@@ -231,16 +231,17 @@ account_trailing_word:
 
 
 
-/* Load the bounds of the longest consecutive physical memory address range
- * that starts at `partrel_offset', has been populated with meaningful data
- * and   contains  at  least  1  byte  (and  at  most  `num_bytes'  bytes).
- * Note  that   `result->mppl_size < num_bytes'   for   multiple   reasons:
- *   - The end of the given mem-part `self' is reached
- *   - Backing physical memory of `self' is scattered, and the next
- *     byte is apart of the  next (discontinuous) chunk of  memory.
- *   - The next block located at the end of the returned range isn't
- *     already loaded in-core. (that is:  doesn't have a state  that
- *     was set to `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG')
+/* Load  the bounds of the longest consecutive physical memory address range
+ * that starts at `partrel_offset', has been populated with meaningful data,
+ * and contains at least 1 byte (and at most `num_bytes' bytes).
+ *
+ * Note that `result->mppl_size < num_bytes' for multiple reasons:
+ *  - The end of the given mem-part `self' is reached
+ *  - Backing physical memory of `self' is scattered, and the next
+ *    byte is apart of the  next (discontinuous) chunk of  memory.
+ *  - The next block located at the end of the returned range isn't
+ *    already loaded in-core. (that is:  doesn't have a state  that
+ *    was set to `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG')
  *
  * NOTE: The caller must be holding a lock to `self'
  * NOTE: The caller is responsible to ensure that `MPART_ST_INMEM(self->mp_state)'
@@ -302,13 +303,13 @@ err_not_loaded:
  * the current state of blocks that are entirely contained within the to-
  * be returned address range.
  *
- * While  `mpart_memaddr_for_read()' requires that  all blocks that overlap
- * with the returned range have a state of are either `MPART_BLOCK_ST_LOAD'
- * or `MPART_BLOCK_ST_CHNG', this function only  requires this for the  0-2
+ * While `mpart_memaddr_for_read()' requires that all blocks that overlap
+ * with the returned range have  a state of either  `MPART_BLOCK_ST_LOAD'
+ * or `MPART_BLOCK_ST_CHNG', this function only requires this for the 0-2
  * blocks that only partially overlap with the returned range.
  *
- * All of the blocks that fully overlap with the returned range are only
- * required  to  not   have  a  state   set  to   `MPART_BLOCK_ST_INIT'.
+ * All of the blocks that fully overlap with the returned range are
+ * only required to not have a state set to  `MPART_BLOCK_ST_INIT'.
  *
  * @return: true:  Success
  * @return: false: Error: At least  one fully  accessed  block has  a  state
@@ -468,28 +469,29 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 
 
 /* Commit modifications made to the given backing address range.
- * For this purpose, this function:
- *   - Set the state of all blocks that fully overlap with the given
- *     address range  to  `MPART_BLOCK_ST_CHNG',  (after  internally
- *     asserting  that their old state wasn't `MPART_BLOCK_ST_INIT')
- *   - Of the 0-2 blocks that only overlap partially with the given
- *     address  range,  make   the  following  state   transitions:
- *      - MPART_BLOCK_ST_LOAD -> MPART_BLOCK_ST_CHNG
- *      - MPART_BLOCK_ST_CHNG -> MPART_BLOCK_ST_CHNG  (i.e. no-op)
- *      - MPART_BLOCK_ST_INIT: Internal assertion failure
- *      - MPART_BLOCK_ST_NDEF:
- *        - If the partially overlapped block isn't the last (iow: right-most)
- *          block (meaning  that the  given address  range partially  overlaps
- *          with its beginning), then an internal assertion fails.
- *        - If the partially overlapped block _is_ the last block,  then
- *          it's state also remains unaltered, and this function returns
- *          the offset from `partrel_offset' to that block's start.
+ * For this purpose, this function will:
+ *  - Set the state of all blocks that fully overlap with the given
+ *    address range  to  `MPART_BLOCK_ST_CHNG',  (after  internally
+ *    asserting  that their old state wasn't `MPART_BLOCK_ST_INIT')
+ *  - Of the 0-2 blocks that only overlap partially with the given
+ *    address  range,  make   the  following  state   transitions:
+ *     - MPART_BLOCK_ST_LOAD -> MPART_BLOCK_ST_CHNG
+ *     - MPART_BLOCK_ST_CHNG -> MPART_BLOCK_ST_CHNG  (i.e. no-op)
+ *     - MPART_BLOCK_ST_INIT: Internal assertion failure
+ *     - MPART_BLOCK_ST_NDEF:
+ *       - If the partially overlapped block isn't the last (iow: right-most)
+ *         block (meaning  that the  given address  range partially  overlaps
+ *         with its beginning), then an internal assertion fails.
+ *       - If the partially overlapped block _is_ the last block,  then
+ *         it's state also remains unaltered, and this function returns
+ *         the offset from `partrel_offset' to that block's start.
  *
  * If this function manages change any at least 1 block to `MPART_BLOCK_ST_CHNG'
  * when that block  wasn't already marked  as such, and  if the associated  file
  * implements the `mo_saveblocks' operator,  then set the MPART_F_CHANGED  flag.
  * If  that flag wasn't  set before, then add  a new reference  to `self' to the
- * list of changed parts of the associated file.
+ * list of changed parts of the associated file (unless the file's list of parts
+ * marked as changed was set to `mf_changed = MFILE_PARTS_ANONYMOUS').
  *
  * @return: * : The   #   of  successfully   committed  bytes.
  *              Usually the same as `num_bytes', but see above */
@@ -585,8 +587,8 @@ after_intermediate_blocks:
 /* Whilst inheriting a lock to `self' from the caller (which is _always_
  * released before this function returns), make sure that the first byte
  * pointed to `partrel_offset' has been loaded for reading (that is: the
- * the containing block has transitioned to one of `MPART_BLOCK_ST_LOAD'
- * or `MPART_BLOCK_ST_CHNG')
+ * containing block has transitioned to one of `MPART_BLOCK_ST_LOAD'  or
+ * `MPART_BLOCK_ST_CHNG')
  * The given `loc->mppl_size' is a hint as to how many consecutive blocks
  * this function should attempt to load, though it will only ever load  a
  * single cluster of consecutive blocks that starts with an uninitialized
@@ -809,11 +811,12 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
  * For this purpose, the caller must ensure that:
  * >> !OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) && endaddr <= mpart_getsize(self)
  *
- * If any of  the blocks within  the given range  had yet to  be marked as  CHNG,
- * and the associated file is  not anonymous, and implements the  `mo_saveblocks'
- * operator, and the `MPART_F_CHANGED' flag had yet to be set for the given part,
- * then set the  `MPART_F_CHANGED' flag  and add `self'  to the  list of  changed
- * parts of its associated file.
+ * If any of the blocks  within the given range had  yet to be marked as  CHNG,
+ * and the associated file is not anonymous, and implements the `mo_saveblocks'
+ * operator, and the  `MPART_F_CHANGED' flag had  yet to be  set for the  given
+ * part, then set  the `MPART_F_CHANGED'  flag and add  `self' to  the list  of
+ * changed parts of its associated file (unless the file's list of parts marked
+ * as changed was set to `mf_changed = MFILE_PARTS_ANONYMOUS').
  * NOTE: The caller must be holding a lock to `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,

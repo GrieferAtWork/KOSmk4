@@ -2404,9 +2404,7 @@ kernel_execveat(fd_t dirfd,
 		/* In order to allow for execution, the file itself must support mmaping.
 		 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
 		 * disabled for the file. */
-		if unlikely((args.ea_xfile->mf_ops->mo_stream &&
-		             args.ea_xfile->mf_ops->mo_stream->mso_mmap) ||
-		            (args.ea_xfile->mf_flags & MFILE_F_NOUSRMMAP))
+		if unlikely(!mfile_hasrawio(args.ea_xfile))
 			THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 
 		/* For filesystem nodes there are a couple of additional checks. */

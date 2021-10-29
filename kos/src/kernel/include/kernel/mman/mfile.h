@@ -1209,21 +1209,23 @@ _mfile_newpart(struct mfile *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
-/* Look at the  neighbors of `part'  and try  to merge them  with `part'.  If
- * no neighbors exist,  or if those  neighbors are so  far away that  merging
- * with them  wouldn't be  efficient, then  simply insert  `part' as-is  into
- * the given mem-file  `self', before  adding `part'  to the  global list  of
- * parts (but only if it has the `MPART_F_GLOBAL_REF' flag set), and  finally
- * releasing a  lock to  `self', as  well as  re-returning a  pointer to  the
- * given part. -  For this  purpose, the  caller must  initialize the  `part'
- * reference    counter    of    `part'    as    `MPART_F_GLOBAL_REF ? 2 : 1'
- * If the `MPART_F_CHANGED' flag is set,  the given part, or the  combination
- * of  it and the to-be returned part will be added to the changed-part list.
- * However, if this is done, the caller is responsible for updating the file,
- * such  that  `MFILE_F_CHANGED'  is  set,  and  `mo_changed()'  is  invoked.
- * If merging was done, returning a reference to the new part against  within
- * the given `part'  was merged  (i.e. the  one that  was left  apart of  the
- * mem-part tree of `self')
+/* Look  at the neighbors of `part' and try to merge them with `part'. If
+ * no neighbors exist, or if those neighbors are so far away that merging
+ * with  them wouldn't be efficient, then simply insert `part' as-is into
+ * the given mem-file `self', before adding `part' to the global list  of
+ * parts, and finally releasing a lock to `self', as well as re-returning
+ * a pointer to the given part.
+ *  - For this purpose,  the caller must  initialize:
+ *    >> part->mp_refcnt = MPART_F_GLOBAL_REF ? 2 : 1
+ *  - If the `MPART_F_CHANGED' flag is  set, the given part, or  the
+ *    combination of it and the to-be returned part will be added to
+ *    the changed-part list.
+ *  - However, if this is done, the caller is responsible for updating
+ *    the file such that `MFILE_F_CHANGED' is set, and  `mo_changed()'
+ *    is invoked.
+ *  - If merging was done, return a reference to the new part against
+ *    within the given `part' was merged (i.e. the one that was  left
+ *    apart of the mem-part tree of `self')
  * This function assumes that:
  *  - @assume(mfile_lock_writing(self));
  *  - @assume(mfile_addr_aligned(self, part->mp_minaddr));
@@ -1248,21 +1250,37 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
 
 
 
+#ifdef CONFIG_USE_NEW_FS
+
+/* Check if the file's raw I/O interface should be used by default.
+ * that is: its mmap operator isn't overwritten, and user-space  is
+ * allowed to mmap() the file itself.
+ *
+ * This is the condition that must be confirmed for a mfile to be
+ * exec(2)-able; else  `E_NOT_EXECUTABLE_NOT_REGULAR' is  thrown. */
+#define mfile_hasrawio(self)                   \
+	((!(self)->mf_ops->mo_stream ||            \
+	  !(self)->mf_ops->mo_stream->mso_mmap) && \
+	 !((self)->mf_flags & MFILE_F_NOUSRMMAP))
+
 
 
 
 /* Read/write raw data to/from a given mem-file.
- * NOTE: File-write functions (almost) always write all data and thus (almost)
- *       always simply re-return `num_bytes'  as-given. The only exception  to
- *       this  rule is when `self' is a `struct fnode' who's associated fsuper
- *       descriptor limits the max size of a file  (`fs_feat.sf_filesize_max')
- *       such that the attempted write  would be located outside the  possible
- *       boundaries of a file.
- *       In  this case, return the # of bytes that could still be written before
- *       the limit is reached, but if this would end up being `0' bytes (because
- *       the initial file-offset was already `> sf_filesize_max'), then an error
- *       `E_FSERROR_FILE_TOO_BIG' is thrown instead. */
-#ifdef CONFIG_USE_NEW_FS
+ * - These function form the _RAW_ I/O interface to the unified file I/O
+ *   buffers. Be careful  about calling these  when operators have  been
+ *   overwritten, in which case `mfile_upread'  and friends may need  to
+ *   be used instead.
+ * - File-write functions (almost) always write all data and thus (almost)
+ *   always simply re-return `num_bytes'  as-given. The only exception  to
+ *   this  rule is when `self' is a `struct fnode' who's associated fsuper
+ *   descriptor limits the max size of a file  (`fs_feat.sf_filesize_max')
+ *   such that the attempted write  would be located outside the  possible
+ *   boundaries of a file.
+ *   In  this case, return the # of bytes that could still be written before
+ *   the limit is reached, but if this would end up being `0' bytes (because
+ *   the initial file-offset was already `> sf_filesize_max'), then an error
+ *   `E_FSERROR_FILE_TOO_BIG' is thrown instead. */
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);

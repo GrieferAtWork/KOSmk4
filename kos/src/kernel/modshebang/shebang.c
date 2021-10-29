@@ -182,9 +182,7 @@ shebang_exec(struct execargs *__restrict args) {
 				 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
 				 * disabled for the file. */
 #ifdef CONFIG_USE_NEW_FS
-				if unlikely((interp_node->mf_ops->mo_stream &&
-				             interp_node->mf_ops->mo_stream->mso_mmap) ||
-				            (interp_node->mf_flags & MFILE_F_NOUSRMMAP))
+				if unlikely(!mfile_hasrawio(interp_node))
 					THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 #endif /* CONFIG_USE_NEW_FS */
 

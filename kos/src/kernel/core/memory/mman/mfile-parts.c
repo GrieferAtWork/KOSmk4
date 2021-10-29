@@ -104,21 +104,23 @@ mfile_extendpart_or_unlock(struct mfile *__restrict self,
 	return MFILE_EXTENDPART_OR_UNLOCK_NOSIB;
 }
 
-/* Look at the  neighbors of `part'  and try  to merge them  with `part'.  If
- * no neighbors exist,  or if those  neighbors are so  far away that  merging
- * with them  wouldn't be  efficient, then  simply insert  `part' as-is  into
- * the given mem-file  `self', before  adding `part'  to the  global list  of
- * parts (but only if it has the `MPART_F_GLOBAL_REF' flag set), and  finally
- * releasing a  lock to  `self', as  well as  re-returning a  pointer to  the
- * given part. -  For this  purpose, the  caller must  initialize the  `part'
- * reference    counter    of    `part'    as    `MPART_F_GLOBAL_REF ? 2 : 1'
- * If the `MPART_F_CHANGED' flag is set,  the given part, or the  combination
- * of  it and the to-be returned part will be added to the changed-part list.
- * However, if this is done, the caller is responsible for updating the file,
- * such  that  `MFILE_F_CHANGED'  is  set,  and  `mo_changed()'  is  invoked.
- * If merging was done, returning a reference to the new part against  within
- * the given `part'  was merged  (i.e. the  one that  was left  apart of  the
- * mem-part tree of `self')
+/* Look  at the neighbors of `part' and try to merge them with `part'. If
+ * no neighbors exist, or if those neighbors are so far away that merging
+ * with  them wouldn't be efficient, then simply insert `part' as-is into
+ * the given mem-file `self', before adding `part' to the global list  of
+ * parts, and finally releasing a lock to `self', as well as re-returning
+ * a pointer to the given part.
+ *  - For this purpose,  the caller must  initialize:
+ *    >> part->mp_refcnt = MPART_F_GLOBAL_REF ? 2 : 1
+ *  - If the `MPART_F_CHANGED' flag is  set, the given part, or  the
+ *    combination of it and the to-be returned part will be added to
+ *    the changed-part list.
+ *  - However, if this is done, the caller is responsible for updating
+ *    the file such that `MFILE_F_CHANGED' is set, and  `mo_changed()'
+ *    is invoked.
+ *  - If merging was done, return a reference to the new part against
+ *    within the given `part' was merged (i.e. the one that was  left
+ *    apart of the mem-part tree of `self')
  * This function assumes that:
  *  - @assume(mfile_lock_writing(self));
  *  - @assume(mfile_addr_aligned(self, part->mp_minaddr));
@@ -149,8 +151,6 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
 	                           : (part->mp_flags & MPART_F_CHANGED) ? 2 : 1));
 	assert(part->mp_file == self);
 
-	/* TODO: Try to merge with an existing part! */
-
 	/* Try to insert the new part into the tree. */
 	if unlikely(!mpart_tree_tryinsert(&self->mf_parts, part))
 		return NULL;
@@ -177,7 +177,9 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
 
 	mpart_all_list_insert(part);
 	mfile_lock_endwrite(self);
-	return part;
+
+	/* Try to merge the part. */
+	return mpart_merge(part);
 }
 
 

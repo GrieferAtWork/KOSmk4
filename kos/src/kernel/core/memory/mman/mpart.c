@@ -488,7 +488,7 @@ DECL_BEGIN
  *       flag! But  note that  that flag  should  _NOT_ be  cleared by  the  one
  *       who  originally  set  it,  since  other  (unrelated)  blocks  may exist
  *       that still make use of the `MPART_BLOCK_ST_CHNG' state!
- * @param: at:  One of `MPART_BLOCK_ST_*'
+ * @param: st:  One of `MPART_BLOCK_ST_*'
  * @return: * : *ditto* */
 PUBLIC NOBLOCK ATTR_PURE NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_getblockstate)(struct mpart const *__restrict self,

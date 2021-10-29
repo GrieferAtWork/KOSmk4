@@ -5548,7 +5548,7 @@ driver_loadmod_filename(USER CHECKED char const *driver_filename,
 
 	/* Verify that we're dealing with a regular file. */
 #ifdef CONFIG_USE_NEW_FS
-	if (!mfile_isreg(driver_file))
+	if (!mfile_hasrawio(driver_file))
 #else /* CONFIG_USE_NEW_FS */
 	if (!INODE_ISREG((struct inode *)driver_file))
 #endif /* !CONFIG_USE_NEW_FS */

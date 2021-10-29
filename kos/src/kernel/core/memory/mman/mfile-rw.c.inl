@@ -883,10 +883,6 @@ restart_after_extendpart_tail:
 		if (io_bytes == (size_t)-1) {
 			/* Undo, and repeat the entire call with buffered memory access! */
 			mpart_truncate_undo(self, part, old_part_size);
-			mpart_truncate_restore(part, old_part_size);
-			mpart_lock_release(part);
-			mfile_lock_end(self);
-			decref_unlikely(part);
 
 			/* Must perform the operation while blocking. */
 #if defined(DEFINE_mfile_tailwrite)
@@ -944,9 +940,10 @@ extend_undo:
 extend_failed:
 #endif /* !__OPTIMIZE_SIZE__ */
 
-	/* Must create a new part  for the accessed address range,  and directly write to  said
-	 * part.  Afterwards,  try to  insert this  new part  into the  file, and  increase the
-	 * file's   size.   (do    this   using    `mfile_insert_and_merge_part_and_unlock()').
+	/* Must create a new part for the accessed address range, and directly write to said
+	 * part. Afterwards, try to  insert this new  part into the  file, and increase  the
+	 * file's size. (do this using `mfile_insert_and_merge_part_and_unlock()').
+	 *
 	 * However,  if this part fails (i.e. `NULL' is returned), then we must not immediately
 	 * discard the part if the caller-given buffer  is located in virtual memory, but  must
 	 * instead using its backing physical memory as a new physical source buffer from which
@@ -1122,12 +1119,13 @@ handle_part_insert_failure:
 #endif /* !LOCAL_BUFFER_IS_PHYS */
 		}
 
-		/* Have the file's `mf_changed' list inherit a reference to `inserted_part',
+		/* Have the file's `mf_changed' list inherit a reference to `inserted_part'.
+		 *
 		 * With  the inclusion of the new changed part, we must always mark the file
 		 * as (possibly) containing modified parts.  We're allowed to set this  flag
 		 * even  if  `mfile_insert_and_merge_part_and_unlock()' didn't  add anything
 		 * to  the changed part list (because the  file may have become anonymous in
-		 * the mean time), since this flag only means: There _may_ be changed parts. */
+		 * the mean time), since this flag only means: there _may_ be changed parts. */
 		changes = MFILE_F_CHANGED;
 
 		/* Atomically increase the file size to `offset + num_bytes', but  do

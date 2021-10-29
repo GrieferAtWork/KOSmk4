@@ -1470,7 +1470,7 @@ err_badalloc:
  *       otherwise this function will result in an internal assertion failure.
  * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
  *       the list is still allowed to contain dead nodes that are about  to,
- *       or have already been added to the dead nodes list.
+ *       or have already been added as lock-ops to `mp_lockops'.
  *       However, the mmans of all nodes still apart of the mp_copy list have
  *       already been destroyed, such that  no alive copy-nodes still  exist! */
 PUBLIC WUNUSED NONNULL((1, 3)) bool FCALL

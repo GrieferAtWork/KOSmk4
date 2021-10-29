@@ -175,9 +175,7 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
 	 * disabled for the file. */
 #ifdef CONFIG_USE_NEW_FS
-	if unlikely((args.ea_xfile->mf_ops->mo_stream &&
-	             args.ea_xfile->mf_ops->mo_stream->mso_mmap) ||
-	            (args.ea_xfile->mf_flags & MFILE_F_NOUSRMMAP))
+	if unlikely(!mfile_hasrawio(args.ea_xfile))
 		THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 #endif /* CONFIG_USE_NEW_FS */
 

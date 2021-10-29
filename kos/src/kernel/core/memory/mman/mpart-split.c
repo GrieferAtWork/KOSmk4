@@ -731,14 +731,14 @@ again:
 
 
 
-/* Split  the given mem-part  `self' (which should be  a member of `file')
- * after `offset' bytes from the start of backing file. For this  purpose,
- * the given `offset' should be `> mpart_getminaddr(self)', and both page-
- * and block-aligned.
- * @return: NULL: The  given `offset' is  greater than the  size of the part
- *                at the time the request was made. The caller should handle
- *                this case by re-checking for a missing part, and  creating
- *                that part if it cannot be found.
+/* Split the given mem-part `self' (which  should be a member of  `file')
+ * after `offset' bytes from the start of backing file. For this purpose,
+ * the given `offset' should  be `> mpart_getminaddr(self)', and must  be
+ * both page- and block-aligned.
+ * @return: NULL: The given `offset' is outside  the bounds of file  memory
+ *                represented by `part'. The caller should handle this case
+ *                by re-checking for a missing part, and creating that part
+ *                if it cannot be found.
  * @return: * :   A reference to a part that (at one point) began at `offset' */
 PUBLIC NONNULL((1)) REF struct mpart *FCALL
 mpart_split(struct mpart *__restrict self,
