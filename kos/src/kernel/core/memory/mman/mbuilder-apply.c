@@ -423,7 +423,22 @@ again:
 		else {
 			pagedir_unmap_userspace_nosync_p(target->mm_pagedir_p);
 		}
+
+		/* Because our thread is  supposed to continue running,  and
+		 * because  user-space (presumably) contained stuff prior to
+		 * the exec, we must still sync the user-space portion  (and
+		 * also the page directory identity mapping, should that one
+		 * exist on this arch).
+		 *
+		 * Otherwise, we'd be executing user-space with a messed-up
+		 * TLB (since it may still contain entries relevant to  the
+		 * old state of user-space)
+		 *
+		 * Since we're only talking user-space here, it's enough to
+		 * sync  it alone (as  opposed to ding `pagedir_syncall()') */
+		pagedir_syncall_user();
 	}
+
 
 	/* Do the actual job of applying the new node-tree, as
 	 * well as clearing the  mman's page directory of  all

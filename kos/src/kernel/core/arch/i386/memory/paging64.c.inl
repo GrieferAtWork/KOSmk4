@@ -1266,29 +1266,50 @@ again_try_exchange_e2_word:
 #define assert_prepared(addr, num_bytes) (void)0
 #define assert_prepared_if(cond, addr, num_bytes) (void)0
 #else /* NDEBUG */
-PRIVATE NOBLOCK WUNUSED bool
-NOTHROW(FCALL p64_pagedir_isprepared)(VIRT void *addr) {
+PRIVATE NOBLOCK void
+NOTHROW(FCALL p64_pagedir_assert_prepared)(VIRT void *addr,
+                                           PAGEDIR_PAGEALIGNED VIRT void *range_addr,
+                                           PAGEDIR_PAGEALIGNED size_t range_num_bytes) {
 	uintptr_t word;
 	unsigned int vec4, vec3, vec2, vec1;
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	word = P64_PDIR_E4_IDENTITY[vec4].p_word;
-	if unlikely(!(word & P64_PAGE_FPRESENT))
-		return false; /* Not mapped */
+	assertf(word & P64_PAGE_FPRESENT,
+	        "Page at %p of range %p...%p isn't prepared\n"
+	        "%p=P64_PDIR_E4_IDENTITY[%u] = %#" PRIxPTR " (!P64_PAGE_FPRESENT)\n",
+	        addr, range_addr, (byte_t *)range_addr + range_num_bytes - 1,
+	        &P64_PDIR_E4_IDENTITY[vec4].p_word, vec4, word);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
-	if unlikely(!(word & P64_PAGE_FPRESENT))
-		return false; /* Not mapped */
-	if unlikely(word & P64_PAGE_F1GIB)
-		return false; /* 1GiB page */
+	assertf(word & P64_PAGE_FPRESENT,
+	        "Page at %p of range %p...%p isn't prepared\n"
+	        "%p=P64_PDIR_E3_IDENTITY[%u][%u] = %#" PRIxPTR " (!P64_PAGE_FPRESENT)\n",
+	        addr, range_addr, (byte_t *)range_addr + range_num_bytes - 1,
+	        &P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, vec4, vec3, word);
+	assertf(!(word & P64_PAGE_F1GIB),
+	        "Page at %p of range %p...%p isn't prepared\n"
+	        "%p=P64_PDIR_E3_IDENTITY[%u][%u] = %#" PRIxPTR " (P64_PAGE_F1GIB)\n",
+	        addr, range_addr, (byte_t *)range_addr + range_num_bytes - 1,
+	        &P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, vec4, vec3, word);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
 	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
-	if unlikely(!(word & P64_PAGE_FPRESENT))
-		return false; /* Not mapped */
-	if unlikely(word & P64_PAGE_F2MIB)
-		return false; /* 2MiB page */
+	assertf(word & P64_PAGE_FPRESENT,
+	        "Page at %p of range %p...%p isn't prepared\n"
+	        "%p=P64_PDIR_E2_IDENTITY[%u][%u][%u] = %#" PRIxPTR " (!P64_PAGE_FPRESENT)\n",
+	        addr, range_addr, (byte_t *)range_addr + range_num_bytes - 1,
+	        &P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, vec4, vec3, vec2, word);
+	assertf(!(word & P64_PAGE_F2MIB),
+	        "Page at %p of range %p...%p isn't prepared\n"
+	        "%p=P64_PDIR_E2_IDENTITY[%u][%u][%u] = %#" PRIxPTR " (P64_PAGE_F2MIB)\n",
+	        addr, range_addr, (byte_t *)range_addr + range_num_bytes - 1,
+	        &P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, vec4, vec3, vec2, word);
 	vec1 = P64_PDIR_VEC1INDEX(addr);
 	word = ATOMIC_READ(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
-	return (word & P64_PAGE_FPREPARED) || P64_PDIR_E1_ISHINT(word);
+	assertf((word & P64_PAGE_FPREPARED) || P64_PDIR_E1_ISHINT(word),
+	        "Page at %p of range %p...%p isn't prepared\n"
+	        "%p=P64_PDIR_E1_IDENTITY[%u][%u][%u][%u] = %#" PRIxPTR "\n",
+	        addr, range_addr, (byte_t *)range_addr + range_num_bytes - 1,
+	        &P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, vec4, vec3, vec2, vec1, word);
 }
 #define assert_prepared_if(cond, addr, num_bytes) \
 	((cond) ? assert_prepared(addr, num_bytes) : (void)0)
@@ -1298,9 +1319,7 @@ NOTHROW(KCALL assert_prepared)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	size_t i;
 	for (i = 0; i < num_bytes; i += PAGESIZE) {
 		void *ptr = (byte_t *)addr + i;
-		assertf(p64_pagedir_isprepared(ptr),
-		        "Page at %p of range %p...%p isn't prepared",
-		        ptr, addr, (byte_t *)addr + num_bytes - 1);
+		p64_pagedir_assert_prepared(ptr, addr, num_bytes);
 	}
 }
 #endif /* !NDEBUG */
