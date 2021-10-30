@@ -28,6 +28,8 @@
 #include <kernel/mman/phys-access.h>
 #include <kernel/mman/phys.h>
 
+#include <hybrid/overflow.h>
+
 #include <kos/io.h>
 #include <sys/stat.h>
 
@@ -89,12 +91,14 @@ printnode_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
 	struct printnode_ops const *ops;
 	struct printnode *me;
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-	size_t io_max;
-	if unlikely(addr > (pos_t)SIZE_MAX)
-		return 0;
-	io_max = ((size_t)SIZE_MAX - addr) + 1;
-	if unlikely(num_bytes > io_max)
-		num_bytes = io_max;
+	size_t io_end;
+	if unlikely(OVERFLOW_UADD(addr, num_bytes, &io_end)) {
+		if unlikely(addr > (pos_t)SIZE_MAX)
+			return 0;
+		io_end = (size_t)0 - addr;
+		if unlikely(num_bytes > io_end)
+			num_bytes = io_end;
+	}
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 	me  = mfile_asprintnode(self);
 	ops = printnode_getops(me);
@@ -189,12 +193,14 @@ printnode_v_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict 
 	struct printnode_ops const *ops;
 	struct printnode *me;
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-	size_t io_max;
-	if unlikely(addr > (pos_t)SIZE_MAX)
-		return 0;
-	io_max = ((size_t)SIZE_MAX - addr) + 1;
-	if unlikely(num_bytes > io_max)
-		num_bytes = io_max;
+	size_t io_end;
+	if unlikely(OVERFLOW_UADD(addr, num_bytes, &io_end)) {
+		if unlikely(addr > (pos_t)SIZE_MAX)
+			return 0;
+		io_end = (size_t)0 - addr;
+		if unlikely(num_bytes > io_end)
+			num_bytes = io_end;
+	}
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 	me  = mfile_asprintnode(self);
 	ops = printnode_getops(me);
@@ -265,15 +271,17 @@ printnode_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 	struct printnode_ops const *ops;
 	struct printnode *me;
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-	size_t io_max;
-	if unlikely(addr > (pos_t)SIZE_MAX) {
-		bzerophyscc(buf, num_bytes);
-		return;
-	}
-	io_max = ((size_t)SIZE_MAX - addr) + 1;
-	if unlikely(num_bytes > io_max) {
-		bzerophyscc(buf + io_max, num_bytes - io_max);
-		num_bytes = io_max;
+	size_t io_end;
+	if unlikely(OVERFLOW_UADD(addr, num_bytes, &io_end)) {
+		if unlikely(addr > (pos_t)SIZE_MAX) {
+			bzerophyscc(buf, num_bytes);
+			return;
+		}
+		io_end = (size_t)0 - addr;
+		if unlikely(num_bytes > io_end) {
+			bzerophyscc(buf + io_end, num_bytes - io_end);
+			num_bytes = io_end;
+		}
 	}
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 	me  = mfile_asprintnode(self);
