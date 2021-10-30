@@ -34,6 +34,7 @@
 #include <kernel/fs/blkdev.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/super.h>
+#include <kernel/printk.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -268,6 +269,8 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 	        "Mounting points would have references");
 	assertf(!LIST_ISBOUND(me, fs_changedsuper),
 	        "The changed-list would have a reference");
+	printk(KERN_INFO "[fs] Destroying %s-superblock\n",
+	       me->fs_sys->ffs_name);
 
 	/* Drop references */
 	decref(me->fs_sys);
@@ -560,6 +563,8 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
 	if (!mfile_begin_delete(&self->fs_root))
 		return; /* Already deleted, or deletion already in progress. */
 
+	printk(KERN_INFO "[fs] Deleting %s-superblock\n",
+	       self->fs_sys->ffs_name);
 	incref(self);
 
 	/* Remove from the list of all superblocks */

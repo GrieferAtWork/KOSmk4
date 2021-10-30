@@ -29,6 +29,7 @@
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/super.h>
+#include <kernel/printk.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
@@ -92,6 +93,8 @@ ffilesys_open(struct ffilesys *__restrict self,
 	/* Open the superblock */
 	result = (*self->ffs_open)(self, dev, args);
 	if (result != NULL) {
+		printk(KERN_INFO "[fs] Created %s-superblock\n", self->ffs_name);
+
 		/* Fill in fields as documented by `ffs_open' */
 		assert(result->fs_root.mf_ops && ADDR_ISKERN(result->fs_root.mf_ops));
 		assert(result->fs_root.mf_ops->mo_destroy != NULL);
