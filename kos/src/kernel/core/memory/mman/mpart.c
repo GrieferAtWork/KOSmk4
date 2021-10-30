@@ -217,17 +217,7 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
-	assert(LIST_EMPTY(&self->mp_copy));
-	assert(LIST_EMPTY(&self->mp_share));
 	assert(!(self->mp_flags & MPART_F_GLOBAL_REF));
-
-	/* Make sure that we've served _all_ dead nodes that may have still been there. */
-	while (!SLIST_EMPTY(&self->mp_lockops)) {
-		Toblockop(mpart) *lop;
-		lop = SLIST_FIRST(&self->mp_lockops);
-		SLIST_REMOVE_HEAD(&self->mp_lockops, olo_link);
-		(*lop->olo_func)(lop, self);
-	}
 
 	/* If valid, free the block-status extension vector. */
 	if (!(self->mp_flags & MPART_F_BLKST_INL))
