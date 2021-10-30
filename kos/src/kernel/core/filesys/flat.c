@@ -1113,6 +1113,11 @@ again_locked:
 	flatdirnode_remove_from_bypos(me, ent);
 	flatdirnode_endwrite(me);
 
+	/* Drop the reference returned by `flatdirnode_remove_from_bypos()'
+	 * We  can use *_nokill because the caller is still holding another
+	 * reference! */
+	decref_nokill(ent);
+
 	/* Decrement the NLINK counter of `file' */
 	{
 		bool deleted;
@@ -1429,6 +1434,9 @@ again:
 
 			/* Add the new entry to the target directory. */
 			flatdirnode_addentry_to_stream(nd, newent, info->frn_file);
+			/* FIXME: The FAT driver incref's `newent' during `flatdirnode_addentry_to_stream()',
+			 *        but if the next part fails  we unconditionally destroy the dirent,  causing
+			 *        it remain dangling within FAT-fs-specific data! */
 
 			/* If present, delete the pre-existing file in `nd' */
 			if (existing) {
