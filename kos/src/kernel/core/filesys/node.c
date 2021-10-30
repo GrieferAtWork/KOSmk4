@@ -1121,6 +1121,9 @@ NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
  *  - Call `mfile_delete()' (technically `mfile_delete_impl()') */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fnode_delete)(struct fnode *__restrict self) {
+	assertf(!fnode_isdevice(self), "You need to use `device_delete()' in this case!");
+	assertf(!fnode_issuper(self), "You need to use `super_delete()' in this case!");
+
 	if (!fnode_delete_strt(self))
 		return; /* Already deleted, or deletion already in progress. */
 	incref(self);

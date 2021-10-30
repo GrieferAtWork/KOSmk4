@@ -270,6 +270,8 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 	        "Mounting points would have references");
 	assertf(!LIST_ISBOUND(me, fs_changedsuper),
 	        "The changed-list would have a reference");
+
+	/* Drop references */
 	if (me->fs_dev) {
 		if (mfile_isdevice(me->fs_dev)) {
 			struct device *dev = mfile_asdevice(me->fs_dev);
@@ -281,14 +283,16 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 			printk(KERN_INFO "[fs] Destroying %s-superblock bound to [mfile]\n",
 			       me->fs_sys->ffs_name);
 		}
+
+		/* Must also drop the trunc-lock acquired when the superblock was created. */
+		mfile_trunclock_dec(me->fs_dev);
+		decref(me->fs_dev);
 	} else {
 		printk(KERN_INFO "[fs] Destroying %s-superblock\n",
 		       me->fs_sys->ffs_name);
 	}
 
-	/* Drop references */
 	decref(me->fs_sys);
-	xdecref(me->fs_dev);
 
 	/* Continue destruction one level deeper */
 	fdirnode_v_destroy(&me->fs_root);
