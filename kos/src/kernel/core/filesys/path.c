@@ -229,7 +229,8 @@ NOTHROW(LOCKOP_CC path_remove_from_parent_postlop)(Tobpostlockop(path) *__restri
 						/* Delete the superblock */
 						drv = super->fs_sys->ffs_drv;
 						fsuper_delete(super);
-						decref_unlikely(dir);
+						decref(dir);
+
 						/* This reference was originally held by `path_asmount(mount)->pm_fsmount' */
 						decref_unlikely(drv);
 						path_free(me);

@@ -263,7 +263,8 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 	assertf(me->fs_nodes == NULL ||
 	        me->fs_nodes == FSUPER_NODES_DELETED,
 	        "Nodes would have references");
-	assertf(me->fs_mounts.lh_first == NULL,
+	assertf(me->fs_mounts.lh_first == NULL ||
+	        me->fs_mounts.lh_first == FSUPER_MOUNTS_DELETED,
 	        "Mounting points would have references");
 	assertf(!LIST_ISBOUND(me, fs_changedsuper),
 	        "The changed-list would have a reference");
