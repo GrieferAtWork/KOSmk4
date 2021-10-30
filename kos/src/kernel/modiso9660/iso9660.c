@@ -81,10 +81,19 @@ PRIVATE NONNULL((1, 5)) void KCALL
 iso9660_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                      physaddr_t buf, size_t num_bytes,
                      struct aio_multihandle *__restrict aio) {
-	struct fnode *me = mfile_asnode(self);
-	pos_t diskaddr   = fnode_getdiskaddr(me, addr);
-	blkdev_rdsectors_async(me->fn_super->fs_dev, diskaddr,
-	                       buf, num_bytes, aio);
+	struct fnode *me   = mfile_asnode(self);
+	pos_t diskaddr     = fnode_getdiskaddr(me, addr);
+	struct blkdev *dev = me->fn_super->fs_dev;
+	if likely(dev->mf_blockshift <= me->mf_blockshift) {
+		/* Backing  device has same or less restrictive alignment
+		 * constraints, meaning that we're able to use direct I/O */
+		blkdev_rdsectors_async(me->fn_super->fs_dev, diskaddr,
+		                       buf, num_bytes, aio);
+	} else {
+		/* Ooof... Backing device has more constraints than we
+		 * do; need to use buffered  I/O to work around  that. */
+		mfile_readall_p(me->fn_super->fs_dev, buf, num_bytes, diskaddr);
+	}
 }
 
 

@@ -818,8 +818,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       also supports via the `O_DIRECT' flag. As such, we should add support
 	 *       for that flag! */
 
-	/* TODO: Re-write `modiso9660' for the new filesystem. */
-
 	/* TODO: The devfs root directory rename() operator should really be  re-written
 	 *       from scratch (and the ramfs one should be, too). Both don't really work
 	 *       correctly  with all of  the special AT_RENAME_*  flags, since they were
@@ -829,7 +827,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       can finally go away! (also: deemon doesn't use it, so don't  worry) */
 
 	/* TODO: Change `fsuper' to not require a `blkdev', but `mfile+mfile_hasrawio()'
-	 *       Also  document  that `blkdev'  files _must_  support `mfile_hasrawio()' */
+	 *       Also  document  that `blkdev'  files _must_  support `mfile_hasrawio()'
+	 * XXX:  Is this really a good idea? Maybe, but `blkdev' guaranties that both
+	 *       loadblocks & saveblocks are _always_ implemented, which is something
+	 *       that filesystem drivers are (and do) assume to be the case... */
 
 	/* TODO: Rewrite `handle_manager' to make it  possible for fds to be  allocated
 	 *       in a 2-step process: #1: reserve, #2: commit (where commit must behave
