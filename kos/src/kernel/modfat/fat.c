@@ -776,7 +776,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL FatReg_Destroy)(struct mfile *__restrict self) {
 	FatRegNode *me = mfile_asfatreg(self);
 	FatNodeData_Fini(&me->frn_fdat);
-	flatdirnode_v_destroy(self);
+	fregnode_v_destroy(self);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -791,7 +791,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL FatLnk_Destroy)(struct mfile *__restrict self) {
 	FatLnkNode *me = mfile_asfatlnk(self);
 	FatNodeData_Fini(&me->fln_fdat);
-	flatdirnode_v_destroy(self);
+	flnknode_v_destroy(self);
 }
 
 PRIVATE byte_t const Fat_CygwinSymlinkMagic[] = { '!', '<', 's', 'y', 'm', 'l', 'i', 'n', 'k', '>' };
