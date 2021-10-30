@@ -131,7 +131,6 @@ struct chrdev;
  *      - [W] !MFILE_F_NOUSRIO;
  *      - [W] !MFILE_F_FIXEDFILESIZE;
  *   - fdirnode:
- *      - [W] MFILE_F_DELETED || mf_filesize == (pos_t)-1;
  *      - [W] MFILE_F_DELETED || fn_nlink == 1;
  *      - [W] MFILE_F_NOUSRMMAP;
  *      - [W] MFILE_F_NOUSRIO;
@@ -170,7 +169,6 @@ struct chrdev;
  *      - [W] MFILE_F_NOUSRIO;
  *      - [W] MFILE_F_FIXEDFILESIZE;
  *   - fsuper:
- *      - [W] MFILE_F_DELETED || mf_filesize == (pos_t)-1;
  *      - [W] MFILE_F_DELETED || fn_nlink == 1;
  *      - [W] MFILE_F_NOUSRMMAP;
  *      - [W] MFILE_F_NOUSRIO;
@@ -310,6 +308,12 @@ struct fnode
 #ifndef FNODE_FSDATA_T
 #define FNODE_FSDATA_T void
 #endif /* !FNODE_FSDATA_T */
+#ifdef __WANT_FNODE_FSDATAINT
+	union {
+		uintptr_t      fn_fsdataint; /* Fs-specific data word as integer. */
+		FNODE_FSDATA_T*fn_fsdata;    /* ... */
+	};
+#else /* __WANT_FNODE_FSDATAINT */
 	FNODE_FSDATA_T    *fn_fsdata; /* [?..?][lock(?)] Optional,  fs-specific data  pointer or  data-word.
 	                               * Since the different standard sub-classes of `fnode' have  different
 	                               * struct sizes, it is normally quite difficult for filesystems to add
@@ -318,6 +322,7 @@ struct fnode
 	                               * can use this field for: have it point to somewhere else in the node
 	                               * structure,  preferably to a fs-specific data blob which can then be
 	                               * shared by _all_ nodes allocated for your filesystem. */
+#endif /* !__WANT_FNODE_FSDATAINT */
 };
 
 #ifdef __WANT_FNODE__fn_alllop

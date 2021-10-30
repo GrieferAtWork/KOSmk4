@@ -118,13 +118,14 @@ struct flatdirnode_xops {
 	 *  - return->fde_ent.fd_ops     = ...;     # likely set to `flatdirent_ops'
 	 *  - return->fde_ent.fd_ino     = ...;     # FS-specific (important for `flatsuper_ops::ffso_makenode')
 	 *  - return->fde_ent.fd_type    = ...;     # File type   (important for `flatsuper_ops::ffso_makenode')
-	 *  - return->fde_ent.fd_name    = ...;     # NUL-terminated, `fd_namelen'-long filename
+	 *  - return->fde_ent.fd_name    = ...;     # `fd_namelen'-character long filename (NUL terminator done by caller)
 	 *  - return->fde_ent.fd_namelen = ...;     # Length of filename
 	 *  - return->fde_pos            = ...;     # Some value >= pos
 	 *  - return->fde_size           = ...;     # Some value > 0
 	 * The caller of this function will initialize:
 	 *  - return->fde_bypos         = ...;      # Caller will insert into by-position list
 	 *  - return->fde_ent.fd_refcnt = 1;
+	 *  - return->fde_ent.fd_name[return->fde_ent.fd_namelen] = '\0';
 	 *  - return->fde_ent.fd_hash   = fdirent_hash(return->fde_ent.fd_name, return->fde_ent.fd_namelen);
 	 *  - ...;                                  # Caller will insert into hash-vector (case-sensitive; duplicate
 	 *                                          # names are automatically corrected by deleting duplicate files)

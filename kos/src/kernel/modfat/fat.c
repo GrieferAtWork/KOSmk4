@@ -981,7 +981,7 @@ readnext:
 			len    = (size_t)(dst - lfn_name);
 			result = _fatdirent_alloc(len);
 			result->fad_ent.fde_ent.fd_namelen = (u16)len;
-			*(char *)mempcpy(result->fad_ent.fde_ent.fd_name, lfn_name, len, sizeof(char)) = '\0';
+			memcpy(result->fad_ent.fde_ent.fd_name, lfn_name, len, sizeof(char));
 			result->fad_ent.fde_pos  = lfn_start;
 			result->fad_ent.fde_size = (size_t)(pos - lfn_start);
 		}
@@ -1055,7 +1055,7 @@ dos_8dot3:
 
 		/* Fill in remaining. */
 		result->fad_ent.fde_ent.fd_ops  = &fatdirent_ops;
-		memcpy(result->fad_ent.fde_ent.fd_name, usedname, usedname_len + 1, sizeof(char));
+		memcpy(result->fad_ent.fde_ent.fd_name, usedname, usedname_len, sizeof(char));
 		result->fad_ent.fde_ent.fd_namelen = usedname_len;
 		result->fad_ent.fde_pos  = pos;
 		result->fad_ent.fde_size = sizeof(struct fat_dirent);
@@ -1793,7 +1793,7 @@ PRIVATE struct fregnode_ops const Fat_RegOps = {
 			.mo_destroy    = &FatReg_Destroy,
 			.mo_loadblocks = &Fat_LoadBlocks,
 			.mo_saveblocks = &Fat_SaveBlocks,
-			.mo_changed    = &fnode_v_changed,
+			.mo_changed    = &fregnode_v_changed,
 			.mo_stream     = NULL,
 			/* TODO: Truncate operator (call the underlying truncate before freeing out-of-bounds clusters) */
 		},
@@ -2457,6 +2457,13 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		shared_rwlock_init(&result->ft_fat_lock);
 		result->ft_free_pos = 0;
 
+		/* Configure root directory behavior. */
+		atomic64_init(&result->ft_super.ffs_super.fs_root.mf_filesize, (uint64_t)-1);
+		result->ft_super.ffs_super.fs_root.mf_parts = NULL;
+		SLIST_INIT(&result->ft_super.ffs_super.fs_root.mf_changed);
+		result->ft_super.ffs_super.fs_root.mf_flags = MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE;
+		result->ft_super.ffs_super.fs_root.fn_mode  = S_IFDIR | 0777;
+
 		/* Extract some common information. */
 		result->ft_fat_start   = (FatSectorIndex)LETOH16(disk->bpb.bpb_reserved_sectors);
 		result->ft_sec4clus    = (size_t)disk->bpb.bpb_sectors_per_cluster;
@@ -2627,9 +2634,6 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 
 		/* Fill in mandatory superblock fields. */
 		/*result->ft_super.ffs_super.fs_root.mf_blockshift       = result->ft_sectorshift;*/ /* It's the same field! */
-		result->ft_super.ffs_super.fs_root.mf_parts = NULL;
-		SLIST_INIT(&result->ft_super.ffs_super.fs_root.mf_changed);
-		result->ft_super.ffs_super.fs_root.mf_flags              = MFILE_F_NORMAL;
 		result->ft_super.ffs_super.fs_root.fn_ino                = 0;
 		result->ft_super.ffs_super.fs_feat.sf_filesize_max       = (pos_t)UINT32_MAX;
 		result->ft_super.ffs_super.fs_feat.sf_uid_max            = 0;

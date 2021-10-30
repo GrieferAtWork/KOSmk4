@@ -345,6 +345,7 @@ again_readend_locked:
 
 	/* Fill in missing fields. */
 	if (result) {
+		result->fde_ent.fd_name[result->fde_ent.fd_namelen] = '\0';
 		result->fde_ent.fd_hash = fdirent_hash(result->fde_ent.fd_name,
 		                                       result->fde_ent.fd_namelen);
 	}
@@ -413,6 +414,7 @@ handle_result_after_wrlock:
 			next_result = (*ops->fdno_flat.fdnx_readdir)(me, flatdirent_endaddr(result));
 			assert(!next_result || flatdirent_basaddr(next_result) >= flatdirent_endaddr(result));
 			if (next_result) {
+				next_result->fde_ent.fd_name[next_result->fde_ent.fd_namelen] = '\0';
 				next_result->fde_ent.fd_hash = fdirent_hash(next_result->fde_ent.fd_name,
 				                                            next_result->fde_ent.fd_namelen);
 			}
@@ -514,6 +516,7 @@ flatdirnode_readdir_and_upgrade(struct flatdirnode *__restrict self) {
 	assert(!ent || flatdirent_basaddr(ent) >= nextpos);
 	/* Fill in missing fields. */
 	if (ent) {
+		ent->fde_ent.fd_name[ent->fde_ent.fd_namelen] = '\0';
 		ent->fde_ent.fd_hash = fdirent_hash(ent->fde_ent.fd_name,
 		                                    ent->fde_ent.fd_namelen);
 	}
@@ -566,6 +569,7 @@ handle_ent_after_wrlock:
 			next_ent = (*ops->fdno_flat.fdnx_readdir)(self, flatdirent_endaddr(ent));
 			assert(!next_ent || flatdirent_basaddr(next_ent) >= flatdirent_endaddr(ent));
 			if (next_ent) {
+				next_ent->fde_ent.fd_name[next_ent->fde_ent.fd_namelen] = '\0';
 				next_ent->fde_ent.fd_hash = fdirent_hash(next_ent->fde_ent.fd_name,
 				                                         next_ent->fde_ent.fd_namelen);
 			}

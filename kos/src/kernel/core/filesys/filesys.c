@@ -95,6 +95,12 @@ ffilesys_open(struct ffilesys *__restrict self,
 		/* Fill in fields as documented by `ffs_open' */
 		assert(result->fs_root.mf_ops && ADDR_ISKERN(result->fs_root.mf_ops));
 		assert(result->fs_root.mf_ops->mo_destroy != NULL);
+		assertf(!(result->fs_root.mf_flags & ~(MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
+		                                       MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |
+		                                       MFILE_F_NOATIME | MFILE_F_NOMTIME | MFILE_FN_NODIRATIME |
+		                                       MFILE_F_STRICTATIME | MFILE_F_LAZYTIME |
+		                                       MFILE_F_PERSISTENT | MFILE_FN_ATTRREADONLY)),
+		        "Only flags from this set may be set by fs-specific superblock open functions");
 		assert(ADDR_ISKERN(result->fs_root.mf_ops->mo_destroy));
 		result->fs_root.mf_refcnt = 1;
 		atomic_rwlock_init(&result->fs_root.mf_lock);
@@ -102,14 +108,13 @@ ffilesys_open(struct ffilesys *__restrict self,
 		SLIST_INIT(&result->fs_root.mf_lockops);
 		SLIST_INIT(&result->fs_root.mf_changed);
 		result->fs_root.mf_part_amask = MAX(PAGESIZE, 1 << result->fs_root.mf_blockshift) - 1;
-		result->fs_root.mf_flags |= MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE;
 		result->fs_root.mf_trunclock = 0;
-		atomic64_init(&result->fs_root.mf_filesize, (uint64_t)-1);
+		/*atomic64_init(&result->fs_root.mf_filesize, (uint64_t)-1);*/ /* Allowed to have custom values. */
 		result->fs_root.mf_atime = realtime();
 		result->fs_root.mf_mtime = result->fs_root.mf_atime;
 		result->fs_root.mf_ctime = result->fs_root.mf_atime;
 		result->fs_root.fn_nlink = 1;
-		result->fs_root.fn_mode  = S_IFDIR | 0777;
+		assert(S_ISDIR(result->fs_root.fn_mode)); /* Only . */
 		result->fs_root.fn_uid   = 0;
 		result->fs_root.fn_gid   = 0;
 		result->fs_root.fn_super = result;

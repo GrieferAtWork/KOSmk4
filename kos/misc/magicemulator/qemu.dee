@@ -190,7 +190,7 @@ did_update_x86_64_kernel:
 //		"-initrd", "bin/i386-kos/drivers/ext2fs e f g h",
 		"-drive", "file=" + DISK_FILENAME + ",format=raw,index=0,media=disk",
 #if 0
-		"-drive", "file=bin/Postal2.iso,format=raw,index=1,media=disk",
+		"-drive", "file=../disk.iso,format=raw,index=1,media=disk",
 		"-drive", "file=bin/ext2.img,format=raw,index=2,media=disk",
 #endif
 		"-smp", options.get(opt.SMP, opt.SMP_DEFAULT),

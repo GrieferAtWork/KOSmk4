@@ -1104,14 +1104,17 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	ramfs_dirdata_init(&result->rs_dat);
 
 	/* Generic fields. */
-	result->fs_root.mf_ops        = &ramfs_super_ops.so_fdir.dno_node.no_file;
-	result->fs_root.mf_parts      = NULL;
-	result->fs_root.mf_blockshift = PAGESHIFT;
-	result->fs_root.mf_flags      = MFILE_F_PERSISTENT;
-	result->fs_root.fn_ino        = (ino_t)skew_kernel_pointer(&result->fs_root);
-	result->fs_root.mf_atime      = realtime();
-	result->fs_root.mf_mtime      = result->fs_root.mf_atime;
-	result->fs_root.mf_ctime      = result->fs_root.mf_atime;
+	result->fs_root.mf_ops               = &ramfs_super_ops.so_fdir.dno_node.no_file;
+	result->fs_root.mf_parts             = MFILE_PARTS_ANONYMOUS;
+	result->fs_root.mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
+	result->fs_root.mf_blockshift        = PAGESHIFT;
+	result->fs_root.mf_flags             = MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | MFILE_F_PERSISTENT;
+	result->fs_root.fn_ino               = (ino_t)skew_kernel_pointer(&result->fs_root);
+	result->fs_root.mf_atime             = realtime();
+	result->fs_root.mf_mtime             = result->fs_root.mf_atime;
+	result->fs_root.mf_ctime             = result->fs_root.mf_atime;
+	result->fs_root.fn_mode              = S_IFDIR | 0777;
+	atomic64_init(&result->fs_root.mf_filesize, (uint64_t)-1);
 
 	/* Fill in filesystem features. */
 	result->fs_feat.sf_filesize_max       = (pos_t)-1;
