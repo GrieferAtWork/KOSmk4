@@ -319,8 +319,8 @@ struct fatdirent {
 
 
 typedef struct inode_data {
-	REF struct fatdirent *fn_ent; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory entry of this INode (or `NULL' for root directory) */
-	REF FatDirNode       *fn_dir; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory containing this INode (or `NULL' for root directory) */
+	REF struct fatdirent *fn_ent; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory entry of this INode (or `NULL' for root directory, or when deleted) */
+	REF FatDirNode       *fn_dir; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory containing this INode (or `NULL' for root directory, or when deleted) */
 	union {
 		struct {
 			pos_t              r16_rootpos;   /* [const] On-disk starting address of the root directory segment. (Aligned by `result->ft_sectorsize') */

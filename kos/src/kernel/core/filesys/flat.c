@@ -287,15 +287,69 @@ NOTHROW(KCALL flatdirnode_anon_parts_after)(struct mfile *__restrict self,
 /* Helper  wrapper for `fdnx_deleteent'  that will follow  up the call by
  * anonymizing any mpart-s of the mfile underlying `self' only containing
  * data after `flatdirent_endaddr(ent)' */
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2, 3)) void KCALL
 flatdirnode_delete_entry(struct flatdirnode *__restrict self,
-                         struct flatdirent const *__restrict ent,
+                         struct flatdirent *__restrict ent,
+                         struct fnode *__restrict file,
                          bool at_end_of_dir) {
 	RAII_FINALLY {
 		if (at_end_of_dir)
 			flatdirnode_anon_parts_after(self, flatdirent_endaddr(ent));
 	};
-	(*flatdirnode_getops(self)->fdno_flat.fdnx_deleteent)(self, ent, at_end_of_dir);
+	(*flatdirnode_getops(self)->fdno_flat.fdnx_deleteent)(self, ent, file, at_end_of_dir);
+}
+
+
+#define FLATDIRNODE_HANDLE_DUPLICATE_NAME_RETRY ((REF struct flatdirent *)-1)
+
+/* NOTE: This function will release a write-lock to
+ *       `self' when returning with an exception!
+ * @return: * :   Next directory entry.
+ * @return: NULL: EOF reached.
+ * @return: FLATDIRNODE_HANDLE_DUPLICATE_NAME_RETRY: Locks were lost and you must retry. */
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct flatdirent *KCALL
+flatdirnode_handle_duplicate_name(struct flatdirnode *__restrict self,
+                                  struct flatdirent *__restrict duplicate_ent,
+                                  pos_t *__restrict p_nextpos)
+		THROWS(E_BADALLOC, E_IOERROR) {
+	struct flatdirnode_ops const *ops;
+	struct flatdirent *next_result = NULL;
+	ops = flatdirnode_getops(self);
+	TRY {
+		next_result = (*ops->fdno_flat.fdnx_readdir)(self, flatdirent_endaddr(duplicate_ent));
+		assert(!next_result || flatdirent_basaddr(next_result) >= flatdirent_endaddr(duplicate_ent));
+		if (next_result) {
+			DBG_memset(&next_result->fde_bypos, 0xcc, sizeof(next_result->fde_bypos));
+			next_result->fde_ent.fd_name[next_result->fde_ent.fd_namelen] = '\0';
+			next_result->fde_ent.fd_hash = fdirent_hash(next_result->fde_ent.fd_name,
+			                                            next_result->fde_ent.fd_namelen);
+		}
+#if 0 /* TODO: Mini-reimplementation of `flatdirent_v_opennode()' */
+		if (ops->fdno_flat.fdnx_deleteent && !(self->mf_flags & MFILE_F_READONLY)) {
+			/* Delete any directory entry with a duplicate name.
+			 * NOTE: Because duplicate names  shouldn't happen at  all,
+			 *       don't bother trying to decrement the NLINK counter
+			 *       in  this case; minimize further corruption by only
+			 *       "fixing" imminent errors. */
+			REF struct fnode *result_node;
+			TAILQ_INSERT_TAIL(&self->fdn_data.fdd_bypos, duplicate_ent, fde_bypos);
+			RAII_FINALLY { TAILQ_REMOVE(&self->fdn_data.fdd_bypos, duplicate_ent, fde_bypos); };
+
+			result_node = TODO;
+			assert(result_node != NULL);
+			FINALLY_DECREF(result_node);
+			flatdirnode_delete_entry(self, duplicate_ent, result_node, next_result == NULL);
+		} else
+#endif
+		{
+			*p_nextpos = flatdirent_endaddr(duplicate_ent);
+		}
+	} EXCEPT {
+		flatdirnode_endwrite(self);
+		xdestroy_partially_initialized_flatdirent(next_result);
+		RETHROW();
+	}
+	return next_result;
 }
 
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
@@ -407,35 +461,10 @@ handle_result_after_wrlock:
 	/* Add the new directory entry to caches. */
 	if unlikely(!flatdirnode_fileslist_tryinsertent(me, result)) {
 		/* oops. That's a duplicate entry... */
-		struct flatdirnode_ops const *ops;
-		struct flatdirent *next_result = NULL;
-		ops = flatdirnode_getops(me);
-		TRY {
-			next_result = (*ops->fdno_flat.fdnx_readdir)(me, flatdirent_endaddr(result));
-			assert(!next_result || flatdirent_basaddr(next_result) >= flatdirent_endaddr(result));
-			if (next_result) {
-				next_result->fde_ent.fd_name[next_result->fde_ent.fd_namelen] = '\0';
-				next_result->fde_ent.fd_hash = fdirent_hash(next_result->fde_ent.fd_name,
-				                                            next_result->fde_ent.fd_namelen);
-			}
-			if (ops->fdno_flat.fdnx_deleteent && !(me->mf_flags & MFILE_F_READONLY)) {
-				/* Delete any directory entry with a duplicate name.
-				 * NOTE: Because duplicate names  shouldn't happen at  all,
-				 *       don't bother trying to decrement the NLINK counter
-				 *       in  this case; minimize further corruption by only
-				 *       "fixing" imminent errors. */
-				flatdirnode_delete_entry(me, result, next_result == NULL);
-			} else {
-				nextpos = flatdirent_endaddr(result);
-			}
-		} EXCEPT {
-			flatdirnode_endwrite(me);
-			xdestroy_partially_initialized_flatdirent(next_result);
-			destroy_partially_initialized_flatdirent(result);
-			RETHROW();
-		}
-		destroy_partially_initialized_flatdirent(result);
-		result = next_result;
+		FINALLY_DECREF_LIKELY(result);
+		result = flatdirnode_handle_duplicate_name(me, result, &nextpos);
+		if (result == FLATDIRNODE_HANDLE_DUPLICATE_NAME_RETRY)
+			goto again;
 		goto handle_result_after_wrlock;
 	}
 
@@ -562,35 +591,10 @@ handle_ent_after_wrlock:
 	/* Add the new directory entry to caches. */
 	if unlikely(!flatdirnode_fileslist_tryinsertent(self, ent)) {
 		/* oops. That's a duplicate entry... */
-		struct flatdirnode_ops const *ops;
-		struct flatdirent *next_ent = NULL;
-		ops = flatdirnode_getops(self);
-		TRY {
-			next_ent = (*ops->fdno_flat.fdnx_readdir)(self, flatdirent_endaddr(ent));
-			assert(!next_ent || flatdirent_basaddr(next_ent) >= flatdirent_endaddr(ent));
-			if (next_ent) {
-				next_ent->fde_ent.fd_name[next_ent->fde_ent.fd_namelen] = '\0';
-				next_ent->fde_ent.fd_hash = fdirent_hash(next_ent->fde_ent.fd_name,
-				                                         next_ent->fde_ent.fd_namelen);
-			}
-			if (ops->fdno_flat.fdnx_deleteent && !(self->mf_flags & MFILE_F_READONLY)) {
-				/* Delete any directory entry with a duplicate name.
-				 * NOTE: Because duplicate names  shouldn't happen at  all,
-				 *       don't bother trying to decrement the NLINK counter
-				 *       in  this case; minimize further corruption by only
-				 *       "fixing" imminent errors. */
-				flatdirnode_delete_entry(self, ent, next_ent == NULL);
-			} else {
-				nextpos = flatdirent_endaddr(ent);
-			}
-		} EXCEPT {
-			flatdirnode_endwrite(self);
-			xdestroy_partially_initialized_flatdirent(next_ent);
-			destroy_partially_initialized_flatdirent(ent);
-			RETHROW();
-		}
-		destroy_partially_initialized_flatdirent(ent);
-		ent = next_ent;
+		FINALLY_DECREF_LIKELY(ent);
+		ent = flatdirnode_handle_duplicate_name(self, ent, &nextpos);
+		if (ent == FLATDIRNODE_HANDLE_DUPLICATE_NAME_RETRY)
+			return false;
 		goto handle_ent_after_wrlock;
 	}
 
@@ -929,7 +933,6 @@ handle_existing:
 	TRY {
 		/* Construct the new directory entry. */
 		ent = flatdirnode_mkent(me, info, node);
-		ent->fde_ent.fd_refcnt = 2; /* +1: fdd_bypos, +1: info->mkf_dent */
 		TRY {
 			/* Acquire  a write-lock & make sure to populate the entire directory.
 			 * There mustn't be any entry on-disk that isn't also loaded into  the
@@ -966,89 +969,96 @@ handle_existing:
 
 				/* Prepare the directory hash-vector for the addition of a new element. */
 				flatdirnode_fileslist_rehash_before_insert(me);
-
-				/* Insert the new directory entry into the hash-vector. */
-				flatdirnode_fileslist_insertent(me, ent);
-				TRY {
-					/* Write directory entries for new node+ent */
-					flatdirnode_addentry_to_stream(me, ent, node);
-
-					/* Ensure that `fdnx_deleteent' is available in case we end up needing it. */
-					assertf(ops->fdno_flat.fdnx_deleteent != NULL,
-					        "As per specs, `fdnx_deleteent' is mandatory when `fdnx_writedir' is provided, "
-					        "the later already having been asserted above by `E_FSERROR_READONLY'");
-
-					/* Deal with hardlinks. */
-					if (info->mkf_fmode == 0) {
-						bool nlink_ok;
-						mfile_tslock_acquire(node);
-						nlink_ok = false;
-						if likely(node->fn_nlink < me->fn_super->fs_feat.sf_link_max) {
-							++node->fn_nlink;
-							nlink_ok = true;
-						}
-						mfile_tslock_release(node);
-						if likely(nlink_ok) {
-							/* Indicate that attributes of `node' have changed. */
-							mfile_changed(node, MFILE_F_ATTRCHANGED);
-						} else {
-							TRY {
-								flatdirnode_delete_entry(me, ent, TAILQ_NEXT(ent, fde_bypos) == NULL);
-							} EXCEPT {
-								/* _Always_ remove `ent' from the `fdd_bypos' list. */
-								flatdirnode_remove_from_bypos(me, ent);
-								RETHROW();
-							}
-							/* Remove `ent' from the `fdd_bypos' list. */
-							flatdirnode_remove_from_bypos(me, ent);
-							THROW(E_FSERROR_TOO_MANY_HARD_LINKS);
-						}
-					} else {
-						/* Invoke the `fdnx_allocfile' operator (if defined). */
-						if (ops->fdno_flat.fdnx_allocfile) {
-							TRY {
-								(*ops->fdno_flat.fdnx_allocfile)(me, ent, node, info);
-							} EXCEPT {
-								/* Invoke the `fdnx_deleteent' operator to (try) remove the previously written entry.
-								 * Note the use of  nested exceptions, as `fdnx_deleteent'  is also allowed to  throw
-								 * its own exceptions. */
-								NESTED_TRY {
-									flatdirnode_delete_entry(me, ent, TAILQ_NEXT(ent, fde_bypos) == NULL);
-								} EXCEPT {
-									/* _Always_ remove `ent' from the `fdd_bypos' list. */
-									flatdirnode_remove_from_bypos(me, ent);
-									RETHROW();
-								}
-								/* Remove `ent' from the `fdd_bypos' list. */
-								flatdirnode_remove_from_bypos(me, ent);
-								RETHROW();
-							}
-						}
-					}
-				} EXCEPT {
-					/* Remove `ent' from the hash-vector. */
-					flatdirnode_fileslist_removeent(me, ent);
-					flatdirnode_fileslist_rehash_after_remove(me);
-					RETHROW();
-				}
 			} EXCEPT {
 				flatdirnode_endwrite(me);
 				RETHROW();
 			}
-
-			/* Add the new node to the nodes list of `me->fn_super',
-			 * as  well  as  to  the  global  list  of  all   nodes. */
-			assert(node->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
-			assert(!(node->mf_flags & MFILE_F_DELETED));
-			assert(!LIST_ISBOUND(node, fn_allnodes));
-			fnode_init_addtosuper_and_all(node);
-
-			/* Release lock */
-			flatdirnode_endwrite(me);
 		} EXCEPT {
 			destroy_partially_initialized_flatdirent(ent);
 			RETHROW();
 		}
+		ent->fde_ent.fd_refcnt = 2; /* +1: fdd_bypos, +1: info->mkf_dent */
+		TRY {
+			/* Insert the new directory entry into the hash-vector. */
+			TRY {
+				flatdirnode_fileslist_insertent(me, ent);
+			} EXCEPT {
+				decref_nokill(ent);
+				RETHROW();
+			}
+			TRY {
+				/* Write directory entries for new node+ent */
+				flatdirnode_addentry_to_stream(me, ent, node);
+
+				/* Ensure that `fdnx_deleteent' is available in case we end up needing it. */
+				assertf(ops->fdno_flat.fdnx_deleteent != NULL,
+				        "As per specs, `fdnx_deleteent' is mandatory when `fdnx_writedir' is provided, "
+				        "the later already having been asserted above by `E_FSERROR_READONLY'");
+
+				/* Deal with hardlinks. */
+				if (info->mkf_fmode == 0) {
+					bool nlink_ok;
+					mfile_tslock_acquire(node);
+					nlink_ok = false;
+					if likely(node->fn_nlink < me->fn_super->fs_feat.sf_link_max) {
+						++node->fn_nlink;
+						nlink_ok = true;
+					}
+					mfile_tslock_release(node);
+					if likely(nlink_ok) {
+						/* Indicate that attributes of `node' have changed. */
+						mfile_changed(node, MFILE_F_ATTRCHANGED);
+					} else {
+						RAII_FINALLY {
+							/* _Always_ remove `ent' from the `fdd_bypos' list. */
+							flatdirnode_remove_from_bypos(me, ent);
+							decref_nokill(ent);
+						};
+						flatdirnode_delete_entry(me, ent, node, TAILQ_NEXT(ent, fde_bypos) == NULL);
+						THROW(E_FSERROR_TOO_MANY_HARD_LINKS);
+					}
+				} else {
+					/* Invoke the `fdnx_allocfile' operator (if defined). */
+					if (ops->fdno_flat.fdnx_allocfile) {
+						TRY {
+							(*ops->fdno_flat.fdnx_allocfile)(me, ent, node, info);
+						} EXCEPT {
+							/* Invoke the `fdnx_deleteent' operator to (try) remove the previously written entry.
+							 * Note the use of  nested exceptions, as `fdnx_deleteent'  is also allowed to  throw
+							 * its own exceptions. */
+							RAII_FINALLY {
+								/* _Always_ remove `ent' from the `fdd_bypos' list. */
+								flatdirnode_remove_from_bypos(me, ent);
+								decref_nokill(ent);
+							};
+							{
+								NESTED_EXCEPTION;
+								flatdirnode_delete_entry(me, ent, node, TAILQ_NEXT(ent, fde_bypos) == NULL);
+							}
+							RETHROW();
+						}
+					}
+				}
+			} EXCEPT {
+				/* Remove `ent' from the hash-vector. */
+				flatdirnode_fileslist_removeent(me, ent);
+				flatdirnode_fileslist_rehash_after_remove(me);
+				RETHROW();
+			}
+		} EXCEPT {
+			flatdirnode_endwrite(me);
+			decref_likely(ent);
+			RETHROW();
+		}
+		/* Add the new node to the nodes list of `me->fn_super',
+		 * as  well  as  to  the  global  list  of  all   nodes. */
+		assert(node->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
+		assert(!(node->mf_flags & MFILE_F_DELETED));
+		assert(!LIST_ISBOUND(node, fn_allnodes));
+		fnode_init_addtosuper_and_all(node);
+
+		/* Release lock */
+		flatdirnode_endwrite(me);
 	} EXCEPT {
 		decref_likely(node);
 		RETHROW();
@@ -1101,7 +1111,7 @@ again_locked:
 
 	/* Ask the FS-specific implementation to delete file entries. */
 	TRY {
-		flatdirnode_delete_entry(me, ent, TAILQ_NEXT(ent, fde_bypos) == NULL);
+		flatdirnode_delete_entry(me, ent, file, TAILQ_NEXT(ent, fde_bypos) == NULL);
 	} EXCEPT {
 		flatdirnode_endwrite(me);
 		RETHROW();
@@ -1272,85 +1282,98 @@ again:
 				assert(mki.mkf_fmode == 0);
 				mki.mkf_hrdlnk.hl_node = nfile;
 				new_nent = flatdirnode_mkent(od, &mki, nfile); /* New entry in `od' (for `nfile') */
+			} EXCEPT {
+				destroy_partially_initialized_flatdirent(new_oent);
+				RETHROW();
+			}
+			new_oent->fde_ent.fd_refcnt = 2;
+			new_nent->fde_ent.fd_refcnt = 2;
+			TRY {
+				/* At this point, all high-level allocations have been made.
+				 * -> Time to modify the actual directory streams:
+				 *
+				 *  - Create `new_nent' in `od' (fdnx_writedir)
+				 *  - Create `new_oent' in `nd' (fdnx_writedir)   (on except: Delete `new_nent' in `od' (fdnx_deleteent))
+				 *  - Delete `oldent' in `od' (fdnx_deleteent)    (on except: Delete `new_oent' in `nd' (fdnx_deleteent),
+				 *                                                            Delete `new_nent' in `od' (fdnx_deleteent))
+				 *  - Delete `newent' in `nd' (fdnx_deleteent)    (on except: Create  `oldent'  in  `od'  (fdnx_writedir)
+				 *                                                            Delete `new_oent' in `nd' (fdnx_deleteent),
+				 *                                                            Delete `new_nent' in `od' (fdnx_deleteent))
+				 * -- CUT: Errors after this point will not cause the operation to be undone
+				 *  - if (fnode_isdir(ofile)) fdnx_direntchanged(ofile, od, nd);
+				 *  - if (fnode_isdir(nfile)) fdnx_direntchanged(nfile, nd, od);
+				 */
 				TRY {
-					/* At this point, all high-level allocations have been made.
-					 * -> Time to modify the actual directory streams:
-					 *
-					 *  - Create `new_nent' in `od' (fdnx_writedir)
-					 *  - Create `new_oent' in `nd' (fdnx_writedir)   (on except: Delete `new_nent' in `od' (fdnx_deleteent))
-					 *  - Delete `oldent' in `od' (fdnx_deleteent)    (on except: Delete `new_oent' in `nd' (fdnx_deleteent),
-					 *                                                            Delete `new_nent' in `od' (fdnx_deleteent))
-					 *  - Delete `newent' in `nd' (fdnx_deleteent)    (on except: Create  `oldent'  in  `od'  (fdnx_writedir)
-					 *                                                            Delete `new_oent' in `nd' (fdnx_deleteent),
-					 *                                                            Delete `new_nent' in `od' (fdnx_deleteent))
-					 * -- CUT: Errors after this point will not cause the operation to be undone
-					 *  - if (fnode_isdir(ofile)) fdnx_direntchanged(ofile, od, nd);
-					 *  - if (fnode_isdir(nfile)) fdnx_direntchanged(nfile, nd, od);
-					 */
-					new_nent->fde_ent.fd_refcnt = 2;
 					flatdirnode_addentry_to_stream(od, new_nent, nfile);
+				} EXCEPT {
+					decref_nokill(new_nent);
+					decref_nokill(new_oent);
+					RETHROW();
+				}
+				TRY {
 					TRY {
-						new_oent->fde_ent.fd_refcnt = 2;
 						flatdirnode_addentry_to_stream(nd, new_oent, ofile);
+					} EXCEPT {
+						decref_nokill(new_oent);
+						RETHROW();
+					}
+					TRY {
+						flatdirnode_delete_entry(od, oldent, ofile, TAILQ_NEXT(oldent, fde_bypos) == NULL);
+						flatdirnode_remove_from_bypos(od, oldent);
+						decref_nokill(oldent); /* Returned by `flatdirnode_remove_from_bypos()' */
 						TRY {
-							flatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
-							flatdirnode_remove_from_bypos(od, oldent);
-							decref_nokill(oldent); /* Returned by `flatdirnode_remove_from_bypos()' */
-							TRY {
-								flatdirnode_delete_entry(nd, newent, TAILQ_NEXT(newent, fde_bypos) == NULL);
-								flatdirnode_remove_from_bypos(nd, newent);
-							} EXCEPT {
-								{
-									NESTED_EXCEPTION;
-									TRY {
-										/* Try to re-add to the old directory, but if that fails,
-										 * admit defeat and get rid  of the file (even though  it
-										 * should stay, we've got no way to make it do that) */
-										flatdirnode_addentry_to_stream(od, oldent, ofile);
-									} EXCEPT {
-										flatdirnode_fileslist_removeent(od, oldent);
-										flatdirnode_fileslist_rehash_after_remove(od);
-										RETHROW();
-									}
-									incref(oldent); /* Used by `flatdirnode_addentry_to_stream()' */
-								}
-								RETHROW();
-							}
+							flatdirnode_delete_entry(nd, newent, nfile, TAILQ_NEXT(newent, fde_bypos) == NULL);
+							flatdirnode_remove_from_bypos(nd, newent);
 						} EXCEPT {
 							{
 								NESTED_EXCEPTION;
-								RAII_FINALLY { flatdirnode_remove_from_bypos(nd, new_oent); };
-								flatdirnode_delete_entry(nd, new_oent, TAILQ_NEXT(new_oent, fde_bypos) == NULL);
+								TRY {
+									/* Try to re-add to the old directory, but if that fails,
+									 * admit defeat and get rid  of the file (even though  it
+									 * should stay, we've got no way to make it do that) */
+									flatdirnode_addentry_to_stream(od, oldent, ofile);
+								} EXCEPT {
+									flatdirnode_fileslist_removeent(od, oldent);
+									flatdirnode_fileslist_rehash_after_remove(od);
+									RETHROW();
+								}
+								incref(oldent); /* Used by `flatdirnode_addentry_to_stream()' */
 							}
 							RETHROW();
 						}
 					} EXCEPT {
 						{
 							NESTED_EXCEPTION;
-							RAII_FINALLY { flatdirnode_remove_from_bypos(od, new_nent); };
-							flatdirnode_delete_entry(od, new_nent, TAILQ_NEXT(new_nent, fde_bypos) == NULL);
+							RAII_FINALLY { flatdirnode_remove_from_bypos(nd, new_oent); };
+							flatdirnode_delete_entry(nd, new_oent, ofile, TAILQ_NEXT(new_oent, fde_bypos) == NULL);
 						}
 						RETHROW();
 					}
-
-					/* Update files from hash-vectors. */
-					flatdirnode_fileslist_removeent(od, oldent);
-					flatdirnode_fileslist_removeent(nd, newent);
-					flatdirnode_fileslist_insertent(od, new_nent);
-					flatdirnode_fileslist_insertent(nd, new_oent);
-
-					/* Update the directory entry for the old file (which has now become the new file) */
-					assert(&oldent->fde_ent == info->frn_oldent);
-					info->frn_oldent = &new_nent->fde_ent; /* Inherit reference */
-					info->frn_dent   = &new_oent->fde_ent; /* Inherit reference */
 				} EXCEPT {
-					destroy_partially_initialized_flatdirent(new_oent);
+					{
+						NESTED_EXCEPTION;
+						RAII_FINALLY { flatdirnode_remove_from_bypos(od, new_nent); };
+						flatdirnode_delete_entry(od, new_nent, nfile, TAILQ_NEXT(new_nent, fde_bypos) == NULL);
+					}
 					RETHROW();
 				}
+
+				/* Update files from hash-vectors. */
+				flatdirnode_fileslist_removeent(od, oldent);
+				flatdirnode_fileslist_removeent(nd, newent);
+				flatdirnode_fileslist_insertent(od, new_nent);
+				flatdirnode_fileslist_insertent(nd, new_oent);
+
+				/* Update the directory entry for the old file (which has now become the new file) */
+				assert(&oldent->fde_ent == info->frn_oldent);
+				info->frn_oldent = &new_nent->fde_ent; /* Inherit reference */
+				info->frn_dent   = &new_oent->fde_ent; /* Inherit reference */
 			} EXCEPT {
-				destroy_partially_initialized_flatdirent(new_oent);
+				decref_likely(new_oent);
+				decref_likely(new_nent);
 				RETHROW();
 			}
+
 			FINALLY_DECREF_UNLIKELY(newent); /* Inherited from `flatdirnode_remove_from_bypos(nd, newent);' */
 			FINALLY_DECREF_UNLIKELY(oldent); /* Stolen from `info->frn_oldent' */
 
@@ -1423,37 +1446,39 @@ again:
 		mki.mkf_fmode          = 0;
 		mki.mkf_hrdlnk.hl_node = info->frn_file;
 		newent = flatdirnode_mkent(nd, &mki, info->frn_file);
+
+		/* +1: flatdirnode_addentry_to_stream(nd, newent, info->frn_file),
+		 * +1: info->frn_dent */
+		newent->fde_ent.fd_refcnt = 2;
 		TRY {
-			/* +1: flatdirnode_addentry_to_stream(nd, newent, info->frn_file),
-			 * +1: info->frn_dent */
-			newent->fde_ent.fd_refcnt = 2;
-
-			/* If nothing gets overwritten, we'll need to rehash for the later-added file. */
-			if (!existing)
-				flatdirnode_fileslist_rehash_before_insert(nd);
-
-			/* Add the new entry to the target directory. */
-			flatdirnode_addentry_to_stream(nd, newent, info->frn_file);
-			/* FIXME: The FAT driver incref's `newent' during `flatdirnode_addentry_to_stream()',
-			 *        but if the next part fails  we unconditionally destroy the dirent,  causing
-			 *        it remain dangling within FAT-fs-specific data! */
+			TRY {
+				/* If nothing gets overwritten, we'll need to rehash for the later-added file. */
+				if (!existing)
+					flatdirnode_fileslist_rehash_before_insert(nd);
+	
+				/* Add the new entry to the target directory. */
+				flatdirnode_addentry_to_stream(nd, newent, info->frn_file);
+			} EXCEPT {
+				decref_nokill(newent);
+				RETHROW();
+			}
 
 			/* If present, delete the pre-existing file in `nd' */
 			if (existing) {
 				TRY {
 					/* Remove the directory relating to `entry' */
-					flatdirnode_delete_entry(nd, existing, TAILQ_NEXT(existing, fde_bypos) == NULL);
+					flatdirnode_delete_entry(nd, existing, info->frn_repfile, TAILQ_NEXT(existing, fde_bypos) == NULL);
 				} EXCEPT {
 					{
 						NESTED_EXCEPTION;
 						RAII_FINALLY { flatdirnode_remove_from_bypos(nd, newent); };
-						flatdirnode_delete_entry(nd, newent, TAILQ_NEXT(newent, fde_bypos) == NULL);
+						flatdirnode_delete_entry(nd, newent, info->frn_file, TAILQ_NEXT(newent, fde_bypos) == NULL);
 					}
 					RETHROW();
 				}
 			}
 		} EXCEPT {
-			destroy_partially_initialized_flatdirent(newent);
+			decref_likely(newent);
 			RETHROW();
 		}
 		/* Point of no return --- From this on, we don't try to undo the rename if an error happens. */
@@ -1503,7 +1528,8 @@ again:
 								NESTED_EXCEPTION;
 								/* Remove `oldent' from `od' on the fs-level */
 								TRY {
-									flatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
+									flatdirnode_delete_entry(od, oldent, info->frn_file,
+									                         TAILQ_NEXT(oldent, fde_bypos) == NULL);
 								} EXCEPT {
 									{
 										NESTED_EXCEPTION;
@@ -1525,7 +1551,8 @@ again:
 
 		/* Remove `oldent' from `od' on the fs-level */
 		TRY {
-			flatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
+			flatdirnode_delete_entry(od, oldent, info->frn_file,
+			                         TAILQ_NEXT(oldent, fde_bypos) == NULL);
 		} EXCEPT {
 			{
 				FINALLY_DECREF_UNLIKELY(newent);

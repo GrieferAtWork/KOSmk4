@@ -207,9 +207,10 @@ struct flatdirnode_xops {
 	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired.
 	 * @param: at_end_of_dir: When `true', the delete is happening such that `ent'
 	 *                        scrapes against the far end of the directory stream. */
-	NONNULL((1, 2)) void
+	NONNULL((1, 2, 3)) void
 	(KCALL *fdnx_deleteent)(struct flatdirnode *__restrict self,
-	                        struct flatdirent const *__restrict ent,
+	                        struct flatdirent *__restrict ent,
+	                        struct fnode *__restrict file,
 	                        __BOOL at_end_of_dir)
 			THROWS(E_IOERROR);
 
@@ -313,9 +314,9 @@ struct flatdirnode_xops {
 			THROWS(E_BADALLOC, E_IOERROR);
 
 	/* [0..1]
-	 * Following deletion of `deleted_ent', the nlink counter of `file' reached `0'.
-	 * As the result of this,  this operator is invoked  for the purpose of  freeing
-	 * any remaining on-disk data of `file'.
+	 * Following deletion of `last_deleted_ent', the nlink counter of `file' reached `0'.
+	 * As  the result of  this, this operator is  invoked for the  purpose of freeing any
+	 * remaining on-disk data of `file'.
 	 *
 	 * At the point at which this operator is invoked, `self' will have already been
 	 * marked as deleted
@@ -325,9 +326,9 @@ struct flatdirnode_xops {
 	 *   - EXT2: Free file data, followed by deallocating the on-disk INode object
 	 *   - ...
 	 *
-	 * Even if this operator returns with an exception, `deleted_ent' will not be
-	 * re-established, and `file->fn_nlink' will remain at `0'. Exactly what this
-	 * means  for on-disk data is filesystem-specific, but it probably means that
+	 * Even  if this operator returns with an exception, `last_deleted_ent' will not
+	 * be re-established, and `file->fn_nlink' will remain at `0'. Exactly what this
+	 * means for on-disk  data is  filesystem-specific, but it  probably means  that
 	 * there's now a minor filesystem inconsistency.
 	 *
 	 * Note that unlike `fdnx_allocfile()', this operator is _NOT_ invoked  while
@@ -335,7 +336,7 @@ struct flatdirnode_xops {
 	 * alone function. */
 	NONNULL((1, 2, 3)) void
 	(KCALL *fdnx_deletefile)(struct flatdirnode *__restrict self,
-	                         struct flatdirent *__restrict deleted_ent,
+	                         struct flatdirent *__restrict last_deleted_ent,
 	                         struct fnode *__restrict file)
 			THROWS(E_IOERROR);
 

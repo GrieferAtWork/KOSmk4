@@ -660,8 +660,13 @@ Fat_WrAttr(struct fnode *__restrict self)
 
 again:
 	mfile_tslock_acquire(self);
-	assert(dat->fn_ent && dat->fn_dir);
+	assert((dat->fn_ent != NULL) == (dat->fn_dir != NULL));
 	dir = dat->fn_dir;
+	if unlikely(!dir) {
+		/* File was deleted. */
+		mfile_tslock_release_br(self);
+		return;
+	}
 	ent = dat->fn_ent;
 	incref(dir);
 	incref(ent);
@@ -1558,6 +1563,10 @@ FatDir_WriteDir(struct flatdirnode *__restrict self,
 	file->fn_ino = ino;
 	oldent = file->fn_fsdata->fn_ent; /* Inherit reference */
 	file->fn_fsdata->fn_ent = ent;    /* Inherit reference */
+	/* NOTE: If changed, the new directory is saved in  `fn_dir'
+	 *       during `FatDir_DirentChanged()', as  only that  one
+	 *       guaranties being called while holding locks to both
+	 *       the old and new directory. */
 	mfile_tslock_release(file);
 
 	/* Also fill in the directory entry's INode number */
@@ -1570,18 +1579,33 @@ FatDir_WriteDir(struct flatdirnode *__restrict self,
 	return true;
 }
 
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2, 3)) void KCALL
 FatDir_DeleteEnt(struct flatdirnode *__restrict self,
-                 struct flatdirent const *__restrict ent_,
+                 struct flatdirent *__restrict ent_,
+                 struct fnode *__restrict file,
                  bool at_end_of_dir)
 		THROWS(E_IOERROR) {
 	pos_t ptr, end;
-	FatDirNode *me              = flatdirnode_asfat(self);
-	struct fatdirent const *ent = flatdirent_asfat(ent_);
+	FatDirNode *me        = flatdirnode_asfat(self);
+	struct fatdirent *ent = flatdirent_asfat(ent_);
+	FatNodeData *dat      = file->fn_fsdata;
 	assert(ent->fad_ent.fde_size != 0);
 	assert((ent->fad_ent.fde_size % sizeof(struct fat_dirent)) == 0);
 	ptr = flatdirent_basaddr(&ent->fad_ent);
 	end = flatdirent_endaddr(&ent->fad_ent);
+
+	mfile_tslock_acquire(file);
+	/* This  may differ  if we got  here after the  file was renamed
+	 * and the caller is currently deleting its old directory entry. */
+	if (dat->fn_ent == ent) {
+		/* Clear the saved dir/dirent from `file' */
+		assert(dat->fn_dir == self);
+		dat->fn_dir = NULL;
+		dat->fn_ent = NULL;
+		decref_nokill(self);
+		decref_nokill(ent);
+	}
+	mfile_tslock_release(file);
 
 	/* Mark directory entries as deleted. */
 	for (; ptr < end; ptr += sizeof(struct fat_dirent)) {
@@ -1710,15 +1734,15 @@ FatDir_AllocFile(struct flatdirnode *__restrict self,
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 FatDir_DeleteFile(struct flatdirnode *__restrict self,
-                  struct flatdirent *__restrict deleted_ent,
+                  struct flatdirent *__restrict UNUSED(last_deleted_ent),
                   struct fnode *__restrict file)
 		THROWS(E_IOERROR) {
 	FatDirNode *me       = flatdirnode_asfat(self);
 	FatNodeData *dat     = file->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
 	FatClusterIndex *newvec;
-	assert(dat->fn_dir == me);
-	assert(dat->fn_ent == flatdirent_asfat(deleted_ent));
+	assertf(dat->fn_dir == NULL, "This should have been set by `FatDir_DeleteEnt()'");
+	assertf(dat->fn_ent == NULL, "This should have been set by `FatDir_DeleteEnt()'");
 	FatNodeData_Write(dat);
 	assert(dat->fn_clusterc >= 1);
 	if (dat->fn_clusterv[0] < super->ft_cluster_eof) {
