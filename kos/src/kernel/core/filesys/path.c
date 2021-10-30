@@ -251,7 +251,6 @@ NOTHROW(LOCKOP_CC path_remove_from_parent_postlop)(Tobpostlockop(path) *__restri
 				decref_unlikely(dir);
 				return;
 			}
-			FSUPER_MOUNTS_DELETED;
 		}
 	}
 	decref_unlikely(dir);

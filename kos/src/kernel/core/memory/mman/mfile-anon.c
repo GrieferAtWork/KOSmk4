@@ -303,6 +303,7 @@ NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *_
 		struct mpart *part;
 		part = SLIST_FIRST(&deadparts);
 		SLIST_REMOVE_HEAD(&deadparts, _mp_dead);
+		DBG_memset(&part->_mp_dead, 0xcc, sizeof(part->_mp_dead));
 		mpart_destroy(part);
 	}
 
@@ -395,7 +396,8 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 		tree = file->mf_parts;
 		mpart_tree_increfall(tree);
 		part = mpart_tree_trylockall(tree, already_locked_part);
-		if unlikely(!part) {
+		if unlikely(part != NULL) {
+			incref(part);
 			mpart_tree_decrefall(tree, &deadparts);
 
 			/* Found a part that's blocking...
@@ -403,9 +405,13 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 			 * the context of `part' that'll try to complete the file deletion
 			 * once that lock becomes available. */
 			file->_mf_mplop.olo_func = &mfile_delete_withpartlock;
+			oblockop_enqueue(&part->mp_lockops, &file->_mf_mplop);
+			_mpart_lockops_reap(part);
+			if (ATOMIC_DECFETCH(part->mp_refcnt) == 0)
+				mpart_delete_postop_builder_enqueue(&deadparts, part);
 
-			/* TODO */
-
+			/* The rest  of the  deletion of  `file' will  happen
+			 * async from inside of `mfile_delete_withpartlock()' */
 			result = NULL;
 			if (!mpart_delete_postop_builder_isempty(&deadparts))
 				result = mpart_delete_postop_builder_asfop(&deadparts);
