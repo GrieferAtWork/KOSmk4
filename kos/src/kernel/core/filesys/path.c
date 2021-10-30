@@ -454,10 +454,6 @@ NOTHROW(FCALL path_cldlist_remove)(struct path *__restrict self,
 	uintptr_t hash, i, perturb;
 	struct path_bucket *bucket;
 	assert(self->p_cldlist != PATH_CLDLIST_DELETED);
-	assert(self->p_cldlist != path_empty_cldlist);
-	assert(self->p_cldused != 0);
-	assert(self->p_cldsize != 0);
-	assert(self->p_cldsize <= self->p_cldmask);
 	hash = path_hashof(elem);
 	i = perturb = hash & self->p_cldmask;
 	for (;; path_hashnx(i, perturb)) {
@@ -467,6 +463,10 @@ NOTHROW(FCALL path_cldlist_remove)(struct path *__restrict self,
 		if (bucket->pb_path == elem)
 			break;
 	}
+	assert(self->p_cldlist != path_empty_cldlist);
+	assert(self->p_cldused != 0);
+	assert(self->p_cldsize != 0);
+	assert(self->p_cldsize <= self->p_cldmask);
 	bucket->pb_path = &deleted_path;
 	--self->p_cldused;
 	return true;
