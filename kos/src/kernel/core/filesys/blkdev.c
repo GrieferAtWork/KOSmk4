@@ -154,14 +154,14 @@ blkpart_v_saveblocks(struct mfile *__restrict self, pos_t addr,
 
 
 PRIVATE NONNULL((1)) void KCALL
-blkpart_v_sync(struct blkdev *__restrict self)
+blkpart_v_sync(struct mfile *__restrict self)
 		THROWS(...) {
-	struct blkdev *master;
-	struct blkdev_ops const *master_ops;
-	master     = self->bd_partinfo.bp_master;
-	master_ops = blkdev_getops(master);
-	if (master_ops->bdo_sync != NULL)
-		(*master_ops->bdo_sync)(master);
+	struct blkdev *me = mfile_asblkdev(self);
+	struct blkdev *ms = me->bd_partinfo.bp_master;
+	struct mfile_stream_ops const *master_stream_ops;
+	master_stream_ops = ms->mf_ops->mo_stream;
+	if (master_stream_ops != NULL && master_stream_ops->mso_sync != NULL)
+		(*master_stream_ops->mso_sync)(ms);
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
@@ -233,25 +233,21 @@ PRIVATE struct mfile_stream_ops const blkpart_stream_ops = {
 	.mso_ioctl = &blkpart_v_ioctl,
 	.mso_hop   = &blkpart_v_hop,
 	.mso_tryas = &blkpart_v_tryas, /* Shouldn't ever be used, but here for the same of completion */
+	.mso_sync  = &blkpart_v_sync,
 };
 
 /* Operators used for block device partitions */
 PUBLIC_CONST struct blkdev_ops const blkpart_ops = {
-	.bdo_dev = {
-		.do_node = {
-			.dno_node = {
-				.no_file = {
-					.mo_destroy    = &blkpart_v_destroy,
-					.mo_loadblocks = &blkpart_v_loadblocks,
-					.mo_saveblocks = &blkpart_v_saveblocks,
-					.mo_changed    = &blkdev_v_changed,
-					.mo_stream     = &blkpart_stream_ops,
-				},
-				.no_wrattr = &blkdev_v_wrattr,
-			},
+	.bdo_dev = {{{
+		.no_file = {
+			.mo_destroy    = &blkpart_v_destroy,
+			.mo_loadblocks = &blkpart_v_loadblocks,
+			.mo_saveblocks = &blkpart_v_saveblocks,
+			.mo_changed    = &blkdev_v_changed,
+			.mo_stream     = &blkpart_stream_ops,
 		},
-	},
-	.bdo_sync = &blkpart_v_sync,
+		.no_wrattr = &blkdev_v_wrattr,
+	}}}
 };
 
 

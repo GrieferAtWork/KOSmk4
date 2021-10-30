@@ -1097,9 +1097,9 @@ NOTHROW(KCALL AtaDrive_Destroy)(struct mfile *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) void KCALL
-AtaDrive_Sync(struct blkdev *__restrict self)
+AtaDrive_Sync(struct mfile *__restrict self)
 		THROWS(...) {
-	AtaDrive *me = blkdev_asata(self);
+	AtaDrive *me = mfile_asata(self);
 	if (me->ad_features & ATA_DRIVE_FEATURE_F_FLUSH) {
 		AtaBus_LockPIO(me->ad_bus);
 		RAII_FINALLY { AtaBus_UnlockPIO(me->ad_bus); };
@@ -1109,6 +1109,12 @@ AtaDrive_Sync(struct blkdev *__restrict self)
 		COMPILER_IMPURE();
 	}
 }
+
+PRIVATE struct mfile_stream_ops const atadrive_v_stream_ops = {
+	.mso_tryas = &blkdev_v_tryas,
+	.mso_sync  = &AtaDrive_Sync,
+};
+
 
 /* Low-level ATA I/O functions. */
 #ifdef __INTELLISENSE__
@@ -1150,19 +1156,18 @@ DECL_BEGIN
 /************************************************************************/
 /* Operator tables                                                      */
 /************************************************************************/
-#define INITIALIZE_DRIVE_OPS(rd, wr)                   \
-	{                                                  \
-		.bdo_dev = {{{                                 \
-			.no_file = {                               \
-				.mo_destroy    = &AtaDrive_Destroy,    \
-				.mo_loadblocks = rd,                   \
-				.mo_saveblocks = wr,                   \
-				.mo_changed    = &blkdev_v_changed,    \
-				.mo_stream     = &blkdev_v_stream_ops, \
-			},                                         \
-			.no_wrattr = &blkdev_v_wrattr              \
-		}}},                                           \
-		.bdo_sync = &AtaDrive_Sync,                    \
+#define INITIALIZE_DRIVE_OPS(rd, wr)                     \
+	{                                                    \
+		.bdo_dev = {{{                                   \
+			.no_file = {                                 \
+				.mo_destroy    = &AtaDrive_Destroy,      \
+				.mo_loadblocks = rd,                     \
+				.mo_saveblocks = wr,                     \
+				.mo_changed    = &blkdev_v_changed,      \
+				.mo_stream     = &atadrive_v_stream_ops, \
+			},                                           \
+			.no_wrattr = &blkdev_v_wrattr                \
+		}}},                                             \
 	}
 PRIVATE struct blkdev_ops const AtaDrive_DmaOps   = INITIALIZE_DRIVE_OPS(&AtaDrive_RdSectorsDMA, &AtaDrive_WrSectorsDMA);
 PRIVATE struct blkdev_ops const AtaDrive_ChsOps   = INITIALIZE_DRIVE_OPS(&AtaDrive_RdSectorsCHS, &AtaDrive_WrSectorsCHS);

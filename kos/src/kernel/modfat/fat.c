@@ -29,7 +29,6 @@
 
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/driver-callbacks.h>
-#include <kernel/fs/blkdev.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
@@ -44,6 +43,7 @@
 #include <kernel/mman/phys.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -519,7 +519,6 @@ Fat_LoadBlocks(struct mfile *__restrict self, pos_t addr,
 	struct fnode *me     = mfile_asnode(self);
 	FatNodeData *dat     = me->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
-	struct blkdev *dev   = super->ft_super.ffs_super.fs_dev;
 	assertf((buf & (super->ft_sectorsize - 1)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
 	assertf((addr & (super->ft_sectorsize - 1)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
 	assertf((num_bytes & (super->ft_sectorsize - 1)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
@@ -564,13 +563,9 @@ again:
 			}
 			if (max_io > num_bytes)
 				max_io = num_bytes;
-			if likely(dev->mf_blockshift <= super->ft_sectorshift) {
-				/* Can use unbuffered I/O */
-				blkdev_rdsectors_async(dev, diskpos, buf, max_io, aio);
-			} else {
-				/* Have to use buffered I/O */
-				mfile_readall_p(dev, buf, max_io, diskpos);
-			}
+			/* Do disk I/O */
+			fsuper_dev_rdsectors_async(&super->ft_super.ffs_super,
+			                           diskpos, buf, max_io, aio);
 			if (max_io >= num_bytes)
 				break;
 			num_bytes -= max_io;
@@ -592,7 +587,6 @@ Fat_SaveBlocks(struct mfile *__restrict self, pos_t addr,
 	struct fnode *me     = mfile_asnode(self);
 	FatNodeData *dat     = me->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
-	struct blkdev *dev   = super->ft_super.ffs_super.fs_dev;
 	assertf((buf & (super->ft_sectorsize - 1)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
 	assertf((addr & (super->ft_sectorsize - 1)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
 	assertf((num_bytes & (super->ft_sectorsize - 1)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
@@ -636,15 +630,12 @@ again:
 			}
 			if (max_io > num_bytes)
 				max_io = num_bytes;
-			if likely(dev->mf_blockshift <= super->ft_sectorshift) {
-				if unlikely(dev->mf_flags & MFILE_F_READONLY)
-					THROW(E_FSERROR_READONLY);
-				/* Can use unbuffered I/O */
-				blkdev_wrsectors_async(dev, diskpos, buf, max_io, aio);
-			} else {
-				/* Have to use buffered I/O */
-				mfile_write_p(dev, buf, max_io, diskpos);
-			}
+
+			/* Do disk I/O */
+			if unlikely(super->ft_super.ffs_super.fs_dev->mf_flags & MFILE_F_READONLY)
+				THROW(E_FSERROR_READONLY);
+			fsuper_dev_wrsectors_async(&super->ft_super.ffs_super,
+			                           diskpos, buf, max_io, aio);
 			if (max_io >= num_bytes)
 				break;
 			num_bytes -= max_io;
@@ -1857,8 +1848,7 @@ Fat16Root_LoadBlocks(struct mfile *__restrict self, pos_t addr,
                      physaddr_t buf, size_t num_bytes,
                      struct aio_multihandle *__restrict aio) {
 	size_t maxio;
-	FatSuperblock *me  = mfile_asfatsup(self);
-	struct blkdev *dev = me->ft_super.ffs_super.fs_dev;
+	FatSuperblock *me = mfile_asfatsup(self);
 	/* Adjust for absolute on-disk addresses. */
 	if (OVERFLOW_USUB(me->ft_fdat.fn16_root.r16_rootsiz, addr, &maxio))
 		maxio = 0;
@@ -1868,15 +1858,10 @@ Fat16Root_LoadBlocks(struct mfile *__restrict self, pos_t addr,
 		num_bytes = maxio;
 	}
 	addr += me->ft_fdat.fn16_root.r16_rootpos;
-	if likely(dev->mf_blockshift <= me->ft_sectorshift) {
-		if unlikely(dev->mf_flags & MFILE_F_READONLY)
-			THROW(E_FSERROR_READONLY);
-		/* Can use unbuffered I/O */
-		blkdev_rdsectors_async(dev, addr, buf, num_bytes, aio);
-	} else {
-		/* Must use sync I/O due to alignment constraints */
-		mfile_readall_p(dev, buf, num_bytes, addr);
-	}
+
+	/* Do disk I/O */
+	fsuper_dev_rdsectors_async(&me->ft_super.ffs_super,
+	                           addr, buf, num_bytes, aio);
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
@@ -1884,23 +1869,19 @@ Fat16Root_SaveBlocks(struct mfile *__restrict self, pos_t addr,
                      physaddr_t buf, size_t num_bytes,
                      struct aio_multihandle *__restrict aio) {
 	size_t maxio;
-	FatSuperblock *me  = mfile_asfatsup(self);
-	struct blkdev *dev = me->ft_super.ffs_super.fs_dev;
+	FatSuperblock *me = mfile_asfatsup(self);
 	/* Adjust for absolute on-disk addresses. */
 	if (OVERFLOW_USUB(me->ft_fdat.fn16_root.r16_rootsiz, addr, &maxio))
 		maxio = 0;
 	if unlikely(num_bytes > maxio)
 		num_bytes = maxio; /* Some part of the tail cannot be written. */
 	addr += me->ft_fdat.fn16_root.r16_rootpos;
-	if likely(dev->mf_blockshift <= me->ft_sectorshift) {
-		if unlikely(dev->mf_flags & MFILE_F_READONLY)
-			THROW(E_FSERROR_READONLY);
-		/* Can use unbuffered I/O */
-		blkdev_wrsectors_async(dev, addr, buf, num_bytes, aio);
-	} else {
-		/* Must use sync I/O due to alignment constraints */
-		mfile_write_p(dev, buf, num_bytes, addr);
-	}
+
+	/* Do disk I/O */
+	if unlikely(me->ft_super.ffs_super.fs_dev->mf_flags & MFILE_F_READONLY)
+		THROW(E_FSERROR_READONLY);
+	fsuper_dev_wrsectors_async(&me->ft_super.ffs_super,
+	                           addr, buf, num_bytes, aio);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -2358,10 +2339,10 @@ trimspecstring(char *__restrict buf, size_t size) {
 
 
 struct multifat_sync_file: mfile {
-	REF struct blkdev *mfsf_dev;              /* Underlying device. */
-	uint64_t           mfsf_fat_delta;        /* [const] Relative on-disk delta between different FAT copies. */
-	u8                 mfsf_fat_count;        /* [const] Total # of FAT copies. */
-	bool               mfsf_delta_is_aligned; /* [const] `true' if `mfsf_fat_delta' is aligned according to `mfsf_dev' */
+	REF struct mfile *mfsf_dev;              /* Underlying device. */
+	uint64_t          mfsf_fat_delta;        /* [const] Relative on-disk delta between different FAT copies. */
+	u8                mfsf_fat_count;        /* [const] Total # of FAT copies. */
+	bool              mfsf_delta_is_aligned; /* [const] `true' if `mfsf_fat_delta' is aligned according to `mfsf_dev' */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -2376,7 +2357,7 @@ multifat_sync_file_loadblocks(struct mfile *__restrict self, pos_t addr,
                               physaddr_t buf, size_t num_bytes,
                               struct aio_multihandle *__restrict aio) {
 	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
-	blkdev_rdsectors_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+	mfile_rdblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
@@ -2385,14 +2366,16 @@ multifat_sync_file_saveblocks(struct mfile *__restrict self, pos_t addr,
                               struct aio_multihandle *__restrict aio) {
 	u8 i;
 	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
-	if (me->mfsf_dev->mf_flags & MFILE_F_READONLY)
+	if ((me->mfsf_dev->mf_flags & MFILE_F_READONLY) ||
+	    (me->mfsf_dev->mf_ops->mo_saveblocks == NULL))
 		THROW(E_FSERROR_READONLY);
+
 	/* The initial FAT is always properly aligned. */
-	blkdev_wrsectors_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+	mfile_wrblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
 	for (i = 1; i < me->mfsf_fat_count; ++i) {
 		addr += me->mfsf_fat_delta;
 		if likely(me->mfsf_delta_is_aligned) {
-			blkdev_wrsectors_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+			mfile_wrblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
 		} else {
 			/* oof... Have to use buffered I/O... */
 			mfile_write_p(me->mfsf_dev, buf, num_bytes, addr);
@@ -2410,7 +2393,7 @@ PRIVATE struct mfile_ops const multifat_sync_file_ops = {
 
 PRIVATE WUNUSED NONNULL((1)) struct fsuper *KCALL
 Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
-                   struct blkdev *dev, UNCHECKED USER char *args) {
+                   struct mfile *dev, UNCHECKED USER char *args) {
 	FatSuperblock *result;
 	FatDiskHeader *disk;
 	u16 sector_size;
@@ -2419,10 +2402,10 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 	assert(dev);
 
 	/* Read the FAT disk header. */
-	if (blkdev_getsectorsize(dev) == sizeof(FatDiskHeader)) {
+	if (mfile_getblocksize(dev) == sizeof(FatDiskHeader)) {
 		disk = (FatDiskHeader *)aligned_alloca(sizeof(FatDiskHeader),
 		                                       sizeof(FatDiskHeader));
-		blkdev_rdsectors(dev, 0, pagedir_translate(disk), sizeof(FatDiskHeader));
+		mfile_rdblocks(dev, 0, pagedir_translate(disk), sizeof(FatDiskHeader));
 	} else {
 		disk = (FatDiskHeader *)alloca(sizeof(FatDiskHeader));
 		mfile_readall(dev, disk, sizeof(FatDiskHeader), 0);
@@ -2589,7 +2572,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 					fatfile->mf_parts = NULL;
 					SLIST_INIT(&fatfile->mf_changed);
 					fatfile->mf_flags = MFILE_F_NORMAL;
-					atomic64_init(&fatfile->mf_filesize, (uint64_t)blkdev_getsize(dev));
+					atomic64_init(&fatfile->mf_filesize, atomic64_read(&dev->mf_filesize));
 
 					/* Timestamps don't matter here; this file isn't exposed to user-space. */
 					DBG_memset(&fatfile->mf_atime, 0xcc, sizeof(fatfile->mf_atime));
@@ -2597,7 +2580,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 					DBG_memset(&fatfile->mf_ctime, 0xcc, sizeof(fatfile->mf_ctime));
 
 					/* Initialize custom fields. */
-					fatfile->mfsf_dev              = (REF struct blkdev *)incref(dev);
+					fatfile->mfsf_dev              = incref(dev);
 					fatfile->mfsf_delta_is_aligned = ((fat_delta >> dev->mf_blockshift) << dev->mf_blockshift) == fat_delta;
 					fatfile->mfsf_fat_delta        = fat_delta;
 					fatfile->mfsf_fat_count        = result->ft_fat_count;
@@ -2674,12 +2657,9 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		kfree(result);
 		RETHROW();
 	}
-	printk(KERN_INFO "[fat] Load FAT%u-filesystem on "
-	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
-	                 "%.2" PRIxN(__SIZEOF_MINOR_T__) " "
+	printk(KERN_INFO "[fat] Loaded FAT%u-filesystem "
 	                 "[oem=%q] [label=%q] [sysname=%q]\n",
 	       result->ft_type == FAT12 ? 12 : result->ft_type == FAT16 ? 16 : 32,
-	       MAJOR(dev->dn_devno), MINOR(dev->dn_devno),
 	       result->ft_oem, result->ft_label, result->ft_sysname);
 	return &result->ft_super.ffs_super;
 }

@@ -650,6 +650,16 @@ handle_mfile_allocate(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_ALLOCATE);
 }
 
+PRIVATE NONNULL((1)) void KCALL
+mfile_sync_generic(struct mfile *__restrict self)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream_ops;
+	mfile_sync(self);
+	stream_ops = self->mf_ops->mo_stream;
+	if (stream_ops != NULL && stream_ops->mso_sync != NULL)
+		(*stream_ops->mso_sync)(self);
+}
+
 INTERN NONNULL((1)) void KCALL
 handle_mfile_sync(struct mfile *__restrict self)
 		THROWS(...) {
@@ -659,7 +669,7 @@ handle_mfile_sync(struct mfile *__restrict self)
 		fnode_syncdata(node);
 		fnode_syncattr(node);
 	} else {
-		mfile_sync(self);
+		mfile_sync_generic(self);
 	}
 }
 
@@ -671,7 +681,7 @@ handle_mfile_datasync(struct mfile *__restrict self)
 		node = mfile_asnode(self);
 		fnode_syncdata(node);
 	} else {
-		mfile_sync(self);
+		mfile_sync_generic(self);
 	}
 }
 
@@ -705,12 +715,12 @@ handle_mfile_stat(struct mfile *__restrict self,
 	st_dev = st_rdev = 0;
 	if (mfile_isnode(self)) {
 		struct fnode *me;
-		struct fdevnode *blk;
+		struct mfile *dev;
 		me  = mfile_asnode(self);
-		blk = (struct fdevnode *)me->fn_super->fs_dev;
+		dev = me->fn_super->fs_dev;
 		/* Fill in extended file-node information */
-		if (blk)
-			st_dev = blk->dn_devno;
+		if (dev && mfile_isdevnode(dev))
+			st_dev = mfile_asdevnode(dev)->dn_devno;
 		st_ino   = me->fn_ino;
 		st_mode  = me->fn_mode;
 		st_nlink = me->fn_nlink;

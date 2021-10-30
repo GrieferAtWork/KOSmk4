@@ -115,11 +115,18 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 	ino_t ino = 0;
 	if (info->mmi_file && mfile_isnode(info->mmi_file)) {
 		struct inode *node = (struct inode *)info->mmi_file;
+#ifdef CONFIG_USE_NEW_FS
+		struct mfile *superdev;
+		superdev = node->fn_super->fs_dev;
+		if (superdev && mfile_isdevnode(superdev))
+			dev = mfile_asdevnode(superdev)->dn_devno;
+#else /* CONFIG_USE_NEW_FS */
 		struct blkdev *superdev;
-		ino      = node->i_fileino;
 		superdev = node->i_super->s_device;
 		if (superdev)
 			dev = blkdev_devno(superdev);
+#endif /* !CONFIG_USE_NEW_FS */
+		ino = node->i_fileino;
 	}
 	dbg_printf(DBGSTR(AC_WHITE("%.8" PRIxPTR) "-"           /* from- */
 	                  AC_WHITE("%.8" PRIxPTR) " "           /* to */

@@ -932,13 +932,10 @@ sys_mount_impl(USER UNCHECKED char const *source,
 				THROW(E_FSERROR_NO_BLOCK_DEVICE);
 			validate_readable(source, 1);
 			dev = path_traversefull(AT_FDCWD, source, atflags & ~AT_IGNORE_TRAILING_SLASHES);
-			if (fnode_isblkdev(dev)) {
-				/* Already the proper /dev/ device */
-			} else {
+			if (fnode_isdevnode(dev) && !fnode_isdevice(dev)) {
+				/* Device node, but not a device file (dereference to get the pointed-to device) */
 				dev_t devno;
 				FINALLY_DECREF_UNLIKELY(dev);
-				if unlikely(!S_ISBLK(dev->fn_mode))
-					THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
 				devno = fnode_asdevnode(dev)->dn_devno;
 				dev   = device_lookup_bydev(S_IFBLK, devno);
 				if unlikely(!dev)
@@ -946,8 +943,8 @@ sys_mount_impl(USER UNCHECKED char const *source,
 			}
 			FINALLY_DECREF_UNLIKELY(dev);
 			/* Open the superblock with the associated block-device. */
-			super = type ? ffilesys_open(type, fnode_asblkdev(dev), (USER UNCHECKED char *)data)
-			             : ffilesys_opendev(fnode_asblkdev(dev), (USER UNCHECKED char *)data);
+			super = type ? ffilesys_open(type, dev, (USER UNCHECKED char *)data)
+			             : ffilesys_opendev(dev, (USER UNCHECKED char *)data);
 		}
 		if unlikely(!super)
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);

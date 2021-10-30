@@ -1090,7 +1090,7 @@ again_acquire_locks:
 
 PRIVATE WUNUSED NONNULL((1)) REF struct fsuper *KCALL
 ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
-           struct blkdev *UNUSED(dev),
+           struct mfile *UNUSED(dev),
            UNCHECKED USER char *UNUSED(args)) {
 	STATIC_ASSERT((offsetof(struct ramfs_super, rs_dat) -
 	               offsetof(struct ramfs_super, fs_root)) ==

@@ -32,7 +32,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/allnodes.h>
-#include <kernel/fs/blkdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/ramfs.h>
@@ -840,18 +839,13 @@ again_acquire_super_changed:
 
 	/* Write modified attributes to disk. */
 	TRY {
+		struct mfile_stream_ops const *stream_ops;
 		mfile_sync(self);
 
-		/* Special case: if we're a block device, also invoke its sync operator. */
-		if (fnode_isblkdev(self)) {
-			struct blkdev *me;
-			struct blkdev_ops const *ops;
-			me  = fnode_asblkdev(self);
-			ops = blkdev_getops(me);
-			if (ops->bdo_sync != NULL)
-				(*ops->bdo_sync)(me);
-		}
-
+		/* If defined, invoke the streams-sync operator */
+		stream_ops = self->mf_ops->mo_stream;
+		if (stream_ops != NULL && stream_ops->mso_sync != NULL)
+			(*stream_ops->mso_sync)(self);
 	} EXCEPT {
 		/* Add back to changed list on error. */
 		mfile_changed(self, MFILE_F_CHANGED);

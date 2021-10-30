@@ -314,6 +314,11 @@ struct mfile_stream_ops {
 	WUNUSED NONNULL((1, 2)) ssize_t
 	(KCALL *mso_printlink)(struct mfile *__restrict self, __pformatprinter printer, void *arg)
 			THROWS(E_WOULDBLOCK, ...);
+
+	/* [0..1] Additional callback that should be invoked during `fsync()' / `fdatasync()' */
+	NONNULL((1)) void
+	(KCALL *mso_sync)(struct mfile *__restrict self)
+			THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 };
 
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
@@ -368,6 +373,15 @@ mfile_dosyncio(struct mfile *__restrict self,
                                                 physaddr_t buf, size_t num_bytes,
                                                 struct aio_multihandle *__restrict aio),
                pos_t addr, physaddr_t buf, size_t num_bytes);
+
+/* Read/Write whole file blocks using direct I/O */
+#define mfile_rdblocks_async(self, addr, buf, num_bytes, aio) ((*(self)->mf_ops->mo_loadblocks)(self, addr, buf, num_bytes, aio))
+#define mfile_wrblocks_async(self, addr, buf, num_bytes, aio) ((*(self)->mf_ops->mo_saveblocks)(self, addr, buf, num_bytes, aio))
+#define mfile_rdblocks(self, addr, buf, num_bytes)            mfile_dosyncio(self, (self)->mf_ops->mo_loadblocks, addr, buf, num_bytes)
+#define mfile_wrblocks(self, addr, buf, num_bytes)            mfile_dosyncio(self, (self)->mf_ops->mo_saveblocks, addr, buf, num_bytes)
+#define mfile_haverdblocks(self) ((self)->mf_ops->mo_loadblocks != __NULLPTR)
+#define mfile_havewrblocks(self) ((self)->mf_ops->mo_saveblocks != __NULLPTR)
+#define mfile_getblocksize(self) ((size_t)1 << (self)->mf_blockshift)
 
 struct mfile_ops {
 	/* [0..1] Finalize + free the given mem-file.
@@ -1283,7 +1297,8 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
  *   In  this case, return the # of bytes that could still be written before
  *   the limit is reached, but if this would end up being `0' bytes (because
  *   the initial file-offset was already `> sf_filesize_max'), then an error
- *   `E_FSERROR_FILE_TOO_BIG' is thrown instead. */
+ *   `E_FSERROR_FILE_TOO_BIG' is thrown instead. (iow: `0' is never returned
+ *   if a non-zero buffer is given) */
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
@@ -1302,8 +1317,12 @@ FUNDEF NONNULL((1, 2)) size_t KCALL mfile_tailwritev(struct mfile *__restrict se
 FUNDEF NONNULL((1, 2)) size_t KCALL mfile_tailwritev_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1)) void KCALL mfile_readall(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL mfile_readall_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) void KCALL mfile_readvall(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_readallv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL mfile_readallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_writeall(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_writeall_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_writeallv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_writeallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces

@@ -196,7 +196,18 @@ struct fsuper {
 	struct atomic_rwlock        fs_mountslock;    /* Lock for `fs_mounts' */
 	Toblockop_slist(fsuper)     fs_mountslockops; /* [lock(ATOMIC)] Pending lock-operations for `fs_mountslock' */
 	REF struct ffilesys        *fs_sys;           /* [1..1][const] fs-descriptor of this superblock. */
-	REF struct blkdev          *fs_dev;           /* [0..1][const] Underlying block-device. (if any) */
+	REF struct mfile           *fs_dev;           /* [0..1][const] Underlying block-device (if any). When non-NULL, this field also
+	                                               * holds a reference to `mf_trunclock' in order to prevent the backing file  from
+	                                               * being truncated. */
+	/* [1..1][const][valid_if(fs_dev != NULL)] Load-/save-blocks operators for `fs_dev'.
+	 * These operators are set such that they require alignment constraints as  required
+	 * by the filesystem  itself, and map  to the  operators of `fs_dev'  such that  its
+	 * constraints aren't violated either.
+	 *
+	 * Filesystem drivers should use these (or rather: the wrapper macros below) in order
+	 * to perform aligned (O_DIRECT-style) disk I/O. */
+	NONNULL((1, 5)) void (KCALL *fs_loadblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
+	NONNULL((1, 5)) void (KCALL *fs_saveblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
 	struct fsuperfeat           fs_feat;          /* [const] Filesystem features. */
 	struct REF fnode_list       fs_changednodes;  /* [0..n][lock(fs_changednodes_lock)][const_if(FSUPER_NODES_DELETED)]
 	                                               * List of changed node (set to FSUPER_NODES_DELETED during unmount). */
@@ -223,8 +234,15 @@ struct fsuper {
 FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsuper *__restrict self);
 
 /* Check if `self' is part of the list of changed superblocks, or is being added to it asynchronously. */
-#define fsuper_haschanged(self) (__hybrid_atomic_load((self)->fs_changedsuper.le_prev, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define fsuper_haschanged(self) \
+	(__hybrid_atomic_load((self)->fs_changedsuper.le_prev, __ATOMIC_ACQUIRE) != __NULLPTR)
 
+
+/* Read/Write whole filesystem sectors */
+#define fsuper_dev_rdsectors_async(self, addr, buf, num_bytes, aio) ((*(self)->fs_loadblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
+#define fsuper_dev_wrsectors_async(self, addr, buf, num_bytes, aio) ((*(self)->fs_saveblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
+#define fsuper_dev_rdsectors(self, addr, buf, num_bytes)            mfile_dosyncio((self)->fs_dev, (self)->fs_loadblocks, addr, buf, num_bytes)
+#define fsuper_dev_wrsectors(self, addr, buf, num_bytes)            mfile_dosyncio((self)->fs_dev, (self)->fs_saveblocks, addr, buf, num_bytes)
 
 
 /* Return a pointer to superblock-node operators of `self' */

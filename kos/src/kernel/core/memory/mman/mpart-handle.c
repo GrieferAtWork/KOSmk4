@@ -98,9 +98,20 @@ handle_mpart_stat(struct mpart *__restrict self,
 
 	/* TODO: Better integration for `CONFIG_USE_NEW_FS' */
 	if (vm_datablock_isinode(file)) {
+		dev_t devno = 0;
 		struct inode *ino  = (struct inode *)file;
-		struct blkdev *dev = ino->i_super->s_device;
-		dev_t devno        = dev ? blkdev_devno(dev) : 0;
+#ifdef CONFIG_USE_NEW_FS
+		struct mfile *dev;
+		dev = ino->fn_super->fs_dev;
+		if (dev && mfile_isdevnode(dev))
+			devno = mfile_asdevnode(dev)->dn_devno;
+#else /* CONFIG_USE_NEW_FS */
+		struct blkdev *dev;
+		dev = ino->i_super->s_device;
+		if (dev)
+			devno = blkdev_devno(dev);
+#endif /* !CONFIG_USE_NEW_FS */
+
 		result->st_dev   = (__dev_t)devno;
 		result->st_ino   = (__FS_TYPE(ino))ino->i_fileino;
 		result->st_mode  = (__mode_t)ino->i_filemode;

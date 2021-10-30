@@ -33,7 +33,6 @@ DECL_END
 #include <dev/tty.h>
 #include <fs/vfs.h>
 #include <kernel/execabi.h> /* execabi_system_rtld_file */
-#include <kernel/fs/blkdev.h>
 #include <kernel/fs/constdir.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/dirhandle.h>
@@ -772,13 +771,13 @@ maps_printer_cb(void *maps_arg, struct mmapinfo *__restrict info) {
 
 	if (info->mmi_file && mfile_isnode(info->mmi_file)) {
 		struct fnode *node = mfile_asnode(info->mmi_file);
-		struct blkdev *superdev;
+		struct mfile *superdev;
 		mfile_tslock_acquire(node);
 		ino = node->fn_ino;
 		mfile_tslock_release(node);
 		superdev = node->fn_super->fs_dev;
-		if (superdev != NULL)
-			dev = device_getdevno(superdev);
+		if (superdev != NULL && mfile_isdevnode(superdev))
+			dev = mfile_asdevnode(superdev)->dn_devno;
 	}
 
 	if (printf("%.8" PRIxPTR "-%.8" PRIxPTR " "     /* from-to */

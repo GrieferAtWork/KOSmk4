@@ -826,12 +826,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, <hybrid/sequence/atree.h>
 	 *       can finally go away! (also: deemon doesn't use it, so don't  worry) */
 
-	/* TODO: Change `fsuper' to not require a `blkdev', but `mfile+mfile_hasrawio()'
-	 *       Also  document  that `blkdev'  files _must_  support `mfile_hasrawio()'
-	 * XXX:  Is this really a good idea? Maybe, but `blkdev' guaranties that both
-	 *       loadblocks & saveblocks are _always_ implemented, which is something
-	 *       that filesystem drivers are (and do) assume to be the case... */
-
 	/* TODO: Rewrite `handle_manager' to make it  possible for fds to be  allocated
 	 *       in a 2-step process: #1: reserve, #2: commit (where commit must behave
 	 *       as NOBLOCK+NOTHROW, and can also be aborted/undone)

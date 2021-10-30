@@ -40,7 +40,7 @@ DECL_BEGIN
 #endif /* !REF_IF */
 
 struct fsuper;
-struct blkdev;
+struct mfile;
 struct driver;
 
 #define FFILESYS_F_NORMAL 0x00 /* Normal filesystem flags. */
@@ -70,7 +70,7 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift = ...;  # Address <=> block shift used by the filesystem
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags      = ...;  # Set of `MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 		 *                                                                        #         MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |
-		 *                                                                        #         MFILE_F_NOATIME | MFILE_F_NOMTIME | MFILE_FN_NODIRATIME |
+		 *                                                                        #         MFILE_F_NOATIME |  MFILE_F_NOMTIME  |  MFILE_FN_NODIRATIME  |
 		 *                                                                        #         MFILE_F_STRICTATIME | MFILE_F_LAZYTIME |
 		 *                                                                        #         MFILE_F_PERSISTENT | MFILE_FN_ATTRREADONLY'
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_filesize   = (pos_t)-1;      # Probably...
@@ -108,6 +108,8 @@ struct ffilesys {
 		 *   - return->fs_mountslockops                                   = SLIST_HEAD_INITIALIZER(~);
 		 *   - return->fs_sys                                             = incref(filesys);
 		 *   - return->fs_dev                                             = xincref(dev);
+		 *   - return->fs_loadblocks                                      = ...; // Based on `dev->mf_blockshift' and `return->fs_root.mf_blockshift',
+		 *   - return->fs_saveblocks                                      = ...; // as well as the set of mfile-block operators actually supported by `dev'
 		 *   - return->fs_changednodes                                    = LIST_HEAD_INITIALIZER(~);
 		 *   - return->fs_changednodes_lock                               = ATOMIC_LOCK_INIT;
 		 *   - return->fs_changednodes_lops                               = SLIST_HEAD_INITIALIZER(~);
@@ -119,13 +121,26 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_refcnt = 0;
 		 *   - return->fs_root._fdirnode_node_ fn_allsuper            = LIST_ENTRY_UNBOUND_INITIALIZER;
 		 *
-		 * @param: dev: [1..1][!FFILESYS_F_NODEV] The backing storage device for the filesystem.
+		 * @param: dev: [1..1][!FFILESYS_F_NODEV] The  backing storage device  for the filesystem. The
+		 *                                        caller  has incremented `mf_trunclock' such that the
+		 *                                        file will not be truncated  for the duration of  the
+		 *                                        call, and upon success, it will remain impossible to
+		 *                                        truncate the file until the superblock is destroyed.
+		 *                                        NOTE: You may assume that:
+		 *                                         - dev->mf_ops->mo_loadblocks != NULL
+		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pread == NULL
+		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_preadv == NULL
+		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pwrite == NULL
+		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pwritev == NULL
+		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_mmap == NULL
+		 *                                         - (dev->mf_flags & (MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP)) == 0
+		 *                                        Note that these requirements imply `mfile_hasrawio(dev)'
 		 * @param: dev: [0..0][FFILESYS_F_NODEV] Always NULL
 		 * @return: * : A new instance of a superblock for `dev'
 		 * @return: NULL: `dev' cannot be mounted using this filesystem. */
 		WUNUSED NONNULL((1)) struct fsuper *
 		(KCALL *ffs_open)(struct ffilesys *__restrict filesys,
-		                  struct blkdev *dev, UNCHECKED USER char *args);
+		                  struct mfile *dev, UNCHECKED USER char *args);
 
 		/* [1..1][valid_if(FFILESYS_F_SINGLE)]
 		 * Singleton instance of a superblock associated with this filesystem type. */
@@ -184,8 +199,8 @@ DATDEF struct lockop_slist ffilesys_formats_lops;   /* Lock operations for `ffil
  *                filesystem of this type. */
 FUNDEF WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_open(struct ffilesys *__restrict self,
-              struct blkdev *dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC);
+              struct mfile *dev, UNCHECKED USER char *args)
+		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE);
 
 /* Helper wrapper for `ffilesys_open()' that blindly goes through all  filesystem
  * types and tries to open `dev' with each of those needing a device, that aren't
@@ -196,8 +211,8 @@ ffilesys_open(struct ffilesys *__restrict self,
  *                aborted, you can simply destroy() (or decref()) it.
  * @return: NULL: `dev' doesn't contain any known filesystem. */
 FUNDEF WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-ffilesys_opendev(struct blkdev *dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC);
+ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
+		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE);
 
 
 /* Lookup a filesystem type, given its name.

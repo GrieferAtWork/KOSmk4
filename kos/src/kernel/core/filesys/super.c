@@ -31,8 +31,9 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/allnodes.h>
-#include <kernel/fs/blkdev.h>
+#include <kernel/fs/devfs.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
@@ -188,20 +189,20 @@ fsuper_sync(struct fsuper *__restrict self)
 
 		/* Sync the associated device file. */
 		{
-			struct blkdev *dev;
+			struct mfile *dev;
 			dev = self->fs_dev;
 			if (dev != NULL) {
-				struct blkdev_ops const *ops;
+				struct mfile_stream_ops const *stream_ops;
 				/* fnode_syncdata() would also work here, but that function
-				 * only conditionally invokes  `bdo_sync', whereas we  have
+				 * only conditionally invokes  `mso_sync', whereas we  have
 				 * to  invoke that operator (if it exists) unconditionally!
 				 *
 				 * As such, just do a normal file sync, followed by always
 				 * invoking the `bdo_sync' operator. */
 				mfile_sync(dev);
-				ops = blkdev_getops(dev);
-				if (ops->bdo_sync != NULL)
-					(*ops->bdo_sync)(dev);
+				stream_ops = dev->mf_ops->mo_stream;
+				if (stream_ops != NULL && stream_ops->mso_sync != NULL)
+					(*stream_ops->mso_sync)(dev);
 			}
 		}
 
@@ -269,8 +270,21 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 	        "Mounting points would have references");
 	assertf(!LIST_ISBOUND(me, fs_changedsuper),
 	        "The changed-list would have a reference");
-	printk(KERN_INFO "[fs] Destroying %s-superblock\n",
-	       me->fs_sys->ffs_name);
+	if (me->fs_dev) {
+		if (mfile_isdevice(me->fs_dev)) {
+			struct device *dev = mfile_asdevice(me->fs_dev);
+			device_getname_lock_acquire(dev);
+			printk(KERN_INFO "[fs] Destroying %s-superblock bound to \"/dev/%#q\"\n",
+			       me->fs_sys->ffs_name, device_getname(dev));
+			device_getname_lock_release(dev);
+		} else {
+			printk(KERN_INFO "[fs] Destroying %s-superblock bound to [mfile]\n",
+			       me->fs_sys->ffs_name);
+		}
+	} else {
+		printk(KERN_INFO "[fs] Destroying %s-superblock\n",
+		       me->fs_sys->ffs_name);
+	}
 
 	/* Drop references */
 	decref(me->fs_sys);
@@ -563,8 +577,21 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
 	if (!mfile_begin_delete(&self->fs_root))
 		return; /* Already deleted, or deletion already in progress. */
 
-	printk(KERN_INFO "[fs] Deleting %s-superblock\n",
-	       self->fs_sys->ffs_name);
+	if (self->fs_dev) {
+		if (mfile_isdevice(self->fs_dev)) {
+			struct device *dev = mfile_asdevice(self->fs_dev);
+			device_getname_lock_acquire(dev);
+			printk(KERN_INFO "[fs] Deleting %s-superblock bound to \"/dev/%#q\"\n",
+			       self->fs_sys->ffs_name, device_getname(dev));
+			device_getname_lock_release(dev);
+		} else {
+			printk(KERN_INFO "[fs] Deleting %s-superblock bound to [mfile]\n",
+			       self->fs_sys->ffs_name);
+		}
+	} else {
+		printk(KERN_INFO "[fs] Deleting %s-superblock\n",
+		       self->fs_sys->ffs_name);
+	}
 	incref(self);
 
 	/* Remove from the list of all superblocks */
@@ -597,7 +624,7 @@ fsuper_statfs(struct fsuper *__restrict self,
 	/* Fill in default fields. */
 	result->f_type    = (typeof(result->f_type))self->fs_feat.sf_magic;
 	result->f_bsize   = (typeof(result->f_bsize))1 << self->fs_root.mf_blockshift;
-	result->f_blocks  = self->fs_dev ? (typeof(result->f_blocks))(blkdev_getsize(self->fs_dev) >> self->fs_root.mf_blockshift) : 0;
+	result->f_blocks  = self->fs_dev ? (typeof(result->f_blocks))(atomic64_read(&self->fs_dev->mf_filesize) >> self->fs_root.mf_blockshift) : 0;
 	result->f_namelen = (typeof(result->f_namelen))self->fs_feat.sf_name_max;
 	result->f_frsize  = (typeof(result->f_frsize))1 << self->fs_root.mf_blockshift;
 	result->f_flags   = (typeof(result->f_flags))statvfs_flags_from_mfile_flags(self->fs_root.mf_flags);

@@ -24,12 +24,13 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
-#include <kernel/fs/blkdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/printk.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
@@ -37,6 +38,7 @@
 #include <kos/except.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -55,6 +57,35 @@ PUBLIC struct ffilesys_slist ffilesys_formats_list = { .slh_first = &devfs_files
 PUBLIC struct atomic_lock ffilesys_formats_lock   = ATOMIC_LOCK_INIT;
 PUBLIC struct lockop_slist ffilesys_formats_lops  = SLIST_HEAD_INITIALIZER(ffilesys_formats_lops);
 
+struct aio_multihandle;
+
+INTDEF NONNULL((1)) void /* From "memory/mman/mfile.c" */
+NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict self,
+                                    pos_t addr, physaddr_t buf, size_t num_bytes,
+                                    struct aio_multihandle *__restrict aio);
+
+PRIVATE NONNULL((1, 5)) void KCALL
+throw_readonly_v_saveblocks(struct mfile *__restrict UNUSED(self), pos_t UNUSED(addr),
+                            physaddr_t UNUSED(buf), size_t num_bytes,
+                            struct aio_multihandle *__restrict UNUSED(aio)) {
+	if likely(num_bytes != 0)
+		THROW(E_FSERROR_READONLY);
+}
+
+
+PRIVATE NONNULL((1, 5)) void KCALL
+unaligned_v_loadblocks(struct mfile *__restrict self, pos_t addr,
+                       physaddr_t buf, size_t num_bytes,
+                       struct aio_multihandle *__restrict UNUSED(aio)) {
+	mfile_readall_p(self, buf, num_bytes, addr);
+}
+
+PRIVATE NONNULL((1, 5)) void KCALL
+unaligned_v_saveblocks(struct mfile *__restrict self, pos_t addr,
+                       physaddr_t buf, size_t num_bytes,
+                       struct aio_multihandle *__restrict UNUSED(aio)) {
+	mfile_writeall_p(self, buf, num_bytes, addr);
+}
 
 
 /* Open  a new superblock and return it.  This function is a high-level wrapper
@@ -77,23 +108,102 @@ PUBLIC struct lockop_slist ffilesys_formats_lops  = SLIST_HEAD_INITIALIZER(ffile
  *                filesystem of this type. */
 PUBLIC WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_open(struct ffilesys *__restrict self,
-              struct blkdev *dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC) {
+              struct mfile *dev, UNCHECKED USER char *args)
+		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE) {
 	REF struct fsuper *result;
 	/* Check for special case: singleton */
 	if (self->ffs_flags & FFILESYS_F_SINGLE)
 		return incref(self->ffs_single);
 
+	/* Open the superblock */
 	if (self->ffs_flags & FFILESYS_F_NODEV) {
 		dev = NULL; /* Must be NULL in call */
+		result = (*self->ffs_open)(self, dev, args);
 	} else {
 		assert(dev); /* Must be non-NULL in call */
+
+		/* Need a device that implements at least a custom read-blocks operator,
+		 * doesn't override the mmap or pread operators, and is set-up to  allow
+		 * for user-I/O. */
+		if unlikely(dev->mf_ops->mo_loadblocks == NULL) {
+err_cannot_open_file:
+			/* TODO: Should probably rename this exception since we're no longer
+			 *       testing for block devices, but instead a specific set of
+			 *       required features which could (in theory) be implemented by
+			 *       any kind of file. */
+			THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
+		}
+		if (dev->mf_ops->mo_stream != NULL) {
+			if unlikely(dev->mf_ops->mo_stream->mso_pread != NULL ||
+			            dev->mf_ops->mo_stream->mso_preadv != NULL ||
+			            dev->mf_ops->mo_stream->mso_pwrite != NULL ||
+			            dev->mf_ops->mo_stream->mso_pwritev != NULL)
+				goto err_cannot_open_file;
+			if unlikely(dev->mf_ops->mo_stream->mso_mmap)
+				goto err_cannot_open_file;
+		}
+		if unlikely(dev->mf_flags & (MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP))
+			goto err_cannot_open_file;
+
+		/* With a device, we must ensure that it's size isn't
+		 * truncated when trying to open it as a  superblock.
+		 *
+		 * This can simply be done by holding a trunc-lock,
+		 * which  will be inherited  by the superblock upon
+		 * success. */
+		mfile_lock_write(dev);
+		mfile_trunclock_inc(dev);
+		mfile_lock_endwrite(dev);
+		TRY {
+			result = (*self->ffs_open)(self, dev, args);
+		} EXCEPT {
+			/* Release the trunc-lock if an exception was thrown. */
+			mfile_trunclock_dec(dev);
+			RETHROW();
+		}
+		if (result == NULL) {
+			/* Release the trunc-lock if the device couldn't be opened. */
+			mfile_trunclock_dec(dev);
+		}
 	}
 
-	/* Open the superblock */
-	result = (*self->ffs_open)(self, dev, args);
 	if (result != NULL) {
-		printk(KERN_INFO "[fs] Created %s-superblock\n", self->ffs_name);
+		if (dev) {
+			if (mfile_isdevice(dev)) {
+				struct device *ddev = mfile_asdevice(dev);
+				device_getname_lock_acquire(ddev);
+				printk(KERN_INFO "[fs] Created %s-superblock bound to \"/dev/%#q\"\n",
+					   self->ffs_name, device_getname(ddev));
+				device_getname_lock_release(ddev);
+			} else {
+				printk(KERN_INFO "[fs] Created %s-superblock bound to [mfile]\n",
+				       self->ffs_name);
+			}
+
+			/* Assign load-/save-blocks operators. */
+			if unlikely(result->fs_root.mf_blockshift < dev->mf_blockshift) {
+				printk(KERN_WARNING "[fs] %s-superblock sector-size (%" PRIuSIZ ") is less "
+				                    "restrictive than device sector-size (%" PRIuSIZ "): "
+				                    "direct I/O not possible\n",
+				       self->ffs_name,
+				       (size_t)1 << result->fs_root.mf_blockshift,
+				       (size_t)1 << dev->mf_blockshift);
+				result->fs_loadblocks = &unaligned_v_loadblocks;
+				result->fs_saveblocks = &unaligned_v_saveblocks;
+			} else {
+				result->fs_loadblocks = dev->mf_ops->mo_loadblocks;
+				result->fs_saveblocks = dev->mf_ops->mo_saveblocks;
+				if unlikely(result->fs_loadblocks == NULL)
+					result->fs_loadblocks = &mfile_zero_loadpages;
+				if unlikely(result->fs_saveblocks == NULL)
+					result->fs_saveblocks = &throw_readonly_v_saveblocks;
+			}
+		} else {
+			printk(KERN_INFO "[fs] Created %s-superblock\n",
+			       self->ffs_name);
+			DBG_memset(&result->fs_loadblocks, 0xcc, sizeof(result->fs_loadblocks));
+			DBG_memset(&result->fs_saveblocks, 0xcc, sizeof(result->fs_saveblocks));
+		}
 
 		/* Fill in fields as documented by `ffs_open' */
 		assert(result->fs_root.mf_ops && ADDR_ISKERN(result->fs_root.mf_ops));
@@ -132,7 +242,7 @@ ffilesys_open(struct ffilesys *__restrict self,
 		atomic_rwlock_init(&result->fs_mountslock);
 		SLIST_INIT(&result->fs_mountslockops);
 		result->fs_sys = incref(self);
-		result->fs_dev = (REF struct blkdev *)xincref(dev);
+		result->fs_dev = xincref(dev); /* Also inherits the trunc-lock created above. */
 		LIST_INIT(&result->fs_changednodes);
 		atomic_lock_init(&result->fs_changednodes_lock);
 		SLIST_INIT(&result->fs_changednodes_lops);
@@ -189,8 +299,8 @@ ffilesys_next(struct ffilesys *prev) {
  *                aborted, you can simply destroy() (or decref()) it.
  * @return: NULL: `dev' doesn't contain any known filesystem. */
 PUBLIC WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-ffilesys_opendev(struct blkdev *dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC) {
+ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
+		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE) {
 	REF struct ffilesys *iter, *next;
 	/* Enumerate filesystem types. */
 	for (iter = NULL;;) {

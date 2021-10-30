@@ -251,7 +251,7 @@ mfile_readall_p(struct mfile *__restrict self,
 }
 
 PUBLIC NONNULL((1, 2)) void KCALL
-mfile_readvall(struct mfile *__restrict self,
+mfile_readallv(struct mfile *__restrict self,
                struct iov_buffer const *__restrict buf,
                size_t buf_offset, size_t num_bytes,
                pos_t src_offset)
@@ -286,6 +286,38 @@ mfile_readallv_p(struct mfile *__restrict self,
 		num_bytes -= temp;
 		src_offset += temp;
 	}
+}
+
+PUBLIC NONNULL((1)) void KCALL
+mfile_writeall(struct mfile *__restrict self, USER CHECKED void const *src,
+               size_t num_bytes, pos_t dst_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	if unlikely(mfile_write(self, src, num_bytes, dst_offset) < num_bytes)
+		THROW(E_FSERROR_FILE_TOO_BIG);
+}
+
+PUBLIC NONNULL((1)) void KCALL
+mfile_writeall_p(struct mfile *__restrict self, physaddr_t src,
+                 size_t num_bytes, pos_t dst_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	if unlikely(mfile_write_p(self, src, num_bytes, dst_offset) < num_bytes)
+		THROW(E_FSERROR_FILE_TOO_BIG);
+}
+
+PUBLIC NONNULL((1, 2)) void KCALL
+mfile_writeallv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf,
+                size_t buf_offset, size_t num_bytes, pos_t dst_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	if unlikely(mfile_writev(self, buf, buf_offset, num_bytes, dst_offset) < num_bytes)
+		THROW(E_FSERROR_FILE_TOO_BIG);
+}
+
+PUBLIC NONNULL((1, 2)) void KCALL
+mfile_writeallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf,
+                  size_t buf_offset, size_t num_bytes, pos_t dst_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	if unlikely(mfile_writev_p(self, buf, buf_offset, num_bytes, dst_offset) < num_bytes)
+		THROW(E_FSERROR_FILE_TOO_BIG);
 }
 
 

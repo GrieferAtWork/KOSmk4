@@ -83,17 +83,8 @@ iso9660_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                      struct aio_multihandle *__restrict aio) {
 	struct fnode *me   = mfile_asnode(self);
 	pos_t diskaddr     = fnode_getdiskaddr(me, addr);
-	struct blkdev *dev = me->fn_super->fs_dev;
-	if likely(dev->mf_blockshift <= me->mf_blockshift) {
-		/* Backing  device has same or less restrictive alignment
-		 * constraints, meaning that we're able to use direct I/O */
-		blkdev_rdsectors_async(me->fn_super->fs_dev, diskaddr,
-		                       buf, num_bytes, aio);
-	} else {
-		/* Ooof... Backing device has more constraints than we
-		 * do; need to use buffered  I/O to work around  that. */
-		mfile_readall_p(me->fn_super->fs_dev, buf, num_bytes, diskaddr);
-	}
+	struct fsuper *sup = me->fn_super;
+	fsuper_dev_rdsectors_async(sup, diskaddr, buf, num_bytes, aio);
 }
 
 
@@ -286,7 +277,7 @@ PRIVATE struct flatsuper_ops const iso9660_super_ops = {
 
 PRIVATE WUNUSED NONNULL((1)) struct fsuper *KCALL
 iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
-               struct blkdev *dev, UNCHECKED USER char *args) {
+               struct mfile *dev, UNCHECKED USER char *args) {
 	struct flatsuper *result;
 	VolumeDescriptor *desc;
 	pos_t offset, second_volume_offset;
@@ -313,7 +304,7 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 		/* Load the volume descriptor. */
 #if PAGESHIFT >= ISO9660_SECTOR_SHIFT
 		if (dev->mf_blockshift <= ISO9660_SECTOR_SHIFT) {
-			blkdev_rdsectors(dev, offset, pagedir_translate(desc), ISO9660_SECTOR_SIZE);
+			mfile_rdblocks(dev, offset, pagedir_translate(desc), ISO9660_SECTOR_SIZE);
 		} else
 #endif /* PAGESHIFT >= ISO9660_SECTOR_SHIFT */
 		{
@@ -329,7 +320,7 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 				offset = second_volume_offset;
 #if PAGESHIFT >= ISO9660_SECTOR_SHIFT
 				if (dev->mf_blockshift <= ISO9660_SECTOR_SHIFT) {
-					blkdev_rdsectors(dev, offset, pagedir_translate(desc), ISO9660_SECTOR_SIZE);
+					mfile_rdblocks(dev, offset, pagedir_translate(desc), ISO9660_SECTOR_SIZE);
 				} else
 #endif /* PAGESHIFT >= ISO9660_SECTOR_SHIFT */
 				{
