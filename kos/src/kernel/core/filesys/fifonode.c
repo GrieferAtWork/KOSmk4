@@ -46,8 +46,8 @@
 
 DECL_BEGIN
 
-/* Default operator for opening ffifonode files. This will construct
- * a  `struct fifohandle' (HANDLE_TYPE_FIFOHANDLE) object and write it
+/* Default operator for opening ffifonode files. This will  construct
+ * a `struct fifohandle' (HANDLE_TYPE_FIFOHANDLE) object and write it
  * back to `hand'. */
 PUBLIC NONNULL((1, 2)) void KCALL
 ffifonode_v_open(struct mfile *__restrict self,

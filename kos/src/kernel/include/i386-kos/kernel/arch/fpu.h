@@ -50,7 +50,7 @@ DECL_BEGIN
 DATDEF unsigned int const x86_fpustate_variant;
 
 /* Save/Load the register state of the FPU unit (always uses `x86_fpustate_variant').
- * NOTE: `x86_fpustate_save()' may reset the active FPU context before
+ * NOTE: `x86_fpustate_save()'  may  reset  the active  FPU  context before
  *       returning. - If this isn't intended, `x86_fpustate_save_noreset()'
  *       must  be used, which  will leave the  current FPU state unchanged. */
 FUNDEF NOBLOCK void FCALL x86_fpustate_load(struct fpustate const *__restrict state);

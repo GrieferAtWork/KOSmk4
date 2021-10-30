@@ -172,7 +172,7 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 #endif /* !CONFIG_USE_NEW_FS */
 
 	/* In order to allow for execution, the file itself must support mmaping.
-	 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
+	 * It's  not OK if the file can be mmap'd indirectly, or if mmap has been
 	 * disabled for the file. */
 #ifdef CONFIG_USE_NEW_FS
 	if unlikely(!mfile_hasrawio(args.ea_xfile))

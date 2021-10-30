@@ -251,7 +251,7 @@ fpustate_loadfrom(USER CHECKED struct fpustate const *state)
 		/* Save the newly allocated FPU state. */
 		PERTASK_SET(this_fpustate, mystate);
 	}
-	/* XXX: Should we be doing some kind of verification here?
+	/* XXX: Should we be doing  some kind of verification  here?
 	 *      Are there register states that are illegal and would
 	 *      result in in exceptions later down the line? */
 	if (!!fpustate_isssave(mystate) != (x86_fpustate_variant == FPU_STATE_SSTATE)) {

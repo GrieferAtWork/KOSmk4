@@ -36,7 +36,7 @@ DECL_BEGIN
  * Using integration with KOS's DL extension APIs, this function automatically
  * accesses the `.eh_frame' sections of  the module associated with the  given
  * address, as well as  keep track of a  lazily allocated address-tree of  FDE
- * caches for quick (O(1))  repeated access to an  FDE located within a  known
+ * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
 INTDEF NONNULL((2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,

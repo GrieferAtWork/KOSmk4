@@ -134,7 +134,7 @@ _clnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_BA
 }
 
 /* Helper-wrapper for `_clnknode_alloc()' that will populate the
- * link-node with  `text_length' characters  copied from  `text'. */
+ * link-node with `text_length'  characters copied from  `text'. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
 _clnknode_new(struct fsuper *__restrict super,
               USER CHECKED char const *text, size_t text_length)

@@ -45,7 +45,7 @@ LOCAL WUNUSED REF struct ttydev *NOTHROW(KCALL task_getctty_of_nx)(struct task *
 
 
 #ifndef CONFIG_USE_NEW_FS
-/* The  character  device made  available  under /dev/ttydev
+/* The   character   device   made   available   under   /dev/ttydev
  * This device implements all operators as direct aliasing callbacks
  * to  the TTY character device addressable through `task_getctty()' */
 DATDEF struct chrdev dev_tty;

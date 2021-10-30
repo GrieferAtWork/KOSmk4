@@ -60,8 +60,8 @@ DECL_BEGIN
 /* FDE Caching                                                          */
 /************************************************************************/
 struct fde_cache_entry {
-	unwind_fde_t                   fce_fde;    /* [const] The FDE entry being cached.
-	                                            * When `f_pcstart...f_pcend' range is
+	unwind_fde_t                   fce_fde;    /* [const] The FDE entry being  cached.
+	                                            * Where `f_pcstart...f_pcend' range is
 	                                            * used as key-pair for the LLRB-tree */
 	__WEAK __REF void             *fce_dlhand; /* [const] Weak reference for the  dl-handle of the library  that
 	                                            * is backing this slot. This weakref is used to detect when  the
@@ -442,7 +442,7 @@ err_no_section:
  * Using integration with KOS's DL extension APIs, this function automatically
  * accesses the `.eh_frame' sections of  the module associated with the  given
  * address, as well as  keep track of a  lazily allocated address-tree of  FDE
- * caches for quick (O(1))  repeated access to an  FDE located within a  known
+ * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
 INTERN NONNULL((2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,

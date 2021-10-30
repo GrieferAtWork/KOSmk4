@@ -267,7 +267,7 @@ FUNDEF NONNULL((1)) poll_mode_t KCALL kbddev_v_polltest(struct chrdev *__restric
  *       must ensure that `keyboard_device_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by keyboard,
- *       get  initialized by `kbddev_init()', and should not be
+ *       get  initialized  by   `kbddev_init()',  and   should  not   be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl

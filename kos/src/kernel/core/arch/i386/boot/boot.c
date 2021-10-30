@@ -444,15 +444,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Once added, make  use of  this API to  pipe syslog  messages written  by
 	 * insmod(1) and rmmod(1) to stdout and stderr (based on message severity). */
 
-	/* TODO: Alter all instances  where the kernel  currently uses <hybrid/sequence/atree.h>  to
-	 *       instead make use of <hybrid/sequence/rbtree.h>. Doing this consistently may greatly
-	 *       improve performance throughout the kernel:
-	 *        - blkdev_tree
-	 *        - chrdev_tree
-	 *        - struct driver::d_eh_frame_cache
-	 *        - struct superblock::s_nodes
-	 * TODO: Also make use of RB-trees to implement `struct epoll_controller::ec_list' */
-
 	/* TODO: Add `__USE_ISOC2X' to <features.h> */
 	/* TODO: Add FLT_NORM_MAX, DBL_NORM_MAX and LDBL_NORM_MAX to <float.h> under #ifdef __USE_ISOC2X
 	 *       Also add DEC32_TRUE_MIN, DEC64_TRUE_MIN and DEC128_TRUE_MIN, alongside everything  from
@@ -751,7 +742,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     then mprotect() the main thread's stack to alter protection.
 	 *   - Expose a dlauxctrl() code to query needed stack protection (with
 	 *     a default of PROT_READ|PROT_WRITE)
-	 *   - pthread_create must use that control code to figure out to map
+	 *   - pthread_create must use that control code to figure out how to map
 	 *     new thread stacks. */
 
 	/* TODO: Look into enabling `-fsanitize=undefined' for all code. */
@@ -801,6 +792,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       `MFILE_F_NOMTIME'),  which  may  only  be  done  (atomically) while
 	 *       enumerating the super's node-tree and holding `fsuper_nodes_read()' */
 
+	/* TODO: Implement the special /dev/disk directory */
+
 	/* TODO: Add procfs file `/proc/mounts' */
 
 	/* TODO: Implement the (currently) stubbed per-proc special directories in procfs */
@@ -824,6 +817,55 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: What our mfiles implement as `mo_loadblocks' / `mo_saveblocks', linux
 	 *       also supports via the `O_DIRECT' flag. As such, we should add support
 	 *       for that flag! */
+
+	/* TODO: Re-write `modiso9660' for the new filesystem. */
+
+	/* TODO: The devfs root directory rename() operator should really be  re-written
+	 *       from scratch (and the ramfs one should be, too). Both don't really work
+	 *       correctly  with all of  the special AT_RENAME_*  flags, since they were
+	 *       implemented before I learned about unix rename() semantics... */
+
+	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, <hybrid/sequence/atree.h>
+	 *       can finally go away! (also: deemon doesn't use it, so don't  worry) */
+
+	/* TODO: Change `fsuper' to not require a `blkdev', but `mfile+mfile_hasrawio()'
+	 *       Also  document  that `blkdev'  files _must_  support `mfile_hasrawio()' */
+
+	/* TODO: Rewrite `handle_manager' to make it  possible for fds to be  allocated
+	 *       in a 2-step process: #1: reserve, #2: commit (where commit must behave
+	 *       as NOBLOCK+NOTHROW, and can also be aborted/undone)
+	 * Idea for data structure: LLRBTREE where nodes are linear vectors of file-id
+	 * ranges. This would allow for O(log2(N)) lookup even when 0 and UINT_MAX are
+	 * both  allocated, as well  as guaranty O(log2(N))  calculation of F_NEXT, as
+	 * well as the greatest currently in-use FD, all of which are operations  that
+	 * are dearly needed.
+	 *
+	 * Reserved slots could be represented via a dedicated, special handle type ID
+	 * which cannot be close(2)'d (doing so acts as though the FD wasn't  opened),
+	 * and a NOBLOCK+NOTHROW commit can be done  by use of an SMP-lock to  prevent
+	 * the realloc (and thus base-pointer-change) of FD sub-tables (commit is then
+	 * implemented  as  `SMP_LOCK(); tab->vec[id] = hand; SMP_UNLOCK();').   These
+	 * tables themselves are owned by the handle manager, and are freed when  they
+	 * become  empty, as well  as merged/split as  slots are allocated/freed. (The
+	 * case  where a slot become freed, and a split is attempted must obviously be
+	 * written with emphasis on _ATTEMPT_, since it would _have_ to be a  NOBLOCK+
+	 * NOTHROW  operation, though I guess it may  also be possible with a lockop?)
+	 *
+	 * End goals:
+	 * - NOBLOCK+NOTHROW handle-commit operation (to fix the problem of  O_CREAT
+	 *   to  make a new file, then later fail to install the handle, but leaving
+	 *   the file still created with no NOBLOCK+NOTHROW way to undo this, and no
+	 *   way in general to prevent the  file from already having become  visible
+	 *   globally)
+	 * - Worst case of O(log2(N)) for: lookup, delete, insert,  find_next,
+	 *   with further emphasis put on `lookup' being the fastest of these.
+	 *   (Where N is the # of open file handles)
+	 *
+	 * New name (idea):
+	 *   - DATDEF ATTR_PERTASK struct handtab *this_handtab;
+	 */
+
+
 
 	return state;
 }

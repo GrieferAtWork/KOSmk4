@@ -734,11 +734,11 @@ NOTHROW(KCALL mousedev_hwheel_nopr)(struct mousedev *__restrict self,
 
 #ifndef CONFIG_USE_NEW_FS
 /* Initialize/finalize the given mouse device.
- * NOTE: Drivers that override  the `ct_fini' operator  of a given  mouse
+ * NOTE: Drivers that override the `ct_fini' operator of a given  mouse
  *       must ensure that `mousedev_v_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by mouse,
- *       get  initialized by `mousedev_init()', and should not be
+ *       get  initialized  by  `mousedev_init()', and  should  not be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl

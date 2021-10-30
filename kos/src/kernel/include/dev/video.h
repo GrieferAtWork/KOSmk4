@@ -140,7 +140,7 @@ videodev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	_ansittydev_init(_videodev_asatty(self), &(ops)->vdf_tty, tty_ops)
 #define _videodev_cinit(self, ops, tty_ops) \
 	_ansittydev_cinit(_videodev_asatty(self), &(ops)->vdf_tty, tty_ops)
-	
+
 /* Finalize a partially initialized `struct videodev' (as initialized by `_videodev_init()') */
 #define _videodev_fini(self) _ansittydev_fini(_videodev_asatty(self))
 

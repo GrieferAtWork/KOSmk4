@@ -225,8 +225,8 @@ chrdev_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-/* Same as `chrdev_lookup()', but return `NULL'
- * if   the  lookup  would   have  caused  an  exception. */
+/* Same as `chrdev_lookup()', but return  `NULL'
+ * if the lookup would have caused an exception. */
 PUBLIC WUNUSED REF struct chrdev *
 NOTHROW(KCALL chrdev_lookup_nx)(dev_t devno) {
 	REF struct chrdev *result;

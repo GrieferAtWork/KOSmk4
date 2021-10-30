@@ -302,8 +302,8 @@ block_device_alloc(size_t sector_size DFL(512),
 FUNDEF WUNUSED REF struct blkdev *KCALL
 blkdev_lookup(dev_t devno) THROWS(E_WOULDBLOCK);
 
-/* Same as `blkdev_lookup()', but return `NULL'
- * if  the  lookup  would have  caused  an exception. */
+/* Same as `blkdev_lookup()', but return  `NULL'
+ * if the lookup would have caused an exception. */
 FUNDEF WUNUSED REF struct blkdev *
 NOTHROW(KCALL blkdev_lookup_nx)(dev_t devno);
 
@@ -350,7 +350,7 @@ blkdev_register(struct blkdev *__restrict self, dev_t devno)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Automatically register the given block-device, assigning it an auto-generated device ID.
- * If `self'  is a  partition (s.a.  `blkdev_ispart()'), assign  based on  other
+ * If   `self'   is  a   partition  (s.a.   `blkdev_ispart()'),   assign  based   on  other
  * preexisting   partitions   `MKDEV(MAJOR(bp_master),LOWEST_UNUSED_MINOR)',   or    assign
  * `MKDEV(MAJOR(bp_master),MINOR(bp_master) + 1)'.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
@@ -364,7 +364,7 @@ blkdev_register_auto(struct blkdev *__restrict self)
 #define blkdev_ispart(self) \
 	((self)->bd_type.dt_read == &block_device_partition_read)
 
-/* Create a new sub-partition for `master', placing it as the given address.
+/* Create   a  new  sub-partition   for  `master',  placing  it   as  the  given  address.
  * Following this, automatically register the new partition with `blkdev_register_auto()',
  * after assigning the name `"%s%u" % (master->bd_name,MINOR(blkdev_devno(return)) - MINOR(blkdev_devno(master)))'.
  * NOTE: If another partition with the same `part_min' and `part_max', no new
@@ -464,8 +464,8 @@ FUNDEF NONNULL((1)) size_t KCALL block_device_sync(struct blkdev *__restrict sel
  *       and fill in at some earlier point in time.
  *       After that, the ~boot_partition~ should be determined via:
  *           vfs_kernel->root->inode->super->device */
-/* [0..1] The  block  device  / partition  from  which the  kernel  was booted.
- * Set to `(struct blkdev *)-1' if indeterminate during early boot. */
+/* [0..1] The block device / partition from which the kernel was booted.
+ * Set  to  `(struct blkdev *)-1'  if indeterminate  during  early boot. */
 DATDEF REF struct blkdev *boot_partition;
 #endif /* __CC__ */
 

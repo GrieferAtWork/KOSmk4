@@ -2402,7 +2402,7 @@ kernel_execveat(fd_t dirfd,
 	}
 	TRY {
 		/* In order to allow for execution, the file itself must support mmaping.
-		 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
+		 * It's  not OK if the file can be mmap'd indirectly, or if mmap has been
 		 * disabled for the file. */
 		if unlikely(!mfile_hasrawio(args.ea_xfile))
 			THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
@@ -2412,7 +2412,7 @@ kernel_execveat(fd_t dirfd,
 			struct fnode *node = mfile_asnode(args.ea_xfile);
 			if unlikely(node->fn_super->fs_root.mf_flags & MFILE_FS_NOEXEC)
 				THROW(E_NOT_EXECUTABLE_NOEXEC); /* XXX: Some other exception for this case? */
-	
+
 			/* Check for execute permissions? */
 			if (!fnode_mayaccess(node, R_OK | X_OK))
 				THROW(E_NOT_EXECUTABLE_NOEXEC);

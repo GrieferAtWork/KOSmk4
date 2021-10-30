@@ -2610,7 +2610,7 @@ cannot_cache:
  * Using integration with KOS's DL extension APIs, this function automatically
  * accesses the `.eh_frame' sections of  the module associated with the  given
  * address, as well as  keep track of a  lazily allocated address-tree of  FDE
- * caches for quick (O(1))  repeated access to an  FDE located within a  known
+ * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
 DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
 INTERN NOBLOCK NONNULL((2)) unsigned int
@@ -3280,9 +3280,9 @@ driver_runfini_unbindglob(struct driver *__restrict self) {
 	 *   - async_job_start()                    (Cancel all running jobs with callbacks apart of `self')
 	 *   - realtime_clock
 	 * XXX:
-	 *   - What  about  file  handles  that  somehow  reference  the   driver,
-	 *     including  stuff  like  HANDLE_TYPE_FILEHANDLE->f_node->i_super->s_device
-	 *     We should probably try to find these files, and close them in their
+	 *   - What  about   file  handles   that  somehow   reference  the   driver,
+	 *     including stuff like HANDLE_TYPE_FILEHANDLE->f_node->i_super->s_device
+	 *     We should probably try  to find these files,  and close them in  their
 	 *     accompanying handle manager.
 	 *     We can enumerate open handle managers by enumerating threads!
 	 *   - This function should also have a  return value to indicate if  it

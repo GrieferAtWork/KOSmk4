@@ -178,8 +178,8 @@ chrdev_alloc(struct driver *__restrict owner,
 FUNDEF WUNUSED REF struct chrdev *KCALL
 chrdev_lookup(dev_t devno) THROWS(E_WOULDBLOCK);
 
-/* Same as `chrdev_lookup()', but return `NULL'
- * if   the  lookup  would   have  caused  an  exception. */
+/* Same as `chrdev_lookup()', but return  `NULL'
+ * if the lookup would have caused an exception. */
 FUNDEF WUNUSED REF struct chrdev *
 NOTHROW(KCALL chrdev_lookup_nx)(dev_t devno);
 

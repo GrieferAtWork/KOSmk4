@@ -201,7 +201,7 @@ NOTHROW(KCALL handle_isdirectory)(struct handle self) {
  * WARNING: This function does _NOT_ fill in `return.h_mode'
  * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
  *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
- *                         O_PATH   |  O_TMPFILE  |  O_*'
+ *                         O_PATH | O_TMPFILE | O_*'
  * @param: fsmode: Set of `0 | AT_SYMLINK_NOFOLLOW | FS_MODE_FDOSPATH |
  *                         FS_MODE_FEMPTY_PATH | FS_MODE_FSYMLINK_NOFOLLOW' */
 PUBLIC WUNUSED NONNULL((1, 2, 3)) REF struct handle KCALL

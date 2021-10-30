@@ -179,7 +179,7 @@ shebang_exec(struct execargs *__restrict args) {
 				size_t more_argc;
 
 				/* In order to allow for execution, the file itself must support mmaping.
-				 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
+				 * It's  not OK if the file can be mmap'd indirectly, or if mmap has been
 				 * disabled for the file. */
 #ifdef CONFIG_USE_NEW_FS
 				if unlikely(!mfile_hasrawio(interp_node))

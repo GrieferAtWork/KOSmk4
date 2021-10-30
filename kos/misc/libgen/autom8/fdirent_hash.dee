@@ -21,12 +21,15 @@ import * from deemon;
 import * from ..autom8;
 import * from ..fdirent_hash;
 
-@@This module works in 1 of 2 ways:
+@@This module works in 1 of 3 ways:
 @@
 @@First method:
 @@>> "foo" /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(...)/*[[[end]]]*/
 @@
 @@Second method:
+@@>> /*[[[fdirent_hash("foo")]]]*/FDIRENT_HASH_INIT(...)/*[[[end]]]*/
+@@
+@@Third method:
 @@>> /*[[[fdirent_hash:A("foo", $$)]]]*/A("foo", FDIRENT_HASH_INIT(...))/*[[[end]]]*/
 function main(parser: Autom8Parser, body: string) {
 	local autoEnd = parser.text.find("/*[[[end]]]*/", parser.commentEnd);

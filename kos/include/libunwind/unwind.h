@@ -77,7 +77,7 @@ typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_ERROR_REGISTER_STATE;
  * Using integration with KOS's DL extension APIs, this function automatically
  * accesses the `.eh_frame' sections of  the module associated with the  given
  * address, as well as  keep track of a  lazily allocated address-tree of  FDE
- * caches for quick (O(1))  repeated access to an  FDE located within a  known
+ * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
 typedef __ATTR_NONNULL((2)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_FIND)(void const *__absolute_pc,

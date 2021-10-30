@@ -512,9 +512,9 @@ register_pty_pair(struct ptymaster *__restrict master,
 		slave_name = devdirent_newf("ttyX.....");
 		TRY {
 			minor_t min;
-			/* Mark the 2 devices such that they're _NOT_ part of the all-nodes list.
+			/* Mark the 2 devices such that they're _NOT_ part of the all-nodes  list.
 			 * No part of the kernel holds explicit reference to PTY devices, which is
-			 * important for allowing such devices to implicitly delete themselves as
+			 * important for allowing such devices to implicitly delete themselves  as
 			 * soon as no-one is holding any more references to them. */
 			LIST_ENTRY_UNBOUND_INIT(&master->fn_allnodes);
 			LIST_ENTRY_UNBOUND_INIT(&slave->fn_allnodes);

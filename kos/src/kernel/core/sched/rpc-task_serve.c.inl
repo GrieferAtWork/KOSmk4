@@ -144,7 +144,7 @@ handle_pending:
 					 * discard the RPC and continue execution like normal!
 					 *
 					 * Such semantics are required for stuff like `handle_fifohandle_write',
-					 * which needs to return with EPIPE  when the signal is being  ignored.
+					 * which  needs to return  with EPIPE when the  signal is being ignored.
 					 *
 					 * But if we were to unwind  normally for ignored signals, then  that
 					 * would result in the RPC only being discarded once the system  call

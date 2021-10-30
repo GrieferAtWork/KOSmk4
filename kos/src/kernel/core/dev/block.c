@@ -76,8 +76,8 @@
 
 DECL_BEGIN
 
-/* [0..1] The  block  device  / partition  from  which the  kernel  was booted.
- * Set to `(struct blkdev *)-1' if indeterminate during early boot. */
+/* [0..1] The block device / partition from which the kernel was booted.
+ * Set  to  `(struct blkdev *)-1'  if indeterminate  during  early boot. */
 PUBLIC REF struct blkdev *boot_partition = NULL;
 
 PRIVATE ATTR_USED ATTR_FREETEXT void KCALL
@@ -636,7 +636,7 @@ blkdev_register(struct blkdev *__restrict self, dev_t devno)
 }
 
 
-/* Automatically   register  the  given  block-device,  assigning  it  an  auto-generated  device  ID.
+/* Automatically register the given block-device, assigning it an auto-generated device ID.
  * If   `self'   is  a   partition  (s.a.   `blkdev_ispart()'),   assign  based   on  other
  * preexisting partitions `MKDEV(MAJOR(bp_master),MINOR(EXISTING_PARTITION_WITH_GREATEST_MINOR) + 1)',
  * or assign `MKDEV(MAJOR(bp_master),MINOR(bp_master) + 1)'.
@@ -711,7 +711,7 @@ NOTHROW(KCALL block_device_findpart)(struct block_device *__restrict self,
 }
 
 
-/* Create a new sub-partition for `master', placing it as the given address.
+/* Create   a  new  sub-partition   for  `master',  placing  it   as  the  given  address.
  * Following this, automatically register the new partition with `blkdev_register_auto()',
  * after  assigning  the  name   `"%s%u" % (master->bd_name,MINOR(blkdev_devno(return)))'.
  * NOTE: If another partition with the same `part_min' and `part_max', no new

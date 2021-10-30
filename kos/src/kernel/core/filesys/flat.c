@@ -280,7 +280,7 @@ NOTHROW(KCALL flatdirnode_anon_parts_after)(struct mfile *__restrict self,
 	 *      end of a directory; it should happen no matter where the removal is done,
 	 *      and unload all parts bound to address ranges consisting only of gaps! */
 	/* NOTE: This function pretty much shares its implementation with `mfile_truncate()',
-	 *       only that this one doesn't actually modify the file's size field! */
+	 *       only   that  this  one  doesn't  actually  modify  the  file's  size  field! */
 }
 
 

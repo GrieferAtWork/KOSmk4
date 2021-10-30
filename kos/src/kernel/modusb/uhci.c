@@ -2423,8 +2423,8 @@ NOTHROW(FCALL uhci_count_isotds_for_interval_and_offset)(struct uhci_controller 
 /* Create an interrupt descriptor.
  * @param: endp:                          The endpoint from which to poll data.
  * @param: handler:                       The handler to-be invoked.
- * @param: character_or_block_device:     Either a `struct chrdev' or `struct block_device',
- *                                        depending  on  the  setting  of  `USB_INTERRUPT_FLAG_ISABLK'
+ * @param: character_or_block_device:     Either  a  `struct chrdev'  or   `struct block_device',
+ *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
  * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
  *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
  *                                        mandatory buffer size,  with it  being an error  if the  device

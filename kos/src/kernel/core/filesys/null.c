@@ -56,9 +56,9 @@
 
 DECL_BEGIN
 
-/* TODO: All of the user-buffer-transfer function below should be interruptible,
- *       as in: if the calling thread receives an RPC (even if it's a synchronous
- *       RPC), then the copy operation should stop and return the # of bytes that
+/* TODO: All of the user-buffer-transfer  function below should be  interruptible,
+ *       as  in: if the calling thread receives an RPC (even if it's a synchronous
+ *       RPC),  then the copy operation should stop and return the # of bytes that
  *       were already copied. If no bytes were copied, throw E_INTERRUPT_USER_RPC,
  *       and if any were copied, return the # of bytes copied. */
 #define interruptible_copyfromphys(dst, src, num_bytes) (copyfromphys(dst, src, num_bytes), num_bytes)

@@ -28,7 +28,7 @@ global final _kosRoot =
 		.replace("\\", "/").rstrip("/") + "/";
 
 @@Mapping for PATHNAME -> GITIGNORE_FILE_LINES
-@@Files  known  not  to  exist  are  bound  to
+@@Files known not  to exist are  bound to  @{}
 global final _knownGitIgnoreFiles: {string: {string...}} = Dict();
 
 function _listGitIgnoreInPath(absPath: string): {string...} {

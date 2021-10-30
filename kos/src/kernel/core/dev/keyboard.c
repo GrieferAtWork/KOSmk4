@@ -1546,7 +1546,7 @@ PUBLIC_CONST struct mfile_stream_ops const kbddev_v_stream_ops = {
  *       must ensure that `keyboard_device_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by keyboard,
- *       get  initialized by `kbddev_init()', and should not be
+ *       get  initialized  by   `kbddev_init()',  and   should  not   be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl

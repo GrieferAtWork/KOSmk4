@@ -129,8 +129,8 @@ NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_
 			result = (*printer)(arg, "?", 1);
 		} else {
 			result = format_printf(printer, arg, "%u",
-			                       os_regno == OS_REGISTER_PGID ? taskpid_getselfpid_s(tpid)
-			                                                    : taskpid_getrootpid(tpid));
+			                       os_regno == OS_REGISTER_SID ? taskpid_getselfpid_s(tpid)
+			                                                   : taskpid_getrootpid(tpid));
 			decref_unlikely(tpid);
 		}
 	}	break;

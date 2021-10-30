@@ -20,7 +20,7 @@
 import * from deemon;
 
 /* R/B-tree implementation that is logic-compatible
- * with that from <hybrid/sequence/rbtree-abi.h>
+ * with  that  from  <hybrid/sequence/rbtree-abi.h>
  *
  * Deemon <===> C logic mappings:
  *

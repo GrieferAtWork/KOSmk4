@@ -20,12 +20,12 @@
 import * from deemon;
 
 @@Deemon re-implementation of the KOS @fdirent_hash() function
-@@Returns a pair of integers @(hash32: int, hash64: int) that
-@@map to the hash values in 32-bit and 64-bit environments
 class fdirent_hash {
 	this = default;
 	public member text: string;
 
+	@@Calculate the hash for @text, assuming `sizeof(void *) == sizeOfPointer`
+	@@and a byteorder as specified by @endian (as one of @"little" or  @"big")
 	function getHash(sizeOfPointer: int, endian: string): int {
 		local result = 0;
 		for (local part: text.bytes().segments(sizeOfPointer)) {
@@ -41,6 +41,7 @@ class fdirent_hash {
 		return result;
 	}
 
+	@@Print instances of `FDIRENT_HASH_INIT()` macro invocations
 	operator str(): string {
 		local values = {
 			getHash(4, "little"),
@@ -59,4 +60,3 @@ class fdirent_hash {
 		return common.hex();
 	}
 }
-
