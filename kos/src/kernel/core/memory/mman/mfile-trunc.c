@@ -461,7 +461,6 @@ again_handle_overlapping_part:
 			}
 			if unlikely(!overlapping_part)
 				goto again; /* Race condition: someone else also split this part before us! */
-			FINALLY_DECREF_UNLIKELY(overlapping_part);
 
 			/* Re-acquire locks. */
 again_reacquire_after_split:
@@ -529,6 +528,7 @@ again_reacquire_after_split:
 				goto again_reacquire_after_split;
 			}
 
+			decref_unlikely(overlapping_part);
 			goto after_file_size_changed;
 		} /* if (HAVE_OVERLAPPING_PART) */
 	}     /* Scope... */
