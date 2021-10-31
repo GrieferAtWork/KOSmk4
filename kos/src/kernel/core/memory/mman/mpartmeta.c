@@ -529,7 +529,7 @@ unlock_file_and_done:
 		FINALLY_DECREF_UNLIKELY(part);
 		mpartmeta_ftxlock_read(meta);
 		if unlikely(addr < mpart_getminaddr(part) ||
-		            addr > mpart_getminaddr(part)) {
+		            addr > mpart_getmaxaddr(part)) {
 			mpartmeta_ftxlock_endread(meta, part);
 			goto again;
 		}
