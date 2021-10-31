@@ -467,8 +467,8 @@ struct mpart {
 		 *
 		 * Also note that  parts with  the `MPART_F_NOFREE' flag  set should  never be  off-
 		 * loaded into swap: If not only because doing so wouldn't actually free up physical
-		 * memory, doing so  might actually  cause problems (since  `MPART_F_NOFREE' is  set
-		 * by special files such as `mfile_phys')
+		 * memory, doing so might actually cause problems (since `MPART_F_NOFREE' is set  by
+		 * special files such as `mfile_phys')
 		 */
 		struct mchunk             mp_swp;       /* [valid_if(MPART_ST_SWP)] Physically allocated swap */
 		struct mchunkvec          mp_swp_sc;    /* [valid_if(MPART_ST_SWP_SC)] Scattered swap */

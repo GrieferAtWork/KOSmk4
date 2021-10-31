@@ -1609,11 +1609,15 @@ FatDir_DeleteEnt(struct flatdirnode *__restrict self,
 
 	/* Mark directory entries as deleted. */
 	for (; ptr < end; ptr += sizeof(struct fat_dirent)) {
-		static byte_t const marker[] = { MARKER_UNUSED };
-		/* TODO: Save deleted first byte at offset 0x0d
+		struct fat_dirent ent;
+		/* Save deleted first byte at offset 0x0d
 		 * https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#Directory_entry */
-		mfile_write(me, marker, sizeof(marker), ptr);
+		mfile_readall(me, &ent, sizeof(ent), ptr);
+		ent.f_delchr = ent.f_marker;
+		ent.f_marker = MARKER_UNUSED;
+		mfile_writeall(me, &ent, sizeof(ent), ptr);
 	}
+
 	if (at_end_of_dir) {
 		/* TODO: Free unused clusters. */
 	}

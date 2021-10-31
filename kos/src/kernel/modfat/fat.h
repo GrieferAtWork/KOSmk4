@@ -160,7 +160,10 @@ struct ATTR_PACKED fat_dirent
 #define NTFLAG_LOWBASE            0x08           /* Lowercase basename. */
 #define NTFLAG_LOWEXT             0x10           /* Lowercase extension. */
 			u8                    f_ntflags;     /* NT Flags (Set of `NTFLAG_*'). */
-			struct fat_filectime  f_ctime;       /* Creation time. */
+			union ATTR_PACKED {
+				u8                   f_delchr;   /* First character of deleted file. */
+				struct fat_filectime f_ctime;    /* Creation time. */
+			};
 			union ATTR_PACKED {
 				struct ATTR_PACKED {
 					u8              f_uid;   /* User ID */
