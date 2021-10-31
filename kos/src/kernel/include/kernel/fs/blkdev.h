@@ -216,8 +216,9 @@ DATDEF struct blkdev_ops const blkpart_ops;
 
 
 /* Initialize common+basic fields. The caller must still initialize:
- *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask
+ *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift
+ *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_iobashift
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize  (to the total device size in bytes)
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_allnodes  # s.a. `device_registerf()'
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_supent    # s.a. `device_registerf()'

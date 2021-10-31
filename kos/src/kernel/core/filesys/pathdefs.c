@@ -79,6 +79,8 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 		.fs_mountslockops = SLIST_HEAD_INITIALIZER(fsuper_unmounted.rs_sup.fs_mountslockops),
 		.fs_sys           = &ramfs_filesys,
 		.fs_dev           = NULL,
+		.fs_loadblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
+		.fs_saveblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
 		.fs_feat = {
 			.sf_filesize_max       = (pos_t)-1,
 			.sf_uid_max            = (uid_t)-1,
@@ -107,7 +109,7 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 					MFILE_INIT_mf_initdone,
 					MFILE_INIT_mf_lockops,
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-					MFILE_INIT_mf_blockshift(PAGESHIFT),
+					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 					                    MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
 					                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |

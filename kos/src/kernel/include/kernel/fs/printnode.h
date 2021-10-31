@@ -146,6 +146,7 @@ struct printnode
 	                                                                 MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE,                 \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_ops        = &(ops)->pno_reg.rno_node.no_file,                    \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_blockshift = PAGESHIFT,                                           \
+	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_iobashift  = 0,                                                   \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_part_amask = PAGEMASK,                                            \
 	 atomic64_init(&(self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                           \
 	 (self)->_printnode_reg_ _fregnode_node_ fn_super = incref(super))
@@ -158,6 +159,7 @@ struct printnode
 	                                                                 MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE,                 \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_ops        = &(ops)->pno_reg.rno_node.no_file,                    \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_blockshift = PAGESHIFT,                                           \
+	 __hybrid_assert((self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_iobashift == 0),                                  \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_part_amask = PAGEMASK,                                            \
 	 atomic64_cinit(&(self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                          \
 	 (self)->_printnode_reg_ _fregnode_node_ fn_super = incref(super))

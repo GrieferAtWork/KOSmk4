@@ -374,7 +374,25 @@ mfile_dosyncio(struct mfile *__restrict self,
                                                 struct aio_multihandle *__restrict aio),
                pos_t addr, physaddr_t buf, size_t num_bytes);
 
-/* Read/Write whole file blocks using direct I/O */
+/* Read/Write whole file blocks using direct I/O
+ * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
+ * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
+ * @assume(IS_ALIGNED(num_bytes, (size_t)1 << self->mf_blockshift));
+ * @assume(addr + num_bytes <= self->mf_filesize);
+ * @assume(num_bytes != 0);
+ * @assume(self->mf_trunclock != 0);
+ *
+ * As you can see, in order to do direct I/O, you need to fulfill 2 different  alignment
+ * constraints (but note that `self->mf_iobashift <= self->mf_blockshift'), meaning that
+ * it's also good enough to only fulfill `self->mf_blockshift'. As such:
+ *   - (size_t)1 << self->mf_blockshift: This is the size of a logical data-block, as well
+ *                                       as  the granularity of allowed buffer sizes, such
+ *                                       that only whole blocks can read/written.
+ *   - (size_t)1 << self->mf_iobashift:  This is the required alignment for `buf', that  is
+ *                                       the  alignment required of DMA buffers. This tends
+ *                                       to be less than `mf_blockshift', but in many cases
+ *                                       (including  those of ramfs-based files), it simply
+ *                                       is equal to `mf_blockshift'. */
 #define mfile_rdblocks_async(self, addr, buf, num_bytes, aio) ((*(self)->mf_ops->mo_loadblocks)(self, addr, buf, num_bytes, aio))
 #define mfile_wrblocks_async(self, addr, buf, num_bytes, aio) ((*(self)->mf_ops->mo_saveblocks)(self, addr, buf, num_bytes, aio))
 #define mfile_rdblocks(self, addr, buf, num_bytes)            mfile_dosyncio(self, (self)->mf_ops->mo_loadblocks, addr, buf, num_bytes)
@@ -429,37 +447,31 @@ struct mfile_ops {
 
 	/* NOTE: Don't get any ideas about adding IOV support for mo_loadblocks/mo_saveblocks (again).
 	 *
-	 * Since these functions  include AIO support,  IOV could simply  be implemented on-top  of
-	 * AIO by invoking the callback once for every IOV entry (using the same AIO multi-handle).
-	 * Afterwards, just do the normal waitfor-and-cancel-on-error-then-rethow-io-error sequence
-	 * to  wait for all of the operations to  complete, whilst allowing hardware to perform all
+	 * Since these functions  include AIO  support, IOV could  simply be  implemented on-top  of
+	 * AIO  by invoking the callback once for every IOV entry (using the same AIO multi-handle).
+	 * Afterwards, just do the normal waitfor-and-cancel-on-error-then-rethrow-io-error sequence
+	 * to wait for all of  the operations to complete, whilst  allowing hardware to perform  all
 	 * of the read/write operations (potentially) in parallel! */
 
 	/* [0..1] Load/initialize the given physical memory buffer (this is the read-from-disk callback)
-	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
+	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
+	 * @assume(IS_ALIGNED(num_bytes, (size_t)1 << self->mf_blockshift));
 	 * @assume(addr + num_bytes <= self->mf_filesize);
-	 * @assume(self->mf_trunclock != 0);
 	 * @assume(num_bytes != 0);
-	 * @assume(WRITABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
-	 * NOTE: WRITABLE_BUFFER_SIZE means that this function is allowed to write until the aligned
-	 *       end of the last  file-block when `num_bytes' isn't  aligned by whole blocks,  where
-	 *       the size of a block is defined as `1 << self->mf_blockshift'.
+	 * @assume(self->mf_trunclock != 0);
 	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job) */
 	NONNULL((1, 5)) void (KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
 	                                            physaddr_t buf, size_t num_bytes,
 	                                            struct aio_multihandle *__restrict aio);
 
 	/* [0..1] Save/write-back the given physical memory buffer (this is the write-to-disk callback)
-	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
+	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
+	 * @assume(IS_ALIGNED(num_bytes, (size_t)1 << self->mf_blockshift));
 	 * @assume(addr + num_bytes <= self->mf_filesize);
-	 * @assume(self->mf_trunclock != 0);
 	 * @assume(num_bytes != 0);
-	 * @assume(READABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
-	 * NOTE: READABLE_BUFFER_SIZE means that this function is allowed to read until the aligned
-	 *       end  of the last file-block when `num_bytes'  isn't aligned by whole blocks, where
-	 *       the size of a block is defined as `1 << self->mf_blockshift'.
+	 * @assume(self->mf_trunclock != 0);
 	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job) */
 	NONNULL((1, 5)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
 	                                            physaddr_t buf, size_t num_bytes,
@@ -653,7 +665,11 @@ struct mfile {
 	                                              * This field describes the minimum alignment of file positions
 	                                              * described by parts, minus one (meaning  it can be used as  a
 	                                              * mask) */
-	unsigned int                  mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
+	uint8_t                       mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
+#ifdef CONFIG_USE_NEW_FS
+	uint8_t                       mf_iobashift;  /* [const][<= mf_blockshift] == log2(REQUIRED_BLOCK_BUFFER_ALIGNMENT) */
+	uint8_t                      _mf_pad[sizeof(size_t) - 2]; /* ... */
+#endif /* CONFIG_USE_NEW_FS */
 
 #ifdef CONFIG_USE_NEW_FS
 #ifdef __WANT_FS_INIT
@@ -668,7 +684,8 @@ struct mfile {
 #define MFILE_INIT_mf_initdone                  SIG_INIT
 #define MFILE_INIT_mf_lockops                   SLIST_HEAD_INITIALIZER(~)
 #define MFILE_INIT_mf_changed(mf_changed)       { mf_changed }
-#define MFILE_INIT_mf_blockshift(mf_blockshift) __hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift
+#define MFILE_INIT_mf_blockshift(mf_blockshift, mf_iobashift) \
+	__hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift, mf_iobashift, { }
 #define MFILE_INIT_mf_flags(mf_flags)           mf_flags
 #define MFILE_INIT_mf_trunclock                 0
 #define MFILE_INIT_mf_filesize(mf_filesize)     ATOMIC64_INIT(mf_filesize)
@@ -861,12 +878,22 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 #endif /* CONFIG_USE_NEW_FS */
 
 #define _mfile_cinit_blockshift _mfile_init_blockshift
-#define _mfile_init_blockshift(self, block_shift)                               \
-	((self)->mf_blockshift = (block_shift),                                     \
+#ifdef CONFIG_USE_NEW_FS
+#define _mfile_init_blockshift(self, blockshift, iobashift)                     \
+	((self)->mf_blockshift = (blockshift),                                      \
+	 (self)->mf_iobashift  = (iobashift),                                       \
 	 (self)->mf_part_amask = ((size_t)1 << (((self)->mf_blockshift) > PAGESHIFT \
 	                                        ? ((self)->mf_blockshift)           \
 	                                        : PAGESHIFT)) -                     \
 	                         1)
+#else /* CONFIG_USE_NEW_FS */
+#define _mfile_init_blockshift(self, blockshift)                                \
+	((self)->mf_blockshift = (blockshift),                                      \
+	 (self)->mf_part_amask = ((size_t)1 << (((self)->mf_blockshift) > PAGESHIFT \
+	                                        ? ((self)->mf_blockshift)           \
+	                                        : PAGESHIFT)) -                     \
+	                         1)
+#endif /* !CONFIG_USE_NEW_FS */
 #ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
 #define __MFILE_INIT_WRLOCKPC        __NULLPTR,
 #define __mfile_init_wrlockpc(self)  (self)->_mf_wrlockpc = __NULLPTR,
@@ -880,8 +907,8 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 
 #ifdef CONFIG_USE_NEW_FS
 /* Initialize common fields. The caller must still initialize:
- *  - mf_ops, mf_parts, mf_changed, mf_part_amask, mf_blockshift,
- *    mf_flags,   mf_filesize,   mf_atime,   mf_mtime,   mf_ctime */
+ *  - mf_ops,  mf_parts,   mf_changed,  mf_part_amask,   mf_blockshift,
+ *    mf_iobashift, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime */
 #define _mfile_init_common(self)           \
 	((self)->mf_refcnt = 1,                \
 	 atomic_rwlock_init(&(self)->mf_lock), \
@@ -897,16 +924,16 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 
 /* Initialize common+basic fields. The caller must still initialize:
  *  - mf_parts, mf_changed, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime */
-#define _mfile_init(self, ops, block_shift) \
-	(_mfile_init_common(self),              \
-	 (self)->mf_ops = (ops),                \
-	 __mfile_init_wrlockpc(self)            \
-	 _mfile_init_blockshift(self, block_shift))
-#define _mfile_cinit(self, ops, block_shift) \
-	(_mfile_cinit_common(self),              \
-	 (self)->mf_ops = (ops),                 \
-	 __mfile_cinit_wrlockpc(self)            \
-	 _mfile_cinit_blockshift(self, block_shift))
+#define _mfile_init(self, ops, block_shift, iobashift) \
+	(_mfile_init_common(self),                         \
+	 (self)->mf_ops = (ops),                           \
+	 __mfile_init_wrlockpc(self)                       \
+	 _mfile_init_blockshift(self, block_shift, iobashift))
+#define _mfile_cinit(self, ops, block_shift, iobashift) \
+	(_mfile_cinit_common(self),                         \
+	 (self)->mf_ops = (ops),                            \
+	 __mfile_cinit_wrlockpc(self)                       \
+	 _mfile_cinit_blockshift(self, block_shift, iobashift))
 #else /* CONFIG_USE_NEW_FS */
 #define mfile_init(self, ops, block_shift) \
 	((self)->mf_refcnt = 1,                \
@@ -957,8 +984,6 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
 		/* .mf_blockshift = */ blockshift,                                             \
 	}
-
-/* TODO: Remove the following 2! */
 #define MFILE_INIT_VIO_EX(type, vio, parts, pageshift)                   \
 	{                                                                    \
 		/* .mf_refcnt     = */ 1,                                        \
@@ -973,30 +998,17 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 		/* .mf_part_amask = */ PAGESIZE - 1,                             \
 	}
 #define MFILE_INIT_VIO(vio) MFILE_INIT_VIO_EX(&mfile_ndef_ops, vio, __NULLPTR, 0)
-#else /* !CONFIG_USE_NEW_FS */
-#define MFILE_INIT_EX(refcnt, ops, parts, changed, blockshift)                         \
-	{                                                                                  \
-		/* .mf_refcnt     = */ refcnt,                                                 \
-		/* .mf_ops        = */ ops,                                                    \
-		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC               \
-		/* .mf_parts      = */ parts,                                                  \
-		/* .mf_initdone   = */ SIG_INIT,                                               \
-		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),                              \
-		/* .mf_changed    = */ { changed },                                            \
-		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
-		/* .mf_blockshift = */ blockshift,                                             \
-	}
-#endif /* CONFIG_USE_NEW_FS */
 #define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, __NULLPTR, blockshift)
 #define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, MFILE_PARTS_ANONYMOUS, blockshift)
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 /* Allocate physical memory for use with mem-parts created for `self'
  * This function is a more restrictive version of `page_malloc_part(1, max_pages, res_pages)',
- * in   that  it  will  also  ensure  that  returned  pages  are  properly  aligned,  as  well
- * as that  the  given  `max_pages'  is  also properly  aligned.  Note  however  that  so-long
- * as   the  size  of  a  single  file-block  is  <=  PAGESIZE,  this  function  behaves  100%
- * identical to the above call to `page_malloc_part()' */
+ * in that it will also ensure that returned  pages are properly aligned, as well as that  the
+ * given `max_pages' is  also properly aligned.  Note however that  so-long as the  size of  a
+ * single file-block is <= PAGESIZE,  this function behaves 100%  identical to the above  call
+ * to `page_malloc_part()' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 3)) physpage_t
 NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
                                    physpagecnt_t max_pages,

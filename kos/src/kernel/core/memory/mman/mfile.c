@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C 1
+#define __WANT_FS_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -57,26 +58,34 @@ DECL_BEGIN
 
 /* Allocate physical memory for use with mem-parts created for `self'
  * This function is a more restrictive version of `page_malloc_part(1, max_pages, res_pages)',
- * in   that  it  will  also  ensure  that  returned  pages  are  properly  aligned,  as  well
- * as that  the  given  `max_pages'  is  also properly  aligned.  Note  however  that  so-long
- * as   the  size  of  a  single  file-block  is  <=  PAGESIZE,  this  function  behaves  100%
- * identical to the above call to `page_malloc_part()' */
+ * in that it will also ensure that returned  pages are properly aligned, as well as that  the
+ * given `max_pages' is  also properly aligned.  Note however that  so-long as the  size of  a
+ * single file-block is <= PAGESIZE,  this function behaves 100%  identical to the above  call
+ * to `page_malloc_part()' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 3)) physpage_t
 NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
                                    physpagecnt_t max_pages,
                                    physpagecnt_t *__restrict res_pages) {
 	physpage_t result, real_result;
 	size_t page_alignment;
-	/* Check for the simple case where natural page alignment
-	 * is   enough   to    satisfy   file-block    alignment. */
-	if likely(self->mf_blockshift <= PAGESHIFT)
-		return page_malloc_part(1, max_pages, res_pages);
-	page_alignment = (size_t)1 << (self->mf_blockshift - PAGESHIFT);
+	assert(self->mf_iobashift <= self->mf_blockshift);
 	assert(max_pages != 0);
-	assertf(IS_ALIGNED(max_pages, page_alignment),
-	        "Badly aligned max_pages %#" PRIxSIZ " for use with "
-	        "file %p that requires %#" PRIxSIZ "-alignment",
-	        max_pages, self, page_alignment);
+#ifndef NDEBUG
+	if (self->mf_blockshift > PAGESHIFT) {
+		size_t size_alignment;
+		size_alignment = (size_t)1 << (self->mf_blockshift - PAGESHIFT);
+		assertf(IS_ALIGNED(max_pages, size_alignment),
+		        "Badly aligned max_pages %#" PRIxSIZ " for use with "
+		        "file %p that requires %#" PRIxSIZ "-alignment",
+		        max_pages, self, size_alignment);
+	}
+#endif /* !NDEBUG */
+
+	/* Check   for  the  simple  case  where  natural  page
+	 * alignment is enough to satisfy file-block alignment. */
+	if likely(self->mf_iobashift <= PAGESHIFT)
+		return page_malloc_part(1, max_pages, res_pages);
+	page_alignment = (size_t)1 << (self->mf_iobashift - PAGESHIFT);
 	result = page_malloc_part(page_alignment + page_alignment - 1,
 	                          max_pages + page_alignment - 1,
 	                          res_pages);
@@ -228,7 +237,28 @@ mfile_sync(struct mfile *__restrict self)
 
 
 PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = { NULL, };
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC struct mfile mfile_ndef = {
+	MFILE_INIT_mf_refcnt(1), /* +1: mfile_ndef */
+	MFILE_INIT_mf_ops(&mfile_ndef_ops),
+	MFILE_INIT_mf_lock,
+	MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+	MFILE_INIT_mf_initdone,
+	MFILE_INIT_mf_lockops,
+	MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+	MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+	                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+	                    MFILE_F_FIXEDFILESIZE),
+	MFILE_INIT_mf_trunclock,
+	MFILE_INIT_mf_filesize((uint64_t)-1),
+	MFILE_INIT_mf_atime(0, 0),
+	MFILE_INIT_mf_mtime(0, 0),
+	MFILE_INIT_mf_ctime(0, 0),
+};
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC struct mfile mfile_ndef = MFILE_INIT_ANON(&mfile_ndef_ops, PAGESHIFT);
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 
@@ -238,7 +268,29 @@ PUBLIC struct mfile mfile_ndef = MFILE_INIT_ANON(&mfile_ndef_ops, PAGESHIFT);
  * As such, these files are used by `mfile_delete()' as replacement mappings
  * of the original file. */
 PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
+#ifdef CONFIG_USE_NEW_FS
+#define INIT_ANON_FILE(i)                                           \
+	{                                                               \
+		MFILE_INIT_mf_refcnt(1), /* +1: mfile_ndef */               \
+		MFILE_INIT_mf_ops(&mfile_anon_ops[i]),                      \
+		MFILE_INIT_mf_lock,                                         \
+		MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                 \
+		MFILE_INIT_mf_initdone,                                     \
+		MFILE_INIT_mf_lockops,                                      \
+		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),               \
+		MFILE_INIT_mf_blockshift(i, i),                             \
+		MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED | \
+		                    MFILE_F_NOATIME | MFILE_F_NOMTIME |     \
+		                    MFILE_F_FIXEDFILESIZE),                 \
+		MFILE_INIT_mf_trunclock,                                    \
+		MFILE_INIT_mf_filesize((uint64_t)-1),                       \
+		MFILE_INIT_mf_atime(0, 0),                                  \
+		MFILE_INIT_mf_mtime(0, 0),                                  \
+		MFILE_INIT_mf_ctime(0, 0),                                  \
+	}
+#else /* CONFIG_USE_NEW_FS */
 #define INIT_ANON_FILE(i) MFILE_INIT_ANON(&mfile_anon_ops[i], i)
+#endif /* !CONFIG_USE_NEW_FS */
 	INIT_ANON_FILE(0),
 	INIT_ANON_FILE(1),
 	INIT_ANON_FILE(2),

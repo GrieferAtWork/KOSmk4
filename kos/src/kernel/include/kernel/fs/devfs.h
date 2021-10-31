@@ -181,6 +181,7 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_changed
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift
+ *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_iobashift
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize
  *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes  # s.a. `device_registerf()'

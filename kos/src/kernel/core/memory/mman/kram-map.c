@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_MAP_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_MAP_C 1
+#define __WANT_FS_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -81,7 +82,28 @@ PUBLIC_CONST struct mfile_ops const mfile_dbgheap_ops = {
 };
 
 /* Special file used to initialize debug-heap memory. */
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC struct mfile mfile_dbgheap = {
+	MFILE_INIT_mf_refcnt(1), /* +1: mfile_dbgheap */
+	MFILE_INIT_mf_ops(&mfile_dbgheap_ops),
+	MFILE_INIT_mf_lock,
+	MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+	MFILE_INIT_mf_initdone,
+	MFILE_INIT_mf_lockops,
+	MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+	MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+	                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+	                    MFILE_F_FIXEDFILESIZE),
+	MFILE_INIT_mf_trunclock,
+	MFILE_INIT_mf_filesize((uint64_t)-1),
+	MFILE_INIT_mf_atime(0, 0),
+	MFILE_INIT_mf_mtime(0, 0),
+	MFILE_INIT_mf_ctime(0, 0),
+};
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC struct mfile mfile_dbgheap = MFILE_INIT_ANON(&mfile_dbgheap_ops, PAGESHIFT);
+#endif /* !CONFIG_USE_NEW_FS */
 #endif /* CONFIG_DEBUG_HEAP */
 
 

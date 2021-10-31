@@ -205,8 +205,9 @@ struct flnknode
 	                                                 MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |                \
 	                                                 MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO,                      \
 	 (self)->_flnknode_node_ _fnode_file_ mf_ops        = &(ops)->lno_node.no_file,                            \
-	 (self)->_flnknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fnode_file_ mf_blockshift,         \
 	 (self)->_flnknode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fnode_file_ mf_part_amask,         \
+	 (self)->_flnknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fnode_file_ mf_blockshift,         \
+	 (self)->_flnknode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fnode_file_ mf_iobashift,          \
 	 (self)->_flnknode_node_ fn_super                   = incref(super))
 #define _flnknode_cinit(self, ops, super)                                                                      \
 	(_flnknode_assert_ops_(ops) _fnode_cinit_common(_flnknode_asnode(self)),                                   \
@@ -218,8 +219,9 @@ struct flnknode
 	                                                 MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |                \
 	                                                 MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO,                      \
 	 (self)->_flnknode_node_ _fnode_file_ mf_ops        = &(ops)->lno_node.no_file,                            \
-	 (self)->_flnknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fnode_file_ mf_blockshift,         \
 	 (self)->_flnknode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fnode_file_ mf_part_amask,         \
+	 (self)->_flnknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fnode_file_ mf_blockshift,         \
+	 (self)->_flnknode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fnode_file_ mf_iobashift,          \
 	 (self)->_flnknode_node_ fn_super                   = incref(super))
 
 /* Finalize a partially initialized `struct flnknode' (as initialized by `_flnknode_init()') */

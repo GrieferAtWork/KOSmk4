@@ -202,7 +202,7 @@ PRIVATE struct flatdirnode_ops const iso9660_dir_ops = {
 
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fnode *KCALL
-iso9660_v_makenode(struct flatsuper *__restrict self,
+iso9660_v_makenode(struct flatsuper *__restrict UNUSED(self),
                    struct flatdirent *__restrict ent_,
                    struct flatdirnode *__restrict UNUSED(dir))
 		THROWS(E_BADALLOC, E_IOERROR) {
@@ -235,7 +235,6 @@ iso9660_v_makenode(struct flatsuper *__restrict self,
 	/* Fill in common fields. */
 	result->mf_parts = NULL;
 	SLIST_INIT(&result->mf_changed);
-	result->mf_blockshift = self->ffs_super.fs_root.mf_blockshift;
 	atomic64_init(&result->mf_filesize, ent->id_siz);
 	result->fn_fsdataint = ent->id_sec;
 	result->fn_nlink     = 1;
@@ -372,6 +371,7 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	result->ffs_super.fs_root.mf_parts = NULL;
 	SLIST_INIT(&result->ffs_super.fs_root.mf_changed);
 	result->ffs_super.fs_root.mf_blockshift = sector_shift;
+	result->ffs_super.fs_root.mf_iobashift  = dev->mf_iobashift;
 	result->ffs_features = FFLATSUPER_FEAT_NORMAL;
 	flatdirdata_init(&result->ffs_rootdata);
 
@@ -393,10 +393,10 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	result->ffs_super.fs_feat.sf_symlink_max        = 0;
 	result->ffs_super.fs_feat.sf_link_max           = 1;
 	result->ffs_super.fs_feat.sf_magic              = ISOFS_SUPER_MAGIC;
-	result->ffs_super.fs_feat.sf_rec_incr_xfer_size = 1 << sector_shift;
-	result->ffs_super.fs_feat.sf_rec_max_xfer_size  = 1 << sector_shift;
-	result->ffs_super.fs_feat.sf_rec_min_xfer_size  = 1 << sector_shift;
-	result->ffs_super.fs_feat.sf_rec_xfer_align     = 1 << sector_shift;
+	result->ffs_super.fs_feat.sf_rec_incr_xfer_size = (u32)1 << sector_shift;
+	result->ffs_super.fs_feat.sf_rec_max_xfer_size  = (u32)1 << sector_shift;
+	result->ffs_super.fs_feat.sf_rec_min_xfer_size  = (u32)1 << sector_shift;
+	result->ffs_super.fs_feat.sf_rec_xfer_align     = (u32)1 << dev->mf_iobashift;
 	result->ffs_super.fs_feat.sf_name_max           = 223;
 	result->ffs_super.fs_feat.sf_filesizebits       = 32;
 

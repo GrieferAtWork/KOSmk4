@@ -125,8 +125,9 @@ _clnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_BA
 	                                               MFILE_F_NOATIME | MFILE_F_NOMTIME)) |
 	                   (MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
 	                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO);
-	result->mf_blockshift = super->fs_root.mf_blockshift;
 	result->mf_part_amask = super->fs_root.mf_part_amask;
+	result->mf_blockshift = super->fs_root.mf_blockshift;
+	result->mf_iobashift  = super->fs_root.mf_iobashift;
 	result->fn_super      = incref(super);
 	atomic64_init(&result->mf_filesize, text_length);
 	result->lnc_text[text_length] = '\0';

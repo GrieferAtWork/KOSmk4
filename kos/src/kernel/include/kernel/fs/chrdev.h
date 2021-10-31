@@ -84,8 +84,9 @@ struct chrdev
 	                                                                                MFILE_F_FIXEDFILESIZE),               \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,     \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,     \
-	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift        = 0,                         \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask        = PAGEMASK,                  \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift        = PAGESHIFT,                 \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_iobashift         = PAGESHIFT,                 \
 	 atomic64_init(&(self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize, 0))
 #define _chrdev_cinit(self, ops)                                                                                          \
 	(_device_cinit(_chrdev_asdev(self), &(ops)->cdo_dev),                                                                 \
@@ -93,8 +94,9 @@ struct chrdev
 	                                                                                MFILE_F_FIXEDFILESIZE),               \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,     \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,     \
-	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift        = 0,                         \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask        = PAGEMASK,                  \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift        = PAGESHIFT,                 \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_iobashift         = PAGESHIFT,                 \
 	 atomic64_cinit(&(self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize, 0))
 
 /* Finalize a partially initialized `struct chrdev' (as initialized by `_chrdev_init()') */

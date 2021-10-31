@@ -228,8 +228,9 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 	                                                  MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |                        \
 	                                                  MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO,                              \
 	 (self)->_ffifonode_node_ _fnode_file_ mf_ops        = &(ops)->fno_node.no_file,                                    \
-	 (self)->_ffifonode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_ffifonode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_ffifonode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_ffifonode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->_ffifonode_node_ fn_super                   = incref(super),                                               \
 	 ringbuffer_init(&(self)->ff_buffer),                                                                               \
 	 (self)->ff_rdcnt = 0,                                                                                              \
@@ -245,8 +246,9 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 	                                                  MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |                        \
 	                                                  MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO,                              \
 	 (self)->_ffifonode_node_ _fnode_file_ mf_ops        = &(ops)->fno_node.no_file,                                    \
-	 (self)->_ffifonode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_ffifonode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_ffifonode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_ffifonode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->_ffifonode_node_ fn_super                   = incref(super),                                               \
 	 ringbuffer_cinit(&(self)->ff_buffer),                                                                              \
 	 __hybrid_assert((self)->ff_rdcnt == 0),                                                                            \

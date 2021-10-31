@@ -40,14 +40,16 @@ INTDEF struct fsuper_ops const devfs_super_ops;
 extern struct fnode _devfs__fs_nodes__INIT[];
 PUBLIC struct ramfs_super devfs = {
 	.rs_sup = {
-		.fs_nodes           = _devfs__fs_nodes__INIT,
-		.fs_nodeslock       = ATOMIC_RWLOCK_INIT,
-		.fs_nodeslockops    = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_nodeslockops),
-		.fs_mounts          = LIST_HEAD_INITIALIZER(devfs.rs_sup.fs_mounts),
-		.fs_mountslock      = ATOMIC_RWLOCK_INIT,
-		.fs_mountslockops   = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_mountslockops),
-		.fs_sys             = &devfs_filesys,
-		.fs_dev             = NULL,
+		.fs_nodes         = _devfs__fs_nodes__INIT,
+		.fs_nodeslock     = ATOMIC_RWLOCK_INIT,
+		.fs_nodeslockops  = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_nodeslockops),
+		.fs_mounts        = LIST_HEAD_INITIALIZER(devfs.rs_sup.fs_mounts),
+		.fs_mountslock    = ATOMIC_RWLOCK_INIT,
+		.fs_mountslockops = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_mountslockops),
+		.fs_sys           = &devfs_filesys,
+		.fs_dev           = NULL,
+		.fs_loadblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
+		.fs_saveblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
 		.fs_feat = {
 			.sf_filesize_max       = (pos_t)-1,
 			.sf_uid_max            = (uid_t)-1,
@@ -76,7 +78,7 @@ PUBLIC struct ramfs_super devfs = {
 					MFILE_INIT_mf_initdone,
 					MFILE_INIT_mf_lockops,
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-					MFILE_INIT_mf_blockshift(PAGESHIFT),
+					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 					                    MFILE_FN_GLOBAL_REF | MFILE_F_NOUSRMMAP |
 					                    MFILE_F_NOUSRIO | MFILE_F_PERSISTENT |

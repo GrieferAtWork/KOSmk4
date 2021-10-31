@@ -424,14 +424,16 @@ NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self);
 #define _fnode_init(self, ops, super)                                                                  \
 	(_fnode_assert_ops_(ops) _fnode_init_common(self),                                                 \
 	 (self)->_fnode_file_ mf_ops        = &(ops)->no_file,                                             \
-	 (self)->_fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->fn_super                   = incref(super))
 #define _fnode_cinit(self, ops, super)                                                                 \
 	(_fnode_assert_ops_(ops) _fnode_cinit_common(self),                                                \
 	 (self)->_fnode_file_ mf_ops        = &(ops)->no_file,                                             \
-	 (self)->_fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->fn_super                   = incref(super))
 /* Finalize a partially initialized `struct fnode' (as initialized by `_fnode_init()') */
 #define _fnode_fini(self) decref_nokill((self)->fn_super)

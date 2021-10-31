@@ -326,6 +326,7 @@ blkdev_makeparts_create(struct blkdev *__restrict self,
 	                               GFP_LOCKED | GFP_PREFLT);
 	__blkdev_init_common(dev, &blkpart_ops);
 	dev->mf_blockshift = self->mf_blockshift;
+	dev->mf_iobashift  = self->mf_iobashift;
 	dev->mf_part_amask = self->mf_part_amask;
 	atomic64_init(&dev->mf_filesize, part_sectorcnt << self->mf_blockshift);
 	dev->dv_dirent = NULL; /* Initialized later, but set to NULL (for now) for error cleanup. */

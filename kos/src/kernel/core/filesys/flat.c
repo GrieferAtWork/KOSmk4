@@ -156,10 +156,12 @@ again:
 	sig_init(&result->mf_initdone);
 	SLIST_INIT(&result->mf_lockops);
 	SLIST_INIT(&result->mf_changed);
-	result->mf_part_amask = MAX(PAGESIZE, 1 << result->mf_blockshift) - 1;
+	result->mf_part_amask = super->ffs_super.fs_root.mf_part_amask;
+	result->mf_blockshift = super->ffs_super.fs_root.mf_blockshift;
+	result->mf_iobashift  = super->ffs_super.fs_root.mf_iobashift;
 	result->mf_trunclock  = 0;
 	result->fn_ino        = me->fde_ent.fd_ino;
-	result->fn_super      = incref(dir->_fdirnode_node_ fn_super);
+	result->fn_super      = incref(&super->ffs_super);
 	LIST_ENTRY_UNBOUND_INIT(&result->fn_changed);
 
 	/* Re-acquire a lock to the nodes cache. */
@@ -333,7 +335,10 @@ flatdirnode_handle_duplicate_name(struct flatdirnode *__restrict self,
 			 *       "fixing" imminent errors. */
 			REF struct fnode *result_node;
 			TAILQ_INSERT_TAIL(&self->fdn_data.fdd_bypos, duplicate_ent, fde_bypos);
-			RAII_FINALLY { TAILQ_REMOVE(&self->fdn_data.fdd_bypos, duplicate_ent, fde_bypos); };
+			RAII_FINALLY {
+				TAILQ_REMOVE(&self->fdn_data.fdd_bypos, duplicate_ent, fde_bypos);
+				DBG_memset(&duplicate_ent->fde_bypos, 0xcc, sizeof(duplicate_ent->fde_bypos));
+			};
 
 			result_node = TODO;
 			assert(result_node != NULL);
@@ -915,7 +920,9 @@ handle_existing:
 		node->mf_initdone   = SIG_INIT;
 		node->mf_lockops    = SLIST_HEAD_INITIALIZER(~);
 		node->mf_changed    = SLIST_HEAD_INITIALIZER(~);
-		node->mf_part_amask = MAX(PAGESIZE, 1 << node->mf_blockshift) - 1;
+		node->mf_part_amask = me->mf_part_amask;
+		node->mf_blockshift = me->mf_blockshift;
+		node->mf_iobashift  = me->mf_iobashift;
 		node->mf_trunclock  = 0;
 		node->mf_atime      = info->mkf_creat.c_atime;
 		node->mf_mtime      = info->mkf_creat.c_mtime;

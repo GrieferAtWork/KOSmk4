@@ -77,6 +77,10 @@
 
 DECL_BEGIN
 
+INTDEF NONNULL((1)) void /* From "memory/mman/mfile.c" */
+NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict self,
+                                    pos_t addr, physaddr_t buf, size_t num_bytes,
+                                    struct aio_multihandle *__restrict aio);
 
 PUBLIC_CONST struct flnknode_ops const ramfs_lnknode_ops = {
 	.lno_node = {
@@ -93,8 +97,9 @@ PUBLIC_CONST struct flnknode_ops const ramfs_lnknode_ops = {
 PUBLIC_CONST struct fregnode_ops const ramfs_regnode_ops = {
 	.rno_node = {
 		.no_file = {
-			.mo_destroy = &ramfs_regnode_v_destroy,
-			.mo_changed = &ramfs_regnode_v_changed,
+			.mo_destroy    = &ramfs_regnode_v_destroy,
+			.mo_loadblocks = &mfile_zero_loadpages,
+			.mo_changed    = &ramfs_regnode_v_changed,
 		},
 		.no_wrattr = &ramfs_regnode_v_wrattr,
 	},
@@ -1107,6 +1112,7 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->fs_root.mf_ops               = &ramfs_super_ops.so_fdir.dno_node.no_file;
 	result->fs_root.mf_parts             = MFILE_PARTS_ANONYMOUS;
 	result->fs_root.mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
+	result->fs_root.mf_iobashift         = PAGESHIFT;
 	result->fs_root.mf_blockshift        = PAGESHIFT;
 	result->fs_root.mf_flags             = MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | MFILE_F_PERSISTENT;
 	result->fs_root.fn_ino               = (ino_t)skew_kernel_pointer(&result->fs_root);

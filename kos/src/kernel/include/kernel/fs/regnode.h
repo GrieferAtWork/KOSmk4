@@ -84,8 +84,9 @@ struct fregnode
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
 	                                                  MFILE_F_NOMTIME),                                                \
 	 (self)->_fregnode_node_ _fnode_file_ mf_ops        = &(ops)->rno_node.no_file,                                    \
-	 (self)->_fregnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fregnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fregnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fregnode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->_fregnode_node_ fn_super                   = incref(super))
 #define _fregnode_cinit(self, ops, super)                                                                              \
 	(_fregnode_assert_ops_(ops) _fnode_cinit_common(_fregnode_asnode(self)),                                           \
@@ -96,8 +97,9 @@ struct fregnode
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
 	                                                  MFILE_F_NOMTIME),                                                \
 	 (self)->_fregnode_node_ _fnode_file_ mf_ops        = &(ops)->rno_node.no_file,                                    \
-	 (self)->_fregnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fregnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fregnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fregnode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->_fregnode_node_ fn_super                   = incref(super))
 /* Finalize a partially initialized `struct fregnode' (as initialized by `_fregnode_init()') */
 #define _fregnode_fini(self) decref_nokill((self)->_fregnode_node_ fn_super)

@@ -106,8 +106,9 @@ fdevnode_v_open(struct mfile *__restrict self,
 	                                                   MFILE_F_NOMTIME)) |                                             \
 	                                                 MFILE_F_FIXEDFILESIZE,                                            \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
-	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->_fdevnode_node_ fn_super                   = incref(super))
 #define _fdevnode_cinit(self, ops, super)                                                                              \
 	(_fdevnode_assert_ops_(ops) _fnode_cinit_common(_fdevnode_asnode(self)),                                           \
@@ -120,8 +121,9 @@ fdevnode_v_open(struct mfile *__restrict self,
 	                                                   MFILE_F_NOMTIME)) |                                             \
 	                                                 MFILE_F_FIXEDFILESIZE,                                            \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
-	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->_fdevnode_node_ fn_super                   = incref(super))
 /* Finalize a partially initialized `struct fdevnode' (as initialized by `_fdevnode_init()') */
 #define _fdevnode_fini(self) decref_nokill((self)->_fdevnode_node_ fn_super)

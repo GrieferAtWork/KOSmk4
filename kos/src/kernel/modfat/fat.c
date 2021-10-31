@@ -1991,8 +1991,7 @@ FatDir_MkFile(struct flatdirnode *__restrict self,
 
 	result->mf_parts = NULL;
 	SLIST_INIT(&result->mf_changed);
-	result->mf_blockshift = self->mf_blockshift;
-	result->fn_ino        = 0; /* Allocated later. */
+	result->fn_ino = 0; /* Allocated later. */
 	return result;
 }
 
@@ -2127,7 +2126,6 @@ FatSuper_MakeNode(struct flatsuper *__restrict self,
 	dat->fn_ent = incref(ent);
 	dat->fn_dir = mfile_asfatdir(incref(dir));
 	shared_rwlock_init(&dat->fn_lock);
-	result->mf_blockshift = dir->mf_blockshift;
 	return result;
 }
 
@@ -2381,6 +2379,7 @@ multifat_sync_file_loadblocks(struct mfile *__restrict self, pos_t addr,
                               physaddr_t buf, size_t num_bytes,
                               struct aio_multihandle *__restrict aio) {
 	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
+	/* The initial FAT is always properly aligned. */
 	mfile_rdblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
 }
 
@@ -2592,7 +2591,8 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 					fatfile = (struct multifat_sync_file *)kmalloc(sizeof(struct multifat_sync_file), GFP_NORMAL);
 
 					/* Initialize the mfile-portion of the sync file. */
-					_mfile_init(fatfile, &multifat_sync_file_ops, dev->mf_blockshift);
+					_mfile_init(fatfile, &multifat_sync_file_ops,
+					            dev->mf_blockshift, dev->mf_iobashift);
 					fatfile->mf_parts = NULL;
 					SLIST_INIT(&fatfile->mf_changed);
 					fatfile->mf_flags = MFILE_F_NORMAL;
@@ -2641,6 +2641,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 
 		/* Fill in mandatory superblock fields. */
 		/*result->ft_super.ffs_super.fs_root.mf_blockshift       = result->ft_sectorshift;*/ /* It's the same field! */
+		result->ft_super.ffs_super.fs_root.mf_iobashift          = dev->mf_iobashift;
 		result->ft_super.ffs_super.fs_root.fn_ino                = 0;
 		result->ft_super.ffs_super.fs_feat.sf_filesize_max       = (pos_t)UINT32_MAX;
 		result->ft_super.ffs_super.fs_feat.sf_uid_max            = 0;
@@ -2651,7 +2652,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		result->ft_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->ft_sectorsize;
 		result->ft_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->ft_sectorsize;
 		result->ft_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->ft_sectorsize;
-		result->ft_super.ffs_super.fs_feat.sf_rec_xfer_align     = result->ft_sectorsize;
+		result->ft_super.ffs_super.fs_feat.sf_rec_xfer_align     = (u32)1 << dev->mf_iobashift;
 		result->ft_super.ffs_super.fs_feat.sf_name_max           = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
 		result->ft_super.ffs_super.fs_feat.sf_filesizebits       = 32;
 		result->ft_super.ffs_super.fs_root.fn_fsdata             = &result->ft_fdat;

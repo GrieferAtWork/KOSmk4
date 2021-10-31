@@ -226,7 +226,6 @@ struct flatdirnode_xops {
 	 *  - return->_fnode_file_ mf_ops        = ...;                # As appropriate
 	 *  - return->_fnode_file_ mf_parts      = NULL;               # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `flatdirnode's, this _MUST_ be `NULL')
 	 *  - return->_fnode_file_ mf_changed    = SLIST_INIT;         # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `flatdirnode's, this _MUST_ be `NULL')
-	 *  - return->_fnode_file_ mf_blockshift = dir->mf_blockshift; # Probably...
 	 *  - return->_fnode_file_ mf_flags      = ... & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |    # directories require `MFILE_F_FIXEDFILESIZE', and should
 	 *                                                MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | # probably also have `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO'
 	 *                                                MFILE_FN_ATTRREADONLY);
@@ -237,12 +236,14 @@ struct flatdirnode_xops {
 	 * The caller of this function will do the following additional init:
 	 *  - return->_fnode_file_ mf_refcnt     = 1 + ...;   # +1: MFILE_FN_GLOBAL_REF
 	 *  - return->_fnode_file_ mf_flags     |= MFILE_FN_GLOBAL_REF;
-	 *  - return->_fnode_file_ mf_flags     |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
+	 *  - return->_fnode_file_ mf_flags     |= self->_fdirnode_node_ _fnode_file_ mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	 *  - return->_fnode_file_ mf_lock       = ATOMIC_RWLOCK_INIT;
 	 *  - return->_fnode_file_ mf_initdone   = SIG_INIT;
 	 *  - return->_fnode_file_ mf_lockops    = SLIST_HEAD_INITIALIZER(~);
 	 *  - return->_fnode_file_ mf_changed    = SLIST_HEAD_INITIALIZER(~);
-	 *  - return->_fnode_file_ mf_part_amask = MAX(PAGESIZE, 1 << mf_blockshift) - 1;
+	 *  - return->_fnode_file_ mf_part_amask = self->_fdirnode_node_ _fnode_file_ mf_part_amask;
+	 *  - return->_fnode_file_ mf_blockshift = self->_fdirnode_node_ _fnode_file_ mf_blockshift;
+	 *  - return->_fnode_file_ mf_iobashift  = self->_fdirnode_node_ _fnode_file_ mf_iobashift;
 	 *  - return->_fnode_file_ mf_trunclock  = 0;
 	 *  - return->_fnode_file_ mf_atime      = info->mkf_creat.c_atime;
 	 *  - return->_fnode_file_ mf_mtime      = info->mkf_creat.c_mtime;
@@ -251,7 +252,7 @@ struct flatdirnode_xops {
 	 *  - return->fn_mode                    = info->mkf_fmode;
 	 *  - return->fn_uid                     = info->mkf_creat.c_owner;
 	 *  - return->fn_gid                     = info->mkf_creat.c_group;
-	 *  - return->fn_super                   = incref(dir->_fdirnode_node_ fn_super);
+	 *  - return->fn_super                   = incref(self->_fdirnode_node_ fn_super);
 	 *  - return->fn_changed                 = LIST_ENTRY_UNBOUND_INITIALIZER;
 	 *  - return->fn_supent                  = ...;    # By adding to the superblock's node-tree (or marking as unbound)
 	 *  - return->fn_allnodes                = ...;    # via `fnode_init_addtoall()'
@@ -623,7 +624,6 @@ struct flatsuper_ops {
 	 *  - return->_fnode_file_ mf_ops        = ...;                # As appropriate
 	 *  - return->_fnode_file_ mf_parts      = NULL;               # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `flatdirnode's, this _MUST_ be `NULL')
 	 *  - return->_fnode_file_ mf_changed    = SLIST_INIT;         # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `flatdirnode's, this _MUST_ be `NULL')
-	 *  - return->_fnode_file_ mf_blockshift = dir->mf_blockshift; # Probably...
 	 *  - return->_fnode_file_ mf_flags      = ... & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |    # directories require `MFILE_F_FIXEDFILESIZE', and should
 	 *                                                MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | # probably also have `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO'
 	 *                                                MFILE_FN_ATTRREADONLY);
@@ -645,7 +645,9 @@ struct flatsuper_ops {
 	 *  - return->_fnode_file_ mf_initdone   = SIG_INIT;
 	 *  - return->_fnode_file_ mf_lockops    = SLIST_HEAD_INITIALIZER(~);
 	 *  - return->_fnode_file_ mf_changed    = SLIST_HEAD_INITIALIZER(~);
-	 *  - return->_fnode_file_ mf_part_amask = MAX(PAGESIZE, 1 << mf_blockshift) - 1;
+	 *  - return->_fnode_file_ mf_part_amask = self->ffs_super.fs_root._fdirnode_node_ _fnode_file_ mf_part_amask;
+	 *  - return->_fnode_file_ mf_blockshift = self->ffs_super.fs_root._fdirnode_node_ _fnode_file_ mf_blockshift;
+	 *  - return->_fnode_file_ mf_iobashift  = self->ffs_super.fs_root._fdirnode_node_ _fnode_file_ mf_iobashift;
 	 *  - return->_fnode_file_ mf_trunclock  = 0;
 	 *  - return->fn_ino                     = ent->fde_ent.fd_ino;
 	 *  - return->fn_super                   = incref(dir->_fdirnode_node_ fn_super);

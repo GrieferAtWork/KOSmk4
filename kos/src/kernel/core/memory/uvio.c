@@ -949,7 +949,7 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	result = (REF struct uvio *)kmalloc(sizeof(struct uvio),
 	                                    GFP_NORMAL);
 #ifdef CONFIG_USE_NEW_FS
-	_mfile_init(result, &uvio_mfile_ops, PAGESHIFT);
+	_mfile_init(result, &uvio_mfile_ops, PAGESHIFT, PAGESHIFT);
 	result->mf_parts = NULL;
 	SLIST_INIT(&result->mf_changed);
 	result->mf_flags = MFILE_F_NORMAL;

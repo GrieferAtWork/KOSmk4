@@ -68,6 +68,7 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_parts      = ...;  # Properly with `NULL' (though `MFILE_PARTS_ANONYMOUS' and anything else is also OK)
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_changed    = ...;  # Properly with `SLIST_INIT' (though `MFILE_PARTS_ANONYMOUS' and anything else is also OK)
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift = ...;  # Address <=> block shift used by the filesystem
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift  = dev ? dev->mf_iobashift : ...; # Probably...
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags      = ...;  # Set of `MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 		 *                                                                        #         MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |
 		 *                                                                        #         MFILE_F_NOATIME |  MFILE_F_NOMTIME  |  MFILE_FN_NODIRATIME  |
@@ -87,7 +88,7 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_lock       = ATOMIC_RWLOCK_INIT;
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_initdone   = SIG_INIT;
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_lockops    = SLIST_HEAD_INITIALIZER(~);
-		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask = MAX(PAGESIZE, 1 << mf_blockshift) - 1;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask = MAX(PAGESIZE, 1 << return->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift) - 1;
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags |= ... & (MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC |    # Conditionally set
 		 *                                                                     MFILE_F_NOATIME | MFILE_F_NOMTIME | MFILE_FN_NODIRATIME | # ...
 		 *                                                                     MFILE_F_STRICTATIME | MFILE_F_LAZYTIME);                  # ...
@@ -108,7 +109,7 @@ struct ffilesys {
 		 *   - return->fs_mountslockops                                   = SLIST_HEAD_INITIALIZER(~);
 		 *   - return->fs_sys                                             = incref(filesys);
 		 *   - return->fs_dev                                             = xincref(dev);
-		 *   - return->fs_loadblocks                                      = ...; // Based on `dev->mf_blockshift' and `return->fs_root.mf_blockshift',
+		 *   - return->fs_loadblocks                                      = ...; // Based on `dev->(mf_blockshift|mf_iobashift)' and `return->fs_root.(mf_blockshift|mf_iobashift)',
 		 *   - return->fs_saveblocks                                      = ...; // as well as the set of mfile-block operators actually supported by `dev'
 		 *   - return->fs_changednodes                                    = LIST_HEAD_INITIALIZER(~);
 		 *   - return->fs_changednodes_lock                               = ATOMIC_LOCK_INIT;

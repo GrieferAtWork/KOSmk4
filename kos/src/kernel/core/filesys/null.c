@@ -1162,7 +1162,6 @@ INTERN_CONST struct device_ops const dev_full_ops    = DEVICE_OPS_INIT(NULL, &de
 INTERN_CONST struct device_ops const dev_random_ops  = DEVICE_OPS_INIT(NULL, NULL, &devrandom_stream_ops, &devrandom_vio_ops);
 INTERN_CONST struct device_ops const dev_urandom_ops = DEVICE_OPS_INIT(NULL, NULL, &devurandom_stream_ops, &devurandom_vio_ops);
 INTERN_CONST struct device_ops const dev_kmsg_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmsg_stream_ops, NULL);
-INTERN_CONST struct device_ops const dev_kmsg_tty    = DEVICE_OPS_INIT(NULL, NULL, &devtty_stream_ops, NULL);
 #undef DEVICE_OPS_INIT
 #undef IF_VIO_ENABLED
 

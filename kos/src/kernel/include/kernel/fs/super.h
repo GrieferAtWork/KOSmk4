@@ -93,10 +93,10 @@ struct fsuperfeat {
 	pos_t   sf_symlink_max;        /* [const] Max length of text contained within symbolic links */
 	nlink_t sf_link_max;           /* [const] Max # of links a file may have */
 	u32     sf_magic;              /* [const] Filesystem ~magic~ (one of the constants from `<linux/magic.h>') */
-	u32     sf_rec_incr_xfer_size; /* [const] Buffer size increments for efficient disk transfer operations */
-	u32     sf_rec_max_xfer_size;  /* [const] Max buffer size for efficient disk transfer operations */
-	u32     sf_rec_min_xfer_size;  /* [const] Min buffer size for efficient disk transfer operations */
-	u32     sf_rec_xfer_align;     /* [const] Required in-memory buffer alignment for efficient disk transfer operations */
+	u32     sf_rec_incr_xfer_size; /* [const] Buffer size increments for efficient disk transfer operations (Usually: `(u32)1 << mf_blockshift') */
+	u32     sf_rec_max_xfer_size;  /* [const] Max buffer size for efficient disk transfer operations (Usually: `(u32)1 << mf_blockshift') */
+	u32     sf_rec_min_xfer_size;  /* [const] Min buffer size for efficient disk transfer operations (Usually: `(u32)1 << mf_blockshift') */
+	u32     sf_rec_xfer_align;     /* [const] Required in-memory buffer alignment for efficient disk transfer operations (Usually: `(u32)1 << mf_iobashift') */
 	u16     sf_name_max;           /* [const] Max # of chars in a file name */
 	u8      sf_filesizebits;       /* [const] Max # of bits in a file's size field (usually 64 or 32) */
 };
@@ -238,7 +238,12 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 	(__hybrid_atomic_load((self)->fs_changedsuper.le_prev, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 
-/* Read/Write whole filesystem sectors */
+/* Read/Write whole filesystem sectors
+ * @assume(IS_ALIGNED(buf, (size_t)1 << self->fs_root.mf_iobashift));
+ * @assume(IS_ALIGNED(addr, (size_t)1 << self->fs_root.mf_blockshift));
+ * @assume(IS_ALIGNED(num_bytes, (size_t)1 << self->fs_root.mf_blockshift));
+ * @assume(addr + num_bytes <= self->fs_dev->mf_filesize);
+ * @assume(num_bytes != 0); */
 #define fsuper_dev_rdsectors_async(self, addr, buf, num_bytes, aio) ((*(self)->fs_loadblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
 #define fsuper_dev_wrsectors_async(self, addr, buf, num_bytes, aio) ((*(self)->fs_saveblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
 #define fsuper_dev_rdsectors(self, addr, buf, num_bytes)            mfile_dosyncio((self)->fs_dev, (self)->fs_loadblocks, addr, buf, num_bytes)
@@ -290,8 +295,9 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_flags:
  *     - Initialized to `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE'
  *       may need to be altered as appropriate.
- *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask
+ *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift
+ *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_atime
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_mtime
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_ctime

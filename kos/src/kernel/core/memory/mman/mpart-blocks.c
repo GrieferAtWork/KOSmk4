@@ -964,7 +964,7 @@ again_read_st:
 				                  * throwing), we can infer that the initializer of such
 				                  * a mapping couldn't possibly make use of AIO.
 				                  *
-				                  * For  force a kernel  crash if it  still tries to, we
+				                  * To force a  kernel crash  if it still  tries to,  we
 				                  * pass a guarantied faulty pointer for the AIO handle. */
 				                 (struct aio_multihandle *)-1);
 			}

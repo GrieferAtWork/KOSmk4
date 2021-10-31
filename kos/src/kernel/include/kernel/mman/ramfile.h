@@ -33,6 +33,7 @@ struct mramfile {
 	struct mpart mrf_part; /* The (only) ram part. */
 };
 
+#ifndef CONFIG_USE_NEW_FS
 #ifdef __WANT_MPART_INIT
 /* >> MRAMFILE_INIT(struct mramfile &self, physpage_t first_page, physpagecnt_t page_count)
  * Initialize a given mem-ram-file, given a simple physical
@@ -43,6 +44,7 @@ struct mramfile {
 		MPART_INIT_PHYS(&(self).mrf_file, first_page, page_count, num_bytes)       \
 	}
 #endif /* __WANT_MPART_INIT */
+#endif /* !CONFIG_USE_NEW_FS */
 
 DECL_END
 #endif /* __CC__ */

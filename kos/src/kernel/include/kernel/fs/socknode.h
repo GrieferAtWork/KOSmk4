@@ -104,8 +104,9 @@ NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self);
 	                                                  MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |                        \
 	                                                  MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO,                              \
 	 (self)->_fsocknode_node_ _fnode_file_ mf_ops        = &(ops)->suno_node.no_file,                                   \
-	 (self)->_fsocknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fsocknode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fsocknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fsocknode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->_fsocknode_node_ fn_super                   = incref(super),                                               \
 	 unix_server_init(&(self)->sun_server))
 #define _fsocknode_cinit(self, ops, super)                                                                              \
@@ -119,8 +120,9 @@ NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self);
 	                                                  MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |                        \
 	                                                  MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO,                              \
 	 (self)->_fsocknode_node_ _fnode_file_ mf_ops        = &(ops)->suno_node.no_file,                                   \
-	 (self)->_fsocknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fsocknode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fsocknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fsocknode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
 	 (self)->_fsocknode_node_ fn_super                   = incref(super),                                               \
 	 unix_server_cinit(&(self)->sun_server))
 

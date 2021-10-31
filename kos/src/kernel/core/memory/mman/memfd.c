@@ -148,7 +148,7 @@ memfd_new(USER CHECKED char const *name)
 	}
 
 	/* The rest of initialization is non-throwing. */
-	_mfile_init(result, &memfd_ops, PAGESHIFT);
+	_mfile_init(result, &memfd_ops, PAGESHIFT, PAGESHIFT);
 	result->mf_parts             = NULL;
 	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS; /* Don't need to track changes. */
 	result->mf_flags             = MFILE_F_PERSISTENT | MFILE_F_ATTRCHANGED | MFILE_F_CHANGED;

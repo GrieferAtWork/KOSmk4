@@ -228,7 +228,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("				MFILE_INIT_mf_initdone,");
 	print("				MFILE_INIT_mf_lockops,");
 	print("				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),");
-	print("				MFILE_INIT_mf_blockshift(PAGESHIFT),");
+	print("				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),");
 	print("				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |");
 	print("				                    MFILE_F_CHANGED | MFILE_F_NOATIME |");
 	print("				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |");
@@ -441,7 +441,7 @@ PUBLIC struct device dev_mem = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -492,7 +492,7 @@ PUBLIC struct device dev_kmem = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -543,7 +543,7 @@ PUBLIC struct device dev_null = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -594,7 +594,7 @@ PUBLIC struct device dev_port = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -645,7 +645,7 @@ PUBLIC struct device dev_zero = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -695,7 +695,7 @@ PUBLIC struct device dev_full = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -747,7 +747,7 @@ PUBLIC struct device dev_random = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -798,7 +798,7 @@ PUBLIC struct device dev_urandom = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -850,7 +850,7 @@ PUBLIC struct device dev_kmsg = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
@@ -902,7 +902,7 @@ PUBLIC struct device dev_tty = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |

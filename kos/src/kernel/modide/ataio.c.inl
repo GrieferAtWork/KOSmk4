@@ -212,11 +212,12 @@ LOCAL_AtaDrive_IO(struct mfile *__restrict self, pos_t addr,
 	(void)aio; /* Unused (without DMA, we can't do async disk transfers) */
 
 	/* Convert absolute position/count into sector-based index/count */
-	assertf((buf & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
+	assertf((buf & 1) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
 	assertf((addr & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
 	assertf((num_bytes & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
 	lba         = (uint64_t)addr >> AtaDrive_GetSectorShift(me);
 	num_sectors = num_bytes >> AtaDrive_GetSectorShift(me);
+	assertf(num_sectors != 0, "Specs say num_bytes != 0, and w/ alignment this means this should never happen");
 
 #if 0
 	if unlikely(!PREEMPTION_ENABLED()) {
@@ -243,11 +244,6 @@ LOCAL_AtaDrive_IO(struct mfile *__restrict self, pos_t addr,
 		return;
 	}
 #endif /* ATADRIVE_HAVE_PIO_IOSECTORS */
-
-	/* Must explicitly handle `num_sectors == 0'.
-	 * DMA with 0-sectors would instead do I/O on 0x10000 bytes. */
-	if unlikely(num_sectors == 0)
-		return;
 
 next_chunk:
 	/* Allocate an AIO handle. */
@@ -331,16 +327,12 @@ next_chunk:
 	(void)aio; /* Unused (without DMA, we can't do async disk transfers) */
 
 	/* Convert absolute position/count into sector-based index/count */
-	assertf((buf & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
+	assertf((buf & 1) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
 	assertf((addr & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
 	assertf((num_bytes & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
 	lba         = (uint64_t)addr >> AtaDrive_GetSectorShift(me);
 	num_sectors = num_bytes >> AtaDrive_GetSectorShift(me);
-
-	/* Explicitly handle `num_sectors == 0'.
-	 * Below code should be able to deal with this on its own, but better be careful and not ~test~ the hardware. */
-	if unlikely(num_sectors == 0)
-		return;
+	assertf(num_sectors != 0, "Specs say num_bytes != 0, and w/ alignment this means this should never happen");
 
 	/* Must operate while holding a bus-lock */
 	AtaBus_LockPIO(bus);

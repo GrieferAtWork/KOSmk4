@@ -94,7 +94,7 @@ DECL_BEGIN
 				MFILE_INIT_mf_initdone,                                          \
 				MFILE_INIT_mf_lockops,                                           \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                    \
-				MFILE_INIT_mf_blockshift(PAGESHIFT),                             \
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                  \
 				MFILE_INIT_mf_flags(MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
 				MFILE_INIT_mf_trunclock,                                         \
 				MFILE_INIT_mf_filesize((uint64_t)-1),                            \
@@ -128,7 +128,7 @@ DECL_BEGIN
 				MFILE_INIT_mf_initdone,                                          \
 				MFILE_INIT_mf_lockops,                                           \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                    \
-				MFILE_INIT_mf_blockshift(PAGESHIFT),                             \
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                  \
 				MFILE_INIT_mf_flags(MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
 				MFILE_INIT_mf_trunclock,                                         \
 				MFILE_INIT_mf_filesize((uint64_t)-1),                            \
@@ -169,7 +169,7 @@ DECL_BEGIN
 			MFILE_INIT_mf_initdone,                                                            \
 			MFILE_INIT_mf_lockops,                                                             \
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                                      \
-			MFILE_INIT_mf_blockshift(PAGESHIFT),                                               \
+			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                                    \
 			MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |                          \
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),                     \
 			MFILE_INIT_mf_trunclock,                                                           \
@@ -210,7 +210,7 @@ DECL_BEGIN
 				MFILE_INIT_mf_initdone,                                         \
 				MFILE_INIT_mf_lockops,                                          \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                   \
-				MFILE_INIT_mf_blockshift(PAGESHIFT),                            \
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                 \
 				MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |       \
 				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),  \
 				MFILE_INIT_mf_trunclock,                                        \
@@ -245,14 +245,16 @@ DECL_BEGIN
 
 INTDEF struct fsuper_ops const procfs_super_ops;
 INTERN struct fsuper procfs_super = {
-	.fs_nodes           = FSUPER_NODES_DELETED, /* Don't add nodes here! */
-	.fs_nodeslock       = ATOMIC_RWLOCK_INIT,
-	.fs_nodeslockops    = SLIST_HEAD_INITIALIZER(procfs_super.fs_nodeslockops),
-	.fs_mounts          = LIST_HEAD_INITIALIZER(procfs_super.fs_mounts),
-	.fs_mountslock      = ATOMIC_RWLOCK_INIT,
-	.fs_mountslockops   = SLIST_HEAD_INITIALIZER(procfs_super.fs_mountslockops),
-	.fs_sys             = &procfs_filesys,
-	.fs_dev             = NULL,
+	.fs_nodes         = FSUPER_NODES_DELETED, /* Don't add nodes here! */
+	.fs_nodeslock     = ATOMIC_RWLOCK_INIT,
+	.fs_nodeslockops  = SLIST_HEAD_INITIALIZER(procfs_super.fs_nodeslockops),
+	.fs_mounts        = LIST_HEAD_INITIALIZER(procfs_super.fs_mounts),
+	.fs_mountslock    = ATOMIC_RWLOCK_INIT,
+	.fs_mountslockops = SLIST_HEAD_INITIALIZER(procfs_super.fs_mountslockops),
+	.fs_sys           = &procfs_filesys,
+	.fs_dev           = NULL,
+	.fs_loadblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
+	.fs_saveblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
 	.fs_feat = {
 		.sf_filesize_max       = (pos_t)-1,
 		.sf_uid_max            = (uid_t)-1,
@@ -281,7 +283,7 @@ INTERN struct fsuper procfs_super = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),

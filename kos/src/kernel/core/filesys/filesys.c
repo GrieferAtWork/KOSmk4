@@ -59,11 +59,6 @@ PUBLIC struct lockop_slist ffilesys_formats_lops  = SLIST_HEAD_INITIALIZER(ffile
 
 struct aio_multihandle;
 
-INTDEF NONNULL((1)) void /* From "memory/mman/mfile.c" */
-NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict self,
-                                    pos_t addr, physaddr_t buf, size_t num_bytes,
-                                    struct aio_multihandle *__restrict aio);
-
 PRIVATE NONNULL((1, 5)) void KCALL
 throw_readonly_v_saveblocks(struct mfile *__restrict UNUSED(self), pos_t UNUSED(addr),
                             physaddr_t UNUSED(buf), size_t num_bytes,
@@ -121,6 +116,7 @@ ffilesys_open(struct ffilesys *__restrict self,
 		result = (*self->ffs_open)(self, dev, args);
 	} else {
 		assert(dev); /* Must be non-NULL in call */
+		assert(dev->mf_iobashift <= dev->mf_blockshift);
 
 		/* Need a device that implements at least a custom read-blocks operator,
 		 * doesn't override the mmap or pread operators, and is set-up to  allow
@@ -168,6 +164,7 @@ err_cannot_open_file:
 	}
 
 	if (result != NULL) {
+		assert(result->fs_root.mf_iobashift <= result->fs_root.mf_blockshift);
 		if (dev) {
 			if (mfile_isdevice(dev)) {
 				struct device *ddev = mfile_asdevice(dev);
@@ -181,20 +178,21 @@ err_cannot_open_file:
 			}
 
 			/* Assign load-/save-blocks operators. */
-			if unlikely(result->fs_root.mf_blockshift < dev->mf_blockshift) {
-				printk(KERN_WARNING "[fs] %s-superblock sector-size (%" PRIuSIZ ") is less "
-				                    "restrictive than device sector-size (%" PRIuSIZ "): "
+			if unlikely(result->fs_root.mf_blockshift < dev->mf_blockshift ||
+			            result->fs_root.mf_iobashift < dev->mf_iobashift) {
+				printk(KERN_WARNING "[fs] %s-superblock sector-size/align (%" PRIuSIZ ", %" PRIuSIZ ") is less "
+				                    "restrictive than device sector-size/align (%" PRIuSIZ ", v): "
 				                    "direct I/O not possible\n",
 				       self->ffs_name,
 				       (size_t)1 << result->fs_root.mf_blockshift,
-				       (size_t)1 << dev->mf_blockshift);
+				       (size_t)1 << result->fs_root.mf_iobashift,
+				       (size_t)1 << dev->mf_blockshift,
+				       (size_t)1 << dev->mf_iobashift);
 				result->fs_loadblocks = &unaligned_v_loadblocks;
 				result->fs_saveblocks = &unaligned_v_saveblocks;
 			} else {
 				result->fs_loadblocks = dev->mf_ops->mo_loadblocks;
 				result->fs_saveblocks = dev->mf_ops->mo_saveblocks;
-				if unlikely(result->fs_loadblocks == NULL)
-					result->fs_loadblocks = &mfile_zero_loadpages;
 				if unlikely(result->fs_saveblocks == NULL)
 					result->fs_saveblocks = &throw_readonly_v_saveblocks;
 			}
