@@ -204,7 +204,7 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 					DBG_memset(&iter->mp_changed, 0xcc, sizeof(iter->mp_changed));
 				} else {
 					struct mpartmeta *meta = iter->mp_meta;
-					if (ATOMIC_READ(meta->mpm_dmalocks) != 0) {
+					if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
 						/* Have to wait for this one... */
 						incref(iter);
 						mfile_unlock_and_decref_whole_tree(self);

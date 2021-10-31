@@ -474,9 +474,10 @@ struct mpart {
 		struct mchunkvec          mp_swp_sc;    /* [valid_if(MPART_ST_SWP_SC)] Scattered swap */
 	};
 #ifdef __WANT_MPART_INIT
-#define MPART_INIT_mp_meta(mp_meta) { mp_meta }
+#define MPART_INIT_mp_meta(mp_meta) mp_meta
 #endif /* __WANT_MPART_INIT */
-	struct mpartmeta             *mp_meta;      /* [0..1][owned][lock(WRITE_ONCE)] Runtime meta-data for futex and RTM support. */
+	struct mpartmeta             *mp_meta;      /* [0..1][owned][lock(READ(ATOMIC), WRITE(ONCE && MPART_F_LOCKBIT))]
+	                                             * Runtime meta-data for futex and RTM support. */
 };
 
 
@@ -745,7 +746,7 @@ FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
                          struct unlockinfo *unlock);
 
-/* Ensure that `self->mp_meta->mpm_dmalocks == 0' */
+/* Ensure that `self->mp_meta == NULL || self->mp_meta->mpm_dmalocks == 0' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_nodma_or_unlock(struct mpart *__restrict self,
                       struct unlockinfo *unlock);

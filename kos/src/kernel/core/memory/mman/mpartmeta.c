@@ -283,9 +283,24 @@ mpart_getmeta(struct mpart *__restrict self) THROWS(E_BADALLOC) {
 		result = (struct mpartmeta *)kmalloc(sizeof(struct mpartmeta),
 		                                     GFP_CALLOC);
 		mpartmeta_cinit(result);
-		if unlikely(!ATOMIC_CMPXCH(self->mp_meta, NULL, result)) {
+
+		/* Need to be holding a lock in order to write to `mp_meta'.
+		 * s.a.  the  explaination  in   `mpart_hasmeta_or_unlock()' */
+		TRY {
+			mpart_lock_acquire(self);
+		} EXCEPT {
 			kfree(result);
-			result = ATOMIC_READ(self->mp_meta);
+			RETHROW();
+		}
+
+		/* Remember that meta-data has been allocated. */
+		if likely(self->mp_meta == NULL) {
+			self->mp_meta = result;
+			mpart_lock_release(self);
+		} else {
+			mpart_lock_release(self);
+			kfree(result);
+			result = self->mp_meta;
 		}
 	}
 	return result;
@@ -403,7 +418,7 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
 	struct mpartmeta *meta;
 	/* Enforce proper alignment. */
 	file_position &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
-	meta = ATOMIC_READ(self->mp_meta);
+	meta = self->mp_meta;
 	if (meta) {
 		mpartmeta_ftxlock_read(meta);
 		if likely(file_position >= mpart_getminaddr(self) &&

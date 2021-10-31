@@ -1676,7 +1676,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 				struct lockop *lop;
 				lop          = mpart_destroy_lockop_encode(hipart);
 				lop->lo_func = &mpart_destroy_lop_rmall_async;
-				SLIST_ATOMIC_INSERT(&mpart_all_lops, lop, lo_link);
+				lockop_enqueue(&mpart_all_lops, lop);
 				_mpart_all_reap();
 				goto done_destroy_hipart;
 			}
@@ -2077,7 +2077,7 @@ NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock_post)(Tobpostlockop(mman) *__
 	} else {
 		/* Acquire a lock to the all-parts list asynchronously. */
 		ATOMIC_WRITE(merge_all_parts_lop.map_lop.lo_func, &merge_all_parts_lop_cb);
-		SLIST_ATOMIC_INSERT(&mpart_all_lops, &merge_all_parts_lop.map_lop, lo_link);
+		lockop_enqueue(&mpart_all_lops, &merge_all_parts_lop.map_lop);
 		_mpart_all_reap();
 	}
 }
@@ -2113,9 +2113,8 @@ NOTHROW(FCALL async_merge_all_parts_including)(struct mpart *__restrict part_to_
 	/* Kick-start the merge-all-parts lop-function. */
 	if (ATOMIC_CMPXCH(merge_all_parts_lop.map_mm_lop.olo_func,
 	                  NULL, &merge_all_parts_after_kernel_mm_lock)) {
-		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
-		                    &merge_all_parts_lop.map_mm_lop,
-		                    olo_link);
+		oblockop_enqueue(&mman_kernel_lockops,
+		                 &merge_all_parts_lop.map_mm_lop);
 	}
 }
 
@@ -2173,8 +2172,8 @@ NOTHROW(FCALL async_waitfor_part_and_mergepart)(struct mpart *part_to_wait,
 	/* Insert the newly created lock-op. */
 	lop->amp_mergeme           = incref(part_to_merge);
 	lop->amp_part_lop.olo_func = &async_merge_part_cb;
-	SLIST_ATOMIC_INSERT(&part_to_wait->mp_lockops,
-	                    &lop->amp_part_lop, olo_link);
+	oblockop_enqueue(&part_to_wait->mp_lockops,
+	                 &lop->amp_part_lop);
 	return true;
 }
 
@@ -2220,8 +2219,8 @@ NOTHROW(FCALL async_waitfor_ftxlck_and_mergepart)(struct mpart *part_to_wait,
 	/* Insert the newly created lock-op. */
 	lop->amp_mergeme           = incref(part_to_merge);
 	lop->amp_part_lop.olo_func = &async_merge_ftxlck_cb;
-	SLIST_ATOMIC_INSERT(&part_to_wait->mp_meta->mpm_ftxlops,
-	                    &lop->amp_part_lop, olo_link);
+	oblockop_enqueue(&part_to_wait->mp_meta->mpm_ftxlops,
+	                 &lop->amp_part_lop);
 	return true;
 }
 
@@ -2272,8 +2271,8 @@ NOTHROW(FCALL async_waitfor_file_and_mergepart)(struct mfile *file_to_wait,
 	/* Insert the newly created lock-op. */
 	lop->amp_mergeme           = incref(part_to_merge);
 	lop->amp_file_lop.olo_func = &async_merge_file_cb;
-	SLIST_ATOMIC_INSERT(&file_to_wait->mf_lockops,
-	                    &lop->amp_file_lop, olo_link);
+	oblockop_enqueue(&file_to_wait->mf_lockops,
+	                 &lop->amp_file_lop);
 	return true;
 }
 
@@ -2324,8 +2323,8 @@ NOTHROW(FCALL async_waitfor_mman_and_mergepart)(struct mman *mman_to_wait,
 	/* Insert the newly created lock-op. */
 	lop->amp_mergeme           = incref(part_to_merge);
 	lop->amp_mman_lop.olo_func = &async_merge_mman_cb;
-	SLIST_ATOMIC_INSERT(&FORMMAN(mman_to_wait, thismman_lockops),
-	                    &lop->amp_mman_lop, olo_link);
+	oblockop_enqueue(&FORMMAN(mman_to_wait, thismman_lockops),
+	                 &lop->amp_mman_lop);
 	return true;
 }
 

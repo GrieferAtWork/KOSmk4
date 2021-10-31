@@ -140,12 +140,11 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 	return true;
 }
 
-/* Ensure that `self->mp_dmalocks == 0' */
+/* Ensure that `self->mp_meta == NULL || self->mp_meta->mpm_dmalocks == 0' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_nodma_or_unlock(struct mpart *__restrict self,
                       struct unlockinfo *unlock) {
-	struct mpartmeta *meta;
-	meta = ATOMIC_READ(self->mp_meta);
+	struct mpartmeta *meta = self->mp_meta;
 	if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
 		/* Must blocking-wait until all DMA locks have been released. */
 		incref(self);
@@ -180,15 +179,42 @@ mpart_hasmeta_or_unlock(struct mpart *__restrict self,
 			meta = (struct mpartmeta *)kmalloc(sizeof(struct mpartmeta),
 			                                   GFP_CALLOC);
 			mpartmeta_cinit(meta);
-			/* Remember that meta-data has been allocated. */
-			if unlikely(!ATOMIC_CMPXCH(self->mp_meta, NULL, meta))
+
+			/* The part-meta-field can only be written while holding  a
+			 * lock to the  mem-part. This is  required to prevent  the
+			 * random  introduction  of additional  locks (such  as the
+			 * `struct mpartmeta::mpm_ftxlock' lock) needing to be held
+			 * to be able to modify  (e.g.) `mp_minaddr'. If the  meta-
+			 * controller  could  be allocated  atomically,  then there
+			 * would be no way to  prevent its addition and  subsequent
+			 * requirement of acquiring `mpm_ftxlock' in this scenario,
+			 * meaning  that  such code  would have  to unconditionally
+			 * allocate the futex controller, even if it's not  needed. */
+			TRY {
+				mpart_lock_acquire(self);
+			} EXCEPT {
 				kfree(meta);
+				RETHROW();
+			}
+
+			/* Remember that meta-data has been allocated. */
+			if likely(self->mp_meta == NULL) {
+				self->mp_meta = meta;
+				mpart_lock_release(self);
+			} else {
+				mpart_lock_release(self);
+				kfree(meta);
+			}
 			return false;
 		}
 		mpartmeta_cinit(meta);
-		/* Remember that meta-data has been allocated. */
-		if unlikely(!ATOMIC_CMPXCH(self->mp_meta, NULL, meta))
-			kfree(meta);
+
+		/* Remember that meta-data has been allocated.
+		 * NOTE: We never released the lock to `self', so we're allowed
+		 *       to  assume that the  meta-data controller still hasn't
+		 *       been allocated. */
+		assert(self->mp_meta == NULL);
+		self->mp_meta = meta;
 	}
 	return true;
 }
