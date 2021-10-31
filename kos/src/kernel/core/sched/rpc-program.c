@@ -836,12 +836,12 @@ rpc_vm_pc_rdq(struct rpc_vm *__restrict self) THROWS(E_SEGFAULT) {
 PRIVATE NONNULL((1)) uintptr_t FCALL
 rpc_vm_pc_rduleb128(struct rpc_vm *__restrict self) THROWS(E_SEGFAULT) {
 	byte_t byte;
-	uintptr_t result   = 0;
-	unsigned int shift = 0;
+	uintptr_t result = 0;
+	shift_t shift    = 0;
 	for (;;) {
-		byte    = rpc_vm_pc_rdb(self);
+		byte = rpc_vm_pc_rdb(self);
 		result |= ((byte & 0x7f) << shift);
-		shift  += 7;
+		shift += 7;
 		if (!(byte & 0x80))
 			break;
 	}

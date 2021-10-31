@@ -53,10 +53,7 @@ iob_maskbyte(byte_t *pbyte, u8 byte_mask, u8 byte_flag) {
 }
 
 LOCAL void KCALL
-iob_maskbyte_c(byte_t *pbyte,
-               unsigned int minbit,
-               unsigned int bitcnt,
-               bool turn_on) {
+iob_maskbyte_c(byte_t *pbyte, shift_t minbit, shift_t bitcnt, bool turn_on) {
 	u8 bitmask;
 	assert((minbit + bitcnt) <= 8);
 	bitmask = (u8)(((1 << bitcnt) - 1) << minbit);
@@ -73,26 +70,30 @@ iob_isenabled(byte_t const *iob, u16 port) {
 LOCAL void KCALL
 iob_setrange(byte_t *iob, u16 minport, u16 maxport, bool turn_on) {
 	size_t minbyte, maxbyte;
-	unsigned int minbit;
+	shift_t minbit;
 	assert(maxport >= minport);
 	minbyte = FLOORDIV(minport, 8);
 	maxbyte = CEILDIV(maxport + 1, 8) - 1;
 	assert(maxbyte >= minbyte);
+
+	/* Special case: only a single byte is getting modified. */
 	if (maxbyte == minbyte) {
-		unsigned int bitcnt;
-		/* Special case: only a single byte is getting modified. */
+		shift_t bitcnt;
 		minbit = minport & 7;
 		bitcnt = (maxport - minport) + 1;
+
 		/* Update the bitmap mask. */
 		iob_maskbyte_c(iob + minbyte,
 		               minbit, bitcnt,
 		               turn_on);
 		return;
 	}
+
 	/* Update the bitsets for the first and last affected bitset byte */
 	minbit = minport & 7;
 	iob_maskbyte_c(iob + minbyte, minbit, 8 - minbit, turn_on);
 	iob_maskbyte_c(iob + maxbyte, 0, (maxport & 7) + 1, turn_on);
+
 	/* Fill in all intermediate bytes. */
 	if (minbyte + 1 < maxbyte) {
 		memset(iob + minbyte,
@@ -123,6 +124,7 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 		      E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON,
 		      turn_on);
 	}
+
 	/* Manipulate the  IOBM of  our own  thread  through use  of the  `thiscpu_x86_iob'  vector.
 	 * Access to said vector is directly granted so-long as we keep the TASK_FKEEPCORE flag set. */
 	caller           = THIS_TASK;
@@ -134,6 +136,7 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 	COMPILER_READ_BARRIER();
 	me  = caller->t_cpu;
 	iob = &FORCPU(me, thiscpu_x86_iob[0]);
+
 	/* Ensure that the caller is allowed hardware port access.
 	 * This essentially enforces that:
 	 *  - Anyone is allowed to disable ports (or keep them enabled)

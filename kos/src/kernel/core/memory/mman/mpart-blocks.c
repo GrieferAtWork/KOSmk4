@@ -95,7 +95,7 @@ NOTHROW(FCALL mpart_page2swap)(struct mpart const *__restrict self,
                                physpagecnt_t partrel_pageaddr) {
 	physpagecnt_t result;
 	mpart_blkst_word_t word, *bitset;
-	unsigned int shift;
+	shift_t shift;
 	assert(((size_t)partrel_pageaddr << PAGESHIFT) <= mpart_getsize(self));
 	shift = self->mp_file->mf_blockshift;
 	if (self->mp_flags & MPART_F_BLKST_INL) {
@@ -186,7 +186,7 @@ account_trailing_word:
 				 * by whole bitset words, either.
 				 * As such, we handle this case separately. */
 				physpagecnt_t i, blocks_per_page;
-				unsigned int page2block_shift;
+				shift_t page2block_shift;
 				page2block_shift = PAGESHIFT - shift;
 				blocks_per_page  = (physpagecnt_t)1 << page2block_shift;
 				for (i = 0; i < partrel_pageaddr; ++i) {
@@ -822,7 +822,7 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
                              mpart_reladdr_t partrel_offset,
                              size_t num_bytes) {
 	size_t i, blocks_start, blocks_end;
-	unsigned int shift;
+	shift_t shift;
 	struct mfile *file;
 	bool did_change;
 	assert(mpart_lock_acquired(self));
@@ -860,10 +860,10 @@ NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
                                               unsigned int new_st) {
 	mpart_blkst_word_t *pword, mask, oldword, newword;
 	mpart_blkst_word_t old_val, new_val;
-	unsigned int shift;
+	shift_t shift;
 	assert(old_st < ((unsigned int)1 << MPART_BLOCK_STBITS));
 	assert(new_st < ((unsigned int)1 << MPART_BLOCK_STBITS));
-	shift   = (unsigned int)((partrel_block_index % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS);
+	shift   = (shift_t)((partrel_block_index % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS);
 	mask    = (mpart_blkst_word_t)((1 << MPART_BLOCK_STBITS) - 1) << shift;
 	old_val = (mpart_blkst_word_t)old_st << shift;
 	new_val = (mpart_blkst_word_t)new_st << shift;

@@ -280,7 +280,7 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	struct flatsuper *result;
 	VolumeDescriptor *desc;
 	pos_t offset, second_volume_offset;
-	unsigned int sector_shift;
+	shift_t sector_shift;
 
 	/* TODO: User-arguments? */
 	(void)args;
@@ -715,7 +715,7 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 
 	{
 		u32 sector_size;
-		unsigned int block_shift;
+		shift_t block_shift;
 		sector_size = (u32)GET_LEBE(volume.vd_prim_volume.pv_sectorsize);
 		switch (sector_size) {
 		case 1: block_shift = 0; break;

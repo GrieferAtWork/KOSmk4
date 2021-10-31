@@ -98,9 +98,9 @@ __NAMESPACE_INT_BEGIN
 
 #ifndef __hybrid_rol8_r
 #define __hybrid_rol8_r(x, shift) \
-	__NAMESPACE_INT_SYM __hybrid_x86_rolb(x, (__UINT8_TYPE__)(shift))
+	__NAMESPACE_INT_SYM __hybrid_x86_rolb(x, (__SHIFT_TYPE__)(shift))
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
-__NOTHROW_NCX(__hybrid_x86_rolb)(__UINT8_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
+__NOTHROW_NCX(__hybrid_x86_rolb)(__UINT8_TYPE__ __lhs, __SHIFT_TYPE__ __shift) {
 	__UINT8_TYPE__ __res;
 	__asm_ncx_memop__("rolb %b1, %b0"
 	                  : "=qm" (__res)
@@ -113,9 +113,9 @@ __NOTHROW_NCX(__hybrid_x86_rolb)(__UINT8_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
 
 #ifndef __hybrid_ror8_r
 #define __hybrid_ror8_r(x, shift) \
-	__NAMESPACE_INT_SYM __hybrid_x86_rorb(x, (__UINT8_TYPE__)(shift))
+	__NAMESPACE_INT_SYM __hybrid_x86_rorb(x, (__SHIFT_TYPE__)(shift))
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
-__NOTHROW_NCX(__hybrid_x86_rorb)(__UINT8_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
+__NOTHROW_NCX(__hybrid_x86_rorb)(__UINT8_TYPE__ __lhs, __SHIFT_TYPE__ __shift) {
 	__UINT8_TYPE__ __res;
 	__asm_ncx_memop__("rorb %b1, %b0"
 	                  : "=qm" (__res)
@@ -128,9 +128,9 @@ __NOTHROW_NCX(__hybrid_x86_rorb)(__UINT8_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
 
 #ifndef __hybrid_rol16_r
 #define __hybrid_rol16_r(x, shift) \
-	__NAMESPACE_INT_SYM __hybrid_x86_rolw(x, (__UINT8_TYPE__)(shift))
+	__NAMESPACE_INT_SYM __hybrid_x86_rolw(x, (__SHIFT_TYPE__)(shift))
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT16_TYPE__
-__NOTHROW_NCX(__hybrid_x86_rolw)(__UINT16_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
+__NOTHROW_NCX(__hybrid_x86_rolw)(__UINT16_TYPE__ __lhs, __SHIFT_TYPE__ __shift) {
 	__UINT16_TYPE__ __res;
 	__asm_ncx_memop__("rolw %b1, %w0"
 	                  : "=g" (__res)
@@ -143,9 +143,9 @@ __NOTHROW_NCX(__hybrid_x86_rolw)(__UINT16_TYPE__ __lhs, __UINT8_TYPE__ __shift) 
 
 #ifndef __hybrid_ror16_r
 #define __hybrid_ror16_r(x, shift) \
-	__NAMESPACE_INT_SYM __hybrid_x86_rorw(x, (__UINT8_TYPE__)(shift))
+	__NAMESPACE_INT_SYM __hybrid_x86_rorw(x, (__SHIFT_TYPE__)(shift))
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT16_TYPE__
-__NOTHROW_NCX(__hybrid_x86_rorw)(__UINT16_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
+__NOTHROW_NCX(__hybrid_x86_rorw)(__UINT16_TYPE__ __lhs, __SHIFT_TYPE__ __shift) {
 	__UINT16_TYPE__ __res;
 	__asm_ncx_memop__("rorw %b1, %w0"
 	                  : "=g" (__res)
@@ -158,9 +158,9 @@ __NOTHROW_NCX(__hybrid_x86_rorw)(__UINT16_TYPE__ __lhs, __UINT8_TYPE__ __shift) 
 
 #ifndef __hybrid_rol32_r
 #define __hybrid_rol32_r(x, shift) \
-	__NAMESPACE_INT_SYM __hybrid_x86_roll(x, (__UINT8_TYPE__)(shift))
+	__NAMESPACE_INT_SYM __hybrid_x86_roll(x, (__SHIFT_TYPE__)(shift))
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__
-__NOTHROW_NCX(__hybrid_x86_roll)(__UINT32_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
+__NOTHROW_NCX(__hybrid_x86_roll)(__UINT32_TYPE__ __lhs, __SHIFT_TYPE__ __shift) {
 	__UINT32_TYPE__ __res;
 	__asm_ncx_memop__("roll %b1, %k0"
 	                  : "=g" (__res)
@@ -173,9 +173,9 @@ __NOTHROW_NCX(__hybrid_x86_roll)(__UINT32_TYPE__ __lhs, __UINT8_TYPE__ __shift) 
 
 #ifndef __hybrid_ror32_r
 #define __hybrid_ror32_r(x, shift) \
-	__NAMESPACE_INT_SYM __hybrid_x86_rorl(x, (__UINT8_TYPE__)(shift))
+	__NAMESPACE_INT_SYM __hybrid_x86_rorl(x, (__SHIFT_TYPE__)(shift))
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__
-__NOTHROW_NCX(__hybrid_x86_rorl)(__UINT32_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
+__NOTHROW_NCX(__hybrid_x86_rorl)(__UINT32_TYPE__ __lhs, __SHIFT_TYPE__ __shift) {
 	__UINT32_TYPE__ __res;
 	__asm_ncx_memop__("rorl %b1, %k0"
 	                  : "=g" (__res)
@@ -189,9 +189,9 @@ __NOTHROW_NCX(__hybrid_x86_rorl)(__UINT32_TYPE__ __lhs, __UINT8_TYPE__ __shift) 
 #if defined(__x86_64__) && defined(__UINT64_TYPE__)
 #ifndef __hybrid_rol64_r
 #define __hybrid_rol64_r(x, shift) \
-	__NAMESPACE_INT_SYM __hybrid_x86_rolq(x, (__UINT8_TYPE__)(shift))
+	__NAMESPACE_INT_SYM __hybrid_x86_rolq(x, (__SHIFT_TYPE__)(shift))
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__
-__NOTHROW_NCX(__hybrid_x86_rolq)(__UINT64_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
+__NOTHROW_NCX(__hybrid_x86_rolq)(__UINT64_TYPE__ __lhs, __SHIFT_TYPE__ __shift) {
 	__UINT64_TYPE__ __res;
 	__asm_ncx_memop__("rolq %b1, %q0"
 	                  : "=g" (__res)
@@ -204,9 +204,9 @@ __NOTHROW_NCX(__hybrid_x86_rolq)(__UINT64_TYPE__ __lhs, __UINT8_TYPE__ __shift) 
 
 #ifndef __hybrid_ror64_r
 #define __hybrid_ror64_r(x, shift) \
-	__NAMESPACE_INT_SYM __hybrid_x86_rorq(x, (__UINT8_TYPE__)(shift))
+	__NAMESPACE_INT_SYM __hybrid_x86_rorq(x, (__SHIFT_TYPE__)(shift))
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__
-__NOTHROW_NCX(__hybrid_x86_rorq)(__UINT64_TYPE__ __lhs, __UINT8_TYPE__ __shift) {
+__NOTHROW_NCX(__hybrid_x86_rorq)(__UINT64_TYPE__ __lhs, __SHIFT_TYPE__ __shift) {
 	__UINT64_TYPE__ __res;
 	__asm_ncx_memop__("rorq %b1, %q0"
 	                  : "=g" (__res)

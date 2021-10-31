@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e864a13 */
+/* HASH CRC-32:0x6f927ef4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -536,7 +536,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST
 #endif /* !__ffs_defined */
 #ifdef __USE_KOS
 #include <hybrid/__bit.h>
-/* unsigned int FFS(INTEGER i):
+/* shift_t FFS(INTEGER i):
  *     FindFirstSet
  *     Returns the index (starting at 1 for 0x01) of the first
  *     1-bit in given value, or ZERO(0) if the given value is ZERO(0).
@@ -725,7 +725,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(popcount64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __UINT64_TYPE__ */
 #ifdef __USE_KOS
 #include <hybrid/__bit.h>
-/* unsigned int POPCOUNT(unsigned Integer i):
+/* shift_t POPCOUNT(unsigned Integer i):
  *     POPulationCOUNT
  *     Return the number of 1-bits in `i' */
 #define popcount(i) __hybrid_popcount(i)

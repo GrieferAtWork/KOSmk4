@@ -737,7 +737,7 @@ doparen_expr:
 
 	case CTOKEN_TOK_CHAR: {
 		char32_t value = 0;
-		unsigned int shift = 0;
+		shift_t shift  = 0;
 		char const *reader, *end;
 		reader = self->c_tokstart;
 		end    = self->c_tokend;

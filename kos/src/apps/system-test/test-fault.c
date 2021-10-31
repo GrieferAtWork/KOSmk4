@@ -26,7 +26,7 @@
 
 #include <hybrid/host.h>
 
-#if 0
+#if defined(__i386__) || defined(__x86_64__)
 #include <hybrid/atomic.h>
 #include <hybrid/typecore.h> /* __REGISTER_TYPE__ */
 
@@ -147,20 +147,20 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 		case 0x0026: ATOMIC_XCH(*(u32 *)addr, (u32)p); break;
 		case 0x0027: I64(ATOMIC_XCH(*(u64 *)addr, (u64)p)); break;
 
-		case 0x0028: *(u8 *)addr <<= (unsigned int)p; break;
-		case 0x0029: *(u16 *)addr <<= (unsigned int)p; break;
-		case 0x002a: *(u32 *)addr <<= (unsigned int)p; break;
-		case 0x002b: I64(*(u64 *)addr <<= (unsigned int)p); break;
+		case 0x0028: *(u8 *)addr <<= (shift_t)p; break;
+		case 0x0029: *(u16 *)addr <<= (shift_t)p; break;
+		case 0x002a: *(u32 *)addr <<= (shift_t)p; break;
+		case 0x002b: I64(*(u64 *)addr <<= (shift_t)p); break;
 
-		case 0x002c: *(u8 *)addr >>= (unsigned int)p; break;
-		case 0x002d: *(u16 *)addr >>= (unsigned int)p; break;
-		case 0x002e: *(u32 *)addr >>= (unsigned int)p; break;
-		case 0x002f: I64(*(u64 *)addr >>= (unsigned int)p); break;
+		case 0x002c: *(u8 *)addr >>= (shift_t)p; break;
+		case 0x002d: *(u16 *)addr >>= (shift_t)p; break;
+		case 0x002e: *(u32 *)addr >>= (shift_t)p; break;
+		case 0x002f: I64(*(u64 *)addr >>= (shift_t)p); break;
 
-		case 0x0030: *(s8 *)addr >>= (unsigned int)p; break;
-		case 0x0031: *(s16 *)addr >>= (unsigned int)p; break;
-		case 0x0032: *(s32 *)addr >>= (unsigned int)p; break;
-		case 0x0033: I64(*(s64 *)addr >>= (unsigned int)p); break;
+		case 0x0030: *(s8 *)addr >>= (shift_t)p; break;
+		case 0x0031: *(s16 *)addr >>= (shift_t)p; break;
+		case 0x0032: *(s32 *)addr >>= (shift_t)p; break;
+		case 0x0033: I64(*(s64 *)addr >>= (shift_t)p); break;
 
 		case 0x0034: *(s8 *)addr *= (s8)p; break;
 		case 0x0035: *(s16 *)addr *= (s16)p; break;

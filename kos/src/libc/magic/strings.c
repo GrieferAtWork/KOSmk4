@@ -151,7 +151,7 @@ __SYSDECL_BEGIN
 %{
 #ifdef __USE_KOS
 #include <hybrid/__bit.h>
-/* unsigned int FFS(INTEGER i):
+/* shift_t FFS(INTEGER i):
  *     FindFirstSet
  *     Returns the index (starting at 1 for 0x01) of the first
  *     1-bit in given value, or ZERO(0) if the given value is ZERO(0).
@@ -241,7 +241,7 @@ unsigned int popcount64($uint64_t i) {
 %{
 #ifdef __USE_KOS
 #include <hybrid/__bit.h>
-/* unsigned int POPCOUNT(unsigned Integer i):
+/* shift_t POPCOUNT(unsigned Integer i):
  *     POPulationCOUNT
  *     Return the number of 1-bits in `i' */
 #define popcount(i) __hybrid_popcount(i)

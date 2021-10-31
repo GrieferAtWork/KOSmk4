@@ -1425,32 +1425,32 @@ __ATTR_PURE __ATTR_WUNUSED void uint128_ge(uint128_t const &__var, unsigned __in
  *  - *32: The SHIFT argument must be < 32
  *  - *64: The SHIFT argument must be < 64
  *  - *:   The SHIFT argument must be < 128 */
-void uint128_shl32(uint128_t &__var, unsigned int __shift /*<32*/);
-void uint128_shl64(uint128_t &__var, unsigned int __shift /*<64*/);
-void uint128_shl(uint128_t &__var, unsigned int __shift /*<128*/);
-void int128_shl32(int128_t &__var, unsigned int __shift /*<32*/);
-void int128_shl64(int128_t &__var, unsigned int __shift /*<64*/);
-void int128_shl(int128_t &__var, unsigned int __shift /*<128*/);
-void uint128_shr32(uint128_t &__var, unsigned int __shift /*<32*/);
-void uint128_shr64(uint128_t &__var, unsigned int __shift /*<64*/);
-void uint128_shr(uint128_t &__var, unsigned int __shift /*<128*/);
-void int128_shr32(int128_t &__var, unsigned int __shift /*<32*/);
-void int128_shr64(int128_t &__var, unsigned int __shift /*<64*/);
-void int128_shr(int128_t &__var, unsigned int __shift /*<128*/);
+void uint128_shl32(uint128_t &__var, __SHIFT_TYPE__ __shift /*<32*/);
+void uint128_shl64(uint128_t &__var, __SHIFT_TYPE__ __shift /*<64*/);
+void uint128_shl(uint128_t &__var, __SHIFT_TYPE__ __shift /*<128*/);
+void int128_shl32(int128_t &__var, __SHIFT_TYPE__ __shift /*<32*/);
+void int128_shl64(int128_t &__var, __SHIFT_TYPE__ __shift /*<64*/);
+void int128_shl(int128_t &__var, __SHIFT_TYPE__ __shift /*<128*/);
+void uint128_shr32(uint128_t &__var, __SHIFT_TYPE__ __shift /*<32*/);
+void uint128_shr64(uint128_t &__var, __SHIFT_TYPE__ __shift /*<64*/);
+void uint128_shr(uint128_t &__var, __SHIFT_TYPE__ __shift /*<128*/);
+void int128_shr32(int128_t &__var, __SHIFT_TYPE__ __shift /*<32*/);
+void int128_shr64(int128_t &__var, __SHIFT_TYPE__ __shift /*<64*/);
+void int128_shr(int128_t &__var, __SHIFT_TYPE__ __shift /*<128*/);
 
 /* Check if a shift operation would cause data to become lost. */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_shl32_overflows(uint128_t const &__var, unsigned int __shift /*<32*/);
-__ATTR_PURE __ATTR_WUNUSED bool int128_shl32_overflows(int128_t const &__var, unsigned int __shift /*<32*/);
-__ATTR_PURE __ATTR_WUNUSED bool uint128_shl64_overflows(uint128_t const &__var, unsigned int __shift /*<64*/);
-__ATTR_PURE __ATTR_WUNUSED bool int128_shl64_overflows(int128_t const &__var, unsigned int __shift /*<64*/);
-__ATTR_PURE __ATTR_WUNUSED bool uint128_shl_overflows(uint128_t const &__var, unsigned int __shift /*<128*/);
-__ATTR_PURE __ATTR_WUNUSED bool int128_shl_overflows(int128_t const &__var, unsigned int __shift /*<128*/);
-__ATTR_PURE __ATTR_WUNUSED bool uint128_shr32_overflows(uint128_t const &__var, unsigned int __shift /*<32*/);
-__ATTR_PURE __ATTR_WUNUSED bool int128_shr32_overflows(int128_t const &__var, unsigned int __shift /*<32*/);
-__ATTR_PURE __ATTR_WUNUSED bool uint128_shr64_overflows(uint128_t const &__var, unsigned int __shift /*<64*/);
-__ATTR_PURE __ATTR_WUNUSED bool int128_shr64_overflows(int128_t const &__var, unsigned int __shift /*<64*/);
-__ATTR_PURE __ATTR_WUNUSED bool uint128_shr_overflows(uint128_t const &__var, unsigned int __shift /*<128*/);
-__ATTR_PURE __ATTR_WUNUSED bool int128_shr_overflows(int128_t const &__var, unsigned int __shift /*<128*/);
+__ATTR_PURE __ATTR_WUNUSED bool uint128_shl32_overflows(uint128_t const &__var, __SHIFT_TYPE__ __shift /*<32*/);
+__ATTR_PURE __ATTR_WUNUSED bool int128_shl32_overflows(int128_t const &__var, __SHIFT_TYPE__ __shift /*<32*/);
+__ATTR_PURE __ATTR_WUNUSED bool uint128_shl64_overflows(uint128_t const &__var, __SHIFT_TYPE__ __shift /*<64*/);
+__ATTR_PURE __ATTR_WUNUSED bool int128_shl64_overflows(int128_t const &__var, __SHIFT_TYPE__ __shift /*<64*/);
+__ATTR_PURE __ATTR_WUNUSED bool uint128_shl_overflows(uint128_t const &__var, __SHIFT_TYPE__ __shift /*<128*/);
+__ATTR_PURE __ATTR_WUNUSED bool int128_shl_overflows(int128_t const &__var, __SHIFT_TYPE__ __shift /*<128*/);
+__ATTR_PURE __ATTR_WUNUSED bool uint128_shr32_overflows(uint128_t const &__var, __SHIFT_TYPE__ __shift /*<32*/);
+__ATTR_PURE __ATTR_WUNUSED bool int128_shr32_overflows(int128_t const &__var, __SHIFT_TYPE__ __shift /*<32*/);
+__ATTR_PURE __ATTR_WUNUSED bool uint128_shr64_overflows(uint128_t const &__var, __SHIFT_TYPE__ __shift /*<64*/);
+__ATTR_PURE __ATTR_WUNUSED bool int128_shr64_overflows(int128_t const &__var, __SHIFT_TYPE__ __shift /*<64*/);
+__ATTR_PURE __ATTR_WUNUSED bool uint128_shr_overflows(uint128_t const &__var, __SHIFT_TYPE__ __shift /*<128*/);
+__ATTR_PURE __ATTR_WUNUSED bool int128_shr_overflows(int128_t const &__var, __SHIFT_TYPE__ __shift /*<128*/);
 
 /* Assign special value to the given 128-bit integer */
 void int128_setzero(int128_t &__var);           /* `var = 0' */

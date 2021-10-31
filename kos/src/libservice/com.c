@@ -347,7 +347,8 @@ NOTHROW(FCALL service_shm_handle_alloc_nopr_nx)(void) {
 INTERN NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL service_shm_handle_free_nopr)(struct service_shm_handle *__restrict self) {
 	struct sh_slab *slab;
-	unsigned int index, i, shift;
+	unsigned int index, i;
+	shift_t shift;
 	slab  = sh_slab_of(self);
 	index = (unsigned int)(self - sh_slab_hand(slab));
 	assertf(&sh_slab_hand(slab)[index] == self,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa38675d8 */
+/* HASH CRC-32:0x1ac6e073 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1649,7 +1649,7 @@ NOTHROW_NCX(LIBCCALL libc_l64a)(long n) {
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_PURE WUNUSED NONNULL((1)) long
 NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
 	unsigned long digit, result = 0;
-	unsigned int shift = 0;
+	shift_t shift = 0;
 	for (;; ++s) {
 		char ch = *s;
 		if (ch <= 0) {
@@ -3512,37 +3512,37 @@ NOTHROW_NCX(LIBCCALL libc__atoldbl_l)(__LONGDOUBLE *__restrict result,
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST unsigned int
 NOTHROW(LIBCCALL libc__rotl)(unsigned int val,
                              int shift) {
-	return __hybrid_rol(val, shift);
+	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST unsigned int
 NOTHROW(LIBCCALL libc__rotr)(unsigned int val,
                              int shift) {
-	return __hybrid_ror(val, shift);
+	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST u64
 NOTHROW(LIBCCALL libc__rotl64)(u64 val,
                                int shift) {
-	return __hybrid_rol64(val, shift);
+	return __hybrid_rol64(val, (shift_t)(unsigned int)shift);
 }
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST u64
 NOTHROW(LIBCCALL libc__rotr64)(u64 val,
                                int shift) {
-	return __hybrid_ror64(val, shift);
+	return __hybrid_ror64(val, (shift_t)(unsigned int)shift);
 }
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST unsigned long
 NOTHROW(LIBCCALL libc__lrotl)(unsigned long val,
                               int shift) {
-	return __hybrid_rol(val, shift);
+	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST unsigned long
 NOTHROW(LIBCCALL libc__lrotr)(unsigned long val,
                               int shift) {
-	return __hybrid_ror(val, shift);
+	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.environ") errno_t
 NOTHROW_NCX(LIBCCALL libc__putenv_s)(char const *varname,

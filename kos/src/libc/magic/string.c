@@ -3435,7 +3435,7 @@ __STDC_INT_AS_UINT_T ffs(int i) {
 %{
 #ifdef __USE_KOS
 #include <hybrid/__bit.h>
-/* unsigned int FFS(INTEGER i):
+/* shift_t FFS(INTEGER i):
  *     FindFirstSet
  *     Returns the index (starting at 1 for 0x01) of the first
  *     1-bit in given value, or ZERO(0) if the given value is ZERO(0).

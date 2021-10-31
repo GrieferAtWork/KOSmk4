@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a90b3f1 */
+/* HASH CRC-32:0xc1aee649 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_rotl) __ATTR_CONST unsigned int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_rotl))(unsigned int __val, int __shift) {
-	return __hybrid_rol(__val, __shift);
+	return __hybrid_rol(__val, (__SHIFT_TYPE__)(unsigned int)__shift);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__rotl_defined

@@ -48,7 +48,7 @@ DECL_BEGIN
 
 #ifdef DEFINE_mpart_mmap_p
 PRIVATE NOBLOCK u16
-NOTHROW(FCALL mpart_mmap_p_impl)(mpart_blkst_word_t const *bitset, unsigned int shift,
+NOTHROW(FCALL mpart_mmap_p_impl)(mpart_blkst_word_t const *bitset, shift_t shift,
                                  physaddr_t baseaddr, PAGEDIR_PAGEALIGNED void *addr,
                                  PAGEDIR_PAGEALIGNED size_t chunk_size,
                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t baseaddr_offset,
@@ -60,7 +60,7 @@ NOTHROW(FCALL mpart_mmap_p_impl)(mpart_blkst_word_t const *bitset, unsigned int 
 #elif defined(DEFINE_mpart_mmap)
 /* Same as `mpart_mmap_p()', but always map into the current page directory. */
 PRIVATE NOBLOCK u16
-NOTHROW(FCALL mpart_mmap_impl)(mpart_blkst_word_t const *bitset, unsigned int shift,
+NOTHROW(FCALL mpart_mmap_impl)(mpart_blkst_word_t const *bitset, shift_t shift,
                                physaddr_t baseaddr, PAGEDIR_PAGEALIGNED void *addr,
                                PAGEDIR_PAGEALIGNED size_t chunk_size,
                                PAGEDIR_PAGEALIGNED mpart_reladdr_t baseaddr_offset,
@@ -142,7 +142,7 @@ do_load_whole_pages_readonly:
 		if (shift < PAGESHIFT) {
 			/* Blocks are smaller than a single page */
 			size_t blocks_per_page;
-			unsigned int page_to_block_shift;
+			shift_t page_to_block_shift;
 			page_to_block_shift = PAGESHIFT - shift;
 			blocks_per_page     = (size_t)1 << page_to_block_shift;
 			assert(blocks_per_page >= 2);
@@ -198,7 +198,7 @@ do_load_small_pages_readonly:
 			}
 		} else {
 			/* Large pages */
-			unsigned int block_to_page_shift;
+			shift_t block_to_page_shift;
 #ifdef __OPTIMIZE_SIZE__
 			assert(shift >= PAGESHIFT);
 #else  /* __OPTIMIZE_SIZE__ */
@@ -296,7 +296,7 @@ NOTHROW(FCALL mpart_mmap)(struct mpart const *__restrict self,
 #endif /* !... */
 {
 	u16 result;
-	unsigned int shift;
+	shift_t shift;
 	mpart_blkst_word_t const *bitset;
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
 	assert(IS_ALIGNED(size, PAGESIZE));

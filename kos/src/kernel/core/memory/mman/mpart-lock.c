@@ -519,7 +519,7 @@ PRIVATE NONNULL((1, 2, 3)) void FCALL
 setcore_ex_load_from_swap(struct mchunkvec *__restrict dst_vec,
                           struct mchunkvec *__restrict src_vec,
                           mpart_blkst_word_t const *__restrict bitset,
-                          unsigned int block_shift,
+                          shift_t block_shift,
                           size_t num_blocks) {
 #define GETSTATE(index) bitset_getstate(bitset, index)
 	size_t i, block_size;
@@ -817,7 +817,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 	size_t i;
 	struct mfile *file = self->mp_file;
 	bool has_init = false;
-	unsigned int shift;
+	shift_t shift;
 	size_t blocks_start, blocks_end;
 	assert(MPART_ST_INCORE(self->mp_state));
 	shift        = self->mp_file->mf_blockshift;

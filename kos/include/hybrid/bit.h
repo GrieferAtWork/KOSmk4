@@ -24,7 +24,7 @@
 
 /* Bit-scanning / bit-manipulation functions. */
 
-/* unsigned int FFS(UNSIGNED i):
+/* shift_t FFS(UNSIGNED i):
  *     FindFirstSet
  *     Returns the index (starting at 1 for 0x01) of the first
  *     1-bit in given value, or ZERO(0) if the given value is ZERO(0).
@@ -32,28 +32,28 @@
  *     >> assert(!x || !(x & ((1 << (ffs(x)-1))-1))); // Less significant bits are clear */
 #define FFS __hybrid_ffs
 
-/* unsigned int CLZ(UNSIGNED i):
+/* shift_t CLZ(UNSIGNED i):
  *     CountLeadingZeroes
  *     Return  the number of  leading ZEROes in `i',  starting at the most
  *     significant bit. When `i' is ZERO(0), then the result is undefined. */
 #define CLZ __hybrid_clz
 
-/* unsigned int CTZ(UNSIGNED i):
+/* shift_t CTZ(UNSIGNED i):
  *     CounTrailingZeroes
  *     Return the number of trailing ZEROes in `i', starting at the  least
  *     significant bit. When `i' is ZERO(0), then the result is undefined. */
 #define CTZ __hybrid_ctz
 
-/* unsigned int POPCOUNT(UNSIGNED i):
+/* shift_t POPCOUNT(UNSIGNED i):
  *     POPulationCOUNT
  *     Return the number of 1-bits in `i' */
 #define POPCOUNT __hybrid_popcount
 
-/* unsigned int PARITY(UNSIGNED i):
+/* shift_t PARITY(UNSIGNED i):
  *     Return the parity of `i', that is `POPCOUNT(i) % 2' */
 #define PARITY __hybrid_parity
 
-/* unsigned int CLRSB(signed Integer i):
+/* shift_t CLRSB(signed Integer i):
  *     CoultLeadingRedundantSignBits
  *     Return the number of leading, redundant sign-bits,
  *     that is:  The number  of bits  following the  most

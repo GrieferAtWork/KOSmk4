@@ -121,8 +121,8 @@ INTERN ATTR_PERCPU u32 thiscpu_x86_apic_emutsc_initial = PIT_HZ_DIV(X86_PIT_EARL
 
 /* Only used in APIC and PIT mode!
  * The current shift stored in `APIC_TIMER_DIVIDE' (shadow value)
- * This  variable  contains  `CTZ(n)'  of  `APIC_TIMER_DIVIDE_Fn' */
-INTERN ATTR_PERCPU u8 thiscpu_x86_apic_emutsc_divide = 0;
+ * This  variable  contains `ilog2(n)'  of `APIC_TIMER_DIVIDE_Fn' */
+INTERN ATTR_PERCPU shift_t thiscpu_x86_apic_emutsc_divide = 0;
 
 /* The minimal  distance for  TSC. Attempts  at
  * setting a distance less than this will fail. */
@@ -135,14 +135,14 @@ INTERN ATTR_PERCPU bool thiscpu_x86_apic_emutsc_early_interrupt = false;
 
 
 PRIVATE u32 const emutsc_shift_to_divide[8] = {
-	/* [CLZ(1)]   = */ APIC_TIMER_DIVIDE_F1,
-	/* [CLZ(2)]   = */ APIC_TIMER_DIVIDE_F2,
-	/* [CLZ(4)]   = */ APIC_TIMER_DIVIDE_F4,
-	/* [CLZ(8)]   = */ APIC_TIMER_DIVIDE_F8,
-	/* [CLZ(16)]  = */ APIC_TIMER_DIVIDE_F16,
-	/* [CLZ(32)]  = */ APIC_TIMER_DIVIDE_F32,
-	/* [CLZ(64)]  = */ APIC_TIMER_DIVIDE_F64,
-	/* [CLZ(128)] = */ APIC_TIMER_DIVIDE_F128
+	/* [ilog2(1)]   = */ APIC_TIMER_DIVIDE_F1,
+	/* [ilog2(2)]   = */ APIC_TIMER_DIVIDE_F2,
+	/* [ilog2(4)]   = */ APIC_TIMER_DIVIDE_F4,
+	/* [ilog2(8)]   = */ APIC_TIMER_DIVIDE_F8,
+	/* [ilog2(16)]  = */ APIC_TIMER_DIVIDE_F16,
+	/* [ilog2(32)]  = */ APIC_TIMER_DIVIDE_F32,
+	/* [ilog2(64)]  = */ APIC_TIMER_DIVIDE_F64,
+	/* [ilog2(128)] = */ APIC_TIMER_DIVIDE_F128
 };
 
 /* Low-level: read current TSC offset. */
@@ -459,7 +459,7 @@ again_with_timer:
 	new_current_reg = FORCPU(me, thiscpu_x86_apic_emutsc_initial) - new_current_reg;
 	FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) += (tsc_t)new_current_reg << FORCPU(me, thiscpu_x86_apic_emutsc_divide);
 	FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)    = UINT32_MAX;
-	FORCPU(me, thiscpu_x86_apic_emutsc_divide)          = 7; /* CLZ(128) */
+	FORCPU(me, thiscpu_x86_apic_emutsc_divide)          = 7; /* ilog2(128) */
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial)         = UINT32_MAX;
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)UINT32_MAX << 7;
 #ifdef CONFIG_TSC_ASSERT_FORWARD

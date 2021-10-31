@@ -74,8 +74,8 @@ public:
 	inline io const &operator *= (T value) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) * value); return *this; }
 	inline io const &operator /= (T value) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) / value); return *this; }
 	inline io const &operator %= (T value) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) % value); return *this; }
-	inline io const &operator <<= (unsigned int shift) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) << shift); return *this; }
-	inline io const &operator >>= (unsigned int shift) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) >> shift); return *this; }
+	inline io const &operator <<= (shift_t shift) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) << shift); return *this; }
+	inline io const &operator >>= (shift_t shift) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) >> shift); return *this; }
 	inline io const &operator |= (T value) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) | value); return *this; }
 	inline io const &operator &= (T value) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) & value); return *this; }
 	inline io const &operator ^= (T value) const __CXX_NOEXCEPT { ac::out(m_port,ac::in(m_port) ^ value); return *this; }

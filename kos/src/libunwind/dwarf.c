@@ -50,7 +50,7 @@ NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(byte_t const **__restrict preader) {
 	byte_t byte;
 	byte_t const *reader   = *preader;
 	dwarf_sleb128_t result = 0;
-	unsigned int shift     = 0;
+	shift_t shift          = 0;
 	for (;;) {
 		byte = *reader++;
 		result |= ((byte & 0x7f) << shift);
@@ -70,7 +70,7 @@ NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(byte_t const **__restrict preader) {
 	byte_t byte;
 	byte_t const *reader   = *preader;
 	dwarf_uleb128_t result = 0;
-	unsigned int shift     = 0;
+	shift_t shift          = 0;
 	for (;;) {
 		byte    = *reader++;
 		result |= ((byte & 0x7f) << shift);

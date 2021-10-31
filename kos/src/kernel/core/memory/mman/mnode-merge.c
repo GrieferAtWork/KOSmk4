@@ -1340,7 +1340,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		if (total_blocks <= MPART_BLKST_BLOCKS_PER_WORD) {
 			/* The combination of the 2 parts still fits into the inline bitset. */
 			mpart_blkst_word_t loword, hiword;
-			unsigned int loshift;
+			shift_t loshift;
 			loword = lopart->mp_blkst_inl;
 			if unlikely(!(lopart->mp_flags & MPART_F_BLKST_INL)) {
 				loword = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
@@ -1356,7 +1356,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 				if (hipart->mp_blkst_ptr != NULL)
 					hiword = hipart->mp_blkst_ptr[0];
 			}
-			loshift = (unsigned int)(lo_blocks * MPART_BLOCK_STBITS);
+			loshift = (shift_t)(lo_blocks * MPART_BLOCK_STBITS);
 			loword &= ((mpart_blkst_word_t)1 << loshift) - 1;
 			loword |= hiword << loshift;
 			lopart->mp_blkst_inl = loword;

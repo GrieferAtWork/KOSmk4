@@ -296,7 +296,7 @@ kernel_configure_syslog_levels(char *__restrict arg) {
 	} else {
 		levels = setup_loglevel_from_name(arg, strlen(arg));
 		levels = ((levels - 1) << 1) | 1;
-		levels = levels | ((uintptr_t)1 << (unsigned int)(uintptr_t)SYSLOG_LEVEL_RAW);
+		levels = levels | ((uintptr_t)1 << (shift_t)(uintptr_t)SYSLOG_LEVEL_RAW);
 	}
 	/* Restrict mask to valid levels. */
 	levels &= ((uintptr_t)1 << SYSLOG_LEVEL_COUNT) - 1;
@@ -385,7 +385,7 @@ DBG_COMMAND_AUTO(loglevel, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 			/* Set level */
 			syslog_levels = ((((uintptr_t)1 << level) - 1) << 1) | 1;
 			/* Keep raw syslog messages enabled */
-			syslog_levels |= (uintptr_t)1 << (unsigned int)(uintptr_t)SYSLOG_LEVEL_RAW;
+			syslog_levels |= (uintptr_t)1 << (shift_t)(uintptr_t)SYSLOG_LEVEL_RAW;
 		}
 	}
 	return 0;
@@ -740,7 +740,7 @@ syslog_printer(void *level,
 	ssize_t result = (ssize_t)datalen;
 	struct syslog_buffer *buffer;
 	/* Quick check: are log entires of level enabled. */
-	if (!(syslog_levels & ((uintptr_t)1 << (unsigned int)(uintptr_t)level)))
+	if (!(syslog_levels & ((uintptr_t)1 << (shift_t)(uintptr_t)level)))
 		goto done;
 	/* Check for special case: empty message */
 	if unlikely(!datalen)

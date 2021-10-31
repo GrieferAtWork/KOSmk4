@@ -788,25 +788,25 @@ typedef __ATTR_NONNULL((1, 3, 5)) unsigned int
 /*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_READ)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                                    unwind_getreg_t __regget, void const *__regget_arg,
                                                    void *__restrict __dst, __size_t __num_bits,
-                                                   unsigned int __dst_left_shift, unsigned int __src_left_shift);
+                                                   __size_t __dst_left_shift, __size_t __src_left_shift);
 typedef __ATTR_NONNULL((1, 3, 7)) unsigned int
 /*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_WRITE)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                                     /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
                                                     /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
                                                     void const *__restrict __src, __size_t __num_bits,
-                                                    unsigned int __dst_left_shift, unsigned int __src_left_shift);
+                                                    __size_t __dst_left_shift, __size_t __src_left_shift);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_read)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                             unwind_getreg_t __regget, void const *__regget_arg,
                                             void *__restrict __dst, __size_t __num_bits,
-                                            unsigned int __dst_left_shift, unsigned int __src_left_shift);
+                                            __size_t __dst_left_shift, __size_t __src_left_shift);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 7)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_write)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                              /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
                                              /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
                                              void const *__restrict __src, __size_t __num_bits,
-                                             unsigned int __dst_left_shift, unsigned int __src_left_shift);
+                                             __size_t __dst_left_shift, __size_t __src_left_shift);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 

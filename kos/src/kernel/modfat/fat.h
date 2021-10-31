@@ -426,7 +426,7 @@ struct fatsuper {
 	u8                     _ft_pad;         /* ... */
 	u8                      ft_fat_count;   /* [const] Amount of redundant FAT copies. */
 #ifdef __INTELLISENSE__
-	unsigned int            ft_sectorshift; /* [const] ilog2(ft_sectorsize) (in bytes). */
+	shift_t                 ft_sectorshift; /* [const] ilog2(ft_sectorsize) (in bytes). */
 #else /* __INTELLISENSE__ */
 #define ft_sectorshift      ft_super.ffs_super.fs_root.mf_blockshift  /* [const] ilog2(ft_sectorsize) (in bytes). */
 #endif /* !__INTELLISENSE__ */

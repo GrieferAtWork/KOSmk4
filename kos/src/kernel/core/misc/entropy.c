@@ -409,7 +409,7 @@ DBG_COMMAND(entropy,
 		onebits += POPCOUNT(val);
 	}
 	{
-		unsigned int tail_bits = entropy_bits % NBBY;
+		shift_t tail_bits = entropy_bits % NBBY;
 		if (tail_bits) {
 			byte_t tail_byte = entropy_data[entropy_bits / NBBY];
 			tail_byte &= (1 << tail_bits) - 1;

@@ -1232,6 +1232,12 @@
 #define __CHAR32_TYPE__ __UINT32_TYPE__
 #endif /* !__CHAR32_TYPE__ */
 
+/* Most efficient type to-be used as RHS-operator of shift operations. */
+#ifndef __SHIFT_TYPE__
+#define __SIZEOF_SHIFT_T__ 1
+#define __SHIFT_TYPE__     __UINT8_TYPE__
+#endif /* !__SHIFT_TYPE__ */
+
 #ifndef __SIG_ATOMIC_TYPE__
 #define __SIG_ATOMIC_TYPE__ int
 #endif /* !__SIG_ATOMIC_TYPE__ */

@@ -32,6 +32,7 @@
 #include <kos/hop/handle.h>
 #include <kos/io.h>
 #include <kos/syscalls.h>
+#include <sys/param.h>
 
 #include <ctype.h>
 #include <errno.h>
@@ -705,7 +706,7 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self)
 			else if unlikely(self->dm_tlsalign & (self->dm_tlsalign - 1)) {
 				size_t real_align = sizeof(void *);
 				while (real_align < self->dm_tlsalign &&
-				       !(real_align & ((size_t)1 << ((sizeof(void *) * 8) - 1))))
+				       !(real_align & ((size_t)1 << ((sizeof(void *) * NBBY) - 1))))
 					real_align <<= 1;
 				self->dm_tlsalign = real_align;
 			}

@@ -342,7 +342,7 @@ do_set_automatic_userspace_hint:
 	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
 	if (mima.mm_min == NULL) {
 		void *alloc_maxaddr;
-		unsigned int alignshift;
+		shift_t alignshift;
 select_from_avail_range:
 		assert(IS_ALIGNED((uintptr_t)allow_minaddr, REQUIRED_ALIGNMENT));
 		assert(IS_ALIGNED((uintptr_t)avail_minaddr, REQUIRED_ALIGNMENT));

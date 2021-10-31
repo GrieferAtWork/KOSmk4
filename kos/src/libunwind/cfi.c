@@ -470,7 +470,7 @@ INTERN NONNULL((1, 3, 5)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                       unwind_getreg_t regget, void const *regget_arg,
                                       void *__restrict dst, size_t num_bits,
-                                      unsigned int dst_left_shift, unsigned int src_left_shift) {
+                                      size_t dst_left_shift, size_t src_left_shift) {
 	unsigned int error;
 	(void)addrsize;
 	switch (self->s_type) {
@@ -572,7 +572,7 @@ NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint
                                        /*[1..1]*/ unwind_getreg_t regget, void const *regget_arg,
                                        /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
                                        void const *__restrict src, size_t num_bits,
-                                       unsigned int dst_left_shift, unsigned int src_left_shift) {
+                                       size_t dst_left_shift, size_t src_left_shift) {
 	unsigned int error;
 	(void)addrsize;
 	switch (self->s_type) {
@@ -651,7 +651,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
                                       unwind_ste_t const *__restrict ste,
                                       uintptr_t num_bits,
-                                      unsigned int target_left_shift) {
+                                      size_t target_left_shift) {
 	unsigned int result;
 	if unlikely(((self->ue_piecebits + num_bits + NBBY - 1) / NBBY) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
@@ -676,7 +676,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *__restrict ste,
                                      uintptr_t num_bits,
-                                     unsigned int target_left_shift) {
+                                     size_t target_left_shift) {
 	unsigned int result;
 	if unlikely(((self->ue_piecebits + num_bits + NBBY - 1) / NBBY) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
@@ -1323,7 +1323,7 @@ do_make_second_const:
 
 		CASE(DW_OP_piece) {
 			uintptr_t num_bits;
-			unsigned int target_left_shift;
+			size_t target_left_shift;
 			unsigned int error;
 			if unlikely(stacksz < 1)
 				ERROR(err_stack_underflow);
@@ -1345,7 +1345,7 @@ do_make_second_const:
 				            TOP.s_type != UNWIND_STE_RW_LVALUE)
 					ERROR(err_not_writable); /* Read-only target location. */
 				num_bits          = dwarf_decode_uleb128(&pc);
-				target_left_shift = (unsigned int)dwarf_decode_uleb128(&pc);
+				target_left_shift = dwarf_decode_uleb128(&pc);
 do_write_bit_pieces:
 				error = libuw_unwind_emulator_write_to_piece(self, &TOP, num_bits, target_left_shift);
 				if unlikely(error != UNWIND_SUCCESS)

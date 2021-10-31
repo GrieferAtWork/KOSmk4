@@ -2350,14 +2350,14 @@ __HYBRID_INT128_DEFINE_COMPARE_CXX_OPERATOR(==, !=, eq)
 __HYBRID_INT128_DEFINE_COMPARE_CXX_OPERATOR(<, >=, lo)
 __HYBRID_INT128_DEFINE_COMPARE_CXX_OPERATOR(<=, >, le)
 #undef __HYBRID_INT128_DEFINE_COMPARE_CXX_OPERATOR
-__LOCAL __hybrid_int128_t &operator <<= (__hybrid_int128_t &__self, unsigned int __shift) __CXX_NOEXCEPT { __hybrid_int128_shl(__self, __shift); return __self; }
-__LOCAL __hybrid_int128_t &operator >>= (__hybrid_int128_t &__self, unsigned int __shift) __CXX_NOEXCEPT { __hybrid_int128_shr(__self, __shift); return __self; }
-__LOCAL __hybrid_uint128_t &operator <<= (__hybrid_uint128_t &__self, unsigned int __shift) __CXX_NOEXCEPT { __hybrid_uint128_shl(__self, __shift); return __self; }
-__LOCAL __hybrid_uint128_t &operator >>= (__hybrid_uint128_t &__self, unsigned int __shift) __CXX_NOEXCEPT { __hybrid_uint128_shr(__self, __shift); return __self; }
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __hybrid_int128_t operator << (__hybrid_int128_t const &__self, unsigned int __shift) __CXX_NOEXCEPT { __hybrid_int128_t __res = __self; __res <<= __shift; return __res; }
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __hybrid_int128_t operator >> (__hybrid_int128_t const &__self, unsigned int __shift) __CXX_NOEXCEPT { __hybrid_int128_t __res = __self; __res >>= __shift; return __res; }
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __hybrid_uint128_t operator << (__hybrid_uint128_t const &__self, unsigned int __shift) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __res <<= __shift; return __res; }
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __hybrid_uint128_t operator >> (__hybrid_uint128_t const &__self, unsigned int __shift) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __res >>= __shift; return __res; }
+__LOCAL __hybrid_int128_t &operator <<= (__hybrid_int128_t &__self, __SHIFT_TYPE__ __shift) __CXX_NOEXCEPT { __hybrid_int128_shl(__self, __shift); return __self; }
+__LOCAL __hybrid_int128_t &operator >>= (__hybrid_int128_t &__self, __SHIFT_TYPE__ __shift) __CXX_NOEXCEPT { __hybrid_int128_shr(__self, __shift); return __self; }
+__LOCAL __hybrid_uint128_t &operator <<= (__hybrid_uint128_t &__self, __SHIFT_TYPE__ __shift) __CXX_NOEXCEPT { __hybrid_uint128_shl(__self, __shift); return __self; }
+__LOCAL __hybrid_uint128_t &operator >>= (__hybrid_uint128_t &__self, __SHIFT_TYPE__ __shift) __CXX_NOEXCEPT { __hybrid_uint128_shr(__self, __shift); return __self; }
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __hybrid_int128_t operator << (__hybrid_int128_t const &__self, __SHIFT_TYPE__ __shift) __CXX_NOEXCEPT { __hybrid_int128_t __res = __self; __res <<= __shift; return __res; }
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __hybrid_int128_t operator >> (__hybrid_int128_t const &__self, __SHIFT_TYPE__ __shift) __CXX_NOEXCEPT { __hybrid_int128_t __res = __self; __res >>= __shift; return __res; }
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __hybrid_uint128_t operator << (__hybrid_uint128_t const &__self, __SHIFT_TYPE__ __shift) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __res <<= __shift; return __res; }
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __hybrid_uint128_t operator >> (__hybrid_uint128_t const &__self, __SHIFT_TYPE__ __shift) __CXX_NOEXCEPT { __hybrid_uint128_t __res = __self; __res >>= __shift; return __res; }
 #undef __HYBRID_INT128_ENABLE_IF_SIGNED
 #undef __HYBRID_INT128_ENABLE_IF_UNSIGNED
 } /* extern "C++" */

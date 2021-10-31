@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcef270ae */
+/* HASH CRC-32:0xaa1966c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(a64l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(a64l))(char const *__s) {
 	unsigned long __digit, __result = 0;
-	unsigned int __shift = 0;
+	__SHIFT_TYPE__ __shift = 0;
 	for (;; ++__s) {
 		char __ch = *__s;
 		if (__ch <= 0) {

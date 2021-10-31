@@ -237,10 +237,8 @@ NOTHROW(KCALL ioperm_bitmap_maskbyte)(struct ioperm_bitmap *__restrict self,
 
 LOCAL NOBLOCK void
 NOTHROW(KCALL ioperm_bitmap_maskbyte_c)(struct ioperm_bitmap *__restrict self,
-                                        size_t byte_index,
-                                        unsigned int minbit,
-                                        unsigned int bitcnt,
-                                        bool turn_on) {
+                                        size_t byte_index, shift_t minbit,
+                                        shift_t bitcnt, bool turn_on) {
 	u8 bitmask;
 	assert((minbit + bitcnt) <= 8);
 	bitmask = (u8)(((1 << bitcnt) - 1) << minbit);
@@ -253,15 +251,16 @@ PUBLIC NOBLOCK void
 NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
                                       u16 minport, u16 maxport, bool turn_on) {
 	size_t minbyte, maxbyte;
-	unsigned int minbit, bitcnt;
+	shift_t minbit;
 	assert(!wasdestroyed(self));
 	assert(maxport >= minport);
 	minbyte = FLOORDIV(minport, 8);
 	maxbyte = CEILDIV(maxport + 1, 8) - 1;
 	assert(maxbyte >= minbyte);
 
+	/* Special case: only a single byte is getting modified. */
 	if (maxbyte == minbyte) {
-		/* Special case: only a single byte is getting modified. */
+		shift_t bitcnt;
 		minbit = minport & 7;
 		bitcnt = (maxport - minport) + 1;
 

@@ -665,10 +665,12 @@ struct mfile {
 	                                              * This field describes the minimum alignment of file positions
 	                                              * described by parts, minus one (meaning  it can be used as  a
 	                                              * mask) */
-	uint8_t                       mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
+	shift_t                       mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
 #ifdef CONFIG_USE_NEW_FS
-	uint8_t                       mf_iobashift;  /* [const][<= mf_blockshift] == log2(REQUIRED_BLOCK_BUFFER_ALIGNMENT) */
-	uint8_t                      _mf_pad[sizeof(size_t) - 2]; /* ... */
+	shift_t                       mf_iobashift;  /* [const][<= mf_blockshift] == log2(REQUIRED_BLOCK_BUFFER_ALIGNMENT) */
+#if ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0
+	byte_t                       _mf_pad[sizeof(size_t) - ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__)]; /* ... */
+#endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0 */
 #endif /* CONFIG_USE_NEW_FS */
 
 #ifdef CONFIG_USE_NEW_FS
@@ -684,8 +686,13 @@ struct mfile {
 #define MFILE_INIT_mf_initdone                  SIG_INIT
 #define MFILE_INIT_mf_lockops                   SLIST_HEAD_INITIALIZER(~)
 #define MFILE_INIT_mf_changed(mf_changed)       { mf_changed }
+#if ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0
 #define MFILE_INIT_mf_blockshift(mf_blockshift, mf_iobashift) \
 	__hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift, mf_iobashift, { }
+#else /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0 */
+#define MFILE_INIT_mf_blockshift(mf_blockshift, mf_iobashift) \
+	__hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift, mf_iobashift
+#endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) == 0 */
 #define MFILE_INIT_mf_flags(mf_flags)           mf_flags
 #define MFILE_INIT_mf_trunclock                 0
 #define MFILE_INIT_mf_filesize(mf_filesize)     ATOMIC64_INIT(mf_filesize)

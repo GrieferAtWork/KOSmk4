@@ -856,7 +856,7 @@ NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 	uintptr_t index, word, value;
 	uintptr_t *bits;
 	size_t result;
-	unsigned int shift;
+	shift_t shift;
 	s                   = SLAB_GET(ptr);
 	slab_segments_start = (byte_t *)s + SLAB_SEGMENT_OFFSET(s->s_size);
 	index               = (uintptr_t)((byte_t *)ptr - slab_segments_start) / s->s_size;

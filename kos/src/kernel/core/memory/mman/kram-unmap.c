@@ -940,8 +940,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	} else if (lopart->mp_blkst_ptr != NULL) {
 		size_t bitset_bytes_per_word, hioffset_blocks;
 		size_t loblocks, hiblocks;
-		unsigned int blockshift;
-		blockshift            = part->mp_file->mf_blockshift;
+		shift_t blockshift    = part->mp_file->mf_blockshift;
 		hioffset_blocks       = hioffset >> blockshift;
 		bitset_bytes_per_word = MPART_BLKST_BLOCKS_PER_WORD << blockshift;
 		loblocks              = losize >> blockshift;

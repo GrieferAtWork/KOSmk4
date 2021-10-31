@@ -885,9 +885,9 @@ readnext:
 		pos_t lfn_start = pos;
 		pos += sizeof(struct fat_dirent);
 		do {
-			unsigned int index = (ent.lfn_seqnum & 0x1f) - 1;
-			char *dst = lfn_name + index * UNICODE_16TO8_MAXBUF(LFN_NAME);
-			char *end = dst + UNICODE_16TO8_MAXBUF(LFN_NAME);
+			shift_t index = (ent.lfn_seqnum & 0x1f) - 1;
+			char *dst     = lfn_name + (size_t)index * UNICODE_16TO8_MAXBUF(LFN_NAME);
+			char *end     = dst + UNICODE_16TO8_MAXBUF(LFN_NAME);
 			char16_t *textend;
 			lfn_valid |= 1 << index;
 #if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
@@ -939,7 +939,7 @@ readnext:
 			 *          filename can still be recovered) */
 			unsigned int index = 0;
 			u32 mask;
-			while ((mask = 1 << index, lfn_valid >= mask)) {
+			while ((mask = (u32)1 << index, lfn_valid >= mask)) {
 				if (lfn_valid & mask) {
 					++index;
 					continue;
@@ -956,7 +956,7 @@ readnext:
 			char *dst, *src, *end;
 			size_t len;
 			dst = src = lfn_name;
-			end = src + POPCOUNT(lfn_valid) * UNICODE_16TO8_MAXBUF(LFN_NAME);
+			end = src + (size_t)POPCOUNT(lfn_valid) * UNICODE_16TO8_MAXBUF(LFN_NAME);
 			for (; src < end;) {
 				size_t off = strnlen(src, (size_t)(end - src));
 				if (dst != src)
@@ -1307,14 +1307,14 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 			if (writer >= COMPILER_ENDOF(ent->fad_dos.f_nameext))
 				goto need_lfn; /* Filename is too long */
 			if (ch >= 'A' && ch <= 'Z') {
-				unsigned int shift = 0;
+				shift_t shift = 0;
 				if (writer >= ent->fad_dos.f_ext)
 					shift = 2;
 				if (flags & (HAVE_LOWER_BASE << shift))
 					goto need_lfn; /* Mixed case */
 				flags |= (HAVE_UPPER_BASE << shift);
 			} else if (ch >= 'a' && ch <= 'z') {
-				unsigned int shift = 0;
+				shift_t shift = 0;
 				if (writer >= ent->fad_dos.f_ext)
 					shift = 2;
 				if (flags & (HAVE_UPPER_BASE << shift))

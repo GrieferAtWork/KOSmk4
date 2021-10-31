@@ -106,6 +106,14 @@ typedef __fd_t fd_t;
 typedef __socklen_t socklen_t;
 #endif /* !__socklen_t_defined */
 
+/* Most efficient type to-be used as RHS-operator of shift operations.
+ * Usually, that is the same as `uint8_t', but may be more if the arch
+ * supports integer types with more than 256 bits. */
+#ifndef __shift_t_defined
+#define __shift_t_defined
+typedef __SHIFT_TYPE__ shift_t;
+#endif /* !__shift_t_defined */
+
 #ifndef __time_t_defined
 #define __time_t_defined
 typedef __TM_TYPE(time) time_t; /* UNIX time in seconds since 01.01.1970 */

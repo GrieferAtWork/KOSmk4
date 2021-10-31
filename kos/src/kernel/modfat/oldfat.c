@@ -836,7 +836,7 @@ continue_reading:
 		{
 			char *dst, *src, *end;
 			dst = src = lfn_name;
-			end = src + POPCOUNT(lfn_valid) * UNICODE_16TO8_MAXBUF(LFN_NAME);
+			end = src + (size_t)POPCOUNT(lfn_valid) * UNICODE_16TO8_MAXBUF(LFN_NAME);
 			for (; src < end;) {
 				size_t off = strnlen(src, (size_t)(end - src));
 				if (dst != src)

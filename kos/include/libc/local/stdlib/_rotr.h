@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c080406 */
+/* HASH CRC-32:0xcb3d1a31 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_rotr) __ATTR_CONST unsigned int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_rotr))(unsigned int __val, int __shift) {
-	return __hybrid_ror(__val, __shift);
+	return __hybrid_ror(__val, (__SHIFT_TYPE__)(unsigned int)__shift);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__rotr_defined

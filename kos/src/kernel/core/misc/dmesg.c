@@ -100,7 +100,7 @@ PUBLIC ATTR_BSS size_t dmesg_size = 0;
 #define getb() (dmesg_buffer[(offset++) % CONFIG_DMESG_BUFFER_SIZE])
 PRIVATE NOBLOCK ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE size_t
 NOTHROW(FCALL decode_rel_seconds)(size_t offset, s64 *__restrict presult) {
-	unsigned int shift = 0;
+	shift_t shift = 0;
 	*presult = 0;
 	while (shift < 64) {
 		byte_t b = getb();

@@ -114,13 +114,13 @@ INTDEF NONNULL((1, 3, 5)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                       unwind_getreg_t regget, void const *regget_arg,
                                       void *__restrict dst, size_t num_bits,
-                                      unsigned int dst_left_shift, unsigned int src_left_shift);
+                                      size_t dst_left_shift, size_t src_left_shift);
 INTDEF NONNULL((1, 3, 7)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                        /*[1..1]*/ unwind_getreg_t regget, void const *regget_arg,
                                        /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
                                        void const *__restrict src, size_t num_bits,
-                                       unsigned int dst_left_shift, unsigned int src_left_shift);
+                                       size_t dst_left_shift, size_t src_left_shift);
 
 /* Read/Write the value associated with a given debuginfo location descriptor.
  * @param: self:                  The debug info location descriptor (s.a. libdebuginfo.so)
