@@ -1385,9 +1385,20 @@ got_identify_signal:
 		}
 
 		/* Initialize blkdev fields */
-		drive->mf_blockshift = DEFAULT_ATA_SECTOR_SHIFT;
-		drive->mf_iobashift  = 1; /* 2-byte (1 == log2(2)) alignment is all ATA needs (I think...) */
 		drive->mf_part_amask = MAX(PAGESIZE, 1 << DEFAULT_ATA_SECTOR_SHIFT) - 1;
+		drive->mf_blockshift = DEFAULT_ATA_SECTOR_SHIFT;
+
+		/* 2-byte (1 == log2(2)) alignment is all ATA needs (I think...)
+		 *
+		 * As far as I can  tell, this could actually  be set to `0',  but
+		 * I still set it to `1' (2-byte alignment) so that when not doing
+		 * DMA transfers, we're  operating on  properly aligned  addresses
+		 * during our  insw() /  outsw(), and  don't have  to worry  about
+		 * some individual word needing to be written to 2 pages (iow:  we
+		 * can use `insphysw()' and `outsphysw()' directly, both of  which
+		 * documents a 2-byte alignment requirement). */
+		drive->mf_iobashift = 1;
+
 		atomic64_init(&drive->mf_filesize, drive->ad_sector_count << AtaDrive_GetSectorShift(drive));
 		drive->dv_driver = incref(&drv_self);
 		drive->fn_mode   = S_IFBLK | 0644;
