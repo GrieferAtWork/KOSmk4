@@ -184,10 +184,8 @@ err_cannot_open_file:
 				                    "restrictive than device sector-size/align (%" PRIuSIZ ", v): "
 				                    "direct I/O not possible\n",
 				       self->ffs_name,
-				       (size_t)1 << result->fs_root.mf_blockshift,
-				       (size_t)1 << result->fs_root.mf_iobashift,
-				       (size_t)1 << dev->mf_blockshift,
-				       (size_t)1 << dev->mf_iobashift);
+				       mfile_getblocksize(&result->fs_root), (size_t)1 << result->fs_root.mf_iobashift,
+				       mfile_getblocksize(dev), (size_t)1 << dev->mf_iobashift);
 				result->fs_loadblocks = &unaligned_v_loadblocks;
 				result->fs_saveblocks = &unaligned_v_saveblocks;
 			} else {

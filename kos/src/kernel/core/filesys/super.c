@@ -627,10 +627,10 @@ fsuper_statfs(struct fsuper *__restrict self,
 
 	/* Fill in default fields. */
 	result->f_type    = (typeof(result->f_type))self->fs_feat.sf_magic;
-	result->f_bsize   = (typeof(result->f_bsize))1 << self->fs_root.mf_blockshift;
+	result->f_bsize   = (typeof(result->f_bsize))mfile_getblocksize(&self->fs_root);
 	result->f_blocks  = self->fs_dev ? (typeof(result->f_blocks))(atomic64_read(&self->fs_dev->mf_filesize) >> self->fs_root.mf_blockshift) : 0;
 	result->f_namelen = (typeof(result->f_namelen))self->fs_feat.sf_name_max;
-	result->f_frsize  = (typeof(result->f_frsize))1 << self->fs_root.mf_blockshift;
+	result->f_frsize  = (typeof(result->f_frsize))mfile_getblocksize(&self->fs_root);
 	result->f_flags   = (typeof(result->f_flags))statvfs_flags_from_mfile_flags(self->fs_root.mf_flags);
 
 	/* If defined, invoke the statfs operator for remaining fields. */

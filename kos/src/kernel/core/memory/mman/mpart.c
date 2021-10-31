@@ -678,7 +678,7 @@ again:
 		/* Figure out the  max continuous physical  memory range  that
 		 * can be used to describe memory starting at the lo'th block. */
 		mpart_memaddr_direct(self, start << file->mf_blockshift, &loc);
-		assert(loc.mppl_size >= (size_t)1 << file->mf_blockshift);
+		assert(loc.mppl_size >= mfile_getblocksize(file));
 
 		/* Figure out the max hi-block that is still contained with
 		 * the   physical   memory   range   described   by   `loc' */

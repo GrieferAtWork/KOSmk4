@@ -494,7 +494,7 @@ again_lock_mman:
 		file                = part->mp_file;
 		partrel_block_index = partrel_addr >> file->mf_blockshift;
 		partrel_block_count = (partrel_size + file->mf_part_amask) >> file->mf_blockshift;
-		blocksize           = (size_t)1 << file->mf_blockshift;
+		blocksize           = mfile_getblocksize(file);
 		assert(partrel_block_count != 0);
 #define mpart_isblockincore(self, partrel_block_index) \
 	(MPART_BLOCK_ST_MINCORE(mpart_getblockstate(self, partrel_block_index)) ? 0x01 : 0x00)

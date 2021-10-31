@@ -159,7 +159,7 @@ handle_mpart_stat(struct mpart *__restrict self,
 		memset(&result->st_ctimespec, 0, sizeof(result->st_ctimespec));
 	}
 	result->st_size    = (__FS_TYPE(pos))size;
-	result->st_blksize = (__blksize_t)1 << file->mf_blockshift;
+	result->st_blksize = (__blksize_t)mfile_getblocksize(file);
 	result->st_blocks  = (__FS_TYPE(blkcnt))(size >> file->mf_blockshift);
 }
 

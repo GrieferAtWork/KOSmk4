@@ -337,7 +337,7 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 		struct mfile *file = self->mp_file;
 		size_t i, min, max, block_mask;
 		unsigned int st;
-		block_mask = (1 << file->mf_blockshift) - 1;
+		block_mask = mfile_getblockmask(file);
 		min        = (partrel_offset) >> file->mf_blockshift;
 		max        = (partrel_offset + result->mppl_size - 1) >> file->mf_blockshift;
 		if ((partrel_offset & block_mask) != 0) {
@@ -510,7 +510,7 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 		size_t i, min, max, block_mask;
 		unsigned int st;
 		bool did_change;
-		block_mask = (1 << file->mf_blockshift) - 1;
+		block_mask = mfile_getblockmask(file);
 		min        = (partrel_offset) >> file->mf_blockshift;
 		max        = (partrel_offset + num_bytes - 1) >> file->mf_blockshift;
 		did_change = false;
@@ -677,7 +677,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 
 	/* Calculate the actual physical address of the first byte
 	 * of the block referenced by `min' */
-	block_size = (size_t)1 << file->mf_blockshift;
+	block_size = mfile_getblocksize(file);
 	min_addr   = loc->mppl_addr - (partrel_offset & (block_size - 1));
 	assert(IS_ALIGNED(min_addr, MIN(block_size, PAGESIZE)));
 

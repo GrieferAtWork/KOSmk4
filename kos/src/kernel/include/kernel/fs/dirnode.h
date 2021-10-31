@@ -493,7 +493,7 @@ struct handle;
 FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
                 struct path *access_path, struct fdirent *access_dent);
-FUNDEF NONNULL((1)) void KCALL /* Writes `st_blocks = 1;', `st_size = 1 << self->mf_blockshift;' */
+FUNDEF NONNULL((1)) void KCALL /* Writes `st_blocks = 1;', `st_size = mfile_getblocksize(self);' */
 fdirnode_v_stat(struct mfile *__restrict self,
                 USER CHECKED struct stat *result) THROWS(...);
 

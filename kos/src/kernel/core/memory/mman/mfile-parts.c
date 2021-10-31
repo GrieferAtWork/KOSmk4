@@ -204,7 +204,7 @@ _mfile_newpart(struct mfile *__restrict self,
 		result = (REF struct mpart *)kmalloc(sizeof(struct mpart),
 		                                     GFP_LOCKED | GFP_PREFLT);
 		result->mp_flags = MPART_F_NORMAL;
-		num_blocks = (num_bytes + (((size_t)1 << self->mf_blockshift) - 1)) >> self->mf_blockshift;
+		num_blocks = (num_bytes + mfile_getblockmask(self)) >> self->mf_blockshift;
 		if (num_blocks <= MPART_BLKST_BLOCKS_PER_WORD) {
 			result->mp_flags |= MPART_F_BLKST_INL;
 			result->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);

@@ -254,9 +254,9 @@ struct mfile_stream_ops {
 	 * additional file information that  wasn't already filled in  by
 	 * the caller. By default, the caller will have already filled:
 	 *   - st_nlink   = 1;
-	 *   - st_size    = mf_filesize;
-	 *   - st_blksize = 1 << mf_blockshift;
-	 *   - st_blocks  = mf_filesize >> mf_blockshift;
+	 *   - st_size    = mfile_getsize(self);
+	 *   - st_blksize = mfile_getblocksize(self);
+	 *   - st_blocks  = mfile_getblockcount(self);
 	 *   - st_atim    = mf_atime;
 	 *   - st_mtim    = mf_mtime;
 	 *   - st_ctim    = mf_ctime;
@@ -376,8 +376,8 @@ mfile_dosyncio(struct mfile *__restrict self,
 
 /* Read/Write whole file blocks using direct I/O
  * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
- * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
- * @assume(IS_ALIGNED(num_bytes, (size_t)1 << self->mf_blockshift));
+ * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
+ * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
  * @assume(addr + num_bytes <= self->mf_filesize);
  * @assume(num_bytes != 0);
  * @assume(self->mf_trunclock != 0);
@@ -399,7 +399,19 @@ mfile_dosyncio(struct mfile *__restrict self,
 #define mfile_wrblocks(self, addr, buf, num_bytes)            mfile_dosyncio(self, (self)->mf_ops->mo_saveblocks, addr, buf, num_bytes)
 #define mfile_haverdblocks(self) ((self)->mf_ops->mo_loadblocks != __NULLPTR)
 #define mfile_havewrblocks(self) ((self)->mf_ops->mo_saveblocks != __NULLPTR)
-#define mfile_getblocksize(self) ((size_t)1 << (self)->mf_blockshift)
+
+/* Helper macros for low-level block sizes */
+#define mfile_getblockshift(self) (self)->mf_blockshift
+#define mfile_getblocksize(self)  ((size_t)1 << (self)->mf_blockshift)
+#define mfile_getblockmask(self)  (mfile_getblocksize(self) - 1)
+
+/* For these 2, the caller must be holding a trunc-lock, or `MFILE_F_FIXEDFILESIZE' must be set.
+ * NOTE: For the `*_nonatomic' versions, `MFILE_F_FIXEDFILESIZE' must be set unconditionally. */
+#define mfile_getsize(self)                 ((pos_t)atomic64_read(&(self)->mf_filesize))
+#define mfile_getsize_nonatomic(self)       ((pos_t)__atomic64_val((self)->mf_filesize))
+#define mfile_getblockcount(self)           (mfile_getsize(self) >> (self)->mf_blockshift)
+#define mfile_getblockcount_nonatomic(self) (mfile_getsize_nonatomic(self) >> (self)->mf_blockshift)
+
 
 struct mfile_ops {
 	/* [0..1] Finalize + free the given mem-file.
@@ -455,8 +467,8 @@ struct mfile_ops {
 
 	/* [0..1] Load/initialize the given physical memory buffer (this is the read-from-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
-	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
-	 * @assume(IS_ALIGNED(num_bytes, (size_t)1 << self->mf_blockshift));
+	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
+	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
 	 * @assume(addr + num_bytes <= self->mf_filesize);
 	 * @assume(num_bytes != 0);
 	 * @assume(self->mf_trunclock != 0);
@@ -467,8 +479,8 @@ struct mfile_ops {
 
 	/* [0..1] Save/write-back the given physical memory buffer (this is the write-to-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
-	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
-	 * @assume(IS_ALIGNED(num_bytes, (size_t)1 << self->mf_blockshift));
+	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
+	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
 	 * @assume(addr + num_bytes <= self->mf_filesize);
 	 * @assume(num_bytes != 0);
 	 * @assume(self->mf_trunclock != 0);

@@ -93,9 +93,9 @@ struct fsuperfeat {
 	pos_t   sf_symlink_max;        /* [const] Max length of text contained within symbolic links */
 	nlink_t sf_link_max;           /* [const] Max # of links a file may have */
 	u32     sf_magic;              /* [const] Filesystem ~magic~ (one of the constants from `<linux/magic.h>') */
-	u32     sf_rec_incr_xfer_size; /* [const] Buffer size increments for efficient disk transfer operations (Usually: `(u32)1 << mf_blockshift') */
-	u32     sf_rec_max_xfer_size;  /* [const] Max buffer size for efficient disk transfer operations (Usually: `(u32)1 << mf_blockshift') */
-	u32     sf_rec_min_xfer_size;  /* [const] Min buffer size for efficient disk transfer operations (Usually: `(u32)1 << mf_blockshift') */
+	u32     sf_rec_incr_xfer_size; /* [const] Buffer size increments for efficient disk transfer operations (Usually: `(u32)mfile_getblocksize(&fs_root)') */
+	u32     sf_rec_max_xfer_size;  /* [const] Max buffer size for efficient disk transfer operations (Usually: `(u32)mfile_getblocksize(&fs_root)') */
+	u32     sf_rec_min_xfer_size;  /* [const] Min buffer size for efficient disk transfer operations (Usually: `(u32)mfile_getblocksize(&fs_root)') */
 	u32     sf_rec_xfer_align;     /* [const] Required in-memory buffer alignment for efficient disk transfer operations (Usually: `(u32)1 << mf_iobashift') */
 	u16     sf_name_max;           /* [const] Max # of chars in a file name */
 	u8      sf_filesizebits;       /* [const] Max # of bits in a file's size field (usually 64 or 32) */
@@ -139,12 +139,12 @@ struct fsuper_ops {
 
 	/* [0..1] Gather information about the filesystem.
 	 * The caller has already initialized:
-	 *   - f_type    (== self->fs_feat.sf_magic)
-	 *   - f_bsize   (== 1 << self->fs_root.mf_blockshift)
-	 *   - f_blocks  (== fs_dev ? fs_dev->mf_filesize >> self->fs_root.mf_blockshift : 0)
-	 *   - f_namelen (== self->fs_feat.sf_name_max)
-	 *   - f_frsize  (== 1 << self->fs_root.mf_blockshift)
-	 *   - f_flags   (== statvfs_flags_from_mfile_flags(self->fs_root.mf_flags))
+	 *   - f_type    = self->fs_feat.sf_magic;
+	 *   - f_bsize   = mfile_getblocksize(&self->fs_root);
+	 *   - f_blocks  = fs_dev ? fs_dev->mf_filesize >> self->fs_root.mf_blockshift : 0;
+	 *   - f_namelen = self->fs_feat.sf_name_max;
+	 *   - f_frsize  = mfile_getblocksize(&self->fs_root);
+	 *   - f_flags   = statvfs_flags_from_mfile_flags(self->fs_root.mf_flags);
 	 * This function must initialize:
 	 *   - f_bfree
 	 *   - f_bavail
@@ -240,8 +240,8 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 
 /* Read/Write whole filesystem sectors
  * @assume(IS_ALIGNED(buf, (size_t)1 << self->fs_root.mf_iobashift));
- * @assume(IS_ALIGNED(addr, (size_t)1 << self->fs_root.mf_blockshift));
- * @assume(IS_ALIGNED(num_bytes, (size_t)1 << self->fs_root.mf_blockshift));
+ * @assume(IS_ALIGNED(addr, mfile_getblocksize(&self->fs_root)));
+ * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(&self->fs_root)));
  * @assume(addr + num_bytes <= self->fs_dev->mf_filesize);
  * @assume(num_bytes != 0); */
 #define fsuper_dev_rdsectors_async(self, addr, buf, num_bytes, aio) ((*(self)->fs_loadblocks)((self)->fs_dev, addr, buf, num_bytes, aio))

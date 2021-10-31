@@ -177,12 +177,13 @@ fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
 	decref_nokill(self);
 }
 
+/* Writes `st_blocks = 1;', `st_size = mfile_getblocksize(self);' */
 PUBLIC NONNULL((1)) void KCALL
 fdirnode_v_stat(struct mfile *__restrict self,
                 USER CHECKED struct stat *result)
 		THROWS(...) {
 	result->st_blocks = (typeof(result->st_blocks))1;
-	result->st_size   = (typeof(result->st_size))1 << self->mf_blockshift;
+	result->st_size   = (typeof(result->st_size))mfile_getblocksize(self);
 }
 
 /* Default stream operators for directories (using `fdirnode_v_open') */
