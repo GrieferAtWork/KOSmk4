@@ -19,8 +19,8 @@
  */
 #ifndef GUARD_MODFAT_FAT_C
 #define GUARD_MODFAT_FAT_C 1
-#define _KOS_SOURCE        1
-#define _GNU_SOURCE        1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "fat.h"
 /**/
@@ -1585,6 +1585,7 @@ FatDir_DeleteEnt(struct flatdirnode *__restrict self,
                  struct fnode *__restrict file,
                  bool at_end_of_dir)
 		THROWS(E_IOERROR) {
+	uint8_t used_marker;
 	pos_t ptr, end;
 	FatDirNode *me        = flatdirnode_asfat(self);
 	struct fatdirent *ent = flatdirent_asfat(ent_);
@@ -1608,14 +1609,18 @@ FatDir_DeleteEnt(struct flatdirnode *__restrict self,
 	mfile_tslock_release(file);
 
 	/* Mark directory entries as deleted. */
+	used_marker = MARKER_UNUSED;
+	if (at_end_of_dir)
+		used_marker = MARKER_DIREND;
 	for (; ptr < end; ptr += sizeof(struct fat_dirent)) {
 		struct fat_dirent ent;
 		/* Save deleted first byte at offset 0x0d
 		 * https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#Directory_entry */
 		mfile_readall(me, &ent, sizeof(ent), ptr);
 		ent.f_delchr = ent.f_marker;
-		ent.f_marker = MARKER_UNUSED;
+		ent.f_marker = used_marker;
 		mfile_writeall(me, &ent, sizeof(ent), ptr);
+		used_marker = MARKER_UNUSED;
 	}
 
 	if (at_end_of_dir) {
