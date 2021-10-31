@@ -266,7 +266,7 @@ NOTHROW(FCALL incref_first_nondestroyed)(struct ffilesys *__restrict start) {
  * when `prev' has been unloaded, this function will also return the
  * first (still-registered) filesystem type. */
 PUBLIC WUNUSED REF struct ffilesys *FCALL
-ffilesys_next(struct ffilesys *prev) {
+ffilesys_next(struct ffilesys *prev) THROWS(E_WOULDBLOCK) {
 	REF struct ffilesys *result;
 	atomic_lock_acquire(&ffilesys_formats_lock);
 	result = SLIST_FIRST(&ffilesys_formats_list);

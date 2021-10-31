@@ -159,6 +159,19 @@ ProcFS_Filesystems_Printer(pformatprinter printer, void *arg,
 
 
 /************************************************************************/
+/* /proc/mounts                                                         */
+/************************************************************************/
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+ProcFS_Mounts_Printer(struct flnknode *__restrict UNUSED(self),
+                      USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
+		THROWS(E_SEGFAULT, ...) {
+	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__) "/mounts", task_getpid_s());
+}
+
+
+
+
+/************************************************************************/
 /* /proc/kcore                                                          */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL

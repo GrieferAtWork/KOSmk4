@@ -858,6 +858,104 @@ err:
 
 
 /************************************************************************/
+/* /proc/[PID]/mounts                                                   */
+/************************************************************************/
+PRIVATE NONNULL((1, 2, 3)) ssize_t KCALL
+print_mounting_point(struct path *__restrict fsroot,
+                     struct pathmount *__restrict self,
+                     pformatprinter printer, void *arg) {
+	char flagsbuf[128], *writer;
+	struct fsuper *super = self->p_dir->fn_super;
+	uintptr_t flags;
+
+	/* Name of the mounted device, or filename system. */
+	if (super->fs_dev) {
+		mfile_uprintlink(super->fs_dev, printer, arg);
+	} else {
+		print(super->fs_sys->ffs_name, strlen(super->fs_sys->ffs_name));
+	}
+	if (PRINT(" ") < 0)
+		goto err;
+
+	/* Mounting point path name. */
+	path_print(self, printer, arg, 0, fsroot);
+	if (PRINT(" ") < 0)
+		goto err;
+
+	/* Filename system. */
+	if (printf("%s ", super->fs_sys->ffs_name) < 0)
+		goto err;
+
+	/* Filesystem flags. */
+	flags = ATOMIC_READ(super->fs_root.mf_flags);
+	if (super->fs_dev)
+		flags |= ATOMIC_READ(super->fs_dev->mf_flags) & MFILE_F_READONLY;
+
+	writer = flagsbuf;
+	writer = stpcpy(writer, (flags & MFILE_F_READONLY) ? "ro" : "rw");
+//TODO:	if (flags & MS_SYNCHRONOUS)
+//TODO:		writer = stpcpy(writer, ",sync");
+//TODO:	if (flags & MS_DIRSYNC)
+//TODO:		writer = stpcpy(writer, ",dirsync");
+//TODO:	if (flags & MS_MANDLOCK)
+//TODO:		writer = stpcpy(writer, ",mand");
+	if (flags & MFILE_F_LAZYTIME)
+		writer = stpcpy(writer, ",lazytime");
+	if (flags & MFILE_FS_NOSUID)
+		writer = stpcpy(writer, ",nosuid");
+//TODO:	if (flags & MS_NODEV)
+//TODO:		writer = stpcpy(writer, ",nodev");
+	if (flags & MFILE_FS_NOEXEC)
+		writer = stpcpy(writer, ",noexec");
+	if (flags & MFILE_F_NOATIME)
+		writer = stpcpy(writer, ",noatime");
+	if (flags & MFILE_FN_NODIRATIME)
+		writer = stpcpy(writer, ",nodiratime");
+	if (flags & MFILE_F_RELATIME)
+		writer = stpcpy(writer, ",relatime");
+	if (print(flagsbuf, strlen(flagsbuf)) < 0)
+		goto err;
+	/* TODO: Filesystem drivers should also be able to print additional options:
+	 * - e.g.: "fat" should print `user_id=...,group_id=...' */
+
+	/* I have no idea what these 2 "0"-s are supposed to be, but looking at the
+	 * linux kernel source, it too simply prints a string " 0 0\n" to terminate
+	 * every line.
+	 * There's no comment explaining it, but if I had to guess, it's probably
+	 * related to some since-removed legacy feature... */
+	return PRINT(" 0 0\n");
+err:
+	return -1;
+}
+
+INTERN NONNULL((1, 2)) void KCALL
+ProcFS_PerProc_Mounts_Printer(struct printnode *__restrict self,
+                              pformatprinter printer, void *arg,
+                              size_t UNUSED(offset_hint)) {
+	REF struct path *fsroot;
+	REF struct pathmount *iter;
+	REF struct vfs *thread_vfs;
+	REF struct task *thread = taskpid_gettask(self->fn_fsdata);
+	if unlikely(!thread)
+		return;
+	thread_vfs = task_getvfs(thread);
+	decref_unlikely(thread);
+	FINALLY_DECREF_UNLIKELY(thread_vfs);
+	fsroot = fs_getroot(THIS_FS);
+	FINALLY_DECREF_UNLIKELY(fsroot);
+	iter = vfs_mounts_next(thread_vfs, NULL);
+	while (iter) {
+		FINALLY_DECREF_UNLIKELY(iter);
+		if (print_mounting_point(fsroot, iter, printer, arg))
+			break;
+		iter = vfs_mounts_next(thread_vfs, iter);
+	}
+}
+
+
+
+
+/************************************************************************/
 /* /proc/[PID]/stat                                                     */
 /************************************************************************/
 /* Return the total # of bytes of mapped memory from `self'. */
@@ -1156,7 +1254,7 @@ nofproc:
 
 
 /************************************************************************/
-/* /proc/[PID]/stat                                                     */
+/* /proc/[PID]/attr/current                                             */
 /************************************************************************/
 INTERN NONNULL((1, 2)) void KCALL
 ProcFS_PerProc_Attr_Current_Printer(struct printnode *__restrict self,

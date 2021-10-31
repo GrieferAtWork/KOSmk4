@@ -60,6 +60,7 @@ ROOTENT("fd",        DT_DIR, 0500, &procfs_pp_fd,        /*[[[fdirent_hash]]]*/0
 ROOTENT("kos",       DT_DIR, 0555, &procfs_pp_kos,       /*[[[fdirent_hash]]]*/0x736f6b/*[[[end]]]*/)
 ROOTENT("map_files", DT_DIR, 0500, &procfs_pp_map_files, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc35e8886, 0x90cfb4995af36d48, 0x35895e0f, 0xd86cf35a99b4d000)/*[[[end]]]*/)
 ROOTENT("maps",      DT_REG, 0444, &procfs_pp_maps,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xef36cd5, 0x7370616d, 0xd86cf40b, 0x7370616d)/*[[[end]]]*/)
+ROOTENT("mounts",    DT_REG, 0444, &procfs_pp_mounts,    /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xe2215e49, 0x73746e756f6d, 0xd8eb9452, 0x73746e756f6d)/*[[[end]]]*/)
 ROOTENT("root",      DT_LNK, 0777, &procfs_pp_root,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x17eaeb02, 0x746f6f72, 0x5eaeb14, 0x746f6f72)/*[[[end]]]*/)
 ROOTENT("stat",      DT_REG, 0444, &procfs_pp_stat,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d180b, 0x74617473, 0xf176d14, 0x74617473)/*[[[end]]]*/)
 ROOTENT("task",      DT_DIR, 0555, &procfs_pp_task,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc70e6d14, 0x6b736174, 0x176d0ec3, 0x6b736174)/*[[[end]]]*/)
@@ -71,6 +72,7 @@ MKREG_RO(procfs_pp_cmdline, ProcFS_PerProc_Cmdline_Printer)
 MKREG_RO(procfs_pp_environ, ProcFS_PerProc_Environ_Printer)
 MKREG_RO(procfs_pp_maps, ProcFS_PerProc_Maps_Printer)
 MKREG_RO(procfs_pp_stat, ProcFS_PerProc_Stat_Printer)
+MKREG_RO(procfs_pp_mounts, ProcFS_PerProc_Mounts_Printer)
 
 
 /* /proc/[PID]/attr */

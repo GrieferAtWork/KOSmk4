@@ -242,7 +242,7 @@ NOTHROW(FCALL ffilesys_unregister)(struct ffilesys *__restrict self);
  * when `prev' has been unloaded, this function will also return the
  * first (still-registered) filesystem type. */
 FUNDEF WUNUSED REF struct ffilesys *FCALL
-ffilesys_next(struct ffilesys *prev);
+ffilesys_next(struct ffilesys *prev) THROWS(E_WOULDBLOCK);
 
 DECL_END
 #endif /* __CC__ */

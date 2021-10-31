@@ -169,6 +169,30 @@ done:
 }
 
 
+
+/* Return  a reference to the mounting point that comes after `prev'
+ * When `prev == NULL',  return the  first  mount point.  Note  that
+ * when `prev' has been unloaded, this function will also return the
+ * first (still-registered) mounting point. */
+PUBLIC WUNUSED NONNULL((1)) REF struct pathmount *FCALL
+vfs_mounts_next(struct vfs *__restrict self,
+                struct pathmount *prev)
+		THROWS(E_WOULDBLOCK) {
+	REF struct pathmount *result;
+	assert(!prev || _path_getvfs(prev) == self);
+	vfs_mountslock_acquire(self);
+	if (prev && LIST_ISBOUND(prev, pm_vsmount)) {
+		result = LIST_NEXT(prev, pm_vsmount);
+	} else {
+		result = LIST_FIRST(&self->vf_mounts);
+	}
+	xincref(result);
+	vfs_mountslock_release(self);
+	return result;
+}
+
+
+
 /* Return the path used to mount the given `dir' within `self'.
  * If the given directory doesn't have a mounting point  within
  * the given VFS `self', return `NULL' */
@@ -280,6 +304,15 @@ NOTHROW(FCALL task_getfs)(struct task *__restrict thread) {
 	REF struct fs *result;
 	this_fs_smplock_acquire();
 	result = incref(FORTASK(thread, this_fs));
+	this_fs_smplock_release();
+	return result;
+}
+
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vfs *
+NOTHROW(FCALL task_getvfs)(struct task *__restrict thread) {
+	REF struct vfs *result;
+	this_fs_smplock_acquire();
+	result = incref(FORTASK(thread, this_fs)->fs_vfs);
 	this_fs_smplock_release();
 	return result;
 }

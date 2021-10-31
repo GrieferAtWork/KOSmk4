@@ -177,6 +177,14 @@ FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct path *
 NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
                           struct path *__restrict self);
 
+/* Return  a reference to the mounting point that comes after `prev'
+ * When `prev == NULL',  return the  first  mount point.  Note  that
+ * when `prev' has been unloaded, this function will also return the
+ * first (still-registered) mounting point. */
+FUNDEF WUNUSED NONNULL((1)) REF struct pathmount *FCALL
+vfs_mounts_next(struct vfs *__restrict self,
+                struct pathmount *prev)
+		THROWS(E_WOULDBLOCK);
 
 struct fdirnode;
 
@@ -272,6 +280,8 @@ DATDEF ATTR_PERTASK REF struct fs *this_fs;
 /* Return the filesystem controller of the given thread. */
 FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
 NOTHROW(FCALL task_getfs)(struct task *__restrict thread);
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vfs *
+NOTHROW(FCALL task_getvfs)(struct task *__restrict thread);
 
 /* Exchange the filesystem controller of the calling thread. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *

@@ -795,8 +795,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Implement the special /dev/disk directory */
 
-	/* TODO: Add procfs file `/proc/mounts' */
-
 	/* TODO: Implement the (currently) stubbed per-proc special directories in procfs */
 
 	/* TODO: Use the general-purpose lockop system in `struct pidns' and replace `pn_dead' */

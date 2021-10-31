@@ -131,7 +131,6 @@ struct flnknode_ops {
 	(KCALL *lno_walklink)(struct flnknode *__restrict self,
 	                      /*in|out*/ u32 *__restrict premaining_symlinks)
 			THROWS(E_IOERROR, E_BADALLOC, ...);
-
 };
 
 
