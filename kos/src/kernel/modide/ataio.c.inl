@@ -245,15 +245,29 @@ LOCAL_AtaDrive_IO(struct mfile *__restrict self, pos_t addr,
 	}
 #endif /* ATADRIVE_HAVE_PIO_IOSECTORS */
 
+
 next_chunk:
 	/* Allocate an AIO handle. */
 	hand = aio_multihandle_allochandle(aio);
 	data = (AtaAIOHandleData *)hand->ah_data;
 
-	/* Figure out the max # of sectors to transfer */
-	part_sectors = (0x10000 >> AtaDrive_GetSectorShift(me));
-	if likely(part_sectors > num_sectors)
-		part_sectors = num_sectors;
+	/* Figure out the max # of sectors to transfer.
+	 *
+	 * According to the specs, `buf' is not allowed to cross a 64K boundary,
+	 * meaning that `(buf & 0xffff0000) == ((buf + num_bytes) & 0xffff0000)'
+	 *
+	 * We  enforce this by only allowing transfer  sizes up to the start of
+	 * the next 64K boundary. This check also enforces that we never try to
+	 * transfer more than 64K bytes  at once (which is another  restriction
+	 * independent of the dont-cross-64K-boundary requirement)
+	 *
+	 * HINT: `maxio' is the # of bytes from `buf' until the next 64K bound. */
+	{
+		u32 maxio    = 0x10000 - ((u16)buf & 0xffff);
+		part_sectors = (u16)(maxio >> AtaDrive_GetSectorShift(me));
+		if likely(part_sectors > num_sectors)
+			part_sectors = num_sectors;
+	}
 
 	/* Set DMA flags (this also selects read vs. write) */
 	data->hd_flags = LOCAL_HANDLE_FLAGS;
