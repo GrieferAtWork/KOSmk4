@@ -46,6 +46,7 @@
 #include <dirent.h>
 #include <stddef.h>
 #include <string.h>
+#include <time.h>
 
 /**/
 #include "iso9660.h"
@@ -62,13 +63,43 @@ DECL_BEGIN
 /************************************************************************/
 /* Timestamp helpers                                                    */
 /************************************************************************/
+#define UNIX_TIME_START_YEAR 1970
+#define SECONDS_PER_DAY      86400
+#define DAYS2YEARS(n_days)   __daystoyears(n_days)
+#define YEARS2DAYS(n_years)  __yearstodays(n_years)
+#define ISLEAPYEAR(year)     __isleap(year)
+
+PRIVATE time_t const time_monthstart_yday[2][13] = {
+	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
+	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
+};
+
+#define MONTH_STARTING_DAY_OF_YEAR(leap_year, month) \
+	time_monthstart_yday[!!(leap_year)][month]
+
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL RecordDateTime_Decode)(RecordDateTime const *__restrict self,
                                      struct timespec *__restrict result) {
-	(void)self;
-	/* TODO */
-	result->tv_sec  = 0;
+	time_t sec;
+	unsigned int year;
+	/* Calculate days since 01.01.1970 */
+	year = 1900 + self->rdt_year;
+	sec = YEARS2DAYS(year) - YEARS2DAYS(UNIX_TIME_START_YEAR);
+	sec += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (self->rdt_month - 1) % 12);
+	sec += self->rdt_day - 1;
+
+	/* Calculate seconds since 01.01.1970T00:00 */
+	sec *= SECONDS_PER_DAY;
+	sec += self->rdt_hour * 60 * 60;
+	sec += self->rdt_minute * 60;
+	sec += self->rdt_second;
+
+	/* Timezone addend */
+	sec += (((s16)self->rdt_timezone - 48) * 15 * 60);
+
+	/* Write-back results. */
+	result->tv_sec  = sec;
 	result->tv_nsec = 0;
 }
 
@@ -135,7 +166,8 @@ again:
 		ent.de_length = (u8)read_size;
 	if unlikely(ent.de_length < offsetof(DirectoryEntry, de_name))
 		return NULL; /* ??? */
-	/* Restruct file name length to allowed range. */
+
+	/* Restrict file name length to allowed range. */
 	if unlikely(ent.de_namelen > ent.de_length - offsetof(DirectoryEntry, de_name))
 		ent.de_namelen = ent.de_length - offsetof(DirectoryEntry, de_name);
 	ent.de_namelen = strnlen(ent.de_name, ent.de_namelen);
@@ -282,7 +314,7 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	pos_t offset, second_volume_offset;
 	shift_t sector_shift;
 
-	/* TODO: User-arguments? */
+	/* XXX: User-arguments? */
 	(void)args;
 
 	/* Allocate disk data buffer. */

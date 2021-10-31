@@ -299,9 +299,9 @@ handle_newsize_ge_oldsize:
 	/* Check that the new file size is allowed by the filesystem. */
 	if (mfile_isnode(self)) {
 		struct fnode *node = mfile_asnode(self);
-		/* Just like `mfile_write()', we throw a disk-full error when
-		 * trying to increase a file beyond the logical limits of the
-		 * underlying physical medium. */
+		/* Just like `mfile_write()', we throw a file-too-big error
+		 * when trying to increase a file beyond the logical limits
+		 * of the underlying physical medium. */
 		if unlikely(new_size > node->fn_super->fs_feat.sf_filesize_max)
 			THROW(E_FSERROR_FILE_TOO_BIG);
 	}
