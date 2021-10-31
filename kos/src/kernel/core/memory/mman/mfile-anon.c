@@ -231,7 +231,6 @@ again:
 		mpart_lock_release(root);
 		if (ATOMIC_DECFETCH(root->mp_refcnt) == 0)
 			mpart_delete_postop_builder_enqueue(deadparts, root);
-
 	}
 	if (lhs != NULL) {
 		if (rhs != NULL)

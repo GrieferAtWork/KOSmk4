@@ -586,7 +586,7 @@ after_file_size_changed:
 		}
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 
-		/* Anonymous parts mustn't hebe holding global references! */
+		/* Anonymous parts mustn't be holding global references! */
 		if ((part->mp_flags & MPART_F_GLOBAL_REF) &&
 		    (ATOMIC_FETCHAND(part->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF))
 			decref_nokill(part);

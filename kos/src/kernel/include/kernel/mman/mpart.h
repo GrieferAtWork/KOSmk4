@@ -81,9 +81,9 @@
                                        * set. This flag is never set for anonymous parts! */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 #define MPART_F_CHANGED        0x0200 /* [lock(SET(MPART_F_LOCKBIT),
-                                       *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
-                                       *             (:mfile::mf_changed == MFILE_PARTS_ANONYMOUS)))]
-                                       * [valid_if(:mfile::mf_changed != MFILE_PARTS_ANONYMOUS)]
+                                       *       CLEAR((MPART_F_LOCKBIT && mp_meta->mpm_dmalocks == 0) ||
+                                       *             (mp_file->mf_changed == MFILE_PARTS_ANONYMOUS)))]
+                                       * [valid_if(mp_file->mf_changed != MFILE_PARTS_ANONYMOUS)]
                                        * Blocks of this  part (may)  have changed.  This flag  must be  cleared by  the
                                        * associated file after changes have been synced, or the file becomes anonymous. */
 #define MPART_F_NOSPLIT        0x0400 /* [const] This mem-part cannot be split, and if doing so would be necessary,
@@ -341,7 +341,6 @@ struct mpart {
 #define MPART_INIT_mp_minaddr (pos_t)
 #define MPART_INIT_mp_maxaddr (pos_t)
 #endif /* __WANT_MPART_INIT */
-	/* TODO: Change all system components such that everything is able to deal with `mp_minaddr' being altered! */
 	PAGEDIR_PAGEALIGNED pos_t     mp_minaddr;   /* [lock(READ (MPART_F_LOCKBIT || mp_meta->mpm_ftxlock || mp_file->mf_lock || ANY(mp_copy, mp_share)->mn_mman->mm_lock),
 	                                             *       WRITE(MPART_F_LOCKBIT && mp_meta->mpm_ftxlock && mp_file->mf_lock && ALL(mp_copy, mp_share)->mn_mman->mm_lock))]
 	                                             *                                \------------------/    \--------------/
@@ -355,7 +354,9 @@ struct mpart {
 	                                             * added, also aligned like `mp_minaddr' must be)
 	                                             * NOTE: May be set to `mp_minaddr - 1' if the part is empty (which  may
 	                                             *       happen if the part's original contents have since been added to
-	                                             *       a neighboring part; s.a. `mpart_merge()') */
+	                                             *       a neighboring part; s.a. `mpart_merge()')
+	                                             * NOTE: The  difference between this and `mp_minaddr' must
+	                                             *       not be greater than `SIZE_MAX' (aka. `(size_t)-1') */
 #endif /* !__WANT_MPART_INIT || __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
 #ifdef __WANT_MPART__mp_dead
 #ifdef __WANT_MPART_INIT

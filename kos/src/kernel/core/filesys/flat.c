@@ -305,7 +305,7 @@ flatdirnode_delete_entry(struct flatdirnode *__restrict self,
 #define FLATDIRNODE_HANDLE_DUPLICATE_NAME_RETRY ((REF struct flatdirent *)-1)
 
 /* NOTE: This function will release a write-lock to
- *       `self' when returning with an exception!
+ *       `self' when returning  with an  exception!
  * @return: * :   Next directory entry.
  * @return: NULL: EOF reached.
  * @return: FLATDIRNODE_HANDLE_DUPLICATE_NAME_RETRY: Locks were lost and you must retry. */
@@ -1462,7 +1462,7 @@ again:
 				/* If nothing gets overwritten, we'll need to rehash for the later-added file. */
 				if (!existing)
 					flatdirnode_fileslist_rehash_before_insert(nd);
-	
+
 				/* Add the new entry to the target directory. */
 				flatdirnode_addentry_to_stream(nd, newent, info->frn_file);
 			} EXCEPT {
