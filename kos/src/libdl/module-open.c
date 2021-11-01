@@ -293,13 +293,13 @@ DlModule_OpenService(USER char const *filename, unsigned int mode) THROWS(E_SEGF
 
 	/* Make the module visible. */
 	if (mode & RTLD_GLOBAL) {
-		atomic_rwlock_write(&DlModule_GlobalLock);
+		DlModule_GlobalLock_Write();
 		DlModule_AddToGlobals(mod);
-		atomic_rwlock_endwrite(&DlModule_GlobalLock);
+		DlModule_GlobalLock_EndWrite();
 	}
-	atomic_rwlock_write(&DlModule_AllLock);
+	DlModule_GlobalLock_Write();
 	DlModule_AddToAll(mod);
-	atomic_rwlock_endwrite(&DlModule_AllLock);
+	DlModule_GlobalLock_EndWrite();
 	return mod;
 err_nomem:
 	dl_seterror_nomem();
@@ -718,19 +718,19 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self)
 
 	/* Register the module as globally loaded (if RTLD_GLOBAL is set). */
 	if (self->dm_flags & RTLD_GLOBAL) {
-		atomic_rwlock_write(&DlModule_GlobalLock);
+		DlModule_GlobalLock_Write();
 		if (!LIST_ISBOUND(self, dm_globals))
 			DlModule_AddToGlobals(self);
-		atomic_rwlock_endwrite(&DlModule_GlobalLock);
+		DlModule_GlobalLock_EndWrite();
 	}
 
 	if (!DLIST_PREV(self, dm_modules)) {
-		atomic_rwlock_write(&DlModule_AllLock);
+		DlModule_GlobalLock_Write();
 		COMPILER_READ_BARRIER();
 		if likely(!DLIST_PREV(self, dm_modules))
 			DlModule_AddToAll(self);
 		COMPILER_READ_BARRIER();
-		atomic_rwlock_endwrite(&DlModule_AllLock);
+		DlModule_GlobalLock_EndWrite();
 	}
 
 	/* Apply relocations and invoke module initializers. */
@@ -989,7 +989,7 @@ INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule
 NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
 		THROWS(E_SEGFAULT) {
 	REF DlModule *result;
-	atomic_rwlock_read(&DlModule_AllLock);
+	DlModule_AllLock_Read();
 	DlModule_AllList_FOREACH(result) {
 		if (strcmp(result->dm_filename, filename) != 0)
 			continue;
@@ -997,7 +997,7 @@ NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
 			incref(result);
 		break;
 	}
-	atomic_rwlock_endread(&DlModule_AllLock);
+	DlModule_AllLock_EndRead();
 	return result;
 }
 

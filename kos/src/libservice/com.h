@@ -610,6 +610,29 @@ struct service {
 	                                                   * Array of known functions descriptors. (Sorted lexicographically by name) */
 };
 
+/* Helper macros for `struct service::s_textlock' */
+#define service_textlock_mustreap(self)   0
+#define service_textlock_reap(self)       (void)0
+#define _service_textlock_reap(self)      (void)0
+#define service_textlock_write(self)      atomic_rwlock_write(&(self)->s_textlock)
+#define service_textlock_trywrite(self)   atomic_rwlock_trywrite(&(self)->s_textlock)
+#define service_textlock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->s_textlock), service_textlock_reap(self))
+#define _service_textlock_endwrite(self)  atomic_rwlock_endwrite(&(self)->s_textlock)
+#define service_textlock_read(self)       atomic_rwlock_read(&(self)->s_textlock)
+#define service_textlock_tryread(self)    atomic_rwlock_tryread(&(self)->s_textlock)
+#define _service_textlock_endread(self)   atomic_rwlock_endread(&(self)->s_textlock)
+#define service_textlock_endread(self)    (void)(atomic_rwlock_endread(&(self)->s_textlock) && (service_textlock_reap(self), 0))
+#define _service_textlock_end(self)       atomic_rwlock_end(&(self)->s_textlock)
+#define service_textlock_end(self)        (void)(atomic_rwlock_end(&(self)->s_textlock) && (service_textlock_reap(self), 0))
+#define service_textlock_upgrade(self)    atomic_rwlock_upgrade(&(self)->s_textlock)
+#define service_textlock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->s_textlock)
+#define service_textlock_downgrade(self)  atomic_rwlock_downgrade(&(self)->s_textlock)
+#define service_textlock_reading(self)    atomic_rwlock_reading(&(self)->s_textlock)
+#define service_textlock_writing(self)    atomic_rwlock_writing(&(self)->s_textlock)
+#define service_textlock_canread(self)    atomic_rwlock_canread(&(self)->s_textlock)
+#define service_textlock_canwrite(self)   atomic_rwlock_canwrite(&(self)->s_textlock)
+#define service_textlock_waitread(self)   atomic_rwlock_waitread(&(self)->s_textlock)
+#define service_textlock_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->s_textlock)
 
 /* Reap lock operations of `self->s_shm_lops' */
 #define libservice_shmlock_mustreap(self)   lockop_mustreap(&(self)->s_shm_lops)

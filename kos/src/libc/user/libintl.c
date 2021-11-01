@@ -290,10 +290,35 @@ DECL_END
 #include <hybrid/sequence/rbtree-abi.h>
 DECL_BEGIN
 
-/* Lock for the LLRB tree used to implement the .mo file cache. */
-PRIVATE struct atomic_rwlock mofiletree_lock = ATOMIC_RWLOCK_INIT;
 /* [0..n][lock(mofiletree_lock)] Root for the .mo file cache tree. */
 PRIVATE LLRBTREE_ROOT(mo_file) mofiletree_root = NULL;
+
+/* Lock for the LLRB tree used to implement the .mo file cache. */
+PRIVATE struct atomic_rwlock mofiletree_lock = ATOMIC_RWLOCK_INIT;
+
+/* Helper macros for `mofiletree_lock' */
+#define mofiletree_mustreap()   0
+#define mofiletree_reap()       (void)0
+#define _mofiletree_reap()      (void)0
+#define mofiletree_write()      atomic_rwlock_write(&mofiletree_lock)
+#define mofiletree_trywrite()   atomic_rwlock_trywrite(&mofiletree_lock)
+#define mofiletree_endwrite()   (atomic_rwlock_endwrite(&mofiletree_lock), mofiletree_reap())
+#define _mofiletree_endwrite()  atomic_rwlock_endwrite(&mofiletree_lock)
+#define mofiletree_read()       atomic_rwlock_read(&mofiletree_lock)
+#define mofiletree_tryread()    atomic_rwlock_tryread(&mofiletree_lock)
+#define _mofiletree_endread()   atomic_rwlock_endread(&mofiletree_lock)
+#define mofiletree_endread()    (void)(atomic_rwlock_endread(&mofiletree_lock) && (mofiletree_reap(), 0))
+#define _mofiletree_end()       atomic_rwlock_end(&mofiletree_lock)
+#define mofiletree_end()        (void)(atomic_rwlock_end(&mofiletree_lock) && (mofiletree_reap(), 0))
+#define mofiletree_upgrade()    atomic_rwlock_upgrade(&mofiletree_lock)
+#define mofiletree_tryupgrade() atomic_rwlock_tryupgrade(&mofiletree_lock)
+#define mofiletree_downgrade()  atomic_rwlock_downgrade(&mofiletree_lock)
+#define mofiletree_reading()    atomic_rwlock_reading(&mofiletree_lock)
+#define mofiletree_writing()    atomic_rwlock_writing(&mofiletree_lock)
+#define mofiletree_canread()    atomic_rwlock_canread(&mofiletree_lock)
+#define mofiletree_canwrite()   atomic_rwlock_canwrite(&mofiletree_lock)
+#define mofiletree_waitread()   atomic_rwlock_waitread(&mofiletree_lock)
+#define mofiletree_waitwrite()  atomic_rwlock_waitwrite(&mofiletree_lock)
 
 
 
@@ -906,9 +931,9 @@ NOTHROW_NCX(FCALL open_mo_file)(char const *__restrict domainname, int category)
 
 	/* Look through the cache for a file with this name. */
 again_load_from_tree:
-	atomic_rwlock_read(&mofiletree_lock);
+	mofiletree_read();
 	result = mofiletree_locate(mofiletree_root, filename);
-	atomic_rwlock_endread(&mofiletree_lock);
+	mofiletree_endread();
 	if (result)
 		goto done;
 
@@ -1008,15 +1033,15 @@ err_r_map:
 	result->mf_category = (uintptr_half_t)(unsigned int)category;
 
 	/* Now try to insert the new descriptor into the tree. */
-	atomic_rwlock_write(&mofiletree_lock);
+	mofiletree_write();
 	if unlikely(!mofiletree_tryinsert(&mofiletree_root, result)) {
 		/* Race condition: another thread was faster. */
-		atomic_rwlock_endwrite(&mofiletree_lock);
+		mofiletree_endwrite();
 		munmap((void *)result->mf_base, result->mf_size);
 		free(result);
 		goto again_load_from_tree;
 	}
-	atomic_rwlock_endwrite(&mofiletree_lock);
+	mofiletree_endwrite();
 
 	/* And we're done! */
 
@@ -1037,35 +1062,60 @@ PRIVATE struct mo_file /**/ *last_file       = NULL;
 PRIVATE int /*            */ last_category   = 0;
 PRIVATE char const /*    */ *last_domainname = NULL;
 
+/* Helper macros for `last_lock' */
+#define last_mustreap()   0
+#define last_reap()       (void)0
+#define _last_reap()      (void)0
+#define last_write()      atomic_rwlock_write(&last_lock)
+#define last_trywrite()   atomic_rwlock_trywrite(&last_lock)
+#define last_endwrite()   (atomic_rwlock_endwrite(&last_lock), last_reap())
+#define _last_endwrite()  atomic_rwlock_endwrite(&last_lock)
+#define last_read()       atomic_rwlock_read(&last_lock)
+#define last_tryread()    atomic_rwlock_tryread(&last_lock)
+#define _last_endread()   atomic_rwlock_endread(&last_lock)
+#define last_endread()    (void)(atomic_rwlock_endread(&last_lock) && (last_reap(), 0))
+#define _last_end()       atomic_rwlock_end(&last_lock)
+#define last_end()        (void)(atomic_rwlock_end(&last_lock) && (last_reap(), 0))
+#define last_upgrade()    atomic_rwlock_upgrade(&last_lock)
+#define last_tryupgrade() atomic_rwlock_tryupgrade(&last_lock)
+#define last_downgrade()  atomic_rwlock_downgrade(&last_lock)
+#define last_reading()    atomic_rwlock_reading(&last_lock)
+#define last_writing()    atomic_rwlock_writing(&last_lock)
+#define last_canread()    atomic_rwlock_canread(&last_lock)
+#define last_canwrite()   atomic_rwlock_canwrite(&last_lock)
+#define last_waitread()   atomic_rwlock_waitread(&last_lock)
+#define last_waitwrite()  atomic_rwlock_waitwrite(&last_lock)
+
+
 
 /* Return the .mo file associated with the given arguments. */
 PRIVATE WUNUSED NONNULL((1)) struct mo_file *FCALL
 get_mo_file(char const *__restrict domainname, int category) {
 	struct mo_file *result;
-	atomic_rwlock_read(&last_lock);
+	last_read();
 	if (last_category == category) {
 		if (last_domainname == domainname) {
 			result = last_file;
-			atomic_rwlock_endread(&last_lock);
+			last_endread();
 			return result;
 		}
 #ifndef __OPTIMIZE_SIZE__
 		else if (strcmp(last_domainname, domainname) == 0) {
 			/* Different memory location, but same string! */
-			if (!atomic_rwlock_upgrade(&last_lock)) {
+			if (!last_upgrade()) {
 				if (last_category != category) {
-					atomic_rwlock_endwrite(&last_lock);
+					last_endwrite();
 					goto load_file_slowly;
 				}
 			}
 			last_domainname = domainname;
 			result          = last_file;
-			atomic_rwlock_endwrite(&last_lock);
+			last_endwrite();
 			return result;
 		}
 #endif /* !__OPTIMIZE_SIZE__ */
 	}
-	atomic_rwlock_endread(&last_lock);
+	last_endread();
 #ifndef __OPTIMIZE_SIZE__
 load_file_slowly:
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -1075,11 +1125,11 @@ load_file_slowly:
 
 	/* On success, remember the last used file. */
 	if (result) {
-		atomic_rwlock_write(&last_lock);
+		last_write();
 		last_file       = result;
 		last_category   = category;
 		last_domainname = domainname;
-		atomic_rwlock_endwrite(&last_lock);
+		last_endwrite();
 	}
 	return result;
 }

@@ -47,16 +47,16 @@ again_old_flags:
 	old_flags = ATOMIC_READ(self->dm_flags);
 	if (!(old_flags & RTLD_GLOBAL)) {
 		/* Make the module global. */
-		atomic_rwlock_write(&DlModule_GlobalLock);
+		DlModule_GlobalLock_Write();
 		if (!ATOMIC_CMPXCH_WEAK(self->dm_flags, old_flags,
 		                        old_flags | RTLD_GLOBAL)) {
-			atomic_rwlock_endwrite(&DlModule_GlobalLock);
+			DlModule_GlobalLock_EndWrite();
 			goto again_old_flags;
 		}
 		assert(!LIST_ISBOUND(self, dm_globals));
 		DlModule_AddToGlobals(self);
 		assert(LIST_ISBOUND(self, dm_globals));
-		atomic_rwlock_endwrite(&DlModule_GlobalLock);
+		DlModule_GlobalLock_EndWrite();
 	}
 }
 
@@ -150,7 +150,7 @@ INTERN void CC DlModule_RunAllStaticInitializers(void) THROWS(...) {
 	assert(primary != &dl_rtld_module);
 	incref(primary);
 again_search_noinit:
-	atomic_rwlock_read(&DlModule_GlobalLock);
+	DlModule_GlobalLock_Read();
 	/* XXX: >> last = LIST_LAST(&DlModule_GlobalList);
 	 *      Change this  code if  we  ever change  the  list
 	 *      type used by `DlModule_GlobalList' to  something
@@ -160,7 +160,7 @@ again_search_noinit:
 		last = LIST_NEXT(last, dm_globals);
 	while (!(last->dm_flags & RTLD_NOINIT)) {
 		if (last == primary) {
-			atomic_rwlock_endread(&DlModule_GlobalLock);
+			DlModule_GlobalLock_EndRead();
 			goto done;
 		}
 		last = LIST_PREV_UNSAFE(last, dm_globals);
@@ -168,7 +168,7 @@ again_search_noinit:
 	assert(last != &dl_rtld_module);
 	last->dm_flags &= ~RTLD_NOINIT;
 	incref(last);
-	atomic_rwlock_endread(&DlModule_GlobalLock);
+	DlModule_GlobalLock_EndRead();
 	/* TODO: Support for formats other than ELF. */
 #if 1 /* This is called during init. - If an exception happens here, it wouldn't even matter... */
 	DlModule_ElfRunInitializers(last);
@@ -368,11 +368,11 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 				flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
 			if (tag.d_un.d_val & DF_1_GLOBAL) {
 				if (!(self->dm_flags & RTLD_GLOBAL)) {
-					atomic_rwlock_write(&DlModule_GlobalLock);
+					DlModule_GlobalLock_Write();
 					self->dm_flags |= RTLD_GLOBAL;
 					if (!LIST_ISBOUND(self, dm_globals))
 						DlModule_AddToGlobals(self);
-					atomic_rwlock_endwrite(&DlModule_GlobalLock);
+					DlModule_GlobalLock_EndWrite();
 				}
 			}
 			if (tag.d_un.d_val & DF_1_NODELETE)

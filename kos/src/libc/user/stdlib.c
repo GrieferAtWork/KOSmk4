@@ -56,6 +56,31 @@ DECL_BEGIN
 
 INTDEF struct atomic_rwlock libc_environ_lock;
 
+/* Helper macros for `libc_environ_lock' */
+#define environ_mustreap()   0
+#define environ_reap()       (void)0
+#define _environ_reap()      (void)0
+#define environ_write()      atomic_rwlock_write(&libc_environ_lock)
+#define environ_trywrite()   atomic_rwlock_trywrite(&libc_environ_lock)
+#define environ_endwrite()   (atomic_rwlock_endwrite(&libc_environ_lock), environ_reap())
+#define _environ_endwrite()  atomic_rwlock_endwrite(&libc_environ_lock)
+#define environ_read()       atomic_rwlock_read(&libc_environ_lock)
+#define environ_tryread()    atomic_rwlock_tryread(&libc_environ_lock)
+#define _environ_endread()   atomic_rwlock_endread(&libc_environ_lock)
+#define environ_endread()    (void)(atomic_rwlock_endread(&libc_environ_lock) && (environ_reap(), 0))
+#define _environ_end()       atomic_rwlock_end(&libc_environ_lock)
+#define environ_end()        (void)(atomic_rwlock_end(&libc_environ_lock) && (environ_reap(), 0))
+#define environ_upgrade()    atomic_rwlock_upgrade(&libc_environ_lock)
+#define environ_tryupgrade() atomic_rwlock_tryupgrade(&libc_environ_lock)
+#define environ_downgrade()  atomic_rwlock_downgrade(&libc_environ_lock)
+#define environ_reading()    atomic_rwlock_reading(&libc_environ_lock)
+#define environ_writing()    atomic_rwlock_writing(&libc_environ_lock)
+#define environ_canread()    atomic_rwlock_canread(&libc_environ_lock)
+#define environ_canwrite()   atomic_rwlock_canwrite(&libc_environ_lock)
+#define environ_waitread()   atomic_rwlock_waitread(&libc_environ_lock)
+#define environ_waitwrite()  atomic_rwlock_waitwrite(&libc_environ_lock)
+
+
 /* Since `environ' can easily  contain strings that weren't  allocated
  * using  `malloc()' and friends, and since `putenv()' is a thing that
  * exists to directly  inject user-provided strings  into the  environ
@@ -86,7 +111,7 @@ PRIVATE ATTR_SECTION(".bss.crt.fs.environ.heap") struct environ_heapstr *libc_en
 LOCAL ATTR_SECTION(".text.crt.fs.environ.heap")
 bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 	struct environ_heapstr **piter, *iter;
-	assert(atomic_rwlock_reading(&libc_environ_lock));
+	assert(environ_reading());
 	for (piter = &libc_environ_strings; (iter = *piter) != NULL;
 	     piter = &iter->ehs_next) {
 		if (iter == ptr) {
@@ -232,7 +257,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 	char *result, **envp;
 	if unlikely(!varname)
 		return NULL;
-	atomic_rwlock_read(&libc_environ_lock);
+	environ_read();
 	envp = environ;
 	if unlikely(!envp)
 		result = NULL;
@@ -298,7 +323,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 		}
 #endif /* !__OPTIMIZE_SIZE__ */
 	}
-	atomic_rwlock_endread(&libc_environ_lock);
+	environ_endread();
 	return result;
 }
 /*[[[end:libc_getenv]]]*/
@@ -339,7 +364,7 @@ NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
 	new_envp = NULL;
 	new_enva = 0;
 again_searchenv:
-	atomic_rwlock_write(&libc_environ_lock);
+	environ_write();
 	envp = environ;
 	envc = 0;
 	if (envp) {
@@ -352,7 +377,7 @@ again_searchenv:
 			if (!replace) {
 				/* Even though we've already checked this above, another thread
 				 * may have added  the environment variable  in the mean  time. */
-				atomic_rwlock_endwrite(&libc_environ_lock);
+				environ_endwrite();
 				free(line);
 				return 0;
 			}
@@ -366,7 +391,7 @@ again_searchenv:
 			*iter = line->ehs_text;
 			line->ehs_next = libc_environ_strings;
 			libc_environ_strings = line;
-			atomic_rwlock_endwrite(&libc_environ_lock);
+			environ_endwrite();
 			/* Free the old line if it was heap-allocated. */
 			free(existing_heapline);
 			return 0;
@@ -387,7 +412,7 @@ again_searchenv:
 				goto do_fill_environ;
 			new_envp = NULL;
 		}
-		atomic_rwlock_endwrite(&libc_environ_lock);
+		environ_endwrite();
 		new_enva     = envc + 1;
 		new_new_envp = (char **)realloc(new_envp,
 		                                new_enva + 1,
@@ -415,7 +440,7 @@ do_fill_environ:
 	libc_environ_heap = new_envp;
 	environ           = new_envp;
 
-	atomic_rwlock_endwrite(&libc_environ_lock);
+	environ_endwrite();
 
 	/* Free the old environ table. */
 	if (old_heap_envp != new_envp)
@@ -435,7 +460,7 @@ NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 	if unlikely(!varname || !*varname || strchr(varname, '='))
 		return libc_seterrno(EINVAL);
 	namelen = strlen(varname);
-	atomic_rwlock_write(&libc_environ_lock);
+	environ_write();
 	envp = environ;
 	if (envp) {
 		struct environ_heapstr *existing_heaplines = NULL;
@@ -469,7 +494,7 @@ NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 			 * there is the possibility that  the user manually added  the
 			 * same variable more than once... */
 		}
-		atomic_rwlock_endwrite(&libc_environ_lock);
+		environ_endwrite();
 		/* Free all removed lines that were allocated on the heap. */
 		while (existing_heaplines) {
 			struct environ_heapstr *next;
@@ -479,7 +504,7 @@ NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 		}
 		return 0;
 	}
-	atomic_rwlock_endwrite(&libc_environ_lock);
+	environ_endwrite();
 	return 0;
 }
 /*[[[end:libc_unsetenv]]]*/
@@ -491,13 +516,13 @@ NOTHROW_NCX(LIBCCALL libc_clearenv)(void)
 {
 	char **heap_envp;
 	struct environ_heapstr *heap_strings, *next;
-	atomic_rwlock_write(&libc_environ_lock);
+	environ_write();
 	heap_envp            = libc_environ_heap;
 	heap_strings         = libc_environ_strings;
 	environ              = NULL;
 	libc_environ_heap    = NULL;
 	libc_environ_strings = NULL;
-	atomic_rwlock_endwrite(&libc_environ_lock);
+	environ_endwrite();
 	/* Free all dynamically allocated strings, as
 	 * well a dynamically allocated environ  map. */
 	while (heap_strings) {
@@ -528,7 +553,7 @@ NOTHROW_NCX(LIBCCALL libc_putenv)(char *string)
 	new_envp = NULL;
 	new_enva = 0;
 again_searchenv:
-	atomic_rwlock_write(&libc_environ_lock);
+	environ_write();
 	envp = environ;
 	envc = 0;
 	if (envp) {
@@ -546,7 +571,7 @@ again_searchenv:
 				existing_heapline = NULL;
 			/* Override the existing line. */
 			*iter = string;
-			atomic_rwlock_endwrite(&libc_environ_lock);
+			environ_endwrite();
 			/* Free the old line if it was heap-allocated. */
 			free(existing_heapline);
 			return 0;
@@ -567,7 +592,7 @@ again_searchenv:
 				goto do_fill_environ;
 			new_envp = NULL;
 		}
-		atomic_rwlock_endwrite(&libc_environ_lock);
+		environ_endwrite();
 		new_enva = envc + 1;
 		new_new_envp = (char **)realloc(new_envp,
 		                                new_enva + 1,
@@ -590,8 +615,7 @@ do_fill_environ:
 	old_heap_envp     = libc_environ_heap;
 	libc_environ_heap = new_envp;
 	environ           = new_envp;
-
-	atomic_rwlock_endwrite(&libc_environ_lock);
+	environ_endwrite();
 
 	/* Free the old environ table. */
 	if (old_heap_envp != new_envp)

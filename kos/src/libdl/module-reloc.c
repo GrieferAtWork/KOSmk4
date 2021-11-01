@@ -214,7 +214,7 @@ search_external_symbol:
 
 		/* Search the symbol tables of already loaded modules. */
 		hash_elf = hash_gnu = DLMODULE_GETLOCALSYMBOL_HASH_UNSET;
-		atomic_rwlock_read(&DlModule_GlobalLock);
+		DlModule_GlobalLock_Read();
 		iter = LIST_FIRST(&DlModule_GlobalList);
 		for (;;) {
 again_search_globals_next:
@@ -222,12 +222,12 @@ again_search_globals_next:
 			if (iter == self || unlikely(!tryincref(iter))) {
 				iter = LIST_NEXT(iter, dm_globals);
 				if unlikely(!iter) {
-					atomic_rwlock_endread(&DlModule_GlobalLock);
+					DlModule_GlobalLock_EndRead();
 					break;
 				}
 				continue;
 			}
-			atomic_rwlock_endread(&DlModule_GlobalLock);
+			DlModule_GlobalLock_EndRead();
 again_search_globals_module:
 			assert(iter != self);
 			if (iter == &dl_rtld_module) {
@@ -254,10 +254,10 @@ again_search_globals_module:
 							weak_symbol.ds_mod = iter; /* Inherit reference */
 							weak_symbol.ds_sym = (ElfW(Sym) const *)symbol_addr;
 							weak_symbol.ds_siz = symbol_size;
-							atomic_rwlock_read(&DlModule_GlobalLock);
+							DlModule_GlobalLock_Read();
 							iter = LIST_NEXT(iter, dm_globals);
 							if unlikely(!iter) {
-								atomic_rwlock_endread(&DlModule_GlobalLock);
+								DlModule_GlobalLock_EndRead();
 								break;
 							}
 							goto again_search_globals_next;
@@ -285,10 +285,10 @@ again_search_globals_module:
 						if (!weak_symbol.ds_mod) {
 							weak_symbol.ds_mod = iter; /* Inherit reference */
 							weak_symbol.ds_sym = symbol;
-							atomic_rwlock_read(&DlModule_GlobalLock);
+							DlModule_GlobalLock_Read();
 							iter = LIST_NEXT(iter, dm_globals);
 							if unlikely(!iter) {
-								atomic_rwlock_endread(&DlModule_GlobalLock);
+								DlModule_GlobalLock_EndRead();
 								break;
 							}
 							goto again_search_globals_next;
@@ -318,11 +318,11 @@ again_search_globals_module:
 					}
 				}
 			}
-			atomic_rwlock_read(&DlModule_GlobalLock);
+			DlModule_GlobalLock_Read();
 			next = LIST_NEXT(iter, dm_globals);
 			while (likely(next) && (next == self || unlikely(!tryincref(next))))
 				next = LIST_NEXT(next, dm_globals);
-			atomic_rwlock_endread(&DlModule_GlobalLock);
+			DlModule_GlobalLock_EndRead();
 			decref(iter);
 			if unlikely(!next)
 				break;

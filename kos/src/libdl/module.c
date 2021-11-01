@@ -88,9 +88,9 @@ DlModule_Destroy(USER DlModule *self)
 		THROWS(E_SEGFAULT, ...) {
 
 	/* Unbind the module from the list of all modules. */
-	atomic_rwlock_write(&DlModule_AllLock);
+	DlModule_AllLock_Write();
 	DlModule_RemoveFromAll(self);
-	atomic_rwlock_endwrite(&DlModule_AllLock);
+	DlModule_AllLock_EndWrite();
 
 	/* Trigger the trap informing a debugger of the change in loaded libraries. */
 	if (!sys_debugtrap_disabled) {
@@ -105,9 +105,9 @@ DlModule_Destroy(USER DlModule *self)
 	assert(LIST_ISBOUND(self, dm_globals) ==
 	       ((self->dm_flags & RTLD_GLOBAL) != 0));
 	if (LIST_ISBOUND(self, dm_globals)) {
-		atomic_rwlock_write(&DlModule_GlobalLock);
+		DlModule_GlobalLock_Write();
 		LIST_UNBIND(self, dm_globals);
-		atomic_rwlock_endwrite(&DlModule_GlobalLock);
+		DlModule_GlobalLock_EndWrite();
 	}
 
 	/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */
@@ -192,19 +192,18 @@ done_fini:
 	if (self->dm_sections) {
 		size_t i;
 again_free_sections:
-		atomic_rwlock_write(&self->dm_sections_lock);
+		DlModule_SectionsWrite(self);
 		for (i = 0; i < self->dm_shnum; ++i) {
 			DlSection *sect;
 			sect = self->dm_sections[i];
 			if (!sect)
 				continue;
-			if (!atomic_rwlock_trywrite(&sect->ds_module_lock)) {
+			if (!DlSection_ModuleTryWrite(sect)) {
 				bool hasref;
 				hasref = DlSection_TryIncref(sect);
-				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				DlModule_SectionsEndWrite(self);
 				if (hasref) {
-					atomic_rwlock_write(&sect->ds_module_lock);
-					atomic_rwlock_endwrite(&sect->ds_module_lock);
+					DlSection_ModuleWaitWrite(sect);
 					DlSection_Decref(sect);
 				}
 				goto again_free_sections;
@@ -212,14 +211,14 @@ again_free_sections:
 			assertf(sect->ds_flags & DLSECTION_FLAG_OWNED,
 			        "If this was true, then the section should have kept a reference to us!");
 			sect->ds_module = NULL;
-			atomic_rwlock_endwrite(&sect->ds_module_lock);
+			DlSection_ModuleEndWrite(sect);
 			DBG_memset(&self->dm_sections[i], 0xcc, sizeof(self->dm_sections[i]));
 		}
 		{
 			REF DlSection *dangle, *next;
 			dangle = self->dm_sections_dangling;
 			self->dm_sections_dangling = NULL;
-			atomic_rwlock_endwrite(&self->dm_sections_lock);
+			DlModule_SectionsEndWrite(self);
 			while (dangle) {
 				next = dangle->ds_dangling;
 				DlSection_Decref(dangle);

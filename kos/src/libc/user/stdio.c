@@ -94,23 +94,48 @@ FileList all_files = LIST_HEAD_INITIALIZER(all_files);
 PRIVATE ATTR_SECTION(".bss.crt.application.exit")
 struct atomic_rwlock all_files_lock = ATOMIC_RWLOCK_INIT;
 
+/* Helper macros for `all_files_lock' */
+#define all_files_mustreap()   0
+#define all_files_reap()       (void)0
+#define _all_files_reap()      (void)0
+#define all_files_write()      atomic_rwlock_write(&all_files_lock)
+#define all_files_trywrite()   atomic_rwlock_trywrite(&all_files_lock)
+#define all_files_endwrite()   (atomic_rwlock_endwrite(&all_files_lock), all_files_reap())
+#define _all_files_endwrite()  atomic_rwlock_endwrite(&all_files_lock)
+#define all_files_read()       atomic_rwlock_read(&all_files_lock)
+#define all_files_tryread()    atomic_rwlock_tryread(&all_files_lock)
+#define _all_files_endread()   atomic_rwlock_endread(&all_files_lock)
+#define all_files_endread()    (void)(atomic_rwlock_endread(&all_files_lock) && (all_files_reap(), 0))
+#define _all_files_end()       atomic_rwlock_end(&all_files_lock)
+#define all_files_end()        (void)(atomic_rwlock_end(&all_files_lock) && (all_files_reap(), 0))
+#define all_files_upgrade()    atomic_rwlock_upgrade(&all_files_lock)
+#define all_files_tryupgrade() atomic_rwlock_tryupgrade(&all_files_lock)
+#define all_files_downgrade()  atomic_rwlock_downgrade(&all_files_lock)
+#define all_files_reading()    atomic_rwlock_reading(&all_files_lock)
+#define all_files_writing()    atomic_rwlock_writing(&all_files_lock)
+#define all_files_canread()    atomic_rwlock_canread(&all_files_lock)
+#define all_files_canwrite()   atomic_rwlock_canwrite(&all_files_lock)
+#define all_files_waitread()   atomic_rwlock_waitread(&all_files_lock)
+#define all_files_waitwrite()  atomic_rwlock_waitwrite(&all_files_lock)
+
+
 /* Add the given file to the set of all files */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility")
 NONNULL((1)) void LIBCCALL allfiles_insert(FILE *__restrict self) {
-	atomic_rwlock_write(&all_files_lock);
+	all_files_write();
 	assert(!LIST_ISBOUND(self, if_exdata->io_link));
 	LIST_INSERT_HEAD(&all_files, self, if_exdata->io_link);
 	assert(LIST_ISBOUND(self, if_exdata->io_link));
-	atomic_rwlock_endwrite(&all_files_lock);
+	all_files_endwrite();
 }
 
 /* Remove the given file from the set of all files */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility")
 NONNULL((1)) void LIBCCALL allfiles_remove(FILE *__restrict self) {
-	atomic_rwlock_write(&all_files_lock);
+	all_files_write();
 	assert(LIST_ISBOUND(self, if_exdata->io_link));
 	LIST_REMOVE(self, if_exdata->io_link);
-	atomic_rwlock_endwrite(&all_files_lock);
+	all_files_endwrite();
 }
 
 
@@ -603,14 +628,14 @@ PRIVATE ATTR_SECTION(".text.crt.application.exit")
 void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
-		atomic_rwlock_read(&all_files_lock);
+		all_files_read();
 		LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
 			if (fp->if_exdata->io_fver != version) {
 				if (tryincref(fp))
 					break;
 			}
 		}
-		atomic_rwlock_endread(&all_files_lock);
+		all_files_endread();
 		if (!fp)
 			break;
 do_flush_fp:
@@ -623,13 +648,13 @@ do_flush_fp:
 			fp->if_exdata->io_fver = version;
 			file_sync(fp);
 		}
-		atomic_rwlock_read(&all_files_lock);
+		all_files_read();
 		next_fp = LIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
 		       (next_fp->if_exdata->io_fver == version ||
 		        !tryincref(next_fp)))
 			next_fp = LIST_NEXT(next_fp, if_exdata->io_link);
-		atomic_rwlock_endread(&all_files_lock);
+		all_files_endread();
 		decref(fp);
 		if (!next_fp)
 			continue; /* Do another full scan for changed files. */
@@ -642,26 +667,26 @@ PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.utility")
 void LIBCCALL file_do_syncall_unlocked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
-		atomic_rwlock_read(&all_files_lock);
+		all_files_read();
 		LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
 			if (fp->if_exdata->io_fver != version) {
 				if (tryincref(fp))
 					break;
 			}
 		}
-		atomic_rwlock_endread(&all_files_lock);
+		all_files_endread();
 		if (!fp)
 			break;
 do_flush_fp:
 		fp->if_exdata->io_fver = version;
 		file_sync(fp);
-		atomic_rwlock_read(&all_files_lock);
+		all_files_read();
 		next_fp = LIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
 		       (next_fp->if_exdata->io_fver == version ||
 		        !tryincref(next_fp)))
 			next_fp = LIST_NEXT(next_fp, if_exdata->io_link);
-		atomic_rwlock_endread(&all_files_lock);
+		all_files_endread();
 		decref(fp);
 		if (!next_fp)
 			continue; /* Do another full scan for changed files. */
@@ -3079,12 +3104,12 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
 	int result = 0;
 	FILE *fp;
 again:
-	atomic_rwlock_write(&all_files_lock);
+	all_files_write();
 	LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
 		if (!tryincref(fp))
 			continue;
 		LIST_UNBIND(fp, if_exdata->io_link);
-		atomic_rwlock_endwrite(&all_files_lock);
+		all_files_endwrite();
 		/* !!!WARNING!!!
 		 * This is entirely unsafe, but if you think about it:
 		 * This  function could only  ever be entirely unsafe! */
@@ -3093,7 +3118,7 @@ again:
 		++result;
 		goto again;
 	}
-	atomic_rwlock_endwrite(&all_files_lock);
+	all_files_endwrite();
 	return result;
 }
 /*[[[end:libc_fcloseall]]]*/

@@ -100,6 +100,21 @@ DATDEF byte_t kernel_debugtrap_data[] ASMNAME("kernel_debugtrap");
 FOREACH_CPUSTATE(DEFINE_CPUSTATE_VARS)
 #undef DEFINE_CPUSTATE_VARS
 
+/* Helper macros for `kernel_debugtrap_lock' */
+#define _kernel_debugtrap_reap()      (void)0
+#define kernel_debugtrap_reap()       (void)0
+#define kernel_debugtrap_mustreap()   0
+#define kernel_debugtrap_tryacquire() atomic_lock_tryacquire(&kernel_debugtrap_lock)
+#define kernel_debugtrap_acquire()    atomic_lock_acquire(&kernel_debugtrap_lock)
+#define kernel_debugtrap_acquire_nx() atomic_lock_acquire_nx(&kernel_debugtrap_lock)
+#define _kernel_debugtrap_release()   atomic_lock_release(&kernel_debugtrap_lock)
+#define kernel_debugtrap_release()    (atomic_lock_release(&kernel_debugtrap_lock), kernel_debugtrap_reap())
+#define kernel_debugtrap_acquired()   atomic_lock_acquired(&kernel_debugtrap_lock)
+#define kernel_debugtrap_available()  atomic_lock_available(&kernel_debugtrap_lock)
+#define kernel_debugtrap_waitfor()    atomic_lock_waitfor(&kernel_debugtrap_lock)
+#define kernel_debugtrap_waitfor_nx() atomic_lock_waitfor_nx(&kernel_debugtrap_lock)
+
+
 
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL setpcrel)(s32 *__restrict offset, void *target) {
@@ -147,10 +162,10 @@ NOTHROW(FCALL do_get_traps)(struct kernel_debugtraps *__restrict handlers) {
 PUBLIC NONNULL((1)) bool FCALL
 kernel_debugtraps_install(struct kernel_debugtraps const *__restrict handlers)
 		THROWS(E_WOULDBLOCK) {
-	sync_write(&kernel_debugtrap_lock);
+	kernel_debugtrap_acquire();
 	if unlikely(TRAPS_ENABLED()) {
 		/* There are already some traps installed. */
-		sync_endwrite(&kernel_debugtrap_lock);
+		kernel_debugtrap_release();
 		return false;
 	}
 	/* Install our new traps handlers. */
@@ -161,7 +176,7 @@ kernel_debugtraps_install(struct kernel_debugtraps const *__restrict handlers)
 	FOREACH_CPUSTATE(ENABLE_TRAP)
 #undef ENABLE_TRAP
 	ATOMIC_WRITE(kernel_debugtrap_data[0], 0x90); /* nop */
-	sync_endwrite(&kernel_debugtrap_lock);
+	kernel_debugtrap_release();
 	return true;
 }
 
@@ -170,7 +185,7 @@ PUBLIC NONNULL((1)) bool FCALL
 kernel_debugtraps_uninstall(struct kernel_debugtraps const *__restrict handlers)
 		THROWS(E_WOULDBLOCK) {
 	struct kernel_debugtraps old_traps;
-	sync_write(&kernel_debugtrap_lock);
+	kernel_debugtrap_acquire();
 	if (!do_get_traps(&old_traps))
 		goto nope; /* No traps installed. */
 	if (memcmp(&old_traps, handlers, sizeof(struct kernel_debugtraps)) != 0)
@@ -183,10 +198,10 @@ kernel_debugtraps_uninstall(struct kernel_debugtraps const *__restrict handlers)
 	FOREACH_CPUSTATE(DISABLE_TRAP)
 #undef DISABLE_TRAP
 	ATOMIC_WRITE(kernel_debugtrap_data[0], 0xc3); /* ret */
-	sync_endwrite(&kernel_debugtrap_lock);
+	kernel_debugtrap_release();
 	return true;
 nope:
-	sync_endwrite(&kernel_debugtrap_lock);
+	kernel_debugtrap_release();
 	return false;
 }
 
@@ -195,9 +210,9 @@ PUBLIC NONNULL((1)) bool FCALL
 kernel_debugtraps_get(struct kernel_debugtraps *__restrict handlers)
 		THROWS(E_WOULDBLOCK) {
 	bool result;
-	sync_read(&kernel_debugtrap_lock);
+	kernel_debugtrap_acquire();
 	result = do_get_traps(handlers);
-	sync_endread(&kernel_debugtrap_lock);
+	kernel_debugtrap_release();
 	return result;
 }
 

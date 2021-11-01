@@ -170,6 +170,30 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") pthread_attr_t pthread_default_attr = {};
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock pthread_default_attr_lock = ATOMIC_RWLOCK_INIT;
 
+/* Helper macros for `pthread_default_attr_lock' */
+#define pthread_default_attr_mustreap()   0
+#define pthread_default_attr_reap()       (void)0
+#define _pthread_default_attr_reap()      (void)0
+#define pthread_default_attr_write()      atomic_rwlock_write(&pthread_default_attr_lock)
+#define pthread_default_attr_trywrite()   atomic_rwlock_trywrite(&pthread_default_attr_lock)
+#define pthread_default_attr_endwrite()   (atomic_rwlock_endwrite(&pthread_default_attr_lock), pthread_default_attr_reap())
+#define _pthread_default_attr_endwrite()  atomic_rwlock_endwrite(&pthread_default_attr_lock)
+#define pthread_default_attr_read()       atomic_rwlock_read(&pthread_default_attr_lock)
+#define pthread_default_attr_tryread()    atomic_rwlock_tryread(&pthread_default_attr_lock)
+#define _pthread_default_attr_endread()   atomic_rwlock_endread(&pthread_default_attr_lock)
+#define pthread_default_attr_endread()    (void)(atomic_rwlock_endread(&pthread_default_attr_lock) && (pthread_default_attr_reap(), 0))
+#define _pthread_default_attr_end()       atomic_rwlock_end(&pthread_default_attr_lock)
+#define pthread_default_attr_end()        (void)(atomic_rwlock_end(&pthread_default_attr_lock) && (pthread_default_attr_reap(), 0))
+#define pthread_default_attr_upgrade()    atomic_rwlock_upgrade(&pthread_default_attr_lock)
+#define pthread_default_attr_tryupgrade() atomic_rwlock_tryupgrade(&pthread_default_attr_lock)
+#define pthread_default_attr_downgrade()  atomic_rwlock_downgrade(&pthread_default_attr_lock)
+#define pthread_default_attr_reading()    atomic_rwlock_reading(&pthread_default_attr_lock)
+#define pthread_default_attr_writing()    atomic_rwlock_writing(&pthread_default_attr_lock)
+#define pthread_default_attr_canread()    atomic_rwlock_canread(&pthread_default_attr_lock)
+#define pthread_default_attr_canwrite()   atomic_rwlock_canwrite(&pthread_default_attr_lock)
+#define pthread_default_attr_waitread()   atomic_rwlock_waitread(&pthread_default_attr_lock)
+#define pthread_default_attr_waitwrite()  atomic_rwlock_waitwrite(&pthread_default_attr_lock)
+
 
 
 /* Called just before a thread exits (used to destroy() the thread's
@@ -1145,14 +1169,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_default_np)(pthread_attr_t *attr)
 	cpu_set_t *cpuset = NULL;
 	size_t cpuset_size = 0;
 again:
-	atomic_rwlock_read(&pthread_default_attr_lock);
+	pthread_default_attr_read();
 	memcpy(attr, &pthread_default_attr, sizeof(pthread_attr_t));
 	if (pthread_default_attr.pa_cpuset) {
 		if (pthread_default_attr.pa_cpuset == (cpu_set_t *)&pthread_default_attr.pa_cpusetsize) {
 			attr->pa_cpuset = (cpu_set_t *)&attr->pa_cpusetsize;
 		} else if (cpuset_size != pthread_default_attr.pa_cpusetsize) {
 			cpuset_size = pthread_default_attr.pa_cpusetsize;
-			atomic_rwlock_endread(&pthread_default_attr_lock);
+			pthread_default_attr_endread();
 			cpuset = (cpu_set_t *)realloc(cpuset, cpuset_size);
 			if unlikely(!cpuset)
 				return ENOMEM;
@@ -1162,7 +1186,7 @@ again:
 		attr->pa_cpusetsize = cpuset_size;
 		cpuset            = NULL; /* Don't free() below */
 	}
-	atomic_rwlock_endread(&pthread_default_attr_lock);
+	pthread_default_attr_endread();
 	if (attr->pa_stacksize == 0)
 		attr->pa_stacksize = PTHREAD_STACK_MIN;
 	free(cpuset);
@@ -1193,7 +1217,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr
 		if unlikely(!new_set)
 			return ENOMEM;
 	}
-	atomic_rwlock_write(&pthread_default_attr_lock);
+	pthread_default_attr_write();
 	old_set = pthread_default_attr.pa_cpuset;
 	if (old_set == (cpu_set_t *)&pthread_default_attr.pa_cpusetsize)
 		old_set = NULL;
@@ -1217,7 +1241,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr
 	pthread_default_attr.pa_guardsize   = attr->pa_guardsize;
 	pthread_default_attr.pa_stackaddr   = attr->pa_stackaddr;
 	pthread_default_attr.pa_stacksize   = attr->pa_stacksize;
-	atomic_rwlock_endwrite(&pthread_default_attr_lock);
+	pthread_default_attr_endwrite();
 	free(old_set);
 	return EOK;
 }
@@ -3451,7 +3475,33 @@ PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") size_t tls_count = 0;
 
 
 /* Lock for accessing `tls_dtors' and `tls_count' */
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock tls_lock = ATOMIC_RWLOCK_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread")
+struct atomic_rwlock tls_lock = ATOMIC_RWLOCK_INIT;
+
+/* Helper macros for `tls_lock' */
+#define tls_mustreap()   0
+#define tls_reap()       (void)0
+#define _tls_reap()      (void)0
+#define tls_write()      atomic_rwlock_write(&tls_lock)
+#define tls_trywrite()   atomic_rwlock_trywrite(&tls_lock)
+#define tls_endwrite()   (atomic_rwlock_endwrite(&tls_lock), tls_reap())
+#define _tls_endwrite()  atomic_rwlock_endwrite(&tls_lock)
+#define tls_read()       atomic_rwlock_read(&tls_lock)
+#define tls_tryread()    atomic_rwlock_tryread(&tls_lock)
+#define _tls_endread()   atomic_rwlock_endread(&tls_lock)
+#define tls_endread()    (void)(atomic_rwlock_endread(&tls_lock) && (tls_reap(), 0))
+#define _tls_end()       atomic_rwlock_end(&tls_lock)
+#define tls_end()        (void)(atomic_rwlock_end(&tls_lock) && (tls_reap(), 0))
+#define tls_upgrade()    atomic_rwlock_upgrade(&tls_lock)
+#define tls_tryupgrade() atomic_rwlock_tryupgrade(&tls_lock)
+#define tls_downgrade()  atomic_rwlock_downgrade(&tls_lock)
+#define tls_reading()    atomic_rwlock_reading(&tls_lock)
+#define tls_writing()    atomic_rwlock_writing(&tls_lock)
+#define tls_canread()    atomic_rwlock_canread(&tls_lock)
+#define tls_canwrite()   atomic_rwlock_canwrite(&tls_lock)
+#define tls_waitread()   atomic_rwlock_waitread(&tls_lock)
+#define tls_waitwrite()  atomic_rwlock_waitwrite(&tls_lock)
+
 
 /* [0..1][lock(WRITE_ONCE)] TLS  segment  (from  libdl's  `dltlsalloc()')  that
  * is  used  for representing  and storing  TLS values  on a  per-thread basis.
@@ -3499,10 +3549,10 @@ pthread_tls_segment_fini(void *UNUSED(arg), void *base) {
 				pthread_destr_function_t dtor;
 				me->pts_values[i] = NULL;
 				dtor              = NULL;
-				atomic_rwlock_read(&tls_lock);
+				tls_read();
 				if likely(i < tls_count)
 					dtor = tls_dtors[i];
-				atomic_rwlock_endread(&tls_lock);
+				tls_endread();
 				/* Invoke the TLS destructor for non-NULL values. */
 				if (dtor) {
 					(*dtor)(tls_value);
@@ -3614,7 +3664,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
 	if (!destr_function)
 		destr_function = &noop_dtor;
 again:
-	atomic_rwlock_write(&tls_lock);
+	tls_write();
 	count = ATOMIC_READ(tls_count);
 	/* Check if we can re-use a previously freed slot. */
 	for (i = 0; i < count; ++i) {
@@ -3626,7 +3676,7 @@ again:
 	if (count >= avail) {
 		pthread_destr_function_t *old_destructors;
 		pthread_destr_function_t *new_destructors;
-		atomic_rwlock_endwrite(&tls_lock);
+		tls_endwrite();
 
 		/* Allocate  a new (slightly larger) TLS destructor vector.
 		 * Note that we mustn't hold `tls_lock' in here, since that
@@ -3636,16 +3686,16 @@ again:
 		 *            make a real effort to always hold it for  the
 		 *            least amount of time possible. */
 		new_destructors = (pthread_destr_function_t *)malloc(count + 1,
-		                                                       sizeof(pthread_destr_function_t));
+		                                                     sizeof(pthread_destr_function_t));
 
 		/* Check if the allocation was ok. */
 		if unlikely(!new_destructors)
 			return ENOMEM;
 
-		atomic_rwlock_write(&tls_lock);
+		tls_write();
 		/* Make sure that the TLS count didn't change in the mean time. */
 		if (ATOMIC_READ(tls_count) != count) {
-			atomic_rwlock_endwrite(&tls_lock);
+			tls_endwrite();
 			free(new_destructors);
 			goto again;
 		}
@@ -3657,7 +3707,7 @@ again:
 
 		/* Set the new destructors vector as active. */
 		tls_dtors = new_destructors;
-		atomic_rwlock_endwrite(&tls_lock);
+		tls_endwrite();
 
 		/* Free the old TLS destructors vector. */
 		free(old_destructors);
@@ -3667,7 +3717,7 @@ again:
 	 * Note   that   i  ==   count   from  above! */
 use_ith_slot:
 	tls_dtors[i] = destr_function;
-	atomic_rwlock_endwrite(&tls_lock);
+	tls_endwrite();
 	*key = (pthread_key_t)i;
 	return EOK;
 }
@@ -3683,7 +3733,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 /*[[[body:libc_pthread_key_delete]]]*/
 {
 	errno_t result = EOK;
-	atomic_rwlock_write(&tls_lock);
+	tls_write();
 	if unlikely(!tls_keyok(key)) {
 		/* Bad key! */
 		result = EINVAL;
@@ -3699,7 +3749,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 				pthread_destr_function_t *old_dtors;
 				old_dtors = tls_dtors;
 				tls_dtors = NULL;
-				atomic_rwlock_endwrite(&tls_lock);
+				tls_endwrite();
 				free(old_dtors);
 				goto done;
 			} else {
@@ -3710,7 +3760,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 			}
 		}
 	}
-	atomic_rwlock_endwrite(&tls_lock);
+	tls_endwrite();
 done:
 	return result;
 }
@@ -3729,13 +3779,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 {
 	void *result = NULL;
 	/* Verify that `key' is actually valid. */
-	atomic_rwlock_read(&tls_lock);
+	tls_read();
 	if unlikely(!tls_keyok(key)) {
-		atomic_rwlock_endread(&tls_lock);
+		tls_endread();
 		/* Bad key! */
 	} else {
 		void **slot;
-		atomic_rwlock_endread(&tls_lock);
+		tls_endread();
 		/* Lookup the slot for `key' */
 		slot = get_pthread_tls_slot((size_t)key);
 		/* Load the value of `slot' */
@@ -3760,13 +3810,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 {
 	void **slot;
 	/* Verify that `key' is actually valid. */
-	atomic_rwlock_read(&tls_lock);
+	tls_read();
 	if unlikely(!tls_keyok(key)) {
-		atomic_rwlock_endread(&tls_lock);
+		tls_endread();
 		/* Bad key! */
 		return EINVAL;
 	}
-	atomic_rwlock_endread(&tls_lock);
+	tls_endread();
 	/* Lookup the slot for `key' */
 	slot = get_pthread_tls_slot((size_t)key);
 	if (!slot)

@@ -200,12 +200,12 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		if (struct_size != sizeof(struct hop_pipe_stat))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_stat), struct_size);
 		COMPILER_BARRIER();
-		sync_read(&self->rb_lock);
+		ringbuffer_lock_read(self);
 		ps_rdtotal = self->rb_rdtot;
 		ps_avail   = self->rb_avail;
 		ps_bufcur  = self->rb_size;
 		ps_buflim  = ATOMIC_READ(self->rb_limit);
-		sync_endread(&self->rb_lock);
+		ringbuffer_lock_endread(self);
 		COMPILER_BARRIER();
 		data->ps_rdtotal = (u64)ps_rdtotal;
 		data->ps_avail   = (u64)ps_avail;

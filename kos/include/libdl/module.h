@@ -78,7 +78,7 @@ struct dlsection {
 	uintptr_t            ds_elfflags;    /* [const] ELF section flags (Set of `SHF_*') */
 	__WEAK refcnt_t      ds_refcnt;      /* Reference counter. */
 	struct atomic_rwlock ds_module_lock; /* Lock for `ds_module' */
-	__REF DlModule      *ds_module;      /* [0..1][ref_if(!(ds_flags & DLSECTION_FLAG_OWNED))]
+	__REF DlModule      *ds_module;      /* [0..1][ref_if(!(ds_flags & DLSECTION_FLAG_OWNED))][lock(ds_module_lock)]
 	                                      * Pointer to the module (or NULL if section data is owned, and the module was destroyed) */
 	__REF DlSection     *ds_dangling;    /* [0..1][lock(ds_module->dm_sections_lock))] Chain of dangling sections.
 	                                      * NOTE: Set  to `(REF DlSection *)-1'  if  the section  isn't  dangling. */
@@ -90,6 +90,31 @@ struct dlsection {
 	                                      * NOTE: A section is compressed when `ds_flags & SHF_COMPRESSED' */
 	size_t               ds_csize;       /* [const][lock(WRITE_ONCE)][valid_if(ds_cdata)] Decompressed section size. */
 };
+
+/* Helper macros for `struct dlsection::ds_module_lock' */
+#define DlSection_ModuleMustReap(self)   0
+#define DlSection_ModuleReap(self)       (void)0
+#define _DlSection_ModuleReap(self)      (void)0
+#define DlSection_ModuleWrite(self)      atomic_rwlock_write(&(self)->ds_module_lock)
+#define DlSection_ModuleTryWrite(self)   atomic_rwlock_trywrite(&(self)->ds_module_lock)
+#define DlSection_ModuleEndWrite(self)   (atomic_rwlock_endwrite(&(self)->ds_module_lock), DlSection_ModuleReap(self))
+#define _DlSection_ModuleEndWrite(self)  atomic_rwlock_endwrite(&(self)->ds_module_lock)
+#define DlSection_ModuleRead(self)       atomic_rwlock_read(&(self)->ds_module_lock)
+#define DlSection_ModuleTryread(self)    atomic_rwlock_tryread(&(self)->ds_module_lock)
+#define _DlSection_ModuleEndRead(self)   atomic_rwlock_endread(&(self)->ds_module_lock)
+#define DlSection_ModuleEndRead(self)    (void)(atomic_rwlock_endread(&(self)->ds_module_lock) && (DlSection_ModuleReap(self), 0))
+#define _DlSection_ModuleEnd(self)       atomic_rwlock_end(&(self)->ds_module_lock)
+#define DlSection_ModuleEnd(self)        (void)(atomic_rwlock_end(&(self)->ds_module_lock) && (DlSection_ModuleReap(self), 0))
+#define DlSection_ModuleUpgrade(self)    atomic_rwlock_upgrade(&(self)->ds_module_lock)
+#define DlSection_ModuleTryUpgrade(self) atomic_rwlock_tryupgrade(&(self)->ds_module_lock)
+#define DlSection_ModuleDowngrade(self)  atomic_rwlock_downgrade(&(self)->ds_module_lock)
+#define DlSection_ModuleReading(self)    atomic_rwlock_reading(&(self)->ds_module_lock)
+#define DlSection_ModuleWriting(self)    atomic_rwlock_writing(&(self)->ds_module_lock)
+#define DlSection_ModuleCanRead(self)    atomic_rwlock_canread(&(self)->ds_module_lock)
+#define DlSection_ModuleCanWrite(self)   atomic_rwlock_canwrite(&(self)->ds_module_lock)
+#define DlSection_ModuleWaitRead(self)   atomic_rwlock_waitread(&(self)->ds_module_lock)
+#define DlSection_ModuleWaitWrite(self)  atomic_rwlock_waitwrite(&(self)->ds_module_lock)
+
 
 #ifdef __INTELLISENSE__
 INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Incref)(__USER DlSection *self) __THROWS(E_SEGFAULT);
@@ -278,6 +303,32 @@ struct dlmodule {
 	STRUCT_DLMODULE_EXT       DLMODULE_EXT; /* non-ELF-specific module data. */
 #endif /* !__BUILDING_LIBDL */
 };
+
+
+/* Helper macros for `struct dlmodule::dm_sections_lock' */
+#define DlModule_SectionsMustReap(self)   0
+#define DlModule_SectionsReap(self)       (void)0
+#define _DlModule_SectionsReap(self)      (void)0
+#define DlModule_SectionsWrite(self)      atomic_rwlock_write(&(self)->dm_sections_lock)
+#define DlModule_SectionsTryWrite(self)   atomic_rwlock_trywrite(&(self)->dm_sections_lock)
+#define DlModule_SectionsEndWrite(self)   (atomic_rwlock_endwrite(&(self)->dm_sections_lock), DlModule_SectionsReap(self))
+#define _DlModule_SectionsEndWrite(self)  atomic_rwlock_endwrite(&(self)->dm_sections_lock)
+#define DlModule_SectionsRead(self)       atomic_rwlock_read(&(self)->dm_sections_lock)
+#define DlModule_SectionsTryread(self)    atomic_rwlock_tryread(&(self)->dm_sections_lock)
+#define _DlModule_SectionsEndRead(self)   atomic_rwlock_endread(&(self)->dm_sections_lock)
+#define DlModule_SectionsEndRead(self)    (void)(atomic_rwlock_endread(&(self)->dm_sections_lock) && (DlModule_SectionsReap(self), 0))
+#define _DlModule_SectionsEnd(self)       atomic_rwlock_end(&(self)->dm_sections_lock)
+#define DlModule_SectionsEnd(self)        (void)(atomic_rwlock_end(&(self)->dm_sections_lock) && (DlModule_SectionsReap(self), 0))
+#define DlModule_SectionsUpgrade(self)    atomic_rwlock_upgrade(&(self)->dm_sections_lock)
+#define DlModule_SectionsTryUpgrade(self) atomic_rwlock_tryupgrade(&(self)->dm_sections_lock)
+#define DlModule_SectionsDowngrade(self)  atomic_rwlock_downgrade(&(self)->dm_sections_lock)
+#define DlModule_SectionsReading(self)    atomic_rwlock_reading(&(self)->dm_sections_lock)
+#define DlModule_SectionsWriting(self)    atomic_rwlock_writing(&(self)->dm_sections_lock)
+#define DlModule_SectionsCanRead(self)    atomic_rwlock_canread(&(self)->dm_sections_lock)
+#define DlModule_SectionsCanWrite(self)   atomic_rwlock_canwrite(&(self)->dm_sections_lock)
+#define DlModule_SectionsWaitRead(self)   atomic_rwlock_waitread(&(self)->dm_sections_lock)
+#define DlModule_SectionsWaitWrite(self)  atomic_rwlock_waitwrite(&(self)->dm_sections_lock)
+
 
 #ifdef __BUILDING_LIBDL
 INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(__USER DlModule *self) __THROWS(E_SEGFAULT, ...);

@@ -62,9 +62,9 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
 		return (byte_t *)seg + self->dm_tlsstoff;
-	atomic_rwlock_read(&seg->ts_exlock);
+	tls_segment_ex_read(seg);
 	extab = dtls_extension_tree_locate(seg->ts_extree, self);
-	atomic_rwlock_endread(&seg->ts_exlock);
+	tls_segment_ex_endread(seg);
 	if (extab)
 		return extab->te_data;
 	/* Lazily allocate missing extension tables.
@@ -125,7 +125,7 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 	 *      isn't   (and   probably  couldn't)   be   re-entrant  in   the   general  case...
 	 *      What do the  specs say  about a  signal handler being  the first  to access  some
 	 *      thread-local variable? */
-	atomic_rwlock_write(&seg->ts_exlock);
+	tls_segment_ex_write(seg);
 	{
 		struct dtls_extension *newtab;
 		newtab = dtls_extension_tree_locate(seg->ts_extree, self);
@@ -133,7 +133,7 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 			/* Some other thread already allocated the TLS segment for us
 			 * XXX: Can this even happen? (I don't think it can, considering
 			 *      we're using lazy allocations) */
-			atomic_rwlock_endwrite(&seg->ts_exlock);
+			tls_segment_ex_endwrite(seg);
 			/* Invoke TLS finalizers. */
 			RAII_FINALLY { free(extab); };
 			if (self->dm_tls_fini)
@@ -142,7 +142,7 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 		}
 	}
 	dtls_extension_tree_insert(&seg->ts_extree, extab);
-	atomic_rwlock_endwrite(&seg->ts_exlock);
+	tls_segment_ex_endwrite(seg);
 	return extab->te_data;
 err_nomem:
 	dl_seterror_nomem();

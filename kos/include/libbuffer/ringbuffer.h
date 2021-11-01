@@ -63,6 +63,35 @@ struct ringbuffer {
 	sched_signal_t       rb_nfull;  /* Signal broadcast when the buffer becomes non-full, or gets closed */
 };
 
+/* Helper macros for `struct ringbuffer::rb_lock' */
+#define ringbuffer_lock_mustreap(self)     0
+#define ringbuffer_lock_reap(self)         (void)0
+#define _ringbuffer_lock_reap(self)        (void)0
+#define ringbuffer_lock_write(self)        atomic_rwlock_write(&(self)->rb_lock)
+#define ringbuffer_lock_write_nx(self)     atomic_rwlock_write_nx(&(self)->rb_lock)
+#define ringbuffer_lock_trywrite(self)     atomic_rwlock_trywrite(&(self)->rb_lock)
+#define ringbuffer_lock_endwrite(self)     (atomic_rwlock_endwrite(&(self)->rb_lock), ringbuffer_lock_reap(self))
+#define _ringbuffer_lock_endwrite(self)    atomic_rwlock_endwrite(&(self)->rb_lock)
+#define ringbuffer_lock_read(self)         atomic_rwlock_read(&(self)->rb_lock)
+#define ringbuffer_lock_read_nx(self)      atomic_rwlock_read_nx(&(self)->rb_lock)
+#define ringbuffer_lock_tryread(self)      atomic_rwlock_tryread(&(self)->rb_lock)
+#define _ringbuffer_lock_endread(self)     atomic_rwlock_endread(&(self)->rb_lock)
+#define ringbuffer_lock_endread(self)      (void)(atomic_rwlock_endread(&(self)->rb_lock) && (ringbuffer_lock_reap(self), 0))
+#define _ringbuffer_lock_end(self)         atomic_rwlock_end(&(self)->rb_lock)
+#define ringbuffer_lock_end(self)          (void)(atomic_rwlock_end(&(self)->rb_lock) && (ringbuffer_lock_reap(self), 0))
+#define ringbuffer_lock_upgrade(self)      atomic_rwlock_upgrade(&(self)->rb_lock)
+#define ringbuffer_lock_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->rb_lock)
+#define ringbuffer_lock_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->rb_lock)
+#define ringbuffer_lock_downgrade(self)    atomic_rwlock_downgrade(&(self)->rb_lock)
+#define ringbuffer_lock_reading(self)      atomic_rwlock_reading(&(self)->rb_lock)
+#define ringbuffer_lock_writing(self)      atomic_rwlock_writing(&(self)->rb_lock)
+#define ringbuffer_lock_canread(self)      atomic_rwlock_canread(&(self)->rb_lock)
+#define ringbuffer_lock_canwrite(self)     atomic_rwlock_canwrite(&(self)->rb_lock)
+#define ringbuffer_lock_waitread(self)     atomic_rwlock_waitread(&(self)->rb_lock)
+#define ringbuffer_lock_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->rb_lock)
+#define ringbuffer_lock_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->rb_lock)
+#define ringbuffer_lock_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->rb_lock)
+
 /* Static initialization */
 #define RINGBUFFER_DEFAULT_LIMIT         4096
 

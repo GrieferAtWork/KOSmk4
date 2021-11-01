@@ -121,17 +121,42 @@ DECL_END
 DECL_BEGIN
 
 /* Caches PCI vendor/device names. */
-PRIVATE struct atomic_rwlock string_cache_lock = ATOMIC_RWLOCK_INIT;
 PRIVATE LLRBTREE_ROOT(vendor_cache_node) vendor_cache = NULL;
 PRIVATE LLRBTREE_ROOT(device_cache_node) device_cache = NULL;
+PRIVATE struct atomic_rwlock string_cache_lock = ATOMIC_RWLOCK_INIT;
+
+/* Helper macros for `string_cache_lock' */
+#define string_cache_mustreap()   0
+#define string_cache_reap()       (void)0
+#define _string_cache_reap()      (void)0
+#define string_cache_write()      atomic_rwlock_write(&string_cache_lock)
+#define string_cache_trywrite()   atomic_rwlock_trywrite(&string_cache_lock)
+#define string_cache_endwrite()   (atomic_rwlock_endwrite(&string_cache_lock), string_cache_reap())
+#define _string_cache_endwrite()  atomic_rwlock_endwrite(&string_cache_lock)
+#define string_cache_read()       atomic_rwlock_read(&string_cache_lock)
+#define string_cache_tryread()    atomic_rwlock_tryread(&string_cache_lock)
+#define _string_cache_endread()   atomic_rwlock_endread(&string_cache_lock)
+#define string_cache_endread()    (void)(atomic_rwlock_endread(&string_cache_lock) && (string_cache_reap(), 0))
+#define _string_cache_end()       atomic_rwlock_end(&string_cache_lock)
+#define string_cache_end()        (void)(atomic_rwlock_end(&string_cache_lock) && (string_cache_reap(), 0))
+#define string_cache_upgrade()    atomic_rwlock_upgrade(&string_cache_lock)
+#define string_cache_tryupgrade() atomic_rwlock_tryupgrade(&string_cache_lock)
+#define string_cache_downgrade()  atomic_rwlock_downgrade(&string_cache_lock)
+#define string_cache_reading()    atomic_rwlock_reading(&string_cache_lock)
+#define string_cache_writing()    atomic_rwlock_writing(&string_cache_lock)
+#define string_cache_canread()    atomic_rwlock_canread(&string_cache_lock)
+#define string_cache_canwrite()   atomic_rwlock_canwrite(&string_cache_lock)
+#define string_cache_waitread()   atomic_rwlock_waitread(&string_cache_lock)
+#define string_cache_waitwrite()  atomic_rwlock_waitwrite(&string_cache_lock)
+
 
 
 PRIVATE ATTR_PURE char *
 NOTHROW(CC find_vendor_name)(uint16_t vendor_id) {
 	struct vendor_cache_node *node;
-	atomic_rwlock_read(&string_cache_lock);
+	string_cache_read();
 	node = vendor_cache_node_tree_locate(vendor_cache, vendor_id);
-	atomic_rwlock_endread(&string_cache_lock);
+	string_cache_endread();
 	if (node)
 		return node->vcn_name;
 	return NULL;
@@ -140,9 +165,9 @@ NOTHROW(CC find_vendor_name)(uint16_t vendor_id) {
 PRIVATE ATTR_PURE char *
 NOTHROW(CC find_device_name)(pci_devnameid_t id) {
 	struct device_cache_node *node;
-	atomic_rwlock_read(&string_cache_lock);
+	string_cache_read();
 	node = device_cache_node_tree_locate(device_cache, id);
-	atomic_rwlock_endread(&string_cache_lock);
+	string_cache_endread();
 	if (node)
 		return node->dcn_name;
 	return NULL;
@@ -158,16 +183,16 @@ NOTHROW(CC remember_vendor_name)(uint16_t vendor_id, char const *name) {
 		return NULL;
 	memcpy(node->vcn_name, name, namelen + 1, sizeof(char));
 	node->vcn_id = vendor_id;
-	atomic_rwlock_write(&string_cache_lock);
+	string_cache_write();
 	if unlikely(!vendor_cache_node_tree_tryinsert(&vendor_cache, node)) {
 		struct vendor_cache_node *real_node;
 		real_node = vendor_cache_node_tree_locate(vendor_cache, vendor_id);
 		assert(real_node);
-		atomic_rwlock_endwrite(&string_cache_lock);
+		string_cache_endwrite();
 		free(node);
 		return real_node->vcn_name;
 	}
-	atomic_rwlock_endwrite(&string_cache_lock);
+	string_cache_endwrite();
 	return node->vcn_name;
 }
 
@@ -181,16 +206,16 @@ NOTHROW(CC remember_device_name)(pci_devnameid_t id, char const *name) {
 		return NULL;
 	memcpy(node->dcn_name, name, namelen + 1, sizeof(char));
 	node->dcn_id = id;
-	atomic_rwlock_write(&string_cache_lock);
+	string_cache_write();
 	if unlikely(!device_cache_node_tree_tryinsert(&device_cache, node)) {
 		struct device_cache_node *real_node;
 		real_node = device_cache_node_tree_locate(device_cache, id);
 		assert(real_node);
-		atomic_rwlock_endwrite(&string_cache_lock);
+		string_cache_endwrite();
 		free(node);
 		return real_node->dcn_name;
 	}
-	atomic_rwlock_endwrite(&string_cache_lock);
+	string_cache_endwrite();
 	return node->dcn_name;
 }
 

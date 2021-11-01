@@ -189,7 +189,7 @@ kbdbuf_getkey(struct kbdbuf *__restrict self)
 PRIVATE NOBLOCK struct keyboard_key_packet
 NOTHROW(KCALL keyboard_device_trygetkey_locked_noled)(struct kbddev *__restrict self) {
 	struct keyboard_key_packet result;
-	assert(sync_reading(&self->kd_map_lock));
+	assert(kbddev_map_reading(self));
 	result.kp_key = kbdbuf_trygetkey(&self->kd_buf);
 	switch (result.kp_key) {
 
@@ -394,9 +394,9 @@ PUBLIC NONNULL((1)) struct keyboard_key_packet KCALL
 kbddev_trygetkey(struct kbddev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	struct keyboard_key_packet result;
-	sync_read(&self->kd_map_lock);
+	kbddev_map_read(self);
 	result = keyboard_device_trygetkey_locked_noled(self);
-	sync_endread(&self->kd_map_lock);
+	kbddev_map_endread(self);
 	if (result.kp_key == KEY_CAPSLOCK ||
 	    result.kp_key == KEY_NUMLOCK ||
 	    result.kp_key == KEY_SCROLLLOCK)
@@ -553,7 +553,7 @@ PRIVATE NOBLOCK size_t
 NOTHROW(KCALL keyboard_device_do_translate)(struct kbddev *__restrict self,
                                             uint16_t key, uint16_t mod) {
 	size_t result;
-	assert(sync_writing(&self->kd_map_lock));
+	assert(kbddev_map_writing(self));
 	key &= ~(KEY_FREPEAT);
 	result = keymap_translate_buf(&self->kd_map, key, mod, (char *)self->kd_pend,
 	                              COMPILER_LENOF(self->kd_pend));
@@ -718,14 +718,14 @@ kbddev_trygetc(struct kbddev *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	int result;
 again:
-	sync_write(&self->kd_map_lock);
+	kbddev_map_write(self);
 	if (self->kd_pendsz) {
 		result = (int)(unsigned int)self->kd_pend[0];
 		--self->kd_pendsz;
 		memmovedown(&self->kd_pend[0],
 		            &self->kd_pend[1],
 		            self->kd_pendsz);
-		sync_endwrite(&self->kd_map_lock);
+		kbddev_map_endwrite(self);
 	} else {
 		struct keyboard_key_packet packet;
 		result = -1;
@@ -833,7 +833,7 @@ again_getkey:
 					       packet.kp_key, packet.kp_mod);
 					chrdev_getname_lock_release(self);
 check_led_and_try_again:
-					sync_endwrite(&self->kd_map_lock);
+					kbddev_map_endwrite(self);
 					if (packet.kp_key == KEY_CAPSLOCK ||
 					    packet.kp_key == KEY_NUMLOCK ||
 					    packet.kp_key == KEY_SCROLLLOCK)
@@ -858,7 +858,7 @@ check_led_and_try_again:
 			            len);
 			self->kd_pendsz = len;
 		}
-		sync_endwrite(&self->kd_map_lock);
+		kbddev_map_endwrite(self);
 		if (packet.kp_key == KEY_CAPSLOCK ||
 		    packet.kp_key == KEY_NUMLOCK ||
 		    packet.kp_key == KEY_SCROLLLOCK)
@@ -1213,7 +1213,7 @@ kbddev_v_ioctl(struct chrdev *__restrict self,
 		validate_readwrite(arg, sizeof(struct keyboard_keymap));
 		memcpy(&data, arg, sizeof(struct keyboard_keymap));
 		validate_writable(data.km_maptext, data.km_mapsize);
-		sync_read(&me->kd_map_lock);
+		kbddev_map_read(me);
 restart_getkeymap_locked:
 		COMPILER_BARRIER();
 		mapsize          = me->kd_map_extsiz;
@@ -1232,11 +1232,11 @@ continue_copy_keymap:
 				byte_t next_byte;
 				offset += mapsize - error;
 				next_byte = *(extbase + offset);
-				sync_endread(&me->kd_map_lock);
+				kbddev_map_endread(me);
 				COMPILER_WRITE_BARRIER();
 				*((byte_t *)data.km_maptext + offset) = next_byte;
 				COMPILER_WRITE_BARRIER();
-				sync_read(&me->kd_map_lock);
+				kbddev_map_read(me);
 				if unlikely(extbase != (byte_t *)ATOMIC_READ(me->kd_map.km_ext))
 					goto restart_getkeymap_locked;
 				if unlikely(mapsize != ATOMIC_READ(me->kd_map_extsiz))
@@ -1245,7 +1245,7 @@ continue_copy_keymap:
 				goto continue_copy_keymap;
 			}
 		}
-		sync_endread(&me->kd_map_lock);
+		kbddev_map_endread(me);
 		COMPILER_WRITE_BARRIER();
 		/* Write back the required buffer size, as well as the default encoding. */
 		((struct keyboard_keymap *)arg)->km_mapsize = mapsize;
@@ -1285,7 +1285,7 @@ continue_copy_keymap:
 			if likely(new_map2)
 				new_map = new_map2;
 			data.km_mapsize = real_length;
-			sync_write(&me->kd_map_lock);
+			kbddev_map_write(me);
 		} EXCEPT {
 			kfree(new_map);
 			RETHROW();
@@ -1296,16 +1296,16 @@ continue_copy_keymap:
 		me->kd_map.km_ext         = new_map;
 		me->kd_map.km_defencoding = data.km_defenc;
 		memset(&me->kd_map.km_basic, 0, sizeof(me->kd_map.km_basic));
-		sync_endwrite(&me->kd_map_lock);
+		kbddev_map_endwrite(me);
 		kfree(old_map);
 	}	break;
 
 	case KBDIO_RESETKEYMAP: {
 		byte_t *old_map;
-		sync_write(&me->kd_map_lock);
+		kbddev_map_write(me);
 		old_map = (byte_t *)me->kd_map.km_ext;
 		keymap_init_en_US(&me->kd_map);
-		sync_endwrite(&me->kd_map_lock);
+		kbddev_map_endwrite(me);
 		kfree(old_map);
 	}	break;
 
@@ -1325,16 +1325,16 @@ continue_copy_keymap:
 		COMPILER_READ_BARRIER();
 		ch = *(char *)arg;
 		COMPILER_READ_BARRIER();
-		sync_write(&me->kd_map_lock);
+		kbddev_map_write(me);
 		if (me->kd_pendsz < COMPILER_LENOF(me->kd_pend)) {
 			me->kd_pend[me->kd_pendsz] = ch;
 			++me->kd_pendsz;
-			sync_endwrite(&me->kd_map_lock);
+			kbddev_map_endwrite(me);
 			/* Only one thread can read input, so use `sig_send()'! */
 			sig_send(&me->kd_buf.kb_avail);
 			return 1;
 		}
-		sync_endwrite(&me->kd_map_lock);
+		kbddev_map_endwrite(me);
 	}	break;
 
 	case KBDIO_PUTSTR: {
@@ -1349,13 +1349,13 @@ continue_copy_keymap:
 		if (data.ks_size > COMPILER_LENOF(me->kd_pend))
 			data.ks_size = COMPILER_LENOF(me->kd_pend);
 		memcpy(new_buf, data.ks_text, data.ks_size);
-		sync_write(&me->kd_map_lock);
+		kbddev_map_write(me);
 		avail = COMPILER_LENOF(me->kd_pend) - me->kd_pendsz;
 		if (avail > data.ks_size)
 			avail = data.ks_size;
 		memcpy(&me->kd_pend[me->kd_pendsz], new_buf, avail);
 		me->kd_pendsz += avail;
-		sync_endwrite(&me->kd_map_lock);
+		kbddev_map_endwrite(me);
 		/* Wake up one thread for every added key. */
 		if (avail)
 			sig_sendmany(&me->kd_buf.kb_avail, avail);

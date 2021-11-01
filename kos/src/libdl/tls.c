@@ -93,14 +93,64 @@ struct tls_segment {
 	LLRBTREE_ROOT(dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
 };
 
+/* Helper macros for `struct tls_segment::ts_exlock' */
+#define tls_segment_ex_mustreap(self)   0
+#define tls_segment_ex_reap(self)       (void)0
+#define _tls_segment_ex_reap(self)      (void)0
+#define tls_segment_ex_write(self)      atomic_rwlock_write(&(self)->ts_exlock)
+#define tls_segment_ex_trywrite(self)   atomic_rwlock_trywrite(&(self)->ts_exlock)
+#define tls_segment_ex_endwrite(self)   (atomic_rwlock_endwrite(&(self)->ts_exlock), tls_segment_ex_reap(self))
+#define _tls_segment_ex_endwrite(self)  atomic_rwlock_endwrite(&(self)->ts_exlock)
+#define tls_segment_ex_read(self)       atomic_rwlock_read(&(self)->ts_exlock)
+#define tls_segment_ex_tryread(self)    atomic_rwlock_tryread(&(self)->ts_exlock)
+#define _tls_segment_ex_endread(self)   atomic_rwlock_endread(&(self)->ts_exlock)
+#define tls_segment_ex_endread(self)    (void)(atomic_rwlock_endread(&(self)->ts_exlock) && (tls_segment_ex_reap(self), 0))
+#define _tls_segment_ex_end(self)       atomic_rwlock_end(&(self)->ts_exlock)
+#define tls_segment_ex_end(self)        (void)(atomic_rwlock_end(&(self)->ts_exlock) && (tls_segment_ex_reap(self), 0))
+#define tls_segment_ex_upgrade(self)    atomic_rwlock_upgrade(&(self)->ts_exlock)
+#define tls_segment_ex_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->ts_exlock)
+#define tls_segment_ex_downgrade(self)  atomic_rwlock_downgrade(&(self)->ts_exlock)
+#define tls_segment_ex_reading(self)    atomic_rwlock_reading(&(self)->ts_exlock)
+#define tls_segment_ex_writing(self)    atomic_rwlock_writing(&(self)->ts_exlock)
+#define tls_segment_ex_canread(self)    atomic_rwlock_canread(&(self)->ts_exlock)
+#define tls_segment_ex_canwrite(self)   atomic_rwlock_canwrite(&(self)->ts_exlock)
+#define tls_segment_ex_waitread(self)   atomic_rwlock_waitread(&(self)->ts_exlock)
+#define tls_segment_ex_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->ts_exlock)
+
+
 STATIC_ASSERT_MSG(offsetof(struct tls_segment, ts_self) == 0,
                   "The self-pointer being at offset=0 is ABI mandated");
 
 LIST_HEAD(tls_segment_list, tls_segment);
 
-/* List of all allocated static-tls segments (usually 1 for each thread) */
-PRIVATE struct atomic_rwlock static_tls_lock    = ATOMIC_RWLOCK_INIT;
+/* [0..n][lock(static_tls_lock)] List of all allocated static-tls segments (usually 1 for each thread) */
 PRIVATE struct tls_segment_list static_tls_list = LIST_HEAD_INITIALIZER(static_tls_list);
+PRIVATE struct atomic_rwlock static_tls_lock    = ATOMIC_RWLOCK_INIT;
+
+/* Helper macros for `static_tls_lock' */
+#define static_tls_mustreap()   0
+#define static_tls_reap()       (void)0
+#define _static_tls_reap()      (void)0
+#define static_tls_write()      atomic_rwlock_write(&static_tls_lock)
+#define static_tls_trywrite()   atomic_rwlock_trywrite(&static_tls_lock)
+#define static_tls_endwrite()   (atomic_rwlock_endwrite(&static_tls_lock), static_tls_reap())
+#define _static_tls_endwrite()  atomic_rwlock_endwrite(&static_tls_lock)
+#define static_tls_read()       atomic_rwlock_read(&static_tls_lock)
+#define static_tls_tryread()    atomic_rwlock_tryread(&static_tls_lock)
+#define _static_tls_endread()   atomic_rwlock_endread(&static_tls_lock)
+#define static_tls_endread()    (void)(atomic_rwlock_endread(&static_tls_lock) && (static_tls_reap(), 0))
+#define _static_tls_end()       atomic_rwlock_end(&static_tls_lock)
+#define static_tls_end()        (void)(atomic_rwlock_end(&static_tls_lock) && (static_tls_reap(), 0))
+#define static_tls_upgrade()    atomic_rwlock_upgrade(&static_tls_lock)
+#define static_tls_tryupgrade() atomic_rwlock_tryupgrade(&static_tls_lock)
+#define static_tls_downgrade()  atomic_rwlock_downgrade(&static_tls_lock)
+#define static_tls_reading()    atomic_rwlock_reading(&static_tls_lock)
+#define static_tls_writing()    atomic_rwlock_writing(&static_tls_lock)
+#define static_tls_canread()    atomic_rwlock_canread(&static_tls_lock)
+#define static_tls_canwrite()   atomic_rwlock_canwrite(&static_tls_lock)
+#define static_tls_waitread()   atomic_rwlock_waitread(&static_tls_lock)
+#define static_tls_waitwrite()  atomic_rwlock_waitwrite(&static_tls_lock)
+
 
 /* Minimum alignment of the static TLS segment. */
 PRIVATE size_t static_tls_align = COMPILER_ALIGNOF(struct tls_segment);
@@ -121,21 +171,21 @@ NOTHROW(CC DlModule_RemoveTLSExtension)(DlModule *__restrict self) {
 	struct dtls_extension *chain, *next;
 	chain = NULL;
 again:
-	atomic_rwlock_read(&static_tls_lock);
+	static_tls_read();
 	LIST_FOREACH (iter, &static_tls_list, ts_threads) {
-		if (!atomic_rwlock_trywrite(&iter->ts_exlock)) {
-			atomic_rwlock_endread(&static_tls_lock);
+		if (!tls_segment_ex_trywrite(iter)) {
+			static_tls_endread();
 			sys_sched_yield();
 			goto again;
 		}
 		next = dtls_extension_tree_remove(&iter->ts_extree, self);
-		atomic_rwlock_endwrite(&iter->ts_exlock);
+		tls_segment_ex_endwrite(iter);
 		if (next) {
 			next->te_tree.rb_lhs = chain;
 			chain                = next;
 		}
 	}
-	atomic_rwlock_endread(&static_tls_lock);
+	static_tls_endread();
 	/* Free all instances of extension data for this module. */
 	while (chain) {
 		next = chain->te_tree.rb_lhs;
@@ -288,15 +338,15 @@ INTERN void CC DlModule_RunAllTlsFinalizers(void) THROWS(...) {
 	self = (struct tls_segment *)RD_TLS_BASE_REGISTER();
 	if unlikely(!self)
 		return;
-	atomic_rwlock_write(&self->ts_exlock);
+	tls_segment_ex_write(self);
 	ext_free = self->ts_extree;
 	if (ext_free) {
 		try_incref_extension_table_modules(ext_free);
-		atomic_rwlock_endwrite(&self->ts_exlock);
+		tls_segment_ex_endwrite(self);
 		/* Free the extension tables, and invoke finalizers. */
 		fini_tls_extension_tables(ext_free);
 	} else {
-		atomic_rwlock_endwrite(&self->ts_exlock);
+		tls_segment_ex_endwrite(self);
 	}
 }
 
@@ -320,9 +370,9 @@ NOTHROW(DLFCN_CC libdl_dltlsallocseg)(void) {
 	result->ts_self = result;
 	atomic_rwlock_init(&result->ts_exlock);
 	result->ts_extree = NULL;
-	atomic_rwlock_write(&static_tls_lock);
+	static_tls_write();
 	LIST_INSERT_HEAD(&static_tls_list, result, ts_threads);
-	atomic_rwlock_endwrite(&static_tls_lock);
+	static_tls_endwrite();
 	return result;
 err_nomem:
 	dl_seterror_nomem();
@@ -368,16 +418,16 @@ LOCAL NONNULL((1)) void CC
 clear_extension_table(struct tls_segment *__restrict self)
 		THROWS(...) {
 	struct dtls_extension *ext_free;
-	atomic_rwlock_write(&self->ts_exlock);
+	tls_segment_ex_write(self);
 	ext_free = self->ts_extree;
 	if (ext_free) {
 		self->ts_extree = NULL;
 		try_incref_extension_table_modules(ext_free);
-		atomic_rwlock_endwrite(&self->ts_exlock);
+		tls_segment_ex_endwrite(self);
 		/* Free the extension tables, and invoke finalizers. */
 		delete_extension_tables(ext_free);
 	} else {
-		atomic_rwlock_endwrite(&self->ts_exlock);
+		tls_segment_ex_endwrite(self);
 	}
 }
 
@@ -387,9 +437,9 @@ libdl_dltlsfreeseg(USER struct tls_segment *seg)
 		THROWS(E_SEGFAULT, ...) {
 	if unlikely(!DL_VERIFY_TLS_SEGMENT(seg))
 		goto err_badptr;
-	atomic_rwlock_write(&static_tls_lock);
+	static_tls_write();
 	LIST_REMOVE(seg, ts_threads);
-	atomic_rwlock_endwrite(&static_tls_lock);
+	static_tls_endwrite();
 	clear_extension_table(seg);
 	free((byte_t *)seg - static_tls_size_no_segment);
 	return 0;
@@ -569,10 +619,10 @@ NOTHROW(CC DlModule_TryGetTLSAddr)(DlModule *__restrict self) {
 	/* Simple case: Static TLS */
 	if (self->dm_tlsstoff)
 		return (byte_t *)tls + self->dm_tlsstoff;
-	atomic_rwlock_read(&tls->ts_exlock);
+	tls_segment_ex_read(tls);
 	extab  = dtls_extension_tree_locate(tls->ts_extree, self);
 	result = extab ? extab->te_data : NULL;
-	atomic_rwlock_endread(&tls->ts_exlock);
+	tls_segment_ex_endread(tls);
 	return result;
 }
 

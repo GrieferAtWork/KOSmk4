@@ -123,10 +123,60 @@ LIST_HEAD(dlmodule_list, dlmodule);
 INTDEF struct dlmodule_list DlModule_GlobalList;
 INTDEF struct atomic_rwlock DlModule_GlobalLock;
 
+/* Helper macros for `DlModule_GlobalLock' */
+#define DlModule_GlobalLock_MustReap()   0
+#define DlModule_GlobalLock_Reap()       (void)0
+#define _DlModule_GlobalLock_Reap()      (void)0
+#define DlModule_GlobalLock_Write()      atomic_rwlock_write(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_TryWrite()   atomic_rwlock_trywrite(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_EndWrite()   (atomic_rwlock_endwrite(&DlModule_GlobalLock), DlModule_GlobalLock_Reap())
+#define _DlModule_GlobalLock_EndWrite()  atomic_rwlock_endwrite(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_Read()       atomic_rwlock_read(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_Tryread()    atomic_rwlock_tryread(&DlModule_GlobalLock)
+#define _DlModule_GlobalLock_EndRead()   atomic_rwlock_endread(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_EndRead()    (void)(atomic_rwlock_endread(&DlModule_GlobalLock) && (DlModule_GlobalLock_Reap(), 0))
+#define _DlModule_GlobalLock_End()       atomic_rwlock_end(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_End()        (void)(atomic_rwlock_end(&DlModule_GlobalLock) && (DlModule_GlobalLock_Reap(), 0))
+#define DlModule_GlobalLock_Upgrade()    atomic_rwlock_upgrade(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_TryUpgrade() atomic_rwlock_tryupgrade(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_Downgrade()  atomic_rwlock_downgrade(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_Reading()    atomic_rwlock_reading(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_Writing()    atomic_rwlock_writing(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_CanRead()    atomic_rwlock_canread(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_CanWrite()   atomic_rwlock_canwrite(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_WaitRead()   atomic_rwlock_waitread(&DlModule_GlobalLock)
+#define DlModule_GlobalLock_WaitWrite()  atomic_rwlock_waitwrite(&DlModule_GlobalLock)
+
+
 /* [1..1] List of all loaded modules. */
 DLIST_HEAD(dlmodule_dlist, dlmodule);
 INTDEF struct dlmodule_dlist DlModule_AllList;
 INTDEF struct atomic_rwlock DlModule_AllLock;
+
+/* Helper macros for `DlModule_AllLock' */
+#define DlModule_AllLock_MustReap()   0
+#define DlModule_AllLock_Reap()       (void)0
+#define _DlModule_AllLock_Reap()      (void)0
+#define DlModule_AllLock_Write()      atomic_rwlock_write(&DlModule_AllLock)
+#define DlModule_AllLock_TryWrite()   atomic_rwlock_trywrite(&DlModule_AllLock)
+#define DlModule_AllLock_EndWrite()   (atomic_rwlock_endwrite(&DlModule_AllLock), DlModule_AllLock_Reap())
+#define _DlModule_AllLock_EndWrite()  atomic_rwlock_endwrite(&DlModule_AllLock)
+#define DlModule_AllLock_Read()       atomic_rwlock_read(&DlModule_AllLock)
+#define DlModule_AllLock_Tryread()    atomic_rwlock_tryread(&DlModule_AllLock)
+#define _DlModule_AllLock_EndRead()   atomic_rwlock_endread(&DlModule_AllLock)
+#define DlModule_AllLock_EndRead()    (void)(atomic_rwlock_endread(&DlModule_AllLock) && (DlModule_AllLock_Reap(), 0))
+#define _DlModule_AllLock_End()       atomic_rwlock_end(&DlModule_AllLock)
+#define DlModule_AllLock_End()        (void)(atomic_rwlock_end(&DlModule_AllLock) && (DlModule_AllLock_Reap(), 0))
+#define DlModule_AllLock_Upgrade()    atomic_rwlock_upgrade(&DlModule_AllLock)
+#define DlModule_AllLock_TryUpgrade() atomic_rwlock_tryupgrade(&DlModule_AllLock)
+#define DlModule_AllLock_Downgrade()  atomic_rwlock_downgrade(&DlModule_AllLock)
+#define DlModule_AllLock_Reading()    atomic_rwlock_reading(&DlModule_AllLock)
+#define DlModule_AllLock_Writing()    atomic_rwlock_writing(&DlModule_AllLock)
+#define DlModule_AllLock_CanRead()    atomic_rwlock_canread(&DlModule_AllLock)
+#define DlModule_AllLock_CanWrite()   atomic_rwlock_canwrite(&DlModule_AllLock)
+#define DlModule_AllLock_WaitRead()   atomic_rwlock_waitread(&DlModule_AllLock)
+#define DlModule_AllLock_WaitWrite()  atomic_rwlock_waitwrite(&DlModule_AllLock)
+
 
 #define DlModule_GlobalList_FOREACH(mod) \
 	LIST_FOREACH (mod, &DlModule_GlobalList, dm_globals)

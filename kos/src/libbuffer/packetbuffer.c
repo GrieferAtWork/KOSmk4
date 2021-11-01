@@ -47,13 +47,13 @@
 
 DECL_BEGIN
 
-#define lock()    atomic_rwlock_write(&self->pb_lock)
-#define trylock() atomic_rwlock_trywrite(&self->pb_lock)
-#define unlock()  atomic_rwlock_endwrite(&self->pb_lock)
+#define lock()    pb_buffer_lock_write(self)
+#define trylock() pb_buffer_lock_trywrite(self)
+#define unlock()  pb_buffer_lock_endwrite(self)
 
-#define rlock()    atomic_rwlock_read(&self->pb_lock)
-#define tryrlock() atomic_rwlock_tryread(&self->pb_lock)
-#define runlock()  atomic_rwlock_endread(&self->pb_lock)
+#define rlock()    pb_buffer_lock_read(self)
+#define tryrlock() pb_buffer_lock_tryread(self)
+#define runlock()  pb_buffer_lock_endread(self)
 
 
 #ifdef __KERNEL__

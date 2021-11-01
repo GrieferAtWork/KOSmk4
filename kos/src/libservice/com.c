@@ -1028,9 +1028,9 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 	       kind == SERVICE_FUNCTION_ENTRY_KIND_EXCEPT);
 
 	/* Check if the requested function had already been queried in the past. */
-	atomic_rwlock_read(&self->s_textlock);
+	service_textlock_read(self);
 	{
-		RAII_FINALLY { atomic_rwlock_endread(&self->s_textlock); };
+		RAII_FINALLY { service_textlock_endread(self); };
 		entry = service_dlsym_lookup(self, name);
 	}
 	if (entry && entry->sfe_entries[kind] != NULL)
@@ -1045,7 +1045,7 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 	/* Compile the wrapper function. */
 	tx_bufsize = COM_GENERATOR_INITIAL_TX_BUFSIZ;
 	eh_bufsize = COM_GENERATOR_INITIAL_EH_BUFSIZ;
-	atomic_rwlock_write(&self->s_textlock);
+	service_textlock_write(self);
 	TRY {
 		tx_range = SLIST_FIRST(&self->s_txranges);
 		eh_range = SLIST_FIRST(&self->s_ehranges);
@@ -1054,7 +1054,7 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 		 * It may be if another thread created it while the server was telling us about it. */
 		entry = service_dlsym_lookup(self, name);
 		if unlikely(entry && entry->sfe_entries[kind] != NULL) {
-			atomic_rwlock_endwrite(&self->s_textlock);
+			service_textlock_endwrite(self);
 			goto done;
 		}
 
@@ -1122,7 +1122,7 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 	} EXCEPT {
 		service_free_textrange(self, tx_range);
 		service_free_textrange(self, eh_range);
-		atomic_rwlock_endwrite(&self->s_textlock);
+		service_textlock_endwrite(self);
 		RETHROW();
 	}
 
@@ -1133,11 +1133,11 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 		SLIST_INSERT(&self->s_txranges, tx_range, str_link);
 	if (eh_range != SLIST_FIRST(&self->s_ehranges)) {
 		SLIST_INSERT(&self->s_ehranges, eh_range, str_link);
-		atomic_rwlock_endwrite(&self->s_textlock);
+		service_textlock_endwrite(self);
 		/* First-time use of this .eh_frame range: register for use by libunwind! */
 		__register_frame(eh_range->str_data);
 	} else {
-		atomic_rwlock_endwrite(&self->s_textlock);
+		service_textlock_endwrite(self);
 	}
 done:
 	return entry->sfe_entries[kind];

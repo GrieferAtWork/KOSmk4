@@ -309,16 +309,16 @@ again_old_flags:
 	old_flags = ATOMIC_READ(self->dm_flags);
 	if ((mode & RTLD_GLOBAL) && !(old_flags & RTLD_GLOBAL)) {
 		/* Make the module global. */
-		atomic_rwlock_write(&DlModule_GlobalLock);
+		DlModule_GlobalLock_Write();
 		if (!ATOMIC_CMPXCH_WEAK(self->dm_flags, old_flags,
 		                        old_flags | RTLD_GLOBAL)) {
-			atomic_rwlock_endwrite(&DlModule_GlobalLock);
+			DlModule_GlobalLock_EndWrite();
 			goto again_old_flags;
 		}
 		assert(!LIST_ISBOUND(self, dm_globals));
 		DlModule_AddToGlobals(self);
 		assert(LIST_ISBOUND(self, dm_globals));
-		atomic_rwlock_endwrite(&DlModule_GlobalLock);
+		DlModule_GlobalLock_EndWrite();
 	}
 }
 
@@ -616,7 +616,7 @@ libdl_dlsym(USER DlModule *self, USER char const *name)
 	weak_symbol.ds_mod  = NULL;
 	if (self == RTLD_DEFAULT) {
 		/* Search all modules in order of being loaded. */
-		atomic_rwlock_read(&DlModule_GlobalLock);
+		DlModule_GlobalLock_Read();
 		symbol.ds_mod = LIST_FIRST(&DlModule_GlobalList);
 		assert(symbol.ds_mod);
 		for (;;) {
@@ -624,12 +624,12 @@ libdl_dlsym(USER DlModule *self, USER char const *name)
 again_search_globals_next_noref:
 				symbol.ds_mod = LIST_NEXT(symbol.ds_mod, dm_globals);
 				if unlikely(!symbol.ds_mod) {
-					atomic_rwlock_endread(&DlModule_GlobalLock);
+					DlModule_GlobalLock_EndRead();
 					break;
 				}
 				continue;
 			}
-			atomic_rwlock_endread(&DlModule_GlobalLock);
+			DlModule_GlobalLock_EndRead();
 again_search_globals_module:
 			/* Search this module. */
 			if (symbol.ds_mod == &dl_rtld_module) {
@@ -702,11 +702,11 @@ again_search_globals_module:
 					}
 				}
 			}
-			atomic_rwlock_read(&DlModule_GlobalLock);
+			DlModule_GlobalLock_Read();
 			next_module = LIST_NEXT(symbol.ds_mod, dm_globals);
 			while (likely(next_module) && unlikely(!tryincref(next_module)))
 				next_module = LIST_NEXT(next_module, dm_globals);
-			atomic_rwlock_endread(&DlModule_GlobalLock);
+			DlModule_GlobalLock_EndRead();
 			decref(symbol.ds_mod);
 			if unlikely(!next_module)
 				break;
@@ -755,7 +755,7 @@ again_search_globals_module:
 		/* Search modules loaded after `symbol.ds_mod' */
 		if unlikely(!symbol.ds_mod)
 			goto err_rtld_next_no_base;
-		atomic_rwlock_read(&DlModule_GlobalLock);
+		DlModule_GlobalLock_Read();
 		goto again_search_globals_next_noref;
 	} else {
 		if unlikely(self == &dl_rtld_module) {
@@ -904,7 +904,7 @@ NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int fla
 		dl_seterrorf("Invalid flags %#x passed to `dlgethandle()'", flags);
 		goto err;
 	}
-	atomic_rwlock_read(&DlModule_AllLock);
+	DlModule_AllLock_Read();
 	DlModule_AllList_FOREACH(result) {
 		uint16_t i;
 		if ((uintptr_t)static_pointer < result->dm_loadstart)
@@ -932,7 +932,7 @@ NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int fla
 			goto got_result;
 		}
 	}
-	atomic_rwlock_endread(&DlModule_AllLock);
+	DlModule_AllLock_EndRead();
 	dl_seterror_no_mod_at_addr(static_pointer);
 err:
 	return NULL;
@@ -941,7 +941,7 @@ got_result:
 	if ((flags & DLGETHANDLE_FINCREF) &&
 	    !(result->dm_flags & RTLD_NODELETE))
 		incref(result);
-	atomic_rwlock_endread(&DlModule_AllLock);
+	DlModule_AllLock_EndRead();
 	return result;
 }
 
@@ -971,7 +971,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 		dl_seterrorf("Invalid flags %#x passed to `dlgetmodule()'", flags);
 		goto err;
 	}
-	atomic_rwlock_read(&DlModule_AllLock);
+	DlModule_AllLock_Read();
 	DlModule_AllList_FOREACH(result) {
 		if (strcmp(result->dm_filename, name) == 0)
 			goto got_result;
@@ -1060,7 +1060,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 				goto got_result;
 		}
 	}
-	atomic_rwlock_endread(&DlModule_AllLock);
+	DlModule_AllLock_EndRead();
 	dl_seterrorf("Unknown module %q", name);
 err:
 	return NULL;
@@ -1068,7 +1068,7 @@ got_result:
 	if ((flags & DLGETHANDLE_FINCREF) &&
 	    !(result->dm_flags & RTLD_NODELETE))
 		incref(result);
-	atomic_rwlock_endread(&DlModule_AllLock);
+	DlModule_AllLock_EndRead();
 	return result;
 }
 
@@ -1201,16 +1201,15 @@ NOTHROW_NCX(CC DlSection_Destroy)(USER DlSection *self)
 	if (self->ds_cdata != (void *)-1 && self->ds_cdata != self->ds_data)
 		sys_munmap(self->ds_cdata, self->ds_csize);
 again:
-	atomic_rwlock_write(&self->ds_module_lock);
+	DlSection_ModuleWrite(self);
 	mod = self->ds_module;
 	if (mod) {
-		if (!atomic_rwlock_trywrite(&mod->dm_sections_lock)) {
+		if (!DlModule_SectionsTryWrite(mod)) {
 			bool hasref;
 			hasref = tryincref(mod);
-			atomic_rwlock_endwrite(&self->ds_module_lock);
+			DlSection_ModuleEndWrite(self);
 			if (hasref) {
-				atomic_rwlock_write(&mod->dm_sections_lock);
-				atomic_rwlock_endwrite(&mod->dm_sections_lock);
+				DlModule_SectionsWaitWrite(mod);
 				decref(mod);
 			}
 			goto again;
@@ -1219,10 +1218,10 @@ again:
 		assert(self->ds_index < mod->dm_shnum);
 		assert(mod->dm_sections[self->ds_index] == self);
 		mod->dm_sections[self->ds_index] = NULL;
-		atomic_rwlock_endwrite(&mod->dm_sections_lock);
+		DlModule_SectionsEndWrite(mod);
 		self->ds_module = NULL;
 	}
-	atomic_rwlock_endwrite(&self->ds_module_lock);
+	DlSection_ModuleEndWrite(self);
 	/* Drop the reference stored in `ds_module' */
 	if (mod && !(self->ds_flags & DLSECTION_FLAG_OWNED))
 		decref(mod);
@@ -1688,14 +1687,14 @@ NOTHROW_NCX(CC libdl_dllocksection_aux)(DlModule *__restrict self,
 
 	/* Check if this section had already been loaded. */
 	real_index = (size_t)self->dm_elf.de_shnum + index;
-	atomic_rwlock_read(&self->dm_sections_lock);
+	DlModule_SectionsRead(self);
 	if ((real_index < self->dm_shnum) &&
 	    (result = self->dm_sections[real_index]) != NULL &&
 	    DlSection_TryIncref(result)) {
-		atomic_rwlock_endread(&self->dm_sections_lock);
+		DlModule_SectionsEndRead(self);
 		return result;
 	}
-	atomic_rwlock_endread(&self->dm_sections_lock);
+	DlModule_SectionsEndRead(self);
 
 	/* Must create the section from scratch (or at least try to) */
 	result = create_aux_section(self, index, flags);
@@ -1704,18 +1703,18 @@ NOTHROW_NCX(CC libdl_dllocksection_aux)(DlModule *__restrict self,
 
 	/* Save the newly created section */
 again_save_results:
-	atomic_rwlock_write(&self->dm_sections_lock);
+	DlModule_SectionsWrite(self);
 	if (real_index >= self->dm_shnum) {
 		/* Must allocate a larger section vector. */
 		DlSection **newvec, **oldvec;
-		atomic_rwlock_endwrite(&self->dm_sections_lock);
+		DlModule_SectionsEndWrite(self);
 		newvec = (DlSection **)calloc(real_index + 1, sizeof(DlSection *));
 		if unlikely(!newvec) {
 			destroy_aux_section(result);
 			dl_seterror_nomem();
 			return NULL;
 		}
-		atomic_rwlock_write(&self->dm_sections_lock);
+		DlModule_SectionsWrite(self);
 		if unlikely(real_index < self->dm_shnum) {
 			oldvec = newvec;
 		} else {
@@ -1725,7 +1724,7 @@ again_save_results:
 			self->dm_sections = newvec;
 			self->dm_shnum    = real_index + 1;
 		}
-		atomic_rwlock_endwrite(&self->dm_sections_lock);
+		DlModule_SectionsEndWrite(self);
 		/* Free the old vector. */
 		free(oldvec);
 		goto again_save_results;
@@ -1734,7 +1733,7 @@ again_save_results:
 	            DlSection_TryIncref(self->dm_sections[real_index])) {
 		REF DlSection *real_result;
 		real_result = self->dm_sections[real_index];
-		atomic_rwlock_endwrite(&self->dm_sections_lock);
+		DlModule_SectionsEndWrite(self);
 		destroy_aux_section(result);
 		return real_result;
 	}
@@ -1756,7 +1755,7 @@ again_save_results:
 	result->ds_cdata    = (void *)-1;
 	result->ds_csize    = 0;
 	self->dm_sections[real_index] = result;
-	atomic_rwlock_endwrite(&self->dm_sections_lock);
+	DlModule_SectionsEndWrite(self);
 	return result;
 }
 
@@ -1820,33 +1819,33 @@ err_unknown_section:
 			index = (size_t)name;
 		}
 again_lock_sections:
-		atomic_rwlock_read(&self->dm_sections_lock);
+		DlModule_SectionsRead(self);
 		if (!self->dm_sections) {
 			DlSection **sec_vec;
 			size_t shnum = self->dm_shnum;
 			/* Must allocate the initial sections vector. */
-			atomic_rwlock_endread(&self->dm_sections_lock);
+			DlModule_SectionsEndRead(self);
 			sec_vec = (DlSection **)calloc(shnum, sizeof(DlSection *));
 			if unlikely(!sec_vec)
 				goto err_nomem;
-			atomic_rwlock_write(&self->dm_sections_lock);
+			DlModule_SectionsWrite(self);
 			COMPILER_READ_BARRIER();
 			if likely(!self->dm_sections && self->dm_shnum == shnum) {
 				self->dm_sections = sec_vec;
 			} else {
-				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				DlModule_SectionsEndWrite(self);
 				free(sec_vec);
 				COMPILER_READ_BARRIER();
 				goto again_lock_sections;
 			}
-			atomic_rwlock_downgrade(&self->dm_sections_lock);
+			DlModule_SectionsDowngrade(self);
 		}
 again_read_section:
 		result = self->dm_sections[index];
 		if (!result || !DlSection_TryIncref(result)) {
 			int error;
 			/* Must allocate a descriptor for this section. */
-			atomic_rwlock_endread(&self->dm_sections_lock);
+			DlModule_SectionsEndRead(self);
 			result = (REF DlSection *)malloc(sizeof(DlSection));
 			if unlikely(!result)
 				goto err_nomem;
@@ -1876,21 +1875,21 @@ again_read_section:
 				result->ds_data  = (void *)-1;
 				result->ds_flags = DLSECTION_FLAG_OWNED;
 			}
-			atomic_rwlock_write(&self->dm_sections_lock);
+			DlModule_SectionsWrite(self);
 			if likely(!self->dm_sections[index]) {
 				self->dm_sections[index] = result;
 			} else {
 				/* Race condition: The section was already allocated in a different thread. */
-				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				DlModule_SectionsEndWrite(self);
 				free(result);
-				atomic_rwlock_read(&self->dm_sections_lock);
+				DlModule_SectionsRead(self);
 				goto again_read_section;
 			}
-			atomic_rwlock_downgrade(&self->dm_sections_lock);
+			DlModule_SectionsDowngrade(self);
 		} else {
 			info.dsi_size = 0;
 		}
-		atomic_rwlock_endread(&self->dm_sections_lock);
+		DlModule_SectionsEndRead(self);
 		if (result->ds_data == (void *)-1 && !(flags & DLLOCKSECTION_FNODATA) &&
 		    (result->ds_flags & DLSECTION_FLAG_OWNED)) {
 			unsigned int prot;
@@ -1960,16 +1959,16 @@ again_read_section:
 		assert(sect < self->dm_elf.de_shdr + self->dm_elf.de_shnum);
 		index = (size_t)(sect - self->dm_elf.de_shdr);
 again_lock_elf_sections:
-		atomic_rwlock_read(&self->dm_sections_lock);
+		DlModule_SectionsRead(self);
 		if (!self->dm_sections || self->dm_elf.de_shnum > self->dm_shnum) {
 			DlSection **sec_vec;
 			/* Must allocate the initial sections vector. */
-			atomic_rwlock_endread(&self->dm_sections_lock);
+			DlModule_SectionsEndRead(self);
 			sec_vec = (DlSection **)calloc(self->dm_elf.de_shnum,
 			                               sizeof(DlSection *));
 			if unlikely(!sec_vec)
 				goto err_nomem;
-			atomic_rwlock_write(&self->dm_sections_lock);
+			DlModule_SectionsWrite(self);
 			COMPILER_READ_BARRIER();
 			if likely(!self->dm_sections) {
 				self->dm_sections = sec_vec;
@@ -1979,21 +1978,21 @@ again_lock_elf_sections:
 				memcpy(sec_vec, old_vec, self->dm_shnum, sizeof(DlSection *));
 				self->dm_sections = sec_vec;
 				self->dm_shnum    = self->dm_elf.de_shnum;
-				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				DlModule_SectionsEndWrite(self);
 				free(old_vec);
 				goto again_lock_elf_sections;
 			} else {
-				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				DlModule_SectionsEndWrite(self);
 				free(sec_vec);
 				goto again_lock_elf_sections;
 			}
-			atomic_rwlock_downgrade(&self->dm_sections_lock);
+			DlModule_SectionsDowngrade(self);
 		}
 again_read_elf_section:
 		result = self->dm_sections[index];
 		if (!result || !DlSection_TryIncref(result)) {
 			/* Must allocate a descriptor for this section. */
-			atomic_rwlock_endread(&self->dm_sections_lock);
+			DlModule_SectionsEndRead(self);
 			result = (REF DlSection *)malloc(sizeof(DlSection));
 			if unlikely(!result)
 				goto err_nomem;
@@ -2017,19 +2016,19 @@ again_read_elf_section:
 				result->ds_data  = (void *)-1;
 				result->ds_flags = DLSECTION_FLAG_OWNED;
 			}
-			atomic_rwlock_write(&self->dm_sections_lock);
+			DlModule_SectionsWrite(self);
 			if likely(!self->dm_sections[index]) {
 				self->dm_sections[index] = result;
 			} else {
 				/* Race condition: The section was already allocated in a different thread. */
-				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				DlModule_SectionsEndWrite(self);
 				free(result);
-				atomic_rwlock_read(&self->dm_sections_lock);
+				DlModule_SectionsRead(self);
 				goto again_read_elf_section;
 			}
-			atomic_rwlock_downgrade(&self->dm_sections_lock);
+			DlModule_SectionsDowngrade(self);
 		}
-		atomic_rwlock_endread(&self->dm_sections_lock);
+		DlModule_SectionsEndRead(self);
 		if (result->ds_data == (void *)-1 && !(flags & DLLOCKSECTION_FNODATA) &&
 		    (result->ds_flags & DLSECTION_FLAG_OWNED)) {
 			unsigned int prot;
@@ -2091,22 +2090,22 @@ NOTHROW_NCX(DLFCN_CC libdl_dlunlocksection)(USER REF DlSection *sect)
 	{
 		REF DlModule *mod;
 set_dangling_section:
-		atomic_rwlock_read(&sect->ds_module_lock);
+		DlSection_ModuleRead(sect);
 		mod = sect->ds_module;
 		if (mod && !tryincref(mod))
 			mod = NULL;
-		atomic_rwlock_endread(&sect->ds_module_lock);
+		DlSection_ModuleEndRead(sect);
 		if (mod) {
-			atomic_rwlock_write(&mod->dm_sections_lock);
+			DlModule_SectionsWrite(mod);
 			/* Insert the section into the set of dangling sections of this module. */
 			if likely(sect->ds_dangling == (REF DlSection *)-1) {
 				sect->ds_dangling         = mod->dm_sections_dangling;
 				mod->dm_sections_dangling = sect;
-				atomic_rwlock_endwrite(&mod->dm_sections_lock);
+				DlModule_SectionsEndWrite(mod);
 				decref(mod);
 				return 0;
 			}
-			atomic_rwlock_endwrite(&mod->dm_sections_lock);
+			DlModule_SectionsEndWrite(mod);
 			decref(mod);
 		}
 	}
@@ -2137,15 +2136,15 @@ NOTHROW_NCX(DLFCN_CC libdl_dlsectionname)(USER DlSection *sect)
 	REF DlModule *mod;
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
-	atomic_rwlock_read(&sect->ds_module_lock);
+	DlSection_ModuleRead(sect);
 	mod = sect->ds_module;
 	if (!mod || !tryincref(mod)) {
-		atomic_rwlock_endread(&sect->ds_module_lock);
+		DlSection_ModuleEndRead(sect);
 err_mod_unloaded:
 		dl_seterrorf("Module associated with section was unloaded");
 		goto err;
 	}
-	atomic_rwlock_endread(&sect->ds_module_lock);
+	DlSection_ModuleEndRead(sect);
 	if (mod == &dl_rtld_module) {
 		/* Special case: the RTLD driver module. */
 		assert(sect->ds_index < BUILTIN_SECTIONS_COUNT);
@@ -2215,16 +2214,16 @@ NOTHROW_NCX(DLFCN_CC libdl_dlsectionmodule)(USER DlSection *sect, unsigned int f
 		dl_seterrorf("Invalid flags %#x passed to `dlsectionmodule()'", flags);
 		goto err;
 	}
-	atomic_rwlock_read(&sect->ds_module_lock);
+	DlSection_ModuleRead(sect);
 	mod = sect->ds_module;
 	if (!mod || ((flags & DLGETHANDLE_FINCREF)
 	             ? !tryincref(mod)
 	             : !ATOMIC_READ(mod->dm_refcnt))) {
-		atomic_rwlock_endread(&sect->ds_module_lock);
+		DlSection_ModuleEndRead(sect);
 		dl_seterrorf("Module associated with section was unloaded");
 		goto err;
 	}
-	atomic_rwlock_endread(&sect->ds_module_lock);
+	DlSection_ModuleEndRead(sect);
 	return mod;
 err_bad_section:
 	dl_seterror_badsection(sect);
@@ -2476,12 +2475,12 @@ INTERN int DLFCN_CC libdl_dlclearcaches(void) THROWS(...) {
 	{
 		DlModule *module_iter;
 again_clear_modules:
-		atomic_rwlock_read(&DlModule_AllLock);
+		DlModule_AllLock_Read();
 		DlModule_AllList_FOREACH(module_iter) {
 			refcnt_t refcnt;
 			if (!tryincref(module_iter))
 				continue;
-			atomic_rwlock_endread(&DlModule_AllLock);
+			DlModule_AllLock_EndRead();
 			if (DlModule_InvokeDlCacheFunctions(module_iter))
 				result = 1;
 again_try_descref_module_iter:
@@ -2490,30 +2489,29 @@ again_try_descref_module_iter:
 				decref(module_iter);
 				goto again_clear_modules;
 			}
-			atomic_rwlock_read(&DlModule_AllLock);
+			DlModule_AllLock_Read();
 			if (!ATOMIC_CMPXCH_WEAK(module_iter->dm_refcnt, refcnt, refcnt - 1)) {
-				atomic_rwlock_endread(&DlModule_AllLock);
+				DlModule_AllLock_EndRead();
 				goto again_try_descref_module_iter;
 			}
 		}
-		atomic_rwlock_endread(&DlModule_AllLock);
+		DlModule_AllLock_EndRead();
 	}
 	{
 		DlModule *module_iter;
 		/* Delete dangling sections. */
 again_lock_global:
-		atomic_rwlock_read(&DlModule_AllLock);
+		DlModule_AllLock_Read();
 		DlModule_AllList_FOREACH(module_iter) {
 			REF DlSection *temp;
 			if (!ATOMIC_READ(module_iter->dm_sections_dangling))
 				continue;
-			if (!atomic_rwlock_trywrite(&module_iter->dm_sections_lock)) {
+			if (!DlModule_SectionsTryWrite(module_iter)) {
 				bool hasref;
 				hasref = tryincref(module_iter);
-				atomic_rwlock_endread(&DlModule_AllLock);
+				DlModule_AllLock_EndRead();
 				if (hasref) {
-					atomic_rwlock_write(&module_iter->dm_sections_lock);
-					atomic_rwlock_endwrite(&module_iter->dm_sections_lock);
+					DlModule_SectionsWaitWrite(module_iter);
 					decref(module_iter);
 				}
 				goto again_lock_global;
@@ -2524,16 +2522,16 @@ again_lock_global:
 				/* Steal a reference to this section. */
 				module_iter->dm_sections_dangling = temp->ds_dangling;
 				temp->ds_dangling                 = (REF DlSection *)-1;
-				atomic_rwlock_endwrite(&module_iter->dm_sections_lock);
-				atomic_rwlock_endread(&DlModule_AllLock);
+				DlModule_SectionsEndWrite(module_iter);
+				DlModule_AllLock_EndRead();
 				/* Drop this reference. */
 				DlSection_Decref(temp);
 				result = 1;
 				goto again_lock_global;
 			}
-			atomic_rwlock_endwrite(&module_iter->dm_sections_lock);
+			DlModule_SectionsEndWrite(module_iter);
 		}
-		atomic_rwlock_endread(&DlModule_AllLock);
+		DlModule_AllLock_EndRead();
 	}
 	/* Also trim malloc memory from our heap implementation. */
 	if (malloc_trim(0))
@@ -2547,7 +2545,7 @@ DlModule_RunAllModuleFinalizers(void)
 		THROWS(...) {
 	DlModule *mod;
 again:
-	atomic_rwlock_read(&DlModule_AllLock);
+	DlModule_AllLock_Read();
 	DlModule_AllList_FOREACH(mod) {
 		size_t i, fini_array_size;
 		uintptr_t fini_func;
@@ -2558,7 +2556,7 @@ again:
 			continue;
 		if unlikely(!tryincref(mod))
 			continue;
-		atomic_rwlock_endread(&DlModule_AllLock);
+		DlModule_AllLock_EndRead();
 		/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */
 		if (mod->dm_finalize)
 			dlmodule_finalizers_run(mod->dm_finalize);
@@ -2615,7 +2613,7 @@ decref_module_and_continue:
 		decref(mod);
 		goto again;
 	}
-	atomic_rwlock_endread(&DlModule_AllLock);
+	DlModule_AllLock_EndRead();
 }
 
 
@@ -2975,14 +2973,14 @@ libdl_iterate_phdr(USER __dl_iterator_callback callback, USER void *arg)
 		THROWS(E_SEGFAULT, ...) {
 	int result = 0;
 	REF DlModule *current, *next;
-	atomic_rwlock_read(&DlModule_AllLock);
+	DlModule_AllLock_Read();
 	current = DLIST_FIRST(&DlModule_AllList);
 	while (current) {
 		if (!tryincref(current)) {
 			current = DLIST_NEXT(current, dm_modules);
 			continue;
 		}
-		atomic_rwlock_endread(&DlModule_AllLock);
+		DlModule_AllLock_EndRead();
 got_current:
 		TRY {
 			result = DlModule_IteratePhdr(current, callback, arg);
@@ -2995,11 +2993,11 @@ got_current:
 			break;
 		}
 		/* Try to lock the next module. */
-		atomic_rwlock_read(&DlModule_AllLock);
+		DlModule_AllLock_Read();
 		next = DLIST_NEXT(current, dm_modules);
 		while (next && !tryincref(next))
 			next = DLIST_NEXT(next, dm_modules);
-		atomic_rwlock_endread(&DlModule_AllLock);
+		DlModule_AllLock_EndRead();
 		/* Continue enumerating the next module. */
 		decref_unlikely(current);
 		if (!next)
@@ -3007,7 +3005,7 @@ got_current:
 		current = next;
 		goto got_current;
 	}
-	atomic_rwlock_endread(&DlModule_AllLock);
+	DlModule_AllLock_EndRead();
 	return result;
 }
 

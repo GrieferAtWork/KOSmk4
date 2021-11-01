@@ -141,7 +141,7 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
 				self->rb_data = NULL;
 				self->rb_size = 0;
 				self->rb_rptr = 0;
-				atomic_rwlock_endwrite(&self->rb_lock);
+				ringbuffer_lock_endwrite(self);
 #ifdef __KERNEL__
 				heap_free(&kernel_default_heap,
 				          free_ptr, free_siz, GFP_NORMAL);
@@ -178,7 +178,7 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
 			}
 		}
 	}
-	atomic_rwlock_endwrite(&self->rb_lock);
+	ringbuffer_lock_endwrite(self);
 }
 
 
@@ -257,7 +257,7 @@ libringbuffer_read_nonblock(struct ringbuffer *__restrict self,
 #ifdef __KERNEL__
 again:
 #endif /* __KERNEL__ */
-	atomic_rwlock_write(&self->rb_lock);
+	ringbuffer_lock_write(self);
 #ifdef __KERNEL__
 again_locked:
 #endif /* __KERNEL__ */
@@ -303,7 +303,7 @@ copy_faulting_byte:
 			((byte_t *)dst)[result] = next_byte; /* CAUTION: SEGFAULT */
 			COMPILER_WRITE_BARRIER();
 			/* Try to re-acquire the lock. */
-			if unlikely(!atomic_rwlock_trywrite(&self->rb_lock)) {
+			if unlikely(!ringbuffer_lock_trywrite(self)) {
 				if (!result)
 					goto again; /* Don't indicate EOF if there is done. */
 				goto done;      /* Better just give the caller what we've found */
@@ -399,7 +399,7 @@ copy_faulting_byte:
 	if (result) {
 		ringbuffer_trimbuf_and_endwrite(self);
 	} else {
-		atomic_rwlock_endwrite(&self->rb_lock);
+		ringbuffer_lock_endwrite(self);
 	}
 #ifdef __KERNEL__
 done:
@@ -588,7 +588,7 @@ again:
 		if unlikely(!num_bytes)
 			goto done; /* No-op */
 		/* Check if we must allocate a new/larger buffer. */
-		atomic_rwlock_read(&self->rb_lock);
+		ringbuffer_lock_read(self);
 		limit = ATOMIC_READ(self->rb_limit);
 		if (self->rb_size < limit &&
 		    self->rb_avail >= self->rb_size) {
@@ -596,7 +596,7 @@ again:
 			heapptr_t new_buffer;
 			/* Allocate a larger buffer. */
 			new_bufsize = self->rb_avail + num_bytes;
-			atomic_rwlock_endread(&self->rb_lock);
+			ringbuffer_lock_endread(self);
 			if unlikely(new_bufsize > limit)
 				new_bufsize = limit;
 			/* Allocate the new buffer. */
@@ -612,7 +612,7 @@ again:
 #endif /* !__KERNEL__ */
 			assert(heapptr_getsiz(new_buffer) >= new_bufsize);
 			TRY {
-				atomic_rwlock_write(&self->rb_lock);
+				ringbuffer_lock_write(self);
 			} EXCEPT {
 				heap_free(&kernel_default_heap,
 				          heapptr_getptr(new_buffer),
@@ -644,7 +644,7 @@ again:
 					self->rb_size  = heapptr_getsiz(new_buffer);
 					self->rb_rptr  = 0;
 					self->rb_rdtot = 0;
-					atomic_rwlock_endwrite(&self->rb_lock);
+					ringbuffer_lock_endwrite(self);
 					heap_free(&kernel_default_heap,
 					          old_buffer_base,
 					          old_buffer_size,
@@ -655,10 +655,10 @@ again:
 					self->rb_rdtot = 0;
 					assert(self->rb_rptr == 0);
 					assert(self->rb_avail == 0);
-					atomic_rwlock_endwrite(&self->rb_lock);
+					ringbuffer_lock_endwrite(self);
 				}
 			} else {
-				atomic_rwlock_endwrite(&self->rb_lock);
+				ringbuffer_lock_endwrite(self);
 				heap_free(&kernel_default_heap,
 				          heapptr_getptr(new_buffer),
 				          heapptr_getsiz(new_buffer),
@@ -666,7 +666,7 @@ again:
 			}
 			goto again;
 		}
-		atomic_rwlock_endread(&self->rb_lock);
+		ringbuffer_lock_endread(self);
 	}
 done:
 	return result;
@@ -687,7 +687,7 @@ libringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict self,
 #ifdef __KERNEL__
 again:
 #endif /* __KERNEL__ */
-	atomic_rwlock_write(&self->rb_lock);
+	ringbuffer_lock_write(self);
 #ifdef __KERNEL__
 again_locked:
 #endif /* __KERNEL__ */
@@ -744,7 +744,7 @@ again_locked:
 			result += temp;
 copy_faulting_byte:
 			next_byte_pos = self->rb_rdtot + self->rb_avail;
-			atomic_rwlock_endwrite(&self->rb_lock);
+			ringbuffer_lock_endwrite(self);
 			if (was_empty)
 				sched_signal_broadcast(&self->rb_nempty);
 			/* Try to copy `next_byte' from the user-supplied buffer */
@@ -752,7 +752,7 @@ copy_faulting_byte:
 			next_byte = ((byte_t const *)src)[result]; /* CAUTION: SEGFAULT */
 			COMPILER_READ_BARRIER();
 			/* Try to re-acquire the lock. */
-			if unlikely(!atomic_rwlock_trywrite(&self->rb_lock)) {
+			if unlikely(!ringbuffer_lock_trywrite(self)) {
 				if (!result)
 					goto again; /* Don't indicate EOF if there is done. */
 				goto done;      /* Better just tell the caller what we've managed to copy */
@@ -828,7 +828,7 @@ copy_faulting_byte:
 	self->rb_avail += temp;
 	result += temp;
 done_unlock:
-	atomic_rwlock_endwrite(&self->rb_lock);
+	ringbuffer_lock_endwrite(self);
 #ifdef __KERNEL__
 done:
 #endif /* __KERNEL__ */
@@ -847,7 +847,7 @@ libringbuffer_unread(struct ringbuffer *__restrict self,
 		__THROWS(E_WOULDBLOCK) {
 	size_t result;
 	bool was_empty = false;
-	atomic_rwlock_write(&self->rb_lock);
+	ringbuffer_lock_write(self);
 	/* Figure out how many bytes can potentially be unread */
 	result = self->rb_size - self->rb_avail;
 	/* Limit how much can be unread by the total number of read bytes. */
@@ -867,7 +867,7 @@ libringbuffer_unread(struct ringbuffer *__restrict self,
 	}
 	if (p_rdtot)
 		*p_rdtot = self->rb_rdtot;
-	atomic_rwlock_endwrite(&self->rb_lock);
+	ringbuffer_lock_endwrite(self);
 	if (was_empty)
 		sched_signal_broadcast(&self->rb_nempty);
 	return result;
@@ -882,7 +882,7 @@ libringbuffer_skipread(struct ringbuffer *__restrict self,
 		__THROWS(E_WOULDBLOCK) {
 	size_t result;
 	bool was_full;
-	atomic_rwlock_write(&self->rb_lock);
+	ringbuffer_lock_write(self);
 	result = self->rb_avail;
 	if (result > num_bytes)
 		result = num_bytes;
@@ -896,7 +896,7 @@ libringbuffer_skipread(struct ringbuffer *__restrict self,
 	self->rb_rdtot += result;
 	if (p_rdtot)
 		*p_rdtot = self->rb_rdtot;
-	atomic_rwlock_endwrite(&self->rb_lock);
+	ringbuffer_lock_endwrite(self);
 	if (was_full)
 		sched_signal_broadcast(&self->rb_nfull);
 	return result;
@@ -930,7 +930,7 @@ libringbuffer_unwrite(struct ringbuffer *__restrict self,
 		__THROWS(E_WOULDBLOCK) {
 	size_t result;
 	bool was_full;
-	atomic_rwlock_write(&self->rb_lock);
+	ringbuffer_lock_write(self);
 	result = self->rb_avail;
 	if (result > num_bytes)
 		result = num_bytes;
@@ -938,7 +938,7 @@ libringbuffer_unwrite(struct ringbuffer *__restrict self,
 	self->rb_avail -= result;
 	if (p_wrtot)
 		*p_wrtot = self->rb_rdtot + self->rb_avail;
-	atomic_rwlock_endwrite(&self->rb_lock);
+	ringbuffer_lock_endwrite(self);
 	if (was_full)
 		sched_signal_broadcast(&self->rb_nfull);
 	return result;
@@ -954,9 +954,9 @@ libringbuffer_wseek(struct ringbuffer *__restrict self, ssize_t offset)
 	if (offset < 0) {
 		libringbuffer_unwrite(self, (size_t)-offset, &result);
 	} else {
-		atomic_rwlock_write(&self->rb_lock);
+		ringbuffer_lock_write(self);
 		result = self->rb_rdtot + self->rb_avail;
-		atomic_rwlock_endwrite(&self->rb_lock);
+		ringbuffer_lock_endwrite(self);
 	}
 	return result;
 }
@@ -969,12 +969,12 @@ libringbuffer_setwritten(struct ringbuffer *__restrict self, size_t num_bytes)
 		__THROWS(E_WOULDBLOCK) {
 	size_t result;
 	bool was_full;
-	atomic_rwlock_write(&self->rb_lock);
+	ringbuffer_lock_write(self);
 	was_full = self->rb_avail >= self->rb_size;
 	if (self->rb_avail > num_bytes)
 		self->rb_avail = num_bytes;
 	result = self->rb_avail;
-	atomic_rwlock_endwrite(&self->rb_lock);
+	ringbuffer_lock_endwrite(self);
 	if (was_full && num_bytes < result)
 		sched_signal_broadcast(&self->rb_nfull);
 	return result;

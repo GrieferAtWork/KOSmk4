@@ -136,6 +136,36 @@ struct kbddev
 	                                      * input  with  `ansitty_translate()',  when an  ansitty  is connected) */
 };
 
+/* Helper macros for `struct kbddev::kd_map_lock' */
+#define kbddev_map_mustreap(self)     0
+#define kbddev_map_reap(self)         (void)0
+#define _kbddev_map_reap(self)        (void)0
+#define kbddev_map_write(self)        atomic_rwlock_write(&(self)->kd_map_lock)
+#define kbddev_map_write_nx(self)     atomic_rwlock_write_nx(&(self)->kd_map_lock)
+#define kbddev_map_trywrite(self)     atomic_rwlock_trywrite(&(self)->kd_map_lock)
+#define kbddev_map_endwrite(self)     (atomic_rwlock_endwrite(&(self)->kd_map_lock), kbddev_map_reap(self))
+#define _kbddev_map_endwrite(self)    atomic_rwlock_endwrite(&(self)->kd_map_lock)
+#define kbddev_map_read(self)         atomic_rwlock_read(&(self)->kd_map_lock)
+#define kbddev_map_read_nx(self)      atomic_rwlock_read_nx(&(self)->kd_map_lock)
+#define kbddev_map_tryread(self)      atomic_rwlock_tryread(&(self)->kd_map_lock)
+#define _kbddev_map_endread(self)     atomic_rwlock_endread(&(self)->kd_map_lock)
+#define kbddev_map_endread(self)      (void)(atomic_rwlock_endread(&(self)->kd_map_lock) && (kbddev_map_reap(self), 0))
+#define _kbddev_map_end(self)         atomic_rwlock_end(&(self)->kd_map_lock)
+#define kbddev_map_end(self)          (void)(atomic_rwlock_end(&(self)->kd_map_lock) && (kbddev_map_reap(self), 0))
+#define kbddev_map_upgrade(self)      atomic_rwlock_upgrade(&(self)->kd_map_lock)
+#define kbddev_map_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->kd_map_lock)
+#define kbddev_map_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->kd_map_lock)
+#define kbddev_map_downgrade(self)    atomic_rwlock_downgrade(&(self)->kd_map_lock)
+#define kbddev_map_reading(self)      atomic_rwlock_reading(&(self)->kd_map_lock)
+#define kbddev_map_writing(self)      atomic_rwlock_writing(&(self)->kd_map_lock)
+#define kbddev_map_canread(self)      atomic_rwlock_canread(&(self)->kd_map_lock)
+#define kbddev_map_canwrite(self)     atomic_rwlock_canwrite(&(self)->kd_map_lock)
+#define kbddev_map_waitread(self)     atomic_rwlock_waitread(&(self)->kd_map_lock)
+#define kbddev_map_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->kd_map_lock)
+#define kbddev_map_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->kd_map_lock)
+#define kbddev_map_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->kd_map_lock)
+
+
 /* Helper macros for `struct kbddev::kd_leds_lock' */
 #define _kbddev_leds_reap(self)      (void)0
 #define kbddev_leds_reap(self)       (void)0

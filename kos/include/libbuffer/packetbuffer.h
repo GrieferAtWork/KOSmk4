@@ -412,6 +412,35 @@ struct pb_buffer {
 	                               * NOTE: Also broadcast when `pb_limt' is increased or set to 0! */
 };
 
+/* Helper macros for `struct pb_buffer::pb_lock' */
+#define pb_buffer_lock_mustreap(self)     0
+#define pb_buffer_lock_reap(self)         (void)0
+#define _pb_buffer_lock_reap(self)        (void)0
+#define pb_buffer_lock_write(self)        atomic_rwlock_write(&(self)->pb_lock)
+#define pb_buffer_lock_write_nx(self)     atomic_rwlock_write_nx(&(self)->pb_lock)
+#define pb_buffer_lock_trywrite(self)     atomic_rwlock_trywrite(&(self)->pb_lock)
+#define pb_buffer_lock_endwrite(self)     (atomic_rwlock_endwrite(&(self)->pb_lock), pb_buffer_lock_reap(self))
+#define _pb_buffer_lock_endwrite(self)    atomic_rwlock_endwrite(&(self)->pb_lock)
+#define pb_buffer_lock_read(self)         atomic_rwlock_read(&(self)->pb_lock)
+#define pb_buffer_lock_read_nx(self)      atomic_rwlock_read_nx(&(self)->pb_lock)
+#define pb_buffer_lock_tryread(self)      atomic_rwlock_tryread(&(self)->pb_lock)
+#define _pb_buffer_lock_endread(self)     atomic_rwlock_endread(&(self)->pb_lock)
+#define pb_buffer_lock_endread(self)      (void)(atomic_rwlock_endread(&(self)->pb_lock) && (pb_buffer_lock_reap(self), 0))
+#define _pb_buffer_lock_end(self)         atomic_rwlock_end(&(self)->pb_lock)
+#define pb_buffer_lock_end(self)          (void)(atomic_rwlock_end(&(self)->pb_lock) && (pb_buffer_lock_reap(self), 0))
+#define pb_buffer_lock_upgrade(self)      atomic_rwlock_upgrade(&(self)->pb_lock)
+#define pb_buffer_lock_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->pb_lock)
+#define pb_buffer_lock_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->pb_lock)
+#define pb_buffer_lock_downgrade(self)    atomic_rwlock_downgrade(&(self)->pb_lock)
+#define pb_buffer_lock_reading(self)      atomic_rwlock_reading(&(self)->pb_lock)
+#define pb_buffer_lock_writing(self)      atomic_rwlock_writing(&(self)->pb_lock)
+#define pb_buffer_lock_canread(self)      atomic_rwlock_canread(&(self)->pb_lock)
+#define pb_buffer_lock_canwrite(self)     atomic_rwlock_canwrite(&(self)->pb_lock)
+#define pb_buffer_lock_waitread(self)     atomic_rwlock_waitread(&(self)->pb_lock)
+#define pb_buffer_lock_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->pb_lock)
+#define pb_buffer_lock_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->pb_lock)
+#define pb_buffer_lock_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->pb_lock)
+
 /* Broadcast the `pb_psta' signal.
  * NOTE: In user-space,  we  increment  the signal  counter  before  broadcasting,
  *       since  other code uses  the value of the  signal itself for inter-locking
