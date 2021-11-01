@@ -107,30 +107,26 @@ NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
 
 
 struct sig_completion
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__WANT_SIG_COMPLETION_INIT)
     : task_connection              /* The underlying connection */
-#endif /* __cplusplus */
+#define _sig_completion_con_ /* nothing */
+#endif /* __cplusplus && !defined(__WANT_SIG_COMPLETION_INIT) */
 {
-#ifndef __cplusplus
+#if !defined(__cplusplus) || defined(__WANT_SIG_COMPLETION_INIT)
 	struct task_connection sc_con; /* The underlying connection */
-#endif /* __cplusplus */
+#define _sig_completion_con_ sc_con.
+#endif /* !__cplusplus || defined(__WANT_SIG_COMPLETION_INIT) */
 	sig_completion_t       sc_cb;  /* [1..1][const] Completion callback. */
 };
 
-#ifdef __cplusplus
-#define _sig_completion_con(self) (*(self))
-#else /* __cplusplus */
-#define _sig_completion_con(self) (self)->sc_con
-#endif /* !__cplusplus */
-
 /* Initialize a given signal completion controller. */
-#define sig_completion_init(self, cb)                                    \
-	(_sig_completion_con(self).tc_stat = TASK_CONNECTION_STAT_BROADCAST, \
-	 (self)->sc_cb                     = (cb))
+#define sig_completion_init(self, cb)                                       \
+	((self)->_sig_completion_con_ tc_stat = TASK_CONNECTION_STAT_BROADCAST, \
+	 (self)->sc_cb                        = (cb))
 
 /* Check if the given signal completion controller `self' was connected. */
 #define sig_completion_wasconnected(self) \
-	(!TASK_CONNECTION_STAT_ISDONE(__hybrid_atomic_load(_sig_completion_con(self).tc_stat, __ATOMIC_ACQUIRE)))
+	(!TASK_CONNECTION_STAT_ISDONE(__hybrid_atomic_load((self)->_sig_completion_con_ tc_stat, __ATOMIC_ACQUIRE)))
 
 /* Connect the given signal completion controller to the specified signal.
  * The caller must  ensure that `completion'  hasn't been connected,  yet. */
@@ -181,13 +177,15 @@ NOTHROW(FCALL sig_completion_disconnect)(struct sig_completion *__restrict self)
  * some other CPU has already passed the point of `sig_completion_release()' */
 struct sig_multicompletion;
 struct _sig_multicompletion_route
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__WANT_SIG_COMPLETION_INIT)
     : sig_completion                    /* The underlying completion function */
-#endif /* __cplusplus */
+#define __sig_multicompletion_route_com_ /* nothing */
+#endif /* __cplusplus && !defined(__WANT_SIG_COMPLETION_INIT) */
 {
-#ifndef __cplusplus
+#if !defined(__cplusplus) || defined(__WANT_SIG_COMPLETION_INIT)
 	struct sig_completion       mr_com; /* The underlying completion function */
-#endif /* __cplusplus */
+#define __sig_multicompletion_route_com_ mr_com.
+#endif /* !__cplusplus || __WANT_SIG_COMPLETION_INIT */
 	struct sig_multicompletion *mr_con; /* [1..1][const] The attached controller. */
 };
 
@@ -219,7 +217,7 @@ LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_init)(struct sig_multicompletion *__restrict self) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
-		self->sm_set.sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat = TASK_CONNECTION_STAT_BROADCAST;
 	self->sm_set.sms_next = __NULLPTR;
 }
 
@@ -232,9 +230,9 @@ NOTHROW(FCALL sig_multicompletion_cinit)(struct sig_multicompletion *__restrict 
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i) {
 #if TASK_CONNECTION_STAT_BROADCAST != 0
-		self->sm_set.sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat = TASK_CONNECTION_STAT_BROADCAST;
 #else /* TASK_CONNECTION_STAT_BROADCAST != 0 */
-		__hybrid_assert(self->sm_set.sms_routes[i].tc_stat == 0);
+		__hybrid_assert(self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat == 0);
 #endif /* TASK_CONNECTION_STAT_BROADCAST == 0 */
 	}
 }

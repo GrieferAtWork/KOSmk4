@@ -48,9 +48,16 @@ DECL_BEGIN
 #define async_from_postlockop(lop) container_of(lop, struct async, _a_postlockop)
 
 
+/* There is 1 pre-defined async worker which can't ever go away and is
+ * used to implement the fallback mechanism for `mpart_start_asyncjob()'
+ *
+ * We set-up the static initialization of async workers such that this
+ * one is linked in by default. */
+INTDEF struct async mpart_ajob_fallback_worker;
+
 /* API access to the set of all running async jobs. */
-PUBLIC struct REF async_list /**/ async_all_list = LIST_HEAD_INITIALIZER(async_all_list);
-PUBLIC size_t /*               */ async_all_size = 0;
+PUBLIC struct REF async_list /**/ async_all_list = { &mpart_ajob_fallback_worker };
+PUBLIC size_t /*               */ async_all_size = 1;
 PUBLIC struct atomic_lock /*   */ async_all_lock = ATOMIC_LOCK_INIT;
 PUBLIC struct lockop_slist /*  */ async_all_lops = SLIST_HEAD_INITIALIZER(async_all_lops);
 
@@ -183,7 +190,9 @@ again:
 	sig_send(&async_ready_sig);
 }
 
-PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+
+/* Must be INTERN because used in the static init of `mpart_ajob_fallback_worker' */
+INTERN NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL async_completion)(struct sig_completion *__restrict self,
                                 struct sig_completion_context *__restrict context,
                                 void *buf, size_t bufsize) {

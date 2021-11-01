@@ -1549,10 +1549,9 @@ trim_completed:
 		 * operation! */
 		ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, NULL);
 	} else if (status == MPART_TRIM_STATUS_NOMEM) {
-		ATOMIC_WRITE(self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
-		incref(self); /* Inherited by `mpart_trim_mmlop()' */
-		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, &self->_mp_trmlop_mm, olo_link);
-		/*_mman_lockops_reap(&mman_kernel);*/ /* _DONT_ reap immediately! */
+		/* Must do the trim operation via the mpart async-job system. */
+		ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, NULL);
+		mpart_start_asyncjob(incref(self), MPART_XF_WILLTRIM);
 	}
 }
 

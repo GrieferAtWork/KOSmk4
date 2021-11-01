@@ -104,15 +104,20 @@
 /* Possible values for `struct mpart::mp_xflags' */
 #define MPART_XF_NORMAL          0x00
 #define MPART_XF_MERGE_AFTER_DMA 0x01 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear
-                                       * this flag and call `mpart_merge()' (s.a. `mpart_dma_dellock()') */
+                                       * this flag and  call `mpart_merge()' (s.a.  `mpart_dma_dellock()') */
 #define MPART_XF_TRIM_AFTER_DMA  0x02 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear
-                                       * this flag and call `mpart_trim()' (s.a. `mpart_dma_dellock()') */
-#define MPART_XF_WILLMERGE       0x04 /* [lock(ATOMIC)] An async merge-request for this part was enqueued. */
-/*efine MPART_XF_                0x08  * ... */
-/*efine MPART_XF_                0x10  * ... */
+                                       * this flag  and call  `mpart_trim()' (s.a.  `mpart_dma_dellock()') */
+#define MPART_XF_WILLMERGE       0x04 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Async worker must merge this part. */
+#define MPART_XF_WILLTRIM        0x08 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Async worker must trim this part. */
+#define MPART_XF_WILLUNLOAD      0x10 /* [lock(SET(ATOMIC), CLEAR(MPART_F_LOCKBIT))] Async worker must unload this part. */
 /*efine MPART_XF_                0x20  * ... */
 /*efine MPART_XF_                0x40  * ... */
-/*efine MPART_XF_                0x80  * ... */
+#define MPART_XF_INJOBLIST       0x80 /* [lock(SET(ATOMIC), CLEAR(PART_WORKER))] Mem-part was added to the
+                                       * async job list. This flag is cleared by an async worker that will
+                                       * perform tasks indicated by `MPART_XF_WILL*' flags.
+                                       * This flag can only be cleared by the async-job-worker for mem-parts,
+                                       * and only after it has  been confirmed that none of  `MPART_XF_WILL*'
+                                       * are still set. */
 
 
 
@@ -186,9 +191,9 @@ struct mchunkvec {
 
 #define __ALIGNOF_MPART __ALIGNOF_INT64__
 #if __SIZEOF_POINTER__ == 4
-#define __SIZEOF_MPART 80
+#define __SIZEOF_MPART 84
 #elif __SIZEOF_POINTER__ == 8
-#define __SIZEOF_MPART 144
+#define __SIZEOF_MPART 152
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported pointer size"
 #endif /* __SIZEOF_POINTER__ != ... */
@@ -252,20 +257,23 @@ struct mpart {
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_refcnt(mp_refcnt) mp_refcnt
 #define MPART_INIT_mp_flags(mp_flags)   mp_flags, 0
-#define MPART_INIT_mp_state(mp_state)   mp_state
+#define MPART_INIT_mp_state(mp_state)   mp_state, __NULLPTR
+#define MPART_INIT_mp_file(mp_file)     mp_file
 #endif /* __WANT_MPART_INIT */
 	WEAK refcnt_t                 mp_refcnt;    /* Reference counter. */
 	uintptr_half_t                mp_flags;     /* Memory part flags (set of `MPART_F_*') */
-	uintptr_quarter_t             mp_xflags;    /* Extended memory part flags (set of `MPART_XF_*')
-	                                             * These are used internally, and this field should
+	uintptr_quarter_t             mp_xflags;    /* Extended  memory part flags (set of `MPART_XF_*')
+	                                             * These  are used internally, and this field should
 	                                             * _always_ be set to `MPART_XF_NORMAL' during init. */
 	uintptr_quarter_t             mp_state;     /* [lock(MPART_F_LOCKBIT)]
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * Memory part state (one of `MPART_ST_*') */
-#ifdef __WANT_MPART_INIT
-#define MPART_INIT_mp_file(mp_file) mp_file
-#endif /* __WANT_MPART_INIT */
+	SLIST_ENTRY(REF mpart)       _mp_joblink;   /* [lock(ATOMIC)][valid_if(MPART_XF_INJOBLIST)]
+	                                             * Link entry in the fallback list of mem-parts with  jobs
+	                                             * that require steps which unconditionally block or can't
+	                                             * be performed immediately due to lack of system  memory.
+	                                             * s.a. `MPART_XF_WILL*' */
 	REF struct mfile             *mp_file;      /* [1..1][lock(MPART_F_LOCKBIT)][const_if(EXISTS(MPART_BLOCK_ST_INIT))]
 	                                             * The associated file. (Cannot be altered as long as any `MPART_BLOCK_ST_INIT' blocks exist) */
 	/* WARNING: The  following  2 lists  may contain  already-destroyed nodes.
@@ -1256,6 +1264,71 @@ NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self);
  *       the list of node-mappings of `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self);
+
+
+
+
+/* Try to (asynchronously) sync unwritten data of `self' before unload `self' from memory.
+ * Note that contrary to its name, this function will never unload memory that is actually
+ * still in use, or in a  way by which said memory  cannot be recovered (by re-loading  it
+ * from swap). Instead, this function only tries  to unload pre-loaded file data, as  well
+ * write-back changed file data to  disk so-as to make  it possible to essentially  change
+ * the state of `self' to `MPART_ST_VOID' (or simply destroy `self' all-together).
+ * @param: self:  The mem-part which should be unloaded. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_unload)(/*inherit(always)*/ REF struct mpart *__restrict self);
+
+/* Synchronous version of `mpart_unload()'. Upon entry, the caller must be holding a lock
+ * to `self' and `unlock'. The lock to  `self' is unconditionally released, but the  lock
+ * to `unlock' is  only released when  `false' is  returned, or an  exception is  thrown.
+ * Locking logic:
+ *  - return != MPART_UNLOADNOW_ST_RETRY:
+ *    - !mpart_lock_acquired(self);
+ *    - decref(self);
+ *  - return == MPART_UNLOADNOW_ST_RETRY:
+ *    - !mpart_lock_acquired(self);
+ *    - unlockinfo_xunlock(unlock);
+ *  - EXCEPT:
+ *    - !mpart_lock_acquired(self);
+ *    - unlockinfo_xunlock(unlock);
+ * @param: flags: Set of `MPART_UNLOADNOW_F_*'
+ * @param: self:  The mem-part which should be unloaded. */
+FUNDEF NONNULL((1)) unsigned int FCALL
+mpart_unloadnow_or_unlock(/*inherit(on_success)*/ REF struct mpart *__restrict self,
+                          unsigned int flags, struct unlockinfo *unlock);
+
+/* Return values for `mpart_unloadnow_or_unlock()' */
+#define MPART_UNLOADNOW_ST_RETRY   0 /* Locks were lost; try again */
+#define MPART_UNLOADNOW_ST_INUSE   1 /* Part couldn't be unloaded because there are unaccounted references
+                                      * to the part and `MPART_UNLOADNOW_F_NOSWAP' was given, or no unused
+                                      * swap space was available. */
+#define MPART_UNLOADNOW_ST_SUCCESS 2 /* Success: the part was unloaded (its state was set to  `MPART_ST_VOID'
+                                      * or `MPART_ST_SWP[_SC]' when `MPART_UNLOADNOW_F_NOSWAP' wasn't given),
+                                      * and in all  likelihood the  part has  been destroyed  (unless it  now
+                                      * resides in swap space). */
+
+/* Flags for `mpart_unloadnow_or_unlock(flags)' */
+#define MPART_UNLOADNOW_F_NORMAL 0x0000     /* Normal flags */
+#define MPART_UNLOADNOW_F_NOSWAP GFP_NOSWAP /* Don't off-load memory into swap */
+
+
+/* Try to allocate a new async job to  do `what', but if that fails use a  fallback
+ * global  async job to do the same thing. _DONT_ call this function directly! This
+ * function is used as the fallback-path when one of mpart named mem-part functions
+ * can't be completed without  blocking, meaning that it  needs to be finished  via
+ * async means. - If  you were to  call this function  directly, that initial  non-
+ * blocking  attempt  would not  be  performed, which  would  introduce unnecessary
+ * overhead  in the  case where the  operation could have  been done synchronously.
+ * When multiple operations are scheduled at the same time, they will be  performed
+ * in the following order:
+ *  - MPART_XF_WILLMERGE:  `mpart_merge()'
+ *  - MPART_XF_WILLUNLOAD: `mpart_unload()'
+ *  - MPART_XF_WILLTRIM:   `mpart_trim()'
+ * @param: what: Set of `MPART_XF_WILLMERGE | MPART_XF_WILLTRIM | MPART_XF_WILLUNLOAD' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_start_asyncjob)(/*inherit(always)*/ REF struct mpart *__restrict self,
+                                    uintptr_quarter_t what);
+
 
 
 

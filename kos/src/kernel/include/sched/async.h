@@ -66,7 +66,10 @@ struct async_ops {
 	NONNULL((1)) ktime_t
 	(FCALL *ao_connect)(struct async *__restrict self);
 
-	/* [1..1] Check if there is any work that needs to be done right now.
+	/* [1..1] Check if there is any work that needs to be done right  now.
+	 * If this function throws an exception, the error will be transferred
+	 * to  an attached AIO handle, or dumped  to the system log before the
+	 * async job is canceled.
 	 * @return: true:  Work is available.
 	 * @return: false: Nothing to do right now. */
 	WUNUSED NONNULL((1)) __BOOL
@@ -75,6 +78,9 @@ struct async_ops {
 	/* [1..1] Perform the actual work associated with the async job. This
 	 * function will only ever be called _after_ `ao_test()' has returned
 	 * indicative of work being available.
+	 * If this function throws an exception, the error will be transferred
+	 * to  an attached AIO handle, or dumped  to the system log before the
+	 * async job is canceled.
 	 * @return: * : One of `ASYNC_RESUME', `ASYNC_FINISHED' or `ASYNC_CANCEL' */
 	WUNUSED NONNULL((1)) unsigned int
 	(FCALL *ao_work)(struct async *__restrict self);
@@ -83,6 +89,9 @@ struct async_ops {
 	 *        When set to `NULL', behave the same as though a function had been
 	 *        specified that always returns `ASYNC_CANCEL'.
 	 * NOTE: May only ever be called when `ao_connect()' returns `!= KTIME_INFINITE'
+	 * If  this  function  throws  an  exception,  the  error  will  be  transferred
+	 * to  an  attached  AIO  handle,  or  dumped  to  the  system  log  before  the
+	 * async job is canceled.
 	 * @return: * : One of `ASYNC_RESUME', `ASYNC_FINISHED' or `ASYNC_CANCEL' */
 	WUNUSED NONNULL((1)) unsigned int
 	(FCALL *ao_time)(struct async *__restrict self);
@@ -241,11 +250,15 @@ NOTHROW(FCALL _async_init_aio)(struct async *__restrict self,
 
 
 /* Helpers for constructing async objects. */
-#define async_new(T, ops) \
-	((T *)__async_init_ptr((struct async *)kmemalign(__COMPILER_ALIGNOF(T), sizeof(T), GFP_NORMAL), ops))
-#define async_new_aio(T, ops, aio) \
-	((T *)__async_init_aio_ptr((struct async *)kmemalign(__COMPILER_ALIGNOF(T), sizeof(T), GFP_NORMAL), ops, aio))
-#define async_free(self) kfree(self)
+#define async_new(T, ops)                      ((T *)__async_init_ptr((struct async *)kmemalign(__COMPILER_ALIGNOF(T), sizeof(T), GFP_NORMAL), ops))
+#define async_new_aio(T, ops, aio)             ((T *)__async_init_aio_ptr((struct async *)kmemalign(__COMPILER_ALIGNOF(T), sizeof(T), GFP_NORMAL), ops, aio))
+#define async_new_gfp(T, ops, gfp)             ((T *)__async_init_ptr((struct async *)kmemalign(__COMPILER_ALIGNOF(T), sizeof(T), gfp), ops))
+#define async_new_aio_gfp(T, ops, aio, gfp)    ((T *)__async_init_aio_ptr((struct async *)kmemalign(__COMPILER_ALIGNOF(T), sizeof(T), gfp), ops, aio))
+#define async_new_nx(T, ops)                   ((T *)__async_init_ptr_nx((struct async *)kmemalign_nx(__COMPILER_ALIGNOF(T), sizeof(T), GFP_NORMAL), ops))
+#define async_new_aio_nx(T, ops, aio)          ((T *)__async_init_aio_ptr_nx((struct async *)kmemalign_nx(__COMPILER_ALIGNOF(T), sizeof(T), GFP_NORMAL), ops, aio))
+#define async_new_gfp_nx(T, ops, gfp)          ((T *)__async_init_ptr_nx((struct async *)kmemalign_nx(__COMPILER_ALIGNOF(T), sizeof(T), gfp), ops))
+#define async_new_aio_gfp_nx(T, ops, aio, gfp) ((T *)__async_init_aio_ptr_nx((struct async *)kmemalign_nx(__COMPILER_ALIGNOF(T), sizeof(T), gfp), ops, aio))
+#define async_free(self)                       kfree(self)
 FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct async *
 NOTHROW(__async_init_ptr)(struct async *__restrict self,
                           struct async_ops const *__restrict ops) {
@@ -257,6 +270,21 @@ NOTHROW(__async_init_aio_ptr)(struct async *__restrict self,
                               struct async_ops const *__restrict ops,
                               struct aio_handle *__restrict aio) {
 	async_init_aio(self, ops, aio);
+	return self;
+}
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((2)) struct async *
+NOTHROW(__async_init_ptr_nx)(struct async *self,
+                             struct async_ops const *__restrict ops) {
+	if likely(self)
+		async_init(self, ops);
+	return self;
+}
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((2, 3)) struct async *
+NOTHROW(__async_init_aio_ptr_nx)(struct async *self,
+                                 struct async_ops const *__restrict ops,
+                                 struct aio_handle *__restrict aio) {
+	if likely(self)
+		async_init_aio(self, ops, aio);
 	return self;
 }
 

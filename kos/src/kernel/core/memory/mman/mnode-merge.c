@@ -330,7 +330,7 @@ NOTHROW(FCALL mergenodes_lop_cb)(Toblockop(mman) *__restrict lop,
 	mman_mergenodes_locked(self);
 
 	/* If the mergenodes lop still indicates a normal RUNNING
-	 * state, then all nodes that  may have been mergeable at
+	 * state, then all nodes that may have been mergeable  at
 	 * one point have  now been merged,  meaning that we  can
 	 * safely switch back to the initial INACTIVE state. */
 	if (lop->olo_func == MERGENODES_LOP_FUNC_RUNNING)
@@ -1195,9 +1195,12 @@ NOTHROW(FCALL mpart_lock_all_mmans_after)(struct mpart const *__restrict self,
 INTDEF NOBLOCK NONNULL((1)) struct postlockop * /* From "mpart.c" */
 NOTHROW(FCALL mpart_destroy_lop_rmall_async)(struct lockop *__restrict self);
 
-/* See description below... */
+/* Use an async job to merge `self' */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_merge_all_parts_including)(struct mpart *__restrict part_to_merge);
+NOTHROW(FCALL asyncjob_merge_part)(struct mpart *__restrict self) {
+	mpart_start_asyncjob(incref(self), MPART_XF_WILLMERGE);
+}
+
 
 /* Allocate kmalloc()-memory (GFP_LOCKED), but if this allocation fails,
  * make  it so that `orig_part' will be  merged once again the next time
@@ -1209,7 +1212,7 @@ NOTHROW(FCALL merge_malloc)(size_t num_bytes, struct mpart *__restrict orig_part
 	void *result;
 	result = kmalloc_nx(num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 	if (!result) {
-		async_merge_all_parts_including(orig_part);
+		asyncjob_merge_part(orig_part);
 		result = kmalloc_nx(num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 	}
 	return result;
@@ -1221,7 +1224,7 @@ NOTHROW(FCALL merge_realloc)(void *ptr, size_t num_bytes,
 	void *result;
 	result = krealloc_nx(ptr, num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 	if (!result) {
-		async_merge_all_parts_including(orig_part);
+		asyncjob_merge_part(orig_part);
 		result = krealloc_nx(ptr, num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 	}
 	return result;
@@ -1557,7 +1560,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 					                                      reqcount * sizeof(struct mchunk),
 					                                      GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
 					if unlikely(!newvec) {
-						async_merge_all_parts_including(orig_part);
+						asyncjob_merge_part(orig_part);
 						newvec = (struct mchunk *)krealloc_nx(hivec,
 						                                      reqcount * sizeof(struct mchunk),
 						                                      GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
@@ -1594,12 +1597,12 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	           0) {
 		/* Nothing to do here.... */
 	} else {
-		/* TODO: If exactly one of the 2 parts is `MPART_ST_VOID', try to allocate
-		 *       its backing data. */
-
-		/* TODO: If  either of the  2 parts is MPART_ST_SWP[_SC],  bring the part into
-		 *       the core, using an async read-from-swap operation (such functionality
-		 *       doesn't exist at the moment, though...) */
+		/* We could still do the following (but choose not to since that would waste memory):
+		 *  - If exactly one of the 2 parts is `MPART_ST_VOID', try to allocate its backing data.
+		 *  - If either of the 2  parts is MPART_ST_SWP[_SC], bring  the part into the  core,
+		 *    using an async read-from-swap operation. Though this operation would  introduce
+		 *    the acquisition of non-atomic locks, which in turn would make us a cancellation
+		 *    point, which we're not allowed to become. */
 
 		/* Unsupported mem-part-state combination (don't merge) */
 		goto err_cannot_merge;
@@ -1950,174 +1953,6 @@ waitfor_blocking_mman:
 		mpart_decref_all_mmans(result);
 	}
 	return result;
-}
-
-
-
-union merge_all_parts_lop_desc {
-	Toblockop(mman)      map_mm_lop;     /* Lop */
-	Tobpostlockop(mman)  map_mm_postlop; /* Post-Lop */
-	struct lockop        map_lop;        /* Lop */
-	struct postlockop    map_postlop;    /* Post-Lop */
-};
-
-PRIVATE union merge_all_parts_lop_desc merge_all_parts_lop = { { {}, NULL } };
-
-/* Merge all mem-parts from `mpart_all_list'
- * @param: deadparts: A list of mem-parts that have been
- *                    destroyed.  Linked  via `_mp_dead' */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL merge_all_parts)(struct mpart_slist *__restrict deadparts) {
-	REF struct mpart *part, *next;
-
-	/* Acquire a reference to the first non-destroyed part. */
-	for (part = LIST_FIRST(&mpart_all_list);;) {
-		if (!part)
-			return;
-		if (tryincref(part))
-			break;
-		part = LIST_NEXT(part, mp_allparts);
-	}
-	for (;;) {
-		/* Find the next non-destroyed part,
-		 * and get a  reference to it,  too. */
-		next = LIST_NEXT(part, mp_allparts);
-		while (next && !tryincref(next))
-			next = LIST_NEXT(next, mp_allparts);
-
-		/* Try to merge the original part... */
-		if (part->mp_xflags & MPART_XF_WILLMERGE) {
-			ATOMIC_AND(part->mp_xflags, ~MPART_XF_WILLMERGE);
-			part = mpart_merge(part);
-		}
-
-		/* Drop our reference to the part. */
-		if unlikely(ATOMIC_DECFETCH(part->mp_refcnt) == 0)
-			SLIST_INSERT(deadparts, part, _mp_dead);
-
-		/* Proceed with the next non-destroyed part,
-		 * to  which we've previously acquire a ref. */
-		if (!next)
-			break;
-		part = next;
-	}
-}
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL merge_all_parts_postlop_destroy_cb)(struct postlockop *__restrict self) {
-	struct mpart_slist deadparts;
-	deadparts.slh_first = container_of(self, struct mpart, _mp_dtplop);
-
-	/* Re-initialize  the  copy/share lists  to satisfy  an internal
-	 * assertion in `mpart_fini()', as well as to ensure consistency
-	 * when destroying mem-parts.
-	 * NOTE: The mp_copy/mp_share lists were re-used by `_mp_dtplop'! */
-	LIST_INIT(&deadparts.slh_first->mp_copy);
-	LIST_INIT(&deadparts.slh_first->mp_share);
-	do {
-		struct mpart *part;
-		part = SLIST_FIRST(&deadparts);
-		SLIST_REMOVE_HEAD(&deadparts, _mp_dead);
-		mpart_destroy(part);
-	} while (!SLIST_EMPTY(&deadparts));
-}
-
-PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
-NOTHROW(FCALL merge_all_parts_lop_cb)(struct lockop *__restrict UNUSED(self)) {
-	struct mpart_slist deadparts;
-
-	/* Mark the merge-all-parts lop as available again. */
-	ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func, NULL);
-	SLIST_INIT(&deadparts);
-	merge_all_parts(&deadparts);
-	if (SLIST_EMPTY(&deadparts))
-		return NULL;
-
-	/* TODO: Infinite loop:
-	 * The `merge_all_parts_lop_cb' function is enqueued by `merge_all_parts_after_kernel_mm_lock'
-	 * when a lock is released from the kernel mman. - However, if the kernel mman lock also  gets
-	 * released somewhere along the merge-nodes control flow, then `merge_all_parts()' will end up
-	 * restarting itself immediately, rather than at some later point in time!
-	 *
-	 * Solution:
-	 * `merge_all_parts()'  needs to have a failed-due-to-NOMEM return  value that is used to deal
-	 * with the oom/blocking-mem scenario that must be handled via the kernel-mman-lock. That way,
-	 * oom faults are only handled _after_ all mman locks have already been released.
-	 *
-	 * TODO: What about the situation where kmalloc() fails because it can't get a lock to the
-	 *       kernel mman, when this is due to the fact that said lock is already being held by
-	 *       someone in the merge-nodes callstack?
-	 *       In this situation, kmalloc() would have succeeded if only the kernel mman lock had
-	 *       been available...
-	 * -> There _really_ needs to be a dedicated async-lockop system within the heap that can be
-	 *    used to enqueue post-lockops  to-be executed once some  specified amount of bytes  may
-	 *    have become available for allocation. */
-
-	/* Set-up a post-lockop that will clean out the list of dead parts.
-	 * For this purpose, re-use the  first destroyed mem-part as a  hub
-	 * for destroying all of the other parts. */
-	{
-		struct mpart *first;
-		STATIC_ASSERT(sizeof(struct postlockop) <= (2 * sizeof(struct mnode_list)));
-		first = SLIST_FIRST(&deadparts);
-		assert(LIST_EMPTY(&first->mp_copy));
-		assert(LIST_EMPTY(&first->mp_share));
-		first->_mp_dtplop.plo_func = &merge_all_parts_postlop_destroy_cb;
-		return &first->_mp_dtplop;
-	}
-}
-
-
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock_post)(Tobpostlockop(mman) *__restrict UNUSED(lop),
-                                                         struct mman *__restrict UNUSED(self)) {
-	if (mpart_all_tryacquire()) {
-		struct mpart_slist deadparts;
-		/* Mark the merge-all-parts lop as available again. */
-		ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func, NULL);
-		SLIST_INIT(&deadparts);
-		merge_all_parts(&deadparts);
-		mpart_all_release();
-	} else {
-		/* Acquire a lock to the all-parts list asynchronously. */
-		ATOMIC_WRITE(merge_all_parts_lop.map_lop.lo_func, &merge_all_parts_lop_cb);
-		lockop_enqueue(&mpart_all_lops, &merge_all_parts_lop.map_lop);
-		_mpart_all_reap();
-	}
-}
-
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mman) *
-NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock)(Toblockop(mman) *__restrict UNUSED(lop),
-                                                    struct mman *__restrict UNUSED(self)) {
-	ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func,
-	             &merge_all_parts_after_kernel_mm_lock_post);
-	return &merge_all_parts_lop.map_mm_postlop;
-}
-
-/* Set-up an async job to  merge all mem-parts in existence,  and
- * more specifically, including the given `part_to_merge', should
- * that part not be apart of the all-parts-list.
- * Merging is done the next time a the kernel mman is unlocked,
- * meaning that this function should be called in order to deal
- * with a heap memory shortage.
- * The caller must be holding a lock to `part_to_merge'!
- * WARNING: The caller must have also been the one to set `MPART_XF_WILLMERGE' */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_merge_all_parts_including)(struct mpart *__restrict part_to_merge) {
-	/* If the part isn't contained in the global list of all  parts,
-	 * then we can't merge it asynchronously (since we won't be able
-	 * to enumerate it). */
-	if (!LIST_ISBOUND(part_to_merge, mp_allparts)) {
-		ATOMIC_AND(part_to_merge->mp_xflags, ~MPART_XF_WILLMERGE);
-		return;
-	}
-
-	/* Kick-start the merge-all-parts lop-function. */
-	if (ATOMIC_CMPXCH(merge_all_parts_lop.map_mm_lop.olo_func,
-	                  NULL, &merge_all_parts_after_kernel_mm_lock)) {
-		oblockop_enqueue(&mman_kernel_lockops,
-		                 &merge_all_parts_lop.map_mm_lop);
-	}
 }
 
 
