@@ -25,6 +25,7 @@
 #ifndef CONFIG_USE_NEW_FS
 #include <fs/vfs.h>
 #else /* !CONFIG_USE_NEW_FS */
+#include <kernel/fs/dirent.h>
 #include <kernel/types.h>
 #include <sched/shared_rwlock.h>
 
@@ -232,13 +233,32 @@ NOTHROW(path_plock_acquire_nopr)(struct path *__restrict self) {
 	}	__WHILE0
 #endif /* !__INTELLISENSE__ */
 
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirent *
+NOTHROW(FCALL path_getname)(struct path *__restrict self) {
+	REF struct fdirent *result;
+	path_plock_acquire(self);
+	result = incref(self->p_name);
+	path_plock_release(self);
+	return result;
+}
+
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *
-NOTHROW(path_getparent)(struct path *__restrict self) {
+NOTHROW(FCALL path_getparent)(struct path *__restrict self) {
 	REF struct path *result;
 	path_plock_acquire(self);
 	result = incref(self->p_parent);
 	path_plock_release(self);
 	return result;
+}
+
+LOCAL NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL path_get_parent_and_name)(struct path *__restrict self,
+                                        /*out[1..1]_ref*/ REF struct path **__restrict p_parent,
+                                        /*out[1..1]_ref*/ REF struct fdirent **__restrict p_name) {
+	path_plock_acquire(self);
+	*p_parent = incref(self->p_parent);
+	*p_name   = incref(self->p_name);
+	path_plock_release(self);
 }
 
 

@@ -114,10 +114,18 @@ INTDEF NONNULL((1, 2)) void KCALL
 handle_path_mmap(struct path *__restrict self,
                  struct handle_mmap_info *__restrict info) THROWS(...) {
 	mfile_ummap(self->p_dir, info);
-	if (!info->hmi_fsname)
-		info->hmi_fsname = incref(self->p_name);
-	if (!info->hmi_fspath)
-		info->hmi_fspath = path_getparent(self);
+	if (!path_isroot(self)) {
+		if (!info->hmi_fsname && !info->hmi_fspath) {
+			path_get_parent_and_name(self,
+			                         &info->hmi_fspath,
+			                         &info->hmi_fsname);
+		} else {
+			if (!info->hmi_fsname)
+				info->hmi_fsname = path_getname(self);
+			if (!info->hmi_fspath)
+				info->hmi_fspath = path_getparent(self);
+		}
+	}
 }
 
 INTDEF NONNULL((1)) pos_t KCALL

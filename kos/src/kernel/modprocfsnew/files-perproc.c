@@ -1446,8 +1446,7 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 		 * about the path's parent+name+dir to  construct a valid data  triple. */
 		struct path *pth = (struct path *)me->pfl_handdat;
 		if (!path_isroot(pth)) {
-			*presult_path   = path_getparent(pth);
-			*presult_dirent = incref(pth->p_name);
+			path_get_parent_and_name(pth, presult_path, presult_dirent);
 			return mfile_asnode(incref(pth->p_dir));
 		}
 	}	break;

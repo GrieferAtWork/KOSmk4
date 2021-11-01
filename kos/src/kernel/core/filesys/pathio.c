@@ -1595,7 +1595,6 @@ path_mount(struct path *__restrict self, struct fdirnode *__restrict dir)
 	/* Fill in fields of the new mounting point. */
 	result->p_refcnt = 2; /* +1: return, +1: `path_cldlist_insert(parent, result);' / `pathvfs->vf_root' */
 	result->p_flags  = PATH_F_ISMOUNT;
-	result->p_name   = self->p_name; /* incref'd later */
 	result->p_dir    = dir;          /* incref'd later */
 	TAILQ_ENTRY_UNBOUND_INIT(&result->p_recent);
 	shared_rwlock_init(&result->p_cldlock);
@@ -1695,7 +1694,7 @@ again_load_parent:
 	assert(!!path_isroot(self) == (parent == NULL));
 
 	/* Construct missing references */
-	incref(result->p_name);
+	result->p_name = incref(self->p_name);
 	incref(dir); /* For `result->p_dir' */
 
 	/* Delete any pre-existing mounting points reachable from `self' */
@@ -1816,7 +1815,11 @@ path_print(struct path *__restrict self, __pformatprinter printer,
 	/* Print the name of this directory. */
 	{
 		ssize_t temp;
-		temp = (*printer)(arg, self->p_name->fd_name, self->p_name->fd_namelen);
+		REF struct fdirent *name = path_getname(self);
+		{
+			FINALLY_DECREF_UNLIKELY(name);
+			temp = (*printer)(arg, name->fd_name, name->fd_namelen);
+		}
 		if unlikely(temp < 0)
 			return temp;
 		result += temp;
