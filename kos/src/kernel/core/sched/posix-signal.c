@@ -2426,8 +2426,7 @@ signal_waitfor(CHECKED USER sigset_t const *uthese,
 					PREEMPTION_ENABLE();
 					/* Yield until the lock becomes available. */
 					proc_rpcs = &THIS_PROCESS_RPCS;
-					while (!atomic_rwlock_canwrite(&proc_rpcs->ppr_lock))
-						task_yield();
+					process_pending_rpcs_waitwrite(proc_rpcs);
 					continue;
 				}
 			}

@@ -221,6 +221,10 @@ NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 #define mpartmeta_ftxlock_writing(self)        atomic_rwlock_writing(&(self)->mpm_ftxlock)
 #define mpartmeta_ftxlock_canread(self)        atomic_rwlock_canread(&(self)->mpm_ftxlock)
 #define mpartmeta_ftxlock_canwrite(self)       atomic_rwlock_canwrite(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_waitread(self)       atomic_rwlock_waitread(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_waitwrite(self)      atomic_rwlock_waitwrite(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_waitread_nx(self)    atomic_rwlock_waitread_nx(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_waitwrite_nx(self)   atomic_rwlock_waitwrite_nx(&(self)->mpm_ftxlock)
 
 /* Helper macros for operating on the futex tree of a given mem-part-meta controller. */
 #define mpartmeta_ftx_locate(self, addr)              mfutex_tree_locate((self)->mpm_ftx, addr)

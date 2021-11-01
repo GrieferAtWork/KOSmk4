@@ -344,29 +344,33 @@ typedef struct inode_data {
 } FatNodeData;
 
 /* Helpers for accessing `fn_lock' */
-#define /*        */ _FatNodeData_Reap(self)      (void)0
-#define /*        */ FatNodeData_Reap(self)       (void)0
-#define /*        */ FatNodeData_MustReap(self)   0
-#define /*BLOCKING*/ FatNodeData_Write(self)      shared_rwlock_write(&(self)->fn_lock)
-#define /*BLOCKING*/ FatNodeData_WriteNx(self)    shared_rwlock_write_nx(&(self)->fn_lock)
-#define /*        */ FatNodeData_TryWrite(self)   shared_rwlock_trywrite(&(self)->fn_lock)
-#define /*        */ FatNodeData_EndWrite(self)   (shared_rwlock_endwrite(&(self)->fn_lock), FatNodeData_Reap(self))
-#define /*        */ _FatNodeData_EndWrite(self)  shared_rwlock_endwrite(&(self)->fn_lock)
-#define /*BLOCKING*/ FatNodeData_Read(self)       shared_rwlock_read(&(self)->fn_lock)
-#define /*BLOCKING*/ FatNodeData_ReadNx(self)     shared_rwlock_read_nx(&(self)->fn_lock)
-#define /*        */ FatNodeData_TryRead(self)    shared_rwlock_tryread(&(self)->fn_lock)
-#define /*        */ _FatNodeData_EndRead(self)   shared_rwlock_endread(&(self)->fn_lock)
-#define /*        */ FatNodeData_EndRead(self)    (void)(shared_rwlock_endread(&(self)->fn_lock) && (FatNodeData_Reap(self), 0))
-#define /*        */ _FatNodeData_End(self)       shared_rwlock_end(&(self)->fn_lock)
-#define /*        */ FatNodeData_End(self)        (void)(shared_rwlock_end(&(self)->fn_lock) && (FatNodeData_Reap(self), 0))
-#define /*BLOCKING*/ FatNodeData_Upgrade(self)    shared_rwlock_upgrade(&(self)->fn_lock)
-#define /*BLOCKING*/ FatNodeData_UpgradeNx(self)  shared_rwlock_upgrade_nx(&(self)->fn_lock)
-#define /*        */ FatNodeData_TryUpgrade(self) shared_rwlock_tryupgrade(&(self)->fn_lock)
-#define /*        */ FatNodeData_Downgrade(self)  shared_rwlock_downgrade(&(self)->fn_lock)
-#define /*        */ FatNodeData_Reading(self)    shared_rwlock_reading(&(self)->fn_lock)
-#define /*        */ FatNodeData_Writing(self)    shared_rwlock_writing(&(self)->fn_lock)
-#define /*        */ FatNodeData_CanRead(self)    shared_rwlock_canread(&(self)->fn_lock)
-#define /*        */ FatNodeData_CanWrite(self)   shared_rwlock_canwrite(&(self)->fn_lock)
+#define /*        */ _FatNodeData_Reap(self)       (void)0
+#define /*        */ FatNodeData_Reap(self)        (void)0
+#define /*        */ FatNodeData_MustReap(self)    0
+#define /*BLOCKING*/ FatNodeData_Write(self)       shared_rwlock_write(&(self)->fn_lock)
+#define /*BLOCKING*/ FatNodeData_WriteNx(self)     shared_rwlock_write_nx(&(self)->fn_lock)
+#define /*        */ FatNodeData_TryWrite(self)    shared_rwlock_trywrite(&(self)->fn_lock)
+#define /*        */ FatNodeData_EndWrite(self)    (shared_rwlock_endwrite(&(self)->fn_lock), FatNodeData_Reap(self))
+#define /*        */ _FatNodeData_EndWrite(self)   shared_rwlock_endwrite(&(self)->fn_lock)
+#define /*BLOCKING*/ FatNodeData_Read(self)        shared_rwlock_read(&(self)->fn_lock)
+#define /*BLOCKING*/ FatNodeData_ReadNx(self)      shared_rwlock_read_nx(&(self)->fn_lock)
+#define /*        */ FatNodeData_TryRead(self)     shared_rwlock_tryread(&(self)->fn_lock)
+#define /*        */ _FatNodeData_EndRead(self)    shared_rwlock_endread(&(self)->fn_lock)
+#define /*        */ FatNodeData_EndRead(self)     (void)(shared_rwlock_endread(&(self)->fn_lock) && (FatNodeData_Reap(self), 0))
+#define /*        */ _FatNodeData_End(self)        shared_rwlock_end(&(self)->fn_lock)
+#define /*        */ FatNodeData_End(self)         (void)(shared_rwlock_end(&(self)->fn_lock) && (FatNodeData_Reap(self), 0))
+#define /*BLOCKING*/ FatNodeData_Upgrade(self)     shared_rwlock_upgrade(&(self)->fn_lock)
+#define /*BLOCKING*/ FatNodeData_UpgradeNx(self)   shared_rwlock_upgrade_nx(&(self)->fn_lock)
+#define /*        */ FatNodeData_TryUpgrade(self)  shared_rwlock_tryupgrade(&(self)->fn_lock)
+#define /*        */ FatNodeData_Downgrade(self)   shared_rwlock_downgrade(&(self)->fn_lock)
+#define /*        */ FatNodeData_Reading(self)     shared_rwlock_reading(&(self)->fn_lock)
+#define /*        */ FatNodeData_Writing(self)     shared_rwlock_writing(&(self)->fn_lock)
+#define /*        */ FatNodeData_CanRead(self)     shared_rwlock_canread(&(self)->fn_lock)
+#define /*        */ FatNodeData_CanWrite(self)    shared_rwlock_canwrite(&(self)->fn_lock)
+#define /*BLOCKING*/ FatNodeData_WaitRead(self)    shared_rwlock_waitread(&(self)->fn_lock)
+#define /*BLOCKING*/ FatNodeData_WaitWrite(self)   shared_rwlock_waitwrite(&(self)->fn_lock)
+#define /*BLOCKING*/ FatNodeData_WaitReadNx(self)  shared_rwlock_waitread_nx(&(self)->fn_lock)
+#define /*BLOCKING*/ FatNodeData_WaitWriteNx(self) shared_rwlock_waitwrite_nx(&(self)->fn_lock)
 
 
 
@@ -460,29 +464,33 @@ struct fatsuper {
 
 
 /* Helpers for accessing `ft_fat_lock' */
-#define /*        */ _FatSuper_FatLockReap(self)      (void)0
-#define /*        */ FatSuper_FatLockReap(self)       (void)0
-#define /*        */ FatSuper_FatLockMustReap(self)   0
-#define /*BLOCKING*/ FatSuper_FatLockWrite(self)      shared_rwlock_write(&(self)->ft_fat_lock)
-#define /*BLOCKING*/ FatSuper_FatLockWriteNx(self)    shared_rwlock_write_nx(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockTryWrite(self)   shared_rwlock_trywrite(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockEndWrite(self)   (shared_rwlock_endwrite(&(self)->ft_fat_lock), FatSuper_FatLockReap(self))
-#define /*        */ _FatSuper_FatLockEndWrite(self)  shared_rwlock_endwrite(&(self)->ft_fat_lock)
-#define /*BLOCKING*/ FatSuper_FatLockRead(self)       shared_rwlock_read(&(self)->ft_fat_lock)
-#define /*BLOCKING*/ FatSuper_FatLockReadNx(self)     shared_rwlock_read_nx(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockTryRead(self)    shared_rwlock_tryread(&(self)->ft_fat_lock)
-#define /*        */ _FatSuper_FatLockEndRead(self)   shared_rwlock_endread(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockEndRead(self)    (void)(shared_rwlock_endread(&(self)->ft_fat_lock) && (FatSuper_FatLockReap(self), 0))
-#define /*        */ _FatSuper_FatLockEnd(self)       shared_rwlock_end(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockEnd(self)        (void)(shared_rwlock_end(&(self)->ft_fat_lock) && (FatSuper_FatLockReap(self), 0))
-#define /*BLOCKING*/ FatSuper_FatLockUpgrade(self)    shared_rwlock_upgrade(&(self)->ft_fat_lock)
-#define /*BLOCKING*/ FatSuper_FatLockUpgradeNx(self)  shared_rwlock_upgrade_nx(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockTryUpgrade(self) shared_rwlock_tryupgrade(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockDowngrade(self)  shared_rwlock_downgrade(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockReading(self)    shared_rwlock_reading(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockWriting(self)    shared_rwlock_writing(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockCanRead(self)    shared_rwlock_canread(&(self)->ft_fat_lock)
-#define /*        */ FatSuper_FatLockCanWrite(self)   shared_rwlock_canwrite(&(self)->ft_fat_lock)
+#define /*        */ _FatSuper_FatLockReap(self)       (void)0
+#define /*        */ FatSuper_FatLockReap(self)        (void)0
+#define /*        */ FatSuper_FatLockMustReap(self)    0
+#define /*BLOCKING*/ FatSuper_FatLockWrite(self)       shared_rwlock_write(&(self)->ft_fat_lock)
+#define /*BLOCKING*/ FatSuper_FatLockWriteNx(self)     shared_rwlock_write_nx(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockTryWrite(self)    shared_rwlock_trywrite(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockEndWrite(self)    (shared_rwlock_endwrite(&(self)->ft_fat_lock), FatSuper_FatLockReap(self))
+#define /*        */ _FatSuper_FatLockEndWrite(self)   shared_rwlock_endwrite(&(self)->ft_fat_lock)
+#define /*BLOCKING*/ FatSuper_FatLockRead(self)        shared_rwlock_read(&(self)->ft_fat_lock)
+#define /*BLOCKING*/ FatSuper_FatLockReadNx(self)      shared_rwlock_read_nx(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockTryRead(self)     shared_rwlock_tryread(&(self)->ft_fat_lock)
+#define /*        */ _FatSuper_FatLockEndRead(self)    shared_rwlock_endread(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockEndRead(self)     (void)(shared_rwlock_endread(&(self)->ft_fat_lock) && (FatSuper_FatLockReap(self), 0))
+#define /*        */ _FatSuper_FatLockEnd(self)        shared_rwlock_end(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockEnd(self)         (void)(shared_rwlock_end(&(self)->ft_fat_lock) && (FatSuper_FatLockReap(self), 0))
+#define /*BLOCKING*/ FatSuper_FatLockUpgrade(self)     shared_rwlock_upgrade(&(self)->ft_fat_lock)
+#define /*BLOCKING*/ FatSuper_FatLockUpgradeNx(self)   shared_rwlock_upgrade_nx(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockTryUpgrade(self)  shared_rwlock_tryupgrade(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockDowngrade(self)   shared_rwlock_downgrade(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockReading(self)     shared_rwlock_reading(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockWriting(self)     shared_rwlock_writing(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockCanRead(self)     shared_rwlock_canread(&(self)->ft_fat_lock)
+#define /*        */ FatSuper_FatLockCanWrite(self)    shared_rwlock_canwrite(&(self)->ft_fat_lock)
+#define /*BLOCKING*/ FatSuper_FatLockWaitRead(self)    shared_rwlock_waitread(&(self)->ft_fat_lock)
+#define /*BLOCKING*/ FatSuper_FatLockWaitWrite(self)   shared_rwlock_waitwrite(&(self)->ft_fat_lock)
+#define /*BLOCKING*/ FatSuper_FatLockWaitReadNx(self)  shared_rwlock_waitread_nx(&(self)->ft_fat_lock)
+#define /*BLOCKING*/ FatSuper_FatLockWaitWriteNx(self) shared_rwlock_waitwrite_nx(&(self)->ft_fat_lock)
 
 /* Get/Set  a  FAT table  indirection.  (These function  access  the `ft_fat_table'  memory mapping)
  * As such, changes made by these functions must be synced to-disk via `mfile_sync(ft_super.fs_dev)' */

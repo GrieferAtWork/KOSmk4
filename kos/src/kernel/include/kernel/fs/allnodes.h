@@ -80,6 +80,8 @@ DATDEF struct lockop_slist fallnodes_lockops;
 #define fallnodes_release()    (atomic_lock_release(&fallnodes_lock), fallnodes_reap())
 #define fallnodes_acquired()   atomic_lock_acquired(&fallnodes_lock)
 #define fallnodes_available()  atomic_lock_available(&fallnodes_lock)
+#define fallnodes_waitfor()    atomic_lock_waitfor(&fallnodes_lock)
+#define fallnodes_waitfor_nx() atomic_lock_waitfor_nx(&fallnodes_lock)
 
 
 
@@ -108,6 +110,8 @@ DATDEF struct lockop_slist fallsuper_lockops;
 #define fallsuper_release()    (atomic_lock_release(&fallsuper_lock), fallsuper_reap())
 #define fallsuper_acquired()   atomic_lock_acquired(&fallsuper_lock)
 #define fallsuper_available()  atomic_lock_available(&fallsuper_lock)
+#define fallsuper_waitfor()    atomic_lock_waitfor(&fallsuper_lock)
+#define fallsuper_waitfor_nx() atomic_lock_waitfor_nx(&fallsuper_lock)
 
 
 
@@ -135,6 +139,8 @@ DATDEF struct lockop_slist fchangedsuper_lockops;
 #define fchangedsuper_release()    (atomic_lock_release(&fchangedsuper_lock), fchangedsuper_reap())
 #define fchangedsuper_acquired()   atomic_lock_acquired(&fchangedsuper_lock)
 #define fchangedsuper_available()  atomic_lock_available(&fchangedsuper_lock)
+#define fchangedsuper_waitfor()    atomic_lock_waitfor(&fchangedsuper_lock)
+#define fchangedsuper_waitfor_nx() atomic_lock_waitfor_nx(&fchangedsuper_lock)
 
 
 

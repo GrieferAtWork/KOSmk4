@@ -285,9 +285,9 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 		{
 			struct pending_rpc *remain;
 			assert(PREEMPTION_ENABLED());
-			atomic_rwlock_write(&mygroup.tg_proc_rpcs.ppr_lock);
+			process_pending_rpcs_write(&mygroup.tg_proc_rpcs); /* NOTHROW because preemption is enabled! */
 			remain = ATOMIC_XCH(mygroup.tg_proc_rpcs.ppr_list.slh_first, THIS_RPCS_TERMINATED);
-			atomic_rwlock_endwrite(&mygroup.tg_proc_rpcs.ppr_lock);
+			process_pending_rpcs_endwrite(&mygroup.tg_proc_rpcs);
 			sig_broadcast_for_fini(&mygroup.tg_proc_rpcs.ppr_more);
 			assert(remain != THIS_RPCS_TERMINATED);
 			task_asyncrpc_destroy_list_for_shutdown(remain);

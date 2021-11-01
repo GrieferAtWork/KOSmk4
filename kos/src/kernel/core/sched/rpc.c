@@ -275,7 +275,7 @@ NOTHROW(FCALL restore_pending_rpcs)(struct pending_rpc *restore);
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) bool FCALL
 are_any_unmasked_process_rpcs_pending_with_faulty(struct process_pending_rpcs *__restrict proc_rpcs,
                                                   signo_t signo)
-		THROWS(E_SEGFAULT) {
+		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	struct pending_rpc *rpc;
 	sigset_t known_masked, known_unmasked;
 	sigemptyset(&known_masked);
@@ -287,7 +287,7 @@ again_test_signo:
 	          signo);
 	if unlikely(ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)
 		return false;
-	atomic_rwlock_read(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_read(proc_rpcs);
 	SLIST_FOREACH (rpc, &proc_rpcs->ppr_list, pr_link) {
 		int status;
 		signo = _RPC_GETSIGNO(rpc->pr_flags);
@@ -297,7 +297,7 @@ again_test_signo:
 			/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
 			 *       disposition  indicates that the signal should be ignored.
 			 *       If so, consume and discard the associated RPC! */
-			atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+			process_pending_rpcs_endread(proc_rpcs);
 			return true; /* Known-unmasked signal */
 		}
 
@@ -309,16 +309,16 @@ again_test_signo:
 		}
 		if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 			/* Must do a "hard" masking-test */
-			atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+			process_pending_rpcs_endread(proc_rpcs);
 			goto again_test_signo;
 		}
 		/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
 		 *       disposition  indicates that the signal should be ignored.
 		 *       If so, consume and discard the associated RPC! */
-		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+		process_pending_rpcs_endread(proc_rpcs);
 		return true;
 	}
-	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_endread(proc_rpcs);
 	return false;
 }
 #endif /* CONFIG_HAVE_USERPROCMASK */
@@ -337,7 +337,7 @@ PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
 	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
 	if (ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)
 		return false;
-	atomic_rwlock_read(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_read(proc_rpcs);
 	SLIST_FOREACH (rpc, &proc_rpcs->ppr_list, pr_link) {
 		int status;
 		status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
@@ -346,19 +346,19 @@ PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
 #ifdef CONFIG_HAVE_USERPROCMASK
 		if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 			signo_t signo = _RPC_GETSIGNO(rpc->pr_flags);
-			atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+			process_pending_rpcs_endread(proc_rpcs);
 			return are_any_unmasked_process_rpcs_pending_with_faulty(proc_rpcs, signo);
 		}
-		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+		process_pending_rpcs_endread(proc_rpcs);
 #else /* CONFIG_HAVE_USERPROCMASK */
-		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+		process_pending_rpcs_endread(proc_rpcs);
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 		/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
 		 *       disposition  indicates that the signal should be ignored.
 		 *       If so, consume and discard the associated RPC! */
 		return true;
 	}
-	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_endread(proc_rpcs);
 	return false;
 }
 
@@ -369,7 +369,7 @@ PRIVATE WUNUSED bool NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_n
 	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
 	if (ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)
 		return false;
-	if (!atomic_rwlock_tryread(&proc_rpcs->ppr_lock))
+	if (!process_pending_rpcs_tryread(proc_rpcs))
 		return true; /* Must assume that at least one of them would be unmasked in our thread. */
 	SLIST_FOREACH (rpc, &proc_rpcs->ppr_list, pr_link) {
 		int status;
@@ -379,10 +379,10 @@ PRIVATE WUNUSED bool NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_n
 		/* Either the signal number isn't masked, or the status can't be determined.
 		 * In any case, we're supposed to act like it isn't masked, since our caller
 		 * asked weather there **may** be unmasked process RPCs. */
-		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+		process_pending_rpcs_endread(proc_rpcs);
 		return true;
 	}
-	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_endread(proc_rpcs);
 	return false;
 }
 
@@ -558,11 +558,11 @@ proc_rpc_pending_sigset(/*in|out*/ sigset_t *__restrict result)
 	struct process_pending_rpcs *proc_rpcs;
 	struct pending_rpc *first;
 	proc_rpcs = &THIS_PROCESS_RPCS;
-	atomic_rwlock_read(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_read(proc_rpcs);
 	first = SLIST_FIRST(&proc_rpcs->ppr_list);
 	if (first != THIS_RPCS_TERMINATED)
 		pending_signals_from_rpc_list(result, first);
-	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_endread(proc_rpcs);
 }
 
 
@@ -595,11 +595,11 @@ proc_rpc_pending_oneof(sigset_t const *__restrict these)
 	struct process_pending_rpcs *proc_rpcs;
 	struct pending_rpc *first;
 	proc_rpcs = &THIS_PROCESS_RPCS;
-	atomic_rwlock_read(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_read(proc_rpcs);
 	first = SLIST_FIRST(&proc_rpcs->ppr_list);
 	if (first != THIS_RPCS_TERMINATED)
 		result = is_one_of_these_pending(these, first);
-	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_endread(proc_rpcs);
 	return result;
 }
 
@@ -610,7 +610,7 @@ NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
 	struct process_pending_rpcs *proc_rpcs;
 	struct pending_rpc *first;
 	proc_rpcs = &THIS_PROCESS_RPCS;
-	if (!atomic_rwlock_tryread(&proc_rpcs->ppr_lock))
+	if (!process_pending_rpcs_tryread(proc_rpcs))
 		return PROC_RPC_TRYPENDING_ONEOF_WOULDBLOCK;
 	first = SLIST_FIRST(&proc_rpcs->ppr_list);
 	if (first != THIS_RPCS_TERMINATED) {
@@ -618,7 +618,7 @@ NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
 		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
 		result = (int)is_one_of_these_pending(these, first);
 	}
-	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_endread(proc_rpcs);
 	return result;
 }
 
@@ -674,9 +674,9 @@ proc_rpc_pending_steal_posix_signal(sigset_t const *__restrict these)
 	if (result == NULL || result == THIS_RPCS_TERMINATED)
 		return NULL;
 	/* XXX: Implement via read-lock + update */
-	atomic_rwlock_write(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_write(proc_rpcs);
 	result = steal_posix_signal(&proc_rpcs->ppr_list, these);
-	atomic_rwlock_endwrite(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_endwrite(proc_rpcs);
 	return result;
 }
 
@@ -693,10 +693,10 @@ NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict
 	if (result == NULL || result == THIS_RPCS_TERMINATED)
 		return NULL;
 	/* XXX: Implement via read-lock + update */
-	if (!atomic_rwlock_trywrite(&proc_rpcs->ppr_lock))
+	if (!process_pending_rpcs_trywrite(proc_rpcs))
 		return PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK;
 	result = steal_posix_signal(&proc_rpcs->ppr_list, these);
-	atomic_rwlock_endwrite(&proc_rpcs->ppr_lock);
+	process_pending_rpcs_endwrite(proc_rpcs);
 	return result;
 }
 

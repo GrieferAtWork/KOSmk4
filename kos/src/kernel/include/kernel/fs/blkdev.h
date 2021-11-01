@@ -163,6 +163,8 @@ DATDEF struct blkdev_ops const blkpart_ops;
 #define blkdev_root_partslock_release(self)    (atomic_lock_release(&(self)->bd_rootinfo.br_partslock), blkdev_root_partslock_reap(self))
 #define blkdev_root_partslock_acquired(self)   atomic_lock_acquired(&(self)->bd_rootinfo.br_partslock)
 #define blkdev_root_partslock_available(self)  atomic_lock_available(&(self)->bd_rootinfo.br_partslock)
+#define blkdev_root_partslock_waitfor(self)    atomic_lock_waitfor(&(self)->bd_rootinfo.br_partslock)
+#define blkdev_root_partslock_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->bd_rootinfo.br_partslock)
 
 
 /* Return a pointer to character-device operators of `self' */

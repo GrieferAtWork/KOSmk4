@@ -395,29 +395,33 @@ struct handle_manager {
 };
 
 /* Helpers for accessing `hm_lock' */
-#define _handle_manager_reap(self)      (void)0
-#define handle_manager_reap(self)       (void)0
-#define handle_manager_mustreap(self)   0
-#define handle_manager_write(self)      atomic_rwlock_write(&(self)->hm_lock)
-#define handle_manager_write_nx(self)   atomic_rwlock_write_nx(&(self)->hm_lock)
-#define handle_manager_trywrite(self)   atomic_rwlock_trywrite(&(self)->hm_lock)
-#define handle_manager_endwrite(self)   (atomic_rwlock_endwrite(&(self)->hm_lock), handle_manager_reap(self))
-#define _handle_manager_endwrite(self)  atomic_rwlock_endwrite(&(self)->hm_lock)
-#define handle_manager_read(self)       atomic_rwlock_read(&(self)->hm_lock)
-#define handle_manager_read_nx(self)    atomic_rwlock_read_nx(&(self)->hm_lock)
-#define handle_manager_tryread(self)    atomic_rwlock_tryread(&(self)->hm_lock)
-#define _handle_manager_endread(self)   atomic_rwlock_endread(&(self)->hm_lock)
-#define handle_manager_endread(self)    (void)(atomic_rwlock_endread(&(self)->hm_lock) && (handle_manager_reap(self), 0))
-#define _handle_manager_end(self)       atomic_rwlock_end(&(self)->hm_lock)
-#define handle_manager_end(self)        (void)(atomic_rwlock_end(&(self)->hm_lock) && (handle_manager_reap(self), 0))
-#define handle_manager_upgrade(self)    atomic_rwlock_upgrade(&(self)->hm_lock)
-#define handle_manager_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->hm_lock)
-#define handle_manager_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->hm_lock)
-#define handle_manager_downgrade(self)  atomic_rwlock_downgrade(&(self)->hm_lock)
-#define handle_manager_reading(self)    atomic_rwlock_reading(&(self)->hm_lock)
-#define handle_manager_writing(self)    atomic_rwlock_writing(&(self)->hm_lock)
-#define handle_manager_canread(self)    atomic_rwlock_canread(&(self)->hm_lock)
-#define handle_manager_canwrite(self)   atomic_rwlock_canwrite(&(self)->hm_lock)
+#define _handle_manager_reap(self)        (void)0
+#define handle_manager_reap(self)         (void)0
+#define handle_manager_mustreap(self)     0
+#define handle_manager_write(self)        atomic_rwlock_write(&(self)->hm_lock)
+#define handle_manager_write_nx(self)     atomic_rwlock_write_nx(&(self)->hm_lock)
+#define handle_manager_trywrite(self)     atomic_rwlock_trywrite(&(self)->hm_lock)
+#define handle_manager_endwrite(self)     (atomic_rwlock_endwrite(&(self)->hm_lock), handle_manager_reap(self))
+#define _handle_manager_endwrite(self)    atomic_rwlock_endwrite(&(self)->hm_lock)
+#define handle_manager_read(self)         atomic_rwlock_read(&(self)->hm_lock)
+#define handle_manager_read_nx(self)      atomic_rwlock_read_nx(&(self)->hm_lock)
+#define handle_manager_tryread(self)      atomic_rwlock_tryread(&(self)->hm_lock)
+#define _handle_manager_endread(self)     atomic_rwlock_endread(&(self)->hm_lock)
+#define handle_manager_endread(self)      (void)(atomic_rwlock_endread(&(self)->hm_lock) && (handle_manager_reap(self), 0))
+#define _handle_manager_end(self)         atomic_rwlock_end(&(self)->hm_lock)
+#define handle_manager_end(self)          (void)(atomic_rwlock_end(&(self)->hm_lock) && (handle_manager_reap(self), 0))
+#define handle_manager_upgrade(self)      atomic_rwlock_upgrade(&(self)->hm_lock)
+#define handle_manager_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->hm_lock)
+#define handle_manager_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->hm_lock)
+#define handle_manager_downgrade(self)    atomic_rwlock_downgrade(&(self)->hm_lock)
+#define handle_manager_reading(self)      atomic_rwlock_reading(&(self)->hm_lock)
+#define handle_manager_writing(self)      atomic_rwlock_writing(&(self)->hm_lock)
+#define handle_manager_canread(self)      atomic_rwlock_canread(&(self)->hm_lock)
+#define handle_manager_canwrite(self)     atomic_rwlock_canwrite(&(self)->hm_lock)
+#define handle_manager_waitread(self)     atomic_rwlock_waitread(&(self)->hm_lock)
+#define handle_manager_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->hm_lock)
+#define handle_manager_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->hm_lock)
+#define handle_manager_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->hm_lock)
 
 
 /* Destroy the given handle manager. */

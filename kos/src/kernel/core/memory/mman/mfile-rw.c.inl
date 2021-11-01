@@ -559,8 +559,7 @@ handle_write_impossible_too_big:
 		if (!mfile_lock_tryupgrade(self)) {
 			mfile_lock_endread(self);
 			decref_unlikely(part);
-			while (!mfile_lock_canwrite(self))
-				task_yield();
+			mfile_lock_waitwrite(self);
 			goto again;
 		}
 

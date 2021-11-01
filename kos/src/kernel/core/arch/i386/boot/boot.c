@@ -924,9 +924,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       more code! (especially  since the THROWS(E_WOULDBLOCK)  doesn't
 	 *       make a lot of sense for a function like that) */
 
-	/* TODO: Remove general-purpose  locking  support  for  `struct mman'
-	 *       Since there is more than 1 lock contained inside, it doesn't
-	 *       make too much  sense to provide  generic locking  overloads! */
+	/* TODO: `struct fdirenum' should be variable-sized,  with
+	 *       the real size stored as a vtable `size_t'-member. */
 
 	return state;
 }

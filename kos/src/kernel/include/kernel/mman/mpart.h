@@ -1481,6 +1481,8 @@ DATDEF struct atomic_lock mpart_all_lock;
 #define mpart_all_release_f()  atomic_lock_release(&mpart_all_lock)
 #define mpart_all_acquired()   atomic_lock_acquired(&mpart_all_lock)
 #define mpart_all_available()  atomic_lock_available(&mpart_all_lock)
+#define mpart_all_waitfor()    atomic_lock_waitfor(&mpart_all_lock)
+#define mpart_all_waitfor_nx() atomic_lock_waitfor_nx(&mpart_all_lock)
 
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'

@@ -489,8 +489,7 @@ Fat_GetAbsDiskPos(struct fnode *__restrict self, pos_t pos) THROWS(...) {
 				break;
 
 			/* Wait for writing to become possible. */
-			FatNodeData_Write(dat);
-			FatNodeData_EndWrite(dat);
+			FatNodeData_WaitWrite(dat);
 		}
 	} else {
 		result = Fat_GetAbsDiskPosWithoutFatClusters(self, pos);
@@ -575,8 +574,7 @@ again:
 	}
 	return;
 waitfor_write_lock:
-	FatNodeData_Write(dat);
-	FatNodeData_EndWrite(dat);
+	FatNodeData_WaitWrite(dat);
 	goto again;
 }
 
@@ -645,8 +643,7 @@ again:
 	}
 	return;
 waitfor_write_lock:
-	FatNodeData_Write(dat);
-	FatNodeData_EndWrite(dat);
+	FatNodeData_WaitWrite(dat);
 	goto again;
 }
 
@@ -1659,8 +1656,7 @@ FatNode_GetFirstCluster(struct fnode *__restrict self)
 		}
 		if likely(result != FAT_GETFILECLUSTER_NEED_WRLOCK)
 			break;
-		FatNodeData_Write(dat);
-		FatNodeData_EndWrite(dat);
+		FatNodeData_WaitWrite(dat);
 	}
 	return result;
 }

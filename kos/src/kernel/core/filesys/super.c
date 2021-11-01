@@ -256,9 +256,9 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 	assert(SLIST_EMPTY(&me->fs_mountslockops));
 	assert(SLIST_EMPTY(&me->fs_changednodes_lops));
 	assert(SLIST_EMPTY(&me->fs_nodeslockops));
-	assert(atomic_rwlock_canwrite(&me->fs_nodeslock));
-	assert(atomic_rwlock_canwrite(&me->fs_mountslock));
-	assert(atomic_lock_available(&me->fs_changednodes_lock));
+	assert(fsuper_nodes_canwrite(me));
+	assert(fsuper_mounts_canwrite(me));
+	assert(fsuper_changednodes_available(me));
 	assertf(me->fs_changednodes.lh_first == NULL ||
 	        me->fs_changednodes.lh_first == FSUPER_NODES_DELETED,
 	        "Nodes would have references");

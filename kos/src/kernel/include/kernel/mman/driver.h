@@ -424,6 +424,38 @@ struct driver
 	COMPILER_FLEXIBLE_ARRAY(ElfW(Phdr), d_phdr); /* [d_phnum][const] Vector of program headers. */
 };
 
+#ifdef __WANT_DRIVER__d_internals
+/* Helper macros for `struct driver::d_eh_frame_cache_lock' */
+#define driver_eh_frame_cache_mustreap(self)     0
+#define driver_eh_frame_cache_reap(self)         (void)0
+#define _driver_eh_frame_cache_reap(self)        (void)0
+#define driver_eh_frame_cache_write(self)        atomic_rwlock_write(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_write_nx(self)     atomic_rwlock_write_nx(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_trywrite(self)     atomic_rwlock_trywrite(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_endwrite(self)     (atomic_rwlock_endwrite(&(self)->d_eh_frame_cache_lock), driver_eh_frame_cache_reap(self))
+#define _driver_eh_frame_cache_endwrite(self)    atomic_rwlock_endwrite(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_read(self)         atomic_rwlock_read(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_read_nx(self)      atomic_rwlock_read_nx(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_tryread(self)      atomic_rwlock_tryread(&(self)->d_eh_frame_cache_lock)
+#define _driver_eh_frame_cache_endread(self)     atomic_rwlock_endread(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_endread(self)      (void)(atomic_rwlock_endread(&(self)->d_eh_frame_cache_lock) && (driver_eh_frame_cache_reap(self), 0))
+#define _driver_eh_frame_cache_end(self)         atomic_rwlock_end(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_end(self)          (void)(atomic_rwlock_end(&(self)->d_eh_frame_cache_lock) && (driver_eh_frame_cache_reap(self), 0))
+#define driver_eh_frame_cache_upgrade(self)      atomic_rwlock_upgrade(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_downgrade(self)    atomic_rwlock_downgrade(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_reading(self)      atomic_rwlock_reading(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_writing(self)      atomic_rwlock_writing(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_canread(self)      atomic_rwlock_canread(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_canwrite(self)     atomic_rwlock_canwrite(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_waitread(self)     atomic_rwlock_waitread(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->d_eh_frame_cache_lock)
+#define driver_eh_frame_cache_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->d_eh_frame_cache_lock)
+#endif /* __WANT_DRIVER__d_internals */
+
+
 /* Check if the given driver is/was finalized. */
 #define driver_isfinalizing(self) \
 	(__hybrid_atomic_load((self)->d_state, __ATOMIC_ACQUIRE) >= DRIVER_STATE_FINI_DT_FINIARR)

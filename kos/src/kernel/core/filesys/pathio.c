@@ -379,8 +379,7 @@ again_acquire_cldlock:
 				path_cldlock_endwrite(self);
 				decref_unlikely(existing_path);
 				FINALLY_DECREF_UNLIKELY(blocking_path);
-				path_cldlock_write(blocking_path);
-				path_cldlock_endwrite(blocking_path);
+				path_cldlock_waitwrite(blocking_path);
 				goto again_acquire_cldlock;
 			}
 
@@ -1312,16 +1311,14 @@ again_rename:
 waitfor_newpath_ref_writelock:
 		twopaths_release_locks(oldpath, newpath);
 		FINALLY_DECREF_UNLIKELY(newpath_ref);
-		path_cldlock_write(newpath_ref);
-		path_cldlock_endwrite(newpath_ref);
+		path_cldlock_waitwrite(newpath_ref);
 	}
 	goto again_acquire_lock;
 	{
 waitfor_status_writelock:
 		twopaths_release_locks(oldpath, newpath);
 		FINALLY_DECREF_UNLIKELY(status);
-		path_cldlock_write(status);
-		path_cldlock_endwrite(status);
+		path_cldlock_waitwrite(status);
 	}
 	goto again_acquire_lock;
 }
@@ -1410,16 +1407,14 @@ again_acquire_locks:
 	blocking_path = path_tryincref_and_trylock_whole_tree(self);
 	if unlikely(blocking_path) {
 		FINALLY_DECREF_UNLIKELY(blocking_path);
-		path_cldlock_write(blocking_path);
-		path_cldlock_endwrite(blocking_path);
+		path_cldlock_waitwrite(blocking_path);
 		goto again_acquire_locks;
 	}
 
 	/* Acquire a lock to the VFS's mounting controller. */
 	if (!vfs_mountslock_tryacquire(pathvfs)) {
 		path_decref_and_unlock_whole_tree(self);
-		while (!vfs_mountslock_available(pathvfs))
-			task_yield();
+		vfs_mountslock_waitfor(pathvfs);
 		goto again_acquire_locks;
 	}
 
@@ -1428,8 +1423,7 @@ again_acquire_locks:
 	if (!vfs_driveslock_trywrite(pathvfs)) {
 		vfs_mountslock_release(pathvfs);
 		path_decref_and_unlock_whole_tree(self);
-		while (!vfs_driveslock_canwrite(pathvfs))
-			task_yield();
+		vfs_driveslock_waitwrite(pathvfs);
 		goto again_acquire_locks;
 	}
 
@@ -1440,8 +1434,7 @@ again_acquire_locks:
 			vfs_driveslock_endwrite(pathvfs);
 			vfs_mountslock_release(pathvfs);
 			path_decref_and_unlock_whole_tree(self);
-			while (!vfs_rootlock_canwrite(pathvfs))
-				task_yield();
+			vfs_rootlock_waitwrite(pathvfs);
 			goto again_acquire_locks;
 		}
 		/* If we're still the root path, replace said path with . */
@@ -1481,8 +1474,7 @@ again_acquire_locks:
 				vfs_driveslock_endwrite(pathvfs);
 				vfs_mountslock_release(pathvfs);
 				path_decref_and_unlock_whole_tree(self);
-				while (!fsuper_mounts_canwrite(&fsuper_unmounted))
-					task_yield();
+				fsuper_mounts_waitwrite(&fsuper_unmounted);
 				goto again_acquire_locks;
 			}
 
@@ -1509,8 +1501,7 @@ again_load_parent:
 			vfs_mountslock_release(pathvfs);
 			path_decref_and_unlock_whole_tree(self);
 			FINALLY_DECREF_UNLIKELY(parent);
-			path_cldlock_write(parent);
-			path_cldlock_endwrite(parent);
+			path_cldlock_waitwrite(parent);
 			goto again_acquire_locks;
 		}
 		if unlikely(parent != self->p_parent) {
@@ -1622,29 +1613,25 @@ again_acquire_locks:
 		blocking_path = path_tryincref_and_trylock_whole_tree(self);
 		if unlikely(blocking_path) {
 			FINALLY_DECREF_UNLIKELY(blocking_path);
-			path_cldlock_write(blocking_path);
-			path_cldlock_endwrite(blocking_path);
+			path_cldlock_waitwrite(blocking_path);
 			goto again_acquire_locks;
 		}
 		if (!vfs_mountslock_tryacquire(pathvfs)) {
 			path_decref_and_unlock_whole_tree(self);
-			while (!vfs_mountslock_available(pathvfs))
-				task_yield();
+			vfs_mountslock_waitfor(pathvfs);
 			goto again_acquire_locks;
 		}
 		if (!vfs_driveslock_trywrite(pathvfs)) {
 			vfs_mountslock_release(pathvfs);
 			path_decref_and_unlock_whole_tree(self);
-			while (!vfs_driveslock_canwrite(pathvfs))
-				task_yield();
+			vfs_driveslock_waitwrite(pathvfs);
 			goto again_acquire_locks;
 		}
 		if (!fsuper_mounts_trywrite(super)) {
 			vfs_driveslock_endwrite(pathvfs);
 			vfs_mountslock_release(pathvfs);
 			path_decref_and_unlock_whole_tree(self);
-			while (!fsuper_mounts_canwrite(super))
-				task_yield();
+			fsuper_mounts_waitwrite(super);
 			goto again_acquire_locks;
 		}
 		if unlikely(path_isroot(self)) {
@@ -1654,8 +1641,7 @@ again_acquire_locks:
 				vfs_driveslock_endwrite(pathvfs);
 				vfs_mountslock_release(pathvfs);
 				path_decref_and_unlock_whole_tree(self);
-				while (!vfs_rootlock_canwrite(pathvfs))
-					task_yield();
+				vfs_rootlock_waitwrite(pathvfs);
 				goto again_acquire_locks;
 			}
 		} else {
@@ -1667,8 +1653,7 @@ again_load_parent:
 				vfs_mountslock_release(pathvfs);
 				path_decref_and_unlock_whole_tree(self);
 				FINALLY_DECREF_UNLIKELY(parent);
-				path_cldlock_write(parent);
-				path_cldlock_endwrite(parent);
+				path_cldlock_waitwrite(parent);
 				goto again_acquire_locks;
 			}
 			if unlikely(parent != self->p_parent) {

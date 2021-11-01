@@ -144,9 +144,9 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 		bool did_remove = true;
 		struct process_pending_rpcs *rpcs;
 		rpcs = &THIS_PROCESS_RPCS;
-		atomic_rwlock_write(&rpcs->ppr_lock);
+		process_pending_rpcs_write(rpcs);
 		SLIST_TRYREMOVE(&rpcs->ppr_list, rpc, pr_link, { did_remove = false; });
-		atomic_rwlock_endwrite(&rpcs->ppr_lock);
+		process_pending_rpcs_endwrite(rpcs);
 		if unlikely(!did_remove) {
 			/* Failed to remove -> Some other thread already came across it, but because
 			 * we managed to set the RPC state to `PENDING_USER_RPC_STATUS_CANCELED', we

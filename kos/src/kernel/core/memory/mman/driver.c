@@ -1274,7 +1274,35 @@ struct driver_argcash {
 	struct driver_argcash_entry dac_ent[1]; /* First entry. */
 };
 
-#define driver_argcash_lock(self) (&(self)->d_eh_frame_cache_lock)
+/* Helper macros for locking argcash of a given driver. */
+#define driver_argcash_mustreap     driver_eh_frame_cache_mustreap
+#define driver_argcash_reap         driver_eh_frame_cache_reap
+#define _driver_argcash_reap        _driver_eh_frame_cache_reap
+#define driver_argcash_write        driver_eh_frame_cache_write
+#define driver_argcash_write_nx     driver_eh_frame_cache_write_nx
+#define driver_argcash_trywrite     driver_eh_frame_cache_trywrite
+#define driver_argcash_endwrite     driver_eh_frame_cache_endwrite
+#define _driver_argcash_endwrite    _driver_eh_frame_cache_endwrite
+#define driver_argcash_read         driver_eh_frame_cache_read
+#define driver_argcash_read_nx      driver_eh_frame_cache_read_nx
+#define driver_argcash_tryread      driver_eh_frame_cache_tryread
+#define _driver_argcash_endread     _driver_eh_frame_cache_endread
+#define driver_argcash_endread      driver_eh_frame_cache_endread
+#define _driver_argcash_end         _driver_eh_frame_cache_end
+#define driver_argcash_end          driver_eh_frame_cache_end
+#define driver_argcash_upgrade      driver_eh_frame_cache_upgrade
+#define driver_argcash_upgrade_nx   driver_eh_frame_cache_upgrade_nx
+#define driver_argcash_tryupgrade   driver_eh_frame_cache_tryupgrade
+#define driver_argcash_downgrade    driver_eh_frame_cache_downgrade
+#define driver_argcash_reading      driver_eh_frame_cache_reading
+#define driver_argcash_writing      driver_eh_frame_cache_writing
+#define driver_argcash_canread      driver_eh_frame_cache_canread
+#define driver_argcash_canwrite     driver_eh_frame_cache_canwrite
+#define driver_argcash_waitread     driver_eh_frame_cache_waitread
+#define driver_argcash_waitwrite    driver_eh_frame_cache_waitwrite
+#define driver_argcash_waitread_nx  driver_eh_frame_cache_waitread_nx
+#define driver_argcash_waitwrite_nx driver_eh_frame_cache_waitwrite_nx
+
 
 PRIVATE NONNULL((1)) struct driver_argcash *FCALL
 driver_argcash_alloc(struct driver *__restrict self, size_t req_ent_size) {
@@ -1389,9 +1417,9 @@ driver_argcash_lookup(struct driver *__restrict self,
 	uintptr_half_t arg_size;
 
 	/* Step #1: Search for an existing instance of the named variable. */
-	atomic_rwlock_read(driver_argcash_lock(self));
+	driver_argcash_read(self);
 	ent = driver_argcash_find_locked(self, type, size, name);
-	atomic_rwlock_endread(driver_argcash_lock(self));
+	driver_argcash_endread(self);
 	if (ent)
 		return ent; /* Argument had already been accessed in the past! */
 
@@ -1428,13 +1456,13 @@ driver_argcash_lookup(struct driver *__restrict self,
 	entsize += arg_size;
 
 	/* Try to create the missing arg$-argument. */
-	atomic_rwlock_write(driver_argcash_lock(self));
+	driver_argcash_write(self);
 
 	/* Since we've lost the lock in the mean time, we must re-check
 	 * if the argument  has since been  created by another  thread. */
 	ent = driver_argcash_find_locked(self, type, size, name);
 	if unlikely(ent) {
-		atomic_rwlock_endwrite(driver_argcash_lock(self));
+		driver_argcash_endwrite(self);
 		return ent; /* Argument had already been accessed in the past! */
 	}
 
@@ -1442,15 +1470,15 @@ driver_argcash_lookup(struct driver *__restrict self,
 	ent = driver_argcash_alloc_locked(self, entsize);
 	if (!ent) {
 		struct driver_argcash *newtab;
-		atomic_rwlock_endwrite(driver_argcash_lock(self));
+		driver_argcash_endwrite(self);
 		/* Allocate a new arg$ page able to hold at
 		 * least  1 entry with a size of `entsize'. */
 		newtab = driver_argcash_alloc(self, entsize);
-		atomic_rwlock_write(driver_argcash_lock(self));
+		driver_argcash_write(self);
 		ent = driver_argcash_find_locked(self, type, size, name);
 		if unlikely(ent) {
 			/* The entry has been created by another thread in the mean time... */
-			atomic_rwlock_endwrite(driver_argcash_lock(self));
+			driver_argcash_endwrite(self);
 			driver_argcash_free(newtab);
 			return ent;
 		}
@@ -1471,7 +1499,7 @@ driver_argcash_lookup(struct driver *__restrict self,
 	ent_data = (byte_t *)CEIL_ALIGN((uintptr_t)ent_data, __ALIGNOF_MAX_ALIGN_T__);
 	ent->dace_data = ent_data;
 	memcpy(ent_data, arg_data, arg_size);
-	atomic_rwlock_endwrite(driver_argcash_lock(self));
+	driver_argcash_endwrite(self);
 	return ent;
 }
 
@@ -2508,11 +2536,11 @@ again:
 PRIVATE ATTR_USED NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL clear_fde_cache)(struct driver *__restrict self) {
 	size_t result = 0;
-	if (atomic_rwlock_trywrite(&self->d_eh_frame_cache_lock)) {
+	if (driver_eh_frame_cache_trywrite(self)) {
 		struct driver_fde_cache *tree;
 		tree = self->d_eh_frame_cache;
 		self->d_eh_frame_cache = NULL;
-		atomic_rwlock_endwrite(&self->d_eh_frame_cache_lock);
+		driver_eh_frame_cache_endwrite(self);
 		if (tree)
 			result = dfc_freetree(tree);
 	}
@@ -2547,15 +2575,15 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 	unsigned int status;
 
 	/* Try to look through the driver's FDE cache for a descriptor. */
-	if (atomic_rwlock_tryread(&self->d_eh_frame_cache_lock)) {
+	if (driver_eh_frame_cache_tryread(self)) {
 		struct driver_fde_cache *cache;
 		cache = dfc_locate(self->d_eh_frame_cache, absolute_pc);
 		if (cache) {
 			memcpy(result, &cache->dfc_fde, sizeof(unwind_fde_t));
-			atomic_rwlock_endread(&self->d_eh_frame_cache_lock);
+			driver_eh_frame_cache_endread(self);
 			return UNWIND_SUCCESS;
 		}
-		atomic_rwlock_endread(&self->d_eh_frame_cache_lock);
+		driver_eh_frame_cache_endread(self);
 	}
 
 	/* Scan the .eh_frame section of the driver. */
@@ -2570,7 +2598,7 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 	 * if the kernel's been poisoned, or trying to the lock the
 	 * cache for writing would most likely block. */
 	if likely(status == UNWIND_SUCCESS && !kernel_poisoned() &&
-	          atomic_rwlock_canwrite(&self->d_eh_frame_cache_lock)) {
+	          driver_eh_frame_cache_canwrite(self)) {
 		heapptr_t cp;
 		assert(absolute_pc >= result->f_pcstart);
 		assert(absolute_pc < result->f_pcend);
@@ -2582,11 +2610,11 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 			cache = (struct driver_fde_cache *)heapptr_getptr(cp);
 			memcpy(&cache->dfc_fde, result, sizeof(unwind_fde_t));
 			cache->dfc_heapsz = heapptr_getsiz(cp);
-			if likely(atomic_rwlock_trywrite(&self->d_eh_frame_cache_lock)) {
+			if likely(driver_eh_frame_cache_trywrite(self)) {
 				bool ok;
 				/* Try to insert the entry into the cache. */
 				ok = dfc_tryinsert(&self->d_eh_frame_cache, cache);
-				atomic_rwlock_endwrite(&self->d_eh_frame_cache_lock);
+				driver_eh_frame_cache_endwrite(self);
 				if unlikely(!ok)
 					goto cannot_cache;
 			} else {

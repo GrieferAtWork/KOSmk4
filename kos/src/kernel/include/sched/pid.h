@@ -143,6 +143,36 @@ struct process_pending_rpcs {
 	                                    * a sporadic interrupt once they do arrive. */
 };
 
+/* Helper macros for `struct driver::ppr_lock' */
+#define process_pending_rpcs_mustreap(self)     0
+#define process_pending_rpcs_reap(self)         (void)0
+#define _process_pending_rpcs_reap(self)        (void)0
+#define process_pending_rpcs_write(self)        atomic_rwlock_write(&(self)->ppr_lock)
+#define process_pending_rpcs_write_nx(self)     atomic_rwlock_write_nx(&(self)->ppr_lock)
+#define process_pending_rpcs_trywrite(self)     atomic_rwlock_trywrite(&(self)->ppr_lock)
+#define process_pending_rpcs_endwrite(self)     (atomic_rwlock_endwrite(&(self)->ppr_lock), process_pending_rpcs_reap(self))
+#define _process_pending_rpcs_endwrite(self)    atomic_rwlock_endwrite(&(self)->ppr_lock)
+#define process_pending_rpcs_read(self)         atomic_rwlock_read(&(self)->ppr_lock)
+#define process_pending_rpcs_read_nx(self)      atomic_rwlock_read_nx(&(self)->ppr_lock)
+#define process_pending_rpcs_tryread(self)      atomic_rwlock_tryread(&(self)->ppr_lock)
+#define _process_pending_rpcs_endread(self)     atomic_rwlock_endread(&(self)->ppr_lock)
+#define process_pending_rpcs_endread(self)      (void)(atomic_rwlock_endread(&(self)->ppr_lock) && (process_pending_rpcs_reap(self), 0))
+#define _process_pending_rpcs_end(self)         atomic_rwlock_end(&(self)->ppr_lock)
+#define process_pending_rpcs_end(self)          (void)(atomic_rwlock_end(&(self)->ppr_lock) && (process_pending_rpcs_reap(self), 0))
+#define process_pending_rpcs_upgrade(self)      atomic_rwlock_upgrade(&(self)->ppr_lock)
+#define process_pending_rpcs_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->ppr_lock)
+#define process_pending_rpcs_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->ppr_lock)
+#define process_pending_rpcs_downgrade(self)    atomic_rwlock_downgrade(&(self)->ppr_lock)
+#define process_pending_rpcs_reading(self)      atomic_rwlock_reading(&(self)->ppr_lock)
+#define process_pending_rpcs_writing(self)      atomic_rwlock_writing(&(self)->ppr_lock)
+#define process_pending_rpcs_canread(self)      atomic_rwlock_canread(&(self)->ppr_lock)
+#define process_pending_rpcs_canwrite(self)     atomic_rwlock_canwrite(&(self)->ppr_lock)
+#define process_pending_rpcs_waitread(self)     atomic_rwlock_waitread(&(self)->ppr_lock)
+#define process_pending_rpcs_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->ppr_lock)
+#define process_pending_rpcs_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->ppr_lock)
+#define process_pending_rpcs_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->ppr_lock)
+
+
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL process_pending_rpcs_fini)(struct process_pending_rpcs *__restrict self);
 

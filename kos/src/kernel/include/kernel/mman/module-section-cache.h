@@ -64,6 +64,8 @@ DATDEF struct lockop_slist /*      */ module_section_cache_lops;
 #define module_section_cache_release_f()  atomic_lock_release(&module_section_cache_lock)
 #define module_section_cache_acquired()   atomic_lock_acquired(&module_section_cache_lock)
 #define module_section_cache_available()  atomic_lock_available(&module_section_cache_lock)
+#define module_section_cache_waitfor()    atomic_lock_waitfor(&module_section_cache_lock)
+#define module_section_cache_waitfor_nx() atomic_lock_waitfor_nx(&module_section_cache_lock)
 
 DECL_END
 #endif /* __CC__ */

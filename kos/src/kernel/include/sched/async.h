@@ -342,6 +342,8 @@ DATDEF struct lockop_slist /*  */ async_all_lops; /* Pending lock operations for
 #define async_all_release_f()  atomic_lock_release(&async_all_lock)
 #define async_all_acquired()   atomic_lock_acquired(&async_all_lock)
 #define async_all_available()  atomic_lock_available(&async_all_lock)
+#define async_all_waitfor()    atomic_lock_waitfor(&async_all_lock)
+#define async_all_waitfor_nx() atomic_lock_waitfor_nx(&async_all_lock)
 
 
 

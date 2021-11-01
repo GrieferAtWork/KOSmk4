@@ -167,27 +167,21 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_threadslock_release_nopr(self)    atomic_lock_release(&(self)->mm_threadslock)
 #define mman_threadslock_acquired(self)        atomic_lock_acquired(&(self)->mm_threadslock)
 #define mman_threadslock_available(self)       atomic_lock_available(&(self)->mm_threadslock)
-#define mman_threadslock_acquire(self)             \
-	do {                                           \
-		pflag_t __mtla_was = PREEMPTION_PUSHOFF(); \
-		atomic_lock_acquire_nopr(&(self)->mm_threadslock)
-#define mman_threadslock_release(self)                \
-		atomic_lock_release(&(self)->mm_threadslock); \
-		PREEMPTION_POP(__mtla_was);                   \
-	}	__WHILE0
 #else /* !CONFIG_NO_SMP */
 #define mman_threadslock_tryacquire_nopr(self) 1
 #define mman_threadslock_acquire_nopr(self)    (void)0
 #define mman_threadslock_release_nopr(self)    (void)0
 #define mman_threadslock_acquired(self)        (!PREEMPTION_ENABLED())
 #define mman_threadslock_available(self)       1
+#endif /* CONFIG_NO_SMP */
 #define mman_threadslock_acquire(self)             \
 	do {                                           \
 		pflag_t __mtla_was = PREEMPTION_PUSHOFF(); \
-#define mman_threadslock_release(self) \
-		PREEMPTION_POP(__mtla_was);    \
+		mman_threadslock_acquire_nopr(self)
+#define mman_threadslock_release(self)       \
+		mman_threadslock_release_nopr(self); \
+		PREEMPTION_POP(__mtla_was);          \
 	}	__WHILE0
-#endif /* CONFIG_NO_SMP */
 
 
 

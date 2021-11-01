@@ -85,8 +85,7 @@ again:
 	/* Look through the node-cache of `super' */
 	if (!fsuper_nodes_tryread(&super->ffs_super)) {
 		flatdirnode_endread(dir);
-		while (!fsuper_nodes_canread(&super->ffs_super))
-			task_yield();
+		fsuper_nodes_waitread(&super->ffs_super);
 		goto again;
 	}
 
@@ -178,8 +177,7 @@ again_lockwrite_super_nodes:
 #undef NEED_waitfor_super_nodes_lock
 waitfor_super_nodes_lock:
 #endif /* NEED_waitfor_super_nodes_lock */
-		while (!fsuper_nodes_canwrite(&super->ffs_super))
-			task_yield();
+		fsuper_nodes_waitwrite(&super->ffs_super);
 		goto again;
 	}
 
@@ -1213,8 +1211,7 @@ again:
 		/* Must also acquire a write-lock to the old directory `od' */
 		if (!flatdirnode_trywrite(od)) {
 			flatdirnode_endwrite(nd);
-			flatdirnode_write(od);
-			flatdirnode_endwrite(od);
+			flatdirnode_waitwrite(od);
 			goto again;
 		}
 	}

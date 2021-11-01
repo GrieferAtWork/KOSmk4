@@ -615,8 +615,7 @@ again_acquire_lock_for_insert:
 			 * a read-lock. */
 			if (!devfs_byname_tryread()) {
 				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
-				devfs_byname_read();
-				devfs_byname_endread();
+				devfs_byname_waitread();
 				goto again_acquire_lock_for_insert;
 			}
 
@@ -634,8 +633,7 @@ again_acquire_lock_for_insert:
 						if (!devfs_byname_tryupgrade()) {
 							ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 							devfs_byname_endread();
-							devfs_byname_write();
-							devfs_byname_endwrite();
+							devfs_byname_waitwrite();
 							goto again_acquire_lock_for_insert;
 						}
 						devfs_byname_removenode(existing_device);
@@ -675,16 +673,14 @@ again_acquire_lock_for_insert:
 				if (!fsuper_nodes_trywrite(&devfs)) {
 					devfs_byname_endread();
 					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
-					while (!fsuper_nodes_canwrite(&devfs))
-						task_yield();
+					fsuper_nodes_waitwrite(&devfs);
 					goto again_acquire_lock_for_insert;
 				}
 				if (!fallnodes_tryacquire()) {
 					fsuper_nodes_endwrite(&devfs);
 					devfs_byname_endread();
 					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
-					while (!fallnodes_available())
-						task_yield();
+					fallnodes_waitfor();
 					goto again_acquire_lock_for_insert;
 				}
 				new_node->mf_flags |= MFILE_FN_GLOBAL_REF;
@@ -926,8 +922,7 @@ again_acquire_locks:
 			ramfs_dirdata_treelock_write(&devfs.rs_dat);
 			if (!devfs_byname_tryread()) {
 				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
-				devfs_byname_read();
-				devfs_byname_endread();
+				devfs_byname_waitread();
 				goto again_acquire_locks;
 			}
 		} EXCEPT {
@@ -1317,23 +1312,20 @@ again:
 	devfs_byname_write();
 	if (!fsuper_nodes_trywrite(&devfs)) {
 		devfs_byname_endwrite();
-		while (!fsuper_nodes_canwrite(&devfs))
-			task_yield();
+		fsuper_nodes_waitwrite(&devfs);
 		goto again;
 	}
 	if (!ramfs_dirdata_treelock_tryread(&devfs.rs_dat)) {
 		fsuper_nodes_endwrite(&devfs);
 		devfs_byname_endwrite();
-		ramfs_dirdata_treelock_read(&devfs.rs_dat);
-		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+		ramfs_dirdata_treelock_waitread(&devfs.rs_dat);
 		goto again;
 	}
 	if (allnodes && !fallnodes_tryacquire()) {
 		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 		fsuper_nodes_endwrite(&devfs);
 		devfs_byname_endwrite();
-		while (!fallnodes_available())
-			task_yield();
+		fallnodes_waitfor();
 		goto again;
 	}
 }

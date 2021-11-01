@@ -251,9 +251,11 @@ PRIVATE struct lockop_slist /*  */ async_tmo_lops; /* Pending lock operations fo
 #define async_tmo_acquire()    atomic_lock_acquire(&async_tmo_lock)
 #define async_tmo_acquire_nx() atomic_lock_acquire_nx(&async_tmo_lock)
 #define async_tmo_release()    (atomic_lock_release(&async_tmo_lock), async_tmo_reap())
-#define async_tmo_release_f()  atomic_lock_release(&async_tmo_lock)
+#define _async_tmo_release()   atomic_lock_release(&async_tmo_lock)
 #define async_tmo_acquired()   atomic_lock_acquired(&async_tmo_lock)
 #define async_tmo_available()  atomic_lock_available(&async_tmo_lock)
+#define async_tmo_waitfor()    atomic_lock_waitfor(&async_tmo_lock)
+#define async_tmo_waitfor_nx() atomic_lock_waitfor_nx(&async_tmo_lock)
 
 
 /* Insert the given `job' into the async-timeout list, inheriting a reference */
@@ -977,7 +979,7 @@ do_async_cancel:
 					                        _ASYNC_ST_READY_TMO,
 					                        _ASYNC_ST_INIT_STOP)) {
 						async_all_release_f();
-						async_tmo_release_f();
+						_async_tmo_release();
 						async_all_reap();
 						async_tmo_reap();
 						goto again;
@@ -986,7 +988,7 @@ do_async_cancel:
 					--async_all_size;
 					async_all_release_f();
 					LIST_REMOVE(self, a_tmolnk); /* Remove from the timeout list */
-					async_tmo_release_f();
+					_async_tmo_release();
 					async_all_reap();
 					async_tmo_reap();
 					sig_multicompletion_disconnectall(&self->a_comp);

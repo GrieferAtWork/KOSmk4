@@ -95,6 +95,28 @@ DECL_BEGIN
 PRIVATE LLRBTREE_ROOT(fde_cache_entry) fde_cache = NULL;
 PRIVATE struct atomic_rwlock fde_cache_lock = ATOMIC_RWLOCK_INIT;
 
+/* Helpers for accessing `fde_cache_lock' */
+#define _fde_cache_reap()      (void)0
+#define fde_cache_reap()       (void)0
+#define fde_cache_mustreap()   0
+#define fde_cache_write()      atomic_rwlock_write(&fde_cache_lock)
+#define fde_cache_trywrite()   atomic_rwlock_trywrite(&fde_cache_lock)
+#define fde_cache_endwrite()   (atomic_rwlock_endwrite(&fde_cache_lock), fde_cache_reap())
+#define _fde_cache_endwrite()  atomic_rwlock_endwrite(&fde_cache_lock)
+#define fde_cache_read()       atomic_rwlock_read(&fde_cache_lock)
+#define fde_cache_tryread()    atomic_rwlock_tryread(&fde_cache_lock)
+#define _fde_cache_endread()   atomic_rwlock_endread(&fde_cache_lock)
+#define fde_cache_endread()    (void)(atomic_rwlock_endread(&fde_cache_lock) && (fde_cache_reap(), 0))
+#define _fde_cache_end()       atomic_rwlock_end(&fde_cache_lock)
+#define fde_cache_end()        (void)(atomic_rwlock_end(&fde_cache_lock) && (fde_cache_reap(), 0))
+#define fde_cache_upgrade()    atomic_rwlock_upgrade(&fde_cache_lock)
+#define fde_cache_tryupgrade() atomic_rwlock_tryupgrade(&fde_cache_lock)
+#define fde_cache_downgrade()  atomic_rwlock_downgrade(&fde_cache_lock)
+#define fde_cache_reading()    atomic_rwlock_reading(&fde_cache_lock)
+#define fde_cache_writing()    atomic_rwlock_writing(&fde_cache_lock)
+#define fde_cache_canread()    atomic_rwlock_canread(&fde_cache_lock)
+#define fde_cache_canwrite()   atomic_rwlock_canwrite(&fde_cache_lock)
+
 PRIVATE NONNULL((1)) void CC
 fde_cache_entry_destroy(struct fde_cache_entry *__restrict self) {
 	dlauxctrl(self->fce_dlhand, DLAUXCTRL_MOD_WEAKDECREF);
@@ -175,6 +197,28 @@ SLIST_HEAD(rf_object_slist, rf_object);
 PRIVATE struct rf_object_slist register_frame_aux_list = SLIST_HEAD_INITIALIZER(register_frame_aux_list);
 PRIVATE struct atomic_rwlock register_frame_aux_lock   = ATOMIC_RWLOCK_INIT;
 
+/* Helpers for accessing `fde_cache_lock' */
+#define _register_frame_aux_reap()      (void)0
+#define register_frame_aux_reap()       (void)0
+#define register_frame_aux_mustreap()   0
+#define register_frame_aux_write()      atomic_rwlock_write(&register_frame_aux_lock)
+#define register_frame_aux_trywrite()   atomic_rwlock_trywrite(&register_frame_aux_lock)
+#define register_frame_aux_endwrite()   (atomic_rwlock_endwrite(&register_frame_aux_lock), register_frame_aux_reap())
+#define _register_frame_aux_endwrite()  atomic_rwlock_endwrite(&register_frame_aux_lock)
+#define register_frame_aux_read()       atomic_rwlock_read(&register_frame_aux_lock)
+#define register_frame_aux_tryread()    atomic_rwlock_tryread(&register_frame_aux_lock)
+#define _register_frame_aux_endread()   atomic_rwlock_endread(&register_frame_aux_lock)
+#define register_frame_aux_endread()    (void)(atomic_rwlock_endread(&register_frame_aux_lock) && (register_frame_aux_reap(), 0))
+#define _register_frame_aux_end()       atomic_rwlock_end(&register_frame_aux_lock)
+#define register_frame_aux_end()        (void)(atomic_rwlock_end(&register_frame_aux_lock) && (register_frame_aux_reap(), 0))
+#define register_frame_aux_upgrade()    atomic_rwlock_upgrade(&register_frame_aux_lock)
+#define register_frame_aux_tryupgrade() atomic_rwlock_tryupgrade(&register_frame_aux_lock)
+#define register_frame_aux_downgrade()  atomic_rwlock_downgrade(&register_frame_aux_lock)
+#define register_frame_aux_reading()    atomic_rwlock_reading(&register_frame_aux_lock)
+#define register_frame_aux_writing()    atomic_rwlock_writing(&register_frame_aux_lock)
+#define register_frame_aux_canread()    atomic_rwlock_canread(&register_frame_aux_lock)
+#define register_frame_aux_canwrite()   atomic_rwlock_canwrite(&register_frame_aux_lock)
+
 
 
 /* Implementation */
@@ -189,9 +233,9 @@ libuw___register_frame_info_bases(/*nullable*/ rf_fde const *begin, struct rf_ob
 	ob->ro_isarray  = false;
 
 	/* Insert into the list of auxiliary objects */
-	atomic_rwlock_write(&register_frame_aux_lock);
+	register_frame_aux_write();
 	SLIST_INSERT(&register_frame_aux_list, ob, ro_link);
-	atomic_rwlock_endwrite(&register_frame_aux_lock);
+	register_frame_aux_endwrite();
 }
 
 INTERN NONNULL((1, 2)) void LIBCCALL
@@ -203,9 +247,9 @@ libuw___register_frame_info_table_bases(rf_fde const *const *begin, struct rf_ob
 	ob->ro_isarray        = true;
 
 	/* Insert into the list of auxiliary objects */
-	atomic_rwlock_write(&register_frame_aux_lock);
+	register_frame_aux_write();
 	SLIST_INSERT(&register_frame_aux_list, ob, ro_link);
-	atomic_rwlock_endwrite(&register_frame_aux_lock);
+	register_frame_aux_endwrite();
 }
 
 
@@ -241,16 +285,16 @@ NOTHROW(LIBCCALL libuw___deregister_frame_info)(/*nullable*/ void const *begin) 
 		return NULL;
 
 	/* Try to remove an entry for the given eh_frame base from the list. */
-	atomic_rwlock_write(&register_frame_aux_lock);
+	register_frame_aux_write();
 	SLIST_TRYREMOVE_IF(&register_frame_aux_list, &result, ro_link,
 	                   result->ro_eh_frame == (rf_fde const *)begin,
 	                   { result = NULL; });
-	atomic_rwlock_endwrite(&register_frame_aux_lock);
+	register_frame_aux_endwrite();
 
 	/* Upon success, we must also remove all FDE caches associated with
 	 * entries FDE descriptors  for the object  that was just  removed. */
 	if (result != NULL) {
-		atomic_rwlock_write(&fde_cache_lock);
+		fde_cache_write();
 		if (result->ro_isarray) {
 			size_t i;
 			for (i = 0;; ++i) {
@@ -267,7 +311,7 @@ NOTHROW(LIBCCALL libuw___deregister_frame_info)(/*nullable*/ void const *begin) 
 			                        result->ro_tbase,
 			                        result->ro_dbase);
 		}
-		atomic_rwlock_endwrite(&fde_cache_lock);
+		fde_cache_endwrite();
 	}
 
 	return result;
@@ -332,7 +376,7 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 
 	/* If that failed, search through auxillary information given by `__register_frame_info_bases()' */
 	result = NULL;
-	atomic_rwlock_read(&register_frame_aux_lock);
+	register_frame_aux_read();
 	SLIST_FOREACH (obj, &register_frame_aux_list, ro_link) {
 		bases->deb_tbase = obj->ro_tbase;
 		bases->deb_dbase = obj->ro_dbase;
@@ -351,7 +395,7 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 		if (result != NULL)
 			return result;
 	}
-	atomic_rwlock_endread(&register_frame_aux_lock);
+	register_frame_aux_endread();
 
 	/* Nothing found :( */
 	return NULL;
@@ -374,7 +418,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_find_rf)(void const *absolute_pc,
                                          unwind_fde_t *__restrict result) {
 	unsigned int error = UNWIND_NO_FRAME;
 	struct rf_object *obj;
-	atomic_rwlock_read(&register_frame_aux_lock);
+	register_frame_aux_read();
 	/* Go through all explicitly registered register-frame objects
 	 * and see if one of them happens to contain the requested PC. */
 	SLIST_FOREACH (obj, &register_frame_aux_list, ro_link) {
@@ -402,7 +446,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_find_rf)(void const *absolute_pc,
 		}
 	}
 done:
-	atomic_rwlock_endread(&register_frame_aux_lock);
+	register_frame_aux_endread();
 	return error;
 }
 
@@ -454,25 +498,25 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
 	 * NOTE: To prevent deadlocks upon re-entrance, only
 	 *       _try_ to acquire locks here, and ignore the
 	 *       cache if we're unable to acquire them! */
-	if (atomic_rwlock_tryread(&fde_cache_lock)) {
+	if (fde_cache_tryread()) {
 		fce = fde_cache_tree_locate(fde_cache, absolute_pc);
 		if (fce) {
 			if likely(dlauxctrl(fce->fce_dlhand, DLAUXCTRL_MOD_NOTDESTROYED) != NULL) {
 				memcpy(result, &fce->fce_fde, sizeof(unwind_fde_t));
-				atomic_rwlock_endread(&fde_cache_lock);
+				fde_cache_endread();
 				result->f_sigframe &= ~0x80; /* 0x80 is (ab-)used as R/B-bit */
 				return UNWIND_SUCCESS;
 			}
 			/* Module  was  deleted in  the  mean time...
 			 * Try to get rid of the stale cache entry... */
-			if (atomic_rwlock_tryupgrade(&fde_cache_lock)) {
+			if (fde_cache_tryupgrade()) {
 				fde_cache_tree_removenode(&fde_cache, fce);
-				atomic_rwlock_endwrite(&fde_cache_lock);
+				fde_cache_endwrite();
 				fde_cache_entry_destroy(fce);
 				goto do_lookup_fde;
 			}
 		}
-		atomic_rwlock_endread(&fde_cache_lock);
+		fde_cache_endread();
 	}
 
 do_lookup_fde:
@@ -509,16 +553,17 @@ do_lookup_fde:
 
 	/* (try to) cache the results */
 #ifndef __OPTIMIZE_SIZE__
-	if unlikely(!atomic_rwlock_canwrite(&fde_cache_lock))
+	if unlikely(!fde_cache_canwrite())
 		goto done; /* Bypass malloc() if acquiring the lock would likely fail. */
 #endif /* !__OPTIMIZE_SIZE__ */
+
 	fce = (struct fde_cache_entry *)malloc(sizeof(struct fde_cache_entry)); /* XXX: malloc_nonblock? */
 	if unlikely(fce == NULL)
 		goto done;
 	memcpy(&fce->fce_fde, result, sizeof(unwind_fde_t));
 	fce->fce_dlhand = dlauxctrl(dlmod, DLAUXCTRL_MOD_WEAKINCREF);
 
-	if unlikely(!atomic_rwlock_trywrite(&fde_cache_lock)) {
+	if unlikely(!fde_cache_trywrite()) {
 destroy_new_fce:
 		fde_cache_entry_destroy(fce);
 		goto done;
@@ -536,19 +581,19 @@ destroy_new_fce:
 			 * existing above! */
 			memcpy(result, &existing_fce->fce_fde, sizeof(unwind_fde_t));
 			fde_cache_tree_insert(&fde_cache, existing_fce);
-			atomic_rwlock_endwrite(&fde_cache_lock);
+			fde_cache_endwrite();
 			result->f_sigframe &= ~0x80; /* 0x80 is (ab-)used as R/B-bit */
 			goto destroy_new_fce;
 		}
 
 		/* Force-insert the new cache entry. */
 		fde_cache_tree_insert(&fde_cache, fce);
-		atomic_rwlock_endwrite(&fde_cache_lock);
+		fde_cache_endwrite();
 
 		/* Destroy the (stale) old cache entry. */
 		fde_cache_entry_destroy(existing_fce);
 	} else {
-		atomic_rwlock_endwrite(&fde_cache_lock);
+		fde_cache_endwrite();
 	}
 done:
 	return error;

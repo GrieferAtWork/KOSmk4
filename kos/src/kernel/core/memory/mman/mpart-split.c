@@ -315,8 +315,7 @@ NOTHROW(FCALL mpart_lock_meta_futex_or_unlock_and_decref)(struct mpart *__restri
 			mpart_unlock_all_mmans(self);
 			mpart_foreach_mmans_decref(self);
 			mpart_lock_release(self);
-			while (!mpartmeta_ftxlock_canwrite(meta))
-				task_yield();
+			mpartmeta_ftxlock_waitwrite(meta);
 			return false;
 		}
 	}
@@ -837,8 +836,7 @@ relock_with_data:
 				incref(file);
 				unlockall(self);
 				FINALLY_DECREF_UNLIKELY(file);
-				while (!mfile_lock_canwrite(file))
-					task_yield();
+				mfile_lock_waitwrite(file);
 				goto again;
 			}
 			assert(!mfile_isanon(file));

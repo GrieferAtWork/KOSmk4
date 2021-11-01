@@ -788,8 +788,7 @@ again_acquire_lock_for_insert:
 				assert(new_node->mf_refcnt == 1);
 				if (!fsuper_nodes_trywrite(super)) {
 					ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
-					while (!fsuper_nodes_canwrite(super))
-						task_yield();
+					fsuper_nodes_waitwrite(super);
 					goto again_acquire_lock_for_insert;
 				}
 				/* Check if the filesystem has been deleted. */
@@ -801,8 +800,7 @@ again_acquire_lock_for_insert:
 				if (!fallnodes_tryacquire()) {
 					fsuper_nodes_endwrite(super);
 					ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
-					while (!fallnodes_available())
-						task_yield();
+					fallnodes_waitfor();
 					goto again_acquire_lock_for_insert;
 				}
 				new_node->mf_flags |= MFILE_FN_GLOBAL_REF;
@@ -875,8 +873,7 @@ again:
 		assert(filedir != self);
 		if (!ramfs_dirdata_treelock_trywrite(&filedir->rdn_dat)) {
 			ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
-			ramfs_dirdata_treelock_write(&filedir->rdn_dat);
-			ramfs_dirdata_treelock_endwrite(&filedir->rdn_dat);
+			ramfs_dirdata_treelock_waitwrite(&filedir->rdn_dat);
 			goto again;
 		}
 		/* Assert that `file' is an empty directory. */

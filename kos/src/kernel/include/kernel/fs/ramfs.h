@@ -165,29 +165,33 @@ NOTHROW(FCALL ramfs_dirdata_fini)(struct ramfs_dirdata *__restrict self);
 
 
 /* Helpers for accessing `rdd_treelock' */
-#define /*        */ _ramfs_dirdata_treelock_reap(self)      (void)0
-#define /*        */ ramfs_dirdata_treelock_reap(self)       (void)0
-#define /*        */ ramfs_dirdata_treelock_mustreap(self)   0
-#define /*BLOCKING*/ ramfs_dirdata_treelock_write(self)      shared_rwlock_write(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_write_nx(self)   shared_rwlock_write_nx(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_trywrite(self)   shared_rwlock_trywrite(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_endwrite(self)   (shared_rwlock_endwrite(&(self)->rdd_treelock), ramfs_dirdata_treelock_reap(self))
-#define /*        */ _ramfs_dirdata_treelock_endwrite(self)  shared_rwlock_endwrite(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_read(self)       shared_rwlock_read(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_read_nx(self)    shared_rwlock_read_nx(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_tryread(self)    shared_rwlock_tryread(&(self)->rdd_treelock)
-#define /*        */ _ramfs_dirdata_treelock_endread(self)   shared_rwlock_endread(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_endread(self)    (void)(shared_rwlock_endread(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
-#define /*        */ _ramfs_dirdata_treelock_end(self)       shared_rwlock_end(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_end(self)        (void)(shared_rwlock_end(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
-#define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade(self)    shared_rwlock_upgrade(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_downgrade(self)  shared_rwlock_downgrade(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_reading(self)    shared_rwlock_reading(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_writing(self)    shared_rwlock_writing(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_canread(self)    shared_rwlock_canread(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_canwrite(self)   shared_rwlock_canwrite(&(self)->rdd_treelock)
+#define /*        */ _ramfs_dirdata_treelock_reap(self)        (void)0
+#define /*        */ ramfs_dirdata_treelock_reap(self)         (void)0
+#define /*        */ ramfs_dirdata_treelock_mustreap(self)     0
+#define /*BLOCKING*/ ramfs_dirdata_treelock_write(self)        shared_rwlock_write(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_write_nx(self)     shared_rwlock_write_nx(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_trywrite(self)     shared_rwlock_trywrite(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_endwrite(self)     (shared_rwlock_endwrite(&(self)->rdd_treelock), ramfs_dirdata_treelock_reap(self))
+#define /*        */ _ramfs_dirdata_treelock_endwrite(self)    shared_rwlock_endwrite(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_read(self)         shared_rwlock_read(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_read_nx(self)      shared_rwlock_read_nx(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_tryread(self)      shared_rwlock_tryread(&(self)->rdd_treelock)
+#define /*        */ _ramfs_dirdata_treelock_endread(self)     shared_rwlock_endread(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_endread(self)      (void)(shared_rwlock_endread(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
+#define /*        */ _ramfs_dirdata_treelock_end(self)         shared_rwlock_end(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_end(self)          (void)(shared_rwlock_end(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
+#define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade(self)      shared_rwlock_upgrade(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade_nx(self)   shared_rwlock_upgrade_nx(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_downgrade(self)    shared_rwlock_downgrade(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_reading(self)      shared_rwlock_reading(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_writing(self)      shared_rwlock_writing(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_canread(self)      shared_rwlock_canread(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_canwrite(self)     shared_rwlock_canwrite(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_waitread(self)     shared_rwlock_waitread(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_waitwrite(self)    shared_rwlock_waitwrite(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_waitread_nx(self)  shared_rwlock_waitread_nx(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_waitwrite_nx(self) shared_rwlock_waitwrite_nx(&(self)->rdd_treelock)
 
 
 /* Ramfs directory by-name tree operations. (For `struct ramfs_dirdata::rdd_tree') */

@@ -292,7 +292,7 @@ make_inactive:
 #endif /* CONFIG_HAVE_USERPROCMASK */
 again_lock_proc_rpcs:
 			has_write_lock = false;
-			atomic_rwlock_read(&proc_rpcs->ppr_lock);
+			process_pending_rpcs_read(proc_rpcs);
 again_scan_proc_rpcs:
 			p_rpc = SLIST_PFIRST(&proc_rpcs->ppr_list);
 			rpc   = *p_rpc;
@@ -329,9 +329,9 @@ again_scan_proc_rpcs:
 							if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 								/* Must do this the hard way... */
 								if (has_write_lock) {
-									atomic_rwlock_endwrite(&proc_rpcs->ppr_lock);
+									process_pending_rpcs_endwrite(proc_rpcs);
 								} else {
-									atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+									process_pending_rpcs_endread(proc_rpcs);
 								}
 								TRY {
 									status = sigmask_ismasked(signo);
@@ -365,9 +365,9 @@ again_scan_proc_rpcs:
 
 					/* If necessary, upgrade to a write-lock. */
 					if (!has_write_lock) {
-						if (!atomic_rwlock_tryupgrade(&proc_rpcs->ppr_lock)) {
-							atomic_rwlock_endread(&proc_rpcs->ppr_lock);
-							atomic_rwlock_write(&proc_rpcs->ppr_lock);
+						if (!process_pending_rpcs_tryupgrade(proc_rpcs)) {
+							process_pending_rpcs_endread(proc_rpcs);
+							process_pending_rpcs_write(proc_rpcs);
 							has_write_lock = true;
 							goto again_scan_proc_rpcs;
 						}
@@ -384,7 +384,7 @@ again_scan_proc_rpcs:
 					}
 
 					COMPILER_BARRIER();
-					atomic_rwlock_endwrite(&proc_rpcs->ppr_lock);
+					process_pending_rpcs_endwrite(proc_rpcs);
 					/* At this point, we've taken ownership of `rpc', and won't ever give it back! */
 					if (rpc->pr_flags & RPC_CONTEXT_KERN) {
 						/* Handle this RPC later. */
@@ -409,9 +409,9 @@ check_next_proc_rpc:
 			}
 			/* Release our lock. */
 			if (has_write_lock) {
-				atomic_rwlock_endwrite(&proc_rpcs->ppr_lock);
+				process_pending_rpcs_endwrite(proc_rpcs);
 			} else {
-				atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+				process_pending_rpcs_endread(proc_rpcs);
 			}
 		}
 	}

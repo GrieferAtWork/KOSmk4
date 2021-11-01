@@ -856,8 +856,7 @@ again:
 	/* devfs_byname_lock... */
 	if (!devfs_byname_trywrite()) {
 		blkdev_root_partslock_release(self);
-		devfs_byname_write();
-		devfs_byname_endwrite();
+		devfs_byname_waitwrite();
 		goto again;
 	}
 
@@ -867,8 +866,7 @@ again:
 		_devfs_byname_endwrite();
 		blkdev_root_partslock_reap(self);
 		devfs_byname_reap();
-		while (!fsuper_nodes_canwrite(&devfs))
-			task_yield();
+		fsuper_nodes_waitwrite(&devfs);
 		goto again;
 	}
 
@@ -891,8 +889,7 @@ again:
 		fsuper_nodes_reap(&devfs);
 		blkdev_root_partslock_reap(self);
 		devfs_byname_reap();
-		ramfs_dirdata_treelock_read(&devfs.rs_dat);
-		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+		ramfs_dirdata_treelock_waitread(&devfs.rs_dat);
 		goto again;
 	}
 
@@ -906,8 +903,7 @@ again:
 		fsuper_nodes_reap(&devfs);
 		blkdev_root_partslock_reap(self);
 		devfs_byname_reap();
-		while (!fallnodes_available())
-			task_yield();
+		fallnodes_waitfor();
 		goto again;
 	}
 }

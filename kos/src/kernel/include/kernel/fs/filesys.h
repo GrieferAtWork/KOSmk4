@@ -174,6 +174,8 @@ DATDEF struct lockop_slist ffilesys_formats_lops;   /* Lock operations for `ffil
 #define ffilesys_formats_release()    (atomic_lock_release(&ffilesys_formats_lock), ffilesys_formats_reap())
 #define ffilesys_formats_acquired()   atomic_lock_acquired(&ffilesys_formats_lock)
 #define ffilesys_formats_available()  atomic_lock_available(&ffilesys_formats_lock)
+#define ffilesys_formats_waitfor()    atomic_lock_waitfor(&ffilesys_formats_lock)
+#define ffilesys_formats_waitfor_nx() atomic_lock_waitfor_nx(&ffilesys_formats_lock)
 
 
 /* Open  a new superblock and return it.  This function is a high-level wrapper
