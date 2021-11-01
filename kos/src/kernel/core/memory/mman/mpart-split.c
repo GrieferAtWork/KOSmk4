@@ -857,6 +857,7 @@ relock_with_data:
 	hipart->mp_refcnt = 1;
 
 	/* Fill in flags for the new pat. */
+	hipart->mp_xflags = MPART_XF_NORMAL;
 	hipart->mp_flags = (lopart->mp_flags & (MPART_F_GLOBAL_REF |
 	                                        MPART_F_CHANGED |
 	                                        MPART_F_NOFREE |

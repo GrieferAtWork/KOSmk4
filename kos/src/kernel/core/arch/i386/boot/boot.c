@@ -871,25 +871,50 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Solution: there are still situations where system_clearcache() _should_
 	 *           be  atomic. As such, it'd probably be  best to just add a new
 	 *           param: `gfp_t flags', which is allowed to include GFP_ATOMIC.
-	 */
+	 *
+	 * It may also  be a  good idea  to add  2 more  arguments:
+	 * >> void (FCALL *retry_alloc)(void *cookie), void *cookie
+	 *
+	 * that represent a pair  of functions occasionally called  in-between
+	 * having done different things to free up memory. This function could
+	 * then  be used to stop the clearing  of caches as soon as sufficient
+	 * system resources have  become available to  satisfy the  allocation
+	 * attempted by the caller. */
 
-	/* TODO: mem-parts need to have a  mechanism that will asynchronously  write
-	 *       changed  blocks to  disk. Following  the completion  of this write,
-	 *       check  if there  are more changed  blocks (if so,  sync those too).
-	 *       If everything has been synced, check if the part has 1-2  reference
-	 *       left  (+1:  current-working-reference, +1:  if `MPART_F_GLOBAL_REF'
-	 *       is set). If `MPART_F_GLOBAL_REF' is set, check `MPART_F_PERSISTENT'
-	 *       for  being set. If so, return and  do nothing. Else, acquire a lock
-	 *       to  the  global parts  list.  If afterwards  the  reference counter
-	 *       is still 2,  we know that  nothing else  is using the  part and  we
-	 *       can  proceed  to  clear  `MPART_F_GLOBAL_REF',  drop  the inherited
-	 *       reference,  remove the part from the global list, unlock the global
-	 *       list,  and finally drop  the working reference  which will then end
-	 *       up  destroying  the  part.  When  `MPART_F_GLOBAL_REF'  wasn't set,
-	 *       simply drop  the working  reference (which  should also  cause  the
-	 *       part to be destroyed).
-	 *       When the part doesn't end up being destroyed, it may be a good
-	 *       idea to pass it along to `mpart_merge()'...
+	/* TODO: Mem-parts need to have a mechanism that will
+	 *       asynchronously write changed blocks to  disk
+	 * - This would essentially  be a slightly  modified, and  async
+	 *   version of `mpart_lock_acquire_and_setcore_unwrite_nodma').
+	 * - Following the completion of the sync, check if the part has 1-2 reference
+	 *   left (+1: current-working-reference, +1: if `MPART_F_GLOBAL_REF' is set).
+	 *   Note  the check order  here which must interlock  with the invariant that
+	 *   `MPART_F_GLOBAL_REF' can only ever be cleared once!
+	 * - If `MPART_F_GLOBAL_REF' is set, check `MPART_F_PERSISTENT' for being set.
+	 * - If so, goto `cleanup'. Else, acquire a lock to the file (if no anon)
+	 *   and the global parts list.
+	 * - If afterwards the reference counter is still 2 and no unsynced changes exist,
+	 *   we know that  nothing else  is using  the part and  we can  proceed to  clear
+	 *   `MPART_F_GLOBAL_REF', drop the inherited reference,  unlock the file and  the
+	 *   global list, and finally  drop the working reference  which will then end  up
+	 *   destroying the part. (The file and global  list locks are needed to keep  the
+	 *   part invisible while we're check if it's invisible. - Without it, we couldn't
+	 *   ensure that the part  does not randomly  become used by  some other piece  of
+	 *   code)
+	 * - When `MPART_F_GLOBAL_REF' wasn't set, simply drop the working reference  (which
+	 *   should also cause the part to be destroyed). When the part doesn't end up being
+	 *   destroyed, it may be a good idea to pass it along to `mpart_merge()'...
+	 * cleanup:
+	 * - Check if `MPART_F_NOFREE' is set, and if so: return and do nothing
+	 * - Check if it's possible to change the part's state to `MPART_ST_VOID', which can
+	 *   be done if there no unsynced changes (changes may still exist if the associated
+	 *   file doesn't support `mo_saveblocks').
+	 * - If the state can be set to `MPART_ST_VOID', make the change before also clearing
+	 *   `MPART_F_BLKST_INL',  as  dealloc `mp_blkst_ptr'  (if appropriate),  and setting
+	 *   `mp_blkst_ptr = NULL'.
+	 * - If the state cannot be set to `MPART_ST_VOID', consider offloading the part into
+	 *   swap  memory (for this purpose there should be  a flag that gets set by the orig
+	 *   call to `mpart_unload()', which takes a flags argument of actions to perform for
+	 *   the purpose of unloading)
 	 *
 	 * Once implemented, this will form the basis of unloading unused file data
 	 * as  the result of wanting to free up memory after `system_clearcache()',

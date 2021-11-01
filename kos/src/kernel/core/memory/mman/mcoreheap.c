@@ -541,6 +541,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	/* Initialize the (remainder of the) mem-part */
 	part->mp_refcnt = 1;
 	part->mp_flags  = MPART_F_COREPART | MPART_F_MLOCK_FROZEN | MPART_F_MLOCK;
+	part->mp_xflags = MPART_XF_NORMAL;
 	part->mp_state  = MPART_ST_MEM;
 	part->mp_file   = incref(&mcore_file);
 	LIST_INIT(&part->mp_copy);

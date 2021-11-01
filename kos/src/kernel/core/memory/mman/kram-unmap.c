@@ -651,6 +651,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		hipart           = &cp->mcp_part;
 		hipart->mp_flags = MPART_F_NORMAL | MPART_F_COREPART;
 	}
+	hipart->mp_xflags = MPART_XF_NORMAL;
 
 	/* Figure out the eventual sizes of the lo- and hi-parts */
 	losize   = unmap_minaddr - node->mn_minaddr;

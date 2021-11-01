@@ -253,13 +253,13 @@ next_chunk:
 
 	/* Figure out the max # of sectors to transfer.
 	 *
-	 * According to the specs, `buf' is not allowed to cross a 64K boundary,
-	 * meaning that `(buf & 0xffff0000) == ((buf + num_bytes) & 0xffff0000)'
+	 * According to the  specs, `buf' is  not allowed to  cross a 64K  boundary,
+	 * meaning that `(buf & 0xffff0000) == ((buf + num_bytes - 1) & 0xffff0000)'
 	 *
-	 * We  enforce this by only allowing transfer  sizes up to the start of
-	 * the next 64K boundary. This check also enforces that we never try to
-	 * transfer more than 64K bytes  at once (which is another  restriction
-	 * independent of the dont-cross-64K-boundary requirement)
+	 * We enforce this by only  allowing transfer sizes up  to the start of  the
+	 * next 64K boundary. This check also enforces that we never try to transfer
+	 * more than 64K bytes at once (which is another restriction independent  of
+	 * the dont-cross-64K-boundary requirement)
 	 *
 	 * HINT: `maxio' is the # of bytes from `buf' until the next 64K bound. */
 	{

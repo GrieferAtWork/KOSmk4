@@ -188,6 +188,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	part->mp_flags  = MPART_F_NOFREE | MPART_F_COREPART |
 	                  MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                  MPART_F_MLOCK_FROZEN | MPART_F_MLOCK;
+	part->mp_xflags = MPART_XF_NORMAL;
 	part->mp_state  = MPART_ST_MEM;
 	part->mp_file   = &mfile_ndef;
 	ATOMIC_INC(mfile_ndef.mf_refcnt);

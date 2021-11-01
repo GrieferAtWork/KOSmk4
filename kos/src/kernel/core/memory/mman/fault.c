@@ -866,6 +866,7 @@ done_mark_changed:
 			assert(copy);
 			copy->mp_refcnt = 1; /* This reference will be inherited by the node we create below */
 			copy->mp_flags  = MPART_F_LOCKBIT;
+			copy->mp_xflags = MPART_XF_NORMAL;
 #if MNODE_F_MLOCK == MPART_F_MLOCK
 			copy->mp_flags |= node->mn_flags & MNODE_F_MLOCK;
 #else /* MNODE_F_MLOCK == MPART_F_MLOCK */

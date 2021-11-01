@@ -4830,6 +4830,7 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 			part->mp_refcnt = 1; /* +1:node->mn_part */
 			part->mp_flags  = MPART_F_MLOCK;
+			part->mp_xflags = MPART_XF_NORMAL;
 			part->mp_file   = &mfile_zero;
 			LIST_INIT(&part->mp_copy);
 			part->mp_share.lh_first = node;

@@ -26,6 +26,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
@@ -241,10 +242,31 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 	iter = (byte_t *)mnode_getaddr(self);
 	end  = (byte_t *)mnode_getendaddr(self);
 	assert(iter < end);
-	do {
-		__asm__ __volatile__("" : : "r" (*iter));
-		iter += PAGESIZE;
-	} while (iter < end);
+#ifdef CONFIG_DEBUG_HEAP
+	if (self->mn_part->mp_file == &mfile_dbgheap) {
+		pflag_t was;
+		/* Super-ugly, hacky work-around because the heap system can't
+		 * be made compatible  with lockops without  a full  re-write.
+		 *
+		 * s.a.: `heap_unmap_kram()' */
+		heap_validate_all();
+		was = PREEMPTION_PUSHOFF();
+		ATOMIC_OR(THIS_TASK->t_flags, _TASK_FDBGHEAPDMEM);
+		do {
+			__asm__ __volatile__("" : : "r" (*iter));
+			iter += PAGESIZE;
+		} while (iter < end);
+		PREEMPTION_POP(was);
+		ATOMIC_AND(THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
+		heap_validate_all();
+	} else
+#endif /* CONFIG_DEBUG_HEAP */
+	{
+		do {
+			__asm__ __volatile__("" : : "r" (*iter));
+			iter += PAGESIZE;
+		} while (iter < end);
+	}
 #ifndef CONFIG_NO_SMP
 	/* Make sure that any other CPU is still initializing hinted pages,
 	 * which may  overlap with  the address  range we've  just  loaded. */
@@ -649,8 +671,9 @@ NOTHROW(FCALL async_alloc_mpart)(struct mpart **__restrict p_newpart,
 	/* First attempt: directly try to kmalloc() the new part. */
 	newpart = (struct mpart *)async_kmalloc(sizeof(struct mpart));
 	if (newpart) {
-		newpart->mp_flags = MPART_F_NORMAL;
-		*p_newpart        = newpart;
+		newpart->mp_xflags = MPART_XF_NORMAL;
+		newpart->mp_flags  = MPART_F_NORMAL;
+		*p_newpart         = newpart;
 		return MPART_TRIM_STATUS_SUCCESS;
 	}
 
@@ -662,8 +685,9 @@ NOTHROW(FCALL async_alloc_mpart)(struct mpart **__restrict p_newpart,
 		mman_lock_release(&mman_kernel);
 		if (!cp)
 			return MPART_TRIM_STATUS_NOMEM;
-		cp->mcp_part.mp_flags = MPART_F_COREPART;
-		*p_newpart            = &cp->mcp_part;
+		cp->mcp_part.mp_xflags = MPART_XF_NORMAL;
+		cp->mcp_part.mp_flags  = MPART_F_COREPART;
+		*p_newpart             = &cp->mcp_part;
 		return MPART_TRIM_STATUS_SUCCESS;
 	}
 
@@ -676,8 +700,9 @@ NOTHROW(FCALL async_alloc_mpart)(struct mpart **__restrict p_newpart,
 		cp = mcoreheap_alloc_locked_nx();
 		if (!cp)
 			return MPART_TRIM_STATUS_NOMEM;
-		cp->mcp_part.mp_flags = MPART_F_COREPART;
-		*p_newpart            = &cp->mcp_part;
+		cp->mcp_part.mp_xflags = MPART_XF_NORMAL;
+		cp->mcp_part.mp_flags  = MPART_F_COREPART;
+		*p_newpart             = &cp->mcp_part;
 		return MPART_TRIM_STATUS_SUCCESS;
 	}
 
@@ -1572,8 +1597,11 @@ NOTHROW(FCALL mpart_trim_locked)(struct mpart *__restrict self) {
 		mpart_trim_locked_ftx(self);
 	} else {
 		if (meta->mpm_dmalocks != 0) {
-			/* TODO: Wait for DMA-locks to go away, and _then_ re-attempt the trim! */
-			return;
+			/* Wait for DMA-locks to go away, and _then_ re-attempt the trim! */
+			ATOMIC_OR(self->mp_xflags, MPART_XF_TRIM_AFTER_DMA);
+			COMPILER_READ_BARRIER();
+			if (meta->mpm_dmalocks != 0)
+				return;
 		}
 		if (mpartmeta_ftxlock_trywrite(meta)) {
 			mpart_trim_locked_ftx(self);

@@ -429,6 +429,7 @@ struct mfile_ops {
 	 * The following fields should _NOT_ already be initialized by this
 	 * function, and will unconditionally be initialized by the caller:
 	 *  - mp_refcnt                      (Initialized to whatever is the correct value)
+	 *  - mp_xflags = MPART_XF_NORMAL;
 	 *  - mp_flags & MPART_F_GLOBAL_REF  (Set if `self' isn't anonymous)
 	 *  - mp_flags & MPART_F_LOCKBIT     (Must not be set)
 	 *  - mp_flags & MPART_F_CHANGED     (Must not be set)

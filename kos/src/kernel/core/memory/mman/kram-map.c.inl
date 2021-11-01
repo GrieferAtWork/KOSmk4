@@ -261,7 +261,7 @@ again_lock_mman:
 		}
 
 #define LOCAL_INIT_PART(part, flags) \
-		((part)->mp_state = MPART_ST_VOID, (part)->mp_flags = (flags))
+		((part)->mp_state = MPART_ST_VOID, (part)->mp_flags = (flags), (part)->mp_xflags = MPART_XF_NORMAL)
 		/* Allocate the required node/part pair. */
 		if (flags & GFP_VCBASE) {
 			if likely(!node) {

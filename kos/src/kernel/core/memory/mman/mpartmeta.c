@@ -253,12 +253,19 @@ PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
 NOTHROW(FCALL _mpart_dma_donelock)(REF struct mpart *__restrict self) {
 	/* When dma-locks go away,  it may also become  possible
 	 * to merge the part with some of its neighboring parts!
-	 * For this purpose, check `_MPART_F_MERGE_AFTER_DMA' */
-	if __unlikely(__hybrid_atomic_load(self->mp_flags, __ATOMIC_ACQUIRE) & _MPART_F_MERGE_AFTER_DMA) {
-		__hybrid_atomic_and(self->mp_flags, ~_MPART_F_MERGE_AFTER_DMA, __ATOMIC_SEQ_CST);
-		self = mpart_merge(self);
-	}
+	 * For this purpose, check `MPART_XF_MERGE_AFTER_DMA' */
+	uintptr_quarter_t xflags;
+	/* Do the broadcast first, since `self' might change when `mpart_merge()' is called. */
 	sig_broadcast(&self->mp_meta->mpm_dma_done);
+	xflags = ATOMIC_READ(self->mp_xflags);
+	if unlikely(xflags & (MPART_XF_TRIM_AFTER_DMA | MPART_XF_MERGE_AFTER_DMA)) {
+		xflags &= MPART_XF_TRIM_AFTER_DMA | MPART_XF_MERGE_AFTER_DMA;
+		ATOMIC_AND(self->mp_xflags, ~xflags);
+		if (xflags & MPART_XF_MERGE_AFTER_DMA)
+			self = mpart_merge(self);
+		if (xflags & MPART_XF_TRIM_AFTER_DMA)
+			mpart_trim(incref(self));
+	}
 	return self;
 }
 

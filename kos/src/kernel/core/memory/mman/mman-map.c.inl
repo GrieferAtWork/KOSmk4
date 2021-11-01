@@ -73,6 +73,7 @@ mnode_create_anon_ram(PAGEDIR_PAGEALIGNED size_t num_bytes,
 		TRY {
 			/* Initialize everything. */
 			part->mp_refcnt = 1; /* +1: `node' */
+			part->mp_xflags = MPART_XF_NORMAL;
 #if MAP_LOCKED == MPART_F_MLOCK
 			part->mp_flags = MPART_F_NORMAL | (flags & MAP_LOCKED);
 #else /* MAP_LOCKED == MPART_F_MLOCK */

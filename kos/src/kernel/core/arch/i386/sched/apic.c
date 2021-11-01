@@ -181,6 +181,7 @@ mpart_create_lockram(size_t num_pages) {
 	result->mp_refcnt = 1;
 	result->mp_flags  = (MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                     MPART_F_MLOCK_FROZEN | MPART_F_MLOCK);
+	result->mp_xflags = MPART_XF_NORMAL;
 	result->mp_file   = incref(&mfile_ndef);
 	LIST_INIT(&result->mp_copy);
 	/*LIST_INIT(&result->mp_share);*/ /* Initialized by our caller. */

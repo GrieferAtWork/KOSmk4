@@ -71,7 +71,7 @@
 /*efine MPART_F_               0x0008  * ... */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)] The backing block-state bitset exists in-line. */
 #define MPART_F_NOFREE         0x0020 /* [const] Don't page_free() backing physical memory or swap. */
-#define _MPART_F_WILLMERGE     0x0040 /* [lock(ATOMIC)] An async merge-request for this part was enqueued. */
+/*efine MPART_F_               0x0040  * ... */
 #define MPART_F_PERSISTENT     0x0080 /* [lock(CLEAR_ONCE)] The `MPART_F_GLOBAL_REF' flag may not  be cleared to free  up
                                        * memory. This flag is still cleared when the is being anonymized as the result of
                                        * a  call to `mfile_delete()'. The only place  where this flag makes a difference,
@@ -99,8 +99,21 @@
                                        * scanned in search  for other  locked mappings. If  any are  found, then  this
                                        * flag will remain set. If none are found, then this flag is cleared. */
 #define MPART_F__RBRED         0x4000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
-#define _MPART_F_MERGE_AFTER_DMA 0x8000 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear this flag
-                                         * and call `mpart_merge()' (s.a. `mpart_dma_dellock()') */
+/*efine MPART_F_               0x8000  * ... */
+
+/* Possible values for `struct mpart::mp_xflags' */
+#define MPART_XF_NORMAL          0x00
+#define MPART_XF_MERGE_AFTER_DMA 0x01 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear
+                                       * this flag and call `mpart_merge()' (s.a. `mpart_dma_dellock()') */
+#define MPART_XF_TRIM_AFTER_DMA  0x02 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear
+                                       * this flag and call `mpart_trim()' (s.a. `mpart_dma_dellock()') */
+#define MPART_XF_WILLMERGE       0x04 /* [lock(ATOMIC)] An async merge-request for this part was enqueued. */
+/*efine MPART_XF_                0x08  * ... */
+/*efine MPART_XF_                0x10  * ... */
+/*efine MPART_XF_                0x20  * ... */
+/*efine MPART_XF_                0x40  * ... */
+/*efine MPART_XF_                0x80  * ... */
+
 
 
 /* Possible values for `struct mpart::mp_state' */
@@ -238,12 +251,15 @@ struct mchunkvec {
 struct mpart {
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_refcnt(mp_refcnt) mp_refcnt
-#define MPART_INIT_mp_flags(mp_flags)   mp_flags
+#define MPART_INIT_mp_flags(mp_flags)   mp_flags, 0
 #define MPART_INIT_mp_state(mp_state)   mp_state
 #endif /* __WANT_MPART_INIT */
 	WEAK refcnt_t                 mp_refcnt;    /* Reference counter. */
 	uintptr_half_t                mp_flags;     /* Memory part flags (set of `MPART_F_*') */
-	uintptr_half_t                mp_state;     /* [lock(MPART_F_LOCKBIT)]
+	uintptr_quarter_t             mp_xflags;    /* Extended memory part flags (set of `MPART_XF_*')
+	                                             * These are used internally, and this field should
+	                                             * _always_ be set to `MPART_XF_NORMAL' during init. */
+	uintptr_quarter_t             mp_state;     /* [lock(MPART_F_LOCKBIT)]
 	                                             * [const_if(EXISTS(MPART_BLOCK_ST_INIT) ||
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * Memory part state (one of `MPART_ST_*') */

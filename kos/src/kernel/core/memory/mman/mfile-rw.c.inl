@@ -394,6 +394,7 @@ restart_after_extendpart:
 
 		/* Initialize remaining fields. */
 		part->mp_refcnt = 2; /* +1: return, +1: MPART_F_GLOBAL_REF */
+		part->mp_xflags = MPART_XF_NORMAL;
 		part->mp_file   = incref(self);
 		LIST_INIT(&part->mp_copy);
 		LIST_INIT(&part->mp_share);
@@ -960,6 +961,7 @@ extend_failed:
 	part->mp_refcnt = 3; /* +1: return:mfile_insert_and_merge_part_and_unlock,
 	                      * +1: MPART_F_CHANGED
 	                      * +1: MPART_F_GLOBAL_REF */
+	part->mp_xflags = MPART_XF_NORMAL;
 	part->mp_file   = incref(self);
 	LIST_INIT(&part->mp_copy);
 	LIST_INIT(&part->mp_share);

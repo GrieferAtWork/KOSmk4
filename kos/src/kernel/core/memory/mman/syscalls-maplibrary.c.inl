@@ -268,6 +268,7 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 
 				/* Initialize the part. */
 				part->mp_refcnt = 1; /* +1: `node->mbn_part' */
+				part->mp_xflags = MPART_XF_NORMAL;
 #if MPART_F_MLOCK == MAP_LOCKED
 				part->mp_flags = MPART_F_NORMAL | (map_flags & MAP_LOCKED);
 #else /* MPART_F_MLOCK == MAP_LOCKED */

@@ -255,6 +255,7 @@ mfile_makepart(struct mfile *__restrict self,
 
 	/* Initialize remaining fields. */
 	result->mp_refcnt = 1;
+	result->mp_xflags = MPART_XF_NORMAL;
 	result->mp_file   = self;
 #ifdef CONFIG_USE_NEW_FS
 	if (self->mf_flags & MFILE_F_DELETED)
@@ -456,6 +457,7 @@ again_extend_part:
 
 	/* Initialize remaining fields. */
 	result->mp_refcnt = 2; /* +1: return, +1: MPART_F_GLOBAL_REF */
+	result->mp_xflags = MPART_XF_NORMAL;
 	result->mp_file   = incref(self);
 	LIST_INIT(&result->mp_copy);
 	LIST_INIT(&result->mp_share);
