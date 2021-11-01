@@ -51,18 +51,18 @@ NOTHROW(KCALL mman_memset_nopf)(struct mman *__restrict self, UNCHECKED void *ad
  * well as properly accessing VIO.
  * @param: force_readable_source:      When true, force `addr' to be readable, ignoring `MNODE_F_PREAD'
  * @param: force_writable_destination: When true, force `addr' to be writable, invoking COW as needed. */
-FUNDEF void KCALL
+FUNDEF BLOCKING void KCALL
 mman_read(struct mman *__restrict self,
           UNCHECKED void const *addr, USER CHECKED void *buf,
           size_t num_bytes, __BOOL force_readable_source DFL(0))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
-FUNDEF void KCALL
+FUNDEF BLOCKING void KCALL
 mman_write(struct mman *__restrict self,
            UNCHECKED void *addr, USER CHECKED void const *buf,
            size_t num_bytes, __BOOL force_writable_destination DFL(0))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 /* Same as `mman_write()', but implement memset() semantics instead. */
-FUNDEF void KCALL
+FUNDEF BLOCKING void KCALL
 mman_memset(struct mman *__restrict self,
             UNCHECKED void *addr, int byte, size_t num_bytes,
             __BOOL force_writable_destination DFL(0))

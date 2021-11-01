@@ -146,10 +146,9 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 
 
 
-PRIVATE NONNULL((1)) void FCALL
-restore_changed_parts(struct mfile *__restrict self,
-                      REF struct mpart *chain)
-		THROWS(E_WOULDBLOCK, ...) {
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL restore_changed_parts)(struct mfile *__restrict self,
+                                     REF struct mpart *chain) {
 	struct mpart *other_changes, **p_last, *more_changes;
 	other_changes = ATOMIC_CMPXCH_VAL(self->mf_changed.slh_first,
 	                                  NULL, chain);
@@ -190,7 +189,7 @@ clear_chain:
 
 /* Sync unwritten changes made to parts within the given address range.
  * @return: * : The total # of bytes that have been synced. */
-PUBLIC NONNULL((1)) pos_t FCALL
+PUBLIC BLOCKING NONNULL((1)) pos_t FCALL
 mfile_sync(struct mfile *__restrict self)
 		THROWS(E_WOULDBLOCK, ...) {
 	pos_t result = 0;
@@ -498,9 +497,7 @@ PUBLIC_CONST struct mfile_ops const mfile_anon_ops[BITSOF(void *)] = {
 
 
 
-#ifdef CONFIG_USE_NEW_FS
-
-#else /* CONFIG_USE_NEW_FS */
+#ifndef CONFIG_USE_NEW_FS
 PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
 mfile_phys_newpart(struct mfile *__restrict UNUSED(self),
                    PAGEDIR_PAGEALIGNED pos_t minaddr,

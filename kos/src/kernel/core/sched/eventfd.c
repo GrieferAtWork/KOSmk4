@@ -44,8 +44,8 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED
-REF struct eventfd *KCALL eventfd_create(u64 value) THROWS(E_BADALLOC) {
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct eventfd *KCALL
+eventfd_create(u64 value) THROWS(E_BADALLOC) {
 	struct eventfd *result;
 	result = (struct eventfd *)kmalloc(sizeof(struct eventfd), GFP_NORMAL);
 	result->ef_refcnt = 1;
@@ -59,7 +59,7 @@ DEFINE_INTERN_ALIAS(handle_eventfd_sema_incref, handle_eventfd_fence_incref);
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_decref, handle_eventfd_fence_decref);
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_refcnt, handle_eventfd_fence_refcnt);
 
-INTERN size_t KCALL
+INTERN BLOCKING size_t KCALL
 handle_eventfd_fence_read(struct eventfd *__restrict self,
                           USER CHECKED void *dst,
                           size_t num_bytes, iomode_t mode) {
@@ -93,7 +93,7 @@ again:
 	return 8;
 }
 
-INTERN size_t KCALL
+INTERN BLOCKING size_t KCALL
 handle_eventfd_sema_read(struct eventfd *__restrict self,
                          USER CHECKED void *dst,
                          size_t num_bytes, iomode_t mode) {
@@ -132,7 +132,7 @@ handle_eventfd_sema_read(struct eventfd *__restrict self,
 }
 
 
-INTERN size_t KCALL
+INTERN BLOCKING size_t KCALL
 handle_eventfd_fence_write(struct eventfd *__restrict self,
                            USER CHECKED void const *src,
                            size_t num_bytes, iomode_t UNUSED(mode)) {

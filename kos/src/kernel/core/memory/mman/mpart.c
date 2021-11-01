@@ -557,7 +557,7 @@ NOTHROW(FCALL mpart_hasblocksstate_init)(struct mpart *__restrict self) {
  * @return: * : The total # of bytes that were synced.
  * NOTE: The caller is responsible for adding/removing the part to/from
  *       the associated file's list of changed parts! */
-PRIVATE NONNULL((1)) size_t FCALL
+PRIVATE BLOCKING NONNULL((1)) size_t FCALL
 mpart_sync_impl(struct mpart *__restrict self, bool keep_lock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	size_t result = 0;
@@ -829,16 +829,16 @@ done_noop_nolock:
  * @return: * : The total # of bytes that were synced.
  * NOTE: The caller is responsible for adding/removing the part to/from
  *       the associated file's list of changed parts! */
-PUBLIC NOBLOCK NONNULL((1)) size_t FCALL
+PUBLIC BLOCKING NONNULL((1)) size_t FCALL
 mpart_sync(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	return mpart_sync_impl(self, false);
 }
 
 /* Same as `mpart_sync()', but keep on holding onto the lock to `self' */
-PUBLIC NOBLOCK NONNULL((1)) size_t FCALL
+PUBLIC BLOCKING NONNULL((1)) size_t FCALL
 mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	return mpart_sync_impl(self, true);
 }
 

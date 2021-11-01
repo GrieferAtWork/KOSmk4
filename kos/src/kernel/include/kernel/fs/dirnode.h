@@ -62,10 +62,10 @@ struct fdirenum_ops {
 	/* [1..1] Directory reader callback.
 	 * When end-of-file has been reached, `0' is returned.
 	 * NOTE: This function mustn't enumerate the `.' and `..' entires! */
-	NONNULL((1)) size_t
+	BLOCKING NONNULL((1)) size_t
 	(KCALL *deo_readdir)(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
 	                     size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
-			THROWS(...);
+			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
 	/* [1..1] Directory stream seeking.
 	 * This callback must at least be capable of  `offset=0,whence=SEEK_SET',
@@ -80,11 +80,12 @@ struct fdirenum_ops {
 	 * NOTE: This function mustn't enumerate the `.' and `..' entires!
 	 * @return: * : The new position (however that may be defined) within
 	 *              the directory stream.
+	 * @throw: E_OVERFLOW: File position would overflow or underflow.
 	 * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE:whence: [...] */
-	NONNULL((1)) pos_t
+	BLOCKING NONNULL((1)) pos_t
 	(KCALL *deo_seekdir)(struct fdirenum *__restrict self,
 	                     off_t offset, unsigned int whence)
-			THROWS(...);
+			THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...);
 };
 
 #define FDIRENUM_HEADER                                               \
@@ -126,12 +127,12 @@ fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
                     u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
 		THROWS(E_SEGFAULT);
 /* Same as `fdirenum_feedent_ex()', but feed values from `ent' */
-FUNDEF WUNUSED NONNULL((4, 5)) ssize_t FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((4, 5)) ssize_t FCALL
 fdirenum_feedent(USER CHECKED struct dirent *buf,
                  size_t bufsize, readdir_mode_t readdir_mode,
                  struct fdirent *__restrict ent,
                  struct fdirnode *__restrict dir)
-		THROWS(E_SEGFAULT);
+		THROWS(E_SEGFAULT, E_IOERROR, ...);
 /* Same as `fdirenum_feedent()', but may only be used when `ent' doesn't implement `fdo_getino' */
 FUNDEF WUNUSED NONNULL((4)) ssize_t FCALL
 fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
@@ -266,9 +267,10 @@ struct fdirnode_ops {
 
 	/* [1..1] Lookup a directory entry within `self', given its name.
 	 * @return: NULL: No entry exists that is matching the given name. */
-	WUNUSED NONNULL((1, 2)) REF struct fdirent *
+	BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *
 	(KCALL *dno_lookup)(struct fdirnode *__restrict self,
-	                    struct flookup_info *__restrict info);
+	                    struct flookup_info *__restrict info)
+			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
 	/* [1..1] Construct a directory enumerator object in `*result'.
 	 * This  function  must  initialize _all_  fields  of `*result'
@@ -283,8 +285,9 @@ struct fdirnode_ops {
 	 *  - result->*      = ...;          # Additional fs-specific fields
 	 * If this operator returns with an exception, the caller will decref()
 	 * whatever directory  is stored  in  `result->de_dir' at  that  point. */
-	NONNULL((1)) void
-	(KCALL *dno_enum)(struct fdirenum *__restrict result);
+	BLOCKING NONNULL((1)) void
+	(KCALL *dno_enum)(struct fdirenum *__restrict result)
+			THROWS(E_IOERROR, ...);
 
 	/* [0..1] Create  new files within a given directory.
 	 * @throw: E_FSERROR_ILLEGAL_PATH:          `info->mkf_name' contains bad characters
@@ -318,12 +321,12 @@ struct fdirnode_ops {
 	 * >> info->mkf_dent  = incref(newent);
 	 * >> info->mkf_rnode = incref(newfil);
 	 * >> return FDIRNODE_MKFILE_SUCCESS; */
-	WUNUSED NONNULL((1, 2)) unsigned int
+	BLOCKING WUNUSED NONNULL((1, 2)) unsigned int
 	(KCALL *dno_mkfile)(struct fdirnode *__restrict self,
 	                    struct fmkfile_info *__restrict info)
-			THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+			THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 			       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
-			       E_FSERROR_UNSUPPORTED_OPERATION);
+			       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
 	/* [0..1] Delete   the  specified  file  from  this  directory.
 	 * This function is also responsible to update `file->fn_nlink'
@@ -337,12 +340,12 @@ struct fdirnode_ops {
 	 * >> assert(entry->FILE == file);
 	 * >> REMOVE_DIRECTORY_ENTRY(self, entry);
 	 * >> MARK_DELETED(entry); */
-	WUNUSED NONNULL((1, 2, 3)) unsigned int
+	BLOCKING WUNUSED NONNULL((1, 2, 3)) unsigned int
 	(KCALL *dno_unlink)(struct fdirnode *__restrict self,
 	                    struct fdirent *__restrict entry,
 	                    struct fnode *__restrict file)
 			THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
-			       E_FSERROR_READONLY);
+			       E_FSERROR_READONLY, E_IOERROR, ...);
 
 	/* [0..1] Rename/move the specified file from one location to  another.
 	 * The caller must ensure that  `self' and `info->frn_olddir' are  part
@@ -398,10 +401,11 @@ struct fdirnode_ops {
 	 * >> }
 	 * >> info->frn_dent = incref(newent);
 	 * >> return FDIRNODE_RENAME_SUCCESS; */
-	WUNUSED NONNULL((1, 2)) unsigned int
+	BLOCKING WUNUSED NONNULL((1, 2)) unsigned int
 	(KCALL *dno_rename)(struct fdirnode *__restrict self,
 	                    struct frename_info *__restrict info)
-			THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL, E_FSERROR_READONLY);
+			THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+			       E_FSERROR_READONLY, E_IOERROR, ...);
 };
 
 struct fdirnode
@@ -492,10 +496,12 @@ struct fdirnode
 struct handle;
 FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
-                struct path *access_path, struct fdirent *access_dent);
+                struct path *access_path, struct fdirent *access_dent)
+		THROWS(E_BADALLOC);
 FUNDEF NONNULL((1)) void KCALL /* Writes `st_blocks = 1;', `st_size = mfile_getblocksize(self);' */
 fdirnode_v_stat(struct mfile *__restrict self,
-                USER CHECKED struct stat *result) THROWS(...);
+                USER CHECKED struct stat *result)
+		THROWS(E_SEGFAULT);
 
 /* Default stream operators for directories (using `fdirnode_v_open') */
 DATDEF struct mfile_stream_ops const fdirnode_v_stream_ops;
@@ -515,9 +521,10 @@ DATDEF struct mfile_stream_ops const fdirnode_v_stream_ops;
  * enumerator, will still be enumerated by said enumerator. It is however
  * guarantied that all files created  before, and not deleted after  will
  * always be enumerated */
-FUNDEF NONNULL((1, 2)) void FCALL
+FUNDEF BLOCKING NONNULL((1, 2)) void FCALL
 fdirnode_enum(struct fdirnode *__restrict self,
-              struct fdirenum *__restrict result);
+              struct fdirenum *__restrict result)
+		THROWS(E_IOERROR, ...);
 
 
 /* Create new files within a given directory.
@@ -528,12 +535,12 @@ fdirnode_enum(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
  * @throw: E_FSERROR_ACCESS_DENIED:         The file didn't already exist, and caller doesn't have write-access to `self'
  * @return: * : One of `FDIRNODE_MKFILE_*' */
-FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,
                 struct fmkfile_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
-		       E_FSERROR_UNSUPPORTED_OPERATION);
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
 /* Delete the specified file from this directory
  * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had  already been deleted,  or
@@ -542,21 +549,23 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
  * @throw: E_FSERROR_READONLY:            Read-only filesystem (or unsupported operation)
  * @return: * : One of `FDIRNODE_UNLINK_*' */
-FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_unlink(struct fdirnode *__restrict self,
                 struct fdirent *__restrict entry,
                 struct fnode *__restrict file)
-		THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY, E_FSERROR_READONLY);
+		THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY,
+		       E_FSERROR_READONLY, E_IOERROR, ...);
 
 /* Rename/move the specified file from one location to another
  * @throw: E_FSERROR_ILLEGAL_PATH: `info->frn_name' contains bad characters
  * @throw: E_FSERROR_DISK_FULL:    Disk full
  * @throw: E_FSERROR_READONLY:     Read-only filesystem
  * @return: * : One of `FDIRNODE_RENAME_*' */
-FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_rename(struct fdirnode *__restrict self,
                 struct frename_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL, E_FSERROR_READONLY);
+		THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		       E_FSERROR_READONLY, E_IOERROR, ...);
 
 
 DECL_END

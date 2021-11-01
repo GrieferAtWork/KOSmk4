@@ -63,7 +63,7 @@ typedef struct __sigset_struct sigset_t;
  *                                 executing even before this function returns.
  * @return: true:  Success
  * @return: false: Failure because `thread' has already terminated. */
-FUNDEF NONNULL((1, 3)) bool KCALL
+FUNDEF NONNULL((1, 3)) __BOOL KCALL
 task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
               prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
@@ -93,30 +93,30 @@ task_rpc_userunwind(prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
  *                 preemption was re-enabled if it was disabled before.
  * @return: false: No  RPC needed to be served, and preemption
  *                 remains disabled if it was disabled before. */
-FUNDEF bool (FCALL task_serve)(void) THROWS(E_INTERRUPT_USER_RPC, ...);
+FUNDEF BLOCKING __BOOL (FCALL task_serve)(void) THROWS(E_INTERRUPT_USER_RPC, ...);
 
 /* Arch-specific function:
  * Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
  * @return: * : Set of `TASK_SERVE_*' */
-FUNDEF WUNUSED unsigned int NOTHROW(FCALL task_serve_nx)(void);
+FUNDEF BLOCKING WUNUSED unsigned int NOTHROW(FCALL task_serve_nx)(void);
 
 /* Same as `task_serve()', but use the given `sigmask'
  * instead of the  calling thread's thread-local  one.
  * Used for the implementation of `sigsuspend(2)' */
-FUNDEF NONNULL((1)) bool FCALL
+FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
 task_serve_with_sigmask(sigset_t const *__restrict sigmask)
 		THROWS(E_INTERRUPT_USER_RPC, ...);
 
 
 /* Automatically updates `state' to include the intended return value for `task_serve()'! */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 task_serve_with_icpustate(struct icpustate *__restrict state)
 		THROWS(E_INTERRUPT_USER_RPC, ...);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
                                       sigset_t const *__restrict sigmask)
 		THROWS(E_INTERRUPT_USER_RPC, ...);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state);
 
 #if !defined(__OPTIMIZE_SIZE__) && !defined(__INTELLISENSE__)

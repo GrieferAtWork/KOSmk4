@@ -152,7 +152,8 @@ NOTHROW(KCALL syslog_sink_array_contains)(struct syslog_sink_array *__restrict s
 
 PRIVATE REF struct syslog_sink_array *KCALL
 syslog_sink_array_with(struct syslog_sink_array *__restrict self,
-                       struct syslog_sink *__restrict additional_sink) {
+                       struct syslog_sink *__restrict additional_sink)
+		THROWS(E_BADALLOC) {
 	size_t i, count;
 	REF struct syslog_sink_array *result;
 	if unlikely(syslog_sink_array_contains(self, additional_sink))
@@ -171,7 +172,8 @@ syslog_sink_array_with(struct syslog_sink_array *__restrict self,
 
 PRIVATE REF struct syslog_sink_array *KCALL
 syslog_sink_array_without(struct syslog_sink_array *__restrict self,
-                          struct syslog_sink *__restrict removed_sink) {
+                          struct syslog_sink *__restrict removed_sink)
+		THROWS(E_BADALLOC) {
 	size_t i, count, dst;
 	REF struct syslog_sink_array *result;
 	if unlikely(!syslog_sink_array_contains(self, removed_sink))
@@ -201,7 +203,7 @@ syslog_sink_array_without(struct syslog_sink_array *__restrict self,
  *    that  contains  a  backlog  of  the  last  N  written packets. */
 PUBLIC ATTR_COLDTEXT bool KCALL
 syslog_sink_register(struct syslog_sink *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BAD_ARGUMENT) {
+		THROWS(E_BADALLOC) {
 	REF struct syslog_sink_array *old_array;
 	REF struct syslog_sink_array *new_array;
 again:
@@ -220,7 +222,7 @@ again:
 
 PUBLIC ATTR_COLDTEXT bool KCALL
 syslog_sink_unregister(struct syslog_sink *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BAD_ARGUMENT) {
+		THROWS(E_BADALLOC) {
 	REF struct syslog_sink_array *old_array;
 	REF struct syslog_sink_array *new_array;
 again:

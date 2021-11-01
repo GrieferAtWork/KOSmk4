@@ -82,7 +82,7 @@ DECL_BEGIN
  *              access to the affected region  (i.e. using `memcpy' rather  than
  *              `memcpy_nopf'), and dealing with any potential E_SEGFAULT error.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
-PUBLIC size_t FCALL
+PUBLIC BLOCKING size_t FCALL
 mman_prefault(USER CHECKED void const *addr,
               size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -169,7 +169,7 @@ unlock_and_done:
  * of successfully faulted  segments, however  faulting also stops  on the  first
  * segment that cannot be fully faulted.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
-PUBLIC size_t FCALL
+PUBLIC BLOCKING NONNULL((1)) size_t FCALL
 mman_prefaultv(struct iov_buffer const *__restrict buffer,
                size_t offset, size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -225,7 +225,7 @@ mman_prefaultv(struct iov_buffer const *__restrict buffer,
  *    its  page directory mapping in `self' will still be updated if need be, as it
  *    may have been faulted as a lazy memory mapping).
  */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 mman_forcefault(struct mman *__restrict self,
                 USER CHECKED void const *addr,
                 size_t num_bytes, unsigned int flags)
@@ -335,7 +335,7 @@ err_unmapped_now:
 
 
 /* Same as `mman_forcefault()', but fault all memory pointed-to by the given buffer. */
-PUBLIC NONNULL((1, 2)) void FCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void FCALL
 mman_forcefaultv(struct mman *__restrict self,
                  struct iov_buffer const *__restrict buffer,
                  size_t offset, size_t num_bytes, unsigned int flags)
@@ -566,7 +566,7 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
  *                 Resolve  this  issue  by simply  trying  again (this
  *                 inconsistency can result from someone else splitting
  *                 the associated mem-part) */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC BLOCKING NONNULL((1)) bool FCALL
 mfault_or_unlock(struct mfault *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct mnode *node;

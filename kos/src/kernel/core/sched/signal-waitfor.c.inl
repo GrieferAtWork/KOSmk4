@@ -49,18 +49,18 @@ DECL_BEGIN
  * @return: NULL: No signal  has  become  available  (never  returned
  *                when `KTIME_INFINITE' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
-PUBLIC struct sig *FCALL
+PUBLIC BLOCKING struct sig *FCALL
 task_waitfor(ktime_t abs_timeout)
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...)
 #elif defined(DEFINE_task_waitfor_with_sigmask)
-PUBLIC NONNULL((1)) struct sig *FCALL
+PUBLIC BLOCKING NONNULL((1)) struct sig *FCALL
 task_waitfor_with_sigmask(sigset_t const *__restrict sigmask,
                           ktime_t abs_timeout)
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...)
 #define LOCAL_HAVE_SIGMASK
 #elif defined(DEFINE_task_waitfor_norpc)
 /* Same as `task_waitfor', but don't serve RPC functions. */
-PUBLIC struct sig *FCALL
+PUBLIC BLOCKING struct sig *FCALL
 task_waitfor_norpc(ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK)
 #define LOCAL_NORPC
@@ -68,13 +68,13 @@ task_waitfor_norpc(ktime_t abs_timeout)
 /* Same as `task_waitfor', but only service NX RPCs, and return `NULL'
  * if there are pending RPCs that  are allowed to throw exception,  or
  * if preemption was disabled, and the operation would have blocked. */
-PUBLIC struct sig *
+PUBLIC BLOCKING struct sig *
 NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout)
 #define LOCAL_NOEXCEPT
 #elif defined(DEFINE_task_waitfor_norpc_nx)
 /* Same as  `task_waitfor',  but  don't serve  RPC  functions,  and  return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
-PUBLIC struct sig *
+PUBLIC BLOCKING struct sig *
 NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout)
 #define LOCAL_NORPC
 #define LOCAL_NOEXCEPT

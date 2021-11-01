@@ -62,9 +62,9 @@ NOTHROW(KCALL constdirent_v_destroy)(struct fdirent *__restrict self) {
 	_constdirent_free(me);
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL /* return incref(me->cd_node); */
-constdirent_v_opennode(struct fdirent *__restrict self,
-                       struct fdirnode *__restrict UNUSED(dir)) {
+PUBLIC WUNUSED NONNULL((1, 2)) REF struct fnode *
+NOTHROW(KCALL constdirent_v_opennode)(struct fdirent *__restrict self, /* return incref(me->cd_node); */
+                                      struct fdirnode *__restrict UNUSED(dir)) {
 	struct constdirent *me = fdirent_asconst(self);
 	return mfile_asnode(incref(me->cd_node));
 }
@@ -116,7 +116,7 @@ again:
 PUBLIC NONNULL((1)) pos_t KCALL
 constdirenum_v_seekdir(struct fdirenum *__restrict self,
                        off_t offset, unsigned int whence)
-		THROWS(...) {
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	size_t newpos;
 	struct constdirenum *me = (struct constdirenum *)self;
 	switch (whence) {
@@ -164,7 +164,8 @@ constdirenum_v_seekdir(struct fdirenum *__restrict self,
 /* Default operators for `struct constdir' */
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 constdir_v_lookup(struct fdirnode *__restrict self,
-                  struct flookup_info *__restrict info) {
+                  struct flookup_info *__restrict info)
+		THROWS(E_SEGFAULT) {
 	struct fdirent *result;
 	struct constdir *me = fdirnode_asconst(self);
 	size_t lo, hi;
@@ -203,8 +204,8 @@ constdir_v_lookup(struct fdirnode *__restrict self,
 }
 
 
-PUBLIC NONNULL((1)) void KCALL
-constdir_v_enum(struct fdirenum *__restrict result) {
+PUBLIC NONNULL((1)) void
+NOTHROW(KCALL constdir_v_enum)(struct fdirenum *__restrict result) {
 	struct constdir *dir;
 	struct constdirenum *ret;
 	ret = (struct constdirenum *)result;

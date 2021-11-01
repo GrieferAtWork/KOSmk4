@@ -767,19 +767,22 @@ NOTHROW(FCALL mpart_page2swap)(struct mpart const *__restrict self,
  ************************************************************************/
 
 /* Ensure that `!mpart_hasblocksstate_init(self)' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
-                         struct unlockinfo *unlock);
+                         struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, ...);
 
 /* Ensure that `self->mp_meta == NULL || self->mp_meta->mpm_dmalocks == 0' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_nodma_or_unlock(struct mpart *__restrict self,
-                      struct unlockinfo *unlock);
+                      struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, ...);
 
 /* Ensure that `self->mp_meta != NULL' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_hasmeta_or_unlock(struct mpart *__restrict self,
-                        struct unlockinfo *unlock);
+                        struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
 struct mpart_setcore_data {
@@ -803,10 +806,11 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict self);
 
 /* Ensure that `MPART_ST_INCORE(self->mp_state)' */
-FUNDEF WUNUSED NONNULL((1, 3)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 3)) __BOOL FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock,
-                        struct mpart_setcore_data *__restrict data);
+                        struct mpart_setcore_data *__restrict data)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Ensure that all blocks (within the given range of blocks)
  * are either `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG'
@@ -814,12 +818,12 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
  *   - ... the given address range is in-bounds!
  *   - ... MPART_ST_INCORE(self->mp_state)
  * If they don't, then this function will cause an assertion failure! */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_load_or_unlock(struct mpart *__restrict self,
                      struct unlockinfo *unlock,
                      mpart_reladdr_t partrel_offset,
                      size_t num_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 struct mpart_unsharecow_data {
 	struct mpart_setcore_data ucd_ucmem; /* Data for unshare. */
@@ -849,11 +853,12 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
  *       or have already been added as lock-ops to `mp_lockops'.
  *       However, the mmans of all nodes still apart of the mp_copy list have
  *       already been destroyed, such that  no alive copy-nodes still  exist! */
-FUNDEF WUNUSED NONNULL((1, 3)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 3)) __BOOL FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data,
-                           mpart_reladdr_t partrel_offset, size_t num_bytes);
+                           mpart_reladdr_t partrel_offset, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
 /* Ensure that:
@@ -866,28 +871,29 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
  * mappings exist that may still have write-access! */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_denywrite_or_unlock(struct mpart *__restrict self,
-                          struct unlockinfo *unlock);
+                          struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
 /************************************************************************/
 
 
 /* Acquire a lock until:
  *  - mpart_initdone_or_unlock(self, ...) */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF BLOCKING NONNULL((1)) void FCALL
 mpart_lock_acquire_and_initdone(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Acquire a lock until:
  *  - mpart_initdone_or_unlock(self, ...)
  *  - mpart_nodma_or_unlock(self, ...) */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF BLOCKING NONNULL((1)) void FCALL
 mpart_lock_acquire_and_initdone_nodma(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...) */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF BLOCKING NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...)
@@ -898,10 +904,10 @@ mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
  * # of bytes that may need to be loaded)
  *
  * HINT: This function is used to implement `mpart_read()' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
                                     pos_t filepos, size_t max_load_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...)
@@ -912,10 +918,10 @@ mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
  * # of bytes that may need to be unshared/loaded)
  *
  * HINT: This function is used to implement `mman_startdma()' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
                                           pos_t filepos, size_t max_load_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...)
@@ -927,10 +933,10 @@ mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
  * # of bytes that may need to be unshared/loaded)
  *
  * HINT: This function is used to implement `mman_startdma()' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_lock_acquire_and_setcore_unsharecow_load(struct mpart *__restrict self,
                                                pos_t filepos, size_t max_load_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
  * are  still being held, and that all shared mappings of the given mem-part are
@@ -958,9 +964,9 @@ mpart_lock_acquire_and_setcore_unsharecow_load(struct mpart *__restrict self,
  * syncing an anonymous file wouldn't really make much sense (where the file being
  * anonymous is one  of the  conditions for  a writable  copy-on-write mapping  to
  * continue to exist) */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF BLOCKING NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
 /* Get/Set the state of the index'd block `partrel_block_index' from the part's block-state bitset.
@@ -1097,7 +1103,7 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
  * this function should attempt to load, though it will only ever load  a
  * single cluster of consecutive blocks that starts with an uninitialized
  * block containing `partrel_offset' */
-FUNDEF NONNULL((1, 3)) void FCALL
+FUNDEF BLOCKING NONNULL((1, 3)) void FCALL
 mpart_memload_and_unlock(struct mpart *__restrict self,
                          mpart_reladdr_t partrel_offset,
                          struct mpart_physloc const *__restrict loc,
@@ -1144,23 +1150,23 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
  *                by re-checking for a missing part, and creating that part
  *                if it cannot be found.
  * @return: * :   A reference to a part that (at one point) began at `offset' */
-FUNDEF NONNULL((1)) REF struct mpart *FCALL
+FUNDEF BLOCKING NONNULL((1)) REF struct mpart *FCALL
 mpart_split(struct mpart *__restrict self,
             PAGEDIR_PAGEALIGNED pos_t offset)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Sync changes made to the given mem-part.
  * @return: * : The total # of bytes that were synced.
  * NOTE: The caller is responsible for adding/removing the part to/from
  *       the associated file's list of changed parts! */
-FUNDEF NOBLOCK NONNULL((1)) size_t FCALL
+FUNDEF BLOCKING NONNULL((1)) size_t FCALL
 mpart_sync(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as `mpart_sync()', but keep on holding onto the lock to `self' */
-FUNDEF NOBLOCK NONNULL((1)) size_t FCALL
+FUNDEF BLOCKING NONNULL((1)) size_t FCALL
 mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
 /* (Re-)map the given mem-part into a page directory.
@@ -1293,9 +1299,10 @@ NOTHROW(FCALL mpart_unload)(/*inherit(always)*/ REF struct mpart *__restrict sel
  *    - unlockinfo_xunlock(unlock);
  * @param: flags: Set of `MPART_UNLOADNOW_F_*'
  * @param: self:  The mem-part which should be unloaded. */
-FUNDEF NONNULL((1)) unsigned int FCALL
+FUNDEF BLOCKING NONNULL((1)) unsigned int FCALL
 mpart_unloadnow_or_unlock(/*inherit(on_success)*/ REF struct mpart *__restrict self,
-                          unsigned int flags, struct unlockinfo *unlock);
+                          unsigned int flags, struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, ...);
 
 /* Return values for `mpart_unloadnow_or_unlock()' */
 #define MPART_UNLOADNOW_ST_RETRY   0 /* Locks were lost; try again */
@@ -1346,10 +1353,10 @@ NOTHROW(FCALL mpart_start_asyncjob)(/*inherit(always)*/ REF struct mpart *__rest
  *   - self->mp_share.filter(MAPS(addr, num_bytes)) == []     // No shared memory mappings
  *   - self->mp_copy .filter(MAPS(addr, num_bytes)) == [node] // Exactly 1 copy-on-write mapping, that is `node' */
 #define mpart_iscopywritable(self, addr, num_bytes, node) \
-	(mpart_isanon(self) &&                                 \
-	 ((LIST_EMPTY(&(self)->mp_share) &&                    \
-	   LIST_FIRST(&(self)->mp_copy) == (node) &&           \
-	   LIST_NEXT(node, mn_link) == __NULLPTR) ||           \
+	(mpart_isanon(self) &&                                \
+	 ((LIST_EMPTY(&(self)->mp_share) &&                   \
+	   LIST_FIRST(&(self)->mp_copy) == (node) &&          \
+	   LIST_NEXT(node, mn_link) == __NULLPTR) ||          \
 	  _mpart_iscopywritable(self, addr, num_bytes, node)))
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 4)) __BOOL
 NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
@@ -1416,22 +1423,22 @@ NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
 /* Read/write raw data to/from a given mem-part.
  * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
  *              is too small, or if  the given `filepos' lies  outside of the part's  bounds. */
-FUNDEF NONNULL((1)) size_t KCALL mpart_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_read_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_write_p(struct mpart *__restrict self, physaddr_t src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_write_p(struct mpart *__restrict self, physaddr_t src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_readv(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_writev(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_readv_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_writev_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */
-FUNDEF NONNULL((1)) size_t KCALL _mpart_buffered_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL _mpart_buffered_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_readv(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mpart_buffered_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mpart_buffered_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mpart_buffered_readv(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
 /* Perform I/O while holding  a lock to `self'.  If this isn't possible,  then
@@ -1451,14 +1458,14 @@ FUNDEF NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart *__restr
  *    >> num_bytes != 0
  *    >> MPART_ST_INCORE(self->mp_state)   // Can be ensured by `mpart_setcore_or_unlock()'
  *    >> mpart_unsharecow_or_unlock(...)   // Only for `mpart_write*', and only within the target address range */
-FUNDEF NONNULL((1)) size_t KCALL mpart_read_or_unlock(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_write_or_unlock(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_read_or_unlock_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) size_t KCALL mpart_write_or_unlock_p(struct mpart *__restrict self, physaddr_t src, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read_or_unlock(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_write_or_unlock(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read_or_unlock_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_write_or_unlock_p(struct mpart *__restrict self, physaddr_t src, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock(struct mpart *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_readv_or_unlock_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock_p(struct mpart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, mpart_reladdr_t offset, struct unlockinfo *unlock) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
 

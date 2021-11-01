@@ -69,7 +69,7 @@ DECL_BEGIN
 #error "Bad configuration"
 #endif /* !... */
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 LOCAL_mfile_vio_rw(struct mfile *__restrict self,
                    LOCAL_buffer_t buffer,
 #ifdef LOCAL_BUFFER_IS_IOVEC

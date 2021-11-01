@@ -207,7 +207,7 @@ NOTHROW(FCALL mman_destroy)(struct mman *__restrict self) {
 
 /* Memory manager construction functions. */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
-mman_new(void) THROWS(E_BADALLOC, ...) {
+mman_new(void) THROWS(E_BADALLOC) {
 	REF struct mman *result;
 	result = _mman_alloc();
 

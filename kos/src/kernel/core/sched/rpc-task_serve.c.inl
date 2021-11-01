@@ -39,15 +39,15 @@ DECL_BEGIN
 
 /* Automatically updates `state' to include the intended return value for `task_serve()'! */
 #ifdef DEFINE_task_serve_with_icpustate
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 task_serve_with_icpustate(struct icpustate *__restrict state)
 		THROWS(E_INTERRUPT_USER_RPC, ...)
 #elif defined(DEFINE_task_serve_with_icpustate_nx)
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state)
 #define LOCAL_NOEXCEPT
 #else /* DEFINE_task_serve_with_icpustate */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
                                       USER CHECKED sigset_t const *sigmask)
 		THROWS(E_SEGFAULT, E_INTERRUPT_USER_RPC, ...)

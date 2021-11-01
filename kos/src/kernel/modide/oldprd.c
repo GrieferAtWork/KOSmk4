@@ -159,7 +159,7 @@ AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *ba
 	                          1,
 	                          base,
 	                          num_bytes,
-	                          for_writing);
+	                          for_writing ? MMAN_FAULT_F_WRITE : 0);
 	if (!req_locks)
 		return 0; /* Not encodable as PRD physical memory. */
 	req_prd = (size_t)(data.ad_buf - data.ad_base);
@@ -198,7 +198,7 @@ again_start_dma_lockvec:
 			                              req_locks,
 			                              base,
 			                              num_bytes,
-			                              for_writing);
+			                              for_writing ? MMAN_FAULT_F_WRITE : 0);
 			if unlikely(new_req_locks > req_locks) {
 				/* Need _even_ more DMA locks! */
 				lockvec = (struct mdmalock *)krealloc(lockvec,
@@ -269,7 +269,7 @@ AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct iov
 	                           &handle->hd_dmalock,
 	                           1,
 	                           buf,
-	                           for_writing);
+	                           for_writing ? MMAN_FAULT_F_WRITE : 0);
 	if (!req_locks)
 		return 0; /* Not encodable as PRD physical memory. */
 	req_prd = (size_t)(data.ad_buf - data.ad_base);
@@ -302,7 +302,7 @@ again_start_dma_lockvec:
 			                               lockvec,
 			                               req_locks,
 			                               buf,
-			                               for_writing);
+			                               for_writing ? MMAN_FAULT_F_WRITE : 0);
 			if unlikely(new_req_locks > req_locks) {
 				/* Need _even_ more DMA locks! */
 				lockvec = (struct mdmalock *)krealloc(lockvec,

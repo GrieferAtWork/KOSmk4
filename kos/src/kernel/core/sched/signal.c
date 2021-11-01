@@ -200,7 +200,7 @@ NOTHROW(FCALL task_popconnections)(void) {
 
 /* Allocate a new task connection. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct task_connection *FCALL
-task_connection_alloc(struct task_connections *__restrict self) /*THROWS(E_BADALLOC)*/ {
+task_connection_alloc(struct task_connections *__restrict self) THROWS(E_BADALLOC) {
 	unsigned int i;
 	struct task_connection *result;
 
@@ -269,7 +269,7 @@ NOTHROW(FCALL task_connection_free)(struct task_connections *__restrict self,
  * @throw: E_BADALLOC: Insufficient  memory  (only  when there  are  at least
  *                     `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 PUBLIC NONNULL((1)) void FCALL
-task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
+task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
 	struct task_connection *con, *next;
 	struct task_connections *cons;
 	cons = THIS_CONNECTIONS;
@@ -350,7 +350,7 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
  *
  * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
 PUBLIC NONNULL((1)) void FCALL
-task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
+task_connect_for_poll(struct sig *__restrict target) THROWS(E_BADALLOC) {
 	struct task_connection *con, *next;
 	struct task_connections *cons;
 	cons = THIS_CONNECTIONS;

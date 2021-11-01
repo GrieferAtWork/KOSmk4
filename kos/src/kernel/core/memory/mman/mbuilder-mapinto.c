@@ -300,7 +300,7 @@ err_insufficient_vmem:
 #define MBNODE_F_WRITABLE MBNODE_F_NONBLOCK
 
 
-/* Load  */
+/* Recursively load `tree' into the page directory of `self' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mman_map_mbuilder_tree_pdmap)(struct mman *__restrict self,
                                             struct mbnode *__restrict tree,

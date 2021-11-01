@@ -548,7 +548,7 @@ NOTHROW(FCALL task_popconnections)(void);
  * @throw: E_BADALLOC: Insufficient  memory  (only  when there  are  at least
  *                     `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 FUNDEF NONNULL((1)) void FCALL
-task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
+task_connect(struct sig *__restrict target) THROWS(E_BADALLOC);
 
 /* Exactly the same as `task_connect()', however must be used when the connection
  * is  made for a poll-based operation that only wishes to wait for some event to
@@ -595,7 +595,7 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
  *
  * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
 FUNDEF NONNULL((1)) void FCALL
-task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
+task_connect_for_poll(struct sig *__restrict target) THROWS(E_BADALLOC);
 
 
 /* Disconnect from a specific signal `target'
@@ -673,24 +673,24 @@ FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
  * @return: NULL: No signal  has  become  available  (never  returned
  *                when `KTIME_INFINITE' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
-FUNDEF struct sig *FCALL
+FUNDEF BLOCKING struct sig *FCALL
 task_waitfor(ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
 
 /* Same as `task_waitfor', but don't serve RPC functions. */
-FUNDEF struct sig *FCALL
+FUNDEF BLOCKING struct sig *FCALL
 task_waitfor_norpc(ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK);
 
 /* Same as `task_waitfor', but only service NX RPCs, and return `NULL'
  * if there are pending RPCs that  are allowed to throw exception,  or
  * if preemption was disabled, and the operation would have blocked. */
-FUNDEF struct sig *
+FUNDEF BLOCKING struct sig *
 NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Same as  `task_waitfor',  but  don't serve  RPC  functions,  and  return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
-FUNDEF struct sig *
+FUNDEF BLOCKING struct sig *
 NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 #ifndef __sigset_t_defined
@@ -700,7 +700,7 @@ typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 /* Same as `task_waitfor()', but uses `task_serve_with_sigmask()' instead of `task_serve()' */
-FUNDEF NONNULL((1)) struct sig *FCALL
+FUNDEF BLOCKING NONNULL((1)) struct sig *FCALL
 task_waitfor_with_sigmask(sigset_t const *__restrict sigmask,
                           ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);

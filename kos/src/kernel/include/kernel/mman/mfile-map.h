@@ -127,22 +127,22 @@ struct mfile_map {
  *    mapping over the given address range in its entirety
  *  - Release locks to all of the parts */
 #ifdef __INTELLISENSE__
-NONNULL((1, 2)) void
+BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 2)) void
 mfile_map_init_and_acquire(struct mfile_map *__restrict self,
                            struct mfile *__restrict file,
                            PAGEDIR_PAGEALIGNED pos_t addr,
                            PAGEDIR_PAGEALIGNED size_t num_bytes,
                            unsigned int prot, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...);
 
 /* Same as `mfile_map_init_and_acquire()', but don't acquire an initial lock. */
-NONNULL((1, 2)) void
+BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 2)) void
 mfile_map_init(struct mfile_map *__restrict self,
                struct mfile *__restrict file,
                PAGEDIR_PAGEALIGNED pos_t addr,
                PAGEDIR_PAGEALIGNED size_t num_bytes,
                unsigned int prot, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...);
 #else /* __INTELLISENSE__ */
 #define mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags) \
 	((self)->mfm_file = (file), (self)->mfm_addr = (addr),                   \
@@ -153,9 +153,9 @@ mfile_map_init(struct mfile_map *__restrict self,
 	(mfile_map_init_and_acquire(self, file, addr, num_bytes, prot, flags), \
 	 mfile_map_release(self))
 #endif /* !__INTELLISENSE__ */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF BLOCKING_IF(self->mfm_flags & MAP_POPULATE) NONNULL((1)) void FCALL
 _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...);
 #define _mfile_map_init(self) \
 	(_mfile_map_init_and_acquire(self), mfile_map_release(self))
 
@@ -184,19 +184,19 @@ NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self);
  * Otherwise, don't invoke `unlock' and return `true'.
  * NOTE: In the case of an exception, `unlock' is guarantied to be invoked
  *       prior to the exception being thrown. */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING_IF(self->mfm_flags & MAP_POPULATE) WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
                             struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...);
 
 /* Essentially does the same as `mfile_map_acquire_or_unlock()', however the
  * caller must already be holding locks  to every mem-part mapped by  `self'
  * However,  use of `mfile_map_acquire_or_unlock()' is still more efficient,
  * since that function can do some tricks which this one can't (see impl)! */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING_IF(self->mfm_flags & MAP_POPULATE) WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
                            struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...);
 
 /* Finalize a given mem-node-allocator.
  * This function will free (and  only free; the caller is  responsible
@@ -244,9 +244,9 @@ mfile_map_init_or_reserved(struct mfile_map *__restrict self,
 	(mfile_map_init_and_acquire_or_reserved(self, file, addr, num_bytes, prot, flags), \
 	 mfile_map_release_or_reserved(self))
 #endif /* !__INTELLISENSE__ */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF BLOCKING_IF(self->mfm_file != NULL && self->mfm_flags & MAP_POPULATE) NONNULL((1)) void FCALL
 _mfile_map_init_and_acquire_or_reserved(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...);
 #define _mfile_map_init_or_reserved(self) \
 	(_mfile_map_init_and_acquire_or_reserved(self), mfile_map_release_or_reserved(self))
 #define mfile_map_acquire_or_reserved(self) \

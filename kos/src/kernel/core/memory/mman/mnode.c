@@ -36,6 +36,7 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 

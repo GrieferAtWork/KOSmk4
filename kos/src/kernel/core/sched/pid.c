@@ -104,7 +104,8 @@ NOTHROW(KCALL taskpid_destroy)(struct taskpid *__restrict self) {
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct task *KCALL
-taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED) {
+taskpid_gettask_srch(struct taskpid *__restrict self)
+		THROWS(E_PROCESS_EXITED) {
 	REF struct task *result;
 	result = taskpid_gettask(self);
 	if unlikely(!result)

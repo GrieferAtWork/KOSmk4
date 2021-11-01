@@ -174,7 +174,7 @@ NOTHROW(FCALL mnode_destroy_anon_ram)(struct mnode *__restrict self) {
  *                        the return value may differ from `hint'!
  * @param: min_alignment: s.a. `mman_findunmapped'
  * @return: * : The effective mapping  base at which `file->DATA.BYTES[file_pos]' can be found. */
-PUBLIC NONNULL((1, 6)) void *KCALL
+PUBLIC BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 6)) void *KCALL
 mman_map(struct mman *__restrict self,
          UNCHECKED void *hint, size_t num_bytes,
          unsigned int prot, unsigned int flags,
@@ -195,7 +195,7 @@ mman_map(struct mman *__restrict self,
  * when user-space is allowed to directly mmap() device ram, but the driver
  * want's to prevent user-space from mapping more than the physical address
  * ranges actually associated with a device. */
-PUBLIC NONNULL((1, 6)) void *KCALL
+PUBLIC BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 6)) void *KCALL
 mman_map_subrange(struct mman *__restrict self,
                   UNCHECKED void *hint, size_t num_bytes,
                   unsigned int prot, unsigned int flags,
@@ -206,7 +206,7 @@ mman_map_subrange(struct mman *__restrict self,
                   pos_t file_map_minaddr,
                   pos_t file_map_maxaddr,
                   size_t min_alignment)
-		THROWS(E_WOULDBLOCK, E_BADALLOC,
+		THROWS(E_BADALLOC, E_WOULDBLOCK,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
 #define HAVE_FILE

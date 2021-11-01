@@ -825,6 +825,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, <hybrid/sequence/atree.h>
 	 *       can finally go away! (also: deemon doesn't use it, so don't  worry) */
 
+	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, get rid of `<sched/rwlock.h>' */
+
 	/* TODO: Rewrite `handle_manager' to make it  possible for fds to be  allocated
 	 *       in a 2-step process: #1: reserve, #2: commit (where commit must behave
 	 *       as NOBLOCK+NOTHROW, and can also be aborted/undone)
@@ -880,6 +882,51 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * then  be used to stop the clearing  of caches as soon as sufficient
 	 * system resources have  become available to  satisfy the  allocation
 	 * attempted by the caller. */
+
+	/* TODO: `struct epoll_controller::ec_lock' must be an atomic lock.
+	 *       Otherwise, anything that wants to acquire this lock  would
+	 *       have to be marked as `BLOCKING' */
+
+	/* TODO: `uvio_create()'  should take the initial-size argument that
+	 *       is passed to `sys_userviofd(2)' (with the new FS, that size
+	 *       becomes relevant and must be stored in `mf_filesize') */
+
+	/* TODO: Lots of functions are marked as E_WOULDBLOCK+E_BADALLOC.
+	 *
+	 * I feel like `E_BADALLOC' should be allowed to imply `E_WOULDBLOCK'
+	 * when talking about  the fact  that kmalloc() tries  to acquire  an
+	 * atomic lock internally, meaning it's able to throw `E_WOULDBLOCK'.
+	 * -> As such, go through all mentions of `THROWS(E_WOULDBLOCK, E_BADALLOC)'
+	 *    and see if the `E_WOULDBLOCK' can be removed. Note that it should stay
+	 *    if the function also acquired some other (unrelated) atomic lock! */
+
+	/* TODO: The new filesystem doesn't have checks for device-already-mounted.
+	 * As such, either re-introduce these checks (which could be done by having
+	 * a global set of mfiles currently being mounted, such that files are only
+	 * removed from this set _after_ the associated superblock was added to the
+	 * list of all superblocks), or removing `E_FSERROR_DEVICE_ALREADY_MOUNTED'
+	 * -> We could then precede calls to opening a superblock by adding the
+	 *    mfile to-be opened to said set whilst also checking that the file
+	 *    isn't already mounted by another known superblock.
+	 * -> Then, after the superblock has added itself to the list of all known
+	 *    superblocks, the associated LOP could  remove the backing file  from
+	 *    the set of files currently being mounted.
+	 */
+
+	/* TODO: `E_FSERROR_NOT_A_BLOCK_DEVICE' should be renamed to not imply that
+	 *       only block devices can be mounted! */
+
+	/* TODO: `cred_isfsgroupmember()'  should be re-implemented such that it
+	 *       becomes NOBLOCK+NOTHROW. If this were done, `fnode_mayaccess()'
+	 *       could also become  NOBLOCK+NOTHROW, which  could simplify  some
+	 *       more code! (especially  since the THROWS(E_WOULDBLOCK)  doesn't
+	 *       make a lot of sense for a function like that) */
+
+	/* TODO: Remove general-purpose  locking  support  for  `struct mman'
+	 *       Since there is more than 1 lock contained inside, it doesn't
+	 *       make too much  sense to provide  generic locking  overloads! */
+
+	/* TODO: Get rid of `<sched/sync.h>' */
 
 	return state;
 }

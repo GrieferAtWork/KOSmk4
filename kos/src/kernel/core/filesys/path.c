@@ -537,7 +537,7 @@ NOTHROW(FCALL path_cldlist_insert)(struct path *__restrict self,
  *                  should  use `fdirnode_lookup()' to determine if the dir
  *                  of `self' contains the named file.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' was marked as `PATH_CLDLIST_DELETED' */
-PUBLIC WUNUSED NONNULL((1)) REF struct path *KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct path *KCALL
 path_lookupchild(struct path *__restrict self,
                  USER CHECKED /*utf-8*/ char const *name,
                  u16 namelen, uintptr_t namehash, atflag_t atflags)
@@ -646,7 +646,7 @@ path_lookupchildref_withlock(struct path *__restrict self,
 /* Create a new child of `self' with for the given `dir' and `dent',
  * whilst making sure that no other path with the same name  already
  * exists (in accordance to `atflags') */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 3, 4)) REF struct path *KCALL
+PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 3, 4)) REF struct path *KCALL
 path_makechild(struct path *__restrict self, atflag_t atflags,
                /*inherit(on_success)*/ REF struct fdirnode *__restrict dir,
                /*inherit(on_success)*/ REF struct fdirent *__restrict dent)
@@ -715,7 +715,7 @@ path_makechild(struct path *__restrict self, atflag_t atflags,
 
 
 
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3, 4)) REF struct path *KCALL
+PRIVATE BLOCKING ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3, 4)) REF struct path *KCALL
 path_readlink_and_walk(struct path *__restrict self,
                        u32 *__restrict premaining_symlinks,
                        struct flnknode *__restrict lnk,
@@ -754,7 +754,7 @@ is_path_visible(struct path *__restrict self) THROWS(E_WOULDBLOCK) {
 
 
 /* Walk a given symlink */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 path_walklink(/*inherit(always)*/ REF struct path *__restrict self,
               u32 *__restrict premaining_symlinks,
               /*inherit(always)*/ REF struct flnknode *__restrict lnk, atflag_t atflags)
@@ -901,7 +901,7 @@ again:
  * @throw: E_FSERROR_NOT_A_DIRECTORY:         The named child isn't a directory or symlink (or the symlink expands to a non-directory)
  * @throw: E_IOERROR:                         ...
  * @throw: E_BADALLOC:                        ... */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct path *KCALL
 path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlinks,
                  USER CHECKED /*utf-8*/ char const *name,
                  u16 namelen, uintptr_t namehash, atflag_t atflags)
@@ -989,7 +989,7 @@ again_lookup_dent:
 
 
 
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3, 4)) REF struct fnode *KCALL
+PRIVATE BLOCKING ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3, 4)) REF struct fnode *KCALL
 path_readlink_and_walknode(struct path *__restrict self,
                            u32 *__restrict premaining_symlinks,
                            struct flnknode *__restrict lnk,
@@ -1019,7 +1019,7 @@ path_readlink_and_walknode(struct path *__restrict self,
 }
 
 /* Walk a given symlink */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct fnode *KCALL
+PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct fnode *KCALL
 path_walklinknode(struct path *__restrict self,
                   u32 *__restrict premaining_symlinks,
                   struct flnknode *__restrict lnk,
@@ -1085,7 +1085,7 @@ path_walklinknode(struct path *__restrict self,
  *
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_NO_AUTOMOUNT | AT_SYMLINK_NOFOLLOW' (other flags are silently ignored)
  */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_symlinks,
                      USER CHECKED /*utf-8*/ char const *name,
                      u16 namelen, uintptr_t namehash, atflag_t atflags,
@@ -1264,7 +1264,7 @@ again_lookup_dent:
  *                                `cwd ? cwd : THIS_FS->fs_cwd' to be returned.
  *  - AT_IGNORE_TRAILING_SLASHES: Ignore trailing slashes
  *  - Other flags are silently ignored. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct path *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct path *KCALL
 path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
                  USER CHECKED /*utf-8*/ char const *upath,
                  /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg,
@@ -1604,7 +1604,7 @@ done:
 
 /* Same as  `path_traverse_ex',  but  automatically keep  track  of  symlinks,
  * as well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handle_get_path(fd_cwd)' */
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
               /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg,
               /*out_opt*/ u16 *plastlen, atflag_t atflags)
@@ -1624,7 +1624,7 @@ path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
 
 /* Helper wrapper that combines `path_traverse_ex()' with `path_expandchildnode()'
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
 path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
                      USER CHECKED /*utf-8*/ char const *upath, atflag_t atflags,
                      /*out[1..1]_opt*/ REF struct path **presult_path,
@@ -1664,7 +1664,7 @@ path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 
 /* Helper wrapper that combines `path_traverse()' with `path_expandchildnode()'
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
 path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_t atflags,
                   /*out[1..1]_opt*/ REF struct path **presult_path,
                   /*out[1..1]_opt*/ REF struct fdirent **presult_dirent)
@@ -1692,7 +1692,7 @@ path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_
 /* open(2)                                                              */
 /************************************************************************/
 
-PRIVATE NONNULL((1, 2, 3, 4, 5)) unsigned int KCALL
+PRIVATE BLOCKING NONNULL((1, 2, 3, 4, 5)) unsigned int KCALL
 create_symlink_target_with_text(struct path *__restrict symlink_path,
                                 u32 *__restrict premaining_symlinks,
                                 char const *__restrict text,
@@ -1717,7 +1717,7 @@ create_symlink_target_with_text(struct path *__restrict symlink_path,
 
 
 #define CREATE_SYMLINK_TARGET_WITH_BUFSIZ_MORE ((unsigned int)-1)
-PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5, 6)) unsigned int KCALL
+PRIVATE BLOCKING ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5, 6)) unsigned int KCALL
 create_symlink_target_with_bufsiz(struct path *__restrict symlink_path,
                                   u32 *__restrict premaining_symlinks,
                                   struct flnknode *__restrict lnk,
@@ -1746,7 +1746,7 @@ create_symlink_target_with_bufsiz(struct path *__restrict symlink_path,
 
 
 /* Must write references to `creat_info->mkf_dent' and `creat_info->mkf_rnode' */
-PRIVATE NONNULL((1, 2, 3, 4, 5)) unsigned int KCALL
+PRIVATE BLOCKING NONNULL((1, 2, 3, 4, 5)) unsigned int KCALL
 create_symlink_target(struct path *__restrict symlink_path,
                       u32 *__restrict premaining_symlinks,
                       struct flnknode *__restrict lnk,
@@ -1778,7 +1778,7 @@ create_symlink_target(struct path *__restrict symlink_path,
 
 
 /* Open (or create) a file, the same way user-space open(2) works. */
-PUBLIC WUNUSED NONNULL((2)) REF struct handle KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((2)) REF struct handle KCALL
 path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
              USER CHECKED char const *filename,
              oflag_t oflags, mode_t mode) {
@@ -2146,7 +2146,7 @@ again_handle_traversed_file:
 }
 
 
-PUBLIC WUNUSED REF struct handle KCALL
+PUBLIC BLOCKING WUNUSED REF struct handle KCALL
 path_open(fd_t fd_cwd, USER CHECKED char const *filename,
           oflag_t oflags, mode_t mode) {
 	REF struct path *used_cwd;

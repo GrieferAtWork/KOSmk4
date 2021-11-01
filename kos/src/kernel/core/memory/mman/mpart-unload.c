@@ -194,9 +194,10 @@ NOTHROW(FCALL mpart_unload)(/*inherit(always)*/ REF struct mpart *__restrict sel
  *    - unlockinfo_xunlock(unlock);
  * @param: flags: Set of `MPART_UNLOADNOW_F_*'
  * @param: self:  The mem-part which should be unloaded. */
-PUBLIC NONNULL((1)) unsigned int FCALL
+PUBLIC BLOCKING NONNULL((1)) unsigned int FCALL
 mpart_unloadnow_or_unlock(/*inherit(on_success)*/ REF struct mpart *__restrict self,
-                          unsigned int flags, struct unlockinfo *unlock) {
+                          unsigned int flags, struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, ...) {
 	assert(mpart_lock_acquired(self));
 	/* TODO: Do the unload synchronously. - When blocking becomes necessary,  release
 	 *       locks, do the blocking operation, and return `MPART_UNLOADNOW_ST_RETRY'. */

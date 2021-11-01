@@ -24,6 +24,29 @@
 
 #include <__stdinc.h>
 
+/*
+ * The meaning of NOBLOCK vs. <neither> vs. BLOCKING
+ *
+ * NOBLOCK:   The  function can be safely called, even while holding atomic locks,
+ *            though  not necessarily while holding SMP locks. You may assume that
+ *            the function doesn't include a call to `task_yield()' (though it may
+ *            include a call  to `task_tryyield[_or_pause]()'), and  as such  will
+ *            never throw `E_WOULDBLOCK' if called with preemption disabled.
+ *
+ * <neither>: The function may  acquire atomic locks  and throw E_WOULDBLOCK  from
+ *            within  `task_yield()'  if  such  a  lock  cannot  be  acquired when
+ *            preemption isn't enabled. However, the function isn't a cancellation
+ *            point, and won't try to service RPCs either.
+ *
+ * BLOCKING:  The function is a cancellation point, in that it includes code-paths
+ *            that include calls to `task_serve()'. As such, the function must not
+ *            be called while holding  any sort of atomic  lock, and care must  be
+ *            taken  if called while holding non-atomic locks, in which case there
+ *            exists the possibility of a deadlock scenario.
+ *
+ */
+
+
 #define __PHYS            /* Annotation for physical pointers */
 #define __VIRT            /* Annotation for virtual pointers */
 #define __USER            /* Annotation for user-space memory (default outside kernel). */
@@ -39,6 +62,8 @@
 #define __NOBLOCK         /* Annotation for functions that are guarantied to never block,
                            * making them safe to-be called from any asynchronous context. */
 #define __NOBLOCK_IF(x)   /* Same as `__NOBLOCK', but only when `x' is true. */
+#define __BLOCKING        /* Annotation for functions that may block indefinitely (as well as service RPCs and be a cancellation point, unless otherwise documented) */
+#define __BLOCKING_IF(x)  /* Annotation for functions that may block indefinitely (as well as service RPCs and be a cancellation point, unless otherwise documented) */
 #define __NOPREEMPT       /* Annotation for functions that may only be called with preemption disabled. */
 #define __NOCONNECT       /* Annotation for  functions which  may only  be called  when the  calling
                            * thread isn't already connected to a signal. (only affects kernel-space) */

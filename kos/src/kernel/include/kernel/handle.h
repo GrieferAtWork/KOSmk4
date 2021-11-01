@@ -54,32 +54,9 @@ struct aio_multihandle;
 struct path;
 struct fdirent;
 
-/* Closing a handle (for the last  time) is allowed to automatically  remove
- * that handle from every epoll controller that may have been monitoring it.
- *
- * Using this mechanic, kernel objects that need it can be made to implement
- * a  weak reference system (while objects that  don't need this can just be
- * made to use normal references in place of weak ones)
- *
- * For this purpose, the following weak reference API exists. */
-struct handle_weakref_ops {
-	/* [1..1] Return a new weak reference, given a proper object pointer.
-	 * Note  that  the  returned  pointer  may  differ  from   `obj_ptr'! */
-	NOBLOCK NONNULL((1)) WEAK REF void * /*NOTHROW*/ (FCALL *hwo_weakincref)(void *__restrict obj_ptr);
-	/* [1..1] Decrement the weak reference counter of `weakref_ptr' */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *hwo_weakdecref)(void *__restrict weakref_ptr);
-	/* [1..1] Given a weak reference `weakref_ptr', try to acquire a reference to
-	 *        the proper handle object (to which a reference is returned on success)
-	 * Note  that the  returned pointer may  differ from `weakref_ptr'  when the object
-	 * uses a weak reference proxy object (like `struct taskpid' is for `struct task'),
-	 * instead  of a dedicated  weak reference counter  (like found in `struct driver') */
-	NOBLOCK WUNUSED NONNULL((1)) REF void * /*NOTHROW*/ (FCALL *hwo_weaklckref)(void *__restrict weakref_ptr);
-};
-
-
 struct handle_mmap_info {
-	/* mmap information to-be filled in by implementations of the `h_mmap' operator.
-	 * Note  that   the   caller   will   have  already   filled   in   fields   as:
+	/* mmap information to-be filled in  by implementations of the  `h_mmap'
+	 * operator. Note that the caller will have already filled in fields as:
 	 *   - hmi_minaddr = 0;
 	 *   - hmi_maxaddr = (pos_t)-1;
 	 *   - hmi_fspath  = NULL;
@@ -139,79 +116,79 @@ struct handle_types {
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: 0 : EOF has been reached
 	 * @return: * : The amount of read/written bytes (`<= num_bytes') */
-	size_t (WUNUSED NONNULL((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1)) KCALL *h_write[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (BLOCKING WUNUSED NONNULL((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (BLOCKING WUNUSED NONNULL((1)) KCALL *h_write[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
 
 	/* Position-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
 	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (WUNUSED NONNULL((1)) KCALL *h_pread[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1)) KCALL *h_pwrite[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (BLOCKING WUNUSED NONNULL((1)) KCALL *h_pread[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (BLOCKING WUNUSED NONNULL((1)) KCALL *h_pwrite[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
 
 	/* Vector-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
 	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_readv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_writev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (BLOCKING WUNUSED NONNULL((1, 2)) KCALL *h_readv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (BLOCKING WUNUSED NONNULL((1, 2)) KCALL *h_writev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (BLOCKING WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (BLOCKING WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
 
 	/* Read a directory entry from the given handle.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: * : The required buffer size for the current entry */
-	size_t (NONNULL((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED struct dirent *buf,
-	                                                          size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
+	size_t (BLOCKING NONNULL((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED struct dirent *buf,
+	                                                                   size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
 			/*THROWS(...)*/;
 
 	/* Seek within the data stream. */
-	pos_t (NONNULL((1)) KCALL *h_seek[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
-	                                                      off_t offset,
-	                                                      unsigned int whence)
+	pos_t (BLOCKING NONNULL((1)) KCALL *h_seek[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
+	                                                               off_t offset,
+	                                                               unsigned int whence)
 			/*THROWS(...)*/;
 
 	/* Perform an ioctl() operation.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
-	syscall_slong_t (NONNULL((1)) KCALL *h_ioctl[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t cmd,
-	                                                                 USER UNCHECKED void *arg, iomode_t mode)
+	syscall_slong_t (BLOCKING NONNULL((1)) KCALL *h_ioctl[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t cmd,
+	                                                                          USER UNCHECKED void *arg, iomode_t mode)
 			/*THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...)*/;
 
 	/* Change the effective size of the object (s.a. `ftruncate()'). */
-	void (NONNULL((1)) KCALL *h_truncate[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, pos_t new_size)
+	void (BLOCKING NONNULL((1)) KCALL *h_truncate[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, pos_t new_size)
 			/*THROWS(...)*/;
 
 	/* Return information on how this handle might be used in a call to `mmap(2)' */
-	void (NONNULL((1, 2)) KCALL *h_mmap[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
-	                                                        struct handle_mmap_info *__restrict info)
+	void (BLOCKING NONNULL((1, 2)) KCALL *h_mmap[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
+	                                                                 struct handle_mmap_info *__restrict info)
 			/*THROWS(...)*/;
 
 	/* @return: * : The amount of newly allocated bytes. */
-	pos_t (NONNULL((1)) KCALL *h_allocate[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
-	                                                          fallocate_mode_t mode,
-	                                                          pos_t start, pos_t length)
+	pos_t (BLOCKING NONNULL((1)) KCALL *h_allocate[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
+	                                                                   fallocate_mode_t mode,
+	                                                                   pos_t start, pos_t length)
 			/*THROWS(...)*/;
 
 	/* Synchronize data */
-	void (NONNULL((1)) KCALL *h_sync[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr) /*THROWS(...)*/;
-	void (NONNULL((1)) KCALL *h_datasync[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr) /*THROWS(...)*/;
+	void (BLOCKING NONNULL((1)) KCALL *h_sync[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr) /*THROWS(...)*/;
+	void (BLOCKING NONNULL((1)) KCALL *h_datasync[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr) /*THROWS(...)*/;
 
 	/* Gather stat-information (s.a. `fstat()')
 	 * NOTE: The given `result' will _NOT_ have been initialized already! */
-	void (NONNULL((1)) KCALL *h_stat[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
-	                                                     USER CHECKED struct stat *result)
+	void (BLOCKING NONNULL((1)) KCALL *h_stat[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
+	                                                              USER CHECKED struct stat *result)
 			/*THROWS(...)*/;
 
 	/* Connect to the signals for monitoring `what' */
-	void (NONNULL((1)) KCALL *h_pollconnect[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, poll_mode_t what)
+	void (BLOCKING NONNULL((1)) KCALL *h_pollconnect[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, poll_mode_t what)
 			/*THROWS(...)*/;
 	/* @return: * : Set of available signals. */
-	poll_mode_t (WUNUSED NONNULL((1)) KCALL *h_polltest[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, poll_mode_t what)
+	poll_mode_t (BLOCKING WUNUSED NONNULL((1)) KCALL *h_polltest[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, poll_mode_t what)
 			/*THROWS(...)*/;
 
 	/* Implement handle control operations (s.a. `<kos/hop/[...].h>')
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment) */
-	syscall_slong_t (NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t cmd,
-	                                                               USER UNCHECKED void *arg, iomode_t mode)
+	syscall_slong_t (BLOCKING NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t cmd,
+	                                                                        USER UNCHECKED void *arg, iomode_t mode)
 			/*THROWS(...)*/;
 
 	/* Try to convert the given object into a handle data pointer of a different type.
@@ -219,11 +196,11 @@ struct handle_types {
 	 * NOTE: This operator is allowed to throw exceptions, however only as the  result
 	 *       of attempting to acquire some kind of lock while preemption was disabled.
 	 * The caller must ensure that `wanted_type' isn't already this handle's type. */
-	REF void *(NONNULL((1)) KCALL *h_tryas[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, uintptr_half_t wanted_type)
+	REF void *(BLOCKING NONNULL((1)) KCALL *h_tryas[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, uintptr_half_t wanted_type)
 			/*THROWS(E_WOULDBLOCK)*/;
 
 	/* Print the text that should appear when doing `readlink("/proc/[pid]/fd/[fdno]")' */
-	ssize_t (NONNULL((1, 2)) KCALL *h_printlink[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, __pformatprinter printer, void *arg)
+	ssize_t (BLOCKING NONNULL((1, 2)) KCALL *h_printlink[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, __pformatprinter printer, void *arg)
 			/*THROWS(E_WOULDBLOCK, ...)*/;
 }
 #ifdef __INTELLISENSE__
@@ -249,60 +226,65 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self);
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
  * @return: false: The data size could not be determined. */
-FUNDEF WUNUSED NONNULL((1, 2)) __BOOL KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) __BOOL KCALL
 handle_datasize(struct handle const *__restrict self,
                 pos_t *__restrict presult);
 
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF NOBLOCK ATTR_PURE WUNUSED uintptr_half_t NOTHROW(KCALL handle_typekind)(struct handle const &__restrict self) ASMNAME("handle_typekind");
-FUNDEF WUNUSED NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict self, pos_t *__restrict presult) ASMNAME("handle_datasize");
+FUNDEF NOBLOCK ATTR_PURE WUNUSED uintptr_half_t
+NOTHROW(KCALL handle_typekind)(struct handle const &__restrict self)
+		ASMNAME("handle_typekind");
+FUNDEF BLOCKING WUNUSED NONNULL((2)) __BOOL KCALL
+handle_datasize(struct handle const &__restrict self,
+                pos_t *__restrict presult)
+		ASMNAME("handle_datasize");
 } /* extern "C++" */
 #endif /* __cplusplus */
 
 
 #define HANDLE_FUNC(self, name) (*handle_type_db.name[(self).h_type])
 
-#define handle_typename(self)                                    handle_type_db.h_typename[(self).h_type]
-#define handle_incref(self)                                      HANDLE_FUNC(self, h_incref)((self).h_data)
-#define handle_decref(self)                                      HANDLE_FUNC(self, h_decref)((self).h_data)
-#define handle_refcnt(self)                                      HANDLE_FUNC(self, h_refcnt)((self).h_data)
-#define handle_tryincref(self)                                   HANDLE_FUNC(self, h_tryincref)((self).h_data)
-#define handle_weakgetref(self)                                  HANDLE_FUNC(self, h_weakgetref)((self).h_data)
-#define handle_read(self, dst, num_bytes)                        HANDLE_FUNC(self, h_read)((self).h_data, dst, num_bytes, (self).h_mode)
-#define handle_write(self, src, num_bytes)                       HANDLE_FUNC(self, h_write)((self).h_data, src, num_bytes, (self).h_mode)
-#define handle_readf(self, dst, num_bytes, mode)                 HANDLE_FUNC(self, h_read)((self).h_data, dst, num_bytes, mode)
-#define handle_writef(self, src, num_bytes, mode)                HANDLE_FUNC(self, h_write)((self).h_data, src, num_bytes, mode)
-#define handle_readv(self, dst, num_bytes)                       HANDLE_FUNC(self, h_readv)((self).h_data, dst, num_bytes, (self).h_mode)
-#define handle_writev(self, src, num_bytes)                      HANDLE_FUNC(self, h_writev)((self).h_data, src, num_bytes, (self).h_mode)
-#define handle_readvf(self, dst, num_bytes, mode)                HANDLE_FUNC(self, h_readv)((self).h_data, dst, num_bytes, mode)
-#define handle_writevf(self, src, num_bytes, mode)               HANDLE_FUNC(self, h_writev)((self).h_data, src, num_bytes, mode)
-#define handle_pread(self, dst, num_bytes, addr)                 HANDLE_FUNC(self, h_pread)((self).h_data, dst, num_bytes, addr, (self).h_mode)
-#define handle_pwrite(self, src, num_bytes, addr)                HANDLE_FUNC(self, h_pwrite)((self).h_data, src, num_bytes, addr, (self).h_mode)
-#define handle_preadf(self, dst, num_bytes, addr, mode)          HANDLE_FUNC(self, h_pread)((self).h_data, dst, num_bytes, addr, mode)
-#define handle_pwritef(self, src, num_bytes, addr, mode)         HANDLE_FUNC(self, h_pwrite)((self).h_data, src, num_bytes, addr, mode)
-#define handle_preadv(self, dst, num_bytes, addr)                HANDLE_FUNC(self, h_preadv)((self).h_data, dst, num_bytes, addr, (self).h_mode)
-#define handle_pwritev(self, src, num_bytes, addr)               HANDLE_FUNC(self, h_pwritev)((self).h_data, src, num_bytes, addr, (self).h_mode)
-#define handle_preadvf(self, dst, num_bytes, addr, mode)         HANDLE_FUNC(self, h_preadv)((self).h_data, dst, num_bytes, addr, mode)
-#define handle_pwritevf(self, src, num_bytes, addr, mode)        HANDLE_FUNC(self, h_pwritev)((self).h_data, src, num_bytes, addr, mode)
-#define handle_readdir(self, buf, bufsize, readdir_mode)         HANDLE_FUNC(self, h_readdir)((self).h_data, buf, bufsize, readdir_mode, (self).h_mode)
-#define handle_readdirf(self, buf, bufsize, readdir_mode, mode)  HANDLE_FUNC(self, h_readdir)((self).h_data, buf, bufsize, readdir_mode, mode)
-#define handle_seek(self, off, whence)                           HANDLE_FUNC(self, h_seek)((self).h_data, off, whence)
-#define handle_ioctl(self, cmd, arg)                             HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, (self).h_mode)
-#define handle_ioctlf(self, cmd, arg, flags)                     HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, flags)
-#define handle_truncate(self, new_size)                          HANDLE_FUNC(self, h_truncate)((self).h_data, new_size)
-#define handle_mmap(self, info)                                  HANDLE_FUNC(self, h_mmap)((self).h_data, info)
-#define handle_allocate(self, mode, start, length)               HANDLE_FUNC(self, h_allocate)((self).h_data, mode, start, length)
-#define handle_sync(self)                                        HANDLE_FUNC(self, h_sync)((self).h_data)
-#define handle_datasync(self)                                    HANDLE_FUNC(self, h_datasync)((self).h_data)
-#define handle_stat(self, result)                                HANDLE_FUNC(self, h_stat)((self).h_data, result)
-#define handle_pollconnect(self, what)                           HANDLE_FUNC(self, h_pollconnect)((self).h_data, what)
-#define handle_polltest(self, what)                              HANDLE_FUNC(self, h_polltest)((self).h_data, what)
-#define handle_poll(self, what)                                  _handle_poll(&(self), what)
-#define _handle_tryas(self, wanted_type)                         HANDLE_FUNC(self, h_tryas)((self).h_data, wanted_type)
-#define handle_printlink(self, printer, arg)                     HANDLE_FUNC(self, h_printlink)((self).h_data, printer, arg)
+#define /*        */ handle_typename(self)                                    handle_type_db.h_typename[(self).h_type]
+#define /*        */ handle_incref(self)                                      HANDLE_FUNC(self, h_incref)((self).h_data)
+#define /*        */ handle_decref(self)                                      HANDLE_FUNC(self, h_decref)((self).h_data)
+#define /*        */ handle_refcnt(self)                                      HANDLE_FUNC(self, h_refcnt)((self).h_data)
+#define /*        */ handle_tryincref(self)                                   HANDLE_FUNC(self, h_tryincref)((self).h_data)
+#define /*        */ handle_weakgetref(self)                                  HANDLE_FUNC(self, h_weakgetref)((self).h_data)
+#define /*BLOCKING*/ handle_read(self, dst, num_bytes)                        HANDLE_FUNC(self, h_read)((self).h_data, dst, num_bytes, (self).h_mode)
+#define /*BLOCKING*/ handle_write(self, src, num_bytes)                       HANDLE_FUNC(self, h_write)((self).h_data, src, num_bytes, (self).h_mode)
+#define /*BLOCKING*/ handle_readf(self, dst, num_bytes, mode)                 HANDLE_FUNC(self, h_read)((self).h_data, dst, num_bytes, mode)
+#define /*BLOCKING*/ handle_writef(self, src, num_bytes, mode)                HANDLE_FUNC(self, h_write)((self).h_data, src, num_bytes, mode)
+#define /*BLOCKING*/ handle_readv(self, dst, num_bytes)                       HANDLE_FUNC(self, h_readv)((self).h_data, dst, num_bytes, (self).h_mode)
+#define /*BLOCKING*/ handle_writev(self, src, num_bytes)                      HANDLE_FUNC(self, h_writev)((self).h_data, src, num_bytes, (self).h_mode)
+#define /*BLOCKING*/ handle_readvf(self, dst, num_bytes, mode)                HANDLE_FUNC(self, h_readv)((self).h_data, dst, num_bytes, mode)
+#define /*BLOCKING*/ handle_writevf(self, src, num_bytes, mode)               HANDLE_FUNC(self, h_writev)((self).h_data, src, num_bytes, mode)
+#define /*BLOCKING*/ handle_pread(self, dst, num_bytes, addr)                 HANDLE_FUNC(self, h_pread)((self).h_data, dst, num_bytes, addr, (self).h_mode)
+#define /*BLOCKING*/ handle_pwrite(self, src, num_bytes, addr)                HANDLE_FUNC(self, h_pwrite)((self).h_data, src, num_bytes, addr, (self).h_mode)
+#define /*BLOCKING*/ handle_preadf(self, dst, num_bytes, addr, mode)          HANDLE_FUNC(self, h_pread)((self).h_data, dst, num_bytes, addr, mode)
+#define /*BLOCKING*/ handle_pwritef(self, src, num_bytes, addr, mode)         HANDLE_FUNC(self, h_pwrite)((self).h_data, src, num_bytes, addr, mode)
+#define /*BLOCKING*/ handle_preadv(self, dst, num_bytes, addr)                HANDLE_FUNC(self, h_preadv)((self).h_data, dst, num_bytes, addr, (self).h_mode)
+#define /*BLOCKING*/ handle_pwritev(self, src, num_bytes, addr)               HANDLE_FUNC(self, h_pwritev)((self).h_data, src, num_bytes, addr, (self).h_mode)
+#define /*BLOCKING*/ handle_preadvf(self, dst, num_bytes, addr, mode)         HANDLE_FUNC(self, h_preadv)((self).h_data, dst, num_bytes, addr, mode)
+#define /*BLOCKING*/ handle_pwritevf(self, src, num_bytes, addr, mode)        HANDLE_FUNC(self, h_pwritev)((self).h_data, src, num_bytes, addr, mode)
+#define /*BLOCKING*/ handle_readdir(self, buf, bufsize, readdir_mode)         HANDLE_FUNC(self, h_readdir)((self).h_data, buf, bufsize, readdir_mode, (self).h_mode)
+#define /*BLOCKING*/ handle_readdirf(self, buf, bufsize, readdir_mode, mode)  HANDLE_FUNC(self, h_readdir)((self).h_data, buf, bufsize, readdir_mode, mode)
+#define /*BLOCKING*/ handle_seek(self, off, whence)                           HANDLE_FUNC(self, h_seek)((self).h_data, off, whence)
+#define /*BLOCKING*/ handle_ioctl(self, cmd, arg)                             HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, (self).h_mode)
+#define /*BLOCKING*/ handle_ioctlf(self, cmd, arg, flags)                     HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, flags)
+#define /*BLOCKING*/ handle_truncate(self, new_size)                          HANDLE_FUNC(self, h_truncate)((self).h_data, new_size)
+#define /*BLOCKING*/ handle_mmap(self, info)                                  HANDLE_FUNC(self, h_mmap)((self).h_data, info)
+#define /*BLOCKING*/ handle_allocate(self, mode, start, length)               HANDLE_FUNC(self, h_allocate)((self).h_data, mode, start, length)
+#define /*BLOCKING*/ handle_sync(self)                                        HANDLE_FUNC(self, h_sync)((self).h_data)
+#define /*BLOCKING*/ handle_datasync(self)                                    HANDLE_FUNC(self, h_datasync)((self).h_data)
+#define /*BLOCKING*/ handle_stat(self, result)                                HANDLE_FUNC(self, h_stat)((self).h_data, result)
+#define /*BLOCKING*/ handle_pollconnect(self, what)                           HANDLE_FUNC(self, h_pollconnect)((self).h_data, what)
+#define /*BLOCKING*/ handle_polltest(self, what)                              HANDLE_FUNC(self, h_polltest)((self).h_data, what)
+#define /*BLOCKING*/ handle_poll(self, what)                                  _handle_poll(&(self), what)
+#define /*BLOCKING*/ _handle_tryas(self, wanted_type)                         HANDLE_FUNC(self, h_tryas)((self).h_data, wanted_type)
+#define /*BLOCKING*/ handle_printlink(self, printer, arg)                     HANDLE_FUNC(self, h_printlink)((self).h_data, printer, arg)
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) poll_mode_t KCALL
+FORCELOCAL BLOCKING ATTR_ARTIFICIAL WUNUSED NONNULL((1)) poll_mode_t KCALL
 _handle_poll(struct handle *__restrict self, poll_mode_t what) {
 	poll_mode_t result;
 #ifndef __OPTIMIZE_SIZE__
@@ -446,7 +428,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct handle_manager, hm_refcnt, handle_manager_destr
 /* Allocate a new or / copy the given (which won't
  * copy  any  `IO_CLOFORK' handle)  handle manager */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
-handle_manager_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
+handle_manager_alloc(void) THROWS(E_BADALLOC);
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
 handle_manager_clone(struct handle_manager *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
@@ -454,8 +436,8 @@ handle_manager_clone(struct handle_manager *__restrict self)
 #ifdef NDEBUG
 #define handle_manager_assert_integrity(self) (void)0
 #else /* NDEBUG */
-FUNDEF NONNULL((1)) void FCALL
-handle_manager_assert_integrity(struct handle_manager *__restrict self);
+FUNDEF NONNULL((1)) void
+NOTHROW(FCALL handle_manager_assert_integrity)(struct handle_manager *__restrict self);
 #endif /* !NDEBUG */
 
 
@@ -480,14 +462,16 @@ NOTHROW(FCALL task_sethandlemanager)(struct handle_manager *__restrict newman);
 /* Close all handles with the `IO_FCLOEXEC' flag set.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */
 FUNDEF NONNULL((1)) void FCALL
-handle_manager_cloexec(struct handle_manager *__restrict self) THROWS(E_WOULDBLOCK);
+handle_manager_cloexec(struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK);
 
 /* Try to close the handle associated with `fd'.
  * @return: true:  The handle under `fd' was closed.
  * @return: false: No handle was associated with `fd'.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */
 FUNDEF __BOOL FCALL
-handle_tryclose(unsigned int fd) THROWS(E_WOULDBLOCK);
+handle_tryclose(unsigned int fd)
+		THROWS(E_WOULDBLOCK);
 FUNDEF NONNULL((2)) __BOOL FCALL
 handle_tryclose_nosym(unsigned int fd,
                       struct handle_manager *__restrict self)
@@ -727,43 +711,43 @@ struct socket;
 struct epoll_controller;
 
 /* Directly translate handlers to references to objects of specific types. */
-FUNDEF ATTR_RETNONNULL WUNUSED REF void *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF void *FCALL
 handle_getas(unsigned int fd, uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
 handle_get_fnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
 handle_get_regnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
 handle_get_dirnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct fdirent *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fdirent *FCALL
 handle_get_fdirent(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
 handle_get_super(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
 handle_get_super_relaxed(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
 /* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct task *FCALL
 handle_get_task(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
@@ -784,11 +768,11 @@ handle_get_task(unsigned int fd)
  * to a handle-compatible object with type `wanted_type'. If such a cast is
  * impossible, an `E_INVALID_HANDLE_FILETYPE' error is thrown.
  * NOTE: This function also inherits a reference to `self' (unless an exception is thrown) */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
 handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self, uintptr_half_t wanted_type)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FORCELOCAL WUNUSED REF void *FCALL
+FORCELOCAL BLOCKING WUNUSED REF void *FCALL
 handle_tryas(/*inherit(on_success)*/ REF struct handle const *__restrict self, uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	REF void *result;
@@ -800,7 +784,7 @@ handle_tryas(/*inherit(on_success)*/ REF struct handle const *__restrict self, u
 	return result;
 }
 
-FORCELOCAL WUNUSED REF void *FCALL
+FORCELOCAL BLOCKING WUNUSED REF void *FCALL
 handle_tryas_noinherit(struct handle const *__restrict self,
                        uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
@@ -810,40 +794,40 @@ handle_tryas_noinherit(struct handle const *__restrict self,
 }
 
 /* Extended handle converted functions */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *FCALL
 handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct regular_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct regular_node *FCALL
 handle_as_regnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_node *FCALL
 handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
 handle_as_super(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
 handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct symlink_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct symlink_node *FCALL
 handle_as_lnknode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_node *FCALL
 handle_as_fifonode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct socket_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct socket_node *FCALL
 handle_as_socketnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
 /* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
@@ -861,47 +845,47 @@ handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 
 #if defined(__cplusplus) && !defined(NO_CXX_HANDLE_AS_OVERLOADS)
 extern "C++" {
-FUNDEF ATTR_RETNONNULL WUNUSED REF void *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF void *FCALL
 handle_as(/*inherit(on_success)*/ REF struct handle const &__restrict self,
           uintptr_half_t wanted_type)
 		THROWS(E_INVALID_HANDLE_FILETYPE)
 		ASMNAME("handle_as");
 
-FORCELOCAL WUNUSED REF void *FCALL
+FORCELOCAL BLOCKING WUNUSED REF void *FCALL
 handle_tryas(/*inherit(on_success)*/ REF struct handle const &__restrict self,
              uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	return handle_tryas(&self, wanted_type);
 }
 
-FORCELOCAL WUNUSED REF void *FCALL
+FORCELOCAL BLOCKING WUNUSED REF void *FCALL
 handle_tryas_noinherit(struct handle const &__restrict self,
                        uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	return handle_tryas_noinherit(&self, wanted_type);
 }
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
 handle_as_fnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fnode");
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
 handle_as_regnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_regnode");
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
 handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_dirnode");
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
 handle_as_super(/*inherit(on_success)*/ REF struct handle const &__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_super");
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
 handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const &__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_super_relaxed");
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct task *FCALL
 handle_as_task(/*inherit(on_success)*/ REF struct handle const &__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) ASMNAME("handle_as_task");
 } /* extern "C++" */

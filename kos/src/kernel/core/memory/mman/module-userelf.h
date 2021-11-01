@@ -143,24 +143,24 @@ INTDEF struct module_ops const uem_ops;
 
 /* UserELF module section operators */
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL uems_destroy)(struct userelf_module_section *__restrict self);
-INTDEF WUNUSED NONNULL((1)) char const *FCALL uems_getname(struct userelf_module_section *__restrict self);
-INTDEF WUNUSED NONNULL((1)) USER CHECKED byte_t *FCALL uems_getaddr(struct userelf_module_section *__restrict self);
-INTDEF WUNUSED NONNULL((1)) KERNEL byte_t *FCALL uems_getaddr_alias(struct userelf_module_section *__restrict self);
-INTDEF WUNUSED NONNULL((1, 2)) KERNEL byte_t *FCALL uems_getaddr_inflate(struct userelf_module_section *__restrict self, size_t *__restrict psize);
+INTDEF BLOCKING WUNUSED NONNULL((1)) char const *FCALL uems_getname(struct userelf_module_section *__restrict self);
+INTDEF BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *FCALL uems_getaddr(struct userelf_module_section *__restrict self);
+INTDEF BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *FCALL uems_getaddr_alias(struct userelf_module_section *__restrict self);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *FCALL uems_getaddr_inflate(struct userelf_module_section *__restrict self, size_t *__restrict psize);
 
 /* UserELF module operators */
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL uem_free)(struct userelf_module *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL uem_nonodes)(struct userelf_module *__restrict self);
-INTDEF WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL uem_locksection(struct userelf_module *__restrict self, USER CHECKED char const *section_name);
-INTDEF WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL uem_locksection_index(struct userelf_module *__restrict self, unsigned int section_index);
-INTDEF WUNUSED NONNULL((1, 3)) bool FCALL uem_sectinfo(struct userelf_module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
+INTDEF BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL uem_locksection(struct userelf_module *__restrict self, USER CHECKED char const *section_name);
+INTDEF BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL uem_locksection_index(struct userelf_module *__restrict self, unsigned int section_index);
+INTDEF BLOCKING WUNUSED NONNULL((1, 3)) bool FCALL uem_sectinfo(struct userelf_module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
 
 
 /* Generic UserELF module creation functions. */
-INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
-INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
-INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_next(struct mman *__restrict self, struct module *__restrict prev);
+INTDEF BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
+INTDEF BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
+INTDEF BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_next(struct mman *__restrict self, struct module *__restrict prev);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 DECL_END

@@ -81,9 +81,9 @@ struct constdirent {
 DATDEF struct fdirent_ops const constdirent_ops;
 FUNDEF NOBLOCK NONNULL((1)) void /* decref(me->cd_node) + _constdirent_free(me) */
 NOTHROW(KCALL constdirent_v_destroy)(struct fdirent *__restrict self);
-FUNDEF WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL /* return incref(me->cd_node); */
-constdirent_v_opennode(struct fdirent *__restrict self,
-                       struct fdirnode *__restrict dir);
+FUNDEF WUNUSED NONNULL((1, 2)) REF struct fnode *
+NOTHROW(KCALL constdirent_v_opennode)(struct fdirent *__restrict self, /* return incref(me->cd_node); */
+                                      struct fdirnode *__restrict dir);
 
 
 /* Convert between `struct fdirent' and `struct constdirent' */
@@ -106,11 +106,11 @@ NOTHROW(KCALL constdirenum_v_fini)(struct fdirenum *__restrict self);
 FUNDEF NONNULL((1)) size_t KCALL
 constdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                        size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
-		THROWS(...);
+		THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) pos_t KCALL
 constdirenum_v_seekdir(struct fdirenum *__restrict self,
                        off_t offset, unsigned int whence)
-		THROWS(...);
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 
 
@@ -200,9 +200,10 @@ struct constdir
 /* Default operators for `struct constdir' */
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 constdir_v_lookup(struct fdirnode *__restrict self,
-                  struct flookup_info *__restrict info);
-FUNDEF NONNULL((1)) void KCALL
-constdir_v_enum(struct fdirenum *__restrict result);
+                  struct flookup_info *__restrict info)
+		THROWS(E_SEGFAULT);
+FUNDEF NONNULL((1)) void
+NOTHROW(KCALL constdir_v_enum)(struct fdirenum *__restrict result);
 #define constdir_v_destroy    fdirnode_v_destroy
 #define constdir_v_changed    fdirnode_v_changed
 #define constdir_v_open       fdirnode_v_open

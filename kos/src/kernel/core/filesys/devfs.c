@@ -1185,7 +1185,8 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
  * device file has been unlink(2)'d from /dev/!) */
 PUBLIC WUNUSED NONNULL((1)) REF void *KCALL
 device_v_tryas(struct mfile *__restrict self,
-               uintptr_half_t wanted_type) THROWS(...) {
+               uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
 	struct device *me = mfile_asdevice(self);
 	switch (wanted_type) {
 
@@ -1268,7 +1269,7 @@ NOTHROW(FCALL devfs_log_new_device)(struct device *__restrict self) {
  *  - self->_device_devnode_ _fdevnode_node_ fn_supent
  *  - self->dv_byname_node
  * @return: * : One of `DEVICE_TRYREGISTER_*' */
-PUBLIC NONNULL((1)) unsigned int FCALL
+PUBLIC WUNUSED NONNULL((1)) unsigned int FCALL
 device_tryregister(struct device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	unsigned int result;

@@ -65,11 +65,11 @@ struct mman;
  *                               thrown for the first address of the given range that
  *                               isn't  mapped. When this  happens, no mem-nodes will
  *                               have had their MLOCK-state altered. */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF BLOCKING_IF(!(flags & MLOCK_ONFAULT)) NONNULL((1)) void FCALL
 mman_mlock(struct mman *__restrict self, void const *addr,
            size_t num_bytes, unsigned int flags DFL(0))
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT_UNMAPPED,
-		       E_BADALLOC);
+		       E_BADALLOC, ...);
 
 
 /* Clear the `MNODE_F_MLOCK' flag for all mem-nodes within the given address range.

@@ -87,10 +87,11 @@ struct printnode_ops {
 	 *       the return value after  every call) In this  regard, this function can  be
 	 *       implemented a little more relaxed when compared to "normal" pformatprinter
 	 *       conventions. */
-	NONNULL((1, 2)) void
+	BLOCKING NONNULL((1, 2)) void
 	(KCALL *pno_print)(struct printnode *__restrict self,
 	                   pformatprinter printer, void *arg,
-	                   size_t offset_hint);
+	                   size_t offset_hint)
+			THROWS(...);
 
 	/* More operators would go here... */
 };
@@ -174,18 +175,21 @@ struct printnode
 FUNDEF NONNULL((1)) void KCALL /* Writes `0' into `st_size' and `st_blocks' */
 printnode_v_stat(struct mfile *__restrict self,
                  USER CHECKED struct stat *result)
-		THROWS(...);
-FUNDEF WUNUSED NONNULL((1)) size_t KCALL /* Populates `dst' via `pno_print' */
+		THROWS(E_SEGFAULT);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL /* Populates `dst' via `pno_print' */
 printnode_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
-                  size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
+                  size_t num_bytes, pos_t addr, iomode_t mode)
+		THROWS(E_SEGFAULT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 printnode_v_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
-                   size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+                   size_t num_bytes, pos_t addr, iomode_t mode)
+		THROWS(E_SEGFAULT, ...);
 DATDEF struct mfile_stream_ops const printnode_v_stream_ops;
-FUNDEF NONNULL((1, 5)) void KCALL /* Populates `buf' via `pno_print' */
+FUNDEF BLOCKING NONNULL((1, 5)) void KCALL /* Populates `buf' via `pno_print' */
 printnode_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                        physaddr_t buf, size_t num_bytes,
-                       struct aio_multihandle *__restrict aio);
+                       struct aio_multihandle *__restrict aio)
+		THROWS(...);
 
 
 DECL_END

@@ -62,7 +62,7 @@ STATIC_ASSERT((MPART_BLOCK_ST_CHNG & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG
  * If the calling thread is interrupted during  waiting, I/O is canceled and the  function
  * returned with an exception. Otherwise, the function returns normally once I/O completed
  * successfully. In the event of an I/O error, this function will re-throw said error. */
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mfile_dosyncio(struct mfile *__restrict self,
                NONNULL((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
                                                 physaddr_t buf, size_t num_bytes,
@@ -593,7 +593,7 @@ after_intermediate_blocks:
  * this function should attempt to load, though it will only ever load  a
  * single cluster of consecutive blocks that starts with an uninitialized
  * block containing `partrel_offset' */
-PUBLIC NONNULL((1, 3)) void FCALL
+PUBLIC BLOCKING NONNULL((1, 3)) void FCALL
 mpart_memload_and_unlock(struct mpart *__restrict self,
                          mpart_reladdr_t partrel_offset,
                          struct mpart_physloc const *__restrict loc,

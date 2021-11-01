@@ -47,15 +47,17 @@ struct fdirent_ops {
 	 * @param: dir: The directory that contains `self'
 	 * @return: NULL: `self'  was  deleted and  you must  re-query the
 	 *                containing directory `dir' for the proper entry. */
-	WUNUSED NONNULL((1, 2)) REF struct fnode *
+	BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *
 	(KCALL *fdo_opennode)(struct fdirent *__restrict self,
-	                      struct fdirnode *__restrict dir);
+	                      struct fdirnode *__restrict dir)
+			THROWS(E_BADALLOC, E_IOERROR, ...);
 
 	/* [0..1] Optional override for dynamically calculated `fd_ino' values.
 	 * When this operator is defined, _IT_ must be used instead of `fd_ino' */
-	WUNUSED NONNULL((1, 2)) ino_t
+	BLOCKING WUNUSED NONNULL((1, 2)) ino_t
 	(FCALL *fdo_getino)(struct fdirent *__restrict self,
-	                    struct fdirnode *__restrict dir);
+	                    struct fdirnode *__restrict dir)
+			THROWS(E_IOERROR, ...);
 };
 
 struct fdirent {
@@ -89,8 +91,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 /* Return the hash of a given directory entry name.
  * This function is used by various APIs related to file lookup.
  * @throw: E_SEGFAULT: Failed to access the given `text'. */
-FUNDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
-fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict text, u16 textlen)
+FUNDEF ATTR_PURE WUNUSED uintptr_t FCALL
+fdirent_hash(CHECKED USER /*utf-8*/ char const *text, u16 textlen)
 		THROWS(E_SEGFAULT);
 #define FDIRENT_EMPTY_HASH 0 /* == fdirent_hash("", 0) */
 

@@ -60,7 +60,7 @@ struct module_section_ops {
 	 * If the name  can't be determined,  then return  `NULL'
 	 * instead. Before calling this function, the caller must
 	 * ensure that `!wasdestroyed(self->ms_module)') */
-	/*ATTR_PURE*/ WUNUSED NONNULL((1)) char const *
+	BLOCKING /*ATTR_PURE*/ WUNUSED NONNULL((1)) char const *
 	(FCALL *ms_getname)(struct module_section *__restrict self);
 
 	/* [1..1] Return the address of this module's section mapping.
@@ -77,7 +77,7 @@ struct module_section_ops {
 	 *          `SHF_ALLOC'  flag set, the returned buffer obviously
 	 *          resides in user-space, also meaning that it may only
 	 *          be accessed while the correct mman/pagedir is active */
-	WUNUSED NONNULL((1)) USER CHECKED byte_t *
+	BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *
 	(FCALL *ms_getaddr)(struct module_section *__restrict self);
 
 	/* [1..1] Similar  to `ms_getaddr' (and  identical in case of
@@ -88,7 +88,7 @@ struct module_section_ops {
 	 * address of which is then  returned. As such, the  returned
 	 * buffer  can be dereferenced  irregardless of the currently
 	 * active mman, since it will be apart of kernel-space. */
-	WUNUSED NONNULL((1)) KERNEL byte_t *
+	BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *
 	(FCALL *ms_getaddr_alias)(struct module_section *__restrict self);
 
 	/* [1..1] Similar to `ms_getaddr_alias()', but if the section
@@ -98,7 +98,7 @@ struct module_section_ops {
 	 *
 	 * If the section isn't compressed, call `ms_getaddr_alias()'
 	 * and write `self->ms_size' to `*psize' */
-	WUNUSED NONNULL((1, 2)) KERNEL byte_t *
+	BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *
 	(FCALL *ms_getaddr_inflate)(struct module_section *__restrict self,
 	                            size_t *__restrict psize);
 };
@@ -137,10 +137,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct module_section, ms_refcnt, module_section_destr
 
 /* Wrappers for module section operators. */
 #ifdef __INTELLISENSE__
-WUNUSED NONNULL((1)) char const *(module_section_getname)(struct module_section *__restrict self);
-WUNUSED NONNULL((1)) USER CHECKED byte_t *(module_section_getaddr)(struct module_section *__restrict self);
-WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_alias)(struct module_section *__restrict self);
-WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
+BLOCKING WUNUSED NONNULL((1)) char const *(module_section_getname)(struct module_section *__restrict self);
+BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *(module_section_getaddr)(struct module_section *__restrict self);
+BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_alias)(struct module_section *__restrict self);
+BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
 #else /* __INTELLISENSE__ */
 #define module_section_getname(self)                (*(self)->ms_ops->ms_getname)(self)
 #define module_section_getaddr(self)                (*(self)->ms_ops->ms_getaddr)(self)
@@ -149,10 +149,10 @@ WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)(struct m
 #endif /* !__INTELLISENSE__ */
 
 /* Same as the functions above, but preserve the current exception, and return `NULL' on error. */
-FUNDEF WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) USER CHECKED byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
-FUNDEF WUNUSED NONNULL((1, 2)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
 
 
 struct module_sectinfo {
@@ -184,13 +184,13 @@ struct module_ops {
 
 	/* [1..1] Return a reference for a module section, given its name.
 	 * If   the  given  `section_name'  isn't  valid,  return  `NULL'. */
-	WUNUSED NONNULL((1)) REF struct module_section *
+	BLOCKING WUNUSED NONNULL((1)) REF struct module_section *
 	(FCALL *mo_locksection)(struct module *__restrict self,
 	                        USER CHECKED char const *section_name);
 
 	/* [1..1] Return a reference for a module section, given its index.
 	 * If   the  given  `section_index'  isn't  valid,  return  `NULL'. */
-	WUNUSED NONNULL((1)) REF struct module_section *
+	BLOCKING WUNUSED NONNULL((1)) REF struct module_section *
 	(FCALL *mo_locksection_index)(struct module *__restrict self,
 	                              unsigned int section_index);
 
@@ -199,7 +199,7 @@ struct module_ops {
 	 * that section in `*info'. Note that only SHF_ALLOC-sections  can
 	 * be found using this function!
 	 * @return: true: Success (section info was filled in) */
-	WUNUSED NONNULL((1, 3)) __BOOL
+	BLOCKING WUNUSED NONNULL((1, 3)) __BOOL
 	(FCALL *mo_sectinfo)(struct module *__restrict self,
 	                     uintptr_t module_relative_addr,
 	                     struct module_sectinfo *__restrict info);
@@ -207,8 +207,8 @@ struct module_ops {
 	/* [1..1] Return the text/data base address for `self' (as used by unwinding)
 	 * NOTE: `self' is only non-const in  order to allow for lazy  initialization.
 	 * These functions may not alter the state of `self' in any observable manner! */
-	WUNUSED NONNULL((1)) void const * /*NOTHROW*/ (FCALL *mo_get_tbase)(struct module *__restrict self);
-	WUNUSED NONNULL((1)) void const * /*NOTHROW*/ (FCALL *mo_get_dbase)(struct module *__restrict self);
+	BLOCKING WUNUSED NONNULL((1)) void const * /*NOTHROW*/ (FCALL *mo_get_tbase)(struct module *__restrict self);
+	BLOCKING WUNUSED NONNULL((1)) void const * /*NOTHROW*/ (FCALL *mo_get_dbase)(struct module *__restrict self);
 };
 
 struct module {
@@ -277,9 +277,9 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
 
 /* Wrappers for module operators. */
 #ifdef __INTELLISENSE__
-WUNUSED NONNULL((1)) REF struct module_section *(module_locksection)(struct module *__restrict self, USER CHECKED char const *section_name);
-WUNUSED NONNULL((1)) REF struct module_section *(module_locksection_index)(struct module *__restrict self, unsigned int section_index);
-WUNUSED NONNULL((1, 3)) __BOOL (module_sectinfo)(struct module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
+BLOCKING WUNUSED NONNULL((1)) REF struct module_section *(module_locksection)(struct module *__restrict self, USER CHECKED char const *section_name);
+BLOCKING WUNUSED NONNULL((1)) REF struct module_section *(module_locksection_index)(struct module *__restrict self, unsigned int section_index);
+BLOCKING WUNUSED NONNULL((1, 3)) __BOOL (module_sectinfo)(struct module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
 /* Return the module's text/data base address, as used during unwinding. */
 WUNUSED NONNULL((1)) void const *NOTHROW(module_get_tbase)(struct module *__restrict self);
 WUNUSED NONNULL((1)) void const *NOTHROW(module_get_dbase)(struct module *__restrict self);
@@ -319,6 +319,7 @@ NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self, unsig
  * to assume  that the  module represents  some sort  of
  * user-space executable object. */
 #define module_isdriver(self) ((self)->md_ops->mo_free == &_driver_free)
+#define module_asdriver(self) ((struct driver *)(self))
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__restrict self) ASMNAME("driver_free");
 
 
@@ -330,20 +331,20 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__re
 
 /* Return the name of the given module (or `NULL' if `!module_hasname(self)')
  * The returned pointer  is the  same as is  printed by  `module_printname()' */
-FUNDEF ATTR_PURE WUNUSED NONNULL((1)) char const *FCALL
-module_getname(struct module *__restrict self);
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) char const *
+NOTHROW(FCALL module_getname)(struct module *__restrict self);
 
 /* Print  the absolute filesystem path or name (filesystem
  * path excluding the leading  path) of the given  module.
  * If the module doesn't have a path/name (s.a. the macros
  * above), then nothing will be printed. */
-FUNDEF NONNULL((1, 2)) ssize_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
 module_printpath(struct module *__restrict self, __pformatprinter printer, void *arg);
-FUNDEF NONNULL((1, 2)) ssize_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
 module_printname(struct module *__restrict self, __pformatprinter printer, void *arg);
 
 /* Try to print the module's path, and if that fails, print its name. */
-FUNDEF NONNULL((1, 2)) ssize_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
 module_printpath_or_name(struct module *__restrict self, __pformatprinter printer, void *arg);
 
 
@@ -353,7 +354,7 @@ module_printpath_or_name(struct module *__restrict self, __pformatprinter printe
  * user-space address, in  which case  memory mappings of  that address  are
  * inspected in order to check if a module has been loaded to that location.
  * If no module exists at `addr', return `NULL'. */
-FUNDEF WUNUSED REF struct module *FCALL
+FUNDEF BLOCKING WUNUSED REF struct module *FCALL
 module_fromaddr(USER CHECKED void const *addr);
 
 /* Search for, and return a reference to the lowest available module, such
@@ -373,21 +374,21 @@ module_next(struct module *prev);
 /* Same as  the functions  above, but  preserve/restore the  old
  * exception if one ends up being thrown by the above functions,
  * and simply return `NULL', rather than RETHROW()-ing it. */
-FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr);
-FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_aboveaddr_nx)(USER CHECKED void const *addr);
-FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct module *prev);
+FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_aboveaddr_nx)(USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct module *prev);
 #define module_first_nx() module_aboveaddr_nx((void const *)0)
 
 /* Same as the functions above,  but rather than operating  the
  * usual THIS_MMAN/mman_kernel hybrid-combo, based on the given
  * `addr', operate exclusively on the given mman `self'
  * @param: self: The mman who's modules should be enumerated. */
-FUNDEF WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
-FUNDEF WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
-FUNDEF WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_next(struct mman *__restrict self, struct module *prev);
-FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self, USER CHECKED void const *addr);
-FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self, USER CHECKED void const *addr);
-FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self, struct module *prev);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_next(struct mman *__restrict self, struct module *prev);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self, struct module *prev);
 #define mman_module_first(self)    mman_module_aboveaddr(self, (void const *)0)
 #define mman_module_first_nx(self) mman_module_aboveaddr_nx(self, (void const *)0)
 

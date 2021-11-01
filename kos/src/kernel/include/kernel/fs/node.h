@@ -84,6 +84,7 @@ struct chrdev;
  *   mfile                                       # <kernel/mman/mfile.h>
  *   └─> fnode                                   # <kernel/fs/node.h>
  *       ├─> fregnode                            # <kernel/fs/regnode.h>: S_IFREG
+ *       │   ├─> printnode                       # <kernel/fs/printnode.h>
  *       │   └─> [...]
  *       ├─> fdirnode                            # <kernel/fs/dirnode.h>: S_IFDIR
  *       │   ├─> fsuper                          # <kernel/fs/super.h>
@@ -92,8 +93,9 @@ struct chrdev;
  *       │   │   └─> flatsuper                   # <kernel/fs/flat.h>
  *       │   │       └─> [...]
  *       │   ├─> ramfs_dirnode
- *       │   └─> flatdirnode                     # <kernel/fs/flat.h>
- *       │       └─> [...]
+ *       │   ├─> flatdirnode                     # <kernel/fs/flat.h>
+ *       │   │   └─> [...]
+ *       │   └─> constdir                        # <kernel/fs/constdir.h>
  *       ├─> flnknode                            # <kernel/fs/lnknode.h>: S_IFLNK
  *       │   ├─> clnknode                        # <kernel/fs/clnknode.h>
  *       │   └─> [...]
@@ -206,7 +208,7 @@ struct fnode_ops {
 	 *  - self->_fnode_file_ mf_atime       # Write to disk as would be truncated by `fsuper_truncate_atime()'
 	 *  - self->_fnode_file_ mf_mtime       # Write to disk as would be truncated by `fsuper_truncate_mtime()'
 	 *  - self->_fnode_file_ mf_ctime       # Write to disk as would be truncated by `fsuper_truncate_ctime()' */
-	NONNULL((1)) void
+	BLOCKING NONNULL((1)) void
 	(KCALL *no_wrattr)(struct fnode *__restrict self)
 			THROWS(E_IOERROR, ...);
 };
@@ -494,7 +496,7 @@ mfile_chtime(struct mfile *__restrict self,
  * superblock's list of changed nodes. If this succeeds, invoke the `no_wrattr'
  * operator. If said operator returns  with an exception, set the  attr-changed
  * flag once again by means of `mfile_changed(self, MFILE_F_ATTRCHANGED)' */
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF BLOCKING NONNULL((1)) void KCALL
 fnode_syncattr(struct fnode *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
@@ -502,7 +504,7 @@ fnode_syncattr(struct fnode *__restrict self)
  * superblock's list of changed nodes. If this succeeds, invoke `mfile_sync'.
  * If said function returns with an exception, set the attr-changed flag once
  * again by means of `mfile_changed(self, MFILE_F_ATTRCHANGED)' */
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF BLOCKING NONNULL((1)) void KCALL
 fnode_syncdata(struct fnode *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 

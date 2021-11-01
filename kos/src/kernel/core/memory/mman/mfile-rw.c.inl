@@ -195,9 +195,9 @@ DECL_BEGIN
 
 
 #ifdef LOCAL_READING
-PUBLIC WUNUSED NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 #else /* LOCAL_READING */
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 #endif /* !LOCAL_READING */
 LOCAL_mfile_rw(struct mfile *__restrict self,
                LOCAL_buffer_t buffer,

@@ -73,7 +73,8 @@ NOTHROW(FCALL dirhandle_destroy)(struct dirhandle *__restrict self) {
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct dirhandle *KCALL
 dirhandle_new(struct fdirnode *__restrict self,
               struct path *access_path,
-              struct fdirent *access_dent) {
+              struct fdirent *access_dent)
+		THROWS(E_BADALLOC) {
 	REF struct dirhandle *result;
 	result = (REF struct dirhandle *)kmalloc(sizeof(REF struct dirhandle),
 	                                         GFP_NORMAL);
@@ -100,10 +101,11 @@ dirhandle_new(struct fdirnode *__restrict self,
 DEFINE_HANDLE_REFCNT_FUNCTIONS(dirhandle, struct dirhandle);
 
 /* Handle operators for `HANDLE_TYPE_DIRHANDLE' (`struct dirhandle') */
-INTDEF WUNUSED NONNULL((1)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_dirhandle_readdir(struct dirhandle *__restrict self,
                          USER CHECKED struct dirent *buf, size_t bufsize,
-                         readdir_mode_t readdir_mode, iomode_t mode) THROWS(...) {
+                         readdir_mode_t readdir_mode, iomode_t mode)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	uintptr_t dots;
 again_dots:
 	dots = ATOMIC_READ(self->dh_dots);
@@ -179,9 +181,10 @@ read_normal_entry:
 #define dirhandle_isfsroot(self) \
 	fdirnode_issuper((self)->dh_enum.de_dir)
 
-INTDEF NONNULL((1)) pos_t KCALL
+INTERN BLOCKING NONNULL((1)) pos_t KCALL
 handle_dirhandle_seek(struct dirhandle *__restrict self,
-                      off_t offset, unsigned int whence) THROWS(...) {
+                      off_t offset, unsigned int whence)
+		THROWS(E_IOERROR, ...) {
 	pos_t result;
 	switch (whence) {
 
@@ -299,28 +302,29 @@ do_normal_seek:
 	return result;
 }
 
-INTDEF NONNULL((1)) syscall_slong_t KCALL
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_dirhandle_ioctl(struct dirhandle *__restrict self, syscall_ulong_t cmd,
                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return mfile_uioctl(self->dh_enum.de_dir, cmd, arg, mode);
 }
 
-INTDEF NONNULL((1)) void KCALL
+INTERN BLOCKING NONNULL((1)) void KCALL
 handle_dirhandle_stat(struct dirhandle *__restrict self,
                       USER CHECKED struct stat *result) THROWS(...) {
 	return mfile_ustat(self->dh_enum.de_dir, result);
 }
 
-INTDEF NONNULL((1)) syscall_slong_t KCALL
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_dirhandle_hop(struct dirhandle *__restrict self, syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	/* XXX: dirhandle-specific HOPs? */
 	return mfile_uhop(self->dh_enum.de_dir, cmd, arg, mode);
 }
 
-INTDEF NONNULL((1)) REF void *KCALL
+INTERN BLOCKING NONNULL((1)) REF void *KCALL
 handle_dirhandle_tryas(struct dirhandle *__restrict self,
-                       uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK) {
+                       uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 	case HANDLE_TYPE_MFILE:
 		return incref(self->dh_enum.de_dir);
@@ -333,7 +337,7 @@ handle_dirhandle_tryas(struct dirhandle *__restrict self,
 	return mfile_utryas(self->dh_enum.de_dir, wanted_type);
 }
 
-INTERN NONNULL((1, 2)) ssize_t KCALL
+INTERN BLOCKING NONNULL((1, 2)) ssize_t KCALL
 handle_dirhandle_printlink(struct dirhandle *__restrict self,
                            pformatprinter printer, void *arg)
 		THROWS(E_WOULDBLOCK, ...) {

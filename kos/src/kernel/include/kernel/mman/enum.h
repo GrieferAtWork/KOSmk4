@@ -61,7 +61,8 @@ struct mmapinfo {
  * @param: info:  Information about the mapping range being enumerated.
  * @return: >= 0: Continue enumeration and add the result to the sum eventually returned by `mman_enum()'
  * @return: < 0:  Halt enumeration immediately by having `mman_enum()' re-return this same value. */
-typedef ssize_t (FCALL *mman_enum_callback_t)(void *arg, struct mmapinfo *__restrict info);
+typedef BLOCKING ssize_t
+(FCALL *mman_enum_callback_t)(void *arg, struct mmapinfo *__restrict info);
 
 /* Enumerate all mappings contained within the given `enum_minaddr...enum_maxaddr'
  * address range within the given VM `self'. This function will automatically  re-
@@ -84,7 +85,7 @@ typedef ssize_t (FCALL *mman_enum_callback_t)(void *arg, struct mmapinfo *__rest
  *                       that overlap  with `enum_minaddr ... enum_maxaddr'  will be  enumerated.
  * @param: enum_maxaddr: Same as `enum_minaddr', but specifies the max address of any enumerated
  *                       mapping. */
-FUNDEF ssize_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(cb)) NONNULL((1, 2)) ssize_t KCALL
 mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
           UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)0),
           UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)-1));

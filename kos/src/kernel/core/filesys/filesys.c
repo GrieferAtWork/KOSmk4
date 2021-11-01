@@ -88,10 +88,15 @@ unaligned_v_saveblocks(struct mfile *__restrict self, pos_t addr,
  * uninitialized by `ffs_open()' itself,  with the exception of  `fn_allsuper',
  * which is initialized as `LIST_ENTRY_UNBOUND_INIT()'.
  *
- * The returned superblock is _only_ visible to the caller, unless it's a  singleton
- * superblock  (`FFILESYS_F_SINGLE'; iow:  is `devfs'),  in which  case the returned
- * superblock is fully initialized and its fields must _NOT_ be modified willy-nilly
- * by the caller.
+ * The returned superblock is _only_ visible to the caller, unless it's a singleton
+ * superblock (`FFILESYS_F_SINGLE'), in which case the returned superblock is fully
+ * initialized and its fields must _NOT_ be modified willy-nilly by the caller.
+ *
+ * WARNING: To safely deal with driver references in the case of singleton superblocks,
+ *          the reference that is keeping `self'  alive (which is actually a  reference
+ *          to  the backing driver)  may only be dropped  _AFTER_ path_mount() was used
+ *          to mount the superblock (since the successful creation of a mounting  point
+ *          will be holding a driver reference via `pathmount::pm_fsmount').
  *
  * @return: * : isshared(return):  `FFILESYS_F_SINGLE' was set, and `return' must NOT
  *                                 be modified under a false assumption of you  being
@@ -100,11 +105,16 @@ unaligned_v_saveblocks(struct mfile *__restrict self, pos_t addr,
  *                                 be made globally  visible, and if  mounting should  be
  *                                 aborted, you can simply destroy() (or decref()) it.
  * @return: NULL: `FFILESYS_F_NODEV' isn't set, and `dev' cannot be mounted as a
- *                filesystem of this type. */
-PUBLIC WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+ *                filesystem of this type.
+ * @throw: E_FSERROR_NOT_A_BLOCK_DEVICE:    `dev' cannot be used to mount superblocks.
+ * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM: The filesystem type was matched, but the on-disk
+ *                                          filesystem doesn't appear to make any sense. It
+ *                                          looks like it's been corrupted... :( */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_open(struct ffilesys *__restrict self,
               struct mfile *dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE) {
+		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_NOT_A_BLOCK_DEVICE,
+		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...) {
 	REF struct fsuper *result;
 	/* Check for special case: singleton */
 	if (self->ffs_flags & FFILESYS_F_SINGLE)
@@ -294,9 +304,10 @@ ffilesys_next(struct ffilesys *prev) THROWS(E_WOULDBLOCK) {
  *                be made globally  visible, and if  mounting should  be
  *                aborted, you can simply destroy() (or decref()) it.
  * @return: NULL: `dev' doesn't contain any known filesystem. */
-PUBLIC WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE) {
+		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE,
+		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...) {
 	REF struct ffilesys *iter, *next;
 	/* Enumerate filesystem types. */
 	for (iter = NULL;;) {

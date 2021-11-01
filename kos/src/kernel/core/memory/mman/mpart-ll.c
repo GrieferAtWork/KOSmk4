@@ -52,7 +52,7 @@ DECL_BEGIN
 PUBLIC NONNULL((1)) void FCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages)
-		THROWS(E_BADALLOC) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	physpage_t pp;
 	physpagecnt_t res_pages;
 	struct mchunkvec cv;

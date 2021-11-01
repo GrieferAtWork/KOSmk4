@@ -62,7 +62,8 @@ NOTHROW(FCALL filehandle_destroy)(struct filehandle *__restrict self) {
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct filehandle *KCALL
 filehandle_new(struct mfile *__restrict self,
                struct path *access_path,
-               struct fdirent *access_dent) {
+               struct fdirent *access_dent)
+		THROWS(E_BADALLOC) {
 	REF struct filehandle *result;
 	result = (REF struct filehandle *)kmalloc(sizeof(struct filehandle), GFP_NORMAL);
 	result->fh_refcnt = 1;

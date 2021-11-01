@@ -81,6 +81,12 @@ struct async_ops {
 	 * If this function throws an exception, the error will be transferred
 	 * to  an attached AIO handle, or dumped  to the system log before the
 	 * async job is canceled.
+	 *
+	 * IMPORTANT: Note that this function isn't marked as `BLOCKING', but
+	 *            also not as `NOBLOCK'. If BLOCKING is needed, then  you
+	 *            must re-write your  code to such  that waiting is  done
+	 *            through calls to `ao_connect()' and `ao_test()'!
+	 *
 	 * @return: * : One of `ASYNC_RESUME', `ASYNC_FINISHED' or `ASYNC_CANCEL' */
 	WUNUSED NONNULL((1)) unsigned int
 	(FCALL *ao_work)(struct async *__restrict self);

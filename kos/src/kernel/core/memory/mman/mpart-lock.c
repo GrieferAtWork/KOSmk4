@@ -102,9 +102,10 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 /************************************************************************/
 
 /* Ensure that `!mpart_hasblocksstate_init(self)' */
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mpart_initdone_or_unlock(struct mpart *__restrict self,
-                         struct unlockinfo *unlock) {
+                         struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, ...) {
 	if unlikely(mpart_hasblocksstate_init(self)) {
 		incref(self);
 		FINALLY_DECREF_UNLIKELY(self);
@@ -141,9 +142,10 @@ mpart_initdone_or_unlock(struct mpart *__restrict self,
 }
 
 /* Ensure that `self->mp_meta == NULL || self->mp_meta->mpm_dmalocks == 0' */
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mpart_nodma_or_unlock(struct mpart *__restrict self,
-                      struct unlockinfo *unlock) {
+                      struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, ...) {
 	struct mpartmeta *meta = self->mp_meta;
 	if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
 		/* Must blocking-wait until all DMA locks have been released. */
@@ -166,7 +168,8 @@ mpart_nodma_or_unlock(struct mpart *__restrict self,
 /* Ensure that `self->mp_meta != NULL' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_hasmeta_or_unlock(struct mpart *__restrict self,
-                        struct unlockinfo *unlock) {
+                        struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	if (self->mp_meta == NULL) {
 		struct mpartmeta *meta;
 		meta = (struct mpartmeta *)kmalloc_nx(sizeof(struct mpartmeta),
@@ -579,10 +582,11 @@ setcore_ex_load_from_swap(struct mchunkvec *__restrict dst_vec,
 
 
 /* Ensure that `MPART_ST_INCORE(self->mp_state)' */
-PUBLIC WUNUSED NONNULL((1, 3)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock,
-                        struct mpart_setcore_data *__restrict data) {
+                        struct mpart_setcore_data *__restrict data)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	size_t num_bytes, num_pages, num_blocks;
 	struct mfile *file;
 
@@ -834,12 +838,12 @@ nope:
  *   - ... the given address range is in-bounds!
  *   - ... MPART_ST_INCORE(self->mp_state)
  * If they don't, then this function will cause an assertion failure! */
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mpart_load_or_unlock(struct mpart *__restrict self,
                      struct unlockinfo *unlock,
                      mpart_reladdr_t partrel_offset,
                      size_t num_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	size_t i;
 	struct mfile *file = self->mp_file;
 	bool has_init = false;
@@ -1500,11 +1504,12 @@ err_badalloc:
  *       or have already been added as lock-ops to `mp_lockops'.
  *       However, the mmans of all nodes still apart of the mp_copy list have
  *       already been destroyed, such that  no alive copy-nodes still  exist! */
-PUBLIC WUNUSED NONNULL((1, 3)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data,
-                           mpart_reladdr_t partrel_offset, size_t num_bytes) {
+                           mpart_reladdr_t partrel_offset, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	/* Instead of unsharing _all_ copy-on-write mappings, extend this function to
 	 * only  unshare those that  are mapping pages from  a specific sub-region of
 	 * the given mem-part (where  copy-on-write mem-nodes overlap partially  with
@@ -1785,7 +1790,8 @@ nope:
  * mappings exist that may still have write-access! */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_denywrite_or_unlock(struct mpart *__restrict self,
-                        struct unlockinfo *unlock) {
+                          struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY) {
 	struct mnode *node;
 	/* Enumerate all shared nodes in order to delete write-access from them. */
 	LIST_FOREACH (node, &self->mp_share, mn_link) {
@@ -1831,7 +1837,7 @@ again_try_clear_write:
 
 /* Acquire a lock until:
  *  - mpart_initdone_or_unlock(self, ...) */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 mpart_lock_acquire_and_initdone(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	do {
@@ -1842,9 +1848,9 @@ mpart_lock_acquire_and_initdone(struct mpart *__restrict self)
 /* Acquire a lock until:
  *  - mpart_initdone_or_unlock(self, ...)
  *  - mpart_nodma_or_unlock(self, ...) */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 mpart_lock_acquire_and_initdone_nodma(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	do {
 		mpart_lock_acquire(self);
 	} while (!mpart_initdone_or_unlock(self, NULL) ||
@@ -1855,9 +1861,9 @@ mpart_lock_acquire_and_initdone_nodma(struct mpart *__restrict self)
 
 /* Acquire a lock until:
  *  - mpart_setcore_or_unlock(self, ...) */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct mpart_setcore_data data;
 	mpart_lock_acquire(self);
 	/* Quick check: is the part already in the expected state? */
@@ -1885,10 +1891,10 @@ mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
  * # of bytes that may need to be loaded)
  *
  * HINT: This function is used to implement `mpart_read()' */
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
                                     pos_t filepos, size_t max_load_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	mpart_reladdr_t reladdr;
 	struct mpart_setcore_data data;
 	size_t loadbytes;
@@ -1952,10 +1958,10 @@ err:
  * # of bytes that may need to be unshared/loaded)
  *
  * HINT: This function is used to implement `mman_startdma()' */
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mpart_lock_acquire_and_setcore_unsharecow_load(struct mpart *__restrict self,
                                                pos_t filepos, size_t max_load_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	bool result;
 again:
 	result = mpart_lock_acquire_and_setcore_unsharecow(self, filepos, max_load_bytes);
@@ -1982,10 +1988,10 @@ again:
  * # of bytes that may need to be unshared/loaded)
  *
  * HINT: This function is used to implement `mman_startdma()' */
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
                                           pos_t filepos, size_t max_load_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	mpart_reladdr_t part_offs, part_size;
 	mpart_lock_acquire(self);
 
@@ -2120,9 +2126,9 @@ err:
  * syncing an anonymous file wouldn't really make much sense (where the file being
  * anonymous is one  of the  conditions for  a writable  copy-on-write mapping  to
  * continue to exist) */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	do {
 		mpart_lock_acquire_and_setcore(self);
 	} while (!mpart_nodma_or_unlock(self, NULL) ||

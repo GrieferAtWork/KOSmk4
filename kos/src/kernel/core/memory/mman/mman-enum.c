@@ -70,7 +70,7 @@ DECL_BEGIN
  *                       that overlap  with `enum_minaddr ... enum_maxaddr'  will be  enumerated.
  * @param: enum_maxaddr: Same as `enum_minaddr', but specifies the max address of any enumerated
  *                       mapping. */
-FUNDEF ssize_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(cb)) NONNULL((1, 2)) ssize_t KCALL
 mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
           UNCHECKED void *enum_minaddr, UNCHECKED void *enum_maxaddr) {
 	ssize_t temp, result = 0;

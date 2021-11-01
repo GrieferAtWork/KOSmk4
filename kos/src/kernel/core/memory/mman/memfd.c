@@ -67,10 +67,9 @@ NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict self,
                                     pos_t addr, physaddr_t buf, size_t num_bytes,
                                     struct aio_multihandle *__restrict aio);
 
-PRIVATE WUNUSED NONNULL((1)) REF void *KCALL
-memfd_v_tryas(struct mfile *__restrict self,
-              uintptr_half_t wanted_type)
-		THROWS(...) {
+PRIVATE WUNUSED NONNULL((1)) REF void *
+NOTHROW(KCALL memfd_v_tryas)(struct mfile *__restrict self,
+                             uintptr_half_t wanted_type) {
 	struct memfd *me = mfile_asmemfd(self);
 	if (wanted_type == HANDLE_TYPE_FDIRENT)
 		return incref(me->mfd_name);
@@ -79,8 +78,7 @@ memfd_v_tryas(struct mfile *__restrict self,
 
 PRIVATE WUNUSED NONNULL((1, 2)) ssize_t KCALL
 memfd_v_printlink(struct mfile *__restrict self,
-                  pformatprinter printer, void *arg)
-		THROWS(E_WOULDBLOCK, ...) {
+                  pformatprinter printer, void *arg) {
 	struct memfd *me = mfile_asmemfd(self);
 	return format_printf(printer, arg, "memfd:%$s",
 	                     (size_t)me->mfd_name->fd_namelen,

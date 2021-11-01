@@ -67,71 +67,73 @@ NOTHROW(mman_dmalock_release)(struct mdmalock *__restrict self);
  * @param: addr:        [mman_startdma] The base address where locking should start.
  * @param: num_bytes:   [mman_startdma] The number of continuous bytes that should be locked.
  * @param: addr_v:      [mman_startdmav] The scatter-gather list of virtual memory ranges to lock.
- * @param: for_writing: When true, unshare copy-on-write mappings  of associated memory, allowing  the
- *                      caller to then write to the acquired memory ranges without accidentally having
- *                      any changes made appear in PRIVATE mappings of the associated memory region.
+ * @param: flags:       Set of `0 | MMAN_FAULT_F_WRITE'. When `MMAN_FAULT_F_WRITE' is given, unshare
+ *                      copy-on-write  mappings of  associated memory,  allowing the  caller to then
+ *                      write  to the acquired memory ranges without accidentally having any changes
+ *                      made appear in PRIVATE mappings of the associated memory region.
  * @return: 0 :         `*prange' returned `false'
  * @return: 0 :         Some portion of the specified address range(s) doesn't actually map to a VM node.
  * @return: 0 :         Some portion of the specified address range(s) maps to a VM node reservation (no associated data part).
  * @return: 0 :         Some portion of the specified address range(s) maps to VIO memory, meaning there is no underlying physical memory.
  * @return: <= lockcnt: The number of used DMA locks (SUCCESS)
  * @return: >  lockcnt: The number of _REQUIRED_ DMA locks (FAILURE) (All locks that may have already been acqured will have already been released) */
-FUNDEF NONNULL((1, 2, 4)) size_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2, 4)) size_t KCALL
 mman_startdma(struct mman *__restrict self, mdma_range_callback_t prange,
               void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
-              UNCHECKED void *addr, size_t num_bytes, __BOOL for_writing)
+              UNCHECKED void *addr, size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2, 4, 6)) size_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2, 4, 6)) size_t KCALL
 mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
                void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
-               struct iov_buffer const *__restrict addr_v, __BOOL for_writing)
+               struct iov_buffer const *__restrict addr_v, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF NONNULL((1, 2, 4, 6)) size_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2, 4, 6)) size_t KCALL
 mman_startdma(struct mman *__restrict self, mdma_range_callback_t prange,
               void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
-              struct iov_buffer const *__restrict addr_v, __BOOL for_writing)
+              struct iov_buffer const *__restrict addr_v, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 		ASMNAME("mman_startdmav");
 } /* extern "C++" */
 #endif /* __cplusplus */
 
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
- * @param: prange:      A  callback that is  invoked for each  affected physical memory range
- *                      Should this callback  return `false', enumeration  will halt and  the
- *                      function will return the number of previously successfully enumerated
- *                      DMA bytes.
- * @param: cookie:      Cookie-argument passed to `prange' upon execution.
- * @param: addr:        [mman_startdma] The base address where locking should start.
- * @param: num_bytes:   [mman_startdma] The number of continuous bytes that should be locked.
- * @param: addr_v:      [mman_startdmav] The scatter-gather list of virtual memory ranges to lock.
- * @param: for_writing: When true, unshare copy-on-write mappings  of associated memory, allowing  the
- *                      caller to then write to the acquired memory ranges without accidentally having
- *                      any changes made appear in PRIVATE mappings of the associated memory region.
+ * @param: prange:    A  callback that is  invoked for each  affected physical memory range
+ *                    Should this callback  return `false', enumeration  will halt and  the
+ *                    function will return the number of previously successfully enumerated
+ *                    DMA bytes.
+ * @param: cookie:    Cookie-argument passed to `prange' upon execution.
+ * @param: addr:      [mman_startdma] The base address where locking should start.
+ * @param: num_bytes: [mman_startdma] The number of continuous bytes that should be locked.
+ * @param: addr_v:    [mman_startdmav] The scatter-gather list of virtual memory ranges to lock.
+ * @param: flags:     Set of `0 | MMAN_FAULT_F_WRITE'. When `MMAN_FAULT_F_WRITE' is given, unshare
+ *                    copy-on-write  mappings of  associated memory,  allowing the  caller to then
+ *                    write  to the acquired memory ranges without accidentally having any changes
+ *                    made appear in PRIVATE mappings of the associated memory region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
  *              Upon full success, this is identical to the given `num_bytes' / `iov_buffer_size(buf)',
  *              though for the same reasons that `mman_startdma[v]' can fail (s.a. `@return: 0' cases),
  *              this may be less than that */
-FUNDEF NONNULL((1, 2)) size_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2)) size_t KCALL
 mman_enumdma(struct mman *__restrict self,
              mdma_range_callback_t prange, void *cookie,
-             void *addr, size_t num_bytes, __BOOL for_writing)
+             void *addr, size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2, 4)) size_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2, 4)) size_t KCALL
 mman_enumdmav(struct mman *__restrict self,
               mdma_range_callback_t prange, void *cookie,
               struct iov_buffer const *__restrict addr_v,
-              __BOOL for_writing)
+              unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF NONNULL((1, 2, 4)) size_t KCALL
+FUNDEF BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2, 4)) size_t KCALL
 mman_enumdma(struct mman *__restrict self,
              mdma_range_callback_t prange, void *cookie,
              struct iov_buffer const *__restrict addr_v,
-             __BOOL for_writing)
+             unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 		ASMNAME("mman_enumdmav");
 } /* extern "C++" */

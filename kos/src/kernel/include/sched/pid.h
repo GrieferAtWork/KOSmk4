@@ -92,7 +92,8 @@ NOBLOCK WUNUSED REF struct task *NOTHROW(taskpid_gettask)(struct taskpid *__rest
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *KCALL
-taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED);
+taskpid_gettask_srch(struct taskpid *__restrict self)
+		THROWS(E_PROCESS_EXITED);
 
 
 /* Return the PID of `self' within the given PID namespace. */

@@ -173,12 +173,13 @@ NOTHROW(FCALL mpart_truncate_undo_unlockinfo_cb)(struct unlockinfo *__restrict s
 /* Write the  physical  memory  contents
  * of  `sec[start_offset...+=num_bytes]'
  * into `self[dst_offset...+=num_bytes]' */
-PRIVATE NOBLOCK NONNULL((1)) void FCALL
+PRIVATE BLOCKING NOBLOCK NONNULL((1)) void FCALL
 mfile_write_from_mempart_buffer(struct mfile *__restrict self,
                                 struct mpart const *__restrict src,
                                 mpart_reladdr_t start_offset,
                                 mpart_reladdr_t num_bytes,
-                                pos_t dst_offset) {
+                                pos_t dst_offset)
+		THROWS(...) {
 	if (src->mp_state == MPART_ST_MEM) {
 		physaddr_t srcaddr;
 		srcaddr = physpage2addr(src->mp_mem.mc_start);
@@ -214,7 +215,7 @@ mfile_write_from_mempart_buffer(struct mfile *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 mfile_readall(struct mfile *__restrict self,
               USER CHECKED void *dst,
               size_t num_bytes, pos_t src_offset)
@@ -232,7 +233,7 @@ mfile_readall(struct mfile *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 mfile_readall_p(struct mfile *__restrict self,
                 physaddr_t dst,
                 size_t num_bytes, pos_t src_offset)
@@ -250,7 +251,7 @@ mfile_readall_p(struct mfile *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mfile_readallv(struct mfile *__restrict self,
                struct iov_buffer const *__restrict buf,
                size_t buf_offset, size_t num_bytes,
@@ -269,7 +270,7 @@ mfile_readallv(struct mfile *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mfile_readallv_p(struct mfile *__restrict self,
                  struct iov_physbuffer const *__restrict buf,
                  size_t buf_offset, size_t num_bytes,
@@ -288,7 +289,7 @@ mfile_readallv_p(struct mfile *__restrict self,
 	}
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 mfile_writeall(struct mfile *__restrict self, USER CHECKED void const *src,
                size_t num_bytes, pos_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
@@ -296,7 +297,7 @@ mfile_writeall(struct mfile *__restrict self, USER CHECKED void const *src,
 		THROW(E_FSERROR_FILE_TOO_BIG);
 }
 
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 mfile_writeall_p(struct mfile *__restrict self, physaddr_t src,
                  size_t num_bytes, pos_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
@@ -304,7 +305,7 @@ mfile_writeall_p(struct mfile *__restrict self, physaddr_t src,
 		THROW(E_FSERROR_FILE_TOO_BIG);
 }
 
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mfile_writeallv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf,
                 size_t buf_offset, size_t num_bytes, pos_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
@@ -312,7 +313,7 @@ mfile_writeallv(struct mfile *__restrict self, struct iov_buffer const *__restri
 		THROW(E_FSERROR_FILE_TOO_BIG);
 }
 
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mfile_writeallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf,
                   size_t buf_offset, size_t num_bytes, pos_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
@@ -339,7 +340,7 @@ NOTHROW(FCALL get_stackbuf_size)(size_t num_bytes) {
 /* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 _mfile_buffered_read(struct mfile *__restrict self, USER CHECKED void *dst,
                      size_t num_bytes, pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
@@ -363,7 +364,7 @@ _mfile_buffered_read(struct mfile *__restrict self, USER CHECKED void *dst,
 	return result;
 }
 
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 _mfile_buffered_write(struct mfile *__restrict self, USER CHECKED void const *src,
                       size_t num_bytes, pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
@@ -387,7 +388,7 @@ _mfile_buffered_write(struct mfile *__restrict self, USER CHECKED void const *sr
 	return result;
 }
 
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 _mfile_buffered_tailwrite(struct mfile *__restrict self,
                           USER CHECKED void const *src,
                           size_t num_bytes)
@@ -411,7 +412,7 @@ _mfile_buffered_tailwrite(struct mfile *__restrict self,
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) size_t KCALL
 _mfile_buffered_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf,
                       size_t buf_offset, size_t num_bytes, pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
@@ -440,7 +441,7 @@ _mfile_buffered_readv(struct mfile *__restrict self, struct iov_buffer const *__
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) size_t KCALL
 _mfile_buffered_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf,
                        size_t buf_offset, size_t num_bytes, pos_t filepos)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
@@ -469,7 +470,7 @@ _mfile_buffered_writev(struct mfile *__restrict self, struct iov_buffer const *_
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) size_t KCALL
 _mfile_buffered_tailwritev(struct mfile *__restrict self,
                            struct iov_buffer const *__restrict buf,
                            size_t buf_offset, size_t num_bytes)

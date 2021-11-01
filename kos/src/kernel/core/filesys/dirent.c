@@ -40,8 +40,8 @@ DECL_BEGIN
 /* Return the hash of a given directory entry name.
  * This function is used by various APIs related to file lookup.
  * @throw: E_SEGFAULT: Failed to access the given `text'. */
-PUBLIC ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
-fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict text, u16 textlen)
+PUBLIC ATTR_PURE WUNUSED uintptr_t FCALL
+fdirent_hash(CHECKED USER /*utf-8*/ char const *text, u16 textlen)
 		THROWS(E_SEGFAULT) {
 	uintptr_t hash = FDIRENT_EMPTY_HASH;
 	uintptr_t const *iter, *end;
@@ -97,7 +97,8 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(fdirent, struct fdirent);
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_fdirent_pread(struct fdirent *__restrict self,
                      USER CHECKED void *dst, size_t num_bytes,
-                     pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+                     pos_t addr, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT) {
 	size_t avail;
 	if (addr >= self->fd_namelen)
 		return 0;
@@ -112,7 +113,8 @@ INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_fdirent_preadv(struct fdirent *__restrict self,
                       struct iov_buffer *__restrict dst,
                       size_t UNUSED(num_bytes),
-                      pos_t addr, iomode_t mode) THROWS(...) {
+                      pos_t addr, iomode_t mode)
+		THROWS(E_SEGFAULT) {
 	size_t result = 0;
 	struct iov_entry ent;
 	IOV_BUFFER_FOREACH(ent, dst) {
@@ -133,7 +135,8 @@ handle_fdirent_preadv(struct fdirent *__restrict self,
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_fdirent_readdir(struct fdirent *__restrict self,
                        USER CHECKED struct dirent *buf, size_t bufsize,
-                       readdir_mode_t readdir_mode, iomode_t UNUSED(mode)) THROWS(...) {
+                       readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT) {
 	ssize_t result;
 	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
 	                             self->fd_ops->fdo_getino ? 0 : self->fd_ino,
@@ -145,7 +148,8 @@ handle_fdirent_readdir(struct fdirent *__restrict self,
 
 INTERN NONNULL((1)) void KCALL
 handle_fdirent_stat(struct fdirent *__restrict self,
-                    USER CHECKED struct stat *result) THROWS(...) {
+                    USER CHECKED struct stat *result)
+		THROWS(E_SEGFAULT) {
 	memset(result, 0, sizeof(*result));
 	/* NOTE: In this case, we can't invoke the `fdo_getino' operator... :( */
 	if (self->fd_ops->fdo_getino == NULL)
@@ -155,15 +159,14 @@ handle_fdirent_stat(struct fdirent *__restrict self,
 
 INTERN ATTR_CONST WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_fdirent_polltest(struct fdirent *__restrict UNUSED(self),
-                        poll_mode_t what) THROWS(...) {
+                        poll_mode_t what) {
 	return what & POLLINMASK;
 }
 
 
 INTERN NONNULL((1, 2)) ssize_t KCALL
 handle_fdirent_printlink(struct fdirent *__restrict self,
-                         pformatprinter printer, void *arg)
-		THROWS(E_WOULDBLOCK, ...) {
+                         pformatprinter printer, void *arg) {
 	return format_printf(printer, arg, "?/%$s",
 	                     (size_t)self->fd_namelen,
 	                     self->fd_name);

@@ -29,13 +29,13 @@ DECL_BEGIN
 
 /* @param: reloc_flags: Set of `DRIVER_RELOC_FLAG_*' */
 #ifdef DEFINE_driver_do_apply_relocations_vector
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
 driver_do_apply_relocations_vector(struct driver *__restrict self,
                                    ElfW(Rel) *__restrict vector,
                                    size_t count, unsigned int reloc_flags)
 #undef LOCAL_HAVE_ADDENDS
 #elif defined(DEFINE_driver_do_apply_relocations_vector_addend)
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
 driver_do_apply_relocations_vector_addend(struct driver *__restrict self,
                                           ElfW(Rela) *__restrict vector,
                                           size_t count, unsigned int reloc_flags)

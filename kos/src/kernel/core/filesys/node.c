@@ -736,7 +736,7 @@ mfile_chtime(struct mfile *__restrict self,
  * superblock's list of changed nodes. If this succeeds, invoke the `no_wrattr'
  * operator. If said operator returns  with an exception, set the  attr-changed
  * flag once again by means of `mfile_changed(self, MFILE_F_ATTRCHANGED)' */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 fnode_syncattr(struct fnode *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	struct fsuper *super;
@@ -795,7 +795,7 @@ again_acquire_super_changed:
  * superblock's list of changed nodes. If this succeeds, invoke `mfile_sync'.
  * If said function returns with an exception, set the attr-changed flag once
  * again by means of `mfile_changed(self, MFILE_F_CHANGED)' */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 fnode_syncdata(struct fnode *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	struct fsuper *super;

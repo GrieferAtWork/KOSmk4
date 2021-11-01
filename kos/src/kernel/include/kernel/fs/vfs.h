@@ -193,7 +193,8 @@ struct fdirnode;
  * the given VFS `self', return `NULL' */
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct pathmount *FCALL
 vfs_mount_location(struct vfs *__restrict self,
-                   struct fdirnode *__restrict dir);
+                   struct fdirnode *__restrict dir)
+		THROWS(E_WOULDBLOCK);
 
 
 

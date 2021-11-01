@@ -400,7 +400,7 @@ NOTHROW(FCALL rising_edge_detector_create)(struct sig *__restrict signal) {
 	return result;
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void FCALL
+PRIVATE BLOCKING NONNULL((1)) void FCALL
 rising_edge_detector_waitfor(struct rising_edge_detector *__restrict self) {
 	while (!ATOMIC_XCH(self->red_detected, false)) {
 		task_connect(&self->red_ondetect);

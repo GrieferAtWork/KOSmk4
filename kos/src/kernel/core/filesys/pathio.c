@@ -308,7 +308,7 @@ NOTHROW(FCALL path_ismount_reachable_from)(struct path *__restrict self) {
  * @throw: E_FSERROR_READONLY:            ...
  * @throw: E_IOERROR:                     ...
  * @throw: E_BADALLOC:                    ... */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 path_remove(struct path *__restrict self,
             /*utf-8*/ USER CHECKED char const *name, u16 namelen, atflag_t atflags,
             /*out[1..1]_opt*/ REF struct fnode **pdeleted_node,
@@ -541,7 +541,7 @@ again_lookup_dent:
 
 
 /* Acquire locks for 2 paths */
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
 twopaths_acquire_locks(struct path *a, struct path *b)
 		THROWS(E_WOULDBLOCK) {
 again:
@@ -577,7 +577,7 @@ STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_SUCCESS));
 STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_EXISTS));
 STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_DELETED));
 
-PRIVATE WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
                         struct frename_info *__restrict info)
 		THROWS(...) {
@@ -709,7 +709,7 @@ fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
 
 
 
-PRIVATE WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 fdirnode_replace_paths(struct path *oldpath, struct path *newpath,
                        struct frename_info *__restrict info)
 		THROWS(...) {
@@ -942,10 +942,12 @@ again:
 /* Returns one of `FDIRNODE_RENAME_IN_PATH_*', or a reference pointer to
  * a `struct path' which the caller should wait for to become available,
  * before restarting the rename operation. */
-PRIVATE WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
                         struct frename_info *__restrict info)
-		THROWS(...) {
+		THROWS(E_FSERROR_CROSS_DEVICE_LINK, E_SEGFAULT,
+		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		       E_FSERROR_READONLY, E_IOERROR, ...) {
 	REF struct path *status;
 	assert(!(info->frn_flags & AT_RENAME_EXCHANGE) || info->frn_repfile);
 
@@ -1051,7 +1053,7 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
  * @throw: E_FSERROR_READONLY:                ...
  * @throw: E_IOERROR:                         ...
  * @throw: E_BADALLOC:                        ... */
-PUBLIC NONNULL((1, 4)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 4)) void KCALL
 path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
             struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
             atflag_t atflags, bool check_permissions,
@@ -1384,9 +1386,9 @@ NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self) {
  * child-paths of it which may also be mounting points.
  * @return: true:  `self' was unmounted.
  * @return: false: `self' had already been unmounted. */
-PUBLIC NONNULL((1)) bool KCALL
+PUBLIC BLOCKING NONNULL((1)) bool KCALL
 path_umount(struct pathmount *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	bool result;
 	REF struct vfs *pathvfs;
 	REF struct path *blocking_path;
@@ -1575,9 +1577,9 @@ again_load_parent:
  *              to `self' will continue to operate  with the old path `self'  (since
  *              the old path didn't get modified but replaced with a newly allocated
  *              path). */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
 path_mount(struct path *__restrict self, struct fdirnode *__restrict dir)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED, ...) {
 	REF struct pathmount *result;
 	REF struct vfs *pathvfs;
 	REF struct path *parent = NULL;
@@ -1763,8 +1765,9 @@ again_load_parent:
  *               print the entire path-tree until the *true* filesystem root  path,
  *               which is the one with a NULL parent pointer. */
 PUBLIC NONNULL((1, 2)) ssize_t KCALL
-path_print(struct path *__restrict self, __pformatprinter printer,
-           void *arg, atflag_t atflags, struct path *root) {
+path_print(struct path *__restrict self, pformatprinter printer,
+           void *arg, atflag_t atflags, struct path *root)
+		THROWS(E_WOULDBLOCK) {
 	ssize_t result;
 	if (!(atflags & _AT_PATHPRINT_REACHABLE)) {
 		/* Check that `self' is a descendant of `root' */
@@ -1844,8 +1847,9 @@ done:
 PUBLIC NONNULL((1, 4)) ssize_t KCALL
 path_printent(struct path *__restrict self,
               USER CHECKED char const *dentry_name, u16 dentry_namelen,
-              __pformatprinter printer, void *arg, atflag_t atflags,
-              struct path *root) {
+              pformatprinter printer, void *arg, atflag_t atflags,
+              struct path *root)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	ssize_t result;
 	result = path_print(self, printer, arg, atflags, root);
 	if likely(result >= 0) {
@@ -1866,7 +1870,8 @@ path_printent(struct path *__restrict self,
  * @return: * : The required buffer size (including a trailing NUL-character) */
 PUBLIC NONNULL((1)) size_t KCALL
 path_sprint(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
-            atflag_t atflags, struct path *root) THROWS(E_SEGFAULT) {
+            atflag_t atflags, struct path *root)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t result;
 	struct format_snprintf_data data;
 	format_snprintf_init(&data, buffer, buflen);
@@ -1882,7 +1887,8 @@ PUBLIC NONNULL((1)) size_t KCALL
 path_sprintent(struct path *__restrict self,
                USER CHECKED char const *dentry_name, u16 dentry_namelen,
                USER CHECKED char *buffer, size_t buflen,
-               atflag_t atflags, struct path *root) THROWS(E_SEGFAULT) {
+               atflag_t atflags, struct path *root)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	size_t result;
 	struct format_snprintf_data data;
 	format_snprintf_init(&data, buffer, buflen);

@@ -290,7 +290,8 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * The sleeping thread should then be woken as follows:
  * >> SET_SHOULD_WAIT(false);
  * >> task_wake(waiting_thread); */
-FUNDEF __BOOL NOTHROW(FCALL task_sleep)(ktime_t abs_timeout DFL(KTIME_INFINITE));
+FUNDEF BLOCKING __BOOL
+NOTHROW(FCALL task_sleep)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Force sleep until `abs_timeout' has passed. Any sporadic interrupts are
  * handled by simply continuing to  sleep, until a timeout event  happens. */

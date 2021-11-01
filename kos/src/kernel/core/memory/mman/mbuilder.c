@@ -202,9 +202,9 @@ NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder_norpc *__restrict self,
 
 
 
-PRIVATE NOBLOCK NONNULL((1, 2)) void FCALL
-mbuilder_insert_anon_file_node(struct mbuilder_norpc *__restrict self,
-                               /*inherit(always)*/ struct mbnode *__restrict node) {
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mbuilder_insert_anon_file_node)(struct mbuilder_norpc *__restrict self,
+                                              /*inherit(always)*/ struct mbnode *__restrict node) {
 	mbuilder_uparts_insert(self, node);
 	SLIST_INSERT(&self->mb_files, node, mbn_nxtfile);
 	mbnode_tree_insert(&self->mb_mappings, node); /* Inherit */
@@ -214,7 +214,8 @@ mbuilder_insert_anon_file_node(struct mbuilder_norpc *__restrict self,
 
 PRIVATE ATTR_RETNONNULL WUNUSED struct mnode *FCALL
 mbuilder_create_res_file_node(PAGEDIR_PAGEALIGNED void *addr,
-                              PAGEDIR_PAGEALIGNED size_t num_bytes) {
+                              PAGEDIR_PAGEALIGNED size_t num_bytes)
+		THROWS(E_BADALLOC) {
 	struct mnode *result;
 	result = (struct mnode *)kmalloc(sizeof(struct mnode), GFP_LOCKED);
 	result->mn_minaddr = (byte_t *)addr;
@@ -236,7 +237,8 @@ mbuilder_create_res_file_node(PAGEDIR_PAGEALIGNED void *addr,
 PRIVATE ATTR_RETNONNULL WUNUSED struct mbnode *FCALL
 mbuilder_create_zero_file_node(PAGEDIR_PAGEALIGNED void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               uintptr_t mnode_flags) {
+                               uintptr_t mnode_flags)
+		THROWS(E_BADALLOC) {
 	struct mbnode *result;
 	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
 	assert(IS_ALIGNED(num_bytes, PAGESIZE));

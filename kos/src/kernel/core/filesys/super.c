@@ -114,7 +114,7 @@ NOTHROW(FCALL fsuper_add2changed)(struct fsuper *__restrict self) {
  * #2: Write modified data and attributes of all changed fnode-s to disk.
  * #3: Invoke the `so_sync' operator (if defined)
  * If an exception is thrown during step #2 or #3, re-add `self' to the list of changed superblocks */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 fsuper_sync(struct fsuper *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	COMPILER_BARRIER();
@@ -215,7 +215,7 @@ fsuper_sync(struct fsuper *__restrict self)
 
 
 /* Synchronize all superblocks containing changed fnode-s (s.a. `fchangedsuper_list') */
-PUBLIC void KCALL fsuper_syncall(void)
+PUBLIC BLOCKING void KCALL fsuper_syncall(void)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	while (!LIST_EMPTY(&fchangedsuper_list)) {
 		REF struct fsuper *changed_superblock;
@@ -619,10 +619,10 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
 
 
 /* Gather information about the filesystem and store that information in `*result' */
-PUBLIC NONNULL((1, 2)) void FCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void FCALL
 fsuper_statfs(struct fsuper *__restrict self,
               USER CHECKED struct statfs *result)
-		THROWS(E_IOERROR, E_SEGFAULT, ...) {
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	struct fsuper_ops const *ops = fsuper_getops(self);
 
 	/* Fill in default fields. */

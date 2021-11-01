@@ -68,21 +68,10 @@ NOTHROW(KCALL mutex_tryacquire)(struct mutex *__restrict self) {
 	return 1;
 }
 
-/* TODO: `mutex_tryacquire_after_failure()'
- * Same as `mutex_tryacquire()', but allowed to assume that `m_owner != THIS_TASK'
- * Also add the same variant for `mutex_acquire()' */
-#define mutex_acquire_after_failure    mutex_acquire
-#define mutex_tryacquire_after_failure mutex_tryacquire
-
-/* Same as `mutex_acquire()', but it's unlikely that
- * the   lock  can  be  acquired  without  blocking. */
-#define mutex_acquire_unlikely \
-	mutex_acquire /* TODO: Implement using connect+test, rather than test+connect+test */
-
 /* Acquire a lock to the given mutex, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-FUNDEF NONNULL((1)) __BOOL KCALL
+FUNDEF BLOCKING NONNULL((1)) __BOOL KCALL
 mutex_acquire(struct mutex *__restrict self,
               ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK, ...);
@@ -92,7 +81,7 @@ mutex_acquire(struct mutex *__restrict self,
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-FUNDEF WUNUSED NONNULL((1)) __BOOL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL
 NOTHROW(KCALL mutex_acquire_nx)(struct mutex *__restrict self,
                                 ktime_t abs_timeout DFL(KTIME_INFINITE));
 

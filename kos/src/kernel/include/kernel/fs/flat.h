@@ -98,10 +98,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct flatdirent, fde_ent.fd_refcnt, flatdirent_destr
 DATDEF struct fdirent_ops const flatdirent_ops;
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL flatdirent_v_destroy)(struct fdirent *__restrict self);
-FUNDEF WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 flatdirent_v_opennode(struct fdirent *__restrict self,
                       struct fdirnode *__restrict dir)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_IOERROR, ...);
 
 
 
@@ -131,9 +131,9 @@ struct flatdirnode_xops {
 	 *                                          # names are automatically corrected by deleting duplicate files)
 	 * @return: * :   Newly allocated, partially initialized dirent. (see above)
 	 * @return: NULL: No more entries exist past `pos'; end-of-directory */
-	WUNUSED struct flatdirent *
+	BLOCKING WUNUSED struct flatdirent *
 	(KCALL *fdnx_readdir)(struct flatdirnode *__restrict self, pos_t pos)
-			THROWS(E_BADALLOC, E_IOERROR);
+			THROWS(E_BADALLOC, E_IOERROR, ...);
 
 	/* [0..1][lock(WRITE(self->fdn_data.fdd_lock))]
 	 * - Write a directory entry `ent' pointing to `file' into the stream of  `self'.
@@ -186,12 +186,12 @@ struct flatdirnode_xops {
 	 *                 The requires space was saved in `ent->fde_size'.
 	 * @throw: E_FSERROR_ILLEGAL_PATH: `ent->fde_ent.fd_name' contains illegal characters.
 	 * @throw: E_FSERROR_DISK_FULL:    Unable to write many more data: disk is full. */
-	WUNUSED NONNULL((1, 2, 3)) __BOOL
+	BLOCKING WUNUSED NONNULL((1, 2, 3)) __BOOL
 	(KCALL *fdnx_writedir)(struct flatdirnode *__restrict self,
 	                       struct flatdirent *__restrict ent,
 	                       struct fnode *__restrict file,
 	                       __BOOL at_end_of_dir)
-			THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH);
+			THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH, ...);
 
 	/* [0..1][lock(WRITE(self->fdn_data.fdd_lock))]
 	 * [if(fdnx_writedir != NULL, [1..1])]
@@ -207,12 +207,12 @@ struct flatdirnode_xops {
 	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired.
 	 * @param: at_end_of_dir: When `true', the delete is happening such that `ent'
 	 *                        scrapes against the far end of the directory stream. */
-	NONNULL((1, 2, 3)) void
+	BLOCKING NONNULL((1, 2, 3)) void
 	(KCALL *fdnx_deleteent)(struct flatdirnode *__restrict self,
 	                        struct flatdirent *__restrict ent,
 	                        struct fnode *__restrict file,
 	                        __BOOL at_end_of_dir)
-			THROWS(E_IOERROR);
+			THROWS(E_IOERROR, ...);
 
 	/* [1..1]
 	 * - Create  a new file & directory entry (but _DONT_ try to add the entry to `self')
@@ -258,10 +258,10 @@ struct flatdirnode_xops {
 	 *  - return->fn_allnodes                = ...;    # via `fnode_init_addtoall()'
 	 * @return: * : The newly allocated (and partially initialized) file.
 	 * @throw: E_FSERROR_UNSUPPORTED_OPERATION: Filesystem doesn't support `info->mkf_fmode & S_IFMT' */
-	ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *
+	BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *
 	(KCALL *fdnx_mkfile)(struct flatdirnode *__restrict self,
 	                     struct fmkfile_info const *__restrict info)
-			THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION);
+			THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION, ...);
 
 	/* [0..1]
 	 * - Allocate a new flat-directory-entry for a given `file' returned by `fdnx_mkfile()'
@@ -285,11 +285,11 @@ struct flatdirnode_xops {
 	 *  - return->fde_ent.fd_hash    = info->mkf_hash;     # or `fdirent_hash(return->fde_ent.fd_name, return->fde_ent.fd_namelen)'
 	 *  - ...;                               # Caller will insert into hash-vector after successful `fdnx_writedir()'
 	 * @return: * : The newly allocated (and partially initialized) directory entry. */
-	ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct flatdirent *
+	BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct flatdirent *
 	(KCALL *fdnx_mkent)(struct flatdirnode *__restrict self,
 	                    struct fmkfile_info const *__restrict info,
 	                    struct fnode *__restrict file)
-			THROWS(E_BADALLOC, E_IOERROR);
+			THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...);
 
 	/* [0..1][lock(WRITE(self->fdn_data.fdd_lock))]
 	 * Optional  callback that is invoked as a phase-2 addendum to `fdnx_mkfile'.
@@ -307,12 +307,12 @@ struct flatdirnode_xops {
 	 *
 	 * If this operator returns with an exception, the directory entry previously
 	 * written by `fdnx_writedir()' will be marked as deleted (`fdnx_deleteent'). */
-	NONNULL((1, 2, 3, 4)) void
+	BLOCKING NONNULL((1, 2, 3, 4)) void
 	(KCALL *fdnx_allocfile)(struct flatdirnode *__restrict self,
 	                        struct flatdirent *__restrict ent,
 	                        struct fnode *__restrict file,
 	                        struct fmkfile_info const *__restrict info)
-			THROWS(E_BADALLOC, E_IOERROR);
+			THROWS(E_BADALLOC, E_IOERROR, ...);
 
 	/* [0..1]
 	 * Following deletion of `last_deleted_ent', the nlink counter of `file' reached `0'.
@@ -335,11 +335,11 @@ struct flatdirnode_xops {
 	 * Note that unlike `fdnx_allocfile()', this operator is _NOT_ invoked  while
 	 * holding any sort of lock to `self'! Instead, it can be invoked as a stand-
 	 * alone function. */
-	NONNULL((1, 2, 3)) void
+	BLOCKING NONNULL((1, 2, 3)) void
 	(KCALL *fdnx_deletefile)(struct flatdirnode *__restrict self,
 	                         struct flatdirent *__restrict last_deleted_ent,
 	                         struct fnode *__restrict file)
-			THROWS(E_IOERROR);
+			THROWS(E_IOERROR, ...);
 
 	/* [0..1][lock(WRITE(oldparent->fdn_data.fdd_lock) &&
 	 *             WRITE(newparent->fdn_data.fdd_lock))]
@@ -349,13 +349,13 @@ struct flatdirnode_xops {
 	 * data for special directory entries present on some filesystems.
 	 *
 	 * Even if this operator returns with an exception, a rename is not aborted. */
-	NONNULL((1, 2, 3, 4, 5)) void
+	BLOCKING NONNULL((1, 2, 3, 4, 5)) void
 	(KCALL *fdnx_direntchanged)(struct fnode *__restrict self,
 	                            struct flatdirnode *oldparent,
 	                            struct flatdirnode *newparent,
 	                            struct flatdirent *__restrict old_ent,
 	                            struct flatdirent *__restrict new_ent)
-			THROWS(E_IOERROR);
+			THROWS(E_IOERROR, ...);
 
 	/* More operators go here. */
 };
@@ -373,10 +373,10 @@ NOTHROW(KCALL flatdirnode_v_destroy)(struct mfile *__restrict self);
 #define flatdirnode_v_stat       fdirnode_v_stat
 #define flatdirnode_v_changed    fdirnode_v_changed
 #define flatdirnode_v_stream_ops fdirnode_v_stream_ops
-FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 flatdirnode_v_lookup(struct fdirnode *__restrict self,
                      struct flookup_info *__restrict info)
-		THROWS(E_BADALLOC, E_IOERROR);
+		THROWS(E_BADALLOC, E_IOERROR, ...);
 /* NOTE: `flatdirnode_v_enum()' fixes  the deleted-file  problem by  searching
  *       though the directory for the next dirent with a position >= any entry
  *       that got deleted.
@@ -385,24 +385,25 @@ flatdirnode_v_lookup(struct fdirnode *__restrict self,
  *       that is >= the seek'd address. (SEEK_END is relative to the fde_pos+
  *       fde_size of the last directory entry) */
 FUNDEF NONNULL((1)) void KCALL
-flatdirnode_v_enum(struct fdirenum *__restrict result);
-FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
+flatdirnode_v_enum(struct fdirenum *__restrict result)
+		THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 flatdirnode_v_mkfile(struct fdirnode *__restrict self,
                      struct fmkfile_info *__restrict info)
-		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		THROWS(E_BADALLOC, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
-		       E_FSERROR_UNSUPPORTED_OPERATION);
-FUNDEF WUNUSED NONNULL((1, 2, 3)) unsigned int KCALL
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2, 3)) unsigned int KCALL
 flatdirnode_v_unlink(struct fdirnode *__restrict self,
                      struct fdirent *__restrict entry,
                      struct fnode *__restrict file)
-		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_DIRECTORY_NOT_EMPTY,
-		       E_FSERROR_READONLY);
-FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
+		THROWS(E_BADALLOC, E_FSERROR_DIRECTORY_NOT_EMPTY,
+		       E_FSERROR_READONLY, E_IOERROR, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 flatdirnode_v_rename(struct fdirnode *__restrict self,
                      struct frename_info *__restrict info)
-		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_ILLEGAL_PATH,
-		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY);
+		THROWS(E_BADALLOC, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		       E_FSERROR_READONLY, E_IOERROR, ...);
 
 
 struct flatdir_bucket {
@@ -493,29 +494,29 @@ flatdirnode_fileslist_remove(struct flatdirnode *__restrict self,
 
 
 /* Helpers for accessing `fdd_lock' */
-#define _flatdirdata_reap(self)      (void)0
-#define flatdirdata_reap(self)       (void)0
-#define flatdirdata_mustreap(self)   0
-#define flatdirdata_write(self)      shared_rwlock_write(&(self)->fdd_lock)
-#define flatdirdata_write_nx(self)   shared_rwlock_write_nx(&(self)->fdd_lock)
-#define flatdirdata_trywrite(self)   shared_rwlock_trywrite(&(self)->fdd_lock)
-#define flatdirdata_endwrite(self)   (shared_rwlock_endwrite(&(self)->fdd_lock), flatdirdata_reap(self))
-#define _flatdirdata_endwrite(self)  shared_rwlock_endwrite(&(self)->fdd_lock)
-#define flatdirdata_read(self)       shared_rwlock_read(&(self)->fdd_lock)
-#define flatdirdata_read_nx(self)    shared_rwlock_read_nx(&(self)->fdd_lock)
-#define flatdirdata_tryread(self)    shared_rwlock_tryread(&(self)->fdd_lock)
-#define _flatdirdata_endread(self)   shared_rwlock_endread(&(self)->fdd_lock)
-#define flatdirdata_endread(self)    (void)(shared_rwlock_endread(&(self)->fdd_lock) && (flatdirdata_reap(self), 0))
-#define _flatdirdata_end(self)       shared_rwlock_end(&(self)->fdd_lock)
-#define flatdirdata_end(self)        (void)(shared_rwlock_end(&(self)->fdd_lock) && (flatdirdata_reap(self), 0))
-#define flatdirdata_upgrade(self)    shared_rwlock_upgrade(&(self)->fdd_lock)
-#define flatdirdata_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->fdd_lock)
-#define flatdirdata_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->fdd_lock)
-#define flatdirdata_downgrade(self)  shared_rwlock_downgrade(&(self)->fdd_lock)
-#define flatdirdata_reading(self)    shared_rwlock_reading(&(self)->fdd_lock)
-#define flatdirdata_writing(self)    shared_rwlock_writing(&(self)->fdd_lock)
-#define flatdirdata_canread(self)    shared_rwlock_canread(&(self)->fdd_lock)
-#define flatdirdata_canwrite(self)   shared_rwlock_canwrite(&(self)->fdd_lock)
+#define /*        */ _flatdirdata_reap(self)      (void)0
+#define /*        */ flatdirdata_reap(self)       (void)0
+#define /*        */ flatdirdata_mustreap(self)   0
+#define /*BLOCKING*/ flatdirdata_write(self)      shared_rwlock_write(&(self)->fdd_lock)
+#define /*BLOCKING*/ flatdirdata_write_nx(self)   shared_rwlock_write_nx(&(self)->fdd_lock)
+#define /*        */ flatdirdata_trywrite(self)   shared_rwlock_trywrite(&(self)->fdd_lock)
+#define /*        */ flatdirdata_endwrite(self)   (shared_rwlock_endwrite(&(self)->fdd_lock), flatdirdata_reap(self))
+#define /*        */ _flatdirdata_endwrite(self)  shared_rwlock_endwrite(&(self)->fdd_lock)
+#define /*BLOCKING*/ flatdirdata_read(self)       shared_rwlock_read(&(self)->fdd_lock)
+#define /*BLOCKING*/ flatdirdata_read_nx(self)    shared_rwlock_read_nx(&(self)->fdd_lock)
+#define /*        */ flatdirdata_tryread(self)    shared_rwlock_tryread(&(self)->fdd_lock)
+#define /*        */ _flatdirdata_endread(self)   shared_rwlock_endread(&(self)->fdd_lock)
+#define /*        */ flatdirdata_endread(self)    (void)(shared_rwlock_endread(&(self)->fdd_lock) && (flatdirdata_reap(self), 0))
+#define /*        */ _flatdirdata_end(self)       shared_rwlock_end(&(self)->fdd_lock)
+#define /*        */ flatdirdata_end(self)        (void)(shared_rwlock_end(&(self)->fdd_lock) && (flatdirdata_reap(self), 0))
+#define /*BLOCKING*/ flatdirdata_upgrade(self)    shared_rwlock_upgrade(&(self)->fdd_lock)
+#define /*BLOCKING*/ flatdirdata_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->fdd_lock)
+#define /*        */ flatdirdata_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->fdd_lock)
+#define /*        */ flatdirdata_downgrade(self)  shared_rwlock_downgrade(&(self)->fdd_lock)
+#define /*        */ flatdirdata_reading(self)    shared_rwlock_reading(&(self)->fdd_lock)
+#define /*        */ flatdirdata_writing(self)    shared_rwlock_writing(&(self)->fdd_lock)
+#define /*        */ flatdirdata_canread(self)    shared_rwlock_canread(&(self)->fdd_lock)
+#define /*        */ flatdirdata_canwrite(self)   shared_rwlock_canwrite(&(self)->fdd_lock)
 
 
 struct flatdirnode
@@ -715,10 +716,10 @@ NOTHROW(KCALL flatsuper_v_destroy)(struct mfile *__restrict self);
  * @return: * :   The file-node referenced by `self'.
  * @return: NULL: The given `self' was marked as deleted. */
 #ifdef __INTELLISENSE__
-WUNUSED REF struct fnode *
+BLOCKING WUNUSED REF struct fnode *
 flatsuper_opennode(struct flatdirnode *__restrict dir,
                    struct flatdirent *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_IOERROR, ...);
 #else /* __INTELLISENSE__ */
 #define flatsuper_opennode(dir, self) \
 	flatdirent_v_opennode(&(self)->fde_ent, _flatdirnode_asdir(dir))

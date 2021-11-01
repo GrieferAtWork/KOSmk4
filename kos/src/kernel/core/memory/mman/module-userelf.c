@@ -104,7 +104,7 @@
 DECL_BEGIN
 
 /************************************************************************/
-PRIVATE NONNULL((1)) UM_ElfW_ShdrP FCALL
+PRIVATE BLOCKING NONNULL((1)) UM_ElfW_ShdrP FCALL
 uem_shdrs(struct userelf_module *__restrict self) {
 	UM_ElfW_ShdrP result;
 	size_t shsize;
@@ -135,7 +135,7 @@ uem_shdrs(struct userelf_module *__restrict self) {
 	return self->um_shdrs;
 }
 
-PRIVATE NONNULL((1)) char *FCALL
+PRIVATE BLOCKING NONNULL((1)) char *FCALL
 uem_shstrtab(struct userelf_module *__restrict self) {
 	UM_ElfW_ShdrP shdrs;
 	UM_ElfW_Shdr *shstrtab;
@@ -204,7 +204,7 @@ NOTHROW(FCALL uem_get_tbase)(struct userelf_module *__restrict self) {
 }
 
 #if defined(__i386__) || (defined(__x86_64__) && defined(__ARCH_HAVE_COMPAT))
-PRIVATE WUNUSED NONNULL((1)) uint32_t FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1)) uint32_t FCALL
 scan_dynamic_for_DT_PLTGOT(struct mfile *__restrict file,
                            pos_t dynamic_offset,
                            size_t dynamic_count) {
@@ -233,7 +233,7 @@ done:
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) void const *
+PRIVATE BLOCKING WUNUSED NONNULL((1)) void const *
 NOTHROW(FCALL uem_get_dbase_386)(struct userelf_module *__restrict self) {
 #ifdef UM_HYBRID
 #define um_phdrs32 um_phdrs._32
@@ -270,7 +270,7 @@ done:
 }
 #endif /* __i386__ || (__x86_64__ && __ARCH_HAVE_COMPAT) */
 
-PRIVATE WUNUSED NONNULL((1)) void const *
+PRIVATE BLOCKING WUNUSED NONNULL((1)) void const *
 NOTHROW(FCALL uem_get_dbase)(struct userelf_module *__restrict self) {
 #if defined(__i386__) && !defined(__x86_64__)
 	return uem_get_dbase_386(self);
@@ -345,7 +345,7 @@ NOTHROW(FCALL uems_destroy)(struct userelf_module_section *__restrict self) {
 	}
 }
 
-INTERN WUNUSED NONNULL((1)) char const *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) char const *FCALL
 uems_getname(struct userelf_module_section *__restrict self) {
 	struct userelf_module *mod;
 	size_t stroffset;
@@ -362,14 +362,14 @@ uems_getname(struct userelf_module_section *__restrict self) {
 	return result;
 }
 
-INTERN WUNUSED NONNULL((1)) USER CHECKED byte_t *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *FCALL
 uems_getaddr(struct userelf_module_section *__restrict self) {
 	if (self->ms_flags & SHF_ALLOC)
 		return self->ums_useraddr;
 	return uems_getaddr_alias(self);
 }
 
-PRIVATE WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 uems_create_kernaddr_ex(struct userelf_module_section *__restrict self,
                         struct userelf_module *__restrict mod) {
 	assert(self->ms_size != 0);
@@ -384,7 +384,7 @@ uems_create_kernaddr_ex(struct userelf_module_section *__restrict self,
 	                          /* file_pos:    */ (pos_t)UM_field(mod, *self->ums_shdr, .sh_offset));
 }
 
-PRIVATE WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 uems_create_kernaddr(struct userelf_module_section *__restrict self) {
 	REF struct userelf_module *mod;
 	if unlikely(self->ms_size == 0)
@@ -398,7 +398,7 @@ uems_create_kernaddr(struct userelf_module_section *__restrict self) {
 
 
 
-INTERN WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 uems_getaddr_alias(struct userelf_module_section *__restrict self) {
 	byte_t *result;
 	if (self->ums_kernaddr != (KERNEL byte_t *)-1)
@@ -411,7 +411,7 @@ uems_getaddr_alias(struct userelf_module_section *__restrict self) {
 	return self->ums_kernaddr;
 }
 
-INTERN WUNUSED NONNULL((1, 2)) KERNEL byte_t *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *FCALL
 uems_getaddr_inflate(struct userelf_module_section *__restrict self,
                      size_t *__restrict psize) {
 	size_t sizeof_cdhr;
@@ -772,7 +772,7 @@ again:
 }
 
 
-INTERN WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL
 uem_locksection(struct userelf_module *__restrict self,
                 USER CHECKED char const *section_name) {
 	uint16_t i;
@@ -799,7 +799,7 @@ uem_locksection(struct userelf_module *__restrict self,
 }
 
 
-INTERN WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL
 uem_locksection_index(struct userelf_module *__restrict self,
                       unsigned int section_index) {
 	UM_ElfW_ShdrP shdrs;
@@ -812,7 +812,7 @@ uem_locksection_index(struct userelf_module *__restrict self,
 	                                  (uint16_t)section_index);
 }
 
-INTERN WUNUSED NONNULL((1, 3)) bool FCALL
+INTERN BLOCKING WUNUSED NONNULL((1, 3)) bool FCALL
 uem_sectinfo(struct userelf_module *__restrict self,
              uintptr_t module_relative_addr,
              struct module_sectinfo *__restrict info) {
@@ -979,7 +979,7 @@ done:
  *
  * This function is called without any locks held, and also
  * always returns without any locks held. */
-PRIVATE WUNUSED NONNULL((1, 2)) REF struct userelf_module *FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct userelf_module *FCALL
 uem_create_from_mapping(struct mman *__restrict self,
                         struct mfile *__restrict file,
                         USER CHECKED byte_t *node_addr,
@@ -1503,7 +1503,7 @@ AXREF(mfile_axref, mfile);
 
 
 /* Open the filesystem location for the given `rtld_fsfile' */
-PRIVATE WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
 open_system_rtld_fsfile(struct mfile_axref *__restrict rtld_fsfile,
                         struct fdirent *__restrict rtld_name) {
 	REF struct mfile *result;
@@ -1562,7 +1562,7 @@ again:
 
 /* Same as `uem_create_from_mapping()', but used for special
  * handling  concerning  the (or  "a") system  RTLD library. */
-PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) REF struct userelf_module *FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2, 3, 4)) REF struct userelf_module *FCALL
 uem_create_system_rtld(struct mman *__restrict self,
                        struct mfile *__restrict rtld_file,
                        struct mfile_axref *__restrict rtld_fsfile,
@@ -2042,7 +2042,7 @@ NOTHROW(KCALL clear_system_rtld_fsfile_cache)(void) {
  *        >> !mman_lock_acquired(self)
  *        An   exception   was  thrown
  */
-PRIVATE WUNUSED NONNULL((1, 2)) REF struct userelf_module *FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct userelf_module *FCALL
 uem_trycreate(struct mman *__restrict self,
               struct mnode *__restrict node,
               unsigned int skipped_neighbor = (unsigned int)-1) {
@@ -2316,7 +2316,7 @@ anon_mem_not_a_module:
 
 
 
-INTERN WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
 uem_fromaddr(struct mman *__restrict self,
              USER CHECKED void const *addr) {
 	REF struct userelf_module *result;
@@ -2359,7 +2359,7 @@ again:
 	return result;
 }
 
-INTERN WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
 uem_aboveaddr(struct mman *__restrict self,
               USER CHECKED void const *addr) {
 	REF struct userelf_module *result;
@@ -2417,7 +2417,7 @@ unlock_and_return_NULL:
 	return result;
 }
 
-INTERN WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
 uem_next(struct mman *__restrict self,
          struct module *__restrict prev) {
 	REF struct userelf_module *result;

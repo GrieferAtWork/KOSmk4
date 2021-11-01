@@ -121,8 +121,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct syslog_sink, ss_refcnt, syslog_sink_destroy)
  *  - An arch-specific default logging sink
  *  - The kernel's dmesg buffer (usually 16384 (0x4000) bytes large)
  *    that  contains  a  backlog  of  the  last  N  written packets. */
-FUNDEF bool KCALL syslog_sink_register(struct syslog_sink *__restrict self) THROWS(E_WOULDBLOCK, E_BAD_ARGUMENT);
-FUNDEF bool KCALL syslog_sink_unregister(struct syslog_sink *__restrict self) THROWS(E_WOULDBLOCK, E_BAD_ARGUMENT);
+FUNDEF bool KCALL syslog_sink_register(struct syslog_sink *__restrict self) THROWS(E_BADALLOC);
+FUNDEF bool KCALL syslog_sink_unregister(struct syslog_sink *__restrict self) THROWS(E_BADALLOC);
 
 /* Broadcast a given system log packet for all registered sinks to handle
  * Note   that   this  function   can   be  called   from   any  context! */

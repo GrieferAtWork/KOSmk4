@@ -309,16 +309,16 @@ NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder_norpc *__restrict self,
  * continuous), return `true'.
  * NOTE: If this function returns with an exception, `unlock' will
  *       also be invoked. */
-FUNDEF NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
 mbuilder_partlocks_acquire_or_unlock(struct mbuilder_norpc *__restrict self,
                                      struct unlockinfo *unlock)
-		THROWS(E_BADALLOC, E_WOULDBLOCK);
+		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
 
 /* Helper wrapper for `mbuilder_partlocks_acquire_or_unlock()' that
  * will  keep  on  attempting  the  operation  until  it  succeeds. */
 FUNDEF NONNULL((1)) void FCALL
 mbuilder_partlocks_acquire(struct mbuilder_norpc *__restrict self)
-		THROWS(E_BADALLOC, E_WOULDBLOCK);
+		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
 
 /* Release locks to all of the mapped mem-parts, as should have previously
  * been   acquired   during  a   call   to  `mbuilder_partlocks_acquire()' */
@@ -383,12 +383,12 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
  * @param: additional_actions: Additional actions to be atomically performed
  *                             alongside  the  setting of  the  new mem-node
  *                             mappings (set of `MBUILDER_APPLY_AA_*') */
-FUNDEF NONNULL((1, 2)) void KCALL
+FUNDEF BLOCKING NONNULL((1, 2)) void KCALL
 mbuilder_apply(struct mbuilder *__restrict self,
                struct mman *__restrict target,
                unsigned int additional_actions,
                struct mexecinfo *execinfo DFL(__NULLPTR))
-		THROWS(E_BADALLOC, E_WOULDBLOCK);
+		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
 #define MBUILDER_APPLY_AA_NOTHING      0x0000 /* No additional actions */
 #define MBUILDER_APPLY_AA_TERMTHREADS  0x0001 /* Terminate  all threads using `target', excluding the caller.
                                                * If the calling thread isn't using `target', simply terminate

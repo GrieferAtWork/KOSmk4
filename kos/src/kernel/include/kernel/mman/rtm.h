@@ -37,7 +37,7 @@ DECL_BEGIN
 struct icpustate;
 struct mrtm_hooks_struct {
 	/* [1..1] Begin transactional execution. */
-	ATTR_RETNONNULL NONNULL((1)) struct icpustate *
+	BLOCKING ATTR_RETNONNULL NONNULL((1)) struct icpustate *
 	(FCALL *rh_rtm_begin)(struct icpustate *__restrict state);
 };
 
@@ -51,7 +51,7 @@ NOTHROW(FCALL mrtm_setnosys)(struct icpustate *__restrict state);
  * This function is used to implement the `sys_rtm_begin()' system call,
  * in  the  event that  said system  call is  available for  the current
  * architecture. */
-LOCAL ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *FCALL
+LBLOCKING OCAL ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *FCALL
 mrtm_exec(struct mrtm_hooks_struct const *__restrict hooks,
           struct icpustate *__restrict state) {
 	return (*hooks->rh_rtm_begin)(state);

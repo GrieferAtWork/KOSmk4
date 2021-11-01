@@ -103,7 +103,7 @@ NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self,
  * path excluding the leading  path) of the given  module.
  * If the module doesn't have a path/name (s.a. the macros
  * above), then nothing will be printed. */
-PUBLIC NONNULL((1, 2)) ssize_t KCALL
+PUBLIC BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
 module_printpath(struct module *__restrict self,
                  pformatprinter printer, void *arg) {
 	ssize_t result = 0;
@@ -123,7 +123,7 @@ done:
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) ssize_t KCALL
+PUBLIC BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
 module_printname(struct module *__restrict self,
                  pformatprinter printer, void *arg) {
 	ssize_t result = 0;
@@ -131,7 +131,7 @@ module_printname(struct module *__restrict self,
 	u16 namelen;
 	if unlikely(self->md_fsname == NULL) {
 		if (module_isdriver(self)) {
-			name = ((struct driver *)self)->d_name;
+			name = module_asdriver(self)->d_name;
 			return (*printer)(arg, name, strlen(name));
 		}
 		goto done;
@@ -151,12 +151,12 @@ done:
 
 /* Return the name of the given module (or `NULL' if `!module_hasname(self)')
  * The returned pointer  is the  same as is  printed by  `module_printname()' */
-PUBLIC ATTR_PURE WUNUSED NONNULL((1)) char const *FCALL
-module_getname(struct module *__restrict self) {
+PUBLIC ATTR_PURE WUNUSED NONNULL((1)) char const *
+NOTHROW(FCALL module_getname)(struct module *__restrict self) {
 	char const *result;
 	if unlikely(self->md_fsname == NULL) {
 		if (module_isdriver(self))
-			return ((struct driver *)self)->d_name;
+			return module_asdriver(self)->d_name;
 		return NULL;
 	}
 	result = self->md_fsname->de_name;
@@ -166,7 +166,7 @@ module_getname(struct module *__restrict self) {
 }
 
 /* Try to print the module's path, and if that fails, print its name. */
-PUBLIC NONNULL((1, 2)) ssize_t KCALL
+PUBLIC BLOCKING_IF(BLOCKING(printer)) NONNULL((1, 2)) ssize_t KCALL
 module_printpath_or_name(struct module *__restrict self,
                          pformatprinter printer, void *arg) {
 	ssize_t result = 0;
@@ -181,7 +181,7 @@ module_printpath_or_name(struct module *__restrict self,
 		                    self->md_fsname->de_namelen);
 	} else if (module_isdriver(self)) {
 		char const *name;
-		name = ((struct driver *)self)->d_name;
+		name = module_asdriver(self)->d_name;
 		return (*printer)(arg, name, strlen(name));
 	}
 	return result;
@@ -382,7 +382,7 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
  * user-space address, in  which case  memory mappings of  that address  are
  * inspected in order to check if a module has been loaded to that location.
  * If no module exists at `addr', return `NULL'. */
-PUBLIC WUNUSED REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED REF struct module *FCALL
 module_fromaddr(USER CHECKED void const *addr) {
 #ifdef CONFIG_HAVE_USERELF_MODULES
 	if (ADDR_ISUSER(addr))
@@ -396,7 +396,7 @@ module_fromaddr(USER CHECKED void const *addr) {
 /* Search for, and return a reference to the lowest available module, such
  * that  `return->md_loadstart >= addr'. If no  such module exists, simply
  * return `NULL' instead. */
-PUBLIC WUNUSED REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED REF struct module *FCALL
 module_aboveaddr(USER CHECKED void const *addr) {
 #ifdef CONFIG_HAVE_USERELF_MODULES
 #ifdef KERNELSPACE_HIGHMEM
@@ -427,7 +427,7 @@ module_aboveaddr(USER CHECKED void const *addr) {
 /* Return  a  reference  to  the  first  module  different  from  `prev',  such  that
  * `return->md_loadstart > prev->md_loadstart'.  When   `prev == NULL',  return   the
  * first module, which is the same as returned by `module_aboveaddr((void const *)0)' */
-PUBLIC WUNUSED REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED REF struct module *FCALL
 module_next(struct module *prev) {
 #ifdef CONFIG_HAVE_USERELF_MODULES
 	if (!prev)
@@ -473,7 +473,7 @@ module_next(struct module *prev) {
 #ifdef _MODULE_FROMADDR_IS_NOTHROW
 DEFINE_PUBLIC_ALIAS(module_fromaddr_nx, module_fromaddr);
 #else /* _MODULE_FROMADDR_IS_NOTHROW */
-PUBLIC WUNUSED REF struct module *
+PUBLIC BLOCKING WUNUSED REF struct module *
 NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr) {
 	REF struct module *result;
 	NESTED_TRY {
@@ -488,7 +488,7 @@ NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr) {
 #ifdef _MODULE_ABOVEADDR_IS_NOTHROW
 DEFINE_PUBLIC_ALIAS(module_aboveaddr_nx, module_aboveaddr);
 #else /* _MODULE_ABOVEADDR_IS_NOTHROW */
-PUBLIC WUNUSED REF struct module *
+PUBLIC BLOCKING WUNUSED REF struct module *
 NOTHROW(FCALL module_aboveaddr_nx)(USER CHECKED void const *addr) {
 	REF struct module *result;
 	NESTED_TRY {
@@ -503,7 +503,7 @@ NOTHROW(FCALL module_aboveaddr_nx)(USER CHECKED void const *addr) {
 #ifdef _MODULE_NEXT_IS_NOTHROW
 DEFINE_PUBLIC_ALIAS(module_next_nx, module_next);
 #else /* _MODULE_NEXT_IS_NOTHROW */
-PUBLIC WUNUSED REF struct module *
+PUBLIC BLOCKING WUNUSED REF struct module *
 NOTHROW(FCALL module_next_nx)(struct module *prev) {
 	REF struct module *result;
 	NESTED_TRY {
@@ -521,7 +521,7 @@ NOTHROW(FCALL module_next_nx)(struct module *prev) {
  * `addr', operate exclusively on the given mman `self'
  * @param: self: The mman who's modules should be enumerated. */
 #ifdef CONFIG_HAVE_USERELF_MODULES
-PUBLIC WUNUSED NONNULL((1)) REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_fromaddr(struct mman *__restrict self,
                      USER CHECKED void const *addr) {
 	if (self == &mman_kernel)
@@ -533,7 +533,7 @@ mman_module_fromaddr(struct mman *__restrict self,
 #endif /* !CONFIG_HAVE_USERELF_MODULES */
 }
 
-PUBLIC WUNUSED NONNULL((1)) REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_aboveaddr(struct mman *__restrict self,
                       USER CHECKED void const *addr) {
 	if (self == &mman_kernel)
@@ -545,7 +545,7 @@ mman_module_aboveaddr(struct mman *__restrict self,
 #endif /* !CONFIG_HAVE_USERELF_MODULES */
 }
 
-PUBLIC WUNUSED NONNULL((1)) REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_next(struct mman *__restrict self, struct module *prev) {
 	if (self == &mman_kernel)
 		return driver_next(prev);
@@ -556,7 +556,7 @@ mman_module_next(struct mman *__restrict self, struct module *prev) {
 #endif /* !CONFIG_HAVE_USERELF_MODULES */
 }
 
-PUBLIC WUNUSED NONNULL((1)) REF struct module *
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
 NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self,
                                        USER CHECKED void const *addr) {
 	REF struct module *result;
@@ -568,7 +568,7 @@ NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self,
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) REF struct module *
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
 NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self,
                                         USER CHECKED void const *addr) {
 	REF struct module *result;
@@ -580,7 +580,7 @@ NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self,
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) REF struct module *
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
 NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self,
                                    struct module *prev) {
 	REF struct module *result;
@@ -593,14 +593,14 @@ NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self,
 }
 
 #else /* CONFIG_HAVE_USERELF_MODULES */
-PUBLIC WUNUSED NONNULL((1)) REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_fromaddr(struct mman *__restrict self,
                      USER CHECKED void const *addr) {
 	if (self == &mman_kernel)
 		return driver_fromaddr(addr);
 	return NULL;
 }
-PUBLIC WUNUSED NONNULL((1)) REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_aboveaddr(struct mman *__restrict self,
                       USER CHECKED void const *addr) {
 	if (self == &mman_kernel)
@@ -608,7 +608,7 @@ mman_module_aboveaddr(struct mman *__restrict self,
 	return NULL;
 }
 
-PUBLIC WUNUSED NONNULL((1)) REF struct module *FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_next(struct mman *__restrict self, struct module *prev) {
 	if (self == &mman_kernel)
 		return driver_next(prev);
@@ -681,7 +681,7 @@ unwind_userspace_with_section(struct module *__restrict mod, void const *absolut
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE NONNULL((2, 4)) unsigned int LIBUNWIND_CC
+PRIVATE BLOCKING ATTR_NOINLINE NONNULL((2, 4)) unsigned int LIBUNWIND_CC
 unwind_userspace(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
@@ -750,7 +750,7 @@ unwind_userspace(void const *absolute_pc,
 }
 
 
-PUBLIC NONNULL((2, 4)) unsigned int LIBDEBUGINFO_CC
+PUBLIC BLOCKING NONNULL((2, 4)) unsigned int LIBDEBUGINFO_CC
 unwind_for_debug(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {

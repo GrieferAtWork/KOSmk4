@@ -222,7 +222,7 @@ NOTHROW(FCALL ramfs_dirent_fixdeleted)(struct ramfs_dirent *__restrict self,
 }
 
 /* Returns `NULL' if there is no next node */
-PRIVATE WUNUSED NONNULL((1, 2)) REF struct ramfs_dirent *KCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct ramfs_dirent *KCALL
 ramfs_dirent_next(struct ramfs_dirent *__restrict self,
                   struct ramfs_dirnode *__restrict dir)
 		THROWS(...) {
@@ -242,10 +242,10 @@ ramfs_dirent_next(struct ramfs_dirent *__restrict self,
 	return result;
 }
 
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 ramfs_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                         size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
-		THROWS(...) {
+		THROWS(E_SEGFAULT, E_WOULDBLOCK, ...) {
 	ssize_t result;
 	REF struct ramfs_dirent *ent;
 	struct ramfs_direnum *me = (struct ramfs_direnum *)self;
@@ -302,10 +302,10 @@ NOTHROW(FCALL ramfs_dir_count_entries)(struct ramfs_dirnode const *__restrict se
 	return result;
 }
 
-PUBLIC NONNULL((1)) pos_t KCALL
+PUBLIC BLOCKING NONNULL((1)) pos_t KCALL
 ramfs_direnum_v_seekdir(struct fdirenum *__restrict self,
                         off_t offset, unsigned int whence)
-		THROWS(...) {
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	pos_t result;
 	REF struct ramfs_dirent *oldent;
 	REF struct ramfs_dirent *newent;
@@ -314,7 +314,7 @@ ramfs_direnum_v_seekdir(struct fdirenum *__restrict self,
 again:
 	oldent = axref_get(&me->rde_next);
 	TRY {
-		ramfs_dirdata_treelock_write(&dir->rdn_dat);
+		ramfs_dirdata_treelock_read(&dir->rdn_dat);
 	} EXCEPT {
 		xdecref_unlikely(oldent);
 		RETHROW();
@@ -410,7 +410,7 @@ do_seek_end:
 	}	break;
 
 	default:
-		ramfs_dirdata_treelock_endwrite(&dir->rdn_dat);
+		ramfs_dirdata_treelock_endread(&dir->rdn_dat);
 		xdecref_unlikely(oldent);
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
@@ -418,7 +418,7 @@ do_seek_end:
 		break;
 	}
 	xincref(newent);
-	ramfs_dirdata_treelock_endwrite(&dir->rdn_dat);
+	ramfs_dirdata_treelock_endread(&dir->rdn_dat);
 	xdecref_unlikely(oldent); /* Returned by `axref_get()' */
 	if (!axref_cmpxch_inherit_new(&me->rde_next, oldent, newent)) {
 		xdecref_unlikely(newent); /* Not inherited on cmpxch failure. */
@@ -544,9 +544,10 @@ NOTHROW(KCALL ramfs_dirnode_v_destroy)(struct mfile *__restrict self) {
 	fnode_v_destroy(self);
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
-                       struct flookup_info *__restrict info) {
+                       struct flookup_info *__restrict info)
+		THROWS(E_SEGFAULT, E_WOULDBLOCK, ...) {
 	REF struct fdirent *ret = NULL;
 	struct ramfs_dirent *result;
 	struct ramfs_dirnode *me;
@@ -596,7 +597,7 @@ ramfs_dirnode_v_enum(struct fdirenum *__restrict result) {
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
                               struct fmkfile_info *__restrict info)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION) {
+		THROWS(E_BADALLOC, E_FSERROR_UNSUPPORTED_OPERATION) {
 	REF struct fnode *result;
 
 	/* Allocate the new file-node */
@@ -681,12 +682,11 @@ ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
 
 
 
-PUBLIC NONNULL((1, 2)) unsigned int KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
                        struct fmkfile_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
-		       E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED) {
+		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DELETED,
+		       E_FSERROR_UNSUPPORTED_OPERATION, ...) {
 	struct ramfs_dirent *old_dirent;
 	REF struct ramfs_dirent *new_dirent;
 	REF struct fnode *new_node;
@@ -844,12 +844,11 @@ again_acquire_lock_for_insert:
 	return FDIRNODE_MKFILE_SUCCESS;
 }
 
-PUBLIC NONNULL((1, 2, 3)) unsigned int KCALL
+PUBLIC BLOCKING NONNULL((1, 2, 3)) unsigned int KCALL
 ramfs_dirnode_v_unlink(struct fdirnode *__restrict self,
                        struct fdirent *__restrict entry,
                        struct fnode *__restrict file)
-		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
-		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
+		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY, ...) {
 	struct ramfs_dirent *known_entry;
 	struct ramfs_dirnode *me = (struct ramfs_dirnode *)self;
 again:
@@ -927,11 +926,10 @@ again:
 }
 
 
-PUBLIC NONNULL((1, 2)) unsigned int KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
                        struct frename_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
+		THROWS(E_FSERROR_ILLEGAL_PATH, ...) {
 	struct ramfs_dirent *new_dirent;
 	struct ramfs_dirnode *me     = (struct ramfs_dirnode *)self;
 	struct ramfs_dirnode *olddir = (struct ramfs_dirnode *)info->frn_olddir;

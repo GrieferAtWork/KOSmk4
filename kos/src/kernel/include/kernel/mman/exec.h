@@ -49,10 +49,10 @@ struct execargs; /* from <kernel/execabi.h> */
  * @throw: E_BADALLOC:       Insufficient memory.
  * @throw: E_SEGFAULT:       The given `ea_argv', `ea_envp', or one of their pointed-to strings is faulty.
  * @throw: E_NOT_EXECUTABLE: The given `ea_xfile' was not recognized as an acceptable binary. */
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF BLOCKING NONNULL((1)) void KCALL
 mman_exec(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT,
-		       E_NOT_EXECUTABLE, E_IOERROR);
+		       E_NOT_EXECUTABLE, E_IOERROR, ...);
 
 DECL_END
 #endif /* __CC__ */

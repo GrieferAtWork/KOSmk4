@@ -51,10 +51,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fifohandle, fu_refcnt, fifohandle_destroy)
  *       and/or `fu_dirent' directly after calling this function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK' (other bits are silently ignored)
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifohandle *FCALL
+FUNDEF BLOCKING ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifohandle *FCALL
 fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
                struct path *access_path, struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE);
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE, ...);
 
 DECL_END
 #endif /* __CC__ */

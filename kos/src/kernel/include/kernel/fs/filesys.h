@@ -139,9 +139,10 @@ struct ffilesys {
 		 * @param: dev: [0..0][FFILESYS_F_NODEV] Always NULL
 		 * @return: * : A new instance of a superblock for `dev'
 		 * @return: NULL: `dev' cannot be mounted using this filesystem. */
-		WUNUSED NONNULL((1)) struct fsuper *
+		BLOCKING WUNUSED NONNULL((1)) struct fsuper *
 		(KCALL *ffs_open)(struct ffilesys *__restrict filesys,
-		                  struct mfile *dev, UNCHECKED USER char *args);
+		                  struct mfile *dev, UNCHECKED USER char *args)
+				THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
 
 		/* [1..1][valid_if(FFILESYS_F_SINGLE)]
 		 * Singleton instance of a superblock associated with this filesystem type. */
@@ -197,11 +198,16 @@ DATDEF struct lockop_slist ffilesys_formats_lops;   /* Lock operations for `ffil
  *                                 be made globally  visible, and if  mounting should  be
  *                                 aborted, you can simply destroy() (or decref()) it.
  * @return: NULL: `FFILESYS_F_NODEV' isn't set, and `dev' cannot be mounted as a
- *                filesystem of this type. */
-FUNDEF WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+ *                filesystem of this type.
+ * @throw: E_FSERROR_NOT_A_BLOCK_DEVICE:    `dev' cannot be used to mount superblocks.
+ * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM: The filesystem type was matched, but the on-disk
+ *                                          filesystem doesn't appear to make any sense. It
+ *                                          looks like it's been corrupted... :( */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_open(struct ffilesys *__restrict self,
               struct mfile *dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE);
+		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_NOT_A_BLOCK_DEVICE,
+		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
 
 /* Helper wrapper for `ffilesys_open()' that blindly goes through all  filesystem
  * types and tries to open `dev' with each of those needing a device, that aren't
@@ -211,9 +217,10 @@ ffilesys_open(struct ffilesys *__restrict self,
  *                be made globally  visible, and if  mounting should  be
  *                aborted, you can simply destroy() (or decref()) it.
  * @return: NULL: `dev' doesn't contain any known filesystem. */
-FUNDEF WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE);
+		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE,
+		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
 
 
 /* Lookup a filesystem type, given its name.
@@ -242,7 +249,9 @@ NOTHROW(FCALL ffilesys_unregister)(struct ffilesys *__restrict self);
  * when `prev' has been unloaded, this function will also return the
  * first (still-registered) filesystem type. */
 FUNDEF WUNUSED REF struct ffilesys *FCALL
-ffilesys_next(struct ffilesys *prev) THROWS(E_WOULDBLOCK);
+ffilesys_next(struct ffilesys *prev)
+		THROWS(E_WOULDBLOCK);
+
 
 DECL_END
 #endif /* __CC__ */

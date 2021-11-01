@@ -49,12 +49,12 @@ DECL_BEGIN
 /* Default operator for opening ffifonode files. This will  construct
  * a `struct fifohandle' (HANDLE_TYPE_FIFOHANDLE) object and write it
  * back to `hand'. */
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 ffifonode_v_open(struct mfile *__restrict self,
                  struct handle *__restrict hand,
                  struct path *access_path,
                  struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE, ...) {
 	struct ffifonode *me;
 	REF struct fifohandle *obj;
 	assert(hand->h_data == self);
@@ -69,7 +69,7 @@ ffifonode_v_open(struct mfile *__restrict self,
 	decref_nokill(self);
 }
 
-PUBLIC WUNUSED NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 ffifonode_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
@@ -114,7 +114,7 @@ done:
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 ffifonode_v_readv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
                   size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t temp, result = 0;
@@ -167,7 +167,7 @@ again_read_ent:
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 ffifonode_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
                   size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
@@ -223,7 +223,7 @@ done:
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 ffifonode_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
                    size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t temp, result = 0;
@@ -294,7 +294,7 @@ again_write_ent:
 /* Does `ringbuffer_setwritten()' */
 PUBLIC NONNULL((1)) void KCALL
 ffifonode_v_truncate(struct mfile *__restrict self, pos_t new_size)
-		THROWS(...) {
+		THROWS(E_WOULDBLOCK) {
 	struct ffifonode *me = mfile_asfifo(self);
 	ringbuffer_setwritten(&me->ff_buffer, (size_t)new_size);
 }
@@ -303,7 +303,7 @@ ffifonode_v_truncate(struct mfile *__restrict self, pos_t new_size)
 PUBLIC NONNULL((1)) void KCALL
 ffifonode_v_stat(struct mfile *__restrict self,
                  USER CHECKED struct stat *result)
-		THROWS(...) {
+		THROWS(E_SEGFAULT) {
 	struct ffifonode *me;
 	size_t avail;
 	me    = mfile_asfifo(self);
@@ -321,7 +321,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode)
-		THROWS(...) {
+		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	struct ffifonode *me = mfile_asfifo(self);
 	switch (cmd) {
 

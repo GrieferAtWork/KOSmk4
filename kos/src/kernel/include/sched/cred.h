@@ -230,7 +230,7 @@ NOTHROW(FCALL credcap_turnoff)(struct credcap *__restrict self,
 	self->cc_caps[icap / 8] &= ~(1 << (icap % 8));
 }
 
-LOCAL NOBLOCK NONNULL((1)) void
+LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL credcap_copyfrom)(struct credcap *__restrict self,
                                 struct credcap const *__restrict src,
                                 syscall_slong_t capno) {

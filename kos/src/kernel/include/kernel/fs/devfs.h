@@ -80,11 +80,11 @@ DEFINE_REFCOUNT_FUNCTIONS(struct devdirent, dd_dirent.fd_refcnt, devdirent_destr
 
 struct device
 #ifndef __WANT_FS_INLINE_STRUCTURES
-    : fdevnode                   /* Underlying dev-node */
+    : fdevnode                        /* Underlying dev-node */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
 #ifdef __WANT_FS_INLINE_STRUCTURES
-	struct fdevnode dv_devnode; /* Underlying dev-node */
+	struct fdevnode       dv_devnode; /* Underlying dev-node */
 #define _device_asdevnode(x) &(x)->dv_devnode
 #define _device_devnode_     dv_devnode.
 #else /* __WANT_FS_INLINE_STRUCTURES */
@@ -103,20 +103,18 @@ struct device
 	 * >> mfile_delete(somedev); // This also sets the `MFILE_F_DELETED' flag
 	 * >> decref(somedev);
 	 * >> // At this point, the device will lazily unload itself. */
-	REF struct driver       *dv_driver;      /* [1..1][const] The kernel driver implementing this device. */
+	REF struct driver    *dv_driver;      /* [1..1][const] The kernel driver implementing this device. */
 	REF struct devdirent *dv_dirent;      /* [1..1][lock(:devfs_byname_lock + _MFILE_F_SMP_TSLOCK)][const_if(wasdestroyed(this))]
-	                                          * Device directory entry (including its name) */
-	RBTREE_NODE(device)      dv_byname_node; /* [lock(:devfs_byname_lock)] By-name tree of devfs devices.
-	                                          * When `.rb_lhs == DEVICE_BYNAME_DELETED', then this  entry
-	                                          * has been deleted. */
+	                                       * Device directory entry (including its name) */
+	RBTREE_NODE(device)   dv_byname_node; /* [lock(:devfs_byname_lock)] By-name tree of devfs devices.
+	                                       * When `.rb_lhs == DEVICE_BYNAME_DELETED', then this  entry
+	                                       * has been deleted. */
 #define DEVICE_BYNAME_DELETED ((struct device *)-1)
 };
 
 #ifdef __WANT_FS_INLINE_STRUCTURES
-#define __device_destroy(self) mfile_destroy(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(self))))
-__DEFINE_REFCOUNT_FUNCTIONS(struct device,
-                            _device_devnode_ _fdevnode_node_ _fnode_file_ mf_refcnt,
-                            __device_destroy)
+#define __struct_device_destroy(self) mfile_destroy(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(self))))
+__DEFINE_REFCOUNT_FUNCTIONS(struct device, _device_devnode_ _fdevnode_node_ _fnode_file_ mf_refcnt, __struct_device_destroy)
 #endif /* __WANT_FS_INLINE_STRUCTURES */
 
 /* Default operators for `struct device_ops' */
@@ -133,7 +131,8 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
  * device file has been unlink(2)'d from /dev/!) */
 FUNDEF WUNUSED NONNULL((1)) REF void *KCALL
 device_v_tryas(struct mfile *__restrict self,
-               uintptr_half_t wanted_type) THROWS(...);
+               uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK);
 /* Device stream operators (simply only devices `.mso_tryas = &device_v_tryas') */
 DATDEF struct mfile_stream_ops const device_v_stream_ops;
 
@@ -243,26 +242,26 @@ FUNDEF NOBLOCK void NOTHROW(KCALL _devfs_byname_reap)(void);
 #else /* __OPTIMIZE_SIZE__ */
 #define devfs_byname_reap() (void)(!lockop_mustreap(&devfs_byname_lops) || (_devfs_byname_reap(), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
-#define devfs_byname_write()      shared_rwlock_write(&devfs_byname_lock)
-#define devfs_byname_write_nx()   shared_rwlock_write_nx(&devfs_byname_lock)
-#define devfs_byname_trywrite()   shared_rwlock_trywrite(&devfs_byname_lock)
-#define devfs_byname_endwrite()   (shared_rwlock_endwrite(&devfs_byname_lock), devfs_byname_reap())
-#define _devfs_byname_endwrite()  shared_rwlock_endwrite(&devfs_byname_lock)
-#define devfs_byname_read()       shared_rwlock_read(&devfs_byname_lock)
-#define devfs_byname_read_nx()    shared_rwlock_read_nx(&devfs_byname_lock)
-#define devfs_byname_tryread()    shared_rwlock_tryread(&devfs_byname_lock)
-#define _devfs_byname_endread()   shared_rwlock_endread(&devfs_byname_lock)
-#define devfs_byname_endread()    (void)(shared_rwlock_endread(&devfs_byname_lock) && (devfs_byname_reap(), 0))
-#define _devfs_byname_end()       shared_rwlock_end(&devfs_byname_lock)
-#define devfs_byname_end()        (void)(shared_rwlock_end(&devfs_byname_lock) && (devfs_byname_reap(), 0))
-#define devfs_byname_upgrade()    shared_rwlock_upgrade(&devfs_byname_lock)
-#define devfs_byname_upgrade_nx() shared_rwlock_upgrade_nx(&devfs_byname_lock)
-#define devfs_byname_tryupgrade() shared_rwlock_tryupgrade(&devfs_byname_lock)
-#define devfs_byname_downgrade()  shared_rwlock_downgrade(&devfs_byname_lock)
-#define devfs_byname_reading()    shared_rwlock_reading(&devfs_byname_lock)
-#define devfs_byname_writing()    shared_rwlock_writing(&devfs_byname_lock)
-#define devfs_byname_canread()    shared_rwlock_canread(&devfs_byname_lock)
-#define devfs_byname_canwrite()   shared_rwlock_canwrite(&devfs_byname_lock)
+#define /*BLOCKING*/ devfs_byname_write()      shared_rwlock_write(&devfs_byname_lock)
+#define /*BLOCKING*/ devfs_byname_write_nx()   shared_rwlock_write_nx(&devfs_byname_lock)
+#define /*        */ devfs_byname_trywrite()   shared_rwlock_trywrite(&devfs_byname_lock)
+#define /*        */ devfs_byname_endwrite()   (shared_rwlock_endwrite(&devfs_byname_lock), devfs_byname_reap())
+#define /*        */ _devfs_byname_endwrite()  shared_rwlock_endwrite(&devfs_byname_lock)
+#define /*BLOCKING*/ devfs_byname_read()       shared_rwlock_read(&devfs_byname_lock)
+#define /*BLOCKING*/ devfs_byname_read_nx()    shared_rwlock_read_nx(&devfs_byname_lock)
+#define /*        */ devfs_byname_tryread()    shared_rwlock_tryread(&devfs_byname_lock)
+#define /*        */ _devfs_byname_endread()   shared_rwlock_endread(&devfs_byname_lock)
+#define /*        */ devfs_byname_endread()    (void)(shared_rwlock_endread(&devfs_byname_lock) && (devfs_byname_reap(), 0))
+#define /*        */ _devfs_byname_end()       shared_rwlock_end(&devfs_byname_lock)
+#define /*        */ devfs_byname_end()        (void)(shared_rwlock_end(&devfs_byname_lock) && (devfs_byname_reap(), 0))
+#define /*BLOCKING*/ devfs_byname_upgrade()    shared_rwlock_upgrade(&devfs_byname_lock)
+#define /*BLOCKING*/ devfs_byname_upgrade_nx() shared_rwlock_upgrade_nx(&devfs_byname_lock)
+#define /*        */ devfs_byname_tryupgrade() shared_rwlock_tryupgrade(&devfs_byname_lock)
+#define /*        */ devfs_byname_downgrade()  shared_rwlock_downgrade(&devfs_byname_lock)
+#define /*        */ devfs_byname_reading()    shared_rwlock_reading(&devfs_byname_lock)
+#define /*        */ devfs_byname_writing()    shared_rwlock_writing(&devfs_byname_lock)
+#define /*        */ devfs_byname_canread()    shared_rwlock_canread(&devfs_byname_lock)
+#define /*        */ devfs_byname_canwrite()   shared_rwlock_canwrite(&devfs_byname_lock)
 
 /* Devfs by-name tree operations. (For `devfs_byname_tree') */
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL devfs_bynametree_insert)(struct device **__restrict proot, struct device *__restrict node);
@@ -272,9 +271,11 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct device *NOTHROW(FCALL devfs_bynametre
 
 /* Helper macros for operating on `devfs_byname_tree' while holding the proper lock to `devfs_byname_lock' */
 FUNDEF ATTR_PURE WUNUSED struct device *FCALL
-devfs_byname_locate(USER CHECKED char const *name, u16 namelen) THROWS(E_SEGFAULT);
+devfs_byname_locate(USER CHECKED char const *name, u16 namelen)
+		THROWS(E_SEGFAULT);
 FUNDEF ATTR_PURE WUNUSED struct device *FCALL
-devfs_byname_caselocate(USER CHECKED char const *name, u16 namelen) THROWS(E_SEGFAULT);
+devfs_byname_caselocate(USER CHECKED char const *name, u16 namelen)
+		THROWS(E_SEGFAULT);
 #define devfs_byname_insert(node)     devfs_bynametree_insert(&devfs_byname_tree, node)
 #define devfs_byname_removenode(node) devfs_bynametree_removenode(&devfs_byname_tree, node)
 
@@ -292,7 +293,7 @@ devfs_byname_caselocate(USER CHECKED char const *name, u16 namelen) THROWS(E_SEG
  *  - self->_device_devnode_ _fdevnode_node_ fn_supent
  *  - self->dv_byname_node
  * @return: * : One of `DEVICE_TRYREGISTER_*' */
-FUNDEF NONNULL((1)) unsigned int FCALL
+FUNDEF WUNUSED NONNULL((1)) unsigned int FCALL
 device_tryregister(struct device *__restrict self)
 		THROWS(E_WOULDBLOCK);
 #define DEVICE_TRYREGISTER_SUCCESS      0 /* Success. */
@@ -317,10 +318,8 @@ device_register(struct device *__restrict self)
 
 /* The following are used internally to implement `device_register()' */
 FUNDEF void FCALL _device_register_lock_acquire(__BOOL allnodes) THROWS(E_WOULDBLOCK);
-FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
-NOTHROW(FCALL _device_register_inuse_name)(char const *__restrict name, u16 len);
-FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
-NOTHROW(FCALL _device_register_inuse_ino)(ino_t ino);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL _device_register_inuse_name)(char const *__restrict name, u16 len);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL _device_register_inuse_ino)(ino_t ino);
 FUNDEF NOBLOCK void NOTHROW(FCALL _device_register_lock_release)(__BOOL allnodes);
 
 

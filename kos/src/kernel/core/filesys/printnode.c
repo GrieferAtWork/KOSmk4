@@ -45,7 +45,7 @@ DECL_BEGIN
 PUBLIC NONNULL((1)) void KCALL /* Writes `0' into `st_size' and `st_blocks' */
 printnode_v_stat(struct mfile *__restrict UNUSED(self),
                  USER CHECKED struct stat *result)
-		THROWS(...) {
+		THROWS(E_SEGFAULT) {
 	result->st_size   = 0;
 	result->st_blocks = 0;
 }
@@ -84,9 +84,10 @@ vprinter_cb(void *arg, char const *__restrict data, size_t datalen) {
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) size_t KCALL /* Populates `dst' via `pno_print' */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL /* Populates `dst' via `pno_print' */
 printnode_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
-                  size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+                  size_t num_bytes, pos_t addr, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, ...) {
 	struct vprinter_data data;
 	struct printnode_ops const *ops;
 	struct printnode *me;
@@ -186,9 +187,10 @@ vvprinter_cb(void *arg, char const *__restrict data, size_t datalen) {
 	return 0;
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 printnode_v_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
-                   size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+                   size_t num_bytes, pos_t addr, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, ...) {
 	struct vvprinter_data data;
 	struct printnode_ops const *ops;
 	struct printnode *me;
@@ -263,10 +265,11 @@ pprinter_cb(void *arg, char const *__restrict data, size_t datalen) {
 }
 
 
-PUBLIC NONNULL((1, 5)) void KCALL /* Populates `buf' via `pno_print' */
+PUBLIC BLOCKING NONNULL((1, 5)) void KCALL /* Populates `buf' via `pno_print' */
 printnode_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                        physaddr_t buf, size_t num_bytes,
-                       struct aio_multihandle *__restrict UNUSED(aio)) {
+                       struct aio_multihandle *__restrict UNUSED(aio))
+		THROWS(...) {
 	struct pprinter_data data;
 	struct printnode_ops const *ops;
 	struct printnode *me;

@@ -178,9 +178,9 @@ NOTHROW(FCALL _mnode_list_maps)(struct mnode_list const *__restrict self,
  * `mpart_unsharecow_or_unlock()' in  order to  populate+unshare
  * (if  PROT_WRITE was  set) the  file-range that  our caller is
  * intending to map. */
-PRIVATE WUNUSED NONNULL((1)) bool FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct mnode *node;
 	struct mfile_map_unlockall_except_info unlock;
 	assert(self->mfm_flags & MAP_POPULATE);
@@ -277,9 +277,9 @@ fail:
  *    sure that all of the parts still form 1 uninterrupted
  *    mapping over the given address range in its entirety
  *  - Release locks to all of the parts */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING_IF(self->mfm_flags & MAP_POPULATE) NONNULL((1)) void FCALL
 _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...) {
 	struct mfile *file;
 	struct mnode *node;
 	REF struct mpart *part;
@@ -761,10 +761,10 @@ continue_with_pnode:
  * Otherwise, don't invoke `unlock' and return `true'.
  * NOTE: In the case of an exception, `unlock' is guarantied to be invoked
  *       prior to the exception being thrown. */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC BLOCKING_IF(self->mfm_flags & MAP_POPULATE) NONNULL((1)) bool FCALL
 mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
                             struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_FSERROR_READONLY, ...) {
 	struct mfile *file;
 	pos_t block_aligned_addr;
 	size_t block_aligned_size;
@@ -853,10 +853,10 @@ fail:
  * caller must already be holding locks  to every mem-part mapped by  `self'
  * However,  use of `mfile_map_acquire_or_unlock()' is still more efficient,
  * since that function can do some tricks which this one can't (see impl)! */
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+PUBLIC BLOCKING_IF(self->mfm_flags & MAP_POPULATE) WUNUSED NONNULL((1)) bool FCALL
 mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
                            struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...) {
 	struct mfile *file;
 	pos_t block_aligned_addr;
 	size_t block_aligned_size;
@@ -911,9 +911,9 @@ fail:
 
 /* Same as all of the  functions above, but includes  support
  * for creating reserved nodes when `self->mfm_file == NULL'. */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING_IF(self->mfm_file != NULL && self->mfm_flags & MAP_POPULATE) NONNULL((1)) void FCALL
 _mfile_map_init_and_acquire_or_reserved(struct mfile_map *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...) {
 	if (self->mfm_file != NULL) {
 		_mfile_map_init_and_acquire(self);
 	} else {

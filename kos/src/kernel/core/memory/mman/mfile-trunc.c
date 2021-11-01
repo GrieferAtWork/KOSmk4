@@ -156,9 +156,10 @@ NOTHROW(FCALL mfile_unlock_and_decref_whole_tree)(struct mfile *__restrict self)
  *
  * When no parts with init-blocks above `minaddr' are found, don't release any locks
  * and return `true'. */
-PRIVATE WUNUSED NONNULL((1)) bool FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__restrict self,
-                                                             pos_t minaddr) {
+                                                             pos_t minaddr)
+		THROWS(...) {
 	struct mpart *iter;
 	struct mpart_tree_minmax mima;
 	mpart_tree_minmaxlocate(self->mf_parts, minaddr, (pos_t)-1, &mima);
@@ -241,10 +242,10 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
  *
  * @throw: E_FSERROR_READONLY:     The `MFILE_F_FIXEDFILESIZE' flag was set.
  * @throw: E_FSERROR_FILE_TOO_BIG: `new_size' is greater than the fs-specific limit. */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 mfile_truncate(struct mfile *__restrict self, pos_t new_size)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY,
-		       E_FSERROR_FILE_TOO_BIG) {
+		       E_FSERROR_FILE_TOO_BIG, ...) {
 	pos_t old_size;
 	pos_t aligned_old_size;
 	pos_t aligned_new_size;

@@ -78,7 +78,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct dirhandle, dh_refcnt, dirhandle_destroy)
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct dirhandle *KCALL
 dirhandle_new(struct fdirnode *__restrict self,
               struct path *access_path,
-              struct fdirent *access_dent);
+              struct fdirent *access_dent)
+		THROWS(E_BADALLOC);
 
 DECL_END
 #endif /* __CC__ */

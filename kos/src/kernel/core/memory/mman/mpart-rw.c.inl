@@ -138,7 +138,7 @@ DECL_BEGIN
 /* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */
-PUBLIC ATTR_NOINLINE NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING ATTR_NOINLINE NONNULL((1)) size_t KCALL
 LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
                          LOCAL_buffer_t buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
@@ -201,7 +201,7 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 /* Read/write raw data to/from a given mem-part.
  * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
  *              is too small, or if  the given `filepos' lies  outside of the part's  bounds. */
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 LOCAL_mpart_rw(struct mpart *__restrict self,
                LOCAL_buffer_t buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
@@ -387,7 +387,7 @@ done:
  *    >> MPART_ST_INCORE(self->mp_state)   // Can be ensured by `mpart_setcore_or_unlock()'
  *    >> mpart_unsharecow_or_unlock(...)   // Only for `mpart_write*', and only within the target address range
  */
-FUNDEF NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 LOCAL_mpart_rw_or_unlock(struct mpart *__restrict self,
                          LOCAL_buffer_t buffer,
 #ifdef LOCAL_BUFFER_IS_AIO

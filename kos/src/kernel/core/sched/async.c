@@ -82,7 +82,8 @@ PRIVATE struct sig async_ready_sig = SIG_INIT;
 PRIVATE struct atomic_lock async_ready_poplock = ATOMIC_LOCK_INIT;
 
 /* Try to pop a ready async job. */
-PRIVATE WUNUSED REF struct async *FCALL async_trypopready(void) {
+PRIVATE WUNUSED REF struct async *FCALL
+async_trypopready(void) THROWS(E_WOULDBLOCK) {
 	REF struct async *result;
 	/* Pop the first ready async job. */
 	atomic_lock_acquire(&async_ready_poplock);

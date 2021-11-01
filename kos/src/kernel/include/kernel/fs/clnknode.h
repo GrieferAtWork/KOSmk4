@@ -85,7 +85,8 @@ NOTHROW(KCALL clnknode_v_linkstr)(struct flnknode *__restrict self);
  *  - return->_clnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK)
  *  - return->lnc_text[0 ... text_length-1]    (exactly `text_length' characters; trailing NUL was already initialized) */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
-_clnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_BADALLOC);
+_clnknode_alloc(struct fsuper *__restrict super, size_t text_length)
+		THROWS(E_BADALLOC);
 
 /* Helper-wrapper for `_clnknode_alloc()' that will populate the
  * link-node with `text_length'  characters copied from  `text'. */

@@ -39,7 +39,7 @@ DECL_BEGIN
 /* Default implementation for  `flnknode_ops::lno_readlink' that may  be used  when
  * the alternate `lno_linkstr' operator is implemented, in which case said operator
  * is invoked before the returned string is copied into the supplied buffer. */
-PUBLIC WUNUSED NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 flnknode_v_readlink_default(struct flnknode *__restrict self,
                             USER CHECKED /*utf-8*/ char *buf,
                             size_t bufsize)
@@ -112,7 +112,8 @@ NOTHROW(KCALL clnknode_v_linkstr)(struct flnknode *__restrict self) {
  *  - return->_clnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK)
  *  - return->lnc_text[0 ... text_length-1]    (exactly `text_length' characters; trailing NUL was already initialized) */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
-_clnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_BADALLOC) {
+_clnknode_alloc(struct fsuper *__restrict super, size_t text_length)
+		THROWS(E_BADALLOC) {
 	REF struct clnknode *result;
 	result = (struct clnknode *)kmalloc(offsetof(struct clnknode, lnc_text) +
 	                                     (text_length + 1) * sizeof(char),

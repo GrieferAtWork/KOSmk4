@@ -202,10 +202,10 @@ NOTHROW(FCALL munlock_rangelock_filter)(void *UNUSED(arg),
  *                               thrown for the first address of the given range that
  *                               isn't  mapped. When this  happens, no mem-nodes will
  *                               have had their MLOCK-state altered. */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING_IF(!(flags & MLOCK_ONFAULT)) NONNULL((1)) void FCALL
 mman_mlock(struct mman *__restrict self, void const *addr,
            size_t num_bytes, unsigned int flags)
-		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT_UNMAPPED, E_BADALLOC) {
+		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT_UNMAPPED, E_BADALLOC, ...) {
 	struct mrangelock rl;
 	byte_t const *minaddr, *maxaddr;
 	minaddr = (byte_t const *)addr;

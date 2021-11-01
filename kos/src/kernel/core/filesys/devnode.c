@@ -43,7 +43,8 @@ PUBLIC NONNULL((1, 2)) void KCALL
 fdevnode_v_open(struct mfile *__restrict self,
                 struct handle *__restrict hand,
                 struct path *access_path,
-                struct fdirent *access_dent) {
+                struct fdirent *access_dent)
+		THROWS(E_WOULDBLOCK, E_NO_DEVICE) {
 	ino_t devfs_ino;
 	REF struct device *node;
 	struct fdevnode *me = (struct fdevnode *)self;

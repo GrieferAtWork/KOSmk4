@@ -75,8 +75,8 @@ DECL_BEGIN
 #ifdef NDEBUG
 #define handle_manager_assert_integrity(self) (void)0
 #else /* NDEBUG */
-PUBLIC ATTR_NOINLINE NONNULL((1)) void FCALL
-handle_manager_assert_integrity(struct handle_manager *__restrict self) {
+PUBLIC ATTR_NOINLINE NONNULL((1)) void
+NOTHROW(FCALL handle_manager_assert_integrity)(struct handle_manager *__restrict self) {
 	unsigned int i, counted, counted_cloexec, counted_clofork;
 	if (self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR) {
 		assert(self->hm_count <= self->hm_hashvector.hm_hashuse);
@@ -137,7 +137,7 @@ NOTHROW(KCALL handle_manager_destroy)(struct handle_manager *__restrict self) {
 }
 
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
-handle_manager_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
+handle_manager_alloc(void) THROWS(E_BADALLOC) {
 	REF struct handle_manager *result;
 	result = (REF struct handle_manager *)kmalloc(sizeof(struct handle_manager),
 	                                              GFP_NORMAL);

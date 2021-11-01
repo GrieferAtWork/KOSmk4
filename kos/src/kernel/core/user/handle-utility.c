@@ -180,7 +180,7 @@ mfile_datasize(struct mfile *__restrict self) {
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
  * @return: false: The data size could not be determined. */
-PUBLIC WUNUSED NONNULL((1, 2)) bool KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) bool KCALL
 handle_datasize(struct handle const *__restrict self,
                 pos_t *__restrict presult) {
 	pos_t value;
@@ -342,7 +342,7 @@ throw_invalid_handle_type(struct handle const *__restrict self,
 }
 
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
 handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self,
           uintptr_half_t wanted_type)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
@@ -374,7 +374,7 @@ handle_getas_complete_except(unsigned int fd)
 
 
 /* Directly translate handlers to references to objects of specific types. */
-PUBLIC ATTR_RETNONNULL WUNUSED REF void *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF void *FCALL
 handle_getas(unsigned int fd, uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
@@ -388,7 +388,7 @@ handle_getas(unsigned int fd, uintptr_half_t wanted_type)
 	}
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
 handle_get_fnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
@@ -402,7 +402,7 @@ handle_get_fnode(unsigned int fd)
 	}
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
 handle_get_regnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
@@ -416,7 +416,7 @@ handle_get_regnode(unsigned int fd)
 	}
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
 handle_get_dirnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
@@ -430,7 +430,7 @@ handle_get_dirnode(unsigned int fd)
 	}
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
 handle_get_super(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
@@ -444,7 +444,7 @@ handle_get_super(unsigned int fd)
 	}
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
 handle_get_super_relaxed(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
@@ -459,7 +459,7 @@ handle_get_super_relaxed(unsigned int fd)
 }
 
 /* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct task *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct task *FCALL
 handle_get_task(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
@@ -499,7 +499,7 @@ handle_get_task(unsigned int fd)
 
 
 /* Extended handle converted functions */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *FCALL
 handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct inode *result;
@@ -523,7 +523,7 @@ handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self
 	                          HANDLE_TYPEKIND_MFILE_INODE);
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct regular_node *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct regular_node *FCALL
 handle_as_regnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct regular_node *result;
@@ -547,7 +547,7 @@ handle_as_regnode(/*inherit(on_success)*/ REF struct handle const *__restrict se
 	                          HANDLE_TYPEKIND_MFILE_REGULARNODE);
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_node *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_node *FCALL
 handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct directory_node *result;
@@ -571,7 +571,7 @@ handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const *__restrict se
 	                          HANDLE_TYPEKIND_MFILE_DIRECTORY);
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
 handle_as_super(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 #ifdef CONFIG_USE_NEW_FS
@@ -614,7 +614,7 @@ handle_as_super(/*inherit(on_success)*/ REF struct handle const *__restrict self
 	                          HANDLE_TYPEKIND_MFILE_SUPERBLOCK);
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
 handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct superblock *result;
@@ -644,7 +644,7 @@ handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const *__restr
 	                          HANDLE_TYPEKIND_MFILE_SUPERBLOCK);
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct symlink_node *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct symlink_node *FCALL
 handle_as_lnknode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct symlink_node *result;
@@ -668,7 +668,7 @@ handle_as_lnknode(/*inherit(on_success)*/ REF struct handle const *__restrict se
 	                          HANDLE_TYPEKIND_MFILE_SYMLINKNODE);
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_node *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_node *FCALL
 handle_as_fifonode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct fifo_node *result;
@@ -692,7 +692,7 @@ handle_as_fifonode(/*inherit(on_success)*/ REF struct handle const *__restrict s
 	                          HANDLE_TYPEKIND_MFILE_FIFONODE);
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct socket_node *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct socket_node *FCALL
 handle_as_socketnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct socket_node *result;
@@ -717,7 +717,7 @@ handle_as_socketnode(/*inherit(on_success)*/ REF struct handle const *__restrict
 }
 
 /* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
 	/* Special case: The handle already has the correct typing */

@@ -383,12 +383,12 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
  * @param: additional_actions: Additional actions to be atomically performed
  *                             alongside  the  setting of  the  new mem-node
  *                             mappings (set of `MBUILDER_APPLY_AA_*') */
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mbuilder_apply(/*inherit(on_success)*/ struct mbuilder *__restrict self,
                struct mman *__restrict target,
                unsigned int additional_actions,
                struct mexecinfo *execinfo)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
 again:
 	mbuilder_partlocks_acquire(self);
 	if (!mman_lock_tryacquire(target)) {

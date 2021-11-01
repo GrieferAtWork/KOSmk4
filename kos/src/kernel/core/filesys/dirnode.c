@@ -91,12 +91,12 @@ fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
 }
 
 /* Same as `fdirenum_feedent_ex()', but feed values from `ent' */
-PUBLIC WUNUSED NONNULL((4, 5)) ssize_t FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((4, 5)) ssize_t FCALL
 fdirenum_feedent(USER CHECKED struct dirent *buf,
                  size_t bufsize, readdir_mode_t readdir_mode,
                  struct fdirent *__restrict ent,
                  struct fdirnode *__restrict dir)
-		THROWS(E_SEGFAULT) {
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t result;
 	result = ((offsetof(struct dirent, d_name)) +
 	          (ent->fd_namelen + 1) * sizeof(char));
@@ -166,7 +166,8 @@ fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
 /* Constructs a wrapper object that implements readdir() (s.a. `dirhandle_new()') */
 PUBLIC NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
-                struct path *access_path, struct fdirent *access_dent) {
+                struct path *access_path, struct fdirent *access_dent)
+		THROWS(E_BADALLOC) {
 	REF struct dirhandle *dh;
 	/* Construct the directory handle. */
 	dh = dirhandle_new(mfile_asdir(self), access_path, access_dent);
@@ -181,7 +182,7 @@ fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
 PUBLIC NONNULL((1)) void KCALL
 fdirnode_v_stat(struct mfile *__restrict self,
                 USER CHECKED struct stat *result)
-		THROWS(...) {
+		THROWS(E_SEGFAULT) {
 	result->st_blocks = (typeof(result->st_blocks))1;
 	result->st_size   = (typeof(result->st_size))mfile_getblocksize(self);
 }
@@ -200,9 +201,10 @@ PUBLIC_CONST struct mfile_stream_ops const fdirnode_v_stream_ops = {
  * enumerator, will still be enumerated by said enumerator. It is however
  * guarantied that all files created  before, and not deleted after  will
  * always be enumerated */
-PUBLIC NONNULL((1, 2)) void FCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void FCALL
 fdirnode_enum(struct fdirnode *__restrict self,
-              struct fdirenum *__restrict result) {
+              struct fdirenum *__restrict result)
+		THROWS(E_IOERROR, ...) {
 	DBG_memset(result, 0xcc, sizeof(*result));
 	result->de_dir = mfile_asdir(incref(self));
 	TRY {
@@ -224,12 +226,12 @@ fdirnode_enum(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
  * @throw: E_FSERROR_ACCESS_DENIED:         The file didn't already exist, and caller doesn't have write-access to `self'
  * @return: * : One of `FDIRNODE_MKFILE_*' * */
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,
                 struct fmkfile_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
-		       E_FSERROR_UNSUPPORTED_OPERATION) {
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_mkfile) {
@@ -273,11 +275,12 @@ again_lookup:
  * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
  * @throw: E_FSERROR_READONLY:            Read-only filesystem (or unsupported operation)
  * @return: * : One of `FDIRNODE_UNLINK_*' */
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_unlink(struct fdirnode *__restrict self,
                 struct fdirent *__restrict entry,
                 struct fnode *__restrict file)
-		THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY, E_FSERROR_READONLY) {
+		THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY,
+		       E_FSERROR_READONLY, E_IOERROR, ...) {
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_unlink)
@@ -290,10 +293,11 @@ fdirnode_unlink(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_DISK_FULL:    Disk full
  * @throw: E_FSERROR_READONLY:     Read-only filesystem
  * @return: * : One of `FDIRNODE_RENAME_*' */
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_rename(struct fdirnode *__restrict self,
                 struct frename_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL, E_FSERROR_READONLY) {
+		THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		       E_FSERROR_READONLY, E_IOERROR, ...) {
 	struct fdirnode_ops const *ops;
 
 	/* Do the low-level rename operation */

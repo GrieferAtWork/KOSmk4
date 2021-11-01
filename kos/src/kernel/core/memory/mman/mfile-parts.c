@@ -87,7 +87,7 @@ PUBLIC WUNUSED NONNULL((1, 2)) struct mpart *FCALL
 mfile_extendpart_or_unlock(struct mfile *__restrict self,
                            struct mfile_extendpart_data *__restrict data,
                            struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	assert(mfile_lock_reading(self) || mfile_lock_writing(self));
 	assert(data->mep_minaddr <= data->mep_maxaddr);
 	assert(mfile_addr_aligned(self, data->mep_minaddr));
@@ -136,10 +136,9 @@ mfile_extendpart_or_unlock(struct mfile *__restrict self,
  *                mpart_tree_rlocate(self->mf_parts, part->mp_minaddr, part->mp_maxaddr) != NULL
  * @return: * :   A reference to a part that (at one point) contained a super-set
  *                of  the   address  range   described  by   the  given   `part'. */
-PUBLIC WUNUSED NONNULL((1)) REF struct mpart *FCALL
-mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
-                                       /*inherit(on_success)*/ struct mpart *__restrict part)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mfile_insert_and_merge_part_and_unlock)(struct mfile *__restrict self,
+                                                      /*inherit(on_success)*/ struct mpart *__restrict part) {
 	assert(mfile_lock_writing(self));
 	assert(mfile_addr_aligned(self, part->mp_minaddr));
 	assert(mfile_addr_aligned(self, part->mp_maxaddr + 1));
@@ -192,7 +191,7 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *FCALL
 _mfile_newpart(struct mfile *__restrict self,
                PAGEDIR_PAGEALIGNED pos_t addr,
                PAGEDIR_PAGEALIGNED size_t num_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct mpart *result;
 	if (self->mf_ops->mo_newpart) {
 		result = (*self->mf_ops->mo_newpart)(self, addr, num_bytes);
@@ -245,7 +244,7 @@ PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_makepart(struct mfile *__restrict self,
                PAGEDIR_PAGEALIGNED pos_t addr,
                PAGEDIR_PAGEALIGNED size_t num_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct mpart *result;
 	assert(mfile_isanon(self));
 	assert(mfile_addr_aligned(self, addr));
@@ -292,7 +291,7 @@ PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_getpart(struct mfile *__restrict self,
               PAGEDIR_PAGEALIGNED pos_t addr,
               PAGEDIR_PAGEALIGNED size_t hint_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT, ...) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT) {
 	REF struct mpart *result;
 	size_t num_bytes;
 	pos_t loadmax;

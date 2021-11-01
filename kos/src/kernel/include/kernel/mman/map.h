@@ -185,7 +185,7 @@ DATDEF struct mfile mfile_zero; /* Zero-initialized, anonymous memory. */
  *                        the return value may differ from `hint'!
  * @param: min_alignment: s.a. `mman_findunmapped'
  * @return: * : The effective mapping  base at which `file->DATA.BYTES[file_pos]' can be found. */
-FUNDEF NONNULL((1, 6)) void *KCALL
+FUNDEF BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 6)) void *KCALL
 mman_map(struct mman *__restrict self,
          UNCHECKED void *hint, size_t num_bytes,
          unsigned int prot DFL(PROT_READ | PROT_WRITE | PROT_SHARED),
@@ -220,7 +220,7 @@ mman_map(/* self:          */ self,
  * when user-space is allowed to directly mmap() device ram, but the driver
  * want's to prevent user-space from mapping more than the physical address
  * ranges actually associated with a device. */
-FUNDEF NONNULL((1, 6)) void *KCALL
+FUNDEF BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 6)) void *KCALL
 mman_map_subrange(struct mman *__restrict self,
                   UNCHECKED void *hint, size_t num_bytes,
                   unsigned int prot DFL(PROT_READ | PROT_WRITE | PROT_SHARED),

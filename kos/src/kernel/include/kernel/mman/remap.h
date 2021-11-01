@@ -137,13 +137,13 @@ struct mman;
  * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS:          `new_address & PAGEMASK != old_address & PAGEMASK'
  * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE:    `old_size == 0 && !MREMAP_MAYMOVE'
  * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE: Mapping at `old_address' isn't `PROT_SHARED' */
-FUNDEF NONNULL((1)) void *KCALL
+FUNDEF BLOCKING_IF(flags & MREMAP_POPULATE) NONNULL((1)) void *KCALL
 mman_remap(struct mman *__restrict self, UNCHECKED void *old_address,
            size_t old_size, size_t new_size, unsigned int flags,
            UNCHECKED void *new_address DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-		       E_INVALID_ARGUMENT);
+		       E_INVALID_ARGUMENT, ...);
 
 
 DECL_END

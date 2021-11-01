@@ -64,10 +64,10 @@ NOTHROW(KCALL flatdirent_v_destroy)(struct fdirent *__restrict self) {
 	_flatdirent_free(me);
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+PUBLIC BLOCKING BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 flatdirent_v_opennode(struct fdirent *__restrict self,
                       struct fdirnode *__restrict dir_)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_IOERROR, ...) {
 	REF struct fnode *result;
 	struct flatsuper *super;
 	struct flatdirent *me   = fdirent_asflat(self);
@@ -289,11 +289,12 @@ NOTHROW(KCALL flatdirnode_anon_parts_after)(struct mfile *__restrict self,
 /* Helper  wrapper for `fdnx_deleteent'  that will follow  up the call by
  * anonymizing any mpart-s of the mfile underlying `self' only containing
  * data after `flatdirent_endaddr(ent)' */
-PRIVATE NONNULL((1, 2, 3)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 2, 3)) void KCALL
 flatdirnode_delete_entry(struct flatdirnode *__restrict self,
                          struct flatdirent *__restrict ent,
                          struct fnode *__restrict file,
-                         bool at_end_of_dir) {
+                         bool at_end_of_dir)
+		THROWS(E_IOERROR, ...) {
 	RAII_FINALLY {
 		if (at_end_of_dir)
 			flatdirnode_anon_parts_after(self, flatdirent_endaddr(ent));
@@ -309,11 +310,11 @@ flatdirnode_delete_entry(struct flatdirnode *__restrict self,
  * @return: * :   Next directory entry.
  * @return: NULL: EOF reached.
  * @return: FLATDIRNODE_HANDLE_DUPLICATE_NAME_RETRY: Locks were lost and you must retry. */
-PRIVATE WUNUSED NONNULL((1, 2)) REF struct flatdirent *KCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct flatdirent *KCALL
 flatdirnode_handle_duplicate_name(struct flatdirnode *__restrict self,
                                   struct flatdirent *__restrict duplicate_ent,
                                   pos_t *__restrict p_nextpos)
-		THROWS(E_BADALLOC, E_IOERROR) {
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
 	struct flatdirnode_ops const *ops;
 	struct flatdirent *next_result = NULL;
 	ops = flatdirnode_getops(self);
@@ -357,10 +358,10 @@ flatdirnode_handle_duplicate_name(struct flatdirnode *__restrict self,
 	return next_result;
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 flatdirnode_v_lookup(struct fdirnode *__restrict self,
                      struct flookup_info *__restrict info)
-		THROWS(E_BADALLOC, E_IOERROR) {
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
 	bool upgrade_status;
 	pos_t nextpos;
 	REF struct flatdirent *result;
@@ -530,8 +531,9 @@ incref_and_return_result:
  *  - Return `true', passing ownership of the (now write-)lock back to the caller.
  * @return: true:  Read-lock was upgraded & one more entry was added (or EOF was set)
  * @return: false: Read-lock was released & nothing was read */
-PRIVATE NONNULL((1)) bool KCALL
-flatdirnode_readdir_and_upgrade(struct flatdirnode *__restrict self) {
+PRIVATE BLOCKING NONNULL((1)) bool KCALL
+flatdirnode_readdir_and_upgrade(struct flatdirnode *__restrict self)
+		THROWS(E_IOERROR, ...) {
 	pos_t nextpos;
 	struct flatdirent *ent;
 	bool upgrade_status;
@@ -619,8 +621,9 @@ handle_ent_after_wrlock:
 
 
 /* Acquire a write-lock to `self' and make sure that the directory's been populated. */
-PRIVATE NONNULL((1)) void KCALL
-flatdirnode_lockwrite_and_populate(struct flatdirnode *__restrict self) {
+PRIVATE BLOCKING NONNULL((1)) void KCALL
+flatdirnode_lockwrite_and_populate(struct flatdirnode *__restrict self)
+		THROWS(E_IOERROR, ...) {
 again:
 	flatdirnode_write(self);
 	COMPILER_READ_BARRIER();
@@ -633,8 +636,9 @@ again:
 }
 
 /* Acquire a read-lock to `self' and make sure that the directory's been populated. */
-PRIVATE NONNULL((1)) void KCALL
-flatdirnode_lockread_and_populate(struct flatdirnode *__restrict self) {
+PRIVATE BLOCKING NONNULL((1)) void KCALL
+flatdirnode_lockread_and_populate(struct flatdirnode *__restrict self)
+		THROWS(E_IOERROR, ...) {
 again:
 	flatdirnode_read(self);
 	while (!(self->fdn_data.fdd_flags & FFLATDIR_F_EOF)) {
@@ -650,10 +654,11 @@ again:
  *  - return->fde_ent.fd_refcnt
  *  - return->fde_bypos
  * ... as well as add it it `self->fdn_data.fdd_fileslist' */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct flatdirent *
-NOTHROW(KCALL flatdirnode_mkent)(struct flatdirnode *__restrict self,
-                                 struct fmkfile_info *__restrict info,
-                                 struct fnode *__restrict file) {
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct flatdirent *KCALL
+flatdirnode_mkent(struct flatdirnode *__restrict self,
+                  struct fmkfile_info *__restrict info,
+                  struct fnode *__restrict file)
+		THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...) {
 	struct flatdirent *result;
 	struct flatdirnode_ops const *ops;
 	ops = flatdirnode_getops(self);
@@ -669,7 +674,16 @@ NOTHROW(KCALL flatdirnode_mkent)(struct flatdirnode *__restrict self,
 	result->fde_ent.fd_ino     = file->fn_ino;
 	result->fde_ent.fd_namelen = info->mkf_namelen;
 	result->fde_ent.fd_type    = IFTODT(file->fn_mode);
-	*(char *)mempcpy(result->fde_ent.fd_name, info->mkf_name, info->mkf_namelen, sizeof(char)) = '\0';
+	DBG_memset(&result->fde_pos, 0xcc, sizeof(result->fde_pos));
+	DBG_memset(&result->fde_size, 0xcc, sizeof(result->fde_size));
+	DBG_memset(&result->fde_bypos, 0xcc, sizeof(result->fde_bypos));
+	TRY {
+		*(char *)mempcpy(result->fde_ent.fd_name, info->mkf_name,
+		                 info->mkf_namelen, sizeof(char)) = '\0';
+	} EXCEPT {
+		destroy(result);
+		RETHROW();
+	}
 	result->fde_ent.fd_hash = info->mkf_hash;
 	if (info->mkf_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->mkf_name)) {
 		/* Caller-given hash value isn't set, or cannot be trusted to be correct.
@@ -678,9 +692,6 @@ NOTHROW(KCALL flatdirnode_mkent)(struct flatdirnode *__restrict self,
 		                                       result->fde_ent.fd_namelen);
 		info->mkf_hash = result->fde_ent.fd_hash;
 	}
-	DBG_memset(&result->fde_pos, 0xcc, sizeof(result->fde_pos));
-	DBG_memset(&result->fde_size, 0xcc, sizeof(result->fde_size));
-	DBG_memset(&result->fde_bypos, 0xcc, sizeof(result->fde_bypos));
 	return result;
 }
 
@@ -712,10 +723,11 @@ NOTHROW(FCALL flatdirnode_update_biggest_gap)(struct flatdirnode *__restrict sel
  *
  * When `FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO' is set, then this function is
  * allowed to make modifications to `ent->fde_ent.fd_ino' and `file->fn_ino' */
-PRIVATE NONNULL((1, 2, 3)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 2, 3)) void KCALL
 flatdirnode_addentry_to_stream(struct flatdirnode *__restrict self,
                                REF struct flatdirent *__restrict ent,
-                               struct fnode *__restrict file) {
+                               struct fnode *__restrict file)
+		THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH, ...) {
 	struct flatdirnode_ops const *ops;
 	ops = flatdirnode_getops(self);
 	DBG_memset(&ent->fde_bypos, 0xcc, sizeof(ent->fde_bypos));
@@ -853,12 +865,12 @@ NOTHROW(FCALL flatdirnode_remove_from_bypos)(struct flatdirnode *__restrict self
 
 
 
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 flatdirnode_v_mkfile(struct fdirnode *__restrict self,
                      struct fmkfile_info *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
-		       E_FSERROR_UNSUPPORTED_OPERATION) {
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	REF struct fnode *node;
 	REF struct flatdirent *ent;
 	REF struct fdirent *existing;
@@ -1076,12 +1088,12 @@ handle_existing:
 }
 
 
-PUBLIC WUNUSED NONNULL((1, 2, 3)) unsigned int KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2, 3)) unsigned int KCALL
 flatdirnode_v_unlink(struct fdirnode *__restrict self,
                      struct fdirent *__restrict entry,
                      struct fnode *__restrict file)
-		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_DIRECTORY_NOT_EMPTY,
-		       E_FSERROR_READONLY) {
+		THROWS(E_BADALLOC, E_FSERROR_DIRECTORY_NOT_EMPTY,
+		       E_FSERROR_READONLY, E_IOERROR, ...) {
 	struct flatdirnode_ops const *ops;
 	struct flatdirnode *me;
 	struct flatdirent *ent;
@@ -1170,23 +1182,24 @@ NOTHROW(FCALL release_locks_for_rename)(struct flatdirnode *nd,
 	flatdirnode_endwrite(nd);
 }
 
-PRIVATE NONNULL((1, 2, 3, 4, 5)) void FCALL
+PRIVATE BLOCKING NONNULL((1, 2, 3, 4, 5)) void FCALL
 call_update_dirent(struct fnode *__restrict file,
                    struct flatdirnode *oldparent,
                    struct flatdirnode *newparent,
                    struct flatdirent *__restrict oldent,
-                   struct flatdirent *__restrict newent) {
+                   struct flatdirent *__restrict newent)
+		THROWS(E_IOERROR, ...) {
 	struct flatdirnode_ops const *ofile_ops;
 	ofile_ops = flatdirnode_getops(oldparent);
 	if (ofile_ops->fdno_flat.fdnx_direntchanged != NULL)
 		(*ofile_ops->fdno_flat.fdnx_direntchanged)(file, oldparent, newparent, oldent, newent);
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 flatdirnode_v_rename(struct fdirnode *__restrict self,
                      struct frename_info *__restrict info)
-		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_ILLEGAL_PATH,
-		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY) {
+		THROWS(E_BADALLOC, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		       E_FSERROR_READONLY, E_IOERROR, ...) {
 	struct fmkfile_info mki;
 	struct flatdirnode *nd    = fdirnode_asflat(self);
 	struct flatdirnode *od    = fdirnode_asflat(info->frn_olddir);
@@ -1635,9 +1648,9 @@ NOTHROW(KCALL flatdirenum_v_fini)(struct fdirenum *__restrict self) {
 
 /* Return a reference to the first directory entry at a position `>= pos'
  * If no such entry exists, return `NULL' instead. */
-PRIVATE WUNUSED NONNULL((1)) REF struct flatdirent *KCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1)) REF struct flatdirent *KCALL
 flatdirnode_entafter(struct flatdirnode *__restrict self, pos_t pos)
-		THROWS(...) {
+		THROWS(E_IOERROR, ...) {
 	REF struct flatdirent *result;
 again:
 	flatdirnode_read(self);
@@ -1679,10 +1692,10 @@ again_locked:
 	goto again_locked;
 }
 
-PRIVATE NONNULL((1)) size_t KCALL
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
 flatdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                       size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
-		THROWS(...) {
+		THROWS(E_SEGFAULT, E_BADALLOC, E_WOULDBLOCK, E_IOERROR, ...) {
 	ssize_t result;
 	pos_t oldpos, real_oldpos;
 	struct flatdirnode *dir;
@@ -1748,10 +1761,10 @@ next_next_ent:
 	return (size_t)result;
 }
 
-PRIVATE NONNULL((1)) pos_t KCALL
+PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
 flatdirenum_v_seekdir(struct fdirenum *__restrict self,
                       off_t offset, unsigned int whence)
-		THROWS(...) {
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
 	pos_t oldpos, newpos;
 	struct flatdirenum *me = fdirenum_asflat(self);
 	flatdirenum_lock_acquire(me);
@@ -1829,7 +1842,8 @@ PRIVATE struct fdirenum_ops const flatdirenum_ops = {
 };
 
 PUBLIC NONNULL((1)) void KCALL
-flatdirnode_v_enum(struct fdirenum *__restrict result) {
+flatdirnode_v_enum(struct fdirenum *__restrict result)
+		THROWS(E_WOULDBLOCK) {
 	struct flatdirenum *rt = (struct flatdirenum *)result;
 	struct flatdirnode *me = fdirnode_asflat(rt->de_dir);
 

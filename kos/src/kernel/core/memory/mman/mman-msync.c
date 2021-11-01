@@ -58,7 +58,7 @@ DECL_BEGIN
  * @throws: E_SEGFAULT_UNMAPPED: When `MS_IFMAPPED' isn't given, this exception is
  *                               thrown for the first  address of the given  range
  *                               that isn't mapped. */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 mman_msync(struct mman *__restrict self, void *addr,
            size_t num_bytes, unsigned int flags)
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT_UNMAPPED, ...) {

@@ -182,7 +182,7 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
  *                                     must be ignored in this value.
  * @throws: ...:        If  user-space  returned  with  `UVIO_OPCODE_EXCEPT',
  *                      that is exception will be re-thrown by this function. */
-PUBLIC NONNULL((1, 4)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 4)) void KCALL
 uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
              /*in|out*/ union kernel_uvio_argument argv_result[2]) THROWS(...) {
 	struct uvio *self;
@@ -242,7 +242,7 @@ got_free_slot:
 }
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 1
-PUBLIC NONNULL((1)) uint8_t KCALL
+PUBLIC BLOCKING NONNULL((1)) uint8_t KCALL
 uvio_requestb(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint8_t arg0, uint8_t arg1) THROWS(...) {
@@ -257,7 +257,7 @@ uvio_requestb(/*in|out*/ struct vioargs *__restrict args,
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 1 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 2
-PUBLIC NONNULL((1)) uint16_t KCALL
+PUBLIC BLOCKING NONNULL((1)) uint16_t KCALL
 uvio_requestw(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint16_t arg0, uint16_t arg1) THROWS(...) {
@@ -272,7 +272,7 @@ uvio_requestw(/*in|out*/ struct vioargs *__restrict args,
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 2 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 4
-PUBLIC NONNULL((1)) uint32_t KCALL
+PUBLIC BLOCKING NONNULL((1)) uint32_t KCALL
 uvio_requestl(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint32_t arg0, uint32_t arg1) THROWS(...) {
@@ -287,7 +287,7 @@ uvio_requestl(/*in|out*/ struct vioargs *__restrict args,
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 4 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 8
-PUBLIC NONNULL((1)) uint64_t KCALL
+PUBLIC BLOCKING NONNULL((1)) uint64_t KCALL
 uvio_requestq(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint64_t arg0, uint64_t arg1) THROWS(...) {
@@ -302,7 +302,7 @@ uvio_requestq(/*in|out*/ struct vioargs *__restrict args,
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 8 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 16
-PUBLIC NONNULL((1)) uint128_t KCALL
+PUBLIC BLOCKING NONNULL((1)) uint128_t KCALL
 uvio_requestx(/*in|out*/ struct vioargs *__restrict args,
               vio_addr_t addr, u16 command,
               uint128_t arg0, uint128_t arg1) THROWS(...) {
@@ -982,7 +982,7 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 
 
 /************************************************************************/
-/* userviofd()                                                          */
+/* sys_userviofd(2)                                                     */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_USERVIOFD
 DEFINE_SYSCALL2(fd_t, userviofd,

@@ -68,20 +68,20 @@ struct iov_buffer;
  *              access to the affected region  (i.e. using `memcpy' rather  than
  *              `memcpy_nopf'), and dealing with any potential E_SEGFAULT error.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
-FUNDEF size_t FCALL
+FUNDEF BLOCKING size_t FCALL
 mman_prefault(USER CHECKED void const *addr,
               size_t num_bytes, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Enumerate segments from `buffer', and prefault up to `num_bytes' of pointed-to
  * memory,  after skipping the first `offset' bytes.  The return value is the sum
  * of successfully faulted  segments, however  faulting also stops  on the  first
  * segment that cannot be fully faulted.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
-FUNDEF NONNULL((1)) size_t FCALL
+FUNDEF BLOCKING NONNULL((1)) size_t FCALL
 mman_prefaultv(struct iov_buffer const *__restrict buffer,
                size_t offset, size_t num_bytes, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
 /* Force  all  bytes within  the given  address range  to be  faulted for  either reading
@@ -107,18 +107,18 @@ mman_prefaultv(struct iov_buffer const *__restrict buffer,
  *    its  page directory mapping in `self' will still be updated if need be, as it
  *    may have been faulted as a lazy memory mapping).
  */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF BLOCKING NONNULL((1)) void FCALL
 mman_forcefault(struct mman *__restrict self,
                 USER CHECKED void const *addr,
                 size_t num_bytes, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 /* Same as `mman_forcefault()', but fault all memory pointed-to by the given buffer. */
-FUNDEF NONNULL((1, 2)) void FCALL
+FUNDEF BLOCKING NONNULL((1, 2)) void FCALL
 mman_forcefaultv(struct mman *__restrict self,
                  struct iov_buffer const *__restrict buffer,
                  size_t offset, size_t num_bytes, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
 
@@ -276,7 +276,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
  *                 Resolve  this  issue  by simply  trying  again (this
  *                 inconsistency can result from someone else splitting
  *                 the associated mem-part) */
-FUNDEF NONNULL((1)) __BOOL FCALL
+FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
 mfault_or_unlock(struct mfault *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 

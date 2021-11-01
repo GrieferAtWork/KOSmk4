@@ -143,8 +143,8 @@ FUNDEF NOBLOCK NONNULL((1)) void /* == ramfs_dirent_ops.fdo_destroy */
 NOTHROW(KCALL ramfs_dirent_v_destroy)(struct fdirent *__restrict self);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode * /* == ramfs_dirent_ops.fdo_opennode */
 NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self, struct fdirnode *__restrict dir);
-#define ramfs_dirent_destroy(self) ramfs_dirent_v_destroy(&(self)->rde_ent)
-DEFINE_REFCOUNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, ramfs_dirent_destroy)
+#define __struct_ramfs_dirent_destroy(self) ramfs_dirent_v_destroy(&(self)->rde_ent)
+DEFINE_REFCOUNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, __struct_ramfs_dirent_destroy)
 
 
 /* Extended directory data. */
@@ -165,29 +165,29 @@ NOTHROW(FCALL ramfs_dirdata_fini)(struct ramfs_dirdata *__restrict self);
 
 
 /* Helpers for accessing `rdd_treelock' */
-#define _ramfs_dirdata_treelock_reap(self)      (void)0
-#define ramfs_dirdata_treelock_reap(self)       (void)0
-#define ramfs_dirdata_treelock_mustreap(self)   0
-#define ramfs_dirdata_treelock_write(self)      shared_rwlock_write(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_write_nx(self)   shared_rwlock_write_nx(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_trywrite(self)   shared_rwlock_trywrite(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_endwrite(self)   (shared_rwlock_endwrite(&(self)->rdd_treelock), ramfs_dirdata_treelock_reap(self))
-#define _ramfs_dirdata_treelock_endwrite(self)  shared_rwlock_endwrite(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_read(self)       shared_rwlock_read(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_read_nx(self)    shared_rwlock_read_nx(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_tryread(self)    shared_rwlock_tryread(&(self)->rdd_treelock)
-#define _ramfs_dirdata_treelock_endread(self)   shared_rwlock_endread(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_endread(self)    (void)(shared_rwlock_endread(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
-#define _ramfs_dirdata_treelock_end(self)       shared_rwlock_end(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_end(self)        (void)(shared_rwlock_end(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
-#define ramfs_dirdata_treelock_upgrade(self)    shared_rwlock_upgrade(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_downgrade(self)  shared_rwlock_downgrade(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_reading(self)    shared_rwlock_reading(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_writing(self)    shared_rwlock_writing(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_canread(self)    shared_rwlock_canread(&(self)->rdd_treelock)
-#define ramfs_dirdata_treelock_canwrite(self)   shared_rwlock_canwrite(&(self)->rdd_treelock)
+#define /*        */ _ramfs_dirdata_treelock_reap(self)      (void)0
+#define /*        */ ramfs_dirdata_treelock_reap(self)       (void)0
+#define /*        */ ramfs_dirdata_treelock_mustreap(self)   0
+#define /*BLOCKING*/ ramfs_dirdata_treelock_write(self)      shared_rwlock_write(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_write_nx(self)   shared_rwlock_write_nx(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_trywrite(self)   shared_rwlock_trywrite(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_endwrite(self)   (shared_rwlock_endwrite(&(self)->rdd_treelock), ramfs_dirdata_treelock_reap(self))
+#define /*        */ _ramfs_dirdata_treelock_endwrite(self)  shared_rwlock_endwrite(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_read(self)       shared_rwlock_read(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_read_nx(self)    shared_rwlock_read_nx(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_tryread(self)    shared_rwlock_tryread(&(self)->rdd_treelock)
+#define /*        */ _ramfs_dirdata_treelock_endread(self)   shared_rwlock_endread(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_endread(self)    (void)(shared_rwlock_endread(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
+#define /*        */ _ramfs_dirdata_treelock_end(self)       shared_rwlock_end(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_end(self)        (void)(shared_rwlock_end(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
+#define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade(self)    shared_rwlock_upgrade(&(self)->rdd_treelock)
+#define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_downgrade(self)  shared_rwlock_downgrade(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_reading(self)    shared_rwlock_reading(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_writing(self)    shared_rwlock_writing(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_canread(self)    shared_rwlock_canread(&(self)->rdd_treelock)
+#define /*        */ ramfs_dirdata_treelock_canwrite(self)   shared_rwlock_canwrite(&(self)->rdd_treelock)
 
 
 /* Ramfs directory by-name tree operations. (For `struct ramfs_dirdata::rdd_tree') */
@@ -220,14 +220,14 @@ struct ramfs_direnum {
 DATDEF struct fdirenum_ops const ramfs_direnum_ops;
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_direnum_v_fini)(struct fdirenum *__restrict self);
-FUNDEF NONNULL((1)) size_t KCALL
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL
 ramfs_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                         size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
-		THROWS(...);
-FUNDEF NONNULL((1)) pos_t KCALL
+		THROWS(E_SEGFAULT, E_WOULDBLOCK, ...);
+FUNDEF BLOCKING NONNULL((1)) pos_t KCALL
 ramfs_direnum_v_seekdir(struct fdirenum *__restrict self,
                         off_t offset, unsigned int whence)
-		THROWS(...);
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
 /* Given a dirent `self' that has been deleted (RAMFS_DIRENT_TREENODE_DELETED),
  * return a pointer  to the first  dirent in `dir'  that has a  lexicographical
@@ -258,29 +258,26 @@ NOTHROW(KCALL ramfs_dirnode_v_destroy)(struct mfile *__restrict self);
 #define ramfs_dirnode_v_open       fdirnode_v_open
 #define ramfs_dirnode_v_stat       fdirnode_v_stat
 #define ramfs_dirnode_v_stream_ops fdirnode_v_stream_ops
-FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
-                       struct flookup_info *__restrict info);
+                       struct flookup_info *__restrict info)
+		THROWS(E_SEGFAULT, E_WOULDBLOCK, ...);
 FUNDEF NONNULL((1)) void KCALL
 ramfs_dirnode_v_enum(struct fdirenum *__restrict result);
-FUNDEF NONNULL((1, 2)) unsigned int KCALL
+FUNDEF BLOCKING NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
                        struct fmkfile_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
-		       E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED);
-FUNDEF NONNULL((1, 2, 3)) unsigned int KCALL
+		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DELETED,
+		       E_FSERROR_UNSUPPORTED_OPERATION, ...);
+FUNDEF BLOCKING NONNULL((1, 2, 3)) unsigned int KCALL
 ramfs_dirnode_v_unlink(struct fdirnode *__restrict self,
                        struct fdirent *__restrict entry,
                        struct fnode *__restrict file)
-		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
-		       E_FSERROR_READONLY, E_FSERROR_DELETED);
-FUNDEF NONNULL((1, 2)) unsigned int KCALL
+		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
                        struct frename_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DELETED);
+		THROWS(E_FSERROR_ILLEGAL_PATH, ...);
 
 
 /* Construct a new fully initialized, but not globally visible, as in:
@@ -295,7 +292,7 @@ ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
                               struct fmkfile_info *__restrict info)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION);
+		THROWS(E_BADALLOC, E_FSERROR_UNSUPPORTED_OPERATION);
 
 
 

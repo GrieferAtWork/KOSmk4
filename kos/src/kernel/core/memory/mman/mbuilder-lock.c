@@ -106,9 +106,9 @@ NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder_norpc *__restrict self
 
 /* Helper wrapper for `mbuilder_partlocks_acquire_or_unlock()' that
  * will  keep  on  attempting  the  operation  until  it  succeeds. */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 mbuilder_partlocks_acquire(struct mbuilder_norpc *__restrict self)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
 	while (!mbuilder_partlocks_acquire_or_unlock(self, NULL))
 		;
 }
@@ -364,10 +364,11 @@ NOTHROW(FCALL mbnode_is_continuous)(struct mbnode const *__restrict fmnode) {
  * without needing to release any locks, return `true'.
  *
  * Otherwise, release all locks and return `false' */
-PRIVATE NONNULL((1, 2)) bool FCALL
+PRIVATE BLOCKING NONNULL((1, 2)) bool FCALL
 mbuilder_reflow_filemap_or_unlock(struct mbuilder_norpc *__restrict self,
                                   struct mbnode **__restrict p_fmnode,
-                                  struct unlockinfo *unlock) {
+                                  struct unlockinfo *unlock)
+		THROWS(...) {
 	bool ok;
 	struct mfile_map_for_reflow fm;
 	struct mbnode *fmnode = *p_fmnode;
@@ -414,10 +415,10 @@ mbuilder_reflow_filemap_or_unlock(struct mbuilder_norpc *__restrict self,
  * continuous), return `true'.
  * NOTE: If this function returns with an exception, `unlock' will
  *       also be invoked. */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC BLOCKING NONNULL((1)) bool FCALL
 mbuilder_partlocks_acquire_or_unlock(struct mbuilder_norpc *__restrict self,
                                      struct unlockinfo *unlock)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
 	struct mbnode **p_fmnode;
 	/* Step #1: Acquire locks to all mapped parts. */
 	if (!mbuilder_lockparts_or_unlock(self, unlock))

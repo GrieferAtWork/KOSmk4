@@ -79,7 +79,7 @@ SLIST_HEAD(mnode_slist, mnode);
 
 
 /* Create a duplicate of a PROT_SHARED mapping. */
-PRIVATE NONNULL((1)) PAGEDIR_PAGEALIGNED void *KCALL
+PRIVATE BLOCKING_IF(flags & MREMAP_POPULATE) NONNULL((1)) PAGEDIR_PAGEALIGNED void *KCALL
 duplicate_shared_mapping(struct mman *__restrict self,
                          PAGEDIR_PAGEALIGNED void *old_address,
                          PAGEDIR_PAGEALIGNED size_t new_size,
@@ -496,7 +496,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 
 
 
-PRIVATE NONNULL((1)) PAGEDIR_PAGEALIGNED void *KCALL
+PRIVATE BLOCKING_IF(flags & MREMAP_POPULATE) NONNULL((1)) PAGEDIR_PAGEALIGNED void *KCALL
 resize_existing_mapping(struct mman *__restrict self,
                         PAGEDIR_PAGEALIGNED void *old_address,
                         PAGEDIR_PAGEALIGNED size_t old_size,
@@ -942,13 +942,13 @@ again_lock_mman_phase2:
  * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS:          `new_address & PAGEMASK != old_address & PAGEMASK'
  * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE:    `old_size == 0 && !MREMAP_MAYMOVE'
  * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE: Mapping at `old_address' isn't `PROT_SHARED' */
-PUBLIC NONNULL((1)) void *KCALL
+PUBLIC BLOCKING_IF(flags & MREMAP_POPULATE) NONNULL((1)) void *KCALL
 mman_remap(struct mman *__restrict self, UNCHECKED void *old_address,
            size_t old_size, size_t new_size, unsigned int flags,
            UNCHECKED void *new_address)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-		       E_INVALID_ARGUMENT) {
+		       E_INVALID_ARGUMENT, ...) {
 	void *result;
 	uintptr_t addend;
 	size_t used_old_size = old_size;

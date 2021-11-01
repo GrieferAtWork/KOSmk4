@@ -63,7 +63,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct filehandle, fh_refcnt, filehandle_destroy)
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct filehandle *KCALL
 filehandle_new(struct mfile *__restrict self,
                struct path *access_path,
-               struct fdirent *access_dent);
+               struct fdirent *access_dent)
+		THROWS(E_BADALLOC);
 
 DECL_END
 #endif /* __CC__ */

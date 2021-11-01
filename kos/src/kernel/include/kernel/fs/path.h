@@ -302,26 +302,26 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _path_cldlock_reap)(struct path *
 #else /* __OPTIMIZE_SIZE__ */
 #define path_cldlock_reap(self) (void)(!lockop_mustreap(&(self)->p_cldlops) || (_path_cldlock_reap(self), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
-#define path_cldlock_write(self)      shared_rwlock_write(&(self)->p_cldlock)
-#define path_cldlock_write_nx(self)   shared_rwlock_write_nx(&(self)->p_cldlock)
-#define path_cldlock_trywrite(self)   shared_rwlock_trywrite(&(self)->p_cldlock)
-#define path_cldlock_endwrite(self)   (shared_rwlock_endwrite(&(self)->p_cldlock), path_cldlock_reap(self))
-#define _path_cldlock_endwrite(self)  shared_rwlock_endwrite(&(self)->p_cldlock)
-#define path_cldlock_read(self)       shared_rwlock_read(&(self)->p_cldlock)
-#define path_cldlock_read_nx(self)    shared_rwlock_read_nx(&(self)->p_cldlock)
-#define path_cldlock_tryread(self)    shared_rwlock_tryread(&(self)->p_cldlock)
-#define _path_cldlock_endread(self)   shared_rwlock_endread(&(self)->p_cldlock)
-#define path_cldlock_endread(self)    (void)(shared_rwlock_endread(&(self)->p_cldlock) && (path_cldlock_reap(self), 0))
-#define _path_cldlock_end(self)       shared_rwlock_end(&(self)->p_cldlock)
-#define path_cldlock_end(self)        (void)(shared_rwlock_end(&(self)->p_cldlock) && (path_cldlock_reap(self), 0))
-#define path_cldlock_upgrade(self)    shared_rwlock_upgrade(&(self)->p_cldlock)
-#define path_cldlock_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->p_cldlock)
-#define path_cldlock_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->p_cldlock)
-#define path_cldlock_downgrade(self)  shared_rwlock_downgrade(&(self)->p_cldlock)
-#define path_cldlock_reading(self)    shared_rwlock_reading(&(self)->p_cldlock)
-#define path_cldlock_writing(self)    shared_rwlock_writing(&(self)->p_cldlock)
-#define path_cldlock_canread(self)    shared_rwlock_canread(&(self)->p_cldlock)
-#define path_cldlock_canwrite(self)   shared_rwlock_canwrite(&(self)->p_cldlock)
+#define /*BLOCKING*/ path_cldlock_write(self)      shared_rwlock_write(&(self)->p_cldlock)
+#define /*BLOCKING*/ path_cldlock_write_nx(self)   shared_rwlock_write_nx(&(self)->p_cldlock)
+#define /*        */ path_cldlock_trywrite(self)   shared_rwlock_trywrite(&(self)->p_cldlock)
+#define /*        */ path_cldlock_endwrite(self)   (shared_rwlock_endwrite(&(self)->p_cldlock), path_cldlock_reap(self))
+#define /*        */ _path_cldlock_endwrite(self)  shared_rwlock_endwrite(&(self)->p_cldlock)
+#define /*BLOCKING*/ path_cldlock_read(self)       shared_rwlock_read(&(self)->p_cldlock)
+#define /*BLOCKING*/ path_cldlock_read_nx(self)    shared_rwlock_read_nx(&(self)->p_cldlock)
+#define /*        */ path_cldlock_tryread(self)    shared_rwlock_tryread(&(self)->p_cldlock)
+#define /*        */ _path_cldlock_endread(self)   shared_rwlock_endread(&(self)->p_cldlock)
+#define /*        */ path_cldlock_endread(self)    (void)(shared_rwlock_endread(&(self)->p_cldlock) && (path_cldlock_reap(self), 0))
+#define /*        */ _path_cldlock_end(self)       shared_rwlock_end(&(self)->p_cldlock)
+#define /*        */ path_cldlock_end(self)        (void)(shared_rwlock_end(&(self)->p_cldlock) && (path_cldlock_reap(self), 0))
+#define /*BLOCKING*/ path_cldlock_upgrade(self)    shared_rwlock_upgrade(&(self)->p_cldlock)
+#define /*BLOCKING*/ path_cldlock_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->p_cldlock)
+#define /*        */ path_cldlock_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->p_cldlock)
+#define /*        */ path_cldlock_downgrade(self)  shared_rwlock_downgrade(&(self)->p_cldlock)
+#define /*        */ path_cldlock_reading(self)    shared_rwlock_reading(&(self)->p_cldlock)
+#define /*        */ path_cldlock_writing(self)    shared_rwlock_writing(&(self)->p_cldlock)
+#define /*        */ path_cldlock_canread(self)    shared_rwlock_canread(&(self)->p_cldlock)
+#define /*        */ path_cldlock_canwrite(self)   shared_rwlock_canwrite(&(self)->p_cldlock)
 
 /* Remove `elem' from the child-list of `self'
  * @return: true:  Successfully removed.
@@ -364,7 +364,7 @@ NOTHROW(FCALL path_cldlist_insert)(struct path *__restrict self,
  *                  should  use `fdirnode_lookup()' to determine if the dir
  *                  of `self' contains the named file.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' was marked as `PATH_CLDLIST_DELETED' */
-FUNDEF WUNUSED NONNULL((1)) REF struct path *KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct path *KCALL
 path_lookupchild(struct path *__restrict self,
                  /*utf-8*/ USER CHECKED char const *name,
                  u16 namelen, uintptr_t namehash,
@@ -411,7 +411,7 @@ path_lookupchildref_withlock(struct path *__restrict self,
  * @throw: E_FSERROR_NOT_A_DIRECTORY:         The named child isn't a directory or symlink (or the symlink expands to a non-directory)
  * @throw: E_IOERROR:                         ...
  * @throw: E_BADALLOC:                        ... */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct path *KCALL
 path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlinks,
                  /*utf-8*/ USER CHECKED char const *name,
                  u16 namelen, uintptr_t namehash, atflag_t atflags DFL(0))
@@ -430,7 +430,7 @@ path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlin
  *
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_NO_AUTOMOUNT | AT_SYMLINK_NOFOLLOW' (other flags are silently ignored)
  */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_symlinks,
                      /*utf-8*/ USER CHECKED char const *name,
                      u16 namelen, uintptr_t namehash, atflag_t atflags DFL(0),
@@ -493,7 +493,7 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
  *                                `cwd ? cwd : THIS_FS->fs_cwd' to be returned.
  *  - AT_IGNORE_TRAILING_SLASHES: Ignore trailing slashes
  *  - Other flags are silently ignored. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct path *KCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct path *KCALL
 path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
                  /*utf-8*/ USER CHECKED char const *upath,
                  /*out_opt*/ /*utf-8*/ USER CHECKED char const **plastseg DFL(__NULLPTR),
@@ -504,7 +504,7 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 
 /* Same as  `path_traverse_ex',  but  automatically keep  track  of  symlinks,
  * as well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handle_get_path(fd_cwd)' */
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct path *KCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_traverse(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath,
               /*out_opt*/ /*utf-8*/ USER CHECKED char const **plastseg DFL(__NULLPTR),
               /*out_opt*/ u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
@@ -523,7 +523,7 @@ path_traverse(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath,
 
 /* Helper wrapper that combines `path_traverse_ex()' with `path_expandchildnode()'
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
 path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
                      /*utf-8*/ USER CHECKED char const *upath, atflag_t atflags DFL(0),
                      /*out[1..1]_opt*/ REF struct path **presult_path DFL(__NULLPTR),
@@ -534,7 +534,7 @@ path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 
 /* Helper wrapper that combines `path_traverse()' with `path_expandchildnode()'
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
 path_traversefull(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath, atflag_t atflags DFL(0),
                   /*out[1..1]_opt*/ REF struct path **presult_path DFL(__NULLPTR),
                   /*out[1..1]_opt*/ REF struct fdirent **presult_dirent DFL(__NULLPTR))
@@ -556,7 +556,7 @@ path_traversefull(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath, atflag_
  * @throw: E_FSERROR_READONLY:            ...
  * @throw: E_IOERROR:                     ...
  * @throw: E_BADALLOC:                    ... */
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF BLOCKING NONNULL((1)) void KCALL
 path_remove(struct path *__restrict self,
             /*utf-8*/ USER CHECKED char const *name, u16 namelen, atflag_t atflags DFL(0),
             /*out[1..1]_opt*/ REF struct fnode **pdeleted_node DFL(__NULLPTR),
@@ -592,7 +592,7 @@ path_remove(struct path *__restrict self,
  * @throw: E_FSERROR_READONLY:                ...
  * @throw: E_IOERROR:                         ...
  * @throw: E_BADALLOC:                        ... */
-FUNDEF NONNULL((1, 4)) void KCALL
+FUNDEF BLOCKING NONNULL((1, 4)) void KCALL
 path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
             struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
             atflag_t atflags DFL(0), __BOOL check_permissions DFL(1),
@@ -627,7 +627,8 @@ path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u1
  *               which is the one with a NULL parent pointer. */
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
 path_print(struct path *__restrict self, __pformatprinter printer, void *arg,
-           atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR));
+           atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK);
 
 /* Helper  wrapper for `path_print' that follows up the call by printing
  * the given `dentry_name...+=dentry_namelen'. You should always include
@@ -638,20 +639,23 @@ path_printent(struct path *__restrict self,
               USER CHECKED char const *dentry_name, u16 dentry_namelen,
               __pformatprinter printer, void *arg,
               atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
-              struct path *root DFL(__NULLPTR));
+              struct path *root DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 
 /* Helper functions for printing a path into a user-space buffer.
  * @return: * : The required buffer size (including a trailing NUL-character) */
 FUNDEF NONNULL((1)) size_t KCALL
 path_sprint(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
-            atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR)) THROWS(E_SEGFAULT);
+            atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 FUNDEF NONNULL((1)) size_t KCALL
 path_sprintent(struct path *__restrict self,
                USER CHECKED char const *dentry_name, u16 dentry_namelen,
                USER CHECKED char *buffer, size_t buflen,
                atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
-               struct path *root DFL(__NULLPTR)) THROWS(E_SEGFAULT);
+               struct path *root DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 
 
@@ -706,27 +710,27 @@ struct pathmount
  *              to `self' will continue to operate  with the old path `self'  (since
  *              the old path didn't get modified but replaced with a newly allocated
  *              path). */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
 path_mount(struct path *__restrict self, struct fdirnode *__restrict dir)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED, ...);
 
 /* Unmount the  a given  path `self',  as well  as  all
  * child-paths of it which may also be mounting points.
  * @return: true:  `self' was unmounted.
  * @return: false: `self' had already been unmounted. */
-FUNDEF NONNULL((1)) __BOOL KCALL
+FUNDEF BLOCKING NONNULL((1)) __BOOL KCALL
 path_umount(struct pathmount *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
 
 
 /* Open (or create) a file, the same way user-space open(2) works. */
-FUNDEF WUNUSED NONNULL((2)) REF struct handle KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((2)) REF struct handle KCALL
 path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
              USER CHECKED char const *filename,
              oflag_t oflags, mode_t mode DFL(0));
-FUNDEF WUNUSED REF struct handle KCALL
+FUNDEF BLOCKING WUNUSED REF struct handle KCALL
 path_open(fd_t fd_cwd, USER CHECKED char const *filename,
           oflag_t oflags, mode_t mode DFL(0));
 

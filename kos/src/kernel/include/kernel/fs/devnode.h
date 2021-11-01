@@ -75,7 +75,8 @@ FUNDEF NONNULL((1, 2)) void KCALL
 fdevnode_v_open(struct mfile *__restrict self,
                 struct handle *__restrict hand,
                 struct path *access_path,
-                struct fdirent *access_dent);
+                struct fdirent *access_dent)
+		THROWS(E_WOULDBLOCK, E_NO_DEVICE);
 #define fdevnode_v_changed fnode_v_changed
 #define fdevnode_v_destroy fnode_v_destroy
 

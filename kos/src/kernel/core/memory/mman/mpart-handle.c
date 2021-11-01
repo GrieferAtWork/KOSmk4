@@ -53,8 +53,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(mpart, struct mpart);
 
 INTERN NONNULL((1)) REF void *KCALL
 handle_mpart_tryas(struct mpart *__restrict self,
-                   uintptr_half_t wanted_type)
-		THROWS(E_WOULDBLOCK) {
+                   uintptr_half_t wanted_type) {
 	switch (wanted_type) {
 
 	case HANDLE_TYPE_MFILE: {

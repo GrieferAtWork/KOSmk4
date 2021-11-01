@@ -71,7 +71,8 @@ DECL_BEGIN
  * open(2)-ing a generic mfile object uses `mfile_open()' (see below). */
 PUBLIC NONNULL((1, 2)) void KCALL
 mfile_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
-             struct path *access_path, struct fdirent *access_dent) {
+             struct path *access_path, struct fdirent *access_dent)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct filehandle *fh;
 	assert(hand->h_type == HANDLE_TYPE_MFILE);
 	assert(hand->h_data == self);
@@ -100,9 +101,10 @@ mfile_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
  * >> } else {
  * >>     // Open mfile itself (iow: `hand->h_data == self')
  * >> } */
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mfile_open(struct mfile *__restrict self, struct handle *__restrict hand,
-           struct path *access_path, struct fdirent *access_dent) {
+           struct path *access_path, struct fdirent *access_dent)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
 	struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
 	if (!stream) {
 		mfile_v_open(self, hand, access_path, access_dent);
@@ -148,7 +150,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(mfile, struct mfile);
 /* Handle-specific operator wrappers for `struct mfile'                 */
 /************************************************************************/
 
-INTERN WUNUSED NONNULL((1)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_read(struct mfile *__restrict self,
                   USER CHECKED void *dst,
                   size_t num_bytes, iomode_t mode)
@@ -168,7 +170,7 @@ handle_mfile_read(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_READ);
 }
 
-INTERN WUNUSED NONNULL((1)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_write(struct mfile *__restrict self,
                    USER CHECKED void const *src,
                    size_t num_bytes, iomode_t mode)
@@ -212,7 +214,7 @@ mfile_utailwrite(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_WRITE);
 }
 
-INTERN WUNUSED NONNULL((1)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_pread(struct mfile *__restrict self,
                    USER CHECKED void *dst, size_t num_bytes,
                    pos_t addr, iomode_t mode)
@@ -243,7 +245,7 @@ handle_mfile_pread(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_PREAD);
 }
 
-INTERN WUNUSED NONNULL((1)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_pwrite(struct mfile *__restrict self,
                     USER CHECKED void const *src, size_t num_bytes,
                     pos_t addr, iomode_t mode)
@@ -274,7 +276,7 @@ handle_mfile_pwrite(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_PWRITE);
 }
 
-INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_mfile_readv(struct mfile *__restrict self,
                    struct iov_buffer *__restrict dst,
                    size_t num_bytes, iomode_t mode)
@@ -315,7 +317,7 @@ done_read:
 	      E_FILESYSTEM_OPERATION_READ);
 }
 
-INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_mfile_writev(struct mfile *__restrict self,
                     struct iov_buffer *__restrict src,
                     size_t num_bytes, iomode_t mode)
@@ -402,7 +404,7 @@ done_write:
 	      E_FILESYSTEM_OPERATION_WRITE);
 }
 
-INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_mfile_preadv(struct mfile *__restrict self,
                     struct iov_buffer *__restrict dst,
                     size_t num_bytes, pos_t addr, iomode_t mode)
@@ -477,7 +479,7 @@ done_read:
 	      E_FILESYSTEM_OPERATION_PREAD);
 }
 
-INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_mfile_pwritev(struct mfile *__restrict self,
                      struct iov_buffer *__restrict src,
                      size_t num_bytes, pos_t addr, iomode_t mode)
@@ -552,7 +554,7 @@ done_write:
 	      E_FILESYSTEM_OPERATION_PWRITE);
 }
 
-INTERN NONNULL((1)) pos_t KCALL
+INTERN BLOCKING NONNULL((1)) pos_t KCALL
 handle_mfile_seek(struct mfile *__restrict self,
                   off_t offset, unsigned int whence)
 		THROWS(...) {
@@ -564,7 +566,7 @@ handle_mfile_seek(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_SEEK);
 }
 
-INTERN NONNULL((1)) syscall_slong_t KCALL
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
@@ -577,7 +579,7 @@ handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	      cmd);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN BLOCKING NONNULL((1)) void KCALL
 handle_mfile_truncate(struct mfile *__restrict self,
                       pos_t new_size)
 		THROWS(...) {
@@ -595,7 +597,7 @@ handle_mfile_truncate(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_TRUNC);
 }
 
-INTERN NONNULL((1, 2)) void KCALL
+INTERN BLOCKING NONNULL((1, 2)) void KCALL
 handle_mfile_mmap(struct mfile *__restrict self,
                   struct handle_mmap_info *__restrict info)
 		THROWS(...) {
@@ -632,7 +634,7 @@ handle_mfile_mmap(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_MMAP);
 }
 
-INTERN NONNULL((1)) pos_t KCALL
+INTERN BLOCKING NONNULL((1)) pos_t KCALL
 handle_mfile_allocate(struct mfile *__restrict self,
                       fallocate_mode_t mode,
                       pos_t start, pos_t length)
@@ -660,7 +662,7 @@ mfile_sync_generic(struct mfile *__restrict self)
 		(*stream_ops->mso_sync)(self);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN BLOCKING NONNULL((1)) void KCALL
 handle_mfile_sync(struct mfile *__restrict self)
 		THROWS(...) {
 	if (mfile_isnode(self)) {
@@ -673,7 +675,7 @@ handle_mfile_sync(struct mfile *__restrict self)
 	}
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN BLOCKING NONNULL((1)) void KCALL
 handle_mfile_datasync(struct mfile *__restrict self)
 		THROWS(...) {
 	if (mfile_isnode(self)) {
@@ -685,7 +687,7 @@ handle_mfile_datasync(struct mfile *__restrict self)
 	}
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN BLOCKING NONNULL((1)) void KCALL
 handle_mfile_stat(struct mfile *__restrict self,
                   USER CHECKED struct stat *result)
 		THROWS(...) {
@@ -771,7 +773,7 @@ handle_mfile_stat(struct mfile *__restrict self,
 	}
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN BLOCKING NONNULL((1)) void KCALL
 handle_mfile_pollconnect(struct mfile *__restrict self,
                          poll_mode_t what)
 		THROWS(...) {
@@ -781,7 +783,7 @@ handle_mfile_pollconnect(struct mfile *__restrict self,
 		(*stream->mso_pollconnect)(self, what);
 }
 
-INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_mfile_polltest(struct mfile *__restrict self,
                       poll_mode_t what)
 		THROWS(...) {
@@ -805,7 +807,7 @@ handle_mfile_polltest(struct mfile *__restrict self,
 	return result;
 }
 
-INTERN NONNULL((1)) syscall_slong_t KCALL
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_mfile_hop(struct mfile *__restrict self,
                  syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
@@ -821,7 +823,7 @@ handle_mfile_hop(struct mfile *__restrict self,
 	      cmd);
 }
 
-INTERN NONNULL((1)) REF void *KCALL
+INTERN BLOCKING NONNULL((1)) REF void *KCALL
 handle_mfile_tryas(struct mfile *__restrict self,
                    uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
@@ -833,7 +835,7 @@ handle_mfile_tryas(struct mfile *__restrict self,
 	return NULL;
 }
 
-INTERN NONNULL((1, 2)) ssize_t KCALL
+INTERN BLOCKING NONNULL((1, 2)) ssize_t KCALL
 handle_mfile_printlink(struct mfile *__restrict self,
                        pformatprinter printer, void *arg)
 		THROWS(E_WOULDBLOCK) {

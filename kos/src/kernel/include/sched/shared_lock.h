@@ -68,7 +68,7 @@ struct shared_lock {
 /* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-FUNDEF NONNULL((1)) __BOOL KCALL
+FUNDEF BLOCKING NONNULL((1)) __BOOL KCALL
 shared_lock_acquire(struct shared_lock *__restrict self,
                     ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK, ...);
@@ -78,7 +78,7 @@ shared_lock_acquire(struct shared_lock *__restrict self,
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-FUNDEF WUNUSED NONNULL((1)) __BOOL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL
 NOTHROW(KCALL shared_lock_acquire_nx)(struct shared_lock *__restrict self,
                                       ktime_t abs_timeout DFL(KTIME_INFINITE));
 

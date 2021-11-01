@@ -118,24 +118,20 @@ struct fsuper_ops {
 	 * for compatibility with linux. On KOS, this exception is:
 	 *   - E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID:uid
 	 *   - E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid */
-	WUNUSED NONNULL((1)) __BOOL (KCALL *so_validuid)(struct fsuper *__restrict self, uid_t uid) THROWS(...);
-	WUNUSED NONNULL((1)) __BOOL (KCALL *so_validgid)(struct fsuper *__restrict self, gid_t gid) THROWS(...);
+	BLOCKING WUNUSED NONNULL((1)) __BOOL (KCALL *so_validuid)(struct fsuper *__restrict self, uid_t uid) THROWS(...);
+	BLOCKING WUNUSED NONNULL((1)) __BOOL (KCALL *so_validgid)(struct fsuper *__restrict self, gid_t gid) THROWS(...);
 
 	/* [0..1] Truncate the given `tms' to the near possible time value which
 	 *        can be encoded within filesystem-specific data structure. */
-	NONNULL((1, 2)) void (KCALL *so_truncate_atime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
-	NONNULL((1, 2)) void (KCALL *so_truncate_mtime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
-	NONNULL((1, 2)) void (KCALL *so_truncate_ctime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
+	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_atime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
+	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_mtime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
+	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_ctime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
 
 	/* [0..1] Flush unwritten changes from fs-specific
 	 *        superblock buffers to disk and/or disk buffers */
-	NONNULL((1)) void
+	BLOCKING NONNULL((1)) void
 	(KCALL *so_sync)(struct fsuper *__restrict self)
 			THROWS(E_IOERROR, ...);
-
-	/* [0..1] Clear filesystem superblock caches */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *so_clearcache)(struct fsuper *__restrict self);
 
 	/* [0..1] Gather information about the filesystem.
 	 * The caller has already initialized:
@@ -151,10 +147,10 @@ struct fsuper_ops {
 	 *   - f_files
 	 *   - f_ffree
 	 *   - f_fsid */
-	NONNULL((1)) void
+	BLOCKING NONNULL((1)) void
 	(KCALL *so_statfs)(struct fsuper *__restrict self,
 	                   USER CHECKED struct statfs *result)
-			THROWS(E_IOERROR, E_SEGFAULT, ...);
+			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
 	struct fdirnode_ops so_fdir; /* FDirNode operators */
 
@@ -206,8 +202,8 @@ struct fsuper {
 	 *
 	 * Filesystem drivers should use these (or rather: the wrapper macros below) in order
 	 * to perform aligned (O_DIRECT-style) disk I/O. */
-	NONNULL((1, 5)) void (KCALL *fs_loadblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
-	NONNULL((1, 5)) void (KCALL *fs_saveblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
+	BLOCKING NONNULL((1, 5)) void (KCALL *fs_loadblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
+	BLOCKING NONNULL((1, 5)) void (KCALL *fs_saveblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
 	struct fsuperfeat           fs_feat;          /* [const] Filesystem features. */
 	struct REF fnode_list       fs_changednodes;  /* [0..n][lock(fs_changednodes_lock)][const_if(FSUPER_NODES_DELETED)]
 	                                               * List of changed node (set to FSUPER_NODES_DELETED during unmount). */
@@ -457,12 +453,12 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self);
  * #2: Write modified data and attributes of all changed fnode-s to disk.
  * #3: Invoke the `so_sync' operator (if defined)
  * If an exception is thrown during step #2 or #3, re-add `self' to the list of changed superblocks */
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF BLOCKING NONNULL((1)) void KCALL
 fsuper_sync(struct fsuper *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
 /* Synchronize all superblocks containing changed fnode-s (s.a. `fchangedsuper_list') */
-FUNDEF void KCALL fsuper_syncall(void)
+FUNDEF BLOCKING void KCALL fsuper_syncall(void)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
 
@@ -487,10 +483,10 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self);
 
 
 /* Gather information about the filesystem and store that information in `*result' */
-FUNDEF NONNULL((1, 2)) void FCALL
+FUNDEF BLOCKING NONNULL((1, 2)) void FCALL
 fsuper_statfs(struct fsuper *__restrict self,
               USER CHECKED struct statfs *result)
-		THROWS(E_IOERROR, E_SEGFAULT, ...);
+		THROWS(E_SEGFAULT, E_IOERROR, ...);
 
 
 

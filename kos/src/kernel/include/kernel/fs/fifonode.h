@@ -166,38 +166,38 @@ struct handle;
 /* Default operator for opening ffifonode files. This will  construct
  * a `struct fifohandle' (HANDLE_TYPE_FIFOHANDLE) object and write it
  * back to `hand'. */
-FUNDEF NONNULL((1, 2)) void KCALL
+FUNDEF BLOCKING NONNULL((1, 2)) void KCALL
 ffifonode_v_open(struct mfile *__restrict self,
                  struct handle *__restrict hand,
                  struct path *access_path,
                  struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE);
-FUNDEF WUNUSED NONNULL((1)) size_t KCALL
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 ffifonode_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 ffifonode_v_readv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
                   size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF WUNUSED NONNULL((1)) size_t KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 ffifonode_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
                   size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
 ffifonode_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
                    size_t num_bytes, iomode_t mode) THROWS(...);
 /* Does `ringbuffer_setwritten()' */
 FUNDEF NONNULL((1)) void KCALL
 ffifonode_v_truncate(struct mfile *__restrict self, pos_t new_size)
-		THROWS(...);
+		THROWS(E_WOULDBLOCK);
 /* Fills in `st_size' with `mfile_asfifo(self)->ff_buffer.rb_avail' */
 FUNDEF NONNULL((1)) void KCALL
 ffifonode_v_stat(struct mfile *__restrict self,
                  USER CHECKED struct stat *result)
-		THROWS(...);
+		THROWS(E_SEGFAULT);
 /* Implements some `HOP_PIPE_OPEN_*' commands */
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
 ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode)
-		THROWS(...);
+		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 #define ffifonode_v_changed fnode_v_changed

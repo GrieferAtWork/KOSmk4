@@ -287,9 +287,9 @@ DATDEF struct blkdev_ops const blkpart_ops;
  *               - fallnodes_lock
  *   - Step #6: Drop references from all of the old partitions
  *   - Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF BLOCKING NONNULL((1)) void KCALL
 blkdev_repart(struct blkdev *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* The  combination of `device_register()' and `blkdev_repart()', but implemented
  * in such a manner that either all of the new devices become visible at the same
@@ -313,9 +313,9 @@ blkdev_repart(struct blkdev *__restrict self)
  *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
  *  - self->_device_devnode_ _fdevnode_node_ fn_supent
  *  - self->dv_byname_node */
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF BLOCKING NONNULL((1)) void KCALL
 blkdev_repart_and_register(struct blkdev *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 DECL_END
 #endif /* __CC__ */

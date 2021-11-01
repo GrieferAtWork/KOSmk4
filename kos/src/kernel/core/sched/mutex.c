@@ -33,7 +33,7 @@ DECL_BEGIN
 /* Acquire a lock to the given mutex, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-PUBLIC NONNULL((1)) bool KCALL
+PUBLIC BLOCKING NONNULL((1)) bool KCALL
 mutex_acquire(struct mutex *__restrict self, ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK, ...) {
 	struct task *old_task, *me = THIS_TASK;
@@ -75,7 +75,7 @@ do_exchange:
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-PUBLIC WUNUSED NONNULL((1)) bool
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL mutex_acquire_nx)(struct mutex *__restrict self,
                                 ktime_t abs_timeout) {
 	struct task *old_task, *me = THIS_TASK;

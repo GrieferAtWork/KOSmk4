@@ -355,7 +355,8 @@ FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
  * NOTE:  This  function  must  not  be  called  by  the  BOOT CPU!
  * With this, it is the arch-dependent portion of `cpu_deepsleep()'
  * that performs  the actual  deep-sleep  on a  multi-core  system. */
-FUNDEF NOPREEMPT void NOTHROW(FCALL cpu_enter_deepsleep)(struct cpu *__restrict caller);
+FUNDEF NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL cpu_enter_deepsleep)(struct cpu *__restrict caller);
 
 /* Check  if IPIs are  pending to be executed  by the calling CPU,
  * returning  `true'  if  this is  the  case, or  `false'  it not.
@@ -471,9 +472,9 @@ struct icpustate;
  * @param: args: The arguments alongside which the IPI was scheduled.
  * @return: * :  The cpu state to restore, or one of `CPU_IPI_MODE_*'
  */
-typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
-(FCALL *cpu_ipi_t)(struct icpustate *__restrict state,
-                   void *args[CPU_IPI_ARGCOUNT]);
+typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
+/*NOTHROW*/ (FCALL *cpu_ipi_t)(struct icpustate *__restrict state,
+                               void *args[CPU_IPI_ARGCOUNT]);
 #endif /* !CONFIG_NO_SMP */
 #endif /* __CC__ */
 
@@ -584,53 +585,6 @@ NOTHROW(FCALL cpu_run_current_and_remember_nopr)(struct task *__restrict caller)
  * NOTE: Preemption must be disabled before this function may be called! */
 FUNDEF ABNORMAL_RETURN NOPREEMPT ATTR_NORETURN void
 NOTHROW(FCALL cpu_run_current_nopr)(void);
-
-/* IDLE job prototype.
- * @param: arg:  The argument with which the job was scheduled.
- * @param: mode: One of `IDLE_JOB_MODE_*' */
-typedef NOBLOCK void /*NOTHROW*/ (FCALL *idle_job_t)(void *arg, unsigned int mode);
-#define IDLE_JOB_MODE_SERVICE 0x0000 /* Service the IDLE job now. */
-#define IDLE_JOB_MODE_CANCEL  0x0001 /* The IDLE job  was canceled after  when the CPU  decided
-                                      * that  too much  time has  already passed  since the job
-                                      * being scheduled, and whatever it may have been intended
-                                      * to accomplish probably won't make any sense to  prolong
-                                      * even further.
-                                      * In this  case,  the  function  should  simply  perform  cleanup
-                                      * on  the  given `arg',  which is  likely  a call  to `decref()',
-                                      * acompanying a prior use of `cpu_schedule_idle_job_and_incref()' */
-
-/* Optional functions to schedule /  delete jobs that should be  executed
- * by the current CPU's IDLE thread the next time there is nothing to do.
- * NOTE: These functions should be used for the purposes of _HINTS_ _ONLY_!
- *       The  kernel is not  actually required to  implement them, and when
- *       defined as no-ops  that simply return  `false', kernel  operations
- *       must be the same as otherwise!
- * `cpu_schedule_idle_job_and_incref'  is  the same  as `cpu_schedule_idle_job()',
- * but if the request succeeds (return == true), atomically increment a `refcnt_t'
- * field found at  `arg + refcnt_offset', thus allowing  the job-function to  take
- * and inherit a reference to some object on which to operate.
- * @param: job:    The job to perform.
- * @param: arg:    The argument to pass to `job' when it should be executed.
- * @return: true:  Successfully scheduled the job for execution.
- *                 In this case, it is guarantied that the job will eventually
- *                 either be executed, or canceled.
- * @return: false: Failed to allocate memory for the job, or there are already too many jobs.
- * @return: false: Another IDLE job with the same `job' and `arg' had already been scheduled.
- * @return: false: The kernel has been configured to disable IDLE jobs. */
-FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(FCALL cpu_schedule_idle_job)(idle_job_t job, void *arg);
-FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(FCALL cpu_schedule_idle_job_and_incref)(idle_job_t job, void *arg, ptrdiff_t refcnt_offset);
-
-/* Delete a previously schedule IDLE job before it can be serviced.
- * @return: true:  The job was unscheduled, and invoked with `IDLE_JOB_MODE_CANCEL'
- * @return: false: Either the job was never scheduled, or has already been serviced
- *                 when the CPU had some down-time between now and a prior call  to
- *                `cpu_schedule_idle_job*()' */
-FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(FCALL cpu_delete_idle_job)(idle_job_t job, void *arg);
-
-/* Helper functions to schedule a simple IDLE job. */
-FUNDEF NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL cpu_schedule_idle_job_simple)(NOBLOCK void /*NOTHROW*/ (KCALL *func)(void));
-
 
 #endif /* __CC__ */
 

@@ -31,7 +31,7 @@
 
 DECL_BEGIN
 
-PUBLIC NOCONNECT NONNULL((1)) bool FCALL
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool FCALL
 shared_rwlock_read(struct shared_rwlock *__restrict self,
                    ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK) {
@@ -54,7 +54,7 @@ success:
 	return true;
 }
 
-PUBLIC NOCONNECT NONNULL((1)) bool FCALL
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool FCALL
 shared_rwlock_write(struct shared_rwlock *__restrict self,
                     ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK) {
@@ -77,7 +77,7 @@ success:
 	return true;
 }
 
-PUBLIC NOCONNECT NONNULL((1)) bool
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool
 NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self,
                                      ktime_t abs_timeout) {
 	assert(!task_wasconnected());
@@ -99,7 +99,7 @@ success:
 	return true;
 }
 
-PUBLIC NOCONNECT NONNULL((1)) bool
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool
 NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self,
                                       ktime_t abs_timeout) {
 	assert(!task_wasconnected());

@@ -198,7 +198,8 @@ vfs_mounts_next(struct vfs *__restrict self,
  * the given VFS `self', return `NULL' */
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct pathmount *FCALL
 vfs_mount_location(struct vfs *__restrict self,
-                   struct fdirnode *__restrict dir) {
+                   struct fdirnode *__restrict dir)
+		THROWS(E_WOULDBLOCK) {
 	REF struct pathmount *result;
 	vfs_mountslock_acquire(self);
 	LIST_FOREACH (result, &self->vf_mounts, pm_vsmount) {

@@ -129,20 +129,22 @@ NOTHROW(KCALL blkpart_v_destroy)(struct mfile *__restrict self) {
 	blkdev_v_destroy(self);
 }
 
-PRIVATE NONNULL((1, 5)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 5)) void KCALL
 blkpart_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                      physaddr_t buf, size_t num_bytes,
-                     struct aio_multihandle *__restrict aio) {
+                     struct aio_multihandle *__restrict aio)
+		THROWS(...) {
 	struct blkdev *me = mfile_asblkdev(self);
 	struct blkdev *ms = me->bd_partinfo.bp_master;
 	addr += me->bd_partinfo.bp_partstart;
 	blkdev_rdsectors_async(ms, addr, buf, num_bytes, aio);
 }
 
-PRIVATE NONNULL((1, 5)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 5)) void KCALL
 blkpart_v_saveblocks(struct mfile *__restrict self, pos_t addr,
                      physaddr_t buf, size_t num_bytes,
-                     struct aio_multihandle *__restrict aio) {
+                     struct aio_multihandle *__restrict aio)
+		THROWS(E_FSERROR_READONLY, ...) {
 	struct blkdev *me = mfile_asblkdev(self);
 	struct blkdev *ms = me->bd_partinfo.bp_master;
 	/* Verify that the master device isn't set to read-only. */
@@ -153,7 +155,7 @@ blkpart_v_saveblocks(struct mfile *__restrict self, pos_t addr,
 }
 
 
-PRIVATE NONNULL((1)) void KCALL
+PRIVATE BLOCKING NONNULL((1)) void KCALL
 blkpart_v_sync(struct mfile *__restrict self)
 		THROWS(...) {
 	struct blkdev *me = mfile_asblkdev(self);
@@ -164,7 +166,7 @@ blkpart_v_sync(struct mfile *__restrict self)
 		(*master_stream_ops->mso_sync)(ms);
 }
 
-PRIVATE NONNULL((1)) syscall_slong_t KCALL
+PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 blkpart_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
@@ -180,7 +182,7 @@ blkpart_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	      cmd);
 }
 
-PRIVATE NONNULL((1)) syscall_slong_t KCALL
+PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 blkpart_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
@@ -196,7 +198,7 @@ blkpart_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 	      cmd);
 }
 
-PRIVATE NONNULL((1)) REF void *KCALL
+PRIVATE BLOCKING NONNULL((1)) REF void *KCALL
 blkpart_v_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type)
 		THROWS(...) {
 	struct blkdev *me = mfile_asblkdev(self);
@@ -319,7 +321,8 @@ PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct blkdev *FCALL
 blkdev_makeparts_create(struct blkdev *__restrict self,
                         struct blkdev_list *__restrict parts,
                         uint64_t part_sectormin,
-                        uint64_t part_sectorcnt) {
+                        uint64_t part_sectorcnt)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct blkdev *dev;
 	/* Must allocate as LOCKED since may end up being used for SWAP */
 	dev = (struct blkdev *)kmalloc(offsetafter(struct blkdev, bd_partinfo),
@@ -357,12 +360,13 @@ blkdev_makeparts_create(struct blkdev *__restrict self,
 /* Try  to decode EFI partitions. If the pointed sector(s) don't actually
  * contain a proper EFI partition table, return `false'. Otherwise, parse
  * the table and create partitions. */
-PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3)) bool FCALL
+PRIVATE BLOCKING ATTR_NOINLINE NONNULL((1, 2, 3)) bool FCALL
 blkdev_makeparts_loadefi(struct blkdev *__restrict self,
                          struct blkdev_list *__restrict parts,
                          struct blkdev_makeparts_info *__restrict info,
                          uint64_t efipart_sectormin,
-                         uint64_t efipart_sectorcnt) {
+                         uint64_t efipart_sectorcnt)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct efi_descriptor *efi;
 	pos_t efi_pos;
 	uint32_t efi_hdrsize;
@@ -564,20 +568,22 @@ fail_badsig:
 
 
 /* Forward declaration... */
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void FCALL
+PRIVATE BLOCKING ATTR_NOINLINE NONNULL((1, 2)) void FCALL
 blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
                          struct blkdev_list *__restrict parts,
                          struct blkdev_makeparts_info *info,
                          uint64_t subpart_sectormin,
-                         uint64_t subpart_sectorcnt);
+                         uint64_t subpart_sectorcnt)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
-PRIVATE NONNULL((1, 2, 4)) void FCALL
+PRIVATE BLOCKING NONNULL((1, 2, 4)) void FCALL
 blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
                           struct blkdev_list *__restrict parts,
                           struct blkdev_makeparts_info *info,
                           struct mbr_sector const *__restrict mbr,
                           uint64_t subpart_sectormin,
-                          uint64_t subpart_sectorcnt) {
+                          uint64_t subpart_sectorcnt)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	unsigned int i;
 	uint64_t subpart_sectormax;
 	assert(subpart_sectorcnt != 0);
@@ -712,12 +718,13 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 	}
 }
 
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void FCALL
+PRIVATE BLOCKING ATTR_NOINLINE NONNULL((1, 2)) void FCALL
 blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
                          struct blkdev_list *__restrict parts,
                          struct blkdev_makeparts_info *info,
                          uint64_t subpart_sectormin,
-                         uint64_t subpart_sectorcnt) {
+                         uint64_t subpart_sectorcnt)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct mbr_sector *mbr;
 	pos_t mbr_pos;
 
@@ -750,9 +757,10 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
  *  - self->bd_partinfo.bp_partlink     (Because of this, you must cannot just decref() these devices,
  *                                       must instead use `blkdev_destroy_incomplete_part()' if  you
  *                                       come into a situation where these new devices must go away) */
-PRIVATE WUNUSED NONNULL((1, 2)) struct REF blkdev_list FCALL
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) struct REF blkdev_list FCALL
 blkdev_makeparts(struct blkdev *__restrict self,
-                 struct blkdev_makeparts_info *__restrict info) {
+                 struct blkdev_makeparts_info *__restrict info)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct REF blkdev_list result;
 	LIST_INIT(&result);
 
@@ -1009,7 +1017,7 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct blkdev *__restrict self) {
  *               - fallnodes_lock
  *   - Step #6: Drop references from all of the old partitions
  *   - Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 blkdev_repart(struct blkdev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct blkdev *dev;
@@ -1129,9 +1137,9 @@ blkdev_repart(struct blkdev *__restrict self)
  *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
  *  - self->_device_devnode_ _fdevnode_node_ fn_supent
  *  - self->dv_byname_node */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC BLOCKING NONNULL((1)) void KCALL
 blkdev_repart_and_register(struct blkdev *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct blkdev *dev;
 	struct REF blkdev_list newparts;
 	struct blkdev_makeparts_info info;

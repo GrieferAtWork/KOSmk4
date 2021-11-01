@@ -274,7 +274,8 @@ PRIVATE NONNULL((1, 2)) bool FCALL
 forktree_or_unlock(struct forktree *__restrict self,
                    struct mnode **__restrict p_newtree,
                    struct mnode *newtree_parent,
-                   struct mnode *oldtree) {
+                   struct mnode *oldtree)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct mnode *newtree;
 	struct mpart *part;
 	if (!oldtree) {
@@ -516,7 +517,7 @@ done:
 /* Memory   manager   construction    functions.
  * NOTE: mman_fork() will fork the current mman. */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
-mman_fork(void) THROWS(E_BADALLOC, ...) {
+mman_fork(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct forktree ft;
 	ft.ft_oldmm = THIS_MMAN;
 	assertf(ft.ft_oldmm != &mman_kernel, "You can't fork the kernel...");
