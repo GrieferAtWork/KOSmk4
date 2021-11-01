@@ -620,7 +620,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		bool hasinit;
 		/* Special case: We must wait for someone else to finish initialization! */
 		incref(file);
-		mpart_lock_release_f(self);
+		_mpart_lock_release(self);
 		unlockinfo_xunlock(unlock);
 		mpart_lockops_reap(self);
 		{
@@ -671,7 +671,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	/* Prevent the file's size from being lowered. */
 	mfile_trunclock_inc(file);
 #endif /* CONFIG_USE_NEW_FS */
-	mpart_lock_release_f(self);
+	_mpart_lock_release(self);
 	unlockinfo_xunlock(unlock);
 	mpart_lockops_reap(self);
 

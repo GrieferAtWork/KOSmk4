@@ -31,9 +31,29 @@
 
 DECL_BEGIN
 
-PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool FCALL
-shared_rwlock_read(struct shared_rwlock *__restrict self,
-                   ktime_t abs_timeout)
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) void FCALL
+shared_rwlock_read(struct shared_rwlock *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_tryread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_tryread(self))
+				goto success;
+		});
+		task_connect(&self->sl_rdwait);
+		if unlikely(shared_rwlock_tryread(self)) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+	COMPILER_READ_BARRIER();
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool FCALL
+shared_rwlock_read_with_timeout(struct shared_rwlock *__restrict self,
+                                ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK) {
 	assert(!task_wasconnected());
 	while (!shared_rwlock_tryread(self)) {
@@ -54,9 +74,29 @@ success:
 	return true;
 }
 
-PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool FCALL
-shared_rwlock_write(struct shared_rwlock *__restrict self,
-                    ktime_t abs_timeout)
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) void FCALL
+shared_rwlock_write(struct shared_rwlock *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_trywrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_trywrite(self))
+				goto success;
+		});
+		task_connect(&self->sl_wrwait);
+		if unlikely(shared_rwlock_trywrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+	COMPILER_BARRIER();
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool FCALL
+shared_rwlock_write_with_timeout(struct shared_rwlock *__restrict self,
+                                 ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK) {
 	assert(!task_wasconnected());
 	while (!shared_rwlock_trywrite(self)) {
@@ -77,9 +117,30 @@ success:
 	return true;
 }
 
-PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool
-NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self,
-                                     ktime_t abs_timeout) {
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_tryread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_tryread(self))
+				goto success;
+		});
+		task_connect(&self->sl_rdwait);
+		if unlikely(shared_rwlock_tryread(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_rwlock_read_with_timeout_nx)(struct shared_rwlock *__restrict self,
+                                                  ktime_t abs_timeout) {
 	assert(!task_wasconnected());
 	while (!shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
@@ -99,9 +160,8 @@ success:
 	return true;
 }
 
-PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool
-NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self,
-                                      ktime_t abs_timeout) {
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self) {
 	assert(!task_wasconnected());
 	while (!shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
@@ -110,6 +170,201 @@ NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self,
 		});
 		task_connect(&self->sl_wrwait);
 		if unlikely(shared_rwlock_trywrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_rwlock_write_with_timeout_nx)(struct shared_rwlock *__restrict self,
+                                                   ktime_t abs_timeout) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_trywrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_trywrite(self))
+				goto success;
+		});
+		task_connect(&self->sl_wrwait);
+		if unlikely(shared_rwlock_trywrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) void FCALL
+shared_rwlock_waitread(struct shared_rwlock *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_canread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_canread(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_rdwait);
+		if unlikely(shared_rwlock_canread(self)) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+	COMPILER_READ_BARRIER();
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool FCALL
+shared_rwlock_waitread_with_timeout(struct shared_rwlock *__restrict self,
+                                    ktime_t abs_timeout)
+		THROWS(E_WOULDBLOCK) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_canread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_canread(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_rdwait);
+		if unlikely(shared_rwlock_canread(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) void FCALL
+shared_rwlock_waitwrite(struct shared_rwlock *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_canwrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_canwrite(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_wrwait);
+		if unlikely(shared_rwlock_canwrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+	COMPILER_BARRIER();
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool FCALL
+shared_rwlock_waitwrite_with_timeout(struct shared_rwlock *__restrict self,
+                                     ktime_t abs_timeout)
+		THROWS(E_WOULDBLOCK) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_canwrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_canwrite(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_wrwait);
+		if unlikely(shared_rwlock_canwrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict self) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_canread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_canread(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_rdwait);
+		if unlikely(shared_rwlock_canread(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_rwlock_waitread_with_timeout_nx)(struct shared_rwlock *__restrict self,
+                                                      ktime_t abs_timeout) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_canread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_canread(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_rdwait);
+		if unlikely(shared_rwlock_canread(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict self) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_canwrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_canwrite(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_wrwait);
+		if unlikely(shared_rwlock_canwrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_rwlock_waitwrite_with_timeout_nx)(struct shared_rwlock *__restrict self,
+                                                       ktime_t abs_timeout) {
+	assert(!task_wasconnected());
+	while (!shared_rwlock_canwrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_rwlock_canwrite(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_wrwait);
+		if unlikely(shared_rwlock_canwrite(self)) {
 			task_disconnectall();
 			break;
 		}

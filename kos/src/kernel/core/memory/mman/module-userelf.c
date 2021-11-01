@@ -927,7 +927,7 @@ NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self) {
 			SLIST_INSERT(&dead, mod, _um_dead);
 		}
 	}
-	mman_lock_release_f(self);
+	_mman_lock_release(self);
 
 	/* Destroy all dead UserELF modules. */
 	while (!SLIST_EMPTY(&dead)) {

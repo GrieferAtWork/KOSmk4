@@ -386,8 +386,7 @@ do_insert_without_file:
 				if (mman_lock_tryacquire(self))
 					break;
 				mfile_map_release(&map.mmwu_map);
-				while (!mman_lock_available(self))
-					task_yield();
+				mman_lock_waitfor(self);
 again_lock_mfile_map:
 				mfile_map_acquire(&map.mmwu_map);
 			}

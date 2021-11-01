@@ -31,12 +31,33 @@
 
 DECL_BEGIN
 
+/* Acquire a lock to the given shared_lock. */
+PUBLIC BLOCKING NONNULL((1)) void FCALL
+shared_lock_acquire(struct shared_lock *__restrict self)
+		THROWS(E_WOULDBLOCK, ...) {
+	assert(!task_wasconnected());
+	while (!shared_lock_tryacquire(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_lock_tryacquire(self))
+				goto success;
+		});
+		task_connect(&self->sl_sig);
+		if unlikely(shared_lock_tryacquire(self)) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+	COMPILER_BARRIER();
+}
+
 /* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-PUBLIC BLOCKING NONNULL((1)) bool KCALL
-shared_lock_acquire(struct shared_lock *__restrict self,
-                    ktime_t abs_timeout)
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
+shared_lock_acquire_with_timeout(struct shared_lock *__restrict self,
+                                 ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK, ...) {
 	assert(!task_wasconnected());
 	while (!shared_lock_tryacquire(self)) {
@@ -57,14 +78,12 @@ success:
 	return true;
 }
 
-/* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
+/* Acquire a lock to the given shared_lock.
  * @return: true:  Successfully acquired a lock.
- * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL shared_lock_acquire_nx)(struct shared_lock *__restrict self,
-                                      ktime_t abs_timeout) {
+NOTHROW(FCALL shared_lock_acquire_nx)(struct shared_lock *__restrict self) {
 	assert(!task_wasconnected());
 	while (!shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
@@ -73,6 +92,133 @@ NOTHROW(KCALL shared_lock_acquire_nx)(struct shared_lock *__restrict self,
 		});
 		task_connect(&self->sl_sig);
 		if unlikely(shared_lock_tryacquire(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+/* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
+ * @return: true:  Successfully acquired a lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_lock_acquire_with_timeout_nx)(struct shared_lock *__restrict self,
+                                                   ktime_t abs_timeout) {
+	assert(!task_wasconnected());
+	while (!shared_lock_tryacquire(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_lock_tryacquire(self))
+				goto success;
+		});
+		task_connect(&self->sl_sig);
+		if unlikely(shared_lock_tryacquire(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+
+/* Acquire a lock to the given shared_lock. */
+PUBLIC BLOCKING NONNULL((1)) void FCALL
+shared_lock_waitfor(struct shared_lock *__restrict self)
+		THROWS(E_WOULDBLOCK, ...) {
+	assert(!task_wasconnected());
+	while (!shared_lock_available(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_lock_available(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_sig);
+		if unlikely(shared_lock_available(self)) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+	COMPILER_BARRIER();
+}
+
+/* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
+ * @return: true:  The lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
+shared_lock_waitfor_with_timeout(struct shared_lock *__restrict self,
+                                 ktime_t abs_timeout)
+		THROWS(E_WOULDBLOCK, ...) {
+	assert(!task_wasconnected());
+	while (!shared_lock_available(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_lock_available(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_sig);
+		if unlikely(shared_lock_available(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+/* Acquire a lock to the given shared_lock.
+ * @return: true:  The lock became available.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_lock_waitfor_nx)(struct shared_lock *__restrict self) {
+	assert(!task_wasconnected());
+	while (!shared_lock_available(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_lock_available(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_sig);
+		if unlikely(shared_lock_available(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+/* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
+ * @return: true:  The lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL shared_lock_waitfor_with_timeout_nx)(struct shared_lock *__restrict self,
+                                                   ktime_t abs_timeout) {
+	assert(!task_wasconnected());
+	while (!shared_lock_available(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (shared_lock_available(self))
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_sig);
+		if unlikely(shared_lock_available(self)) {
 			task_disconnectall();
 			break;
 		}

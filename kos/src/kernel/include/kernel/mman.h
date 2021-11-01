@@ -193,95 +193,74 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 
 /* Lock accessor helpers for `struct mman' */
 #ifdef CONFIG_USE_RWLOCK_FOR_MMAN
-#define mman_lock_tryread(self)    atomic_rwlock_tryread(&(self)->mm_lock)
-#define mman_lock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mm_lock)
-#define mman_lock_read(self)       atomic_rwlock_read(&(self)->mm_lock)
-#define mman_lock_read_nx(self)    atomic_rwlock_read_nx(&(self)->mm_lock)
-#define mman_lock_write(self)      atomic_rwlock_write(&(self)->mm_lock)
-#define mman_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mm_lock)
-#define mman_lock_endread(self)    (atomic_rwlock_endread(&(self)->mm_lock) ? mman_lockops_reap(self) : (void)0)
-#define mman_lock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->mm_lock), mman_lockops_reap(self))
-#define mman_lock_end(self)        (atomic_rwlock_end(&(self)->mm_lock) ? mman_lockops_reap(self) : (void)0)
-#define mman_lock_endread_f(self)  atomic_rwlock_endread(&(self)->mm_lock)
-#define mman_lock_endwrite_f(self) atomic_rwlock_endwrite(&(self)->mm_lock)
-#define mman_lock_end_f(self)      atomic_rwlock_end(&(self)->mm_lock)
-#define mman_lock_reading(self)    atomic_rwlock_reading(&(self)->mm_lock)
-#define mman_lock_writing(self)    atomic_rwlock_writing(&(self)->mm_lock)
-#define mman_lock_canread(self)    atomic_rwlock_canread(&(self)->mm_lock)
-#define mman_lock_canwrite(self)   atomic_rwlock_canwrite(&(self)->mm_lock)
-#define mman_lock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->mm_lock)
-#define mman_lock_upgrade(self)    atomic_rwlock_upgrade(&(self)->mm_lock)
-#define mman_lock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->mm_lock)
-#define mman_lock_downgrade(self)  atomic_rwlock_downgrade(&(self)->mm_lock)
+#define mman_lock_tryread(self)      atomic_rwlock_tryread(&(self)->mm_lock)
+#define mman_lock_trywrite(self)     atomic_rwlock_trywrite(&(self)->mm_lock)
+#define mman_lock_read(self)         atomic_rwlock_read(&(self)->mm_lock)
+#define mman_lock_read_nx(self)      atomic_rwlock_read_nx(&(self)->mm_lock)
+#define mman_lock_write(self)        atomic_rwlock_write(&(self)->mm_lock)
+#define mman_lock_write_nx(self)     atomic_rwlock_write_nx(&(self)->mm_lock)
+#define mman_lock_endread(self)      (atomic_rwlock_endread(&(self)->mm_lock) ? mman_lockops_reap(self) : (void)0)
+#define mman_lock_endwrite(self)     (atomic_rwlock_endwrite(&(self)->mm_lock), mman_lockops_reap(self))
+#define mman_lock_end(self)          (atomic_rwlock_end(&(self)->mm_lock) ? mman_lockops_reap(self) : (void)0)
+#define _mman_lock_endread(self)     atomic_rwlock_endread(&(self)->mm_lock)
+#define _mman_lock_endwrite(self)    atomic_rwlock_endwrite(&(self)->mm_lock)
+#define _mman_lock_end(self)         atomic_rwlock_end(&(self)->mm_lock)
+#define mman_lock_reading(self)      atomic_rwlock_reading(&(self)->mm_lock)
+#define mman_lock_writing(self)      atomic_rwlock_writing(&(self)->mm_lock)
+#define mman_lock_canread(self)      atomic_rwlock_canread(&(self)->mm_lock)
+#define mman_lock_canwrite(self)     atomic_rwlock_canwrite(&(self)->mm_lock)
+#define mman_lock_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->mm_lock)
+#define mman_lock_upgrade(self)      atomic_rwlock_upgrade(&(self)->mm_lock)
+#define mman_lock_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->mm_lock)
+#define mman_lock_downgrade(self)    atomic_rwlock_downgrade(&(self)->mm_lock)
+#define mman_lock_waitread(self)     atomic_rwlock_waitread(&(self)->mm_lock)
+#define mman_lock_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->mm_lock)
+#define mman_lock_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->mm_lock)
+#define mman_lock_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->mm_lock)
 
 /* Aliases for !CONFIG_USE_RWLOCK_FOR_MMAN-mode
  * Use write-locks for all of these since those are exclusive */
-#define mman_lock_tryacquire(self) mman_lock_trywrite(self)
-#define mman_lock_acquire(self)    mman_lock_write(self)
-#define mman_lock_acquire_nx(self) mman_lock_write_nx(self)
-#define mman_lock_release(self)    mman_lock_endwrite(self)
-#define mman_lock_release_f(self)  mman_lock_endwrite_f(self)
-#define mman_lock_acquired(self)   mman_lock_writing(self)
-#define mman_lock_available(self)  mman_lock_canwrite(self)
-
-/* TODO: Remove general-purpose  locking  support  for  `struct mman'
- *       Since there is more than 1 lock contained inside, it doesn't
- *       make too much  sense to provide  generic locking  overloads! */
-__DEFINE_SYNC_RWLOCK(struct mman,
-                     mman_lock_tryread,
-                     mman_lock_read,
-                     mman_lock_read_nx,
-                     mman_lock_endread,
-                     mman_lock_reading,
-                     mman_lock_canread,
-                     mman_lock_trywrite,
-                     mman_lock_write,
-                     mman_lock_write_nx,
-                     mman_lock_endwrite,
-                     mman_lock_writing,
-                     mman_lock_canwrite,
-                     mman_lock_end,
-                     mman_lock_tryupgrade,
-                     mman_lock_upgrade,
-                     mman_lock_upgrade_nx,
-                     mman_lock_downgrade)
+#define mman_lock_tryacquire mman_lock_trywrite
+#define mman_lock_acquire    mman_lock_write
+#define mman_lock_acquire_nx mman_lock_write_nx
+#define mman_lock_release    mman_lock_endwrite
+#define _mman_lock_release  _mman_lock_endwrite
+#define mman_lock_acquired   mman_lock_writing
+#define mman_lock_available  mman_lock_canwrite
+#define mman_lock_waitfor    mman_lock_waitwrite
+#define mman_lock_waitfor_nx mman_lock_waitwrite_nx
 #else /* CONFIG_USE_RWLOCK_FOR_MMAN */
 #define mman_lock_tryacquire(self) atomic_lock_tryacquire(&(self)->mm_lock)
 #define mman_lock_acquire(self)    atomic_lock_acquire(&(self)->mm_lock)
 #define mman_lock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->mm_lock)
 #define mman_lock_release(self)    (atomic_lock_release(&(self)->mm_lock), mman_lockops_reap(self))
-#define mman_lock_release_f(self)  atomic_lock_release(&(self)->mm_lock)
+#define _mman_lock_release(self)   atomic_lock_release(&(self)->mm_lock)
 #define mman_lock_acquired(self)   atomic_lock_acquired(&(self)->mm_lock)
 #define mman_lock_available(self)  atomic_lock_available(&(self)->mm_lock)
-
-/* TODO: Remove general-purpose  locking  support  for  `struct mman'
- *       Since there is more than 1 lock contained inside, it doesn't
- *       make too much  sense to provide  generic locking  overloads! */
-__DEFINE_SYNC_MUTEX(struct mman,
-                    mman_lock_tryacquire,
-                    mman_lock_acquire,
-                    mman_lock_acquire_nx,
-                    mman_lock_release,
-                    mman_lock_acquired,
-                    mman_lock_available)
+#define mman_lock_waitfor(self)    atomic_lock_waitfor(&(self)->mm_lock)
+#define mman_lock_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->mm_lock)
 
 /* Aliases for the R/W-lock configuration option. */
-#define mman_lock_tryread(self)    mman_lock_tryacquire(self)
-#define mman_lock_trywrite(self)   mman_lock_tryacquire(self)
-#define mman_lock_read(self)       mman_lock_acquire(self)
-#define mman_lock_read_nx(self)    mman_lock_acquire_nx(self)
-#define mman_lock_write(self)      mman_lock_acquire(self)
-#define mman_lock_write_nx(self)   mman_lock_acquire_nx(self)
-#define mman_lock_endread(self)    mman_lock_release(self)
-#define mman_lock_endwrite(self)   mman_lock_release(self)
-#define mman_lock_end(self)        mman_lock_release(self)
-#define mman_lock_endread_f(self)  mman_lock_release_f(self)
-#define mman_lock_endwrite_f(self) mman_lock_release_f(self)
-#define mman_lock_end_f(self)      mman_lock_release_f(self)
-#define mman_lock_reading(self)    mman_lock_acquired(self)
-#define mman_lock_writing(self)    mman_lock_acquired(self)
-#define mman_lock_canread(self)    mman_lock_available(self)
-#define mman_lock_canwrite(self)   mman_lock_available(self)
+#define mman_lock_tryread          mman_lock_tryacquire
+#define mman_lock_trywrite         mman_lock_tryacquire
+#define mman_lock_read             mman_lock_acquire
+#define mman_lock_read_nx          mman_lock_acquire_nx
+#define mman_lock_write            mman_lock_acquire
+#define mman_lock_write_nx         mman_lock_acquire_nx
+#define mman_lock_endread          mman_lock_release
+#define mman_lock_endwrite         mman_lock_release
+#define mman_lock_end              mman_lock_release
+#define _mman_lock_endread         _mman_lock_release
+#define _mman_lock_endwrite        _mman_lock_release
+#define _mman_lock_end             _mman_lock_release
+#define mman_lock_reading          mman_lock_acquired
+#define mman_lock_writing          mman_lock_acquired
+#define mman_lock_canread          mman_lock_available
+#define mman_lock_canwrite         mman_lock_available
+#define mman_lock_waitread         mman_lock_waitfor
+#define mman_lock_waitwrite        mman_lock_waitfor
+#define mman_lock_waitread_nx      mman_lock_waitfor_nx
+#define mman_lock_waitwrite_nx     mman_lock_waitfor_nx
 #define mman_lock_tryupgrade(self) 1
 #define mman_lock_upgrade(self)    1
 #define mman_lock_upgrade_nx(self) 1

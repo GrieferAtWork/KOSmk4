@@ -297,13 +297,13 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	TRY {
 		cpu_node3 = mnode_create_lockram(1);
 		TRY {
-			sync_write(&mman_kernel);
+			mman_lock_acquire(&mman_kernel);
 			cpu_baseaddr = (byte_t *)mman_findunmapped(&mman_kernel,
 			                                           MHINT_GETADDR(KERNEL_MHINT_ALTCORE),
 			                                           (size_t)__kernel_percpu_full_bytes,
 			                                           MHINT_GETMODE(KERNEL_MHINT_ALTCORE));
 			if unlikely(cpu_baseaddr == MAP_FAILED) {
-				sync_endwrite(&mman_kernel);
+				mman_lock_endwrite(&mman_kernel);
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 				      (size_t)__kernel_percpu_full_bytes);
 			}
@@ -329,7 +329,7 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	/* Insert the CPU nodes into the kernel VM. */
 	mman_mappings_insert(&mman_kernel, cpu_node1);
 	mman_mappings_insert(&mman_kernel, cpu_node3);
-	sync_endwrite(&mman_kernel);
+	mman_lock_endwrite(&mman_kernel);
 
 	result = (struct cpu *)cpu_baseaddr;
 
@@ -397,7 +397,7 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	byte_t *cpu_baseaddr;
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	cpu_baseaddr = (byte_t *)self;
-	sync_write(&mman_kernel); /* Never throws due to early-boot guaranties. */
+	mman_lock_write(&mman_kernel); /* Never throws due to early-boot guaranties. */
 	/* NOTE: Must remove `cpu_node2'  first, since that  mnode object is  actually
 	 *       stored inside of `cpu_node1', meaning that once that node is removed,
 	 *       the `cpu_node2' descriptor will automatically become invalid! */
@@ -411,7 +411,7 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_unmap(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
 	pagedir_kernelunprepare(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
-	sync_endwrite(&mman_kernel);
+	mman_lock_endwrite(&mman_kernel);
 	assert(cpu_node1);
 	assert(cpu_node2);
 	assert(cpu_node3);

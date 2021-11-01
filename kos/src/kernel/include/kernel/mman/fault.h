@@ -263,7 +263,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
  * Locking logic:
  *   - return == true:   mpart_lock_acquire(self->mfl_part);
  *                       undefined(out(INTERNAL_DATA(self)))
- *   - return == false:  mman_lock_release_f(self->mfl_mman);
+ *   - return == false:  _mman_lock_release(self->mfl_mman);
  *   - EXCEPT:           mman_lock_release(self->mfl_mman);
  *
  * @param: self:   mem-lock control descriptor.

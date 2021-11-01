@@ -354,7 +354,7 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
 	/* Remove module-self-pointers from `self' */
 	if (mman_lock_tryacquire(mm)) {
 		module_remove_from_mman(self, mm);
-		mman_lock_release_f(mm);
+		_mman_lock_release(mm);
 		DBG_memset(&self->md_mman, 0xcc, sizeof(self->md_mman));
 		weakdecref_likely(self);
 		mman_lockops_reap(mm);

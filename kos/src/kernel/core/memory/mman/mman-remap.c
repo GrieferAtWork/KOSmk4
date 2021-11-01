@@ -159,8 +159,7 @@ err_not_shareable:
 		/* Re-acquire a lock to our mman. */
 		while unlikely(!mman_lock_tryacquire(self)) {
 			mfile_map_release(&map.mmwu_map);
-			while (!mman_lock_available(self))
-				task_yield();
+			mman_lock_waitfor(self);
 again_lock_mman_phase2:
 			mfile_map_acquire(&map.mmwu_map);
 		}
@@ -721,8 +720,7 @@ err_cannot_prepare:
 				/* Re-acquire a lock to the mman. */
 				while (!mman_lock_tryacquire(self)) {
 					mfile_map_release_or_reserved(&map.mmwu_map);
-					while (!mman_lock_available(self))
-						task_yield();
+					mman_lock_waitfor(self);
 again_lock_mman_phase2:
 					mfile_map_acquire_or_reserved(&map.mmwu_map);
 				}

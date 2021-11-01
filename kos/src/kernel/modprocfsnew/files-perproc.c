@@ -1178,9 +1178,9 @@ nofproc:
 		return;
 	if (mm) {
 		size_t vsize;
-		sync_read(mm);
+		mman_lock_read(mm);
 		vsize = mman_get_total_mapped_bytes(mm);
-		sync_endread(mm);
+		mman_lock_endread(mm);
 		if (printf("%" PRIuSIZ " ", vsize) < 0)
 			return;
 	} else {

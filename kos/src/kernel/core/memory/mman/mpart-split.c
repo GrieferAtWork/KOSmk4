@@ -200,7 +200,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 			continue;
 		if (mnode_list_contains_mman(LIST_FIRST(&self->mp_copy), mm, node))
 			continue; /* Already enumerated. */
-		if (!sync_trywrite(mm)) {
+		if (!mman_lock_tryacquire(mm)) {
 			struct mman *blocking_mm = mm;
 			/* Cannot be lock immediately. */
 			while (node != LIST_FIRST(&self->mp_copy)) {
@@ -210,7 +210,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 					continue;
 				if (mnode_list_contains_mman(LIST_FIRST(&self->mp_copy), mm, node))
 					continue; /* Will be enumerated later. */
-				sync_endwrite(mm);
+				mman_lock_release(mm);
 			}
 			return blocking_mm;
 		}
@@ -223,7 +223,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 			continue; /* Already enumerated. */
 		if (mnode_list_contains_mman(LIST_FIRST(&self->mp_share), mm, node))
 			continue; /* Already enumerated. */
-		if (!sync_trywrite(mm)) {
+		if (!mman_lock_tryacquire(mm)) {
 			/* Cannot be lock immediately. */
 			struct mman *blocking_mm = mm;
 			/* Unlock all share-nodes (that have already been locked). */
@@ -236,7 +236,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 					continue; /* Will be enumerated later. */
 				if (mnode_list_contains_mman(LIST_FIRST(&self->mp_share), mm, node))
 					continue; /* Will be enumerated later. */
-				sync_endwrite(mm);
+				mman_lock_release(mm);
 			}
 			/* Unlock all copy-on-write nodes. */
 			LIST_FOREACH (node, &self->mp_copy, mn_link) {
@@ -245,7 +245,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 					continue;
 				if (mnode_list_contains_mman(LIST_FIRST(&self->mp_copy), mm, node))
 					continue; /* Already enumerated. */
-				sync_endwrite(mm);
+				mman_lock_release(mm);
 			}
 			return blocking_mm;
 		}
@@ -268,7 +268,7 @@ NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart *__restrict self) {
 			continue; /* Will be enumerated later. */
 		if (mnode_list_contains_mman(LIST_FIRST(&self->mp_share), mm, node))
 			continue; /* Already enumerated. */
-		sync_endwrite(mm);
+		mman_lock_release(mm);
 	}
 	LIST_FOREACH (node, &self->mp_copy, mn_link) {
 		mm = node->mn_mman;
@@ -276,7 +276,7 @@ NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart *__restrict self) {
 			continue;
 		if (mnode_list_contains_mman(LIST_FIRST(&self->mp_copy), mm, node))
 			continue; /* Already enumerated. */
-		sync_endwrite(mm);
+		mman_lock_release(mm);
 	}
 }
 
@@ -295,8 +295,7 @@ NOTHROW(FCALL mpart_lock_all_mmans_or_unlock_and_decref)(struct mpart *__restric
 		mpart_foreach_mmans_decref(self);
 		mpart_lock_release(self);
 		FINALLY_DECREF_UNLIKELY(error);
-		while (!sync_canwrite(error))
-			task_yield();
+		mman_lock_waitfor(error);
 		return false;
 	}
 	return true;

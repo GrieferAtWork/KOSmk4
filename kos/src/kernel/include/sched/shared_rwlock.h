@@ -73,23 +73,46 @@ struct shared_rwlock {
 #define shared_rwlock_canread(self)  (!(__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) & SHARED_RWLOCK_WFLAG))
 #define shared_rwlock_canwrite(self) (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
 
-LOCAL NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self);
-LOCAL NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self);
-FUNDEF BLOCKING NOCONNECT NONNULL((1)) __BOOL FCALL shared_rwlock_read(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
-FUNDEF BLOCKING NOCONNECT NONNULL((1)) __BOOL FCALL shared_rwlock_write(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
-FUNDEF BLOCKING NOCONNECT NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
-FUNDEF BLOCKING NOCONNECT NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self);
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self);
+FUNDEF BLOCKING NOCONNECT NONNULL((1)) void FCALL shared_rwlock_read(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING NOCONNECT NONNULL((1)) void FCALL shared_rwlock_write(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL FCALL shared_rwlock_read_with_timeout(struct shared_rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL FCALL shared_rwlock_write_with_timeout(struct shared_rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_with_timeout_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_with_timeout_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout);
+FUNDEF BLOCKING NOCONNECT NONNULL((1)) void FCALL shared_rwlock_waitread(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING NOCONNECT NONNULL((1)) void FCALL shared_rwlock_waitwrite(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict self);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict self);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL FCALL shared_rwlock_waitread_with_timeout(struct shared_rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL FCALL shared_rwlock_waitwrite_with_timeout(struct shared_rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_waitread_with_timeout_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout);
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_waitwrite_with_timeout_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL FCALL shared_rwlock_read(struct shared_rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK) ASMNAME("shared_rwlock_read_with_timeout");
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL FCALL shared_rwlock_write(struct shared_rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK) ASMNAME("shared_rwlock_write_with_timeout");
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout) ASMNAME("shared_rwlock_read_with_timeout_nx");
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout) ASMNAME("shared_rwlock_write_with_timeout_nx");
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL FCALL shared_rwlock_waitread(struct shared_rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK) ASMNAME("shared_rwlock_waitread_with_timeout");
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL FCALL shared_rwlock_waitwrite(struct shared_rwlock *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK) ASMNAME("shared_rwlock_waitwrite_with_timeout");
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout) ASMNAME("shared_rwlock_waitread_with_timeout_nx");
+FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout) ASMNAME("shared_rwlock_waitwrite_with_timeout_nx");
+} /* extern "C++" */
+#endif /* __cplusplus */
 
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
-LOCAL NOBLOCK NONNULL((1)) __BOOL
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self);
 
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources. */
-LOCAL BLOCKING NOCONNECT NONNULL((1)) __BOOL
-(FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
-                              ktime_t abs_timeout DFL(KTIME_INFINITE))
+LOCAL BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL
+(FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self)
 		THROWS(E_WOULDBLOCK);
 
 /* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,
@@ -98,8 +121,7 @@ LOCAL BLOCKING NOCONNECT NONNULL((1)) __BOOL
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
 LOCAL NOCONNECT NONNULL((1)) unsigned int
-NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self,
-                                        ktime_t abs_timeout DFL(KTIME_INFINITE));
+NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self);
 
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
 LOCAL NOBLOCK NONNULL((1)) void
@@ -203,7 +225,7 @@ NOTHROW(FCALL shared_rwlock_end)(struct shared_rwlock *__restrict self) {
 	return __newval == 0;
 }
 
-LOCAL NOBLOCK NONNULL((1)) __BOOL
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self) {
 	uintptr_t __temp;
 	do {
@@ -216,7 +238,7 @@ NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self) {
 	return 1;
 }
 
-LOCAL NOBLOCK NONNULL((1)) __BOOL
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self) {
 	if (!__hybrid_atomic_cmpxch(self->sl_lock, 0, SHARED_RWLOCK_WFLAG, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return 0;
@@ -225,7 +247,7 @@ NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self) {
 }
 
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
-LOCAL NOBLOCK NONNULL((1)) __BOOL
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self) {
 	uintptr_t __temp;
 	do {
@@ -241,14 +263,13 @@ NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self) {
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources. */
-LOCAL BLOCKING NOCONNECT NONNULL((1)) __BOOL
-(FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
-                              ktime_t abs_timeout)
+LOCAL BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL
+(FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	if (shared_rwlock_tryupgrade(self))
 		return 1;
 	shared_rwlock_endread(self);
-	shared_rwlock_write(self, abs_timeout);
+	shared_rwlock_write(self);
 	return 0;
 }
 
@@ -258,12 +279,11 @@ LOCAL BLOCKING NOCONNECT NONNULL((1)) __BOOL
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
 LOCAL NOCONNECT NONNULL((1)) unsigned int
-NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self,
-                                        ktime_t abs_timeout) {
+NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self) {
 	if (shared_rwlock_tryupgrade(self))
 		return 1;
 	shared_rwlock_endread(self);
-	if (!shared_rwlock_write_nx(self, abs_timeout))
+	if (!shared_rwlock_write_nx(self))
 		return 0;
 	return 2;
 }

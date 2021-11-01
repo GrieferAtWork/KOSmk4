@@ -83,12 +83,12 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 
 
 #define UNLOCK(self, unlock)     \
-	(mpart_lock_release_f(self), \
+	(_mpart_lock_release(self), \
 	 unlockinfo_xunlock(unlock), \
 	 mpart_lockops_reap(self))
 #ifdef __OPTIMIZE_SIZE__
 #define UNLOCK_OPTREAP(self, unlock) \
-	(mpart_lock_release_f(self),     \
+	(_mpart_lock_release(self),     \
 	 unlockinfo_xunlock(unlock))
 #else /* __OPTIMIZE_SIZE__ */
 #define UNLOCK_OPTREAP(self, unlock) \
@@ -350,7 +350,7 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 		vec = (struct mchunk *)kmalloc_nx(2 * sizeof(struct mchunk),
 		                                  GFP_LOCKED | GFP_ATOMIC | GFP_PREFLT);
 		if unlikely(!vec) {
-			mpart_lock_release_f(self);
+			_mpart_lock_release(self);
 			unlockinfo_xunlock(unlock);
 			mpart_lockops_reap(self);
 			/* Must do the allocation with blocking */
@@ -1379,7 +1379,7 @@ NOTHROW(FCALL unsharecow_unlock_unique_mmans_until)(struct mpart *__restrict par
 		if (mnode_list_contains_mman_until(LIST_FIRST(&part->mp_copy),
 		                                   node, mm, minaddr, maxaddr))
 			continue;
-		sync_endwrite(mm);
+		mman_lock_release(mm);
 	}
 }
 
@@ -1396,7 +1396,7 @@ NOTHROW(FCALL unsharecow_unlock_unique_mmans_fast)(struct mpart *__restrict part
 		if (mnode_list_contains_mman_until_fast(LIST_FIRST(&part->mp_copy),
 		                                        node, mm))
 			continue;
-		sync_endwrite(mm);
+		mman_lock_release(mm);
 	}
 }
 
@@ -1418,7 +1418,7 @@ unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
 		if (mnode_list_contains_mman_until(LIST_FIRST(&part->mp_copy),
 		                                   node, mm, minaddr, maxaddr))
 			continue;
-		if (!sync_trywrite(mm)) {
+		if (!mman_lock_tryacquire(mm)) {
 			/* Found one that can't be locked immediately.
 			 * -> Unlock all others and drop already-gathered references. */
 			unsharecow_unlock_unique_mmans_until(part, node, minaddr, maxaddr);
@@ -1427,8 +1427,7 @@ unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
 			UNLOCK(part, unlock);
 
 			/* Wait until the lock of this mman becomes available. */
-			while (!sync_canwrite(mm))
-				task_yield();
+			mman_lock_waitfor(mm);
 			return false;
 		}
 	}
@@ -1486,7 +1485,7 @@ err_badalloc:
 	 *    then proceed by throwing an exception! */
 	unprepare_mmans_until(LIST_FIRST(&self->mp_copy), node, minaddr, maxaddr);
 	unsharecow_unlock_unique_mmans(self, minaddr, maxaddr);
-	mpart_lock_release_f(self);
+	_mpart_lock_release(self);
 	unlockinfo_xunlock(unlock);
 	mpart_lockops_reap(self);
 	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
@@ -1574,7 +1573,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 		if (!try_prepare_mmans_or_throw(self, unlock, partrel_minaddr, partrel_maxaddr)) {
 			/* Special case: All nodes had been destroyed! */
 			unsharecow_unlock_unique_mmans(self, partrel_minaddr, partrel_maxaddr);
-			mpart_lock_release_f(self);
+			_mpart_lock_release(self);
 			unlockinfo_xunlock(unlock);
 			mpart_lockops_reap(self);
 			goto nope_decref_mmans;
@@ -1806,17 +1805,16 @@ again_try_clear_write:
 			mm = node->mn_mman;
 			if unlikely(!tryincref(mm))
 				goto again_try_clear_write;
-			mpart_lock_release_f(self);
+			_mpart_lock_release(self);
 			unlockinfo_xunlock(unlock);
 			mpart_lockops_reap(self);
 			FINALLY_DECREF_UNLIKELY(mm);
-			while (!sync_canwrite(mm))
-				task_yield();
+			mman_lock_waitfor(mm);
 			return false;
 		}
 		/* Hard error: bad allocation :( */
 		assert(error == MNODE_CLEAR_WRITE_BADALLOC);
-		mpart_lock_release_f(self);
+		_mpart_lock_release(self);
 		unlockinfo_xunlock(unlock);
 		mpart_lockops_reap(self);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);

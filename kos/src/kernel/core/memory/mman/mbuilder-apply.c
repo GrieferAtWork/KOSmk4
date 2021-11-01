@@ -393,8 +393,7 @@ again:
 	mbuilder_partlocks_acquire(self);
 	if (!mman_lock_tryacquire(target)) {
 		mbuilder_partlocks_release(self);
-		while (!mman_lock_available(target))
-			task_yield();
+		mman_lock_waitfor(target);
 		goto again;
 	}
 	/* All required locks have been acquired! */

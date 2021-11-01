@@ -827,6 +827,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, get rid of `<sched/rwlock.h>' */
 
+	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, get rid of `<sched/sync.h>' */
+
 	/* TODO: Rewrite `handle_manager' to make it  possible for fds to be  allocated
 	 *       in a 2-step process: #1: reserve, #2: commit (where commit must behave
 	 *       as NOBLOCK+NOTHROW, and can also be aborted/undone)
@@ -925,8 +927,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Remove general-purpose  locking  support  for  `struct mman'
 	 *       Since there is more than 1 lock contained inside, it doesn't
 	 *       make too much  sense to provide  generic locking  overloads! */
-
-	/* TODO: Get rid of `<sched/sync.h>' */
 
 	return state;
 }

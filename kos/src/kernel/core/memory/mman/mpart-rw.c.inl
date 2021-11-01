@@ -460,7 +460,7 @@ again_memaddr:
 			 * Assuming a well-behaved application, we can optimize performance
 			 * for the first case by attempting to pre-fault the current target
 			 * buffer. */
-			mpart_lock_release_f(self);
+			_mpart_lock_release(self);
 			unlockinfo_xunlock(unlock);
 			mpart_lockops_reap(self);
 

@@ -422,7 +422,7 @@ mfault_pcopy_makememdat_or_unlock(struct mfault *__restrict self) {
 }
 
 #define unlockall(self)                      \
-	(mpart_lock_release_f((self)->mfl_part), \
+	(_mpart_lock_release((self)->mfl_part), \
 	 mman_lock_release((self)->mfl_mman),    \
 	 mpart_lockops_reap((self)->mfl_part))
 
@@ -553,7 +553,7 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
  * Locking logic:
  *   - return == true:   mpart_lock_acquire(self->mfl_part);
  *                       undefined(out(INTERNAL_DATA(self)))
- *   - return == false:  mman_lock_release_f(self->mfl_mman);
+ *   - return == false:  _mman_lock_release(self->mfl_mman);
  *   - EXCEPT:           mman_lock_release(self->mfl_mman);
  *
  * @param: self:   mem-lock control descriptor.

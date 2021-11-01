@@ -1592,7 +1592,7 @@ continue_with_next:
 		} while (!SLIST_EMPTY(&krlist));
 	}
 
-	mman_lock_release_f(self);
+	_mman_lock_release(self);
 
 	/* Check for more operations. */
 	lops.slh_first = SLIST_ATOMIC_CLEAR(&FORMMAN(self, thismman_lockops));

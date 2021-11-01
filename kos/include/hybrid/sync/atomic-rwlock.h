@@ -62,22 +62,26 @@ struct atomic_rwlock {
 #define atomic_rwlock_canwrite(self) (__hybrid_atomic_load((self)->arw_lock, __ATOMIC_ACQUIRE) == 0)
 
 /* Acquire an exclusive read/write lock. */
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self);
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_trywrite)(struct atomic_rwlock *__restrict __self);
-__LOCAL void (atomic_rwlock_read)(struct atomic_rwlock *__restrict __self);
-__LOCAL void (atomic_rwlock_write)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_trywrite)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_read)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_write)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_waitread)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_rwlock_waitwrite)(struct atomic_rwlock *__restrict __self);
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwlock *__restrict __self);
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_waitread_nx)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_waitwrite_nx)(struct atomic_rwlock *__restrict __self);
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_rwlock *__restrict __self);
 
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources. */
-__LOCAL __ATTR_WUNUSED __BOOL (atomic_rwlock_upgrade)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (atomic_rwlock_upgrade)(struct atomic_rwlock *__restrict __self);
 
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 /* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,
@@ -85,24 +89,25 @@ __LOCAL __ATTR_WUNUSED __BOOL (atomic_rwlock_upgrade)(struct atomic_rwlock *__re
  *       re-load local copies of affected resources.
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
-__LOCAL __ATTR_WUNUSED unsigned int __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self);
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
-__LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict __self);
 
 /* End reading/writing/either.
  * @return: true:  The lock has become free.
  * @return: false: The lock is still held by something. */
-__LOCAL void __NOTHROW(atomic_rwlock_endwrite)(struct atomic_rwlock *__restrict __self);
-__LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict __self);
-__LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void __NOTHROW(atomic_rwlock_endwrite)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __self);
 
 
 
 
 #ifndef __INTELLISENSE__
-__LOCAL void __NOTHROW(atomic_rwlock_endwrite)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) void
+__NOTHROW(atomic_rwlock_endwrite)(struct atomic_rwlock *__restrict __self) {
 	__COMPILER_BARRIER();
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	__hybrid_atomic_store(__self->arw_lock, 0, __ATOMIC_RELEASE);
@@ -115,7 +120,8 @@ __LOCAL void __NOTHROW(atomic_rwlock_endwrite)(struct atomic_rwlock *__restrict 
 #endif /* !NDEBUG && !NDEBUG_SYNC */
 }
 
-__LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict __self) {
 	__COMPILER_READ_BARRIER();
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	return __hybrid_atomic_decfetch(__self->arw_lock, __ATOMIC_RELEASE) == 0;
@@ -130,7 +136,8 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict
 #endif /* !NDEBUG && !NDEBUG_SYNC */
 }
 
-__LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp, __newval;
 	__COMPILER_BARRIER();
 	do {
@@ -147,7 +154,8 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __s
 	return __newval == 0;
 }
 
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __BOOL
+__NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
 	do {
 		__temp = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
@@ -160,7 +168,8 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwl
 	return 1;
 }
 
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_trywrite)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __BOOL
+__NOTHROW(atomic_rwlock_trywrite)(struct atomic_rwlock *__restrict __self) {
 	if __untraced(!__hybrid_atomic_cmpxch(__self->arw_lock, 0, __ATOMIC_RWLOCK_WFLAG,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
@@ -168,20 +177,37 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_trywrite)(struct atomic_rw
 	return 1;
 }
 
-__LOCAL void (atomic_rwlock_read)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) void
+(atomic_rwlock_read)(struct atomic_rwlock *__restrict __self) {
 	while (!atomic_rwlock_tryread(__self))
 		__hybrid_yield();
 	__COMPILER_READ_BARRIER();
 }
 
-__LOCAL void (atomic_rwlock_write)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) void
+(atomic_rwlock_write)(struct atomic_rwlock *__restrict __self) {
 	while (!atomic_rwlock_trywrite(__self))
 		__hybrid_yield();
 	__COMPILER_BARRIER();
 }
 
+__LOCAL __ATTR_NONNULL((1)) void
+(atomic_rwlock_waitread)(struct atomic_rwlock *__restrict __self) {
+	while (!atomic_rwlock_canread(__self))
+		__hybrid_yield();
+	__COMPILER_READ_BARRIER();
+}
+
+__LOCAL __ATTR_NONNULL((1)) void
+(atomic_rwlock_waitwrite)(struct atomic_rwlock *__restrict __self) {
+	while (!atomic_rwlock_canwrite(__self))
+		__hybrid_yield();
+	__COMPILER_BARRIER();
+}
+
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwlock *__restrict __self) {
 	while (!atomic_rwlock_tryread(__self)) {
 		if __unlikely(!__hybrid_yield_nx())
 			return 0;
@@ -190,8 +216,29 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwl
 	return 1;
 }
 
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_rwlock_write_nx)(struct atomic_rwlock *__restrict __self) {
 	while (!atomic_rwlock_trywrite(__self)) {
+		if __unlikely(!__hybrid_yield_nx())
+			return 0;
+	}
+	__COMPILER_READ_BARRIER();
+	return 1;
+}
+
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_rwlock_waitread_nx)(struct atomic_rwlock *__restrict __self) {
+	while (!atomic_rwlock_canread(__self)) {
+		if __unlikely(!__hybrid_yield_nx())
+			return 0;
+	}
+	__COMPILER_READ_BARRIER();
+	return 1;
+}
+
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_rwlock_waitwrite_nx)(struct atomic_rwlock *__restrict __self) {
+	while (!atomic_rwlock_canwrite(__self)) {
 		if __unlikely(!__hybrid_yield_nx())
 			return 0;
 	}
@@ -200,7 +247,8 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rw
 }
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
 	do {
 		__temp = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
@@ -212,7 +260,8 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_
 	return 1;
 }
 
-__LOCAL __ATTR_WUNUSED __BOOL (atomic_rwlock_upgrade)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+(atomic_rwlock_upgrade)(struct atomic_rwlock *__restrict __self) {
 	if __untraced(atomic_rwlock_tryupgrade(__self))
 		return 1;
 	atomic_rwlock_endread(__self);
@@ -221,7 +270,7 @@ __LOCAL __ATTR_WUNUSED __BOOL (atomic_rwlock_upgrade)(struct atomic_rwlock *__re
 }
 
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
-__LOCAL __ATTR_WUNUSED unsigned int
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
 __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self) {
 	if __untraced(atomic_rwlock_tryupgrade(__self))
 		return 1;
@@ -232,7 +281,8 @@ __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self) {
 }
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
-__LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) void
+__NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict __self) {
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_atomic_store(__self->arw_lock, 1, __ATOMIC_ACQ_REL);

@@ -1716,7 +1716,7 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
 		 * serviced. */
 		if unlikely(!ATOMIC_CMPXCH(self->_mp_trmlop_mp.olo_func,
 		                           NULL, &mpart_trim_mplop)) {
-			mpart_lock_release_f(self);
+			_mpart_lock_release(self);
 			goto reap_and_normal_decref;
 		}
 

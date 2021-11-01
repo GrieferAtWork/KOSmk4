@@ -65,26 +65,38 @@ struct atomic_lock {
 
 
 /* Acquire an exclusive lock. */
-__LOCAL void (atomic_lock_acquire)(struct atomic_lock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_lock_acquire)(struct atomic_lock *__restrict __self);
+__LOCAL __ATTR_NONNULL((1)) void (atomic_lock_waitfor)(struct atomic_lock *__restrict __self);
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_lock_acquire_nx)(struct atomic_lock *__restrict __self);
-__LOCAL __NOPREEMPT void __NOTHROW(atomic_lock_acquire_nopr)(struct atomic_lock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_lock_acquire_nx)(struct atomic_lock *__restrict __self);
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_lock_waitfor_nx)(struct atomic_lock *__restrict __self);
+__LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void __NOTHROW(atomic_lock_acquire_nopr)(struct atomic_lock *__restrict __self);
+__LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void __NOTHROW(atomic_lock_waitfor_nopr)(struct atomic_lock *__restrict __self);
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 #if !defined(__INTELLISENSE__) && !defined(__NO_builtin_expect)
 #undef atomic_lock_tryacquire
 #define atomic_lock_tryacquire(self) __builtin_expect(__hybrid_atomic_xch((self)->a_lock, 1, __ATOMIC_ACQUIRE) == 0, 1)
 #define atomic_lock_acquire_nx(self) __builtin_expect(atomic_lock_acquire_nx(self), 1)
+#define atomic_lock_waitfor_nx(self) __builtin_expect(atomic_lock_waitfor_nx(self), 1)
 #endif /* !__INTELLISENSE__ && !__NO_builtin_expect */
 
 #ifndef __INTELLISENSE__
-__LOCAL void (atomic_lock_acquire)(struct atomic_lock *__restrict __self) {
+__LOCAL __ATTR_NONNULL((1)) void
+(atomic_lock_acquire)(struct atomic_lock *__restrict __self) {
 	while (!atomic_lock_tryacquire(__self))
 		__hybrid_yield();
 	__COMPILER_READ_BARRIER();
 }
+__LOCAL __ATTR_NONNULL((1)) void
+(atomic_lock_waitfor)(struct atomic_lock *__restrict __self) {
+	while (!atomic_lock_available(__self))
+		__hybrid_yield();
+	__COMPILER_READ_BARRIER();
+}
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
-__LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_lock_acquire_nx)(struct atomic_lock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_lock_acquire_nx)(struct atomic_lock *__restrict __self) {
 	while (!atomic_lock_tryacquire(__self)) {
 		if __unlikely(!__hybrid_yield_nx())
 			return 0;
@@ -92,8 +104,24 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_lock_acquire_nx)(struct atomic_lo
 	__COMPILER_READ_BARRIER();
 	return 1;
 }
-__LOCAL __NOPREEMPT void __NOTHROW(atomic_lock_acquire_nopr)(struct atomic_lock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(atomic_lock_waitfor_nx)(struct atomic_lock *__restrict __self) {
+	while (!atomic_lock_available(__self)) {
+		if __unlikely(!__hybrid_yield_nx())
+			return 0;
+	}
+	__COMPILER_READ_BARRIER();
+	return 1;
+}
+__LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void
+__NOTHROW(atomic_lock_acquire_nopr)(struct atomic_lock *__restrict __self) {
 	while (!atomic_lock_tryacquire(__self))
+		task_pause();
+	__COMPILER_READ_BARRIER();
+}
+__LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void
+__NOTHROW(atomic_lock_waitfor_nopr)(struct atomic_lock *__restrict __self) {
+	while (!atomic_lock_available(__self))
 		task_pause();
 	__COMPILER_READ_BARRIER();
 }

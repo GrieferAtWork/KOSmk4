@@ -3934,10 +3934,10 @@ NOTHROW(FCALL driver_clear_mnode_pointers_and_destroy)(struct driver *__restrict
 		if (mman_lock_tryacquire(&mman_kernel)) {
 			COMPILER_READ_BARRIER();
 			if unlikely(self->d_module.md_nodecount == 0) {
-				mman_lock_release_f(&mman_kernel);
+				_mman_lock_release(&mman_kernel);
 			} else {
 				mman_remove_driver_nodes(self, &self->_d_deadnodes);
-				mman_lock_release_f(&mman_kernel);
+				_mman_lock_release(&mman_kernel);
 				/* Destroy all of the dead mem-noeds. */
 				assert(!SLIST_EMPTY(&self->_d_deadnodes));
 				driver_deadnodes_freelist(&self->_d_deadnodes);
@@ -5328,7 +5328,7 @@ again_acquire_mman_lock:
 						if unlikely(strcmp(other_driver->d_name, result->d_name) == 0) {
 							/* Driver already loaded... (undo everything...) */
 							mman_remove_driver_nodes(result, &nodes);
-							mman_lock_release_f(&mman_kernel);
+							_mman_lock_release(&mman_kernel);
 							kfree(new_ll);
 							xdecref_nokill(drv_file);
 							xdecref_nokill(drv_fspath);
@@ -5381,7 +5381,7 @@ again_acquire_mman_lock:
 						 * Undo everything we did since we've read out `old_ll' */
 						struct mnode *node;
 						mman_remove_driver_nodes(result, &nodes);
-						mman_lock_release_f(&mman_kernel);
+						_mman_lock_release(&mman_kernel);
 						destroy(new_ll);
 						mman_lockops_reap(&mman_kernel);
 

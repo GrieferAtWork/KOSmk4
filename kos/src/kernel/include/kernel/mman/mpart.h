@@ -610,7 +610,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_lockops_reap)(struct mpart
 #define mpart_lock_release(self)                                                \
 	(__hybrid_atomic_and((self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST), \
 	 mpart_lockops_reap(self))
-#define mpart_lock_release_f(self) \
+#define _mpart_lock_release(self) \
 	(__hybrid_atomic_and((self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST))
 FORCELOCAL NONNULL((1)) void FCALL
 mpart_lock_acquire(struct mpart *__restrict self) {

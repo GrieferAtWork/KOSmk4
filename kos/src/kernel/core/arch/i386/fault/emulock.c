@@ -231,7 +231,7 @@ handle_vio_or_not_faulted:
 		/* Check for an unmapped memory location. */
 		if (!node || !node->mn_part) {
 			uintptr_t context;
-			sync_endread(effective_mman);
+			mman_lock_endread(effective_mman);
 			context = 0;
 #ifdef __x86_64__
 			if (ADDR_IS_NONCANON((uintptr_t)addr))
@@ -246,7 +246,7 @@ handle_vio_or_not_faulted:
 		    /*             */ (MNODE_F_PREAD | MNODE_F_PWRITE)) {
 			uintptr_half_t prot = node->mn_flags;
 			uintptr_t context;
-			sync_endread(effective_mman);
+			mman_lock_endread(effective_mman);
 			context = 0;
 			if (icpustate_isuser(*pstate))
 				context |= E_SEGFAULT_CONTEXT_USERCODE;
@@ -256,7 +256,7 @@ handle_vio_or_not_faulted:
 				      E_SEGFAULT_CONTEXT_WRITING | context);
 			} else {
 				THROW(E_SEGFAULT_NOTREADABLE,
-					  addr,
+				      addr,
 				      context);
 			}
 		}
@@ -265,7 +265,7 @@ handle_vio_or_not_faulted:
 		part         = incref(node->mn_part);
 		part_minaddr = mpart_getminaddr(part);
 #endif /* LIBVIO_CONFIG_ENABLED */
-		sync_endread(effective_mman);
+		mman_lock_endread(effective_mman);
 #ifdef LIBVIO_CONFIG_ENABLED
 		{
 			REF struct mfile *file;

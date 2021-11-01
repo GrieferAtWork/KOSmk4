@@ -65,13 +65,25 @@ struct shared_lock {
 #endif /* !NDEBUG || !NDEBUG_SYNC */
 
 
+/* Acquire a lock to the given shared_lock. */
+FUNDEF BLOCKING NONNULL((1)) void FCALL
+shared_lock_acquire(struct shared_lock *__restrict self)
+		THROWS(E_WOULDBLOCK, ...);
+
 /* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-FUNDEF BLOCKING NONNULL((1)) __BOOL KCALL
-shared_lock_acquire(struct shared_lock *__restrict self,
-                    ktime_t abs_timeout DFL(KTIME_INFINITE))
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+shared_lock_acquire_with_timeout(struct shared_lock *__restrict self,
+                                 ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK, ...);
+
+/* Acquire a lock to the given shared_lock.
+ * @return: true:  Successfully acquired a lock.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL shared_lock_acquire_nx)(struct shared_lock *__restrict self);
 
 /* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
@@ -79,8 +91,62 @@ shared_lock_acquire(struct shared_lock *__restrict self,
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL
-NOTHROW(KCALL shared_lock_acquire_nx)(struct shared_lock *__restrict self,
-                                      ktime_t abs_timeout DFL(KTIME_INFINITE));
+NOTHROW(FCALL shared_lock_acquire_with_timeout_nx)(struct shared_lock *__restrict self,
+                                                   ktime_t abs_timeout);
+
+/* Wait that `self' becomes available. */
+FUNDEF BLOCKING NONNULL((1)) void FCALL
+shared_lock_waitfor(struct shared_lock *__restrict self)
+		THROWS(E_WOULDBLOCK, ...);
+
+/* Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
+ * @return: true:  The lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
+shared_lock_waitfor_with_timeout(struct shared_lock *__restrict self,
+                                 ktime_t abs_timeout)
+		THROWS(E_WOULDBLOCK, ...);
+
+
+/* Wait that `self' becomes available.
+ * @return: true:  The lock became available.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL shared_lock_waitfor_nx)(struct shared_lock *__restrict self);
+
+/* Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
+ * @return: true:  The lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL shared_lock_waitfor_with_timeout_nx)(struct shared_lock *__restrict self,
+                                                   ktime_t abs_timeout);
+
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+shared_lock_acquire(struct shared_lock *__restrict self,
+                    ktime_t abs_timeout)
+		THROWS(E_WOULDBLOCK, ...)
+		ASMNAME("shared_lock_acquire_with_timeout");
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL shared_lock_acquire_nx)(struct shared_lock *__restrict self,
+                                      ktime_t abs_timeout)
+		ASMNAME("shared_lock_acquire_with_timeout_nx");
+FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
+shared_lock_waitfor(struct shared_lock *__restrict self,
+                    ktime_t abs_timeout)
+		THROWS(E_WOULDBLOCK, ...)
+		ASMNAME("shared_lock_waitfor_with_timeout");
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL shared_lock_waitfor_nx)(struct shared_lock *__restrict self,
+                                      ktime_t abs_timeout)
+		ASMNAME("shared_lock_waitfor_with_timeout_nx");
+} /* extern "C++" */
+#endif /* __cplusplus */
+
 
 /* Shared-lock polling functions. */
 #define shared_lock_pollconnect_ex(self, cb) cb(&(self)->sl_sig)

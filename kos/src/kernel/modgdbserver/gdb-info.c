@@ -136,10 +136,10 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 			/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
 			 *        We should have some kind of timeout here, and switch to all-stop
 			 *        mode if the timeout expires. */
-			sync_read(v);
+			mman_lock_read(v);
 			dent = xincref(FORMMAN(v, thismman_execinfo).mei_dent);
 			path = xincref(FORMMAN(v, thismman_execinfo).mei_path);
-			sync_endread(v);
+			mman_lock_endread(v);
 		}
 		if (filename_only && (dent || path)) {
 			result = dent ? (*printer)(arg, dent->de_name, dent->de_namelen)

@@ -1218,8 +1218,7 @@ do_create_far_region:
 			else {
 				if unlikely(!mman_lock_tryread(aliasing_node_mm)) {
 					mman_lock_endread(effective_mm);
-					while (!mman_lock_canread(aliasing_node_mm))
-						task_yield();
+					mman_lock_waitread(aliasing_node_mm);
 					goto again_lock_effective_mman;
 				}
 				aliasing_node = mman_mappings_locate(effective_mm, region->mr_addrlo);
@@ -1473,8 +1472,7 @@ again_acquire_region_locks:
 			region_start_addr = (byte_t *)region->mr_addrlo;
 			if unlikely(!mman_lock_tryread(effective_mm)) {
 				rtm_memory_endwrite_modified_parts(self, i);
-				while (!mman_lock_canread(effective_mm))
-					task_yield();
+				mman_lock_waitread(effective_mm);
 				goto again_acquire_region_locks;
 			}
 			node = mman_mappings_locate(mymm, region_start_addr);
@@ -1641,8 +1639,7 @@ again_allocate_ftx_controller_for_part:
 again_acquire_region_locks_for_mman_lock:
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 					rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
-					while (!mman_lock_canread(effective_mm))
-						task_yield();
+					mman_lock_waitread(effective_mm);
 					goto again_acquire_region_locks;
 				}
 				has_modified_user = true;

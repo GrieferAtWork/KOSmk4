@@ -685,12 +685,12 @@ task_waitfor_norpc(ktime_t abs_timeout DFL(KTIME_INFINITE))
 /* Same as `task_waitfor', but only service NX RPCs, and return `NULL'
  * if there are pending RPCs that  are allowed to throw exception,  or
  * if preemption was disabled, and the operation would have blocked. */
-FUNDEF BLOCKING struct sig *
+FUNDEF BLOCKING WUNUSED struct sig *
 NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Same as  `task_waitfor',  but  don't serve  RPC  functions,  and  return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
-FUNDEF BLOCKING struct sig *
+FUNDEF BLOCKING WUNUSED struct sig *
 NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 #ifndef __sigset_t_defined

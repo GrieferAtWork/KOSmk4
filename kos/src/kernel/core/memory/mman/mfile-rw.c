@@ -136,7 +136,7 @@ NOTHROW(FCALL mpart_truncate_undo)(struct mfile *__restrict file,
                                    /*inherit(always)*/ REF struct mpart *__restrict part,
                                    mpart_reladdr_t orig_size) {
 	mpart_truncate_restore(part, orig_size);
-	mpart_lock_release_f(part);
+	_mpart_lock_release(part);
 	mfile_lock_endwrite_f(file);
 	mpart_lockops_reap(part);
 	decref_unlikely(part);

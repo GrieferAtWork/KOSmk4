@@ -405,7 +405,7 @@ again_service_lops:
 			SLIST_INSERT(&post, later, oplo_link);
 		iter = next;
 	}
-	mpart_lock_release_f(self);
+	_mpart_lock_release(self);
 
 	/* Check for more operations. */
 	lops.slh_first = SLIST_ATOMIC_CLEAR(&self->mp_lockops);
@@ -637,7 +637,7 @@ again:
 				            file != self->mp_file ||
 				            block_count != mpart_getblockcount(self, file) ||
 				            mpart_hasblockstate(self)) {
-					mpart_lock_release_f(self);
+					_mpart_lock_release(self);
 					kfree(bitset);
 #ifndef __OPTIMIZE_SIZE__
 					mpart_lockops_reap(self);
@@ -705,7 +705,7 @@ again:
 		mfile_trunclock_inc(file);
 #endif /* CONFIG_USE_NEW_FS */
 		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
-		mpart_lock_release_f(self);
+		_mpart_lock_release(self);
 		TRY {
 			pos_t addr;
 			size_t num_bytes;
@@ -767,7 +767,7 @@ done_writeback:
 	}
 	if unlikely(has_initializing_parts) {
 		incref(file);
-		mpart_lock_release_f(self);
+		_mpart_lock_release(self);
 #ifndef __OPTIMIZE_SIZE__
 		mpart_lockops_reap(self);
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -784,7 +784,7 @@ done_writeback:
 				}
 				/* Check for init-parts once again. */
 				if unlikely(!mpart_hasblocksstate_init(self)) {
-					mpart_lock_release_f(self);
+					_mpart_lock_release(self);
 					task_disconnectall();
 #ifndef __OPTIMIZE_SIZE__
 					mpart_lockops_reap(self);

@@ -1535,8 +1535,7 @@ again:
 
 	if (!mman_lock_trywrite(&mman_kernel)) {
 		sched_super_override_end();
-		while (!mman_lock_canwrite(&mman_kernel))
-			task_yield();
+		mman_lock_waitwrite(&mman_kernel);
 		goto again;
 	}
 
