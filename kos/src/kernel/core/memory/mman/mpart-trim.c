@@ -102,7 +102,7 @@ DECL_BEGIN
  *
  * NOTE: This macro should be used independently of `mpart_isanon()'! */
 #define mpart_maytrim(self) \
-	(!((self)->mp_flags & MPART_F_NOSPLIT))
+	(!((self)->mp_flags & (MPART_F_NOSPLIT | MPART_F_PERSISTENT)))
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
