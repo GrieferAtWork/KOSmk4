@@ -64,6 +64,7 @@ ROOTENT("mounts",    DT_REG, 0444, &procfs_pp_mounts,    /*[[[fdirent_hash]]]*/F
 ROOTENT("root",      DT_LNK, 0777, &procfs_pp_root,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x17eaeb02, 0x746f6f72, 0x5eaeb14, 0x746f6f72)/*[[[end]]]*/)
 ROOTENT("smaps",     DT_REG, 0444, &procfs_pp_smaps,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xf36cd97e, 0x7370616d73, 0xed86d63, 0x7370616d73)/*[[[end]]]*/)
 ROOTENT("stat",      DT_REG, 0444, &procfs_pp_stat,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d180b, 0x74617473, 0xf176d14, 0x74617473)/*[[[end]]]*/)
+ROOTENT("status",    DT_REG, 0444, &procfs_pp_status,    /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d8b80, 0x737574617473, 0xf17e089, 0x737574617473)/*[[[end]]]*/)
 ROOTENT("task",      DT_DIR, 0555, &procfs_pp_task,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc70e6d14, 0x6b736174, 0x176d0ec3, 0x6b736174)/*[[[end]]]*/)
 #if defined(__x86_64__) || defined(__i386__)
 ROOTENT("x86",       DT_DIR, 0555, &procfs_pp_x86,       /*[[[fdirent_hash]]]*/0x363878/*[[[end]]]*/)
@@ -75,6 +76,7 @@ MKREG_RO(procfs_pp_maps, ProcFS_PerProc_Maps_Printer)
 MKREG_RO(procfs_pp_mounts, ProcFS_PerProc_Mounts_Printer)
 MKREG_RO(procfs_pp_smaps, ProcFS_PerProc_SMaps_Printer)
 MKREG_RO(procfs_pp_stat, ProcFS_PerProc_Stat_Printer)
+MKREG_RO(procfs_pp_status, ProcFS_PerProc_Status_Printer)
 
 
 /* /proc/[PID]/attr */

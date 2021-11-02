@@ -340,7 +340,7 @@ struct cred {
 	WEAK struct credcap      c_cap_ambient;     /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that always become permitted in privileged programs
 	                                             * during exec(). Note  the invariant  that this one  is always  a subset of  permitted &  inheritable. */
 	WEAK uint8_t             c_securebits;      /* [lock(READ(ATOMIC), WRITE(c_lock))] Secure capability bits. (set of `SECBIT_*' from <kos/capability.h>) */
-	WEAK uint8_t             c_no_new_privs;    /* [lock(READ(ATOMIC), WRITE(c_lock))] When non-zero, exec() calls do not  */
+	WEAK uint8_t             c_no_new_privs;    /* [lock(READ(ATOMIC), WRITE(c_lock))] When non-zero, exec() calls do not add new permissions. */
 };
 
 /* Helper macros for `struct cred::c_lock' */

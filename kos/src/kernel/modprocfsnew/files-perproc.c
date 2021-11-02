@@ -376,7 +376,7 @@ ProcFS_PerProc_Exe_Printer(struct flnknode *__restrict self,
 	REF struct task *thread;
 	REF struct mman *thread_mm;
 	REF struct path *exec_path;
-	REF struct fdirent *exec_dent;
+	REF struct fdirent *exec_name;
 	REF struct path *caller_root;
 	thread    = taskpid_gettask_srch(self->fn_fsdata);
 	thread_mm = task_getmman(thread);
@@ -384,25 +384,25 @@ ProcFS_PerProc_Exe_Printer(struct flnknode *__restrict self,
 	{
 		FINALLY_DECREF_UNLIKELY(thread_mm);
 		mman_lock_read(thread_mm);
-		exec_dent = xincref(FORMMAN(thread_mm, thismman_execinfo).mei_dent);
+		exec_name = xincref(FORMMAN(thread_mm, thismman_execinfo).mei_dent);
 		exec_path = xincref(FORMMAN(thread_mm, thismman_execinfo).mei_path);
 		mman_lock_endread(thread_mm);
 	}
-	if unlikely(!exec_dent) {
+	if unlikely(!exec_name) {
 		xdecref_unlikely(exec_path);
 		THROW(E_FSERROR_FILE_NOT_FOUND);
 	}
-	FINALLY_DECREF_UNLIKELY(exec_dent);
+	FINALLY_DECREF_UNLIKELY(exec_name);
 	if unlikely(!exec_path) {
 		return snprintf(buf, bufsize, "%s%$s",
-		                exec_dent->fd_name[0] == '/' ? "" : "?/",
-		                (size_t)exec_dent->fd_namelen,
-		                exec_dent->fd_name);
+		                exec_name->fd_name[0] == '/' ? "" : "?/",
+		                (size_t)exec_name->fd_namelen,
+		                exec_name->fd_name);
 	}
 	FINALLY_DECREF_UNLIKELY(exec_path);
 	caller_root = fs_getroot(THIS_FS);
-	return path_sprintent(exec_path, exec_dent->fd_name,
-	                      exec_dent->fd_namelen, buf, bufsize,
+	return path_sprintent(exec_path, exec_name->fd_name,
+	                      exec_name->fd_namelen, buf, bufsize,
 	                      /* The kernel always interprets symbolic link texts using POSIX semantics.
 	                       * As such, symbolic link texts should  also only be printed using  those! */
 	                      /*fs_atflags(0) | */ AT_PATHPRINT_INCTRAIL,
@@ -1130,21 +1130,19 @@ ProcFS_PerProc_Stat_Printer(struct printnode *__restrict self,
 	           taskpid_getpid_s(tpid)) < 0)
 		return;
 	if (mm) {
-		REF struct fdirent *exec_dent;
+		REF struct fdirent *exec_name;
 		mman_lock_read(mm);
-		exec_dent = xincref(FORMMAN(mm, thismman_execinfo).mei_dent);
+		exec_name = xincref(FORMMAN(mm, thismman_execinfo).mei_dent);
 		mman_lock_endread(mm);
-		if (!exec_dent)
+		if (!exec_name)
 			goto no_exec;
-		FINALLY_DECREF_UNLIKELY(exec_dent);
-		print(exec_dent->fd_name, exec_dent->fd_namelen);
+		FINALLY_DECREF_UNLIKELY(exec_name);
+		print(exec_name->fd_name, exec_name->fd_namelen);
 	} else {
 no_exec:
 		PRINT("?");
 	}
 	PRINT(") ");
-	if ((*printer)(arg, ") ", 2) < 0)
-		return;
 	{
 		char state;
 		if (thread) {
@@ -1352,6 +1350,171 @@ nofproc:
 	       (void *)-1,     /* TODO: end_data */
 #endif /* !KERNELSPACE_HIGHMEM */
 	       tpid->tp_status.w_status);
+}
+
+
+
+
+/************************************************************************/
+/* /proc/[PID]/status                                                   */
+/************************************************************************/
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) uint64_t
+NOTHROW(FCALL credcap_as_u64)(struct credcap const *__restrict self) {
+	uint64_t result = 0;
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	memcpy(&result, self->cc_caps, MIN(8, sizeof(self->cc_caps)));
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	memcpy((byte_t *)&result + 8 - MIN(8, sizeof(self->cc_caps)),
+	       self->cc_caps, MIN(8, sizeof(self->cc_caps)));
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+	return result;
+}
+
+INTERN NONNULL((1, 2)) void KCALL
+ProcFS_PerProc_Status_Printer(struct printnode *__restrict self,
+                              pformatprinter printer, void *arg,
+                              size_t UNUSED(offset_hint)) {
+	REF struct task *thread;
+	REF struct mman *thread_mm             = NULL;
+	REF struct taskpid *parent_pid         = NULL;
+	REF struct cred *thread_cred           = NULL;
+	REF struct handle_manager *thread_hman = NULL;
+	struct taskpid *tpid;
+	char const *state;
+	tpid   = self->fn_fsdata;
+	thread = taskpid_gettask(tpid);
+	RAII_FINALLY {
+		xdecref_unlikely(thread);
+		xdecref_unlikely(thread_mm);
+		xdecref_unlikely(thread_cred);
+		xdecref_unlikely(parent_pid);
+		xdecref_unlikely(thread_hman);
+	};
+	if (thread) {
+		thread_mm   = task_getmman(thread);
+		thread_cred = task_getcred(thread);
+		parent_pid  = task_getprocessparentpid_of(thread);
+		thread_hman = task_gethandlemanager(thread);
+	}
+	PRINT("Name:\t");
+	if (thread_mm) {
+		REF struct fdirent *exec_name;
+		mman_lock_read(thread_mm);
+		exec_name = xincref(FORMMAN(thread_mm, thismman_execinfo).mei_dent);
+		mman_lock_endread(thread_mm);
+		if (!exec_name)
+			goto no_exec;
+		FINALLY_DECREF_UNLIKELY(exec_name);
+		print(exec_name->fd_name, exec_name->fd_namelen);
+	} else {
+no_exec:
+		PRINT("?");
+	}
+	if (thread) {
+		uintptr_t flags;
+		flags = ATOMIC_READ(thread->t_flags);
+		if (flags & TASK_FRUNNING)
+			state = "R (running)"; /* Running */
+		else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED))
+			state = "T (stopped)"; /* Stopped */
+		else if (flags & TASK_FSTARTED)
+			state = "S (sleeping)"; /* Sleeping */
+		else {
+			/* XXX: 'W' For waking??? */
+			state = "P (parked)"; /* Parked? */
+		}
+	} else {
+		/* XXX: 'X' For dead??? */
+		state = "Z (zombie)";
+	}
+	if (printf("\n"
+	           "State:\t%s\n"
+	           "Tgid:\t%" PRIuN(__SIZEOF_PID_T__) "\n"
+	           "Ngid:\t0\n" /* Numa group id (not supported by KOS (yet?)) */
+	           "Pid:\t%" PRIuN(__SIZEOF_PID_T__) "\n"
+	           "PPid:\t%" PRIuN(__SIZEOF_PID_T__) "\n"
+	           "TracerPid:\t0\n"
+	           "Uid:\t%" PRIuN(__SIZEOF_UID_T__) "\t"
+	                 "%" PRIuN(__SIZEOF_UID_T__) "\t"
+	                 "%" PRIuN(__SIZEOF_UID_T__) "\t"
+	                 "%" PRIuN(__SIZEOF_UID_T__) "\n"
+	           "Gid:\t%" PRIuN(__SIZEOF_GID_T__) "\t"
+	                 "%" PRIuN(__SIZEOF_GID_T__) "\t"
+	                 "%" PRIuN(__SIZEOF_GID_T__) "\t"
+	                 "%" PRIuN(__SIZEOF_GID_T__) "\n"
+	           "FDSize:\t%u\n"
+	           "Groups:\t%" PRIuN(__SIZEOF_GID_T__),
+	           state,
+	           thread ? task_getpid_of_s(thread) : 0,         /* Tgid */
+	           thread ? task_getpid_of_s(thread) : 0,         /* Pid */
+	           parent_pid ? taskpid_getpid_s(parent_pid) : 0, /* PPid */
+	           thread_cred ? ATOMIC_READ(thread_cred->c_ruid) : 0,
+	           thread_cred ? ATOMIC_READ(thread_cred->c_euid) : 0,
+	           thread_cred ? ATOMIC_READ(thread_cred->c_suid) : 0,
+	           thread_cred ? ATOMIC_READ(thread_cred->c_fsuid) : 0,
+	           thread_cred ? ATOMIC_READ(thread_cred->c_rgid) : 0,
+	           thread_cred ? ATOMIC_READ(thread_cred->c_egid) : 0,
+	           thread_cred ? ATOMIC_READ(thread_cred->c_sgid) : 0,
+	           thread_cred ? ATOMIC_READ(thread_cred->c_fsgid) : 0,
+	           thread_hman ? ATOMIC_READ(thread_hman->hm_maxlimit) : 0,
+	           thread_cred ? ATOMIC_READ(thread_cred->c_fsgid) : 0) < 0)
+		return;
+	if (thread_cred) {
+		size_t i;
+		REF struct cred_groups *groups;
+		groups = arref_get(&thread_cred->c_groups);
+		FINALLY_DECREF_UNLIKELY(groups);
+		for (i = 0; i < groups->cg_count; ++i) {
+			printf(" %" PRIuN(__SIZEOF_GID_T__),
+			       groups->cg_groups[i]);
+		}
+	}
+	if (PRINT("\n") < 0)
+		return;
+
+	/* TODO: VmPeak:     2380 kB */
+	/* TODO: VmSize:     2380 kB */
+	/* TODO: VmLck:         0 kB */
+	/* TODO: VmPin:         0 kB */
+	/* TODO: VmHWM:       576 kB */
+	/* TODO: VmRSS:       576 kB */
+	/* TODO: VmData:      300 kB */
+	/* TODO: VmStk:       132 kB */
+	/* TODO: VmExe:        48 kB */
+	/* TODO: VmLib:      1868 kB */
+	/* TODO: VmPTE:        20 kB */
+	/* TODO: VmPMD:        12 kB */
+	/* TODO: VmSwap:        0 kB */
+	/* TODO: HugetlbPages:  0 kB */
+
+	/* TODO: Threads:        1 */
+
+	/* TODO: SigQ:   0/14747 */
+	/* TODO: SigPnd: 0000000000000000 */
+	/* TODO: ShdPnd: 0000000000000000 */
+	/* TODO: SigBlk: 0000000000000000 */
+	/* TODO: SigIgn: 0000000000000000 */
+	/* TODO: SigCgt: 0000000000000000 */
+
+	if (printf("CapInh:\t%.16" PRIx64 "\n"
+	           "CapPrm:\t%.16" PRIx64 "\n"
+	           "CapEff:\t%.16" PRIx64 "\n"
+	           "CapBnd:\t%.16" PRIx64 "\n"
+	           "CapAmb:\t%.16" PRIx64 "\n"
+	           "NoNewPrivs:\t%" PRIu8 "\n",
+	           thread_cred ? credcap_as_u64(&thread_cred->c_cap_inheritable) : 0,
+	           thread_cred ? credcap_as_u64(&thread_cred->c_cap_permitted) : 0,
+	           thread_cred ? credcap_as_u64(&thread_cred->c_cap_effective) : 0,
+	           thread_cred ? credcap_as_u64(&thread_cred->c_cap_bounding) : 0,
+	           thread_cred ? credcap_as_u64(&thread_cred->c_cap_ambient) : 0,
+	           thread_cred ? thread_cred->c_no_new_privs : 0) < 0)
+		return;
+
+	/* TODO: Cpus_allowed:   3 */
+	/* TODO: Cpus_allowed_list:      0-1 */
+
+	/* TODO: voluntary_ctxt_switches:        0 */
+	/* TODO: nonvoluntary_ctxt_switches:     2 */
 }
 
 
