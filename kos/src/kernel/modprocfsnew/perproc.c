@@ -320,8 +320,8 @@ procfs_perproc_dirent_v_opennode_reg(struct fdirent *__restrict self,
                                      struct fdirnode *__restrict dir) {
 	struct procfs_perproc_dirent *me = fdirent_asperproc(self);
 	REF struct fnode *result;
-	result = (REF struct fnode *)kmalloc(sizeof(struct fnode), GFP_NORMAL);
-	result = (REF struct fnode *)memcpy(result, &procfs_perproc_reg_template, sizeof(struct fnode));
+	result = (REF struct fnode *)memcpy(kmalloc(sizeof(struct fnode), GFP_NORMAL),
+	                                    &procfs_perproc_reg_template, sizeof(struct fnode));
 
 	/* Fill in fields. */
 	result->fn_file.mf_ops = &me->ppd_fops->no_file;
@@ -336,8 +336,8 @@ procfs_perproc_dirent_v_opennode_nomap(struct fdirent *__restrict self,
                                        struct fdirnode *__restrict dir) {
 	struct procfs_perproc_dirent *me = fdirent_asperproc(self);
 	REF struct fnode *result;
-	result = (REF struct fnode *)kmalloc(sizeof(struct fnode), GFP_NORMAL);
-	result = (REF struct fnode *)memcpy(result, &procfs_perproc_nomap_template, sizeof(struct fnode));
+	result = (REF struct fnode *)memcpy(kmalloc(sizeof(struct fnode), GFP_NORMAL),
+	                                    &procfs_perproc_nomap_template, sizeof(struct fnode));
 
 	/* Fill in fields. */
 	result->fn_file.mf_ops = &me->ppd_fops->no_file;
@@ -614,8 +614,8 @@ procfs_perproc_root_dirent_v_opennode(struct fdirent *__restrict self,
                                       struct fdirnode *__restrict UNUSED(dir)) {
 	struct procfs_perproc_root_dirent *me = fdirent_asperprocroot(self);
 	REF struct fnode *result;
-	result = (REF struct fnode *)kmalloc(sizeof(struct fnode), GFP_NORMAL);
-	result = (REF struct fnode *)memcpy(result, &procfs_perproc_nomap_template, sizeof(struct fnode));
+	result = (REF struct fnode *)memcpy(kmalloc(sizeof(struct fnode), GFP_NORMAL),
+	                                    &procfs_perproc_nomap_template, sizeof(struct fnode));
 
 	/* Fill in fields. */
 	result->fn_file.mf_ops = &procfs_perproc_root_ops.dno_node.no_file;

@@ -30,6 +30,7 @@
 #include <kernel/handle.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -45,6 +46,53 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fdirenum_empty_v_fini)(struct fdirenum *__restrict UNUSED(self)) {
+	COMPILER_IMPURE(); /* No-op */
+}
+
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+fdirenum_empty_v_readdir(struct fdirenum *__restrict UNUSED(self), USER CHECKED struct dirent *UNUSED(buf),
+                         size_t UNUSED(bufsize), readdir_mode_t UNUSED(readdir_mode), iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	COMPILER_IMPURE();
+	return 0; /* Always indicate EOF */
+}
+
+PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
+fdirenum_empty_v_seekdir(struct fdirenum *__restrict UNUSED(self),
+                         off_t offset, unsigned int whence)
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...) {
+	switch (whence) {
+	case SEEK_SET:
+		break;
+
+	case SEEK_CUR:
+	case SEEK_END:
+		/* CUR/END is always `0', or negative offsets would underflow */
+		if unlikely(offset < 0)
+			THROW(E_OVERFLOW);
+		break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+	}
+	return (pos_t)0;
+}
+
+/* Simple  catch-all fallback to enumerate an empty directory.
+ * A minimal implementation of `struct fdirnode_ops::dno_enum'
+ * may simply  do `result->de_ops = &fdirenum_empty_ops'  when
+ * wanting enumeration to yield an empty directory. */
+PUBLIC_CONST struct fdirenum_ops const fdirenum_empty_ops = {
+	.deo_fini    = &fdirenum_empty_v_fini,
+	.deo_readdir = &fdirenum_empty_v_readdir,
+	.deo_seekdir = &fdirenum_empty_v_seekdir,
+};
 
 
 /* Feed   directory  entry  information  (the  `feed_d_*'  arguments)

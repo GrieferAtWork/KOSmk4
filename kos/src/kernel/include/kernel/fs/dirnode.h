@@ -88,6 +88,14 @@ struct fdirenum_ops {
 			THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...);
 };
 
+
+/* Simple  catch-all fallback to enumerate an empty directory.
+ * A minimal implementation of `struct fdirnode_ops::dno_enum'
+ * may simply  do `result->de_ops = &fdirenum_empty_ops'  when
+ * wanting enumeration to yield an empty directory. */
+DATDEF struct fdirenum_ops const fdirenum_empty_ops;
+
+
 #define FDIRENUM_HEADER                                               \
 	struct fdirenum_ops const *de_ops; /* [1..1][const] Operators. */ \
 	REF struct fdirnode       *de_dir; /* [1..1][const] Directory being enumerated. */

@@ -1622,8 +1622,8 @@ procfs_fd_dirent_v_opennode(struct fdirent *__restrict self,
                             struct fdirnode *__restrict UNUSED(dir)) {
 	struct procfs_fd_dirent *me = fdirent_asfd(self);
 	REF struct procfs_fd_lnknode *result;
-	result = (REF struct procfs_fd_lnknode *)kmalloc(sizeof(REF struct procfs_fd_lnknode), GFP_NORMAL);
-	memcpy(result, &procfs_fdlnk_template, sizeof(struct flnknode));
+	result = (REF struct procfs_fd_lnknode *)memcpy(kmalloc(sizeof(REF struct procfs_fd_lnknode), GFP_NORMAL),
+	                                                &procfs_fdlnk_template, sizeof(struct flnknode));
 	result->pfl_handtyp = me->pfd_handtyp;
 	result->pfl_handdat = me->pfd_handptr;
 	result->fn_fsdata   = incref(me->pfd_thread);
@@ -1856,23 +1856,18 @@ PRIVATE struct fdirenum_ops const procfs_fd_enum_ops = {
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_fd_v_enum(struct fdirenum *__restrict result) {
 	REF struct task *thread;
-	struct taskpid *pid = result->de_dir->fn_fsdata;
-	struct procfs_fd_enum *rt;
+	struct procfs_fd_enum *rt = (struct procfs_fd_enum *)result;
+	struct taskpid *pid       = rt->de_dir->fn_fsdata;
 	thread = taskpid_gettask(pid);
 	if unlikely(!thread) {
-		struct constdirenum *ret = (struct constdirenum *)result;
 		/* Thread has already terminated. -> Set-up an empty directory */
-		ret->de_ops    = &constdirenum_ops;
-		ret->cde_index = 0;
-		ret->cde_entc  = 0;
-		ret->cde_entv  = NULL;
-		return;
+		rt->de_ops = &fdirenum_empty_ops;
+	} else {
+		rt->pfe_hman = task_gethandlemanager(thread);
+		decref_unlikely(thread);
+		rt->de_ops = &procfs_fd_enum_ops;
+		rt->pfe_fd = 0;
 	}
-	rt = (struct procfs_fd_enum *)result;
-	rt->pfe_hman = task_gethandlemanager(thread);
-	decref_unlikely(thread);
-	rt->de_ops = &procfs_fd_enum_ops;
-	rt->pfe_fd = 0;
 }
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_fd = {
@@ -1993,8 +1988,8 @@ perproc_mapfile_dirent_v_opennode(struct fdirent *__restrict self,
                                   struct fdirnode *__restrict UNUSED(dir)) {
 	struct perproc_mapfile_dirent *me = fdirent_asmapfile(self);
 	REF struct perproc_mapfile_lnknode *result;
-	result = (REF struct perproc_mapfile_lnknode *)kmalloc(sizeof(REF struct perproc_mapfile_lnknode), GFP_NORMAL);
-	memcpy(result, &perproc_mapfile_lnknode_template, sizeof(struct flnknode));
+	result = (REF struct perproc_mapfile_lnknode *)memcpy(kmalloc(sizeof(REF struct perproc_mapfile_lnknode), GFP_NORMAL),
+	                                                      &perproc_mapfile_lnknode_template, sizeof(struct flnknode));
 	result->ppml_file   = mfile_asnode(incref(me->ppmd_file));
 	result->ppml_fspath = incref(me->ppmd_fspath);
 	result->ppml_fsname = incref(me->ppmd_fsname);
@@ -2243,11 +2238,7 @@ procfs_perproc_map_files_v_enum(struct fdirenum *__restrict result) {
 	thread = taskpid_gettask(result->de_dir->fn_fsdata);
 	if unlikely(!thread) {
 		/* Thread exited. -> Enumerate an empty directory. */
-		struct constdirenum *ret = (struct constdirenum *)result;
-		ret->de_ops    = &constdirenum_ops;
-		ret->cde_index = 0;
-		ret->cde_entc  = 0;
-		ret->cde_entv  = NULL;
+		rt->de_ops = &fdirenum_empty_ops;
 		return;
 	}
 	rt->ppmd_mm = task_getmman(thread);
@@ -2278,6 +2269,9 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_map_files = {
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_perproc_task_v_lookup(struct fdirnode *__restrict self,
                              struct flookup_info *__restrict info) {
+	/* NOTE: The directory entry created here is very similar to procfs_perproc_root_dirent_ops,
+	 *       except that instead of moving on to open the normal `procfs_perproc_root_files', it
+	 *       opens a custom version that doesn't include the "task" sub-folder. */
 	struct taskpid *pid = self->fn_fsdata;
 
 	/* TODO */
@@ -2295,13 +2289,7 @@ procfs_perproc_task_v_enum(struct fdirenum *__restrict result) {
 	/* TODO */
 	(void)pid;
 	COMPILER_IMPURE();
-
-	struct constdirenum *ret = (struct constdirenum *)result;
-	/* Fill in enumerator info */
-	ret->de_ops    = &constdirenum_ops;
-	ret->cde_index = 0;
-	ret->cde_entc  = 0;
-	ret->cde_entv  = NULL;
+	result->de_ops = &fdirenum_empty_ops;
 }
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_task = {
@@ -2343,13 +2331,7 @@ procfs_perproc_kos_dcwd_v_enum(struct fdirenum *__restrict result) {
 	/* TODO */
 	(void)pid;
 	COMPILER_IMPURE();
-
-	struct constdirenum *ret = (struct constdirenum *)result;
-	/* Fill in enumerator info */
-	ret->de_ops    = &constdirenum_ops;
-	ret->cde_index = 0;
-	ret->cde_entc  = 0;
-	ret->cde_entv  = NULL;
+	result->de_ops = &fdirenum_empty_ops;
 }
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_kos_dcwd = {
@@ -2391,13 +2373,7 @@ procfs_perproc_kos_drives_v_enum(struct fdirenum *__restrict result) {
 	/* TODO */
 	(void)pid;
 	COMPILER_IMPURE();
-
-	struct constdirenum *ret = (struct constdirenum *)result;
-	/* Fill in enumerator info */
-	ret->de_ops    = &constdirenum_ops;
-	ret->cde_index = 0;
-	ret->cde_entc  = 0;
-	ret->cde_entv  = NULL;
+	result->de_ops = &fdirenum_empty_ops;
 }
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_kos_drives = {
