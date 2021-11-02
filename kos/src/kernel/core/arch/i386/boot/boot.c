@@ -915,9 +915,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    the set of files currently being mounted.
 	 */
 
-	/* TODO: `E_FSERROR_NOT_A_BLOCK_DEVICE' should be renamed to not imply that
-	 *       only block devices can be mounted! */
-
 	/* TODO: `struct fdirenum' should be variable-sized,  with
 	 *       the real size stored as a vtable `size_t'-member. */
 

@@ -106,14 +106,14 @@ unaligned_v_saveblocks(struct mfile *__restrict self, pos_t addr,
  *                                 aborted, you can simply destroy() (or decref()) it.
  * @return: NULL: `FFILESYS_F_NODEV' isn't set, and `dev' cannot be mounted as a
  *                filesystem of this type.
- * @throw: E_FSERROR_NOT_A_BLOCK_DEVICE:    `dev' cannot be used to mount superblocks.
- * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM: The filesystem type was matched, but the on-disk
- *                                          filesystem doesn't appear to make any sense. It
- *                                          looks like it's been corrupted... :( */
+ * @throw: E_FSERROR_MOUNT_UNSUPPORTED_DEVICE: `dev' cannot be used to mount superblocks.
+ * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM:    The filesystem type was matched, but the on-disk
+ *                                             filesystem doesn't appear to make any sense. It
+ *                                             looks like it's been corrupted... :( */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_open(struct ffilesys *__restrict self,
               struct mfile *dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_NOT_A_BLOCK_DEVICE,
+		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...) {
 	REF struct fsuper *result;
 	/* Check for special case: singleton */
@@ -133,11 +133,7 @@ ffilesys_open(struct ffilesys *__restrict self,
 		 * for user-I/O. */
 		if unlikely(dev->mf_ops->mo_loadblocks == NULL) {
 err_cannot_open_file:
-			/* TODO: Should probably rename this exception since we're no longer
-			 *       testing for block devices, but instead a specific set of
-			 *       required features which could (in theory) be implemented by
-			 *       any kind of file. */
-			THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
+			THROW(E_FSERROR_MOUNT_UNSUPPORTED_DEVICE);
 		}
 		if (dev->mf_ops->mo_stream != NULL) {
 			if unlikely(dev->mf_ops->mo_stream->mso_pread != NULL ||
@@ -306,7 +302,7 @@ ffilesys_next(struct ffilesys *prev) THROWS(E_WOULDBLOCK) {
  * @return: NULL: `dev' doesn't contain any known filesystem. */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE,
+		THROWS(E_BADALLOC, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...) {
 	REF struct ffilesys *iter, *next;
 	/* Enumerate filesystem types. */

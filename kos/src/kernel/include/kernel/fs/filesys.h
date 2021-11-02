@@ -122,20 +122,25 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_refcnt = 0;
 		 *   - return->fs_root._fdirnode_node_ fn_allsuper            = LIST_ENTRY_UNBOUND_INITIALIZER;
 		 *
+		 * =====================================================================================
+		 * === Device requirements (s.a. `E_FSERROR_MOUNT_UNSUPPORTED_DEVICE')
+		 *  - dev->mf_ops->mo_loadblocks != NULL
+		 *  - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pread == NULL
+		 *  - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_preadv == NULL
+		 *  - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pwrite == NULL
+		 *  - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pwritev == NULL
+		 *  - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_mmap == NULL
+		 *  - (dev->mf_flags & (MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP)) == 0
+		 * If these requirements aren't fulfilled, the caller will have already thrown an
+		 * `E_FSERROR_MOUNT_UNSUPPORTED_DEVICE' exception. Also note that these requirements
+		 * imply `mfile_hasrawio(dev)'
+		 * =====================================================================================
+		 *
 		 * @param: dev: [1..1][!FFILESYS_F_NODEV] The  backing storage device  for the filesystem. The
 		 *                                        caller  has incremented `mf_trunclock' such that the
 		 *                                        file will not be truncated  for the duration of  the
 		 *                                        call, and upon success, it will remain impossible to
 		 *                                        truncate the file until the superblock is destroyed.
-		 *                                        NOTE: You may assume that:
-		 *                                         - dev->mf_ops->mo_loadblocks != NULL
-		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pread == NULL
-		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_preadv == NULL
-		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pwrite == NULL
-		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pwritev == NULL
-		 *                                         - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_mmap == NULL
-		 *                                         - (dev->mf_flags & (MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP)) == 0
-		 *                                        Note that these requirements imply `mfile_hasrawio(dev)'
 		 * @param: dev: [0..0][FFILESYS_F_NODEV] Always NULL
 		 * @return: * : A new instance of a superblock for `dev'
 		 * @return: NULL: `dev' cannot be mounted using this filesystem. */
@@ -201,14 +206,14 @@ DATDEF struct lockop_slist ffilesys_formats_lops;   /* Lock operations for `ffil
  *                                 aborted, you can simply destroy() (or decref()) it.
  * @return: NULL: `FFILESYS_F_NODEV' isn't set, and `dev' cannot be mounted as a
  *                filesystem of this type.
- * @throw: E_FSERROR_NOT_A_BLOCK_DEVICE:    `dev' cannot be used to mount superblocks.
- * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM: The filesystem type was matched, but the on-disk
- *                                          filesystem doesn't appear to make any sense. It
- *                                          looks like it's been corrupted... :( */
+ * @throw: E_FSERROR_MOUNT_UNSUPPORTED_DEVICE: `dev' cannot be used to mount superblocks.
+ * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM:    The filesystem type was matched, but the on-disk
+ *                                             filesystem doesn't appear to make any sense. It
+ *                                             looks like it's been corrupted... :( */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_open(struct ffilesys *__restrict self,
               struct mfile *dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_NOT_A_BLOCK_DEVICE,
+		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
 
 /* Helper wrapper for `ffilesys_open()' that blindly goes through all  filesystem
@@ -221,7 +226,7 @@ ffilesys_open(struct ffilesys *__restrict self,
  * @return: NULL: `dev' doesn't contain any known filesystem. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
 ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
-		THROWS(E_BADALLOC, E_FSERROR_NOT_A_BLOCK_DEVICE,
+		THROWS(E_BADALLOC, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
 
 

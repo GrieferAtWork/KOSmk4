@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ce8aa67 */
+/* HASH CRC-32:0x3f915543 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -287,10 +287,10 @@ for (local name: classes.keys.sorted()) {
 			break;
 #endif /* __EINVAL */
 #ifdef __ENOTBLK
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NOT_A_BLOCK_DEVICE)):
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_MOUNT_UNSUPPORTED_DEVICE)):
 			__result = __ENOTBLK;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NO_BLOCK_DEVICE)):
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_MOUNT_NEEDS_DEVICE)):
 			__result = __ENOTBLK;
 			break;
 #endif /* __ENOTBLK */

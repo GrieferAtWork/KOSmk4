@@ -4281,7 +4281,7 @@ lookup_filesystem_type(USER CHECKED char const *name)
  * @param: flags: Set of `SUPERBLOCK_F*'
  * @throws: E_FSERROR_DEVICE_ALREADY_MOUNTED: [...]
  * @throws: E_FSERROR_UNKNOWN_FILE_SYSTEM:    The driver associated with `type' is finalizing
- * @throws: E_FSERROR_NO_BLOCK_DEVICE:        [...]
+ * @throws: E_FSERROR_MOUNT_NEEDS_DEVICE:     [...]
  * @throws: E_FSERROR_WRONG_FILE_SYSTEM:      [...]
  * @throws: E_FSERROR_CORRUPTED_FILE_SYSTEM:  [...]
  * @throws: E_IOERROR:                        [...]
@@ -4292,7 +4292,7 @@ superblock_open(struct superblock_type *__restrict type,
                 uintptr_t flags, UNCHECKED USER char *args,
                 bool *pnew_superblock_created)
 		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,
-		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_NO_BLOCK_DEVICE,
+		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_MOUNT_NEEDS_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
 	heapptr_t resptr;
@@ -4318,7 +4318,7 @@ superblock_open(struct superblock_type *__restrict type,
 		fs_filesystems_lock_write();
 	} else {
 		if unlikely(!device)
-			THROW(E_FSERROR_NO_BLOCK_DEVICE);
+			THROW(E_FSERROR_MOUNT_NEEDS_DEVICE);
 		/* Search for an existing mapping of the given block-device. */
 		fs_filesystems_lock_read();
 		result = fs_filesystems.f_superblocks;

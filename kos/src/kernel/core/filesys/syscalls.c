@@ -929,7 +929,7 @@ sys_mount_impl(USER UNCHECKED char const *source,
 		} else {
 			REF struct fnode *dev;
 			if unlikely(!source)
-				THROW(E_FSERROR_NO_BLOCK_DEVICE);
+				THROW(E_FSERROR_MOUNT_NEEDS_DEVICE);
 			validate_readable(source, 1);
 			dev = path_traversefull(AT_FDCWD, source, atflags & ~AT_IGNORE_TRAILING_SLASHES);
 			if (fnode_isdevnode(dev) && !fnode_isdevice(dev)) {

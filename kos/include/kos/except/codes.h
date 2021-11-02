@@ -603,14 +603,21 @@
 #define E_FSERROR_DIRECTORY_MOVE_TO_CHILD         (E_FSERROR, 0x0011) /* [errno(EINVAL), msg("Move to child directory")]
                                                                        * Attempted to move a directory such that it would become a child of itself */
 #endif /* !E_FSERROR_DIRECTORY_MOVE_TO_CHILD */
-#ifndef E_FSERROR_NOT_A_BLOCK_DEVICE
-#define E_FSERROR_NOT_A_BLOCK_DEVICE              (E_FSERROR, 0x0012) /* [errno(ENOTBLK), msg("mount() expected a block-device")]
-                                                                       * Attempted to mount() something that isn't a block-device */
-#endif /* !E_FSERROR_NOT_A_BLOCK_DEVICE */
-#ifndef E_FSERROR_NO_BLOCK_DEVICE
-#define E_FSERROR_NO_BLOCK_DEVICE                 (E_FSERROR, 0x0013) /* [errno(ENOTBLK), msg("This filesystem type requires a block-device")]
+#ifndef E_FSERROR_MOUNT_UNSUPPORTED_DEVICE
+#define E_FSERROR_MOUNT_UNSUPPORTED_DEVICE        (E_FSERROR, 0x0012) /* [errno(ENOTBLK), msg("The given device cannot be used for mount()")]
+                                                                       * Attempted to mount() something that doesn't fulfil the requirements documentd under:
+                                                                       * `/kos/src/kernel/include/kernel/fs/filesys.h:ffilesys::ffs_open::<Device requirements>'
+                                                                       * Note that contrary to this exception translating to `ENOTBLK', these requirements don't
+                                                                       * include  the device needing to be a block-device (or even a device for that matter). As
+                                                                       * a matter of fact, pretty much any "normal" file will do, so-long as the file allows for
+                                                                       * direct mmap(2) into  user-space (without  overwriting the mmap  operator), and  doesn't
+                                                                       * include special overrides for pread(2) or pwrite(2).
+                                                                       * Iow: KOS doesn't need loop devices, because you can just directly mount(2) regular files. */
+#endif /* !E_FSERROR_MOUNT_UNSUPPORTED_DEVICE */
+#ifndef E_FSERROR_MOUNT_NEEDS_DEVICE
+#define E_FSERROR_MOUNT_NEEDS_DEVICE              (E_FSERROR, 0x0013) /* [errno(ENOTBLK), msg("This filesystem type requires a device")]
                                                                        * Attempted to mount() a filesystem without a block-device, when that filesystem requires one */
-#endif /* !E_FSERROR_NO_BLOCK_DEVICE */
+#endif /* !E_FSERROR_MOUNT_NEEDS_DEVICE */
 #ifndef E_FSERROR_WRONG_FILE_SYSTEM
 #define E_FSERROR_WRONG_FILE_SYSTEM               (E_FSERROR, 0x0014) /* [errno(ENODEV), msg("Invalid file-system type for mount()")]
                                                                        * Attempted to mount a block-device with the wrong file system */

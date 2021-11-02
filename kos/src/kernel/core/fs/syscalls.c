@@ -1418,7 +1418,7 @@ DEFINE_SYSCALL5(errno_t, mount,
 			REF struct inode *source_node;
 			REF struct blkdev *source_dev;
 			if unlikely(!source)
-				THROW(E_FSERROR_NO_BLOCK_DEVICE);
+				THROW(E_FSERROR_FILESYS_NEEDS_DEVICE);
 			validate_readable(source, 1);
 			source_node = path_traversefull(f,
 			                                source,
@@ -1430,7 +1430,7 @@ DEFINE_SYSCALL5(errno_t, mount,
 			                                NULL);
 			FINALLY_DECREF(source_node);
 			if unlikely(!S_ISBLK(source_node->i_filemode))
-				THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
+				THROW(E_FSERROR_MOUNT_UNSUPPORTED_DEVICE);
 			inode_loadattr(source_node);
 			source_dev = blkdev_lookup(source_node->i_filerdev);
 			if unlikely(!source_dev)
