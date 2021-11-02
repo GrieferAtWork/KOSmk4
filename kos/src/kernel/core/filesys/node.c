@@ -860,10 +860,9 @@ again_acquire_super_changed:
  * @param: type:   Set of `R_OK | W_OK | X_OK' (all specified types must be allowed)
  * @return: true:  Access granted
  * @return: false: Access denied. */
-PUBLIC ATTR_PURE WUNUSED NONNULL((1)) bool FCALL
-fnode_mayaccess(struct fnode *__restrict self,
-                unsigned int type)
-		THROWS(E_WOULDBLOCK) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL fnode_mayaccess)(struct fnode *__restrict self,
+                               unsigned int type) {
 	unsigned int how;
 	mode_t mode = ATOMIC_READ(self->fn_mode);
 	for (how = 1; how <= 4; how <<= 1) {
@@ -894,7 +893,7 @@ fnode_mayaccess(struct fnode *__restrict self,
  * @param: type: Set of `R_OK | W_OK | X_OK' (all specified types must be allowed)
  * @return:                         Access granted
  * @throw: E_FSERROR_ACCESS_DENIED: Access denied. */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC NOBLOCK NONNULL((1)) void FCALL
 fnode_access(struct fnode *__restrict self, unsigned int type)
 		THROWS(E_FSERROR_ACCESS_DENIED) {
 	if unlikely(!fnode_mayaccess(self, type))

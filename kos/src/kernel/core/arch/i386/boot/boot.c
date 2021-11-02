@@ -918,12 +918,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: `E_FSERROR_NOT_A_BLOCK_DEVICE' should be renamed to not imply that
 	 *       only block devices can be mounted! */
 
-	/* TODO: `cred_isfsgroupmember()'  should be re-implemented such that it
-	 *       becomes NOBLOCK+NOTHROW. If this were done, `fnode_mayaccess()'
-	 *       could also become  NOBLOCK+NOTHROW, which  could simplify  some
-	 *       more code! (especially  since the THROWS(E_WOULDBLOCK)  doesn't
-	 *       make a lot of sense for a function like that) */
-
 	/* TODO: `struct fdirenum' should be variable-sized,  with
 	 *       the real size stored as a vtable `size_t'-member. */
 

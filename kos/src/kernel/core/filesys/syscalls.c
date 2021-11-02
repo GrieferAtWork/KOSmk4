@@ -2867,14 +2867,16 @@ DEFINE_COMPAT_SYSCALL2(errno_t, statfs64,
  * timestamp to the given `node's last-accessed and last-modified
  * fields. */
 PRIVATE NONNULL((1)) void KCALL
-fnode_request_arbitrary_timestamps(struct fnode *__restrict node) {
+fnode_request_arbitrary_timestamps(struct fnode *__restrict node)
+		THROWS(E_INSUFFICIENT_RIGHTS) {
 	/* Caller must be owner, or have `CAP_FOWNER' */
 	if (ATOMIC_READ(node->fn_uid) != cred_getfsuid())
 		require(CAP_FOWNER); /* FIXME: This fails with EACCES, but POSIX wants EPERM... */
 }
 
 PRIVATE NONNULL((1)) void KCALL
-fnode_request_current_timestamps(struct fnode *__restrict node) {
+fnode_request_current_timestamps(struct fnode *__restrict node)
+		THROWS(E_FSERROR_ACCESS_DENIED) {
 	/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
 	if (!fnode_mayaccess(node, W_OK) && !capable(CAP_DAC_OVERRIDE))
 		THROW(E_FSERROR_ACCESS_DENIED);

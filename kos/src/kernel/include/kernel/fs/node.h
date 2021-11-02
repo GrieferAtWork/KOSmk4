@@ -513,17 +513,16 @@ fnode_syncdata(struct fnode *__restrict self)
  * @param: type:   Set of `R_OK | W_OK | X_OK' (all specified types must be allowed)
  * @return: true:  Access granted
  * @return: false: Access denied. */
-FUNDEF ATTR_PURE WUNUSED NONNULL((1)) __BOOL FCALL
-fnode_mayaccess(struct fnode *__restrict self,
-                unsigned int type)
-		THROWS(E_WOULDBLOCK);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL fnode_mayaccess)(struct fnode *__restrict self,
+                               unsigned int type);
 
 /* Helper wrapper for `fnode_mayaccess()' that asserts access
  * and throws `E_FSERROR_ACCESS_DENIED' is access was denied.
  * @param: type: Set of `R_OK | W_OK | X_OK' (all specified types must be allowed)
  * @return:                         Access granted
  * @throw: E_FSERROR_ACCESS_DENIED: Access denied. */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF NOBLOCK NONNULL((1)) void FCALL
 fnode_access(struct fnode *__restrict self, unsigned int type)
 		THROWS(E_WOULDBLOCK, E_FSERROR_ACCESS_DENIED);
 
