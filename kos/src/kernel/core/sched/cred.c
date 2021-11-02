@@ -69,10 +69,74 @@ DECL_BEGIN
 
 #ifndef CONFIG_EVERYONE_IS_ROOT
 
+/* Default, empty set of supplementary groups. */
+PUBLIC struct cred_groups cred_groups_empty = {
+	.cg_refcnt = 2, /* +1: cred_groups_empty, +1: cred_kernel.c_groups */
+	.cg_count  = 0, /* No additional groups. */
+};
+
+
+
+/* Check if `self' contains `gid' */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL cred_groups_contains)(struct cred_groups const *__restrict self,
+                                    gid_t gid) {
+	size_t lo, hi;
+	lo = 0;
+	hi = self->cg_count;
+	while (lo < hi) {
+		size_t i;
+		i = (lo + hi) / 2;
+		if (gid < self->cg_groups[i]) {
+			hi = i;
+		} else if (gid > self->cg_groups[i]) {
+			lo = i + 1;
+		} else {
+			return true;
+		}
+	}
+	return false;
+}
+
+/* Check if the groups from `subset' are a sub-set of those from `superset' */
+PUBLIC ATTR_PURE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL cred_groups_issubset)(struct cred_groups const *__restrict subset,
+                                    struct cred_groups const *__restrict superset) {
+	size_t i, j;
+	if (subset->cg_count > superset->cg_count)
+		return false; /* There are more groups, so it can't be a sub-set. */
+	for (i = 0, j = 0;;) {
+		gid_t subset_group;
+		if (i >= subset->cg_count)
+			return true; /* No additional groups found! */
+		subset_group = subset->cg_groups[i];
+		/* Check if we can find `subset_group' within the superset */
+		for (;;) {
+			gid_t superset_group;
+			if (j >= superset->cg_count)
+				return false; /* No in here... */
+			superset_group = superset->cg_groups[j];
+			if (superset_group == subset_group)
+				break;
+			if (superset_group > subset_group)
+				return false; /* Because they're sorted, we won't find `subset_group' in `superset' */
+			++j;
+		}
+		++i;
+	}
+}
+
+
+
+
+
+
+
+
 /* Destroy the given credentials controller. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL cred_destroy)(struct cred *__restrict self) {
-	kfree(self->c_groups);
+	arref_fini(&self->c_groups);
 	kfree(self);
 }
 
@@ -80,56 +144,25 @@ NOTHROW(FCALL cred_destroy)(struct cred *__restrict self) {
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *FCALL
 cred_clone(struct cred *__restrict self) THROWS(E_BADALLOC) {
 	REF struct cred *result;
+	REF struct cred_groups *groups;
 	result = (REF struct cred *)kmalloc(sizeof(struct cred),
 	                                    GFP_NORMAL);
 	TRY {
-		sync_read(&self->c_lock);
+		cred_read(self);
 	} EXCEPT {
 		kfree(result);
 		RETHROW();
 	}
-again:
+
 	/* Copy static credentials data. */
 	memcpy((byte_t *)result + offsetafter(struct cred, c_lock),
 	       (byte_t *)self + offsetafter(struct cred, c_lock),
 	       sizeof(struct cred) - offsetafter(struct cred, c_lock));
-	/* Check if we need to duplicate the supplemental GID vector. */
-	if (result->c_ngroups) {
-		gid_t *groupvec;
-		assert(self->c_groups);
-		groupvec = (gid_t *)kmalloc_nx(result->c_ngroups *
-		                               sizeof(gid_t),
-		                               GFP_ATOMIC);
-		if unlikely(!groupvec) {
-			sync_endread(&self->c_lock);
-			TRY {
-				groupvec = (gid_t *)kmalloc(result->c_ngroups *
-				                            sizeof(gid_t),
-				                            GFP_NORMAL);
-				TRY {
-					sync_read(&self->c_lock);
-				} EXCEPT {
-					kfree(groupvec);
-					RETHROW();
-				}
-			} EXCEPT {
-				kfree(result);
-				RETHROW();
-			}
-			if unlikely(self->c_ngroups != result->c_ngroups) {
-				kfree(groupvec);
-				goto again;
-			}
-		}
-		result->c_groups = groupvec;
-		memcpy(groupvec,
-		       self->c_groups,
-		       result->c_ngroups,
-		       sizeof(gid_t));
-	} else {
-		result->c_groups = NULL;
-	}
-	sync_endread(&self->c_lock);
+
+	/* Copy supplementary groups. */
+	groups = arref_get(&self->c_groups);
+	arref_init(&result->c_groups, groups);
+	cred_endread(self);
 	result->c_refcnt = 1;
 	atomic_rwlock_init(&result->c_lock);
 	return result;
@@ -141,6 +174,7 @@ again:
 /* Generic kernel credentials / credentials for /bin/init */
 PUBLIC struct cred cred_kernel = {
 	.c_refcnt          = 2, /* +1: `cred_kernel', +1: FORTASK(&boottask, this_cred) */
+	.c_groups          = ARREF_INIT(&cred_groups_empty),
 	.c_lock            = ATOMIC_RWLOCK_INIT,
 	.c_ruid            = (uid_t)0,
 	.c_rgid            = (gid_t)0,
@@ -150,8 +184,6 @@ PUBLIC struct cred cred_kernel = {
 	.c_sgid            = (gid_t)0,
 	.c_fsuid           = (uid_t)0,
 	.c_fsgid           = (gid_t)0,
-	.c_ngroups         = 0,
-	.c_groups          = NULL,
 	.c_cap_permitted   = CREDCAP_INIT_FULL,
 	.c_cap_inheritable = CREDCAP_INIT_FULL,
 	.c_cap_effective   = CREDCAP_INIT_FULL,
@@ -195,7 +227,8 @@ NOTHROW(FCALL capable)(syscall_slong_t capno) {
 
 /* Ensure that the calling thread is `capable(capno)'
  * If the calling thread isn't, throw an `E_INSUFFICIENT_RIGHTS' exception */
-PUBLIC void FCALL require(syscall_slong_t capno)
+PUBLIC NOBLOCK void FCALL
+require(syscall_slong_t capno)
 		THROWS(E_INSUFFICIENT_RIGHTS) {
 	if (!capable(capno))
 		THROW(E_INSUFFICIENT_RIGHTS, capno);
@@ -203,46 +236,42 @@ PUBLIC void FCALL require(syscall_slong_t capno)
 
 /* Lock for accessing any remote thread's this_cred field */
 #ifndef CONFIG_NO_SMP
-PRIVATE struct atomic_rwlock cred_change_lock = ATOMIC_RWLOCK_INIT;
-DEFINE_DBG_BZERO_OBJECT(cred_change_lock);
-#endif /* !CONFIG_NO_SMP */
+PRIVATE struct atomic_lock cred_change_lock = ATOMIC_LOCK_INIT;
+#define cred_change_lock_acquire_nopr() atomic_lock_acquire_nopr(&cred_change_lock)
+#define cred_change_lock_release_nopr() atomic_lock_release(&cred_change_lock)
+#else /* !CONFIG_NO_SMP */
+#define cred_change_lock_acquire_nopr() (void)0
+#define cred_change_lock_release_nopr() (void)0
+#endif /* CONFIG_NO_SMP */
+#define cred_change_lock_acquire()           \
+	do {                                     \
+		pflag_t _was = PREEMPTION_PUSHOFF(); \
+		cred_change_lock_acquire_nopr()
+#define cred_change_lock_release()       \
+		cred_change_lock_release_nopr(); \
+		PREEMPTION_POP(_was);            \
+	}	__WHILE0
 
 /* Return the credentials controller of the given thread. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
 NOTHROW(FCALL task_getcred)(struct task *__restrict thread) {
-	pflag_t was;
 	REF struct cred *result;
-	was = PREEMPTION_PUSHOFF();
-#ifndef CONFIG_NO_SMP
-	while unlikely(!sync_tryread(&cred_change_lock))
-		task_pause();
-#endif /* !CONFIG_NO_SMP */
+	cred_change_lock_acquire();
 	assert(FORTASK(thread, this_cred));
 	result = incref(FORTASK(thread, this_cred));
-#ifndef CONFIG_NO_SMP
-	sync_endread(&cred_change_lock);
-#endif /* !CONFIG_NO_SMP */
-	PREEMPTION_POP(was);
+	cred_change_lock_release();
 	return result;
 }
 
 /* Exchange the credentials controller of the calling thread. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
 NOTHROW(FCALL task_setcred)(struct cred *__restrict newcred) {
-	pflag_t was;
 	REF struct cred *result;
-	was = PREEMPTION_PUSHOFF();
-#ifndef CONFIG_NO_SMP
-	while unlikely(!sync_trywrite(&cred_change_lock))
-		task_pause();
-#endif /* !CONFIG_NO_SMP */
-	result = PERTASK_GET(this_cred);
 	incref(newcred);
+	cred_change_lock_acquire();
+	result = PERTASK_GET(this_cred);
 	PERTASK_SET(this_cred, newcred);
-#ifndef CONFIG_NO_SMP
-	sync_endwrite(&cred_change_lock);
-#endif /* !CONFIG_NO_SMP */
-	PREEMPTION_POP(was);
+	cred_change_lock_release();
 	assert(result);
 	return result;
 }
@@ -252,60 +281,70 @@ NOTHROW(FCALL task_setcred)(struct cred *__restrict newcred) {
 
 
 /* Get the calling thread's real user ID */
-PUBLIC NOBLOCK uid_t NOTHROW(FCALL cred_getruid)(void) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED uid_t
+NOTHROW(FCALL cred_getruid)(void) {
 	return ATOMIC_READ(THIS_CRED->c_ruid);
 }
 
 /* Get the calling thread's real group ID */
-PUBLIC NOBLOCK gid_t NOTHROW(FCALL cred_getrgid)(void) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED gid_t
+NOTHROW(FCALL cred_getrgid)(void) {
 	return ATOMIC_READ(THIS_CRED->c_rgid);
 }
 
 /* Get the calling thread's effective user ID */
-PUBLIC NOBLOCK uid_t NOTHROW(FCALL cred_geteuid)(void) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED uid_t
+NOTHROW(FCALL cred_geteuid)(void) {
 	return ATOMIC_READ(THIS_CRED->c_euid);
 }
 
 /* Get the calling thread's effective group ID */
-PUBLIC NOBLOCK gid_t NOTHROW(FCALL cred_getegid)(void) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED gid_t
+NOTHROW(FCALL cred_getegid)(void) {
 	return ATOMIC_READ(THIS_CRED->c_egid);
 }
 
 
 /* Get the calling thread's saved user ID */
-PUBLIC NOBLOCK uid_t NOTHROW(FCALL cred_getsuid)(void) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED uid_t
+NOTHROW(FCALL cred_getsuid)(void) {
 	return ATOMIC_READ(THIS_CRED->c_suid);
 }
 
 /* Get the calling thread's saved group ID */
-PUBLIC NOBLOCK gid_t NOTHROW(FCALL cred_getsgid)(void) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED gid_t
+NOTHROW(FCALL cred_getsgid)(void) {
 	return ATOMIC_READ(THIS_CRED->c_sgid);
 }
 
 /* Get the calling thread's filesystem user ID */
-PUBLIC NOBLOCK uid_t NOTHROW(FCALL cred_getfsuid)(void) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED uid_t
+NOTHROW(FCALL cred_getfsuid)(void) {
 	return ATOMIC_READ(THIS_CRED->c_fsuid);
 }
 
 /* Get the calling thread's filesystem group ID */
-PUBLIC NOBLOCK gid_t NOTHROW(FCALL cred_getfsgid)(void) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED gid_t
+NOTHROW(FCALL cred_getfsgid)(void) {
 	return ATOMIC_READ(THIS_CRED->c_fsgid);
 }
 
 
 /* Check if the calling thread is considered to be apart of the given group `gid' */
-PUBLIC WUNUSED bool FCALL cred_isfsgroupmember(gid_t gid) {
-	size_t i;
-	struct cred *self = THIS_CRED;
+PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
+NOTHROW(FCALL cred_isfsgroupmember)(gid_t gid) {
 	bool result;
-	if (ATOMIC_READ(THIS_CRED->c_fsgid) == gid)
-		return 1;
-	result = 0;
-	sync_read(&self->c_lock);
-	BSEARCH(i, self->c_groups, self->c_ngroups, , gid) {
-		result = 1;
-	}
-	sync_endread(&self->c_lock);
+	struct cred *self = THIS_CRED;
+	REF struct cred_groups *groups;
+
+	/* Check for simple case: `gid' is the actual, current filesystem group ID */
+	if (ATOMIC_READ(self->c_fsgid) == gid)
+		return true;
+
+	/* Check supplementary groups. */
+	groups = arref_get(&self->c_groups);
+	result = cred_groups_contains(groups, gid);
+	decref_unlikely(groups);
 	return result;
 }
 
@@ -514,7 +553,7 @@ cred_setuid(uid_t ruid, uid_t euid,
             bool chk_rights)
 		THROWS(E_INSUFFICIENT_RIGHTS) {
 	struct cred *self = THIS_CRED;
-	sync_write(&self->c_lock);
+	cred_write(self);
 	/* Load old values for UIDs that shouldn't be modified */
 	if (ruid == (uid_t)-1)
 		ruid = self->c_ruid;
@@ -531,7 +570,7 @@ cred_setuid(uid_t ruid, uid_t euid,
 		            euid == self->c_euid &&
 		            suid == self->c_suid &&
 		            fsuid == self->c_fsuid;
-		sync_endwrite(&self->c_lock);
+		cred_endwrite(self);
 		/* Only throw an insufficient-rights exception
 		 * if  the  call  wouldn't have  been  a no-op */
 		if (!is_a_noop)
@@ -571,7 +610,7 @@ cred_setuid(uid_t ruid, uid_t euid,
 	self->c_euid  = euid;
 	self->c_suid  = suid;
 	self->c_fsuid = fsuid;
-	sync_endwrite(&self->c_lock);
+	cred_endwrite(self);
 }
 
 PUBLIC void FCALL
@@ -580,7 +619,7 @@ cred_setgid(gid_t rgid, gid_t egid,
             bool chk_rights)
 		THROWS(E_INSUFFICIENT_RIGHTS) {
 	struct cred *self = THIS_CRED;
-	sync_write(&self->c_lock);
+	cred_write(self);
 	/* Load old values for GIDs that shouldn't be modified */
 	if (rgid == (gid_t)-1)
 		rgid = self->c_rgid;
@@ -597,7 +636,7 @@ cred_setgid(gid_t rgid, gid_t egid,
 		            egid == self->c_egid &&
 		            sgid == self->c_sgid &&
 		            fsgid == self->c_fsgid;
-		sync_endwrite(&self->c_lock);
+		cred_endwrite(self);
 		/* Only throw an insufficient-rights exception
 		 * if  the  call  wouldn't have  been  a no-op */
 		if (!is_a_noop)
@@ -609,139 +648,37 @@ cred_setgid(gid_t rgid, gid_t egid,
 	self->c_egid  = egid;
 	self->c_sgid  = sgid;
 	self->c_fsgid = fsgid;
-	sync_endwrite(&self->c_lock);
-}
-
-
-PRIVATE ATTR_PURE int __LIBCCALL
-compare_gid(void const *a, void const *b) {
-	typedef __CRT_PRIVATE_SINT(__SIZEOF_GID_T__) sgid_t;
-	return *(sgid_t *)a - *(sgid_t *)b;
-
-}
-
-/* Sort `vec', remove duplicate, and return the new (possibly lower) # of entries. */
-PRIVATE NONNULL((1)) size_t FCALL
-sort_groups_and_remove_duplicates(gid_t *__restrict vec,
-                                  size_t cnt) {
-	size_t i;
-	/* Sort the vector. */
-	qsort(vec, cnt, sizeof(gid_t), &compare_gid);
-	/* Remove duplicates. */
-	for (i = 0; i + 1 < cnt; ++i) {
-		gid_t cur = vec[i];
-		if (vec[i + 1] == cur) {
-			size_t dups = 1;
-			while (i + dups + 1 < cnt &&
-			       vec[i + dups + 1] == cur)
-				++dups;
-			/* Remove duplicates */
-			cnt -= dups;
-			memmovedown(&vec[i + 1],
-			            &vec[i + 2],
-			            cnt - (i + 1),
-			            sizeof(gid_t));
-		}
-	}
-	return cnt;
-}
-
-
-PRIVATE void FCALL
-cred_setgroups_heapvec_inherit(struct cred *__restrict self,
-                               size_t ngroups,
-                               /*inherit(always)*/ gid_t *new_groups,
-                               bool chk_rights)
-		THROWS(E_INSUFFICIENT_RIGHTS, E_SEGFAULT) {
-	size_t i;
-	gid_t *old_groups;
-	/* Sort the user-provided list of groups and remove duplicates. */
-	i = sort_groups_and_remove_duplicates(new_groups, ngroups);
-	assert(i <= ngroups);
-	if (i < ngroups) {
-		/* Try to release unused memory. */
-		gid_t *new_groups_trunc;
-		ngroups          = i;
-		new_groups_trunc = (gid_t *)krealloc_nx(new_groups,
-		                                        ngroups *
-		                                        sizeof(gid_t),
-		                                        GFP_NORMAL);
-		if likely(new_groups_trunc)
-			new_groups = new_groups_trunc;
-	}
-	/* Get down to the meat: Check for differences (there are any,
-	 * then we have to `require(CAP_SETGID)') */
-	sync_write(&self->c_lock);
-	old_groups = self->c_groups;
-	if (ngroups != self->c_ngroups) {
-do_set_new_group:
-		if unlikely(chk_rights && !credcap_capable(&self->c_cap_effective, CAP_SETGID)) {
-			/* Not allowed! */
-			sync_endwrite(&self->c_lock);
-			kfree(new_groups);
-			THROW(E_INSUFFICIENT_RIGHTS, CAP_SETGID);
-		}
-		self->c_groups  = new_groups;
-		self->c_ngroups = ngroups;
-		sync_endwrite(&self->c_lock);
-		kfree(old_groups);
-		return;
-	}
-	/* Check if any of the groups has changed.
-	 * Since we can assume that both group lists are sorted,
-	 * as well as not contain any duplicate entires, we  can
-	 * simply use memcmp() for this! */
-#if __SIZEOF_GID_T__ == 4
-	if (memcmpl(old_groups, new_groups, ngroups) != 0)
-		goto do_set_new_group;
-#elif __SIZEOF_GID_T__ == 2
-	if (memcmpw(old_groups, new_groups, ngroups) != 0)
-		goto do_set_new_group;
-#elif __SIZEOF_GID_T__ == 8
-	if (memcmpq(old_groups, new_groups, ngroups) != 0)
-		goto do_set_new_group;
-#else /* __SIZEOF_GID_T__ == ... */
-	if (memcmp(old_groups, new_groups, ngroups * sizeof(gid_t)) != 0)
-		goto do_set_new_group;
-#endif /* __SIZEOF_GID_T__ != ... */
-	sync_endwrite(&self->c_lock);
-	/* Groups have remained unchanged. -> Nothing to do here! */
-	kfree(new_groups);
+	cred_endwrite(self);
 }
 
 
 /* Set the list of supplementary group ids of the calling thread. */
 PUBLIC void FCALL
-cred_setgroups(size_t ngroups,
-               USER CHECKED gid_t const *groups,
-               bool chk_rights)
-		THROWS(E_INSUFFICIENT_RIGHTS, E_SEGFAULT) {
-	gid_t *new_groups;
+cred_setgroups(/*inherit(on_success)*/ REF struct cred_groups *__restrict new_groups)
+		THROWS(E_INSUFFICIENT_RIGHTS) {
 	struct cred *self = THIS_CRED;
-	if (ngroups > ATOMIC_READ(self->c_ngroups)) {
-		/* NOTE: Technically,   `groups[]'   may  contain   duplicate  entries,
-		 *       such that  the effective  group sets  are actually  identical,
-		 *       however we  also have  to keep  in mind  that `ngroups'  might
-		 *       be a maliciously  big value  that could result  in the  kernel
-		 *       running out  of heap  memory. As  such, a  non-malicious  user
-		 *       program that wants to rely on  setting the same set of  groups
-		 *       as  had  already been  set before,  should  also take  tare to
-		 *       ensure that their list of groups doesn't contain any duplicate
-		 *       entires! */
-		if (chk_rights)
-			require(CAP_SETGID);
+	/* Groups can only be added if the caller has CAP_SETGID */
+	if (capable(CAP_SETGID)) {
+		arref_set_inherit(&self->c_groups, new_groups);
+	} else {
+		REF struct cred_groups *old_groups;
+again:
+		old_groups = arref_get(&self->c_groups);
+
+		/* Without `CAP_SETGID', we can only  set the new set  of
+		 * groups if it doesn't try to add any additional groups! */
+		if (!cred_groups_issubset(new_groups, old_groups)) {
+			decref_unlikely(old_groups);
+			THROW(E_INSUFFICIENT_RIGHTS, CAP_SETGID);
+		}
+
+		/* The new set of groups is a subset, so we're always allowed to set it! */
+		if (!arref_cmpxch_inherit_new(&self->c_groups, old_groups, new_groups)) {
+			/* The old set of groups has changed in the mean time. */
+			decref_unlikely(old_groups);
+			goto again;
+		}
 	}
-	/* Allocate a new set of groups. */
-	new_groups = (gid_t *)kmalloc(ngroups * sizeof(gid_t),
-	                              GFP_NORMAL);
-	TRY {
-		/* Copy groups from user-space. */
-		memcpy(new_groups, groups, ngroups, sizeof(gid_t));
-	} EXCEPT {
-		kfree(new_groups);
-		RETHROW();
-	}
-	cred_setgroups_heapvec_inherit(self, ngroups, new_groups, chk_rights);
 }
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 
@@ -1159,11 +1096,11 @@ DEFINE_SYSCALL3(errno_t, getresuid,
 #else /* CONFIG_EVERYONE_IS_ROOT */
 	getresuid_id_t ruid, euid, suid;
 	struct cred *self = THIS_CRED;
-	sync_read(&self->c_lock);
+	cred_read(self);
 	ruid = (getresuid_id_t)self->c_ruid;
 	euid = (getresuid_id_t)self->c_euid;
 	suid = (getresuid_id_t)self->c_suid;
-	sync_endread(&self->c_lock);
+	cred_endread(self);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
@@ -1198,11 +1135,11 @@ DEFINE_SYSCALL3(errno_t, getresuid32,
 #else /* CONFIG_EVERYONE_IS_ROOT */
 	getresuid32_id_t ruid, euid, suid;
 	struct cred *self = THIS_CRED;
-	sync_read(&self->c_lock);
+	cred_read(self);
 	ruid = (getresuid32_id_t)self->c_ruid;
 	euid = (getresuid32_id_t)self->c_euid;
 	suid = (getresuid32_id_t)self->c_suid;
-	sync_endread(&self->c_lock);
+	cred_endread(self);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
@@ -1237,11 +1174,11 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresuid,
 #else /* CONFIG_EVERYONE_IS_ROOT */
 	compat_getresuid_id_t ruid, euid, suid;
 	struct cred *self = THIS_CRED;
-	sync_read(&self->c_lock);
+	cred_read(self);
 	ruid = (compat_getresuid_id_t)self->c_ruid;
 	euid = (compat_getresuid_id_t)self->c_euid;
 	suid = (compat_getresuid_id_t)self->c_suid;
-	sync_endread(&self->c_lock);
+	cred_endread(self);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
@@ -1276,11 +1213,11 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresuid32,
 #else /* CONFIG_EVERYONE_IS_ROOT */
 	compat_getresuid32_id_t ruid, euid, suid;
 	struct cred *self = THIS_CRED;
-	sync_read(&self->c_lock);
+	cred_read(self);
 	ruid = (compat_getresuid32_id_t)self->c_ruid;
 	euid = (compat_getresuid32_id_t)self->c_euid;
 	suid = (compat_getresuid32_id_t)self->c_suid;
-	sync_endread(&self->c_lock);
+	cred_endread(self);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
@@ -1319,11 +1256,11 @@ DEFINE_SYSCALL3(errno_t, getresgid,
 #else /* CONFIG_EVERYONE_IS_ROOT */
 	getresgid_id_t rgid, egid, sgid;
 	struct cred *self = THIS_CRED;
-	sync_read(&self->c_lock);
+	cred_read(self);
 	rgid = (getresgid_id_t)self->c_rgid;
 	egid = (getresgid_id_t)self->c_egid;
 	sgid = (getresgid_id_t)self->c_sgid;
-	sync_endread(&self->c_lock);
+	cred_endread(self);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
@@ -1358,11 +1295,11 @@ DEFINE_SYSCALL3(errno_t, getresgid32,
 #else /* CONFIG_EVERYONE_IS_ROOT */
 	getresgid32_id_t rgid, egid, sgid;
 	struct cred *self = THIS_CRED;
-	sync_read(&self->c_lock);
+	cred_read(self);
 	rgid = (getresgid32_id_t)self->c_rgid;
 	egid = (getresgid32_id_t)self->c_egid;
 	sgid = (getresgid32_id_t)self->c_sgid;
-	sync_endread(&self->c_lock);
+	cred_endread(self);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
@@ -1397,11 +1334,11 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresgid,
 #else /* CONFIG_EVERYONE_IS_ROOT */
 	compat_getresgid_id_t rgid, egid, sgid;
 	struct cred *self = THIS_CRED;
-	sync_read(&self->c_lock);
+	cred_read(self);
 	rgid = (compat_getresgid_id_t)self->c_rgid;
 	egid = (compat_getresgid_id_t)self->c_egid;
 	sgid = (compat_getresgid_id_t)self->c_sgid;
-	sync_endread(&self->c_lock);
+	cred_endread(self);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
@@ -1429,11 +1366,11 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresgid32,
                        USER UNCHECKED compat_getresgid32_id_t *, psgid) {
 	compat_getresgid32_id_t rgid, egid, sgid;
 	struct cred *self = THIS_CRED;
-	sync_read(&self->c_lock);
+	cred_read(self);
 	rgid = (compat_getresgid32_id_t)self->c_rgid;
 	egid = (compat_getresgid32_id_t)self->c_egid;
 	sgid = (compat_getresgid32_id_t)self->c_sgid;
-	sync_endread(&self->c_lock);
+	cred_endread(self);
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
 	if (prgid) {
@@ -1465,166 +1402,65 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresgid32,
      defined(__ARCH_WANT_COMPAT_SYSCALL_GETGROUPS) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_GETGROUPS32))
 
-#ifdef __cplusplus
 extern "C++" {
-#endif /* __cplusplus */
-
-#ifndef CONFIG_EVERYONE_IS_ROOT
-#ifdef __cplusplus
-template<size_t sizeof_gid_t>
-FORCELOCAL void KCALL
-getgid_with_custom_size_(struct cred const *__restrict self,
-                         void *__restrict buf, size_t index)
-#define getgid_with_custom_size(self, buf, index, sizeof_gid_t) \
-	getgid_with_custom_size_<sizeof_gid_t>(self, buf, index)
-#else /* __cplusplus */
-FORCELOCAL void KCALL
-getgid_with_custom_size(struct cred const *__restrict self,
-                        void *__restrict buf, size_t index,
-                        size_t sizeof_gid_t)
-#endif /* !__cplusplus */
-{
-	if (sizeof_gid_t > sizeof(gid_t)) {
-		memset(buf, 0, sizeof_gid_t);
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		memcpy(buf, &self->c_groups[index], sizeof(gid_t));
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		memcpy(buf + (sizeof_gid_t - sizeof(gid_t)),
-		       &self->c_groups[index],
-		       sizeof(gid_t));
-#else /* __BYTE_ORDER__ == ... */
-#error "Unsupported byteorder"
-#endif /* __BYTE_ORDER__ != ... */
-	} else {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		memcpy(buf, &self->c_groups[index], sizeof_gid_t);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		memcpy(buf,
-		       (byte_t *)&self->c_groups[index] + (sizeof(gid_t) -
-		                                           sizeof_gid_t),
-		       sizeof_gid_t);
-#else /* __BYTE_ORDER__ == ... */
-#error "Unsupported byteorder"
-#endif /* __BYTE_ORDER__ != ... */
-	}
-}
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
-
-
-#ifdef __cplusplus
-template<size_t sizeof_gid_t>
-LOCAL ssize_t KCALL
-sys_getgroups_impl_(size_t count,
-                    USER UNCHECKED void *list)
-#define sys_getgroups_impl(count, list, sizeof_gid_t) \
-	sys_getgroups_impl_<sizeof_gid_t>(count, list)
-#else /* __cplusplus */
-LOCAL ssize_t KCALL
-sys_getgroups_impl(size_t count,
-                   USER UNCHECKED void *list,
-                   size_t sizeof_gid_t)
-#endif /* !__cplusplus */
-{
-#ifndef CONFIG_EVERYONE_IS_ROOT
-	byte_t tempgid[sizeof_gid_t];
-	size_t src, missing, result;
-	struct cred *self = THIS_CRED;
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
-	validate_writablem(list, count, sizeof_gid_t);
+template<class GID_T>
+PRIVATE ssize_t KCALL
+sys_getgroups_impl(size_t count, USER UNCHECKED GID_T *list) {
 #ifdef CONFIG_EVERYONE_IS_ROOT
+	validate_writablem(list, count, sizeof(GID_T));
 	return 0;
 #else /* CONFIG_EVERYONE_IS_ROOT */
-	sync_read(&self->c_lock);
-	result = self->c_ngroups;
+	size_t result;
+	REF struct cred_groups *groups;
+	validate_writablem(list, count, sizeof(GID_T));
+	groups = arref_get(&THIS_CRED->c_groups);
+	FINALLY_DECREF_UNLIKELY(groups);
+
 	/* Deal with the buffer size, as well as the -EINVAL return case. */
+	result = groups->cg_count;
 	if (result > count) {
 		if (count != 0)
 			result = (size_t)-EINVAL;
-		goto done;
-	}
-	src     = 0;
-	missing = result;
-	/* Copy to user-space.
-	 * NOTE: Because we need to be holding a lock to `c_lock', this
-	 *       entire copy operation must be performed as interlocked
-	 *       with said lock. */
-continue_copy:
-	if (sizeof_gid_t == sizeof(gid_t)) {
-		size_t copy_error;
-		copy_error = memcpy_nopf(list, self->c_groups + src,
-		                         missing * sizeof_gid_t);
-		if unlikely(copy_error) {
-			size_t ok;
-			copy_error += (sizeof_gid_t - 1);
-			copy_error /= sizeof_gid_t;
-			assert(copy_error);
-			ok      = missing - copy_error;
-			missing = copy_error;
-			list = (byte_t *)list + ok * sizeof_gid_t;
-			goto copynext_without_locks;
-		}
+	} else if (sizeof(GID_T) == sizeof(gid_t)) {
+		/* Copy to user-space. */
+		memcpy(list, groups->cg_groups, result, sizeof(GID_T));
 	} else {
-		while (missing) {
-			getgid_with_custom_size(self, tempgid, src, sizeof_gid_t);
-			if unlikely(memcpy_nopf(list, tempgid, sizeof_gid_t) != 0)
-				goto copynext_without_locks;
-			--missing;
-			list = (byte_t *)list + sizeof_gid_t;
-			++src;
-		}
+		size_t i;
+		for (i = 0; i < result; ++i)
+			list[i] = (GID_T)groups->cg_groups[i];
 	}
-done:
-	sync_endread(&self->c_lock);
 	return (ssize_t)result;
-copynext_without_locks:
-	getgid_with_custom_size(self, tempgid, src, sizeof_gid_t);
-	sync_endread(&self->c_lock);
-	COMPILER_WRITE_BARRIER();
-	/* Copy to user-space without holding any locks. */
-	memcpy(list, tempgid, sizeof_gid_t);
-	COMPILER_WRITE_BARRIER();
-	sync_read(&self->c_lock);
-	--missing;
-	list = (byte_t *)list + sizeof_gid_t;
-	++src;
-	goto continue_copy;
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 }
 #endif /* __ARCH_WANT_SYSCALL_GETGROUPS */
 
-#ifdef __cplusplus
 } /* extern "C++" */
-#endif /* __cplusplus */
 
 #ifdef __ARCH_WANT_SYSCALL_GETGROUPS
-typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getgroups, 1)) getgroups_id_t;
 DEFINE_SYSCALL2(ssize_t, getgroups, size_t, count,
-                USER UNCHECKED getgroups_id_t *, list) {
-	return sys_getgroups_impl(count, list, sizeof(getgroups_id_t));
+                USER UNCHECKED SYSCALL_ARG_TYPE_OF(getgroups, 1), list) {
+	return sys_getgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_SYSCALL_GETGROUPS */
 
 #ifdef __ARCH_WANT_SYSCALL_GETGROUPS32
-typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getgroups32, 1)) getgroups32_id_t;
 DEFINE_SYSCALL2(ssize_t, getgroups32, size_t, count,
-                USER UNCHECKED getgroups32_id_t *, list) {
-	return sys_getgroups_impl(count, list, sizeof(getgroups32_id_t));
+                USER UNCHECKED SYSCALL_ARG_TYPE_OF(getgroups32, 1), list) {
+	return sys_getgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_SYSCALL_GETGROUPS32 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS
-typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getgroups, 1)) compat_getgroups_id_t;
 DEFINE_COMPAT_SYSCALL2(ssize_t, getgroups, size_t, count,
-                       USER UNCHECKED compat_getgroups_id_t *, list) {
-	return sys_getgroups_impl(count, list, sizeof(compat_getgroups_id_t));
+                       USER UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(getgroups, 1), list) {
+	return sys_getgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS32
-typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getgroups32, 1)) compat_getgroups32_id_t;
 DEFINE_COMPAT_SYSCALL2(ssize_t, getgroups32, size_t, count,
-                       USER UNCHECKED compat_getgroups32_id_t *, list) {
-	return sys_getgroups_impl(count, list, sizeof(compat_getgroups32_id_t));
+                       USER UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(getgroups32, 1), list) {
+	return sys_getgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS32 */
 
@@ -1641,136 +1477,142 @@ DEFINE_COMPAT_SYSCALL2(ssize_t, getgroups32, size_t, count,
      defined(__ARCH_WANT_COMPAT_SYSCALL_SETGROUPS) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_SETGROUPS32))
 
-#ifdef __cplusplus
 extern "C++" {
-#endif /* __cplusplus */
 
 #ifndef CONFIG_EVERYONE_IS_ROOT
-#ifdef __cplusplus
-template<size_t sizeof_gid_t>
-FORCELOCAL gid_t KCALL
-extractgid_with_custom_size_(void const *__restrict buf, size_t index)
-#define extractgid_with_custom_size(buf, index, sizeof_gid_t) \
-	extractgid_with_custom_size_<sizeof_gid_t>(buf, index)
-#else /* __cplusplus */
-FORCELOCAL gid_t KCALL
-extractgid_with_custom_size(void const *__restrict buf, size_t index,
-                            size_t sizeof_gid_t)
-#endif /* !__cplusplus */
-{
-	gid_t result;
-	buf = (byte_t const *)buf + index * sizeof_gid_t;
-	if (sizeof_gid_t < sizeof(gid_t)) {
-		memset(&result, 0, sizeof(result));
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		memcpy(&result, buf, sizeof_gid_t);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		memcpy((byte_t *)&result + (sizeof(gid_t) -
-		                            sizeof_gid_t),
-		       buf, sizeof_gid_t);
-#else /* __BYTE_ORDER__ == ... */
-#error "Unsupported byteorder"
-#endif /* __BYTE_ORDER__ != ... */
-	} else {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		memcpy(&result, buf, sizeof(gid_t));
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		memcpy(&result,
-		       buf + (sizeof_gid_t -
-		              sizeof(gid_t)),
-		       sizeof(gid_t));
-#else /* __BYTE_ORDER__ == ... */
-#error "Unsupported byteorder"
-#endif /* __BYTE_ORDER__ != ... */
+/* Create a new set of groups that may consist of at most `max_ngroups'
+ * groups (duplicate groups  are ignored). If  more than  `max_ngroups'
+ * unique groups are given, and  the caller doesn't have  `CAP_SETGID',
+ * an `E_INSUFFICIENT_RIGHTS' exception is thrown. */
+template<class GID_T>
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct cred_groups *KCALL
+cred_groups_new(USER UNCHECKED GID_T const *groups,
+                size_t ngroups, size_t max_ngroups)
+		THROWS(E_SEGFAULT, E_BADALLOC, E_INSUFFICIENT_RIGHTS) {
+	size_t count;
+	REF struct cred_groups *result;
+	validate_readablem(groups, ngroups, sizeof(GID_T));
+	if (max_ngroups > ngroups)
+		max_ngroups = ngroups;
+
+	/* Allocate the new groups controller. */
+	result = (REF struct cred_groups *)kmalloc(offsetof(struct cred_groups, cg_groups) +
+	                                           max_ngroups * sizeof(gid_t),
+	                                           GFP_NORMAL);
+	TRY {
+		size_t i;
+		count = 0;
+		for (i = 0; i < ngroups; ++i) {
+			size_t lo, hi;
+			gid_t newgid = ATOMIC_READ(groups[i]);
+			/* Sorted-insert into the new list, ignoring duplicates. When exceeding
+			 * `max_ngroups' during this, require that the caller has `CAP_SETGID'. */
+			lo = 0;
+			hi = count;
+			while (lo < hi) {
+				size_t j = (lo + hi) / 2;
+				if (newgid < result->cg_groups[j]) {
+					hi = j;
+				} else if (newgid > result->cg_groups[j]) {
+					lo = j + 1;
+				} else {
+					goto next_gid;
+				}
+			}
+			/* Insert into `lo' */
+			if (count > max_ngroups) {
+				require(CAP_SETGID);
+				result = (REF struct cred_groups *)krealloc(result,
+				                                            offsetof(struct cred_groups, cg_groups) +
+				                                            (count + 1) * sizeof(gid_t),
+				                                            GFP_NORMAL);
+				/* Remember available space. */
+				max_ngroups = (kmalloc_usable_size(result) -
+				               offsetof(struct cred_groups, cg_groups)) /
+				              sizeof(gid_t);
+				assert(max_ngroups > count);
+			}
+
+			/* Do the insert at the proper position. */
+			memmoveup(&result->cg_groups[lo + 1],
+			          &result->cg_groups[lo],
+			          count - lo, sizeof(gid_t));
+			result->cg_groups[lo] = newgid;
+			++count;
+next_gid:
+			;
+		}
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
 	}
+
+	/* Try to free unused memory. */
+	if (count < max_ngroups) {
+		REF struct cred_groups *new_result;
+		new_result = (REF struct cred_groups *)krealloc_nx(result,
+		                                                   offsetof(struct cred_groups, cg_groups) +
+		                                                   max_ngroups * sizeof(gid_t),
+		                                                   GFP_NORMAL);
+		if likely(new_result)
+			result = new_result;
+	}
+
+	/* Fill in missing fields. */
+	result->cg_count  = count;
+	result->cg_refcnt = 1;
 	return result;
 }
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 
-#ifdef __cplusplus
-template<size_t sizeof_gid_t>
-LOCAL errno_t KCALL
-sys_setgroups_impl_(size_t count,
-                    USER UNCHECKED void const *list)
-#define sys_setgroups_impl(count, list, sizeof_gid_t) \
-	sys_setgroups_impl_<sizeof_gid_t>(count, list)
-#else /* __cplusplus */
-LOCAL errno_t KCALL
-sys_setgroups_impl(size_t count,
-                   USER UNCHECKED void const *list,
-                   size_t sizeof_gid_t)
-#endif /* !__cplusplus */
-{
-	validate_readablem(list, count, sizeof_gid_t);
-#ifndef CONFIG_EVERYONE_IS_ROOT
-	if (sizeof_gid_t == sizeof(gid_t)) {
-		cred_setgroups(count, (gid_t const *)list, true);
-	} else {
-		gid_t *new_groups;
-		struct cred *self = THIS_CRED;
-		if (count > ATOMIC_READ(self->c_ngroups))
-			require(CAP_SETGID);
-		/* Allocate a new set of groups. */
-		new_groups = (gid_t *)kmalloc(count * sizeof(gid_t),
-		                              GFP_NORMAL);
-		TRY {
-			/* Copy groups from user-space. */
-			size_t i;
-			for (i = 0; i < count; ++i) {
-				new_groups[i] = extractgid_with_custom_size(list,
-				                                            i,
-				                                            sizeof_gid_t);
-			}
-		} EXCEPT {
-			kfree(new_groups);
-			RETHROW();
-		}
-		/* Apply new groups. */
-		cred_setgroups_heapvec_inherit(self,
-		                               count,
-		                               new_groups,
-		                               true);
+template<class GID_T>
+PRIVATE errno_t KCALL
+sys_setgroups_impl(size_t count, USER UNCHECKED GID_T const *groups) {
+	REF struct cred_groups *set;
+	size_t max;
+	set = arref_get(&THIS_CRED->c_groups);
+	max = set->cg_count;
+	decref_unlikely(set);
+	set = cred_groups_new(groups, count, max);
+	TRY {
+		cred_setgroups(set);
+	} EXCEPT {
+		destroy(set);
+		RETHROW();
 	}
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_SETGROUPS */
 
-#ifdef __cplusplus
 } /* extern "C++" */
-#endif /* __cplusplus */
 
 #ifdef __ARCH_WANT_SYSCALL_SETGROUPS
-typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(setgroups, 1)) setgroups_id_t;
 DEFINE_SYSCALL2(errno_t, setgroups, size_t, count,
-                USER UNCHECKED setgroups_id_t const *, list) {
-	return sys_setgroups_impl(count, list, sizeof(setgroups_id_t));
+                USER UNCHECKED SYSCALL_ARG_TYPE_OF(setgroups, 1), list) {
+	return sys_setgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_SYSCALL_SETGROUPS */
 
 #ifdef __ARCH_WANT_SYSCALL_SETGROUPS32
-typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(setgroups32, 1)) setgroups32_id_t;
 DEFINE_SYSCALL2(errno_t, setgroups32, size_t, count,
-                USER UNCHECKED setgroups32_id_t const *, list) {
-	return sys_setgroups_impl(count, list, sizeof(setgroups32_id_t));
+                USER UNCHECKED SYSCALL_ARG_TYPE_OF(setgroups32, 1), list) {
+	return sys_setgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_SYSCALL_SETGROUPS32 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS
-typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(setgroups, 1)) compat_setgroups_id_t;
 DEFINE_COMPAT_SYSCALL2(errno_t, setgroups, size_t, count,
-                       USER UNCHECKED compat_setgroups_id_t const *, list) {
-	return sys_setgroups_impl(count, list, sizeof(compat_setgroups_id_t));
+                       USER UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(setgroups, 1), list) {
+	return sys_setgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS32
-typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(setgroups32, 1)) compat_setgroups32_id_t;
 DEFINE_COMPAT_SYSCALL2(errno_t, setgroups32, size_t, count,
-                       USER UNCHECKED compat_setgroups32_id_t const *, list) {
-	return sys_setgroups_impl(count, list, sizeof(compat_setgroups32_id_t));
+                       USER UNCHECKED COMPAT_SYSCALL_ARG_TYPE_OF(setgroups32, 1), list) {
+	return sys_setgroups_impl(count, list);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS32 */
+#endif /* ... */
 
 
 

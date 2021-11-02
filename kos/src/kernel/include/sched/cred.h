@@ -24,12 +24,13 @@
 
 #include <kernel/types.h>
 #include <sched/arch/cred.h>
+#include <sched/pertask.h>
 
 #include <hybrid/__atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <kos/aref.h>
 #include <kos/capability.h>
-#include <sched/pertask.h>
 
 
 /* ===== How the whole CAP_* system works on linux (and KOS) =====
@@ -263,41 +264,114 @@ NOTHROW(FCALL credcap_andset)(struct credcap *dst,
 }
 
 
-
-struct cred {
-	REF refcnt_t         c_refcnt;          /* Reference counter. */
-	struct atomic_rwlock c_lock;            /* Lock for the credentials controller. */
-	WEAK uid_t           c_ruid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real user ID */
-	WEAK gid_t           c_rgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real group ID */
-	WEAK uid_t           c_euid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Effective user ID
-	                                         * Used   to   determine   permissions   for   accessing
-	                                         * shared resources (mainly shared memory)
-	                                         * When this field is set, you must also set `c_fsuid' */
-	WEAK gid_t           c_egid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Effective group ID (s.a. `c_euid') */
-	WEAK uid_t           c_suid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved  user  ID
-	                                         * When  an `S_ISUID' / `S_ISGID' program is executed,
-	                                         * what  would have otherwise been `c_euid' / `c_egid'
-	                                         * is stored here (and `c_euid' / `c_egid' will become
-	                                         * the `struct stat::st_uid/st_gid' of the executable) */
-	WEAK gid_t           c_sgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved group ID (s.a. `c_suid') */
-	WEAK uid_t           c_fsuid;           /* [lock(READ(ATOMIC), WRITE(c_lock))] Filesystem user ID
-	                                         * Used to  determine  permissions  for  accessing  files */
-	WEAK gid_t           c_fsgid;           /* [lock(READ(ATOMIC), WRITE(c_lock))] Filesystem group ID */
-	size_t               c_ngroups;         /* [lock(c_lock)] # of supplementary group IDs. */
-	gid_t               *c_groups;          /* [0..c_ngroups][owned][lock(c_lock)] Supplementary group IDs.
-	                                         * These are used as extensions to `c_fsgid'.
-	                                         * NOTE: This list may or may not contain `c_fsgid', but is sorted
-	                                         *       ascendingly, meaning that BSEARCH can be used to scan it. */
-	WEAK struct credcap  c_cap_permitted;   /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that can be acquired by anyone, at any time. */
-	WEAK struct credcap  c_cap_inheritable; /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that ~can~ be inherited by privileged programs during exec(). */
-	WEAK struct credcap  c_cap_effective;   /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities current in effect. */
-	WEAK struct credcap  c_cap_bounding;    /* [lock(READ(ATOMIC), WRITE(c_lock))] - Caps that can be made permitted by privileged programs
-	                                         *                                     - Caps that can be added to `caps.inheritable' by `capset()' */
-	WEAK struct credcap  c_cap_ambient;     /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that always become permitted in privileged programs
-	                                         * during exec(). Note  the invariant  that this one  is always  a subset of  permitted &  inheritable. */
-	WEAK uint8_t         c_securebits;      /* [lock(READ(ATOMIC), WRITE(c_lock))] Secure capability bits. (set of `SECBIT_*' from <kos/capability.h>) */
-	WEAK uint8_t         c_no_new_privs;    /* [lock(READ(ATOMIC), WRITE(c_lock))] When non-zero, exec() calls do not  */
+/* Supplementary credential groups. */
+struct cred_groups {
+	REF refcnt_t                   cg_refcnt;  /* Reference counter. */
+	size_t                         cg_count;   /* [const] # of supplementary groups. */
+	COMPILER_FLEXIBLE_ARRAY(gid_t, cg_groups); /* [0..cg_count][const] Array of supplementary groups (sorted ascendingly; no duplicates). */
 };
+
+/* Default, empty set of supplementary groups. */
+DATDEF struct cred_groups cred_groups_empty;
+
+#ifndef ____os_free_defined
+#define ____os_free_defined
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
+#endif /* !____os_free_defined */
+#define cred_groups_destroy(self) __os_free(self)
+DEFINE_REFCOUNT_FUNCTIONS(struct cred_groups, cg_refcnt, cred_groups_destroy)
+
+/* Check if the groups from `subset' are a sub-set of those from `superset' */
+FUNDEF ATTR_PURE WUNUSED NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL cred_groups_issubset)(struct cred_groups const *__restrict subset,
+                                    struct cred_groups const *__restrict superset);
+
+
+/* Check if `self' contains `gid' */
+EIDECLARE(NOBLOCK ATTR_PURE WUNUSED NONNULL((1)), __BOOL, NOTHROW, FCALL,
+          cred_groups_contains, (struct cred_groups const *__restrict self, gid_t gid), {
+	size_t lo, hi;
+	lo = 0;
+	hi = self->cg_count;
+	while (lo < hi) {
+		size_t i;
+		i = (lo + hi) / 2;
+		if (gid < self->cg_groups[i]) {
+			hi = i;
+		} else if (gid > self->cg_groups[i]) {
+			lo = i + 1;
+		} else {
+			return true;
+		}
+	}
+	return false;
+})
+
+
+/* Atomic reference to `cred_groups' */
+ARREF(cred_groups_arref, cred_groups);
+
+/* Thread credentials controller. */
+struct cred {
+	REF refcnt_t             c_refcnt;           /* Reference counter. */
+	struct cred_groups_arref c_groups;           /* [1..1] Supplementary group IDs. These are used as extensions to `c_fsgid'. */
+	struct atomic_rwlock     c_lock;            /* Lock for the credentials controller. */
+	WEAK uid_t               c_ruid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real user ID */
+	WEAK gid_t               c_rgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real group ID */
+	WEAK uid_t               c_euid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Effective user ID
+	                                             * Used   to   determine   permissions   for   accessing
+	                                             * shared resources (mainly shared memory)
+	                                             * When this field is set, you must also set `c_fsuid' */
+	WEAK gid_t               c_egid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Effective group ID (s.a. `c_euid') */
+	WEAK uid_t               c_suid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved  user  ID
+	                                             * When  an `S_ISUID' / `S_ISGID' program is executed,
+	                                             * what  would have otherwise been `c_euid' / `c_egid'
+	                                             * is stored here (and `c_euid' / `c_egid' will become
+	                                             * the `struct stat::st_uid/st_gid' of the executable) */
+	WEAK gid_t               c_sgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved group ID (s.a. `c_suid') */
+	WEAK uid_t               c_fsuid;           /* [lock(READ(ATOMIC), WRITE(c_lock))] Filesystem user ID
+	                                             * Used to  determine  permissions  for  accessing  files */
+	WEAK gid_t               c_fsgid;           /* [lock(READ(ATOMIC), WRITE(c_lock))] Filesystem group ID */
+	WEAK struct credcap      c_cap_permitted;   /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that can be acquired by anyone, at any time. */
+	WEAK struct credcap      c_cap_inheritable; /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that ~can~ be inherited by privileged programs during exec(). */
+	WEAK struct credcap      c_cap_effective;   /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities current in effect. */
+	WEAK struct credcap      c_cap_bounding;    /* [lock(READ(ATOMIC), WRITE(c_lock))] - Caps that can be made permitted by privileged programs
+	                                             *                                     - Caps that can be added to `caps.inheritable' by `capset()' */
+	WEAK struct credcap      c_cap_ambient;     /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that always become permitted in privileged programs
+	                                             * during exec(). Note  the invariant  that this one  is always  a subset of  permitted &  inheritable. */
+	WEAK uint8_t             c_securebits;      /* [lock(READ(ATOMIC), WRITE(c_lock))] Secure capability bits. (set of `SECBIT_*' from <kos/capability.h>) */
+	WEAK uint8_t             c_no_new_privs;    /* [lock(READ(ATOMIC), WRITE(c_lock))] When non-zero, exec() calls do not  */
+};
+
+/* Helper macros for `struct cred::c_lock' */
+#define cred_mustreap(self)     0
+#define cred_reap(self)         (void)0
+#define _cred_reap(self)        (void)0
+#define cred_write(self)        atomic_rwlock_write(&(self)->c_lock)
+#define cred_write_nx(self)     atomic_rwlock_write_nx(&(self)->c_lock)
+#define cred_trywrite(self)     atomic_rwlock_trywrite(&(self)->c_lock)
+#define cred_endwrite(self)     (atomic_rwlock_endwrite(&(self)->c_lock), cred_reap(self))
+#define _cred_endwrite(self)    atomic_rwlock_endwrite(&(self)->c_lock)
+#define cred_read(self)         atomic_rwlock_read(&(self)->c_lock)
+#define cred_read_nx(self)      atomic_rwlock_read_nx(&(self)->c_lock)
+#define cred_tryread(self)      atomic_rwlock_tryread(&(self)->c_lock)
+#define _cred_endread(self)     atomic_rwlock_endread(&(self)->c_lock)
+#define cred_endread(self)      (void)(atomic_rwlock_endread(&(self)->c_lock) && (cred_reap(self), 0))
+#define _cred_end(self)         atomic_rwlock_end(&(self)->c_lock)
+#define cred_end(self)          (void)(atomic_rwlock_end(&(self)->c_lock) && (cred_reap(self), 0))
+#define cred_upgrade(self)      atomic_rwlock_upgrade(&(self)->c_lock)
+#define cred_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->c_lock)
+#define cred_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->c_lock)
+#define cred_downgrade(self)    atomic_rwlock_downgrade(&(self)->c_lock)
+#define cred_reading(self)      atomic_rwlock_reading(&(self)->c_lock)
+#define cred_writing(self)      atomic_rwlock_writing(&(self)->c_lock)
+#define cred_canread(self)      atomic_rwlock_canread(&(self)->c_lock)
+#define cred_canwrite(self)     atomic_rwlock_canwrite(&(self)->c_lock)
+#define cred_waitread(self)     atomic_rwlock_waitread(&(self)->c_lock)
+#define cred_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->c_lock)
+#define cred_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->c_lock)
+#define cred_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->c_lock)
+
 
 /* Destroy the given credentials controller. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -335,49 +409,50 @@ EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, __BOOL,
 
 /* Ensure that the calling thread is `capable(capno)'
  * If the calling thread isn't, throw an `E_INSUFFICIENT_RIGHTS' exception */
-FUNDEF void FCALL require(syscall_slong_t capno)
+FUNDEF NOBLOCK void FCALL
+require(syscall_slong_t capno)
 		THROWS(E_INSUFFICIENT_RIGHTS);
 
 
 
 /* Get the calling thread's real user ID */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL, uid_t, NOTHROW, FCALL, cred_getruid, (void), {
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, uid_t, NOTHROW, FCALL, cred_getruid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_ruid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's real group ID */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL, gid_t, NOTHROW, FCALL, cred_getrgid, (void), {
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, gid_t, NOTHROW, FCALL, cred_getrgid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_rgid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's effective user ID */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL, uid_t, NOTHROW, FCALL, cred_geteuid, (void), {
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, uid_t, NOTHROW, FCALL, cred_geteuid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_euid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's effective group ID */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL, gid_t, NOTHROW, FCALL, cred_getegid, (void), {
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, gid_t, NOTHROW, FCALL, cred_getegid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_egid, __ATOMIC_ACQUIRE);
 })
 
 
 /* Get the calling thread's saved user ID */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL, uid_t, NOTHROW, FCALL, cred_getsuid, (void), {
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, uid_t, NOTHROW, FCALL, cred_getsuid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_suid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's saved group ID */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL, gid_t, NOTHROW, FCALL, cred_getsgid, (void), {
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, gid_t, NOTHROW, FCALL, cred_getsgid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_sgid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's filesystem user ID */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL, uid_t, NOTHROW, FCALL, cred_getfsuid, (void), {
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, uid_t, NOTHROW, FCALL, cred_getfsuid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_fsuid, __ATOMIC_ACQUIRE);
 })
 
 /* Get the calling thread's filesystem group ID */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL, gid_t, NOTHROW, FCALL, cred_getfsgid, (void), {
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, gid_t, NOTHROW, FCALL, cred_getfsgid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_fsgid, __ATOMIC_ACQUIRE);
 })
 
@@ -392,8 +467,9 @@ cred_setgid(gid_t rgid, gid_t egid, gid_t sgid, gid_t fsgid, __BOOL chk_rights D
 
 /* Set the list of supplementary group ids of the calling thread. */
 FUNDEF void FCALL
-cred_setgroups(size_t ngroups, USER CHECKED gid_t const *groups, __BOOL chk_rights DFL(1))
-		THROWS(E_INSUFFICIENT_RIGHTS, E_SEGFAULT);
+cred_setgroups(/*inherit(on_success)*/ REF struct cred_groups *__restrict new_groups)
+		THROWS(E_INSUFFICIENT_RIGHTS);
+
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* Update program credentials as has to be done as part of an exec() system call. */
@@ -405,24 +481,23 @@ INTDEF void FCALL cred_onexec(struct inode *__restrict program_file) THROWS(E_BA
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 /* Check if the calling thread is considered to be apart of the given group `gid' */
-EIDECLARE(WUNUSED, __BOOL, , FCALL, cred_isfsgroupmember, (gid_t gid), {
-	size_t i;
+EIDECLARE(NOBLOCK ATTR_PURE WUNUSED, __BOOL, NOTHROW, FCALL,
+          cred_isfsgroupmember, (gid_t gid), {
 	__BOOL result;
 	struct cred *self = THIS_CRED;
+	REF struct cred_groups *groups;
+
 	/* Check for simple case: `gid' is the actual, current filesystem group ID */
-	if (__hybrid_atomic_load(THIS_CRED->c_fsgid, __ATOMIC_ACQUIRE) == gid)
+	if (__hybrid_atomic_load(self->c_fsgid, __ATOMIC_ACQUIRE) == gid)
 		return 1;
-	result = 0;
-	atomic_rwlock_read(&self->c_lock);
-	for (i = 0; i < self->c_ngroups; ++i) {
-		if (self->c_groups[i] == gid) {
-			result = 1;
-			break;
-		}
-	}
-	atomic_rwlock_endread(&self->c_lock);
+
+	/* Check supplementary groups. */
+	groups = arref_get(&self->c_groups);
+	result = cred_groups_contains(groups, gid);
+	decref_unlikely(groups);
 	return result;
 })
+
 #else /* !CONFIG_EVERYONE_IS_ROOT */
 #define capable(capno)                            1
 #define require(capno)                            (void)0
@@ -436,7 +511,7 @@ EIDECLARE(WUNUSED, __BOOL, , FCALL, cred_isfsgroupmember, (gid_t gid), {
 #define cred_getfsgid()                           (gid_t)0
 #define cred_setuid(ruid, euid, suid, fsuid, ...) (void)0
 #define cred_setgid(rgid, egid, sgid, fsgid, ...) (void)0
-#define cred_setgroups(ngroups, groups, ...)      (void)0
+#define cred_setgroups(ngroups, groups)           (void)0
 #define cred_isfsgroupmember(gid)                 0 /* Yes, this has to be `0'! */
 #endif /* CONFIG_EVERYONE_IS_ROOT */
 

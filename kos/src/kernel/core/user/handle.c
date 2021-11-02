@@ -469,7 +469,6 @@ clone_this_handle_manager(struct task *__restrict new_thread, uintptr_t flags) {
 #ifndef CONFIG_NO_SMP
 /* Lock for accessing any remote thread's this_handle_manager field */
 PRIVATE struct atomic_rwlock handle_manager_change_lock = ATOMIC_RWLOCK_INIT;
-DEFINE_DBG_BZERO_OBJECT(handle_manager_change_lock);
 #endif /* !CONFIG_NO_SMP */
 
 /* Return the handle manager of the given thread. */

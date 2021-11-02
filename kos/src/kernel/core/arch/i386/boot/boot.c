@@ -927,6 +927,20 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: `struct fdirenum' should be variable-sized,  with
 	 *       the real size stored as a vtable `size_t'-member. */
 
+	/* TODO: Lots of places throughout the kernel still talk about  "datablock"s;
+	 *       they're called "mfile"s. The same also goes for "datapart" ("mpart") */
+
+	/* TODO: Refactor `vio_operators' -> `vio_ops' */
+
+	/* TODO: The kernel `struct shared_lock' and `struct shared_rwlock'  should
+	 *       also be available in user-space  (iow: move these structures  into
+	 *       new headers <kos/shared-lock.h>; possibly named differently, since
+	 *       the name "shared" has never  perfectly represented what they  are;
+	 *       maybe call them "preemptive_lock"? - but that's a pretty long name
+	 *       when compared to "shared_lock")
+	 * Anyways: userspace should also be able to use these, and the
+	 *          implementation should  be  driven  by  sys_futex(2) */
+
 	return state;
 }
 
