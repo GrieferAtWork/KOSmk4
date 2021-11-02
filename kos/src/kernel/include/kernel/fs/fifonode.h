@@ -171,7 +171,7 @@ ffifonode_v_open(struct mfile *__restrict self,
                  struct handle *__restrict hand,
                  struct path *access_path,
                  struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE, ...);
+		THROWS(E_BADALLOC, E_INVALID_ARGUMENT_BAD_STATE, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 ffifonode_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...);

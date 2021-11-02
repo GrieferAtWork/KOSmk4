@@ -54,7 +54,7 @@ ffifonode_v_open(struct mfile *__restrict self,
                  struct handle *__restrict hand,
                  struct path *access_path,
                  struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE, ...) {
+		THROWS(E_BADALLOC, E_INVALID_ARGUMENT_BAD_STATE, ...) {
 	struct ffifonode *me;
 	REF struct fifohandle *obj;
 	assert(hand->h_data == self);

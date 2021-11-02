@@ -1005,7 +1005,7 @@ NOTHROW(FCALL driver_fromfile)(struct mfile *__restrict driver_file) {
  * If the file still can't be found, return `NULL'. */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) struct mfile *FCALL
 driver_getfile(struct driver *__restrict self)
-		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	if (!self->d_module.md_file) {
 		/* TODO */
 		COMPILER_IMPURE();

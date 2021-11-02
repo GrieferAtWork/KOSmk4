@@ -570,7 +570,7 @@ driver_fromfilename(USER CHECKED char const *driver_filename, size_t driver_name
  * If the file still can't be found, return `NULL'. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) struct mfile *FCALL
 driver_getfile(struct driver *__restrict self)
-		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC, ...);
+		THROWS(E_IOERROR, E_BADALLOC, ...);
 
 
 /************************************************************************/

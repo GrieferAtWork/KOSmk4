@@ -893,15 +893,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       is passed to `sys_userviofd(2)' (with the new FS, that size
 	 *       becomes relevant and must be stored in `mf_filesize') */
 
-	/* TODO: Lots of functions are marked as E_WOULDBLOCK+E_BADALLOC.
-	 *
-	 * I feel like `E_BADALLOC' should be allowed to imply `E_WOULDBLOCK'
-	 * when talking about  the fact  that kmalloc() tries  to acquire  an
-	 * atomic lock internally, meaning it's able to throw `E_WOULDBLOCK'.
-	 * -> As such, go through all mentions of `THROWS(E_WOULDBLOCK, E_BADALLOC)'
-	 *    and see if the `E_WOULDBLOCK' can be removed. Note that it should stay
-	 *    if the function also acquired some other (unrelated) atomic lock! */
-
 	/* TODO: `struct fdirenum' should be variable-sized,  with
 	 *       the real size stored as a vtable `size_t'-member. */
 

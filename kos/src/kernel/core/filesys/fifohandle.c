@@ -165,7 +165,7 @@ NOTHROW(FCALL fifohandle_destroy)(struct fifohandle *__restrict self) {
 PUBLIC BLOCKING ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifohandle *FCALL
 fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
                struct path *access_path, struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE, ...) {
+		THROWS(E_BADALLOC, E_INVALID_ARGUMENT_BAD_STATE, ...) {
 	REF struct fifohandle *result;
 	assert(!task_wasconnected());
 	assert((iomode & ~(IO_ACCMODE | IO_NONBLOCK)) == 0);

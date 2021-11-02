@@ -322,7 +322,7 @@ blkdev_makeparts_create(struct blkdev *__restrict self,
                         struct blkdev_list *__restrict parts,
                         uint64_t part_sectormin,
                         uint64_t part_sectorcnt)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_BADALLOC) {
 	struct blkdev *dev;
 	/* Must allocate as LOCKED since may end up being used for SWAP */
 	dev = (struct blkdev *)kmalloc(offsetafter(struct blkdev, bd_partinfo),
@@ -366,7 +366,7 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
                          struct blkdev_makeparts_info *__restrict info,
                          uint64_t efipart_sectormin,
                          uint64_t efipart_sectorcnt)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+		THROWS(E_BADALLOC, ...) {
 	struct efi_descriptor *efi;
 	pos_t efi_pos;
 	uint32_t efi_hdrsize;
@@ -574,7 +574,7 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
                          struct blkdev_makeparts_info *info,
                          uint64_t subpart_sectormin,
                          uint64_t subpart_sectorcnt)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+		THROWS(E_BADALLOC, ...);
 
 PRIVATE BLOCKING NONNULL((1, 2, 4)) void FCALL
 blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
@@ -583,7 +583,7 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
                           struct mbr_sector const *__restrict mbr,
                           uint64_t subpart_sectormin,
                           uint64_t subpart_sectorcnt)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+		THROWS(E_BADALLOC, ...) {
 	unsigned int i;
 	uint64_t subpart_sectormax;
 	assert(subpart_sectorcnt != 0);
@@ -724,7 +724,7 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
                          struct blkdev_makeparts_info *info,
                          uint64_t subpart_sectormin,
                          uint64_t subpart_sectorcnt)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+		THROWS(E_BADALLOC, ...) {
 	struct mbr_sector *mbr;
 	pos_t mbr_pos;
 
@@ -760,7 +760,7 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) struct REF blkdev_list FCALL
 blkdev_makeparts(struct blkdev *__restrict self,
                  struct blkdev_makeparts_info *__restrict info)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+		THROWS(E_BADALLOC, ...) {
 	struct REF blkdev_list result;
 	LIST_INIT(&result);
 
@@ -1015,7 +1015,7 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct blkdev *__restrict self) {
  *   - Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
 PUBLIC BLOCKING NONNULL((1)) void KCALL
 blkdev_repart(struct blkdev *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct blkdev *dev;
 	struct REF blkdev_list oldparts;
 	struct REF blkdev_list newparts;
