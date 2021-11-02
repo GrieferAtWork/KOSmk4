@@ -138,6 +138,51 @@ mman_mapinfo_above(struct mman *__restrict self,
 #endif /* CONFIG_USE_NEW_FS */
 
 
+struct mmapinfo_ex
+#ifdef __cplusplus
+    : mmapinfo                    /* Basic info */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct mmapinfo mmix_info;    /* Basic info */
+#endif /* !__cplusplus */
+	size_t          mmix_locked;  /* Total number of bytes belonging to parts with `MPART_F_MLOCK' set */
+	size_t          mmix_alloc;   /* Total number of bytes mapped by parts not set to `MPART_ST_VOID' */
+	size_t          mmix_loaded;  /* Total number of bytes within the range marked as `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG' */
+	size_t          mmix_changed; /* Total number of bytes within the range marked as `MPART_BLOCK_ST_CHNG' */
+	size_t          mmix_swap;    /* Total number of bytes within the range marked as `MPART_BLOCK_ST_CHNG' and backed by `MPART_ST_SWP[_SC]' */
+};
+
+
+/* Callback for `mman_enum_ex()'
+ * @param: arg:   The argument (cookie) originally passed to `mman_enum_ex()'
+ * @param: info:  Information about the mapping range being enumerated.
+ * @return: >= 0: Continue enumeration and add the result to the sum eventually returned by `mman_enum_ex()'
+ * @return: < 0:  Halt enumeration immediately by having `mman_enum_ex()' re-return this same value. */
+typedef BLOCKING ssize_t
+(FCALL *mman_enum_ex_callback_t)(void *arg, struct mmapinfo_ex *__restrict info);
+
+/* Same as `mman_enum()', but provide some more (additional) accounting info about mappings. */
+FUNDEF BLOCKING_IF(BLOCKING(cb)) NONNULL((1, 2)) ssize_t KCALL
+mman_enum_ex(struct mman *__restrict self, mman_enum_ex_callback_t cb, void *arg,
+             UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)0),
+             UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)-1))
+		THROWS(E_WOULDBLOCK);
+
+/* Enumerate all of userspace. */
+#ifdef USERSPACE_END
+#define mman_enum_userspace_ex(self, cb, arg) \
+	mman_enum_ex(self, cb, arg,               \
+	             (UNCHECKED void *)0,         \
+	             (UNCHECKED void *)(USERSPACE_END - 1))
+#else /* USERSPACE_END */
+#define mman_enum_userspace_ex(self, cb, arg)       \
+	mman_enum_ex(self, cb, arg,                     \
+	             (UNCHECKED void *)USERSPACE_START, \
+	             (UNCHECKED void *)-1);
+#endif /* !USERSPACE_END */
+
+
 DECL_END
 #endif /* __CC__ */
 

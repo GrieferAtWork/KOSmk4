@@ -732,7 +732,7 @@ ProcFS_PerProc_Environ_Printer(struct printnode *__restrict self,
 
 
 /************************************************************************/
-/* /proc/[PID]/maps                                                  */
+/* /proc/[PID]/maps                                                     */
 /************************************************************************/
 /* Check if `self' has a special names, and if so: return that name. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) char const *
@@ -855,6 +855,131 @@ maps_printer_cb(void *maps_arg, struct mmapinfo *__restrict info) {
 err:
 	return -1;
 }
+
+INTERN NONNULL((1, 2)) void KCALL
+ProcFS_PerProc_Maps_Printer(struct printnode *__restrict self,
+                            pformatprinter printer, void *arg,
+                            size_t UNUSED(offset_hint)) {
+	REF struct task *thread;
+	REF struct mman *threadmm;
+	struct maps_printer_data pd;
+	thread = taskpid_gettask(self->fn_fsdata);
+	if unlikely(!thread)
+		return;
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
+	FINALLY_DECREF_UNLIKELY(threadmm);
+	pd.pd_printer = printer;
+	pd.pd_arg     = arg;
+	pd.pd_root    = NULL;
+	RAII_FINALLY { xdecref_unlikely(pd.pd_root); };
+
+	/* Enumerate nodes and print the maps-file. */
+	mman_enum_userspace(threadmm, &maps_printer_cb, &pd);
+}
+
+
+
+
+/************************************************************************/
+/* /proc/[PID]/smaps                                                    */
+/************************************************************************/
+PRIVATE ssize_t FCALL
+smaps_printer_cb(void *maps_arg, struct mmapinfo_ex *__restrict info) {
+	struct maps_printer_data *ctx;
+	pformatprinter printer;
+	void *arg;
+	if (maps_printer_cb(maps_arg, info))
+		return -1;
+	ctx     = (struct maps_printer_data *)maps_arg;
+	printer = ctx->pd_printer;
+	arg     = ctx->pd_arg;
+	if (printf("Size:           %8" PRIuSIZ " kB\n"
+	           "Rss:                   0 kB\n" /* ??? */
+	           "Pss:                   0 kB\n" /* ??? */
+	           "Shared_Clean:   %8" PRIuSIZ " kB\n"
+	           "Shared_Dirty:   %8" PRIuSIZ " kB\n"
+	           "Private_Clean:  %8" PRIuSIZ " kB\n"
+	           "Private_Dirty:  %8" PRIuSIZ " kB\n"
+	           "Referenced:     %8" PRIuSIZ " kB\n"
+	           "Anonymous:      %8" PRIuSIZ " kB\n"
+	           "AnonHugePages:         0 kB\n" /* KOS does huge page merging automatically */
+	           "Shared_Hugetlb:        0 kB\n" /* KOS does huge page merging automatically */
+	           "Private_Hugetlb:       0 kB\n" /* KOS does huge page merging automatically */
+	           "Swap:           %8" PRIuSIZ " kB\n"
+	           "SwapPss:               0 kB\n" /* ??? */
+	           "KernelPageSize: %8" PRIuSIZ " kB\n"
+	           "MMUPageSize:    %8" PRIuSIZ " kB\n"
+	           "Locked:         %8" PRIuSIZ " kB\n"
+	           "VmFlags:",
+	           mmapinfo_size(info) / 1024,                                                                  /* Size */
+	           !(info->mmi_flags & MNODE_F_SHARED) ? 0 : ((info->mmix_loaded - info->mmix_changed) / 1024), /* Shared_Clean */
+	           !(info->mmi_flags & MNODE_F_SHARED) ? 0 : (info->mmix_changed / 1024),                       /* Shared_Dirty */
+	           (info->mmi_flags & MNODE_F_SHARED) ? 0 : (info->mmix_loaded - info->mmix_changed) / 1024,    /* Private_Clean */
+	           (info->mmi_flags & MNODE_F_SHARED) ? 0 : (info->mmix_changed / 1024),                        /* Private_Dirty */
+	           info->mmix_loaded / 1024,                                                                    /* Referenced */
+	           !info->mmi_file || !mfile_isanon(info->mmi_file) ? 0 : info->mmix_loaded / 1024,             /* Anonymous */
+	           info->mmix_swap / 1024,                                                                      /* Swap */
+	           PAGESIZE / 1024 /* ??? */,                                                                   /* KernelPageSize */
+	           PAGESIZE / 1024 /* ??? */,                                                                   /* MMUPageSize */
+	           info->mmix_locked / 1024                                                                     /* Locked */
+	           ) < 0)
+		return -1;
+	if (info->mmi_flags & MNODE_F_PREAD)
+		PRINT(" rd");
+	if (info->mmi_flags & MNODE_F_PWRITE)
+		PRINT(" wr");
+	if (info->mmi_flags & MNODE_F_PEXEC)
+		PRINT(" ex");
+	if (info->mmi_flags & MNODE_F_SHARED)
+		PRINT(" sh");
+
+	/* linux: VM_MAYREAD (XXX: am I doing this right?)
+	 * On KOS, anything that is mmap-able can be mapped for reading */
+	PRINT(" mr");
+
+	/* linux: VM_MAYWRITE  (XXX:  am I  doing  this right?)
+	 * Files marked as READONLY cannot be PROT_WRITE-mapped */
+	if (!(info->mmi_file->mf_flags & MFILE_F_READONLY))
+		PRINT(" mw");
+
+	/* linux: VM_MAYEXEC (XXX: am I doing this right?)
+	 * XXX: maybe disallow if:
+	 * >> mfile_isnode(info->mmi_file) != NULL &&
+	 * >> mfile_asnode(info->mmi_file)->fn_super->fs_root.mf_flags & MFILE_FS_NOEXEC */
+	PRINT(" me");
+
+	/* linux: VM_MAYSHARE (XXX: am I doing this right?)
+	 * All file mappings allow for sharing. */
+	PRINT(" ms");
+
+	if (info->mmi_flags & MNODE_F_MLOCK)
+		PRINT(" lo");
+	return PRINT("\n");
+}
+
+INTERN NONNULL((1, 2)) void KCALL
+ProcFS_PerProc_SMaps_Printer(struct printnode *__restrict self,
+                             pformatprinter printer, void *arg,
+                             size_t UNUSED(offset_hint)) {
+	REF struct task *thread;
+	REF struct mman *threadmm;
+	struct maps_printer_data pd;
+	thread = taskpid_gettask(self->fn_fsdata);
+	if unlikely(!thread)
+		return;
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
+	FINALLY_DECREF_UNLIKELY(threadmm);
+	pd.pd_printer = printer;
+	pd.pd_arg     = arg;
+	pd.pd_root    = NULL;
+	RAII_FINALLY { xdecref_unlikely(pd.pd_root); };
+
+	/* Enumerate nodes and print the maps-file. */
+	mman_enum_userspace_ex(threadmm, &smaps_printer_cb, &pd);
+}
+
 
 
 
@@ -987,29 +1112,6 @@ NOTHROW(FCALL mman_get_total_mapped_bytes)(struct mman const *__restrict self) {
 	return mnode_tree_get_total_mapped_bytes(self->mm_mappings,
 	                                         &FORMMAN(self, thismman_kernel_reservation));
 }
-
-INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_Maps_Printer(struct printnode *__restrict self,
-                            pformatprinter printer, void *arg,
-                            size_t UNUSED(offset_hint)) {
-	REF struct task *thread;
-	REF struct mman *threadmm;
-	struct maps_printer_data pd;
-	thread = taskpid_gettask(self->fn_fsdata);
-	if unlikely(!thread)
-		return;
-	threadmm = task_getmman(thread);
-	decref_unlikely(thread);
-	FINALLY_DECREF_UNLIKELY(threadmm);
-	pd.pd_printer = printer;
-	pd.pd_arg     = arg;
-	pd.pd_root    = NULL;
-	RAII_FINALLY { xdecref_unlikely(pd.pd_root); };
-
-	/* Enumerate nodes and print the maps-file. */
-	mman_enum_userspace(threadmm, &maps_printer_cb, &pd);
-}
-
 
 INTERN NONNULL((1, 2)) void KCALL
 ProcFS_PerProc_Stat_Printer(struct printnode *__restrict self,

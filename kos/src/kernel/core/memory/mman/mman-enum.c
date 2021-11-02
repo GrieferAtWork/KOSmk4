@@ -49,251 +49,6 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-/* Enumerate all mappings contained within the given `enum_minaddr...enum_maxaddr'
- * address range within the given VM `self'. This function will automatically  re-
- * assemble  memory mappings that  had previously been  split into multiple nodes,
- * such that adjacent  `struct mnode's that describe  a contiguous memory  mapping
- * do not appear as individual, separate nodes.
- * @param: cb:           A callback  that  should  be  invoked for  every  mapped  memory  region
- *                       contained with the given address range `enum_minaddr' ... `enum_maxaddr'
- *                       The  sum of return  values returned by this  callback will eventually be
- *                       returned by this function, unless `cb()' returns a negative value, which
- *                       will  cause enumeration to  halt immediately, and that  same value to be
- *                       propagated to the caller.
- *                       Note that mappings are enumerated  in strictly ascending order, and  that
- *                       this function guaranties that even in the modifications being made to the
- *                       given `self' while enumeration takes  place, the `mmi_min' of all  future
- *                       mappings will always be `> mmi_max' of every already/currently enumerated
- *                       mapping.
- * @param: arg:          An argument (cookie) to-be passed to `cb()'
- * @param: enum_minaddr: The starting address of mappings to-be enumerated, such that any mapping
- *                       that overlap  with `enum_minaddr ... enum_maxaddr'  will be  enumerated.
- * @param: enum_maxaddr: Same as `enum_minaddr', but specifies the max address of any enumerated
- *                       mapping. */
-PUBLIC BLOCKING_IF(BLOCKING(cb)) NONNULL((1, 2)) ssize_t KCALL
-mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
-          UNCHECKED void *enum_minaddr, UNCHECKED void *enum_maxaddr)
-		THROWS(E_WOULDBLOCK) {
-	ssize_t temp, result = 0;
-	struct mmapinfo mi;
-#ifndef CONFIG_USE_NEW_FS
-	size_t num_nodes = 0;
-#endif /* !CONFIG_USE_NEW_FS */
-	while (enum_minaddr <= enum_maxaddr) {
-		struct mnode_tree_minmax mima;
-		struct mnode *node;
-		struct mpart *part;
-again_lookup_node:
-#ifndef CONFIG_USE_NEW_FS
-		mi.mmi_index = num_nodes++;
-#endif /* !CONFIG_USE_NEW_FS */
-#ifdef CONFIG_HAVE_DEBUGGER
-		if unlikely(dbg_active) {
-			/* Do everything while ignoring all of the locks (or refs).
-			 *
-			 * The debugger uses  this function for  `lsmm', and  yes:
-			 * by not acquiring  locks, there is  a chance that  we'll
-			 * crash because mappings may be in an inconsistent state.
-			 *
-			 * But  if  we did  try to  acquire  locks, then  it also
-			 * wouldn't work because task_yield() within the debugger
-			 * throws an exception. */
-			mnode_tree_minmaxlocate(self->mm_mappings,
-			                        enum_minaddr,
-			                        enum_maxaddr,
-			                        &mima);
-			node = mima.mm_min;
-			if (!node)
-				break;
-			mi.mmi_min   = mnode_getminaddr(node);
-			mi.mmi_flags = node->mn_flags & MMAPINFO_FLAGS_MASK;
-			part         = node->mn_part;
-			if (part) {
-				mi.mmi_file   = part->mp_file;
-				mi.mmi_offset = mnode_getfileaddr(node);
-			} else {
-				mi.mmi_file   = NULL;
-				mi.mmi_offset = 0;
-			}
-			if (mi.mmi_min < enum_minaddr) {
-				if (part != NULL) {
-					mi.mmi_offset += (size_t)((byte_t *)enum_minaddr -
-					                          (byte_t *)mi.mmi_min);
-				}
-				mi.mmi_min = enum_minaddr;
-			}
-			mi.mmi_fspath = node->mn_fspath;
-			mi.mmi_fsname = node->mn_fsname;
-			for (;;) {
-				mi.mmi_max = mnode_getmaxaddr(node);
-				if (mi.mmi_max >= enum_maxaddr)
-					break;
-				if (node == mima.mm_max)
-					break; /* Nothing hereafter -> We're done! */
-				/* Search for adjacent nodes that may reference the same underlying file. */
-				node = mnode_tree_nextnode(node);
-				assertf(node != NULL,
-				        "But the last node should have been `mima.mm_max', "
-				        "and we didn't get to that one, yet...");
-				if ((byte_t *)mi.mmi_max + 1 !=  mnode_getminaddr(node))
-					break; /* Not a continuous mapping */
-				if (mi.mmi_flags != (node->mn_flags & MMAPINFO_FLAGS_MASK))
-					break; /* Different flags */
-				if (mi.mmi_fsname != node->mn_fsname ||
-				    mi.mmi_fspath != node->mn_fspath)
-					break; /* Different file name */
-				if (part) {
-					pos_t expected_offset;
-					bool part_ok;
-					if (node->mn_part == NULL)
-						break;
-					expected_offset = mi.mmi_offset;
-					expected_offset += (size_t)((byte_t *)mnode_getminaddr(node) -
-					                            (byte_t *)mi.mmi_min);
-					/* Check that the part maps the expected location. */
-					part_ok = (part->mp_file == mi.mmi_file) &&
-					          (mnode_getfileaddr(node) == expected_offset);
-					if (!part_ok)
-						break;
-				} else {
-					if (node->mn_part != NULL)
-						break;
-				}
-				/* The secondary node is considered to be apart of the same mapping! */
-#ifndef CONFIG_USE_NEW_FS
-				++num_nodes;
-#endif /* !CONFIG_USE_NEW_FS */
-			}
-
-			/* Limit the enumerated address range to the requested range */
-			if (mi.mmi_max > enum_maxaddr)
-				mi.mmi_max = enum_maxaddr;
-#ifdef CONFIG_USE_NEW_FS
-			mi._mmi_node = mima.mm_min;
-#endif /* CONFIG_USE_NEW_FS */
-
-			/* Invoke the given callback. */
-			temp = (*cb)(arg, &mi);
-		} else
-#endif /* CONFIG_HAVE_DEBUGGER */
-		{
-			mman_lock_read(self);
-			mnode_tree_minmaxlocate(self->mm_mappings,
-			                        enum_minaddr,
-			                        enum_maxaddr,
-			                        &mima);
-			node = mima.mm_min;
-			if (!node) {
-				mman_lock_endread(self);
-				break;
-			}
-			mi.mmi_min   = mnode_getminaddr(node);
-			mi.mmi_flags = node->mn_flags & MMAPINFO_FLAGS_MASK;
-			part         = node->mn_part;
-			if (part) {
-				if (!mpart_lock_tryacquire(part)) {
-waitfor_part:
-					/* Wait for the lock of `part' to become available. */
-					incref(part);
-					mman_lock_endread(self);
-					FINALLY_DECREF_UNLIKELY(part);
-					mpart_lock_waitfor(part);
-#ifndef CONFIG_USE_NEW_FS
-					num_nodes = mi.mmi_index;
-#endif /* !CONFIG_USE_NEW_FS */
-					goto again_lookup_node;
-				}
-				mi.mmi_file   = incref(part->mp_file);
-				mi.mmi_offset = mnode_getfileaddr(node);
-				mpart_lock_release(part);
-			} else {
-				mi.mmi_file   = NULL;
-				mi.mmi_offset = 0;
-			}
-			if (mi.mmi_min < enum_minaddr) {
-				if (part != NULL) {
-					mi.mmi_offset += (size_t)((byte_t *)enum_minaddr -
-					                          (byte_t *)mi.mmi_min);
-				}
-				mi.mmi_min = enum_minaddr;
-			}
-			mi.mmi_fspath = xincref(node->mn_fspath);
-			mi.mmi_fsname = xincref(node->mn_fsname);
-			for (;;) {
-				mi.mmi_max = mnode_getmaxaddr(node);
-				if (mi.mmi_max >= enum_maxaddr)
-					break;
-				if (node == mima.mm_max)
-					break; /* Nothing hereafter -> We're done! */
-				/* Search for adjacent nodes that may reference the same underlying file. */
-				node = mnode_tree_nextnode(node);
-				assertf(node != NULL,
-				        "But the last node should have been `mima.mm_max', "
-				        "and we didn't get to that one, yet...");
-				if ((byte_t *)mi.mmi_max + 1 !=  mnode_getminaddr(node))
-					break; /* Not a continuous mapping */
-				if (mi.mmi_flags != (node->mn_flags & MMAPINFO_FLAGS_MASK))
-					break; /* Different flags */
-				if (mi.mmi_fsname != node->mn_fsname ||
-				    mi.mmi_fspath != node->mn_fspath)
-					break; /* Different file name */
-				if (part) {
-					pos_t expected_offset;
-					bool part_ok;
-					if (node->mn_part == NULL)
-						break;
-					expected_offset = mi.mmi_offset;
-					expected_offset += (size_t)((byte_t *)mnode_getminaddr(node) -
-					                            (byte_t *)mi.mmi_min);
-					if (!mpart_lock_tryacquire(part)) {
-						xdecref_unlikely(mi.mmi_file);
-						xdecref_unlikely(mi.mmi_fsname);
-						xdecref_unlikely(mi.mmi_fspath);
-						DBG_memset(&mi.mmi_file, 0xcc, sizeof(mi.mmi_file));
-						DBG_memset(&mi.mmi_fsname, 0xcc, sizeof(mi.mmi_fsname));
-						DBG_memset(&mi.mmi_fspath, 0xcc, sizeof(mi.mmi_fspath));
-						goto waitfor_part;
-					}
-					/* Check that the part maps the expected location. */
-					part_ok = (part->mp_file == mi.mmi_file) &&
-					          (mnode_getfileaddr(node) == expected_offset);
-					mpart_lock_release(part);
-					if (!part_ok)
-						break;
-				} else {
-					if (node->mn_part != NULL)
-						break;
-				}
-				/* The secondary node is considered to be apart of the same mapping! */
-#ifndef CONFIG_USE_NEW_FS
-				++num_nodes;
-#endif /* !CONFIG_USE_NEW_FS */
-			}
-			mman_lock_endread(self);
-
-			/* Limit the enumerated address range to the requested range */
-			if (mi.mmi_max > enum_maxaddr)
-				mi.mmi_max = enum_maxaddr;
-
-			/* Invoke the given callback. */
-			FINALLY_XDECREF_UNLIKELY(mi.mmi_file);
-			FINALLY_XDECREF_UNLIKELY(mi.mmi_fsname);
-			FINALLY_XDECREF_UNLIKELY(mi.mmi_fspath);
-#ifdef CONFIG_USE_NEW_FS
-			mi._mmi_node = mima.mm_min;
-#endif /* CONFIG_USE_NEW_FS */
-			temp = (*cb)(arg, &mi);
-		}
-		if unlikely(temp < 0)
-			return temp;
-		result += temp;
-		if (OVERFLOW_UADD((uintptr_t)mi.mmi_max, 1,
-		                  (uintptr_t *)&enum_minaddr))
-			break;
-	}
-	return result;
-}
-
 #ifdef CONFIG_USE_NEW_FS
 PRIVATE WUNUSED NONNULL((1, 2, 3)) bool
 NOTHROW(KCALL mman_mapinfo_and_unlock)(struct mman *__restrict self,
@@ -346,12 +101,14 @@ waitfor_part:
 		if (part) {
 			pos_t expected_offset;
 			bool part_ok;
-			if (next->mn_part == NULL)
+			struct mpart *nextpart;
+			nextpart = next->mn_part;
+			if (nextpart == NULL)
 				break;
 			expected_offset = offset_at_addr;
 			expected_offset -= (size_t)((byte_t *)addr -
 			                            (byte_t *)mnode_getminaddr(next));
-			if (!mpart_lock_tryacquire(part)) {
+			if (!mpart_lock_tryacquire(nextpart)) {
 handle_blocking_part:
 				xdecref_unlikely(info->mmi_file);
 				xdecref_unlikely(info->mmi_fsname);
@@ -363,9 +120,9 @@ handle_blocking_part:
 			}
 
 			/* Check that the part maps the expected location. */
-			part_ok = (part->mp_file == info->mmi_file) &&
+			part_ok = (nextpart->mp_file == info->mmi_file) &&
 			          (mnode_getfileaddr(next) == expected_offset);
-			mpart_lock_release(part);
+			mpart_lock_release(nextpart);
 			if (!part_ok)
 				break;
 		} else {
@@ -391,18 +148,20 @@ handle_blocking_part:
 		if (part) {
 			pos_t expected_offset;
 			bool part_ok;
-			if (next->mn_part == NULL)
+			struct mpart *nextpart;
+			nextpart = next->mn_part;
+			if (nextpart == NULL)
 				break;
 			expected_offset = offset_at_addr;
 			expected_offset += (size_t)((byte_t *)mnode_getminaddr(next) -
 			                            (byte_t *)addr);
-			if (!mpart_lock_tryacquire(part))
+			if (!mpart_lock_tryacquire(nextpart))
 				goto handle_blocking_part;
 
 			/* Check that the part maps the expected location. */
-			part_ok = (part->mp_file == info->mmi_file) &&
+			part_ok = (nextpart->mp_file == info->mmi_file) &&
 			          (mnode_getfileaddr(next) == expected_offset);
-			mpart_lock_release(part);
+			mpart_lock_release(nextpart);
 			if (!part_ok)
 				break;
 		} else {
@@ -470,7 +229,14 @@ mman_mapinfo_above(struct mman *__restrict self,
 }
 #endif /* CONFIG_USE_NEW_FS */
 
-
 DECL_END
+
+#ifndef __INTELLISENSE__
+#define DEFINE_mman_enum
+#include "mman-enum-impl.c.inl"
+#define DEFINE_mman_enum_ex
+#include "mman-enum-impl.c.inl"
+#endif /* !__INTELLISENSE__ */
+
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_ENUM_C */
