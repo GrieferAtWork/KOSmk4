@@ -966,6 +966,19 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    provided buffer to the operator.
 	 */
 
+	/* TODO: Re-implement ioctl() codes for blkdev */
+
+	/* TODO: Re-implement ioctl() codes for fatfs */
+
+	/* TODO: Add operators for fsuper for label access (as present
+	 *       in   FAT).  Also  implement  the  associated  ioctls:
+	 * - FS_IOC_GETFSLABEL
+	 * - FS_IOC_SETFSLABEL */
+
+	/* TODO: Implement default ioctl() codes for inodes:
+	 * - FS_IOC_GETFLAGS
+	 * - FS_IOC_SETFLAGS */
+
 	return state;
 }
 
