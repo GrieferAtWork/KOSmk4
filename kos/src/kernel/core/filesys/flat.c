@@ -1903,36 +1903,36 @@ struct struct_flatdirnode_deleted_dirent {
 	pos_t                                   fde_pos;
 	size_t                                  fde_size;
 	TAILQ_ENTRY(REF flatdirent)             fde_bypos;
-	WEAK refcnt_t                           fd_refcnt;
-	struct fdirent_ops const               *fd_ops;
-	ino_t                                   fd_ino;
-	uintptr_t                               fd_hash;
-	u16                                     fd_namelen;
-	unsigned char                           fd_type;
-	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name);
+	WEAK refcnt_t                           _fd_refcnt;
+	struct fdirent_ops const               *_fd_ops;
+	ino_t                                   _fd_ino;
+	uintptr_t                               _fd_hash;
+	u16                                     _fd_namelen;
+	unsigned char                           _fd_type;
+	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, _fd_name);
 };
 static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fde_pos) == offsetof(struct flatdirent, fde_pos));
 static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fde_size) == offsetof(struct flatdirent, fde_size));
 static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fde_bypos) == offsetof(struct flatdirent, fde_bypos));
-static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fd_refcnt) == offsetof(struct flatdirent, fde_ent.fd_refcnt));
-static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fd_ops) == offsetof(struct flatdirent, fde_ent.fd_ops));
-static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fd_ino) == offsetof(struct flatdirent, fde_ent.fd_ino));
-static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fd_hash) == offsetof(struct flatdirent, fde_ent.fd_hash));
-static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fd_namelen) == offsetof(struct flatdirent, fde_ent.fd_namelen));
-static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fd_type) == offsetof(struct flatdirent, fde_ent.fd_type));
-static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, fd_name) == offsetof(struct flatdirent, fde_ent.fd_name));
+static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_refcnt) == offsetof(struct flatdirent, fde_ent.fd_refcnt));
+static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_ops) == offsetof(struct flatdirent, fde_ent.fd_ops));
+static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_ino) == offsetof(struct flatdirent, fde_ent.fd_ino));
+static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_hash) == offsetof(struct flatdirent, fde_ent.fd_hash));
+static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_namelen) == offsetof(struct flatdirent, fde_ent.fd_namelen));
+static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_type) == offsetof(struct flatdirent, fde_ent.fd_type));
+static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_name) == offsetof(struct flatdirent, fde_ent.fd_name));
 DATDEF struct struct_flatdirnode_deleted_dirent __flatdirnode_deleted_dirent ASMNAME("flatdirnode_deleted_dirent");
 PUBLIC struct struct_flatdirnode_deleted_dirent __flatdirnode_deleted_dirent = {
 	.fde_pos    = 0,
 	.fde_size   = 0,
 	.fde_bypos  = TAILQ_ENTRY_UNBOUND_INITIALIZER,
-	.fd_refcnt  = 1,
-	.fd_ops     = &fdirent_empty_ops,
-	.fd_ino     = 0,
-	.fd_hash    = FDIRENT_EMPTY_HASH,
-	.fd_namelen = 0,
-	.fd_type    = DT_UNKNOWN,
-	/* .fd_name = */ "",
+	._fd_refcnt  = 1,
+	._fd_ops     = &fdirent_empty_ops,
+	._fd_ino     = 0,
+	._fd_hash    = FDIRENT_EMPTY_HASH,
+	._fd_namelen = 0,
+	._fd_type    = DT_UNKNOWN,
+	/* ._fd_name = */ "",
 };
 #endif
 

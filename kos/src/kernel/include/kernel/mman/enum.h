@@ -44,16 +44,26 @@ struct mmapinfo {
 	UNCHECKED void     *mmi_max;    /* [> mmi_min] Address of the greatest mapped byte */
 	uintptr_t           mmi_flags;  /* Mem-node flags (Set of flags from `MMAPINFO_FLAGS_MASK'). */
 	REF struct mfile   *mmi_file;   /* [0..1] Mapped mem-file (or `NULL' of reserved memory mappings) */
-	pos_t               mmi_offset; /* Byte-offset into `mmi_block', where the mapping at `mmi_min' starts. */
+	pos_t               mmi_offset; /* [valid_if(mmi_file)] Byte-offset into `mmi_file', where the mapping at `mmi_min' starts. */
 	REF struct path    *mmi_fspath; /* [0..1] Mapped object filesystem path (or NULL if unknown or N/A) */
 	REF struct fdirent *mmi_fsname; /* [0..1] Mapped object filesystem name (or NULL if unknown or N/A) */
+#ifdef CONFIG_USE_NEW_FS
+	void              *_mmi_node;   /* [1..1] Address of the first mem-node apart of this range (!!DONT DEREF!!)
+	                                 * This  address is only used by procfs to assign unique INO values to links
+	                                 * in `/proc/[pid]/map_files/...' */
+#else /* CONFIG_USE_NEW_FS */
 	size_t              mmi_index;  /* ID of the first `struct mnode' that this area is apart of. For this purpose,
 	                                 * node-ids are counted such that the first node that either overlaps, or comes
 	                                 * after  `enum_minaddr' has  `mmi_index=0'. This  counter is  used to generate
 	                                 * INode numbers for `/proc/[pid]/map_files/...' */
+#endif /* !CONFIG_USE_NEW_FS */
 };
 #define mmapinfo_size(self) \
 	((size_t)((byte_t *)(self)->mmi_max - (byte_t *)(self)->mmi_min) + 1)
+#define mmapinfo_fini(self)                \
+	(xdecref_unlikely((self)->mmi_file),   \
+	 xdecref_unlikely((self)->mmi_fspath), \
+	 xdecref_unlikely((self)->mmi_fsname))
 
 
 /* Callback for `mman_enum()'
@@ -88,8 +98,8 @@ typedef BLOCKING ssize_t
 FUNDEF BLOCKING_IF(BLOCKING(cb)) NONNULL((1, 2)) ssize_t KCALL
 mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
           UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)0),
-          UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)-1));
-
+          UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)-1))
+		THROWS(E_WOULDBLOCK);
 
 /* Enumerate all of userspace. */
 #ifdef USERSPACE_END
@@ -103,6 +113,29 @@ mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
 	          (UNCHECKED void *)USERSPACE_START, \
 	          (UNCHECKED void *)-1);
 #endif /* !USERSPACE_END */
+
+
+#ifdef CONFIG_USE_NEW_FS
+/* Lookup information about the mapping at `addr' and write that information to `*info'
+ * Upon success, the caller must `mmapinfo_fini(info);'
+ * @return: true:  Success: mapping information was stored in `*info'
+ * @return: false: No mapping exists at `addr' */
+FUNDEF WUNUSED NONNULL((1, 2)) __BOOL KCALL
+mman_mapinfo(struct mman *__restrict self,
+             struct mmapinfo *__restrict info,
+             UNCHECKED void *addr)
+		THROWS(E_WOULDBLOCK);
+
+/* Return map information for the first node with a base-address `>= addr'
+ * Upon success, the caller must `mmapinfo_fini(info);'
+ * @return: true:  Success: mapping information was stored in `*info'
+ * @return: false: No mapping exists at `addr' */
+FUNDEF WUNUSED NONNULL((1, 2)) __BOOL KCALL
+mman_mapinfo_above(struct mman *__restrict self,
+                   struct mmapinfo *__restrict info,
+                   UNCHECKED void *addr)
+		THROWS(E_WOULDBLOCK);
+#endif /* CONFIG_USE_NEW_FS */
 
 
 DECL_END

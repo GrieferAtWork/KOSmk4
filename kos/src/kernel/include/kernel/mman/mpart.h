@@ -612,22 +612,38 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_lockops_reap)(struct mpart
 	 mpart_lockops_reap(self))
 #define _mpart_lock_release(self) \
 	(__hybrid_atomic_and((self)->mp_flags, ~MPART_F_LOCKBIT, __ATOMIC_SEQ_CST))
-FORCELOCAL NONNULL((1)) void FCALL
-mpart_lock_acquire(struct mpart *__restrict self) {
+#define mpart_lock_acquired(self)  (__hybrid_atomic_load((self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT)
+#define mpart_lock_available(self) (!(__hybrid_atomic_load((self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT))
+
+FORCELOCAL NONNULL((1)) void
+mpart_lock_acquire(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK) {
 	while (!mpart_lock_tryacquire(self))
 		__hybrid_yield();
 }
 
-FORCELOCAL NONNULL((1)) __BOOL FCALL
-mpart_lock_acquire_nx(struct mpart *__restrict self) {
+FORCELOCAL NONNULL((1)) __BOOL
+NOTHROW(mpart_lock_acquire_nx)(struct mpart *__restrict self) {
 	while (!mpart_lock_tryacquire(self)) {
 		if (!__hybrid_yield_nx())
 			return 0;
 	}
 	return 1;
 }
-#define mpart_lock_acquired(self)  (__hybrid_atomic_load((self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT)
-#define mpart_lock_available(self) (!(__hybrid_atomic_load((self)->mp_flags, __ATOMIC_ACQUIRE) & MPART_F_LOCKBIT))
+FORCELOCAL NONNULL((1)) void
+mpart_lock_waitfor(struct mpart *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	while (!mpart_lock_available(self))
+		__hybrid_yield();
+}
+FORCELOCAL NONNULL((1)) __BOOL
+NOTHROW(mpart_lock_waitfor_nx)(struct mpart *__restrict self) {
+	while (!mpart_lock_available(self)) {
+		if (!__hybrid_yield_nx())
+			return 0;
+	}
+	return 1;
+}
 
 
 

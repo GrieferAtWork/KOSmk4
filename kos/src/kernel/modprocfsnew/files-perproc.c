@@ -72,6 +72,7 @@ DECL_END
 #include <kos/except/reason/io.h>
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h> /* RTLD_LIBDL */
+#include <sys/param.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -1416,9 +1417,9 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 	case HANDLE_TYPE_MFILE: {
 		/* Device handles are known  to be relative to  the
 		 * devfs root (so-long as they've not been deleted) */
-		if (mfile_isdevice((struct mfile *)me->fn_fsdata)) {
+		if (mfile_isdevice((struct mfile *)me->pfl_handdat)) {
 			struct device *dev;
-			dev = mfile_asdevice((struct mfile *)me->fn_fsdata);
+			dev = mfile_asdevice((struct mfile *)me->pfl_handdat);
 			devfs_byname_read();
 			if (dev->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED) {
 				devfs_byname_endread();
@@ -1791,33 +1792,367 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_fd = {
 /************************************************************************/
 /* /proc/[pid]/map_files                                                */
 /************************************************************************/
+struct perproc_mapfile_lnknode: flnknode {
+	REF struct fnode   *ppml_file;   /* [1..1] Mapped file */
+	REF struct path    *ppml_fspath; /* [1..1] Mapped filesystem path */
+	REF struct fdirent *ppml_fsname; /* [1..1] Mapped filesystem name */
+};
+
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL perproc_mapfile_lnknode_v_destroy)(struct mfile *__restrict self) {
+	struct perproc_mapfile_lnknode *me;
+	me = (struct perproc_mapfile_lnknode *)mfile_aslnk(self);
+	assert(!LIST_ISBOUND(me, fn_allnodes));
+	assert(me->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
+	assert(me->mf_parts == MFILE_PARTS_ANONYMOUS);
+	/*mmapinfo_fini(&me->ppmd_info);*/
+	decref_unlikely(me->ppml_file);
+	decref_unlikely(me->ppml_fspath);
+	decref_unlikely(me->ppml_fsname);
+	decref_unlikely(me->fn_fsdata);
+	kfree(me);
+}
+
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+perproc_mapfile_lnknode_v_readlink(struct flnknode *__restrict self,
+                                   USER CHECKED /*utf-8*/ char *buf,
+                                   size_t bufsize)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	struct perproc_mapfile_lnknode *me;
+	REF struct path *fsroot = fs_getroot(THIS_FS);
+	me = (struct perproc_mapfile_lnknode *)mfile_aslnk(self);
+	FINALLY_DECREF_UNLIKELY(fsroot);
+	return path_sprintent(me->ppml_fspath,
+	                      me->ppml_fsname->fd_name,
+	                      me->ppml_fsname->fd_namelen,
+	                      buf, bufsize, AT_PATHPRINT_INCTRAIL,
+	                      fsroot);
+}
+
+#ifndef __OPTIMIZE_SIZE__
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) REF struct fnode *KCALL
+perproc_mapfile_lnknode_v_expandlink(struct flnknode *__restrict self,
+                                     /*out[1..1]_opt*/ REF struct path **__restrict presult_path,
+                                     /*out[1..1]_opt*/ REF struct fdirent **__restrict presult_dirent,
+                                     /*in|out*/ u32 *__restrict UNUSED(premaining_symlinks))
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	struct perproc_mapfile_lnknode *me;
+	me = (struct perproc_mapfile_lnknode *)mfile_aslnk(self);
+	*presult_path   = incref(me->ppml_fspath);
+	*presult_dirent = incref(me->ppml_fsname);
+	return mfile_asnode(incref(me->ppml_file));
+}
+#endif /* !__OPTIMIZE_SIZE__ */
+
+#define perproc_mapfile_lnknode_v_changed    procfs_perproc_v_changed
+#define perproc_mapfile_lnknode_v_wrattr     procfs_perproc_v_wrattr
+#define perproc_mapfile_lnknode_v_free       procfs_perproc_v_free
+#define perproc_mapfile_lnknode_v_stream_ops procfs_perproc_lnknode_v_stream_ops
+
+INTDEF struct flnknode const perproc_mapfile_lnknode_template;
+INTERN_CONST struct flnknode_ops const perproc_mapfile_lnknode_ops = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy = &perproc_mapfile_lnknode_v_destroy,
+			.mo_changed = &perproc_mapfile_lnknode_v_changed,
+			.mo_stream  = &perproc_mapfile_lnknode_v_stream_ops,
+		},
+		.no_free   = &perproc_mapfile_lnknode_v_free,
+		.no_wrattr = &perproc_mapfile_lnknode_v_wrattr,
+	},
+	.lno_readlink   = &perproc_mapfile_lnknode_v_readlink,
+#ifndef __OPTIMIZE_SIZE__
+	.lno_expandlink = &perproc_mapfile_lnknode_v_expandlink, /* Optimization operator! */
+#endif /* !__OPTIMIZE_SIZE__ */
+};
+
+struct perproc_mapfile_dirent {
+	REF struct fnode   *ppmd_file;   /* [1..1][const] Mapped file */
+	REF struct path    *ppmd_fspath; /* [1..1][const] Mapped filesystem path */
+	REF struct fdirent *ppmd_fsname; /* [1..1][const] Mapped filesystem name */
+	REF struct taskpid *ppmd_thread; /* [1..1][const] Thread in question */
+	struct fdirent      ppmd_ent;    /* Underlying directory entry. */
+};
+#define fdirent_asmapfile(self) container_of(self, struct perproc_mapfile_dirent, ppmd_ent)
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL perproc_mapfile_dirent_v_destroy)(struct fdirent *__restrict self) {
+	struct perproc_mapfile_dirent *me = fdirent_asmapfile(self);
+	decref_unlikely(me->ppmd_file);
+	decref_unlikely(me->ppmd_fspath);
+	decref_unlikely(me->ppmd_fsname);
+	decref_unlikely(me->ppmd_thread);
+	kfree(me);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+perproc_mapfile_dirent_v_opennode(struct fdirent *__restrict self,
+                                  struct fdirnode *__restrict UNUSED(dir)) {
+	struct perproc_mapfile_dirent *me = fdirent_asmapfile(self);
+	REF struct perproc_mapfile_lnknode *result;
+	result = (REF struct perproc_mapfile_lnknode *)kmalloc(sizeof(REF struct perproc_mapfile_lnknode), GFP_NORMAL);
+	memcpy(result, &perproc_mapfile_lnknode_template, sizeof(struct flnknode));
+	result->ppml_file   = mfile_asnode(incref(me->ppmd_file));
+	result->ppml_fspath = incref(me->ppmd_fspath);
+	result->ppml_fsname = incref(me->ppmd_fsname);
+	result->fn_fsdata   = incref(me->ppmd_thread);
+	result->fn_ino      = me->ppmd_ent.fd_ino;
+	return result;
+}
+
+PRIVATE struct fdirent_ops const perproc_mapfile_dirent_ops = {
+	.fdo_destroy  = &perproc_mapfile_dirent_v_destroy,
+	.fdo_opennode = &perproc_mapfile_dirent_v_opennode,
+};
+
+#include <kernel/printk.h>
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
                                   struct flookup_info *__restrict info) {
-	struct taskpid *pid = self->fn_fsdata;
+	REF struct perproc_mapfile_dirent *result;
+	struct mmapinfo mminfo;
+	uintptr_t minaddr, endaddr;
+	USER CHECKED char const *reader, *end;
+	unsigned int state;
+#define STATE_MIN0 0
+#define STATE_MIN  1
+#define STATE_END0 2
+#define STATE_END  3
 
-	/* TODO */
-	(void)pid;
-	(void)info;
-	COMPILER_IMPURE();
+	/* Decode address string */
+	reader  = info->flu_name;
+	end     = info->flu_name + info->flu_namelen;
+	endaddr = 0;
+	state   = STATE_MIN0;
+	while (reader < end) {
+		char ch;
+		ch = ATOMIC_READ(*reader);
+		++reader;
+		if (ch >= '0' && ch <= '9') {
+			if (ch == '0' && (state == STATE_MIN0 || state == STATE_END0))
+				{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+			ch -= '0';
+		} else if (ch >= 'a' && ch <= 'f') {
+			ch += 10 - 'a';
+		} else if ((ch >= 'A' && ch <= 'F') && (info->flu_flags & AT_DOSPATH)) {
+			ch += 10 - 'A';
+		} else if (ch == '-' && state == STATE_MIN) {
+			minaddr = endaddr;
+			state   = STATE_END0;
+			endaddr = 0;
+			continue;
+		} else {
+			{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+		}
+		if unlikely(((endaddr << 4) >> 4) != endaddr)
+			{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+		endaddr <<= 4;
+		endaddr += (unsigned char)ch;
+		state |= 1; /* STATE_MIN0 -> STATE_MIN, STATE_END0 -> STATE_END */
+	}
+	if unlikely(state != STATE_END)
+		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
 
+	/* Lookup address information. */
+	{
+		REF struct task *thread;
+		REF struct mman *mm;
+		thread = taskpid_gettask(self->fn_fsdata);
+		if unlikely(!thread)
+			{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+		mm = task_getmman(thread);
+		decref_unlikely(thread);
+		FINALLY_DECREF_UNLIKELY(mm);
+		if unlikely(!mman_mapinfo(mm, &mminfo, (USER UNCHECKED void *)minaddr))
+			{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+	}
+
+	/* Verify min/max bounds of mapping info */
+	if unlikely(mminfo.mmi_min != (UNCHECKED void *)minaddr)
+		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+	if unlikely(mminfo.mmi_max != (UNCHECKED void *)(endaddr - 1))
+		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+
+	/* Verify that this mapping really should appear in /proc/[PID]/map_files */
+	if unlikely(!mminfo.mmi_file)
+		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+	if unlikely(!mminfo.mmi_fsname)
+		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+	if unlikely(!mminfo.mmi_fspath)
+		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+	if unlikely(!mfile_isnode(mminfo.mmi_file))
+		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+
+	/* Construct the new directory entry. */
+	TRY {
+		result = (REF struct perproc_mapfile_dirent *)kmalloc(offsetof(struct perproc_mapfile_dirent,
+		                                                               ppmd_ent.fd_name) +
+		                                                      (info->flu_namelen + 1) * sizeof(char),
+		                                                      GFP_NORMAL);
+	} EXCEPT {
+		mmapinfo_fini(&mminfo);
+		RETHROW();
+	}
+	sprintf(result->ppmd_ent.fd_name, "%" PRIxPTR "-%" PRIxPTR, minaddr, endaddr);
+	result->ppmd_file           = mfile_asnode(mminfo.mmi_file); /* Inherit reference */
+	result->ppmd_fspath         = mminfo.mmi_fspath;             /* Inherit reference */
+	result->ppmd_fsname         = mminfo.mmi_fsname;             /* Inherit reference */
+	result->ppmd_thread         = incref(self->fn_fsdata);
+	result->ppmd_ent.fd_refcnt  = 1;
+	result->ppmd_ent.fd_ops     = &perproc_mapfile_dirent_ops;
+	result->ppmd_ent.fd_ino     = procfs_perproc_ino(mminfo._mmi_node, &perproc_mapfile_lnknode_ops);
+	result->ppmd_ent.fd_namelen = info->flu_namelen;
+	result->ppmd_ent.fd_type    = DT_LNK;
+	result->ppmd_ent.fd_hash    = fdirent_hash(result->ppmd_ent.fd_name, info->flu_namelen);
+	return &result->ppmd_ent;
+err_mminfo:
+	mmapinfo_fini(&mminfo);
 	return NULL;
+
+#undef STATE_MIN0
+#undef STATE_MIN
+#undef STATE_END0
+#undef STATE_END
 }
+
+struct perproc_mapfile_direnum {
+	FDIRENUM_HEADER
+	REF struct mman *ppmd_mm;   /* [1..1][const] The mman being enumerated. */
+	UNCHECKED void  *ppmd_addr; /* [lock(ATOMIC)] Lower bound for mappings still needing enumeration. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL perproc_mapfile_direnum_v_fini)(struct fdirenum *__restrict self) {
+	struct perproc_mapfile_direnum *me = (struct perproc_mapfile_direnum *)self;
+	decref_unlikely(me->ppmd_mm);
+}
+
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+perproc_mapfile_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                                  size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	ssize_t result;
+	bool should_enum;
+	struct mmapinfo mminfo;
+	char rangename[2 + (sizeof(void *) * 2 * (NBBY / 4))];
+	u16 namelen;
+	struct perproc_mapfile_direnum *me = (struct perproc_mapfile_direnum *)self;
+	UNCHECKED void *oldaddr, *newaddr;
+
+again:
+	oldaddr = ATOMIC_READ(me->ppmd_addr);
+	if unlikely(oldaddr == (UNCHECKED void *)(uintptr_t)-1)
+		return 0; /* Forced end-of-directory. */
+	newaddr = oldaddr;
+
+again_lookup:
+	/* Lookup mapping information. */
+	if (!mman_mapinfo_above(me->ppmd_mm, &mminfo, newaddr))
+		return 0;
+
+	/* Check if this range should be enumerated. */
+	should_enum = mminfo.mmi_file && mminfo.mmi_fsname &&
+	              mminfo.mmi_fspath && mfile_isnode(mminfo.mmi_file);
+	mmapinfo_fini(&mminfo);
+	if (OVERFLOW_UADD((uintptr_t)mminfo.mmi_max, 1, (uintptr_t *)&newaddr)) {
+		if (!should_enum)
+			return 0;
+		newaddr = (UNCHECKED void *)(uintptr_t)-1;
+	} else {
+		if (!should_enum)
+			goto again_lookup;
+	}
+
+	/* Yield info on this range. */
+	namelen = (u16)sprintf(rangename, "%" PRIxPTR "-%" PRIxPTR, mminfo.mmi_min, newaddr);
+	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+	                             procfs_perproc_ino(mminfo._mmi_node, &perproc_mapfile_lnknode_ops),
+	                             DT_LNK, namelen, rangename);
+	if (result < 0)
+		return (size_t)~result; /* Don't advance directory position. */
+
+	/* Advance directory position. */
+	if (!ATOMIC_CMPXCH(me->ppmd_addr, oldaddr, newaddr))
+		goto again;
+	return (size_t)result;
+}
+
+
+PRIVATE NONNULL((1)) pos_t KCALL
+perproc_mapfile_direnum_v_seekdir(struct fdirenum *__restrict self,
+                                  off_t offset, unsigned int whence)
+		THROWS(...) {
+	UNCHECKED void *newpos;
+	struct perproc_mapfile_direnum *me = (struct perproc_mapfile_direnum *)self;
+	switch (whence) {
+	case SEEK_SET:
+#if __SIZEOF_POS_T__ > __SIZEOF_POINTER__
+		if unlikely((pos_t)offset >= (uintptr_t)-1)
+			THROW(E_OVERFLOW);
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
+		newpos = (UNCHECKED void *)(uintptr_t)(pos_t)offset;
+		ATOMIC_WRITE(me->ppmd_addr, newpos);
+		break;
+
+	case SEEK_CUR: {
+		UNCHECKED void *oldpos;
+		do {
+			oldpos = ATOMIC_READ(me->ppmd_addr);
+			newpos = (UNCHECKED byte_t *)oldpos + (intptr_t)offset;
+			if unlikely(offset < 0 ? newpos > oldpos
+			                       : newpos < oldpos)
+				THROW(E_OVERFLOW);
+		} while (!ATOMIC_CMPXCH_WEAK(me->ppmd_addr, oldpos, newpos));
+	}	break;
+
+	case SEEK_END: {
+		if unlikely(offset >= 0)
+			THROW(E_OVERFLOW);
+#if __SIZEOF_POS_T__ > __SIZEOF_POINTER__
+		offset = (-offset) - 1;
+		if (OVERFLOW_USUB((uintptr_t)-1, offset, (uintptr_t *)&newpos))
+			THROW(E_OVERFLOW);
+#else /* __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
+		newpos = (UNCHECKED void *)((uintptr_t)0 - offset);
+#endif /* __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
+		ATOMIC_WRITE(me->ppmd_addr, newpos);
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+	}
+	return (pos_t)(uintptr_t)newpos;
+}
+
+PRIVATE struct fdirenum_ops const perproc_mapfile_direnum_ops = {
+	.deo_fini    = &perproc_mapfile_direnum_v_fini,
+	.deo_readdir = &perproc_mapfile_direnum_v_readdir,
+	.deo_seekdir = &perproc_mapfile_direnum_v_seekdir,
+};
+
 
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_map_files_v_enum(struct fdirenum *__restrict result) {
-	struct taskpid *pid = result->de_dir->fn_fsdata;
-
-	/* TODO */
-	(void)pid;
-	COMPILER_IMPURE();
-
-	struct constdirenum *ret = (struct constdirenum *)result;
-	/* Fill in enumerator info */
-	ret->de_ops    = &constdirenum_ops;
-	ret->cde_index = 0;
-	ret->cde_entc  = 0;
-	ret->cde_entv  = NULL;
+	struct perproc_mapfile_direnum *rt;
+	REF struct task *thread;
+	rt = (struct perproc_mapfile_direnum *)result;
+	thread = taskpid_gettask(result->de_dir->fn_fsdata);
+	if unlikely(!thread) {
+		/* Thread exited. -> Enumerate an empty directory. */
+		struct constdirenum *ret = (struct constdirenum *)result;
+		ret->de_ops    = &constdirenum_ops;
+		ret->cde_index = 0;
+		ret->cde_entc  = 0;
+		ret->cde_entv  = NULL;
+		return;
+	}
+	rt->ppmd_mm = task_getmman(thread);
+	decref_unlikely(thread);
+	rt->de_ops    = &perproc_mapfile_direnum_ops;
+	rt->ppmd_addr = (UNCHECKED void *)0;
 }
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_map_files = {
