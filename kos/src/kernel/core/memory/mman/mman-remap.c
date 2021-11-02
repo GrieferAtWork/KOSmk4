@@ -371,8 +371,7 @@ get_mappinginfo_or_unlock(struct mman *__restrict self,
 		incref(part);
 		mman_lock_release(self);
 		FINALLY_DECREF_UNLIKELY(part);
-		while (!mpart_lock_available(part))
-			task_yield();
+		mpart_lock_waitfor(part);
 		return false;
 	}
 	result->mi_file = incref(part->mp_file);

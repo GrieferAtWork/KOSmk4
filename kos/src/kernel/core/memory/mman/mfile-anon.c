@@ -688,8 +688,7 @@ mfile_lockparts_or_decref_and_unlock(struct mfile *__restrict self)
 		mfile_lock_endwrite(self);
 		FINALLY_DECREF_UNLIKELY(blocking);
 		/* Wait for the lock to become available. */
-		while (!mpart_lock_available(blocking))
-			task_yield();
+		mpart_lock_waitfor(blocking);
 		return false;
 	}
 	return true;

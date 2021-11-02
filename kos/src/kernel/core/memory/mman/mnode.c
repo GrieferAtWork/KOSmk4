@@ -398,8 +398,7 @@ reload_lonode_after_mman_lock:
 		xdecref(hinode->mn_fsname);
 		{
 			FINALLY_DECREF_UNLIKELY(part);
-			while (!mpart_lock_available(part))
-				task_yield();
+			mpart_lock_waitfor(part);
 		}
 		mman_lock_acquire(self);
 		goto reload_lonode_after_mman_lock;

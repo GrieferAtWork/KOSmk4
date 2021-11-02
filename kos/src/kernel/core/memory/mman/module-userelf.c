@@ -2087,8 +2087,7 @@ uem_trycreate(struct mman *__restrict self,
 		incref(part);
 		mman_lock_release(self);
 		FINALLY_DECREF_UNLIKELY(part);
-		while (!mpart_lock_available(part))
-			task_yield();
+		mpart_lock_waitfor(part);
 		return UEM_TRYCREATE_UNLOCKED;
 	}
 

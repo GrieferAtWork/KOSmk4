@@ -429,8 +429,7 @@ directly_modify_file_size:
 		if unlikely(blocking_part) {
 			mfile_lock_endwrite(self);
 			FINALLY_DECREF_UNLIKELY(blocking_part);
-			while (!mpart_lock_available(blocking_part))
-				task_yield();
+			mpart_lock_waitfor(blocking_part);
 			goto again;
 		}
 		if (!mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(self, aligned_new_size))
@@ -500,8 +499,7 @@ again_reacquire_after_split:
 				if unlikely(blocking_part) {
 					mfile_lock_endwrite(self);
 					FINALLY_DECREF_UNLIKELY(blocking_part);
-					while (!mpart_lock_available(blocking_part))
-						task_yield();
+					mpart_lock_waitfor(blocking_part);
 					goto again_reacquire_after_split;
 				}
 				if (!mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(self, aligned_new_size))

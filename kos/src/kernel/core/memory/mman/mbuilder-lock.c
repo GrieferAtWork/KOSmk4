@@ -82,8 +82,7 @@ mbuilder_lockparts_or_unlock(struct mbuilder_norpc *__restrict self,
 			}
 done_unlock_all:
 			unlockinfo_xunlock(unlock);
-			while (!mpart_lock_available(part))
-				task_yield();
+			mpart_lock_waitfor(part);
 			return false;
 		}
 	}

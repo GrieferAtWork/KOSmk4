@@ -598,8 +598,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 		mman_lock_release(self->mfl_mman);
 		FINALLY_DECREF_UNLIKELY(part);
 		/* Wait for the part's lock to become available. */
-		while (!mpart_lock_available(part))
-			task_yield();
+		mpart_lock_waitfor(part);
 		goto nope;
 	}
 	mpart_assert_integrity(part);

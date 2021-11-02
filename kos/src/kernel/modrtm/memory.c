@@ -1498,9 +1498,8 @@ again_acquire_region_locks:
 			struct mpartmeta *fxc;
 			if (!mpart_lock_tryacquire(part)) {
 				rtm_memory_endwrite_modified_parts(self, i);
-				/* Poll until the lock becomes available. - _then_ try acquiring locks again */
-				while (!mpart_lock_available(part))
-					task_yield();
+				/* Wait until the lock becomes available. - _then_ try acquiring locks again */
+				mpart_lock_waitfor(part);
 				goto again_acquire_region_locks;
 			}
 			/* Verify that the version of this region did not change */
@@ -1520,9 +1519,8 @@ endwrite_par_and_release_locks_and_retry:
 		} else {
 			if unlikely(!mpart_lock_tryacquire(part)) {
 				rtm_memory_endwrite_modified_parts(self, i);
-				/* Poll until the lock becomes available. - _then_ try acquiring locks again */
-				while (!mpart_lock_available(part))
-					task_yield();
+				/* Wait until the lock becomes available. - _then_ try acquiring locks again */
+				mpart_lock_waitfor(part);
 				goto again_acquire_region_locks;
 			}
 			/* Verify that the version of this region did not change */

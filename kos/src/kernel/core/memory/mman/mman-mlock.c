@@ -159,8 +159,7 @@ mrangelock_aq_lockparts_or_unlock(struct mrangelock *__restrict self,
 		incref(blocking_part);
 		mman_lock_release(mm);
 		FINALLY_DECREF_UNLIKELY(blocking_part);
-		while (!mpart_lock_available(blocking_part))
-			task_yield();
+		mpart_lock_waitfor(blocking_part);
 		goto fail;
 	}
 

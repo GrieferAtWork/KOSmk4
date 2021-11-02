@@ -484,8 +484,7 @@ again_lock_mman:
 		if unlikely(!mpart_lock_tryacquire(part)) {
 			mman_lock_endread(mm);
 			FINALLY_DECREF_UNLIKELY(part);
-			while (!mpart_lock_available(part))
-				task_yield();
+			mpart_lock_waitfor(part);
 			goto again_lock_mman;
 		}
 		mman_lock_endread(mm);

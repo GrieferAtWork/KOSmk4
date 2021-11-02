@@ -431,8 +431,7 @@ mfile_map_lockall(struct mfile_map *__restrict self,
 	if (error != NULL) {
 		/* Must wait for the given part to become available. */
 		unlockinfo_xunlock(unlock);
-		while (!mpart_lock_available(error))
-			task_yield();
+		mpart_lock_waitfor(error);
 		return false;
 	}
 	return true;

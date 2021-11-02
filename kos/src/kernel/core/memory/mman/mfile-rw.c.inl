@@ -587,8 +587,7 @@ handle_write_impossible_too_big:
 			mfile_lock_endwrite(self);
 waitfor_part_and_try_again:
 			FINALLY_DECREF_UNLIKELY(part);
-			while (!mpart_lock_available(part))
-				task_yield();
+			mpart_lock_waitfor(part);
 			goto again;
 		}
 		TRY {
