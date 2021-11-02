@@ -910,6 +910,39 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Anyways: userspace should also be able to use these, and the
 	 *          implementation should  be  driven  by  sys_futex(2) */
 
+	/* TODO: Add support for /proc/[PID]/mem,  including the ability to  mmap
+	 *       the resulting file (by having the special node object  implement
+	 *       a custom mmap operator! _NOT_ by providing a loadblocks operator
+	 *       that will copy data from the other process).
+	 * For this, the mmap() operator needs  to be expanded with an  address-hint
+	 * argument that will be the verbatim  `pos' passed to `mmap(2)' (the  other
+	 * `maplibrary(2)' system call always passes `0' for this argument), and the
+	 * mmap operator itself is also allowed  to modify this position, with  mmap
+	 * then using the modified value.
+	 * As such, it should probably be added to the handle_mmap_info structure.
+	 *
+	 * The /proc/[PID]/mem file's mmap operator then uses that hint in order  to
+	 * select the mnode who's mn_part->mp_file should be mmap'd in the new proc,
+	 * before adjusting the file-offset to-be mapped such that the  file-address
+	 * to map will equal the file-address that was mapped at the specified  addr
+	 * within the original mman:
+	 *
+	 * >> fd_t fd = open("/path/to/some/file", O_RDONLY);
+	 * >> struct stat st;
+	 * >> fstat(fd, &st);
+	 * >> void *addr = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	 * >>
+	 * >> // This is where the magic happens: create a new mapping of at
+	 * >> // least 1 byte that is an alias for the mapping at "addr + 42"
+	 * >> fd_t mymaps = open("/proc/self/maps", O_RDONLY);
+	 * >> void *alias = mmap(NULL, 1, PROT_READ, MAP_SHARED, mymaps, (pos_t)addr + 42);
+	 * >> assert(*(byte_t *)alias == *((byte_t *)addr + 42));
+	 *
+	 * Note that this really only works if the original mapping was  MAP_SHARED
+	 * and  not backed by an anonymous file. Try to mmap an anonymous file such
+	 * as a /dev/zero mapping will just give you another anonymous (and totally
+	 * unrelated) mapping. */
+
 	return state;
 }
 
