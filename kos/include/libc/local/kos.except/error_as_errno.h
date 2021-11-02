@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f915543 */
+/* HASH CRC-32:0x23d96e8d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -306,9 +306,6 @@ for (local name: classes.keys.sorted()) {
 			break;
 #endif /* __ENODEV */
 #ifdef __EBUSY
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DEVICE_ALREADY_MOUNTED)):
-			__result = __EBUSY;
-			break;
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_PATH_ALREADY_MOUNTED)):
 			__result = __EBUSY;
 			break;

@@ -24,17 +24,21 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
+#include <kernel/fs/allnodes.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/printk.h>
+#include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
+#include <hybrid/sync/atomic-lock.h>
 
+#include <kos/aref.h>
 #include <kos/except.h>
 
 #include <assert.h>
@@ -68,19 +72,260 @@ throw_readonly_v_saveblocks(struct mfile *__restrict UNUSED(self), pos_t UNUSED(
 }
 
 
-PRIVATE NONNULL((1, 5)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 5)) void KCALL
 unaligned_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                        physaddr_t buf, size_t num_bytes,
                        struct aio_multihandle *__restrict UNUSED(aio)) {
 	mfile_readall_p(self, buf, num_bytes, addr);
 }
 
-PRIVATE NONNULL((1, 5)) void KCALL
+PRIVATE BLOCKING NONNULL((1, 5)) void KCALL
 unaligned_v_saveblocks(struct mfile *__restrict self, pos_t addr,
                        physaddr_t buf, size_t num_bytes,
                        struct aio_multihandle *__restrict UNUSED(aio)) {
 	mfile_writeall_p(self, buf, num_bytes, addr);
 }
+
+
+
+/* Set of files for which mounting is currently in progress. */
+PRIVATE size_t /*       */ mount_in_progress_count = 0;        /* [lock(mount_in_progress_lock)] # of files with in-progress mounts */
+PRIVATE REF struct mfile **mount_in_progress_list  = NULL;     /* [1..1][0..mount_in_progress_count][owned][lock(mount_in_progress_lock)] List of files with in-progress mounts */
+PRIVATE struct sig /*   */ mount_in_progress_rmsig = SIG_INIT; /* Broadcast when a file is removed from `mount_in_progress_list' */
+#ifndef CONFIG_NO_SMP
+PRIVATE struct atomic_lock mount_in_progress_lock = ATOMIC_LOCK_INIT; /* SMP-lock for `mount_in_progress_list' */
+#define mount_in_progress_lock_acquire_nopr() atomic_lock_acquire_nopr(&mount_in_progress_lock)
+#define mount_in_progress_lock_release_nopr() atomic_lock_release(&mount_in_progress_lock)
+#else /* !CONFIG_NO_SMP */
+#define mount_in_progress_lock_acquire_nopr() (void)0
+#define mount_in_progress_lock_release_nopr() (void)0
+#endif /* CONFIG_NO_SMP */
+#define mount_in_progress_lock_acquire_br() (_was = PREEMPTION_PUSHOFF(), mount_in_progress_lock_acquire_nopr())
+#define mount_in_progress_lock_release_br() (mount_in_progress_lock_release_nopr(), PREEMPTION_POP(_was))
+#define mount_in_progress_lock_acquire()     \
+	do {                                     \
+		pflag_t _was = PREEMPTION_PUSHOFF(); \
+		mount_in_progress_lock_acquire_nopr()
+#define mount_in_progress_lock_release()       \
+		mount_in_progress_lock_release_nopr(); \
+		PREEMPTION_POP(_was);                  \
+	}	__WHILE0
+
+/* Check if  `mount_in_progress_list'  contains  `dev'.  The
+ * caller must be holding a lock to `mount_in_progress_lock' */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL mount_in_progress_contains)(struct mfile *__restrict dev) {
+	size_t i;
+	for (i = 0; i < mount_in_progress_count; ++i) {
+		if (mount_in_progress_list[i] == dev)
+			return true;
+	}
+	return false;
+}
+
+/* Search for a pre-existing superblock that uses `dev'.
+ * The caller must be holding a lock to `fallsuper_list'. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct fsuper *
+NOTHROW(FCALL find_existing_superblock)(struct mfile *__restrict dev) {
+	struct fsuper *iter;
+	LIST_FOREACH (iter, &fallsuper_list, fs_root.fn_allsuper) {
+		if (ATOMIC_READ(iter->fs_dev) != dev)
+			continue;
+
+		/* Make sure that this superblock hasn't been destroyed yet,
+		 * and also hasn't  been marked as  unmounted. If either  of
+		 * these  is the case, then act like we didn't see anything. */
+		if (ATOMIC_READ(iter->fs_mounts.lh_first) == FSUPER_MOUNTS_DELETED)
+			continue; /* Can no longer be mounted. */
+
+		if unlikely(!tryincref(iter)) {
+			/* Already marked as destroyed (highly unlikely
+			 * since `fs_mounts' wasn't marked as  deleted) */
+			continue;
+		}
+
+		/* Return a pre-existing superblock that is using `dev' */
+		return iter;
+	}
+	return NULL;
+}
+
+
+
+/* Begin  opening a superblock for `dev'. If another superblock that has
+ * yet to be marked as unmounted `FSUPER_MOUNTS_DELETED') already exists
+ * that is mounting `dev', then  return a reference to that  superblock.
+ * Otherwise, return `NULL'. If another mount operation is currently  in
+ * progress for `dev', wait for that  one to finish before checking  for
+ * existing superblocks for `dev' */
+PRIVATE BLOCKING NONNULL((1)) REF struct fsuper *FCALL
+fsuper_open_begin(struct mfile *__restrict dev)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
+	REF struct fsuper *existing;
+	REF struct mfile **new_list;
+
+	/* Must simultaneously acquire locks to `fallsuper_list' and `mount_in_progress_list'.
+	 * Because  `mount_in_progress_list' uses an SMP-lock, we can safely acquire the later
+	 * in a blocking manner after having already acquired the former. */
+again:
+	fallsuper_acquire();
+
+	/* Check if one of the superblocks from the global list is using `dev' */
+	existing = find_existing_superblock(dev);
+	if unlikely(existing) {
+		fallsuper_release();
+		return existing;
+	}
+
+	/* Now acquire  the secondary  lock to  `mount_in_progress_list' (while  still
+	 * holding a lock to `fallsuper_list', so-as to guaranty interlocked semantics
+	 * when  it comes to  new superblocks being  added to `fallsuper_list', before
+	 * being removed from `mount_in_progress_list' via `ffilesys_open_done()')
+	 *
+	 * Again: this can't deadlock because `mount_in_progress_lock' is an SMP-lock! */
+	mount_in_progress_lock_acquire();
+	if (mount_in_progress_contains(dev)) {
+		mount_in_progress_lock_release_br();
+		fallsuper_release();
+		goto waitfor_dev_inprogress_end;
+	}
+
+	/* Reallocate the list of devices for which a mount is in progress. */
+	new_list = (REF struct mfile **)krealloc_nx(mount_in_progress_list,
+	                                            (mount_in_progress_count + 1) *
+	                                            sizeof(REF struct mfile *),
+	                                            GFP_ATOMIC);
+	if (!new_list) {
+		size_t newcount;
+		newcount = mount_in_progress_count + 1;
+		mount_in_progress_lock_release_br();
+		fallsuper_release();
+
+		/* Blocking-allocate a new list. */
+		new_list = (REF struct mfile **)kmalloc(newcount * sizeof(REF struct mfile *), GFP_NORMAL);
+
+again_lock_with_new_list:
+		TRY {
+			fallsuper_acquire();
+		} EXCEPT {
+			kfree(new_list);
+			RETHROW();
+		}
+
+		/* Re-check for no pre-existing superblock. */
+		existing = find_existing_superblock(dev);
+		if unlikely(existing) {
+			fallsuper_release();
+			kfree(new_list);
+			return existing;
+		}
+
+		/* Re-acquire a lock to the in-progress list. */
+		mount_in_progress_lock_acquire_br();
+
+		/* Re-check that the operation isn't already in-progress. */
+		if unlikely(mount_in_progress_contains(dev)) {
+			mount_in_progress_lock_release_br();
+			fallsuper_release();
+			kfree(new_list);
+			goto waitfor_dev_inprogress_end;
+		}
+
+		/* Re-check that `newcount == mount_in_progress_count + 1' */
+		if unlikely(newcount != mount_in_progress_count + 1) {
+			newcount = mount_in_progress_count + 1;
+			mount_in_progress_lock_release_br();
+			fallsuper_release();
+			TRY {
+				new_list = (REF struct mfile **)krealloc(new_list,
+				                                         newcount * sizeof(REF struct mfile *),
+				                                         GFP_NORMAL);
+			} EXCEPT {
+				kfree(new_list);
+				RETHROW();
+			}
+			goto again_lock_with_new_list;
+		}
+
+		/* Save the newly up-sized list. */
+		mount_in_progress_list = new_list;
+	}
+
+	/* Append the new device. */
+	new_list[mount_in_progress_count] = incref(dev);
+	mount_in_progress_list            = new_list;
+	++mount_in_progress_count;
+	mount_in_progress_lock_release();
+	fallsuper_release();
+
+	/* Indicate that there was no already in-progress mount operation. */
+	return NULL;
+
+waitfor_dev_inprogress_end:
+	/* Wait for an in-progress mount operation on `dev' to finish. */
+	task_connect(&mount_in_progress_rmsig);
+	mount_in_progress_lock_acquire();
+	if unlikely(!mount_in_progress_contains(dev)) {
+		mount_in_progress_lock_release_br();
+		task_disconnectall();
+		goto again;
+	}
+	mount_in_progress_lock_release();
+	task_waitfor();
+	goto again;
+}
+
+/* Must be called  after `ffilesys_open()'  returns with  `*pnewly_created = true'
+ * while a non-NULL `dev' was given (the same `dev' also passed to this function),
+ * and after the newly created superblock  has been added to `fallsuper_list',  or
+ * was destroyed in case the open was aborted.
+ *
+ * This function will indicate that the given `dev' is no longer in the process of
+ * being opened, allowing future/concurrent attempts  at opening this device as  a
+ * superblock from no longer blocking. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev) {
+	mount_in_progress_lock_acquire();
+	assertf(mount_in_progress_count != 0, "No mounts in progress for _any_ files");
+	if likely(mount_in_progress_count == 1) {
+		REF struct mfile **old_list;
+		/* Likely case: no concurrent mounting operations. */
+		assertf(mount_in_progress_list[0] == dev,
+		        "You're not the device for which a mount is in progress!");
+		old_list = mount_in_progress_list;
+		mount_in_progress_list  = NULL;
+		mount_in_progress_count = 0;
+		mount_in_progress_lock_release_br();
+
+		/* Free the dynamically allocated list. */
+		kfree(old_list);
+		goto done;
+	} else {
+		size_t i;
+		/* Find the index of `dev' */
+		for (i = 0;; ++i) {
+			assertf(i < mount_in_progress_count,
+			        "That's not one of the devices for which a mount is in progress!");
+			if (mount_in_progress_list[i] == dev)
+				break;
+		}
+		/* Shift the list to get rid of `dev' */
+		--mount_in_progress_count;
+		memmovedown(&mount_in_progress_list[i],
+		            &mount_in_progress_list[i + 1],
+		            mount_in_progress_count - i,
+		            sizeof(REF struct mfile *));
+	}
+	mount_in_progress_lock_release();
+
+done:
+	/* Wake up anything who might be waiting for opening to be done. */
+	sig_broadcast(&mount_in_progress_rmsig);
+
+	/* Reference from `mount_in_progress_list' (*_nokill because caller still has another ref) */
+	decref_nokill(dev);
+}
+
 
 
 /* Open  a new superblock and return it.  This function is a high-level wrapper
@@ -98,33 +343,42 @@ unaligned_v_saveblocks(struct mfile *__restrict self, pos_t addr,
  *          to mount the superblock (since the successful creation of a mounting  point
  *          will be holding a driver reference via `pathmount::pm_fsmount').
  *
- * @return: * : isshared(return):  `FFILESYS_F_SINGLE' was set, and `return' must NOT
- *                                 be modified under a false assumption of you  being
- *                                 the only one using the superblock!
- * @return: * : !isshared(return): A new superblock was opened. The superblock has yet to
- *                                 be made globally  visible, and if  mounting should  be
- *                                 aborted, you can simply destroy() (or decref()) it.
+ * NOTE: This function takes care to ensure that any given `dev' only ever gets
+ *       mounted under a singular filesystem type (an existing fsuper for `dev'
+ *       will always  be re-returned  unless its  `fs_mounts' had  been set  to
+ *       `FSUPER_MOUNTS_DELETED').  If an existing  fsuper uses filesystem type
+ *       other than `self', return `NULL'.
+ *
+ * @param: pnewly_created: Set to  true/false indicative  of  a new  superblock  having
+ *                         been  opened.  When  set to  true,  `!isshared(return)', and
+ *                         the caller must complete opening via `ffilesys_open_done()'.
+ * @return: * :   The superblock that was opened.
  * @return: NULL: `FFILESYS_F_NODEV' isn't set, and `dev' cannot be mounted as a
  *                filesystem of this type.
  * @throw: E_FSERROR_MOUNT_UNSUPPORTED_DEVICE: `dev' cannot be used to mount superblocks.
  * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM:    The filesystem type was matched, but the on-disk
- *                                             filesystem doesn't appear to make any sense. It
+ *                                             filesystem  doesn't appear to make any sense. It
  *                                             looks like it's been corrupted... :( */
-PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-ffilesys_open(struct ffilesys *__restrict self,
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fsuper *FCALL
+ffilesys_open(struct ffilesys *__restrict self, bool *__restrict pnewly_created,
               struct mfile *dev, UNCHECKED USER char *args)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...) {
 	REF struct fsuper *result;
 	/* Check for special case: singleton */
-	if (self->ffs_flags & FFILESYS_F_SINGLE)
+	if (self->ffs_flags & FFILESYS_F_SINGLE) {
+		*pnewly_created = false;
+		assertf(ATOMIC_READ(self->ffs_single->fs_mounts.lh_first) != FSUPER_MOUNTS_DELETED,
+		        "Singleton superblocks shouldn't be able to get marked as mounts-DELETED");
 		return incref(self->ffs_single);
+	}
 
 	/* Open the superblock */
 	if (self->ffs_flags & FFILESYS_F_NODEV) {
-		dev = NULL; /* Must be NULL in call */
+		dev    = NULL; /* Must be NULL in call */
 		result = (*self->ffs_open)(self, dev, args);
 	} else {
+		REF struct fsuper *existing;
 		assert(dev); /* Must be non-NULL in call */
 		assert(dev->mf_iobashift <= dev->mf_blockshift);
 
@@ -147,23 +401,45 @@ err_cannot_open_file:
 		if unlikely(dev->mf_flags & (MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP))
 			goto err_cannot_open_file;
 
-		/* With a device, we must ensure that it's size isn't
-		 * truncated when trying to open it as a  superblock.
-		 *
-		 * This can simply be done by holding a trunc-lock,
-		 * which  will be inherited  by the superblock upon
-		 * success. */
-		mfile_lock_write(dev);
-		mfile_trunclock_inc(dev);
-		mfile_lock_endwrite(dev);
+		/* Start opening a superblock */
+		existing = fsuper_open_begin(dev);
+		if unlikely(existing != NULL) {
+			/* Another superblock is already mounting `dev' */
+			if (existing->fs_sys == self) {
+				*pnewly_created = false;
+				return existing;
+			}
+
+			/* Different filesystem type -> indicate that
+			 * a  different type is needed to open `dev'! */
+			decref_unlikely(existing);
+			return NULL;
+		}
+
 		TRY {
-			result = (*self->ffs_open)(self, dev, args);
+			/* With a device, we must ensure that it's size isn't
+			 * truncated when trying to open it as a  superblock.
+			 *
+			 * This can simply be done by holding a trunc-lock,
+			 * which  will be inherited  by the superblock upon
+			 * success. */
+			mfile_lock_write(dev);
+			mfile_trunclock_inc(dev);
+			mfile_lock_endwrite(dev);
+			TRY {
+				result = (*self->ffs_open)(self, dev, args);
+			} EXCEPT {
+				/* Release the trunc-lock if an exception was thrown. */
+				mfile_trunclock_dec(dev);
+				RETHROW();
+			}
 		} EXCEPT {
-			/* Release the trunc-lock if an exception was thrown. */
-			mfile_trunclock_dec(dev);
+			ffilesys_open_done(dev);
 			RETHROW();
 		}
 		if (result == NULL) {
+			ffilesys_open_done(dev);
+
 			/* Release the trunc-lock if the device couldn't be opened. */
 			mfile_trunclock_dec(dev);
 		}
@@ -249,6 +525,7 @@ err_cannot_open_file:
 		atomic_lock_init(&result->fs_changednodes_lock);
 		SLIST_INIT(&result->fs_changednodes_lops);
 		LIST_ENTRY_UNBOUND_INIT(&result->fs_changedsuper);
+		*pnewly_created = true;
 	}
 	return result;
 }
@@ -295,13 +572,14 @@ ffilesys_next(struct ffilesys *prev) THROWS(E_WOULDBLOCK) {
 /* Helper wrapper for `ffilesys_open()' that blindly goes through all  filesystem
  * types and tries to open `dev' with each of those needing a device, that aren't
  * singleton filesystems.
- * @return: * :   @assume(!isshared(return));
- *                A new superblock was opened. The superblock has yet to
- *                be made globally  visible, and if  mounting should  be
- *                aborted, you can simply destroy() (or decref()) it.
+ * @param: pnewly_created: Set to  true/false indicative  of  a new  superblock  having
+ *                         been  opened.  When  set to  true,  `!isshared(return)', and
+ *                         the caller must complete opening via `ffilesys_open_done()'.
+ * @return: * :   The superblock that was opened.
  * @return: NULL: `dev' doesn't contain any known filesystem. */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
+ffilesys_opendev(bool *__restrict pnewly_created,
+                 struct mfile *__restrict dev, UNCHECKED USER char *args)
 		THROWS(E_BADALLOC, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...) {
 	REF struct ffilesys *iter, *next;
@@ -318,7 +596,7 @@ ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
 			REF struct fsuper *result;
 			TRY {
 				/* Try to open with this filesystem type. */
-				result = ffilesys_open(iter, dev, args);
+				result = ffilesys_open(iter, pnewly_created, dev, args);
 			} EXCEPT {
 				decref_unlikely(iter);
 				RETHROW();

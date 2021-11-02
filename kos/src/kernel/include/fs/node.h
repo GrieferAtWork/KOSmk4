@@ -2241,12 +2241,12 @@ FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL superblock_mountlock_upgr
 
 /* Open the given block-device as a superblock.
  * NOTE: If the given `device' has already been opened, return the existing
- *       filesystem   or   throw   an    `E_FSERROR_DEVICE_ALREADY_MOUNTED'
+ *       filesystem   or   throw   an    `E_FSERROR_WRONG_FILE_SYSTEM'
  *       error if the  given type doesn't  match the existing  association.
  * @param: flags:                   Set of `SUPERBLOCK_F*'
  * @param: pnew_superblock_created: When non-NULL, set to `true' if a new
  *                                  superblock was created, otherwise set to `false'
- * @throws: E_FSERROR_DEVICE_ALREADY_MOUNTED: [...]
+ * @throws: E_FSERROR_WRONG_FILE_SYSTEM: [...]
  * @throws: E_FSERROR_UNKNOWN_FILE_SYSTEM:    The driver associated with `type' is finalizing
  * @throws: E_FSERROR_MOUNT_NEEDS_DEVICE:        [...]
  * @throws: E_FSERROR_WRONG_FILE_SYSTEM:      [...]
@@ -2259,7 +2259,7 @@ superblock_open(struct superblock_type *__restrict type,
                 uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                 UNCHECKED USER char *args DFL(__NULLPTR),
                 bool *pnew_superblock_created DFL(__NULLPTR))
-		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,
+		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_UNKNOWN_FILE_SYSTEM,
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_MOUNT_NEEDS_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...);
@@ -2407,7 +2407,7 @@ LOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                         UNCHECKED USER char *args DFL(__NULLPTR),
                         bool *pnew_superblock_created DFL(__NULLPTR))
-		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,
+		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_UNKNOWN_FILE_SYSTEM,
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_MOUNT_NEEDS_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
@@ -2425,7 +2425,7 @@ LOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                         UNCHECKED USER char *args DFL(__NULLPTR),
                         bool *pnew_superblock_created DFL(__NULLPTR))
-		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,
+		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_UNKNOWN_FILE_SYSTEM,
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_MOUNT_NEEDS_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
@@ -2443,7 +2443,7 @@ LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                         UNCHECKED USER char *args DFL(__NULLPTR),
                         bool *pnew_superblock_created DFL(__NULLPTR))
-		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,
+		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_UNKNOWN_FILE_SYSTEM,
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_MOUNT_NEEDS_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
@@ -2460,7 +2460,7 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED REF struct superblock *
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                         UNCHECKED USER char *args DFL(__NULLPTR),
                         bool *pnew_superblock_created DFL(__NULLPTR))
-		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,
+		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_UNKNOWN_FILE_SYSTEM,
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_MOUNT_NEEDS_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
@@ -2476,7 +2476,7 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct super
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                         UNCHECKED USER char *args DFL(__NULLPTR),
                         bool *pnew_superblock_created DFL(__NULLPTR))
-		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,
+		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_UNKNOWN_FILE_SYSTEM,
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_MOUNT_NEEDS_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {

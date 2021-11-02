@@ -131,7 +131,7 @@ struct ffilesys {
 		 *  - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_pwritev == NULL
 		 *  - dev->mf_ops->mo_stream == NULL || dev->mf_ops->mo_stream->mso_mmap == NULL
 		 *  - (dev->mf_flags & (MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP)) == 0
-		 * If these requirements aren't fulfilled, the caller will have already thrown an
+		 * If  these requirements aren't  fulfilled, the caller will  have already thrown an
 		 * `E_FSERROR_MOUNT_UNSUPPORTED_DEVICE' exception. Also note that these requirements
 		 * imply `mfile_hasrawio(dev)'
 		 * =====================================================================================
@@ -198,20 +198,24 @@ DATDEF struct lockop_slist ffilesys_formats_lops;   /* Lock operations for `ffil
  *          to mount the superblock (since the successful creation of a mounting  point
  *          will be holding a driver reference via `pathmount::pm_fsmount').
  *
- * @return: * : isshared(return):  `FFILESYS_F_SINGLE' was set, and `return' must NOT
- *                                 be modified under a false assumption of you  being
- *                                 the only one using the superblock!
- * @return: * : !isshared(return): A new superblock was opened. The superblock has yet to
- *                                 be made globally  visible, and if  mounting should  be
- *                                 aborted, you can simply destroy() (or decref()) it.
+ * NOTE: This function takes care to ensure that any given `dev' only ever gets
+ *       mounted under a singular filesystem type (an existing fsuper for `dev'
+ *       will always  be re-returned  unless its  `fs_mounts' had  been set  to
+ *       `FSUPER_MOUNTS_DELETED').  If an existing  fsuper uses filesystem type
+ *       other than `self', return `NULL'.
+ *
+ * @param: pnewly_created: Set to  true/false indicative  of  a new  superblock  having
+ *                         been  opened.  When  set to  true,  `!isshared(return)', and
+ *                         the caller must complete opening via `ffilesys_open_done()'.
+ * @return: * :   The superblock that was opened.
  * @return: NULL: `FFILESYS_F_NODEV' isn't set, and `dev' cannot be mounted as a
  *                filesystem of this type.
  * @throw: E_FSERROR_MOUNT_UNSUPPORTED_DEVICE: `dev' cannot be used to mount superblocks.
  * @throw: E_FSERROR_CORRUPTED_FILE_SYSTEM:    The filesystem type was matched, but the on-disk
- *                                             filesystem doesn't appear to make any sense. It
+ *                                             filesystem  doesn't appear to make any sense. It
  *                                             looks like it's been corrupted... :( */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-ffilesys_open(struct ffilesys *__restrict self,
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fsuper *FCALL
+ffilesys_open(struct ffilesys *__restrict self, __BOOL *__restrict pnewly_created,
               struct mfile *dev, UNCHECKED USER char *args)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
@@ -219,15 +223,28 @@ ffilesys_open(struct ffilesys *__restrict self,
 /* Helper wrapper for `ffilesys_open()' that blindly goes through all  filesystem
  * types and tries to open `dev' with each of those needing a device, that aren't
  * singleton filesystems.
- * @return: * :   @assume(!isshared(return));
- *                A new superblock was opened. The superblock has yet to
- *                be made globally  visible, and if  mounting should  be
- *                aborted, you can simply destroy() (or decref()) it.
+ * @param: pnewly_created: Set to  true/false indicative  of  a new  superblock  having
+ *                         been  opened.  When  set to  true,  `!isshared(return)', and
+ *                         the caller must complete opening via `ffilesys_open_done()'.
+ * @return: * :   The superblock that was opened.
  * @return: NULL: `dev' doesn't contain any known filesystem. */
-FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-ffilesys_opendev(struct mfile *__restrict dev, UNCHECKED USER char *args)
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fsuper *FCALL
+ffilesys_opendev(__BOOL *__restrict pnewly_created,
+                 struct mfile *__restrict dev,
+                 UNCHECKED USER char *args)
 		THROWS(E_BADALLOC, E_FSERROR_MOUNT_UNSUPPORTED_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);
+
+/* Must be called  after `ffilesys_open()'  returns with  `*pnewly_created = true'
+ * while a non-NULL `dev' was given (the same `dev' also passed to this function),
+ * and after the newly created superblock  has been added to `fallsuper_list',  or
+ * was destroyed in case the open was aborted.
+ *
+ * This function will indicate that the given `dev' is no longer in the process of
+ * being opened, allowing future/concurrent attempts  at opening this device as  a
+ * superblock from no longer blocking. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev);
 
 
 /* Lookup a filesystem type, given its name.

@@ -616,11 +616,13 @@
 #endif /* !E_FSERROR_MOUNT_UNSUPPORTED_DEVICE */
 #ifndef E_FSERROR_MOUNT_NEEDS_DEVICE
 #define E_FSERROR_MOUNT_NEEDS_DEVICE              (E_FSERROR, 0x0013) /* [errno(ENOTBLK), msg("This filesystem type requires a device")]
-                                                                       * Attempted to mount() a filesystem without a block-device, when that filesystem requires one */
+                                                                       * Attempted to mount() a filesystem without a device, when that filesystem requires one */
 #endif /* !E_FSERROR_MOUNT_NEEDS_DEVICE */
 #ifndef E_FSERROR_WRONG_FILE_SYSTEM
 #define E_FSERROR_WRONG_FILE_SYSTEM               (E_FSERROR, 0x0014) /* [errno(ENODEV), msg("Invalid file-system type for mount()")]
-                                                                       * Attempted to mount a block-device with the wrong file system */
+                                                                       * Attempted to mount a device with the wrong file system. Also
+                                                                       * thrown if the device is already mounted, but using a different
+                                                                       * filesystem type. */
 #endif /* !E_FSERROR_WRONG_FILE_SYSTEM */
 #ifndef E_FSERROR_UNKNOWN_FILE_SYSTEM
 #define E_FSERROR_UNKNOWN_FILE_SYSTEM             (E_FSERROR, 0x0015) /* [errno(ENODEV), msg("Unknown filesystem type")]
@@ -628,26 +630,22 @@
 #endif /* !E_FSERROR_UNKNOWN_FILE_SYSTEM */
 #ifndef E_FSERROR_CORRUPTED_FILE_SYSTEM
 #define E_FSERROR_CORRUPTED_FILE_SYSTEM           (E_FSERROR, 0x0016) /* [errno(ENODEV), msg("Corrupted filesystem data")]
-                                                                       * The filesystem data found within a given block-device has been corrupted and cannot be mounted */
+                                                                       * The filesystem data found within a given device has been corrupted and cannot be mounted */
 #endif /* !E_FSERROR_CORRUPTED_FILE_SYSTEM */
-#ifndef E_FSERROR_DEVICE_ALREADY_MOUNTED
-#define E_FSERROR_DEVICE_ALREADY_MOUNTED          (E_FSERROR, 0x0017) /* [errno(EBUSY), msg("Filesystem has already been mounted")]
-                                                                       * Attempted to mount a block-device with a different file system type than the one it had already been mounted with */
-#endif /* !E_FSERROR_DEVICE_ALREADY_MOUNTED */
 #ifndef E_FSERROR_PATH_ALREADY_MOUNTED
-#define E_FSERROR_PATH_ALREADY_MOUNTED            (E_FSERROR, 0x0018) /* [errno(EBUSY), msg("Path has already been mounted")]
+#define E_FSERROR_PATH_ALREADY_MOUNTED            (E_FSERROR, 0x0017) /* [errno(EBUSY), msg("Path has already been mounted")]
                                                                        * Attempted to create a new mounting point for a path that has already been mounted */
 #endif /* !E_FSERROR_PATH_ALREADY_MOUNTED */
 #ifndef E_FSERROR_NOT_A_MOUNTING_POINT
-#define E_FSERROR_NOT_A_MOUNTING_POINT            (E_FSERROR, 0x0019) /* [errno(EINVAL), msg("Path hasn't been mounted")]
+#define E_FSERROR_NOT_A_MOUNTING_POINT            (E_FSERROR, 0x0018) /* [errno(EINVAL), msg("Path hasn't been mounted")]
                                                                        * Attempted to umount() a path that isn't a mounting point */
 #endif /* !E_FSERROR_NOT_A_MOUNTING_POINT */
 #ifndef E_FSERROR_IS_A_MOUNTING_POINT
-#define E_FSERROR_IS_A_MOUNTING_POINT             (E_FSERROR, 0x001a) /* [errno(ENOTDIR), msg("Path is a mounting point")]
+#define E_FSERROR_IS_A_MOUNTING_POINT             (E_FSERROR, 0x0019) /* [errno(ENOTDIR), msg("Path is a mounting point")]
                                                                        * Attempted to rmdir() or rename() a mounting point */
 #endif /* !E_FSERROR_IS_A_MOUNTING_POINT */
 #ifndef E_FSERROR_FILE_TOO_BIG
-#define E_FSERROR_FILE_TOO_BIG                    (E_FSERROR, 0x001b) /* [errno(EFBIG), msg("File would become too large")]
+#define E_FSERROR_FILE_TOO_BIG                    (E_FSERROR, 0x001a) /* [errno(EFBIG), msg("File would become too large")]
                                                                        * Attempted to write() or truncate() a file beyond its fs-imposed limit. */
 #endif /* !E_FSERROR_FILE_TOO_BIG */
 #ifndef E_FSERROR_UNSUPPORTED_OPERATION

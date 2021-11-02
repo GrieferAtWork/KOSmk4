@@ -4276,10 +4276,10 @@ lookup_filesystem_type(USER CHECKED char const *name)
 
 /* Open the given block-device as a superblock.
  * NOTE: If the given `device' has already been opened, return the existing
- *       filesystem   or   throw   an    `E_FSERROR_DEVICE_ALREADY_MOUNTED'
+ *       filesystem   or   throw   an    `E_FSERROR_WRONG_FILE_SYSTEM'
  *       error if the  given type doesn't  match the existing  association.
  * @param: flags: Set of `SUPERBLOCK_F*'
- * @throws: E_FSERROR_DEVICE_ALREADY_MOUNTED: [...]
+ * @throws: E_FSERROR_WRONG_FILE_SYSTEM: [...]
  * @throws: E_FSERROR_UNKNOWN_FILE_SYSTEM:    The driver associated with `type' is finalizing
  * @throws: E_FSERROR_MOUNT_NEEDS_DEVICE:     [...]
  * @throws: E_FSERROR_WRONG_FILE_SYSTEM:      [...]
@@ -4291,7 +4291,7 @@ superblock_open(struct superblock_type *__restrict type,
                 struct blkdev *device,
                 uintptr_t flags, UNCHECKED USER char *args,
                 bool *pnew_superblock_created)
-		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,
+		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_UNKNOWN_FILE_SYSTEM,
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_MOUNT_NEEDS_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
@@ -4335,7 +4335,7 @@ superblock_open(struct superblock_type *__restrict type,
 			}
 			fs_filesystems_lock_endread();
 			decref_unlikely(result);
-			THROW(E_FSERROR_DEVICE_ALREADY_MOUNTED);
+			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
 		}
 		if unlikely(!fs_filesystems_lock_upgrade()) {
 			result = fs_filesystems.f_superblocks;
@@ -4352,7 +4352,7 @@ superblock_open(struct superblock_type *__restrict type,
 				}
 				fs_filesystems_lock_endwrite();
 				decref_unlikely(result);
-				THROW(E_FSERROR_DEVICE_ALREADY_MOUNTED);
+				THROW(E_FSERROR_WRONG_FILE_SYSTEM);
 			}
 		}
 	}

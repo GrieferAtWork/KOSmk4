@@ -883,6 +883,7 @@ sys_mount_impl(USER UNCHECKED char const *source,
 		REF struct ffilesys *type;
 		REF struct path *mount_location;
 		REF struct fsuper *super;
+		REF struct fnode *dev;
 		bool newsuper;
 		VALIDATE_FLAGSET(mountflags,
 		                 MS_RDONLY | MS_NOSUID | MS_NODEV | MS_NOEXEC | MS_SYNCHRONOUS |
@@ -923,11 +924,10 @@ sys_mount_impl(USER UNCHECKED char const *source,
 		 *       until `path_mount()' got called, we  need to keep this  explicit
 		 *       reference around. */
 		FINALLY_XDECREF_UNLIKELY(type);
-
 		if (type && type->ffs_flags & (FFILESYS_F_NODEV | FFILESYS_F_SINGLE)) {
-			super = ffilesys_open(type, NULL, (USER UNCHECKED char *)data);
+			/* No device needed! */
+			dev = NULL;
 		} else {
-			REF struct fnode *dev;
 			if unlikely(!source)
 				THROW(E_FSERROR_MOUNT_NEEDS_DEVICE);
 			validate_readable(source, 1);
@@ -941,15 +941,16 @@ sys_mount_impl(USER UNCHECKED char const *source,
 				if unlikely(!dev)
 					THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLKDEV, devno);
 			}
-			FINALLY_DECREF_UNLIKELY(dev);
-			/* Open the superblock with the associated block-device. */
-			super = type ? ffilesys_open(type, dev, (USER UNCHECKED char *)data)
-			             : ffilesys_opendev(dev, (USER UNCHECKED char *)data);
 		}
+		FINALLY_XDECREF_UNLIKELY(dev);
+
+		/* Open the superblock with the associated device. */
+again_open_superblock:
+		super = type ? ffilesys_open(type, &newsuper, dev, (USER UNCHECKED char *)data)
+		             : ffilesys_opendev(&newsuper, dev, (USER UNCHECKED char *)data);
 		if unlikely(!super)
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
 		FINALLY_DECREF_UNLIKELY(super);
-		newsuper = !isshared(super);
 		if (newsuper) {
 			super_set_mount_flags(super, mountflags);
 			/* Make the superblock globally visible. */
@@ -958,6 +959,8 @@ sys_mount_impl(USER UNCHECKED char const *source,
 			TRY {
 				fallsuper_acquire();
 			} EXCEPT {
+				if (dev != NULL)
+					ffilesys_open_done(dev);
 				assert(super->fs_root.mf_refcnt == 1);
 				super->fs_root.mf_refcnt = 0;
 				COMPILER_WRITE_BARRIER();
@@ -968,6 +971,8 @@ sys_mount_impl(USER UNCHECKED char const *source,
 			COMPILER_WRITE_BARRIER();
 			LIST_INSERT_HEAD(&fallsuper_list, super, fs_root.fn_allsuper);
 			fallsuper_release();
+			if (dev != NULL)
+				ffilesys_open_done(dev);
 		}
 		TRY {
 			/* Find out where the mount should happen */
@@ -977,7 +982,15 @@ sys_mount_impl(USER UNCHECKED char const *source,
 			/* Do the mount */
 			if (path_ismount(mount_location))
 				THROW(E_FSERROR_PATH_ALREADY_MOUNTED);
-			decref_unlikely(path_mount(mount_location, &super->fs_root));
+			mount_location = path_mount(mount_location, &super->fs_root);
+			if unlikely(!mount_location) {
+				/* This can happen when trying to create secondary mounting  points
+				 * for filesystems that have been unmounted due to lack of mounting
+				 * points since it was originally returned by `ffilesys_open()'. */
+				assert(!newsuper);
+				goto again_open_superblock;
+			}
+			decref_unlikely(mount_location);
 
 			/* Set flags for multi-mounted superblocks. */
 			if (!newsuper)

@@ -902,19 +902,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    and see if the `E_WOULDBLOCK' can be removed. Note that it should stay
 	 *    if the function also acquired some other (unrelated) atomic lock! */
 
-	/* TODO: The new filesystem doesn't have checks for device-already-mounted.
-	 * As such, either re-introduce these checks (which could be done by having
-	 * a global set of mfiles currently being mounted, such that files are only
-	 * removed from this set _after_ the associated superblock was added to the
-	 * list of all superblocks), or removing `E_FSERROR_DEVICE_ALREADY_MOUNTED'
-	 * -> We could then precede calls to opening a superblock by adding the
-	 *    mfile to-be opened to said set whilst also checking that the file
-	 *    isn't already mounted by another known superblock.
-	 * -> Then, after the superblock has added itself to the list of all known
-	 *    superblocks, the associated LOP could  remove the backing file  from
-	 *    the set of files currently being mounted.
-	 */
-
 	/* TODO: `struct fdirenum' should be variable-sized,  with
 	 *       the real size stored as a vtable `size_t'-member. */
 

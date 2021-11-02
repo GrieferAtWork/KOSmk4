@@ -34,6 +34,7 @@
 #include <kernel/mman/driver.h>
 #include <kernel/panic.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -156,13 +157,13 @@ NOTHROW(KCALL kernel_initialize_rootfs)(void) {
 	REF struct blkdev *root;
 	struct pathmount *mount;
 	REF struct fsuper *super;
+	bool newly_created;
 
 	/* Lookup the root partition. */
 	root = kernel_get_root_partition();
 
 	/* Open the filesystem of the partition */
-	super = ffilesys_opendev(root, NULL);
-	decref_unlikely(root);
+	super = ffilesys_opendev(&newly_created, root, NULL);
 
 	/* Create the root mounting point descriptor. */
 	mount = _pathmount_alloc();
@@ -215,6 +216,7 @@ again_acquire_locks:
 	}
 
 	/* Install hooks. */
+	assert(super->fs_mounts.lh_first != FSUPER_MOUNTS_DELETED);
 	LIST_INSERT_HEAD(&super->fs_mounts, mount, pm_fsmount);
 	LIST_INSERT_HEAD(&vfs_kernel.vf_mounts, mount, pm_vsmount); /* Inherit reference */
 	vfs_kernel.vf_root = mount;                                 /* Inherit reference */
@@ -226,6 +228,10 @@ again_acquire_locks:
 	fs_pathlock_endwrite(&fs_kernel);
 	vfs_mountslock_release(&vfs_kernel);
 	vfs_rootlock_endwrite(&vfs_kernel);
+
+	/* Indicate completion of the mount operation. */
+	ffilesys_open_done(root);
+	decref_unlikely(root);
 }
 
 

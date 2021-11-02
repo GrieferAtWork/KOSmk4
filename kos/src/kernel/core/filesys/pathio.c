@@ -1561,14 +1561,16 @@ again_load_parent:
  *         or altered to point to some other path.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED:
  *         The superblock of `dir' indicate `FSUPER_MOUNTS_DELETED'
- * @return: * : The  new  path  node  replacing   `self'  and  pointing  to   `dir'.
- *              This path node is also referenced by `_path_getvfs(self)->vf_mounts'
- *              and has replaced `self' within the filesystem hierarchy, though  any
- *              path-relative filesystem operations that use some existing reference
- *              to `self' will continue to operate  with the old path `self'  (since
- *              the old path didn't get modified but replaced with a newly allocated
- *              path). */
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
+ * @return: * :   The  new  path  node  replacing   `self'  and  pointing  to   `dir'.
+ *                This path node is also referenced by `_path_getvfs(self)->vf_mounts'
+ *                and has replaced `self' within the filesystem hierarchy, though  any
+ *                path-relative filesystem operations that use some existing reference
+ *                to `self' will continue to operate  with the old path `self'  (since
+ *                the old path didn't get modified but replaced with a newly allocated
+ *                path).
+ * @return: NULL: `dir' can no longer be mounted because:
+ *                `dir->fn_super->fs_mounts.lh_first == FSUPER_MOUNTS_DELETED' */
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
 path_mount(struct path *__restrict self, struct fdirnode *__restrict dir)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED, ...) {
 	REF struct pathmount *result;
@@ -1633,6 +1635,15 @@ again_acquire_locks:
 			path_decref_and_unlock_whole_tree(self);
 			fsuper_mounts_waitwrite(super);
 			goto again_acquire_locks;
+		}
+		/* Check for special case: the superblock can no longer be mounted. */
+		if unlikely(super->fs_mounts.lh_first == FSUPER_MOUNTS_DELETED) {
+			fsuper_mounts_endwrite(super);
+			vfs_driveslock_endwrite(pathvfs);
+			vfs_mountslock_release(pathvfs);
+			path_decref_and_unlock_whole_tree(self);
+			_pathmount_free(result);
+			return NULL;
 		}
 		if unlikely(path_isroot(self)) {
 			parent = NULL;
