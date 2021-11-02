@@ -1906,7 +1906,6 @@ PRIVATE struct fdirent_ops const perproc_mapfile_dirent_ops = {
 	.fdo_opennode = &perproc_mapfile_dirent_v_opennode,
 };
 
-#include <kernel/printk.h>
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
                                   struct flookup_info *__restrict info) {
@@ -1931,7 +1930,7 @@ procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
 		++reader;
 		if (ch >= '0' && ch <= '9') {
 			if (ch == '0' && (state == STATE_MIN0 || state == STATE_END0))
-				{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+				return NULL;
 			ch -= '0';
 		} else if (ch >= 'a' && ch <= 'f') {
 			ch += 10 - 'a';
@@ -1943,16 +1942,16 @@ procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
 			endaddr = 0;
 			continue;
 		} else {
-			{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+			return NULL;
 		}
 		if unlikely(((endaddr << 4) >> 4) != endaddr)
-			{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+			return NULL;
 		endaddr <<= 4;
 		endaddr += (unsigned char)ch;
 		state |= 1; /* STATE_MIN0 -> STATE_MIN, STATE_END0 -> STATE_END */
 	}
 	if unlikely(state != STATE_END)
-		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+		return NULL;
 
 	/* Lookup address information. */
 	{
@@ -1960,29 +1959,29 @@ procfs_perproc_map_files_v_lookup(struct fdirnode *__restrict self,
 		REF struct mman *mm;
 		thread = taskpid_gettask(self->fn_fsdata);
 		if unlikely(!thread)
-			{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+			return NULL;
 		mm = task_getmman(thread);
 		decref_unlikely(thread);
 		FINALLY_DECREF_UNLIKELY(mm);
 		if unlikely(!mman_mapinfo(mm, &mminfo, (USER UNCHECKED void *)minaddr))
-			{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__); return NULL; }
+			return NULL;
 	}
 
 	/* Verify min/max bounds of mapping info */
 	if unlikely(mminfo.mmi_min != (UNCHECKED void *)minaddr)
-		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+		goto err_mminfo;
 	if unlikely(mminfo.mmi_max != (UNCHECKED void *)(endaddr - 1))
-		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+		goto err_mminfo;
 
 	/* Verify that this mapping really should appear in /proc/[PID]/map_files */
 	if unlikely(!mminfo.mmi_file)
-		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+		goto err_mminfo;
 	if unlikely(!mminfo.mmi_fsname)
-		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+		goto err_mminfo;
 	if unlikely(!mminfo.mmi_fspath)
-		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+		goto err_mminfo;
 	if unlikely(!mfile_isnode(mminfo.mmi_file))
-		{ printk(KERN_RAW "%s(%d) : HERE\n", __FILE__, __LINE__);  goto err_mminfo; }
+		goto err_mminfo;
 
 	/* Construct the new directory entry. */
 	TRY {

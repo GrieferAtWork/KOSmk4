@@ -902,7 +902,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Refactor `vio_operators' -> `vio_ops' */
 
 	/* TODO: The kernel `struct shared_lock' and `struct shared_rwlock'  should
-	 *       also be available in user-space  (iow: move these structures  into
+	 *       also be available in user-space (iow: move these structures into a
 	 *       new headers <kos/shared-lock.h>; possibly named differently, since
 	 *       the name "shared" has never  perfectly represented what they  are;
 	 *       maybe call them "preemptive_lock"? - but that's a pretty long name
