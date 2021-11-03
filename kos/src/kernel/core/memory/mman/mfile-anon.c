@@ -101,7 +101,7 @@ NOTHROW(FCALL mpart_delete_postop_builder_enqueue)(struct mpart_delete_postop_bu
 
 /* Try to acquire a reference to all parts reachable from `root'.
  * Parts  that  had  already  been  destroyed  will  be  skipped. */
-PRIVATE NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_tree_increfall)(struct mpart *__restrict root) {
 again:
 	COMPILER_UNUSED(tryincref(root));
@@ -120,7 +120,7 @@ again:
 /* Drop a reference from all parts reachable from `root'. If a
  * part  ends up dying because of this, add it to `deadparts'.
  * Parts that had already been destroyed will be skipped. */
-PRIVATE NONNULL((1, 2)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mpart_tree_decrefall)(struct mpart *__restrict root,
                                     struct mpart_delete_postop_builder *__restrict deadparts) {
 	struct mpart *lhs, *rhs;
@@ -146,7 +146,7 @@ again:
 /* Release locks to all parts reachable from `root', with the exception
  * of `skipme'  (if non-NULL),  from which  no lock  will be  released.
  * Parts that had already been destroyed will be skipped. */
-PRIVATE NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_tree_unlockall)(struct mpart *root,
                                     struct mpart *skipme) {
 again:
@@ -169,7 +169,7 @@ again:
  * It  at least  one part can't  be locked immediately,  release all locks
  * already  acquired,  and  return  a   pointer  to  the  blocking   part.
  * Parts that had already been destroyed will be skipped. */
-PRIVATE WUNUSED NONNULL((1)) struct mpart *
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mpart *
 NOTHROW(FCALL mpart_tree_trylockall)(struct mpart *root,
                                      struct mpart *skipme) {
 	struct mpart *error;
@@ -202,7 +202,7 @@ err_root:
  * change their file field from  `file' to `mfile_anon[*]', clear  their
  * `MPART_F_GLOBAL_REF'  flag, and (if different from `dont_unlock_me'),
  * release a lock to them. */
-PRIVATE NONNULL((1, 3)) void
+PRIVATE NOBLOCK NONNULL((1, 3, 4)) void
 NOTHROW(FCALL mpart_tree_forall_makeanon_and_unlock_decref)(struct mpart *root,
                                                             struct mpart *dont_unlock_me,
                                                             struct mfile *__restrict file,
@@ -222,15 +222,27 @@ again:
 		                                      MPART_F_PERSISTENT)) &
 		    MPART_F_GLOBAL_REF)
 			decref_nokill(root);
+
 		/* Try to merge mem-parts after changing the pointed-to file.
 		 * This  must be done to prevent a race condition relating to
 		 * some very rare cases of async mem-part merging, as well as
 		 * to ensure consistency,  and to allow  merging of  adjacent
 		 * nodes within mman mapping trees. */
-		root = mpart_merge_locked(root);
-		mpart_lock_release(root);
-		if (ATOMIC_DECFETCH(root->mp_refcnt) == 0)
+		if likely(root != dont_unlock_me) {
+			root = mpart_merge_locked(root);
+			mpart_lock_release(root);
+		} else {
+			/* We can't do the merge right now since we're not allowed
+			 * to release/change `dont_unlock_me', but what we can do
+			 * is enqueue the merge to be done later. */
+			mpart_start_asyncjob(root, MPART_XF_WILLMERGE);
+		}
+
+		/* Drop the reference gifted to us by the caller. */
+		if (ATOMIC_DECFETCH(root->mp_refcnt) == 0) {
+			assert(root != dont_unlock_me);
 			mpart_delete_postop_builder_enqueue(deadparts, root);
+		}
 	}
 	if (lhs != NULL) {
 		if (rhs != NULL)

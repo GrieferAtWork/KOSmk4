@@ -298,8 +298,8 @@ er_bad_addr_alignment:
 #endif /* DEFINE_mman_map_subrange */
 	{
 #ifdef DEFINE_mman_map_subrange
-		/* Create anon-ram nodes are replacements for all file
-		 * regions  which  the  caller isn't  allowed  to map. */
+		/* Create anon-ram nodes as replacements for all file
+		 * regions  which  the caller  isn't allowed  to map. */
 		file_size        = num_bytes;
 		file_base_offset = 0;
 		if (file_pos < file_map_minaddr) {
@@ -326,6 +326,7 @@ er_bad_addr_alignment:
 				    OVERFLOW_UADD(max_file_size, 1, &max_file_size))
 					max_file_size = SIZE_MAX;
 			}
+
 			/* Check if the requested size exceeds the allowed size. */
 			if (file_size > max_file_size) {
 				struct mnode *node;
@@ -333,6 +334,7 @@ er_bad_addr_alignment:
 				gap       = file_size - max_file_size;
 				file_size = max_file_size;
 				node      = mnode_create_anon_ram(gap, prot, flags);
+
 				/* Include the relative offset from the to-be returned base-address
 				 * to after where the actual file mapping will end, so-as to  place
 				 * the post-node properly. */
