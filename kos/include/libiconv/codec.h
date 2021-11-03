@@ -60,7 +60,7 @@ __NOTHROW_NCX(LIBICONV_CC iconv_codecbyname)(char const *__restrict name);
  * least 1 valid name. As such, supported codecs as well as their names can
  * be enumerated as:
  * >> iconv_codec_t id;
- * >> for (id = ICONV_CODEC_FIRST;;) {
+ * >> for (id = ICONV_CODEC_FIRST;;++id) {
  * >>     char const *name;
  * >>     if ((name = iconv_getcodecnames(id)) == NULL)
  * >>         break;
