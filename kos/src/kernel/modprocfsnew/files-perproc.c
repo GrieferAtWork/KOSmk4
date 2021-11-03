@@ -54,6 +54,7 @@ DECL_END
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/ramfile.h>
 #include <kernel/mman/rw.h>
+#include <kernel/mman/stat.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
@@ -894,23 +895,23 @@ smaps_printer_cb(void *maps_arg, struct mmapinfo_ex *__restrict info) {
 	ctx     = (struct maps_printer_data *)maps_arg;
 	printer = ctx->pd_printer;
 	arg     = ctx->pd_arg;
-	if (printf("Size:           %8" PRIuSIZ " kB\n"
-	           "Rss:                   0 kB\n" /* ??? */
-	           "Pss:                   0 kB\n" /* ??? */
-	           "Shared_Clean:   %8" PRIuSIZ " kB\n"
-	           "Shared_Dirty:   %8" PRIuSIZ " kB\n"
-	           "Private_Clean:  %8" PRIuSIZ " kB\n"
-	           "Private_Dirty:  %8" PRIuSIZ " kB\n"
-	           "Referenced:     %8" PRIuSIZ " kB\n"
-	           "Anonymous:      %8" PRIuSIZ " kB\n"
-	           "AnonHugePages:         0 kB\n" /* KOS does huge page merging automatically */
-	           "Shared_Hugetlb:        0 kB\n" /* KOS does huge page merging automatically */
-	           "Private_Hugetlb:       0 kB\n" /* KOS does huge page merging automatically */
-	           "Swap:           %8" PRIuSIZ " kB\n"
-	           "SwapPss:               0 kB\n" /* ??? */
-	           "KernelPageSize: %8" PRIuSIZ " kB\n"
-	           "MMUPageSize:    %8" PRIuSIZ " kB\n"
-	           "Locked:         %8" PRIuSIZ " kB\n"
+	if (printf("Size:\t" /*           */ "%" PRIuSIZ " kB\n"
+	           "Rss:\t" /*            */ "0 kB\n" /* ??? */
+	           "Pss:\t" /*            */ "0 kB\n" /* ??? */
+	           "Shared_Clean:\t" /*   */ "%" PRIuSIZ " kB\n"
+	           "Shared_Dirty:\t" /*   */ "%" PRIuSIZ " kB\n"
+	           "Private_Clean:\t" /*  */ "%" PRIuSIZ " kB\n"
+	           "Private_Dirty:\t" /*  */ "%" PRIuSIZ " kB\n"
+	           "Referenced:\t" /*     */ "%" PRIuSIZ " kB\n"
+	           "Anonymous:\t" /*      */ "%" PRIuSIZ " kB\n"
+	           "AnonHugePages:\t" /*  */ "0 kB\n" /* KOS does huge page merging automatically */
+	           "Shared_Hugetlb:\t" /* */ "0 kB\n" /* KOS does huge page merging automatically */
+	           "Private_Hugetlb:\t" /**/ "0 kB\n" /* KOS does huge page merging automatically */
+	           "Swap:\t" /*           */ "%" PRIuSIZ " kB\n"
+	           "SwapPss:\t" /*        */ "0 kB\n" /* ??? */
+	           "KernelPageSize:\t" /* */ "%" PRIuSIZ " kB\n"
+	           "MMUPageSize:\t" /*    */ "%" PRIuSIZ " kB\n"
+	           "Locked:\t" /*         */ "%" PRIuSIZ " kB\n"
 	           "VmFlags:",
 	           mmapinfo_size(info) / 1024,                                                                  /* Size */
 	           !(info->mmi_flags & MNODE_F_SHARED) ? 0 : ((info->mmix_loaded - info->mmix_changed) / 1024), /* Shared_Clean */
@@ -1381,6 +1382,7 @@ ProcFS_PerProc_Status_Printer(struct printnode *__restrict self,
 	REF struct handle_manager *thread_hman = NULL;
 	struct taskpid *tpid;
 	char const *state;
+	struct mman_statinfo mmstat;
 	tpid   = self->fn_fsdata;
 	thread = taskpid_gettask(tpid);
 	RAII_FINALLY {
@@ -1469,25 +1471,43 @@ no_exec:
 			       groups->cg_groups[i]);
 		}
 	}
-	if (PRINT("\n") < 0)
+
+	memset(&mmstat, 0, sizeof(mmstat));
+	if (thread_mm)
+		mman_stat(thread_mm, &mmstat);
+	if (printf("\n"
+	           "VmPeak:\t" /*      */ "%" PRIuSIZ " kB\n"
+	           "VmSize:\t" /*      */ "%" PRIuSIZ " kB\n"
+	           "VmLck:\t" /*       */ "%" PRIuSIZ " kB\n"
+	           "VmPin:\t" /*       */ "0 kB\n" /* ??? */
+	           "VmHWM:\t" /*       */ "%" PRIuSIZ " kB\n"
+	           "VmRSS:\t" /*       */ "%" PRIuSIZ " kB\n"
+	           "RssAnon:\t" /*     */ "%" PRIuSIZ " kB\n"
+	           "RssFile:\t" /*     */ "%" PRIuSIZ " kB\n"
+	           "RssShmem:\t" /*    */ "0 kB\n"
+	           "VmData:\t" /*      */ "%" PRIuSIZ " kB\n"
+	           "VmStk:\t" /*       */ "%" PRIuSIZ " kB\n"
+	           "VmExe:\t" /*       */ "%" PRIuSIZ " kB\n"
+	           "VmLib:\t" /*       */ "0 kB\n" /* Linux diffs from `VmExe' by keeping track of the original
+	                                            * exe's code start/end (but KOS doesn't keep track of that) */
+	           "VmPTE:\t" /*       */ "0 kB\n" /* Memory consumed by page directory structures??? */
+	           "VmSwap:\t" /*      */ "%" PRIuSIZ " kB\n"
+	           "HugetlbPages:\t" /**/ "0 kB\n"
+	           "Threads:\t" /*     */ "%" PRIuSIZ "\n",
+	           mmstat.msi_size / 1024,                     /* TODO: VmPeak */
+	           mmstat.msi_size / 1024,                     /* VmSize */
+	           mmstat.msi_lock / 1024,                     /* VmLck */
+	           mmstat.msi_size / 1024,                     /* ??? VmHWM */
+	           mmstat.msi_size / 1024,                     /* ??? VmRSS */
+	           mmstat.msi_anon / 1024,                     /* RssAnon */
+	           (mmstat.msi_size - mmstat.msi_anon) / 1024, /* RssFile */
+	           mmstat.msi_ndat / 1024,                     /* VmData */
+	           mmstat.msi_ndat / 1024,                     /* ??? VmStk */
+	           mmstat.msi_nexe / 1024,                     /* VmExe */
+	           mmstat.msi_swap / 1024,                     /* VmSwap */
+	           thread_mm ? mman_nrthreads(thread_mm) : 0   /* Threads */
+	           ) < 0)
 		return;
-
-	/* TODO: VmPeak:     2380 kB */
-	/* TODO: VmSize:     2380 kB */
-	/* TODO: VmLck:         0 kB */
-	/* TODO: VmPin:         0 kB */
-	/* TODO: VmHWM:       576 kB */
-	/* TODO: VmRSS:       576 kB */
-	/* TODO: VmData:      300 kB */
-	/* TODO: VmStk:       132 kB */
-	/* TODO: VmExe:        48 kB */
-	/* TODO: VmLib:      1868 kB */
-	/* TODO: VmPTE:        20 kB */
-	/* TODO: VmPMD:        12 kB */
-	/* TODO: VmSwap:        0 kB */
-	/* TODO: HugetlbPages:  0 kB */
-
-	/* TODO: Threads:        1 */
 
 	/* TODO: SigQ:   0/14747 */
 	/* TODO: SigPnd: 0000000000000000 */
@@ -1496,12 +1516,12 @@ no_exec:
 	/* TODO: SigIgn: 0000000000000000 */
 	/* TODO: SigCgt: 0000000000000000 */
 
-	if (printf("CapInh:\t%.16" PRIx64 "\n"
-	           "CapPrm:\t%.16" PRIx64 "\n"
-	           "CapEff:\t%.16" PRIx64 "\n"
-	           "CapBnd:\t%.16" PRIx64 "\n"
-	           "CapAmb:\t%.16" PRIx64 "\n"
-	           "NoNewPrivs:\t%" PRIu8 "\n",
+	if (printf("CapInh:\t" /*    */ "%.16" PRIx64 "\n"
+	           "CapPrm:\t" /*    */ "%.16" PRIx64 "\n"
+	           "CapEff:\t" /*    */ "%.16" PRIx64 "\n"
+	           "CapBnd:\t" /*    */ "%.16" PRIx64 "\n"
+	           "CapAmb:\t" /*    */ "%.16" PRIx64 "\n"
+	           "NoNewPrivs:\t" /**/ "%" PRIu8 "\n",
 	           thread_cred ? credcap_as_u64(&thread_cred->c_cap_inheritable) : 0,
 	           thread_cred ? credcap_as_u64(&thread_cred->c_cap_permitted) : 0,
 	           thread_cred ? credcap_as_u64(&thread_cred->c_cap_effective) : 0,
