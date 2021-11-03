@@ -728,7 +728,7 @@ again:
 #ifdef __ARCH_WANT_SYSCALL_GETUID
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getuid), getuid) {
 	uid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getruid();
 	return (SYSCALL_RETURN_TYPE_OF(getuid))result;
 }
@@ -736,7 +736,7 @@ DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getuid), getuid) {
 #ifdef __ARCH_WANT_SYSCALL_GETUID32
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getuid32), getuid32) {
 	uid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getruid();
 	return (SYSCALL_RETURN_TYPE_OF(getuid32))result;
 }
@@ -768,7 +768,7 @@ DEFINE_SYSCALL1(errno_t, setuid32, SYSCALL_ARG_TYPE_OF(setuid32, 0), uid) {
 #ifdef __ARCH_WANT_SYSCALL_GETGID
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getgid), getgid) {
 	gid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getrgid();
 	return (SYSCALL_RETURN_TYPE_OF(getgid))result;
 }
@@ -776,7 +776,7 @@ DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getgid), getgid) {
 #ifdef __ARCH_WANT_SYSCALL_GETGID32
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getgid32), getgid32) {
 	gid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getrgid();
 	return (SYSCALL_RETURN_TYPE_OF(getgid32))result;
 }
@@ -808,7 +808,7 @@ DEFINE_SYSCALL1(errno_t, setgid32, SYSCALL_ARG_TYPE_OF(setgid32, 0), gid) {
 #ifdef __ARCH_WANT_SYSCALL_GETEUID
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(geteuid), geteuid) {
 	uid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_geteuid();
 	return (SYSCALL_RETURN_TYPE_OF(geteuid))result;
 }
@@ -816,7 +816,7 @@ DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(geteuid), geteuid) {
 #ifdef __ARCH_WANT_SYSCALL_GETEUID32
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(geteuid32), geteuid32) {
 	uid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_geteuid();
 	return (SYSCALL_RETURN_TYPE_OF(geteuid32))result;
 }
@@ -848,7 +848,7 @@ DEFINE_SYSCALL1(errno_t, seteuid32, SYSCALL_ARG_TYPE_OF(seteuid32, 0), euid) {
 #ifdef __ARCH_WANT_SYSCALL_GETEGID
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getegid), getegid) {
 	gid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getegid();
 	return (SYSCALL_RETURN_TYPE_OF(getegid))result;
 }
@@ -856,7 +856,7 @@ DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getegid), getegid) {
 #ifdef __ARCH_WANT_SYSCALL_GETEGID32
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getegid32), getegid32) {
 	gid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getegid();
 	return (SYSCALL_RETURN_TYPE_OF(getegid32))result;
 }
@@ -888,7 +888,7 @@ DEFINE_SYSCALL1(errno_t, setegid32, SYSCALL_ARG_TYPE_OF(setegid32, 0), egid) {
 #ifdef __ARCH_WANT_SYSCALL_GETFSUID
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsuid), getfsuid) {
 	uid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getfsuid();
 	return (SYSCALL_RETURN_TYPE_OF(getfsuid))result;
 }
@@ -896,7 +896,7 @@ DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsuid), getfsuid) {
 #ifdef __ARCH_WANT_SYSCALL_GETFSUID32
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsuid32), getfsuid32) {
 	uid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getfsuid();
 	return (SYSCALL_RETURN_TYPE_OF(getfsuid32))result;
 }
@@ -928,7 +928,7 @@ DEFINE_SYSCALL1(errno_t, setfsuid32, SYSCALL_ARG_TYPE_OF(setfsuid32, 0), fsuid) 
 #ifdef __ARCH_WANT_SYSCALL_GETFSGID
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsgid), getfsgid) {
 	gid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getfsgid();
 	return (SYSCALL_RETURN_TYPE_OF(getfsgid))result;
 }
@@ -936,7 +936,7 @@ DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsgid), getfsgid) {
 #ifdef __ARCH_WANT_SYSCALL_GETFSGID32
 DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsgid32), getfsgid32) {
 	gid_t result;
-	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	COMPILER_IMPURE();
 	result = cred_getfsgid();
 	return (SYSCALL_RETURN_TYPE_OF(getfsgid32))result;
 }

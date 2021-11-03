@@ -232,6 +232,7 @@ NOTHROW(FCALL mpart_ajob_v_connect)(struct async *__restrict self) {
 	struct mpart_ajob *me = (struct mpart_ajob *)self;
 	if (me->mpaj_state != MPART_AJOB_ST_WORKING) {
 		/* TODO */
+		COMPILER_IMPURE();
 		return KTIME_INFINITE;
 	}
 	return KTIME_NONBLOCK;
@@ -242,6 +243,7 @@ NOTHROW(FCALL mpart_ajob_v_test)(struct async *__restrict self) {
 	struct mpart_ajob *me = (struct mpart_ajob *)self;
 	if (me->mpaj_state != MPART_AJOB_ST_WORKING) {
 		/* TODO */
+		COMPILER_IMPURE();
 		return false;
 	}
 	return true;
