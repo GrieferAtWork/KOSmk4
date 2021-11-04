@@ -171,15 +171,7 @@ blkpart_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct blkdev *me = mfile_asblkdev(self);
-	struct mfile_stream_ops const *master_stream_ops;
-	struct blkdev *master;
-	master            = me->bd_partinfo.bp_master;
-	master_stream_ops = master->mf_ops->mo_stream;
-	if (master_stream_ops != NULL && master_stream_ops->mso_ioctl != NULL)
-		return (*master_stream_ops->mso_ioctl)(master, cmd, arg, mode);
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-	      cmd);
+	return mfile_uioctl(me->bd_partinfo.bp_master, cmd, arg, mode);
 }
 
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
@@ -187,28 +179,7 @@ blkpart_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct blkdev *me = mfile_asblkdev(self);
-	struct mfile_stream_ops const *master_stream_ops;
-	struct blkdev *master;
-	master            = me->bd_partinfo.bp_master;
-	master_stream_ops = master->mf_ops->mo_stream;
-	if (master_stream_ops != NULL && master_stream_ops->mso_hop != NULL)
-		return (*master_stream_ops->mso_hop)(master, cmd, arg, mode);
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-	      cmd);
-}
-
-PRIVATE BLOCKING NONNULL((1)) REF void *KCALL
-blkpart_v_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type)
-		THROWS(...) {
-	struct blkdev *me = mfile_asblkdev(self);
-	struct mfile_stream_ops const *master_stream_ops;
-	struct blkdev *master;
-	master            = me->bd_partinfo.bp_master;
-	master_stream_ops = master->mf_ops->mo_stream;
-	if (master_stream_ops != NULL && master_stream_ops->mso_tryas != NULL)
-		return (*master_stream_ops->mso_tryas)(master, wanted_type);
-	return NULL;
+	return mfile_uhop(me->bd_partinfo.bp_master, cmd, arg, mode);
 }
 
 
@@ -234,7 +205,7 @@ PRIVATE struct mfile_stream_ops const blkpart_stream_ops = {
 	.mso_open  = &mfile_v_open,
 	.mso_ioctl = &blkpart_v_ioctl,
 	.mso_hop   = &blkpart_v_hop,
-	.mso_tryas = &blkpart_v_tryas, /* Shouldn't ever be used, but here for the same of completion */
+	.mso_tryas = &blkdev_v_tryas,
 	.mso_sync  = &blkpart_v_sync,
 };
 

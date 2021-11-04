@@ -205,14 +205,6 @@ struct mfile_stream_ops {
 	(KCALL *mso_seek)(struct mfile *__restrict self, off_t offset,
 	                  unsigned int whence) THROWS(...);
 
-	/* [0..1] Hook for `ioctl(2)': Extended file I/O control.
-	 * Note that no standard ioctl commands are defined for mem-files, meaning that
-	 * this callback has completely unfiltered control over the `ioctl(2)' syscall. */
-	BLOCKING NONNULL((1)) syscall_slong_t
-	(KCALL *mso_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
-	                   USER UNCHECKED void *arg, iomode_t mode)
-			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
-
 	/* [0..1] Hook for `ftruncate(2)': File length setting.
 	 * If defined, this callback will only be called by  `handle_mfile_truncate()',
 	 * where  it  will take  the  place of  the  usual call  to `mfile_truncate()'.
@@ -291,10 +283,20 @@ struct mfile_stream_ops {
 	                      poll_mode_t what)
 			THROWS(...);
 
+	/* [0..1] Hook for `ioctl(2)': Extended file I/O control.
+	 * Note that no standard ioctl commands are defined for mem-files, meaning that
+	 * this callback has completely unfiltered control over the `ioctl(2)' syscall.
+	 * When `NULL', same as `mfile_v_ioctl'. */
+	BLOCKING NONNULL((1)) syscall_slong_t
+	(KCALL *mso_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
+	                   USER UNCHECKED void *arg, iomode_t mode)
+			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
+
 	/* [0..1] Implementation for custom hop(2)-operators (s.a. `<kos/hop/[...].h>')
 	 * When not implemented, only the default set of hop-operators for mem-files is
 	 * usable with this mem-file.
-	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment) */
+	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
+	 * When `NULL', same as `mfile_v_hop'. */
 	BLOCKING NONNULL((1)) syscall_slong_t
 	(KCALL *mso_hop)(struct mfile *__restrict self, syscall_ulong_t cmd,
 	                 USER UNCHECKED void *arg, iomode_t mode)
@@ -327,6 +329,14 @@ struct mfile_stream_ops {
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
+
+/* Default hop(2) operator for mfiles. (currently unconditionally,
+ * throws `E_INVALID_ARGUMENT_UNKNOWN_COMMAND', but should be used
+ * by sub-class overrides as fallback) */
+FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
+mfile_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
+            USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to

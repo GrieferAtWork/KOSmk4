@@ -144,6 +144,8 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 #define flnknode_v_changed fnode_v_changed
 #define flnknode_v_destroy fnode_v_destroy
+#define flnknode_v_ioctl   fnode_v_ioctl
+#define flnknode_v_hop     fnode_v_hop
 
 
 struct flnknode

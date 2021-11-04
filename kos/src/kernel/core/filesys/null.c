@@ -25,6 +25,7 @@
 #include <kernel/driver.h>
 #include <kernel/entropy.h>
 #include <kernel/fs/allnodes.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/null.h>
 #include <kernel/fs/ramfs.h>
@@ -165,6 +166,8 @@ PRIVATE struct mfile_stream_ops const devmem_stream_ops = {
 	.mso_pwrite  = &devmem_v_pwrite,
 	.mso_pwritev = &devmem_v_pwritev,
 	.mso_stat    = &nullfile_v_stat,
+	.mso_ioctl   = &chrdev_v_ioctl,
+	.mso_hop     = &chrdev_v_hop,
 };
 
 
@@ -244,6 +247,8 @@ PRIVATE struct mfile_stream_ops const devnull_stream_ops = {
 	.mso_pwritev = &devnull_v_pwritev,
 	.mso_seek    = &devnull_v_seek,
 	.mso_stat    = &nullfile_v_stat,
+	.mso_ioctl   = &chrdev_v_ioctl,
+	.mso_hop     = &chrdev_v_hop,
 };
 
 
@@ -318,6 +323,8 @@ PRIVATE struct mfile_stream_ops const devzero_stream_ops = {
 	.mso_pwritev = &devzero_v_pwritev,
 	.mso_seek    = &devzero_v_seek,
 	.mso_stat    = &nullfile_v_stat,
+	.mso_ioctl   = &chrdev_v_ioctl,
+	.mso_hop     = &chrdev_v_hop,
 };
 
 
@@ -374,6 +381,8 @@ PRIVATE struct mfile_stream_ops const devfull_stream_ops = {
 	.mso_pwritev = &devfull_v_pwritev,
 	.mso_seek    = &devfull_v_seek,
 	.mso_stat    = &nullfile_v_stat,
+	.mso_ioctl   = &chrdev_v_ioctl,
+	.mso_hop     = &chrdev_v_hop,
 };
 
 
@@ -440,6 +449,8 @@ PRIVATE struct mfile_stream_ops const devkmem_stream_ops = {
 	.mso_pwrite  = &devkmem_v_pwrite,
 	.mso_pwritev = &devkmem_v_pwritev,
 	.mso_stat    = &nullfile_v_stat,
+	.mso_ioctl   = &chrdev_v_ioctl,
+	.mso_hop     = &chrdev_v_hop,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -599,6 +610,8 @@ PRIVATE struct mfile_stream_ops const devport_stream_ops = {
 	.mso_pwrite  = &devport_v_pwrite,
 	.mso_pwritev = &devport_v_pwritev,
 	.mso_stat    = &nullfile_v_stat,
+	.mso_ioctl   = &chrdev_v_ioctl,
+	.mso_hop     = &chrdev_v_hop,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -739,6 +752,8 @@ PRIVATE struct mfile_stream_ops const devrandom_stream_ops = {
 	.mso_stat        = &devrandom_v_stat,
 	.mso_pollconnect = &devrandom_v_pollconnect,
 	.mso_polltest    = &devrandom_v_polltest,
+	.mso_ioctl       = &chrdev_v_ioctl,
+	.mso_hop         = &chrdev_v_hop,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -828,6 +843,8 @@ PRIVATE struct mfile_stream_ops const devurandom_stream_ops = {
 	.mso_pread  = &devurandom_v_pread,
 	.mso_preadv = &devurandom_v_preadv,
 	.mso_stat   = &nullfile_v_stat,
+	.mso_ioctl  = &chrdev_v_ioctl,
+	.mso_hop    = &chrdev_v_hop,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -899,6 +916,8 @@ PRIVATE struct mfile_stream_ops const devkmsg_stream_ops = {
 	.mso_write  = &devkmsg_v_write,
 	.mso_writev = &devkmsg_v_writev,
 	.mso_stat   = &nullfile_v_stat,
+	.mso_ioctl  = &chrdev_v_ioctl,
+	.mso_hop    = &chrdev_v_hop,
 };
 
 
@@ -1110,13 +1129,13 @@ PRIVATE struct mfile_stream_ops const devtty_stream_ops = {
 	.mso_pwrite      = &devtty_v_pwrite,
 	.mso_pwritev     = &devtty_v_pwritev,
 	.mso_seek        = &devtty_v_seek,
-	.mso_ioctl       = &devtty_v_ioctl,
 	.mso_truncate    = &devtty_v_truncate,
 	.mso_mmap        = &devtty_v_mmap,
 	.mso_allocate    = &devtty_v_allocate,
 	.mso_stat        = &devtty_v_stat,
 	.mso_pollconnect = &devtty_v_pollconnect,
 	.mso_polltest    = &devtty_v_polltest,
+	.mso_ioctl       = &devtty_v_ioctl,
 	.mso_hop         = &devtty_v_hop,
 	.mso_tryas       = &devtty_v_tryas,
 };
@@ -1140,28 +1159,24 @@ INTERN_CONST struct device_ops const dev_tty_ops = {{{
 #else /* LIBVIO_CONFIG_ENABLED */
 #define IF_VIO_ENABLED(...) /* nothing */
 #endif /* !LIBVIO_CONFIG_ENABLED */
-#define DEVICE_OPS_INIT(mo_newpart, mo_loadblocks, mo_stream, mo_vio)               \
-	{                                                                               \
-		{                                                                           \
-			{                                                                       \
-				{                                                                   \
-					(void(KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1, \
-					mo_newpart, mo_loadblocks, NULL, &device_v_changed, mo_stream,  \
-					IF_VIO_ENABLED(mo_vio)                                          \
-				},                                                                  \
-				&device_v_wrattr                                                    \
-			}                                                                       \
-		}                                                                           \
-	}
-INTERN_CONST struct device_ops const dev_mem_ops     = DEVICE_OPS_INIT(&devmem_v_newpart, NULL, &devmem_stream_ops, NULL);
-INTERN_CONST struct device_ops const dev_kmem_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmem_stream_ops, &devkmem_vio_ops);
-INTERN_CONST struct device_ops const dev_null_ops    = DEVICE_OPS_INIT(NULL, &devnull_v_loadpages, &devnull_stream_ops, NULL);
-INTERN_CONST struct device_ops const dev_port_ops    = DEVICE_OPS_INIT(NULL, NULL, &devport_stream_ops, &devport_vio_ops);
-INTERN_CONST struct device_ops const dev_zero_ops    = DEVICE_OPS_INIT(NULL, &devzero_v_loadpages, &devzero_stream_ops, NULL);
-INTERN_CONST struct device_ops const dev_full_ops    = DEVICE_OPS_INIT(NULL, &devfull_v_loadpages, &devfull_stream_ops, NULL);
-INTERN_CONST struct device_ops const dev_random_ops  = DEVICE_OPS_INIT(NULL, NULL, &devrandom_stream_ops, &devrandom_vio_ops);
-INTERN_CONST struct device_ops const dev_urandom_ops = DEVICE_OPS_INIT(NULL, NULL, &devurandom_stream_ops, &devurandom_vio_ops);
-INTERN_CONST struct device_ops const dev_kmsg_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmsg_stream_ops, NULL);
+#define DEVICE_OPS_INIT(mo_newpart, mo_loadblocks, mo_stream, mo_vio)       \
+	{{{{                                                                    \
+		{                                                                   \
+			(void(KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1, \
+			mo_newpart, mo_loadblocks, NULL, &device_v_changed, mo_stream,  \
+			IF_VIO_ENABLED(mo_vio)                                          \
+		},                                                                  \
+		&device_v_wrattr                                                    \
+	}}}}
+INTERN_CONST struct chrdev_ops const dev_mem_ops     = DEVICE_OPS_INIT(&devmem_v_newpart, NULL, &devmem_stream_ops, NULL);
+INTERN_CONST struct chrdev_ops const dev_kmem_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmem_stream_ops, &devkmem_vio_ops);
+INTERN_CONST struct chrdev_ops const dev_null_ops    = DEVICE_OPS_INIT(NULL, &devnull_v_loadpages, &devnull_stream_ops, NULL);
+INTERN_CONST struct chrdev_ops const dev_port_ops    = DEVICE_OPS_INIT(NULL, NULL, &devport_stream_ops, &devport_vio_ops);
+INTERN_CONST struct chrdev_ops const dev_zero_ops    = DEVICE_OPS_INIT(NULL, &devzero_v_loadpages, &devzero_stream_ops, NULL);
+INTERN_CONST struct chrdev_ops const dev_full_ops    = DEVICE_OPS_INIT(NULL, &devfull_v_loadpages, &devfull_stream_ops, NULL);
+INTERN_CONST struct chrdev_ops const dev_random_ops  = DEVICE_OPS_INIT(NULL, NULL, &devrandom_stream_ops, &devrandom_vio_ops);
+INTERN_CONST struct chrdev_ops const dev_urandom_ops = DEVICE_OPS_INIT(NULL, NULL, &devurandom_stream_ops, &devurandom_vio_ops);
+INTERN_CONST struct chrdev_ops const dev_kmsg_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmsg_stream_ops, NULL);
 #undef DEVICE_OPS_INIT
 #undef IF_VIO_ENABLED
 

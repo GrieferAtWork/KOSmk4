@@ -237,8 +237,10 @@ fdirnode_v_stat(struct mfile *__restrict self,
 
 /* Default stream operators for directories (using `fdirnode_v_open') */
 PUBLIC_CONST struct mfile_stream_ops const fdirnode_v_stream_ops = {
-	.mso_open = &fdirnode_v_open,
-	.mso_stat = &fdirnode_v_stat,
+	.mso_open  = &fdirnode_v_open,
+	.mso_stat  = &fdirnode_v_stat,
+	.mso_ioctl = &fdirnode_v_ioctl,
+	.mso_hop   = &fdirnode_v_hop,
 };
 
 

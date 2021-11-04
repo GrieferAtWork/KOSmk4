@@ -77,6 +77,8 @@ fsocknode_v_open(struct mfile *__restrict self,
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self);
 #define fsocknode_v_changed fnode_v_changed
+#define fsocknode_v_ioctl   fnode_v_ioctl
+#define fsocknode_v_hop     fnode_v_hop
 
 
 /* Initialize common+basic fields. The caller must still initialize:

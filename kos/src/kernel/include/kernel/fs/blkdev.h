@@ -146,6 +146,8 @@ struct blkdev
 #define blkdev_v_changed    device_v_changed
 #define blkdev_v_wrattr     device_v_wrattr
 #define blkdev_v_tryas      device_v_tryas
+#define blkdev_v_ioctl      device_v_ioctl
+#define blkdev_v_hop        device_v_hop
 #define blkdev_v_stream_ops device_v_stream_ops
 
 /* Operators used for block device partitions */

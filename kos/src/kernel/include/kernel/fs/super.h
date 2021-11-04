@@ -455,7 +455,10 @@ FUNDEF NOBLOCK NONNULL((1)) void /* `kfree(fnode_assuper(self));' */
 NOTHROW(KCALL fsuper_v_free)(struct fnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self);
-#define fsuper_v_changed fdirnode_v_changed
+#define fsuper_v_changed    fdirnode_v_changed
+#define fsuper_v_ioctl      fdirnode_v_ioctl
+#define fsuper_v_hop        fdirnode_v_hop
+#define fsuper_v_stream_ops fdirnode_v_stream_ops
 
 
 

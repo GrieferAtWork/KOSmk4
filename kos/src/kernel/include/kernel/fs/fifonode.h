@@ -201,6 +201,7 @@ ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 #define ffifonode_v_changed fnode_v_changed
+#define ffifonode_v_ioctl   fnode_v_ioctl
 
 
 /* Initialize common+basic fields. The caller must still initialize:

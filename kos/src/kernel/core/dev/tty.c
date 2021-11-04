@@ -954,9 +954,13 @@ ttydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 	syscall_slong_t result;
 	result = _ttydev_tryioctl(self, cmd, arg, mode);
 	if (result == -EINVAL) {
+#ifdef CONFIG_USE_NEW_FS
+		return chrdev_v_ioctl(self, cmd, arg, mode);
+#else /* CONFIG_USE_NEW_FS */
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
 		      cmd);
+#endif /* !CONFIG_USE_NEW_FS */
 	}
 	return result;
 }

@@ -31,6 +31,7 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 
 #include <kernel/driver.h>
 #include <kernel/fs/allnodes.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/null.h>
 #include <kernel/fs/ramfs.h>
@@ -203,7 +204,7 @@ print("DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, ", byNameTree.value.val, ")
 
 // Print device objects
 for (local name, none, none: DEVICES)
-	print("INTDEF struct device_ops const dev_", name, "_ops;");
+	print("INTDEF struct chrdev_ops const dev_", name, "_ops;");
 
 for (local name, st_mode, st_rdev: DEVICES) {
 	local byNameNode = rbtree.locate(byNameTree.value, name);
@@ -222,7 +223,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("		.dn_node = {");
 	print("			.fn_file = {");
 	print("				MFILE_INIT_mf_refcnt(2), /" "* +1: dev_", name, ", +1: MFILE_FN_GLOBAL_REF *" "/");
-	print("				MFILE_INIT_mf_ops(&dev_", name, "_ops.do_node.dno_node.no_file),");
+	print("				MFILE_INIT_mf_ops(&dev_", name, "_ops.cdo_dev.do_node.dno_node.no_file),");
 	print("				MFILE_INIT_mf_lock,");
 	print("				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),");
 	print("				MFILE_INIT_mf_initdone,");
@@ -418,16 +419,16 @@ DEFINE_INTERN_ALIAS(_fallnodes_list__INIT, dev_mem);
 __SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_random),
              DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_random));
 DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, dev_port);
-INTDEF struct device_ops const dev_mem_ops;
-INTDEF struct device_ops const dev_kmem_ops;
-INTDEF struct device_ops const dev_null_ops;
-INTDEF struct device_ops const dev_port_ops;
-INTDEF struct device_ops const dev_zero_ops;
-INTDEF struct device_ops const dev_full_ops;
-INTDEF struct device_ops const dev_random_ops;
-INTDEF struct device_ops const dev_urandom_ops;
-INTDEF struct device_ops const dev_kmsg_ops;
-INTDEF struct device_ops const dev_tty_ops;
+INTDEF struct chrdev_ops const dev_mem_ops;
+INTDEF struct chrdev_ops const dev_kmem_ops;
+INTDEF struct chrdev_ops const dev_null_ops;
+INTDEF struct chrdev_ops const dev_port_ops;
+INTDEF struct chrdev_ops const dev_zero_ops;
+INTDEF struct chrdev_ops const dev_full_ops;
+INTDEF struct chrdev_ops const dev_random_ops;
+INTDEF struct chrdev_ops const dev_urandom_ops;
+INTDEF struct chrdev_ops const dev_kmsg_ops;
+INTDEF struct chrdev_ops const dev_tty_ops;
 
 /* Device: `/dev/mem' */
 PUBLIC struct device dev_mem = {
@@ -435,7 +436,7 @@ PUBLIC struct device dev_mem = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_mem, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_mem_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_mem_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -486,7 +487,7 @@ PUBLIC struct device dev_kmem = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_kmem, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_kmem_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_kmem_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -537,7 +538,7 @@ PUBLIC struct device dev_null = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_null, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_null_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_null_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -588,7 +589,7 @@ PUBLIC struct device dev_port = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_port, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_port_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_port_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -639,7 +640,7 @@ PUBLIC struct device dev_zero = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_zero, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_zero_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_zero_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -689,7 +690,7 @@ PUBLIC struct device dev_full = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_full, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_full_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_full_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -741,7 +742,7 @@ PUBLIC struct device dev_random = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_random, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_random_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_random_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -792,7 +793,7 @@ PUBLIC struct device dev_urandom = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_urandom, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_urandom_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_urandom_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -844,7 +845,7 @@ PUBLIC struct device dev_kmsg = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_kmsg, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_kmsg_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_kmsg_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -896,7 +897,7 @@ PUBLIC struct device dev_tty = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_tty, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_tty_ops.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_tty_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,

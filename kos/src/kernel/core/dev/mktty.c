@@ -401,11 +401,12 @@ typedef poll_mode_t (KCALL *phandle_polltest_function_t)(void *__restrict ptr, p
 PRIVATE struct mfile_stream_ops const mktty_stream_ops = {
 	.mso_read        = &ttydev_v_read,
 	.mso_write       = &ttydev_v_write,
-	.mso_ioctl       = &mkttydev_v_ioctl,
 	.mso_mmap        = &mkttydev_v_mmap,
 	.mso_stat        = &ttydev_v_stat,
 	.mso_pollconnect = &mkttydev_v_pollconnect,
 	.mso_polltest    = &mkttydev_v_polltest,
+	.mso_ioctl       = &mkttydev_v_ioctl,
+	.mso_hop         = &ttydev_v_hop,
 	.mso_tryas       = &ttydev_v_tryas,
 };
 

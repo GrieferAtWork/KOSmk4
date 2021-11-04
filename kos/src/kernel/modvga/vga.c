@@ -1491,8 +1491,9 @@ VGA_SetPal(struct videodev *__restrict self,
 #ifdef CONFIG_USE_NEW_FS
 PRIVATE struct mfile_stream_ops const vga_stream_operators = {
 	.mso_write = &videodev_v_write,
-	.mso_ioctl = &VGA_Ioctl,
 	.mso_mmap  = &VGA_MMap,
+	.mso_ioctl = &VGA_Ioctl,
+	.mso_hop   = &videodev_v_hop,
 	.mso_tryas = &videodev_v_tryas,
 };
 PRIVATE struct videodev_ops const vga_operators = {

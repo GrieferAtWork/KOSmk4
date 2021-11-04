@@ -138,6 +138,8 @@ DECL_BEGIN
 /* Common operators for all per-process files. */
 #define procfs_perproc_v_changed fnode_v_changed
 #define procfs_perproc_v_wrattr  fnode_v_wrattr_noop
+#define procfs_perproc_v_ioctl   fnode_v_ioctl
+#define procfs_perproc_v_hop     fnode_v_hop
 #define procfs_perproc_v_free    (*((void(KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1))
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
@@ -213,15 +215,23 @@ procfs_perproc_lnknode_v_stat(struct mfile *__restrict self,
 	result->st_blocks = CEILDIV(lnksize, PAGESIZE);
 	result->st_size   = lnksize;
 }
+#define procfs_perproc_lnknode_v_ioctl   flnknode_v_ioctl
+#define procfs_perproc_lnknode_v_hop     flnknode_v_hop
+#define procfs_perproc_printnode_v_ioctl printnode_v_ioctl
+#define procfs_perproc_printnode_v_hop   printnode_v_hop
 
 INTERN_CONST struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops = {
-	.mso_stat = &procfs_perproc_lnknode_v_stat,
+	.mso_stat  = &procfs_perproc_lnknode_v_stat,
+	.mso_ioctl = &procfs_perproc_lnknode_v_ioctl,
+	.mso_hop   = &procfs_perproc_lnknode_v_hop,
 };
 
 INTERN_CONST struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops = {
 	.mso_pread  = &printnode_v_pread,
 	.mso_preadv = &printnode_v_preadv,
 	.mso_stat   = &procfs_perproc_printnode_v_stat,
+	.mso_ioctl  = &procfs_perproc_printnode_v_ioctl,
+	.mso_hop    = &procfs_perproc_printnode_v_hop,
 };
 
 /* Operators for per-process directories */
@@ -229,11 +239,15 @@ INTERN_CONST struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops
 #define procfs_perproc_dir_v_destroy procfs_perproc_v_destroy
 #define procfs_perproc_dir_v_changed procfs_perproc_v_changed
 #define procfs_perproc_dir_v_wrattr  procfs_perproc_v_wrattr
+#define procfs_perproc_dir_v_open    fdirnode_v_open
+#define procfs_perproc_dir_v_ioctl   fdirnode_v_ioctl
+#define procfs_perproc_dir_v_hop     fdirnode_v_hop
 INTERN_CONST struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops = {
-	.mso_open = &fdirnode_v_open,
-	.mso_stat = &procfs_perproc_dir_v_stat,
+	.mso_open  = &procfs_perproc_dir_v_open,
+	.mso_stat  = &procfs_perproc_dir_v_stat,
+	.mso_ioctl = &procfs_perproc_dir_v_ioctl,
+	.mso_hop   = &procfs_perproc_dir_v_hop,
 };
-#define procfs_perproc_dir_v_open fdirnode_v_open
 
 
 

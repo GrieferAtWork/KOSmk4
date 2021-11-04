@@ -108,6 +108,8 @@ struct fregnode
 /* Default operators for `struct fdirnode_ops' */
 #define fregnode_v_destroy fnode_v_destroy
 #define fregnode_v_changed fnode_v_changed
+#define fregnode_v_ioctl   fnode_v_ioctl
+#define fregnode_v_hop     fnode_v_hop
 
 
 DECL_END

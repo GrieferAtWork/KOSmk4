@@ -1511,9 +1511,13 @@ continue_copy_keymap:
 	 *       had to be freshly cached then (the ones that weren't) */
 
 	default:
+#ifdef CONFIG_USE_NEW_FS
+		return chrdev_v_ioctl(me, cmd, arg, mode);
+#else /* CONFIG_USE_NEW_FS */
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
 		      cmd);
+#endif /* !CONFIG_USE_NEW_FS */
 		break;
 	}
 	return 0;
@@ -1532,10 +1536,11 @@ NOTHROW(KCALL kbddev_v_destroy)(struct mfile *__restrict self) {
 /* Default set of stream operators for keyboard devices (s.a.: the operators above) */
 PUBLIC_CONST struct mfile_stream_ops const kbddev_v_stream_ops = {
 	.mso_read        = &kbddev_v_read,
-	.mso_ioctl       = &kbddev_v_ioctl,
 	.mso_stat        = &kbddev_v_stat,
 	.mso_pollconnect = &kbddev_v_pollconnect,
 	.mso_polltest    = &kbddev_v_polltest,
+	.mso_ioctl       = &kbddev_v_ioctl,
+	.mso_hop         = &kbddev_v_hop,
 	.mso_tryas       = &kbddev_v_tryas,
 };
 

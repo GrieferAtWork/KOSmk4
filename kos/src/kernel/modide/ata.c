@@ -1111,6 +1111,8 @@ AtaDrive_Sync(struct mfile *__restrict self)
 }
 
 PRIVATE struct mfile_stream_ops const atadrive_v_stream_ops = {
+	.mso_ioctl = &blkdev_v_ioctl,
+	.mso_hop   = &blkdev_v_hop,
 	.mso_tryas = &blkdev_v_tryas,
 	.mso_sync  = &AtaDrive_Sync,
 };

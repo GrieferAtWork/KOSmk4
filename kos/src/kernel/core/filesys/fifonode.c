@@ -42,6 +42,7 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -312,10 +313,10 @@ ffifonode_v_stat(struct mfile *__restrict self,
 }
 
 INTDEF syscall_slong_t KCALL /* From "pipe.c" */
-ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
-                    syscall_ulong_t cmd,
-                    USER UNCHECKED void *arg,
-                    iomode_t mode);
+_ringbuffer_pipe_tryhop(struct ringbuffer *__restrict self,
+                        syscall_ulong_t cmd,
+                        USER UNCHECKED void *arg,
+                        iomode_t mode);
 
 /* Implements some `HOP_PIPE_OPEN_*' commands */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
@@ -358,8 +359,14 @@ ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 	default:
 		break;
 	}
-	/* Execute generic pipe-HOPs on our ring-buffer. */
-	return ringbuffer_pipe_hop(&me->ff_buffer, cmd, arg, mode);
+	{
+		syscall_slong_t result;
+		/* Execute generic pipe-HOPs on our ring-buffer. */
+		result = _ringbuffer_pipe_tryhop(&me->ff_buffer, cmd, arg, mode);
+		if (result != -EINVAL)
+			return result;
+	}
+	return fnode_v_hop(me, cmd, arg, mode);
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void

@@ -106,7 +106,9 @@ PUBLIC_CONST struct fregnode_ops const ramfs_regnode_ops = {
 };
 
 PRIVATE struct mfile_stream_ops const ramfs_devnode_v_stream_ops = {
-	.mso_open = &ramfs_devnode_v_open,
+	.mso_open  = &ramfs_devnode_v_open,
+	.mso_ioctl = &ramfs_devnode_v_ioctl,
+	.mso_hop   = &ramfs_devnode_v_hop,
 };
 PUBLIC_CONST struct fdevnode_ops const ramfs_devnode_ops = {
 	.dno_node = {
@@ -128,6 +130,7 @@ PRIVATE struct mfile_stream_ops const ramfs_fifonode_v_stream_ops = {
 	.mso_writev   = &ramfs_fifonode_v_writev,
 	.mso_truncate = &ramfs_fifonode_v_truncate,
 	.mso_stat     = &ramfs_fifonode_v_stat,
+	.mso_ioctl    = &ramfs_fifonode_v_ioctl,
 	.mso_hop      = &ramfs_fifonode_v_hop,
 };
 PUBLIC_CONST struct ffifonode_ops const ramfs_fifonode_ops = {
@@ -143,7 +146,9 @@ PUBLIC_CONST struct ffifonode_ops const ramfs_fifonode_ops = {
 
 
 PRIVATE struct mfile_stream_ops const ramfs_socknode_v_stream_ops = {
-	.mso_open = &ramfs_socknode_v_open,
+	.mso_open  = &ramfs_socknode_v_open,
+	.mso_ioctl = &ramfs_socknode_v_ioctl,
+	.mso_hop   = &ramfs_socknode_v_hop,
 };
 PUBLIC_CONST struct fsocknode_ops const ramfs_socknode_ops = {
 	.suno_node = {

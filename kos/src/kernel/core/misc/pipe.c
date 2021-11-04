@@ -178,10 +178,10 @@ ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
 }
 
 INTERN syscall_slong_t KCALL
-ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
-                    syscall_ulong_t cmd,
-                    USER UNCHECKED void *arg,
-                    iomode_t mode) {
+_ringbuffer_pipe_tryhop(struct ringbuffer *__restrict self,
+                        syscall_ulong_t cmd,
+                        USER UNCHECKED void *arg,
+                        iomode_t mode) {
 	switch (cmd) {
 
 	case HOP_PIPE_STAT: {
@@ -448,9 +448,17 @@ handle_pipe_hop(struct pipe *__restrict self,
 		return result;
 	}	break;
 
-	default:
+	default: {
 		/* Execute generic pipe-HOPs on our ring-buffer. */
-		return ringbuffer_pipe_hop(&self->p_buffer, cmd, arg, mode);
+		syscall_slong_t result;
+		result = _ringbuffer_pipe_tryhop(&self->p_buffer, cmd, arg, mode);
+		if (result == -EINVAL) {
+			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+			      cmd);
+		}
+		return result;
+	}	break;
 	}
 	return 0;
 }

@@ -372,6 +372,8 @@ NOTHROW(KCALL flatdirnode_v_destroy)(struct mfile *__restrict self);
 #define flatdirnode_v_open       fdirnode_v_open
 #define flatdirnode_v_stat       fdirnode_v_stat
 #define flatdirnode_v_changed    fdirnode_v_changed
+#define flatdirnode_v_ioctl      fdirnode_v_ioctl
+#define flatdirnode_v_hop        fdirnode_v_hop
 #define flatdirnode_v_stream_ops fdirnode_v_stream_ops
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 flatdirnode_v_lookup(struct fdirnode *__restrict self,
@@ -706,6 +708,11 @@ FUNDEF NOBLOCK NONNULL((1)) void /* `kfree(fnode_asflatsuper(self));' */
 NOTHROW(KCALL flatsuper_v_free)(struct fnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL flatsuper_v_destroy)(struct mfile *__restrict self);
+#define flatsuper_v_ioctl      fsuper_v_ioctl
+#define flatsuper_v_open       flatdirnode_v_open
+#define flatsuper_v_stat       flatdirnode_v_stat
+#define flatsuper_v_hop        fsuper_v_hop
+#define flatsuper_v_stream_ops fsuper_v_stream_ops
 
 
 

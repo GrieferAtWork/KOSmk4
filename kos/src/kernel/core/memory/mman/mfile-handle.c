@@ -174,6 +174,23 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	return 0;
 }
 
+/* Default hop(2) operator for mfiles. (currently unconditionally,
+ * throws `E_INVALID_ARGUMENT_UNKNOWN_COMMAND', but should be used
+ * by sub-class overrides as fallback) */
+PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
+mfile_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
+            USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	/* TODO: Default HOP operations. */
+	(void)self;
+	(void)arg;
+	(void)mode;
+	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+	      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
+	      cmd);
+}
+
+
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
  * be dispatched via `mfile_upread()' and `mfile_upwrite()' (which uses the `mso_pread'
  * and `mso_pwrite' operators, with `mfile_read()' and `mfile_write()' as fallback, so-
@@ -933,15 +950,15 @@ handle_mfile_hop(struct mfile *__restrict self,
                  syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
-	/* TODO: Default HOP operations. */
-
-	/* Check for a custom HOP override. */
-	stream = self->mf_ops->mo_stream;
+	BLOCKING NONNULL((1)) syscall_slong_t
+	(KCALL *mso_hop)(struct mfile *__restrict self, syscall_ulong_t cmd,
+	                 USER UNCHECKED void *arg, iomode_t mode)
+			THROWS(...);
+	mso_hop = &mfile_v_hop;
+	stream  = self->mf_ops->mo_stream;
 	if (stream && stream->mso_hop)
-		return (*stream->mso_hop)(self, cmd, arg, mode);
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-	      cmd);
+		mso_hop = stream->mso_hop; /* Custom HOP override. */
+	return (*mso_hop)(self, cmd, arg, mode);
 }
 
 INTERN BLOCKING NONNULL((1)) REF void *KCALL

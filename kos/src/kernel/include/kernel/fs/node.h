@@ -452,6 +452,8 @@ NOTHROW(KCALL fnode_v_changed)(struct mfile *__restrict self,
  * sub-class destroy-operator. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self);
+#define fnode_v_ioctl mfile_v_ioctl
+#define fnode_v_hop   mfile_v_hop
 
 
 /* High-level file-node functions */

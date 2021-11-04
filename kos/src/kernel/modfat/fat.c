@@ -1802,11 +1802,57 @@ FatDir_DirentChanged(struct fnode *__restrict self,
 }
 
 
+/************************************************************************/
+/* FAT ioctl(2) integration                                             */
+/************************************************************************/
+PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
+Fat_Ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+          USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	struct fnode *me = mfile_asnode(self);
+	switch (cmd) {
+
+		/* TODO: Fat-specific IOCTLs (yes: those exist!) */
+
+	default: {
+		BLOCKING NONNULL((1)) syscall_slong_t
+		(KCALL *super_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
+		                     USER UNCHECKED void *arg, iomode_t mode)
+				THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
+		if (fnode_isdir(me)) {
+			super_ioctl = &flatdirnode_v_ioctl;
+			if (fnode_issuper(me))
+				super_ioctl = &flatsuper_v_ioctl;
+		} else if (fnode_isreg(me)) {
+			super_ioctl = &fregnode_v_ioctl;
+		} else
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+		if (fnode_islnk(me)) {
+			super_ioctl = &flnknode_v_ioctl;
+		} else
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+		{
+			super_ioctl = &fnode_v_ioctl;
+		}
+		return (*super_ioctl)(me, cmd, arg, mode);
+	}	break;
+	}
+	return 0;
+}
+
+
+
 
 
 /************************************************************************/
 /* FAT operator tables.                                                 */
 /************************************************************************/
+PRIVATE struct mfile_stream_ops const FatReg_StreamOps = {
+	/* TODO: Truncate operator (call the underlying truncate before freeing out-of-bounds clusters) */
+	.mso_ioctl = &Fat_Ioctl,
+	.mso_hop   = &fregnode_v_hop,
+};
+
 PRIVATE struct fregnode_ops const Fat_RegOps = {
 	.rno_node = {
 		.no_file = {
@@ -1814,11 +1860,17 @@ PRIVATE struct fregnode_ops const Fat_RegOps = {
 			.mo_loadblocks = &Fat_LoadBlocks,
 			.mo_saveblocks = &Fat_SaveBlocks,
 			.mo_changed    = &fregnode_v_changed,
-			.mo_stream     = NULL,
-			/* TODO: Truncate operator (call the underlying truncate before freeing out-of-bounds clusters) */
+			.mo_stream     = &FatReg_StreamOps,
 		},
 		.no_wrattr = &Fat_WrAttr,
 	},
+};
+
+PRIVATE struct mfile_stream_ops const FatDir_StreamOps = {
+	.mso_open  = &flatdirnode_v_open,
+	.mso_stat  = &flatdirnode_v_stat,
+	.mso_ioctl = &Fat_Ioctl,
+	.mso_hop   = &flatdirnode_v_hop,
 };
 PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 	.fdno_dir = {
@@ -1828,7 +1880,7 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 				.mo_loadblocks = &Fat_LoadBlocks,
 				.mo_saveblocks = &Fat_SaveBlocks,
 				.mo_changed    = &flatdirnode_v_changed,
-				.mo_stream     = &flatdirnode_v_stream_ops,
+				.mo_stream     = &FatDir_StreamOps,
 			},
 			.no_wrattr = &Fat_WrAttr,
 		},
@@ -1851,7 +1903,9 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 };
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 PRIVATE struct mfile_stream_ops const Fat_LnkStreamOps = {
-	.mso_stat = &FatLnk_Stat,
+	.mso_stat  = &FatLnk_Stat,
+	.mso_ioctl = &Fat_Ioctl,
+	.mso_hop   = &flnknode_v_hop,
 };
 PRIVATE struct flnknode_ops const Fat_LnkOps = {
 	.lno_node = {
@@ -1859,7 +1913,7 @@ PRIVATE struct flnknode_ops const Fat_LnkOps = {
 			.mo_destroy    = &FatLnk_Destroy,
 			.mo_loadblocks = &Fat_LoadBlocks,
 			.mo_saveblocks = &Fat_SaveBlocks,
-			.mo_changed    = &fnode_v_changed,
+			.mo_changed    = &flnknode_v_changed,
 			.mo_stream     = &Fat_LnkStreamOps,
 		},
 		.no_wrattr = &Fat_WrAttr,
@@ -2205,7 +2259,7 @@ PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 					.mo_loadblocks = &Fat16Root_LoadBlocks,
 					.mo_saveblocks = &Fat16Root_SaveBlocks,
 					.mo_changed    = &fsuper_v_changed,
-					.mo_stream     = &flatdirnode_v_stream_ops,
+					.mo_stream     = &FatDir_StreamOps,
 				},
 				.no_free   = &FatSuper_Free,
 				.no_wrattr = &fnode_v_wrattr_noop,
@@ -2243,7 +2297,7 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 					.mo_loadblocks = &Fat_LoadBlocks,
 					.mo_saveblocks = &Fat_SaveBlocks,
 					.mo_changed    = &fsuper_v_changed,
-					.mo_stream     = &flatdirnode_v_stream_ops,
+					.mo_stream     = &FatDir_StreamOps,
 				},
 				.no_free   = &FatSuper_Free,
 				.no_wrattr = &fnode_v_wrattr_noop,

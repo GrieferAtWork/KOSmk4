@@ -252,6 +252,8 @@ NOTHROW(KCALL nicdev_v_destroy)(struct mfile *__restrict self);
 #define nicdev_v_changed chrdev_v_changed
 #define nicdev_v_wrattr  chrdev_v_wrattr
 #define nicdev_v_tryas   chrdev_v_tryas
+#define nicdev_v_ioctl   chrdev_v_ioctl
+#define nicdev_v_hop     chrdev_v_hop
 DATDEF struct mfile_stream_ops const nicdev_v_stream_ops;
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This write operator is _MANDATORY_ and may not be overwritten by sub-classes! */
 nicdev_v_write(struct mfile *__restrict self,
