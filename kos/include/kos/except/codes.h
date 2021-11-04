@@ -537,6 +537,9 @@
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_MOUNT_BIND
 #define E_FILESYSTEM_NOT_A_DIRECTORY_MOUNT_BIND 6 /* `mount(2)' with MS_BIND was given a non-directory. */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_MOUNT_BIND */
+#ifndef E_FILESYSTEM_NOT_A_DIRECTORY_IOCTL
+#define E_FILESYSTEM_NOT_A_DIRECTORY_IOCTL   7 /* The specific `ioctl(2)' command cannot be used on a non-directory. */
+#endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_IOCTL */
 
 /* SPLIT: All error codes above should be interpreted as  FILE-NOT-FOUND
  *        in situations where a list of paths is searched for a specific

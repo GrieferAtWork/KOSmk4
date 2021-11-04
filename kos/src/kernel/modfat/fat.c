@@ -29,6 +29,7 @@
 
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/driver-callbacks.h>
+#include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
@@ -42,6 +43,7 @@
 #include <kernel/mman/map.h>
 #include <kernel/mman/phys.h>
 #include <kernel/printk.h>
+#include <kernel/user.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -51,10 +53,14 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/dev.h>
 #include <kos/except.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/inval.h>
 #include <linux/magic.h>
+#include <linux/msdos_fs.h>
 #include <sys/stat.h>
 
 #include <alloca.h>
@@ -749,7 +755,7 @@ again:
 
 		/* Implement the read-only attribute. */
 		if (!(fmode & 0222))
-			ent->fad_dos.f_attr |= FAT_ATTR_READONLY;
+			ent->fad_dos.f_attr |= FATATTR_RO;
 
 		if (super->ft_features & FAT_FEATURE_UGID) {
 			/* UID/GID support */
@@ -765,7 +771,7 @@ again:
 		FatFileCTime_Encode(&ent->fad_dos.f_ctime, &ctm);
 
 		/* Set the ARCHIVE flag to indicate a file that has been modified. */
-		ent->fad_dos.f_attr |= FAT_ATTR_ARCHIVE;
+		ent->fad_dos.f_attr |= FATATTR_ARCH;
 
 		/* Write `ent->fad_dos' back into the directory stream. */
 		mfile_write(dir, &ent->fad_dos, sizeof(struct fat_dirent),
@@ -876,7 +882,7 @@ readnext:
 	}
 
 	/* Check for LFN entries. */
-	if (ent.f_attr == FAT_ATTR_LONGFILENAME) {
+	if (ent.f_attr == FATATTR_LFN) {
 		char lfn_name[LFN_SEQNUM_MAXCOUNT * UNICODE_16TO8_MAXBUF(LFN_NAME)];
 		u32 lfn_valid   = 0;
 		pos_t lfn_start = pos;
@@ -925,7 +931,7 @@ readnext:
 			 * with end-of-directory inside of LFN sequence. */
 			if unlikely(ent.f_marker == MARKER_DIREND)
 				return NULL;
-		} while (ent.f_attr == FAT_ATTR_LONGFILENAME);
+		} while (ent.f_attr == FATATTR_LFN);
 
 		if unlikely(lfn_valid & (lfn_valid + 1)) {
 			/* `lfn_valid' isn't  a complete  mask.  (some part  of  the
@@ -1065,14 +1071,14 @@ dos_8dot3:
 	/* Fill in generic fields. */
 	result->fad_ent.fde_ent.fd_ops = &fatdirent_ops;
 	memcpy(&result->fad_dos, &ent, sizeof(struct fat_dirent));
-	if (ent.f_attr & FAT_ATTR_DIRECTORY) {
+	if (ent.f_attr & FATATTR_DIR) {
 		result->fad_ent.fde_ent.fd_type = DT_DIR;
 	} else {
 		result->fad_ent.fde_ent.fd_type = DT_REG;
 
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 		/* Check if this is actually a symbolic link. */
-		if ((ent.f_attr & FAT_ATTR_SYSTEM) &&
+		if ((ent.f_attr & FATATTR_SYS) &&
 		    LETOH32(ent.f_size) >= FAT_SYMLINK_FILE_MINSIZE) {
 			FatSuperblock *super = fsuper_asfat(me->fn_super);
 			if (!(super->ft_features & FAT_FEATURE_NO_CYGWIN_SYMLINK)) {
@@ -1114,12 +1120,12 @@ PRIVATE struct fat_dirent const new_directory_pattern[3] = {
 	[0] = { /* '.' */
 		{{{{{.f_name    = { '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ' }},
 			.f_ext     = { ' ', ' ', ' ' }}},
-			.f_attr    = FAT_ATTR_DIRECTORY,
+			.f_attr    = FATATTR_DIR,
 			.f_ntflags = NTFLAG_NONE }}},
 	[1] = { /* '..' */
 		{{{{{.f_name    = { '.', '.', ' ', ' ', ' ', ' ', ' ', ' ' }},
 			.f_ext      = { ' ', ' ', ' ' }}},
-			.f_attr     = FAT_ATTR_DIRECTORY,
+			.f_attr     = FATATTR_DIR,
 			.f_ntflags  = NTFLAG_NONE }}},
 	[2] = {{{{{{ .f_marker  = MARKER_DIREND }}}}}}
 #endif /* !__INTELLISENSE__ */
@@ -1229,11 +1235,11 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 	/* Construct the DOS 8.3 directory entry. */
 	memset(ent->fad_dos.f_nameext, ' ', sizeof(ent->fad_dos.f_nameext));
 	ent->fad_dos.f_ntflags = NTFLAG_NONE;
-	ent->fad_dos.f_attr    = FAT_ATTR_ARCHIVE;
+	ent->fad_dos.f_attr    = FATATTR_ARCH;
 	if (fnode_isdir(file))
-		ent->fad_dos.f_attr |= FAT_ATTR_DIRECTORY;
+		ent->fad_dos.f_attr |= FATATTR_DIR;
 	if (ent->fad_ent.fde_ent.fd_name[0] == '.')
-		ent->fad_dos.f_attr |= FAT_ATTR_HIDDEN;
+		ent->fad_dos.f_attr |= FATATTR_HIDDEN;
 	mfile_tslock_acquire(file);
 	if (super->ft_features & FAT_FEATURE_UGID) {
 		ent->fad_dos.f_uid = (u8)file->fn_uid;
@@ -1247,7 +1253,7 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 	mfile_tslock_release(file);
 
 	if (!(fmode & 0222))
-		ent->fad_dos.f_attr |= FAT_ATTR_READONLY;
+		ent->fad_dos.f_attr |= FATATTR_RO;
 	first_cluster = file->fn_fsdata->fn_clusterv[0];
 	ent->fad_dos.f_clusterlo = HTOLE16(first_cluster & 0xffff);
 	if (super->ft_features & FAT_FEATURE_ARB) {
@@ -1476,7 +1482,7 @@ retry_lfn:
 			memcpyw(files[i].lfn_name_2, &lfn_name[offset + LFN_NAME1], LFN_NAME2);
 			memcpyw(files[i].lfn_name_3, &lfn_name[offset + LFN_NAME1 + LFN_NAME2], LFN_NAME3);
 			files[i].lfn_seqnum = LFN_SEQNUM_MIN + (u8)seqnum;
-			files[i].lfn_attr   = FAT_ATTR_LONGFILENAME;
+			files[i].lfn_attr   = FATATTR_LFN;
 			files[i].lfn_type   = 0;
 			files[i].lfn_clus   = (le16)0;
 			files[i].lfn_csum   = checksum;
@@ -1812,13 +1818,108 @@ Fat_Ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	struct fnode *me = mfile_asnode(self);
 	switch (cmd) {
 
-		/* TODO: Fat-specific IOCTLs (yes: those exist!) */
+	case FAT_IOCTL_GET_ATTRIBUTES: {
+		u8 attr;
+		struct fatdirent *ent;
+		FatNodeData *dat = me->fn_fsdata;
+		validate_writable(arg, sizeof(u32));
+		mfile_tslock_acquire(me);
+		ent = dat->fn_ent;
+		if unlikely(!ent) {
+			mfile_tslock_release_br(me);
+			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+		}
+		/* Read attributes. */
+		attr = ent->fad_dos.f_attr;
+		mfile_tslock_release(me);
+		UNALIGNED_SET32((USER CHECKED u32 *)arg, attr);
+	}	break;
+
+	case FAT_IOCTL_SET_ATTRIBUTES: {
+		struct fatdirent *ent;
+		FatNodeData *dat = me->fn_fsdata;
+		REF FatDirNode *dir;
+		u32 newflags;
+		validate_readable(arg, sizeof(u32));
+		newflags = UNALIGNED_GET32((u32 const *)arg);
+		VALIDATE_FLAGSET(newflags,
+		                 FATATTR_RO | FATATTR_HIDDEN | FATATTR_SYS |
+		                 FATATTR_VOLUME | FATATTR_DIR | FATATTR_ARCH,
+		                 E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR);
+		if unlikely((newflags & FATATTR_LFN) == FATATTR_LFN) {
+			THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+			      E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR,
+			      newflags, FATATTR_LFN, FATATTR_LFN);
+		}
+
+		/* In order to change attributes, the calling thread
+		 * needs write-access to the containing directory. */
+		mfile_tslock_acquire(me);
+		dir = dat->fn_dir;
+		xincref(dir);
+		mfile_tslock_release(me);
+		if unlikely(!dir)
+			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+		{
+			FINALLY_DECREF_UNLIKELY(dir);
+			fnode_access(dir, W_OK);
+		}
+
+		mfile_tslock_acquire(me);
+		ent = dat->fn_ent;
+		if unlikely(!ent) {
+			mfile_tslock_release_br(me);
+			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+		}
+
+		/* Check if it's even possible to change attributes. */
+		if unlikely((me->mf_flags & MFILE_FN_ATTRREADONLY) ||
+		            me->fn_super->fs_root.mf_flags & MFILE_F_READONLY ||
+		            me->fn_super->fs_dev->mf_flags & MFILE_F_READONLY) {
+			mfile_tslock_release_br(me);
+			THROW(E_FSERROR_READONLY);
+		}
+
+		/* Check if the caller is trying to change `ATTR_VOLUME' or `ATTR_DIR' */
+		if unlikely((newflags & (FATATTR_VOLUME | FATATTR_DIR)) !=
+		            (ent->fad_dos.f_attr & (FATATTR_VOLUME | FATATTR_DIR))) {
+			u8 oldflags = ent->fad_dos.f_attr;
+			mfile_tslock_release_br(me);
+			THROW(E_INVALID_ARGUMENT_RESERVED_FLAG,
+			      E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR,
+			      newflags, FATATTR_VOLUME | FATATTR_DIR,
+			      (oldflags & (FATATTR_VOLUME | FATATTR_DIR)));
+		}
+
+		/* Set attributes. */
+		ent->fad_dos.f_attr = (u8)newflags;
+		mfile_tslock_release(me);
+
+		/* Mark file attributes as having changed. */
+		mfile_changed(me, MFILE_F_ATTRCHANGED);
+	}	break;
+
+	case FAT_IOCTL_GET_VOLUME_ID: {
+		FatSuperblock *super = fsuper_asfat(me->fn_super);
+		validate_writable(arg, sizeof(u32));
+		UNALIGNED_SET32((USER CHECKED u32 *)arg, super->ft_volid);
+	}	break;
+
+	case VFAT_IOCTL_READDIR_BOTH:
+	case VFAT_IOCTL_READDIR_SHORT:
+		/* As documented  these  throw  not-a-directory  when
+		 * attempting to use them without an offset-argument. */
+		THROW(E_FSERROR_NOT_A_DIRECTORY,
+		      E_FILESYSTEM_NOT_A_DIRECTORY_IOCTL);
+		break;
 
 	default: {
 		BLOCKING NONNULL((1)) syscall_slong_t
 		(KCALL *super_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
 		                     USER UNCHECKED void *arg, iomode_t mode)
 				THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
+
+		/* Invoke the super-type's ioctl() operator. */
 		if (fnode_isdir(me)) {
 			super_ioctl = &flatdirnode_v_ioctl;
 			if (fnode_issuper(me))
@@ -1836,6 +1937,7 @@ Fat_Ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		}
 		return (*super_ioctl)(me, cmd, arg, mode);
 	}	break;
+
 	}
 	return 0;
 }
@@ -1885,7 +1987,7 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 			.no_wrattr = &Fat_WrAttr,
 		},
 		.dno_lookup = &flatdirnode_v_lookup,
-		.dno_enum   = &flatdirnode_v_enum,
+		.dno_enum   = &flatdirnode_v_enum, /* TODO: Custom override so we can implement `deo_ioctl' for `VFAT_IOCTL_READDIR_(BOTH|SHORT)' */
 		.dno_mkfile = &flatdirnode_v_mkfile,
 		.dno_unlink = &flatdirnode_v_unlink,
 		.dno_rename = &flatdirnode_v_rename,
@@ -2156,7 +2258,7 @@ FatSuper_MakeNode(struct flatsuper *__restrict self,
 	}
 
 	/* Implement the read-only attribute via unix permissions. */
-	if (ent->fad_dos.f_attr & FAT_ATTR_READONLY)
+	if (ent->fad_dos.f_attr & FATATTR_RO)
 		result->fn_mode &= ~0222;
 
 	/* FAT files always have exactly 1 link (unless they've been deleted) */
@@ -2718,6 +2820,8 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		result->ft_super.ffs_super.fs_root.mf_atime              = realtime();
 		result->ft_super.ffs_super.fs_root.mf_mtime              = result->ft_super.ffs_super.fs_root.mf_atime;
 		result->ft_super.ffs_super.fs_root.mf_ctime              = result->ft_super.ffs_super.fs_root.mf_atime;
+		result->ft_fdat.fn_ent                                   = NULL;
+		result->ft_fdat.fn_dir                                   = NULL;
 
 		/* Special case for when uid/gid support is available. */
 		if (result->ft_features & FAT_FEATURE_UGID) {

@@ -305,7 +305,7 @@ do_normal_seek:
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_dirhandle_ioctl(struct dirhandle *__restrict self, syscall_ulong_t cmd,
                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	return mfile_uioctl(self->dh_enum.de_dir, cmd, arg, mode);
+	return fdirenum_ioctl(&self->dh_enum, cmd, arg, mode);
 }
 
 INTERN BLOCKING NONNULL((1)) void KCALL

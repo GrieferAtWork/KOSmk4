@@ -975,10 +975,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * - FS_IOC_GETFSLABEL
 	 * - FS_IOC_SETFSLABEL */
 
-	/* TODO: Implement default ioctl() codes for inodes:
-	 * - FS_IOC_GETFLAGS
-	 * - FS_IOC_SETFLAGS */
-
 	/* TODO: KOS's kernel memory leak detection should be exposed  via
 	 *       a procfs file /proc/kos/leaks. That way, if it turns  out
 	 *       that there _are_ memory leaks, then it's possible to dump

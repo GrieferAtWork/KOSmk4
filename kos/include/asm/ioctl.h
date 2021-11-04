@@ -81,11 +81,11 @@
 	((1 << _IOC_KOSSHIFT) | _IOC(dir, type, nr, size))
 #endif /* _IOC_KOSSHIFT */
 
-#ifdef __USE_KOS_ALTERATIONS
-#define _IOC_TYPECHECK(t) sizeof(*(t *)0)
-#else /* __USE_KOS_ALTERATIONS */
+#if defined(__USE_KOS_ALTERATIONS) && defined(__COMPILER_HAVE_TYPEOF)
+#define _IOC_TYPECHECK(t) sizeof(*(__typeof__(t) *)0)
+#else /* __USE_KOS_ALTERATIONS && __COMPILER_HAVE_TYPEOF */
 #define _IOC_TYPECHECK(t) sizeof(t)
-#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__USE_KOS_ALTERATIONS || !__COMPILER_HAVE_TYPEOF */
 
 /* used to create numbers */
 #define _IO(type, nr)          _IOC(_IOC_NONE, (type), (nr), 0)
@@ -101,7 +101,7 @@
 #define _IOW_KOS(type, nr, T)  _IOC_KOS(_IOC_WRITE, (type), (nr), _IOC_TYPECHECK(T))
 #define _IOWR_KOS(type, nr, T) _IOC_KOS(_IOC_READ | _IOC_WRITE, (type), (nr), _IOC_TYPECHECK(T))
 #endif /* _IOC_KOS */
-#define _IO_WITHTYPE(base, T)  (((base) & ~(_IOC_TYPEMASK << _IOC_TYPESHIFT)) | (_IOC_TYPECHECK(T) << _IOC_TYPESHIFT))
+#define _IO_WITHTYPE(base, T)  (((base) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT)) | (_IOC_TYPECHECK(T) << _IOC_SIZESHIFT))
 
 /* used to decode ioctl numbers.. */
 #define _IOC_NR(nr)    (((nr) >> _IOC_NRSHIFT) & _IOC_NRMASK)

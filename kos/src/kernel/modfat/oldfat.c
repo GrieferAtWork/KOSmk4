@@ -753,10 +753,10 @@ continue_reading:
 	pos += sizeof(struct fat_dirent);
 #if 1
 #if 1
-#define FILE_IS_LFN(x) ((x).f_attr == FAT_ATTR_LONGFILENAME)
+#define FILE_IS_LFN(x) ((x).f_attr == FATATTR_LFN)
 #else
 #define FILE_IS_LFN(x)                      \
-	((x).f_attr == FAT_ATTR_LONGFILENAME && \
+	((x).f_attr == FATATTR_LFN && \
 	 (x).lfn_clus == (le16)0 &&             \
 	 (x).lfn_name_3[0] != (le16)0)
 #endif
@@ -955,12 +955,12 @@ dos_8dot3:
 		        (8 + 3) * sizeof(char), orig_name);
 	}
 	/* Fill in the type field. */
-	if (fatfile.f_attr & FAT_ATTR_DIRECTORY) {
+	if (fatfile.f_attr & FATATTR_DIR) {
 		result->de_type = DT_DIR;
 	} else {
 		result->de_type = DT_REG;
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-		if (fatfile.f_attr & FAT_ATTR_SYSTEM) {
+		if (fatfile.f_attr & FATATTR_SYS) {
 			/* Check if this might actually be a symbolic  link.
 			 * For this purpose, verify  that the file is  large
 			 * enough (symlinks must have at least 1 character),
@@ -1189,7 +1189,7 @@ Fat_LoadINodeFromFatFile(struct inode *__restrict self,
 		self->i_filemode |= 0222 | (super->ft_mode & 0555);
 	}
 	/* Implement the read-only attribute. */
-	if (file->f_attr & FAT_ATTR_READONLY)
+	if (file->f_attr & FATATTR_RO)
 		self->i_filemode &= ~0222;
 
 	/* Convert timestamps. */
@@ -1282,7 +1282,7 @@ NOTHROW(KCALL Fat_SaveINodeToFatFile)(struct inode const *__restrict self,
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 	/* Implement the read-only attribute. */
 	if (!(self->i_filemode & 0222))
-		file->f_attr |= FAT_ATTR_READONLY;
+		file->f_attr |= FATATTR_RO;
 
 	if (super->ft_features & FAT_FEATURE_UGID) {
 		/* UID/GID support */
@@ -1300,7 +1300,7 @@ NOTHROW(KCALL Fat_SaveINodeToFatFile)(struct inode const *__restrict self,
 	file->f_ctime.fc_time     = Fat_EncodeFileTime(self->i_filectime.tv_sec);
 	file->f_ctime.fc_sectenth = (u8)(self->i_filectime.tv_nsec / (1000000000ul / 200ul));
 	/* Set the ARCHIVE flag to indicate a file that has been modified. */
-	file->f_attr |= FAT_ATTR_ARCHIVE;
+	file->f_attr |= FATATTR_ARCH;
 }
 
 PRIVATE NONNULL((1)) void KCALL
@@ -1364,7 +1364,7 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 		if unlikely(value & ~0xff)
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_GENERIC, value);
-		if unlikely(!!(value & FAT_ATTR_DIRECTORY) != !!INODE_ISDIR(self))
+		if unlikely(!!(value & FATATTR_DIR) != !!INODE_ISDIR(self))
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_GENERIC, value);
 		ATOMIC_WRITE(self->i_fsdata->fn_file.ff_attr, (u8)value);
@@ -1535,13 +1535,13 @@ Fat_GenerateFileEntries(struct fat_dirent *__restrict buffer,
 	assert(*pbuffer_length != 0);
 	memset(dos83.f_nameext, ' ', sizeof(dos83.f_nameext));
 	dos83.f_ntflags = NTFLAG_NONE;
-	dos83.f_attr    = FAT_ATTR_ARCHIVE;
+	dos83.f_attr    = FATATTR_ARCH;
 	if (INODE_ISDIR(new_node))
-		dos83.f_attr |= FAT_ATTR_DIRECTORY;
+		dos83.f_attr |= FATATTR_DIR;
 	if (target_dirent->de_name[0] == '.')
-		dos83.f_attr |= FAT_ATTR_HIDDEN;
+		dos83.f_attr |= FATATTR_HIDDEN;
 	if (!(new_node->i_filemode & 0222))
-		dos83.f_attr |= FAT_ATTR_READONLY;
+		dos83.f_attr |= FATATTR_RO;
 
 	/* Convert timestamps. */
 	dos83.f_atime             = Fat_EncodeFileDate(new_node->i_fileatime.tv_sec);
@@ -1766,7 +1766,7 @@ Fat_GenerateFileEntries(struct fat_dirent *__restrict buffer,
 			memcpyw(entry->lfn_name_2, &lfn_name[offset + LFN_NAME1], LFN_NAME2);
 			memcpyw(entry->lfn_name_3, &lfn_name[offset + LFN_NAME1 + LFN_NAME2], LFN_NAME3);
 			entry->lfn_seqnum = LFN_SEQNUM_MIN + (u8)seqnum;
-			entry->lfn_attr   = FAT_ATTR_LONGFILENAME;
+			entry->lfn_attr   = FATATTR_LFN;
 			entry->lfn_type   = 0;
 			entry->lfn_clus   = (le16)0;
 			entry->lfn_csum   = checksum;
@@ -1873,7 +1873,7 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 			files[file_count - 1].f_size = HTOLE32((u32)new_node->i_filesize +
 			                                       (u32)sizeof(Fat_CygwinSymlinkMagic) +
 			                                       (u32)1);
-			files[file_count - 1].f_attr |= FAT_ATTR_SYSTEM;
+			files[file_count - 1].f_attr |= FATATTR_SYS;
 		} else
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 		{
@@ -2003,12 +2003,12 @@ PRIVATE struct fat_dirent const new_directory_pattern[3] = {
 	[0] = { /* '.' */
 		{{{{{.f_name    = { '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ' }},
 			.f_ext     = { ' ', ' ', ' ' }}},
-			.f_attr    = FAT_ATTR_DIRECTORY,
+			.f_attr    = FATATTR_DIR,
 			.f_ntflags = NTFLAG_NONE }}},
 	[1] = { /* '..' */
 		{{{{{.f_name    = { '.', '.', ' ', ' ', ' ', ' ', ' ', ' ' }},
 			.f_ext      = { ' ', ' ', ' ' }}},
-			.f_attr     = FAT_ATTR_DIRECTORY,
+			.f_attr     = FATATTR_DIR,
 			.f_ntflags  = NTFLAG_NONE }}},
 	[2] = {{{{{{ .f_marker  = MARKER_DIREND }}}}}}
 #endif

@@ -86,6 +86,14 @@ struct fdirenum_ops {
 	(KCALL *deo_seekdir)(struct fdirenum *__restrict self,
 	                     off_t offset, unsigned int whence)
 			THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...);
+
+	/* [0..1] If non-NULL, override  for ioctl(2) invocations  done on  the
+	 * directory reader. When `NULL', do `mfile_uioctl()' on the associated
+	 * directory instead. */
+	BLOCKING NONNULL((1)) syscall_slong_t
+	(KCALL *deo_ioctl)(struct fdirenum *__restrict self, syscall_ulong_t cmd,
+	                   USER UNCHECKED void *arg, iomode_t mode)
+			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 };
 
 
@@ -117,6 +125,9 @@ struct fdirenum {
 	(*(self)->de_ops->deo_readdir)(self, buf, bufsize, readdir_mode, mode)
 #define fdirenum_seekdir(self, offset, whence) \
 	(*(self)->de_ops->deo_seekdir)(self, offset, whence)
+#define fdirenum_ioctl(self, cmd, arg, mode)                                        \
+	((self)->de_ops->deo_ioctl ? (*(self)->de_ops->deo_ioctl)(self, cmd, arg, mode) \
+	                           : mfile_uioctl((self)->de_dir, cmd, arg, mode))
 
 /* Feed   directory  entry  information  (the  `feed_d_*'  arguments)
  * into `buf' as requested by  `readdir_mode' ('.' and '..'  handling

@@ -84,17 +84,6 @@ typedef struct fatsuper FatSuperblock;
 #define FAT32_MAXCLUSTERS 0xfffffff4 /* 4294967284 */
 
 
-/* File attribute flags for `struct fat_dirent::f_attr' */
-#define FAT_ATTR_READONLY      0x01
-#define FAT_ATTR_HIDDEN        0x02
-#define FAT_ATTR_SYSTEM        0x04
-#define FAT_ATTR_VOLUMEID      0x08
-#define FAT_ATTR_DIRECTORY     0x10
-#define FAT_ATTR_ARCHIVE       0x20
-#define FAT_ATTR_DEVICE        0x40
-/*                             0x80 */
-#define FAT_ATTR_LONGFILENAME (FAT_ATTR_READONLY | FAT_ATTR_HIDDEN | FAT_ATTR_SYSTEM | FAT_ATTR_VOLUMEID)
-
 struct ATTR_PACKED fat_filetime {
 	union ATTR_PACKED {
 		struct ATTR_PACKED {
@@ -203,7 +192,7 @@ struct ATTR_PACKED fat_dirent
 #define LFN_SEQNUM_MAXCOUNT ((LFN_SEQNUM_MAX-LFN_SEQNUM_MIN)+1)
 			u8   lfn_seqnum;            /* Sequence number (One of `LFN_SEQNUM_*'). */
 			le16 lfn_name_1[LFN_NAME1]; /* First LFN part */
-			u8   lfn_attr;              /* Attributes (always `FAT_ATTR_LONGFILENAME') */
+			u8   lfn_attr;              /* Attributes (always `FATATTR_LFN') */
 			u8   lfn_type;              /* Long directory entry type (set to ZERO(0)) */
 			u8   lfn_csum;              /* Checksum of DOS filename (s.a.: `fat_LFNchksum'). */
 			le16 lfn_name_2[LFN_NAME2]; /* Second LFN part */
