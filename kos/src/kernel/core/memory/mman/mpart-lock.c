@@ -2125,7 +2125,7 @@ err:
  * anonymous is one  of the  conditions for  a writable  copy-on-write mapping  to
  * continue to exist) */
 PUBLIC BLOCKING NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
+mpart_lock_acquire_and_setcore_denywrite_nodma(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	do {
 		mpart_lock_acquire_and_setcore(self);

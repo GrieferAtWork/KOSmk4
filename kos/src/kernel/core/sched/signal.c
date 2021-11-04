@@ -315,8 +315,8 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
  * `sig_send()',  meaning that only a single thread  would be informed of the signal
  * event having taken  place. If  in this scenario,  the recipient  thread (i.e  the
  * thread that called  `task_connect()') then  decides not  to act  upon the  signal
- * in question, but rather to do something else, the original intend of `sig_send()'
- * will become lost, that intend  being for some (single)  thread to try to  acquire
+ * in question, but rather to do something else, the original intent of `sig_send()'
+ * will become lost, that intent  being for some (single)  thread to try to  acquire
  * an accompanying lock (for an example of this, see kernel header  <sched/mutex.h>)
  *
  * As  far as semantics go, a signal  connection established with this function will
@@ -330,7 +330,7 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
  *
  * With all of  this in  mind, this  function can  also be  though of  as a  sort-of
  * low-priority task connection, that will only be triggered after other connections
- * have already been served, and will only  be woken by `sig_send()', when no  other
+ * have already been served, and  will only be woken  by `sig_send()' when no  other
  * connections exist.
  *
  * In practice, this function must be used whenever it is unknown what will eventually

@@ -60,7 +60,7 @@ DECL_BEGIN
 /* TODO: Mem-parts need to have a mechanism that will
  *       asynchronously write changed blocks to  disk
  * - This would essentially  be a slightly  modified, and  async
- *   version of `mpart_lock_acquire_and_setcore_unwrite_nodma').
+ *   version of `mpart_lock_acquire_and_setcore_denywrite_nodma').
  * - Following the completion of the sync, check if the part has 1-2 reference
  *   left (+1: current-working-reference, +1: if `MPART_F_GLOBAL_REF' is set).
  *   Note  the check order  here which must interlock  with the invariant that

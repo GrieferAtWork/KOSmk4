@@ -484,7 +484,7 @@ struct mpart {
 		 * the `mo_saveblocks' operator. In that case it is still possible to off-load such
 		 * parts  into swap, but doing so is pointless.  If the intend is to free up unused
 		 * memory, then  you  should  instead write-back  modified  files  (possibly  using
-		 * `mpart_lock_acquire_and_setcore_unwrite_sync') and  only  use  swap  memory  (of
+		 * `mpart_lock_acquire_and_setcore_denywrite_sync') and  only use  swap memory  (of
 		 * changed blocks) if the part is still marked as changed.
 		 * Unchanged,  but allocated blocks can simply be  freed, and you are allowed to
 		 * assume that any unchanged block can always be re-constructed at a later point
@@ -981,7 +981,7 @@ mpart_lock_acquire_and_setcore_unsharecow_load(struct mpart *__restrict self,
  * anonymous is one  of the  conditions for  a writable  copy-on-write mapping  to
  * continue to exist) */
 FUNDEF BLOCKING NONNULL((1)) void FCALL
-mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
+mpart_lock_acquire_and_setcore_denywrite_nodma(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
@@ -1181,7 +1181,7 @@ mpart_sync(struct mpart *__restrict self)
 
 /* Same as `mpart_sync()', but keep on holding onto the lock to `self' */
 FUNDEF BLOCKING NONNULL((1)) size_t FCALL
-mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
+mpart_lock_acquire_and_setcore_denywrite_sync(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 

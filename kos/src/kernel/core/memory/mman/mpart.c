@@ -582,7 +582,7 @@ again:
 	 *       and write- DMA operations, and  only wait for write  DMA
 	 *       operations here. - In practice,  we don't have to  worry
 	 *       about anyone reading memory in the mean time... */
-	mpart_lock_acquire_and_setcore_unwrite_nodma(self);
+	mpart_lock_acquire_and_setcore_denywrite_nodma(self);
 
 	if (!(self->mp_flags & MPART_F_CHANGED))
 		goto done_noop;
@@ -627,7 +627,7 @@ again:
 				mpart_lock_release(self);
 				bitset = (mpart_blkst_word_t *)kmalloc(bitset_size, GFP_LOCKED | GFP_PREFLT);
 				TRY {
-					mpart_lock_acquire_and_setcore_unwrite_nodma(self);
+					mpart_lock_acquire_and_setcore_denywrite_nodma(self);
 				} EXCEPT {
 					kfree(bitset);
 					RETHROW();
@@ -821,7 +821,7 @@ done_noop:
 	return result;
 done_noop_nolock:
 	if (keep_lock)
-		mpart_lock_acquire_and_setcore_unwrite_nodma(self);
+		mpart_lock_acquire_and_setcore_denywrite_nodma(self);
 	return result;
 }
 
@@ -837,7 +837,7 @@ mpart_sync(struct mpart *__restrict self)
 
 /* Same as `mpart_sync()', but keep on holding onto the lock to `self' */
 PUBLIC BLOCKING NONNULL((1)) size_t FCALL
-mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
+mpart_lock_acquire_and_setcore_denywrite_sync(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	return mpart_sync_impl(self, true);
 }
