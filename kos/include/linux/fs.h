@@ -129,112 +129,59 @@
 #define FITRIM   __FITRIM   /* TODO:Trim */
 #endif /* !FITRIM && __FITRIM */
 
-#if !defined(FS_IOC_GETFLAGS) && defined(__FS_IOC_GETFLAGS)
-#define FS_IOC_GETFLAGS     __FS_IOC_GETFLAGS     /* ??? */
-#endif /* !FS_IOC_GETFLAGS && __FS_IOC_GETFLAGS */
-#if !defined(FS_IOC_SETFLAGS) && defined(__FS_IOC_SETFLAGS)
-#define FS_IOC_SETFLAGS     __FS_IOC_SETFLAGS     /* ??? */
-#endif /* !FS_IOC_SETFLAGS && __FS_IOC_SETFLAGS */
-#if !defined(FS_IOC_GETVERSION) && defined(__FS_IOC_GETVERSION)
-#define FS_IOC_GETVERSION   __FS_IOC_GETVERSION   /* ??? */
-#endif /* !FS_IOC_GETVERSION && __FS_IOC_GETVERSION */
-#if !defined(FS_IOC_SETVERSION) && defined(__FS_IOC_SETVERSION)
-#define FS_IOC_SETVERSION   __FS_IOC_SETVERSION   /* ??? */
-#endif /* !FS_IOC_SETVERSION && __FS_IOC_SETVERSION */
-#if !defined(FS_IOC_FIEMAP) && defined(__FS_IOC_FIEMAP)
-#define FS_IOC_FIEMAP       __FS_IOC_FIEMAP       /* ??? */
-#endif /* !FS_IOC_FIEMAP && __FS_IOC_FIEMAP */
-#if !defined(FS_IOC32_GETFLAGS) && defined(__FS_IOC32_GETFLAGS)
-#define FS_IOC32_GETFLAGS   __FS_IOC32_GETFLAGS   /* ??? */
-#endif /* !FS_IOC32_GETFLAGS && __FS_IOC32_GETFLAGS */
-#if !defined(FS_IOC32_SETFLAGS) && defined(__FS_IOC32_SETFLAGS)
-#define FS_IOC32_SETFLAGS   __FS_IOC32_SETFLAGS   /* ??? */
-#endif /* !FS_IOC32_SETFLAGS && __FS_IOC32_SETFLAGS */
-#if !defined(FS_IOC32_GETVERSION) && defined(__FS_IOC32_GETVERSION)
-#define FS_IOC32_GETVERSION __FS_IOC32_GETVERSION /* ??? */
-#endif /* !FS_IOC32_GETVERSION && __FS_IOC32_GETVERSION */
-#if !defined(FS_IOC32_SETVERSION) && defined(__FS_IOC32_SETVERSION)
-#define FS_IOC32_SETVERSION __FS_IOC32_SETVERSION /* ??? */
-#endif /* !FS_IOC32_SETVERSION && __FS_IOC32_SETVERSION */
+#if defined(__linux__) || defined(__KOS__)
+#define FS_IOC_GETFLAGS     _IOR('f', 1, long) /* Get INode flags (set of `FS_*') */
+#define FS_IOC_SETFLAGS     _IOW('f', 2, long) /* Set INode flags (set of `FS_*') */
+#define FS_IOC32_GETVERSION _IOR('v', 1, int)  /* Get INode flags (set of `FS_*') */
+#define FS_IOC32_SETVERSION _IOW('v', 2, int)  /* Set INode flags (set of `FS_*') */
 
-/* Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS) */
-#if !defined(FS_SECRM_FL) && defined(__FS_SECRM_FL)
-#define FS_SECRM_FL           __FS_SECRM_FL           /* ??? */
-#endif /* !FS_SECRM_FL && __FS_SECRM_FL */
-#if !defined(FS_UNRM_FL) && defined(__FS_UNRM_FL)
-#define FS_UNRM_FL            __FS_UNRM_FL            /* ??? */
-#endif /* !FS_UNRM_FL && __FS_UNRM_FL */
-#if !defined(FS_COMPR_FL) && defined(__FS_COMPR_FL)
-#define FS_COMPR_FL           __FS_COMPR_FL           /* ??? */
-#endif /* !FS_COMPR_FL && __FS_COMPR_FL */
-#if !defined(FS_SYNC_FL) && defined(__FS_SYNC_FL)
-#define FS_SYNC_FL            __FS_SYNC_FL            /* ??? */
-#endif /* !FS_SYNC_FL && __FS_SYNC_FL */
-#if !defined(FS_IMMUTABLE_FL) && defined(__FS_IMMUTABLE_FL)
-#define FS_IMMUTABLE_FL       __FS_IMMUTABLE_FL       /* ??? */
-#endif /* !FS_IMMUTABLE_FL && __FS_IMMUTABLE_FL */
-#if !defined(FS_APPEND_FL) && defined(__FS_APPEND_FL)
-#define FS_APPEND_FL          __FS_APPEND_FL          /* ??? */
-#endif /* !FS_APPEND_FL && __FS_APPEND_FL */
-#if !defined(FS_NODUMP_FL) && defined(__FS_NODUMP_FL)
-#define FS_NODUMP_FL          __FS_NODUMP_FL          /* ??? */
-#endif /* !FS_NODUMP_FL && __FS_NODUMP_FL */
-#if !defined(FS_NOATIME_FL) && defined(__FS_NOATIME_FL)
-#define FS_NOATIME_FL         __FS_NOATIME_FL         /* ??? */
-#endif /* !FS_NOATIME_FL && __FS_NOATIME_FL */
-#if !defined(FS_DIRTY_FL) && defined(__FS_DIRTY_FL)
-#define FS_DIRTY_FL           __FS_DIRTY_FL           /* for compression: ??? */
-#endif /* !FS_DIRTY_FL && __FS_DIRTY_FL */
-#if !defined(FS_COMPRBLK_FL) && defined(__FS_COMPRBLK_FL)
-#define FS_COMPRBLK_FL        __FS_COMPRBLK_FL        /* for compression: ??? */
-#endif /* !FS_COMPRBLK_FL && __FS_COMPRBLK_FL */
-#if !defined(FS_NOCOMP_FL) && defined(__FS_NOCOMP_FL)
-#define FS_NOCOMP_FL          __FS_NOCOMP_FL          /* for compression: ??? */
-#endif /* !FS_NOCOMP_FL && __FS_NOCOMP_FL */
-#if !defined(FS_ECOMPR_FL) && defined(__FS_ECOMPR_FL)
-#define FS_ECOMPR_FL          __FS_ECOMPR_FL          /* for compression: ??? */
-#endif /* !FS_ECOMPR_FL && __FS_ECOMPR_FL */
-#if !defined(FS_BTREE_FL) && defined(__FS_BTREE_FL)
-#define FS_BTREE_FL           __FS_BTREE_FL           /* ??? */
-#endif /* !FS_BTREE_FL && __FS_BTREE_FL */
-#if !defined(FS_INDEX_FL) && defined(__FS_INDEX_FL)
-#define FS_INDEX_FL           __FS_INDEX_FL           /* ??? */
-#endif /* !FS_INDEX_FL && __FS_INDEX_FL */
-#if !defined(FS_IMAGIC_FL) && defined(__FS_IMAGIC_FL)
-#define FS_IMAGIC_FL          __FS_IMAGIC_FL          /* ??? */
-#endif /* !FS_IMAGIC_FL && __FS_IMAGIC_FL */
-#if !defined(FS_JOURNAL_DATA_FL) && defined(__FS_JOURNAL_DATA_FL)
-#define FS_JOURNAL_DATA_FL    __FS_JOURNAL_DATA_FL    /* ??? */
-#endif /* !FS_JOURNAL_DATA_FL && __FS_JOURNAL_DATA_FL */
-#if !defined(FS_NOTAIL_FL) && defined(__FS_NOTAIL_FL)
-#define FS_NOTAIL_FL          __FS_NOTAIL_FL          /* ??? */
-#endif /* !FS_NOTAIL_FL && __FS_NOTAIL_FL */
-#if !defined(FS_DIRSYNC_FL) && defined(__FS_DIRSYNC_FL)
-#define FS_DIRSYNC_FL         __FS_DIRSYNC_FL         /* ??? */
-#endif /* !FS_DIRSYNC_FL && __FS_DIRSYNC_FL */
-#if !defined(FS_TOPDIR_FL) && defined(__FS_TOPDIR_FL)
-#define FS_TOPDIR_FL          __FS_TOPDIR_FL          /* ??? */
-#endif /* !FS_TOPDIR_FL && __FS_TOPDIR_FL */
-#if !defined(FS_EXTENT_FL) && defined(__FS_EXTENT_FL)
-#define FS_EXTENT_FL          __FS_EXTENT_FL          /* ??? */
-#endif /* !FS_EXTENT_FL && __FS_EXTENT_FL */
-#if !defined(FS_DIRECTIO_FL) && defined(__FS_DIRECTIO_FL)
-#define FS_DIRECTIO_FL        __FS_DIRECTIO_FL        /* ??? */
-#endif /* !FS_DIRECTIO_FL && __FS_DIRECTIO_FL */
-#if !defined(FS_NOCOW_FL) && defined(__FS_NOCOW_FL)
-#define FS_NOCOW_FL           __FS_NOCOW_FL           /* ??? */
-#endif /* !FS_NOCOW_FL && __FS_NOCOW_FL */
-#if !defined(FS_PROJINHERIT_FL) && defined(__FS_PROJINHERIT_FL)
-#define FS_PROJINHERIT_FL     __FS_PROJINHERIT_FL     /* ??? */
-#endif /* !FS_PROJINHERIT_FL && __FS_PROJINHERIT_FL */
-#if !defined(FS_RESERVED_FL) && defined(__FS_RESERVED_FL)
-#define FS_RESERVED_FL        __FS_RESERVED_FL        /* ??? */
-#endif /* !FS_RESERVED_FL && __FS_RESERVED_FL */
-#if !defined(FS_FL_USER_VISIBLE) && defined(__FS_FL_USER_VISIBLE)
-#define FS_FL_USER_VISIBLE    __FS_FL_USER_VISIBLE    /* ??? */
-#endif /* !FS_FL_USER_VISIBLE && __FS_FL_USER_VISIBLE */
-#if !defined(FS_FL_USER_MODIFIABLE) && defined(__FS_FL_USER_MODIFIABLE)
-#define FS_FL_USER_MODIFIABLE __FS_FL_USER_MODIFIABLE /* ??? */
-#endif /* !FS_FL_USER_MODIFIABLE && __FS_FL_USER_MODIFIABLE */
+#ifdef __linux__ /* XXX: KOS? */
+#define FS_IOC_GETVERSION   _IOR('v', 1, long)            /* ??? */
+#define FS_IOC_SETVERSION   _IOW('v', 2, long)            /* ??? */
+#define FS_IOC_FIEMAP       _IOWR('f', 11, struct fiemap) /* ??? */
+#define FS_IOC32_GETFLAGS   _IOR('f', 1, int)             /* ??? */
+#define FS_IOC32_SETFLAGS   _IOW('f', 2, int)             /* ??? */
+#endif /* __linux__ */
+
+/* Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS)
+ * These  flags are no  necessarily persistent; once  the associate mfile is
+ * unloaded due to no-one holding any more references, the next time another
+ * access is made, these flags set set based on superblock mount flags! */
+#define FS_SECRM_FL           0x00000001 /* 's': Ignored. */
+#define FS_UNRM_FL            0x00000002 /* 'u': Ignored. */
+#define FS_COMPR_FL           0x00000004 /* 'c': [KOS:Unsupported] Store on-disk in compressed format (if supported by FS) */
+#define FS_SYNC_FL            0x00000008 /* 'S': [KOS:Unsupported] Per-file state of `MS_SYNC' */
+#define FS_IMMUTABLE_FL       0x00000010 /* 'i': `MFILE_F_READONLY | MFILE_FN_ATTRREADONLY' (need `CAP_LINUX_IMMUTABLE' to modify) */
+#define FS_APPEND_FL          0x00000020 /* 'a': [KOS:Unsupported] File can only be opened with O_APPEND */
+#define FS_NODUMP_FL          0x00000040 /* 'd': [KOS:Unsupported] Don't include in backups by `dump(8)'. */
+#define FS_NOATIME_FL         0x00000080 /* 'A': `MFILE_F_NOATIME' */
+#define FS_DIRTY_FL           0x00000100 /* ??? */
+#define FS_COMPRBLK_FL        0x00000200 /* ??? */
+#define FS_NOCOMP_FL          0x00000400 /* ??? */
+#define FS_ECOMPR_FL          0x00000800 /* ??? */
+#define FS_BTREE_FL           0x00001000 /* ??? */
+#define FS_INDEX_FL           0x00001000 /* ??? */
+#define FS_IMAGIC_FL          0x00002000 /* ??? */
+#define FS_JOURNAL_DATA_FL    0x00004000 /* 'j': [KOS:Unsupported] Enable/disable journaling on a per-file basis. */
+#define FS_NOTAIL_FL          0x00008000 /* 't': [KOS:Unsupported] Disable Reiserfs tail-packing feature (if supported by FS) */
+#define FS_DIRSYNC_FL         0x00010000 /* 'D': [KOS:Unsupported] Per-directory state of `MS_DIRSYNC' */
+#define FS_TOPDIR_FL          0x00020000 /* 'T': [KOS:Unsupported] ??? */
+/*      FS_                   0x00040000  * ... */
+#define FS_EXTENT_FL          0x00080000 /* ??? */
+#define FS_DIRECTIO_FL        0x00100000 /* ??? */
+/*      FS_                   0x00200000  * ... */
+/*      FS_                   0x00400000  * ... */
+#define FS_NOCOW_FL           0x00800000 /* 'C': [KOS:Unsupported] Disable copy-on-write (if supported by FS) */
+/*      FS_                   0x01000000  * ... */
+/*      FS_                   0x02000000  * ... */
+/*      FS_                   0x04000000  * ... */
+/*      FS_                   0x08000000  * ... */
+/*      FS_                   0x10000000  * ... */
+#define FS_PROJINHERIT_FL     0x20000000 /* 'P': [KOS:Unsupported] Inherit the quota project ID (???) */
+/*      FS_                   0x40000000  * ... */
+#define FS_RESERVED_FL        0x80000000 /* ??? */
+#define FS_FL_USER_VISIBLE    0x0003dfff /* ??? */
+#define FS_FL_USER_MODIFIABLE 0x000380ff /* ??? */
+#endif /* __linux__ || __KOS__ */
 
 #endif /* _LINUX_FS_H */

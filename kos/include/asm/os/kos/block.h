@@ -62,46 +62,6 @@
 #define __FITHAW   _IOWR('X', 120, int) /* TODO:Thaw */
 #define __FITRIM   _IOWR('X', 121, struct fstrim_range) /* TODO:Trim */
 
-#ifdef __linux__ /* TODO */
-#define __FS_IOC_GETFLAGS     _IOR('f', 1, long)            /* ??? */
-#define __FS_IOC_SETFLAGS     _IOW('f', 2, long)            /* ??? */
-#define __FS_IOC_GETVERSION   _IOR('v', 1, long)            /* ??? */
-#define __FS_IOC_SETVERSION   _IOW('v', 2, long)            /* ??? */
-#define __FS_IOC_FIEMAP       _IOWR('f', 11, struct fiemap) /* ??? */
-#define __FS_IOC32_GETFLAGS   _IOR('f', 1, int)             /* ??? */
-#define __FS_IOC32_SETFLAGS   _IOW('f', 2, int)             /* ??? */
-#define __FS_IOC32_GETVERSION _IOR('v', 1, int)             /* ??? */
-#define __FS_IOC32_SETVERSION _IOW('v', 2, int)             /* ??? */
-
-/* Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS) */
-#define __FS_SECRM_FL           0x00000001 /* ??? */
-#define __FS_UNRM_FL            0x00000002 /* ??? */
-#define __FS_COMPR_FL           0x00000004 /* ??? */
-#define __FS_SYNC_FL            0x00000008 /* ??? */
-#define __FS_IMMUTABLE_FL       0x00000010 /* ??? */
-#define __FS_APPEND_FL          0x00000020 /* ??? */
-#define __FS_NODUMP_FL          0x00000040 /* ??? */
-#define __FS_NOATIME_FL         0x00000080 /* ??? */
-#define __FS_DIRTY_FL           0x00000100 /* for compression: ??? */
-#define __FS_COMPRBLK_FL        0x00000200 /* for compression: ??? */
-#define __FS_NOCOMP_FL          0x00000400 /* for compression: ??? */
-#define __FS_ECOMPR_FL          0x00000800 /* for compression: ??? */
-#define __FS_BTREE_FL           0x00001000 /* ??? */
-#define __FS_INDEX_FL           0x00001000 /* ??? */
-#define __FS_IMAGIC_FL          0x00002000 /* ??? */
-#define __FS_JOURNAL_DATA_FL    0x00004000 /* ??? */
-#define __FS_NOTAIL_FL          0x00008000 /* ??? */
-#define __FS_DIRSYNC_FL         0x00010000 /* ??? */
-#define __FS_TOPDIR_FL          0x00020000 /* ??? */
-#define __FS_EXTENT_FL          0x00080000 /* ??? */
-#define __FS_DIRECTIO_FL        0x00100000 /* ??? */
-#define __FS_NOCOW_FL           0x00800000 /* ??? */
-#define __FS_PROJINHERIT_FL     0x20000000 /* ??? */
-#define __FS_RESERVED_FL        0x80000000 /* ??? */
-#define __FS_FL_USER_VISIBLE    0x0003dfff /* ??? */
-#define __FS_FL_USER_MODIFIABLE 0x000380ff /* ??? */
-#endif /* __linux__ -- TODO */
-
 #ifdef __CC__
 __DECL_BEGIN
 

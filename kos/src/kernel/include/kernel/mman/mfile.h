@@ -321,6 +321,14 @@ struct mfile_stream_ops {
 			THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 };
 
+/* Default ioctl(2) operator for mfiles. Implements:
+ *  - FS_IOC_GETFLAGS
+ *  - FS_IOC_SETFLAGS */
+FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
+mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+              USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
+
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
  * be dispatched via `mfile_upread()' and `mfile_upwrite()' (which uses the `mso_pread'
  * and `mso_pwrite' operators, with `mfile_read()' and `mfile_write()' as fallback, so-
@@ -1225,6 +1233,8 @@ struct mfile_extendpart_data {
 #define mfile_extendpart_data_init(self) ((self)->_placeholder = 0)
 #define mfile_extendpart_data_fini(self) ((self)->_placeholder = 0)
 
+struct unlockinfo;
+
 /* While holding a read- or write-lock to `self', try to extend an
  * existing mem-part that borders against the given address  range
  * in order to fill the specified gap.
@@ -1315,6 +1325,46 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
 NOTHROW(FCALL mfile_insert_and_merge_part_and_unlock)(struct mfile *__restrict self,
                                                       /*inherit(on_success)*/ struct mpart *__restrict part);
 
+
+
+
+/************************************************************************/
+/* Mfile part locking helpers.                                          */
+/************************************************************************/
+
+/* Acquire locks to all of the mem-parts associated with a given mfile.
+ * - The caller must be holding a write-lock to `self' and must ensure
+ *   that `self' isn't anonymous.
+ * - Acquire  references to  all parts of  `self'. If any  one of these
+ *   cannot be acquired due to some part already having been destroyed,
+ *   remove the offending part from the part-tree and mark it as  anon.
+ * - Afterwards, try to acquire a lock to each of the parts. If  this
+ *   fails, release locks from all  already-locked parts, as well  as
+ *   the write-lock to `self' and `unlock'. Then wait for the lock to
+ *   the blocking part to become available and return `false'
+ * - If all locks could be acquired, return `true'
+ * @return: true:  Locks+references acquired.
+ * @return: false: All locks were locks; try again. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL mfile_incref_and_lock_parts_or_unlock)(struct mfile *__restrict self,
+                                                     struct unlockinfo *unlock);
+
+/* Same  as  `mfile_incref_and_lock_parts_or_unlock()', but  return a
+ * reference to the blocking part (if any), and not release any locks
+ * other than those to mem-parts that could be locked before the part
+ * that is blocking was encountered:
+ * - Try to acquire references and locks to an entire part tree. When
+ *   there is some part to which no lock can be acquired immediately,
+ *   return a reference to said part.
+ * - When this function returns `NULL', locks+references have been acquired. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mfile_tryincref_and_lock_parts)(struct mfile *__restrict self);
+
+/* Do the inverse of `mfile_incref_and_lock_parts_or_unlock()' and
+ * release locks+references to parts of `self'. NOTE: The lock  to
+ * `self' is _NOT_ released during this! */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts)(struct mfile *__restrict self);
 
 
 

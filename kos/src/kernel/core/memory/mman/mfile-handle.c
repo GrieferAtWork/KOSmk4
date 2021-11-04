@@ -37,14 +37,18 @@
 #include <kernel/iovec.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/unaligned.h>
 
+#include <asm/ioctl.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
+#include <linux/fs.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -54,6 +58,121 @@
 #include <string.h>
 
 DECL_BEGIN
+
+/* Return set of `FS_*' from <linux/fs.h> */
+PRIVATE WUNUSED NONNULL((1)) uintptr_t
+NOTHROW(FCALL mfile_get_inode_flags)(struct mfile const *__restrict self) {
+	uintptr_t inode_flags = 0;
+	uintptr_t mfile_flags = ATOMIC_READ(self->mf_flags);
+	if (mfile_flags & MFILE_F_READONLY)
+		inode_flags |= FS_IMMUTABLE_FL;
+	if (mfile_flags & MFILE_F_NOATIME)
+		inode_flags |= FS_NOATIME_FL;
+	return inode_flags;
+}
+
+/* Apply set of `FS_*' from <linux/fs.h> to `self' */
+PRIVATE NONNULL((1)) void FCALL
+mfile_set_inode_flags(struct mfile *__restrict self,
+                      uintptr_t inode_flags) {
+	bool cmpxch_ok;
+	uintptr_t old_flags, new_flags;
+	inode_flags &= (FS_IMMUTABLE_FL | FS_NOATIME_FL); /* Other flags are ignored (for now...) */
+again:
+	do {
+		mfile_lock_write(self);
+		old_flags = ATOMIC_READ(self->mf_flags);
+		new_flags = old_flags;
+
+		/* Apply flags transformations. */
+		new_flags &= ~(MFILE_F_READONLY | MFILE_FN_ATTRREADONLY | MFILE_F_NOATIME);
+		if (inode_flags & FS_IMMUTABLE_FL)
+			new_flags |= MFILE_F_READONLY | MFILE_FN_ATTRREADONLY;
+		if (inode_flags & FS_NOATIME_FL)
+			new_flags |= MFILE_F_NOATIME;
+
+		/* Check if the READONLY flag changed state. */
+		if ((new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY)) {
+			/* Need locks to all of the file's mem-parts to change `MFILE_F_READONLY'. */
+			if (!mfile_incref_and_lock_parts_or_unlock(self, NULL))
+				goto again;
+		}
+
+		/* As per the specs, in order to change the flags of a file, you must
+		 * be that file's owner, or have the `CAP_FOWNER' capability. Because
+		 * we allow this operator for mfiles that don't have owners, we  only
+		 * do this check if the file _does_ have an owner! */
+		if (old_flags != new_flags && mfile_isnode(self)) {
+			uid_t file_uid;
+			struct fnode *me = mfile_asnode(self);
+			mfile_tslock_acquire(me);
+			file_uid = me->fn_uid;
+			mfile_tslock_release(me);
+			if (file_uid != cred_geteuid() && !capable(CAP_FOWNER)) {
+				/* Not allowed! */
+				if ((new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
+					mfile_unlock_and_decref_parts(self);
+				mfile_lock_endwrite(self);
+				THROW(E_INSUFFICIENT_RIGHTS, CAP_FOWNER);
+			}
+		}
+
+		/* Try to atomically apply the new set of flags. */
+		cmpxch_ok = ATOMIC_CMPXCH(self->mf_flags, old_flags, new_flags);
+
+		/* Release locks */
+		if ((new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
+			mfile_unlock_and_decref_parts(self);
+		mfile_lock_endwrite(self);
+	} while (!cmpxch_ok);
+}
+
+
+/* Default ioctl(2) operator for mfiles. Implements:
+ *  - FS_IOC_GETFLAGS
+ *  - FS_IOC_SETFLAGS */
+PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
+mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+              USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	switch (cmd) {
+
+	case _IO_WITHTYPE(FS_IOC_GETFLAGS, u32):
+	case _IO_WITHTYPE(FS_IOC_GETFLAGS, u64): {
+		uintptr_t flags;
+		if (!IO_CANREAD(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_GETPROPERTY, mode);
+		flags = mfile_get_inode_flags(self);
+		validate_writable(arg, _IOC_SIZE(cmd));
+		if (_IOC_SIZE(cmd) == sizeof(u32)) {
+			UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)flags);
+		} else {
+			UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)flags);
+		}
+	}	break;
+
+	case _IO_WITHTYPE(FS_IOC_SETFLAGS, u32):
+	case _IO_WITHTYPE(FS_IOC_SETFLAGS, u64): {
+		uintptr_t flags;
+		if (!IO_CANWRITE(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_SETPROPERTY, mode);
+		validate_readable(arg, _IOC_SIZE(cmd));
+		if (_IOC_SIZE(cmd) == sizeof(u32)) {
+			flags = (uintptr_t)UNALIGNED_GET32((USER CHECKED u32 const *)arg);
+		} else {
+			flags = (uintptr_t)UNALIGNED_GET64((USER CHECKED u64 const *)arg);
+		}
+		mfile_set_inode_flags(self, flags);
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+		      cmd);
+		break;
+	}
+	return 0;
+}
 
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
  * be dispatched via `mfile_upread()' and `mfile_upwrite()' (which uses the `mso_pread'
@@ -570,13 +689,15 @@ INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
+	BLOCKING NONNULL((1)) syscall_slong_t
+	(KCALL *mso_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
+	                   USER UNCHECKED void *arg, iomode_t mode);
 	struct mfile_stream_ops const *stream;
-	stream = self->mf_ops->mo_stream;
-	if likely(stream != NULL && stream->mso_ioctl)
-		return (*stream->mso_ioctl)(self, cmd, arg, mode);
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-	      cmd);
+	mso_ioctl = &mfile_v_ioctl;
+	stream    = self->mf_ops->mo_stream;
+	if (stream != NULL && stream->mso_ioctl)
+		mso_ioctl = stream->mso_ioctl;
+	return (*mso_ioctl)(self, cmd, arg, mode);
 }
 
 INTERN BLOCKING NONNULL((1)) void KCALL

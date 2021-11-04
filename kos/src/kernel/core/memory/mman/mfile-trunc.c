@@ -29,6 +29,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
+#include <misc/unlockinfo.h>
 #include <sched/atomic64.h>
 #include <sched/signal.h>
 #include <sched/task.h>
@@ -111,15 +112,18 @@ err:
 }
 
 
-/* Try to acquire references and locks to an entire  part
- * tree. When there is some part to which no lock can  be
- * acquired immediately, return a reference to said part.
- *
- * When this function returns `NULL', locks+references have
- * been acquired. */
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
-NOTHROW(FCALL mfile_incref_and_trylock_whole_tree)(struct mfile *__restrict self) {
+/* Same  as  `mfile_incref_and_lock_parts_or_unlock()', but  return a
+ * reference to the blocking part (if any), and not release any locks
+ * other than those to mem-parts that could be locked before the part
+ * that is blocking was encountered:
+ * - Try to acquire references and locks to an entire part tree. When
+ *   there is some part to which no lock can be acquired immediately,
+ *   return a reference to said part.
+ * - When this function returns `NULL', locks+references have been acquired. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mfile_tryincref_and_lock_parts)(struct mfile *__restrict self) {
 	REF struct mpart *result;
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
 again:
 	result = self->mf_parts;
 	if (result) {
@@ -143,16 +147,51 @@ again:
 	return result;
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_unlock_and_decref_whole_tree)(struct mfile *__restrict self) {
+/* Do the inverse of `mfile_incref_and_lock_parts_or_unlock()' and
+ * release locks+references to parts of `self'. NOTE: The lock  to
+ * `self' is _NOT_ released during this! */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts)(struct mfile *__restrict self) {
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
 	if (self->mf_parts)
 		mpart_unlock_and_decref_whole_tree(self->mf_parts);
 }
 
-/* Ensure that no  mem-parts with `mpart_getminaddr() >= minaddr'  exists within  `self'
- * for which `mpart_hasblocksstate_init()' is the case. If any such part is found,  then
- * `mfile_unlock_and_decref_whole_tree(self), mfile_lock_endwrite(self);' before waiting
- * for the found part to no longer feature INIT-blocks and return `false'.
+
+/* Acquire locks to all of the mem-parts associated with a given mfile.
+ * - The caller must be holding a write-lock to `self' and must ensure
+ *   that `self' isn't anonymous.
+ * - Acquire  references to  all parts of  `self'. If any  one of these
+ *   cannot be acquired due to some part already having been destroyed,
+ *   remove the offending part from the part-tree and mark it as  anon.
+ * - Afterwards, try to acquire a lock to each of the parts. If  this
+ *   fails, release locks from all  already-locked parts, as well  as
+ *   the write-lock to `self' and `unlock'. Then wait for the lock to
+ *   the blocking part to become available and return `false'
+ * - If all locks could be acquired, return `true'
+ * @return: true:  Locks+references acquired.
+ * @return: false: All locks were locks; try again. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL mfile_incref_and_lock_parts_or_unlock)(struct mfile *__restrict self,
+                                                     struct unlockinfo *unlock) {
+	REF struct mpart *blocking_part;
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	blocking_part = mfile_tryincref_and_lock_parts(self);
+	if unlikely(blocking_part) {
+		mfile_lock_endwrite(self);
+		unlockinfo_xunlock(unlock);
+		FINALLY_DECREF_UNLIKELY(blocking_part);
+		mpart_lock_waitfor(blocking_part);
+		return false;
+	}
+	return true;
+}
+
+
+/* Ensure that no mem-parts with `mpart_getminaddr() >= minaddr' exists within `self'
+ * for  which `mpart_hasblocksstate_init()' is  the case. If any  such part is found,
+ * then   `mfile_unlock_and_decref_parts(self), mfile_lock_endwrite(self);'    before
+ * waiting for the found  part to no longer  feature INIT-blocks and return  `false'.
  *
  * When no parts with init-blocks above `minaddr' are found, don't release any locks
  * and return `true'. */
@@ -168,7 +207,7 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 			if unlikely(mpart_hasblocksstate_init(iter)) {
 				/* Damn it! - have to wait for this one... */
 				incref(iter);
-				mfile_unlock_and_decref_whole_tree(self);
+				mfile_unlock_and_decref_parts(self);
 				mfile_lock_endwrite(self);
 				FINALLY_DECREF_UNLIKELY(iter);
 				task_connect(&self->mf_initdone);
@@ -208,7 +247,7 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 					if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
 						/* Have to wait for this one... */
 						incref(iter);
-						mfile_unlock_and_decref_whole_tree(self);
+						mfile_unlock_and_decref_parts(self);
 						mfile_lock_endwrite(self);
 						FINALLY_DECREF_UNLIKELY(iter);
 						task_connect(&meta->mpm_dma_done);
@@ -425,7 +464,7 @@ directly_modify_file_size:
 	 * guarantying that _all_ mem-parts from the part-tree are `!wasdestroyed'. */
 	{
 		REF struct mpart *blocking_part;
-		blocking_part = mfile_incref_and_trylock_whole_tree(self);
+		blocking_part = mfile_tryincref_and_lock_parts(self);
 		if unlikely(blocking_part) {
 			mfile_lock_endwrite(self);
 			FINALLY_DECREF_UNLIKELY(blocking_part);
@@ -453,7 +492,7 @@ directly_modify_file_size:
 again_handle_overlapping_part:
 			/* Must split this part... */
 			incref(overlapping_part);
-			mfile_unlock_and_decref_whole_tree(self);
+			mfile_unlock_and_decref_parts(self);
 			mfile_lock_endwrite(self);
 			{
 				FINALLY_DECREF_UNLIKELY(overlapping_part);
@@ -495,7 +534,7 @@ again_reacquire_after_split:
 					task_waitfor();
 					goto again_reacquire_after_split;
 				}
-				blocking_part = mfile_incref_and_trylock_whole_tree(self);
+				blocking_part = mfile_tryincref_and_lock_parts(self);
 				if unlikely(blocking_part) {
 					mfile_lock_endwrite(self);
 					FINALLY_DECREF_UNLIKELY(blocking_part);
@@ -521,7 +560,7 @@ again_reacquire_after_split:
 
 			/* Do step #7 while we still know about `overlapping_part' */
 			if (!atomic64_cmpxch(&self->mf_filesize, (uint64_t)old_size, (uint64_t)new_size)) {
-				mfile_unlock_and_decref_whole_tree(self);
+				mfile_unlock_and_decref_parts(self);
 				mfile_lock_endwrite(self);
 				decref_unlikely(mpart_merge(overlapping_part));
 				goto again_reacquire_after_split;
@@ -536,7 +575,7 @@ again_reacquire_after_split:
 	 *          the file's size changed since it was read above, re-merge a possibly split
 	 *          part from #6 and start over from scratch. */
 	if (!atomic64_cmpxch(&self->mf_filesize, (uint64_t)old_size, (uint64_t)new_size)) {
-		mfile_unlock_and_decref_whole_tree(self);
+		mfile_unlock_and_decref_parts(self);
 		mfile_lock_endwrite(self);
 		goto again;
 	}
@@ -547,8 +586,8 @@ after_file_size_changed:
 	 *          there isn't any part that overlaps with `aligned_new_size'. */
 	for (;;) {
 		REF struct mpart *part;
-		/* NOTE: Normally, the mem-part tree  doesn't contain references, but  right
-		 *       now it does, as `mfile_incref_and_trylock_whole_tree' created some. */
+		/* NOTE: Normally, the mem-part tree doesn't contain references, but right
+		 *       now it  does, as  `mfile_tryincref_and_lock_parts' created  some. */
 		part = mpart_tree_rremove(&self->mf_parts, aligned_new_size, (pos_t)-1);
 		if (!part)
 			break;
@@ -597,7 +636,7 @@ after_file_size_changed:
 
 	/* Step #10: Release locks + references from all of the remaining mem-
 	 *           parts which still remain  apart of the file's  part-tree. */
-	mfile_unlock_and_decref_whole_tree(self);
+	mfile_unlock_and_decref_parts(self);
 
 	/* Step #11: Release the write-lock `mfile_lock_endwrite(self);' */
 	mfile_lock_endwrite(self);
