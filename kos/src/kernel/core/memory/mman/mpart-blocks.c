@@ -937,11 +937,12 @@ again_read_st:
 		}
 
 		/* Must lazily initialize this block!
-		 * For this purpose, we  must disable preemption, since  being
-		 * interrupted during the init, and having another thread then
-		 * attempt to access the same  page that we're trying to  init
-		 * would result in  a dead-lock,  where it will  just keep  on
-		 * seeing `MPART_BLOCK_ST_INIT' for all of eternity... */
+		 * For  this  purpose, preemption  must be  disabled (which
+		 * is already done by the caller), since being  interrupted
+		 * during the init, and having another thread then  attempt
+		 * to  access the same page that we're trying to init would
+		 * result in a dead-lock, where it will just keep on seeing
+		 * `MPART_BLOCK_ST_INIT' for all of eternity... */
 		if (!mpart_atomic_cmpxch_blockstate(self, block_index, st,
 		                                    MPART_BLOCK_ST_INIT)) {
 			/* Someone else was faster... -> Just re-read the status! */

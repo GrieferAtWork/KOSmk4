@@ -235,15 +235,15 @@ NOTHROW(KCALL outsl_nopf)(port_t port, USER CHECKED void const *buf, size_t num_
 
 /* Read/write a single user-space data word to/from (Pax|Pcx)<-->(rax|eax|ax|al)
  * NOTE: Upon success, EFLAGS.CF is cleared; Upon error, EFLAGS.CF is set. */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movb_Pax_al)();  /* movb (%eax), %al  (read byte) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movw_Pax_ax)();  /* movw (%eax), %ax  (read word) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movl_Pax_eax)(); /* movl (%eax), %eax (read dword) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movb_al_Pcx)();  /* movb %al, (%ecx)  (write byte) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movw_ax_Pcx)();  /* movw %ax, (%ecx)  (write word) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movl_eax_Pcx)(); /* movl %eax, (%ecx) (write dword) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movb_Pax_al)();  /* movb (%Pax), %al  (read byte) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movw_Pax_ax)();  /* movw (%Pax), %ax  (read word) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movl_Pax_eax)(); /* movl (%Pax), %eax (read dword) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movb_al_Pcx)();  /* movb %al, (%Pcx)  (write byte) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movw_ax_Pcx)();  /* movw %ax, (%Pcx)  (write word) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movl_eax_Pcx)(); /* movl %eax, (%Pcx) (write dword) */
 #ifdef __x86_64__
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movq_Pax_rax)(); /* movq (%rax), %rax (read qword) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movq_rax_Pcx)(); /* movq %rax, (%rcx) (write qword) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movq_Pax_rax)(); /* movq (%Pax), %rax (read qword) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movq_rax_Pcx)(); /* movq %rax, (%Pcx) (write qword) */
 #endif /* __x86_64__ */
 
 /* Try to read from a possibly faulty `addr' into `*presult'

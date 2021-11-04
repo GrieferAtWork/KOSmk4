@@ -448,8 +448,13 @@ x86_handle_pagefault(struct icpustate *__restrict state,
 			}
 			mman_kernel_hintinit_inuse_dec();
 		}
-		/* Check if some other thread initialized this page...
-		 * If this happened, */
+		/* Check  if some other thread initialized this page...
+		 * If this happened, we mustn't fall-through to any  of
+		 * the blocking code below in case the original mapping
+		 * was marked as HINTED.
+		 *
+		 * Luckily, we're allowed to assume that the transition
+		 * from HINTED->MAPPED on the page-dir level is atomic! */
 		if ((ecode & X86_PAGEFAULT_ECODE_WRITING)
 		    ? pagedir_iswritable(addr)
 		    : pagedir_ismapped(addr))
