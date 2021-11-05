@@ -46,6 +46,7 @@
 #include <hybrid/overflow.h>
 
 #include <hw/disk/part/efi.h>
+#include <hw/disk/part/embr.h>
 #include <hw/disk/part/mbr.h>
 #include <kos/dev.h>
 #include <kos/except.h>
@@ -335,8 +336,7 @@ PRIVATE BLOCKING ATTR_NOINLINE NONNULL((1, 2, 3)) bool FCALL
 blkdev_makeparts_loadefi(struct blkdev *__restrict self,
                          struct blkdev_list *__restrict parts,
                          struct blkdev_makeparts_info *__restrict info,
-                         uint64_t efipart_sectormin,
-                         uint64_t efipart_sectorcnt)
+                         uint64_t efipart_sectormin)
 		THROWS(E_BADALLOC, ...) {
 	struct efi_descriptor *efi;
 	pos_t efi_pos;
@@ -380,12 +380,11 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 	/* Save partition GUID */
 	memcpy(&info->br_efi_guid, &efi->gpt_guid, sizeof(guid_t));
 
-	printk(KERN_INFO "[blk] EFI partition found at %#" PRIx64 "...%#" PRIx64 " on "
+	printk(KERN_INFO "[blk] EFI partition found at %#" PRIx64 " on "
 	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                 "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
-	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
-	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
-	       device_getname(self));
+	       efipart_sectormin, MAJOR(self->dn_devno),
+	       MINOR(self->dn_devno), device_getname(self));
 	efi_hdrsize = LETOH32(efi->gpt_hdrsize);
 	if unlikely(efi_hdrsize < offsetafter(struct efi_descriptor, gpt_partition_count))
 		goto fail_hdr_toosmall;
@@ -466,12 +465,12 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 		if (lba_min > lba_max) {
 			if (lba_min == lba_max + 1)
 				continue; /* Empty partition (allowed and ignored) */
-			printk(KERN_ERR "[blk] EFI partition from EFI table in %#" PRIx64 "...%#" PRIx64 " on "
+			printk(KERN_ERR "[blk] EFI partition from EFI table in %#" PRIx64 " on "
 			                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 			                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) "
 			                "ends at %" PRIu64 " before it starts at %" PRIu64 "\n",
-			       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
-			       MAJOR(self->dn_devno), MINOR(self->dn_devno), device_getname(self),
+			       efipart_sectormin, MAJOR(self->dn_devno),
+			       MINOR(self->dn_devno), device_getname(self),
 			       lba_max + 1, lba_min);
 			continue;
 		}
@@ -501,39 +500,188 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 
 	return true;
 fail_bad_partition_vector:
-	printk(KERN_ERR "[blk] EFI partition table address in %#" PRIx64 "...%#" PRIx64 " on "
+	printk(KERN_ERR "[blk] EFI partition table address in %#" PRIx64 " on "
 	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) overflows "
 	                "(sector %" PRIu64 " * %" PRIuSIZ " bytes per sector)\n",
-	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
-	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       efipart_sectormin, MAJOR(self->dn_devno), MINOR(self->dn_devno),
 	       device_getname(self), efi_entbase, blkdev_getsectorsize(self));
 	return false;
 fail_ent_toosmall:
-	printk(KERN_ERR "[blk] EFI partition entires in %#" PRIx64 "...%#" PRIx64 " on "
+	printk(KERN_ERR "[blk] EFI partition entires in %#" PRIx64 " on "
 	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) are too small (%" PRIu32 " bytes)\n",
-	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
-	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       efipart_sectormin, MAJOR(self->dn_devno), MINOR(self->dn_devno),
 	       device_getname(self), efi_entsize);
 	return false;
 fail_hdr_toosmall:
-	printk(KERN_ERR "[blk] EFI header table at %#" PRIx64 "...%#" PRIx64 " on "
+	printk(KERN_ERR "[blk] EFI header table at %#" PRIx64 " on "
 	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) is too small (%" PRIu32 " bytes)\n",
-	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
-	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
-	       device_getname(self), efi_hdrsize);
+	       efipart_sectormin, MAJOR(self->dn_devno),
+	       MINOR(self->dn_devno), device_getname(self), efi_hdrsize);
 	return false;
 fail_badsig:
-	printk(KERN_WARNING "[blk] Invalid EFI signature in EFI partition at "
-	                    "%#" PRIx64 "...%#" PRIx64 " on "
+	printk(KERN_WARNING "[blk] Invalid EFI signature in EFI partition at %#" PRIx64 " on "
 	                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                    "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
-	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
-	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
-	       device_getname(self));
+	       efipart_sectormin, MAJOR(self->dn_devno),
+	       MINOR(self->dn_devno), device_getname(self));
 	return false;
+}
+
+
+/* Try  to decode EFI partitions. If the pointed sector(s) don't actually
+ * contain a proper EFI partition table, return `false'. Otherwise, parse
+ * the table and create partitions. */
+PRIVATE BLOCKING ATTR_NOINLINE NONNULL((1, 2)) bool FCALL
+blkdev_makeparts_loadembr(struct blkdev *__restrict self,
+                          struct blkdev_list *__restrict parts,
+                          uint64_t embr_sectormin)
+		THROWS(E_BADALLOC, ...) {
+	STATIC_ASSERT(sizeof(struct embr_partition) == 512);
+	STATIC_ASSERT((512 % sizeof(struct embr_parthdr)) == 0);
+	STATIC_ASSERT((512 % sizeof(struct embr_partent)) == 0);
+	struct embr_partition *embr;
+	struct embr_parthdr *phdr;
+	struct embr_partent *pent;
+	uint16_t i, num_partitions;
+	pos_t embr_pos;
+	uint64_t embr_sectors_base;
+	size_t loaded;
+
+	/* Read the eMBR partition */
+	embr_pos = (pos_t)embr_sectormin << blkdev_getsectorshift(self);
+	if likely(blkdev_getsectorsize(self) == 512) {
+		STATIC_ASSERT(PAGESIZE >= 512);
+		embr = (struct embr_partition *)aligned_alloca(512, 512);
+		blkdev_rdsectors(self, embr_pos, pagedir_translate(embr), 512);
+	} else {
+		embr = (struct embr_partition *)alloca(512);
+		mfile_readall(self, embr, 512, embr_pos);
+	}
+
+	/* Verify signature. */
+	if (memcmp(embr->embr_signature, "EmbrrbmE", 8) != 0)
+		return false;
+	if (embr->embr_bootsig[0] != 0x55)
+		return false;
+	if (embr->embr_bootsig[1] != 0xAA)
+		return false;
+
+	/* Calculate the starting sector of the "eMBR Partition Header" */
+	embr_pos -= 512; /* Because  `embr_sectormin == 1',  and  EMBR  assumes  512b
+	                  * sectors, but `embr->embr_hdrsector' is relative to LBA=0. */
+	embr_sectors_base = (uint64_t)embr_pos >> blkdev_getsectorshift(self); /* Remember base */
+	embr_pos += (pos_t)LETOH16(embr->embr_hdrsector) * 512;
+
+	/* Read the sector of the partition header. */
+	phdr = (struct embr_parthdr *)embr;
+	if likely(blkdev_getsectorsize(self) == 512) {
+		blkdev_rdsectors(self, embr_pos, pagedir_translate(phdr), 512);
+	} else {
+		mfile_readall(self, phdr, 512, embr_pos);
+	}
+
+	/* Do some more signature validation */
+	if (memcmp(phdr->eph_sig1, "EMBR", 4) != 0)
+		return false;
+	if (memcmp(phdr->eph_sig2, "RBME", 4) != 0)
+		return false;
+	num_partitions = LETOH16(phdr->eph_entcnt);
+	if unlikely(!num_partitions)
+		return false;
+	pent   = (struct embr_partent *)(phdr + 1);
+	loaded = 512 - sizeof(struct embr_parthdr);
+	for (i = 0; i < num_partitions; ++i) {
+		/* Check if the next entry is still loaded in memory. */
+		if (loaded < sizeof(struct embr_partent)) {
+			/* Must load next entry. */
+			byte_t buf[sizeof(struct embr_partent)];
+			memcpy(buf, pent, loaded);
+			pent = (struct embr_partent *)phdr;
+			embr_pos += 512; /* Set `embr_pos' to address of next partition-table-sector not yet loaded. */
+			if likely(blkdev_getsectorsize(self) == 512) {
+				blkdev_rdsectors(self, embr_pos, pagedir_translate(pent), 512);
+			} else {
+				mfile_readall(self, pent, 512, embr_pos);
+			}
+			/* Inject a partial entry from a previous sector */
+			if (loaded) {
+				memmoveup((byte_t *)pent + loaded,
+				          (byte_t *)pent, 512 - loaded);
+				memcpy(pent, buf, loaded);
+			}
+			loaded = 512;
+		}
+
+		/* Load the partition. */
+		if likely(memcmp(pent->epe_sig, "eMBR", 4) == 0) {
+			struct blkdev *dev;
+			uint64_t partbase, partsize, partmax;
+			partbase = embr_sectors_base + LETOH64(pent->epe_lbastart);
+			partsize = LETOH64(pent->epe_lbacount);
+			if unlikely(partsize == 0)
+				goto nextpart;
+
+			/* Verify that sector indices don't overflow. */
+			if unlikely(OVERFLOW_UADD(partbase, partsize - 1, &partmax)) {
+				printk(KERN_ERR "[eMBR] Partition #%" PRIu16 " overflows "
+				                "(base: %#" PRIx64 ", size: %#" PRIx64 ")\n",
+				       i, partbase, partsize);
+				partsize = (uint64_t)0 - partbase;
+				partmax  = (uint64_t)-1;
+			}
+
+			/* Verify that the partition isn't larger than the disk. */
+			if unlikely(partmax >= (blkdev_getsectorcount(self) - 1)) {
+				printk(KERN_ERR "[eMBR] Partition #%" PRIu16 " extends beyond disk size "
+				                "(base: %#" PRIx64 ", size: %#" PRIx64 ", disk: %#" PRIx64 ")\n",
+				       i, partbase, partsize, blkdev_getsectorcount(self));
+				if unlikely(partbase >= blkdev_getsectorcount(self))
+					goto nextpart;
+				partsize = blkdev_getsectorcount(self) - partbase;
+				partmax  = partbase + partsize - 1;
+			}
+
+			/* Verify that no other partition already overlaps with this range. */
+			if (blkdev_list_overlaps(parts, partbase, partmax)) {
+				printk(KERN_ERR "[eMBR] Partition #%" PRIu16 " overlaps with another partition "
+				                "(base: %#" PRIx64 ", size: %#" PRIx64 ")\n",
+				       i, partbase, partsize);
+				goto nextpart;
+			}
+
+			/* Create the partition. */
+			assert(partsize != 0);
+
+			/* Create a new partition */
+			dev = blkdev_makeparts_create(self, parts, partbase, partsize);
+			
+			/* Fill in partition information. */
+			dev->bd_partinfo.bp_mbr_sysno = 0;
+			*(char *)mempcpy(dev->bd_partinfo.bp_efi_name, pent->epe_desc, 64) = '\0';
+
+			/* Trim partition name. */
+			while (*dev->bd_partinfo.bp_efi_name && isspace(*dev->bd_partinfo.bp_efi_name))
+				memmovedown(dev->bd_partinfo.bp_efi_name, dev->bd_partinfo.bp_efi_name + 1, 65, sizeof(char));
+			while (*dev->bd_partinfo.bp_efi_name) {
+				size_t len = strlen(dev->bd_partinfo.bp_efi_name);
+				if (!isspace(dev->bd_partinfo.bp_efi_name[len - 1]))
+					break;
+				dev->bd_partinfo.bp_efi_name[len - 1] = '\0';
+			}
+
+			dev->bd_partinfo.bp_active = 0; /* I don't think eMBR has a way to indicate active partitions... :( */
+			memset(&dev->bd_partinfo.bp_efi_typeguid, 0, sizeof(guid_t));
+			memset(&dev->bd_partinfo.bp_efi_partguid, 0, sizeof(guid_t));
+		}
+nextpart:
+		/* Move to next partition */
+		loaded -= sizeof(struct embr_partent);
+		pent += 1;
+	}
+	return true;
 }
 
 
@@ -567,7 +715,7 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 		return;
 
 	/* Save MBR's "diskuid" (and strip leading/trailing spaces) */
-	{
+	if (info) {
 		char *writer;
 		writer = (char *)mempcpy(info->br_mbr_diskuid, mbr->mbr_diskuid, sizeof(mbr->mbr_diskuid));
 		*writer = '\0';
@@ -665,14 +813,34 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 			blkdev_makeparts_loadmbr(self, parts, NULL, lba_min, lba_cnt);
 			break;
 
+		case MBR_SYSID_EMBR: {
+			/* EMBR (s.a. `https://web.archive.org/web/20210417035311/http://www.fysnet.net/fysos_embr.htm') */
+			if (i != 0)
+				goto make_normal_partition;
+			if (mbr->mbr_part[i].pt_32.pt_bootable != 0x80)
+				goto make_normal_partition;
+			if (mbr->mbr_part[i].pt_32.pt_sectstart != 1)
+				goto make_normal_partition;
+			if (mbr->mbr_part[i].pt_32.pt_cylistart != 0)
+				goto make_normal_partition;
+			if (mbr->mbr_part[i].pt_32.pt_lbastart != HTOLE32(1))
+				goto make_normal_partition;
+			if (!blkdev_makeparts_loadembr(self, parts, lba_min))
+				goto make_normal_partition;
+		}	break;
+
 		case MBR_SYSID_EFI:
-			if (info != NULL &&
-			    blkdev_makeparts_loadefi(self, parts, info, lba_min, lba_cnt))
-				break;
-			/* Not a valid EFI partition; fall through to creating a normal partition. */
-			ATTR_FALLTHROUGH
+			if (info == NULL)
+				goto make_normal_partition;
+			if (!blkdev_makeparts_loadefi(self, parts, info, lba_min)) {
+				/* Not a valid EFI partition; fall through to creating a normal partition. */
+				goto make_normal_partition;
+			}
+			break;
+
 		default: {
 			struct blkdev *dev;
+make_normal_partition:
 			/* Create a normal MBR partition */
 			dev = blkdev_makeparts_create(self, parts, lba_min, lba_cnt);
 

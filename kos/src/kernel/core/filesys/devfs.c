@@ -1972,6 +1972,29 @@ do_dump_blkdev(struct blkdev *__restrict self,
 	           total_bytes_adj, total_bytes_name,
 	           (uint64_t)blkdev_getsectorcount(self),
 	           (size_t)blkdev_getsectorsize(self));
+	if (blkdev_ispart(self)) {
+		if (self->bd_partinfo.bp_active)
+			dbg_print(DBGSTR("\tactive: " AC_WHITE("true") "\n"));
+		if (self->bd_partinfo.bp_mbr_sysno != 0)
+			dbg_printf(DBGSTR("\tsysno: " AC_WHITE("%#" PRIx8) "\n"), self->bd_partinfo.bp_mbr_sysno);
+		if (*self->bd_partinfo.bp_efi_name != '\0')
+			dbg_printf(DBGSTR("\tname: " AC_WHITE("%q") "\n"), self->bd_partinfo.bp_efi_name);
+		if (memxchr(&self->bd_partinfo.bp_efi_typeguid, 0, sizeof(self->bd_partinfo.bp_efi_typeguid)))
+			dbg_printf(DBGSTR("\ttypeguid: " AC_WHITE(FORMAT_GUID_T) "\n"), FORMAT_GUID_T_ARGS(self->bd_partinfo.bp_efi_typeguid));
+		if (memxchr(&self->bd_partinfo.bp_efi_partguid, 0, sizeof(self->bd_partinfo.bp_efi_partguid)))
+			dbg_printf(DBGSTR("\tpartguid: " AC_WHITE(FORMAT_GUID_T) "\n"), FORMAT_GUID_T_ARGS(self->bd_partinfo.bp_efi_partguid));
+	} else {
+		if (*self->bd_rootinfo.br_ata_serial_no != '\0')
+			dbg_printf(DBGSTR("\tserial_no: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_ata_serial_no);
+		if (*self->bd_rootinfo.br_ata_fw_rev != '\0')
+			dbg_printf(DBGSTR("\tfw_rev: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_ata_fw_rev);
+		if (*self->bd_rootinfo.br_ata_model != '\0')
+			dbg_printf(DBGSTR("\tmodel: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_ata_model);
+		if (*self->bd_rootinfo.br_mbr_diskuid != '\0')
+			dbg_printf(DBGSTR("\tdiskuid: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_mbr_diskuid);
+		if (memxchr(&self->bd_rootinfo.br_efi_guid, 0, sizeof(self->bd_rootinfo.br_efi_guid)))
+			dbg_printf(DBGSTR("\tguid: " AC_WHITE(FORMAT_GUID_T) "\n"), FORMAT_GUID_T_ARGS(self->bd_rootinfo.br_efi_guid));
+	}
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL

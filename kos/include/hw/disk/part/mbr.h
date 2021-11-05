@@ -34,9 +34,11 @@ __DECL_BEGIN
 
 /* Values for `pt_sysid' */
 #define MBR_SYSID_UNUSED  0x00 /* Unused partition */
-#define MBR_SYSID_EFI     0xee /* (probable) EFI partition (s.a. <hw/disk/part/efi.h>) */
 #define MBR_SYSID_EXT     0x05 /* Extended partition; recursively points to another MBR */
 #define MBR_SYSID_EXT_ALT 0x0f /* Alias for `MBR_SYSID_EXT' */
+#define MBR_SYSID_EMBR    0xe0 /* EMBR (more characteristics than this need to match, though!)
+                                * http://www.fysnet.net/fysos_embr.htm */
+#define MBR_SYSID_EFI     0xee /* (probable) EFI partition (s.a. <hw/disk/part/efi.h>) */
 
 
 #ifdef __CC__
