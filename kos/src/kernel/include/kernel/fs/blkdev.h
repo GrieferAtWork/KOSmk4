@@ -116,6 +116,9 @@ struct blkdev
 		struct {
 			REF struct blkdev  *bp_master;        /* [1..1][const] Underlying master device. */
 			LIST_ENTRY(blkdev)  bp_partlink;      /* [0..1][lock(bp_master->bd_rootinfo.br_partslock)] Link in list of partitions */
+#if __SIZEOF_POS_T__ > __SIZEOF_POINTER__
+			void              *_bp_pad;           /* ... */
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
 #ifdef __WANT_BLKDEV_bd_partinfo__bp_blkdevlop
 			union {
 				struct {
@@ -123,6 +126,8 @@ struct blkdev
 					minor_t     bp_partno;        /* [const] Partition index (position of this part in `bp_master->bd_rootinfo.br_parts') */
 					uint8_t     bp_mbr_sysno;     /* [const] MBR system ID (`struct mbr_partition_common::pt_sysid', or `0' if unknown or N/A) */
 					char        bp_efi_name[109]; /* [const] NUL-termianted string (`struct efi_partition::p_name', or empty if unknown or N/A) */
+					uint8_t     bp_active;        /* [const] Non-zero if this partition is "active" (s.a. `PART_BOOTABLE_ACTICE', `EFI_PART_F_ACTIVE') */
+					uint8_t    _bp_pad2;          /* ... */
 				};
 				Toblockop(blkdev)     _bp_blkdevlop;  /* Used internally during destruction... */
 				Tobpostlockop(blkdev) _bp_blkdevplop; /* Used internally during destruction... */
@@ -132,8 +137,9 @@ struct blkdev
 			minor_t             bp_partno;        /* [const] Partition index (position of this part in `bp_master->bd_rootinfo.br_parts') */
 			uint8_t             bp_mbr_sysno;     /* [const] MBR system ID (`struct mbr_partition_common::pt_sysid', or `0' if unknown or N/A) */
 			char                bp_efi_name[109]; /* [const] NUL-termianted string (`struct efi_partition::p_name', or empty if unknown or N/A) */
-#endif /* !__WANT_BLKDEV_bd_partinfo__bp_blkdevlop */
 			uint8_t             bp_active;        /* [const] Non-zero if this partition is "active" (s.a. `PART_BOOTABLE_ACTICE', `EFI_PART_F_ACTIVE') */
+			uint8_t            _bp_pad2;          /* ... */
+#endif /* !__WANT_BLKDEV_bd_partinfo__bp_blkdevlop */
 			guid_t              bp_efi_typeguid;  /* [const] EFI part type GUID (`struct efi_partition::p_type_guid', or all zeroes if unknown or N/A) */
 			guid_t              bp_efi_partguid;  /* [const] EFI part type GUID (`struct efi_partition::p_part_guid', or all zeroes if unknown or N/A) */
 		} bd_partinfo; /* [valid_if(blkdev_ispart(this))] */

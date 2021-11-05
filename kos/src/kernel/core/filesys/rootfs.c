@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_FILESYS_ROOTFS_C
 #define GUARD_KERNEL_CORE_FILESYS_ROOTFS_C 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -46,10 +47,12 @@ DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_root_partition, KERNEL_COMMANDLINE_OPTIO
 
 /* Search criteria for KOS auto-detecting the KOS root partition
  * - Sorted in order of descending priority. */
-#define FIND_UNIQUE_BLKDEV_BYACTIVE   0
-#define FIND_UNIQUE_BLKDEV_BYPARTNAME 1
-#define FIND_UNIQUE_BLKDEV_BYDISKNAME 2
-#define FIND_UNIQUE_BLKDEV_COUNT      3
+#define FIND_UNIQUE_BLKDEV_BYACTIVE    0
+#define FIND_UNIQUE_BLKDEV_BYPARTNAME  1
+#define FIND_UNIQUE_BLKDEV_BYDISKNAME  2
+#define FIND_UNIQUE_BLKDEV_BYPARTNAME2 3
+#define FIND_UNIQUE_BLKDEV_BYDISKNAME2 4
+#define FIND_UNIQUE_BLKDEV_COUNT       5
 
 
 /* Search the devfs device tree for a unique block-device matching `criteria' */
@@ -75,6 +78,16 @@ again:
 			ismatch = LIST_NEXT(me, bd_partinfo.bp_partlink) == NULL &&
 			          LIST_FIRST(&me->bd_partinfo.bp_master->bd_rootinfo.br_parts) == me &&
 			          strcasecmp(me->bd_partinfo.bp_master->bd_rootinfo.br_mbr_diskuid, "kos") == 0;
+			break;
+
+		case FIND_UNIQUE_BLKDEV_BYPARTNAME2:
+			ismatch = strcasestr(me->bd_partinfo.bp_efi_name, "kos") != NULL;
+			break;
+
+		case FIND_UNIQUE_BLKDEV_BYDISKNAME2:
+			ismatch = LIST_NEXT(me, bd_partinfo.bp_partlink) == NULL &&
+			          LIST_FIRST(&me->bd_partinfo.bp_master->bd_rootinfo.br_parts) == me &&
+			          strcasestr(me->bd_partinfo.bp_master->bd_rootinfo.br_mbr_diskuid, "kos") != NULL;
 			break;
 
 		default: __builtin_unreachable();
