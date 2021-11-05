@@ -37,6 +37,7 @@
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>

@@ -52,7 +52,6 @@
 
 
 #ifdef DBG_MONITOR_MEMORY
-#include <fs/vfs.h>
 #include <kernel/paging.h>
 #endif /* DBG_MONITOR_MEMORY */
 
@@ -184,7 +183,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 		size_t len;
 		localtime_r(&packet->sp_time, &t);
 #ifdef DBG_MONITOR_MEMORY
-		if (vfs_kernel.p_inode && sync_trywrite(&monitor_memory_lock)) {
+		if (sync_trywrite(&monitor_memory_lock)) {
 			pagedir_pushval_t pv;
 			byte_t *addr = (byte_t *)0xc0000000 + (DBG_MONITOR_MEMORY & ~PAGEMASK);
 			DBG_MONITOR_TYPE value;

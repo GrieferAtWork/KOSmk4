@@ -31,13 +31,13 @@ DECL_END
 #include <kernel/compiler.h>
 
 #include <dev/tty.h>
-#include <fs/vfs.h>
 #include <kernel/execabi.h> /* execabi_system_rtld_file */
 #include <kernel/fs/constdir.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/dirhandle.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/filehandle.h>
+#include <kernel/fs/fs.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>

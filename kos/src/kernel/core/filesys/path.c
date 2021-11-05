@@ -27,6 +27,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filehandle.h>
+#include <kernel/fs/fs.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>

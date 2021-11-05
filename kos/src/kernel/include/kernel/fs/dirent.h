@@ -24,6 +24,15 @@
 
 #ifndef CONFIG_USE_NEW_FS
 #include <fs/node.h>
+
+/* struct fdirent */
+#define fd_refcnt  de_refcnt
+#define fd_ino     de_ino
+#define fd_hash    de_hash
+#define fd_namelen de_namelen
+#define fd_type    de_type
+#define fd_name    de_name
+
 #else /* !CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 

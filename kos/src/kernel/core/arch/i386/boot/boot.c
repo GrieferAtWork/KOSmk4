@@ -50,11 +50,12 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libpciaccess/pciaccess.h> /* pci_system_init() */
 
-/**/
-#include <dev/block.h>    /* TODO: Remove me; Only used for boot_partition-init */
-#include <fs/node.h>      /* TODO: Remove me; Only used for boot_partition-init */
-#include <fs/vfs.h>       /* TODO: Remove me; Only used for boot_partition-init */
-#include <kernel/panic.h> /* TODO: Remove me; Only used for boot_partition-init */
+#ifndef CONFIG_USE_NEW_FS /* Only used for boot_partition-init */
+#include <dev/block.h>
+#include <fs/node.h>
+#include <fs/vfs.h>
+#include <kernel/panic.h>
+#endif /* !CONFIG_USE_NEW_FS */
 
 DECL_BEGIN
 

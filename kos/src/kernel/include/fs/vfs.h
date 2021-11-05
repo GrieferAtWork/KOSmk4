@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/fs.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
 

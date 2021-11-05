@@ -30,10 +30,10 @@ opt.append("-Os");
 #include <kernel/compiler.h>
 
 #include <debugger/debugger.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/panic.h>
 #include <kernel/rt/except-handler.h>
@@ -70,10 +70,9 @@ dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 		dbg_print(DBGSTR("Breakpoint "));
 		if (ei->mei_path && ei->mei_dent) {
 			path_printent(ei->mei_path,
-			              ei->mei_dent->de_name,
-			              ei->mei_dent->de_namelen,
-			              &dbg_printer,
-			              NULL);
+			              ei->mei_dent->fd_name,
+			              ei->mei_dent->fd_namelen,
+			              &dbg_printer, NULL);
 			dbg_putc(' ');
 		}
 	}

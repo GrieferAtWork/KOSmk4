@@ -25,8 +25,8 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <fs/vfs.h>
 #include <kernel/driver-param.h>
+#include <kernel/fs/fs.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>

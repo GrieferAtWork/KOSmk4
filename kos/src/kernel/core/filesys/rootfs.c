@@ -26,6 +26,7 @@
 #include <kernel/fs/blkdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/fs.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
