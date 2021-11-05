@@ -524,9 +524,9 @@ Fat_LoadBlocks(struct mfile *__restrict self, pos_t addr,
 	struct fnode *me     = mfile_asnode(self);
 	FatNodeData *dat     = me->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
-	assertf((buf & (super->ft_sectorsize - 1)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
-	assertf((addr & (super->ft_sectorsize - 1)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
-	assertf((num_bytes & (super->ft_sectorsize - 1)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
+	assertf((buf & super->ft_sectormask) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
+	assertf((addr & super->ft_sectormask) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
+	assertf((num_bytes & super->ft_sectormask) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
 	if unlikely(!num_bytes)
 		return;
 again:
@@ -591,9 +591,9 @@ Fat_SaveBlocks(struct mfile *__restrict self, pos_t addr,
 	struct fnode *me     = mfile_asnode(self);
 	FatNodeData *dat     = me->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
-	assertf((buf & (super->ft_sectorsize - 1)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
-	assertf((addr & (super->ft_sectorsize - 1)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
-	assertf((num_bytes & (super->ft_sectorsize - 1)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
+	assertf((buf & super->ft_sectormask) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
+	assertf((addr & super->ft_sectormask) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
+	assertf((num_bytes & super->ft_sectormask) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
 	if unlikely(!num_bytes)
 		return;
 again:
@@ -2616,7 +2616,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		result->ft_sectorshift = CTZ(sector_size);
 
 		/* Fill in filesystem info. */
-		result->ft_sectorsize = sector_size;
+		result->ft_sectormask = sector_size - 1;
 		result->ft_uid        = 0;
 		result->ft_gid        = 0;
 		result->ft_mode       = 0755; /* Read/Execute permissions for everyone. */
@@ -2645,8 +2645,9 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		} else {
 			u32 fat_size, root_sectors;
 			u32 data_sectors, total_clusters;
-			root_sectors = (LETOH16(disk->bpb.bpb_maxrootsize) * sizeof(struct fat_dirent) +
-			                (result->ft_sectorsize - 1)) >>
+			root_sectors = (LETOH16(disk->bpb.bpb_maxrootsize) *
+			                sizeof(struct fat_dirent) +
+			                result->ft_sectormask) >>
 			               result->ft_sectorshift;
 			fat_size             = (disk->bpb.bpb_fatc * LETOH16(disk->bpb.bpb_sectors_per_fat));
 			result->ft_dat_start = LETOH16(disk->bpb.bpb_reserved_sectors);
@@ -2810,9 +2811,9 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		result->ft_super.ffs_super.fs_feat.sf_symlink_max        = 0;
 		result->ft_super.ffs_super.fs_feat.sf_link_max           = 1;
 		result->ft_super.ffs_super.fs_feat.sf_magic              = MSDOS_SUPER_MAGIC;
-		result->ft_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->ft_sectorsize;
-		result->ft_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->ft_sectorsize;
-		result->ft_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->ft_sectorsize;
+		result->ft_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->ft_sectormask + 1;
+		result->ft_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->ft_sectormask + 1;
+		result->ft_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->ft_sectormask + 1;
 		result->ft_super.ffs_super.fs_feat.sf_rec_xfer_align     = (u32)1 << dev->mf_iobashift;
 		result->ft_super.ffs_super.fs_feat.sf_name_max           = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
 		result->ft_super.ffs_super.fs_feat.sf_filesizebits       = 32;
@@ -2820,8 +2821,13 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		result->ft_super.ffs_super.fs_root.mf_atime              = realtime();
 		result->ft_super.ffs_super.fs_root.mf_mtime              = result->ft_super.ffs_super.fs_root.mf_atime;
 		result->ft_super.ffs_super.fs_root.mf_ctime              = result->ft_super.ffs_super.fs_root.mf_atime;
+		result->ft_super.ffs_super.fs_root.fn_nlink              = 1;
+		result->ft_super.ffs_super.fs_root.fn_uid                = 0;
+		result->ft_super.ffs_super.fs_root.fn_gid                = 0;
 		result->ft_fdat.fn_ent                                   = NULL;
 		result->ft_fdat.fn_dir                                   = NULL;
+		result->_ft_1dot                                         = (uint32_t)-1;
+		result->_ft_2dot                                         = (uint32_t)-1;
 
 		/* Special case for when uid/gid support is available. */
 		if (result->ft_features & FAT_FEATURE_UGID) {

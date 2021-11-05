@@ -672,7 +672,7 @@ struct flatsuper_ops {
 	                       struct flatdirnode *__restrict dir)
 			THROWS(E_BADALLOC, E_IOERROR);
 
-	struct fsuper_ops        ffso_super; /* Super operators */
+	struct fsuper_ops       ffso_super; /* Super operators */
 	struct flatdirnode_xops ffso_flat;  /* Flat root directory operators */
 };
 

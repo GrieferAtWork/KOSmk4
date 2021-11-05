@@ -1120,6 +1120,9 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->fs_root.mf_mtime             = result->fs_root.mf_atime;
 	result->fs_root.mf_ctime             = result->fs_root.mf_atime;
 	result->fs_root.fn_mode              = S_IFDIR | 0777;
+	result->fs_root.fn_nlink             = 1;
+	result->fs_root.fn_uid               = 0;
+	result->fs_root.fn_gid               = 0;
 	atomic64_init(&result->fs_root.mf_filesize, (uint64_t)-1);
 
 	/* Fill in filesystem features. */

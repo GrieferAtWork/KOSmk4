@@ -315,7 +315,7 @@ typedef struct inode_data {
 	REF FatDirNode       *fn_dir; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory containing this INode (or `NULL' for root directory, or when deleted) */
 	union {
 		struct {
-			pos_t              r16_rootpos;   /* [const] On-disk starting address of the root directory segment. (Aligned by `result->ft_sectorsize') */
+			pos_t              r16_rootpos;   /* [const] On-disk starting address of the root directory segment. (Aligned by `result->ft_sectormask + 1') */
 			u32                r16_rootsiz;   /* [const] Max size of the root-directory segment (in bytes) */
 		}                      fn16_root;     /* [valid_if(:ft_type != FAT32 && :self == :s_root)] */
 		struct {
@@ -382,21 +382,21 @@ struct fatlnknode: flnknode {
 };
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 
-#define fregnode_asfat(self)     ((FatRegNode *)(self))
+#define fregnode_asfat(self)    ((FatRegNode *)(self))
 #define flatdirnode_asfat(self) ((FatDirNode *)(self))
-#define fdirnode_asfat(self)     flatdirnode_asfat(fdirnode_asflat(self))
-#define fdirnode_asfatsup(self)  FatDirNode_AsSuper(fdirnode_asfat(self))
+#define fdirnode_asfat(self)    flatdirnode_asfat(fdirnode_asflat(self))
+#define fdirnode_asfatsup(self) FatDirNode_AsSuper(fdirnode_asfat(self))
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-#define flnknode_asfat(self)     ((FatLnkNode *)(self))
+#define flnknode_asfat(self) ((FatLnkNode *)(self))
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
-#define fnode_asfatreg(self)   fregnode_asfat(fnode_asreg(self))
-#define fnode_asfatdir(self)   flatdirnode_asfat(fnode_asflatdir(self))
-#define fnode_asfatlnk(self)   flnknode_asfat(fnode_aslnk(self))
-#define fnode_asfatsup(self)   FatDirNode_AsSuper(fnode_asfatdir(self))
-#define mfile_asfatreg(self)   fregnode_asfat(mfile_asreg(self))
-#define mfile_asfatdir(self)   flatdirnode_asfat(mfile_asflatdir(self))
-#define mfile_asfatlnk(self)   flnknode_asfat(mfile_aslnk(self))
-#define mfile_asfatsup(self)   FatDirNode_AsSuper(mfile_asfatdir(self))
+#define fnode_asfatreg(self) fregnode_asfat(fnode_asreg(self))
+#define fnode_asfatdir(self) flatdirnode_asfat(fnode_asflatdir(self))
+#define fnode_asfatlnk(self) flnknode_asfat(fnode_aslnk(self))
+#define fnode_asfatsup(self) FatDirNode_AsSuper(fnode_asfatdir(self))
+#define mfile_asfatreg(self) fregnode_asfat(mfile_asreg(self))
+#define mfile_asfatdir(self) flatdirnode_asfat(mfile_asflatdir(self))
+#define mfile_asfatlnk(self) flnknode_asfat(mfile_aslnk(self))
+#define mfile_asfatsup(self) FatDirNode_AsSuper(mfile_asfatdir(self))
 
 
 typedef NOBLOCK NONNULL((1)) FatClusterIndex (FCALL *PFatGetFatIndirection)(FatSuperblock const *__restrict self, FatClusterIndex index);
@@ -422,11 +422,11 @@ struct fatsuper {
 	u8                     _ft_pad;         /* ... */
 	u8                      ft_fat_count;   /* [const] Amount of redundant FAT copies. */
 #ifdef __INTELLISENSE__
-	shift_t                 ft_sectorshift; /* [const] ilog2(ft_sectorsize) (in bytes). */
+	shift_t                 ft_sectorshift; /* [const] ilog2(SECTOR_SIZE) (in bytes). */
 #else /* __INTELLISENSE__ */
-#define ft_sectorshift      ft_super.ffs_super.fs_root.mf_blockshift  /* [const] ilog2(ft_sectorsize) (in bytes). */
+#define ft_sectorshift      ft_super.ffs_super.fs_root.mf_blockshift  /* [const] ilog2(SECTOR_SIZE) (in bytes). */
 #endif /* !__INTELLISENSE__ */
-	size_t                  ft_sectorsize;  /* [const][== 1 << ft_sectorshift] Size of a sector (in bytes). */
+	size_t                  ft_sectormask;  /* [const][== (1 << ft_sectorshift) - 1] Size of a sector (in bytes). */
 	size_t                  ft_clustersize; /* [const][== ft_sec4clus << ft_sectorshift] Size of a cluster (in bytes). */
 	size_t                  ft_fat_size;    /* [const][== ft_sec4fat << ft_sectorshift] Size of a single FileAllocationTable (in bytes). */
 	FatSectorIndex          ft_sec4clus;    /* [const] Amount of sectors per cluster. */
@@ -447,6 +447,8 @@ struct fatsuper {
 	FatClusterIndex         ft_free_pos;    /* [lock(ft_fat_lock)] Next cluster index that should be considered when search for free clusters. */
 	struct flatsuper        ft_super;       /* Underlying superblock */
 	FatNodeData             ft_fdat;        /* Fat root directory node data. */
+	uint32_t                _ft_1dot;       /* s.a. `struct fatdirnode::fdn_1dot' */
+	uint32_t                _ft_2dot;       /* s.a. `struct fatdirnode::fdn_2dot' */
 };
 #define flatsuper_asfat(self) COMPILER_CONTAINER_OF(self, FatSuperblock, ft_super)
 #define fsuper_asfat(self)    COMPILER_CONTAINER_OF(self, FatSuperblock, ft_super.ffs_super)

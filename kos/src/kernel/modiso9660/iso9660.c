@@ -27,7 +27,6 @@
 #ifdef CONFIG_USE_NEW_FS
 
 #include <kernel/driver-callbacks.h>
-#include <kernel/fs/blkdev.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/flat.h>
@@ -35,6 +34,7 @@
 #include <kernel/fs/regnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
+#include <sched/tsc.h>
 
 #include <hybrid/bit.h>
 #include <hybrid/byteorder.h>
@@ -420,6 +420,9 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	result->ffs_super.fs_root.mf_atime = realtime();
 	result->ffs_super.fs_root.mf_mtime = result->ffs_super.fs_root.mf_atime;
 	result->ffs_super.fs_root.mf_ctime = result->ffs_super.fs_root.mf_atime;
+	result->ffs_super.fs_root.fn_nlink = 1;
+	result->ffs_super.fs_root.fn_uid   = 0;
+	result->ffs_super.fs_root.fn_gid   = 0;
 
 	/* Fill in features. */
 	result->ffs_super.fs_feat.sf_filesize_max       = (pos_t)(u32)-1;

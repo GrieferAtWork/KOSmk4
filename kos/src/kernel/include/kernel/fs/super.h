@@ -98,7 +98,7 @@ struct fsuperfeat {
 	u32     sf_rec_min_xfer_size;  /* [const] Min buffer size for efficient disk transfer operations (Usually: `(u32)mfile_getblocksize(&fs_root)') */
 	u32     sf_rec_xfer_align;     /* [const] Required in-memory buffer alignment for efficient disk transfer operations (Usually: `(u32)1 << mf_iobashift') */
 	u16     sf_name_max;           /* [const] Max # of chars in a file name */
-	u8      sf_filesizebits;       /* [const] Max # of bits in a file's size field (usually 64 or 32) */
+	shift_t sf_filesizebits;       /* [const] Max # of bits in a file's size field (usually 64 or 32) */
 };
 #define fsuperfeat_hassymlink(self) ((self)->sf_symlink_max != 0)
 #define fsuperfeat_hashrdlink(self) ((self)->sf_link_max > 1)

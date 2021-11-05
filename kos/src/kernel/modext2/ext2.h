@@ -17,14 +17,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODEXT2FS_EXT2_H
-#define GUARD_MODEXT2FS_EXT2_H 1
+#ifndef GUARD_MODEXT2_EXT2_H
+#define GUARD_MODEXT2_EXT2_H 1
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+DECL_BEGIN
+struct ext2idat;
+DECL_END
+#define FNODE_FSDATA_T struct ext2idat
+#include <kernel/fs/flat.h>
+#include <kernel/fs/lnknode.h>
+#include <kernel/fs/regnode.h>
+#include <sched/atomic64.h>
+#include <sched/shared_rwlock.h>
+#else /* CONFIG_USE_NEW_FS */
 #include <fs/node.h>
+#endif /* !CONFIG_USE_NEW_FS */
+
 #include <kernel/types.h>
-#include <sched/rwlock.h>
 
 DECL_BEGIN
 
@@ -40,8 +52,8 @@ typedef struct ATTR_PACKED {
 	le32    e_free_blocks;       /* Total number of unallocated blocks */
 	le32    e_free_inodes;       /* Total number of unallocated inodes */
 	le32    e_super_blockno;     /* Block number of the block containing the superblock */
-	le32    e_log2_blocksz;      /* log2 (block_size) - 10.    (block_size == 1024 << e_log2_blocksz) */
-	le32    e_log2_fragsz;       /* log2 (fragment_size) - 10. (fragment_size == 1024 << e_log2_fragsz) */
+	le32    e_log2_blocksz;      /* log2(block_size) - 10.    (block_size == 1024 << e_log2_blocksz) */
+	le32    e_log2_fragsz;       /* log2(fragment_size) - 10. (fragment_size == 1024 << e_log2_fragsz) */
 	le32    e_blocks_per_group;  /* Number of blocks in each block group */
 	le32    e_frags_per_group;   /* Number of fragments in each block group */
 	le32    e_inodes_per_group;  /* Number of inodes in each block group */
@@ -109,7 +121,15 @@ typedef struct ATTR_PACKED {
 #define EXT2_ROOT_DIRECTORY_INO 2    /* Root directory INode number. */
 
 
-typedef u32 ext2_block_t;
+typedef u32 ext2_block_t;          /* Index of disk block (get addr via `EXT2_BLOCK2ADDR()') */
+typedef u32 ext2_blocki_t;         /* Index of disk block containing an array `ext2_block_t[es_ind_blocksize]' */
+typedef u32 ext2_blockii_t;        /* Index of disk block containing an array `ext2_blocki_t[es_ind_blocksize]' */
+typedef u32 ext2_blockiii_t;       /* Index of disk block containing an array `ext2_blockii_t[es_ind_blocksize]' */
+typedef le32 ext2_disk_block_t;    /* Same as `ext2_block_t', but uses on-disk endian encoding. */
+typedef le32 ext2_disk_blocki_t;   /* Same as `ext2_blocki_t', but uses on-disk endian encoding. */
+typedef le32 ext2_disk_blockii_t;  /* Same as `ext2_blockii_t', but uses on-disk endian encoding. */
+typedef le32 ext2_disk_blockiii_t; /* Same as `ext2_blockiii_t', but uses on-disk endian encoding. */
+
 typedef u32 ext2_blockid_t; /* Index of a block within a file. */
 typedef u32 ext2_bgroup_t;
 typedef u32 ext2_ino_t;
@@ -117,29 +137,29 @@ typedef u32 ext2_ino_t;
 
 typedef struct ATTR_PACKED {
 	/* Block group descriptor. */
-	le32    bg_busage;           /* [TYPE(ext2_block_t)] Block address of a block-usage bitset. */
-	le32    bg_iusage;           /* [TYPE(ext2_block_t)] Block address of an inode-usage bitset. */
-	le32    bg_inodes;           /* [TYPE(ext2_block_t -> Ext2INode)] Starting block address of inode table */
-	le16    bg_free_blocks;      /* Number of unallocated blocks in group */
-	le16    bg_free_inodes;      /* Number of unallocated inodes in group */
-	le16    bg_num_dirs;         /* Number of directories in group */
-/*	u8    __bg_unused[14];        * ... */
+	ext2_disk_block_t bg_busage;      /* Block address of a block-usage bitset. */
+	ext2_disk_block_t bg_iusage;      /* Block address of an inode-usage bitset. */
+	ext2_disk_block_t bg_inodes;      /* Starting block address of inode table (points to `Ext2INode') */
+	le16              bg_free_blocks; /* Number of unallocated blocks in group */
+	le16              bg_free_inodes; /* Number of unallocated inodes in group */
+	le16              bg_num_dirs;    /* Number of directories in group */
+/*	u8              __bg_unused[14];   * ... */
 } Ext2DiskBlockGroup;
-#define EXT2_BLOCKGROUP_SIZE   32
+#define EXT2_BLOCKGROUP_SIZE 32
 
 
 typedef struct ATTR_PACKED {
 	/* INode data structure. */
-	le16    i_mode;              /* INode type and permissions (Identical to our `mode_t i_attr.a_mode' field) */
-	le16    i_uid;               /* INode UID (Identical to our `mode_t i_attr.a_uid' field) */
+	le16    i_mode;              /* INode type and permissions (Identical to our `mode_t') */
+	le16    i_uid;               /* INode UID (Identical to our `uid_t') */
 	le32    i_size_low;          /* Lower 32 bits of INode size in bytes. */
 	le32    i_atime;             /* Last accessed time (`time32_t' format) */
 	le32    i_ctime;             /* File creation time (`time32_t' format) */
 	le32    i_mtime;             /* File modification time (`time32_t' format) */
 	le32    i_dtime;             /* File deletion time (`time32_t' format) */
-	le16    i_gid;               /* INode GID (Identical to our `mode_t i_attr.a_gid' field) */
-	le16    i_nlink;             /* Number of hard links (Identical to our `mode_t i_nlink' field) */
-	le32    i_blocks;            /* Count of disk sectors (not Ext2 blocks) in use by this inode, not
+	le16    i_gid;               /* INode GID (Identical to our gid_t') */
+	le16    i_nlink;             /* Number of hard links (Identical to our `nlink_t') */
+	le32    i_nsectors;          /* Count of disk sectors (not Ext2 blocks) in use by this inode, not
 	                              * counting the actual inode structure nor directory entries linking
 	                              * to the inode. */
 #define EXT2_INODE_FSECURE_DELETE 0x00000001 /* Rewrite data and INode headers of the file a couple
@@ -161,11 +181,11 @@ typedef struct ATTR_PACKED {
 #define EXT2_DIRECT_BLOCK_COUNT  12 /* Number of direct block pointers. */
 	le32    i_dblock[EXT2_DIRECT_BLOCK_COUNT];
 	                             /* [TYPE(ext2_block_t)] Direct block pointers for file data. */
-	le32    i_siblock;           /* [TYPE(ext2_block_t)] Pointer to a block filled with `ext2_block_t[:sd_ind_blocksize]'. */
-	le32    i_diblock;           /* [TYPE(ext2_block_t)] Pointer to a block filled with `i_siblock[:sd_ind_blocksize]'. */
-	le32    i_tiblock;           /* [TYPE(ext2_block_t)] Pointer to a block filled with `i_diblock[:sd_ind_blocksize]'. */
+	le32    i_siblock;           /* [TYPE(ext2_blocki_t)] Single-Indirect block table. */
+	le32    i_diblock;           /* [TYPE(ext2_blockii_t)] Double-indirect block table. */
+	le32    i_tiblock;           /* [TYPE(ext2_blockiii_t)] Triple-indirect block table. */
 	le32    i_generation;        /* Generation number? */
-	le32    i_acl;               /* [valid_if(:->sd_version >= EXT2_VERSION_1)] File ACL. */
+	le32    i_acl;               /* [valid_if(:->es_version >= EXT2_VERSION_1)] File ACL. */
 	le32    i_size_high;         /* [valid_if(EXT2_FEAT_MRO_FSIZE64)] High 32 bits of file size. */
 	le32    i_fragment;          /* Block address of fragment??? */
 #ifdef __INTELLISENSE__
@@ -181,7 +201,8 @@ typedef struct ATTR_PACKED {
 			le16   l_uid_high;      /* High 16 bits of `i_uid' */
 			le16   l_gid_high;      /* High 16 bits of `i_gid' */
 			le32 __l_pad2;          /* ... */
-		}          i_os_linux;      /* [valid_if(:sd_os == EXT2_OS_FLINUX)] */
+		}          i_os_linux;      /* [valid_if(:es_os == EXT2_OS_FLINUX)] */
+
 		struct ATTR_PACKED {
 			u8     h_fragno;        /* Fragment number??? */
 			u8     h_fragsz;        /* Fragment size??? */
@@ -189,12 +210,13 @@ typedef struct ATTR_PACKED {
 			le16   h_uid_high;      /* High 16 bits of `i_uid' */
 			le16   h_gid_high;      /* High 16 bits of `i_gid' */
 			le32   h_uid_author;    /* User ID of author (if == 0xFFFFFFFF, the normal User ID will be used) */
-		}          i_os_hurd;       /* [valid_if(:sd_os == EXT2_OS_FGNU_HURD)] */
+		}          i_os_hurd;       /* [valid_if(:es_os == EXT2_OS_FGNU_HURD)] */
+
 		struct ATTR_PACKED {
 			u8     m_fragno;        /* Fragment number??? */
 			u8     m_fragsz;        /* Fragment size??? */
 			u8   __m_pad[10];       /* ... */
-		}          i_masix;         /* [valid_if(:sd_os == EXT2_OS_FMASIX)] */
+		}          i_masix;         /* [valid_if(:es_os == EXT2_OS_FMASIX)] */
 		le32       i_os2[3];        /* Operating System Specific Value #2 */
 	};
 } Ext2DiskINode;
@@ -210,7 +232,7 @@ typedef struct ATTR_PACKED {
 	union ATTR_PACKED
 #endif /* !__INTELLISENSE__ */
 	{
-		le16    d_namlen;        /* [valid_if(!(:->sd_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE))]
+		le16    d_namlen;        /* [valid_if(!(:->es_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE))]
 		                          * length of the name (in characters; excluding \0) */
 		struct ATTR_PACKED {
 			u8  d_namlen_low;    /* Low 8 bits of the name length. */
@@ -222,23 +244,111 @@ typedef struct ATTR_PACKED {
 
 
 
+#ifdef CONFIG_USE_NEW_FS
+struct ext2iblock {
+	ext2_block_t eib_blocks[0]; /* [es_ind_blocksize] Direct block pointers (Or `0' if not allocated) */
+};
+struct ext2iiblock {
+	struct ext2iblock *eiib_blocks[0]; /* [0..1][es_ind_blocksize]  */
+/*	COMPILER_FLEXIBLE_ARRAY(le32, eiib_block_ptrs);             * [TYPE(ext2_block_t)][es_ind_blocksize] Disk contents */
+};
+#define ext2iiblock_eiib_block_ptrs
+
+
+struct ext2idat {
+	pos_t                ei_inoaddr; /* [const] On-disk address of associated `Ext2DiskINode' */
+	struct shared_rwlock ei_lock;    /* Lock for fields below */
+	ext2_blockid_t       ei_blocks;  /* [lock(ei_lock)] # of allocated EXT2 blocks in use. (NOT THE SAME AS `i_nsectors'!) */
+	ext2_block_t         ei_dblock[EXT2_DIRECT_BLOCK_COUNT];
+	                                 /* [lock(ei_lock)] Direct block pointers for file data. (Or `0' if not allocated) */
+	ext2_blocki_t        ei_siblock; /* [lock(ei_lock)] Single-Indirect block table. (Or `0' if not allocated) */
+	ext2_blockii_t       ei_diblock; /* [lock(ei_lock)] Double-indirect block table. (Or `0' if not allocated) */
+	ext2_blockiii_t      ei_tiblock; /* [lock(ei_lock)] Triple-indirect block table. (Or `0' if not allocated) */
+};
+
+struct ext2regnode: fregnode {
+	struct ext2idat ern_fdat; /* Fat node data. */
+};
+
+struct ext2lnknode: flnknode {
+	struct ext2idat eln_fdat; /* Fat node data. */
+};
+
+struct ext2dirnode: flatdirnode {
+	struct ext2idat edn_fdat; /* Fat node data. */
+	atomic64_t      edn_1dot; /* [lock(ATOMIC && WRITE_ONCE)] Position of "." entry in directory stream (or `(uint64_t)-1' if unknown). */
+	atomic64_t      edn_2dot; /* [lock(ATOMIC && WRITE_ONCE)] Position of ".." entry in directory stream (or `(uint64_t)-1' if unknown). */
+};
+#define ext2dirnode_assuper(self) \
+	flatsuper_asext2(flatdirnode_assuper((struct flatdirnode *)(self)))
+
+
+#define ext2super_blocks2sectors(self, num_blocks) \
+	((uint32_t)((((uint64_t)(num_blocks) << (self)->es_blockshift) + (self)->es_blockmask) >> (self)->es_super.ffs_super.fs_dev->mf_blockshift))
+#define ext2super_sectors2blocks(self, num_sectors) \
+	((uint32_t)(((uint64_t)(num_sectors) << (self)->es_super.ffs_super.fs_dev->mf_blockshift)) >> (self)->es_blockshift)
+
+struct ext2super {
+	ext2_block_t        es_blk_per_bgrp;  /* [!0][const] Blocks per block group. */
+	ext2_ino_t          es_ino_per_bgrp;  /* [!0][const] Inodes per block group. */
+	ext2_block_t        es_total_blocks;  /* [!0][const] Total number of blocks. */
+	size_t              es_inode_size;    /* [>= 128][const] Size of a single INode (in bytes). */
+	size_t              es_inode_io_size; /* [>= 128 && <= sizeof(Ext2DiskINode)][const] INode I/O size. */
+	ext2_ino_t          es_total_inodes;  /* [!0][const] Total number of INodes.
+	                                       * NOTE: Since the first valid INode number is ONE(1), this
+	                                       *       field  doubles as the greatest valid INode number. */
+	u16                 es_version_maj;   /* [const] EXT2 version number */
+	u16                 es_version_min;   /* [const] EXT2 version number */
+	u32                 es_feat_optional; /* [const] Optional features in use (Set of `EXT2_FEAT_OPT_F*') */
+	u32                 es_feat_required; /* [const] Required features in use (Set of `EXT2_FEAT_REQ_F*') */
+	u32                 es_feat_mountro;  /* [const] Mount-ro features in use (Set of `EXT2_FEAT_MRO_F*') */
+	u32                 es_os;            /* [const] Operating system that was used to create the superblock (One of `EXT2_OS_F*'). */
+#ifdef __INTELLISENSE__
+	shift_t             es_blockshift;    /* [const] Shift to convert block numbers into absolute on-disk locations. */
+#else /* __INTELLISENSE__ */
+#define es_blockshift   es_super.ffs_super.fs_root.mf_blockshift
+#endif /* !__INTELLISENSE__ */
+	size_t              es_blockmask;     /* [const][== (1 << es_blockshift) - 1] Size of a block (in bytes). */
+	size_t              es_ind_blocksize; /* [const][== (1 << es_blockshift) / 4] Number of entries in an indirect block pointer block. */
+	pos_t               es_bgroup_addr;   /* [const] On-disk address of `es_bgroupv'. */
+	ext2_bgroup_t       es_bgroupc;       /* [!0][const] The total number of block groups. */
+	Ext2DiskBlockGroup *es_bgroupv;       /* [0..es_bgroupc][lock(WRITE_ONCE)][owned] Read/Write memory mapping of the superblock's block-group table. */
+	void               *es_freebgroupv;   /* [1..1][lock(WRITE_ONCE)][const] Token used to munmap() `es_bgroupv' during destruction (only used during destruction) */
+	struct flatsuper    es_super;         /* Underlying superblock */
+	struct ext2idat     es_fdat;          /* Superblock fs-specific file data. */
+	atomic64_t         _es_1dot;          /* s.a. `struct ext2dirnode::edn_1dot' */
+	atomic64_t         _es_2dot;          /* s.a. `struct ext2dirnode::edn_2dot' */
+};
+#define flatsuper_asext2(self) COMPILER_CONTAINER_OF(self, struct ext2super, es_super)
+#define fsuper_asext2(self)    COMPILER_CONTAINER_OF(self, struct ext2super, es_super.ffs_super)
+
+/* Convert block addresses to on-disk locations, as well as the opposite.
+ * Also  used  to  convert  in-file  addresses  to  their  block indices. */
+#define EXT2_BLOCK2ADDR(self, block) ((pos_t)(block) << (self)->es_blockshift)
+#define EXT2_ADDR2BLOCK(self, block) ((ext2_block_t)(block) >> (self)->es_blockshift)
+
+/* Return the block group index associated with a given INode. */
+#define EXT2_INO_BGRP_INDEX(self, ino) ((ext2_bgroup_t)((ext2_ino_t)((ino)-1) / (self)->es_ino_per_bgrp))
+
+/* Return the offset into a block group of a given INode. */
+#define EXT2_INO_BGRP_OFFSET(self, ino) ((ext2_ino_t)((ext2_ino_t)((ino)-1) % (self)->es_ino_per_bgrp))
 
 
 
-
+#else /* CONFIG_USE_NEW_FS */
 typedef struct block_group Ext2BlockGroup;
 struct block_group {
 	/* Block group descriptor. */
 	struct rwlock bg_lock;
 	ext2_block_t  bg_busage_addr;  /* [valid_if(BLOCK_GROUP_FLOADED)][const]
-	                                * Block address of a block-usage bitset with `:sd_blk_per_bgrp' elements.
+	                                * Block address of a block-usage bitset with `:es_blk_per_bgrp' elements.
 	                                * 1-bits are  currently  in  use (allocated),  and  ZERO-bits  are  free.
-	                                * The blocks referred to are calculated as `INDEX_OF(:sd_groups,self) * sd_blk_per_bgrp' */
+	                                * The blocks referred to are calculated as `INDEX_OF(:es_bgroupv,self) * es_blk_per_bgrp' */
 	ext2_block_t  bg_iusage_addr;  /* [valid_if(BLOCK_GROUP_FLOADED)][const]
-	                                * Block address of an inode-usage bitset with `:sd_ino_per_bgrp' elements.
+	                                * Block address of an inode-usage bitset with `:es_ino_per_bgrp' elements.
 	                                * 1-bits  are  currently in  use (allocated),  and  ZERO-bits are  free. * */
 	ext2_block_t  bg_inodes;       /* [valid_if(BLOCK_GROUP_FLOADED)][const]
-	                                * Block address of an `Ext2INode[:sd_ino_per_bgrp]' array. */
+	                                * Block address of an `Ext2INode[:es_ino_per_bgrp]' array. */
 	u16           bg_free_blocks;  /* [valid_if(BLOCK_GROUP_FLOADED)] Number of unallocated blocks in group */
 	u16           bg_free_inodes;  /* [valid_if(BLOCK_GROUP_FLOADED)] Number of unallocated inodes in group */
 	u16           bg_num_dirs;     /* [valid_if(BLOCK_GROUP_FLOADED)] Number of allocated directory INodes in group. */
@@ -251,56 +361,56 @@ struct block_group {
 #if __SIZEOF_POINTER__ > 4
 	u32         __bg_pad2;         /* ... */
 #endif
-	byte_t       *bg_busage;       /* [0..:sd_blk_per_bgrp/8][owned] Bitset of  allocated blocks  in this  group.
+	byte_t       *bg_busage;       /* [0..:es_blk_per_bgrp/8][owned] Bitset of  allocated blocks  in this  group.
 	                                * This  vector  is lazily  allocated and  read from  disk upon  first access.
 	                                * Note however  that it  does not  follow WRITE_ONCE  rules, so  you need  to
 	                                * be holding a read-lock on `bg_lock' if you wish to dereference this vector.
 	                                * (Anything  else  would  make  sense  either,  considering  that  the bitset
 	                                * contained could change at any time if you aren't holding that lock)
 	                                * When `BLOCK_GROUP_FBCHANG' flag has been set, this vector differs from its on-disk shadow. */
-	byte_t       *bg_iusage;       /* [0..:sd_ino_per_bgrp/8][owned] Bitset of allocated Inodes in this group.
+	byte_t       *bg_iusage;       /* [0..:es_ino_per_bgrp/8][owned] Bitset of allocated Inodes in this group.
 	                                * Lazily allocated the same way `bg_busage' is.
 	                                * When `BLOCK_GROUP_FICHANG' flag has been set, this vector differs from its on-disk shadow. */
 };
 
 typedef struct ext2_superblock Ext2Superblock;
 struct ext2_superblock: public superblock {
-	pos_t               sd_bgroups_pos;   /* [const] The absolute on-disk position of the block group table. */
-	ext2_bgroup_t       sd_bgroups_cnt;   /* [!0][const] The total number of block groups. */
-	ext2_block_t        sd_blk_per_bgrp;  /* [!0][const] Blocks per block group. */
-	ext2_ino_t          sd_ino_per_bgrp;  /* [!0][const] Inodes per block group. */
-	ext2_block_t        sd_total_blocks;  /* [!0][const] Total number of blocks. */
-	size_t              sd_inode_size;    /* [>= 128][const] Size of a single INode (in bytes). */
-	ext2_ino_t          sd_total_inodes;  /* [!0][const] Total number of INodes.
+	pos_t               es_bgroups_pos;   /* [const] The absolute on-disk position of the block group table. */
+	ext2_bgroup_t       es_bgroupc;   /* [!0][const] The total number of block groups. */
+	ext2_block_t        es_blk_per_bgrp;  /* [!0][const] Blocks per block group. */
+	ext2_ino_t          es_ino_per_bgrp;  /* [!0][const] Inodes per block group. */
+	ext2_block_t        es_total_blocks;  /* [!0][const] Total number of blocks. */
+	size_t              es_inode_size;    /* [>= 128][const] Size of a single INode (in bytes). */
+	ext2_ino_t          es_total_inodes;  /* [!0][const] Total number of INodes.
 	                                       * NOTE: Since the first valid INode number is ONE(1), this
 	                                       *       field  doubles as the greatest valid INode number. */
 #define EXT2_VERSION_0  0x00000000        /* Ext2 version 0 */
 #define EXT2_VERSION_1  0x00010000        /* Ext2 version 1.0 */
-	u32                 sd_version;       /* [const] EXT2 version number (major << 16 | minor) */
-	u32                 sd_feat_optional; /* [const] Optional features in use (Set of `EXT2_FEAT_OPT_F*') */
-	u32                 sd_feat_required; /* [const] Required features in use (Set of `EXT2_FEAT_REQ_F*') */
-	u32                 sd_feat_mountro;  /* [const] Mount-ro features in use (Set of `EXT2_FEAT_MRO_F*') */
-	unsigned int        sd_os;            /* [const] Operating system that was used to create the superblock (One of `EXT2_OS_F*'). */
-#define sd_block_shift  mf_blockshift     /* [const] Shift applied to block numbers to convert
+	u32                 es_version;       /* [const] EXT2 version number (major << 16 | minor) */
+	u32                 es_feat_optional; /* [const] Optional features in use (Set of `EXT2_FEAT_OPT_F*') */
+	u32                 es_feat_required; /* [const] Required features in use (Set of `EXT2_FEAT_REQ_F*') */
+	u32                 es_feat_mountro;  /* [const] Mount-ro features in use (Set of `EXT2_FEAT_MRO_F*') */
+	unsigned int        es_os;            /* [const] Operating system that was used to create the superblock (One of `EXT2_OS_F*'). */
+#define es_blockshift  mf_blockshift     /* [const] Shift applied to block numbers to convert
 	                                       *         them into absolute on-disk locations. */
-	size_t              sd_ind_blocksize; /* [const][== (1 << sd_block_shift) / 4] Number of entries in an indirect block pointer block. */
-	struct block_group *sd_groups;        /* [1..sd_bgroups_cnt][const][owned]
+	size_t              es_ind_blocksize; /* [const][== (1 << es_blockshift) / 4] Number of entries in an indirect block pointer block. */
+	struct block_group *es_bgroupv;        /* [1..es_bgroupc][const][owned]
 	                                       * Vector of block group descriptors that have been loaded into memory. */
 };
 
-#define EXT2_BLOCKSIZE(super) (1 << (super)->sd_block_shift)
+#define EXT2_BLOCKSIZE(super) (1 << (super)->es_blockshift)
 
 
 /* Convert block addresses to on-disk locations, as well as the opposite.
  * Also  used  to  convert  in-file  addresses  to  their  block indices. */
-#define EXT2_BLOCK2ADDR(super,block)     ((pos_t)(block) << (super)->sd_block_shift)
-#define EXT2_ADDR2BLOCK(super,block)     ((ext2_block_t)(block) >> (super)->sd_block_shift)
+#define EXT2_BLOCK2ADDR(super,block)     ((pos_t)(block) << (super)->es_blockshift)
+#define EXT2_ADDR2BLOCK(super,block)     ((ext2_block_t)(block) >> (super)->es_blockshift)
 
 /* Return the block group index associated with a given INode. */
-#define EXT2_INO_BGRP_INDEX(super,ino)   ((ext2_bgroup_t)((ext2_ino_t)((ino)-1) / (super)->sd_ino_per_bgrp))
+#define EXT2_INO_BGRP_INDEX(super,ino)   ((ext2_bgroup_t)((ext2_ino_t)((ino)-1) / (super)->es_ino_per_bgrp))
 
 /* Return the offset into a block group of a given INode. */
-#define EXT2_INO_BGRP_OFFSET(super,ino)  ((ext2_ino_t)((ext2_ino_t)((ino)-1) % (super)->sd_ino_per_bgrp))
+#define EXT2_INO_BGRP_OFFSET(super,ino)  ((ext2_ino_t)((ext2_ino_t)((ino)-1) % (super)->es_ino_per_bgrp))
 
 
 
@@ -310,7 +420,7 @@ struct ext2_superblock: public superblock {
 struct block_table {
 	u16          bt_flags;     /* Set of `BLOCK_TABLE_F*' */
 	u16        __bt_pad;       /* ... */
-	ext2_block_t bt_blocks[1]; /* [:sd_ind_blocksize] Vector of indicate blocks.
+	ext2_block_t bt_blocks[1]; /* [:es_ind_blocksize] Vector of indicate blocks.
 	                            * This vector is initially read from disk when the table is allocated.
 	                            * Making  modifications to  this vector  requires a  write-lock on the
 	                            * associated INode. */
@@ -319,7 +429,7 @@ struct block_table {
 struct block_table_x2 {
 	u16                     b2_flags;     /* Set of `BLOCK_TABLE_F*' */
 	u16                   __b2_pad[(sizeof(void *)-2)/2]; /* ... */
-	struct block_table    **b2_tables;    /* [0..1][owned][1..:sd_ind_blocksize][owned] Vector of indirection blocks.
+	struct block_table    **b2_tables;    /* [0..1][owned][1..:es_ind_blocksize][owned] Vector of indirection blocks.
 	                                       * NOTE: Both  this vector, as  well as its  contents are lazily allocated:
 	                                       *  - LAZLY_ALLOC(WRITE_ONCE,lock(READ(::i_lock)))
 	                                       *    - Meaning you can use WRITE_ONCE semantics while
@@ -327,24 +437,24 @@ struct block_table_x2 {
 	                                       *  - DELETE(lock(WRITE(::i_lock)))
 	                                       *    - Meaning you have  full access (including  deletion)
 	                                       *      while holding a write-lock in the associated INode. */
-	ext2_block_t            b2_blocks[1]; /* [:sd_ind_blocksize] Vector of indirection blocks. */
+	ext2_block_t            b2_blocks[1]; /* [:es_ind_blocksize] Vector of indirection blocks. */
 };
 
 struct block_table_x3 {
 	u16                     b3_flags;     /* Set of `BLOCK_TABLE_F*' */
 	u16                   __b3_pad[(sizeof(void *)-2)/2]; /* ... */
-	struct block_table_x2 **b3_tables;    /* [0..1][owned][1..:sd_ind_blocksize][owned]   Vector    of   indirection    blocks.
+	struct block_table_x2 **b3_tables;    /* [0..1][owned][1..:es_ind_blocksize][owned]   Vector    of   indirection    blocks.
 	                                       * Same as `struct block_table_x2::b2_tables' (including the same locking semantics),
 	                                       * but used for triple indirection, rather than single indirection. */
-	ext2_block_t            b3_blocks[1]; /* [:sd_ind_blocksize] Vector of indirection blocks. */
+	ext2_block_t            b3_blocks[1]; /* [:es_ind_blocksize] Vector of indirection blocks. */
 };
 
 struct inode_data {
 	/* INode data blocks are enumerated in the following order:
 	 *    #1: i_dblock                 (0 ... 11)
-	 *    #2: i_siblock->*data         (12 ... 12 + sd_ind_blocksize - 1)
-	 *    #3: i_diblock->*->*data      (12 + sd_ind_blocksize ... 12 + sd_ind_blocksize + sd_ind_blocksize^2 - 1)
-	 *    #4: i_tiblock->*->*->*data   (12 + sd_ind_blocksize + sd_ind_blocksize^2 ... 12 + sd_ind_blocksize + sd_ind_blocksize^3 - 1)
+	 *    #2: i_siblock->*data         (12 ... 12 + es_ind_blocksize - 1)
+	 *    #3: i_diblock->*->*data      (12 + es_ind_blocksize ... 12 + es_ind_blocksize + es_ind_blocksize^2 - 1)
+	 *    #4: i_tiblock->*->*->*data   (12 + es_ind_blocksize + es_ind_blocksize^2 ... 12 + es_ind_blocksize + es_ind_blocksize^3 - 1)
 	 */
 	struct block_table    *i_siblock; /* [0..1][MIRROR(lock,struct block_table_x2::b2_tables)]
 	                                   * Lazily allocated  pointer to  the single  indirection block  table.
@@ -359,13 +469,13 @@ struct inode_data {
 	ext2_block_t i_siblock_addr; /* Pointer to a block filled with `ext2_block_t[EXT2_BLOCKSIZE(:)]'. */
 	ext2_block_t i_diblock_addr; /* Pointer to a block filled with `i_siblock[EXT2_BLOCKSIZE(:)]'. */
 	ext2_block_t i_tiblock_addr; /* Pointer to a block filled with `i_diblock[EXT2_BLOCKSIZE(:)]'. */
-	ext2_block_t i_block_count;  /* Number of allocated blocks (Ext2DiskINode::i_blocks) */
+	ext2_block_t i_block_count;  /* Number of allocated blocks (Ext2DiskINode::i_nsectors) */
 	/* With the exception of `i_flags', the following fields aren't actually being used. */
 	le32         i_dtime;        /* File deletion time (`time32_t' format) */
 	le32         i_flags;        /* File flags (Set of `EXT2_INODE_F*') */
 	le32         i_os1;          /* OS-specific field #1 (RESERVED) */
 	le32         i_generation;   /* Generation number? */
-	le32         i_acl;          /* [valid_if(:->sd_version >= EXT2_VERSION_1)] File ACL. */
+	le32         i_acl;          /* [valid_if(:->es_version >= EXT2_VERSION_1)] File ACL. */
 	le32         i_fragment;     /* Block address of fragment??? */
 	le32         i_os2[3];       /* Operating System Specific Value #2
 	                              * NOTE: depending  on  the OS,  KOS makes  use of
@@ -386,7 +496,7 @@ INTDEF struct inode_type Ext2_LnkOps; /* S_ISLNK */
 
 /* Return a pointer to (and lazily initialize) the block group
  * associated with the given `index'.
- * @assume(index < self->sd_bgroups_cnt); */
+ * @assume(index < self->es_bgroupc); */
 INTDEF ATTR_RETNONNULL WUNUSED Ext2BlockGroup *KCALL
 Ext2_Group(Ext2Superblock *__restrict self, ext2_bgroup_t index)
 		THROWS(E_IOERROR, E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT);
@@ -446,8 +556,9 @@ Ext2_SynchronizeSuperblock(Ext2Superblock *__restrict self)
 		THROWS(E_IOERROR, ...);
 
 INTDEF struct superblock_type Ext2_SuperblockType;
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 DECL_END
 
-#endif /* !GUARD_MODEXT2FS_EXT2_H */
+#endif /* !GUARD_MODEXT2_EXT2_H */

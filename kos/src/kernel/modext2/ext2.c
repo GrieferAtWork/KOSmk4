@@ -17,14 +17,372 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODEXT2FS_EXT2_C
-#define GUARD_MODEXT2FS_EXT2_C 1
+#ifndef GUARD_MODEXT2_EXT2_C
+#define GUARD_MODEXT2_EXT2_C 1
 #define _KOS_SOURCE 1
-
-#include "ext2.h"
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include "ext2.h"
+/**/
+
+#include <kernel/driver-callbacks.h>
+#include <kernel/fs/blkdev.h>
+#include <kernel/fs/dirnode.h>
+#include <kernel/fs/filesys.h>
+#include <kernel/fs/flat.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/regnode.h>
+#include <kernel/fs/super.h>
+#include <kernel/malloc.h>
+#include <kernel/mman.h>
+#include <kernel/mman/kram.h>
+#include <kernel/mman/map.h>
+#include <kernel/paging.h>
+
+#include <hybrid/align.h>
+#include <hybrid/atomic.h>
+#include <hybrid/byteorder.h>
+#include <hybrid/byteswap.h>
+#include <hybrid/overflow.h>
+
+#include <kos/except.h>
+#include <linux/magic.h>
+
+#include <alloca.h>
+#include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+DECL_BEGIN
+
+/* Lazily construct & return memory-mapping of block-group table. */
+PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) Ext2DiskBlockGroup *KCALL
+ext2_bgroups(struct ext2super *__restrict self) {
+	Ext2DiskBlockGroup *result;
+	void *cookie;
+	result = ATOMIC_READ(self->es_bgroupv);
+	if likely(result != NULL)
+		return result;
+	cookie = mman_unmap_kram_cookie_alloc();
+	TRY {
+		result = (Ext2DiskBlockGroup *)mman_map(/* self:        */ &mman_kernel,
+		                                        /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
+		                                        /* num_bytes:   */ self->es_bgroupc * sizeof(Ext2DiskBlockGroup),
+		                                        /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
+		                                        /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
+		                                        /* file:        */ self->es_super.ffs_super.fs_dev,
+		                                        /* file_fspath: */ NULL,
+		                                        /* file_fsname: */ NULL,
+		                                        /* file_pos:    */ self->es_bgroup_addr);
+	} EXCEPT {
+		mman_unmap_kram_cookie_free(cookie);
+		RETHROW();
+	}
+	if unlikely(!ATOMIC_CMPXCH(self->es_bgroupv, NULL, result)) {
+		mman_unmap_kram_and_kfree(result, self->es_bgroupc * sizeof(Ext2DiskBlockGroup), cookie);
+		return self->es_bgroupv;
+	}
+	if unlikely(!ATOMIC_CMPXCH(self->es_freebgroupv, NULL, cookie))
+		mman_unmap_kram_cookie_free(cookie);
+	return result;
+}
+
+/* Return  the absolute on-disk position of the `Ext2DiskINode'
+ * structure used to store descriptor data for the given `ino'. */
+PRIVATE BLOCKING WUNUSED NONNULL((1)) pos_t KCALL
+ext2_inoaddr(struct ext2super *__restrict self, ext2_ino_t ino) {
+	pos_t result;
+	ext2_bgroup_t group;
+	ext2_ino_t offset;
+	u32 bg_inodes;
+	if unlikely(ino < 1 || ino > self->es_total_inodes)
+		THROW(E_IOERROR_BADBOUNDS);
+	group     = EXT2_INO_BGRP_INDEX(self, ino);
+	offset    = EXT2_INO_BGRP_OFFSET(self, ino);
+	bg_inodes = LETOH32(self->es_bgroupv[group].bg_inodes);
+	result    = EXT2_BLOCK2ADDR(self, bg_inodes);
+	result += offset * self->es_inode_size;
+	return result;
+}
+
+/* Decode INode data (excluding file size fields) */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL ext2_diskinode_decode)(Ext2DiskINode const *__restrict self,
+                                     struct fnode *__restrict node) {
+	unsigned int i;
+	struct ext2super *super = fsuper_asext2(node->fn_super);
+	struct ext2idat *idat   = node->fn_fsdata;
+
+	/* Basic fields. */
+	node->mf_atime.tv_sec  = LETOH32(self->i_atime);
+	node->mf_atime.tv_nsec = 0;
+	node->mf_mtime.tv_sec  = LETOH32(self->i_mtime);
+	node->mf_mtime.tv_nsec = 0;
+	node->mf_ctime.tv_sec  = LETOH32(self->i_ctime);
+	node->mf_ctime.tv_nsec = 0;
+	node->fn_nlink         = LETOH16(self->i_nlink);
+	node->fn_uid           = (uid_t)LETOH16(self->i_uid);
+	node->fn_gid           = (gid_t)LETOH16(self->i_gid);
+	node->fn_mode          = LETOH16(self->i_mode);
+	if (super->es_os == EXT2_OS_FLINUX || super->es_os == EXT2_OS_FGNU_HURD) {
+		node->fn_uid |= (uid_t)LETOH16(self->i_os_linux.l_uid_high) << 16;
+		node->fn_gid |= (gid_t)LETOH16(self->i_os_linux.l_gid_high) << 16;
+	}
+	for (i = 0; i < EXT2_DIRECT_BLOCK_COUNT; ++i)
+		idat->ei_dblock[i] = LETOH32(self->i_dblock[i]);
+	idat->ei_siblock = LETOH32(self->i_siblock);
+	idat->ei_diblock = LETOH32(self->i_diblock);
+	idat->ei_tiblock = LETOH32(self->i_tiblock);
+}
+
+
+
+
+
+/************************************************************************/
+/* Superblock operator table                                            */
+/************************************************************************/
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fnode *KCALL
+ext2_super_v_makenode(struct flatsuper *__restrict self,
+                      struct flatdirent *__restrict ent,
+                      struct flatdirnode *__restrict dir)
+		THROWS(E_BADALLOC, E_IOERROR) {
+	/* TODO */
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+PRIVATE struct flatsuper_ops const ext2_super_ops = {
+	.ffso_makenode = &ext2_super_v_makenode,
+	.ffso_super = {
+		/* TODO */
+	},
+	.ffso_flat = {
+		/* TODO */
+	},
+};
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* Superblock open                                                      */
+/************************************************************************/
+PRIVATE BLOCKING WUNUSED NONNULL((1)) struct fsuper *KCALL
+ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
+            struct mfile *dev, UNCHECKED USER char *args) {
+	struct ext2super *result;
+	Ext2DiskSuperblock *desc;
+	u32 num_block_groups, temp;
+	bool must_mount_ro = false;
+	shift_t blockshift;
+
+	/* XXX: Mount arguments? */
+	(void)args;
+
+	/* Read the Ext2 disk header. */
+	if (mfile_getblocksize(dev) == 256) {
+		STATIC_ASSERT((EXT2_SUPERBLOCK_OFFSET % 256) == 0);
+		STATIC_ASSERT(sizeof(Ext2DiskSuperblock) > 128 && sizeof(Ext2DiskSuperblock) <= 256);
+		desc = (Ext2DiskSuperblock *)aligned_alloca(256, 256);
+		mfile_rdblocks(dev, (pos_t)EXT2_SUPERBLOCK_OFFSET,
+		               pagedir_translate(desc), 256);
+	} else {
+		desc = (Ext2DiskSuperblock *)alloca(sizeof(Ext2DiskSuperblock));
+		mfile_readall(dev, &desc, sizeof(desc), (pos_t)EXT2_SUPERBLOCK_OFFSET);
+	}
+
+	/* Do some basic verification to check if this is really an EXT2 filesystem. */
+	if (LETOH16(desc->e_signature) != EXT2_SIGNATURE)
+		return NULL;
+	if unlikely(LETOH32(desc->e_free_inodes) > LETOH32(desc->e_total_inodes) ||
+	            LETOH32(desc->e_free_blocks) > LETOH32(desc->e_total_blocks))
+		return NULL;
+	if unlikely(!desc->e_blocks_per_group || !desc->e_inodes_per_group)
+		return NULL;
+
+	num_block_groups = CEILDIV(LETOH32(desc->e_total_blocks), LETOH32(desc->e_blocks_per_group));
+	temp             = CEILDIV(LETOH32(desc->e_total_inodes), LETOH32(desc->e_inodes_per_group));
+	if unlikely(num_block_groups != temp)
+		return NULL;
+	if unlikely(!num_block_groups)
+		return NULL;
+
+	/* Figure out the block-shift. */
+	{
+		u32 shift  = LETOH32(desc->e_log2_blocksz);
+		blockshift = (shift_t)shift;
+		if unlikely(blockshift != (shift_t)shift)
+			return NULL;
+		if unlikely(OVERFLOW_UADD(blockshift, 10, &blockshift))
+			return NULL;
+		if unlikely(blockshift >= 24)
+			return NULL; /* That would be _way_ too big */
+	}
+
+	/* Allocate the FAT superblock controller. */
+	result = (struct ext2super *)kmalloc(sizeof(struct ext2super), GFP_NORMAL);
+	TRY {
+		Ext2DiskINode rootnode;
+
+		/* Fill in (most) ext2-specific superblock fields. */
+		result->es_blk_per_bgrp  = LETOH32(desc->e_blocks_per_group);
+		result->es_ino_per_bgrp  = LETOH32(desc->e_inodes_per_group);
+		result->es_total_blocks  = LETOH32(desc->e_total_blocks);
+		result->es_inode_size    = 128;
+		result->es_total_inodes  = LETOH32(desc->e_total_inodes);
+		result->es_version_maj   = LETOH16(desc->e_version_major);
+		result->es_version_min   = LETOH16(desc->e_version_minor);
+		result->es_feat_optional = 0;
+		result->es_feat_required = 0;
+		result->es_feat_mountro  = 0;
+		result->es_os            = LETOH32(desc->e_os_id);
+		result->es_blockshift    = blockshift;
+		result->es_blockmask     = ((size_t)1 << blockshift) - 1;
+		result->es_ind_blocksize = ((size_t)1 << blockshift) / 4;
+		result->es_bgroupc       = num_block_groups;
+
+		if (result->es_version_maj >= 1) {
+			result->es_feat_optional = LETOH32(desc->e_feat_optional);
+			result->es_feat_required = LETOH32(desc->e_feat_required);
+			result->es_feat_mountro  = LETOH32(desc->e_feat_mountro);
+			result->es_inode_size    = LETOH16(desc->e_inode_size);
+
+			/* Make sure that the specified INode size isn't too small. */
+			if unlikely(result->es_inode_size < 128)
+				THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+
+			/* Check if we're implementing all the required features.
+			 * NOTE: Just to improve compatibility, we treat journaling
+			 *       as a mount-ro feature. */
+			if (result->es_feat_required & ~(EXT2_FEAT_REQ_FDIRENT_TYPE |
+			                                 EXT2_FEAT_REQ_FREPLAY_JOURNAL |
+			                                 EXT2_FEAT_REQ_FJOURNAL)) {
+				kfree(result);
+				return NULL;
+			}
+			if (result->es_feat_required & (EXT2_FEAT_REQ_FREPLAY_JOURNAL |
+			                                EXT2_FEAT_REQ_FJOURNAL))
+				must_mount_ro = true;
+			if (result->es_feat_mountro & ~(EXT2_FEAT_MRO_FSIZE64))
+				must_mount_ro = true;
+		}
+		result->es_inode_io_size = result->es_inode_size;
+		if (result->es_inode_io_size > sizeof(Ext2DiskINode))
+			result->es_inode_io_size = sizeof(Ext2DiskINode);
+
+		result->es_fdat.ei_inoaddr = ext2_inoaddr(result, 2); /* 2: INode number of root directory */
+		mfile_readall(dev, &rootnode, result->es_inode_io_size, result->es_fdat.ei_inoaddr);
+		shared_rwlock_init(&result->es_fdat.ei_lock);
+
+		/* Decode the root INode */
+		ext2_diskinode_decode(&rootnode, &result->es_super.ffs_super.fs_root);
+		if unlikely(!S_ISDIR(result->es_super.ffs_super.fs_root.fn_mode))
+			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+
+		/* Fill in remaining ext2-specific data for the root node. */
+		result->es_super.ffs_super.fs_root.fn_super = &result->es_super.ffs_super;
+		atomic64_init(&result->_es_1dot, (uint64_t)-1);
+		atomic64_init(&result->_es_2dot, (uint64_t)-1);
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+
+	/* Fill in remaining ext2-specific superblock fields. */
+	result->es_freebgroupv = NULL; /* Lazily allocated */
+	result->es_bgroupv     = NULL; /* Lazily allocated */
+
+#if 1 /* I'm guessing this is  the right answer, but  the wiki really isn't  clear...             \
+       * [...] The table is located in the block immediately following the Superblock             \
+       *    -> That would mean a fixed partition offset of `2048'                                 \
+       * [...] the Block Group Descriptor Table will begin at block 2 [for 1024 bytes per block]. \
+       *       For any other block size, it will begin at block 1                                 \
+       * I'm going with the later variant here, since that seems to make the most sense. */
+	if (result->es_blockshift <= 10)
+		result->es_bgroup_addr = EXT2_BLOCK2ADDR(result, 2);
+	else {
+		result->es_bgroup_addr = EXT2_BLOCK2ADDR(result, 1);
+	}
+#else
+	result->es_bgroup_addr = EXT2_SUPERBLOCK_OFFSET + 1024;
+#endif
+
+
+	/* Fill in filesystem features. */
+	result->es_super.ffs_super.fs_feat.sf_filesizebits = 32;
+	if (result->es_feat_mountro & EXT2_FEAT_MRO_FSIZE64)
+		result->es_super.ffs_super.fs_feat.sf_filesizebits = 64;
+	result->es_super.ffs_super.fs_feat.sf_filesize_max = (pos_t)1 << result->es_super.ffs_super.fs_feat.sf_filesizebits;
+	result->es_super.ffs_super.fs_feat.sf_symlink_max  = result->es_super.ffs_super.fs_feat.sf_filesize_max;
+	result->es_super.ffs_super.fs_feat.sf_uid_max      = (uid_t)UINT16_MAX;
+	result->es_super.ffs_super.fs_feat.sf_gid_max      = (gid_t)UINT16_MAX;
+	if (result->es_os == EXT2_OS_FLINUX || result->es_os == EXT2_OS_FGNU_HURD) {
+		result->es_super.ffs_super.fs_feat.sf_uid_max = (uid_t)UINT32_MAX;
+		result->es_super.ffs_super.fs_feat.sf_gid_max = (gid_t)UINT32_MAX;
+	}
+	result->es_super.ffs_super.fs_feat.sf_link_max           = UINT16_MAX;
+	result->es_super.ffs_super.fs_feat.sf_magic              = EXT2_SUPER_MAGIC;
+	result->es_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->es_blockmask + 1;
+	result->es_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->es_blockmask + 1;
+	result->es_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->es_blockmask + 1;
+	result->es_super.ffs_super.fs_feat.sf_rec_xfer_align     = (u32)1 << dev->mf_iobashift;
+	result->es_super.ffs_super.fs_feat.sf_name_max           = UINT8_MAX;
+	if (!(result->es_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE))
+		result->es_super.ffs_super.fs_feat.sf_name_max = UINT16_MAX;
+
+	/* Fill in generic superblock fields. */
+	result->es_super.ffs_features = FFLATSUPER_FEAT_NORMAL;
+	result->es_super.ffs_super.fs_root.mf_ops    = &ext2_super_ops.ffso_super.so_fdir.dno_node.no_file;
+	result->es_super.ffs_super.fs_root.mf_parts  = NULL;
+	SLIST_INIT(&result->es_super.ffs_super.fs_root.mf_changed);
+	result->es_super.ffs_super.fs_root.mf_iobashift = dev->mf_iobashift;
+	result->es_super.ffs_super.fs_root.mf_flags     = MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE;
+	atomic64_init(&result->es_super.ffs_super.fs_root.mf_filesize, (uint64_t)-1);
+	result->es_super.ffs_super.fs_root.fn_ino       = (ino_t)2; /* On EXT2 filesystem, the root directory is always Inode number #2 */
+	result->es_super.ffs_super.fs_root.fn_fsdata    = &result->es_fdat;
+	flatdirdata_init(&result->es_super.ffs_rootdata);
+
+	/* If necessary, mount as read-only */
+	if (must_mount_ro)
+		result->es_super.ffs_super.fs_root.mf_flags |= MFILE_F_READONLY;
+	return &result->es_super.ffs_super;
+}
+
+
+PRIVATE struct ffilesys ext2_filesys = {
+	.ffs_drv = &drv_self,
+	{ .ffs_open = &ext2_openfs },
+	.ffs_flags = FFILESYS_F_NORMAL,
+	/* .ffs_name = */ "ext2",
+};
+
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+INTERN ATTR_FREETEXT void KCALL kernel_initialize_ext2_driver(void) {
+	ffilesys_register(&ext2_filesys);
+}
+#else /* CONFIG_BUILDING_KERNEL_CORE */
+PRIVATE ATTR_FREETEXT DRIVER_INIT void init(void) {
+	ffilesys_register(&ext2_filesys);
+}
+
+PRIVATE DRIVER_FINI void fini(void) {
+	ffilesys_unregister(&ext2_filesys);
+}
+#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+
+
+
+DECL_END
+
+#else /* CONFIG_USE_NEW_FS */
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
@@ -40,6 +398,9 @@
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
+
+/**/
+#include "ext2.h"
 
 DECL_BEGIN
 
@@ -176,17 +537,17 @@ Ext2_WriteToINodeVectorPhys(struct inode *__restrict self,
 
 /* Return a pointer to (and lazily initialize) the block group
  * associated with the given `index'.
- * @assume(index < self->sd_bgroups_cnt); */
+ * @assume(index < self->es_bgroupc); */
 INTERN ATTR_RETNONNULL WUNUSED Ext2BlockGroup *KCALL
 Ext2_Group(Ext2Superblock *__restrict self, ext2_bgroup_t index)
 		THROWS(E_IOERROR, E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT) {
 	Ext2BlockGroup *result;
-	assert(index < self->sd_bgroups_cnt);
-	result = &self->sd_groups[index];
+	assert(index < self->es_bgroupc);
+	result = &self->es_bgroupv[index];
 	if (!(ATOMIC_READ(result->bg_flags) & BLOCK_GROUP_FLOADED)) {
 		Ext2DiskBlockGroup group;
 		block_device_read(self->s_device, &group, sizeof(group),
-		                  self->sd_bgroups_pos + (index * EXT2_BLOCKGROUP_SIZE));
+		                  self->es_bgroups_pos + (index * EXT2_BLOCKGROUP_SIZE));
 		sync_write(&result->bg_lock);
 		COMPILER_READ_BARRIER();
 		if likely(!(ATOMIC_READ(result->bg_flags) & BLOCK_GROUP_FLOADED)) {
@@ -213,13 +574,13 @@ Ext2_InoAddr(Ext2Superblock *__restrict self, ext2_ino_t ino)
 		THROWS(E_IOERROR_BADBOUNDS, E_IOERROR, E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT) {
 	Ext2BlockGroup *block; pos_t result;
 	ext2_bgroup_t group; ext2_ino_t offset;
-	if unlikely(ino < 1 || ino > self->sd_total_inodes)
+	if unlikely(ino < 1 || ino > self->es_total_inodes)
 		THROW(E_IOERROR_BADBOUNDS);
 	group   = EXT2_INO_BGRP_INDEX(self, ino);
 	offset  = EXT2_INO_BGRP_OFFSET(self, ino);
 	block   = Ext2_Group(self, group);
 	result  = EXT2_BLOCK2ADDR(self, block->bg_inodes);
-	result += offset * self->sd_inode_size;
+	result += offset * self->es_inode_size;
 	return result;
 }
 
@@ -308,13 +669,13 @@ ExtINode_LoadAttr(struct inode *__restrict self) {
 	self->i_filemtime.tv_nsec = 0;
 	self->i_filectime.tv_sec  = LETOH32(data.i_ctime);
 	self->i_filectime.tv_nsec = 0;
-	node->i_block_count       = LETOH32(data.i_blocks);
+	node->i_block_count       = LETOH32(data.i_nsectors);
 
 	/* Parse Version-specific fields. */
-	if (super->sd_feat_mountro & EXT2_FEAT_MRO_FSIZE64)
+	if (super->es_feat_mountro & EXT2_FEAT_MRO_FSIZE64)
 		self->i_filesize |= (pos_t)((u64)LETOH32(data.i_size_high) << 32);
 	/* Parse OS-specific fields. */
-	switch (super->sd_os) {
+	switch (super->es_os) {
 
 	case EXT2_OS_FGNU_HURD:
 		self->i_filemode |= LETOH16(data.i_os_hurd.h_mode_high) << 16;
@@ -361,18 +722,18 @@ ExtINode_SaveAttr(struct inode *__restrict self) {
 	data.i_atime    = HTOLE32((u32)self->i_fileatime.tv_sec);
 	data.i_mtime    = HTOLE32((u32)self->i_filemtime.tv_sec);
 	data.i_ctime    = HTOLE32((u32)self->i_filectime.tv_sec);
-	data.i_blocks   = HTOLE32((u32)node->i_block_count);
+	data.i_nsectors   = HTOLE32((u32)node->i_block_count);
 
 	super = (Ext2Superblock *)self->i_super;
 
 	/* Parse Version-specific fields. */
-	if (super->sd_feat_mountro & EXT2_FEAT_MRO_FSIZE64)
+	if (super->es_feat_mountro & EXT2_FEAT_MRO_FSIZE64)
 		data.i_size_high = HTOLE32((u32)(self->i_filesize >> 32));
 	else
 		data.i_size_high = (le32)0;
 
 	/* Encode OS-specific fields. */
-	switch (super->sd_os) {
+	switch (super->es_os) {
 
 	case EXT2_OS_FGNU_HURD:
 		data.i_os_hurd.h_mode_high = HTOLE16((u16)(self->i_filemode >> 16));
@@ -423,9 +784,9 @@ ExtINode_Fini(struct inode *__restrict self) {
 	if (node) {
 		kfree(node->i_siblock);
 		if (node->i_diblock)
-			free_x2_table(node->i_diblock, ((Ext2Superblock *)self->i_super)->sd_ind_blocksize);
+			free_x2_table(node->i_diblock, ((Ext2Superblock *)self->i_super)->es_ind_blocksize);
 		if (node->i_tiblock)
-			free_x3_table(node->i_tiblock, ((Ext2Superblock *)self->i_super)->sd_ind_blocksize);
+			free_x3_table(node->i_tiblock, ((Ext2Superblock *)self->i_super)->es_ind_blocksize);
 		kfree(node);
 	}
 }
@@ -448,7 +809,7 @@ again:
 	*pentry_pos += entsize;
 	if (!entry.d_ino)
 		goto again; /* Unused entry. */
-	if (((Ext2Superblock *)self->i_super)->sd_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE) {
+	if (((Ext2Superblock *)self->i_super)->es_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE) {
 		entry_type = entry.d_type;
 		namlen     = entry.d_namlen_low;
 		if ((entsize - sizeof(Ext2DiskDirent)) > 0xff) {
@@ -541,7 +902,7 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
        *        these two cases other than the link size (which is ambiguous for small  \
        *        links). */
 		if (textlen * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4 &&
-		    node->i_dblock[0] >= ((Ext2Superblock *)self->i_super)->sd_total_blocks)
+		    node->i_dblock[0] >= ((Ext2Superblock *)self->i_super)->es_total_blocks)
 #else
 		if (textlen * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4)
 #endif
@@ -691,9 +1052,9 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 
 	_mfile_init_blockshift(self, 10 + LETOH32(super.e_log2_blocksz));
-	if unlikely(self->sd_block_shift >= PAGESHIFT)
+	if unlikely(self->es_blockshift >= PAGESHIFT)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
-	self->sd_ind_blocksize = ((size_t)1 << self->sd_block_shift) / 4;
+	self->es_ind_blocksize = ((size_t)1 << self->es_blockshift) / 4;
 
 
 #if 1 /* I'm guessing this is  the right answer, but  the wiki really isn't  clear...             \
@@ -702,44 +1063,44 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
        * [...] the Block Group Descriptor Table will begin at block 2 [for 1024 bytes per block]. \
        *       For any other block size, it will begin at block 1                                 \
        * I'm going with the later variant here, since that seems to make the most sense. */
-	if (self->sd_block_shift <= 10)
-		self->sd_bgroups_pos = EXT2_BLOCK2ADDR(self, 2);
+	if (self->es_blockshift <= 10)
+		self->es_bgroups_pos = EXT2_BLOCK2ADDR(self, 2);
 	else {
-		self->sd_bgroups_pos = EXT2_BLOCK2ADDR(self, 1);
+		self->es_bgroups_pos = EXT2_BLOCK2ADDR(self, 1);
 	}
 #else
-	self->sd_bgroups_pos = EXT2_SUPERBLOCK_OFFSET + 1024;
+	self->es_bgroups_pos = EXT2_SUPERBLOCK_OFFSET + 1024;
 #endif
-	self->sd_bgroups_cnt  = num_block_groups;
-	self->sd_ino_per_bgrp = LETOH32(super.e_inodes_per_group);
-	self->sd_blk_per_bgrp = LETOH32(super.e_blocks_per_group);
-	self->sd_total_inodes = LETOH32(super.e_total_inodes);
-	self->sd_total_blocks = LETOH32(super.e_total_blocks);
-	self->sd_version      = ((u32)LETOH16(super.e_version_major) << 16 |
+	self->es_bgroupc  = num_block_groups;
+	self->es_ino_per_bgrp = LETOH32(super.e_inodes_per_group);
+	self->es_blk_per_bgrp = LETOH32(super.e_blocks_per_group);
+	self->es_total_inodes = LETOH32(super.e_total_inodes);
+	self->es_total_blocks = LETOH32(super.e_total_blocks);
+	self->es_version      = ((u32)LETOH16(super.e_version_major) << 16 |
 	                         (u32)LETOH16(super.e_version_minor));
-	if (self->sd_version >= EXT2_VERSION_1) {
-		self->sd_feat_optional = LETOH32(super.e_feat_optional);
-		self->sd_feat_required = LETOH32(super.e_feat_required);
-		self->sd_feat_mountro  = LETOH32(super.e_feat_mountro);
-		self->sd_inode_size    = LETOH16(super.e_inode_size);
+	if (self->es_version >= EXT2_VERSION_1) {
+		self->es_feat_optional = LETOH32(super.e_feat_optional);
+		self->es_feat_required = LETOH32(super.e_feat_required);
+		self->es_feat_mountro  = LETOH32(super.e_feat_mountro);
+		self->es_inode_size    = LETOH16(super.e_inode_size);
 		/* Make sure that the specified INode size isn't too small. */
-		if unlikely(self->sd_inode_size < 128)
+		if unlikely(self->es_inode_size < 128)
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 
 		/* Check if we're implementing all the required features.
 		 * NOTE: Just to improve compatibility, we treat journaling
 		 *       as a mount-ro feature. */
-		if (self->sd_feat_required & ~(EXT2_FEAT_REQ_FDIRENT_TYPE |
+		if (self->es_feat_required & ~(EXT2_FEAT_REQ_FDIRENT_TYPE |
 		                               EXT2_FEAT_REQ_FREPLAY_JOURNAL |
 		                               EXT2_FEAT_REQ_FJOURNAL))
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
-		if (self->sd_feat_required & (EXT2_FEAT_REQ_FREPLAY_JOURNAL |
+		if (self->es_feat_required & (EXT2_FEAT_REQ_FREPLAY_JOURNAL |
 		                              EXT2_FEAT_REQ_FJOURNAL))
 			must_mount_ro = true;
-		if (self->sd_feat_mountro & ~(EXT2_FEAT_MRO_FSIZE64))
+		if (self->es_feat_mountro & ~(EXT2_FEAT_MRO_FSIZE64))
 			must_mount_ro = true;
 	} else {
-		self->sd_inode_size = 128;
+		self->es_inode_size = 128;
 	}
 
 	/* On EXT2 filesystem, the root directory is always Inode number #2 */
@@ -749,21 +1110,21 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 	(void)must_mount_ro; /* TODO */
 
 	/* Allocate Ext2-specific superblock data. */
-	self->sd_groups = (struct block_group *)kmalloc(num_block_groups *
+	self->es_bgroupv = (struct block_group *)kmalloc(num_block_groups *
 	                                                sizeof(struct block_group),
 	                                                FS_GFP | GFP_CALLOC);
 }
 
 INTERN NOBLOCK void
 NOTHROW(KCALL Ext2_FinalizeSuperblock)(Ext2Superblock *__restrict self) {
-	if (self->sd_groups) {
+	if (self->es_bgroupv) {
 		ext2_bgroup_t i;
 		/* Free lazily allocated block group buffers. */
-		for (i = 0; i < self->sd_bgroups_cnt; ++i) {
-			kfree(self->sd_groups[i].bg_busage);
-			kfree(self->sd_groups[i].bg_iusage);
+		for (i = 0; i < self->es_bgroupc; ++i) {
+			kfree(self->es_bgroupv[i].bg_busage);
+			kfree(self->es_bgroupv[i].bg_iusage);
 		}
-		kfree(self->sd_groups);
+		kfree(self->es_bgroupv);
 	}
 }
 
@@ -864,5 +1225,6 @@ PRIVATE DRIVER_FINI void fini2(void) {
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODEXT2FS_EXT2_C */
+#endif /* !GUARD_MODEXT2_EXT2_C */
