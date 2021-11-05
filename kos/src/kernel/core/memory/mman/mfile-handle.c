@@ -94,7 +94,8 @@ again:
 		/* Check if the READONLY flag changed state. */
 		if ((new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY)) {
 			/* Need locks to all of the file's mem-parts to change `MFILE_F_READONLY'. */
-			if (!mfile_incref_and_lock_parts_or_unlock(self, NULL))
+			if (self->mf_parts != MFILE_PARTS_ANONYMOUS &&
+			    !mfile_incref_and_lock_parts_or_unlock(self, NULL))
 				goto again;
 		}
 
@@ -110,7 +111,8 @@ again:
 			mfile_tslock_release(me);
 			if (file_uid != cred_geteuid() && !capable(CAP_FOWNER)) {
 				/* Not allowed! */
-				if ((new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
+				if (self->mf_parts != MFILE_PARTS_ANONYMOUS &&
+				    (new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
 					mfile_unlock_and_decref_parts(self);
 				mfile_lock_endwrite(self);
 				THROW(E_INSUFFICIENT_RIGHTS, CAP_FOWNER);
@@ -121,7 +123,8 @@ again:
 		cmpxch_ok = ATOMIC_CMPXCH(self->mf_flags, old_flags, new_flags);
 
 		/* Release locks */
-		if ((new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
+		if (self->mf_parts != MFILE_PARTS_ANONYMOUS &&
+		    (new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
 			mfile_unlock_and_decref_parts(self);
 		mfile_lock_endwrite(self);
 	} while (!cmpxch_ok);
