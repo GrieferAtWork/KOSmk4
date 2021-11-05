@@ -104,12 +104,7 @@ again:
 		 * we allow this operator for mfiles that don't have owners, we  only
 		 * do this check if the file _does_ have an owner! */
 		if (old_flags != new_flags && mfile_isnode(self)) {
-			uid_t file_uid;
-			struct fnode *me = mfile_asnode(self);
-			mfile_tslock_acquire(me);
-			file_uid = me->fn_uid;
-			mfile_tslock_release(me);
-			if (file_uid != cred_geteuid() && !capable(CAP_FOWNER)) {
+			if (fnode_getuid(mfile_asnode(self)) != cred_geteuid() && !capable(CAP_FOWNER)) {
 				/* Not allowed! */
 				if (self->mf_parts != MFILE_PARTS_ANONYMOUS &&
 				    (new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
@@ -857,10 +852,8 @@ handle_mfile_stat(struct mfile *__restrict self,
 
 	st_dev = st_rdev = 0;
 	if (mfile_isnode(self)) {
-		struct fnode *me;
-		struct mfile *dev;
-		me  = mfile_asnode(self);
-		dev = me->fn_super->fs_dev;
+		struct fnode *me  = mfile_asnode(self);
+		struct mfile *dev = me->fn_super->fs_dev;
 		/* Fill in extended file-node information */
 		if (dev && mfile_isdevnode(dev))
 			st_dev = mfile_asdevnode(dev)->dn_devno;
@@ -879,6 +872,15 @@ handle_mfile_stat(struct mfile *__restrict self,
 		st_gid   = 0;
 	}
 	mfile_tslock_release(self);
+
+	/* If defined, invoke the get-file-node-owner override operator. */
+	if (mfile_isnode(self)) {
+		struct fnode *me = mfile_asnode(self);
+		struct fnode_perm_ops const *perm_ops;
+		perm_ops = fnode_getops(me)->no_perm;
+		if (perm_ops && perm_ops->npo_getown)
+			(*perm_ops->npo_getown)(me, &st_uid, &st_gid);
+	}
 
 	/* Check if the file has been deleted. If it has, timestamps are invalid. */
 	if (ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) {

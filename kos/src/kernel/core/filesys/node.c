@@ -331,6 +331,66 @@ again_unbind_allnodes:
 
 
 
+/* Get the uid/gid of a given file-node. These functions respect `npo_getown' */
+PUBLIC BLOCKING NONNULL((1)) uid_t KCALL
+fnode_getuid(struct fnode *__restrict self) {
+	uid_t result;
+	struct fnode_perm_ops const *perm_ops;
+	perm_ops = fnode_getops(self)->no_perm;
+	if (perm_ops && perm_ops->npo_getown) {
+		gid_t _ignored;
+		(*perm_ops->npo_getown)(self, &result, &_ignored);
+	} else {
+#if 1
+		result = ATOMIC_READ(self->fn_uid);
+#else
+		mfile_tslock_acquire(self);
+		result = self->fn_uid;
+		mfile_tslock_release(self);
+#endif
+	}
+	return result;
+}
+
+PUBLIC BLOCKING NONNULL((1)) gid_t KCALL
+fnode_getgid(struct fnode *__restrict self) {
+	gid_t result;
+	struct fnode_perm_ops const *perm_ops;
+	perm_ops = fnode_getops(self)->no_perm;
+	if (perm_ops && perm_ops->npo_getown) {
+		uid_t _ignored;
+		(*perm_ops->npo_getown)(self, &_ignored, &result);
+	} else {
+#if 1
+		result = ATOMIC_READ(self->fn_gid);
+#else
+		mfile_tslock_acquire(self);
+		result = self->fn_gid;
+		mfile_tslock_release(self);
+#endif
+	}
+	return result;
+}
+
+PUBLIC BLOCKING NONNULL((1, 2, 3)) void KCALL
+fnode_getugid(struct fnode *__restrict self,
+              uid_t *__restrict puid,
+              gid_t *__restrict pgid) {
+	struct fnode_perm_ops const *perm_ops;
+	perm_ops = fnode_getops(self)->no_perm;
+	if (perm_ops && perm_ops->npo_getown) {
+		(*perm_ops->npo_getown)(self, puid, pgid);
+	} else {
+		mfile_tslock_acquire(self);
+		*puid = self->fn_uid;
+		*pgid = self->fn_gid;
+		mfile_tslock_release(self);
+	}
+}
+
+
+
+
 /* For use with `_fn_alllop': asynchronously add the node to the list of all nodes.
  * This function needs to be exposed publicly because it being set requires special
  * care if set during custom fnode destructors.
@@ -508,7 +568,7 @@ NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self) {
  * @return: * : The old file mode
  * @throw: E_FSERROR_READONLY:    The `MFILE_FN_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this. */
-PUBLIC NONNULL((1)) mode_t KCALL
+PUBLIC BLOCKING NONNULL((1)) mode_t KCALL
 fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
             mode_t perm_flag, bool check_permissions)
 		THROWS(E_FSERROR_READONLY, E_INSUFFICIENT_RIGHTS) {
@@ -523,6 +583,26 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
 	perm_flag &= 07777;
 
 #ifndef CONFIG_EVERYONE_IS_ROOT
+	if (check_permissions) {
+		struct fnode_perm_ops const *perm_ops;
+		perm_ops = fnode_getops(self)->no_perm;
+		if (perm_ops && perm_ops->npo_getown) {
+			uid_t uid;
+			gid_t gid;
+			(*perm_ops->npo_getown)(self, &uid, &gid);
+			if (uid != cred_getfsuid() && !capable(CAP_FOWNER))
+				THROW(E_INSUFFICIENT_RIGHTS, CAP_FOWNER);
+			if ((perm_flag & S_ISGID) || (perm_mask & S_ISGID)) {
+				/* The Set-gid bit can must  be turned off (i.e.  cannot be turned on/or  left
+				 * on) when the caller isn't apart of the group associated with `self->fn_gid' */
+				if (!capable(CAP_FSETID) && !cred_isfsgroupmember(gid)) {
+					perm_mask &= ~S_ISGID;
+					perm_flag &= ~S_ISGID;
+				}
+			}
+			check_permissions = false;
+		}
+	}
 again:
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 	mfile_tslock_acquire(self);
@@ -570,6 +650,7 @@ again_check_permissions:
 	/* Set the new file mode. */
 	ATOMIC_WRITE(self->fn_mode, new_mode);
 	mfile_tslock_release(self);
+
 	/* Broadcast that mode bits have changed. */
 	if (old_mode != new_mode)
 		mfile_changed(self, MFILE_F_ATTRCHANGED);
@@ -594,15 +675,28 @@ fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
 	uid_t old_owner, new_owner;
 	gid_t old_group, new_group;
 
-	/* Check if file attributes may be modified. */
-	if unlikely(self->mf_flags & MFILE_FN_ATTRREADONLY)
-		THROW(E_FSERROR_READONLY);
-
 	/* Verify that the filesystem allows the given owner/group */
 	if (owner != (uid_t)-1 && !fsuper_validuid(self->fn_super, owner))
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID, owner);
 	if (group != (gid_t)-1 && !fsuper_validgid(self->fn_super, group))
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID, group);
+
+	{
+		struct fnode_perm_ops const *perm_ops;
+		perm_ops = fnode_getops(self)->no_perm;
+		if (perm_ops && perm_ops->npo_getown) {
+			/* Owner/group are fixed and cannot be changed. */
+			(*perm_ops->npo_getown)(self, &old_owner, &old_group);
+			if ((owner != (uid_t)-1 && owner != old_owner) ||
+			    (group != (gid_t)-1 && group != old_group))
+				THROW(E_FSERROR_READONLY);
+			if (pold_owner)
+				*pold_owner = old_owner;
+			if (pold_group)
+				*pold_group = old_group;
+			return;
+		}
+	}
 
 	mfile_tslock_acquire(self);
 again_read_old_values:
@@ -636,6 +730,13 @@ again_read_old_values:
 	/* Only do permission checks if stuff actually changed! */
 	if (old_owner != new_owner || old_group != new_group) {
 		mode_t mode;
+
+		/* Check if file attributes may be modified. */
+		if unlikely(self->mf_flags & MFILE_FN_ATTRREADONLY) {
+			mfile_tslock_release_br(self);
+			THROW(E_FSERROR_READONLY);
+		}
+
 #ifndef CONFIG_EVERYONE_IS_ROOT
 		if (check_permissions) {
 			/* Permission restrictions:
@@ -865,6 +966,32 @@ NOTHROW(FCALL fnode_mayaccess)(struct fnode *__restrict self,
                                unsigned int type) {
 	unsigned int how;
 	mode_t mode = ATOMIC_READ(self->fn_mode);
+	struct fnode_perm_ops const *perm_ops;
+	perm_ops = fnode_getops(self)->no_perm;
+	if (perm_ops && perm_ops->npo_getown) {
+		uid_t uid;
+		gid_t gid;
+		(*perm_ops->npo_getown)(self, &uid, &gid);
+		for (how = 1; how <= 4; how <<= 1) {
+			if (!(type & how))
+				continue; /* Access not checked. */
+			if likely(mode & how)
+				continue; /* Access is allowed for everyone. */
+			if (mode & (how << 3)) {
+				if likely(cred_isfsgroupmember(gid))
+					continue; /* The calling thread's user is part of the file owner's group */
+			}
+			if (mode & (how << 6)) {
+				if likely(uid == cred_getfsuid())
+					continue; /* The calling thread's user is the file's owner */
+				/* CAP_FOWNER: ... Ignore filesystem-uid checks ... */
+				if likely(capable(CAP_FOWNER))
+					continue;
+			}
+			return false;
+		}
+		return true;
+	}
 	for (how = 1; how <= 4; how <<= 1) {
 		if (!(type & how))
 			continue; /* Access not checked. */

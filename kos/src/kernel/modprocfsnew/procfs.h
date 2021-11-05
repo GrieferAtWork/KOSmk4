@@ -117,6 +117,9 @@ INTDEF struct fdirent_ops const procfs_perproc_root_dirent_ops;
  * NOTE: For this directory, `fn_fsdata' is a `REF struct taskpid *' [1..1] */
 INTDEF struct fdirnode_ops const procfs_perproc_root_ops;
 
+/* Permissions operators for per-process files. */
+INTDEF struct fnode_perm_ops const procfs_perproc_v_perm_ops;
+
 /* Calculate+return the INO of a given taskpid-pointer and INode operators table.
  * @param: context_object_ptr: Pointer an unique object  with a unique address  that
  *                             identifies the current context (for per-thread files,

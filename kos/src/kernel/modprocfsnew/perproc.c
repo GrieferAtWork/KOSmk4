@@ -130,13 +130,14 @@ INTDEF NONNULL((1)) void KCALL
 procfs_perproc_dir_v_stat(struct mfile *__restrict self,
                           USER CHECKED struct stat *result)
 		THROWS(...);
-#define procfs_perproc_dir_v_free    procfs_perproc_v_free
-#define procfs_perproc_dir_v_destroy procfs_perproc_v_destroy
-#define procfs_perproc_dir_v_changed procfs_perproc_v_changed
-#define procfs_perproc_dir_v_wrattr  procfs_perproc_v_wrattr
-#define procfs_perproc_dir_v_open    fdirnode_v_open
-#define procfs_perproc_dir_v_ioctl   fdirnode_v_ioctl
-#define procfs_perproc_dir_v_hop     fdirnode_v_hop
+#define procfs_perproc_dir_v_free     procfs_perproc_v_free
+#define procfs_perproc_dir_v_destroy  procfs_perproc_v_destroy
+#define procfs_perproc_dir_v_changed  procfs_perproc_v_changed
+#define procfs_perproc_dir_v_wrattr   procfs_perproc_v_wrattr
+#define procfs_perproc_dir_v_perm_ops procfs_perproc_v_perm_ops
+#define procfs_perproc_dir_v_open     fdirnode_v_open
+#define procfs_perproc_dir_v_ioctl    fdirnode_v_ioctl
+#define procfs_perproc_dir_v_hop      fdirnode_v_hop
 INTDEF struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops;
 
 
@@ -181,8 +182,8 @@ PRIVATE struct fnode const procfs_perproc_reg_template = {
 	},
 	FNODE_INIT_fn_nlink(1),
 	FNODE_INIT_fn_mode(0), /* Will be overwritten */
-	FNODE_INIT_fn_uid(0),
-	FNODE_INIT_fn_gid(0),
+	FNODE_INIT_fn_uid(0),  /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+	FNODE_INIT_fn_gid(0),  /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
 	FNODE_INIT_fn_ino(0),
 	FNODE_INIT_fn_super(&procfs_super),
 	FNODE_INIT_fn_changed,
@@ -211,8 +212,8 @@ PRIVATE struct fnode const procfs_perproc_nomap_template = {
 	},
 	FNODE_INIT_fn_nlink(1),
 	FNODE_INIT_fn_mode(S_IFDIR | 0555), /* May be overwritten (but this is the default for the /proc/[pid] root directory) */
-	FNODE_INIT_fn_uid(0),
-	FNODE_INIT_fn_gid(0),
+	FNODE_INIT_fn_uid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+	FNODE_INIT_fn_gid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
 	FNODE_INIT_fn_ino(0),
 	FNODE_INIT_fn_super(&procfs_super),
 	FNODE_INIT_fn_changed,
@@ -245,8 +246,8 @@ INTERN_CONST struct flnknode const procfs_fdlnk_template = {
 		},
 		FNODE_INIT_fn_nlink(1),
 		FNODE_INIT_fn_mode(S_IFLNK | 0777),
-		FNODE_INIT_fn_uid(0),
-		FNODE_INIT_fn_gid(0),
+		FNODE_INIT_fn_uid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+		FNODE_INIT_fn_gid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
 		FNODE_INIT_fn_ino(0),
 		FNODE_INIT_fn_super(&procfs_super),
 		FNODE_INIT_fn_changed,
@@ -281,8 +282,8 @@ INTERN_CONST struct flnknode const perproc_mapfile_lnknode_template = {
 		},
 		FNODE_INIT_fn_nlink(1),
 		FNODE_INIT_fn_mode(S_IFLNK | 0400),
-		FNODE_INIT_fn_uid(0),
-		FNODE_INIT_fn_gid(0),
+		FNODE_INIT_fn_uid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+		FNODE_INIT_fn_gid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
 		FNODE_INIT_fn_ino(0),
 		FNODE_INIT_fn_super(&procfs_super),
 		FNODE_INIT_fn_changed,
@@ -429,8 +430,13 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 
 
 /* Define operator tables. */
-#define procfs_perproc_lnknode_v_ioctl   flnknode_v_ioctl
-#define procfs_perproc_lnknode_v_hop     flnknode_v_hop
+#define procfs_perproc_lnknode_v_destroy  procfs_perproc_v_destroy
+#define procfs_perproc_lnknode_v_changed  procfs_perproc_v_changed
+#define procfs_perproc_lnknode_v_ioctl    flnknode_v_ioctl
+#define procfs_perproc_lnknode_v_hop      flnknode_v_hop
+#define procfs_perproc_lnknode_v_free     procfs_perproc_v_free
+#define procfs_perproc_lnknode_v_wrattr   procfs_perproc_v_wrattr
+#define procfs_perproc_lnknode_v_perm_ops procfs_perproc_v_perm_ops
 INTDEF struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops;
 #define procfs_perproc_printnode_v_ioctl printnode_v_ioctl
 #define procfs_perproc_printnode_v_hop   printnode_v_hop
@@ -463,6 +469,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 			},                                                                         \
 			.no_free   = &procfs_perproc_dir_v_free,                                   \
 			.no_wrattr = &procfs_perproc_dir_v_wrattr,                                 \
+			.no_perm   = &procfs_perproc_dir_v_perm_ops,                               \
 		},                                                                             \
 		.dno_lookup = &__##ops_symbol_name##_v_lookup,                                 \
 		.dno_enum   = &__##ops_symbol_name##_v_enum,                                   \
@@ -482,6 +489,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 			},                                                           \
 			.no_free   = &procfs_perproc_v_free,                         \
 			.no_wrattr = &procfs_perproc_v_wrattr,                       \
+			.no_perm   = &procfs_perproc_v_perm_ops,                     \
 		}},                                                              \
 		.pno_print = &printer,                                           \
 	};
@@ -511,6 +519,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 			},                                                                 \
 			.no_free   = &procfs_perproc_v_free,                               \
 			.no_wrattr = &procfs_perproc_v_wrattr,                             \
+			.no_perm   = &procfs_perproc_v_perm_ops,                           \
 		}},                                                                    \
 		.pno_print = &printer,                                                 \
 	};
@@ -523,12 +532,13 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 	INTERN_CONST struct flnknode_ops const ops_symbol_name = {      \
 		.lno_node = {                                               \
 			.no_file = {                                            \
-				.mo_destroy = &procfs_perproc_v_destroy,            \
-				.mo_changed = &procfs_perproc_v_changed,            \
+				.mo_destroy = &procfs_perproc_lnknode_v_destroy,    \
+				.mo_changed = &procfs_perproc_lnknode_v_changed,    \
 				.mo_stream  = &procfs_perproc_lnknode_v_stream_ops, \
 			},                                                      \
-			.no_free   = &procfs_perproc_v_free,                    \
-			.no_wrattr = &procfs_perproc_v_wrattr,                  \
+			.no_free   = &procfs_perproc_lnknode_v_free,            \
+			.no_wrattr = &procfs_perproc_lnknode_v_wrattr,          \
+			.no_perm   = &procfs_perproc_lnknode_v_perm_ops,        \
 		},                                                          \
 		.lno_readlink = &readlink,                                  \
 	};
@@ -602,10 +612,7 @@ INTERN_CONST struct fdirnode_ops const procfs_perproc_root_ops = {
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
-		/* TODO: Operators to override `uid' and `gid', as are used for permission  checks,
-		 *       and are exposed to user-space via `stat' (we want to use cred_* values for
-		 *       these)
-		 * The same also goes for all of the other operator tables above! (grep this file for `no_wrattr') */
+		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_root_v_lookup,
 	.dno_enum   = &procfs_perproc_root_v_enum,

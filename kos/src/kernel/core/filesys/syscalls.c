@@ -2883,7 +2883,7 @@ PRIVATE NONNULL((1)) void KCALL
 fnode_request_arbitrary_timestamps(struct fnode *__restrict node)
 		THROWS(E_INSUFFICIENT_RIGHTS) {
 	/* Caller must be owner, or have `CAP_FOWNER' */
-	if (ATOMIC_READ(node->fn_uid) != cred_getfsuid())
+	if (fnode_getuid(node) != cred_getfsuid())
 		require(CAP_FOWNER); /* FIXME: This fails with EACCES, but POSIX wants EPERM... */
 }
 

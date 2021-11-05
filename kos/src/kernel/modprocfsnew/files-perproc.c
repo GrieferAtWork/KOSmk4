@@ -144,6 +144,35 @@ DECL_BEGIN
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
 
+PRIVATE BLOCKING NONNULL((1, 2, 3)) void KCALL
+procfs_perproc_v_getown(struct fnode *__restrict self,
+                        uid_t *__restrict powner,
+                        gid_t *__restrict pgroup)
+		THROWS(E_IOERROR, ...) {
+	REF struct task *thread = taskpid_gettask(self->fn_fsdata);
+
+	/* Fill uid/gid based on thread credentials. */
+	if (thread) {
+		REF struct cred *thread_cred;
+		thread_cred = task_getcred(thread);
+		decref_unlikely(thread);
+		FINALLY_DECREF_UNLIKELY(thread_cred);
+
+		/* NOTE: Yes, we need to use the effective U/G-id here (linux does the same) */
+		*powner = ATOMIC_READ(thread_cred->c_euid);
+		*pgroup = ATOMIC_READ(thread_cred->c_egid);
+	} else {
+		/* Fallback... */
+		*powner = 0;
+		*pgroup = 0;
+	}
+}
+
+/* Permissions operators for per-process files. */
+INTERN_CONST struct fnode_perm_ops const procfs_perproc_v_perm_ops = {
+	.npo_getown = &procfs_perproc_v_getown
+};
+
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_v_stat_common(struct mfile *__restrict self,
                              USER CHECKED struct stat *result)
@@ -153,7 +182,6 @@ procfs_perproc_v_stat_common(struct mfile *__restrict self,
 	/* Set timestamps based on thread times. */
 	if (thread) {
 		struct timespec ts;
-		REF struct cred *thread_cred;
 		FINALLY_DECREF_UNLIKELY(thread);
 
 		/* Creation-time: store the time when the thread was started. */
@@ -167,13 +195,6 @@ procfs_perproc_v_stat_common(struct mfile *__restrict self,
 		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))ts.tv_nsec;
 		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))ts.tv_sec;
 		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))ts.tv_nsec;
-
-		/* Fill uid/gid based on thread credentials. */
-		thread_cred = task_getcred(thread);
-		FINALLY_DECREF_UNLIKELY(thread_cred);
-		/* NOTE: Yes, we need to use the effective U/G-id here (linux does the same) */
-		result->st_uid = (typeof(result->st_uid))ATOMIC_READ(thread_cred->c_euid);
-		result->st_gid = (typeof(result->st_gid))ATOMIC_READ(thread_cred->c_egid);
 
 	} else {
 		/* Fallback: just write the current time... */
@@ -215,10 +236,16 @@ procfs_perproc_lnknode_v_stat(struct mfile *__restrict self,
 	result->st_blocks = CEILDIV(lnksize, PAGESIZE);
 	result->st_size   = lnksize;
 }
-#define procfs_perproc_lnknode_v_ioctl   flnknode_v_ioctl
-#define procfs_perproc_lnknode_v_hop     flnknode_v_hop
-#define procfs_perproc_printnode_v_ioctl printnode_v_ioctl
-#define procfs_perproc_printnode_v_hop   printnode_v_hop
+#define procfs_perproc_lnknode_v_destroy    procfs_perproc_v_destroy
+#define procfs_perproc_lnknode_v_changed    procfs_perproc_v_changed
+#define procfs_perproc_lnknode_v_ioctl      flnknode_v_ioctl
+#define procfs_perproc_lnknode_v_hop        flnknode_v_hop
+#define procfs_perproc_lnknode_v_free       procfs_perproc_v_free
+#define procfs_perproc_lnknode_v_wrattr     procfs_perproc_v_wrattr
+#define procfs_perproc_lnknode_v_perm_ops   procfs_perproc_v_perm_ops
+#define procfs_perproc_printnode_v_ioctl    printnode_v_ioctl
+#define procfs_perproc_printnode_v_hop      printnode_v_hop
+#define procfs_perproc_printnode_v_perm_ops procfs_perproc_v_perm_ops
 
 INTERN_CONST struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops = {
 	.mso_stat  = &procfs_perproc_lnknode_v_stat,
@@ -235,13 +262,14 @@ INTERN_CONST struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops
 };
 
 /* Operators for per-process directories */
-#define procfs_perproc_dir_v_free    procfs_perproc_v_free
-#define procfs_perproc_dir_v_destroy procfs_perproc_v_destroy
-#define procfs_perproc_dir_v_changed procfs_perproc_v_changed
-#define procfs_perproc_dir_v_wrattr  procfs_perproc_v_wrattr
-#define procfs_perproc_dir_v_open    fdirnode_v_open
-#define procfs_perproc_dir_v_ioctl   fdirnode_v_ioctl
-#define procfs_perproc_dir_v_hop     fdirnode_v_hop
+#define procfs_perproc_dir_v_free     procfs_perproc_v_free
+#define procfs_perproc_dir_v_destroy  procfs_perproc_v_destroy
+#define procfs_perproc_dir_v_changed  procfs_perproc_v_changed
+#define procfs_perproc_dir_v_wrattr   procfs_perproc_v_wrattr
+#define procfs_perproc_dir_v_open     fdirnode_v_open
+#define procfs_perproc_dir_v_ioctl    fdirnode_v_ioctl
+#define procfs_perproc_dir_v_hop      fdirnode_v_hop
+#define procfs_perproc_dir_v_perm_ops procfs_perproc_v_perm_ops
 INTERN_CONST struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops = {
 	.mso_open  = &procfs_perproc_dir_v_open,
 	.mso_stat  = &procfs_perproc_dir_v_stat,
@@ -328,12 +356,13 @@ procfs_pp_cwd_v_walklink(struct flnknode *__restrict self,
 INTERN_CONST struct flnknode_ops const procfs_pp_cwd = {
 	.lno_node = {
 		.no_file = {
-			.mo_destroy = &procfs_perproc_v_destroy,
-			.mo_changed = &procfs_perproc_v_changed,
+			.mo_destroy = &procfs_perproc_lnknode_v_destroy,
+			.mo_changed = &procfs_perproc_lnknode_v_changed,
 			.mo_stream  = &procfs_perproc_lnknode_v_stream_ops,
 		},
-		.no_free   = &procfs_perproc_v_free,
-		.no_wrattr = &procfs_perproc_v_wrattr,
+		.no_free   = &procfs_perproc_lnknode_v_free,
+		.no_wrattr = &procfs_perproc_lnknode_v_wrattr,
+		.no_perm   = &procfs_perproc_lnknode_v_perm_ops,
 	},
 	.lno_readlink = &procfs_pp_cwd_v_readlink,
 #ifndef __OPTIMIZE_SIZE__
@@ -365,12 +394,13 @@ procfs_pp_root_v_walklink(struct flnknode *__restrict self,
 INTERN_CONST struct flnknode_ops const procfs_pp_root = {
 	.lno_node = {
 		.no_file = {
-			.mo_destroy = &procfs_perproc_v_destroy,
-			.mo_changed = &procfs_perproc_v_changed,
+			.mo_destroy = &procfs_perproc_lnknode_v_destroy,
+			.mo_changed = &procfs_perproc_lnknode_v_changed,
 			.mo_stream  = &procfs_perproc_lnknode_v_stream_ops,
 		},
-		.no_free   = &procfs_perproc_v_free,
-		.no_wrattr = &procfs_perproc_v_wrattr,
+		.no_free   = &procfs_perproc_lnknode_v_free,
+		.no_wrattr = &procfs_perproc_lnknode_v_wrattr,
+		.no_perm   = &procfs_perproc_lnknode_v_perm_ops,
 	},
 	.lno_readlink = &procfs_pp_root_v_readlink,
 #ifndef __OPTIMIZE_SIZE__
@@ -460,12 +490,13 @@ ProcFS_PerProc_Exe_ExpandLink(struct flnknode *__restrict self,
 INTERN_CONST struct flnknode_ops const procfs_pp_exe = {
 	.lno_node = {
 		.no_file = {
-			.mo_destroy = &procfs_perproc_v_destroy,
-			.mo_changed = &procfs_perproc_v_changed,
+			.mo_destroy = &procfs_perproc_lnknode_v_destroy,
+			.mo_changed = &procfs_perproc_lnknode_v_changed,
 			.mo_stream  = &procfs_perproc_lnknode_v_stream_ops,
 		},
-		.no_free   = &procfs_perproc_v_free,
-		.no_wrattr = &procfs_perproc_v_wrattr,
+		.no_free   = &procfs_perproc_lnknode_v_free,
+		.no_wrattr = &procfs_perproc_lnknode_v_wrattr,
+		.no_perm   = &procfs_perproc_lnknode_v_perm_ops,
 	},
 	.lno_readlink   = &ProcFS_PerProc_Exe_Printer,
 #ifndef __OPTIMIZE_SIZE__
@@ -1638,9 +1669,10 @@ NOTHROW(KCALL procfs_fd_lnknode_v_destroy)(struct mfile *__restrict self) {
 	decref_unlikely(me->fn_fsdata);
 	kfree(me);
 }
-#define procfs_fd_lnknode_v_changed    procfs_perproc_v_changed
-#define procfs_fd_lnknode_v_wrattr     procfs_perproc_v_wrattr
-#define procfs_fd_lnknode_v_free       procfs_perproc_v_free
+#define procfs_fd_lnknode_v_changed    procfs_perproc_lnknode_v_changed
+#define procfs_fd_lnknode_v_wrattr     procfs_perproc_lnknode_v_wrattr
+#define procfs_fd_lnknode_v_perm_ops   procfs_perproc_lnknode_v_perm_ops
+#define procfs_fd_lnknode_v_free       procfs_perproc_lnknode_v_free
 #define procfs_fd_lnknode_v_stream_ops procfs_perproc_lnknode_v_stream_ops
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
@@ -1781,6 +1813,7 @@ INTERN_CONST struct flnknode_ops const procfs_perproc_fdlnk_ops = {
 		},
 		.no_free   = &procfs_fd_lnknode_v_free,
 		.no_wrattr = &procfs_fd_lnknode_v_wrattr,
+		.no_perm   = &procfs_fd_lnknode_v_perm_ops,
 	},
 	.lno_readlink   = &procfs_fd_lnknode_v_readlink,
 	.lno_openlink   = &procfs_fd_lnknode_v_openlink,
@@ -2076,6 +2109,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_fd = {
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
+		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_fd_v_lookup,
 	.dno_enum   = &procfs_perproc_fd_v_enum,
@@ -2139,9 +2173,10 @@ perproc_mapfile_lnknode_v_expandlink(struct flnknode *__restrict self,
 }
 #endif /* !__OPTIMIZE_SIZE__ */
 
-#define perproc_mapfile_lnknode_v_changed    procfs_perproc_v_changed
-#define perproc_mapfile_lnknode_v_wrattr     procfs_perproc_v_wrattr
-#define perproc_mapfile_lnknode_v_free       procfs_perproc_v_free
+#define perproc_mapfile_lnknode_v_changed    procfs_perproc_lnknode_v_changed
+#define perproc_mapfile_lnknode_v_wrattr     procfs_perproc_lnknode_v_wrattr
+#define perproc_mapfile_lnknode_v_perm_ops   procfs_perproc_lnknode_v_perm_ops
+#define perproc_mapfile_lnknode_v_free       procfs_perproc_lnknode_v_free
 #define perproc_mapfile_lnknode_v_stream_ops procfs_perproc_lnknode_v_stream_ops
 
 INTDEF struct flnknode const perproc_mapfile_lnknode_template;
@@ -2154,6 +2189,7 @@ INTERN_CONST struct flnknode_ops const perproc_mapfile_lnknode_ops = {
 		},
 		.no_free   = &perproc_mapfile_lnknode_v_free,
 		.no_wrattr = &perproc_mapfile_lnknode_v_wrattr,
+		.no_perm   = &perproc_mapfile_lnknode_v_perm_ops,
 	},
 	.lno_readlink   = &perproc_mapfile_lnknode_v_readlink,
 #ifndef __OPTIMIZE_SIZE__
@@ -2465,6 +2501,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_map_files = {
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
+		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_map_files_v_lookup,
 	.dno_enum   = &procfs_perproc_map_files_v_enum,
@@ -2510,6 +2547,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_task = {
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
+		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_task_v_lookup,
 	.dno_enum   = &procfs_perproc_task_v_enum,
@@ -2552,6 +2590,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_kos_dcwd = {
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
+		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_kos_dcwd_v_lookup,
 	.dno_enum   = &procfs_perproc_kos_dcwd_v_enum,
@@ -2594,6 +2633,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_kos_drives = {
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
+		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_kos_drives_v_lookup,
 	.dno_enum   = &procfs_perproc_kos_drives_v_enum,

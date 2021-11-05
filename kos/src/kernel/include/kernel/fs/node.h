@@ -188,6 +188,18 @@ struct chrdev;
 struct fsuper;
 struct fnode;
 
+struct fnode_perm_ops {
+	/* [0..1] Get the owner of the  file-node. When this operator  is
+	 * implemented, the `fn_uid' and `fn_gid' fields container either
+	 * invalid-, or fs-specific data. Furthermore, the file owner can
+	 * not be changed, as though `MFILE_FN_ATTRREADONLY' was set. */
+	BLOCKING NONNULL((1, 2, 3)) void
+	(KCALL *npo_getown)(struct fnode *__restrict self,
+	                    uid_t *__restrict powner,
+	                    gid_t *__restrict pgroup)
+			THROWS(E_IOERROR, ...);
+};
+
 struct fnode_ops {
 	struct mfile_ops no_file; /* MFile operators */
 
@@ -211,6 +223,9 @@ struct fnode_ops {
 	BLOCKING NONNULL((1)) void
 	(KCALL *no_wrattr)(struct fnode *__restrict self)
 			THROWS(E_IOERROR, ...);
+
+	/* [0..1] Permissions-related operators. */
+	struct fnode_perm_ops const *no_perm;
 };
 
 
@@ -248,8 +263,8 @@ struct fnode
 #endif /* __WANT_FS_INIT */
 	nlink_t                     fn_nlink;    /* [lock(_MFILE_F_SMP_TSLOCK)][<= fn_super->fs_feat.sf_link_max] INode link counter. */
 	mode_t                      fn_mode;     /* [lock(_MFILE_F_SMP_TSLOCK)] INode access mode (but note that file-type bits are [const]). */
-	uid_t                       fn_uid;      /* [lock(_MFILE_F_SMP_TSLOCK)] INode owner UID. (guarantied to be ) */
-	gid_t                       fn_gid;      /* [lock(_MFILE_F_SMP_TSLOCK)] INode owner GID. */
+	uid_t                       fn_uid;      /* [lock(_MFILE_F_SMP_TSLOCK)][valid_if(!npo_getown)] INode owner UID. */
+	gid_t                       fn_gid;      /* [lock(_MFILE_F_SMP_TSLOCK)][valid_if(!npo_getown)] INode owner GID. */
 	ino_t                       fn_ino;      /* [lock(fn_super->fs_nodeslock)] INode number.
 	                                          * On some filesystems, this number may change when the file is renamed (e.g.
 	                                          * FAT). As such, a lock is  required when reading/writing the INode  number! */
@@ -456,6 +471,15 @@ NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self);
 #define fnode_v_hop   mfile_v_hop
 
 
+/* Get the uid/gid of a given file-node. These functions respect `npo_getown' */
+FUNDEF BLOCKING NONNULL((1)) uid_t KCALL fnode_getuid(struct fnode *__restrict self);
+FUNDEF BLOCKING NONNULL((1)) gid_t KCALL fnode_getgid(struct fnode *__restrict self);
+FUNDEF BLOCKING NONNULL((1, 2, 3)) void KCALL
+fnode_getugid(struct fnode *__restrict self,
+              uid_t *__restrict puid,
+              gid_t *__restrict pgid);
+
+
 /* High-level file-node functions */
 
 /* Change permissions, SUID/SGID and the sticky bit of the given INode (flagsmask: 07777)
@@ -464,7 +488,7 @@ NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self);
  * @return: * : The old file mode
  * @throw: E_FSERROR_READONLY:    The `MFILE_FN_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this. */
-FUNDEF NONNULL((1)) mode_t KCALL
+FUNDEF BLOCKING NONNULL((1)) mode_t KCALL
 fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
             mode_t perm_flag, __BOOL check_permissions DFL(1))
 		THROWS(E_FSERROR_READONLY, E_INSUFFICIENT_RIGHTS);

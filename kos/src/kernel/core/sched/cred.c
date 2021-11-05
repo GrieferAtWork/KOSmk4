@@ -459,12 +459,21 @@ cred_onexec(struct inode *__restrict program_file)
 		gid_t program_gid;
 #ifdef CONFIG_USE_NEW_FS
 		struct fnode *node;
-		node = mfile_asnode(program_file);
-		mfile_tslock_acquire(node);
-		program_mode = node->fn_mode;
-		program_uid  = node->fn_uid;
-		program_gid  = node->fn_gid;
-		mfile_tslock_release(node);
+		struct fnode_perm_ops const *perm_ops;
+		node     = mfile_asnode(program_file);
+		perm_ops = fnode_getops(node)->no_perm;
+		if (perm_ops && perm_ops->npo_getown) {
+			(*perm_ops->npo_getown)(node, &program_uid, &program_gid);
+			mfile_tslock_acquire(node);
+			program_mode = node->fn_mode;
+			mfile_tslock_release(node);
+		} else {
+			mfile_tslock_acquire(node);
+			program_mode = node->fn_mode;
+			program_uid  = node->fn_uid;
+			program_gid  = node->fn_gid;
+			mfile_tslock_release(node);
+		}
 #else /* CONFIG_USE_NEW_FS */
 		inode_loadattr(program_file);
 		program_mode = program_file->i_filemode;
