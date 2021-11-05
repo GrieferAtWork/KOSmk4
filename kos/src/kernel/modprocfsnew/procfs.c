@@ -641,7 +641,10 @@ PRIVATE DRIVER_INIT void KCALL procfs_init(void) {
 	                      &now);
 
 	/* Fill in the inode value for the procfs root. */
-	procfs_super.fs_root.fn_ino = (ino_t)skew_kernel_pointer(&procfs_super.fs_root);
+	procfs_super.fs_root.fn_ino   = (ino_t)skew_kernel_pointer(&procfs_super.fs_root);
+	procfs_super.fs_root.mf_atime = now;
+	procfs_super.fs_root.mf_mtime = now;
+	procfs_super.fs_root.mf_ctime = now;
 
 	/* Register the filesystem type. */
 	ffilesys_register(&procfs_filesys);
