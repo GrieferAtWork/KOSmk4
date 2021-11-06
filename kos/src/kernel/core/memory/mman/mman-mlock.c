@@ -275,6 +275,9 @@ again_prefault:
 					/* Fault this node. */
 					if (!mfault_lockpart_or_unlock(&mf))
 						goto again_prefault;
+
+					/* NOTE: Because  we only ever  fault for reading (`mf.mfl_flags = MMAN_FAULT_F_NORMAL'),
+					 *       we don't have to worry about `mfault_or_unlock()' throwing `E_FSERROR_READONLY'! */
 					if (!mfault_or_unlock(&mf))
 						goto again_prefault;
 

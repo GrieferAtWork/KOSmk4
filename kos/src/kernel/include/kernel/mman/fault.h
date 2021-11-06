@@ -106,12 +106,12 @@ mman_prefaultv(struct iov_buffer const *__restrict buffer,
  *    though also note that if some mem-part within the range was already  faulted,
  *    its  page directory mapping in `self' will still be updated if need be, as it
  *    may have been faulted as a lazy memory mapping).
- */
+ * @param: E_FSERROR_READONLY: Attempted to write-fault a SHARED mapping of a READONLY file. */
 FUNDEF BLOCKING NONNULL((1)) void FCALL
 mman_forcefault(struct mman *__restrict self,
                 USER CHECKED void const *addr,
                 size_t num_bytes, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_FSERROR_READONLY, ...);
 
 /* Same as `mman_forcefault()', but fault all memory pointed-to by the given buffer. */
 FUNDEF BLOCKING NONNULL((1, 2)) void FCALL
@@ -299,8 +299,9 @@ _mfault_unlock_and_waitfor_part(struct mfault *__restrict self)
  *                 the associated mem-part)
  * @throw: E_FSERROR_READONLY:
  *         Attempted to fault write for `MNODE_F_SHARED' mapping of `MFILE_F_READONLY'-file:
+ *         >> (self->mfl_flags & MMAN_FAULT_F_WRITE) &&
  *         >> (self->mfl_node->mn_flags & MNODE_F_SHARED) &&
- *         >> ((self->mfl_part->mp_file->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY)
+ *         >> (self->mfl_part->mp_file->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY
  */
 FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
 mfault_or_unlock(struct mfault *__restrict self)

@@ -115,6 +115,28 @@ again:
 			/* Try to fault the backing mem-parts. */
 			if (!mfault_lockpart_or_unlock(&mf))
 				goto again;
+
+#ifdef CONFIG_USE_NEW_FS
+			/* `mfault_or_unlock()' would normally throw E_FSERROR_READONLY when
+			 * trying to write-fault a SHARED mapping of a READONLY file, but we
+			 * don't want that here.
+			 *
+			 * Instead, we want to handle that case by `goto unlock_and_done'!
+			 * NOTE: Because `MFILE_F_DELETED' negates the effects of READONLY
+			 *       and is WRITE_ONCE, and `MFILE_F_READONLY' can only be set
+			 *       while  holding a lock to all parts (which no other thread
+			 *       can  do right now since we're currently holding a lock to
+			 *       at least one of those parts), we know that the file won't
+			 *       randomly become READONLY by the time `mfault_or_unlock()'
+			 *       repeats this check! */
+			if ((mf.mfl_flags & MMAN_FAULT_F_WRITE) &&
+			    (mf.mfl_node->mn_flags & MNODE_F_SHARED) &&
+			    (mf.mfl_part->mp_file->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY) {
+				mpart_lock_release(mf.mfl_part);
+				goto unlock_and_done;
+			}
+#endif /* CONFIG_USE_NEW_FS */
+
 			if (!mfault_or_unlock(&mf))
 				goto again;
 
@@ -226,12 +248,12 @@ mman_prefaultv(struct iov_buffer const *__restrict buffer,
  *    though also note that if some mem-part within the range was already  faulted,
  *    its  page directory mapping in `self' will still be updated if need be, as it
  *    may have been faulted as a lazy memory mapping).
- */
+ * @param: E_FSERROR_READONLY: Attempted to write-fault a SHARED mapping of a READONLY file. */
 PUBLIC BLOCKING NONNULL((1)) void FCALL
 mman_forcefault(struct mman *__restrict self,
                 USER CHECKED void const *addr,
                 size_t num_bytes, unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_FSERROR_READONLY, ...) {
 	struct mfault mf;
 	while (num_bytes) {
 		PAGEDIR_PAGEALIGNED void *pagealigned_addr;
@@ -594,6 +616,7 @@ _mfault_unlock_and_waitfor_part(struct mfault *__restrict self)
  *                 the associated mem-part)
  * @throw: E_FSERROR_READONLY:
  *         Attempted to fault write for `MNODE_F_SHARED' mapping of `MFILE_F_READONLY'-file:
+ *         >> (self->mfl_flags & MMAN_FAULT_F_WRITE) &&
  *         >> (self->mfl_node->mn_flags & MNODE_F_SHARED) &&
  *         >> ((self->mfl_part->mp_file->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY)
  */

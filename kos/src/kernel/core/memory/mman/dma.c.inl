@@ -63,18 +63,19 @@ DECL_BEGIN
  * @return: 0 :         Some portion of the specified address range(s) maps to a VM node reservation (no associated data part).
  * @return: 0 :         Some portion of the specified address range(s) maps to VIO memory, meaning there is no underlying physical memory.
  * @return: <= lockcnt: The number of used DMA locks (SUCCESS)
- * @return: >  lockcnt: The number of _REQUIRED_ DMA locks (FAILURE) (All locks that may have already been acqured will have already been released) */
+ * @return: >  lockcnt: The number of _REQUIRED_ DMA locks (FAILURE) (All locks that may have already been acqured will have already been released)
+ * @throw: E_FSERROR_READONLY: Attempted to fault write-access for a SHARED mapping of a MFILE_F_READONLY file. */
 PUBLIC BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2, 4)) size_t KCALL
 mman_startdma(struct mman *__restrict self, mdma_range_callback_t prange,
               void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
               UNCHECKED void *addr, size_t num_bytes, unsigned int flags)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_FSERROR_READONLY, ...)
 #elif defined(DEFINE_mman_startdmav)
 PUBLIC BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2, 4, 6)) size_t KCALL
 mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
                void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
                struct iov_buffer const *__restrict addr_v, unsigned int flags)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_FSERROR_READONLY, ...)
 #define LOCAL_IS_VECTOR
 #elif defined(DEFINE_mman_enumdma)
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
@@ -94,13 +95,14 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
  *              Upon full success, this is identical to the given `num_bytes' / `iov_buffer_size(buf)',
  *              though for the same reasons that `mman_startdma[v]' can fail (s.a. `@return: 0' cases),
- *              this may be less than that */
+ *              this may be less than that.
+ * @throw: E_FSERROR_READONLY: Attempted to fault write-access for a SHARED mapping of a MFILE_F_READONLY file. */
 PUBLIC BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2)) size_t KCALL
 mman_enumdma(struct mman *__restrict self,
              mdma_range_callback_t prange, void *cookie,
              UNCHECKED void *addr, size_t num_bytes,
              unsigned int flags)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_FSERROR_READONLY, ...)
 #define LOCAL_IS_ENUM
 #elif defined(DEFINE_mman_enumdmav)
 PUBLIC BLOCKING_IF(BLOCKING(prange)) NONNULL((1, 2, 4)) size_t KCALL
@@ -108,7 +110,7 @@ mman_enumdmav(struct mman *__restrict self,
               mdma_range_callback_t prange, void *cookie,
               struct iov_buffer const *__restrict addr_v,
               unsigned int flags)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_FSERROR_READONLY, ...)
 #define LOCAL_IS_ENUM
 #define LOCAL_IS_VECTOR
 #else /* ... */
