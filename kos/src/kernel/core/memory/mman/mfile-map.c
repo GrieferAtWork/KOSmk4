@@ -55,7 +55,7 @@ DECL_BEGIN
 #ifdef CONFIG_USE_NEW_FS
 #define IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)                            \
 	(((file)->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) == MFILE_F_READONLY && \
-	 ((self)->mfm_prot & (PROT_WRITE | PROT_SHARED)) == (PROT_WRITE | PROT_SHARED))
+	 ((self)->mfm_prot & (PROT_WRITE | PROT_SHARED | PROT_FORCEWRITE)) == (PROT_WRITE | PROT_SHARED))
 #endif /* CONFIG_USE_NEW_FS */
 
 
@@ -276,7 +276,9 @@ fail:
  *  - Acquire  locks to all of the parts, as well as making
  *    sure that all of the parts still form 1 uninterrupted
  *    mapping over the given address range in its entirety
- *  - Release locks to all of the parts */
+ *  - Release locks to all of the parts
+ * @param: prot:  Set of `0 | PROT_WRITE | PROT_SHARED | PROT_FORCEWRITE' (other flags are silently ignored)
+ * @param: flags: Set of `0 | MAP_POPULATE | MAP_NONBLOCK' (other flags are silently ignored) */
 PUBLIC BLOCKING_IF(self->mfm_flags & MAP_POPULATE) NONNULL((1)) void FCALL
 _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...) {

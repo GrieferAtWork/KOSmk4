@@ -82,7 +82,7 @@ struct mfile_map {
 	struct mfile                *mfm_file;  /* [1..1][const] File from which to allocate nodes. */
 	PAGEDIR_PAGEALIGNED pos_t    mfm_addr;  /* [const] Starting address within the source file. */
 	PAGEDIR_PAGEALIGNED size_t   mfm_size;  /* [const] Total # of bytes that should be mapped. */
-	unsigned int                 mfm_prot;  /* Set of `0 | PROT_WRITE | PROT_SHARED' (other flags are silently ignored) */
+	unsigned int                 mfm_prot;  /* Set of `0 | PROT_WRITE | PROT_SHARED | PROT_FORCEWRITE' (other flags are silently ignored) */
 	unsigned int                 mfm_flags; /* Set of `0 | MAP_POPULATE | MAP_NONBLOCK' (other flags are silently ignored)
 	                                         * MAP_POPULATE -- Ensure  the following conditions  when locking data  parts:
 	                                         *                  - mpart_setcore_or_unlock()
@@ -125,7 +125,9 @@ struct mfile_map {
  *  - Acquire  locks to all of the parts, as well as making
  *    sure that all of the parts still form 1 uninterrupted
  *    mapping over the given address range in its entirety
- *  - Release locks to all of the parts */
+ *  - Release locks to all of the parts
+ * @param: prot:  Set of `0 | PROT_WRITE | PROT_SHARED | PROT_FORCEWRITE' (other flags are silently ignored)
+ * @param: flags: Set of `0 | MAP_POPULATE | MAP_NONBLOCK' (other flags are silently ignored) */
 #ifdef __INTELLISENSE__
 BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 2)) void
 mfile_map_init_and_acquire(struct mfile_map *__restrict self,

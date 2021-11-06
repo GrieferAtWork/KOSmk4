@@ -347,8 +347,15 @@ PUBLIC NONNULL((1)) uintptr_t FCALL
 mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
               uintptr_t flags, bool check_permissions)
 		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, E_INSUFFICIENT_RIGHTS) {
+#define MODIFIABLE_FLAGS                                         \
+	(MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOUSRMMAP |    \
+	 MFILE_F_NOUSRIO | MFILE_F_NOMTIME | MFILE_FN_ATTRREADONLY | \
+	 MFILE_F_RELATIME | MFILE_F_STRICTATIME | MFILE_F_LAZYTIME)
 	bool cmpxch_ok;
 	uintptr_t old_flags, new_flags;
+	/* Ensure that only certain flags will be modified. */
+	assert((~mask & ~MODIFIABLE_FLAGS) == 0);
+	assert((flags & ~MODIFIABLE_FLAGS) == 0);
 again:
 	do {
 		mfile_lock_write(self);

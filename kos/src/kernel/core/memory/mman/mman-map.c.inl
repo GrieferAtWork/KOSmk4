@@ -158,7 +158,7 @@ NOTHROW(FCALL mnode_destroy_anon_ram)(struct mnode *__restrict self) {
 #ifdef DEFINE_mman_map
 /* Map a given file into the specified mman.
  * @param: hint:          s.a. `mman_findunmapped'
- * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED' (Other bits are silently ignored)
+ * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED | PROT_FORCEWRITE' (Other bits are silently ignored)
  * @param: flags:         Set  of  `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED'   (Other  bits   are
  *                        silently ignored)  Additionally,  the following  flags  may  be set  to  customize  how
  *                        a  suitable   address  is   located  (s.a.   `mman_findunmapped()'  for   more   info):

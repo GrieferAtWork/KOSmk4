@@ -242,7 +242,7 @@ blkdev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
                USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct blkdev *me = mfile_asblkdev(self);
-	switch (_IO_WITHSIZE(cmd, 0)) {
+	switch (cmd) {
 
 	case BLKRRPART:
 		if (blkdev_ispart(me)) {
@@ -250,7 +250,7 @@ blkdev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT);
 		}
 		blkdev_repart(me);
-		break;
+		return 0;
 
 #if 0
 	case BLKRASET:         /* TODO */
@@ -276,9 +276,9 @@ blkdev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 #endif
 
 	default:
-		return device_v_ioctl(self, cmd, arg, mode);
+		break;
 	}
-	return 0;
+	return device_v_ioctl(self, cmd, arg, mode);
 }
 
 

@@ -63,6 +63,32 @@
 #define PROT_SHARED __PROT_SHARED
 #endif /* !PROT_SHARED && __PROT_SHARED */
 
+/* Kernel-only flag: force creation of PROT_WRITE|PROT_SHARED mappings,
+ *                   even if the  backing file is  marked as  READONLY.
+ *
+ * When this flag is used, the mapping will be created and trying to
+ * read from it will function like normal. However, attempting to do
+ * a write operation will result in the write instruction  returning
+ * with an `E_FSERROR_READONLY' exception.
+ *
+ * Note that when a file becomes READONLY but already has preexisting
+ * PROT_WRITE|PROT_SHARED mappings, write access will be revoked from
+ * those mappings, and the next time they perform a write access, the
+ * same `E_FSERROR_READONLY' exception is thrown.
+ *
+ * As such, this flag could theoretically be exposed to user-space,
+ * but for the time being its intended purpose is to force creation
+ * of PROT_WRITE|PROT_SHARED mappings of device files in filesystem
+ * drivers.
+ *
+ * When this flag isn't given (default), then mman_map() will fail
+ * and throw an exception `E_FSERROR_READONLY' when trying to  map
+ * a READONLY file as WRITE+SHARED. */
+#ifndef PROT_FORCEWRITE
+#define PROT_FORCEWRITE 0x40
+#endif /* !PROT_FORCEWRITE */
+
+
 
 /************************************************************************/
 /* Flags for `mman_map*::flags'                                         */
@@ -169,7 +195,7 @@ DATDEF struct mfile mfile_zero; /* Zero-initialized, anonymous memory. */
 
 /* Map a given file into the specified mman.
  * @param: hint:          s.a. `mman_findunmapped'
- * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED' (Other bits are silently ignored)
+ * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED | PROT_FORCEWRITE' (Other bits are silently ignored)
  * @param: flags:         Set  of  `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED'   (Other  bits   are
  *                        silently ignored)  Additionally,  the following  flags  may  be set  to  customize  how
  *                        a  suitable   address  is   located  (s.a.   `mman_findunmapped()'  for   more   info):
