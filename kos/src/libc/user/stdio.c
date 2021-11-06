@@ -75,6 +75,9 @@ DEFINE_DEFAULT_STD_FILE(stderr, IO_RW | IO_LNIFTYY, STDERR_FILENO); /* !Relocati
 DEFINE_PUBLIC_ALIAS(_IO_2_1_stdin_, default_stdin);
 DEFINE_PUBLIC_ALIAS(_IO_2_1_stdout_, default_stdout);
 DEFINE_PUBLIC_ALIAS(_IO_2_1_stderr_, default_stderr);
+DEFINE_PUBLIC_ALIAS(_IO_stdin_, default_stdin);
+DEFINE_PUBLIC_ALIAS(_IO_stdout_, default_stdout);
+DEFINE_PUBLIC_ALIAS(_IO_stderr_, default_stderr);
 
 /* These are the actual, exported std* stream symbols. */
 DATDEF FILE *g_stdin ASMNAME("stdin");

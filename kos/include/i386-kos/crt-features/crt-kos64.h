@@ -255,6 +255,9 @@
 #define __CRT_HAVE__IO_setvbuf
 #define __CRT_HAVE__IO_sprintf
 #define __CRT_HAVE__IO_sscanf
+#define __CRT_HAVE__IO_stderr_
+#define __CRT_HAVE__IO_stdin_
+#define __CRT_HAVE__IO_stdout_
 #define __CRT_HAVE__IO_ungetc
 #define __CRT_HAVE__IO_vfprintf
 #define __CRT_HAVE__IO_vfscanf
