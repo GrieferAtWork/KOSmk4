@@ -447,17 +447,18 @@ ext2_lnk_v_readlink(struct flnknode *__restrict self,
 	size_t lnksize = (size_t)__atomic64_val(self->mf_filesize);
 	if (bufsize > lnksize)
 		bufsize = lnksize;
-	/* As  per the specs, symbolic links with lengths  less than or equal 60 (even though
-	 * the specs say "less than" (and neglect the equal), but looking at the linux kernel
-	 * sources, it too uses "<= 60" in essence) are stored in-line with INode data.
+	/* As  per the specs, symbolic links with lengths less than 60 (yes: "<" and NOT "<=",
+	 * even though symlink texts don't traditionally have trailing NULs, and the in-inode
+	 * space would be enough for 60 characters, even though only up to 59 get saved, but
+	 * whatever...)
 	 *
 	 * ref: linux:/fs/ext2/namei.c:ext2_symlink: `if (l > sizeof (EXT2_I(inode)->i_data))'
 	 *      This  condition tests if a newly created symlink is "slow" (that is: it's text
-	 *      is  not stored in-line). `l' is the strlen() of the link's text, and the other
-	 *      `sizeof (EXT2_I(inode)->i_data))' equates to `60' */
-	if (lnksize * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4) {
+	 *      is  not stored in-line). `l' is the strlen()+1 of the link's text, and the
+	 *      other `sizeof (EXT2_I(inode)->i_data))' equates to `60' */
+	if (lnksize <= 59) {
 		struct ext2idat *idat = self->fn_fsdata;
-		memcpy(buf, &idat->ei_dblock, lnksize, sizeof(char));
+		memcpy(buf, &idat->ei_dblock, lnksize);
 	} else {
 		mfile_readall(self, buf, bufsize, 0);
 	}
