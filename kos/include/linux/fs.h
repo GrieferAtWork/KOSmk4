@@ -141,7 +141,14 @@
 #define FS_IOC_FIEMAP       _IOWR('f', 11, struct fiemap) /* ??? */
 #define FS_IOC32_GETFLAGS   _IOR('f', 1, int)             /* ??? */
 #define FS_IOC32_SETFLAGS   _IOW('f', 2, int)             /* ??? */
+#define FS_IOC_FSGETXATTR   _IOR('X', 31, struct fsxattr)
+#define FS_IOC_FSSETXATTR   _IOW('X', 32, struct fsxattr)
 #endif /* __linux__ */
+
+#define FSLABEL_MAX       256 /* Max chars for the interface; each fs may differ */
+#define FS_IOC_GETFSLABEL _IOR(0x94, 49, char[FSLABEL_MAX])
+#define FS_IOC_SETFSLABEL _IOW(0x94, 50, char[FSLABEL_MAX])
+
 
 /* Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS)
  * These  flags are no  necessarily persistent; once  the associate mfile is

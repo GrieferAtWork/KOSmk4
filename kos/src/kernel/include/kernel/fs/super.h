@@ -37,6 +37,7 @@
 
 #include <asm/os/statvfs.h>
 #include <kos/lockop.h>
+#include <linux/fs.h> /* FSLABEL_MAX */
 
 #ifndef REF_IF
 #define REF_IF __REF_IF
@@ -108,6 +109,30 @@ struct fdirent;
 
 struct fsuper_ops {
 	/* NOTE: filesystem-specific operators (if needed) go here... */
+
+	/* [0..1] Get volume label. writing it as a NUL-terminated string to `buf'
+	 * When not implemented by singleton filesystems, the filesystem type name
+	 * will be returned during a user-space query.
+	 * @return: true:  Successfully retrieved the label
+	 * @return: false: This volume doesn't have a label (same as not implementing
+	 *                 this  operator, except that the special singleton handling
+	 *                 is skipped as well) */
+	BLOCKING WUNUSED NONNULL((1)) __BOOL
+	(KCALL *so_getlabel)(struct fsuper *__restrict self,
+	                     USER CHECKED char buf[FSLABEL_MAX])
+			THROWS(E_IOERROR, E_SEGFAULT, ...);
+
+	/* [0..1] Set volume label, directly writing the new value to disk.
+	 *        Depending on implementation, it may be necessary to sync
+	 *        the superblock and/or backing device.
+	 * @return: true:  Successfully saved the label
+	 * @return: false: This volume doesn't have a label (same as not implementing this operator)
+	 * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG:namelen: [...] */
+	BLOCKING WUNUSED NONNULL((1)) __BOOL
+	(KCALL *so_setlabel)(struct fsuper *__restrict self,
+	                     USER CHECKED char const *name, size_t namelen)
+			THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
+			       E_INVALID_ARGUMENT_BAD_VALUE, ...);
 
 	/* [0..1] Verify that a given uid/gid can be saved on-disk within file attributes.
 	 *        When these functions aren't defined, `sf_uid_max' and `sf_gid_max' are
@@ -482,6 +507,24 @@ fsuper_sync(struct fsuper *__restrict self)
 FUNDEF BLOCKING void KCALL fsuper_syncall(void)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
+
+/* Retrieve the label of the given superblock and store it in `buf'
+ * @return: true:  Successfully retrieved and stored the label.
+ * @return: false: `self' doesn't have a volume label. */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL KCALL
+fsuper_getlabel(struct fsuper *__restrict self,
+                USER CHECKED char buf[FSLABEL_MAX])
+		THROWS(E_IOERROR, E_SEGFAULT, ...);
+
+/* Set the label of the given superblock and store it in `buf'
+ * @return: true:  Successfully saved the label.
+ * @return: false: `self' doesn't have a volume label.
+ * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG:namelen: [...] */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL KCALL
+fsuper_setlabel(struct fsuper *__restrict self,
+                USER CHECKED char const *name, size_t namelen)
+		THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
+		       E_INVALID_ARGUMENT_BAD_VALUE, ...);
 
 
 

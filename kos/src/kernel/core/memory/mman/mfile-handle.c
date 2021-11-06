@@ -164,7 +164,34 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		mfile_set_inode_flags(self, flags);
 	}	break;
 
+	case FS_IOC_GETFSLABEL:
+		if (mfile_isnode(self)) {
+			struct fsuper *super;
+			super = mfile_asnode(self)->fn_super;
+			validate_readable(arg, FSLABEL_MAX * sizeof(char));
+			if (fsuper_getlabel(super, (USER CHECKED char *)arg))
+				break;
+		}
+		goto fallback;
+
+	case FS_IOC_SETFSLABEL:
+		if (mfile_isnode(self)) {
+			struct fsuper *super;
+			USER CHECKED char const *labelname;
+			size_t labelsize;
+			super = mfile_asnode(self)->fn_super;
+			validate_readable(arg, 1);
+			labelname = (USER CHECKED char const *)arg;
+			labelsize = strnlen(labelname, FSLABEL_MAX);
+			/* As per the specs, only a SYS_ADMIN can issue this command! */
+			require(CAP_SYS_ADMIN);
+			if (fsuper_setlabel(super, labelname, labelsize))
+				break;
+		}
+		goto fallback;
+
 	default:
+fallback:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
 		      cmd);

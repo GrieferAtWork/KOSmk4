@@ -242,6 +242,52 @@ PUBLIC BLOCKING void KCALL fsuper_syncall(void)
 }
 
 
+/* Retrieve the label of the given superblock and store it in `buf'
+ * @return: true:  Successfully retrieved and stored the label.
+ * @return: false: `self' doesn't have a volume label. */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool KCALL
+fsuper_getlabel(struct fsuper *__restrict self,
+                USER CHECKED char buf[FSLABEL_MAX])
+		THROWS(E_IOERROR, E_SEGFAULT, ...) {
+	struct fsuper_ops const *ops = fsuper_getops(self);
+	if (ops->so_getlabel != NULL)
+		return (*ops->so_getlabel)(self, buf);
+
+	/* Special handling for singleton filesystems. */
+	if (self->fs_sys->ffs_flags & FFILESYS_F_SINGLE) {
+		char const *name = self->fs_sys->ffs_name;
+		size_t len       = strnlen(name, FSLABEL_MAX);
+		memcpy(buf, name, len, sizeof(char));
+		return true;
+	}
+
+	/* No label available... */
+	return false;
+}
+
+/* Set the label of the given superblock and store it in `buf'
+ * @return: true:  Successfully saved the label.
+ * @return: false: `self' doesn't have a volume label.
+ * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG:namelen: [...] */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool KCALL
+fsuper_setlabel(struct fsuper *__restrict self,
+                USER CHECKED char const *name, size_t namelen)
+		THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
+		       E_INVALID_ARGUMENT_BAD_VALUE, ...) {
+	struct fsuper_ops const *ops = fsuper_getops(self);
+	if (ops->so_setlabel != NULL)
+		return (*ops->so_setlabel)(self, name, namelen);
+
+	/* Special handling for singleton filesystems. */
+	if (self->fs_sys->ffs_flags & FFILESYS_F_SINGLE)
+		THROW(E_FSERROR_READONLY); /* Here, the """label""" is read-only */
+	return false;
+}
+
+
+
+
+
 /* Default operators for `struct fsuper_ops' */
 PUBLIC NOBLOCK NONNULL((1)) void /* `kfree(fnode_assuper(self));' */
 NOTHROW(KCALL fsuper_v_free)(struct fnode *__restrict self) {

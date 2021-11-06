@@ -39,6 +39,8 @@
 
 #include <hybrid/atomic.h>
 
+#include <linux/fs.h>
+
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
@@ -175,56 +177,75 @@ NOTHROW(KCALL kernel_get_root_partition)(void) {
 
 
 /* Open and return the `/os/kernel.bin' file (if present within `self') */
-PRIVATE ATTR_FREETEXT WUNUSED NONNULL((1)) REF struct fnode *KCALL
+PRIVATE ATTR_FREETEXT WUNUSED NONNULL((1)) bool KCALL
 fsuper_open_os_kernel_bin(struct fsuper *__restrict self) {
 	REF struct fnode *kbin;
 	kbin = fdirnode_lookup_path(&self->fs_root, kernel_driver.md_fsname->fd_name);
 	if (!kbin)
-		return NULL;
+		return false;
+	FINALLY_DECREF_UNLIKELY(kbin);
 	if unlikely(!fnode_isreg(kbin) ||
-	            !mfile_hasrawio(kbin)) {
-		decref_unlikely(kbin);
-		return NULL;
-	}
-	TRY {
-		/* TODO: Verify that `kbin' is an ELF binary, and that it contains
-		 *       a build timestamp that matches the build timestamp of our
-		 *       loaded kernel. */
+	            !mfile_hasrawio(kbin))
+		return false;
 
-	} EXCEPT {
-		decref_unlikely(kbin);
-		RETHROW();
-	}
-	return kbin;
+	/* TODO: Verify that `kbin' is an ELF binary, and that it contains
+	 *       a build timestamp that matches the build timestamp of our
+	 *       loaded kernel. */
+
+	return true;
 }
+
+
+
+/* Flags for `kernel_open_rootfs_bydev()' */
+#define KERNEL_OPEN_ROOTFS_BYDEV_F_PARTS 0x0001 /* Mount partitions (as opposed to drive roots) */
+#define KERNEL_OPEN_ROOTFS_BYDEV_F_LABEL 0x0002 /* Check for "KOS" in filesystem labels. */
+#define KERNEL_OPEN_ROOTFS_BYDEV_F_EQLBL 0x0004 /* Label must equal "KOS" (case-insensitive) */
+typedef u8 kernel_open_rootfs_bydev_flag_t; /* Set of `KERNEL_OPEN_ROOTFS_BYDEV_F_*' */
 
 
 /* Go through all block devices and try to open them as superblocks.
  * When able to do the open, check if the filesystem contains a file
- * "/os/kernel.bin" that is a regular file */
+ * "/os/kernel.bin" that is a regular file
+ * @param: flags: Set of `KERNEL_OPEN_ROOTFS_BYDEV_F_*' */
 PRIVATE ATTR_FREETEXT WUNUSED NONNULL((1, 2)) REF struct fsuper *
 NOTHROW(KCALL kernel_open_rootfs_trydev)(struct blkdev *__restrict dev,
-                                         bool *__restrict pnewly_created) {
+                                         bool *__restrict pnewly_created,
+                                         kernel_open_rootfs_bydev_flag_t flags) {
 	REF struct fsuper *result = NULL;
 	TRY {
 		/* Try to open the superblock. */
 		result = ffilesys_opendev(pnewly_created, dev, NULL);
 		if (result) {
-			REF struct fnode *kernel_bin;
-			printk(FREESTR(KERN_INFO "[boot] Opened \"/dev/%#q\" as %s-filesystem; checking for %q\n"),
-			       dev->dv_dirent->dd_dirent.fd_name, result->fs_sys->ffs_name,
-			       kernel_driver.md_fsname->fd_name);
+			printk(FREESTR(KERN_INFO "[boot] Opened \"/dev/%#q\" as %s-filesystem while searching for rootfs\n"),
+			       dev->dv_dirent->dd_dirent.fd_name, result->fs_sys->ffs_name);
+			if (flags & KERNEL_OPEN_ROOTFS_BYDEV_F_LABEL) {
+				/* If the filesystem defines a label-field (like seen in FAT), then
+				 * we  also check if that field contains  a string "KOS", and if it
+				 * does, we can skip the open-os-kernel-bin test below. */
+				char label[FSLABEL_MAX];
+				bool haslabel;
+				TRY {
+					haslabel = fsuper_getlabel(result, label);
+				} EXCEPT {
+					haslabel = false;
+				}
+				if (haslabel && ((flags & KERNEL_OPEN_ROOTFS_BYDEV_F_EQLBL) ? strcasecmp(label, "KOS") == 0
+				                                                            : strcasestr(label, "KOS") != NULL)) {
+					printk(FREESTR(KERN_INFO "[boot] %s-filesystem loaded from \"/dev/%#q\" "
+					                         "has label %q referencing 'KOS'\n"),
+					       result->fs_sys->ffs_name,
+					       dev->dv_dirent->dd_dirent.fd_name, label);
+					return result; /* Found it! */
+				}
+			}
 
 			/* Try to open "/os/kernel.bin" on this filesystem. */
-			kernel_bin = fsuper_open_os_kernel_bin(result);
-			if (kernel_bin) {
-				/* Found it!
-				 * NOTE: Even when `kernel_driver.md_file != NULL' at this point,
-				 *       whatever that field was pointing to before couldn't have
-				 *       been correct, since we've only  now found the actual  fs
-				 *       containing the kernel. */
-				ATOMIC_WRITE(kernel_driver.md_file, kernel_bin);
-				return result;
+			if (fsuper_open_os_kernel_bin(result)) {
+				printk(FREESTR(KERN_INFO "[boot] Found %q on %s-filesystem loaded from \"/dev/%#q\"\n"),
+				       kernel_driver.md_fsname->fd_name, result->fs_sys->ffs_name,
+				       dev->dv_dirent->dd_dirent.fd_name);
+				return result; /* Found it! */
 			}
 		}
 	} EXCEPT {
@@ -240,23 +261,43 @@ NOTHROW(KCALL kernel_open_rootfs_trydev)(struct blkdev *__restrict dev,
 }
 
 
+/* Try to find the root filesystem by opening drives and checking if
+ * they contain a filesystem that matches what we expect to see as a
+ * normal KOS rootfs.
+ * @param: flags: Set of `KERNEL_OPEN_ROOTFS_BYDEV_F_*' */
 PRIVATE ATTR_FREETEXT WUNUSED NONNULL((1)) REF struct fsuper *
 NOTHROW(KCALL kernel_open_rootfs_bydev)(bool *__restrict pnewly_created,
-                                        bool mount_partitions) {
-	REF struct fnode *iter = fsuper_nodeafter(&devfs, NULL);
+                                        kernel_open_rootfs_bydev_flag_t flags) {
+	bool result_newly_created = false;
+	REF struct fsuper *result = NULL;
+	REF struct fnode *iter    = fsuper_nodeafter(&devfs, NULL);
 	while (iter) {
 		FINALLY_DECREF_UNLIKELY(iter);
-		if (mount_partitions ? fnode_isblkpart(iter)
-		                     : fnode_isblkroot(iter)) {
-			REF struct fsuper *result;
-			result = kernel_open_rootfs_trydev(fnode_asblkdev(iter),
-			                                   pnewly_created);
-			if (result)
-				return result;
+		if ((flags & KERNEL_OPEN_ROOTFS_BYDEV_F_PARTS) ? fnode_isblkpart(iter)
+		                                               : fnode_isblkroot(iter)) {
+			REF struct fsuper *new_result;
+			new_result = kernel_open_rootfs_trydev(fnode_asblkdev(iter),
+			                                       pnewly_created, flags);
+			if (new_result) {
+				/* Found a good-looking candidate. */
+				if (result) {
+					/* Ambiguous... :( */
+					if (result_newly_created)
+						ffilesys_open_done(result->fs_dev);
+					decref_unlikely(result);
+					if (*pnewly_created)
+						ffilesys_open_done(new_result->fs_dev);
+					decref_unlikely(new_result);
+					return NULL;
+				}
+				result               = new_result;
+				result_newly_created = *pnewly_created;
+			}
 		}
 		iter = fsuper_nodeafter(&devfs, iter);
 	}
-	return NULL;
+	*pnewly_created = result_newly_created;
+	return result;
 }
 
 
@@ -287,14 +328,31 @@ again:
 	       kernel_driver.md_fsname->fd_name);
 
 	/* Try to tell the root filesystem by the presence of `/os/kernel.bin' */
-	if ((result = kernel_open_rootfs_bydev(pnewly_created, true)) != NULL)
-		return result;
-	if ((result = kernel_open_rootfs_bydev(pnewly_created, false)) != NULL)
-		return result;
+	{
+		static kernel_open_rootfs_bydev_flag_t const flags[] = {
+			KERNEL_OPEN_ROOTFS_BYDEV_F_PARTS | KERNEL_OPEN_ROOTFS_BYDEV_F_LABEL | KERNEL_OPEN_ROOTFS_BYDEV_F_EQLBL,
+			KERNEL_OPEN_ROOTFS_BYDEV_F_PARTS | KERNEL_OPEN_ROOTFS_BYDEV_F_LABEL,
+			KERNEL_OPEN_ROOTFS_BYDEV_F_PARTS,
+			KERNEL_OPEN_ROOTFS_BYDEV_F_LABEL | KERNEL_OPEN_ROOTFS_BYDEV_F_EQLBL,
+			KERNEL_OPEN_ROOTFS_BYDEV_F_LABEL,
+			0,
+		};
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(flags); ++i) {
+			result = kernel_open_rootfs_bydev(pnewly_created, flags[i]);
+			if (result) {
+				printk(FREESTR(KERN_NOTICE "[boot] Boot partition found the hard way. "
+				                           "Consider adding 'boot=/dev/%#q' to the kernel "
+				                           "cmdline to speed-up booting in the future.\n"),
+				       mfile_asdevice(result->fs_dev)->dv_dirent->dd_dirent.fd_name);
+				return result;
+			}
+		}
+	}
 
-
-	/* Fallback: cause kernel panic */
-	kernel_panic(FREESTR("Boot partition not found or ambiguous (reboot with `boot=...')"));
+	/* Fallback: cause kernel panic (but if the user CRTL+D-s the message, repeat the search) */
+	kernel_panic(FREESTR("Boot partition not found or ambiguous (load "
+	                     "missing drivers and/or reboot with `boot=...')"));
 	goto again;
 }
 
