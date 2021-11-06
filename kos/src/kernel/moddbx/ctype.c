@@ -395,18 +395,22 @@ struct _pointer_ctype {
 };
 #define _POINTER_CTYPE_INIT(children, sib, base_typ, base_flags) \
 	{ 0x7fff, CTYPE_KIND_PTR, children, sib, { base_typ, { NULL, NULL }, base_flags } }
+#ifdef __ARCH_HAVE_COMPAT
+#define _COMPAT_POINTER_CTYPE_INIT(children, sib, base_typ, base_flags) \
+	{ 0x7fff, CTYPE_KIND_COMPAT_PTR, children, sib, { base_typ, { NULL, NULL }, base_flags } }
+#endif /* __ARCH_HAVE_COMPAT */
 
 
 #define DEFINE_CTYPE(T, name)        \
 	DATDEF T _##name ASMNAME(#name); \
 	PUBLIC T _##name
 #ifdef __ARCH_HAVE_COMPAT
-#define DEFINE_CTYPE_TRIPLE(kind, name)                                                                                                                                      \
-	DEFINE_CTYPE(struct _basic_ctype, ctype_##name)                      = _BASIC_CTYPE_INIT(kind, &ctype_##name##_ptr);                                                     \
-	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_ptr)              = _POINTER_CTYPE_INIT(NULL, &ctype_##name##_const_ptr, &ctype_##name, CTYPEREF_FLAG_NORMAL);        \
-	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_const_ptr)        = _POINTER_CTYPE_INIT(NULL, &ctype_##name##_compat_ptr, &ctype_##name, CTYPEREF_FLAG_CONST);        \
-	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_compat_ptr)       = _POINTER_CTYPE_INIT(NULL, &ctype_##name##_const_compat_ptr, &ctype_##name, CTYPEREF_FLAG_NORMAL); \
-	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_const_compat_ptr) = _POINTER_CTYPE_INIT(NULL, NULL, &ctype_##name, CTYPEREF_FLAG_CONST);
+#define DEFINE_CTYPE_TRIPLE(kind, name)                                                                                                                                             \
+	DEFINE_CTYPE(struct _basic_ctype, ctype_##name)                      = _BASIC_CTYPE_INIT(kind, &ctype_##name##_ptr);                                                            \
+	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_ptr)              = _POINTER_CTYPE_INIT(NULL, &ctype_##name##_const_ptr, &ctype_##name, CTYPEREF_FLAG_NORMAL);               \
+	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_const_ptr)        = _POINTER_CTYPE_INIT(NULL, &ctype_##name##_compat_ptr, &ctype_##name, CTYPEREF_FLAG_CONST);               \
+	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_compat_ptr)       = _COMPAT_POINTER_CTYPE_INIT(NULL, &ctype_##name##_const_compat_ptr, &ctype_##name, CTYPEREF_FLAG_NORMAL); \
+	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_const_compat_ptr) = _COMPAT_POINTER_CTYPE_INIT(NULL, NULL, &ctype_##name, CTYPEREF_FLAG_CONST);
 #else /* __ARCH_HAVE_COMPAT */
 #define DEFINE_CTYPE_TRIPLE(kind, name)                                                                                                                        \
 	DEFINE_CTYPE(struct _basic_ctype, ctype_##name)               = _BASIC_CTYPE_INIT(kind, &ctype_##name##_ptr);                                              \

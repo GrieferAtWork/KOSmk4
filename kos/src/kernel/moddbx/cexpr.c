@@ -2220,11 +2220,25 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 		goto do_set_type;
 
 	case CVALUE_KIND_IDATA:
-		pointed_to_addr = *(byte_t **)top->cv_idata;
+#ifdef __ARCH_HAVE_COMPAT
+		if (CTYPE_KIND_SIZEOF(typ->ct_kind) == sizeof(compat_uintptr_t)) {
+			pointed_to_addr = (byte_t *)(uintptr_t)(*(compat_uintptr_t *)top->cv_idata);
+		} else
+#endif /* __ARCH_HAVE_COMPAT */
+		{
+			pointed_to_addr = *(byte_t **)top->cv_idata;
+		}
 		break;
 
 	case CVALUE_KIND_DATA:
-		pointed_to_addr = *(byte_t **)top->cv_data;
+#ifdef __ARCH_HAVE_COMPAT
+		if (CTYPE_KIND_SIZEOF(typ->ct_kind) == sizeof(compat_uintptr_t)) {
+			pointed_to_addr = (byte_t *)(uintptr_t)(*(compat_uintptr_t *)top->cv_data);
+		} else
+#endif /* __ARCH_HAVE_COMPAT */
+		{
+			pointed_to_addr = *(byte_t **)top->cv_data;
+		}
 		dbx_free(top->cv_data);
 		break;
 
