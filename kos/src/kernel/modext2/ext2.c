@@ -447,25 +447,16 @@ ext2_lnk_v_readlink(struct flnknode *__restrict self,
 	size_t lnksize = (size_t)__atomic64_val(self->mf_filesize);
 	if (bufsize > lnksize)
 		bufsize = lnksize;
-#if 0 /* XXX: ASCII data is usually written in a way that causes this check to succeed, \
-       *      but  what about 1 or 2-character links?  This is little endian after all, \
-       *      so that would  end up  with a  really small  number that  might be  lower \
-       *      that the actual number block blocks...                                    \
-       * LATER: From what little I can gather, at some point Ext2 just started placing  \
-       *        symlink  data  that  was  small   enough  within  the  INode   itself.  \
-       *        Although sources state that prior to  this data was written in  actual  \
-       *        blocks,  what  isn't stated  is  anything about  how  to differentiate  \
-       *        these two cases other than the link size (which is ambiguous for small  \
-       *        links). */
-	if (lnksize * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4 &&
-	    node->i_dblock[0] >= ((Ext2Superblock *)self->i_super)->es_total_blocks)
-#else
-	if (lnksize * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4)
-#endif
-	{
+	/* As  per the specs, symbolic links with lengths  less than or equal 60 (even though
+	 * the specs say "less than" (and neglect the equal), but looking at the linux kernel
+	 * sources, it too uses "<= 60" in essence) are stored in-line with INode data.
+	 *
+	 * ref: linux:/fs/ext2/namei.c:ext2_symlink: `if (l > sizeof (EXT2_I(inode)->i_data))'
+	 *      This  condition tests if a newly created symlink is "slow" (that is: it's text
+	 *      is  not stored in-line). `l' is the strlen() of the link's text, and the other
+	 *      `sizeof (EXT2_I(inode)->i_data))' equates to `60' */
+	if (lnksize * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4) {
 		struct ext2idat *idat = self->fn_fsdata;
-		/* XXX: Is this really how we discern between the 2 methods?
-		 *      Shouldn't  there  be  some kind  of  flag somewhere? */
 		memcpy(buf, &idat->ei_dblock, lnksize, sizeof(char));
 	} else {
 		mfile_readall(self, buf, bufsize, 0);
