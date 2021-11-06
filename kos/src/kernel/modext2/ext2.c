@@ -108,7 +108,7 @@ ext2_blockindex(struct ext2idat *__restrict self,
 
 	/* Singly-indirect block table. */
 	if (blockno < super->es_ind_blocksize) {
-		/* TODO: `EXT2_BLOCK2ADDR(super, self->ei_siblock);' is the on-disk location of an
+		/* TODO: `EXT2_BLOCK2ADDR(super, self->ei_siblock);' is the  on-disk location of  an
 		 *       super->es_ind_blocksize-long, and `1 << es_blockshift'-large array of block
 		 *       points: `ext2_block_t[super->es_ind_blocksize]' */
 	}
@@ -317,7 +317,7 @@ ext2_dir_v_readdir(struct flatdirnode *__restrict self, pos_t pos)
 		THROWS(E_BADALLOC, E_IOERROR, ...) {
 	struct ext2super *super = fsuper_asext2(self->fn_super);
 	Ext2DiskDirent entry;
-	u16 entsize, fd_namelen;
+	u16 entsize, entused, fd_namelen;
 	REF struct flatdirent *result;
 	unsigned char fd_type;
 again:
@@ -335,36 +335,37 @@ again:
 		if likely(entry.d_type < COMPILER_LENOF(ext_ft2dt))
 			fd_type = ext_ft2dt[entry.d_type];
 		fd_namelen = entry.d_namlen_low;
-		if ((entsize - sizeof(Ext2DiskDirent)) > 0xff) {
-			/* The  filename is longer than 255 characters, and
-			 * we only have the least significant 8 bits of its
-			 * actual length.
-			 * To  deal with this, we must scan ahead and read a byte at every
-			 * `entry_pos + sizeof(Ext2Dirent) + entry.d_namlen_low + N * 256'
-			 * that is still located below `entry_pos + entsize' until we find
-			 * a NUL-character. */
-			pos_t name_endpos, name_endpos_max;
-			name_endpos = pos + sizeof(Ext2DiskDirent);
-			name_endpos += entry.d_namlen_low;
-			name_endpos += 256 * sizeof(char);
-			name_endpos_max = pos + entsize;
-			while (name_endpos < name_endpos_max) {
-				char ch;
-				mfile_readall(self, &ch, sizeof(char), name_endpos);
-				if (!ch)
-					break;
-				++name_endpos;
-			}
-			fd_namelen = (u16)(name_endpos - (pos + sizeof(Ext2DiskDirent))) / sizeof(char);
-		}
 	} else {
 		pos_t ino_addr = ext2_inoaddr(super, LETOH32(entry.d_ino));
 		le16 ino_type;
 		/* Read the directory entry type from its INode. */
 		mfile_readall(super->es_super.ffs_super.fs_dev, &ino_type, 2,
 		              ino_addr + offsetof(Ext2DiskINode, i_mode));
-		fd_type   = IFTODT(LETOH16(ino_type));
+		fd_type    = IFTODT(LETOH16(ino_type));
 		fd_namelen = LETOH16(entry.d_namlen);
+	}
+	entused = sizeof(Ext2DiskDirent) + fd_namelen;
+	if unlikely(entsize < entused) {
+		/* Log an error if the directory entry's size doesn't make any sense. */
+		printk(KERN_ERR "[ext2] Directory entry at offset %#" PRIx64 " in inode %#" PRIx32 " "
+		                "has recuse=%#" PRIx16 " > reclen=%#" PRIx16 "\n",
+		       (uint64_t)pos, (uint32_t)self->fn_ino, entused, entsize);
+		fd_namelen = entsize - sizeof(Ext2DiskDirent);
+	} else if (entsize > entused) {
+		/* TODO: In this case,  the trailing `entsize - entused'  bytes of the  directory
+		 *       entry can be used to allocate more directory entries. However, according
+		 *       to  the specs, only until the start of the next block, and only starting
+		 *       at the next 4-byte aligned addr:
+		 * >> size_t avail = entsize - entused;                // Available space for next entry (before align)
+		 * >> pos_t  strt  = CEIL_ALIGN(pos + entused, 4);     // Lowest aligned starting address of next entry
+		 * >> size_t align = (size_t)(strt - (pos + entused)); // # of bytes lost due to alignment
+		 * >> if (OVERFLOW_USUB(avail, align, &avail))         // Available space for next entry (after align)
+		 * >>     avail = 0;
+		 * >> pos_t  end  = CEIL_ALIGN(strt, mfile_getblocksize(self)); // End of block containing next entry
+		 * >> size_t free = (size_t)(end - strt);                       // Space in block for next entry
+		 * >> if (free > avail)                                         // Limit space until delta to next record
+		 * >>     free = avail;
+		 * >> INDICATE_AVAILABLE_SPACE_FOR_NEW_ENTRIES(base: strt, num_bytes: free); */
 	}
 
 	/* Construct the resulting directory entry. */
