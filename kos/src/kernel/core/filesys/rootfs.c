@@ -52,6 +52,11 @@ DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_root_partition, KERNEL_COMMANDLINE_OPTIO
 #define FIND_UNIQUE_BLKDEV_BYDISKNAME  2
 #define FIND_UNIQUE_BLKDEV_BYPARTNAME2 3
 #define FIND_UNIQUE_BLKDEV_BYDISKNAME2 4
+/* TODO: Another criteria that tries to do `ffilesys_opendev()' for every partition that was detected.
+ *       If a filesystem could be mounted, check if it contains a file "/os/kernel.bin", and if so, if
+ *       that file is an  ELF binary with  a build timestamp (XXX:  add a build  timestamp to the  KOS
+ *       kernel) that matches the timestamp of the loaded kernel.
+ * NOTE: Also don't hardcode "/os/kernel.bin" here; use `module_getname(&kernel_driver)' */
 #define FIND_UNIQUE_BLKDEV_COUNT       5
 
 

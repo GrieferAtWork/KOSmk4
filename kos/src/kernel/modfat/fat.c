@@ -871,7 +871,8 @@ FatDir_ReadDir(struct flatdirnode *__restrict self, pos_t pos)
 
 	/* Read the next entry from disk. */
 readnext:
-	mfile_readall(self, &ent, sizeof(struct fat_dirent), pos);
+	if (mfile_read(self, &ent, sizeof(struct fat_dirent), pos) < sizeof(struct fat_dirent))
+		return NULL; /* Forced EOF */
 
 	/* Check for special markers. */
 	if (ent.f_marker == MARKER_DIREND)
@@ -2360,7 +2361,7 @@ PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 					.mo_destroy    = &FatSuper_Destroy,
 					.mo_loadblocks = &Fat16Root_LoadBlocks,
 					.mo_saveblocks = &Fat16Root_SaveBlocks,
-					.mo_changed    = &fsuper_v_changed,
+					.mo_changed    = &flatsuper_v_changed,
 					.mo_stream     = &FatDir_StreamOps,
 				},
 				.no_free   = &FatSuper_Free,
@@ -2398,7 +2399,7 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 					.mo_destroy    = &FatSuper_Destroy,
 					.mo_loadblocks = &Fat_LoadBlocks,
 					.mo_saveblocks = &Fat_SaveBlocks,
-					.mo_changed    = &fsuper_v_changed,
+					.mo_changed    = &flatsuper_v_changed,
 					.mo_stream     = &FatDir_StreamOps,
 				},
 				.no_free   = &FatSuper_Free,

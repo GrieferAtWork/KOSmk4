@@ -39,7 +39,10 @@
 #include <kernel/mman.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
+#include <kernel/printk.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -52,43 +55,13 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 DECL_BEGIN
-
-/* Lazily construct & return memory-mapping of block-group table. */
-PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) Ext2DiskBlockGroup *KCALL
-ext2_bgroups(struct ext2super *__restrict self) {
-	Ext2DiskBlockGroup *result;
-	void *cookie;
-	result = ATOMIC_READ(self->es_bgroupv);
-	if likely(result != NULL)
-		return result;
-	cookie = mman_unmap_kram_cookie_alloc();
-	TRY {
-		result = (Ext2DiskBlockGroup *)mman_map(/* self:        */ &mman_kernel,
-		                                        /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
-		                                        /* num_bytes:   */ self->es_bgroupc * sizeof(Ext2DiskBlockGroup),
-		                                        /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
-		                                        /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
-		                                        /* file:        */ self->es_super.ffs_super.fs_dev,
-		                                        /* file_fspath: */ NULL,
-		                                        /* file_fsname: */ NULL,
-		                                        /* file_pos:    */ self->es_bgroup_addr);
-	} EXCEPT {
-		mman_unmap_kram_cookie_free(cookie);
-		RETHROW();
-	}
-	if unlikely(!ATOMIC_CMPXCH(self->es_bgroupv, NULL, result)) {
-		mman_unmap_kram_and_kfree(result, self->es_bgroupc * sizeof(Ext2DiskBlockGroup), cookie);
-		return self->es_bgroupv;
-	}
-	if unlikely(!ATOMIC_CMPXCH(self->es_freebgroupv, NULL, cookie))
-		mman_unmap_kram_cookie_free(cookie);
-	return result;
-}
 
 /* Return  the absolute on-disk position of the `Ext2DiskINode'
  * structure used to store descriptor data for the given `ino'. */
@@ -108,13 +81,68 @@ ext2_inoaddr(struct ext2super *__restrict self, ext2_ino_t ino) {
 	return result;
 }
 
-/* Decode INode data (excluding file size fields) */
-PRIVATE NOBLOCK NONNULL((1)) void
+
+
+/* Special return values for `ext2_blockaddr()' */
+#define EXT2_BLOCKADDR_ST_NOTALLOC 0 /* Block isn't allocated. (Not returned for `EXT2_BLOCKADDR_F_ALLOC') */
+#define EXT2_BLOCKADDR_ST_WRLOCK   1 /* Need a write-lock but cannot upgrade; caller must acquire lock and try again */
+
+/* Flags for `ext2_blockaddr()' */
+#define EXT2_BLOCKADDR_F_NORMAL 0x0000 /* Normal flags */
+#define EXT2_BLOCKADDR_F_WRLOCK 0x0001 /* Caller is holding a write-lock to `self' */
+//TODO:#define EXT2_BLOCKADDR_F_ALLOC  0x0002 /* Allocate missing blocks. */
+
+/* Return the on-disk block number (which can be converted into an on-disk
+ * address with `EXT2_BLOCK2ADDR()') of  the `blockno'th block of  `self'.
+ * The caller must be holding (at least) a read-lock to `self'.
+ * @param: flags: Set of `EXT2_BLOCKADDR_F_*' */
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ext2_block_t KCALL
+ext2_blockindex(struct ext2idat *__restrict self,
+                struct ext2super *__restrict super,
+                ext2_blockid_t blockno, unsigned int flags) {
+
+	/* Simple case: direct block pointer */
+	if (blockno < EXT2_DIRECT_BLOCK_COUNT)
+		return self->ei_dblock[blockno];
+	blockno -= EXT2_DIRECT_BLOCK_COUNT;
+
+	/* Singly-indirect block table. */
+	if (blockno < super->es_ind_blocksize) {
+		/* TODO: `EXT2_BLOCK2ADDR(super, self->ei_siblock);' is the on-disk location of an
+		 *       super->es_ind_blocksize-long, and `1 << es_blockshift'-large array of block
+		 *       points: `ext2_block_t[super->es_ind_blocksize]' */
+	}
+	(void)flags;
+	blockno -= super->es_ind_blocksize;
+	THROW(E_NOT_IMPLEMENTED_TODO);
+
+	return EXT2_BLOCKADDR_ST_NOTALLOC;
+}
+
+/* Decode INode data (excluding file size fields)
+ * This function initializes:
+ *  - node->mf_atime
+ *  - node->mf_mtime
+ *  - node->mf_ctime
+ *  - node->fn_nlink
+ *  - node->fn_uid
+ *  - node->fn_gid
+ *  - node->fn_mode
+ *  - node->fn_fsdata->ei_blocks
+ *  - node->fn_fsdata->ei_dblock
+ *  - node->fn_fsdata->ei_siblock
+ *  - node->fn_fsdata->ei_diblock
+ *  - node->fn_fsdata->ei_tiblock
+ * Regarding fields from `struct ext2idat', the caller must still initialize:
+ *  - node->fn_fsdata->ei_inoaddr
+ *  - node->fn_fsdata->ei_lock */
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL ext2_diskinode_decode)(Ext2DiskINode const *__restrict self,
-                                     struct fnode *__restrict node) {
+                                     struct fnode *__restrict node,
+                                     struct ext2super *__restrict super,
+                                     ext2_ino_t ino) {
+	struct ext2idat *idat = node->fn_fsdata;
 	unsigned int i;
-	struct ext2super *super = fsuper_asext2(node->fn_super);
-	struct ext2idat *idat   = node->fn_fsdata;
 
 	/* Basic fields. */
 	node->mf_atime.tv_sec  = LETOH32(self->i_atime);
@@ -136,7 +164,382 @@ NOTHROW(FCALL ext2_diskinode_decode)(Ext2DiskINode const *__restrict self,
 	idat->ei_siblock = LETOH32(self->i_siblock);
 	idat->ei_diblock = LETOH32(self->i_diblock);
 	idat->ei_tiblock = LETOH32(self->i_tiblock);
+	idat->ei_blocks  = ext2super_sectors2blocks(super, LETOH32(self->i_nsectors));
+
+	/* Safety check */
+	if unlikely(node->fn_nlink == 0) {
+		printk(KERN_WARNING "[ext2] Inode %#" PRIx32 " has nlink=0 "
+		                    "on-disk (acting as though it had 1)\n",
+		       (uint32_t)ino);
+		node->fn_nlink = 1;
+	}
 }
+
+
+
+
+
+/************************************************************************/
+/* Ext2 file operators                                                  */
+/************************************************************************/
+PRIVATE BLOCKING NONNULL((1, 5)) void KCALL
+ext2_v_loadblocks(struct mfile *__restrict self, pos_t addr,
+                  physaddr_t buf, size_t num_bytes,
+                  struct aio_multihandle *__restrict aio) {
+	struct fnode *me        = mfile_asnode(self);
+	struct ext2idat *idat   = me->fn_fsdata;
+	struct ext2super *super = fsuper_asext2(me->fn_super);
+	ext2_blockid_t block    = (ext2_blockid_t)(addr >> me->mf_blockshift);
+	size_t num_blocks       = num_bytes >> me->mf_blockshift;
+	assertf((buf & super->es_blockmask) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
+	assertf((addr & super->es_blockmask) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
+	assertf((num_bytes & super->es_blockmask) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
+	if unlikely(!num_bytes)
+		return;
+again:
+	ext2idat_read(idat);
+	{
+		RAII_FINALLY { ext2idat_endread(idat); };
+		while (num_blocks) {
+			size_t num_cont = 1;
+			size_t io_bytes;
+			ext2_block_t blockindex;
+			blockindex = ext2_blockindex(idat, super, block, EXT2_BLOCKADDR_F_NORMAL);
+			if (blockindex == EXT2_BLOCKADDR_ST_WRLOCK)
+				goto waitwrite;
+			if (blockindex == EXT2_BLOCKADDR_ST_NOTALLOC) {
+				/* Unallocated blocks. */
+				while (num_cont < num_blocks) {
+					ext2_block_t next;
+					next = ext2_blockindex(idat, super, block + num_cont, EXT2_BLOCKADDR_F_NORMAL);
+					if (next == EXT2_BLOCKADDR_ST_WRLOCK)
+						goto waitwrite;
+					if (next != EXT2_BLOCKADDR_ST_NOTALLOC)
+						break;
+					++num_cont;
+				}
+				io_bytes = num_cont << me->mf_blockshift;
+				bzerophyscc(buf, io_bytes);
+			} else {
+				/* Check for continuous blocks. */
+				while (num_cont < num_blocks) {
+					ext2_block_t next;
+					next = ext2_blockindex(idat, super, block + num_cont, EXT2_BLOCKADDR_F_NORMAL);
+					if (next == EXT2_BLOCKADDR_ST_WRLOCK)
+						goto waitwrite;
+					if (next != blockindex + num_cont)
+						break;
+					++num_cont;
+				}
+				io_bytes = num_cont << me->mf_blockshift;
+
+				/* Do disk I/O */
+				fsuper_dev_rdsectors_async(&super->es_super.ffs_super,
+				                           (pos_t)blockindex << me->mf_blockshift,
+				                           buf, io_bytes, aio);
+			}
+
+			/* Advance to the next part. */
+			buf += io_bytes;
+			block += num_cont;
+			num_blocks -= num_cont;
+		}
+	}
+	return;
+waitwrite:
+	ext2idat_waitwrite(idat);
+	goto again;
+}
+
+PRIVATE BLOCKING NONNULL((1)) void KCALL
+ext2_v_wrattr(struct fnode *__restrict self)
+		THROWS(E_IOERROR, ...) {
+	struct ext2idat *idat   = self->fn_fsdata;
+	struct ext2super *super = fsuper_asext2(self->fn_super);
+	Ext2DiskINode disk_inode;
+	uint64_t filesize;
+	/* Read... */
+	mfile_readall(super->es_super.ffs_super.fs_dev, &disk_inode,
+	              super->es_inode_io_size, idat->ei_inoaddr);
+
+	/* Modify... */
+	mfile_tslock_acquire(self);
+	if unlikely(self->mf_flags & MFILE_F_DELETED) {
+		mfile_tslock_release_br(self);
+		return;
+	}
+	disk_inode.i_atime = HTOLE32((u32)self->mf_atime.tv_sec);
+	disk_inode.i_mtime = HTOLE32((u32)self->mf_mtime.tv_sec);
+	disk_inode.i_ctime = HTOLE32((u32)self->mf_ctime.tv_sec);
+	if (!mfile_issuper(self))
+		disk_inode.i_nlink = HTOLE16((u16)self->fn_nlink);
+	disk_inode.i_uid  = HTOLE16((u16)self->fn_uid);
+	disk_inode.i_gid  = HTOLE16((u16)self->fn_gid);
+	disk_inode.i_mode = HTOLE16((u16)self->fn_mode);
+	if (super->es_os == EXT2_OS_FLINUX || super->es_os == EXT2_OS_FGNU_HURD) {
+		disk_inode.i_os_linux.l_uid_high = HTOLE16((u16)(self->fn_uid >> 16));
+		disk_inode.i_os_linux.l_gid_high = HTOLE16((u16)(self->fn_gid >> 16));
+	}
+	disk_inode.i_nsectors = HTOLE32(ext2super_blocks2sectors(super, idat->ei_blocks));
+	filesize              = atomic64_read(&self->mf_filesize);
+	mfile_tslock_release(self);
+	if (!mfile_isdir(self)) {
+		disk_inode.i_size_low  = HTOLE32((u32)filesize);
+		disk_inode.i_size_high = HTOLE32((u32)(filesize >> 32));
+	}
+
+	/* Write... */
+	mfile_writeall(super->es_super.ffs_super.fs_dev, &disk_inode,
+	               super->es_inode_io_size, idat->ei_inoaddr);
+}
+
+
+
+
+/************************************************************************/
+/* Directory operators                                                  */
+/************************************************************************/
+
+/* Mapping from `EXT2_FT_*' to `DT_*' */
+PRIVATE unsigned char const ext_ft2dt[] = {
+	[EXT2_FT_UNKNOWN]  = DT_UNKNOWN,
+	[EXT2_FT_REG_FILE] = DT_REG,
+	[EXT2_FT_DIR]      = DT_DIR,
+	[EXT2_FT_CHRDEV]   = DT_CHR,
+	[EXT2_FT_BLKDEV]   = DT_BLK,
+	[EXT2_FT_FIFO]     = DT_FIFO,
+	[EXT2_FT_SOCK]     = DT_SOCK,
+	[EXT2_FT_SYMLINK]  = DT_LNK,
+};
+
+PRIVATE BLOCKING WUNUSED struct flatdirent *KCALL
+ext2_dir_v_readdir(struct flatdirnode *__restrict self, pos_t pos)
+		THROWS(E_BADALLOC, E_IOERROR, ...) {
+	struct ext2super *super = fsuper_asext2(self->fn_super);
+	Ext2DiskDirent entry;
+	u16 entsize, fd_namelen;
+	REF struct flatdirent *result;
+	unsigned char fd_type;
+again:
+	if (mfile_read(self, &entry, sizeof(entry), pos) < sizeof(entry))
+		return NULL; /* Forced EOF */
+	entsize = LETOH16(entry.d_entsize);
+	if (entsize <= sizeof(Ext2DiskDirent))
+		return NULL; /* End of directory */
+	if (!entry.d_ino) {
+		pos += entsize;
+		goto again; /* Unused entry. */
+	}
+	if (super->es_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE) {
+		fd_type = DT_UNKNOWN;
+		if likely(entry.d_type < COMPILER_LENOF(ext_ft2dt))
+			fd_type = ext_ft2dt[entry.d_type];
+		fd_namelen = entry.d_namlen_low;
+		if ((entsize - sizeof(Ext2DiskDirent)) > 0xff) {
+			/* The  filename is longer than 255 characters, and
+			 * we only have the least significant 8 bits of its
+			 * actual length.
+			 * To  deal with this, we must scan ahead and read a byte at every
+			 * `entry_pos + sizeof(Ext2Dirent) + entry.d_namlen_low + N * 256'
+			 * that is still located below `entry_pos + entsize' until we find
+			 * a NUL-character. */
+			pos_t name_endpos, name_endpos_max;
+			name_endpos = pos + sizeof(Ext2DiskDirent);
+			name_endpos += entry.d_namlen_low;
+			name_endpos += 256 * sizeof(char);
+			name_endpos_max = pos + entsize;
+			while (name_endpos < name_endpos_max) {
+				char ch;
+				mfile_readall(self, &ch, sizeof(char), name_endpos);
+				if (!ch)
+					break;
+				++name_endpos;
+			}
+			fd_namelen = (u16)(name_endpos - (pos + sizeof(Ext2DiskDirent))) / sizeof(char);
+		}
+	} else {
+		pos_t ino_addr = ext2_inoaddr(super, LETOH32(entry.d_ino));
+		le16 ino_type;
+		/* Read the directory entry type from its INode. */
+		mfile_readall(super->es_super.ffs_super.fs_dev, &ino_type, 2,
+		              ino_addr + offsetof(Ext2DiskINode, i_mode));
+		fd_type   = IFTODT(LETOH16(ino_type));
+		fd_namelen = LETOH16(entry.d_namlen);
+	}
+
+	/* Construct the resulting directory entry. */
+	result = _flatdirent_alloc(fd_namelen);
+	TRY {
+		mfile_readall(self, result->fde_ent.fd_name,
+		              fd_namelen * sizeof(char),
+		              pos + sizeof(Ext2DiskDirent));
+		switch (fd_namelen) {
+		case 2:
+			if (result->fde_ent.fd_name[1] != '.')
+				break;
+			ATTR_FALLTHROUGH
+		case 1:
+			if (result->fde_ent.fd_name[0] != '.')
+				break;
+			/* Skip `.' and `..' -- Those are emulated by the VFS layer. */
+			kfree(result);
+			pos += entsize;
+			goto again;
+		default: break;
+		}
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+
+	/* Fill in missing fields of the new directory entry. */
+	result->fde_pos            = pos;
+	result->fde_size           = entsize;
+	result->fde_ent.fd_ino     = (ino_t)LETOH32(entry.d_ino);
+	result->fde_ent.fd_type    = fd_type;
+	result->fde_ent.fd_ops     = &flatdirent_ops;
+	result->fde_ent.fd_namelen = fd_namelen;
+	return result;
+}
+
+
+
+
+
+
+/************************************************************************/
+/* File node operators                                                  */
+/************************************************************************/
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ext2idat_fini)(struct ext2idat *__restrict self) {
+	/* TODO: Free lazily allocated indirect block tables. */
+	(void)self;
+	COMPILER_IMPURE();
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ext2_reg_v_destroy)(struct mfile *__restrict self) {
+	struct ext2regnode *me = (struct ext2regnode *)mfile_asreg(self);
+	ext2idat_fini(&me->ern_fdat);
+	fregnode_v_destroy(self);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ext2_lnk_v_destroy)(struct mfile *__restrict self) {
+	struct ext2lnknode *me = (struct ext2lnknode *)mfile_aslnk(self);
+	ext2idat_fini(&me->eln_fdat);
+	flnknode_v_destroy(self);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ext2_dir_v_destroy)(struct mfile *__restrict self) {
+	struct ext2dirnode *me = (struct ext2dirnode *)mfile_aslnk(self);
+	ext2idat_fini(&me->edn_fdat);
+	fdirnode_v_destroy(self);
+}
+
+PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+ext2_lnk_v_readlink(struct flnknode *__restrict self,
+                    USER CHECKED /*utf-8*/ char *buf,
+                    size_t bufsize)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	size_t lnksize = (size_t)__atomic64_val(self->mf_filesize);
+	if (bufsize > lnksize)
+		bufsize = lnksize;
+#if 0 /* XXX: ASCII data is usually written in a way that causes this check to succeed, \
+       *      but  what about 1 or 2-character links?  This is little endian after all, \
+       *      so that would  end up  with a  really small  number that  might be  lower \
+       *      that the actual number block blocks...                                    \
+       * LATER: From what little I can gather, at some point Ext2 just started placing  \
+       *        symlink  data  that  was  small   enough  within  the  INode   itself.  \
+       *        Although sources state that prior to  this data was written in  actual  \
+       *        blocks,  what  isn't stated  is  anything about  how  to differentiate  \
+       *        these two cases other than the link size (which is ambiguous for small  \
+       *        links). */
+	if (lnksize * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4 &&
+	    node->i_dblock[0] >= ((Ext2Superblock *)self->i_super)->es_total_blocks)
+#else
+	if (lnksize * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4)
+#endif
+	{
+		struct ext2idat *idat = self->fn_fsdata;
+		/* XXX: Is this really how we discern between the 2 methods?
+		 *      Shouldn't  there  be  some kind  of  flag somewhere? */
+		memcpy(buf, &idat->ei_dblock, lnksize, sizeof(char));
+	} else {
+		mfile_readall(self, buf, bufsize, 0);
+	}
+	return lnksize;
+}
+
+
+
+
+
+
+
+/************************************************************************/
+/* File node operator tables                                            */
+/************************************************************************/
+PRIVATE struct fregnode_ops const ext2_regops = {
+	.rno_node = {
+		.no_file = {
+			.mo_destroy    = &ext2_reg_v_destroy,
+			.mo_loadblocks = &ext2_v_loadblocks,
+//TODO:		.mo_saveblocks = &ext2_v_saveblocks,
+			.mo_changed    = &fregnode_v_changed,
+#ifdef fregnode_v_stream_ops
+			.mo_stream     = &fregnode_v_stream_ops,
+#endif /* fregnode_v_stream_ops */
+		},
+		.no_wrattr = &ext2_v_wrattr,
+	},
+};
+PRIVATE struct flatdirnode_ops const ext2_dirops = {
+	.fdno_dir = {
+		.dno_node = {
+			.no_file = {
+				.mo_destroy    = &ext2_dir_v_destroy,
+				.mo_loadblocks = &ext2_v_loadblocks,
+//TODO:			.mo_saveblocks = &ext2_v_saveblocks,
+				.mo_changed    = &flatdirnode_v_changed,
+				.mo_stream     = &flatdirnode_v_stream_ops,
+			},
+			.no_wrattr = &ext2_v_wrattr,
+		},
+		.dno_lookup = &flatdirnode_v_lookup,
+		.dno_enum   = &flatdirnode_v_enum,
+		.dno_mkfile = &flatdirnode_v_mkfile,
+		.dno_unlink = &flatdirnode_v_unlink,
+		.dno_rename = &flatdirnode_v_rename,
+	},
+	.fdno_flat = {
+		.fdnx_readdir       = &ext2_dir_v_readdir,
+//TODO:	.fdnx_writedir      = &ext2_dir_v_writedir,
+//TODO:	.fdnx_deleteent     = &ext2_dir_v_deleteent,
+//TODO:	.fdnx_mkfile        = &ext2_dir_v_mkfile,
+//TODO:	.fdnx_mkent         = &ext2_dir_v_mkent,
+//TODO:	.fdnx_allocfile     = &ext2_dir_v_allocfile,
+//TODO:	.fdnx_deletefile    = &ext2_dir_v_deletefile,
+//TODO:	.fdnx_direntchanged = &ext2_dir_v_direntchanged,
+	},
+};
+PRIVATE struct flnknode_ops const ext2_lnkops = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy    = &ext2_lnk_v_destroy,
+			.mo_loadblocks = &ext2_v_loadblocks,
+//TODO:		.mo_saveblocks = &ext2_v_saveblocks,
+			.mo_changed    = &flnknode_v_changed,
+#ifdef flnknode_v_stream_ops
+			.mo_stream     = &flnknode_v_stream_ops,
+#endif /* flnknode_v_stream_ops */
+		},
+		.no_wrattr = &ext2_v_wrattr,
+	},
+	.lno_readlink = &ext2_lnk_v_readlink,
+};
+
 
 
 
@@ -148,19 +551,121 @@ NOTHROW(FCALL ext2_diskinode_decode)(Ext2DiskINode const *__restrict self,
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fnode *KCALL
 ext2_super_v_makenode(struct flatsuper *__restrict self,
                       struct flatdirent *__restrict ent,
-                      struct flatdirnode *__restrict dir)
+                      struct flatdirnode *__restrict UNUSED(dir))
 		THROWS(E_BADALLOC, E_IOERROR) {
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	struct ext2super *super = flatsuper_asext2(self);
+	struct fnode *result;
+	Ext2DiskINode disk_inode;
+
+	/* Read the on-disk INode */
+	pos_t inoaddr = ext2_inoaddr(super, (ext2_ino_t)ent->fde_ent.fd_ino);
+	mfile_readall(super->es_super.ffs_super.fs_dev, &disk_inode,
+	              super->es_inode_io_size, inoaddr);
+	if (!(super->es_feat_mountro & EXT2_FEAT_MRO_FSIZE64))
+		disk_inode.i_size_high = HTOLE32(0);
+
+	/* Validate that the on-disk INode type matches what we're expecting. */
+	if unlikely(ent->fde_ent.fd_type != IFTODT(LETOH16(disk_inode.i_mode)))
+		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+	switch (ent->fde_ent.fd_type) {
+
+	case DT_REG: {
+		struct ext2regnode *node;
+		node = (struct ext2regnode *)kmalloc(sizeof(struct ext2regnode), GFP_NORMAL);
+		node->mf_flags  = MFILE_F_NORMAL;
+		node->mf_ops    = &ext2_regops.rno_node.no_file;
+		node->fn_fsdata = &node->ern_fdat;
+		atomic64_init(&node->mf_filesize, (uint64_t)LETOH32(disk_inode.i_size_low) |
+		                                  (uint64_t)LETOH32(disk_inode.i_size_high) << 32);
+		result = node;
+	}	break;
+
+	case DT_DIR: {
+		struct ext2dirnode *node;
+		node = (struct ext2dirnode *)kmalloc(sizeof(struct ext2dirnode), GFP_NORMAL);
+		node->mf_flags  = MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE;
+		node->mf_ops    = &ext2_dirops.fdno_dir.dno_node.no_file;
+		node->fn_fsdata = &node->edn_fdat;
+		flatdirdata_init(&node->fdn_data);
+		atomic64_init(&node->mf_filesize, (uint64_t)-1);
+		atomic64_init(&node->edn_1dot, (uint64_t)-1);
+		atomic64_init(&node->edn_2dot, (uint64_t)-1);
+		result = node;
+	}	break;
+
+	case DT_LNK: {
+		struct ext2lnknode *node;
+		node = (struct ext2lnknode *)kmalloc(sizeof(struct ext2lnknode), GFP_NORMAL);
+		node->mf_flags  = MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE;
+		node->mf_ops    = &ext2_lnkops.lno_node.no_file;
+		node->fn_fsdata = &node->eln_fdat;
+		atomic64_init(&node->mf_filesize, (uint64_t)LETOH32(disk_inode.i_size_low) |
+		                                  (uint64_t)LETOH32(disk_inode.i_size_high) << 32);
+		result = node;
+	}	break;
+
+	default:
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION);
+	}
+	result->mf_parts = NULL;
+	SLIST_INIT(&result->mf_changed);
+	result->fn_fsdata->ei_inoaddr = inoaddr;
+	shared_rwlock_init(&result->fn_fsdata->ei_lock);
+	/* Decode generic INode data. */
+	ext2_diskinode_decode(&disk_inode, result, super,
+	                      (ext2_ino_t)ent->fde_ent.fd_ino);
+	return result;
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ext2_super_v_destroy)(struct mfile *__restrict self) {
+	struct ext2super *me = mfile_asext2super(self);
+	mman_unmap_kram_and_kfree(me->es_bgroupv,
+	                          me->es_bgroupc * sizeof(Ext2DiskBlockGroup),
+	                          me->es_freebgroupv);
+	flatsuper_v_destroy(self);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ext2_super_v_free)(struct fnode *__restrict self) {
+	struct ext2super *me = fnode_asext2super(self);
+	kfree(me);
 }
 
 PRIVATE struct flatsuper_ops const ext2_super_ops = {
 	.ffso_makenode = &ext2_super_v_makenode,
 	.ffso_super = {
-		/* TODO */
+//TODO:.so_truncate_atime = &FatSuper_TruncateATime,
+//TODO:.so_truncate_mtime = &FatSuper_TruncateMTime,
+//TODO:.so_truncate_ctime = &FatSuper_TruncateCTime,
+		.so_fdir = {
+			.dno_node = {
+				.no_file = {
+					.mo_destroy    = &ext2_super_v_destroy,
+					.mo_loadblocks = &ext2_v_loadblocks,
+//TODO:				.mo_saveblocks = &ext2_v_saveblocks,
+					.mo_changed    = &flatsuper_v_changed,
+					.mo_stream     = &flatsuper_v_stream_ops,
+				},
+				.no_free   = &ext2_super_v_free,
+				.no_wrattr = &ext2_v_wrattr,
+			},
+			.dno_lookup = &flatdirnode_v_lookup,
+			.dno_enum   = &flatdirnode_v_enum,
+			.dno_mkfile = &flatdirnode_v_mkfile,
+			.dno_unlink = &flatdirnode_v_unlink,
+			.dno_rename = &flatdirnode_v_rename,
+		},
 	},
 	.ffso_flat = {
-		/* TODO */
+		.fdnx_readdir    = &ext2_dir_v_readdir,
+//TODO:	.fdnx_writedir   = &ext2_dir_v_writedir,
+//TODO:	.fdnx_deleteent  = &ext2_dir_v_deleteent,
+//TODO:	.fdnx_mkfile     = &ext2_dir_v_mkfile,
+//TODO:	.fdnx_mkent      = &ext2_dir_v_mkent,
+//TODO:	.fdnx_allocfile  = &ext2_dir_v_allocfile,
+//TODO:	.fdnx_deletefile = &ext2_dir_v_deletefile,
 	},
 };
 
@@ -179,7 +684,7 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
             struct mfile *dev, UNCHECKED USER char *args) {
 	struct ext2super *result;
 	Ext2DiskSuperblock *desc;
-	u32 num_block_groups, temp;
+	u32 num_block_groups;
 	bool must_mount_ro = false;
 	shift_t blockshift;
 
@@ -211,11 +716,6 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 		return NULL;
 
 	num_block_groups = CEILDIV(LETOH32(desc->e_total_blocks), LETOH32(desc->e_blocks_per_group));
-	temp             = CEILDIV(LETOH32(desc->e_total_inodes), LETOH32(desc->e_inodes_per_group));
-	if unlikely(num_block_groups != temp)
-		return NULL;
-	if unlikely(!num_block_groups)
-		return NULL;
 
 	/* Figure out the block-shift. */
 	{
@@ -232,6 +732,7 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	/* Allocate the FAT superblock controller. */
 	result = (struct ext2super *)kmalloc(sizeof(struct ext2super), GFP_NORMAL);
 	TRY {
+		pos_t bgroup_addr; /* [const] On-disk address of `es_bgroupv'. */
 		Ext2DiskINode rootnode;
 
 		/* Fill in (most) ext2-specific superblock fields. */
@@ -240,7 +741,7 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 		result->es_total_blocks  = LETOH32(desc->e_total_blocks);
 		result->es_inode_size    = 128;
 		result->es_total_inodes  = LETOH32(desc->e_total_inodes);
-		result->es_version_maj   = LETOH16(desc->e_version_major);
+		result->es_version_maj   = LETOH32(desc->e_version_major);
 		result->es_version_min   = LETOH16(desc->e_version_minor);
 		result->es_feat_optional = 0;
 		result->es_feat_required = 0;
@@ -280,17 +781,51 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 		if (result->es_inode_io_size > sizeof(Ext2DiskINode))
 			result->es_inode_io_size = sizeof(Ext2DiskINode);
 
-		result->es_fdat.ei_inoaddr = ext2_inoaddr(result, 2); /* 2: INode number of root directory */
-		mfile_readall(dev, &rootnode, result->es_inode_io_size, result->es_fdat.ei_inoaddr);
-		shared_rwlock_init(&result->es_fdat.ei_lock);
+		if (result->es_blockshift <= 10) {
+			/* 3rd block (0,1,2) for 1KiB block sizes */
+			bgroup_addr = EXT2_BLOCK2ADDR(result, 2);
+		} else {
+			/* 2nd block (0,1) for 2KiB+ block sizes */
+			bgroup_addr = EXT2_BLOCK2ADDR(result, 1);
+		}
 
-		/* Decode the root INode */
-		ext2_diskinode_decode(&rootnode, &result->es_super.ffs_super.fs_root);
-		if unlikely(!S_ISDIR(result->es_super.ffs_super.fs_root.fn_mode))
-			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+		/* Map the block group vector. */
+		result->es_freebgroupv = mman_unmap_kram_cookie_alloc();
+		TRY {
+			result->es_bgroupv = (Ext2DiskBlockGroup *)mman_map(/* self:        */ &mman_kernel,
+			                                                    /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
+			                                                    /* num_bytes:   */ result->es_bgroupc * sizeof(Ext2DiskBlockGroup),
+			                                                    /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
+			                                                    /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
+			                                                    /* file:        */ dev,
+			                                                    /* file_fspath: */ NULL,
+			                                                    /* file_fsname: */ NULL,
+			                                                    /* file_pos:    */ bgroup_addr);
+		} EXCEPT {
+			mman_unmap_kram_cookie_free(result->es_freebgroupv);
+			RETHROW();
+		}
+
+		/* Load+decode the root directory INode */
+		TRY {
+			result->es_fdat.ei_inoaddr = ext2_inoaddr(result, 2); /* 2: INode number of root directory */
+			mfile_readall(dev, &rootnode, result->es_inode_io_size, result->es_fdat.ei_inoaddr);
+
+			/* Decode the root INode */
+			result->es_super.ffs_super.fs_root.fn_fsdata = &result->es_fdat; /* Needed for `ext2_diskinode_decode' */
+			result->es_super.ffs_super.fs_dev            = dev;              /* Needed for `ext2_diskinode_decode' */
+			ext2_diskinode_decode(&rootnode, &result->es_super.ffs_super.fs_root, result, 2);
+			if unlikely(!S_ISDIR(result->es_super.ffs_super.fs_root.fn_mode))
+				THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+			shared_rwlock_init(&result->es_fdat.ei_lock);
+		} EXCEPT {
+			mman_unmap_kram_and_kfree(result->es_bgroupv,
+			                          result->es_bgroupc * sizeof(Ext2DiskBlockGroup),
+			                          result->es_freebgroupv);
+			RETHROW();
+		}
 
 		/* Fill in remaining ext2-specific data for the root node. */
-		result->es_super.ffs_super.fs_root.fn_super = &result->es_super.ffs_super;
 		atomic64_init(&result->_es_1dot, (uint64_t)-1);
 		atomic64_init(&result->_es_2dot, (uint64_t)-1);
 	} EXCEPT {
@@ -298,31 +833,11 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 		RETHROW();
 	}
 
-	/* Fill in remaining ext2-specific superblock fields. */
-	result->es_freebgroupv = NULL; /* Lazily allocated */
-	result->es_bgroupv     = NULL; /* Lazily allocated */
-
-#if 1 /* I'm guessing this is  the right answer, but  the wiki really isn't  clear...             \
-       * [...] The table is located in the block immediately following the Superblock             \
-       *    -> That would mean a fixed partition offset of `2048'                                 \
-       * [...] the Block Group Descriptor Table will begin at block 2 [for 1024 bytes per block]. \
-       *       For any other block size, it will begin at block 1                                 \
-       * I'm going with the later variant here, since that seems to make the most sense. */
-	if (result->es_blockshift <= 10)
-		result->es_bgroup_addr = EXT2_BLOCK2ADDR(result, 2);
-	else {
-		result->es_bgroup_addr = EXT2_BLOCK2ADDR(result, 1);
-	}
-#else
-	result->es_bgroup_addr = EXT2_SUPERBLOCK_OFFSET + 1024;
-#endif
-
-
 	/* Fill in filesystem features. */
 	result->es_super.ffs_super.fs_feat.sf_filesizebits = 32;
 	if (result->es_feat_mountro & EXT2_FEAT_MRO_FSIZE64)
 		result->es_super.ffs_super.fs_feat.sf_filesizebits = 64;
-	result->es_super.ffs_super.fs_feat.sf_filesize_max = (pos_t)1 << result->es_super.ffs_super.fs_feat.sf_filesizebits;
+	result->es_super.ffs_super.fs_feat.sf_filesize_max = ((pos_t)1 << result->es_super.ffs_super.fs_feat.sf_filesizebits) - 1;
 	result->es_super.ffs_super.fs_feat.sf_symlink_max  = result->es_super.ffs_super.fs_feat.sf_filesize_max;
 	result->es_super.ffs_super.fs_feat.sf_uid_max      = (uid_t)UINT16_MAX;
 	result->es_super.ffs_super.fs_feat.sf_gid_max      = (gid_t)UINT16_MAX;
@@ -349,7 +864,6 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	result->es_super.ffs_super.fs_root.mf_flags     = MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE;
 	atomic64_init(&result->es_super.ffs_super.fs_root.mf_filesize, (uint64_t)-1);
 	result->es_super.ffs_super.fs_root.fn_ino       = (ino_t)2; /* On EXT2 filesystem, the root directory is always Inode number #2 */
-	result->es_super.ffs_super.fs_root.fn_fsdata    = &result->es_fdat;
 	flatdirdata_init(&result->es_super.ffs_rootdata);
 
 	/* If necessary, mount as read-only */

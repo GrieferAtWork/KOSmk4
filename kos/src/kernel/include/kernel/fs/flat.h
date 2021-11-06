@@ -495,7 +495,7 @@ flatdirnode_fileslist_remove(struct flatdirnode *__restrict self,
 
 
 
-/* Helpers for accessing `fdd_lock' */
+/* Helpers for accessing `struct flatdirdata::fdd_lock' */
 #define /*        */ _flatdirdata_reap(self)        (void)0
 #define /*        */ flatdirdata_reap(self)         (void)0
 #define /*        */ flatdirdata_mustreap(self)     0
@@ -560,7 +560,7 @@ struct flatdirnode
 #define flatdirnode_assuper(self) __COMPILER_CONTAINER_OF((struct fdirnode *)(self), struct flatsuper, ffs_super.fs_root)
 
 
-/* Helpers for accessing `fdn_data.fdd_lock' */
+/* Helpers for accessing `struct flatdirnode::fdn_data.fdd_lock' */
 #define /*        */ _flatdirnode_reap(self)        _flatdirdata_reap(&(self)->fdn_data)
 #define /*        */ flatdirnode_reap(self)         flatdirdata_reap(&(self)->fdn_data)
 #define /*        */ flatdirnode_mustreap(self)     flatdirdata_mustreap(&(self)->fdn_data)
@@ -711,6 +711,7 @@ NOTHROW(KCALL flatsuper_v_destroy)(struct mfile *__restrict self);
 #define flatsuper_v_ioctl      fsuper_v_ioctl
 #define flatsuper_v_open       flatdirnode_v_open
 #define flatsuper_v_stat       flatdirnode_v_stat
+#define flatsuper_v_changed    fsuper_v_changed
 #define flatsuper_v_hop        fsuper_v_hop
 #define flatsuper_v_stream_ops fsuper_v_stream_ops
 

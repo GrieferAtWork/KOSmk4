@@ -43,7 +43,19 @@ DECL_BEGIN
 
 /* Documentation and comments are taken from here:
  * >> https://wiki.osdev.org/Ext2
+ * >> https://en.wikipedia.org/wiki/Ext2
+ * >> http://www.nongnu.org/ext2-doc/ext2.html
  */
+
+#define EXT2_FT_UNKNOWN  0 /* Unknown File Type */
+#define EXT2_FT_REG_FILE 1 /* Regular File */
+#define EXT2_FT_DIR      2 /* Directory File */
+#define EXT2_FT_CHRDEV   3 /* Character Device */
+#define EXT2_FT_BLKDEV   4 /* Block Device */
+#define EXT2_FT_FIFO     5 /* Buffer File */
+#define EXT2_FT_SOCK     6 /* Socket File */
+#define EXT2_FT_SYMLINK  7 /* Symbolic Link */
+
 
 typedef struct ATTR_PACKED {
 	le32    e_total_inodes;      /* Total number of inodes in file system */
@@ -51,7 +63,7 @@ typedef struct ATTR_PACKED {
 	le32    e_reserved_blocks;   /* Number of blocks reserved for superuser (see `e_reserved_(u|g)id') */
 	le32    e_free_blocks;       /* Total number of unallocated blocks */
 	le32    e_free_inodes;       /* Total number of unallocated inodes */
-	le32    e_super_blockno;     /* Block number of the block containing the superblock */
+	le32    e_first_blockno;     /* First block which is available for general-purpose allocation */
 	le32    e_log2_blocksz;      /* log2(block_size) - 10.    (block_size == 1024 << e_log2_blocksz) */
 	le32    e_log2_fragsz;       /* log2(fragment_size) - 10. (fragment_size == 1024 << e_log2_fragsz) */
 	le32    e_blocks_per_group;  /* Number of blocks in each block group */
@@ -79,7 +91,7 @@ typedef struct ATTR_PACKED {
 #define EXT2_OS_FFREEBSD       3 /* Free BSD */
 #define EXT2_OS_FOTHER         4 /* Other */
 	le32    e_os_id;             /* Operating system ID from which the filesystem on this volume was created (One of `EXT2_OS_F*') */
-	le16    e_version_major;     /* Major portion of version */
+	le32    e_version_major;     /* Major portion of version */
 	le16    e_reserved_uid;      /* User ID that can use reserved blocks */
 	le16    e_reserved_gid;      /* Group ID that can use reserved blocks */
 	/* Everything below only exists when `e_version_major >= 1' */
@@ -236,7 +248,7 @@ typedef struct ATTR_PACKED {
 		                          * length of the name (in characters; excluding \0) */
 		struct ATTR_PACKED {
 			u8  d_namlen_low;    /* Low 8 bits of the name length. */
-			u8  d_type;          /* Entry type (One of `DT_*'). */
+			u8  d_type;          /* Entry type (One of `EXT2_FT_*'). */
 		};
 	};
 //	char        d_name[1];       /* The directory entry name. */
@@ -249,8 +261,8 @@ struct ext2iblock {
 	ext2_block_t eib_blocks[0]; /* [es_ind_blocksize] Direct block pointers (Or `0' if not allocated) */
 };
 struct ext2iiblock {
-	struct ext2iblock *eiib_blocks[0]; /* [0..1][es_ind_blocksize]  */
-/*	COMPILER_FLEXIBLE_ARRAY(le32, eiib_block_ptrs);             * [TYPE(ext2_block_t)][es_ind_blocksize] Disk contents */
+	struct ext2iblock            *eiib_blocks[0];  /* [0..1][es_ind_blocksize]  */
+/*	COMPILER_FLEXIBLE_ARRAY(le32, eiib_block_ptrs); * [TYPE(ext2_block_t)][es_ind_blocksize] Disk contents */
 };
 #define ext2iiblock_eiib_block_ptrs
 
@@ -265,6 +277,36 @@ struct ext2idat {
 	ext2_blockii_t       ei_diblock; /* [lock(ei_lock)] Double-indirect block table. (Or `0' if not allocated) */
 	ext2_blockiii_t      ei_tiblock; /* [lock(ei_lock)] Triple-indirect block table. (Or `0' if not allocated) */
 };
+
+/* Helpers for accessing `struct ext2idat::ei_lock' */
+#define /*        */ _ext2idat_reap(self)        (void)0
+#define /*        */ ext2idat_reap(self)         (void)0
+#define /*        */ ext2idat_mustreap(self)     0
+#define /*BLOCKING*/ ext2idat_write(self)        shared_rwlock_write(&(self)->ei_lock)
+#define /*BLOCKING*/ ext2idat_write_nx(self)     shared_rwlock_write_nx(&(self)->ei_lock)
+#define /*        */ ext2idat_trywrite(self)     shared_rwlock_trywrite(&(self)->ei_lock)
+#define /*        */ ext2idat_endwrite(self)     (shared_rwlock_endwrite(&(self)->ei_lock), ext2idat_reap(self))
+#define /*        */ _ext2idat_endwrite(self)    shared_rwlock_endwrite(&(self)->ei_lock)
+#define /*BLOCKING*/ ext2idat_read(self)         shared_rwlock_read(&(self)->ei_lock)
+#define /*BLOCKING*/ ext2idat_read_nx(self)      shared_rwlock_read_nx(&(self)->ei_lock)
+#define /*        */ ext2idat_tryread(self)      shared_rwlock_tryread(&(self)->ei_lock)
+#define /*        */ _ext2idat_endread(self)     shared_rwlock_endread(&(self)->ei_lock)
+#define /*        */ ext2idat_endread(self)      (void)(shared_rwlock_endread(&(self)->ei_lock) && (ext2idat_reap(self), 0))
+#define /*        */ _ext2idat_end(self)         shared_rwlock_end(&(self)->ei_lock)
+#define /*        */ ext2idat_end(self)          (void)(shared_rwlock_end(&(self)->ei_lock) && (ext2idat_reap(self), 0))
+#define /*BLOCKING*/ ext2idat_upgrade(self)      shared_rwlock_upgrade(&(self)->ei_lock)
+#define /*BLOCKING*/ ext2idat_upgrade_nx(self)   shared_rwlock_upgrade_nx(&(self)->ei_lock)
+#define /*        */ ext2idat_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->ei_lock)
+#define /*        */ ext2idat_downgrade(self)    shared_rwlock_downgrade(&(self)->ei_lock)
+#define /*        */ ext2idat_reading(self)      shared_rwlock_reading(&(self)->ei_lock)
+#define /*        */ ext2idat_writing(self)      shared_rwlock_writing(&(self)->ei_lock)
+#define /*        */ ext2idat_canread(self)      shared_rwlock_canread(&(self)->ei_lock)
+#define /*        */ ext2idat_canwrite(self)     shared_rwlock_canwrite(&(self)->ei_lock)
+#define /*BLOCKING*/ ext2idat_waitread(self)     shared_rwlock_waitread(&(self)->ei_lock)
+#define /*BLOCKING*/ ext2idat_waitwrite(self)    shared_rwlock_waitwrite(&(self)->ei_lock)
+#define /*BLOCKING*/ ext2idat_waitread_nx(self)  shared_rwlock_waitread_nx(&(self)->ei_lock)
+#define /*BLOCKING*/ ext2idat_waitwrite_nx(self) shared_rwlock_waitwrite_nx(&(self)->ei_lock)
+
 
 struct ext2regnode: fregnode {
 	struct ext2idat ern_fdat; /* Fat node data. */
@@ -297,7 +339,7 @@ struct ext2super {
 	ext2_ino_t          es_total_inodes;  /* [!0][const] Total number of INodes.
 	                                       * NOTE: Since the first valid INode number is ONE(1), this
 	                                       *       field  doubles as the greatest valid INode number. */
-	u16                 es_version_maj;   /* [const] EXT2 version number */
+	u32                 es_version_maj;   /* [const] EXT2 version number */
 	u16                 es_version_min;   /* [const] EXT2 version number */
 	u32                 es_feat_optional; /* [const] Optional features in use (Set of `EXT2_FEAT_OPT_F*') */
 	u32                 es_feat_required; /* [const] Required features in use (Set of `EXT2_FEAT_REQ_F*') */
@@ -310,22 +352,24 @@ struct ext2super {
 #endif /* !__INTELLISENSE__ */
 	size_t              es_blockmask;     /* [const][== (1 << es_blockshift) - 1] Size of a block (in bytes). */
 	size_t              es_ind_blocksize; /* [const][== (1 << es_blockshift) / 4] Number of entries in an indirect block pointer block. */
-	pos_t               es_bgroup_addr;   /* [const] On-disk address of `es_bgroupv'. */
 	ext2_bgroup_t       es_bgroupc;       /* [!0][const] The total number of block groups. */
-	Ext2DiskBlockGroup *es_bgroupv;       /* [0..es_bgroupc][lock(WRITE_ONCE)][owned] Read/Write memory mapping of the superblock's block-group table. */
-	void               *es_freebgroupv;   /* [1..1][lock(WRITE_ONCE)][const] Token used to munmap() `es_bgroupv' during destruction (only used during destruction) */
+	Ext2DiskBlockGroup *es_bgroupv;       /* [0..es_bgroupc][const][owned] Read/Write memory mapping of the superblock's block-group table. */
+	void               *es_freebgroupv;   /* [1..1][const][owned] Token used to munmap() `es_bgroupv' during destruction (only used during destruction) */
 	struct flatsuper    es_super;         /* Underlying superblock */
 	struct ext2idat     es_fdat;          /* Superblock fs-specific file data. */
 	atomic64_t         _es_1dot;          /* s.a. `struct ext2dirnode::edn_1dot' */
 	atomic64_t         _es_2dot;          /* s.a. `struct ext2dirnode::edn_2dot' */
 };
-#define flatsuper_asext2(self) COMPILER_CONTAINER_OF(self, struct ext2super, es_super)
-#define fsuper_asext2(self)    COMPILER_CONTAINER_OF(self, struct ext2super, es_super.ffs_super)
+#define flatsuper_asext2(self)     COMPILER_CONTAINER_OF(self, struct ext2super, es_super)
+#define fsuper_asext2(self)        COMPILER_CONTAINER_OF(self, struct ext2super, es_super.ffs_super)
+#define fdirnode_asext2super(self) COMPILER_CONTAINER_OF(self, struct ext2super, es_super.ffs_super.fs_root)
+#define fnode_asext2super(self)    fdirnode_asext2super(fnode_asdir(self))
+#define mfile_asext2super(self)    fdirnode_asext2super(mfile_asdir(self))
 
 /* Convert block addresses to on-disk locations, as well as the opposite.
  * Also  used  to  convert  in-file  addresses  to  their  block indices. */
 #define EXT2_BLOCK2ADDR(self, block) ((pos_t)(block) << (self)->es_blockshift)
-#define EXT2_ADDR2BLOCK(self, block) ((ext2_block_t)(block) >> (self)->es_blockshift)
+#define EXT2_ADDR2BLOCK(self, addr)  ((ext2_block_t)((addr) >> (self)->es_blockshift))
 
 /* Return the block group index associated with a given INode. */
 #define EXT2_INO_BGRP_INDEX(self, ino) ((ext2_bgroup_t)((ext2_ino_t)((ino)-1) / (self)->es_ino_per_bgrp))
