@@ -113,6 +113,8 @@ again:
 #endif /* LIBVIO_CONFIG_ENABLED */
 
 			/* Try to fault the backing mem-parts. */
+			if (!mfault_lockpart_or_unlock(&mf))
+				goto again;
 			if (!mfault_or_unlock(&mf))
 				goto again;
 
@@ -280,6 +282,8 @@ again:
 #endif /* LIBVIO_CONFIG_ENABLED */
 
 			/* Try to fault the backing mem-parts. */
+			if (!mfault_lockpart_or_unlock(&mf))
+				goto again;
 			if (!mfault_or_unlock(&mf))
 				goto again;
 
@@ -509,10 +513,29 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
 
 
 
+/* Acquire a lock to `self->mfl_part', or release a lock to `self->mfl_mman'
+ * Locking logic:
+ *   - return == true:   mpart_lock_acquire(self->mfl_part);
+ *   - return == false:  _mman_lock_release(self->mfl_mman);
+ *   - EXCEPT:           mman_lock_release(self->mfl_mman); */
+PUBLIC NONNULL((1)) void FCALL
+_mfault_unlock_and_waitfor_part(struct mfault *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	struct mpart *part = self->mfl_part;
+	incref(part);
+	mman_lock_release(self->mfl_mman);
+	FINALLY_DECREF_UNLIKELY(part);
+	/* Wait for the part's lock to become available. */
+	mpart_lock_waitfor(part);
+}
+
+
+
 /* (Try to) acquire locks, and load/split/unshare/... backing memory,
  * as  well as mem-parts and mem-nodes in order to prepare everything
  * needed in order to map a given sub-address-range of a given mpart,
  * as accessed through a given mnode into memory.
+ * The caller must already be holding a lock to `self->mfl_part'!
  *
  * Usage:
  * >> void pf_handler(void *addr, bool is_write) {
@@ -529,6 +552,8 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
  * >>         mf.mfl_part = mf.mfl_node->mn_part;
  * >>         // Missing: NULL- and safety-checks; VIO support
  * >>         // Missing: Is-access-even-allowed-checks
+ * >>         if (!mfault_lockpart_or_unlock(&mf))
+ * >>             goto again;
  * >>         if (!mfault_or_unlock(&mf))
  * >>             goto again;
  * >>     } EXCEPT {
@@ -551,10 +576,11 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
  * >> }
  *
  * Locking logic:
- *   - return == true:   mpart_lock_acquire(self->mfl_part);
- *                       undefined(out(INTERNAL_DATA(self)))
- *   - return == false:  _mman_lock_release(self->mfl_mman);
- *   - EXCEPT:           mman_lock_release(self->mfl_mman);
+ *   - return == true:   undefined(out(INTERNAL_DATA(self)))
+ *   - return == false:  mpart_lock_releases(self->mfl_part);
+ *                       _mman_lock_release(self->mfl_mman);
+ *   - EXCEPT:           mpart_lock_releases(self->mfl_part);
+ *                       mman_lock_release(self->mfl_mman);
  *
  * @param: self:   mem-lock control descriptor.
  * @return: true:  Successfully faulted memory.
@@ -565,10 +591,15 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
  *                 of the associated mem-part.
  *                 Resolve  this  issue  by simply  trying  again (this
  *                 inconsistency can result from someone else splitting
- *                 the associated mem-part) */
+ *                 the associated mem-part)
+ * @throw: E_FSERROR_READONLY:
+ *         Attempted to fault write for `MNODE_F_SHARED' mapping of `MFILE_F_READONLY'-file:
+ *         >> (self->mfl_node->mn_flags & MNODE_F_SHARED) &&
+ *         >> ((self->mfl_part->mp_file->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY)
+ */
 PUBLIC BLOCKING NONNULL((1)) bool FCALL
 mfault_or_unlock(struct mfault *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...) {
 	struct mnode *node;
 	struct mpart *part;
 	mpart_reladdr_t acc_offs;
@@ -581,6 +612,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 	assert(self->mfl_mman == self->mfl_node->mn_mman);
 	assert(self->mfl_part == self->mfl_node->mn_part);
 	assert(mman_lock_acquired(self->mfl_mman));
+	assert(mpart_lock_acquired(self->mfl_part));
 	assert(IS_ALIGNED((uintptr_t)self->mfl_addr, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)self->mfl_size, PAGESIZE));
 	assert(self->mfl_size != 0);
@@ -588,19 +620,6 @@ mfault_or_unlock(struct mfault *__restrict self)
 	assert(!wasdestroyed(self->mfl_mman));
 	node = self->mfl_node;
 	part = self->mfl_part;
-
-	/* First off: Try to acquire  a lock to the associated  data-part.
-	 * XXX: Maybe change the ABI so this is also done by other caller?
-	 * After all: Our  function name doesn't  really suggest that we
-	 *            do this; only the function doc tells about this... */
-	if unlikely(!mpart_lock_tryacquire(part)) {
-		incref(part);
-		mman_lock_release(self->mfl_mman);
-		FINALLY_DECREF_UNLIKELY(part);
-		/* Wait for the part's lock to become available. */
-		mpart_lock_waitfor(part);
-		goto nope;
-	}
 	mpart_assert_integrity(part);
 
 	/* Set-up our extended unlock controller. */
@@ -670,7 +689,9 @@ mfault_or_unlock(struct mfault *__restrict self)
 			 * existing MAP_SHARED+PROT_WRITE mapping of a file that has later become
 			 * READONLY, at which point pagedir-level  write access was revoked,  but
 			 * the mapping itself wasn't deleted. */
-			if unlikely((part->mp_file->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY) {
+			if unlikely((part->mp_file->mf_flags & (MFILE_F_DELETED |
+			                                        MFILE_F_READONLY)) ==
+			            MFILE_F_READONLY) {
 				mpart_lock_release(part);
 				unlockinfo_unlock(&self->mfl_unlck);
 				THROW(E_FSERROR_READONLY);

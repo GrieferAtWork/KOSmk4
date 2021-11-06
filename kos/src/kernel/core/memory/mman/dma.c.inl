@@ -197,6 +197,8 @@ again_lookup_part_locked:
 				 *                our use of `mfault_or_unlock()' (rightfully) does do so. */
 
 				/* Fault the accessed address under the relevant access-mode. */
+				if (!mfault_lockpart_or_unlock(&mf))
+					goto again_lookup_part;
 				if (!mfault_or_unlock(&mf))
 					goto again_lookup_part;
 			} EXCEPT {

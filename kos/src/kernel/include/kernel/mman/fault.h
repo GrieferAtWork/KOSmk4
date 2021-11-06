@@ -218,11 +218,29 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 	                      : (void)0)
 
 
+/* Acquire a lock to `self->mfl_part', or release a lock to `self->mfl_mman'
+ * Locking logic:
+ *   - return == true:   mpart_lock_acquire(self->mfl_part);
+ *   - return == false:  _mman_lock_release(self->mfl_mman);
+ *   - EXCEPT:           mman_lock_release(self->mfl_mman); */
+#ifdef __INTELLISENSE__
+BLOCKING NONNULL((1)) __BOOL
+mfault_lockpart_or_unlock(struct mfault *__restrict self)
+		THROWS(E_WOULDBLOCK);
+#else /* __INTELLISENSE__ */
+#define mfault_lockpart_or_unlock(self) \
+	(mpart_lock_tryacquire((self)->mfl_part) || (_mfault_unlock_and_waitfor_part(self), 0))
+#endif /* !__INTELLISENSE__ */
+FUNDEF NONNULL((1)) void FCALL
+_mfault_unlock_and_waitfor_part(struct mfault *__restrict self)
+		THROWS(E_WOULDBLOCK);
+
 
 /* (Try to) acquire locks, and load/split/unshare/... backing memory,
  * as  well as mem-parts and mem-nodes in order to prepare everything
  * needed in order to map a given sub-address-range of a given mpart,
  * as accessed through a given mnode into memory.
+ * The caller must already be holding a lock to `self->mfl_part'!
  *
  * Usage:
  * >> void pf_handler(void *addr, bool is_write) {
@@ -239,6 +257,8 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
  * >>         mf.mfl_part = mf.mfl_node->mn_part;
  * >>         // Missing: NULL- and safety-checks; VIO support
  * >>         // Missing: Is-access-even-allowed-checks
+ * >>         if (!mfault_lockpart_or_unlock(&mf))
+ * >>             goto again;
  * >>         if (!mfault_or_unlock(&mf))
  * >>             goto again;
  * >>     } EXCEPT {
@@ -261,10 +281,11 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
  * >> }
  *
  * Locking logic:
- *   - return == true:   mpart_lock_acquire(self->mfl_part);
- *                       undefined(out(INTERNAL_DATA(self)))
- *   - return == false:  _mman_lock_release(self->mfl_mman);
- *   - EXCEPT:           mman_lock_release(self->mfl_mman);
+ *   - return == true:   undefined(out(INTERNAL_DATA(self)))
+ *   - return == false:  mpart_lock_releases(self->mfl_part);
+ *                       _mman_lock_release(self->mfl_mman);
+ *   - EXCEPT:           mpart_lock_releases(self->mfl_part);
+ *                       mman_lock_release(self->mfl_mman);
  *
  * @param: self:   mem-lock control descriptor.
  * @return: true:  Successfully faulted memory.
@@ -275,10 +296,15 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
  *                 of the associated mem-part.
  *                 Resolve  this  issue  by simply  trying  again (this
  *                 inconsistency can result from someone else splitting
- *                 the associated mem-part) */
+ *                 the associated mem-part)
+ * @throw: E_FSERROR_READONLY:
+ *         Attempted to fault write for `MNODE_F_SHARED' mapping of `MFILE_F_READONLY'-file:
+ *         >> (self->mfl_node->mn_flags & MNODE_F_SHARED) &&
+ *         >> ((self->mfl_part->mp_file->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY)
+ */
 FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
 mfault_or_unlock(struct mfault *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY, ...);
 
 
 

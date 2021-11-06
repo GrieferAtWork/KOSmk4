@@ -273,6 +273,8 @@ again_prefault:
 						mf.mfl_flags = MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE;
 
 					/* Fault this node. */
+					if (!mfault_lockpart_or_unlock(&mf))
+						goto again_prefault;
 					if (!mfault_or_unlock(&mf))
 						goto again_prefault;
 
@@ -304,16 +306,15 @@ again_prefault:
 						pagedir_unprepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size);
 					}
 
-					/* Upon success, `mfault_or_unlock()'  will have acquired  a
-					 * lock to the associated part. We will actually be  needing
-					 * this lock later, and we will re-acquire it at that point.
+					/* Upon success, `mfault_lockpart_or_unlock()' will have  acquired
+					 * a lock to the associated part. We will actually be needing this
+					 * lock later, and we will re-acquire it at that point.
 					 *
-					 * But  until then, our lock to `self' will prevent the now-
-					 * faulted backing data of `mf.mfl_part' from being unloaded
-					 * again, since anyone trying to do so would have to acquire
-					 * our mman-lock first (which  we won't release until  after
-					 * we've  re-acquired  the part-lock  if everything  goes to
-					 * plan) */
+					 * But  until then, our lock to `self' will prevent the now-faulted
+					 * backing data of `mf.mfl_part'  from being unloaded again,  since
+					 * anyone trying to do so would have to acquire our mman-lock first
+					 * (which we won't release until after we've re-acquired the  part-
+					 * lock if everything goes to plan) */
 					mpart_lock_release(mf.mfl_part);
 
 					/* If write-access was granted, add the node to the list of writable nodes. */
