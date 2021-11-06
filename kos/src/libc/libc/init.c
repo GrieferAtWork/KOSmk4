@@ -24,15 +24,11 @@
 #include "../api.h"
 /**/
 
-#include <kos/exec/peb.h>
 #include <kos/syscalls.h>
 
 #include <stdio.h>  /* flushall() */
-#include <stdlib.h> /* exit() */
 
 #include "except.h" /* EXCEPT_INITIALIZER_KERNEL_EXCEPTION_HANDLER() */
-#include "globals.h"
-
 
 DECL_BEGIN
 
@@ -61,33 +57,6 @@ void LIBCCALL libc_fini(void) {
 	/* Flush all file buffers to disk. */
 	flushall();
 }
-
-INTERN ATTR_SECTION(".text.crt.glibc.application.init")
-NONNULL((1)) int LIBCCALL
-libc_start_main(int (*main)(int, char **, char **),
-                int argc, char **ubp_av,
-                void (*init)(void),
-                void (*fini)(void),
-                void (*rtld_fini)(void),
-                void *stack_end) {
-	int exit_code;
-	struct process_peb *peb;
-	/* All of these will contain garbage... */
-	(void)argc;
-	(void)ubp_av;
-	(void)init;
-	(void)fini;
-	(void)rtld_fini;
-	(void)stack_end;
-	/* Use the PEB to pass the correct information. */
-	peb       = &__peb;
-	exit_code = (*main)(peb->pp_argc,
-	                    peb->pp_argv,
-	                    peb->pp_envp);
-	exit(exit_code);
-}
-
-DEFINE_PUBLIC_ALIAS(__libc_start_main, libc_start_main);
 
 DECL_END
 

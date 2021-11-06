@@ -150,9 +150,9 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 					src_size = dst_sym->st_size;
 				else {
 					syslog(LOG_WARN, "[rtld] %q: Symbol %q imported with %" PRIuSIZ " "
-			                         "bytes, but exported with %" PRIuSIZ " from %q\n",
+					                 "bytes, but exported with %" PRIuSIZ " from %q\n",
 					       self->dm_filename, self->dm_elf.de_dynstr + dst_sym->st_name,
-					       dst_sym->st_info, src_size, src_module->dm_filename);
+					       dst_sym->st_size, src_size, src_module->dm_filename);
 					/* NOTE: When `src_size' is  ZERO(0), then always  copy the size  information
 					 *       that is expected by the hosted module (though still emit the warning
 					 *       in this case) */

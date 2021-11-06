@@ -29,7 +29,7 @@
  *  - fdirent_open() only uses fd_type and fd_ino (alongside the superblock's
  *    fnode tree and an fs-specific create-new-fnode function for new nodes).
  *
- * Pretty much all on-disk filesystems are derived from this model.
+ * Pretty much all on-disk filesystem drivers are derived from this model.
  */
 
 
@@ -44,15 +44,6 @@
 
 #ifdef __CC__
 DECL_BEGIN
-
-/************************************************************************/
-/* TODO: REMOVE_ME                                                      */
-/* REMINDER: Before using this API for implementing FAT, finish its     */
-/*           implementation. Otherwise, you'll likely end up doing      */
-/*           everything twice in case some aspects of the API still     */
-/*           need to be changed.                                        */
-/************************************************************************/
-
 
 struct flatdirnode;
 struct flatdirent;
@@ -634,7 +625,7 @@ struct flatsuper_ops {
 	 * This function must allocate+initialize the returned node:
 	 *  - return->_fnode_file_ mf_ops        = ...;                # As appropriate
 	 *  - return->_fnode_file_ mf_parts      = NULL;               # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `flatdirnode's, this _MUST_ be `NULL')
-	 *  - return->_fnode_file_ mf_changed    = SLIST_INIT;         # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `flatdirnode's, this _MUST_ be `NULL')
+	 *  - return->_fnode_file_ mf_changed    = SLIST_INIT;         # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `flatdirnode's, this _MUST_ be `SLIST_INIT')
 	 *  - return->_fnode_file_ mf_flags      = ... & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |    # directories require `MFILE_F_FIXEDFILESIZE', and should
 	 *                                                MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | # probably also have `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO'
 	 *                                                MFILE_FN_ATTRREADONLY);

@@ -431,6 +431,7 @@
 #define __CRT_HAVE___fpclassifyl
 #define __CRT_HAVE___fpecode
 #define __CRT_HAVE___fpending
+#define __CRT_HAVE___fpu_control
 #define __CRT_HAVE___fpurge
 #define __CRT_HAVE___freadable
 #define __CRT_HAVE___freading
@@ -527,6 +528,7 @@
 #define __CRT_HAVE___lgammal_r
 #define __CRT_HAVE___libc_current_sigrtmax
 #define __CRT_HAVE___libc_current_sigrtmin
+#define __CRT_HAVE___libc_init
 #define __CRT_HAVE___libc_start_main
 #define __CRT_HAVE___llrint
 #define __CRT_HAVE___llrintf
@@ -714,6 +716,7 @@
 #define __CRT_HAVE___set_doserrno
 #define __CRT_HAVE___set_errno
 #define __CRT_HAVE___set_nterrno
+#define __CRT_HAVE___setfpucw
 #define __CRT_HAVE___setjmp
 #define __CRT_HAVE___setmntent
 #define __CRT_HAVE___setpgid
