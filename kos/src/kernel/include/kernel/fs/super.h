@@ -123,8 +123,6 @@ struct fsuper_ops {
 			THROWS(E_IOERROR, E_SEGFAULT, ...);
 
 	/* [0..1] Set volume label, directly writing the new value to disk.
-	 *        Depending on implementation, it may be necessary to sync
-	 *        the superblock and/or backing device.
 	 * @return: true:  Successfully saved the label
 	 * @return: false: This volume doesn't have a label (same as not implementing this operator)
 	 * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG:namelen: [...] */

@@ -415,6 +415,7 @@ struct fatsuper {
 #define FAT_FEATURE_NO_CYGWIN_SYMLINK 0x8000 /* Disable cygwin symlink support */
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 	u16                     ft_features;    /* [const] Fat features (Set of `FAT_FEATURE_*'). */
+	struct atomic_lock      fs_stringslock; /* Lock for `ft_oem', `ft_label' and `ft_sysname' */
 	char                    ft_oem[9];      /* [const] OEM identifier. */
 	char                    ft_label[12];   /* [const] Volume label string (zero-terminated). */
 	char                    ft_sysname[9];  /* [const] System identifier string (zero-terminated). */

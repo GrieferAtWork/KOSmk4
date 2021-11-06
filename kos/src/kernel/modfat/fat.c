@@ -2346,9 +2346,54 @@ FatSuper_Sync(struct fsuper *__restrict self)
 }
 
 
+PRIVATE BLOCKING WUNUSED NONNULL((1)) bool KCALL
+FatSuper_GetLabel(struct fsuper *__restrict self,
+                  USER CHECKED char buf[FSLABEL_MAX])
+		THROWS(E_IOERROR, E_SEGFAULT, ...) {
+	STATIC_ASSERT(FSLABEL_MAX >= 12);
+	FatSuperblock *me = fsuper_asfat(self);
+	char label[12];
+	atomic_lock_acquire(&me->fs_stringslock);
+	memcpy(label, me->ft_label, 12);
+	atomic_lock_release(&me->fs_stringslock);
+	strcpy(buf, label);
+	return true;
+}
+
+PRIVATE BLOCKING WUNUSED NONNULL((1)) bool KCALL
+FatSuper_SetLabel(struct fsuper *__restrict self,
+                  USER CHECKED char const *name, size_t namelen)
+		THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
+		       E_INVALID_ARGUMENT_BAD_VALUE, ...) {
+	unsigned int i;
+	char newlabel[12];
+	FatSuperblock *me = fsuper_asfat(self);
+	pos_t diskaddr;
+	if unlikely(namelen >= 12)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG, namelen);
+	*(char *)mempcpy(newlabel, name, namelen) = '\0';
+	atomic_lock_acquire(&me->fs_stringslock);
+	memcpy(me->ft_label, newlabel, 12);
+	atomic_lock_release(&me->fs_stringslock);
+
+	/* Write the updated label string to disk. */
+	for (i = 0; i < 11; ++i) {
+		if (newlabel[i] == '\0')
+			newlabel[i] = ' ';
+	}
+	diskaddr = (pos_t)(me->ft_type == FAT32 ? offsetof(FatDiskHeader, fat32.f32_label)
+	                                        : offsetof(FatDiskHeader, fat16.f16_label));
+	mfile_writeall(me->ft_super.ffs_super.fs_dev, newlabel, 11 * sizeof(char), diskaddr);
+	mfile_sync(me->ft_super.ffs_super.fs_dev);
+	return true;
+}
+
+
 PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 	.ffso_makenode = &FatSuper_MakeNode,
 	.ffso_super = {
+		.so_getlabel       = &FatSuper_GetLabel,
+		.so_setlabel       = &FatSuper_SetLabel,
 		.so_validuid       = &FatSuper_ValidUid,
 		.so_validgid       = &FatSuper_ValidGid,
 		.so_truncate_atime = &FatSuper_TruncateATime,
@@ -2387,6 +2432,8 @@ PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 	.ffso_makenode = &FatSuper_MakeNode,
 	.ffso_super = {
+		.so_getlabel       = &FatSuper_GetLabel,
+		.so_setlabel       = &FatSuper_SetLabel,
 		.so_validuid       = &FatSuper_ValidUid,
 		.so_validgid       = &FatSuper_ValidGid,
 		.so_truncate_atime = &FatSuper_TruncateATime,
@@ -2735,6 +2782,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		trimspecstring(result->ft_oem, 8);
 		trimspecstring(result->ft_label, 11);
 		trimspecstring(result->ft_sysname, 8);
+		atomic_lock_init(&result->fs_stringslock);
 
 		/* Map the FAT table into memory. */
 		TRY {
