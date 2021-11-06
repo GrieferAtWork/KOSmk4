@@ -528,7 +528,6 @@
 #define __CRT_HAVE___lgammal_r
 #define __CRT_HAVE___libc_current_sigrtmax
 #define __CRT_HAVE___libc_current_sigrtmin
-#define __CRT_HAVE___libc_init
 #define __CRT_HAVE___libc_start_main
 #define __CRT_HAVE___llrint
 #define __CRT_HAVE___llrintf

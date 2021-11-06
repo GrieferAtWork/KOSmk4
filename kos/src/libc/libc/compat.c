@@ -63,13 +63,48 @@ libc_start_main(int (*main)(int, char **, char **),
 }
 
 
+#if defined(__i386__) && !defined(__x86_64__)
+/* >> void __libc_init(int argc, char *argv[], char *envp[]);
+ * Instead of its usual purpose of initializing libc, we define
+ * this  function  to write-back  parameters with  their proper
+ * values onto the stack, thus allowing the caller to  continue
+ * working with them.
+ *
+ * This may not look like it makes much sense since normally
+ * parameters like this can't be  accessed by the caller  of
+ * the  function, but `__libc_init()' is provided for compat
+ * with old linux programs (1990-2001-ish) that had a custom
+ * assembly _start function which essentially did this:
+ * >> pushl   <envp>   # With the emulated stub-PEB, this pushes <TOP_OF_STACK>
+ * >> pushl   <argv>   # With the emulated stub-PEB, this pushes <TOP_OF_STACK>
+ * >> pushl   <argc>   # With the emulated stub-PEB, this pushes `0'
+ * >> ...
+ * >> call    __libc_init
+ * >> ...
+ * >> call    main     # Note that arguments for main are never re-loaded,
+ * >>                  # meaning that modifications by `__libc_init' are
+ * >>                  # preserved! */
 DEFINE_PUBLIC_ALIAS(__libc_init, libc___libc_init);
+
+/* Yes GCC. I know it looks like those assignments don't do anything...
+ * But  trust me on this one. - Just don't try to optimize them away ;) */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-parameter"
+
+/* Prevent GCC from (rightfully) optimizing  away
+ * (seemingly unnecessary) parameter assignments. */
+__attribute__((optimize("-O0")))
 INTERN ATTR_SECTION(".text.crt.glibc.application.init") void LIBCCALL
 libc___libc_init(int argc, char *argv[], char *envp[]) {
-	(void)argc;
-	(void)argv;
-	(void)envp;
+	struct process_peb *peb;
+	peb  = &__peb;
+	argc = peb->pp_argc;
+	argv = peb->pp_argv;
+	envp = peb->pp_envp;
 }
+
+#pragma GCC diagnostic pop
+#endif /* __i386__ && !__x86_64__ */
 
 DECL_END
 
