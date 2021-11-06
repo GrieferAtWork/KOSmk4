@@ -586,19 +586,18 @@ again_lock_mman:
 						struct mnode *krs;
 						/* The access is of a 32-bit program trying to reach into
 						 * what it ~thinks~ is the location of its  kernel-space.
-						 * -> Try to handle this case by re-sizing the `v_kernreserve'
-						 *    to instead start at +3GiB, but only do so if there isn't
-						 *    anything else mapped within that address range.
-						 * Technically,  it  would  be  more  correct  if'd  had  already   done
-						 * this  during  the  exec()  that  spawned  the  calling   application,
-						 * especially  since  prior   to  this  being   done,  the   application
-						 * would have been  able to  map something else  into the  +3GiB...+4GiB
-						 * address space range, however given  that this is highly  kos-specific
-						 * behavior, I do think that doing this lazily should be ok  (especially
-						 * since a 32-bit program trying to map into +3GiB...+4GiB would already
-						 * be doing something that it shouldn't, as attempting to map that  area
-						 * of memory is something  that cannot be done  when hosted by a  32-bit
-						 * kernel) */
+						 * -> Try to handle this case by re-sizing `thismman_kernel_reservation'
+						 *    to instead start at +3GiB, but only do so if there isn't  anything
+						 *    else mapped within that address range.
+						 * Technically, it would be more correct  if'd had already done this  during
+						 * the exec() that spawned the  calling application, especially since  prior
+						 * to this being done, the application would have been able to map something
+						 * else  into the +3GiB...+4GiB address space range, however given that this
+						 * is highly kos-specific behavior, I do think that doing this lazily should
+						 * be ok (especially since a 32-bit program trying to map into +3GiB...+4GiB
+						 * would already be doing something that it shouldn't, as attempting to  map
+						 * that area of memory  is something that  cannot be done  when hosted by  a
+						 * 32-bit kernel) */
 
 						mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
 						mf.mfl_mman = mm;
@@ -615,7 +614,7 @@ again_lock_mman:
 #define NEED_got_node_and_lock
 							goto got_node_and_lock;
 						}
-						/* Make sure that `v_kernreserve' hasn't already been extended. */
+						/* Make sure that `thismman_kernel_reservation' hasn't already been extended. */
 						krs = &FORMMAN(mm, thismman_kernel_reservation);
 						assert(mnode_getaddr(krs) == (void *)KERNELSPACE_BASE ||
 						       mnode_getaddr(krs) == (void *)COMPAT_KERNELSPACE_BASE);
@@ -626,8 +625,8 @@ again_lock_mman:
 							                        (void const *)((uintptr_t)COMPAT_KERNELSPACE_BASE),
 							                        (void const *)((uintptr_t)UINT64_C(0x100000000) -
 							                                       (uintptr_t)COMPAT_KERNELSPACE_BASE))) {
-								/* All right! Let's extend the `v_kernreserve' node! */
-								printk(KERN_DEBUG "[x32] Extend v_kernreserve to include +3GiB...+4GiB\n");
+								/* All right! Let's extend the `thismman_kernel_reservation' node! */
+								printk(KERN_DEBUG "[x32] Extend thismman_kernel_reservation to include +3GiB...+4GiB\n");
 								mf.mfl_node = krs;
 								mman_mappings_removenode(mm, krs);
 								krs->mn_minaddr = (byte_t *)COMPAT_KERNELSPACE_BASE;
@@ -647,7 +646,6 @@ again_lock_mman:
 				}
 #endif /* !CONFIG_NO_USERKERN_SEGMENT && __x86_64__ */
 			}
-			/* TODO */
 			goto pop_connections_and_throw_segfault;
 		}
 #ifdef NEED_got_node_and_lock
@@ -697,6 +695,7 @@ do_handle_iob_node_access:
 					        "THIS_X86_IOPERM_BITMAP                = %p\n",
 					        me, FORCPU(me, thiscpu_x86_ioperm_bitmap),
 					        THIS_X86_IOPERM_BITMAP);
+
 					/* Make sure to handle any access errors after the ioperm() bitmap
 					 * was already mapped during the current quantum as full segfault. */
 					if unlikely(FORCPU(me, thiscpu_x86_ioperm_bitmap) != NULL) {
@@ -710,12 +709,15 @@ do_handle_iob_node_access:
 						}
 					}
 					allow_preemption = icpustate_getpreemption(state);
-					/* Make special checks if the access itself seems to
-					 * originate  from  a   direct  user-space   access. */
+
+					/* Make special checks if the access itself seems
+					 * to  originate from a direct user-space access. */
 					if (FAULT_IS_USER) {
+
 						/* User-space can never get write-access to the IOB vector. */
 						if (FAULT_IS_WRITE)
 							goto pop_connections_and_throw_segfault;
+
 						/* User-space isn't  allowed  to  directly  access  the  IOB  vector.
 						 * To not  rely on  undocumented processor  behavior, manually  check
 						 * if the  access  originates  from  a  user-space  I/O  instruction.

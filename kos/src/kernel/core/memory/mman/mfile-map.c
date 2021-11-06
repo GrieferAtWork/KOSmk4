@@ -654,12 +654,14 @@ continue_with_pnode:
 					 * a  time, since we always make an  effort to prevent duplicates from the
 					 * get-go,  meaning that  inside of  the already-allocated  list of nodes,
 					 * there should never be any node that re-using the part from another one. */
+					assert(*p_node == next);
+					assert(*p_duplicate_node == duplicate_node);
 					if (duplicate_node_is_after_gap) {
 						removed_nodes_lo = next;
 						removed_nodes_hi = duplicate_node;
 						SLIST_P_REMOVE_R(p_node, duplicate_node, _mn_alloc);
 					} else {
-						removed_nodes_lo = next;
+						removed_nodes_lo = duplicate_node;
 						removed_nodes_hi = prev;
 						SLIST_P_REMOVE_R(p_duplicate_node, prev, _mn_alloc);
 						p_node = p_duplicate_node;
