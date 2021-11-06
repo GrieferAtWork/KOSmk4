@@ -299,6 +299,54 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 }
 
 
+/* Return a reference to the first non-destroyed node with a base-ino >= `pred->fn_ino'.
+ * - When `pred == NULL' or `pred->fn_supent.rb_rhs == FSUPER_NODES_DELETED', return a
+ *   reference to the inode with the lowest address.
+ * - If no such INode exists, or the inode tree of `self' has been destroyed, return `NULL'. */
+PUBLIC WUNUSED NONNULL((1)) REF struct fnode *KCALL
+fsuper_nodeafter(struct fsuper *__restrict self, struct fnode *pred)
+		THROWS(E_WOULDBLOCK) {
+	REF struct fnode *result;
+again:
+	fsuper_nodes_read(self);
+again_locked:
+	result = self->fs_nodes;
+	if unlikely(result == NULL) {
+		/* There are no nodes */
+	} else if unlikely(result == FSUPER_NODES_DELETED) {
+		/* The node-tree has been deleted. */
+		result = NULL;
+	} else if (!pred || unlikely(pred->fn_supent.rb_rhs == FSUPER_NODES_DELETED)) {
+		/* The caller-given node is `NULL' or has been deleted. */
+		while (result->fn_supent.rb_lhs)
+			result = result->fn_supent.rb_lhs;
+	} else {
+		/* Find the next-larger node after `pred' */
+		struct fnode_tree_minmax mima;
+		fnode_tree_minmaxlocate(result, pred->fn_ino + 1, (ino_t)-1, &mima);
+		result = mima.mm_min;
+	}
+
+	/* Try to get a reference to the discovered node. */
+	if (result && unlikely(!tryincref(result))) {
+		/* If the node is dead, try to remove it. */
+		if (!fsuper_nodes_tryupgrade(self)) {
+			fsuper_nodes_endread(self);
+			fsuper_nodes_waitwrite(self);
+			goto again;
+		}
+		fsuper_nodes_removenode(self, result);
+		DBG_memset(&result->fn_supent, 0xcc, sizeof(result->fn_supent));
+		ATOMIC_WRITE(result->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+		fsuper_nodes_downgrade(self);
+		goto again_locked;
+	}
+	fsuper_nodes_endread(self);
+	return result;
+}
+
+
+
 
 
 /************************************************************************/

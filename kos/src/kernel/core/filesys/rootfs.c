@@ -35,12 +35,21 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/panic.h>
+#include <kernel/printk.h>
+
+#include <hybrid/atomic.h>
 
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN
+
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
 
 INTERN ATTR_FREEDATA char const *kernel_root_partition = NULL;
 DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_root_partition, KERNEL_COMMANDLINE_OPTION_TYPE_STRING, "boot");
@@ -52,11 +61,6 @@ DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_root_partition, KERNEL_COMMANDLINE_OPTIO
 #define FIND_UNIQUE_BLKDEV_BYDISKNAME  2
 #define FIND_UNIQUE_BLKDEV_BYPARTNAME2 3
 #define FIND_UNIQUE_BLKDEV_BYDISKNAME2 4
-/* TODO: Another criteria that tries to do `ffilesys_opendev()' for every partition that was detected.
- *       If a filesystem could be mounted, check if it contains a file "/os/kernel.bin", and if so, if
- *       that file is an  ELF binary with  a build timestamp (XXX:  add a build  timestamp to the  KOS
- *       kernel) that matches the timestamp of the loaded kernel.
- * NOTE: Also don't hardcode "/os/kernel.bin" here; use `module_getname(&kernel_driver)' */
 #define FIND_UNIQUE_BLKDEV_COUNT       5
 
 
@@ -143,12 +147,10 @@ NOTHROW(KCALL find_unique_blkdev)(unsigned int criteria) {
 
 
 /* Return the partition device which should be mounted as the filesystem root. */
-PRIVATE ATTR_FREETEXT ATTR_RETNONNULL WUNUSED REF struct blkdev *
+PRIVATE ATTR_FREETEXT WUNUSED REF struct blkdev *
 NOTHROW(KCALL kernel_get_root_partition)(void) {
 	REF struct blkdev *result;
 	unsigned int criteria;
-again:
-
 	/* Highest priority: kernel_root_partition (commandline option) */
 	if (kernel_root_partition) {
 		result = (REF struct blkdev *)device_lookup_bystring(kernel_root_partition,
@@ -166,6 +168,131 @@ again:
 			return result;
 	}
 
+	/* Default search criteria didn't yield any results. */
+	return NULL;
+}
+
+
+
+/* Open and return the `/os/kernel.bin' file (if present within `self') */
+PRIVATE ATTR_FREETEXT WUNUSED NONNULL((1)) REF struct fnode *KCALL
+fsuper_open_os_kernel_bin(struct fsuper *__restrict self) {
+	REF struct fnode *kbin;
+	kbin = fdirnode_lookup_path(&self->fs_root, kernel_driver.md_fsname->fd_name);
+	if (!kbin)
+		return NULL;
+	if unlikely(!fnode_isreg(kbin) ||
+	            !mfile_hasrawio(kbin)) {
+		decref_unlikely(kbin);
+		return NULL;
+	}
+	TRY {
+		/* TODO: Verify that `kbin' is an ELF binary, and that it contains
+		 *       a build timestamp that matches the build timestamp of our
+		 *       loaded kernel. */
+
+	} EXCEPT {
+		decref_unlikely(kbin);
+		RETHROW();
+	}
+	return kbin;
+}
+
+
+/* Go through all block devices and try to open them as superblocks.
+ * When able to do the open, check if the filesystem contains a file
+ * "/os/kernel.bin" that is a regular file */
+PRIVATE ATTR_FREETEXT WUNUSED NONNULL((1, 2)) REF struct fsuper *
+NOTHROW(KCALL kernel_open_rootfs_trydev)(struct blkdev *__restrict dev,
+                                         bool *__restrict pnewly_created) {
+	REF struct fsuper *result = NULL;
+	TRY {
+		/* Try to open the superblock. */
+		result = ffilesys_opendev(pnewly_created, dev, NULL);
+		if (result) {
+			REF struct fnode *kernel_bin;
+			printk(FREESTR(KERN_INFO "[boot] Opened \"/dev/%#q\" as %s-filesystem; checking for %q\n"),
+			       dev->dv_dirent->dd_dirent.fd_name, result->fs_sys->ffs_name,
+			       kernel_driver.md_fsname->fd_name);
+
+			/* Try to open "/os/kernel.bin" on this filesystem. */
+			kernel_bin = fsuper_open_os_kernel_bin(result);
+			if (kernel_bin) {
+				/* Found it!
+				 * NOTE: Even when `kernel_driver.md_file != NULL' at this point,
+				 *       whatever that field was pointing to before couldn't have
+				 *       been correct, since we've only  now found the actual  fs
+				 *       containing the kernel. */
+				ATOMIC_WRITE(kernel_driver.md_file, kernel_bin);
+				return result;
+			}
+		}
+	} EXCEPT {
+		error_printf(FREESTR("Opening blkdev \"/dev/%#q\""),
+		             dev->dv_dirent->dd_dirent.fd_name);
+	}
+	if (result) {
+		if (*pnewly_created)
+			ffilesys_open_done(dev);
+		decref_likely(result);
+	}
+	return NULL;
+}
+
+
+PRIVATE ATTR_FREETEXT WUNUSED NONNULL((1)) REF struct fsuper *
+NOTHROW(KCALL kernel_open_rootfs_bydev)(bool *__restrict pnewly_created,
+                                        bool mount_partitions) {
+	REF struct fnode *iter = fsuper_nodeafter(&devfs, NULL);
+	while (iter) {
+		FINALLY_DECREF_UNLIKELY(iter);
+		if (mount_partitions ? fnode_isblkpart(iter)
+		                     : fnode_isblkroot(iter)) {
+			REF struct fsuper *result;
+			result = kernel_open_rootfs_trydev(fnode_asblkdev(iter),
+			                                   pnewly_created);
+			if (result)
+				return result;
+		}
+		iter = fsuper_nodeafter(&devfs, iter);
+	}
+	return NULL;
+}
+
+
+/* Return an opened superblock for the boot=... root partition. */
+PRIVATE ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fsuper *
+NOTHROW(KCALL kernel_open_rootfs)(bool *__restrict pnewly_created) {
+	REF struct fsuper *result;
+	REF struct blkdev *rootpart;
+again:
+	rootpart = kernel_get_root_partition();
+
+	/* Open the filesystem of the partition */
+	if (rootpart) {
+		FINALLY_DECREF_UNLIKELY(rootpart);
+		result = ffilesys_opendev(pnewly_created, rootpart, NULL);
+		if unlikely(!result) {
+			kernel_panic(FREESTR("No driver to open boot parition \"/dev/%#q\" "
+			                     "(reboot with relevant fs-driver or different `boot=...')"),
+			             rootpart->dv_dirent->dd_dirent.fd_name);
+			goto again;
+		}
+		return result;
+	}
+
+	/* Tell the user what's going on. */
+	printk(FREESTR(KERN_WARNING "[boot] Boot partition not found or ambiguous consider booting with `boot=...'\n"
+	                            "[boot] Trying to find root filesystem by opening all block devices in search of %q\n"),
+	       kernel_driver.md_fsname->fd_name);
+
+	/* Try to tell the root filesystem by the presence of `/os/kernel.bin' */
+	if ((result = kernel_open_rootfs_bydev(pnewly_created, true)) != NULL)
+		return result;
+	if ((result = kernel_open_rootfs_bydev(pnewly_created, false)) != NULL)
+		return result;
+
+
 	/* Fallback: cause kernel panic */
 	kernel_panic(FREESTR("Boot partition not found or ambiguous (reboot with `boot=...')"));
 	goto again;
@@ -173,16 +300,12 @@ again:
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_rootfs)(void) {
-	REF struct blkdev *root;
 	struct pathmount *mount;
 	REF struct fsuper *super;
 	bool newly_created;
 
-	/* Lookup the root partition. */
-	root = kernel_get_root_partition();
-
 	/* Open the filesystem of the partition */
-	super = ffilesys_opendev(&newly_created, root, NULL);
+	super = kernel_open_rootfs(&newly_created);
 
 	/* Create the root mounting point descriptor. */
 	mount = _pathmount_alloc();
@@ -249,8 +372,8 @@ again_acquire_locks:
 	vfs_rootlock_endwrite(&vfs_kernel);
 
 	/* Indicate completion of the mount operation. */
-	ffilesys_open_done(root);
-	decref_unlikely(root);
+	if (newly_created)
+		ffilesys_open_done(super->fs_dev);
 }
 
 

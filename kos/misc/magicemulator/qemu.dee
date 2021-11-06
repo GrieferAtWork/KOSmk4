@@ -201,12 +201,10 @@ did_update_x86_64_kernel:
 		/* Enable the VM-based RTC clock, which pauses when the kernel is paused. */
 		"-rtc", "base=utc,clock=vm"
 	});
-	local hasSecondaryDrives = false;
 	if (fs.stat.exists("../disk.img")) {
 		qemu_arguments.extend({
 			"-drive", "file=../disk.img,format=raw,index=1,media=disk"
 		});
-		hasSecondaryDrives = true;
 	}
 	if (fs.stat.exists("bin/ext2.img")) {
 		qemu_arguments.extend({
@@ -217,7 +215,6 @@ did_update_x86_64_kernel:
 			"-device", "usb-mouse,bus=ohci.0",
 //			"-device", "usb-kbd,bus=uhci.0",
 		});
-		hasSecondaryDrives = true;
 	}
 	local enableMonitorCommands = false;
 	local monitorCommandPipe = none;
@@ -228,12 +225,7 @@ did_update_x86_64_kernel:
 		r, monitorCommandPipe = ipc.Pipe.new()...;
 		enableMonitorCommands = Thread(qemuMonitorBackend, ("localhost:" + port, r));
 	}
-	local cmdline = options.get(opt.CMDLINE, "");
-	if (hasSecondaryDrives) {
-		if (cmdline)
-			cmdline = " " + cmdline;
-		cmdline = "boot=/dev/hda1" + cmdline;
-	}
+	local cmdline = options.get(opt.CMDLINE);
 	if (cmdline) {
 		qemu_arguments.append("-append");
 		qemu_arguments.append(cmdline);

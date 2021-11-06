@@ -148,12 +148,6 @@ struct my_node {
 #define RBTREE_GETMAXKEY RBTREE_GETKEY
 #endif /* RBTREE_GETKEY && !RBTREE_GETMINKEY && !RBTREE_GETMAXKEY */
 
-/* Prevent illegal combinations */
-#if defined(RBTREE_WANT_PREV_NEXT_NODE) && defined(RBTREE_LEFT_LEANING)
-#error "`RBTREE_WANT_PREV_NEXT_NODE' cannot be used with \
-        `RBTREE_LEFT_LEANING', due to the missing parent-pointer"
-#endif /* RBTREE_WANT_PREV_NEXT_NODE && RBTREE_LEFT_LEANING */
-
 
 
 /* ===== Optional features ===== */
@@ -247,14 +241,24 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 /* Return the next node with a key-range located below `node'
  * If  no  such  node exists,  return  `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
+#ifdef RBTREE_WANT_MINMAXLOCATE
+RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) RBTREE_T *
+RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T *root, RBTREE_T const *node);
+#else /* RBTREE_WANT_MINMAXLOCATE */
 RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node);
+#endif /* !RBTREE_WANT_MINMAXLOCATE */
 
 /* Return the next node with a key-range located above `node'
  * If  no  such  node exists,  return  `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
+#ifdef RBTREE_WANT_MINMAXLOCATE
+RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) RBTREE_T *
+RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T *root, RBTREE_T const *node);
+#else /* RBTREE_WANT_MINMAXLOCATE */
 RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node);
+#endif /* !RBTREE_WANT_MINMAXLOCATE */
 #endif /* RBTREE_WANT_PREV_NEXT_NODE */
 
 
@@ -1580,9 +1584,43 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_WUNUSED __ATTR_NONNULL((1)), RBTREE_T
 #endif /* RBTREE_WANT_RREMOVE */
 
 #if defined(RBTREE_WANT_PREV_NEXT_NODE) || defined(RBTREE_WANT_MINMAXLOCATE)
+
+/* Find the parent  of `node'  by searching through  the given  tree from  `root'
+ * Returns `RBTREE_NULL' when `root == node' (in which case `node' has no parent) */
+#ifdef RBTREE_LEFT_LEANING
+RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), RBTREE_T *, RBTREE_NOTHROW,
+                       RBTREE_CC, RBTREE(tryhard_getpar), (RBTREE_T *root, RBTREE_T const *node), (node)) {
+	if (RBTREE_NODE_EQ(root, node))
+		return RBTREE_NULL;
+	for (;;) {
+		RBTREE_LOCVAR(RBTREE_T *, next);
+		RBTREE_ASSERT(RBTREE_NODE_NOT_ISNULL(root));
+		if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(node), RBTREE_GETMINKEY(root))) {
+			next = RBTREE_GETLHS(root);
+		} else {
+			next = RBTREE_GETRHS(root);
+		}
+		if (RBTREE_NODE_EQ(next, node))
+			break;
+		root = next;
+	}
+	return root;
+}
+#endif /* RBTREE_LEFT_LEANING */
+
+
 /* Return the next node with a key-range located below `node'
  * If  no  such  node exists,  return  `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
+#ifdef RBTREE_WANT_MINMAXLOCATE
+#ifdef RBTREE_WANT_PREV_NEXT_NODE
+RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), RBTREE_T *, RBTREE_NOTHROW,
+                       RBTREE_CC, RBTREE(prevnode), (RBTREE_T *root, RBTREE_T const *node), (root, node))
+#else /* RBTREE_WANT_PREV_NEXT_NODE */
+RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), RBTREE_T *, RBTREE_NOTHROW,
+                       RBTREE_CC, RBTREE(prevnode), (RBTREE_T *root, RBTREE_T const *node), (root, node))
+#endif /* !RBTREE_WANT_PREV_NEXT_NODE */
+#else /* RBTREE_WANT_MINMAXLOCATE */
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)), RBTREE_T *, RBTREE_NOTHROW,
                        RBTREE_CC, RBTREE(prevnode), (RBTREE_T const *__restrict node), (node))
@@ -1590,6 +1628,7 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1
 RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)), RBTREE_T *, RBTREE_NOTHROW,
                        RBTREE_CC, RBTREE(prevnode), (RBTREE_T const *__restrict node), (node))
 #endif /* !RBTREE_WANT_PREV_NEXT_NODE */
+#endif /* !RBTREE_WANT_MINMAXLOCATE */
 {
 	RBTREE_LOCVAR(RBTREE_T *, result);
 	result = RBTREE_GETLHS(node);
@@ -1597,7 +1636,11 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))
 		/* Keep going up until we reach the ROOT (NULL),
 		 * or reach a  parent via its  RHS-child-branch. */
 		for (;;) {
+#ifdef RBTREE_WANT_MINMAXLOCATE
+			result = RBTREE(tryhard_getpar)(root, node);
+#else /* RBTREE_WANT_MINMAXLOCATE */
 			result = RBTREE_GETPAR(node);
+#endif /* !RBTREE_WANT_MINMAXLOCATE */
 			if (RBTREE_NODE_ISNULL(result))
 				break;
 			if (RBTREE_NODE_EQ(RBTREE_GETRHS(result), node))
@@ -1615,6 +1658,15 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))
 /* Return the next node with a key-range located above `node'
  * If  no  such  node exists,  return  `RBTREE_NULL' instead.
  * NOTE: This function takes O(log(N)) to execute. */
+#ifdef RBTREE_WANT_MINMAXLOCATE
+#ifdef RBTREE_WANT_PREV_NEXT_NODE
+RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), RBTREE_T *, RBTREE_NOTHROW,
+                       RBTREE_CC, RBTREE(nextnode), (RBTREE_T *root, RBTREE_T const *node), (root, node))
+#else /* RBTREE_WANT_PREV_NEXT_NODE */
+RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), RBTREE_T *, RBTREE_NOTHROW,
+                       RBTREE_CC, RBTREE(nextnode), (RBTREE_T *root, RBTREE_T const *node), (root, node))
+#endif /* !RBTREE_WANT_PREV_NEXT_NODE */
+#else /* RBTREE_WANT_MINMAXLOCATE */
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)), RBTREE_T *, RBTREE_NOTHROW,
                        RBTREE_CC, RBTREE(nextnode), (RBTREE_T const *__restrict node), (node))
@@ -1622,6 +1674,7 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1
 RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)), RBTREE_T *, RBTREE_NOTHROW,
                        RBTREE_CC, RBTREE(nextnode), (RBTREE_T const *__restrict node), (node))
 #endif /* !RBTREE_WANT_PREV_NEXT_NODE */
+#endif /* !RBTREE_WANT_MINMAXLOCATE */
 {
 	RBTREE_LOCVAR(RBTREE_T *, result);
 	result = RBTREE_GETRHS(node);
@@ -1629,7 +1682,11 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))
 		/* Keep going up until we reach the ROOT (NULL),
 		 * or reach a  parent via its  LHS-child-branch. */
 		for (;;) {
+#ifdef RBTREE_WANT_MINMAXLOCATE
+			result = RBTREE(tryhard_getpar)(root, node);
+#else /* RBTREE_WANT_MINMAXLOCATE */
 			result = RBTREE_GETPAR(node);
+#endif /* !RBTREE_WANT_MINMAXLOCATE */
 			if (RBTREE_NODE_ISNULL(result))
 				break;
 			if (RBTREE_NODE_EQ(RBTREE_GETLHS(result), node))
@@ -1764,7 +1821,11 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 		 * we must still  check for the  case where the  predecessor/successor
 		 * the min/max node continues to be in-bounds! */
 		for (;;) {
+#ifdef RBTREE_WANT_MINMAXLOCATE
+			iter = RBTREE(prevnode)(root, min_node);
+#else /* RBTREE_WANT_MINMAXLOCATE */
 			iter = RBTREE(prevnode)(min_node);
+#endif /* !RBTREE_WANT_MINMAXLOCATE */
 			if (RBTREE_NODE_ISNULL(iter))
 				break;
 			if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(iter), minkey))
@@ -1772,7 +1833,11 @@ RBTREE_NOTHROW_U(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 			min_node = iter;
 		}
 		for (;;) {
+#ifdef RBTREE_WANT_MINMAXLOCATE
+			iter = RBTREE(nextnode)(root, max_node);
+#else /* RBTREE_WANT_MINMAXLOCATE */
 			iter = RBTREE(nextnode)(max_node);
+#endif /* !RBTREE_WANT_MINMAXLOCATE */
 			if (RBTREE_NODE_ISNULL(iter))
 				break;
 			if (RBTREE_KEY_GR(RBTREE_GETMINKEY(iter), maxkey))

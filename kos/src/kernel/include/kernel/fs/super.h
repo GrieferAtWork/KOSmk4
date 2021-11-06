@@ -461,6 +461,14 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self);
 #define fsuper_v_stream_ops fdirnode_v_stream_ops
 
 
+/* Return a reference to the first non-destroyed node with a base-ino >= `pred->fn_ino'.
+ * - When `pred == NULL' or `pred->fn_supent.rb_rhs == FSUPER_NODES_DELETED', return a
+ *   reference to the inode with the lowest address.
+ * - If no such INode exists, or the inode tree of `self' has been destroyed, return `NULL'. */
+FUNDEF WUNUSED NONNULL((1)) REF struct fnode *KCALL
+fsuper_nodeafter(struct fsuper *__restrict self, struct fnode *pred)
+		THROWS(E_WOULDBLOCK);
+
 
 /* #1: Remove `self' from the list of changed superblocks (if not done already)
  * #2: Write modified data and attributes of all changed fnode-s to disk.

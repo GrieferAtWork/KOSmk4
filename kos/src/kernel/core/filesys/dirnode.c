@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_FILESYS_DIRNODE_C
 #define GUARD_KERNEL_CORE_FILESYS_DIRNODE_C 1
+#define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -242,6 +243,104 @@ PUBLIC_CONST struct mfile_stream_ops const fdirnode_v_stream_ops = {
 	.mso_ioctl = &fdirnode_v_ioctl,
 	.mso_hop   = &fdirnode_v_hop,
 };
+
+
+
+
+/* Helper-wrapper for `fdirent_opennode(fdirnode_lookup(self, info))'
+ * @return: NULL: No entry exists  that is matching  the given  name.
+ *                The  case  where `fdirent_opennode()'  returns NULL
+ *                is implicitly handled by repeating the lookup until
+ *                a non-deleted entry (or no entry at all) is  found. */
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *FCALL
+fdirnode_lookup_node(struct fdirnode *__restrict self,
+                     struct flookup_info *__restrict info,
+                     /*out[1..1]_opt*/ REF struct fdirent **p_dirent)
+		THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...) {
+	REF struct fnode *result;
+	REF struct fdirent *ent;
+again:
+	ent = fdirnode_lookup(self, info);
+	if (!ent)
+		return NULL; /* Non-existent file */
+	TRY {
+		result = fdirent_opennode(ent, self);
+	} EXCEPT {
+		decref_unlikely(ent);
+		RETHROW();
+	}
+	if unlikely(!result) {
+		/* Race condition: directory entry was deleted after the lookup above! */
+		decref_likely(ent);
+		goto again;
+	}
+	/* Write-back results */
+	if (p_dirent) {
+		*p_dirent = ent; /* Inherit reference */
+	} else {
+		decref_unlikely(ent);
+	}
+	return result;
+}
+
+
+
+/* !!! DON'T USE THIS FUNCTION IF YOU COULD ALSO USE `path_traverse()' !!!
+ *
+ * Low-level implementation of a directory path walking function. Mainly
+ * intended to traverse filesystem paths without mounting a directory on
+ * some `struct path'. This function simply  scans `path' for '/'  chars
+ * and does a really dumb path traversal.
+ *  - _NO_ support for symbolic links.
+ *  - _NO_ support for "." and ".." references
+ *  - _NO_ support for permission checks
+ *  - _NO_ support for dos paths
+ *  - _NO_ support not-a-directory exceptions (if a path isn't a directory, return `NULL')
+ *  - Empty paths segments are silently ignored (including leading/trailing '/')
+ *
+ * @return: NULL: File not found (path or file doesn't exist,
+ *                or a segment of the path isn't a directory) */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct fnode *FCALL
+fdirnode_lookup_path(struct fdirnode *__restrict self,
+                     USER CHECKED char const *path)
+		THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...) {
+	REF struct fnode *result = mfile_asnode(incref(self));
+	for (;;) {
+		USER CHECKED char const *sep;
+		size_t partlen;
+		TRY {
+			sep = strchrnul(path, '/');
+		} EXCEPT {
+			decref_unlikely(result);
+			RETHROW();
+		}
+		partlen = (size_t)(sep - path);
+		if (partlen != 0) {
+			struct flookup_info info;
+			FINALLY_DECREF_UNLIKELY(result);
+			if unlikely(!fnode_isdir(result))
+				return NULL; /* Not a directory */
+			if unlikely(partlen > 0xffff)
+				return NULL; /* Name too long */
+			info.flu_name    = path;
+			info.flu_namelen = (u16)partlen;
+			info.flu_flags   = 0;
+			info.flu_hash    = FLOOKUP_INFO_HASH_UNSET;
+			result = fdirnode_lookup_node(fnode_asdir(result), &info);
+			if unlikely(!result)
+				return NULL; /* File not found */
+		}
+		TRY {
+			if (!*sep)
+				break;
+		} EXCEPT {
+			decref_unlikely(result);
+			RETHROW();
+		}
+		path = sep + 1;
+	}
+	return result;
+}
 
 
 

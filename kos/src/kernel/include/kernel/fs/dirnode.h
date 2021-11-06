@@ -536,6 +536,38 @@ DATDEF struct mfile_stream_ops const fdirnode_v_stream_ops;
 #define fdirnode_lookup(self, info) \
 	(*fdirnode_getops(self)->dno_lookup)(self, info)
 
+/* Helper-wrapper for `fdirent_opennode(fdirnode_lookup(self, info))'
+ * @return: NULL: No entry exists  that is matching  the given  name.
+ *                The  case  where `fdirent_opennode()'  returns NULL
+ *                is implicitly handled by repeating the lookup until
+ *                a non-deleted entry (or no entry at all) is  found. */
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *FCALL
+fdirnode_lookup_node(struct fdirnode *__restrict self,
+                     struct flookup_info *__restrict info,
+                     /*out[1..1]_opt*/ REF struct fdirent **p_dirent DFL(__NULLPTR))
+		THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...);
+
+/* !!! DON'T USE THIS FUNCTION IF YOU COULD ALSO USE `path_traverse()' !!!
+ *
+ * Low-level implementation of a directory path walking function. Mainly
+ * intended to traverse filesystem paths without mounting a directory on
+ * some `struct path'. This function simply  scans `path' for '/'  chars
+ * and does a really dumb path traversal.
+ *  - _NO_ support for symbolic links.
+ *  - _NO_ support for "." and ".." references
+ *  - _NO_ support for permission checks
+ *  - _NO_ support for dos paths
+ *  - _NO_ support not-a-directory exceptions (if a path isn't a directory, return `NULL')
+ *  - Empty paths segments are silently ignored (including leading/trailing '/')
+ *
+ * @return: NULL: File not found (path or file doesn't exist,
+ *                or a segment of the path isn't a directory) */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct fnode *FCALL
+fdirnode_lookup_path(struct fdirnode *__restrict self,
+                     USER CHECKED char const *path)
+		THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...);
+
+
 /* Construct a directory  enumerator object in  `*result'.
  * This function must initialize _all_ fields of `*result'
  * It  is undefined if files created or  deleted after the creation of an

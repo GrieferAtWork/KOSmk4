@@ -55,6 +55,9 @@
 /* Filenode tree operations. (for `struct fsuper::fs_nodes') */
 #define RBTREE_LEFT_LEANING
 #define RBTREE_WANT_TRYINSERT
+#define RBTREE_WANT_MINMAXLOCATE
+#define RBTREE_MINMAX_T_DEFINED
+#define fnode_tree_minmax_t        struct fnode_tree_minmax
 #define RBTREE(name)               fnode_tree_##name
 #define RBTREE_T                   struct fnode
 #define RBTREE_Tkey                ino_t

@@ -630,11 +630,17 @@ NOTHROW(FCALL fnode_delete_impl)(/*inherit(always)*/ REF struct fnode *__restric
 #define mfile_asblkdev(self)  fnode_asblkdev(mfile_asnode(self))
 
 /* Filenode tree operations. (for `struct fsuper::fs_nodes') */
+struct fnode_tree_minmax {
+	struct fnode *mm_min; /* [0..1] Lowest branch. */
+	struct fnode *mm_max; /* [0..1] Greatest branch. */
+};
+
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct fnode *NOTHROW(FCALL fnode_tree_locate)(/*nullable*/ struct fnode *root, ino_t key);
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL fnode_tree_tryinsert)(struct fnode **__restrict proot, struct fnode *__restrict node);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fnode_tree_insert)(struct fnode **__restrict proot, struct fnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct fnode *NOTHROW(FCALL fnode_tree_remove)(struct fnode **__restrict proot, ino_t key);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fnode_tree_removenode)(struct fnode **__restrict proot, struct fnode *__restrict node);
+FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL fnode_tree_minmaxlocate)(struct fnode *root, ino_t minkey, ino_t maxkey, struct fnode_tree_minmax *__restrict result);
 
 DECL_END
 #endif /* __CC__ */
