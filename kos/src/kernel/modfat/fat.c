@@ -2353,9 +2353,20 @@ FatSuper_GetLabel(struct fsuper *__restrict self,
 	STATIC_ASSERT(FSLABEL_MAX >= 12);
 	FatSuperblock *me = fsuper_asfat(self);
 	char label[12];
+	pflag_t was;
+
+	/* Load current label */
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
 	atomic_lock_acquire(&me->fs_stringslock);
+#endif /* !CONFIG_NO_SMP */
 	memcpy(label, me->ft_label, 12);
+#ifndef CONFIG_NO_SMP
 	atomic_lock_release(&me->fs_stringslock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+
+	/* Copy label to user-space.  */
 	strcpy(buf, label);
 	return true;
 }
@@ -2369,12 +2380,10 @@ FatSuper_SetLabel(struct fsuper *__restrict self,
 	char newlabel[12];
 	FatSuperblock *me = fsuper_asfat(self);
 	pos_t diskaddr;
+	pflag_t was;
 	if unlikely(namelen >= 12)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG, namelen);
 	*(char *)mempcpy(newlabel, name, namelen) = '\0';
-	atomic_lock_acquire(&me->fs_stringslock);
-	memcpy(me->ft_label, newlabel, 12);
-	atomic_lock_release(&me->fs_stringslock);
 
 	/* Write the updated label string to disk. */
 	for (i = 0; i < 11; ++i) {
@@ -2385,6 +2394,18 @@ FatSuper_SetLabel(struct fsuper *__restrict self,
 	                                        : offsetof(FatDiskHeader, fat16.f16_label));
 	mfile_writeall(me->ft_super.ffs_super.fs_dev, newlabel, 11 * sizeof(char), diskaddr);
 	mfile_sync(me->ft_super.ffs_super.fs_dev);
+
+	/* Save the new label */
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
+	atomic_lock_acquire_nopr(&me->fs_stringslock);
+#endif /* !CONFIG_NO_SMP */
+	memcpy(me->ft_label, newlabel, 12);
+#ifndef CONFIG_NO_SMP
+	atomic_lock_release(&me->fs_stringslock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+
 	return true;
 }
 
@@ -2782,7 +2803,9 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		trimspecstring(result->ft_oem, 8);
 		trimspecstring(result->ft_label, 11);
 		trimspecstring(result->ft_sysname, 8);
+#ifndef CONFIG_NO_SMP
 		atomic_lock_init(&result->fs_stringslock);
+#endif /* !CONFIG_NO_SMP */
 
 		/* Map the FAT table into memory. */
 		TRY {

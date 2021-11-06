@@ -279,8 +279,9 @@ fsuper_setlabel(struct fsuper *__restrict self,
 		return (*ops->so_setlabel)(self, name, namelen);
 
 	/* Special handling for singleton filesystems. */
-	if (self->fs_sys->ffs_flags & FFILESYS_F_SINGLE)
-		THROW(E_FSERROR_READONLY); /* Here, the """label""" is read-only */
+	if ((ops->so_getlabel != NULL) ||                  /* There's a getlabel operator, but no setlabel one... */
+	    (self->fs_sys->ffs_flags & FFILESYS_F_SINGLE)) /* Here, the """label""" is read-only */
+		THROW(E_FSERROR_READONLY);
 	return false;
 }
 
