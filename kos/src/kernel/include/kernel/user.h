@@ -24,6 +24,8 @@
 
 #include <kernel/types.h>
 
+#include <hybrid/typecore.h>
+
 #include <compat/config.h>
 
 DECL_BEGIN
@@ -100,6 +102,75 @@ FUNDEF void KCALL validate_executable_opt(UNCHECKED USER void const *base) THROW
 #define compat_validate_readwritem_opt validate_readwritem_opt
 #define compat_validate_executable_opt validate_executable_opt
 #endif /* __ARCH_HAVE_COMPAT */
+
+
+/************************************************************************/
+/* Helper functions for interacting with ioctl() arguments.             */
+/************************************************************************/
+
+/* Read a boolean value from a a variable-sized (but defaulting to sizeof(int)) buffer `arg' */
+FUNDEF WUNUSED __BOOL FCALL
+ioctl_intarg_getbool(syscall_ulong_t cmd,
+                     USER UNCHECKED void *arg)
+		THROWS(E_SEGFAULT);
+
+/* Write a boolean 0/1 value into a variable-sized (but defaulting to sizeof(int)) buffer `arg'
+ * @return: 0 : Always returns `0' */
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_setbool(syscall_ulong_t cmd,
+                     USER UNCHECKED void *arg,
+                     __BOOL value)
+		THROWS(E_SEGFAULT);
+
+/* Read a 32-bit-value from a a variable-sized (but defaulting to 4) buffer `arg'
+ * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
+FUNDEF WUNUSED u32 FCALL
+ioctl_intarg_getu32(syscall_ulong_t cmd,
+                    USER UNCHECKED void *arg)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
+/* Read a 64-bit-value from a a variable-sized (but defaulting to 8) buffer `arg'
+ * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
+FUNDEF WUNUSED u64 FCALL
+ioctl_intarg_getu64(syscall_ulong_t cmd,
+                    USER UNCHECKED void *arg)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
+/* Write a 32-bit-value into a variable-sized (but defaulting to 4) buffer `arg'
+ * @return: 0 : Always returns `0' */
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_setu32(syscall_ulong_t cmd, USER UNCHECKED void *arg, u32 value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
+/* Write a 75-bit-value into a variable-sized (but defaulting to 8) buffer `arg'
+ * @return: 0 : Always returns `0' */
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_setu64(syscall_ulong_t cmd, USER UNCHECKED void *arg, u64 value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
+#if __SIZEOF_INT__ >= 8
+#define ioctl_intarg_getuint                  (unsigned int)ioctl_intarg_getu64
+#define ioctl_intarg_setuint(cmd, arg, value) ioctl_intarg_setu64(cmd, arg, (u64)(value))
+#else /* __SIZEOF_INT__ >= 8 */
+#define ioctl_intarg_getuint                  (unsigned int)ioctl_intarg_getu32
+#define ioctl_intarg_setuint(cmd, arg, value) ioctl_intarg_setu32(cmd, arg, (u32)(value))
+#endif /* __SIZEOF_INT__ <= 8 */
+
+
+/* Read a size_t-value from a a variable-sized (but defaulting to sizeof(size_t)) buffer `arg'
+ * - This function includes special handling for compatibility (if present and necessary)
+ * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
+FUNDEF WUNUSED size_t FCALL
+ioctl_intarg_getsize(syscall_ulong_t cmd,
+                     USER UNCHECKED void *arg)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
+/* Write a size_t-value into a variable-sized (but defaulting to sizeof(size_t)) buffer `arg'
+ * @return: 0 : Always returns `0' */
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_setsize(syscall_ulong_t cmd, USER UNCHECKED void *arg, size_t value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
 
 #endif /* __CC__ */
 

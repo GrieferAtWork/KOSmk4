@@ -228,7 +228,9 @@ again_lookup_part_locked:
 			mf.mfl_size -= page_offset;
 			mf.mfl_size -= tail_offset;
 
-			/* If we're doing a write-DMA, mark the accessed address range as changed. */
+			/* If we're doing a write-DMA, mark the accessed address range as changed.
+			 * NOTE: No need to check for READONLY files; that's already done inside
+			 *       of `mfault_or_unlock()'. */
 			if (flags & MMAN_FAULT_F_WRITE)
 				mpart_changed(mf.mfl_part, mf.mfl_offs, mf.mfl_size);
 

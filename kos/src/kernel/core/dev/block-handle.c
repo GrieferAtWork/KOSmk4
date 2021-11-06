@@ -136,7 +136,7 @@ block_device_get_readahead(struct blkdev *__restrict self) {
 
 LOCAL NONNULL((1)) void KCALL
 block_device_set_readahead(struct blkdev *__restrict self, size_t value) {
-	require(CAP_SET_BLOCKDEV_READAHEAD);
+	require(CAP_SYS_ADMIN);
 	/* KOS doesn't implement read-ahead on the block-device layer.
 	 * Instead,  read-ahead (if at all) is only done on a per-file
 	 * basis, where we cache them in mpart objects. */
@@ -163,7 +163,7 @@ block_device_get_max_sectors_per_request(struct blkdev *__restrict self) {
 
 LOCAL NONNULL((1)) void KCALL
 block_device_set_max_sectors_per_request(struct blkdev *__restrict self, u16 value) {
-	require(CAP_SET_BLOCKDEV_SECTORS_PER_REQUEST);
+	require(CAP_SYS_ADMIN);
 	(void)self;
 	(void)value;
 	/* XXX: Implement me? */
@@ -176,7 +176,7 @@ block_device_get_sector_size(struct blkdev *__restrict self) {
 
 LOCAL NONNULL((1)) void KCALL
 block_device_set_sector_size(struct blkdev *__restrict self, size_t value) {
-	require(CAP_SET_BLOCKDEV_SECTORSIZE);
+	require(CAP_SYS_ADMIN);
 	/* XXX: Throw some kind of error when `value != self->bd_sector_size' */
 	(void)self;
 	(void)value;
@@ -193,7 +193,7 @@ handle_blkdev_ioctl(struct blkdev *__restrict self,
 	case _IOW(_IOC_TYPE(BLKROSET), _IOC_NR(BLKROSET), int): {
 		int value;
 		validate_readable(arg, sizeof(value));
-		require(CAP_SET_BLOCKDEV_READONLY);
+		require(CAP_SYS_ADMIN);
 		value = *(USER CHECKED int *)arg;
 		if (value)
 			ATOMIC_OR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
@@ -510,7 +510,7 @@ handle_blkdev_hop(struct blkdev *__restrict self,
 		return ATOMIC_READ(self->bd_flags) & BLOCK_DEVICE_FLAG_READONLY ? 1 : 0;
 
 	case HOP_BLKDEV_WRREADONLY:
-		require(CAP_SET_BLOCKDEV_READONLY);
+		require(CAP_SYS_ADMIN);
 		if (arg)
 			ATOMIC_OR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
 		else {

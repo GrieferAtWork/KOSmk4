@@ -324,8 +324,11 @@ struct mfile_stream_ops {
 };
 
 /* Default ioctl(2) operator for mfiles. Implements:
- *  - FS_IOC_GETFLAGS
- *  - FS_IOC_SETFLAGS */
+ *  - FS_IOC_GETFLAGS, FS_IOC_SETFLAGS
+ *  - FS_IOC_GETFSLABEL, FS_IOC_SETFSLABEL
+ *  - BLKROSET, BLKROGET, BLKFLSBUF
+ *  - BLKSSZGET, BLKBSZGET,
+ *  - BLKGETSIZE, BLKGETSIZE64 */
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
@@ -606,7 +609,11 @@ struct mfile_ops {
 #define MFILE_F_READONLY        0x00000001 /* [lock(READ:  mf_lock || mpart_lock_acquired(ANY(mf_parts)),
                                             *       WRITE: mf_lock && mpart_lock_acquired(ALL(mf_parts)))]
                                             * Disallow `mfile_write()', as  well as `PROT_WRITE|PROT_SHARED'  mappings.
-                                            * Attempting to do either will result in `E_FSERROR_READONLY' being thrown. */
+                                            * Attempting to do either will result in `E_FSERROR_READONLY' being thrown.
+                                            *
+                                            * NOTE: If intending to set this flag, you should probably precede this  by
+                                            *       a call to `mfile_parts_denywrite_or_unlock()'. Else, existing write
+                                            *       mappings of file parts will continue to have that access! */
 #define MFILE_FS_NOSUID         0x00000002 /* [lock(ATOMIC)] fsuper-specific: Ignore `S_ISGID' and `S_ISUID' bits. */
 #define MFILE_FN_GLOBAL_REF     0x00000004 /* [lock(CLEAR_ONCE)] fnode-specific: The global list of fnode-s or fsuper-s holds a reference to this one. */
 #define MFILE_FS_NOEXEC         0x00000008 /* [lock(ATOMIC)] fsuper-specific: Disallow execution of files. */
@@ -617,11 +624,13 @@ struct mfile_ops {
                                             * will be the same  sooner or later, though  this may not be  the case yet,  since
                                             * file anonymization &  all of  that jazz  happens asynchronously  through use  of
                                             * lockops!
-                                            * Note  that this flag implies `MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE', except
-                                            * that the delete-operation itself will eventually  be allowed to set the  file's
-                                            * size to `0'. Once async deletion is complete, the file's part-tree and changed-
-                                            * list will be set to  MFILE_PARTS_ANONYMOUS, the file will  have a zero of  `0',
-                                            * and all of its used-to-be parts will be anon, too. */
+                                            * Note  that this flag  implies `MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE', but also
+                                            * negates `MFILE_F_READONLY' for memory mappings (since those will eventually become
+                                            * anonymous, at which point write access is  once again allowed). But note that  the
+                                            * delete-operation itself will eventually be allowed to set the file's size to  `0'.
+                                            * Once async deletion is complete, the file's part-tree and changed-list will be set
+                                            * to  MFILE_PARTS_ANONYMOUS, the file will have a zero  of `0', and all of its used-
+                                            * to-be parts will be anon, too. */
 /*      MFILE_F_                0x00000040  * ... Reserved: MS_MANDLOCK */
 /*      MFILE_F_                0x00000080  * ... Reserved: MS_DIRSYNC */
 #define MFILE_F_ATTRCHANGED     0x00000100 /* [lock(SET(ATOMIC), CLEAR(WEAK))][const_SET_if(MFILE_F_DELETED)]
@@ -1282,7 +1291,7 @@ struct unlockinfo;
 FUNDEF WUNUSED NONNULL((1, 2)) struct mpart *FCALL
 mfile_extendpart_or_unlock(struct mfile *__restrict self,
                            struct mfile_extendpart_data *__restrict data,
-                           struct unlockinfo *unlock)
+                           struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 #define MFILE_EXTENDPART_OR_UNLOCK_NOSIB ((REF struct mpart *)0)
 #define MFILE_EXTENDPART_OR_UNLOCK_AGAIN ((REF struct mpart *)-1)
@@ -1355,9 +1364,10 @@ NOTHROW(FCALL mfile_insert_and_merge_part_and_unlock)(struct mfile *__restrict s
  * - If all locks could be acquired, return `true'
  * @return: true:  Locks+references acquired.
  * @return: false: All locks were locks; try again. */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(FCALL mfile_incref_and_lock_parts_or_unlock)(struct mfile *__restrict self,
-                                                     struct unlockinfo *unlock);
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_incref_and_lock_parts_or_unlock(struct mfile *__restrict self,
+                                      struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK);
 
 /* Same  as  `mfile_incref_and_lock_parts_or_unlock()', but  return a
  * reference to the blocking part (if any), and not release any locks
@@ -1376,7 +1386,56 @@ NOTHROW(FCALL mfile_tryincref_and_lock_parts)(struct mfile *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_unlock_and_decref_parts)(struct mfile *__restrict self);
 
+/* Same as `mfile_unlock_and_decref_parts()', but keep a lock & reference to `part' */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts_except)(struct mfile *__restrict self,
+                                                    struct mpart *__restrict part);
 
+/* Same as `mfile_incref_and_lock_parts_or_unlock()', but
+ * assert `mpart_denywrite_or_unlock()'  for  all  parts.
+ *
+ * Should be used if the caller intends to set `MFILE_F_READONLY' */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_incref_and_lock_parts_and_denywrite_or_unlock(struct mfile *__restrict self,
+                                                    struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+
+/* Deny  write  access  to anyone  currently  mapping any  part  of `self'.
+ * The caller must be holding a write-lock to `self', as well as individual
+ * locks to every part associated with it, as well as be holding references
+ * to all of teh parts of `self' (`mfile_incref_and_lock_parts_or_unlock').
+ *
+ * @return: true:  Success: write access has been denied to all parts.
+ * @return: false: Locks were lost and you must try again.
+ *
+ * Locking logic:
+ *   - return == true:  No locks are lost, and no locks are gained
+ *   - return == false: - mfile_unlock_and_decref_parts(self);
+ *                      - mfile_lock_endwrite(unlock);
+ *                      - unlockinfo_xunlock(unlock);
+ *   - THROW:           like `return == false' */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
+                                struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+
+
+
+/* Alter  flags  of `self'  like `self->mf_flags = (self->mf_flags & mask) | flags'
+ * Special care is taken to ensure that the transformation is performed atomically,
+ * and that `MFILE_F_READONLY' is only  altered while holding the necessary  locks,
+ * including a preceding denywrite when it is set.
+ * @param: mask:  Inverted set of flags, as accepted by `flags'
+ * @param: flags: Set of `MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOUSRMMAP |
+ *                        MFILE_F_NOUSRIO | MFILE_F_NOMTIME | MFILE_FN_ATTRREADONLY |
+ *                        MFILE_F_RELATIME | MFILE_F_STRICTATIME |  MFILE_F_LAZYTIME'
+ * @param: check_permissions: When true, ensure that the caller is allowed to alter
+ *                            flags in the requested manner.
+ * @return: * : The old set of file flags. */
+FUNDEF NONNULL((1)) uintptr_t FCALL
+mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
+              uintptr_t flags, __BOOL check_permissions DFL(1))
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, E_INSUFFICIENT_RIGHTS);
 
 
 #ifdef CONFIG_USE_NEW_FS

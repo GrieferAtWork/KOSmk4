@@ -245,6 +245,7 @@ enum {
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG:        Attempted to change the `FATATTR_VOLUME' or `FATATTR_DIR' flag.
 	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: All flags from `FATATTR_LFN' were given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)'. */
 	E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG,                   /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
+	E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT,           /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to use `BLKRRPART' on a block device partition. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -465,6 +466,7 @@ enum {
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG:        Attempted to change the `FATATTR_VOLUME' or `FATATTR_DIR' flag.
                                                                                                                                      * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: All flags from `FATATTR_LFN' were given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                   E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                   /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
+#define E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT           E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT           /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to use `BLKRRPART' on a block device partition. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -682,6 +684,7 @@ enum {
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG:        Attempted to change the `FATATTR_VOLUME' or `FATATTR_DIR' flag.
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: All flags from `FATATTR_LFN' were given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                   194 /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
+#define E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT           195 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to use `BLKRRPART' on a block device partition. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

@@ -642,6 +642,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 		if (!(self->mfl_flags & MMAN_FAULT_F_WRITE)) {
 			if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 				goto nope_reinit_scmem;
+
 			/* Make  sure  that   unshare-cow  data   was  never   allocated.
 			 * Because the  `mfl_flags'  field  is [const],  we  should  have
 			 * never reached any of the paths that would have allocated this! */
@@ -654,6 +655,28 @@ mfault_or_unlock(struct mfault *__restrict self)
 
 		/* Deal with writes to shared memory mappings. */
 		if (node->mn_flags & MNODE_F_SHARED) {
+
+#ifdef CONFIG_USE_NEW_FS
+			/* Ensure that the backing file isn't marked as READONLY
+			 *
+			 * This can happen if the memory mapping was created before the READONLY
+			 * flag  was set (but note that setting  the flag causes denywrite to be
+			 * called for all parts, meaning that we may very well have gotten  here
+			 * because)
+			 *
+			 * This check is synonymous to the IS_WRITESHARE_MAPPING_OF_READONLY_FILE
+			 * check done when trying to create  file mappings, only that this  check
+			 * is necessary to deal with the case  where a thread already has a  pre-
+			 * existing MAP_SHARED+PROT_WRITE mapping of a file that has later become
+			 * READONLY, at which point pagedir-level  write access was revoked,  but
+			 * the mapping itself wasn't deleted. */
+			if unlikely((part->mp_file->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY) {
+				mpart_lock_release(part);
+				unlockinfo_unlock(&self->mfl_unlck);
+				THROW(E_FSERROR_READONLY);
+			}
+#endif /* CONFIG_USE_NEW_FS */
+
 			if (LIST_EMPTY(&part->mp_copy)) {
 				if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 					goto nope_reinit_scmem;
@@ -664,6 +687,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 				if (!mpart_unsharecow_or_unlock(part, &self->mfl_unlck, &self->mfl_ucdat, acc_offs, acc_size))
 					goto nope;
 			}
+
 			/* Free data which may have been allocated for a previous pcopy attempt. */
 			if unlikely(self->mfl_pcopy[0]) {
 				kfree(self->mfl_pcopy[0]);

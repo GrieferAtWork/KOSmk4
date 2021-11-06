@@ -39,10 +39,6 @@
 #define CAP_MOUNT_DRIVES                     CAP_SYS_ADMIN       /* Re-bind `HANDLE_SYMBOLIC_DDRIVEROOT(<letter>)' file handles. */
 #define CAP_EXCEED_PIPE_MAX_SIZE             CAP_SYS_RESOURCE    /* Exceed and modify the pipe-buffer-size limit from `/proc/sys/fs/pipe-max-size' */
 #define CAP_ALLOW_CTTY_STEALING              CAP_SYS_ADMIN       /* Allow stealing of controlling terminals (s.a. `TIOCSCTTY') */
-#define CAP_SET_BLOCKDEV_READAHEAD           CAP_SYS_ADMIN       /* Allow use of `BLKRASET' and `BLKFRASET' */
-#define CAP_SET_BLOCKDEV_SECTORS_PER_REQUEST CAP_SYS_ADMIN       /* Allow use of `BLKSECTSET' */
-#define CAP_SET_BLOCKDEV_SECTORSIZE          CAP_SYS_ADMIN       /* Allow use of `BLKBSZSET' */
-#define CAP_SET_BLOCKDEV_READONLY            CAP_SYS_ADMIN       /* Allow use of `BLKROSET' */
 #define CAP_OPEN_BLOCKDEV_ROOT               CAP_SYS_ADMIN       /* Allow use of `HOP_BLKDEV_OPENDRIVEROOT' */
 #define CAP_OPEN_BLOCKDEV_PART               CAP_SYS_ADMIN       /* Allow use of `HOP_BLKDEV_OPENDRIVEPART' */
 #define CAP_SET_TTY_BUFFER_SIZES             CAP_SYS_RESOURCE    /* Allow use of `TTYIO_IBUF_SETLIMIT', `TTYIO_CANON_SETLIMIT', `TTYIO_OPEND_SETLIMIT', `TTYIO_IPEND_SETLIMIT' */

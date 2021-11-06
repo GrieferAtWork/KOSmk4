@@ -35,9 +35,9 @@
 #define __BLKFRAGET     _IO(0x12, 101) /* [unsigned long *arg] Get filesystem read-ahead. */
 #define __BLKSECTSET    _IO(0x12, 102) /* [u16 const *arg] Set max sectors per request. */
 #define __BLKSECTGET    _IO(0x12, 103) /* [u16 *arg] Get max sectors per request. */
-#define __BLKSSZGET     _IO(0x12, 104) /* Get block device sector size */
+#define __BLKSSZGET     _IO(0x12, 104) /* [unsigned int *arg] Get block device sector size */
 #define __BLKBSZGET    _IOR(0x12, 112, __SIZE_TYPE__) /* [size_t *arg] */
-#define __BLKBSZSET    _IOW(0x12, 113, __SIZE_TYPE__) /* [size_t *arg] */
+#define __BLKBSZSET    _IOW(0x12, 113, __SIZE_TYPE__) /* [size_t const *arg] */
 #define __BLKGETSIZE64 _IOR(0x12, 114, __SIZE_TYPE__) /* [u64 *arg] return device size in bytes */
 
 #define __BLKTRACESETUP    _IOWR(0x12, 115, struct blk_user_trace_setup) /* ??? */

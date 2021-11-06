@@ -53,8 +53,8 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 #ifdef CONFIG_USE_NEW_FS
-#define IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)        \
-	(((file)->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) && \
+#define IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)                            \
+	(((file)->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) == MFILE_F_READONLY && \
 	 ((self)->mfm_prot & (PROT_WRITE | PROT_SHARED)) == (PROT_WRITE | PROT_SHARED))
 #endif /* CONFIG_USE_NEW_FS */
 

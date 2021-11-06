@@ -51,6 +51,8 @@ struct unlockinfo {
 /* When `self' is non-NULL, invoke it's `ui_unlock'-callback. */
 #define unlockinfo_xunlock(self) \
 	(void)(!(self) || ((*(self)->ui_unlock)(self), 0))
+#define unlockinfo_unlock(self) \
+	(void)((*(self)->ui_unlock)(self), 0)
 
 DECL_END
 #endif /* __CC__ */

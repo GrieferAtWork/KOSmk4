@@ -37,6 +37,8 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <kernel/user.h>
+#include <sched/cred.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -44,6 +46,7 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
 #include <hw/disk/part/efi.h>
 #include <hw/disk/part/embr.h>
@@ -51,6 +54,7 @@
 #include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <linux/fs.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -223,6 +227,59 @@ PUBLIC_CONST struct blkdev_ops const blkpart_ops = {
 		.no_wrattr = &blkdev_v_wrattr,
 	}}}
 };
+
+
+PUBLIC_CONST struct mfile_stream_ops const blkdev_v_stream_ops = {
+	.mso_ioctl = &blkdev_v_ioctl,
+	.mso_hop   = &blkdev_v_hop,
+	.mso_tryas = &blkdev_v_tryas,
+};
+
+
+/* Implements `BLK*' ioctls from <linux/fs.h> */
+FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
+blkdev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+               USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	struct blkdev *me = mfile_asblkdev(self);
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case BLKRRPART:
+		if (blkdev_ispart(me)) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT);
+		}
+		blkdev_repart(me);
+		break;
+
+#if 0
+	case BLKRASET:         /* TODO */
+	case BLKRAGET:         /* TODO */
+	case BLKFRASET:        /* TODO */
+	case BLKFRAGET:        /* TODO */
+	case BLKSECTSET:       /* TODO */
+	case BLKSECTGET:       /* TODO */
+	case BLKBSZSET:        /* TODO */
+	case BLKTRACESETUP:    /* TODO */
+	case BLKTRACESTART:    /* TODO */
+	case BLKTRACESTOP:     /* TODO */
+	case BLKTRACETEARDOWN: /* TODO */
+	case BLKDISCARD:       /* TODO */
+	case BLKIOMIN:         /* TODO */
+	case BLKIOOPT:         /* TODO */
+	case BLKALIGNOFF:      /* TODO */
+	case BLKPBSZGET:       /* TODO */
+	case BLKDISCARDZEROES: /* TODO */
+	case BLKSECDISCARD:    /* TODO */
+	case BLKROTATIONAL:    /* TODO */
+	case BLKZEROOUT:       /* TODO */
+#endif
+
+	default:
+		return device_v_ioctl(self, cmd, arg, mode);
+	}
+	return 0;
+}
 
 
 

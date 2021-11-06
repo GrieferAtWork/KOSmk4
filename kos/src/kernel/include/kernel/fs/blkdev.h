@@ -147,18 +147,22 @@ struct blkdev
 	};
 };
 
+/* Operators used for block device partitions */
+DATDEF struct blkdev_ops const blkpart_ops;
+
 /* Default operators for block devices */
 #define blkdev_v_destroy    device_v_destroy
 #define blkdev_v_changed    device_v_changed
 #define blkdev_v_wrattr     device_v_wrattr
 #define blkdev_v_tryas      device_v_tryas
-#define blkdev_v_ioctl      device_v_ioctl
 #define blkdev_v_hop        device_v_hop
-#define blkdev_v_stream_ops device_v_stream_ops
+DATDEF struct mfile_stream_ops const blkdev_v_stream_ops;
 
-/* Operators used for block device partitions */
-DATDEF struct blkdev_ops const blkpart_ops;
-
+/* Implements `BLK*' ioctls from <linux/fs.h> */
+FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
+blkdev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+               USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
 /* Helper macros for `struct blkdev::bd_rootinfo::br_partslock' */
 #define _blkdev_root_partslock_reap(self)      _oblockop_reap_atomic_lock(&(self)->bd_rootinfo.br_partslops, &(self)->bd_rootinfo.br_partslock, self)

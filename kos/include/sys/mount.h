@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cbf5f95 */
+/* HASH CRC-32:0x8322510f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@
 #define BLKBSZGET    __BLKBSZGET    /* [size_t *arg] */
 #endif /* !BLKBSZGET && __BLKBSZGET */
 #if !defined(BLKBSZSET) && defined(__BLKBSZSET)
-#define BLKBSZSET    __BLKBSZSET    /* [size_t *arg] */
+#define BLKBSZSET    __BLKBSZSET    /* [size_t const *arg] */
 #endif /* !BLKBSZSET && __BLKBSZSET */
 #if !defined(BLKGETSIZE64) && defined(__BLKGETSIZE64)
 #define BLKGETSIZE64 __BLKGETSIZE64 /* [u64 *arg] return device size in bytes */

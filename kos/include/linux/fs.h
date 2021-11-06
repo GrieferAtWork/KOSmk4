@@ -67,7 +67,7 @@
 #define BLKBSZGET    __BLKBSZGET    /* [size_t *arg] */
 #endif /* !BLKBSZGET && __BLKBSZGET */
 #if !defined(BLKBSZSET) && defined(__BLKBSZSET)
-#define BLKBSZSET    __BLKBSZSET    /* [size_t *arg] */
+#define BLKBSZSET    __BLKBSZSET    /* [size_t const *arg] */
 #endif /* !BLKBSZSET && __BLKBSZSET */
 #if !defined(BLKGETSIZE64) && defined(__BLKGETSIZE64)
 #define BLKGETSIZE64 __BLKGETSIZE64 /* [u64 *arg] return device size in bytes */
@@ -132,22 +132,22 @@
 #if defined(__linux__) || defined(__KOS__)
 #define FS_IOC_GETFLAGS     _IOR('f', 1, long) /* Get INode flags (set of `FS_*') */
 #define FS_IOC_SETFLAGS     _IOW('f', 2, long) /* Set INode flags (set of `FS_*') */
-#define FS_IOC32_GETVERSION _IOR('v', 1, int)  /* Get INode flags (set of `FS_*') */
-#define FS_IOC32_SETVERSION _IOW('v', 2, int)  /* Set INode flags (set of `FS_*') */
+#define FS_IOC32_GETFLAGS   _IOR('f', 1, int)  /* Get INode flags (set of `FS_*') */
+#define FS_IOC32_SETFLAGS   _IOW('f', 2, int)  /* Set INode flags (set of `FS_*') */
 
 #ifdef __linux__ /* XXX: KOS? */
 #define FS_IOC_GETVERSION   _IOR('v', 1, long)            /* ??? */
 #define FS_IOC_SETVERSION   _IOW('v', 2, long)            /* ??? */
+#define FS_IOC32_GETVERSION _IOR('v', 1, int)             /* ??? */
+#define FS_IOC32_SETVERSION _IOW('v', 2, int)             /* ??? */
 #define FS_IOC_FIEMAP       _IOWR('f', 11, struct fiemap) /* ??? */
-#define FS_IOC32_GETFLAGS   _IOR('f', 1, int)             /* ??? */
-#define FS_IOC32_SETFLAGS   _IOW('f', 2, int)             /* ??? */
-#define FS_IOC_FSGETXATTR   _IOR('X', 31, struct fsxattr)
-#define FS_IOC_FSSETXATTR   _IOW('X', 32, struct fsxattr)
+#define FS_IOC_FSGETXATTR   _IOR('X', 31, struct fsxattr) /* ??? */
+#define FS_IOC_FSSETXATTR   _IOW('X', 32, struct fsxattr) /* ??? */
 #endif /* __linux__ */
 
 #define FSLABEL_MAX       256 /* Max chars for the interface; each fs may differ */
-#define FS_IOC_GETFSLABEL _IOR(0x94, 49, char[FSLABEL_MAX])
-#define FS_IOC_SETFSLABEL _IOW(0x94, 50, char[FSLABEL_MAX])
+#define FS_IOC_GETFSLABEL _IOR(0x94, 49, char[FSLABEL_MAX]) /* Get volume label */
+#define FS_IOC_SETFSLABEL _IOW(0x94, 50, char[FSLABEL_MAX]) /* Set volume label */
 
 
 /* Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS)

@@ -60,76 +60,12 @@
 
 DECL_BEGIN
 
-/* Return set of `FS_*' from <linux/fs.h> */
-PRIVATE WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(FCALL mfile_get_inode_flags)(struct mfile const *__restrict self) {
-	uintptr_t inode_flags = 0;
-	uintptr_t mfile_flags = ATOMIC_READ(self->mf_flags);
-	if (mfile_flags & MFILE_F_READONLY)
-		inode_flags |= FS_IMMUTABLE_FL;
-	if (mfile_flags & MFILE_F_NOATIME)
-		inode_flags |= FS_NOATIME_FL;
-	return inode_flags;
-}
-
-/* Apply set of `FS_*' from <linux/fs.h> to `self' */
-PRIVATE NONNULL((1)) void FCALL
-mfile_set_inode_flags(struct mfile *__restrict self,
-                      uintptr_t inode_flags) {
-	bool cmpxch_ok;
-	uintptr_t old_flags, new_flags;
-	inode_flags &= (FS_IMMUTABLE_FL | FS_NOATIME_FL); /* Other flags are ignored (for now...) */
-again:
-	do {
-		mfile_lock_write(self);
-		old_flags = ATOMIC_READ(self->mf_flags);
-		new_flags = old_flags;
-
-		/* Apply flags transformations. */
-		new_flags &= ~(MFILE_F_READONLY | MFILE_FN_ATTRREADONLY | MFILE_F_NOATIME);
-		if (inode_flags & FS_IMMUTABLE_FL)
-			new_flags |= MFILE_F_READONLY | MFILE_FN_ATTRREADONLY;
-		if (inode_flags & FS_NOATIME_FL)
-			new_flags |= MFILE_F_NOATIME;
-
-		/* Check if the READONLY flag changed state. */
-		if ((new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY)) {
-			/* Need locks to all of the file's mem-parts to change `MFILE_F_READONLY'. */
-			if (self->mf_parts != MFILE_PARTS_ANONYMOUS &&
-			    !mfile_incref_and_lock_parts_or_unlock(self, NULL))
-				goto again;
-		}
-
-		/* As per the specs, in order to change the flags of a file, you must
-		 * be that file's owner, or have the `CAP_FOWNER' capability. Because
-		 * we allow this operator for mfiles that don't have owners, we  only
-		 * do this check if the file _does_ have an owner! */
-		if (old_flags != new_flags && mfile_isnode(self)) {
-			if (fnode_getuid(mfile_asnode(self)) != cred_geteuid() && !capable(CAP_FOWNER)) {
-				/* Not allowed! */
-				if (self->mf_parts != MFILE_PARTS_ANONYMOUS &&
-				    (new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
-					mfile_unlock_and_decref_parts(self);
-				mfile_lock_endwrite(self);
-				THROW(E_INSUFFICIENT_RIGHTS, CAP_FOWNER);
-			}
-		}
-
-		/* Try to atomically apply the new set of flags. */
-		cmpxch_ok = ATOMIC_CMPXCH(self->mf_flags, old_flags, new_flags);
-
-		/* Release locks */
-		if (self->mf_parts != MFILE_PARTS_ANONYMOUS &&
-		    (new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY))
-			mfile_unlock_and_decref_parts(self);
-		mfile_lock_endwrite(self);
-	} while (!cmpxch_ok);
-}
-
-
 /* Default ioctl(2) operator for mfiles. Implements:
- *  - FS_IOC_GETFLAGS
- *  - FS_IOC_SETFLAGS */
+ *  - FS_IOC_GETFLAGS, FS_IOC_SETFLAGS
+ *  - FS_IOC_GETFSLABEL, FS_IOC_SETFSLABEL
+ *  - BLKROSET, BLKROGET, BLKFLSBUF
+ *  - BLKSSZGET, BLKBSZGET,
+ *  - BLKGETSIZE, BLKGETSIZE64 */
 PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
@@ -138,30 +74,45 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 	case _IO_WITHTYPE(FS_IOC_GETFLAGS, u32):
 	case _IO_WITHTYPE(FS_IOC_GETFLAGS, u64): {
-		uintptr_t flags;
+		uintptr_t mfile_flags, flags = 0;
 		if (!IO_CANREAD(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_GETPROPERTY, mode);
-		flags = mfile_get_inode_flags(self);
+		mfile_flags = ATOMIC_READ(self->mf_flags);
+		if (mfile_flags & MFILE_F_READONLY)
+			flags |= FS_IMMUTABLE_FL;
+		if (mfile_flags & MFILE_F_NOATIME)
+			flags |= FS_NOATIME_FL;
 		validate_writable(arg, _IOC_SIZE(cmd));
 		if (_IOC_SIZE(cmd) == sizeof(u32)) {
 			UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)flags);
 		} else {
 			UNALIGNED_SET64((USER CHECKED u64 *)arg, (u64)flags);
 		}
+		return 0;
 	}	break;
 
 	case _IO_WITHTYPE(FS_IOC_SETFLAGS, u32):
 	case _IO_WITHTYPE(FS_IOC_SETFLAGS, u64): {
-		uintptr_t flags;
+		uintptr_t mask, flag, inode_flags;
 		if (!IO_CANWRITE(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_SETPROPERTY, mode);
 		validate_readable(arg, _IOC_SIZE(cmd));
 		if (_IOC_SIZE(cmd) == sizeof(u32)) {
-			flags = (uintptr_t)UNALIGNED_GET32((USER CHECKED u32 const *)arg);
+			inode_flags = (uintptr_t)UNALIGNED_GET32((USER CHECKED u32 const *)arg);
 		} else {
-			flags = (uintptr_t)UNALIGNED_GET64((USER CHECKED u64 const *)arg);
+			inode_flags = (uintptr_t)UNALIGNED_GET64((USER CHECKED u64 const *)arg);
 		}
-		mfile_set_inode_flags(self, flags);
+		mask = ~(uintptr_t)(MFILE_F_READONLY | MFILE_FN_ATTRREADONLY | MFILE_F_NOATIME);
+		flag = 0;
+		if (inode_flags & FS_IMMUTABLE_FL)
+			flag |= MFILE_F_READONLY | MFILE_FN_ATTRREADONLY;
+		if (inode_flags & FS_NOATIME_FL)
+			flag |= MFILE_F_NOATIME;
+		/* Other flags are ignored (for now...) */
+
+		/* Set new flags. */
+		mfile_chflags(self, mask, flag);
+		return 0;
 	}	break;
 
 	case FS_IOC_GETFSLABEL:
@@ -170,9 +121,9 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 			super = mfile_asnode(self)->fn_super;
 			validate_readable(arg, FSLABEL_MAX * sizeof(char));
 			if (fsuper_getlabel(super, (USER CHECKED char *)arg))
-				break;
+				return 0;
 		}
-		goto fallback;
+		break;
 
 	case FS_IOC_SETFSLABEL:
 		if (mfile_isnode(self)) {
@@ -186,18 +137,55 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 			/* As per the specs, only a SYS_ADMIN can issue this command! */
 			require(CAP_SYS_ADMIN);
 			if (fsuper_setlabel(super, labelname, labelsize))
-				break;
+				return 0;
 		}
-		goto fallback;
+		break;
 
 	default:
-fallback:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-		      cmd);
 		break;
 	}
-	return 0;
+
+	/* Also implement a couple of BLK* ioctl commands
+	 * Mainly because on KOS pretty much any file can
+	 * be used as a block device (for mounting and so
+	 * on...) */
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(BLKROSET, 0): {
+		/* NOTE: Permission checks are done inside of `mfile_chflags()'! */
+		uintptr_t newflags = ioctl_intarg_getbool(cmd, arg) ? MFILE_F_READONLY
+		                                                    : MFILE_F_NORMAL;
+		mfile_chflags(self, ~MFILE_F_READONLY, newflags, /*check_permissions:*/ true);
+		return 0;
+	}	break;
+
+	case _IO_WITHSIZE(BLKROGET, 0):
+		return ioctl_intarg_setbool(cmd, arg, self->mf_flags & MFILE_F_READONLY ? 1 : 0);
+
+	case _IO_WITHSIZE(BLKGETSIZE, 0):
+		return ioctl_intarg_setsize(cmd, arg, (size_t)(atomic64_read(&self->mf_filesize) / 512));
+
+	case _IO_WITHSIZE(BLKFLSBUF, 0):
+		/*require(CAP_SYS_ADMIN);*/ /* Linux does this... Why? */
+		mfile_usync(self);
+		return 0;
+
+	case _IO_WITHSIZE(BLKSSZGET, 0):
+		cmd = _IO_WITHSIZE(BLKBSZGET, sizeof(int)); /* Yes: sizeof(int) is correct here! */
+		ATTR_FALLTHROUGH
+	case _IO_WITHSIZE(BLKBSZGET, 0):
+		return ioctl_intarg_setsize(cmd, arg, mfile_getblocksize(self));
+
+	case _IO_WITHSIZE(BLKGETSIZE64, 0):
+		return ioctl_intarg_setu64(cmd, arg, atomic64_read(&self->mf_filesize));
+
+	default:
+		break;
+	}
+
+	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+	      cmd);
 }
 
 /* Default hop(2) operator for mfiles. (currently unconditionally,

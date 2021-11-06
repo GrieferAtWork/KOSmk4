@@ -629,9 +629,9 @@ NOTHROW(KCALL ext2_super_v_free)(struct fnode *__restrict self) {
 PRIVATE struct flatsuper_ops const ext2_super_ops = {
 	.ffso_makenode = &ext2_super_v_makenode,
 	.ffso_super = {
-//TODO:.so_truncate_atime = &FatSuper_TruncateATime,
-//TODO:.so_truncate_mtime = &FatSuper_TruncateMTime,
-//TODO:.so_truncate_ctime = &FatSuper_TruncateCTime,
+//TODO:	.so_truncate_atime = &ext2_super_v_truncate_atime,
+//TODO:	.so_truncate_mtime = &ext2_super_v_truncate_mtime,
+//TODO:	.so_truncate_ctime = &ext2_super_v_truncate_ctime,
 		.so_fdir = {
 			.dno_node = {
 				.no_file = {
