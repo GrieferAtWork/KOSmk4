@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18c499db */
+/* HASH CRC-32:0x50df75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,6 +112,7 @@
 #define __CRT_HAVE_DOS$__memsetl_chk
 #define __CRT_HAVE_DOS$__memsetq_chk
 #define __CRT_HAVE_DOS$__memsetw_chk
+#define __CRT_HAVE_DOS$__overflow
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$__p___wargv
@@ -3241,6 +3242,7 @@
 #define __CRT_HAVE___memsetl_chk
 #define __CRT_HAVE___memsetq_chk
 #define __CRT_HAVE___memsetw_chk
+#define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
 #define __CRT_HAVE___p___initenv

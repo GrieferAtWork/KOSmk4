@@ -641,6 +641,7 @@
 #define __CRT_HAVE___nexttowardl
 #define __CRT_HAVE___open
 #define __CRT_HAVE___open64
+#define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
 #define __CRT_HAVE___p___initenv
@@ -813,6 +814,7 @@
 #define __CRT_HAVE___tsearch
 #define __CRT_HAVE___twalk
 #define __CRT_HAVE___tzname
+#define __CRT_HAVE___uflow
 #define __CRT_HAVE___unicode_descriptor
 #define __CRT_HAVE___unicode_descriptor_digit
 #define __CRT_HAVE___unicode_descriptor_digit64
@@ -5060,6 +5062,7 @@
 #define __CRT_HAVE_KOS$__nexttowardl
 #define __CRT_HAVE_KOS$__open
 #define __CRT_HAVE_KOS$__open64
+#define __CRT_HAVE_KOS$__overflow
 #define __CRT_HAVE_KOS$__p___wargv
 #define __CRT_HAVE_KOS$__p___winitenv
 #define __CRT_HAVE_KOS$__p__wenviron
@@ -5199,6 +5202,7 @@
 #define __CRT_HAVE_KOS$__tsearch
 #define __CRT_HAVE_KOS$__twalk
 #define __CRT_HAVE_KOS$__tzname
+#define __CRT_HAVE_KOS$__uflow
 #define __CRT_HAVE_KOS$__unicode_descriptor
 #define __CRT_HAVE_KOS$__unicode_descriptor_digit
 #define __CRT_HAVE_KOS$__unicode_descriptor_digit64
@@ -8471,6 +8475,7 @@
 #define __CRT_HAVE_DOS$__nexttowardl
 #define __CRT_HAVE_DOS$__open
 #define __CRT_HAVE_DOS$__open64
+#define __CRT_HAVE_DOS$__overflow
 #define __CRT_HAVE_DOS$__p___wargv
 #define __CRT_HAVE_DOS$__p___winitenv
 #define __CRT_HAVE_DOS$__p__wenviron
@@ -8610,6 +8615,7 @@
 #define __CRT_HAVE_DOS$__tsearch
 #define __CRT_HAVE_DOS$__twalk
 #define __CRT_HAVE_DOS$__tzname
+#define __CRT_HAVE_DOS$__uflow
 #define __CRT_HAVE_DOS$__unicode_descriptor
 #define __CRT_HAVE_DOS$__unicode_descriptor_digit
 #define __CRT_HAVE_DOS$__unicode_descriptor_digit64

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6475fb46 */
+/* HASH CRC-32:0x8732ed79 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -474,6 +474,16 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_funlockfile)(FILE *__restrict
 /* >> ftrylockfile(3)
  * Try to acquire a lock to `stream' */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ftrylockfile)(FILE *__restrict stream);
+/* >> __overflow(3)
+ * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
+INTDEF NONNULL((1)) int (LIBDCALL libd___overflow)(FILE *stream, int ch) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> __overflow(3)
+ * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
+INTDEF NONNULL((1)) int (LIBCCALL libc___overflow)(FILE *stream, int ch) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> popen(3)
  * Open and return a new process I/O stream for executing `command'
  * @param: command: The command to execute (s.a. `shexec(3)')

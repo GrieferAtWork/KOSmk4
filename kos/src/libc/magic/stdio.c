@@ -1945,6 +1945,20 @@ void funlockfile([[nonnull]] $FILE *__restrict stream);
 int ftrylockfile([[nonnull]] $FILE *__restrict stream);
 %#endif /* __USE_POSIX || __USE_REENTRANT */
 
+@@>> __uflow(3)
+@@This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible)
+[[wunused]] int __uflow([[nonnull]] FILE *stream) = _filbuf;
+
+@@>> __overflow(3)
+@@This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible)
+[[cp_stdio, section(".text.crt{|.dos}.FILE.locked.write.write")]]
+[[requires_function(_flsbuf)]]
+int __overflow([[nonnull]] $FILE *stream, int ch) {
+	return _flsbuf(ch, stream);
+}
+
+
+
 %
 %#ifdef __USE_POSIX
 %[default:section(".text.crt{|.dos}.io.tty")]
@@ -4214,6 +4228,7 @@ int _flushall() {
 
 %
 [[cp_stdio, section(".text.crt.dos.FILE.locked.read.read")]]
+[[export_alias("__uflow")]]
 int _filbuf([[nonnull]] $FILE *__restrict stream);
 
 [[cp_stdio, section(".text.crt.dos.FILE.locked.write.write")]]

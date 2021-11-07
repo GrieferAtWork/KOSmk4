@@ -645,6 +645,7 @@
 #define __CRT_HAVE___nexttowardl
 #define __CRT_HAVE___open
 #define __CRT_HAVE___open64
+#define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
 #define __CRT_HAVE___p___initenv
@@ -819,6 +820,7 @@
 #define __CRT_HAVE___tsearch
 #define __CRT_HAVE___twalk
 #define __CRT_HAVE___tzname
+#define __CRT_HAVE___uflow
 #define __CRT_HAVE___unicode_descriptor
 #define __CRT_HAVE___unicode_descriptor_digit
 #define __CRT_HAVE___unicode_descriptor_digit64

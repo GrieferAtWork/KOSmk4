@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3102f11c */
+/* HASH CRC-32:0xbcd3d83d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1603,6 +1603,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_IO_funlockfile, libd_funlockfile);
 DEFINE_PUBLIC_ALIAS(DOS$funlockfile, libd_funlockfile);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_ftrylockfile, libd_ftrylockfile);
 DEFINE_PUBLIC_ALIAS(DOS$ftrylockfile, libd_ftrylockfile);
+DEFINE_PUBLIC_ALIAS(DOS$__overflow, libd___overflow);
 DEFINE_PUBLIC_ALIAS(DOS$_popen, libd_popen);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_popen, libd_popen);
 DEFINE_PUBLIC_ALIAS(DOS$popen, libd_popen);
@@ -1678,6 +1679,7 @@ DEFINE_PUBLIC_ALIAS(DOS$funopen2, libd_funopen2);
 DEFINE_PUBLIC_ALIAS(DOS$funopen64, libd_funopen64);
 DEFINE_PUBLIC_ALIAS(DOS$funopen2_64, libd_funopen2_64);
 DEFINE_PUBLIC_ALIAS(DOS$_fsopen, libd__fsopen);
+DEFINE_PUBLIC_ALIAS(DOS$__uflow, libd__filbuf);
 DEFINE_PUBLIC_ALIAS(DOS$_filbuf, libd__filbuf);
 DEFINE_PUBLIC_ALIAS(DOS$_flsbuf, libd__flsbuf);
 DEFINE_PUBLIC_ALIAS(DOS$_setmaxstdio, libd__setmaxstdio);

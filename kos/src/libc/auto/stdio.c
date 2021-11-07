@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0887383 */
+/* HASH CRC-32:0xa7f187cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -705,6 +705,13 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") int
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") int
 (LIBCCALL libc_putchar_unlocked)(int ch) THROWS(...) {
 	return libc_fputc_unlocked(ch, stdout);
+}
+/* >> __overflow(3)
+ * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) int
+(LIBCCALL libc___overflow)(FILE *stream,
+                           int ch) THROWS(...) {
+	return libc__flsbuf(ch, stream);
 }
 #include <asm/crt/stdio.h>
 /* >> getw(3)
@@ -3407,6 +3414,7 @@ DEFINE_PUBLIC_ALIAS(getdelim, libc_getdelim);
 DEFINE_PUBLIC_ALIAS(getline, libc_getline);
 DEFINE_PUBLIC_ALIAS(getchar_unlocked, libc_getchar_unlocked);
 DEFINE_PUBLIC_ALIAS(putchar_unlocked, libc_putchar_unlocked);
+DEFINE_PUBLIC_ALIAS(__overflow, libc___overflow);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_getw, libc_getw);
 #endif /* __LIBCCALL_IS_LIBDCALL */

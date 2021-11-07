@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fa2db84 */
+/* HASH CRC-32:0x1fd67bea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1285,6 +1285,7 @@ DFUN(".text.crt.dos.FILE.unlocked.write.putc", libd_putchar_unlocked, libc_putch
 DFUN(".text.crt.dos.FILE.locked.utility", libd_flockfile, libc_flockfile, TV, 1, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_funlockfile, libc_funlockfile, TV, 1, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_ftrylockfile, libc_ftrylockfile, TD, 1, TP)
+DFUN(".text.crt.dos.FILE.locked.write.write", libd___overflow, libc___overflow, TD, 2, TP, TD)
 DFUN(".text.crt.dos.FILE.locked.access", libd_popen, libc_popen, TP, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.access", libd_pclose, libc_pclose, TD, 1, TP)
 DFUN(".text.crt.dos.FILE.locked.access", libd_popenve, libc_popenve, TP, 4, TP, TP, TP, TP)
