@@ -399,7 +399,6 @@
 	CB(PREFIX.crt.except.system.mman PREFIX.crt.except.system.utility) \
 	CB(PREFIX.crt.except.system.configuration) \
 	CB(PREFIX.crt.dos.application.init) \
-	CB(PREFIX.crt.dos.errno_access.core) \
 	CB(PREFIX.crt.dos.errno_access) \
 	CB(PREFIX.crt.dos.application.exit) \
 	CB(PREFIX.crt.dos.fs.exec.exec PREFIX.crt.dos.sched.access) \

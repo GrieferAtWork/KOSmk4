@@ -728,6 +728,7 @@
 #define __CRT_HAVE___llround
 #define __CRT_HAVE___llroundf
 #define __CRT_HAVE___llroundl
+#define __CRT_HAVE___llseek
 #define __CRT_HAVE___locale_ctype_ptr
 #define __CRT_HAVE___locale_ctype_ptr_l
 #define __CRT_HAVE___lock_fhandle
@@ -2847,6 +2848,7 @@
 #define __CRT_HAVE_llround
 #define __CRT_HAVE_llroundf
 #define __CRT_HAVE_llroundl
+#define __CRT_HAVE_llseek
 #define __CRT_HAVE_lltostr
 #define __CRT_HAVE_localeconv
 #define __CRT_HAVE_localtime

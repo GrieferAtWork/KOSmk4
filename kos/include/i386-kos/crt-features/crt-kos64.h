@@ -724,6 +724,7 @@
 #define __CRT_HAVE___llround
 #define __CRT_HAVE___llroundf
 #define __CRT_HAVE___llroundl
+#define __CRT_HAVE___llseek
 #define __CRT_HAVE___locale_ctype_ptr
 #define __CRT_HAVE___locale_ctype_ptr_l
 #define __CRT_HAVE___lock_fhandle
@@ -2685,6 +2686,7 @@
 #define __CRT_HAVE_llround
 #define __CRT_HAVE_llroundf
 #define __CRT_HAVE_llroundl
+#define __CRT_HAVE_llseek
 #define __CRT_HAVE_lltostr
 #define __CRT_HAVE_localeconv
 #define __CRT_HAVE_localtime
@@ -5380,6 +5382,7 @@
 #define __CRT_HAVE_KOS$__llround
 #define __CRT_HAVE_KOS$__llroundf
 #define __CRT_HAVE_KOS$__llroundl
+#define __CRT_HAVE_KOS$__llseek
 #define __CRT_HAVE_KOS$__locale_ctype_ptr_l
 #define __CRT_HAVE_KOS$__lock_fhandle
 #define __CRT_HAVE_KOS$__log
@@ -7203,6 +7206,7 @@
 #define __CRT_HAVE_KOS$llround
 #define __CRT_HAVE_KOS$llroundf
 #define __CRT_HAVE_KOS$llroundl
+#define __CRT_HAVE_KOS$llseek
 #define __CRT_HAVE_KOS$lltostr
 #define __CRT_HAVE_KOS$localtime
 #define __CRT_HAVE_KOS$localtime64
@@ -9009,6 +9013,7 @@
 #define __CRT_HAVE_DOS$__llround
 #define __CRT_HAVE_DOS$__llroundf
 #define __CRT_HAVE_DOS$__llroundl
+#define __CRT_HAVE_DOS$__llseek
 #define __CRT_HAVE_DOS$__locale_ctype_ptr_l
 #define __CRT_HAVE_DOS$__lock_fhandle
 #define __CRT_HAVE_DOS$__log
@@ -10832,6 +10837,7 @@
 #define __CRT_HAVE_DOS$llround
 #define __CRT_HAVE_DOS$llroundf
 #define __CRT_HAVE_DOS$llroundl
+#define __CRT_HAVE_DOS$llseek
 #define __CRT_HAVE_DOS$lltostr
 #define __CRT_HAVE_DOS$localtime
 #define __CRT_HAVE_DOS$localtime64

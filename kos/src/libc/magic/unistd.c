@@ -905,7 +905,7 @@ $off32_t lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 @@Change the position of the file read/write pointer within a file referred to by `fd'
 [[guard, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("lseek", "_lseek", "__lseek", "__libc_lseek")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("lseek64", "_lseeki64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("lseek64", "llseek", "__llseek", "_lseeki64")]]
 [[userimpl, requires($has_function(lseek32) || $has_function(lseek64))]]
 [[section(".text.crt{|.dos}.io.seek"), dos_only_export_as("_lseek"), export_as("__lseek", "__libc_lseek")]]
 $off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
@@ -1091,7 +1091,7 @@ int unlinkat($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 [[decl_include("<bits/types.h>")]]
 [[preferred_off64_variant_of(lseek), doc_alias("lseek")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("_lseek", "__lseek", "__libc_lseek")]]
-[[dos_only_export_alias("_lseeki64")]]
+[[dos_only_export_alias("_lseeki64"), export_alias("llseek", "__llseek")]]
 [[section(".text.crt{|.dos}.io.large.seek")]]
 [[userimpl, requires_function(lseek32)]]
 $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
