@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeebfae5 */
+/* HASH CRC-32:0xe8266455 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -347,6 +347,7 @@ NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst,
 	return n;
 }
 #endif /* !LIBC_ARCH_HAVE_STRXFRM */
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) {
 	static char strerror_buf[64];
@@ -381,6 +382,7 @@ NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) {
 	}
 	return result;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
 	static char strerror_buf[64];

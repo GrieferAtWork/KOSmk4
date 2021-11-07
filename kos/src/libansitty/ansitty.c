@@ -3836,7 +3836,7 @@ set_buf_escape_lbracket_6:
 	case KEY_PAGEDOWN:
 		key = 6;
 do_1char_tilde_code:
-		buf[2] = '0' + key;
+		buf[2] = itoa_decimal(key);
 		if (KEYMOD_HASSHIFT(mod)) {
 			buf[3] = ';';
 			if (KEYMOD_HASGUI(mod)) {

@@ -30,6 +30,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -38,12 +39,6 @@
 #include "writer.h"
 
 DECL_BEGIN
-
-LOCAL WUNUSED char tohex(unsigned int x) {
-	return x >= 10
-	       ? ('a' + (x - 10))
-	       : ('0' + (x));
-}
 
 /* Json writer helper functions.
  * Note all of these have the same return value convention:
@@ -250,21 +245,21 @@ json_print_string(struct json_writer *__restrict self,
 				if (ch <= 0xffff) {
 					escape_len = 6;
 					escape_buf[1] = 'u';
-					escape_buf[2] = tohex((ch & 0xf000) >> 12);
-					escape_buf[3] = tohex((ch & 0x0f00) >> 8);
-					escape_buf[4] = tohex((ch & 0x00f0) >> 4);
-					escape_buf[5] = tohex((ch & 0x000f));
+					escape_buf[2] = _itoa_lower_digits[(ch & 0xf000) >> 12];
+					escape_buf[3] = _itoa_lower_digits[(ch & 0x0f00) >> 8];
+					escape_buf[4] = _itoa_lower_digits[(ch & 0x00f0) >> 4];
+					escape_buf[5] = _itoa_lower_digits[(ch & 0x000f)];
 				} else {
 					escape_len = 10;
 					escape_buf[1] = 'U';
-					escape_buf[2] = tohex((ch & 0xf0000000) >> 28);
-					escape_buf[3] = tohex((ch & 0x0f000000) >> 24);
-					escape_buf[4] = tohex((ch & 0x00f00000) >> 20);
-					escape_buf[5] = tohex((ch & 0x000f0000) >> 16);
-					escape_buf[6] = tohex((ch & 0x0000f000) >> 12);
-					escape_buf[7] = tohex((ch & 0x00000f00) >> 8);
-					escape_buf[8] = tohex((ch & 0x000000f0) >> 4);
-					escape_buf[9] = tohex((ch & 0x0000000f));
+					escape_buf[2] = _itoa_lower_digits[(ch & 0xf0000000) >> 28];
+					escape_buf[3] = _itoa_lower_digits[(ch & 0x0f000000) >> 24];
+					escape_buf[4] = _itoa_lower_digits[(ch & 0x00f00000) >> 20];
+					escape_buf[5] = _itoa_lower_digits[(ch & 0x000f0000) >> 16];
+					escape_buf[6] = _itoa_lower_digits[(ch & 0x0000f000) >> 12];
+					escape_buf[7] = _itoa_lower_digits[(ch & 0x00000f00) >> 8];
+					escape_buf[8] = _itoa_lower_digits[(ch & 0x000000f0) >> 4];
+					escape_buf[9] = _itoa_lower_digits[(ch & 0x0000000f)];
 				}
 				break;
 			}

@@ -45,6 +45,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -484,8 +485,7 @@ NOTHROW(FCALL set_pty_name_minor)(struct devdirent *__restrict name,
 		if (temp > 'z')
 			temp = 'a' + (temp - 'z');
 		name->dd_dirent.fd_name[3] = temp;
-		minor %= 16;
-		name->dd_dirent.fd_name[4] = minor >= 10 ? 'a' + (minor - 10) : '0' + minor;
+		name->dd_dirent.fd_name[4] = _itoa_lower_digits[minor % 16];
 		name->dd_dirent.fd_name[5] = '\0';
 		name->dd_dirent.fd_namelen = 5;
 	}

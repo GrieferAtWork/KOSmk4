@@ -356,10 +356,10 @@ PRIVATE void CC
 da_regno31_str(char name[2], u8 regno) {
 	regno &= 31;
 	if (regno >= 10) {
-		name[0] = '0' + (regno / 10);
-		name[1] = '0' + (regno % 10);
+		name[0] = itoa_decimal(regno / 10);
+		name[1] = itoa_decimal(regno % 10);
 	} else {
-		name[0] = '0' + regno;
+		name[0] = itoa_decimal(regno);
 		name[1] = 0;
 	}
 }
@@ -381,7 +381,7 @@ da_print_kreg(struct disassembler *__restrict self, u8 regno) {
 	char name[5];
 	name[0] = '%';
 	name[1] = 'k';
-	name[2] = '0' + (regno & 7);
+	name[2] = itoa_decimal(regno & 7);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
 	disasm_print(self, name, 3);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
@@ -1079,11 +1079,11 @@ do_nextop_nocomma:
 						regname[1] = 'r';
 						if (name >= 'O') {
 							regname[2] = '1';
-							regname[3] = '0' + ((uint8_t)(name - 'O') >> 1);
+							regname[3] = itoa_decimal((uint8_t)(name - 'O') >> 1);
 							regname[4] = (name - 'K') & 1 ? 'd' : 'w';
 							reglen = 5;
 						} else {
-							regname[2] = '8' + ((uint8_t)(name - 'K') >> 1);
+							regname[2] = itoa_decimal(8 + ((uint8_t)(name - 'K') >> 1));
 							regname[3] = (name - 'K') & 1 ? 'd' : 'w';
 							reglen = 4;
 						}
@@ -1114,10 +1114,10 @@ do_nextop_nocomma:
 						regname[1] = 'r';
 						if (name >= OP_X64_RN_MIN + 2) {
 							regname[2] = '1';
-							regname[3] = '0' + (name - (OP_X64_RN_MIN + 2));
+							regname[3] = itoa_decimal(name - (OP_X64_RN_MIN + 2));
 							reglen = 4;
 						} else {
-							regname[2] = '8' + (name - OP_X64_RN_MIN);
+							regname[2] = itoa_decimal(8 + (name - OP_X64_RN_MIN));
 							reglen = 3;
 						}
 					} else if (name == 'a' || name == 'b' || name == 'c') {

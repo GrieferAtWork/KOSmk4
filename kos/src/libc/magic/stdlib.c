@@ -54,6 +54,13 @@
 %[define_replacement(s64 = __INT64_TYPE__)]
 %[define_replacement(shift_t = __SHIFT_TYPE__)]
 
+/* itoa */
+%[define_replacement(itoa_digit         = __LOCAL_itoa_digit)]
+%[define_replacement(itoa_decimal       = __LOCAL_itoa_decimal)]
+%[define_replacement(_itoa_digits       = __LOCAL_itoa_digits)]
+%[define_replacement(_itoa_lower_digits = __LOCAL_itoa_lower_digits)]
+%[define_replacement(_itoa_upper_digits = __LOCAL_itoa_upper_digits)]
+
 %[define_replacement(__WAIT_STATUS = __WAIT_STATUS)]
 %[define_replacement(__WAIT_STATUS_DEFN = __WAIT_STATUS_DEFN)]
 %[define_type_class(__WAIT_STATUS      = "TP")]
@@ -1900,6 +1907,11 @@ DEFINE_PUBLIC_ALIAS(_itoa_upper_digits, libc__itoa_upper_digits);
 #define itoa_digit(upper, digit) \
 	_itoa_digits[(digit) + (!!(upper) << 6)]
 
+/* >> char itoa_decimal(uint8_t digit);
+ * Same as `itoa_digit()', but weak undefined behavior when `digit >= 10' */
+#define itoa_decimal(digit) \
+	('0' + (digit))
+
 /* >> char const _itoa_digits[101] =
  * >> "0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
  * >> "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // << offset from base: 64 */
@@ -3257,9 +3269,10 @@ char *lltostr(__LONGLONG value, [[nonnull]] char *buf) {
 }
 
 [[nonnull, wunused]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 char *ulltostr(__ULONGLONG value, [[nonnull]] char *buf) {
 	do {
-		*--buf = '0' + (value % 10);
+		*--buf = itoa_decimal(value % 10);
 	} while ((value /= 10) != 0);
 	return buf;
 }
@@ -4372,11 +4385,14 @@ errno_t _dupenv_s([[nonnull]] char **__restrict pbuf,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_ltoa_s")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_i64toa_s")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	int temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -4403,9 +4419,7 @@ errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
@@ -4415,11 +4429,14 @@ errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_i64toa_s")]]
 [[impl_include("<libc/errno.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	long temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -4446,9 +4463,7 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
@@ -4457,11 +4472,14 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 [[impl_include("<libc/errno.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_ui64toa_s")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 errno_t _ultoa_s(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	unsigned long temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	temp = val;
 	do {
@@ -4477,9 +4495,7 @@ errno_t _ultoa_s(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int r
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
@@ -4510,11 +4526,14 @@ char *_ui64toa($u64 val, [[nonnull]] char *buf, int radix) {
 [[alt_variant_of(__SIZEOF_INT__ == 8, _itoa_s)]]
 [[impl_include("<libc/errno.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	s64 temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -4541,9 +4560,7 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
@@ -4552,11 +4569,14 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 [[impl_include("<libc/errno.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, _ultoa_s)]]
 [[section(".text.crt.dos.unicode.static.convert")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 errno_t _ui64toa_s($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	u64 temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	temp = val;
 	do {
@@ -4572,9 +4592,7 @@ errno_t _ui64toa_s($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x992fbc4e */
+/* HASH CRC-32:0x853e7f46 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,7 +173,6 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
                                char16_t const *__restrict text,
                                size_t textlen,
                                unsigned int flags) THROWS(...) {
-#define escape_tooct(c) ('0' + (char16_t)(char16_t)(c))
 	__PRIVATE char16_t const quote[1] = { '\"' };
 	char16_t encoded_text[12]; size_t encoded_text_size;
 	ssize_t result = 0, temp;
@@ -230,92 +229,92 @@ encode_oct:
 							goto encode_hex;
 					}
 					if (ch <= 0x07) {
-						encoded_text[1] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 2;
 					} else if (ch <= 0x3f) {
-						encoded_text[1] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[2] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[2] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 3;
 					} else if (ch <= 0x1ff) {
-						encoded_text[1] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[2] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[3] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[2] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[3] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 4;
 					} else if (ch <= 0xfff) {
-						encoded_text[1] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[2] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[3] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[4] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[2] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[3] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[4] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 5;
 					} else if (ch <= 0x7fff) {
-						encoded_text[1] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[2] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[3] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[4] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[5] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[2] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[3] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[4] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[5] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 6;
 					} else if (ch <= 0x3ffff) {
-						encoded_text[1] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[2] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[3] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[4] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[5] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[6] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[2] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[3] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[4] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[5] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[6] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 7;
 					} else if (ch <= 0x1fffff) {
-						encoded_text[1] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[2] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[3] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[4] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[5] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[6] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[7] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[2] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[3] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[4] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[5] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[6] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[7] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 8;
 					} else if (ch <= 0xffffff) {
-						encoded_text[1] = escape_tooct((ch & 0x00e00000) >> 21);
-						encoded_text[2] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[3] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[4] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[5] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[6] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[7] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[8] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00e00000) >> 21);
+						encoded_text[2] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[3] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[4] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[5] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[6] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[7] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[8] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 9;
 					} else if (ch <= 0x7ffffff) {
-						encoded_text[1] = escape_tooct((ch & 0x07000000) >> 24);
-						encoded_text[2] = escape_tooct((ch & 0x00e00000) >> 21);
-						encoded_text[3] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[4] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[5] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[6] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[7] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[8] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[9] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x07000000) >> 24);
+						encoded_text[2] = itoa_decimal((ch & 0x00e00000) >> 21);
+						encoded_text[3] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[4] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[5] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[6] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[7] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[8] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[9] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 10;
 					} else if (ch <= 0x3fffffff) {
-						encoded_text[1] = escape_tooct((ch & 0x38000000) >> 27);
-						encoded_text[2] = escape_tooct((ch & 0x07000000) >> 24);
-						encoded_text[3] = escape_tooct((ch & 0x00e00000) >> 21);
-						encoded_text[4] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[5] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[6] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[7] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[8] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[9] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[10] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x38000000) >> 27);
+						encoded_text[2] = itoa_decimal((ch & 0x07000000) >> 24);
+						encoded_text[3] = itoa_decimal((ch & 0x00e00000) >> 21);
+						encoded_text[4] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[5] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[6] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[7] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[8] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[9] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[10] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 11;
 					} else {
-						encoded_text[1] = escape_tooct((ch & 0xc0000000) >> 30);
-						encoded_text[2] = escape_tooct((ch & 0x38000000) >> 27);
-						encoded_text[3] = escape_tooct((ch & 0x07000000) >> 24);
-						encoded_text[4] = escape_tooct((ch & 0x00e00000) >> 21);
-						encoded_text[5] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[6] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[7] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[8] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[9] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[10] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[11] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0xc0000000) >> 30);
+						encoded_text[2] = itoa_decimal((ch & 0x38000000) >> 27);
+						encoded_text[3] = itoa_decimal((ch & 0x07000000) >> 24);
+						encoded_text[4] = itoa_decimal((ch & 0x00e00000) >> 21);
+						encoded_text[5] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[6] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[7] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[8] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[9] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[10] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[11] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 12;
 					}
 					goto print_encoded;
@@ -370,32 +369,32 @@ encode_hex:
 				}
 				if (ch <= 0xf) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, ch);
+					encoded_text[2] = itoa_digit(flags & 0x0020, ch);
 					encoded_text_size = 3;
 				} else if (ch <= 0x7f) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
-					encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
+					encoded_text[2] = itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+					encoded_text[3] = itoa_digit(flags & 0x0020, ch & 0x0000000f);
 					encoded_text_size = 4;
 				} else {
 encode_uni:
 					if (ch <= 0xffff) {
 						encoded_text[1] = 'u';
-						encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
-						encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
-						encoded_text[4] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
-						encoded_text[5] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
+						encoded_text[2] = itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
+						encoded_text[3] = itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
+						encoded_text[4] = itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+						encoded_text[5] = itoa_digit(flags & 0x0020, ch & 0x0000000f);
 						encoded_text_size = 6;
 					} else {
 						encoded_text[1] = 'U';
-						encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0xf0000000) >> 28);
-						encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0f000000) >> 24);
-						encoded_text[4] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00f00000) >> 20);
-						encoded_text[5] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000f0000) >> 16);
-						encoded_text[6] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
-						encoded_text[7] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
-						encoded_text[8] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
-						encoded_text[9] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
+						encoded_text[2] = itoa_digit(flags & 0x0020, (ch & 0xf0000000) >> 28);
+						encoded_text[3] = itoa_digit(flags & 0x0020, (ch & 0x0f000000) >> 24);
+						encoded_text[4] = itoa_digit(flags & 0x0020, (ch & 0x00f00000) >> 20);
+						encoded_text[5] = itoa_digit(flags & 0x0020, (ch & 0x000f0000) >> 16);
+						encoded_text[6] = itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
+						encoded_text[7] = itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
+						encoded_text[8] = itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+						encoded_text[9] = itoa_digit(flags & 0x0020, ch & 0x0000000f);
 						encoded_text_size = 10;
 					}
 				}
@@ -424,7 +423,6 @@ print_encoded:
 	return result;
 err:
 	return temp;
-#undef escape_tooct
 }
 #include <libc/template/itoa_digits.h>
 /* >> format_escape(3)
@@ -447,7 +445,6 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
                                char32_t const *__restrict text,
                                size_t textlen,
                                unsigned int flags) THROWS(...) {
-#define escape_tooct(c) ('0' + (char32_t)(char32_t)(c))
 	__PRIVATE char32_t const quote[1] = { '\"' };
 	char32_t encoded_text[12]; size_t encoded_text_size;
 	ssize_t result = 0, temp;
@@ -504,92 +501,92 @@ encode_oct:
 							goto encode_hex;
 					}
 					if (ch <= 0x07) {
-						encoded_text[1] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 2;
 					} else if (ch <= 0x3f) {
-						encoded_text[1] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[2] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[2] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 3;
 					} else if (ch <= 0x1ff) {
-						encoded_text[1] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[2] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[3] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[2] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[3] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 4;
 					} else if (ch <= 0xfff) {
-						encoded_text[1] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[2] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[3] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[4] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[2] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[3] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[4] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 5;
 					} else if (ch <= 0x7fff) {
-						encoded_text[1] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[2] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[3] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[4] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[5] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[2] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[3] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[4] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[5] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 6;
 					} else if (ch <= 0x3ffff) {
-						encoded_text[1] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[2] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[3] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[4] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[5] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[6] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[2] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[3] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[4] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[5] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[6] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 7;
 					} else if (ch <= 0x1fffff) {
-						encoded_text[1] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[2] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[3] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[4] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[5] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[6] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[7] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[2] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[3] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[4] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[5] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[6] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[7] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 8;
 					} else if (ch <= 0xffffff) {
-						encoded_text[1] = escape_tooct((ch & 0x00e00000) >> 21);
-						encoded_text[2] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[3] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[4] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[5] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[6] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[7] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[8] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x00e00000) >> 21);
+						encoded_text[2] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[3] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[4] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[5] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[6] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[7] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[8] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 9;
 					} else if (ch <= 0x7ffffff) {
-						encoded_text[1] = escape_tooct((ch & 0x07000000) >> 24);
-						encoded_text[2] = escape_tooct((ch & 0x00e00000) >> 21);
-						encoded_text[3] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[4] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[5] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[6] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[7] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[8] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[9] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x07000000) >> 24);
+						encoded_text[2] = itoa_decimal((ch & 0x00e00000) >> 21);
+						encoded_text[3] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[4] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[5] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[6] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[7] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[8] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[9] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 10;
 					} else if (ch <= 0x3fffffff) {
-						encoded_text[1] = escape_tooct((ch & 0x38000000) >> 27);
-						encoded_text[2] = escape_tooct((ch & 0x07000000) >> 24);
-						encoded_text[3] = escape_tooct((ch & 0x00e00000) >> 21);
-						encoded_text[4] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[5] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[6] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[7] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[8] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[9] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[10] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0x38000000) >> 27);
+						encoded_text[2] = itoa_decimal((ch & 0x07000000) >> 24);
+						encoded_text[3] = itoa_decimal((ch & 0x00e00000) >> 21);
+						encoded_text[4] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[5] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[6] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[7] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[8] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[9] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[10] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 11;
 					} else {
-						encoded_text[1] = escape_tooct((ch & 0xc0000000) >> 30);
-						encoded_text[2] = escape_tooct((ch & 0x38000000) >> 27);
-						encoded_text[3] = escape_tooct((ch & 0x07000000) >> 24);
-						encoded_text[4] = escape_tooct((ch & 0x00e00000) >> 21);
-						encoded_text[5] = escape_tooct((ch & 0x001c0000) >> 18);
-						encoded_text[6] = escape_tooct((ch & 0x00038000) >> 15);
-						encoded_text[7] = escape_tooct((ch & 0x00007000) >> 12);
-						encoded_text[8] = escape_tooct((ch & 0x00000e00) >> 9);
-						encoded_text[9] = escape_tooct((ch & 0x000000c0) >> 6);
-						encoded_text[10] = escape_tooct((ch & 0x00000038) >> 3);
-						encoded_text[11] = escape_tooct((ch & 0x00000007));
+						encoded_text[1] = itoa_decimal((ch & 0xc0000000) >> 30);
+						encoded_text[2] = itoa_decimal((ch & 0x38000000) >> 27);
+						encoded_text[3] = itoa_decimal((ch & 0x07000000) >> 24);
+						encoded_text[4] = itoa_decimal((ch & 0x00e00000) >> 21);
+						encoded_text[5] = itoa_decimal((ch & 0x001c0000) >> 18);
+						encoded_text[6] = itoa_decimal((ch & 0x00038000) >> 15);
+						encoded_text[7] = itoa_decimal((ch & 0x00007000) >> 12);
+						encoded_text[8] = itoa_decimal((ch & 0x00000e00) >> 9);
+						encoded_text[9] = itoa_decimal((ch & 0x000000c0) >> 6);
+						encoded_text[10] = itoa_decimal((ch & 0x00000038) >> 3);
+						encoded_text[11] = itoa_decimal((ch & 0x00000007));
 						encoded_text_size = 12;
 					}
 					goto print_encoded;
@@ -644,32 +641,32 @@ encode_hex:
 				}
 				if (ch <= 0xf) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, ch);
+					encoded_text[2] = itoa_digit(flags & 0x0020, ch);
 					encoded_text_size = 3;
 				} else if (ch <= 0x7f) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
-					encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
+					encoded_text[2] = itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+					encoded_text[3] = itoa_digit(flags & 0x0020, ch & 0x0000000f);
 					encoded_text_size = 4;
 				} else {
 encode_uni:
 					if (ch <= 0xffff) {
 						encoded_text[1] = 'u';
-						encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
-						encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
-						encoded_text[4] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
-						encoded_text[5] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
+						encoded_text[2] = itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
+						encoded_text[3] = itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
+						encoded_text[4] = itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+						encoded_text[5] = itoa_digit(flags & 0x0020, ch & 0x0000000f);
 						encoded_text_size = 6;
 					} else {
 						encoded_text[1] = 'U';
-						encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0xf0000000) >> 28);
-						encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0f000000) >> 24);
-						encoded_text[4] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00f00000) >> 20);
-						encoded_text[5] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000f0000) >> 16);
-						encoded_text[6] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
-						encoded_text[7] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
-						encoded_text[8] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
-						encoded_text[9] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
+						encoded_text[2] = itoa_digit(flags & 0x0020, (ch & 0xf0000000) >> 28);
+						encoded_text[3] = itoa_digit(flags & 0x0020, (ch & 0x0f000000) >> 24);
+						encoded_text[4] = itoa_digit(flags & 0x0020, (ch & 0x00f00000) >> 20);
+						encoded_text[5] = itoa_digit(flags & 0x0020, (ch & 0x000f0000) >> 16);
+						encoded_text[6] = itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
+						encoded_text[7] = itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
+						encoded_text[8] = itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+						encoded_text[9] = itoa_digit(flags & 0x0020, ch & 0x0000000f);
 						encoded_text_size = 10;
 					}
 				}
@@ -698,7 +695,6 @@ print_encoded:
 	return result;
 err:
 	return temp;
-#undef escape_tooct
 }
 #include <hybrid/__alloca.h>
 #include <hybrid/__unaligned.h>
@@ -747,7 +743,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 			dst = buffer + sizeof(void *) * 2;
 			*dst = ' ';
 			while (dst > buffer) {
-				*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), value & 0xf);
+				*--dst = itoa_digit(!(flags & 0x0001), value & 0xf);
 				value >>= 4;
 			}
 			temp = (*printer)(arg, buffer, (sizeof(void *) * 2) + 1);
@@ -760,7 +756,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 			*dst = ' ';
 			value = (line_data - (byte_t const *)data);
 			while (dst > buffer + 1) {
-				*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), value & 0xf);
+				*--dst = itoa_digit(!(flags & 0x0001), value & 0xf);
 				value >>= 4;
 			}
 			buffer[0] = '+';
@@ -785,7 +781,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 					u16 w = __hybrid_unaligned_get16((u16 *)(line_data + i));
 					dst = buffer + 4;
 					while (dst > buffer) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), w & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), w & 0xf);
 						w >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 5);
@@ -803,7 +799,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 					u32 l = __hybrid_unaligned_get32((u32 *)(line_data + i));
 					dst = buffer + 8;
 					while (dst > buffer) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), l & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), l & 0xf);
 						l >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 9);
@@ -822,7 +818,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
 					dst = buffer + 16;
 					while (dst > buffer) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), q & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), q & 0xf);
 						q >>= 4;
 					}
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -836,11 +832,11 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), b & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), b & 0xf);
 						b >>= 4;
 					}
 					while (dst > buffer) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), a & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), a & 0xf);
 						a >>= 4;
 					}
 #endif /* __SIZEOF_POINTER__ < 8 */
@@ -855,8 +851,8 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 			buffer[2] = ' ';
 			for (; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				buffer[0] = __LOCAL_itoa_digit(!(flags & 0x0001), b >> 4);
-				buffer[1] = __LOCAL_itoa_digit(!(flags & 0x0001), b & 0xf);
+				buffer[0] = itoa_digit(!(flags & 0x0001), b >> 4);
+				buffer[1] = itoa_digit(!(flags & 0x0001), b & 0xf);
 				temp = (*printer)(arg, buffer, 3);
 				if unlikely(temp < 0)
 					goto err;
@@ -942,7 +938,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 			dst = buffer + sizeof(void *) * 2;
 			*dst = ' ';
 			while (dst > buffer) {
-				*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), value & 0xf);
+				*--dst = itoa_digit(!(flags & 0x0001), value & 0xf);
 				value >>= 4;
 			}
 			temp = (*printer)(arg, buffer, (sizeof(void *) * 2) + 1);
@@ -955,7 +951,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 			*dst = ' ';
 			value = (line_data - (byte_t const *)data);
 			while (dst > buffer + 1) {
-				*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), value & 0xf);
+				*--dst = itoa_digit(!(flags & 0x0001), value & 0xf);
 				value >>= 4;
 			}
 			buffer[0] = '+';
@@ -980,7 +976,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 					u16 w = __hybrid_unaligned_get16((u16 *)(line_data + i));
 					dst = buffer + 4;
 					while (dst > buffer) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), w & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), w & 0xf);
 						w >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 5);
@@ -998,7 +994,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 					u32 l = __hybrid_unaligned_get32((u32 *)(line_data + i));
 					dst = buffer + 8;
 					while (dst > buffer) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), l & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), l & 0xf);
 						l >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 9);
@@ -1017,7 +1013,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
 					dst = buffer + 16;
 					while (dst > buffer) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), q & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), q & 0xf);
 						q >>= 4;
 					}
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -1031,11 +1027,11 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), b & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), b & 0xf);
 						b >>= 4;
 					}
 					while (dst > buffer) {
-						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), a & 0xf);
+						*--dst = itoa_digit(!(flags & 0x0001), a & 0xf);
 						a >>= 4;
 					}
 #endif /* __SIZEOF_POINTER__ < 8 */
@@ -1050,8 +1046,8 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 			buffer[2] = ' ';
 			for (; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				buffer[0] = __LOCAL_itoa_digit(!(flags & 0x0001), b >> 4);
-				buffer[1] = __LOCAL_itoa_digit(!(flags & 0x0001), b & 0xf);
+				buffer[0] = itoa_digit(!(flags & 0x0001), b >> 4);
+				buffer[1] = itoa_digit(!(flags & 0x0001), b & 0xf);
 				temp = (*printer)(arg, buffer, 3);
 				if unlikely(temp < 0)
 					goto err;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc65f0427 */
+/* HASH CRC-32:0xea1d2ba6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,16 @@
 #include <__crt.h>
 #include <bits/types.h>
 #include <libc/errno.h>
+#include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ultoa_s) __ATTR_NONNULL((2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultoa_s))(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) {
 	char *__p;
 	unsigned long __temp;
-	if (__radix < 2)
-		__radix = 10;
+	if __unlikely(__radix < 2)
+		__radix = 2;
+	if __unlikely(__radix > 36)
+		__radix = 36;
 	__p = __buf;
 	__temp = __val;
 	do {
@@ -45,9 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultoa_s))(unsigned long __val, char 
 	__temp = __val;
 	*__p = '\0';
 	do {
-		unsigned char __digit;
-		__digit = __temp % (unsigned int)__radix;
-		*--__p = __digit < 10 ? (char)('0' + __digit) : (char)('A' + (__digit - 10));
+		*--__p = __LOCAL_itoa_upper_digits[__temp % (unsigned int)__radix];
 	} while ((__temp /= (unsigned int)__radix) != 0);
 	return 0;
 }

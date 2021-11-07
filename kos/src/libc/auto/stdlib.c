@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x289d9bc2 */
+/* HASH CRC-32:0x1a65f7fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2243,11 +2243,12 @@ NOTHROW_NCX(LIBCCALL libc_lltostr)(__LONGLONG value,
 	}
 	return result;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL WUNUSED NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_ulltostr)(__ULONGLONG value,
                                     char *buf) {
 	do {
-		*--buf = '0' + (value % 10);
+		*--buf = itoa_decimal(value % 10);
 	} while ((value /= 10) != 0);
 	return buf;
 }
@@ -2756,6 +2757,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
 	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
 	               &data);
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
                                    char *buf,
@@ -2763,8 +2765,10 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
                                    int radix) {
 	char *p;
 	int temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -2791,15 +2795,14 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc__ltoa_s, libc__itoa_s);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
                                    char *buf,
@@ -2807,8 +2810,10 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
                                    int radix) {
 	char *p;
 	long temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -2835,13 +2840,12 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
                                     char *buf,
@@ -2849,8 +2853,10 @@ NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
                                     int radix) {
 	char *p;
 	unsigned long temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	temp = val;
 	do {
@@ -2866,9 +2872,7 @@ NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
@@ -2901,6 +2905,7 @@ DEFINE_INTERN_ALIAS(libc__i64toa_s, libc__ltoa_s);
 #elif __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__i64toa_s, libc__itoa_s);
 #else /* ... */
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
                                      char *buf,
@@ -2908,8 +2913,10 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
                                      int radix) {
 	char *p;
 	s64 temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -2936,9 +2943,7 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
@@ -2946,6 +2951,7 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 #if __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc__ui64toa_s, libc__ultoa_s);
 #else /* __SIZEOF_LONG__ == 8 */
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
                                       char *buf,
@@ -2953,8 +2959,10 @@ NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
                                       int radix) {
 	char *p;
 	u64 temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	temp = val;
 	do {
@@ -2970,9 +2978,7 @@ NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char)('0' + digit) : (char)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
@@ -3867,6 +3873,7 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow)(u64 val,
 	libc__ui64tow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
                                    char16_t *buf,
@@ -3874,8 +3881,10 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
                                    int radix) {
 	char16_t *p;
 	int temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -3902,12 +3911,11 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
 	temp = val;
 	*p = '\0';
 	do {
-		char16_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
                                    char32_t *buf,
@@ -3915,8 +3923,10 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
                                    int radix) {
 	char32_t *p;
 	int temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -3943,12 +3953,11 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
 	temp = val;
 	*p = '\0';
 	do {
-		char32_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
                                    char16_t *buf,
@@ -3956,8 +3965,10 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
                                    int radix) {
 	char16_t *p;
 	long temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -3984,12 +3995,11 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
 	temp = val;
 	*p = '\0';
 	do {
-		char16_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
                                    char32_t *buf,
@@ -3997,8 +4007,10 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
                                    int radix) {
 	char32_t *p;
 	long temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -4025,12 +4037,11 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 	temp = val;
 	*p = '\0';
 	do {
-		char32_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
                                     char16_t *buf,
@@ -4038,8 +4049,10 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
                                     int radix) {
 	char16_t *p;
 	unsigned long temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	temp = val;
 	do {
@@ -4055,12 +4068,11 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
 	temp = val;
 	*p = '\0';
 	do {
-		char16_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
                                     char32_t *buf,
@@ -4068,8 +4080,10 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
                                     int radix) {
 	char32_t *p;
 	unsigned long temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	temp = val;
 	do {
@@ -4085,12 +4099,11 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
 	temp = val;
 	*p = '\0';
 	do {
-		char32_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
                                      char16_t *buf,
@@ -4098,8 +4111,10 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
                                      int radix) {
 	char16_t *p;
 	s64 temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -4126,12 +4141,11 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		char16_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
                                      char32_t *buf,
@@ -4139,8 +4153,10 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
                                      int radix) {
 	char32_t *p;
 	s64 temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
@@ -4167,12 +4183,11 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		char32_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
                                       char16_t *buf,
@@ -4180,8 +4195,10 @@ NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
                                       int radix) {
 	char16_t *p;
 	u64 temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	temp = val;
 	do {
@@ -4197,12 +4214,11 @@ NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		char16_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
                                       char32_t *buf,
@@ -4210,8 +4226,10 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
                                       int radix) {
 	char32_t *p;
 	u64 temp;
-	if (radix < 2)
-		radix = 10;
+	if unlikely(radix < 2)
+		radix = 2;
+	if unlikely(radix > 36)
+		radix = 36;
 	p = buf;
 	temp = val;
 	do {
@@ -4227,9 +4245,7 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		char32_t digit;
-		digit = temp % (unsigned int)radix;
-		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
+		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }

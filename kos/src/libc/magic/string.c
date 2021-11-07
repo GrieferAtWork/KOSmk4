@@ -872,6 +872,7 @@ size_t strxfrm(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen)
 [[decl_include("<bits/types.h>")]]
 [[std, wunused, ATTR_COLD, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.errno")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 char *strerror($errno_t errnum) {
 	static char strerror_buf[64];
 	char *result;
@@ -895,7 +896,7 @@ char *strerror($errno_t errnum) {
 		result = COMPILER_ENDOF(strerror_buf);
 		*--result = '\0';
 		do {
-			*--result = '0' + (iter % 10);
+			*--result = itoa_decimal(iter % 10);
 		} while ((iter /= 10) != 0);
 		if (errnum < 0)
 			*--result = '-';

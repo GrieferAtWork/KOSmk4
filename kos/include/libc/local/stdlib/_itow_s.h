@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f16d6f7 */
+/* HASH CRC-32:0x677459da */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,16 @@
 #include <__crt.h>
 #include <bits/types.h>
 #include <libc/errno.h>
+#include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_itow_s) __ATTR_NONNULL((2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow_s))(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix) {
 	__WCHAR_TYPE__ *__p;
 	int __temp;
-	if (__radix < 2)
-		__radix = 10;
+	if __unlikely(__radix < 2)
+		__radix = 2;
+	if __unlikely(__radix > 36)
+		__radix = 36;
 	__p = __buf;
 	if (__val < 0) {
 		if (!__buflen--) {
@@ -56,9 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow_s))(int __val, __WCHAR_TYPE__ *
 	__temp = __val;
 	*__p = '\0';
 	do {
-		__WCHAR_TYPE__ __digit;
-		__digit = __temp % (unsigned int)__radix;
-		*--__p = __digit < 10 ? (__WCHAR_TYPE__)('0' + __digit) : (__WCHAR_TYPE__)('A' + (__digit - 10));
+		*--__p = __LOCAL_itoa_upper_digits[__temp % (unsigned int)__radix];
 	} while ((__temp /= (unsigned int)__radix) != 0);
 	return 0;
 }

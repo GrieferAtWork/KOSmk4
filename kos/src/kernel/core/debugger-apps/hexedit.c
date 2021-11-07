@@ -52,6 +52,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <ctype.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
@@ -277,9 +278,7 @@ LOCAL ATTR_DBGTEXT char FCALL
 hd_tohex(byte_t val, bool is_valid) {
 	if (!is_valid)
 		return '?';
-	if (val <= 9)
-		return '0' + val;
-	return 'A' + (val - 10);
+	return _itoa_upper_digits[val];
 }
 
 

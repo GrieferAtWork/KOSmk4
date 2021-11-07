@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83fde538 */
+/* HASH CRC-32:0x5b4aa4f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,12 @@
 #ifndef __local_ulltostr_defined
 #define __local_ulltostr_defined
 #include <__crt.h>
+#include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ulltostr) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ulltostr))(__ULONGLONG __value, char *__buf) {
 	do {
-		*--__buf = '0' + (__value % 10);
+		*--__buf = __LOCAL_itoa_decimal(__value % 10);
 	} while ((__value /= 10) != 0);
 	return __buf;
 }

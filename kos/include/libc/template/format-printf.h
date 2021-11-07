@@ -1209,8 +1209,7 @@ __again_vinfo_xiter:
 __do_vinfo_hex:
 					__bufiter = __COMPILER_ENDOF(__buf);
 					do {
-						__UINT8_TYPE__ __digit = __val % 16;
-						*--__bufiter = __digit >= 10 ? (char)('A' + (__digit - 10)) : (char)('0' + __digit);
+						*--__bufiter = __LOCAL_itoa_upper_digits[__val % 16];
 					} while ((__val /= 16) != 0);
 					__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __bufiter, (__SIZE_TYPE__)(__COMPILER_ENDOF(__buf) - __bufiter));
 					if __unlikely(__temp < 0)
@@ -1308,8 +1307,7 @@ __do_vinfo_hex:
 __do_vinfo_decimal:
 					__bufiter = __COMPILER_ENDOF(__buf);
 					do {
-						__UINT8_TYPE__ __digit = __val % 10;
-						*--__bufiter = (char)('0' + __digit);
+						*--__bufiter = __LOCAL_itoa_decimal(__val % 10);
 					} while ((__val /= 10) != 0);
 					__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __bufiter, (__SIZE_TYPE__)(__COMPILER_ENDOF(__buf) - __bufiter));
 					if __unlikely(__temp < 0)
@@ -1416,10 +1414,7 @@ __err_vinfo:
 				__bufdst = __COMPILER_ENDOF(__ptr_buffer);
 				__val = (__UINTPTR_TYPE__)__p;
 				do {
-					--__bufdst;
-					*__bufdst = (__val & 0xf) < 10
-						? ('0' + (__val & 0xf))
-						: ('A' + ((__val & 0xf) - 10));
+					*--__bufdst = __LOCAL_itoa_upper_digits[__val & 0xf];
 					__val >>= 4;
 				} while (__bufdst > __ptr_buffer);
 				__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __ptr_buffer, __COMPILER_LENOF(__ptr_buffer));
@@ -1433,10 +1428,7 @@ __err_vinfo:
 				__bufdst = __COMPILER_ENDOF(__ptr_buffer);
 				__val = (__UINTPTR_TYPE__)__p;
 				do {
-					--__bufdst;
-					*__bufdst = (__val & 0xf) < 10
-						? ('0' + (__val & 0xf))
-						: ('A' + ((__val & 0xf) - 10));
+					*--__bufdst = __LOCAL_itoa_upper_digits[__val & 0xf];
 					__val >>= 4;
 				} while (__bufdst > __ptr_buffer);
 				__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __ptr_buffer, __COMPILER_LENOF(__ptr_buffer));

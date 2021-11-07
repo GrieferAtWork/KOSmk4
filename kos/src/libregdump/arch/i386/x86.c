@@ -38,6 +38,7 @@
 
 #include <format-printer.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <libdebuginfo/addr2line.h>
@@ -185,10 +186,10 @@ libregdump_gpreg(struct regdump_printer *__restrict self,
 #ifdef __x86_64__
 	if (id >= '0' && id <= '7') {
 		if (id <= '1') {
-			name[2] = '8' + (id - '1');
+			name[2] = itoa_decimal(8 + (id - '1'));
 		} else {
-			name[2] = '1' + (id - '1');
-			name[3] = '0' + (id - '2');
+			name[2] = itoa_decimal(1 + (id - '1'));
+			name[3] = itoa_decimal(id - '2');
 		}
 		print(name, id <= 1 ? 3 : 4);
 	} else
@@ -602,7 +603,7 @@ libregdump_dr7(struct regdump_printer *__restrict self,
 			          : mode == (unsigned int)DR7_LN(i)
 			            ? 'l'
 			            : 'g';
-			desc[1] = '0' + i;
+			desc[1] = itoa_decimal(i);
 			if (!is_first)
 				PRINT(",");
 			format(REGDUMP_FORMAT_FLAG_PREFIX);
@@ -888,7 +889,7 @@ libregdump_do_drx(struct regdump_printer *__restrict self,
 		name[0] = '%';
 		name[1] = 'd';
 		name[2] = 'r';
-		name[3] = '0' + n;
+		name[3] = itoa_decimal(n);
 		print(name, 4);
 	}
 	format(REGDUMP_FORMAT_REGISTER_SUFFIX);

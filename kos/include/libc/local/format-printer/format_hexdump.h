@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff1f03e3 */
+/* HASH CRC-32:0x2e54664b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 			__dst = __buffer + sizeof(void *) * 2;
 			*__dst = ' ';
 			while (__dst > __buffer) {
-				*--__dst = __itoa_digit(!(__flags & 0x0001), __value & 0xf);
+				*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __value & 0xf);
 				__value >>= 4;
 			}
 			__temp = (*__printer)(__arg, __buffer, (sizeof(void *) * 2) + 1);
@@ -103,7 +103,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 			*__dst = ' ';
 			__value = (__line_data - (__BYTE_TYPE__ const *)__data);
 			while (__dst > __buffer + 1) {
-				*--__dst = __itoa_digit(!(__flags & 0x0001), __value & 0xf);
+				*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __value & 0xf);
 				__value >>= 4;
 			}
 			__buffer[0] = '+';
@@ -128,7 +128,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 					__UINT16_TYPE__ __w = __hybrid_unaligned_get16((__UINT16_TYPE__ *)(__line_data + __i));
 					__dst = __buffer + 4;
 					while (__dst > __buffer) {
-						*--__dst = __itoa_digit(!(__flags & 0x0001), __w & 0xf);
+						*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __w & 0xf);
 						__w >>= 4;
 					}
 					__temp = (*__printer)(__arg, __buffer, 5);
@@ -146,7 +146,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 					__UINT32_TYPE__ __l = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
 					__dst = __buffer + 8;
 					while (__dst > __buffer) {
-						*--__dst = __itoa_digit(!(__flags & 0x0001), __l & 0xf);
+						*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __l & 0xf);
 						__l >>= 4;
 					}
 					__temp = (*__printer)(__arg, __buffer, 9);
@@ -165,7 +165,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 					__UINT64_TYPE__ __q = __hybrid_unaligned_get64((__UINT64_TYPE__ *)(__line_data + __i));
 					__dst = __buffer + 16;
 					while (__dst > __buffer) {
-						*--__dst = __itoa_digit(!(__flags & 0x0001), __q & 0xf);
+						*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __q & 0xf);
 						__q >>= 4;
 					}
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -179,11 +179,11 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					__dst = __buffer + 16;
 					while (__dst > __buffer + 8) {
-						*--__dst = __itoa_digit(!(__flags & 0x0001), __b & 0xf);
+						*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __b & 0xf);
 						__b >>= 4;
 					}
 					while (__dst > __buffer) {
-						*--__dst = __itoa_digit(!(__flags & 0x0001), __a & 0xf);
+						*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __a & 0xf);
 						__a >>= 4;
 					}
 #endif /* __SIZEOF_POINTER__ < 8 */
@@ -198,8 +198,8 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 			__buffer[2] = ' ';
 			for (; __i < __line_len; ++__i) {
 				__BYTE_TYPE__ __b = __line_data[__i];
-				__buffer[0] = __itoa_digit(!(__flags & 0x0001), __b >> 4);
-				__buffer[1] = __itoa_digit(!(__flags & 0x0001), __b & 0xf);
+				__buffer[0] = __LOCAL_itoa_digit(!(__flags & 0x0001), __b >> 4);
+				__buffer[1] = __LOCAL_itoa_digit(!(__flags & 0x0001), __b & 0xf);
 				__temp = (*__printer)(__arg, __buffer, 3);
 				if __unlikely(__temp < 0)
 					goto __err;

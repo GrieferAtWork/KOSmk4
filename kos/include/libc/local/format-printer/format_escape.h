@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf369729f */
+/* HASH CRC-32:0x2232ffd3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,6 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_escape))(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
-#define __escape_tooct(__c) ('0' + (char)(unsigned char)(__c))
 	__PRIVATE char const __quote[1] = { '\"' };
 	char __encoded_text[12]; __SIZE_TYPE__ __encoded_text_size;
 	__SSIZE_TYPE__ __result = 0, __temp;
@@ -109,92 +108,92 @@ __encode_oct:
 							goto __encode_hex;
 					}
 					if (__ch <= 0x07) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 2;
 					} else if (__ch <= 0x3f) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[2] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 3;
 					} else if (__ch <= 0x1ff) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[2] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[3] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 4;
 					} else if (__ch <= 0xfff) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x00000e00) >> 9);
-						__encoded_text[2] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[3] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[4] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x00000e00) >> 9);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[4] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 5;
 					} else if (__ch <= 0x7fff) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x00007000) >> 12);
-						__encoded_text[2] = __escape_tooct((__ch & 0x00000e00) >> 9);
-						__encoded_text[3] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[4] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[5] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x00007000) >> 12);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x00000e00) >> 9);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[4] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[5] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 6;
 					} else if (__ch <= 0x3ffff) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x00038000) >> 15);
-						__encoded_text[2] = __escape_tooct((__ch & 0x00007000) >> 12);
-						__encoded_text[3] = __escape_tooct((__ch & 0x00000e00) >> 9);
-						__encoded_text[4] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[5] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[6] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x00038000) >> 15);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x00007000) >> 12);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x00000e00) >> 9);
+						__encoded_text[4] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[5] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[6] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 7;
 					} else if (__ch <= 0x1fffff) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x001c0000) >> 18);
-						__encoded_text[2] = __escape_tooct((__ch & 0x00038000) >> 15);
-						__encoded_text[3] = __escape_tooct((__ch & 0x00007000) >> 12);
-						__encoded_text[4] = __escape_tooct((__ch & 0x00000e00) >> 9);
-						__encoded_text[5] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[6] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[7] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x001c0000) >> 18);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x00038000) >> 15);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x00007000) >> 12);
+						__encoded_text[4] = __LOCAL_itoa_decimal((__ch & 0x00000e00) >> 9);
+						__encoded_text[5] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[6] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[7] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 8;
 					} else if (__ch <= 0xffffff) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x00e00000) >> 21);
-						__encoded_text[2] = __escape_tooct((__ch & 0x001c0000) >> 18);
-						__encoded_text[3] = __escape_tooct((__ch & 0x00038000) >> 15);
-						__encoded_text[4] = __escape_tooct((__ch & 0x00007000) >> 12);
-						__encoded_text[5] = __escape_tooct((__ch & 0x00000e00) >> 9);
-						__encoded_text[6] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[7] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[8] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x00e00000) >> 21);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x001c0000) >> 18);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x00038000) >> 15);
+						__encoded_text[4] = __LOCAL_itoa_decimal((__ch & 0x00007000) >> 12);
+						__encoded_text[5] = __LOCAL_itoa_decimal((__ch & 0x00000e00) >> 9);
+						__encoded_text[6] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[7] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[8] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 9;
 					} else if (__ch <= 0x7ffffff) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x07000000) >> 24);
-						__encoded_text[2] = __escape_tooct((__ch & 0x00e00000) >> 21);
-						__encoded_text[3] = __escape_tooct((__ch & 0x001c0000) >> 18);
-						__encoded_text[4] = __escape_tooct((__ch & 0x00038000) >> 15);
-						__encoded_text[5] = __escape_tooct((__ch & 0x00007000) >> 12);
-						__encoded_text[6] = __escape_tooct((__ch & 0x00000e00) >> 9);
-						__encoded_text[7] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[8] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[9] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x07000000) >> 24);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x00e00000) >> 21);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x001c0000) >> 18);
+						__encoded_text[4] = __LOCAL_itoa_decimal((__ch & 0x00038000) >> 15);
+						__encoded_text[5] = __LOCAL_itoa_decimal((__ch & 0x00007000) >> 12);
+						__encoded_text[6] = __LOCAL_itoa_decimal((__ch & 0x00000e00) >> 9);
+						__encoded_text[7] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[8] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[9] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 10;
 					} else if (__ch <= 0x3fffffff) {
-						__encoded_text[1] = __escape_tooct((__ch & 0x38000000) >> 27);
-						__encoded_text[2] = __escape_tooct((__ch & 0x07000000) >> 24);
-						__encoded_text[3] = __escape_tooct((__ch & 0x00e00000) >> 21);
-						__encoded_text[4] = __escape_tooct((__ch & 0x001c0000) >> 18);
-						__encoded_text[5] = __escape_tooct((__ch & 0x00038000) >> 15);
-						__encoded_text[6] = __escape_tooct((__ch & 0x00007000) >> 12);
-						__encoded_text[7] = __escape_tooct((__ch & 0x00000e00) >> 9);
-						__encoded_text[8] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[9] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[10] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0x38000000) >> 27);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x07000000) >> 24);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x00e00000) >> 21);
+						__encoded_text[4] = __LOCAL_itoa_decimal((__ch & 0x001c0000) >> 18);
+						__encoded_text[5] = __LOCAL_itoa_decimal((__ch & 0x00038000) >> 15);
+						__encoded_text[6] = __LOCAL_itoa_decimal((__ch & 0x00007000) >> 12);
+						__encoded_text[7] = __LOCAL_itoa_decimal((__ch & 0x00000e00) >> 9);
+						__encoded_text[8] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[9] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[10] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 11;
 					} else {
-						__encoded_text[1] = __escape_tooct((__ch & 0xc0000000) >> 30);
-						__encoded_text[2] = __escape_tooct((__ch & 0x38000000) >> 27);
-						__encoded_text[3] = __escape_tooct((__ch & 0x07000000) >> 24);
-						__encoded_text[4] = __escape_tooct((__ch & 0x00e00000) >> 21);
-						__encoded_text[5] = __escape_tooct((__ch & 0x001c0000) >> 18);
-						__encoded_text[6] = __escape_tooct((__ch & 0x00038000) >> 15);
-						__encoded_text[7] = __escape_tooct((__ch & 0x00007000) >> 12);
-						__encoded_text[8] = __escape_tooct((__ch & 0x00000e00) >> 9);
-						__encoded_text[9] = __escape_tooct((__ch & 0x000000c0) >> 6);
-						__encoded_text[10] = __escape_tooct((__ch & 0x00000038) >> 3);
-						__encoded_text[11] = __escape_tooct((__ch & 0x00000007));
+						__encoded_text[1] = __LOCAL_itoa_decimal((__ch & 0xc0000000) >> 30);
+						__encoded_text[2] = __LOCAL_itoa_decimal((__ch & 0x38000000) >> 27);
+						__encoded_text[3] = __LOCAL_itoa_decimal((__ch & 0x07000000) >> 24);
+						__encoded_text[4] = __LOCAL_itoa_decimal((__ch & 0x00e00000) >> 21);
+						__encoded_text[5] = __LOCAL_itoa_decimal((__ch & 0x001c0000) >> 18);
+						__encoded_text[6] = __LOCAL_itoa_decimal((__ch & 0x00038000) >> 15);
+						__encoded_text[7] = __LOCAL_itoa_decimal((__ch & 0x00007000) >> 12);
+						__encoded_text[8] = __LOCAL_itoa_decimal((__ch & 0x00000e00) >> 9);
+						__encoded_text[9] = __LOCAL_itoa_decimal((__ch & 0x000000c0) >> 6);
+						__encoded_text[10] = __LOCAL_itoa_decimal((__ch & 0x00000038) >> 3);
+						__encoded_text[11] = __LOCAL_itoa_decimal((__ch & 0x00000007));
 						__encoded_text_size = 12;
 					}
 					goto __print_encoded;
@@ -249,32 +248,32 @@ __encode_hex:
 				}
 				if (__ch <= 0xf) {
 					__encoded_text[1] = 'x';
-					__encoded_text[2] = __itoa_digit(__flags & 0x0020, __ch);
+					__encoded_text[2] = __LOCAL_itoa_digit(__flags & 0x0020, __ch);
 					__encoded_text_size = 3;
 				} else if (__ch <= 0x7f) {
 					__encoded_text[1] = 'x';
-					__encoded_text[2] = __itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
-					__encoded_text[3] = __itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
+					__encoded_text[2] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
+					__encoded_text[3] = __LOCAL_itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
 					__encoded_text_size = 4;
 				} else {
 __encode_uni:
 					if (__ch <= 0xffff) {
 						__encoded_text[1] = 'u';
-						__encoded_text[2] = __itoa_digit(__flags & 0x0020, (__ch & 0x0000f000) >> 12);
-						__encoded_text[3] = __itoa_digit(__flags & 0x0020, (__ch & 0x00000f00) >> 8);
-						__encoded_text[4] = __itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
-						__encoded_text[5] = __itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
+						__encoded_text[2] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x0000f000) >> 12);
+						__encoded_text[3] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x00000f00) >> 8);
+						__encoded_text[4] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
+						__encoded_text[5] = __LOCAL_itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
 						__encoded_text_size = 6;
 					} else {
 						__encoded_text[1] = 'U';
-						__encoded_text[2] = __itoa_digit(__flags & 0x0020, (__ch & 0xf0000000) >> 28);
-						__encoded_text[3] = __itoa_digit(__flags & 0x0020, (__ch & 0x0f000000) >> 24);
-						__encoded_text[4] = __itoa_digit(__flags & 0x0020, (__ch & 0x00f00000) >> 20);
-						__encoded_text[5] = __itoa_digit(__flags & 0x0020, (__ch & 0x000f0000) >> 16);
-						__encoded_text[6] = __itoa_digit(__flags & 0x0020, (__ch & 0x0000f000) >> 12);
-						__encoded_text[7] = __itoa_digit(__flags & 0x0020, (__ch & 0x00000f00) >> 8);
-						__encoded_text[8] = __itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
-						__encoded_text[9] = __itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
+						__encoded_text[2] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0xf0000000) >> 28);
+						__encoded_text[3] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x0f000000) >> 24);
+						__encoded_text[4] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x00f00000) >> 20);
+						__encoded_text[5] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x000f0000) >> 16);
+						__encoded_text[6] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x0000f000) >> 12);
+						__encoded_text[7] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x00000f00) >> 8);
+						__encoded_text[8] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
+						__encoded_text[9] = __LOCAL_itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
 						__encoded_text_size = 10;
 					}
 				}
@@ -303,7 +302,6 @@ __print_encoded:
 	return __result;
 __err:
 	return __temp;
-#undef __escape_tooct
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_escape_defined

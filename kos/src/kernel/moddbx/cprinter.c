@@ -46,6 +46,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -617,13 +618,6 @@ NOTHROW(FCALL use_decimal_representation)(char const *decimal_repr, size_t len) 
 			return true;
 	}
 	return false;
-}
-
-PRIVATE ATTR_CONST WUNUSED char
-NOTHROW(FCALL tohex)(byte_t nibble) {
-	if (nibble <= 9)
-		return '0' + nibble;
-	return 'a' + (nibble - 10);
 }
 
 
@@ -1673,7 +1667,7 @@ print_integer_value_as_hex:
 					/* Convert to hex */
 					ptr = COMPILER_ENDOF(hexbuf);
 					while (value.u && max_digits) {
-						*--ptr = tohex(value.u & 0xf);
+						*--ptr = _itoa_lower_digits[value.u & 0xf];
 						value.u >>= 4;
 						--max_digits;
 					}
@@ -1698,8 +1692,8 @@ print_integer_value_as_hex:
 				if unlikely(dbg_readmemory((byte_t const *)buf + i, &b, 1) != 0)
 					goto err_segfault;
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
-				repr[0] = tohex(b >> 4);
-				repr[1] = tohex(b & 0xf);
+				repr[0] = _itoa_lower_digits[b >> 4];
+				repr[1] = _itoa_lower_digits[b & 0xf];
 				DO((*P_PRINTER)(P_ARG, repr, 2));
 			}
 		}
