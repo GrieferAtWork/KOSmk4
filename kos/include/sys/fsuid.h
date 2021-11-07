@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66c8d151 */
+/* HASH CRC-32:0x27314c0b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,18 +42,50 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifdef __CRT_HAVE_setfsuid
 /* >> setfsuid(2)
  * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
  * @return: 0:  Success.
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),(__uid))
+__CDECLARE(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),(__uid))
+#elif defined(__CRT_HAVE___setfsuid)
+/* >> setfsuid(2)
+ * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
+__CREDIRECT(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),__setfsuid,(__uid))
+#elif defined(__CRT_HAVE___libc_setfsuid)
+/* >> setfsuid(2)
+ * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
+ * calling thread. The calling thread needs the `CAP_SETUID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
+__CREDIRECT(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),__libc_setfsuid,(__uid))
+#endif /* ... */
+#ifdef __CRT_HAVE_setfsgid
 /* >> setfsgid(2)
  * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETGID' privilege.
  * @return: 0:  Success.
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),(__gid))
+__CDECLARE(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),(__gid))
+#elif defined(__CRT_HAVE___setfsgid)
+/* >> setfsgid(2)
+ * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
+__CREDIRECT(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),__setfsgid,(__gid))
+#elif defined(__CRT_HAVE___libc_setfsgid)
+/* >> setfsgid(2)
+ * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
+ * calling thread. The calling thread needs the `CAP_SETGID' privilege.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno') */
+__CREDIRECT(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),__libc_setfsgid,(__gid))
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15b5339a */
+/* HASH CRC-32:0x7791df16 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_open64_defined
 #define __local_open64_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
+#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_open32_defined
@@ -32,6 +32,8 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open32,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open32,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___libc_open)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open32,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
 #undef __local___localdep_open32_defined
 #endif /* !... */
@@ -59,7 +61,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_open64_defined
 #define __localdep_open64 __LIBC_LOCAL_NAME(open64)
 #endif /* !__local___localdep_open64_defined */
-#else /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */
+#else /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open */
 #undef __local_open64_defined
-#endif /* !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open */
+#endif /* !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open */
 #endif /* !__local_open64_defined */

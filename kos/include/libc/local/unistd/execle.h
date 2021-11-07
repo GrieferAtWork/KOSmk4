@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c2de664 */
+/* HASH CRC-32:0xcf8409d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_execle_defined
 #define __local_execle_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
+#if defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_execve_defined
 #define __local___localdep_execve_defined
@@ -67,6 +67,34 @@ __NAMESPACE_LOCAL_END
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),_execve,(__path,___argv,___envp))
+#elif defined(__CRT_HAVE___execve)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#ifndef __TARGV
+#ifdef __USE_DOS_ALTERATIONS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS_ALTERATIONS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS_ALTERATIONS */
+#endif /* !__TARGV */
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),__execve,(__path,___argv,___envp))
+#elif defined(__CRT_HAVE___libc_execve)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#ifndef __TARGV
+#ifdef __USE_DOS_ALTERATIONS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS_ALTERATIONS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS_ALTERATIONS */
+#endif /* !__TARGV */
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),__libc_execve,(__path,___argv,___envp))
 #else /* ... */
 #undef __local___localdep_execve_defined
 #endif /* !... */
@@ -83,7 +111,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_execle_defined
 #define __localdep_execle __LIBC_LOCAL_NAME(execle)
 #endif /* !__local___localdep_execle_defined */
-#else /* __CRT_HAVE_execve || __CRT_HAVE__execve */
+#else /* __CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve */
 #undef __local_execle_defined
-#endif /* !__CRT_HAVE_execve && !__CRT_HAVE__execve */
+#endif /* !__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve */
 #endif /* !__local_execle_defined */

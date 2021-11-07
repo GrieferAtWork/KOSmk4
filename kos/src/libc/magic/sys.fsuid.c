@@ -49,6 +49,7 @@ __SYSDECL_BEGIN
 @@@return: 0:  Success.
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
+[[export_alias("__setfsuid", "__libc_setfsuid")]]
 int setfsuid($uid_t uid);
 
 @@>> setfsgid(2)
@@ -57,6 +58,7 @@ int setfsuid($uid_t uid);
 @@@return: 0:  Success.
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
+[[export_alias("__setfsgid", "__libc_setfsgid")]]
 int setfsgid($gid_t gid);
 
 %{

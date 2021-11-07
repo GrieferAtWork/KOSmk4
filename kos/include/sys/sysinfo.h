@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe079e812 */
+/* HASH CRC-32:0x699cf50c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,12 +42,24 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if !defined(__sysinfo_defined) && defined(__CRT_HAVE_sysinfo) && !defined(__solaris__)
+#ifndef __sysinfo_defined
 #define __sysinfo_defined
+#if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__)
 /* >> sysinfo(2)
  * Return current system information */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),(__info))
-#endif /* !__sysinfo_defined && __CRT_HAVE_sysinfo && !__solaris__ */
+#elif defined(__CRT_HAVE___sysinfo)
+/* >> sysinfo(2)
+ * Return current system information */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),__sysinfo,(__info))
+#elif defined(__CRT_HAVE___libc_sysinfo)
+/* >> sysinfo(2)
+ * Return current system information */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),__libc_sysinfo,(__info))
+#else /* ... */
+#undef __sysinfo_defined
+#endif /* !... */
+#endif /* !__sysinfo_defined */
 /* >> get_nprocs_conf(3)
  * Return the # of configured online processors */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW,get_nprocs_conf,(void),())
@@ -60,12 +72,12 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW,get_nprocs,(void),())
 __CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW,get_phys_pages,(void),())
 #else /* __CRT_HAVE_get_phys_pages */
 #include <asm/pagesize.h>
-#if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
+#if ((defined(__CRT_HAVE_sysinfo) && !defined(__solaris__)) || defined(__CRT_HAVE___sysinfo) || defined(__CRT_HAVE___libc_sysinfo)) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
 #include <libc/local/sys.sysinfo/get_phys_pages.h>
 /* >> get_phys_pages(3)
  * Return the total # of pages of physical memory */
 __NAMESPACE_LOCAL_USING_OR_IMPL(get_phys_pages, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTPTR_TYPE__ __NOTHROW(__LIBCCALL get_phys_pages)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_phys_pages))(); })
-#endif /* __CRT_HAVE_sysinfo && !__solaris__ && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
+#endif /* ((__CRT_HAVE_sysinfo && !__solaris__) || __CRT_HAVE___sysinfo || __CRT_HAVE___libc_sysinfo) && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
 #endif /* !__CRT_HAVE_get_phys_pages */
 #ifdef __CRT_HAVE_get_avphys_pages
 /* >> get_avphys_pages(3)
@@ -73,12 +85,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(get_phys_pages, __FORCELOCAL __ATTR_ARTIFICIAL _
 __CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW,get_avphys_pages,(void),())
 #else /* __CRT_HAVE_get_avphys_pages */
 #include <asm/pagesize.h>
-#if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
+#if ((defined(__CRT_HAVE_sysinfo) && !defined(__solaris__)) || defined(__CRT_HAVE___sysinfo) || defined(__CRT_HAVE___libc_sysinfo)) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
 #include <libc/local/sys.sysinfo/get_avphys_pages.h>
 /* >> get_avphys_pages(3)
  * Return the total # of free pages of physical memory */
 __NAMESPACE_LOCAL_USING_OR_IMPL(get_avphys_pages, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTPTR_TYPE__ __NOTHROW(__LIBCCALL get_avphys_pages)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_avphys_pages))(); })
-#endif /* __CRT_HAVE_sysinfo && !__solaris__ && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
+#endif /* ((__CRT_HAVE_sysinfo && !__solaris__) || __CRT_HAVE___sysinfo || __CRT_HAVE___libc_sysinfo) && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
 #endif /* !__CRT_HAVE_get_avphys_pages */
 __SYSDECL_END
 #endif /* __CC__ */

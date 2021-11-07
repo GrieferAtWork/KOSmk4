@@ -231,7 +231,7 @@ typedef struct __dirstream DIR;
 @@>> opendir(3)
 @@Open and return a new directory stream for reading, referring to `name'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>"), export_alias("__libc_opendir")]]
 [[requires(defined(__AT_FDCWD) && $has_function(opendirat))]]
 DIR *opendir([[nonnull]] char const *name) {
 	/* TODO: Emulate using DOS's _find* functions */
@@ -271,7 +271,7 @@ DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {
 %
 @@>> closedir(3)
 @@Close a directory stream previously returned by `opendir(3)' and friends
-[[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[decl_prefix(DEFINE_STRUCT_DIRSTREAM), export_alias("__libc_closedir")]]
 int closedir([[nonnull]] DIR *dirp);
 
 
@@ -287,8 +287,8 @@ $fd_t fdclosedir([[nonnull]] DIR *dirp);
 @@>> readdir(3), readdir64(3)
 @@Read and return the next pending directory entry of the given directory stream `dirp'
 @@@except: Returns `NULL' for end-of-directory; throws an error if something else went wrong
-[[cp, decl_include("<bits/os/dirent.h>"), decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), alias("readdir")]]
+[[cp, decl_include("<bits/os/dirent.h>"), decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import, export_as("__libc_readdir")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), alias("readdir", "__libc_readdir")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), alias("readdir64")]]
 struct dirent *readdir([[nonnull]] DIR *__restrict dirp);
 
@@ -296,7 +296,7 @@ struct dirent *readdir([[nonnull]] DIR *__restrict dirp);
 @@>> rewinddir(3)
 @@Rewind the given directory stream in such a way that the next call
 @@to `readdir(3)' will once again  return the first directory  entry
-[[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[decl_prefix(DEFINE_STRUCT_DIRSTREAM), export_alias("__libc_rewinddir")]]
 void rewinddir([[nonnull]] DIR *__restrict dirp);
 
 %
@@ -311,6 +311,7 @@ DIR *fdopendir($fd_t fd);
 %#ifdef __USE_LARGEFILE64
 [[cp, decl_include("<bits/os/dirent.h>"), decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[preferred_dirent64_variant_of(readdir), doc_alias("readdir")]]
+[[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("__libc_readdir")]]
 struct dirent64 *readdir64([[nonnull]] DIR *__restrict dirp);
 %#endif /* __USE_LARGEFILE64 */
 
@@ -322,8 +323,8 @@ struct dirent64 *readdir64([[nonnull]] DIR *__restrict dirp);
 @@      kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
 @@>> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
 @@   per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT')
-[[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), alias("readdir_r")]]
+[[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import, export_as("__libc_readdir_r")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), alias("readdir_r", "__libc_readdir_r")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), alias("readdir64_r")]]
 int readdir_r([[nonnull]] DIR *__restrict dirp,
               [[nonnull]] struct dirent *__restrict entry,
@@ -333,6 +334,7 @@ int readdir_r([[nonnull]] DIR *__restrict dirp,
 %#ifdef __USE_LARGEFILE64
 [[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[preferred_dirent64_variant_of(readdir_r), doc_alias("readdir_r")]]
+[[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("__libc_readdir_r")]]
 int readdir64_r([[nonnull]] DIR *__restrict dirp,
                 [[nonnull]] struct dirent64 *__restrict entry,
                 [[nonnull]] struct dirent64 **__restrict result);
@@ -345,11 +347,13 @@ int readdir64_r([[nonnull]] DIR *__restrict dirp,
 @@>> seekdir(3)
 @@Get the directory stream position
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__libc_seekdir")]]
 void seekdir([[nonnull]] DIR *__restrict dirp, $longptr_t pos);
 
 @@>> telldir(3)
 @@Get the directory stream position
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__libc_telldir")]]
 $longptr_t telldir([[nonnull]] DIR *__restrict dirp);
 
 %#endif /* __USE_MISC || __USE_XOPEN */
@@ -441,8 +445,8 @@ __STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[nonnull]] char const *__restric
 %#ifdef __USE_MISC
 @@>> getdirentries(2), getdirentries64(2)
 @@Linux's underlying system call for reading the entries of a directory
-[[cp, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("getdirentries")]]
+[[cp, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import, export_as("__getdirentries", "__libc_getdirentries")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("getdirentries", "__getdirentries", "__libc_getdirentries")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("getdirentries64")]]
 $ssize_t getdirentries($fd_t fd, [[nonnull]] char *__restrict buf,
                        size_t nbytes, [[nonnull]] $off_t *__restrict basep);
@@ -450,6 +454,7 @@ $ssize_t getdirentries($fd_t fd, [[nonnull]] char *__restrict buf,
 %#ifdef __USE_LARGEFILE64
 [[cp, decl_include("<bits/types.h>")]]
 [[preferred_dirent64_variant_of(getdirentries), doc_alias("getdirentries")]]
+[[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("__getdirentries", "__libc_getdirentries")]]
 $ssize_t getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbytes,
                          [[nonnull]] $off64_t *__restrict basep);
 %#endif /* __USE_LARGEFILE64 */

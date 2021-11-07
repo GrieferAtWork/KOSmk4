@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x512e3be8 */
+/* HASH CRC-32:0x5c554a24 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,6 +78,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,ssize_t,__NOTHROW_RPC,process_vm_readv,(__pid_t __
 __CDECLARE_OPT(,ssize_t,__NOTHROW_RPC,process_vm_writev,(__pid_t __pid, struct iovec const *__local_iov, __ULONGPTR_TYPE__ __liovcnt, struct iovec const *__remote_iov, __ULONGPTR_TYPE__ __riovcnt, __ULONGPTR_TYPE__ __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __USE_GNU */
 
+#ifdef __CRT_HAVE_readv
 /* >> readv(2)
  * Same as `read(2)', but rather than specifying a single, continuous buffer,
  * read  data into `count'  separate buffers, though  still return the actual
@@ -87,7 +88,20 @@ __CDECLARE_OPT(,ssize_t,__NOTHROW_RPC,process_vm_writev,(__pid_t __pid, struct i
  * was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
+#elif defined(__CRT_HAVE___readv)
+/* >> readv(2)
+ * Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read  data into `count'  separate buffers, though  still return the actual
+ * number of read bytes.
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),__readv,(__fd,__iov,__count))
+#endif /* ... */
+#ifdef __CRT_HAVE_writev
 /* >> writev(2)
  * Same as `write(2)', but rather than specifying a single, continuous buffer,
  * write  data from `count'  separate buffers, though  still return the actual
@@ -97,7 +111,19 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readv,(_
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
+__CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
+#elif defined(__CRT_HAVE___writev)
+/* >> writev(2)
+ * Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write  data from `count'  separate buffers, though  still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),__writev,(__fd,__iov,__count))
+#endif /* ... */
 
 #ifdef __USE_MISC
 #if defined(__CRT_HAVE_preadv) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)

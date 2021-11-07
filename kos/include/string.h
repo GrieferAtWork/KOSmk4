@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfd7daf7 */
+/* HASH CRC-32:0x210ca1af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1085,7 +1085,7 @@ __CEIDECLARE_GCCNCX(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __A
 __CDECLARE_GCCNCX(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strndup,(char const *__restrict __str, __SIZE_TYPE__ __max_chars),(__str,__max_chars))
 #elif defined(__CRT_HAVE___strndup)
 __CREDIRECT_GCCNCX(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strndup,(char const *__restrict __str, __SIZE_TYPE__ __max_chars),__strndup,(__str,__max_chars))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/string/strndup.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strndup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL strndup)(char const *__restrict __str, __SIZE_TYPE__ __max_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strndup))(__str, __max_chars); })
 #endif /* ... */
@@ -1100,7 +1100,7 @@ __CDECLARE_GCCNCX(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATT
 __CREDIRECT_GCCNCX(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strdup,(char const *__restrict __string),_strdup,(__string))
 #elif defined(__CRT_HAVE___strdup)
 __CREDIRECT_GCCNCX(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strdup,(char const *__restrict __string),__strdup,(__string))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/string/strdup.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strdup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL strdup)(char const *__restrict __string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strdup))(__string); })
 #endif /* ... */
@@ -1477,7 +1477,82 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHRO
  * >> basename(NULL);              // <Undefined behavior> */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char const *__filename),(__filename))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
-#else /* __CRT_HAVE_basename */
+#elif defined(__CRT_HAVE___basename)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
+extern "C++" {
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char *__filename),__basename,(__filename))
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,basename,(char const *__filename),__basename,(__filename))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char const *__filename),__basename,(__filename))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
+#else /* ... */
 #include <libc/local/string/basename.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
@@ -1553,7 +1628,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ch
  * >> basename(NULL);              // <Undefined behavior> */
 __NAMESPACE_LOCAL_USING_OR_IMPL(basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
-#endif /* !__CRT_HAVE_basename */
+#endif /* !... */
 #endif /* !__basename_defined */
 #ifdef __CRT_HAVE_strverscmp
 /* >> strverscmp(3) */
@@ -2207,6 +2282,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strlcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memccpy,(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes),(__dst,__src,__needle,__num_bytes))
 #elif defined(__CRT_HAVE__memccpy)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memccpy,(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes),_memccpy,(__dst,__src,__needle,__num_bytes))
+#elif defined(__CRT_HAVE___memccpy)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memccpy,(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes),__memccpy,(__dst,__src,__needle,__num_bytes))
 #else /* ... */
 #include <libc/local/string/memccpy.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(memccpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memccpy)(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memccpy))(__dst, __src, __needle, __num_bytes); })
@@ -6683,7 +6760,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcasestr_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #ifdef __CRT_HAVE_vstrdupf
 /* Print the given `format' into a newly allocated, heap-allocated string */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0),char *,__NOTHROW_NCX,vstrdupf,(char const *__restrict __format, __builtin_va_list __args),(__format,__args))
-#elif defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
+#elif defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)))
 #include <libc/local/string/vstrdupf.h>
 /* Print the given `format' into a newly allocated, heap-allocated string */
 __NAMESPACE_LOCAL_USING_OR_IMPL(vstrdupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) char *__NOTHROW_NCX(__LIBCCALL vstrdupf)(char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vstrdupf))(__format, __args); })
@@ -6691,7 +6768,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vstrdupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifdef __CRT_HAVE_strdupf
 /* Print the given `format' into a newly allocated, heap-allocated string */
 __LIBC __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) char *__NOTHROW_NCX(__VLIBCCALL strdupf)(char const *__restrict __format, ...) __CASMNAME_SAME("strdupf");
-#elif defined(__CRT_HAVE_vstrdupf) || defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
+#elif defined(__CRT_HAVE_vstrdupf) || defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)))
 #include <libc/local/string/strdupf.h>
 /* Print the given `format' into a newly allocated, heap-allocated string */
 #ifdef __cplusplus
@@ -7195,6 +7272,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strrev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,_memccpy,(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes),memccpy,(__dst,__src,__needle,__num_bytes))
 #elif defined(__CRT_HAVE__memccpy)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,_memccpy,(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes),(__dst,__src,__needle,__num_bytes))
+#elif defined(__CRT_HAVE___memccpy)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,_memccpy,(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes),__memccpy,(__dst,__src,__needle,__num_bytes))
 #else /* ... */
 #include <libc/local/string/memccpy.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL _memccpy)(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memccpy))(__dst, __src, __needle, __num_bytes); }
@@ -7315,7 +7394,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_strdup,(char const *__restrict __string),(__string))
 #elif defined(__CRT_HAVE___strdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_strdup,(char const *__restrict __string),__strdup,(__string))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/string/strdup.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL _strdup)(char const *__restrict __string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strdup))(__string); }
 #endif /* ... */
@@ -7642,7 +7721,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 #elif defined(__CRT_HAVE__wcsdup)
 /* >> wcsdup(3) */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wcsdup,(wchar_t const *__restrict __string),(__string))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/wchar/wcsdup.h>
 /* >> wcsdup(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL _wcsdup)(wchar_t const *__restrict __string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsdup))(__string); }
@@ -8376,7 +8455,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
 #elif defined(__CRT_HAVE__wcsdup)
 /* >> wcsdup(3) */
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,wcsdup,(wchar_t const *__restrict __string),_wcsdup,(__string))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/wchar/wcsdup.h>
 /* >> wcsdup(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcsdup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL wcsdup)(wchar_t const *__restrict __string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsdup))(__string); })

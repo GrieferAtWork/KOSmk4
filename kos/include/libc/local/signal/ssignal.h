@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6816dce4 */
+/* HASH CRC-32:0x3cd32f4b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,19 @@
 #ifndef __local_ssignal_defined
 #define __local_ssignal_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_bsd_signal
+#if defined(__CRT_HAVE_bsd_signal) || defined(__CRT_HAVE___bsd_signal)
 #include <bits/types.h>
 #include <bits/os/sigaction.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bsd_signal_defined
 #define __local___localdep_bsd_signal_defined
+#ifdef __CRT_HAVE_bsd_signal
 __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__localdep_bsd_signal,(__signo_t __signo, __sighandler_t __handler),bsd_signal,(__signo,__handler))
+#elif defined(__CRT_HAVE___bsd_signal)
+__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__localdep_bsd_signal,(__signo_t __signo, __sighandler_t __handler),__bsd_signal,(__signo,__handler))
+#else /* ... */
+#undef __local___localdep_bsd_signal_defined
+#endif /* !... */
 #endif /* !__local___localdep_bsd_signal_defined */
 __LOCAL_LIBC(ssignal) __sighandler_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ssignal))(__signo_t __signo, __sighandler_t __handler) {
@@ -38,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ssignal_defined
 #define __localdep_ssignal __LIBC_LOCAL_NAME(ssignal)
 #endif /* !__local___localdep_ssignal_defined */
-#else /* __CRT_HAVE_bsd_signal */
+#else /* __CRT_HAVE_bsd_signal || __CRT_HAVE___bsd_signal */
 #undef __local_ssignal_defined
-#endif /* !__CRT_HAVE_bsd_signal */
+#endif /* !__CRT_HAVE_bsd_signal && !__CRT_HAVE___bsd_signal */
 #endif /* !__local_ssignal_defined */

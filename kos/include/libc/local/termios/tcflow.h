@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39377801 */
+/* HASH CRC-32:0xcf722170 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,29 @@
 #define __local_tcflow_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
-#if defined(__CRT_HAVE_ioctl) && defined(__TCXONC)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCXONC)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
 #define __local___localdep_ioctl_defined
+#ifdef __CRT_HAVE_ioctl
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#else /* ... */
+#undef __local___localdep_ioctl_defined
+#endif /* !... */
 #endif /* !__local___localdep_ioctl_defined */
 __LOCAL_LIBC(tcflow) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcflow))(__fd_t __fd, __STDC_INT_AS_UINT_T __action) {
@@ -41,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_tcflow_defined
 #define __localdep_tcflow __LIBC_LOCAL_NAME(tcflow)
 #endif /* !__local___localdep_tcflow_defined */
-#else /* __CRT_HAVE_ioctl && __TCXONC */
+#else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCXONC */
 #undef __local_tcflow_defined
-#endif /* !__CRT_HAVE_ioctl || !__TCXONC */
+#endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCXONC */
 #endif /* !__local_tcflow_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2d5801a */
+/* HASH CRC-32:0xcc2e8a04 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_create,(char *co
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_create,(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len),__argz_create,(___argv,__pargz,__pargz_len))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/argz/argz_create.h>
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
@@ -182,7 +182,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_create,(char 
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_create,(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len),(___argv,__pargz,__pargz_len))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/argz/argz_create.h>
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
@@ -236,7 +236,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(char
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len),__argz_create_sep,(__string,__sep,__pargz,__pargz_len))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/argz/argz_create_sep.h>
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
@@ -280,7 +280,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(c
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len),(__string,__sep,__pargz,__pargz_len))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/argz/argz_create_sep.h>
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
@@ -518,7 +518,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,argz_append,(char **__re
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,argz_append,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/argz/argz_append.h>
 /* >> argz_append(3)
  * Increase allocated memory of `*pargz' and append `buf...+=buf_len'
@@ -538,7 +538,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,__argz_append,(char **_
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,__argz_append,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/argz/argz_append.h>
 /* >> argz_append(3)
  * Increase allocated memory of `*pargz' and append `buf...+=buf_len'
@@ -560,7 +560,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add,(char **__re
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
-#elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/argz/argz_add.h>
 /* >> argz_add(3)
  * Append `str' (including its trailing NUL) to the argz string in `*pargz...+=pargz_len'
@@ -583,7 +583,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add,(char **_
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str),(__pargz,__pargz_len,__str))
-#elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/argz/argz_add.h>
 /* >> argz_add(3)
  * Append `str' (including its trailing NUL) to the argz string in `*pargz...+=pargz_len'
@@ -614,7 +614,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add_sep,(char **
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add_sep,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep),__argz_add_sep,(__pargz,__pargz_len,__string,__sep))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/argz/argz_add_sep.h>
 /* >> argz_add_sep(3)
  * A  combination of `argz_create_sep()'  and `argz_append()' that will
@@ -649,7 +649,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add_sep,(char
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add_sep,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep),(__pargz,__pargz_len,__string,__sep))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/argz/argz_add_sep.h>
 /* >> argz_add_sep(3)
  * A  combination of `argz_create_sep()'  and `argz_append()' that will
@@ -742,7 +742,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_insert,(char **_
  * @return: ENOMEM: Insufficient heap memory
  * @return: EINVAL: The given `before' is either `NULL', or apart of `*pargz' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_insert,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry),__argz_insert,(__pargz,__pargz_len,__before,__entry))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/argz/argz_insert.h>
 /* >> argz_insert(3)
  * When `before' is  `NULL', do the  same as  `argz_add(pargz, pargz_len, entry)'
@@ -777,7 +777,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_insert,(char 
  * @return: ENOMEM: Insufficient heap memory
  * @return: EINVAL: The given `before' is either `NULL', or apart of `*pargz' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_insert,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry),(__pargz,__pargz_len,__before,__entry))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/argz/argz_insert.h>
 /* >> argz_insert(3)
  * When `before' is  `NULL', do the  same as  `argz_add(pargz, pargz_len, entry)'
@@ -810,7 +810,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_replace,(char **
  *                  but  note  that  the GLibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),__argz_replace,(__pargz,__pargz_len,__str,__with,__replace_count))
-#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free))
 #include <libc/local/argz/argz_replace.h>
 /* >> argz_replace(3)
  * Replace all matches of `str' inside of every string or sub-string from `pargz...+=pargz_len'
@@ -842,7 +842,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_replace,(char
  *                  but  note  that  the GLibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),(__pargz,__pargz_len,__str,__with,__replace_count))
-#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free))
 #include <libc/local/argz/argz_replace.h>
 /* >> argz_replace(3)
  * Replace all matches of `str' inside of every string or sub-string from `pargz...+=pargz_len'

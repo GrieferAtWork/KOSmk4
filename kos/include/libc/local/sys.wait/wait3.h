@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabe1b406 */
+/* HASH CRC-32:0x7e7b6f27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,30 @@
 #define __local_wait3_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_wait3_64) || defined(__CRT_HAVE_wait3)
+#if defined(__CRT_HAVE_wait3_64) || defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
 #include <features.h>
 #include <bits/os/rusage.h>
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_wait3_32_defined) && defined(__CRT_HAVE_wait3)
+#ifndef __local___localdep_wait3_32_defined
 #define __local___localdep_wait3_32_defined
+#ifdef __CRT_HAVE_wait3
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait3,(__stat_loc,__options,__usage))
-#endif /* !__local___localdep_wait3_32_defined && __CRT_HAVE_wait3 */
+#elif defined(__CRT_HAVE___wait3)
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),__wait3,(__stat_loc,__options,__usage))
+#else /* ... */
+#undef __local___localdep_wait3_32_defined
+#endif /* !... */
+#endif /* !__local___localdep_wait3_32_defined */
 #ifndef __local___localdep_wait3_64_defined
 #define __local___localdep_wait3_64_defined
 #if defined(__CRT_HAVE_wait3) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait3,(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE___wait3) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),__wait3,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3_64)
 __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait3_64,(__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait3)
+#elif defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.wait/wait3_64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -52,17 +60,17 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wait3) __pid_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wait3))(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage) {
 	__pid_t __result;
-#ifdef __CRT_HAVE_wait3
+#if defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
 	struct __rusage32 __ru32;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_wait3_32)(__stat_loc, __options, __usage ? &__ru32 : __NULLPTR);
 	if (__result >= 0 && __usage)
 		rusage32_to_rusage(&__ru32, __usage);
-#else /* __CRT_HAVE_wait3 */
+#else /* __CRT_HAVE_wait3 || __CRT_HAVE___wait3 */
 	struct __rusage64 __ru64;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_wait3_64)(__stat_loc, __options, __usage ? &__ru64 : __NULLPTR);
 	if (__result >= 0 && __usage)
 		rusage64_to_rusage(&__ru64, __usage);
-#endif /* !__CRT_HAVE_wait3 */
+#endif /* !__CRT_HAVE_wait3 && !__CRT_HAVE___wait3 */
 	return __result;
 }
 __NAMESPACE_LOCAL_END
@@ -70,7 +78,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wait3_defined
 #define __localdep_wait3 __LIBC_LOCAL_NAME(wait3)
 #endif /* !__local___localdep_wait3_defined */
-#else /* __CRT_HAVE_wait3_64 || __CRT_HAVE_wait3 */
+#else /* __CRT_HAVE_wait3_64 || __CRT_HAVE_wait3 || __CRT_HAVE___wait3 */
 #undef __local_wait3_defined
-#endif /* !__CRT_HAVE_wait3_64 && !__CRT_HAVE_wait3 */
+#endif /* !__CRT_HAVE_wait3_64 && !__CRT_HAVE_wait3 && !__CRT_HAVE___wait3 */
 #endif /* !__local_wait3_defined */

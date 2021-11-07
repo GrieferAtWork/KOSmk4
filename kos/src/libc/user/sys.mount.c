@@ -86,8 +86,12 @@ NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5bf6184c]]]*/
+/*[[[start:exports,hash:CRC-32=0x6e080805]]]*/
+DEFINE_PUBLIC_ALIAS(__mount, libc_mount);
+DEFINE_PUBLIC_ALIAS(__libc_mount, libc_mount);
 DEFINE_PUBLIC_ALIAS(mount, libc_mount);
+DEFINE_PUBLIC_ALIAS(__umount, libc_umount);
+DEFINE_PUBLIC_ALIAS(__libc_umount, libc_umount);
 DEFINE_PUBLIC_ALIAS(umount, libc_umount);
 DEFINE_PUBLIC_ALIAS(umount2, libc_umount2);
 /*[[[end:exports]]]*/

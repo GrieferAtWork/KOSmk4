@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa02dcb32 */
+/* HASH CRC-32:0x33bd7883 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,17 @@
 #ifndef __local_time64_defined
 #define __local_time64_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)
+#if defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_time32_defined
 #define __local___localdep_time32_defined
 #ifdef __CRT_HAVE_time
 __CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),time,(__timer))
+#elif defined(__CRT_HAVE___time)
+__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),__time,(__timer))
+#elif defined(__CRT_HAVE___libc_time)
+__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),__libc_time,(__timer))
 #elif defined(__CRT_HAVE__time32)
 __CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),_time32,(__timer))
 #else /* ... */
@@ -46,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_time64_defined
 #define __localdep_time64 __LIBC_LOCAL_NAME(time64)
 #endif /* !__local___localdep_time64_defined */
-#else /* __CRT_HAVE_time || __CRT_HAVE__time32 */
+#else /* __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
 #undef __local_time64_defined
-#endif /* !__CRT_HAVE_time && !__CRT_HAVE__time32 */
+#endif /* !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
 #endif /* !__local_time64_defined */

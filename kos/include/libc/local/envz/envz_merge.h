@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc59f07f5 */
+/* HASH CRC-32:0x3e21ca06 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_envz_merge_defined
 #define __local_envz_merge_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
+#if defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_append_defined
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_append.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -102,7 +102,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_envz_merge_defined
 #define __localdep_envz_merge __LIBC_LOCAL_NAME(envz_merge)
 #endif /* !__local___localdep_envz_merge_defined */
-#else /* __CRT_HAVE_argz_append || __CRT_HAVE___argz_create_sep || __CRT_HAVE_realloc */
+#else /* __CRT_HAVE_argz_append || __CRT_HAVE___argz_create_sep || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc */
 #undef __local_envz_merge_defined
-#endif /* !__CRT_HAVE_argz_append && !__CRT_HAVE___argz_create_sep && !__CRT_HAVE_realloc */
+#endif /* !__CRT_HAVE_argz_append && !__CRT_HAVE___argz_create_sep && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc */
 #endif /* !__local_envz_merge_defined */

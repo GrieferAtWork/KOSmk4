@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d4e24ca */
+/* HASH CRC-32:0x78d4737e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_gettimeofday_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gettimeofday32_defined
@@ -31,6 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__gettimeofday,(__tv,__tz))
+#elif defined(__CRT_HAVE___libc_gettimeofday)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__libc_gettimeofday,(__tv,__tz))
 #else /* ... */
 #undef __local___localdep_gettimeofday32_defined
 #endif /* !... */
@@ -41,7 +43,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(str
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_gettimeofday64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),gettimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+#elif defined(__CRT_HAVE___gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),__gettimeofday,(__tv,__tz))
+#elif defined(__CRT_HAVE___libc_gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),__libc_gettimeofday,(__tv,__tz))
+#elif defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/gettimeofday64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -52,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_gettimeofday64_defined */
 __LOCAL_LIBC(gettimeofday) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday))(struct timeval *__restrict __tv, void * __tz) {
-#if defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+#if defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 	int __result;
 	struct __timeval32 __tv32;
 	if (!__tv)
@@ -63,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday))(struct timeval *__rest
 		__tv->tv_usec = __tv32.tv_usec;
 	}
 	return __result;
-#else /* __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday */
+#else /* __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday || __CRT_HAVE___libc_gettimeofday */
 	int __result;
 	struct __timeval64 __tv64;
 	if (!__tv)
@@ -74,14 +80,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday))(struct timeval *__rest
 		__tv->tv_usec = __tv64.tv_usec;
 	}
 	return __result;
-#endif /* !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday */
+#endif /* !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday && !__CRT_HAVE___libc_gettimeofday */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gettimeofday_defined
 #define __local___localdep_gettimeofday_defined
 #define __localdep_gettimeofday __LIBC_LOCAL_NAME(gettimeofday)
 #endif /* !__local___localdep_gettimeofday_defined */
-#else /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday */
+#else /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday || __CRT_HAVE___libc_gettimeofday */
 #undef __local_gettimeofday_defined
-#endif /* !__CRT_HAVE_gettimeofday64 && !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday */
+#endif /* !__CRT_HAVE_gettimeofday64 && !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday && !__CRT_HAVE___libc_gettimeofday */
 #endif /* !__local_gettimeofday_defined */

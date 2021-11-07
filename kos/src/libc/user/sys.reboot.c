@@ -49,7 +49,9 @@ NOTHROW_NCX(LIBCCALL libc_reboot)(__STDC_INT_AS_UINT_T howto)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2679280]]]*/
+/*[[[start:exports,hash:CRC-32=0x160a2a8c]]]*/
+DEFINE_PUBLIC_ALIAS(__reboot, libc_reboot);
+DEFINE_PUBLIC_ALIAS(__libc_reboot, libc_reboot);
 DEFINE_PUBLIC_ALIAS(reboot, libc_reboot);
 /*[[[end:exports]]]*/
 

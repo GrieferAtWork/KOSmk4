@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6e7b4d */
+/* HASH CRC-32:0x212692df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,20 @@
 #ifndef __local_stime64_defined
 #define __local_stime64_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_stime
+#if defined(__CRT_HAVE_stime) || defined(__CRT_HAVE___stime) || defined(__CRT_HAVE___libc_stime)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_stime32_defined
 #define __local___localdep_stime32_defined
+#ifdef __CRT_HAVE_stime
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),stime,(__when))
+#elif defined(__CRT_HAVE___stime)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),__stime,(__when))
+#elif defined(__CRT_HAVE___libc_stime)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),__libc_stime,(__when))
+#else /* ... */
+#undef __local___localdep_stime32_defined
+#endif /* !... */
 #endif /* !__local___localdep_stime32_defined */
 __LOCAL_LIBC(stime64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stime64))(__time64_t const *__when) {
@@ -38,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_stime64_defined
 #define __localdep_stime64 __LIBC_LOCAL_NAME(stime64)
 #endif /* !__local___localdep_stime64_defined */
-#else /* __CRT_HAVE_stime */
+#else /* __CRT_HAVE_stime || __CRT_HAVE___stime || __CRT_HAVE___libc_stime */
 #undef __local_stime64_defined
-#endif /* !__CRT_HAVE_stime */
+#endif /* !__CRT_HAVE_stime && !__CRT_HAVE___stime && !__CRT_HAVE___libc_stime */
 #endif /* !__local_stime64_defined */

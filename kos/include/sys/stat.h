@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f4c08aa */
+/* HASH CRC-32:0x3ede9610 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -570,6 +570,12 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, c
 #ifdef __CRT_HAVE_mkdir
 /* >> mkdir(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
+#elif defined(__CRT_HAVE___mkdir)
+/* >> mkdir(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),__mkdir,(__pathname,__mode))
+#elif defined(__CRT_HAVE___libc_mkdir)
+/* >> mkdir(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),__libc_mkdir,(__pathname,__mode))
 #elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 #include <libc/local/sys.stat/mkdir.h>
 /* >> mkdir(2) */
@@ -586,6 +592,12 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, 
 #elif defined(__CRT_HAVE__chmod)
 /* >> chmod(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),_chmod,(__filename,__mode))
+#elif defined(__CRT_HAVE___chmod)
+/* >> chmod(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),__chmod,(__filename,__mode))
+#elif defined(__CRT_HAVE___libc_chmod)
+/* >> chmod(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),__libc_chmod,(__filename,__mode))
 #else /* ... */
 #undef __chmod_defined
 #endif /* !... */
@@ -616,6 +628,12 @@ __CDECLARE(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),(__mode))
 #elif defined(__CRT_HAVE__umask)
 /* >> umask(2) */
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),_umask,(__mode))
+#elif defined(__CRT_HAVE___umask)
+/* >> umask(2) */
+__CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),__umask,(__mode))
+#elif defined(__CRT_HAVE___libc_umask)
+/* >> umask(2) */
+__CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),__libc_umask,(__mode))
 #else /* ... */
 #undef __umask_defined
 #endif /* !... */
@@ -627,7 +645,7 @@ __CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),_umask,(__mode))
  * Return the current umask.
  * WARNING: This function isn't thread-safe */
 __CDECLARE(,__mode_t,__NOTHROW_NCX,getumask,(void),())
-#elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
+#elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask) || defined(__CRT_HAVE___umask) || defined(__CRT_HAVE___libc_umask)
 #include <libc/local/sys.stat/getumask.h>
 /* >> getumask(2)
  * Return the current umask.
@@ -658,8 +676,16 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkfifoat,(__fd_t __dirfd, c
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_POSIX
+#ifdef __CRT_HAVE_fchmod
 /* >> fchmod(2) */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,fchmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
+__CDECLARE(,int,__NOTHROW_RPC,fchmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
+#elif defined(__CRT_HAVE___fchmod)
+/* >> fchmod(2) */
+__CREDIRECT(,int,__NOTHROW_RPC,fchmod,(__fd_t __fd, __mode_t __mode),__fchmod,(__fd,__mode))
+#elif defined(__CRT_HAVE___libc_fchmod)
+/* >> fchmod(2) */
+__CREDIRECT(,int,__NOTHROW_RPC,fchmod,(__fd_t __fd, __mode_t __mode),__libc_fchmod,(__fd,__mode))
+#endif /* ... */
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab2724c1 */
+/* HASH CRC-32:0xc210a47d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -229,7 +229,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec con
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),thrd_sleep64,(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
+#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/threads/thrd_sleep.h>
 /* >> thrd_sleep(3), thrd_sleep64(3)
  * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
@@ -253,7 +253,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec6
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
+#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/threads/thrd_sleep64.h>
 /* >> thrd_sleep(3), thrd_sleep64(3)
  * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
@@ -317,6 +317,10 @@ __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),pthread_yield,())
 /* >> thrd_yield(3)
  * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),__sched_yield,())
+#elif defined(__CRT_HAVE___libc_sched_yield)
+/* >> thrd_yield(3)
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
+__CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),__libc_sched_yield,())
 #elif defined(__CRT_HAVE_yield)
 /* >> thrd_yield(3)
  * Yield execution to another thread (s.a. `pthread_yield(3)') */
@@ -665,7 +669,7 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW,thr_main,(void),pthread_main_np,())
  * Internally,  this is  the return value  if the caller  doesn't have a
  * proper pthread-controller attached. */
 __CDECLARE(__ATTR_CONST,int,__NOTHROW,thr_main,(void),())
-#elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
+#elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> thr_main(3)
  * Another  one of these non-restricted, but solaris-specific functions:

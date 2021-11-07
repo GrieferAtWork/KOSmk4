@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e8e3164 */
+/* HASH CRC-32:0x703c89d5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_eventfd_read_defined
 #define __local_eventfd_read_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
+#if defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_read_defined
@@ -32,6 +32,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___read)
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_read)
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__libc_read,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_read_defined
 #endif /* !... */
@@ -56,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_eventfd_read_defined
 #define __localdep_eventfd_read __LIBC_LOCAL_NAME(eventfd_read)
 #endif /* !__local___localdep_eventfd_read_defined */
-#else /* __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read */
+#else /* __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read */
 #undef __local_eventfd_read_defined
-#endif /* !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read */
+#endif /* !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read */
 #endif /* !__local_eventfd_read_defined */

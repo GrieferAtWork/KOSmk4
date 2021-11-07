@@ -52,7 +52,9 @@ NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2acf11c5]]]*/
+/*[[[start:exports,hash:CRC-32=0xe2e9031d]]]*/
+DEFINE_PUBLIC_ALIAS(__uname, libc_uname);
+DEFINE_PUBLIC_ALIAS(__libc_uname, libc_uname);
 DEFINE_PUBLIC_ALIAS(uname, libc_uname);
 /*[[[end:exports]]]*/
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44c24d89 */
+/* HASH CRC-32:0xa1fa123c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__
 #define __local___localdep_clock_settime64_defined
 #if defined(__CRT_HAVE_clock_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid_t __clock_id, struct __timespec64 const *__tp),clock_settime,(__clock_id,__tp))
+#elif defined(__CRT_HAVE___clock_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid_t __clock_id, struct __timespec64 const *__tp),__clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid_t __clock_id, struct __timespec64 const *__tp),clock_settime64,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)

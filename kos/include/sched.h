@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3dff2d75 */
+/* HASH CRC-32:0xf7ed4bbc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -418,21 +418,33 @@ typedef struct __cpu_set_struct cpu_set_t;
 #define CPU_FREE(cpuset) __CPU_FREE(cpuset)
 
 #ifdef __CC__
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sched_setparam,(__pid_t __pid, struct sched_param const *__param),(__pid,__param))
+#ifdef __CRT_HAVE_sched_setparam
+__CDECLARE(,int,__NOTHROW_NCX,sched_setparam,(__pid_t __pid, struct sched_param const *__param),(__pid,__param))
+#elif defined(__CRT_HAVE___sched_setparam)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_setparam,(__pid_t __pid, struct sched_param const *__param),__sched_setparam,(__pid,__param))
+#elif defined(__CRT_HAVE___libc_sched_setparam)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_setparam,(__pid_t __pid, struct sched_param const *__param),__libc_sched_setparam,(__pid,__param))
+#endif /* ... */
 #ifdef __CRT_HAVE_sched_getparam
 __CDECLARE(,int,__NOTHROW_NCX,sched_getparam,(__pid_t __pid, struct sched_param *__param),(__pid,__param))
 #elif defined(__CRT_HAVE___sched_getparam)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_getparam,(__pid_t __pid, struct sched_param *__param),__sched_getparam,(__pid,__param))
+#elif defined(__CRT_HAVE___libc_sched_getparam)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_getparam,(__pid_t __pid, struct sched_param *__param),__libc_sched_getparam,(__pid,__param))
 #endif /* ... */
 #ifdef __CRT_HAVE_sched_setscheduler
 __CDECLARE(,int,__NOTHROW_NCX,sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),(__pid,__policy,__param))
 #elif defined(__CRT_HAVE___sched_setscheduler)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),__sched_setscheduler,(__pid,__policy,__param))
+#elif defined(__CRT_HAVE___libc_sched_setscheduler)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),__libc_sched_setscheduler,(__pid,__policy,__param))
 #endif /* ... */
 #ifdef __CRT_HAVE_sched_getscheduler
 __CDECLARE(,int,__NOTHROW_NCX,sched_getscheduler,(__pid_t __pid),(__pid))
 #elif defined(__CRT_HAVE___sched_getscheduler)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_getscheduler,(__pid_t __pid),__sched_getscheduler,(__pid))
+#elif defined(__CRT_HAVE___libc_sched_getscheduler)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_getscheduler,(__pid_t __pid),__libc_sched_getscheduler,(__pid))
 #endif /* ... */
 
 #ifdef __CRT_HAVE_sched_yield
@@ -455,6 +467,11 @@ __CREDIRECT(,int,__NOTHROW,sched_yield,(void),pthread_yield,())
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT(,int,__NOTHROW,sched_yield,(void),__sched_yield,())
+#elif defined(__CRT_HAVE___libc_sched_yield)
+/* @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT(,int,__NOTHROW,sched_yield,(void),__libc_sched_yield,())
 #elif defined(__CRT_HAVE_yield)
 /* @return: 1: Another thread was  executed prior to  the function  returning
  *             The thread may not necessarily be apart of the calling process
@@ -465,28 +482,40 @@ __CREDIRECT(,int,__NOTHROW,sched_yield,(void),yield,())
 __CDECLARE(,int,__NOTHROW_NCX,sched_get_priority_max,(__STDC_INT_AS_UINT_T __algorithm),(__algorithm))
 #elif defined(__CRT_HAVE___sched_get_priority_max)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_get_priority_max,(__STDC_INT_AS_UINT_T __algorithm),__sched_get_priority_max,(__algorithm))
+#elif defined(__CRT_HAVE___libc_sched_get_priority_max)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_get_priority_max,(__STDC_INT_AS_UINT_T __algorithm),__libc_sched_get_priority_max,(__algorithm))
 #endif /* ... */
 #ifdef __CRT_HAVE_sched_get_priority_min
 __CDECLARE(,int,__NOTHROW_NCX,sched_get_priority_min,(__STDC_INT_AS_UINT_T __algorithm),(__algorithm))
 #elif defined(__CRT_HAVE___sched_get_priority_min)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_get_priority_min,(__STDC_INT_AS_UINT_T __algorithm),__sched_get_priority_min,(__algorithm))
+#elif defined(__CRT_HAVE___libc_sched_get_priority_min)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_get_priority_min,(__STDC_INT_AS_UINT_T __algorithm),__libc_sched_get_priority_min,(__algorithm))
 #endif /* ... */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sched_setaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, cpu_set_t const *__cpuset),(__pid,__cpusetsize,__cpuset))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, cpu_set_t *__cpuset),(__pid,__cpusetsize,__cpuset))
 #if defined(__CRT_HAVE_sched_rr_get_interval) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CDECLARE(,int,__NOTHROW_NCX,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),(__pid,__tms))
+#elif defined(__CRT_HAVE___sched_rr_get_interval) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),__sched_rr_get_interval,(__pid,__tms))
+#elif defined(__CRT_HAVE___libc_sched_rr_get_interval) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),__libc_sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),sched_rr_get_interval64,(__pid,__tms))
-#elif defined(__CRT_HAVE_sched_rr_get_interval64) || defined(__CRT_HAVE_sched_rr_get_interval)
+#elif defined(__CRT_HAVE_sched_rr_get_interval64) || defined(__CRT_HAVE_sched_rr_get_interval) || defined(__CRT_HAVE___sched_rr_get_interval) || defined(__CRT_HAVE___libc_sched_rr_get_interval)
 #include <libc/local/sched/sched_rr_get_interval.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sched_rr_get_interval, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sched_rr_get_interval)(__pid_t __pid, struct timespec *__tms) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sched_rr_get_interval))(__pid, __tms); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_sched_rr_get_interval) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,sched_rr_get_interval64,(__pid_t __pid, struct timespec64 *__tms),sched_rr_get_interval,(__pid,__tms))
+#elif defined(__CRT_HAVE___sched_rr_get_interval) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(,int,__NOTHROW_NCX,sched_rr_get_interval64,(__pid_t __pid, struct timespec64 *__tms),__sched_rr_get_interval,(__pid,__tms))
+#elif defined(__CRT_HAVE___libc_sched_rr_get_interval) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(,int,__NOTHROW_NCX,sched_rr_get_interval64,(__pid_t __pid, struct timespec64 *__tms),__libc_sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval64)
 __CDECLARE(,int,__NOTHROW_NCX,sched_rr_get_interval64,(__pid_t __pid, struct timespec64 *__tms),(__pid,__tms))
-#elif defined(__CRT_HAVE_sched_rr_get_interval)
+#elif defined(__CRT_HAVE_sched_rr_get_interval) || defined(__CRT_HAVE___sched_rr_get_interval) || defined(__CRT_HAVE___libc_sched_rr_get_interval)
 #include <libc/local/sched/sched_rr_get_interval64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sched_rr_get_interval64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sched_rr_get_interval64)(__pid_t __pid, struct timespec64 *__tms) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sched_rr_get_interval64))(__pid, __tms); })
 #endif /* ... */

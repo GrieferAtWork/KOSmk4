@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd1370bc */
+/* HASH CRC-32:0x62b7cef5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_posix_spawn_file_actions_addopen_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
-#if defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#if defined(__POSIX_SPAWN_USE_KOS) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <bits/crt/posix_spawn.h>
 #include <bits/types.h>
 #include <libc/errno.h>
@@ -35,6 +35,8 @@ __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __bui
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#elif defined(__CRT_HAVE___libc_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(__mallptr))
 #else /* ... */
 #undef __local___localdep_free_defined
 #endif /* !... */
@@ -85,9 +87,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen))(st
 	__action->__sa_action.__sa_open_action.__sa_mode  = __mode;
 	return 0;
 __err_path:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	(__NAMESPACE_LOCAL_SYM __localdep_free)((char *)__path);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 __err:
 #ifdef __ENOMEM
 	return __ENOMEM;
@@ -100,7 +102,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_posix_spawn_file_actions_addopen_defined
 #define __localdep_posix_spawn_file_actions_addopen __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen)
 #endif /* !__local___localdep_posix_spawn_file_actions_addopen_defined */
-#else /* __POSIX_SPAWN_USE_KOS && __CRT_HAVE_realloc */
+#else /* __POSIX_SPAWN_USE_KOS && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
 #undef __local_posix_spawn_file_actions_addopen_defined
-#endif /* !__POSIX_SPAWN_USE_KOS || !__CRT_HAVE_realloc */
+#endif /* !__POSIX_SPAWN_USE_KOS || (!__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) */
 #endif /* !__local_posix_spawn_file_actions_addopen_defined */

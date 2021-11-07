@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x681cc51e */
+/* HASH CRC-32:0x3ac75487 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -655,8 +655,9 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if !defined(__ioctl_defined) && defined(__CRT_HAVE_ioctl)
+#ifndef __ioctl_defined
 #define __ioctl_defined
+#ifdef __CRT_HAVE_ioctl
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
  * Many I/O  control operations  except  an additional  argument,  though
@@ -667,7 +668,32 @@ __SYSDECL_BEGIN
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 __LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ULONGPTR_TYPE__ __request, ...) __CASMNAME_SAME("ioctl");
-#endif /* !__ioctl_defined && __CRT_HAVE_ioctl */
+#elif defined(__CRT_HAVE___ioctl)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#else /* ... */
+#undef __ioctl_defined
+#endif /* !... */
+#endif /* !__ioctl_defined */
 
 __SYSDECL_END
 #endif /* __CC__ */

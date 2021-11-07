@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x436aeb42 */
+/* HASH CRC-32:0x73a4a749 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <asm/os/oflags.h>
 #include <features.h>
 #include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
+#if (defined(__CRT_HAVE_fpathconf) || defined(__CRT_HAVE___fpathconf)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined
@@ -43,16 +43,30 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
+#elif defined(__CRT_HAVE___libc_close)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__libc_close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
 #ifndef __local___localdep_fpathconf_defined
 #define __local___localdep_fpathconf_defined
+#ifdef __CRT_HAVE_fpathconf
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_fpathconf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),fpathconf,(__fd,__name))
+#elif defined(__CRT_HAVE___fpathconf)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_fpathconf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),__fpathconf,(__fd,__name))
+#else /* ... */
+#undef __local___localdep_fpathconf_defined
+#endif /* !... */
 #endif /* !__local___localdep_fpathconf_defined */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined
@@ -71,6 +85,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___libc_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -81,7 +100,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/open.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -98,9 +117,9 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32pathconf))(__CHAR32_TYPE__ const *
 	if __unlikely(__fd < 0)
 		return -1;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_fpathconf)(__fd, __name);
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
+#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
 	(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
+#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */
 	return __result;
 }
 __NAMESPACE_LOCAL_END
@@ -108,7 +127,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32pathconf_defined
 #define __localdep_c32pathconf __LIBC_LOCAL_NAME(c32pathconf)
 #endif /* !__local___localdep_c32pathconf_defined */
-#else /* __CRT_HAVE_fpathconf && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
+#else /* (__CRT_HAVE_fpathconf || __CRT_HAVE___fpathconf) && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
 #undef __local_c32pathconf_defined
-#endif /* !__CRT_HAVE_fpathconf || (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || !__O_RDONLY */
+#endif /* (!__CRT_HAVE_fpathconf && !__CRT_HAVE___fpathconf) || (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || !__O_RDONLY */
 #endif /* !__local_c32pathconf_defined */

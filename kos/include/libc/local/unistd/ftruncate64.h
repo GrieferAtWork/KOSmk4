@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc086bd65 */
+/* HASH CRC-32:0x80e9a11c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_ftruncate64_defined
 #define __local_ftruncate64_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_ftruncate
+#if defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)
 #include <features.h>
 #include <bits/types.h>
 #ifndef __PIO_OFFSET
@@ -36,7 +36,19 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ftruncate32_defined
 #define __local___localdep_ftruncate32_defined
+#ifdef __CRT_HAVE_ftruncate
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___ftruncate)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),__ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___libc_ftruncate)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),__libc_ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE__chsize)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),_chsize,(__fd,__length))
+#elif defined(__CRT_HAVE_chsize)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),chsize,(__fd,__length))
+#else /* ... */
+#undef __local___localdep_ftruncate32_defined
+#endif /* !... */
 #endif /* !__local___localdep_ftruncate32_defined */
 __LOCAL_LIBC(ftruncate64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftruncate64))(__fd_t __fd, __PIO_OFFSET64 __length) {
@@ -47,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ftruncate64_defined
 #define __localdep_ftruncate64 __LIBC_LOCAL_NAME(ftruncate64)
 #endif /* !__local___localdep_ftruncate64_defined */
-#else /* __CRT_HAVE_ftruncate */
+#else /* __CRT_HAVE_ftruncate || __CRT_HAVE___ftruncate || __CRT_HAVE___libc_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_chsize */
 #undef __local_ftruncate64_defined
-#endif /* !__CRT_HAVE_ftruncate */
+#endif /* !__CRT_HAVE_ftruncate && !__CRT_HAVE___ftruncate && !__CRT_HAVE___libc_ftruncate && !__CRT_HAVE__chsize && !__CRT_HAVE_chsize */
 #endif /* !__local_ftruncate64_defined */

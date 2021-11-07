@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd3695b2 */
+/* HASH CRC-32:0x48a3fdaf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,10 +66,26 @@ __NAMESPACE_STD_USING(FILE)
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
-__CDECLARE_VOID_OPT(,__NOTHROW_RPC,setspent,(void),())
-__CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endspent,(void),())
-__CDECLARE_OPT(,struct spwd *,__NOTHROW_RPC,getspent,(void),())
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,getspnam,(char const *__restrict __name),(__name))
+#ifdef __CRT_HAVE_setspent
+__CDECLARE_VOID(,__NOTHROW_RPC,setspent,(void),())
+#elif defined(__CRT_HAVE___setspent)
+__CREDIRECT_VOID(,__NOTHROW_RPC,setspent,(void),__setspent,())
+#endif /* ... */
+#ifdef __CRT_HAVE_endspent
+__CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endspent,(void),())
+#elif defined(__CRT_HAVE___endspent)
+__CREDIRECT_VOID(,__NOTHROW_RPC_NOKOS,endspent,(void),__endspent,())
+#endif /* ... */
+#ifdef __CRT_HAVE_getspent
+__CDECLARE(,struct spwd *,__NOTHROW_RPC,getspent,(void),())
+#elif defined(__CRT_HAVE___getspent)
+__CREDIRECT(,struct spwd *,__NOTHROW_RPC,getspent,(void),__getspent,())
+#endif /* ... */
+#ifdef __CRT_HAVE_getspnam
+__CDECLARE(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,getspnam,(char const *__restrict __name),(__name))
+#elif defined(__CRT_HAVE___getspnam)
+__CREDIRECT(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,getspnam,(char const *__restrict __name),__getspnam,(__name))
+#endif /* ... */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,sgetspent,(char const *__restrict __string),(__string))
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,fgetspent,(__FILE *__restrict __stream),(__stream))
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,putspent,(struct spwd const *__restrict __p, __FILE *__restrict __stream),(__p,__stream))
@@ -80,8 +96,16 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,getspnam_r,(char c
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,sgetspent_r,(char const *__restrict __string, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__string,__result_buf,__buffer,__buflen,__result))
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetspent_r,(__FILE *__restrict __stream, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__stream,__result_buf,__buffer,__buflen,__result))
 #endif /* __USE_MISC */
-__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,lckpwdf,(void),())
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ulckpwdf,(void),())
+#ifdef __CRT_HAVE_lckpwdf
+__CDECLARE(,int,__NOTHROW_RPC_KOS,lckpwdf,(void),())
+#elif defined(__CRT_HAVE___lckpwdf)
+__CREDIRECT(,int,__NOTHROW_RPC_KOS,lckpwdf,(void),__lckpwdf,())
+#endif /* ... */
+#ifdef __CRT_HAVE_ulckpwdf
+__CDECLARE(,int,__NOTHROW_NCX,ulckpwdf,(void),())
+#elif defined(__CRT_HAVE___ulckpwdf)
+__CREDIRECT(,int,__NOTHROW_NCX,ulckpwdf,(void),__ulckpwdf,())
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

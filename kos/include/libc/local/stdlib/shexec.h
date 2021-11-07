@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48901d1d */
+/* HASH CRC-32:0x10f81f84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_shexec_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
-#if defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
+#if defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__LOCAL_environ))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_execl_defined
 #define __local___localdep_execl_defined
@@ -32,7 +32,7 @@ __CEIREDIRECT(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_e
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL __localdep_execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME("execl");
 #elif defined(__CRT_HAVE__execl)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL __localdep_execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME("_execl");
-#elif defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
+#elif defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__LOCAL_environ))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/execl.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -98,7 +98,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_shexec_defined
 #define __localdep_shexec __LIBC_LOCAL_NAME(shexec)
 #endif /* !__local___localdep_shexec_defined */
-#else /* __CRT_HAVE_execl || __CRT_HAVE__execl || __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ) */
+#else /* __CRT_HAVE_execl || __CRT_HAVE__execl || __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __LOCAL_environ) */
 #undef __local_shexec_defined
-#endif /* !__CRT_HAVE_execl && !__CRT_HAVE__execl && !__CRT_HAVE_execv && !__CRT_HAVE__execv && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__LOCAL_environ) */
+#endif /* !__CRT_HAVE_execl && !__CRT_HAVE__execl && !__CRT_HAVE_execv && !__CRT_HAVE__execv && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__LOCAL_environ) */
 #endif /* !__local_shexec_defined */

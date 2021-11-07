@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa390980 */
+/* HASH CRC-32:0x85d16a41 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,9 +66,19 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifdef __CRT_HAVE_reboot
 /* Reboot or halt the system
  * @param: howto: One of the `RB_*' constants above */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,reboot,(__STDC_INT_AS_UINT_T __howto),(__howto))
+__CDECLARE(,int,__NOTHROW_NCX,reboot,(__STDC_INT_AS_UINT_T __howto),(__howto))
+#elif defined(__CRT_HAVE___reboot)
+/* Reboot or halt the system
+ * @param: howto: One of the `RB_*' constants above */
+__CREDIRECT(,int,__NOTHROW_NCX,reboot,(__STDC_INT_AS_UINT_T __howto),__reboot,(__howto))
+#elif defined(__CRT_HAVE___libc_reboot)
+/* Reboot or halt the system
+ * @param: howto: One of the `RB_*' constants above */
+__CREDIRECT(,int,__NOTHROW_NCX,reboot,(__STDC_INT_AS_UINT_T __howto),__libc_reboot,(__howto))
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

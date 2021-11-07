@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x186999ff */
+/* HASH CRC-32:0x518eec3a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_funopen2_64_defined
 #define __local_funopen2_64_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_funopen2)
+#if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_funopen2)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined
@@ -31,6 +31,8 @@ __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __bui
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#elif defined(__CRT_HAVE___libc_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(__mallptr))
 #else /* ... */
 #undef __local___localdep_free_defined
 #endif /* !... */
@@ -51,7 +53,12 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE___libc_malloc)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),__libc_malloc,(__num_bytes))
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/malloc.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -128,9 +135,9 @@ __LOCAL_LIBC(__funopen_to_funopen2_closefn) int
 	__holder = (struct __funopen_holder *)__cookie;
 	if (__holder->__fh_closefn != __NULLPTR)
 		__result = (*__holder->__fh_closefn)(__holder->__fh_cookie);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	(__NAMESPACE_LOCAL_SYM __localdep_free)(__holder);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	return __result;
 }
 __NAMESPACE_LOCAL_END
@@ -219,10 +226,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen2_64))(void const *__cookie, _
 	                     /* flushfn: */ __flushfn ? &__NAMESPACE_LOCAL_SYM __funopen2_to_funopen2_64_flushfn : __NULLPTR,
 	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	if __unlikely(!__result)
 		(__NAMESPACE_LOCAL_SYM __localdep_free)(__holder);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	return __result;
 }
 __NAMESPACE_LOCAL_END
@@ -230,7 +237,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_funopen2_64_defined
 #define __localdep_funopen2_64 __LIBC_LOCAL_NAME(funopen2_64)
 #endif /* !__local___localdep_funopen2_64_defined */
-#else /* (__CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && __CRT_HAVE_funopen2 */
+#else /* (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && __CRT_HAVE_funopen2 */
 #undef __local_funopen2_64_defined
-#endif /* (!__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign) || !__CRT_HAVE_funopen2 */
+#endif /* (!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || !__CRT_HAVE_funopen2 */
 #endif /* !__local_funopen2_64_defined */

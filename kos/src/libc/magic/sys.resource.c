@@ -419,28 +419,30 @@ int prlimit64($pid_t pid, __rlimit_resource_t resource,
 %#endif /* __USE_GNU */
 
 
-[[no_crt_self_import, export_as("__getrlimit")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("getrlimit", "__getrlimit")]]
+[[decl_include("<bits/os/rlimit.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("getrlimit", "__getrlimit", "__libc_getrlimit")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("getrlimit64")]]
-[[decl_include("<bits/os/rlimit.h>")]]
+[[export_as("__getrlimit", "__libc_getrlimit")]]
 int getrlimit(__rlimit_resource_t resource,
               [[nonnull]] struct rlimit *rlimits);
 
-[[no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("setrlimit")]]
+[[decl_include("<bits/os/rlimit.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("setrlimit", "__setrlimit", "__libc_setrlimit")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("setrlimit64")]]
-[[decl_include("<bits/os/rlimit.h>")]]
+[[export_as("__setrlimit", "__libc_setrlimit")]]
 int setrlimit(__rlimit_resource_t resource,
               [[nonnull]] struct rlimit const *rlimits);
 
 [[decl_include("<bits/os/rusage.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getrusage")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getrusage", "__getrusage", "__libc_getrusage")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getrusage64")]]
+[[export_as("__getrusage", "__libc_getrusage")]]
 int getrusage(__rusage_who_t who,
               [[nonnull]] struct rusage *usage);
 
 %#ifdef __USE_TIME64
 [[preferred_time64_variant_of(getrusage), doc_alias("getrusage")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__getrusage", "__libc_getrusage")]]
 [[decl_include("<bits/os/rusage.h>")]]
 int getrusage64(__rusage_who_t who,
                 [[nonnull]] struct rusage64 *usage); /* TODO: Inline implementation using `getrusage()' */
@@ -453,16 +455,19 @@ int getrusage64(__rusage_who_t who,
 int getpriority(__priority_which_t which, id_t who);
 
 [[decl_include("<bits/types.h>"), doc_alias("getpriority")]]
+[[export_alias("__setpriority", "__libc_setpriority")]]
 int setpriority(__priority_which_t which, id_t who, int prio);
 
 %
 %#ifdef __USE_LARGEFILE64
 [[preferred_rlim64_variant_of(getrlimit)]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), preferred_alias("__getrlimit", "__libc_getrlimit")]]
 [[decl_include("<bits/os/rlimit.h>")]]
 int getrlimit64(__rlimit_resource_t resource,
                 [[nonnull]] struct rlimit64 *rlimits);
 
 [[preferred_rlim64_variant_of(setrlimit)]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), preferred_alias("__setrlimit", "__libc_setrlimit")]]
 [[decl_include("<bits/os/rlimit.h>")]]
 int setrlimit64(__rlimit_resource_t resource,
                 [[nonnull]] struct rlimit64 const *rlimits);

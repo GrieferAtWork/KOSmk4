@@ -108,6 +108,7 @@ ssize_t process_vm_writev($pid_t pid,
 @@@return: <= SUM(iov[*].iov_len): The actual amount of read bytes
 @@@return: 0                     : EOF
 [[cp, wunused, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
+[[export_alias("__readv")]]
 ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 @@>> writev(2)
@@ -120,6 +121,7 @@ ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SI
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
 @@@return: 0                     : No more data can be written
 [[cp, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
+[[export_alias("__writev")]]
 ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 

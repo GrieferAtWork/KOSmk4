@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64503ac7 */
+/* HASH CRC-32:0x6d4cc288 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,10 @@ __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_AL
 #elif defined(__CRT_HAVE_malloc)
 #include <hybrid/typecore.h>
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__libc_core_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE___libc_malloc)
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__libc_core_malloc,(__SIZE_TYPE__ __num_bytes),__libc_malloc,(__num_bytes))
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/stdlib/malloc.h>
 #define __libc_core_malloc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc)
 #else /* ... */
@@ -52,7 +55,10 @@ __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_AL
 #elif defined(__CRT_HAVE_calloc)
 #include <hybrid/typecore.h>
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__libc_core_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,(__count,__num_bytes))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE___libc_calloc)
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__libc_core_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),__libc_calloc,(__count,__num_bytes))
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/stdlib/calloc.h>
 #define __libc_core_calloc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(calloc)
 #else /* ... */
@@ -67,6 +73,9 @@ __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),
 #elif defined(__CRT_HAVE_realloc)
 #include <hybrid/typecore.h>
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__libc_core_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
+#elif defined(__CRT_HAVE___libc_realloc)
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__libc_core_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),__libc_realloc,(__mallptr,__num_bytes))
 #else /* ... */
 #undef ____libc_core_realloc_defined
 #endif /* !... */
@@ -79,6 +88,8 @@ __CEIREDIRECT(,void,__NOTHROW_NCX,__libc_core_free,(void *__mallptr),free,{ __bu
 __CREDIRECT_VOID(,__NOTHROW_NCX,__libc_core_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__libc_core_free,(void *__mallptr),cfree,(__mallptr))
+#elif defined(__CRT_HAVE___libc_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__libc_core_free,(void *__mallptr),__libc_free,(__mallptr))
 #else /* ... */
 #undef ____libc_core_free_defined
 #endif /* !... */

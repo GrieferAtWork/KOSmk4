@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11e08791 */
+/* HASH CRC-32:0xcedd46fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__setmode_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fcntl_defined
@@ -37,6 +37,11 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
+#elif defined(__CRT_HAVE___libc_fcntl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd),__libc_fcntl,(__fd,__cmd),__cmd,1,(void *))
 #else /* ... */
 #undef __local___localdep_fcntl_defined
 #endif /* !... */
@@ -58,7 +63,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__setmode_defined
 #define __localdep__setmode __LIBC_LOCAL_NAME(_setmode)
 #endif /* !__local___localdep__setmode_defined */
-#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */
+#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */
 #undef __local__setmode_defined
-#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || (!__F_SETFL_XCH && (!__F_GETFL || !__F_SETFL)) */
+#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || (!__F_SETFL_XCH && (!__F_GETFL || !__F_SETFL)) */
 #endif /* !__local__setmode_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb434357b */
+/* HASH CRC-32:0xeebfae5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6054,6 +6054,7 @@ DEFINE_PUBLIC_ALIAS(__rawmemchr, libc_rawmemchr);
 DEFINE_PUBLIC_ALIAS(rawmemchr, libc_rawmemchr);
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHR */
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__basename, libc_basename);
 DEFINE_PUBLIC_ALIAS(basename, libc_basename);
 DEFINE_PUBLIC_ALIAS(__strverscmp, libc_strverscmp);
 DEFINE_PUBLIC_ALIAS(strverscmp, libc_strverscmp);
@@ -6148,6 +6149,7 @@ DEFINE_PUBLIC_ALIAS(strlcpy, libc_strlcpy);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_memccpy, libc_memccpy);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__memccpy, libc_memccpy);
 DEFINE_PUBLIC_ALIAS(memccpy, libc_memccpy);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMCCPY */
 #ifndef LIBC_ARCH_HAVE_MEMCPYW

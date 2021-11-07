@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ac6e073 */
+/* HASH CRC-32:0x26f1c29f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1930,7 +1930,7 @@ NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
 	attempt = 0;
 again:
 	{
-#if (defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+#if (defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 		struct timeval64 tv;
 		if (libc_gettimeofday64(&tv, NULL) == 0) {
 			seed = (uint32_t)(tv.tv_sec) ^
@@ -1939,7 +1939,7 @@ again:
 			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
 		} else
-#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 		struct timeval tv;
 		if (libc_gettimeofday(&tv, NULL) == 0) {
 			seed = (uint32_t)(tv.tv_sec) ^
@@ -1969,7 +1969,7 @@ again:
 	}
 #ifdef __CRT_HAVE_gettid
 	seed ^= libc_gettid();
-#elif defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)
+#elif defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)
 	seed ^= libc_getpid();
 #endif /* ... */
 
@@ -2001,7 +2001,7 @@ again:
 	(void)flags;
 	switch (what) {
 
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 	case 0: {
 #ifdef O_RDWR
 #ifdef O_ACCMODE
@@ -2017,15 +2017,15 @@ again:
 #endif /* O_EXCL */
 		result = libc_open(template_, flags, 0600);
 	}	break;
-#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 
-#if defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
 	case 1:
 		result = libc_mkdir(template_, 0700);
 		break;
-#endif /* __CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
+#endif /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
 
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))
 	case 2: {
 #if (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))
 		struct stat st;
@@ -2049,9 +2049,9 @@ again:
 			result = 0;
 		} else {
 			/* File does already exist. */
-#if (!defined(__CRT_HAVE_kstat) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE_kstat64) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE__stat64) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stat64i32) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stati64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32i64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE_stat) || (defined(__USE_FILE_OFFSET64) && !defined(__STAT32_MATCHES_STAT64))) && (!defined(__CRT_HAVE_stat64) || (!defined(__USE_FILE_OFFSET64) && !defined(__STAT32_MATCHES_STAT64))) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close))
+#if (!defined(__CRT_HAVE_kstat) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE_kstat64) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE__stat64) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stat64i32) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stati64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32i64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE_stat) || (defined(__USE_FILE_OFFSET64) && !defined(__STAT32_MATCHES_STAT64))) && (!defined(__CRT_HAVE_stat64) || (!defined(__USE_FILE_OFFSET64) && !defined(__STAT32_MATCHES_STAT64))) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close))
 			libc_close(result);
-#endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || (__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) && (!__CRT_HAVE_stat64 || (!__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
+#endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || (__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) && (!__CRT_HAVE_stat64 || (!__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close) */
 #ifdef EEXIST
 			result = __libc_seterrno(EEXIST);
 #else /* EEXIST */
@@ -2061,7 +2061,7 @@ again:
 			goto do_try_again;
 		}
 	}	break;
-#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
 
 	default: __builtin_unreachable();
 	}
@@ -2221,7 +2221,7 @@ NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
                                     size_t num_bytes) {
 	void *result;
 	result = libc_realloc(mallptr, num_bytes);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #ifdef __REALLOC_ZERO_IS_NONNULL
 	if unlikely(!result)
 #else /* __REALLOC_ZERO_IS_NONNULL */
@@ -2239,7 +2239,7 @@ NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
 	{
 		libc_free(mallptr);
 	}
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	return result;
 }
 /* >> l64a_r(3)
@@ -4654,11 +4654,15 @@ DEFINE_PUBLIC_ALIAS(strtoul, libc_strtoul);
 DEFINE_PUBLIC_ALIAS(strtol, libc_strtol);
 DEFINE_PUBLIC_ALIAS(strtoull, libc_strtoull);
 DEFINE_PUBLIC_ALIAS(strtouq, libc_strtoull);
+DEFINE_PUBLIC_ALIAS(__strtouq, libc_strtoull);
 DEFINE_PUBLIC_ALIAS(strtoll, libc_strtoll);
 DEFINE_PUBLIC_ALIAS(strtoq, libc_strtoll);
+DEFINE_PUBLIC_ALIAS(__strtoq, libc_strtoll);
 DEFINE_PUBLIC_ALIAS(atof, libc_atof);
 DEFINE_PUBLIC_ALIAS(strtod, libc_strtod);
+DEFINE_PUBLIC_ALIAS(__strtof, libc_strtof);
 DEFINE_PUBLIC_ALIAS(strtof, libc_strtof);
+DEFINE_PUBLIC_ALIAS(__strtold, libc_strtold);
 DEFINE_PUBLIC_ALIAS(strtold, libc_strtold);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strtou32_r, libc_strtou32_r);

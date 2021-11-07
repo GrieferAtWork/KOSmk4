@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82ed4646 */
+/* HASH CRC-32:0x25cfdc9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_ftruncate_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
+#if defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)
 #include <features.h>
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
@@ -34,19 +34,39 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_ftruncate32_defined) && defined(__CRT_HAVE_ftruncate)
+#ifndef __local___localdep_ftruncate32_defined
 #define __local___localdep_ftruncate32_defined
+#ifdef __CRT_HAVE_ftruncate
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),ftruncate,(__fd,__length))
-#endif /* !__local___localdep_ftruncate32_defined && __CRT_HAVE_ftruncate */
+#elif defined(__CRT_HAVE___ftruncate)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),__ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___libc_ftruncate)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),__libc_ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE__chsize)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),_chsize,(__fd,__length))
+#elif defined(__CRT_HAVE_chsize)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),chsize,(__fd,__length))
+#else /* ... */
+#undef __local___localdep_ftruncate32_defined
+#endif /* !... */
+#endif /* !__local___localdep_ftruncate32_defined */
 #ifndef __local___localdep_ftruncate64_defined
 #define __local___localdep_ftruncate64_defined
 #if defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),__ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___libc_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),__libc_ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE__chsize) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize,(__fd,__length))
+#elif defined(__CRT_HAVE_chsize) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize_s,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate)
+#elif defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/ftruncate64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -57,18 +77,18 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_ftruncate64_defined */
 __LOCAL_LIBC(ftruncate) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftruncate))(__fd_t __fd, __PIO_OFFSET __length) {
-#ifdef __CRT_HAVE_ftruncate
+#if defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)
 	return (__NAMESPACE_LOCAL_SYM __localdep_ftruncate32)(__fd, (__pos32_t)__length);
-#else /* __CRT_HAVE_ftruncate */
+#else /* __CRT_HAVE_ftruncate || __CRT_HAVE___ftruncate || __CRT_HAVE___libc_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_chsize */
 	return (__NAMESPACE_LOCAL_SYM __localdep_ftruncate64)(__fd, (__pos64_t)__length);
-#endif /* !__CRT_HAVE_ftruncate */
+#endif /* !__CRT_HAVE_ftruncate && !__CRT_HAVE___ftruncate && !__CRT_HAVE___libc_ftruncate && !__CRT_HAVE__chsize && !__CRT_HAVE_chsize */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ftruncate_defined
 #define __local___localdep_ftruncate_defined
 #define __localdep_ftruncate __LIBC_LOCAL_NAME(ftruncate)
 #endif /* !__local___localdep_ftruncate_defined */
-#else /* __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate */
+#else /* __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate || __CRT_HAVE___ftruncate || __CRT_HAVE___libc_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_chsize */
 #undef __local_ftruncate_defined
-#endif /* !__CRT_HAVE_ftruncate64 && !__CRT_HAVE__chsize_s && !__CRT_HAVE_ftruncate */
+#endif /* !__CRT_HAVE_ftruncate64 && !__CRT_HAVE__chsize_s && !__CRT_HAVE_ftruncate && !__CRT_HAVE___ftruncate && !__CRT_HAVE___libc_ftruncate && !__CRT_HAVE__chsize && !__CRT_HAVE_chsize */
 #endif /* !__local_ftruncate_defined */

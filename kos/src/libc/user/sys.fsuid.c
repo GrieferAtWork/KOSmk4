@@ -76,8 +76,12 @@ NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb1293c3]]]*/
+/*[[[start:exports,hash:CRC-32=0x9e040ce9]]]*/
+DEFINE_PUBLIC_ALIAS(__setfsuid, libc_setfsuid);
+DEFINE_PUBLIC_ALIAS(__libc_setfsuid, libc_setfsuid);
 DEFINE_PUBLIC_ALIAS(setfsuid, libc_setfsuid);
+DEFINE_PUBLIC_ALIAS(__setfsgid, libc_setfsgid);
+DEFINE_PUBLIC_ALIAS(__libc_setfsgid, libc_setfsgid);
 DEFINE_PUBLIC_ALIAS(setfsgid, libc_setfsgid);
 /*[[[end:exports]]]*/
 

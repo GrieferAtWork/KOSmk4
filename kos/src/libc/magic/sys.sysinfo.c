@@ -47,6 +47,7 @@ __SYSDECL_BEGIN
 @@Return current system information
 [[guard, decl_include("<linux/sysinfo.h>")]]
 [[no_crt_self_import, if(!defined(__solaris__)), alias("sysinfo")]]
+[[export_alias("__sysinfo", "__libc_sysinfo")]]
 int sysinfo([[nonnull]] struct sysinfo *info);
 
 @@>> get_nprocs_conf(3)

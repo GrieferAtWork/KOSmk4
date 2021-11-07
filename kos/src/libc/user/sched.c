@@ -309,7 +309,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa58ef2c5]]]*/
+/*[[[start:exports,hash:CRC-32=0x195db0b9]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$__clone, libd_clone);
 DEFINE_PUBLIC_ALIAS(DOS$clone, libd_clone);
@@ -318,24 +318,34 @@ DEFINE_PUBLIC_ALIAS(unshare, libc_unshare);
 DEFINE_PUBLIC_ALIAS(sched_getcpu, libc_sched_getcpu);
 DEFINE_PUBLIC_ALIAS(setns, libc_setns);
 DEFINE_PUBLIC_ALIAS(exit_thread, libc_exit_thread);
+DEFINE_PUBLIC_ALIAS(__sched_setparam, libc_sched_setparam);
+DEFINE_PUBLIC_ALIAS(__libc_sched_setparam, libc_sched_setparam);
 DEFINE_PUBLIC_ALIAS(sched_setparam, libc_sched_setparam);
 DEFINE_PUBLIC_ALIAS(__sched_getparam, libc_sched_getparam);
+DEFINE_PUBLIC_ALIAS(__libc_sched_getparam, libc_sched_getparam);
 DEFINE_PUBLIC_ALIAS(sched_getparam, libc_sched_getparam);
 DEFINE_PUBLIC_ALIAS(__sched_setscheduler, libc_sched_setscheduler);
+DEFINE_PUBLIC_ALIAS(__libc_sched_setscheduler, libc_sched_setscheduler);
 DEFINE_PUBLIC_ALIAS(sched_setscheduler, libc_sched_setscheduler);
 DEFINE_PUBLIC_ALIAS(__sched_getscheduler, libc_sched_getscheduler);
+DEFINE_PUBLIC_ALIAS(__libc_sched_getscheduler, libc_sched_getscheduler);
 DEFINE_PUBLIC_ALIAS(sched_getscheduler, libc_sched_getscheduler);
 DEFINE_PUBLIC_ALIAS(thrd_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(pthread_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(__sched_yield, libc_sched_yield);
+DEFINE_PUBLIC_ALIAS(__libc_sched_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(sched_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(__sched_get_priority_max, libc_sched_get_priority_max);
+DEFINE_PUBLIC_ALIAS(__libc_sched_get_priority_max, libc_sched_get_priority_max);
 DEFINE_PUBLIC_ALIAS(sched_get_priority_max, libc_sched_get_priority_max);
 DEFINE_PUBLIC_ALIAS(__sched_get_priority_min, libc_sched_get_priority_min);
+DEFINE_PUBLIC_ALIAS(__libc_sched_get_priority_min, libc_sched_get_priority_min);
 DEFINE_PUBLIC_ALIAS(sched_get_priority_min, libc_sched_get_priority_min);
 DEFINE_PUBLIC_ALIAS(sched_setaffinity, libc_sched_setaffinity);
 DEFINE_PUBLIC_ALIAS(sched_getaffinity, libc_sched_getaffinity);
+DEFINE_PUBLIC_ALIAS(__sched_rr_get_interval, libc_sched_rr_get_interval);
+DEFINE_PUBLIC_ALIAS(__libc_sched_rr_get_interval, libc_sched_rr_get_interval);
 DEFINE_PUBLIC_ALIAS(sched_rr_get_interval, libc_sched_rr_get_interval);
 DEFINE_PUBLIC_ALIAS(sched_rr_get_interval64, libc_sched_rr_get_interval64);
 /*[[[end:exports]]]*/

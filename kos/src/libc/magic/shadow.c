@@ -66,16 +66,16 @@ typedef __SIZE_TYPE__ size_t;
 }
 
 
-[[cp]]
+[[cp, export_alias("__setspent")]]
 void setspent();
 
-[[cp_nokos]]
+[[cp_nokos, export_alias("__endspent")]]
 void endspent();
 
-[[cp, decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, decl_include("<bits/crt/db/spwd.h>"), export_alias("__getspent")]]
 struct spwd *getspent();
 
-[[cp, decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, decl_include("<bits/crt/db/spwd.h>"), export_alias("__getspnam")]]
 struct spwd *getspnam([[nonnull]] char const *__restrict name);
 
 [[cp, decl_include("<bits/crt/db/spwd.h>")]]
@@ -114,7 +114,10 @@ int fgetspent_r([[nonnull]] $FILE *__restrict stream,
                 [[nonnull]] struct spwd **__restrict result);
 %#endif /* __USE_MISC */
 
-[[cp_kos]] int lckpwdf();
+[[cp_kos, export_alias("__lckpwdf")]]
+int lckpwdf();
+
+[[export_alias("__ulckpwdf")]]
 int ulckpwdf();
 
 

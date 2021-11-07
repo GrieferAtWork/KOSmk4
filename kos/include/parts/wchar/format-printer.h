@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x243d0c4b */
+/* HASH CRC-32:0xbd3de662 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -661,7 +661,7 @@ struct format_waprintf_data {
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_pack,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),(__self,__pstrlen))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/parts.wchar.format-printer/format_waprintf_pack.h>
 /* Pack  and  finalize  a  given  aprintf  format printer
  * Together with `format_waprintf_printer()', the aprintf
@@ -694,7 +694,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_pack, __FORCELOCAL __ATTR_ARTIFI
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_alloc,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),(__self,__num_wchars))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/parts.wchar.format-printer/format_waprintf_alloc.h>
 /* >> format_waprintf_alloc(3)
  * Allocate  a  buffer  of  `num_wchars'  wide-characters  at  the  end  of `self'
@@ -708,7 +708,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_alloc, __FORCELOCAL __ATTR_ARTIF
 /* >> format_waprintf_printer(3)
  * Print data to a dynamically allocated heap buffer. On error, `-1' is returned */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_waprintf_printer,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/parts.wchar.format-printer/format_waprintf_printer.h>
 /* >> format_waprintf_printer(3)
  * Print data to a dynamically allocated heap buffer. On error, `-1' is returned */

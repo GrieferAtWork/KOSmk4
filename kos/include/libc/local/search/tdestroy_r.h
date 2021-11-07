@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd806a662 */
+/* HASH CRC-32:0x90260878 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@ __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __bui
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#elif defined(__CRT_HAVE___libc_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(__mallptr))
 #else /* ... */
 #undef __local___localdep_free_defined
 #endif /* !... */
@@ -43,9 +45,9 @@ __again:
 		__l = ((void **)__root)[1];
 		__r = ((void **)__root)[2];
 		(*__freefct)(((void **)__root)[0], __arg);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 		(__NAMESPACE_LOCAL_SYM __localdep_free)(__root);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 		if (__l) {
 			(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdestroy_r))(__r, __freefct, __arg);
 			__root = __l;

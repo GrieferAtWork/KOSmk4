@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x816b22fc */
+/* HASH CRC-32:0xea174873 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_umask_s_defined
 #define __local_umask_s_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
+#if defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask) || defined(__CRT_HAVE___umask) || defined(__CRT_HAVE___libc_umask)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_umask_defined
@@ -30,6 +30,10 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),umask,(__mode))
 #elif defined(__CRT_HAVE__umask)
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),_umask,(__mode))
+#elif defined(__CRT_HAVE___umask)
+__CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),__umask,(__mode))
+#elif defined(__CRT_HAVE___libc_umask)
+__CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),__libc_umask,(__mode))
 #else /* ... */
 #undef __local___localdep_umask_defined
 #endif /* !... */
@@ -54,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_umask_s_defined
 #define __localdep_umask_s __LIBC_LOCAL_NAME(umask_s)
 #endif /* !__local___localdep_umask_s_defined */
-#else /* __CRT_HAVE_umask || __CRT_HAVE__umask */
+#else /* __CRT_HAVE_umask || __CRT_HAVE__umask || __CRT_HAVE___umask || __CRT_HAVE___libc_umask */
 #undef __local_umask_s_defined
-#endif /* !__CRT_HAVE_umask && !__CRT_HAVE__umask */
+#endif /* !__CRT_HAVE_umask && !__CRT_HAVE__umask && !__CRT_HAVE___umask && !__CRT_HAVE___libc_umask */
 #endif /* !__local_umask_s_defined */

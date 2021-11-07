@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd40fab89 */
+/* HASH CRC-32:0xa5beed82 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,29 @@
 #define __local_unlockpt_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
-#if defined(__CRT_HAVE_ioctl) && defined(__TIOCSPTLCK)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCSPTLCK)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
 #define __local___localdep_ioctl_defined
+#ifdef __CRT_HAVE_ioctl
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#else /* ... */
+#undef __local___localdep_ioctl_defined
+#endif /* !... */
 #endif /* !__local___localdep_ioctl_defined */
 __LOCAL_LIBC(unlockpt) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unlockpt))(__fd_t __fd) {
@@ -44,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_unlockpt_defined
 #define __localdep_unlockpt __LIBC_LOCAL_NAME(unlockpt)
 #endif /* !__local___localdep_unlockpt_defined */
-#else /* __CRT_HAVE_ioctl && __TIOCSPTLCK */
+#else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSPTLCK */
 #undef __local_unlockpt_defined
-#endif /* !__CRT_HAVE_ioctl || !__TIOCSPTLCK */
+#endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TIOCSPTLCK */
 #endif /* !__local_unlockpt_defined */

@@ -212,11 +212,13 @@ __SYSDECL_BEGIN
 
 @@@param: mountflags: Set of `MS_*' from <sys/mount.h>
 [[cp, decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__mount", "__libc_mount")]]
 int mount([[nullable]] char const *special_file, [[nullable]] char const *dir,
           [[nullable]] char const *fstype, $ulongptr_t mountflags,
           [[nullable]] void const *data);
 
 [[cp, userimpl, requires_function(umount2)]]
+[[export_alias("__umount", "__libc_umount")]]
 int umount([[nullable]] char const *special_file) {
 	return umount2(special_file, 0);
 }

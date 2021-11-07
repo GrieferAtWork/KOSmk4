@@ -3644,8 +3644,10 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xef925083]]]*/
+/*[[[start:exports,hash:CRC-32=0xc1b3c00e]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
+DEFINE_PUBLIC_ALIAS(__rename, libc_rename);
+DEFINE_PUBLIC_ALIAS(__libc_rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
 #ifdef __LIBCCALL_IS_LIBDCALL

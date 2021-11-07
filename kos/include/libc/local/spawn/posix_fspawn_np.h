@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fe7149e */
+/* HASH CRC-32:0xbbf945e9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
 #include <asm/os/vfork.h>
-#if (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))) || defined(__CRT_HAVE_posix_spawn)
+#if (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork) || defined(__CRT_HAVE___libc_fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))) || defined(__CRT_HAVE_posix_spawn)
 #include <bits/crt/posix_spawn.h>
 #include <bits/types.h>
 #include <features.h>
@@ -79,6 +79,10 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),chdir,(__path))
 #elif defined(__CRT_HAVE__chdir)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),_chdir,(__path))
+#elif defined(__CRT_HAVE___chdir)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__chdir,(__path))
+#elif defined(__CRT_HAVE___libc_chdir)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__libc_chdir,(__path))
 #else /* ... */
 #undef __local___localdep_chdir_defined
 #endif /* !... */
@@ -91,6 +95,8 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
+#elif defined(__CRT_HAVE___libc_close)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__libc_close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
 #endif /* !... */
@@ -103,14 +109,14 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_closefrom,(__fd_t __lowfd),closefrom,
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_CLOSEM)
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_CLOSEM)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/closefrom.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_closefrom __LIBC_LOCAL_NAME(closefrom)
-#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */
+#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM */
 #undef __local___localdep_closefrom_defined
-#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || !__F_CLOSEM */
+#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM */
 #endif /* !__CRT_HAVE_closefrom */
 #endif /* !__local___localdep_closefrom_defined */
 #if !defined(__local___localdep_crt_posix_spawn_defined) && defined(__CRT_HAVE_posix_spawn)
@@ -125,14 +131,24 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE___dup2)
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
+#elif defined(__CRT_HAVE___libc_dup2)
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__libc_dup2,(__oldfd,__newfd))
 #else /* ... */
 #undef __local___localdep_dup2_defined
 #endif /* !... */
 #endif /* !__local___localdep_dup2_defined */
-#if !defined(__local___localdep_fchdir_defined) && defined(__CRT_HAVE_fchdir)
+#ifndef __local___localdep_fchdir_defined
 #define __local___localdep_fchdir_defined
+#ifdef __CRT_HAVE_fchdir
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_fchdir,(__fd_t __fd),fchdir,(__fd))
-#endif /* !__local___localdep_fchdir_defined && __CRT_HAVE_fchdir */
+#elif defined(__CRT_HAVE___fchdir)
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_fchdir,(__fd_t __fd),__fchdir,(__fd))
+#elif defined(__CRT_HAVE___libc_fchdir)
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_fchdir,(__fd_t __fd),__libc_fchdir,(__fd))
+#else /* ... */
+#undef __local___localdep_fchdir_defined
+#endif /* !... */
+#endif /* !__local___localdep_fchdir_defined */
 #if !defined(__local___localdep_fexecve_defined) && defined(__CRT_HAVE_fexecve)
 #define __local___localdep_fexecve_defined
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_fexecve,(__fd_t __fd, __TARGV, __TENVP),fexecve,(__fd,___argv,___envp))
@@ -145,18 +161,36 @@ __CEIREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,{
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,())
 #elif defined(__CRT_HAVE___fork)
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,())
+#elif defined(__CRT_HAVE___libc_fork)
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__libc_fork,())
 #else /* ... */
 #undef __local___localdep_fork_defined
 #endif /* !... */
 #endif /* !__local___localdep_fork_defined */
-#if !defined(__local___localdep_getgid_defined) && defined(__CRT_HAVE_getgid)
+#ifndef __local___localdep_getgid_defined
 #define __local___localdep_getgid_defined
+#ifdef __CRT_HAVE_getgid
 __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,__localdep_getgid,(void),getgid,())
-#endif /* !__local___localdep_getgid_defined && __CRT_HAVE_getgid */
-#if !defined(__local___localdep_getuid_defined) && defined(__CRT_HAVE_getuid)
+#elif defined(__CRT_HAVE___getgid)
+__CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,__localdep_getgid,(void),__getgid,())
+#elif defined(__CRT_HAVE___libc_getgid)
+__CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,__localdep_getgid,(void),__libc_getgid,())
+#else /* ... */
+#undef __local___localdep_getgid_defined
+#endif /* !... */
+#endif /* !__local___localdep_getgid_defined */
+#ifndef __local___localdep_getuid_defined
 #define __local___localdep_getuid_defined
+#ifdef __CRT_HAVE_getuid
 __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,__localdep_getuid,(void),getuid,())
-#endif /* !__local___localdep_getuid_defined && __CRT_HAVE_getuid */
+#elif defined(__CRT_HAVE___getuid)
+__CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,__localdep_getuid,(void),__getuid,())
+#elif defined(__CRT_HAVE___libc_getuid)
+__CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,__localdep_getuid,(void),__libc_getuid,())
+#else /* ... */
+#undef __local___localdep_getuid_defined
+#endif /* !... */
+#endif /* !__local___localdep_getuid_defined */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined
 __NAMESPACE_LOCAL_END
@@ -168,6 +202,8 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___libc_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open64)
@@ -176,21 +212,21 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/open.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_open __LIBC_LOCAL_NAME(open)
-#else /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#else /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #undef __local___localdep_open_defined
-#endif /* !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
+#endif /* !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 #ifndef __local___localdep_pipe2_defined
 #define __local___localdep_pipe2_defined
 #ifdef __CRT_HAVE_pipe2
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
-#elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
+#elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pipe2.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -207,6 +243,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___read)
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_read)
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__libc_read,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_read_defined
 #endif /* !... */
@@ -223,17 +261,36 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getparam,(__pid_t __pid, struct sched_param *__param),__sched_getparam,(__pid,__param))
+#elif defined(__CRT_HAVE___libc_sched_getparam)
+__NAMESPACE_LOCAL_END
+#include <bits/os/sched.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getparam,(__pid_t __pid, struct sched_param *__param),__libc_sched_getparam,(__pid,__param))
 #else /* ... */
 #undef __local___localdep_sched_getparam_defined
 #endif /* !... */
 #endif /* !__local___localdep_sched_getparam_defined */
-#if !defined(__local___localdep_sched_setparam_defined) && defined(__CRT_HAVE_sched_setparam)
+#ifndef __local___localdep_sched_setparam_defined
 #define __local___localdep_sched_setparam_defined
+#ifdef __CRT_HAVE_sched_setparam
 __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setparam,(__pid_t __pid, struct sched_param const *__param),sched_setparam,(__pid,__param))
-#endif /* !__local___localdep_sched_setparam_defined && __CRT_HAVE_sched_setparam */
+#elif defined(__CRT_HAVE___sched_setparam)
+__NAMESPACE_LOCAL_END
+#include <bits/os/sched.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setparam,(__pid_t __pid, struct sched_param const *__param),__sched_setparam,(__pid,__param))
+#elif defined(__CRT_HAVE___libc_sched_setparam)
+__NAMESPACE_LOCAL_END
+#include <bits/os/sched.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setparam,(__pid_t __pid, struct sched_param const *__param),__libc_sched_setparam,(__pid,__param))
+#else /* ... */
+#undef __local___localdep_sched_setparam_defined
+#endif /* !... */
+#endif /* !__local___localdep_sched_setparam_defined */
 #ifndef __local___localdep_sched_setscheduler_defined
 #define __local___localdep_sched_setscheduler_defined
 #ifdef __CRT_HAVE_sched_setscheduler
@@ -246,6 +303,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),__sched_setscheduler,(__pid,__policy,__param))
+#elif defined(__CRT_HAVE___libc_sched_setscheduler)
+__NAMESPACE_LOCAL_END
+#include <bits/os/sched.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),__libc_sched_setscheduler,(__pid,__policy,__param))
 #else /* ... */
 #undef __local___localdep_sched_setscheduler_defined
 #endif /* !... */
@@ -264,6 +326,8 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_seteuid,(__uid_t __euid),seteuid,(__eu
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid),setpgid,(__pid,__pgid))
 #elif defined(__CRT_HAVE___setpgid)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid),__setpgid,(__pid,__pgid))
+#elif defined(__CRT_HAVE___libc_setpgid)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid),__libc_setpgid,(__pid,__pgid))
 #else /* ... */
 #undef __local___localdep_setpgid_defined
 #endif /* !... */
@@ -414,6 +478,16 @@ __NAMESPACE_LOCAL_END
 struct __sigset_struct;
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE___sigprocmask)
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__sigprocmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE___libc_sigprocmask)
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__libc_sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE_pthread_sigmask)
 __NAMESPACE_LOCAL_END
 struct __sigset_struct;
@@ -476,6 +550,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),_write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___write)
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__write,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_write)
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__libc_write,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_write_defined
 #endif /* !... */
@@ -488,7 +564,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(posix_fspawn_np) __ATTR_NONNULL((1, 5, 6)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict __pid, __fd_t __execfd, struct __posix_spawn_file_actions const *__file_actions, struct __posix_spawnattr const *__attrp, __TARGV, __TENVP) {
-#if defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))
+#if defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork) || defined(__CRT_HAVE___libc_fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))
 
 
 
@@ -581,32 +657,32 @@ __do_exec:
 			switch (__act->__sa_tag) {
 #undef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
 
-#if !defined(__CRT_HAVE_close) && !defined(__CRT_HAVE__close) && !defined(__CRT_HAVE___close)
+#if !defined(__CRT_HAVE_close) && !defined(__CRT_HAVE__close) && !defined(__CRT_HAVE___close) && !defined(__CRT_HAVE___libc_close)
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
-#else /* !__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close */
+#else /* !__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close && !__CRT_HAVE___libc_close */
 			case __POSIX_SPAWN_ACTION_CLOSE:
 				/* Close a file handle */
 				if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_close)(__act->__sa_action.__sa_close_action.__sa_fd))
 					goto __child_error;
 				break;
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
+#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */
 
 
-#if !defined(__CRT_HAVE_dup2) && !defined(__CRT_HAVE__dup2) && !defined(__CRT_HAVE___dup2)
+#if !defined(__CRT_HAVE_dup2) && !defined(__CRT_HAVE__dup2) && !defined(__CRT_HAVE___dup2) && !defined(__CRT_HAVE___libc_dup2)
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
-#else /* !__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2 */
+#else /* !__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2 && !__CRT_HAVE___libc_dup2 */
 			case __POSIX_SPAWN_ACTION_DUP2:
 				/* Duplicate a file handle */
 				if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_dup2)(__act->__sa_action.__sa_dup2_action.__sa_oldfd,
 				                 __act->__sa_action.__sa_dup2_action.__sa_newfd))
 					goto __child_error;
 				break;
-#endif /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 */
+#endif /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 || __CRT_HAVE___libc_dup2 */
 
 
-#if (!defined(__CRT_HAVE_open64) && !defined(__CRT_HAVE___open64) && !defined(__CRT_HAVE_open) && !defined(__CRT_HAVE__open) && !defined(__CRT_HAVE___open) && (!defined(__AT_FDCWD) || (!defined(__CRT_HAVE_openat64) && !defined(__CRT_HAVE_openat)))) || (!defined(__CRT_HAVE_dup2) && !defined(__CRT_HAVE__dup2) && !defined(__CRT_HAVE___dup2)) || (!defined(__CRT_HAVE_close) && !defined(__CRT_HAVE__close) && !defined(__CRT_HAVE___close))
+#if (!defined(__CRT_HAVE_open64) && !defined(__CRT_HAVE___open64) && !defined(__CRT_HAVE_open) && !defined(__CRT_HAVE__open) && !defined(__CRT_HAVE___open) && !defined(__CRT_HAVE___libc_open) && (!defined(__AT_FDCWD) || (!defined(__CRT_HAVE_openat64) && !defined(__CRT_HAVE_openat)))) || (!defined(__CRT_HAVE_dup2) && !defined(__CRT_HAVE__dup2) && !defined(__CRT_HAVE___dup2) && !defined(__CRT_HAVE___libc_dup2)) || (!defined(__CRT_HAVE_close) && !defined(__CRT_HAVE__close) && !defined(__CRT_HAVE___close) && !defined(__CRT_HAVE___libc_close))
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
-#else /* (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) */
+#else /* (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2 && !__CRT_HAVE___libc_dup2) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close && !__CRT_HAVE___libc_close) */
 			case __POSIX_SPAWN_ACTION_OPEN: {
 				/* Open a file using `open(2)' */
 				__fd_t __tempfd;
@@ -621,12 +697,12 @@ __do_exec:
 					(__NAMESPACE_LOCAL_SYM __localdep_close)(__tempfd);
 				}
 			}	break;
-#endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
+#endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 || __CRT_HAVE___libc_dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close) */
 
 
-#if !defined(__CRT_HAVE_chdir) && !defined(__CRT_HAVE__chdir)
+#if !defined(__CRT_HAVE_chdir) && !defined(__CRT_HAVE__chdir) && !defined(__CRT_HAVE___chdir) && !defined(__CRT_HAVE___libc_chdir)
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
-#else /* !__CRT_HAVE_chdir && !__CRT_HAVE__chdir */
+#else /* !__CRT_HAVE_chdir && !__CRT_HAVE__chdir && !__CRT_HAVE___chdir && !__CRT_HAVE___libc_chdir */
 			case __POSIX_SPAWN_ACTION_CHDIR: {
 				/* Change direction using `chdir(2)' */
 				int __error;
@@ -634,12 +710,12 @@ __do_exec:
 				if __unlikely(__error != 0)
 					goto __child_error;
 			}	break;
-#endif /* __CRT_HAVE_chdir || __CRT_HAVE__chdir */
+#endif /* __CRT_HAVE_chdir || __CRT_HAVE__chdir || __CRT_HAVE___chdir || __CRT_HAVE___libc_chdir */
 
 
-#ifndef __CRT_HAVE_fchdir
+#if !defined(__CRT_HAVE_fchdir) && !defined(__CRT_HAVE___fchdir) && !defined(__CRT_HAVE___libc_fchdir)
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
-#else /* !__CRT_HAVE_fchdir */
+#else /* !__CRT_HAVE_fchdir && !__CRT_HAVE___fchdir && !__CRT_HAVE___libc_fchdir */
 			case __POSIX_SPAWN_ACTION_FCHDIR: {
 				/* Change direction using `fchdir(2)' */
 				int __error;
@@ -647,7 +723,7 @@ __do_exec:
 				if __unlikely(__error != 0)
 					goto __child_error;
 			}	break;
-#endif /* __CRT_HAVE_fchdir */
+#endif /* __CRT_HAVE_fchdir || __CRT_HAVE___fchdir || __CRT_HAVE___libc_fchdir */
 
 
 #ifdef __POSIX_SPAWN_ACTION_TCSETPGRP
@@ -664,13 +740,13 @@ __do_exec:
 
 
 #ifdef __POSIX_SPAWN_ACTION_CLOSEFROM
-#if !defined(__CRT_HAVE_closefrom) && ((!defined(__CRT_HAVE_fcntl) && !defined(__CRT_HAVE___fcntl)) || !defined(__F_CLOSEM))
+#if !defined(__CRT_HAVE_closefrom) && ((!defined(__CRT_HAVE_fcntl) && !defined(__CRT_HAVE___fcntl) && !defined(__CRT_HAVE___libc_fcntl)) || !defined(__F_CLOSEM))
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
-#else /* !__CRT_HAVE_closefrom && ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || !__F_CLOSEM) */
+#else /* !__CRT_HAVE_closefrom && ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM) */
 			case __POSIX_SPAWN_ACTION_CLOSEFROM:
 				(__NAMESPACE_LOCAL_SYM __localdep_closefrom)(__act->__sa_action.__sa_closefrom_action.__sa_fd);
 				break;
-#endif /* __CRT_HAVE_closefrom || ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM) */
+#endif /* __CRT_HAVE_closefrom || ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM) */
 #endif /* __POSIX_SPAWN_ACTION_CLOSEFROM */
 
 
@@ -698,16 +774,16 @@ __do_exec:
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 	if (__attrp) {
 		if (__attrp->__flags & __POSIX_SPAWN_RESETIDS) {
-#if (defined(__CRT_HAVE_seteuid) && defined(__CRT_HAVE_getuid)) || (defined(__CRT_HAVE_setegid) && defined(__CRT_HAVE_getgid))
-#if defined(__CRT_HAVE_seteuid) && defined(__CRT_HAVE_getuid)
+#if (defined(__CRT_HAVE_seteuid) && (defined(__CRT_HAVE_getuid) || defined(__CRT_HAVE___getuid) || defined(__CRT_HAVE___libc_getuid))) || (defined(__CRT_HAVE_setegid) && (defined(__CRT_HAVE_getgid) || defined(__CRT_HAVE___getgid) || defined(__CRT_HAVE___libc_getgid)))
+#if defined(__CRT_HAVE_seteuid) && (defined(__CRT_HAVE_getuid) || defined(__CRT_HAVE___getuid) || defined(__CRT_HAVE___libc_getuid))
 			if ((__NAMESPACE_LOCAL_SYM __localdep_seteuid)((__NAMESPACE_LOCAL_SYM __localdep_getuid)()))
 				goto __child_error;
-#endif /* __CRT_HAVE_seteuid && __CRT_HAVE_getuid */
-#if defined(__CRT_HAVE_setegid) && defined(__CRT_HAVE_getgid)
+#endif /* __CRT_HAVE_seteuid && (__CRT_HAVE_getuid || __CRT_HAVE___getuid || __CRT_HAVE___libc_getuid) */
+#if defined(__CRT_HAVE_setegid) && (defined(__CRT_HAVE_getgid) || defined(__CRT_HAVE___getgid) || defined(__CRT_HAVE___libc_getgid))
 			if ((__NAMESPACE_LOCAL_SYM __localdep_setegid)((__NAMESPACE_LOCAL_SYM __localdep_getgid)()))
 				goto __child_error;
-#endif /* __CRT_HAVE_setegid && __CRT_HAVE_getgid */
-#else /* (__CRT_HAVE_seteuid && __CRT_HAVE_getuid) || (__CRT_HAVE_setegid && __CRT_HAVE_getgid) */
+#endif /* __CRT_HAVE_setegid && (__CRT_HAVE_getgid || __CRT_HAVE___getgid || __CRT_HAVE___libc_getgid) */
+#else /* (__CRT_HAVE_seteuid && (__CRT_HAVE_getuid || __CRT_HAVE___getuid || __CRT_HAVE___libc_getuid)) || (__CRT_HAVE_setegid && (__CRT_HAVE_getgid || __CRT_HAVE___getgid || __CRT_HAVE___libc_getgid)) */
 #ifdef __ENOSYS
 			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
@@ -716,14 +792,14 @@ __do_exec:
 			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
-#endif /* (!__CRT_HAVE_seteuid || !__CRT_HAVE_getuid) && (!__CRT_HAVE_setegid || !__CRT_HAVE_getgid) */
+#endif /* (!__CRT_HAVE_seteuid || (!__CRT_HAVE_getuid && !__CRT_HAVE___getuid && !__CRT_HAVE___libc_getuid)) && (!__CRT_HAVE_setegid || (!__CRT_HAVE_getgid && !__CRT_HAVE___getgid && !__CRT_HAVE___libc_getgid)) */
 		}
 		if (__attrp->__flags & __POSIX_SPAWN_SETPGROUP) {
-#if defined(__CRT_HAVE_setpgid) || defined(__CRT_HAVE___setpgid)
+#if defined(__CRT_HAVE_setpgid) || defined(__CRT_HAVE___setpgid) || defined(__CRT_HAVE___libc_setpgid)
 			/* HINT: Passing `0' as first argument is the same as passing `getpid()'! */
 			if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_setpgid)(0, __attrp->__pgrp))
 				goto __child_error;
-#else /* __CRT_HAVE_setpgid || __CRT_HAVE___setpgid */
+#else /* __CRT_HAVE_setpgid || __CRT_HAVE___setpgid || __CRT_HAVE___libc_setpgid */
 #ifdef __ENOSYS
 			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
@@ -732,7 +808,7 @@ __do_exec:
 			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
-#endif /* !__CRT_HAVE_setpgid && !__CRT_HAVE___setpgid */
+#endif /* !__CRT_HAVE_setpgid && !__CRT_HAVE___setpgid && !__CRT_HAVE___libc_setpgid */
 		}
 		if (__attrp->__flags & __POSIX_SPAWN_SETSIGDEF) {
 #if (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)) && defined(__SIG_DFL)
@@ -759,10 +835,10 @@ __do_exec:
 #endif /* (!__CRT_HAVE_sigaction && !__CRT_HAVE___sigaction) || !__SIG_DFL */
 		}
 		if (__attrp->__flags & __POSIX_SPAWN_SETSIGMASK) {
-#if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && defined(__SIG_SETMASK)
+#if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && defined(__SIG_SETMASK)
 			if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_sigprocmask)(__SIG_SETMASK, &__attrp->__ss, __NULLPTR))
 				goto __child_error;
-#else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) && __SIG_SETMASK */
+#else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask) && __SIG_SETMASK */
 #ifdef __ENOSYS
 			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
@@ -771,10 +847,10 @@ __do_exec:
 			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
-#endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE_pthread_sigmask) || !__SIG_SETMASK */
+#endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask) || !__SIG_SETMASK */
 		}
 		if (__attrp->__flags & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
-#if (defined(__CRT_HAVE_sched_setscheduler) || defined(__CRT_HAVE___sched_setscheduler)) && defined(__CRT_HAVE_sched_setparam) && (defined(__CRT_HAVE_sched_getparam) || defined(__CRT_HAVE___sched_getparam))
+#if (defined(__CRT_HAVE_sched_setscheduler) || defined(__CRT_HAVE___sched_setscheduler) || defined(__CRT_HAVE___libc_sched_setscheduler)) && (defined(__CRT_HAVE_sched_setparam) || defined(__CRT_HAVE___sched_setparam) || defined(__CRT_HAVE___libc_sched_setparam)) && (defined(__CRT_HAVE_sched_getparam) || defined(__CRT_HAVE___sched_getparam) || defined(__CRT_HAVE___libc_sched_getparam))
 			int __error;
 			if ((__attrp->__flags & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) ==
 			    /*               */ (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
@@ -789,7 +865,7 @@ __do_exec:
 			}
 			if __unlikely(__error)
 				goto __child_error;
-#else /* (__CRT_HAVE_sched_setscheduler || __CRT_HAVE___sched_setscheduler) && __CRT_HAVE_sched_setparam && (__CRT_HAVE_sched_getparam || __CRT_HAVE___sched_getparam) */
+#else /* (__CRT_HAVE_sched_setscheduler || __CRT_HAVE___sched_setscheduler || __CRT_HAVE___libc_sched_setscheduler) && (__CRT_HAVE_sched_setparam || __CRT_HAVE___sched_setparam || __CRT_HAVE___libc_sched_setparam) && (__CRT_HAVE_sched_getparam || __CRT_HAVE___sched_getparam || __CRT_HAVE___libc_sched_getparam) */
 #ifdef __ENOSYS
 			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
@@ -798,7 +874,7 @@ __do_exec:
 			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
-#endif /* (!__CRT_HAVE_sched_setscheduler && !__CRT_HAVE___sched_setscheduler) || !__CRT_HAVE_sched_setparam || (!__CRT_HAVE_sched_getparam && !__CRT_HAVE___sched_getparam) */
+#endif /* (!__CRT_HAVE_sched_setscheduler && !__CRT_HAVE___sched_setscheduler && !__CRT_HAVE___libc_sched_setscheduler) || (!__CRT_HAVE_sched_setparam && !__CRT_HAVE___sched_setparam && !__CRT_HAVE___libc_sched_setparam) || (!__CRT_HAVE_sched_getparam && !__CRT_HAVE___sched_getparam && !__CRT_HAVE___libc_sched_getparam) */
 		}
 	}
 	/* When the exec succeeds, the pipe is auto-
@@ -833,18 +909,18 @@ __child_error:
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 	}
 	(__NAMESPACE_LOCAL_SYM __localdep__Exit)(127);
-#else /* __POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) */
+#else /* __POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork || __CRT_HAVE___libc_fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE___libc_pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) */
 	char __buf[32];
 	(__NAMESPACE_LOCAL_SYM __localdep_sprintf)(__buf, "/proc/self/fd/%d", __execfd);
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_posix_spawn)(__pid, __buf, __file_actions, __attrp, ___argv, ___envp);
-#endif /* !__POSIX_SPAWN_USE_KOS || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) */
+#endif /* !__POSIX_SPAWN_USE_KOS || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork && !__CRT_HAVE___libc_fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE___libc_pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write && !__CRT_HAVE___libc_write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close && !__CRT_HAVE___libc_close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_fspawn_np_defined
 #define __local___localdep_posix_fspawn_np_defined
 #define __localdep_posix_fspawn_np __LIBC_LOCAL_NAME(posix_fspawn_np)
 #endif /* !__local___localdep_posix_fspawn_np_defined */
-#else /* (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid)) || __CRT_HAVE_posix_spawn */
+#else /* (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork || __CRT_HAVE___libc_fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE___libc_pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid)) || __CRT_HAVE_posix_spawn */
 #undef __local_posix_fspawn_np_defined
-#endif /* (!__POSIX_SPAWN_USE_KOS || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid)) && !__CRT_HAVE_posix_spawn */
+#endif /* (!__POSIX_SPAWN_USE_KOS || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork && !__CRT_HAVE___libc_fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE___libc_pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write && !__CRT_HAVE___libc_write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close && !__CRT_HAVE___libc_close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid)) && !__CRT_HAVE_posix_spawn */
 #endif /* !__local_posix_fspawn_np_defined */

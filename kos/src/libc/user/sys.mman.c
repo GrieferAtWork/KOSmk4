@@ -374,20 +374,36 @@ NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5df15eb4]]]*/
+/*[[[start:exports,hash:CRC-32=0x28b0a05a]]]*/
 DEFINE_PUBLIC_ALIAS(mmap, libc_mmap);
+DEFINE_PUBLIC_ALIAS(__munmap, libc_munmap);
+DEFINE_PUBLIC_ALIAS(__libc_munmap, libc_munmap);
 DEFINE_PUBLIC_ALIAS(munmap, libc_munmap);
+DEFINE_PUBLIC_ALIAS(__mprotect, libc_mprotect);
+DEFINE_PUBLIC_ALIAS(__libc_mprotect, libc_mprotect);
 DEFINE_PUBLIC_ALIAS(mprotect, libc_mprotect);
+DEFINE_PUBLIC_ALIAS(__msync, libc_msync);
+DEFINE_PUBLIC_ALIAS(__libc_msync, libc_msync);
 DEFINE_PUBLIC_ALIAS(msync, libc_msync);
+DEFINE_PUBLIC_ALIAS(__mlock, libc_mlock);
+DEFINE_PUBLIC_ALIAS(__libc_mlock, libc_mlock);
 DEFINE_PUBLIC_ALIAS(mlock, libc_mlock);
+DEFINE_PUBLIC_ALIAS(__munlock, libc_munlock);
+DEFINE_PUBLIC_ALIAS(__libc_munlock, libc_munlock);
 DEFINE_PUBLIC_ALIAS(munlock, libc_munlock);
+DEFINE_PUBLIC_ALIAS(__mlockall, libc_mlockall);
+DEFINE_PUBLIC_ALIAS(__libc_mlockall, libc_mlockall);
 DEFINE_PUBLIC_ALIAS(mlockall, libc_mlockall);
+DEFINE_PUBLIC_ALIAS(__munlockall, libc_munlockall);
+DEFINE_PUBLIC_ALIAS(__libc_munlockall, libc_munlockall);
 DEFINE_PUBLIC_ALIAS(munlockall, libc_munlockall);
 DEFINE_PUBLIC_ALIAS(__madvise, libc_madvise);
 DEFINE_PUBLIC_ALIAS(madvise, libc_madvise);
 DEFINE_PUBLIC_ALIAS(mincore, libc_mincore);
 DEFINE_PUBLIC_ALIAS(mmap64, libc_mmap64);
 DEFINE_PUBLIC_ALIAS(posix_madvise, libc_posix_madvise);
+DEFINE_PUBLIC_ALIAS(__mremap, libc_mremap);
+DEFINE_PUBLIC_ALIAS(__libc_mremap, libc_mremap);
 DEFINE_PUBLIC_ALIAS(mremap, libc_mremap);
 DEFINE_PUBLIC_ALIAS(remap_file_pages, libc_remap_file_pages);
 DEFINE_PUBLIC_ALIAS(memfd_create, libc_memfd_create);

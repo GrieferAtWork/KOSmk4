@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ddb0fcd */
+/* HASH CRC-32:0xa226607b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,30 @@
 #ifndef __local_tcsetattr_defined
 #define __local_tcsetattr_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_ioctl
+#if defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)
 #include <features.h>
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
 #define __local___localdep_ioctl_defined
+#ifdef __CRT_HAVE_ioctl
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#else /* ... */
+#undef __local___localdep_ioctl_defined
+#endif /* !... */
 #endif /* !__local___localdep_ioctl_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/tty.h>
@@ -74,7 +88,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_tcsetattr_defined
 #define __localdep_tcsetattr __LIBC_LOCAL_NAME(tcsetattr)
 #endif /* !__local___localdep_tcsetattr_defined */
-#else /* __CRT_HAVE_ioctl */
+#else /* __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl */
 #undef __local_tcsetattr_defined
-#endif /* !__CRT_HAVE_ioctl */
+#endif /* !__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl */
 #endif /* !__local_tcsetattr_defined */

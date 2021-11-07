@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4bcef3 */
+/* HASH CRC-32:0xdd362f9e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,12 +84,12 @@ INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_setsid)(void);
 /* >> getuid(2)
  * Return the real user ID of the calling process */
 INTDEF WUNUSED uid_t NOTHROW_NCX(LIBCCALL libc_getuid)(void);
-/* >> geteuid(2)
- * Return the effective user ID of the calling process */
-INTDEF WUNUSED uid_t NOTHROW_NCX(LIBCCALL libc_geteuid)(void);
 /* >> getgid(2)
  * Return the real group ID of the calling process */
 INTDEF WUNUSED gid_t NOTHROW_NCX(LIBCCALL libc_getgid)(void);
+/* >> geteuid(2)
+ * Return the effective user ID of the calling process */
+INTDEF WUNUSED uid_t NOTHROW_NCX(LIBCCALL libc_geteuid)(void);
 /* >> getegid(2)
  * Return the effective group ID of the calling process */
 INTDEF WUNUSED gid_t NOTHROW_NCX(LIBCCALL libc_getegid)(void);

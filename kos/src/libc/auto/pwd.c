@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x595f974b */
+/* HASH CRC-32:0x4d77a7bd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -263,9 +263,9 @@ got_all_fields:
 		}
 	}
 done_free_dbline:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	libc_free(dbline);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	*result = retval ? NULL : resultbuf;
 	return retval;
 
@@ -293,9 +293,9 @@ badline:
 #endif /* LOG_ERR && (__CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer) */
 	/* FALLTHRU */
 nextline:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	libc_free(dbline);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	if unlikely(libc_fgetpos64(stream, &curpos))
 		goto err_nodbline;
 	if (curpos >= maxpos)

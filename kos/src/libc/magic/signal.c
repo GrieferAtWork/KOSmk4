@@ -1383,7 +1383,7 @@ int gsignal($signo_t signo) {
 @@Modern   code   should   use   `sigprocmask()'    instead.
 @@@return: 0: Success
 [[deprecated("Using `sigprocmask(SIG_BLOCK)' instead")]]
-[[requires_include("<asm/os/signal.h>")]]
+[[requires_include("<asm/os/signal.h>"), export_alias("__sigblock")]]
 [[requires(defined(__SIG_BLOCK) && $has_function(sigprocmask))]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>")]]
 int sigblock(int mask) {
@@ -1398,7 +1398,7 @@ int sigblock(int mask) {
 @@Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
 @@@return: 0: Success
 [[deprecated("Using `sigprocmask()' instead")]]
-[[requires_include("<asm/os/signal.h>")]]
+[[requires_include("<asm/os/signal.h>"), export_alias("__sigsetmask")]]
 [[requires(defined(__SIG_SETMASK) && $has_function(sigprocmask))]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>")]]
 int sigsetmask(int mask) {
@@ -1415,7 +1415,7 @@ int sigsetmask(int mask) {
 @@                     of  the  lowest-numbered  couple  of  signal.
 @@@return: -1:         Error
 [[deprecated("Using `sigprocmask()' instead")]]
-[[requires($has_function(sigprocmask))]]
+[[requires($has_function(sigprocmask)), export_alias("__siggetmask")]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>", "<hybrid/typecore.h>")]]
 int siggetmask(void) {
 	sigset_t sigset;
@@ -1491,6 +1491,7 @@ void sigreturn(struct sigcontext const *scp);
 @@@return: * :      The previous signal handler function.
 @@@return: SIG_ERR: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sigaction.h>"), crt_dos_variant]]
+[[export_alias("__bsd_signal")]]
 $sighandler_t bsd_signal($signo_t signo, $sighandler_t handler);
 
 @@>> sigpause(3)
@@ -1526,6 +1527,7 @@ int sigpause($signo_t signo) {
 @@@return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
 @@@return: -1:   [errno=ESRCH]  No process is identified by `pid'
 [[decl_include("<bits/types.h>")]]
+[[export_alias("__kill", "__libc_kill")]]
 int kill($pid_t pid, $signo_t signo);
 
 @@>> sigemptyset(3)
@@ -1627,8 +1629,8 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 @@@param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 @@@return: 0:  Success
 @@@return: -1: [errno=EINVAL] Invalid `how'
-[[decl_include("<features.h>"), export_alias("pthread_sigmask")]]
-[[libc, decl_prefix(struct __sigset_struct;)]]
+[[libc, decl_prefix(struct __sigset_struct;), decl_include("<features.h>")]]
+[[export_alias("__sigprocmask", "__libc_sigprocmask", "pthread_sigmask")]]
 int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 
 %#ifdef __USE_KOS
@@ -1730,6 +1732,7 @@ int sigaction($signo_t signo, struct sigaction const *act, struct sigaction *oac
 @@in  either  the calling  thread  and process
 @@@return: 0: Success
 [[decl_include("<bits/os/sigset.h>")]]
+[[export_alias("__sigpending", "__libc_sigpending")]]
 int sigpending([[nonnull]] sigset_t *__restrict set);
 
 @@>> sigwait(3)

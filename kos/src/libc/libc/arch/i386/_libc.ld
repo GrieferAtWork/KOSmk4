@@ -186,6 +186,7 @@ SECTIONS {
 	} PHDR(data)
 
 	. = ALIGN(__ARCH_PAGESIZE);
+	__bss_start = .;
 	.bss : {
 		ENUMERATE_SECTIONS(.bss)
 		*(.bss.local.*)

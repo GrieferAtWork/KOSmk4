@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4376df67 */
+/* HASH CRC-32:0x3b7bc361 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,32 @@
 #define __local_getitimer_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE_getitimer)
+#if defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_getitimer32_defined) && defined(__CRT_HAVE_getitimer)
+#ifndef __local___localdep_getitimer32_defined
 #define __local___localdep_getitimer32_defined
+#ifdef __CRT_HAVE_getitimer
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(int __which, struct __itimerval32 *__curr_value),getitimer,(__which,__curr_value))
-#endif /* !__local___localdep_getitimer32_defined && __CRT_HAVE_getitimer */
+#elif defined(__CRT_HAVE___getitimer)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(int __which, struct __itimerval32 *__curr_value),__getitimer,(__which,__curr_value))
+#elif defined(__CRT_HAVE___libc_getitimer)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(int __which, struct __itimerval32 *__curr_value),__libc_getitimer,(__which,__curr_value))
+#else /* ... */
+#undef __local___localdep_getitimer32_defined
+#endif /* !... */
+#endif /* !__local___localdep_getitimer32_defined */
 #ifndef __local___localdep_getitimer64_defined
 #define __local___localdep_getitimer64_defined
 #if defined(__CRT_HAVE_getitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),getitimer,(__which,__curr_value))
+#elif defined(__CRT_HAVE___getitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),__getitimer,(__which,__curr_value))
+#elif defined(__CRT_HAVE___libc_getitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),__libc_getitimer,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),getitimer64,(__which,__curr_value))
-#elif defined(__CRT_HAVE_getitimer)
+#elif defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/getitimer64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -46,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_getitimer64_defined */
 __LOCAL_LIBC(getitimer) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(int __which, struct itimerval *__curr_value) {
-#ifdef __CRT_HAVE_getitimer
+#if defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
 	int __result;
 	struct __itimerval32 __tv32;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_getitimer32)(__which, &__tv32);
@@ -57,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(int __which, struct itime
 		__curr_value->it_value.tv_usec    = __tv32.it_value.tv_usec;
 	}
 	return __result;
-#else /* __CRT_HAVE_getitimer */
+#else /* __CRT_HAVE_getitimer || __CRT_HAVE___getitimer || __CRT_HAVE___libc_getitimer */
 	int __result;
 	struct __timeval64 __tv64;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_getitimer64)(__which, &__tv64);
@@ -68,14 +80,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(int __which, struct itime
 		__curr_value->it_value.tv_usec    = __tv64.it_value.tv_usec;
 	}
 	return __result;
-#endif /* !__CRT_HAVE_getitimer */
+#endif /* !__CRT_HAVE_getitimer && !__CRT_HAVE___getitimer && !__CRT_HAVE___libc_getitimer */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getitimer_defined
 #define __local___localdep_getitimer_defined
 #define __localdep_getitimer __LIBC_LOCAL_NAME(getitimer)
 #endif /* !__local___localdep_getitimer_defined */
-#else /* __CRT_HAVE_getitimer64 || __CRT_HAVE_getitimer */
+#else /* __CRT_HAVE_getitimer64 || __CRT_HAVE_getitimer || __CRT_HAVE___getitimer || __CRT_HAVE___libc_getitimer */
 #undef __local_getitimer_defined
-#endif /* !__CRT_HAVE_getitimer64 && !__CRT_HAVE_getitimer */
+#endif /* !__CRT_HAVE_getitimer64 && !__CRT_HAVE_getitimer && !__CRT_HAVE___getitimer && !__CRT_HAVE___libc_getitimer */
 #endif /* !__local_getitimer_defined */

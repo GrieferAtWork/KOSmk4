@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0c6a9eb */
+/* HASH CRC-32:0xecbafc4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strtold_defined
 #ifdef __CRT_HAVE_strtold
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
+#elif defined(__CRT_HAVE___strtold)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),__strtold,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_strtod) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
 #else /* ... */

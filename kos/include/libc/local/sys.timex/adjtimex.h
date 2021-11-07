@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabb59491 */
+/* HASH CRC-32:0xd3af3556 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_adjtimex_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+#if (defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #include <bits/os/timex.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_adjtimex32_defined
@@ -41,6 +41,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct 
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),__adjtimex,(__ntx))
+#elif defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),__libc_adjtimex,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex64)
@@ -159,7 +161,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_adjtimex_defined
 #define __localdep_adjtimex __LIBC_LOCAL_NAME(adjtimex)
 #endif /* !__local___localdep_adjtimex_defined */
-#else /* __CRT_HAVE_adjtimex64 || __CRT_HAVE___adjtimex64 || __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
+#else /* (__CRT_HAVE___libc_adjtimex && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || __CRT_HAVE_adjtimex64 || __CRT_HAVE___adjtimex64 || __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
 #undef __local_adjtimex_defined
-#endif /* !__CRT_HAVE_adjtimex64 && !__CRT_HAVE___adjtimex64 && !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
+#endif /* (!__CRT_HAVE___libc_adjtimex || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__) && !__CRT_HAVE_adjtimex64 && !__CRT_HAVE___adjtimex64 && !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
 #endif /* !__local_adjtimex_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe07884aa */
+/* HASH CRC-32:0x9bcc36aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_posix_spawn_file_actions_addclose_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
-#if defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#if defined(__POSIX_SPAWN_USE_KOS) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <bits/crt/posix_spawn.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_posix_spawn_file_actions_addclose_defined
 #define __localdep_posix_spawn_file_actions_addclose __LIBC_LOCAL_NAME(posix_spawn_file_actions_addclose)
 #endif /* !__local___localdep_posix_spawn_file_actions_addclose_defined */
-#else /* __POSIX_SPAWN_USE_KOS && __CRT_HAVE_realloc */
+#else /* __POSIX_SPAWN_USE_KOS && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
 #undef __local_posix_spawn_file_actions_addclose_defined
-#endif /* !__POSIX_SPAWN_USE_KOS || !__CRT_HAVE_realloc */
+#endif /* !__POSIX_SPAWN_USE_KOS || (!__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) */
 #endif /* !__local_posix_spawn_file_actions_addclose_defined */

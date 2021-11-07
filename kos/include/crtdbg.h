@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc94edd2f */
+/* HASH CRC-32:0x48ab4bd3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -348,7 +348,7 @@ __LIBC __LONG32_TYPE__ __NOTHROW_NCX(__LIBDCALL _CrtSetBreakAlloc)(__LONG32_TYPE
 #define ___malloc_dbg_defined
 #ifdef __CRT_HAVE__malloc_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _malloc_dbg)(__SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_malloc_dbg");
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/crtdbg/_malloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_malloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _malloc_dbg)(__SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_malloc_dbg))(__num_bytes, __block_type, __filename, __line); })
 #else /* ... */
@@ -359,7 +359,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_malloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #define ___calloc_dbg_defined
 #ifdef __CRT_HAVE__calloc_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBDCALL _calloc_dbg)(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_calloc_dbg");
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/crtdbg/_calloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_calloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBDCALL _calloc_dbg)(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_calloc_dbg))(__count, __num_bytes, __block_type, __filename, __line); })
 #else /* ... */
@@ -370,7 +370,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_calloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #define ___realloc_dbg_defined
 #ifdef __CRT_HAVE__realloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_realloc_dbg");
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/crtdbg/_realloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_realloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_realloc_dbg))(__ptr, __num_bytes, __block_type, __filename, __line); })
 #else /* ... */
@@ -381,7 +381,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_realloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #define ___recalloc_dbg_defined
 #ifdef __CRT_HAVE__recalloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_recalloc_dbg");
-#elif defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))
+#elif defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))
 #include <libc/local/crtdbg/_recalloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_recalloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_recalloc_dbg))(__ptr, __count, __num_bytes, __block_type, __filename, __line); })
 #else /* ... */
@@ -403,7 +403,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_expand_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #define ___free_dbg_defined
 #ifdef __CRT_HAVE__free_dbg
 __LIBC void __NOTHROW_NCX(__LIBDCALL _free_dbg)(void *__ptr, int __block_type) __CASMNAME_SAME("_free_dbg");
-#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/crtdbg/_free_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_free_dbg, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBDCALL _free_dbg)(void *__ptr, int __block_type) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_free_dbg))(__ptr, __block_type); })
 #else /* ... */
@@ -434,7 +434,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize_dbg, __FORCELOCAL __ATTR_ARTIFICI
 #define ___aligned_malloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_malloc_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_malloc_dbg");
-#elif defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/crtdbg/_aligned_malloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_malloc_dbg))(__num_bytes, __min_alignment, __filename, __line); })
 #else /* ... */
@@ -445,7 +445,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc_dbg, __FORCELOCAL __ATTR_ARTIFIC
 #define ___aligned_realloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_realloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_realloc_dbg");
-#elif defined(__CRT_HAVE__aligned_realloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
+#elif defined(__CRT_HAVE__aligned_realloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)))
 #include <libc/local/crtdbg/_aligned_realloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_realloc_dbg))(__ptr, __num_bytes, __min_alignment, __filename, __line); })
 #else /* ... */
@@ -456,7 +456,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc_dbg, __FORCELOCAL __ATTR_ARTIFI
 #define ___aligned_recalloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_recalloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_recalloc_dbg");
-#elif defined(__CRT_HAVE__aligned_recalloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
+#elif defined(__CRT_HAVE__aligned_recalloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)))
 #include <libc/local/crtdbg/_aligned_recalloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_recalloc_dbg))(__ptr, __count, __num_bytes, __min_alignment, __filename, __line); })
 #else /* ... */
@@ -467,7 +467,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc_dbg, __FORCELOCAL __ATTR_ARTIF
 #define ___aligned_offset_malloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_offset_malloc_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_malloc_dbg");
-#elif defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/crtdbg/_aligned_offset_malloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_malloc_dbg))(__num_bytes, __min_alignment, __offset, __filename, __line); })
 #else /* ... */
@@ -478,7 +478,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc_dbg, __FORCELOCAL __ATTR_
 #define ___aligned_offset_realloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_offset_realloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_realloc_dbg");
-#elif defined(__CRT_HAVE__aligned_offset_realloc) || ((defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
+#elif defined(__CRT_HAVE__aligned_offset_realloc) || ((defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)))
 #include <libc/local/crtdbg/_aligned_offset_realloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_realloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_realloc_dbg))(__ptr, __num_bytes, __min_alignment, __offset, __filename, __line); })
 #else /* ... */
@@ -489,7 +489,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_realloc_dbg, __FORCELOCAL __ATTR
 #define ___aligned_offset_recalloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_offset_recalloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_recalloc_dbg");
-#elif defined(__CRT_HAVE__aligned_offset_recalloc) || ((defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
+#elif defined(__CRT_HAVE__aligned_offset_recalloc) || ((defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)))
 #include <libc/local/crtdbg/_aligned_offset_recalloc_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_recalloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_recalloc_dbg))(__ptr, __count, __num_bytes, __min_alignment, __offset, __filename, __line); })
 #else /* ... */
@@ -500,7 +500,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_recalloc_dbg, __FORCELOCAL __ATT
 #define ___aligned_free_dbg_defined
 #ifdef __CRT_HAVE__aligned_free_dbg
 __LIBC void __NOTHROW_NCX(__LIBDCALL _aligned_free_dbg)(void *__ptr) __CASMNAME_SAME("_aligned_free_dbg");
-#elif defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#elif defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/crtdbg/_aligned_free_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free_dbg, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBDCALL _aligned_free_dbg)(void *__ptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free_dbg))(__ptr); })
 #else /* ... */
@@ -511,7 +511,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free_dbg, __FORCELOCAL __ATTR_ARTIFICIA
 #define ___strdup_dbg_defined
 #ifdef __CRT_HAVE__strdup_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _strdup_dbg)(char const *__string, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_strdup_dbg");
-#elif defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/crtdbg/_strdup_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_strdup_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _strdup_dbg)(char const *__string, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strdup_dbg))(__string, __block_type, __filename, __line); })
 #else /* ... */
@@ -522,7 +522,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_strdup_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #define ___wcsdup_dbg_defined
 #ifdef __CRT_HAVE__wcsdup_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wcsdup_dbg)(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wcsdup_dbg");
-#elif (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wcsdup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wcsdup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/crtdbg/_wcsdup_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wcsdup_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wcsdup_dbg)(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcsdup_dbg))(__string, __block_type, __filename, __line); })
 #else /* ... */

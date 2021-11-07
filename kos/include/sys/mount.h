@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8322510f */
+/* HASH CRC-32:0x2ae52d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,10 +207,22 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifdef __CRT_HAVE_mount
 /* @param: mountflags: Set of `MS_*' from <sys/mount.h> */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
+__CDECLARE(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
+#elif defined(__CRT_HAVE___mount)
+/* @param: mountflags: Set of `MS_*' from <sys/mount.h> */
+__CREDIRECT(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),__mount,(__special_file,__dir,__fstype,__mountflags,__data))
+#elif defined(__CRT_HAVE___libc_mount)
+/* @param: mountflags: Set of `MS_*' from <sys/mount.h> */
+__CREDIRECT(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),__libc_mount,(__special_file,__dir,__fstype,__mountflags,__data))
+#endif /* ... */
 #ifdef __CRT_HAVE_umount
 __CDECLARE(,int,__NOTHROW_RPC,umount,(char const *__special_file),(__special_file))
+#elif defined(__CRT_HAVE___umount)
+__CREDIRECT(,int,__NOTHROW_RPC,umount,(char const *__special_file),__umount,(__special_file))
+#elif defined(__CRT_HAVE___libc_umount)
+__CREDIRECT(,int,__NOTHROW_RPC,umount,(char const *__special_file),__libc_umount,(__special_file))
 #elif defined(__CRT_HAVE_umount2)
 #include <libc/local/sys.mount/umount.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(umount, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL umount)(char const *__special_file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(umount))(__special_file); })

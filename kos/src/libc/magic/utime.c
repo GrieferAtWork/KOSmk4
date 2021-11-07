@@ -86,7 +86,7 @@ typedef __TM_TYPE(time) time_t;
 };
 
 [[decl_include("<bits/os/utimbuf.h>")]]
-[[cp, ignore, nocrt, alias("utime", "_utime32")]]
+[[cp, ignore, nocrt, alias("utime", "__utime", "__libc_utime", "_utime32")]]
 int crt_utime32([[nonnull]] char const *filename, [[nullable]] struct $utimbuf32 const *file_times);
 
 [[decl_include("<bits/os/utimbuf.h>")]]
@@ -103,8 +103,8 @@ int crt_futime64($fd_t fd, [[nullable]] struct $utimbuf64 const *file_times);
 
 
 @@>> utime(2), utime64(2)
-[[cp, decl_include("<bits/os/utimbuf.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utime", "_utime32")]]
+[[cp, decl_include("<bits/os/utimbuf.h>"), no_crt_self_import, export_as("__utime", "__libc_utime")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utime", "__utime", "__libc_utime", "_utime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utime64", "_utime64")]]
 [[userimpl, requires($has_function(crt_utime32) || $has_function(crt_utime64))]]
 [[export_as("_utime32")]]
@@ -140,6 +140,7 @@ int utime([[nonnull]] char const *filename, [[nullable]] struct utimbuf const *f
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/os/utimbuf.h>")]]
 [[preferred_time64_variant_of(utime)], doc_alias("utime")]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__utime", "__libc_utime", "_utime32")]]
 [[userimpl, requires_function(crt_utime32)]]
 [[export_alias("_utime64")]]
 int utime64([[nonnull]] char const *filename, [[nullable]] struct utimbuf64 const *file_times) {
@@ -244,7 +245,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 [[decl_include("<features.h>", "<bits/os/utimbuf.h>")]]
-[[cp, alias("utime"), no_crt_impl, requires_function(crt_utime64)]]
+[[cp, alias("utime", "__utime", "__libc_utime"), no_crt_impl, requires_function(crt_utime64)]]
 int _utime32([[nonnull]] char const *filename,
              [[nullable]] struct $utimbuf32 __KOS_FIXED_CONST *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

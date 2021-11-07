@@ -227,10 +227,10 @@ int ntp_adjtime32([[nonnull]] struct $timex32 *__restrict tntx);
 
 @@>> adjtimex(2), adjtimex64(2)
 [[decl_include("<bits/os/timex.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("adjtimex", "__adjtimex")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("adjtimex", "__adjtimex", "__libc_adjtimex")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("adjtimex64", "__adjtimex64")]]
 [[userimpl, requires($has_function(adjtimex32) || $has_function(adjtimex64))]]
-[[export_as("__adjtimex")]]
+[[export_as("__adjtimex", "__libc_adjtimex")]]
 int adjtimex([[nonnull]] struct timex *__restrict ntx) {
 	int result;
 @@pp_if $has_function(adjtimex32)@@
@@ -480,7 +480,7 @@ int ntp_adjtime([[nonnull]] struct timex *__restrict tntx) {
 %#ifdef __USE_TIME64
 [[decl_include("<bits/os/timex.h>")]]
 [[preferred_time64_variant_of(adjtimex), doc_alias("adjtimex")]]
-[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__adjtimex")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__adjtimex", "__libc_adjtimex")]]
 [[export_alias("__adjtimex64"), userimpl, requires_function(adjtimex32)]]
 int adjtimex64([[nonnull]] struct timex64 *__restrict ntx) {
 	int result;

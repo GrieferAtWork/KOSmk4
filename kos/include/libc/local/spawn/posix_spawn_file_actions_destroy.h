@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4581c236 */
+/* HASH CRC-32:0x9641b0ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,8 @@ __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __bui
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#elif defined(__CRT_HAVE___libc_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(__mallptr))
 #else /* ... */
 #undef __local___localdep_free_defined
 #endif /* !... */
@@ -53,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memset_defined */
 __LOCAL_LIBC(posix_spawn_file_actions_destroy) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_destroy))(struct __posix_spawn_file_actions *__restrict __file_actions) {
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	unsigned int __i;
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("__used")
@@ -79,7 +81,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_destroy))(st
 #pragma pop_macro("__actions")
 #pragma pop_macro("__used")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 	(__NAMESPACE_LOCAL_SYM __localdep_memset)(__file_actions, 0xcc, sizeof(*__file_actions));
 #endif /* !NDEBUG && !NDEBUG_FINI */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb02783df */
+/* HASH CRC-32:0x6b959feb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_dup3_defined
 #define __local_dup3_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
+#if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2) || defined(__CRT_HAVE___libc_dup2)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dup2_defined
@@ -32,6 +32,8 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE___dup2)
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
+#elif defined(__CRT_HAVE___libc_dup2)
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__libc_dup2,(__oldfd,__newfd))
 #else /* ... */
 #undef __local___localdep_dup2_defined
 #endif /* !... */
@@ -48,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_dup3_defined
 #define __localdep_dup3 __LIBC_LOCAL_NAME(dup3)
 #endif /* !__local___localdep_dup3_defined */
-#else /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 */
+#else /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 || __CRT_HAVE___libc_dup2 */
 #undef __local_dup3_defined
-#endif /* !__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2 */
+#endif /* !__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2 && !__CRT_HAVE___libc_dup2 */
 #endif /* !__local_dup3_defined */

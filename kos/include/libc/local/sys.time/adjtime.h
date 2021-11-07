@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x506261a8 */
+/* HASH CRC-32:0x97b7d525 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,26 @@
 #define __local_adjtime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE_adjtime)
+#if defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_adjtime32_defined) && defined(__CRT_HAVE_adjtime)
+#ifndef __local___localdep_adjtime32_defined
 #define __local___localdep_adjtime32_defined
+#ifdef __CRT_HAVE_adjtime
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),adjtime,(__delta,__olddelta))
-#endif /* !__local___localdep_adjtime32_defined && __CRT_HAVE_adjtime */
+#elif defined(__CRT_HAVE___adjtime)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),__adjtime,(__delta,__olddelta))
+#else /* ... */
+#undef __local___localdep_adjtime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_adjtime32_defined */
 #ifndef __local___localdep_adjtime64_defined
 #define __local___localdep_adjtime64_defined
 #if defined(__CRT_HAVE_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime,(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime64)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime64,(__delta,__olddelta))
-#elif defined(__CRT_HAVE_adjtime)
+#elif defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/adjtime64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -46,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_adjtime64_defined */
 __LOCAL_LIBC(adjtime) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime))(struct timeval const *__delta, struct timeval *__olddelta) {
-#ifdef __CRT_HAVE_adjtime
+#if defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
 	int __result;
 	struct __timeval32 __delta32, __olddelta32;
 	if (__delta) {
@@ -59,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime))(struct timeval const *__del
 		__olddelta->tv_usec = __olddelta32.tv_usec;
 	}
 	return __result;
-#else /* __CRT_HAVE_adjtime */
+#else /* __CRT_HAVE_adjtime || __CRT_HAVE___adjtime */
 	int __result;
 	struct __timeval64 __delta64, __olddelta64;
 	if (__delta) {
@@ -72,14 +78,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime))(struct timeval const *__del
 		__olddelta->tv_usec = __olddelta64.tv_usec;
 	}
 	return __result;
-#endif /* !__CRT_HAVE_adjtime */
+#endif /* !__CRT_HAVE_adjtime && !__CRT_HAVE___adjtime */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_adjtime_defined
 #define __local___localdep_adjtime_defined
 #define __localdep_adjtime __LIBC_LOCAL_NAME(adjtime)
 #endif /* !__local___localdep_adjtime_defined */
-#else /* __CRT_HAVE_adjtime64 || __CRT_HAVE_adjtime */
+#else /* __CRT_HAVE_adjtime64 || __CRT_HAVE_adjtime || __CRT_HAVE___adjtime */
 #undef __local_adjtime_defined
-#endif /* !__CRT_HAVE_adjtime64 && !__CRT_HAVE_adjtime */
+#endif /* !__CRT_HAVE_adjtime64 && !__CRT_HAVE_adjtime && !__CRT_HAVE___adjtime */
 #endif /* !__local_adjtime_defined */

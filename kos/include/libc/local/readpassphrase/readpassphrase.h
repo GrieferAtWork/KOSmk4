@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d4ccfe1 */
+/* HASH CRC-32:0xb08768e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_readpassphrase_defined
 #include <__crt.h>
 #include <asm/os/stdio.h>
-#if defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read))
+#if defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_close_defined
@@ -42,6 +42,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
+#elif defined(__CRT_HAVE___libc_close)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__libc_close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
 #endif /* !... */
@@ -54,17 +59,33 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(voi
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),_getpid,())
 #elif defined(__CRT_HAVE___getpid)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),__getpid,())
+#elif defined(__CRT_HAVE___libc_getpid)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),__libc_getpid,())
 #else /* ... */
 #undef __local___localdep_getpid_defined
 #endif /* !... */
 #endif /* !__local___localdep_getpid_defined */
-#if !defined(__local___localdep_kill_defined) && defined(__CRT_HAVE_kill)
+#ifndef __local___localdep_kill_defined
 #define __local___localdep_kill_defined
+#ifdef __CRT_HAVE_kill
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo),kill,(__pid,__signo))
-#endif /* !__local___localdep_kill_defined && __CRT_HAVE_kill */
+#elif defined(__CRT_HAVE___kill)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo),__kill,(__pid,__signo))
+#elif defined(__CRT_HAVE___libc_kill)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo),__libc_kill,(__pid,__signo))
+#else /* ... */
+#undef __local___localdep_kill_defined
+#endif /* !... */
+#endif /* !__local___localdep_kill_defined */
 #ifndef __local___localdep_memcmp_defined
 #define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
@@ -132,6 +153,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___libc_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -146,14 +172,14 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/open.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_open __LIBC_LOCAL_NAME(open)
-#else /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#else /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #undef __local___localdep_open_defined
-#endif /* !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
+#endif /* !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 #ifndef __local___localdep_raise_defined
@@ -163,7 +189,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_raise,(__signo_t __signo),raise,(__signo))
-#elif (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
+#elif (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/raise.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -189,6 +215,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_read)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__libc_read,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_read_defined
 #endif /* !... */
@@ -232,19 +263,14 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),tcgetattr,(__fd,__termios_p))
-#else /* __CRT_HAVE_tcgetattr */
-__NAMESPACE_LOCAL_END
-#include <asm/os/tty.h>
-__NAMESPACE_LOCAL_BEGIN
-#if defined(__CRT_HAVE_ioctl) && defined(__TCGETA)
+#elif (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA)
 __NAMESPACE_LOCAL_END
 #include <libc/local/termios/tcgetattr.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_tcgetattr __LIBC_LOCAL_NAME(tcgetattr)
-#else /* __CRT_HAVE_ioctl && __TCGETA */
+#else /* ... */
 #undef __local___localdep_tcgetattr_defined
-#endif /* !__CRT_HAVE_ioctl || !__TCGETA */
-#endif /* !__CRT_HAVE_tcgetattr */
+#endif /* !... */
 #endif /* !__local___localdep_tcgetattr_defined */
 #ifndef __local___localdep_tcsetattr_defined
 #define __local___localdep_tcsetattr_defined
@@ -253,7 +279,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_tcsetattr,(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p),tcsetattr,(__fd,__optional_actions,__termios_p))
-#elif defined(__CRT_HAVE_ioctl)
+#elif defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)
 __NAMESPACE_LOCAL_END
 #include <libc/local/termios/tcsetattr.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -319,6 +345,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__write,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_write)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__libc_write,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_write_defined
 #endif /* !... */
@@ -386,9 +417,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readpassphrase))(char const *__prompt
 	__BOOL __must_restart;
 #endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
 	__fd_t __infd, __outfd;
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	struct termios __old_ios, __new_ios;
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
 #if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
 	struct sigaction __old_sact[__COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __rpp_signals)];
 #endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
@@ -412,7 +443,7 @@ __again:
 
 	/* Open the relevant output stream. */
 	if (!(__flags & __RPP_STDIN)) {
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #ifdef _PATH_TTY
 #ifdef __O_RDWR
 		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_TTY, __O_RDWR);
@@ -434,7 +465,7 @@ __again:
 			goto __err;
 		}
 		__outfd = __infd;
-#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #if defined(__ENOTTY) && defined(__ENOENT)
 		(void)__libc_seterrno(__flags & __RPP_REQUIRE_TTY ? __ENOTTY : __ENOENT);
 #elif defined(__ENOENT)
@@ -443,11 +474,11 @@ __again:
 		(void)__libc_seterrno(1);
 #endif /* !... */
 		goto __err;
-#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
+#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
 	}
 
 	/* Update terminal IOS mode to our liking. */
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	if ((__NAMESPACE_LOCAL_SYM __localdep_tcgetattr)(__infd, &__old_ios) != 0) {
 		if (__flags & __RPP_REQUIRE_TTY) {
 #ifdef __ENOTTY
@@ -491,7 +522,7 @@ __again:
 		__new_ios.c_lflag = __ECHO;
 #endif /* __ECHO */
 	}
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
 
 	/* Switch out signal handlers
 	 * WARNING: The fact that we need to  do this has the (unintended)  side-effect
@@ -522,7 +553,7 @@ __again:
 
 	/* Write the given `prompt' (if given and possible to write) */
 	(void)__prompt;
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 	/* XXX: I don't really understand why the prompt is only printed
 	 *      when using /dev/tty as output,  but that's how BSD  does
 	 *      this, too... */
@@ -530,7 +561,7 @@ __again:
 		if ((__NAMESPACE_LOCAL_SYM __localdep_write)(__outfd, __prompt, (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__prompt)) == -1)
 			goto __err_infd_oldsact_oldios;
 	}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 
 	/* Read the actual password from input. */
 	{
@@ -563,22 +594,22 @@ __again:
 	}
 
 	/* Write a trailing \n-character if echo was disabled. */
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	if (!(__new_ios.c_lflag & __ECHO))
-#else /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
+#else /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
 	if (!(__flags & __RPP_ECHO_ON))
-#endif /* (!__CRT_HAVE_tcgetattr && (!__CRT_HAVE_ioctl || !__TCGETA)) || (!__CRT_HAVE_tcsetattr && !__CRT_HAVE_ioctl) */
+#endif /* (!__CRT_HAVE_tcgetattr && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA)) || (!__CRT_HAVE_tcsetattr && !__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) */
 	{
 		if ((__NAMESPACE_LOCAL_SYM __localdep_write)(__outfd, "\n", 1) == -1)
 			goto __err_infd_oldsact_oldios;
 	}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 
 
 	/* Restore terminal IOS configuration */
 __done_infd_oldsact_oldios:
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
 		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH | __TCSASOFT, &__old_ios);
@@ -588,7 +619,7 @@ __done_infd_oldsact_oldios:
 		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, 0, &__old_ios);
 #endif /* !... */
 	}
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
 
 	/* Restore signal handlers. */
 #if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
@@ -603,10 +634,10 @@ __done_infd_oldsact_oldios:
 #ifdef __PRIVATE_WANT_err_infd
 __done_infd:
 #endif /* __PRIVATE_WANT_err_infd */
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
+#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
 	if (__infd != __STDIN_FILENO)
 		(__NAMESPACE_LOCAL_SYM __localdep_close)(__infd);
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
+#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */
 
 	/* Re-throw signals that arrived in the mean time. */
 #if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
@@ -615,7 +646,7 @@ __done_infd:
 		for (__i = 0; __i < __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __rpp_signals); ++__i) {
 			if (!__NAMESPACE_LOCAL_SYM __rpp_arrived[__i])
 				continue;
-#if defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
+#if (defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
 			(__NAMESPACE_LOCAL_SYM __localdep_kill)((__NAMESPACE_LOCAL_SYM __localdep_getpid)(), __NAMESPACE_LOCAL_SYM __rpp_signals[__i]);
 #elif defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current)))
 			(__NAMESPACE_LOCAL_SYM __localdep_raise)(__NAMESPACE_LOCAL_SYM __rpp_signals[__i]);
@@ -658,7 +689,7 @@ __err_infd_oldsact_oldios:
 #undef __PRIVATE_WANT_err_infd_oldios
 __err_infd_oldios:
 	/* Restore terminal IOS configuration */
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
 		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH | __TCSASOFT, &__old_ios);
@@ -668,7 +699,7 @@ __err_infd_oldios:
 		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, 0, &__old_ios);
 #endif /* !... */
 	}
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
 	__buf = __NULLPTR;
 	goto __done_infd;
 #endif /* __PRIVATE_WANT_err_infd_oldios */
@@ -688,7 +719,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_readpassphrase_defined
 #define __localdep_readpassphrase __LIBC_LOCAL_NAME(readpassphrase)
 #endif /* !__local___localdep_readpassphrase_defined */
-#else /* __STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) */
+#else /* __STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) */
 #undef __local_readpassphrase_defined
-#endif /* !__STDIN_FILENO || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) */
+#endif /* !__STDIN_FILENO || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read) */
 #endif /* !__local_readpassphrase_defined */

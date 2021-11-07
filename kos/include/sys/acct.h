@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5adc39d6 */
+/* HASH CRC-32:0x681968bd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,8 +54,16 @@ __SYSDECL_BEGIN
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
+#ifdef __CRT_HAVE_acct
 /* Switch process accounting on and off */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
+__CDECLARE(,int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
+#elif defined(__CRT_HAVE___acct)
+/* Switch process accounting on and off */
+__CREDIRECT(,int,__NOTHROW_RPC,acct,(const char *__filename),__acct,(__filename))
+#elif defined(__CRT_HAVE___libc_acct)
+/* Switch process accounting on and off */
+__CREDIRECT(,int,__NOTHROW_RPC,acct,(const char *__filename),__libc_acct,(__filename))
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

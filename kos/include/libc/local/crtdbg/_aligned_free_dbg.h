@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa69115ec */
+/* HASH CRC-32:0x9b9bf1de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,13 @@
 #ifndef __local__aligned_free_dbg_defined
 #define __local__aligned_free_dbg_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__aligned_free_defined
 #define __local___localdep__aligned_free_defined
 #ifdef __CRT_HAVE__aligned_free
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
-#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_aligned_free.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__aligned_free_dbg_defined
 #define __localdep__aligned_free_dbg __LIBC_LOCAL_NAME(_aligned_free_dbg)
 #endif /* !__local___localdep__aligned_free_dbg_defined */
-#else /* __CRT_HAVE__aligned_free || __CRT_HAVE_free || __CRT_HAVE_cfree */
+#else /* __CRT_HAVE__aligned_free || __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #undef __local__aligned_free_dbg_defined
-#endif /* !__CRT_HAVE__aligned_free && !__CRT_HAVE_free && !__CRT_HAVE_cfree */
+#endif /* !__CRT_HAVE__aligned_free && !__CRT_HAVE_free && !__CRT_HAVE_cfree && !__CRT_HAVE___libc_free */
 #endif /* !__local__aligned_free_dbg_defined */

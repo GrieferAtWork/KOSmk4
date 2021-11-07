@@ -629,32 +629,39 @@ void *mmap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@Unmap memory from `addr...+=len'
 [[section(".text.crt{|.dos}.heap.mman")]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__munmap", "__libc_munmap")]]
 int munmap([[nonnull]] void *addr, size_t len);
 
 @@@param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
 @@             PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
 @@             PROT_GROWSUP | PROT_GROWSDOWN'
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), section(".text.crt{|.dos}.system.mman")]]
+[[export_alias("__mprotect", "__libc_mprotect")]]
 int mprotect([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 
 @@@param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC'
 [[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[export_alias("__msync", "__libc_msync")]]
 int msync([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
 
 @@>> mlock(2)
 [[decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__mlock", "__libc_mlock")]]
 int mlock([[nonnull]] void const *addr, size_t len);
 
 @@>> munlock(2)
 [[decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__munlock", "__libc_munlock")]]
 int munlock([[nonnull]] void const *addr, size_t len);
 
 @@>> mlockall(2)
 @@@param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT'
 [[decl_include("<features.h>")]]
+[[export_alias("__mlockall", "__libc_mlockall")]]
 int mlockall(__STDC_INT_AS_UINT_T flags);
 
 @@>> munlockall(2)
+[[export_alias("__munlockall", "__libc_munlockall")]]
 int munlockall();
 
 @@>> shm_open(3)
@@ -797,6 +804,7 @@ int posix_madvise([[nonnull]] void *addr, size_t len,
 @@@param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED'
 [[section(".text.crt{|.dos}.heap.mman"), vartypes(void *)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[export_alias("__mremap", "__libc_mremap")]]
 void *mremap(void *addr, size_t old_len, size_t new_len,
              __STDC_INT_AS_UINT_T flags, ... /* void *new_address */);
 

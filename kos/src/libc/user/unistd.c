@@ -3542,57 +3542,98 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6beea8fb]]]*/
+/*[[[start:exports,hash:CRC-32=0x57b68f49]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__execve, libc_execve);
+DEFINE_PUBLIC_ALIAS(__libc_execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(execve, libc_execve);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_getpid, libc_getpid);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__getpid, libc_getpid);
+DEFINE_PUBLIC_ALIAS(__libc_getpid, libc_getpid);
 DEFINE_PUBLIC_ALIAS(getpid, libc_getpid);
 DEFINE_PUBLIC_ALIAS(gettid, libc_gettid);
 DEFINE_PUBLIC_ALIAS(__pipe, libc_pipe);
+DEFINE_PUBLIC_ALIAS(__libc_pipe, libc_pipe);
 DEFINE_PUBLIC_ALIAS(pipe, libc_pipe);
 DEFINE_PUBLIC_ALIAS(sleep, libc_sleep);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_commit, libc_fsync);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__fsync, libc_fsync);
+DEFINE_PUBLIC_ALIAS(__libc_fsync, libc_fsync);
 DEFINE_PUBLIC_ALIAS(fsync, libc_fsync);
+DEFINE_PUBLIC_ALIAS(__getppid, libc_getppid);
+DEFINE_PUBLIC_ALIAS(__libc_getppid, libc_getppid);
 DEFINE_PUBLIC_ALIAS(getppid, libc_getppid);
+DEFINE_PUBLIC_ALIAS(__getpgrp, libc_getpgrp);
+DEFINE_PUBLIC_ALIAS(__libc_getpgrp, libc_getpgrp);
 DEFINE_PUBLIC_ALIAS(getpgrp, libc_getpgrp);
 DEFINE_PUBLIC_ALIAS(__setpgid, libc_setpgid);
+DEFINE_PUBLIC_ALIAS(__libc_setpgid, libc_setpgid);
 DEFINE_PUBLIC_ALIAS(setpgid, libc_setpgid);
+DEFINE_PUBLIC_ALIAS(__setsid, libc_setsid);
+DEFINE_PUBLIC_ALIAS(__libc_setsid, libc_setsid);
 DEFINE_PUBLIC_ALIAS(setsid, libc_setsid);
+DEFINE_PUBLIC_ALIAS(__getuid, libc_getuid);
+DEFINE_PUBLIC_ALIAS(__libc_getuid, libc_getuid);
 DEFINE_PUBLIC_ALIAS(getuid, libc_getuid);
-DEFINE_PUBLIC_ALIAS(geteuid, libc_geteuid);
+DEFINE_PUBLIC_ALIAS(__getgid, libc_getgid);
+DEFINE_PUBLIC_ALIAS(__libc_getgid, libc_getgid);
 DEFINE_PUBLIC_ALIAS(getgid, libc_getgid);
+DEFINE_PUBLIC_ALIAS(__geteuid, libc_geteuid);
+DEFINE_PUBLIC_ALIAS(__libc_geteuid, libc_geteuid);
+DEFINE_PUBLIC_ALIAS(geteuid, libc_geteuid);
+DEFINE_PUBLIC_ALIAS(__getegid, libc_getegid);
+DEFINE_PUBLIC_ALIAS(__libc_getegid, libc_getegid);
 DEFINE_PUBLIC_ALIAS(getegid, libc_getegid);
+DEFINE_PUBLIC_ALIAS(__getgroups, libc_getgroups);
+DEFINE_PUBLIC_ALIAS(__libc_getgroups, libc_getgroups);
 DEFINE_PUBLIC_ALIAS(getgroups, libc_getgroups);
+DEFINE_PUBLIC_ALIAS(__setuid, libc_setuid);
+DEFINE_PUBLIC_ALIAS(__libc_setuid, libc_setuid);
 DEFINE_PUBLIC_ALIAS(setuid, libc_setuid);
+DEFINE_PUBLIC_ALIAS(__setgid, libc_setgid);
+DEFINE_PUBLIC_ALIAS(__libc_setgid, libc_setgid);
 DEFINE_PUBLIC_ALIAS(setgid, libc_setgid);
 DEFINE_PUBLIC_ALIAS(__fork, libc_fork);
+DEFINE_PUBLIC_ALIAS(__libc_fork, libc_fork);
 DEFINE_PUBLIC_ALIAS(fork, libc_fork);
+DEFINE_PUBLIC_ALIAS(__alarm, libc_alarm);
+DEFINE_PUBLIC_ALIAS(__libc_alarm, libc_alarm);
 DEFINE_PUBLIC_ALIAS(alarm, libc_alarm);
+DEFINE_PUBLIC_ALIAS(__pause, libc_pause);
+DEFINE_PUBLIC_ALIAS(__libc_pause, libc_pause);
 DEFINE_PUBLIC_ALIAS(pause, libc_pause);
+DEFINE_PUBLIC_ALIAS(__fpathconf, libc_fpathconf);
 DEFINE_PUBLIC_ALIAS(fpathconf, libc_fpathconf);
+DEFINE_PUBLIC_ALIAS(__ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(ttyname_r, libc_ttyname_r);
 DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
 DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
+DEFINE_PUBLIC_ALIAS(__chown, libc_chown);
+DEFINE_PUBLIC_ALIAS(__libc_chown, libc_chown);
 DEFINE_PUBLIC_ALIAS(chown, libc_chown);
+DEFINE_PUBLIC_ALIAS(__pathconf, libc_pathconf);
 DEFINE_PUBLIC_ALIAS(pathconf, libc_pathconf);
+DEFINE_PUBLIC_ALIAS(__link, libc_link);
+DEFINE_PUBLIC_ALIAS(__libc_link, libc_link);
 DEFINE_PUBLIC_ALIAS(link, libc_link);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_read, libc_read);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__read, libc_read);
+DEFINE_PUBLIC_ALIAS(__libc_read, libc_read);
 DEFINE_PUBLIC_ALIAS(read, libc_read);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_write, libc_write);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__write, libc_write);
+DEFINE_PUBLIC_ALIAS(__libc_write, libc_write);
 DEFINE_PUBLIC_ALIAS(write, libc_write);
 DEFINE_PUBLIC_ALIAS(readall, libc_readall);
 #include <hybrid/typecore.h>
@@ -3605,28 +3646,37 @@ DEFINE_PUBLIC_ALIAS(writeall, libc_writeall);
 DEFINE_PUBLIC_ALIAS(_lseek, libc_lseek);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__lseek, libc_lseek);
+DEFINE_PUBLIC_ALIAS(__libc_lseek, libc_lseek);
 DEFINE_PUBLIC_ALIAS(lseek, libc_lseek);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_dup2, libc_dup2);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__dup2, libc_dup2);
+DEFINE_PUBLIC_ALIAS(__libc_dup2, libc_dup2);
 DEFINE_PUBLIC_ALIAS(dup2, libc_dup2);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_dup, libc_dup);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__dup, libc_dup);
+DEFINE_PUBLIC_ALIAS(__libc_dup, libc_dup);
 DEFINE_PUBLIC_ALIAS(dup, libc_dup);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_close, libc_close);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__close, libc_close);
+DEFINE_PUBLIC_ALIAS(__libc_close, libc_close);
 DEFINE_PUBLIC_ALIAS(close, libc_close);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_access, libc_access);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__access, libc_access);
+DEFINE_PUBLIC_ALIAS(__libc_access, libc_access);
 DEFINE_PUBLIC_ALIAS(access, libc_access);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chdir, libc_chdir);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__chdir, libc_chdir);
+DEFINE_PUBLIC_ALIAS(__libc_chdir, libc_chdir);
 DEFINE_PUBLIC_ALIAS(chdir, libc_chdir);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_getcwd, libc_getcwd);
@@ -3635,10 +3685,14 @@ DEFINE_PUBLIC_ALIAS(getcwd, libc_getcwd);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_unlink, libc_unlink);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__unlink, libc_unlink);
+DEFINE_PUBLIC_ALIAS(__libc_unlink, libc_unlink);
 DEFINE_PUBLIC_ALIAS(unlink, libc_unlink);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_rmdir, libc_rmdir);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__rmdir, libc_rmdir);
+DEFINE_PUBLIC_ALIAS(__libc_rmdir, libc_rmdir);
 DEFINE_PUBLIC_ALIAS(rmdir, libc_rmdir);
 DEFINE_PUBLIC_ALIAS(eaccess, libc_euidaccess);
 DEFINE_PUBLIC_ALIAS(euidaccess, libc_euidaccess);
@@ -3674,33 +3728,61 @@ DEFINE_PUBLIC_ALIAS(setresgid, libc_setresgid);
 DEFINE_PUBLIC_ALIAS(usleep, libc_usleep);
 DEFINE_PUBLIC_ALIAS(getwd, libc_getwd);
 DEFINE_PUBLIC_ALIAS(ualarm, libc_ualarm);
+DEFINE_PUBLIC_ALIAS(__fchown, libc_fchown);
+DEFINE_PUBLIC_ALIAS(__libc_fchown, libc_fchown);
 DEFINE_PUBLIC_ALIAS(fchown, libc_fchown);
+DEFINE_PUBLIC_ALIAS(__fchdir, libc_fchdir);
+DEFINE_PUBLIC_ALIAS(__libc_fchdir, libc_fchdir);
 DEFINE_PUBLIC_ALIAS(fchdir, libc_fchdir);
 DEFINE_PUBLIC_ALIAS(__getpgid, libc_getpgid);
+DEFINE_PUBLIC_ALIAS(__libc_getpgid, libc_getpgid);
 DEFINE_PUBLIC_ALIAS(getpgid, libc_getpgid);
+DEFINE_PUBLIC_ALIAS(__getsid, libc_getsid);
+DEFINE_PUBLIC_ALIAS(__libc_getsid, libc_getsid);
 DEFINE_PUBLIC_ALIAS(getsid, libc_getsid);
 DEFINE_PUBLIC_ALIAS(lchown, libc_lchown);
+DEFINE_PUBLIC_ALIAS(__truncate, libc_truncate);
+DEFINE_PUBLIC_ALIAS(__libc_truncate, libc_truncate);
 DEFINE_PUBLIC_ALIAS(truncate, libc_truncate);
 DEFINE_PUBLIC_ALIAS(truncate64, libc_truncate64);
 DEFINE_PUBLIC_ALIAS(fexecve, libc_fexecve);
+DEFINE_PUBLIC_ALIAS(__nice, libc_nice);
+DEFINE_PUBLIC_ALIAS(__libc_nice, libc_nice);
 DEFINE_PUBLIC_ALIAS(nice, libc_nice);
 DEFINE_PUBLIC_ALIAS(confstr, libc_confstr);
+DEFINE_PUBLIC_ALIAS(__sync, libc_sync);
+DEFINE_PUBLIC_ALIAS(__libc_sync, libc_sync);
 DEFINE_PUBLIC_ALIAS(sync, libc_sync);
 DEFINE_PUBLIC_ALIAS(setpgrp, libc_setpgrp);
+DEFINE_PUBLIC_ALIAS(__setreuid, libc_setreuid);
+DEFINE_PUBLIC_ALIAS(__libc_setreuid, libc_setreuid);
 DEFINE_PUBLIC_ALIAS(setreuid, libc_setreuid);
+DEFINE_PUBLIC_ALIAS(__setregid, libc_setregid);
+DEFINE_PUBLIC_ALIAS(__libc_setregid, libc_setregid);
 DEFINE_PUBLIC_ALIAS(setregid, libc_setregid);
 DEFINE_PUBLIC_ALIAS(gethostid, libc_gethostid);
 DEFINE_PUBLIC_ALIAS(seteuid, libc_seteuid);
 DEFINE_PUBLIC_ALIAS(setegid, libc_setegid);
 DEFINE_PUBLIC_ALIAS(ttyslot, libc_ttyslot);
+DEFINE_PUBLIC_ALIAS(__symlink, libc_symlink);
+DEFINE_PUBLIC_ALIAS(__libc_symlink, libc_symlink);
 DEFINE_PUBLIC_ALIAS(symlink, libc_symlink);
+DEFINE_PUBLIC_ALIAS(__readlink, libc_readlink);
+DEFINE_PUBLIC_ALIAS(__libc_readlink, libc_readlink);
 DEFINE_PUBLIC_ALIAS(readlink, libc_readlink);
+DEFINE_PUBLIC_ALIAS(__gethostname, libc_gethostname);
 DEFINE_PUBLIC_ALIAS(gethostname, libc_gethostname);
 DEFINE_PUBLIC_ALIAS(setlogin, libc_setlogin);
+DEFINE_PUBLIC_ALIAS(__sethostname, libc_sethostname);
+DEFINE_PUBLIC_ALIAS(__libc_sethostname, libc_sethostname);
 DEFINE_PUBLIC_ALIAS(sethostname, libc_sethostname);
 DEFINE_PUBLIC_ALIAS(sethostid, libc_sethostid);
 DEFINE_PUBLIC_ALIAS(getdomainname, libc_getdomainname);
+DEFINE_PUBLIC_ALIAS(__setdomainname, libc_setdomainname);
+DEFINE_PUBLIC_ALIAS(__libc_setdomainname, libc_setdomainname);
 DEFINE_PUBLIC_ALIAS(setdomainname, libc_setdomainname);
+DEFINE_PUBLIC_ALIAS(__vhangup, libc_vhangup);
+DEFINE_PUBLIC_ALIAS(__libc_vhangup, libc_vhangup);
 DEFINE_PUBLIC_ALIAS(vhangup, libc_vhangup);
 DEFINE_PUBLIC_ALIAS(profil, libc_profil);
 DEFINE_PUBLIC_ALIAS(getusershell, libc_getusershell);
@@ -3708,19 +3790,26 @@ DEFINE_PUBLIC_ALIAS(endusershell, libc_endusershell);
 DEFINE_PUBLIC_ALIAS(setusershell, libc_setusershell);
 DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
 DEFINE_PUBLIC_ALIAS(revoke, libc_revoke);
+DEFINE_PUBLIC_ALIAS(__chroot, libc_chroot);
+DEFINE_PUBLIC_ALIAS(__libc_chroot, libc_chroot);
 DEFINE_PUBLIC_ALIAS(chroot, libc_chroot);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chsize, libc_ftruncate);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__ftruncate, libc_ftruncate);
+DEFINE_PUBLIC_ALIAS(__libc_ftruncate, libc_ftruncate);
 DEFINE_PUBLIC_ALIAS(chsize, libc_ftruncate);
 DEFINE_PUBLIC_ALIAS(ftruncate, libc_ftruncate);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chsize_s, libc_ftruncate64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(ftruncate64, libc_ftruncate64);
+DEFINE_PUBLIC_ALIAS(__brk, libc_brk);
 DEFINE_PUBLIC_ALIAS(brk, libc_brk);
 DEFINE_PUBLIC_ALIAS(__sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(sbrk, libc_sbrk);
+DEFINE_PUBLIC_ALIAS(__fdatasync, libc_fdatasync);
+DEFINE_PUBLIC_ALIAS(__libc_fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(setmode, libc_setmode);
 DEFINE_PUBLIC_ALIAS(getmode, libc_getmode);

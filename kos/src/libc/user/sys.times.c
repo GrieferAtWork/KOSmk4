@@ -41,7 +41,9 @@ NOTHROW_NCX(LIBCCALL libc_times)(struct tms *buffer)
 }
 /*[[[end:libc_times]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x71047dcf]]]*/
+/*[[[start:exports,hash:CRC-32=0xf638c414]]]*/
+DEFINE_PUBLIC_ALIAS(__times, libc_times);
+DEFINE_PUBLIC_ALIAS(__libc_times, libc_times);
 DEFINE_PUBLIC_ALIAS(times, libc_times);
 /*[[[end:exports]]]*/
 

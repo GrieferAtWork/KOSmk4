@@ -125,8 +125,9 @@ NOTHROW_NCX(LIBCCALL libc_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x813b6bf0]]]*/
+/*[[[start:exports,hash:CRC-32=0xbcdc0fbb]]]*/
 DEFINE_PUBLIC_ALIAS(__adjtimex, libc_adjtimex);
+DEFINE_PUBLIC_ALIAS(__libc_adjtimex, libc_adjtimex);
 DEFINE_PUBLIC_ALIAS(adjtimex, libc_adjtimex);
 DEFINE_PUBLIC_ALIAS(ntp_gettimex, libc_ntp_gettimex);
 DEFINE_PUBLIC_ALIAS(ntp_adjtime, libc_ntp_adjtime);

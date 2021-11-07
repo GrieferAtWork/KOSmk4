@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb54f2fb8 */
+/* HASH CRC-32:0x35df1d76 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ typedef struct _stringlist {
 /* >> sl_init(3)
  * Allocates and returns a new StringList object. Upon error, `NULL' is returned */
 __CDECLARE(__ATTR_WUNUSED,struct _stringlist *,__NOTHROW_NCX,sl_init,(void),())
-#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free))
 #include <libc/local/stringlist/sl_init.h>
 /* >> sl_init(3)
  * Allocates and returns a new StringList object. Upon error, `NULL' is returned */
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sl_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
  * Append a  given `name'  to  `sl'. `name'  is  considered
  * inherited if the StringList is destroyed with `freeit=1' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sl_add,(struct _stringlist *__sl, char *__name),(__sl,__name))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/stringlist/sl_add.h>
 /* >> sl_add(3)
  * Append a  given `name'  to  `sl'. `name'  is  considered
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sl_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
  * string pointers (as previously added with `sl_add()') will also be
  * `free(3)'d. */
 __CDECLARE_VOID(,__NOTHROW_NCX,sl_free,(struct _stringlist *__sl, int __freeit),(__sl,__freeit))
-#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/stringlist/sl_free.h>
 /* >> sl_free(3)
  * Free a given string list. When `freeit' is non-zero, all contained

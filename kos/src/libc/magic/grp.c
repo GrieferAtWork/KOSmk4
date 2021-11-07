@@ -155,6 +155,7 @@ struct group *fgetgrent([[nonnull]] $FILE *__restrict stream);
 
 @@>> setgroups(2)
 [[cp, guard, decl_include("<bits/types.h>")]]
+[[export_alias("__setgroups", "__libc_setgroups")]]
 int setgroups(size_t count, [[inp_opt(count)]] $gid_t const *groups);
 
 @@>> getgrouplist(3)

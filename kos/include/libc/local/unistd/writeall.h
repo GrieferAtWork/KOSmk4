@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cd40aff */
+/* HASH CRC-32:0xf907f47d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_writeall_defined
 #define __local_writeall_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_write_defined
@@ -32,6 +32,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),_write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___write)
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__write,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_write)
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__libc_write,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_write_defined
 #endif /* !... */
@@ -65,7 +67,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_writeall_defined
 #define __localdep_writeall __LIBC_LOCAL_NAME(writeall)
 #endif /* !__local___localdep_writeall_defined */
-#else /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#else /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 #undef __local_writeall_defined
-#endif /* !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write */
+#endif /* !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write && !__CRT_HAVE___libc_write */
 #endif /* !__local_writeall_defined */

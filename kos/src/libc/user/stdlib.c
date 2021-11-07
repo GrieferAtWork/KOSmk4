@@ -2310,7 +2310,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x23fce99b]]]*/
+/*[[[start:exports,hash:CRC-32=0x15b3f280]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2355,9 +2355,13 @@ DEFINE_PUBLIC_ALIAS(lcong48, libc_lcong48);
 DEFINE_PUBLIC_ALIAS(_putenv, libc_putenv);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(putenv, libc_putenv);
+DEFINE_PUBLIC_ALIAS(__random, libc_random);
 DEFINE_PUBLIC_ALIAS(random, libc_random);
+DEFINE_PUBLIC_ALIAS(__srandom, libc_srandom);
 DEFINE_PUBLIC_ALIAS(srandom, libc_srandom);
+DEFINE_PUBLIC_ALIAS(__initstate, libc_initstate);
 DEFINE_PUBLIC_ALIAS(initstate, libc_initstate);
+DEFINE_PUBLIC_ALIAS(__setstate, libc_setstate);
 DEFINE_PUBLIC_ALIAS(setstate, libc_setstate);
 DEFINE_PUBLIC_ALIAS(realpath, libc_realpath);
 DEFINE_PUBLIC_ALIAS(frealpath, libc_frealpath);
@@ -2367,6 +2371,7 @@ DEFINE_PUBLIC_ALIAS(grantpt, libc_grantpt);
 DEFINE_PUBLIC_ALIAS(posix_openpt, libc_posix_openpt);
 DEFINE_PUBLIC_ALIAS(ptsname_r, libc_ptsname_r);
 DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
+DEFINE_PUBLIC_ALIAS(__libc_secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(getpt, libc_getpt);
 DEFINE_PUBLIC_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);

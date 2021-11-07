@@ -241,8 +241,8 @@ typedef __compar_fn_t comparison_fn_t;
 %[define_crt_name_list(CNL_lldiv       = ["lldiv", "qdiv"])]
 %[define_crt_name_list(CNL_strtol      = ["strtol"])]
 %[define_crt_name_list(CNL_strtoul     = ["strtoul"])]
-%[define_crt_name_list(CNL_strtoll     = ["strtoll", "strtoq"])]
-%[define_crt_name_list(CNL_strtoull    = ["strtoull", "strtouq"])]
+%[define_crt_name_list(CNL_strtoll     = ["strtoll", "strtoq", "__strtoq"])]
+%[define_crt_name_list(CNL_strtoull    = ["strtoull", "strtouq", "__strtouq"])]
 %[define_crt_name_list(CNL_strtoimax   = ["strtoimax"])]
 %[define_crt_name_list(CNL_strtoumax   = ["strtoumax"])]
 %[define_crt_name_list(CNL_strtol_l    = ["strtol_l", "_strtol_l", "__strtol_l"])]
@@ -730,11 +730,11 @@ int at_quick_exit([[nonnull]] void (LIBCCALL *func)(void));
 void _Exit(int status);
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
-[[ignore, nocrt, alias("calloc"), decl_include("<hybrid/typecore.h>")]]
+[[ignore, nocrt, alias("calloc", "__libc_calloc"), decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 void *crt_calloc(size_t count, size_t num_bytes);
 
-[[section(".text.crt{|.dos}.heap.malloc")]]
+[[section(".text.crt{|.dos}.heap.malloc"), export_alias("__libc_malloc")]]
 [[std, guard, crtbuiltin, libc, decl_include("<hybrid/typecore.h>")]]
 [[ATTR_ALLOC_SIZE((1)), wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[userimpl, requires($has_function(crt_calloc) || $has_function(realloc) || $has_function(memalign))]]
@@ -748,7 +748,7 @@ void *malloc(size_t num_bytes) {
 @@pp_endif@@
 }
 
-[[section(".text.crt{|.dos}.heap.malloc")]]
+[[section(".text.crt{|.dos}.heap.malloc"), export_alias("__libc_calloc")]]
 [[guard, std, libc, crtbuiltin, decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 [[userimpl, requires_function(malloc), impl_include("<hybrid/__overflow.h>")]]
@@ -763,13 +763,13 @@ void *calloc(size_t count, size_t num_bytes) {
 	return result;
 }
 
-[[section(".text.crt{|.dos}.heap.malloc")]]
+[[section(".text.crt{|.dos}.heap.malloc"), export_alias("__libc_realloc")]]
 [[guard, std, libc, crtbuiltin, decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 void *realloc(void *mallptr, size_t num_bytes);
 
 [[section(".text.crt{|.dos}.heap.malloc")]]
-[[guard, std, libc, crtbuiltin, export_alias("cfree")]]
+[[guard, std, libc, crtbuiltin, export_alias("cfree", "__libc_free")]]
 void free(void *mallptr);
 
 
@@ -962,7 +962,7 @@ double strtod([[nonnull]] char const *__restrict nptr,
 }
 
 %(std)#ifdef __USE_ISOC99
-[[guard, std, leaf]]
+[[guard, std, leaf, export_alias("__strtof")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
@@ -1001,7 +1001,7 @@ float strtof([[nonnull]] char const *__restrict nptr,
 }
 
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[guard, std, leaf]]
+[[guard, std, leaf, export_alias("__strtold")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
@@ -2300,14 +2300,14 @@ int putenv([[nonnull]] char *string);
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 
-[[userimpl]]
+[[userimpl, export_alias("__random")]]
 [[section(".text.crt{|.dos}.random")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("rand")]]
 long random() {
 	return (long)rand();
 }
 
-[[userimpl]]
+[[userimpl, export_alias("__srandom")]]
 [[section(".text.crt{|.dos}.random")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("srand")]]
 void srandom(unsigned int seed) {
@@ -2315,9 +2315,11 @@ void srandom(unsigned int seed) {
 }
 
 [[section(".text.crt{|.dos}.random")]]
+[[export_alias("__initstate")]]
 char *initstate(unsigned int seed, [[outp(statelen)]] char *statebuf, $size_t statelen);
 
 [[section(".text.crt{|.dos}.random")]]
+[[export_alias("__setstate")]]
 char *setstate([[nonnull]] char *statebuf);
 
 
@@ -2710,7 +2712,7 @@ __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
 %#endif /* !__NO_FPU */
 
 [[wunused, section(".text.crt{|.dos}.fs.environ")]]
-[[export_alias("__secure_getenv"), alias("getenv")]]
+[[export_alias("__secure_getenv", "__libc_secure_getenv"), alias("getenv")]]
 [[if($extended_include_prefix("<libc/template/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
 char *secure_getenv([[nonnull]] char const *varname);
 

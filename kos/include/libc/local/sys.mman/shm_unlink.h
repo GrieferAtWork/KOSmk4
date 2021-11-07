@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9772343 */
+/* HASH CRC-32:0xeeec8a9c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_shm_unlink_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
+#if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined
@@ -77,6 +77,10 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
+#elif defined(__CRT_HAVE___unlink)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
+#elif defined(__CRT_HAVE___libc_unlink)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/unlink.h>
@@ -124,7 +128,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_shm_unlink_defined
 #define __localdep_shm_unlink __LIBC_LOCAL_NAME(shm_unlink)
 #endif /* !__local___localdep_shm_unlink_defined */
-#else /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
+#else /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || __CRT_HAVE___unlink || __CRT_HAVE___libc_unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
 #undef __local_shm_unlink_defined
-#endif /* !__CRT_HAVE_unlink && !__CRT_HAVE__unlink && (!__AT_FDCWD || !__CRT_HAVE_unlinkat) */
+#endif /* !__CRT_HAVE_unlink && !__CRT_HAVE__unlink && !__CRT_HAVE___unlink && !__CRT_HAVE___libc_unlink && (!__AT_FDCWD || !__CRT_HAVE_unlinkat) */
 #endif /* !__local_shm_unlink_defined */

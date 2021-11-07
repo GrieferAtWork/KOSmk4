@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0506629 */
+/* HASH CRC-32:0x74b37bca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,32 @@
 #define __local_tcgetattr_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
-#if defined(__CRT_HAVE_ioctl) && defined(__TCGETA)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA)
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
 #define __local___localdep_ioctl_defined
+#ifdef __CRT_HAVE_ioctl
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#else /* ... */
+#undef __local___localdep_ioctl_defined
+#endif /* !... */
 #endif /* !__local___localdep_ioctl_defined */
 __LOCAL_LIBC(tcgetattr) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcgetattr))(__fd_t __fd, struct termios *__restrict __termios_p) {
@@ -42,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_tcgetattr_defined
 #define __localdep_tcgetattr __LIBC_LOCAL_NAME(tcgetattr)
 #endif /* !__local___localdep_tcgetattr_defined */
-#else /* __CRT_HAVE_ioctl && __TCGETA */
+#else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA */
 #undef __local_tcgetattr_defined
-#endif /* !__CRT_HAVE_ioctl || !__TCGETA */
+#endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA */
 #endif /* !__local_tcgetattr_defined */

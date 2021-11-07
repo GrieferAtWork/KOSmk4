@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdae0aa52 */
+/* HASH CRC-32:0xd4b07748 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,20 @@
 #ifndef __local_setitimer64_defined
 #define __local_setitimer64_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_setitimer
+#if defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setitimer32_defined
 #define __local___localdep_setitimer32_defined
+#ifdef __CRT_HAVE_setitimer
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
+#elif defined(__CRT_HAVE___setitimer)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),__setitimer,(__which,__newval,__oldval))
+#elif defined(__CRT_HAVE___libc_setitimer)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),__libc_setitimer,(__which,__newval,__oldval))
+#else /* ... */
+#undef __local___localdep_setitimer32_defined
+#endif /* !... */
 #endif /* !__local___localdep_setitimer32_defined */
 __LOCAL_LIBC(setitimer64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer64))(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval) {
@@ -50,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_setitimer64_defined
 #define __localdep_setitimer64 __LIBC_LOCAL_NAME(setitimer64)
 #endif /* !__local___localdep_setitimer64_defined */
-#else /* __CRT_HAVE_setitimer */
+#else /* __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer */
 #undef __local_setitimer64_defined
-#endif /* !__CRT_HAVE_setitimer */
+#endif /* !__CRT_HAVE_setitimer && !__CRT_HAVE___setitimer && !__CRT_HAVE___libc_setitimer */
 #endif /* !__local_setitimer64_defined */

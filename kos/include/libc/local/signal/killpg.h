@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeaad8939 */
+/* HASH CRC-32:0x721a0938 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,20 @@
 #ifndef __local_killpg_defined
 #define __local_killpg_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_kill
+#if defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_kill_defined
 #define __local___localdep_kill_defined
+#ifdef __CRT_HAVE_kill
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo),kill,(__pid,__signo))
+#elif defined(__CRT_HAVE___kill)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo),__kill,(__pid,__signo))
+#elif defined(__CRT_HAVE___libc_kill)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo),__libc_kill,(__pid,__signo))
+#else /* ... */
+#undef __local___localdep_kill_defined
+#endif /* !... */
 #endif /* !__local___localdep_kill_defined */
 __LOCAL_LIBC(killpg) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(killpg))(__pid_t __pgrp, __signo_t __signo) {
@@ -37,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_killpg_defined
 #define __localdep_killpg __LIBC_LOCAL_NAME(killpg)
 #endif /* !__local___localdep_killpg_defined */
-#else /* __CRT_HAVE_kill */
+#else /* __CRT_HAVE_kill || __CRT_HAVE___kill || __CRT_HAVE___libc_kill */
 #undef __local_killpg_defined
-#endif /* !__CRT_HAVE_kill */
+#endif /* !__CRT_HAVE_kill && !__CRT_HAVE___kill && !__CRT_HAVE___libc_kill */
 #endif /* !__local_killpg_defined */

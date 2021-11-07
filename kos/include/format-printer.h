@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46789deb */
+/* HASH CRC-32:0xd56f1cea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -849,7 +849,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_pack, __FORCELOCAL __ATTR_ARTIFIC
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,format_aprintf_alloc,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars),(__self,__num_chars))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/format-printer/format_aprintf_alloc.h>
 /* >> format_aprintf_alloc(3)
  * Allocate  a   buffer  of   `num_chars'  characters   at  the   end  of   `self'
@@ -864,7 +864,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_alloc, __FORCELOCAL __ATTR_ARTIFI
  * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
  * This function is intended to be used as a pformatprinter-compatible printer sink */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_aprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_aprintf_printer");
-#elif defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/format-printer/format_aprintf_printer.h>
 /* >> format_aprintf_printer(3)
  * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned

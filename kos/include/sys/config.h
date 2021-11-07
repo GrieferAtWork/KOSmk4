@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c5616a */
+/* HASH CRC-32:0x18e10971 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -259,14 +259,14 @@
 #define HAVE_BCOPY 1
 
 #undef HAVE_CLOSEDIR
-#ifdef __CRT_HAVE_closedir
+#if defined(__CRT_HAVE_closedir) || defined(__CRT_HAVE___libc_closedir)
 #define HAVE_CLOSEDIR 1
-#endif /* __CRT_HAVE_closedir */
+#endif /* __CRT_HAVE_closedir || __CRT_HAVE___libc_closedir */
 
 #undef HAVE_DUP2
-#if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
+#if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2) || defined(__CRT_HAVE___libc_dup2)
 #define HAVE_DUP2 1
-#endif /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 */
+#endif /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 || __CRT_HAVE___libc_dup2 */
 
 #undef HAVE_ENDGRENT
 #ifdef __CRT_HAVE_endgrent
@@ -293,9 +293,9 @@
 #endif /* __CRT_HAVE__ftime32_s || __CRT_HAVE__ftime64_s || __CRT_HAVE__ftime32 || __CRT_HAVE__ftime64 || __CRT_HAVE_ftime || __CRT_HAVE_ftime64 */
 
 #undef HAVE_FTRUNCATE
-#if (defined(__CRT_HAVE__chsize) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_chsize) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
+#if defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)
 #define HAVE_FTRUNCATE 1
-#endif /* (__CRT_HAVE__chsize && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_chsize && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate */
+#endif /* __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate || __CRT_HAVE___ftruncate || __CRT_HAVE___libc_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_chsize */
 
 #undef HAVE_FTW
 #include <bits/os/stat.h>
@@ -312,19 +312,19 @@
 #define HAVE_GETDTABLESIZE 1
 
 #undef HAVE_GETGROUPS
-#ifdef __CRT_HAVE_getgroups
+#if defined(__CRT_HAVE_getgroups) || defined(__CRT_HAVE___getgroups) || defined(__CRT_HAVE___libc_getgroups)
 #define HAVE_GETGROUPS 1
-#endif /* __CRT_HAVE_getgroups */
+#endif /* __CRT_HAVE_getgroups || __CRT_HAVE___getgroups || __CRT_HAVE___libc_getgroups */
 
 #undef HAVE_GETHOSTNAME
-#ifdef __CRT_HAVE_gethostname
+#if defined(__CRT_HAVE_gethostname) || defined(__CRT_HAVE___gethostname)
 #define HAVE_GETHOSTNAME 1
-#endif /* __CRT_HAVE_gethostname */
+#endif /* __CRT_HAVE_gethostname || __CRT_HAVE___gethostname */
 
 #undef HAVE_GETMNTENT
-#if defined(__CRT_HAVE_getmntent) || defined(__CRT_HAVE_getmntent_r) || defined(__CRT_HAVE___getmntent_r) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
+#if defined(__CRT_HAVE_getmntent) || defined(__CRT_HAVE_getmntent_r) || defined(__CRT_HAVE___getmntent_r) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE__IO_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
 #define HAVE_GETMNTENT 1
-#endif /* __CRT_HAVE_getmntent || __CRT_HAVE_getmntent_r || __CRT_HAVE___getmntent_r || __CRT_HAVE_fgets || __CRT_HAVE_fgets_unlocked || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked)) */
+#endif /* __CRT_HAVE_getmntent || __CRT_HAVE_getmntent_r || __CRT_HAVE___getmntent_r || __CRT_HAVE_fgets || __CRT_HAVE__IO_fgets || __CRT_HAVE_fgets_unlocked || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked)) */
 
 #undef HAVE_GETPAGESIZE
 #include <asm/pagesize.h>
@@ -333,9 +333,9 @@
 #endif /* __CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE */
 
 #undef HAVE_GETTIMEOFDAY
-#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 #define HAVE_GETTIMEOFDAY 1
-#endif /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday */
+#endif /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday || __CRT_HAVE___libc_gettimeofday */
 
 #undef HAVE_GLOB
 #define HAVE_GLOB 1
@@ -350,9 +350,9 @@
 #define HAVE_MEMCPY 1
 
 #undef HAVE_MKDIR
-#if defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
 #define HAVE_MKDIR 1
-#endif /* __CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
+#endif /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
 
 #undef HAVE_MKFIFO
 #ifdef __CRT_HAVE_mkfifo
@@ -377,14 +377,14 @@
 
 #undef HAVE_RENAME
 #include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_rename) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_renameat2)))
+#if defined(__CRT_HAVE_rename) || defined(__CRT_HAVE___rename) || defined(__CRT_HAVE___libc_rename) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_renameat2)))
 #define HAVE_RENAME 1
-#endif /* __CRT_HAVE_rename || (__AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_renameat2)) */
+#endif /* __CRT_HAVE_rename || __CRT_HAVE___rename || __CRT_HAVE___libc_rename || (__AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_renameat2)) */
 
 #undef HAVE_RMDIR
-#if defined(__CRT_HAVE_rmdir) || defined(__CRT_HAVE__rmdir) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
+#if defined(__CRT_HAVE_rmdir) || defined(__CRT_HAVE__rmdir) || defined(__CRT_HAVE___rmdir) || defined(__CRT_HAVE___libc_rmdir) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 #define HAVE_RMDIR 1
-#endif /* __CRT_HAVE_rmdir || __CRT_HAVE__rmdir || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
+#endif /* __CRT_HAVE_rmdir || __CRT_HAVE__rmdir || __CRT_HAVE___rmdir || __CRT_HAVE___libc_rmdir || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
 
 #undef HAVE_SETENV
 #include <libc/template/environ.h>
@@ -423,9 +423,9 @@
 #define HAVE_STRCOLL 1
 
 #undef HAVE_STRDUP
-#if defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#if defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #define HAVE_STRDUP 1
-#endif /* __CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#endif /* __CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
 
 #undef HAVE_STRFTIME
 #define HAVE_STRFTIME 1
@@ -445,25 +445,25 @@
 #endif /* __CRT_HAVE_waitpid || __CRT_HAVE___waitpid */
 
 #undef GETPGRP_VOID
-#ifdef __CRT_HAVE_getpgrp
+#if defined(__CRT_HAVE_getpgrp) || defined(__CRT_HAVE___getpgrp) || defined(__CRT_HAVE___libc_getpgrp)
 #define GETPGRP_VOID 1 /* 0-argument getpgrp() version */
-#endif /* __CRT_HAVE_getpgrp */
+#endif /* __CRT_HAVE_getpgrp || __CRT_HAVE___getpgrp || __CRT_HAVE___libc_getpgrp */
 
 #undef MOUNTED_GETMNTENT1
-#if defined(__CRT_HAVE_getmntent) || defined(__CRT_HAVE_getmntent_r) || defined(__CRT_HAVE___getmntent_r) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
+#if defined(__CRT_HAVE_getmntent) || defined(__CRT_HAVE_getmntent_r) || defined(__CRT_HAVE___getmntent_r) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE__IO_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
 #define MOUNTED_GETMNTENT1 1 /* 1-argument getmntent() version */
-#endif /* __CRT_HAVE_getmntent || __CRT_HAVE_getmntent_r || __CRT_HAVE___getmntent_r || __CRT_HAVE_fgets || __CRT_HAVE_fgets_unlocked || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked)) */
+#endif /* __CRT_HAVE_getmntent || __CRT_HAVE_getmntent_r || __CRT_HAVE___getmntent_r || __CRT_HAVE_fgets || __CRT_HAVE__IO_fgets || __CRT_HAVE_fgets_unlocked || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked)) */
 
 #undef STAT_STATFS2_BSIZE
-#if (defined(__CRT_HAVE_statfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE___statfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_statfs64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
+#if (defined(__CRT_HAVE_statfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE___statfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE___libc_statfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_statfs64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 #define STAT_STATFS2_BSIZE 1 /* Actually requires that statfs() takes 2 arguments,
                               * and    that    `struct statfs::f_bsize'    exists! */
-#endif /* (__CRT_HAVE_statfs && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE___statfs && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_statfs64 && (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */
+#endif /* (__CRT_HAVE_statfs && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE___statfs && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE___libc_statfs && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_statfs64 && (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */
 
 #undef HAVE_UTIME_NULL
-#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
+#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE___utime) || defined(__CRT_HAVE___libc_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
 #define HAVE_UTIME_NULL 1 /* Second argument to utime() can be NULL for current time. */
-#endif /* __CRT_HAVE_utime || __CRT_HAVE__utime32 || __CRT_HAVE_utime64 || __CRT_HAVE__utime64 */
+#endif /* __CRT_HAVE_utime || __CRT_HAVE___utime || __CRT_HAVE___libc_utime || __CRT_HAVE__utime32 || __CRT_HAVE_utime64 || __CRT_HAVE__utime64 */
 
 
 
@@ -499,9 +499,9 @@
 
 
 #undef GETGROUPS_T
-#ifdef __CRT_HAVE_getgroups
+#if defined(__CRT_HAVE_getgroups) || defined(__CRT_HAVE___getgroups) || defined(__CRT_HAVE___libc_getgroups)
 #define GETGROUPS_T __gid_t /* Vector element type of `getgroups()' */
-#endif /* __CRT_HAVE_getgroups */
+#endif /* __CRT_HAVE_getgroups || __CRT_HAVE___getgroups || __CRT_HAVE___libc_getgroups */
 
 #undef RETSIGTYPE
 #define RETSIGTYPE void /* Return type of `sighandler_t' callbacks */

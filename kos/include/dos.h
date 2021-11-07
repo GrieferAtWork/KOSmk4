@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cf23a7c */
+/* HASH CRC-32:0x915f2bc1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,6 +114,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
+#elif defined(__CRT_HAVE___unlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),__unlink,(__file))
+#elif defined(__CRT_HAVE___libc_unlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),__libc_unlink,(__file))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a5594c6 */
+/* HASH CRC-32:0x989dac2d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_pthread_main_np_defined
 #define __local_pthread_main_np_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
+#if defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getpid_defined
 #define __local___localdep_getpid_defined
@@ -31,6 +31,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(voi
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),_getpid,())
 #elif defined(__CRT_HAVE___getpid)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),__getpid,())
+#elif defined(__CRT_HAVE___libc_getpid)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),__libc_getpid,())
 #else /* ... */
 #undef __local___localdep_getpid_defined
 #endif /* !... */
@@ -48,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_pthread_main_np_defined
 #define __localdep_pthread_main_np __LIBC_LOCAL_NAME(pthread_main_np)
 #endif /* !__local___localdep_pthread_main_np_defined */
-#else /* __CRT_HAVE_gettid && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid) */
+#else /* __CRT_HAVE_gettid && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid || __CRT_HAVE___libc_getpid) */
 #undef __local_pthread_main_np_defined
-#endif /* !__CRT_HAVE_gettid || (!__CRT_HAVE_getpid && !__CRT_HAVE__getpid && !__CRT_HAVE___getpid) */
+#endif /* !__CRT_HAVE_gettid || (!__CRT_HAVE_getpid && !__CRT_HAVE__getpid && !__CRT_HAVE___getpid && !__CRT_HAVE___libc_getpid) */
 #endif /* !__local_pthread_main_np_defined */

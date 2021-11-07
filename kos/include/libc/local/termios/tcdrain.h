@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf325364 */
+/* HASH CRC-32:0x7170320e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,31 @@
 #define __local_tcdrain_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
-#if defined(__CRT_HAVE_ioctl) && defined(__TCSBRK)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCSBRK)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
 #define __local___localdep_ioctl_defined
+#ifdef __CRT_HAVE_ioctl
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#else /* ... */
+#undef __local___localdep_ioctl_defined
+#endif /* !... */
 #endif /* !__local___localdep_ioctl_defined */
 __LOCAL_LIBC(tcdrain) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tcdrain))(__fd_t __fd) {
@@ -41,7 +57,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_tcdrain_defined
 #define __localdep_tcdrain __LIBC_LOCAL_NAME(tcdrain)
 #endif /* !__local___localdep_tcdrain_defined */
-#else /* __CRT_HAVE_ioctl && __TCSBRK */
+#else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCSBRK */
 #undef __local_tcdrain_defined
-#endif /* !__CRT_HAVE_ioctl || !__TCSBRK */
+#endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCSBRK */
 #endif /* !__local_tcdrain_defined */

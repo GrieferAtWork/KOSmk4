@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb59b20cb */
+/* HASH CRC-32:0xa4ac0782 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_sigblock_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
-#if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigemptyset_defined
 #define __local___localdep_sigemptyset_defined
@@ -42,14 +42,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_sigprocmask_defined
 #ifdef __CRT_HAVE_sigprocmask
 __NAMESPACE_LOCAL_END
-#include <features.h>
 struct __sigset_struct;
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE___sigprocmask)
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__sigprocmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE___libc_sigprocmask)
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__libc_sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE_pthread_sigmask)
 __NAMESPACE_LOCAL_END
-#include <features.h>
 struct __sigset_struct;
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
 #else /* ... */
@@ -71,7 +83,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_sigblock_defined
 #define __localdep_sigblock __LIBC_LOCAL_NAME(sigblock)
 #endif /* !__local___localdep_sigblock_defined */
-#else /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) */
+#else /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask) */
 #undef __local_sigblock_defined
-#endif /* !__SIG_BLOCK || (!__CRT_HAVE_sigprocmask && !__CRT_HAVE_pthread_sigmask) */
+#endif /* !__SIG_BLOCK || (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask) */
 #endif /* !__local_sigblock_defined */

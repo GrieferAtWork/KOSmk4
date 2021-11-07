@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d14e882 */
+/* HASH CRC-32:0xfc3607cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,22 +21,29 @@
 #ifndef __local_format_aprintf_alloc_defined
 #define __local_format_aprintf_alloc_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_realloc
+#if defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 struct format_aprintf_data;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined
-#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
+#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
-#else /* __has_builtin(__builtin_realloc) && __LIBC_BIND_CRTBUILTINS */
+#elif defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
+#elif defined(__CRT_HAVE___libc_realloc)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),__libc_realloc,(__mallptr,__num_bytes))
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
 #endif /* !__local___localdep_realloc_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
@@ -83,7 +90,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_format_aprintf_alloc_defined
 #define __localdep_format_aprintf_alloc __LIBC_LOCAL_NAME(format_aprintf_alloc)
 #endif /* !__local___localdep_format_aprintf_alloc_defined */
-#else /* __CRT_HAVE_realloc */
+#else /* __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc */
 #undef __local_format_aprintf_alloc_defined
-#endif /* !__CRT_HAVE_realloc */
+#endif /* !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc */
 #endif /* !__local_format_aprintf_alloc_defined */

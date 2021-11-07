@@ -78,8 +78,12 @@ NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x21225f62]]]*/
+/*[[[start:exports,hash:CRC-32=0x8c944090]]]*/
+DEFINE_PUBLIC_ALIAS(__ioperm, libc_ioperm);
+DEFINE_PUBLIC_ALIAS(__libc_ioperm, libc_ioperm);
 DEFINE_PUBLIC_ALIAS(ioperm, libc_ioperm);
+DEFINE_PUBLIC_ALIAS(__iopl, libc_iopl);
+DEFINE_PUBLIC_ALIAS(__libc_iopl, libc_iopl);
 DEFINE_PUBLIC_ALIAS(iopl, libc_iopl);
 /*[[[end:exports]]]*/
 

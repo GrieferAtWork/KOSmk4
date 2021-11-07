@@ -216,10 +216,14 @@ NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc9cf3d45]]]*/
+/*[[[start:exports,hash:CRC-32=0x9488edd3]]]*/
+DEFINE_PUBLIC_ALIAS(__setspent, libc_setspent);
 DEFINE_PUBLIC_ALIAS(setspent, libc_setspent);
+DEFINE_PUBLIC_ALIAS(__endspent, libc_endspent);
 DEFINE_PUBLIC_ALIAS(endspent, libc_endspent);
+DEFINE_PUBLIC_ALIAS(__getspent, libc_getspent);
 DEFINE_PUBLIC_ALIAS(getspent, libc_getspent);
+DEFINE_PUBLIC_ALIAS(__getspnam, libc_getspnam);
 DEFINE_PUBLIC_ALIAS(getspnam, libc_getspnam);
 DEFINE_PUBLIC_ALIAS(sgetspent, libc_sgetspent);
 DEFINE_PUBLIC_ALIAS(fgetspent, libc_fgetspent);
@@ -228,7 +232,9 @@ DEFINE_PUBLIC_ALIAS(getspent_r, libc_getspent_r);
 DEFINE_PUBLIC_ALIAS(getspnam_r, libc_getspnam_r);
 DEFINE_PUBLIC_ALIAS(sgetspent_r, libc_sgetspent_r);
 DEFINE_PUBLIC_ALIAS(fgetspent_r, libc_fgetspent_r);
+DEFINE_PUBLIC_ALIAS(__lckpwdf, libc_lckpwdf);
 DEFINE_PUBLIC_ALIAS(lckpwdf, libc_lckpwdf);
+DEFINE_PUBLIC_ALIAS(__ulckpwdf, libc_ulckpwdf);
 DEFINE_PUBLIC_ALIAS(ulckpwdf, libc_ulckpwdf);
 /*[[[end:exports]]]*/
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x122e5a3d */
+/* HASH CRC-32:0xe09e827d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_fchroot_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && defined(__AT_FDROOT)
+#if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2) || defined(__CRT_HAVE___libc_dup2)) && defined(__AT_FDROOT)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dup2_defined
 #define __local___localdep_dup2_defined
@@ -41,6 +41,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
+#elif defined(__CRT_HAVE___libc_dup2)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__libc_dup2,(__oldfd,__newfd))
 #else /* ... */
 #undef __local___localdep_dup2_defined
 #endif /* !... */
@@ -58,7 +63,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fchroot_defined
 #define __localdep_fchroot __LIBC_LOCAL_NAME(fchroot)
 #endif /* !__local___localdep_fchroot_defined */
-#else /* (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && __AT_FDROOT */
+#else /* (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 || __CRT_HAVE___libc_dup2) && __AT_FDROOT */
 #undef __local_fchroot_defined
-#endif /* (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2) || !__AT_FDROOT */
+#endif /* (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2 && !__CRT_HAVE___libc_dup2) || !__AT_FDROOT */
 #endif /* !__local_fchroot_defined */

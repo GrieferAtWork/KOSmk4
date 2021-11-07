@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc02f03a */
+/* HASH CRC-32:0xdb0dadf6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -948,8 +948,11 @@ NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__sigblock, libc_sigblock);
 DEFINE_PUBLIC_ALIAS(sigblock, libc_sigblock);
+DEFINE_PUBLIC_ALIAS(__sigsetmask, libc_sigsetmask);
 DEFINE_PUBLIC_ALIAS(sigsetmask, libc_sigsetmask);
+DEFINE_PUBLIC_ALIAS(__siggetmask, libc_siggetmask);
 DEFINE_PUBLIC_ALIAS(siggetmask, libc_siggetmask);
 DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
 #endif /* !__KERNEL__ */

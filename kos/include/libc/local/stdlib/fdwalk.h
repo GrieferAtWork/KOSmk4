@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10cb243e */
+/* HASH CRC-32:0x2edfc92b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_fdwalk_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_NEXT)
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_NEXT)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fcntl_defined
@@ -39,6 +39,12 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
+#elif defined(__CRT_HAVE___libc_fcntl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd),__libc_fcntl,(__fd,__cmd),__cmd,1,(void *))
 #else /* ... */
 #undef __local___localdep_fcntl_defined
 #endif /* !... */
@@ -79,7 +85,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fdwalk_defined
 #define __localdep_fdwalk __LIBC_LOCAL_NAME(fdwalk)
 #endif /* !__local___localdep_fdwalk_defined */
-#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_NEXT */
+#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_NEXT */
 #undef __local_fdwalk_defined
-#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || !__F_NEXT */
+#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_NEXT */
 #endif /* !__local_fdwalk_defined */

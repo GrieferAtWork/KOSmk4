@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cbab28 */
+/* HASH CRC-32:0x72d259bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__c
 #define __local___localdep_clock_getres64_defined
 #if defined(__CRT_HAVE_clock_getres) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),clock_getres,(__clock_id,__res))
+#elif defined(__CRT_HAVE___clock_getres) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),__clock_getres,(__clock_id,__res))
 #elif defined(__CRT_HAVE_clock_getres64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),clock_getres64,(__clock_id,__res))
 #elif defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres)

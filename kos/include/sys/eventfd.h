@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f14836 */
+/* HASH CRC-32:0x3dfa2efd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,7 +113,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,eventfd,(__STDC_UINT_AS_SIZE_
 /* >> eventfd_read(3)
  * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
 __CDECLARE(,int,__NOTHROW_RPC,eventfd_read,(__fd_t __fd, eventfd_t *__value),(__fd,__value))
-#elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
+#elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 #include <libc/local/sys.eventfd/eventfd_read.h>
 /* >> eventfd_read(3)
  * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
@@ -123,7 +123,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL __ATTR_ARTIFICIAL int
 /* >> eventfd_write(3)
  * Increment the event counter */
 __CDECLARE(,int,__NOTHROW_RPC,eventfd_write,(__fd_t __fd, eventfd_t __value),(__fd,__value))
-#elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 #include <libc/local/sys.eventfd/eventfd_write.h>
 /* >> eventfd_write(3)
  * Increment the event counter */

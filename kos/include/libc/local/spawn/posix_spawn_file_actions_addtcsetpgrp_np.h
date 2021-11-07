@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb3622de */
+/* HASH CRC-32:0x21d4a565 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
 #include <bits/crt/posix_spawn.h>
-#if defined(__POSIX_SPAWN_ACTION_TCSETPGRP) && defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#if defined(__POSIX_SPAWN_ACTION_TCSETPGRP) && defined(__POSIX_SPAWN_USE_KOS) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_posix_spawn_file_actions_alloc_defined
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_posix_spawn_file_actions_addtcsetpgrp_np_defined
 #define __localdep_posix_spawn_file_actions_addtcsetpgrp_np __LIBC_LOCAL_NAME(posix_spawn_file_actions_addtcsetpgrp_np)
 #endif /* !__local___localdep_posix_spawn_file_actions_addtcsetpgrp_np_defined */
-#else /* __POSIX_SPAWN_ACTION_TCSETPGRP && __POSIX_SPAWN_USE_KOS && __CRT_HAVE_realloc */
+#else /* __POSIX_SPAWN_ACTION_TCSETPGRP && __POSIX_SPAWN_USE_KOS && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
 #undef __local_posix_spawn_file_actions_addtcsetpgrp_np_defined
-#endif /* !__POSIX_SPAWN_ACTION_TCSETPGRP || !__POSIX_SPAWN_USE_KOS || !__CRT_HAVE_realloc */
+#endif /* !__POSIX_SPAWN_ACTION_TCSETPGRP || !__POSIX_SPAWN_USE_KOS || (!__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) */
 #endif /* !__local_posix_spawn_file_actions_addtcsetpgrp_np_defined */

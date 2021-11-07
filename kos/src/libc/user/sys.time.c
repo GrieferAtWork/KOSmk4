@@ -383,14 +383,22 @@ NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbc4749a8]]]*/
+/*[[[start:exports,hash:CRC-32=0x35fa5afa]]]*/
 DEFINE_PUBLIC_ALIAS(__gettimeofday, libc_gettimeofday);
+DEFINE_PUBLIC_ALIAS(__libc_gettimeofday, libc_gettimeofday);
 DEFINE_PUBLIC_ALIAS(gettimeofday, libc_gettimeofday);
+DEFINE_PUBLIC_ALIAS(__getitimer, libc_getitimer);
+DEFINE_PUBLIC_ALIAS(__libc_getitimer, libc_getitimer);
 DEFINE_PUBLIC_ALIAS(getitimer, libc_getitimer);
+DEFINE_PUBLIC_ALIAS(__setitimer, libc_setitimer);
+DEFINE_PUBLIC_ALIAS(__libc_setitimer, libc_setitimer);
 DEFINE_PUBLIC_ALIAS(setitimer, libc_setitimer);
 DEFINE_PUBLIC_ALIAS(utimes, libc_utimes);
 DEFINE_PUBLIC_ALIAS(futimesat, libc_futimesat);
+DEFINE_PUBLIC_ALIAS(__settimeofday, libc_settimeofday);
+DEFINE_PUBLIC_ALIAS(__libc_settimeofday, libc_settimeofday);
 DEFINE_PUBLIC_ALIAS(settimeofday, libc_settimeofday);
+DEFINE_PUBLIC_ALIAS(__adjtime, libc_adjtime);
 DEFINE_PUBLIC_ALIAS(adjtime, libc_adjtime);
 DEFINE_PUBLIC_ALIAS(lutimes, libc_lutimes);
 DEFINE_PUBLIC_ALIAS(futimes, libc_futimes);

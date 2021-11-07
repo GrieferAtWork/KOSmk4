@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23fbcd06 */
+/* HASH CRC-32:0xf51ed7ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_getpass_r_defined
 #include <__crt.h>
 #include <asm/os/stdio.h>
-#if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE_readpassphrase)
+#if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read) || defined(__CRT_HAVE_readpassphrase)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getpassfd_defined
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,__localdep_getpassfd,(char const *__prompt, char *__buf, __SIZE_TYPE__ __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds),getpassfd,(__prompt,__buf,__buflen,__fds,__flags,__timeout_in_seconds))
-#elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
+#elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/getpassfd.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_readpassphrase,(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize, __STDC_INT_AS_UINT_T __flags),readpassphrase,(__prompt,__buf,__bufsize,__flags))
-#elif defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read))
+#elif defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read))
 __NAMESPACE_LOCAL_END
 #include <libc/local/readpassphrase/readpassphrase.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getpass_r) __ATTR_WUNUSED char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass_r))(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize) {
-#if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
+#if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 	/* Prefer using `getpassfd(3)' because I feel like that one's more
 	 * user-friendly.  - But if it's not available, fall back on using
 	 * the regular, old `readpassphrase(3)' */
@@ -73,20 +73,20 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass_r))(char const *__prompt, cha
 #else /* __GETPASS_ECHO_NL */
 	return (__NAMESPACE_LOCAL_SYM __localdep_getpassfd)(__prompt, __buf, __bufsize, __NULLPTR, 0, 0);
 #endif /* !__GETPASS_ECHO_NL */
-#else /* __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read */
+#else /* __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read */
 #ifdef __RPP_ECHO_OFF
 	return (__NAMESPACE_LOCAL_SYM __localdep_readpassphrase)(__prompt, __buf, __bufsize, __RPP_ECHO_OFF);
 #else /* __RPP_ECHO_OFF */
 	return (__NAMESPACE_LOCAL_SYM __localdep_readpassphrase)(__prompt, __buf, __bufsize, 0);
 #endif /* !__RPP_ECHO_OFF */
-#endif /* !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read */
+#endif /* !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getpass_r_defined
 #define __local___localdep_getpass_r_defined
 #define __localdep_getpass_r __LIBC_LOCAL_NAME(getpass_r)
 #endif /* !__local___localdep_getpass_r_defined */
-#else /* __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE_readpassphrase */
+#else /* __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read || __CRT_HAVE_readpassphrase */
 #undef __local_getpass_r_defined
-#endif /* !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE_readpassphrase */
+#endif /* !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read && !__CRT_HAVE_readpassphrase */
 #endif /* !__local_getpass_r_defined */

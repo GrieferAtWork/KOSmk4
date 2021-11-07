@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0ed5c58 */
+/* HASH CRC-32:0xf928b255 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,24 @@
 #define __local_sigignore_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
-#if defined(__SIG_IGN) && defined(__SIG_ERR) && defined(__CRT_HAVE_bsd_signal)
+#if defined(__SIG_IGN) && defined(__SIG_ERR) && (defined(__CRT_HAVE_bsd_signal) || defined(__CRT_HAVE___bsd_signal))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bsd_signal_defined
 #define __local___localdep_bsd_signal_defined
+#ifdef __CRT_HAVE_bsd_signal
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigaction.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__localdep_bsd_signal,(__signo_t __signo, __sighandler_t __handler),bsd_signal,(__signo,__handler))
+#elif defined(__CRT_HAVE___bsd_signal)
+__NAMESPACE_LOCAL_END
+#include <bits/os/sigaction.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__localdep_bsd_signal,(__signo_t __signo, __sighandler_t __handler),__bsd_signal,(__signo,__handler))
+#else /* ... */
+#undef __local___localdep_bsd_signal_defined
+#endif /* !... */
 #endif /* !__local___localdep_bsd_signal_defined */
 __LOCAL_LIBC(sigignore) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigignore))(__signo_t __signo) {
@@ -41,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_sigignore_defined
 #define __localdep_sigignore __LIBC_LOCAL_NAME(sigignore)
 #endif /* !__local___localdep_sigignore_defined */
-#else /* __SIG_IGN && __SIG_ERR && __CRT_HAVE_bsd_signal */
+#else /* __SIG_IGN && __SIG_ERR && (__CRT_HAVE_bsd_signal || __CRT_HAVE___bsd_signal) */
 #undef __local_sigignore_defined
-#endif /* !__SIG_IGN || !__SIG_ERR || !__CRT_HAVE_bsd_signal */
+#endif /* !__SIG_IGN || !__SIG_ERR || (!__CRT_HAVE_bsd_signal && !__CRT_HAVE___bsd_signal) */
 #endif /* !__local_sigignore_defined */

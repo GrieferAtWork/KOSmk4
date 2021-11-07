@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa938b97e */
+/* HASH CRC-32:0x4878e296 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,11 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL __localdep_scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf");
+#elif defined(__CRT_HAVE__IO_scanf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL __localdep_scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_scanf");
 #elif defined(__CRT_HAVE_scanf_unlocked)
 __NAMESPACE_LOCAL_END
 #include <features.h>

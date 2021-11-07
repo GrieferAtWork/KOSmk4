@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a276ad5 */
+/* HASH CRC-32:0x5560005b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,13 +200,16 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__re
 #elif defined(__CRT_HAVE___adjtimex) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),(__ntx))
+#elif defined(__CRT_HAVE___libc_adjtimex) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> adjtimex(2), adjtimex64(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),__libc_adjtimex,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),__adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+#elif (defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #include <libc/local/sys.timex/adjtimex.h>
 /* >> adjtimex(2), adjtimex64(2) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __adjtimex)(struct timex *__restrict __ntx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex))(__ntx); }
@@ -217,13 +220,16 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restr
 #elif defined(__CRT_HAVE___adjtimex) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),__adjtimex,(__ntx))
+#elif defined(__CRT_HAVE___libc_adjtimex) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> adjtimex(2), adjtimex64(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),__libc_adjtimex,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),__adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+#elif (defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #include <libc/local/sys.timex/adjtimex.h>
 /* >> adjtimex(2), adjtimex64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(adjtimex, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL adjtimex)(struct timex *__restrict __ntx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex))(__ntx); })
@@ -258,6 +264,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__
 #elif defined(__CRT_HAVE___adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> adjtimex(2), adjtimex64(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__restrict __ntx),__adjtimex,(__ntx))
+#elif defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> adjtimex(2), adjtimex64(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__restrict __ntx),__libc_adjtimex,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex64)
 /* >> adjtimex(2), adjtimex64(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__restrict __ntx),(__ntx))

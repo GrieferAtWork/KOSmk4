@@ -642,7 +642,7 @@ int dos_mkdir([[nonnull]] char const *pathname);
 
 
 @@>> mkdir(2)
-[[cp, guard, userimpl, decl_include("<bits/types.h>")]]
+[[cp, guard, userimpl, decl_include("<bits/types.h>"), export_alias("__mkdir", "__libc_mkdir")]]
 [[requires(defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir))]]
 int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
 	(void)mode;
@@ -651,7 +651,8 @@ int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
 
 
 @@>> chmod(2)
-[[cp, guard, dos_only_export_alias("_chmod"), decl_include("<bits/types.h>")]]
+[[cp, guard, decl_include("<bits/types.h>")]]
+[[dos_only_export_alias("_chmod"), export_alias("__chmod", "__libc_chmod")]]
 int chmod([[nonnull]] char const *filename, $mode_t mode);
 
 
@@ -671,6 +672,7 @@ int lchmod([[nonnull]] char const *filename, $mode_t mode);
 @@>> umask(2)
 [[guard, dos_only_export_alias("_umask")]]
 [[decl_include("<bits/types.h>")]]
+[[export_alias("__umask", "__libc_umask")]]
 $mode_t umask($mode_t mode);
 
 
@@ -732,6 +734,7 @@ int mkfifoat($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode);
 %#ifdef __USE_POSIX
 @@>> fchmod(2)
 [[cp, decl_include("<bits/types.h>")]]
+[[export_alias("__fchmod", "__libc_fchmod")]]
 int fchmod($fd_t fd, $mode_t mode);
 %#endif /* __USE_POSIX */
 

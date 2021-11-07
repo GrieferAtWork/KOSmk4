@@ -141,7 +141,9 @@ NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbe3d13f6]]]*/
+/*[[[start:exports,hash:CRC-32=0x39cdd95d]]]*/
+DEFINE_PUBLIC_ALIAS(__utime, libc_utime);
+DEFINE_PUBLIC_ALIAS(__libc_utime, libc_utime);
 DEFINE_PUBLIC_ALIAS(_utime32, libc_utime);
 DEFINE_PUBLIC_ALIAS(utime, libc_utime);
 DEFINE_PUBLIC_ALIAS(_utime64, libc_utime64);

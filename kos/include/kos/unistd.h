@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f5e2525 */
+/* HASH CRC-32:0x31d2b0ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -241,7 +241,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Write,(__fd_t __fd, void co
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,ReadAll,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #else /* __CRT_HAVE_ReadAll */
 #include <bits/types.h>
-#if defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
+#if defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek))
 #include <libc/local/kos.unistd/ReadAll.h>
 /* >> readall(3)
  * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
@@ -251,7 +251,7 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,ReadAll,(__fd_t __fd, void *__b
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL ReadAll)(__fd_t __fd, void *__buf, size_t __bufsize) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ReadAll))(__fd, __buf, __bufsize); })
-#endif /* __CRT_HAVE_Read && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) */
+#endif /* __CRT_HAVE_Read && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) */
 #endif /* !__CRT_HAVE_ReadAll */
 #endif /* __USE_KOS */
 #include <bits/types.h>

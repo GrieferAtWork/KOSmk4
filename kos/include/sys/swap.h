@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda7a4bae */
+/* HASH CRC-32:0x3b2aeac1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,11 +57,22 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifdef __CRT_HAVE_swapon
 /* >> swapon(2)
  * @param swapflags: Set of `SWAP_FLAG_*' */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),(__path,__swapflags))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),(__path,__swapflags))
+#elif defined(__CRT_HAVE___libc_swapon)
+/* >> swapon(2)
+ * @param swapflags: Set of `SWAP_FLAG_*' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),__libc_swapon,(__path,__swapflags))
+#endif /* ... */
+#ifdef __CRT_HAVE_swapoff
 /* >> swapoff(2) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapoff,(char const *__path),(__path))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapoff,(char const *__path),(__path))
+#elif defined(__CRT_HAVE___libc_swapoff)
+/* >> swapoff(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapoff,(char const *__path),__libc_swapoff,(__path))
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

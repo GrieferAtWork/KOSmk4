@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x426fcd7f */
+/* HASH CRC-32:0xcbaf498 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_lseek64_defined
 #define __local_lseek64_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#if defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lseek32_defined
@@ -41,6 +41,11 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___libc_lseek)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
 #else /* ... */
 #undef __local___localdep_lseek32_defined
 #endif /* !... */
@@ -54,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lseek64_defined
 #define __localdep_lseek64 __LIBC_LOCAL_NAME(lseek64)
 #endif /* !__local___localdep_lseek64_defined */
-#else /* __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
+#else /* __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek */
 #undef __local_lseek64_defined
-#endif /* !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek */
+#endif /* !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE___libc_lseek */
 #endif /* !__local_lseek64_defined */

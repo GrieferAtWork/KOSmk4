@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fd16819 */
+/* HASH CRC-32:0xac96280d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,8 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
+#elif defined(__CRT_HAVE___libc_close)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__libc_close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
 #endif /* !... */
@@ -65,10 +67,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopendirat))(__fd_t __dirfd, char con
 	if __unlikely(__fd < 0)
 		return __NULLPTR;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_fdopendir)(__fd);
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
+#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
 	if __unlikely(!__result)
 		(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
+#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */
 	return __result;
 }
 __NAMESPACE_LOCAL_END

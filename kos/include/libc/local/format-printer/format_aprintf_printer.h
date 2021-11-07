@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc82a0670 */
+/* HASH CRC-32:0xa1686711 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_format_aprintf_printer_defined
 #define __local_format_aprintf_printer_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
+#if defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_END
 struct format_aprintf_data;
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_format_aprintf_alloc,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars),format_aprintf_alloc,(__self,__num_chars))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_aprintf_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_format_aprintf_printer_defined
 #define __localdep_format_aprintf_printer __LIBC_LOCAL_NAME(format_aprintf_printer)
 #endif /* !__local___localdep_format_aprintf_printer_defined */
-#else /* __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc */
+#else /* __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc */
 #undef __local_format_aprintf_printer_defined
-#endif /* !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc */
+#endif /* !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc */
 #endif /* !__local_format_aprintf_printer_defined */

@@ -498,7 +498,7 @@ $errno_t dos_ctime64_s([[nonnull]] char buf[26], $size_t bufsize,
 
 
 [[ignore, nocrt, decl_include("<bits/types.h>")]]
-[[doc_alias("time"), alias("time", "_time32")]]
+[[doc_alias("time"), alias("time", "__time", "__libc_time", "_time32")]]
 $time32_t time32([[nullable]] $time32_t *timer);
 
 [[decl_include("<bits/types.h>")]]
@@ -533,8 +533,8 @@ $time32_t mktime32([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
 
 @@>> time(2), time64(2)
 @@Return the current time and put it in `*timer' if `timer' is not `NULL'
-[[std, decl_include("<bits/types.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("time", "_time32")]]
+[[std, decl_include("<bits/types.h>"), no_crt_self_import, export_as("__time", "__libc_time")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("time", "__time", "__libc_time", "_time32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("time64", "_time64")]]
 [[userimpl, requires($has_function(time32) || $has_function(time64))]]
 time_t time(time_t *timer) {
@@ -751,6 +751,7 @@ $errno_t asctime_s([[outp(buflen)]] char *__restrict buf, size_t buflen,
 %#ifdef __USE_TIME64
 [[decl_include("<bits/types.h>")]]
 [[preferred_time64_variant_of(time), doc_alias("time")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__time", "__libc_time")]]
 [[dos_only_export_alias("_time64")]]
 [[userimpl, requires_function(time32)]]
 $time64_t time64($time64_t *timer) {
@@ -999,13 +1000,13 @@ __LIBC __LONGPTR_TYPE__ timezone __ASMNAME("__timezone");
 %#ifdef __USE_MISC
 
 [[decl_include("<bits/types.h>")]]
-[[doc_alias("stime"), ignore, nocrt, alias("stime")]]
+[[doc_alias("stime"), ignore, nocrt, alias("stime", "__stime", "__libc_stime")]]
 int stime32([[nonnull]] $time32_t const *when);
 
 @@>> stime(2), stime64(2)
 @@Set the system time to `*when'. This call is restricted to the superuser
-[[guard, decl_include("<bits/types.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("stime")]]
+[[guard, decl_include("<bits/types.h>"), no_crt_self_import, export_as("__stime", "__libc_stime")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("stime", "__stime", "__libc_stime")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("stime64")]]
 [[userimpl, requires($has_function(stime32) || $has_function("stime64"))]]
 int stime([[nonnull]] $time_t const *when) {
@@ -1071,6 +1072,7 @@ int dysize(__STDC_INT_AS_UINT_T year) {
 %#ifdef __USE_TIME64
 [[decl_include("<bits/types.h>")]]
 [[preferred_time64_variant_of(stime), doc_alias("stime")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__stime", "__libc_stime")]]
 [[userimpl, requires_function(stime32)]]
 int stime64([[nonnull]] $time64_t const *when) {
 	time32_t tms = (time32_t)*when;
@@ -1105,17 +1107,16 @@ timelocal64(*) = mktime64;
 %
 %#ifdef __USE_POSIX199309
 
-[[cp, doc_alias("nanosleep"), ignore, nocrt, alias("nanosleep", "__nanosleep")]]
+[[cp, doc_alias("nanosleep"), ignore, nocrt, alias("nanosleep", "__nanosleep", "__libc_nanosleep")]]
 int nanosleep32([[nonnull]] struct timespec const *requested_time,
                 [[nullable]] struct $timespec32 *remaining);
 
 @@>> nanosleep(2), nanosleep64(2)
 @@Pause execution for a number of nanoseconds
-[[cp, decl_include("<bits/os/timespec.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("nanosleep", "__nanosleep")]]
+[[cp, decl_include("<bits/os/timespec.h>"), no_crt_self_import, export_as("__nanosleep", "__libc_nanosleep")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("nanosleep", "__nanosleep", "__libc_nanosleep")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("nanosleep64")]]
 [[userimpl, requires($has_function(nanosleep32) || $has_function(nanosleep64))]]
-[[export_as("__nanosleep")]]
 int nanosleep([[nonnull]] struct timespec const *requested_time,
               [[nullable]] struct timespec *remaining) {
 @@pp_if $has_function(nanosleep32)@@
@@ -1396,6 +1397,7 @@ int clock_getcpuclockid(pid_t pid, clockid_t *clock_id);
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(nanosleep), doc_alias("nanosleep")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__nanosleep", "__libc_nanosleep")]]
 [[userimpl, requires_function(nanosleep32)]]
 int nanosleep64([[nonnull]] struct timespec64 const *__restrict requested_time,
                 [[nullable]] struct timespec64 *remaining) {
@@ -1413,6 +1415,7 @@ int nanosleep64([[nonnull]] struct timespec64 const *__restrict requested_time,
 
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(clock_getres), doc_alias("clock_getres")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__clock_getres")]]
 [[userimpl, requires($has_function(clock_getres32))]]
 int clock_getres64(clockid_t clock_id, [[nonnull]] struct timespec64 *res) {
 	int result;
@@ -1427,6 +1430,7 @@ int clock_getres64(clockid_t clock_id, [[nonnull]] struct timespec64 *res) {
 
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(clock_gettime), doc_alias("clock_gettime")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__clock_gettime")]]
 [[userimpl, requires_function(clock_gettime32)]]
 int clock_gettime64(clockid_t clock_id, [[nonnull]] struct timespec64 *tp) {
 	int result;
@@ -1441,6 +1445,7 @@ int clock_gettime64(clockid_t clock_id, [[nonnull]] struct timespec64 *tp) {
 
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(clock_settime), doc_alias("clock_settime")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__clock_settime")]]
 [[userimpl, requires_function(clock_settime32)]]
 int clock_settime64(clockid_t clock_id, [[nonnull]] struct timespec64 const *tp) {
 	struct timespec32 tp32;

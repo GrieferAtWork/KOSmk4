@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d506c10 */
+/* HASH CRC-32:0x4f0ea119 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,20 @@
 #define __local_thrd_sleep64_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
+#if defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nanosleep64_defined
 #define __local___localdep_nanosleep64_defined
 #if defined(__CRT_HAVE_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep,(__requested_time,__remaining))
+#elif defined(__CRT_HAVE___nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),__nanosleep,(__requested_time,__remaining))
+#elif defined(__CRT_HAVE___libc_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),__libc_nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep64,(__requested_time,__remaining))
-#elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
+#elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/nanosleep64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -46,7 +50,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_thrd_sleep32,(struc
 #endif /* !__local___localdep_thrd_sleep32_defined && __CRT_HAVE_thrd_sleep */
 __LOCAL_LIBC(thrd_sleep64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 const *__time_point, struct __timespec64 *__remaining) {
-#if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
+#if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 	int __result;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_nanosleep64)(__time_point, __remaining);
 	if __likely(__result == 0)
@@ -56,7 +60,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 co
 		return -1;
 #endif /* __libc_geterrno && __EINTR */
 	return -2;
-#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
+#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
 	int __result;
 	struct __timespec32 __tp32;
 	struct __timespec32 __rem32;
@@ -68,14 +72,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 co
 		__remaining->tv_nsec = __rem32.tv_nsec;
 	}
 	return __result;
-#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep */
+#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_thrd_sleep64_defined
 #define __local___localdep_thrd_sleep64_defined
 #define __localdep_thrd_sleep64 __LIBC_LOCAL_NAME(thrd_sleep64)
 #endif /* !__local___localdep_thrd_sleep64_defined */
-#else /* __CRT_HAVE_thrd_sleep || __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
+#else /* __CRT_HAVE_thrd_sleep || __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
 #undef __local_thrd_sleep64_defined
-#endif /* !__CRT_HAVE_thrd_sleep && !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep */
+#endif /* !__CRT_HAVE_thrd_sleep && !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
 #endif /* !__local_thrd_sleep64_defined */

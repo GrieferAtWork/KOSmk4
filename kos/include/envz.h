@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf44ef50f */
+/* HASH CRC-32:0xf12ba642 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,7 +134,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(envz_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * the entry created  doesn't have a  value-portion (i.e. `name'  is
  * added to `penvz' as-is, without the trailing `=value') */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,envz_add,(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name, char const *__value),(__penvz,__penvz_len,__name,__value))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/envz/envz_add.h>
 /* >> envz_add(3)
  * Add an entry `name=value' to `penvz'. If another entry for `name'
@@ -152,7 +152,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(envz_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * on `override_', which if non-zero will cause existing entries to be
  * overwritten, and otherwise if zero, will cause them to stay. */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,envz_merge,(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __envz2, size_t __envz2_len, int __override_),(__penvz,__penvz_len,__envz2,__envz2_len,__override_))
-#elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/envz/envz_merge.h>
 /* >> envz_merge(3)
  * Add all entries from `envz2' to `penvz', as though `envz_add()' was

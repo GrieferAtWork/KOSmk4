@@ -704,7 +704,7 @@ int remove([[nonnull]] char const *filename) {
 @@>> rename(2)
 @@Rename  a given file `oldname' to `newname_or_path', or in the event
 @@that `newname_or_path' refers to a directory, place the file within.
-[[cp, std, guard]]
+[[cp, std, guard, export_alias("__rename", "__libc_rename")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(renameat))]]
 int rename([[nonnull]] char const *oldname,
@@ -847,7 +847,7 @@ int putchar(int ch) {
 @@Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred.
 [[std, cp_stdio, wunused, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgets_unlocked")]]
-[[alias("fgets_unlocked"), impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
+[[export_alias("_IO_fgets"), alias("fgets_unlocked"), impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
 [[requires($has_function(fgetc) && $has_function(ungetc) && $has_function(ferror))]]
 char *fgets([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
             __STDC_INT_AS_SIZE_T bufsize, [[nonnull]] FILE *__restrict stream) {
@@ -1104,7 +1104,7 @@ int ferror([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 @@>> } else {
 @@>>     fprintf(stderr, "%s\n", strerror(errno));
 @@>> }
-[[cp, std, guard]]
+[[cp, std, guard, export_alias("_IO_perror")]]
 [[section(".text.crt{|.dos}.errno.utility")]]
 [[requires_include("<__crt.h>", "<libc/errno.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
@@ -1343,7 +1343,7 @@ __STDC_INT_AS_SIZE_T vscanf([[nonnull]] char const *__restrict format, $va_list 
 [[decl_include("<features.h>")]]
 [[std, cp_stdio, crtbuiltin, ATTR_LIBC_SCANF(2, 3), wunused]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fscanf_unlocked")]]
-[[section(".text.crt{|.dos}.FILE.locked.read.scanf"), alias("fscanf_unlocked")]]
+[[export_alias("_IO_fscanf"), alias("fscanf_unlocked"), section(".text.crt{|.dos}.FILE.locked.read.scanf")]]
 __STDC_INT_AS_SIZE_T fscanf([[nonnull]] FILE *__restrict stream,
                             [[nonnull]] char const *__restrict format, ...)
 	%{printf("vfscanf")}
@@ -1351,10 +1351,9 @@ __STDC_INT_AS_SIZE_T fscanf([[nonnull]] FILE *__restrict stream,
 @@>> scanf(3), vscanf(3)
 @@Scan data from `stdin', following `format'
 @@Return the number of successfully scanned data items
-[[decl_include("<features.h>")]]
-[[std, cp_stdio, crtbuiltin, ATTR_LIBC_SCANF(1, 2), wunused]]
+[[std, cp_stdio, crtbuiltin, ATTR_LIBC_SCANF(1, 2), wunused, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("scanf_unlocked")]]
-[[section(".text.crt{|.dos}.FILE.locked.read.scanf"), alias("scanf_unlocked")]]
+[[section(".text.crt{|.dos}.FILE.locked.read.scanf"), export_alias("_IO_scanf"), alias("scanf_unlocked")]]
 __STDC_INT_AS_SIZE_T scanf([[nonnull]] char const *__restrict format, ...)
 	%{printf("vscanf")}
 
@@ -1448,7 +1447,7 @@ __LOCAL_LIBC(@vsc32scanf_ungetc@) ssize_t
 [[dependency(unicode_readutf8, unicode_readutf8_rev), doc_alias("sscanf")]]
 [[impl_include("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")]]
 [[impl_prefix(DEFINE_VSSCANF_HELPERS_C8), alias("_vsscanf", "_vsscanf_s")]]
-[[section(".text.crt{|.dos}.unicode.static.format.scanf"), export_alias("__vsscanf")]]
+[[section(".text.crt{|.dos}.unicode.static.format.scanf"), export_alias("__vsscanf", "_IO_vsscanf")]]
 __STDC_INT_AS_SIZE_T vsscanf([[nonnull]] char const *__restrict input,
                              [[nonnull]] char const *__restrict format, $va_list args) {
 	char const *input_pointer = input;
@@ -1837,10 +1836,10 @@ $FILE *open_memstream(char **bufloc, $size_t *sizeloc);
 %[insert:function(__getdelim = getdelim)]
 
 @@>> getdelim(3)
-[[cp_stdio, wunused, alias("getdelim_unlocked"), export_alias("__getdelim")]]
+[[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("getdelim_unlocked")]]
+[[alias("getdelim_unlocked"), export_alias("__getdelim", "_IO_getdelim")]]
 [[requires_function(realloc, fgetc, ungetc)]]
-[[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<asm/crt/stdio.h>", "<hybrid/__assert.h>")]]
 $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
                   [[nonnull]] $size_t *__restrict pcount, int delimiter,
@@ -1889,9 +1888,10 @@ $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
 }
 
 @@>> getline(3)
-[[cp_stdio, wunused, alias("getline_unlocked")]]
+[[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("getline_unlocked")]]
-[[requires_function(getdelim), decl_include("<hybrid/typecore.h>")]]
+[[alias("getline_unlocked"), export_alias("__getline", "_IO_getline")]]
+[[requires_function(getdelim)]]
 $ssize_t getline([[nonnull]] char **__restrict lineptr,
                  [[nonnull]] $size_t *__restrict pcount,
                  [[nonnull]] $FILE *__restrict stream) {
@@ -2890,7 +2890,7 @@ int ungetc_unlocked(int ch, [[nonnull]] $FILE *__restrict stream) {
 	return ungetc(ch, stream);
 }
 
-[[cp_stdio, wunused, alias("getdelim"), doc_alias("getdelim")]]
+[[cp_stdio, wunused, alias("getdelim", "__getdelim", "_IO_getdelim"), doc_alias("getdelim")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
 [[requires_function(realloc, fgetc_unlocked, ungetc_unlocked)]]
 [[impl_include("<asm/crt/stdio.h>", "<hybrid/__assert.h>")]]
@@ -2944,7 +2944,7 @@ err:
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, wunused, alias("getline")]]
+[[cp_stdio, wunused, alias("getline", "__getline", "_IO_getline")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
 [[requires_function(getdelim_unlocked)]]
 $ssize_t getline_unlocked([[nonnull]] char **__restrict lineptr,

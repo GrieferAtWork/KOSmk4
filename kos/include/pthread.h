@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2c9a568 */
+/* HASH CRC-32:0x79323aae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1052,6 +1052,14 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),())
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),__sched_yield,())
+#elif defined(__CRT_HAVE___libc_sched_yield)
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
+ * Yield  the processor to another thread or process.
+ * This function is similar to the POSIX `sched_yield' function but
+ * might  be differently implemented in the case of a m-on-n thread
+ * implementation
+ * @return: EOK: Success */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),__libc_sched_yield,())
 #elif defined(__CRT_HAVE_yield)
 /* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
  * Yield  the processor to another thread or process.
@@ -2374,7 +2382,7 @@ __CDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),())
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
-#elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
+#elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the

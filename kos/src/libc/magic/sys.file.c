@@ -113,6 +113,7 @@ __SYSDECL_BEGIN
 @@>> flock(2)
 @@Apply or remove an advisory lock, according to `operation', on the file `fd' refers to
 [[cp, decl_include("<features.h>", "<bits/types.h>")]]
+[[export_alias("__flock")]]
 int flock($fd_t fd, __STDC_INT_AS_UINT_T operation);
 
 %{

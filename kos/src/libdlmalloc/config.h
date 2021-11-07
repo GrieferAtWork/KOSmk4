@@ -203,21 +203,35 @@ DL_REGISTER_CACHE(dl_clear_caches) {
 #endif /* !CONFIG_DLMALLOC_EXPORT_AS_INTERN */
 #endif /* !DEFINE_DL_EXPORT_ALIAS */
 
+#undef __libc_malloc
+#undef __libc_calloc
+#undef __libc_free
+#undef __libc_realloc
+#undef __libc_memalign
+#undef __libc_valloc
+DEFINE_DL_EXPORT_ALIAS(__libc_malloc, dlmalloc);
 DEFINE_DL_EXPORT_ALIAS(malloc, dlmalloc);
+DEFINE_DL_EXPORT_ALIAS(__libc_free, dlfree);
 DEFINE_DL_EXPORT_ALIAS(free, dlfree);
 DEFINE_DL_EXPORT_ALIAS(cfree, dlfree);
+DEFINE_DL_EXPORT_ALIAS(__libc_calloc, dlcalloc);
 DEFINE_DL_EXPORT_ALIAS(calloc, dlcalloc);
+DEFINE_DL_EXPORT_ALIAS(__libc_realloc, dlrealloc);
 DEFINE_DL_EXPORT_ALIAS(realloc, dlrealloc);
 DEFINE_DL_EXPORT_ALIAS(realloc_in_place, dlrealloc_in_place);
+DEFINE_DL_EXPORT_ALIAS(__libc_memalign, dlmemalign);
 DEFINE_DL_EXPORT_ALIAS(memalign, dlmemalign);
 DEFINE_DL_EXPORT_ALIAS(aligned_alloc, dlmemalign);
 DEFINE_DL_EXPORT_ALIAS(posix_memalign, dlposix_memalign);
+DEFINE_DL_EXPORT_ALIAS(__libc_valloc, dlvalloc);
 DEFINE_DL_EXPORT_ALIAS(valloc, dlvalloc);
+DEFINE_DL_EXPORT_ALIAS(__libc_mallopt, dlmallopt);
 DEFINE_DL_EXPORT_ALIAS(mallopt, dlmallopt);
 DEFINE_DL_EXPORT_ALIAS(malloc_footprint, dlmalloc_footprint);
 DEFINE_DL_EXPORT_ALIAS(malloc_max_footprint, dlmalloc_max_footprint);
 DEFINE_DL_EXPORT_ALIAS(malloc_footprint_limit, dlmalloc_footprint_limit);
 DEFINE_DL_EXPORT_ALIAS(malloc_set_footprint_limit, dlmalloc_set_footprint_limit);
+DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, dlmallinfo);
 DEFINE_DL_EXPORT_ALIAS(mallinfo, dlmallinfo);
 DEFINE_DL_EXPORT_ALIAS(independent_calloc, dlindependent_calloc);
 DEFINE_DL_EXPORT_ALIAS(independent_comalloc, dlindependent_comalloc);

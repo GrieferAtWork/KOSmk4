@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf058360 */
+/* HASH CRC-32:0x6e14fa25 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_execv_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
-#if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ)
+#if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__LOCAL_environ)
 #include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS_ALTERATIONS
@@ -42,6 +42,10 @@ __CEIREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(cha
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),execve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__execve)
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),_execve,(__path,___argv,___envp))
+#elif defined(__CRT_HAVE___execve)
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),__execve,(__path,___argv,___envp))
+#elif defined(__CRT_HAVE___libc_execve)
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),__libc_execve,(__path,___argv,___envp))
 #else /* ... */
 #undef __local___localdep_execve_defined
 #endif /* !... */
@@ -55,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_execv_defined
 #define __localdep_execv __LIBC_LOCAL_NAME(execv)
 #endif /* !__local___localdep_execv_defined */
-#else /* (__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ */
+#else /* (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __LOCAL_environ */
 #undef __local_execv_defined
-#endif /* (!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__LOCAL_environ */
+#endif /* (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__LOCAL_environ */
 #endif /* !__local_execv_defined */

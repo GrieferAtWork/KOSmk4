@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x650b962e */
+/* HASH CRC-32:0x7e26d4cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,52 @@
 #define __local_tcsetsid_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
-#if defined(__CRT_HAVE_ioctl) && defined(__TIOCSCTTY)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCSCTTY)
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_getsid_defined) && defined(__CRT_HAVE_getsid)
+#ifndef __local___localdep_getsid_defined
 #define __local___localdep_getsid_defined
+#ifdef __CRT_HAVE_getsid
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getsid,(__pid_t __pid),getsid,(__pid))
-#endif /* !__local___localdep_getsid_defined && __CRT_HAVE_getsid */
+#elif defined(__CRT_HAVE___getsid)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getsid,(__pid_t __pid),__getsid,(__pid))
+#elif defined(__CRT_HAVE___libc_getsid)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getsid,(__pid_t __pid),__libc_getsid,(__pid))
+#else /* ... */
+#undef __local___localdep_getsid_defined
+#endif /* !... */
+#endif /* !__local___localdep_getsid_defined */
 #ifndef __local___localdep_ioctl_defined
 #define __local___localdep_ioctl_defined
+#ifdef __CRT_HAVE_ioctl
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#else /* ... */
+#undef __local___localdep_ioctl_defined
+#endif /* !... */
 #endif /* !__local___localdep_ioctl_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
@@ -61,7 +91,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_tcsetsid_defined
 #define __localdep_tcsetsid __LIBC_LOCAL_NAME(tcsetsid)
 #endif /* !__local___localdep_tcsetsid_defined */
-#else /* __CRT_HAVE_ioctl && __TIOCSCTTY */
+#else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSCTTY */
 #undef __local_tcsetsid_defined
-#endif /* !__CRT_HAVE_ioctl || !__TIOCSCTTY */
+#endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TIOCSCTTY */
 #endif /* !__local_tcsetsid_defined */

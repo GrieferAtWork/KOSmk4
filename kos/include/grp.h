@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6e6bf15 */
+/* HASH CRC-32:0x9e30e2e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,11 +120,21 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetgrent_r,(__FIL
 #ifdef __USE_MISC
 /* >> fgetgrent(3), fgetgrent_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,fgetgrent,(__FILE *__restrict __stream),(__stream))
-#if !defined(__setgroups_defined) && defined(__CRT_HAVE_setgroups)
+#ifndef __setgroups_defined
 #define __setgroups_defined
+#ifdef __CRT_HAVE_setgroups
 /* >> setgroups(2) */
 __CDECLARE(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
-#endif /* !__setgroups_defined && __CRT_HAVE_setgroups */
+#elif defined(__CRT_HAVE___setgroups)
+/* >> setgroups(2) */
+__CREDIRECT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__setgroups,(__count,__groups))
+#elif defined(__CRT_HAVE___libc_setgroups)
+/* >> setgroups(2) */
+__CREDIRECT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
+#else /* ... */
+#undef __setgroups_defined
+#endif /* !... */
+#endif /* !__setgroups_defined */
 #if !defined(__getgrouplist_defined) && defined(__CRT_HAVE_getgrouplist)
 #define __getgrouplist_defined
 /* >> getgrouplist(3) */

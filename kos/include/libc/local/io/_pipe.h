@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x483de49e */
+/* HASH CRC-32:0x8637fddf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,14 @@
 #ifndef __local__pipe_defined
 #define __local__pipe_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
+#if defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pipe2_defined
 #define __local___localdep_pipe2_defined
 #ifdef __CRT_HAVE_pipe2
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
-#elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
+#elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pipe2.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__pipe_defined
 #define __localdep__pipe __LIBC_LOCAL_NAME(_pipe)
 #endif /* !__local___localdep__pipe_defined */
-#else /* __CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe */
+#else /* __CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE___libc_pipe || __CRT_HAVE__pipe */
 #undef __local__pipe_defined
-#endif /* !__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe */
+#endif /* !__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE___libc_pipe && !__CRT_HAVE__pipe */
 #endif /* !__local__pipe_defined */

@@ -206,15 +206,22 @@ NOTHROW_NCX(LIBCCALL libc_setpriority)(__priority_which_t which,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x87c1c3e3]]]*/
+/*[[[start:exports,hash:CRC-32=0xda0b99f9]]]*/
 DEFINE_PUBLIC_ALIAS(prlimit, libc_prlimit);
 DEFINE_PUBLIC_ALIAS(prlimit64, libc_prlimit64);
 DEFINE_PUBLIC_ALIAS(__getrlimit, libc_getrlimit);
+DEFINE_PUBLIC_ALIAS(__libc_getrlimit, libc_getrlimit);
 DEFINE_PUBLIC_ALIAS(getrlimit, libc_getrlimit);
+DEFINE_PUBLIC_ALIAS(__setrlimit, libc_setrlimit);
+DEFINE_PUBLIC_ALIAS(__libc_setrlimit, libc_setrlimit);
 DEFINE_PUBLIC_ALIAS(setrlimit, libc_setrlimit);
+DEFINE_PUBLIC_ALIAS(__getrusage, libc_getrusage);
+DEFINE_PUBLIC_ALIAS(__libc_getrusage, libc_getrusage);
 DEFINE_PUBLIC_ALIAS(getrusage, libc_getrusage);
 DEFINE_PUBLIC_ALIAS(getrusage64, libc_getrusage64);
 DEFINE_PUBLIC_ALIAS(getpriority, libc_getpriority);
+DEFINE_PUBLIC_ALIAS(__setpriority, libc_setpriority);
+DEFINE_PUBLIC_ALIAS(__libc_setpriority, libc_setpriority);
 DEFINE_PUBLIC_ALIAS(setpriority, libc_setpriority);
 DEFINE_PUBLIC_ALIAS(getrlimit64, libc_getrlimit64);
 DEFINE_PUBLIC_ALIAS(setrlimit64, libc_setrlimit64);

@@ -48,7 +48,9 @@ NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x988f5825]]]*/
+/*[[[start:exports,hash:CRC-32=0x8612bfee]]]*/
+DEFINE_PUBLIC_ALIAS(__acct, libc_acct);
+DEFINE_PUBLIC_ALIAS(__libc_acct, libc_acct);
 DEFINE_PUBLIC_ALIAS(acct, libc_acct);
 /*[[[end:exports]]]*/
 

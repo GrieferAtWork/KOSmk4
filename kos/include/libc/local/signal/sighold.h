@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab5b0c87 */
+/* HASH CRC-32:0x1500f50f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_sighold_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
-#if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_set_single_signal_masked_defined
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_sighold_defined
 #define __localdep_sighold __LIBC_LOCAL_NAME(sighold)
 #endif /* !__local___localdep_sighold_defined */
-#else /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) */
+#else /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask) */
 #undef __local_sighold_defined
-#endif /* !__SIG_BLOCK || (!__CRT_HAVE_sigprocmask && !__CRT_HAVE_pthread_sigmask) */
+#endif /* !__SIG_BLOCK || (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask) */
 #endif /* !__local_sighold_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dcbfe28 */
+/* HASH CRC-32:0x9ff10ead */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,6 +103,7 @@
 #define __stub___acosh
 #define __stub_acosh
 #define __stub___adjtimex
+#define __stub___libc_adjtimex
 #define __stub_adjtimex
 #define __stub___adjtimex64
 #define __stub_adjtimex64
@@ -208,6 +209,7 @@
 #define __stub_endprotoent
 #define __stub_endrpcent
 #define __stub_endservent
+#define __stub___endspent
 #define __stub_endspent
 #define __stub_endttyent
 #define __stub_endusershell
@@ -323,8 +325,10 @@
 #define __stub_getservent
 #define __stub_getservent_r
 #define __stub_getsourcefilter
+#define __stub___getspent
 #define __stub_getspent
 #define __stub_getspent_r
+#define __stub___getspnam
 #define __stub_getspnam
 #define __stub_getspnam_r
 #define __stub_getttyent
@@ -380,6 +384,7 @@
 #define __stub_inet_ntop
 #define __stub_inet_pton
 #define __stub_initgroups
+#define __stub___initstate
 #define __stub_initstate
 #define __stub_initstate_r
 #define __stub_innetgr
@@ -395,6 +400,7 @@
 #define __stub_jrand48
 #define __stub_jrand48_r
 #define __stub_klogctl
+#define __stub___lckpwdf
 #define __stub_lckpwdf
 #define __stub_lcong48
 #define __stub_lcong48_r
@@ -528,7 +534,9 @@
 #define __stub_setrpcent
 #define __stub_setservent
 #define __stub_setsourcefilter
+#define __stub___setspent
 #define __stub_setspent
+#define __stub___setstate
 #define __stub_setstate
 #define __stub_setstate_r
 #define __stub_setttyent
@@ -570,6 +578,7 @@
 #define __stub_tmpnam
 #define __stub_ttyslot
 #define __stub_tzset
+#define __stub___ulckpwdf
 #define __stub_ulckpwdf
 #define __stub_updwtmp
 #define __stub_updwtmpx
@@ -579,6 +588,8 @@
 #define __stub_utmpxname
 #define __stub_vfwscanf
 #define __stub_vfwscanf_unlocked
+#define __stub___vhangup
+#define __stub___libc_vhangup
 #define __stub_vhangup
 #define __stub_wcsnrtombs
 #define __stub_wfreadlinkat

@@ -262,7 +262,7 @@ NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x61a9e11e]]]*/
+/*[[[start:exports,hash:CRC-32=0x64e41340]]]*/
 DEFINE_PUBLIC_ALIAS(getgrgid, libc_getgrgid);
 DEFINE_PUBLIC_ALIAS(getgrnam, libc_getgrnam);
 DEFINE_PUBLIC_ALIAS(setgrent, libc_setgrent);
@@ -274,6 +274,8 @@ DEFINE_PUBLIC_ALIAS(getgrnam_r, libc_getgrnam_r);
 DEFINE_PUBLIC_ALIAS(getgrent_r, libc_getgrent_r);
 DEFINE_PUBLIC_ALIAS(fgetgrent_r, libc_fgetgrent_r);
 DEFINE_PUBLIC_ALIAS(fgetgrent, libc_fgetgrent);
+DEFINE_PUBLIC_ALIAS(__setgroups, libc_setgroups);
+DEFINE_PUBLIC_ALIAS(__libc_setgroups, libc_setgroups);
 DEFINE_PUBLIC_ALIAS(setgroups, libc_setgroups);
 DEFINE_PUBLIC_ALIAS(getgrouplist, libc_getgrouplist);
 DEFINE_PUBLIC_ALIAS(initgroups, libc_initgroups);

@@ -1190,16 +1190,22 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x16c7a139]]]*/
+/*[[[start:exports,hash:CRC-32=0x7121b13]]]*/
+DEFINE_PUBLIC_ALIAS(__mkdir, libc_mkdir);
+DEFINE_PUBLIC_ALIAS(__libc_mkdir, libc_mkdir);
 DEFINE_PUBLIC_ALIAS(mkdir, libc_mkdir);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chmod, libc_chmod);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__chmod, libc_chmod);
+DEFINE_PUBLIC_ALIAS(__libc_chmod, libc_chmod);
 DEFINE_PUBLIC_ALIAS(chmod, libc_chmod);
 DEFINE_PUBLIC_ALIAS(lchmod, libc_lchmod);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_umask, libc_umask);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__umask, libc_umask);
+DEFINE_PUBLIC_ALIAS(__libc_umask, libc_umask);
 DEFINE_PUBLIC_ALIAS(umask, libc_umask);
 DEFINE_PUBLIC_ALIAS(getumask, libc_getumask);
 DEFINE_PUBLIC_ALIAS(fmkdirat, libc_fmkdirat);
@@ -1208,6 +1214,8 @@ DEFINE_PUBLIC_ALIAS(mkfifo, libc_mkfifo);
 DEFINE_PUBLIC_ALIAS(fchmodat, libc_fchmodat);
 DEFINE_PUBLIC_ALIAS(mkdirat, libc_mkdirat);
 DEFINE_PUBLIC_ALIAS(mkfifoat, libc_mkfifoat);
+DEFINE_PUBLIC_ALIAS(__fchmod, libc_fchmod);
+DEFINE_PUBLIC_ALIAS(__libc_fchmod, libc_fchmod);
 DEFINE_PUBLIC_ALIAS(fchmod, libc_fchmod);
 DEFINE_PUBLIC_ALIAS(mknod, libc_mknod);
 DEFINE_PUBLIC_ALIAS(mknodat, libc_mknodat);

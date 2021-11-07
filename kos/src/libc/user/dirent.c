@@ -622,25 +622,34 @@ NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa2ef2bd7]]]*/
+/*[[[start:exports,hash:CRC-32=0x9b89c61c]]]*/
+DEFINE_PUBLIC_ALIAS(__libc_opendir, libc_opendir);
 DEFINE_PUBLIC_ALIAS(opendir, libc_opendir);
 DEFINE_PUBLIC_ALIAS(fopendirat, libc_fopendirat);
 DEFINE_PUBLIC_ALIAS(opendirat, libc_opendirat);
+DEFINE_PUBLIC_ALIAS(__libc_closedir, libc_closedir);
 DEFINE_PUBLIC_ALIAS(closedir, libc_closedir);
 DEFINE_PUBLIC_ALIAS(fdclosedir, libc_fdclosedir);
+DEFINE_PUBLIC_ALIAS(__libc_readdir, libc_readdir);
 DEFINE_PUBLIC_ALIAS(readdir, libc_readdir);
+DEFINE_PUBLIC_ALIAS(__libc_rewinddir, libc_rewinddir);
 DEFINE_PUBLIC_ALIAS(rewinddir, libc_rewinddir);
 DEFINE_PUBLIC_ALIAS(fdopendir, libc_fdopendir);
 DEFINE_PUBLIC_ALIAS(readdir64, libc_readdir64);
+DEFINE_PUBLIC_ALIAS(__libc_readdir_r, libc_readdir_r);
 DEFINE_PUBLIC_ALIAS(readdir_r, libc_readdir_r);
 DEFINE_PUBLIC_ALIAS(readdir64_r, libc_readdir64_r);
+DEFINE_PUBLIC_ALIAS(__libc_seekdir, libc_seekdir);
 DEFINE_PUBLIC_ALIAS(seekdir, libc_seekdir);
+DEFINE_PUBLIC_ALIAS(__libc_telldir, libc_telldir);
 DEFINE_PUBLIC_ALIAS(telldir, libc_telldir);
 DEFINE_PUBLIC_ALIAS(dirfd, libc_dirfd);
 DEFINE_PUBLIC_ALIAS(scandir, libc_scandir);
 DEFINE_PUBLIC_ALIAS(scandirat, libc_scandirat);
 DEFINE_PUBLIC_ALIAS(scandir64, libc_scandir64);
 DEFINE_PUBLIC_ALIAS(scandirat64, libc_scandirat64);
+DEFINE_PUBLIC_ALIAS(__getdirentries, libc_getdirentries);
+DEFINE_PUBLIC_ALIAS(__libc_getdirentries, libc_getdirentries);
 DEFINE_PUBLIC_ALIAS(getdirentries, libc_getdirentries);
 DEFINE_PUBLIC_ALIAS(getdirentries64, libc_getdirentries64);
 DEFINE_PUBLIC_ALIAS(kreaddir, libc_kreaddir);

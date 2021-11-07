@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52c4d627 */
+/* HASH CRC-32:0x84341c14 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,31 @@
 #define __local_stime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_stime64) || defined(__CRT_HAVE_stime)
+#if defined(__CRT_HAVE_stime64) || defined(__CRT_HAVE_stime) || defined(__CRT_HAVE___stime) || defined(__CRT_HAVE___libc_stime)
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_stime32_defined) && defined(__CRT_HAVE_stime)
+#ifndef __local___localdep_stime32_defined
 #define __local___localdep_stime32_defined
+#ifdef __CRT_HAVE_stime
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),stime,(__when))
-#endif /* !__local___localdep_stime32_defined && __CRT_HAVE_stime */
+#elif defined(__CRT_HAVE___stime)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),__stime,(__when))
+#elif defined(__CRT_HAVE___libc_stime)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),__libc_stime,(__when))
+#else /* ... */
+#undef __local___localdep_stime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_stime32_defined */
 #ifndef __local___localdep_stime64_defined
 #define __local___localdep_stime64_defined
 #if defined(__CRT_HAVE_stime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime,(__when))
+#elif defined(__CRT_HAVE___stime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),__stime,(__when))
+#elif defined(__CRT_HAVE___libc_stime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),__libc_stime,(__when))
 #elif defined(__CRT_HAVE_stime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime64,(__when))
-#elif defined(__CRT_HAVE_stime)
+#elif defined(__CRT_HAVE_stime) || defined(__CRT_HAVE___stime) || defined(__CRT_HAVE___libc_stime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/stime64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -45,20 +57,20 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_stime64_defined */
 __LOCAL_LIBC(stime) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stime))(__TM_TYPE(time) const *__when) {
-#ifdef __CRT_HAVE_stime
+#if defined(__CRT_HAVE_stime) || defined(__CRT_HAVE___stime) || defined(__CRT_HAVE___libc_stime)
 	__time32_t __tms = (__time32_t)*__when;
 	return (__NAMESPACE_LOCAL_SYM __localdep_stime32)(&__tms);
-#else /* __CRT_HAVE_stime */
+#else /* __CRT_HAVE_stime || __CRT_HAVE___stime || __CRT_HAVE___libc_stime */
 	__time64_t __tms = (__time64_t)*__when;
 	return (__NAMESPACE_LOCAL_SYM __localdep_stime64)(&__tms);
-#endif /* !__CRT_HAVE_stime */
+#endif /* !__CRT_HAVE_stime && !__CRT_HAVE___stime && !__CRT_HAVE___libc_stime */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_stime_defined
 #define __local___localdep_stime_defined
 #define __localdep_stime __LIBC_LOCAL_NAME(stime)
 #endif /* !__local___localdep_stime_defined */
-#else /* __CRT_HAVE_stime64 || __CRT_HAVE_stime */
+#else /* __CRT_HAVE_stime64 || __CRT_HAVE_stime || __CRT_HAVE___stime || __CRT_HAVE___libc_stime */
 #undef __local_stime_defined
-#endif /* !__CRT_HAVE_stime64 && !__CRT_HAVE_stime */
+#endif /* !__CRT_HAVE_stime64 && !__CRT_HAVE_stime && !__CRT_HAVE___stime && !__CRT_HAVE___libc_stime */
 #endif /* !__local_stime_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe23d42bb */
+/* HASH CRC-32:0x27ed5744 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,6 +97,10 @@ __SYSDECL_BEGIN
 __CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #elif defined(__CRT_HAVE_ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+#elif defined(__CRT_HAVE___htons)
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),__htons,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+#elif defined(__CRT_HAVE___ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),__ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #else /* ... */
 __LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); }
 #endif /* !... */
@@ -107,6 +111,10 @@ __LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TY
 __CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #elif defined(__CRT_HAVE_htons) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+#elif defined(__CRT_HAVE___ntohs)
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),__ntohs,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+#elif defined(__CRT_HAVE___htons) && defined(__HYBRID_HTOBE_IS_BETOH)
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),__htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #else /* ... */
 __LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); }
 #endif /* !... */
@@ -117,6 +125,10 @@ __LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TY
 __CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #elif defined(__CRT_HAVE_ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),ntohl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
+#elif defined(__CRT_HAVE___htonl)
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),__htonl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
+#elif defined(__CRT_HAVE___ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),__ntohl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #else /* ... */
 __LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TYPE__ __hostlong) { return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); }
 #endif /* !... */
@@ -127,6 +139,10 @@ __LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TY
 __CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #elif defined(__CRT_HAVE_htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),htonl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
+#elif defined(__CRT_HAVE___ntohl)
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),__ntohl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
+#elif defined(__CRT_HAVE___htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),__htonl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #else /* ... */
 __LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohl)(__UINT32_TYPE__ __netlong) { return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); }
 #endif /* !... */

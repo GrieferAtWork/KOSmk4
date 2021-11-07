@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2f497e5 */
+/* HASH CRC-32:0xcaead87f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,12 +26,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strtof_defined
 #ifdef __CRT_HAVE_strtof
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),strtof,(__nptr,__endptr))
-#else /* __CRT_HAVE_strtof */
+#elif defined(__CRT_HAVE___strtof)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),__strtof,(__nptr,__endptr))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtof.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtof __LIBC_LOCAL_NAME(strtof)
-#endif /* !__CRT_HAVE_strtof */
+#endif /* !... */
 #endif /* !__local___localdep_strtof_defined */
 __LOCAL_LIBC(_atoflt) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoflt))(float *__restrict __result, char const *__restrict __nptr) {

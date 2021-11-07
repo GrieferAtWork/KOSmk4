@@ -62,8 +62,12 @@ NOTHROW_RPC(LIBCCALL libc_swapoff)(char const *path)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc8b8c5fc]]]*/
+/*[[[start:exports,hash:CRC-32=0x38323142]]]*/
 DEFINE_PUBLIC_ALIAS(swapon, libc_swapon);
+DEFINE_PUBLIC_ALIAS(__libc_swapon, libc_swapon);
+DEFINE_PUBLIC_ALIAS(swapon, libc_swapon);
+DEFINE_PUBLIC_ALIAS(swapoff, libc_swapoff);
+DEFINE_PUBLIC_ALIAS(__libc_swapoff, libc_swapoff);
 DEFINE_PUBLIC_ALIAS(swapoff, libc_swapoff);
 /*[[[end:exports]]]*/
 

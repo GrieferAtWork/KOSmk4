@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a076e3 */
+/* HASH CRC-32:0x7b96186 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_format_c16aprintf_printer_defined
 #define __local_format_c16aprintf_printer_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc)
+#if (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_c16aprintf_alloc_defined
 #define __local___localdep_format_c16aprintf_alloc_defined
@@ -49,12 +49,12 @@ struct format_waprintf_data {
 #endif /* !__format_waprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_format_c16aprintf_alloc,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
-#elif defined(__CRT_HAVE_realloc) && __SIZEOF_WCHAR_T__ == 2
+#elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_waprintf_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_c16aprintf_alloc __NAMESPACE_LOCAL_TYPEHAX(__CHAR16_TYPE__ *(__LIBDCALL*)(struct format_c16aprintf_data *__restrict,__SIZE_TYPE__),__CHAR16_TYPE__ *(__LIBDCALL&)(struct format_c16aprintf_data *__restrict,__SIZE_TYPE__),format_waprintf_alloc)
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.format-printer/format_c16aprintf_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -103,7 +103,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_format_c16aprintf_printer_defined
 #define __localdep_format_c16aprintf_printer __LIBC_LOCAL_NAME(format_c16aprintf_printer)
 #endif /* !__local___localdep_format_c16aprintf_printer_defined */
-#else /* (__CRT_HAVE_format_waprintf_alloc && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$format_waprintf_alloc || __CRT_HAVE_realloc */
+#else /* (__CRT_HAVE_format_waprintf_alloc && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc */
 #undef __local_format_c16aprintf_printer_defined
-#endif /* (!__CRT_HAVE_format_waprintf_alloc || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$format_waprintf_alloc && !__CRT_HAVE_realloc */
+#endif /* (!__CRT_HAVE_format_waprintf_alloc || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$format_waprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc */
 #endif /* !__local_format_c16aprintf_printer_defined */

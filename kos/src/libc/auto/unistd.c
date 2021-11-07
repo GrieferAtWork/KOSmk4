@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4552e842 */
+/* HASH CRC-32:0x1d316cd8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -269,16 +269,16 @@ NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(void *fd,
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd) {
 	struct termios ios;
-#if defined(__CRT_HAVE_ioctl) && defined(__TCGETA)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA)
 	return libc_ioctl(fd, __TCGETA, &ios) < 0 ? 0 : 1;
-#else /* __CRT_HAVE_ioctl && __TCGETA */
+#else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA */
 	return libc_tcgetattr(fd, &ios) != 0 ? 0 : 1;
-#endif /* !__CRT_HAVE_ioctl || !__TCGETA */
+#endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA */
 }
 #include <bits/os/stat.h>
 INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_MALLOC WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void) {
-#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && ((defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))) && (defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign))
+#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && ((defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))) && (defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
 	/* Specs require us to return a duplicate of $PWD iff it's correct
 	 *   ***Author's comment: DUMB!***
 	 */
@@ -292,7 +292,7 @@ NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void) {
 				return libc_strdup(pwd);
 		}
 	}
-#endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && ((__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) && (__CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) */
+#endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && ((__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) && (__CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) */
 	return libc_getcwd(NULL, 0);
 }
 #include <asm/pagesize.h>
@@ -320,18 +320,18 @@ NOTHROW(LIBCCALL libc_getdtablesize)(void) {
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
                                       size_t name_len) {
-#if defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid)
+#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid))
 	char buf[1024]; /* NSS_BUFLEN_PASSWD */
 	struct passwd pwent, *pwptr;
-#endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
+#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid) */
 	char *pwname;
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 	pwname = libc_getenv("LOGNAME");
-#if defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid)
+#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid))
 	if (!pwname)
-#endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
+#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid) */
 #endif /* __CRT_HAVE_getenv || __LOCAL_environ */
-#if defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid)
+#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid))
 	{
 		if (libc_getpwuid_r(libc_geteuid(), &pwent, buf,
 		               sizeof(buf), &pwptr) ||
@@ -341,7 +341,7 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
 		if (!pwname)
 			return -1;
 	}
-#endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
+#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid) */
 	if (name_len) {
 		name[name_len - 1] = '\0';
 		libc_strncpy(name, pwname, name_len - 1);
@@ -471,25 +471,25 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 #define __STDERR_FILENO 2
 #endif /* !__STDERR_FILENO */
 
-#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 	bool heap_buf;
-#endif /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#endif /* __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
 	char *result;
 	fd_t default_fds[3];
 	signo_t interrupt_signo;
 
 	/* Initialize locals. */
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	struct termios old_ios, new_ios;
 	libc_memset(&old_ios, -1, sizeof(old_ios));
 	libc_memset(&new_ios, -1, sizeof(new_ios));
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
 	result          = NULL;
 	interrupt_signo = 0;
 	default_fds[0]  = __STDIN_FILENO;
 
 	/* Allocate a dynamic buffer if none was given by the caller. */
-#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 	heap_buf = false;
 	if (!buf) {
 		buflen = 512;
@@ -502,7 +502,7 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 		}
 		heap_buf = true;
 	} else
-#endif /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#endif /* __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
 	if (buflen < 1) {
 		/* Invalid buffer length */
 #ifdef EINVAL
@@ -514,7 +514,7 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 	/* Open input files if not provided by the caller. */
 	if (!fds) {
 		fds = default_fds;
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #ifdef __O_CLOEXEC
 #define __PRIVATE_GETPASSFD_O_CLOEXEC __O_CLOEXEC
 #else /* __O_CLOEXEC */
@@ -556,7 +556,7 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 			default_fds[0] = default_fds[2];
 			default_fds[1] = default_fds[2];
 		} else
-#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 		{
 			default_fds[1] = __STDERR_FILENO;
 			default_fds[2] = __STDERR_FILENO;
@@ -564,7 +564,7 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 	}
 
 	/* Load terminal settings. */
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	if (libc_tcgetattr(fds[0], &old_ios) == 0) {
 		libc_memcpy(&new_ios, &old_ios, sizeof(struct termios));
 
@@ -616,28 +616,28 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 		if (flags & __GETPASS_NEED_TTY)
 			goto out; /* tcgetattr() should have already set errno=ENOTTY */
 	}
-#elif defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))
+#elif defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE___isatty) || defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))
 	if ((flags & __GETPASS_NEED_TTY) && !libc_isatty(fds[0]))
 		goto out; /* isatty() should have already set errno=ENOTTY */
 #endif /* ... */
 
 	/* Print the given prompt */
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 	if (prompt && *prompt) {
 		if (libc_write(fds[1], prompt, libc_strlen(prompt)) == -1)
 			goto out;
 	}
-#else /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#else /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 	(void)prompt;
-#endif /* !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write */
+#endif /* !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write && !__CRT_HAVE___libc_write */
 
 	/* The actual interpreter loop for the password reader: */
 	{
 		unsigned char ch, *dst, *bufend;
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl)) && defined(__VLNEXT)
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__VLNEXT)
 		bool escape; /* Set to `true' if the next character is escaped. */
 		escape = false;
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) && __VLNEXT */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __VLNEXT */
 		dst    = (unsigned char *)buf;
 		bufend = (unsigned char *)buf + buflen - 1;
 		for (;;) {
@@ -692,14 +692,14 @@ handle_eof:
 				}
 			}
 
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl)) && defined(__VLNEXT)
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__VLNEXT)
 			if (escape) {
 				/* Unconditionally add `ch' */
 				escape = false;
 			} else
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) && __VLNEXT */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __VLNEXT */
 			{
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 #if !__VDISABLE
 #define __PRIVATE_GETPASSFD_CTRL(index, defl) \
 	(new_ios.c_cc[index] != '\0' ? new_ios.c_cc[index] : __CTRL(defl))
@@ -757,7 +757,7 @@ handle_eof:
 				    )
 				{
 					__libc_explicit_bzero(buf, buflen * sizeof(char));
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 					if (flags & (__GETPASS_ECHO | __GETPASS_ECHO_STAR)) {
 						while (dst > (unsigned char *)buf) {
 							if (libc_write(fds[1], "\b \b", 3 * sizeof(char)) == -1)
@@ -765,7 +765,7 @@ handle_eof:
 							--dst;
 						}
 					}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 					dst = (unsigned char *)buf;
 					continue;
 				}
@@ -818,33 +818,33 @@ handle_eof:
 				if (new_ios.c_cc[__VEOL2] != __VDISABLE && ch == new_ios.c_cc[__VEOL2])
 					break;
 #endif /* __VEOL2 */
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
 
 				/* Check for single-character erase (backspace) */
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl)) && defined(__VERASE)
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__VERASE)
 				if (ch == __PRIVATE_GETPASSFD_CTRL(__VERASE, 'H'))
-#else /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) && __VERASE */
+#else /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __VERASE */
 				if (ch == '\b')
-#endif /* (!__CRT_HAVE_tcgetattr && (!__CRT_HAVE_ioctl || !__TCGETA)) || (!__CRT_HAVE_tcsetattr && !__CRT_HAVE_ioctl) || !__VERASE */
+#endif /* (!__CRT_HAVE_tcgetattr && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA)) || (!__CRT_HAVE_tcsetattr && !__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__VERASE */
 				{
 					if (dst > (unsigned char *)buf) {
 						--dst;
 						__libc_explicit_bzero(dst, sizeof(char));
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 						if (flags & (__GETPASS_ECHO | __GETPASS_ECHO_STAR)) {
 							if (libc_write(fds[1], "\b \b", 3 * sizeof(char)) == -1)
 								goto out;
 						}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 						continue;
 					}
 maybe_beep:
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 					if (!(flags & __GETPASS_NO_BEEP)) {
 						if (libc_write(fds[2], "\7" /*BEL*/, sizeof(char)) == -1)
 							goto out;
 					}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 					continue;
 				}
 
@@ -862,7 +862,7 @@ maybe_beep:
 
 			/* Check if the buffer is full. */
 			if (dst >= bufend) {
-#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 				if (heap_buf) {
 					/* Allocate more space. */
 					size_t new_buflen;
@@ -877,14 +877,14 @@ maybe_beep:
 					}
 					libc_memcpyc(new_buf, buf, buflen, sizeof(char));
 					__libc_explicit_bzero(buf, buflen * sizeof(char));
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 					libc_free(buf);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 					dst    = (unsigned char *)new_buf + (size_t)(dst - (unsigned char *)buf);
 					bufend = (unsigned char *)new_buf + new_buflen - 1;
 					buf    = new_buf;
 				} else
-#endif /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#endif /* __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
 				{
 					if (flags & __GETPASS_BUF_LIMIT)
 						goto maybe_beep;
@@ -903,7 +903,7 @@ maybe_beep:
 			/* Append to the result buffer. */
 			*dst++ = ch;
 
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 			if (flags & __GETPASS_ECHO_STAR) {
 				if (libc_write(fds[1], "*", sizeof(char)) == -1)
 					goto out;
@@ -913,22 +913,22 @@ maybe_beep:
 				if (libc_write(fds[1], &ch, sizeof(char)) == -1)
 					goto out;
 			}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 
 		} /* for (;;) */
 
 		/* If requested to do so by the caller, write a trailing '\n' upon success. */
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 		if (flags & __GETPASS_ECHO_NL) {
 			if (libc_write(fds[1], "\n", 1) == -1)
 				goto out;
 		}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 
 		/* Force NUL-termination of the password buffer. */
 		*dst = '\0';
 
-#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 		if (heap_buf && dst < bufend) {
 			/* Try to release unused buffer memory. */
 			size_t new_buflen;
@@ -938,14 +938,14 @@ maybe_beep:
 			if likely(new_buf) {
 				libc_memcpyc(new_buf, buf, new_buflen, sizeof(char));
 				__libc_explicit_bzero(buf, buflen * sizeof(char));
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 				libc_free(buf);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 				buf    = new_buf;
 				buflen = new_buflen;
 			}
 		}
-#endif /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#endif /* __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
 
 		/* Indicate success! */
 		result = buf;
@@ -953,7 +953,7 @@ maybe_beep:
 out:
 
 	/* Restore old terminal settings. */
-#if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
+#if (defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 	if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
 		(void)libc_tcsetattr(fds[0], __TCSAFLUSH | __TCSASOFT, &old_ios);
@@ -963,13 +963,13 @@ out:
 		(void)libc_tcsetattr(fds[0], 0, &old_ios);
 #endif /* !... */
 	}
-#endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
+#endif /* (__CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
 
 	/* Close our file handle to /dev/tty */
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
+#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
 	if (default_fds[0] != __STDIN_FILENO)
 		libc_close(default_fds[0]);
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
+#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */
 
 	/* Error-only cleanup... */
 	if (!result) {
@@ -978,19 +978,19 @@ out:
 		__libc_explicit_bzero(buf, buflen * sizeof(char));
 
 		/* Free a dynamically allocated password buffer. */
-#if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free))
 		if (heap_buf)
 			libc_free(buf);
-#endif /* (__CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_free || __CRT_HAVE_cfree) */
+#endif /* (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free) */
 
 		/* Raise the signal of a given control character, and/or set
 		 * `errno'  to indicate that the password-read operation was
 		 * interrupted. */
 		if (interrupt_signo != 0) {
-#if defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
+#if defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 			if (!(flags & __GETPASS_NO_SIGNAL))
 				(void)libc_raise(interrupt_signo);
-#endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || (__CRT_HAVE_kill && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid)) */
+#endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || ((__CRT_HAVE_kill || __CRT_HAVE___kill || __CRT_HAVE___libc_kill) && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid || __CRT_HAVE___libc_getpid)) */
 #ifdef EINTR
 			(void)__libc_seterrno(EINTR);
 #endif /* EINTR */
@@ -1005,7 +1005,7 @@ INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
                                      char *buf,
                                      size_t bufsize) {
-#if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
+#if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 	/* Prefer using `getpassfd(3)' because I feel like that one's more
 	 * user-friendly.  - But if it's not available, fall back on using
 	 * the regular, old `readpassphrase(3)' */
@@ -1014,13 +1014,13 @@ NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
 #else /* __GETPASS_ECHO_NL */
 	return libc_getpassfd(prompt, buf, bufsize, NULL, 0, 0);
 #endif /* !__GETPASS_ECHO_NL */
-#else /* __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read */
+#else /* __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read */
 #ifdef __RPP_ECHO_OFF
 	return libc_readpassphrase(prompt, buf, bufsize, __RPP_ECHO_OFF);
 #else /* __RPP_ECHO_OFF */
 	return libc_readpassphrase(prompt, buf, bufsize, 0);
 #endif /* !__RPP_ECHO_OFF */
-#endif /* !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read */
+#endif /* !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read */
 }
 #include <bits/os/ucred.h>
 #include <libc/errno.h>
@@ -1094,10 +1094,10 @@ NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename,
 	if unlikely(!result)
 		return -1;
 	retval = (__STDC_INT_AS_SSIZE_T)libc_strlen(result);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	if unlikely(!resolved)
 		libc_free(result);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	return retval;
 }
 #include <asm/os/stdio.h>
@@ -1185,10 +1185,12 @@ DEFINE_PUBLIC_ALIAS(write_printer, libc_write_printer);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_isatty, libc_isatty);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__isatty, libc_isatty);
 DEFINE_PUBLIC_ALIAS(isatty, libc_isatty);
 DEFINE_PUBLIC_ALIAS(get_current_dir_name, libc_get_current_dir_name);
 DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
+DEFINE_PUBLIC_ALIAS(__getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
 DEFINE_PUBLIC_ALIAS(getpassphrase, libc_getpass);

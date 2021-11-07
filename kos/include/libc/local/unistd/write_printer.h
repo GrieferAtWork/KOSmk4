@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f92139f */
+/* HASH CRC-32:0xd660259d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
-#if defined(__CRT_HAVE_writeall) || (defined(__CRT_HAVE_write_printer) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#if defined(__CRT_HAVE_writeall) || (defined(__CRT_HAVE_write_printer) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_writeall_defined
 #define __local___localdep_writeall_defined
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_writeall,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write_printer,(__fd,__buf,__bufsize))
-#elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/writeall.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_write_printer_defined
 #define __localdep_write_printer __LIBC_LOCAL_NAME(write_printer)
 #endif /* !__local___localdep_write_printer_defined */
-#else /* __CRT_HAVE_writeall || (__CRT_HAVE_write_printer && __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#else /* __CRT_HAVE_writeall || (__CRT_HAVE_write_printer && __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
 #undef __local_write_printer_defined
-#endif /* !__CRT_HAVE_writeall && (!__CRT_HAVE_write_printer || !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) && !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write */
+#endif /* !__CRT_HAVE_writeall && (!__CRT_HAVE_write_printer || !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) && !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write && !__CRT_HAVE___libc_write */
 #endif /* !__local_write_printer_defined */

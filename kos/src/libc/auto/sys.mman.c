@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ca36169 */
+/* HASH CRC-32:0x8bb9f644 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,14 +74,14 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
 	       (namelen + 1) *
 	       sizeof(char));
 	result = libc_open(fullname, oflags, mode);
-#if defined(ENOENT) && defined(O_CREAT) && (defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)))
+#if defined(ENOENT) && defined(O_CREAT) && (defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)))
 	if (result < 0 && (oflags & O_CREAT) != 0 && __libc_geterrno_or(ENOENT) == ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
 		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
 		libc_mkdir(__PATH_SHM, 0777);
 		result = libc_open(fullname, oflags, mode);
 	}
-#endif /* ENOENT && O_CREAT && (__CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir)) */
+#endif /* ENOENT && O_CREAT && (__CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir)) */
 	__freea(fullname);
 	return result;
 }

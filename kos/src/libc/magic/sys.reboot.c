@@ -68,6 +68,7 @@ __SYSDECL_BEGIN
 @@Reboot or halt the system
 @@@param: howto: One of the `RB_*' constants above
 [[decl_include("<features.h>")]]
+[[export_alias("__reboot", "__libc_reboot")]]
 int reboot(__STDC_INT_AS_UINT_T howto);
 
 %{

@@ -104,7 +104,7 @@ int crt_posix_memalign([[nonnull]] void **__restrict pp,
 %
 
 [[guard, wunused, ATTR_ALLOC_ALIGN(1), ATTR_ALLOC_SIZE((2))]]
-[[ATTR_MALLOC, export_alias("aligned_alloc"), decl_include("<hybrid/typecore.h>")]]
+[[ATTR_MALLOC, export_alias("aligned_alloc", "__libc_memalign"), decl_include("<hybrid/typecore.h>")]]
 [[if(__has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("aligned_alloc", { return __builtin_aligned_alloc(alignment, n_bytes); })]]
 [[userimpl, requires_function(crt_posix_memalign)]]
@@ -121,7 +121,7 @@ void *memalign(size_t alignment, size_t n_bytes) {
 [[section(".text.crt{|.dos}.heap.rare_helpers"), decl_include("<hybrid/typecore.h>")]]
 void *pvalloc(size_t n_bytes);
 
-[[decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>"), export_alias("__libc_valloc")]]
 [[guard, wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires($has_function(memalign))]]
 void *valloc($size_t n_bytes) {

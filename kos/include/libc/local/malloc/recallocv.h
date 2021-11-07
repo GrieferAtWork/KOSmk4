@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x198244eb */
+/* HASH CRC-32:0xb70101d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_recallocv_defined
 #define __local_recallocv_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
+#if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_usable_size_defined
@@ -47,11 +47,15 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memset_defined */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined
-#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
+#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
-#else /* __has_builtin(__builtin_realloc) && __LIBC_BIND_CRTBUILTINS */
+#elif defined(__CRT_HAVE_realloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
+#elif defined(__CRT_HAVE___libc_realloc)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),__libc_realloc,(__mallptr,__num_bytes))
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
 #endif /* !__local___localdep_realloc_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__overflow.h>
@@ -75,7 +79,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_recallocv_defined
 #define __localdep_recallocv __LIBC_LOCAL_NAME(recallocv)
 #endif /* !__local___localdep_recallocv_defined */
-#else /* __CRT_HAVE_realloc && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize) */
+#else /* (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize) */
 #undef __local_recallocv_defined
-#endif /* !__CRT_HAVE_realloc || (!__CRT_HAVE_malloc_usable_size && !__CRT_HAVE__msize) */
+#endif /* (!__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) || (!__CRT_HAVE_malloc_usable_size && !__CRT_HAVE__msize) */
 #endif /* !__local_recallocv_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39d5a9d9 */
+/* HASH CRC-32:0xd379870a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_gettimeofday64_defined
 #define __local_gettimeofday64_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+#if defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gettimeofday32_defined
@@ -30,6 +30,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__gettimeofday,(__tv,__tz))
+#elif defined(__CRT_HAVE___libc_gettimeofday)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__libc_gettimeofday,(__tv,__tz))
 #else /* ... */
 #undef __local___localdep_gettimeofday32_defined
 #endif /* !... */
@@ -52,7 +54,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_gettimeofday64_defined
 #define __localdep_gettimeofday64 __LIBC_LOCAL_NAME(gettimeofday64)
 #endif /* !__local___localdep_gettimeofday64_defined */
-#else /* __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday */
+#else /* __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday || __CRT_HAVE___libc_gettimeofday */
 #undef __local_gettimeofday64_defined
-#endif /* !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday */
+#endif /* !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday && !__CRT_HAVE___libc_gettimeofday */
 #endif /* !__local_gettimeofday64_defined */

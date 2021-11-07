@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x181aafd7 */
+/* HASH CRC-32:0x13e0be0c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,6 +124,16 @@ __NAMESPACE_STD_USING(rename)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),(__oldname,__newname_or_path))
+#elif defined(__CRT_HAVE___rename)
+/* >> rename(2)
+ * Rename  a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),__rename,(__oldname,__newname_or_path))
+#elif defined(__CRT_HAVE___libc_rename)
+/* >> rename(2)
+ * Rename  a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),__libc_rename,(__oldname,__newname_or_path))
 #elif defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_renameat2))
 #include <libc/local/stdio/rename.h>
 /* >> rename(2)
@@ -144,6 +154,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
+#elif defined(__CRT_HAVE___unlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),__unlink,(__file))
+#elif defined(__CRT_HAVE___libc_unlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),__libc_unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
@@ -197,6 +215,20 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___libc_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -225,7 +257,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/fcntl/open.h>
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -258,11 +290,19 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char c
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
+#elif defined(__CRT_HAVE___creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* >> creat(2), creat64(2)
+ * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),__creat,(__filename,__mode))
+#elif defined(__CRT_HAVE___libc_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* >> creat(2), creat64(2)
+ * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),__libc_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat64)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
-#elif ((defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
+#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/fcntl/creat.h>
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
@@ -283,6 +323,16 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char con
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
+#elif defined(__CRT_HAVE___access)
+/* >> access(2)
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
+#elif defined(__CRT_HAVE___libc_access)
+/* >> access(2)
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <libc/local/unistd/access.h>
 /* >> access(2)
@@ -301,6 +351,12 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, 
 #elif defined(__CRT_HAVE__chmod)
 /* >> chmod(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),_chmod,(__filename,__mode))
+#elif defined(__CRT_HAVE___chmod)
+/* >> chmod(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),__chmod,(__filename,__mode))
+#elif defined(__CRT_HAVE___libc_chmod)
+/* >> chmod(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),__libc_chmod,(__filename,__mode))
 #else /* ... */
 #undef __chmod_defined
 #endif /* !... */
@@ -319,6 +375,10 @@ __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),_close,(__fd))
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__close,(__fd))
+#elif defined(__CRT_HAVE___libc_close)
+/* >> close(2)
+ * Close a given file descriptor/handle `fd' */
+__CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__libc_close,(__fd))
 #else /* ... */
 #undef __close_defined
 #endif /* !... */
@@ -335,6 +395,16 @@ __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),(__fd))
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `fd' and return its duplicated handle number */
 __CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),_dup,(__fd))
+#elif defined(__CRT_HAVE___dup)
+/* >> dup(2)
+ * @return: * : Returns the new handle upon success.
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
+__CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),__dup,(__fd))
+#elif defined(__CRT_HAVE___libc_dup)
+/* >> dup(2)
+ * @return: * : Returns the new handle upon success.
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
+__CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),__libc_dup,(__fd))
 #else /* ... */
 #undef __dup_defined
 #endif /* !... */
@@ -356,6 +426,11 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(_
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
+#elif defined(__CRT_HAVE___libc_dup2)
+/* >> dup2(2)
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__libc_dup2,(__oldfd,__newfd))
 #else /* ... */
 #undef __dup2_defined
 #endif /* !... */
@@ -374,18 +449,24 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),(__fd))
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),_isatty,(__fd))
+#elif defined(__CRT_HAVE___isatty)
+/* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),__isatty,(__fd))
 #else /* ... */
 #include <asm/os/tty.h>
-#if defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))
+#if defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))
 #include <libc/local/unistd/isatty.h>
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(isatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isatty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isatty))(__fd); })
-#else /* __CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA) */
+#else /* __CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA) */
 #undef __isatty_defined
-#endif /* !__CRT_HAVE_tcgetattr && (!__CRT_HAVE_ioctl || !__TCGETA) */
+#endif /* !__CRT_HAVE_tcgetattr && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA) */
 #endif /* !... */
 #endif /* !__isatty_defined */
 #ifndef __lseek_defined
@@ -402,6 +483,10 @@ __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __o
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___libc_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> lseek(2), lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
@@ -410,7 +495,7 @@ __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __o
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/unistd/lseek.h>
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
@@ -456,7 +541,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(c
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),__mktemp,(__template_))
 #else /* ... */
 #include <bits/os/stat.h>
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))
 #include <libc/local/stdlib/mktemp.h>
 /* >> mktemp(3)
  * Badly designed version of  `mkstemp' that won't actually  create
@@ -468,9 +553,9 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(c
  *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mktemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL mktemp)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mktemp))(__template_); })
-#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
+#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
 #undef __mktemp_defined
-#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) && (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || (__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) && (!__CRT_HAVE_stat64 || (!__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) */
+#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) && (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || (__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) && (!__CRT_HAVE_stat64 || (!__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) */
 #endif /* !... */
 #endif /* !__mktemp_defined */
 #ifndef __umask_defined
@@ -481,6 +566,12 @@ __CDECLARE(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),(__mode))
 #elif defined(__CRT_HAVE__umask)
 /* >> umask(2) */
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),_umask,(__mode))
+#elif defined(__CRT_HAVE___umask)
+/* >> umask(2) */
+__CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),__umask,(__mode))
+#elif defined(__CRT_HAVE___libc_umask)
+/* >> umask(2) */
+__CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),__libc_umask,(__mode))
 #else /* ... */
 #undef __umask_defined
 #endif /* !... */
@@ -514,6 +605,15 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *_
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),__read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_read)
+/* >> read(2)
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),__libc_read,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __read_defined
 #endif /* !... */
@@ -547,6 +647,15 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void c
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),__write,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_write)
+/* >> write(2)
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),__libc_write,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __write_defined
 #endif /* !... */
@@ -561,6 +670,16 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char c
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
+#elif defined(__CRT_HAVE___access)
+/* >> access(2)
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
+#elif defined(__CRT_HAVE___libc_access)
+/* >> access(2)
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <libc/local/unistd/access.h>
 /* >> access(2)
@@ -576,11 +695,19 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
+#elif defined(__CRT_HAVE___creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* >> creat(2), creat64(2)
+ * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),__creat,(__filename,__mode))
+#elif defined(__CRT_HAVE___libc_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* >> creat(2), creat64(2)
+ * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),__libc_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat64)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
-#elif ((defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
+#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/fcntl/creat.h>
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
@@ -592,12 +719,26 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename
 #elif defined(__CRT_HAVE__chmod)
 /* >> chmod(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
+#elif defined(__CRT_HAVE___chmod)
+/* >> chmod(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename, __mode_t __mode),__chmod,(__filename,__mode))
+#elif defined(__CRT_HAVE___libc_chmod)
+/* >> chmod(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename, __mode_t __mode),__libc_chmod,(__filename,__mode))
 #endif /* ... */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_RPC,_access_s,(char const *__filename, int __type),(__filename,__type))
 #if defined(__CRT_HAVE_ftruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___ftruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> ftruncate(2), ftruncate64(2)
+ * Truncate the given file `fd' to a length of `length' */
+__CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),__ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___libc_ftruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> ftruncate(2), ftruncate64(2)
+ * Truncate the given file `fd' to a length of `length' */
+__CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),__libc_ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
@@ -614,7 +755,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),ftru
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
+#elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)
 #include <libc/local/unistd/ftruncate.h>
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
@@ -624,6 +765,22 @@ __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _chsize)(__fd_t __fd
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> ftruncate(2), ftruncate64(2)
+ * Truncate the given file `fd' to a length of `length' */
+__CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),__ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___libc_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> ftruncate(2), ftruncate64(2)
+ * Truncate the given file `fd' to a length of `length' */
+__CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),__libc_ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE__chsize) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> ftruncate(2), ftruncate64(2)
+ * Truncate the given file `fd' to a length of `length' */
+__CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize,(__fd,__length))
+#elif defined(__CRT_HAVE_chsize) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> ftruncate(2), ftruncate64(2)
+ * Truncate the given file `fd' to a length of `length' */
+__CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
@@ -632,7 +789,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CDECLARE(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate)
+#elif defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)
 #include <libc/local/unistd/ftruncate64.h>
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
@@ -648,11 +805,26 @@ __CREDIRECT(,int,__NOTHROW_RPC,_commit,(__fd_t __fd),fsync,(__fd))
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CDECLARE(,int,__NOTHROW_RPC,_commit,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE___fsync)
+/* >> fsync(2)
+ * Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
+__CREDIRECT(,int,__NOTHROW_RPC,_commit,(__fd_t __fd),__fsync,(__fd))
+#elif defined(__CRT_HAVE___libc_fsync)
+/* >> fsync(2)
+ * Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
+__CREDIRECT(,int,__NOTHROW_RPC,_commit,(__fd_t __fd),__libc_fsync,(__fd))
 #elif defined(__CRT_HAVE_fdatasync)
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CREDIRECT(,int,__NOTHROW_RPC,_commit,(__fd_t __fd),fdatasync,(__fd))
+#elif defined(__CRT_HAVE___fdatasync)
+/* >> fsync(2)
+ * Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
+__CREDIRECT(,int,__NOTHROW_RPC,_commit,(__fd_t __fd),__fdatasync,(__fd))
 #else /* ... */
 #include <libc/local/unistd/fsync.h>
 /* >> fsync(2)
@@ -672,6 +844,10 @@ __CDECLARE(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __o
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___libc_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> lseek(2), lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
@@ -680,7 +856,7 @@ __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/unistd/lseek.h>
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
@@ -690,6 +866,18 @@ __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL _lseek)(_
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE__lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> lseek(2), lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> lseek(2), lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___libc_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> lseek(2), lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
@@ -698,7 +886,7 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset,
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CDECLARE(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/unistd/lseek64.h>
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
@@ -724,6 +912,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),u
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),(__file))
+#elif defined(__CRT_HAVE___unlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),__unlink,(__file))
+#elif defined(__CRT_HAVE___libc_unlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),__libc_unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
@@ -745,6 +941,10 @@ __CDECLARE(,int,__NOTHROW_NCX,_close,(__fd_t __fd),(__fd))
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,_close,(__fd_t __fd),__close,(__fd))
+#elif defined(__CRT_HAVE___libc_close)
+/* >> close(2)
+ * Close a given file descriptor/handle `fd' */
+__CREDIRECT(,int,__NOTHROW_NCX,_close,(__fd_t __fd),__libc_close,(__fd))
 #endif /* ... */
 #ifdef __CRT_HAVE_dup
 /* >> dup(2)
@@ -756,6 +956,16 @@ __CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,_dup,(__fd_t __fd),dup,(__fd))
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `fd' and return its duplicated handle number */
 __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,_dup,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE___dup)
+/* >> dup(2)
+ * @return: * : Returns the new handle upon success.
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
+__CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,_dup,(__fd_t __fd),__dup,(__fd))
+#elif defined(__CRT_HAVE___libc_dup)
+/* >> dup(2)
+ * @return: * : Returns the new handle upon success.
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
+__CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,_dup,(__fd_t __fd),__libc_dup,(__fd))
 #endif /* ... */
 #ifdef __CRT_HAVE_dup2
 /* >> dup2(2)
@@ -772,6 +982,11 @@ __CDECLARE(,__fd_t,__NOTHROW_NCX,_dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
+#elif defined(__CRT_HAVE___libc_dup2)
+/* >> dup2(2)
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,_dup2,(__fd_t __oldfd, __fd_t __newfd),__libc_dup2,(__oldfd,__newfd))
 #endif /* ... */
 #ifdef __CRT_HAVE_read
 /* >> read(2)
@@ -800,6 +1015,15 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,_read,(__fd_t __fd, void *_
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,_read,(__fd_t __fd, void *__buf, size_t __bufsize),__read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_read)
+/* >> read(2)
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,_read,(__fd_t __fd, void *__buf, size_t __bufsize),__libc_read,(__fd,__buf,__bufsize))
 #endif /* ... */
 #ifdef __CRT_HAVE_write
 /* >> write(2)
@@ -828,6 +1052,15 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,_write,(__fd_t __fd, void c
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,_write,(__fd_t __fd, void const *__buf, size_t __bufsize),__write,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___libc_write)
+/* >> write(2)
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,_write,(__fd_t __fd, void const *__buf, size_t __bufsize),__libc_write,(__fd,__buf,__bufsize))
 #endif /* ... */
 #if defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
@@ -871,6 +1104,20 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _open
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___libc_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -899,7 +1146,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/fcntl/open.h>
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -921,6 +1168,12 @@ __CREDIRECT(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),umask,(__mode))
 #elif defined(__CRT_HAVE__umask)
 /* >> umask(2) */
 __CDECLARE(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),(__mode))
+#elif defined(__CRT_HAVE___umask)
+/* >> umask(2) */
+__CREDIRECT(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),__umask,(__mode))
+#elif defined(__CRT_HAVE___libc_umask)
+/* >> umask(2) */
+__CREDIRECT(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),__libc_umask,(__mode))
 #endif /* ... */
 #ifdef __CRT_HAVE_isatty
 /* >> isatty(2)
@@ -934,20 +1187,26 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),isatty,(__fd)
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE___isatty)
+/* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),__isatty,(__fd))
 #else /* ... */
 #include <asm/os/tty.h>
-#if defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))
+#if defined(__CRT_HAVE_tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))
 #include <libc/local/unistd/isatty.h>
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isatty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isatty))(__fd); }
-#endif /* __CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA) */
+#endif /* __CRT_HAVE_tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA) */
 #endif /* !... */
 #ifdef __CRT_HAVE__setmode
 __CDECLARE(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),(__fd,__mode))
-#elif (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
+#elif (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
 #include <libc/local/io/_setmode.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_setmode, __FORCELOCAL __ATTR_ARTIFICIAL __oflag_t __NOTHROW_NCX(__LIBCCALL _setmode)(__fd_t __fd, __oflag_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_setmode))(__fd, __mode); })
 #endif /* ... */
@@ -999,7 +1258,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __find
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s_nolock)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s_nolock,(__fd,__filename,__oflags,__sflags,__mode))
-#elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/_sopen_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_sopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_s)(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_s))(__fd, __filename, __oflags, __sflags, __mode); })
 #endif /* ... */
@@ -1007,7 +1266,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_sopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 __CREDIRECT(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s,(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s_nolock)
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
-#elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/_sopen_s.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_s_nolock)(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_s))(__fd, __filename, __oflags, __sflags, __mode); }
 #endif /* ... */
@@ -1016,25 +1275,25 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_mktemp_s,(char *__temp
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__sopen)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("_sopen");
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/sopen.h>
 #define _sopen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))
 #endif /* ... */
 #ifdef __CRT_HAVE__pipe
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_pipe,(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode),(__pipedes,__pipesize,__textmode))
-#elif defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe)
+#elif defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe)
 #include <libc/local/io/_pipe.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_pipe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _pipe)(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_pipe))(__pipedes, __pipesize, __textmode); })
 #endif /* ... */
 #ifdef __CRT_HAVE__eof
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_eof,(__fd_t __fd),(__fd))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/io/eof.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _eof)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eof))(__fd); }
 #endif /* ... */
 #ifdef __CRT_HAVE__filelength
 __CDECLARE(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_filelength,(__fd_t __fd),(__fd))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/io/filelength.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL _filelength)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(filelength))(__fd); }
 #endif /* ... */
@@ -1056,12 +1315,12 @@ __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),tell
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),_telli64,(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL _tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); }
-#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR */
 #endif /* !... */
 #if defined(__CRT_HAVE_tell) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> tell(3), tell64(3)
@@ -1077,25 +1336,25 @@ __CREDIRECT(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,_telli64,(__fd_t __fd),tell64
 __CDECLARE(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,_telli64,(__fd_t __fd),(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell64.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __off64_t __NOTHROW_NCX(__LIBCCALL _telli64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell64))(__fd); }
-#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR */
 #endif /* !... */
 #ifdef __CRT_HAVE__filelengthi64
 __CDECLARE(__ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW_NCX,_filelengthi64,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE__filelengthi64 */
 #include <asm/os/stdio.h>
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR) && defined(__SEEK_END) && defined(__SEEK_SET)
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR) && defined(__SEEK_END) && defined(__SEEK_SET)
 #include <libc/local/io/_filelengthi64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_filelengthi64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _filelengthi64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_filelengthi64))(__fd); })
-#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR && __SEEK_END && __SEEK_SET */
+#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR && __SEEK_END && __SEEK_SET */
 #endif /* !__CRT_HAVE__filelengthi64 */
 #ifdef __CRT_HAVE_umask_s
 __CDECLARE(,errno_t,__NOTHROW_NCX,umask_s,(__mode_t __newmode, __mode_t *__oldmode),(__newmode,__oldmode))
-#elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
+#elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask) || defined(__CRT_HAVE___umask) || defined(__CRT_HAVE___libc_umask)
 #include <libc/local/io/umask_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(umask_s, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL umask_s)(__mode_t __newmode, __mode_t *__oldmode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(umask_s))(__newmode, __oldmode); })
 #endif /* ... */
@@ -1133,7 +1392,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_open_osfhandle, __FORCELOCAL __ATTR_ARTIFICIAL 
 #define __setmode_defined
 #ifdef __CRT_HAVE__setmode
 __CREDIRECT(,__oflag_t,__NOTHROW_NCX,setmode,(__fd_t __fd, __oflag_t __mode),_setmode,(__fd,__mode))
-#elif (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
+#elif (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
 #include <libc/local/io/_setmode.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __oflag_t __NOTHROW_NCX(__LIBCCALL setmode)(__fd_t __fd, __oflag_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_setmode))(__fd, __mode); }
 #else /* ... */
@@ -1144,6 +1403,14 @@ __FORCELOCAL __ATTR_ARTIFICIAL __oflag_t __NOTHROW_NCX(__LIBCCALL setmode)(__fd_
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___ftruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> ftruncate(2), ftruncate64(2)
+ * Truncate the given file `fd' to a length of `length' */
+__CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),__ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE___libc_ftruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> ftruncate(2), ftruncate64(2)
+ * Truncate the given file `fd' to a length of `length' */
+__CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),__libc_ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
@@ -1160,7 +1427,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),ftrun
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
+#elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)
 #include <libc/local/unistd/ftruncate.h>
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
@@ -1180,7 +1447,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL locking)(__fd_t __fd
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("sopen");
 #elif defined(__CRT_HAVE__sopen)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,sopen,(char const *__filename, __oflag_t __oflags, int __sflags),_sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/sopen.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(sopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))(__filename, __oflags, __sflags, __builtin_va_arg_pack()); })
@@ -1190,7 +1457,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #ifdef __CRT_HAVE__filelength
 __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,filelength,(__fd_t __fd),_filelength,(__fd))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/io/filelength.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(filelength, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL filelength)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(filelength))(__fd); })
 #endif /* ... */
@@ -1214,19 +1481,19 @@ __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),tell6
 __CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
-#else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR */
 #undef __tell_defined
-#endif /* (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek) || !__SEEK_CUR */
+#endif /* (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE___libc_lseek) || !__SEEK_CUR */
 #endif /* !... */
 #endif /* !__tell_defined */
 #ifdef __CRT_HAVE__eof
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,eof,(__fd_t __fd),_eof,(__fd))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/io/eof.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(eof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL eof)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eof))(__fd); })
 #endif /* ... */

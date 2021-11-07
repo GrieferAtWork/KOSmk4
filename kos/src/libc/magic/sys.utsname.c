@@ -55,6 +55,7 @@ __SYSDECL_BEGIN
 @@@return: 0:  Success
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/os/utsname.h>")]]
+[[export_alias("__uname", "__libc_uname")]]
 int uname([[nonnull]] struct utsname *name);
 
 %{

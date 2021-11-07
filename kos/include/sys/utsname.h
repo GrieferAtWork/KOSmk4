@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3213a01d */
+/* HASH CRC-32:0x5ad6c62d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,11 +51,25 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifdef __CRT_HAVE_uname
 /* >> uname(2)
  * Put information about the system in `name'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),(__name))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),(__name))
+#elif defined(__CRT_HAVE___uname)
+/* >> uname(2)
+ * Put information about the system in `name'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),__uname,(__name))
+#elif defined(__CRT_HAVE___libc_uname)
+/* >> uname(2)
+ * Put information about the system in `name'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),__libc_uname,(__name))
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

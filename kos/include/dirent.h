@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x133d9ef2 */
+/* HASH CRC-32:0xd7050687 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,7 +216,11 @@ typedef struct __dirstream DIR;
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char const *__name),(__name))
-#else /* __CRT_HAVE_opendir */
+#elif defined(__CRT_HAVE___libc_opendir)
+/* >> opendir(3)
+ * Open and return a new directory stream for reading, referring to `name' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char const *__name),__libc_opendir,(__name))
+#else /* ... */
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
@@ -225,7 +229,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char 
  * Open and return a new directory stream for reading, referring to `name' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) DIR *__NOTHROW_RPC(__LIBCCALL opendir)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendir))(__name); })
 #endif /* __AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */
-#endif /* !__CRT_HAVE_opendir */
+#endif /* !... */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
 #ifdef __CRT_HAVE_fopendirat
@@ -256,9 +260,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE_opendirat */
 #endif /* __USE_KOS && __USE_ATFILE */
 
+#ifdef __CRT_HAVE_closedir
 /* >> closedir(3)
  * Close a directory stream previously returned by `opendir(3)' and friends */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),(__dirp))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),(__dirp))
+#elif defined(__CRT_HAVE___libc_closedir)
+/* >> closedir(3)
+ * Close a directory stream previously returned by `opendir(3)' and friends */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),__libc_closedir,(__dirp))
+#endif /* ... */
 
 #ifdef __USE_BSD
 /* >> fdclosedir(3)
@@ -271,6 +281,11 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fdclosedi
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
 __CDECLARE(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),(__dirp))
+#elif defined(__CRT_HAVE___libc_readdir) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
+/* >> readdir(3), readdir64(3)
+ * Read and return the next pending directory entry of the given directory stream `dirp'
+ * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
+__CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),__libc_readdir,(__dirp))
 #elif defined(__CRT_HAVE_readdir64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
@@ -278,10 +293,17 @@ __CDECLARE(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__res
 __CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdir64,(__dirp))
 #endif /* ... */
 
+#ifdef __CRT_HAVE_rewinddir
 /* >> rewinddir(3)
  * Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again  return the first directory  entry */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),(__dirp))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),(__dirp))
+#elif defined(__CRT_HAVE___libc_rewinddir)
+/* >> rewinddir(3)
+ * Rewind the given directory stream in such a way that the next call
+ * to `readdir(3)' will once again  return the first directory  entry */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),__libc_rewinddir,(__dirp))
+#endif /* ... */
 
 #ifdef __USE_XOPEN2K8
 /* >> fdopendir(3)
@@ -295,6 +317,11 @@ __CDECLARE_OPT(__ATTR_WUNUSED,DIR *,__NOTHROW_NCX,fdopendir,(__fd_t __fd),(__fd)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
 __CREDIRECT(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),readdir,(__dirp))
+#elif defined(__CRT_HAVE___libc_readdir) && defined(_DIRENT_MATCHES_DIRENT64)
+/* >> readdir(3), readdir64(3)
+ * Read and return the next pending directory entry of the given directory stream `dirp'
+ * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
+__CREDIRECT(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),__libc_readdir,(__dirp))
 #elif defined(__CRT_HAVE_readdir64)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
@@ -311,6 +338,14 @@ __CDECLARE(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *_
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),(__dirp,__entry,__result))
+#elif defined(__CRT_HAVE___libc_readdir_r) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
+/* >> readdir_r(3), readdir64_r(3)
+ * Reentrant version of `readdir(3)'
+ * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
+ *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
+ * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
+ *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),__libc_readdir_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE_readdir64_r) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
@@ -330,6 +365,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restri
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),readdir_r,(__dirp,__entry,__result))
+#elif defined(__CRT_HAVE___libc_readdir_r) && defined(_DIRENT_MATCHES_DIRENT64)
+/* >> readdir_r(3), readdir64_r(3)
+ * Reentrant version of `readdir(3)'
+ * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
+ *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
+ * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
+ *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),__libc_readdir_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE_readdir64_r)
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
@@ -343,12 +386,24 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restr
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
+#ifdef __CRT_HAVE_seekdir
 /* >> seekdir(3)
  * Get the directory stream position */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),(__dirp,__pos))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),(__dirp,__pos))
+#elif defined(__CRT_HAVE___libc_seekdir)
+/* >> seekdir(3)
+ * Get the directory stream position */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),__libc_seekdir,(__dirp,__pos))
+#endif /* ... */
+#ifdef __CRT_HAVE_telldir
 /* >> telldir(3)
  * Get the directory stream position */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),(__dirp))
+__CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),(__dirp))
+#elif defined(__CRT_HAVE___libc_telldir)
+/* >> telldir(3)
+ * Get the directory stream position */
+__CREDIRECT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),__libc_telldir,(__dirp))
+#endif /* ... */
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifdef __USE_XOPEN2K8
@@ -451,6 +506,14 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat6
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
 __CDECLARE(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),(__fd,__buf,__nbytes,__basep))
+#elif defined(__CRT_HAVE___getdirentries) && (!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
+/* >> getdirentries(2), getdirentries64(2)
+ * Linux's underlying system call for reading the entries of a directory */
+__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),__getdirentries,(__fd,__buf,__nbytes,__basep))
+#elif defined(__CRT_HAVE___libc_getdirentries) && (!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
+/* >> getdirentries(2), getdirentries64(2)
+ * Linux's underlying system call for reading the entries of a directory */
+__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),__libc_getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE_getdirentries64) && (defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
@@ -461,6 +524,14 @@ __CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(_
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),getdirentries,(__fd,__buf,__nbytes,__basep))
+#elif defined(__CRT_HAVE___getdirentries) && defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> getdirentries(2), getdirentries64(2)
+ * Linux's underlying system call for reading the entries of a directory */
+__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),__getdirentries,(__fd,__buf,__nbytes,__basep))
+#elif defined(__CRT_HAVE___libc_getdirentries) && defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> getdirentries(2), getdirentries64(2)
+ * Linux's underlying system call for reading the entries of a directory */
+__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),__libc_getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE_getdirentries64)
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
