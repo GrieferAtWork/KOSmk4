@@ -60,12 +60,12 @@ __SYSDECL_BEGIN
 @@>> swapon(2)
 @@@param swapflags: Set of `SWAP_FLAG_*'
 [[cp, decl_include("<features.h>")]]
-[[export_alias("swapon", "__libc_swapon")]]
+[[export_alias("swapon", "__swapon", "__libc_swapon")]]
 int swapon([[nonnull]] char const *path,
            __STDC_INT_AS_UINT_T swapflags);
 
 @@>> swapoff(2)
-[[cp, export_alias("swapoff", "__libc_swapoff")]]
+[[cp, export_alias("swapoff", "__swapoff", "__libc_swapoff")]]
 int swapoff([[nonnull]] char const *path);
 
 %{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x698e4adb */
+/* HASH CRC-32:0x90482646 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,28 @@
 #define __local_utimes_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE_utimes)
+#if defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_utimes32_defined) && defined(__CRT_HAVE_utimes)
+#ifndef __local___localdep_utimes32_defined
 #define __local___localdep_utimes32_defined
+#ifdef __CRT_HAVE_utimes
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),utimes,(__file,__tvp))
-#endif /* !__local___localdep_utimes32_defined && __CRT_HAVE_utimes */
+#elif defined(__CRT_HAVE___utimes)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),__utimes,(__file,__tvp))
+#else /* ... */
+#undef __local___localdep_utimes32_defined
+#endif /* !... */
+#endif /* !__local___localdep_utimes32_defined */
 #ifndef __local___localdep_utimes64_defined
 #define __local___localdep_utimes64_defined
 #if defined(__CRT_HAVE_utimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),utimes,(__file,__tvp))
+#elif defined(__CRT_HAVE___utimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),__utimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),utimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_utimes)
+#elif defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/utimes64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -46,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_utimes64_defined */
 __LOCAL_LIBC(utimes) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes))(char const *__file, struct timeval const __tvp[2]) {
-#ifdef __CRT_HAVE_utimes
+#if defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
 		return (__NAMESPACE_LOCAL_SYM __localdep_utimes32)(__file, __NULLPTR);
@@ -55,7 +63,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes))(char const *__file, struct t
 	__tv32[1].tv_sec  = (__time32_t)__tvp[1].tv_sec;
 	__tv32[1].tv_usec = __tvp[1].tv_usec;
 	return (__NAMESPACE_LOCAL_SYM __localdep_utimes32)(__file, __tv32);
-#else /* __CRT_HAVE_utimes */
+#else /* __CRT_HAVE_utimes || __CRT_HAVE___utimes */
 	struct __timeval64 __tv64[2];
 	if (!__tvp)
 		return (__NAMESPACE_LOCAL_SYM __localdep_utimes64)(__file, __NULLPTR);
@@ -64,14 +72,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes))(char const *__file, struct t
 	__tv64[1].tv_sec  = (__time64_t)__tvp[1].tv_sec;
 	__tv64[1].tv_usec = __tvp[1].tv_usec;
 	return (__NAMESPACE_LOCAL_SYM __localdep_utimes64)(__file, __tv64);
-#endif /* !__CRT_HAVE_utimes */
+#endif /* !__CRT_HAVE_utimes && !__CRT_HAVE___utimes */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_utimes_defined
 #define __local___localdep_utimes_defined
 #define __localdep_utimes __LIBC_LOCAL_NAME(utimes)
 #endif /* !__local___localdep_utimes_defined */
-#else /* __CRT_HAVE_utimes64 || __CRT_HAVE_utimes */
+#else /* __CRT_HAVE_utimes64 || __CRT_HAVE_utimes || __CRT_HAVE___utimes */
 #undef __local_utimes_defined
-#endif /* !__CRT_HAVE_utimes64 && !__CRT_HAVE_utimes */
+#endif /* !__CRT_HAVE_utimes64 && !__CRT_HAVE_utimes && !__CRT_HAVE___utimes */
 #endif /* !__local_utimes_defined */

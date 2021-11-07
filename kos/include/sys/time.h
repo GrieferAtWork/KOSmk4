@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7418d20b */
+/* HASH CRC-32:0x507bde1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -188,10 +188,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setitimer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__CRT_HAVE_utimes) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> utimes(2), utimes64(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes,(char const *__file, struct timeval const __tvp[2]),(__file,__tvp))
+#elif defined(__CRT_HAVE___utimes) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> utimes(2), utimes64(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes,(char const *__file, struct timeval const __tvp[2]),__utimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> utimes(2), utimes64(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes,(char const *__file, struct timeval const __tvp[2]),utimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE_utimes)
+#elif defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 #include <libc/local/sys.time/utimes.h>
 /* >> utimes(2), utimes64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(utimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL utimes)(char const *__file, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimes))(__file, __tvp); })
@@ -322,10 +325,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setitimer64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__CRT_HAVE_utimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> utimes(2), utimes64(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes64,(char const *__file, struct timeval64 const __tvp[2]),utimes,(__file,__tvp))
+#elif defined(__CRT_HAVE___utimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> utimes(2), utimes64(2) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes64,(char const *__file, struct timeval64 const __tvp[2]),__utimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes64)
 /* >> utimes(2), utimes64(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes64,(char const *__file, struct timeval64 const __tvp[2]),(__file,__tvp))
-#elif defined(__CRT_HAVE_utimes)
+#elif defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 #include <libc/local/sys.time/utimes64.h>
 /* >> utimes(2), utimes64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(utimes64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL utimes64)(char const *__file, struct timeval64 const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimes64))(__file, __tvp); })

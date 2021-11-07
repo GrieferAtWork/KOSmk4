@@ -73,6 +73,8 @@ SECTIONS {
 		ENUMERATE_SECTIONS(.text)
 		*(.text.local.*)
 	} PHDR(text)
+	__etext = .;
+	_etext = .;
 
 #ifndef __x86_64__
 	. = ALIGN(__ARCH_PAGESIZE);
@@ -184,13 +186,15 @@ SECTIONS {
 	.fini_array : {
 		KEEP(*(SORT_BY_INIT_PRIORITY(.fini_array*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 	} PHDR(data)
+	_edata = .;
 
-	. = ALIGN(__ARCH_PAGESIZE);
+//	. = ALIGN(__ARCH_PAGESIZE);
 	__bss_start = .;
 	.bss : {
 		ENUMERATE_SECTIONS(.bss)
 		*(.bss.local.*)
 	} PHDR(data)
+	_end = .;
 
 	/DISCARD/ : {
 		*(.discard)

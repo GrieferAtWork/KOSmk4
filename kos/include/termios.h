@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb99ffe2e */
+/* HASH CRC-32:0x6451cdd3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -667,12 +667,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetispeed, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 /* >> tcgetattr(3)
  * Get terminal attributes */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),(__fd,__termios_p))
-#elif (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA)
+#elif defined(__CRT_HAVE___tcgetattr)
+/* >> tcgetattr(3)
+ * Get terminal attributes */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),__tcgetattr,(__fd,__termios_p))
+#else /* ... */
+#include <asm/os/tty.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA)
 #include <libc/local/termios/tcgetattr.h>
 /* >> tcgetattr(3)
  * Get terminal attributes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetattr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL tcgetattr)(__fd_t __fd, struct termios *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcgetattr))(__fd, __termios_p); })
-#endif /* ... */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA */
+#endif /* !... */
 #ifdef __CRT_HAVE_tcsetattr
 /* >> tcsetattr(3)
  * Set terminal attributes

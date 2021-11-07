@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11000922 */
+/* HASH CRC-32:0x776faac8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2635,9 +2635,11 @@ DEFINE_PUBLIC_ALIAS(DOS$fstatvfs64, libd_fstatvfs64);
 
 /* sys.swap */
 DEFINE_PUBLIC_ALIAS(DOS$swapon, libd_swapon);
+DEFINE_PUBLIC_ALIAS(DOS$__swapon, libd_swapon);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_swapon, libd_swapon);
 DEFINE_PUBLIC_ALIAS(DOS$swapon, libd_swapon);
 DEFINE_PUBLIC_ALIAS(DOS$swapoff, libd_swapoff);
+DEFINE_PUBLIC_ALIAS(DOS$__swapoff, libd_swapoff);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_swapoff, libd_swapoff);
 DEFINE_PUBLIC_ALIAS(DOS$swapoff, libd_swapoff);
 
@@ -2669,6 +2671,7 @@ DEFINE_PUBLIC_ALIAS(DOS$getitimer, libd_getitimer);
 DEFINE_PUBLIC_ALIAS(DOS$__setitimer, libd_setitimer);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_setitimer, libd_setitimer);
 DEFINE_PUBLIC_ALIAS(DOS$setitimer, libd_setitimer);
+DEFINE_PUBLIC_ALIAS(DOS$__utimes, libd_utimes);
 DEFINE_PUBLIC_ALIAS(DOS$utimes, libd_utimes);
 DEFINE_PUBLIC_ALIAS(DOS$futimesat, libd_futimesat);
 DEFINE_PUBLIC_ALIAS(DOS$__settimeofday, libd_settimeofday);
@@ -2773,7 +2776,7 @@ DEFINE_PUBLIC_ALIAS(DOS$cfgetospeed, libd_cfgetospeed);
 DEFINE_PUBLIC_ALIAS(DOS$cfgetispeed, libd_cfgetispeed);
 DEFINE_PUBLIC_ALIAS(DOS$cfsetospeed, libd_cfsetospeed);
 DEFINE_PUBLIC_ALIAS(DOS$cfsetispeed, libd_cfsetispeed);
-DEFINE_PUBLIC_ALIAS(DOS$tcgetattr, libd_tcgetattr);
+DEFINE_PUBLIC_ALIAS(DOS$__tcgetattr, libd_tcgetattr);
 DEFINE_PUBLIC_ALIAS(DOS$tcgetattr, libd_tcgetattr);
 DEFINE_PUBLIC_ALIAS(DOS$tcsetattr, libd_tcsetattr);
 DEFINE_PUBLIC_ALIAS(DOS$tcsendbreak, libd_tcsendbreak);

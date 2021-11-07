@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bd94394 */
+/* HASH CRC-32:0xd39cea7b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_lutimes64_defined */
 __LOCAL_LIBC(lutimes) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file, struct timeval const __tvp[2]) {
-#ifdef __CRT_HAVE_utimes
+#if defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
 		return (__NAMESPACE_LOCAL_SYM __localdep_lutimes32)(__file, __NULLPTR);
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file, struct 
 	__tv32[1].tv_sec  = (__time32_t)__tvp[1].tv_sec;
 	__tv32[1].tv_usec = __tvp[1].tv_usec;
 	return (__NAMESPACE_LOCAL_SYM __localdep_lutimes32)(__file, __tv32);
-#else /* __CRT_HAVE_utimes */
+#else /* __CRT_HAVE_utimes || __CRT_HAVE___utimes */
 	struct __timeval64 __tv64[2];
 	if (!__tvp)
 		return (__NAMESPACE_LOCAL_SYM __localdep_lutimes64)(__file, __NULLPTR);
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file, struct 
 	__tv64[1].tv_sec  = (__time64_t)__tvp[1].tv_sec;
 	__tv64[1].tv_usec = __tvp[1].tv_usec;
 	return (__NAMESPACE_LOCAL_SYM __localdep_lutimes64)(__file, __tv64);
-#endif /* !__CRT_HAVE_utimes */
+#endif /* !__CRT_HAVE_utimes && !__CRT_HAVE___utimes */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lutimes_defined

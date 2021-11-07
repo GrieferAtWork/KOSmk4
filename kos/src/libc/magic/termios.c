@@ -668,7 +668,7 @@ int cfsetispeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed)
 
 @@>> tcgetattr(3)
 @@Get terminal attributes
-[[decl_include("<bits/os/termios.h>"), export_alias("tcgetattr")]]
+[[decl_include("<bits/os/termios.h>"), export_alias("__tcgetattr")]]
 [[requires_include("<asm/os/tty.h>")]] /* __TCGETA */
 [[requires($has_function(ioctl) && defined(__TCGETA))]]
 int tcgetattr($fd_t fd, [[nonnull]] struct termios *__restrict termios_p) {

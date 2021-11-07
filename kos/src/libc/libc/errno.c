@@ -35,10 +35,9 @@
 
 DECL_BEGIN
 
-#undef _errno
 #undef __errno
 #undef __errno_location
-DEFINE_PUBLIC_ALIAS(_errno, libc_errno_p);
+DEFINE_PUBLIC_ALIAS(DOS$_errno, libc_errno_p); /* Only export under this name in the DOS$ namespace! */
 DEFINE_PUBLIC_ALIAS(__errno, libc_errno_p);
 DEFINE_PUBLIC_ALIAS(__errno_location, libc_errno_p);
 DEFINE_INTERN_ALIAS(libc__errno, libc_errno_p);

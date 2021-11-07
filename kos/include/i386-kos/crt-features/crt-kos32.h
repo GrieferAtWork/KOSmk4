@@ -409,6 +409,7 @@
 #define __CRT_HAVE___erfl
 #define __CRT_HAVE___errno
 #define __CRT_HAVE___errno_location
+#define __CRT_HAVE___etext
 #define __CRT_HAVE___execve
 #define __CRT_HAVE___exp
 #define __CRT_HAVE___exp10
@@ -1024,6 +1025,8 @@
 #define __CRT_HAVE___strtouq
 #define __CRT_HAVE___strverscmp
 #define __CRT_HAVE___strxfrm_l
+#define __CRT_HAVE___swapoff
+#define __CRT_HAVE___swapon
 #define __CRT_HAVE___symlink
 #define __CRT_HAVE___sync
 #define __CRT_HAVE___sys_errlist
@@ -1038,6 +1041,7 @@
 #define __CRT_HAVE___tanhf
 #define __CRT_HAVE___tanhl
 #define __CRT_HAVE___tanl
+#define __CRT_HAVE___tcgetattr
 #define __CRT_HAVE___tdelete
 #define __CRT_HAVE___tfind
 #define __CRT_HAVE___tgamma
@@ -1074,6 +1078,7 @@
 #define __CRT_HAVE___unlink
 #define __CRT_HAVE___uselocale
 #define __CRT_HAVE___utime
+#define __CRT_HAVE___utimes
 #define __CRT_HAVE___vfork
 #define __CRT_HAVE___vfscanf
 #define __CRT_HAVE___vhangup
@@ -1187,13 +1192,15 @@
 #define __CRT_HAVE__dupenv_s_dbg
 #define __CRT_HAVE__ecvt
 #define __CRT_HAVE__ecvt_s
+#define __CRT_HAVE__edata
+#define __CRT_HAVE__end
 #define __CRT_HAVE__endthread
 #define __CRT_HAVE__endthreadex
 #define __CRT_HAVE__environ
 #define __CRT_HAVE__eof
-#define __CRT_HAVE__errno
 #define __CRT_HAVE__error_badusage_no_nesting
 #define __CRT_HAVE__error_check_no_nesting
+#define __CRT_HAVE__etext
 #define __CRT_HAVE__execl
 #define __CRT_HAVE__execle
 #define __CRT_HAVE__execlp
@@ -5370,7 +5377,7 @@
 #define __CRT_HAVE_KOS$__wcstoull_l
 #define __CRT_HAVE_KOS$__wcsxfrm_l
 #define __CRT_HAVE__creat
-#define __CRT_HAVE_KOS$_errno
+#define __CRT_HAVE__errno
 #define __CRT_HAVE__fgetwc_nolock
 #define __CRT_HAVE__fgetwchar
 #define __CRT_HAVE__fgetws_nolock

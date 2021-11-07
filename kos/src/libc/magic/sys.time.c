@@ -165,7 +165,7 @@ int setitimer32(__itimer_which_t which,
                 [[nonnull]] struct $itimerval32 const *__restrict newval,
                 [[nullable]] struct $itimerval32 *__restrict oldval);
 
-[[ignore, nocrt, doc_alias("utimes"), alias("utimes")]]
+[[ignore, nocrt, doc_alias("utimes"), alias("utimes", "__utimes")]]
 [[decl_include("<bits/os/timeval.h>")]]
 int utimes32([[nonnull]] char const *file,
              [[nonnull]] struct $timeval32 const tvp[2]);
@@ -307,8 +307,8 @@ int setitimer(__itimer_which_t which,
 
 @@>> utimes(2), utimes64(2)
 [[decl_include("<bits/os/timeval.h>")]]
-[[section(".text.crt{|.dos}.fs.modify_time"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimes")]]
+[[section(".text.crt{|.dos}.fs.modify_time"), no_crt_self_import, export_as("__utimes")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimes", "__utimes")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimes64")]]
 [[userimpl, requires($has_function(utimes32) || $has_function(utimes64))]]
 int utimes([[nonnull]] char const *file,
@@ -557,6 +557,7 @@ int setitimer64(__itimer_which_t which,
 
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(utimes), doc_alias("utimes")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__utimes")]]
 [[section(".text.crt{|.dos}.fs.modify_time")]]
 [[userimpl, requires_function(utimes32)]]
 int utimes64([[nonnull]] char const *file,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d25edcf */
+/* HASH CRC-32:0xb4a039e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -512,7 +512,7 @@ DEFINE_PUBLIC_ALIAS(cfgetospeed, libc_cfgetospeed);
 DEFINE_PUBLIC_ALIAS(cfgetispeed, libc_cfgetispeed);
 DEFINE_PUBLIC_ALIAS(cfsetospeed, libc_cfsetospeed);
 DEFINE_PUBLIC_ALIAS(cfsetispeed, libc_cfsetispeed);
-DEFINE_PUBLIC_ALIAS(tcgetattr, libc_tcgetattr);
+DEFINE_PUBLIC_ALIAS(__tcgetattr, libc_tcgetattr);
 DEFINE_PUBLIC_ALIAS(tcgetattr, libc_tcgetattr);
 DEFINE_PUBLIC_ALIAS(tcsetattr, libc_tcsetattr);
 DEFINE_PUBLIC_ALIAS(tcsendbreak, libc_tcsendbreak);
