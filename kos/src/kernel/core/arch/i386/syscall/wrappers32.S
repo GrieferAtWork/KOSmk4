@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d04dc27 */
+/* HASH CRC-32:0x7fc45738 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4895,14 +4895,8 @@ END(__x86_asm32_int80_init_module)
  * as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
- *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
- *                               Currently,  KOS  simply  ignores  this   flag,
- *                               since drivers on KOS should always be unloaded
- *                               immediately. - However, driver finalizers  may
- *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediately
- *                               (may    compromise    system     integrity)
- *                               s.a.         `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+ *                - O_NONBLOCK: s.a. `KSYSCTL_DRIVER_DELMOD_FNONBLOCK'
+ *                - O_TRUNC:    s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 /* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.x86.asm32_syscall_int80.delete_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
@@ -24479,14 +24473,8 @@ END(__x86_asm32_sysenter_init_module)
  * as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
- *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
- *                               Currently,  KOS  simply  ignores  this   flag,
- *                               since drivers on KOS should always be unloaded
- *                               immediately. - However, driver finalizers  may
- *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediately
- *                               (may    compromise    system     integrity)
- *                               s.a.         `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+ *                - O_NONBLOCK: s.a. `KSYSCTL_DRIVER_DELMOD_FNONBLOCK'
+ *                - O_TRUNC:    s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 /* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.delete_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_delete_module)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd73dd07f */
+/* HASH CRC-32:0x2c064b1b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -262,14 +262,8 @@
  * as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
- *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
- *                               Currently,  KOS  simply  ignores  this   flag,
- *                               since drivers on KOS should always be unloaded
- *                               immediately. - However, driver finalizers  may
- *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediately
- *                               (may    compromise    system     integrity)
- *                               s.a.         `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+ *                - O_NONBLOCK: s.a. `KSYSCTL_DRIVER_DELMOD_FNONBLOCK'
+ *                - O_TRUNC:    s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 #define __NR_delete_module          0x6a  /* errno_t delete_module(char const *name, oflag_t flags) */
 #define __NR_timer_create           0x6b  /* errno_t timer_create(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) */
 #define __NR_timer_gettime          0x6c  /* errno_t timer_gettime(timer_t timerid, struct itimerspec *value) */
