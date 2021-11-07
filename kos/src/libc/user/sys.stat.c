@@ -32,6 +32,7 @@
 
 #include <fcntl.h>
 #include <malloc.h>
+#include <string.h>
 #include <syscall.h>
 #include <unistd.h>
 
@@ -199,38 +200,44 @@ DEFINE_INTERN_ALIAS(libc_fstatat64, libc_glc_fstatat64);
 LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2glc(struct __glc_stat *__restrict dst,
                  struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (u64)src->st_dev;
-	dst->st_ino     = (u32)src->st_ino32;
-	dst->st_mode    = (u32)src->st_mode;
-	dst->st_nlink   = (u32)src->st_nlink;
-	dst->st_uid     = (u32)src->st_uid;
-	dst->st_gid     = (u32)src->st_gid;
-	dst->st_rdev    = (u64)src->st_rdev;
-	dst->st_size    = (u32)src->st_size32;
-	dst->st_blksize = (u32)src->st_blksize;
-	dst->st_blocks  = (u32)src->st_blocks32;
-	dst->st_atim    = src->st_atim32;
-	dst->st_mtim    = src->st_mtim32;
-	dst->st_ctim    = src->st_ctim32;
+	dst->st_dev          = (typeof(dst->st_dev))src->st_dev;
+	dst->st_ino          = (typeof(dst->st_ino))src->st_ino32;
+	dst->st_mode         = (typeof(dst->st_mode))src->st_mode;
+	dst->st_nlink        = (typeof(dst->st_nlink))src->st_nlink;
+	dst->st_uid          = (typeof(dst->st_uid))src->st_uid;
+	dst->st_gid          = (typeof(dst->st_gid))src->st_gid;
+	dst->st_rdev         = (typeof(dst->st_rdev))src->st_rdev;
+	dst->st_size         = (typeof(dst->st_size))src->st_size32;
+	dst->st_blksize      = (typeof(dst->st_blksize))src->st_blksize;
+	dst->st_blocks       = (typeof(dst->st_blocks))src->st_blocks32;
+	dst->st_atim.tv_sec  = (typeof(dst->st_atim.tv_sec))src->st_atim32.tv_sec;
+	dst->st_atim.tv_nsec = (typeof(dst->st_atim.tv_nsec))src->st_atim32.tv_nsec;
+	dst->st_mtim.tv_sec  = (typeof(dst->st_mtim.tv_sec))src->st_mtim32.tv_sec;
+	dst->st_mtim.tv_nsec = (typeof(dst->st_mtim.tv_nsec))src->st_mtim32.tv_nsec;
+	dst->st_ctim.tv_sec  = (typeof(dst->st_ctim.tv_sec))src->st_ctim32.tv_sec;
+	dst->st_ctim.tv_nsec = (typeof(dst->st_ctim.tv_nsec))src->st_ctim32.tv_nsec;
 }
 
 LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2glc64(struct __glc_stat64 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (u64)src->st_dev;
-	dst->st_ino32   = (u32)src->st_ino32;
-	dst->st_mode    = (u32)src->st_mode;
-	dst->st_nlink   = (u32)src->st_nlink;
-	dst->st_uid     = (u32)src->st_uid;
-	dst->st_gid     = (u32)src->st_gid;
-	dst->st_rdev    = (u64)src->st_rdev;
-	dst->st_size64  = (u64)src->st_size64;
-	dst->st_blksize = (u32)src->st_blksize;
-	dst->st_blocks  = (u32)src->st_blocks32;
-	dst->st_atim    = src->st_atim32;
-	dst->st_mtim    = src->st_mtim32;
-	dst->st_ctim    = src->st_ctim32;
-	dst->st_ino64   = (u64)src->st_ino64;
+	dst->st_dev          = (typeof(dst->st_dev))src->st_dev;
+	dst->st_ino32        = (typeof(dst->st_ino32))src->st_ino32;
+	dst->st_mode         = (typeof(dst->st_mode))src->st_mode;
+	dst->st_nlink        = (typeof(dst->st_nlink))src->st_nlink;
+	dst->st_uid          = (typeof(dst->st_uid))src->st_uid;
+	dst->st_gid          = (typeof(dst->st_gid))src->st_gid;
+	dst->st_rdev         = (typeof(dst->st_rdev))src->st_rdev;
+	dst->st_size64       = (typeof(dst->st_size64))src->st_size64;
+	dst->st_blksize      = (typeof(dst->st_blksize))src->st_blksize;
+	dst->st_blocks       = (typeof(dst->st_blocks))src->st_blocks32;
+	dst->st_atim.tv_sec  = (typeof(dst->st_atim.tv_sec))src->st_atim32.tv_sec;
+	dst->st_atim.tv_nsec = (typeof(dst->st_atim.tv_nsec))src->st_atim32.tv_nsec;
+	dst->st_mtim.tv_sec  = (typeof(dst->st_mtim.tv_sec))src->st_mtim32.tv_sec;
+	dst->st_mtim.tv_nsec = (typeof(dst->st_mtim.tv_nsec))src->st_mtim32.tv_nsec;
+	dst->st_ctim.tv_sec  = (typeof(dst->st_ctim.tv_sec))src->st_ctim32.tv_sec;
+	dst->st_ctim.tv_nsec = (typeof(dst->st_ctim.tv_nsec))src->st_ctim32.tv_nsec;
+	dst->st_ino64        = (typeof(dst->st_ino64))src->st_ino64;
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2)) int
@@ -321,6 +328,295 @@ NOTHROW_RPC(LIBCCALL libc_glc_fstatat64)(fd_t dirfd,
 	if likely(!result)
 		convstat_kos2glc64(buf, &st);
 	return result;
+}
+
+
+/************************************************************************/
+/* Compatibility for gLibc's mess of different stat structures...       */
+/************************************************************************/
+
+
+/*
+ * Names -> types:
+ *  - _STAT_VER_KERNEL:                  `struct linux_stat32'
+ *  - _STAT_VER_KERNEL | STAT_CONV_F_64: `struct linux_stat64'
+ *  - _STAT_VER_KERNEL64:                `struct linux_stat64'
+ *  - _STAT_VER_LINUX:                   `struct __glc_stat'
+ *  - _STAT_VER_LINUX | STAT_CONV_F_64:  `struct __glc_stat64'
+ *  - _STAT_VER_LINUX_OLD:               ???  (weird, platform-specific alias for `_STAT_VER_KERNEL')
+ *  - _STAT_VER_SVR4:                    ???  (Not implemented anywhere; historical artifact)
+ */
+#ifdef __x86_64__
+#define _STAT_VER_KERNEL 0
+#define _STAT_VER_LINUX  1
+#define _MKNOD_VER_LINUX 0
+#elif defined(__i386__)
+#define _STAT_VER_LINUX_OLD 1
+#define _STAT_VER_KERNEL    1
+#define _STAT_VER_SVR4      2
+#define _STAT_VER_LINUX     3
+#define _MKNOD_VER_LINUX    1
+#define _MKNOD_VER_SVR4     2
+#elif defined(__alpha__)
+#define _STAT_VER_KERNEL     0
+#define _STAT_VER_GLIBC2     1
+#define _STAT_VER_GLIBC2_1   2
+#define _STAT_VER_KERNEL64   3
+#define _STAT_VER_GLIBC2_3_4 3
+#define _STAT_VER_LINUX      3
+#define _MKNOD_VER_LINUX     0
+#elif defined(__ia64__)
+#define _STAT_VER_KERNEL 0
+#define _STAT_VER_LINUX  1
+#define _MKNOD_VER_LINUX 0
+#elif (defined(__m64k__) || defined(__microblaze__) || \
+       defined(__mips__) || defined(__powerpc__) ||    \
+       defined(__sparc__))
+#define _STAT_VER_LINUX_OLD 1
+#define _STAT_VER_KERNEL    1
+#define _STAT_VER_SVR4      2
+#define _STAT_VER_LINUX     3
+#define _MKNOD_VER_LINUX    1
+#define _MKNOD_VER_SVR4     2
+#elif defined(__s390__)
+#if __SIZEOF_POINTER__ == 8
+#define _STAT_VER_KERNEL 0
+#define _STAT_VER_LINUX  1
+#define _MKNOD_VER_LINUX 0
+#else /* __SIZEOF_POINTER__ == 8 */
+#define _STAT_VER_LINUX_OLD 1
+#define _STAT_VER_KERNEL    1
+#define _STAT_VER_SVR4      2
+#define _STAT_VER_LINUX     3
+#define _MKNOD_VER_LINUX    1
+#define _MKNOD_VER_SVR4     2
+#endif /* __SIZEOF_POINTER__ != 8 */
+#elif __SIZEOF_POINTER__ == 8
+#define _STAT_VER_KERNEL 0
+#define _STAT_VER_LINUX  0
+#define _MKNOD_VER_LINUX 0
+#else /* ... */
+#define _STAT_VER_LINUX_OLD 1
+#define _STAT_VER_KERNEL    1
+#define _STAT_VER_LINUX     3
+#define _STAT_VER_SVR4      2
+#define _MKNOD_VER_LINUX    1
+#define _MKNOD_VER_SVR4     2
+#endif /* !... */
+
+
+
+#define STAT_CONV_F_64 0x8000 /* 64-bit flag */
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) errno_t
+NOTHROW(LIBCCALL stat_conv)(int vers, struct stat const *__restrict st, void *__restrict buf) {
+	switch (vers) {
+
+	case _STAT_VER_KERNEL:
+#ifdef __LINUX_STAT32_MATCHES_LINUX_STAT64
+	case _STAT_VER_KERNEL | STAT_CONV_F_64:
+#ifdef _STAT_VER_KERNEL64
+	case _STAT_VER_KERNEL64:
+#endif /* _STAT_VER_KERNEL64 */
+#endif /* __LINUX_STAT32_MATCHES_LINUX_STAT64 */
+	{
+		struct linux_stat32 *res;
+		res = (struct linux_stat32 *)buf;
+		memset(res, 0, sizeof(*res));
+		res->st_dev        = (typeof(res->st_dev))st->st_dev;
+		res->st_ino        = (typeof(res->st_ino))st->st_ino;
+		res->st_mode       = (typeof(res->st_mode))st->st_mode;
+		res->st_nlink      = (typeof(res->st_nlink))st->st_nlink;
+		res->st_uid        = (typeof(res->st_uid))st->st_uid;
+		res->st_gid        = (typeof(res->st_gid))st->st_gid;
+		res->st_rdev       = (typeof(res->st_rdev))st->st_rdev;
+		res->st_size       = (typeof(res->st_size))st->st_size;
+		res->st_blksize    = (typeof(res->st_blksize))st->st_blksize;
+		res->st_blocks     = (typeof(res->st_blocks))st->st_blocks;
+		res->st_atime      = (typeof(res->st_atime))st->st_atime;
+		res->st_atime_nsec = (typeof(res->st_atime_nsec))st->st_atimensec;
+		res->st_mtime      = (typeof(res->st_mtime))st->st_mtime;
+		res->st_mtime_nsec = (typeof(res->st_mtime_nsec))st->st_mtimensec;
+		res->st_ctime      = (typeof(res->st_ctime))st->st_ctime;
+		res->st_ctime_nsec = (typeof(res->st_ctime_nsec))st->st_ctimensec;
+	}	break;
+
+#ifndef __LINUX_STAT32_MATCHES_LINUX_STAT64
+	case _STAT_VER_KERNEL | STAT_CONV_F_64:
+#ifdef _STAT_VER_KERNEL64
+	case _STAT_VER_KERNEL64:
+#endif /* _STAT_VER_KERNEL64 */
+	{
+		struct linux_stat64 *res;
+		res = (struct linux_stat64 *)buf;
+		memset(res, 0, sizeof(*res));
+		res->st_dev        = (typeof(res->st_dev))st->st_dev;
+#ifdef _HAVE_LINUX_STAT64___ST_INO
+		res->__st_ino      = (typeof(res->__st_ino))st->st_ino;
+#endif /* _HAVE_LINUX_STAT64___ST_INO */
+		res->st_mode       = (typeof(res->st_mode))st->st_mode;
+		res->st_nlink      = (typeof(res->st_nlink))st->st_nlink;
+		res->st_uid        = (typeof(res->st_uid))st->st_uid;
+		res->st_gid        = (typeof(res->st_gid))st->st_gid;
+		res->st_rdev       = (typeof(res->st_rdev))st->st_rdev;
+		res->st_size       = (typeof(res->st_size))st->st_size;
+		res->st_blksize    = (typeof(res->st_blksize))st->st_blksize;
+		res->st_blocks     = (typeof(res->st_blocks))st->st_blocks;
+		res->st_atime      = (typeof(res->st_atime))st->st_atime;
+		res->st_atime_nsec = (typeof(res->st_atime_nsec))st->st_atimensec;
+		res->st_mtime      = (typeof(res->st_mtime))st->st_mtime;
+		res->st_mtime_nsec = (typeof(res->st_mtime_nsec))st->st_mtimensec;
+		res->st_ctime      = (typeof(res->st_ctime))st->st_ctime;
+		res->st_ctime_nsec = (typeof(res->st_ctime_nsec))st->st_ctimensec;
+		res->st_ino        = (typeof(res->st_ino))st->st_ino;
+	}	break;
+#endif /* !__LINUX_STAT32_MATCHES_LINUX_STAT64 */
+
+#ifdef _STAT_VER_GLIBC2_1
+	case _STAT_VER_GLIBC2_1: {
+		struct glibc21_stat {
+			__dev_t st_dev;
+			__ino64_t st_ino;
+			__mode_t st_mode;
+			__nlink_t st_nlink;
+			__uid_t st_uid;
+			__gid_t st_gid;
+			__dev_t st_rdev;
+			__off_t st_size;
+			__time_t st_atime;
+			__time_t st_mtime;
+			__time_t st_ctime;
+			__blkcnt64_t st_blocks;
+			__blksize_t st_blksize;
+			unsigned int st_flags;
+			unsigned int st_gen;
+			int __pad3;
+			long __glibc_reserved[4];
+		};
+		struct glibc21_stat *res;
+		res = (struct glibc21_stat *)buf;
+		memset(res, 0, sizeof(*res));
+		res->st_dev     = st->st_dev;
+		res->st_ino     = st->st_ino;
+		res->st_mode    = st->st_mode;
+		res->st_nlink   = st->st_nlink;
+		res->st_uid     = st->st_uid;
+		res->st_gid     = st->st_gid;
+		res->st_rdev    = st->st_rdev;
+		res->st_size    = st->st_size;
+		res->st_atime   = st->st_atime;
+		res->st_mtime   = st->st_mtime;
+		res->st_ctime   = st->st_ctime;
+		res->st_blocks  = st->st_blocks;
+		res->st_blksize = st->st_blksize;
+		res->st_flags   = st->st_flags;
+		res->st_gen     = st->st_gen;
+	}	break;
+#endif /* _STAT_VER_GLIBC2_1 */
+
+	case _STAT_VER_LINUX:
+		convstat_kos2glc((struct __glc_stat *)buf, st);
+		break;
+
+	case _STAT_VER_LINUX | STAT_CONV_F_64:
+		convstat_kos2glc64((struct __glc_stat64 *)buf, st);
+		break;
+
+	default:
+		return -EINVAL;
+	}
+	return 0;
+}
+
+DEFINE_PUBLIC_ALIAS(__fxstat, libc___fxstat);
+DEFINE_PUBLIC_ALIAS(_fxstat, libc___fxstat);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3)) int
+NOTHROW_RPC(LIBCCALL libc___fxstat)(int vers, fd_t fd, void *__restrict buf) {
+	struct stat info;
+	errno_t error = sys_kfstat(fd, &info);
+	if (error == -EOK)
+		error = stat_conv(vers, &info, buf);
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(__fxstat64, libc___fxstat64);
+DEFINE_PUBLIC_ALIAS(_fxstat64, libc___fxstat64);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3)) int
+NOTHROW_RPC(LIBCCALL libc___fxstat64)(int vers, fd_t fd, void *__restrict buf) {
+	struct stat info;
+	errno_t error = sys_kfstat(fd, &info);
+	if (error == -EOK)
+		error = stat_conv(vers | STAT_CONV_F_64, &info, buf);
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(__xstat, libc___xstat);
+DEFINE_PUBLIC_ALIAS(_xstat, libc___xstat);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
+NOTHROW_RPC(LIBCCALL libc___xstat)(int vers, char const *filename, void *__restrict buf) {
+	struct stat info;
+	errno_t error = sys_kstat(filename, &info);
+	if (error == -EOK)
+		error = stat_conv(vers, &info, buf);
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(__xstat64, libc___xstat64);
+DEFINE_PUBLIC_ALIAS(_xstat64, libc___xstat64);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
+NOTHROW_RPC(LIBCCALL libc___xstat64)(int vers, char const *filename, void *__restrict buf) {
+	struct stat info;
+	errno_t error = sys_kstat(filename, &info);
+	if (error == -EOK)
+		error = stat_conv(vers | STAT_CONV_F_64, &info, buf);
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(__lxstat, libc___lxstat);
+DEFINE_PUBLIC_ALIAS(_lxstat, libc___lxstat);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
+NOTHROW_RPC(LIBCCALL libc___lxstat)(int vers, char const *filename, void *__restrict buf) {
+	struct stat info;
+	errno_t error = sys_klstat(filename, &info);
+	if (error == -EOK)
+		error = stat_conv(vers, &info, buf);
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(__lxstat64, libc___lxstat64);
+DEFINE_PUBLIC_ALIAS(_lxstat64, libc___lxstat64);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
+NOTHROW_RPC(LIBCCALL libc___lxstat64)(int vers, char const *filename, void *__restrict buf) {
+	struct stat info;
+	errno_t error = sys_klstat(filename, &info);
+	if (error == -EOK)
+		error = stat_conv(vers | STAT_CONV_F_64, &info, buf);
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(__xmknod, libc___xmknod);
+DEFINE_PUBLIC_ALIAS(_xmknod, libc___xmknod);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 4)) int
+NOTHROW_RPC(LIBCCALL libc___xmknod)(int vers, char const *path, mode_t mode, void *dev) {
+	errno_t error;
+	if (vers == _MKNOD_VER_LINUX) {
+		error = sys_mknod(path, mode, *(uint32_t *)dev);
+	} else {
+		error = -EINVAL;
+	}
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(__xmknodat, libc___xmknodat);
+DEFINE_PUBLIC_ALIAS(_xmknodat, libc___xmknodat);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3, 5)) int
+NOTHROW_RPC(LIBCCALL libc___xmknodat)(int vers, fd_t dfd, char const *path, mode_t mode, void *dev) {
+	errno_t error;
+	if (vers == _MKNOD_VER_LINUX) {
+		error = sys_mknodat(dfd, path, mode, *(uint32_t *)dev);
+	} else {
+		error = -EINVAL;
+	}
+	return libc_seterrno_syserr(error);
 }
 
 

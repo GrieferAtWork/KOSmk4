@@ -445,6 +445,8 @@
 #define __CRT_HAVE___fsetlocking
 #define __CRT_HAVE___fwritable
 #define __CRT_HAVE___fwriting
+#define __CRT_HAVE___fxstat
+#define __CRT_HAVE___fxstat64
 #define __CRT_HAVE___gamma
 #define __CRT_HAVE___gammaf
 #define __CRT_HAVE___gammal
@@ -568,6 +570,8 @@
 #define __CRT_HAVE___lroundf
 #define __CRT_HAVE___lroundl
 #define __CRT_HAVE___lseek
+#define __CRT_HAVE___lxstat
+#define __CRT_HAVE___lxstat64
 #define __CRT_HAVE___madvise
 #define __CRT_HAVE___mbrlen
 #define __CRT_HAVE___mbrtowc
@@ -847,9 +851,13 @@
 #define __CRT_HAVE___x86_getcontext_eax
 #define __CRT_HAVE___x86_rtm_xtest
 #define __CRT_HAVE___x86_setcontext_ebp
+#define __CRT_HAVE___xmknod
+#define __CRT_HAVE___xmknodat
 #define __CRT_HAVE___xpg_basename
 #define __CRT_HAVE___xpg_sigpause
 #define __CRT_HAVE___xpg_strerror_r
+#define __CRT_HAVE___xstat
+#define __CRT_HAVE___xstat64
 #define __CRT_HAVE___y0
 #define __CRT_HAVE___y0f
 #define __CRT_HAVE___y0l
@@ -1012,6 +1020,8 @@
 #define __CRT_HAVE__fwprintf_s_l
 #define __CRT_HAVE__fwrite_nolock
 #define __CRT_HAVE__fwscanf_l
+#define __CRT_HAVE__fxstat
+#define __CRT_HAVE__fxstat64
 #define __CRT_HAVE__gcvt
 #define __CRT_HAVE__gcvt_s
 #define __CRT_HAVE__get_doserrno
@@ -1097,6 +1107,8 @@
 #define __CRT_HAVE__ltoa_s
 #define __CRT_HAVE__ltow
 #define __CRT_HAVE__ltow_s
+#define __CRT_HAVE__lxstat
+#define __CRT_HAVE__lxstat64
 #define __CRT_HAVE__makepath
 #define __CRT_HAVE__makepath_s
 #define __CRT_HAVE__malloc_dbg
@@ -1405,6 +1417,10 @@
 #define __CRT_HAVE__wtol_l
 #define __CRT_HAVE__wtoll_l
 #define __CRT_HAVE__wutime32
+#define __CRT_HAVE__xmknod
+#define __CRT_HAVE__xmknodat
+#define __CRT_HAVE__xstat
+#define __CRT_HAVE__xstat64
 #define __CRT_HAVE_a64l
 #define __CRT_HAVE_abort
 #define __CRT_HAVE_abs

@@ -26,6 +26,7 @@
 #include <hybrid/typecore.h>
 
 #ifdef __x86_64__
+#define __LINUX_STAT32_MATCHES_LINUX_STAT64
 #define linux_stat       linux_stat64
 #define linux_stat32     linux_stat64
 #define linux_statx64    linux_stat64

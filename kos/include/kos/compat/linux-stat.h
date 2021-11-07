@@ -91,6 +91,7 @@ struct linux_stat64 {
 	__ULONG64_TYPE__ st_dev;
 	__BYTE_TYPE__    __pad0[4];
 	__ULONG32_TYPE__ __st_ino;
+#define _HAVE_LINUX_STAT64___ST_INO
 	__UINT32_TYPE__  st_mode;
 	__UINT32_TYPE__  st_nlink;
 	__ULONG32_TYPE__ st_uid;
