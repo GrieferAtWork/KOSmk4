@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3deb8a5 */
+/* HASH CRC-32:0x4d92ebb6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,8 +29,8 @@
 
 DECL_BEGIN
 
-/* For the sake  of optimization,  allow libc  auto
- * functions to make direct use of `__ctype_flags'. */
+/* For  the  sake  of optimization,  allow  libc auto
+ * functions to make direct use of `__ctype_C_flags'. */
 #define libc_iscntrl(ch)  __crt_iscntrl(ch)
 #define libc_isspace(ch)  __crt_isspace(ch)
 #define libc_isupper(ch)  __crt_isupper(ch)

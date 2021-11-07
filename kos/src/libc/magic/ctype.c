@@ -71,9 +71,9 @@
 %[define_str2wcs_replacement(toupper_l = towupper_l)]
 %[define_str2wcs_replacement(isascii   = iswascii)]
 
-%[declare_kernel_export("__ctype_flags")]
-%[declare_kernel_export("__ctype_tolower")]
-%[declare_kernel_export("__ctype_toupper")]
+%[declare_kernel_export("__ctype_C_flags")]
+%[declare_kernel_export("__ctype_C_tolower")]
+%[declare_kernel_export("__ctype_C_toupper")]
 
 
 /* Because KOS uses UTF-8 through, functions from <ctype.h> must
@@ -134,20 +134,20 @@ function printTable(name, tab, signed) {
 	print("};");
 }
 print("%(auto_source){");
-print("DEFINE_PUBLIC_ALIAS(__ctype_flags, libc___ctype_flags);");
-print("DEFINE_PUBLIC_ALIAS(__ctype_tolower, libc___ctype_tolower);");
-print("DEFINE_PUBLIC_ALIAS(__ctype_toupper, libc___ctype_toupper);");
-printTable("libc___ctype_flags", CTYPE, false);
-printTable("libc___ctype_tolower", TOLOWER, true);
-printTable("libc___ctype_toupper", TOUPPER, true);
+print("DEFINE_PUBLIC_ALIAS(__ctype_C_flags, libc___ctype_C_flags);");
+print("DEFINE_PUBLIC_ALIAS(__ctype_C_tolower, libc___ctype_C_tolower);");
+print("DEFINE_PUBLIC_ALIAS(__ctype_C_toupper, libc___ctype_C_toupper);");
+printTable("libc___ctype_C_flags", CTYPE, false);
+printTable("libc___ctype_C_tolower", TOLOWER, true);
+printTable("libc___ctype_C_toupper", TOUPPER, true);
 print("}");
 ]]]*/
 %(auto_source){
-DEFINE_PUBLIC_ALIAS(__ctype_flags, libc___ctype_flags);
-DEFINE_PUBLIC_ALIAS(__ctype_tolower, libc___ctype_tolower);
-DEFINE_PUBLIC_ALIAS(__ctype_toupper, libc___ctype_toupper);
-INTDEF __UINT8_TYPE__ const libc___ctype_flags[256];
-INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __UINT8_TYPE__ const libc___ctype_flags[256] = {
+DEFINE_PUBLIC_ALIAS(__ctype_C_flags, libc___ctype_C_flags);
+DEFINE_PUBLIC_ALIAS(__ctype_C_tolower, libc___ctype_C_tolower);
+DEFINE_PUBLIC_ALIAS(__ctype_C_toupper, libc___ctype_C_toupper);
+INTDEF __UINT8_TYPE__ const libc___ctype_C_flags[256];
+INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __UINT8_TYPE__ const libc___ctype_C_flags[256] = {
 	0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x3,0x3,0x3,0x3,0x3,0x1,0x1,
 	0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,
 	0x82,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
@@ -165,8 +165,8 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __UINT8_TYPE__ con
 	0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
 	0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
 };
-INTDEF __INT8_TYPE__ const libc___ctype_tolower[256];
-INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ const libc___ctype_tolower[256] = {
+INTDEF __INT8_TYPE__ const libc___ctype_C_tolower[256];
+INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ const libc___ctype_C_tolower[256] = {
 	0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf,
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
 	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,
@@ -184,8 +184,8 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ cons
 	-0x20,-0x1f,-0x1e,-0x1d,-0x1c,-0x1b,-0x1a,-0x19,-0x18,-0x17,-0x16,-0x15,-0x14,-0x13,-0x12,-0x11,
 	-0x10,-0xf,-0xe,-0xd,-0xc,-0xb,-0xa,-0x9,-0x8,-0x7,-0x6,-0x5,-0x4,-0x3,-0x2,-0x1,
 };
-INTDEF __INT8_TYPE__ const libc___ctype_toupper[256];
-INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ const libc___ctype_toupper[256] = {
+INTDEF __INT8_TYPE__ const libc___ctype_C_toupper[256];
+INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ const libc___ctype_C_toupper[256] = {
 	0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf,
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
 	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,
@@ -208,8 +208,8 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ cons
 
 
 %(auto_header){
-/* For the sake  of optimization,  allow libc  auto
- * functions to make direct use of `__ctype_flags'. */
+/* For  the  sake  of optimization,  allow  libc auto
+ * functions to make direct use of `__ctype_C_flags'. */
 #define libc_iscntrl(ch)  __crt_iscntrl(ch)
 #define libc_isspace(ch)  __crt_isspace(ch)
 #define libc_isupper(ch)  __crt_isupper(ch)

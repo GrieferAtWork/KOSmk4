@@ -29,7 +29,7 @@
 
 #ifdef __CC__
 
-#if defined(__CRT_KOS) && defined(__CRT_HAVE___ctype_flags)
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___ctype_C_flags)
 
 /************************************************************************/
 /* KOS                                                                  */
@@ -38,8 +38,8 @@
  * operate on only those characters which can be represented  in
  * single-byte mode (iow: ASCII)
  *
- * To improve performance, we make use of a lookup table define
- * flags   and   implement   the   tolower/toupper   functions.
+ * To improve performance, we make use of a lookup table that
+ * defines flags and implement the tolower/toupper functions.
  *
  * CTYPE flags are defined as follows:
  *     0x01: iscntrl   00-1F, 7F
@@ -50,43 +50,43 @@
  *     0x20: ishex     41-46, 61-66
  *     0x40: ispunct   21-2F, 3A-40, 5B-60, 7B-7E
  *     0x80: -         20 */
-#ifndef ____ctype_flags_defined
-#define ____ctype_flags_defined
-__DECL_BEGIN __LIBC __UINT8_TYPE__ const __ctype_flags[256] __CASMNAME_SAME("__ctype_flags"); __DECL_END
-#endif /* !____ctype_flags_defined */
+#ifndef ____ctype_C_flags_defined
+#define ____ctype_C_flags_defined
+__DECL_BEGIN __LIBC __UINT8_TYPE__ const __ctype_C_flags[256] __CASMNAME_SAME("__ctype_C_flags"); __DECL_END
+#endif /* !____ctype_C_flags_defined */
 
-#define __crt_iscntrl(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x01)
-#define __crt_isspace(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x02)
-#define __crt_islower(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x04)
-#define __crt_isupper(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x08)
-#define __crt_isalpha(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x0c)
-#define __crt_isdigit(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x10)
-#define __crt_isxdigit(ch) (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x30)
-#define __crt_isalnum(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x1c)
-#define __crt_ispunct(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x40)
-#define __crt_isgraph(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x5c)
-#define __crt_isprint(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0xdc)
+#define __crt_iscntrl(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x01)
+#define __crt_isspace(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x02)
+#define __crt_islower(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x04)
+#define __crt_isupper(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x08)
+#define __crt_isalpha(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x0c)
+#define __crt_isdigit(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x10)
+#define __crt_isxdigit(ch) (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x30)
+#define __crt_isalnum(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x1c)
+#define __crt_ispunct(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x40)
+#define __crt_isgraph(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x5c)
+#define __crt_isprint(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0xdc)
 #ifdef __NO_XBLOCK
 #define __crt_isblank(ch) ((__UINT8_TYPE__)(ch) == 9 || (__UINT8_TYPE__)(ch) == 0x20)
 #else /* __NO_XBLOCK */
 #define __crt_isblank(ch) __XBLOCK({ __UINT8_TYPE__ __cib_ch = (__UINT8_TYPE__)(ch); __XRETURN (__cib_ch) == 9 || (__cib_ch) == 0x20; })
 #endif /* !__NO_XBLOCK */
 
-#ifdef __CRT_HAVE___ctype_tolower
-#ifndef ____ctype_tolower_defined
-#define ____ctype_tolower_defined
-__DECL_BEGIN __LIBC char const __ctype_tolower[256] __CASMNAME_SAME("__ctype_tolower"); __DECL_END
-#endif /* !____ctype_tolower_defined */
-#define __crt_tolower(ch) __ctype_tolower[(__UINT8_TYPE__)(ch)]
-#endif /* __CRT_HAVE___ctype_tolower */
+#ifdef __CRT_HAVE___ctype_C_tolower
+#ifndef ____ctype_C_tolower_defined
+#define ____ctype_C_tolower_defined
+__DECL_BEGIN __LIBC char const __ctype_C_tolower[256] __CASMNAME_SAME("__ctype_C_tolower"); __DECL_END
+#endif /* !____ctype_C_tolower_defined */
+#define __crt_tolower(ch) __ctype_C_tolower[(__UINT8_TYPE__)(ch)]
+#endif /* __CRT_HAVE___ctype_C_tolower */
 
-#ifdef __CRT_HAVE___ctype_toupper
-#ifndef ____ctype_toupper_defined
-#define ____ctype_toupper_defined
-__DECL_BEGIN __LIBC char const __ctype_toupper[256] __CASMNAME_SAME("__ctype_toupper"); __DECL_END
-#endif /* !____ctype_toupper_defined */
-#define __crt_toupper(ch) __ctype_toupper[(__UINT8_TYPE__)(ch)]
-#endif /* __CRT_HAVE___ctype_toupper */
+#ifdef __CRT_HAVE___ctype_C_toupper
+#ifndef ____ctype_C_toupper_defined
+#define ____ctype_C_toupper_defined
+__DECL_BEGIN __LIBC char const __ctype_C_toupper[256] __CASMNAME_SAME("__ctype_C_toupper"); __DECL_END
+#endif /* !____ctype_C_toupper_defined */
+#define __crt_toupper(ch) __ctype_C_toupper[(__UINT8_TYPE__)(ch)]
+#endif /* __CRT_HAVE___ctype_C_toupper */
 /************************************************************************/
 
 #elif defined(__CRT_GLC) && defined(__CRT_HAVE___ctype_b_loc)

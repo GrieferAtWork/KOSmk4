@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84d0634 */
+/* HASH CRC-32:0x18c499db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3148,16 +3148,12 @@
 #define __CRT_HAVE___control87_2
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___crt_unreachable
+#define __CRT_HAVE___ctype_C_flags
+#define __CRT_HAVE___ctype_C_tolower
+#define __CRT_HAVE___ctype_C_toupper
 #ifndef __KERNEL__
 #define __CRT_HAVE___ctype_b_loc
-#endif /* !__KERNEL__ */
-#define __CRT_HAVE___ctype_flags
-#define __CRT_HAVE___ctype_tolower
-#ifndef __KERNEL__
 #define __CRT_HAVE___ctype_tolower_loc
-#endif /* !__KERNEL__ */
-#define __CRT_HAVE___ctype_toupper
-#ifndef __KERNEL__
 #define __CRT_HAVE___ctype_toupper_loc
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___cxa_begin_catch

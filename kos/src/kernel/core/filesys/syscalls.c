@@ -718,18 +718,16 @@ sys_umount2_impl(fd_t dirfd, USER UNCHECKED char const *target,
 	validate_readable(target, 1);
 	atflags    = fs_atflags(atflags) | AT_IGNORE_TRAILING_SLASHES;
 	unmount_me = path_traverse_r(dirfd, target, NULL, NULL, atflags);
-	{
-		FINALLY_DECREF_UNLIKELY(unmount_me);
-		if (path_ismount(unmount_me)) {
-			/* Require mounting rights. */
-			require(CAP_MOUNT);
+	FINALLY_DECREF_UNLIKELY(unmount_me);
+	if (path_ismount(unmount_me)) {
+		/* Require mounting rights. */
+		require(CAP_MOUNT);
 
-			/* Force a sync before doing the unmount. (Don't unload in inconsistent state) */
-			fsuper_sync(unmount_me->p_dir->fn_super);
+		/* Force a sync before doing the unmount. (Don't unload in inconsistent state) */
+		fsuper_sync(unmount_me->p_dir->fn_super);
 
-			/* Do the unmount. */
-			path_umount(path_asmount(unmount_me));
-		}
+		/* Do the unmount. */
+		path_umount(path_asmount(unmount_me));
 	}
 	return -EOK;
 }
