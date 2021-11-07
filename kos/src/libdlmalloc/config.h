@@ -205,12 +205,14 @@ DL_REGISTER_CACHE(dl_clear_caches) {
 
 #undef __libc_malloc
 #undef __libc_calloc
+#undef __builtin_delete
 #undef __libc_free
 #undef __libc_realloc
 #undef __libc_memalign
 #undef __libc_valloc
 DEFINE_DL_EXPORT_ALIAS(__libc_malloc, dlmalloc);
 DEFINE_DL_EXPORT_ALIAS(malloc, dlmalloc);
+DEFINE_DL_EXPORT_ALIAS(__builtin_delete, dlfree);
 DEFINE_DL_EXPORT_ALIAS(__libc_free, dlfree);
 DEFINE_DL_EXPORT_ALIAS(free, dlfree);
 DEFINE_DL_EXPORT_ALIAS(cfree, dlfree);

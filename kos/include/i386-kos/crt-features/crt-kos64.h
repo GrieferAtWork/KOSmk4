@@ -341,6 +341,10 @@
 #define __CRT_HAVE___brk
 #define __CRT_HAVE___bsd_signal
 #define __CRT_HAVE___bss_start
+#define __CRT_HAVE___builtin_delete
+#define __CRT_HAVE___builtin_new
+#define __CRT_HAVE___builtin_vec_delete
+#define __CRT_HAVE___builtin_vec_new
 #define __CRT_HAVE___bzero
 #define __CRT_HAVE___cbrt
 #define __CRT_HAVE___cbrtf
@@ -829,6 +833,7 @@
 #define __CRT_HAVE___nearbyint
 #define __CRT_HAVE___nearbyintf
 #define __CRT_HAVE___nearbyintl
+#define __CRT_HAVE___new_handler
 #define __CRT_HAVE___newlocale
 #define __CRT_HAVE___nextafter
 #define __CRT_HAVE___nextafterf
@@ -3443,6 +3448,7 @@
 #define __CRT_HAVE_sendmsg
 #define __CRT_HAVE_sendto
 #define __CRT_HAVE_set_exception_handler
+#define __CRT_HAVE_set_new_handler
 #define __CRT_HAVE_setaliasent
 #define __CRT_HAVE_setbuf
 #define __CRT_HAVE_setbuffer

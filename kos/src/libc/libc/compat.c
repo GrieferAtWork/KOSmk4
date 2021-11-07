@@ -307,6 +307,102 @@ DEFINE_PUBLIC_IDATA_G(_IO_stderr_, linux_stdio_get_stderr, SIZEOF_IO_FILE_84);
 
 
 /************************************************************************/
+/* __builtin_[vec_](new|delete)                                         */
+/************************************************************************/
+typedef void (LIBCCALL *PNEW_HANDLER)(void);
+PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.builtin_new") char const
+default_new_handler_message[] = "Virtual memory exceeded in `new'\n";
+PRIVATE ATTR_SECTION(".text.crt.compat.linux.builtin_new") void LIBCCALL
+libc_default_new_handler(void) {
+	/* Yes: old-style c++ dynamic memory functions didn't raise exceptions
+	 *      on  out-of-memory,  but  simply  terminated  the  application! */
+	sys_write(STDERR_FILENO, default_new_handler_message,
+	          sizeof(default_new_handler_message) - sizeof(char));
+	sys_exit((syscall_ulong_t)-1);
+}
+
+#undef __new_handler
+DEFINE_PUBLIC_IDATA_G(__new_handler, libc___new_handler, __SIZEOF_POINTER__);
+INTERN ATTR_SECTION(".bss.crt.compat.linux.builtin_new") PNEW_HANDLER libc___new_handler = NULL;
+INTERN ATTR_SECTION(".text.crt.compat.linux.builtin_new") PNEW_HANDLER *LIBCCALL
+libc___new_handler_cb(void) {
+	if (libc___new_handler == NULL)
+		libc___new_handler = &libc_default_new_handler;
+	return &libc___new_handler;
+}
+
+PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.builtin_new") char const
+name___new_handler[] = "__new_handler";
+PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.builtin_new")
+PNEW_HANDLER *LIBCCALL libc_p_new_handler(void) {
+	PNEW_HANDLER *result;
+	result = (PNEW_HANDLER *)dlsym(RTLD_DEFAULT, name___new_handler);
+	if unlikely(!result)
+		result = libc___new_handler_cb(); /* Shouldn't happen */
+	if unlikely(!*result)
+		*result = &libc_default_new_handler;
+	return result;
+}
+#define __new_handler (*libc_p_new_handler())
+
+DEFINE_PUBLIC_ALIAS(set_new_handler, libc_set_new_handler);
+INTERN ATTR_RETNONNULL ATTR_SECTION(".text.crt.compat.linux.builtin_new")
+PNEW_HANDLER LIBCCALL libc_set_new_handler(PNEW_HANDLER handler) {
+	PNEW_HANDLER result, *phandler;
+	phandler = &__new_handler;
+	result   = *phandler;
+	if (handler == NULL)
+		handler = &libc_default_new_handler;
+	*phandler = handler;
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(__builtin_new, libc___builtin_new);
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.builtin_new")
+void *LIBCCALL libc___builtin_new(size_t sz) {
+	void *result = malloc(sz);
+	if unlikely(result == NULL)
+		(*__new_handler)();
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(__builtin_vec_delete, libc___builtin_vec_delete);
+INTERN ATTR_SECTION(".text.crt.compat.linux.builtin_new") void LIBCCALL
+libc___builtin_vec_delete(void *ptr, size_t maxindex, size_t size,
+                          void(LIBCCALL *dtor)(void *obj, int auto_delete),
+                          int auto_delete_vec, int auto_delete) {
+	size_t count = maxindex + 1;
+	byte_t *iter = (byte_t *)ptr + count * size;
+	while (count--) {
+		(*dtor)(iter, auto_delete);
+		iter -= size;
+	}
+	if (auto_delete_vec)
+		free(iter); /* __builtin_delete(iter); */
+}
+
+DEFINE_PUBLIC_ALIAS(__builtin_vec_new, libc___builtin_vec_new);
+INTERN ATTR_SECTION(".text.crt.compat.linux.builtin_new") void *LIBCCALL
+libc___builtin_vec_new(void *ptr, size_t maxindex, size_t size,
+                       void(LIBCCALL *ctor)(void *obj)) {
+	byte_t *iter;
+	size_t count = maxindex + 1;
+	if (ptr == NULL)
+		ptr = libc___builtin_new(count * size);
+	iter = (byte_t *)ptr;
+	while (count--) {
+		(*ctor)(iter);
+		iter += size;
+	}
+	return ptr;
+}
+
+
+
+
+
+
+/************************************************************************/
 /* socketcall(2)                                                        */
 /************************************************************************/
 DEFINE_PUBLIC_ALIAS(socketcall, libc_socketcall);

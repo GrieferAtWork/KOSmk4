@@ -776,7 +776,7 @@ void *calloc(size_t count, size_t num_bytes) {
 void *realloc(void *mallptr, size_t num_bytes);
 
 [[section(".text.crt{|.dos}.heap.malloc")]]
-[[guard, std, libc, crtbuiltin, export_alias("cfree", "__libc_free")]]
+[[guard, std, libc, crtbuiltin, export_alias("cfree", "__libc_free" /*, "__builtin_delete"*/ )]]
 void free(void *mallptr);
 
 
