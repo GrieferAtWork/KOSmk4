@@ -266,11 +266,11 @@ INTDEF WUNUSED FILE *__FCALL file_calloc(size_t extsize); /* Defined in "../libc
 #else /* (WEOF16 & 0xffff) == (-1 & 0xffff) */
 #define libc_seterrno_and_return_WEOF16(eno) (libc_seterrno(eno), WEOF16)
 #endif /* (WEOF16 & 0xffff) != (-1 & 0xffff) */
-#if (WEOF32 & 0xffff) == (-1 & 0xffff)
+#if (WEOF32 & 0xffffffff) == (-1 & 0xffffffff)
 #define libc_seterrno_and_return_WEOF32(eno) ((wint32_t)libc_seterrno(eno))
-#else /* (WEOF32 & 0xffff) == (-1 & 0xffff) */
+#else /* (WEOF32 & 0xffffffff) == (-1 & 0xffffffff) */
 #define libc_seterrno_and_return_WEOF32(eno) (libc_seterrno(eno), WEOF32)
-#endif /* (WEOF32 & 0xffff) != (-1 & 0xffff) */
+#endif /* (WEOF32 & 0xffffffff) != (-1 & 0xffffffff) */
 #undef __CCAST
 #define __CCAST /* Nothing */
 

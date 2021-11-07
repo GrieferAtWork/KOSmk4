@@ -27,12 +27,14 @@
 #include "../api.h"
 /**/
 
+#include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
 #include <kos/exec/peb.h>
 #include <kos/malloc.h>
 #include <kos/syscalls.h>
 #include <linux/net.h>
 
+#include <elf.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
 #include <syscall.h>
@@ -40,6 +42,7 @@
 #include <unistd.h>
 
 #include "../user/stdio-api.h"
+#include "dl.h"
 #include "globals.h"
 
 DECL_BEGIN
@@ -215,12 +218,38 @@ file_calloc(size_t extsize) {
 PRIVATE ATTR_SECTION(".bss.crt.compat.linux.stdio") struct linux_default_stdio_file *
 linux_stdio_files = NULL;
 
-/* Initialize the linux stdio-compatibility system. */
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio")
-struct linux_default_stdio_file *NOTHROW(LIBCCALL linux_stdio_get_stdin)(void) {
+
+/* Helper for loading std stream addresses in compatibility mode. */
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") NONNULL((1, 2, 3)) FILE *
+NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
+                                              char const *__restrict name1,
+                                              char const *__restrict name2,
+                                              struct linux_default_stdio_file *__restrict fallback) {
+	byte_t *result;
+	ElfW(Sym) const *sym;
+	sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, name1);
+	if (sym == NULL || sym->st_shndx == SHN_UNDEF)
+		sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, name2);
+	if (sym == NULL || sym->st_shndx == SHN_UNDEF)
+		return (FILE *)fallback;
+	result = (byte_t *)sym->st_value;
+	if (sym->st_shndx != SHN_ABS)
+		result += (uintptr_t)dlmodulebase(mainapp);
+
+	/* Initialize the user-program STD stream. (This right here
+	 * emulates the R_*_COPY relocation which was no doubt  the
+	 * reason why we got here in the first place) */
+	memcpy(result, fallback, SIZEOF_IO_FILE_84);
+	return (FILE *)result;
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void
+NOTHROW(LIBCCALL linux_stdio_init)(void) {
+	void *mainapp;
 	struct linux_default_stdio_file *result;
 	if (linux_stdio_files)
-		return linux_stdio_files;
+		return; /* Already initialized */
+
 	/* NOTE: Intentional crash if this Calloc() fails */
 	result = (struct linux_default_stdio_file *)Calloc(3, sizeof(struct linux_default_stdio_file));
 	memcpy(&result[0].ldsf_stdio, &libc_iob[0], sizeof(FILE));
@@ -233,26 +262,35 @@ struct linux_default_stdio_file *NOTHROW(LIBCCALL linux_stdio_get_stdin)(void) {
 	file_uoffset = offsetof(struct linux_default_stdio_file, ldsf_stdio);
 #endif /* FILE_HAVE_UOFFSET */
 
-	/* Update global pointers. */
-	libc_stdin  = (FILE *)&result[0];
-	libc_stdout = (FILE *)&result[1];
-	libc_stderr = (FILE *)&result[2];
-	stdin       = (FILE *)&result[0];
-	stdout      = (FILE *)&result[1];
-	stderr      = (FILE *)&result[2];
+	/* Load std stream addresses. */
+	mainapp     = dlopen(NULL, 0);
+	libc_stdin  = get_mainapp_std_stream_addr(mainapp, "_IO_stdin_", "_IO_2_1_stdin_", &result[0]);
+	libc_stdout = get_mainapp_std_stream_addr(mainapp, "_IO_stdout_", "_IO_2_1_stdout_", &result[1]);
+	libc_stderr = get_mainapp_std_stream_addr(mainapp, "_IO_stderr_", "_IO_2_1_stderr_", &result[2]);
 
-	/* Return pointer to custom STDIN file. */
-	return &result[0];
+	/* Update global std stream symbols with correct values. */
+	stdin  = libc_stdin;
+	stdout = libc_stdout;
+	stderr = libc_stderr;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio")
-struct linux_default_stdio_file *NOTHROW(LIBCCALL linux_stdio_get_stdout)(void) {
-	return &linux_stdio_get_stdin()[1];
+/* Initialize the linux stdio-compatibility system. */
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_stdin)(void) {
+	linux_stdio_init();
+	return libc_stdin;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio")
-struct linux_default_stdio_file *NOTHROW(LIBCCALL linux_stdio_get_stderr)(void) {
-	return &linux_stdio_get_stdin()[2];
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_stdout)(void) {
+	linux_stdio_init();
+	return libc_stdout;
+}
+
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_stderr)(void) {
+	linux_stdio_init();
+	return libc_stderr;
 }
 
 /* Export symbols. */

@@ -489,19 +489,6 @@ err:
 	return -1;
 }
 
-PRIVATE NONNULL((1)) ATTR_SECTION(".text.crt.application.exit") int LIBCCALL
-file_sync_locked(FILE *__restrict self) {
-	int result;
-	if (FMUSTLOCK(self)) {
-		file_lock_write(self);
-		result = file_sync(self);
-		file_lock_endwrite(self);
-	} else {
-		result = file_sync(self);
-	}
-	return result;
-}
-
 INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility") void LIBCCALL
 file_destroy(FILE *__restrict self) {
 	refcnt_t refcnt;
@@ -1644,6 +1631,20 @@ file_reopenfd(FILE *__restrict self, fd_t fd, uint32_t flags) {
 
 
 
+PRIVATE NONNULL((1)) ATTR_SECTION(".text.crt.application.exit") void LIBCCALL
+file_sync_std_stream(FILE *__restrict stream) {
+	if unlikely(!stream)
+		return;
+	stream = file_fromuser(stream);
+	if (FMUSTLOCK(stream)) {
+		file_lock_write(stream);
+		file_sync(stream);
+		file_lock_endwrite(stream);
+	} else {
+		file_sync(stream);
+	}
+}
+
 
 /*[[[head:libc__flushall,hash:CRC-32=0x6230416a]]]*/
 INTERN ATTR_SECTION(".text.crt.application.exit") int
@@ -1652,10 +1653,11 @@ INTERN ATTR_SECTION(".text.crt.application.exit") int
 {
 	/* All all streams opened by the user. */
 	file_syncall_locked();
-	/* Flush the active STD streams. */
-	file_sync_locked(file_fromuser(stdin));
-	file_sync_locked(file_fromuser(stdout));
-	file_sync_locked(file_fromuser(stderr));
+
+	/* Flush active std-streams. */
+	file_sync_std_stream(stdin);
+	file_sync_std_stream(stdout);
+	file_sync_std_stream(stderr);
 	return 0;
 }
 /*[[[end:libc__flushall]]]*/
