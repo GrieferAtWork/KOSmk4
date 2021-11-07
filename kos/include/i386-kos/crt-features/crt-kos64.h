@@ -692,6 +692,7 @@
 #define __CRT_HAVE___libc_setuid
 #define __CRT_HAVE___libc_sigpending
 #define __CRT_HAVE___libc_sigprocmask
+#define __CRT_HAVE___libc_socketcall
 #define __CRT_HAVE___libc_start_main
 #define __CRT_HAVE___libc_statfs
 #define __CRT_HAVE___libc_stime
@@ -976,6 +977,7 @@
 #define __CRT_HAVE___sinhl
 #define __CRT_HAVE___sinl
 #define __CRT_HAVE___socket
+#define __CRT_HAVE___socketcall
 #define __CRT_HAVE___solaris_sysinfo
 #define __CRT_HAVE___sqrt
 #define __CRT_HAVE___sqrtf
@@ -3558,6 +3560,7 @@
 #define __CRT_HAVE_snprintf
 #define __CRT_HAVE_sockatmark
 #define __CRT_HAVE_socket
+#define __CRT_HAVE_socketcall
 #define __CRT_HAVE_socketpair
 #define __CRT_HAVE_sopen
 #define __CRT_HAVE_spawnl

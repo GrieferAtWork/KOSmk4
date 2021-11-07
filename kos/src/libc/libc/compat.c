@@ -28,12 +28,201 @@
 /**/
 
 #include <kos/exec/peb.h>
+#include <kos/syscalls.h>
+#include <linux/net.h>
 
 #include <stdlib.h> /* exit() */
+#include <syscall.h>
 
 #include "globals.h"
 
 DECL_BEGIN
+
+
+/* socketcall(2) */
+DEFINE_PUBLIC_ALIAS(socketcall, libc_socketcall);
+DEFINE_PUBLIC_ALIAS(__socketcall, libc_socketcall);
+DEFINE_PUBLIC_ALIAS(__libc_socketcall, libc_socketcall);
+INTERN ATTR_SECTION(".text.crt.glibc.application.init") NONNULL((2)) longptr_t LIBCCALL
+libc_socketcall(ulongptr_t call, ulongptr_t *__restrict argv) {
+	longptr_t result;
+#ifdef SYS_socketcall
+	result = sys_socketcall(call, argv);
+#else /* SYS_socketcall */
+	/* Branch based on the requested call. */
+	switch (call) {
+
+#ifdef SYS_socket
+	case SYS_SOCKET:
+		result = sys_socket(argv[0], argv[1], argv[2]);
+		break;
+#endif /* SYS_socket */
+
+#ifdef SYS_bind
+	case SYS_BIND:
+		result = sys_bind(argv[0], (struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		break;
+#endif /* SYS_bind */
+
+#ifdef SYS_connect
+	case SYS_CONNECT:
+		result = sys_connect(argv[0], (struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		break;
+#endif /* SYS_connect */
+
+#ifdef SYS_listen
+	case SYS_LISTEN:
+		result = sys_listen(argv[0], argv[1]);
+		break;
+#endif /* SYS_listen */
+
+#ifdef SYS_accept
+	case SYS_ACCEPT:
+		result = sys_accept(argv[0],
+		                    (struct sockaddr *)(uintptr_t)argv[1],
+		                    (socklen_t *)(uintptr_t)argv[2]);
+		break;
+#elif defined(SYS_accept4)
+	case SYS_ACCEPT:
+		result = sys_accept4(argv[0],
+		                     (struct sockaddr *)(uintptr_t)argv[1],
+		                     (socklen_t *)(uintptr_t)argv[2], 0);
+		break;
+#endif /* ... */
+
+#ifdef SYS_getsockname
+	case SYS_GETSOCKNAME:
+		result = sys_getsockname(argv[0],
+		                         (struct sockaddr *)(uintptr_t)argv[1],
+		                         (socklen_t *)(uintptr_t)argv[2]);
+		break;
+#endif /* SYS_getsockname */
+
+#ifdef SYS_getsockname
+	case SYS_GETPEERNAME:
+		result = sys_getpeername(argv[0],
+		                         (struct sockaddr *)(uintptr_t)argv[1],
+		                         (socklen_t *)(uintptr_t)argv[2]);
+		break;
+#endif /* SYS_getsockname */
+
+#ifdef SYS_socketpair
+	case SYS_SOCKETPAIR:
+		result = sys_socketpair(argv[0], argv[1], argv[2],
+		                        (fd_t *)(uintptr_t)argv[3]);
+		break;
+#endif /* SYS_socketpair */
+
+#ifdef SYS_send
+	case SYS_SEND:
+		result = sys_send(argv[0],
+		                  (void const *)(uintptr_t)argv[1],
+		                  argv[2], argv[3]);
+		break;
+#elif defined(SYS_sendto)
+	case SYS_SEND:
+		result = sys_sendto(argv[0],
+		                    (void const *)(uintptr_t)argv[1],
+		                    argv[2], argv[3], NULL, 0);
+		break;
+#endif /* ... */
+
+#ifdef SYS_recv
+	case SYS_RECV:
+		result = sys_recv(argv[0],
+		                  (void *)(uintptr_t)argv[1],
+		                  argv[2], argv[3]);
+		break;
+#elif defined(SYS_recvfrom)
+	case SYS_RECV:
+		result = sys_recvfrom(argv[0],
+		                      (void *)(uintptr_t)argv[1],
+		                      argv[2], argv[3], NULL, 0);
+		break;
+#endif /* ... */
+
+#ifdef SYS_sendto
+	case SYS_SENDTO:
+		result = sys_sendto(argv[0], (void const *)(uintptr_t)argv[1], argv[2],
+		                    argv[3], (struct sockaddr const *)(uintptr_t)argv[4], argv[5]);
+		break;
+#endif /* SYS_sendto */
+
+#ifdef SYS_recvfrom
+	case SYS_RECVFROM:
+		result = sys_recvfrom(argv[0], (void *)(uintptr_t)argv[1], argv[2],
+		                      argv[3], (struct sockaddr *)(uintptr_t)argv[4],
+		                      (socklen_t *)(uintptr_t)argv[5]);
+		break;
+#endif /* SYS_recvfrom */
+
+#ifdef SYS_shutdown
+	case SYS_SHUTDOWN:
+		result = sys_shutdown(argv[0], argv[1]);
+		break;
+#endif /* SYS_shutdown */
+
+#ifdef SYS_setsockopt
+	case SYS_SETSOCKOPT:
+		result = sys_setsockopt(argv[0], argv[1], argv[2],
+		                        (void const *)(uintptr_t)argv[3],
+		                        argv[4]);
+		break;
+#endif /* SYS_setsockopt */
+
+#ifdef SYS_getsockopt
+	case SYS_GETSOCKOPT:
+		result = sys_getsockopt(argv[0], argv[1], argv[2],
+		                        (void *)(uintptr_t)argv[3],
+		                        (socklen_t *)(uintptr_t)argv[4]);
+		break;
+#endif /* SYS_getsockopt */
+
+#ifdef SYS_sendmsg
+	case SYS_SENDMSG:
+		result = sys_sendmsg(argv[0],
+		                     (struct msghdr const *)(uintptr_t)argv[1],
+		                     argv[2]);
+		break;
+#endif /* SYS_sendmsg */
+
+#ifdef SYS_recvmsg
+	case SYS_RECVMSG:
+		result = sys_recvmsg(argv[0],
+		                     (struct msghdr *)(uintptr_t)argv[1],
+		                     argv[2]);
+		break;
+#endif /* SYS_recvmsg */
+
+#ifdef SYS_accept4
+	case SYS_ACCEPT4:
+		result = sys_accept4(argv[0],
+		                     (struct sockaddr *)(uintptr_t)argv[1],
+		                     (socklen_t *)(uintptr_t)argv[2],
+		                     argv[3]);
+		break;
+#endif /* SYS_accept4 */
+
+#ifdef SYS_recvmmsg
+	case SYS_RECVMMSG:
+		result = sys_recvmmsg(argv[0], (struct mmsghdr *)(uintptr_t)argv[1], argv[2],
+		                      argv[3], (struct timespec32 const *)(uintptr_t)argv[4]);
+		break;
+#endif /* SYS_recvmmsg */
+
+#ifdef SYS_sendmmsg
+	case SYS_SENDMMSG:
+		result = sys_sendmmsg(argv[0], (struct mmsghdr *)(uintptr_t)argv[1],
+		                      argv[2], argv[3]);
+		break;
+#endif /* SYS_sendmmsg */
+
+	default:
+		result = -EINVAL;
+	}
+#endif /* !SYS_socketcall */
+	return libc_seterrno_syserr(result);
+}
 
 
 /* Shift lookup table?? No idea why code doesn't use `1 << i' instead of `__shtab[i]'... */
