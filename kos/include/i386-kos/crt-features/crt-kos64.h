@@ -288,6 +288,7 @@
 #define __CRT_HAVE__Unwind_SetGR
 #define __CRT_HAVE__Unwind_SetIP
 #define __CRT_HAVE__ZSt9terminatev
+#define __CRT_HAVE____brk_addr
 #define __CRT_HAVE___access
 #define __CRT_HAVE___acct
 #define __CRT_HAVE___acos

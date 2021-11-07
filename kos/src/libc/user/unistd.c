@@ -29,6 +29,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/pagesize.h>
+#include <kos/exec/idata.h>
 #include <kos/hop/mfile.h> /* Needed for fpathconf() */
 #include <kos/ioctl/tty.h>
 #include <kos/syscalls.h>
@@ -1800,10 +1801,19 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd,
 /*[[[end:libc_ftruncate64]]]*/
 
 
-PRIVATE byte_t *brk_curr = NULL;
-PRIVATE struct atomic_lock brk_lock = ATOMIC_LOCK_INIT;
+INTERN ATTR_SECTION(".bss.crt.heap.utility") byte_t *brk_curr = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.heap.utility") struct atomic_lock brk_lock = ATOMIC_LOCK_INIT;
 
-PRIVATE int LIBCCALL do_brk(void *addr) {
+/* For compatibility with old linux programs: the current program break address. */
+DEFINE_PUBLIC_IDATA_G(___brk_addr, libc_brk_addr_cb, __SIZEOF_POINTER__);
+INTERN ATTR_SECTION(".text.crt.compat.linux.heap") byte_t **LIBCCALL
+libc_brk_addr_cb(void) {
+	if (brk_curr == NULL)
+		brk_curr = (byte_t *)dlsym(RTLD_DEFAULT, "_end");
+	return &brk_curr;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.heap.utility") int LIBCCALL do_brk(void *addr) {
 	byte_t *real_oldbrk, *real_newbrk;
 	if ((real_oldbrk = brk_curr) == NULL) {
 		/* Lookup the end address of the main executable
