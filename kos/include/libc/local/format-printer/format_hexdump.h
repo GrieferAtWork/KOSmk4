@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb57c74b0 */
+/* HASH CRC-32:0xff1f03e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,19 +60,11 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__alloca.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/byteorder.h>
+#include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_hexdump))(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) {
-#ifndef __DECIMALS_SELECTOR
-#define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define __DECIMALS_SELECTOR  __decimals
-	__PRIVATE char const __decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif /* !DECIMALS_SELECTOR */
 	__PRIVATE char const __lf[1] = { '\n' };
-	char const *__dec;
 	__BYTE_TYPE__ const *__line_data;
 	char __buffer[
 		(1 + (sizeof(void *) * 2) + 1) < 17 ? 17 :
@@ -82,7 +74,6 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 	unsigned int __offset_digits = 0;
 	if (!__size) goto __done;
 	if (!__linesize) __linesize = 16;
-	__dec = __DECIMALS_SELECTOR[!(__flags & 0x0001)];
 	if (__flags & 0x0004) {
 		__value = __size;
 		do {
@@ -99,7 +90,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 			__dst = __buffer + sizeof(void *) * 2;
 			*__dst = ' ';
 			while (__dst > __buffer) {
-				*--__dst = __dec[__value & 0xf];
+				*--__dst = __itoa_digit(!(__flags & 0x0001), __value & 0xf);
 				__value >>= 4;
 			}
 			__temp = (*__printer)(__arg, __buffer, (sizeof(void *) * 2) + 1);
@@ -112,7 +103,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 			*__dst = ' ';
 			__value = (__line_data - (__BYTE_TYPE__ const *)__data);
 			while (__dst > __buffer + 1) {
-				*--__dst = __dec[__value & 0xf];
+				*--__dst = __itoa_digit(!(__flags & 0x0001), __value & 0xf);
 				__value >>= 4;
 			}
 			__buffer[0] = '+';
@@ -137,7 +128,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 					__UINT16_TYPE__ __w = __hybrid_unaligned_get16((__UINT16_TYPE__ *)(__line_data + __i));
 					__dst = __buffer + 4;
 					while (__dst > __buffer) {
-						*--__dst = __dec[__w & 0xf];
+						*--__dst = __itoa_digit(!(__flags & 0x0001), __w & 0xf);
 						__w >>= 4;
 					}
 					__temp = (*__printer)(__arg, __buffer, 5);
@@ -155,7 +146,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 					__UINT32_TYPE__ __l = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
 					__dst = __buffer + 8;
 					while (__dst > __buffer) {
-						*--__dst = __dec[__l & 0xf];
+						*--__dst = __itoa_digit(!(__flags & 0x0001), __l & 0xf);
 						__l >>= 4;
 					}
 					__temp = (*__printer)(__arg, __buffer, 9);
@@ -174,7 +165,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 					__UINT64_TYPE__ __q = __hybrid_unaligned_get64((__UINT64_TYPE__ *)(__line_data + __i));
 					__dst = __buffer + 16;
 					while (__dst > __buffer) {
-						*--__dst = __dec[__q & 0xf];
+						*--__dst = __itoa_digit(!(__flags & 0x0001), __q & 0xf);
 						__q >>= 4;
 					}
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -188,11 +179,11 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					__dst = __buffer + 16;
 					while (__dst > __buffer + 8) {
-						*--__dst = __dec[__b & 0xf];
+						*--__dst = __itoa_digit(!(__flags & 0x0001), __b & 0xf);
 						__b >>= 4;
 					}
 					while (__dst > __buffer) {
-						*--__dst = __dec[__a & 0xf];
+						*--__dst = __itoa_digit(!(__flags & 0x0001), __a & 0xf);
 						__a >>= 4;
 					}
 #endif /* __SIZEOF_POINTER__ < 8 */
@@ -207,8 +198,8 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 			__buffer[2] = ' ';
 			for (; __i < __line_len; ++__i) {
 				__BYTE_TYPE__ __b = __line_data[__i];
-				__buffer[0] = __dec[__b >> 4];
-				__buffer[1] = __dec[__b & 0xf];
+				__buffer[0] = __itoa_digit(!(__flags & 0x0001), __b >> 4);
+				__buffer[1] = __itoa_digit(!(__flags & 0x0001), __b & 0xf);
 				__temp = (*__printer)(__arg, __buffer, 3);
 				if __unlikely(__temp < 0)
 					goto __err;
@@ -246,10 +237,6 @@ __done:
 	return __result;
 __err:
 	return __temp;
-#ifdef __LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef __LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef __DECIMALS_SELECTOR
-#endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_hexdump_defined

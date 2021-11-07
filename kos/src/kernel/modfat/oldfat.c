@@ -56,6 +56,7 @@
 #include <ctype.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -1689,17 +1690,13 @@ Fat_GenerateFileEntries(struct fat_dirent *__restrict buffer,
 			}
 		}
 		if (retry_hex) {
-			PRIVATE char const xch[16] = {
-				'0', '1', '2', '3', '4', '5', '6', '7',
-				'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-			};
 			/* Following the matching characters are 4 hex-chars
 			 * whenever  more than 9  retry attempts have failed
 			 * >> This multiplies the amount of available names by 0xffff */
-			*dst++ = xch[(retry_hex & 0xf000) >> 12];
-			*dst++ = xch[(retry_hex & 0x0f00) >> 8];
-			*dst++ = xch[(retry_hex & 0x00f0) >> 4];
-			*dst++ = xch[(retry_hex & 0x000f)];
+			*dst++ = _itoa_upper_digits[(retry_hex & 0xf000) >> 12];
+			*dst++ = _itoa_upper_digits[(retry_hex & 0x0f00) >> 8];
+			*dst++ = _itoa_upper_digits[(retry_hex & 0x00f0) >> 4];
+			*dst++ = _itoa_upper_digits[(retry_hex & 0x000f)];
 		}
 		assert(dst <= dos83.f_nameext + 6);
 		/* Following the shared name and the hex part is always a tilde '~' */

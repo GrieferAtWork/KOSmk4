@@ -70,6 +70,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unicode.h>
@@ -1398,17 +1399,13 @@ retry_lfn:
 			*writer++ = (char)(unsigned char)ch;
 		}
 		if (retry_hex) {
-			PRIVATE char const xch[16] = {
-				'0', '1', '2', '3', '4', '5', '6', '7',
-				'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-			};
 			/* Following the matching characters are 4 hex-chars
 			 * whenever  more than 9  retry attempts have failed
 			 * >> This multiplies the amount of available names by 0xffff */
-			*writer++ = xch[(retry_hex & 0xf000) >> 12];
-			*writer++ = xch[(retry_hex & 0x0f00) >> 8];
-			*writer++ = xch[(retry_hex & 0x00f0) >> 4];
-			*writer++ = xch[(retry_hex & 0x000f)];
+			*writer++ = _itoa_upper_digits[(retry_hex & 0xf000) >> 12];
+			*writer++ = _itoa_upper_digits[(retry_hex & 0x0f00) >> 8];
+			*writer++ = _itoa_upper_digits[(retry_hex & 0x00f0) >> 4];
+			*writer++ = _itoa_upper_digits[(retry_hex & 0x000f)];
 		}
 		assert(writer == ent->fad_dos.f_nameext + 6);
 		/* Following the shared name and the hex part is always a tilde '~' */

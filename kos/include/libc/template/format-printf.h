@@ -33,6 +33,7 @@
 #include <libc/errno.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/string.h>
+#include <libc/template/itoa_digits.h>
 #define __CHAR_TYPE                char
 #define __CHAR_SIZE                __SIZEOF_CHAR__
 #define __FORMAT_ESCAPE            format_escape
@@ -155,14 +156,6 @@ format_vprintf(__pformatprinter __FORMAT_PRINTER,
                __builtin_va_list __FORMAT_ARGS)
 #endif /* __INTELLISENSE__ */
 {
-#ifndef __DECIMALS_SELECTOR
-#define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define __DECIMALS_SELECTOR  __decimals
-	__PRIVATE char const __decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif /* !__DECIMALS_SELECTOR */
 	__SSIZE_TYPE__ __temp, __result = 0;
 	__SIZE_TYPE__ __width, __precision;
 	__CHAR_TYPE const *__flush_start;
@@ -311,7 +304,6 @@ __nextfmt:
 
 	{
 		unsigned int __numsys;
-		char const *__dec;
 		__BOOL __is_neg;
 		union {
 #ifdef __UINT64_TYPE__
@@ -420,12 +412,6 @@ __nextfmt:
 			__data.__u = __builtin_va_arg(__FORMAT_ARGS, __UINT32_TYPE__);
 		}
 #endif /* !__UINT64_TYPE__ */
-
-#if __PRINTF_F_UPPER == 1
-		__dec = __DECIMALS_SELECTOR[__flags & __PRINTF_F_UPPER];
-#else /* __PRINTF_F_UPPER == 1 */
-		__dec = __DECIMALS_SELECTOR[!!(__flags & __PRINTF_F_UPPER)];
-#endif /* __PRINTF_F_UPPER != 1 */
 		__is_neg = 0;
 		if ((__flags & __PRINTF_F_SIGNED) && __data.__i < 0) {
 			__is_neg = 1;
@@ -435,7 +421,7 @@ __nextfmt:
 		/* Actually translate the given input integer. */
 		do {
 			__hybrid_assert(__iter > __buffer);
-			*--__iter = __dec[__data.__u % __numsys];
+			*--__iter = __LOCAL_itoa_digit(__flags & __PRINTF_F_UPPER, __data.__u % __numsys);
 		} while ((__data.__u /= __numsys) != 0);
 		__space_width = 0;
 		__print_width = (__SIZE_TYPE__)(__COMPILER_ENDOF(__buffer) - __iter);
@@ -478,7 +464,7 @@ __nextfmt:
 					*__dst++ = __flags & __PRINTF_F_UPPER2 ? 'X' : 'x';
 				} else if (__numsys == 2) {
 					*__dst++ = '0';
-					*__dst++ = __dec[11]; /* B/b */
+					*__dst++ = __LOCAL_itoa_digit(__flags & __PRINTF_F_UPPER, 11); /* B/b */
 				} else if (__numsys == 8 && __data.__u != 0) {
 					*__dst++ = '0';
 				}
@@ -1773,11 +1759,6 @@ __err:
 	return __temp;
 }
 
-
-#ifdef __LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef __LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef __DECIMALS_SELECTOR
-#endif /* __LOCAL_DECIMALS_SELECTOR_DEFINED */
 #undef __FORMAT_ESCAPE
 #undef __FORMAT_REPEAT
 #undef __PRINTF_LENGTH_I64

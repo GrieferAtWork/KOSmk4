@@ -1349,7 +1349,10 @@
 #define __CRT_HAVE__iswxdigit_l
 #define __CRT_HAVE__isxdigit_l
 #define __CRT_HAVE__itoa
+#define __CRT_HAVE__itoa_digits
+#define __CRT_HAVE__itoa_lower_digits
 #define __CRT_HAVE__itoa_s
+#define __CRT_HAVE__itoa_upper_digits
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
 #define __CRT_HAVE__ldclass

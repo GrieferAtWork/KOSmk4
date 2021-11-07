@@ -52,6 +52,7 @@
 %[define_str2wcs_replacement(__ATTR_LIBC_PRINTF   = __ATTR_LIBC_WPRINTF)]
 %[define_str2wcs_replacement(__ATTR_LIBC_PRINTF_P = __ATTR_LIBC_WPRINTF_P)]
 %[define_str2wcs_replacement(__ATTR_LIBC_SCANF    = __ATTR_LIBC_WSCANF)]
+%[define_str2wcs_replacement(itoa_digit           = __LOCAL_itoa_digit)]
 
 %[define_str2wcs_header_replacement("<format-printer.h>"          = "<parts/wchar/format-printer.h>")]
 %[define_str2wcs_header_replacement("<bits/crt/format-printer.h>" = "<bits/crt/wformat-printer.h>")]
@@ -60,8 +61,10 @@
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <libc/template/format-printf.h>' */
 #include "../libc/unicode.h" /* Dependency of `#include <libc/template/format-scanf.h>' */
+/**/
 #include <bits/math-constants.h>
 
+#include <libc/template/itoa_digits.h> /* Dependency of `#include <libc/template/format-printf.h>' */
 #include <libdisasm/disassembler.h>
 #ifdef __KERNEL__
 #include <kernel/addr2line.h>
@@ -219,24 +222,16 @@ err:
 [[kernel, throws, alias("format_quote")]]
 [[if(!defined(__KERNEL__)), export_as("format_quote")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 $ssize_t format_escape([[nonnull]] pformatprinter printer, void *arg,
                        /*utf-8*/ char const *__restrict text,
                        $size_t textlen, unsigned int flags) {
 #define escape_tooct(c) ('0' + (char)(unsigned char)(c))
-#ifndef DECIMALS_SELECTOR
-#define LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define DECIMALS_SELECTOR  decimals
-	__PRIVATE @char@ const decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif
 	__PRIVATE char const quote[1] = { '\"' };
 	char encoded_text[12]; size_t encoded_text_size;
-	ssize_t result = 0, temp; @char@ const *c_hex;
+	ssize_t result = 0, temp;
 	char const *textend = text + textlen;
 	char const *flush_start = text;
-	c_hex = DECIMALS_SELECTOR[!(flags & FORMAT_ESCAPE_FUPPERHEX)];
 	encoded_text[0] = '\\';
 	if likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
 		temp = (*printer)(arg, quote, 1);
@@ -428,32 +423,32 @@ encode_hex:
 				}
 				if (ch <= 0xf) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = c_hex[ch];
+					encoded_text[2] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, ch);
 					encoded_text_size = 3;
 				} else if (ch <= 0x7f) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = c_hex[(ch & 0x000000f0) >> 4];
-					encoded_text[3] = c_hex[ch & 0x0000000f];
+					encoded_text[2] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x000000f0) >> 4);
+					encoded_text[3] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, ch & 0x0000000f);
 					encoded_text_size = 4;
 				} else {
 encode_uni:
 					if (ch <= 0xffff) {
 						encoded_text[1] = 'u';
-						encoded_text[2] = c_hex[(ch & 0x0000f000) >> 12];
-						encoded_text[3] = c_hex[(ch & 0x00000f00) >> 8];
-						encoded_text[4] = c_hex[(ch & 0x000000f0) >> 4];
-						encoded_text[5] = c_hex[ch & 0x0000000f];
+						encoded_text[2] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x0000f000) >> 12);
+						encoded_text[3] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x00000f00) >> 8);
+						encoded_text[4] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x000000f0) >> 4);
+						encoded_text[5] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, ch & 0x0000000f);
 						encoded_text_size = 6;
 					} else {
 						encoded_text[1] = 'U';
-						encoded_text[2] = c_hex[(ch & 0xf0000000) >> 28];
-						encoded_text[3] = c_hex[(ch & 0x0f000000) >> 24];
-						encoded_text[4] = c_hex[(ch & 0x00f00000) >> 20];
-						encoded_text[5] = c_hex[(ch & 0x000f0000) >> 16];
-						encoded_text[6] = c_hex[(ch & 0x0000f000) >> 12];
-						encoded_text[7] = c_hex[(ch & 0x00000f00) >> 8];
-						encoded_text[8] = c_hex[(ch & 0x000000f0) >> 4];
-						encoded_text[9] = c_hex[ch & 0x0000000f];
+						encoded_text[2] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0xf0000000) >> 28);
+						encoded_text[3] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x0f000000) >> 24);
+						encoded_text[4] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x00f00000) >> 20);
+						encoded_text[5] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x000f0000) >> 16);
+						encoded_text[6] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x0000f000) >> 12);
+						encoded_text[7] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x00000f00) >> 8);
+						encoded_text[8] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, (ch & 0x000000f0) >> 4);
+						encoded_text[9] = itoa_digit(flags & FORMAT_ESCAPE_FUPPERHEX, ch & 0x0000000f);
 						encoded_text_size = 10;
 					}
 				}
@@ -482,10 +477,6 @@ print_encoded:
 	return result;
 err:
 	return temp;
-#ifdef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef DECIMALS_SELECTOR
-#endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 #undef escape_tooct
 }
 
@@ -533,19 +524,11 @@ err:
 @@@return: < 0:  The first negative value ever returned by `printer' (if any)
 [[kernel, throws, decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__alloca.h>", "<hybrid/__unaligned.h>", "<hybrid/byteorder.h>")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
                         void const *__restrict data, $size_t size,
                         $size_t linesize, unsigned int flags) {
-#ifndef DECIMALS_SELECTOR
-#define LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define DECIMALS_SELECTOR  decimals
-	__PRIVATE @char@ const decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif /* !DECIMALS_SELECTOR */
 	__PRIVATE char const lf[1] = { '\n' };
-	@char@ const *dec;
 	byte_t const *line_data;
 	char buffer[
 		(1 + (sizeof(void *) * 2) + 1) < 17 ? 17 :
@@ -555,7 +538,6 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 	unsigned int offset_digits = 0;
 	if (!size) goto done;
 	if (!linesize) linesize = 16;
-	dec = DECIMALS_SELECTOR[!(flags & FORMAT_HEXDUMP_FHEXLOWER)];
 	if (flags & FORMAT_HEXDUMP_FOFFSETS) {
 		value = size;
 		do {
@@ -572,7 +554,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 			dst = buffer + sizeof(void *) * 2;
 			*dst = ' ';
 			while (dst > buffer) {
-				*--dst = dec[value & 0xf];
+				*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), value & 0xf);
 				value >>= 4;
 			}
 			temp = (*printer)(arg, buffer, (sizeof(void *) * 2) + 1);
@@ -585,7 +567,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 			*dst = ' ';
 			value = (line_data - (byte_t const *)data);
 			while (dst > buffer + 1) {
-				*--dst = dec[value & 0xf];
+				*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), value & 0xf);
 				value >>= 4;
 			}
 			buffer[0] = '+';
@@ -610,7 +592,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 					u16 w = __hybrid_unaligned_get16((u16 *)(line_data + i));
 					dst = buffer + 4;
 					while (dst > buffer) {
-						*--dst = dec[w & 0xf];
+						*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), w & 0xf);
 						w >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 5);
@@ -628,7 +610,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 					u32 l = __hybrid_unaligned_get32((u32 *)(line_data + i));
 					dst = buffer + 8;
 					while (dst > buffer) {
-						*--dst = dec[l & 0xf];
+						*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), l & 0xf);
 						l >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 9);
@@ -647,7 +629,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
 					dst = buffer + 16;
 					while (dst > buffer) {
-						*--dst = dec[q & 0xf];
+						*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), q & 0xf);
 						q >>= 4;
 					}
 @@pp_else@@
@@ -661,11 +643,11 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 @@pp_endif@@
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
-						*--dst = dec[b & 0xf];
+						*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), b & 0xf);
 						b >>= 4;
 					}
 					while (dst > buffer) {
-						*--dst = dec[a & 0xf];
+						*--dst = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), a & 0xf);
 						a >>= 4;
 					}
 @@pp_endif@@
@@ -680,8 +662,8 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 			buffer[2] = ' ';
 			for (; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				buffer[0] = dec[b >> 4];
-				buffer[1] = dec[b & 0xf];
+				buffer[0] = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), b >> 4);
+				buffer[1] = itoa_digit(!(flags & FORMAT_HEXDUMP_FHEXLOWER), b & 0xf);
 				temp = (*printer)(arg, buffer, 3);
 				if unlikely(temp < 0)
 					goto err;
@@ -719,10 +701,6 @@ done:
 	return result;
 err:
 	return temp;
-#ifdef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef DECIMALS_SELECTOR
-#endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 }
 
 
@@ -826,6 +804,7 @@ err:
 [[kernel, throws, ATTR_LIBC_PRINTF(3, 0)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 [[impl_include("<libc/parts.uchar.string.h>")]]
 [[impl_include("<libc/string.h>")]]
 [[impl_include("<libc/errno.h>")]]

@@ -1857,6 +1857,96 @@ $int64_t strto64_l([[nonnull]] char const *__restrict nptr,
 }
 %#endif /* __UINT64_TYPE__ */
 %#endif /* __USE_XOPEN2K8 */
+
+
+%[declare_kernel_export("_itoa_digits")]
+%[declare_user_export("_itoa_lower_digits")]
+%[declare_user_export("_itoa_upper_digits")]
+
+%(auto_source){
+DEFINE_PUBLIC_ALIAS(_itoa_digits, libc__itoa_digits);
+INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") char const libc__itoa_digits[101] =
+"0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+#ifndef __KERNEL__
+/* Export the lower/upper tables as dedicated symbols. */
+__asm__(".hidden libc__itoa_lower_digits\n"
+        ".hidden libc__itoa_upper_digits\n"
+        ".type   libc__itoa_lower_digits, @object\n"
+        ".type   libc__itoa_upper_digits, @object\n"
+        ".set    .Ldisp_itoa_lower_digits, libc__itoa_digits - 1\n"       /* Prevent size aliasing */
+        ".set    libc__itoa_lower_digits, .Ldisp_itoa_lower_digits + 1\n" /* *ditto* */
+        ".set    libc__itoa_upper_digits, libc__itoa_digits + 64\n"
+        ".size   libc__itoa_lower_digits, 37\n"
+        ".size   libc__itoa_upper_digits, 37\n");
+DEFINE_PUBLIC_ALIAS(_itoa_lower_digits, libc__itoa_lower_digits);
+DEFINE_PUBLIC_ALIAS(_itoa_upper_digits, libc__itoa_upper_digits);
+#endif /* !__KERNEL__ */
+}
+
+%{
+
+/* >> char itoa_digit(bool upper, uint8_t digit); */
+#define itoa_digit(upper, digit) \
+	_itoa_digits[(digit) + (!!(upper) << 6)]
+
+/* >> char const _itoa_digits[101] =
+ * >> "0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+ * >> "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // << offset from base: 64 */
+#ifndef _itoa_digits
+#ifdef __LOCAL_itoa_digits
+#define _itoa_digits __LOCAL_itoa_digits
+#elif defined(__CRT_HAVE__itoa_digits)
+__LIBC char const _itoa_digits[101] __CASMNAME_SAME("_itoa_digits");
+#define _itoa_digits _itoa_digits
+#elif defined(__cplusplus)
+#define _itoa_digits __LOCAL_itoa_digits_fp()
+__ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
+char const *(__LOCAL_itoa_digits_fp)(void) {
+	__ATTR_VISIBILITY("hidden")
+	static __LOCAL_LIBC_CONST_DATA_SECTION(_itoa_digits) char const ___itoa_digits_p[101] =
+	"0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+	"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	return ___itoa_digits_p;
+}
+#else /* ... */
+__LOCAL_LIBC_CONST_DATA(_itoa_digits) char const _itoa_digits[101] =
+"0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+#define _itoa_digits _itoa_digits
+#endif /* !... */
+#endif /* !_itoa_digits */
+
+/* >> char const _itoa_lower_digits[37] = "0123456789abcdefghijklmnopqrstuvwxyz"; */
+#ifndef _itoa_lower_digits
+#ifdef __LOCAL_itoa_lower_digits
+#define _itoa_lower_digits __LOCAL_itoa_lower_digits
+#elif defined(__CRT_HAVE__itoa_digits)
+#define _itoa_lower_digits (_itoa_digits + 0)
+#elif defined(__CRT_HAVE__itoa_lower_digits)
+__LIBC char const _itoa_lower_digits[37] __CASMNAME_SAME("_itoa_lower_digits");
+#define _itoa_lower_digits _itoa_lower_digits
+#else /* ... */
+#define _itoa_lower_digits (_itoa_digits + 0)
+#endif /* !... */
+#endif /* !_itoa_lower_digits */
+
+/* >> char const _itoa_upper_digits[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; */
+#ifndef _itoa_upper_digits
+#ifdef __LOCAL_itoa_upper_digits
+#define _itoa_upper_digits __LOCAL_itoa_upper_digits
+#elif defined(__CRT_HAVE__itoa_digits)
+#define _itoa_upper_digits (_itoa_digits + 64)
+#elif defined(__CRT_HAVE__itoa_upper_digits)
+__LIBC char const _itoa_upper_digits[37] __CASMNAME_SAME("_itoa_upper_digits");
+#define _itoa_upper_digits _itoa_upper_digits
+#else /* ... */
+#define _itoa_upper_digits (_itoa_digits + 64)
+#endif /* !... */
+#endif /* !_itoa_upper_digits */
+
+}
+
 %#endif /* __USE_KOS */
 
 %

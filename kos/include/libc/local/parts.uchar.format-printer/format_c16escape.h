@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe98c6b9 */
+/* HASH CRC-32:0xea5e7ed0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,23 +47,17 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
 #endif /* !__CRT_HAVE_unicode_readutf8_n */
 #endif /* !__local___localdep_unicode_readutf8_n_defined */
+__NAMESPACE_LOCAL_END
+#include <libc/template/itoa_digits.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_c16escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
 #define __escape_tooct(__c) ('0' + (__CHAR16_TYPE__)(__CHAR16_TYPE__)(__c))
-#ifndef __DECIMALS_SELECTOR
-#define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define __DECIMALS_SELECTOR  __decimals
-	__PRIVATE char const __decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif
 	__PRIVATE __CHAR16_TYPE__ const __quote[1] = { '\"' };
 	__CHAR16_TYPE__ __encoded_text[12]; __SIZE_TYPE__ __encoded_text_size;
-	__SSIZE_TYPE__ __result = 0, __temp; char const *__c_hex;
+	__SSIZE_TYPE__ __result = 0, __temp;
 	__CHAR16_TYPE__ const *__textend = __text + __textlen;
 	__CHAR16_TYPE__ const *__flush_start = __text;
-	__c_hex = __DECIMALS_SELECTOR[!(__flags & 0x0020)];
 	__encoded_text[0] = '\\';
 	if __likely(!(__flags & 0x0001)) {
 		__temp = (*__printer)(__arg, __quote, 1);
@@ -255,32 +249,32 @@ __encode_hex:
 				}
 				if (__ch <= 0xf) {
 					__encoded_text[1] = 'x';
-					__encoded_text[2] = __c_hex[__ch];
+					__encoded_text[2] = __LOCAL_itoa_digit(__flags & 0x0020, __ch);
 					__encoded_text_size = 3;
 				} else if (__ch <= 0x7f) {
 					__encoded_text[1] = 'x';
-					__encoded_text[2] = __c_hex[(__ch & 0x000000f0) >> 4];
-					__encoded_text[3] = __c_hex[__ch & 0x0000000f];
+					__encoded_text[2] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
+					__encoded_text[3] = __LOCAL_itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
 					__encoded_text_size = 4;
 				} else {
 __encode_uni:
 					if (__ch <= 0xffff) {
 						__encoded_text[1] = 'u';
-						__encoded_text[2] = __c_hex[(__ch & 0x0000f000) >> 12];
-						__encoded_text[3] = __c_hex[(__ch & 0x00000f00) >> 8];
-						__encoded_text[4] = __c_hex[(__ch & 0x000000f0) >> 4];
-						__encoded_text[5] = __c_hex[__ch & 0x0000000f];
+						__encoded_text[2] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x0000f000) >> 12);
+						__encoded_text[3] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x00000f00) >> 8);
+						__encoded_text[4] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
+						__encoded_text[5] = __LOCAL_itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
 						__encoded_text_size = 6;
 					} else {
 						__encoded_text[1] = 'U';
-						__encoded_text[2] = __c_hex[(__ch & 0xf0000000) >> 28];
-						__encoded_text[3] = __c_hex[(__ch & 0x0f000000) >> 24];
-						__encoded_text[4] = __c_hex[(__ch & 0x00f00000) >> 20];
-						__encoded_text[5] = __c_hex[(__ch & 0x000f0000) >> 16];
-						__encoded_text[6] = __c_hex[(__ch & 0x0000f000) >> 12];
-						__encoded_text[7] = __c_hex[(__ch & 0x00000f00) >> 8];
-						__encoded_text[8] = __c_hex[(__ch & 0x000000f0) >> 4];
-						__encoded_text[9] = __c_hex[__ch & 0x0000000f];
+						__encoded_text[2] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0xf0000000) >> 28);
+						__encoded_text[3] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x0f000000) >> 24);
+						__encoded_text[4] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x00f00000) >> 20);
+						__encoded_text[5] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x000f0000) >> 16);
+						__encoded_text[6] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x0000f000) >> 12);
+						__encoded_text[7] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x00000f00) >> 8);
+						__encoded_text[8] = __LOCAL_itoa_digit(__flags & 0x0020, (__ch & 0x000000f0) >> 4);
+						__encoded_text[9] = __LOCAL_itoa_digit(__flags & 0x0020, __ch & 0x0000000f);
 						__encoded_text_size = 10;
 					}
 				}
@@ -309,10 +303,6 @@ __print_encoded:
 	return __result;
 __err:
 	return __temp;
-#ifdef __LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef __LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef __DECIMALS_SELECTOR
-#endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 #undef __escape_tooct
 }
 __NAMESPACE_LOCAL_END

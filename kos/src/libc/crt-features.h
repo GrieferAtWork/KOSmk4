@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50df75 */
+/* HASH CRC-32:0xbcd40e07 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3419,7 +3419,12 @@
 #define __CRT_HAVE__isleadbyte_l
 #define __CRT_HAVE__iswcsym_l
 #define __CRT_HAVE__iswcsymf_l
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE__itoa_digits
+#ifndef __KERNEL__
+#define __CRT_HAVE__itoa_lower_digits
 #define __CRT_HAVE__itoa_s
+#define __CRT_HAVE__itoa_upper_digits
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
 #define __CRT_HAVE__lfind_s

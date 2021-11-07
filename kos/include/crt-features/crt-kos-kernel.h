@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa88a902 */
+/* HASH CRC-32:0x14689f03 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,7 @@
 #define __CRT_HAVE___stack_chk_guard
 #define __CRT_HAVE__error_badusage_no_nesting
 #define __CRT_HAVE__error_check_no_nesting
+#define __CRT_HAVE__itoa_digits
 #define __CRT_HAVE_abort
 #define __CRT_HAVE_bitcpy
 #define __CRT_HAVE_bzero

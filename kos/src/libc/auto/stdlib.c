@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26f1c29f */
+/* HASH CRC-32:0x12cb5d21 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1433,6 +1433,26 @@ NOTHROW_NCX(LIBCCALL libc_strto64_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strto64(nptr, endptr, base);
 }
+#endif /* !__KERNEL__ */
+DEFINE_PUBLIC_ALIAS(_itoa_digits, libc__itoa_digits);
+INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") char const libc__itoa_digits[101] =
+"0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+#ifndef __KERNEL__
+/* Export the lower/upper tables as dedicated symbols. */
+__asm__(".hidden libc__itoa_lower_digits\n"
+        ".hidden libc__itoa_upper_digits\n"
+        ".type   libc__itoa_lower_digits, @object\n"
+        ".type   libc__itoa_upper_digits, @object\n"
+        ".set    .Ldisp_itoa_lower_digits, libc__itoa_digits - 1\n"       /* Prevent size aliasing */
+        ".set    libc__itoa_lower_digits, .Ldisp_itoa_lower_digits + 1\n" /* *ditto* */
+        ".set    libc__itoa_upper_digits, libc__itoa_digits + 64\n"
+        ".size   libc__itoa_lower_digits, 37\n"
+        ".size   libc__itoa_upper_digits, 37\n");
+DEFINE_PUBLIC_ALIAS(_itoa_lower_digits, libc__itoa_lower_digits);
+DEFINE_PUBLIC_ALIAS(_itoa_upper_digits, libc__itoa_upper_digits);
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
 #include <hybrid/floatcore.h>
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3)) char *
 NOTHROW_NCX(LIBCCALL libc_gcvt)(double val,

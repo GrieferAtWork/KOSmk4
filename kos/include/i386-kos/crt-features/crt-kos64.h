@@ -1275,7 +1275,10 @@
 #define __CRT_HAVE__isleadbyte_l
 #define __CRT_HAVE__iswcsym_l
 #define __CRT_HAVE__iswcsymf_l
+#define __CRT_HAVE__itoa_digits
+#define __CRT_HAVE__itoa_lower_digits
 #define __CRT_HAVE__itoa_s
+#define __CRT_HAVE__itoa_upper_digits
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
 #define __CRT_HAVE__lfind_s

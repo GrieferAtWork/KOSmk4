@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f2b1679 */
+/* HASH CRC-32:0x5fbb8ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2142,6 +2142,66 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strto64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !... */
 #endif /* __UINT64_TYPE__ */
 #endif /* __USE_XOPEN2K8 */
+
+/* >> char itoa_digit(bool upper, uint8_t digit); */
+#define itoa_digit(upper, digit) \
+	_itoa_digits[(digit) + (!!(upper) << 6)]
+
+/* >> char const _itoa_digits[101] =
+ * >> "0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+ * >> "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // << offset from base: 64 */
+#ifndef _itoa_digits
+#ifdef __LOCAL_itoa_digits
+#define _itoa_digits __LOCAL_itoa_digits
+#elif defined(__CRT_HAVE__itoa_digits)
+__LIBC char const _itoa_digits[101] __CASMNAME_SAME("_itoa_digits");
+#define _itoa_digits _itoa_digits
+#elif defined(__cplusplus)
+#define _itoa_digits __LOCAL_itoa_digits_fp()
+__ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
+char const *(__LOCAL_itoa_digits_fp)(void) {
+	__ATTR_VISIBILITY("hidden")
+	static __LOCAL_LIBC_CONST_DATA_SECTION(_itoa_digits) char const ___itoa_digits_p[101] =
+	"0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+	"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	return ___itoa_digits_p;
+}
+#else /* ... */
+__LOCAL_LIBC_CONST_DATA(_itoa_digits) char const _itoa_digits[101] =
+"0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+#define _itoa_digits _itoa_digits
+#endif /* !... */
+#endif /* !_itoa_digits */
+
+/* >> char const _itoa_lower_digits[37] = "0123456789abcdefghijklmnopqrstuvwxyz"; */
+#ifndef _itoa_lower_digits
+#ifdef __LOCAL_itoa_lower_digits
+#define _itoa_lower_digits __LOCAL_itoa_lower_digits
+#elif defined(__CRT_HAVE__itoa_digits)
+#define _itoa_lower_digits (_itoa_digits + 0)
+#elif defined(__CRT_HAVE__itoa_lower_digits)
+__LIBC char const _itoa_lower_digits[37] __CASMNAME_SAME("_itoa_lower_digits");
+#define _itoa_lower_digits _itoa_lower_digits
+#else /* ... */
+#define _itoa_lower_digits (_itoa_digits + 0)
+#endif /* !... */
+#endif /* !_itoa_lower_digits */
+
+/* >> char const _itoa_upper_digits[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; */
+#ifndef _itoa_upper_digits
+#ifdef __LOCAL_itoa_upper_digits
+#define _itoa_upper_digits __LOCAL_itoa_upper_digits
+#elif defined(__CRT_HAVE__itoa_digits)
+#define _itoa_upper_digits (_itoa_digits + 64)
+#elif defined(__CRT_HAVE__itoa_upper_digits)
+__LIBC char const _itoa_upper_digits[37] __CASMNAME_SAME("_itoa_upper_digits");
+#define _itoa_upper_digits _itoa_upper_digits
+#else /* ... */
+#define _itoa_upper_digits (_itoa_digits + 64)
+#endif /* !... */
+#endif /* !_itoa_upper_digits */
+
 #endif /* __USE_KOS */
 
 #if (defined(__USE_MISC) || defined(__USE_DOS) || \

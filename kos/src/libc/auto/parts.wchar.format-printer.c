@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb5dbfb0 */
+/* HASH CRC-32:0x992fbc4e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,8 +37,10 @@ DECL_BEGIN
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <libc/template/format-printf.h>' */
 #include "../libc/unicode.h" /* Dependency of `#include <libc/template/format-scanf.h>' */
+/**/
 #include <bits/math-constants.h>
 
+#include <libc/template/itoa_digits.h> /* Dependency of `#include <libc/template/format-printf.h>' */
 #include <libdisasm/disassembler.h>
 #ifdef __KERNEL__
 #include <kernel/addr2line.h>
@@ -150,6 +152,7 @@ done:
 err:
 	return temp;
 }
+#include <libc/template/itoa_digits.h>
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -171,20 +174,11 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
                                size_t textlen,
                                unsigned int flags) THROWS(...) {
 #define escape_tooct(c) ('0' + (char16_t)(char16_t)(c))
-#ifndef DECIMALS_SELECTOR
-#define LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define DECIMALS_SELECTOR  decimals
-	__PRIVATE char const decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif
 	__PRIVATE char16_t const quote[1] = { '\"' };
 	char16_t encoded_text[12]; size_t encoded_text_size;
-	ssize_t result = 0, temp; char const *c_hex;
+	ssize_t result = 0, temp;
 	char16_t const *textend = text + textlen;
 	char16_t const *flush_start = text;
-	c_hex = DECIMALS_SELECTOR[!(flags & 0x0020)];
 	encoded_text[0] = '\\';
 	if likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
@@ -376,32 +370,32 @@ encode_hex:
 				}
 				if (ch <= 0xf) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = c_hex[ch];
+					encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, ch);
 					encoded_text_size = 3;
 				} else if (ch <= 0x7f) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = c_hex[(ch & 0x000000f0) >> 4];
-					encoded_text[3] = c_hex[ch & 0x0000000f];
+					encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+					encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
 					encoded_text_size = 4;
 				} else {
 encode_uni:
 					if (ch <= 0xffff) {
 						encoded_text[1] = 'u';
-						encoded_text[2] = c_hex[(ch & 0x0000f000) >> 12];
-						encoded_text[3] = c_hex[(ch & 0x00000f00) >> 8];
-						encoded_text[4] = c_hex[(ch & 0x000000f0) >> 4];
-						encoded_text[5] = c_hex[ch & 0x0000000f];
+						encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
+						encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
+						encoded_text[4] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+						encoded_text[5] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
 						encoded_text_size = 6;
 					} else {
 						encoded_text[1] = 'U';
-						encoded_text[2] = c_hex[(ch & 0xf0000000) >> 28];
-						encoded_text[3] = c_hex[(ch & 0x0f000000) >> 24];
-						encoded_text[4] = c_hex[(ch & 0x00f00000) >> 20];
-						encoded_text[5] = c_hex[(ch & 0x000f0000) >> 16];
-						encoded_text[6] = c_hex[(ch & 0x0000f000) >> 12];
-						encoded_text[7] = c_hex[(ch & 0x00000f00) >> 8];
-						encoded_text[8] = c_hex[(ch & 0x000000f0) >> 4];
-						encoded_text[9] = c_hex[ch & 0x0000000f];
+						encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0xf0000000) >> 28);
+						encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0f000000) >> 24);
+						encoded_text[4] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00f00000) >> 20);
+						encoded_text[5] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000f0000) >> 16);
+						encoded_text[6] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
+						encoded_text[7] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
+						encoded_text[8] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+						encoded_text[9] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
 						encoded_text_size = 10;
 					}
 				}
@@ -430,12 +424,9 @@ print_encoded:
 	return result;
 err:
 	return temp;
-#ifdef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef DECIMALS_SELECTOR
-#endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 #undef escape_tooct
 }
+#include <libc/template/itoa_digits.h>
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -457,20 +448,11 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
                                size_t textlen,
                                unsigned int flags) THROWS(...) {
 #define escape_tooct(c) ('0' + (char32_t)(char32_t)(c))
-#ifndef DECIMALS_SELECTOR
-#define LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define DECIMALS_SELECTOR  decimals
-	__PRIVATE char const decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif
 	__PRIVATE char32_t const quote[1] = { '\"' };
 	char32_t encoded_text[12]; size_t encoded_text_size;
-	ssize_t result = 0, temp; char const *c_hex;
+	ssize_t result = 0, temp;
 	char32_t const *textend = text + textlen;
 	char32_t const *flush_start = text;
-	c_hex = DECIMALS_SELECTOR[!(flags & 0x0020)];
 	encoded_text[0] = '\\';
 	if likely(!(flags & 0x0001)) {
 		temp = (*printer)(arg, quote, 1);
@@ -662,32 +644,32 @@ encode_hex:
 				}
 				if (ch <= 0xf) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = c_hex[ch];
+					encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, ch);
 					encoded_text_size = 3;
 				} else if (ch <= 0x7f) {
 					encoded_text[1] = 'x';
-					encoded_text[2] = c_hex[(ch & 0x000000f0) >> 4];
-					encoded_text[3] = c_hex[ch & 0x0000000f];
+					encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+					encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
 					encoded_text_size = 4;
 				} else {
 encode_uni:
 					if (ch <= 0xffff) {
 						encoded_text[1] = 'u';
-						encoded_text[2] = c_hex[(ch & 0x0000f000) >> 12];
-						encoded_text[3] = c_hex[(ch & 0x00000f00) >> 8];
-						encoded_text[4] = c_hex[(ch & 0x000000f0) >> 4];
-						encoded_text[5] = c_hex[ch & 0x0000000f];
+						encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
+						encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
+						encoded_text[4] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+						encoded_text[5] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
 						encoded_text_size = 6;
 					} else {
 						encoded_text[1] = 'U';
-						encoded_text[2] = c_hex[(ch & 0xf0000000) >> 28];
-						encoded_text[3] = c_hex[(ch & 0x0f000000) >> 24];
-						encoded_text[4] = c_hex[(ch & 0x00f00000) >> 20];
-						encoded_text[5] = c_hex[(ch & 0x000f0000) >> 16];
-						encoded_text[6] = c_hex[(ch & 0x0000f000) >> 12];
-						encoded_text[7] = c_hex[(ch & 0x00000f00) >> 8];
-						encoded_text[8] = c_hex[(ch & 0x000000f0) >> 4];
-						encoded_text[9] = c_hex[ch & 0x0000000f];
+						encoded_text[2] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0xf0000000) >> 28);
+						encoded_text[3] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0f000000) >> 24);
+						encoded_text[4] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00f00000) >> 20);
+						encoded_text[5] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000f0000) >> 16);
+						encoded_text[6] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x0000f000) >> 12);
+						encoded_text[7] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x00000f00) >> 8);
+						encoded_text[8] = __LOCAL_itoa_digit(flags & 0x0020, (ch & 0x000000f0) >> 4);
+						encoded_text[9] = __LOCAL_itoa_digit(flags & 0x0020, ch & 0x0000000f);
 						encoded_text_size = 10;
 					}
 				}
@@ -716,15 +698,12 @@ print_encoded:
 	return result;
 err:
 	return temp;
-#ifdef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef DECIMALS_SELECTOR
-#endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 #undef escape_tooct
 }
 #include <hybrid/__alloca.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/byteorder.h>
+#include <libc/template/itoa_digits.h>
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
  * @param: printer:  The format printer callback
@@ -742,16 +721,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
                                 size_t size,
                                 size_t linesize,
                                 unsigned int flags) THROWS(...) {
-#ifndef DECIMALS_SELECTOR
-#define LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define DECIMALS_SELECTOR  decimals
-	__PRIVATE char const decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif /* !DECIMALS_SELECTOR */
 	__PRIVATE char16_t const lf[1] = { '\n' };
-	char const *dec;
 	byte_t const *line_data;
 	char16_t buffer[
 		(1 + (sizeof(void *) * 2) + 1) < 17 ? 17 :
@@ -761,7 +731,6 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 	unsigned int offset_digits = 0;
 	if (!size) goto done;
 	if (!linesize) linesize = 16;
-	dec = DECIMALS_SELECTOR[!(flags & 0x0001)];
 	if (flags & 0x0004) {
 		value = size;
 		do {
@@ -778,7 +747,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 			dst = buffer + sizeof(void *) * 2;
 			*dst = ' ';
 			while (dst > buffer) {
-				*--dst = dec[value & 0xf];
+				*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), value & 0xf);
 				value >>= 4;
 			}
 			temp = (*printer)(arg, buffer, (sizeof(void *) * 2) + 1);
@@ -791,7 +760,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 			*dst = ' ';
 			value = (line_data - (byte_t const *)data);
 			while (dst > buffer + 1) {
-				*--dst = dec[value & 0xf];
+				*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), value & 0xf);
 				value >>= 4;
 			}
 			buffer[0] = '+';
@@ -816,7 +785,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 					u16 w = __hybrid_unaligned_get16((u16 *)(line_data + i));
 					dst = buffer + 4;
 					while (dst > buffer) {
-						*--dst = dec[w & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), w & 0xf);
 						w >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 5);
@@ -834,7 +803,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 					u32 l = __hybrid_unaligned_get32((u32 *)(line_data + i));
 					dst = buffer + 8;
 					while (dst > buffer) {
-						*--dst = dec[l & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), l & 0xf);
 						l >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 9);
@@ -853,7 +822,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
 					dst = buffer + 16;
 					while (dst > buffer) {
-						*--dst = dec[q & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), q & 0xf);
 						q >>= 4;
 					}
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -867,11 +836,11 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
-						*--dst = dec[b & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), b & 0xf);
 						b >>= 4;
 					}
 					while (dst > buffer) {
-						*--dst = dec[a & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), a & 0xf);
 						a >>= 4;
 					}
 #endif /* __SIZEOF_POINTER__ < 8 */
@@ -886,8 +855,8 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 			buffer[2] = ' ';
 			for (; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				buffer[0] = dec[b >> 4];
-				buffer[1] = dec[b & 0xf];
+				buffer[0] = __LOCAL_itoa_digit(!(flags & 0x0001), b >> 4);
+				buffer[1] = __LOCAL_itoa_digit(!(flags & 0x0001), b & 0xf);
 				temp = (*printer)(arg, buffer, 3);
 				if unlikely(temp < 0)
 					goto err;
@@ -925,14 +894,11 @@ done:
 	return result;
 err:
 	return temp;
-#ifdef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef DECIMALS_SELECTOR
-#endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 }
 #include <hybrid/__alloca.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/byteorder.h>
+#include <libc/template/itoa_digits.h>
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
  * @param: printer:  The format printer callback
@@ -950,16 +916,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
                                 size_t size,
                                 size_t linesize,
                                 unsigned int flags) THROWS(...) {
-#ifndef DECIMALS_SELECTOR
-#define LOCAL_DECIMALS_SELECTOR_DEFINED 1
-#define DECIMALS_SELECTOR  decimals
-	__PRIVATE char const decimals[2][16] = {
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
-	};
-#endif /* !DECIMALS_SELECTOR */
 	__PRIVATE char32_t const lf[1] = { '\n' };
-	char const *dec;
 	byte_t const *line_data;
 	char32_t buffer[
 		(1 + (sizeof(void *) * 2) + 1) < 17 ? 17 :
@@ -969,7 +926,6 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 	unsigned int offset_digits = 0;
 	if (!size) goto done;
 	if (!linesize) linesize = 16;
-	dec = DECIMALS_SELECTOR[!(flags & 0x0001)];
 	if (flags & 0x0004) {
 		value = size;
 		do {
@@ -986,7 +942,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 			dst = buffer + sizeof(void *) * 2;
 			*dst = ' ';
 			while (dst > buffer) {
-				*--dst = dec[value & 0xf];
+				*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), value & 0xf);
 				value >>= 4;
 			}
 			temp = (*printer)(arg, buffer, (sizeof(void *) * 2) + 1);
@@ -999,7 +955,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 			*dst = ' ';
 			value = (line_data - (byte_t const *)data);
 			while (dst > buffer + 1) {
-				*--dst = dec[value & 0xf];
+				*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), value & 0xf);
 				value >>= 4;
 			}
 			buffer[0] = '+';
@@ -1024,7 +980,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 					u16 w = __hybrid_unaligned_get16((u16 *)(line_data + i));
 					dst = buffer + 4;
 					while (dst > buffer) {
-						*--dst = dec[w & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), w & 0xf);
 						w >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 5);
@@ -1042,7 +998,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 					u32 l = __hybrid_unaligned_get32((u32 *)(line_data + i));
 					dst = buffer + 8;
 					while (dst > buffer) {
-						*--dst = dec[l & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), l & 0xf);
 						l >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 9);
@@ -1061,7 +1017,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
 					dst = buffer + 16;
 					while (dst > buffer) {
-						*--dst = dec[q & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), q & 0xf);
 						q >>= 4;
 					}
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -1075,11 +1031,11 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
-						*--dst = dec[b & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), b & 0xf);
 						b >>= 4;
 					}
 					while (dst > buffer) {
-						*--dst = dec[a & 0xf];
+						*--dst = __LOCAL_itoa_digit(!(flags & 0x0001), a & 0xf);
 						a >>= 4;
 					}
 #endif /* __SIZEOF_POINTER__ < 8 */
@@ -1094,8 +1050,8 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 			buffer[2] = ' ';
 			for (; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				buffer[0] = dec[b >> 4];
-				buffer[1] = dec[b & 0xf];
+				buffer[0] = __LOCAL_itoa_digit(!(flags & 0x0001), b >> 4);
+				buffer[1] = __LOCAL_itoa_digit(!(flags & 0x0001), b & 0xf);
 				temp = (*printer)(arg, buffer, 3);
 				if unlikely(temp < 0)
 					goto err;
@@ -1133,14 +1089,12 @@ done:
 	return result;
 err:
 	return temp;
-#ifdef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef LOCAL_DECIMALS_SELECTOR_DEFINED
-#undef DECIMALS_SELECTOR
-#endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 }
 #include <parts/printf-config.h>
+#include <libc/template/itoa_digits.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/string.h>
+#include <libc/errno.h>
 #include <hybrid/__assert.h>
 #ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)
@@ -1282,8 +1236,10 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 #endif /* !__INTELLISENSE__ */
 }
 #include <parts/printf-config.h>
+#include <libc/template/itoa_digits.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/string.h>
+#include <libc/errno.h>
 #include <hybrid/__assert.h>
 #ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)

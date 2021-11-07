@@ -52,8 +52,10 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <libc/template/format-printf.h>' */
 #include "../libc/unicode.h" /* Dependency of `#include <libc/template/format-scanf.h>' */
+/**/
 #include <bits/math-constants.h>
 
+#include <libc/template/itoa_digits.h> /* Dependency of `#include <libc/template/format-printf.h>' */
 #include <libdisasm/disassembler.h>
 #ifdef __KERNEL__
 #include <kernel/addr2line.h>
@@ -132,8 +134,10 @@ $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
 [[wchar, doc_alias("format_vprintf")]]
 [[decl_include("<bits/crt/wformat-printer.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
 [[impl_include("<libc/parts.uchar.string.h>")]]
 [[impl_include("<libc/string.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[impl_prefix(
 #ifndef __NO_PRINTF_DISASM
