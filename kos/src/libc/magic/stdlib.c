@@ -1864,12 +1864,18 @@ $int64_t strto64_l([[nonnull]] char const *__restrict nptr,
 %[declare_user_export("_itoa_upper_digits")]
 
 %(auto_source){
+#undef _itoa_digits
+#undef libc__itoa_digits
 DEFINE_PUBLIC_ALIAS(_itoa_digits, libc__itoa_digits);
 INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") char const libc__itoa_digits[101] =
 "0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+#define _itoa_digits libc__itoa_digits
+
+/* For ABI compat, also export the lower/upper tables as dedicated symbols. (but only in user-space) */
 #ifndef __KERNEL__
-/* Export the lower/upper tables as dedicated symbols. */
+#undef libc__itoa_lower_digits
+#undef libc__itoa_upper_digits
 __asm__(".hidden libc__itoa_lower_digits\n"
         ".hidden libc__itoa_upper_digits\n"
         ".type   libc__itoa_lower_digits, @object\n"
@@ -1879,8 +1885,12 @@ __asm__(".hidden libc__itoa_lower_digits\n"
         ".set    libc__itoa_upper_digits, libc__itoa_digits + 64\n"
         ".size   libc__itoa_lower_digits, 37\n"
         ".size   libc__itoa_upper_digits, 37\n");
+#undef _itoa_lower_digits
+#undef _itoa_upper_digits
 DEFINE_PUBLIC_ALIAS(_itoa_lower_digits, libc__itoa_lower_digits);
 DEFINE_PUBLIC_ALIAS(_itoa_upper_digits, libc__itoa_upper_digits);
+#define _itoa_lower_digits (libc__itoa_digits + 0)
+#define _itoa_upper_digits (libc__itoa_digits + 64)
 #endif /* !__KERNEL__ */
 }
 
@@ -2675,6 +2685,7 @@ int unlockpt($fd_t fd) {
 	return 0;
 }
 
+@@>> ptsname(3)
 @@Returns the name of the PTY slave (Pseudo TTY slave)
 @@associated   with   the   master   descriptor   `fd'
 [[section(".text.crt{|.dos}.io.tty")]]
@@ -2848,6 +2859,7 @@ $fd_t system_mktemp(unsigned int what, [[nonnull]] char *template_,
 	uint32_t seed, overflow;
 	size_t i, attempt;
 	fd_t result;
+
 	/* Verify the validity of the input template. */
 	if unlikely(xloc < template_ || memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
 @@pp_ifdef EINVAL@@
@@ -2856,6 +2868,7 @@ $fd_t system_mktemp(unsigned int what, [[nonnull]] char *template_,
 		return __libc_seterrno(1);
 @@pp_endif@@
 	}
+
 	/* Calculate an  initial,  random  seed.
 	 * For this purpose, try to make use of:
 	 *   - gettimeofday()
@@ -2914,8 +2927,9 @@ again:
 	overflow = seed >> 30;
 	for (i = 0; i < 6; ++i) {
 		unsigned int digit;
-	    digit = seed & 0x1f;                      /* digit in 0-31 */
+		digit = seed & 0x1f;                      /* digit in 0-31 */
 		digit += overflow & ((1 << (i & 3)) - 1); /* Add a random addend between 0-7 */
+
 		/* Right now, digit in 0-38. But because we're using 2 addend, `0' is less
 		 * likely than the other digits. As such, subtract a bit if we're not at 0
 		 * already. */
@@ -2923,9 +2937,11 @@ again:
 			--digit;
 		if (digit)
 			--digit;
+
 		/* Now, digit in 0-36, but 36 itself would still be invalid. */
 		if (digit > 35)
 			digit = 35;
+
 		/* All right! we've got the digit. */
 		xloc[i] = letters[digit];
 		seed >>= 5;

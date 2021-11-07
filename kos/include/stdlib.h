@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fbb8ed */
+/* HASH CRC-32:0xbccabfeb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2915,12 +2915,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlockpt, __FORCELOCAL __ATTR_ARTIFICIAL int __N
 #endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSPTLCK */
 #endif /* !__CRT_HAVE_unlockpt */
 #ifdef __CRT_HAVE_ptsname
-/* Returns the name of the PTY slave (Pseudo TTY slave)
+/* >> ptsname(3)
+ * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,ptsname,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_ptsname_r)
 #include <libc/local/stdlib/ptsname.h>
-/* Returns the name of the PTY slave (Pseudo TTY slave)
+/* >> ptsname(3)
+ * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ptsname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL ptsname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ptsname))(__fd); })
 #endif /* ... */

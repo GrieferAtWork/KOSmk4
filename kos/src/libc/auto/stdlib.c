@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12cb5d21 */
+/* HASH CRC-32:0x289d9bc2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1434,12 +1434,18 @@ NOTHROW_NCX(LIBCCALL libc_strto64_l)(char const *__restrict nptr,
 	return libc_strto64(nptr, endptr, base);
 }
 #endif /* !__KERNEL__ */
+#undef _itoa_digits
+#undef libc__itoa_digits
 DEFINE_PUBLIC_ALIAS(_itoa_digits, libc__itoa_digits);
 INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") char const libc__itoa_digits[101] =
 "0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+#define _itoa_digits libc__itoa_digits
+
+/* For ABI compat, also export the lower/upper tables as dedicated symbols. (but only in user-space) */
 #ifndef __KERNEL__
-/* Export the lower/upper tables as dedicated symbols. */
+#undef libc__itoa_lower_digits
+#undef libc__itoa_upper_digits
 __asm__(".hidden libc__itoa_lower_digits\n"
         ".hidden libc__itoa_upper_digits\n"
         ".type   libc__itoa_lower_digits, @object\n"
@@ -1449,8 +1455,12 @@ __asm__(".hidden libc__itoa_lower_digits\n"
         ".set    libc__itoa_upper_digits, libc__itoa_digits + 64\n"
         ".size   libc__itoa_lower_digits, 37\n"
         ".size   libc__itoa_upper_digits, 37\n");
+#undef _itoa_lower_digits
+#undef _itoa_upper_digits
 DEFINE_PUBLIC_ALIAS(_itoa_lower_digits, libc__itoa_lower_digits);
 DEFINE_PUBLIC_ALIAS(_itoa_upper_digits, libc__itoa_upper_digits);
+#define _itoa_lower_digits (libc__itoa_digits + 0)
+#define _itoa_upper_digits (libc__itoa_digits + 64)
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/floatcore.h>
@@ -1811,7 +1821,8 @@ NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
 		return -1;
 	return 0;
 }
-/* Returns the name of the PTY slave (Pseudo TTY slave)
+/* >> ptsname(3)
+ * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
@@ -1934,6 +1945,7 @@ NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
 	uint32_t seed, overflow;
 	size_t i, attempt;
 	fd_t result;
+
 	/* Verify the validity of the input template. */
 	if unlikely(xloc < template_ || libc_memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
 #ifdef EINVAL
@@ -1942,6 +1954,7 @@ NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
 		return __libc_seterrno(1);
 #endif /* !EINVAL */
 	}
+
 	/* Calculate an  initial,  random  seed.
 	 * For this purpose, try to make use of:
 	 *   - gettimeofday()
@@ -2000,8 +2013,9 @@ again:
 	overflow = seed >> 30;
 	for (i = 0; i < 6; ++i) {
 		unsigned int digit;
-	    digit = seed & 0x1f;                      /* digit in 0-31 */
+		digit = seed & 0x1f;                      /* digit in 0-31 */
 		digit += overflow & ((1 << (i & 3)) - 1); /* Add a random addend between 0-7 */
+
 		/* Right now, digit in 0-38. But because we're using 2 addend, `0' is less
 		 * likely than the other digits. As such, subtract a bit if we're not at 0
 		 * already. */
@@ -2009,9 +2023,11 @@ again:
 			--digit;
 		if (digit)
 			--digit;
+
 		/* Now, digit in 0-36, but 36 itself would still be invalid. */
 		if (digit > 35)
 			digit = 35;
+
 		/* All right! we've got the digit. */
 		xloc[i] = letters[digit];
 		seed >>= 5;

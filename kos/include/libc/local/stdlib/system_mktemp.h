@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x282cbb26 */
+/* HASH CRC-32:0x5fc3bd6b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,6 +341,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system_mktemp))(unsigned int __what, 
 	__UINT32_TYPE__ __seed, __overflow;
 	__SIZE_TYPE__ __i, __attempt;
 	__fd_t __result;
+
 	/* Verify the validity of the input template. */
 	if __unlikely(__xloc < __template_ || (__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
 #ifdef __EINVAL
@@ -349,6 +350,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system_mktemp))(unsigned int __what, 
 		return __libc_seterrno(1);
 #endif /* !__EINVAL */
 	}
+
 	/* Calculate an  initial,  random  seed.
 	 * For this purpose, try to make use of:
 	 *   - gettimeofday()
@@ -407,8 +409,9 @@ __again:
 	__overflow = __seed >> 30;
 	for (__i = 0; __i < 6; ++__i) {
 		unsigned int __digit;
-	    __digit = __seed & 0x1f;                      /* digit in 0-31 */
+		__digit = __seed & 0x1f;                      /* digit in 0-31 */
 		__digit += __overflow & ((1 << (__i & 3)) - 1); /* Add a random addend between 0-7 */
+
 		/* Right now, digit in 0-38. But because we're using 2 addend, `0' is less
 		 * likely than the other digits. As such, subtract a bit if we're not at 0
 		 * already. */
@@ -416,9 +419,11 @@ __again:
 			--__digit;
 		if (__digit)
 			--__digit;
+
 		/* Now, digit in 0-36, but 36 itself would still be invalid. */
 		if (__digit > 35)
 			__digit = 35;
+
 		/* All right! we've got the digit. */
 		__xloc[__i] = __letters[__digit];
 		__seed >>= 5;

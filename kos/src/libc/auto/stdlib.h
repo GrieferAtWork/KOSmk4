@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf09a545 */
+/* HASH CRC-32:0x2f045502 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -786,12 +786,14 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_unlockpt)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Returns the name of the PTY slave (Pseudo TTY slave)
+/* >> ptsname(3)
+ * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Returns the name of the PTY slave (Pseudo TTY slave)
+/* >> ptsname(3)
+ * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
 #endif /* !__KERNEL__ */
