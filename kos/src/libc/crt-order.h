@@ -347,7 +347,7 @@
 	CB(PREFIX.crt.solaris) \
 	CB(PREFIX.crt.unsorted) \
 	CB(PREFIX.crt.compat.dos.msabi64.msabi64_RRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRRRn) \
-	CB(PREFIX.crt.compat.linux.__register_frame) \
+	CB(PREFIX.crt.compat.linux.__register_frame PREFIX.crt.compat.linux.stdio) \
 	CB(PREFIX.crt.wchar.fs.exec.exec) \
 	CB(PREFIX.crt.wchar.heap.strdup) \
 	CB(PREFIX.crt.wchar.FILE.locked.access) \
@@ -424,6 +424,7 @@
 	CB(PREFIX.crt.dos.heap) \
 	CB(PREFIX.crt.dos.io.read PREFIX.crt.dos.io.large.read PREFIX.crt.dos.io.write PREFIX.crt.dos.io.large.write) \
 	CB(PREFIX.crt.dos.io.access) \
+	CB(PREFIX.crt.dos.FILE.std_files) \
 	CB(PREFIX.crt.dos.FILE.locked.access) \
 	CB(PREFIX.crt.dos.FILE.locked.read.read) \
 	CB(PREFIX.crt.dos.FILE.locked.read.scanf) \

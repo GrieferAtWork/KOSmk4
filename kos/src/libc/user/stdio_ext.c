@@ -38,6 +38,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1))
 NOTHROW_NCX(LIBCCALL libc___fbufsize)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___fbufsize]]]*/
 {
+	stream = file_fromuser(stream);
 	return (size_t)stream->if_bufsiz;
 }
 /*[[[end:libc___fbufsize]]]*/
@@ -50,6 +51,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1))
 NOTHROW_NCX(LIBCCALL libc___freading)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___freading]]]*/
 {
+	stream = file_fromuser(stream);
 	return (stream->if_flag & __IO_FILE_IORW) ||
 	       (stream->if_exdata->io_chsz == 0);
 }
@@ -64,6 +66,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1))
 NOTHROW_NCX(LIBCCALL libc___fwriting)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___fwriting]]]*/
 {
+	stream = file_fromuser(stream);
 	return (stream->if_exdata->io_chsz != 0);
 }
 /*[[[end:libc___fwriting]]]*/
@@ -90,6 +93,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1))
 NOTHROW_NCX(LIBCCALL libc___fwritable)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___fwritable]]]*/
 {
+	stream = file_fromuser(stream);
 	return (stream->if_flag & __IO_FILE_IORW) != 0;
 }
 /*[[[end:libc___fwritable]]]*/
@@ -101,6 +105,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1))
 NOTHROW_NCX(LIBCCALL libc___flbf)(FILE *stream)
 /*[[[body:libc___flbf]]]*/
 {
+	stream = file_fromuser(stream);
 	if (stream->if_flag & IO_LNIFTYY) {
 		if (FMUSTLOCK(stream)) {
 			file_lock_write(stream);
@@ -118,7 +123,8 @@ NOTHROW_NCX(LIBCCALL libc___flbf)(FILE *stream)
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.ext") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL stdio_purge_file)(FILE *__restrict stream) {
 	struct iofile_data *ex;
-	ex = stream->if_exdata;
+	stream = file_fromuser(stream);
+	ex     = stream->if_exdata;
 	stream->if_ptr += stream->if_cnt;
 	stream->if_cnt = 0;
 	ex->io_chng    = stream->if_base;
@@ -134,6 +140,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *stream)
 /*[[[body:libc___fpurge]]]*/
 {
+	stream = file_fromuser(stream);
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		stdio_purge_file(stream);
@@ -153,6 +160,7 @@ NOTHROW_NCX(LIBCCALL libc___fpending)(FILE __KOS_FIXED_CONST *stream)
 {
 	size_t result;
 	struct iofile_data *ex;
+	stream = file_fromuser(stream);
 	ex     = stream->if_exdata;
 	result = ATOMIC_READ(ex->io_chsz);
 	return result;
@@ -181,6 +189,7 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream,
 {
 	int result;
 	(void)type;
+	stream = file_fromuser(stream);
 	result = FMUSTLOCK(stream)
 	         ? FSETLOCKING_INTERNAL
 	         : FSETLOCKING_BYCALLER;

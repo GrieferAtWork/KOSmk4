@@ -127,10 +127,9 @@ struct iofile_data_novtab {
 	size_t                     io_chsz;   /* [lock(fb_lock)] Amount of bytes that were changed. */
 	LIST_ENTRY(FILE)           io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that
 	                                       * have  changed and must  be flushed before another  line-buffered file is read. */
-	LIST_ENTRY(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry in the global chain of open files. (Used
-	                                       * by  `fcloseall()',  as well  as flushing  all  open files  during `exit()') */
-	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a
-	                                       * global flush. */
+	LIST_ENTRY(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry  in  the  global chain  of  open  files.
+	                                       * (Used by `fcloseall()', as well as flushing all open files during `exit()') */
+	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a global flush. */
 	pos64_t                    io_fblk;   /* The starting address of the data block currently stored in `if_base'. */
 	pos64_t                    io_fpos;   /* The current (assumed) position within the underlying file stream. */
 	mbstate_t                  io_mbs;    /* MB State used for translating unicode data. */
@@ -224,6 +223,56 @@ INTDEF WUNUSED uint32_t LIBCCALL file_evalmodes(char const *modes, oflag_t *pofl
 INTDEF WUNUSED FILE *LIBCCALL file_openfd(/*inherit(on_success)*/ fd_t fd, uint32_t flags);
 INTDEF WUNUSED NONNULL((1)) FILE *LIBCCALL file_reopenfd(FILE *__restrict self, fd_t fd, uint32_t flags);
 
+
+#undef FILE_HAVE_UOFFSET
+#if __SIZEOF_POINTER__ < 8
+#define FILE_HAVE_UOFFSET 1
+#endif /* __SIZEOF_POINTER__ < 8 */
+
+
+/* Offset from the base of a user-FILE object to the start of the
+ * internal FILE. Usually `0', but may be larger in compatibility
+ * mode. */
+#ifdef FILE_HAVE_UOFFSET
+INTDEF ptrdiff_t file_uoffset;
+#endif /* FILE_HAVE_UOFFSET */
+
+/* Pack/unpack a user-given FILE object. */
+#ifdef FILE_HAVE_UOFFSET
+#define file_fromuser(ptr)     ((FILE *)((byte_t *)(ptr) + file_uoffset))
+#define file_touser(ptr)       ((FILE *)((byte_t *)(ptr) - file_uoffset))
+#define file_fromuser_opt(ptr) ((FILE *)((ptr) ? (byte_t *)(ptr) + file_uoffset : (byte_t *)(ptr)))
+#define file_touser_opt(ptr)   ((FILE *)((ptr) ? (byte_t *)(ptr) - file_uoffset : (byte_t *)(ptr)))
+#define file_free(self)        free((byte_t *)(self) - file_uoffset)
+INTDEF WUNUSED FILE *__FCALL file_calloc(size_t extsize); /* Defined in "../libc/compat.c" */
+#else /* FILE_HAVE_UOFFSET */
+#define file_fromuser(ptr)     (ptr)
+#define file_fromuser_opt(ptr) (ptr)
+#define file_touser(ptr)       (ptr)
+#define file_touser_opt(ptr)   (ptr)
+#define file_free(self)        free(self)
+#define file_calloc(extsize)   ((FILE *)calloc(sizeof(FILE) + (extsize)))
+#endif /* !FILE_HAVE_UOFFSET */
+
+#undef __CCAST
+#define __CCAST(T) /* Nothing */
+#if EOF == -1
+#define libc_seterrno_and_return_EOF(eno) libc_seterrno(eno)
+#else /* EOF == -1 */
+#define libc_seterrno_and_return_EOF(eno) (libc_seterrno(eno), EOF)
+#endif /* EOF != -1 */
+#if (WEOF16 & 0xffff) == (-1 & 0xffff)
+#define libc_seterrno_and_return_WEOF16(eno) ((wint16_t)libc_seterrno(eno))
+#else /* (WEOF16 & 0xffff) == (-1 & 0xffff) */
+#define libc_seterrno_and_return_WEOF16(eno) (libc_seterrno(eno), WEOF16)
+#endif /* (WEOF16 & 0xffff) != (-1 & 0xffff) */
+#if (WEOF32 & 0xffff) == (-1 & 0xffff)
+#define libc_seterrno_and_return_WEOF32(eno) ((wint32_t)libc_seterrno(eno))
+#else /* (WEOF32 & 0xffff) == (-1 & 0xffff) */
+#define libc_seterrno_and_return_WEOF32(eno) (libc_seterrno(eno), WEOF32)
+#endif /* (WEOF32 & 0xffff) != (-1 & 0xffff) */
+#undef __CCAST
+#define __CCAST /* Nothing */
 
 DECL_END
 

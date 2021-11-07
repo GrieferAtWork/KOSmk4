@@ -31,7 +31,6 @@
 
 #include "../libc/globals.h"
 #include "getopt.h"
-#include "stdio-api.h"
 
 DECL_BEGIN
 

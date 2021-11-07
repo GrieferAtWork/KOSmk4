@@ -27,31 +27,30 @@
 
 /* I/O buffer flags (DOS-compatible)
  * WARNING: These flags may change in the future. */
-#define __IO_FILE_IOR       0x00000001 /* The current buffer was read from disk (Undefined when 'if_cnt == 0'). */
-#define __IO_FILE_IOW       0x00000002 /* The current buffer has changed since being read. */
-#define __IO_FILE_IONBF     0x00000004 /* ??? */
-#define __IO_FILE_IOMALLBUF 0x00000008 /* The buffer was allocated internally. */
-#define __IO_FILE_IOEOF     0x00000010 /* Set when the file pointed to by 'if_fd' has been exhausted. */
-#define __IO_FILE_IOERR     0x00000020 /* Set when an I/O error occurred. */
-#define __IO_FILE_IONOFD    0x00000040 /* The file acts as output to buffer only. - 'if_fd' is not valid.
-                                        * Under KOS this flag is used to indicate the use of file cookies; s.a. `fopencookie(3)' */
-#define __IO_FILE_IORW      0x00000080 /* The file was opened for read+write permissions ('+' flag) */
-#define __IO_FILE_IOUSERBUF 0x00000100 /* The buffer was given by the user. */
-#define __IO_FILE_IOLNBUF   0x00000200 /* NOT ORIGINALLY DEFINED IN DOS: Use line-buffering. */
-#define __IO_FILE_IOSETVBUF 0x00000400 /* ??? */
-#define __IO_FILE_IOFEOF    0x00000800 /* Never used */
-#define __IO_FILE_IOFLRTN   0x00001000 /* ??? */
-#define __IO_FILE_IOCTRLZ   0x00002000 /* ??? */
-#define __IO_FILE_IOCOMMIT  0x00004000 /* Invoke fsync() during fflush() */
-#define __IO_FILE_IOLOCKED  0x00008000 /* ??? */
-#define __IO_FILE_IONOLOCK  0x08000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer does not perform any locking (s.a. `__fsetlocking()') */
-#define __IO_FILE_IOLNIFTYY 0x80000000 /* NOT ORIGINALLY DEFINED IN DOS: Determine `isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
-#define __IO_FILE_IOREADING 0x40000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer is currently being read into and must not be changed or resized. */
-#define __IO_FILE_IOISATTY  0x20000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer refers to a TTY */
-#define __IO_FILE_IONOTATTY 0x10000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer doesn't refer to a TTY */
+#define __IO_FILE_IOR       __UINT32_C(0x00000001) /* The current buffer was read from disk (Undefined when 'if_cnt == 0'). */
+#define __IO_FILE_IOW       __UINT32_C(0x00000002) /* The current buffer has changed since being read. */
+#define __IO_FILE_IONBF     __UINT32_C(0x00000004) /* ??? */
+#define __IO_FILE_IOMALLBUF __UINT32_C(0x00000008) /* The buffer was allocated internally. */
+#define __IO_FILE_IOEOF     __UINT32_C(0x00000010) /* Set when the file pointed to by 'if_fd' has been exhausted. */
+#define __IO_FILE_IOERR     __UINT32_C(0x00000020) /* Set when an I/O error occurred. */
+#define __IO_FILE_IONOFD    __UINT32_C(0x00000040) /* The file acts as output to buffer only. - 'if_fd' is not valid.
+                                                    * Under KOS this flag is used to indicate the use of file cookies; s.a. `fopencookie(3)' */
+#define __IO_FILE_IORW      __UINT32_C(0x00000080) /* The file was opened for read+write permissions ('+' flag) */
+#define __IO_FILE_IOUSERBUF __UINT32_C(0x00000100) /* The buffer was given by the user. */
+#define __IO_FILE_IOLNBUF   __UINT32_C(0x00000200) /* NOT ORIGINALLY DEFINED IN DOS: Use line-buffering. */
+#define __IO_FILE_IOSETVBUF __UINT32_C(0x00000400) /* ??? */
+#define __IO_FILE_IOFEOF    __UINT32_C(0x00000800) /* Never used */
+#define __IO_FILE_IOFLRTN   __UINT32_C(0x00001000) /* ??? */
+#define __IO_FILE_IOCTRLZ   __UINT32_C(0x00002000) /* ??? */
+#define __IO_FILE_IOCOMMIT  __UINT32_C(0x00004000) /* Invoke fsync() during fflush() */
+#define __IO_FILE_IOLOCKED  __UINT32_C(0x00008000) /* ??? */
+#define __IO_FILE_IONOLOCK  __UINT32_C(0x08000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer does not perform any locking (s.a. `__fsetlocking()') */
+#define __IO_FILE_IOLNIFTYY __UINT32_C(0x80000000) /* NOT ORIGINALLY DEFINED IN DOS: Determine `isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
+#define __IO_FILE_IOREADING __UINT32_C(0x40000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer is currently being read into and must not be changed or resized. */
+#define __IO_FILE_IOISATTY  __UINT32_C(0x20000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer refers to a TTY */
+#define __IO_FILE_IONOTATTY __UINT32_C(0x10000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer doesn't refer to a TTY */
 
 
-#ifdef __CC__
 #ifdef __CRT_KOS_PRIMARY
 #ifdef __BUILDING_LIBC
 /* This structure is only defined internally, because
@@ -59,13 +58,41 @@
  * NOTE: The first byte of this structure is always the NUL character,
  *       thus allowing library users to  interpret a pointer to it  as
  *       a C-string of 0 length. */
+#ifdef __CC__
 struct iofile_data;
+#endif /* __CC__ */
 #endif /* __BUILDING_LIBC */
 #endif /* __CRT_KOS_PRIMARY */
 
-__NAMESPACE_STD_BEGIN
 
+__NAMESPACE_STD_BEGIN
 #ifdef __CRT_KOS_PRIMARY
+
+/*
+ * `struct __IO_FILE' data layout:
+ *
+ *      32|64-bit
+ *     [ 0| 0]  byte_t             *if_ptr;
+ *     [ 4| 8]  uint32_t            if_cnt;
+ *     [   12]  int32_t           __if_pad0;        (64-bit only field)
+ *     [ 8|16]  byte_t             *if_base;
+ *     [12|24]  uint32_t            if_flag;
+ *     [16|28]  int32_t             if_fd;
+ *     [20|32]  byte_t              if_charbuf[4];
+ *     [24|36]  uint32_t            if_bufsiz;
+ *     [28|40]  struct iofile_data *if_exdata;
+ *     [32|48]  <END-OF-STRUCT>
+ */
+#define __OFFSET_IO_FILE_PTR     0
+#define __OFFSET_IO_FILE_CNT     __SIZEOF_POINTER__
+#define __OFFSET_IO_FILE_BASE    (__SIZEOF_POINTER__ * 2)
+#define __OFFSET_IO_FILE_FLAG    (__SIZEOF_POINTER__ * 3)
+#define __OFFSET_IO_FILE_FD      (__SIZEOF_POINTER__ * 3 + 4)
+#define __OFFSET_IO_FILE_CHARBUF (__SIZEOF_POINTER__ * 3 + 8)
+#define __OFFSET_IO_FILE_BUFSIZ  (__SIZEOF_POINTER__ * 3 + 12)
+#define __OFFSET_IO_FILE_EXDATA  (__SIZEOF_POINTER__ * 3 + 16)
+#define __SIZEOF_IO_FILE         (__SIZEOF_POINTER__ * 4 + 16)
+#ifdef __CC__
 struct __IO_FILE {
 #ifdef __BUILDING_LIBC
 #if __SIZEOF_POINTER__ >= 8
@@ -74,7 +101,7 @@ struct __IO_FILE {
 	{                                                                \
 		/* .if_ptr     = */ if_ptr_,                                 \
 		/* .if_cnt     = */ if_cnt_,                                 \
-		/* .__if_pad0  = */ 0,                                       \
+		/* .__if_pad0  = */ -1, /* Important for glibc compat! */    \
 		/* .if_base    = */ if_base_,                                \
 		/* .if_flag    = */ if_flag_,                                \
 		/* .if_fd      = */ if_fd_,                                  \
@@ -208,7 +235,11 @@ struct __IO_FILE {
 #endif /* !__USE_KOS_PURE */
 #endif /* !__BUILDING_LIBC */
 };
+#endif /* __CC__ */
+
 #elif defined(__CRT_DOS_PRIMARY)
+
+#ifdef __CC__
 struct __IO_FILE {
 #ifdef __USE_KOS_PURE
 	/* Use names that are protected by the C standard. */
@@ -292,14 +323,21 @@ struct __IO_FILE {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* !__USE_KOS_PURE */
 };
+#endif /* __CC__ */
+
 #else /* __CRT_... */
+#ifdef __CC__
 struct __IO_FILE; /* Opaque */
+#endif /* __CC__ */
 #endif /* !__CRT_... */
 
 #ifndef __std_FILE_defined
 #define __std_FILE_defined
+#ifdef __CC__
 typedef __FILE FILE;
+#endif /* __CC__ */
 #endif /* !__std_FILE_defined */
+
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
@@ -308,8 +346,6 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
-
-#endif /* __CC__ */
 
 
 #endif /* !_BITS_CRT_IO_FILE_H */

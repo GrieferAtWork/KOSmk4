@@ -361,7 +361,7 @@ __LIBC FILE _iob[];
 #else /* __USE_DOS_LINKOBJECTS */
 #ifndef ____iob_func_defined
 #define ____iob_func_defined
-__LIBC __ATTR_WUNUSED __ATTR_RETNONNULL FILE *__NOTHROW(__LIBCCALL __iob_func)(void);
+__LIBC __ATTR_WUNUSED __ATTR_RETNONNULL FILE *__NOTHROW(__LIBDCALL __iob_func)(void);
 #endif /* !____iob_func_defined */
 #   define stdin    (__iob_func() + 0)
 #   define stdout   (__iob_func() + 1)

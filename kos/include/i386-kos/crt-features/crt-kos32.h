@@ -530,6 +530,7 @@
 #define __CRT_HAVE___ilogbf
 #define __CRT_HAVE___ilogbl
 #define __CRT_HAVE___initstate
+#define __CRT_HAVE___iob_func
 #define __CRT_HAVE___ioctl
 #define __CRT_HAVE___ioperm
 #define __CRT_HAVE___iopl
@@ -1316,6 +1317,7 @@
 #define __CRT_HAVE__i64toa_s
 #define __CRT_HAVE__i64tow
 #define __CRT_HAVE__i64tow_s
+#define __CRT_HAVE__iob
 #define __CRT_HAVE__isalnum_l
 #define __CRT_HAVE__isalpha_l
 #define __CRT_HAVE__isatty

@@ -73,8 +73,10 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.getc") NONNULL((1)) wint
 {
 	wint32_t result;
 	struct iofile_data *ex;
-	assert(stream);
-	ex = stream->if_exdata;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF32(EINVAL);
+	stream = file_fromuser(stream);
+	ex     = stream->if_exdata;
 	assert(ex);
 	/* Try to complete an in-progress utf-8 sequence. */
 	for (;;) {
@@ -114,8 +116,10 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.getc") NONNULL((1)) 
 {
 	wint16_t result;
 	struct iofile_data *ex;
-	assert(stream);
-	ex = stream->if_exdata;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF16(EINVAL);
+	stream = file_fromuser(stream);
+	ex     = stream->if_exdata;
 	assert(ex);
 	/* Check for a pending surrogate */
 	if ((ex->io_mbs.__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -166,6 +170,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.getc") NONNULL((1)) wint32
 /*[[[body:libc_fgetwc]]]*/
 {
 	wint32_t result;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF32(EINVAL);
+	stream = file_fromuser(stream);
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		result = libc_fgetwc_unlocked(stream);
@@ -184,6 +191,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.getc") NONNULL((1)) wi
 /*[[[body:libd_fgetwc]]]*/
 {
 	wint16_t result;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF16(EINVAL);
+	stream = file_fromuser(stream);
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		result = libd_fgetwc_unlocked(stream);
@@ -204,6 +214,9 @@ NOTHROW_NCX(LIBKCALL libc_ungetwc_unlocked)(wint32_t ch,
 {
 	wint32_t result = ch;
 	char buf[UNICODE_UTF8_CURLEN], *end;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF32(EINVAL);
+	stream = file_fromuser(stream);
 	end = unicode_writeutf8(buf, (char32_t)ch);
 	assert(end > buf);
 	do {
@@ -227,7 +240,9 @@ NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint16_t ch,
 	char32_t unget_char;
 	wint16_t result = ch;
 	struct iofile_data *ex;
-	assert(stream);
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF16(EINVAL);
+	stream = file_fromuser(stream);
 	ex = stream->if_exdata;
 	assert(ex);
 	/* Check for a pending surrogate */
@@ -269,6 +284,9 @@ NOTHROW_NCX(LIBKCALL libc_ungetwc)(wint32_t wc,
 /*[[[body:libc_ungetwc]]]*/
 {
 	wint32_t result;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF32(EINVAL);
+	stream = file_fromuser(stream);
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		result = libc_ungetwc_unlocked(wc, stream);
@@ -288,6 +306,9 @@ NOTHROW_NCX(LIBDCALL libd_ungetwc)(wint16_t wc,
 /*[[[body:libd_ungetwc]]]*/
 {
 	wint16_t result;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF16(EINVAL);
+	stream = file_fromuser(stream);
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		result = libd_ungetwc_unlocked(wc, stream);
@@ -307,6 +328,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") NONNULL((2)) win
 /*[[[body:libc_fputwc_unlocked]]]*/
 {
 	wint32_t result = (wint32_t)wc;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF32(EINVAL);
+	stream = file_fromuser(stream);
 	if (file_print32(stream, &wc, 1) <= 0)
 		result = WEOF32;
 	return result;
@@ -321,6 +345,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") NONNULL((2))
 /*[[[body:libd_fputwc_unlocked]]]*/
 {
 	wint16_t result = (wint16_t)wc;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF16(EINVAL);
+	stream = file_fromuser(stream);
 	if (file_print16(stream, &wc, 1) <= 0)
 		result = WEOF16;
 	return result;
@@ -336,6 +363,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") NONNULL((2)) wint3
 {
 	ssize_t error;
 	wint32_t result = (wint32_t)wc;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF32(EINVAL);
+	stream = file_fromuser(stream);
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		error = file_print32(stream, &wc, 1);
@@ -358,6 +388,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") NONNULL((2)) w
 {
 	ssize_t error;
 	wint16_t result = (wint16_t)wc;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_WEOF16(EINVAL);
+	stream = file_fromuser(stream);
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		error = file_print16(stream, &wc, 1);
@@ -520,7 +553,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) s
 /*[[[body:libc_file_wprinter]]]*/
 {
 	ssize_t result;
-	FILE *me = (FILE *)arg;
+	FILE *me = file_fromuser((FILE *)arg);
 	if (FMUSTLOCK(me)) {
 		file_lock_write(me);
 		result = file_print32(arg, data, datalen);
@@ -558,7 +591,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2
 /*[[[body:libd_file_wprinter]]]*/
 {
 	ssize_t result;
-	FILE *me = (FILE *)arg;
+	FILE *me = file_fromuser((FILE *)arg);
 	if (FMUSTLOCK(me)) {
 		file_lock_write(me);
 		result = file_print16(arg, data, datalen);
@@ -582,8 +615,8 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1,
 	ssize_t result;
 	struct format_16to8_data format;
 	struct iofile_data *ex;
-	FILE *me = (FILE *)arg;
-	assert(me);
+	FILE *me;
+	me = file_fromuser((FILE *)arg);
 	ex = me->if_exdata;
 	assert(ex);
 	format.fd_arg       = arg;

@@ -26,17 +26,10 @@
 #include "../libc/uchar.h"
 #include "malloc.h"
 #include "parts.wchar.stdio.h"
-#include "stdio-api.h"
 #include "stdio.h"
 #include "stdlib.h"
 
 DECL_BEGIN
-
-
-
-
-
-
 
 /*[[[head:libc_wremove,hash:CRC-32=0xff46ff3c]]]*/
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
