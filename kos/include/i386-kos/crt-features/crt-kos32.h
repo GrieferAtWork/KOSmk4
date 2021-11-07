@@ -384,6 +384,7 @@
 #define __CRT_HAVE___cxa_begin_catch
 #define __CRT_HAVE___cxa_end_catch
 #define __CRT_HAVE___cxa_rethrow
+#define __CRT_HAVE___cygerrno_location
 #define __CRT_HAVE___daylight
 #define __CRT_HAVE___dcgettext
 #define __CRT_HAVE___deregister_frame
@@ -392,6 +393,7 @@
 #define __CRT_HAVE___dgettext
 #define __CRT_HAVE___difftime64
 #define __CRT_HAVE___doserrno
+#define __CRT_HAVE___doserrno_location
 #define __CRT_HAVE___drem
 #define __CRT_HAVE___dremf
 #define __CRT_HAVE___dreml
@@ -837,6 +839,7 @@
 #define __CRT_HAVE___nexttowardf
 #define __CRT_HAVE___nexttowardl
 #define __CRT_HAVE___nice
+#define __CRT_HAVE___nterrno_location
 #define __CRT_HAVE___ntohl
 #define __CRT_HAVE___ntohs
 #define __CRT_HAVE___open
@@ -1198,6 +1201,7 @@
 #define __CRT_HAVE__endthreadex
 #define __CRT_HAVE__environ
 #define __CRT_HAVE__eof
+#define __CRT_HAVE__errno
 #define __CRT_HAVE__error_badusage_no_nesting
 #define __CRT_HAVE__error_check_no_nesting
 #define __CRT_HAVE__etext
@@ -1995,6 +1999,7 @@
 #define __CRT_HAVE_erfl
 #define __CRT_HAVE_err
 #define __CRT_HAVE_errc
+#define __CRT_HAVE_errno
 #define __CRT_HAVE_errno_cyg2dos
 #define __CRT_HAVE_errno_cyg2kos
 #define __CRT_HAVE_errno_cyg2nt
@@ -5377,7 +5382,7 @@
 #define __CRT_HAVE_KOS$__wcstoull_l
 #define __CRT_HAVE_KOS$__wcsxfrm_l
 #define __CRT_HAVE__creat
-#define __CRT_HAVE__errno
+#define __CRT_HAVE_KOS$_errno
 #define __CRT_HAVE__fgetwc_nolock
 #define __CRT_HAVE__fgetwchar
 #define __CRT_HAVE__fgetws_nolock

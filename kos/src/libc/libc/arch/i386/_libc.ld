@@ -70,7 +70,20 @@ SECTIONS {
 
 	.text : {
 		*(.text.__x86.*)
+#ifdef __x86_64__
 		ENUMERATE_SECTIONS(.text)
+#else /* __x86_64__ */
+		/* Hacky premature declaration of sections so we can let  the
+		 * linker calculate the bounding address range which needs to
+		 * be made writable for `nontls_errno_redirect()' */
+		*(.text.hot .text.likely .text.hot.* .text.likely.*)
+		*(.text)
+		*(.text.crt.application.init)
+		PROVIDE_HIDDEN(__libc_errno_access_core_start = .);
+		*(.text.crt.errno_access.core)
+		PROVIDE_HIDDEN(__libc_errno_access_core_end = .);
+		ENUMERATE_SECTIONS(.text)
+#endif /* !__x86_64__ */
 		*(.text.local.*)
 	} PHDR(text)
 	__etext = .;

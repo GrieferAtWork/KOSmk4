@@ -39,6 +39,16 @@
 
 DECL_BEGIN
 
+/* Fun fact: this right here works (but only on i386) to force libc into
+ *           using a custom non-thread-safe `errno' global variable, rather
+ *           than using its normal per-thread `errno'.
+ * s.a. `/kos/src/libc/libc/arch/i386/errno.c' */
+#if !defined(__x86_64__) && defined(__i386__) && 0
+#undef errno
+extern int errno;
+#endif
+
+
 /*      CONFTYPE_...      0  * ... */
 #define CONFTYPE_CONFSTR  1 /* Use `confstr()' to determine value */
 #define CONFTYPE_PATHCONF 2 /* Use `pathconf()' to determine value */

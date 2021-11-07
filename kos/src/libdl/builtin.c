@@ -2909,6 +2909,17 @@ done_add_finalizer:
 		result = DlModule_ElfGetShstrtab(self);
 		break;
 
+	case DLAUXCTRL_ELF_GET_LSYMBOL: {
+		USER char const *name;
+		uintptr_t elf_hash = DLMODULE_GETLOCALSYMBOL_HASH_UNSET;
+		uintptr_t gnu_hash = DLMODULE_GETLOCALSYMBOL_HASH_UNSET;
+		/* Check that this is an ELF module. */
+		if unlikely(self->dm_ops)
+			goto err_notelf;
+		name   = va_arg(args, USER char const *);
+		result = (void *)DlModule_ElfGetLocalSymbol(self, name, &elf_hash, &gnu_hash);
+	}	break;
+
 	default:
 		dl_seterrorf("Invalid auxctrl command %#x", cmd);
 		goto err;

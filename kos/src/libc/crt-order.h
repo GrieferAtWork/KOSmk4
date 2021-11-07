@@ -52,6 +52,7 @@
 
 # Core-application components
 	.application.init
+	.errno_access.core                # Keep core errno access functions together
 	.errno_access
 	.application.exit                 # Keep exit-functions and errno together (both are likely to be used)
 	.application.* .application       # Other application components
@@ -224,6 +225,7 @@
 ]]]*/
 #define CRT_SECTIONS_LINKORDER(CB, PREFIX) \
 	CB(PREFIX.crt.application.init) \
+	CB(PREFIX.crt.errno_access.core) \
 	CB(PREFIX.crt.errno_access) \
 	CB(PREFIX.crt.application.exit) \
 	CB(PREFIX.crt.fs.exec.exec PREFIX.crt.sched.access) \
@@ -397,6 +399,7 @@
 	CB(PREFIX.crt.except.system.mman PREFIX.crt.except.system.utility) \
 	CB(PREFIX.crt.except.system.configuration) \
 	CB(PREFIX.crt.dos.application.init) \
+	CB(PREFIX.crt.dos.errno_access.core) \
 	CB(PREFIX.crt.dos.errno_access) \
 	CB(PREFIX.crt.dos.application.exit) \
 	CB(PREFIX.crt.dos.fs.exec.exec PREFIX.crt.dos.sched.access) \
