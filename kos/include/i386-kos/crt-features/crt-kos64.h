@@ -859,6 +859,7 @@
 #define __CRT_HAVE___p__crtDbgFlag
 #define __CRT_HAVE___p__environ
 #define __CRT_HAVE___p__fmode
+#define __CRT_HAVE___p__iob
 #define __CRT_HAVE___p__pgmptr
 #define __CRT_HAVE___p__wenviron
 #define __CRT_HAVE___p__wpgmptr

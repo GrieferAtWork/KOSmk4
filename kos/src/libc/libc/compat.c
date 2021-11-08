@@ -76,9 +76,12 @@ DEFINE_PUBLIC_ALIAS(stderr, libc_stderr);
 
 
 DEFINE_PUBLIC_ALIAS(_iob, libc_iob);              /* For DOS compatibility */
+DEFINE_PUBLIC_ALIAS(__p__iob, libd___iob_func);   /* For DOS compatibility */
 DEFINE_PUBLIC_ALIAS(__iob_func, libd___iob_func); /* For DOS compatibility */
 INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.FILE.std_files") FILE *
 NOTHROW(LIBDCALL libd___iob_func)(void) {
+	/* DOS doesn't have copy-relocations, we don't have
+	 * to  worry  about   `dlsym("_iob") != &libc_iob'. */
 	return libc_iob;
 }
 
