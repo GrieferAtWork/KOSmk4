@@ -251,7 +251,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL flatdirnode_v_destroy)(struct mfile *__restrict self) {
 	struct flatdirnode *me = mfile_asflatdir(self);
 	flatdirdata_fini(&me->fdn_data);
-	flatdirnode_v_destroy(self);
+	fdirnode_v_destroy(self);
 }
 
 #define destroy_partially_initialized_flatdirent xdestroy_partially_initialized_flatdirent
@@ -1868,7 +1868,7 @@ NOTHROW(FCALL flatdirdata_fini)(struct flatdirdata *__restrict self) {
 
 	/* Drop references from cached directory entries. */
 	TAILQ_FOREACH_SAFE (iter, &self->fdd_bypos, fde_bypos)
-		decref_unlikely(iter);
+		decref_likely(iter);
 
 	/* Free the hash-vector (if dynamically allocated) */
 	if (self->fdd_fileslist != flatdir_empty_buckets)
@@ -2086,8 +2086,8 @@ flatdirnode_fileslist_rehash_before_insert(struct flatdirnode *__restrict self)
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;
 		new_list = (struct flatdir_bucket *)kmalloc_nx((new_mask + 1) *
-		                                                sizeof(struct flatdir_bucket),
-		                                                GFP_CALLOC);
+		                                               sizeof(struct flatdir_bucket),
+		                                               GFP_CALLOC);
 		if unlikely(!new_list) {
 			if ((self->fdn_data.fdd_filessize + 1) <= self->fdn_data.fdd_filesmask)
 				return;
@@ -2095,8 +2095,8 @@ flatdirnode_fileslist_rehash_before_insert(struct flatdirnode *__restrict self)
 			while ((self->fdn_data.fdd_filesused + 1) > self->fdn_data.fdd_filesmask)
 				new_mask = (new_mask << 1) | 1;
 			new_list = (struct flatdir_bucket *)kmalloc((new_mask + 1) *
-			                                             sizeof(struct flatdir_bucket),
-			                                             GFP_CALLOC);
+			                                            sizeof(struct flatdir_bucket),
+			                                            GFP_CALLOC);
 		}
 		/* Rehash using the new list. */
 		flatdirnode_fileslist_rehash_with(self, new_list, new_mask);
