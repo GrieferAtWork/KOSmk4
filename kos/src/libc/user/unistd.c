@@ -921,8 +921,17 @@ NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
                                    __STDC_INT_AS_UINT_T whence)
 /*[[[body:libc_lseek64]]]*/
 {
+#ifdef SYS_lseek64
 	off64_t result = sys_lseek64(fd, (int64_t)offset, whence);
 	return libc_seterrno_syserr(result);
+#else /* SYS_lseek64 */
+	uint64_t result;
+	errno_t error;
+	error = sys__llseek(fd, offset, &result, whence);
+	if unlikely(E_ISERR(error))
+		result = (uint64_t)(int64_t)libc_seterrno_neg(error);
+	return result;
+#endif /* !SYS_lseek64 */
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_lseek64]]]*/

@@ -83,6 +83,109 @@ ext2_inoaddr(struct ext2super *__restrict self, ext2_ino_t ino) {
 
 
 
+/* Allocate physically continuous memory. */
+PRIVATE WUNUSED ATTR_RETNONNULL void *FCALL
+kmemalign_offset_physcont(size_t min_alignment, ptrdiff_t offset,
+                          size_t num_bytes, gfp_t gfp) {
+	/* TODO: Do this via a proper kernel API
+	 * Idea: Instead of having a physical memory allocator function,
+	 *       we should have mman functions that can be used to force
+	 *       a block of kernel RAM to be physically continuous until
+	 *       a phys-cont-release function is called.
+	 * - Can only be used on memory allocated by mman_map_kram()
+	 * - Locking is allowed to fail if locking isn't possible due
+	 *   to other phys-cont-locks that  are already held on  some
+	 *   overlapping pages. This way,  one such lock won't  block
+	 *   if it collides with another, but we're able to  allocate
+	 *   a different block and try to lock that one in that  case */
+	struct s_delme { struct s_delme *next; };
+	struct s_delme *delme = NULL;
+	void *result;
+	size_t pagebytes;
+	RAII_FINALLY {
+		while (delme) {
+			struct s_delme *next;
+			next = delme->next;
+			kfree(delme);
+			delme = next;
+		}
+	};
+again:
+	result = kmemalign_offset(min_alignment, offset, num_bytes,
+	                          gfp | GFP_LOCKED | GFP_PREFLT);
+
+	pagebytes = num_bytes + ((uintptr_t)result & PAGEMASK);
+	if (pagebytes >= PAGESIZE) {
+		size_t i        = PAGESIZE;
+		physaddr_t base = pagedir_translate(result);
+		do {
+			physaddr_t next = pagedir_translate((byte_t *)result + i);
+			if (base + i != next) {
+				struct s_delme *d;
+				d       = (struct s_delme *)result;
+				d->next = delme;
+				delme   = d;
+				goto again;
+			}
+			i += PAGESIZE;
+		} while (i < pagebytes);
+	}
+	return result;
+}
+
+PRIVATE NONNULL((1)) void FCALL
+kfree_physcont(void *ptr) {
+	/* TODO: Do this via a proper kernel API */
+	kfree(ptr);
+}
+
+
+
+#define ext2iblock_free(self)   kfree_physcont(self)
+#define ext2iiblock_free(self)  kfree_physcont(self)
+#define ext2iiiblock_free(self) kfree_physcont(self)
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1)) struct ext2iblock *FCALL
+ext2iblock_alloc(struct ext2super *__restrict super, ext2_blocki_t addr) {
+	struct ext2iblock *result;
+	result = (struct ext2iblock *)kmemalign_offset_physcont(super->es_iobalign,
+	                                                        offsetof(struct ext2iblock, eib_blocks),
+	                                                        super->es_blocksize,
+	                                                        GFP_NORMAL);
+	TRY {
+		fsuper_dev_rdsectors(&super->es_super.ffs_super,
+		                     EXT2_BLOCK2ADDR(super, addr),
+		                     pagedir_translate(ext2iblock_blocks(result)),
+		                     super->es_blocksize);
+	} EXCEPT {
+		kfree_physcont(result);
+		RETHROW();
+	}
+	return result;
+}
+
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1)) struct ext2iiblock *FCALL
+ext2iiblock_alloc(struct ext2super *__restrict super, ext2_blockii_t addr) {
+	struct ext2iiblock *result;
+	result = (struct ext2iiblock *)kmemalign_offset_physcont(super->es_iobalign,
+	                                                         super->es_ind_blocksize * sizeof(struct ext2iblock *),
+	                                                         ext2iiblock_sizeof(super->es_ind_blocksize),
+	                                                         GFP_CALLOC);
+	TRY {
+		fsuper_dev_rdsectors(&super->es_super.ffs_super,
+		                     EXT2_BLOCK2ADDR(super, addr),
+		                     pagedir_translate(ext2iiblock_blocks(result, super->es_ind_blocksize)),
+		                     super->es_blocksize);
+	} EXCEPT {
+		kfree_physcont(result);
+		RETHROW();
+	}
+	return result;
+}
+#define ext2iiiblock_alloc(super, /*ext2_blockiii_t*/ addr) \
+	((struct ext2iiiblock *)ext2iiblock_alloc(super, addr))
+
+
+
 /* Special return values for `ext2_blockaddr()' */
 #define EXT2_BLOCKADDR_ST_NOTALLOC 0 /* Block isn't allocated. (Not returned for `EXT2_BLOCKADDR_F_ALLOC') */
 #define EXT2_BLOCKADDR_ST_WRLOCK   1 /* Need a write-lock but cannot upgrade; caller must acquire lock and try again */
@@ -90,7 +193,7 @@ ext2_inoaddr(struct ext2super *__restrict self, ext2_ino_t ino) {
 /* Flags for `ext2_blockaddr()' */
 #define EXT2_BLOCKADDR_F_NORMAL 0x0000 /* Normal flags */
 #define EXT2_BLOCKADDR_F_WRLOCK 0x0001 /* Caller is holding a write-lock to `self' */
-//TODO:#define EXT2_BLOCKADDR_F_ALLOC  0x0002 /* Allocate missing blocks. */
+#define EXT2_BLOCKADDR_F_ALLOC  0x0002 /* Allocate missing blocks. */
 
 /* Return the on-disk block number (which can be converted into an on-disk
  * address with `EXT2_BLOCK2ADDR()') of  the `blockno'th block of  `self'.
@@ -100,22 +203,159 @@ PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ext2_block_t KCALL
 ext2_blockindex(struct ext2idat *__restrict self,
                 struct ext2super *__restrict super,
                 ext2_blockid_t blockno, unsigned int flags) {
+	ext2_block_t result;
 
 	/* Simple case: direct block pointer */
-	if (blockno < EXT2_DIRECT_BLOCK_COUNT)
-		return self->ei_dblock[blockno];
+	if (blockno < EXT2_DIRECT_BLOCK_COUNT) {
+		result = self->ei_dblock[blockno];
+		if (result == 0 && (flags & EXT2_BLOCKADDR_F_ALLOC))
+			THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+		return result;
+	}
 	blockno -= EXT2_DIRECT_BLOCK_COUNT;
 
 	/* Singly-indirect block table. */
 	if (blockno < super->es_ind_blocksize) {
-		/* TODO: `EXT2_BLOCK2ADDR(super, self->ei_siblock);' is the  on-disk location of  an
-		 *       super->es_ind_blocksize-long, and `1 << es_blockshift'-large array of block
-		 *       points: `ext2_block_t[super->es_ind_blocksize]' */
+		struct ext2iblock *sib = self->ei_siblock_c;
+		if (sib == NULL) {
+			if unlikely(self->ei_siblock == 0) {
+				if (flags & EXT2_BLOCKADDR_F_ALLOC)
+					THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+				return EXT2_BLOCKADDR_ST_NOTALLOC; /* SIB not allocated */
+			}
+			sib = ext2iblock_alloc(super, self->ei_siblock);
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK) && !ext2idat_tryupgrade(self)) {
+				ext2iblock_free(sib);
+				return EXT2_BLOCKADDR_ST_WRLOCK;
+			}
+			self->ei_siblock_c = sib;
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK))
+				ext2idat_downgrade(self);
+		}
+		result = LETOH32(sib->eib_blocks[blockno]);
+		if (result == 0 && (flags & EXT2_BLOCKADDR_F_ALLOC))
+			THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+		return result;
 	}
-	(void)flags;
 	blockno -= super->es_ind_blocksize;
-	THROW(E_NOT_IMPLEMENTED_TODO);
 
+	/* Doubly-indirect block table. */
+	if (blockno < super->es_ind_blocksize_p2) {
+		struct ext2iblock *sib;
+		struct ext2iiblock *dib = self->ei_diblock_c;
+		ext2_blockid_t subindex;
+		if (dib == NULL) {
+			if unlikely(self->ei_diblock == 0) {
+				if (flags & EXT2_BLOCKADDR_F_ALLOC)
+					THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+				return EXT2_BLOCKADDR_ST_NOTALLOC; /* DIB not allocated */
+			}
+			dib = ext2iiblock_alloc(super, self->ei_diblock);
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK) && !ext2idat_tryupgrade(self)) {
+				ext2iiblock_free(dib);
+				return EXT2_BLOCKADDR_ST_WRLOCK;
+			}
+			self->ei_diblock_c = dib;
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK))
+				ext2idat_downgrade(self);
+		}
+		subindex = blockno / super->es_ind_blocksize;
+		blockno %= super->es_ind_blocksize;
+		sib = dib->eiib_blocks_c[subindex];
+		if (sib == NULL) {
+			ext2_blocki_t sib_block;
+			sib_block = LETOH32(ext2iiblock_blocks(dib, super->es_ind_blocksize)[subindex]);
+			if unlikely(sib_block == 0) {
+				if (flags & EXT2_BLOCKADDR_F_ALLOC)
+					THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+				return EXT2_BLOCKADDR_ST_NOTALLOC; /* DIB->SIB not allocated */
+			}
+			sib = ext2iblock_alloc(super, sib_block);
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK) && !ext2idat_tryupgrade(self)) {
+				ext2iblock_free(sib);
+				return EXT2_BLOCKADDR_ST_WRLOCK;
+			}
+			dib->eiib_blocks_c[subindex] = sib;
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK))
+				ext2idat_downgrade(self);
+		}
+		result = LETOH32(sib->eib_blocks[blockno]);
+		if (result == 0 && (flags & EXT2_BLOCKADDR_F_ALLOC))
+			THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+		return result;
+	}
+	blockno -= super->es_ind_blocksize_p2;
+
+	/* Triply-indirect block table. */
+	if (blockno < super->es_ind_blocksize_p3) {
+		struct ext2iblock *sib;
+		struct ext2iiblock *dib;
+		struct ext2iiiblock *tib = self->ei_tiblock_c;
+		ext2_blockid_t subindex;
+		if (tib == NULL) {
+			if unlikely(self->ei_tiblock == 0) {
+				if (flags & EXT2_BLOCKADDR_F_ALLOC)
+					THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+				return EXT2_BLOCKADDR_ST_NOTALLOC; /* TIB not allocated */
+			}
+			tib = ext2iiiblock_alloc(super, self->ei_tiblock);
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK) && !ext2idat_tryupgrade(self)) {
+				ext2iiiblock_free(tib);
+				return EXT2_BLOCKADDR_ST_WRLOCK;
+			}
+			self->ei_tiblock_c = tib;
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK))
+				ext2idat_downgrade(self);
+		}
+		subindex = blockno / super->es_ind_blocksize_p2;
+		blockno %= super->es_ind_blocksize_p2;
+		dib = tib->eiiib_blocks_c[subindex];
+		if (dib == NULL) {
+			ext2_blockii_t dib_block;
+			dib_block = LETOH32(ext2iiiblock_blocks(tib, super->es_ind_blocksize)[subindex]);
+			if unlikely(dib_block == 0) {
+				if (flags & EXT2_BLOCKADDR_F_ALLOC)
+					THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+				return EXT2_BLOCKADDR_ST_NOTALLOC; /* TIB->DIB not allocated */
+			}
+			dib = ext2iiblock_alloc(super, dib_block);
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK) && !ext2idat_tryupgrade(self)) {
+				ext2iiblock_free(dib);
+				return EXT2_BLOCKADDR_ST_WRLOCK;
+			}
+			tib->eiiib_blocks_c[subindex] = dib;
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK))
+				ext2idat_downgrade(self);
+		}
+		subindex = blockno / super->es_ind_blocksize;
+		blockno %= super->es_ind_blocksize;
+		sib = dib->eiib_blocks_c[subindex];
+		if (sib == NULL) {
+			ext2_blocki_t sib_block;
+			sib_block = LETOH32(ext2iiblock_blocks(dib, super->es_ind_blocksize)[subindex]);
+			if unlikely(sib_block == 0) {
+				if (flags & EXT2_BLOCKADDR_F_ALLOC)
+					THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+				return EXT2_BLOCKADDR_ST_NOTALLOC; /* TIB->DIB->SIB not allocated */
+			}
+			sib = ext2iblock_alloc(super, sib_block);
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK) && !ext2idat_tryupgrade(self)) {
+				ext2iblock_free(sib);
+				return EXT2_BLOCKADDR_ST_WRLOCK;
+			}
+			dib->eiib_blocks_c[subindex] = sib;
+			if (!(flags & EXT2_BLOCKADDR_F_WRLOCK))
+				ext2idat_downgrade(self);
+		}
+		result = LETOH32(sib->eib_blocks[blockno]);
+		if (result == 0 && (flags & EXT2_BLOCKADDR_F_ALLOC))
+			THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: Alloc */
+		return result;
+	}
+
+	/* Anything beyond this point cannot be allocated. */
+	if (flags & EXT2_BLOCKADDR_F_ALLOC)
+		THROW(E_FSERROR_FILE_TOO_BIG);
 	return EXT2_BLOCKADDR_ST_NOTALLOC;
 }
 
@@ -134,8 +374,7 @@ ext2_blockindex(struct ext2idat *__restrict self,
  *  - node->fn_fsdata->ei_diblock
  *  - node->fn_fsdata->ei_tiblock
  * Regarding fields from `struct ext2idat', the caller must still initialize:
- *  - node->fn_fsdata->ei_inoaddr
- *  - node->fn_fsdata->ei_lock */
+ *  - node->fn_fsdata->ei_inoaddr */
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL ext2_diskinode_decode)(Ext2DiskINode const *__restrict self,
                                      struct fnode *__restrict node,
@@ -173,6 +412,12 @@ NOTHROW(FCALL ext2_diskinode_decode)(Ext2DiskINode const *__restrict self,
 		       (uint32_t)ino);
 		node->fn_nlink = 1;
 	}
+
+	/* Initialize some common IData fields. */
+	shared_rwlock_init(&idat->ei_lock);
+	idat->ei_siblock_c = NULL;
+	idat->ei_diblock_c = NULL;
+	idat->ei_tiblock_c = NULL;
 }
 
 
@@ -412,31 +657,60 @@ again:
 /* File node operators                                                  */
 /************************************************************************/
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ext2idat_fini)(struct ext2idat *__restrict self) {
-	/* TODO: Free lazily allocated indirect block tables. */
-	(void)self;
-	COMPILER_IMPURE();
+NOTHROW(KCALL ext2iiblock_delete)(struct ext2iiblock *__restrict self,
+                                  size_t es_ind_blocksize) {
+	size_t i;
+	for (i = 0; i < es_ind_blocksize; ++i)
+		ext2iblock_free(self->eiib_blocks_c[i]);
+	ext2iiblock_free(self);
+}
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ext2iiiblock_delete)(struct ext2iiiblock *__restrict self,
+                                   size_t es_ind_blocksize) {
+	size_t i;
+	for (i = 0; i < es_ind_blocksize; ++i) {
+		struct ext2iiblock *inner;
+		inner = self->eiiib_blocks_c[i];
+		if (inner != NULL)
+			ext2iiblock_delete(inner, es_ind_blocksize);
+	}
+	ext2iiiblock_free(self);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ext2idat_fini)(struct ext2idat *__restrict self,
+                             size_t es_ind_blocksize) {
+	/* Free lazily allocated indirect block tables. */
+	if (self->ei_siblock_c)
+		ext2iblock_free(self->ei_siblock_c);
+	if (self->ei_diblock_c)
+		ext2iiblock_delete(self->ei_diblock_c, es_ind_blocksize);
+	if (self->ei_tiblock_c)
+		ext2iiiblock_delete(self->ei_tiblock_c, es_ind_blocksize);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ext2_reg_v_destroy)(struct mfile *__restrict self) {
-	struct ext2regnode *me = (struct ext2regnode *)mfile_asreg(self);
-	ext2idat_fini(&me->ern_fdat);
+	struct ext2regnode *me  = (struct ext2regnode *)mfile_asreg(self);
+	struct ext2super *super = fsuper_asext2(me->fn_super);
+	ext2idat_fini(&me->ern_fdat, super->es_ind_blocksize);
 	fregnode_v_destroy(self);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ext2_lnk_v_destroy)(struct mfile *__restrict self) {
-	struct ext2lnknode *me = (struct ext2lnknode *)mfile_aslnk(self);
-	ext2idat_fini(&me->eln_fdat);
+	struct ext2lnknode *me  = (struct ext2lnknode *)mfile_aslnk(self);
+	struct ext2super *super = fsuper_asext2(me->fn_super);
+	ext2idat_fini(&me->eln_fdat, super->es_ind_blocksize);
 	flnknode_v_destroy(self);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ext2_dir_v_destroy)(struct mfile *__restrict self) {
-	struct ext2dirnode *me = (struct ext2dirnode *)mfile_aslnk(self);
-	ext2idat_fini(&me->edn_fdat);
-	fdirnode_v_destroy(self);
+	struct ext2dirnode *me  = (struct ext2dirnode *)mfile_aslnk(self);
+	struct ext2super *super = fsuper_asext2(me->fn_super);
+	ext2idat_fini(&me->edn_fdat, super->es_ind_blocksize);
+	flatdirnode_v_destroy(self);
 }
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
@@ -447,14 +721,14 @@ ext2_lnk_v_readlink(struct flnknode *__restrict self,
 	size_t lnksize = (size_t)__atomic64_val(self->mf_filesize);
 	if (bufsize > lnksize)
 		bufsize = lnksize;
-	/* As  per the specs, symbolic links with lengths less than 60 (yes: "<" and NOT "<=",
+	/* As per the specs, symbolic links with lengths less than 60 (yes: "<" and NOT "<=",
 	 * even though symlink texts don't traditionally have trailing NULs, and the in-inode
-	 * space would be enough for 60 characters, even though only up to 59 get saved, but
+	 * space  would be enough for 60 characters, even though only up to 59 get saved, but
 	 * whatever...)
 	 *
 	 * ref: linux:/fs/ext2/namei.c:ext2_symlink: `if (l > sizeof (EXT2_I(inode)->i_data))'
 	 *      This  condition tests if a newly created symlink is "slow" (that is: it's text
-	 *      is  not stored in-line). `l' is the strlen()+1 of the link's text, and the
+	 *      is not stored  in-line). `l' is  the strlen()+1  of the link's  text, and  the
 	 *      other `sizeof (EXT2_I(inode)->i_data))' equates to `60' */
 	if (lnksize <= 59) {
 		struct ext2idat *idat = self->fn_fsdata;
@@ -603,7 +877,6 @@ ext2_super_v_makenode(struct flatsuper *__restrict self,
 	result->mf_parts = NULL;
 	SLIST_INIT(&result->mf_changed);
 	result->fn_fsdata->ei_inoaddr = inoaddr;
-	shared_rwlock_init(&result->fn_fsdata->ei_lock);
 	/* Decode generic INode data. */
 	ext2_diskinode_decode(&disk_inode, result, super,
 	                      (ext2_ino_t)ent->fde_ent.fd_ino);
@@ -617,6 +890,7 @@ NOTHROW(KCALL ext2_super_v_destroy)(struct mfile *__restrict self) {
 	mman_unmap_kram_and_kfree(me->es_bgroupv,
 	                          me->es_bgroupc * sizeof(Ext2DiskBlockGroup),
 	                          me->es_freebgroupv);
+	ext2idat_fini(&me->es_fdat, me->es_ind_blocksize);
 	flatsuper_v_destroy(self);
 }
 
@@ -729,21 +1003,25 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 		Ext2DiskINode rootnode;
 
 		/* Fill in (most) ext2-specific superblock fields. */
-		result->es_blk_per_bgrp  = LETOH32(desc->e_blocks_per_group);
-		result->es_ino_per_bgrp  = LETOH32(desc->e_inodes_per_group);
-		result->es_total_blocks  = LETOH32(desc->e_total_blocks);
-		result->es_inode_size    = 128;
-		result->es_total_inodes  = LETOH32(desc->e_total_inodes);
-		result->es_version_maj   = LETOH32(desc->e_version_major);
-		result->es_version_min   = LETOH16(desc->e_version_minor);
-		result->es_feat_optional = 0;
-		result->es_feat_required = 0;
-		result->es_feat_mountro  = 0;
-		result->es_os            = LETOH32(desc->e_os_id);
-		result->es_blockshift    = blockshift;
-		result->es_blockmask     = ((size_t)1 << blockshift) - 1;
-		result->es_ind_blocksize = ((size_t)1 << blockshift) / 4;
-		result->es_bgroupc       = num_block_groups;
+		result->es_blk_per_bgrp     = LETOH32(desc->e_blocks_per_group);
+		result->es_ino_per_bgrp     = LETOH32(desc->e_inodes_per_group);
+		result->es_total_blocks     = LETOH32(desc->e_total_blocks);
+		result->es_inode_size       = 128;
+		result->es_total_inodes     = LETOH32(desc->e_total_inodes);
+		result->es_version_maj      = LETOH32(desc->e_version_major);
+		result->es_version_min      = LETOH16(desc->e_version_minor);
+		result->es_feat_optional    = 0;
+		result->es_feat_required    = 0;
+		result->es_feat_mountro     = 0;
+		result->es_os               = LETOH32(desc->e_os_id);
+		result->es_blockshift       = blockshift;
+		result->es_blocksize        = (size_t)1 << blockshift;
+		result->es_blockmask        = result->es_blocksize - 1;
+		result->es_iobalign         = (size_t)1 << dev->mf_iobashift;
+		result->es_ind_blocksize    = result->es_blocksize / 4;
+		result->es_ind_blocksize_p2 = result->es_ind_blocksize * result->es_ind_blocksize;
+		result->es_ind_blocksize_p3 = result->es_ind_blocksize * result->es_ind_blocksize_p2;
+		result->es_bgroupc          = num_block_groups;
 
 		if (result->es_version_maj >= 1) {
 			result->es_feat_optional = LETOH32(desc->e_feat_optional);
@@ -810,7 +1088,6 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 			ext2_diskinode_decode(&rootnode, &result->es_super.ffs_super.fs_root, result, 2);
 			if unlikely(!S_ISDIR(result->es_super.ffs_super.fs_root.fn_mode))
 				THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
-			shared_rwlock_init(&result->es_fdat.ei_lock);
 		} EXCEPT {
 			mman_unmap_kram_and_kfree(result->es_bgroupv,
 			                          result->es_bgroupc * sizeof(Ext2DiskBlockGroup),
@@ -840,9 +1117,9 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	}
 	result->es_super.ffs_super.fs_feat.sf_link_max           = UINT16_MAX;
 	result->es_super.ffs_super.fs_feat.sf_magic              = EXT2_SUPER_MAGIC;
-	result->es_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->es_blockmask + 1;
-	result->es_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->es_blockmask + 1;
-	result->es_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->es_blockmask + 1;
+	result->es_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->es_blocksize;
+	result->es_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->es_blocksize;
+	result->es_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->es_blocksize;
 	result->es_super.ffs_super.fs_feat.sf_rec_xfer_align     = (u32)1 << dev->mf_iobashift;
 	result->es_super.ffs_super.fs_feat.sf_name_max           = UINT8_MAX;
 	if (!(result->es_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE))

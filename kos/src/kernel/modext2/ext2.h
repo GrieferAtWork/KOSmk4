@@ -162,18 +162,18 @@ typedef struct ATTR_PACKED {
 
 typedef struct ATTR_PACKED {
 	/* INode data structure. */
-	le16    i_mode;              /* INode type and permissions (Identical to our `mode_t') */
-	le16    i_uid;               /* INode UID (Identical to our `uid_t') */
-	le32    i_size_low;          /* Lower 32 bits of INode size in bytes. */
-	le32    i_atime;             /* Last accessed time (`time32_t' format) */
-	le32    i_ctime;             /* File creation time (`time32_t' format) */
-	le32    i_mtime;             /* File modification time (`time32_t' format) */
-	le32    i_dtime;             /* File deletion time (`time32_t' format) */
-	le16    i_gid;               /* INode GID (Identical to our gid_t') */
-	le16    i_nlink;             /* Number of hard links (Identical to our `nlink_t') */
-	le32    i_nsectors;          /* Count of disk sectors (not Ext2 blocks) in use by this inode, not
-	                              * counting the actual inode structure nor directory entries linking
-	                              * to the inode. */
+	le16                 i_mode;       /* INode type and permissions (Identical to our `mode_t') */
+	le16                 i_uid;        /* INode UID (Identical to our `uid_t') */
+	le32                 i_size_low;   /* Lower 32 bits of INode size in bytes. */
+	le32                 i_atime;      /* Last accessed time (`time32_t' format) */
+	le32                 i_ctime;      /* File creation time (`time32_t' format) */
+	le32                 i_mtime;      /* File modification time (`time32_t' format) */
+	le32                 i_dtime;      /* File deletion time (`time32_t' format) */
+	le16                 i_gid;        /* INode GID (Identical to our gid_t') */
+	le16                 i_nlink;      /* Number of hard links (Identical to our `nlink_t') */
+	le32                 i_nsectors;   /* Count of disk sectors (not Ext2 blocks) in use by this inode, not
+	                                    * counting the actual inode structure nor directory entries linking
+	                                    * to the inode. */
 #define EXT2_INODE_FSECURE_DELETE 0x00000001 /* Rewrite data and INode headers of the file a couple
                                               * of times to  prevent file  recovery upon  deletion. */
 #define EXT2_INODE_FKEEP_DATA     0x00000002 /* (IGNORED) Try to preserve file data for as long as
@@ -188,18 +188,18 @@ typedef struct ATTR_PACKED {
 #define EXT2_INODE_FHASHDIR       0x00010000 /* Hash-indexed directory. */
 #define EXT2_INODE_FAFSDIR        0x00020000 /* AFS directory. */
 #define EXT2_INODE_FJOURNAL       0x00040000 /* Journal file data. */
-	le32    i_flags;             /* File flags (Set of `EXT2_INODE_F*') */
-	le32    i_os1;               /* OS-specific field #1 (RESERVED) */
-#define EXT2_DIRECT_BLOCK_COUNT  12 /* Number of direct block pointers. */
-	le32    i_dblock[EXT2_DIRECT_BLOCK_COUNT];
-	                             /* [TYPE(ext2_block_t)] Direct block pointers for file data. */
-	le32    i_siblock;           /* [TYPE(ext2_blocki_t)] Single-Indirect block table. */
-	le32    i_diblock;           /* [TYPE(ext2_blockii_t)] Double-indirect block table. */
-	le32    i_tiblock;           /* [TYPE(ext2_blockiii_t)] Triple-indirect block table. */
-	le32    i_generation;        /* Generation number? */
-	le32    i_acl;               /* [valid_if(:->es_version >= EXT2_VERSION_1)] File ACL. */
-	le32    i_size_high;         /* [valid_if(EXT2_FEAT_MRO_FSIZE64)] High 32 bits of file size. */
-	le32    i_fragment;          /* Block address of fragment??? */
+	le32                 i_flags;      /* File flags (Set of `EXT2_INODE_F*') */
+	le32                 i_os1;        /* OS-specific field #1 (RESERVED) */
+#define EXT2_DIRECT_BLOCK_COUNT  12    /* Number of direct block pointers. */
+	ext2_disk_block_t    i_dblock[EXT2_DIRECT_BLOCK_COUNT];
+	                                   /* Direct block pointers for file data. */
+	ext2_disk_blocki_t   i_siblock;    /* Single-Indirect block table. */
+	ext2_disk_blockii_t  i_diblock;    /* Double-indirect block table. */
+	ext2_disk_blockiii_t i_tiblock;    /* Triple-indirect block table. */
+	le32                 i_generation; /* Generation number? */
+	le32                 i_acl;        /* [valid_if(:->es_version >= EXT2_VERSION_1)] File ACL. */
+	le32                 i_size_high;  /* [valid_if(EXT2_FEAT_MRO_FSIZE64)] High 32 bits of file size. */
+	le32                 i_fragment;   /* Block address of fragment??? */
 #ifdef __INTELLISENSE__
 	struct ATTR_PACKED
 #else /* __INTELLISENSE__ */
@@ -258,24 +258,41 @@ typedef struct ATTR_PACKED {
 
 #ifdef CONFIG_USE_NEW_FS
 struct ext2iblock {
-	ext2_block_t eib_blocks[0]; /* [es_ind_blocksize] Direct block pointers (Or `0' if not allocated) */
+	ext2_disk_block_t eib_blocks[0]; /* [es_ind_blocksize] Direct block pointers (Or `0' if not allocated) */
 };
+#define ext2iblock_sizeof(es_ind_blocksize) (sizeof(ext2_disk_block_t) * (es_ind_blocksize))
+#define ext2iblock_blocks(self)             ((self)->eib_blocks)
+
 struct ext2iiblock {
-	struct ext2iblock            *eiib_blocks[0];  /* [0..1][es_ind_blocksize]  */
-/*	COMPILER_FLEXIBLE_ARRAY(le32, eiib_block_ptrs); * [TYPE(ext2_block_t)][es_ind_blocksize] Disk contents */
+	struct ext2iblock *eiib_blocks_c[0]; /* [0..1][owned][NULL_if(eiib_blocks[i] != 0)][es_ind_blocksize]
+	                                      * [lock(ei_lock)] Lazily allocated, in-sync mirrors of `eiib_blocks[i]' */
+/*	ext2_disk_blocki_t eiib_blocks[0];    * [es_ind_blocksize] Single-Indirect block table. (Or `0' if not allocated) */
 };
-#define ext2iiblock_eiib_block_ptrs
+#define ext2iiblock_sizeof(es_ind_blocksize)       ((sizeof(struct ext2iblock *) + sizeof(ext2_disk_blocki_t)) * (es_ind_blocksize))
+#define ext2iiblock_blocks(self, es_ind_blocksize) ((ext2_disk_blocki_t *)&(self)->eiib_blocks_c[es_ind_blocksize])
+
+struct ext2iiiblock {
+	struct ext2iiblock *eiiib_blocks_c[0]; /* [0..1][owned][NULL_if(eiiib_blocks[i] != 0)][es_ind_blocksize]
+	                                        * [lock(ei_lock)] Lazily allocated, in-sync mirrors of `eiiib_blocks[i]' */
+/*	ext2_disk_blockii_t eiiib_blocks[0];    * [es_ind_blocksize] Double-indirect block table. (Or `0' if not allocated) */
+};
+#define ext2iiiblock_sizeof(es_ind_blocksize)       ((sizeof(struct ext2iiblock *) + sizeof(ext2_disk_blockii_t)) * (es_ind_blocksize))
+#define ext2iiiblock_blocks(self, es_ind_blocksize) ((ext2_disk_blockii_t *)&(self)->eiiib_blocks_c[es_ind_blocksize])
+
 
 
 struct ext2idat {
-	pos_t                ei_inoaddr; /* [const] On-disk address of associated `Ext2DiskINode' */
-	struct shared_rwlock ei_lock;    /* Lock for fields below */
-	ext2_blockid_t       ei_blocks;  /* [lock(ei_lock)] # of allocated EXT2 blocks in use. (NOT THE SAME AS `i_nsectors'!) */
+	pos_t                ei_inoaddr;   /* [const] On-disk address of associated `Ext2DiskINode' */
+	struct shared_rwlock ei_lock;      /* Lock for fields below */
+	ext2_blockid_t       ei_blocks;    /* [lock(ei_lock)] # of allocated EXT2 blocks in use. (NOT THE SAME AS `i_nsectors'!) */
 	ext2_block_t         ei_dblock[EXT2_DIRECT_BLOCK_COUNT];
-	                                 /* [lock(ei_lock)] Direct block pointers for file data. (Or `0' if not allocated) */
-	ext2_blocki_t        ei_siblock; /* [lock(ei_lock)] Single-Indirect block table. (Or `0' if not allocated) */
-	ext2_blockii_t       ei_diblock; /* [lock(ei_lock)] Double-indirect block table. (Or `0' if not allocated) */
-	ext2_blockiii_t      ei_tiblock; /* [lock(ei_lock)] Triple-indirect block table. (Or `0' if not allocated) */
+	                                   /* [lock(ei_lock)] Direct block pointers for file data. (Or `0' if not allocated) */
+	ext2_blocki_t        ei_siblock;   /* [lock(ei_lock)] Single-Indirect block table. (Or `0' if not allocated) */
+	ext2_blockii_t       ei_diblock;   /* [lock(ei_lock)] Double-indirect block table. (Or `0' if not allocated) */
+	ext2_blockiii_t      ei_tiblock;   /* [lock(ei_lock)] Triple-indirect block table. (Or `0' if not allocated) */
+	struct ext2iblock   *ei_siblock_c; /* [0..1][NULL_if(ei_siblock != 0)][lock(ei_lock)] Lazily allocated, in-sync mirror of `ei_siblock' */
+	struct ext2iiblock  *ei_diblock_c; /* [0..1][NULL_if(ei_diblock != 0)][lock(ei_lock)] Lazily allocated, in-sync mirror of `ei_diblock' */
+	struct ext2iiiblock *ei_tiblock_c; /* [0..1][NULL_if(ei_tiblock != 0)][lock(ei_lock)] Lazily allocated, in-sync mirror of `ei_tiblock' */
 };
 
 /* Helpers for accessing `struct ext2idat::ei_lock' */
@@ -350,8 +367,12 @@ struct ext2super {
 #else /* __INTELLISENSE__ */
 #define es_blockshift   es_super.ffs_super.fs_root.mf_blockshift
 #endif /* !__INTELLISENSE__ */
-	size_t              es_blockmask;     /* [const][== (1 << es_blockshift) - 1] Size of a block (in bytes). */
+	size_t              es_iobalign;      /* [const][== 1 << es_super.ffs_super.fs_dev->mf_iobashift] */
+	size_t              es_blockmask;     /* [const][== (1 << es_blockshift) - 1] Size of a block (in bytes) minus 1. */
+	size_t              es_blocksize;     /* [const][== (1 << es_blockshift)] Size of a block (in bytes). */
 	size_t              es_ind_blocksize; /* [const][== (1 << es_blockshift) / 4] Number of entries in an indirect block pointer block. */
+	size_t              es_ind_blocksize_p2; /* [const][== es_ind_blocksize * es_ind_blocksize] */
+	size_t              es_ind_blocksize_p3; /* [const][== es_ind_blocksize * es_ind_blocksize * es_ind_blocksize] */
 	ext2_bgroup_t       es_bgroupc;       /* [!0][const] The total number of block groups. */
 	Ext2DiskBlockGroup *es_bgroupv;       /* [0..es_bgroupc][const][owned] Read/Write memory mapping of the superblock's block-group table. */
 	void               *es_freebgroupv;   /* [1..1][const][owned] Token used to munmap() `es_bgroupv' during destruction (only used during destruction) */
