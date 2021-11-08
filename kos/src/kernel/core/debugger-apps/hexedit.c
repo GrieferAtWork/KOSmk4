@@ -274,7 +274,7 @@ hd_convnibble(unsigned int nibble, unsigned int sel_region) {
 	return nibble;
 }
 
-LOCAL ATTR_DBGTEXT char FCALL
+LOCAL ATTR_DBGTEXT ATTR_PURE char FCALL
 hd_tohex(byte_t val, bool is_valid) {
 	if (!is_valid)
 		return '?';

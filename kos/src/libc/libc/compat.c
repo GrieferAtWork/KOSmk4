@@ -75,9 +75,9 @@ DEFINE_PUBLIC_ALIAS(stderr, libc_stderr);
 #define stderr GET_NOREL_GLOBAL(stderr)
 
 
-DEFINE_PUBLIC_ALIAS(_iob, libc_iob);         /* For DOS compatibility */
+DEFINE_PUBLIC_ALIAS(_iob, libc_iob);              /* For DOS compatibility */
 DEFINE_PUBLIC_ALIAS(__iob_func, libd___iob_func); /* For DOS compatibility */
-INTERN WUNUSED ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.FILE.std_files") FILE *
+INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.FILE.std_files") FILE *
 NOTHROW(LIBDCALL libd___iob_func)(void) {
 	return libc_iob;
 }
@@ -358,7 +358,7 @@ PNEW_HANDLER LIBCCALL libc_set_new_handler(PNEW_HANDLER handler) {
 }
 
 DEFINE_PUBLIC_ALIAS(__builtin_new, libc___builtin_new);
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.heap")
+INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.heap")
 void *LIBCCALL libc___builtin_new(size_t sz) {
 	void *result = malloc(sz);
 	if unlikely(result == NULL)
