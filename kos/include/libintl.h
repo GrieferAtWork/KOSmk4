@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca5c8ba5 */
+/* HASH CRC-32:0xefc28a21 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,6 +343,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LI
 #define dgettext(domainname, msgid)                                       ((char *)(msgid))
 #define gettext(msgid)                                                    ((char *)(msgid))
 #else /* !__CRT_HAVE_dcngettext */
+#if 0 /* Let's not bloat program assembly too much ;) */
 #define dngettext(domainname, msgid_singular, msgid_plural, n) \
 	dcngettext(domainname, msgid_singular, msgid_plural, n, __LC_MESSAGES)
 #define dgettext(domainname, msgid) \
@@ -351,6 +352,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LI
 	dcngettext(__NULLPTR, msgid_singular, msgid_plural, n, __LC_MESSAGES)
 #define gettext(msgid) \
 	dcngettext(__NULLPTR, msgid, __NULLPTR, 1, __LC_MESSAGES)
+#endif
 #endif /* __CRT_HAVE_dcngettext */
 #define __dcngettext(domainname, msgid_singular, msgid_plural, n, category) \
 	dcngettext(domainname, msgid_singular, msgid_plural, n, category)

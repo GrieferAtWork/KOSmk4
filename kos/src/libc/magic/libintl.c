@@ -129,6 +129,7 @@ char *bind_textdomain_codeset(char const *domainname, char const *codeset);
 #define dgettext(domainname, msgid)                                       ((char *)(msgid))
 #define gettext(msgid)                                                    ((char *)(msgid))
 #else /* !__CRT_HAVE_dcngettext */
+#if 0 /* Let's not bloat program assembly too much ;) */
 #define dngettext(domainname, msgid_singular, msgid_plural, n) \
 	dcngettext(domainname, msgid_singular, msgid_plural, n, __LC_MESSAGES)
 #define dgettext(domainname, msgid) \
@@ -137,6 +138,7 @@ char *bind_textdomain_codeset(char const *domainname, char const *codeset);
 	dcngettext(__NULLPTR, msgid_singular, msgid_plural, n, __LC_MESSAGES)
 #define gettext(msgid) \
 	dcngettext(__NULLPTR, msgid, __NULLPTR, 1, __LC_MESSAGES)
+#endif
 #endif /* __CRT_HAVE_dcngettext */
 #define __dcngettext(domainname, msgid_singular, msgid_plural, n, category) \
 	dcngettext(domainname, msgid_singular, msgid_plural, n, category)
