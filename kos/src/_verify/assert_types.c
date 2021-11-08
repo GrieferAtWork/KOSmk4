@@ -2281,5 +2281,15 @@ static_assert(sizeof(union exception_data_pointers) ==
 
 
 
+#include <bits/os/dirent.h>
+
+static_assert(offsetof(struct dirent, d_ino) == __OFFSET_DIRENT_INO);
+static_assert(offsetof(struct dirent, d_namlen) == __OFFSET_DIRENT_NAMLEN);
+static_assert(offsetof(struct dirent, d_type) == __OFFSET_DIRENT_TYPE);
+static_assert(offsetof(struct dirent, d_name) == __OFFSET_DIRENT_NAME);
+static_assert(offsetof(struct dirent64, d_ino) == __OFFSET_DIRENT64_INO);
+static_assert(offsetof(struct dirent64, d_namlen) == __OFFSET_DIRENT64_NAMLEN);
+static_assert(offsetof(struct dirent64, d_type) == __OFFSET_DIRENT64_TYPE);
+static_assert(offsetof(struct dirent64, d_name) == __OFFSET_DIRENT64_NAME);
 
 #endif /* !GUARD__VERIFY_ASSERT_TYPES_C */

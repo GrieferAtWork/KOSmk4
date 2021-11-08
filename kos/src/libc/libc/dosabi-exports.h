@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2e84dee */
+/* HASH CRC-32:0x64498ca4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -251,28 +251,26 @@ DEFINE_PUBLIC_ALIAS(DOS$opendirat, libd_opendirat);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_closedir, libd_closedir);
 DEFINE_PUBLIC_ALIAS(DOS$closedir, libd_closedir);
 DEFINE_PUBLIC_ALIAS(DOS$fdclosedir, libd_fdclosedir);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_readdir, libd_readdir);
-DEFINE_PUBLIC_ALIAS(DOS$readdir, libd_readdir);
+DEFINE_PUBLIC_ALIAS(DOS$readdirk, libd_readdirk);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rewinddir, libd_rewinddir);
 DEFINE_PUBLIC_ALIAS(DOS$rewinddir, libd_rewinddir);
 DEFINE_PUBLIC_ALIAS(DOS$fdopendir, libd_fdopendir);
-DEFINE_PUBLIC_ALIAS(DOS$readdir64, libd_readdir64);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_readdir_r, libd_readdir_r);
-DEFINE_PUBLIC_ALIAS(DOS$readdir_r, libd_readdir_r);
-DEFINE_PUBLIC_ALIAS(DOS$readdir64_r, libd_readdir64_r);
+DEFINE_PUBLIC_ALIAS(DOS$readdirk64, libd_readdirk64);
+DEFINE_PUBLIC_ALIAS(DOS$readdirk_r, libd_readdirk_r);
+DEFINE_PUBLIC_ALIAS(DOS$readdirk64_r, libd_readdirk64_r);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_seekdir, libd_seekdir);
 DEFINE_PUBLIC_ALIAS(DOS$seekdir, libd_seekdir);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_telldir, libd_telldir);
 DEFINE_PUBLIC_ALIAS(DOS$telldir, libd_telldir);
 DEFINE_PUBLIC_ALIAS(DOS$dirfd, libd_dirfd);
-DEFINE_PUBLIC_ALIAS(DOS$alphasort, libd_alphasort);
-DEFINE_PUBLIC_ALIAS(DOS$alphasort64, libd_alphasort64);
+DEFINE_PUBLIC_ALIAS(DOS$alphasortk, libd_alphasortk);
+DEFINE_PUBLIC_ALIAS(DOS$alphasortk64, libd_alphasortk64);
 DEFINE_PUBLIC_ALIAS(DOS$__getdirentries, libd_getdirentries);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_getdirentries, libd_getdirentries);
 DEFINE_PUBLIC_ALIAS(DOS$getdirentries, libd_getdirentries);
 DEFINE_PUBLIC_ALIAS(DOS$getdirentries64, libd_getdirentries64);
-DEFINE_PUBLIC_ALIAS(DOS$versionsort, libd_versionsort);
-DEFINE_PUBLIC_ALIAS(DOS$versionsort64, libd_versionsort64);
+DEFINE_PUBLIC_ALIAS(DOS$versionsortk, libd_versionsortk);
+DEFINE_PUBLIC_ALIAS(DOS$versionsortk64, libd_versionsortk64);
 DEFINE_PUBLIC_ALIAS(DOS$kreaddir, libd_kreaddir);
 DEFINE_PUBLIC_ALIAS(DOS$kreaddirf, libd_kreaddirf);
 DEFINE_PUBLIC_ALIAS(DOS$kreaddir64, libd_kreaddir64);

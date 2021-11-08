@@ -33,6 +33,14 @@
 
 #define __DIRENT32_MATCHES_DIRENT64 1
 
+#define __OFFSET_DIRENT_INO      0
+#define __OFFSET_DIRENT_NAMLEN   __SIZEOF_INO64_T__
+#define __OFFSET_DIRENT_TYPE     (__SIZEOF_INO64_T__ + 2)
+#define __OFFSET_DIRENT_NAME     (__SIZEOF_INO64_T__ + 3)
+#define __OFFSET_DIRENT64_INO    0
+#define __OFFSET_DIRENT64_NAMLEN __SIZEOF_INO64_T__
+#define __OFFSET_DIRENT64_TYPE   (__SIZEOF_INO64_T__ + 2)
+#define __OFFSET_DIRENT64_NAME   (__SIZEOF_INO64_T__ + 3)
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -89,9 +97,8 @@ struct dirent {
 #endif /* __SIZEOF_INO32_T__ < __SIZEOF_INO64_T__ */
 #endif /* !__USE_FILE_OFFSET64 */
 #endif /* !__USE_KOS */
-	__UINT8_TYPE__     d_type;
-	__UINT8_TYPE__   __d_pad;
 	__UINT16_TYPE__    d_namlen; /* == strlen(d_name) */
+	__UINT8_TYPE__     d_type;
 #if defined(__DIRENT_TEXTSIZE)
 	char               d_name[__DIRENT_TEXTSIZE];
 #elif defined(__USE_KOS_KERNEL)
@@ -151,9 +158,8 @@ struct dirent64 {
 	__ino64_t          d_ino;
 #endif /* !_DIRENT_HAVE_D_FILENO */
 #endif /* !__USE_KOS */
-	__UINT8_TYPE__     d_type;
-	__UINT8_TYPE__   __d_pad;
 	__UINT16_TYPE__    d_namlen; /* == strlen(d_name) */
+	__UINT8_TYPE__     d_type;
 #if defined(__DIRENT_TEXTSIZE)
 	char               d_name[__DIRENT_TEXTSIZE];
 #elif defined(__USE_KOS_KERNEL)

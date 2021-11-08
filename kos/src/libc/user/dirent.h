@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8991e6a5 */
+/* HASH CRC-32:0x84dcf4d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_fdclosedir)(DIR *dirp
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-INTDEF NONNULL((1)) struct dirent *NOTHROW_RPC(LIBCCALL libc_readdir)(DIR *__restrict dirp);
+INTDEF NONNULL((1)) struct dirent *NOTHROW_RPC(LIBCCALL libc_readdirk)(DIR *__restrict dirp);
 /* >> rewinddir(3)
  * Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again  return the first directory  entry */
@@ -60,21 +60,18 @@ INTDEF WUNUSED DIR *NOTHROW_NCX(LIBCCALL libc_fdopendir)(fd_t fd);
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-INTDEF NONNULL((1)) struct dirent64 *NOTHROW_RPC(LIBCCALL libc_readdir64)(DIR *__restrict dirp);
+INTDEF NONNULL((1)) struct dirent64 *NOTHROW_RPC(LIBCCALL libc_readdirk64)(DIR *__restrict dirp);
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
  * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp, struct dirent *__restrict entry, struct dirent **__restrict result);
-/* >> readdir_r(3), readdir64_r(3)
- * Reentrant version of `readdir(3)'
- * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
- *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
- * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
- *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp, struct dirent64 *__restrict entry, struct dirent64 **__restrict result);
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_readdirk_r)(DIR *__restrict dirp, struct dirent *__restrict entry, struct dirent **__restrict result);
+/* >> readdir(3), readdir64(3)
+ * Read and return the next pending directory entry of the given directory stream `dirp'
+ * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_readdirk64_r)(DIR *__restrict dirp, struct dirent64 *__restrict entry, struct dirent64 **__restrict result);
 /* >> seekdir(3)
  * Get the directory stream position */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp, longptr_t pos);
@@ -86,16 +83,16 @@ INTDEF NONNULL((1)) longptr_t NOTHROW_NCX(LIBCCALL libc_telldir)(DIR *__restrict
 INTDEF ATTR_PURE NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp);
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir, struct dirent ***__restrict namelist, int (LIBKCALL *selector)(struct dirent const *entry), int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandirk)(char const *__restrict dir, struct dirent ***__restrict namelist, int (LIBKCALL *selector)(struct dirent const *entry), int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd, char const *__restrict dir, struct dirent ***__restrict namelist, int (LIBKCALL *selector)(struct dirent const *entry), int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
+INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandiratk)(fd_t dirfd, char const *__restrict dir, struct dirent ***__restrict namelist, int (LIBKCALL *selector)(struct dirent const *entry), int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandir64)(char const *__restrict dir, struct dirent64 ***__restrict namelist, int (LIBKCALL *selector)(struct dirent64 const *entry), int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b));
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandirk64)(char const *__restrict dir, struct dirent64 ***__restrict namelist, int (LIBKCALL *selector)(struct dirent64 const *entry), int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b));
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandirat64)(fd_t dirfd, char const *__restrict dir, struct dirent64 ***__restrict namelist, int (LIBKCALL *selector)(struct dirent64 const *entry), int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b));
+INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandiratk64)(fd_t dirfd, char const *__restrict dir, struct dirent64 ***__restrict namelist, int (LIBKCALL *selector)(struct dirent64 const *entry), int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b));
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
 INTDEF NONNULL((2, 4)) ssize_t NOTHROW_RPC(LIBCCALL libc_getdirentries)(fd_t fd, char *__restrict buf, size_t nbytes, off_t *__restrict basep);

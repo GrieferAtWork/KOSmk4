@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcd40e07 */
+/* HASH CRC-32:0x85c68b2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -563,8 +563,8 @@
 #define __CRT_HAVE_DOS$aio_write
 #define __CRT_HAVE_DOS$aio_write64
 #define __CRT_HAVE_DOS$alarm
-#define __CRT_HAVE_DOS$alphasort
-#define __CRT_HAVE_DOS$alphasort64
+#define __CRT_HAVE_DOS$alphasortk
+#define __CRT_HAVE_DOS$alphasortk64
 #define __CRT_HAVE_DOS$argz_add
 #define __CRT_HAVE_DOS$argz_add_sep
 #define __CRT_HAVE_DOS$argz_append
@@ -2079,10 +2079,10 @@
 #define __CRT_HAVE_DOS$read
 #define __CRT_HAVE_DOS$readahead
 #define __CRT_HAVE_DOS$readall
-#define __CRT_HAVE_DOS$readdir
-#define __CRT_HAVE_DOS$readdir64
-#define __CRT_HAVE_DOS$readdir64_r
-#define __CRT_HAVE_DOS$readdir_r
+#define __CRT_HAVE_DOS$readdirk
+#define __CRT_HAVE_DOS$readdirk64
+#define __CRT_HAVE_DOS$readdirk64_r
+#define __CRT_HAVE_DOS$readdirk_r
 #define __CRT_HAVE_DOS$readlink
 #define __CRT_HAVE_DOS$readlinkat
 #define __CRT_HAVE_DOS$readpassphrase
@@ -2677,8 +2677,8 @@
 #define __CRT_HAVE_DOS$verr
 #define __CRT_HAVE_DOS$verrc
 #define __CRT_HAVE_DOS$verrx
-#define __CRT_HAVE_DOS$versionsort
-#define __CRT_HAVE_DOS$versionsort64
+#define __CRT_HAVE_DOS$versionsortk
+#define __CRT_HAVE_DOS$versionsortk64
 #define __CRT_HAVE_DOS$vfprintf
 #define __CRT_HAVE_DOS$vfprintf_unlocked
 #define __CRT_HAVE_DOS$vfscanf
@@ -3683,8 +3683,8 @@
 #define __CRT_HAVE_aio_write
 #define __CRT_HAVE_aio_write64
 #define __CRT_HAVE_alarm
-#define __CRT_HAVE_alphasort
-#define __CRT_HAVE_alphasort64
+#define __CRT_HAVE_alphasortk
+#define __CRT_HAVE_alphasortk64
 #define __CRT_HAVE_argz_add
 #define __CRT_HAVE_argz_add_sep
 #define __CRT_HAVE_argz_append
@@ -5401,10 +5401,10 @@
 #define __CRT_HAVE_read
 #define __CRT_HAVE_readahead
 #define __CRT_HAVE_readall
-#define __CRT_HAVE_readdir
-#define __CRT_HAVE_readdir64
-#define __CRT_HAVE_readdir64_r
-#define __CRT_HAVE_readdir_r
+#define __CRT_HAVE_readdirk
+#define __CRT_HAVE_readdirk64
+#define __CRT_HAVE_readdirk64_r
+#define __CRT_HAVE_readdirk_r
 #define __CRT_HAVE_readlink
 #define __CRT_HAVE_readlinkat
 #define __CRT_HAVE_readpassphrase
@@ -5478,10 +5478,10 @@
 #define __CRT_HAVE_scalbn
 #define __CRT_HAVE_scalbnf
 #define __CRT_HAVE_scalbnl
-#define __CRT_HAVE_scandir
-#define __CRT_HAVE_scandir64
-#define __CRT_HAVE_scandirat
-#define __CRT_HAVE_scandirat64
+#define __CRT_HAVE_scandiratk
+#define __CRT_HAVE_scandiratk64
+#define __CRT_HAVE_scandirk
+#define __CRT_HAVE_scandirk64
 #define __CRT_HAVE_scanf
 #define __CRT_HAVE_scanf_unlocked
 #define __CRT_HAVE_sched_get_priority_max
@@ -6039,8 +6039,8 @@
 #define __CRT_HAVE_verr
 #define __CRT_HAVE_verrc
 #define __CRT_HAVE_verrx
-#define __CRT_HAVE_versionsort
-#define __CRT_HAVE_versionsort64
+#define __CRT_HAVE_versionsortk
+#define __CRT_HAVE_versionsortk64
 #define __CRT_HAVE_vfork
 #define __CRT_HAVE_vfprintf
 #define __CRT_HAVE_vfprintf_unlocked

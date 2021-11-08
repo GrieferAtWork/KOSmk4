@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fd67bea */
+/* HASH CRC-32:0xa414c72f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -301,21 +301,21 @@ DFUN(".text.crt.dos.fs.dir", libd_fopendirat, libc_fopendirat, TP, 3, TIn(__SIZE
 DFUN(".text.crt.dos.fs.dir", libd_opendirat, libc_opendirat, TP, 2, TIn(__SIZEOF_FD_T__), TP)
 DFUN(".text.crt.dos.fs.dir", libd_closedir, libc_closedir, TD, 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_fdclosedir, libc_fdclosedir, TIn(__SIZEOF_FD_T__), 1, TP)
-DFUN(".text.crt.dos.fs.dir", libd_readdir, libc_readdir, TP, 1, TP)
+DFUN(".text.crt.dos.fs.dir", libd_readdirk, libc_readdirk, TP, 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_rewinddir, libc_rewinddir, TV, 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_fdopendir, libc_fdopendir, TP, 1, TIn(__SIZEOF_FD_T__))
-DFUN(".text.crt.dos.fs.dir", libd_readdir64, libc_readdir64, TP, 1, TP)
-DFUN(".text.crt.dos.fs.dir", libd_readdir_r, libc_readdir_r, TD, 3, TP, TP, TP)
-DFUN(".text.crt.dos.fs.dir", libd_readdir64_r, libc_readdir64_r, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.fs.dir", libd_readdirk64, libc_readdirk64, TP, 1, TP)
+DFUN(".text.crt.dos.fs.dir", libd_readdirk_r, libc_readdirk_r, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.fs.dir", libd_readdirk64_r, libc_readdirk64_r, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.dir", libd_seekdir, libc_seekdir, TV, 2, TP, TP)
 DFUN(".text.crt.dos.fs.dir", libd_telldir, libc_telldir, TP, 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_dirfd, libc_dirfd, TIn(__SIZEOF_FD_T__), 1, TP)
-DFUN(".text.crt.dos.fs.dir", libd_alphasort, libc_alphasort, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.dir", libd_alphasort64, libc_alphasort64, TD, 2, TP, TP)
+DFUN(".text.crt.dos.fs.dir", libd_alphasortk, libc_alphasortk, TD, 2, TP, TP)
+DFUN(".text.crt.dos.fs.dir", libd_alphasortk64, libc_alphasortk64, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.dir", libd_getdirentries, libc_getdirentries, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TP)
 DFUN(".text.crt.dos.fs.dir", libd_getdirentries64, libc_getdirentries64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TP)
-DFUN(".text.crt.dos.fs.dir", libd_versionsort, libc_versionsort, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.dir", libd_versionsort64, libc_versionsort64, TD, 2, TP, TP)
+DFUN(".text.crt.dos.fs.dir", libd_versionsortk, libc_versionsortk, TD, 2, TP, TP)
+DFUN(".text.crt.dos.fs.dir", libd_versionsortk64, libc_versionsortk64, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.dir", libd_kreaddir, libc_kreaddir, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TD)
 DFUN(".text.crt.dos.fs.dir", libd_kreaddirf, libc_kreaddirf, TI, 5, TIn(__SIZEOF_FD_T__), TP, TI, TD, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.dir", libd_kreaddir64, libc_kreaddir64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TD)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc308970b */
+/* HASH CRC-32:0x6a1bfd67 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_fdclosedir)(DIR *dirp
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-INTDEF NONNULL((1)) struct dirent *NOTHROW_RPC(LIBDCALL libd_readdir)(DIR *__restrict dirp);
+INTDEF NONNULL((1)) struct dirent *NOTHROW_RPC(LIBDCALL libd_readdirk)(DIR *__restrict dirp);
 /* >> rewinddir(3)
  * Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again  return the first directory  entry */
@@ -59,21 +59,18 @@ INTDEF WUNUSED DIR *NOTHROW_NCX(LIBDCALL libd_fdopendir)(fd_t fd);
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-INTDEF NONNULL((1)) struct dirent64 *NOTHROW_RPC(LIBDCALL libd_readdir64)(DIR *__restrict dirp);
+INTDEF NONNULL((1)) struct dirent64 *NOTHROW_RPC(LIBDCALL libd_readdirk64)(DIR *__restrict dirp);
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
  * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_readdir_r)(DIR *__restrict dirp, struct dirent *__restrict entry, struct dirent **__restrict result);
-/* >> readdir_r(3), readdir64_r(3)
- * Reentrant version of `readdir(3)'
- * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
- *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
- * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
- *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_readdir64_r)(DIR *__restrict dirp, struct dirent64 *__restrict entry, struct dirent64 **__restrict result);
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_readdirk_r)(DIR *__restrict dirp, struct dirent *__restrict entry, struct dirent **__restrict result);
+/* >> readdir(3), readdir64(3)
+ * Read and return the next pending directory entry of the given directory stream `dirp'
+ * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_readdirk64_r)(DIR *__restrict dirp, struct dirent64 *__restrict entry, struct dirent64 **__restrict result);
 /* >> seekdir(3)
  * Get the directory stream position */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_seekdir)(DIR *__restrict dirp, longptr_t pos);
@@ -85,22 +82,22 @@ INTDEF NONNULL((1)) longptr_t NOTHROW_NCX(LIBDCALL libd_telldir)(DIR *__restrict
 INTDEF ATTR_PURE NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp);
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_alphasort)(struct dirent const **e1, struct dirent const **e2);
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_alphasortk)(struct dirent const **e1, struct dirent const **e2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1, struct dirent const **e2);
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_alphasortk)(struct dirent const **e1, struct dirent const **e2);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_alphasort64)(struct dirent64 const **e1, struct dirent64 const **e2);
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_alphasortk64)(struct dirent64 const **e1, struct dirent64 const **e2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1, struct dirent64 const **e2);
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_alphasortk64)(struct dirent64 const **e1, struct dirent64 const **e2);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getdirentries(2), getdirentries64(2)
@@ -111,22 +108,22 @@ INTDEF NONNULL((2, 4)) ssize_t NOTHROW_RPC(LIBDCALL libd_getdirentries)(fd_t fd,
 INTDEF NONNULL((2, 4)) ssize_t NOTHROW_RPC(LIBDCALL libd_getdirentries64)(fd_t fd, char *__restrict buf, size_t nbytes, off64_t *__restrict basep);
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_versionsort)(struct dirent const **e1, struct dirent const **e2);
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_versionsortk)(struct dirent const **e1, struct dirent const **e2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1, struct dirent const **e2);
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_versionsortk)(struct dirent const **e1, struct dirent const **e2);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_versionsort64)(struct dirent64 const **e1, struct dirent64 const **e2);
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_versionsortk64)(struct dirent64 const **e1, struct dirent64 const **e2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1, struct dirent64 const **e2);
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_versionsortk64)(struct dirent64 const **e1, struct dirent64 const **e2);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)

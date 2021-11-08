@@ -40,6 +40,9 @@
 
 DECL_BEGIN
 
+#ifndef _DIRENT_MATCHES_DIRENT64
+#error "Unsupported configuration"
+#endif /* !_DIRENT_MATCHES_DIRENT64 */
 
 struct __dirstream {
 	int            ds_fd;      /* [const][owned] The handle for the underlying file stream object. */
@@ -125,9 +128,7 @@ NOTHROW_RPC(LIBCCALL libc_opendirat)(fd_t dirfd,
                                      char const *name)
 /*[[[body:libc_opendirat]]]*/
 {
-	return fopendirat(dirfd,
-	                  name,
-	                  O_RDONLY | O_DIRECTORY);
+	return fopendirat(dirfd, name, O_RDONLY | O_DIRECTORY);
 }
 /*[[[end:libc_opendirat]]]*/
 
@@ -185,9 +186,9 @@ NOTHROW_NCX(LIBCCALL libc_rewinddir)(DIR *__restrict dirp)
 			uint64_t res;
 			sys__llseek(dirp->ds_fd, 0, &res, SEEK_SET);
 		}
-#else
+#else /* ... */
 #error "No suitable sys_lseek() function"
-#endif
+#endif /* !... */
 		dirp->ds_lodsize = 0;
 	}
 }
@@ -232,9 +233,9 @@ NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp,
 			uint64_t res;
 			sys__llseek(dirp->ds_fd, (int64_t)pos, &res, SEEK_SET);
 		}
-#else
+#else /* ... */
 #error "No suitable sys_lseek() function"
-#endif
+#endif /* !... */
 	}
 }
 /*[[[end:libc_seekdir]]]*/
@@ -251,12 +252,11 @@ NOTHROW_NCX(LIBCCALL libc_telldir)(DIR *__restrict dirp)
 	/* XXX: Adjust for unread, but pre-cached directory entries? */
 #if __SIZEOF_LONG__ == 4
 	return (long int)lseek(dirp->ds_fd, 0, SEEK_CUR);
-#else
+#else /* __SIZEOF_LONG__ == 4 */
 	return (long int)lseek64(dirp->ds_fd, 0, SEEK_CUR);
-#endif
+#endif /* __SIZEOF_LONG__ != 4 */
 err_null:
-	libc_seterrno(EINVAL);
-	return -1;
+	return libc_seterrno(EINVAL);
 }
 /*[[[end:libc_telldir]]]*/
 
@@ -271,13 +271,13 @@ NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp)
 }
 /*[[[end:libc_dirfd]]]*/
 
-/*[[[head:libc_readdir,hash:CRC-32=0x1f13eccf]]]*/
+/*[[[head:libc_readdirk,hash:CRC-32=0x4c95c35]]]*/
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) struct dirent *
-NOTHROW_RPC(LIBCCALL libc_readdir)(DIR *__restrict dirp)
-/*[[[body:libc_readdir]]]*/
+NOTHROW_RPC(LIBCCALL libc_readdirk)(DIR *__restrict dirp)
+/*[[[body:libc_readdirk]]]*/
 {
 	struct dirent *result;
 	ssize_t load_size;
@@ -330,12 +330,12 @@ err_null:
 	libc_seterrno(EINVAL);
 	return NULL;
 }
-/*[[[end:libc_readdir]]]*/
+/*[[[end:libc_readdirk]]]*/
 
-/*[[[impl:libc_readdir64]]]*/
-DEFINE_INTERN_WEAK_ALIAS(libc_readdir64, libc_readdir);
+/*[[[impl:libc_readdirk64]]]*/
+DEFINE_INTERN_ALIAS(libc_readdirk64, libc_readdirk);
 
-/*[[[head:libc_readdir_r,hash:CRC-32=0xf1a0a0ec]]]*/
+/*[[[head:libc_readdirk_r,hash:CRC-32=0xe8f79e3f]]]*/
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
  * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
@@ -343,10 +343,10 @@ DEFINE_INTERN_WEAK_ALIAS(libc_readdir64, libc_readdir);
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1, 2, 3)) int
-NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
-                                     struct dirent *__restrict entry,
-                                     struct dirent **__restrict result)
-/*[[[body:libc_readdir_r]]]*/
+NOTHROW_RPC(LIBCCALL libc_readdirk_r)(DIR *__restrict dirp,
+                                      struct dirent *__restrict entry,
+                                      struct dirent **__restrict result)
+/*[[[body:libc_readdirk_r]]]*/
 {
 	errno_t old_error;
 	struct dirent *ent;
@@ -371,35 +371,35 @@ NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
 	*result = entry;
 	return 0;
 }
-/*[[[end:libc_readdir_r]]]*/
+/*[[[end:libc_readdirk_r]]]*/
 
-/*[[[impl:libc_readdir64_r]]]*/
-DEFINE_INTERN_WEAK_ALIAS(libc_readdir64_r, libc_readdir_r);
+/*[[[impl:libc_readdirk64_r]]]*/
+DEFINE_INTERN_ALIAS(libc_readdirk64_r, libc_readdirk_r);
 
-/*[[[head:libc_scandir,hash:CRC-32=0xf8c8f44f]]]*/
+/*[[[head:libc_scandirk,hash:CRC-32=0x36e741eb]]]*/
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
-NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir,
-                                   struct dirent ***__restrict namelist,
-                                   int (LIBKCALL *selector)(struct dirent const *entry),
-                                   int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b))
-/*[[[body:libc_scandir]]]*/
+NOTHROW_RPC(LIBCCALL libc_scandirk)(char const *__restrict dir,
+                                    struct dirent ***__restrict namelist,
+                                    int (LIBKCALL *selector)(struct dirent const *entry),
+                                    int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b))
+/*[[[body:libc_scandirk]]]*/
 /*AUTO*/{
 	return scandirat(__AT_FDCWD, dir, namelist, selector, cmp);
 }
-/*[[[end:libc_scandir]]]*/
+/*[[[end:libc_scandirk]]]*/
 
-/*[[[head:libc_scandirat,hash:CRC-32=0xd2b59bf3]]]*/
+/*[[[head:libc_scandiratk,hash:CRC-32=0x49b96a8e]]]*/
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
-NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
-                                     char const *__restrict dir,
-                                     struct dirent ***__restrict namelist,
-                                     int (LIBKCALL *selector)(struct dirent const *entry),
-                                     int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b))
-/*[[[body:libc_scandirat]]]*/
+NOTHROW_RPC(LIBCCALL libc_scandiratk)(fd_t dirfd,
+                                      char const *__restrict dir,
+                                      struct dirent ***__restrict namelist,
+                                      int (LIBKCALL *selector)(struct dirent const *entry),
+                                      int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b))
+/*[[[body:libc_scandiratk]]]*/
 {
 	DIR stream;
 	ssize_t result;
@@ -423,7 +423,7 @@ NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
 	for (;;) {
 		struct dirent *ent, *ent_copy;
 		size_t ent_size;
-		ent = libc_readdir(&stream);
+		ent = libc_readdirk(&stream);
 		if (!ent) {
 			/* Check if this is an error, or if it's EOF */
 			if (libc_geterrno() != EOK)
@@ -510,13 +510,13 @@ err:
 	ents_list = NULL; /* Write-back a NULL-pointer on error */
 	goto done;
 }
-/*[[[end:libc_scandirat]]]*/
+/*[[[end:libc_scandiratk]]]*/
 
-/*[[[impl:libc_scandir64]]]*/
-/*[[[impl:libc_scandirat64]]]*/
-DEFINE_INTERN_WEAK_ALIAS(libc_scandir64, libc_scandir);
-DEFINE_INTERN_WEAK_ALIAS(libc_scandirat64, libc_scandirat);
+/*[[[impl:libc_scandirk64]]]*/
+DEFINE_INTERN_ALIAS(libc_scandirk64, libc_scandirk);
 
+/*[[[impl:libc_scandiratk64]]]*/
+DEFINE_INTERN_ALIAS(libc_scandiratk64, libc_scandiratk);
 
 /*[[[head:libc_getdirentries,hash:CRC-32=0xdfabe16e]]]*/
 /* >> getdirentries(2), getdirentries64(2)
@@ -540,31 +540,8 @@ err:
 }
 /*[[[end:libc_getdirentries]]]*/
 
-/*[[[head:libc_getdirentries64,hash:CRC-32=0x9c969aaa]]]*/
-#ifdef __DIRENT32_MATCHES_DIRENT64
+/*[[[impl:libc_getdirentries64]]]*/
 DEFINE_INTERN_ALIAS(libc_getdirentries64, libc_getdirentries);
-#else /* MAGIC:alias */
-/* >> getdirentries(2), getdirentries64(2)
- * Linux's underlying system call for reading the entries of a directory */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 4)) ssize_t
-NOTHROW_RPC(LIBCCALL libc_getdirentries64)(fd_t fd,
-                                           char *__restrict buf,
-                                           size_t nbytes,
-                                           off64_t *__restrict basep)
-/*[[[body:libc_getdirentries64]]]*/
-{
-	ssize_t result;
-	if unlikely(lseek64(fd, *basep, SEEK_SET) < 0)
-		goto err;
-	result = kreaddir(fd, (struct dirent *)buf, nbytes, READDIR_MULTIPLE);
-	if (result > 0)
-		*basep += result;
-	return result;
-err:
-	return -1;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_getdirentries64]]]*/
 
 /*[[[impl:libc_kreaddirf64]]]*/
 /*[[[impl:libc_kreaddir64]]]*/
@@ -622,7 +599,7 @@ NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9b89c61c]]]*/
+/*[[[start:exports,hash:CRC-32=0x7e3a6aca]]]*/
 DEFINE_PUBLIC_ALIAS(__libc_opendir, libc_opendir);
 DEFINE_PUBLIC_ALIAS(opendir, libc_opendir);
 DEFINE_PUBLIC_ALIAS(fopendirat, libc_fopendirat);
@@ -630,24 +607,22 @@ DEFINE_PUBLIC_ALIAS(opendirat, libc_opendirat);
 DEFINE_PUBLIC_ALIAS(__libc_closedir, libc_closedir);
 DEFINE_PUBLIC_ALIAS(closedir, libc_closedir);
 DEFINE_PUBLIC_ALIAS(fdclosedir, libc_fdclosedir);
-DEFINE_PUBLIC_ALIAS(__libc_readdir, libc_readdir);
-DEFINE_PUBLIC_ALIAS(readdir, libc_readdir);
+DEFINE_PUBLIC_ALIAS(readdirk, libc_readdirk);
 DEFINE_PUBLIC_ALIAS(__libc_rewinddir, libc_rewinddir);
 DEFINE_PUBLIC_ALIAS(rewinddir, libc_rewinddir);
 DEFINE_PUBLIC_ALIAS(fdopendir, libc_fdopendir);
-DEFINE_PUBLIC_ALIAS(readdir64, libc_readdir64);
-DEFINE_PUBLIC_ALIAS(__libc_readdir_r, libc_readdir_r);
-DEFINE_PUBLIC_ALIAS(readdir_r, libc_readdir_r);
-DEFINE_PUBLIC_ALIAS(readdir64_r, libc_readdir64_r);
+DEFINE_PUBLIC_ALIAS(readdirk64, libc_readdirk64);
+DEFINE_PUBLIC_ALIAS(readdirk_r, libc_readdirk_r);
+DEFINE_PUBLIC_ALIAS(readdirk64_r, libc_readdirk64_r);
 DEFINE_PUBLIC_ALIAS(__libc_seekdir, libc_seekdir);
 DEFINE_PUBLIC_ALIAS(seekdir, libc_seekdir);
 DEFINE_PUBLIC_ALIAS(__libc_telldir, libc_telldir);
 DEFINE_PUBLIC_ALIAS(telldir, libc_telldir);
 DEFINE_PUBLIC_ALIAS(dirfd, libc_dirfd);
-DEFINE_PUBLIC_ALIAS(scandir, libc_scandir);
-DEFINE_PUBLIC_ALIAS(scandirat, libc_scandirat);
-DEFINE_PUBLIC_ALIAS(scandir64, libc_scandir64);
-DEFINE_PUBLIC_ALIAS(scandirat64, libc_scandirat64);
+DEFINE_PUBLIC_ALIAS(scandirk, libc_scandirk);
+DEFINE_PUBLIC_ALIAS(scandiratk, libc_scandiratk);
+DEFINE_PUBLIC_ALIAS(scandirk64, libc_scandirk64);
+DEFINE_PUBLIC_ALIAS(scandiratk64, libc_scandiratk64);
 DEFINE_PUBLIC_ALIAS(__getdirentries, libc_getdirentries);
 DEFINE_PUBLIC_ALIAS(__libc_getdirentries, libc_getdirentries);
 DEFINE_PUBLIC_ALIAS(getdirentries, libc_getdirentries);
