@@ -22,7 +22,7 @@ if [ -z "$VERSION" ]; then VERSION="0.58.0"; fi
 
 SRCPATH="$KOS_ROOT/binutils/src/vitetris-$VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/vitetris-$VERSION"
-EXEPATH="$OPTPATH/vitetris"
+EXEPATH="$OPTPATH/tetris"
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEPATH" ]; then
 	set_archpath
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/configure" ]; then
