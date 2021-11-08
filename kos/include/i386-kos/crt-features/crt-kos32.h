@@ -670,6 +670,8 @@
 #define __CRT_HAVE___libc_pause
 #define __CRT_HAVE___libc_pipe
 #define __CRT_HAVE___libc_read
+#define __CRT_HAVE___libc_readdir
+#define __CRT_HAVE___libc_readdir_r
 #define __CRT_HAVE___libc_readlink
 #define __CRT_HAVE___libc_realloc
 #define __CRT_HAVE___libc_reboot
@@ -3484,6 +3486,10 @@
 #define __CRT_HAVE_read
 #define __CRT_HAVE_readahead
 #define __CRT_HAVE_readall
+#define __CRT_HAVE_readdir
+#define __CRT_HAVE_readdir64
+#define __CRT_HAVE_readdir64_r
+#define __CRT_HAVE_readdir_r
 #define __CRT_HAVE_readdirk
 #define __CRT_HAVE_readdirk64
 #define __CRT_HAVE_readdirk64_r
@@ -3563,6 +3569,10 @@
 #define __CRT_HAVE_scalbn
 #define __CRT_HAVE_scalbnf
 #define __CRT_HAVE_scalbnl
+#define __CRT_HAVE_scandir
+#define __CRT_HAVE_scandir64
+#define __CRT_HAVE_scandirat
+#define __CRT_HAVE_scandirat64
 #define __CRT_HAVE_scandiratk
 #define __CRT_HAVE_scandiratk64
 #define __CRT_HAVE_scandirk

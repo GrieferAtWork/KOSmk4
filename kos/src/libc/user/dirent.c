@@ -25,6 +25,7 @@
 
 #include <hybrid/overflow.h>
 
+#include <kos/exec/ifunc.h>
 #include <kos/syscalls.h>
 
 #include <assert.h>
@@ -56,21 +57,23 @@ struct __dirstream {
 	                                                                *       to free this buffer. */
 };
 
-#define dirstream_init_nofd(self)                           \
-	((self)->ds_lodsize = 0,                                \
-	 (self)->ds_bufsize = sizeof((self)->ds_sbuf),          \
-	 (self)->ds_next    = (struct dirent *)(self)->ds_sbuf, \
-	 (self)->ds_buf     = (struct dirent *)(self)->ds_sbuf)
+/* # of leading bytes to allocate before `ds_buf' (for linux compatibility) */
+PRIVATE ATTR_SECTION(".bss.crt.fs.dir") size_t dirbuf_compat_offset = 0;
+
+#define dirstream_init_nofd(self)                                         \
+	((self)->ds_lodsize = 0,                                              \
+	 (self)->ds_bufsize = sizeof((self)->ds_sbuf) - dirbuf_compat_offset, \
+	 (self)->ds_next = (self)->ds_buf = (struct dirent *)((self)->ds_sbuf + dirbuf_compat_offset))
 #define dirstream_init(self, fd) \
-	((self)->ds_fd = (fd),       \
-	 dirstream_init_nofd(self))
-#define dirstream_fini_keepfd(self)                       \
-	(((self)->ds_buf != (struct dirent *)(self)->ds_sbuf) \
-	 ? free((self)->ds_buf)                               \
+	((self)->ds_fd = (fd), dirstream_init_nofd(self))
+#define dirstream_fini_keepfd(self)                                                \
+	(((self)->ds_buf != (struct dirent *)((self)->ds_sbuf + dirbuf_compat_offset)) \
+	 ? free((byte_t *)(self)->ds_buf - dirbuf_compat_offset)                       \
 	 : (void)0)
 #define dirstream_fini(self)      \
 	(dirstream_fini_keepfd(self), \
 	 sys_close((self)->ds_fd))
+
 
 
 
@@ -271,6 +274,84 @@ NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp)
 }
 /*[[[end:libc_dirfd]]]*/
 
+/*[[[head:libc_getdirentries,hash:CRC-32=0xdfabe16e]]]*/
+/* >> getdirentries(2), getdirentries64(2)
+ * Linux's underlying system call for reading the entries of a directory */
+INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 4)) ssize_t
+NOTHROW_RPC(LIBCCALL libc_getdirentries)(fd_t fd,
+                                         char *__restrict buf,
+                                         size_t nbytes,
+                                         off_t *__restrict basep)
+/*[[[body:libc_getdirentries]]]*/
+{
+	ssize_t result;
+	if unlikely(lseek(fd, *basep, SEEK_SET) < 0)
+		goto err;
+	result = kreaddir(fd, (struct dirent *)buf, nbytes, READDIR_MULTIPLE);
+	if (result > 0)
+		*basep += result;
+	return result;
+err:
+	return -1;
+}
+/*[[[end:libc_getdirentries]]]*/
+
+/*[[[impl:libc_getdirentries64]]]*/
+DEFINE_INTERN_ALIAS(libc_getdirentries64, libc_getdirentries);
+
+/*[[[impl:libc_kreaddirf64]]]*/
+/*[[[impl:libc_kreaddir64]]]*/
+DEFINE_INTERN_WEAK_ALIAS(libc_kreaddirf64, libc_kreaddirf);
+DEFINE_INTERN_WEAK_ALIAS(libc_kreaddir64, libc_kreaddir);
+
+/*[[[head:libc_kreaddirf,hash:CRC-32=0x32514912]]]*/
+/* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
+ * The KOS-specific system call for reading a single directory entry
+ * from  a file  descriptor referring  to an  open directory stream.
+ * @param: mode: One of `READDIR_*' (See below)
+ * @return: * : The actually required buffer size for the directory entry (in bytes)
+ *              NOTE: When  `READDIR_DEFAULT' was passed for `mode', the directory
+ *                    stream will only be advanced when this value is >= 'bufsize'
+ * @return: 0 : The end of the directory has been reached.
+ * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ssize_t
+NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd,
+                                     struct dirent *buf,
+                                     size_t bufsize,
+                                     unsigned int mode,
+                                     oflag_t flags)
+/*[[[body:libc_kreaddirf]]]*/
+{
+	ssize_t result;
+	result = sys_kreaddirf(fd, buf, bufsize, mode, flags);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_kreaddirf]]]*/
+
+/*[[[head:libc_kreaddir,hash:CRC-32=0xfc1b6ac9]]]*/
+/* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
+ * The KOS-specific system call for reading a single directory entry
+ * from  a file  descriptor referring  to an  open directory stream.
+ * @param: mode: One of `READDIR_*' (See below)
+ * @return: * : The actually required buffer size for the directory entry (in bytes)
+ *              NOTE: When  `READDIR_DEFAULT' was passed for `mode', the directory
+ *                    stream will only be advanced when this value is >= 'bufsize'
+ * @return: 0 : The end of the directory has been reached.
+ * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ssize_t
+NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
+                                    struct dirent *buf,
+                                    size_t bufsize,
+                                    unsigned int mode)
+/*[[[body:libc_kreaddir]]]*/
+{
+	ssize_t result;
+	result = sys_kreaddir(fd, buf, bufsize, mode);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_kreaddir]]]*/
+
+
 /*[[[head:libc_readdirk,hash:CRC-32=0x4c95c35]]]*/
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
@@ -285,6 +366,7 @@ NOTHROW_RPC(LIBCCALL libc_readdirk)(DIR *__restrict dirp)
 		goto err_null;
 again:
 	result = dirp->ds_next;
+
 	/* Check if there the pre-loaded next-pointer is valid. */
 	if (READDIR_MULTIPLE_ISVALID(result, dirp->ds_buf, dirp->ds_lodsize)) {
 		if (READDIR_MULTIPLE_ISEOF(result))
@@ -292,6 +374,7 @@ again:
 		dirp->ds_next = READDIR_MULTIPLE_GETNEXT(result);
 		return result;
 	}
+
 	/* Read more entires. */
 	load_size = kreaddir(dirp->ds_fd,
 	                     dirp->ds_buf,
@@ -300,11 +383,13 @@ again:
 	                     READDIR_WANTEOF);
 	if unlikely(load_size <= 0)
 		return NULL; /* Error, or end-of-directory. */
+
 	if unlikely((size_t)load_size > dirp->ds_bufsize) {
 		size_t new_bufsize;
 		struct dirent *new_buffer;
+
 		/* Buffer is too small. -> Must allocate one that is larger. */
-		if (dirp->ds_buf == (struct dirent *)dirp->ds_sbuf) {
+		if (dirp->ds_buf == (struct dirent *)(dirp->ds_sbuf + dirbuf_compat_offset)) {
 			/* Free the static buffer. */
 			realloc_in_place(dirp, offsetof(DIR, ds_sbuf));
 			dirp->ds_buf = NULL;
@@ -312,15 +397,16 @@ again:
 		new_bufsize = load_size << 1;
 		if unlikely(new_bufsize < (size_t)load_size)
 			new_bufsize = (size_t)load_size;
-		new_buffer  = (struct dirent *)realloc(dirp->ds_buf, new_bufsize);
+		new_buffer  = (struct dirent *)realloc(dirp->ds_buf, new_bufsize + dirbuf_compat_offset);
 		if unlikely(!new_buffer) {
 			new_bufsize = (size_t)load_size;
-			new_buffer  = (struct dirent *)realloc(dirp->ds_buf, new_bufsize);
+			new_buffer  = (struct dirent *)realloc(dirp->ds_buf, new_bufsize + dirbuf_compat_offset);
 			if unlikely(!new_buffer)
 				return NULL;
 		}
+
 		/* Install the new buffer. */
-		dirp->ds_buf     = new_buffer;
+		dirp->ds_buf     = (struct dirent *)((byte_t *)new_buffer + dirbuf_compat_offset);
 		dirp->ds_bufsize = new_bufsize;
 	}
 	dirp->ds_next    = dirp->ds_buf;
@@ -493,7 +579,7 @@ NOTHROW_RPC(LIBCCALL libc_scandiratk)(fd_t dirfd,
 	if (cmp) {
 		qsort(ents_list, ents_used,
 		      sizeof(struct dirent *),
-		      (__compar_fn_t)cmp);
+		      (comparison_fn_t)cmp);
 	}
 done:
 	*namelist = ents_list; /* Inherit */
@@ -518,82 +604,431 @@ DEFINE_INTERN_ALIAS(libc_scandirk64, libc_scandirk);
 /*[[[impl:libc_scandiratk64]]]*/
 DEFINE_INTERN_ALIAS(libc_scandiratk64, libc_scandiratk);
 
-/*[[[head:libc_getdirentries,hash:CRC-32=0xdfabe16e]]]*/
-/* >> getdirentries(2), getdirentries64(2)
- * Linux's underlying system call for reading the entries of a directory */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 4)) ssize_t
-NOTHROW_RPC(LIBCCALL libc_getdirentries)(fd_t fd,
-                                         char *__restrict buf,
-                                         size_t nbytes,
-                                         off_t *__restrict basep)
-/*[[[body:libc_getdirentries]]]*/
-{
+
+
+/************************************************************************/
+/* Linux compatibility                                                  */
+/************************************************************************/
+struct glibc_dirent32 {
+	uintptr_t d_ino;
+	intptr_t  d_off;
+	uint16_t  d_reclen;
+	uint8_t   d_type;
+	char      d_name[256];
+};
+struct glibc_dirent64 {
+	uint64_t d_ino;
+	int64_t  d_off;
+	uint16_t d_reclen;
+	uint8_t  d_type;
+	char     d_name[256];
+};
+
+#if __SIZEOF_POINTER__ == 4
+#define SIZEOF_LINUX_DIRENT32_MATCHES_KOS_DIRENT
+#endif /* __SIZEOF_POINTER__ == 4 */
+
+
+#ifdef SIZEOF_LINUX_DIRENT32_MATCHES_KOS_DIRENT
+PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1))
+ATTR_RETNONNULL WUNUSED struct glibc_dirent32 *__FCALL
+dirent2glibc32(struct dirent *__restrict self) {
+	static_assert(offsetof(struct glibc_dirent32, d_ino) == offsetof(struct dirent, d_ino));
+	static_assert(offsetof(struct glibc_dirent32, d_reclen) == offsetof(struct dirent, d_namlen));
+	static_assert(offsetof(struct glibc_dirent32, d_type) == offsetof(struct dirent, d_type));
+	static_assert(offsetof(struct glibc_dirent32, d_name) == offsetof(struct dirent, d_name));
+	struct glibc_dirent32 *result;
+	result = (struct glibc_dirent32 *)self;
+	result->d_off = 0; /* We don't have this one... */
+	result->d_reclen += offsetof(struct glibc_dirent32, d_name) + 1;
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1)) struct glibc_dirent32 *
+NOTHROW_RPC(LIBCCALL libc_readdir)(DIR *__restrict dirp) {
+	struct dirent *result;
+	result = libc_readdirk(dirp);
+	if unlikely(!result)
+		return NULL;
+	return dirent2glibc32(result);
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1, 2, 3)) int
+NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
+                                     struct glibc_dirent32 *__restrict entry,
+                                     struct glibc_dirent32 **__restrict result) {
+	int retval;
+	retval = libc_readdirk_r(dirp, (struct dirent *)entry, (struct dirent **)result);
+	if (retval == 0)
+		*result = dirent2glibc32((struct dirent *)*result);
+	return retval;
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
+                                     char const *__restrict dir,
+                                     struct glibc_dirent32 ***__restrict namelist,
+                                     int (LIBKCALL *selector)(struct glibc_dirent32 const *entry),
+                                     int (LIBKCALL *cmp)(struct glibc_dirent32 const **a, struct glibc_dirent32 const **b)) {
+	DIR stream;
 	ssize_t result;
-	if unlikely(lseek(fd, *basep, SEEK_SET) < 0)
-		goto err;
-	result = kreaddir(fd, (struct dirent *)buf, nbytes, READDIR_MULTIPLE);
-	if (result > 0)
-		*basep += result;
+	struct glibc_dirent32 **ents_list;
+	size_t ents_used, ents_size;
+	errno_t saved_errno;
+	result    = -1;
+	*namelist = NULL;
+	/* Open the named directory. */
+	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY);
+	if unlikely(stream.ds_fd < 0)
+		goto done_nostream;
+	/* Initialize the directory stream. */
+	dirstream_init_nofd(&stream);
+	/* Enumerate the directory's contents. */
+	ents_list = NULL; /* Vector of selected directories */
+	ents_used = 0;    /* # of used entries in `ent_list' */
+	ents_size = 0;    /* # of allocated entries in `ent_list' */
+	saved_errno = libc_geterrno();
+	libc_seterrno(EOK);
+	for (;;) {
+		struct dirent *kos_ent;
+		struct glibc_dirent32 *ent;
+		struct glibc_dirent32 *ent_copy;
+		kos_ent = libc_readdirk(&stream);
+		if (!kos_ent) {
+			/* Check if this is an error, or if it's EOF */
+			if (libc_geterrno() != EOK)
+				goto err; /* It's an error! */
+			/* Its EOF */
+			break;
+		}
+		ent = dirent2glibc32(kos_ent);
+
+		/* Check with the filter-function if we should use this entry. */
+		if (selector) {
+			if ((*selector)(ent) == 0)
+				continue; /* Don't include this one. */
+		}
+		/* Make sure `ent_list' has sufficient space for another entry. */
+		if (ents_used >= ents_size) {
+			struct glibc_dirent32 **new_ents_list;
+			size_t new_alloc;
+			if (OVERFLOW_UMUL(ents_size, 2, &new_alloc))
+				new_alloc = (size_t)-1;
+			if (!new_alloc)
+				new_alloc = 16;
+			new_ents_list = (struct glibc_dirent32 **)realloc(ents_list,
+			                                                  new_alloc,
+			                                                  sizeof(struct glibc_dirent32 *));
+			if unlikely(!new_ents_list) {
+				new_alloc = ents_used + 1;
+				new_ents_list = (struct glibc_dirent32 **)realloc(ents_list,
+				                                                  new_alloc,
+				                                                  sizeof(struct glibc_dirent32 *));
+				if unlikely(!new_ents_list)
+					goto err;
+			}
+			ents_list = new_ents_list;
+			ents_size = new_alloc;
+		}
+		/* Append a copy of `ent' to `ent_list' */
+		ent_copy = (struct glibc_dirent32 *)malloc(ent->d_reclen);
+		if unlikely(!ent_copy)
+			goto err;
+		ent_copy = (struct glibc_dirent32 *)memcpy(ent_copy, ent, ent->d_reclen);
+		/* Actually append the entry copy. */
+		ents_list[ents_used++] = ent_copy;
+	}
+	libc_seterrno(saved_errno);
+	result = (ssize_t)ents_used;
+	if (!ents_list) {
+		/* Don't return a NULL-pointer on success! */
+		assert(ents_used == 0);
+#ifdef __MALLOC_ZERO_IS_NONNULL
+		ents_list = (struct glibc_dirent32 **)malloc(0);
+#else /* __MALLOC_ZERO_IS_NONNULL */
+		ents_list = (struct glibc_dirent32 **)malloc(1);
+#endif /* !__MALLOC_ZERO_IS_NONNULL */
+		if unlikely(!ents_list)
+			result = -1;
+	} else if (ents_size > ents_used) {
+		/* Try to reclaim unused memory. */
+		struct glibc_dirent32 **new_ents_list;
+		new_ents_list = (struct glibc_dirent32 **)realloc(ents_list,
+		                                                  ents_used,
+		                                                  sizeof(struct glibc_dirent32 *));
+		if likely(new_ents_list)
+			ents_list = new_ents_list;
+	}
+	/* Finally, we must qsort() the list as a whole. */
+	if (cmp) {
+		qsort(ents_list, ents_used,
+		      sizeof(struct glibc_dirent32 *),
+		      (comparison_fn_t)cmp);
+	}
+done:
+	*namelist = ents_list; /* Inherit */
+	dirstream_fini(&stream);
+done_nostream:
 	return result;
 err:
-	return -1;
+	/* Free already-allocated dirent copies, as well as the dirent list. */
+	while (ents_used) {
+		--ents_used;
+		free(ents_list[ents_used]);
+	}
+	free(ents_list);
+	ents_list = NULL; /* Write-back a NULL-pointer on error */
+	goto done;
 }
-/*[[[end:libc_getdirentries]]]*/
 
-/*[[[impl:libc_getdirentries64]]]*/
-DEFINE_INTERN_ALIAS(libc_getdirentries64, libc_getdirentries);
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir,
+                                   struct glibc_dirent32 ***__restrict namelist,
+                                   int (LIBKCALL *selector)(struct glibc_dirent32 const *entry),
+                                   int (LIBKCALL *cmp)(struct glibc_dirent32 const **a, struct glibc_dirent32 const **b)) {
+	return libc_scandirat(AT_FDCWD, dir, namelist, selector, cmp);
+}
+#else /* SIZEOF_LINUX_DIRENT32_MATCHES_KOS_DIRENT */
+static_assert(sizeof(struct glibc_dirent32) == sizeof(struct glibc_dirent64));
+DEFINE_INTERN_ALIAS(libc_readdir, libc_readdir64);
+DEFINE_INTERN_ALIAS(libc_readdir_r, libc_readdir64_r);
+DEFINE_INTERN_ALIAS(libc_scandirat, libc_scandirat64);
+DEFINE_INTERN_ALIAS(libc_scandir, libc_scandir64);
+#endif /* SIZEOF_LINUX_DIRENT32_MATCHES_KOS_DIRENT */
 
-/*[[[impl:libc_kreaddirf64]]]*/
-/*[[[impl:libc_kreaddir64]]]*/
-DEFINE_INTERN_WEAK_ALIAS(libc_kreaddirf64, libc_kreaddirf);
-DEFINE_INTERN_WEAK_ALIAS(libc_kreaddir64, libc_kreaddir);
+PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1))
+ATTR_RETNONNULL WUNUSED struct glibc_dirent64 *__FCALL
+dirent2glibc64(struct dirent *__restrict self) {
+	static_assert(offsetof(struct glibc_dirent64, d_ino) == offsetof(struct dirent, d_ino));
+	static_assert(offsetof(struct glibc_dirent64, d_reclen) == 8 + offsetof(struct dirent, d_namlen));
+	static_assert(offsetof(struct glibc_dirent64, d_type) == 8 + offsetof(struct dirent, d_type));
+	static_assert(offsetof(struct glibc_dirent64, d_name) == 8 + offsetof(struct dirent, d_name));
+	struct glibc_dirent64 *result;
+	assertf(dirbuf_compat_offset >= 8, "We need at least 8 bytes of compat space!");
+	result = (struct glibc_dirent64 *)((byte_t *)self - 8);
+	result->d_ino = self->d_ino64;
+	result->d_off = 0; /* We don't have this one... */
+	result->d_reclen += offsetof(struct glibc_dirent64, d_name) + 1;
+	return result;
+}
 
-/*[[[head:libc_kreaddirf,hash:CRC-32=0x32514912]]]*/
-/* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
- * The KOS-specific system call for reading a single directory entry
- * from  a file  descriptor referring  to an  open directory stream.
- * @param: mode: One of `READDIR_*' (See below)
- * @return: * : The actually required buffer size for the directory entry (in bytes)
- *              NOTE: When  `READDIR_DEFAULT' was passed for `mode', the directory
- *                    stream will only be advanced when this value is >= 'bufsize'
- * @return: 0 : The end of the directory has been reached.
- * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ssize_t
-NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd,
-                                     struct dirent *buf,
-                                     size_t bufsize,
-                                     unsigned int mode,
-                                     oflag_t flags)
-/*[[[body:libc_kreaddirf]]]*/
-{
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1)) struct glibc_dirent64 *
+NOTHROW_RPC(LIBCCALL libc_readdir64)(DIR *__restrict dirp) {
+	struct dirent *result;
+	result = libc_readdirk(dirp);
+	if unlikely(!result)
+		return NULL;
+	return dirent2glibc64(result);
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1, 2, 3)) int
+NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp,
+                                       struct glibc_dirent64 *__restrict entry,
+                                       struct glibc_dirent64 **__restrict result) {
+	errno_t old_error;
+	struct dirent *kos_ent;
+	struct glibc_dirent64 *ent;
+	old_error = libc_geterrno();
+	libc_seterrno(EOK);
+	kos_ent = readdir(dirp);
+	if (!kos_ent) {
+		errno_t error;
+		error = libc_geterrno();
+		libc_seterrno(old_error); /* Restore the old error. */
+		*result = NULL;
+		return error;
+	}
+	libc_seterrno(old_error); /* Restore the old error. */
+	if unlikely(kos_ent->d_namlen >= NAME_MAX) {
+		*result = NULL;
+		return ENAMETOOLONG;
+	}
+	ent = dirent2glibc64(kos_ent);
+	memcpy(entry, ent, ent->d_reclen);
+	*result = entry;
+	return 0;
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_scandirat64)(fd_t dirfd,
+                                       char const *__restrict dir,
+                                       struct glibc_dirent64 ***__restrict namelist,
+                                       int (LIBKCALL *selector)(struct glibc_dirent64 const *entry),
+                                       int (LIBKCALL *cmp)(struct glibc_dirent64 const **a, struct glibc_dirent64 const **b)) {
+	DIR stream;
 	ssize_t result;
-	result = sys_kreaddirf(fd, buf, bufsize, mode, flags);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_kreaddirf]]]*/
+	struct glibc_dirent64 **ents_list;
+	size_t ents_used, ents_size;
+	errno_t saved_errno;
+	result    = -1;
+	*namelist = NULL;
+	/* Open the named directory. */
+	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY);
+	if unlikely(stream.ds_fd < 0)
+		goto done_nostream;
+	/* Initialize the directory stream. */
+	dirstream_init_nofd(&stream);
+	/* Enumerate the directory's contents. */
+	ents_list = NULL; /* Vector of selected directories */
+	ents_used = 0;    /* # of used entries in `ent_list' */
+	ents_size = 0;    /* # of allocated entries in `ent_list' */
+	saved_errno = libc_geterrno();
+	libc_seterrno(EOK);
+	for (;;) {
+		struct dirent *kos_ent;
+		struct glibc_dirent64 *ent;
+		struct glibc_dirent64 *ent_copy;
+		kos_ent = libc_readdirk(&stream);
+		if (!kos_ent) {
+			/* Check if this is an error, or if it's EOF */
+			if (libc_geterrno() != EOK)
+				goto err; /* It's an error! */
+			/* Its EOF */
+			break;
+		}
+		ent = dirent2glibc64(kos_ent);
 
-/*[[[head:libc_kreaddir,hash:CRC-32=0xfc1b6ac9]]]*/
-/* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
- * The KOS-specific system call for reading a single directory entry
- * from  a file  descriptor referring  to an  open directory stream.
- * @param: mode: One of `READDIR_*' (See below)
- * @return: * : The actually required buffer size for the directory entry (in bytes)
- *              NOTE: When  `READDIR_DEFAULT' was passed for `mode', the directory
- *                    stream will only be advanced when this value is >= 'bufsize'
- * @return: 0 : The end of the directory has been reached.
- * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ssize_t
-NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
-                                    struct dirent *buf,
-                                    size_t bufsize,
-                                    unsigned int mode)
-/*[[[body:libc_kreaddir]]]*/
-{
-	ssize_t result;
-	result = sys_kreaddir(fd, buf, bufsize, mode);
-	return libc_seterrno_syserr(result);
+		/* Check with the filter-function if we should use this entry. */
+		if (selector) {
+			if ((*selector)(ent) == 0)
+				continue; /* Don't include this one. */
+		}
+		/* Make sure `ent_list' has sufficient space for another entry. */
+		if (ents_used >= ents_size) {
+			struct glibc_dirent64 **new_ents_list;
+			size_t new_alloc;
+			if (OVERFLOW_UMUL(ents_size, 2, &new_alloc))
+				new_alloc = (size_t)-1;
+			if (!new_alloc)
+				new_alloc = 16;
+			new_ents_list = (struct glibc_dirent64 **)realloc(ents_list,
+			                                                  new_alloc,
+			                                                  sizeof(struct glibc_dirent64 *));
+			if unlikely(!new_ents_list) {
+				new_alloc = ents_used + 1;
+				new_ents_list = (struct glibc_dirent64 **)realloc(ents_list,
+				                                                  new_alloc,
+				                                                  sizeof(struct glibc_dirent64 *));
+				if unlikely(!new_ents_list)
+					goto err;
+			}
+			ents_list = new_ents_list;
+			ents_size = new_alloc;
+		}
+		/* Append a copy of `ent' to `ent_list' */
+		ent_copy = (struct glibc_dirent64 *)malloc(ent->d_reclen);
+		if unlikely(!ent_copy)
+			goto err;
+		ent_copy = (struct glibc_dirent64 *)memcpy(ent_copy, ent, ent->d_reclen);
+		/* Actually append the entry copy. */
+		ents_list[ents_used++] = ent_copy;
+	}
+	libc_seterrno(saved_errno);
+	result = (ssize_t)ents_used;
+	if (!ents_list) {
+		/* Don't return a NULL-pointer on success! */
+		assert(ents_used == 0);
+#ifdef __MALLOC_ZERO_IS_NONNULL
+		ents_list = (struct glibc_dirent64 **)malloc(0);
+#else /* __MALLOC_ZERO_IS_NONNULL */
+		ents_list = (struct glibc_dirent64 **)malloc(1);
+#endif /* !__MALLOC_ZERO_IS_NONNULL */
+		if unlikely(!ents_list)
+			result = -1;
+	} else if (ents_size > ents_used) {
+		/* Try to reclaim unused memory. */
+		struct glibc_dirent64 **new_ents_list;
+		new_ents_list = (struct glibc_dirent64 **)realloc(ents_list,
+		                                                  ents_used,
+		                                                  sizeof(struct glibc_dirent64 *));
+		if likely(new_ents_list)
+			ents_list = new_ents_list;
+	}
+	/* Finally, we must qsort() the list as a whole. */
+	if (cmp) {
+		qsort(ents_list, ents_used,
+		      sizeof(struct glibc_dirent64 *),
+		      (comparison_fn_t)cmp);
+	}
+done:
+	*namelist = ents_list; /* Inherit */
+	dirstream_fini(&stream);
+done_nostream:
+	return result;
+err:
+	/* Free already-allocated dirent copies, as well as the dirent list. */
+	while (ents_used) {
+		--ents_used;
+		free(ents_list[ents_used]);
+	}
+	free(ents_list);
+	ents_list = NULL; /* Write-back a NULL-pointer on error */
+	goto done;
 }
-/*[[[end:libc_kreaddir]]]*/
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_scandir64)(char const *__restrict dir,
+                                     struct glibc_dirent64 ***__restrict namelist,
+                                     int (LIBKCALL *selector)(struct glibc_dirent64 const *entry),
+                                     int (LIBKCALL *cmp)(struct glibc_dirent64 const **a, struct glibc_dirent64 const **b)) {
+	return libc_scandirat64(AT_FDCWD, dir, namelist, selector, cmp);
+}
+
+
+
+/* Export compatibility mode symbols. */
+#ifdef SIZEOF_LINUX_DIRENT32_MATCHES_KOS_DIRENT
+DEFINE_PUBLIC_ALIAS(__libc_readdir, libc_readdir);
+DEFINE_PUBLIC_ALIAS(__libc_readdir_r, libc_readdir_r);
+DEFINE_PUBLIC_ALIAS(readdir, libc_readdir);
+DEFINE_PUBLIC_ALIAS(readdir_r, libc_readdir_r);
+DEFINE_PUBLIC_ALIAS(scandir, libc_scandir);
+DEFINE_PUBLIC_ALIAS(scandirat, libc_scandirat);
+#else /* SIZEOF_LINUX_DIRENT32_MATCHES_KOS_DIRENT */
+DEFINE_PUBLIC_IFUNC(__libc_readdir, libc_get_readdir64);
+DEFINE_PUBLIC_IFUNC(__libc_readdir_r, libc_get_readdir64_r);
+DEFINE_PUBLIC_IFUNC(readdir, libc_get_readdir64);
+DEFINE_PUBLIC_IFUNC(readdir_r, libc_get_readdir64_r);
+DEFINE_PUBLIC_IFUNC(scandir, libc_get_scandir64);
+DEFINE_PUBLIC_IFUNC(scandirat, libc_get_scandirat64);
+#endif /* !SIZEOF_LINUX_DIRENT32_MATCHES_KOS_DIRENT */
+
+PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent") void
+NOTHROW(LIBCCALL enable_glibc_dirent64_compat)(void) {
+	static_assert((offsetof(struct glibc_dirent64, d_name) - offsetof(struct dirent, d_name)) == 8);
+	dirbuf_compat_offset = offsetof(struct glibc_dirent64, d_name) -
+	                       offsetof(struct dirent, d_name);
+}
+
+/* Use indirect functions to auto-enable compat support
+ * in the event that relevant symbols are imported. */
+DEFINE_PUBLIC_IFUNC(readdir64, libc_get_readdir64);
+DEFINE_PUBLIC_IFUNC(readdir64_r, libc_get_readdir64_r);
+DEFINE_PUBLIC_IFUNC(scandir64, libc_get_scandir64);
+DEFINE_PUBLIC_IFUNC(scandirat64, libc_get_scandirat64);
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") void *
+NOTHROW(LIBCCALL libc_get_readdir64)(void) {
+	enable_glibc_dirent64_compat();
+	return (void *)&libc_readdir64;
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") void *
+NOTHROW(LIBCCALL libc_get_readdir64_r)(void) {
+	enable_glibc_dirent64_compat();
+	return (void *)&libc_readdir64_r;
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") void *
+NOTHROW(LIBCCALL libc_get_scandir64)(void) {
+	enable_glibc_dirent64_compat();
+	return (void *)&libc_scandir64;
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") void *
+NOTHROW(LIBCCALL libc_get_scandirat64)(void) {
+	enable_glibc_dirent64_compat();
+	return (void *)&libc_scandirat64;
+}
 
 
 
