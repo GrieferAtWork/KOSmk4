@@ -253,8 +253,12 @@ handle_pending:
 
 	/* Unmasked process RPCs also require that we unwind the system call. */
 	if (!must_unwind) {
-		if (are_any_unmasked_process_rpcs_pending())
+		if (are_any_unmasked_process_rpcs_pending()) {
+			/* Enabling interrupts before throwing an exception is part of the ABI! */
+			PREEMPTION_ENABLE();
+			icpustate_setpreemption(ctx.rc_state, 1);
 			must_unwind = true;
+		}
 	}
 	if (must_unwind)
 		THROW(E_INTERRUPT_USER_RPC);
