@@ -292,9 +292,6 @@ enum_locals_at_with_debug_sections(void const *absolute_pc,
 		result = enum_locals_at_with_debug_sections_impl(absolute_pc,
 		                                                 callback,
 		                                                 arg);
-	} else if (kernel_poisoned()) {
-		/* Don't switch to arbitrary VMs after having been poisoned. */
-		result = 0;
 	} else {
 		/* Switch to the foreign VM, so we can directly access user-space memory. */
 		REF struct mman *oldmm = task_xchmman(required_mm);
