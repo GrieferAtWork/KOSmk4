@@ -95,6 +95,7 @@ procfs_perproc_lookup_impl(struct fdirent *const *__restrict files, size_t count
 	return NULL;
 }
 
+#define procfs_perproc_enumsz_impl sizeof(struct constdirenum)
 PRIVATE NONNULL((3)) void KCALL
 procfs_perproc_enum_impl(struct fdirent *const *files, size_t count,
                          struct fdirenum *__restrict result) {
@@ -472,6 +473,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 			.no_perm   = &procfs_perproc_dir_v_perm_ops,                               \
 		},                                                                             \
 		.dno_lookup = &__##ops_symbol_name##_v_lookup,                                 \
+		.dno_enumsz = procfs_perproc_enumsz_impl,                                      \
 		.dno_enum   = &__##ops_symbol_name##_v_enum,                                   \
 	};
 #define MKREG_RO(ops_symbol_name, printer)                               \
@@ -568,6 +570,7 @@ procfs_perproc_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 	                                  info);
 }
 
+#define procfs_perproc_root_v_enumsz procfs_perproc_enumsz_impl
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_root_v_enum(struct fdirenum *__restrict result) {
 	procfs_perproc_enum_impl(procfs_perproc_root_files,
@@ -615,6 +618,7 @@ INTERN_CONST struct fdirnode_ops const procfs_perproc_root_ops = {
 		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_root_v_lookup,
+	.dno_enumsz = procfs_perproc_root_v_enumsz,
 	.dno_enum   = &procfs_perproc_root_v_enum,
 };
 

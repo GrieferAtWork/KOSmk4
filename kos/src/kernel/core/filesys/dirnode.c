@@ -343,28 +343,25 @@ fdirnode_lookup_path(struct fdirnode *__restrict self,
 }
 
 
-
-/* Construct a directory  enumerator object in  `*result'.
- * This function must initialize _all_ fields of `*result'
- * It  is undefined if files created or  deleted after the creation of an
- * enumerator, will still be enumerated by said enumerator. It is however
- * guarantied that all files created  before, and not deleted after  will
- * always be enumerated */
-PUBLIC BLOCKING NONNULL((1, 2)) void FCALL
-fdirnode_enum(struct fdirnode *__restrict self,
-              struct fdirenum *__restrict result)
+/* Allocate  (on the stack)  and return a new  directory enumerator for `self'
+ * The returned object must be finalized as `fdirenum_fini(return)' once done. */
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fdirenum *
+_fdirnode_initenum(struct fdirenum *__restrict self, struct fdirnode *__restrict dir)
 		THROWS(E_IOERROR, ...) {
-	DBG_memset(result, 0xcc, sizeof(*result));
-	result->de_dir = mfile_asdir(incref(self));
+	DBG_memset(self, 0xcc, sizeof(*self));
+	self->de_dir = mfile_asdir(incref(dir));
 	TRY {
 		struct fdirnode_ops const *ops;
-		ops = fdirnode_getops(self);
-		(*ops->dno_enum)(result);
+		ops = fdirnode_getops(dir);
+		/* Construct a directory enumerator. */
+		(*ops->dno_enum)(self);
 	} EXCEPT {
-		decref_unlikely(result->de_dir);
+		decref_unlikely(self->de_dir);
 		RETHROW();
 	}
+	return self;
 }
+
 
 
 /* Create new files within a given directory.

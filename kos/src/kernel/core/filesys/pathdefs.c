@@ -60,6 +60,7 @@ PRIVATE struct fsuper_ops const fsuper_unmounted_ops = {
 			.no_wrattr = &ramfs_super_v_wrattr,
 		},
 		.dno_lookup = &ramfs_super_v_lookup,
+		.dno_enumsz = ramfs_super_v_enumsz,
 		.dno_enum   = &ramfs_super_v_enum,
 		.dno_mkfile = &ramfs_super_v_mkfile,
 		.dno_unlink = &ramfs_super_v_unlink,

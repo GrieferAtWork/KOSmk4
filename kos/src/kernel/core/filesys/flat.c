@@ -1620,37 +1620,8 @@ err_exists_fill_in_repnode:
 
 
 
-struct flatdirenum {
-	FDIRENUM_HEADER
-	REF struct flatdirent *ffde_next; /* [0..1][lock(SMP(ffde_lock))] Next entry to read.
-	                                   * When NULL, load the next entry with a position `>= ffde_pos' */
-	pos_t                  ffde_pos;  /* [valid_if(!ffde_next)][lock(SMP(ffde_lock))] Next position. */
-#ifndef CONFIG_NO_SMP
-	struct atomic_lock     ffde_lock; /* Lock for the above. */
-#endif /* !CONFIG_NO_SMP */
-};
-#define fdirenum_asflat(self) ((struct flatdirenum *)(self))
 
-#ifdef CONFIG_NO_SMP
-#define flatdirenum_lock_acquire_nopr(self) (void)0
-#define flatdirenum_lock_release_nopr(self) (void)0
-#else /* CONFIG_NO_SMP */
-#define flatdirenum_lock_acquire_nopr(self) atomic_lock_acquire_nopr(&(self)->ffde_lock)
-#define flatdirenum_lock_release_nopr(self) atomic_lock_release(&(self)->ffde_lock)
-#endif /* !CONFIG_NO_SMP */
-#define flatdirenum_lock_acquire(self)      \
-	do {                                     \
-		pflag_t _was = PREEMPTION_PUSHOFF(); \
-		flatdirenum_lock_acquire_nopr(self)
-#define flatdirenum_lock_release_br(self)     \
-		(flatdirenum_lock_release_nopr(self), \
-		 PREEMPTION_POP(_was))
-#define flatdirenum_lock_release(self)     \
-		flatdirenum_lock_release_br(self); \
-	}	__WHILE0
-
-
-PRIVATE NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL flatdirenum_v_fini)(struct fdirenum *__restrict self) {
 	struct flatdirenum *me = fdirenum_asflat(self);
 	xdecref(me->ffde_next);
@@ -1658,7 +1629,7 @@ NOTHROW(KCALL flatdirenum_v_fini)(struct fdirenum *__restrict self) {
 
 /* Return a reference to the first directory entry at a position `>= pos'
  * If no such entry exists, return `NULL' instead. */
-PRIVATE BLOCKING WUNUSED NONNULL((1)) REF struct flatdirent *KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct flatdirent *KCALL
 flatdirnode_entafter(struct flatdirnode *__restrict self, pos_t pos)
 		THROWS(E_IOERROR, ...) {
 	REF struct flatdirent *result;
@@ -1702,7 +1673,7 @@ again_locked:
 	goto again_locked;
 }
 
-PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 flatdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                       size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_BADALLOC, E_WOULDBLOCK, E_IOERROR, ...) {
@@ -1771,7 +1742,7 @@ next_next_ent:
 	return (size_t)result;
 }
 
-PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
+PUBLIC BLOCKING NONNULL((1)) pos_t KCALL
 flatdirenum_v_seekdir(struct fdirenum *__restrict self,
                       off_t offset, unsigned int whence)
 		THROWS(E_BADALLOC, E_IOERROR, ...) {
@@ -1845,7 +1816,7 @@ again_switch:
 
 
 /* Flat directory enumeration operators. */
-PRIVATE struct fdirenum_ops const flatdirenum_ops = {
+PUBLIC_CONST struct fdirenum_ops const flatdirenum_ops = {
 	.deo_fini    = &flatdirenum_v_fini,
 	.deo_readdir = &flatdirenum_v_readdir,
 	.deo_seekdir = &flatdirenum_v_seekdir,

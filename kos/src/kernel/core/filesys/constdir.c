@@ -227,6 +227,7 @@ PUBLIC_CONST struct fdirnode_ops const constdir_ops = {
 		.no_wrattr = &constdir_v_wrattr,
 	},
 	.dno_lookup = &constdir_v_lookup,
+	.dno_enumsz = constdir_v_enumsz,
 	.dno_enum   = &constdir_v_enum,
 };
 

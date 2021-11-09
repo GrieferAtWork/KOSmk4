@@ -228,6 +228,7 @@ PRIVATE struct flatdirnode_ops const iso9660_dir_ops = {
 			.no_wrattr = &fnode_v_wrattr_noop,
 		},
 		.dno_lookup = &flatdirnode_v_lookup,
+		.dno_enumsz = flatdirnode_v_enumsz,
 		.dno_enum   = &flatdirnode_v_enum,
 	},
 	.fdno_flat = {
@@ -300,6 +301,7 @@ PRIVATE struct flatsuper_ops const iso9660_super_ops = {
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
 			.dno_lookup = &flatdirnode_v_lookup,
+			.dno_enumsz = flatdirnode_v_enumsz,
 			.dno_enum   = &flatdirnode_v_enum,
 		},
 	},

@@ -28,6 +28,8 @@
 #include <kernel/fs/node.h>
 #include <kernel/types.h>
 
+#include <hybrid/__alloca.h>
+
 #include <asm/os/fcntl.h> /* __AT_DOSPATH */
 #include <asm/os/stdio.h> /* __RENAME_NOREPLACE, __RENAME_EXCHANGE */
 #include <bits/os/timespec.h>
@@ -104,14 +106,9 @@ struct fdirenum_ops {
 DATDEF struct fdirenum_ops const fdirenum_empty_ops;
 
 
-#define FDIRENUM_HEADER                                               \
-	struct fdirenum_ops const *de_ops; /* [1..1][const] Operators. */ \
-	REF struct fdirnode       *de_dir; /* [1..1][const] Directory being enumerated. */
-
-
 struct fdirenum {
-	FDIRENUM_HEADER
-	void *de_data[14]; /* Filesystem-specific data. */
+	struct fdirenum_ops const *de_ops; /* [1..1][const] Operators. */
+	REF struct fdirnode       *de_dir; /* [1..1][const] Directory being enumerated. */
 };
 
 /* Helper macros for operating with `struct fdirenum' */
@@ -290,6 +287,9 @@ struct fdirnode_ops {
 	(KCALL *dno_lookup)(struct fdirnode *__restrict self,
 	                    struct flookup_info *__restrict info)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
+
+	/* [== sizeof(struct MY_SUBCLASS_FOR_fdirenum)] */
+	size_t dno_enumsz;
 
 	/* [1..1] Construct a directory enumerator object in `*result'.
 	 * This  function  must  initialize _all_  fields  of `*result'
@@ -568,16 +568,19 @@ fdirnode_lookup_path(struct fdirnode *__restrict self,
 		THROWS(E_SEGFAULT, E_BADALLOC, E_IOERROR, ...);
 
 
-/* Construct a directory  enumerator object in  `*result'.
- * This function must initialize _all_ fields of `*result'
- * It  is undefined if files created or  deleted after the creation of an
- * enumerator, will still be enumerated by said enumerator. It is however
- * guarantied that all files created  before, and not deleted after  will
- * always be enumerated */
-FUNDEF BLOCKING NONNULL((1, 2)) void FCALL
-fdirnode_enum(struct fdirnode *__restrict self,
-              struct fdirenum *__restrict result)
-		THROWS(E_IOERROR, ...);
+/* Allocate  (on the stack)  and return a new  directory enumerator for `self'
+ * The returned object must be finalized as `fdirenum_fini(return)' once done. */
+#ifdef __INTELLISENSE__
+BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fdirenum *
+fdirnode_newenum(struct fdirnode *__restrict self)
+		THROWS(E_IOERROR, ...);;
+#else /* __INTELLISENSE__ */
+#define fdirnode_newenum(self) \
+	_fdirnode_initenum((struct fdirenum *)__hybrid_alloca(fdirnode_getops(dir)->dno_enumsz), dir)
+#endif /* !__INTELLISENSE__ */
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fdirenum *
+_fdirnode_initenum(struct fdirenum *__restrict self, struct fdirnode *__restrict dir)
+		THROWS(E_IOERROR, ...);;
 
 
 /* Create new files within a given directory.

@@ -373,12 +373,18 @@ notapid:
 
 
 
-struct procfs_root_direnum {
-	FDIRENUM_HEADER
-	uintptr_t prd_index; /* [lock(ATOMIC)] Enumeration index.
-	                      * For entries `< PROCFS_ROOT_COUNT', index into `procfs_root_files'.
-	                      * Otherwise, `- PROCFS_ROOT_COUNT' is a lower bound for the UPID  of
-	                      * the next thread that should be enumerated. */
+struct procfs_root_direnum
+#ifdef __cplusplus
+    : fdirenum                 /* Underlying enumerator */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct fdirenum prd_enum;  /* Underlying enumerator */
+#endif /* !__cplusplus */
+	uintptr_t       prd_index; /* [lock(ATOMIC)] Enumeration index.
+	                            * For entries `< PROCFS_ROOT_COUNT', index into `procfs_root_files'.
+	                            * Otherwise, `- PROCFS_ROOT_COUNT' is a lower bound for the UPID  of
+	                            * the next thread that should be enumerated. */
 	/* TODO: On linux, processes are enumerated by PID (TGID),
 	 *       such that each read returns the process with  the
 	 *       lowest getpid() that is still > than any  process
@@ -577,6 +583,7 @@ PRIVATE struct fdirenum_ops const procfs_root_direnum_ops = {
 	.deo_seekdir = &procfs_root_direnum_ops_v_seekdir,
 };
 
+#define procfs_root_v_enumsz sizeof(struct procfs_root_direnum)
 PRIVATE NONNULL((1)) void KCALL
 procfs_root_v_enum(struct fdirenum *__restrict result) {
 	struct procfs_root_direnum *rt;
@@ -599,6 +606,7 @@ INTERN_CONST struct fsuper_ops const procfs_super_ops = {
 			.no_wrattr = &fnode_v_wrattr_noop,
 		},
 		.dno_lookup = &procfs_root_v_lookup,
+		.dno_enumsz = procfs_root_v_enumsz,
 		.dno_enum   = &procfs_root_v_enum,
 	},
 };

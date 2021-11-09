@@ -894,9 +894,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       is passed to `sys_userviofd(2)' (with the new FS, that size
 	 *       becomes relevant and must be stored in `mf_filesize') */
 
-	/* TODO: `struct fdirenum' should be variable-sized,  with
-	 *       the real size stored as a vtable `size_t'-member. */
-
 	/* TODO: Lots of places throughout the kernel still talk about  "datablock"s;
 	 *       they're called "mfile"s. The same also goes for "datapart" ("mpart") */
 

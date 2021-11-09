@@ -92,8 +92,14 @@ NOTHROW(KCALL constdirent_v_opennode)(struct fdirent *__restrict self, /* return
 
 
 /* Enumeration of `struct constdir' */
-struct constdirenum {
-	FDIRENUM_HEADER   /* Header */
+struct constdirenum
+#ifdef __cplusplus
+    : fdirenum                        /* Underlying enumerator */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct fdirenum        cde_enum;  /* Underlying enumerator */
+#endif /* !__cplusplus */
 	size_t                 cde_index; /* [lock(ATOMIC)] Index into `cde_entv'; `>= cde_entc' is used to indicate EOF. */
 	size_t                 cde_entc;  /* [const] # of directory entries to enumerate */
 	struct fdirent *const *cde_entv;  /* [1..1][const][0..cde_entc][const] Directory entries. */
@@ -204,6 +210,7 @@ constdir_v_lookup(struct fdirnode *__restrict self,
 		THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void
 NOTHROW(KCALL constdir_v_enum)(struct fdirenum *__restrict result);
+#define constdir_v_enumsz     sizeof(struct constdirenum)
 #define constdir_v_destroy    fdirnode_v_destroy
 #define constdir_v_changed    fdirnode_v_changed
 #define constdir_v_open       fdirnode_v_open

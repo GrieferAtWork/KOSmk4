@@ -43,8 +43,15 @@
 #include <assert.h>
 #include <format-printer.h>
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
+
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Destroy the given dirhandle object. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -76,15 +83,23 @@ dirhandle_new(struct fdirnode *__restrict self,
               struct fdirent *access_dent)
 		THROWS(E_BADALLOC) {
 	REF struct dirhandle *result;
-	result = (REF struct dirhandle *)kmalloc(sizeof(REF struct dirhandle),
+	struct fdirnode_ops const *ops;
+	ops = fdirnode_getops(self);
+	assert(ops->dno_enumsz >= sizeof(struct fdirenum));
+	result = (REF struct dirhandle *)kmalloc(offsetof(struct dirhandle, dh_enum) +
+	                                         ops->dno_enumsz,
 	                                         GFP_NORMAL);
-	/* Construct a directory enumerator. */
+	DBG_memset(&result->dh_enum, 0xcc, sizeof(result->dh_enum));
+	result->dh_enum.de_dir = mfile_asdir(incref(self));
 	TRY {
-		fdirnode_enum(self, &result->dh_enum);
+		/* Construct a directory enumerator. */
+		(*ops->dno_enum)(&result->dh_enum);
 	} EXCEPT {
+		decref_unlikely(result->dh_enum.de_dir);
 		kfree(result);
 		RETHROW();
 	}
+
 	/* Fill in remaining fields. */
 	result->dh_refcnt = 1;
 	result->dh_path   = xincref(access_path);

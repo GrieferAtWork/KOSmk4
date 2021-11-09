@@ -352,6 +352,65 @@ struct flatdirnode_xops {
 };
 
 
+/* Flat directory enumeration */
+struct flatdirenum
+#ifdef __cplusplus
+    : fdirenum                        /* Underlying enumerator */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct fdirenum        ffde_enum; /* Underlying enumerator */
+#endif /* !__cplusplus */
+	REF struct flatdirent *ffde_next; /* [0..1][lock(SMP(ffde_lock))] Next entry to read.
+	                                   * When NULL, load the next entry with a position `>= ffde_pos' */
+	pos_t                  ffde_pos;  /* [valid_if(!ffde_next)][lock(SMP(ffde_lock))] Next position. */
+#ifndef CONFIG_NO_SMP
+	struct atomic_lock     ffde_lock; /* Lock for the above. */
+#endif /* !CONFIG_NO_SMP */
+};
+#define fdirenum_asflat(self) ((struct flatdirenum *)(self))
+
+#ifdef CONFIG_NO_SMP
+#define flatdirenum_lock_acquire_nopr(self) (void)0
+#define flatdirenum_lock_release_nopr(self) (void)0
+#else /* CONFIG_NO_SMP */
+#define flatdirenum_lock_acquire_nopr(self) atomic_lock_acquire_nopr(&(self)->ffde_lock)
+#define flatdirenum_lock_release_nopr(self) atomic_lock_release(&(self)->ffde_lock)
+#endif /* !CONFIG_NO_SMP */
+#define flatdirenum_lock_acquire(self)      \
+	do {                                     \
+		pflag_t _was = PREEMPTION_PUSHOFF(); \
+		flatdirenum_lock_acquire_nopr(self)
+#define flatdirenum_lock_release_br(self)     \
+		(flatdirenum_lock_release_nopr(self), \
+		 PREEMPTION_POP(_was))
+#define flatdirenum_lock_release(self)     \
+		flatdirenum_lock_release_br(self); \
+	}	__WHILE0
+
+/* Directory enumeration operators for `struct flatdirenum' */
+DATDEF struct fdirenum_ops const flatdirenum_ops;
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL flatdirenum_v_fini)(struct fdirenum *__restrict self);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL
+flatdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                      size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_BADALLOC, E_WOULDBLOCK, E_IOERROR, ...);
+FUNDEF BLOCKING NONNULL((1)) pos_t KCALL
+flatdirenum_v_seekdir(struct fdirenum *__restrict self,
+                      off_t offset, unsigned int whence)
+		THROWS(E_BADALLOC, E_IOERROR, ...);
+
+/* Return a reference to the first directory entry at a position `>= pos'
+ * If no such entry exists, return `NULL' instead. */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct flatdirent *KCALL
+flatdirnode_entafter(struct flatdirnode *__restrict self, pos_t pos)
+		THROWS(E_IOERROR, ...);
+
+
+
+
+
 struct flatdirnode_ops {
 	struct fdirnode_ops     fdno_dir;  /* Directory operators */
 	struct flatdirnode_xops fdno_flat; /* Flat directory operators */
@@ -370,7 +429,7 @@ FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 flatdirnode_v_lookup(struct fdirnode *__restrict self,
                      struct flookup_info *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR, ...);
-/* NOTE: `flatdirnode_v_enum()' fixes  the deleted-file  problem by  searching
+/* NOTE: `flatdirnode_v_enum()' solves the  deleted-file problem by  searching
  *       though the directory for the next dirent with a position >= any entry
  *       that got deleted.
  *       Other than that, seekdir() addressing uses `fde_pos', with readdir()
@@ -380,6 +439,7 @@ flatdirnode_v_lookup(struct fdirnode *__restrict self,
 FUNDEF NONNULL((1)) void KCALL
 flatdirnode_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_WOULDBLOCK);
+#define flatdirnode_v_enumsz sizeof(struct flatdirenum)
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 flatdirnode_v_mkfile(struct fdirnode *__restrict self,
                      struct fmkfile_info *__restrict info)

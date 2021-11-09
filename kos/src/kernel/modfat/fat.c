@@ -2042,7 +2042,8 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 			.no_wrattr = &Fat_WrAttr,
 		},
 		.dno_lookup = &flatdirnode_v_lookup,
-		.dno_enum   = &flatdirnode_v_enum, /* TODO: Custom override so we can implement `deo_ioctl' for `VFAT_IOCTL_READDIR_(BOTH|SHORT)' */
+		.dno_enumsz = flatdirnode_v_enumsz, /* TODO: Custom override so we can implement `deo_ioctl' for `VFAT_IOCTL_READDIR_(BOTH|SHORT)' */
+		.dno_enum   = &flatdirnode_v_enum,
 		.dno_mkfile = &flatdirnode_v_mkfile,
 		.dno_unlink = &flatdirnode_v_unlink,
 		.dno_rename = &flatdirnode_v_rename,
@@ -2488,6 +2489,7 @@ PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
 			.dno_lookup = &flatdirnode_v_lookup,
+			.dno_enumsz = flatdirnode_v_enumsz,
 			.dno_enum   = &flatdirnode_v_enum,
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,
@@ -2528,6 +2530,7 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
 			.dno_lookup = &flatdirnode_v_lookup,
+			.dno_enumsz = flatdirnode_v_enumsz,
 			.dno_enum   = &flatdirnode_v_enum,
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,

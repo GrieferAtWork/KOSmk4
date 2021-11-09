@@ -268,8 +268,14 @@ devfs_super_v_lookup(struct fdirnode *__restrict self,
 AXREF(fdirent_axref, fdirent);
 #endif /* !__fdirent_axref_defined */
 
-struct devfs_root_direnum {
-	FDIRENUM_HEADER
+struct devfs_root_direnum
+#ifdef __cplusplus
+    : fdirenum                     /* Underlying enumerator */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct fdirenum      drd_enum; /* Underlying enumerator */
+#endif /* !__cplusplus */
 	struct fdirent_axref drd_next; /* [0..1][lock(ATOMIC)] Next directory entry to enumerate.
 	                                * Either a  `struct ramfs_dirent'  (ramfs_dirent_ops)  or
 	                                * a `struct devdirent' (devdirent_ops).  The 2  directory
@@ -465,6 +471,8 @@ PRIVATE struct fdirenum_ops const devfs_root_direnum_ops = {
 };
 
 
+#define devfs_super_v_enumsz sizeof(struct devfs_root_direnum)
+
 PRIVATE NONNULL((1)) void KCALL
 devfs_super_v_enum(struct fdirenum *__restrict result) {
 	struct devfs_root_direnum *rt;
@@ -500,6 +508,7 @@ PUBLIC_CONST struct fdirnode_ops const devfs_dirnode_ops = {
 		.no_wrattr = &ramfs_dirnode_v_wrattr,
 	},
 	.dno_lookup = &ramfs_dirnode_v_lookup,
+	.dno_enumsz = ramfs_dirnode_v_enumsz,
 	.dno_enum   = &ramfs_dirnode_v_enum,
 	.dno_mkfile = &ramfs_dirnode_v_mkfile,
 	.dno_unlink = &ramfs_dirnode_v_unlink,
@@ -1114,6 +1123,7 @@ INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 			.no_wrattr = &devfs_super_v_wrattr,
 		},
 		.dno_lookup = &devfs_super_v_lookup,
+		.dno_enumsz = devfs_super_v_enumsz,
 		.dno_enum   = &devfs_super_v_enum,
 		.dno_mkfile = &devfs_super_v_mkfile,
 		.dno_unlink = &devfs_super_v_unlink,

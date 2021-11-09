@@ -1940,8 +1940,14 @@ notanfd:
 	return NULL;
 }
 
-struct procfs_fd_enum {
-	FDIRENUM_HEADER
+struct procfs_fd_enum
+#ifdef __cplusplus
+    : fdirenum                           /* Underlying enumerator */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct fdirenum            pfe_enum; /* Underlying enumerator */
+#endif /* !__cplusplus */
 	REF struct handle_manager *pfe_hman; /* [1..1][const] Handle manager being enumerated. */
 	unsigned int               pfe_fd;   /* Lower bound for next handle to enumerate. */
 };
@@ -2083,6 +2089,7 @@ PRIVATE struct fdirenum_ops const procfs_fd_enum_ops = {
 	.deo_seekdir = &procfs_fd_enum_v_seekdir,
 };
 
+#define procfs_perproc_fd_v_enumsz sizeof(struct procfs_fd_enum)
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_fd_v_enum(struct fdirenum *__restrict result) {
 	REF struct task *thread;
@@ -2112,6 +2119,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_fd = {
 		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_fd_v_lookup,
+	.dno_enumsz = procfs_perproc_fd_v_enumsz,
 	.dno_enum   = &procfs_perproc_fd_v_enum,
 };
 
@@ -2357,8 +2365,14 @@ err_mminfo:
 #pragma GCC diagnostic pop
 #endif /* __GNUC__ */
 
-struct perproc_mapfile_direnum {
-	FDIRENUM_HEADER
+struct perproc_mapfile_direnum
+#ifdef __cplusplus
+    : fdirenum                  /* Underlying enumerator */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct fdirenum  ppmd_enum; /* Underlying enumerator */
+#endif /* !__cplusplus */
 	REF struct mman *ppmd_mm;   /* [1..1][const] The mman being enumerated. */
 	UNCHECKED void  *ppmd_addr; /* [lock(ATOMIC)] Lower bound for mappings still needing enumeration. */
 };
@@ -2475,6 +2489,7 @@ PRIVATE struct fdirenum_ops const perproc_mapfile_direnum_ops = {
 };
 
 
+#define procfs_perproc_map_files_v_enumsz sizeof(struct perproc_mapfile_direnum)
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_map_files_v_enum(struct fdirenum *__restrict result) {
 	struct perproc_mapfile_direnum *rt;
@@ -2504,6 +2519,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_map_files = {
 		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_map_files_v_lookup,
+	.dno_enumsz = procfs_perproc_map_files_v_enumsz,
 	.dno_enum   = &procfs_perproc_map_files_v_enum,
 };
 
@@ -2528,6 +2544,7 @@ procfs_perproc_task_v_lookup(struct fdirnode *__restrict self,
 	return NULL;
 }
 
+#define procfs_perproc_task_v_enumsz sizeof(struct fdirenum)
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_task_v_enum(struct fdirenum *__restrict result) {
 	struct taskpid *pid = result->de_dir->fn_fsdata;
@@ -2550,6 +2567,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_task = {
 		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_task_v_lookup,
+	.dno_enumsz = procfs_perproc_task_v_enumsz,
 	.dno_enum   = &procfs_perproc_task_v_enum,
 };
 
@@ -2571,6 +2589,7 @@ procfs_perproc_kos_dcwd_v_lookup(struct fdirnode *__restrict self,
 	return NULL;
 }
 
+#define procfs_perproc_kos_dcwd_v_enumsz sizeof(struct fdirenum)
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_kos_dcwd_v_enum(struct fdirenum *__restrict result) {
 	struct taskpid *pid = result->de_dir->fn_fsdata;
@@ -2593,6 +2612,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_kos_dcwd = {
 		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_kos_dcwd_v_lookup,
+	.dno_enumsz = procfs_perproc_kos_dcwd_v_enumsz,
 	.dno_enum   = &procfs_perproc_kos_dcwd_v_enum,
 };
 
@@ -2614,6 +2634,7 @@ procfs_perproc_kos_drives_v_lookup(struct fdirnode *__restrict self,
 	return NULL;
 }
 
+#define procfs_perproc_kos_drives_v_enumsz sizeof(struct fdirenum)
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_kos_drives_v_enum(struct fdirenum *__restrict result) {
 	struct taskpid *pid = result->de_dir->fn_fsdata;
@@ -2636,6 +2657,7 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_kos_drives = {
 		.no_perm   = &procfs_perproc_dir_v_perm_ops,
 	},
 	.dno_lookup = &procfs_perproc_kos_drives_v_lookup,
+	.dno_enumsz = procfs_perproc_kos_drives_v_enumsz,
 	.dno_enum   = &procfs_perproc_kos_drives_v_enum,
 };
 

@@ -213,8 +213,14 @@ FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL _ramfs_direnttr
 /* Enumeration of ramfs directories. */
 struct ramfs_dirent;
 AXREF(ramfs_dirent_axref, ramfs_dirent);
-struct ramfs_direnum {
-	FDIRENUM_HEADER
+struct ramfs_direnum
+#ifdef __cplusplus
+    : fdirenum                           /* Underlying enumerator */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct fdirenum            rde_enum; /* Underlying enumerator */
+#endif /* !__cplusplus */
 	struct ramfs_dirent_axref  rde_next; /* [0..1][lock(ATOMIC)] Next directory entry to enumerate. */
 	/* NOTE: The deleted-file-problem is solved for ramfs since we can enumerate the contents of
 	 *       a  directory in alphabetical order (thanks to  the R/B-tree). When it's the current
@@ -273,6 +279,7 @@ ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
 		THROWS(E_SEGFAULT, E_WOULDBLOCK, ...);
 FUNDEF NONNULL((1)) void KCALL
 ramfs_dirnode_v_enum(struct fdirenum *__restrict result);
+#define ramfs_dirnode_v_enumsz sizeof(struct ramfs_direnum)
 FUNDEF BLOCKING NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
                        struct fmkfile_info *__restrict info)
@@ -338,6 +345,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self);
 #define ramfs_super_v_wrattr ramfs_dirnode_v_wrattr
 #define ramfs_super_v_lookup ramfs_dirnode_v_lookup
+#define ramfs_super_v_enumsz ramfs_dirnode_v_enumsz
 #define ramfs_super_v_enum   ramfs_dirnode_v_enum
 #define ramfs_super_v_mkfile ramfs_dirnode_v_mkfile
 #define ramfs_super_v_unlink ramfs_dirnode_v_unlink
