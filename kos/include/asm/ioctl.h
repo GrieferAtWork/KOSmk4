@@ -71,14 +71,14 @@
 #define _IOC_WRITE 1 /* Write to property; read from arg */
 #define _IOC_READ  2 /* Read from property; write to arg */
 
-#define _IOC(dir, type, nr, size) \
-	(((dir) << _IOC_DIRSHIFT) |     \
-	 ((size) << _IOC_SIZESHIFT) |   \
-	 ((type) << _IOC_TYPESHIFT) | \
-	 ((nr) << _IOC_NRSHIFT))
+#define _IOC(dir, type, nr, size)                      \
+	__CCAST(unsigned int)(((dir) << _IOC_DIRSHIFT) |   \
+	                      ((size) << _IOC_SIZESHIFT) | \
+	                      ((type) << _IOC_TYPESHIFT) | \
+	                      ((nr) << _IOC_NRSHIFT))
 #ifdef _IOC_KOSSHIFT
 #define _IOC_KOS(dir, type, nr, size) \
-	((1 << _IOC_KOSSHIFT) | _IOC(dir, type, nr, size))
+	__CCAST(unsigned int)((1 << _IOC_KOSSHIFT) | _IOC(dir, type, nr, size))
 #endif /* _IOC_KOSSHIFT */
 
 #if defined(__USE_KOS_ALTERATIONS) && defined(__COMPILER_HAVE_TYPEOF)
@@ -101,8 +101,8 @@
 #define _IOW_KOS(type, nr, T)  _IOC_KOS(_IOC_WRITE, (type), (nr), _IOC_TYPECHECK(T))
 #define _IOWR_KOS(type, nr, T) _IOC_KOS(_IOC_READ | _IOC_WRITE, (type), (nr), _IOC_TYPECHECK(T))
 #endif /* _IOC_KOS */
-#define _IO_WITHSIZE(base, sz) (((base) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT)) | ((sz) << _IOC_SIZESHIFT))
-#define _IO_WITHTYPE(base, T)  (((base) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT)) | (_IOC_TYPECHECK(T) << _IOC_SIZESHIFT))
+#define _IO_WITHSIZE(base, sz) __CCAST(unsigned int)(((base) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT)) | ((sz) << _IOC_SIZESHIFT))
+#define _IO_WITHTYPE(base, T)  __CCAST(unsigned int)(((base) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT)) | (_IOC_TYPECHECK(T) << _IOC_SIZESHIFT))
 
 /* used to decode ioctl numbers.. */
 #define _IOC_NR(nr)    (((nr) >> _IOC_NRSHIFT) & _IOC_NRMASK)

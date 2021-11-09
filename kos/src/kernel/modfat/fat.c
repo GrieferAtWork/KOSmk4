@@ -56,6 +56,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
+#include <compat/config.h>
 #include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
@@ -75,6 +76,19 @@
 #include <string.h>
 #include <time.h>
 #include <unicode.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/linux/msdos_fs.h>
+#ifndef __COMPAT_FAT_DIRENT_MATCHES_FAT_DIRENT
+#define NEED_COMPAT_IOCTL_FAT_READDIR
+#endif /* !__COMPAT_FAT_DIRENT_MATCHES_FAT_DIRENT */
+#endif /* __ARCH_HAVE_COMPAT */
+
+#ifdef NEED_COMPAT_IOCTL_FAT_READDIR
+#include <kernel/compat.h>
+
+#include <compat/kos/types.h>
+#endif /* NEED_COMPAT_IOCTL_FAT_READDIR */
 
 DECL_BEGIN
 
@@ -1999,6 +2013,251 @@ Fat_Ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 
 
+/************************************************************************/
+/* FAT Directory enumeration (same as flatdir, but w/ ioctl)            */
+/************************************************************************/
+#define FATDIRENUM_IOCTL_READDIR_F_BOTH   0x01
+#ifdef NEED_COMPAT_IOCTL_FAT_READDIR
+#define FATDIRENUM_IOCTL_READDIR_F_COMPAT 0x02
+#endif /* NEED_COMPAT_IOCTL_FAT_READDIR */
+PRIVATE NONNULL((1)) void KCALL
+fatdirenum_do_ioctl_readdir(struct fatdirent *__restrict ent,
+                            USER CHECKED struct __fat_dirent *result,
+                            unsigned int flags) {
+	uint8_t usedname_len;
+	char usedname[11 * 2 + 2], *dstptr;
+	char fixedname[11], *srcptr;
+
+	memcpy(fixedname, ent->fad_dos.f_nameext, 11);
+
+	/* Fix lowercase filenames. */
+	if (ent->fad_dos.f_ntflags & NTFLAG_LOWBASE)
+		strlwrz(fixedname, 8);
+	if (ent->fad_dos.f_ntflags & NTFLAG_LOWEXT)
+		strlwrz(fixedname + 8, 3);
+	/* Deal with this one... */
+	if unlikely(ent->fad_dos.f_marker == MARKER_IS0XE5)
+		fixedname[0] = 0xe5;
+
+	/* Construct the proper, human-readable filename. */
+	dstptr = usedname;
+	srcptr = fixedname;
+	while (srcptr < fixedname + 8 && isspace(*srcptr))
+		++srcptr;
+	dstptr = decode_latin1(dstptr, srcptr, (size_t)((fixedname + 8) - srcptr));
+	while (dstptr > usedname && isspace(dstptr[-1]))
+		--dstptr;
+	*dstptr++ = '.';
+	srcptr = fixedname + 8;
+	while (srcptr < fixedname + 11 && isspace(*srcptr))
+		++srcptr;
+	dstptr = decode_latin1(dstptr, srcptr, (size_t)((fixedname + 11) - srcptr));
+	while (dstptr > usedname && isspace(dstptr[-1]))
+		--dstptr;
+	if (dstptr > usedname && dstptr[-1] == '.')
+		--dstptr;
+	*dstptr = 0;
+	usedname_len = (uint8_t)(dstptr - usedname);
+
+	/* Fill in info about the DOS filename. */
+#ifdef NEED_COMPAT_IOCTL_FAT_READDIR
+	if (flags & FATDIRENUM_IOCTL_READDIR_F_COMPAT) {
+		USER CHECKED struct __compat_fat_dirent *compat_result;
+		compat_result = (USER CHECKED struct __compat_fat_dirent *)result;
+		compat_result[0].d_ino    = 0;
+		compat_result[0].d_off    = 0;
+		compat_result[0].d_reclen = usedname_len;
+		memcpy(compat_result[0].d_name, usedname, usedname_len + 1, sizeof(char));
+		if (flags & FATDIRENUM_IOCTL_READDIR_F_BOTH) {
+			uint16_t longlen = ent->fad_ent.fde_ent.fd_namelen;
+			if (longlen > 255)
+				longlen = 255;
+			compat_result[1].d_ino    = (compat_ulongptr_t)(uint64_t)ent->fad_ent.fde_ent.fd_ino;
+			compat_result[1].d_off    = (compat_longptr_t)(compat_ulongptr_t)(uint64_t)ent->fad_ent.fde_pos;
+			compat_result[1].d_reclen = longlen;
+			*(char *)mempcpy(compat_result[1].d_name, ent->fad_ent.fde_ent.fd_name, longlen, sizeof(char)) = '\0';
+		}
+	} else
+#endif /* NEED_COMPAT_IOCTL_FAT_READDIR */
+	{
+		result[0].d_ino    = 0;            /* Linux says this doesn't exist for short entries. */
+		result[0].d_off    = 0;            /* *ditto* */
+		result[0].d_reclen = usedname_len; /* Contrary to the name, this is the length of the filename! */
+		memcpy(result[0].d_name, usedname, usedname_len + 1, sizeof(char));
+	
+		if (flags & FATDIRENUM_IOCTL_READDIR_F_BOTH) {
+			/* Fill in the second entry with the long filename. */
+			uint16_t longlen = ent->fad_ent.fde_ent.fd_namelen;
+			if (longlen > 255) {
+				/* We're dealing with fixed buffers, meaning we're limited to this many characters.
+				 * Linux doesn't say what should happen if the long filename is longer than this,
+				 * and I would like to mention that yes: IT CAN BE LONGER THAN THIS. As a matter of
+				 * fact, the longest theoretical name is 780 characters long:
+				 * >> 780 == LFN_SEQNUM_MAXCOUNT * UNICODE_16TO8_MAXBUF(LFN_NAME)
+				 * >> 780 == 20                  * UNICODE_16TO8_MAXBUF(13)
+				 * >> 780 == 20                  * 3 * 13
+				 * >> 780 == 20                  * 39
+				 * >> 780 == 780
+				 *
+				 * So lets just make it easy and truncate the name when this happens. */
+				longlen = 255;
+			}
+			result[1].d_ino    = (ulongptr_t)(uint64_t)ent->fad_ent.fde_ent.fd_ino;
+			result[1].d_off    = (longptr_t)(ulongptr_t)(uint64_t)ent->fad_ent.fde_pos;
+			result[1].d_reclen = longlen; /* Contrary to the name, this is the length of the filename! */
+			*(char *)mempcpy(result[1].d_name, ent->fad_ent.fde_ent.fd_name, longlen, sizeof(char)) = '\0';
+		}
+	}
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+fatdirenum_ioctl_readdir(struct flatdirenum *__restrict self,
+                         USER CHECKED struct __fat_dirent *result,
+                         unsigned int flags) {
+	pos_t oldpos, real_oldpos;
+	FatDirNode *dir;
+	REF struct flatdirent *ent, *oldent;
+	dir = fdirnode_asfat(self->de_dir);
+again:
+	flatdirenum_lock_acquire(self);
+	ent    = self->ffde_next;
+	oldpos = self->ffde_pos;
+	if (ent) {
+		incref(ent);
+		oldpos = flatdirent_basaddr(ent);
+	}
+	flatdirenum_lock_release(self);
+	if (!ent) {
+		/* load directory entries, or find the one most suitable for `oldpos' */
+next_next_ent:
+		ent = flatdirnode_entafter(dir, oldpos);
+		/* Check for end-of-directory */
+		if (!ent) {
+			/* This is another indicator that the end of the directory has been reached! */
+#ifdef NEED_COMPAT_IOCTL_FAT_READDIR
+			if (flags & FATDIRENUM_IOCTL_READDIR_F_COMPAT) {
+				memset(result, 0, 2 * sizeof(struct __compat_fat_dirent));
+			} else
+#endif /* NEED_COMPAT_IOCTL_FAT_READDIR */
+			{
+				memset(result, 0, 2 * sizeof(struct __fat_dirent));
+			}
+			return 0;
+		}
+	} else if (flatdirent_wasdeleted_atomic(ent)) {
+		decref_unlikely(ent);
+		goto next_next_ent;
+	}
+
+	/* Yield `ent' to user-space. */
+	FINALLY_DECREF_UNLIKELY(ent);
+	fatdirenum_do_ioctl_readdir(flatdirent_asfat(ent), result, flags);
+
+	/* Yield to the next entry. */
+	flatdirnode_read(dir);
+	flatdirenum_lock_acquire(self);
+	real_oldpos = self->ffde_pos;
+	oldent      = self->ffde_next; /* Inherit reference (on success) */
+	if (oldent)
+		real_oldpos = flatdirent_basaddr(oldent);
+
+	/* Check if the enumerator position changed during the read. */
+	if unlikely(oldpos != real_oldpos) {
+		flatdirenum_lock_release_br(self);
+		flatdirnode_endread(dir);
+		goto again;
+	}
+
+	/* Update the enumerator position. */
+	self->ffde_pos = flatdirent_endaddr(ent);
+	if unlikely(flatdirent_wasdeleted(ent)) {
+		self->ffde_next = NULL;
+	} else {
+		self->ffde_next = TAILQ_NEXT(ent, fde_bypos);
+		if (self->ffde_next) {
+			incref(self->ffde_next);
+			DBG_memset(&self->ffde_pos, 0xcc, sizeof(self->ffde_pos));
+		}
+	}
+	flatdirenum_lock_release(self);
+	flatdirnode_endread(dir);
+	xdecref_unlikely(oldent);
+	return 1;
+}
+
+PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
+fatdirenum_v_ioctl(struct fdirenum *__restrict self, syscall_ulong_t cmd,
+                   USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	struct flatdirenum *me = fdirenum_asflat(self);
+
+	/* Custom override so we can implement `deo_ioctl' for `VFAT_IOCTL_READDIR_(BOTH|SHORT)' */
+	switch (cmd) {
+
+	case VFAT_IOCTL_READDIR_BOTH:
+	case VFAT_IOCTL_READDIR_SHORT: {
+		unsigned int flags;
+		USER CHECKED struct __fat_dirent *data;
+		validate_writable(arg, 2 * sizeof(struct __fat_dirent));
+		data = (USER CHECKED struct __fat_dirent *)arg;
+		if unlikely(!IO_CANREAD(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
+		flags = 0;
+		if (cmd == VFAT_IOCTL_READDIR_BOTH)
+			flags = FATDIRENUM_IOCTL_READDIR_F_BOTH;
+		return fatdirenum_ioctl_readdir(me, data, flags);
+	}	break;
+
+#ifdef NEED_COMPAT_IOCTL_FAT_READDIR
+	case _IO_WITHTYPE(VFAT_IOCTL_READDIR_BOTH, struct __compat_fat_dirent[2]):
+	case _IO_WITHTYPE(VFAT_IOCTL_READDIR_SHORT, struct __compat_fat_dirent[2]): {
+		unsigned int flags;
+		USER CHECKED struct __compat_fat_dirent *data;
+		validate_writable(arg, 2 * sizeof(struct __compat_fat_dirent));
+		data = (USER CHECKED struct __compat_fat_dirent *)arg;
+		if unlikely(!IO_CANREAD(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
+		flags = FATDIRENUM_IOCTL_READDIR_F_COMPAT;
+		if (cmd == _IO_WITHTYPE(VFAT_IOCTL_READDIR_BOTH, struct __compat_fat_dirent[2]))
+			flags = FATDIRENUM_IOCTL_READDIR_F_BOTH | FATDIRENUM_IOCTL_READDIR_F_COMPAT;
+		return fatdirenum_ioctl_readdir(me, (USER CHECKED struct __fat_dirent *)data, flags);
+	}	break;
+#endif /* NEED_COMPAT_IOCTL_FAT_READDIR */
+
+	default:
+		break;
+	}
+
+	/* Fallback: service a normal FAT ioctl */
+	return Fat_Ioctl(me->de_dir, cmd, arg, mode);
+}
+
+
+PRIVATE struct fdirenum_ops const fatdirenum_ops = {
+	.deo_fini    = &flatdirenum_v_fini,
+	.deo_readdir = &flatdirenum_v_readdir,
+	.deo_seekdir = &flatdirenum_v_seekdir,
+	.deo_ioctl   = &fatdirenum_v_ioctl,
+};
+
+#define fatdir_v_enumsz flatdirnode_v_enumsz
+PRIVATE BLOCKING NONNULL((1)) void KCALL
+fatdir_v_enum(struct fdirenum *__restrict result)
+		THROWS(E_IOERROR, ...) {
+	struct flatdirenum *rt = (struct flatdirenum *)result;
+	struct flatdirnode *me = fdirnode_asflat(rt->de_dir);
+
+	/* Fill in the enumerator. (copy+pasted from `flatdirnode_v_enum') */
+#ifndef CONFIG_NO_SMP
+	atomic_lock_init(&rt->ffde_lock);
+#endif /* !CONFIG_NO_SMP */
+	rt->ffde_pos = 0;
+	flatdirnode_read(me);
+	rt->ffde_next = xincref(TAILQ_FIRST(&me->fdn_data.fdd_bypos));
+	flatdirnode_endread(me);
+	rt->de_ops = &fatdirenum_ops;
+}
+
 
 
 /************************************************************************/
@@ -2042,8 +2301,8 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 			.no_wrattr = &Fat_WrAttr,
 		},
 		.dno_lookup = &flatdirnode_v_lookup,
-		.dno_enumsz = flatdirnode_v_enumsz, /* TODO: Custom override so we can implement `deo_ioctl' for `VFAT_IOCTL_READDIR_(BOTH|SHORT)' */
-		.dno_enum   = &flatdirnode_v_enum,
+		.dno_enumsz = fatdir_v_enumsz,
+		.dno_enum   = &fatdir_v_enum,
 		.dno_mkfile = &flatdirnode_v_mkfile,
 		.dno_unlink = &flatdirnode_v_unlink,
 		.dno_rename = &flatdirnode_v_rename,
@@ -2489,8 +2748,8 @@ PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
 			.dno_lookup = &flatdirnode_v_lookup,
-			.dno_enumsz = flatdirnode_v_enumsz,
-			.dno_enum   = &flatdirnode_v_enum,
+			.dno_enumsz = fatdir_v_enumsz,
+			.dno_enum   = &fatdir_v_enum,
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,
 			.dno_rename = &flatdirnode_v_rename,
@@ -2530,8 +2789,8 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
 			.dno_lookup = &flatdirnode_v_lookup,
-			.dno_enumsz = flatdirnode_v_enumsz,
-			.dno_enum   = &flatdirnode_v_enum,
+			.dno_enumsz = fatdir_v_enumsz,
+			.dno_enum   = &fatdir_v_enum,
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,
 			.dno_rename = &flatdirnode_v_rename,

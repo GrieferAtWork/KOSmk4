@@ -75,7 +75,7 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	case _IO_WITHTYPE(FS_IOC_GETFLAGS, u32):
 	case _IO_WITHTYPE(FS_IOC_GETFLAGS, u64): {
 		uintptr_t mfile_flags, flags = 0;
-		if (!IO_CANREAD(mode))
+		if unlikely(!IO_CANREAD(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_GETPROPERTY, mode);
 		mfile_flags = ATOMIC_READ(self->mf_flags);
 		if (mfile_flags & MFILE_F_READONLY)
@@ -94,7 +94,7 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	case _IO_WITHTYPE(FS_IOC_SETFLAGS, u32):
 	case _IO_WITHTYPE(FS_IOC_SETFLAGS, u64): {
 		uintptr_t mask, flag, inode_flags;
-		if (!IO_CANWRITE(mode))
+		if unlikely(!IO_CANWRITE(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_SETPROPERTY, mode);
 		validate_readable(arg, _IOC_SIZE(cmd));
 		if (_IOC_SIZE(cmd) == sizeof(u32)) {

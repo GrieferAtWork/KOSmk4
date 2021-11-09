@@ -649,12 +649,12 @@ DEFINE_SYSCALL4(fd_t, mktty,
 		 *   - Read from the keyboard
 		 *   - Write from to the display
 		 */
-		if (!IO_CANREAD(hkeyboard.h_mode))
+		if unlikely(!IO_CANREAD(hkeyboard.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION,
 			      (unsigned int)keyboard,
 			      E_INVALID_HANDLE_OPERATION_READ,
 			      hkeyboard.h_mode);
-		if (!IO_CANWRITE(hdisplay.h_mode))
+		if unlikely(!IO_CANWRITE(hdisplay.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION,
 			      (unsigned int)display,
 			      E_INVALID_HANDLE_OPERATION_WRITE,

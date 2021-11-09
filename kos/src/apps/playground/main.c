@@ -43,6 +43,7 @@
 #include <kos/ukern.h>
 #include <kos/unistd.h>
 #include <linux/if_ether.h>
+#include <linux/msdos_fs.h>
 #include <netinet/if_ether.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -945,6 +946,44 @@ int main_fg(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_fatls(int argc, char *argv[], char *envp[]) {
+	static char *default_args[] = { (char *)"." };
+	(void)envp;
+	--argc;
+	++argv;
+	if (!argc) {
+		argv = default_args;
+		argc = 1;
+	}
+	for (; argc; --argc, ++argv) {
+		fd_t dirfd = open(*argv, O_DIRECTORY | O_RDONLY);
+		if (dirfd < 0)
+			err(1, "fatls: failed to open %q", *argv);
+		printf("%s:\n", *argv);
+		for (;;) {
+			struct __fat_dirent ent[2];
+			int status = ioctl(dirfd, VFAT_IOCTL_READDIR_BOTH, &ent[0]);
+			if (status == 0)
+				break;
+			if (status == -1) {
+				err(1, "fatls: ioctl failed");
+				break;
+			}
+			printf("%-12s %-50s %#lx %lu\n",
+			       ent[0].d_name,
+			       ent[1].d_name,
+			       ent[1].d_ino,
+			       ent[1].d_off);
+		}
+		close(dirfd);
+	}
+	return 0;
+}
+/************************************************************************/
+
+
+
+/************************************************************************/
 int main_charmap(int argc, char *argv[], char *envp[]) {
 	char const *cpvga[] = { /* s.a. /src/libvgastate/vgastate.c */
 		"\uFFFD\u263A\u263B\u2665\u2666\u2663\u2660\u2022\u25D8\u25CB\u25D9\u2642\u2640\u266A\u266B\u263C",
@@ -1073,6 +1112,7 @@ PRIVATE DEF defs[] = {
 	{ "charmap", &main_charmap },
 	{ "dumpdebug", &main_dumpdebug },
 	{ "fg", &main_fg },
+	{ "fatls", &main_fatls },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall
