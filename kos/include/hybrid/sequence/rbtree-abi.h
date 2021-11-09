@@ -715,8 +715,8 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNUL
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void, RBTREE_NOTHROW, RBTREE_CC,
                        RBTREE(insert), (RBTREE_T **__restrict proot, RBTREE_T *__restrict node), (proot, node)) {
 	RBTREE_LOCVAR(RBTREE_T *, root);
-	_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
 	root = RBTREE_PROOT_GET(proot);
+	_RBTREE_VALIDATE(root);
 	root = RBTREE(_insert_impl)(root, node);
 	RBTREE_SETBLACK(root);
 	RBTREE_PROOT_SET(proot, root);
@@ -775,8 +775,8 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_WUNUSED __ATTR_NONNULL((2)), RBTREE_T *
 RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_WUNUSED __ATTR_NONNULL((1, 2)), __BOOL, RBTREE_NOTHROW, RBTREE_CC,
                        RBTREE(tryinsert), (RBTREE_T **__restrict proot, RBTREE_T *__restrict node), (proot, node)) {
 	RBTREE_LOCVAR(RBTREE_T *, root);
-	_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
 	root = RBTREE_PROOT_GET(proot);
+	_RBTREE_VALIDATE(root);
 	root = RBTREE(_tryinsert_impl)(root, node);
 	if (RBTREE_NODE_ISNULL(root)) {
 		_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
@@ -965,8 +965,15 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2)), void, RBTREE_NOTHROW
 #endif /* !RBTREE_OMIT_REMOVENODE */
 {
 	RBTREE_LOCVAR(RBTREE_T *, root);
-	_RBTREE_VALIDATE(RBTREE_PROOT_GET(proot));
 	root = RBTREE_PROOT_GET(proot);
+	_RBTREE_VALIDATE(root);
+#if !defined(RBTREE_OMIT_LOCATE) || !defined(RBTREE_OMIT_REMOVE)
+	{
+		RBTREE_LOCVAR(RBTREE_T *, loc);
+		loc = RBTREE(locate)(root, RBTREE_GETMINKEY(node));
+		RBTREE_ASSERT(RBTREE_NODE_EQ(loc, node));
+	}
+#endif /* !RBTREE_OMIT_LOCATE || !RBTREE_OMIT_REMOVE */
 	root = RBTREE(_remove_impl)(root, node);
 #ifdef RBTREE_XSETBLACK
 	RBTREE_XSETBLACK(root);

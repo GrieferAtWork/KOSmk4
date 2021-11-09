@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_MODFAT_FAT_C
 #define GUARD_MODFAT_FAT_C 1
+#define __WANT_FNODE__fn_suplop
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -1226,11 +1227,11 @@ NOTHROW(FCALL lfn_checksum)(char const dos83_name[8 + 3]) {
 /* Generate FAT file entries and return the # generated. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2, 3, 4)) size_t KCALL
 Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
-                        FatDirNode *__restrict dir,
+                        FatDirNode const *__restrict dir,
                         struct fatdirent *__restrict ent,
                         struct fnode *__restrict file)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS) {
-	FatSuperblock *super = fsuper_asfat(file->fn_super);
+	FatSuperblock const *super = fsuper_asfat(file->fn_super);
 	FatClusterIndex first_cluster;
 	mode_t fmode;
 
@@ -1555,23 +1556,62 @@ FatDir_WriteDir(struct flatdirnode *__restrict self,
 
 	/* Write directory entries. */
 	ino = (ino_t)Fat_GetAbsDiskPos(me, ent->fad_ent.fde_pos);
-	mfile_write(me, files, num_files * sizeof(struct fat_dirent),
-	            ent->fad_ent.fde_pos);
+	mfile_writeall(me, files, num_files * sizeof(struct fat_dirent),
+	               ent->fad_ent.fde_pos);
 
 	/* Fill in INode numbers */
-	incref(ent);
-	mfile_tslock_acquire(file);
-	file->fn_ino = ino;
-	oldent = file->fn_fsdata->fn_ent; /* Inherit reference */
-	file->fn_fsdata->fn_ent = ent;    /* Inherit reference */
+	incref(ent);                       /* For `file->fn_fsdata->fn_ent' */
+	ent->fad_ent.fde_ent.fd_ino = ino; /* Also fill in the directory entry's INode number */
+again_check_supent:
+	if (ATOMIC_READ(file->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+		struct fsuper *super = file->fn_super;
+		/* Because  we're changing the Inode, we must re-insert
+		 * the file into the superblock's INode tree. Otherwise
+		 * stuff will become inconsistent. */
+		TRY {
+			fsuper_nodes_write(super);
+		} EXCEPT {
+			{
+				NESTED_EXCEPTION;
+				/* Delete the stuff that was written above. */
+				memset(files, at_end_of_dir ? MARKER_DIREND : MARKER_UNUSED,
+				       num_files * sizeof(struct fat_dirent));
+				mfile_writeall(me, files, num_files * sizeof(struct fat_dirent),
+				               ent->fad_ent.fde_pos);
+			}
+			RETHROW();
+		}
+
+		/* Check that the file is actually properly inserted into the superblock. */
+		if unlikely(file->fn_supent.rb_rhs == FSUPER_NODES_DELETED ||
+		            me->_fn_suplop.olo_func == &fnode_add2sup_lop) {
+			fsuper_nodes_endwrite(super);
+			goto again_check_supent;
+		}
+		fsuper_nodes_removenode(super, file);
+		mfile_tslock_acquire(file);
+		file->fn_ino = ino;
+		oldent = file->fn_fsdata->fn_ent; /* Inherit reference */
+		file->fn_fsdata->fn_ent = ent;    /* Inherit reference */
+		mfile_tslock_release(file);
+		fsuper_nodes_insert(super, file);
+		fsuper_nodes_endwrite(super);
+	} else {
+		mfile_tslock_acquire(file);
+		/* Interlock another check for `fn_supent' with the TSLOCK */
+		if unlikely(ATOMIC_READ(file->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+			mfile_tslock_release_br(file);
+			goto again_check_supent;
+		}
+		file->fn_ino = ino;
+		oldent = file->fn_fsdata->fn_ent; /* Inherit reference */
+		file->fn_fsdata->fn_ent = ent;    /* Inherit reference */
+		mfile_tslock_release(file);
+	}
 	/* NOTE: If changed, the new directory is saved in  `fn_dir'
 	 *       during `FatDir_DirentChanged()', as  only that  one
 	 *       guaranties being called while holding locks to both
 	 *       the old and new directory. */
-	mfile_tslock_release(file);
-
-	/* Also fill in the directory entry's INode number */
-	ent->fad_ent.fde_ent.fd_ino = ino;
 
 	/* Drop reference from a possible old entry. */
 	xdecref_unlikely(oldent);
@@ -1851,7 +1891,7 @@ Fat_Ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		}
 
 		/* In order to change attributes, the calling thread
-		 * needs write-access to the containing directory. */
+		 * needs write-access to  the containing  directory. */
 		mfile_tslock_acquire(me);
 		dir = dat->fn_dir;
 		xincref(dir);
