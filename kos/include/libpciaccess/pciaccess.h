@@ -1159,7 +1159,9 @@ LIBPCIACCESS_DECL int __NOTHROW(LIBPCIACCESS_CC pci_device_vgaarb_decodes)(int n
 LIBPCIACCESS_DECL int __NOTHROW(LIBPCIACCESS_CC pci_device_vgaarb_lock)(void);
 LIBPCIACCESS_DECL int __NOTHROW(LIBPCIACCESS_CC pci_device_vgaarb_trylock)(void);
 LIBPCIACCESS_DECL int __NOTHROW(LIBPCIACCESS_CC pci_device_vgaarb_unlock)(void);
-LIBPCIACCESS_DECL __ATTR_NONNULL((2, 3)) __errno_t __NOTHROW(LIBPCIACCESS_CC pci_device_vgaarb_get_info)(struct pci_device const *self, int *__restrict vga_count, int *__restrict rsrc_decodes);
+LIBPCIACCESS_DECL __ATTR_NONNULL((2)) __errno_t
+__NOTHROW(LIBPCIACCESS_CC pci_device_vgaarb_get_info)(struct pci_device const *self, int *vga_count,
+                                                      /*[valid_if(self != NULL)]*/ int *rsrc_decodes);
 #endif /* !__KERNEL__ */
 
 

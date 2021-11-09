@@ -1574,10 +1574,9 @@ NOTHROW(CC libpci_device_vgaarb_unlock)(void) {
 }
 
 DEFINE_PUBLIC_ALIAS(pci_device_vgaarb_get_info, libpci_device_vgaarb_get_info);
-INTERN NONNULL((2, 3)) errno_t
-NOTHROW(CC libpci_device_vgaarb_get_info)(struct pci_device const *self,
-                                          int *__restrict vga_count,
-                                          int *__restrict rsrc_decodes) {
+INTERN NONNULL((2)) errno_t
+NOTHROW(CC libpci_device_vgaarb_get_info)(struct pci_device const *self, int *vga_count,
+                                          /*[valid_if(self != NULL)]*/ int *rsrc_decodes) {
 	COMPILER_IMPURE();
 	(void)self;
 	(void)vga_count;

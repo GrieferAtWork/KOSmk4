@@ -201,7 +201,9 @@ INTDEF int NOTHROW(CC libpci_device_vgaarb_decodes)(int new_vga_rsrc);
 INTDEF int NOTHROW(CC libpci_device_vgaarb_lock)(void);
 INTDEF int NOTHROW(CC libpci_device_vgaarb_trylock)(void);
 INTDEF int NOTHROW(CC libpci_device_vgaarb_unlock)(void);
-INTDEF NONNULL((2, 3)) errno_t NOTHROW(CC libpci_device_vgaarb_get_info)(struct pci_device const *self, int *__restrict vga_count, int *__restrict rsrc_decodes);
+INTDEF NONNULL((2)) errno_t
+NOTHROW(CC libpci_device_vgaarb_get_info)(struct pci_device const *self, int *vga_count,
+                                          /*[valid_if(self != NULL)]*/ int *rsrc_decodes);
 
 /************************************************************************/
 /* General purpose I/O accessors.                                       */
