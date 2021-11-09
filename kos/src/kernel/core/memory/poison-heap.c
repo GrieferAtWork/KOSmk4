@@ -548,13 +548,13 @@ NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t num_bytes,
                                    gfp_t gfp, unsigned int tb_skip);
 #ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
 INTDEF ATTR_CONST size_t KCALL ph_kmalloc_leaks(void);
-INTDEF ATTR_CONST kmalloc_leak_t KCALL ph_kmalloc_leaks_collect(void);
-INTDEF ATTR_CONST ssize_t KCALL ph_kmalloc_leaks_print(kmalloc_leak_t leaks, __pformatprinter printer, void *arg, size_t *pnum_leaks);
+INTDEF ATTR_CONST kmalloc_leaks_t KCALL ph_kmalloc_leaks_collect(void);
+INTDEF ATTR_CONST ssize_t KCALL ph_kmalloc_leaks_print(kmalloc_leaks_t leaks, __pformatprinter printer, void *arg, size_t *pnum_leaks);
 INTDEF ATTR_CONST size_t KCALL ph_kmalloc_traceback(void *ptr, /*out*/ void **tb, size_t buflen, pid_t *p_alloc_roottid);
 #endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
 #ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
 INTDEF void NOTHROW(KCALL ph_kmalloc_validate)(void);
-INTDEF void NOTHROW(KCALL ph_kmalloc_leaks_discard)(kmalloc_leak_t leaks);
+INTDEF void NOTHROW(KCALL ph_kmalloc_leaks_release)(kmalloc_leaks_t leaks);
 INTDEF void NOTHROW(KCALL ph_kmalloc_untrace)(void *ptr);
 INTDEF void NOTHROW(KCALL ph_kmalloc_untrace_n)(void *ptr, size_t num_bytes);
 #endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
@@ -875,16 +875,21 @@ ph_kmalloc_leaks(void) {
 	return 0;
 }
 
-INTERN ATTR_COLDTEXT ATTR_CONST kmalloc_leak_t KCALL
+INTERN ATTR_COLDTEXT ATTR_CONST kmalloc_leaks_t KCALL
 ph_kmalloc_leaks_collect(void) {
 	return NULL;
 }
 
 INTERN ATTR_COLDTEXT ATTR_CONST ssize_t KCALL
-ph_kmalloc_leaks_print(kmalloc_leak_t UNUSED(leaks),
+ph_kmalloc_leaks_print(kmalloc_leaks_t UNUSED(leaks),
                        __pformatprinter UNUSED(printer),
                        void *UNUSED(arg),
                        size_t *UNUSED(pnum_leaks)) {
+	return 0;
+}
+
+INTERN NOBLOCK ATTR_COLDTEXT ATTR_CONST size_t
+NOTHROW(KCALL ph_kmalloc_leaks_count)(kmalloc_leaks_t UNUSED(leaks)) {
 	return 0;
 }
 
@@ -895,6 +900,13 @@ ph_kmalloc_traceback(void *UNUSED(ptr),
                      pid_t *UNUSED(p_alloc_roottid)) {
 	return 0;
 }
+
+INTERN NOBLOCK ATTR_PURE ATTR_CONST memleak_t
+NOTHROW(FCALL ph_memleak_next)(kmalloc_leaks_t UNUSED(leaks), memleak_t UNUSED(prev)) {
+	return NULL;
+}
+
+DEFINE_INTERN_ALIAS(ph_memleak_getattr, ph_memleak_next);
 #endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
 
 #ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
@@ -904,7 +916,8 @@ NOTHROW(KCALL ph_kmalloc_validate)(void) {
 }
 
 INTERN ATTR_COLDTEXT void
-NOTHROW(KCALL ph_kmalloc_leaks_discard)(kmalloc_leak_t UNUSED(leaks)) {
+NOTHROW(KCALL ph_kmalloc_leaks_release)(kmalloc_leaks_t UNUSED(leaks),
+                                        unsigned int UNUSED(how)) {
 	/* no-op */
 }
 

@@ -1501,7 +1501,7 @@ kmalloc_leaks_sort(struct trace_node *leaks) {
 
 
 /* Collect, print and discard memory leaks. */
-PUBLIC ATTR_COLDTEXT kmalloc_leak_t KCALL
+PUBLIC ATTR_COLDTEXT kmalloc_leaks_t KCALL
 kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
 	struct trace_node *result;
 again:
@@ -1580,7 +1580,7 @@ PRIVATE ATTR_COLDBSS bool gc_slab_leak_did_notify_noslab_boot_option = false;
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 PUBLIC ATTR_COLDTEXT ssize_t KCALL
-kmalloc_leaks_print(kmalloc_leak_t leaks,
+kmalloc_leaks_print(kmalloc_leaks_t leaks,
                     pformatprinter printer, void *arg,
                     size_t *pnum_leaks) {
 #define DO(expr)                           \
@@ -1724,44 +1724,127 @@ err:
 }
 
 PUBLIC NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
+NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
+                                     unsigned int how) {
 	struct trace_node *node, *next;
+	assert(how == KMALLOC_LEAKS_RELEASE_RESTORE ||
+	       how == KMALLOC_LEAKS_RELEASE_DISCARD ||
+	       how == KMALLOC_LEAKS_RELEASE_FREE);
 	node = (struct trace_node *)leaks;
 	while (node) {
 		next = trace_node_leak_next(node);
-#if 0 /* Don't free pointed-to data! The user  way wish to break into  the
-       * debugger and inspect leaked memory, but  if we free it now,  then
-       * it'll be gone. After all: we're not trying to implement an actual
-       * gc  here (one that would free unreachable heap block); we're only
-       * trying to discover and log memory leaks! */
-		/* Try  to release the memory pointed to by the memory leaks.
-		 * However, we can only do this for kmalloc() and slab-leaks.
-		 * Custom traced regions cannot be blindly free'd! */
-		switch (node->tn_kind) {
+		if (how == KMALLOC_LEAKS_RELEASE_FREE) {
+			/* Try  to release the memory pointed to by the memory leaks.
+			 * However, we can only do this for kmalloc() and slab-leaks.
+			 * Custom traced regions cannot be blindly free'd! */
+			switch (node->tn_kind) {
 
-		case TRACE_NODE_KIND_MALL: {
-			gfp_t flags;
-			flags = node->tn_flags & __GFP_HEAPMASK;
-			heap_free_untraced(&kernel_heaps[flags],
-			                   trace_node_uaddr(node),
-			                   trace_node_usize(node),
-			                   flags);
-		}	break;
+			case TRACE_NODE_KIND_MALL: {
+				gfp_t flags;
+				flags = node->tn_flags & __GFP_HEAPMASK;
+				heap_free_untraced(&kernel_heaps[flags],
+				                   trace_node_uaddr(node),
+				                   trace_node_usize(node),
+				                   flags);
+			}	break;
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-		case TRACE_NODE_KIND_SLAB:
-			slab_free(trace_node_uaddr(node));
-			break;
+			case TRACE_NODE_KIND_SLAB:
+				slab_free(trace_node_uaddr(node));
+				break;
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
-		default:
-			break;
+			default:
+				break;
+			}
 		}
-#endif
-		trace_node_free(node);
+		if (how == KMALLOC_LEAKS_RELEASE_RESTORE &&
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+		    node->tn_kind != TRACE_NODE_KIND_SLAB &&
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+		    1) {
+			lock_acquire();
+			trace_node_tree_insert(&nodes, node);
+			lock_release();
+		} else {
+			trace_node_free(node);
+		}
 		node = next;
 	}
 }
+
+/* Count the # of objects in `leaks' */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED size_t
+NOTHROW(KCALL kmalloc_leaks_count)(kmalloc_leaks_t leaks) {
+	size_t result = 0;
+	struct trace_node *node;
+	node = (struct trace_node *)leaks;
+	while (node) {
+		++result;
+		node = trace_node_leak_next(node);
+	}
+	return result;
+}
+
+
+/* Helpers for working with abstract memory leak descriptors. */
+
+/* Return the next memory after `prev' from the set of `leaks'
+ * When `prev == NULL', return  the first  leak from  `leaks'.
+ * Returns `NULL' when all leaks were enumerated. */
+PUBLIC NOBLOCK ATTR_PURE memleak_t
+NOTHROW(FCALL memleak_next)(kmalloc_leaks_t leaks, memleak_t prev) {
+	if (!leaks)
+		return NULL;
+	if (!prev)
+		return (struct trace_node *)leaks;
+	return trace_node_leak_next(prev);
+}
+
+/* Get a  named  attribute  of `self',  or  `NULL'  if  the
+ * attribute isn't available or unknown, or `self == NULL'.
+ * @param: attr: One of `MEMLEAK_ATTR_*' */
+PUBLIC NOBLOCK ATTR_PURE void *
+NOTHROW(FCALL memleak_getattr)(memleak_t self, uintptr_t attr) {
+	if (!self)
+		return NULL;
+
+	/* Query memory leak attributes. */
+	switch (attr) {
+
+	case MEMLEAK_ATTR_MINADDR:
+		return (void *)trace_node_umin(self);
+
+	case MEMLEAK_ATTR_MAXADDR:
+		return (void *)trace_node_umax(self);
+
+	case MEMLEAK_ATTR_SIZE:
+		return (void *)trace_node_usize(self);
+
+	case MEMLEAK_ATTR_TID:
+		return (void *)(uintptr_t)self->tn_tid;
+
+	case MEMLEAK_ATTR_TBSIZE: {
+		size_t result;
+		result = trace_node_traceback_count(self);
+		/* Trim NULL entries from the back of the traceback. */
+		while (result && trace_node_traceback_vector(self)[result - 1] == NULL)
+			--result;
+		return (void *)result;
+	}	break;
+
+	default:
+		break;
+	}
+
+	/* Check for traceback vector index attributes. */
+	if (attr >= MEMLEAK_ATTR_TBADDR(0) && attr < MEMLEAK_ATTR_TBADDR(trace_node_traceback_count(self)))
+		return (void *)trace_node_traceback_vector(self)[attr - MEMLEAK_ATTR_TBADDR(0)];
+
+	/* Unknown/undefined attribute */
+	return NULL;
+}
+
 
 
 
@@ -1772,13 +1855,13 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
  * This function is the combination of:
  *     kmalloc_leaks_collect() +
  *     kmalloc_leaks_print(printer: &syslog_printer, arg: SYSLOG_LEVEL_RAW) +
- *     kmalloc_leaks_discard() */
+ *     kmalloc_leaks_release() */
 PUBLIC ATTR_COLDTEXT ATTR_NOINLINE size_t KCALL
 kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 	size_t result;
-	kmalloc_leak_t leaks;
+	kmalloc_leaks_t leaks;
 	leaks = kmalloc_leaks_collect();
-	RAII_FINALLY { kmalloc_leaks_discard(leaks); };
+	RAII_FINALLY { kmalloc_leaks_release(leaks, KMALLOC_LEAKS_RELEASE_RESTORE); };
 	kmalloc_leaks_print(leaks, &syslog_printer, SYSLOG_LEVEL_RAW, &result);
 	return result;
 }
@@ -1797,7 +1880,7 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void const **__restrict buffer, s
 	 *       to be able  to construct user-space  program/section descriptors, etc,  where-as
 	 *       the  normal unwind() function is specifically designed  to _not_ make use of any
 	 *       heap  memory  (which is  also the  reason why  drivers pre-load  their .eh_frame
-	 *       sections during initialization, rather than loading it lazily)
+	 *       sections during initialization, rather than loading them lazily)
 	 * But the reason this is done isn't only for this, but rather to ensure that throwing
 	 * exceptions  and the like don't just randomly  fail because the kernel couldn't find
 	 * enough memory... */

@@ -60,7 +60,7 @@ DECL_BEGIN
  * @return: true:  IPI delivery successful.
  * @return: false: The IPI could not be scheduled because the target
   *                CPU is offline, and `CPU_IPI_FWAKEUP' was not set. */
-PUBLIC ATTR_WEAK NOBLOCK NONNULL((2, 3)) ATTR_SECTION(".text.kernel.cpu_sendipi_cpuset") unsigned int
+PUBLIC NOBLOCK ATTR_WEAK NONNULL((2, 3)) ATTR_SECTION(".text.kernel.cpu_sendipi_cpuset") unsigned int
 NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
                                   void *args[CPU_IPI_ARGCOUNT], unsigned int flags) {
 	unsigned int i, result = 0;
@@ -130,7 +130,7 @@ again_check_cpu_state:
 
 /* Same as the regular IPI functions, however the IPI is broadcast to all CPUs.
  * @return: * : The number of successfully delivered IPIs. */
-PUBLIC ATTR_WEAK NOBLOCK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcastipi") unsigned int
+PUBLIC NOBLOCK ATTR_WEAK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcastipi") unsigned int
 NOTHROW(KCALL cpu_broadcastipi)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], unsigned int flags) {
 	unsigned int result;
 	cpuset_t set;
@@ -140,7 +140,7 @@ NOTHROW(KCALL cpu_broadcastipi)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], un
 }
 
 /* Same as `cpu_broadcastipi()', but don't send the IPI to the calling CPU. */
-PUBLIC ATTR_WEAK NOBLOCK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcastipi_notthis") unsigned int
+PUBLIC NOBLOCK ATTR_WEAK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcastipi_notthis") unsigned int
 NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], unsigned int flags) {
 	unsigned int result;
 	cpuset_t set;

@@ -29,9 +29,8 @@
 
 #include "malloc-defs.h"
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 
@@ -358,9 +357,13 @@ NOTHROW(KCALL krealloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 }
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 
+DECL_END
+#endif /* __CC__ */
+
 
 #ifdef CONFIG_TRACE_MALLOC
 #ifdef __CC__
+DECL_BEGIN
 
 /* Trace a given address range `base...+=num_bytes' for the purposes
  * of  having that  range checked  during GC  memory leak detection.
@@ -449,25 +452,54 @@ FUNDEF NOBLOCK void NOTHROW(KCALL kmalloc_validate)(void);
  * This function is the combination of:
  *     kmalloc_leaks_collect() +
  *     kmalloc_leaks_print(printer: &syslog_printer, arg: SYSLOG_LEVEL_RAW) +
- *     kmalloc_leaks_discard() */
+ *     kmalloc_leaks_release() */
 FUNDEF size_t KCALL kmalloc_leaks(void) THROWS(E_WOULDBLOCK);
 
-typedef void *kmalloc_leak_t;
+typedef struct trace_node *memleak_t;
+typedef void *kmalloc_leaks_t;
 
 /* Collect, print and discard memory leaks. */
-FUNDEF kmalloc_leak_t KCALL
+FUNDEF kmalloc_leaks_t KCALL
 kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK);
 FUNDEF ssize_t KCALL
-kmalloc_leaks_print(kmalloc_leak_t leaks,
+kmalloc_leaks_print(kmalloc_leaks_t leaks,
                     __pformatprinter printer, void *arg,
                     size_t *pnum_leaks DFL(__NULLPTR));
-FUNDEF NOBLOCK void
-NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks);
 
+/* Count the # of objects in `leaks' */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED size_t
+NOTHROW(KCALL kmalloc_leaks_count)(kmalloc_leaks_t leaks);
+
+/* Releaes leaks previously collected by `kmalloc_leaks_collect()'
+ * @param: how: One of `KMALLOC_LEAKS_RELEASE_*' */
+FUNDEF NOBLOCK void
+NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
+                                     unsigned int how);
+#define KMALLOC_LEAKS_RELEASE_RESTORE 0 /* Restore leaks; future calls to `kmalloc_leaks_collect()' will re-yield them. */
+#define KMALLOC_LEAKS_RELEASE_DISCARD 1 /* Discard leaks but don't release leaked memory. */
+#define KMALLOC_LEAKS_RELEASE_FREE    2 /* Discard leaks and free leaked memory. (Only possible for `kmalloc()'; not possible for `heap_alloc()') */
+
+/* Helpers for working with abstract memory leak descriptors. */
+
+/* Return the next memory after `prev' from the set of `leaks'
+ * When `prev == NULL', return  the first  leak from  `leaks'.
+ * Returns `NULL' when all leaks were enumerated. */
+FUNDEF NOBLOCK ATTR_PURE memleak_t
+NOTHROW(FCALL memleak_next)(kmalloc_leaks_t leaks, memleak_t prev);
+
+/* Get a  named  attribute  of `self',  or  `NULL'  if  the
+ * attribute isn't available or unknown, or `self == NULL'.
+ * @param: attr: One of `MEMLEAK_ATTR_*' */
+FUNDEF NOBLOCK ATTR_PURE void *
+NOTHROW(FCALL memleak_getattr)(memleak_t self, uintptr_t attr);
+
+DECL_END
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss.mall.untracked")
 #else /* CONFIG_TRACE_MALLOC */
 #ifdef __CC__
+#define memleak_t                                         void *
+#define kmalloc_leaks_t                                   void *
 #define kmalloc_trace(base, num_bytes, flags, tb_skip)    (base)
 #define kmalloc_trace_nx(base, num_bytes, flags, tb_skip) (base)
 #define kmalloc_untrace(...)                              (void)0
@@ -478,34 +510,17 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks);
 #define kmalloc_leaks_collect()                           __NULLPTR
 #define kmalloc_leaks_print(leaks, printer, arg, pnum_leaks) \
 	((pnum_leaks) ? (void)(*(pnum_leaks) = 0) : (void)0, (ssize_t)0)
-#define kmalloc_leaks_discard(leaks) (void)0
+#define kmalloc_leaks_release(leaks, how) (void)0
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss")
 #endif /* !CONFIG_TRACE_MALLOC */
 
-
-#ifdef __cplusplus
-extern "C++" {
-__NAMESPACE_INT_BEGIN
-class _finally_kfree {
-private:
-	void *&m_ptr;
-public:
-	NOBLOCK _finally_kfree(void *&p) __CXX_NOEXCEPT: m_ptr(p) {}
-#ifndef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
-	NOBLOCK ~_finally_kfree() __CXX_NOEXCEPT { kfree(m_ptr); }
-#else /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
-	NOBLOCK ~_finally_kfree() __CXX_NOEXCEPT { __os_free(m_ptr); }
-#endif /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
-};
-__NAMESPACE_INT_END
-} /* extern "C++" */
-#define FINALLY_KFREE(ptr) __NAMESPACE_INT_SYM _finally_kfree __COMPILER_UNIQUE(__fkfptr)(ptr)
-#endif /* __cplusplus */
-
-#endif /* __CC__ */
-
-
-DECL_END
+/* Memory leak attributes. (For use with `memleak_getattr()') */
+#define MEMLEAK_ATTR_MINADDR   1             /* The lowest memory address part of the leak */
+#define MEMLEAK_ATTR_MAXADDR   2             /* The greatest memory address part of the leak */
+#define MEMLEAK_ATTR_SIZE      3             /* Total leak size (in bytes) */
+#define MEMLEAK_ATTR_TID       4             /* Root-namespace TID of the original allocator thread. */
+#define MEMLEAK_ATTR_TBSIZE    5             /* # of addresses within the traceback (enumerate through `MEMLEAK_ATTR_TBADDR()') */
+#define MEMLEAK_ATTR_TBADDR(i) (0x100 + (i)) /* Traceback addresses. */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MALLOC_H */

@@ -143,7 +143,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 }
 
 
-PUBLIC ATTR_WEAK NOBLOCK void
+PUBLIC NOBLOCK ATTR_WEAK void
 NOTHROW(KCALL kmalloc_validate)(void) {
 }
 
@@ -152,22 +152,36 @@ kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 	return 0;
 }
 
-PUBLIC ATTR_WEAK ATTR_CONST kmalloc_leak_t KCALL
+PUBLIC ATTR_WEAK ATTR_CONST kmalloc_leaks_t KCALL
 kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
 	return NULL;
 }
 
 PUBLIC ATTR_WEAK ATTR_CONST ssize_t KCALL
-kmalloc_leaks_print(kmalloc_leak_t UNUSED(leaks),
+kmalloc_leaks_print(kmalloc_leaks_t UNUSED(leaks),
                     __pformatprinter UNUSED(printer),
                     void *UNUSED(arg),
                     size_t *UNUSED(pnum_leaks)) {
 	return 0;
 }
 
-PUBLIC ATTR_WEAK NOBLOCK void
-NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t UNUSED(leaks)) {
+PUBLIC NOBLOCK ATTR_WEAK ATTR_PURE WUNUSED size_t
+NOTHROW(KCALL kmalloc_leaks_count)(kmalloc_leaks_t UNUSED(leaks)) {
+	return 0;
 }
+
+PUBLIC NOBLOCK ATTR_WEAK void
+NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t UNUSED(leaks),
+                                     unsigned int UNUSED(now)) {
+}
+
+
+PUBLIC NOBLOCK ATTR_WEAK ATTR_PURE memleak_t
+NOTHROW(FCALL memleak_next)(kmalloc_leaks_t UNUSED(leaks),
+                            memleak_t UNUSED(prev)) {
+	return NULL;
+}
+DEFINE_PUBLIC_WEAK_ALIAS(memleak_getattr, memleak_next);
 
 PUBLIC ATTR_WEAK ATTR_CONST NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
 NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),

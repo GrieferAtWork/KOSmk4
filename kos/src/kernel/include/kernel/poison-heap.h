@@ -241,7 +241,10 @@
 	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_leaks, /*        */ ph_kmalloc_leaks, 0))         \
 	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_leaks_collect, /**/ ph_kmalloc_leaks_collect, 0)) \
 	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_leaks_print, /*  */ ph_kmalloc_leaks_print, 4))   \
-	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_leaks_discard, /**/ ph_kmalloc_leaks_discard, 1)) \
+	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_leaks_count, /*  */ ph_kmalloc_leaks_count, 1))   \
+	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_leaks_release, /**/ ph_kmalloc_leaks_release, 2)) \
+	__PH_IF_DEBUG_MALLOC(bind_zero(memleak_next, /*         */ ph_memleak_next, 2))          \
+	__PH_IF_DEBUG_MALLOC(bind_zero(memleak_getattr, /*      */ ph_memleak_getattr, 2))       \
 	__PH_IF_DEBUG_MALLOC(bind_func(kmalloc_trace_nx, /*     */ ph_kmalloc_trace_nx))         \
 	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_untrace, /*      */ ph_kmalloc_untrace, 1))       \
 	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_untrace_n, /*    */ ph_kmalloc_untrace_n, 2))     \
