@@ -163,7 +163,8 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 		} else if (exec_dentry) {
 			reqlen = snprintf((USER char *)user_state_sp - buflen, buflen,
 			                  "%$s", (size_t)exec_dentry->fd_namelen,
-			                  exec_dentry->fd_name);
+			                  exec_dentry->fd_name) +
+			         1;
 		} else {
 			reqlen = 1;
 			if (buflen)
@@ -359,7 +360,8 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 		} else if (exec_dentry) {
 			reqlen = snprintf((USER char *)user_state_sp - buflen, buflen,
 			                  "%$s", (size_t)exec_dentry->fd_namelen,
-			                  exec_dentry->fd_name);
+			                  exec_dentry->fd_name) +
+			         1;
 		} else {
 			reqlen = 1;
 			if (buflen)

@@ -1897,6 +1897,34 @@ path_sprintent(struct path *__restrict self,
 	return result;
 }
 
+/* Like above, but don't print a trailing NUL and return length w/o said NUL
+ * @return: * : The required buffer size (excluding a trailing NUL, which also isn't printed) */
+PUBLIC NONNULL((1)) size_t KCALL
+path_sprint_without_nul(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
+                        atflag_t atflags, struct path *root)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+	size_t result;
+	struct format_snprintf_data data;
+	format_snprintf_init(&data, buffer, buflen);
+	result = (size_t)path_print(self, &format_snprintf_printer,
+	                            &data, atflags, root);
+	return result;
+}
+
+PUBLIC NONNULL((1)) size_t KCALL
+path_sprintent_without_nul(struct path *__restrict self,
+                           USER CHECKED char const *dentry_name, u16 dentry_namelen,
+                           USER CHECKED char *buffer, size_t buflen,
+                           atflag_t atflags, struct path *root)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+	size_t result;
+	struct format_snprintf_data data;
+	format_snprintf_init(&data, buffer, buflen);
+	result = (size_t)path_printent(self, dentry_name, dentry_namelen,
+	                               &format_snprintf_printer, &data,
+	                               atflags, root);
+	return result;
+}
 
 
 

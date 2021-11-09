@@ -304,8 +304,7 @@ ProcFS_PerProc_FsSpecificPath_ReadLink(struct flnknode *__restrict self,
 	FINALLY_DECREF_UNLIKELY(thread_pth);
 	caller_root = fs_getroot(THIS_FS);
 	FINALLY_DECREF_UNLIKELY(caller_root);
-	return path_sprint(thread_pth, buf, bufsize,
-	                   fs_atflags(0), caller_root);
+	return path_sprint_without_nul(thread_pth, buf, bufsize, 0, caller_root);
 }
 
 #ifndef __OPTIMIZE_SIZE__
@@ -446,12 +445,12 @@ ProcFS_PerProc_Exe_Printer(struct flnknode *__restrict self,
 	}
 	FINALLY_DECREF_UNLIKELY(exec_path);
 	caller_root = fs_getroot(THIS_FS);
-	return path_sprintent(exec_path, exec_name->fd_name,
-	                      exec_name->fd_namelen, buf, bufsize,
-	                      /* The kernel always interprets symbolic link texts using POSIX semantics.
-	                       * As such, symbolic link texts should  also only be printed using  those! */
-	                      /*fs_atflags(0) | */ AT_PATHPRINT_INCTRAIL,
-	                      caller_root);
+	return path_sprintent_without_nul(exec_path, exec_name->fd_name,
+	                                  exec_name->fd_namelen, buf, bufsize,
+	                                  /* The kernel always interprets symbolic link texts using POSIX semantics.
+	                                   * As such, symbolic link texts should  also only be printed using  those! */
+	                                  /*fs_atflags(0) | */ AT_PATHPRINT_INCTRAIL,
+	                                  caller_root);
 }
 
 #ifndef __OPTIMIZE_SIZE__
@@ -1106,21 +1105,21 @@ ProcFS_PerProc_Mounts_Printer(struct printnode *__restrict self,
                               size_t UNUSED(offset_hint)) {
 	REF struct path *fsroot;
 	REF struct pathmount *iter;
-	REF struct vfs *thread_vfs;
+	REF struct vfs *threadvfs;
 	REF struct task *thread = taskpid_gettask(self->fn_fsdata);
 	if unlikely(!thread)
 		return;
-	thread_vfs = task_getvfs(thread);
+	threadvfs = task_getvfs(thread);
 	decref_unlikely(thread);
-	FINALLY_DECREF_UNLIKELY(thread_vfs);
+	FINALLY_DECREF_UNLIKELY(threadvfs);
 	fsroot = fs_getroot(THIS_FS);
 	FINALLY_DECREF_UNLIKELY(fsroot);
-	iter = vfs_mounts_next(thread_vfs, NULL);
+	iter = vfs_mounts_next(threadvfs, NULL);
 	while (iter) {
 		FINALLY_DECREF_UNLIKELY(iter);
 		if (print_mounting_point(fsroot, iter, printer, arg))
 			break;
-		iter = vfs_mounts_next(thread_vfs, iter);
+		iter = vfs_mounts_next(threadvfs, iter);
 	}
 }
 
@@ -2159,11 +2158,11 @@ perproc_mapfile_lnknode_v_readlink(struct flnknode *__restrict self,
 	REF struct path *fsroot = fs_getroot(THIS_FS);
 	me = (struct perproc_mapfile_lnknode *)mfile_aslnk(self);
 	FINALLY_DECREF_UNLIKELY(fsroot);
-	return path_sprintent(me->ppml_fspath,
-	                      me->ppml_fsname->fd_name,
-	                      me->ppml_fsname->fd_namelen,
-	                      buf, bufsize, AT_PATHPRINT_INCTRAIL,
-	                      fsroot);
+	return path_sprintent_without_nul(me->ppml_fspath,
+	                                  me->ppml_fsname->fd_name,
+	                                  me->ppml_fsname->fd_namelen,
+	                                  buf, bufsize, AT_PATHPRINT_INCTRAIL,
+	                                  fsroot);
 }
 
 #ifndef __OPTIMIZE_SIZE__
@@ -2728,6 +2727,7 @@ procfs_task_direnum_v_seekdir(struct fdirenum *__restrict self,
 	uintptr_t newpos;
 	struct procfs_task_direnum *me = (struct procfs_task_direnum *)self;
 	switch (whence) {
+
 	case SEEK_SET:
 #if __SIZEOF_POS_T__ > __SIZEOF_PID_T__
 		if unlikely((pos_t)offset > (pos_t)(upid_t)-1)

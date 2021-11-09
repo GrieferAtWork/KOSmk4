@@ -660,6 +660,19 @@ path_sprintent(struct path *__restrict self,
                atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
                struct path *root DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
+/* Like above, but don't print a trailing NUL and return length w/o said NUL
+ * @return: * : The required buffer size (excluding a trailing NUL, which also isn't printed) */
+FUNDEF NONNULL((1)) size_t KCALL
+path_sprint_without_nul(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
+                        atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
+FUNDEF NONNULL((1)) size_t KCALL
+path_sprintent_without_nul(struct path *__restrict self,
+                           USER CHECKED char const *dentry_name, u16 dentry_namelen,
+                           USER CHECKED char *buffer, size_t buflen,
+                           atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
+                           struct path *root DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 
 
