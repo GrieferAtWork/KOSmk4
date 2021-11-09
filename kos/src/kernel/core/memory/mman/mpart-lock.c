@@ -596,6 +596,17 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 
 	num_bytes = mpart_getsize(self);
 	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	if unlikely(!num_bytes) {
+		/* Special case for when a part was deleted. */
+		assert((self->mp_state == MPART_ST_VOID) ||
+		       (self->mp_state == MPART_ST_MEM && self->mp_mem.mc_size == 0) ||
+		       (self->mp_state == MPART_ST_SWP && self->mp_swp.mc_size == 0));
+		self->mp_state        = MPART_ST_MEM;
+		self->mp_mem.mc_start = 0;
+		self->mp_mem.mc_size  = 0;
+		return true;
+	}
+
 	file       = self->mp_file;
 	num_pages  = num_bytes / PAGESIZE;
 	num_blocks = num_bytes >> file->mf_blockshift;
