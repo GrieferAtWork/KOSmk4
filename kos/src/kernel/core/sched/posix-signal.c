@@ -2595,21 +2595,23 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 /************************************************************************/
 /* rt_sigsuspend(), sigsuspend()                                        */
 /************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_RT_SIGSUSPEND
+
+#if (defined(__ARCH_WANT_SYSCALL_RT_SIGSUSPEND) || \
+     defined(__ARCH_WANT_SYSCALL_SIGSUSPEND) ||    \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND))
 /* This function is also called from arch-specific, optimized syscall routers. */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
-sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
-                       struct rpc_syscall_info *__restrict sc_info) {
+sys_sigsuspend_impl(struct icpustate *__restrict state,
+                    struct rpc_syscall_info *__restrict sc_info,
+                    size_t sigsetsize) {
 	sigset_t these;
-	size_t sigsetsize;
-	USER UNCHECKED sigset_t *uthese;
-	uthese     = (USER UNCHECKED sigset_t *)sc_info->rsi_regs[0];
-	sigsetsize = (size_t)sc_info->rsi_regs[1];
+	USER UNCHECKED sigset_t const *uthese;
 	if unlikely(sigsetsize != sizeof(sigset_t)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
 	}
+	uthese = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[0];
 	validate_readable(uthese, sizeof(sigset_t));
 	memcpy(&these, uthese, sizeof(sigset_t));
 
@@ -2637,7 +2639,7 @@ again:
 			PREEMPTION_DISABLE();
 			if (task_serve_with_sigmask(&these))
 				continue;
-			task_pause();
+			task_sleep();
 		}
 	} EXCEPT {
 		/* This function  only returns  normally
@@ -2648,14 +2650,17 @@ again:
 	}
 	__builtin_unreachable();
 }
+#endif /* ... */
 
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGSUSPEND
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 
 	/* Do the actual system call. */
-	ctx->rc_state = sys_rt_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo);
+	ctx->rc_state = sys_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo,
+	                                    (size_t)ctx->rc_scinfo.rsi_regs[1]);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
@@ -2674,16 +2679,48 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGSUSPEND */
 
 #ifdef __ARCH_WANT_SYSCALL_SIGSUSPEND
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo, sizeof(sigset_t));
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+}
+
 DEFINE_SYSCALL1(errno_t, sigsuspend,
                 USER UNCHECKED sigset_t const *, uthese) {
-	return sys_rt_sigsuspend(uthese, sizeof(sigset_t));
+	(void)uthese;
+
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_userunwind(&sys_sigsuspend_rpc, NULL);
+	__builtin_unreachable();
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGSUSPEND */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_compat_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo, sizeof(compat_sigset_t));
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+}
+
 DEFINE_COMPAT_SYSCALL1(errno_t, sigsuspend,
                        USER UNCHECKED compat_sigset_t const *, uthese) {
-	return sys_rt_sigsuspend(uthese, sizeof(compat_sigset_t));
+	(void)uthese;
+
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_userunwind(&sys_compat_sigsuspend_rpc, NULL);
+	__builtin_unreachable();
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND */
 
