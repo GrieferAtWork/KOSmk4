@@ -1804,8 +1804,8 @@ NOTHROW(FCALL memleak_next)(kmalloc_leaks_t leaks, memleak_t prev) {
 /* Get a  named  attribute  of `self',  or  `NULL'  if  the
  * attribute isn't available or unknown, or `self == NULL'.
  * @param: attr: One of `MEMLEAK_ATTR_*' */
-PUBLIC NOBLOCK ATTR_PURE void *
-NOTHROW(FCALL memleak_getattr)(memleak_t self, uintptr_t attr) {
+PUBLIC ATTR_PURE void *FCALL
+memleak_getattr(memleak_t self, uintptr_t attr) {
 	if (!self)
 		return NULL;
 

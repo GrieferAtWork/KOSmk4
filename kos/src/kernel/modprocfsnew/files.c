@@ -24,15 +24,21 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/filehandle.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/super.h>
+#include <kernel/handle.h>
+#include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/pipe.h>
 #include <kernel/uname.h>
+#include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
@@ -40,6 +46,7 @@
 #include <kos/except.h>
 #include <network/socket.h>
 
+#include <assert.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -63,6 +70,12 @@
 #define PRINT(str)    print(str, COMPILER_STRLEN(str))
 
 DECL_BEGIN
+
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Create forward declarations. (Prevent declaration errors below) */
 #define MKDIR_BEGIN(symbol_name, perm) \
@@ -535,6 +548,144 @@ ProcFS_Sys_Net_Core_WmemMax_Write(USER CHECKED void const *buf, size_t bufsize) 
 	} while (!ATOMIC_CMPXCH_WEAK(socket_default_sndbufsiz,
 	                             old_dfl, newval));
 }
+
+
+/************************************************************************/
+/* /proc/sys/net/core/wmem_max                                          */
+/************************************************************************/
+#ifdef CONFIG_TRACE_MALLOC
+
+struct memleaks: printnode {
+	kmalloc_leaks_t ml_leaks;   /* [0..1][const] Memory leaks. */
+	unsigned int    ml_relmode; /* Memory leaks release mode (one of `KMALLOC_LEAKS_RELEASE_*') */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL memleaks_v_destroy)(struct mfile *__restrict self) {
+	struct memleaks *me;
+	me = (struct memleaks *)mfile_asprintnode(self);
+	kmalloc_leaks_release(me->ml_leaks, me->ml_relmode);
+	printnode_v_destroy(me);
+}
+
+PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
+memleaks_v_print(struct printnode *__restrict self,
+                 pformatprinter printer, void *arg,
+                 size_t UNUSED(offset_hint))
+		THROWS(...) {
+	struct memleaks *me = (struct memleaks *)self;
+	kmalloc_leaks_print(me->ml_leaks, printer, arg);
+}
+
+PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
+memleaks_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	/* TODO: ioctl codes to work with memory leaks. */
+	return printnode_v_ioctl(self, cmd, arg, mode);
+}
+
+
+PRIVATE struct mfile_stream_ops const memleaks_v_stream_ops = {
+	.mso_pread  = &printnode_v_pread,
+	.mso_preadv = &printnode_v_preadv,
+	.mso_stat   = &printnode_v_stat,
+	.mso_ioctl  = &memleaks_v_ioctl,
+	.mso_hop    = &printnode_v_hop,
+};
+PRIVATE struct printnode_ops const memleaks_ops = {
+	.pno_reg = {{
+		.no_file = {
+			.mo_destroy    = &memleaks_v_destroy,
+			.mo_loadblocks = &printnode_v_loadblocks,
+			.mo_changed    = &printnode_v_changed,
+			.mo_stream     = &memleaks_v_stream_ops,
+		},
+		.no_wrattr = &printnode_v_wrattr,
+	}},
+	.pno_print = &memleaks_v_print,
+};
+
+/* Allocate a new memleaks file. */
+PRIVATE WUNUSED REF struct memleaks *KCALL
+memleaks_createfile(void) {
+	REF struct memleaks *result;
+	result = (struct memleaks *)kmalloc(sizeof(struct memleaks), GFP_NORMAL);
+	TRY {
+		/* Collect memory leaks. */
+		result->ml_leaks = kmalloc_leaks_collect();
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+
+	/* Fill in other fields. */
+	_mfile_init_common(result);
+	result->mf_ops   = &memleaks_ops.pno_reg.rno_node.no_file;
+	result->mf_parts = NULL;
+	SLIST_INIT(&result->mf_changed);
+	result->mf_part_amask = PAGEMASK;
+	result->mf_blockshift = PAGESHIFT;
+	result->mf_iobashift  = PAGESHIFT;
+	result->mf_flags      = MFILE_F_NORMAL;
+	atomic64_init(&result->mf_filesize, (uint64_t)-1);
+	result->mf_atime   = realtime();
+	result->mf_mtime   = result->mf_atime;
+	result->mf_ctime   = result->mf_atime;
+	result->fn_nlink   = 1;
+	result->fn_mode    = S_IFREG | 0400;
+	result->fn_uid     = 0;
+	result->fn_gid     = 0;
+	result->fn_ino     = (ino_t)skew_kernel_pointer(result);
+	result->fn_super   = incref(&procfs_super);
+	LIST_ENTRY_UNBOUND_INIT(&result->fn_changed);
+	DBG_memset(&result->fn_supent, 0xcc, sizeof(result->fn_supent));
+	result->fn_supent.rb_rhs = FSUPER_NODES_DELETED;
+	LIST_ENTRY_UNBOUND_INIT(&result->fn_allnodes);
+	result->ml_relmode = KMALLOC_LEAKS_RELEASE_RESTORE;
+	return result;
+}
+
+PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
+procfs_r_kos_leaks_v_open(struct mfile *__restrict self,
+                          struct handle *__restrict hand,
+                          struct path *access_path,
+                          struct fdirent *access_dent) {
+	REF struct memleaks *file;
+	REF struct filehandle *fh;
+
+	/* Only the sysadmin is allowed to access memory leaks. */
+	require(CAP_SYS_ADMIN);
+
+	/* Create the leaks file. */
+	file = memleaks_createfile();
+	FINALLY_DECREF_UNLIKELY(file);
+
+	/* Construct the filehandle wrapper object. */
+	fh = filehandle_new(file, access_path, access_dent);
+
+	/* Write-back the file-handle wrapper. */
+	hand->h_type = HANDLE_TYPE_FILEHANDLE;
+	hand->h_data = fh;   /* Inherit reference */
+	decref_nokill(self); /* Old reference from `hand->h_data' */
+}
+
+PRIVATE struct mfile_stream_ops const procfs_r_kos_leaks_v_stream_ops = {
+	.mso_open = &procfs_r_kos_leaks_v_open,
+};
+
+INTERN_CONST struct fregnode_ops const procfs_r_kos_leaks_ops = {
+	.rno_node = {
+		.no_file = {
+			.mo_destroy = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1,
+			.mo_changed = &fnode_v_changed,
+			.mo_stream  = &procfs_r_kos_leaks_v_stream_ops,
+		},
+		.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1,
+		.no_wrattr = &fnode_v_wrattr_noop,
+	},
+};
+#endif /* CONFIG_TRACE_MALLOC */
 
 
 DECL_END

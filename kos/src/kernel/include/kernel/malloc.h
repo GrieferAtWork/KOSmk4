@@ -475,9 +475,6 @@ NOTHROW(KCALL kmalloc_leaks_count)(kmalloc_leaks_t leaks);
 FUNDEF NOBLOCK void
 NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
                                      unsigned int how);
-#define KMALLOC_LEAKS_RELEASE_RESTORE 0 /* Restore leaks; future calls to `kmalloc_leaks_collect()' will re-yield them. */
-#define KMALLOC_LEAKS_RELEASE_DISCARD 1 /* Discard leaks but don't release leaked memory. */
-#define KMALLOC_LEAKS_RELEASE_FREE    2 /* Discard leaks and free leaked memory. (Only possible for `kmalloc()'; not possible for `heap_alloc()') */
 
 /* Helpers for working with abstract memory leak descriptors. */
 
@@ -490,8 +487,8 @@ NOTHROW(FCALL memleak_next)(kmalloc_leaks_t leaks, memleak_t prev);
 /* Get a  named  attribute  of `self',  or  `NULL'  if  the
  * attribute isn't available or unknown, or `self == NULL'.
  * @param: attr: One of `MEMLEAK_ATTR_*' */
-FUNDEF NOBLOCK ATTR_PURE void *
-NOTHROW(FCALL memleak_getattr)(memleak_t self, uintptr_t attr);
+FUNDEF NOBLOCK ATTR_PURE void *FCALL
+memleak_getattr(memleak_t self, uintptr_t attr);
 
 DECL_END
 #endif /* __CC__ */
@@ -514,6 +511,11 @@ DECL_END
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss")
 #endif /* !CONFIG_TRACE_MALLOC */
+
+/* Memory leak release modes. (for use with `kmalloc_leaks_release()') */
+#define KMALLOC_LEAKS_RELEASE_RESTORE 0 /* Restore leaks; future calls to `kmalloc_leaks_collect()' will re-yield them. */
+#define KMALLOC_LEAKS_RELEASE_DISCARD 1 /* Discard leaks but don't release leaked memory. */
+#define KMALLOC_LEAKS_RELEASE_FREE    2 /* Discard leaks and free leaked memory. (Only possible for `kmalloc()'; not possible for `heap_alloc()') */
 
 /* Memory leak attributes. (For use with `memleak_getattr()') */
 #define MEMLEAK_ATTR_MINADDR   1             /* The lowest memory address part of the leak */

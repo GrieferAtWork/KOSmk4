@@ -962,16 +962,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    provided buffer to the operator.
 	 */
 
-	/* TODO: KOS's kernel memory leak detection should be exposed  via
-	 *       a procfs file /proc/kos/leaks. That way, if it turns  out
-	 *       that there _are_ memory leaks, then it's possible to dump
-	 *       information about them to disk, making it easier to later
-	 *       debug them.
-	 * However,  for this to work effectively, kmalloc_leaks_discard()
-	 * must not actually get rid of memory leak trace nodes the way it
-	 * does  right now, which prevents any single leak from being seen
-	 * more than once. */
-
 	return state;
 }
 

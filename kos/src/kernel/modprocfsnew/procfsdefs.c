@@ -37,6 +37,7 @@ gcc_opt.remove("-fno-rtti");
 #include <kernel/fs/node.h>
 #include <kernel/fs/printnode.h>
 #include <kernel/fs/super.h>
+#include <kernel/malloc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/uname.h>
 
@@ -53,6 +54,39 @@ gcc_opt.remove("-fno-rtti");
 /************************************************************************/
 
 DECL_BEGIN
+
+#ifdef CONFIG_TRACE_MALLOC
+INTDEF struct fregnode_ops const procfs_r_kos_leaks_ops;
+INTERN struct fregnode procfs_r_kos_leaks = {{
+	.fn_file = {
+		MFILE_INIT_mf_refcnt(2), /* +1: symbol_name, +1: <my dirent> */
+		MFILE_INIT_mf_ops(&procfs_r_kos_leaks_ops.rno_node.no_file),
+		MFILE_INIT_mf_lock,
+		MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+		MFILE_INIT_mf_initdone,
+		MFILE_INIT_mf_lockops,
+		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+		MFILE_INIT_mf_flags(MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+		                    MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+		                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO),
+		MFILE_INIT_mf_trunclock,
+		MFILE_INIT_mf_filesize(0),
+		MFILE_INIT_mf_atime(0, 0),
+		MFILE_INIT_mf_mtime(0, 0),
+		MFILE_INIT_mf_ctime(0, 0),
+	},
+	FNODE_INIT_fn_nlink(1),
+	FNODE_INIT_fn_mode(S_IFREG | 0400),
+	FNODE_INIT_fn_uid(0), /* root */
+	FNODE_INIT_fn_gid(0), /* root */
+	FNODE_INIT_fn_ino(0),
+	FNODE_INIT_fn_super(&procfs_super),
+	FNODE_INIT_fn_changed,
+	.fn_supent = { NULL, FSUPER_NODES_DELETED },
+	FNODE_INIT_fn_allnodes,
+}};
+#endif /* CONFIG_TRACE_MALLOC */
 
 /* Create forward declarations. */
 #define ROOTENT(name, type, nodeptr, hash) \

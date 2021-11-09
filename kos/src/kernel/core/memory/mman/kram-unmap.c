@@ -1615,6 +1615,12 @@ continue_with_next:
 		op = SLIST_FIRST(&post);
 		SLIST_REMOVE_HEAD(&post, oplo_link);
 		(*op->oplo_func)(op, self);
+
+		/* To ease debugging, keep `op' visible during unwinding,
+		 * even  when  `op->oplo_func'   is  a  faulty   pointer. */
+#ifndef NDEBUG
+		__asm__ __volatile__("" : : "X" (op));
+#endif /* !NDEBUG */
 	}
 }
 
