@@ -205,7 +205,7 @@ struct flatdirnode_xops {
 	                        __BOOL at_end_of_dir)
 			THROWS(E_IOERROR, ...);
 
-	/* [1..1]
+	/* [0..1][if(fdnx_writedir != NULL, [1..1])]
 	 * - Create  a new file & directory entry (but _DONT_ try to add the entry to `self')
 	 * - This function is only supposed to allocate a new file-node as will be needed for
 	 *   representing the file specified by `info'  in memory. NOTE: This function  isn't

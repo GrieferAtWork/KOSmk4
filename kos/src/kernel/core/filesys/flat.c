@@ -925,11 +925,11 @@ handle_existing:
 		/* Initialize missing fields as per the specs. */
 		node->mf_flags |= MFILE_FN_GLOBAL_REF;
 		node->mf_flags |= me->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
-		node->mf_refcnt     = 2; /* +1: MFILE_FN_GLOBAL_REF, +1: info->mkf_rnode */
-		node->mf_lock       = ATOMIC_RWLOCK_INIT;
-		node->mf_initdone   = SIG_INIT;
-		node->mf_lockops    = SLIST_HEAD_INITIALIZER(~);
-		node->mf_changed    = SLIST_HEAD_INITIALIZER(~);
+		node->mf_refcnt = 2; /* +1: MFILE_FN_GLOBAL_REF, +1: info->mkf_rnode */
+		atomic_rwlock_init(&node->mf_lock);
+		sig_init(&node->mf_initdone);
+		SLIST_INIT(&node->mf_lockops);
+		SLIST_INIT(&node->mf_changed);
 		node->mf_part_amask = me->mf_part_amask;
 		node->mf_blockshift = me->mf_blockshift;
 		node->mf_iobashift  = me->mf_iobashift;
@@ -942,7 +942,7 @@ handle_existing:
 		node->fn_uid        = info->mkf_creat.c_owner;
 		node->fn_gid        = info->mkf_creat.c_group;
 		node->fn_super      = incref(me->fn_super);
-		node->fn_changed    = LIST_ENTRY_UNBOUND_INITIALIZER;
+		LIST_ENTRY_UNBOUND_INIT(&node->fn_changed);
 		DBG_memset(&node->fn_supent, 0xcc, sizeof(node->fn_supent)); /* Initialized later */
 		node->fn_supent.rb_rhs = FSUPER_NODES_DELETED;               /* Loaded later... */
 		LIST_ENTRY_UNBOUND_INIT(&node->fn_allnodes);
@@ -975,6 +975,8 @@ handle_existing:
 
 					/* Destroy partially constructed objects. */
 					destroy_partially_initialized_flatdirent(ent);
+					if (ATOMIC_FETCHAND(node->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
+						decref_nokill(node);
 					decref_likely(node);
 
 					/* Deal with `existing' */
@@ -1005,7 +1007,12 @@ handle_existing:
 			}
 			TRY {
 				/* Write directory entries for new node+ent */
-				flatdirnode_addentry_to_stream(me, ent, node);
+				TRY {
+					flatdirnode_addentry_to_stream(me, ent, node);
+				} EXCEPT {
+					decref_nokill(ent);
+					RETHROW();
+				}
 
 				/* Ensure that `fdnx_deleteent' is available in case we end up needing it. */
 				assertf(ops->fdno_flat.fdnx_deleteent != NULL,
@@ -1077,6 +1084,8 @@ handle_existing:
 		/* Release lock */
 		flatdirnode_endwrite(me);
 	} EXCEPT {
+		if (ATOMIC_FETCHAND(node->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
+			decref_nokill(node);
 		decref_likely(node);
 		RETHROW();
 	}
