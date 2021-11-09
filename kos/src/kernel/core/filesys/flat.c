@@ -1153,7 +1153,9 @@ again_locked:
 		--file->fn_nlink;
 		deleted = file->fn_nlink == 0;
 		mfile_tslock_release(file);
-		if (deleted) {
+		if (!deleted) {
+			mfile_changed(file, MFILE_F_ATTRCHANGED);
+		} else {
 			/* Last link went away -> must delete the file. */
 			fnode_delete(file);
 
@@ -1523,7 +1525,9 @@ again:
 			--info->frn_repfile->fn_nlink;
 			deleted = info->frn_repfile->fn_nlink == 0;
 			mfile_tslock_release(info->frn_repfile);
-			if (deleted) {
+			if (!deleted) {
+				mfile_changed(info->frn_repfile, MFILE_F_ATTRCHANGED);
+			} else {
 				struct flatdirnode_ops const *ops;
 				/* Last link went away -> must delete the file. */
 				fnode_delete(info->frn_repfile);
