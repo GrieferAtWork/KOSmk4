@@ -353,6 +353,8 @@ Fat_GetFileCluster(struct fnode *__restrict self,
 						                                            GFP_NORMAL);
 						if likely(new_vector)
 							dat->fn_clusterv = new_vector;
+						if (!(mode & FAT_GETCLUSTER_MODE_WRLOCK))
+							FatNodeData_Downgrade(dat);
 						return result;
 					}
 					if (nth_cluster < dat->fn_clusterc) {
