@@ -2547,9 +2547,9 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 /************************************************************************/
 /* The FAT get/set implementation for different table sizes.            */
 /************************************************************************/
-PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex
-NOTHROW(FCALL Fat12_GetFatIndirection)(FatSuperblock const *__restrict self,
-                                       FatClusterIndex index) {
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex FCALL
+Fat12_GetFatIndirection(FatSuperblock const *__restrict self,
+                        FatClusterIndex index) {
 	u16 val;
 	assertf(index < self->ft_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
@@ -2563,28 +2563,28 @@ NOTHROW(FCALL Fat12_GetFatIndirection)(FatSuperblock const *__restrict self,
 	return val;
 }
 
-PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex
-NOTHROW(FCALL Fat16_GetFatIndirection)(FatSuperblock const *__restrict self,
-                                       FatClusterIndex index) {
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex FCALL
+Fat16_GetFatIndirection(FatSuperblock const *__restrict self,
+                        FatClusterIndex index) {
 	assertf(index < self->ft_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->ft_fat_length);
 	return ((u16 const *)self->ft_fat_table)[index];
 }
 
-PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex
-NOTHROW(FCALL Fat32_GetFatIndirection)(FatSuperblock const *__restrict self,
-                                       FatClusterIndex index) {
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex FCALL
+Fat32_GetFatIndirection(FatSuperblock const *__restrict self,
+                        FatClusterIndex index) {
 	assertf(index < self->ft_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->ft_fat_length);
 	return ((u32 const *)self->ft_fat_table)[index];
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL Fat12_SetFatIndirection)(FatSuperblock *__restrict self,
-                                       FatClusterIndex index,
-                                       FatClusterIndex indirection_target) {
+PRIVATE NOBLOCK NONNULL((1)) void FCALL
+Fat12_SetFatIndirection(FatSuperblock *__restrict self,
+                        FatClusterIndex index,
+                        FatClusterIndex indirection_target) {
 	u16 *pval;
 	assertf(index < self->ft_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
@@ -2597,20 +2597,20 @@ NOTHROW(FCALL Fat12_SetFatIndirection)(FatSuperblock *__restrict self,
 	}
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL Fat16_SetFatIndirection)(FatSuperblock *__restrict self,
-                                       FatClusterIndex index,
-                                       FatClusterIndex indirection_target) {
+PRIVATE NOBLOCK NONNULL((1)) void FCALL
+Fat16_SetFatIndirection(FatSuperblock *__restrict self,
+                        FatClusterIndex index,
+                        FatClusterIndex indirection_target) {
 	assertf(index < self->ft_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->ft_fat_length);
 	((u16 *)self->ft_fat_table)[index] = (u16)indirection_target;
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL Fat32_SetFatIndirection)(FatSuperblock *__restrict self,
-                                       FatClusterIndex index,
-                                       FatClusterIndex indirection_target) {
+PRIVATE NOBLOCK NONNULL((1)) void FCALL
+Fat32_SetFatIndirection(FatSuperblock *__restrict self,
+                        FatClusterIndex index,
+                        FatClusterIndex indirection_target) {
 	assertf(index < self->ft_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->ft_fat_length);
