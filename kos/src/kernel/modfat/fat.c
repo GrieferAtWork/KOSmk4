@@ -1295,6 +1295,11 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 		ent->fad_dos.f_clusterhi = HTOLE16((u16)(first_cluster >> 16));
 	}
 
+	/* Fill in the file size attribute of the entry. */
+	ent->fad_dos.f_size = HTOLE32((u32)atomic64_read(&file->mf_filesize));
+	if (fnode_isdir(file)) /* Directories should have size=0 */
+		ent->fad_dos.f_size = HTOLE32(0);
+
 	/* Figure out if `ent' can be encoded as a DOS 8.3 filename. */
 	if unlikely(ent->fad_ent.fde_ent.fd_namelen == 0)
 		THROW(E_FSERROR_ILLEGAL_PATH);
