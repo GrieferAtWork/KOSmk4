@@ -79,11 +79,13 @@ print_unhandled_exception(pformatprinter printer, void *arg,
                           char const *reason, va_list args) {
 	unsigned int i;
 	bool is_first_pointer;
-	struct exception_info *info = error_info();
+	struct exception_info info, *tls = error_info();
 	struct regdump_printer rd_printer;
+	memcpy(&info, tls, sizeof(struct exception_info));
+	tls->ei_code = ERROR_CODEOF(E_OK);
 
 	/* Dump the exception that occurred. */
-	error_print_short_description(printer, arg, &info->ei_data,
+	error_print_short_description(printer, arg, &info.ei_data,
 	                              ERROR_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL);
 	if (reason) {
 		(*printer)(arg, "\nThrown when: ", COMPILER_STRLEN("\nThrown when: "));
@@ -93,15 +95,15 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	rd_printer.rdp_printer     = printer;
 	rd_printer.rdp_printer_arg = arg;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
-	regdump_gpregs(&rd_printer, &info->ei_state.kcs_gpregs);
-	regdump_ip(&rd_printer, kcpustate_getpip(&info->ei_state),
-	           instrlen_isa_from_kcpustate(&info->ei_state));
-	regdump_flags(&rd_printer, kcpustate_getpflags(&info->ei_state));
+	regdump_gpregs(&rd_printer, &info.ei_state.kcs_gpregs);
+	regdump_ip(&rd_printer, kcpustate_getpip(&info.ei_state),
+	           instrlen_isa_from_kcpustate(&info.ei_state));
+	regdump_flags(&rd_printer, kcpustate_getpflags(&info.ei_state));
 	(*printer)(arg, "\n", 1);
 	is_first_pointer = true;
 	/* Print exception pointers. */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
-		if (info->ei_data.e_args.e_pointers[i] == 0)
+		if (info.ei_data.e_args.e_pointers[i] == 0)
 			continue;
 		if (is_first_pointer) {
 			(*printer)(arg, "Exception pointers:\n", COMPILER_STRLEN("Exception pointers:\n"));
@@ -110,23 +112,24 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 		format_printf(printer, arg,
 		              "    [%u] = %p (%" PRIuPTR ")\n",
 		              i,
-		              info->ei_data.e_args.e_pointers[i],
-		              info->ei_data.e_args.e_pointers[i]);
+		              info.ei_data.e_args.e_pointers[i],
+		              info.ei_data.e_args.e_pointers[i]);
 	}
 	addr2line_printf(tb_printer, tb_arg,
-	                 instruction_trypred(kcpustate_getpc(&info->ei_state),
-	                                     instrlen_isa_from_kcpustate(&info->ei_state)),
-	                 kcpustate_getpc(&info->ei_state), "Thrown here");
+	                 instruction_trypred(kcpustate_getpc(&info.ei_state),
+	                                     instrlen_isa_from_kcpustate(&info.ei_state)),
+	                 kcpustate_getpc(&info.ei_state), "Thrown here");
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
-		if (!info->ei_trace[i])
+		if (!info.ei_trace[i])
 			break;
 		addr2line_printf(tb_printer, tb_arg,
-		                 instruction_trypred(info->ei_trace[i],
-		                                     instrlen_isa_from_kcpustate(&info->ei_state)),
-		                 info->ei_trace[i], "Called here");
+		                 instruction_trypred(info.ei_trace[i],
+		                                     instrlen_isa_from_kcpustate(&info.ei_state)),
+		                 info.ei_trace[i], "Called here");
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	memcpy(tls, &info, sizeof(struct exception_info));
 }
 
 
