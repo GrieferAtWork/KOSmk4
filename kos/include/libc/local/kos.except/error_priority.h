@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6683e89b */
+/* HASH CRC-32:0x8e11b39d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,11 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_priority))(__error_code_t __code) {
 		return 4 + (__code_class - ERRORCLASS_RTL_MIN);
 	if (ERRORCLASS_ISHIGHPRIORITY(__code_class))
 		return 3;
-	if (!ERRORCLASS_ISLOWPRIORITY(__code_class))
-		return 2;
-	if (__code_class != ERROR_CLASS(ERROR_CODEOF(E_OK)))
+	if (__code_class != ERROR_CLASS(ERROR_CODEOF(E_OK))) {
+		if (!ERRORCLASS_ISLOWPRIORITY(__code_class))
+			return 2;
 		return 1;
+	}
 	return 0;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7c68c1a */
+/* HASH CRC-32:0xf86fd8a7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1103,10 +1103,11 @@ NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {
 		return 4 + (code_class - ERRORCLASS_RTL_MIN);
 	if (ERRORCLASS_ISHIGHPRIORITY(code_class))
 		return 3;
-	if (!ERRORCLASS_ISLOWPRIORITY(code_class))
-		return 2;
-	if (code_class != ERROR_CLASS(ERROR_CODEOF(E_OK)))
+	if (code_class != ERROR_CLASS(ERROR_CODEOF(E_OK))) {
+		if (!ERRORCLASS_ISLOWPRIORITY(code_class))
+			return 2;
 		return 1;
+	}
 	return 0;
 }
 #include <bits/crt/inttypes.h>

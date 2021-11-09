@@ -1349,10 +1349,11 @@ unsigned int error_priority(error_code_t code) {
 		return 4 + (code_class - @ERRORCLASS_RTL_MIN@);
 	if (@ERRORCLASS_ISHIGHPRIORITY@(code_class))
 		return 3;
-	if (!@ERRORCLASS_ISLOWPRIORITY@(code_class))
-		return 2;
-	if (code_class != @ERROR_CLASS@(@ERROR_CODEOF@(@E_OK@)))
+	if (code_class != @ERROR_CLASS@(@ERROR_CODEOF@(@E_OK@))) {
+		if (!@ERRORCLASS_ISLOWPRIORITY@(code_class))
+			return 2;
 		return 1;
+	}
 	return 0;
 }
 
