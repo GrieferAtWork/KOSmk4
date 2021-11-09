@@ -918,6 +918,33 @@ int main_cc(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_fg(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	printf("Before fork: %d\n", getpid());
+	printf("	tcgetpgrp(0) = %d\n", tcgetpgrp(0));
+	pid_t cpid = fork();
+	if (cpid == 0) {
+		printf("In child #1: %d (getpgid(0) = %d, tcgetpgrp(0) = %d)\n",
+			getpid(), getpgid(0), tcgetpgrp(0));
+		setpgid(0, getpid());
+		printf("In child #2: %d (getpgid(0) = %d, tcgetpgrp(0) = %d)\n",
+			getpid(), getpgid(0), tcgetpgrp(0));
+		_Exit(1);
+	}
+	printf("In parent: %d (cpid: %d, tcgetpgrp(0) = %d)\n",
+		getpid(), cpid, tcgetpgrp(0));
+	int st;
+	while (waitpid(cpid, &st, 0) != cpid)
+		;
+	printf("Child exited: %#x (tcgetpgrp(0) = %d)\n",
+		st, tcgetpgrp(0));
+	return 0;
+}
+/************************************************************************/
+
+
+
+/************************************************************************/
 int main_charmap(int argc, char *argv[], char *envp[]) {
 	char const *cpvga[] = { /* s.a. /src/libvgastate/vgastate.c */
 		"\uFFFD\u263A\u263B\u2665\u2666\u2663\u2660\u2022\u25D8\u25CB\u25D9\u2642\u2640\u266A\u266B\u263C",
@@ -1045,6 +1072,7 @@ PRIVATE DEF defs[] = {
 	{ "cc", &main_cc },
 	{ "charmap", &main_charmap },
 	{ "dumpdebug", &main_dumpdebug },
+	{ "fg", &main_fg },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

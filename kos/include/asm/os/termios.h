@@ -229,19 +229,12 @@
 #define __PRIVATE_OPT_ECHOK   0
 #endif /* !__ECHOK */
 #endif /* !__PRIVATE_OPT_ECHOK */
-#ifndef __PRIVATE_OPT_TOSTOP
-#ifdef __TOSTOP
-#define __PRIVATE_OPT_TOSTOP  __TOSTOP
-#else /* __TOSTOP */
-#define __PRIVATE_OPT_TOSTOP  0
-#endif /* !__TOSTOP */
-#endif /* !__PRIVATE_OPT_TOSTOP */
 #define __TTYDEF_LFLAG                                                           \
 	(__PRIVATE_OPT_ECHO | __PRIVATE_OPT_ICANON | __PRIVATE_OPT_ISIG |            \
 	 __PRIVATE_OPT_IEXTEN | __PRIVATE_OPT_ECHOE | __PRIVATE_OPT_ECHOKE |         \
 	 __PRIVATE_OPT_ECHOCTL | /* These last two, linux doesn't enable by default, \
 	                          * but I see no reason why one shouldn't! */        \
-	 __PRIVATE_OPT_ECHOK | __PRIVATE_OPT_TOSTOP)
+	 __PRIVATE_OPT_ECHOK)
 #endif /* !__TTYDEF_LFLAG */
 
 #ifndef __TTYDEF_CFLAG
