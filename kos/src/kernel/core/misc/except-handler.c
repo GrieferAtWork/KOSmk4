@@ -415,6 +415,9 @@ again:
 		task_exit((int)error->ei_data.e_args.e_exit_thread.et_exit_code);
 
 	case ERROR_CODEOF(_E_STOP_PROCESS):
+		/* TODO: If/when we implement this properly, `userexcept_unwind()' must be
+		 *       able  to return some  special value to  indicate that the current
+		 *       system call/interrupt should be restarted. */
 		return process_waitfor_SIG_CONT(state, error->ei_data.e_args.e_pointers[0]);
 
 	case ERROR_CODEOF(_E_CORE_PROCESS):

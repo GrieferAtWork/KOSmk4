@@ -269,10 +269,10 @@ NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr);
  * copy-on-write signal handler  tables, while still  keeping association  of
  * handlers in check when it comes to shared handler tables, as usually found
  * within the same process. */
-FUNDEF struct sighand *KCALL
+FUNDEF WUNUSED NONNULL((1)) struct sighand *KCALL
 sighand_ptr_lockread(struct sighand_ptr *__restrict ptr)
 		THROWS(E_WOULDBLOCK);
-FUNDEF ATTR_RETNONNULL struct sighand *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED struct sighand *KCALL
 sighand_ptr_lockwrite(void) THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Return the default action to perform when faced with `signo' configured as `SIG_DFL'

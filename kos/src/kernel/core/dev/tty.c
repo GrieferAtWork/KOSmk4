@@ -154,6 +154,23 @@ do_try_override_fproc:
 			       taskpid_getrootpid(my_leader_pid));
 			chrdev_getname_lock_release(term);
 
+			/* When `SIGTTOU' is ignored, allow the write */
+			if (THIS_SIGHAND_PTR) {
+				struct sighand *hand;
+				hand = sighand_ptr_lockread(THIS_SIGHAND_PTR);
+				if likely(hand) {
+					USER CHECKED user_sighandler_func_t fun;
+					fun = hand->sh_actions[SIGTTOU - 1].sa_handler;
+					sync_endread(hand);
+					if (fun == SIG_IGN || fun == SIG_CONT)
+						return;
+				}
+			}
+
+			/* When `SIGTTOU' is masked, allow the write */
+			if (sigmask_ismasked(SIGTTOU))
+				return;
+
 			/* ...  Attempts by a process in a background process group to write to its controlling
 			 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
 			 * following special cases applies:

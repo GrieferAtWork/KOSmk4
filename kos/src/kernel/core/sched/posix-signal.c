@@ -931,7 +931,7 @@ NOTHROW(KCALL sighand_ptr_destroy)(struct sighand_ptr *__restrict self) {
  * copy-on-write signal handler  tables, while still  keeping association  of
  * handlers in check when it comes to shared handler tables, as usually found
  * within the same process. */
-PUBLIC struct sighand *KCALL
+PUBLIC WUNUSED NONNULL((1)) struct sighand *KCALL
 sighand_ptr_lockread(struct sighand_ptr *__restrict ptr)
 		THROWS(E_WOULDBLOCK) {
 	struct sighand *result;
@@ -950,7 +950,7 @@ again:
 	return result;
 }
 
-PUBLIC ATTR_RETNONNULL struct sighand *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED struct sighand *KCALL
 sighand_ptr_lockwrite(void) THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct sighand *result;
 	struct sighand_ptr *ptr;
