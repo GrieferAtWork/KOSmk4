@@ -201,6 +201,7 @@ NOTHROW(FCALL libc_error_badusage_no_nesting)(error_register_state_t const *stat
 	args.aa_line   = 0;
 	args.aa_func   = NULL;
 	args.aa_format = "Recursive `TRY' isn't nested; use `NESTED_TRY' instead";
+	args.aa_expr   = "TRY";
 	libc_assertion_failure_core(&args);
 }
 
