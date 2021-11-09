@@ -67,7 +67,7 @@ struct leaktb {
 	                           * [out] Required buffer size (in # of elements) */
 	union {
 		__uint64_t *lt_elemp; /* [0..lt_count] Traceback address buffer. */
-		__uint64_t  _lt_elem; /* Force zero-padding. */
+		__uint64_t _lt_elem;  /* Force zero-padding. */
 	};
 };
 
@@ -77,8 +77,8 @@ struct leakmem {
 	__uint64_t      lm_size;   /* [in]  # of bytes to read
 	                            * [out] # of bytes read (less than `lm_size' if trying to read past leak bounds) */
 	union {
-		__byte_t   *lm_buf;    /* [0..lt_count] Traceback address buffer. */
-		__uint64_t  _lm_buf;   /* Force zero-padding. */
+		__byte_t   *lm_buf;    /* [0..lm_size] Destination buffer. */
+		__uint64_t _lm_buf;    /* Force zero-padding. */
 	};
 };
 
