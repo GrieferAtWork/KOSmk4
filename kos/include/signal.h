@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d9df962 */
+/* HASH CRC-32:0xec0d188a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1878,14 +1878,16 @@ __CDECLARE_VOID(,__NOTHROW,chkuserprocmask,(void),())
 #ifdef __CRT_HAVE_sigsuspend
 /* >> sigsuspend(2)
  * Atomically save and  set the caller's  signal mask to  `set', then wait  for
- * one of the contained signals to arrive before restoring the old signal mask.
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),(__set))
 #elif defined(__CRT_HAVE___sigsuspend)
 /* >> sigsuspend(2)
  * Atomically save and  set the caller's  signal mask to  `set', then wait  for
- * one of the contained signals to arrive before restoring the old signal mask.
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),__sigsuspend,(__set))

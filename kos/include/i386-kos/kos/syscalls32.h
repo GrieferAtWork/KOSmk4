@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0fd71d9 */
+/* HASH CRC-32:0x8af05fab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1884,6 +1884,12 @@ __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, str
 __CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
 #endif /* __CRT_HAVE_SC(rt_sigreturn) */
 #if __CRT_HAVE_SC(rt_sigsuspend)
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 __CDECLARE_SC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigsuspend) */
 #if __CRT_HAVE_SC(rt_sigtimedwait)
@@ -2336,6 +2342,12 @@ __CDECLARE_SC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __sigset_s
 __CDECLARE_VOID_SC(,sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
 #endif /* __CRT_HAVE_SC(sigreturn) */
 #if __CRT_HAVE_SC(sigsuspend)
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 __CDECLARE_SC(,__errno_t,sigsuspend,(struct __sigset_struct const *__set),(__set))
 #endif /* __CRT_HAVE_SC(sigsuspend) */
 #if __CRT_HAVE_SC(socket)
@@ -4408,6 +4420,12 @@ __CDECLARE_XSC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigs
 __CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, struct __siginfox32_struct const *__uinfo),(__pid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_sigqueueinfo) */
 #if __CRT_HAVE_XSC(rt_sigsuspend)
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 __CDECLARE_XSC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigsuspend) */
 #if __CRT_HAVE_XSC(rt_sigtimedwait)
@@ -4851,6 +4869,12 @@ __CDECLARE_XSC(,__errno_t,sigpending,(struct __sigset_struct *__set),(__set))
 __CDECLARE_XSC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),(__how,__set,__oset))
 #endif /* __CRT_HAVE_XSC(sigprocmask) */
 #if __CRT_HAVE_XSC(sigsuspend)
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 __CDECLARE_XSC(,__errno_t,sigsuspend,(struct __sigset_struct const *__set),(__set))
 #endif /* __CRT_HAVE_XSC(sigsuspend) */
 #if __CRT_HAVE_XSC(socket)

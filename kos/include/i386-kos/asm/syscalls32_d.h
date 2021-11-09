@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb678920 */
+/* HASH CRC-32:0xf2b14006 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,6 +167,12 @@
  * @return: 0 : Success
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
 #define __NR32_setregid                     0x47                   /* errno_t setregid(uint16_t rgid, uint16_t egid) */
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 #define __NR32_sigsuspend                   0x48                   /* errno_t sigsuspend(struct __sigset_struct const *set) */
 #define __NR32_sigpending                   0x49                   /* errno_t sigpending(struct __sigset_struct *set) */
 #define __NR32_sethostname                  0x4a                   /* errno_t sethostname(char const *name, size_t len) */
@@ -386,6 +392,12 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 #define __NR32_rt_sigqueueinfo              0xb2                   /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 #define __NR32_rt_sigsuspend                0xb3                   /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define __NR32_pread64                      0xb4                   /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define __NR32_pwrite64                     0xb5                   /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */

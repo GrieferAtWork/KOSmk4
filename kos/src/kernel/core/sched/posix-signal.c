@@ -2604,20 +2604,20 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_sigsuspend_impl(struct icpustate *__restrict state,
                     struct rpc_syscall_info *__restrict sc_info,
                     size_t sigsetsize) {
-	sigset_t these;
-	USER UNCHECKED sigset_t const *uthese;
+	sigset_t not_these;
+	USER UNCHECKED sigset_t const *unot_these;
 	if unlikely(sigsetsize != sizeof(sigset_t)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
 	}
-	uthese = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[0];
-	validate_readable(uthese, sizeof(sigset_t));
-	memcpy(&these, uthese, sizeof(sigset_t));
+	unot_these = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[0];
+	validate_readable(unot_these, sizeof(sigset_t));
+	memcpy(&not_these, unot_these, sizeof(sigset_t));
 
-	/* These signals cannot be masked.  */
-	sigdelset(&these, SIGSTOP);
-	sigdelset(&these, SIGKILL);
+	/* These signals cannot be masked. (iow: _always_ wait for these signals) */
+	sigdelset(&not_these, SIGSTOP);
+	sigdelset(&not_these, SIGKILL);
 
 	/* Indicate that we want to receive wake-ups for masked signals. */
 	ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
@@ -2637,14 +2637,14 @@ again:
 		 * is `pause(2)`, which can simply be implemented like this: */
 		for (;;) {
 			PREEMPTION_DISABLE();
-			if (task_serve_with_sigmask(&these))
+			if (task_serve_with_sigmask(&not_these))
 				continue;
 			task_sleep();
 		}
 	} EXCEPT {
 		/* This function  only returns  normally
 		 * when the syscall should be restarted. */
-		state = userexcept_handler_with_sigmask(state, sc_info, &these);
+		state = userexcept_handler_with_sigmask(state, sc_info, &not_these);
 		PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
 		goto again;
 	}
@@ -2667,9 +2667,9 @@ sys_rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) 
 }
 
 DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
-                USER UNCHECKED sigset_t const *, uthese,
+                USER UNCHECKED sigset_t const *, unot_these,
                 size_t, sigsetsize) {
-	(void)uthese;
+	(void)unot_these;
 	(void)sigsetsize;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
@@ -2692,8 +2692,8 @@ sys_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 }
 
 DEFINE_SYSCALL1(errno_t, sigsuspend,
-                USER UNCHECKED sigset_t const *, uthese) {
-	(void)uthese;
+                USER UNCHECKED sigset_t const *, unot_these) {
+	(void)unot_these;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 	task_rpc_userunwind(&sys_sigsuspend_rpc, NULL);
@@ -2715,8 +2715,8 @@ sys_compat_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cooki
 }
 
 DEFINE_COMPAT_SYSCALL1(errno_t, sigsuspend,
-                       USER UNCHECKED compat_sigset_t const *, uthese) {
-	(void)uthese;
+                       USER UNCHECKED compat_sigset_t const *, unot_these) {
+	(void)unot_these;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 	task_rpc_userunwind(&sys_compat_sigsuspend_rpc, NULL);

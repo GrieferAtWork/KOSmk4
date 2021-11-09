@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4358fa53 */
+/* HASH CRC-32:0x8358b947 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -471,6 +471,12 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 #define SYS_rt_sigqueueinfo          __NR_rt_sigqueueinfo          /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 #define SYS_rt_sigsuspend            __NR_rt_sigsuspend            /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define SYS_sigaltstack              __NR_sigaltstack              /* errno_t sigaltstack(struct __sigaltstackx64 const *ss, struct __sigaltstackx64 *oss) */
 /* @param: times: When NULL, set the current time */

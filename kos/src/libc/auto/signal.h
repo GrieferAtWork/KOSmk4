@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99690c09 */
+/* HASH CRC-32:0x413b9c3b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,7 +214,8 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigs
 INTDEF ATTR_RETNONNULL NONNULL((1)) sigset_t *NOTHROW_NCX(LIBDCALL libd_setsigmaskptr)(sigset_t *sigmaskptr);
 /* >> sigsuspend(2)
  * Atomically save and  set the caller's  signal mask to  `set', then wait  for
- * one of the contained signals to arrive before restoring the old signal mask.
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *set);

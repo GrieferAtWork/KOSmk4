@@ -1686,9 +1686,15 @@ sigpending:(struct __sigset_struct *set) -> errno_t;
 rt_sigpending:([tostr(out:STRUCT_SIGSET:sigsetsize)] struct __sigset_struct *set,
                size_t sigsetsize) -> errno_t;
 
+@@>> sigsuspend(2), rt_sigsuspend(2)
+@@Atomically save and  set the caller's  signal mask to  `set', then wait  for
+@@one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+@@the old signal mask.
+@@@param: set: The set of signals on which to wait
+@@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [cp][restart(dont)]
 sigsuspend:([tostr(STRUCT_SIGSET)] struct __sigset_struct const *set) -> errno_t;
-[cp][restart(dont)]
+[cp][restart(dont)][doc_alias(sigsuspend)]
 rt_sigsuspend:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set,
                size_t sigsetsize) -> errno_t;
 

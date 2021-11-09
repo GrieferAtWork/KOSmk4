@@ -1709,7 +1709,8 @@ void chkuserprocmask(void);
 
 @@>> sigsuspend(2)
 @@Atomically save and  set the caller's  signal mask to  `set', then wait  for
-@@one of the contained signals to arrive before restoring the old signal mask.
+@@one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+@@the old signal mask.
 @@@param: set: The set of signals on which to wait
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, export_alias("__sigsuspend")]]

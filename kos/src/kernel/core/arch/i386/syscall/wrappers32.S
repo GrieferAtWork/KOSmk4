@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fc45738 */
+/* HASH CRC-32:0x25d0ade1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2729,6 +2729,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid)
 	.cfi_endproc
 END(__x86_asm32_int80_setregid)
 
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 /* errno_t sigsuspend(struct __sigset_struct const *set) */
 .section .text.x86.asm32_syscall_int80.sigsuspend
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigsuspend)
@@ -6821,6 +6827,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigqueueinfo)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigqueueinfo)
 
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigsuspend
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigsuspend)
@@ -22301,6 +22313,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setregid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setregid)
 
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 /* errno_t sigsuspend(struct __sigset_struct const *set) */
 .section .text.x86.asm32_syscall_sysenter.sigsuspend
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigsuspend)
@@ -26407,6 +26425,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigqueueinfo)
 	.cfi_endproc
 END(__x86_asm32_sysenter_rt_sigqueueinfo)
 
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysenter.rt_sigsuspend
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigsuspend)

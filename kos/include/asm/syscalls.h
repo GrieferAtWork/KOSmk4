@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c064b1b */
+/* HASH CRC-32:0x2629b6a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -295,6 +295,12 @@
 #define __NR_tkill                  0x82  /* errno_t tkill(pid_t tid, signo_t signo) */
 #define __NR_tgkill                 0x83  /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 #define __NR_sigaltstack            0x84  /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 #define __NR_rt_sigsuspend          0x85  /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define __NR_rt_sigaction           0x86  /* errno_t rt_sigaction(signo_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */

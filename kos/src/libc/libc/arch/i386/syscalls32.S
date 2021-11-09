@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xead4e93f */
+/* HASH CRC-32:0xd41f60d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -783,6 +783,12 @@ INTERN_FUNCTION(libc_sys_setregid)
 END(libc_sys_setregid)
 DEFINE_PUBLIC_ALIAS(sys_setregid, libc_sys_setregid)
 
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 /* errno_t sigsuspend(struct __sigset_struct const *set) */
 INTERN_FUNCTION(libc_sys_sigsuspend)
 	movl   $(0x48), %eax
@@ -1644,6 +1650,12 @@ INTERN_FUNCTION(libc_sys_rt_sigqueueinfo)
 END(libc_sys_rt_sigqueueinfo)
 DEFINE_PUBLIC_ALIAS(sys_rt_sigqueueinfo, libc_sys_rt_sigqueueinfo)
 
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 INTERN_FUNCTION(libc_sys_rt_sigsuspend)
 	movl   $(0xb3), %eax
@@ -5288,6 +5300,12 @@ INTERN_FUNCTION(libc_sys_Xsetregid)
 END(libc_sys_Xsetregid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetregid, libc_sys_Xsetregid)
 
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 /* errno_t sigsuspend(struct __sigset_struct const *set) */
 INTERN_FUNCTION(libc_sys_Xsigsuspend)
 	movl   $(0x48), %eax
@@ -6123,6 +6141,12 @@ INTERN_FUNCTION(libc_sys_Xrt_sigqueueinfo)
 END(libc_sys_Xrt_sigqueueinfo)
 DEFINE_PUBLIC_ALIAS(sys_Xrt_sigqueueinfo, libc_sys_Xrt_sigqueueinfo)
 
+/* >> sigsuspend(2), rt_sigsuspend(2)
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 INTERN_FUNCTION(libc_sys_Xrt_sigsuspend)
 	movl   $(0xb3), %eax

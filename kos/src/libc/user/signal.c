@@ -703,10 +703,11 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 /*[[[end:libc_chkuserprocmask]]]*/
 
 
-/*[[[head:libc_sigsuspend,hash:CRC-32=0x7d1515b8]]]*/
+/*[[[head:libc_sigsuspend,hash:CRC-32=0x6f350e2c]]]*/
 /* >> sigsuspend(2)
  * Atomically save and  set the caller's  signal mask to  `set', then wait  for
- * one of the contained signals to arrive before restoring the old signal mask.
+ * one of the unmasked (iow: `!sigismember')-signals to arrive before restoring
+ * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
