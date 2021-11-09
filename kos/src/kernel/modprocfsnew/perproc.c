@@ -624,6 +624,53 @@ INTERN_CONST struct fdirnode_ops const procfs_perproc_root_ops = {
 
 
 
+/* Define the per-task root directory. */
+PRIVATE REF struct fdirent *const procfs_pertask_root_files[] = {
+#define ROOTENT(name, type, perm, fnode_ops_ptr, hash) \
+	procfs_perproc_dirent_asent(&PP_CAT2(perproc_root_dirent_, __LINE__)),
+#define DEFINE_PERTASK_ROOT_DIRECTORY
+#include "perproc.def"
+#undef DEFINE_PERTASK_ROOT_DIRECTORY
+};
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+procfs_pertask_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
+                             struct flookup_info *__restrict info) {
+	return procfs_perproc_lookup_impl(procfs_pertask_root_files,
+	                                  COMPILER_LENOF(procfs_pertask_root_files),
+	                                  info);
+}
+
+#define procfs_pertask_root_v_enumsz procfs_perproc_root_v_enumsz
+PRIVATE NONNULL((1)) void KCALL
+procfs_pertask_root_v_enum(struct fdirenum *__restrict result) {
+	procfs_perproc_enum_impl(procfs_pertask_root_files,
+	                         COMPILER_LENOF(procfs_pertask_root_files),
+	                         result);
+}
+
+
+
+/* Operators for `/proc/[pid]/task/[tid]'
+ * NOTE: For this directory, `fn_fsdata' is a `REF struct taskpid *' [1..1] */
+INTERN_CONST struct fdirnode_ops const procfs_pertask_root_ops = {
+	.dno_node = {
+		.no_file = {
+			.mo_destroy = &procfs_perproc_dir_v_destroy,
+			.mo_changed = &procfs_perproc_dir_v_changed,
+			.mo_stream  = &procfs_perproc_root_v_stream_ops,
+		},
+		.no_free   = &procfs_perproc_dir_v_free,
+		.no_wrattr = &procfs_perproc_dir_v_wrattr,
+		.no_perm   = &procfs_perproc_dir_v_perm_ops,
+	},
+	.dno_lookup = &procfs_pertask_root_v_lookup,
+	.dno_enumsz = procfs_pertask_root_v_enumsz,
+	.dno_enum   = &procfs_pertask_root_v_enum,
+};
+
+
+
 
 
 
@@ -665,6 +712,36 @@ INTERN_CONST struct fdirent_ops const procfs_perproc_root_dirent_ops = {
 	.fdo_opennode = &procfs_perproc_root_dirent_v_opennode,
 	.fdo_getino   = &procfs_perproc_root_dirent_v_getino,
 };
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+procfs_pertask_root_dirent_v_opennode(struct fdirent *__restrict self,
+                                      struct fdirnode *__restrict UNUSED(dir)) {
+	struct procfs_perproc_root_dirent *me = fdirent_asperprocroot(self);
+	REF struct fnode *result;
+	result = (REF struct fnode *)memcpy(kmalloc(sizeof(struct fnode), GFP_NORMAL),
+	                                    &procfs_perproc_nomap_template, sizeof(struct fnode));
+
+	/* Fill in fields. */
+	result->fn_file.mf_ops = &procfs_pertask_root_ops.dno_node.no_file;
+	result->fn_fsdata      = incref(me->pprd_pid);
+	result->fn_ino         = procfs_perproc_ino(me->pprd_pid, &procfs_pertask_root_ops);
+	return result;
+}
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) ino_t
+NOTHROW(FCALL procfs_pertask_root_dirent_v_getino)(struct fdirent *__restrict self,
+                                                   struct fdirnode *__restrict UNUSED(dir)) {
+	struct procfs_perproc_root_dirent *me = fdirent_asperprocroot(self);
+	return procfs_perproc_ino(me->pprd_pid, &procfs_pertask_root_ops);
+}
+
+/* Operators for `procfs_pertask_root_dirent' (under /proc/[pid]/task/[tid]) */
+INTERN_CONST struct fdirent_ops const procfs_pertask_root_dirent_ops = {
+	.fdo_destroy  = &procfs_perproc_root_dirent_v_destroy,
+	.fdo_opennode = &procfs_pertask_root_dirent_v_opennode,
+	.fdo_getino   = &procfs_pertask_root_dirent_v_getino,
+};
+
 
 DECL_END
 

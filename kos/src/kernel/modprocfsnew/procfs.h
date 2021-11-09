@@ -112,10 +112,12 @@ struct procfs_perproc_root_dirent {
 
 /* Operators for `procfs_perproc_root_dirent' */
 INTDEF struct fdirent_ops const procfs_perproc_root_dirent_ops;
+INTDEF struct fdirent_ops const procfs_pertask_root_dirent_ops; /* /proc/[pid]/task/[tid] */
 
 /* Operators for `/proc/[pid]/'
  * NOTE: For this directory, `fn_fsdata' is a `REF struct taskpid *' [1..1] */
 INTDEF struct fdirnode_ops const procfs_perproc_root_ops;
+INTDEF struct fdirnode_ops const procfs_pertask_root_ops; /* /proc/[pid]/task/[tid] */
 
 /* Permissions operators for per-process files. */
 INTDEF struct fnode_perm_ops const procfs_perproc_v_perm_ops;

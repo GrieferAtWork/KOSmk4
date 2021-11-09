@@ -2534,25 +2534,263 @@ procfs_perproc_task_v_lookup(struct fdirnode *__restrict self,
 	/* NOTE: The directory entry created here is very similar to procfs_perproc_root_dirent_ops,
 	 *       except that instead of moving on to open the normal `procfs_perproc_root_files', it
 	 *       opens a custom version that doesn't include the "task" sub-folder. */
-	struct taskpid *pid = self->fn_fsdata;
+	struct taskpid *master_pid = self->fn_fsdata;
+	char ch;
 
-	/* TODO */
-	(void)pid;
-	(void)info;
-	COMPILER_IMPURE();
+	/* Evaluate running process PIDs */
+	if unlikely(info->flu_namelen == 0)
+		goto notapid;
+	ch = ATOMIC_READ(info->flu_name[0]);
+	if (ch >= '1' && ch <= '9') {
+		REF struct taskpid *pid;
+		upid_t pidno = (upid_t)(ch - '0');
+		size_t i;
+		for (i = 1; i < info->flu_namelen; ++i) {
+			ch = ATOMIC_READ(info->flu_name[i]);
+			if unlikely(!(ch >= '0' && ch <= '9'))
+				goto notapid;
+			pidno *= 10;
+			pidno += (upid_t)(ch - '0');
+		}
+		pid = pidns_trylookup(THIS_PIDNS, pidno);
+		if likely(pid) {
+			REF struct procfs_perproc_root_dirent *result;
+			if (pid != master_pid) {
+				/* Check that this is actually a child thraed of `master_pid' */
+				REF struct task *thread;
+				bool ischild;
+				thread  = taskpid_gettask(pid);
+				ischild = task_getprocess_of(thread) == taskpid_gettaskptr(master_pid);
+				decref_unlikely(thread);
+				if (!ischild)
+					return NULL;
+			}
 
+			/* Allocate the directory entry. */
+			result = (REF struct procfs_perproc_root_dirent *)kmalloc(offsetof(struct procfs_perproc_root_dirent,
+			                                                                   pprd_ent.fd_name) +
+			                                                          (info->flu_namelen + 1) * sizeof(char),
+			                                                          GFP_NORMAL);
+
+			/* Fill in the directory entry. */
+			result->pprd_pid            = pid; /* Inherit reference */
+			result->pprd_ent.fd_namelen = (u16)sprintf(result->pprd_ent.fd_name, "%" PRIuN(__SIZEOF_PID_T__), pidno);
+			assert(result->pprd_ent.fd_namelen == info->flu_namelen);
+			if (info->flu_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->flu_name))
+				info->flu_hash = fdirent_hash(result->pprd_ent.fd_name, result->pprd_ent.fd_namelen);
+			result->pprd_ent.fd_hash   = info->flu_hash;
+			result->pprd_ent.fd_refcnt = 1; /* +1: return */
+			result->pprd_ent.fd_ops    = &procfs_pertask_root_dirent_ops;
+//			result->pprd_ent.fd_ino    = procfs_perproc_ino(pid, &procfs_pertask_root_ops); /* Not needed; we've got `fdo_getino()' */
+			DBG_memset(&result->pprd_ent.fd_ino, 0xcc, sizeof(result->pprd_ent.fd_ino));
+			result->pprd_ent.fd_type   = DT_DIR;
+			return &result->pprd_ent;
+		}
+	}
+notapid:
 	return NULL;
 }
 
-#define procfs_perproc_task_v_enumsz sizeof(struct fdirenum)
+struct procfs_task_direnum: fdirenum {
+	upid_t          ptd_index; /* [lock(ATOMIC)] Lowest pid of next thread to enumerate. */
+	struct taskpid *ptd_pid;   /* [const][== de_dir->fn_fsdata] PID of the process leader. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_task_direnum_v_fini)(struct fdirenum *__restrict UNUSED(self)) {
+	/* No-op */
+	COMPILER_IMPURE();
+}
+
+PRIVATE WUNUSED NONNULL((1)) REF struct taskpid *KCALL
+find_first_thread_greater_or_equal(struct task *__restrict master,
+                                   upid_t pid, size_t myind) {
+	struct taskpid *iter;
+	REF struct taskpid *result;
+	upid_t result_pid;
+	struct taskgroup *group;
+	assert(task_isprocessleader_p(master));
+	result     = NULL;
+	result_pid = (upid_t)-1;
+	group      = &FORTASK(master, this_taskgroup);
+	atomic_rwlock_read(&group->tg_proc_threads_lock);
+	LIST_FOREACH (iter, &group->tg_proc_threads, tp_siblings) {
+		upid_t iter_pid;
+		if unlikely(iter->tp_pidns->pn_indirection < myind)
+			continue; /* Cannot be represented */
+		iter_pid = iter->tp_pids[myind];
+		if (!(pid >= iter_pid))
+			continue;
+		if (result_pid < iter_pid)
+			continue; /* Current `result' is better. */
+		if (!tryincref(iter))
+			continue; /* Dead... */
+		xdecref_unlikely(result);
+		result     = iter;
+		result_pid = iter_pid;
+	}
+	atomic_rwlock_endread(&group->tg_proc_threads_lock);
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) upid_t KCALL
+get_greatest_child_pid_plus_one(struct task *__restrict master) {
+	struct taskpid *iter;
+	upid_t result;
+	size_t myind;
+	struct taskgroup *group;
+	assert(task_isprocessleader_p(master));
+	myind  = THIS_PIDNS->pn_indirection;
+	result = 0;
+	group  = &FORTASK(master, this_taskgroup);
+	atomic_rwlock_read(&group->tg_proc_threads_lock);
+	LIST_FOREACH (iter, &group->tg_proc_threads, tp_siblings) {
+		upid_t iter_pid;
+		if unlikely(iter->tp_pidns->pn_indirection < myind)
+			continue; /* Cannot be represented */
+		iter_pid = iter->tp_pids[myind];
+		if (result < iter_pid)
+			result = iter_pid;
+	}
+	atomic_rwlock_endread(&group->tg_proc_threads_lock);
+	return result;
+}
+
+
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                              size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	REF struct task *master;
+	REF struct taskpid *pid;
+	upid_t pid_id;
+	u16 namelen;
+#if __SIZEOF_PID_T__ == 4
+	char namebuf[sizeof("4294967295")];
+#elif __SIZEOF_PID_T__ == 8
+	char namebuf[sizeof("18446744073709551615")];
+#else /* __SIZEOF_PID_T__ == ... */
+#error "Unsupported sizeof(pid_t)"
+#endif /* __SIZEOF_PID_T__ != ... */
+	size_t myind = THIS_PIDNS->pn_indirection;
+	upid_t index, newindex;
+	ssize_t result;
+	struct procfs_task_direnum *me;
+	me     = (struct procfs_task_direnum *)self;
+	master = taskpid_gettask(me->ptd_pid);
+	if unlikely(!master)
+		return 0; /* End-of-directory */
+	FINALLY_DECREF_UNLIKELY(master);
+
+again:
+	/* Read current index. */
+	index = ATOMIC_READ(me->ptd_index);
+
+	/* Lookup next taskpid entry. */
+	if (index == 0) {
+		/* Special behavior for PID=0: The original process itself (but as a thread) */
+		pid = me->ptd_pid;
+		if likely(pid->tp_pidns->pn_indirection >= myind) {
+			incref(pid);
+			pid_id   = pid->tp_pids[myind];
+			newindex = 1; /* Start enumeration threads the next time around */
+			goto gotpid;
+		}
+	}
+	pid = find_first_thread_greater_or_equal(master, index, myind);
+	if (!pid)
+		return 0; /* End-of-directory */
+	pid_id   = pid->tp_pids[myind];
+	newindex = pid_id + 1; /* Next time around, yield a process with a greater PID */
+	{
+gotpid:
+		FINALLY_DECREF_UNLIKELY(pid);
+		namelen = (u16)sprintf(namebuf, "%" PRIuN(__SIZEOF_PID_T__), pid_id);
+
+		/* Feed directory entry. */
+		result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+		                             procfs_perproc_ino(pid, &procfs_pertask_root_ops),
+		                             DT_DIR, namelen, namebuf);
+	}
+	if (result < 0)
+		return (size_t)~result; /* Don't advance directory position. */
+
+	/* Advance directory position. */
+	if (!ATOMIC_CMPXCH(me->ptd_index, index, newindex))
+		goto again;
+	return (size_t)result;
+}
+
+PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
+procfs_task_direnum_v_seekdir(struct fdirenum *__restrict self,
+                              off_t offset, unsigned int whence)
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...) {
+	uintptr_t newpos;
+	struct procfs_task_direnum *me = (struct procfs_task_direnum *)self;
+	switch (whence) {
+	case SEEK_SET:
+#if __SIZEOF_POS_T__ > __SIZEOF_PID_T__
+		if unlikely((pos_t)offset > (pos_t)(upid_t)-1)
+			THROW(E_OVERFLOW);
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_PID_T__ */
+		newpos = (upid_t)(pos_t)offset;
+		ATOMIC_WRITE(me->ptd_index, newpos);
+		break;
+
+	case SEEK_CUR: {
+		uintptr_t oldpos;
+		do {
+			oldpos = ATOMIC_READ(me->ptd_index);
+			newpos = oldpos + (intptr_t)offset;
+			if unlikely(offset < 0 ? newpos > oldpos
+			                       : newpos < oldpos)
+				THROW(E_OVERFLOW);
+		} while (!ATOMIC_CMPXCH_WEAK(me->ptd_index, oldpos, newpos));
+	}	break;
+
+	case SEEK_END: {
+		upid_t dirsiz = 0;
+		REF struct task *master;
+		/* The end of the directory is relative to the largest in-use PID */
+		master = taskpid_gettask(me->ptd_pid);
+		if (master) {
+			FINALLY_DECREF_UNLIKELY(master);
+			dirsiz = get_greatest_child_pid_plus_one(master);
+		}
+		newpos = dirsiz + (pid_t)offset;
+		if unlikely(offset < 0 ? newpos > dirsiz
+		                       : newpos < dirsiz)
+			THROW(E_OVERFLOW);
+		ATOMIC_WRITE(me->ptd_index, newpos);
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+	}
+	return (pos_t)newpos;
+}
+
+
+PRIVATE struct fdirenum_ops const procfs_task_direnum_ops = {
+	.deo_fini    = &procfs_task_direnum_v_fini,
+	.deo_readdir = &procfs_task_direnum_v_readdir,
+	.deo_seekdir = &procfs_task_direnum_v_seekdir,
+};
+
+#define procfs_perproc_task_v_enumsz sizeof(struct procfs_task_direnum)
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_task_v_enum(struct fdirenum *__restrict result) {
-	struct taskpid *pid = result->de_dir->fn_fsdata;
+	struct procfs_task_direnum *rt;
+	struct taskpid *pid;
+	rt  = (struct procfs_task_direnum *)result;
+	pid = rt->de_dir->fn_fsdata;
 
-	/* TODO */
-	(void)pid;
-	COMPILER_IMPURE();
-	result->de_ops = &fdirenum_empty_ops;
+	/* Fill in fields. */
+	rt->de_ops    = &procfs_task_direnum_ops;
+	rt->ptd_index = 0;
+	rt->ptd_pid   = pid;
 }
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_task = {

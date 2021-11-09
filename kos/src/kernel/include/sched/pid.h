@@ -86,8 +86,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
  * If that task has already terminated and has already been destroyed, return `NULL' instead. */
 #ifdef __INTELLISENSE__
 NOBLOCK WUNUSED REF struct task *NOTHROW(taskpid_gettask)(struct taskpid *__restrict self);
+NOBLOCK WUNUSED struct task *NOTHROW(taskpid_gettaskptr)(struct taskpid *__restrict self);
 #else /* __INTELLISENSE__ */
-#define taskpid_gettask(self) awref_get(&(self)->tp_thread)
+#define taskpid_gettask(self)    awref_get(&(self)->tp_thread)
+#define taskpid_gettaskptr(self) awref_ptr(&(self)->tp_thread)
 #endif /* !__INTELLISENSE__ */
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */

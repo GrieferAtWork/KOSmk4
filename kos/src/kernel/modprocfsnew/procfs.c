@@ -324,6 +324,19 @@ procfs_root_find_static_file(struct flookup_info *__restrict info) {
 	return NULL;
 }
 
+/* Check if a given taskpid is a process leader. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL taskpid_isprocess)(struct taskpid *__restrict self) {
+	bool result;
+	REF struct task *thread;
+	thread = taskpid_gettask(self);
+	if unlikely(!thread)
+		return true;
+	result = task_isprocessleader_p(thread);
+	decref_unlikely(thread);
+	return result;
+}
+
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
                      struct flookup_info *__restrict info) {
@@ -361,6 +374,8 @@ procfs_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 			result->pprd_ent.fd_hash   = info->flu_hash;
 			result->pprd_ent.fd_refcnt = 1; /* +1: return */
 			result->pprd_ent.fd_ops    = &procfs_perproc_root_dirent_ops;
+			if unlikely(!taskpid_isprocess(pid)) /* Threads have an alternate directory layout (no "task" sub-directory). */
+				result->pprd_ent.fd_ops = &procfs_pertask_root_dirent_ops;
 //			result->pprd_ent.fd_ino    = procfs_perproc_ino(pid, &procfs_perproc_root_ops); /* Not needed; we've got `fdo_getino()' */
 			DBG_memset(&result->pprd_ent.fd_ino, 0xcc, sizeof(result->pprd_ent.fd_ino));
 			result->pprd_ent.fd_type   = DT_DIR;
@@ -538,7 +553,7 @@ procfs_root_direnum_ops_v_seekdir(struct fdirenum *__restrict self,
 	switch (whence) {
 	case SEEK_SET:
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-		if unlikely((pos_t)offset >= SIZE_MAX)
+		if unlikely((pos_t)offset > (pos_t)(size_t)-1)
 			THROW(E_OVERFLOW);
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 		newpos = (uintptr_t)(pos_t)offset;
