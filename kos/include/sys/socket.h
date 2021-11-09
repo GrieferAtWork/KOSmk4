@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51ccb2bf */
+/* HASH CRC-32:0x40b18966 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1170,7 +1170,7 @@ __CDECLARE_OPT(,__fd_t,__NOTHROW_RPC,accept,(__fd_t __sockfd, __SOCKADDR_ARG __a
  * @return: -1: [errno=ENOTCONN] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __how),(__sockfd,__how))
 
-#ifdef __USE_GNU
+#if defined(__USE_GNU) || defined(__USE_BSD)
 /* >> accept4(2)
  * Accept incoming client (aka. peer) connection requests.
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
@@ -1187,6 +1187,9 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
 __CDECLARE_OPT(,__fd_t,__NOTHROW_RPC,accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, __STDC_INT_AS_UINT_T __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
+#endif /* __USE_GNU || __USE_BSD */
+
+#ifdef __USE_GNU
 #ifdef __CRT_HAVE_sendmmsg
 /* >> sendmmsg(2)
  * Same as `sendmsg(2)', but may be used to send many
@@ -1298,6 +1301,24 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__
  * @return: -1: error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isfdtype,(__fd_t __fd, __STDC_INT_AS_UINT_T __fdtype),(__fd,__fdtype))
 #endif /* __USE_MISC */
+
+#ifdef __USE_BSD
+#ifndef __getpeereid_defined
+#define __getpeereid_defined
+#ifdef __CRT_HAVE_getpeereid
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+__CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,getpeereid,(__fd_t __sockfd, uid_t *__euid, gid_t *__egid),(__sockfd,__euid,__egid))
+#elif defined(__CRT_HAVE_getsockopt) && defined(__SOL_SOCKET) && defined(__SO_PEERCRED)
+#include <libc/local/unistd/getpeereid.h>
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid))(__sockfd, __euid, __egid); })
+#else /* ... */
+#undef __getpeereid_defined
+#endif /* !... */
+#endif /* !__getpeereid_defined */
+#endif /* __USE_BSD */
 
 __SYSDECL_END
 #endif /* __CC__ */

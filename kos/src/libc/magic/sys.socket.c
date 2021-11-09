@@ -1174,7 +1174,7 @@ $fd_t accept($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
 int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 
 %
-%#ifdef __USE_GNU
+%#if defined(__USE_GNU) || defined(__USE_BSD)
 @@>> accept4(2)
 @@Accept incoming client (aka. peer) connection requests.
 @@@param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
@@ -1193,7 +1193,11 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
 $fd_t accept4($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
               socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
+%#endif /* __USE_GNU || __USE_BSD */
 
+
+%
+%#ifdef __USE_GNU
 @@>> sendmmsg(2)
 @@Same as `sendmsg(2)', but may be used to send many
 @@messages (datagrams)  with a  single system  call.
@@ -1284,6 +1288,11 @@ int sockatmark($fd_t sockfd);
 [[wunused, decl_include("<features.h>", "<bits/types.h>")]]
 int isfdtype($fd_t fd, __STDC_INT_AS_UINT_T fdtype);
 %#endif /* __USE_MISC */
+
+%
+%#ifdef __USE_BSD
+%[insert:extern(getpeereid)]
+%#endif /* __USE_BSD */
 
 %{
 

@@ -2872,7 +2872,7 @@ $mode_t getmode([[nonnull]] void const *bbox, $mode_t mode); /* TODO: Implement 
 
 @@>> getpeereid(3)
 @@Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)'
-[[requires_include("<asm/os/socket.h>")]]
+[[guard, requires_include("<asm/os/socket.h>")]]
 [[requires($has_function(getsockopt) &&
            (defined(__SOL_SOCKET) && defined(__SO_PEERCRED)))]]
 [[impl_include("<bits/os/ucred.h>", "<libc/errno.h>")]]
