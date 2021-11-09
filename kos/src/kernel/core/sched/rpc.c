@@ -362,6 +362,28 @@ PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
 	return false;
 }
 
+/* Check if there are any unmasked process RPCs that are currently pending. */
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+are_any_unmasked_process_rpcs_pending_with_sigmask(sigset_t const *__restrict sigmask)
+		THROWS(E_WOULDBLOCK) {
+	struct pending_rpc *rpc;
+	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
+	if (ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)
+		return false;
+	process_pending_rpcs_read(proc_rpcs);
+	SLIST_FOREACH (rpc, &proc_rpcs->ppr_list, pr_link) {
+		if (sigismember(sigmask, _RPC_GETSIGNO(rpc->pr_flags)))
+			continue;
+		process_pending_rpcs_endread(proc_rpcs);
+		/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
+		 *       disposition  indicates that the signal should be ignored.
+		 *       If so, consume and discard the associated RPC! */
+		return true;
+	}
+	process_pending_rpcs_endread(proc_rpcs);
+	return false;
+}
+
 /* Same as `are_any_unmasked_process_rpcs_pending()', but use *_nopf memory
  * access, and if that fails, assume that pending RPCs are always unmasked. */
 PRIVATE WUNUSED bool NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_nx)(void) {

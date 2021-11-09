@@ -253,7 +253,12 @@ handle_pending:
 
 	/* Unmasked process RPCs also require that we unwind the system call. */
 	if (!must_unwind) {
-		if (are_any_unmasked_process_rpcs_pending()) {
+#ifdef LOCAL_HAVE_SIGMASK
+		if (are_any_unmasked_process_rpcs_pending_with_sigmask(sigmask))
+#else /* LOCAL_HAVE_SIGMASK */
+		if (are_any_unmasked_process_rpcs_pending())
+#endif /* !LOCAL_HAVE_SIGMASK */
+		{
 			/* Enabling interrupts before throwing an exception is part of the ABI! */
 			PREEMPTION_ENABLE();
 			icpustate_setpreemption(ctx.rc_state, 1);
