@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefa262f2 */
+/* HASH CRC-32:0x66d2e106 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,7 +152,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execvpe))(char const *__restrict __fi
 	char *__env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $path is ignored, and the file at the  specified
+	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 #ifdef _WIN32
@@ -162,7 +162,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execvpe))(char const *__restrict __fi
 	if ((__NAMESPACE_LOCAL_SYM __localdep_strchr)(__file, '/'))
 		return (__NAMESPACE_LOCAL_SYM __localdep_execve)(__file, ___argv, ___envp);
 #endif /* !_WIN32 */
-	__env_path = (__NAMESPACE_LOCAL_SYM __localdep_getenv)("path");
+	__env_path = (__NAMESPACE_LOCAL_SYM __localdep_getenv)("PATH");
 	if (__env_path && *__env_path) {
 		__SIZE_TYPE__ __filelen;
 		__filelen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__file);

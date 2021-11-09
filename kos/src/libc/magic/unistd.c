@@ -450,7 +450,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 	char *env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $path is ignored, and the file at the  specified
+	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 @@pp_ifdef _WIN32@@
@@ -460,7 +460,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 	if (strchr(file, '/'))
 		return execve(file, ___argv, ___envp);
 @@pp_endif@@
-	env_path = getenv("path");
+	env_path = getenv("PATH");
 	if (env_path && *env_path) {
 		size_t filelen;
 		filelen = strlen(file);
