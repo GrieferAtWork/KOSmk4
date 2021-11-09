@@ -1197,16 +1197,21 @@ for (local x: [:128/(8 / BITS_PER_CHAR)]) {
 
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL FatDir_Contains83Filename)(FatDirNode const *__restrict self,
-                                         char const filename[8 + 3]) {
+                                         struct fatdirent *__restrict newent) {
 	size_t i;
 	for (i = 0; i <= self->fdn_data.fdd_filesmask; ++i) {
 		struct flatdirent *ent;
+		struct fatdirent *fatent;
 		ent = self->fdn_data.fdd_fileslist[i].ffdb_ent;
 		if (ent == NULL || ent == &flatdirnode_deleted_dirent)
 			continue; /* Unused slot */
 		assert(!flatdirent_wasdeleted(ent));
-		if (memcmp(flatdirent_asfat(ent)->fad_dos.f_nameext,
-		           filename, (8 + 3) * sizeof(char)) == 0)
+		fatent = flatdirent_asfat(ent);
+		if (fatent == newent)
+			continue; /* Don't collide with our own entry! */
+		if (memcmp(fatent->fad_dos.f_nameext,
+		           newent->fad_dos.f_nameext,
+		           (8 + 3) * sizeof(char)) == 0)
 			return true;
 	}
 	return false;
@@ -1369,6 +1374,7 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 		char *writer;
 need_lfn:
 		cookie = 0;
+
 		/* Generate the 8.3 filename used for the LFN entry. */
 		memset(ent->fad_dos.f_nameext, ' ', sizeof(ent->fad_dos.f_nameext));
 		ent->fad_dos.f_ntflags = NTFLAG_NONE;
@@ -1392,7 +1398,7 @@ retry_lfn:
 			ch = unicode_readutf8_n(&reader, rdend);
 			if (ch == '.') {
 				reader = rdend;
-			} else if (ch >= 'a' && ch <= 'Z') {
+			} else if (ch >= 'a' && ch <= 'z') {
 				ch += ('A' - 'a');
 			}
 			if (!Fat_IsAccepted83(ch))
@@ -1409,15 +1415,19 @@ retry_lfn:
 			*writer++ = _itoa_upper_digits[(retry_hex & 0x000f)];
 		}
 		assert(writer == ent->fad_dos.f_nameext + 6);
+
 		/* Following the shared name and the hex part is always a tilde '~' */
 		*writer++ = '~';
+
 		/* The last character then, is the non-hex digit (1..9) */
 		*writer++ = '1' + retry_dig;
+
 		/* Fix 0xe5 --> 0x05 */
 		if ((unsigned char)ent->fad_dos.f_nameext[0] == 0xe5)
 			ent->fad_dos.f_nameext[0] = (char)MARKER_IS0XE5;
+
 		/* If the 8.3 filename already exists, then try to generate another one. */
-		if unlikely(FatDir_Contains83Filename(dir, ent->fad_dos.f_nameext)) {
+		if unlikely(FatDir_Contains83Filename(dir, ent)) {
 			if unlikely(cookie >= (0xffff * 9))
 				THROW(E_FSERROR_FILE_ALREADY_EXISTS);
 			++cookie;

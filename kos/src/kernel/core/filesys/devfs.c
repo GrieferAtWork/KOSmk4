@@ -483,8 +483,7 @@ PRIVATE NONNULL((1, 2)) unsigned int KCALL
 devfs_dirnode_v_rename(struct fdirnode *__restrict self,
                        struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DELETED) {
+		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
 	if (!fdirent_isramfs(info->frn_oldent))
 		THROW(E_FSERROR_READONLY);
 	return ramfs_dirnode_v_rename(self, info);
