@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa833c574 */
+/* HASH CRC-32:0x8428e405 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsspn) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsspn))(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept) {
 	__WCHAR_TYPE__ const *__iter = __haystack;
-	while ((__NAMESPACE_LOCAL_SYM __localdep_wcschr)(__accept, *__iter))
+	while (*__iter && (__NAMESPACE_LOCAL_SYM __localdep_wcschr)(__accept, *__iter))
 		++__iter;
 	return (__SIZE_TYPE__)(__iter - __haystack);
 }

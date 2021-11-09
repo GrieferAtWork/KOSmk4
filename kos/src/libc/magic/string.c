@@ -818,7 +818,7 @@ size_t strcspn([[nonnull]] char const *haystack,
 size_t strspn([[nonnull]] char const *haystack,
               [[nonnull]] char const *accept) {
 	char const *iter = haystack;
-	while (strchr(accept, *iter))
+	while (*iter && strchr(accept, *iter))
 		++iter;
 	return (size_t)(iter - haystack);
 }

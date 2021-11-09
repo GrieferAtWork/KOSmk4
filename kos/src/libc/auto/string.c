@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8266455 */
+/* HASH CRC-32:0x3d37be9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -299,7 +299,7 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2))
 NOTHROW_NCX(LIBCCALL libc_strspn)(char const *haystack,
                                   char const *accept) {
 	char const *iter = haystack;
-	while (libc_strchr(accept, *iter))
+	while (*iter && libc_strchr(accept, *iter))
 		++iter;
 	return (size_t)(iter - haystack);
 }
