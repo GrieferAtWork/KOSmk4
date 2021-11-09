@@ -585,6 +585,9 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
 	perm_mask &= 07777;
 	perm_flag &= 07777;
 
+	/* These bits must be preserved at all cost (they contain file type information) */
+	perm_mask |= ~07777;
+
 #ifndef CONFIG_EVERYONE_IS_ROOT
 	if (check_permissions) {
 		struct fnode_perm_ops const *perm_ops;
