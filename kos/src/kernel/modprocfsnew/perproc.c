@@ -257,6 +257,76 @@ INTERN_CONST struct flnknode const procfs_fdlnk_template = {
 	},
 };
 
+/* Template for files from "/proc/[PID]/kos/dcwd/[id]" */
+INTDEF struct flnknode_ops const procfs_perproc_dcwdlink_ops;
+INTERN_CONST struct flnknode const procfs_perproc_dcwdlink_template = {
+	.ln_node = {
+		.fn_file = {
+			MFILE_INIT_mf_refcnt(1), /* Return value of creator */
+			MFILE_INIT_mf_ops(&procfs_perproc_dcwdlink_ops.lno_node.no_file),
+			MFILE_INIT_mf_lock,
+			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_lockops,
+			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+			MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
+			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+			                    MFILE_FN_FLEETING),
+			MFILE_INIT_mf_trunclock,
+			MFILE_INIT_mf_filesize(0),
+			MFILE_INIT_mf_atime(0, 0),
+			MFILE_INIT_mf_mtime(0, 0),
+			MFILE_INIT_mf_ctime(0, 0),
+		},
+		FNODE_INIT_fn_nlink(1),
+		FNODE_INIT_fn_mode(S_IFLNK | 0777),
+		FNODE_INIT_fn_uid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+		FNODE_INIT_fn_gid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+		FNODE_INIT_fn_ino(0),
+		FNODE_INIT_fn_super(&procfs_super),
+		FNODE_INIT_fn_changed,
+		FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+		FNODE_INIT_fn_allnodes,
+	},
+};
+
+/* Template for files from "/proc/[PID]/kos/drives/[id]" */
+INTDEF struct flnknode_ops const procfs_perproc_drivelink_ops;
+INTERN_CONST struct flnknode const procfs_perproc_drivelink_template = {
+	.ln_node = {
+		.fn_file = {
+			MFILE_INIT_mf_refcnt(1), /* Return value of creator */
+			MFILE_INIT_mf_ops(&procfs_perproc_drivelink_ops.lno_node.no_file),
+			MFILE_INIT_mf_lock,
+			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_lockops,
+			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+			MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
+			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+			                    MFILE_FN_FLEETING),
+			MFILE_INIT_mf_trunclock,
+			MFILE_INIT_mf_filesize(0),
+			MFILE_INIT_mf_atime(0, 0),
+			MFILE_INIT_mf_mtime(0, 0),
+			MFILE_INIT_mf_ctime(0, 0),
+		},
+		FNODE_INIT_fn_nlink(1),
+		FNODE_INIT_fn_mode(S_IFLNK | 0777),
+		FNODE_INIT_fn_uid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+		FNODE_INIT_fn_gid(0), /* Ignored; overwritten by `fnode_perm_ops::npo_getown' */
+		FNODE_INIT_fn_ino(0),
+		FNODE_INIT_fn_super(&procfs_super),
+		FNODE_INIT_fn_changed,
+		FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+		FNODE_INIT_fn_allnodes,
+	},
+};
+
 
 /* Template for files from "/proc/[PID]/map_files/[...]" */
 INTDEF struct flnknode_ops const perproc_mapfile_lnknode_ops;

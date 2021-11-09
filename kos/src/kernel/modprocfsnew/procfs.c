@@ -551,6 +551,7 @@ procfs_root_direnum_ops_v_seekdir(struct fdirenum *__restrict self,
 	uintptr_t newpos;
 	struct procfs_root_direnum *me = (struct procfs_root_direnum *)self;
 	switch (whence) {
+
 	case SEEK_SET:
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
 		if unlikely((pos_t)offset > (pos_t)(size_t)-1)

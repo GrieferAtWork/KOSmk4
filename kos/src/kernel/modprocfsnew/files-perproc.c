@@ -2812,30 +2812,508 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_task = {
 
 
 /************************************************************************/
-/* /proc/[pid]/kos/dcwd                                                 */
+/* /proc/[pid]/kos/dcwd + /proc/[pid]/kos/drives                        */
 /************************************************************************/
+INTDEF struct flnknode const procfs_perproc_dcwdlink_template;
+INTDEF struct flnknode const procfs_perproc_drivelink_template;
+struct procfs_perproc_drivelnk: flnknode {
+	uint8_t ppdl_driveno; /* [const] Driver number (in `[0,VFS_DRIVECOUNT)') */
+};
+
+PRIVATE WUNUSED NONNULL((1)) REF struct path *FCALL
+procfs_perproc_drivelnk_getcwd(struct procfs_perproc_drivelnk *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	REF struct path *drivepath;
+	REF struct fs *threadfs;
+	REF struct task *thread;
+	thread = taskpid_gettask(self->fn_fsdata);
+	if unlikely(!thread)
+		return NULL;
+	threadfs = task_getfs(thread);
+	decref_unlikely(thread);
+	{
+		struct vfs *threadvfs;
+		FINALLY_DECREF_UNLIKELY(threadfs);
+		fs_pathlock_read(threadfs);
+		drivepath = threadfs->fs_dcwd[self->ppdl_driveno];
+		if (drivepath) {
+			incref(drivepath);
+			fs_pathlock_endread(threadfs);
+			return drivepath;
+		}
+		fs_pathlock_endread(threadfs);
+		threadvfs = threadfs->fs_vfs;
+		vfs_driveslock_read(threadvfs);
+		drivepath = xincref(threadvfs->vf_drives[self->ppdl_driveno]);
+		vfs_driveslock_endread(threadvfs);
+	}
+	return drivepath;
+}
+
+PRIVATE WUNUSED NONNULL((1)) REF struct path *FCALL
+procfs_perproc_drivelnk_getroot(struct procfs_perproc_drivelnk *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	REF struct path *drivepath;
+	REF struct fs *threadfs;
+	REF struct task *thread;
+	thread = taskpid_gettask(self->fn_fsdata);
+	if unlikely(!thread)
+		return NULL;
+	threadfs = task_getfs(thread);
+	decref_unlikely(thread);
+	{
+		struct vfs *threadvfs = threadfs->fs_vfs;
+		FINALLY_DECREF_UNLIKELY(threadfs);
+		vfs_driveslock_read(threadvfs);
+		drivepath = xincref(threadvfs->vf_drives[self->ppdl_driveno]);
+		vfs_driveslock_endread(threadvfs);
+	}
+	return drivepath;
+}
+
+PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+procfs_perproc_dcwdlink_v_readlink(struct flnknode *__restrict self,
+                                   USER CHECKED /*utf-8*/ char *buf,
+                                   size_t bufsize)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	struct procfs_perproc_drivelnk *me;
+	REF struct path *caller_root;
+	REF struct path *drivepath;
+	me        = (struct procfs_perproc_drivelnk *)self;
+	drivepath = procfs_perproc_drivelnk_getcwd(me);
+	if unlikely(!drivepath)
+		return snprintf(buf, bufsize, "/");
+	FINALLY_DECREF_UNLIKELY(drivepath);
+	caller_root = fs_getroot(THIS_FS);
+	FINALLY_DECREF_UNLIKELY(caller_root);
+	return path_sprint_without_nul(drivepath, buf, bufsize, 0, caller_root);
+}
+
+PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+procfs_perproc_drivelink_v_readlink(struct flnknode *__restrict self,
+                                    USER CHECKED /*utf-8*/ char *buf,
+                                    size_t bufsize)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	struct procfs_perproc_drivelnk *me;
+	REF struct path *caller_root;
+	REF struct path *drivepath;
+	me        = (struct procfs_perproc_drivelnk *)self;
+	drivepath = procfs_perproc_drivelnk_getroot(me);
+	if unlikely(!drivepath)
+		return snprintf(buf, bufsize, "/");
+	FINALLY_DECREF_UNLIKELY(drivepath);
+	caller_root = fs_getroot(THIS_FS);
+	FINALLY_DECREF_UNLIKELY(caller_root);
+	return path_sprint_without_nul(drivepath, buf, bufsize, 0, caller_root);
+}
+
+#ifndef __OPTIMIZE_SIZE__
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+procfs_perproc_dcwdlink_v_walklink(struct flnknode *__restrict self,
+                                   /*in|out*/ u32 *__restrict UNUSED(premaining_symlinks))
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	struct procfs_perproc_drivelnk *me;
+	me = (struct procfs_perproc_drivelnk *)self;
+	return procfs_perproc_drivelnk_getcwd(me);
+}
+
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+procfs_perproc_drivelink_v_walklink(struct flnknode *__restrict self,
+                                    /*in|out*/ u32 *__restrict UNUSED(premaining_symlinks))
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	struct procfs_perproc_drivelnk *me;
+	me = (struct procfs_perproc_drivelnk *)self;
+	return procfs_perproc_drivelnk_getroot(me);
+}
+#endif /* !__OPTIMIZE_SIZE__ */
+
+
+INTERN_CONST struct flnknode_ops const procfs_perproc_dcwdlink_ops = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy = &procfs_perproc_lnknode_v_destroy,
+			.mo_changed = &procfs_perproc_lnknode_v_changed,
+			.mo_stream  = &procfs_perproc_lnknode_v_stream_ops,
+		},
+		.no_free   = &procfs_perproc_lnknode_v_free,
+		.no_wrattr = &procfs_perproc_lnknode_v_wrattr,
+		.no_perm   = &procfs_perproc_lnknode_v_perm_ops,
+	},
+	.lno_readlink = &procfs_perproc_dcwdlink_v_readlink,
+#ifndef __OPTIMIZE_SIZE__
+	.lno_walklink = &procfs_perproc_dcwdlink_v_walklink, /* Optimization operator! */
+#endif /* !__OPTIMIZE_SIZE__ */
+};
+
+INTERN_CONST struct flnknode_ops const procfs_perproc_drivelink_ops = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy = &procfs_perproc_lnknode_v_destroy,
+			.mo_changed = &procfs_perproc_lnknode_v_changed,
+			.mo_stream  = &procfs_perproc_lnknode_v_stream_ops,
+		},
+		.no_free   = &procfs_perproc_lnknode_v_free,
+		.no_wrattr = &procfs_perproc_lnknode_v_wrattr,
+		.no_perm   = &procfs_perproc_lnknode_v_perm_ops,
+	},
+	.lno_readlink = &procfs_perproc_drivelink_v_readlink,
+#ifndef __OPTIMIZE_SIZE__
+	.lno_walklink = &procfs_perproc_drivelink_v_walklink, /* Optimization operator! */
+#endif /* !__OPTIMIZE_SIZE__ */
+};
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+procfs_perproc_dcwd_v_opennode(struct fdirent *__restrict self,
+                               struct fdirnode *__restrict dir) {
+	REF struct procfs_perproc_drivelnk *result;
+	result = (REF struct procfs_perproc_drivelnk *)memcpy(kmalloc(sizeof(struct procfs_perproc_drivelnk), GFP_NORMAL),
+	                                                      &procfs_perproc_dcwdlink_template, sizeof(struct fnode));
+
+	/* Fill in fields. */
+	result->mf_ops       = &procfs_perproc_dcwdlink_ops.lno_node.no_file;
+	result->fn_fsdata    = incref(dir->fn_fsdata);
+	result->fn_ino       = procfs_perproc_ino((uintptr_t)result->fn_fsdata ^ (uintptr_t)self, &procfs_perproc_dcwdlink_ops);
+	result->ppdl_driveno = (uint8_t)self->fd_ino;
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+procfs_perproc_drives_v_opennode(struct fdirent *__restrict self,
+                                 struct fdirnode *__restrict dir) {
+	REF struct procfs_perproc_drivelnk *result;
+	result = (REF struct procfs_perproc_drivelnk *)memcpy(kmalloc(sizeof(struct procfs_perproc_drivelnk), GFP_NORMAL),
+	                                                      &procfs_perproc_drivelink_template, sizeof(struct fnode));
+
+	/* Fill in fields. */
+	result->mf_ops       = &procfs_perproc_drivelink_ops.lno_node.no_file;
+	result->fn_fsdata    = incref(dir->fn_fsdata);
+	result->fn_ino       = procfs_perproc_ino((uintptr_t)result->fn_fsdata ^ (uintptr_t)self, &procfs_perproc_drivelink_ops);
+	result->ppdl_driveno = (uint8_t)self->fd_ino;
+	return result;
+}
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) ino_t FCALL
+procfs_perproc_dcwd_v_getino(struct fdirent *__restrict self,
+                             struct fdirnode *__restrict dir) {
+	return procfs_perproc_ino((uintptr_t)dir->fn_fsdata ^ (uintptr_t)self,
+	                          &procfs_perproc_dcwdlink_ops);
+}
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) ino_t FCALL
+procfs_perproc_drives_v_getino(struct fdirent *__restrict self,
+                               struct fdirnode *__restrict dir) {
+	return procfs_perproc_ino((uintptr_t)dir->fn_fsdata ^ (uintptr_t)self,
+	                          &procfs_perproc_drivelink_ops);
+}
+
+PRIVATE struct fdirent_ops const procfs_perproc_dcwd_dirent_ops = {
+	.fdo_destroy  = (void(KCALL *)(struct fdirent *__restrict))(void *)(uintptr_t)-1,
+	.fdo_opennode = &procfs_perproc_dcwd_v_opennode,
+	.fdo_getino   = &procfs_perproc_dcwd_v_getino,
+};
+
+PRIVATE struct fdirent_ops const procfs_perproc_drives_dirent_ops = {
+	.fdo_destroy  = (void(KCALL *)(struct fdirent *__restrict))(void *)(uintptr_t)-1,
+	.fdo_opennode = &procfs_perproc_drives_v_opennode,
+	.fdo_getino   = &procfs_perproc_drives_v_getino,
+};
+
+#define DEFINE_DRIVE_DIRENT(name, letter, hash)                    \
+	PRIVATE struct fdirent procfs_perproc_dirent_dcwd_##name = {   \
+		.fd_refcnt  = 1,                                           \
+		.fd_ops     = &procfs_perproc_dcwd_dirent_ops,             \
+		.fd_ino     = (ino_t)(letter - 'A'),                       \
+		.fd_hash    = hash,                                        \
+		.fd_namelen = 1,                                           \
+		.fd_type    = DT_LNK,                                      \
+		/* .fd_name = */ { letter, 0 }                             \
+	};                                                             \
+	PRIVATE struct fdirent procfs_perproc_dirent_drives_##name = { \
+		.fd_refcnt  = 1,                                           \
+		.fd_ops     = &procfs_perproc_drives_dirent_ops,           \
+		.fd_ino     = (ino_t)(letter - 'A'),                       \
+		.fd_hash    = hash,                                        \
+		.fd_namelen = 1,                                           \
+		.fd_type    = DT_LNK,                                      \
+		/* .fd_name = */ { letter, 0 }                             \
+	}
+/*[[[deemon
+#undef print
+import * from deemon;
+import * from ....misc.libgen.fdirent_hash;
+for (local x: [:26]) {
+	local letter = string.chr("A".ord() + x);
+	print("DEFINE_DRIVE_DIRENT(", letter, ", '", letter, "', ",
+		fdirent_hash(letter), ");");
+}
+print("PRIVATE struct fdirent *const procfs_perproc_dirent_dcwd[VFS_DRIVECOUNT] = {");
+for (local x: [:26].segments(3)) {
+	print("	", ", ".join(for (local y: x)
+		"&procfs_perproc_dirent_dcwd_" + string.chr("A".ord() + y)), ",");
+}
+print("};");
+print("PRIVATE struct fdirent *const procfs_perproc_dirent_drives[VFS_DRIVECOUNT] = {");
+for (local x: [:26].segments(3)) {
+	print("	", ", ".join(for (local y: x)
+		"&procfs_perproc_dirent_drives_" + string.chr("A".ord() + y)), ",");
+}
+print("};");
+]]]*/
+DEFINE_DRIVE_DIRENT(A, 'A', 0x41);
+DEFINE_DRIVE_DIRENT(B, 'B', 0x42);
+DEFINE_DRIVE_DIRENT(C, 'C', 0x43);
+DEFINE_DRIVE_DIRENT(D, 'D', 0x44);
+DEFINE_DRIVE_DIRENT(E, 'E', 0x45);
+DEFINE_DRIVE_DIRENT(F, 'F', 0x46);
+DEFINE_DRIVE_DIRENT(G, 'G', 0x47);
+DEFINE_DRIVE_DIRENT(H, 'H', 0x48);
+DEFINE_DRIVE_DIRENT(I, 'I', 0x49);
+DEFINE_DRIVE_DIRENT(J, 'J', 0x4a);
+DEFINE_DRIVE_DIRENT(K, 'K', 0x4b);
+DEFINE_DRIVE_DIRENT(L, 'L', 0x4c);
+DEFINE_DRIVE_DIRENT(M, 'M', 0x4d);
+DEFINE_DRIVE_DIRENT(N, 'N', 0x4e);
+DEFINE_DRIVE_DIRENT(O, 'O', 0x4f);
+DEFINE_DRIVE_DIRENT(P, 'P', 0x50);
+DEFINE_DRIVE_DIRENT(Q, 'Q', 0x51);
+DEFINE_DRIVE_DIRENT(R, 'R', 0x52);
+DEFINE_DRIVE_DIRENT(S, 'S', 0x53);
+DEFINE_DRIVE_DIRENT(T, 'T', 0x54);
+DEFINE_DRIVE_DIRENT(U, 'U', 0x55);
+DEFINE_DRIVE_DIRENT(V, 'V', 0x56);
+DEFINE_DRIVE_DIRENT(W, 'W', 0x57);
+DEFINE_DRIVE_DIRENT(X, 'X', 0x58);
+DEFINE_DRIVE_DIRENT(Y, 'Y', 0x59);
+DEFINE_DRIVE_DIRENT(Z, 'Z', 0x5a);
+PRIVATE struct fdirent *const procfs_perproc_dirent_dcwd[VFS_DRIVECOUNT] = {
+	&procfs_perproc_dirent_dcwd_A, &procfs_perproc_dirent_dcwd_B, &procfs_perproc_dirent_dcwd_C,
+	&procfs_perproc_dirent_dcwd_D, &procfs_perproc_dirent_dcwd_E, &procfs_perproc_dirent_dcwd_F,
+	&procfs_perproc_dirent_dcwd_G, &procfs_perproc_dirent_dcwd_H, &procfs_perproc_dirent_dcwd_I,
+	&procfs_perproc_dirent_dcwd_J, &procfs_perproc_dirent_dcwd_K, &procfs_perproc_dirent_dcwd_L,
+	&procfs_perproc_dirent_dcwd_M, &procfs_perproc_dirent_dcwd_N, &procfs_perproc_dirent_dcwd_O,
+	&procfs_perproc_dirent_dcwd_P, &procfs_perproc_dirent_dcwd_Q, &procfs_perproc_dirent_dcwd_R,
+	&procfs_perproc_dirent_dcwd_S, &procfs_perproc_dirent_dcwd_T, &procfs_perproc_dirent_dcwd_U,
+	&procfs_perproc_dirent_dcwd_V, &procfs_perproc_dirent_dcwd_W, &procfs_perproc_dirent_dcwd_X,
+	&procfs_perproc_dirent_dcwd_Y, &procfs_perproc_dirent_dcwd_Z,
+};
+PRIVATE struct fdirent *const procfs_perproc_dirent_drives[VFS_DRIVECOUNT] = {
+	&procfs_perproc_dirent_drives_A, &procfs_perproc_dirent_drives_B, &procfs_perproc_dirent_drives_C,
+	&procfs_perproc_dirent_drives_D, &procfs_perproc_dirent_drives_E, &procfs_perproc_dirent_drives_F,
+	&procfs_perproc_dirent_drives_G, &procfs_perproc_dirent_drives_H, &procfs_perproc_dirent_drives_I,
+	&procfs_perproc_dirent_drives_J, &procfs_perproc_dirent_drives_K, &procfs_perproc_dirent_drives_L,
+	&procfs_perproc_dirent_drives_M, &procfs_perproc_dirent_drives_N, &procfs_perproc_dirent_drives_O,
+	&procfs_perproc_dirent_drives_P, &procfs_perproc_dirent_drives_Q, &procfs_perproc_dirent_drives_R,
+	&procfs_perproc_dirent_drives_S, &procfs_perproc_dirent_drives_T, &procfs_perproc_dirent_drives_U,
+	&procfs_perproc_dirent_drives_V, &procfs_perproc_dirent_drives_W, &procfs_perproc_dirent_drives_X,
+	&procfs_perproc_dirent_drives_Y, &procfs_perproc_dirent_drives_Z,
+};
+/*[[[end]]]*/
+
+
+/* Returns the drive ID referenced by `info' or `0xff' if
+ * `info' isn't a drive name or the drive doesn't exist. */
+PRIVATE WUNUSED NONNULL((1)) uint8_t KCALL
+get_driveid(struct fdirnode *__restrict self,
+            struct flookup_info const *__restrict info) {
+	REF struct task *thread;
+	REF struct fs *threadfs;
+	bool exists;
+	uint8_t id;
+	if (info->flu_namelen != 1)
+		return 0xff;
+	id = (uint8_t)ATOMIC_READ(info->flu_name[0]);
+	if (id >= 'A' && id <= 'Z') {
+		id -= 'A';
+	} else if (id >= 'a' && id <= 'z' && (info->flu_flags & AT_DOSPATH)) {
+		id -= 'a';
+	} else {
+		return 0xff;
+	}
+	thread = taskpid_gettask(self->fn_fsdata);
+	if unlikely(!thread)
+		return 0xff;
+	threadfs = task_getfs(thread);
+	decref_unlikely(thread);
+	exists = ATOMIC_READ(threadfs->fs_vfs->vf_drives[id]) != NULL;
+	decref_unlikely(threadfs);
+	if unlikely(!exists)
+		return 0xff;
+	return id;
+}
+
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_perproc_kos_dcwd_v_lookup(struct fdirnode *__restrict self,
                                  struct flookup_info *__restrict info) {
-	struct taskpid *pid = self->fn_fsdata;
-
-	/* TODO */
-	(void)pid;
-	(void)info;
-	COMPILER_IMPURE();
-
-	return NULL;
+	uint8_t id = get_driveid(self, info);
+	if unlikely(id == 0xff)
+		return NULL;
+	return incref(procfs_perproc_dirent_dcwd[id]);
 }
 
-#define procfs_perproc_kos_dcwd_v_enumsz sizeof(struct fdirenum)
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+procfs_perproc_kos_drives_v_lookup(struct fdirnode *__restrict self,
+                                   struct flookup_info *__restrict info) {
+	uint8_t id = get_driveid(self, info);
+	if unlikely(id == 0xff)
+		return NULL;
+	return incref(procfs_perproc_dirent_drives[id]);
+}
+
+struct procfs_perproc_drives_enum: fdirenum {
+	REF struct vfs *ppde_vfs;     /* [1..1][const] VFS who's drives are being enumerated. */
+	uint8_t         ppde_driveno; /* [lock(ATOMIC)] Next drive id to enumerate is >= this. */
+};
+
+#define procfs_perproc_dcwd_enum_v_fini procfs_perproc_drives_enum_v_fini
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_perproc_drives_enum_v_fini)(struct fdirenum *__restrict self) {
+	struct procfs_perproc_drives_enum *me;
+	me = (struct procfs_perproc_drives_enum *)self;
+	decref_unlikely(me->ppde_vfs);
+}
+
+PRIVATE BLOCKING NONNULL((1, 5)) size_t KCALL
+procfs_perproc_drives_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                              size_t bufsize, readdir_mode_t readdir_mode,
+                              struct flnknode_ops const *__restrict ops)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	struct procfs_perproc_drives_enum *me;
+	char namebuf[2];
+	uint8_t oldindex, newindex;
+	ssize_t result;
+	me = (struct procfs_perproc_drives_enum *)self;
+again:
+	/* Read current index. */
+	oldindex = ATOMIC_READ(me->ppde_driveno);
+	newindex = oldindex;
+
+	for (;;) {
+		if (newindex >= VFS_DRIVECOUNT)
+			return 0; /* End-of-directory */
+		if (ATOMIC_READ(me->ppde_vfs->vf_drives[newindex]) != NULL)
+			break; /* This one's bound! */
+		++newindex;
+	}
+
+	/* Construct filename. */
+	namebuf[0] = 'A' + newindex;
+	namebuf[1] = '\0';
+
+	/* Feed directory entry. */
+	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+	                             procfs_perproc_ino((uintptr_t)self->de_dir->fn_fsdata ^
+	                                                (uintptr_t)self,
+	                                                ops),
+	                             DT_LNK, 1, namebuf);
+	if (result < 0)
+		return (size_t)~result; /* Don't advance directory position. */
+
+	/* Advance directory position. */
+	if (!ATOMIC_CMPXCH(me->ppde_driveno, oldindex, newindex + 1))
+		goto again;
+	return (size_t)result;
+}
+
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+procfs_perproc_dcwd_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                                   size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	return procfs_perproc_drives_readdir(self, buf, bufsize, readdir_mode, &procfs_perproc_dcwdlink_ops);
+}
+
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+procfs_perproc_drives_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                                     size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	return procfs_perproc_drives_readdir(self, buf, bufsize, readdir_mode, &procfs_perproc_drivelink_ops);
+}
+
+#define procfs_perproc_dcwd_enum_v_seekdir procfs_perproc_drives_enum_v_seekdir
+PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
+procfs_perproc_drives_enum_v_seekdir(struct fdirenum *__restrict self,
+                                     off_t offset, unsigned int whence)
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...) {
+	uint8_t newpos;
+	struct procfs_perproc_drives_enum *me = (struct procfs_perproc_drives_enum *)self;
+	switch (whence) {
+
+	case SEEK_SET:
+#if __SIZEOF_POS_T__ > __SIZEOF_PID_T__
+		if unlikely((pos_t)offset > (pos_t)(uint8_t)-1)
+			THROW(E_OVERFLOW);
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_PID_T__ */
+		newpos = (uint8_t)(pos_t)offset;
+		ATOMIC_WRITE(me->ppde_driveno, newpos);
+		break;
+
+	case SEEK_CUR: {
+		uint8_t oldpos;
+		do {
+			oldpos = ATOMIC_READ(me->ppde_driveno);
+			newpos = oldpos + (int8_t)offset;
+			if unlikely(offset < 0 ? newpos > oldpos
+			                       : newpos < oldpos)
+				THROW(E_OVERFLOW);
+		} while (!ATOMIC_CMPXCH_WEAK(me->ppde_driveno, oldpos, newpos));
+	}	break;
+
+	case SEEK_END: {
+		newpos = VFS_DRIVECOUNT + (int8_t)offset;
+		if unlikely(offset < 0 ? newpos > VFS_DRIVECOUNT
+		                       : newpos < VFS_DRIVECOUNT)
+			THROW(E_OVERFLOW);
+		ATOMIC_WRITE(me->ppde_driveno, newpos);
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+	}
+	return (pos_t)newpos;
+}
+
+PRIVATE struct fdirenum_ops const procfs_perproc_dcwd_enum_ops = {
+	.deo_fini    = &procfs_perproc_dcwd_enum_v_fini,
+	.deo_readdir = &procfs_perproc_dcwd_enum_v_readdir,
+	.deo_seekdir = &procfs_perproc_dcwd_enum_v_seekdir,
+};
+PRIVATE struct fdirenum_ops const procfs_perproc_drives_enum_ops = {
+	.deo_fini    = &procfs_perproc_drives_enum_v_fini,
+	.deo_readdir = &procfs_perproc_drives_enum_v_readdir,
+	.deo_seekdir = &procfs_perproc_drives_enum_v_seekdir,
+};
+
+PRIVATE NONNULL((1)) void KCALL
+procfs_perproc_drives_enum_init(struct fdirenum *__restrict result,
+                                struct fdirenum_ops const *__restrict ops) {
+	struct procfs_perproc_drives_enum *rt;
+	REF struct task *thread;
+	REF struct fs *threadfs;
+	rt     = (struct procfs_perproc_drives_enum *)result;
+	thread = taskpid_gettask(rt->de_dir->fn_fsdata);
+	if unlikely(!thread) {
+		rt->de_ops = &fdirenum_empty_ops;
+		return;
+	}
+	threadfs = task_getfs(thread);
+	decref_unlikely(thread);
+	rt->ppde_vfs = incref(threadfs->fs_vfs);
+	decref_unlikely(threadfs);
+	rt->ppde_driveno = 0;
+	rt->de_ops       = ops;
+}
+
+#define procfs_perproc_kos_dcwd_v_enumsz sizeof(struct procfs_perproc_drives_enum)
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_kos_dcwd_v_enum(struct fdirenum *__restrict result) {
-	struct taskpid *pid = result->de_dir->fn_fsdata;
+	procfs_perproc_drives_enum_init(result, &procfs_perproc_dcwd_enum_ops);
+}
 
-	/* TODO */
-	(void)pid;
-	COMPILER_IMPURE();
-	result->de_ops = &fdirenum_empty_ops;
+#define procfs_perproc_kos_drives_v_enumsz sizeof(struct procfs_perproc_drives_enum)
+PRIVATE NONNULL((1)) void KCALL
+procfs_perproc_kos_drives_v_enum(struct fdirenum *__restrict result) {
+	procfs_perproc_drives_enum_init(result, &procfs_perproc_drives_enum_ops);
 }
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_kos_dcwd = {
@@ -2853,35 +3331,6 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_kos_dcwd = {
 	.dno_enumsz = procfs_perproc_kos_dcwd_v_enumsz,
 	.dno_enum   = &procfs_perproc_kos_dcwd_v_enum,
 };
-
-
-
-/************************************************************************/
-/* /proc/[pid]/kos/drives                                               */
-/************************************************************************/
-PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-procfs_perproc_kos_drives_v_lookup(struct fdirnode *__restrict self,
-                                   struct flookup_info *__restrict info) {
-	struct taskpid *pid = self->fn_fsdata;
-
-	/* TODO */
-	(void)pid;
-	(void)info;
-	COMPILER_IMPURE();
-
-	return NULL;
-}
-
-#define procfs_perproc_kos_drives_v_enumsz sizeof(struct fdirenum)
-PRIVATE NONNULL((1)) void KCALL
-procfs_perproc_kos_drives_v_enum(struct fdirenum *__restrict result) {
-	struct taskpid *pid = result->de_dir->fn_fsdata;
-
-	/* TODO */
-	(void)pid;
-	COMPILER_IMPURE();
-	result->de_ops = &fdirenum_empty_ops;
-}
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_kos_drives = {
 	.dno_node = {
