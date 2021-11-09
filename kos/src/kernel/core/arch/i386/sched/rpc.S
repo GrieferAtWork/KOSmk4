@@ -269,9 +269,12 @@ __ASM_L(	.cfi_escape 45,0)
 /*[[[end]]]*/
 	.cfi_def_cfa %Psp, -SIZEOF_IRREGS_KERNEL
 #ifndef __x86_64__
-	/* Correctly unwind these */
-	.cfi_restore_iret_esp 0
-	.cfi_restore_iret_ss  0
+	/* Always unwind %esp and %ss from `irregs_user'.
+	 * If we  used `cfi_restore_iret_(esp|ss)',  then
+	 * incorrect  values  would be  unwound  after an
+	 * IRET tail redirection. */
+	.cfi_rel_offset %Psp, (OFFSET_IRREGS_PSP - SIZEOF_IRREGS_KERNEL)
+	.cfi_rel_offset %ss,  (OFFSET_IRREGS_SS - SIZEOF_IRREGS_KERNEL)
 #endif /* !__x86_64__ */
 
 	nop /* Required to allow for detection during unwinding. */
