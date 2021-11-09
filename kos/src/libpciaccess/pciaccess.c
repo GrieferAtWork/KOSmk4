@@ -510,6 +510,14 @@ NOTHROW(CC iterator_matches_device)(struct pci_device_iterator const *__restrict
 		goto nope;
 	if ((dev->pd_device_class & self->pdi_device_class_mask) != self->pdi_device_class)
 		goto nope;
+#ifndef __KERNEL__
+	if (!PCI_ID_COMPARE(self->pdi_func, dev->pd_func))
+		goto nope;
+	if (!PCI_ID_COMPARE(self->pdi_dev, dev->pd_dev))
+		goto nope;
+	if (!PCI_ID_COMPARE(self->pdi_bus, dev->pd_bus))
+		goto nope;
+#endif /* !__KERNEL__ */
 	return true;
 nope:
 	return false;
@@ -521,26 +529,42 @@ DEFINE_PUBLIC_ALIAS(pci_slot_match_iterator_init, libpci_slot_match_iterator_ini
 INTERN NONNULL((1)) void
 NOTHROW(CC libpci_slot_match_iterator_init)(struct pci_device_iterator *__restrict self,
                                             struct pci_slot_match const *match) {
+	self->pdi_next = SLIST_FIRST(&libpci_devices);
+	self->pdi_device_class      = 0;
+	self->pdi_device_class_mask = 0;
+	self->pdi_vendor_id         = PCI_MATCH_ANY;
+	self->pdi_device_id         = PCI_MATCH_ANY;
+	self->pdi_subvendor_id      = PCI_MATCH_ANY;
+	self->pdi_subdevice_id      = PCI_MATCH_ANY;
 	if (match) {
-		struct pci_device *dev;
-		pciaddr_t addr;
-		addr = match->psm_addr & ~0xff; /* Mask out the domain address. */
-		dev  = pcidev_tree_locate(libpci_devices_tree, addr);
+		self->pdi_func = match->psm_func;
+		self->pdi_dev  = match->psm_dev;
+		self->pdi_bus  = match->psm_bus;
+		if (self->pdi_func <= 7 && self->pdi_dev <= 31 && self->pdi_bus <= 0xff) {
+			struct pci_device *dev;
+			pciaddr_t addr;
+			addr = (self->pdi_func << 8) |
+			       (self->pdi_dev << 11) |
+			       (self->pdi_bus << 16);
+			dev = pcidev_tree_locate(libpci_devices_tree, addr);
+			if (dev) {
+				/* Set-up impossible device class requirements (there is no `x', such that `(x & 0) == 1') */
+				self->pdi_device_class      = 1;
+				self->pdi_device_class_mask = 0;
 
-		/* Set-up impossible device class requirements (there is no `x', such that `(x & 0) == 1') */
-		self->pdi_device_class      = 1;
-		self->pdi_device_class_mask = 0;
+				/* Have the first call to `pci_device_next()' return the requested device. */
+				self->pdi_next = dev;
+				return;
+			}
+		}
 
-		/* Have the first call to `pci_device_next()' return the requested device. */
-		self->pdi_next = dev;
+		/* Scan for the first matching device. */
+		while (self->pdi_next && !iterator_matches_device(self, self->pdi_next))
+			self->pdi_next = SLIST_NEXT(self->pdi_next, _pd_link);
 	} else {
-		self->pdi_next = SLIST_FIRST(&libpci_devices);
-		self->pdi_device_class      = 0;
-		self->pdi_device_class_mask = 0;
-		self->pdi_vendor_id         = PCI_MATCH_ANY;
-		self->pdi_device_id         = PCI_MATCH_ANY;
-		self->pdi_subvendor_id      = PCI_MATCH_ANY;
-		self->pdi_subdevice_id      = PCI_MATCH_ANY;
+		self->pdi_func = PCI_MATCH_ANY;
+		self->pdi_dev  = PCI_MATCH_ANY;
+		self->pdi_bus  = PCI_MATCH_ANY;
 	}
 }
 #endif /* !__KERNEL__ */
@@ -567,6 +591,11 @@ NOTHROW(CC libpci_id_match_iterator_init)(struct pci_device_iterator *__restrict
 		self->pdi_subvendor_id      = PCI_MATCH_ANY;
 		self->pdi_subdevice_id      = PCI_MATCH_ANY;
 	}
+#ifndef __KERNEL__
+	self->pdi_func = PCI_MATCH_ANY;
+	self->pdi_dev  = PCI_MATCH_ANY;
+	self->pdi_bus  = PCI_MATCH_ANY;
+#endif /* !__KERNEL__ */
 }
 
 DEFINE_PUBLIC_ALIAS(pci_device_next, libpci_device_next);

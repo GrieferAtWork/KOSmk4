@@ -67,7 +67,6 @@ typedef __uint32_t pciaddr_t;
 
 struct pci_device;
 struct pci_id_match;
-struct pci_slot_match;
 struct pci_agp_info;
 struct pci_bridge_info;
 struct pci_pcmcia_bridge_info;
@@ -179,35 +178,36 @@ struct pci_id_match {
 
 
 /* Descriptor for a PCI device search query (based on functionality) */
+#ifndef __KERNEL__
 struct pci_slot_match {
 #ifdef __USE_KOS
 	union {
 		struct {
-			__uint8_t    psm_domain;   /* Ignored (for now) */
-			unsigned int psm_func: 3;  /* s.a. `PCI_ADDR_FUNMASK' */
-			unsigned int psm_dev: 5;   /* s.a. `PCI_ADDR_DEVMASK' */
-			__uint8_t    psm_bus;      /* s.a. `PCI_ADDR_BUSMASK' */
+			__uint16_t psm_domain; /* Ignored (for now) */
+			__uint16_t psm_func;   /* s.a. `PCI_ADDR_FUNMASK' */
+			__uint16_t psm_dev;    /* s.a. `PCI_ADDR_DEVMASK' */
+			__uint16_t psm_bus;    /* s.a. `PCI_ADDR_BUSMASK' */
 		};
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
-			__uint8_t    domain;   /* Ignored (for now) */
-			unsigned int func: 3;  /* s.a. `PCI_ADDR_FUNMASK' */
-			unsigned int dev: 5;   /* s.a. `PCI_ADDR_DEVMASK' */
-			__uint8_t    bus;      /* s.a. `PCI_ADDR_BUSMASK' */
+			__uint16_t domain; /* Ignored (for now) */
+			__uint16_t func;   /* s.a. `PCI_ADDR_FUNMASK' */
+			__uint16_t dev;    /* s.a. `PCI_ADDR_DEVMASK' */
+			__uint16_t bus;    /* s.a. `PCI_ADDR_BUSMASK' */
 		};
 #endif /* !__USE_KOS_ALTERATIONS */
-		pciaddr_t        psm_addr;      /* PCI match address. */
 	};
 #else /* __USE_KOS */
-	__uint8_t    domain;   /* Ignored (for now) */
-	unsigned int func: 3;  /* s.a. `PCI_ADDR_FUNMASK' */
-	unsigned int dev: 5;   /* s.a. `PCI_ADDR_DEVMASK' */
-	__uint8_t    bus;      /* s.a. `PCI_ADDR_BUSMASK' */
+	__uint16_t   domain; /* Ignored (for now) */
+	__uint16_t   func;   /* s.a. `PCI_ADDR_FUNMASK' */
+	__uint16_t   dev;    /* s.a. `PCI_ADDR_DEVMASK' */
+	__uint16_t   bus;    /* s.a. `PCI_ADDR_BUSMASK' */
 #endif /* !__USE_KOS */
 #ifndef __USE_KOS_ALTERATIONS
-	__intptr_t   match_data;        /* User-data (unconditionally ignored) */
+	__intptr_t   match_data; /* User-data (unconditionally ignored) */
 #endif /* !__USE_KOS_ALTERATIONS */
 };
+#endif /* !__KERNEL__ */
 
 
 
@@ -255,6 +255,11 @@ struct pci_device_iterator {
 	};
 	pciclass_t         pdi_device_class;      /* [const] Required class bits */
 	pciclass_t         pdi_device_class_mask; /* [const] Masked class bits */
+#ifndef __KERNEL__
+	__uint16_t         pdi_func; /* s.a. `PCI_ADDR_FUNMASK' */
+	__uint16_t         pdi_dev;  /* s.a. `PCI_ADDR_DEVMASK' */
+	__uint16_t         pdi_bus;  /* s.a. `PCI_ADDR_BUSMASK' */
+#endif /* !__KERNEL__ */
 };
 #else /* __USE_KOS || __USE_KOS_KERNEL */
 struct pci_device_iterator; /* opaque... */
