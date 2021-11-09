@@ -42,8 +42,12 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
+#include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
+#include <kos/ioctl/leaks.h>
 #include <network/socket.h>
 
 #include <assert.h>
@@ -551,7 +555,7 @@ ProcFS_Sys_Net_Core_WmemMax_Write(USER CHECKED void const *buf, size_t bufsize) 
 
 
 /************************************************************************/
-/* /proc/sys/net/core/wmem_max                                          */
+/* /proc/kos/leaks                                                      */
 /************************************************************************/
 #ifdef CONFIG_TRACE_MALLOC
 
@@ -577,12 +581,179 @@ memleaks_v_print(struct printnode *__restrict self,
 	kmalloc_leaks_print(me->ml_leaks, printer, arg);
 }
 
+PRIVATE NOBLOCK ATTR_CONST uint32_t
+NOTHROW(FCALL encode_release_mode)(unsigned int mode) {
+	uint32_t result;
+	switch (mode) {
+	case KMALLOC_LEAKS_RELEASE_RESTORE: result = LEAKS_ONCLOSE_RESTORE; break;
+	case KMALLOC_LEAKS_RELEASE_DISCARD: result = LEAKS_ONCLOSE_DISCARD; break;
+	case KMALLOC_LEAKS_RELEASE_FREE:    result = LEAKS_ONCLOSE_FREE; break;
+	default:
+		__builtin_unreachable();
+	}
+	return result;
+}
+
+PRIVATE unsigned int FCALL
+decode_release_mode(uint32_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
+	unsigned int result;
+	switch (mode) {
+	case LEAKS_ONCLOSE_RESTORE: result = KMALLOC_LEAKS_RELEASE_RESTORE; break;
+	case LEAKS_ONCLOSE_DISCARD: result = KMALLOC_LEAKS_RELEASE_DISCARD; break;
+	case LEAKS_ONCLOSE_FREE:    result = KMALLOC_LEAKS_RELEASE_FREE; break;
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE,
+		      mode);
+	}
+	return result;
+}
+
+PRIVATE uintptr_t FCALL
+decode_leakattr(uint64_t attr)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
+	uintptr_t result;
+	switch (attr) {
+	case LEAK_ATTR_MINADDR:  result = MEMLEAK_ATTR_MINADDR; break;
+	case LEAK_ATTR_MAXADDR:  result = MEMLEAK_ATTR_MAXADDR; break;
+	case LEAK_ATTR_LEAKSIZE: result = MEMLEAK_ATTR_LEAKSIZE; break;
+	case LEAK_ATTR_MINUSER:  result = MEMLEAK_ATTR_MINUSER; break;
+	case LEAK_ATTR_MAXUSER:  result = MEMLEAK_ATTR_MAXUSER; break;
+	case LEAK_ATTR_USERSIZE: result = MEMLEAK_ATTR_USERSIZE; break;
+	case LEAK_ATTR_TID:      result = MEMLEAK_ATTR_TID; break;
+	case LEAK_ATTR_TBSIZE:   result = MEMLEAK_ATTR_TBSIZE; break;
+	case LEAK_ATTR_NOWALK:   result = MEMLEAK_ATTR_NOWALK; break;
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB,
+		      attr);
+	}
+	return result;
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED memleak_t FCALL
+get_nth_leak(struct memleaks *__restrict self, uint64_t nth)
+		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+	size_t i = 0, count = 0;
+	memleak_t result = memleak_next(self->ml_leaks, NULL);
+	for (;;) {
+		if (!result) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX,
+			      (uintptr_t)nth, count);
+		}
+		if (i >= nth)
+			break;
+		result = memleak_next(self->ml_leaks, result);
+		++i;
+	}
+	return result;
+}
+
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 memleaks_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
-	/* TODO: ioctl codes to work with memory leaks. */
-	return printnode_v_ioctl(self, cmd, arg, mode);
+	struct memleaks *me = (struct memleaks *)mfile_asprintnode(self);
+	switch (cmd) {
+
+	case LEAKS_IOC_GETONCLOSE: {
+		uint32_t mode;
+		validate_writable(arg, sizeof(uint32_t));
+		mode = encode_release_mode(me->ml_relmode);
+		UNALIGNED_SET32((USER CHECKED uint32_t *)arg, mode);
+	}	break;
+
+	case LEAKS_IOC_SETONCLOSE: {
+		uint32_t mode;
+		validate_readable(arg, sizeof(uint32_t));
+		mode           = UNALIGNED_GET32((USER CHECKED uint32_t const *)arg);
+		me->ml_relmode = decode_release_mode(mode);
+	}	break;
+
+	case LEAKS_IOC_GETCOUNT: {
+		size_t count;
+		validate_writable(arg, sizeof(uint64_t));
+		count = kmalloc_leaks_count(me->ml_leaks);
+		UNALIGNED_SET64((USER CHECKED uint64_t *)arg, count);
+	}	break;
+
+	case LEAKS_IOC_LEAKATTR: {
+		memleak_t leak;
+		uintptr_t attr, aval;
+		USER CHECKED struct leakattr *info;
+		validate_writable(arg, sizeof(struct leakattr));
+		info = (USER CHECKED struct leakattr *)arg;
+		attr = decode_leakattr(info->la_attr);
+		leak = get_nth_leak(me, info->la_index);
+		aval = (uintptr_t)memleak_getattr(leak, attr);
+
+		/* Write-back the attribute value. */
+		info->la_value = (uint64_t)aval;
+	}	break;
+
+	case LEAKS_IOC_LEAKTB: {
+		memleak_t leak;
+		USER CHECKED struct leaktb *info;
+		size_t i, count, req;
+		USER CHECKED uint64_t *uvec;
+		validate_readwrite(arg, sizeof(struct leaktb));
+		info  = (USER CHECKED struct leaktb *)arg;
+		leak  = get_nth_leak(me, info->lt_index);
+		count = (size_t)info->lt_count;
+		uvec  = info->lt_elemp;
+		COMPILER_READ_BARRIER();
+		validate_writablem(uvec, count, sizeof(uint64_t));
+		req = (size_t)memleak_getattr(leak, MEMLEAK_ATTR_TBSIZE);
+		info->lt_count = req;
+		if (req > count)
+			req = count;
+		for (i = 0; i < req; ++i)
+			uvec[i] = (uint64_t)(uintptr_t)memleak_getattr(leak, MEMLEAK_ATTR_TBADDR(i));
+	}	break;
+
+	case LEAKS_IOC_READLEAKMEM:
+	case LEAKS_IOC_READUSERMEM: {
+		byte_t const *leak_addr;
+		size_t leak_size;
+		memleak_t leak;
+		USER CHECKED struct leakmem *info;
+		size_t size, offs, _temp;
+		USER CHECKED byte_t *ubuf;
+		validate_readwrite(arg, sizeof(struct leakmem));
+		info = (USER CHECKED struct leakmem *)arg;
+		leak = get_nth_leak(me, info->lm_index);
+		offs = (size_t)info->lm_offset;
+		size = (size_t)info->lm_size;
+		ubuf = info->lm_buf;
+		COMPILER_READ_BARRIER();
+
+		/* Load leak attributes */
+		if (cmd == LEAKS_IOC_READLEAKMEM) {
+			leak_addr = (byte_t const *)memleak_getattr(leak, MEMLEAK_ATTR_MINADDR);
+			leak_size = (size_t)memleak_getattr(leak, MEMLEAK_ATTR_LEAKSIZE);
+		} else {
+			leak_addr = (byte_t const *)memleak_getattr(leak, MEMLEAK_ATTR_MINUSER);
+			leak_size = (size_t)memleak_getattr(leak, MEMLEAK_ATTR_USERSIZE);
+		}
+
+		/* Limit I/O size to relevant leak size. */
+		if (OVERFLOW_UADD(offs, size, &_temp) || _temp > leak_size) {
+			if (OVERFLOW_USUB(leak_size, offs, &size))
+				size = 0;
+			info->lm_size = size;
+		}
+
+		/* Copy leaked data into userspace. */
+		validate_writable(ubuf, size);
+		memcpy(ubuf, leak_addr, size);
+	}	break;
+
+	default:
+		return printnode_v_ioctl(self, cmd, arg, mode);
+	}
+	return 0;
 }
 
 

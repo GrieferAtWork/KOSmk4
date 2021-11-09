@@ -246,6 +246,9 @@ enum {
 	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: All flags from `FATATTR_LFN' were given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)'. */
 	E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG,                   /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
 	E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT,           /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to use `BLKRRPART' on a block device partition. */
+	E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE,            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Argument to `LEAKS_IOC_SETONCLOSE' isn't one of `LEAKS_ONCLOSE_*' */
+	E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB,               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
+	E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX,                /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -467,6 +470,9 @@ enum {
                                                                                                                                      * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: All flags from `FATATTR_LFN' were given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                   E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                   /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
 #define E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT           E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT           /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to use `BLKRRPART' on a block device partition. */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE            E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Argument to `LEAKS_IOC_SETONCLOSE' isn't one of `LEAKS_ONCLOSE_*' */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -685,6 +691,9 @@ enum {
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: All flags from `FATATTR_LFN' were given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                   194 /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
 #define E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT           195 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to use `BLKRRPART' on a block device partition. */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE            196 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Argument to `LEAKS_IOC_SETONCLOSE' isn't one of `LEAKS_ONCLOSE_*' */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               197 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                198 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

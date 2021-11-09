@@ -514,15 +514,19 @@ DECL_END
 
 /* Memory leak release modes. (for use with `kmalloc_leaks_release()') */
 #define KMALLOC_LEAKS_RELEASE_RESTORE 0 /* Restore leaks; future calls to `kmalloc_leaks_collect()' will re-yield them. */
-#define KMALLOC_LEAKS_RELEASE_DISCARD 1 /* Discard leaks but don't release leaked memory. */
+#define KMALLOC_LEAKS_RELEASE_DISCARD 1 /* Discard leaks but don't free leaked memory. */
 #define KMALLOC_LEAKS_RELEASE_FREE    2 /* Discard leaks and free leaked memory. (Only possible for `kmalloc()'; not possible for `heap_alloc()') */
 
 /* Memory leak attributes. (For use with `memleak_getattr()') */
-#define MEMLEAK_ATTR_MINADDR   1             /* The lowest memory address part of the leak */
-#define MEMLEAK_ATTR_MAXADDR   2             /* The greatest memory address part of the leak */
-#define MEMLEAK_ATTR_SIZE      3             /* Total leak size (in bytes) */
-#define MEMLEAK_ATTR_TID       4             /* Root-namespace TID of the original allocator thread. */
-#define MEMLEAK_ATTR_TBSIZE    5             /* # of addresses within the traceback (enumerate through `MEMLEAK_ATTR_TBADDR()') */
+#define MEMLEAK_ATTR_MINADDR   1             /* The lowest memory address apart of the leak */
+#define MEMLEAK_ATTR_MAXADDR   2             /* The greatest memory address apart of the leak */
+#define MEMLEAK_ATTR_LEAKSIZE  3             /* Total leak size (in bytes) */
+#define MEMLEAK_ATTR_MINUSER   4             /* The lowest memory address apart of the leak's user-data area (following a possible `CONFIG_MALL_HEAD_SIZE') */
+#define MEMLEAK_ATTR_MAXUSER   5             /* The greatest memory address apart of the leak's user-data area (ending before a possible `CONFIG_MALL_TAIL_SIZE') */
+#define MEMLEAK_ATTR_USERSIZE  6             /* Total user-data area size (in bytes; w/o `CONFIG_MALL_HEAD_SIZE' or `CONFIG_MALL_TAIL_SIZE') */
+#define MEMLEAK_ATTR_TID       7             /* Root-namespace TID of the original allocator thread. */
+#define MEMLEAK_ATTR_TBSIZE    8             /* # of addresses within the traceback (enumerate through `MEMLEAK_ATTR_TBADDR()') */
+#define MEMLEAK_ATTR_NOWALK    9             /* Returns non-NULL if `GFP_NOWALK' was set during the original allocation. */
 #define MEMLEAK_ATTR_TBADDR(i) (0x100 + (i)) /* Traceback addresses. */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MALLOC_H */

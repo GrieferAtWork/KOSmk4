@@ -123,11 +123,11 @@ DECL_BEGIN
 
 #if ((GFP_NOLEAK >> 8) == TRACE_NODE_FLAG_NOLEAK && \
      (GFP_NOWALK >> 8) == TRACE_NODE_FLAG_NOWALK)
-#define TRACE_NODE_FLAG_FROM_GFP(gfp) ((gfp & (GFP_NOLEAK | GFP_NOWALK)) >> 8)
+#define TRACE_NODE_FLAG_FROM_GFP(gfp) (((gfp) & (GFP_NOLEAK | GFP_NOWALK)) >> 8)
 #else /* ... */
-#define TRACE_NODE_FLAG_FROM_GFP(gfp)                  \
-	(((gfp)&GFP_NOLEAK ? TRACE_NODE_FLAG_NOLEAK : 0) | \
-	 ((gfp)&GFP_NOWALK ? TRACE_NODE_FLAG_NOWALK : 0))
+#define TRACE_NODE_FLAG_FROM_GFP(gfp)                    \
+	(((gfp) & GFP_NOLEAK ? TRACE_NODE_FLAG_NOLEAK : 0) | \
+	 ((gfp) & GFP_NOWALK ? TRACE_NODE_FLAG_NOWALK : 0))
 #endif /* !... */
 
 struct trace_node {
@@ -1818,8 +1818,29 @@ memleak_getattr(memleak_t self, uintptr_t attr) {
 	case MEMLEAK_ATTR_MAXADDR:
 		return (void *)trace_node_umax(self);
 
-	case MEMLEAK_ATTR_SIZE:
+	case MEMLEAK_ATTR_LEAKSIZE:
 		return (void *)trace_node_usize(self);
+
+	case MEMLEAK_ATTR_MINUSER: {
+		uintptr_t result = trace_node_umin(self);
+		if (self->tn_kind == TRACE_NODE_KIND_MALL)
+			result += CONFIG_MALL_HEAD_SIZE;
+		return (void *)result;
+	}	break;
+
+	case MEMLEAK_ATTR_MAXUSER: {
+		uintptr_t result = trace_node_umax(self);
+		if (self->tn_kind == TRACE_NODE_KIND_MALL)
+			result -= CONFIG_MALL_TAIL_SIZE;
+		return (void *)result;
+	}	break;
+
+	case MEMLEAK_ATTR_USERSIZE: {
+		size_t result = trace_node_usize(self);
+		if (self->tn_kind == TRACE_NODE_KIND_MALL)
+			result -= (CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE);
+		return (void *)result;
+	}	break;
 
 	case MEMLEAK_ATTR_TID:
 		return (void *)(uintptr_t)self->tn_tid;
@@ -1832,6 +1853,9 @@ memleak_getattr(memleak_t self, uintptr_t attr) {
 			--result;
 		return (void *)result;
 	}	break;
+
+	case MEMLEAK_ATTR_NOWALK:
+		return (void *)(uintptr_t)(self->tn_flags & TRACE_NODE_FLAG_NOWALK);
 
 	default:
 		break;
