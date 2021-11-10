@@ -523,23 +523,23 @@ again:
 		break;
 
 	case 'f':
-		if (json_getc(self) != 'a')
+		if ((ch = json_getc(self)) != 'a')
 			goto syn2;
-		if (json_getc(self) != 'l')
+		if ((ch = json_getc(self)) != 'l')
 			goto syn3;
-		if (json_getc(self) != 's')
+		if ((ch = json_getc(self)) != 's')
 			goto syn4;
-		if (json_getc(self) != 'e')
+		if ((ch = json_getc(self)) != 'e')
 			goto syn5;
 		result = JSON_PARSER_FALSE;
 		break;
 
 	case 'n':
-		if (json_getc(self) != 'u')
+		if ((ch = json_getc(self)) != 'u')
 			goto syn2;
-		if (json_getc(self) != 'l')
+		if ((ch = json_getc(self)) != 'l')
 			goto syn3;
-		if (json_getc(self) != 'l')
+		if ((ch = json_getc(self)) != 'l')
 			goto syn4;
 		result = JSON_PARSER_NULL;
 		break;

@@ -1619,11 +1619,11 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 @@pp_if defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym)@@
 				void *libregdump;
 @@pp_ifdef RTLD_LOCAL@@
-				if ((libregdump = @dlopen@(@LIBREGDUMP_LIBRARY_NAME@, @RTLD_LOCAL@)) != NULL)
+				libregdump = @dlopen@(@LIBREGDUMP_LIBRARY_NAME@, @RTLD_LOCAL@);
 @@pp_else@@
-				if ((libregdump = @dlopen@(@LIBREGDUMP_LIBRARY_NAME@, 0)) != NULL)
+				libregdump = @dlopen@(@LIBREGDUMP_LIBRARY_NAME@, 0);
 @@pp_endif@@
-				{
+				if (libregdump != NULL) {
 					@PREGDUMP_REGISTER_NAME@ pdyn_regdump_register_name;
 					*(void **)&pdyn_regdump_register_name = @dlsym@(libregdump, "regdump_register_name");
 					if unlikely(!pdyn_regdump_register_name) {

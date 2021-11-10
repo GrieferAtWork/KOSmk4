@@ -395,7 +395,7 @@ special_control:
 				encoded_text_size = 2;
 				goto print_encoded;
 			} else if ((ch == '\\' || ch == '\'' || ch == '\"') &&
-			          !(flags & FORMAT_ESCAPE_FNOCTRL)) {
+			           !(flags & FORMAT_ESCAPE_FNOCTRL)) {
 				goto special_control;
 			} else {
 				/* Non-ascii character. */

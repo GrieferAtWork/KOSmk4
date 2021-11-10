@@ -357,6 +357,7 @@ again_lock_mman:
 		mbuilder_norpc_fini(&builder);
 		RETHROW();
 	}
+
 	/* With  all of the locks held, a target address selected, and
 	 * everything being consistent, we can now move on to actually
 	 * load our new mappings into memory.

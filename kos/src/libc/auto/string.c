@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d37be9 */
+/* HASH CRC-32:0x44ca06b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -693,21 +693,25 @@ NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1,
 	do {
 		if ((c1 = *s1) != (c2 = *s2)) {
 			unsigned int vala, valb;
+
 			/* Unwind common digits. */
 			while (s1 != s1_start) {
 				if (s1[-1] < '0' || s1[-1] > '9')
 					break;
 				c2 = c1 = *--s1, --s2;
 			}
+
 			/* Check if both strings have digit sequences in the same places. */
 			if ((c1 < '0' || c1 > '9') &&
 			    (c2 < '0' || c2 > '9'))
 				return (int)((unsigned char)c1 - (unsigned char)c2);
+
 			/* Deal with leading zeros. */
 			if (c1 == '0')
 				return -1;
 			if (c2 == '0')
 				return 1;
+
 			/* Compare digits. */
 			vala = c1 - '0';
 			valb = c2 - '0';
@@ -725,10 +729,13 @@ NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1,
 				valb *= 10;
 				valb += c2-'0';
 			}
+
+			/* Return difference between digits. */
 			return (int)vala - (int)valb;
 		}
-		++s1, ++s2;
-	} while (c1);
+		++s1;
+		++s2;
+	} while (c1 != '\0');
 	return 0;
 }
 #endif /* !__KERNEL__ */
@@ -2249,11 +2256,15 @@ NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1,
                                       char const *s2) {
 	char c1, c2;
 	do {
-		if ((c1 = *s1++) != (c2 = *s2++) &&
-		    ((c1 = (char)libc_tolower((unsigned char)c1)) !=
-		     (c2 = (char)libc_tolower((unsigned char)c2))))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
-	} while (c1);
+		c1 = *s1++;
+		c2 = *s2++;
+		if (c1 != c2) {
+			c1 = (char)libc_tolower((unsigned char)c1);
+			c2 = (char)libc_tolower((unsigned char)c2);
+			if (c1 != c2)
+				return (int)((unsigned char)c1 - (unsigned char)c2);
+		}
+	} while (c1 != '\0');
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
@@ -2264,11 +2275,15 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1,
 	do {
 		if (!maxlen--)
 			break;
-		if ((c1 = *s1++) != (c2 = *s2++) &&
-		    ((c1 = (char)libc_tolower((unsigned char)c1)) !=
-		     (c2 = (char)libc_tolower((unsigned char)c2))))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
-	} while (c1);
+		c1 = *s1++;
+		c2 = *s2++;
+		if (c1 != c2) {
+			c1 = (char)libc_tolower((unsigned char)c1);
+			c2 = (char)libc_tolower((unsigned char)c2);
+			if (c1 != c2)
+				return (int)((unsigned char)c1 - (unsigned char)c2);
+		}
+	} while (c1 != '\0');
 	return 0;
 }
 #include <hybrid/typecore.h>
@@ -4328,11 +4343,16 @@ NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
 	byte_t const *p2 = (byte_t const *)s2;
 	byte_t v1, v2;
 	v1 = v2 = 0;
-	while (n_bytes-- &&
-	       (((v1 = *p1++) == (v2 = *p2++)) ||
-	        ((v1 = (byte_t)libc_tolower(v1)) ==
-	         (v2 = (byte_t)libc_tolower(v2)))))
-		;
+	while (n_bytes--) {
+		v1 = *p1++;
+		v2 = *p2++;
+		if (v1 != v2) {
+			v1 = (byte_t)libc_tolower(v1);
+			v2 = (byte_t)libc_tolower(v2);
+			if (v1 != v2)
+				break;
+		}
+	}
 	return (int)v1 - (int)v2;
 }
 #ifndef __KERNEL__
@@ -4643,7 +4663,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmp)(void const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4705,7 +4725,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp)(void const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4763,9 +4783,9 @@ NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp_l)(char const *pattern,
 		pattern_ch = *pattern;
 		string_ch = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
-		   (pattern_ch = libc_tolower_l(pattern_ch, locale),
-		    string_ch = libc_tolower_l(string_ch, locale),
-		    pattern_ch == string_ch)) {
+		    (pattern_ch = libc_tolower_l(pattern_ch, locale),
+		     string_ch = libc_tolower_l(string_ch, locale),
+		     pattern_ch == string_ch)) {
 next:
 			++string;
 			++pattern;
@@ -4829,7 +4849,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4887,7 +4907,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpw)(void const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_words, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_words, sizeof(size_t));
 	}
 	temp = v1[s2_words];
 	__freea(v1);
@@ -4945,7 +4965,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_dwords, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_dwords, sizeof(size_t));
 	}
 	temp = v1[s2_dwords];
 	__freea(v1);
@@ -5003,7 +5023,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpq)(void const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_qwords, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_qwords, sizeof(size_t));
 	}
 	temp = v1[s2_qwords];
 	__freea(v1);
@@ -5196,6 +5216,7 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmp)(char const *str,
 		if unlikely(c1 != c2)
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
+
 	/* The given `str' has a  length less than `strlen(startswith)',  meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
 	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of
@@ -5224,6 +5245,7 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str,
 		if unlikely(c1 != c2)
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
+
 	/* The  given  `str' has  a  length less  than  `startswith_len', meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
 	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of

@@ -353,11 +353,15 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 	struct rf_object *obj;
 
 	/* Check if we can find the FDE by searching for a module and loading that module's .eh_frame section. */
-	if ((dlmod = dlgethandle(pc, DLGETHANDLE_FNORMAL)) != NULL &&
-	    /* TODO: Support for: `.eh_frame_hdr' (and its alias: `PT_GNU_EH_FRAME') */
-	    (eh_frame_sect = dllocksection(dlmod, ".eh_frame", DLLOCKSECTION_FNODATA)) != NULL &&
-	    (eh_frame_sect->ds_data != (void *)-1)) {
-
+	dlmod = dlgethandle(pc, DLGETHANDLE_FNORMAL);
+	if (dlmod == NULL)
+		goto no_dl_info;
+	eh_frame_sect = dllocksection(dlmod, ".eh_frame", DLLOCKSECTION_FNODATA);
+	if (eh_frame_sect == NULL) {
+		/* TODO: Support for: `.eh_frame_hdr' (and its alias: `PT_GNU_EH_FRAME') */
+		goto no_dl_info;
+	}
+	if (eh_frame_sect->ds_data != (void *)-1) {
 		/* Search through this modules .eh_frame section. */
 		bases->deb_tbase = NULL;
 		bases->deb_dbase = NULL;
@@ -370,9 +374,12 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 				bases->deb_tbase = dlauxctrl(dlmod, DLAUXCTRL_GET_TEXTBASE);
 			if (bases->deb_dbase == NULL)
 				bases->deb_dbase = dlauxctrl(dlmod, DLAUXCTRL_GET_DATABASE);
+			dlunlocksection(eh_frame_sect);
 			return result;
 		}
 	}
+	dlunlocksection(eh_frame_sect);
+no_dl_info:
 
 	/* If that failed, search through auxillary information given by `__register_frame_info_bases()' */
 	result = NULL;

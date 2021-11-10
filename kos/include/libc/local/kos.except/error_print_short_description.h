@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x427e1be2 */
+/* HASH CRC-32:0xf25ec975 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -320,11 +320,11 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 #if defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym)
 				void *__libregdump;
 #ifdef __RTLD_LOCAL
-				if ((__libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, RTLD_LOCAL)) != __NULLPTR)
+				__libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, RTLD_LOCAL);
 #else /* __RTLD_LOCAL */
-				if ((__libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, 0)) != __NULLPTR)
+				__libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, 0);
 #endif /* !__RTLD_LOCAL */
-				{
+				if (__libregdump != __NULLPTR) {
 					PREGDUMP_REGISTER_NAME __pdyn_regdump_register_name;
 					*(void **)&__pdyn_regdump_register_name = dlsym(__libregdump, "regdump_register_name");
 					if __unlikely(!__pdyn_regdump_register_name) {

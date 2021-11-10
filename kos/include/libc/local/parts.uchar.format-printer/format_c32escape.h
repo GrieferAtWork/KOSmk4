@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe07e8ea9 */
+/* HASH CRC-32:0xf8974c96 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,7 +222,7 @@ __special_control:
 				__encoded_text_size = 2;
 				goto __print_encoded;
 			} else if ((__ch == '\\' || __ch == '\'' || __ch == '\"') &&
-			          !(__flags & 0x0008)) {
+			           !(__flags & 0x0008)) {
 				goto __special_control;
 			} else {
 				/* Non-ascii character. */

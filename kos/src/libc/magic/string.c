@@ -1250,21 +1250,25 @@ int strverscmp([[nonnull]] char const *s1,
 	do {
 		if ((c1 = *s1) != (c2 = *s2)) {
 			unsigned int vala, valb;
+
 			/* Unwind common digits. */
 			while (s1 != s1_start) {
 				if (s1[-1] < '0' || s1[-1] > '9')
 					break;
 				c2 = c1 = *--s1, --s2;
 			}
+
 			/* Check if both strings have digit sequences in the same places. */
 			if ((c1 < '0' || c1 > '9') &&
 			    (c2 < '0' || c2 > '9'))
 				return (int)((unsigned char)c1 - (unsigned char)c2);
+
 			/* Deal with leading zeros. */
 			if (c1 == '0')
 				return -1;
 			if (c2 == '0')
 				return 1;
+
 			/* Compare digits. */
 			vala = c1 - '0';
 			valb = c2 - '0';
@@ -1282,10 +1286,13 @@ int strverscmp([[nonnull]] char const *s1,
 				valb *= 10;
 				valb += c2-'0';
 			}
+
+			/* Return difference between digits. */
 			return (int)vala - (int)valb;
 		}
-		++s1, ++s2;
-	} while (c1);
+		++s1;
+		++s2;
+	} while (c1 != '\0');
 	return 0;
 }
 
@@ -3395,11 +3402,15 @@ void bzeroc([[nonnull]] void *__restrict dst,
 int strcasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	char c1, c2;
 	do {
-		if ((c1 = *s1++) != (c2 = *s2++) &&
-		    ((c1 = (char)tolower((unsigned char)c1)) !=
-		     (c2 = (char)tolower((unsigned char)c2))))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
-	} while (c1);
+		c1 = *s1++;
+		c2 = *s2++;
+		if (c1 != c2) {
+			c1 = (char)tolower((unsigned char)c1);
+			c2 = (char)tolower((unsigned char)c2);
+			if (c1 != c2)
+				return (int)((unsigned char)c1 - (unsigned char)c2);
+		}
+	} while (c1 != '\0');
 	return 0;
 }
 
@@ -3412,11 +3423,15 @@ int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t 
 	do {
 		if (!maxlen--)
 			break;
-		if ((c1 = *s1++) != (c2 = *s2++) &&
-		    ((c1 = (char)tolower((unsigned char)c1)) !=
-		     (c2 = (char)tolower((unsigned char)c2))))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
-	} while (c1);
+		c1 = *s1++;
+		c2 = *s2++;
+		if (c1 != c2) {
+			c1 = (char)tolower((unsigned char)c1);
+			c2 = (char)tolower((unsigned char)c2);
+			if (c1 != c2)
+				return (int)((unsigned char)c1 - (unsigned char)c2);
+		}
+	} while (c1 != '\0');
 	return 0;
 }
 
@@ -6115,11 +6130,16 @@ int memcasecmp([[nonnull]] void const *s1,
 	byte_t const *p2 = (byte_t const *)s2;
 	byte_t v1, v2;
 	v1 = v2 = 0;
-	while (n_bytes-- &&
-	       (((v1 = *p1++) == (v2 = *p2++)) ||
-	        ((v1 = (byte_t)tolower(v1)) ==
-	         (v2 = (byte_t)tolower(v2)))))
-		;
+	while (n_bytes--) {
+		v1 = *p1++;
+		v2 = *p2++;
+		if (v1 != v2) {
+			v1 = (byte_t)tolower(v1);
+			v2 = (byte_t)tolower(v2);
+			if (v1 != v2)
+				break;
+		}
+	}
 	return (int)v1 - (int)v2;
 }
 
@@ -6527,7 +6547,7 @@ $size_t fuzzy_memcmp([[nonnull]] void const *s1, $size_t s1_bytes,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -6590,7 +6610,7 @@ $size_t fuzzy_memcasecmp([[nonnull]] void const *s1, $size_t s1_bytes,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -6653,9 +6673,9 @@ int wildstrcasecmp_l([[nonnull]] char const *pattern,
 		pattern_ch = *pattern;
 		string_ch = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
-		   (pattern_ch = tolower_l(pattern_ch, locale),
-		    string_ch = tolower_l(string_ch, locale),
-		    pattern_ch == string_ch)) {
+		    (pattern_ch = tolower_l(pattern_ch, locale),
+		     string_ch = tolower_l(string_ch, locale),
+		     pattern_ch == string_ch)) {
 next:
 			++string;
 			++pattern;
@@ -6721,7 +6741,7 @@ $size_t fuzzy_memcasecmp_l([[nonnull]] void const *s1, $size_t s1_bytes,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -6793,7 +6813,7 @@ $size_t fuzzy_memcmpw([[nonnull]] void const *s1, $size_t s1_words,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		memcpyc((u8 *)v0, (u8 *)v1, s2_words, sizeof(size_t));
+		memcpyc(v0, v1, s2_words, sizeof(size_t));
 	}
 	temp = v1[s2_words];
 	__freea(v1);
@@ -6855,7 +6875,7 @@ $size_t fuzzy_memcmpl([[nonnull]] void const *s1, $size_t s1_dwords,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		memcpyc((u8 *)v0, (u8 *)v1, s2_dwords, sizeof(size_t));
+		memcpyc(v0, v1, s2_dwords, sizeof(size_t));
 	}
 	temp = v1[s2_dwords];
 	__freea(v1);
@@ -6914,7 +6934,7 @@ $size_t fuzzy_memcmpq([[nonnull]] void const *s1, $size_t s1_qwords,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		memcpyc((u8 *)v0, (u8 *)v1, s2_qwords, sizeof(size_t));
+		memcpyc(v0, v1, s2_qwords, sizeof(size_t));
 	}
 	temp = v1[s2_qwords];
 	__freea(v1);
@@ -7139,6 +7159,7 @@ int strstartcmp([[nonnull]] char const *str,
 		if unlikely(c1 != c2)
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
+
 	/* The given `str' has a  length less than `strlen(startswith)',  meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
 	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of
@@ -7168,6 +7189,7 @@ int strstartcmpz([[nonnull]] char const *str,
 		if unlikely(c1 != c2)
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
+
 	/* The  given  `str' has  a  length less  than  `startswith_len', meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
 	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of

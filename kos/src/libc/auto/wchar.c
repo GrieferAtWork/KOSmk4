@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ca50e57 */
+/* HASH CRC-32:0x4de82fb4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1824,11 +1824,15 @@ NOTHROW_NCX(LIBDCALL libd_wcscasecmp)(char16_t const *s1,
                                       char16_t const *s2) {
 	char16_t c1, c2;
 	do {
-		if ((c1 = *s1++) != (c2 = *s2++) &&
-		    ((c1 = (char16_t)libd_towlower((char16_t)c1)) !=
-		     (c2 = (char16_t)libd_towlower((char16_t)c2))))
-			return (int)((char16_t)c1 - (char16_t)c2);
-	} while (c1);
+		c1 = *s1++;
+		c2 = *s2++;
+		if (c1 != c2) {
+			c1 = (char16_t)libd_towlower((char16_t)c1);
+			c2 = (char16_t)libd_towlower((char16_t)c2);
+			if (c1 != c2)
+				return (int)((char16_t)c1 - (char16_t)c2);
+		}
+	} while (c1 != '\0');
 	return 0;
 }
 /* >> wcscasecmp(3) */
@@ -1837,11 +1841,15 @@ NOTHROW_NCX(LIBKCALL libc_wcscasecmp)(char32_t const *s1,
                                       char32_t const *s2) {
 	char32_t c1, c2;
 	do {
-		if ((c1 = *s1++) != (c2 = *s2++) &&
-		    ((c1 = (char32_t)libc_towlower((char32_t)c1)) !=
-		     (c2 = (char32_t)libc_towlower((char32_t)c2))))
-			return (int)((char32_t)c1 - (char32_t)c2);
-	} while (c1);
+		c1 = *s1++;
+		c2 = *s2++;
+		if (c1 != c2) {
+			c1 = (char32_t)libc_towlower((char32_t)c1);
+			c2 = (char32_t)libc_towlower((char32_t)c2);
+			if (c1 != c2)
+				return (int)((char32_t)c1 - (char32_t)c2);
+		}
+	} while (c1 != '\0');
 	return 0;
 }
 /* >> wcsncasecmp(3) */
@@ -1853,11 +1861,15 @@ NOTHROW_NCX(LIBDCALL libd_wcsncasecmp)(char16_t const *s1,
 	do {
 		if (!maxlen--)
 			break;
-		if ((c1 = *s1++) != (c2 = *s2++) &&
-		    ((c1 = (char16_t)libd_towlower((char16_t)c1)) !=
-		     (c2 = (char16_t)libd_towlower((char16_t)c2))))
-			return (int)((char16_t)c1 - (char16_t)c2);
-	} while (c1);
+		c1 = *s1++;
+		c2 = *s2++;
+		if (c1 != c2) {
+			c1 = (char16_t)libd_towlower((char16_t)c1);
+			c2 = (char16_t)libd_towlower((char16_t)c2);
+			if (c1 != c2)
+				return (int)((char16_t)c1 - (char16_t)c2);
+		}
+	} while (c1 != '\0');
 	return 0;
 }
 /* >> wcsncasecmp(3) */
@@ -1869,11 +1881,15 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecmp)(char32_t const *s1,
 	do {
 		if (!maxlen--)
 			break;
-		if ((c1 = *s1++) != (c2 = *s2++) &&
-		    ((c1 = (char32_t)libc_towlower((char32_t)c1)) !=
-		     (c2 = (char32_t)libc_towlower((char32_t)c2))))
-			return (int)((char32_t)c1 - (char32_t)c2);
-	} while (c1);
+		c1 = *s1++;
+		c2 = *s2++;
+		if (c1 != c2) {
+			c1 = (char32_t)libc_towlower((char32_t)c1);
+			c2 = (char32_t)libc_towlower((char32_t)c2);
+			if (c1 != c2)
+				return (int)((char32_t)c1 - (char32_t)c2);
+		}
+	} while (c1 != '\0');
 	return 0;
 }
 /* >> wcscasecmp_l(3) */
@@ -4236,7 +4252,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp)(char16_t const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4299,7 +4315,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp)(char32_t const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4529,21 +4545,25 @@ NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
 	do {
 		if ((c1 = *s1) != (c2 = *s2)) {
 			unsigned int vala, valb;
+
 			/* Unwind common digits. */
 			while (s1 != s1_start) {
 				if (s1[-1] < '0' || s1[-1] > '9')
 					break;
 				c2 = c1 = *--s1, --s2;
 			}
+
 			/* Check if both strings have digit sequences in the same places. */
 			if ((c1 < '0' || c1 > '9') &&
 			    (c2 < '0' || c2 > '9'))
 				return (int)((char16_t)c1 - (char16_t)c2);
+
 			/* Deal with leading zeros. */
 			if (c1 == '0')
 				return -1;
 			if (c2 == '0')
 				return 1;
+
 			/* Compare digits. */
 			vala = c1 - '0';
 			valb = c2 - '0';
@@ -4561,10 +4581,13 @@ NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
 				valb *= 10;
 				valb += c2-'0';
 			}
+
+			/* Return difference between digits. */
 			return (int)vala - (int)valb;
 		}
-		++s1, ++s2;
-	} while (c1);
+		++s1;
+		++s2;
+	} while (c1 != '\0');
 	return 0;
 }
 /* >> wcsverscmp(3) */
@@ -4576,21 +4599,25 @@ NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
 	do {
 		if ((c1 = *s1) != (c2 = *s2)) {
 			unsigned int vala, valb;
+
 			/* Unwind common digits. */
 			while (s1 != s1_start) {
 				if (s1[-1] < '0' || s1[-1] > '9')
 					break;
 				c2 = c1 = *--s1, --s2;
 			}
+
 			/* Check if both strings have digit sequences in the same places. */
 			if ((c1 < '0' || c1 > '9') &&
 			    (c2 < '0' || c2 > '9'))
 				return (int)((char32_t)c1 - (char32_t)c2);
+
 			/* Deal with leading zeros. */
 			if (c1 == '0')
 				return -1;
 			if (c2 == '0')
 				return 1;
+
 			/* Compare digits. */
 			vala = c1 - '0';
 			valb = c2 - '0';
@@ -4608,10 +4635,13 @@ NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
 				valb *= 10;
 				valb += c2-'0';
 			}
+
+			/* Return difference between digits. */
 			return (int)vala - (int)valb;
 		}
-		++s1, ++s2;
-	} while (c1);
+		++s1;
+		++s2;
+	} while (c1 != '\0');
 	return 0;
 }
 /* >> wcsncoll_l(3) */
@@ -4817,7 +4847,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp_l)(char16_t const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4879,7 +4909,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp_l)(char32_t const *s1,
 				cost = temp;
 			v1[j + 1] = cost;
 		}
-		libc_memcpyc((u8 *)v0, (u8 *)v1, s2_bytes, sizeof(size_t));
+		libc_memcpyc(v0, v1, s2_bytes, sizeof(size_t));
 	}
 	temp = v1[s2_bytes];
 	__freea(v1);
@@ -4956,9 +4986,9 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern,
 		pattern_ch = *pattern;
 		wcsing_ch = *string;
 		if (pattern_ch == wcsing_ch || pattern_ch == '?' ||
-		   (pattern_ch = libd_towlower_l(pattern_ch, locale),
-		    wcsing_ch = libd_towlower_l(wcsing_ch, locale),
-		    pattern_ch == wcsing_ch)) {
+		    (pattern_ch = libd_towlower_l(pattern_ch, locale),
+		     wcsing_ch = libd_towlower_l(wcsing_ch, locale),
+		     pattern_ch == wcsing_ch)) {
 next:
 			++string;
 			++pattern;
@@ -5006,9 +5036,9 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern,
 		pattern_ch = *pattern;
 		wcsing_ch = *string;
 		if (pattern_ch == wcsing_ch || pattern_ch == '?' ||
-		   (pattern_ch = libc_towlower_l(pattern_ch, locale),
-		    wcsing_ch = libc_towlower_l(wcsing_ch, locale),
-		    pattern_ch == wcsing_ch)) {
+		    (pattern_ch = libc_towlower_l(pattern_ch, locale),
+		     wcsing_ch = libc_towlower_l(wcsing_ch, locale),
+		     pattern_ch == wcsing_ch)) {
 next:
 			++string;
 			++pattern;

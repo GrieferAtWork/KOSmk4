@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf86fd8a7 */
+/* HASH CRC-32:0x7f79d12d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1358,11 +1358,11 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 #if defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym)
 				void *libregdump;
 #ifdef RTLD_LOCAL
-				if ((libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, RTLD_LOCAL)) != NULL)
+				libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, RTLD_LOCAL);
 #else /* RTLD_LOCAL */
-				if ((libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, 0)) != NULL)
+				libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, 0);
 #endif /* !RTLD_LOCAL */
-				{
+				if (libregdump != NULL) {
 					PREGDUMP_REGISTER_NAME pdyn_regdump_register_name;
 					*(void **)&pdyn_regdump_register_name = dlsym(libregdump, "regdump_register_name");
 					if unlikely(!pdyn_regdump_register_name) {

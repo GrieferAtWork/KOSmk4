@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x463ffd95 */
+/* HASH CRC-32:0xbeef7ed8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,9 +155,9 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(wildc32scasecmp_l))(__CHAR32_TYPE__ c
 		__pattern_ch = *__pattern;
 		__wcsing_ch = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
-		   (__pattern_ch = (__NAMESPACE_LOCAL_SYM __localdep_tolower32_l)(__pattern_ch, __locale),
-		    __wcsing_ch = (__NAMESPACE_LOCAL_SYM __localdep_tolower32_l)(__wcsing_ch, __locale),
-		    __pattern_ch == __wcsing_ch)) {
+		    (__pattern_ch = (__NAMESPACE_LOCAL_SYM __localdep_tolower32_l)(__pattern_ch, __locale),
+		     __wcsing_ch = (__NAMESPACE_LOCAL_SYM __localdep_tolower32_l)(__wcsing_ch, __locale),
+		     __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;
 			++__pattern;

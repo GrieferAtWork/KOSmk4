@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b05b15f */
+/* HASH CRC-32:0x1f0b0082 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strstartcmpz))(char const *__str, cha
 		if __unlikely(__c1 != __c2)
 			return (int)((unsigned char)__c1 - (unsigned char)__c2);
 	} while (__c1);
+
 	/* The  given  `str' has  a  length less  than  `startswith_len', meaning
 	 * that we're expected to return the result of a compare `NUL - NON_NUL',
 	 * which  means  we must  return  -1. Note  that  the NON_NUL  is kind-of
