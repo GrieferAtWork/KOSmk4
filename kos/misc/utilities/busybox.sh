@@ -71,3 +71,10 @@ while read line; do
 	fi
 	install_symlink "$line" "$text"
 done < "${OPTPATH}/busybox.links"
+
+# Since busybox is kind-of needed to do anything with KOS, this
+# is the perfect place to set-up some additional system paths
+# within disk images
+install_symlink "/etc/mtab" "/proc/mounts"
+
+
