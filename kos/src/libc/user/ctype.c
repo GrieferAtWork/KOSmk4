@@ -23,8 +23,11 @@
 #include "../api.h"
 /**/
 
-#include "ctype.h"
 #include <hybrid/byteorder.h>
+
+#include <kos/exec/idata.h>
+
+#include "ctype.h"
 
 DECL_BEGIN
 
@@ -59,25 +62,18 @@ DECL_BEGIN
 
 
 #define ASCII_ISCNTRL(ch)  ((ch) <= 0x1f || (ch) == 0x7f)
-#define ASCII_ISSPACE(ch) (((ch) >= 0x09 && (ch) <= 0x0d) || \
-                            (ch) == 0x20)
+#define ASCII_ISSPACE(ch)  (((ch) >= 0x09 && (ch) <= 0x0d) || (ch) == 0x20)
 #define ASCII_ISUPPER(ch)  ((ch) >= 0x41 && (ch) <= 0x5a)
 #define ASCII_ISLOWER(ch)  ((ch) >= 0x61 && (ch) <= 0x7a)
 #define ASCII_ISALPHA(ch)  (ASCII_ISUPPER(ch) || ASCII_ISLOWER(ch))
 #define ASCII_ISDIGIT(ch)  ((ch) >= 0x30 && (ch) <= 0x39)
-#define ASCII_ISXDIGIT(ch)  (ASCII_ISDIGIT(ch) || \
-                           ((ch) >= 0x41 && (ch) <= 0x46) || \
-                           ((ch) >= 0x61 && (ch) <= 0x66))
-#define ASCII_ISALNUM(ch)   (ASCII_ISUPPER(ch) || ASCII_ISLOWER(ch) || ASCII_ISDIGIT(ch))
-#define ASCII_ISPUNCT(ch) (((ch) >= 0x21 && (ch) <= 0x2f) || \
-                           ((ch) >= 0x3a && (ch) <= 0x40) || \
-                           ((ch) >= 0x5b && (ch) <= 0x60) || \
-                           ((ch) >= 0x7b && (ch) <= 0x7e))
+#define ASCII_ISXDIGIT(ch) (ASCII_ISDIGIT(ch) || ((ch) >= 0x41 && (ch) <= 0x46) || ((ch) >= 0x61 && (ch) <= 0x66))
+#define ASCII_ISALNUM(ch)  (ASCII_ISUPPER(ch) || ASCII_ISLOWER(ch) || ASCII_ISDIGIT(ch))
+#define ASCII_ISPUNCT(ch)  (((ch) >= 0x21 && (ch) <= 0x2f) || ((ch) >= 0x3a && (ch) <= 0x40) || ((ch) >= 0x5b && (ch) <= 0x60) || ((ch) >= 0x7b && (ch) <= 0x7e))
 #define ASCII_ISGRAPH(ch)  ((ch) >= 0x21 && (ch) <= 0x7e)
 #define ASCII_ISPRINT(ch)  ((ch) >= 0x20 && (ch) <= 0x7e)
 #define ASCII_ISBLANK(ch)  ((ch) == 0x09 || (ch) == 0x20)
-
-#define ASCII_TOLOWER(ch)  (ASCII_ISUPPER(ch) ? ((ch)+0x20) : (ch))
+#define ASCII_TOLOWER(ch)  (ASCII_ISUPPER(ch) ? ((ch) + 0x20) : (ch))
 #define ASCII_TOUPPER(ch)  (ASCII_ISLOWER(ch) ? ((ch)-0x20) : (ch))
 
 
@@ -1297,6 +1293,9 @@ PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") uint16_t const *libc___cty
 PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") int32_t const *libc___ctype_tolower_loc_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") int32_t const *libc___ctype_toupper_loc_pointer = NULL;
 
+DEFINE_PUBLIC_IDATA_G(__ctype_b, libc___ctype_b_loc, __SIZEOF_POINTER__);             /* >> extern uint16_t const *__ctype_b; */
+DEFINE_PUBLIC_IDATA_G(__ctype_tolower, libc___ctype_tolower_loc, __SIZEOF_POINTER__); /* >> extern int32_t const *__ctype_tolower; */
+DEFINE_PUBLIC_IDATA_G(__ctype_toupper, libc___ctype_toupper_loc, __SIZEOF_POINTER__); /* >> extern int32_t const *__ctype_toupper; */
 
 /*[[[head:libc___ctype_b_loc,hash:CRC-32=0xde267e1c]]]*/
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED uint16_t const **
