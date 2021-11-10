@@ -289,7 +289,11 @@ file_determine_isatty(FILE *__restrict self) {
 			flags |= IO_NOTATTY;
 		} else {
 			int is_a_tty;
-			is_a_tty = isatty(self->if_fd);
+			errno_t saved_errno;
+			/* Preserve errno */
+			saved_errno = libc_geterrno();
+			is_a_tty    = isatty(self->if_fd);
+			libc_seterrno(saved_errno);
 			flags |= is_a_tty ? IO_ISATTY : IO_NOTATTY;
 		}
 		self->if_flag = flags;
