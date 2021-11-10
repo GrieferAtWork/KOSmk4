@@ -30,6 +30,7 @@
 
 #include <kos/exec/peb.h> /* struct process_peb */
 #include <kos/syscalls.h>
+#include <sys/ioctl.h>
 
 #include <elf.h>
 #include <inttypes.h>
@@ -37,6 +38,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <termios.h>
+#include <unistd.h>
 
 #undef LAZY_TRACE
 #if 1
@@ -558,9 +561,25 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 #endif /* !LAZY_TRACE */
 	{
 		ElfW(Sym) const *sym = self->dm_elf.de_dynsym_tab + ELFW(R_SYM)(rel->r_info);
+		char const *symname  = self->dm_elf.de_dynstr + sym->st_name;
 		syslog(LOG_ERROR, "[rtld] Unable to resolve symbol %q in %q\n",
-		       self->dm_elf.de_dynstr + sym->st_name,
-		       self->dm_filename);
+		       symname, self->dm_filename);
+		/* If STDERR is  a tty,  also print the  error message  there.
+		 * Don't  do so  when STDERR  is something  different (such as
+		 * a file) in order to  not accidentally inject an  unexpected
+		 * error message into an error stream that wouldn't understand
+		 * such an error. */
+		{
+			struct termios ios;
+			if (sys_ioctl(STDERR_FILENO, TCGETA, &ios) >= 0) {
+				sys_write(STDERR_FILENO, "DL: ", 4);
+				sys_write(STDERR_FILENO, "Unresolved symbol '", 19);
+				sys_write(STDERR_FILENO, symname, strlen(symname));
+				sys_write(STDERR_FILENO, "' in '", 6);
+				sys_write(STDERR_FILENO, self->dm_filename, strlen(self->dm_filename));
+				sys_write(STDERR_FILENO, "'\n", 2);
+			}
+		}
 		sys_exit_group(EXIT_FAILURE);
 	}
 #if ELF_ARCH_USESRELA
