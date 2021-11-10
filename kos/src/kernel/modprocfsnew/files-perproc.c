@@ -1089,11 +1089,8 @@ print_mounting_point(struct path *__restrict fsroot,
 	/* TODO: Filesystem drivers should also be able to print additional options:
 	 * - e.g.: "fat" should print `user_id=...,group_id=...' */
 
-	/* I have no idea what these 2 "0"-s are supposed to be, but looking at the
-	 * linux kernel source, it too simply prints a string " 0 0\n" to terminate
-	 * every line.
-	 * There's no comment explaining it, but if I had to guess, it's probably
-	 * related to some since-removed legacy feature... */
+	/* When  passed by `getmntent(3)', these 2 values become `mnt_freq' and `mnt_passno'.
+	 * Note that we unconditionally print `0' for both of them since linux does the same. */
 	return PRINT(" 0 0\n");
 err:
 	return -1;
@@ -3111,7 +3108,7 @@ PRIVATE struct fdirent *const procfs_perproc_dirent_drives[VFS_DRIVECOUNT] = {
 
 
 /* Returns the drive ID referenced by `info' or `0xff' if
- * `info' isn't a drive name or the drive doesn't exist. */
+ * `info' isn't a drive name or the drive doesn't  exist. */
 PRIVATE WUNUSED NONNULL((1)) uint8_t KCALL
 get_driveid(struct fdirnode *__restrict self,
             struct flookup_info const *__restrict info) {
