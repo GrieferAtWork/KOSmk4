@@ -42,10 +42,12 @@
 #include <unistd.h>
 
 #include "../user/stdio-api.h"
+#include "compat.h"
 #include "dl.h"
 #include "globals.h"
 
 DECL_BEGIN
+
 
 
 /************************************************************************/
@@ -247,11 +249,17 @@ NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
 }
 
 INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void
-NOTHROW(LIBCCALL linux_stdio_init)(void) {
+NOTHROW(LIBCCALL linux_stdio_init)(bool is_2_1) {
 	void *mainapp;
 	struct linux_default_stdio_file *result;
 	if (linux_stdio_files)
 		return; /* Already initialized */
+
+	/* Remember what was linked. */
+	libc_compat |= is_2_1 ? COMPAT_FLAG_LINKED_IO_FILE_84_2_1
+	                      : COMPAT_FLAG_LINKED_IO_FILE_84;
+
+	/* TODO: Figure out what's supposed to be different when `is_2_1 == true' */
 
 	/* NOTE: Intentional crash if this Calloc() fails */
 	result = (struct linux_default_stdio_file *)Calloc(3, sizeof(struct linux_default_stdio_file));
@@ -279,27 +287,46 @@ NOTHROW(LIBCCALL linux_stdio_init)(void) {
 
 /* Initialize the linux stdio-compatibility system. */
 INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_2_1_stdin)(void) {
+	linux_stdio_init(true);
+	return libc_stdin;
+}
+
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_2_1_stdout)(void) {
+	linux_stdio_init(true);
+	return libc_stdout;
+}
+
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_2_1_stderr)(void) {
+	linux_stdio_init(true);
+	return libc_stderr;
+}
+
+/* Initialize the linux stdio-compatibility system. */
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
 NOTHROW(LIBCCALL linux_stdio_get_stdin)(void) {
-	linux_stdio_init();
+	linux_stdio_init(false);
 	return libc_stdin;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
 NOTHROW(LIBCCALL linux_stdio_get_stdout)(void) {
-	linux_stdio_init();
+	linux_stdio_init(false);
 	return libc_stdout;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
 NOTHROW(LIBCCALL linux_stdio_get_stderr)(void) {
-	linux_stdio_init();
+	linux_stdio_init(false);
 	return libc_stderr;
 }
 
 /* Export symbols. */
-DEFINE_PUBLIC_IDATA_G(_IO_2_1_stdin_, linux_stdio_get_stdin, SIZEOF_IO_FILE_84);
-DEFINE_PUBLIC_IDATA_G(_IO_2_1_stdout_, linux_stdio_get_stdout, SIZEOF_IO_FILE_84);
-DEFINE_PUBLIC_IDATA_G(_IO_2_1_stderr_, linux_stdio_get_stderr, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA_G(_IO_2_1_stdin_, linux_stdio_get_2_1_stdin, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA_G(_IO_2_1_stdout_, linux_stdio_get_2_1_stdout, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA_G(_IO_2_1_stderr_, linux_stdio_get_2_1_stderr, SIZEOF_IO_FILE_84);
 DEFINE_PUBLIC_IDATA_G(_IO_stdin_, linux_stdio_get_stdin, SIZEOF_IO_FILE_84);
 DEFINE_PUBLIC_IDATA_G(_IO_stdout_, linux_stdio_get_stdout, SIZEOF_IO_FILE_84);
 DEFINE_PUBLIC_IDATA_G(_IO_stderr_, linux_stdio_get_stderr, SIZEOF_IO_FILE_84);
@@ -411,7 +438,7 @@ libc___builtin_vec_new(void *ptr, size_t maxindex, size_t size,
 DEFINE_PUBLIC_ALIAS(socketcall, libc_socketcall);
 DEFINE_PUBLIC_ALIAS(__socketcall, libc_socketcall);
 DEFINE_PUBLIC_ALIAS(__libc_socketcall, libc_socketcall);
-INTERN ATTR_SECTION(".text.crt.glibc.application.init") NONNULL((2)) longptr_t LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.misc") NONNULL((2)) longptr_t LIBCCALL
 libc_socketcall(ulongptr_t call, ulongptr_t *__restrict argv) {
 	longptr_t result;
 #ifdef SYS_socketcall
@@ -625,7 +652,7 @@ INTERN_CONST __UINT32_TYPE__ const libc___shtab[] = {
 /* __libc_start_main(3)                                                 */
 /************************************************************************/
 DEFINE_PUBLIC_ALIAS(__libc_start_main, libc_start_main);
-INTERN ATTR_SECTION(".text.crt.glibc.application.init") NONNULL((1)) int LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.init") NONNULL((1)) int LIBCCALL
 libc_start_main(int (*main)(int, char **, char **),
                 int argc, char **ubp_av,
                 void (*init)(void),
@@ -634,6 +661,7 @@ libc_start_main(int (*main)(int, char **, char **),
                 void *stack_end) {
 	int exit_code;
 	struct process_peb *peb;
+	libc_compat |= COMPAT_FLAG_CALLED___libc_start_main;
 
 	/* All of these will contain garbage... */
 	(void)argc;
@@ -687,9 +715,11 @@ DEFINE_PUBLIC_ALIAS(__libc_init, libc___libc_init);
 /* Prevent GCC from (rightfully) optimizing  away
  * (seemingly unnecessary) parameter assignments. */
 __attribute__((optimize("-O0")))
-INTERN ATTR_SECTION(".text.crt.glibc.application.init") void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.init") void LIBCCALL
 libc___libc_init(int argc, char *argv[], char *envp[]) {
 	struct process_peb *peb;
+	libc_compat |= COMPAT_FLAG_CALLED___libc_init;
+
 	peb  = &__peb;
 	argc = peb->pp_argc;
 	argv = peb->pp_argv;
@@ -698,6 +728,13 @@ libc___libc_init(int argc, char *argv[], char *envp[]) {
 
 #pragma GCC diagnostic pop
 #endif /* __i386__ && !__x86_64__ */
+
+
+/************************************************************************/
+/* General compatibility flags                                          */
+/************************************************************************/
+INTERN ATTR_SECTION(".bss.crt.compat.linux.init") uintptr_t libc_compat = COMPAT_FLAG_NORMAL;
+
 
 DECL_END
 

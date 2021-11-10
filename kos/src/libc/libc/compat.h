@@ -365,6 +365,22 @@ repeatEscapedMacrosFromFile("../../../include/asm/os/dos/signal.h", "__", "DOS_"
 /*[[[end]]]*/
 
 
+
+/* Compatibility mode flags. */
+#define COMPAT_FLAG_NORMAL                   0x00000000 /* No special compat flags. */
+#define COMPAT_FLAG_CALLED___libc_init       0x00000001 /* `__libc_init()' was called */
+#define COMPAT_FLAG_CALLED___libc_start_main 0x00000002 /* `__libc_start_main()' was called */
+#define COMPAT_FLAG_LINKED_IO_FILE_84        0x00000004 /* One of `_IO_stdin_', `_IO_stdout_' or `_IO_stderr_' was linked. */
+#define COMPAT_FLAG_LINKED_IO_FILE_84_2_1    0x00000008 /* One of `_IO_2_1_stdin_', `_IO_2_1_stdout_' or `_IO_2_1_stderr_' was linked. */
+INTDEF uintptr_t libc_compat; /* Set of `COMPAT_FLAG_*' */
+
+/* Check if the main application was compiled against libc4/5 */
+#define libc_compat_islibc5()                                                                \
+	((libc_compat & (COMPAT_FLAG_CALLED___libc_init | COMPAT_FLAG_CALLED___libc_start_main | \
+	                 COMPAT_FLAG_LINKED_IO_FILE_84_2_1)) ==                                  \
+	 COMPAT_FLAG_CALLED___libc_init)
+
+
 DECL_END
 
 #endif /* !GUARD_LIBC_LIBC_COMPAT_H */

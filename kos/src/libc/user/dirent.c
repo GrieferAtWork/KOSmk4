@@ -37,7 +37,9 @@
 #include <syscall.h>
 #include <unistd.h>
 
+#include "../libc/compat.h"
 #include "dirent.h"
+
 
 DECL_BEGIN
 
@@ -47,7 +49,7 @@ DECL_BEGIN
 
 struct __dirstream {
 	int            ds_fd;      /* [const][owned] The handle for the underlying file stream object. */
-	size_t         ds_lodsize; /* Amount of bytes returned by the `xreaddir()' system call during its last invocation. */
+	size_t         ds_lodsize; /* Amount of bytes returned by the `kreaddir()' system call during its last invocation. */
 	size_t         ds_bufsize; /* Size of the directory stream buffer (`ds_buf') in bytes. */
 	struct dirent *ds_next;    /* [1..1][in(ds_buf)] Pointer to the next directory entry yet to-be read. */
 	struct dirent *ds_buf;     /* [1..ds_bufsize][owned_if(!= ds_sbuf)] Directory entry buffer. */
@@ -58,6 +60,7 @@ struct __dirstream {
 };
 
 /* # of leading bytes to allocate before `ds_buf' (for linux compatibility) */
+/*ATTR_SECTION(".bss.crt.compat.linux.dirent")*/
 PRIVATE ATTR_SECTION(".bss.crt.fs.dir") size_t dirbuf_compat_offset = 0;
 
 #define dirstream_init_nofd(self)                                         \
@@ -641,6 +644,20 @@ struct glibc_dirent64 {
 
 
 #ifdef SIZEOF_GLIBC_DIRENT32_MATCHES_KOS_DIRENT
+/* Evaluates to true if the `d_type' must be removed for compatibility */
+#define get_glibc_dirent32_compat_libc5() libc_compat_islibc5()
+
+PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1))
+ATTR_RETNONNULL WUNUSED struct glibc_dirent32 *__FCALL
+dirent_glibc32_to_libc5(struct glibc_dirent32 *__restrict self) {
+	/* Old versions of libc4/5 didn't have the `d_type' field.
+	 * Instead, their `struct dirent' matched `struct old_linux_direntx32',
+	 * which is identical to `struct glibc_dirent32', except that it lacks
+	 * the `d_type' field (which becomes the first name-char instead) */
+	self = (struct glibc_dirent32 *)memcpy((byte_t *)self + 1, self, 10);
+	return self;
+}
+
 PRIVATE ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1))
 ATTR_RETNONNULL WUNUSED struct glibc_dirent32 *__FCALL
 dirent2glibc32(struct dirent *__restrict self) {
@@ -658,10 +675,14 @@ dirent2glibc32(struct dirent *__restrict self) {
 INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1)) struct glibc_dirent32 *
 NOTHROW_RPC(LIBCCALL libc_readdir)(DIR *__restrict dirp) {
 	struct dirent *result;
+	struct glibc_dirent32 *resent;
 	result = libc_readdirk(dirp);
 	if unlikely(!result)
 		return NULL;
-	return dirent2glibc32(result);
+	resent = dirent2glibc32(result);
+	if (get_glibc_dirent32_compat_libc5())
+		resent = dirent_glibc32_to_libc5(resent);
+	return resent;
 }
 
 INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") NONNULL((1, 2, 3)) int
@@ -670,8 +691,11 @@ NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
                                      struct glibc_dirent32 **__restrict result) {
 	int retval;
 	retval = libc_readdirk_r(dirp, (struct dirent *)entry, (struct dirent **)result);
-	if (retval == 0)
+	if (retval == 0) {
 		*result = dirent2glibc32((struct dirent *)*result);
+		if (get_glibc_dirent32_compat_libc5())
+			*result = dirent_glibc32_to_libc5(*result);
+	}
 	return retval;
 }
 
@@ -783,6 +807,12 @@ NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
 		      (comparison_fn_t)cmp);
 	}
 done:
+	/* Yes: libc4/5 did have a scandir(3) function! */
+	if (get_glibc_dirent32_compat_libc5()) {
+		size_t i;
+		for (i = 0; i < ents_used; ++i)
+			ents_list[i] = dirent_glibc32_to_libc5(ents_list[i]);
+	}
 	*namelist = ents_list; /* Inherit */
 	dirstream_fini(&stream);
 done_nostream:
