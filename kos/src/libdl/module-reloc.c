@@ -38,6 +38,26 @@
 #include <string.h>
 #include <syslog.h>
 
+#undef LAZY_TRACE
+#if 1
+#define LAZY_TRACE 1
+#endif
+
+#undef RELSYM_TRACE
+#if 0
+#define RELSYM_TRACE 1
+#endif
+
+#ifdef RELSYM_TRACE
+#define TRACE_RESOLVE_FOR_RELOC(name, addr, size, module_filename)                       \
+	syslog(LOG_DEBUG, "[rtld] %d:Resolve %q for relocation (to %p+%" PRIuSIZ " from %q)\n", \
+	       __LINE__, name, addr, size, module_filename)
+#else /* RELSYM_TRACE */
+#define TRACE_RESOLVE_FOR_RELOC(name, addr, size, module_filename) (void)0
+#endif /* !RELSYM_TRACE */
+
+
+
 DECL_BEGIN
 
 struct dl_symbol {
@@ -100,6 +120,8 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 			addr = dlsym_builtin(name);
 			if (addr) {
 				*paddr = (ElfW(Addr))addr;
+				TRACE_RESOLVE_FOR_RELOC(name, *paddr, dlsym_builtin_size(name),
+				                        dl_rtld_module.dm_filename);
 				if unlikely(psize)
 					*psize = dlsym_builtin_size(name);
 				if unlikely(pmodule)
@@ -126,6 +148,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 			} else {
 				/* Found the real, actual symbol! */
 				*paddr = (ElfW(Addr))(void *)symbol.ds_sym;
+				TRACE_RESOLVE_FOR_RELOC(name, *paddr, symbol.ds_siz, symbol.ds_mod->dm_filename);
 				if unlikely(psize)
 					*psize = symbol.ds_siz;
 				if unlikely(pmodule)
@@ -164,6 +187,8 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 					}
 				}
 				*paddr = addr;
+				TRACE_RESOLVE_FOR_RELOC(name, addr, symbol.ds_sym->st_size,
+				                        symbol.ds_mod->dm_filename);
 				if unlikely(psize)
 					*psize = symbol.ds_sym->st_size;
 				if unlikely(pmodule)
@@ -202,6 +227,15 @@ got_local_symbol:
 		if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
 		    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA)
 			addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
+		TRACE_RESOLVE_FOR_RELOC(name, addr, symbol->st_size,
+		                        self->dm_filename);
+		if (ELFW(ST_BIND)(symbol->st_info) != STB_WEAK && !(self->dm_flags & RTLD_DEEPBIND) &&
+		    self == LIST_FIRST(&DlModule_GlobalList)) {
+			/* Log a warning when a non-weak symbol from the main
+			 * app isn't overwritten  but linked against  itself. */
+			syslog(LOG_WARN, "[rtld] Symbol %q at %p+%" PRIuSIZ " linked against itself in %q\n",
+			       name, addr, symbol->st_size, self->dm_filename);
+		}
 		if unlikely(psize)
 			*psize = symbol->st_size;
 		if unlikely(pmodule)
@@ -235,6 +269,8 @@ again_search_globals_module:
 				if (addr) {
 					if (weak_symbol.ds_mod)
 						decref(weak_symbol.ds_mod);
+					TRACE_RESOLVE_FOR_RELOC(name, addr, dlsym_builtin_size(name),
+					                        dl_rtld_module.dm_filename);
 					if unlikely(psize)
 						*psize = dlsym_builtin_size(name);
 					if unlikely(pmodule)
@@ -267,6 +303,8 @@ again_search_globals_module:
 						if (weak_symbol.ds_mod)
 							decref(weak_symbol.ds_mod);
 						addr = (ElfW(Addr))symbol_addr;
+						TRACE_RESOLVE_FOR_RELOC(name, addr, symbol_size,
+						                        iter->dm_filename);
 						if unlikely(psize)
 							*psize = symbol_size;
 						if unlikely(pmodule)
@@ -309,6 +347,8 @@ again_search_globals_module:
 								RETHROW();
 							}
 						}
+						TRACE_RESOLVE_FOR_RELOC(name, addr, symbol->st_size,
+						                        iter->dm_filename);
 						if unlikely(psize)
 							*psize = symbol->st_size;
 						if unlikely(pmodule)
@@ -356,10 +396,10 @@ again_search_globals_module:
 		}
 
 		if (weak_symbol.ds_mod) {
+			size_t symbol_size;
 			if (weak_symbol.ds_mod->dm_ops) {
 				addr = (ElfW(Addr))weak_symbol.ds_sym;
-				if unlikely(psize)
-					*psize = weak_symbol.ds_siz;
+				symbol_size = weak_symbol.ds_siz;
 			} else {
 				addr = weak_symbol.ds_sym->st_value;
 				if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
@@ -373,11 +413,14 @@ again_search_globals_module:
 						RETHROW();
 					}
 				}
-				if unlikely(psize)
-					*psize = weak_symbol.ds_sym->st_size;
+				symbol_size = weak_symbol.ds_sym->st_size;
 			}
+			TRACE_RESOLVE_FOR_RELOC(name, addr, symbol_size,
+			                        weak_symbol.ds_mod->dm_filename);
 			if unlikely(pmodule)
 				*pmodule = weak_symbol.ds_mod;
+			if unlikely(psize)
+				*psize = symbol_size;
 			decref(weak_symbol.ds_mod);
 			goto done;
 		}
@@ -393,8 +436,12 @@ again_search_globals_module:
 				*psize = symbol->st_size; /* Return 0 instead? */
 			if unlikely(pmodule)
 				*pmodule = self;
+			/* Log a warning when a weak symbol is resolved to NULL. */
+			syslog(LOG_WARN, "[rtld] Weak symbol %q resolves to NULL+%" PRIuSIZ " in %q\n",
+			       name, symbol->st_size, self->dm_filename);
 			goto done;
 		}
+
 		/* If the symbol continues to be undefined, set an error. */
 		dl_seterrorf("Could not find symbol %q required by %q",
 		             name, self->dm_filename);
@@ -409,11 +456,6 @@ done:
 
 
 #ifdef ELF_ARCH_IS_R_JMP_SLOT
-#undef LAZY_TRACE
-#if 1
-#define LAZY_TRACE 1
-#endif
-
 /* Assert  that the offset/info fields of relocation descriptors are at the
  * same location, regardless if the relocation has, or hasn't got an addend */
 STATIC_ASSERT(offsetof(Elf32_Rel, r_offset) == offsetof(Elf32_Rela, r_offset));

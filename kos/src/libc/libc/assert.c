@@ -53,7 +53,7 @@
 
 DECL_BEGIN
 
-PUBLIC uintptr_t __stack_chk_guard = 0x123baf37;
+PUBLIC ATTR_WEAK uintptr_t __stack_chk_guard = 0x123baf37;
 
 /* 0: Unknown, 1: Yes, 2: No */
 PRIVATE ATTR_SECTION(".bss.crt.assert") int stderr_isatty = 0;
