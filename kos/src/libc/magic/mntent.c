@@ -79,9 +79,12 @@ $FILE *setmntent([[nonnull]] char const *file,
                  [[nonnull]] char const *mode);
 
 @@>> endmntent(3)
-[[cp_nokos, nocrt]]
-[[alias("endmntent", "__endmntent", "fclose", "_fclose_nolock", "_IO_fclose")]]
-int endmntent([[nonnull]] $FILE *stream);
+[[cp_nokos, requires_function(fclose)]]
+[[export_alias("__endmntent")]]
+int endmntent([[nonnull]] $FILE *stream) {
+	fclose(stream);
+	return 1;
+}
 
 @@>> getmntent(3), getmntent_r(3)
 [[cp, decl_include("<bits/crt/db/mntent.h>")]]

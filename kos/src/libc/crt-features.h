@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85c68b2b */
+/* HASH CRC-32:0x328e045b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -798,6 +798,7 @@
 #define __CRT_HAVE_DOS$ecvt_r
 #define __CRT_HAVE_DOS$encrypt
 #define __CRT_HAVE_DOS$encrypt_r
+#define __CRT_HAVE_DOS$endmntent
 #define __CRT_HAVE_DOS$envz_add
 #define __CRT_HAVE_DOS$envz_entry
 #define __CRT_HAVE_DOS$envz_get
@@ -3921,6 +3922,7 @@
 #define __CRT_HAVE_endaliasent
 #define __CRT_HAVE_endgrent
 #define __CRT_HAVE_endhostent
+#define __CRT_HAVE_endmntent
 #define __CRT_HAVE_endnetent
 #define __CRT_HAVE_endnetgrent
 #define __CRT_HAVE_endprotoent

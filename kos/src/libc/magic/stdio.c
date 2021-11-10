@@ -721,7 +721,6 @@ char *tmpnam([[nonnull]] char *buf);
 @@>> fclose(3)
 @@Close and destroy a given file `stream'
 [[stdio_throws, std, dos_only_export_alias("_fclose_nolock"), export_alias("_IO_fclose")]]
-[[export_as("endmntent", "__endmntent")]]
 [[section(".text.crt{|.dos}.FILE.locked.access")]]
 int fclose([[nonnull]] FILE *__restrict stream);
 

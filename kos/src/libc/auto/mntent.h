@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb59b96a */
+/* HASH CRC-32:0x7f47b06b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,14 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> endmntent(3) */
+INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBDCALL libd_endmntent)(FILE *stream);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> endmntent(3) */
+INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent)(FILE *stream);

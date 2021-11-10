@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89139767 */
+/* HASH CRC-32:0x8759ee15 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,15 +92,10 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stre
 #elif defined(__CRT_HAVE___endmntent)
 /* >> endmntent(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),__endmntent,(__stream))
-#elif defined(__CRT_HAVE_fclose)
+#elif defined(__CRT_HAVE_fclose) || defined(__CRT_HAVE__fclose_nolock) || defined(__CRT_HAVE__IO_fclose)
+#include <libc/local/mntent/endmntent.h>
 /* >> endmntent(3) */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),fclose,(__stream))
-#elif defined(__CRT_HAVE__fclose_nolock)
-/* >> endmntent(3) */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),_fclose_nolock,(__stream))
-#elif defined(__CRT_HAVE__IO_fclose)
-/* >> endmntent(3) */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),_IO_fclose,(__stream))
+__NAMESPACE_LOCAL_USING_OR_IMPL(endmntent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC_NOKOS(__LIBCCALL endmntent)(__FILE *__stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(endmntent))(__stream); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getmntent
 /* >> getmntent(3), getmntent_r(3) */

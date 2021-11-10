@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f44769f */
+/* HASH CRC-32:0x8128fc6c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,12 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+/* >> endmntent(3) */
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1)) int
+NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream) {
+	libc_fclose(stream);
+	return 1;
+}
 #include <bits/crt/db/mntent.h>
 /* >> getmntent(3), getmntent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1)) struct mntent *
@@ -169,6 +175,8 @@ NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__endmntent, libc_endmntent);
+DEFINE_PUBLIC_ALIAS(endmntent, libc_endmntent);
 DEFINE_PUBLIC_ALIAS(getmntent, libc_getmntent);
 DEFINE_PUBLIC_ALIAS(__getmntent_r, libc_getmntent_r);
 DEFINE_PUBLIC_ALIAS(getmntent_r, libc_getmntent_r);
