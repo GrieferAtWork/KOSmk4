@@ -1262,6 +1262,10 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 	ent->fad_dos.f_attr    = FATATTR_ARCH;
 	if (fnode_isdir(file))
 		ent->fad_dos.f_attr |= FATATTR_DIR;
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+	if (fnode_islnk(file))
+		ent->fad_dos.f_attr |= FATATTR_SYS;
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 	if (ent->fad_ent.fde_ent.fd_name[0] == '.')
 		ent->fad_dos.f_attr |= FATATTR_HIDDEN;
 	mfile_tslock_acquire(file);
