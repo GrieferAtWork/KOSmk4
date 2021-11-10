@@ -134,7 +134,7 @@ NOTHROW(LIBCCALL nontls_errno_redirect)(void) {
 	 * >>     movl  <g_errno>, %eax  # { 0xa1, <u32:g_errno>... }
 	 * >>     ret                    # { 0xc3 } */
 	writer = b_libc_geterrno;
-	PUTB(0xb8), PUTL(g_errno);
+	PUTB(0xa1), PUTL(g_errno);
 	PUTB(0xc3);
 
 	/* >> libc_geterrno_safe:
