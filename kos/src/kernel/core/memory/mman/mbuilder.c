@@ -272,7 +272,8 @@ mbuilder_map(struct mbuilder_norpc *__restrict self,
              struct path *file_fspath,
              struct fdirent *file_fsname,
              pos_t file_pos,
-             size_t min_alignment)
+             size_t min_alignment,
+             ptrdiff_t min_alignment_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
@@ -310,7 +311,8 @@ er_bad_addr_alignment:
 
 	/* Align the required map size by whole pages. */
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags, min_alignment);
+	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags,
+	                                 min_alignment, min_alignment_offset);
 	result    = baseaddr;
 	if unlikely(num_bytes == 0)
 		goto done;
@@ -388,7 +390,8 @@ mbuilder_map_subrange(struct mbuilder_norpc *__restrict self,
                       pos_t file_pos,
                       pos_t file_map_minaddr,
                       pos_t file_map_maxaddr,
-                      size_t min_alignment)
+                      size_t min_alignment,
+                      ptrdiff_t min_alignment_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
@@ -425,7 +428,8 @@ er_bad_addr_alignment:
 
 	/* Align the required map size by whole pages. */
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags, min_alignment);
+	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags,
+	                                 min_alignment, min_alignment_offset);
 	result    = baseaddr;
 
 	/* Make sure that the given file-bounds are properly aligned. */
@@ -555,7 +559,8 @@ er_bad_addr_alignment:
 PUBLIC NONNULL((1)) void *KCALL
 mbuilder_map_res(struct mbuilder_norpc *__restrict self,
                  UNCHECKED void *hint, size_t num_bytes,
-                 unsigned int flags, size_t min_alignment)
+                 unsigned int flags, size_t min_alignment,
+                 ptrdiff_t min_alignment_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
@@ -571,7 +576,8 @@ mbuilder_map_res(struct mbuilder_norpc *__restrict self,
 
 	/* Align the required map size by whole pages. */
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags, min_alignment);
+	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags,
+	                                 min_alignment, min_alignment_offset);
 	result    = baseaddr;
 
 	/* TODO: Extend adjacent nodes if possible */
@@ -598,7 +604,7 @@ mbuilder_map_res(struct mbuilder_norpc *__restrict self,
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
 mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
                      size_t num_bytes, unsigned int flags,
-                     size_t min_alignment)
+                     size_t min_alignment, ptrdiff_t min_alignment_offset)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
 	void *result;
@@ -621,7 +627,8 @@ mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
 	} else {
 		/* Normal case: automatically select a free location. */
 		result = mbuilder_findunmapped(self, addr, num_bytes,
-		                               flags, min_alignment);
+		                               flags, min_alignment,
+		                               min_alignment_offset);
 		if unlikely(result == MAP_FAILED)
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes);
 	}

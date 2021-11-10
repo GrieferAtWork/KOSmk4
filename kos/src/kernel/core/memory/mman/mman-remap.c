@@ -192,12 +192,13 @@ something_changed:
 		/* Everything's still in order!
 		 * In this case, move on ahead to figuring out where
 		 * we should place  the to-be  returned mapping  at. */
-		result = mman_getunmapped_or_unlock(/* self:          */ self,
-		                                    /* addr:          */ new_address,
-		                                    /* num_bytes:     */ map.mmwu_map.mfm_size,
-		                                    /* flags:         */ mapflags_from_remapflags_fndonly(flags),
-		                                    /* min_alignment: */ PAGESIZE,
-		                                    /* unlock:        */ &map /* Unlock the file-map on error! */);
+		result = mman_getunmapped_or_unlock(/* self:                 */ self,
+		                                    /* addr:                 */ new_address,
+		                                    /* num_bytes:            */ map.mmwu_map.mfm_size,
+		                                    /* flags:                */ mapflags_from_remapflags_fndonly(flags),
+		                                    /* min_alignment:        */ PAGESIZE,
+		                                    /* min_alignment_offset: */ 0,
+		                                    /* unlock:               */ &map /* Unlock the file-map on error! */);
 
 		/* Check for special case: lock was lost. */
 		if unlikely(result == MAP_FAILED)
@@ -780,12 +781,13 @@ again_lock_mman_phase2:
 					map.ui_unlock = &mfile_map_with_unlockinfo_unlock_or_reserved;
 
 					/* Find a suitable location for the mapping as a whole. */
-					result = mman_getunmapped_or_unlock(/* self:          */ self,
-					                                    /* addr:          */ new_address,
-					                                    /* num_bytes:     */ new_size,
-					                                    /* flags:         */ mapflags_from_remapflags_fndonly(flags),
-					                                    /* min_alignment: */ PAGESIZE,
-					                                    /* unlock:        */ &map /* Unlock the file-map on error! */);
+					result = mman_getunmapped_or_unlock(/* self:                 */ self,
+					                                    /* addr:                 */ new_address,
+					                                    /* num_bytes:            */ new_size,
+					                                    /* flags:                */ mapflags_from_remapflags_fndonly(flags),
+					                                    /* min_alignment:        */ PAGESIZE,
+					                                    /* min_alignment_offset: */ 0,
+					                                    /* unlock:               */ &map /* Unlock the file-map on error! */);
 
 					/* Check for special case: lock was lost. */
 					if unlikely(result == MAP_FAILED)

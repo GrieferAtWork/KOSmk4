@@ -209,7 +209,8 @@ DATDEF struct mfile mfile_zero; /* Zero-initialized, anonymous memory. */
  *                        But  that that when  `MAP_FIXED' flag is also  set, then the sub-page
  *                        offset of `hint' will be silently ignored, meaning that in this  case
  *                        the return value may differ from `hint'!
- * @param: min_alignment: s.a. `mman_findunmapped'
+ * @param: min_alignment:        s.a. `mman_findunmapped'
+ * @param: min_alignment_offset: s.a. `mman_findunmapped'
  * @return: * : The effective mapping  base at which `file->DATA.BYTES[file_pos]' can be found. */
 FUNDEF BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 6)) void *KCALL
 mman_map(struct mman *__restrict self,
@@ -220,21 +221,21 @@ mman_map(struct mman *__restrict self,
          struct path *file_fspath DFL(__NULLPTR),
          struct fdirent *file_fsname DFL(__NULLPTR),
          pos_t file_pos DFL(0),
-         size_t min_alignment DFL(PAGESIZE))
+         size_t min_alignment DFL(PAGESIZE),
+         ptrdiff_t min_alignment_offset DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
 #if 0
-mman_map(/* self:          */ self,
-         /* hint:          */ hint,
-         /* num_bytes:     */ num_bytes,
-         /* prot:          */ prot,
-         /* flags:         */ flags,
-         /* file:          */ file,
-         /* file_fspath:   */ file_fspath,
-         /* file_fsname:   */ file_fsname,
-         /* file_pos:      */ file_pos,
-         /* min_alignment: */ min_alignment);
+mman_map(/* self:        */ self,
+         /* hint:        */ hint,
+         /* num_bytes:   */ num_bytes,
+         /* prot:        */ prot,
+         /* flags:       */ flags,
+         /* file:        */ file,
+         /* file_fspath: */ file_fspath,
+         /* file_fsname: */ file_fsname,
+         /* file_pos:    */ file_pos);
 #endif
 
 
@@ -257,7 +258,8 @@ mman_map_subrange(struct mman *__restrict self,
                   pos_t file_pos DFL(0),
                   pos_t file_map_minaddr DFL(0),
                   pos_t file_map_maxaddr DFL((pos_t)-1),
-                  size_t min_alignment DFL(PAGESIZE))
+                  size_t min_alignment DFL(PAGESIZE),
+                  ptrdiff_t min_alignment_offset DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
@@ -272,7 +274,8 @@ FUNDEF NONNULL((1)) void *KCALL
 mman_map_res(struct mman *__restrict self,
              UNCHECKED void *hint, size_t num_bytes,
              unsigned int flags DFL(0),
-             size_t min_alignment DFL(PAGESIZE))
+             size_t min_alignment DFL(PAGESIZE),
+             ptrdiff_t min_alignment_offset DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);

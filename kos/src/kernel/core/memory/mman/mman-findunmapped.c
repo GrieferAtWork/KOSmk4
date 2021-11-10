@@ -179,6 +179,9 @@ select_random_integer_with_bias(uintptr_t minval,
  *                    be  aligned by at least the size of a single page. If this argument
  *                    isn't a pointer-of-2, then the alignment guarantied for the  return
  *                    value is undefined, except that it will still be at least PAGESIZE!
+ * @param: min_alignment_offset: [valid_if(IS_POWER_OF_TWO(min_alignment) && min_alignment >= PAGESIZE)]
+ *                    Offset from `return' at which `min_alignment' shall be applied.
+ *                    If  valid, this  argument _must_  be a  multiple of `PAGESIZE'.
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Unknown flags are silently ignored.
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
@@ -186,11 +189,13 @@ select_random_integer_with_bias(uintptr_t minval,
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) void *
 NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self,
                                  void *addr, size_t num_bytes, unsigned int flags,
-                                 size_t min_alignment) {
+                                 size_t min_alignment, ptrdiff_t min_alignment_offset) {
 #define HAS_EXTENDED_MIN_ALIGNMENT \
 	(min_alignment > PAGESIZE && IS_POWER_OF_TWO(min_alignment))
 #define REQUIRED_ALIGNMENT \
 	(HAS_EXTENDED_MIN_ALIGNMENT ? min_alignment : PAGESIZE)
+#define ALIGN_EXTENDED_POINTER(value) \
+	((void *)(CEIL_ALIGN((uintptr_t)(value) + min_alignment_offset, min_alignment) - min_alignment_offset))
 	void *result;
 	struct mnode_tree_minmax mima;
 	PAGEDIR_PAGEALIGNED void *allow_minaddr, *allow_maxaddr;
@@ -270,8 +275,9 @@ again_find_good_range:
 
 	/* Apply extended alignment requirements to result bounds and the hint address. */
 	if unlikely(HAS_EXTENDED_MIN_ALIGNMENT) {
-		allow_minaddr = (void *)CEIL_ALIGN((uintptr_t)allow_minaddr, min_alignment);
-		addr          = (void *)CEIL_ALIGN((uintptr_t)addr, min_alignment);
+		assert(IS_ALIGNED(min_alignment_offset, PAGESIZE));
+		allow_minaddr = ALIGN_EXTENDED_POINTER(allow_minaddr);
+		addr          = ALIGN_EXTENDED_POINTER(addr);
 	}
 
 	/* Safety check: Is the range of allowed addresses non-empty? */
@@ -311,16 +317,18 @@ do_set_automatic_userspace_hint:
 				addr = allow_minaddr;
 			else {
 				if (HAS_EXTENDED_MIN_ALIGNMENT)
-					addr = (void *)CEIL_ALIGN((uintptr_t)addr, min_alignment);
+					addr = ALIGN_EXTENDED_POINTER(addr);
 			}
 		}
 	} else if (addr == NULL && self != &mman_kernel) {
 		goto do_set_automatic_userspace_hint;
 	}
 
+	assert((byte_t *)addr >= (byte_t *)allow_minaddr);
 	assert(IS_ALIGNED((uintptr_t)addr, REQUIRED_ALIGNMENT));
 	avail_minaddr = (byte_t *)addr;
 	avail_maxaddr = (byte_t *)addr + num_bytes - 1;
+
 	/* Make sure that the hinted address range lies within the max result bounds.
 	 * This  also makes sure  that the requested address  size is properly bound. */
 	if (avail_maxaddr > allow_maxaddr) {
@@ -333,6 +341,8 @@ do_set_automatic_userspace_hint:
 		avail_minaddr = (byte_t *)addr;
 		avail_maxaddr = (byte_t *)addr + num_bytes - 1;
 	}
+	assert((byte_t *)avail_minaddr >= (byte_t *)allow_minaddr);
+	assert((byte_t *)avail_maxaddr <= (byte_t *)allow_maxaddr);
 
 	/* Check if the hinted address range is available. */
 	mnode_tree_minmaxlocate(self->mm_mappings,
@@ -366,7 +376,7 @@ select_from_avail_range:
 				avail_minaddr = allow_minaddr;
 			}
 			if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
-				avail_minaddr = (void *)CEIL_ALIGN((uintptr_t)avail_minaddr, min_alignment);
+				avail_minaddr = ALIGN_EXTENDED_POINTER(avail_minaddr);
 		}
 		if (avail_maxaddr < allow_maxaddr) {
 			mnode_tree_minmaxlocate(self->mm_mappings,
@@ -381,6 +391,7 @@ select_from_avail_range:
 			}
 		}
 		assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
+
 		/* Figure out the max address which we're allowed to return. */
 		alloc_maxaddr = ((byte_t *)avail_maxaddr + 1) - num_bytes;
 		assert(alloc_maxaddr >= avail_minaddr);
@@ -412,6 +423,7 @@ select_from_avail_range:
 		bool want_below, want_above;
 		PAGEDIR_PAGEALIGNED void *lo_best_minaddr, *lo_best_maxaddr;
 		PAGEDIR_PAGEALIGNED void *hi_best_minaddr, *hi_best_maxaddr;
+
 		/* The hinted address range is already in use.
 		 * -> Find a larger  range below  and/or above  the
 		 *    first (resp.) conflict with the hinted range. */
@@ -439,23 +451,31 @@ again_find_below_above:
 				size_t gap_size;
 				prev    = mnode_tree_prevnode(next);
 				gap_min = allow_minaddr;
-				if (prev != NULL)
+				if (prev != NULL) {
 					gap_min = (byte_t *)mnode_getmaxaddr(prev) + 1;
-				gap_max = (byte_t *)mnode_getminaddr(next) - 1;
+					if (gap_min < allow_minaddr)
+						gap_min = allow_minaddr;
+				}
+				gap_max = (byte_t *)mnode_getminaddr(next);
+				if (OVERFLOW_USUB((uintptr_t)gap_max, 1, (uintptr_t *)&gap_max))
+					break; /* Prevent overflow, else we'd get `gap_max == (void *)-1' */
 				if (gap_min >= gap_max)
 					goto continue_find_below;
+				assert(gap_max <= allow_maxaddr);
 				gap_size = (size_t)((byte_t *)gap_max - (byte_t *)gap_min) + 1;
 				if (gap_size < num_bytes)
 					goto continue_find_below;
+
 				/* Include extended alignment requirements. */
 				if unlikely(HAS_EXTENDED_MIN_ALIGNMENT) {
-					gap_min = (void *)CEIL_ALIGN((uintptr_t)gap_min, min_alignment);
+					gap_min = ALIGN_EXTENDED_POINTER(gap_min);
 					if (gap_min >= gap_max)
 						goto continue_find_below;
 					gap_size = (size_t)((byte_t *)gap_max - (byte_t *)gap_min) + 1;
 					if (gap_size < num_bytes)
 						goto continue_find_below;
 				}
+
 				/* Found the nearest address range that is still large enough! */
 				lo_best_minaddr = gap_min;
 				lo_best_maxaddr = gap_max;
@@ -474,24 +494,33 @@ continue_find_below:
 				void *gap_min, *gap_max;
 				size_t gap_size;
 				next    = mnode_tree_nextnode(prev);
-				gap_min = (byte_t *)mnode_getmaxaddr(prev) + 1;
+				gap_min = (byte_t *)mnode_getmaxaddr(prev);
+				if (OVERFLOW_UADD((uintptr_t)gap_min, 1, (uintptr_t *)&gap_min))
+					break; /* Prevent overflow, else we'd get `gap_min == (void *)0' */
 				gap_max = allow_maxaddr;
-				if (next != NULL)
+				if (next != NULL) {
 					gap_max = (byte_t *)mnode_getminaddr(next) - 1;
+					assert(gap_max != (void *)-1);
+					if (gap_max > allow_maxaddr)
+						gap_max = allow_maxaddr;
+				}
 				if (gap_min >= gap_max)
 					goto continue_find_above;
+				assert(gap_min >= allow_minaddr);
 				gap_size = (size_t)((byte_t *)gap_max - (byte_t *)gap_min) + 1;
 				if (gap_size < num_bytes)
 					goto continue_find_above;
+
 				/* Include extended alignment requirements. */
 				if unlikely(HAS_EXTENDED_MIN_ALIGNMENT) {
-					gap_min = (void *)CEIL_ALIGN((uintptr_t)gap_min, min_alignment);
+					gap_min = ALIGN_EXTENDED_POINTER(gap_min);
 					if (gap_min >= gap_max)
 						goto continue_find_above;
 					gap_size = (size_t)((byte_t *)gap_max - (byte_t *)gap_min) + 1;
 					if (gap_size < num_bytes)
 						goto continue_find_above;
 				}
+
 				/* Found the nearest address range that is still large enough! */
 				hi_best_minaddr = gap_min;
 				hi_best_maxaddr = gap_max;
@@ -502,6 +531,14 @@ continue_find_above:
 				prev = next;
 			}
 		}
+
+		/* Assert that best-fit ranges are within allowed bounds. */
+		assert(!(lo_best_minaddr <= lo_best_maxaddr) || lo_best_minaddr >= allow_minaddr);
+		assert(!(lo_best_minaddr <= lo_best_maxaddr) || lo_best_maxaddr <= allow_maxaddr);
+		assert(!(lo_best_minaddr <= lo_best_maxaddr) || !mnode_tree_rlocate(self->mm_mappings, lo_best_minaddr, lo_best_maxaddr));
+		assert(!(hi_best_minaddr <= hi_best_maxaddr) || hi_best_minaddr >= allow_minaddr);
+		assert(!(hi_best_minaddr <= hi_best_maxaddr) || hi_best_maxaddr <= allow_maxaddr);
+		assert(!(hi_best_minaddr <= hi_best_maxaddr) || !mnode_tree_rlocate(self->mm_mappings, hi_best_minaddr, hi_best_maxaddr));
 
 		/* Check for special case: we've managed to find something in both directions. */
 		if (lo_best_minaddr <= lo_best_maxaddr &&
@@ -637,6 +674,7 @@ PUBLIC NOBLOCK WUNUSED NONNULL((1)) void *FCALL
 mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
                            size_t num_bytes, unsigned int flags,
                            size_t min_alignment,
+                           ptrdiff_t min_alignment_offset,
                            struct unlockinfo *unlock)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
@@ -719,7 +757,8 @@ disallow_mmap:
 		}
 	} else {
 		/* Normal case: automatically select a free location. */
-		result = mman_findunmapped(self, addr, num_bytes, flags, min_alignment);
+		result = mman_findunmapped(self, addr, num_bytes, flags,
+		                           min_alignment, min_alignment_offset);
 		if unlikely(result == MAP_FAILED)
 			goto err_insufficient_vmem;
 	}

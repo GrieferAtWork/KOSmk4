@@ -410,7 +410,8 @@ mbuilder_apply(struct mbuilder *__restrict self,
 NOBLOCK WUNUSED NONNULL((1)) void *
 NOTHROW(mbuilder_findunmapped)(struct mbuilder_norpc *__restrict self, void *addr,
                                size_t num_bytes, unsigned int flags,
-                               size_t min_alignment DFL(PAGESIZE));
+                               size_t min_alignment DFL(PAGESIZE),
+                               ptrdiff_t min_alignment_offset DFL(0));
 #else /* __INTELLISENSE__ */
 #define mbuilder_findunmapped(self, ...) \
 	mman_findunmapped_in_usertree((struct mnode **)&(self)->mb_mappings, __VA_ARGS__)
@@ -426,7 +427,8 @@ NOTHROW(mbuilder_findunmapped)(struct mbuilder_norpc *__restrict self, void *add
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
 mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
                      size_t num_bytes, unsigned int flags,
-                     size_t min_alignment DFL(PAGESIZE))
+                     size_t min_alignment DFL(PAGESIZE),
+                     ptrdiff_t min_alignment_offset DFL(0))
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
 
@@ -441,21 +443,21 @@ mbuilder_map(struct mbuilder_norpc *__restrict self,
              struct path *file_fspath DFL(__NULLPTR),
              struct fdirent *file_fsname DFL(__NULLPTR),
              pos_t file_pos DFL(0),
-             size_t min_alignment DFL(PAGESIZE))
+             size_t min_alignment DFL(PAGESIZE),
+             ptrdiff_t min_alignment_offset DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
 #if 0
-mbuilder_map(/* self:          */ self,
-             /* hint:          */ hint,
-             /* num_bytes:     */ num_bytes,
-             /* prot:          */ prot,
-             /* flags:         */ flags,
-             /* file:          */ file,
-             /* file_fspath:   */ file_fspath,
-             /* file_fsname:   */ file_fsname,
-             /* file_pos:      */ file_pos,
-             /* min_alignment: */ min_alignment);
+mbuilder_map(/* self:        */ self,
+             /* hint:        */ hint,
+             /* num_bytes:   */ num_bytes,
+             /* prot:        */ prot,
+             /* flags:       */ flags,
+             /* file:        */ file,
+             /* file_fspath: */ file_fspath,
+             /* file_fsname: */ file_fsname,
+             /* file_pos:    */ file_pos);
 #endif
 
 
@@ -471,7 +473,8 @@ mbuilder_map_subrange(struct mbuilder_norpc *__restrict self,
                       pos_t file_pos DFL(0),
                       pos_t file_map_minaddr DFL(0),
                       pos_t file_map_maxaddr DFL((pos_t)-1),
-                      size_t min_alignment DFL(PAGESIZE))
+                      size_t min_alignment DFL(PAGESIZE),
+                      ptrdiff_t min_alignment_offset DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
@@ -481,7 +484,8 @@ FUNDEF NONNULL((1)) void *KCALL
 mbuilder_map_res(struct mbuilder_norpc *__restrict self,
                  UNCHECKED void *hint, size_t num_bytes,
                  unsigned int flags DFL(0),
-                 size_t min_alignment DFL(PAGESIZE))
+                 size_t min_alignment DFL(PAGESIZE),
+                 ptrdiff_t min_alignment_offset DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);

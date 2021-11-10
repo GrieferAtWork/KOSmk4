@@ -172,7 +172,8 @@ NOTHROW(FCALL mnode_destroy_anon_ram)(struct mnode *__restrict self) {
  *                        But  that that when  `MAP_FIXED' flag is also  set, then the sub-page
  *                        offset of `hint' will be silently ignored, meaning that in this  case
  *                        the return value may differ from `hint'!
- * @param: min_alignment: s.a. `mman_findunmapped'
+ * @param: min_alignment:        s.a. `mman_findunmapped'
+ * @param: min_alignment_offset: s.a. `mman_findunmapped'
  * @return: * : The effective mapping  base at which `file->DATA.BYTES[file_pos]' can be found. */
 PUBLIC BLOCKING_IF(flags & MAP_POPULATE) NONNULL((1, 6)) void *KCALL
 mman_map(struct mman *__restrict self,
@@ -181,7 +182,8 @@ mman_map(struct mman *__restrict self,
          struct mfile *__restrict file,
          struct path *file_fspath,
          struct fdirent *file_fsname,
-         pos_t file_pos, size_t min_alignment)
+         pos_t file_pos, size_t min_alignment,
+         ptrdiff_t min_alignment_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
@@ -205,7 +207,8 @@ mman_map_subrange(struct mman *__restrict self,
                   pos_t file_pos,
                   pos_t file_map_minaddr,
                   pos_t file_map_maxaddr,
-                  size_t min_alignment)
+                  size_t min_alignment,
+                  ptrdiff_t min_alignment_offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
@@ -219,7 +222,8 @@ mman_map_subrange(struct mman *__restrict self,
 PUBLIC NONNULL((1)) void *KCALL
 mman_map_res(struct mman *__restrict self,
              UNCHECKED void *hint, size_t num_bytes,
-             unsigned int flags, size_t min_alignment)
+             unsigned int flags, size_t min_alignment,
+             ptrdiff_t min_alignment_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
@@ -406,6 +410,7 @@ again_lock_mfile_map:
 			 *       below. */
 			result = mman_getunmapped_or_unlock(self, hint, num_bytes,
 			                                    flags, min_alignment,
+			                                    min_alignment_offset,
 #ifdef HAVE_FILE
 			                                    &map
 #else /* HAVE_FILE */

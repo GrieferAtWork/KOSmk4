@@ -101,16 +101,19 @@ DECL_BEGIN
  * @param: min_alignment: The minimum alignment  for the returned  pointer. Ignored  when
  *                        the `GFP_MAP_FIXED' flag was given. Otherwise, a value  greater
  *                        than `PAGESIZE' can be used to ensure that the returned pointer
- *                        is aligned by multiple pages. s.a. `mman_findunmapped()' */
+ *                        is aligned by multiple pages. s.a. `mman_findunmapped()'
+ * @param: min_alignment_offset: Offset from `return' at which `min_alignment' shall be applied. */
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
-              gfp_t flags, size_t min_alignment)
+              gfp_t flags, size_t min_alignment,
+              ptrdiff_t min_alignment_offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK)
 #elif defined(DEFINE_mman_map_kram_nx)
 /* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void *
 NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
-                                gfp_t flags, size_t min_alignment)
+                                gfp_t flags, size_t min_alignment,
+                                ptrdiff_t min_alignment_offset)
 #define LOCAL_NX
 #endif /* ... */
 {
@@ -228,7 +231,7 @@ again_lock_mman:
 			}
 			result = mman_findunmapped(&mman_kernel, hint, num_bytes,
 			                           mapfindflags_from_gfp(flags),
-			                           min_alignment);
+			                           min_alignment, min_alignment_offset);
 			if unlikely(result == MAP_FAILED)
 				goto err_nospace_for_mapping;
 		}

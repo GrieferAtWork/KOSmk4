@@ -118,17 +118,20 @@ typedef unsigned int gfp_t;
  * @param: min_alignment: The minimum alignment  for the returned  pointer. Ignored  when
  *                        the `GFP_MAP_FIXED' flag was given. Otherwise, a value  greater
  *                        than `PAGESIZE' can be used to ensure that the returned pointer
- *                        is aligned by multiple pages. s.a. `mman_findunmapped()' */
+ *                        is aligned by multiple pages. s.a. `mman_findunmapped()'
+ * @param: min_alignment_offset: Offset from `return' at which `min_alignment' shall be applied. */
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
 mman_map_kram(void *hint, size_t num_bytes,
-              gfp_t flags, size_t min_alignment DFL(PAGESIZE))
+              gfp_t flags, size_t min_alignment DFL(PAGESIZE),
+              ptrdiff_t min_alignment_offset DFL(0))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 
 /* Non-throwing version of `mman_map_kram()'. Returns `MAP_FAILED' on error. */
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *
-NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
-                                gfp_t flags, size_t min_alignment DFL(PAGESIZE));
+NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes, gfp_t flags,
+                                size_t min_alignment DFL(PAGESIZE),
+                                ptrdiff_t min_alignment_offset DFL(0));
 
 /* Return value of `mman_map_kram()' and `mman_map_kram_nx()' if GFP_MAP_FIXED
  * is used with  an address that  is already being  mapped by something  else. */

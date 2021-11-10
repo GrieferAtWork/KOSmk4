@@ -184,6 +184,9 @@ DATDEF unsigned int mman_findunmapped_extflags;
  *                    be  aligned by at least the size of a single page. If this argument
  *                    isn't a pointer-of-2, then the alignment guarantied for the  return
  *                    value is undefined, except that it will still be at least PAGESIZE!
+ * @param: min_alignment_offset: [valid_if(IS_POWER_OF_TWO(min_alignment) && min_alignment >= PAGESIZE)]
+ *                    Offset from `return' at which `min_alignment' shall be applied.
+ *                    If  valid, this  argument _must_  be a  multiple of `PAGESIZE'.
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Unknown flags are silently ignored.
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
@@ -191,7 +194,8 @@ DATDEF unsigned int mman_findunmapped_extflags;
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *
 NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self, void *addr,
                                  size_t num_bytes, unsigned int flags,
-                                 size_t min_alignment DFL(PAGESIZE));
+                                 size_t min_alignment DFL(PAGESIZE),
+                                 ptrdiff_t min_alignment_offset DFL(0));
 
 /* Given a `struct mnode **p_tree_root', try to find a free user-space location.
  * Don't  use this function. - It's a kind-of hacky work-around to allow for the
@@ -221,6 +225,9 @@ NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self, void *addr,
  *                    be  aligned by at least the size of a single page. If this argument
  *                    isn't a pointer-of-2, then the alignment guarantied for the  return
  *                    value is undefined, except that it will still be at least PAGESIZE!
+ * @param: min_alignment_offset: [valid_if(IS_POWER_OF_TWO(min_alignment) && min_alignment >= PAGESIZE)]
+ *                    Offset from `return' at which `min_alignment' shall be applied.
+ *                    If  valid, this  argument _must_  be a  multiple of `PAGESIZE'.
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Additionally,   `MAP_FIXED'   and  `MAP_FIXED_NOREPLACE'   are  accepted.
  *                    Unknown flags are silently ignored.
@@ -236,6 +243,7 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *FCALL
 mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
                            size_t num_bytes, unsigned int flags,
                            size_t min_alignment DFL(PAGESIZE),
+                           ptrdiff_t min_alignment_offset DFL(0),
                            struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
