@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa00eafb1 */
+/* HASH CRC-32:0xa111d5d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -330,7 +330,7 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockad
  * @return: < 0: Timeout expired */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
-#include <libc/local/kos.futexexpr/LFutexExpr.h>
+#include <libc/local/kos.futexexpr/LFutexExpr_except.h>
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
  * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
@@ -340,7 +340,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr,(lfutex_t *__ulocka
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
  * @return: < 0: Timeout expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(LFutexExpr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL LFutexExpr)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); })
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL LFutexExpr)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr_except))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); }
 #endif /* ... */
 
 #ifdef __USE_TIME64
@@ -367,7 +367,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr64,(lfutex_t *__uloc
  * @return: < 0: Timeout expired */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr)
-#include <libc/local/kos.futexexpr/LFutexExpr64.h>
+#include <libc/local/kos.futexexpr/LFutexExpr64_except.h>
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
  * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
@@ -377,7 +377,7 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulock
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
  * @return: < 0: Timeout expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(LFutexExpr64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL LFutexExpr64)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr64))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); })
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL LFutexExpr64)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr64_except))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); }
 #endif /* ... */
 #endif /* __USE_TIME64 */
 

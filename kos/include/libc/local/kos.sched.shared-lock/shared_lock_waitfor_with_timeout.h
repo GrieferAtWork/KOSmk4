@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91ab60a3 */
+/* HASH CRC-32:0x4e244fad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,29 +27,29 @@
 #include <kos/anno.h>
 #include <kos/bits/shared-lock.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_LFutexExpr_defined
-#define __local___localdep_LFutexExpr_defined
+#ifndef __local___localdep_LFutexExpr_except_defined
+#define __local___localdep_LFutexExpr_except_defined
 #if defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,__localdep_LFutexExpr,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,__localdep_LFutexExpr_except,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,__localdep_LFutexExpr,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,__localdep_LFutexExpr_except,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 __NAMESPACE_LOCAL_END
-#include <libc/local/kos.futexexpr/LFutexExpr.h>
+#include <libc/local/kos.futexexpr/LFutexExpr_except.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_LFutexExpr __LIBC_LOCAL_NAME(LFutexExpr)
+#define __localdep_LFutexExpr_except __LIBC_LOCAL_NAME(LFutexExpr_except)
 #else /* ... */
-#undef __local___localdep_LFutexExpr_defined
+#undef __local___localdep_LFutexExpr_except_defined
 #endif /* !... */
-#endif /* !__local___localdep_LFutexExpr_defined */
+#endif /* !__local___localdep_LFutexExpr_except_defined */
 __NAMESPACE_LOCAL_END
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
@@ -89,9 +89,9 @@ __success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(__self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if ((__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr)(&__self->sl_sig, __self, 1,
-		               __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		               __abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr_except)(&__self->sl_sig, __self, 1,
+		                      __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
+		                      __abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return 0;
 	}
 #endif /* !__KERNEL__ */

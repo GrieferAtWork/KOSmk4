@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa40600f */
+/* HASH CRC-32:0xcc89bc61 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,8 +99,8 @@ success:
 	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr(&self->sl_sig, self, 1,
-		               __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		               abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		                      __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
+		                      abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
 #endif /* !__KERNEL__ */
@@ -159,8 +159,8 @@ success:
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr(&self->sl_sig, self, 1,
-		               __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		               abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		                      __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
+		                      abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
 #endif /* !__KERNEL__ */
@@ -192,8 +192,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr64(&self->sl_sig, self, 1,
-		                 __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                 abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		                        __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
+		                        abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
 	COMPILER_BARRIER();
@@ -225,8 +225,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr64(&self->sl_sig, self, 1,
-		                 __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                 abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		                        __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
+		                        abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
 	return true;

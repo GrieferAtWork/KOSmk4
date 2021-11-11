@@ -268,9 +268,10 @@ int LFutexExpr32([[nonnull]] lfutex_t *ulockaddr, void *base,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("LFutexExpr64")]]
 [[userimpl, requires($has_function(lfutexexpr32) || $has_function(lfutexexpr64))]]
 [[section(".text.crt{|.dos}.sched.futexlockexpr")]]
-int LFutexExpr([[nonnull]] lfutex_t *ulockaddr, void *base,
-               $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
-               struct timespec const *timeout, unsigned int timeout_flags) {
+[[exposed_name("LFutexExpr"), crt_name("LFutexExpr")]]
+int LFutexExpr_except([[nonnull]] lfutex_t *ulockaddr, void *base,
+                      $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
+                      struct timespec const *timeout, unsigned int timeout_flags) {
 @@pp_if $has_function(LFutexExpr32)@@
 	struct timespec32 tms32;
 	if (!timeout)
@@ -281,21 +282,22 @@ int LFutexExpr([[nonnull]] lfutex_t *ulockaddr, void *base,
 @@pp_else@@
 	struct timespec64 tms64;
 	if (!timeout)
-		return LFutexExpr64(ulockaddr, base, exprc, exprv, NULL, 0);
+		return LFutexExpr64_except(ulockaddr, base, exprc, exprv, NULL, 0);
 	tms64.tv_sec  = (time64_t)timeout->tv_sec;
 	tms64.tv_nsec = timeout->tv_nsec;
-	return LFutexExpr64(ulockaddr, base, exprc, exprv, &tms64, timeout_flags);
+	return LFutexExpr64_except(ulockaddr, base, exprc, exprv, &tms64, timeout_flags);
 @@pp_endif@@
 }
 
 %
 %#ifdef __USE_TIME64
 [[cp, throws, decl_include("<bits/types.h>", "<bits/os/timespec.h>", "<kos/bits/futex-expr.h>")]]
-[[preferred_time64_variant_of(LFutexExpr), doc_alias("LFutexExpr")]]
+[[preferred_time64_variant_of(LFutexExpr), doc_alias("LFutexExpr_except")]]
 [[userimpl, requires_function(LFutexExpr32), section(".text.crt{|.dos}.sched.futexlockexpr")]]
-int LFutexExpr64([[nonnull]] lfutex_t *ulockaddr, void *base,
-                 $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
-                 struct timespec64 const *timeout, unsigned int timeout_flags) {
+[[exposed_name("LFutexExpr64"), crt_name("LFutexExpr64")]]
+int LFutexExpr64_except([[nonnull]] lfutex_t *ulockaddr, void *base,
+                        $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
+                        struct timespec64 const *timeout, unsigned int timeout_flags) {
 	struct timespec32 tms32;
 	if (!timeout)
 		return LFutexExpr32(ulockaddr, base, exprc, exprv, NULL, 0);

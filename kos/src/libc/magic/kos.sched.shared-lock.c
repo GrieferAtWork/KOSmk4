@@ -110,7 +110,7 @@ __SYSDECL_BEGIN
 @@Acquire a lock to the given shared_lock.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64)), impl_prefix(
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except)), impl_prefix(
 @@pp_ifdef __KERNEL__@@
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
@@ -147,7 +147,7 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64(&self->@sl_sig@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, NULL, 0);
+		LFutexExpr64_except(&self->@sl_sig@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, NULL, 0);
 	}
 @@pp_endif@@
 	COMPILER_BARRIER();
@@ -162,7 +162,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_acquire_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_acquire_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr)), impl_prefix(
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except)), impl_prefix(
 @@pp_ifdef __KERNEL__@@
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
@@ -201,9 +201,9 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr(&self->@sl_sig@, self, 1,
-		               __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		               abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		if (LFutexExpr_except(&self->@sl_sig@, self, 1,
+		                      __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
+		                      abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
 @@pp_endif@@
@@ -216,7 +216,7 @@ success:
 @@Wait that `self' becomes available.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64)), impl_prefix(
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except)), impl_prefix(
 @@pp_ifdef __KERNEL__@@
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
@@ -252,7 +252,7 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64(&self->@sl_sig@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, NULL, 0);
+		LFutexExpr64_except(&self->@sl_sig@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, NULL, 0);
 	}
 @@pp_endif@@
 }
@@ -266,7 +266,7 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_waitfor_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_waitfor_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr)), impl_prefix(
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except)), impl_prefix(
 @@pp_ifdef __KERNEL__@@
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
@@ -305,9 +305,9 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr(&self->@sl_sig@, self, 1,
-		               __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		               abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		if (LFutexExpr_except(&self->@sl_sig@, self, 1,
+		                      __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
+		                      abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
 @@pp_endif@@
@@ -321,7 +321,7 @@ success:
 [[preferred_time64_variant_of(shared_lock_acquire_with_timeout), doc_alias("shared_lock_acquire_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExpr64)), impl_prefix(
+[[requires($has_function(LFutexExpr64_except)), impl_prefix(
 #include <kos/syscalls.h>
 #include <kos/bits/futex.h>
 #include <kos/bits/futex-expr.h>
@@ -338,9 +338,9 @@ $bool shared_lock_acquire_with_timeout64([[nonnull]] struct shared_lock *__restr
                                          struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64(&self->@sl_sig@, self, 1,
-		                 __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		                 abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		if (LFutexExpr64_except(&self->@sl_sig@, self, 1,
+		                        __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
+		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
 	COMPILER_BARRIER();
@@ -350,7 +350,7 @@ $bool shared_lock_acquire_with_timeout64([[nonnull]] struct shared_lock *__restr
 [[preferred_time64_variant_of(shared_lock_waitfor_with_timeout), doc_alias("shared_lock_waitfor_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExpr64)), impl_prefix(
+[[requires($has_function(LFutexExpr64_except)), impl_prefix(
 #include <kos/syscalls.h>
 #include <kos/bits/futex.h>
 #include <kos/bits/futex-expr.h>
@@ -367,9 +367,9 @@ $bool shared_lock_waitfor_with_timeout64([[nonnull]] struct shared_lock *__restr
                                          struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64(&self->@sl_sig@, self, 1,
-		                 __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		                 abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		if (LFutexExpr64_except(&self->@sl_sig@, self, 1,
+		                        __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
+		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
 	return true;
