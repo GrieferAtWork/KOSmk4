@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f4da3ba */
+/* HASH CRC-32:0x30df8ccc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -411,8 +411,7 @@
 #define __NRAC_userviofd                2
 #define __NRAC_coredump                 6
 #define __NRAC_mktty                    4
-#define __NRAC_lfutexlockexpr           6
-#define __NRAC_lfutexexpr               5
+#define __NRAC_lfutexexpr               6
 #define __NRAC_lfutex                   5
 #define __NRAC_rpc_serve                0
 #define __NRAC_debugtrap                2
@@ -819,7 +818,6 @@
 #define __NRRT_userviofd                (fd_t, __fd_t)
 #define __NRRT_coredump                 (errno_t, __errno_t)
 #define __NRRT_mktty                    (fd_t, __fd_t)
-#define __NRRT_lfutexlockexpr           (errno_t, __errno_t)
 #define __NRRT_lfutexexpr               (errno_t, __errno_t)
 #define __NRRT_lfutex                   (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_rpc_serve                (errno_t, __errno_t)
@@ -1696,17 +1694,12 @@
 #define __NRAT1_mktty                    (fd_t, __fd_t)
 #define __NRAT2_mktty                    (fd_t, __fd_t)
 #define __NRAT3_mktty                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_lfutexlockexpr           (uint64_t *, __uint64_t *)
-#define __NRAT1_lfutexlockexpr           (void *, void *)
-#define __NRAT2_lfutexlockexpr           (size_t, __size_t)
-#define __NRAT3_lfutexlockexpr           (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
-#define __NRAT4_lfutexlockexpr           (struct timespecx64 const *, struct __timespecx64 const *)
-#define __NRAT5_lfutexlockexpr           (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_lfutexexpr               (void *, void *)
-#define __NRAT1_lfutexexpr               (size_t, __size_t)
-#define __NRAT2_lfutexexpr               (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
-#define __NRAT3_lfutexexpr               (struct timespecx64 const *, struct __timespecx64 const *)
-#define __NRAT4_lfutexexpr               (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_lfutexexpr               (uint64_t *, __uint64_t *)
+#define __NRAT1_lfutexexpr               (void *, void *)
+#define __NRAT2_lfutexexpr               (size_t, __size_t)
+#define __NRAT3_lfutexexpr               (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
+#define __NRAT4_lfutexexpr               (struct timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT5_lfutexexpr               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_lfutex                   (uint64_t *, __uint64_t *)
 #define __NRAT1_lfutex                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_lfutex                   (uint64_t, __uint64_t)
@@ -2166,8 +2159,7 @@
 #define __NRAM_userviofd(a, b, c, d, e, f)                (__size_t)a, (__syscall_ulong_t)b
 #define __NRAM_coredump(a, b, c, d, e, f)                 (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void const) const *)c, (__size_t)d, (union coredump_info64 const *)e, (__syscall_ulong_t)f
 #define __NRAM_mktty(a, b, c, d, e, f)                    (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
-#define __NRAM_lfutexlockexpr(a, b, c, d, e, f)           (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
-#define __NRAM_lfutexexpr(a, b, c, d, e, f)               (void *)a, (__size_t)b, (struct lfutexexprx64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
+#define __NRAM_lfutexexpr(a, b, c, d, e, f)               (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
 #define __NRAM_lfutex(a, b, c, d, e, f)                   (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
 #define __NRAM_rpc_serve(a, b, c, d, e, f)                /* nothing */
 #define __NRAM_debugtrap(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct debugtrap_reason64 const *)b
@@ -2574,8 +2566,7 @@
 #define __NRAP_userviofd(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_coredump(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_mktty(a, b, c, d)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_lfutexlockexpr(a, b, c, d, e, f)           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NRAP_lfutexexpr(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_lfutexexpr(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_lfutex(a, b, c, d, e)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_rpc_serve()                                /* nothing */
 #define __NRAP_debugtrap(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b

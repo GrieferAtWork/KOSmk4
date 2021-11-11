@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2e027da */
+/* HASH CRC-32:0xcdd5b6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1303,46 +1303,11 @@
  * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
 #define __NR_mktty                        __UINT32_C(0xffffffea) /* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
-/* >> lfutexlockexpr(2)
- * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function  only  has  the  calling  thread wait  on  a  single  futex  `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things  such as files, see the documentation  on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __NR_lfutexlockexpr               __UINT32_C(0xffffffeb) /* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 /* >> lfutexexpr(2)
- * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
- * expressions  that must  atomically (in  relation to  other futex operations)
- * hold  true before the scheduler will suspend  the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any  address that  is checked as  part of the  expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex  function that can be used  to wait on multiple  futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on  futex objects, as well as waiting  on
- *     futexes in conjunction  with waiting  on other things  such as  files, see  the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * The lfutexexpr(2) system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread.
+ * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
  * @param: exprv:         Vector of expressions for which to check
  * @param: exprc:         Number of expressions given in `exprv'
@@ -1358,7 +1323,7 @@
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __NR_lfutexexpr                   __UINT32_C(0xffffffec) /* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+#define __NR_lfutexexpr                   __UINT32_C(0xffffffeb) /* errno_t lfutexexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 #define __NR_lseek64                      __UINT32_C(0xffffffed) /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -2095,7 +2060,6 @@
 #define __NRRM_stime64                      0
 #define __NRRM_coredump                     2
 #define __NRRM_mktty                        0
-#define __NRRM_lfutexlockexpr               1
 #define __NRRM_lfutexexpr                   1
 #define __NRRM_lseek64                      0
 #define __NRRM_lfutex                       1
@@ -2284,7 +2248,6 @@
 #define __NRCP_select64
 #define __NRCP_ioctlf
 #define __NRCP_utime64
-#define __NRCP_lfutexlockexpr
 #define __NRCP_lfutexexpr
 #define __NRCP_lseek64
 #define __NRCP_lfutex
@@ -2782,8 +2745,7 @@
 #define __NRRC_stime64                      1
 #define __NRRC_coredump                     6
 #define __NRRC_mktty                        4
-#define __NRRC_lfutexlockexpr               6
-#define __NRRC_lfutexexpr                   5
+#define __NRRC_lfutexexpr                   6
 #define __NRRC_lseek64                      4 /* __NRAC_lseek64 + 1 */
 #define __NRRC_lfutex                       5
 #define __NRRC_debugtrap                    2

@@ -229,7 +229,7 @@ again_connect:
 			LFUTEXEXPR_TEQUAL(struct ringbuffer, rb_avail, 0),     /* self->rb_avail == 0 */
 			LFUTEXEXPR_TNOT_EQUAL(struct ringbuffer, rb_limit, 0), /* self->rb_limit != 0 */
 		};
-		if (lfutexlockexpr(&self->rb_nempty, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
+		if (lfutexexpr(&self->rb_nempty, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
 			return -1;
 	}
 #endif /* !__KERNEL__ */
@@ -479,7 +479,7 @@ again_connect:
 			expr[0] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_avail) >= size;
 			expr[1] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_size)  == size;
 			expr[2] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_limit) == limit;
-			if (lfutexlockexpr(&self->rb_nfull, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
+			if (lfutexexpr(&self->rb_nfull, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
 				return -1;
 		}
 	}
@@ -553,7 +553,7 @@ again_connect:
 			expr[0] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_avail) >= size;
 			expr[1] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_size)  == size;
 			expr[2] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_limit) == limit;
-			if (lfutexlockexpr(&self->rb_nfull, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
+			if (lfutexexpr(&self->rb_nfull, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
 				return -1;
 		}
 	}

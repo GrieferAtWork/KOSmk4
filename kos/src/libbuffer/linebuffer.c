@@ -90,9 +90,9 @@ linebuffer_waitfor(struct linebuffer *__restrict self) {
 	expr[0] = LFUTEXEXPR_FIELD(struct linebuffer, lb_limt) == limit;
 	/* Verify that the current line cannot be extended with our read limit. */
 	expr[1] = LFUTEXEXPR_FIELD(struct linebuffer, lb_line.lc_size) >= limit;
-	return lfutexlockexpr(&self->lb_nful, self,
-	                      COMPILER_LENOF(expr), expr,
-	                      NULL, 0);
+	return lfutexexpr(&self->lb_nful, self,
+	                  COMPILER_LENOF(expr), expr,
+	                  NULL, 0);
 }
 
 #endif /* !__KERNEL__ */

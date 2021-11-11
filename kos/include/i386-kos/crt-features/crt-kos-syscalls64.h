@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28886b20 */
+/* HASH CRC-32:0x23d2e6b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,7 +179,6 @@
 #define __CRT_HAVE_sys_lchown
 #define __CRT_HAVE_sys_lfutex
 #define __CRT_HAVE_sys_lfutexexpr
-#define __CRT_HAVE_sys_lfutexlockexpr
 #define __CRT_HAVE_sys_lgetxattr
 #define __CRT_HAVE_sys_link
 #define __CRT_HAVE_sys_linkat
@@ -577,7 +576,6 @@
 #define __CRT_HAVE_sys_Xlchown
 #define __CRT_HAVE_sys_Xlfutex
 #define __CRT_HAVE_sys_Xlfutexexpr
-#define __CRT_HAVE_sys_Xlfutexlockexpr
 #define __CRT_HAVE_sys_Xlgetxattr
 #define __CRT_HAVE_sys_Xlink
 #define __CRT_HAVE_sys_Xlinkat

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc74335d7 */
+/* HASH CRC-32:0x240b76cb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -868,17 +868,12 @@
 #define __NRAN1_mktty                    keyboard
 #define __NRAN2_mktty                    display
 #define __NRAN3_mktty                    rsvd
-#define __NRAN0_lfutexlockexpr           ulockaddr
-#define __NRAN1_lfutexlockexpr           base
-#define __NRAN2_lfutexlockexpr           exprc
-#define __NRAN3_lfutexlockexpr           exprv
-#define __NRAN4_lfutexlockexpr           timeout
-#define __NRAN5_lfutexlockexpr           timeout_flags
-#define __NRAN0_lfutexexpr               base
-#define __NRAN1_lfutexexpr               exprc
-#define __NRAN2_lfutexexpr               exprv
-#define __NRAN3_lfutexexpr               timeout
-#define __NRAN4_lfutexexpr               timeout_flags
+#define __NRAN0_lfutexexpr               ulockaddr
+#define __NRAN1_lfutexexpr               base
+#define __NRAN2_lfutexexpr               exprc
+#define __NRAN3_lfutexexpr               exprv
+#define __NRAN4_lfutexexpr               timeout
+#define __NRAN5_lfutexexpr               timeout_flags
 #define __NRAN0_lfutex                   uaddr
 #define __NRAN1_lfutex                   futex_op
 #define __NRAN2_lfutex                   val
@@ -2274,20 +2269,13 @@
 #define __NRATR2_mktty                    SC_REPR_FD_T                                                         /* display */ 
 #define __NRATR3_mktty                    SC_REPR_SYSCALL_ULONG_T                                              /* rsvd */ 
 #define __NRRTR_mktty                     SC_REPR_FD_T                                                         /* return */
-#define __NRATR0_lfutexlockexpr           SC_REPR_POINTER                                                      /* ulockaddr */ 
-#define __NRATR1_lfutexlockexpr           SC_REPR_POINTER                                                      /* base */ 
-#define __NRATR2_lfutexlockexpr           SC_REPR_SIZE_T                                                       /* exprc */ 
-#define __NRATR3_lfutexlockexpr           SC_REPR_STRUCT_LFUTEXEXPRX64_VECTOR                                  /* exprv */ 
-#define __NRATL3_lfutexlockexpr           2                                                                    /* exprv -> exprc */ 
-#define __NRATR4_lfutexlockexpr           SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
-#define __NRATR5_lfutexlockexpr           SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
-#define __NRRTR_lfutexlockexpr            SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_lfutexexpr               SC_REPR_POINTER                                                      /* base */ 
-#define __NRATR1_lfutexexpr               SC_REPR_SIZE_T                                                       /* exprc */ 
-#define __NRATR2_lfutexexpr               SC_REPR_STRUCT_LFUTEXEXPRX64_VECTOR                                  /* exprv */ 
-#define __NRATL2_lfutexexpr               1                                                                    /* exprv -> exprc */ 
-#define __NRATR3_lfutexexpr               SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
-#define __NRATR4_lfutexexpr               SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
+#define __NRATR0_lfutexexpr               SC_REPR_POINTER                                                      /* ulockaddr */ 
+#define __NRATR1_lfutexexpr               SC_REPR_POINTER                                                      /* base */ 
+#define __NRATR2_lfutexexpr               SC_REPR_SIZE_T                                                       /* exprc */ 
+#define __NRATR3_lfutexexpr               SC_REPR_STRUCT_LFUTEXEXPRX64_VECTOR                                  /* exprv */ 
+#define __NRATL3_lfutexexpr               2                                                                    /* exprv -> exprc */ 
+#define __NRATR4_lfutexexpr               SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
+#define __NRATR5_lfutexexpr               SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
 #define __NRRTR_lfutexexpr                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_lfutex                   SC_REPR_POINTER                                                      /* uaddr */ 
 #define __NRATR1_lfutex                   SC_REPR_LFUTEX_OP                                                    /* futex_op */ 

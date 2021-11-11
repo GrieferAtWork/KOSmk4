@@ -231,7 +231,7 @@
 	CB(PREFIX.crt.fs.exec.exec PREFIX.crt.sched.access) \
 	CB(PREFIX.crt.sched.thread) \
 	CB(PREFIX.crt.sched.pthread) \
-	CB(PREFIX.crt.sched.futex PREFIX.crt.sched.futexexpr PREFIX.crt.sched.futexlockexpr) \
+	CB(PREFIX.crt.sched.futex PREFIX.crt.sched.futexlockexpr) \
 	CB(PREFIX.crt.sched.semaphore) \
 	CB(PREFIX.crt.sched.lockop) \
 	CB(PREFIX.crt.sched.param) \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47916d14 */
+/* HASH CRC-32:0x80ea83c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -180,7 +180,6 @@
 #define __ARCH_WANT_SYSCALL_LCHOWN
 #define __ARCH_WANT_SYSCALL_LFUTEX
 #define __ARCH_WANT_SYSCALL_LFUTEXEXPR
-#define __ARCH_WANT_SYSCALL_LFUTEXLOCKEXPR
 #define __ARCH_WANT_SYSCALL_LGETXATTR
 #define __ARCH_WANT_SYSCALL_LINK
 #define __ARCH_WANT_SYSCALL_LINKAT
@@ -472,7 +471,6 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_KSTAT
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEX
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEXEXPR
-#define __ARCH_WANT_COMPAT_SYSCALL_LFUTEXLOCKEXPR
 #define __ARCH_WANT_COMPAT_SYSCALL_LOCK
 #define __ARCH_WANT_COMPAT_SYSCALL_LSTAT
 #define __ARCH_WANT_COMPAT_SYSCALL_LSTAT64

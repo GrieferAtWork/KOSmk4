@@ -120,7 +120,6 @@ rt_sigqueueinfo = rt_sigqueueinfox64;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox64;
 coredump = coredumpx64;
 lfutexexpr = lfutexexprx64;
-lfutexlockexpr = lfutexlockexprx64;
 lfutex = lfutexx64;
 debugtrap = debugtrapx64;
 get_exception_handler = get_exception_handlerx64;
@@ -747,8 +746,8 @@ socketcall = socketcallx64;
 -0x0000000000000016:debugtrap
 -0x0000000000000017:rpc_serve
 -0x0000000000000018:lfutex
--0x0000000000000019:lfutexexpr
--0x000000000000001a:lfutexlockexpr
+/*x0000000000000019:...*/
+-0x000000000000001a:lfutexexpr
 -0x000000000000001b:mktty
 /*x000000000000001c:...*/
 -0x000000000000001d:coredump

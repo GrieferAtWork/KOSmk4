@@ -165,7 +165,6 @@ rt_sigqueueinfo = rt_sigqueueinfox32;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox32;
 coredump = coredumpx32;
 lfutexexpr = lfutexexprx32_64;
-lfutexlockexpr = lfutexlockexprx32_64;
 lfutex = lfutexx32_64;
 debugtrap = debugtrapx32;
 get_exception_handler = get_exception_handlerx32;
@@ -682,8 +681,8 @@ select64 = selectx32_64;
 -0x00000011:debugtrap
 -0x00000012:lfutex
 -0x00000013:lseek64
--0x00000014:lfutexexpr
--0x00000015:lfutexlockexpr
+/*x00000014:...*/
+-0x00000015:lfutexexpr
 -0x00000016:mktty
 /*x00000017:...*/
 -0x00000018:coredump
