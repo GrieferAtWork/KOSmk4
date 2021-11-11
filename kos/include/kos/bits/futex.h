@@ -50,7 +50,7 @@
                                               * Behavior:
                                               * >> result = 0;
                                               * >> while (val && sig_send(uaddr))
-                                              * >>     ++result;
+                                              * >>     ++result, --val;
                                               * >> if (result < val && val != 0) {
                                               * >>     *uaddr = (*uaddr & (lfutex_t)timeout) | val2;
                                               * >>     result += sig_broadcast(uaddr);

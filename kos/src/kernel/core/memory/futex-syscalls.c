@@ -41,7 +41,6 @@
 #include <kos/except/reason/inval.h>
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
-#include <kos/futexlock.h>
 #include <linux/futex.h>
 
 #include <assert.h>

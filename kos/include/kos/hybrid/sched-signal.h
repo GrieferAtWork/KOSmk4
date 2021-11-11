@@ -33,7 +33,7 @@
 #ifdef __KERNEL__
 #include <sched/signal.h>
 #else /* __KERNEL__ */
-#include <kos/futexlock.h>
+#include <kos/futex.h>
 #endif /* !__KERNEL__ */
 
 __DECL_BEGIN

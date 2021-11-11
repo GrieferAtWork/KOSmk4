@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x238fbdef */
+/* HASH CRC-32:0x986a25b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_KOS_FUTEX_H 1
 
 #include "../api.h"
+#include "../auto/kos.futex.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

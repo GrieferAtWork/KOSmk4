@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x138d4e7e */
+/* HASH CRC-32:0x25193ca0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,45 +18,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_futexlock_wakeall_defined
-#define __local_futexlock_wakeall_defined
+#ifndef __local_futexlock_wake_defined
+#define __local_futexlock_wake_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#if defined(__CRT_HAVE_futex_wakemask) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_futex_wakeall_defined
-#define __local___localdep_futex_wakeall_defined
-#ifdef __CRT_HAVE_futex_wakeall
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_futex_wakeall,(__uintptr_t *__uaddr),futex_wakeall,(__uaddr))
-#elif defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#ifndef __local___localdep_futex_wakemask_defined
+#define __local___localdep_futex_wakemask_defined
+#ifdef __CRT_HAVE_futex_wakemask
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_futex_wakemask,(__uintptr_t *__uaddr, __SIZE_TYPE__ __max_wake, __uintptr_t __mask_and, __uintptr_t __mask_or),futex_wakemask,(__uaddr,__max_wake,__mask_and,__mask_or))
+#elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 __NAMESPACE_LOCAL_END
-#include <libc/local/kos.futex/futex_wakeall.h>
+#include <libc/local/kos.futex/futex_wakemask.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_futex_wakeall __LIBC_LOCAL_NAME(futex_wakeall)
+#define __localdep_futex_wakemask __LIBC_LOCAL_NAME(futex_wakemask)
 #else /* ... */
-#undef __local___localdep_futex_wakeall_defined
+#undef __local___localdep_futex_wakemask_defined
 #endif /* !... */
-#endif /* !__local___localdep_futex_wakeall_defined */
+#endif /* !__local___localdep_futex_wakemask_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 #include <kos/bits/futex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(futexlock_wakeall) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ulockaddr) {
-#ifndef __OPTIMIZE_SIZE__
+__LOCAL_LIBC(futexlock_wake) __ATTR_NONNULL((1)) __SSIZE_TYPE__
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wake))(__uintptr_t *__ulockaddr, __SIZE_TYPE__ __max_wake) {
 	if (!(__hybrid_atomic_load(*__ulockaddr, __ATOMIC_ACQUIRE) & __LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
-#endif /* !__OPTIMIZE_SIZE__ */
-	if (!(__hybrid_atomic_fetchand(*__ulockaddr, ~__LFUTEX_WAIT_LOCK_WAITERS, __ATOMIC_SEQ_CST) & __LFUTEX_WAIT_LOCK_WAITERS))
-		return 0; /* No waiting threads. */
-	return (__NAMESPACE_LOCAL_SYM __localdep_futex_wakeall)(__ulockaddr);
+	return (__NAMESPACE_LOCAL_SYM __localdep_futex_wakemask)(__ulockaddr, __max_wake, ~(__uintptr_t)__LFUTEX_WAIT_LOCK_WAITERS, 0);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_futexlock_wakeall_defined
-#define __local___localdep_futexlock_wakeall_defined
-#define __localdep_futexlock_wakeall __LIBC_LOCAL_NAME(futexlock_wakeall)
-#endif /* !__local___localdep_futexlock_wakeall_defined */
-#else /* __CRT_HAVE_futex_wakeall || __CRT_HAVE_futex_wake || __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
-#undef __local_futexlock_wakeall_defined
-#endif /* !__CRT_HAVE_futex_wakeall && !__CRT_HAVE_futex_wake && !__CRT_HAVE_lfutex64 && !__CRT_HAVE_lfutex */
-#endif /* !__local_futexlock_wakeall_defined */
+#ifndef __local___localdep_futexlock_wake_defined
+#define __local___localdep_futexlock_wake_defined
+#define __localdep_futexlock_wake __LIBC_LOCAL_NAME(futexlock_wake)
+#endif /* !__local___localdep_futexlock_wake_defined */
+#else /* __CRT_HAVE_futex_wakemask || __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
+#undef __local_futexlock_wake_defined
+#endif /* !__CRT_HAVE_futex_wakemask && !__CRT_HAVE_lfutex64 && !__CRT_HAVE_lfutex */
+#endif /* !__local_futexlock_wake_defined */

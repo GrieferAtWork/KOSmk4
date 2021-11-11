@@ -629,7 +629,6 @@ incdir("");
 #include <kos/fcntl.h>
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
-#include <kos/futexlock.h>
 #include <kos/guid.h>
 #include <kos/hop/api.h>
 #include <kos/hop/blkdev.h>

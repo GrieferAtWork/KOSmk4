@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6be9c279 */
+/* HASH CRC-32:0x3bed028e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -273,6 +273,38 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,futex_wakemask,(lfut
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_wakemask, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL futex_wakemask)(lfutex_t *__uaddr, __SIZE_TYPE__ __max_wake, lfutex_t __mask_and, lfutex_t __mask_or) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_wakemask))(__uaddr, __max_wake, __mask_and, __mask_or); })
+#endif /* ... */
+#ifdef __CRT_HAVE_futexlock_wake
+/* >> futexlock_wake(3), futexlock_wakeall(3)
+ * A more efficient variant of `futex_wake()' that does nothing
+ * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
+ * the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+ * when there are no more waiting threads. */
+__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,futexlock_wake,(lfutex_t *__ulockaddr, __SIZE_TYPE__ __max_wake),(__ulockaddr,__max_wake))
+#elif defined(__CRT_HAVE_futex_wakemask) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#include <libc/local/kos.futex/futexlock_wake.h>
+/* >> futexlock_wake(3), futexlock_wakeall(3)
+ * A more efficient variant of `futex_wake()' that does nothing
+ * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
+ * the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+ * when there are no more waiting threads. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(futexlock_wake, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL futexlock_wake)(lfutex_t *__ulockaddr, __SIZE_TYPE__ __max_wake) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futexlock_wake))(__ulockaddr, __max_wake); })
+#endif /* ... */
+#ifdef __CRT_HAVE_futexlock_wakeall
+/* >> futexlock_wake(3), futexlock_wakeall(3)
+ * A more efficient variant of `futex_wake()' that does nothing
+ * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
+ * the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+ * when there are no more waiting threads. */
+__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,futexlock_wakeall,(lfutex_t *__ulockaddr),(__ulockaddr))
+#elif defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#include <libc/local/kos.futex/futexlock_wakeall.h>
+/* >> futexlock_wake(3), futexlock_wakeall(3)
+ * A more efficient variant of `futex_wake()' that does nothing
+ * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
+ * the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+ * when there are no more waiting threads. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(futexlock_wakeall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL futexlock_wakeall)(lfutex_t *__ulockaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futexlock_wakeall))(__ulockaddr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_futex_waitwhile
 /* Wait if `*uaddr == equal_to_value'

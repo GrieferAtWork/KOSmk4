@@ -363,6 +363,34 @@ $ssize_t futex_wakemask([[nonnull]] lfutex_t *uaddr, $size_t max_wake,
 	return lfutex64(uaddr, @LFUTEX_WAKEMASK@, max_wake, mask_and, mask_or);
 }
 
+
+@@>> futexlock_wake(3), futexlock_wakeall(3)
+@@A more efficient variant of `futex_wake()' that does nothing
+@@if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
+@@the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+@@when there are no more waiting threads.
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<kos/bits/futex.h>")]]
+[[requires_function(futex_wakemask)]]
+$ssize_t futexlock_wake([[nonnull]] lfutex_t *ulockaddr, $size_t max_wake) {
+	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))
+		return 0; /* No waiting threads. */
+	return futex_wakemask(ulockaddr, max_wake, ~(lfutex_t)LFUTEX_WAIT_LOCK_WAITERS, 0);
+}
+
+[[doc_alias("futexlock_wake"), decl_include("<bits/types.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<kos/bits/futex.h>")]]
+[[requires_function(futex_wakeall)]]
+$ssize_t futexlock_wakeall([[nonnull]] lfutex_t *ulockaddr) {
+@@pp_ifndef __OPTIMIZE_SIZE__@@
+	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))
+		return 0; /* No waiting threads. */
+@@pp_endif@@
+	if (!(__hybrid_atomic_fetchand(*ulockaddr, ~(lfutex_t)LFUTEX_WAIT_LOCK_WAITERS, __ATOMIC_SEQ_CST) & LFUTEX_WAIT_LOCK_WAITERS))
+		return 0; /* No waiting threads. */
+	return futex_wakeall(ulockaddr);
+}
+
 @@Wait if `*uaddr == equal_to_value'
 @@@return: 0: Did wait
 @@@return: 1: Didn't wait
