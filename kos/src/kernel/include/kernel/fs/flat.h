@@ -563,7 +563,6 @@ flatdirnode_fileslist_remove(struct flatdirnode *__restrict self,
 #define /*        */ _flatdirdata_end(self)         shared_rwlock_end(&(self)->fdd_lock)
 #define /*        */ flatdirdata_end(self)          (void)(shared_rwlock_end(&(self)->fdd_lock) && (flatdirdata_reap(self), 0))
 #define /*BLOCKING*/ flatdirdata_upgrade(self)      shared_rwlock_upgrade(&(self)->fdd_lock)
-#define /*BLOCKING*/ flatdirdata_upgrade_nx(self)   shared_rwlock_upgrade_nx(&(self)->fdd_lock)
 #define /*        */ flatdirdata_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->fdd_lock)
 #define /*        */ flatdirdata_downgrade(self)    shared_rwlock_downgrade(&(self)->fdd_lock)
 #define /*        */ flatdirdata_reading(self)      shared_rwlock_reading(&(self)->fdd_lock)

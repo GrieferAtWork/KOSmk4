@@ -20,6 +20,8 @@
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_SHARED_LOCK_H
 #define GUARD_KERNEL_INCLUDE_SCHED_SHARED_LOCK_H 1
 
+/* !!! DEPRECATED HEADER !!! */
+
 #include <kos/sched/shared-lock.h>
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SHARED_LOCK_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1645bc59 */
+/* HASH CRC-32:0xbc51550b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __KERNEL__
 #include <kos/anno.h>
 #include <kos/bits/shared-lock.h>
-#include <bits/os/timespec.h>
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +35,7 @@ __LOCAL_LIBC(shared_lock_waitfor_with_timeout_nx) __ATTR_WUNUSED __BLOCKING __NO
 			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto __success;
 		});
-		task_connect(&__self->sl_sig);
+		task_connect_for_poll(&__self->sl_sig);
 		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;

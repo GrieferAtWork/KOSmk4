@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a1b77c9 */
+/* HASH CRC-32:0x18610cbc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5572,8 +5572,52 @@
 #define __CRT_HAVE_shared_rwlock_endread
 #define __CRT_HAVE_shared_rwlock_endwrite
 #define __CRT_HAVE_shared_rwlock_read
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_read_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_rwlock_read_with_timeout
+#ifndef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_read_with_timeout64
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_read_with_timeout_nx
+#endif /* __KERNEL__ */
 #define __CRT_HAVE_shared_rwlock_tryread
 #define __CRT_HAVE_shared_rwlock_trywrite
+#define __CRT_HAVE_shared_rwlock_upgrade
+#define __CRT_HAVE_shared_rwlock_waitread
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_waitread_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_rwlock_waitread_with_timeout
+#ifndef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_waitread_with_timeout64
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_waitread_with_timeout_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_rwlock_waitwrite
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_waitwrite_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_rwlock_waitwrite_with_timeout
+#ifndef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_waitwrite_with_timeout64
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_waitwrite_with_timeout_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_rwlock_write
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_write_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_rwlock_write_with_timeout
+#ifndef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_write_with_timeout64
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_rwlock_write_with_timeout_nx
+#endif /* __KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_shexec
 #define __CRT_HAVE_shm_open

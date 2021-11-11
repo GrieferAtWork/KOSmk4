@@ -249,11 +249,11 @@ PUBLIC ATTR_COLDTEXT bool FCALL x86_idt_modify_begin(bool nx)
 		copy = (struct idt_segment *)kmalloc(256 * sizeof(struct idt_segment),
 		                                     GFP_LOCKED | GFP_PREFLT);
 	}
-	if (!sync_trywrite(&x86_idt_modify_lock)) {
+	if (!shared_rwlock_trywrite(&x86_idt_modify_lock)) {
 		if (nx)
 			return false;
 		TRY {
-			sync_write(&x86_idt_modify_lock);
+			shared_rwlock_write(&x86_idt_modify_lock);
 		} EXCEPT {
 			kfree(copy);
 			RETHROW();
@@ -281,7 +281,7 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 		return;
 	}
 #endif /* CONFIG_HAVE_DEBUGGER */
-	assert(sync_writing(&x86_idt_modify_lock));
+	assert(shared_rwlock_writing(&x86_idt_modify_lock));
 	assert(x86_idt_modify_copy);
 	copy = x86_idt_modify_copy;
 	x86_idt_modify_copy = NULL;
@@ -291,7 +291,7 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 	/* Restore the used IDT within all CPUs */
 	x86_idt_setcurrent(&x86_idt_ptr);
 	/* Release the IDT modifications lock. */
-	sync_endwrite(&x86_idt_modify_lock);
+	shared_rwlock_endwrite(&x86_idt_modify_lock);
 	/* Free the temporary IDT copy */
 	kfree(copy);
 }

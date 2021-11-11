@@ -186,7 +186,6 @@ NOTHROW(FCALL ramfs_dirdata_fini)(struct ramfs_dirdata *__restrict self);
 #define /*        */ _ramfs_dirdata_treelock_end(self)         shared_rwlock_end(&(self)->rdd_treelock)
 #define /*        */ ramfs_dirdata_treelock_end(self)          (void)(shared_rwlock_end(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
 #define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade(self)      shared_rwlock_upgrade(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade_nx(self)   shared_rwlock_upgrade_nx(&(self)->rdd_treelock)
 #define /*        */ ramfs_dirdata_treelock_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->rdd_treelock)
 #define /*        */ ramfs_dirdata_treelock_downgrade(self)    shared_rwlock_downgrade(&(self)->rdd_treelock)
 #define /*        */ ramfs_dirdata_treelock_reading(self)      shared_rwlock_reading(&(self)->rdd_treelock)

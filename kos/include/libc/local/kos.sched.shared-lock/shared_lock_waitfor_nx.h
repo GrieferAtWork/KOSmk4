@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7e035fa */
+/* HASH CRC-32:0xfadc264d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __LOCAL_LIBC(shared_lock_waitfor_nx) __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATT
 			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto __success;
 		});
-		task_connect(&__self->sl_sig);
+		task_connect_for_poll(&__self->sl_sig);
 		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;

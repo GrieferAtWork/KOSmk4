@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4573a6c */
+/* HASH CRC-32:0x7ae12aa0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -187,8 +187,24 @@
 #define __CRT_HAVE_shared_rwlock_endread
 #define __CRT_HAVE_shared_rwlock_endwrite
 #define __CRT_HAVE_shared_rwlock_read
+#define __CRT_HAVE_shared_rwlock_read_nx
+#define __CRT_HAVE_shared_rwlock_read_with_timeout
+#define __CRT_HAVE_shared_rwlock_read_with_timeout_nx
 #define __CRT_HAVE_shared_rwlock_tryread
 #define __CRT_HAVE_shared_rwlock_trywrite
+#define __CRT_HAVE_shared_rwlock_upgrade
+#define __CRT_HAVE_shared_rwlock_waitread
+#define __CRT_HAVE_shared_rwlock_waitread_nx
+#define __CRT_HAVE_shared_rwlock_waitread_with_timeout
+#define __CRT_HAVE_shared_rwlock_waitread_with_timeout_nx
+#define __CRT_HAVE_shared_rwlock_waitwrite
+#define __CRT_HAVE_shared_rwlock_waitwrite_nx
+#define __CRT_HAVE_shared_rwlock_waitwrite_with_timeout
+#define __CRT_HAVE_shared_rwlock_waitwrite_with_timeout_nx
+#define __CRT_HAVE_shared_rwlock_write
+#define __CRT_HAVE_shared_rwlock_write_nx
+#define __CRT_HAVE_shared_rwlock_write_with_timeout
+#define __CRT_HAVE_shared_rwlock_write_with_timeout_nx
 #define __CRT_HAVE_sigaddset
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigdelset

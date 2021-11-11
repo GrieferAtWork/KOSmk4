@@ -257,7 +257,6 @@ FUNDEF NOBLOCK void NOTHROW(KCALL _devfs_byname_reap)(void);
 #define /*        */ _devfs_byname_end()         shared_rwlock_end(&devfs_byname_lock)
 #define /*        */ devfs_byname_end()          (void)(shared_rwlock_end(&devfs_byname_lock) && (devfs_byname_reap(), 0))
 #define /*BLOCKING*/ devfs_byname_upgrade()      shared_rwlock_upgrade(&devfs_byname_lock)
-#define /*BLOCKING*/ devfs_byname_upgrade_nx()   shared_rwlock_upgrade_nx(&devfs_byname_lock)
 #define /*        */ devfs_byname_tryupgrade()   shared_rwlock_tryupgrade(&devfs_byname_lock)
 #define /*        */ devfs_byname_downgrade()    shared_rwlock_downgrade(&devfs_byname_lock)
 #define /*        */ devfs_byname_reading()      shared_rwlock_reading(&devfs_byname_lock)

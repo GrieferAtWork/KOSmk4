@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1db0924f */
+/* HASH CRC-32:0x452533a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shared_lock_waitfor_defined
-#define __local_shared_lock_waitfor_defined
+#ifndef __local_shared_rwlock_write_defined
+#define __local_shared_rwlock_write_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
 #include <kos/anno.h>
-#include <kos/bits/shared-lock.h>
+#include <kos/bits/shared-rwlock.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_LFutexExpr64_except_defined
 #define __local___localdep_LFutexExpr64_except_defined
@@ -49,6 +49,32 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_LFutexExpr64_except_defined
 #endif /* !... */
 #endif /* !__local___localdep_LFutexExpr64_except_defined */
+#ifndef __local___localdep_shared_rwlock_trywrite_defined
+#define __local___localdep_shared_rwlock_trywrite_defined
+#ifdef __CRT_HAVE_shared_rwlock_trywrite
+__NAMESPACE_LOCAL_END
+#include <hybrid/__atomic.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_EIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
+	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
+	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+		return 0;
+	__COMPILER_BARRIER();
+	return 1;
+})
+#else /* __CRT_HAVE_shared_rwlock_trywrite */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__atomic.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
+	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
+	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+		return 0;
+	__COMPILER_BARRIER();
+	return 1;
+}
+#endif /* !__CRT_HAVE_shared_rwlock_trywrite */
+#endif /* !__local___localdep_shared_rwlock_trywrite_defined */
 __NAMESPACE_LOCAL_END
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
@@ -57,48 +83,49 @@ __NAMESPACE_LOCAL_END
 #include <kos/syscalls.h>
 #include <kos/bits/futex.h>
 #include <kos/bits/futex-expr.h>
-#ifndef __SHARED_LOCK_WAITEXPR_DEFINED
-#define __SHARED_LOCK_WAITEXPR_DEFINED
+#ifndef __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
+#define __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
 __NAMESPACE_LOCAL_BEGIN
-static struct lfutexexpr const __shared_lock_waitexpr[] = {
+static struct lfutexexpr const __shared_rwlock_waitwriteexpr[] = {
 	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(__builtin_offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
+	LFUTEXEXPR_INIT(__builtin_offsetof(struct shared_rwlock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
 };
 __NAMESPACE_LOCAL_END
-#endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
+#endif /* !__SHARED_RWLOCK_WAITWRITEEXPR_DEFINED */
 
 #endif /* !__KERNEL__ */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL_LIBC(shared_rwlock_write) __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void
+(__FCALL __LIBC_LOCAL_NAME(shared_rwlock_write))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(__self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
-				return;
+			if ((__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(__self))
+				goto __success;
 		});
-		task_connect_for_poll(&__self->sl_sig);
-		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		task_connect(&__self->sl_wrwait);
+		if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(__self)) {
 			task_disconnectall();
 			break;
 		}
 		task_waitfor();
 	}
+__success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(__self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64_except)(&__self->sl_sig, __self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                    __NULLPTR, 0);
+	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(__self)) {
+		__hybrid_atomic_store(__self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64_except)(&__self->sl_wrwait, __self, 1, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr, __NULLPTR, 0);
 	}
 #endif /* !__KERNEL__ */
+	__COMPILER_BARRIER();
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shared_lock_waitfor_defined
-#define __local___localdep_shared_lock_waitfor_defined
-#define __localdep_shared_lock_waitfor __LIBC_LOCAL_NAME(shared_lock_waitfor)
-#endif /* !__local___localdep_shared_lock_waitfor_defined */
+#ifndef __local___localdep_shared_rwlock_write_defined
+#define __local___localdep_shared_rwlock_write_defined
+#define __localdep_shared_rwlock_write __LIBC_LOCAL_NAME(shared_rwlock_write)
+#endif /* !__local___localdep_shared_rwlock_write_defined */
 #else /* __KERNEL__ || __CRT_HAVE_LFutexExpr64 || __CRT_HAVE_LFutexExpr */
-#undef __local_shared_lock_waitfor_defined
+#undef __local_shared_rwlock_write_defined
 #endif /* !__KERNEL__ && !__CRT_HAVE_LFutexExpr64 && !__CRT_HAVE_LFutexExpr */
-#endif /* !__local_shared_lock_waitfor_defined */
+#endif /* !__local_shared_rwlock_write_defined */

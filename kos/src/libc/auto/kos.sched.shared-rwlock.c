@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x593f82b7 */
+/* HASH CRC-32:0xfd90617a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,6 +113,21 @@ NOTHROW(__FCALL libc_shared_rwlock_downgrade)(struct shared_rwlock *__restrict s
 	__hybrid_atomic_store(self->sl_lock, 1, __ATOMIC_RELEASE);
 	__shared_rwlock_rdwait_broadcast(self); /* Allow for more readers. */
 }
+/* >> shared_rwlock_upgrade(3)
+ * Blocking-upgrade a read-lock into a write-lock
+ * NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+ *       may  have been  held temporarily,  meaning that  the caller should
+ *       re-load local copies of affected resources.
+ * @return: true:  Upgrade was performed without the read-lock being lost
+ * @return: false: The read-lock had to be released before a write-lock was acquired */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_upgrade)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	if (__hybrid_atomic_cmpxch(self->sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+		return true; /* Lock wasn't lost */
+	libc_shared_rwlock_endread(self);
+	libc_shared_rwlock_write(self);
+	return false; /* Lock was (temporarily) lost */
+}
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
@@ -133,7 +148,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__KERNEL__ */
 /* >> shared_rwlock_read(3)
  * Acquire a read-lock to the given shared_rwlock. */
-INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1)) void
 (__FCALL libc_shared_rwlock_read)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
@@ -158,6 +173,613 @@ success:
 #endif /* !__KERNEL__ */
 	COMPILER_READ_BARRIER();
 }
+#ifdef __KERNEL__
+#include <hybrid/__assert.h>
+#include <sched/signal.h>
+#else /* __KERNEL__ */
+#include <kos/syscalls.h>
+#include <kos/bits/futex.h>
+#include <kos/bits/futex-expr.h>
+#ifndef __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
+#define __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
+__NAMESPACE_LOCAL_BEGIN
+static struct lfutexexpr const __shared_rwlock_waitwriteexpr[] = {
+	/* Wait until `sl_lock == 0' */
+	LFUTEXEXPR_INIT(offsetof(struct shared_rwlock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
+};
+__NAMESPACE_LOCAL_END
+#endif /* !__SHARED_RWLOCK_WAITWRITEEXPR_DEFINED */
+
+#endif /* !__KERNEL__ */
+/* >> shared_rwlock_write(3)
+ * Acquire a write-lock to the given shared_rwlock. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1)) void
+(__FCALL libc_shared_rwlock_write)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+#ifdef __KERNEL__
+	__hybrid_assert(!task_wasconnected());
+	while (!libc_shared_rwlock_trywrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (libc_shared_rwlock_trywrite(self))
+				goto success;
+		});
+		task_connect(&self->sl_wrwait);
+		if unlikely(libc_shared_rwlock_trywrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+#else /* __KERNEL__ */
+	while (!libc_shared_rwlock_trywrite(self)) {
+		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		libc_LFutexExpr64(&self->sl_wrwait, self, 1, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr, NULL, 0);
+	}
+#endif /* !__KERNEL__ */
+	COMPILER_BARRIER();
+}
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_read_with_timeout)(struct shared_rwlock *__restrict self,
+                                               __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+#ifdef __KERNEL__
+	__hybrid_assert(!task_wasconnected());
+	while (!libc_shared_rwlock_tryread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (libc_shared_rwlock_tryread(self))
+				goto success;
+		});
+		task_connect(&self->sl_rdwait);
+		if unlikely(libc_shared_rwlock_tryread(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor(abs_timeout))
+			return false;
+	}
+success:
+#else /* __KERNEL__ */
+	while (!libc_shared_rwlock_tryread(self)) {
+		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		if (libc_LFutexExpr(&self->sl_rdwait, self, 1,
+		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                      abs_timeout, 0) < 0)
+			return false;
+	}
+#endif /* !__KERNEL__ */
+	COMPILER_READ_BARRIER();
+	return true;
+}
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_write_with_timeout)(struct shared_rwlock *__restrict self,
+                                                __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+#ifdef __KERNEL__
+	__hybrid_assert(!task_wasconnected());
+	while (!libc_shared_rwlock_trywrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (libc_shared_rwlock_trywrite(self))
+				goto success;
+		});
+		task_connect(&self->sl_wrwait);
+		if unlikely(libc_shared_rwlock_trywrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor(abs_timeout))
+			return false;
+	}
+success:
+#else /* __KERNEL__ */
+	while (!libc_shared_rwlock_trywrite(self)) {
+		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		if (libc_LFutexExpr(&self->sl_wrwait, self, 1,
+		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                      abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+			return false;
+	}
+#endif /* !__KERNEL__ */
+	COMPILER_BARRIER();
+	return true;
+}
+/* >> shared_rwlock_waitread(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks */
+INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1)) void
+(__FCALL libc_shared_rwlock_waitread)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+#ifdef __KERNEL__
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_rdwait);
+		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+#else /* __KERNEL__ */
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		libc_LFutexExpr64(&self->sl_rdwait, self, 1, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                    NULL, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
+	}
+#endif /* !__KERNEL__ */
+	COMPILER_READ_BARRIER();
+}
+/* >> shared_rwlock_waitwrite(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks */
+INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1)) void
+(__FCALL libc_shared_rwlock_waitwrite)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+#ifdef __KERNEL__
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_wrwait);
+		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+success:
+#else /* __KERNEL__ */
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		libc_LFutexExpr64(&self->sl_wrwait, self, 1, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                    NULL, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
+	}
+#endif /* !__KERNEL__ */
+	COMPILER_BARRIER();
+}
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_waitread_with_timeout)(struct shared_rwlock *__restrict self,
+                                                   __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+#ifdef __KERNEL__
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_rdwait);
+		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor(abs_timeout))
+			return false;
+	}
+success:
+#else /* __KERNEL__ */
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		if (libc_LFutexExpr(&self->sl_rdwait, self, 1,
+		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                      abs_timeout,
+		                      LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                      LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
+			return false;
+	}
+#endif /* !__KERNEL__ */
+	COMPILER_READ_BARRIER();
+	return true;
+}
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_waitwrite_with_timeout)(struct shared_rwlock *__restrict self,
+                                                    __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+#ifdef __KERNEL__
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_wrwait);
+		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor(abs_timeout))
+			return false;
+	}
+success:
+#else /* __KERNEL__ */
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		if (libc_LFutexExpr(&self->sl_wrwait, self, 1,
+		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                      abs_timeout,
+		                      LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                      LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
+			return false;
+	}
+#endif /* !__KERNEL__ */
+	COMPILER_BARRIER();
+	return true;
+}
+#ifndef __KERNEL__
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_shared_rwlock_read_with_timeout64, libc_shared_rwlock_read_with_timeout);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#include <kos/syscalls.h>
+#include <kos/bits/futex.h>
+#include <kos/bits/futex-expr.h>
+#ifndef __SHARED_RWLOCK_WAITREADEXPR_DEFINED
+#define __SHARED_RWLOCK_WAITREADEXPR_DEFINED
+__NAMESPACE_LOCAL_BEGIN
+static struct lfutexexpr const __shared_rwlock_waitreadexpr[] = {
+	/* Wait while `sl_lock == (uintptr_t)-1' */
+	LFUTEXEXPR_INIT(offsetof(struct shared_rwlock, sl_lock), LFUTEX_WAIT_WHILE, (uintptr_t)-1, 0)
+};
+__NAMESPACE_LOCAL_END
+#endif /* !__SHARED_RWLOCK_WAITREADEXPR_DEFINED */
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_read_with_timeout64)(struct shared_rwlock *__restrict self,
+                                                 struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	while (!libc_shared_rwlock_tryread(self)) {
+		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		if (libc_LFutexExpr64(&self->sl_rdwait, self, 1,
+		                        __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                        abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+			return false;
+	}
+	COMPILER_READ_BARRIER();
+	return true;
+}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_shared_rwlock_write_with_timeout64, libc_shared_rwlock_write_with_timeout);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#include <kos/syscalls.h>
+#include <kos/bits/futex.h>
+#include <kos/bits/futex-expr.h>
+#ifndef __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
+#define __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
+__NAMESPACE_LOCAL_BEGIN
+static struct lfutexexpr const __shared_rwlock_waitwriteexpr[] = {
+	/* Wait until `sl_lock == 0' */
+	LFUTEXEXPR_INIT(offsetof(struct shared_rwlock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
+};
+__NAMESPACE_LOCAL_END
+#endif /* !__SHARED_RWLOCK_WAITWRITEEXPR_DEFINED */
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_write_with_timeout64)(struct shared_rwlock *__restrict self,
+                                                  struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	while (!libc_shared_rwlock_trywrite(self)) {
+		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		if (libc_LFutexExpr64(&self->sl_wrwait, self, 1,
+		                        __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                        abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+			return false;
+	}
+	COMPILER_BARRIER();
+	return true;
+}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_shared_rwlock_waitread_with_timeout64, libc_shared_rwlock_waitread_with_timeout);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#include <kos/syscalls.h>
+#include <kos/bits/futex.h>
+#include <kos/bits/futex-expr.h>
+#ifndef __SHARED_RWLOCK_WAITREADEXPR_DEFINED
+#define __SHARED_RWLOCK_WAITREADEXPR_DEFINED
+__NAMESPACE_LOCAL_BEGIN
+static struct lfutexexpr const __shared_rwlock_waitreadexpr[] = {
+	/* Wait while `sl_lock == (uintptr_t)-1' */
+	LFUTEXEXPR_INIT(offsetof(struct shared_rwlock, sl_lock), LFUTEX_WAIT_WHILE, (uintptr_t)-1, 0)
+};
+__NAMESPACE_LOCAL_END
+#endif /* !__SHARED_RWLOCK_WAITREADEXPR_DEFINED */
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_waitread_with_timeout64)(struct shared_rwlock *__restrict self,
+                                                     struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		if (libc_LFutexExpr64(&self->sl_rdwait, self, 1,
+		                        __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                        abs_timeout,
+		                        LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                        LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
+			return false;
+	}
+	COMPILER_READ_BARRIER();
+	return true;
+}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_shared_rwlock_waitwrite_with_timeout64, libc_shared_rwlock_waitwrite_with_timeout);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#include <kos/syscalls.h>
+#include <kos/bits/futex.h>
+#include <kos/bits/futex-expr.h>
+#ifndef __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
+#define __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
+__NAMESPACE_LOCAL_BEGIN
+static struct lfutexexpr const __shared_rwlock_waitwriteexpr[] = {
+	/* Wait until `sl_lock == 0' */
+	LFUTEXEXPR_INIT(offsetof(struct shared_rwlock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
+};
+__NAMESPACE_LOCAL_END
+#endif /* !__SHARED_RWLOCK_WAITWRITEEXPR_DEFINED */
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_waitwrite_with_timeout64)(struct shared_rwlock *__restrict self,
+                                                      struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
+		if (libc_LFutexExpr64(&self->sl_wrwait, self, 1,
+		                        __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                        abs_timeout,
+		                        LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                        LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
+			return false;
+	}
+	COMPILER_BARRIER();
+	return true;
+}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#include <sched/signal.h>
+/* >> shared_rwlock_read_nx(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_read_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (!libc_shared_rwlock_tryread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (libc_shared_rwlock_tryread(self))
+				goto success;
+		});
+		task_connect(&self->sl_rdwait);
+		if unlikely(libc_shared_rwlock_tryread(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+#include <sched/signal.h>
+/* >> shared_rwlock_write_nx(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * Acquire a lock to the given shared_lock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_write_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (!libc_shared_rwlock_trywrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (libc_shared_rwlock_trywrite(self))
+				goto success;
+		});
+		task_connect(&self->sl_wrwait);
+		if unlikely(libc_shared_rwlock_trywrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+#include <sched/signal.h>
+/* >> shared_rwlock_read_with_timeout_nx(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_read_with_timeout_nx)(struct shared_rwlock *__restrict self,
+                                                  __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (!libc_shared_rwlock_tryread(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (libc_shared_rwlock_tryread(self))
+				goto success;
+		});
+		task_connect(&self->sl_rdwait);
+		if unlikely(libc_shared_rwlock_tryread(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+#include <sched/signal.h>
+/* >> shared_rwlock_write_with_timeout_nx(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_write_with_timeout_nx)(struct shared_rwlock *__restrict self,
+                                                   __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (!libc_shared_rwlock_trywrite(self)) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (libc_shared_rwlock_trywrite(self))
+				goto success;
+		});
+		task_connect(&self->sl_wrwait);
+		if unlikely(libc_shared_rwlock_trywrite(self)) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+#include <sched/signal.h>
+/* >> shared_rwlock_waitread_nx(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_rdwait);
+		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+#include <sched/signal.h>
+/* >> shared_rwlock_waitwrite_nx(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * Acquire a lock to the given shared_lock.
+ * @return: true:  A write-lock became available.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_wrwait);
+		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+#include <sched/signal.h>
+/* >> shared_rwlock_waitread_with_timeout_nx(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_waitread_with_timeout_nx)(struct shared_rwlock *__restrict self,
+                                                      __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_rdwait);
+		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+#include <sched/signal.h>
+/* >> shared_rwlock_waitwrite_with_timeout_nx(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONNULL((1)) bool
+(__FCALL libc_shared_rwlock_waitwrite_with_timeout_nx)(struct shared_rwlock *__restrict self,
+                                                       __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+				goto success;
+		});
+		task_connect_for_poll(&self->sl_wrwait);
+		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+#endif /* __KERNEL__ */
 
 DECL_END
 
@@ -167,6 +789,30 @@ DEFINE_PUBLIC_ALIAS(shared_rwlock_endwrite, libc_shared_rwlock_endwrite);
 DEFINE_PUBLIC_ALIAS(shared_rwlock_endread, libc_shared_rwlock_endread);
 DEFINE_PUBLIC_ALIAS(shared_rwlock_end, libc_shared_rwlock_end);
 DEFINE_PUBLIC_ALIAS(shared_rwlock_downgrade, libc_shared_rwlock_downgrade);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_upgrade, libc_shared_rwlock_upgrade);
 DEFINE_PUBLIC_ALIAS(shared_rwlock_read, libc_shared_rwlock_read);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_write, libc_shared_rwlock_write);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_read_with_timeout, libc_shared_rwlock_read_with_timeout);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_write_with_timeout, libc_shared_rwlock_write_with_timeout);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread, libc_shared_rwlock_waitread);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite, libc_shared_rwlock_waitwrite);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread_with_timeout, libc_shared_rwlock_waitread_with_timeout);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite_with_timeout, libc_shared_rwlock_waitwrite_with_timeout);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(shared_rwlock_read_with_timeout64, libc_shared_rwlock_read_with_timeout64);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_write_with_timeout64, libc_shared_rwlock_write_with_timeout64);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread_with_timeout64, libc_shared_rwlock_waitread_with_timeout64);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite_with_timeout64, libc_shared_rwlock_waitwrite_with_timeout64);
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+DEFINE_PUBLIC_ALIAS(shared_rwlock_read_nx, libc_shared_rwlock_read_nx);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_write_nx, libc_shared_rwlock_write_nx);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_read_with_timeout_nx, libc_shared_rwlock_read_with_timeout_nx);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_write_with_timeout_nx, libc_shared_rwlock_write_with_timeout_nx);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread_nx, libc_shared_rwlock_waitread_nx);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite_nx, libc_shared_rwlock_waitwrite_nx);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread_with_timeout_nx, libc_shared_rwlock_waitread_with_timeout_nx);
+DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite_with_timeout_nx, libc_shared_rwlock_waitwrite_with_timeout_nx);
+#endif /* __KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_SCHED_SHARED_RWLOCK_C */

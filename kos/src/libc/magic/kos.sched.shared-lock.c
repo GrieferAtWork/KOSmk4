@@ -221,7 +221,7 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
 				return;
 		});
-		@task_connect@(&self->@sl_sig@);
+		@task_connect_for_poll@(&self->@sl_sig@);
 		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
@@ -231,7 +231,8 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_sig@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, NULL, 0);
+		LFutexExpr64_except(&self->@sl_sig@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
+		                    NULL, 0);
 	}
 @@pp_endif@@
 }
@@ -256,7 +257,7 @@ $bool shared_lock_waitfor_with_timeout([[nonnull]] struct shared_lock *__restric
 			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
-		@task_connect@(&self->@sl_sig@);
+		@task_connect_for_poll@(&self->@sl_sig@);
 		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
@@ -269,8 +270,9 @@ success:
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExpr_except(&self->@sl_sig@, self, 1,
-		                      __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		                      abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		                      __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, abs_timeout,
+		                      @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                      @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
 			return false;
 	}
 @@pp_endif@@
@@ -309,8 +311,9 @@ $bool shared_lock_waitfor_with_timeout64([[nonnull]] struct shared_lock *__restr
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExpr64_except(&self->@sl_sig@, self, 1,
-		                        __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		                        __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, abs_timeout,
+		                        @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                        @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
 			return false;
 	}
 	return true;
@@ -361,7 +364,7 @@ success:
 @@@return: false: Preemption was disabled, and the operation would have blocked.
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
-[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_lock_acquire_with_timeout_nx([[nonnull]] struct shared_lock *__restrict self,
@@ -402,7 +405,7 @@ $bool shared_lock_waitfor_nx([[nonnull]] struct shared_lock *__restrict self) {
 			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
-		@task_connect@(&self->@sl_sig@);
+		@task_connect_for_poll@(&self->@sl_sig@);
 		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;
@@ -423,7 +426,7 @@ success:
 @@@return: false: Preemption was disabled, and the operation would have blocked.
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
-[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_lock_waitfor_with_timeout_nx([[nonnull]] struct shared_lock *__restrict self,
@@ -434,7 +437,7 @@ $bool shared_lock_waitfor_with_timeout_nx([[nonnull]] struct shared_lock *__rest
 			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
-		@task_connect@(&self->@sl_sig@);
+		@task_connect_for_poll@(&self->@sl_sig@);
 		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
 			@task_disconnectall@();
 			break;

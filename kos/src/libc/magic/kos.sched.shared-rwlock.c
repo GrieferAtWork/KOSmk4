@@ -100,7 +100,7 @@ __SYSDECL_BEGIN
 /* >> shared_rwlock_tryupgrade(3)
  * Try to upgrade a read-lock to a write-lock. Return `false' upon failure. */
 #define shared_rwlock_tryupgrade(self) \
-	__hybrid_atomic_cmpxch((self)->sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)
+	__hybrid_atomic_cmpxch((self)->sl_lock, 1, (__uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)
 
 }
 
@@ -214,6 +214,33 @@ void shared_rwlock_downgrade([[nonnull]] struct shared_rwlock *__restrict self) 
 }
 
 
+/************************************************************************/
+/* Blocking-upgrade a read-lock into a write-lock                       */
+/************************************************************************/
+
+@@>> shared_rwlock_upgrade(3)
+@@Blocking-upgrade a read-lock into a write-lock
+@@NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+@@      may  have been  held temporarily,  meaning that  the caller should
+@@      re-load local copies of affected resources.
+@@@return: true:  Upgrade was performed without the read-lock being lost
+@@@return: false: The read-lock had to be released before a write-lock was acquired
+[[wunused, attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[extern_inline, kernel, decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
+[[requires_function(shared_rwlock_endread, shared_rwlock_write)]]
+[[impl_include("<hybrid/__atomic.h>")]]
+$bool shared_rwlock_upgrade([[nonnull]] struct shared_rwlock *__restrict self) {
+	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, ($uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+		return $true; /* Lock wasn't lost */
+	shared_rwlock_endread(self);
+	shared_rwlock_write(self);
+	return $false; /* Lock was (temporarily) lost */
+}
+
+
+
+
+
 
 /************************************************************************/
 /* Proper (blocking) read-/write-lock acquire functions                 */
@@ -262,7 +289,7 @@ DEFINE_SHARED_RWLOCK_READ_USER_PREFIX
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
 @@pp_else@@
-DEFINE_SHARED_RWLOCK_READ_WRITE_PREFIX
+DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX
 @@pp_endif@@
 )]
 
@@ -270,7 +297,7 @@ DEFINE_SHARED_RWLOCK_READ_WRITE_PREFIX
 @@>> shared_rwlock_read(3)
 @@Acquire a read-lock to the given shared_rwlock.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 void shared_rwlock_read([[nonnull]] struct shared_rwlock *__restrict self) {
@@ -298,6 +325,688 @@ success:
 	COMPILER_READ_BARRIER();
 }
 
+
+@@>> shared_rwlock_write(3)
+@@Acquire a write-lock to the given shared_rwlock.
+[[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
+void shared_rwlock_write([[nonnull]] struct shared_rwlock *__restrict self) {
+@@pp_ifdef __KERNEL__@@
+	__hybrid_assert(!@task_wasconnected@());
+	while (!shared_rwlock_trywrite(self)) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (shared_rwlock_trywrite(self))
+				goto success;
+		});
+		@task_connect@(&self->@sl_wrwait@);
+		if unlikely(shared_rwlock_trywrite(self)) {
+			@task_disconnectall@();
+			break;
+		}
+		@task_waitfor@();
+	}
+success:
+@@pp_else@@
+	while (!shared_rwlock_trywrite(self)) {
+		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
+		LFutexExpr64_except(&self->@sl_wrwait@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@, NULL, 0);
+	}
+@@pp_endif@@
+	COMPILER_BARRIER();
+}
+
+
+@@>> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+@@Acquire a read-lock to the given shared_rwlock.
+@@@return: true:  Successfully acquired a read-lock.
+@@@return: false: The given `abs_timeout' has expired.
+[[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_read_with_timeout")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_read_with_timeout64")]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
+$bool shared_rwlock_read_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
+                                      __shared_rwlock_timespec abs_timeout) {
+@@pp_ifdef __KERNEL__@@
+	__hybrid_assert(!@task_wasconnected@());
+	while (!shared_rwlock_tryread(self)) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (shared_rwlock_tryread(self))
+				goto success;
+		});
+		@task_connect@(&self->@sl_rdwait@);
+		if unlikely(shared_rwlock_tryread(self)) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor@(abs_timeout))
+			return false;
+	}
+success:
+@@pp_else@@
+	while (!shared_rwlock_tryread(self)) {
+		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
+		if (LFutexExpr_except(&self->@sl_rdwait@, self, 1,
+		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                      abs_timeout, 0) < 0)
+			return false;
+	}
+@@pp_endif@@
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+
+@@>> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+@@Acquire a write-lock to the given shared_rwlock.
+@@@return: true:  Successfully acquired a write-lock.
+@@@return: false: The given `abs_timeout' has expired.
+[[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_write_with_timeout")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_write_with_timeout64")]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
+$bool shared_rwlock_write_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
+                                       __shared_rwlock_timespec abs_timeout) {
+@@pp_ifdef __KERNEL__@@
+	__hybrid_assert(!@task_wasconnected@());
+	while (!shared_rwlock_trywrite(self)) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (shared_rwlock_trywrite(self))
+				goto success;
+		});
+		@task_connect@(&self->@sl_wrwait@);
+		if unlikely(shared_rwlock_trywrite(self)) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor@(abs_timeout))
+			return false;
+	}
+success:
+@@pp_else@@
+	while (!shared_rwlock_trywrite(self)) {
+		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
+		if (LFutexExpr_except(&self->@sl_wrwait@, self, 1,
+		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                      abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+			return false;
+	}
+@@pp_endif@@
+	COMPILER_BARRIER();
+	return true;
+}
+
+
+
+
+
+/************************************************************************/
+/* Wait-for-lock (w/o acquire) functions                                */
+/************************************************************************/
+
+
+@@>> shared_rwlock_waitread(3)
+@@Wait until acquiring a read-lock to `self' no longer blocks
+[[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
+void shared_rwlock_waitread([[nonnull]] struct shared_rwlock *__restrict self) {
+@@pp_ifdef __KERNEL__@@
+	__hybrid_assert(!@task_wasconnected@());
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1)
+				goto success;
+		});
+		@task_connect_for_poll@(&self->@sl_rdwait@);
+		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1) {
+			@task_disconnectall@();
+			break;
+		}
+		@task_waitfor@();
+	}
+success:
+@@pp_else@@
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
+		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
+		LFutexExpr64_except(&self->@sl_rdwait@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                    NULL, @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@);
+	}
+@@pp_endif@@
+	COMPILER_READ_BARRIER();
+}
+
+
+@@>> shared_rwlock_waitwrite(3)
+@@Wait until acquiring a write-lock to `self' no longer blocks
+[[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
+void shared_rwlock_waitwrite([[nonnull]] struct shared_rwlock *__restrict self) {
+@@pp_ifdef __KERNEL__@@
+	__hybrid_assert(!@task_wasconnected@());
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+				goto success;
+		});
+		@task_connect_for_poll@(&self->@sl_wrwait@);
+		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+			@task_disconnectall@();
+			break;
+		}
+		@task_waitfor@();
+	}
+success:
+@@pp_else@@
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
+		LFutexExpr64_except(&self->@sl_wrwait@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                    NULL, @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@);
+	}
+@@pp_endif@@
+	COMPILER_BARRIER();
+}
+
+
+@@>> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+@@Wait until acquiring a read-lock to `self' no longer blocks
+@@@return: true:  A read-lock became available.
+@@@return: false: The given `abs_timeout' has expired.
+[[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_waitread_with_timeout")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_waitread_with_timeout64")]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
+$bool shared_rwlock_waitread_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
+                                      __shared_rwlock_timespec abs_timeout) {
+@@pp_ifdef __KERNEL__@@
+	__hybrid_assert(!@task_wasconnected@());
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1)
+				goto success;
+		});
+		@task_connect_for_poll@(&self->@sl_rdwait@);
+		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor@(abs_timeout))
+			return false;
+	}
+success:
+@@pp_else@@
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
+		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
+		if (LFutexExpr_except(&self->@sl_rdwait@, self, 1,
+		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                      abs_timeout,
+		                      @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                      @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
+			return false;
+	}
+@@pp_endif@@
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+
+@@>> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+@@Wait until acquiring a write-lock to `self' no longer blocks
+@@@return: true:  A write-lock became available.
+@@@return: false: The given `abs_timeout' has expired.
+[[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_waitwrite_with_timeout")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_waitwrite_with_timeout64")]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
+$bool shared_rwlock_waitwrite_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
+                                       __shared_rwlock_timespec abs_timeout) {
+@@pp_ifdef __KERNEL__@@
+	__hybrid_assert(!@task_wasconnected@());
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+				goto success;
+		});
+		@task_connect_for_poll@(&self->@sl_wrwait@);
+		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor@(abs_timeout))
+			return false;
+	}
+success:
+@@pp_else@@
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
+		if (LFutexExpr_except(&self->@sl_wrwait@, self, 1,
+		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                      abs_timeout,
+		                      @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                      @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
+			return false;
+	}
+@@pp_endif@@
+	COMPILER_BARRIER();
+	return true;
+}
+
+
+
+/************************************************************************/
+/* 64-bit time functions                                                */
+/************************************************************************/
+%#if !defined(__KERNEL__) && defined(__USE_TIME64)
+[[preferred_time64_variant_of(shared_rwlock_read_with_timeout), doc_alias("shared_rwlock_read_with_timeout")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires($has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX)]]
+$bool shared_rwlock_read_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
+                                        struct timespec64 const *abs_timeout) {
+	while (!shared_rwlock_tryread(self)) {
+		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
+		if (LFutexExpr64_except(&self->@sl_rdwait@, self, 1,
+		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+			return false;
+	}
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+[[preferred_time64_variant_of(shared_rwlock_write_with_timeout), doc_alias("shared_rwlock_write_with_timeout")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires($has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX)]]
+$bool shared_rwlock_write_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
+                                         struct timespec64 const *abs_timeout) {
+	while (!shared_rwlock_trywrite(self)) {
+		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
+		if (LFutexExpr64_except(&self->@sl_wrwait@, self, 1,
+		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+			return false;
+	}
+	COMPILER_BARRIER();
+	return true;
+}
+
+[[preferred_time64_variant_of(shared_rwlock_waitread_with_timeout), doc_alias("shared_rwlock_waitread_with_timeout")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires($has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX)]]
+$bool shared_rwlock_waitread_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
+                                        struct timespec64 const *abs_timeout) {
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
+		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
+		if (LFutexExpr64_except(&self->@sl_rdwait@, self, 1,
+		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                        abs_timeout,
+		                        @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                        @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
+			return false;
+	}
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+[[preferred_time64_variant_of(shared_rwlock_waitwrite_with_timeout), doc_alias("shared_rwlock_waitwrite_with_timeout")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires($has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX)]]
+$bool shared_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
+                                         struct timespec64 const *abs_timeout) {
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
+		if (LFutexExpr64_except(&self->@sl_wrwait@, self, 1,
+		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                        abs_timeout,
+		                        @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                        @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
+			return false;
+	}
+	COMPILER_BARRIER();
+	return true;
+}
+%#endif /* !__KERNEL__ && __USE_TIME64 */
+
+
+
+
+
+
+/************************************************************************/
+/* Kernel NoeXcept functions                                            */
+/************************************************************************/
+%#if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
+@@>> shared_rwlock_read_nx(3)
+@@Acquire a read-lock to the given shared_rwlock.
+@@@return: true:  Successfully acquired a read-lock.
+@@@return: false: Preemption was disabled, and the operation would have blocked.
+@@@return: false: There are pending X-RPCs that could not be serviced.
+[[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+$bool shared_rwlock_read_nx([[nonnull]] struct shared_rwlock *__restrict self) {
+	__hybrid_assert(!@task_wasconnected@());
+	while (!shared_rwlock_tryread(self)) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (shared_rwlock_tryread(self))
+				goto success;
+		});
+		@task_connect@(&self->@sl_rdwait@);
+		if unlikely(shared_rwlock_tryread(self)) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor_nx@())
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+
+@@>> shared_rwlock_write_nx(3)
+@@Acquire a write-lock to the given shared_rwlock.
+@@Acquire a lock to the given shared_lock.
+@@@return: true:  Successfully acquired a write-lock.
+@@@return: false: Preemption was disabled, and the operation would have blocked.
+@@@return: false: There are pending X-RPCs that could not be serviced.
+[[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+$bool shared_rwlock_write_nx([[nonnull]] struct shared_rwlock *__restrict self) {
+	__hybrid_assert(!@task_wasconnected@());
+	while (!shared_rwlock_trywrite(self)) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (shared_rwlock_trywrite(self))
+				goto success;
+		});
+		@task_connect@(&self->@sl_wrwait@);
+		if unlikely(shared_rwlock_trywrite(self)) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor_nx@())
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+
+@@>> shared_rwlock_read_with_timeout_nx(3)
+@@Acquire a read-lock to the given shared_rwlock.
+@@@return: true:  Successfully acquired a read-lock.
+@@@return: false: The given `abs_timeout' has expired.
+@@@return: false: Preemption was disabled, and the operation would have blocked.
+@@@return: false: There are pending X-RPCs that could not be serviced.
+[[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+$bool shared_rwlock_read_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
+                                         __shared_rwlock_timespec abs_timeout) {
+	__hybrid_assert(!@task_wasconnected@());
+	while (!shared_rwlock_tryread(self)) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (shared_rwlock_tryread(self))
+				goto success;
+		});
+		@task_connect@(&self->@sl_rdwait@);
+		if unlikely(shared_rwlock_tryread(self)) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor_nx@(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+
+@@>> shared_rwlock_write_with_timeout_nx(3)
+@@Acquire a write-lock to the given shared_rwlock.
+@@@return: true:  Successfully acquired a write-lock.
+@@@return: false: The given `abs_timeout' has expired.
+@@@return: false: Preemption was disabled, and the operation would have blocked.
+@@@return: false: There are pending X-RPCs that could not be serviced.
+[[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+$bool shared_rwlock_write_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
+                                          __shared_rwlock_timespec abs_timeout) {
+	__hybrid_assert(!@task_wasconnected@());
+	while (!shared_rwlock_trywrite(self)) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (shared_rwlock_trywrite(self))
+				goto success;
+		});
+		@task_connect@(&self->@sl_wrwait@);
+		if unlikely(shared_rwlock_trywrite(self)) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor_nx@(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+@@>> shared_rwlock_waitread_nx(3)
+@@Wait until acquiring a read-lock to `self' no longer blocks
+@@@return: true:  A read-lock became available.
+@@@return: false: Preemption was disabled, and the operation would have blocked.
+@@@return: false: There are pending X-RPCs that could not be serviced.
+[[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+$bool shared_rwlock_waitread_nx([[nonnull]] struct shared_rwlock *__restrict self) {
+	__hybrid_assert(!@task_wasconnected@());
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1)
+				goto success;
+		});
+		@task_connect_for_poll@(&self->@sl_rdwait@);
+		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor_nx@())
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+
+@@>> shared_rwlock_waitwrite_nx(3)
+@@Wait until acquiring a write-lock to `self' no longer blocks
+@@Acquire a lock to the given shared_lock.
+@@@return: true:  A write-lock became available.
+@@@return: false: Preemption was disabled, and the operation would have blocked.
+@@@return: false: There are pending X-RPCs that could not be serviced.
+[[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+$bool shared_rwlock_waitwrite_nx([[nonnull]] struct shared_rwlock *__restrict self) {
+	__hybrid_assert(!@task_wasconnected@());
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+				goto success;
+		});
+		@task_connect_for_poll@(&self->@sl_wrwait@);
+		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor_nx@())
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+
+
+@@>> shared_rwlock_waitread_with_timeout_nx(3)
+@@Wait until acquiring a read-lock to `self' no longer blocks
+@@@return: true:  A read-lock became available.
+@@@return: false: The given `abs_timeout' has expired.
+@@@return: false: Preemption was disabled, and the operation would have blocked.
+@@@return: false: There are pending X-RPCs that could not be serviced.
+[[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+$bool shared_rwlock_waitread_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
+                                             __shared_rwlock_timespec abs_timeout) {
+	__hybrid_assert(!@task_wasconnected@());
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1)
+				goto success;
+		});
+		@task_connect_for_poll@(&self->@sl_rdwait@);
+		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != ($uintptr_t)-1) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor_nx@(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_READ_BARRIER();
+	return true;
+}
+
+
+@@>> shared_rwlock_waitwrite_with_timeout_nx(3)
+@@Wait until acquiring a write-lock to `self' no longer blocks
+@@@return: true:  A write-lock became available.
+@@@return: false: The given `abs_timeout' has expired.
+@@@return: false: Preemption was disabled, and the operation would have blocked.
+@@@return: false: There are pending X-RPCs that could not be serviced.
+[[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+$bool shared_rwlock_waitwrite_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
+                                              __shared_rwlock_timespec abs_timeout) {
+	__hybrid_assert(!@task_wasconnected@());
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		@TASK_POLL_BEFORE_CONNECT@({
+			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
+				goto success;
+		});
+		@task_connect_for_poll@(&self->@sl_wrwait@);
+		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
+			@task_disconnectall@();
+			break;
+		}
+		if (!@task_waitfor_nx@(abs_timeout))
+			return false;
+	}
+success:
+	COMPILER_BARRIER();
+	return true;
+}
+%#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
+
+
+
+%#ifdef __cplusplus
+%[insert:function(shared_rwlock_read      = shared_rwlock_read_with_timeout, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_write     = shared_rwlock_write_with_timeout, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_waitread  = shared_rwlock_waitread_with_timeout, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_waitwrite = shared_rwlock_waitwrite_with_timeout, externLinkageOverride: "C++")]
+%#if !defined(__KERNEL__) && defined(__USE_TIME64)
+%[insert:function(shared_rwlock_read      = shared_rwlock_read_with_timeout64, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_write     = shared_rwlock_write_with_timeout64, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_waitread  = shared_rwlock_waitread_with_timeout64, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_waitwrite = shared_rwlock_waitwrite_with_timeout64, externLinkageOverride: "C++")]
+%#endif /* !__KERNEL__ && __USE_TIME64 */
+%#if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
+%[insert:function(shared_rwlock_read_nx      = shared_rwlock_read_with_timeout_nx, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_write_nx     = shared_rwlock_write_with_timeout_nx, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_waitread_nx  = shared_rwlock_waitread_with_timeout_nx, externLinkageOverride: "C++")]
+%[insert:function(shared_rwlock_waitwrite_nx = shared_rwlock_waitwrite_with_timeout_nx, externLinkageOverride: "C++")]
+%#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
+%#elif defined(__HYBRID_PP_VA_OVERLOAD)
+%{
+#define __PRIVATE_shared_rwlock_read_1      (shared_rwlock_read)
+#define __PRIVATE_shared_rwlock_read_2      shared_rwlock_read_with_timeout
+#define __PRIVATE_shared_rwlock_write_1     (shared_rwlock_write)
+#define __PRIVATE_shared_rwlock_write_2     shared_rwlock_write_with_timeout
+#define __PRIVATE_shared_rwlock_waitread_1  (shared_rwlock_waitread)
+#define __PRIVATE_shared_rwlock_waitread_2  shared_rwlock_waitread_with_timeout
+#define __PRIVATE_shared_rwlock_waitwrite_1 (shared_rwlock_waitwrite)
+#define __PRIVATE_shared_rwlock_waitwrite_2 shared_rwlock_waitwrite_with_timeout
+#define shared_rwlock_read(...)      __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_read_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_write(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_write_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitread(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitread_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitwrite(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitwrite_, (__VA_ARGS__))(__VA_ARGS__)
+#if !defined(__KERNEL__) && defined(__USE_TIME64)
+#define __PRIVATE_shared_rwlock_read64_1      (shared_rwlock_read)
+#define __PRIVATE_shared_rwlock_read64_2      shared_rwlock_read_with_timeout64
+#define __PRIVATE_shared_rwlock_write64_1     (shared_rwlock_write)
+#define __PRIVATE_shared_rwlock_write64_2     shared_rwlock_write_with_timeout64
+#define __PRIVATE_shared_rwlock_waitread64_1  (shared_rwlock_waitread)
+#define __PRIVATE_shared_rwlock_waitread64_2  shared_rwlock_waitread_with_timeout64
+#define __PRIVATE_shared_rwlock_waitwrite64_1 (shared_rwlock_waitwrite)
+#define __PRIVATE_shared_rwlock_waitwrite64_2 shared_rwlock_waitwrite_with_timeout64
+#define shared_rwlock_read64(...)      __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_read64_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_write64(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_write64_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitread64(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitread64_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitwrite64(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitwrite64_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* !__KERNEL__ && __USE_TIME64 */
+#if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
+#define __PRIVATE_shared_rwlock_read_nx_1      (shared_rwlock_read_nx)
+#define __PRIVATE_shared_rwlock_read_nx_2      shared_rwlock_read_with_timeout_nx
+#define __PRIVATE_shared_rwlock_write_nx_1     (shared_rwlock_write_nx)
+#define __PRIVATE_shared_rwlock_write_nx_2     shared_rwlock_write_with_timeout_nx
+#define __PRIVATE_shared_rwlock_waitread_nx_1  (shared_rwlock_waitread_nx)
+#define __PRIVATE_shared_rwlock_waitread_nx_2  shared_rwlock_waitread_with_timeout_nx
+#define __PRIVATE_shared_rwlock_waitwrite_nx_1 (shared_rwlock_waitwrite_nx)
+#define __PRIVATE_shared_rwlock_waitwrite_nx_2 shared_rwlock_waitwrite_with_timeout_nx
+#define shared_rwlock_read_nx(...)      __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_read_nx_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_write_nx(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_write_nx_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitread_nx(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitread_nx_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitwrite_nx(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitwrite_nx_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
+}
+%#endif /* ... */
 
 
 %{

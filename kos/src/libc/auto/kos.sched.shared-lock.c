@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf984d457 */
+/* HASH CRC-32:0x62042f4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,7 +120,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1))
 			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				return;
 		});
-		task_connect(&self->sl_sig);
+		task_connect_for_poll(&self->sl_sig);
 		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
@@ -130,7 +130,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1))
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExpr64(&self->sl_sig, self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, NULL, 0);
+		libc_LFutexExpr64(&self->sl_sig, self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
+		                    NULL, 0);
 	}
 #endif /* !__KERNEL__ */
 }
@@ -148,7 +149,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
-		task_connect(&self->sl_sig);
+		task_connect_for_poll(&self->sl_sig);
 		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
@@ -161,8 +162,9 @@ success:
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr(&self->sl_sig, self, 1,
-		                      __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                      abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		                      __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, abs_timeout,
+		                      LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                      LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
 			return false;
 	}
 #endif /* !__KERNEL__ */
@@ -229,8 +231,9 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr64(&self->sl_sig, self, 1,
-		                        __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                        abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		                        __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, abs_timeout,
+		                        LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                        LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
 			return false;
 	}
 	return true;
@@ -309,7 +312,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
-		task_connect(&self->sl_sig);
+		task_connect_for_poll(&self->sl_sig);
 		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
@@ -338,7 +341,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto success;
 		});
-		task_connect(&self->sl_sig);
+		task_connect_for_poll(&self->sl_sig);
 		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;

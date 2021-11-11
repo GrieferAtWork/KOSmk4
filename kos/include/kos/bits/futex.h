@@ -155,5 +155,6 @@
 #define LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE 0x00000000 /* Default: Timeouts are given as absolute positions of CPU quantum time (`CLOCK_PROCESS_CPUTIME_ID') */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE 0x40000000 /* The given timeout argument describes a timeout relative to the point when waiting starts */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME 0x80000000 /* The given timeout argument is in absolute realtime (`CLOCK_REALTIME') */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL  0x20000000 /* Connect to signals for polling. */
 
 #endif /* !_KOS_BITS_FUTEX_H */

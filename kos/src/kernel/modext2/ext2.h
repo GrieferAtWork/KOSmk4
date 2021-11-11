@@ -312,7 +312,6 @@ struct ext2idat {
 #define /*        */ _ext2idat_end(self)         shared_rwlock_end(&(self)->ei_lock)
 #define /*        */ ext2idat_end(self)          (void)(shared_rwlock_end(&(self)->ei_lock) && (ext2idat_reap(self), 0))
 #define /*BLOCKING*/ ext2idat_upgrade(self)      shared_rwlock_upgrade(&(self)->ei_lock)
-#define /*BLOCKING*/ ext2idat_upgrade_nx(self)   shared_rwlock_upgrade_nx(&(self)->ei_lock)
 #define /*        */ ext2idat_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->ei_lock)
 #define /*        */ ext2idat_downgrade(self)    shared_rwlock_downgrade(&(self)->ei_lock)
 #define /*        */ ext2idat_reading(self)      shared_rwlock_reading(&(self)->ei_lock)

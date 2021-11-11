@@ -315,7 +315,6 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _path_cldlock_reap)(struct path *
 #define /*        */ _path_cldlock_end(self)         shared_rwlock_end(&(self)->p_cldlock)
 #define /*        */ path_cldlock_end(self)          (void)(shared_rwlock_end(&(self)->p_cldlock) && (path_cldlock_reap(self), 0))
 #define /*BLOCKING*/ path_cldlock_upgrade(self)      shared_rwlock_upgrade(&(self)->p_cldlock)
-#define /*BLOCKING*/ path_cldlock_upgrade_nx(self)   shared_rwlock_upgrade_nx(&(self)->p_cldlock)
 #define /*        */ path_cldlock_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->p_cldlock)
 #define /*        */ path_cldlock_downgrade(self)    shared_rwlock_downgrade(&(self)->p_cldlock)
 #define /*        */ path_cldlock_reading(self)      shared_rwlock_reading(&(self)->p_cldlock)

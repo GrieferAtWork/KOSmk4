@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe16cb4c5 */
+/* HASH CRC-32:0x7cdc61d3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@ __SYSDECL_BEGIN
 /* >> shared_rwlock_tryupgrade(3)
  * Try to upgrade a read-lock to a write-lock. Return `false' upon failure. */
 #define shared_rwlock_tryupgrade(self) \
-	__hybrid_atomic_cmpxch((self)->sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)
+	__hybrid_atomic_cmpxch((self)->sl_lock, 1, (__uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)
 
 #ifdef __CRT_HAVE_shared_rwlock_tryread
 /* >> shared_rwlock_tryread(3)
@@ -283,15 +283,820 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(__FCALL shared_rwlock_downg
 	__shared_rwlock_rdwait_broadcast(__self); /* Allow for more readers. */
 }
 #endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_upgrade) && (defined(__CRT_HAVE_shared_rwlock_endread) || defined(__shared_rwlock_wrwait_send)) && (defined(__CRT_HAVE_shared_rwlock_write) || defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr))
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_shared_rwlock_endread_defined
+#define __local___localdep_shared_rwlock_endread_defined
+#if defined(__CRT_HAVE_shared_rwlock_endread) && defined(__shared_rwlock_wrwait_send)
+/* >> shared_rwlock_endread(3)
+ * Release a read-lock from `self'
+ * @return: true:  The lock has become free.
+ * @return: false: The lock is still held by something. */
+__COMPILER_EIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_endread,(struct shared_rwlock *__restrict __self),shared_rwlock_endread,{
+	__UINTPTR_TYPE__ __result;
+	__COMPILER_READ_BARRIER();
+	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
+	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
+	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	if (__result == 0)
+		__shared_rwlock_wrwait_send(__self);
+	return __result == 0;
+})
+#elif defined(__CRT_HAVE_shared_rwlock_endread)
+/* >> shared_rwlock_endread(3)
+ * Release a read-lock from `self'
+ * @return: true:  The lock has become free.
+ * @return: false: The lock is still held by something. */
+__COMPILER_REDIRECT(__LIBC,__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_endread,(struct shared_rwlock *__restrict __self),shared_rwlock_endread,(__self))
+#elif defined(__shared_rwlock_wrwait_send)
+/* >> shared_rwlock_endread(3)
+ * Release a read-lock from `self'
+ * @return: true:  The lock has become free.
+ * @return: false: The lock is still held by something. */
+__LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_endread)(struct shared_rwlock *__restrict __self) {
+	__UINTPTR_TYPE__ __result;
+	__COMPILER_READ_BARRIER();
+	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
+	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
+	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	if (__result == 0)
+		__shared_rwlock_wrwait_send(__self);
+	return __result == 0;
+}
+#else /* ... */
+#undef __local___localdep_shared_rwlock_endread_defined
+#endif /* !... */
+#endif /* !__local___localdep_shared_rwlock_endread_defined */
+#ifndef __local___localdep_shared_rwlock_write_defined
+#define __local___localdep_shared_rwlock_write_defined
+#ifdef __CRT_HAVE_shared_rwlock_write
+/* >> shared_rwlock_write(3)
+ * Acquire a write-lock to the given shared_rwlock. */
+__COMPILER_REDIRECT_VOID(__LIBC,__BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__THROWING,__FCALL,__localdep_shared_rwlock_write,(struct shared_rwlock *__restrict __self),shared_rwlock_write,(__self))
+#elif defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> shared_rwlock_write(3)
+ * Acquire a write-lock to the given shared_rwlock. */
+#define __localdep_shared_rwlock_write __LIBC_LOCAL_NAME(shared_rwlock_write)
+#else /* ... */
+#undef __local___localdep_shared_rwlock_write_defined
+#endif /* !... */
+#endif /* !__local___localdep_shared_rwlock_write_defined */
+__NAMESPACE_LOCAL_END
+/* >> shared_rwlock_upgrade(3)
+ * Blocking-upgrade a read-lock into a write-lock
+ * NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+ *       may  have been  held temporarily,  meaning that  the caller should
+ *       re-load local copies of affected resources.
+ * @return: true:  Upgrade was performed without the read-lock being lost
+ * @return: false: The read-lock had to be released before a write-lock was acquired */
+__COMPILER_EIDECLARE(__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_upgrade,(struct shared_rwlock *__restrict __self),{
+	if (__hybrid_atomic_cmpxch(__self->sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+		return 1; /* Lock wasn't lost */
+	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_endread)(__self);
+	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_write)(__self);
+	return 0; /* Lock was (temporarily) lost */
+})
+#elif defined(__CRT_HAVE_shared_rwlock_upgrade)
+/* >> shared_rwlock_upgrade(3)
+ * Blocking-upgrade a read-lock into a write-lock
+ * NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+ *       may  have been  held temporarily,  meaning that  the caller should
+ *       re-load local copies of affected resources.
+ * @return: true:  Upgrade was performed without the read-lock being lost
+ * @return: false: The read-lock had to be released before a write-lock was acquired */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_upgrade");
+#elif (defined(__CRT_HAVE_shared_rwlock_endread) || defined(__shared_rwlock_wrwait_send)) && (defined(__CRT_HAVE_shared_rwlock_write) || defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr))
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_shared_rwlock_endread_defined
+#define __local___localdep_shared_rwlock_endread_defined
+#if defined(__CRT_HAVE_shared_rwlock_endread) && defined(__shared_rwlock_wrwait_send)
+/* >> shared_rwlock_endread(3)
+ * Release a read-lock from `self'
+ * @return: true:  The lock has become free.
+ * @return: false: The lock is still held by something. */
+__COMPILER_EIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_endread,(struct shared_rwlock *__restrict __self),shared_rwlock_endread,{
+	__UINTPTR_TYPE__ __result;
+	__COMPILER_READ_BARRIER();
+	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
+	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
+	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	if (__result == 0)
+		__shared_rwlock_wrwait_send(__self);
+	return __result == 0;
+})
+#elif defined(__CRT_HAVE_shared_rwlock_endread)
+/* >> shared_rwlock_endread(3)
+ * Release a read-lock from `self'
+ * @return: true:  The lock has become free.
+ * @return: false: The lock is still held by something. */
+__COMPILER_REDIRECT(__LIBC,__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_endread,(struct shared_rwlock *__restrict __self),shared_rwlock_endread,(__self))
+#elif defined(__shared_rwlock_wrwait_send)
+/* >> shared_rwlock_endread(3)
+ * Release a read-lock from `self'
+ * @return: true:  The lock has become free.
+ * @return: false: The lock is still held by something. */
+__LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_endread)(struct shared_rwlock *__restrict __self) {
+	__UINTPTR_TYPE__ __result;
+	__COMPILER_READ_BARRIER();
+	__hybrid_assertf(__self->sl_lock != (__UINTPTR_TYPE__)-1, "Lock is in write-mode (%x)", __self->sl_lock);
+	__hybrid_assertf(__self->sl_lock != 0, "Lock isn't held by anyone");
+	__result = __hybrid_atomic_decfetch(__self->sl_lock, __ATOMIC_RELEASE);
+	if (__result == 0)
+		__shared_rwlock_wrwait_send(__self);
+	return __result == 0;
+}
+#else /* ... */
+#undef __local___localdep_shared_rwlock_endread_defined
+#endif /* !... */
+#endif /* !__local___localdep_shared_rwlock_endread_defined */
+#ifndef __local___localdep_shared_rwlock_write_defined
+#define __local___localdep_shared_rwlock_write_defined
+#ifdef __CRT_HAVE_shared_rwlock_write
+/* >> shared_rwlock_write(3)
+ * Acquire a write-lock to the given shared_rwlock. */
+__COMPILER_REDIRECT_VOID(__LIBC,__BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__THROWING,__FCALL,__localdep_shared_rwlock_write,(struct shared_rwlock *__restrict __self),shared_rwlock_write,(__self))
+#elif defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> shared_rwlock_write(3)
+ * Acquire a write-lock to the given shared_rwlock. */
+#define __localdep_shared_rwlock_write __LIBC_LOCAL_NAME(shared_rwlock_write)
+#else /* ... */
+#undef __local___localdep_shared_rwlock_write_defined
+#endif /* !... */
+#endif /* !__local___localdep_shared_rwlock_write_defined */
+__NAMESPACE_LOCAL_END
+/* >> shared_rwlock_upgrade(3)
+ * Blocking-upgrade a read-lock into a write-lock
+ * NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+ *       may  have been  held temporarily,  meaning that  the caller should
+ *       re-load local copies of affected resources.
+ * @return: true:  Upgrade was performed without the read-lock being lost
+ * @return: false: The read-lock had to be released before a write-lock was acquired */
+__LOCAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	if (__hybrid_atomic_cmpxch(__self->sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+		return 1; /* Lock wasn't lost */
+	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_endread)(__self);
+	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_write)(__self);
+	return 0; /* Lock was (temporarily) lost */
+}
+#endif /* ... */
 #ifdef __CRT_HAVE_shared_rwlock_read
 /* >> shared_rwlock_read(3)
  * Acquire a read-lock to the given shared_rwlock. */
-__LIBC __BLOCKING __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_read)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_read");
+__LIBC __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_read)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_read");
 #elif defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
 #include <libc/local/kos.sched.shared-rwlock/shared_rwlock_read.h>
 /* >> shared_rwlock_read(3)
  * Acquire a read-lock to the given shared_rwlock. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_read, __FORCELOCAL __ATTR_ARTIFICIAL __BLOCKING __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_read)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read))(__self); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_read, __FORCELOCAL __ATTR_ARTIFICIAL __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_read)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read))(__self); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_write
+/* >> shared_rwlock_write(3)
+ * Acquire a write-lock to the given shared_rwlock. */
+__LIBC __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_write)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_write");
+#elif defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write.h>
+/* >> shared_rwlock_write(3)
+ * Acquire a write-lock to the given shared_rwlock. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_write, __FORCELOCAL __ATTR_ARTIFICIAL __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_write)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_write))(__self); })
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_read_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_with_timeout)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_read_with_timeout");
+#elif defined(__CRT_HAVE_shared_rwlock_read_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_read_with_timeout,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_read_with_timeout64,(__self,__abs_timeout))
+#elif defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_read_with_timeout.h>
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_read_with_timeout, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_with_timeout)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read_with_timeout))(__self, __abs_timeout); })
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_write_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_with_timeout)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_write_with_timeout");
+#elif defined(__CRT_HAVE_shared_rwlock_write_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_write_with_timeout,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_write_with_timeout64,(__self,__abs_timeout))
+#elif defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write_with_timeout.h>
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_write_with_timeout, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_with_timeout)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_write_with_timeout))(__self, __abs_timeout); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_waitread
+/* >> shared_rwlock_waitread(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks */
+__LIBC __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_waitread)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitread");
+#elif defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitread.h>
+/* >> shared_rwlock_waitread(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitread, __FORCELOCAL __ATTR_ARTIFICIAL __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_waitread)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitread))(__self); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_waitwrite
+/* >> shared_rwlock_waitwrite(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks */
+__LIBC __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_waitwrite)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitwrite");
+#elif defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitwrite.h>
+/* >> shared_rwlock_waitwrite(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitwrite, __FORCELOCAL __ATTR_ARTIFICIAL __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_rwlock_waitwrite)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite))(__self); })
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_with_timeout)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitread_with_timeout");
+#elif defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitread_with_timeout,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_waitread_with_timeout64,(__self,__abs_timeout))
+#elif defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitread_with_timeout.h>
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitread_with_timeout, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_with_timeout)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitread_with_timeout))(__self, __abs_timeout); })
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_with_timeout)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitwrite_with_timeout");
+#elif defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitwrite_with_timeout,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_waitwrite_with_timeout64,(__self,__abs_timeout))
+#elif defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitwrite_with_timeout.h>
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitwrite_with_timeout, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_with_timeout)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout))(__self, __abs_timeout); })
+#endif /* ... */
+#if !defined(__KERNEL__) && defined(__USE_TIME64)
+#if defined(__CRT_HAVE_shared_rwlock_read_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_read_with_timeout64,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_read_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_read_with_timeout64)
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_with_timeout64)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_read_with_timeout64");
+#elif defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_read_with_timeout64.h>
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_read_with_timeout64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_with_timeout64)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read_with_timeout64))(__self, __abs_timeout); })
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_write_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_write_with_timeout64,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_write_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_write_with_timeout64)
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_with_timeout64)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_write_with_timeout64");
+#elif defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write_with_timeout64.h>
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_write_with_timeout64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_with_timeout64)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_write_with_timeout64))(__self, __abs_timeout); })
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitread_with_timeout64,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_waitread_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout64)
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_with_timeout64)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitread_with_timeout64");
+#elif defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitread_with_timeout64.h>
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitread_with_timeout64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_with_timeout64)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitread_with_timeout64))(__self, __abs_timeout); })
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitwrite_with_timeout64,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_waitwrite_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout64)
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_with_timeout64)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitwrite_with_timeout64");
+#elif defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitwrite_with_timeout64.h>
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitwrite_with_timeout64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_with_timeout64)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout64))(__self, __abs_timeout); })
+#endif /* ... */
+#endif /* !__KERNEL__ && __USE_TIME64 */
+#if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
+#ifdef __CRT_HAVE_shared_rwlock_read_nx
+/* >> shared_rwlock_read_nx(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_read_nx");
+#elif defined(__KERNEL__)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_read_nx.h>
+/* >> shared_rwlock_read_nx(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_read_nx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read_nx))(__self); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_write_nx
+/* >> shared_rwlock_write_nx(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * Acquire a lock to the given shared_lock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_write_nx");
+#elif defined(__KERNEL__)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write_nx.h>
+/* >> shared_rwlock_write_nx(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * Acquire a lock to the given shared_lock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_write_nx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_write_nx))(__self); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_read_with_timeout_nx
+/* >> shared_rwlock_read_with_timeout_nx(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_with_timeout_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_read_with_timeout_nx");
+#elif defined(__KERNEL__)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_read_with_timeout_nx.h>
+/* >> shared_rwlock_read_with_timeout_nx(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_read_with_timeout_nx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_with_timeout_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read_with_timeout_nx))(__self, __abs_timeout); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_write_with_timeout_nx
+/* >> shared_rwlock_write_with_timeout_nx(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_with_timeout_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_write_with_timeout_nx");
+#elif defined(__KERNEL__)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write_with_timeout_nx.h>
+/* >> shared_rwlock_write_with_timeout_nx(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_write_with_timeout_nx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_with_timeout_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_write_with_timeout_nx))(__self, __abs_timeout); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_waitread_nx
+/* >> shared_rwlock_waitread_nx(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitread_nx");
+#elif defined(__KERNEL__)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitread_nx.h>
+/* >> shared_rwlock_waitread_nx(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitread_nx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitread_nx))(__self); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_waitwrite_nx
+/* >> shared_rwlock_waitwrite_nx(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * Acquire a lock to the given shared_lock.
+ * @return: true:  A write-lock became available.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitwrite_nx");
+#elif defined(__KERNEL__)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitwrite_nx.h>
+/* >> shared_rwlock_waitwrite_nx(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * Acquire a lock to the given shared_lock.
+ * @return: true:  A write-lock became available.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitwrite_nx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_nx))(__self); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_waitread_with_timeout_nx
+/* >> shared_rwlock_waitread_with_timeout_nx(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_with_timeout_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitread_with_timeout_nx");
+#elif defined(__KERNEL__)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitread_with_timeout_nx.h>
+/* >> shared_rwlock_waitread_with_timeout_nx(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitread_with_timeout_nx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_with_timeout_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitread_with_timeout_nx))(__self, __abs_timeout); })
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_waitwrite_with_timeout_nx
+/* >> shared_rwlock_waitwrite_with_timeout_nx(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__LIBC __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_with_timeout_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) __CASMNAME_SAME("shared_rwlock_waitwrite_with_timeout_nx");
+#elif defined(__KERNEL__)
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitwrite_with_timeout_nx.h>
+/* >> shared_rwlock_waitwrite_with_timeout_nx(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_waitwrite_with_timeout_nx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_with_timeout_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout_nx))(__self, __abs_timeout); })
+#endif /* ... */
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
+#ifdef __cplusplus
+extern "C++" {
+#if defined(__CRT_HAVE_shared_rwlock_read_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_read,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_read_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_read_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_read,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_read_with_timeout64,(__self,__abs_timeout))
+#elif defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_read_with_timeout.h>
+extern "C++" {
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read_with_timeout))(__self, __abs_timeout); }
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_write_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_write,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_write_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_write_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_write,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_write_with_timeout64,(__self,__abs_timeout))
+#elif defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write_with_timeout.h>
+extern "C++" {
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_write_with_timeout))(__self, __abs_timeout); }
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitread,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_waitread_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitread,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_waitread_with_timeout64,(__self,__abs_timeout))
+#elif defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitread_with_timeout.h>
+extern "C++" {
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitread_with_timeout))(__self, __abs_timeout); }
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitwrite,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_waitwrite_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout64) && !defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitwrite,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_waitwrite_with_timeout64,(__self,__abs_timeout))
+#elif defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitwrite_with_timeout.h>
+extern "C++" {
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout))(__self, __abs_timeout); }
+#endif /* ... */
+} /* extern "C++" */
+#if !defined(__KERNEL__) && defined(__USE_TIME64)
+extern "C++" {
+#if defined(__CRT_HAVE_shared_rwlock_read_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_read,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_read_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_read_with_timeout64)
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_read,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_read_with_timeout64,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_read_with_timeout64.h>
+extern "C++" {
+/* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read_with_timeout64))(__self, __abs_timeout); }
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_write_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_write,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_write_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_write_with_timeout64)
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_write,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_write_with_timeout64,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write_with_timeout64.h>
+extern "C++" {
+/* >> shared_rwlock_write_with_timeout(3), shared_rwlock_write_with_timeout64(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_write_with_timeout64))(__self, __abs_timeout); }
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitread,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_waitread_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_waitread_with_timeout64)
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitread,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_waitread_with_timeout64,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitread_with_timeout64.h>
+extern "C++" {
+/* >> shared_rwlock_waitread_with_timeout(3), shared_rwlock_waitread_with_timeout64(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitread_with_timeout64))(__self, __abs_timeout); }
+#endif /* ... */
+#if defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitwrite,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_waitwrite_with_timeout,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_shared_rwlock_waitwrite_with_timeout64)
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitwrite,(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_rwlock_waitwrite_with_timeout64,(__self,__abs_timeout))
+#elif defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitwrite_with_timeout64.h>
+extern "C++" {
+/* >> shared_rwlock_waitwrite_with_timeout(3), shared_rwlock_waitwrite_with_timeout64(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout64))(__self, __abs_timeout); }
+#endif /* ... */
+} /* extern "C++" */
+#endif /* !__KERNEL__ && __USE_TIME64 */
+#if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
+extern "C++" {
+#ifdef __CRT_HAVE_shared_rwlock_read_with_timeout_nx
+/* >> shared_rwlock_read_with_timeout_nx(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_read_nx,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_read_with_timeout_nx,(__self,__abs_timeout))
+#elif defined(__KERNEL__)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_read_with_timeout_nx.h>
+extern "C++" {
+/* >> shared_rwlock_read_with_timeout_nx(3)
+ * Acquire a read-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a read-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_read_with_timeout_nx))(__self, __abs_timeout); }
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_write_with_timeout_nx
+/* >> shared_rwlock_write_with_timeout_nx(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_write_nx,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_write_with_timeout_nx,(__self,__abs_timeout))
+#elif defined(__KERNEL__)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write_with_timeout_nx.h>
+extern "C++" {
+/* >> shared_rwlock_write_with_timeout_nx(3)
+ * Acquire a write-lock to the given shared_rwlock.
+ * @return: true:  Successfully acquired a write-lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_write_with_timeout_nx))(__self, __abs_timeout); }
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_waitread_with_timeout_nx
+/* >> shared_rwlock_waitread_with_timeout_nx(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitread_nx,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_waitread_with_timeout_nx,(__self,__abs_timeout))
+#elif defined(__KERNEL__)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitread_with_timeout_nx.h>
+extern "C++" {
+/* >> shared_rwlock_waitread_with_timeout_nx(3)
+ * Wait until acquiring a read-lock to `self' no longer blocks
+ * @return: true:  A read-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitread_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitread_with_timeout_nx))(__self, __abs_timeout); }
+#endif /* ... */
+#ifdef __CRT_HAVE_shared_rwlock_waitwrite_with_timeout_nx
+/* >> shared_rwlock_waitwrite_with_timeout_nx(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),__BOOL,__THROWING,__FCALL,shared_rwlock_waitwrite_nx,(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_rwlock_waitwrite_with_timeout_nx,(__self,__abs_timeout))
+#elif defined(__KERNEL__)
+} /* extern "C++" */
+#include <libc/local/kos.sched.shared-rwlock/shared_rwlock_waitwrite_with_timeout_nx.h>
+extern "C++" {
+/* >> shared_rwlock_waitwrite_with_timeout_nx(3)
+ * Wait until acquiring a write-lock to `self' no longer blocks
+ * @return: true:  A write-lock became available.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite_nx)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout_nx))(__self, __abs_timeout); }
+#endif /* ... */
+} /* extern "C++" */
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
+#elif defined(__HYBRID_PP_VA_OVERLOAD)
+#define __PRIVATE_shared_rwlock_read_1      (shared_rwlock_read)
+#define __PRIVATE_shared_rwlock_read_2      shared_rwlock_read_with_timeout
+#define __PRIVATE_shared_rwlock_write_1     (shared_rwlock_write)
+#define __PRIVATE_shared_rwlock_write_2     shared_rwlock_write_with_timeout
+#define __PRIVATE_shared_rwlock_waitread_1  (shared_rwlock_waitread)
+#define __PRIVATE_shared_rwlock_waitread_2  shared_rwlock_waitread_with_timeout
+#define __PRIVATE_shared_rwlock_waitwrite_1 (shared_rwlock_waitwrite)
+#define __PRIVATE_shared_rwlock_waitwrite_2 shared_rwlock_waitwrite_with_timeout
+#define shared_rwlock_read(...)      __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_read_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_write(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_write_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitread(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitread_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitwrite(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitwrite_, (__VA_ARGS__))(__VA_ARGS__)
+#if !defined(__KERNEL__) && defined(__USE_TIME64)
+#define __PRIVATE_shared_rwlock_read64_1      (shared_rwlock_read)
+#define __PRIVATE_shared_rwlock_read64_2      shared_rwlock_read_with_timeout64
+#define __PRIVATE_shared_rwlock_write64_1     (shared_rwlock_write)
+#define __PRIVATE_shared_rwlock_write64_2     shared_rwlock_write_with_timeout64
+#define __PRIVATE_shared_rwlock_waitread64_1  (shared_rwlock_waitread)
+#define __PRIVATE_shared_rwlock_waitread64_2  shared_rwlock_waitread_with_timeout64
+#define __PRIVATE_shared_rwlock_waitwrite64_1 (shared_rwlock_waitwrite)
+#define __PRIVATE_shared_rwlock_waitwrite64_2 shared_rwlock_waitwrite_with_timeout64
+#define shared_rwlock_read64(...)      __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_read64_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_write64(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_write64_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitread64(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitread64_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitwrite64(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitwrite64_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* !__KERNEL__ && __USE_TIME64 */
+#if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
+#define __PRIVATE_shared_rwlock_read_nx_1      (shared_rwlock_read_nx)
+#define __PRIVATE_shared_rwlock_read_nx_2      shared_rwlock_read_with_timeout_nx
+#define __PRIVATE_shared_rwlock_write_nx_1     (shared_rwlock_write_nx)
+#define __PRIVATE_shared_rwlock_write_nx_2     shared_rwlock_write_with_timeout_nx
+#define __PRIVATE_shared_rwlock_waitread_nx_1  (shared_rwlock_waitread_nx)
+#define __PRIVATE_shared_rwlock_waitread_nx_2  shared_rwlock_waitread_with_timeout_nx
+#define __PRIVATE_shared_rwlock_waitwrite_nx_1 (shared_rwlock_waitwrite_nx)
+#define __PRIVATE_shared_rwlock_waitwrite_nx_2 shared_rwlock_waitwrite_with_timeout_nx
+#define shared_rwlock_read_nx(...)      __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_read_nx_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_write_nx(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_write_nx_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitread_nx(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitread_nx_, (__VA_ARGS__))(__VA_ARGS__)
+#define shared_rwlock_waitwrite_nx(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_shared_rwlock_waitwrite_nx_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 #endif /* ... */
 
 #ifdef __KERNEL__

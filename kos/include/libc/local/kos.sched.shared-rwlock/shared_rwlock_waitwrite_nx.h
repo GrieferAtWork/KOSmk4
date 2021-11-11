@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfda59061 */
+/* HASH CRC-32:0x6fd4bab3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shared_lock_acquire_with_timeout_nx_defined
-#define __local_shared_lock_acquire_with_timeout_nx_defined
+#ifndef __local_shared_rwlock_waitwrite_nx_defined
+#define __local_shared_rwlock_waitwrite_nx_defined
 #include <__crt.h>
 #ifdef __KERNEL__
 #include <kos/anno.h>
-#include <kos/bits/shared-lock.h>
+#include <kos/bits/shared-rwlock.h>
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_acquire_with_timeout_nx) __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout_nx))(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL_LIBC(shared_rwlock_waitwrite_nx) __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL
+(__FCALL __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_nx))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
 				goto __success;
 		});
-		task_connect(&__self->sl_sig);
-		if __unlikely(__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
+		task_connect_for_poll(&__self->sl_wrwait);
+		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
 			task_disconnectall();
 			break;
 		}
-		if (!task_waitfor_nx(__abs_timeout))
+		if (!task_waitfor_nx())
 			return 0;
 	}
 __success:
@@ -48,11 +48,11 @@ __success:
 	return 1;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shared_lock_acquire_with_timeout_nx_defined
-#define __local___localdep_shared_lock_acquire_with_timeout_nx_defined
-#define __localdep_shared_lock_acquire_with_timeout_nx __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout_nx)
-#endif /* !__local___localdep_shared_lock_acquire_with_timeout_nx_defined */
+#ifndef __local___localdep_shared_rwlock_waitwrite_nx_defined
+#define __local___localdep_shared_rwlock_waitwrite_nx_defined
+#define __localdep_shared_rwlock_waitwrite_nx __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_nx)
+#endif /* !__local___localdep_shared_rwlock_waitwrite_nx_defined */
 #else /* __KERNEL__ */
-#undef __local_shared_lock_acquire_with_timeout_nx_defined
+#undef __local_shared_rwlock_waitwrite_nx_defined
 #endif /* !__KERNEL__ */
-#endif /* !__local_shared_lock_acquire_with_timeout_nx_defined */
+#endif /* !__local_shared_rwlock_waitwrite_nx_defined */

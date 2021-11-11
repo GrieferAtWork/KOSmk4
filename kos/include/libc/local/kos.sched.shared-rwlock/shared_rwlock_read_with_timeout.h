@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e36c76a */
+/* HASH CRC-32:0xec42135c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,37 +18,38 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shared_rwlock_read_defined
-#define __local_shared_rwlock_read_defined
+#ifndef __local_shared_rwlock_read_with_timeout_defined
+#define __local_shared_rwlock_read_with_timeout_defined
 #include <__crt.h>
+#include <features.h>
 #include <bits/types.h>
-#if defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
+#if defined(__KERNEL__) || (defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 #include <kos/anno.h>
 #include <kos/bits/shared-rwlock.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_LFutexExpr64_except_defined
-#define __local___localdep_LFutexExpr64_except_defined
-#if defined(__CRT_HAVE_LFutexExpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#ifndef __local___localdep_LFutexExpr_except_defined
+#define __local___localdep_LFutexExpr_except_defined
+#if defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,__localdep_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_LFutexExpr64)
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,__localdep_LFutexExpr_except,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+#elif defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,__localdep_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_LFutexExpr)
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,__localdep_LFutexExpr_except,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+#elif defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 __NAMESPACE_LOCAL_END
-#include <libc/local/kos.futexexpr/LFutexExpr64_except.h>
+#include <libc/local/kos.futexexpr/LFutexExpr_except.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_LFutexExpr64_except __LIBC_LOCAL_NAME(LFutexExpr64_except)
+#define __localdep_LFutexExpr_except __LIBC_LOCAL_NAME(LFutexExpr_except)
 #else /* ... */
-#undef __local___localdep_LFutexExpr64_except_defined
+#undef __local___localdep_LFutexExpr_except_defined
 #endif /* !... */
-#endif /* !__local___localdep_LFutexExpr64_except_defined */
+#endif /* !__local___localdep_LFutexExpr_except_defined */
 #ifndef __local___localdep_shared_rwlock_tryread_defined
 #define __local___localdep_shared_rwlock_tryread_defined
 #ifdef __CRT_HAVE_shared_rwlock_tryread
@@ -105,8 +106,8 @@ __NAMESPACE_LOCAL_END
 
 #endif /* !__KERNEL__ */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_rwlock_read) __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void
-(__FCALL __LIBC_LOCAL_NAME(shared_rwlock_read))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL_LIBC(shared_rwlock_read_with_timeout) __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL
+(__FCALL __LIBC_LOCAL_NAME(shared_rwlock_read_with_timeout))(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
 	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(__self)) {
@@ -119,23 +120,28 @@ __LOCAL_LIBC(shared_rwlock_read) __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void
 			task_disconnectall();
 			break;
 		}
-		task_waitfor();
+		if (!task_waitfor(__abs_timeout))
+			return 0;
 	}
 __success:
 #else /* __KERNEL__ */
 	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(__self)) {
 		__hybrid_atomic_store(__self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
-		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64_except)(&__self->sl_rdwait, __self, 1, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr, __NULLPTR, 0);
+		if ((__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr_except)(&__self->sl_rdwait, __self, 1,
+		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                      __abs_timeout, 0) < 0)
+			return 0;
 	}
 #endif /* !__KERNEL__ */
 	__COMPILER_READ_BARRIER();
+	return 1;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shared_rwlock_read_defined
-#define __local___localdep_shared_rwlock_read_defined
-#define __localdep_shared_rwlock_read __LIBC_LOCAL_NAME(shared_rwlock_read)
-#endif /* !__local___localdep_shared_rwlock_read_defined */
-#else /* __KERNEL__ || __CRT_HAVE_LFutexExpr64 || __CRT_HAVE_LFutexExpr */
-#undef __local_shared_rwlock_read_defined
-#endif /* !__KERNEL__ && !__CRT_HAVE_LFutexExpr64 && !__CRT_HAVE_LFutexExpr */
-#endif /* !__local_shared_rwlock_read_defined */
+#ifndef __local___localdep_shared_rwlock_read_with_timeout_defined
+#define __local___localdep_shared_rwlock_read_with_timeout_defined
+#define __localdep_shared_rwlock_read_with_timeout __LIBC_LOCAL_NAME(shared_rwlock_read_with_timeout)
+#endif /* !__local___localdep_shared_rwlock_read_with_timeout_defined */
+#else /* __KERNEL__ || (__CRT_HAVE_LFutexExpr && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_LFutexExpr64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || __CRT_HAVE_lfutexexpr64 || __CRT_HAVE_lfutexexpr */
+#undef __local_shared_rwlock_read_with_timeout_defined
+#endif /* !__KERNEL__ && (!__CRT_HAVE_LFutexExpr || (__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && (!__CRT_HAVE_LFutexExpr64 || (!__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && !__CRT_HAVE_lfutexexpr64 && !__CRT_HAVE_lfutexexpr */
+#endif /* !__local_shared_rwlock_read_with_timeout_defined */
