@@ -189,7 +189,7 @@ NOTHROW(FCALL shared_rwlock_end)(struct shared_rwlock *__restrict self) {
 	__hybrid_atomic_store(self->sl_lock, 0, __ATOMIC_RELEASE);
 	if (!sig_send(&self->sl_wrwait))
 		sig_broadcast(&self->sl_rdwait);
-	return true;
+	return 1;
 }
 
 LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
@@ -201,14 +201,15 @@ NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self) {
 			return 0;
 		__hybrid_assert(__temp != (uintptr_t)-2);
 	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, __temp, __temp + 1,
-	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
+	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	COMPILER_READ_BARRIER();
 	return 1;
 }
 
 LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self) {
-	if (!__hybrid_atomic_cmpxch(self->sl_lock, 0, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+	if (!__hybrid_atomic_cmpxch(self->sl_lock, 0, (uintptr_t)-1,
+	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
 	COMPILER_BARRIER();
 	return 1;
