@@ -32,7 +32,8 @@ struct lfutexexpr {
 	 * Using this, you can specify arbitrarily complex expressions
 	 * that all have to be true in order for a wait to take place. */
 	__ptrdiff_t       fe_offset;    /* Offset of the `lfutex_t' object from the base-pointer. */
-	__syscall_ulong_t fe_condition; /* Futex wait condition (must be one of `LFUTEX_WAIT_(WHILE|UNTIL)*') */
+	__syscall_ulong_t fe_condition; /* Futex wait condition (must be one of `LFUTEX_WAIT_(WHILE|UNTIL)*')
+	                                 * For the  last expression  in the  list, set  to  `LFUTEX_EXPREND'. */
 	__syscall_ulong_t fe_val;       /* First condition operand (depending on `fe_condition') */
 	__syscall_ulong_t fe_val2;      /* Second condition operand (depending on `fe_condition') */
 };

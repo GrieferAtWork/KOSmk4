@@ -228,8 +228,9 @@ again_connect:
 		PRIVATE struct lfutexexpr const expr[] = {
 			LFUTEXEXPR_TEQUAL(struct ringbuffer, rb_avail, 0),     /* self->rb_avail == 0 */
 			LFUTEXEXPR_TNOT_EQUAL(struct ringbuffer, rb_limit, 0), /* self->rb_limit != 0 */
+			LFUTEXEXPR_END,
 		};
-		if (lfutexexpr(&self->rb_nempty, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
+		if (lfutexexpr(&self->rb_nempty, self, expr, NULL, 0) < 0)
 			return -1;
 	}
 #endif /* !__KERNEL__ */
@@ -475,11 +476,12 @@ again_connect:
 			goto done;
 		/* Wait if AVAIL >= SIZE and SIZE >= LIMIT */
 		if (size >= limit) {
-			struct lfutexexpr expr[3];
+			struct lfutexexpr expr[4];
 			expr[0] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_avail) >= size;
 			expr[1] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_size)  == size;
 			expr[2] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_limit) == limit;
-			if (lfutexexpr(&self->rb_nfull, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
+			expr[3] = LFUTEXEXPR_END;
+			if (lfutexexpr(&self->rb_nfull, self, expr, NULL, 0) < 0)
 				return -1;
 		}
 	}
@@ -549,11 +551,12 @@ again_connect:
 			goto done;
 		/* Wait if AVAIL >= SIZE and SIZE >= LIMIT */
 		if (size >= limit) {
-			struct lfutexexpr expr[3];
+			struct lfutexexpr expr[4];
 			expr[0] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_avail) >= size;
 			expr[1] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_size)  == size;
 			expr[2] = LFUTEXEXPR_FIELD(struct ringbuffer, rb_limit) == limit;
-			if (lfutexexpr(&self->rb_nfull, self, COMPILER_LENOF(expr), expr, NULL, 0) < 0)
+			expr[3] = LFUTEXEXPR_END;
+			if (lfutexexpr(&self->rb_nfull, self, expr, NULL, 0) < 0)
 				return -1;
 		}
 	}

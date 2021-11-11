@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6de987 */
+/* HASH CRC-32:0x7ad20f16 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -512,7 +512,7 @@
 #define __NR32AC_stime64                      1
 #define __NR32AC_coredump                     6
 #define __NR32AC_mktty                        4
-#define __NR32AC_lfutexexpr                   6
+#define __NR32AC_lfutexexpr                   5
 #define __NR32AC_lseek64                      3
 #define __NR32AC_lfutex                       5
 #define __NR32AC_debugtrap                    2
@@ -2117,10 +2117,9 @@
 #define __NR32AT3_mktty                        (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_lfutexexpr                   (uint32_t *, __uint32_t *)
 #define __NR32AT1_lfutexexpr                   (void *, void *)
-#define __NR32AT2_lfutexexpr                   (size_t, __size_t)
-#define __NR32AT3_lfutexexpr                   (struct lfutexexprx32 const *, struct lfutexexprx32 const *)
-#define __NR32AT4_lfutexexpr                   (struct timespecx32_64 const *, struct __timespecx32_64 const *)
-#define __NR32AT5_lfutexexpr                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT2_lfutexexpr                   (struct lfutexexprx32 const *, struct lfutexexprx32 const *)
+#define __NR32AT3_lfutexexpr                   (struct timespecx32_64 const *, struct __timespecx32_64 const *)
+#define __NR32AT4_lfutexexpr                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_lseek64                      (fd_t, __fd_t)
 #define __NR32AT1_lseek64                      (int64_t, __int64_t)
 #define __NR32AT2_lseek64                      (syscall_ulong_t, __syscall_ulong_t)
@@ -2660,7 +2659,7 @@
 #define __NR32AM_stime64(a, b, c, d, e, f)                      (__time64_t const *)a
 #define __NR32AM_coredump(a, b, c, d, e, f)                     (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void const) const *)c, (__size_t)d, (union coredump_info32 const *)e, (__syscall_ulong_t)f
 #define __NR32AM_mktty(a, b, c, d, e, f)                        (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
-#define __NR32AM_lfutexexpr(a, b, c, d, e, f)                   (__uint32_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx32 const *)d, (struct __timespecx32_64 const *)e, (__syscall_ulong_t)f
+#define __NR32AM_lfutexexpr(a, b, c, d, e, f)                   (__uint32_t *)a, (void *)b, (struct lfutexexprx32 const *)c, (struct __timespecx32_64 const *)d, (__syscall_ulong_t)e
 #define __NR32AM_lseek64(a, b, c, d, e, f)                      (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
 #define __NR32AM_lfutex(a, b, c, d, e, f)                       (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct __timespecx32_64 const *)d, (__uint32_t)e
 #define __NR32AM_debugtrap(a, b, c, d, e, f)                    (struct ucpustate32 const *)a, (struct debugtrap_reason32 const *)b
@@ -3162,7 +3161,7 @@
 #define __NR32AP_stime64(a)                                     (__syscall_ulong_t)a
 #define __NR32AP_coredump(a, b, c, d, e, f)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_mktty(a, b, c, d)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR32AP_lfutexexpr(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NR32AP_lfutexexpr(a, b, c, d, e)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_lseek64(a, b, c)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32), (__syscall_ulong_t)c
 #define __NR32AP_lfutex(a, b, c, d, e)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_debugtrap(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b

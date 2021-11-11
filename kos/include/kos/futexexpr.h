@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa111d5d6 */
+/* HASH CRC-32:0xbe0fd537 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,9 @@ __SYSDECL_BEGIN
 #define __lfutex_t_defined
 typedef __uintptr_t lfutex_t;
 #endif /* !__lfutex_t_defined */
+
+/* Mandatory expression list terminator. */
+#define LFUTEXEXPR_END LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
 
 /* Initializers for futex expressions. */
 #define LFUTEXEXPR_EQUAL(offset, value)                     LFUTEXEXPR_INIT(offset, LFUTEX_WAIT_WHILE, value, 0)                                                      /* x == value */
@@ -175,21 +178,20 @@ __NAMESPACE_INT_END
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexexpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,lfutexexpr,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lfutexexpr(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
@@ -197,21 +199,20 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexexpr,(lfutex_t *__uloc
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexexpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,lfutexexpr,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 #include <libc/local/kos.futexexpr/lfutexexpr.h>
 /* >> lfutexexpr(2)
@@ -220,21 +221,20 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexexpr,(lfutex_t *__ulo
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
@@ -245,21 +245,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexexpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,lfutexexpr64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr64)
 /* >> lfutexexpr(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
@@ -267,21 +266,20 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexexpr64,(lfutex_t *__u
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexexpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,lfutexexpr64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr)
 #include <libc/local/kos.futexexpr/lfutexexpr64.h>
 /* >> lfutexexpr(2)
@@ -290,94 +288,93 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexexpr64,(lfutex_t *__ul
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr64)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr64))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr64)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr64))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #if defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
  * @return: < 0: Timeout expired */
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
  * @return: < 0: Timeout expired */
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 #include <libc/local/kos.futexexpr/LFutexExpr_except.h>
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
  * @return: < 0: Timeout expired */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL LFutexExpr)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr_except))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int (__LIBCCALL LFutexExpr)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
 #endif /* ... */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_LFutexExpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
  * @return: < 0: Timeout expired */
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr64)
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
  * @return: < 0: Timeout expired */
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr)
 #include <libc/local/kos.futexexpr/LFutexExpr64_except.h>
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
  * @return: < 0: Timeout expired */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL LFutexExpr64)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr64_except))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int (__LIBCCALL LFutexExpr64)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr64_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
 #endif /* ... */
 #endif /* __USE_TIME64 */
 

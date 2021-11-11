@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6511d675 */
+/* HASH CRC-32:0x7a6ee618 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1101,10 +1101,9 @@
 #define __NR32AN3_mktty                        rsvd
 #define __NR32AN0_lfutexexpr                   ulockaddr
 #define __NR32AN1_lfutexexpr                   base
-#define __NR32AN2_lfutexexpr                   exprc
-#define __NR32AN3_lfutexexpr                   exprv
-#define __NR32AN4_lfutexexpr                   timeout
-#define __NR32AN5_lfutexexpr                   timeout_flags
+#define __NR32AN2_lfutexexpr                   expr
+#define __NR32AN3_lfutexexpr                   timeout
+#define __NR32AN4_lfutexexpr                   timeout_flags
 #define __NR32AN0_lseek64                      fd
 #define __NR32AN1_lseek64                      offset
 #define __NR32AN2_lseek64                      whence
@@ -2834,11 +2833,9 @@
 #define __NR32RTR_mktty                         SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_lfutexexpr                   SC_REPR_POINTER                                                      /* ulockaddr */ 
 #define __NR32ATR1_lfutexexpr                   SC_REPR_POINTER                                                      /* base */ 
-#define __NR32ATR2_lfutexexpr                   SC_REPR_SIZE_T                                                       /* exprc */ 
-#define __NR32ATR3_lfutexexpr                   SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* exprv */ 
-#define __NR32ATL3_lfutexexpr                   2                                                                    /* exprv -> exprc */ 
-#define __NR32ATR4_lfutexexpr                   SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
-#define __NR32ATR5_lfutexexpr                   SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
+#define __NR32ATR2_lfutexexpr                   SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* expr */ 
+#define __NR32ATR3_lfutexexpr                   SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
+#define __NR32ATR4_lfutexexpr                   SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
 #define __NR32RTR_lfutexexpr                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_lseek64                      SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_lseek64                      SC_REPR_INT64_T                                                      /* offset */ 

@@ -323,18 +323,16 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 #if (defined(DEFINE_COMPAT_FUTEX) ? defined(__ARCH_WANT_COMPAT_SYSCALL_LFUTEXEXPR) \
                                   : defined(__ARCH_WANT_SYSCALL_LFUTEXEXPR))
 #ifdef DEFINE_COMPAT_FUTEX
-DEFINE_COMPAT_SYSCALL6(errno_t, lfutexexpr,
+DEFINE_COMPAT_SYSCALL5(errno_t, lfutexexpr,
                        USER UNCHECKED compat_uintptr_t *, ulockaddr,
                        USER UNCHECKED void *, base,
-                       size_t, exprc,
                        USER UNCHECKED struct compat_lfutexexpr const *, exprv,
                        USER UNCHECKED struct compat_timespec64 const *, timeout,
                        syscall_ulong_t, timeout_flags)
 #else /* DEFINE_COMPAT_FUTEX */
-DEFINE_SYSCALL6(errno_t, lfutexexpr,
+DEFINE_SYSCALL5(errno_t, lfutexexpr,
                 USER UNCHECKED uintptr_t *, ulockaddr,
                 USER UNCHECKED void *, base,
-                size_t, exprc,
                 USER UNCHECKED struct lfutexexpr const *, exprv,
                 USER UNCHECKED struct timespec64 const *, timeout,
                 syscall_ulong_t, timeout_flags)
@@ -342,7 +340,6 @@ DEFINE_SYSCALL6(errno_t, lfutexexpr,
 {
 	(void)ulockaddr;
 	(void)base;
-	(void)exprc;
 	(void)exprv;
 	(void)timeout;
 	(void)timeout_flags;

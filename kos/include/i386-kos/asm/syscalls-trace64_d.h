@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf5613f3 */
+/* HASH CRC-32:0x52399fcc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -870,10 +870,9 @@
 #define __NR64AN3_mktty                    rsvd
 #define __NR64AN0_lfutexexpr               ulockaddr
 #define __NR64AN1_lfutexexpr               base
-#define __NR64AN2_lfutexexpr               exprc
-#define __NR64AN3_lfutexexpr               exprv
-#define __NR64AN4_lfutexexpr               timeout
-#define __NR64AN5_lfutexexpr               timeout_flags
+#define __NR64AN2_lfutexexpr               expr
+#define __NR64AN3_lfutexexpr               timeout
+#define __NR64AN4_lfutexexpr               timeout_flags
 #define __NR64AN0_lfutex                   uaddr
 #define __NR64AN1_lfutex                   futex_op
 #define __NR64AN2_lfutex                   val
@@ -2271,11 +2270,9 @@
 #define __NR64RTR_mktty                     SC_REPR_FD_T                                                         /* return */
 #define __NR64ATR0_lfutexexpr               SC_REPR_POINTER                                                      /* ulockaddr */ 
 #define __NR64ATR1_lfutexexpr               SC_REPR_POINTER                                                      /* base */ 
-#define __NR64ATR2_lfutexexpr               SC_REPR_SIZE_T                                                       /* exprc */ 
-#define __NR64ATR3_lfutexexpr               SC_REPR_STRUCT_LFUTEXEXPRX64_VECTOR                                  /* exprv */ 
-#define __NR64ATL3_lfutexexpr               2                                                                    /* exprv -> exprc */ 
-#define __NR64ATR4_lfutexexpr               SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
-#define __NR64ATR5_lfutexexpr               SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
+#define __NR64ATR2_lfutexexpr               SC_REPR_STRUCT_LFUTEXEXPRX64_VECTOR                                  /* expr */ 
+#define __NR64ATR3_lfutexexpr               SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
+#define __NR64ATR4_lfutexexpr               SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
 #define __NR64RTR_lfutexexpr                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_lfutex                   SC_REPR_POINTER                                                      /* uaddr */ 
 #define __NR64ATR1_lfutex                   SC_REPR_LFUTEX_OP                                                    /* futex_op */ 

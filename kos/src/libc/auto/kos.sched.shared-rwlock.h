@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96391fbc */
+/* HASH CRC-32:0xca26d7c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ INTDEF __NOBLOCK NONNULL((1)) bool NOTHROW(__FCALL libc_shared_rwlock_end)(struc
 INTDEF __NOBLOCK NONNULL((1)) void NOTHROW(__FCALL libc_shared_rwlock_downgrade)(struct shared_rwlock *__restrict self);
 /* >> shared_rwlock_upgrade(3)
  * Blocking-upgrade a read-lock into a write-lock
- * NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+ * NOTE: The lock is always upgraded, but when `false' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources.
  * @return: true:  Upgrade was performed without the read-lock being lost

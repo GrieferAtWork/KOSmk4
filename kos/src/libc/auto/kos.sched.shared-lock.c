@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62042f4a */
+/* HASH CRC-32:0x2e083e76 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,8 @@ DECL_BEGIN
 __NAMESPACE_LOCAL_BEGIN
 static struct lfutexexpr const __shared_lock_waitexpr[] = {
 	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
+	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0),
+	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
 };
 __NAMESPACE_LOCAL_END
 #endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
@@ -69,7 +70,7 @@ success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExpr64(&self->sl_sig, self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, NULL, 0);
+		libc_LFutexExpr64(&self->sl_sig, self, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, NULL, 0);
 	}
 #endif /* !__KERNEL__ */
 	COMPILER_BARRIER();
@@ -100,7 +101,7 @@ success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr(&self->sl_sig, self, 1,
+		if (libc_LFutexExpr(&self->sl_sig, self,
 		                      __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
 		                      abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
@@ -130,7 +131,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1))
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExpr64(&self->sl_sig, self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
+		libc_LFutexExpr64(&self->sl_sig, self, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
 		                    NULL, 0);
 	}
 #endif /* !__KERNEL__ */
@@ -161,7 +162,7 @@ success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr(&self->sl_sig, self, 1,
+		if (libc_LFutexExpr(&self->sl_sig, self,
 		                      __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, abs_timeout,
 		                      LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
 		                      LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
@@ -183,7 +184,8 @@ DEFINE_INTERN_ALIAS(libc_shared_lock_acquire_with_timeout64, libc_shared_lock_ac
 __NAMESPACE_LOCAL_BEGIN
 static struct lfutexexpr const __shared_lock_waitexpr[] = {
 	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
+	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0),
+	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
 };
 __NAMESPACE_LOCAL_END
 #endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
@@ -196,7 +198,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr64(&self->sl_sig, self, 1,
+		if (libc_LFutexExpr64(&self->sl_sig, self,
 		                        __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
 		                        abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
@@ -217,7 +219,8 @@ DEFINE_INTERN_ALIAS(libc_shared_lock_waitfor_with_timeout64, libc_shared_lock_wa
 __NAMESPACE_LOCAL_BEGIN
 static struct lfutexexpr const __shared_lock_waitexpr[] = {
 	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
+	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0),
+	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
 };
 __NAMESPACE_LOCAL_END
 #endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
@@ -230,7 +233,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr64(&self->sl_sig, self, 1,
+		if (libc_LFutexExpr64(&self->sl_sig, self,
 		                        __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, abs_timeout,
 		                        LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
 		                        LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)

@@ -220,7 +220,7 @@ void shared_rwlock_downgrade([[nonnull]] struct shared_rwlock *__restrict self) 
 
 @@>> shared_rwlock_upgrade(3)
 @@Blocking-upgrade a read-lock into a write-lock
-@@NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+@@NOTE: The lock is always upgraded, but when `false' is returned, no lock
 @@      may  have been  held temporarily,  meaning that  the caller should
 @@      re-load local copies of affected resources.
 @@@return: true:  Upgrade was performed without the read-lock being lost
@@ -254,7 +254,8 @@ $bool shared_rwlock_upgrade([[nonnull]] struct shared_rwlock *__restrict self) {
 @@push_namespace(local)@@
 static struct @lfutexexpr@ const @__shared_rwlock_waitreadexpr@[] = {
 	/* Wait while `sl_lock == (uintptr_t)-1' */
-	@LFUTEXEXPR_INIT@(offsetof(struct @shared_rwlock@, @sl_lock@), @LFUTEX_WAIT_WHILE@, ($uintptr_t)-1, 0)
+	@LFUTEXEXPR_INIT@(offsetof(struct @shared_rwlock@, @sl_lock@), @LFUTEX_WAIT_WHILE@, ($uintptr_t)-1, 0),
+	@LFUTEXEXPR_INIT@(0, @LFUTEX_EXPREND@, 0, 0)
 };
 @@pop_namespace@@
 @@pp_endif@@
@@ -269,7 +270,8 @@ static struct @lfutexexpr@ const @__shared_rwlock_waitreadexpr@[] = {
 @@push_namespace(local)@@
 static struct @lfutexexpr@ const @__shared_rwlock_waitwriteexpr@[] = {
 	/* Wait until `sl_lock == 0' */
-	@LFUTEXEXPR_INIT@(offsetof(struct @shared_rwlock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0)
+	@LFUTEXEXPR_INIT@(offsetof(struct @shared_rwlock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0),
+	@LFUTEXEXPR_INIT@(0, @LFUTEX_EXPREND@, 0, 0)
 };
 @@pop_namespace@@
 @@pp_endif@@
@@ -319,7 +321,7 @@ success:
 @@pp_else@@
 	while (!shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_rdwait@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@, NULL, 0);
+		LFutexExpr64_except(&self->@sl_rdwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@, NULL, 0);
 	}
 @@pp_endif@@
 	COMPILER_READ_BARRIER();
@@ -351,7 +353,7 @@ success:
 @@pp_else@@
 	while (!shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_wrwait@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@, NULL, 0);
+		LFutexExpr64_except(&self->@sl_wrwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@, NULL, 0);
 	}
 @@pp_endif@@
 	COMPILER_BARRIER();
@@ -389,7 +391,7 @@ success:
 @@pp_else@@
 	while (!shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr_except(&self->@sl_rdwait@, self, 1,
+		if (LFutexExpr_except(&self->@sl_rdwait@, self,
 		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
 		                      abs_timeout, 0) < 0)
 			return false;
@@ -431,7 +433,7 @@ success:
 @@pp_else@@
 	while (!shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr_except(&self->@sl_wrwait@, self, 1,
+		if (LFutexExpr_except(&self->@sl_wrwait@, self,
 		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
 		                      abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
@@ -475,7 +477,7 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_rdwait@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		LFutexExpr64_except(&self->@sl_rdwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
 		                    NULL, @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@);
 	}
 @@pp_endif@@
@@ -508,7 +510,7 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_wrwait@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		LFutexExpr64_except(&self->@sl_wrwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
 		                    NULL, @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@);
 	}
 @@pp_endif@@
@@ -547,7 +549,7 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr_except(&self->@sl_rdwait@, self, 1,
+		if (LFutexExpr_except(&self->@sl_rdwait@, self,
 		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
 		                      abs_timeout,
 		                      @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
@@ -591,7 +593,7 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr_except(&self->@sl_wrwait@, self, 1,
+		if (LFutexExpr_except(&self->@sl_wrwait@, self,
 		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
 		                      abs_timeout,
 		                      @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
@@ -618,7 +620,7 @@ $bool shared_rwlock_read_with_timeout64([[nonnull]] struct shared_rwlock *__rest
                                         struct timespec64 const *abs_timeout) {
 	while (!shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64_except(&self->@sl_rdwait@, self, 1,
+		if (LFutexExpr64_except(&self->@sl_rdwait@, self,
 		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
 		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
@@ -636,7 +638,7 @@ $bool shared_rwlock_write_with_timeout64([[nonnull]] struct shared_rwlock *__res
                                          struct timespec64 const *abs_timeout) {
 	while (!shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64_except(&self->@sl_wrwait@, self, 1,
+		if (LFutexExpr64_except(&self->@sl_wrwait@, self,
 		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
 		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
@@ -654,7 +656,7 @@ $bool shared_rwlock_waitread_with_timeout64([[nonnull]] struct shared_rwlock *__
                                         struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64_except(&self->@sl_rdwait@, self, 1,
+		if (LFutexExpr64_except(&self->@sl_rdwait@, self,
 		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
 		                        abs_timeout,
 		                        @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
@@ -674,7 +676,7 @@ $bool shared_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_rwlock *_
                                          struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64_except(&self->@sl_wrwait@, self, 1,
+		if (LFutexExpr64_except(&self->@sl_wrwait@, self,
 		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
 		                        abs_timeout,
 		                        @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x333c8aeb */
+/* HASH CRC-32:0xcc743b7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1155,21 +1155,20 @@ __CDECLARE_SC(,__syscall_slong_t,lfutex,(__uint32_t *__uaddr, __syscall_ulong_t 
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_SC(,__errno_t,lfutexexpr,(__uint32_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexprx32 const *__exprv, struct __timespecx32_64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE_SC(,__errno_t,lfutexexpr,(__uint32_t *__ulockaddr, void *__base, struct lfutexexprx32 const *__expr, struct __timespecx32_64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #endif /* __CRT_HAVE_SC(lfutexexpr) */
 #if __CRT_HAVE_SC(lgetxattr)
 __CDECLARE_SC(,__ssize_t,lgetxattr,(char const *__path, char const *__name, void *__buf, __size_t __bufsize),(__path,__name,__buf,__bufsize))
@@ -3660,21 +3659,20 @@ __CDECLARE_XSC(,__syscall_slong_t,lfutex,(__uint32_t *__uaddr, __syscall_ulong_t
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_XSC(,__errno_t,lfutexexpr,(__uint32_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexprx32 const *__exprv, struct __timespecx32_64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE_XSC(,__errno_t,lfutexexpr,(__uint32_t *__ulockaddr, void *__base, struct lfutexexprx32 const *__expr, struct __timespecx32_64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #endif /* __CRT_HAVE_XSC(lfutexexpr) */
 #if __CRT_HAVE_XSC(lgetxattr)
 __CDECLARE_XSC(,__ssize_t,lgetxattr,(char const *__path, char const *__name, void *__buf, __size_t __bufsize),(__path,__name,__buf,__bufsize))

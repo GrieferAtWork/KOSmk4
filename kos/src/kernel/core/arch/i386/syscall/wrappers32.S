@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5775704 */
+/* HASH CRC-32:0xe7bceb9c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18624,21 +18624,20 @@ END(__x86_asm32_int80_mktty)
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexexpr(uint32_t *ulockaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.x86.asm32_syscall_int80.lfutexexpr
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	.cfi_startproc simple
@@ -18657,7 +18656,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ebp  /* Arg #5 */
 	pushl_cfi_r %edi  /* Arg #4 */
 	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
@@ -18668,8 +18666,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(12), %esp
-	.cfi_adjust_cfa_offset -12
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -38242,21 +38240,20 @@ END(__x86_asm32_sysenter_mktty)
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexexpr(uint32_t *ulockaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.x86.asm32_syscall_sysenter.lfutexexpr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
 	.cfi_startproc simple
@@ -38277,7 +38274,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
 	movw   %ax, %fs
 	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
@@ -38288,8 +38284,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(12), %esp
-	.cfi_adjust_cfa_offset -12
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es

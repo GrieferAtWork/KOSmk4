@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48e8604 */
+/* HASH CRC-32:0x93209961 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1309,21 +1309,20 @@
  * hold true before the scheduler will suspend the calling thread.
  * @param: ulockaddr:     The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
+ * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __NR32_lfutexexpr                   __UINT32_C(0xffffffeb) /* errno_t lfutexexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+#define __NR32_lfutexexpr                   __UINT32_C(0xffffffeb) /* errno_t lfutexexpr(uint32_t *ulockaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 #define __NR32_lseek64                      __UINT32_C(0xffffffed) /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -2742,7 +2741,7 @@
 #define __NR32RC_stime64                      1
 #define __NR32RC_coredump                     6
 #define __NR32RC_mktty                        4
-#define __NR32RC_lfutexexpr                   6
+#define __NR32RC_lfutexexpr                   5
 #define __NR32RC_lseek64                      4 /* __NR32AC_lseek64 + 1 */
 #define __NR32RC_lfutex                       5
 #define __NR32RC_debugtrap                    2

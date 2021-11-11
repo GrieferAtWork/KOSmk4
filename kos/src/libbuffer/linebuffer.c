@@ -78,21 +78,22 @@ linebuffer_waitfor(struct linebuffer *__restrict self) {
 	/* We've got 2 conditions that must be met in order to be allowed to wait:
 	 *  - self->lb_limt == CACHED_LIMIT
 	 *  - self->lb_line.lc_size >= CACHED_LIMIT
-	 * ... where `CACHED_LIMIT' is is the lazily loaded value of `self->lb_limt'
-	 */
-	struct lfutexexpr expr[2];
+	 * ... where `CACHED_LIMIT' is is the lazily loaded value of `self->lb_limt' */
+	struct lfutexexpr expr[3];
 	size_t limit = ATOMIC_READ(self->lb_limt);
 	if (!limit)
 		return 1; /* Empty limit */
 	if (ATOMIC_READ(self->lb_line.lc_size) < limit)
 		return 1;
+
 	/* Verify that our read limit is still correct */
 	expr[0] = LFUTEXEXPR_FIELD(struct linebuffer, lb_limt) == limit;
+
 	/* Verify that the current line cannot be extended with our read limit. */
 	expr[1] = LFUTEXEXPR_FIELD(struct linebuffer, lb_line.lc_size) >= limit;
-	return lfutexexpr(&self->lb_nful, self,
-	                  COMPILER_LENOF(expr), expr,
-	                  NULL, 0);
+	expr[2] = LFUTEXEXPR_END;
+
+	return lfutexexpr(&self->lb_nful, self, expr, NULL, 0);
 }
 
 #endif /* !__KERNEL__ */

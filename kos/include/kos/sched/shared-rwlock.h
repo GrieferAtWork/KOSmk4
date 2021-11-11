@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cdc61d3 */
+/* HASH CRC-32:0x283f33d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -347,7 +347,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_rwlock_upgrade(3)
  * Blocking-upgrade a read-lock into a write-lock
- * NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+ * NOTE: The lock is always upgraded, but when `false' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources.
  * @return: true:  Upgrade was performed without the read-lock being lost
@@ -362,7 +362,7 @@ __COMPILER_EIDECLARE(__ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)),_
 #elif defined(__CRT_HAVE_shared_rwlock_upgrade)
 /* >> shared_rwlock_upgrade(3)
  * Blocking-upgrade a read-lock into a write-lock
- * NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+ * NOTE: The lock is always upgraded, but when `false' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources.
  * @return: true:  Upgrade was performed without the read-lock being lost
@@ -432,7 +432,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 /* >> shared_rwlock_upgrade(3)
  * Blocking-upgrade a read-lock into a write-lock
- * NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
+ * NOTE: The lock is always upgraded, but when `false' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources.
  * @return: true:  Upgrade was performed without the read-lock being lost
