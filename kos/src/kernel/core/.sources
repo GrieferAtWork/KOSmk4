@@ -140,6 +140,7 @@ BEGIN
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
 		/* Required for: Emulation of BIOS functions (especially on x86_64, where EFLAGS_VM doesn't work) */
 		KERNEL_C_SOURCES.append("../../libvm86/*.c");
+		KERNEL_C_SOURCES.append("../../libbios86/*.c");
 
 		/* Required for: Emulation and disassembly of instructions, VIO, etc. */
 		KERNEL_C_SOURCES.append("../../libemu86/*.c");

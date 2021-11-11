@@ -132,6 +132,14 @@ LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC munmapphys)(void *base, size_t 
 #endif /* LIBPHYS_WANT_PROTOTYPES */
 /************************************************************************/
 
+
+/* Return a file descriptor for /dev/mem (or -1 with `errno' modified) */
+typedef __NOBLOCK __fd_t /*__NOTHROW*/ (LIBPHYS_CC PGETDEVMEM)(void);
+#ifdef LIBPHYS_WANT_PROTOTYPES
+LIBPHYS_DECL __NOBLOCK __fd_t __NOTHROW(LIBPHYS_CC getdevmem)(void);
+#endif /* LIBPHYS_WANT_PROTOTYPES */
+
+
 #if !defined(MAP_FAILED) && defined(__MAP_FAILED)
 #define MAP_FAILED __MAP_FAILED
 #endif /* !MAP_FAILED && __MAP_FAILED */

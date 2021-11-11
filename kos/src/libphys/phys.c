@@ -55,7 +55,7 @@ PRIVATE void NOTHROW(CC openmem)(void) {
 }
 
 /* Select the technique by which /dev/mem should be opened. */
-#if 1
+#if 0
 #define WITHMEM(op, on_error)      \
 	do {                           \
 		if unlikely(dev_mem == -1) \
@@ -264,6 +264,13 @@ NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes) {
 /************************************************************************/
 
 
+/* Return a file descriptor for /dev/mem (or -1 with `errno' modified) */
+INTERN NOBLOCK fd_t
+NOTHROW(CC libphys_getdevmem)(void) {
+	if unlikely(dev_mem == -1)
+		openmem();
+	return dev_mem;
+}
 
 
 /* Library exports */
@@ -287,6 +294,7 @@ DEFINE_PUBLIC_ALIAS(copyinphys, libphys_copyinphys);
 DEFINE_PUBLIC_ALIAS(memsetphys, libphys_memsetphys);
 DEFINE_PUBLIC_ALIAS(mmapphys, libphys_mmapphys);
 DEFINE_PUBLIC_ALIAS(munmapphys, libphys_munmapphys);
+DEFINE_PUBLIC_ALIAS(getdevmem, libphys_getdevmem);
 
 DECL_END
 
