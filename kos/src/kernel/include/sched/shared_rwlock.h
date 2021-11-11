@@ -33,21 +33,9 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* Same  as the regular `struct rwlock', however neither read-after-write,
- * nor write-after-read is  allowed. However  read-after-read is  allowed,
- * and unlike with `struct rwlock', read/write-locks created by one thread
- * can be inherited by another.
- * Essentially, a `shared_rwlock' is the  same as an `atomic_rwlock',  with
- * the addition that a `shared_rwlock' includes a signal with which one can
- * do blocking waits for the lock to become available. */
-
-#if __SIZEOF_POINTER__ >= 8
-#define SHARED_RWLOCK_RMASK __UINT64_C(0x7fffffffffffffff)
-#define SHARED_RWLOCK_WFLAG __UINT64_C(0x8000000000000000)
-#else /* __SIZEOF_POINTER__ >= 8 */
-#define SHARED_RWLOCK_RMASK __UINT32_C(0x7fffffff)
-#define SHARED_RWLOCK_WFLAG __UINT32_C(0x80000000)
-#endif /* __SIZEOF_POINTER__ < 8 */
+/* `shared_rwlock' is the  same as an `atomic_rwlock', with the
+ * addition that a `shared_rwlock' includes a signal with which
+ * one can do blocking waits for the lock to become available. */
 
 struct shared_rwlock {
 	WEAK uintptr_t sl_lock;   /* Lock state (Set of `SHARED_RWLOCK_*') */
@@ -57,20 +45,20 @@ struct shared_rwlock {
 
 #define SHARED_RWLOCK_INIT              { 0, SIG_INIT, SIG_INIT }
 #define SHARED_RWLOCK_INIT_READ         { 1, SIG_INIT, SIG_INIT }
-#define SHARED_RWLOCK_INIT_WRITE        { SHARED_RWLOCK_WFLAG, SIG_INIT, SIG_INIT }
+#define SHARED_RWLOCK_INIT_WRITE        { (uintptr_t)-1, SIG_INIT, SIG_INIT }
 #define shared_rwlock_init(self)        ((self)->sl_lock = 0, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
 #define shared_rwlock_init_read(self)   (void)((self)->sl_lock = 1, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
-#define shared_rwlock_init_write(self)  (void)((self)->sl_lock = SHARED_RWLOCK_WFLAG, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
+#define shared_rwlock_init_write(self)  (void)((self)->sl_lock = (uintptr_t)-1, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
 #define shared_rwlock_cinit(self)       (__hybrid_assert((self)->sl_lock == 0), sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
 #define shared_rwlock_cinit_read(self)  (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
-#define shared_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = SHARED_RWLOCK_WFLAG, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
+#define shared_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (uintptr_t)-1, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
 #define shared_rwlock_broadcast_for_fini(self)   \
 	(sig_broadcast_for_fini(&(self)->sl_rdwait), \
 	 sig_broadcast_for_fini(&(self)->sl_wrwait))
 
 #define shared_rwlock_reading(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
-#define shared_rwlock_writing(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) & SHARED_RWLOCK_WFLAG)
-#define shared_rwlock_canread(self)  (!(__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) & SHARED_RWLOCK_WFLAG))
+#define shared_rwlock_writing(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1)
+#define shared_rwlock_canread(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != (uintptr_t)-1)
 #define shared_rwlock_canwrite(self) (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
 
 LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self);
@@ -105,8 +93,8 @@ FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwloc
 #endif /* __cplusplus */
 
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
-LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self);
+#define shared_rwlock_tryupgrade(self) \
+	__hybrid_atomic_cmpxch((self)->sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)
 
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
@@ -167,62 +155,41 @@ NOTHROW(FCALL shared_rwlock_end)(struct shared_rwlock *__restrict self);
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL shared_rwlock_endwrite)(struct shared_rwlock *__restrict self) {
 	COMPILER_BARRIER();
-#ifdef NDEBUG
+	__hybrid_assertf(self->sl_lock == (uintptr_t)-1, "Lock isn't in write-mode (%x)", self->sl_lock);
 	__hybrid_atomic_store(self->sl_lock, 0, __ATOMIC_RELEASE);
-#else /* NDEBUG */
-	uintptr_t f;
-	do {
-		f = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
-		__hybrid_assertf(f & SHARED_RWLOCK_WFLAG, "Lock isn't in write-mode (%x)", f);
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, f, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-#endif /* !NDEBUG */
 	if (!sig_send(&self->sl_wrwait))
 		sig_broadcast(&self->sl_rdwait);
 }
 
 LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_endread)(struct shared_rwlock *__restrict self) {
+	uintptr_t __result;
 	COMPILER_READ_BARRIER();
-#ifdef NDEBUG
-	uintptr_t result;
-	result = __hybrid_atomic_decfetch(self->sl_lock, __ATOMIC_RELEASE);
-	if (result == 0)
+	__hybrid_assertf(self->sl_lock != (uintptr_t)-1, "Lock is in write-mode (%x)", self->sl_lock);
+	__hybrid_assertf(self->sl_lock != 0, "Lock isn't held by anyone");
+	__result = __hybrid_atomic_decfetch(self->sl_lock, __ATOMIC_RELEASE);
+	if (__result == 0)
 		sig_send(&self->sl_wrwait);
-	return result == 0;
-#else /* NDEBUG */
-	uintptr_t f;
-	do {
-		f = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
-		__hybrid_assertf(!(f & SHARED_RWLOCK_WFLAG), "Lock is in write-mode (%x)", f);
-		__hybrid_assertf(f != 0, "Lock isn't held by anyone");
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, f, f - 1,
-	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-	if (f == 1)
-		sig_send(&self->sl_wrwait);
-	return f == 1;
-#endif /* !NDEBUG */
+	return __result == 0;
 }
 
 LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_end)(struct shared_rwlock *__restrict self) {
-	uintptr_t __temp, __newval;
 	COMPILER_BARRIER();
-	do {
-		__temp = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
-		if (__temp & SHARED_RWLOCK_WFLAG) {
-			__hybrid_assert(!(__temp & SHARED_RWLOCK_RMASK));
-			__newval = 0;
-		} else {
-			__hybrid_assertf(__temp != 0, "No remaining read-locks");
-			__newval = __temp - 1;
-		}
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, __temp, __newval,
-	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-	if (!__newval) {
-		if (!sig_send(&self->sl_wrwait))
-			sig_broadcast(&self->sl_rdwait);
+	if (self->sl_lock != (uintptr_t)-1) {
+		/* Read-lock */
+		uintptr_t __result;
+		__hybrid_assertf(self->sl_lock != 0, "No remaining read-locks");
+		__result = __hybrid_atomic_decfetch(self->sl_lock, __ATOMIC_RELEASE);
+		if (__result == 0)
+			sig_send(&self->sl_wrwait);
+		return __result == 0;
 	}
-	return __newval == 0;
+	/* Write-lock */
+	__hybrid_atomic_store(self->sl_lock, 0, __ATOMIC_RELEASE);
+	if (!sig_send(&self->sl_wrwait))
+		sig_broadcast(&self->sl_rdwait);
+	return true;
 }
 
 LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
@@ -230,33 +197,20 @@ NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self) {
 	uintptr_t __temp;
 	do {
 		__temp = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
-		if (__temp & SHARED_RWLOCK_WFLAG)
+		if (__temp == (uintptr_t)-1)
 			return 0;
-		__hybrid_assert((__temp & SHARED_RWLOCK_RMASK) != SHARED_RWLOCK_RMASK);
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, __temp, __temp + 1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
+		__hybrid_assert(__temp != (uintptr_t)-2);
+	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, __temp, __temp + 1,
+	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
 	COMPILER_READ_BARRIER();
 	return 1;
 }
 
 LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self) {
-	if (!__hybrid_atomic_cmpxch(self->sl_lock, 0, SHARED_RWLOCK_WFLAG, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+	if (!__hybrid_atomic_cmpxch(self->sl_lock, 0, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return 0;
 	COMPILER_BARRIER();
-	return 1;
-}
-
-/* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
-LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self) {
-	uintptr_t __temp;
-	do {
-		__temp = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
-		if (__temp != 1)
-			return 0;
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, __temp, SHARED_RWLOCK_WFLAG,
-	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
-	COMPILER_WRITE_BARRIER();
 	return 1;
 }
 
@@ -291,18 +245,10 @@ NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self) {
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL shared_rwlock_downgrade)(struct shared_rwlock *__restrict self) {
-#ifdef NDEBUG
-	__hybrid_atomic_store(self->sl_lock, 1, __ATOMIC_ACQ_REL);
-#else /* NDEBUG */
-	uintptr_t f;
 	COMPILER_WRITE_BARRIER();
-	do {
-		f = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
-		__hybrid_assertf(f == SHARED_RWLOCK_WFLAG, "Lock not in write-mode (%x)", f);
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, f, 1,
-	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
+	__hybrid_assertf(self->sl_lock == (uintptr_t)-1, "Lock isn't in write-mode (%x)", self->sl_lock);
+	__hybrid_atomic_store(self->sl_lock, 1, __ATOMIC_RELEASE);
 	sig_broadcast(&self->sl_rdwait); /* Allow for more readers. */
-#endif /* !NDEBUG */
 }
 #endif /* !__INTELLISENSE__ */
 
