@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f60259c */
+/* HASH CRC-32:0x3fe9816b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,7 +114,7 @@ __LIBC __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_lock_acqu
  * Acquire a lock to the given shared_lock. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(shared_lock_acquire, __FORCELOCAL __ATTR_ARTIFICIAL __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_lock_acquire)(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_lock_acquire))(__self); })
 #endif /* ... */
-#ifdef __CRT_HAVE_shared_lock_acquire_with_timeout
+#if defined(__CRT_HAVE_shared_lock_acquire_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
@@ -144,7 +144,7 @@ __LIBC __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_lock_wait
  * Wait that `self' becomes available. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(shared_lock_waitfor, __FORCELOCAL __ATTR_ARTIFICIAL __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void (__FCALL shared_lock_waitfor)(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_lock_waitfor))(__self); })
 #endif /* ... */
-#ifdef __CRT_HAVE_shared_lock_waitfor_with_timeout
+#if defined(__CRT_HAVE_shared_lock_waitfor_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
@@ -280,7 +280,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shared_lock_waitfor_with_timeout_nx, __FORCELOCA
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 #ifdef __cplusplus
 extern "C++" {
-#ifdef __CRT_HAVE_shared_lock_acquire_with_timeout
+#if defined(__CRT_HAVE_shared_lock_acquire_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
@@ -302,7 +302,7 @@ extern "C++" {
  * @return: false: The given `abs_timeout' has expired. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL (__FCALL shared_lock_acquire)(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout))(__self, __abs_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_shared_lock_waitfor_with_timeout
+#if defined(__CRT_HAVE_shared_lock_waitfor_with_timeout) && (defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.

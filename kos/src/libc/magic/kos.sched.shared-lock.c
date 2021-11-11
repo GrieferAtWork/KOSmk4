@@ -169,7 +169,7 @@ success:
 @@Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
 @@@return: true:  Successfully acquired a lock.
 @@@return: false: The given `abs_timeout' has expired.
-[[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
+[[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_acquire_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_acquire_with_timeout64")]]
@@ -241,7 +241,7 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 @@Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
 @@@return: true:  The lock became available.
 @@@return: false: The given `abs_timeout' has expired.
-[[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
+[[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_waitfor_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_waitfor_with_timeout64")]]
@@ -282,7 +282,7 @@ success:
 
 %#if !defined(__KERNEL__) && defined(__USE_TIME64)
 [[preferred_time64_variant_of(shared_lock_acquire_with_timeout), doc_alias("shared_lock_acquire_with_timeout")]]
-[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX)]]
@@ -300,7 +300,7 @@ $bool shared_lock_acquire_with_timeout64([[nonnull]] struct shared_lock *__restr
 }
 
 [[preferred_time64_variant_of(shared_lock_waitfor_with_timeout), doc_alias("shared_lock_waitfor_with_timeout")]]
-[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX)]]
@@ -361,7 +361,7 @@ success:
 @@@return: false: Preemption was disabled, and the operation would have blocked.
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
-[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_lock_acquire_with_timeout_nx([[nonnull]] struct shared_lock *__restrict self,
@@ -423,7 +423,7 @@ success:
 @@@return: false: Preemption was disabled, and the operation would have blocked.
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
-[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
+[[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_lock_waitfor_with_timeout_nx([[nonnull]] struct shared_lock *__restrict self,

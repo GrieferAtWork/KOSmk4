@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfda59061 */
+/* HASH CRC-32:0x650f660b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #ifdef __KERNEL__
 #include <kos/anno.h>
 #include <kos/bits/shared-lock.h>
+#include <bits/os/timespec.h>
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
 __NAMESPACE_LOCAL_BEGIN
