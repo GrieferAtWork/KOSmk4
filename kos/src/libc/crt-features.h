@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7333ce30 */
+/* HASH CRC-32:0x4f862ba1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2995,6 +2995,8 @@
 #define __CRT_HAVE_Ioctl
 #define __CRT_HAVE_LChmod
 #define __CRT_HAVE_LChown
+#define __CRT_HAVE_LFutexExpr
+#define __CRT_HAVE_LFutexExpr64
 #define __CRT_HAVE_LSeek
 #define __CRT_HAVE_LSeek64
 #define __CRT_HAVE_Link
@@ -5542,6 +5544,30 @@
 #define __CRT_HAVE_setxattr
 #define __CRT_HAVE_sgetspent
 #define __CRT_HAVE_sgetspent_r
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE_shared_lock_acquire
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_lock_acquire_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_lock_acquire_with_timeout
+#ifndef __KERNEL__
+#define __CRT_HAVE_shared_lock_acquire_with_timeout64
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_lock_acquire_with_timeout_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_lock_waitfor
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_lock_waitfor_nx
+#endif /* __KERNEL__ */
+#define __CRT_HAVE_shared_lock_waitfor_with_timeout
+#ifndef __KERNEL__
+#define __CRT_HAVE_shared_lock_waitfor_with_timeout64
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#define __CRT_HAVE_shared_lock_waitfor_with_timeout_nx
+#endif /* __KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_shexec
 #define __CRT_HAVE_shm_open
 #define __CRT_HAVE_shm_unlink

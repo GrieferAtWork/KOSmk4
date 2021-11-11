@@ -182,7 +182,6 @@ int lfutexexpr32([[nonnull]] lfutex_t *ulockaddr, void *base,
                  struct timespec64 const *timeout,
                  unsigned int timeout_flags);
 
-
 @@>> lfutexexpr(2)
 @@The lfutexexpr(2) system call can be used to specify arbitrarily complex
 @@expressions that must atomically (in relation to other futex operations)
@@ -242,6 +241,67 @@ int lfutexexpr64([[nonnull]] lfutex_t *ulockaddr, void *base,
 	tms32.tv_sec  = (time32_t)timeout->tv_sec;
 	tms32.tv_nsec = timeout->tv_nsec;
 	return lfutexexpr32(ulockaddr, base, exprc, exprv, &tms32, timeout_flags);
+}
+%#endif /* __USE_TIME64 */
+
+
+
+
+[[decl_include("<bits/types.h>", "<bits/os/timespec.h>", "<kos/bits/futex-expr.h>")]]
+[[cp, doc_alias("lfutexexpr"), ignore, nocrt, alias("LFutexExpr")]]
+int LFutexExpr32([[nonnull]] lfutex_t *ulockaddr, void *base,
+                 $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
+                 struct timespec64 const *timeout,
+                 unsigned int timeout_flags);
+
+@@>> LFutexExpr(2)
+@@Excetion-enabled version of `lfutexexpr(2)'
+@@@return: * :  The  first  non-zero return  value  from executing  all  of the  given `exprv'
+@@              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+@@              to see their  possible return  values, which are  always `0'  when they  would
+@@              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+@@              thread had to perform a wait operation, at which point this function returning
+@@              that value means that you've once again been re-awoken.
+@@@return: < 0: Timeout expired
+[[cp, throws, decl_include("<bits/types.h>", "<bits/os/timespec.h>", "<kos/bits/futex-expr.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("LFutexExpr")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("LFutexExpr64")]]
+[[userimpl, requires($has_function(lfutexexpr32) || $has_function(lfutexexpr64))]]
+[[section(".text.crt{|.dos}.sched.futexlockexpr")]]
+int LFutexExpr([[nonnull]] lfutex_t *ulockaddr, void *base,
+               $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
+               struct timespec const *timeout, unsigned int timeout_flags) {
+@@pp_if $has_function(LFutexExpr32)@@
+	struct timespec32 tms32;
+	if (!timeout)
+		return LFutexExpr32(ulockaddr, base, exprc, exprv, NULL, 0);
+	tms32.tv_sec  = (time32_t)timeout->tv_sec;
+	tms32.tv_nsec = timeout->tv_nsec;
+	return LFutexExpr32(ulockaddr, base, exprc, exprv, &tms32, timeout_flags);
+@@pp_else@@
+	struct timespec64 tms64;
+	if (!timeout)
+		return LFutexExpr64(ulockaddr, base, exprc, exprv, NULL, 0);
+	tms64.tv_sec  = (time64_t)timeout->tv_sec;
+	tms64.tv_nsec = timeout->tv_nsec;
+	return LFutexExpr64(ulockaddr, base, exprc, exprv, &tms64, timeout_flags);
+@@pp_endif@@
+}
+
+%
+%#ifdef __USE_TIME64
+[[cp, throws, decl_include("<bits/types.h>", "<bits/os/timespec.h>", "<kos/bits/futex-expr.h>")]]
+[[preferred_time64_variant_of(LFutexExpr), doc_alias("LFutexExpr")]]
+[[userimpl, requires_function(LFutexExpr32), section(".text.crt{|.dos}.sched.futexlockexpr")]]
+int LFutexExpr64([[nonnull]] lfutex_t *ulockaddr, void *base,
+                 $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
+                 struct timespec64 const *timeout, unsigned int timeout_flags) {
+	struct timespec32 tms32;
+	if (!timeout)
+		return LFutexExpr32(ulockaddr, base, exprc, exprv, NULL, 0);
+	tms32.tv_sec  = (time32_t)timeout->tv_sec;
+	tms32.tv_nsec = timeout->tv_nsec;
+	return LFutexExpr32(ulockaddr, base, exprc, exprv, &tms32, timeout_flags);
 }
 %#endif /* __USE_TIME64 */
 

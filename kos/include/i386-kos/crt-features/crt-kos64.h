@@ -91,6 +91,8 @@
 #define __CRT_HAVE_KSysctl
 #define __CRT_HAVE_LChmod
 #define __CRT_HAVE_LChown
+#define __CRT_HAVE_LFutexExpr
+#define __CRT_HAVE_LFutexExpr64
 #define __CRT_HAVE_LSeek
 #define __CRT_HAVE_LSeek64
 #define __CRT_HAVE_Link
@@ -3479,6 +3481,12 @@
 #define __CRT_HAVE_setxattr
 #define __CRT_HAVE_sgetspent
 #define __CRT_HAVE_sgetspent_r
+#define __CRT_HAVE_shared_lock_acquire
+#define __CRT_HAVE_shared_lock_acquire_with_timeout
+#define __CRT_HAVE_shared_lock_acquire_with_timeout64
+#define __CRT_HAVE_shared_lock_waitfor
+#define __CRT_HAVE_shared_lock_waitfor_with_timeout
+#define __CRT_HAVE_shared_lock_waitfor_with_timeout64
 #define __CRT_HAVE_shexec
 #define __CRT_HAVE_shm_open
 #define __CRT_HAVE_shm_unlink

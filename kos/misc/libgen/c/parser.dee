@@ -516,6 +516,26 @@ twochar:
 		return getUserString(resultStart, resultEnd);
 	}
 
+	@@Parse everything until a trailing @")", @"]", @"}"
+	function parseAllUntilRParenNoComma(): UserString | string {
+		local tok = this.tok;
+		local resultStart = tokStart;
+		for (;;) {
+			if (tok in "([{") {
+				skipPair();
+				tok = next();
+				continue;
+			}
+			if (tok in ")]}")
+				break;
+			tok = next();
+		}
+		local resultEnd = tokStart;
+		while (resultEnd > resultStart && text.isspace(resultEnd - 1))
+			--resultEnd;
+		return getUserString(resultStart, resultEnd);
+	}
+
 	@@Parse a C-String, or everything else until a trailing @")", @"]", @"}" or @","
 	function parseCStringOrAllUntilRParen(): UserString | string {
 		local tok = this.tok;
@@ -524,6 +544,16 @@ twochar:
 			return tok.decode("c-escape");
 		}
 		return parseAllUntilRParen();
+	}
+
+	@@Parse a C-String, or everything else until a trailing @")", @"]", @"}"
+	function parseCStringOrAllUntilRParenNoComma(): UserString | string {
+		local tok = this.tok;
+		if (isCString(tok)) {
+			next();
+			return tok.decode("c-escape");
+		}
+		return parseAllUntilRParenNoComma();
 	}
 
 	@@Same as @parseCStringOrAllUntilRParen, but only ever return a @string

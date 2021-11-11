@@ -64,14 +64,15 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulockaddr,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 	error = sys_lfutexexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+	struct timespec64 tm64;
 	if (timeout) {
-		struct timespec64 tm64;
 		tm64.tv_sec  = (time64_t)timeout->tv_sec;
 		tm64.tv_nsec = timeout->tv_nsec;
-		error = sys_lfutexexpr(ulockaddr, base, exprc, exprv, &tm64, timeout_flags);
-	} else {
-		error = sys_lfutexexpr(ulockaddr, base, exprc, exprv, NULL, timeout_flags);
+		timeout = (struct timespec const *)&tm64;
 	}
+	error = sys_lfutexexpr(ulockaddr, base, exprc, exprv,
+	                       (struct timespec64 const *)&tm64,
+	                       timeout_flags);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	return libc_seterrno_syserr(error);
 }
@@ -116,6 +117,29 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulockaddr,
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_lfutexexpr64]]]*/
+
+
+/*[[[skip:libc_LFutexExpr]]]*/
+/*[[[skip:libc_LFutexExpr64]]]*/
+
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(LFutexExpr, libc_LFutexExpr);
+INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") NONNULL((1, 4)) int LIBCCALL
+libc_LFutexExpr(lfutex_t *ulockaddr, void *base, size_t exprc,
+                struct lfutexexpr const *exprv, struct timespec const *timeout,
+                unsigned int timeout_flags) THROWS(...) {
+	struct timespec64 tm64;
+	if (timeout) {
+		tm64.tv_sec  = (time64_t)timeout->tv_sec;
+		tm64.tv_nsec = timeout->tv_nsec;
+		timeout = (struct timespec const *)&tm64;
+	}
+	return sys_Xlfutexexpr(ulockaddr, base, exprc, exprv,
+	                       (struct timespec64 const *)&tm64,
+	                       timeout_flags);
+}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+
 
 /*[[[start:exports,hash:CRC-32=0xa856d1a4]]]*/
 DEFINE_PUBLIC_ALIAS(lfutexexpr, libc_lfutexexpr);

@@ -310,7 +310,7 @@ function parsePrototypeAnnotation(
 		if (tok == "(") {
 			self.next();
 			prototype.nothrow = "THROWS({})"
-				.format({ self.parseCStringOrAllUntilRParen() });
+				.format({ self.parseCStringOrAllUntilRParenNoComma() });
 			self.skip(")");
 		} else {
 			prototype.nothrow = "THROWS(...)";

@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xacd912a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,9 +18,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_SHARED_LOCK_H
-#define GUARD_KERNEL_INCLUDE_SCHED_SHARED_LOCK_H 1
-
-#include <kos/sched/shared-lock.h>
-
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SHARED_LOCK_H */
+#ifndef __local_shared_lock_acquire_nx_defined
+#define __local_shared_lock_acquire_nx_defined
+#include <__crt.h>
+#ifdef __KERNEL__
+#include <kos/anno.h>
+#include <kos/bits/shared-lock.h>
+#include <hybrid/__assert.h>
+#include <sched/signal.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(shared_lock_acquire_nx) __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL
+(__FCALL __LIBC_LOCAL_NAME(shared_lock_acquire_nx))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	__hybrid_assert(!task_wasconnected());
+	while (__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+		TASK_POLL_BEFORE_CONNECT({
+			if (__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+				goto __success;
+		});
+		task_connect(&__self->sl_sig);
+		if __unlikely(__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
+			task_disconnectall();
+			break;
+		}
+		if (!task_waitfor_nx())
+			return 0;
+	}
+__success:
+	__COMPILER_BARRIER();
+	return 1;
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_shared_lock_acquire_nx_defined
+#define __local___localdep_shared_lock_acquire_nx_defined
+#define __localdep_shared_lock_acquire_nx __LIBC_LOCAL_NAME(shared_lock_acquire_nx)
+#endif /* !__local___localdep_shared_lock_acquire_nx_defined */
+#else /* __KERNEL__ */
+#undef __local_shared_lock_acquire_nx_defined
+#endif /* !__KERNEL__ */
+#endif /* !__local_shared_lock_acquire_nx_defined */

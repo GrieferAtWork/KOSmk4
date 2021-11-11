@@ -243,4 +243,9 @@ DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat)
 #error "Invalid configuration"
 #endif /* !... */
 
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_XSYSCALL_EXPORT(LFutexExpr, sys_Xlfutexexpr)
+#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+DEFINE_XSYSCALL_EXPORT(LFutexExpr64, sys_Xlfutexexpr)
+
 #undef DEFINE_XSYSCALL_EXPORT

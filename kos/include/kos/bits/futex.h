@@ -152,7 +152,7 @@
 #define LFUTEX_FLAGMASK 0xff000000
 
 /* Flags for waiter futex functions. */
-#define LFUTEX_WAIT_FLAG_TIMEOUT_SYSQTIME 0x00000000 /* Default: Timeouts are given as absolute positions of CPU quantum time (`CLOCK_PROCESS_CPUTIME_ID') */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE 0x00000000 /* Default: Timeouts are given as absolute positions of CPU quantum time (`CLOCK_PROCESS_CPUTIME_ID') */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE 0x40000000 /* The given timeout argument describes a timeout relative to the point when waiting starts */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME 0x80000000 /* The given timeout argument is in absolute realtime (`CLOCK_REALTIME') */
 
