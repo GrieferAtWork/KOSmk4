@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6601c2a0 */
+/* HASH CRC-32:0x111481f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shared_lock_waitfor_defined
-#define __local_shared_lock_waitfor_defined
+#ifndef __local_shared_rwlock_read_defined
+#define __local_shared_rwlock_read_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)
 #include <kos/anno.h>
-#include <kos/bits/shared-lock.h>
+#include <kos/bits/shared-rwlock.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_LFutexExpr64_except_defined
 #define __local___localdep_LFutexExpr64_except_defined
@@ -49,6 +49,42 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_LFutexExpr64_except_defined
 #endif /* !... */
 #endif /* !__local___localdep_LFutexExpr64_except_defined */
+#ifndef __local___localdep_shared_rwlock_tryread_defined
+#define __local___localdep_shared_rwlock_tryread_defined
+#ifdef __CRT_HAVE_shared_rwlock_tryread
+__NAMESPACE_LOCAL_END
+#include <hybrid/__atomic.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_EIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_tryread,(struct shared_rwlock *__restrict __self),shared_rwlock_tryread,{
+	__UINTPTR_TYPE__ __temp;
+	do {
+		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+		if (__temp == (__UINTPTR_TYPE__)-1)
+			return 0;
+		__hybrid_assert(__temp != (__UINTPTR_TYPE__)-2);
+	} while (!__hybrid_atomic_cmpxch_weak(__self->sl_lock, __temp, __temp + 1,
+	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
+	__COMPILER_READ_BARRIER();
+	return 1;
+})
+#else /* __CRT_HAVE_shared_rwlock_tryread */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__atomic.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_tryread)(struct shared_rwlock *__restrict __self) {
+	__UINTPTR_TYPE__ __temp;
+	do {
+		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
+		if (__temp == (__UINTPTR_TYPE__)-1)
+			return 0;
+		__hybrid_assert(__temp != (__UINTPTR_TYPE__)-2);
+	} while (!__hybrid_atomic_cmpxch_weak(__self->sl_lock, __temp, __temp + 1,
+	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
+	__COMPILER_READ_BARRIER();
+	return 1;
+}
+#endif /* !__CRT_HAVE_shared_rwlock_tryread */
+#endif /* !__local___localdep_shared_rwlock_tryread_defined */
 __NAMESPACE_LOCAL_END
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
@@ -57,47 +93,49 @@ __NAMESPACE_LOCAL_END
 #include <kos/syscalls.h>
 #include <kos/bits/futex.h>
 #include <kos/bits/futex-expr.h>
-#ifndef __SHARED_LOCK_WAITEXPR_DEFINED
-#define __SHARED_LOCK_WAITEXPR_DEFINED
+#ifndef __SHARED_RWLOCK_WAITREADEXPR_DEFINED
+#define __SHARED_RWLOCK_WAITREADEXPR_DEFINED
 __NAMESPACE_LOCAL_BEGIN
-static struct lfutexexpr const __shared_lock_waitexpr[] = {
-	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(__builtin_offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
+static struct lfutexexpr const __shared_rwlock_waitreadexpr[] = {
+	/* Wait while `sl_lock == (uintptr_t)-1' */
+	LFUTEXEXPR_INIT(__builtin_offsetof(struct shared_rwlock, sl_lock), LFUTEX_WAIT_WHILE, (__UINTPTR_TYPE__)-1, 0)
 };
 __NAMESPACE_LOCAL_END
-#endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
+#endif /* !__SHARED_RWLOCK_WAITREADEXPR_DEFINED */
 
 #endif /* !__KERNEL__ */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+__LOCAL_LIBC(shared_rwlock_read) __BLOCKING __ATTR_NONNULL((1)) void
+(__FCALL __LIBC_LOCAL_NAME(shared_rwlock_read))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(__self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
-				return;
+			if ((__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(__self))
+				goto __success;
 		});
-		task_connect(&__self->sl_sig);
-		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
+		task_connect(&__self->sl_rdwait);
+		if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(__self)) {
 			task_disconnectall();
 			break;
 		}
 		task_waitfor();
 	}
+__success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(__self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64_except)(&__self->sl_sig, __self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, __NULLPTR, 0);
+	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(__self)) {
+		__hybrid_atomic_store(__self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
+		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64_except)(&__self->sl_rdwait, __self, 1, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr, __NULLPTR, 0);
 	}
 #endif /* !__KERNEL__ */
+	__COMPILER_READ_BARRIER();
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shared_lock_waitfor_defined
-#define __local___localdep_shared_lock_waitfor_defined
-#define __localdep_shared_lock_waitfor __LIBC_LOCAL_NAME(shared_lock_waitfor)
-#endif /* !__local___localdep_shared_lock_waitfor_defined */
+#ifndef __local___localdep_shared_rwlock_read_defined
+#define __local___localdep_shared_rwlock_read_defined
+#define __localdep_shared_rwlock_read __LIBC_LOCAL_NAME(shared_rwlock_read)
+#endif /* !__local___localdep_shared_rwlock_read_defined */
 #else /* __KERNEL__ || __CRT_HAVE_LFutexExpr64 || __CRT_HAVE_LFutexExpr */
-#undef __local_shared_lock_waitfor_defined
+#undef __local_shared_rwlock_read_defined
 #endif /* !__KERNEL__ && !__CRT_HAVE_LFutexExpr64 && !__CRT_HAVE_LFutexExpr */
-#endif /* !__local_shared_lock_waitfor_defined */
+#endif /* !__local_shared_rwlock_read_defined */

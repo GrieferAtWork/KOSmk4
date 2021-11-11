@@ -30,6 +30,8 @@
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
+#include <hybrid/__assert.h>
+)]%[insert:prefix(
 #include <hybrid/__atomic.h>
 )]%[insert:prefix(
 #include <kos/anno.h>
@@ -106,15 +108,8 @@ __SYSDECL_BEGIN
 
 }
 
-@@>> shared_lock_acquire(3)
-@@Acquire a lock to the given shared_lock.
-[[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except)), impl_prefix(
-@@pp_ifdef __KERNEL__@@
-#include <hybrid/__assert.h>
-#include <sched/signal.h>
-@@pp_else@@
+
+%[define(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX =
 #include <kos/syscalls.h>
 #include <kos/bits/futex.h>
 #include <kos/bits/futex-expr.h>
@@ -122,12 +117,28 @@ __SYSDECL_BEGIN
 #define __SHARED_LOCK_WAITEXPR_DEFINED
 @@push_namespace(local)@@
 static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
+	/* Wait until `sl_lock == 0' */
 	@LFUTEXEXPR_INIT@(offsetof(struct @shared_lock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0)
 };
 @@pop_namespace@@
 @@pp_endif@@
+)]
+
+%[define(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX =
+@@pp_ifdef __KERNEL__@@
+#include <hybrid/__assert.h>
+#include <sched/signal.h>
+@@pp_else@@
+DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX
 @@pp_endif@@
-)]]
+)]
+
+@@>> shared_lock_acquire(3)
+@@Acquire a lock to the given shared_lock.
+[[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX)]]
 void shared_lock_acquire([[nonnull]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
@@ -159,29 +170,13 @@ success:
 @@@return: true:  Successfully acquired a lock.
 @@@return: false: The given `abs_timeout' has expired.
 [[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_acquire_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_acquire_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except)), impl_prefix(
-@@pp_ifdef __KERNEL__@@
-#include <hybrid/__assert.h>
-#include <sched/signal.h>
-@@pp_else@@
-#include <kos/syscalls.h>
-#include <kos/bits/futex.h>
-#include <kos/bits/futex-expr.h>
-@@pp_ifndef __SHARED_LOCK_WAITEXPR_DEFINED@@
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-@@push_namespace(local)@@
-static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
-	@LFUTEXEXPR_INIT@(offsetof(struct @shared_lock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0)
-};
-@@pop_namespace@@
-@@pp_endif@@
-@@pp_endif@@
-)]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX)]]
 $bool shared_lock_acquire_with_timeout([[nonnull]] struct shared_lock *__restrict self,
-                                       __shared_rwlock_timespec abs_timeout) {
+                                       __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
@@ -215,25 +210,9 @@ success:
 @@>> shared_lock_waitfor(3)
 @@Wait that `self' becomes available.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except)), impl_prefix(
-@@pp_ifdef __KERNEL__@@
-#include <hybrid/__assert.h>
-#include <sched/signal.h>
-@@pp_else@@
-#include <kos/syscalls.h>
-#include <kos/bits/futex.h>
-#include <kos/bits/futex-expr.h>
-@@pp_ifndef __SHARED_LOCK_WAITEXPR_DEFINED@@
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-@@push_namespace(local)@@
-static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
-	@LFUTEXEXPR_INIT@(offsetof(struct @shared_lock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0)
-};
-@@pop_namespace@@
-@@pp_endif@@
-@@pp_endif@@
-)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX)]]
 void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
@@ -263,29 +242,13 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 @@@return: true:  The lock became available.
 @@@return: false: The given `abs_timeout' has expired.
 [[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_waitfor_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_waitfor_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except)), impl_prefix(
-@@pp_ifdef __KERNEL__@@
-#include <hybrid/__assert.h>
-#include <sched/signal.h>
-@@pp_else@@
-#include <kos/syscalls.h>
-#include <kos/bits/futex.h>
-#include <kos/bits/futex-expr.h>
-@@pp_ifndef __SHARED_LOCK_WAITEXPR_DEFINED@@
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-@@push_namespace(local)@@
-static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
-	@LFUTEXEXPR_INIT@(offsetof(struct @shared_lock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0)
-};
-@@pop_namespace@@
-@@pp_endif@@
-@@pp_endif@@
-)]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX)]]
 $bool shared_lock_waitfor_with_timeout([[nonnull]] struct shared_lock *__restrict self,
-                                       __shared_rwlock_timespec abs_timeout) {
+                                       __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
@@ -320,20 +283,9 @@ success:
 %#if !defined(__KERNEL__) && defined(__USE_TIME64)
 [[preferred_time64_variant_of(shared_lock_acquire_with_timeout), doc_alias("shared_lock_acquire_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExpr64_except)), impl_prefix(
-#include <kos/syscalls.h>
-#include <kos/bits/futex.h>
-#include <kos/bits/futex-expr.h>
-@@pp_ifndef __SHARED_LOCK_WAITEXPR_DEFINED@@
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-@@push_namespace(local)@@
-static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
-	@LFUTEXEXPR_INIT@(offsetof(struct @shared_lock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0)
-};
-@@pop_namespace@@
-@@pp_endif@@
-)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires($has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX)]]
 $bool shared_lock_acquire_with_timeout64([[nonnull]] struct shared_lock *__restrict self,
                                          struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
@@ -349,20 +301,9 @@ $bool shared_lock_acquire_with_timeout64([[nonnull]] struct shared_lock *__restr
 
 [[preferred_time64_variant_of(shared_lock_waitfor_with_timeout), doc_alias("shared_lock_waitfor_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExpr64_except)), impl_prefix(
-#include <kos/syscalls.h>
-#include <kos/bits/futex.h>
-#include <kos/bits/futex-expr.h>
-@@pp_ifndef __SHARED_LOCK_WAITEXPR_DEFINED@@
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-@@push_namespace(local)@@
-static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
-	@LFUTEXEXPR_INIT@(offsetof(struct @shared_lock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0)
-};
-@@pop_namespace@@
-@@pp_endif@@
-)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[requires($has_function(LFutexExpr64_except))]]
+[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX)]]
 $bool shared_lock_waitfor_with_timeout64([[nonnull]] struct shared_lock *__restrict self,
                                          struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
@@ -390,7 +331,7 @@ $bool shared_lock_waitfor_with_timeout64([[nonnull]] struct shared_lock *__restr
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_lock_acquire_nx([[nonnull]] struct shared_lock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -421,10 +362,10 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_lock_acquire_with_timeout_nx([[nonnull]] struct shared_lock *__restrict self,
-                                          __shared_rwlock_timespec abs_timeout) {
+                                          __shared_lock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
@@ -452,7 +393,7 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_lock_waitfor_nx([[nonnull]] struct shared_lock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -483,10 +424,10 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
-[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_lock_waitfor_with_timeout_nx([[nonnull]] struct shared_lock *__restrict self,
-                                          __shared_rwlock_timespec abs_timeout) {
+                                          __shared_lock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({

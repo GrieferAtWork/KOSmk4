@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8aa118f8 */
+/* HASH CRC-32:0xc965f62c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,12 +57,13 @@ __NAMESPACE_LOCAL_END
 #define __SHARED_LOCK_WAITEXPR_DEFINED
 __NAMESPACE_LOCAL_BEGIN
 static struct lfutexexpr const __shared_lock_waitexpr[] = {
+	/* Wait until `sl_lock == 0' */
 	LFUTEXEXPR_INIT(__builtin_offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0)
 };
 __NAMESPACE_LOCAL_END
 #endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_waitfor_with_timeout64) __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL
+__LOCAL_LIBC(shared_lock_waitfor_with_timeout64) __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_with_timeout64))(struct shared_lock *__restrict __self, struct __timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(__self->sl_sig, 1, __ATOMIC_SEQ_CST);

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xfda59061 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,41 +17,54 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shared_lock_acquire_with_timeout_nx_defined
-#define __local_shared_lock_acquire_with_timeout_nx_defined
-#include <__crt.h>
-#ifdef __KERNEL__
-#include <kos/anno.h>
-#include <kos/bits/shared-lock.h>
+#ifndef _KOS_BITS_SHARED_RWLOCK_H
+#define _KOS_BITS_SHARED_RWLOCK_H 1
+
+#include <__stdinc.h>
+
 #include <hybrid/__assert.h>
+#include <hybrid/__atomic.h>
+
+#include <bits/types.h>
+
+#ifdef __KERNEL__
+#include <kernel/types.h> /* ktime_t */
 #include <sched/signal.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_acquire_with_timeout_nx) __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL
-(__FCALL __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout_nx))(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_wasconnected());
-	while (__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
-				goto __success;
-		});
-		task_connect(&__self->sl_sig);
-		if __unlikely(__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
-			task_disconnectall();
-			break;
-		}
-		if (!task_waitfor_nx(__abs_timeout))
-			return 0;
-	}
-__success:
-	__COMPILER_BARRIER();
-	return 1;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shared_lock_acquire_with_timeout_nx_defined
-#define __local___localdep_shared_lock_acquire_with_timeout_nx_defined
-#define __localdep_shared_lock_acquire_with_timeout_nx __LIBC_LOCAL_NAME(shared_lock_acquire_with_timeout_nx)
-#endif /* !__local___localdep_shared_lock_acquire_with_timeout_nx_defined */
+#define __shared_rwlock_timespec ktime_t
 #else /* __KERNEL__ */
-#undef __local_shared_lock_acquire_with_timeout_nx_defined
+#include <bits/os/timespec.h>
+#include <kos/syscalls.h>
+#define __shared_rwlock_timespec struct timespec const *
 #endif /* !__KERNEL__ */
-#endif /* !__local_shared_lock_acquire_with_timeout_nx_defined */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct shared_rwlock {
+	__uintptr_t sl_lock;   /* Lock state (Set of `SHARED_RWLOCK_*') */
+#ifdef __KERNEL__
+	struct sig  sl_rdwait; /* Signal broadcast to wake-up readers. */
+	struct sig  sl_wrwait; /* Signal broadcast to wake-up writers. */
+#else /* __KERNEL__ */
+	__uintptr_t sl_rdwait; /* Futex (`1' if there are threads waiting for this futex) */
+	__uintptr_t sl_wrwait; /* Futex (`1' if there are threads waiting for this futex) */
+#endif /* !__KERNEL__ */
+};
+
+#ifdef __KERNEL__
+#define __shared_rwlock_wrwait_send(self)      sig_send(&(self)->sl_wrwait)
+#define __shared_rwlock_rdwait_broadcast(self) sig_broadcast(&(self)->sl_rdwait)
+#elif defined(__CRT_HAVE_XSC)
+#if __CRT_HAVE_XSC(lfutex)
+#define __shared_rwlock_wrwait_send(self) \
+	((self)->sl_wrwait ? (sys_Xlfutex(&(self)->sl_wrwait, LFUTEX_WAKEMASK, 1, __NULLPTR, 0) != 0) : 0)
+#define __shared_rwlock_rdwait_broadcast(self) \
+	((self)->sl_rdwait ? sys_Xlfutex(&(self)->sl_rdwait, LFUTEX_WAKEMASK, (__uintptr_t)-1, __NULLPTR, 0) : 0)
+#endif /* __CRT_HAVE_XSC(lfutex) */
+#endif /* ... */
+
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_KOS_BITS_SHARED_RWLOCK_H */

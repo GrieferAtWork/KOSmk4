@@ -31,26 +31,6 @@
 
 DECL_BEGIN
 
-PUBLIC BLOCKING NOCONNECT NONNULL((1)) void FCALL
-shared_rwlock_read(struct shared_rwlock *__restrict self)
-		THROWS(E_WOULDBLOCK) {
-	assert(!task_wasconnected());
-	while (!shared_rwlock_tryread(self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_tryread(self))
-				goto success;
-		});
-		task_connect(&self->sl_rdwait);
-		if unlikely(shared_rwlock_tryread(self)) {
-			task_disconnectall();
-			break;
-		}
-		task_waitfor();
-	}
-success:
-	COMPILER_READ_BARRIER();
-}
-
 PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool FCALL
 shared_rwlock_read_with_timeout(struct shared_rwlock *__restrict self,
                                 ktime_t abs_timeout)

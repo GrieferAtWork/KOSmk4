@@ -3487,6 +3487,13 @@
 #define __CRT_HAVE_shared_lock_waitfor
 #define __CRT_HAVE_shared_lock_waitfor_with_timeout
 #define __CRT_HAVE_shared_lock_waitfor_with_timeout64
+#define __CRT_HAVE_shared_rwlock_downgrade
+#define __CRT_HAVE_shared_rwlock_end
+#define __CRT_HAVE_shared_rwlock_endread
+#define __CRT_HAVE_shared_rwlock_endwrite
+#define __CRT_HAVE_shared_rwlock_read
+#define __CRT_HAVE_shared_rwlock_tryread
+#define __CRT_HAVE_shared_rwlock_trywrite
 #define __CRT_HAVE_shexec
 #define __CRT_HAVE_shm_open
 #define __CRT_HAVE_shm_unlink

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c90e3fc */
+/* HASH CRC-32:0x4573a6c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -182,6 +182,13 @@
 #define __CRT_HAVE_shared_lock_waitfor_nx
 #define __CRT_HAVE_shared_lock_waitfor_with_timeout
 #define __CRT_HAVE_shared_lock_waitfor_with_timeout_nx
+#define __CRT_HAVE_shared_rwlock_downgrade
+#define __CRT_HAVE_shared_rwlock_end
+#define __CRT_HAVE_shared_rwlock_endread
+#define __CRT_HAVE_shared_rwlock_endwrite
+#define __CRT_HAVE_shared_rwlock_read
+#define __CRT_HAVE_shared_rwlock_tryread
+#define __CRT_HAVE_shared_rwlock_trywrite
 #define __CRT_HAVE_sigaddset
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigdelset

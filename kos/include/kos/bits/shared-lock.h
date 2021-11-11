@@ -30,10 +30,10 @@
 #ifdef __KERNEL__
 #include <kernel/types.h> /* ktime_t */
 #include <sched/signal.h>
-#define __shared_rwlock_timespec ktime_t
+#define __shared_lock_timespec ktime_t
 #else /* __KERNEL__ */
 #include <bits/os/timespec.h>
-#define __shared_rwlock_timespec struct timespec const *
+#define __shared_lock_timespec struct timespec const *
 #endif /* !__KERNEL__ */
 
 #ifdef __CC__
