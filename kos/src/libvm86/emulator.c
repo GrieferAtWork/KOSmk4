@@ -68,7 +68,7 @@ libvm86_intr(vm86_state_t *__restrict self, uint8_t intno) {
 		uint16_t *sp, cs, ip;
 		if (self->vr_trans)
 			base = (uint16_t *)(*self->vr_trans)(self, 0);
-		TRY {
+		NESTED_TRY {
 			ip = base[(intno * 2) + 0];
 			cs = base[(intno * 2) + 1];
 		} EXCEPT {
