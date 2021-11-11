@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x986a25b6 */
+/* HASH CRC-32:0xa9809e5d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,6 @@ DECL_BEGIN
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)
- *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex_t val = ignored, struct timespec const *timeout)
  *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
@@ -45,8 +44,6 @@ DECL_BEGIN
  *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
  *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -60,7 +57,6 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(VLIBCCALL libc_lfutex)(lfutex_t *uaddr, 
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)
- *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex_t val = ignored, struct timespec const *timeout)
  *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
@@ -68,8 +64,6 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(VLIBCCALL libc_lfutex)(lfutex_t *uaddr, 
  *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
  *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -126,18 +120,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_aboveequal)(lf
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr, lfutex_t below_equal_value);
-/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_cmpxch)(lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value);
-/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waituntil_cmpxch)(lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value);
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -210,20 +192,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequa
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal)(lfutex_t *uaddr, lfutex_t below_equal_value, struct timespec const *rel_timeout);
-/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_cmpxch)(lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value, struct timespec const *rel_timeout);
-/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_cmpxch)(lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value, struct timespec const *rel_timeout);
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -297,20 +265,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequa
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr, lfutex_t below_equal_value, struct timespec64 const *rel_timeout);
-/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_cmpxch64)(lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value, struct timespec64 const *rel_timeout);
-/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_cmpxch64)(lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value, struct timespec64 const *rel_timeout);
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait

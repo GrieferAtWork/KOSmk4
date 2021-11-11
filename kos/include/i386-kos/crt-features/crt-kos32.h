@@ -2344,8 +2344,6 @@
 #define __CRT_HAVE_futex_timedwaitlock64
 #define __CRT_HAVE_futex_timedwaituntil
 #define __CRT_HAVE_futex_timedwaituntil64
-#define __CRT_HAVE_futex_timedwaituntil_cmpxch
-#define __CRT_HAVE_futex_timedwaituntil_cmpxch64
 #define __CRT_HAVE_futex_timedwaituntil_exactbits
 #define __CRT_HAVE_futex_timedwaituntil_exactbits64
 #define __CRT_HAVE_futex_timedwaitwhile
@@ -2362,13 +2360,10 @@
 #define __CRT_HAVE_futex_timedwaitwhile_below64
 #define __CRT_HAVE_futex_timedwaitwhile_belowequal
 #define __CRT_HAVE_futex_timedwaitwhile_belowequal64
-#define __CRT_HAVE_futex_timedwaitwhile_cmpxch
-#define __CRT_HAVE_futex_timedwaitwhile_cmpxch64
 #define __CRT_HAVE_futex_timedwaitwhile_exactbits
 #define __CRT_HAVE_futex_timedwaitwhile_exactbits64
 #define __CRT_HAVE_futex_waitlock
 #define __CRT_HAVE_futex_waituntil
-#define __CRT_HAVE_futex_waituntil_cmpxch
 #define __CRT_HAVE_futex_waituntil_exactbits
 #define __CRT_HAVE_futex_waitwhile
 #define __CRT_HAVE_futex_waitwhile_above
@@ -2377,7 +2372,6 @@
 #define __CRT_HAVE_futex_waitwhile_anybit
 #define __CRT_HAVE_futex_waitwhile_below
 #define __CRT_HAVE_futex_waitwhile_belowequal
-#define __CRT_HAVE_futex_waitwhile_cmpxch
 #define __CRT_HAVE_futex_waitwhile_exactbits
 #define __CRT_HAVE_futex_wake
 #define __CRT_HAVE_futex_wakeall

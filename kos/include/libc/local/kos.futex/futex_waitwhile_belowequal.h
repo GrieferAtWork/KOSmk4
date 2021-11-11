@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d82bc6c */
+/* HASH CRC-32:0xde903e2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,11 +42,11 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex.h>
+#include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futex_waitwhile_belowequal) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waitwhile_belowequal))(__uintptr_t *__uaddr, __uintptr_t __below_equal_value) {
-	if __unlikely(__below_equal_value == (__uintptr_t)-1)
-		return (__NAMESPACE_LOCAL_SYM __localdep_lfutex64)(__uaddr, LFUTEX_WAIT, 0, (struct __timespec64 const *)__NULLPTR);
+	__hybrid_assert(__above_equal_value != (__uintptr_t)-1);
 	return (__NAMESPACE_LOCAL_SYM __localdep_lfutex64)(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END

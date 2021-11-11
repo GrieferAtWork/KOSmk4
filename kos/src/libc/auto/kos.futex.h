@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc652ca54 */
+/* HASH CRC-32:0xbf59ca79 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,15 +31,15 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> futexlock_wake(3), futexlock_wakeall(3)
- * A more efficient variant of `futex_wake()' that does nothing
+ * A more efficient variant of `futex_wake()' that does  nothing
  * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
- * the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+ * the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
  * when there are no more waiting threads. */
 INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_futexlock_wake)(lfutex_t *ulockaddr, size_t max_wake);
 /* >> futexlock_wake(3), futexlock_wakeall(3)
- * A more efficient variant of `futex_wake()' that does nothing
+ * A more efficient variant of `futex_wake()' that does  nothing
  * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
- * the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+ * the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
  * when there are no more waiting threads. */
 INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_futexlock_wakeall)(lfutex_t *ulockaddr);
 #endif /* !__KERNEL__ */

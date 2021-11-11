@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c2b6f40 */
+/* HASH CRC-32:0x2d822616 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,9 @@ DECL_BEGIN
 #include <hybrid/__atomic.h>
 #include <kos/bits/futex.h>
 /* >> futexlock_wake(3), futexlock_wakeall(3)
- * A more efficient variant of `futex_wake()' that does nothing
+ * A more efficient variant of `futex_wake()' that does  nothing
  * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
- * the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+ * the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
  * when there are no more waiting threads. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_futexlock_wake)(lfutex_t *ulockaddr,
@@ -46,9 +46,9 @@ NOTHROW_NCX(LIBCCALL libc_futexlock_wake)(lfutex_t *ulockaddr,
 #include <hybrid/__atomic.h>
 #include <kos/bits/futex.h>
 /* >> futexlock_wake(3), futexlock_wakeall(3)
- * A more efficient variant of `futex_wake()' that does nothing
+ * A more efficient variant of `futex_wake()' that does  nothing
  * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
- * the `LFUTEX_WAIT_LOCK_WAITERS' flag (in a race-safe manner)
+ * the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
  * when there are no more waiting threads. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_futexlock_wakeall)(lfutex_t *ulockaddr) {

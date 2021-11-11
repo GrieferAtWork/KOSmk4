@@ -26,7 +26,8 @@
 /* KOS futex  operations (for  use with  the lfutex()  system
  * call, though can't be used with the futex() system call!). */
 #define LFUTEX_WAKE               0x00000000 /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
-#define LFUTEX_NOP                0x00000001 /* >> return 0; */
+#define LFUTEX_NOP                0x00000001 /* >> return 0;
+                                              * In futex expressions, this condition is always met */
 #define LFUTEX_GETFUTEX           0x00000002 /* [struct hop_openfd *val]
                                               * Return a handle for the underlying kernel futex object  that
                                               * is automatically created for some given address, as doing so
@@ -58,32 +59,20 @@
                                               * >>         result = val;
                                               * >> }
                                               * >> return result; */
-#define LFUTEX_WAIT               0x00000010 /* >> return waitfor(uaddr); // 0, E_INTERRUPT or -ETIMEDOUT */
-#define LFUTEX_WAIT_LOCK          0x00000011 /* >> if ((*uaddr & LFUTEX_WAIT_LOCK_TIDMASK) == 0) {
+#define LFUTEX_WAIT_WHILE         0x00000010 /* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_UNTIL         0x00000011 /* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_ABOVE   0x00000012 /* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_BELOW   0x00000013 /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_BITMASK 0x00000014 /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_UNTIL_BITMASK 0x00000015 /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_LOCK          0x00000018 /* >> if ((*uaddr & LFUTEX_WAIT_LOCK_TIDMASK) == 0) {
                                               * >>     *uaddr = (*uaddr & ~LFUTEX_WAIT_LOCK_TIDMASK) | (val ? val : gettid());
                                               * >>     return 1;
                                               * >> } else {
                                               * >>     *uaddr |= LFUTEX_WAIT_LOCK_WAITERS;
                                               * >>     return waitfor(uaddr); // 0, E_INTERRUPT or -ETIMEDOUT
-                                              * >> }
-                                              */
-#define LFUTEX_WAIT_WHILE         0x00000012 /* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_UNTIL         0x00000013 /* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_ABOVE   0x00000014 /* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_BELOW   0x00000015 /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_BITMASK 0x00000016 /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_UNTIL_BITMASK 0x00000017 /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_CMPXCH  0x00000018 /* >> if (*uaddr == val) {
-                                              * >>     *uaddr = val2;
-                                              * >>     return waitfor(uaddr); // 0, E_INTERRUPT or -ETIMEDOUT
-                                              * >> }
-                                              * >> return 1; */
-#define LFUTEX_WAIT_UNTIL_CMPXCH  0x00000019 /* >> if (*uaddr != val) {
-                                              * >>     return waitfor(uaddr); // 0, E_INTERRUPT or -ETIMEDOUT
-                                              * >> } else {
-                                              * >>     *uaddr = val2;
-                                              * >> }
-                                              * >> return 1; */
+                                              * >> } */
+
 
 
 /* Bit indicating a futexfd operation.
@@ -121,8 +110,6 @@
 #define LFUTEX_FDWAIT_WHILE_BELOW   (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_BELOW)
 #define LFUTEX_FDWAIT_WHILE_BITMASK (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_BITMASK)
 #define LFUTEX_FDWAIT_UNTIL_BITMASK (LFUTEX_FDBIT | LFUTEX_WAIT_UNTIL_BITMASK)
-#define LFUTEX_FDWAIT_WHILE_CMPXCH  (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_CMPXCH)
-#define LFUTEX_FDWAIT_UNTIL_CMPXCH  (LFUTEX_FDBIT | LFUTEX_WAIT_UNTIL_CMPXCH)
 
 /* This bit function very similar  to `LFUTEX_FDBIT', however enables the  use
  * of  futex FD objects across multiple processes with different, and possibly

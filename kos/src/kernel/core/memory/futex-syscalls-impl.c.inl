@@ -226,26 +226,6 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		result = 0;
 		break;
 
-	case LFUTEX_WAIT: {
-		validate_user(uaddr, 1);
-		f = mman_createfutex(THIS_MMAN, uaddr);
-		FINALLY_DECREF(f);
-		mfutex_connect(f);
-		TRY {
-			/* NOTE: The  futex `f'  must be  kept alive  during the wait,
-			 *       since even  though semantics  would  allow it  to  be
-			 *       destroyed  before  being  waited  upon,  doing  so in
-			 *       practice would  immediately trigger  its signal,  and
-			 *       any sender thread to not broadcast to the same futex,
-			 *       meaning that we  wouldn't sleep at  all, but  instead
-			 *       instantly wake up once again! */
-			result = FUNC(task_waitfor_futex)(futex_op, timeout);
-		} EXCEPT {
-			task_disconnectall();
-			RETHROW();
-		}
-	}	break;
-
 	case LFUTEX_WAIT_LOCK: {
 		FUNC(lfutex_t) oldval, newval;
 		validate_writable(uaddr, sizeof(*uaddr));
@@ -311,8 +291,6 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW, validate_readable, ATOMIC_READ(*uaddr) < val);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BITMASK, validate_readable, (ATOMIC_READ(*uaddr) & val) == val2);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_BITMASK, validate_readable, (ATOMIC_READ(*uaddr) & val) != val2);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_CMPXCH, validate_readwrite, ATOMIC_CMPXCH(*uaddr, val, val2));
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_CMPXCH, validate_readwrite, !ATOMIC_CMPXCH(*uaddr, val, val2));
 #undef DEFINE_WAIT_WHILE_OPERATOR
 
 	/* TODO: Futex FD support */
@@ -324,8 +302,6 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 #define LFUTEX_FDWAIT_WHILE_BELOW   (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_BELOW)
 #define LFUTEX_FDWAIT_WHILE_BITMASK (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_BITMASK)
 #define LFUTEX_FDWAIT_UNTIL_BITMASK (LFUTEX_FDBIT | LFUTEX_WAIT_UNTIL_BITMASK)
-#define LFUTEX_FDWAIT_WHILE_CMPXCH  (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_CMPXCH)
-#define LFUTEX_FDWAIT_UNTIL_CMPXCH  (LFUTEX_FDBIT | LFUTEX_WAIT_UNTIL_CMPXCH)
 
 	default:
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
