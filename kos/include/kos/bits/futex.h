@@ -102,7 +102,6 @@
  *       of  an additional call to some kernel  function that can be used for
  *       duplicating file descriptors (e.g. `dup2()' or `HOP_HANDLE_REOPEN'). */
 #define LFUTEX_FDBIT                0x00000100
-#define LFUTEX_FDWAIT               (LFUTEX_FDBIT | LFUTEX_WAIT)
 #define LFUTEX_FDWAIT_LOCK          (LFUTEX_FDBIT | LFUTEX_WAIT_LOCK)
 #define LFUTEX_FDWAIT_WHILE         (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE)
 #define LFUTEX_FDWAIT_UNTIL         (LFUTEX_FDBIT | LFUTEX_WAIT_UNTIL)
@@ -155,6 +154,6 @@
 #define LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE 0x00000000 /* Default: Timeouts are given as absolute positions of CPU quantum time (`CLOCK_PROCESS_CPUTIME_ID') */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE 0x40000000 /* The given timeout argument describes a timeout relative to the point when waiting starts */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME 0x80000000 /* The given timeout argument is in absolute realtime (`CLOCK_REALTIME') */
-#define LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL  0x20000000 /* Connect to signals for polling. */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL  0x20000000 /* Connect to signals for polling. (s.a. `task_connect_for_poll()') */
 
 #endif /* !_KOS_BITS_FUTEX_H */

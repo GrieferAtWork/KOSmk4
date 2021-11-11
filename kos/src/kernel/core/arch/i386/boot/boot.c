@@ -981,6 +981,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * and (if  not loaded)  will contain  minimal code  to set-up  the
 	 * normal 80x25 text mode. */
 
+	/* TODO: Remove the old kernel <sched/shared_[rw]lock.h> headers */
+
 	return state;
 }
 

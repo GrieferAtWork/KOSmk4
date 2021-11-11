@@ -119,8 +119,8 @@ INTERN void vesa_init(void) {
 		}
 		if (!(mi->vmi_attrib & VBE_MODEINFO_ATTR_SUPPORTED))
 			continue;
-		printk(KERN_INFO "[vesa] mode %" PRIu16 ": %" PRIu16 "x%" PRIu16 "x%" PRIu8 "\n",
-		       mode, mi->vmi_resx, mi->vmi_resy, mi->vmi_bpp);
+		printk(KERN_INFO "[vesa] mode %" PRIu16 ": [vmi_memmodel:%" PRIu8 "] %" PRIu16 "x%" PRIu16 "x%" PRIu8 "\n",
+		       mode, mi->vmi_memmodel, mi->vmi_resx, mi->vmi_resy, mi->vmi_bpp);
 	}
 
 	/* TODO */

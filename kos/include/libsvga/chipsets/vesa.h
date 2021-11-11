@@ -45,7 +45,7 @@ struct __ATTR_PACKED vbe_biosinfo {
 	__uint32_t vbi_capabilities;         /* Set of `VBE_BIOSINFO_CAP_*' */
 	__uint16_t vbi_vidmodelist_off;      /* Far pointer to video mode list (Pointes to 0xffff-terminated array of `u16') */
 	__uint16_t vbi_vidmodelist_seg;      /* *ditto* */
-	__uint16_t vbi_vmemsize;             /* Video memory size in 64K-blocks */
+	__uint16_t vbi_vmemsize;             /* Video memory size in 64K-blocks (starting at `vmi_lfbaddr') */
 	__uint16_t vbi_oem_software_rev;     /* OEM software revision. */
 	__uint16_t vbi_oem_vendor_name_off;  /* Far pointer to OEM vendor name string */
 	__uint16_t vbi_oem_vendor_name_seg;  /* *ditto* */
