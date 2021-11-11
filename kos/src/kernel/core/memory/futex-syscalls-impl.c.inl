@@ -23,13 +23,16 @@
 #endif /* __INTELLISENSE__ */
 
 #include <sched/tsc.h>
+#include <sched/rpc.h>
 
 #ifdef DEFINE_COMPAT_FUTEX
-#define FUNC(x)  compat_##x
-#define FUNC2(x) COMPAT_##x
+#define FUNC(x)         compat_##x
+#define FUNC2(x)        COMPAT_##x
+#define LOCAL_uintptr_t compat_uintptr_t
 #else /* DEFINE_COMPAT_FUTEX */
-#define FUNC(x)  x
-#define FUNC2(x) x
+#define FUNC(x)         x
+#define FUNC2(x)        x
+#define LOCAL_uintptr_t uintptr_t
 #endif /* !DEFINE_COMPAT_FUTEX */
 
 DECL_BEGIN
@@ -38,7 +41,8 @@ DECL_BEGIN
 #define FUTEX_TIMEOUT_FLAG_MASK          \
 	(LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE | \
 	 LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE | \
-	 LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME)
+	 LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME | \
+	 LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL)
 
 /* @return: 0:          A connected signal was triggered.
  * @return: -ETIMEDOUT: The given timeout has expired. */
@@ -46,8 +50,10 @@ PRIVATE syscall_slong_t KCALL
 FUNC(task_waitfor_futex)(syscall_ulong_t flags,
                          USER UNCHECKED struct FUNC(timespec64) const *timeout) {
 	ktime_t tmo;
+
 	/* Mask flag bits. */
 	flags &= LFUTEX_FLAGMASK;
+
 	/* Validate that only known flags are being used. */
 	VALIDATE_FLAGSET(flags,
 	                 FUTEX_TIMEOUT_FLAG_MASK,
@@ -55,7 +61,7 @@ FUNC(task_waitfor_futex)(syscall_ulong_t flags,
 	if (!timeout) {
 		/* Simple case: Without any timeout.
 		 * In this case, still validate that `flags' aren't malformed. */
-		if unlikely((flags & FUTEX_TIMEOUT_FLAG_MASK) != 0) {
+		if unlikely((flags & (FUTEX_TIMEOUT_FLAG_MASK & ~LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL)) != 0) {
 			THROW(E_INVALID_ARGUMENT_RESERVED_FLAG,
 			      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
 			      flags,
@@ -93,18 +99,18 @@ FUNC(task_waitfor_futex)(syscall_ulong_t flags,
                                   : defined(__ARCH_WANT_SYSCALL_LFUTEX))
 #ifdef DEFINE_COMPAT_FUTEX
 DEFINE_COMPAT_SYSCALL5(syscall_slong_t, lfutex,
-                       USER UNCHECKED compat_uintptr_t *, uaddr,
+                       USER UNCHECKED LOCAL_uintptr_t *, uaddr,
                        syscall_ulong_t, futex_op,
-                       compat_uintptr_t, val,
+                       LOCAL_uintptr_t, val,
                        USER UNCHECKED struct compat_timespec64 const *, timeout,
-                       compat_uintptr_t, val2)
+                       LOCAL_uintptr_t, val2)
 #else /* DEFINE_COMPAT_FUTEX */
 DEFINE_SYSCALL5(syscall_slong_t, lfutex,
-                USER UNCHECKED uintptr_t *, uaddr,
+                USER UNCHECKED LOCAL_uintptr_t *, uaddr,
                 syscall_ulong_t, futex_op,
-                uintptr_t, val,
+                LOCAL_uintptr_t, val,
                 USER UNCHECKED struct timespec64 const *, timeout,
-                uintptr_t, val2)
+                LOCAL_uintptr_t, val2)
 #endif /* !DEFINE_COMPAT_FUTEX */
 {
 	syscall_slong_t result;
@@ -136,7 +142,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 
 	case LFUTEX_WAKEMASK: {
 		size_t count = (size_t)val;
-		FUNC(lfutex_t) mask_and = (FUNC(lfutex_t))(uintptr_t)timeout;
+		FUNC(lfutex_t) mask_and = (FUNC(lfutex_t))(LOCAL_uintptr_t)(uintptr_t)timeout;
 		FUNC(lfutex_t) mask_or  = (FUNC(lfutex_t))val2;
 #ifdef __OPTIMIZE_SIZE__
 #define APPLY_MASK()                                            \
@@ -245,7 +251,11 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			newval = oldval | FUNC2(LFUTEX_WAIT_LOCK_WAITERS);
 			f = mman_createfutex(THIS_MMAN, uaddr);
 			FINALLY_DECREF(f);
-			mfutex_connect(f);
+			if (futex_op & LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) {
+				mfutex_connect_for_poll(f);
+			} else {
+				mfutex_connect(f);
+			}
 			TRY {
 				if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
 					/* Failed to set the locked bit (try again) */
@@ -269,7 +279,11 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		 * should-wait checked in a manner that is interlocked. */    \
 		f = mman_createfutex(THIS_MMAN, uaddr);                       \
 		FINALLY_DECREF(f);                                            \
-		mfutex_connect(f);                                            \
+		if (futex_op & LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) {            \
+			mfutex_connect_for_poll(f);                               \
+		} else {                                                      \
+			mfutex_connect(f);                                        \
+		}                                                             \
 		/* Read the futex value. */                                   \
 		TRY {                                                         \
 			if (should_wait) {                                        \
@@ -326,30 +340,117 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 DEFINE_COMPAT_SYSCALL5(errno_t, lfutexexpr,
                        USER UNCHECKED compat_uintptr_t *, ulockaddr,
                        USER UNCHECKED void *, base,
-                       USER UNCHECKED struct compat_lfutexexpr const *, exprv,
+                       USER UNCHECKED struct compat_lfutexexpr const *, expr,
                        USER UNCHECKED struct compat_timespec64 const *, timeout,
                        syscall_ulong_t, timeout_flags)
 #else /* DEFINE_COMPAT_FUTEX */
 DEFINE_SYSCALL5(errno_t, lfutexexpr,
                 USER UNCHECKED uintptr_t *, ulockaddr,
                 USER UNCHECKED void *, base,
-                USER UNCHECKED struct lfutexexpr const *, exprv,
+                USER UNCHECKED struct lfutexexpr const *, expr,
                 USER UNCHECKED struct timespec64 const *, timeout,
                 syscall_ulong_t, timeout_flags)
 #endif /* !DEFINE_COMPAT_FUTEX */
 {
-	(void)ulockaddr;
-	(void)base;
-	(void)exprv;
-	(void)timeout;
-	(void)timeout_flags;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	errno_t result;
+	REF struct mfutex *f;
+	validate_user(ulockaddr, sizeof(*ulockaddr));
+	validate_readable(expr, sizeof(*expr));
+	f = mman_createfutex(THIS_MMAN, ulockaddr);
+	FINALLY_DECREF(f);
+
+	/* Connect to the named futex. */
+	if (timeout_flags & LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) {
+		mfutex_connect_for_poll(f);
+	} else {
+		mfutex_connect(f);
+	}
+
+	/* Evaluate expressions. */
+	TRY {
+		typeof(expr) iter = expr;
+		for (;; ++iter) {
+			errno_t expr_result;
+			syscall_ulong_t cond;
+			USER CHECKED LOCAL_uintptr_t *uaddr;
+			cond  = ATOMIC_READ(iter->fe_condition);
+			uaddr = (USER UNCHECKED LOCAL_uintptr_t *)((USER UNCHECKED byte_t *)base +
+			                                           ATOMIC_READ(iter->fe_offset));
+			validate_readable(uaddr, sizeof(*uaddr));
+			switch (cond) {
+
+			case LFUTEX_EXPREND:
+				if unlikely(iter == expr)
+					goto bad_opcode; /* Not allowed as the first expression! */
+				goto must_wait;
+
+			case LFUTEX_NOP:
+				expr_result = 0; /* no-op */
+				break;
+
+			case LFUTEX_WAIT_WHILE:
+				/* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
+				expr_result = ATOMIC_READ(*uaddr) == iter->fe_val;
+				break;
+
+			case LFUTEX_WAIT_UNTIL:
+				/* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
+				expr_result = ATOMIC_READ(*uaddr) != iter->fe_val;
+				break;
+
+			case LFUTEX_WAIT_WHILE_ABOVE:
+				/* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
+				expr_result = ATOMIC_READ(*uaddr) > iter->fe_val;
+				break;
+
+			case LFUTEX_WAIT_WHILE_BELOW:
+				/* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
+				expr_result = ATOMIC_READ(*uaddr) < iter->fe_val;
+				break;
+
+			case LFUTEX_WAIT_WHILE_BITMASK:
+				/* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
+				expr_result = (ATOMIC_READ(*uaddr) & iter->fe_val) == iter->fe_val2;
+				break;
+
+			case LFUTEX_WAIT_UNTIL_BITMASK:
+				/* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
+				expr_result = (ATOMIC_READ(*uaddr) & iter->fe_val) != iter->fe_val2;
+				break;
+
+			default:
+bad_opcode:
+				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+				      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
+				      cond);
+				break;
+			}
+			if (expr_result != 0) {
+				result = expr_result;
+				task_disconnectall();
+				goto done;
+			}
+
+			/* This right here prevents threads being unkillable
+			 * whenever  they're  executing  futex  expressions. */
+			task_serve();
+		}
+	} EXCEPT {
+		task_disconnectall();
+		RETHROW();
+	}
+must_wait:
+	/* Do the wait */
+	result = FUNC(task_waitfor_futex)(timeout_flags, timeout);
+done:
+	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_LFUTEXEXPR */
 
 
 DECL_END
 
+#undef LOCAL_uintptr_t
 #undef FUNC2
 #undef FUNC
 #undef DEFINE_COMPAT_FUTEX

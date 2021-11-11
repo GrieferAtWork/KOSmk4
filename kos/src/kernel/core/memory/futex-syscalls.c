@@ -255,14 +255,12 @@ DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex_time64,
 DECL_END
 
 #ifndef __INTELLISENSE__
-#if (defined(__ARCH_WANT_SYSCALL_LFUTEX) ||     \
-     defined(__ARCH_WANT_SYSCALL_LFUTEXEXPR) || \
-     defined(__ARCH_WANT_SYSCALL_LFUTEXLOCKEXPR))
+#if (defined(__ARCH_WANT_SYSCALL_LFUTEX) || \
+     defined(__ARCH_WANT_SYSCALL_LFUTEXEXPR))
 #include "futex-syscalls-impl.c.inl"
 #endif /* lfutex... */
-#if (defined(__ARCH_WANT_COMPAT_SYSCALL_LFUTEX) ||     \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LFUTEXEXPR) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LFUTEXLOCKEXPR))
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_LFUTEX) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LFUTEXEXPR))
 #define DEFINE_COMPAT_FUTEX 1
 #include "futex-syscalls-impl.c.inl"
 #endif /* lfutex... (compat) */

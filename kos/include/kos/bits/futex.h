@@ -27,8 +27,7 @@
  * call, though can't be used with the futex() system call!). */
 #define LFUTEX_WAKE               0x00000000 /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
 #define LFUTEX_EXPREND            0x00000000 /* Expression terminator for `lfutexexpr(2)' */
-#define LFUTEX_NOP                0x00000001 /* >> return 0;
-                                              * In futex expressions, this condition is always met */
+#define LFUTEX_NOP                0x00000001 /* >> return 0; // iow: ignored in `lfutexexpr(2)' */
 #define LFUTEX_GETFUTEX           0x00000002 /* [struct hop_openfd *val]
                                               * Return a handle for the underlying kernel futex object  that
                                               * is automatically created for some given address, as doing so
