@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34a768a4 */
+/* HASH CRC-32:0xa40600f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,8 +65,10 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING NONNULL((1)) void
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0)
+	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		libc_LFutexExpr64(&self->sl_sig, self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, NULL, 0);
+	}
 #endif /* !__KERNEL__ */
 	COMPILER_BARRIER();
 }
@@ -95,6 +97,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr(&self->sl_sig, self, 1,
 		               __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
 		               abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
@@ -113,7 +116,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING NONNULL((1)) void
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0)
-				goto success;
+				return;
 		});
 		task_connect(&self->sl_sig);
 		if unlikely(__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
@@ -122,12 +125,12 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING NONNULL((1)) void
 		}
 		task_waitfor();
 	}
-success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0)
+	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		libc_LFutexExpr64(&self->sl_sig, self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, NULL, 0);
+	}
 #endif /* !__KERNEL__ */
-	COMPILER_BARRIER();
 }
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
@@ -154,13 +157,13 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr(&self->sl_sig, self, 1,
 		               __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
 		               abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
 #endif /* !__KERNEL__ */
-	COMPILER_BARRIER();
 	return true;
 }
 #ifndef __KERNEL__
@@ -187,6 +190,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 (__FCALL libc_shared_lock_acquire_with_timeout64)(struct shared_lock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr64(&self->sl_sig, self, 1,
 		                 __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
 		                 abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
@@ -219,12 +223,12 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 (__FCALL libc_shared_lock_waitfor_with_timeout64)(struct shared_lock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		if (libc_LFutexExpr64(&self->sl_sig, self, 1,
 		                 __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
 		                 abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
-	COMPILER_BARRIER();
 	return true;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */

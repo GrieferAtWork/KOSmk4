@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ad201df */
+/* HASH CRC-32:0x1699cdd6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __ATTR_NONNULL((1)) void
 	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0)
-				goto __success;
+				return;
 		});
 		task_connect(&__self->sl_sig);
 		if __unlikely(__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) == 0) {
@@ -83,12 +83,12 @@ __LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __ATTR_NONNULL((1)) void
 		}
 		task_waitfor();
 	}
-__success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0)
+	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(__self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64)(&__self->sl_sig, __self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, __NULLPTR, 0);
+	}
 #endif /* !__KERNEL__ */
-	__COMPILER_BARRIER();
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_shared_lock_waitfor_defined

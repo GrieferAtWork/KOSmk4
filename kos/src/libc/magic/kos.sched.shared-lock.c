@@ -145,8 +145,10 @@ void shared_lock_acquire([[nonnull]] struct shared_lock *__restrict self) {
 	}
 success:
 @@pp_else@@
-	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0)
+	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
 		LFutexExpr64(&self->@sl_sig@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, NULL, 0);
+	}
 @@pp_endif@@
 	COMPILER_BARRIER();
 }
@@ -198,6 +200,7 @@ $bool shared_lock_acquire_with_timeout([[nonnull]] struct shared_lock *__restric
 success:
 @@pp_else@@
 	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExpr(&self->@sl_sig@, self, 1,
 		               __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
 		               abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
@@ -237,7 +240,7 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
 			if (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0)
-				goto success;
+				return;
 		});
 		@task_connect@(&self->@sl_sig@);
 		if unlikely(__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == 0) {
@@ -246,12 +249,12 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 		}
 		@task_waitfor@();
 	}
-success:
 @@pp_else@@
-	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0)
+	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
 		LFutexExpr64(&self->@sl_sig@, self, 1, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, NULL, 0);
+	}
 @@pp_endif@@
-	COMPILER_BARRIER();
 }
 
 
@@ -301,13 +304,13 @@ $bool shared_lock_waitfor_with_timeout([[nonnull]] struct shared_lock *__restric
 success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExpr(&self->@sl_sig@, self, 1,
 		               __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
 		               abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
 @@pp_endif@@
-	COMPILER_BARRIER();
 	return true;
 }
 
@@ -334,6 +337,7 @@ static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
 $bool shared_lock_acquire_with_timeout64([[nonnull]] struct shared_lock *__restrict self,
                                          struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExpr64(&self->@sl_sig@, self, 1,
 		                 __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
 		                 abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
@@ -362,12 +366,12 @@ static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
 $bool shared_lock_waitfor_with_timeout64([[nonnull]] struct shared_lock *__restrict self,
                                          struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExpr64(&self->@sl_sig@, self, 1,
 		                 __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
 		                 abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
-	COMPILER_BARRIER();
 	return true;
 }
 %#endif /* !__KERNEL__ && __USE_TIME64 */

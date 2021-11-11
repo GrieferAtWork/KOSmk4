@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25a7b066 */
+/* HASH CRC-32:0x6329508e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,8 +85,10 @@ __LOCAL_LIBC(shared_lock_acquire) __BLOCKING __ATTR_NONNULL((1)) void
 	}
 __success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0)
+	while (__hybrid_atomic_xch(__self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(__self->sl_sig, 1, __ATOMIC_SEQ_CST);
 		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64)(&__self->sl_sig, __self, 1, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, __NULLPTR, 0);
+	}
 #endif /* !__KERNEL__ */
 	__COMPILER_BARRIER();
 }
