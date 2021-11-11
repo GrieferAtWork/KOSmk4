@@ -1928,12 +1928,12 @@ NOTHROW(CC CS_setregb)(vio_cpustate_t *__restrict state,
 	(*(u8 *)((byte_t *)self->vea_args.va_state + CS_breg_offsets[(regno) & (X86_GPREGCOUNT - 1)]) = (value))
 #endif /* !__x86_64__ */
 
-#define _EMU86_GETREGW(state, regno) (*(u16 const *)((byte_t const *)state + CS_reg_offsets[regno]))
-#define _EMU86_GETREGL(state, regno) (*(u32 const *)((byte_t const *)state + CS_reg_offsets[regno]))
-#define _EMU86_SETREGW(state, regno, value) (*(uintptr_t *)((byte_t *)state + CS_reg_offsets[regno]) = (u16)(value))
-#define _EMU86_SETREGL(state, regno, value) (*(uintptr_t *)((byte_t *)state + CS_reg_offsets[regno]) = (u32)(value))
+#define _EMU86_GETREGW(state, regno)        (*(u16 const *)((byte_t const *)state + CS_reg_offsets[regno]))
+#define _EMU86_GETREGL(state, regno)        (*(u32 const *)((byte_t const *)state + CS_reg_offsets[regno]))
+#define _EMU86_SETREGW(state, regno, value) (*(u16 *)((byte_t *)state + CS_reg_offsets[regno]) = (u16)(value))
+#define _EMU86_SETREGL(state, regno, value) (*(uintptr_t *)((byte_t *)state + CS_reg_offsets[regno]) = (uintptr_t)(u32)(value))
 #ifdef __x86_64__
-#define _EMU86_GETREGQ(state, regno) (*(u64 const *)((byte_t const *)state + CS_reg_offsets[regno]))
+#define _EMU86_GETREGQ(state, regno)        (*(u64 const *)((byte_t const *)state + CS_reg_offsets[regno]))
 #define _EMU86_SETREGQ(state, regno, value) (*(uintptr_t *)((byte_t *)state + CS_reg_offsets[regno]) = (u64)(value))
 #endif /* __x86_64__ */
 
@@ -1974,7 +1974,7 @@ PRIVATE ATTR_LEAF WUNUSED NONNULL((1)) void
 NOTHROW(CC CS_setregw)(vio_cpustate_t *__restrict state, u8 regno, u16 value) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_SP) {
-		icpustate64_setrsp(state, (u64)value);
+		icpustate64_setrsp(state, (icpustate64_getrsp(state) & ~0xffff) | (u64)value);
 	} else {
 		_EMU86_SETREGW(state, regno, value);
 	}
@@ -2005,7 +2005,9 @@ PRIVATE ATTR_LEAF WUNUSED NONNULL((1)) void
 NOTHROW(CC CS_setregw)(struct vio_emulate_args *__restrict self, u8 regno, u16 value) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_SP) {
-		self->vea_args.va_state = icpustate32_setesp_p(self->vea_args.va_state, (u64)value);
+		u32 new_esp = icpustate32_getesp(self->vea_args.va_state);
+		new_esp     = (new_esp & ~0xffff) | value;
+		self->vea_args.va_state = icpustate32_setesp_p(self->vea_args.va_state, new_esp);
 	} else {
 		_EMU86_SETREGW(self->vea_args.va_state, regno, value);
 	}
@@ -2023,8 +2025,8 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #endif /* __x86_64__ */
 #else /* __KERNEL__ */
 #define EMU86_GETREGW(regno)        _EMU86_GETREGW(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
-#define EMU86_GETREGL(regno)        _EMU86_GETREGL(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
 #define EMU86_SETREGW(regno, value) _EMU86_SETREGW(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1), value)
+#define EMU86_GETREGL(regno)        _EMU86_GETREGL(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
 #define EMU86_SETREGL(regno, value) _EMU86_SETREGL(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1), value)
 #ifdef __x86_64__
 #define EMU86_GETREGQ(regno)        _EMU86_GETREGQ(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))

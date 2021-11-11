@@ -1108,13 +1108,13 @@ PRIVATE uintptr_t const mach_breg_offset[2][16] = {
 
 #define REG8(id, op_flags) \
 	(*((u8 *)self + mach_breg_offset[!!((op_flags) & EMU86_F_HASREX)][id]))
-#define REG16(id)                        self->r_gpregsw[(id)*4]
-#define REG32(id)                        self->r_gpregsl[(id)*2]
-#define REG64(id)                        self->r_gpregsq[id]
-#define EMU86_GETREGQ(regno)             REG64(regno)
-#define EMU86_SETREGW(regno, value)      REG64(regno) = (u64)(u16)(value) /* 16-bit register writes clear the upper 16 bits */
-#define EMU86_SETREGL(regno, value)      REG64(regno) = (u64)(u32)(value) /* 32-bit register writes clear the upper 32 bits */
-#define EMU86_SETREGQ(regno, value)      REG64(regno) = (u64)(value)
+#define REG16(id)                   self->r_gpregsw[(id)*4]
+#define REG32(id)                   self->r_gpregsl[(id)*2]
+#define REG64(id)                   self->r_gpregsq[id]
+#define EMU86_GETREGQ(regno)        REG64(regno)
+#define EMU86_SETREGW(regno, value) REG16(regno) = (u16)(value)
+#define EMU86_SETREGL(regno, value) REG64(regno) = (u64)(u32)(value) /* 32-bit register writes clear the upper 32 bits */
+#define EMU86_SETREGQ(regno, value) REG64(regno) = (u64)(value)
 #else /* __x86_64__ */
 PRIVATE uintptr_t const mach_breg_offset[8] = {
 	[EMU86_R_AL] = offsetof(struct rtm_machstate, r_al), /* %al */
@@ -1126,11 +1126,11 @@ PRIVATE uintptr_t const mach_breg_offset[8] = {
 	[EMU86_R_DH] = offsetof(struct rtm_machstate, r_dh), /* %dh */
 	[EMU86_R_BH] = offsetof(struct rtm_machstate, r_bh), /* %bh */
 };
-#define REG8(id, ...)                    (*((u8 *)self + mach_breg_offset[id]))
-#define REG16(id)                        self->r_gpregsw[(id)*2]
-#define REG32(id)                        self->r_gpregsl[id]
-#define EMU86_SETREGW(regno, value)      REG32(regno) = (u32)(u16)(value) /* 16-bit register writes clear the upper 16 bits */
-#define EMU86_SETREGL(regno, value)      REG32(regno) = (u32)(value)
+#define REG8(id, ...)               (*((u8 *)self + mach_breg_offset[id]))
+#define REG16(id)                   self->r_gpregsw[(id)*2]
+#define REG32(id)                   self->r_gpregsl[id]
+#define EMU86_SETREGW(regno, value) REG16(regno) = (u16)(value)
+#define EMU86_SETREGL(regno, value) REG32(regno) = (u32)(value)
 #endif /* !__x86_64__ */
 #define EMU86_GETREGB(regno, op_flags)        REG8(regno, op_flags)
 #define EMU86_SETREGB(regno, value, op_flags) REG8(regno, op_flags) = (u8)(value)
