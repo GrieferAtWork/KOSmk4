@@ -389,26 +389,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	__hybrid_assert(!kmalloc_leaks());
 
-#if 0
-	decref(driver_insmod("iso9660", "a b foobar bazbaz"));
-	{
-		REF struct superblock *cd;
-		cd = superblock_open("iso9660", "/dev/hdb");
-		{
-			SCOPED_READLOCK((struct mfile *)cd);
-			REF struct fdirent *ent;
-			while ((ent = directory_readnext(cd)) != NULL) {
-				printk("ENTRY: %$q, %u, %" PRIuN(__SIZEOF_INO_T__) "\n",
-				       (size_t)ent->de_namelen,
-				       ent->de_name,
-				       (unsigned int)ent->de_type,
-				       (ino_t)ent->de_ino);
-			}
-		}
-		superblock_set_unmounted(cd);
-		decref(cd);
+#if 1
+	/* Do some testing  with VESA,  but only  on qemu,  just so  we
+	 * don't actually try to do something wonky on real hardware ;) */
+	if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
+		extern void vesa_init(void);
+		vesa_init();
 	}
-	driver_delmod("iso9660");
 #endif
 
 	/* Update the given initial user-state to start
@@ -961,6 +948,38 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    `page_iszero()' bits for all buffer pages before passing along the user-
 	 *    provided buffer to the operator.
 	 */
+
+	/* TODO: New library `libsvgalib'.
+	 *
+	 * Design:
+	 *   /kos/include/libsvga
+	 *     - Includes emulations of the normal svgalib's headers
+	 *     - Includes additional kos-specific headers, including
+	 *       those for individual VGA card drivers
+	 *   /kos/src/libsvga
+	 *     - Source. Can be compiled both in user- and kernel-space
+	 *     - Both versions are pretty much  the same, but the  kernel
+	 *       version may be stripped down, but also include a special
+	 *       VGA display mode where  the kernel won't interfere  with
+	 *       user-space  (except  for  when the  builtin  debugger is
+	 *       being shown)
+	 *     - Includes normal VGA driver and one that takes to the BIOS
+	 *       Once those are working, maybe  take a closer look at  the
+	 *       svga sources for more drivers. (Be careful about license)
+	 *   /kos/src/kernel/modsvga
+	 *     - Includes the sources from /kos/src/libsvga
+	 *     - When loaded as a driver, tries to switch to graphics
+	 *       mode which it uses to emulate a high-resolution tty.
+	 *       If graphics mode cannot be enabled, fall back to the
+	 *       normal 80x25 text mode
+	 *
+	 * Once all of this has been implemented, get rid of the current
+	 * modvga  and libvgastate; all of this stuff will be handled by
+	 * the new libsvga
+	 *
+	 * Also: the builtin debugger must consult with modsvga (if loaded)
+	 * and (if  not loaded)  will contain  minimal code  to set-up  the
+	 * normal 80x25 text mode. */
 
 	return state;
 }

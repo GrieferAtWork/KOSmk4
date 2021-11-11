@@ -109,6 +109,7 @@ BEGIN
 		/* Required for: disk file access */
 		"../modfat/*.c",
 
+		"../../libsvga/*.c", /* TODO: Remove me */
 		"../moddbx/*.c", /* TODO: Remove me */
 
 		/* Pull in the actual kernel sources */
