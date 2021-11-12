@@ -43,12 +43,21 @@ typedef __port_t port_t;
 INTDEF void CC basevga_init(void);
 
 /* Get/Set standard VGA registers.
- * NOTE: Must be called while holding a lock to the true VGA Chipset driver. */
+ * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
+ * NOTE: Setting the basevga register state leaves the screen turned off! */
 INTDEF NONNULL((1)) void CC basevga_getregs(struct vga_mode *__restrict regs);
 INTDEF NONNULL((1)) void CC basevga_setregs(struct vga_mode const *__restrict regs);
+
 /* Same as `basevga_setregs()', but preserve the state of reserved bits.
- * NOTE: Must be called while holding a lock to the true VGA Chipset driver. */
+ * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
+ * NOTE: This function leaves the screen turned off! */
 INTDEF NONNULL((1)) void CC basevga_setmode(struct vga_mode const *__restrict regs);
+
+/* TODO: basevga_getpal() */
+/* TODO: basevga_setpal() */
+/* TODO: basevga_copytoplanar16()  {smi_bits_per_pixel: 1, smi_colorbits: 4} */
+/* TODO: basevga_copytoplanar256() {smi_bits_per_pixel: 2, smi_colorbits: 8} */
+
 
 /* Basic VGA adapter flags. (Set of `BASEVGA_FLAG_*') */
 INTDEF uint32_t basevga_flags;

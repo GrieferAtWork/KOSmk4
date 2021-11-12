@@ -25,6 +25,7 @@
 /**/
 
 #include <hybrid/align.h>
+#include <hybrid/bit.h>
 
 #include <kos/except.h>
 #include <kos/kernel/types.h>
@@ -243,12 +244,23 @@ next:
 		                        result->smi_gbits +
 		                        result->smi_bbits;
 	} else {
-		/* NOTE: We use the window size as granularity unit and make the assumption
-		 *       that `info->vmi_win_granularity <= info->vmi_win_size'. From  what
-		 *       I understand, this assumption is  allowed since if it didn't  hold
-		 *       true, there would be video memory that couldn't be accessed at all */
-		result->smi_vpagesiz = info->vmi_win_size;
-		result->smi_vpagecnt = CEILDIV(me->sc_vmemsize, result->smi_vpagesiz);
+		/* Validate window size and granularity parameters.
+		 *
+		 * NOTE: We require that video memory windows are 64K
+		 *       large  because svgalib does the same (and it
+		 *       worked well enough) */
+		if (me->sc_vmemsize > 64 * 1024) {
+			if (info->vmi_win_size != 0 && info->vmi_win_size != 64)
+				goto next;
+			if (info->vmi_win_granularity == 0)
+				info->vmi_win_granularity = 64; /* Guess */
+			if (info->vmi_win_granularity > 64)
+				goto next; /* Wouldn't make sense. */
+		} else {
+			/* Video memory is small enough to fit into the standard VGA window. */
+		}
+		if (!IS_POWER_OF_TWO(info->vmi_win_granularity))
+			goto next; /* Needs to be the case to match the expected 64K window size! */
 		result->smi_scanline = info->vmi_scanline;
 	}
 	if (result->smi_scanline == 0)
@@ -276,12 +288,12 @@ got_result:
 }
 
 LOCAL void CC
-vesa_setwindow(struct svga_chipset *__restrict self, uint8_t no, size_t pageno) {
+vesa_setwindow(struct svga_chipset *__restrict self, uint8_t no, size_t window) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
 	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f05;
 	me->vc_emu.b86e_vm.vr_regs.vr_bx = 0x0000 | no; /* SET_WINDOW */
-	me->vc_emu.b86e_vm.vr_regs.vr_dx = (pageno * 64) / me->vc_mode.vmi_win_granularity;
+	me->vc_emu.b86e_vm.vr_regs.vr_dx = (window * 64) >> me->vc_wingranshift;
 	if (!bios86_emulator_int(&me->vc_emu, 0x10))
 		THROW(E_IOERROR);
 }
@@ -294,54 +306,54 @@ vesa_getwindow(struct svga_chipset *__restrict self, uint8_t no) {
 	me->vc_emu.b86e_vm.vr_regs.vr_bx = 0x0100 | no; /* GET_WINDOW */
 	if (!bios86_emulator_int(&me->vc_emu, 0x10))
 		THROW(E_IOERROR);
-	return ((u32)me->vc_emu.b86e_vm.vr_regs.vr_dx * me->vc_mode.vmi_win_granularity) / 64;
+	return ((u32)me->vc_emu.b86e_vm.vr_regs.vr_dx << me->vc_wingranshift) / 64;
 }
 
 
 PRIVATE void CC
-vesa_v_setwindow_both_0(struct svga_chipset *__restrict self, size_t pageno) {
-	vesa_setwindow(self, 0, pageno); /* Only need to set `0' */
-	self->sc_rdpageno = pageno;
-	self->sc_wrpageno = pageno;
+vesa_v_setwindow_both_0(struct svga_chipset *__restrict self, size_t window) {
+	vesa_setwindow(self, 0, window); /* Only need to set `0' */
+	self->sc_rdwindow = window;
+	self->sc_wrwindow = window;
 }
 
 PRIVATE void CC
-vesa_v_setwindow_both_1(struct svga_chipset *__restrict self, size_t pageno) {
-	vesa_setwindow(self, 1, pageno); /* Only need to set `1' */
-	self->sc_rdpageno = pageno;
-	self->sc_wrpageno = pageno;
+vesa_v_setwindow_both_1(struct svga_chipset *__restrict self, size_t window) {
+	vesa_setwindow(self, 1, window); /* Only need to set `1' */
+	self->sc_rdwindow = window;
+	self->sc_wrwindow = window;
 }
 
 PRIVATE void CC
-vesa_v_setwindow_both_01(struct svga_chipset *__restrict self, size_t pageno) {
-	vesa_setwindow(self, 0, pageno);
-	vesa_setwindow(self, 1, pageno);
-	self->sc_rdpageno = pageno;
-	self->sc_wrpageno = pageno;
+vesa_v_setwindow_both_01(struct svga_chipset *__restrict self, size_t window) {
+	vesa_setwindow(self, 0, window);
+	vesa_setwindow(self, 1, window);
+	self->sc_rdwindow = window;
+	self->sc_wrwindow = window;
 }
 
 PRIVATE void CC
-vesa_v_setwindow_rd_0(struct svga_chipset *__restrict self, size_t pageno) {
-	vesa_setwindow(self, 0, pageno);
-	self->sc_rdpageno = pageno;
+vesa_v_setwindow_rd_0(struct svga_chipset *__restrict self, size_t window) {
+	vesa_setwindow(self, 0, window);
+	self->sc_rdwindow = window;
 }
 
 PRIVATE void CC
-vesa_v_setwindow_rd_1(struct svga_chipset *__restrict self, size_t pageno) {
-	vesa_setwindow(self, 1, pageno);
-	self->sc_rdpageno = pageno;
+vesa_v_setwindow_rd_1(struct svga_chipset *__restrict self, size_t window) {
+	vesa_setwindow(self, 1, window);
+	self->sc_rdwindow = window;
 }
 
 PRIVATE void CC
-vesa_v_setwindow_wr_0(struct svga_chipset *__restrict self, size_t pageno) {
-	vesa_setwindow(self, 0, pageno);
-	self->sc_wrpageno = pageno;
+vesa_v_setwindow_wr_0(struct svga_chipset *__restrict self, size_t window) {
+	vesa_setwindow(self, 0, window);
+	self->sc_wrwindow = window;
 }
 
 PRIVATE void CC
-vesa_v_setwindow_wr_1(struct svga_chipset *__restrict self, size_t pageno) {
-	vesa_setwindow(self, 1, pageno);
-	self->sc_wrpageno = pageno;
+vesa_v_setwindow_wr_1(struct svga_chipset *__restrict self, size_t window) {
+	vesa_setwindow(self, 1, window);
+	self->sc_wrwindow = window;
 }
 
 PRIVATE void CC
@@ -409,11 +421,11 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 		modeword |= 0x4000; /* Use linear buffer. */
 	if (!vesa_setmode(me, modeword))
 		THROW(E_IOERROR);
-	DBG_memset(&me->sc_ops.sco_setpage, 0xcc, sizeof(me->sc_ops.sco_setpage));
-	DBG_memset(&me->sc_ops.sco_setrdpage, 0xcc, sizeof(me->sc_ops.sco_setrdpage));
-	DBG_memset(&me->sc_ops.sco_setwrpage, 0xcc, sizeof(me->sc_ops.sco_setwrpage));
-	DBG_memset(&me->sc_rdpageno, 0xcc, sizeof(me->sc_rdpageno));
-	DBG_memset(&me->sc_wrpageno, 0xcc, sizeof(me->sc_wrpageno));
+	DBG_memset(&me->sc_ops.sco_setwindow, 0xcc, sizeof(me->sc_ops.sco_setwindow));
+	DBG_memset(&me->sc_ops.sco_setrdwindow, 0xcc, sizeof(me->sc_ops.sco_setrdwindow));
+	DBG_memset(&me->sc_ops.sco_setwrwindow, 0xcc, sizeof(me->sc_ops.sco_setwrwindow));
+	DBG_memset(&me->sc_rdwindow, 0xcc, sizeof(me->sc_rdwindow));
+	DBG_memset(&me->sc_wrwindow, 0xcc, sizeof(me->sc_wrwindow));
 
 	/* Remember current mode. */
 	memcpy(&me->sc_mode, mode, sizeof(struct vesa_modeinfo));
@@ -438,12 +450,9 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB)) {
 		uint8_t rdwindow, wrwindow;
 
-		/* The granularity is important for loading page numbers.
-		 * >> The page number expected by the BIOS is `INDEX_AS_NTH_64K_PAGE * 64 / GRANULARITY' */
-		if (me->vc_mode.vmi_win_granularity == 0)
-			me->vc_mode.vmi_win_granularity = 64; /* `0' wouldn't make sense, so guess... */
-		if (me->vc_mode.vmi_win_granularity > 64)
-			me->vc_mode.vmi_win_granularity = 64; /* Greater than 64 would means unaddressable memory */
+		/* The granularity is important for loading video memory windows.
+		 * >> The window number expected by the BIOS is `INDEX_AS_NTH_64K_PAGE * 64 / GRANULARITY' */
+		me->vc_wingranshift = CTZ(me->vc_mode.vmi_win_granularity);
 
 		/* Figure out the window numbers for the read/write windows. */
 		rdwindow = wrwindow = 0;
@@ -456,30 +465,30 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 				wrwindow = 1;
 		}
 
-		/* Select most efficient set-window operators. */
+		/* Select most efficient set-window-index operators. */
 		if (rdwindow == 0 && wrwindow == 0) {
-			me->sc_ops.sco_setpage   = &vesa_v_setwindow_both_0;
-			me->sc_ops.sco_setrdpage = &vesa_v_setwindow_both_0;
-			me->sc_ops.sco_setwrpage = &vesa_v_setwindow_both_0;
+			me->sc_ops.sco_setwindow   = &vesa_v_setwindow_both_0;
+			me->sc_ops.sco_setrdwindow = &vesa_v_setwindow_both_0;
+			me->sc_ops.sco_setwrwindow = &vesa_v_setwindow_both_0;
 		} else if (rdwindow == 1 && wrwindow == 1) {
-			me->sc_ops.sco_setpage   = &vesa_v_setwindow_both_1;
-			me->sc_ops.sco_setrdpage = &vesa_v_setwindow_both_1;
-			me->sc_ops.sco_setwrpage = &vesa_v_setwindow_both_1;
+			me->sc_ops.sco_setwindow   = &vesa_v_setwindow_both_1;
+			me->sc_ops.sco_setrdwindow = &vesa_v_setwindow_both_1;
+			me->sc_ops.sco_setwrwindow = &vesa_v_setwindow_both_1;
 		} else if (rdwindow == 0 /*&& wrwindow == 1*/) {
-			me->sc_ops.sco_setpage   = &vesa_v_setwindow_both_01;
-			me->sc_ops.sco_setrdpage = &vesa_v_setwindow_rd_0;
-			me->sc_ops.sco_setwrpage = &vesa_v_setwindow_wr_1;
+			me->sc_ops.sco_setwindow   = &vesa_v_setwindow_both_01;
+			me->sc_ops.sco_setrdwindow = &vesa_v_setwindow_rd_0;
+			me->sc_ops.sco_setwrwindow = &vesa_v_setwindow_wr_1;
 		} else /*if (rdwindow == 1 && wrwindow == 0)*/ {
-			me->sc_ops.sco_setpage   = &vesa_v_setwindow_both_01;
-			me->sc_ops.sco_setrdpage = &vesa_v_setwindow_rd_1;
-			me->sc_ops.sco_setwrpage = &vesa_v_setwindow_wr_0;
+			me->sc_ops.sco_setwindow   = &vesa_v_setwindow_both_01;
+			me->sc_ops.sco_setrdwindow = &vesa_v_setwindow_rd_1;
+			me->sc_ops.sco_setwrwindow = &vesa_v_setwindow_wr_0;
 		}
 
 		/* Load currently selected window numbers. */
-		me->sc_rdpageno = vesa_getwindow(self, rdwindow);
-		me->sc_wrpageno = me->sc_rdpageno;
+		me->sc_rdwindow = vesa_getwindow(self, rdwindow);
+		me->sc_wrwindow = me->sc_rdwindow;
 		if (wrwindow != rdwindow)
-			me->sc_wrpageno = vesa_getwindow(self, wrwindow);
+			me->sc_wrwindow = vesa_getwindow(self, wrwindow);
 	}
 }
 
@@ -595,8 +604,8 @@ vesa_probe(struct svga_chipset *__restrict self) {
 		me->vc_modelist = (uint16_t const *)vesa_farptr(me, bi->vbi_vidmodelist_seg, bi->vbi_vidmodelist_off);
 
 		/* Initialize current-mode-related fields to indicate that no mode is selected. */
-		DBG_memset(&me->sc_rdpageno, 0xcc, sizeof(me->sc_rdpageno));
-		DBG_memset(&me->sc_wrpageno, 0xcc, sizeof(me->sc_wrpageno));
+		DBG_memset(&me->sc_rdwindow, 0xcc, sizeof(me->sc_rdwindow));
+		DBG_memset(&me->sc_wrwindow, 0xcc, sizeof(me->sc_wrwindow));
 		DBG_memset(&me->sc_displaystart, 0xcc, sizeof(me->sc_displaystart));
 		DBG_memset(&me->sc_logicalwidth, 0xcc, sizeof(me->sc_logicalwidth));
 		DBG_memset(&me->sc_mode, 0xcc, sizeof(me->sc_mode));

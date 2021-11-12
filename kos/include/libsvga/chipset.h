@@ -57,8 +57,6 @@ __DECL_BEGIN
 
 struct svga_modeinfo {
 	__physaddr_t smi_lfb;                /* [valid_if(SVGA_MODEINFO_F_LFB)] Linear frame buffer base address (if available) */
-	__size_t     smi_vpagesiz;           /* [valid_if(!SVGA_MODEINFO_F_LFB)] Video page size (<= 16K) */
-	__size_t     smi_vpagecnt;           /* [valid_if(!SVGA_MODEINFO_F_LFB)][== CEILDIV(sc_vmemsize, smi_vpagesiz)] # of video pages */
 	__uint32_t   smi_flags;              /* Mode flags (set of `SVGA_MODEINFO_F_*') */
 	__uint32_t   smi_scanline;           /* [!0] Scanline size (in bytes; aligned by `smi_logicalwidth_align')
 	                                      *      Usually is `>= CEIL_ALIGN(smi_resy, smi_logicalwidth_align)' */
@@ -144,23 +142,23 @@ struct svga_chipset_ops {
 	 * `sco_setmode()'. */
 
 	/* [1..1][lock(WRITE(sc_lock))]
-	 * - Set the current display page to the `pageno'th 64K chunk
+	 * - Set the current display window to the `window'th 64K chunk
 	 * - This function makes it so that the 64K physical memory at A0000-AFFFF
-	 *   will be mapped to video card memory `VIDEO_MEMORY + pageno * 0x10000'
-	 * - This operator will set `self->sc_rdpageno = self->sc_wrpageno = pageno'
+	 *   will be mapped to video card memory `VIDEO_MEMORY + window * 0x10000'
+	 * - This operator will set `self->sc_rdwindow = self->sc_wrwindow = window'
 	 * - These functions may only be used if no LFB (linear frame buffer) is
 	 *   available. If such a buffer is available, you must mmap() `smi_lfb'
 	 *   and just directly modify its backing memory!
 	 * @assume(WAS_CALLED(sco_setmode));
-	 * @assume(pageno < self->sc_mode.smi_vpagecnt);
+	 * @assume(window < CEILDIV(self->sc_vmemsize, 64 * 1024));
 	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_LFB)); */
-	void (LIBSVGA_CC *sco_setpage)(struct svga_chipset *__restrict self, __size_t pageno)
+	void (LIBSVGA_CC *sco_setwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
-	/* [1..1][lock(WRITE(sc_lock))] Same as `sco_setpage', but *may* only update `sc_rdpageno' */
-	void (LIBSVGA_CC *sco_setrdpage)(struct svga_chipset *__restrict self, __size_t pageno)
+	/* [1..1][lock(WRITE(sc_lock))] Same as `sco_setwindow', but *may* only update `sc_rdwindow' */
+	void (LIBSVGA_CC *sco_setrdwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
-	/* [1..1][lock(WRITE(sc_lock))] Same as `sco_setpage', but *may* only update `sc_wrpageno' */
-	void (LIBSVGA_CC *sco_setwrpage)(struct svga_chipset *__restrict self, __size_t pageno)
+	/* [1..1][lock(WRITE(sc_lock))] Same as `sco_setwindow', but *may* only update `sc_wrwindow' */
+	void (LIBSVGA_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 
 	/* [1..1][lock(WRITE(sc_lock))]
@@ -193,10 +191,10 @@ struct svga_chipset {
 	struct svga_chipset_ops sc_ops;              /* [const] Chipset operators. */
 	struct shared_rwlock    sc_lock;             /* Lock for this chipset. */
 	__size_t                sc_vmemsize;         /* [const] Video memory size (in bytes; usually a multiple of 64K). */
-	__size_t                sc_rdpageno;         /* [lock(sc_lock)][< sc_mode.smi_vpagecnt][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Current display page for reads. */
-	__size_t                sc_wrpageno;         /* [lock(sc_lock)][< sc_mode.smi_vpagecnt][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Current display page for writes. */
+	__size_t                sc_rdwindow;         /* [lock(sc_lock)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                              * Current display window for reads. */
+	__size_t                sc_wrwindow;         /* [lock(sc_lock)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                              * Current display window for writes. */
 	__size_t                sc_displaystart;     /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
 	                                              * Current display start (pixels from  `sc_mode.smi_vmembase'
 	                                              * to the beginning of the screen; usually top-left corner) */

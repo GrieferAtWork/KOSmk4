@@ -28,7 +28,6 @@
 #include <hw/video/vgamodes.h> /* VGAMODE_INIT_EGA_TEXT */
 #include <kos/types.h>
 
-#include <assert.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -88,7 +87,8 @@ INTERN void CC basevga_init(void) {
 PRIVATE struct vga_mode ega_registers = VGAMODE_INIT_EGA_TEXT;
 
 /* Get/Set standard VGA registers.
- * NOTE: Must be called while holding a lock to the true VGA Chipset driver. */
+ * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
+ * NOTE: Setting the basevga register state leaves the screen turned off! */
 INTERN NONNULL((1)) void CC
 basevga_getregs(struct vga_mode *__restrict regs) {
 	unsigned int i;
@@ -178,7 +178,7 @@ basevga_setregs(struct vga_mode const *__restrict regs) {
 	vga_wseq(VGA_SEQ_RESET, 3);
 
 	/* CRT... */
-	if (!(basevga_flags & BASEVGA_FLAG_ISEGA)) 	/* Unlock CRT registers. */
+	if (!(basevga_flags & BASEVGA_FLAG_ISEGA)) /* Unlock CRT registers. */
 		vga_wcrt(VGA_CRTC_V_SYNC_END, vga_rcrt(VGA_CRTC_V_SYNC_END) & ~VGA_CR11_FLOCK_CR0_CR7);
 	vga_wcrt(VGA_CRTC_H_TOTAL, regs->vm_crt_h_total);
 	vga_wcrt(VGA_CRTC_H_DISP, regs->vm_crt_h_disp);
@@ -243,7 +243,7 @@ basevga_setregs(struct vga_mode const *__restrict regs) {
 
 
 /* Special case: EGA doesn't allow (normal) register reads. As such,
- * we must fix-up `regs' and apply them via `basevga_setregs()'! */
+ * we must  fix-up `regs'  and apply  them via  `basevga_setregs()'! */
 PRIVATE ATTR_NOINLINE NONNULL((1)) void CC
 ega_setmode(struct vga_mode const *__restrict regs) {
 	unsigned int i;
@@ -285,14 +285,15 @@ ega_setmode(struct vga_mode const *__restrict regs) {
 }
 
 /* Same as `basevga_setregs()', but preserve the state of reserved bits.
- * NOTE: Must be called while holding a lock to the true VGA Chipset driver. */
+ * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
+ * NOTE: This function leaves the screen turned off! */
 INTERN NONNULL((1)) void CC
 basevga_setmode(struct vga_mode const *__restrict regs) {
 	unsigned int i;
 
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
 		/* Special case: EGA doesn't allow (normal) register reads. As such,
-		 * we must fix-up `regs' and apply them via `basevga_setregs()'! */
+		 * we must  fix-up `regs'  and apply  them via  `basevga_setregs()'! */
 		ega_setmode(regs);
 		return;
 	}
@@ -309,7 +310,7 @@ basevga_setmode(struct vga_mode const *__restrict regs) {
 	vga_wseq(VGA_SEQ_RESET, 3);
 
 	/* CRT... */
-	if (!(basevga_flags & BASEVGA_FLAG_ISEGA)) 	/* Unlock CRT registers. */
+	if (!(basevga_flags & BASEVGA_FLAG_ISEGA)) /* Unlock CRT registers. */
 		vga_wcrt(VGA_CRTC_V_SYNC_END, vga_rcrt(VGA_CRTC_V_SYNC_END) & ~VGA_CR11_FLOCK_CR0_CR7);
 	vga_wcrt(VGA_CRTC_H_TOTAL, regs->vm_crt_h_total);
 	vga_wcrt(VGA_CRTC_H_DISP, regs->vm_crt_h_disp);
@@ -328,7 +329,6 @@ basevga_setmode(struct vga_mode const *__restrict regs) {
 	vga_wcrt(VGA_CRTC_CURSOR_HI, regs->vm_crt_cursor_hi);
 	vga_wcrt(VGA_CRTC_CURSOR_LO, regs->vm_crt_cursor_lo);
 	vga_wcrt(VGA_CRTC_V_SYNC_START, regs->vm_crt_v_sync_start);
-	assert(!(regs->vm_crt_v_sync_end & VGA_CR11_FLOCK_CR0_CR7));
 	vga_wcrt_res(VGA_CRTC_V_SYNC_END, regs->vm_crt_v_sync_end, VGA_CR11_FRESERVED);
 	vga_wcrt(VGA_CRTC_V_DISP_END, regs->vm_crt_v_disp_end);
 	vga_wcrt(VGA_CRTC_OFFSET, regs->vm_crt_offset);

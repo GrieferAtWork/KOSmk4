@@ -35,11 +35,6 @@
 
 DECL_BEGIN
 
-/* VGA defines a total of 64K video memory, across 4 planes
- * which  can   be  individually   mapped  at   A0000-BFFFF */
-#define CS_VGA_VPAGESIZ (16 * 1024)
-#define CS_VGA_VPAGECNT 4
-
 /* List of supported VGA modes. */
 INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_TEXT] = {
@@ -60,8 +55,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_320X200X16] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
 				.smi_scanline       = 40,
 				.smi_resx           = 320,
@@ -77,8 +70,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_640X200X16] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
 				.smi_scanline       = 80,
 				.smi_resx           = 640,
@@ -94,8 +85,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_640X350X16] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
 				.smi_scanline       = 80,
 				.smi_resx           = 640,
@@ -111,8 +100,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_640X480X16] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
 				.smi_scanline       = 80,
 				.smi_resx           = 640,
@@ -128,8 +115,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_640X480X2] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_BW | SVGA_MODEINFO_F_PAL,
 				.smi_scanline       = 80,
 				.smi_resx           = 640,
@@ -147,8 +132,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_320X200X256] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_PAL,
 				.smi_scanline       = 320,
 				.smi_resx           = 320,
@@ -164,8 +147,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_320X240X256] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
 				.smi_scanline       = 80,
 				.smi_resx           = 320,
@@ -181,8 +162,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_320X400X256] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
 				.smi_scanline       = 80,
 				.smi_resx           = 320,
@@ -198,8 +177,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_360X480X256] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
 				.smi_scanline       = 90,
 				.smi_resx           = 360,
@@ -215,8 +192,6 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_720X348X2] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_vpagesiz       = CS_VGA_VPAGESIZ,
-				.smi_vpagecnt       = CS_VGA_VPAGECNT,
 				.smi_flags          = SVGA_MODEINFO_F_BW/* | SVGA_MODEINFO_F_PAL*/, /* XXX: Should this have PAL set? */
 				.smi_scanline       = 90,
 				.smi_resx           = 720,

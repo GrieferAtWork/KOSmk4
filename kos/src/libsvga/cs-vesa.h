@@ -45,6 +45,7 @@ struct vesa_chipset: svga_chipset {
 	uint16_t               vc_regsavebits; /* [const] Set of registers to save/load in AX=4F04h (default to 0x0E;
 	                                        * all except controller registers which  are standard across VGA  and
 	                                        * normally saved by the caller) */
+	shift_t                vc_wingranshift;/* [lock(sc_lock)] ilog2 of current mode window granularity */
 };
 
 /* BIOS Buffer offsets (info `vc_emu.b86e_bios.b86_biosbase') */

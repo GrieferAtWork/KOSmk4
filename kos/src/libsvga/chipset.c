@@ -138,11 +138,8 @@ INTERN void libsvga_init(void) {
 
 		printk(KERN_INFO "[svga] Supported: %-12s {flags:%s",
 		       modenamebuf, flagsbuf + 1);
-		if (mode->smi_flags & SVGA_MODEINFO_F_LFB) {
+		if (mode->smi_flags & SVGA_MODEINFO_F_LFB)
 			printk(KERN_INFO ",lfb:%#" PRIx64, (uint64_t)mode->smi_lfb);
-		} else {
-			printk(KERN_INFO ",vpage:%#" PRIxSIZ, mode->smi_vpagesiz);
-		}
 		printk(KERN_INFO ",scan:%" PRIu32, mode->smi_scanline);
 		if (!(mode->smi_flags & SVGA_MODEINFO_F_TXT))
 			printk(KERN_INFO ",col:%" PRIu8, mode->smi_colorbits);
