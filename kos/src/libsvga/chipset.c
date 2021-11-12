@@ -131,6 +131,8 @@ INTERN void libsvga_init(void) {
 			ptr = stpcpy(ptr, "|bw");
 		if (mode->smi_flags & SVGA_MODEINFO_F_TXT)
 			ptr = stpcpy(ptr, "|txt");
+		if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR)
+			ptr = stpcpy(ptr, "|planar");
 		sprintf(modenamebuf, "%" PRIu32 "x%" PRIu32 "x%" PRIu8,
 		        mode->smi_resx, mode->smi_resy, mode->smi_bits_per_pixel);
 

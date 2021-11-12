@@ -288,12 +288,12 @@ struct __ATTR_PACKED vga_font {
 };
 
 struct __ATTR_PACKED vga_mode {
+	__uint8_t vm_att_pal[16];       /* VGA_ATC_PALETTEn. */
 	__uint8_t vm_att_mode;          /* VGA_ATC_MODE. */
 	__uint8_t vm_att_overscan;      /* VGA_ATC_OVERSCAN. */
 	__uint8_t vm_att_plane_enable;  /* VGA_ATC_PLANE_ENABLE. */
 	__uint8_t vm_att_pel;           /* VGA_ATC_PEL. */
 	__uint8_t vm_att_color_page;    /* VGA_ATC_COLOR_PAGE. */
-	__uint8_t vm_att_pal[16];       /* VGA_ATC_PALETTEn. */
 
 	__uint8_t vm_mis;               /* VGA_MIS_R / VGA_MIS_W. */
 
@@ -338,6 +338,10 @@ struct __ATTR_PACKED vga_mode {
 	__uint8_t vm_seq_character_map; /* VGA_SEQ_CHARACTER_MAP. */
 	__uint8_t vm_seq_memory_mode;   /* VGA_SEQ_MEMORY_MODE. */
 };
+
+/* TODO: All of these static initializers will be removed once libsvga is ready
+ *       All VGA mode initializers are stored in /include/hw/video/vgamodes.h */
+
 
 /* CGA color palette indices for VGA color codes (for `vm_att_pal'). */
 #define VGA_PALINDX_CGA_INIT                          \
@@ -419,12 +423,12 @@ struct __ATTR_PACKED vga_mode {
 		 * (And wiki.osdev's VGA TTY page neglects to mention the seizure-           \
 		 *  inducing blinkyness that happens on real hardware and emulators          \
 		 *  ~supporting~ the VgA sTaNdArT's GrEaT iDeA oF iNcLuDiNg ThIs FeAtUrE) */ \
+		.vm_att_pal           = __VA_ARGS__,                                         \
 		.vm_att_mode          = VGA_AT10_FDUP9 & ~(VGA_AT10_FBLINK),                 \
 		.vm_att_overscan      = 0x00,                                                \
 		.vm_att_plane_enable  = 0x0f & VGA_AT12_FMASK,                               \
 		.vm_att_pel           = 0x08 & VGA_AT13_FMASK,                               \
 		.vm_att_color_page    = 0x00,                                                \
-		.vm_att_pal           = __VA_ARGS__,                                         \
 		.vm_mis               = VGA_MIS_FCOLOR | VGA_MIS_FENB_MEM_ACCESS |           \
 		                        VGA_MIS_FCLOCK_28322_720 | VGA_MIS_FHSYNCPOL |       \
 		                        VGA_MIS_FSEL_HIGH_PAGE,                              \

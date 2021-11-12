@@ -36,7 +36,9 @@
 
 #include <libbios86/bios.h>
 
+#include "basevga.h"
 #include "cs-vesa.h"
+
 
 DECL_BEGIN
 
@@ -618,6 +620,9 @@ vesa_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_regsize = vesa_getregsbufsize(me);
 		me->sc_ops.sco_getregs = &vesa_v_getregs;
 		me->sc_ops.sco_setregs = &vesa_v_setregs;
+
+		/* Lastly, initialize the base-VGA system. */
+		basevga_init();
 	} EXCEPT {
 		bios86_emulator_fini(&me->vc_emu);
 		RETHROW();

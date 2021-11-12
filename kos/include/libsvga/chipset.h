@@ -34,19 +34,30 @@ __DECL_BEGIN
 #endif /* !__shift_t */
 
 /* Flags for `struct svga_modeinfo::smi_flags' */
-#define SVGA_MODEINFO_F_LFB 0x0001 /* Linear frame buffer is available. */
-#define SVGA_MODEINFO_F_PAL 0x0002 /* Palette-driven video mode. (Get/set palette colors `VGA_PEL_MSK' / `VGA_PEL_IW' / `VGA_PEL_D') */
-#define SVGA_MODEINFO_F_BW  0x0004 /* Black-and-white video mode (`smi_colors' is # of possible gray-scale values) */
-#define SVGA_MODEINFO_F_TXT 0x0008 /* Text video mode. When set, you may also assume that `SVGA_MODEINFO_F_LFB' and
-                                    * `SVGA_MODEINFO_F_PAL' are also set.
-                                    * With this, `smi_lfb' points at a `smi_scanline * smi_resy'-large buffer,  where
-                                    * each character cell is a 16-bit word,  with upper 8 bits selecting fg/bg  color
-                                    * palette indices (alongside the "blink" bit based on `VGA_AT10_FBLINK'), and the
-                                    * low 8 bits select the character index from the currently loaded font. */
+#define SVGA_MODEINFO_F_LFB    0x0001 /* Linear frame buffer is available. */
+#define SVGA_MODEINFO_F_PAL    0x0002 /* Palette-driven video mode. (Get/set palette colors `VGA_PEL_MSK' / `VGA_PEL_IW' / `VGA_PEL_D') */
+#define SVGA_MODEINFO_F_BW     0x0004 /* Black-and-white video mode (`smi_colors' is # of possible gray-scale values) */
+#define SVGA_MODEINFO_F_TXT    0x0008 /* Text video mode. When set, you may also assume that `SVGA_MODEINFO_F_LFB' and
+                                       * `SVGA_MODEINFO_F_PAL' are also set.
+                                       * With this, `smi_lfb' points at a `smi_scanline * smi_resy'-large buffer,  where
+                                       * each character cell is a 16-bit word,  with upper 8 bits selecting fg/bg  color
+                                       * palette indices (alongside the "blink" bit based on `VGA_AT10_FBLINK'), and the
+                                       * low 8 bits select the character index from the currently loaded font. */
+#define SVGA_MODEINFO_F_PLANAR 0x0010 /* Planar video mode. In this case, `smi_bits_per_pixel < smi_colorbits', such  that
+                                       * each plane defines `smi_bits_per_pixel' bits of a whole, totaling `smi_colorbits'
+                                       * bits across `smi_colorbits / smi_bits_per_pixel' planes. Also note that this flag
+                                       * implies `SVGA_MODEINFO_F_PAL'.
+                                       *
+                                       * There are 2 possible configurations for this:
+                                       *  - smi_bits_per_pixel == 1 && smi_colorbits == 4:
+                                       *    This is a 16-color mode, with each plane holding exactly 1 bit of the final palette index
+                                       *  - smi_bits_per_pixel == 2 && smi_colorbits == 8:
+                                       *    This is a 256-color mode, with each plane holding exactly 2 bits of the final palette index */
+
 
 struct svga_modeinfo {
 	__physaddr_t smi_lfb;                /* [valid_if(SVGA_MODEINFO_F_LFB)] Linear frame buffer base address (if available) */
-	__size_t     smi_vpagesiz;           /* [valid_if(!SVGA_MODEINFO_F_LFB)] Video page size (<= 64K) */
+	__size_t     smi_vpagesiz;           /* [valid_if(!SVGA_MODEINFO_F_LFB)] Video page size (<= 16K) */
 	__size_t     smi_vpagecnt;           /* [valid_if(!SVGA_MODEINFO_F_LFB)][== CEILDIV(sc_vmemsize, smi_vpagesiz)] # of video pages */
 	__uint32_t   smi_flags;              /* Mode flags (set of `SVGA_MODEINFO_F_*') */
 	__uint32_t   smi_scanline;           /* [!0] Scanline size (in bytes; aligned by `smi_logicalwidth_align')
@@ -55,8 +66,8 @@ struct svga_modeinfo {
 	__uint16_t   smi_resy;               /* [!0] Resolution in Y (when `SVGA_MODEINFO_F_TXT': # of character cells in Y) */
 	__shift_t    smi_bits_per_pixel;     /* [!0] Bits per pixel (when `SVGA_MODEINFO_F_TXT': 16) */
 	__shift_t    smi_colorbits;          /* [!0][valid_if(!SVGA_MODEINFO_F_TXT)]
-	                                      * # of bits per pixel that encode color (usually <= smi_bits_per_pixel)
-	                                      * Should   be   used   as    `NUM_PALETTE_COLORS = 1 << smi_colorbits'. */
+	                                      * # of bits per pixel that encode color (usually <= smi_bits_per_pixel, unless in
+	                                      * `SVGA_MODEINFO_F_PLANAR').  Use  as  `NUM_PALETTE_COLORS = 1 << smi_colorbits'. */
 	__shift_t    smi_rshift, smi_rbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Red color shift/bits */
 	__shift_t    smi_gshift, smi_gbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Green color shift/bits */
 	__shift_t    smi_bshift, smi_bbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Blue color shift/bits */
