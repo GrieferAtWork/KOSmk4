@@ -34,8 +34,17 @@
 #define NOBLOCK __NOBLOCK
 #endif /* !NOBLOCK */
 
+#ifndef THROWS
+#define THROWS __THROWS
+#endif /* !THROWS */
+
 #ifndef NOTHROW_KERNEL
 #define NOTHROW_KERNEL __NOTHROW_KERNEL
 #endif /* !NOTHROW_KERNEL */
+
+
+/* Configure supported chipsets. */
+#define CONFIG_SVGA_HAVE_CHIPSET_VESA
+
 
 #endif /* !GUARD_LIBSVGA_API_H */

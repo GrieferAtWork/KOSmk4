@@ -393,8 +393,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Do some testing  with VESA,  but only  on qemu,  just so  we
 	 * don't actually try to do something wonky on real hardware ;) */
 	if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
-		extern void vesa_init(void);
-		vesa_init();
+		extern void libsvga_init(void);
+		libsvga_init();
 	}
 #endif
 
@@ -982,6 +982,29 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * normal 80x25 text mode. */
 
 	/* TODO: Remove the old kernel <sched/shared_[rw]lock.h> headers */
+
+	/* TODO: We can emulate banked video memory as linear by using a
+	 *       custom mfile that maps overrides a new operator that's
+	 *       yet to be added but will behave similar to what is
+	 *       currently being done for physical identity on x86_64,
+	 *       in that it allows for custom behavior routing of phys
+	 *       addresses.
+	 * Combined with a modified version of `mfile_parts_denywrite_or_unlock'
+	 * that not only denies write but also reads, it becomes possible to
+	 * do lazy bank switching as linear memory of different banks gets
+	 * accessed!
+	 *
+	 * For this purpose, we need 3 operators:
+	 *  - BEFORE_FAULT_OR_UNLOCK: Called at the start of `mfault_or_unlock'
+	 *                            while already holding a lock to the mpart
+	 *                            This operator is allowed to release locks
+	 *                            to indicate a restart request
+	 *  - AFTER_FAULT_ABORT:      NOBLOCK+NOTHROW; called after BEFORE_FAULT_OR_UNLOCK
+	 *                            already succeeded, but some later set failed and the
+	 *                            fault is either aborted or restarted.
+	 *  - AFTER_FAULT_COMMIT:     NOBLOCK+NOTHROW; called after pagedir_mmap() of the
+	 *                            faulted area.
+	 */
 
 	return state;
 }

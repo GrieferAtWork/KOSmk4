@@ -17,28 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_KERNEL_PRINTK_H
-#define _KOS_KERNEL_PRINTK_H 1
+#ifndef GUARD_LIBSVGA_CHIPSET_H
+#define GUARD_LIBSVGA_CHIPSET_H 1
 
-#include <__stdinc.h>
+#include "api.h"
+/**/
 
-#ifdef __KERNEL__
-#include <kernel/printk.h>
-#else /* __KERNEL__ */
-#include <sys/syslog.h>
+#include <libsvga/chipset.h>
 
-#define KERN_EMERG   LOG_EMERG,
-#define KERN_ALERT   LOG_ALERT,
-#define KERN_CRIT    LOG_CRIT,
-#define KERN_ERR     LOG_ERR,
-#define KERN_WARNING LOG_WARNING,
-#define KERN_NOTICE  LOG_NOTICE,
-#define KERN_INFO    LOG_INFO,
-#define KERN_TRACE   LOG_DEBUG,
-#define KERN_DEBUG   LOG_DEBUG,
-#define KERN_DEFAULT LOG_DEBUG,
-#define KERN_RAW     LOG_DEBUG,
-#define printk       syslog
-#endif /* !__KERNEL__ */
+DECL_BEGIN
 
-#endif /* !_KOS_KERNEL_PRINTK_H */
+/* Return the list of supported VGA chipset drivers (terminated by a bzero'd entry)
+ * This list is sorted from most specific- to most generic driver. As such, some of
+ * the later drivers might also  be usable even when one  of the former ones  could
+ * also be used.
+ *
+ * As such, when probing for devices you should simply iterate this list until you
+ * find a driver  for which probing  succeeds. Once that  happens, simply keep  on
+ * using that driver. */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct svga_chipset_driver const *
+NOTHROW(CC libsvga_chipset_getdrivers)(void);
+
+DECL_END
+
+#endif /* !GUARD_LIBSVGA_CHIPSET_H */

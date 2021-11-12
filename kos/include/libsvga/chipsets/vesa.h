@@ -78,7 +78,7 @@ struct __ATTR_PACKED vbe_biosinfo {
 #define VBE_MEMMODEL_CGA      0x01 /* CGA graphics */
 #define VBE_MEMMODEL_HERCULES 0x02 /* Hercules graphics */
 #define VBE_MEMMODEL_PLANAR   0x03 /* Planar */
-#define VBE_MEMMODEL_Packed   0x04 /* Packed pixel */
+#define VBE_MEMMODEL_PACKED   0x04 /* Packed pixel */
 #define VBE_MEMMODEL_NC4_256  0x05 /* Non-chain 4, 256 color */
 #define VBE_MEMMODEL_DCOLOR   0x06 /* Direct color */
 #define VBE_MEMMODEL_YUV      0x07 /* YUV */
@@ -122,6 +122,7 @@ struct __ATTR_PACKED vbe_modeinfo {
 	__uint32_t vmi_lfbaddr;           /* [valid_if(VBE_MODEINFO_ATTR_LFB)] Physical address of LFB buffer. */
 	__uint32_t vmi_offscrn_offs;      /* Start of off-screen video memory (TODO: Is this an offset, or a physical address?) */
 	__uint16_t vmi_offscrn_size;      /* Size of off-screen video memory */
+	/* NOTE: Everything from here on is only available when `vbi_version >= 0x0300' */
 	__uint16_t vmi_lfbscanline;       /* [valid_if(VBE_MODEINFO_ATTR_LFB)] Scanline size for LFB (in bytes) */
 	__uint8_t  vmi_bnknumimgpages;    /* ??? */
 	__uint8_t  vmi_linnumimgpages;    /* [valid_if(VBE_MODEINFO_ATTR_LFB)] ??? */
