@@ -146,18 +146,52 @@ next:
 		goto next;
 
 	/* Check what kind of memory mode this is (and if we support it) */
-	result->smi_flags = 0;
 	switch (info->vmi_memmodel) {
+
+	case VBE_MEMMODEL_TEXT:
+		/* Text mode implies a certain configuration.
+		 * Verify  that all of  our criteria are met. */
+		result->smi_flags    = (SVGA_MODEINFO_F_TXT | SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_LFB);
+		result->smi_resx     = info->vmi_resx;
+		result->smi_resy     = info->vmi_resy;
+		result->smi_scanline = info->vmi_scanline;
+		if (result->smi_scanline == 0)
+			result->smi_scanline = result->smi_resx * 2;
+		if (result->smi_scanline < result->smi_resx * 2)
+			goto next; /* This would mean overlap... */
+		result->smi_bits_per_pixel = 16;
+		if (info->vmi_attrib & VBE_MODEINFO_ATTR_LFB) {
+			result->smi_lfb = info->vmi_lfbaddr;
+		} else {
+			size_t textmem_size;
+			/* We don't support banking in text-mode. As such, the
+			 * entire  text-page  must fit  into a  single window. */
+			textmem_size = result->smi_scanline * result->smi_resy;
+			if unlikely(textmem_size > 0x10000)
+				goto next; /* Too large :( */
+			if ((info->vmi_wina_attr & (VBE_WINATTR_MAYREAD | VBE_WINATTR_MAYWRITE)) ==
+			    /*                  */ (VBE_WINATTR_MAYREAD | VBE_WINATTR_MAYWRITE)) {
+				result->smi_lfb = info->vmi_wina_segment << 4;
+			} else if ((info->vmi_winb_attr & (VBE_WINATTR_MAYREAD | VBE_WINATTR_MAYWRITE)) ==
+			           /*                  */ (VBE_WINATTR_MAYREAD | VBE_WINATTR_MAYWRITE)) {
+				result->smi_lfb = info->vmi_winb_segment << 4;
+			} else {
+				/* Unsupported memory mode. */
+				goto next;
+			}
+		}
+		goto got_result;
 
 	case VBE_MEMMODEL_NC4_256:
 		/* This is a palette-driven mode. */
-		result->smi_flags |= SVGA_MODEINFO_F_PAL;
+		result->smi_flags = SVGA_MODEINFO_F_PAL;
 		break;
 
 	case VBE_MEMMODEL_PACKED:
 	case VBE_MEMMODEL_DCOLOR:
 		/* I don't really know the difference between PACKED and
 		 * DIRECT-COLOR, as they appear  to just be the  same... */
+		result->smi_flags = 0;
 		break;
 
 	default:
@@ -165,11 +199,10 @@ next:
 	}
 
 	/* Fill in `*result' */
-	result->smi_resx               = info->vmi_resx;
-	result->smi_resy               = info->vmi_resy;
-	result->smi_bits_per_pixel     = info->vmi_bpp;
-	result->smi_colorbits          = info->vmi_bpp;
-	result->smi_logicalwidth_align = 1;            /* ??? */
+	result->smi_resx           = info->vmi_resx;
+	result->smi_resy           = info->vmi_resy;
+	result->smi_bits_per_pixel = info->vmi_bpp;
+	result->smi_colorbits      = info->vmi_bpp;
 	if (info->vmi_attrib & VBE_MODEINFO_ATTR_LFB) {
 		result->smi_lfb = info->vmi_lfbaddr;
 		result->smi_flags |= SVGA_MODEINFO_F_LFB;
@@ -220,6 +253,10 @@ next:
 		result->smi_scanline = CEILDIV(result->smi_resx * result->smi_bits_per_pixel, 8);
 	if (!(info->vmi_attrib & VBE_MODEINFO_ATTR_COLOR))
 		result->smi_flags |= SVGA_MODEINFO_F_BW;
+	if unlikely(result->smi_colorbits == 0)
+		goto next;
+
+got_result:
 	memcpy(&result->vm_vesa, info, sizeof(struct vbe_modeinfo));
 	result->vm_modeid = modeid;
 
@@ -229,8 +266,6 @@ next:
 	if unlikely(result->smi_resy == 0)
 		goto next;
 	if unlikely(result->smi_bits_per_pixel == 0)
-		goto next;
-	if unlikely(result->smi_colorbits == 0)
 		goto next;
 	if unlikely(result->smi_scanline == 0)
 		goto next;
@@ -565,6 +600,7 @@ vesa_probe(struct svga_chipset *__restrict self) {
 		DBG_memset(&me->sc_mode, 0xcc, sizeof(me->sc_mode));
 		DBG_memset(&me->vc_mode, 0xcc, sizeof(me->vc_mode));
 		me->sc_mode.smi_bits_per_pixel = 0; /* Uninitialized */
+		me->sc_logicalwidth_align      = 1; /* ??? */
 		shared_rwlock_init(&me->sc_lock);
 		me->sc_vmemsize = bi->vbi_vmemsize * 64 * 1024;
 

@@ -37,7 +37,12 @@ __DECL_BEGIN
 #define SVGA_MODEINFO_F_LFB 0x0001 /* Linear frame buffer is available. */
 #define SVGA_MODEINFO_F_PAL 0x0002 /* Palette-driven video mode. (Get/set palette colors `VGA_PEL_MSK' / `VGA_PEL_IW' / `VGA_PEL_D') */
 #define SVGA_MODEINFO_F_BW  0x0004 /* Black-and-white video mode (`smi_colors' is # of possible gray-scale values) */
-#define SVGA_MODEINFO_F_TXT 0x0008 /*  */
+#define SVGA_MODEINFO_F_TXT 0x0008 /* Text video mode. When set, you may also assume that `SVGA_MODEINFO_F_LFB' and
+                                    * `SVGA_MODEINFO_F_PAL' are also set.
+                                    * With this, `smi_lfb' points at a `smi_scanline * smi_resy'-large buffer,  where
+                                    * each character cell is a 16-bit word,  with upper 8 bits selecting fg/bg  color
+                                    * palette indices (alongside the "blink" bit based on `VGA_AT10_FBLINK'), and the
+                                    * low 8 bits select the character index from the currently loaded font. */
 
 struct svga_modeinfo {
 	__physaddr_t smi_lfb;                /* [valid_if(SVGA_MODEINFO_F_LFB)] Linear frame buffer base address (if available) */
@@ -46,12 +51,12 @@ struct svga_modeinfo {
 	__uint32_t   smi_flags;              /* Mode flags (set of `SVGA_MODEINFO_F_*') */
 	__uint32_t   smi_scanline;           /* [!0] Scanline size (in bytes; aligned by `smi_logicalwidth_align')
 	                                      *      Usually is `>= CEIL_ALIGN(smi_resy, smi_logicalwidth_align)' */
-	__uint32_t   smi_logicalwidth_align; /* Alignment requirements of `sc_logicalwidth' */
-	__uint16_t   smi_resx;               /* [!0] Resolution in X */
-	__uint16_t   smi_resy;               /* [!0] Resolution in Y */
-	__shift_t    smi_bits_per_pixel;     /* [!0] Bits per pixel */
-	__shift_t    smi_colorbits;          /* [!0] # of bits per pixel used to represent color (usually <= smi_bits_per_pixel)
-	                                      * Should be used as `NUM_PALETTE_COLORS = 1 << smi_colorbits' */
+	__uint16_t   smi_resx;               /* [!0] Resolution in X (when `SVGA_MODEINFO_F_TXT': # of character cells in X) */
+	__uint16_t   smi_resy;               /* [!0] Resolution in Y (when `SVGA_MODEINFO_F_TXT': # of character cells in Y) */
+	__shift_t    smi_bits_per_pixel;     /* [!0] Bits per pixel (when `SVGA_MODEINFO_F_TXT': 16) */
+	__shift_t    smi_colorbits;          /* [!0][valid_if(!SVGA_MODEINFO_F_TXT)]
+	                                      * # of bits per pixel that encode color (usually <= smi_bits_per_pixel)
+	                                      * Should   be   used   as    `NUM_PALETTE_COLORS = 1 << smi_colorbits'. */
 	__shift_t    smi_rshift, smi_rbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Red color shift/bits */
 	__shift_t    smi_gshift, smi_gbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Green color shift/bits */
 	__shift_t    smi_bshift, smi_bbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Blue color shift/bits */
@@ -149,8 +154,10 @@ struct svga_chipset_ops {
 
 	/* [1..1][lock(WRITE(sc_lock))]
 	 * - Set display start offset to `offset' pixels from `self->sc_mode.smi_vmembase'
+	 * - Not available in text-mode video modes.
 	 * @assume(WAS_CALLED(sco_setmode));
-	 * @assume(offset <= sc_vmemsize * 8 / smi_bits_per_pixel); */
+	 * @assume(offset <= sc_vmemsize * 8 / smi_bits_per_pixel);
+	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_TXT)); */
 	void (LIBSVGA_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
 			__THROWS(E_IOERROR);
 
@@ -162,9 +169,11 @@ struct svga_chipset_ops {
 	 *   order to get the memory location of the next line.
 	 * - The value must be aligned by `self->sc_logicalwidth_align'
 	 * - The default value is `smi_scanline'
+	 * - Not available in text-mode video modes.
 	 * @assume(WAS_CALLED(sco_setmode));
 	 * @assume(IS_ALIGNED(offset, self->sc_mode.smi_logicalwidth_align));
-	 * @assume(offset <= sc_logicalwidth_max); */
+	 * @assume(offset <= sc_logicalwidth_max);
+	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_TXT)); */
 	void (LIBSVGA_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t offset)
 			__THROWS(E_IOERROR);
 };
@@ -184,6 +193,8 @@ struct svga_chipset {
 	                                              * Current logical screen width (in bytes; updated by `sco_setlogicalwidth') */
 	__uint32_t              sc_logicalwidth_max; /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
 	                                              * Max value allowed for `sc_logicalwidth' */
+	__uint32_t              sc_logicalwidth_align; /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                              * Alignment requirements of `sc_logicalwidth' */
 	struct svga_modeinfo    sc_mode;             /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
 	                                              * Current display mode */
 	/* Chipset-specific data goes here. */

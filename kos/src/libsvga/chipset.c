@@ -129,6 +129,8 @@ INTERN void libsvga_init(void) {
 			ptr = stpcpy(ptr, "|pal");
 		if (mode->smi_flags & SVGA_MODEINFO_F_BW)
 			ptr = stpcpy(ptr, "|bw");
+		if (mode->smi_flags & SVGA_MODEINFO_F_TXT)
+			ptr = stpcpy(ptr, "|txt");
 		sprintf(modenamebuf, "%" PRIu32 "x%" PRIu32 "x%" PRIu8,
 		        mode->smi_resx, mode->smi_resy, mode->smi_bits_per_pixel);
 
@@ -139,8 +141,9 @@ INTERN void libsvga_init(void) {
 		} else {
 			printk(KERN_INFO ",vpage:%#" PRIxSIZ, mode->smi_vpagesiz);
 		}
-		printk(KERN_INFO ",scan:%" PRIu32 ",col:%" PRIu8,
-		       mode->smi_scanline, mode->smi_colorbits);
+		printk(KERN_INFO ",scan:%" PRIu32, mode->smi_scanline);
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_TXT))
+			printk(KERN_INFO ",col:%" PRIu8, mode->smi_colorbits);
 		if (!(mode->smi_flags & (SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_BW))) {
 			printk(KERN_INFO ",r:%" PRIu8 "@%" PRIu8
 			                 ",g:%" PRIu8 "@%" PRIu8
