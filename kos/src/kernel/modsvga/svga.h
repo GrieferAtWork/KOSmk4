@@ -126,11 +126,12 @@ union svga_tty_cursor {
 /* Flags for `struct svga_ttyaccess::sta_flags' */
 #define SVGA_TTYACCESS_F_NORMAL 0x0000 /* Normal flags */
 #define SVGA_TTYACCESS_F_ACTIVE 0x0001 /* [lock(sta_lock && CLEAR_ONCE)] This TTY is currently active.
-                                        * When not set, `sta_vmem' points to anonymous physical ram. */
+                                        * When not set, `sta_vmem'  points to anonymous physical  ram. */
 #define SVGA_TTYACCESS_F_EOL    0x8000 /* [lock(sta_lock)] Set while `sta_cursor.stc_cellx == 0' as
                                         * the result  of the  previously line  being wrapped.  This
                                         * flag is cleared the next time a character is printed, but
                                         * if said character is '\n', it is silently ignored. */
+#define _SVGA_TTYACCESS_F_HWCUROFF 0x4000 /* For hardware text-mode ttys: cursor is currently off. */
 
 struct svga_ttyaccess {
 	WEAK refcnt_t               sta_refcnt; /* Reference counter. */
@@ -164,6 +165,17 @@ struct svga_ttyaccess {
 	                                 uintptr_t address, char32_t ch,
 	                                 struct svga_ansitty *__restrict tty);
 
+	/* [1..1][lock(sta_lock)] Hide the hardware cursor */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (FCALL *sta_hidecursor)(struct svga_ttyaccess *__restrict self);
+
+	/* [1..1][lock(sta_lock)] Show the hardware cursor at the current cursor position.
+	 * NOTE: This operator is only called when `sta_cursor.stc_celly < sta_resy', which
+	 *       compiled with the  invariant `sta_cursor.stc_cellx < sta_resx' means  that
+	 *       the cursor is guarantied visible on-screen. */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (FCALL *sta_showcursor)(struct svga_ttyaccess *__restrict self);
+
 	/* [1..1][lock(sta_lock)] Copy cells across video memory.
 	 * NOTE: The cell addresses taken by this function do _NOT_ account for large scanlines!
 	 * @param: from_cellid/to_cellid: == CELL_X + CELL_Y * sta_resx */
@@ -178,8 +190,6 @@ struct svga_ttyaccess {
 	/*NOTHROW*/ (FCALL *sta_fillcells)(struct svga_ttyaccess *__restrict self,
 	                                   uintptr_t start, char32_t ch, size_t num_cells,
 	                                   struct svga_ansitty *__restrict tty);
-
-	/* TODO: Operators to update+show+hide the cursor position, both in-hardware and in-software */
 };
 
 INTDEF NOBLOCK NONNULL((1)) void

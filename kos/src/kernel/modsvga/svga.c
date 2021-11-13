@@ -165,7 +165,7 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 
 			/* Set the EOL flag after an implicit line-feed */
 			me->sta_flags |= SVGA_TTYACCESS_F_EOL;
-			goto after_clear_eol;
+			goto maybe_hide_cursor_after_eol;
 		}
 	}	break;
 
@@ -239,6 +239,13 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 
 			/* Set the EOL flag after an implicit line-feed */
 			me->sta_flags |= SVGA_TTYACCESS_F_EOL;
+maybe_hide_cursor_after_eol:
+			if (me->sta_cursor.stc_celly >= me->sta_resy) {
+				/* Hide the hardware cursor (if it was visible before) */
+				if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR))
+					(*me->sta_hidecursor)(me);
+				goto after_clear_eol_nocursor;
+			}
 			goto after_clear_eol;
 		}
 	}	break;
@@ -248,9 +255,9 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 	/* Clear the EOL flag. */
 	me->sta_flags &= ~SVGA_TTYACCESS_F_EOL;
 after_clear_eol:
-	if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR)) {
-		/* TODO: Update hardware cursor. */
-	}
+	if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR))
+		(*me->sta_showcursor)(me); /* Update hardware cursor. */
+after_clear_eol_nocursor:
 	atomic_lock_release(&me->sta_lock);
 }
 
@@ -269,9 +276,8 @@ svga_ansitty_v_setcursor(struct ansitty *__restrict self,
 	me->sta_cursor.stc_cellx = x;
 	me->sta_cursor.stc_celly = y;
 	me->sta_flags &= ~SVGA_TTYACCESS_F_EOL;
-	if (update_hw_cursor && !(self->at_ttymode & ANSITTY_MODE_HIDECURSOR)) {
-		/* TODO: Update hardware cursor. */
-	}
+	if (update_hw_cursor && !(self->at_ttymode & ANSITTY_MODE_HIDECURSOR))
+		(*me->sta_showcursor)(me); /* Update hardware cursor. */
 	atomic_lock_release(&me->sta_lock);
 }
 
@@ -404,13 +410,32 @@ done:
 	atomic_lock_release(&me->sta_lock);
 }
 
+PRIVATE NONNULL((1)) void LIBANSITTY_CC
+svga_ansitty_v_setttymode(struct ansitty *__restrict self,
+                          uint16_t new_ttymode) {
+	REF struct svga_ttyaccess *me;
+	me = ansitty_getaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	atomic_lock_acquire(&me->sta_lock);
+
+	/* Update the state of the on-screen cursor. */
+	if (new_ttymode & ANSITTY_MODE_HIDECURSOR) {
+		(*me->sta_hidecursor)(me);
+	} else if (me->sta_cursor.stc_celly < me->sta_resy) {
+		(*me->sta_showcursor)(me);
+	}
+	atomic_lock_release(&me->sta_lock);
+}
+
+
 PRIVATE struct ansitty_operators const svga_ansitty_ops = {
-	.ato_putc      = &svga_ansitty_v_putc,
-	.ato_setcursor = &svga_ansitty_v_setcursor,
-	.ato_getcursor = &svga_ansitty_v_getcursor,
-	.ato_getsize   = &svga_ansitty_v_getsize,
-	.ato_copycell  = &svga_ansitty_v_copycell,
-	.ato_fillcell  = &svga_ansitty_v_fillcell,
+	.ato_putc       = &svga_ansitty_v_putc,
+	.ato_setcursor  = &svga_ansitty_v_setcursor,
+	.ato_getcursor  = &svga_ansitty_v_getcursor,
+	.ato_getsize    = &svga_ansitty_v_getsize,
+	.ato_copycell   = &svga_ansitty_v_copycell,
+	.ato_fillcell   = &svga_ansitty_v_fillcell,
+	.ato_setttymode = &svga_ansitty_v_setttymode,
 };
 
 
@@ -495,6 +520,38 @@ NOTHROW(FCALL svga_ttyaccess_v_setcell_htxt)(struct svga_ttyaccess *__restrict s
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_hidecursor_htxt)(struct svga_ttyaccess *__restrict self) {
+	/* Don't touch the actual hardware registers when we're not the active TTY! */
+	if (!(self->sta_flags & SVGA_TTYACCESS_F_ACTIVE))
+		return;
+	if (!(self->sta_flags & _SVGA_TTYACCESS_F_HWCUROFF)) {
+		vga_wcrt(VGA_CRTC_CURSOR_START, vga_rcrt(VGA_CRTC_CURSOR_START) | VGA_CRA_FCURSOR_DISABLE);
+		self->sta_flags |= _SVGA_TTYACCESS_F_HWCUROFF;
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_showcursor_htxt)(struct svga_ttyaccess *__restrict self) {
+	uint16_t address;
+	/* Don't touch the actual hardware registers when we're not the active TTY! */
+	if (!(self->sta_flags & SVGA_TTYACCESS_F_ACTIVE))
+		return;
+
+	/* Write the intended cursor position into hardware. */
+	address = self->sta_cursor.stc_cellx +
+	          self->sta_cursor.stc_celly *
+	          self->sta_scan;
+	vga_wcrt(VGA_CRTC_CURSOR_HI, (uint8_t)(address >> 8));
+	vga_wcrt(VGA_CRTC_CURSOR_LO, (uint8_t)(address));
+
+	/* Show the cursor if it was hidden before. */
+	if (self->sta_flags & _SVGA_TTYACCESS_F_HWCUROFF) {
+		vga_wcrt(VGA_CRTC_CURSOR_START, vga_rcrt(VGA_CRTC_CURSOR_START) & ~VGA_CRA_FCURSOR_DISABLE);
+		self->sta_flags &= ~_SVGA_TTYACCESS_F_HWCUROFF;
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_v_copycell_htxt_nooverscan)(struct svga_ttyaccess *__restrict self,
                                                          uintptr_t to_cellid, uintptr_t from_cellid,
                                                          size_t num_cells) {
@@ -507,8 +564,8 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_htxt_nooverscan)(struct svga_ttyaccess *
 }
 
 PRIVATE NOBLOCK NONNULL((1)) uint16_t
-NOTHROW(FCALL svga_ttyaccess_getcell_without_overscan)(struct svga_ttyaccess *__restrict self,
-                                                       uintptr_t screen_index) {
+NOTHROW(FCALL svga_ttyaccess_getcell_htxt_without_overscan)(struct svga_ttyaccess *__restrict self,
+                                                            uintptr_t screen_index) {
 	u16 const *src;
 	size_t delta = self->sta_scan - self->sta_resx;
 	screen_index += (screen_index / self->sta_resx) * delta;
@@ -518,8 +575,8 @@ NOTHROW(FCALL svga_ttyaccess_getcell_without_overscan)(struct svga_ttyaccess *__
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL svga_ttyaccess_setcell_without_overscan)(struct svga_ttyaccess *__restrict self,
-                                                       uintptr_t screen_index, uint16_t val) {
+NOTHROW(FCALL svga_ttyaccess_setcell_htxt_without_overscan)(struct svga_ttyaccess *__restrict self,
+                                                            uintptr_t screen_index, uint16_t val) {
 	u16 *dst;
 	size_t delta = self->sta_scan - self->sta_resx;
 	screen_index += (screen_index / self->sta_resx) * delta;
@@ -535,8 +592,8 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_htxt_overscan)(struct svga_ttyaccess *__
 	if (from_cellid < to_cellid) {
 		while (num_cells--) {
 			u16 word;
-			word = svga_ttyaccess_getcell_without_overscan(self, from_cellid);
-			svga_ttyaccess_setcell_without_overscan(self, to_cellid, word);
+			word = svga_ttyaccess_getcell_htxt_without_overscan(self, from_cellid);
+			svga_ttyaccess_setcell_htxt_without_overscan(self, to_cellid, word);
 			++from_cellid;
 			++to_cellid;
 		}
@@ -547,16 +604,16 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_htxt_overscan)(struct svga_ttyaccess *__
 			u16 word;
 			--from_cellid;
 			--to_cellid;
-			word = svga_ttyaccess_getcell_without_overscan(self, from_cellid);
-			svga_ttyaccess_setcell_without_overscan(self, to_cellid, word);
+			word = svga_ttyaccess_getcell_htxt_without_overscan(self, from_cellid);
+			svga_ttyaccess_setcell_htxt_without_overscan(self, to_cellid, word);
 		}
 	}
 }
 
 PRIVATE NOBLOCK NONNULL((1, 5)) void
-NOTHROW(FCALL svga_ttyaccess_v_fillcells)(struct svga_ttyaccess *__restrict self,
-                                          uintptr_t start, char32_t ch, size_t num_cells,
-                                          struct svga_ansitty *__restrict tty) {
+NOTHROW(FCALL svga_ttyaccess_v_fillcells_htxt)(struct svga_ttyaccess *__restrict self,
+                                               uintptr_t start, char32_t ch, size_t num_cells,
+                                               struct svga_ansitty *__restrict tty) {
 	u16 *cell, word;
 	cell = (u16 *)mnode_getaddr(&self->sta_vmem);
 	cell += start;
@@ -620,14 +677,16 @@ svga_makettyaccess(struct svga_device *__restrict self,
 	result->sta_mode  = mode;
 	result->sta_flags = SVGA_TTYACCESS_F_ACTIVE; /* Must mark as active since we already mapped physical memory! */
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
-		result->sta_resx      = mode->smi_resx;
-		result->sta_resy      = mode->smi_resy;
-		result->sta_cellw     = 8;
-		result->sta_cellh     = 16;
-		result->sta_scan      = mode->smi_scanline / 2;
-		result->sta_setcell   = &svga_ttyaccess_v_setcell_htxt;
-		result->sta_copycell  = &svga_ttyaccess_v_copycell_htxt_nooverscan;
-		result->sta_fillcells = &svga_ttyaccess_v_fillcells;
+		result->sta_resx       = mode->smi_resx;
+		result->sta_resy       = mode->smi_resy;
+		result->sta_cellw      = 8;
+		result->sta_cellh      = 16;
+		result->sta_scan       = mode->smi_scanline / 2;
+		result->sta_setcell    = &svga_ttyaccess_v_setcell_htxt;
+		result->sta_hidecursor = &svga_ttyaccess_v_hidecursor_htxt;
+		result->sta_showcursor = &svga_ttyaccess_v_showcursor_htxt;
+		result->sta_copycell   = &svga_ttyaccess_v_copycell_htxt_nooverscan;
+		result->sta_fillcells  = &svga_ttyaccess_v_fillcells_htxt;
 		if (result->sta_scan > result->sta_resx)
 			result->sta_copycell = &svga_ttyaccess_v_copycell_htxt_overscan;
 	} else {
