@@ -31,6 +31,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <libphys/phys.h>
 #include <libsvga/chipset.h>
 #include <libsvga/chipsets/vga.h>
 #include <libsvga/util/vgaio.h>
@@ -370,6 +371,137 @@ basevga_setmode(struct vga_mode const *__restrict regs) {
 	vga_wattr_res(basevga_IS1_R, VGA_ATC_PEL, regs->vm_att_pel, VGA_AT13_FRESERVED);
 	vga_wattr_res(basevga_IS1_R, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page, VGA_AT14_FRESERVED);
 }
+
+
+
+/* Direct access  to the  standard 256K  of VGA  video  memory.
+ * These functions take the current register state into account
+ * in order to  work around any  weird address  transformations
+ * which may be done by the video card:
+ *  - VGA_GR04_READMAP(i)  // For `basevga_rdvmem()'
+ *  - VGA_GR05_FREADMODE_* // For `basevga_rdvmem()'
+ *  - VGA_GR06_FCHAINOE
+ *  - VGA_GR06_FMM_*
+ *  - VGA_SR02_FPLANE(i)   // For `basevga_wrvmem()'
+ * Any VGA registers modified by these functions will be restored
+ * before they return. These functions  aren't very fast and  are
+ * meant  to be used to backup and restore base-vga video memory.
+ *
+ * Here are some important memory locations:
+ *  - 00000h: Plane 0
+ *    - On-screen text characters in text-mode
+ *    - yes: Only the characters (not attributes), tightly packed together
+ *  - 40000h: Plane 1
+ *    - On-screen text attributes in text-mode
+ *    - yes: Text-mode uses `VGA_GR05_FHOSTOE' + `VGA_GR06_FCHAINOE'
+ *           and  `VGA_GR06_FMM_32K_HI' to create  a linear array of
+ *           u16-cells at `B8000h'
+ *  - 80000h: Plane 2
+ *    - Text-mode font data as array of 32-byte scanline bitsets,
+ *      even though only  the first 16  are used for  characters.
+ *  - C0000h: Plane 3 */
+INTERN NONNULL((2)) void CC
+basevga_rdvmem(uint32_t addr, void *buf, uint32_t num_bytes) {
+	uint8_t saved_VGA_GFX_PLANE_READ;
+	uint8_t saved_VGA_GFX_MODE;
+	uint8_t saved_VGA_GFX_MISC;
+	uint8_t saved_VGA_SEQ_MEMORY_MODE;
+	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
+		saved_VGA_GFX_PLANE_READ  = baseega_registers.vm_gfx_plane_read;
+		saved_VGA_GFX_MODE        = baseega_registers.vm_gfx_mode;
+		saved_VGA_GFX_MISC        = baseega_registers.vm_gfx_misc;
+		saved_VGA_SEQ_MEMORY_MODE = baseega_registers.vm_seq_memory_mode;
+		/* TODO: EGA had less video memory than VGA, meaning  this
+		 *       function probably won't work with an EGA adapter.
+		 * Question is if this makes EGA's plane-select work differently,
+		 * in  that everything  is located in  the first plane,  or if it
+		 * does something else. In the  later case, what would that  mean
+		 * for VGA memory locations? -  Normal VGA uses 80000h+ to  store
+		 * the text-mode font... */
+	} else {
+		saved_VGA_GFX_PLANE_READ  = vga_rgfx(VGA_GFX_PLANE_READ);
+		saved_VGA_GFX_MODE        = vga_rgfx(VGA_GFX_MODE);
+		saved_VGA_GFX_MISC        = vga_rgfx(VGA_GFX_MISC);
+		saved_VGA_SEQ_MEMORY_MODE = vga_rgfx(VGA_SEQ_MEMORY_MODE);
+	}
+	vga_wgfx(VGA_GFX_MISC, (saved_VGA_GFX_MISC & ~(VGA_GR06_FMM_MASK | VGA_GR06_FCHAINOE)) | VGA_GR06_FMM_64K);
+	vga_wgfx(VGA_GFX_MODE, (saved_VGA_GFX_MODE & ~(VGA_GR05_FREADMODE | VGA_GR05_FHOSTOE)) | VGA_GR05_FREADMODE_0);
+	vga_wseq(VGA_SEQ_MEMORY_MODE, (saved_VGA_SEQ_MEMORY_MODE & ~VGA_SR04_FCHN_4M) | VGA_SR04_FEXT_MEM | VGA_SR04_FSEQ_MODE);
+	while (num_bytes) {
+		uint32_t bankspace;
+		bankspace = 0x10000 - (addr & 0xffff); /* Limit to 64K (1 plane) at a time */
+		if (bankspace > num_bytes)
+			bankspace = num_bytes;
+
+		/* Select the bank we want to read from. */
+		vga_wgfx(VGA_GFX_PLANE_READ,
+		         (saved_VGA_GFX_PLANE_READ & ~VGA_GR04_FREADMAP) |
+		         VGA_GR04_READMAP((addr >> 16) & 3));
+
+		/* Copy memory. */
+		copyfromphys(buf, 0xA0000 + (addr & 0xffff), bankspace);
+
+		/* Advance buffers. */
+		buf = (byte_t *)buf + bankspace;
+		addr += bankspace;
+		num_bytes -= bankspace;
+	}
+
+	/* Restore registers. */
+	vga_wseq(VGA_SEQ_MEMORY_MODE, saved_VGA_SEQ_MEMORY_MODE);
+	vga_wgfx(VGA_GFX_MISC, saved_VGA_GFX_MISC);
+	vga_wgfx(VGA_GFX_MODE, saved_VGA_GFX_MODE);
+	vga_wgfx(VGA_GFX_PLANE_READ, saved_VGA_GFX_PLANE_READ);
+}
+
+INTERN NONNULL((2)) void CC
+basevga_wrvmem(uint32_t addr, void const *buf, uint32_t num_bytes) {
+	uint8_t saved_VGA_SEQ_PLANE_WRITE;
+	uint8_t saved_VGA_GFX_MODE;
+	uint8_t saved_VGA_GFX_MISC;
+	uint8_t saved_VGA_SEQ_MEMORY_MODE;
+	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
+		saved_VGA_SEQ_PLANE_WRITE = baseega_registers.vm_seq_plane_write;
+		saved_VGA_GFX_MODE        = baseega_registers.vm_gfx_mode;
+		saved_VGA_GFX_MISC        = baseega_registers.vm_gfx_misc;
+		saved_VGA_SEQ_MEMORY_MODE = baseega_registers.vm_seq_memory_mode;
+	} else {
+		saved_VGA_SEQ_PLANE_WRITE = vga_rseq(VGA_SEQ_PLANE_WRITE);
+		saved_VGA_GFX_MODE        = vga_rgfx(VGA_GFX_MODE);
+		saved_VGA_GFX_MISC        = vga_rgfx(VGA_GFX_MISC);
+		saved_VGA_SEQ_MEMORY_MODE = vga_rgfx(VGA_SEQ_MEMORY_MODE);
+	}
+	vga_wgfx(VGA_GFX_MISC, (saved_VGA_GFX_MISC & ~(VGA_GR06_FMM_MASK | VGA_GR06_FCHAINOE)) | VGA_GR06_FMM_64K);
+	vga_wgfx(VGA_GFX_MODE, (saved_VGA_GFX_MODE & ~(VGA_GR05_FWRITEMODE | VGA_GR05_FHOSTOE)) | VGA_GR05_FWRITEMODE_0);
+	vga_wseq(VGA_SEQ_MEMORY_MODE, (saved_VGA_SEQ_MEMORY_MODE & ~VGA_SR04_FCHN_4M) | VGA_SR04_FEXT_MEM | VGA_SR04_FSEQ_MODE);
+	while (num_bytes) {
+		uint32_t bankspace;
+		bankspace = 0x10000 - (addr & 0xffff); /* Limit to 64K (1 plane) at a time */
+		if (bankspace > num_bytes)
+			bankspace = num_bytes;
+
+		/* Select the bank we want to read from. */
+		vga_wgfx(VGA_SEQ_PLANE_WRITE,
+		         (saved_VGA_SEQ_PLANE_WRITE & ~VGA_SR02_FALL_PLANES) |
+		         VGA_SR02_FPLANE((addr >> 16) & 3));
+
+		/* Copy memory. */
+		copytophys(0xA0000 + (addr & 0xffff), buf, bankspace);
+
+		/* Advance buffers. */
+		buf = (byte_t *)buf + bankspace;
+		addr += bankspace;
+		num_bytes -= bankspace;
+	}
+
+	/* Restore registers. */
+	vga_wseq(VGA_SEQ_MEMORY_MODE, saved_VGA_SEQ_MEMORY_MODE);
+	vga_wgfx(VGA_GFX_MISC, saved_VGA_GFX_MISC);
+	vga_wgfx(VGA_GFX_MODE, saved_VGA_GFX_MODE);
+	vga_wgfx(VGA_SEQ_PLANE_WRITE, saved_VGA_SEQ_PLANE_WRITE);
+}
+
+
 
 
 

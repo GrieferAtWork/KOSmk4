@@ -214,6 +214,21 @@ __SYSDECL_BEGIN
 #   define VGA_SR02_FALL_PLANES     0x0f /* bits 3-0: enable access to all planes */
 #   define VGA_SR02_FRESERVED       0xf0 /* Mask of reserved registers */
 #define VGA_SEQ_CHARACTER_MAP  0x03
+#   define VGA_SR03_CSETB_MASK      0x13 /* Mask for character set B */
+#   define VGA_SR03_CSETA_MASK      0x2c /* Mask for character set A */
+#   define VGA_SR03_CSETB_GET(x) (((x) & 3) | (((x) >> 2) & 4))        /* Extract character set B index */
+#   define VGA_SR03_CSETA_GET(x) ((((x) >> 2) & 3) | (((x) >> 3) & 4)) /* Extract character set A index */
+#   define VGA_SR03_CSETB_SET(i) (((i) & 3) | (((i) & 4) << 2))        /* Encode character set B index */
+#   define VGA_SR03_CSETA_SET(i) ((((i) & 3) << 2) | (((i) & 4) << 3)) /* Encode character set A index */
+/* Character set indices (returned by `VGA_SR03_CSET(A|B)_GET'; encoded by `VGA_SR03_CSET(A|B)_SET') */
+#      define VGA_SR03_CSET_0000_1FFF 0 /* Font is stored at in plane 2 at 0000h-1FFFh */
+#      define VGA_SR03_CSET_4000_5FFF 1 /* Font is stored at in plane 2 at 4000h-5FFFh */
+#      define VGA_SR03_CSET_8000_9FFF 2 /* Font is stored at in plane 2 at 8000h-9FFFh */
+#      define VGA_SR03_CSET_C000_DFFF 3 /* Font is stored at in plane 2 at C000h-DFFFh */
+#      define VGA_SR03_CSET_2000_3FFF 4 /* Font is stored at in plane 2 at 2000h-3FFFh */
+#      define VGA_SR03_CSET_6000_7FFF 5 /* Font is stored at in plane 2 at 6000h-7FFFh */
+#      define VGA_SR03_CSET_A000_BFFF 6 /* Font is stored at in plane 2 at A000h-BFFFh */
+#      define VGA_SR03_CSET_E000_FFFF 7 /* Font is stored at in plane 2 at E000h-FFFFh */
 #   define VGA_SR03_FRESERVED       0xc0 /* Mask of reserved registers */
 #define VGA_SEQ_MEMORY_MODE    0x04
 #   define VGA_SR04_FEXT_MEM        0x02 /* bit 1: allows complete mem access to 256K */
@@ -244,8 +259,10 @@ __SYSDECL_BEGIN
 #   define VGA_GR05_FWRITEMODE_1    0x01 /* Write mode #1. */
 #   define VGA_GR05_FWRITEMODE_2    0x02 /* Write mode #2. */
 #   define VGA_GR05_FWRITEMODE_3    0x03 /* Write mode #3. */
+#   define VGA_GR05_FWRITEMODE      0x03 /* Mask */
 #   define VGA_GR05_FREADMODE_0     0x00 /* Read mode #0. */
 #   define VGA_GR05_FREADMODE_1     0x08 /* Read mode #1. */
+#   define VGA_GR05_FREADMODE       0x08 /* Mask */
 #   define VGA_GR05_FHOSTOE         0x10 /* Enable odd/even mode (used for 16-bit-per-character text-mode). */
 #   define VGA_GR05_FSHIFTREG       0x20 /* ... */
 #   define VGA_GR05_FSHIFT256       0x40 /* ... */
@@ -258,6 +275,7 @@ __SYSDECL_BEGIN
 #   define VGA_GR06_FMM_64K         0x04 /* A0000h-AFFFFh (64K region) */
 #   define VGA_GR06_FMM_32K_LO      0x08 /* B0000h-B7FFFh (32K region) */
 #   define VGA_GR06_FMM_32K_HI      0x0c /* B8000h-BFFFFh (32K region) */
+#   define VGA_GR06_FMM_MASK        0x0c /* Mask for memory mode */
 #   define VGA_GR06_FRESERVED       0xf0 /* Mask of reserved registers */
 #define VGA_GFX_COMPARE_MASK    0x07
 #   define VGA_GR07_FRESERVED       0xf0 /* Mask of reserved registers */

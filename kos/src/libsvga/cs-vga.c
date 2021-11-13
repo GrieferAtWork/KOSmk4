@@ -455,10 +455,12 @@ cs_vga_probe(struct svga_chipset *__restrict self) {
 		self->sc_ops.sco_getmode         = &ega_v_getmode;
 		self->sc_ops.sco_setmode         = &ega_v_setmode;
 		self->sc_ops.sco_setlogicalwidth = &ega_v_setlogicalwidth;
+		self->sc_vmemsize                = 16 * 1024; /* EGA had at least 64K video memory. */
 	} else {
 		self->sc_ops.sco_getmode         = &vga_v_getmode;
 		self->sc_ops.sco_setmode         = &vga_v_setmode;
 		self->sc_ops.sco_setlogicalwidth = &vga_v_setlogicalwidth;
+		self->sc_vmemsize                = 4 * 16 * 1024; /* Standard VGA has 256K of video memory */
 	}
 	self->sc_ops.sco_modeinfosize = sizeof(struct vga_modeinfo);
 	self->sc_ops.sco_strings      = NULL;
@@ -468,7 +470,6 @@ cs_vga_probe(struct svga_chipset *__restrict self) {
 	/* NOTE: We don't define the setwindow operators because
 	 *       standard EGA/VGA don't  have multiple  windows! */
 	shared_rwlock_init(&self->sc_lock);
-	self->sc_vmemsize           = 16 * 1024; /* Standard VGA has 64K of video memory */
 	self->sc_rdwindow           = 0;
 	self->sc_wrwindow           = 0;
 	self->sc_logicalwidth_max   = 2040; /* s.a. `vga_v_setlogicalwidth' */

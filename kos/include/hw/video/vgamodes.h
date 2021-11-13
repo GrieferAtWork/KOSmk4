@@ -251,7 +251,8 @@
 		.vm_crt_line_compare  = 0xff,                                                \
 		.vm_seq_clock_mode    = VGA_SR01_FCHAR_CLK_8DOTS,                            \
 		.vm_seq_plane_write   = VGA_SR02_FPLANE(0) | VGA_SR02_FPLANE(1),             \
-		.vm_seq_character_map = 0x00,                                                \
+		.vm_seq_character_map = VGA_SR03_CSETA_SET(VGA_SR03_CSET_0000_1FFF) |        \
+		                        VGA_SR03_CSETB_SET(VGA_SR03_CSET_0000_1FFF),         \
 		.vm_seq_memory_mode   = VGA_SR04_FEXT_MEM | 0x01,                            \
 	}
 
@@ -319,7 +320,8 @@
 		.vm_crt_line_compare  = 0xff,                                                \
 		.vm_seq_clock_mode    = 0x00,                                                \
 		.vm_seq_plane_write   = VGA_SR02_FPLANE(0) | VGA_SR02_FPLANE(1),             \
-		.vm_seq_character_map = 0x00,                                                \
+		.vm_seq_character_map = VGA_SR03_CSETA_SET(VGA_SR03_CSET_0000_1FFF) |        \
+		                        VGA_SR03_CSETB_SET(VGA_SR03_CSET_0000_1FFF),         \
 		.vm_seq_memory_mode   = VGA_SR04_FEXT_MEM,                                   \
 	}
 

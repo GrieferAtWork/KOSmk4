@@ -219,7 +219,7 @@ NOTHROW_KERNEL(CC begin_vga_font_access)(struct vga_font_access_regs *__restrict
 	vga_wseq(VGA_SEQ_PLANE_WRITE, (regs->old_seq_plane_write & VGA_SR02_FRESERVED) | VGA_SR02_FPLANE(2));
 	vga_wseq(VGA_SEQ_MEMORY_MODE, (regs->old_seq_memory_mode & VGA_SR04_FRESERVED) |
 	                              (VGA_SR04_FEXT_MEM | VGA_SR04_FSEQ_MODE));
-	vga_wgfx(VGA_GFX_PLANE_READ, (regs->old_gfx_plane_read & VGA_GR04_FRESERVED) | 0x02);
+	vga_wgfx(VGA_GFX_PLANE_READ, (regs->old_gfx_plane_read & VGA_GR04_FRESERVED) | VGA_GR04_READMAP(2));
 	vga_wgfx(VGA_GFX_MODE, (regs->old_gfx_mode & VGA_GR05_FRESERVED) | 0x00);
 	vga_wgfx(VGA_GFX_MISC, (regs->old_gfx_misc & VGA_GR06_FRESERVED) |
 	                       (VGA_GR06_FGRAPHICS_MODE | VGA_GR06_FMM_64K));
