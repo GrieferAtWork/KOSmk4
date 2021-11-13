@@ -387,6 +387,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	kernel_initialize_selftest();
 #endif /* CONFIG_SELFTEST */
 
+#if 1 /* TODO: Remove me */
+	{
+		extern void KCALL kernel_initialize_svga_driver(void);
+		kernel_initialize_svga_driver();
+	}
+#endif
+
 	__hybrid_assert(!kmalloc_leaks());
 
 	/* Update the given initial user-state to start

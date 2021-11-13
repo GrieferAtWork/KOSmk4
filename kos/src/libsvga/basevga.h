@@ -91,16 +91,16 @@ INTDEF NONNULL((2)) void CC basevga_wrpal(uint8_t color_index, struct vga_palcol
  *  - 00000h: Plane 0
  *    - On-screen text characters in text-mode
  *    - yes: Only the characters (not attributes), tightly packed together
- *  - 40000h: Plane 1
+ *  - 10000h: Plane 1
  *    - On-screen text attributes in text-mode
  *    - yes: Text-mode uses `VGA_GR05_FHOSTOE' + `VGA_GR06_FCHAINOE'
  *           and  `VGA_GR06_FMM_32K_HI' to create  a linear array of
  *           u16-cells at `B8000h'
- *  - 80000h: Plane 2
+ *  - 20000h: Plane 2
  *    - Text-mode font data as array of 32-byte scanline bitsets,
  *      even though only  the first 16  are used for  characters.
  *    - Actual font location(s) are stored in `VGA_SEQ_CHARACTER_MAP'
- *  - C0000h: Plane 3 */
+ *  - 30000h: Plane 3 */
 INTDEF NONNULL((2)) void CC basevga_rdvmem(uint32_t addr, void *buf, uint32_t num_bytes);
 INTDEF NONNULL((2)) void CC basevga_wrvmem(uint32_t addr, void const *buf, uint32_t num_bytes);
 

@@ -115,10 +115,10 @@ FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC __ansittydev_v_termios(struct ansitt
  *  - self->_ansittydev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
  *  - self->_ansittydev_chr_ _chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
  *  - self->_ansittydev_chr_ _chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
- * @param: struct ansittydev        *self:    Ansitty to initialize.
- * @param: struct ansittydev_ops    *ops:     Ansitty operators.
- * @param: struct ansitty_operators *tty_ops: TTY operators. NOTE: `ato_output', `ato_setled' and `ato_termios' must _NOT_
- *                                            be implemented; these operators are provided by the internal implementation! */
+ * @param: struct ansittydev              *self:    Ansitty to initialize.
+ * @param: struct ansittydev_ops const    *ops:     Ansitty operators.
+ * @param: struct ansitty_operators const *tty_ops: TTY operators. NOTE: `ato_output', `ato_setled' and `ato_termios' must _NOT_
+ *                                                  be implemented; these operators are provided by the internal implementation! */
 #define _ansittydev_init(self, ops, tty_ops)                       \
 	(___ansittydev_assert_ops_(ops)                                \
 	 __hybrid_assert((tty_ops)->ato_output == __NULLPTR),          \

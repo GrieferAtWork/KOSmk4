@@ -88,6 +88,7 @@ __SYSDECL_BEGIN
 #define VGA_CRT_IC      __IOPORT(0x3d4) /* CRT Controller Index - color emulation. */
 #define VGA_CRT_IM      __IOPORT(0x3b4) /* CRT Controller Index - mono emulation. */
 #define VGA_ATT_IW      __IOPORT(0x3c0) /* Attribute Controller Index & Data Write Register. */
+#   define VGA_ATT_IW_PAS 0x20          /* Palette Address Source (must be clear to modify ) */
 #define VGA_GFX_I       __IOPORT(0x3ce) /* Graphics Controller Index. */
 #define VGA_SEQ_I       __IOPORT(0x3c4) /* Sequencer Index. */
 #define VGA_PEL_IW      __IOPORT(0x3c8) /* PEL Write Index. */
@@ -210,7 +211,7 @@ __SYSDECL_BEGIN
                                           * NOTE: The `VGA_SETMODE' ioctl ignores this bit! */
 #   define VGA_SR01_FRESERVED       0xc2 /* Mask of reserved registers */
 #define VGA_SEQ_PLANE_WRITE    0x02
-#   define VGA_SR02_FPLANE(i)     ((1) << i) /* ... */
+#   define VGA_SR02_FPLANE(i)     ((1) << (i)) /* ... */
 #   define VGA_SR02_FALL_PLANES     0x0f /* bits 3-0: enable access to all planes */
 #   define VGA_SR02_FRESERVED       0xf0 /* Mask of reserved registers */
 #define VGA_SEQ_CHARACTER_MAP  0x03

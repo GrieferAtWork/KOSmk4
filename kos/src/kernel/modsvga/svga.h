@@ -112,6 +112,26 @@ struct svga_userlock: chrdev {
  *    is still alive.
  *  - Don't expose this object to user-space
  */
+union svga_tty_cursor {
+	uintptr_t          stc_word;  /* Cursor position word. */
+	struct {
+		uintptr_half_t stc_cellx; /* [< sta_resx] Current cell in X */
+		uintptr_half_t stc_celly; /* [<= sta_resy] Current cell in Y
+		                           * NOTE: May only be equal to `sta_resy' when
+		                           *       `SVGA_TTYACCESS_F_EOL' is also  set! */
+	};
+};
+
+
+/* Flags for `struct svga_ttyaccess::sta_flags' */
+#define SVGA_TTYACCESS_F_NORMAL 0x0000 /* Normal flags */
+#define SVGA_TTYACCESS_F_ACTIVE 0x0001 /* [lock(sta_lock && CLEAR_ONCE)] This TTY is currently active.
+                                        * When not set, `sta_vmem' points to anonymous physical ram. */
+#define SVGA_TTYACCESS_F_EOL    0x8000 /* [lock(sta_lock)] Set while `sta_cursor.stc_cellx == 0' as
+                                        * the result  of the  previously line  being wrapped.  This
+                                        * flag is cleared the next time a character is printed, but
+                                        * if said character is '\n', it is silently ignored. */
+
 struct svga_ttyaccess {
 	WEAK refcnt_t               sta_refcnt; /* Reference counter. */
 	struct atomic_lock          sta_lock;   /* Lock for character movements. */
@@ -120,41 +140,52 @@ struct svga_ttyaccess {
 	                                         * When `SVGA_TTYACCESS_F_ACTIVE' is cleared, then
 	                                         * the pointed-to physical  memory must be  free'd
 	                                         * during destruction of the access object. */
-#define SVGA_TTYACCESS_F_NORMAL 0x0000      /* Normal flags */
-#define SVGA_TTYACCESS_F_ACTIVE 0x0001      /* [lock(sta_lock && CLEAR_ONCE)] This TTY is currently active.
-	                                         * When not set, `sta_vmem' points to anonymous physical ram. */
-	uintptr_t                   sta_flags;  /* [lock(sta_lock)] Set of `SVGA_TTYACCESS_F_*' */
-	uint32_t                    sta_resx;   /* [const] # of character cells in X */
-	uint32_t                    sta_resy;   /* [const] # of character cells in Y */
-	uint32_t                    sta_cellx;  /* [const] Cell size in X, in pixels */
-	uint32_t                    sta_celly;  /* [const] Cell size in Y, in pixels */
-	size_t                      sta_scan;   /* [const] Scanline size (in characters cells) */
-	uintptr_t                   sta_cursor; /* [lock(sta_lock)] Current cursor position. */
+	union {
+		struct {
+			uintptr_t             sta_flags;  /* [lock(sta_lock)] Set of `SVGA_TTYACCESS_F_*' */
+			uintptr_half_t        sta_resx;   /* [const] # of character cells in X */
+			uintptr_half_t        sta_resy;   /* [const] # of character cells in Y */
+			uintptr_half_t        sta_cellw;  /* [const] Cell size in X, in pixels */
+			uintptr_half_t        sta_cellh;  /* [const] Cell size in Y, in pixels */
+			size_t                sta_scan;   /* [const] Scanline size (in characters cells) */
+			union svga_tty_cursor sta_cursor; /* [lock(sta_lock)] Current cursor position. */
+		};
+		Toblockop(mman)     _sta_mmlop;  /* Used internally */
+		Tobpostlockop(mman) _sta_mmplop; /* Used internally */
+	};
+	/* TODO: support for custom fonts! */
 	/* Operators... */
 
-	/* [1..1] Destroy this access object. */
-	NOBLOCK void /*NOTHROW*/ (FCALL *sta_destroy)(struct svga_ttyaccess *__restrict self);
-
 	/* [1..1][lock(sta_lock)] Set the contents of a single cell. (attributes are taken from `tty->at_ansi')
+	 * NOTE: This operator may assume that `address' is visible on-screen
 	 * @param: address: == CELL_X + CELL_Y * sta_scan */
 	NOBLOCK NONNULL((1, 4)) void
 	/*NOTHROW*/ (FCALL *sta_setcell)(struct svga_ttyaccess *__restrict self,
-	                                 uintptr_t address, char32_t chr,
+	                                 uintptr_t address, char32_t ch,
 	                                 struct svga_ansitty *__restrict tty);
 
 	/* [1..1][lock(sta_lock)] Copy cells across video memory.
-	 * @param: from/to: == CELL_X + CELL_Y * sta_scan */
+	 * NOTE: The cell addresses taken by this function do _NOT_ account for large scanlines!
+	 * @param: from_cellid/to_cellid: == CELL_X + CELL_Y * sta_resx */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (FCALL *sta_copycell)(struct svga_ttyaccess *__restrict self,
-	                                  uintptr_t from, uintptr_t to, size_t num_cells);
+	                                  uintptr_t to_cellid, uintptr_t from_cellid,
+	                                  size_t num_cells);
 
 	/* [1..1][lock(sta_lock)] Same as:
-	 * >> while (num_cells--) (*sta_setcell)(self, start++, ' ', tty); */
-	NOBLOCK NONNULL((1, 4)) void
-	/*NOTHROW*/ (FCALL *sta_cillcells)(struct svga_ttyaccess *__restrict self,
-	                                   uintptr_t start, size_t num_cells,
+	 * >> while (num_cells--) (*sta_setcell)(self, start++, ch, tty); */
+	NOBLOCK NONNULL((1, 5)) void
+	/*NOTHROW*/ (FCALL *sta_fillcells)(struct svga_ttyaccess *__restrict self,
+	                                   uintptr_t start, char32_t ch, size_t num_cells,
 	                                   struct svga_ansitty *__restrict tty);
+
+	/* TODO: Operators to update+show+hide the cursor position, both in-hardware and in-software */
 };
+
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_destroy)(struct svga_ttyaccess *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct svga_ttyaccess, sta_refcnt, svga_ttyaccess_destroy);
+
 
 ARREF(svga_ttyaccess_arref, svga_ttyaccess);
 
@@ -176,21 +207,18 @@ struct svga_ansitty: ansittydev {
 };
 
 /* Check the object pointed to by `svd_active' is a userlock or a TTY */
-#define svga_active_islock(self) ((self)->mf_ops->mo_stream == NULL)
-#define svga_active_istty(self)  ((self)->mf_ops->mo_stream != NULL)
-
-/* Return the base-address of the  */
-#define svga_ansitty_buffer(self) ((self)->sva_buffer.mn_minaddr)
-
+#define svga_active_islock(self) 0 /* TODO (use operator pointers) */
+#define svga_active_istty(self)  1 /* TODO (use operator pointers) */
 
 
 AWREF(chrdev_awref, chrdev);
 struct svga_device: svga_ansitty {
-	struct chrdev_awref      svd_active;   /* [1..1][lock(WRITE(svd_chipset.sc_lock))] Active TTY or user-lock. */
-	byte_t const            *svd_supmodev; /* [0..n][const][owned] Array of supported video modes. */
-	size_t                   svd_supmodec; /* [const] # of supported video modes. */
-	size_t                   svd_supmodeS; /* [const] Aligned sizeof() supported video modes. */
-	struct svga_chipset      svd_chipset;  /* VGA Chipset driver. */
+	struct chrdev_awref               svd_active;   /* [1..1][lock(WRITE(svd_chipset.sc_lock))] Active TTY or user-lock. */
+	byte_t const                     *svd_supmodev; /* [0..n][const][owned] Array of supported video modes. */
+	size_t                            svd_supmodec; /* [const] # of supported video modes. */
+	size_t                            svd_supmodeS; /* [const] Aligned sizeof() supported video modes. */
+	struct svga_chipset_driver const *svd_csdriver; /* [1..1][const] SVGA driver. */
+	struct svga_chipset               svd_chipset;  /* SVGA Chipset driver. */
 };
 
 /* Return a `struct svga_modeinfo const *' for the i'th supported video mode if `self' */
@@ -206,7 +234,7 @@ struct svga_device: svga_ansitty {
 /************************************************************************/
 
 /* Default text-mode palette colors for KOS (these are set-up for ANSI TTY compatibility) */
-INTDEF struct vga_palcolor const basevga_defaultpal[64];
+INTDEF struct vga_palcolor const basevga_defaultpal[16];
 
 /* Default values that must be loaded into `vm_att_pal' in order to
  * make the `basevga_defaultpal' palette behave as ANSI-compatible. */

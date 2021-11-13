@@ -157,6 +157,7 @@ basevga_getregs(struct vga_mode *__restrict regs) {
 	regs->vm_gfx_bit_mask      = vga_rgfx(VGA_GFX_BIT_MASK);
 
 	/* Attribute controller. */
+	vga_setpas(basevga_IS1_R, 0);
 	for (i = 0; i < 16; ++i)
 		regs->vm_att_pal[i] = vga_rattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i);
 	regs->vm_att_mode         = vga_rattr(basevga_IS1_R, VGA_ATC_MODE);
@@ -164,6 +165,7 @@ basevga_getregs(struct vga_mode *__restrict regs) {
 	regs->vm_att_plane_enable = vga_rattr(basevga_IS1_R, VGA_ATC_PLANE_ENABLE);
 	regs->vm_att_pel          = vga_rattr(basevga_IS1_R, VGA_ATC_PEL);
 	regs->vm_att_color_page   = vga_rattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE);
+	vga_setpas(basevga_IS1_R, VGA_ATT_IW_PAS);
 }
 
 INTERN NONNULL((1)) void CC
@@ -238,6 +240,7 @@ basevga_setregs(struct vga_mode const *__restrict regs) {
 	vga_wgfx(VGA_GFX_BIT_MASK, regs->vm_gfx_bit_mask);
 
 	/* Attribute controller. */
+	vga_setpas(basevga_IS1_R, 0);
 	for (i = 0; i < 16; ++i)
 		vga_wattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i, regs->vm_att_pal[i]);
 	vga_wattr(basevga_IS1_R, VGA_ATC_MODE, regs->vm_att_mode);
@@ -245,6 +248,7 @@ basevga_setregs(struct vga_mode const *__restrict regs) {
 	vga_wattr(basevga_IS1_R, VGA_ATC_PLANE_ENABLE, regs->vm_att_plane_enable);
 	vga_wattr(basevga_IS1_R, VGA_ATC_PEL, regs->vm_att_pel);
 	vga_wattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page);
+	vga_setpas(basevga_IS1_R, VGA_ATT_IW_PAS);
 
 	/* Remember EGA register state. */
 	if (basevga_flags & BASEVGA_FLAG_ISEGA)
@@ -360,6 +364,7 @@ basevga_setmode(struct vga_mode const *__restrict regs) {
 	vga_wgfx(VGA_GFX_BIT_MASK, regs->vm_gfx_bit_mask);
 
 	/* Attribute controller. */
+	vga_setpas(basevga_IS1_R, 0);
 	for (i = 0; i < 16; ++i) {
 		vga_wattr_res(basevga_IS1_R,
 		              VGA_ATC_PALETTE0 + i, regs->vm_att_pal[i],
@@ -370,6 +375,7 @@ basevga_setmode(struct vga_mode const *__restrict regs) {
 	vga_wattr_res(basevga_IS1_R, VGA_ATC_PLANE_ENABLE, regs->vm_att_plane_enable, VGA_AT12_FRESERVED);
 	vga_wattr_res(basevga_IS1_R, VGA_ATC_PEL, regs->vm_att_pel, VGA_AT13_FRESERVED);
 	vga_wattr_res(basevga_IS1_R, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page, VGA_AT14_FRESERVED);
+	vga_setpas(basevga_IS1_R, VGA_ATT_IW_PAS);
 }
 
 
@@ -421,15 +427,15 @@ basevga_wrpal(uint8_t color_index,
  *  - 00000h: Plane 0
  *    - On-screen text characters in text-mode
  *    - yes: Only the characters (not attributes), tightly packed together
- *  - 40000h: Plane 1
+ *  - 10000h: Plane 1
  *    - On-screen text attributes in text-mode
  *    - yes: Text-mode uses `VGA_GR05_FHOSTOE' + `VGA_GR06_FCHAINOE'
  *           and  `VGA_GR06_FMM_32K_HI' to create  a linear array of
  *           u16-cells at `B8000h'
- *  - 80000h: Plane 2
+ *  - 20000h: Plane 2
  *    - Text-mode font data as array of 32-byte scanline bitsets,
  *      even though only  the first 16  are used for  characters.
- *  - C0000h: Plane 3 */
+ *  - 30000h: Plane 3 */
 INTERN NONNULL((2)) void CC
 basevga_rdvmem(uint32_t addr, void *buf, uint32_t num_bytes) {
 	uint8_t saved_VGA_GFX_PLANE_READ;
@@ -452,7 +458,7 @@ basevga_rdvmem(uint32_t addr, void *buf, uint32_t num_bytes) {
 		saved_VGA_GFX_PLANE_READ  = vga_rgfx(VGA_GFX_PLANE_READ);
 		saved_VGA_GFX_MODE        = vga_rgfx(VGA_GFX_MODE);
 		saved_VGA_GFX_MISC        = vga_rgfx(VGA_GFX_MISC);
-		saved_VGA_SEQ_MEMORY_MODE = vga_rgfx(VGA_SEQ_MEMORY_MODE);
+		saved_VGA_SEQ_MEMORY_MODE = vga_rseq(VGA_SEQ_MEMORY_MODE);
 	}
 	vga_wgfx(VGA_GFX_MISC, (saved_VGA_GFX_MISC & ~(VGA_GR06_FMM_MASK | VGA_GR06_FCHAINOE)) | VGA_GR06_FMM_64K);
 	vga_wgfx(VGA_GFX_MODE, (saved_VGA_GFX_MODE & ~(VGA_GR05_FREADMODE | VGA_GR05_FHOSTOE)) | VGA_GR05_FREADMODE_0);
@@ -478,28 +484,28 @@ basevga_rdvmem(uint32_t addr, void *buf, uint32_t num_bytes) {
 	}
 
 	/* Restore registers. */
+	vga_wgfx(VGA_GFX_PLANE_READ, saved_VGA_GFX_PLANE_READ);
 	vga_wseq(VGA_SEQ_MEMORY_MODE, saved_VGA_SEQ_MEMORY_MODE);
 	vga_wgfx(VGA_GFX_MISC, saved_VGA_GFX_MISC);
 	vga_wgfx(VGA_GFX_MODE, saved_VGA_GFX_MODE);
-	vga_wgfx(VGA_GFX_PLANE_READ, saved_VGA_GFX_PLANE_READ);
 }
 
 INTERN NONNULL((2)) void CC
 basevga_wrvmem(uint32_t addr, void const *buf, uint32_t num_bytes) {
-	uint8_t saved_VGA_SEQ_PLANE_WRITE;
 	uint8_t saved_VGA_GFX_MODE;
 	uint8_t saved_VGA_GFX_MISC;
 	uint8_t saved_VGA_SEQ_MEMORY_MODE;
+	uint8_t saved_VGA_SEQ_PLANE_WRITE;
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
 		saved_VGA_SEQ_PLANE_WRITE = baseega_registers.vm_seq_plane_write;
 		saved_VGA_GFX_MODE        = baseega_registers.vm_gfx_mode;
 		saved_VGA_GFX_MISC        = baseega_registers.vm_gfx_misc;
 		saved_VGA_SEQ_MEMORY_MODE = baseega_registers.vm_seq_memory_mode;
 	} else {
-		saved_VGA_SEQ_PLANE_WRITE = vga_rseq(VGA_SEQ_PLANE_WRITE);
 		saved_VGA_GFX_MODE        = vga_rgfx(VGA_GFX_MODE);
 		saved_VGA_GFX_MISC        = vga_rgfx(VGA_GFX_MISC);
-		saved_VGA_SEQ_MEMORY_MODE = vga_rgfx(VGA_SEQ_MEMORY_MODE);
+		saved_VGA_SEQ_MEMORY_MODE = vga_rseq(VGA_SEQ_MEMORY_MODE);
+		saved_VGA_SEQ_PLANE_WRITE = vga_rseq(VGA_SEQ_PLANE_WRITE);
 	}
 	vga_wgfx(VGA_GFX_MISC, (saved_VGA_GFX_MISC & ~(VGA_GR06_FMM_MASK | VGA_GR06_FCHAINOE)) | VGA_GR06_FMM_64K);
 	vga_wgfx(VGA_GFX_MODE, (saved_VGA_GFX_MODE & ~(VGA_GR05_FWRITEMODE | VGA_GR05_FHOSTOE)) | VGA_GR05_FWRITEMODE_0);
@@ -511,7 +517,7 @@ basevga_wrvmem(uint32_t addr, void const *buf, uint32_t num_bytes) {
 			bankspace = num_bytes;
 
 		/* Select the bank we want to read from. */
-		vga_wgfx(VGA_SEQ_PLANE_WRITE,
+		vga_wseq(VGA_SEQ_PLANE_WRITE,
 		         (saved_VGA_SEQ_PLANE_WRITE & ~VGA_SR02_FALL_PLANES) |
 		         VGA_SR02_FPLANE((addr >> 16) & 3));
 
@@ -525,10 +531,10 @@ basevga_wrvmem(uint32_t addr, void const *buf, uint32_t num_bytes) {
 	}
 
 	/* Restore registers. */
+	vga_wseq(VGA_SEQ_PLANE_WRITE, saved_VGA_SEQ_PLANE_WRITE);
 	vga_wseq(VGA_SEQ_MEMORY_MODE, saved_VGA_SEQ_MEMORY_MODE);
 	vga_wgfx(VGA_GFX_MISC, saved_VGA_GFX_MISC);
 	vga_wgfx(VGA_GFX_MODE, saved_VGA_GFX_MODE);
-	vga_wgfx(VGA_SEQ_PLANE_WRITE, saved_VGA_SEQ_PLANE_WRITE);
 }
 
 

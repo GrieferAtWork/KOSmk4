@@ -249,8 +249,10 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
 
 /* Helpers macros for finding unmapped areas within the kernel for specific purposes. */
-#define mman_findunmapped_device(num_bytes, ...)    mman_findunmapped(&mman_kernel, MHINT_GETADDR(KERNEL_MHINT_DEVICE), num_bytes, MHINT_GETMODE(KERNEL_MHINT_DEVICE), ##__VA_ARGS__)
-#define mman_findunmapped_temporary(num_bytes, ...) mman_findunmapped(&mman_kernel, MHINT_GETADDR(KERNEL_MHINT_TEMPORARY), num_bytes, MHINT_GETMODE(KERNEL_MHINT_TEMPORARY), ##__VA_ARGS__)
+#define mman_findunmapped_device(num_bytes, ...)             mman_findunmapped(&mman_kernel, MHINT_GETADDR(KERNEL_MHINT_DEVICE), num_bytes, MHINT_GETMODE(KERNEL_MHINT_DEVICE), ##__VA_ARGS__)
+#define mman_findunmapped_temporary(num_bytes, ...)          mman_findunmapped(&mman_kernel, MHINT_GETADDR(KERNEL_MHINT_TEMPORARY), num_bytes, MHINT_GETMODE(KERNEL_MHINT_TEMPORARY), ##__VA_ARGS__)
+#define mman_getunmapped_or_unlock_device(num_bytes, ...)    mman_getunmapped_or_unlock(&mman_kernel, MHINT_GETADDR(KERNEL_MHINT_DEVICE), num_bytes, MHINT_GETMODE(KERNEL_MHINT_DEVICE), ##__VA_ARGS__)
+#define mman_getunmapped_or_unlock_temporary(num_bytes, ...) mman_getunmapped_or_unlock(&mman_kernel, MHINT_GETADDR(KERNEL_MHINT_TEMPORARY), num_bytes, MHINT_GETMODE(KERNEL_MHINT_TEMPORARY), ##__VA_ARGS__)
 
 DECL_END
 #endif /* __CC__ */

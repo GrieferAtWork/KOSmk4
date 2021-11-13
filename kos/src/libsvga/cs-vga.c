@@ -299,9 +299,8 @@ vga_v_setdisplaystart_linear(struct svga_chipset *__restrict self, size_t offset
 
 PRIVATE NONNULL((1)) void CC /* For use when `smi_bits_per_pixel == 1' (16-color mode) */
 vga_v_setdisplaystart_16(struct svga_chipset *__restrict self, size_t offset) {
-	vga_r(VGA_IS1_RC); /* Reset flip/flop */
-	vga_w(VGA_ATT_IW, VGA_ATC_PEL | 0x20); /* ??? (0x20?) */
-	vga_w(VGA_ATT_IW, (inb(VGA_ATT_R) & VGA_AT13_FRESERVED) | (offset & 7));
+	uint8_t temp = vga_rattr(VGA_IS1_RC, VGA_ATT_IW_PAS | VGA_ATC_PEL);
+	vga_wattr(VGA_IS1_RC, VGA_ATT_IW_PAS | VGA_ATC_PEL, (temp & VGA_AT13_FRESERVED) | (offset & 7));
 	self->sc_displaystart = offset;
 	offset >>= 3;
 	vga_wcrt(VGA_CRTC_START_LO, (uint8_t)(offset));
@@ -310,9 +309,8 @@ vga_v_setdisplaystart_16(struct svga_chipset *__restrict self, size_t offset) {
 
 PRIVATE NONNULL((1)) void CC /* For use when `smi_bits_per_pixel == 2' (256-color mode) */
 vga_v_setdisplaystart_256(struct svga_chipset *__restrict self, size_t offset) {
-	vga_r(VGA_IS1_RC); /* Reset flip/flop */
-	vga_w(VGA_ATT_IW, VGA_ATC_PEL | 0x20); /* ??? (0x20?) */
-	vga_w(VGA_ATT_IW, (inb(VGA_ATT_R) & VGA_AT13_FRESERVED) | ((offset & 3) << 1));
+	uint8_t temp = vga_rattr(VGA_IS1_RC, VGA_ATT_IW_PAS | VGA_ATC_PEL);
+	vga_wattr(VGA_IS1_RC, VGA_ATT_IW_PAS | VGA_ATC_PEL, (temp & VGA_AT13_FRESERVED) | ((offset & 3) << 1));
 	self->sc_displaystart = offset;
 	offset >>= 2;
 	vga_wcrt(VGA_CRTC_START_LO, (uint8_t)(offset));
@@ -321,9 +319,9 @@ vga_v_setdisplaystart_256(struct svga_chipset *__restrict self, size_t offset) {
 
 PRIVATE NONNULL((1)) void CC /* For use when `smi_bits_per_pixel == 2' (256-color mode) */
 ega_v_setdisplaystart(struct svga_chipset *__restrict self, size_t offset) {
-	inb_p(basevga_IS1_R); /* Reset flip/flop */
-	outb_p(VGA_ATT_IW, VGA_ATC_PEL + 0x20); /* ??? (0x20?) */
-	outb(VGA_ATT_IW, (baseega_registers.vm_att_pel & VGA_AT13_FRESERVED) | (offset & 7));
+	vga_wattr(VGA_IS1_RC, VGA_ATT_IW_PAS | VGA_ATC_PEL,
+	          (baseega_registers.vm_att_pel & VGA_AT13_FRESERVED) |
+	          (offset & 7));
 	self->sc_displaystart = offset;
 	offset >>= 3;
 	__VGA_OUTW_SELECTOR(vga_w, basevga_CRT_I, basevga_CRT_D, VGA_CRTC_START_LO, (uint8_t)(offset));

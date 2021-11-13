@@ -148,13 +148,17 @@ BEGIN
 
 		DEFINE_SIMPLE_DRIVER("vga")
 		DEFINE_SIMPLE_DRIVER("ps2")
-		DEFINE_SIMPLE_DRIVER("sctrace", SOURCE({ "../libsctrace/*.c" })) /* Include libsctrace source files */
+
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
 		DEFINE_SIMPLE_DRIVER("dbx") /* DeBug eXtensions */
 
 		if (TARGET_ARCH in ["i386", "x86_64"]) {
 			DEFINE_SIMPLE_ARCH_DRIVER("rtm")
 		}
+
+		DEFINE_SIMPLE_DRIVER("sctrace",
+			SOURCE({ "../libsctrace/*.c" }) /* Include libsctrace source files */
+		)
 
 		DEFINE_SIMPLE_DRIVER("svga",
 			SOURCE({ "../libsvga/*.c" }) /* Video driver library */

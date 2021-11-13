@@ -133,7 +133,8 @@ done_tmpfs:
 
 	/* Load some additional drivers that we need for the I/O console. */
 	KSysctlInsmod("ps2", NULL); /* Keyboard */
-	ksysctl_insmod("svga", NULL); /* Display */
+	if (access("/dev/svga", F_OK) != 0)
+		ksysctl_insmod("svga", NULL); /* Display */
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
 	 *       emulation, such that we only need to load the usb-hid drivers
