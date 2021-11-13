@@ -389,15 +389,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	__hybrid_assert(!kmalloc_leaks());
 
-#if 1
-	/* Do some testing  with VESA,  but only  on qemu,  just so  we
-	 * don't actually try to do something wonky on real hardware ;) */
-	if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
-		extern void libsvga_init(void);
-		libsvga_init();
-	}
-#endif
-
 	/* Update the given initial user-state to start
 	 * executing /bin/init (or whatever was passed as `init=...') */
 	state = kernel_initialize_exec_init(state);

@@ -286,35 +286,11 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-struct __ATTR_PACKED vga_color {
-	/* NOTE: When loading/saving  the color  palette, the  kernel
-	 *       will automatically up/down-scale the color intensity
-	 *       in order to clamp it to VGA's limit of `0x3f'.
-	 *       With that in mind, to get `0x3f', you should pass `0xff'! */
-	__uint8_t   c_red;       /* Red color component. */
-	__uint8_t   c_green;     /* Green color component. */
-	__uint8_t   c_blue;      /* Blue color component. */
-};
-
-struct __ATTR_PACKED vga_palette256 {
-	struct vga_color vp_pal[256]; /* VGA color palette. */
-};
-
-struct __ATTR_PACKED vga_palette64 {
-	struct vga_color vp_pal[64]; /* VGA color palette. */
-};
-
-struct __ATTR_PACKED vga_palette16 {
-	struct vga_color vp_pal[16]; /* VGA color palette. */
-};
-
-
-struct __ATTR_PACKED vga_font_char {
-	__byte_t    fc_lines[16]; /* Character lines. */
-};
-
-struct __ATTR_PACKED vga_font {
-	struct vga_font_char vf_blob[256]; /* Font data blob. */
+struct __ATTR_PACKED vga_palcolor {
+	/* NOTE: Yes, VGA palette colors are only 6-bit per color! */
+	__uint8_t vpc_r; /* Red color component (00h-3fh). */
+	__uint8_t vpc_g; /* Green color component (00h-3fh). */
+	__uint8_t vpc_b; /* Blue color component (00h-3fh). */
 };
 
 struct __ATTR_PACKED vga_mode {
@@ -369,9 +345,42 @@ struct __ATTR_PACKED vga_mode {
 	__uint8_t vm_seq_memory_mode;   /* VGA_SEQ_MEMORY_MODE. */
 };
 
+
+
+#if 1 /* DEPRECATED */
+struct __ATTR_PACKED vga_color {
+	/* NOTE: When loading/saving  the color  palette, the  kernel
+	 *       will automatically up/down-scale the color intensity
+	 *       in order to clamp it to VGA's limit of `0x3f'.
+	 *       With that in mind, to get `0x3f', you should pass `0xff'! */
+	__uint8_t   c_red;       /* Red color component. */
+	__uint8_t   c_green;     /* Green color component. */
+	__uint8_t   c_blue;      /* Blue color component. */
+};
+
+struct __ATTR_PACKED vga_palette256 {
+	struct vga_color vp_pal[256]; /* VGA color palette. */
+};
+
+struct __ATTR_PACKED vga_palette64 {
+	struct vga_color vp_pal[64]; /* VGA color palette. */
+};
+
+struct __ATTR_PACKED vga_palette16 {
+	struct vga_color vp_pal[16]; /* VGA color palette. */
+};
+
+
+struct __ATTR_PACKED vga_font_char {
+	__byte_t    fc_lines[16]; /* Character lines. */
+};
+
+struct __ATTR_PACKED vga_font {
+	struct vga_font_char vf_blob[256]; /* Font data blob. */
+};
+
 /* TODO: All of these static initializers will be removed once libsvga is ready
  *       All VGA mode initializers are stored in /include/hw/video/vgamodes.h */
-
 
 /* CGA color palette indices for VGA color codes (for `vm_att_pal'). */
 #define VGA_PALINDX_CGA_INIT                          \
@@ -505,6 +514,7 @@ struct __ATTR_PACKED vga_mode {
 		.vm_seq_character_map = 0x00,                                                \
 		.vm_seq_memory_mode   = VGA_SR04_FEXT_MEM,                                   \
 	}
+#endif /* DEPRECATED */
 
 #endif /* __CC__ */
 

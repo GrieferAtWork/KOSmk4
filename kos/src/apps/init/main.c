@@ -133,7 +133,7 @@ done_tmpfs:
 
 	/* Load some additional drivers that we need for the I/O console. */
 	KSysctlInsmod("ps2", NULL); /* Keyboard */
-	KSysctlInsmod("vga", NULL); /* Display */
+	ksysctl_insmod("svga", NULL); /* Display */
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
 	 *       emulation, such that we only need to load the usb-hid drivers
@@ -156,7 +156,13 @@ done_tmpfs:
 			keyboard = open("/dev/ps2kbd1", O_RDONLY | O_CLOEXEC, 0);
 		if (keyboard < 0)
 			keyboard = Open("/dev/ps2kbd2", O_RDONLY | O_CLOEXEC, 0);
-		display = Open("/dev/vga", O_WRONLY | O_CLOEXEC, 0);
+		display = open("/dev/svga", O_WRONLY | O_CLOEXEC, 0);
+#if 1 /* Backwards compat (for now) */
+		if (display < 0) {
+			KSysctlInsmod("vga", NULL);
+			display = Open("/dev/vga", O_WRONLY | O_CLOEXEC, 0);
+		}
+#endif
 		console = sys_Xmktty("console", keyboard, display, 0);
 		close(keyboard);
 		close(display);

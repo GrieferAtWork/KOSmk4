@@ -373,6 +373,36 @@ basevga_setmode(struct vga_mode const *__restrict regs) {
 }
 
 
+/* Read/write to/from the current color palette.
+ * @param: color_index: Starting palette color index.
+ * @param: count:       # of color rgb-triples to read/write */
+INTERN NONNULL((2)) void CC
+basevga_rdpal(uint8_t color_index,
+              struct vga_palcolor *__restrict buf,
+              uint8_t count) {
+	vga_w(VGA_PEL_IR, color_index);
+	while (count--) {
+		buf->vpc_r = vga_r(VGA_PEL_D);
+		buf->vpc_g = vga_r(VGA_PEL_D);
+		buf->vpc_b = vga_r(VGA_PEL_D);
+		++buf;
+	}
+}
+
+INTERN NONNULL((2)) void CC
+basevga_wrpal(uint8_t color_index,
+              struct vga_palcolor const *__restrict buf,
+              uint8_t count) {
+	vga_w(VGA_PEL_IW, color_index);
+	while (count--) {
+		vga_w(VGA_PEL_D, buf->vpc_r);
+		vga_w(VGA_PEL_D, buf->vpc_g);
+		vga_w(VGA_PEL_D, buf->vpc_b);
+		++buf;
+	}
+}
+
+
 
 /* Direct access  to the  standard 256K  of VGA  video  memory.
  * These functions take the current register state into account
@@ -500,9 +530,6 @@ basevga_wrvmem(uint32_t addr, void const *buf, uint32_t num_bytes) {
 	vga_wgfx(VGA_GFX_MODE, saved_VGA_GFX_MODE);
 	vga_wgfx(VGA_SEQ_PLANE_WRITE, saved_VGA_SEQ_PLANE_WRITE);
 }
-
-
-
 
 
 DECL_END
