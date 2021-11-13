@@ -23,7 +23,10 @@
 #include "api.h"
 /**/
 
+#ifdef CONFIG_SVGA_HAVE_CHIPSET_VGA
 #include <kos/types.h>
+
+#include <stdbool.h>
 
 #include <libsvga/chipset.h>
 #include <libsvga/chipsets/vga.h>
@@ -63,9 +66,33 @@ struct vga_known_mode {
 #define CS_VGAMODE_720X348X2   10
 #define CS_VGAMODE_COUNT       11
 
+/* Indices for `ega_modelist' */
+#define CS_EGAMODE_TEXT       0
+#define CS_EGAMODE_320X200X16 1
+#define CS_EGAMODE_640X200X16 2
+#define CS_EGAMODE_640X350X16 3
+#define CS_EGAMODE_COUNT      4
+
 /* List of supported VGA modes. */
 INTDEF struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT];
+INTDEF struct vga_known_mode const ega_modelist[CS_EGAMODE_COUNT];
+
+
+/* Probe for VGA support.
+ * @return: true:  Chipset found.
+ * @return: false: Chipset isn't present. */
+INTDEF WUNUSED NONNULL((1)) bool CC
+cs_vga_probe(struct svga_chipset *__restrict self);
+
+/* VGA Chipset driver initializer. */
+#define SVGA_CHIPSET_DRIVER_INIT_VGA              \
+	{                                             \
+		.scd_cssize = sizeof(struct vga_chipset), \
+		.scd_probe  = &cs_vga_probe,              \
+		/* .scd_name = */ "vga",                  \
+	}
 
 DECL_END
+#endif /* CONFIG_SVGA_HAVE_CHIPSET_VGA */
 
 #endif /* !GUARD_LIBSVGA_CS_VGA_H */

@@ -34,18 +34,20 @@
 #include "chipset.h"
 
 /* Include headers of supported chipset drivers. */
-#ifdef CONFIG_SVGA_HAVE_CHIPSET_VESA
 #include "cs-vesa.h"
-#endif /* CONFIG_SVGA_HAVE_CHIPSET_VESA */
+#include "cs-vga.h"
 
 DECL_BEGIN
 
 
 /* List of supported drivers. - Keep sorted most-specific to most-generic. */
 PRIVATE struct svga_chipset_driver svga_drivers[] = {
-#ifdef CONFIG_SVGA_HAVE_CHIPSET_VESA
+#ifdef SVGA_CHIPSET_DRIVER_INIT_VESA
 	SVGA_CHIPSET_DRIVER_INIT_VESA,
-#endif /* CONFIG_SVGA_HAVE_CHIPSET_VESA */
+#endif /* SVGA_CHIPSET_DRIVER_INIT_VESA */
+#ifdef SVGA_CHIPSET_DRIVER_INIT_VGA
+	SVGA_CHIPSET_DRIVER_INIT_VGA,
+#endif /* SVGA_CHIPSET_DRIVER_INIT_VGA */
 	{ 0, NULL },
 };
 
@@ -110,6 +112,7 @@ INTERN void libsvga_init(void) {
 		if ((*drivers[i].scd_probe)(cs))
 			break;
 	}
+	printk(KERN_DEBUG "[svga] Chipset detected: %q\n", drivers[i].scd_name);
 	RAII_FINALLY { (*cs->sc_ops.sco_fini)(cs); };
 	svga_chipset_write(cs);
 	RAII_FINALLY { svga_chipset_endwrite(cs); };

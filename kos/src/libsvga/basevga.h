@@ -38,7 +38,7 @@ typedef __port_t port_t;
 /* Initialize base-vga global variables.
  * This function initializes:
  * - basevga_flags
- * - basevga_is1rx
+ * - basevga_IS1_R
  * Called during chipset driver probe functions. */
 INTDEF void CC basevga_init(void);
 
@@ -53,6 +53,10 @@ INTDEF NONNULL((1)) void CC basevga_setregs(struct vga_mode const *__restrict re
  * NOTE: This function leaves the screen turned off! */
 INTDEF NONNULL((1)) void CC basevga_setmode(struct vga_mode const *__restrict regs);
 
+/* Current (assumed) EGA register state. */
+INTDEF struct vga_mode baseega_registers;
+
+
 /* TODO: basevga_getpal() */
 /* TODO: basevga_setpal() */
 /* TODO: basevga_copytoplanar16()  {smi_bits_per_pixel: 1, smi_colorbits: 4} */
@@ -63,8 +67,9 @@ INTDEF NONNULL((1)) void CC basevga_setmode(struct vga_mode const *__restrict re
 INTDEF uint32_t basevga_flags;
 #define BASEVGA_FLAG_ISEGA 0x0001 /* FLAG: Video card is EGA-derived */
 
-/* Either `VGA_IS1_RC' or `VGA_IS1_RM' (as appropriate) */
-INTDEF port_t basevga_is1rx;
+INTDEF port_t basevga_CRT_I; /* Either `VGA_CRT_IC' or `VGA_CRT_IM' (as appropriate) */
+INTDEF port_t basevga_CRT_D; /* Either `VGA_CRT_DC' or `VGA_CRT_DM' (as appropriate) */
+INTDEF port_t basevga_IS1_R; /* Either `VGA_IS1_RC' or `VGA_IS1_RM' (as appropriate) */
 
 DECL_END
 

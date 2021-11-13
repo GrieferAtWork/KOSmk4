@@ -23,6 +23,7 @@
 #include "api.h"
 /**/
 
+#ifdef CONFIG_SVGA_HAVE_CHIPSET_VESA
 #include <stdbool.h>
 
 #include <libbios86/bios.h>
@@ -64,19 +65,19 @@ struct vesa_chipset: svga_chipset {
 /* Probe for VESA support.
  * @return: true:  Chipset found.
  * @return: false: Chipset isn't present. */
-INTDEF bool CC
-vesa_probe(struct svga_chipset *__restrict self);
+INTDEF WUNUSED NONNULL((1)) bool CC
+cs_vesa_probe(struct svga_chipset *__restrict self);
 
 
 /* VESA Chipset driver initializer. */
 #define SVGA_CHIPSET_DRIVER_INIT_VESA              \
 	{                                              \
 		.scd_cssize = sizeof(struct vesa_chipset), \
-		.scd_probe  = &vesa_probe,                 \
+		.scd_probe  = &cs_vesa_probe,              \
 		/* .scd_name = */ "vesa",                  \
 	}
 
-
 DECL_END
+#endif /* CONFIG_SVGA_HAVE_CHIPSET_VESA */
 
 #endif /* !GUARD_LIBSVGA_CS_VESA_H */

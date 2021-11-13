@@ -24,16 +24,32 @@
 #include "api.h"
 /**/
 
+#ifdef CONFIG_SVGA_HAVE_CHIPSET_VGA
 #include <hw/video/vga.h>
 #include <hw/video/vgamodes.h>
 #include <kos/types.h>
 
+#include <stddef.h>
+#include <string.h>
+
 #include <libsvga/chipset.h>
 #include <libsvga/chipsets/vga.h>
+#include <libsvga/util/vgaio.h>
 
+#include "basevga.h"
 #include "cs-vga.h"
 
 DECL_BEGIN
+
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
+
+STATIC_ASSERT((offsetof(struct vga_chipset, gcs_modeid) - offsetof(struct vga_chipset, sc_mode)) ==
+              (offsetof(struct vga_modeinfo, gmi_modeid)));
+
 
 /* List of supported VGA modes. */
 INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
@@ -207,9 +223,261 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 };
 
 
-/* TODO */
+INTERN_CONST struct vga_known_mode const ega_modelist[CS_EGAMODE_COUNT] = {
+	[CS_EGAMODE_TEXT] = {
+		.vkm_info = {
+			.gmi_base = {
+				.smi_lfb            = 0xb8000,
+				.smi_flags          = SVGA_MODEINFO_F_LFB | SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_TXT,
+				.smi_scanline       = 160,
+				.smi_resx           = 80,
+				.smi_resy           = 25,
+				.smi_bits_per_pixel = 16,
+			},
+			.gmi_modeid = CS_VGAMODE_TEXT,
+		},
+		.vkm_regs = VGAMODE_INIT_EGA_TEXT,
+	},
 
+	[CS_EGAMODE_320X200X16] = {
+		.vkm_info = {
+			.gmi_base = {
+				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
+				.smi_scanline       = 40,
+				.smi_resx           = 320,
+				.smi_resy           = 200,
+				.smi_bits_per_pixel = 1,
+				.smi_colorbits      = 4,
+			},
+			.gmi_modeid = CS_EGAMODE_320X200X16,
+		},
+		.vkm_regs = VGAMODE_INIT_EGA_320X200X16,
+	},
+
+	[CS_EGAMODE_640X200X16] = {
+		.vkm_info = {
+			.gmi_base = {
+				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
+				.smi_scanline       = 80,
+				.smi_resx           = 640,
+				.smi_resy           = 200,
+				.smi_bits_per_pixel = 1,
+				.smi_colorbits      = 4,
+			},
+			.gmi_modeid = CS_EGAMODE_640X200X16,
+		},
+		.vkm_regs = VGAMODE_INIT_EGA_640X200X16,
+	},
+
+	[CS_EGAMODE_640X350X16] = {
+		.vkm_info = {
+			.gmi_base = {
+				.smi_flags          = SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_PLANAR,
+				.smi_scanline       = 80,
+				.smi_resx           = 640,
+				.smi_resy           = 350,
+				.smi_bits_per_pixel = 1,
+				.smi_colorbits      = 4,
+			},
+			.gmi_modeid = CS_EGAMODE_640X350X16,
+		},
+		.vkm_regs = VGAMODE_INIT_EGA_640X350X16,
+	},
+
+};
+
+
+
+
+
+PRIVATE NONNULL((1)) void CC /* For use when `smi_bits_per_pixel == 8' */
+vga_v_setdisplaystart_linear(struct svga_chipset *__restrict self, size_t offset) {
+	vga_wcrt(VGA_CRTC_START_LO, (uint8_t)(offset));
+	vga_wcrt(VGA_CRTC_START_HI, (uint8_t)(offset >> 8));
+	self->sc_displaystart = offset;
+}
+
+PRIVATE NONNULL((1)) void CC /* For use when `smi_bits_per_pixel == 1' (16-color mode) */
+vga_v_setdisplaystart_16(struct svga_chipset *__restrict self, size_t offset) {
+	vga_r(VGA_IS1_RC); /* Reset flip/flop */
+	vga_w(VGA_ATT_IW, VGA_ATC_PEL | 0x20); /* ??? (0x20?) */
+	vga_w(VGA_ATT_IW, (inb(VGA_ATT_R) & VGA_AT13_FRESERVED) | (offset & 7));
+	self->sc_displaystart = offset;
+	offset >>= 3;
+	vga_wcrt(VGA_CRTC_START_LO, (uint8_t)(offset));
+	vga_wcrt(VGA_CRTC_START_HI, (uint8_t)(offset >> 8));
+}
+
+PRIVATE NONNULL((1)) void CC /* For use when `smi_bits_per_pixel == 2' (256-color mode) */
+vga_v_setdisplaystart_256(struct svga_chipset *__restrict self, size_t offset) {
+	vga_r(VGA_IS1_RC); /* Reset flip/flop */
+	vga_w(VGA_ATT_IW, VGA_ATC_PEL | 0x20); /* ??? (0x20?) */
+	vga_w(VGA_ATT_IW, (inb(VGA_ATT_R) & VGA_AT13_FRESERVED) | ((offset & 3) << 1));
+	self->sc_displaystart = offset;
+	offset >>= 2;
+	vga_wcrt(VGA_CRTC_START_LO, (uint8_t)(offset));
+	vga_wcrt(VGA_CRTC_START_HI, (uint8_t)(offset >> 8));
+}
+
+PRIVATE NONNULL((1)) void CC /* For use when `smi_bits_per_pixel == 2' (256-color mode) */
+ega_v_setdisplaystart(struct svga_chipset *__restrict self, size_t offset) {
+	inb_p(basevga_IS1_R); /* Reset flip/flop */
+	outb_p(VGA_ATT_IW, VGA_ATC_PEL + 0x20); /* ??? (0x20?) */
+	outb(VGA_ATT_IW, (baseega_registers.vm_att_pel & VGA_AT13_FRESERVED) | (offset & 7));
+	self->sc_displaystart = offset;
+	offset >>= 3;
+	__VGA_OUTW_SELECTOR(vga_w, basevga_CRT_I, basevga_CRT_D, VGA_CRTC_START_LO, (uint8_t)(offset));
+	__VGA_OUTW_SELECTOR(vga_w, basevga_CRT_I, basevga_CRT_D, VGA_CRTC_START_HI, (uint8_t)(offset >> 8));
+}
+
+PRIVATE NONNULL((1)) void CC
+vga_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t offset) {
+	/* This right here limits `offset' to: {range: [0,2040], align: 8} */
+	vga_wcrt(VGA_CRTC_OFFSET, (uint8_t)(offset >> 3));
+	self->sc_logicalwidth = offset;
+}
+
+PRIVATE NONNULL((1)) void CC
+ega_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t offset) {
+	/* This right here limits `offset' to: {range: [0,2040], align: 8} */
+	__VGA_OUTW_SELECTOR(vga_w, basevga_CRT_I, basevga_CRT_D, VGA_CRTC_OFFSET, (uint8_t)(offset >> 3));
+	self->sc_logicalwidth = offset;
+}
+
+
+/* Raw VGA doesn't need to save any additional registers.
+ * The base registers  are already saved  by the  caller! */
+PRIVATE NONNULL((1)) void CC
+vga_v_getregs(struct svga_chipset *__restrict UNUSED(self),
+              byte_t UNUSED(regbuf)[]) {
+}
+#define vga_v_setregs (*(void(CC *)(struct svga_chipset *__restrict, __byte_t const[]))&vga_v_getregs)
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(CC vga_v_fini)(struct svga_chipset *__restrict UNUSED(self)) {
+	/* nothing */
+}
+
+
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) bool CC
+vga_v_getmode(struct svga_chipset *__restrict UNUSED(self),
+              struct svga_modeinfo *__restrict _result,
+              uintptr_t *__restrict p_index)
+		THROWS(E_IOERROR) {
+	struct vga_modeinfo *result = (struct vga_modeinfo *)_result;
+	if (*p_index >= COMPILER_LENOF(vga_modelist))
+		return false; /* No more modes... */
+	/* Copy mode information. */
+	memcpy(&result->gmi_base, &vga_modelist[*p_index].vkm_info,
+	       sizeof(struct svga_modeinfo));
+	result->gmi_modeid = (uint8_t)*p_index;
+	++*p_index;
+	return true;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) bool CC
+ega_v_getmode(struct svga_chipset *__restrict UNUSED(self),
+              struct svga_modeinfo *__restrict _result,
+              uintptr_t *__restrict p_index)
+		THROWS(E_IOERROR) {
+	struct vga_modeinfo *result = (struct vga_modeinfo *)_result;
+	if (*p_index >= COMPILER_LENOF(ega_modelist))
+		return false; /* No more modes... */
+	/* Copy mode information. */
+	memcpy(&result->gmi_base, &ega_modelist[*p_index].vkm_info,
+	       sizeof(struct svga_modeinfo));
+	result->gmi_modeid = (uint8_t)*p_index;
+	++*p_index;
+	return true;
+}
+
+PRIVATE NONNULL((1, 2)) void CC
+vga_v_setmode(struct svga_chipset *__restrict self,
+              struct svga_modeinfo const *__restrict _mode) {
+	struct vga_chipset *me          = (struct vga_chipset *)self;
+	struct vga_modeinfo const *mode = (struct vga_modeinfo const *)_mode;
+
+	/* Set VGA registers. */
+	basevga_setmode(&vga_modelist[mode->gmi_modeid].vkm_regs);
+
+	/* Remember mode information. */
+	memcpy(&me->sc_mode, mode, sizeof(struct vga_modeinfo));
+
+	/* Define mode-specific operators. */
+	switch (me->sc_mode.smi_bits_per_pixel) {
+	case 1: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_16; break;
+	case 2: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_256; break;
+	case 8: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_linear; break;
+	default: __builtin_unreachable();
+	}
+	me->sc_displaystart = 0;
+	me->sc_logicalwidth = 0;
+}
+
+PRIVATE NONNULL((1, 2)) void CC
+ega_v_setmode(struct svga_chipset *__restrict self,
+              struct svga_modeinfo const *__restrict _mode) {
+	struct vga_chipset *me          = (struct vga_chipset *)self;
+	struct vga_modeinfo const *mode = (struct vga_modeinfo const *)_mode;
+
+	/* Set VGA registers. */
+	basevga_setmode(&ega_modelist[mode->gmi_modeid].vkm_regs);
+
+	/* Remember mode information. */
+	memcpy(&me->sc_mode, mode, sizeof(struct vga_modeinfo));
+
+	/* Define mode-specific operators. */
+	me->sc_ops.sco_setdisplaystart = &ega_v_setdisplaystart;
+	me->sc_displaystart = 0;
+	me->sc_logicalwidth = 0;
+}
+
+
+
+/* Probe for VGA support.
+ * @return: true:  Chipset found.
+ * @return: false: Chipset isn't present. */
+INTERN WUNUSED NONNULL((1)) bool CC
+cs_vga_probe(struct svga_chipset *__restrict self) {
+	/* XXX: Maybe check if PCI says that VGA exists? */
+
+	/* Initialize the base-VGA system.
+	 * This also initializes `basevga_flags & BASEVGA_FLAG_ISEGA' */
+	basevga_init();
+
+	/* Initialize the VGA chipset controller. */
+	DBG_memset(self, 0xcc, sizeof(struct vga_chipset));
+	self->sc_ops.sco_fini = &vga_v_fini;
+
+	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
+		self->sc_ops.sco_getmode         = &ega_v_getmode;
+		self->sc_ops.sco_setmode         = &ega_v_setmode;
+		self->sc_ops.sco_setlogicalwidth = &ega_v_setlogicalwidth;
+	} else {
+		self->sc_ops.sco_getmode         = &vga_v_getmode;
+		self->sc_ops.sco_setmode         = &vga_v_setmode;
+		self->sc_ops.sco_setlogicalwidth = &vga_v_setlogicalwidth;
+	}
+	self->sc_ops.sco_modeinfosize = sizeof(struct vga_modeinfo);
+	self->sc_ops.sco_strings      = NULL;
+	self->sc_ops.sco_getregs      = &vga_v_getregs;
+	self->sc_ops.sco_setregs      = &vga_v_setregs;
+	self->sc_ops.sco_regsize      = 0;
+	/* NOTE: We don't define the setwindow operators because
+	 *       standard EGA/VGA don't  have multiple  windows! */
+	shared_rwlock_init(&self->sc_lock);
+	self->sc_vmemsize           = 16 * 1024; /* Standard VGA has 64K of video memory */
+	self->sc_rdwindow           = 0;
+	self->sc_wrwindow           = 0;
+	self->sc_logicalwidth_max   = 2040; /* s.a. `vga_v_setlogicalwidth' */
+	self->sc_logicalwidth_align = 8;    /* s.a. `vga_v_setlogicalwidth' */
+
+	return true;
+}
 
 DECL_END
+#endif /* CONFIG_SVGA_HAVE_CHIPSET_VGA */
 
 #endif /* !GUARD_LIBSVGA_CS_VGA_C */

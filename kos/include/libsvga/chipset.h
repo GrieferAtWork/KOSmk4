@@ -58,8 +58,8 @@ __DECL_BEGIN
 struct svga_modeinfo {
 	__physaddr_t smi_lfb;                /* [valid_if(SVGA_MODEINFO_F_LFB)] Linear frame buffer base address (if available) */
 	__uint32_t   smi_flags;              /* Mode flags (set of `SVGA_MODEINFO_F_*') */
-	__uint32_t   smi_scanline;           /* [!0] Scanline size (in bytes; aligned by `smi_logicalwidth_align')
-	                                      *      Usually is `>= CEIL_ALIGN(smi_resy, smi_logicalwidth_align)' */
+	__uint32_t   smi_scanline;           /* [!0] Scanline size (in bytes; aligned by `sc_logicalwidth_align')
+	                                      *      Usually is `>= CEIL_ALIGN(smi_resy, sc_logicalwidth_align)' */
 	__uint16_t   smi_resx;               /* [!0] Resolution in X (when `SVGA_MODEINFO_F_TXT': # of character cells in X) */
 	__uint16_t   smi_resy;               /* [!0] Resolution in Y (when `SVGA_MODEINFO_F_TXT': # of character cells in Y) */
 	__shift_t    smi_bits_per_pixel;     /* [!0] Bits per pixel (when `SVGA_MODEINFO_F_TXT': 16) */
@@ -87,16 +87,18 @@ typedef __ATTR_NONNULL((2, 3)) __ssize_t
 
 struct svga_chipset_ops {
 
-	/* [0..1][const] Chipset-specific finalization. */
-	NOBLOCK void /*NOTHROW*/ (LIBSVGA_CC *sco_fini)(struct svga_chipset *__restrict self);
+	/* [1..1][const] Chipset-specific finalization. */
+	__NOBLOCK __ATTR_NONNULL((1)) void
+	/*NOTHROW*/ (LIBSVGA_CC *sco_fini)(struct svga_chipset *__restrict self);
 
 	/* [const][== sizeof(struct MYCHIPSET_svga_modeinfo)] */
 	__size_t sco_modeinfosize;
 
 	/* [0..1][const][lock(WRITE(sc_lock))]
 	 * Enumerate chipset-specific identification strings. */
-	__ssize_t (LIBSVGA_CC *sco_strings)(struct svga_chipset *__restrict self,
-	                                    svga_chipset_enumstring_t cb, void *arg);
+	__ATTR_NONNULL((1, 2)) __ssize_t
+	(LIBSVGA_CC *sco_strings)(struct svga_chipset *__restrict self,
+	                          svga_chipset_enumstring_t cb, void *arg);
 
 	/* [1..1][const][lock(WRITE(sc_lock))]
 	 * - Return  information about the first mode with a cs-specific ID that
@@ -109,9 +111,10 @@ struct svga_chipset_ops {
 	 *   was  written  back to  that  variable during  a  preceding call.
 	 * @return: true:  Another mode was retrieved.
 	 * @return: false: All modes enumerated. */
-	__BOOL (LIBSVGA_CC *sco_getmode)(struct svga_chipset *__restrict self,
-	                                 struct svga_modeinfo *__restrict result,
-	                                 __uintptr_t *__restrict p_index)
+	__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __BOOL
+	(LIBSVGA_CC *sco_getmode)(struct svga_chipset *__restrict self,
+	                          struct svga_modeinfo *__restrict result,
+	                          __uintptr_t *__restrict p_index)
 			__THROWS(E_IOERROR);
 
 	/* [1..1][const][lock(WRITE(sc_lock))]
@@ -120,8 +123,9 @@ struct svga_chipset_ops {
 	 * - Prior to this function being  called for the first  time,
 	 *   `self->sc_mode.smi_bits_per_pixel' may be `0' to indicate
 	 *   that the current video mode is unknown. */
-	void (LIBSVGA_CC *sco_setmode)(struct svga_chipset *__restrict self,
-	                               struct svga_modeinfo const *__restrict mode);
+	__ATTR_NONNULL((1, 2)) void
+	(LIBSVGA_CC *sco_setmode)(struct svga_chipset *__restrict self,
+	                          struct svga_modeinfo const *__restrict mode);
 
 	/* [1..1][const][lock(WRITE(sc_lock))]
 	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'
@@ -129,8 +133,10 @@ struct svga_chipset_ops {
 	 *   even before `sco_setmode' was called for the first time. They should
 	 *   also  be used before  exclusive display control is  handed to a user
 	 *   application, and after that application relinquishes control. */
-	void (LIBSVGA_CC *sco_getregs)(struct svga_chipset *__restrict self, __byte_t regbuf[]);
-	void (LIBSVGA_CC *sco_setregs)(struct svga_chipset *__restrict self, __byte_t const regbuf[]);
+	__ATTR_NONNULL((1, 2)) void
+	(LIBSVGA_CC *sco_getregs)(struct svga_chipset *__restrict self, __byte_t regbuf[]);
+	__ATTR_NONNULL((1, 2)) void
+	(LIBSVGA_CC *sco_setregs)(struct svga_chipset *__restrict self, __byte_t const regbuf[]);
 
 	/* [const] Required buffer size for `sco_getregs' / `sco_setregs'. */
 	__size_t sco_regsize;
@@ -149,25 +155,32 @@ struct svga_chipset_ops {
 	 * - These functions may only be used if no LFB (linear frame buffer) is
 	 *   available. If such a buffer is available, you must mmap() `smi_lfb'
 	 *   and just directly modify its backing memory!
+	 * @assume(windows != sc_rdwindow || windows != sc_wrwindow); // as relevant
 	 * @assume(WAS_CALLED(sco_setmode));
 	 * @assume(window < CEILDIV(self->sc_vmemsize, 64 * 1024));
 	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_LFB)); */
-	void (LIBSVGA_CC *sco_setwindow)(struct svga_chipset *__restrict self, __size_t window)
+	__ATTR_NONNULL((1)) void
+	(LIBSVGA_CC *sco_setwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 	/* [1..1][lock(WRITE(sc_lock))] Same as `sco_setwindow', but *may* only update `sc_rdwindow' */
-	void (LIBSVGA_CC *sco_setrdwindow)(struct svga_chipset *__restrict self, __size_t window)
+	__ATTR_NONNULL((1)) void
+	(LIBSVGA_CC *sco_setrdwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 	/* [1..1][lock(WRITE(sc_lock))] Same as `sco_setwindow', but *may* only update `sc_wrwindow' */
-	void (LIBSVGA_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
+	__ATTR_NONNULL((1)) void
+	(LIBSVGA_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 
 	/* [1..1][lock(WRITE(sc_lock))]
 	 * - Set display start offset to `offset' pixels from `self->sc_mode.smi_vmembase'
+	 * - Set `self->sc_displaystart = offset;'
 	 * - Not available in text-mode video modes.
 	 * @assume(WAS_CALLED(sco_setmode));
-	 * @assume(offset <= sc_vmemsize * 8 / smi_bits_per_pixel);
+	 * @assume(self->sc_displaystart != offset);
+	 * @assume(offset <= self->sc_vmemsize * 8 / self->sc_mode.smi_bits_per_pixel);
 	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_TXT)); */
-	void (LIBSVGA_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
+	__ATTR_NONNULL((1)) void
+	(LIBSVGA_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
 			__THROWS(E_IOERROR);
 
 	/* [1..1][lock(WRITE(sc_lock))]
@@ -180,32 +193,34 @@ struct svga_chipset_ops {
 	 * - The default value is `smi_scanline'
 	 * - Not available in text-mode video modes.
 	 * @assume(WAS_CALLED(sco_setmode));
-	 * @assume(IS_ALIGNED(offset, self->sc_mode.smi_logicalwidth_align));
+	 * @assume(self->sc_logicalwidth != offset);
+	 * @assume(IS_ALIGNED(offset, self->sc_logicalwidth_align));
 	 * @assume(offset <= sc_logicalwidth_max);
 	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_TXT)); */
-	void (LIBSVGA_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t offset)
+	__ATTR_NONNULL((1)) void
+	(LIBSVGA_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t offset)
 			__THROWS(E_IOERROR);
 };
 
 struct svga_chipset {
-	struct svga_chipset_ops sc_ops;              /* [const] Chipset operators. */
-	struct shared_rwlock    sc_lock;             /* Lock for this chipset. */
-	__size_t                sc_vmemsize;         /* [const] Video memory size (in bytes; usually a multiple of 64K). */
-	__size_t                sc_rdwindow;         /* [lock(sc_lock)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Current display window for reads. */
-	__size_t                sc_wrwindow;         /* [lock(sc_lock)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Current display window for writes. */
-	__size_t                sc_displaystart;     /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Current display start (pixels from  `sc_mode.smi_vmembase'
-	                                              * to the beginning of the screen; usually top-left corner) */
-	__uint32_t              sc_logicalwidth;     /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Current logical screen width (in bytes; updated by `sco_setlogicalwidth') */
-	__uint32_t              sc_logicalwidth_max; /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Max value allowed for `sc_logicalwidth' */
+	struct svga_chipset_ops sc_ops;                /* [const] Chipset operators. */
+	struct shared_rwlock    sc_lock;               /* Lock for this chipset. */
+	__size_t                sc_vmemsize;           /* [const] Video memory size (in bytes; usually a multiple of 64K). */
+	__size_t                sc_rdwindow;           /* [lock(sc_lock)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                                * Current display window for reads. */
+	__size_t                sc_wrwindow;           /* [lock(sc_lock)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                                * Current display window for writes. */
+	__size_t                sc_displaystart;       /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                                * Current display start (pixels from  `sc_mode.smi_vmembase'
+	                                                * to the beginning of the screen; usually top-left corner) */
+	__uint32_t              sc_logicalwidth;       /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                                * Current logical screen width (in bytes; updated by `sco_setlogicalwidth') */
+	__uint32_t              sc_logicalwidth_max;   /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                                * Max value allowed for `sc_logicalwidth' */
 	__uint32_t              sc_logicalwidth_align; /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Alignment requirements of `sc_logicalwidth' */
-	struct svga_modeinfo    sc_mode;             /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                              * Current display mode */
+	                                                * Alignment requirements of `sc_logicalwidth' */
+	struct svga_modeinfo    sc_mode;               /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	                                                * Current display mode */
 	/* Chipset-specific data goes here. */
 };
 
@@ -245,7 +260,8 @@ struct svga_chipset_driver {
 	 *        For this, `self' must point to a `scd_cssize'-byte long buffer.
 	 * @return: true:  Chipset found.
 	 * @return: false: Chipset isn't present. */
-	__BOOL (LIBSVGA_CC *scd_probe)(struct svga_chipset *__restrict self);
+	__ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+	(LIBSVGA_CC *scd_probe)(struct svga_chipset *__restrict self);
 
 	/* Chipset name. */
 	char scd_name[16];

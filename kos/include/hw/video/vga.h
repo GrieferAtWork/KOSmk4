@@ -100,6 +100,9 @@ __SYSDECL_BEGIN
 #define VGA_SEQ_C       0x05  /* Number of Sequencer Registers. */
 #define VGA_MIS_C       0x01  /* Number of Misc Output Register. */
 
+
+
+
 /* VGA CRT controller register indices */
 #define VGA_CRTC_H_TOTAL       0x00
 #define VGA_CRTC_H_DISP        0x01
@@ -154,6 +157,9 @@ __SYSDECL_BEGIN
 #define VGA_CRTC_LINE_COMPARE  0x18
 #define VGA_CRTC_REGS          VGA_CRT_C
 
+
+
+
 /* VGA attribute controller register indices */
 #define VGA_ATC_PALETTE0       0x00
 #define VGA_ATC_PALETTE1       0x01
@@ -193,6 +199,9 @@ __SYSDECL_BEGIN
 
 #define VGA_AR_ENABLE_DISPLAY  0x20
 
+
+
+
 /* VGA sequencer register indices */
 #define VGA_SEQ_RESET          0x00
 #define VGA_SEQ_CLOCK_MODE     0x01
@@ -211,6 +220,9 @@ __SYSDECL_BEGIN
 #   define VGA_SR04_FSEQ_MODE       0x04 /* bit 2: directs system to use a sequential addressing mode */
 #   define VGA_SR04_FCHN_4M         0x08 /* bit 3: selects modulo 4 addressing for CPU access to display memory */
 #   define VGA_SR04_FRESERVED       0xf1 /* Mask of reserved registers */
+
+
+
 
 /* VGA graphics controller register indices */
 #define VGA_GFX_SR_VALUE        0x00

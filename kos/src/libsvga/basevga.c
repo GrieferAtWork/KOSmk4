@@ -42,8 +42,10 @@ DECL_BEGIN
 /* Basic VGA adapter flags. (Set of `BASEVGA_FLAG_*') */
 INTERN uint32_t basevga_flags = 0;
 
-/* Either `VGA_IS1_RC' or `VGA_IS1_RM' (as appropriate) */
-INTERN port_t basevga_is1rx = 0; /* Initialized in `basevga_init()' */
+/* Initialized in `basevga_init()' */
+INTERN port_t basevga_CRT_I = 0; /* Either `VGA_CRT_IC' or `VGA_CRT_IM' (as appropriate) */
+INTERN port_t basevga_CRT_D = 0; /* Either `VGA_CRT_DC' or `VGA_CRT_DM' (as appropriate) */
+INTERN port_t basevga_IS1_R = 0; /* Either `VGA_IS1_RC' or `VGA_IS1_RM' (as appropriate) */
 
 
 /* Check if we're dealing */
@@ -60,7 +62,7 @@ PRIVATE bool CC probe_ega(void) {
 /* Initialize base-vga global variables.
  * This function initializes:
  * - basevga_flags
- * - basevga_is1rx
+ * - basevga_IS1_R
  * Called during chipset driver probe functions. */
 INTERN void CC basevga_init(void) {
 	bool hascolor;
@@ -77,14 +79,21 @@ INTERN void CC basevga_init(void) {
 		hascolor = (inb(VGA_MIS_R) & 0x01) != 0;
 	}
 
-	/* Set-up the correct input-status register. */
-	basevga_is1rx = hascolor ? VGA_IS1_RC
-	                         : VGA_IS1_RM;
+	/* Set-up the correct registers for color/mono mode. */
+	if (hascolor) {
+		basevga_IS1_R = VGA_IS1_RC;
+		basevga_CRT_I = VGA_CRT_IC;
+		basevga_CRT_D = VGA_CRT_DC;
+	} else {
+		basevga_IS1_R = VGA_IS1_RM;
+		basevga_CRT_I = VGA_CRT_IM;
+		basevga_CRT_D = VGA_CRT_DM;
+	}
 }
 
 
 /* Current (assumed) EGA register state. */
-PRIVATE struct vga_mode ega_registers = VGAMODE_INIT_EGA_TEXT;
+INTERN struct vga_mode baseega_registers = VGAMODE_INIT_EGA_TEXT;
 
 /* Get/Set standard VGA registers.
  * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
@@ -95,7 +104,7 @@ basevga_getregs(struct vga_mode *__restrict regs) {
 
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
 		/* Special case for EGA */
-		memcpy(regs, &ega_registers, sizeof(struct vga_mode));
+		memcpy(regs, &baseega_registers, sizeof(struct vga_mode));
 		return;
 	}
 
@@ -148,12 +157,12 @@ basevga_getregs(struct vga_mode *__restrict regs) {
 
 	/* Attribute controller. */
 	for (i = 0; i < 16; ++i)
-		regs->vm_att_pal[i] = vga_rattr(basevga_is1rx, VGA_ATC_PALETTE0 + i);
-	regs->vm_att_mode         = vga_rattr(basevga_is1rx, VGA_ATC_MODE);
-	regs->vm_att_overscan     = vga_rattr(basevga_is1rx, VGA_ATC_OVERSCAN);
-	regs->vm_att_plane_enable = vga_rattr(basevga_is1rx, VGA_ATC_PLANE_ENABLE);
-	regs->vm_att_pel          = vga_rattr(basevga_is1rx, VGA_ATC_PEL);
-	regs->vm_att_color_page   = vga_rattr(basevga_is1rx, VGA_ATC_COLOR_PAGE);
+		regs->vm_att_pal[i] = vga_rattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i);
+	regs->vm_att_mode         = vga_rattr(basevga_IS1_R, VGA_ATC_MODE);
+	regs->vm_att_overscan     = vga_rattr(basevga_IS1_R, VGA_ATC_OVERSCAN);
+	regs->vm_att_plane_enable = vga_rattr(basevga_IS1_R, VGA_ATC_PLANE_ENABLE);
+	regs->vm_att_pel          = vga_rattr(basevga_IS1_R, VGA_ATC_PEL);
+	regs->vm_att_color_page   = vga_rattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE);
 }
 
 INTERN NONNULL((1)) void CC
@@ -229,16 +238,16 @@ basevga_setregs(struct vga_mode const *__restrict regs) {
 
 	/* Attribute controller. */
 	for (i = 0; i < 16; ++i)
-		vga_wattr(basevga_is1rx, VGA_ATC_PALETTE0 + i, regs->vm_att_pal[i]);
-	vga_wattr(basevga_is1rx, VGA_ATC_MODE, regs->vm_att_mode);
-	vga_wattr(basevga_is1rx, VGA_ATC_OVERSCAN, regs->vm_att_overscan);
-	vga_wattr(basevga_is1rx, VGA_ATC_PLANE_ENABLE, regs->vm_att_plane_enable);
-	vga_wattr(basevga_is1rx, VGA_ATC_PEL, regs->vm_att_pel);
-	vga_wattr(basevga_is1rx, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page);
+		vga_wattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i, regs->vm_att_pal[i]);
+	vga_wattr(basevga_IS1_R, VGA_ATC_MODE, regs->vm_att_mode);
+	vga_wattr(basevga_IS1_R, VGA_ATC_OVERSCAN, regs->vm_att_overscan);
+	vga_wattr(basevga_IS1_R, VGA_ATC_PLANE_ENABLE, regs->vm_att_plane_enable);
+	vga_wattr(basevga_IS1_R, VGA_ATC_PEL, regs->vm_att_pel);
+	vga_wattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page);
 
 	/* Remember EGA register state. */
 	if (basevga_flags & BASEVGA_FLAG_ISEGA)
-		memcpy(&ega_registers, regs, sizeof(struct vga_mode));
+		memcpy(&baseega_registers, regs, sizeof(struct vga_mode));
 }
 
 
@@ -250,10 +259,10 @@ ega_setmode(struct vga_mode const *__restrict regs) {
 	struct vga_mode newregs;
 	memcpy(&newregs, regs, sizeof(struct vga_mode));
 
-	/* Load reserved bits from expected register state `ega_registers'. */
+	/* Load reserved bits from expected register state `baseega_registers'. */
 #define MASK_REGISTER(name, reserved_mask) \
 	(newregs.name &= ~reserved_mask,       \
-	 newregs.name |= ega_registers.name & reserved_mask)
+	 newregs.name |= baseega_registers.name & reserved_mask)
 	MASK_REGISTER(vm_seq_clock_mode, VGA_SR01_FRESERVED);
 	MASK_REGISTER(vm_seq_plane_write, VGA_SR02_FRESERVED);
 	MASK_REGISTER(vm_seq_character_map, VGA_SR03_FRESERVED);
@@ -351,15 +360,15 @@ basevga_setmode(struct vga_mode const *__restrict regs) {
 
 	/* Attribute controller. */
 	for (i = 0; i < 16; ++i) {
-		vga_wattr_res(basevga_is1rx,
+		vga_wattr_res(basevga_IS1_R,
 		              VGA_ATC_PALETTE0 + i, regs->vm_att_pal[i],
 		              VGA_ATC_PALETTEn_FRESERVED);
 	}
-	vga_wattr_res(basevga_is1rx, VGA_ATC_MODE, regs->vm_att_mode, VGA_AT10_FRESERVED);
-	vga_wattr(basevga_is1rx, VGA_ATC_OVERSCAN, regs->vm_att_overscan);
-	vga_wattr_res(basevga_is1rx, VGA_ATC_PLANE_ENABLE, regs->vm_att_plane_enable, VGA_AT12_FRESERVED);
-	vga_wattr_res(basevga_is1rx, VGA_ATC_PEL, regs->vm_att_pel, VGA_AT13_FRESERVED);
-	vga_wattr_res(basevga_is1rx, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page, VGA_AT14_FRESERVED);
+	vga_wattr_res(basevga_IS1_R, VGA_ATC_MODE, regs->vm_att_mode, VGA_AT10_FRESERVED);
+	vga_wattr(basevga_IS1_R, VGA_ATC_OVERSCAN, regs->vm_att_overscan);
+	vga_wattr_res(basevga_IS1_R, VGA_ATC_PLANE_ENABLE, regs->vm_att_plane_enable, VGA_AT12_FRESERVED);
+	vga_wattr_res(basevga_IS1_R, VGA_ATC_PEL, regs->vm_att_pel, VGA_AT13_FRESERVED);
+	vga_wattr_res(basevga_IS1_R, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page, VGA_AT14_FRESERVED);
 }
 
 
