@@ -61,57 +61,12 @@ DECL_BEGIN
  *     then the saved register state is restored, including any
  *     and all video mode transitions.
  *
- * ```
- *  svga_device  ==>  svga_ansitty  ==>  svga_screendata
- *   |                 ^                   ^
- *   |                 |                   |
- *   |           +-----+                   |
- *   v           |                         |
- *  svd_active --+--> svga_userlock =======/
- * ```
- *
  */
 
 
-struct svga_device;
-struct svga_ansitty;
+struct svgadev;
+struct svgatty;
 
-/* Screen data - common context structure for user-locks and TTYs.
- * For both,  the  `fn_fsdata'  field points  to  this  structure! */
-struct svga_screendata {
-	REF struct svga_device *ssd_dev;    /* [1..1][const][ref_if(:self != ssd_dev)] SVGA device. */
-	unsigned int            ssd_active; /* [const_if(svga_active_islock(:self))]
-	                                     * [lock(ssd_dev->svd_chipset.sc_lock)]
-	                                     * Non-zero if this screen is active. */
-	REF struct async       *ssd_deact;  /* [1..1][const][valid_if(:self != ssd_dev)]
-	                                     * Async job that can be used (once) to deactivate this
-	                                     * screen in response  to the  screen being  destroyed.
-	                                     *
-	                                     * When `ssd_active' at the time of the
-	                                     */
-};
-
-
-struct svga_userlock: chrdev {
-	struct svga_screendata          sul_screen; /* Screen data. */
-	REF struct svga_ansitty        *sul_oldtty; /* [1..1][const] TTY that is made active when this userlock is released. */
-	struct vga_mode                 sul_vmode;  /* [const] Standard VGA registers to restore upon release. */
-	COMPILER_FLEXIBLE_ARRAY(byte_t, sul_xregs); /* [const][0..sul_screen.ssd_dev->svd_chipset.sco_regsize]
-	                                             * Extended registers (restored with `sul_screen.ssd_dev->
-	                                             * svd_chipset.sco_setregs') */
-};
-
-
-
-/* SVGA tty accessor descriptor.
- * Used for encoding TTY display mode info and the like.
- *
- * NOTES:
- *  - It is assumed that  this object is never  destroyed
- *    for as long as the associated `struct svga_ansitty'
- *    is still alive.
- *  - Don't expose this object to user-space
- */
 union svga_tty_cursor {
 	uintptr_t          stc_word;  /* Cursor position word. */
 	struct {
@@ -125,8 +80,9 @@ union svga_tty_cursor {
 
 /* Flags for `struct svga_ttyaccess::sta_flags' */
 #define SVGA_TTYACCESS_F_NORMAL 0x0000 /* Normal flags */
-#define SVGA_TTYACCESS_F_ACTIVE 0x0001 /* [lock(sta_lock && CLEAR_ONCE)] This TTY is currently active.
-                                        * When not set, `sta_vmem'  points to anonymous physical  ram. */
+#define SVGA_TTYACCESS_F_ACTIVE 0x0001 /* [lock(sta_lock && svd_chipset.sc_lock)]
+                                        * This TTY is currently active.
+                                        * When not set, `sta_vmem' may not be accessed. */
 #define SVGA_TTYACCESS_F_EOL    0x8000 /* [lock(sta_lock)] Set while `sta_cursor.stc_cellx == 0' as
                                         * the result  of the  previously line  being wrapped.  This
                                         * flag is cleared the next time a character is printed, but
@@ -134,14 +90,14 @@ union svga_tty_cursor {
 #define _SVGA_TTYACCESS_F_HWCUROFF 0x4000 /* For hardware text-mode ttys: cursor is currently off. */
 #define _SVGA_TTYACCESS_F_SWCURON  0x4000 /* For graphics tty: the cursor is currently shown. */
 
+/* SVGA tty accessor descriptor.
+ * Used for encoding TTY display mode info and the like. */
 struct svga_ttyaccess {
 	WEAK refcnt_t               sta_refcnt; /* Reference counter. */
 	struct atomic_lock          sta_lock;   /* Lock for character movements. */
 	struct svga_modeinfo const *sta_mode;   /* [1..1][const] Associated SVGA mode. */
 	struct mnode                sta_vmem;   /* [const] Video memory mapping. (prepared+mapped)
-	                                         * When `SVGA_TTYACCESS_F_ACTIVE' is cleared, then
-	                                         * the pointed-to physical  memory must be  free'd
-	                                         * during destruction of the access object. */
+	                                         * May only be accessed when `SVGA_TTYACCESS_F_ACTIVE' is set! */
 	union {
 		struct {
 			/* NOTE: Cell size in `x' is always 9 */
@@ -176,17 +132,19 @@ struct svga_ttyaccess {
 	 * @param: address: == CELL_X + CELL_Y * sta_scan */
 	NOBLOCK NONNULL((1, 2)) void
 	/*NOTHROW*/ (FCALL *sta_setcell)(struct svga_ttyaccess *__restrict self,
-	                                 struct svga_ansitty *__restrict tty,
+	                                 struct svgatty *__restrict tty,
 	                                 uintptr_t address, char32_t ch);
 
-	/* [1..1][lock(sta_lock)] Hide the hardware cursor */
+	/* [1..1][lock(sta_lock)] Hide the hardware cursor
+	 * NOTE: This operator is only invoked when `SVGA_TTYACCESS_F_ACTIVE' is set. */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (FCALL *sta_hidecursor)(struct svga_ttyaccess *__restrict self);
 
 	/* [1..1][lock(sta_lock)] Show the hardware cursor at the current cursor position.
 	 * NOTE: This operator is only called when `sta_cursor.stc_celly < sta_resy', which
 	 *       compiled with the  invariant `sta_cursor.stc_cellx < sta_resx' means  that
-	 *       the cursor is guarantied visible on-screen. */
+	 *       the cursor is guarantied visible on-screen.
+	 * NOTE: This operator is only invoked when `SVGA_TTYACCESS_F_ACTIVE' is set. */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (FCALL *sta_showcursor)(struct svga_ttyaccess *__restrict self);
 
@@ -202,31 +160,29 @@ struct svga_ttyaccess {
 	 * >> while (num_cells--) (*sta_setcell)(self, tty, start++, ch); */
 	NOBLOCK NONNULL((1, 2)) void
 	/*NOTHROW*/ (FCALL *sta_fillcells)(struct svga_ttyaccess *__restrict self,
-	                                   struct svga_ansitty *__restrict tty,
+	                                   struct svgatty *__restrict tty,
 	                                   uintptr_t start, char32_t ch, size_t num_cells);
 
-	/* [1..1][lock(sta_lock)] Redraw the entire screen (called when this TTY is reactivated) */
+	/* [1..1][lock(sta_lock)] Do additional stuff needed after to activate this tty.
+	 * This includes loading the tty's font into the video card and doing an initial
+	 * full redraw of the entire screen.
+	 * NOTE: This operator is only invoked when `SVGA_TTYACCESS_F_ACTIVE' is set. */
 	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *sta_redraw)(struct svga_ttyaccess *__restrict self);
-
+	/*NOTHROW*/ (FCALL *sta_activate)(struct svga_ttyaccess *__restrict self);
 };
+
 
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_destroy)(struct svga_ttyaccess *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct svga_ttyaccess, sta_refcnt, svga_ttyaccess_destroy);
 
+
+/* TEXT tty sub-class. */
 struct svga_ttyaccess_txt: svga_ttyaccess {
 	COMPILER_FLEXIBLE_ARRAY(uint16_t, stt_display);   /* [sta_scan * sta_resy][lock(sta_lock)] Display contents. */
 };
 #define svga_ttyaccess_txt_vmem(self) ((uint16_t *)mnode_getaddr(&(self)->sta_vmem))
 #define svga_ttyaccess_txt_dmem(self) ((self)->stt_display)
-
-#define svga_ttyaccess_txt_setcell(self, addr, word) \
-	(svga_ttyaccess_txt_vmem(self)[addr] =           \
-	 svga_ttyaccess_txt_dmem(self)[addr] = (word))
-#define svga_ttyaccess_txt_fillcell(self, addr, word, count)     \
-	(memsetw(&svga_ttyaccess_txt_dmem(self)[addr], word, count), \
-	 memsetw(&svga_ttyaccess_txt_vmem(self)[addr], word, count))
 
 
 /* GFX tty sub-class. */
@@ -234,13 +190,14 @@ struct svga_gfxcell {
 	uint8_t sgc_lines[16]; /* Bitmasks to select fg/bg colors for each pixel. */
 	uint8_t sgc_color;     /* fg/bg color for this color. */
 };
-
 struct svga_ttyaccess_gfx: svga_ttyaccess {
-	/* [1..1][lock(sta_lock)] Redraw the cell at `address' (index into `stx_display') */
+	/* [1..1][lock(sta_lock)] Redraw the cell at `address' (index into `stx_display')
+	 * NOTE: This operator is only invoked when `SVGA_TTYACCESS_F_ACTIVE' is set. */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (FCALL *stx_redraw_cell)(struct svga_ttyaccess_gfx *__restrict self,
 	                                     uintptr_t address);
-	/* [1..1][lock(sta_lock)] Draw a cursor at `stx_swcur' */
+	/* [1..1][lock(sta_lock)] Draw a cursor at `stx_swcur'
+	 * NOTE: This operator is only invoked when `SVGA_TTYACCESS_F_ACTIVE' is set. */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (FCALL *stx_redraw_cursor)(struct svga_ttyaccess *__restrict self);
 	uint32_t                                     stx_ccolor;     /* [lock(sta_lock)] Cursor color. */
@@ -255,31 +212,61 @@ struct svga_ttyaccess_gfx: svga_ttyaccess {
 
 ARREF(svga_ttyaccess_arref, svga_ttyaccess);
 
+
 /* SVGA tty instance */
-struct svga_ansitty: ansittydev {
-	struct svga_screendata      sva_screen; /* Screen data. */
-	struct svga_ttyaccess_arref sva_tty;    /* [1..1][lock(ATOMIC)] TTY I/O access.
+struct svgatty: ansittydev {
+	REF struct svgadev         *sty_dev;    /* [1..1][const] SVGA device. */
+	REF struct svgatty         *sty_oldtty; /* [0..1][const_if(wasdestroyed(self))]
+	                                         * [lock(slc_dev->svd_chipset.sc_lock)]
+	                                         * TTY that is made active when this tty is destroyed. */
+	unsigned int                sty_active; /* [lock(sty_dev->svd_chipset.sc_lock)]
+	                                         * [const_if(wasdestroyed(self))]
+	                                         * Non-zero if this tty is currently active. */
+	struct svga_ttyaccess_arref sty_tty;    /* [1..1][lock(WRITE(sty_dev->svd_chipset.sc_lock))]
 	                                         * Only the pointed-to may have the `SVGA_TTYACCESS_F_ACTIVE'
 	                                         * flag set. When you with to set a new tty access object (as
 	                                         * the result of a mode-change  request), you must clear  the
 	                                         * `SVGA_TTYACCESS_F_ACTIVE' flag (if it is set).
 	                                         *
-	                                         * Also  note that `SVGA_TTYACCESS_F_ACTIVE' can only ever be
-	                                         * set when  `sva_screen.ssd_active'. As  such, changing  the
-	                                         * current foreground TTY of an SVGA controller also requires
-	                                         * that one create a new  tty-access object for the new  tty,
-	                                         * and  clear the `SVGA_TTYACCESS_F_ACTIVE'  flag for the old
+	                                         * Also  note that `SVGA_TTYACCESS_F_ACTIVE' can only ever
+	                                         * be set when `sty_active'. As such, changing the current
+	                                         * foreground TTY of an SVGA controller also requires that
+	                                         * one create a new tty-access object for the new tty, and
+	                                         * clear the  `SVGA_TTYACCESS_F_ACTIVE' flag  for the  old
 	                                         * tty's access object. */
 };
+#define ansitty_assvga(self)    container_of(self, struct svgatty, at_ansi)
+#define ansitty_getaccess(self) arref_get(&ansitty_assvga(self)->sty_tty)
 
-/* Check the object pointed to by `svd_active' is a userlock or a TTY */
-#define svga_active_islock(self) 0 /* TODO (use operator pointers) */
-#define svga_active_istty(self)  1 /* TODO (use operator pointers) */
+/* Async job  started to  revert  to the  old  display
+ * mode when this TTY is destroyed while `sty_active'. */
+#define _svgatty_toasyncrestore(self) \
+	((struct async *)&(self)->at_ansi)
+#define _svgatty_fromasyncrestore(self) \
+	container_of((struct ansitty *)__COMPILER_REQTYPE(struct async *, self), struct svgatty, at_ansi)
+STATIC_ASSERT(sizeof(struct async) <= sizeof(struct ansitty));
 
 
-AWREF(chrdev_awref, chrdev);
-struct svga_device: svga_ansitty {
-	struct chrdev_awref               svd_active;   /* [1..1][lock(WRITE(svd_chipset.sc_lock))] Active TTY or user-lock. */
+
+struct svgalck: mfile {
+	REF struct svgadev             *slc_dev;    /* [1..1][const] SVGA device. */
+	REF struct svgatty             *slc_oldtty; /* [0..1][lock(slc_dev->svd_chipset.sc_lock)] TTY that is made active when this tty is destroyed. */
+	struct async                    slc_rstor;  /* A pre-allocated async controller used to release the lock. */
+	struct vga_mode                 slc_vmode;  /* [lock(slc_dev->svd_chipset.sc_lock)] Standard VGA registers to restore upon release. */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, slc_xregs); /* [lock(slc_dev->svd_chipset.sc_lock)][0..slc_dev->svd_chipset.sco_regsize]
+	                                             * Extended     registers      (restored     with      `sul_screen.sty_dev->
+	                                             * svd_chipset.sco_setregs') */
+};
+
+
+#ifndef __mfile_awref_defined
+#define __mfile_awref_defined
+AWREF(mfile_awref, mfile);
+#endif /* !__mfile_awref_defined */
+
+struct svgadev: chrdev {
+	struct mfile_awref                svd_active;   /* [0..1][lock(WRITE(svd_chipset.sc_lock))] Active TTY or  user-lock.
+	                                                 * When this points to a dead file, that file _must_ clean up itself! */
 	byte_t const                     *svd_supmodev; /* [0..n][const][owned] Array of supported video modes. */
 	size_t                            svd_supmodec; /* [const] # of supported video modes. */
 	size_t                            svd_supmodeS; /* [const] Aligned sizeof() supported video modes. */
@@ -287,9 +274,65 @@ struct svga_device: svga_ansitty {
 	struct svga_chipset               svd_chipset;  /* SVGA Chipset driver. */
 };
 
+INTDEF struct ansitty_operators const svga_ansitty_ops; /* ANSI TTY operators. */
+INTDEF struct ansittydev_ops const svgatty_ops;         /* Operators for `struct svgatty' */
+INTDEF struct mfile_ops const svgalck_ops;              /* Operators for `struct svgalck' */
+INTDEF struct chrdev_ops const svgadev_ops;             /* Operators for `struct svgadev' */
+
+/* Check the object pointed to by `svd_active' is a userlock or a TTY */
+#define svga_active_istty(self)  ((self)->mf_ops == &svgatty_ops.ato_cdev.cdo_dev.do_node.dno_node.no_file)
+#define svga_active_islock(self) ((self)->mf_ops != &svgatty_ops.ato_cdev.cdo_dev.do_node.dno_node.no_file)
+
 /* Return a `struct svga_modeinfo const *' for the i'th supported video mode if `self' */
-#define svga_device_supmode(self, i) \
+#define svgadev_supmode(self, i) \
 	((struct svga_modeinfo const *)((self)->svd_supmodev + ((i) * (self)->svd_supmodeS)))
+
+
+/* Return a reference to the currently "active" tty (or the one that will become
+ * active after a currently held user-lock is released). If no such TTY  exists,
+ * return NULL instead. */
+INTDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) REF struct svgatty *FCALL
+svgadev_getactivetty(struct svgadev *__restrict self);
+
+/* Create a TTY access object for the given `mode' */
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess *FCALL
+svgadev_makettyaccess(struct svgadev *__restrict self,
+                      struct svga_modeinfo const *__restrict mode);
+
+/* Set the SVGA video mode to `mode' */
+INTDEF NONNULL((1, 2)) void FCALL
+svgadev_setmode(struct svgadev *__restrict self,
+                struct svga_modeinfo const *__restrict mode)
+		THROWS(E_IOERROR);
+
+
+/* Create a new  tty for a  given SVGA  device.
+ * Note that the tty has yet to be made active! */
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svgatty *FCALL
+svgadev_vnewttyf(struct svgadev *__restrict self,
+                 struct svga_modeinfo const *__restrict mode, dev_t devno,
+                 char const *__restrict format, __builtin_va_list args)
+		THROWS(E_WOULDBLOCK);
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svgatty *VCALL
+svgadev_newttyf(struct svgadev *__restrict self,
+                struct svga_modeinfo const *__restrict mode, dev_t devno,
+                char const *__restrict format, ...)
+		THROWS(E_WOULDBLOCK);
+
+/* Activate a given TTY. If an active userlock exists, the tty will not actually
+ * be  made active, but will instead be  linked such that the userlock's release
+ * will make the tty active. */
+INTDEF BLOCKING NONNULL((1, 2)) void FCALL
+svgadev_activate_tty(struct svgadev *__restrict self,
+                     struct svgatty *__restrict tty)
+		THROWS(E_WOULDBLOCK);
+
+/* Allocate  and activate a new userlock for a given SVGA device.
+ * If another lock already exists, this function will block until
+ * said lock is released. */
+INTDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct svgalck *FCALL
+svgadev_newuserlock(struct svgadev *__restrict self)
+		THROWS(E_WOULDBLOCK);
 
 
 

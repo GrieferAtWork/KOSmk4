@@ -25,7 +25,8 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/fcntl.h>     /* Open() */
+#include <kos/fcntl.h> /* Open() */
+#include <kos/ioctl/svga.h>
 #include <kos/ksysctl.h>   /* ksysctl_insmod() */
 #include <kos/sys/ioctl.h> /* Ioctl() */
 #include <kos/sys/stat.h>  /* Mkdir() */
@@ -49,6 +50,7 @@
 
 #include <libansitty/ansitty.h>
 #include <libansitty/ctl.h>
+
 
 DECL_BEGIN
 
@@ -162,8 +164,15 @@ done_tmpfs:
 		if (display < 0) {
 			KSysctlInsmod("vga", NULL);
 			display = Open("/dev/vga", O_WRONLY | O_CLOEXEC, 0);
-		}
+		} else
 #endif
+		{
+			fd_t tty1;
+			tty1 = Ioctl(display, SVGA_IOC_MAKEDEFTTY);
+			close(display);
+			display = tty1;
+		}
+
 		console = sys_Xmktty("console", keyboard, display, 0);
 		close(keyboard);
 		close(display);

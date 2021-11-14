@@ -1,8 +1,3 @@
-/*[[[magic
-local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.removeif([](x) -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
-]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,31 +17,20 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODSVGA_SVGA_C
-#define GUARD_MODSVGA_SVGA_C 1
-#define _GNU_SOURCE 1
-#define _KOS_SOURCE 1
+#ifndef _KOS_IOCTL_VIDEO_H
+#define _KOS_IOCTL_VIDEO_H 1
 
-#include <kernel/compiler.h>
+/* KOS-specific video-device system interface. */
 
-/**/
-#include "svga.h"
+#include <__stdinc.h>
 
-#ifndef __INTELLISENSE__
-//TODO:#define BPP 1
-//TODO:#include "svga-dcoltty.c.inl"
-//TODO:#define BPP 2
-//TODO:#include "svga-dcoltty.c.inl"
-//TODO:#define BPP 4
-//TODO:#include "svga-dcoltty.c.inl"
-#define BPP 8
-#include "svga-dcoltty.c.inl"
-#define BPP 16
-#include "svga-dcoltty.c.inl"
-#define BPP 24
-#include "svga-dcoltty.c.inl"
-#define BPP 32
-#include "svga-dcoltty.c.inl"
-#endif /* !__INTELLISENSE__ */
+#include <asm/ioctl.h>
+#include <bits/types.h>
 
-#endif /* !GUARD_MODSVGA_SVGA_C */
+__DECL_BEGIN
+
+#define SVGA_IOC_MAKEDEFTTY _IO_KOS('S', 0x01) /* Create default TTY (TODO: Remove this ioctl()) */
+
+__DECL_END
+
+#endif /* !_KOS_IOCTL_VIDEO_H */
