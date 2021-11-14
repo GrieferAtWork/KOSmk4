@@ -20,6 +20,7 @@
 #ifndef GUARD_MODSVGA_SVGA_C
 #define GUARD_MODSVGA_SVGA_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -34,6 +35,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/except.h>
 
@@ -83,17 +85,20 @@ svga_setmode(struct svga_device *__restrict self,
 		/* Write attribute registers relating to palette values. */
 		if (basevga_flags & BASEVGA_FLAG_ISEGA) {
 			uint8_t i;
-			STATIC_ASSERT(sizeof(baseega_registers.vm_att_pal) == sizeof(basevga_defaultattpal));
-			memcpy(baseega_registers.vm_att_pal, basevga_defaultattpal, sizeof(basevga_defaultattpal));
-			vga_wattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE,
-			          (baseega_registers.vm_att_color_page & VGA_AT14_FRESERVED) | 0);
+			baseega_registers.vm_att_color_page &= VGA_AT14_FRESERVED;
+			baseega_registers.vm_att_color_page |= 0;
+			vga_wattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE, baseega_registers.vm_att_color_page);
 			for (i = 0; i < 16; ++i) {
 				uint8_t temp;
 				temp = baseega_registers.vm_att_pal[i];
 				temp &= VGA_ATC_PALETTEn_FRESERVED;
-				temp |= basevga_defaultattpal[i];
+				temp |= i;
 				vga_wattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i, temp);
+				baseega_registers.vm_att_pal[i] = temp;
 			}
+			baseega_registers.vm_att_mode &= ~VGA_AT10_FBLINK;
+			baseega_registers.vm_att_mode |= VGA_AT10_FDUP9;
+			vga_wattr(basevga_IS1_R, VGA_ATC_MODE, baseega_registers.vm_att_mode);
 		} else {
 			uint8_t i, temp;
 			temp = vga_rattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE);
@@ -102,9 +107,14 @@ svga_setmode(struct svga_device *__restrict self,
 			for (i = 0; i < 16; ++i) {
 				temp = vga_rattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i);
 				temp &= VGA_ATC_PALETTEn_FRESERVED;
-				temp |= basevga_defaultattpal[i];
+				temp |= i;
 				vga_wattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i, temp);
 			}
+
+			/* Disable "blinky" if it was enabled by the chip.
+			 * Also enable `VGA_AT10_FDUP9' while we're at it. */
+			temp = vga_rattr(basevga_IS1_R, VGA_ATC_MODE);
+			vga_wattr(basevga_IS1_R, VGA_ATC_MODE, (temp & ~VGA_AT10_FBLINK) | VGA_AT10_FDUP9);
 		}
 
 		/* Disable palette access */
@@ -122,9 +132,9 @@ svga_setmode(struct svga_device *__restrict self,
 /* Scroll up once */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_scrollone)(struct svga_ttyaccess *__restrict me,
-                                        struct svga_ansitty *__restrict self) {
+                                        struct svga_ansitty *__restrict tty) {
 	(*me->sta_copycell)(me, 0, me->sta_scan, me->sta_resx * (me->sta_resy - 1));
-	(*me->sta_fillcells)(me, me->sta_scan * (me->sta_resy - 1), ' ', me->sta_resx, self);
+	(*me->sta_fillcells)(me, tty, me->sta_scan * (me->sta_resy - 1), ' ', me->sta_resx);
 }
 
 
@@ -152,12 +162,11 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 		advance = TABSIZE - (me->sta_cursor.stc_cellx % TABSIZE);
 		if ((me->sta_cursor.stc_cellx + advance) > me->sta_resx)
 			advance = me->sta_resx - me->sta_cursor.stc_cellx;
-		(*me->sta_fillcells)(me,
+		(*me->sta_fillcells)(me, ansitty_assvga(self),
 		                     me->sta_cursor.stc_cellx +
 		                     me->sta_cursor.stc_celly *
 		                     me->sta_scan,
-		                     ' ', advance,
-		                     ansitty_assvga(self));
+		                     ' ', advance);
 		me->sta_cursor.stc_cellx += advance;
 		if (me->sta_cursor.stc_cellx >= me->sta_resx) {
 			me->sta_cursor.stc_cellx = 0;
@@ -194,13 +203,12 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 		}
 		if (self->at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE) {
 			/* Clear trailing spaces */
-			(*me->sta_fillcells)(me,
+			(*me->sta_fillcells)(me, ansitty_assvga(self),
 			                     me->sta_cursor.stc_cellx +
 			                     me->sta_cursor.stc_celly *
 			                     me->sta_scan,
 			                     ' ',
-			                     me->sta_resx - me->sta_cursor.stc_cellx,
-			                     ansitty_assvga(self));
+			                     me->sta_resx - me->sta_cursor.stc_cellx);
 		}
 		me->sta_cursor.stc_cellx = 0;
 		break;
@@ -223,11 +231,11 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 		}
 
 		/* Print the character to the screen. */
-		(*me->sta_setcell)(me,
+		(*me->sta_setcell)(me, ansitty_assvga(self),
 		                   me->sta_cursor.stc_cellx +
 		                   me->sta_cursor.stc_celly *
 		                   me->sta_scan,
-		                   ch, ansitty_assvga(self));
+		                   ch);
 
 		/* Advance the cursor. */
 		++me->sta_cursor.stc_cellx;
@@ -358,8 +366,8 @@ svga_ansitty_v_copycell(struct ansitty *__restrict self,
 			size_t delta = me->sta_scan - me->sta_resx;
 			dstaddr += (dstaddr / me->sta_resx) * delta;
 		}
-		(*me->sta_fillcells)(me, dstaddr, ' ', overflow,
-		                     ansitty_assvga(self));
+		(*me->sta_fillcells)(me, ansitty_assvga(self),
+		                     dstaddr, ' ', overflow);
 	} else {
 		/* Do the actual cell-copy. */
 		assert(srcaddr <= dispend);
@@ -404,8 +412,8 @@ svga_ansitty_v_fillcell(struct ansitty *__restrict self,
 	}
 
 	/* Do the fill. */
-	(*me->sta_fillcells)(me, dstaddr, ch, count,
-	                     ansitty_assvga(self));
+	(*me->sta_fillcells)(me, ansitty_assvga(self),
+	                     dstaddr, ch, count);
 done:
 	atomic_lock_release(&me->sta_lock);
 }
@@ -509,14 +517,24 @@ NOTHROW(FCALL svga_ttyaccess_makecell_htxt)(char32_t ch,
 	return result;
 }
 
-PRIVATE NOBLOCK NONNULL((1, 4)) void
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_htxt)(struct svga_ttyaccess *__restrict self) {
+	struct svga_ttyaccess_txt *me;
+	me = (struct svga_ttyaccess_txt *)self;
+	memcpy(svga_ttyaccess_txt_vmem(me),
+	       svga_ttyaccess_txt_dmem(me),
+	       me->sta_scan * me->sta_resx);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL svga_ttyaccess_v_setcell_htxt)(struct svga_ttyaccess *__restrict self,
-                                             uintptr_t address, char32_t ch,
-                                             struct svga_ansitty *__restrict tty) {
-	u16 *cell;
-	cell = (u16 *)mnode_getaddr(&self->sta_vmem);
-	cell += address;
-	*cell = svga_ttyaccess_makecell_htxt(ch, tty);
+                                             struct svga_ansitty *__restrict tty,
+                                             uintptr_t address, char32_t ch) {
+	u16 word;
+	struct svga_ttyaccess_txt *me;
+	me   = (struct svga_ttyaccess_txt *)self;
+	word = svga_ttyaccess_makecell_htxt(ch, tty);
+	svga_ttyaccess_txt_setcell(me, address, word);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -556,44 +574,43 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_htxt_nooverscan)(struct svga_ttyaccess *
                                                          uintptr_t to_cellid, uintptr_t from_cellid,
                                                          size_t num_cells) {
 	u16 *dst, *src;
-	src = (u16 *)mnode_getaddr(&self->sta_vmem);
-	dst = (u16 *)mnode_getaddr(&self->sta_vmem);
-	src += from_cellid;
-	dst += to_cellid;
-	memmovew(dst, src, num_cells);
+	struct svga_ttyaccess_txt *me;
+	me  = (struct svga_ttyaccess_txt *)self;
+	src = svga_ttyaccess_txt_dmem(me) + from_cellid;
+	dst = svga_ttyaccess_txt_dmem(me) + to_cellid;
+	src = memmovew(dst, src, num_cells); /* Modify display buffer */
+	dst = svga_ttyaccess_txt_vmem(me) + to_cellid;
+	memcpyw(dst, src, num_cells); /* Copy to video memory */
 }
 
 PRIVATE NOBLOCK NONNULL((1)) uint16_t
-NOTHROW(FCALL svga_ttyaccess_getcell_htxt_without_overscan)(struct svga_ttyaccess *__restrict self,
+NOTHROW(FCALL svga_ttyaccess_getcell_htxt_without_overscan)(struct svga_ttyaccess_txt *__restrict self,
                                                             uintptr_t screen_index) {
-	u16 const *src;
 	size_t delta = self->sta_scan - self->sta_resx;
 	screen_index += (screen_index / self->sta_resx) * delta;
-	src = (u16 const *)mnode_getaddr(&self->sta_vmem);
-	src += screen_index;
-	return *src;
+	return svga_ttyaccess_txt_dmem(self)[screen_index];
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL svga_ttyaccess_setcell_htxt_without_overscan)(struct svga_ttyaccess *__restrict self,
+NOTHROW(FCALL svga_ttyaccess_setcell_htxt_without_overscan)(struct svga_ttyaccess_txt *__restrict self,
                                                             uintptr_t screen_index, uint16_t val) {
-	u16 *dst;
 	size_t delta = self->sta_scan - self->sta_resx;
 	screen_index += (screen_index / self->sta_resx) * delta;
-	dst = (u16 *)mnode_getaddr(&self->sta_vmem);
-	dst += screen_index;
-	*dst = val;
+	svga_ttyaccess_txt_dmem(self)[screen_index] = val;
+	svga_ttyaccess_txt_vmem(self)[screen_index] = val;
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_v_copycell_htxt_overscan)(struct svga_ttyaccess *__restrict self,
                                                        uintptr_t to_cellid, uintptr_t from_cellid,
                                                        size_t num_cells) {
+	struct svga_ttyaccess_txt *me;
+	me  = (struct svga_ttyaccess_txt *)self;
 	if (from_cellid < to_cellid) {
 		while (num_cells--) {
 			u16 word;
-			word = svga_ttyaccess_getcell_htxt_without_overscan(self, from_cellid);
-			svga_ttyaccess_setcell_htxt_without_overscan(self, to_cellid, word);
+			word = svga_ttyaccess_getcell_htxt_without_overscan(me, from_cellid);
+			svga_ttyaccess_setcell_htxt_without_overscan(me, to_cellid, word);
 			++from_cellid;
 			++to_cellid;
 		}
@@ -604,21 +621,347 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_htxt_overscan)(struct svga_ttyaccess *__
 			u16 word;
 			--from_cellid;
 			--to_cellid;
-			word = svga_ttyaccess_getcell_htxt_without_overscan(self, from_cellid);
-			svga_ttyaccess_setcell_htxt_without_overscan(self, to_cellid, word);
+			word = svga_ttyaccess_getcell_htxt_without_overscan(me, from_cellid);
+			svga_ttyaccess_setcell_htxt_without_overscan(me, to_cellid, word);
 		}
 	}
 }
 
-PRIVATE NOBLOCK NONNULL((1, 5)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL svga_ttyaccess_v_fillcells_htxt)(struct svga_ttyaccess *__restrict self,
-                                               uintptr_t start, char32_t ch, size_t num_cells,
-                                               struct svga_ansitty *__restrict tty) {
-	u16 *cell, word;
-	cell = (u16 *)mnode_getaddr(&self->sta_vmem);
-	cell += start;
+                                               struct svga_ansitty *__restrict tty,
+                                               uintptr_t start, char32_t ch, size_t num_cells) {
+	u16 word;
+	struct svga_ttyaccess_txt *me;
+	me   = (struct svga_ttyaccess_txt *)self;
 	word = svga_ttyaccess_makecell_htxt(ch, tty);
-	memsetw(cell, word, num_cells);
+	svga_ttyaccess_txt_fillcell(me, start, word, num_cells);
+}
+
+/* Initialize the following fields of `self':
+ * - self->sta_refcnt = 1;
+ * - atomic_lock_init(&self->sta_lock);
+ * - self->sta_mode  = mode;
+ * - self->sta_flags = SVGA_TTYACCESS_F_ACTIVE;
+ * - self->sta_vmem  = ...;
+ * - self->sta_cursor.stc_word = 0; */
+PRIVATE NONNULL((1, 2)) void FCALL
+svga_ttyaccess_initcommon(struct svga_ttyaccess *__restrict self,
+                          struct svga_modeinfo const *__restrict mode)
+		THROWS(E_WOULDBLOCK) {
+	void *mapbase;
+	size_t vmemsize;
+
+	/* Initialize the `sta_vmem' node of `self' */
+	vmemsize = mode->smi_scanline * mode->smi_resy;
+	vmemsize = CEIL_ALIGN(vmemsize, PAGESIZE);
+	mman_lock_write(&mman_kernel);
+	mapbase = mman_getunmapped_or_unlock_device(vmemsize);
+
+	/* Prepare the buffer region */
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	if unlikely(!pagedir_kernelprepare(mapbase, vmemsize)) {
+		mman_lock_endwrite(&mman_kernel);
+		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+	}
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	self->sta_vmem.mn_minaddr = (byte_t *)mapbase;
+	self->sta_vmem.mn_maxaddr = (byte_t *)mapbase + vmemsize - 1;
+	self->sta_vmem.mn_flags   = MNODE_F_PWRITE | MNODE_F_PREAD | MNODE_F_SHARED |
+	                              MNODE_F_MPREPARED | MNODE_F_KERNPART | MNODE_F_NOSPLIT |
+	                              MNODE_F_NOMERGE;
+	self->sta_vmem.mn_part    = NULL; /* Reserved node. */
+	self->sta_vmem.mn_fspath  = NULL;
+	self->sta_vmem.mn_fsname  = NULL;
+	self->sta_vmem.mn_mman    = &mman_kernel;
+	DBG_memset(&self->sta_vmem.mn_partoff, 0xcc, sizeof(self->sta_vmem.mn_partoff));
+	DBG_memset(&self->sta_vmem.mn_link, 0xcc, sizeof(self->sta_vmem.mn_link));
+	LIST_ENTRY_UNBOUND_INIT(&self->sta_vmem.mn_writable);
+	mman_mappings_insert(&mman_kernel, &self->sta_vmem);
+	mman_lock_endwrite(&mman_kernel);
+
+	/* Bind video memory to our custom buffer mapping. */
+	pagedir_map(mapbase, vmemsize, (physaddr_t)mode->smi_lfb,
+	            PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
+
+	/* Initialize all the resulting fields of `self' */
+	self->sta_refcnt = 1;
+	atomic_lock_init(&self->sta_lock);
+	self->sta_mode  = mode;
+	self->sta_flags = SVGA_TTYACCESS_F_ACTIVE; /* Must mark as active since we already mapped physical memory! */
+	self->sta_cursor.stc_word = 0;
+}
+
+
+
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess_txt *FCALL
+svga_makettyaccess_txt(struct svga_device *__restrict UNUSED(self),
+                       struct svga_modeinfo const *__restrict mode) {
+	REF struct svga_ttyaccess_txt *result;
+	size_t dispsz;
+
+	/* Allocate the object. */
+	dispsz = mode->smi_resy * mode->smi_scanline * sizeof(uint16_t);
+	result = (REF struct svga_ttyaccess_txt *)kmalloc(offsetof(struct svga_ttyaccess_txt, stt_display) +
+	                                                  dispsz,
+	                                                  GFP_NORMAL);
+	/* Initialize common fields. */
+	TRY {
+		svga_ttyaccess_initcommon(result, mode);
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+	result->sta_resx       = mode->smi_resx;
+	result->sta_resy       = mode->smi_resy;
+	result->sta_scan       = mode->smi_scanline / 2;
+	result->sta_redraw     = &svga_ttyaccess_v_redraw_htxt;
+	result->sta_setcell    = &svga_ttyaccess_v_setcell_htxt;
+	result->sta_hidecursor = &svga_ttyaccess_v_hidecursor_htxt;
+	result->sta_showcursor = &svga_ttyaccess_v_showcursor_htxt;
+	result->sta_copycell   = &svga_ttyaccess_v_copycell_htxt_nooverscan;
+	result->sta_fillcells  = &svga_ttyaccess_v_fillcells_htxt;
+	if (result->sta_scan > result->sta_resx)
+		result->sta_copycell = &svga_ttyaccess_v_copycell_htxt_overscan;
+
+	/* Fill in the saved display state.
+	 * This is the only time we read from display memory! */
+	memcpy(svga_ttyaccess_txt_dmem(result),
+	       svga_ttyaccess_txt_vmem(result),
+	       dispsz);
+	return result;
+}
+
+
+
+/************************************************************************/
+/* Graphics mode TTY                                                    */
+/************************************************************************/
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_makettyaccess_redraw_cells_gfx)(struct svga_ttyaccess_gfx *__restrict self,
+                                                   uintptr_t start, size_t num_cells) {
+	uintptr_t i;
+	for (i = 0; i < num_cells; ++i)
+		(*self->stx_redraw_cell)(self, start + i);
+
+	/* Check if we need to redraw the cursor. */
+	if (self->sta_flags & _SVGA_TTYACCESS_F_SWCURON) {
+		uintptr_t cursor_addr;
+		cursor_addr = self->stx_swcur.stc_cellx +
+		              self->stx_swcur.stc_celly *
+		              self->sta_resx;
+		if (cursor_addr >= start && cursor_addr < start + num_cells)
+			(*self->stx_redraw_cursor)(self);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_gfx)(struct svga_ttyaccess *__restrict self) {
+	struct svga_ttyaccess_gfx *me = (struct svga_ttyaccess_gfx *)self;
+	svga_makettyaccess_redraw_cells_gfx(me, 0, me->sta_resx * me->sta_resy);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL svga_ttyaccess_v_setcell_gfx)(struct svga_ttyaccess *__restrict self,
+                                            struct svga_ansitty *__restrict tty,
+                                            uintptr_t address, char32_t ch) {
+	struct svga_ttyaccess_gfx *me = (struct svga_ttyaccess_gfx *)self;
+	byte_t const *pattern;
+	pattern = basevga_defaultfont[basevga_defaultfont_encode(ch)];
+	memcpy(me->stx_display[address].sgc_lines, pattern, 16);
+	me->stx_display[address].sgc_color = tty->at_ansi.at_color;
+	(*me->stx_redraw_cell)(me, address);
+	/* Check if we need to redraw the cursor. */
+	if (me->sta_flags & _SVGA_TTYACCESS_F_SWCURON) {
+		uintptr_t cursor_addr;
+		cursor_addr = me->stx_swcur.stc_cellx +
+		              me->stx_swcur.stc_celly *
+		              me->sta_resx;
+		if (cursor_addr == address)
+			(*me->stx_redraw_cursor)(me);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct svga_ttyaccess *__restrict self,
+                                              struct svga_ansitty *__restrict tty,
+                                              uintptr_t start, char32_t ch, size_t num_cells) {
+	struct svga_ttyaccess_gfx *me = (struct svga_ttyaccess_gfx *)self;
+	struct svga_gfxcell *src, *dst;
+	byte_t const *pattern;
+	size_t count;
+	if unlikely(!num_cells)
+		return;
+	/* Properly fill in the first cell. */
+	pattern = basevga_defaultfont[basevga_defaultfont_encode(ch)];
+	src     = &me->stx_display[start];
+	memcpy(src->sgc_lines, pattern, 16);
+	src->sgc_color = tty->at_ansi.at_color;
+	count          = num_cells - 1;
+	if unlikely(!count) {
+		(*me->stx_redraw_cell)(me, start);
+		/* Check if we need to redraw the cursor. */
+		if (me->sta_flags & _SVGA_TTYACCESS_F_SWCURON) {
+			uintptr_t cursor_addr;
+			cursor_addr = me->stx_swcur.stc_cellx +
+			              me->stx_swcur.stc_celly *
+			              me->sta_resx;
+			if (cursor_addr == start)
+				(*me->stx_redraw_cursor)(me);
+		}
+		return;
+	}
+	/* Copy template into all additional cells. */
+	dst = src + 1;
+	do {
+		dst = (struct svga_gfxcell *)mempcpy(dst, src, sizeof(struct svga_gfxcell));
+	} while (--count);
+	svga_makettyaccess_redraw_cells_gfx(me, start, num_cells);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_copycell_gfx)(struct svga_ttyaccess *__restrict self,
+                                             uintptr_t to_cellid, uintptr_t from_cellid,
+                                             size_t num_cells) {
+	struct svga_gfxcell *dst, *src;
+	struct svga_ttyaccess_gfx *me;
+	me  = (struct svga_ttyaccess_gfx *)self;
+	src = me->stx_display + from_cellid;
+	dst = me->stx_display + to_cellid;
+	memmove(dst, src, num_cells, sizeof(struct svga_gfxcell));
+	svga_makettyaccess_redraw_cells_gfx(me, to_cellid, num_cells);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_showcursor_gfx)(struct svga_ttyaccess *__restrict self) {
+	struct svga_ttyaccess_gfx *me;
+	me = (struct svga_ttyaccess_gfx *)self;
+
+	/* Redraw the cursor's old cell to hide it. */
+	if (me->sta_flags & _SVGA_TTYACCESS_F_SWCURON) {
+		(*me->stx_redraw_cell)(me,
+		                       me->stx_swcur.stc_cellx +
+		                       me->stx_swcur.stc_celly *
+		                       me->sta_resx);
+	}
+
+	/* Remember the new software cursor position. */
+	me->stx_swcur.stc_word = me->sta_cursor.stc_word;
+	me->sta_flags |= _SVGA_TTYACCESS_F_SWCURON;
+
+	/* Draw a cursor at the new position. */
+	(*me->stx_redraw_cursor)(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_hidecursor_gfx)(struct svga_ttyaccess *__restrict self) {
+	struct svga_ttyaccess_gfx *me;
+	me = (struct svga_ttyaccess_gfx *)self;
+	if (me->sta_flags & _SVGA_TTYACCESS_F_SWCURON) {
+		/* Redraw cell to override the cursor.
+		 * Technically, we'd only need to redraw the area actually occupied
+		 * by  the cursor, but this is keeping  it a little more simple! :) */
+		(*me->stx_redraw_cell)(me,
+		                       me->stx_swcur.stc_cellx +
+		                       me->stx_swcur.stc_celly *
+		                       me->sta_resx);
+		me->sta_flags &= ~_SVGA_TTYACCESS_F_SWCURON;
+	}
+}
+
+
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess_gfx *FCALL
+svga_makettyaccess_gfx(struct svga_device *__restrict UNUSED(self),
+                       struct svga_modeinfo const *__restrict mode) {
+	REF struct svga_ttyaccess_gfx *result;
+	size_t dispsz;
+	uintptr_half_t cells_x = mode->smi_resx / 9;
+	uintptr_half_t cells_y = mode->smi_resy / 16;
+
+	/* Allocate the object. */
+	dispsz = cells_x * cells_y * sizeof(struct svga_gfxcell);
+	result = (REF struct svga_ttyaccess_gfx *)kmalloc(offsetof(struct svga_ttyaccess_gfx, stx_display) +
+	                                                  dispsz,
+	                                                  GFP_NORMAL);
+
+	/* Initialize common fields. */
+	TRY {
+		svga_ttyaccess_initcommon(result, mode);
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+
+	result->sta_resy       = mode->smi_resy / 16;
+	result->sta_resx       = mode->smi_resx / 9;
+	result->sta_scan       = result->sta_resx;
+	result->stx_cellscan   = 16 * mode->smi_scanline;
+	result->sta_setcell    = &svga_ttyaccess_v_setcell_gfx;
+	result->sta_showcursor = &svga_ttyaccess_v_showcursor_gfx;
+	result->sta_hidecursor = &svga_ttyaccess_v_hidecursor_gfx;
+	result->sta_copycell   = &svga_ttyaccess_v_copycell_gfx;
+	result->sta_fillcells  = &svga_ttyaccess_v_fillcells_gfx;
+	result->sta_redraw     = &svga_ttyaccess_v_redraw_gfx;
+	switch (mode->smi_bits_per_pixel) {
+
+#ifndef __INTELLISENSE__
+#define SETOPS(bpp)                                                                    \
+	{                                                                                  \
+		INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, bpp))(struct svga_ttyaccess_gfx *__restrict self, uintptr_t address); \
+		INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, bpp))(struct svga_ttyaccess *__restrict self); \
+		result->stx_redraw_cell   = &PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, bpp);   \
+		result->stx_redraw_cursor = &PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, bpp); \
+	}
+//TODO:	case 1:         SETOPS(1);  break;
+//TODO:	case 2:         SETOPS(2);  break;
+//TODO:	case 3 ... 4:   SETOPS(4);  break;
+	case 5 ... 8:   SETOPS(8);  break;
+	case 9 ... 16:  SETOPS(16); break;
+	case 17 ... 24: SETOPS(24); break;
+	case 25 ... 32: SETOPS(32); break;
+#undef SETOPS
+#endif /* !__INTELLISENSE__ */
+
+	default:
+		destroy(result);
+		THROW(E_NOT_IMPLEMENTED_UNSUPPORTED);
+		break;
+	}
+
+	/* Precalculate palette colors. */
+	if (mode->smi_flags & SVGA_MODEINFO_F_PAL) {
+		unsigned int i;
+		for (i = 0; i < 16; ++i)
+			result->stx_colors[i] = i;
+	} else {
+		unsigned int i;
+		for (i = 0; i < 16; ++i) {
+			struct vga_palcolor col;
+			uint32_t dcl; /* DirectCoLor */
+			col = basevga_defaultpal[i];
+			dcl = (((col.vpc_r << 2) >> (8 - mode->smi_rbits)) << mode->smi_rshift) |
+			      (((col.vpc_g << 2) >> (8 - mode->smi_gbits)) << mode->smi_gshift) |
+			      (((col.vpc_b << 2) >> (8 - mode->smi_bbits)) << mode->smi_bshift);
+			result->stx_colors[i] = dcl;
+		}
+	}
+
+	/* Use a white cursor by default. */
+	result->stx_ccolor = result->stx_colors[ANSITTY_CL_WHITE];
+	result->stx_swcur.stc_word = 0;
+
+	/* Fill in the saved display state. */
+	memset(result->stx_display, 0, dispsz);
+
+	/* Set default color for all cells. */
+	{
+		size_t i;
+		for (i = 0; i < cells_x * cells_y; ++i)
+			result->stx_display[i].sgc_color = ANSITTY_CL_DEFAULT;
+	}
+
+	return result;
 }
 
 
@@ -626,74 +969,14 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_htxt)(struct svga_ttyaccess *__restrict
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess *FCALL
 svga_makettyaccess(struct svga_device *__restrict self,
                    struct svga_modeinfo const *__restrict mode) {
-	void *mapbase;
 	REF struct svga_ttyaccess *result;
-	size_t vmemsize;
-	(void)self;
-	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
-		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO: paged memory access! */
-	vmemsize = mode->smi_scanline * mode->smi_resy;
-	vmemsize = CEIL_ALIGN(vmemsize, PAGESIZE);
-	result   = (REF struct svga_ttyaccess *)kmalloc(sizeof(struct svga_ttyaccess), GFP_NORMAL);
-	TRY {
-		/* Initialize the `sta_vmem' node of `result' */
-		mman_lock_write(&mman_kernel);
-		mapbase = mman_getunmapped_or_unlock_device(vmemsize);
-
-		/* Prepare the buffer region */
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		if unlikely(!pagedir_kernelprepare(mapbase, vmemsize)) {
-			mman_lock_endwrite(&mman_kernel);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
-		}
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	} EXCEPT {
-		kfree(result);
-		RETHROW();
-	}
-
-	result->sta_vmem.mn_minaddr = (byte_t *)mapbase;
-	result->sta_vmem.mn_maxaddr = (byte_t *)mapbase + vmemsize - 1;
-	result->sta_vmem.mn_flags   = MNODE_F_PWRITE | MNODE_F_PREAD | MNODE_F_SHARED |
-	                              MNODE_F_MPREPARED | MNODE_F_KERNPART | MNODE_F_NOSPLIT |
-	                              MNODE_F_NOMERGE;
-	result->sta_vmem.mn_part    = NULL; /* Reserved node. */
-	result->sta_vmem.mn_fspath  = NULL;
-	result->sta_vmem.mn_fsname  = NULL;
-	result->sta_vmem.mn_mman    = &mman_kernel;
-	DBG_memset(&result->sta_vmem.mn_partoff, 0xcc, sizeof(result->sta_vmem.mn_partoff));
-	DBG_memset(&result->sta_vmem.mn_link, 0xcc, sizeof(result->sta_vmem.mn_link));
-	LIST_ENTRY_UNBOUND_INIT(&result->sta_vmem.mn_writable);
-	mman_mappings_insert(&mman_kernel, &result->sta_vmem);
-	mman_lock_endwrite(&mman_kernel);
-
-	/* Bind video memory to our custom buffer mapping. */
-	pagedir_map(mapbase, vmemsize, (physaddr_t)mode->smi_lfb,
-	            PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
-
-	/* Initialize all the resulting fields of `result' */
-	result->sta_refcnt = 1;
-	atomic_lock_init(&result->sta_lock);
-	result->sta_mode  = mode;
-	result->sta_flags = SVGA_TTYACCESS_F_ACTIVE; /* Must mark as active since we already mapped physical memory! */
+	/* Support both hardware text-mode, as well as
+	 * software emulation for higher  resolutions! */
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
-		result->sta_resx       = mode->smi_resx;
-		result->sta_resy       = mode->smi_resy;
-		result->sta_cellw      = 8;
-		result->sta_cellh      = 16;
-		result->sta_scan       = mode->smi_scanline / 2;
-		result->sta_setcell    = &svga_ttyaccess_v_setcell_htxt;
-		result->sta_hidecursor = &svga_ttyaccess_v_hidecursor_htxt;
-		result->sta_showcursor = &svga_ttyaccess_v_showcursor_htxt;
-		result->sta_copycell   = &svga_ttyaccess_v_copycell_htxt_nooverscan;
-		result->sta_fillcells  = &svga_ttyaccess_v_fillcells_htxt;
-		if (result->sta_scan > result->sta_resx)
-			result->sta_copycell = &svga_ttyaccess_v_copycell_htxt_overscan;
+		result = svga_makettyaccess_txt(self, mode);
 	} else {
-		/* TODO */
-		THROW(E_NOT_IMPLEMENTED_TODO);
+		result = svga_makettyaccess_gfx(self, mode);
 	}
-	result->sta_cursor.stc_word = 0;
 	return result;
 }
 
@@ -746,7 +1029,7 @@ PRIVATE struct ansittydev_ops const svga_ansittydev_ops = {{{{{
  * These are on hints used to select the initial  mode. */
 DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resx, "xres", 1024);
 DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resy, "yres", 768);
-DEFINE_CMDLINE_PARAM_UINT8_VAR(default_bpp, "bpp", 24);
+DEFINE_CMDLINE_PARAM_UINT8_VAR(default_bpp, "bpp", 32);
 
 
 PRIVATE NOBLOCK ATTR_FREETEXT WUNUSED NONNULL((1)) uint64_t
@@ -756,8 +1039,14 @@ NOTHROW(FCALL calculate_mode_cost)(struct svga_modeinfo const *__restrict mode,
 	result += abs((int32_t)xres - (int32_t)mode->smi_resx);
 	result += abs((int32_t)yres - (int32_t)mode->smi_resy);
 	result += abs((int8_t)bpp - (int8_t)mode->smi_bits_per_pixel);
-#if 1 /* TODO: Remove me */
-	if (!(mode->smi_flags & SVGA_MODEINFO_F_TXT))
+	if (mode->smi_bits_per_pixel > 32)
+		return (uint64_t)-1; /* We only support BPP up to 32-bit! */
+#if 1 /* TODO: multiple-pixels-per-byte graphics modes! */
+	if (mode->smi_bits_per_pixel <= 4)
+		return (uint64_t)-1;
+#endif
+#if 1 /* TODO: paged memory access! */
+	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
 		return (uint64_t)-1;
 #endif
 	return result;
@@ -848,7 +1137,12 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 		TRY {
 			byte_t *modev;
 			size_t modec;
-			uintptr_t iterator;
+
+			/* Free unused memory. */
+			self = (struct svga_device *)krealloc_in_place(self,
+			                                               offsetof(struct svga_device, svd_chipset)+
+			                                               drivers[i].scd_cssize,
+			                                               GFP_NORMAL);
 
 			self->svd_csdriver = &drivers[i];
 			printk(FREESTR(KERN_INFO "[svga] Video chipset detected: %s\n"),
@@ -871,6 +1165,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 				modev = (byte_t *)kmalloc(self->svd_supmodeS, GFP_NORMAL);
 			TRY {
 				REF struct svga_ttyaccess *tty;
+				uintptr_t iterator;
 
 				/* Might not make much sense to force a lock here, but it's part of the contract... */
 				svga_chipset_write(&self->svd_chipset);

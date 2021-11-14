@@ -132,6 +132,7 @@ union svga_tty_cursor {
                                         * flag is cleared the next time a character is printed, but
                                         * if said character is '\n', it is silently ignored. */
 #define _SVGA_TTYACCESS_F_HWCUROFF 0x4000 /* For hardware text-mode ttys: cursor is currently off. */
+#define _SVGA_TTYACCESS_F_SWCURON  0x4000 /* For graphics tty: the cursor is currently shown. */
 
 struct svga_ttyaccess {
 	WEAK refcnt_t               sta_refcnt; /* Reference counter. */
@@ -143,11 +144,11 @@ struct svga_ttyaccess {
 	                                         * during destruction of the access object. */
 	union {
 		struct {
+			/* NOTE: Cell size in `x' is always 9 */
+			/* NOTE: Cell size in `y' is always 16 */
 			uintptr_t             sta_flags;  /* [lock(sta_lock)] Set of `SVGA_TTYACCESS_F_*' */
 			uintptr_half_t        sta_resx;   /* [const] # of character cells in X */
 			uintptr_half_t        sta_resy;   /* [const] # of character cells in Y */
-			uintptr_half_t        sta_cellw;  /* [const] Cell size in X, in pixels */
-			uintptr_half_t        sta_cellh;  /* [const] Cell size in Y, in pixels */
 			size_t                sta_scan;   /* [const] Scanline size (in characters cells) */
 			union svga_tty_cursor sta_cursor; /* [lock(sta_lock)] Current cursor position. */
 		};
@@ -160,10 +161,10 @@ struct svga_ttyaccess {
 	/* [1..1][lock(sta_lock)] Set the contents of a single cell. (attributes are taken from `tty->at_ansi')
 	 * NOTE: This operator may assume that `address' is visible on-screen
 	 * @param: address: == CELL_X + CELL_Y * sta_scan */
-	NOBLOCK NONNULL((1, 4)) void
+	NOBLOCK NONNULL((1, 2)) void
 	/*NOTHROW*/ (FCALL *sta_setcell)(struct svga_ttyaccess *__restrict self,
-	                                 uintptr_t address, char32_t ch,
-	                                 struct svga_ansitty *__restrict tty);
+	                                 struct svga_ansitty *__restrict tty,
+	                                 uintptr_t address, char32_t ch);
 
 	/* [1..1][lock(sta_lock)] Hide the hardware cursor */
 	NOBLOCK NONNULL((1)) void
@@ -185,16 +186,58 @@ struct svga_ttyaccess {
 	                                  size_t num_cells);
 
 	/* [1..1][lock(sta_lock)] Same as:
-	 * >> while (num_cells--) (*sta_setcell)(self, start++, ch, tty); */
-	NOBLOCK NONNULL((1, 5)) void
+	 * >> while (num_cells--) (*sta_setcell)(self, tty, start++, ch); */
+	NOBLOCK NONNULL((1, 2)) void
 	/*NOTHROW*/ (FCALL *sta_fillcells)(struct svga_ttyaccess *__restrict self,
-	                                   uintptr_t start, char32_t ch, size_t num_cells,
-	                                   struct svga_ansitty *__restrict tty);
+	                                   struct svga_ansitty *__restrict tty,
+	                                   uintptr_t start, char32_t ch, size_t num_cells);
+
+	/* [1..1][lock(sta_lock)] Redraw the entire screen (called when this TTY is reactivated) */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (FCALL *sta_redraw)(struct svga_ttyaccess *__restrict self);
+
 };
 
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_destroy)(struct svga_ttyaccess *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct svga_ttyaccess, sta_refcnt, svga_ttyaccess_destroy);
+
+struct svga_ttyaccess_txt: svga_ttyaccess {
+	COMPILER_FLEXIBLE_ARRAY(uint16_t, stt_display);   /* [sta_scan * sta_resy][lock(sta_lock)] Display contents. */
+};
+#define svga_ttyaccess_txt_vmem(self) ((uint16_t *)mnode_getaddr(&(self)->sta_vmem))
+#define svga_ttyaccess_txt_dmem(self) ((self)->stt_display)
+
+#define svga_ttyaccess_txt_setcell(self, addr, word) \
+	(svga_ttyaccess_txt_vmem(self)[addr] =           \
+	 svga_ttyaccess_txt_dmem(self)[addr] = (word))
+#define svga_ttyaccess_txt_fillcell(self, addr, word, count)     \
+	(memsetw(&svga_ttyaccess_txt_dmem(self)[addr], word, count), \
+	 memsetw(&svga_ttyaccess_txt_vmem(self)[addr], word, count))
+
+
+/* GFX tty sub-class. */
+struct svga_gfxcell {
+	uint8_t sgc_lines[16]; /* Bitmasks to select fg/bg colors for each pixel. */
+	uint8_t sgc_color;     /* fg/bg color for this color. */
+};
+
+struct svga_ttyaccess_gfx: svga_ttyaccess {
+	/* [1..1][lock(sta_lock)] Redraw the cell at `address' (index into `stx_display') */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (FCALL *stx_redraw_cell)(struct svga_ttyaccess_gfx *__restrict self,
+	                                     uintptr_t address);
+	/* [1..1][lock(sta_lock)] Draw a cursor at `stx_swcur' */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (FCALL *stx_redraw_cursor)(struct svga_ttyaccess *__restrict self);
+	uint32_t                                     stx_ccolor;     /* [lock(sta_lock)] Cursor color. */
+	union svga_tty_cursor                        stx_swcur;      /* [valid_if(_SVGA_TTYACCESS_F_SWCURON)][lock(sta_lock)]
+	                                                              * Current software cursor position. */
+	uint32_t                                     stx_colors[16]; /* [const] Pre-calculated palette colors. */
+	size_t                                       stx_cellscan;   /* [const][== 16 * mode->smi_scanline] */
+	COMPILER_FLEXIBLE_ARRAY(struct svga_gfxcell, stx_display);   /* [sta_resx * sta_resy][lock(sta_lock)] Display contents. */
+};
+
 
 
 ARREF(svga_ttyaccess_arref, svga_ttyaccess);
@@ -245,10 +288,6 @@ struct svga_device: svga_ansitty {
 
 /* Default text-mode palette colors for KOS (these are set-up for ANSI TTY compatibility) */
 INTDEF struct vga_palcolor const basevga_defaultpal[16];
-
-/* Default values that must be loaded into `vm_att_pal' in order to
- * make the `basevga_defaultpal' palette behave as ANSI-compatible. */
-INTDEF uint8_t const basevga_defaultattpal[16];
 
 /* Default text-mode font for KOS. */
 INTDEF byte_t const basevga_defaultfont[256][32];
