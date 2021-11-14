@@ -133,8 +133,8 @@ svga_setmode(struct svga_device *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_scrollone)(struct svga_ttyaccess *__restrict me,
                                         struct svga_ansitty *__restrict tty) {
-	(*me->sta_copycell)(me, 0, me->sta_scan, me->sta_resx * (me->sta_resy - 1));
-	(*me->sta_fillcells)(me, tty, me->sta_scan * (me->sta_resy - 1), ' ', me->sta_resx);
+	(*me->sta_copycell)(me, me->_sta_scrl1_to, me->_sta_scrl1_from, me->_sta_scrl1_cnt);
+	(*me->sta_fillcells)(me, tty, me->_sta_scrl1_fil, ' ', me->sta_resx);
 }
 
 
@@ -155,8 +155,8 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 #define TABSIZE 8
 		uintptr_half_t advance;
 		/* Check if we need to scroll. */
-		if (me->sta_cursor.stc_celly >= me->sta_resy) {
-			me->sta_cursor.stc_celly = me->sta_resy - 1;
+		if (me->sta_cursor.stc_celly >= me->sta_scroll_yend) {
+			me->sta_cursor.stc_celly = me->_sta_scrl_ymax;
 			svga_ttyaccess_scrollone(me, ansitty_assvga(self));
 		}
 		advance = TABSIZE - (me->sta_cursor.stc_cellx % TABSIZE);
@@ -188,8 +188,8 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 			}
 		}
 		/* Check if we need to scroll. */
-		if (me->sta_cursor.stc_celly >= me->sta_resy) {
-			me->sta_cursor.stc_celly = me->sta_resy - 1;
+		if (me->sta_cursor.stc_celly >= me->sta_scroll_yend) {
+			me->sta_cursor.stc_celly = me->_sta_scrl_ymax;
 			svga_ttyaccess_scrollone(me, ansitty_assvga(self));
 		}
 		break;
@@ -217,16 +217,16 @@ svga_ansitty_v_putc(struct ansitty *__restrict self,
 		/* Ignore '\n' after an implicit line-wrap. */
 		if (!(me->sta_flags & SVGA_TTYACCESS_F_EOL))
 			++me->sta_cursor.stc_celly;
-		if (me->sta_cursor.stc_celly >= me->sta_resy) {
-			me->sta_cursor.stc_celly = me->sta_resy - 1;
+		if (me->sta_cursor.stc_celly >= me->sta_scroll_yend) {
+			me->sta_cursor.stc_celly = me->_sta_scrl_ymax;
 			svga_ttyaccess_scrollone(me, ansitty_assvga(self));
 		}
 		break;
 
 	default: {
 		/* Check if we need to scroll. */
-		if (me->sta_cursor.stc_celly >= me->sta_resy) {
-			me->sta_cursor.stc_celly = me->sta_resy - 1;
+		if (me->sta_cursor.stc_celly >= me->sta_scroll_yend) {
+			me->sta_cursor.stc_celly = me->_sta_scrl_ymax;
 			svga_ttyaccess_scrollone(me, ansitty_assvga(self));
 		}
 
@@ -435,15 +435,36 @@ svga_ansitty_v_setttymode(struct ansitty *__restrict self,
 	atomic_lock_release(&me->sta_lock);
 }
 
+PRIVATE NONNULL((1)) void LIBANSITTY_CC
+svga_ansitty_v_scrollregion(struct ansitty *__restrict self,
+                            ansitty_coord_t start_line,
+                            ansitty_coord_t end_line) {
+	REF struct svga_ttyaccess *me;
+	me = ansitty_getaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	atomic_lock_acquire(&me->sta_lock);
+	if (start_line < 0)
+		start_line = 0;
+	if (end_line > me->sta_resy)
+		end_line = me->sta_resy;
+	if (start_line > end_line)
+		start_line = end_line;
+	me->sta_scroll_ystart = start_line;
+	me->sta_scroll_yend   = end_line;
+	svga_ttyaccess__update_scrl(me);
+	atomic_lock_release(&me->sta_lock);
+}
+
 
 PRIVATE struct ansitty_operators const svga_ansitty_ops = {
-	.ato_putc       = &svga_ansitty_v_putc,
-	.ato_setcursor  = &svga_ansitty_v_setcursor,
-	.ato_getcursor  = &svga_ansitty_v_getcursor,
-	.ato_getsize    = &svga_ansitty_v_getsize,
-	.ato_copycell   = &svga_ansitty_v_copycell,
-	.ato_fillcell   = &svga_ansitty_v_fillcell,
-	.ato_setttymode = &svga_ansitty_v_setttymode,
+	.ato_putc         = &svga_ansitty_v_putc,
+	.ato_setcursor    = &svga_ansitty_v_setcursor,
+	.ato_getcursor    = &svga_ansitty_v_getcursor,
+	.ato_getsize      = &svga_ansitty_v_getsize,
+	.ato_copycell     = &svga_ansitty_v_copycell,
+	.ato_fillcell     = &svga_ansitty_v_fillcell,
+	.ato_setttymode   = &svga_ansitty_v_setttymode,
+	.ato_scrollregion = &svga_ansitty_v_scrollregion,
 };
 
 
@@ -723,6 +744,9 @@ svga_makettyaccess_txt(struct svga_device *__restrict UNUSED(self),
 	result->sta_fillcells  = &svga_ttyaccess_v_fillcells_htxt;
 	if (result->sta_scan > result->sta_resx)
 		result->sta_copycell = &svga_ttyaccess_v_copycell_htxt_overscan;
+	result->sta_scroll_ystart = 0;
+	result->sta_scroll_yend   = result->sta_resy;
+	svga_ttyaccess__update_scrl(result);
 
 	/* Fill in the saved display state.
 	 * This is the only time we read from display memory! */
@@ -893,18 +917,25 @@ svga_makettyaccess_gfx(struct svga_device *__restrict UNUSED(self),
 		RETHROW();
 	}
 
-	result->sta_resy       = mode->smi_resy / 16;
-	result->sta_resx       = mode->smi_resx / 9;
-	result->sta_scan       = result->sta_resx;
-	result->stx_cellscan   = 16 * mode->smi_scanline;
+	/* Configure dimensions. */
+	result->sta_resy          = mode->smi_resy / 16;
+	result->sta_resx          = mode->smi_resx / 9;
+	result->sta_scan          = result->sta_resx;
+	result->stx_cellscan      = 16 * mode->smi_scanline;
+	result->sta_scroll_ystart = 0;
+	result->sta_scroll_yend   = result->sta_resy;
+	svga_ttyaccess__update_scrl(result);
+
+	/* Configure operators. */
 	result->sta_setcell    = &svga_ttyaccess_v_setcell_gfx;
 	result->sta_showcursor = &svga_ttyaccess_v_showcursor_gfx;
 	result->sta_hidecursor = &svga_ttyaccess_v_hidecursor_gfx;
 	result->sta_copycell   = &svga_ttyaccess_v_copycell_gfx;
 	result->sta_fillcells  = &svga_ttyaccess_v_fillcells_gfx;
 	result->sta_redraw     = &svga_ttyaccess_v_redraw_gfx;
-	switch (mode->smi_bits_per_pixel) {
 
+	/* BPP-specific operators. */
+	switch (mode->smi_bits_per_pixel) {
 #ifndef __INTELLISENSE__
 #define SETOPS(bpp)                                                                    \
 	{                                                                                  \
@@ -924,6 +955,7 @@ svga_makettyaccess_gfx(struct svga_device *__restrict UNUSED(self),
 #endif /* !__INTELLISENSE__ */
 
 	default:
+		/* Unsupported # of bits-per-pixel. */
 		destroy(result);
 		THROW(E_NOT_IMPLEMENTED_UNSUPPORTED);
 		break;

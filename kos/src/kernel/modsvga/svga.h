@@ -146,11 +146,24 @@ struct svga_ttyaccess {
 		struct {
 			/* NOTE: Cell size in `x' is always 9 */
 			/* NOTE: Cell size in `y' is always 16 */
-			uintptr_t             sta_flags;  /* [lock(sta_lock)] Set of `SVGA_TTYACCESS_F_*' */
-			uintptr_half_t        sta_resx;   /* [const] # of character cells in X */
-			uintptr_half_t        sta_resy;   /* [const] # of character cells in Y */
-			size_t                sta_scan;   /* [const] Scanline size (in characters cells) */
-			union svga_tty_cursor sta_cursor; /* [lock(sta_lock)] Current cursor position. */
+			uintptr_t             sta_flags;         /* [lock(sta_lock)] Set of `SVGA_TTYACCESS_F_*' */
+			uintptr_half_t        sta_resx;          /* [const] # of character cells in X */
+			uintptr_half_t        sta_resy;          /* [const] # of character cells in Y */
+			size_t                sta_scan;          /* [const] Scanline size (in characters cells) */
+			uintptr_half_t        sta_scroll_ystart; /* [lock(sta_lock)][<= sta_scroll_yend && <= sta_resy] Start scroll line (usualy `0') */
+			uintptr_half_t        sta_scroll_yend;   /* [lock(sta_lock)][>= sta_scroll_ystart && <= sta_resy] End scroll line (usualy `sta_resy') */
+			union svga_tty_cursor sta_cursor;        /* [lock(sta_lock)] Current cursor position. */
+			uintptr_half_t       _sta_scrl_ymax;     /* [lock(sta_lock)][== sta_scroll_yend - 1] */
+			uintptr_t            _sta_scrl1_to;      /* [lock(sta_lock)][== sta_scroll_ystart * sta_resx] */
+			uintptr_t            _sta_scrl1_from;    /* [lock(sta_lock)][== (sta_scroll_ystart + 1) * sta_resx] */
+			uintptr_t            _sta_scrl1_cnt;     /* [lock(sta_lock)][== sta_resx * ((sta_scroll_yend - sta_scroll_ystart) - 1)] */
+			uintptr_t            _sta_scrl1_fil;     /* [lock(sta_lock)][== (sta_scroll_yend - 1) * sta_scan] */
+#define svga_ttyaccess__update_scrl(self)                                                                      \
+	((self)->_sta_scrl_ymax  = (self)->sta_scroll_yend - 1,                                                    \
+	 (self)->_sta_scrl1_to   = (self)->sta_scroll_ystart * (self)->sta_resx,                                   \
+	 (self)->_sta_scrl1_from = ((self)->sta_scroll_ystart + 1) * (self)->sta_resx,                             \
+	 (self)->_sta_scrl1_cnt  = (self)->sta_resx * (((self)->sta_scroll_yend - (self)->sta_scroll_ystart) - 1), \
+	 (self)->_sta_scrl1_fil  = ((self)->sta_scroll_yend - 1) * (self)->sta_scan)
 		};
 		Toblockop(mman)     _sta_mmlop;  /* Used internally */
 		Tobpostlockop(mman) _sta_mmplop; /* Used internally */
