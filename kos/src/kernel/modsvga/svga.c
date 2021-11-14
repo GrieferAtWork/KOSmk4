@@ -25,16 +25,11 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
+#include <kernel/driver-param.h>
 #include <kernel/memory.h>
-#include <kernel/mman.h>
-#include <kernel/mman/sync.h>
-#include <kernel/mman/unmapped.h>
 #include <kernel/printk.h>
 
 #include <hybrid/align.h>
-#include <hybrid/atomic.h>
-#include <hybrid/overflow.h>
-#include <hybrid/unaligned.h>
 
 #include <kos/except.h>
 
@@ -45,9 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libsvga/api.h>
 #include <libsvga/chipset.h>
-#include <libsvga/util/vgaio.h>
 
 /**/
 #include "svga.h"
@@ -71,6 +64,63 @@ svga_init_enumstring_callback(void *arg,
 	       driver->scd_name, name, value);
 	return 0;
 }
+
+
+/* Default graphics mode hints.
+ *
+ * Note that modes can always be switched via ioctl(2).
+ * These are on hints used to select the initial  mode. */
+DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resx, "xres", 1024);
+DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resy, "yres", 768);
+DEFINE_CMDLINE_PARAM_UINT8_VAR(default_bpp, "bpp", 32);
+
+
+PRIVATE NOBLOCK ATTR_FREETEXT WUNUSED NONNULL((1)) uint64_t
+NOTHROW(FCALL calculate_mode_cost)(struct svga_modeinfo const *__restrict mode,
+                                   uint32_t xres, uint32_t yres, uint8_t bpp) {
+	uint64_t result = 0;
+	result += abs((int32_t)xres - (int32_t)mode->smi_resx);
+	result += abs((int32_t)yres - (int32_t)mode->smi_resy);
+	result += abs((int8_t)bpp - (int8_t)mode->smi_bits_per_pixel);
+	if (mode->smi_bits_per_pixel > 32)
+		return (uint64_t)-1; /* We only support BPP up to 32-bit! */
+#if 1 /* TODO: multiple-pixels-per-byte graphics modes! */
+	if (mode->smi_bits_per_pixel <= 4)
+		return (uint64_t)-1;
+#endif
+#if 1 /* TODO: paged memory access! */
+	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+		return (uint64_t)-1;
+#endif
+	return result;
+}
+
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *
+NOTHROW(FCALL select_closest_video_mode)(struct svgadev *__restrict self,
+                                         uint32_t xres, uint32_t yres, uint8_t bpp) {
+	size_t i;
+	uint64_t winner_cost;
+	struct svga_modeinfo const *winner;
+	winner      = svgadev_supmode(self, 0);
+	winner_cost = calculate_mode_cost(winner, xres, yres, bpp);
+	for (i = 1; i < self->svd_supmodec; ++i) {
+		struct svga_modeinfo const *mode;
+		uint64_t cost;
+		mode = svgadev_supmode(self, i);
+		cost = calculate_mode_cost(mode, xres, yres, bpp);
+		if (winner_cost > cost) {
+			winner_cost = cost;
+			winner      = mode;
+		}
+	}
+	return winner;
+}
+
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *
+NOTHROW(FCALL get_default_video_mode)(struct svgadev *__restrict self) {
+	return select_closest_video_mode(self, default_resx, default_resy, default_bpp);
+}
+
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_svga_driver(void)
@@ -145,7 +195,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 				iterator = 0;
 				for (;;) {
 					struct svga_modeinfo *mode;
-					size_t avail, used;
+					size_t j, avail, used;
 					used  = modec * self->svd_supmodeS;
 					avail = kmalloc_usable_size(modev);
 					avail -= used;
@@ -163,9 +213,23 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 					}
 
 					/* Query mode information. */
+again_load_mode:
 					mode = (struct svga_modeinfo *)((byte_t *)modev + used);
 					if (!(*self->svd_chipset.sc_ops.sco_getmode)(&self->svd_chipset, mode, &iterator))
 						break; /* Done! */
+
+					/* Safety check if a duplicate mode already exists.
+					 * For  this purpose, we  only compare non-chipset-specific fields!
+					 * This is necessary since user-space  selects modes based on  only
+					 * these public fields, and if multiple modes with identical fields
+					 * were to exist, that would create ambiguity. */
+					for (j = 0; j < modec; ++j) {
+						struct svga_modeinfo *oldmode;
+						oldmode = (struct svga_modeinfo *)((byte_t *)modev +
+						                                   (j * self->svd_chipset.sc_ops.sco_modeinfosize));
+						if (memcmp(mode, oldmode, sizeof(struct svga_modeinfo)) == 0)
+							goto again_load_mode;
+					}
 					++modec; /* Remember that we've got another mode now! */
 
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
@@ -222,6 +286,9 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 				modev = (byte_t *)krealloc_nx(modev, modec, GFP_NORMAL);
 				if likely(modev != NULL)
 					self->svd_supmodev = modev;
+
+				/* Select the default video mode. */
+				self->svd_defmode = get_default_video_mode(self);
 
 				/* By default, nothing is active. */
 				awref_init(&self->svd_active, NULL);

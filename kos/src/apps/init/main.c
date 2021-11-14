@@ -26,6 +26,7 @@
 #include <hybrid/compiler.h>
 
 #include <kos/fcntl.h> /* Open() */
+#include <kos/io.h>
 #include <kos/ioctl/svga.h>
 #include <kos/ksysctl.h>   /* ksysctl_insmod() */
 #include <kos/sys/ioctl.h> /* Ioctl() */
@@ -135,7 +136,7 @@ done_tmpfs:
 
 	/* Load some additional drivers that we need for the I/O console. */
 	KSysctlInsmod("ps2", NULL); /* Keyboard */
-	if (access("/dev/svga", F_OK) != 0)
+	if (access("/dev/svga", F_OK) != 0) /* TODO: Remove me once modsvga is no longer hard-coded into the kernel. */
 		ksysctl_insmod("svga", NULL); /* Display */
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
@@ -167,10 +168,16 @@ done_tmpfs:
 		} else
 #endif
 		{
-			fd_t tty1;
-			tty1 = Ioctl(display, SVGA_IOC_MAKEDEFTTY);
+			/* Construct ansitty device /dev/svga1 */
+			struct svga_maketty tty;
+			tty.smt_res.of_mode  = HOP_OPENFD_MODE_AUTO;
+			tty.smt_res.of_flags = IO_CLOEXEC | IO_CLOFORK;
+			Ioctl(display, SVGA_IOC_GETDEFMODE, &tty.smt_mode);
+			tty.smt_name = "svga1";
+			Ioctl(display, SVGA_IOC_MAKETTY, &tty);
 			close(display);
-			display = tty1;
+			display = tty.smt_res.of_hint;
+			Ioctl(display, SVGA_IOC_ACTIVATE);
 		}
 
 		console = sys_Xmktty("console", keyboard, display, 0);

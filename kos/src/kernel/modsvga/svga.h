@@ -238,6 +238,12 @@ struct svgatty: ansittydev {
 #define ansitty_assvga(self)    container_of(self, struct svgatty, at_ansi)
 #define ansitty_getaccess(self) arref_get(&ansitty_assvga(self)->sty_tty)
 
+/* Safely update the tty pointed-to by `self->sty_tty' */
+INTDEF BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
+svgatty_settty(struct svgatty *__restrict self,
+               struct svga_ttyaccess *__restrict tty);
+
+
 /* Async job  started to  revert  to the  old  display
  * mode when this TTY is destroyed while `sty_active'. */
 #define _svgatty_toasyncrestore(self) \
@@ -251,11 +257,11 @@ STATIC_ASSERT(sizeof(struct async) <= sizeof(struct ansitty));
 struct svgalck: mfile {
 	REF struct svgadev             *slc_dev;    /* [1..1][const] SVGA device. */
 	REF struct svgatty             *slc_oldtty; /* [0..1][lock(slc_dev->svd_chipset.sc_lock)] TTY that is made active when this tty is destroyed. */
+	struct svga_modeinfo const     *slc_mode;   /* [0..1][lock(slc_dev->svd_chipset.sc_lock)] Current video mode (for `SVGA_IOC_GETMODE' / `SVGA_IOC_SETMODE') */
 	struct async                    slc_rstor;  /* A pre-allocated async controller used to release the lock. */
 	struct vga_mode                 slc_vmode;  /* [lock(slc_dev->svd_chipset.sc_lock)] Standard VGA registers to restore upon release. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, slc_xregs); /* [lock(slc_dev->svd_chipset.sc_lock)][0..slc_dev->svd_chipset.sco_regsize]
-	                                             * Extended     registers      (restored     with      `sul_screen.sty_dev->
-	                                             * svd_chipset.sco_setregs') */
+	                                             * Extended registers (restored with `sul_screen.sty_dev->svd_chipset.sco_setregs') */
 };
 
 
@@ -268,8 +274,9 @@ struct svgadev: chrdev {
 	struct mfile_awref                svd_active;   /* [0..1][lock(WRITE(svd_chipset.sc_lock))] Active TTY or  user-lock.
 	                                                 * When this points to a dead file, that file _must_ clean up itself! */
 	byte_t const                     *svd_supmodev; /* [0..n][const][owned] Array of supported video modes. */
-	size_t                            svd_supmodec; /* [const] # of supported video modes. */
+	size_t                            svd_supmodec; /* [!0][const] # of supported video modes. */
 	size_t                            svd_supmodeS; /* [const] Aligned sizeof() supported video modes. */
+	struct svga_modeinfo const       *svd_defmode;  /* [1..1][lock(ATOMIC)] Default video mode. (points into `svd_supmodev') */
 	struct svga_chipset_driver const *svd_csdriver; /* [1..1][const] SVGA driver. */
 	struct svga_chipset               svd_chipset;  /* SVGA Chipset driver. */
 };
@@ -330,7 +337,7 @@ svgadev_activate_tty(struct svgadev *__restrict self,
 /* Allocate  and activate a new userlock for a given SVGA device.
  * If another lock already exists, this function will block until
  * said lock is released. */
-INTDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct svgalck *FCALL
+INTDEF BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct svgalck *FCALL
 svgadev_newuserlock(struct svgadev *__restrict self)
 		THROWS(E_WOULDBLOCK);
 

@@ -1004,6 +1004,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *                            faulted area.
 	 */
 
+	/* TODO: Write a user-space program with which to control svga video modes:
+	 *  - List modes
+	 *  - Select modes
+	 *  - Create TTYs
+	 */
+
 	return state;
 }
 

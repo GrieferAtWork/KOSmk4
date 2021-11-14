@@ -24,14 +24,16 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/driver-param.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
+#include <sched/cred.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 
 #include <hw/video/vga.h>
 #include <kos/except.h>
@@ -41,6 +43,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <libsvga/util/vgaio.h>
 
@@ -54,6 +57,280 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+/************************************************************************/
+/* ioctl helpers.                                                       */
+/************************************************************************/
+
+/* Return a pointer to the internal mode descriptor matching `mode' */
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *FCALL
+svgadev_findmode(struct svgadev *__restrict self,
+                 USER CHECKED struct svga_modeinfo const *mode)
+		THROWS(E_SEGFAULT, E_NO_SUCH_OBJECT) {
+	struct svga_modeinfo const *result;
+	size_t i;
+	for (i = 0; i < self->svd_supmodec; ++i) {
+		result = svgadev_supmode(self, i);
+		if (memcmp(result, mode, sizeof(struct svga_modeinfo)) == 0)
+			return result;
+	}
+	THROW(E_NO_SUCH_OBJECT);
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgadev_ioctl_getdefmode(struct svgadev *__restrict self,
+                         USER UNCHECKED struct svga_modeinfo *modeinfo)
+		THROWS(E_SEGFAULT) {
+	validate_writable(modeinfo, sizeof(*modeinfo));
+	memcpy(modeinfo, self->svd_defmode, sizeof(*self->svd_defmode));
+	return 0;
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgadev_ioctl_setdefmode(struct svgadev *__restrict self,
+                         USER UNCHECKED struct svga_modeinfo const *modeinfo)
+		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
+	USER CHECKED struct svga_modeinfo const *reqmode;
+	require(CAP_SYS_RAWIO);
+	validate_readable(modeinfo, sizeof(*modeinfo));
+	reqmode = svgadev_findmode(self, modeinfo);
+	ATOMIC_WRITE(self->svd_defmode, reqmode);
+	return 0;
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgadev_ioctl_lsmodes(struct svgadev *__restrict self,
+                      USER UNCHECKED struct svga_lsmodes *info)
+		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
+	size_t i, avail;
+	struct svga_lsmodes req;
+	validate_readwrite(info, sizeof(*info));
+	memcpy(&req, info, sizeof(req));
+	validate_writablem(req.svl_buf, req.svl_count,
+	                   sizeof(struct svga_modeinfo));
+	if (OVERFLOW_USUB(self->svd_supmodec, req.svl_offset, &avail))
+		avail = 0;
+	if (avail > req.svl_count)
+		avail = req.svl_count;
+
+	/* Copy mode information into user-space. */
+	for (i = 0; i < avail; ++i) {
+		struct svga_modeinfo const *mode;
+		mode = svgadev_supmode(self, i);
+		memcpy(&req.svl_buf[i], mode, sizeof(struct svga_modeinfo));
+	}
+
+	/* Write-back the # of written modes. */
+	COMPILER_WRITE_BARRIER();
+	info->svl_count = avail;
+	return 0;
+}
+
+
+
+
+
+
+/************************************************************************/
+/* SVGALCK                                                              */
+/************************************************************************/
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svgalck_async_v_destroy)(struct async *__restrict self) {
+	struct svgalck *me = container_of(self, struct svgalck, slc_rstor);
+
+	/* Clear remaining references. */
+	decref_unlikely(me->slc_dev);
+	xdecref_unlikely(me->slc_oldtty);
+
+	/* Destroy the original underlying character-device. */
+	chrdev_v_destroy(me);
+}
+
+PRIVATE NONNULL((1)) ktime_t FCALL
+svgalck_async_v_connect(struct async *__restrict self) {
+	struct svgalck *me = container_of(self, struct svgalck, slc_rstor);
+	shared_rwlock_pollconnect_write(&me->slc_dev->svd_chipset.sc_lock);
+	return KTIME_INFINITE;
+}
+
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+svgalck_async_v_test(struct async *__restrict self) {
+	struct svgalck *me = container_of(self, struct svgalck, slc_rstor);
+	return svga_chipset_canwrite(&me->slc_dev->svd_chipset);
+}
+
+PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL
+svgalck_async_v_work(struct async *__restrict self) {
+	struct svgalck *me = container_of(self, struct svgalck, slc_rstor);
+	struct svgatty *nt = me->slc_oldtty;
+	struct svgadev *dv = me->slc_dev;
+	struct svga_ttyaccess *ac;
+	assert(PREEMPTION_ENABLED());
+	if (!svga_chipset_trywrite(&dv->svd_chipset))
+		return ASYNC_RESUME;
+	RAII_FINALLY { svga_chipset_endwrite(&dv->svd_chipset); };
+	assert(awref_ptr(&dv->svd_active) == me);
+
+	/* Restore extended registers. (Only do this once if `svgadev_setmode()' below throws) */
+	if (me->slc_mode != (struct svga_modeinfo const *)-1) {
+		(*dv->svd_chipset.sc_ops.sco_setregs)(&dv->svd_chipset, me->slc_xregs);
+		basevga_setregs(&me->slc_vmode);
+		me->slc_mode = (struct svga_modeinfo const *)-1;
+	}
+
+	/* Set the video mode used by `nt'
+	 * NOTE: Because we're holding a lock to `dv', the tty access object can't change! */
+	ac = arref_ptr(&nt->sty_tty);
+	assert(!wasdestroyed(ac));
+	assert(!(ac->sta_flags & SVGA_TTYACCESS_F_ACTIVE));
+	assert(!nt->sty_active);
+	svgadev_setmode(dv, ac->sta_mode);
+
+	/* Mark the tty as active. */
+	atomic_lock_acquire(&ac->sta_lock);       /* This can't throw because preemption is enabled. */
+	ac->sta_flags |= SVGA_TTYACCESS_F_ACTIVE; /* Mark TTY accessor as active */
+	nt->sty_active = 1;                       /* Mark TTY as active */
+	(*ac->sta_activate)(ac);                  /* This is NOBLOCK+NOTHROW */
+	awref_set(&dv->svd_active, nt);           /* Remember TTY as active */
+	atomic_lock_release(&ac->sta_lock);
+	return ASYNC_FINISHED;
+}
+
+
+PRIVATE struct async_ops const svgalck_async_v_ops = {
+	.ao_driver  = &drv_self,
+	.ao_destroy = &svgalck_async_v_destroy,
+	.ao_connect = &svgalck_async_v_connect,
+	.ao_test    = &svgalck_async_v_test,
+	.ao_work    = &svgalck_async_v_work,
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL svgalck_v_destroy)(struct mfile *__restrict self) {
+	struct svgalck *me = (struct svgalck *)self;
+	/* Setup an async job to restore another tty. */
+	async_init(&me->slc_rstor, &svgalck_async_v_ops);
+	decref_unlikely(async_start(&me->slc_rstor));
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+	struct svgalck *me = (struct svgalck *)self;
+	switch (cmd) {
+
+	case SVGA_IOC_GETMODE: {
+		struct svga_modeinfo const *mymode;
+		validate_writable(arg, sizeof(struct svga_modeinfo));
+		mymode = ATOMIC_READ(me->slc_mode);
+		if (!mymode)
+			THROW(E_NO_SUCH_OBJECT);
+		memcpy(arg, mymode, sizeof(struct svga_modeinfo));
+		return 0;
+	}	break;
+
+	case SVGA_IOC_SETMODE: {
+		struct svgadev *dv = me->slc_dev;
+		struct svga_modeinfo const *newmode;
+		validate_readable(arg, sizeof(struct svga_modeinfo));
+		newmode = svgadev_findmode(me->slc_dev, (USER CHECKED struct svga_modeinfo *)arg);
+		svga_chipset_write(&dv->svd_chipset);
+		RAII_FINALLY { svga_chipset_endwrite(&dv->svd_chipset); };
+
+		/* Set new video mode. */
+		svgadev_setmode(dv, newmode);
+
+		/* For text modes, also load the default font! */
+		if (newmode->smi_flags & SVGA_MODEINFO_F_TXT)
+			basevga_wrvmem(0x20000, basevga_defaultfont, sizeof(basevga_defaultfont));
+
+		/* Remember last-set mode. */
+		ATOMIC_WRITE(me->slc_mode, newmode);
+	}	break;
+
+	case SVGA_IOC_GETDEFMODE:
+		return svgadev_ioctl_getdefmode(me->slc_dev, (USER UNCHECKED struct svga_modeinfo *)arg);
+
+	case SVGA_IOC_SETDEFMODE:
+		return svgadev_ioctl_setdefmode(me->slc_dev, (USER UNCHECKED struct svga_modeinfo const *)arg);
+
+	case SVGA_IOC_LSMODES:
+		return svgadev_ioctl_lsmodes(me->slc_dev, (USER UNCHECKED struct svga_lsmodes *)arg);
+
+	default:
+		return mfile_v_ioctl(self, cmd, arg, mode);
+		break;
+	}
+	return 0;
+}
+
+
+PRIVATE struct mfile_stream_ops const svgalck_v_stream_ops = {
+	.mso_ioctl = &svgalck_v_ioctl,
+};
+
+INTERN_CONST struct mfile_ops const svgalck_ops = {
+	.mo_destroy = &svgalck_v_destroy,
+	.mo_stream  = &svgalck_v_stream_ops,
+};
+
+
+
+
+
+/************************************************************************/
+/* SVGATTY                                                              */
+/************************************************************************/
+
+/* Safely update the tty pointed-to by `self->sty_tty' */
+INTERN BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
+svgatty_settty(struct svgatty *__restrict self,
+               struct svga_ttyaccess *__restrict ntty) {
+	struct svga_ttyaccess *otty;
+	struct svgadev *dev;
+	/* One of the branches below wouldn't be NOEXCEPT if preemption wasn't enabled... */
+	if (!PREEMPTION_ENABLED())
+		THROW(E_WOULDBLOCK_PREEMPTED);
+	dev = self->sty_dev;
+	atomic_lock_waitfor(&ntty->sta_lock);
+	svga_chipset_write(&dev->svd_chipset);
+	RAII_FINALLY { svga_chipset_endwrite(&dev->svd_chipset); };
+	otty = arref_ptr(&self->sty_tty);
+	assertf(otty != ntty, "Only pass new ttys!");
+
+	/* Mark the old tty as inactive. */
+	atomic_lock_acquire(&otty->sta_lock);
+	otty->sta_flags &= ~SVGA_TTYACCESS_F_ACTIVE;
+	atomic_lock_release(&otty->sta_lock);
+
+	/* If this tty is active, update the hardware video mode. */
+	if (self->sty_active) {
+		TRY {
+			svgadev_setmode(dev, ntty->sta_mode);
+		} EXCEPT {
+			atomic_lock_acquire(&otty->sta_lock);
+			otty->sta_flags |= SVGA_TTYACCESS_F_ACTIVE;
+			(*otty->sta_activate)(otty);
+			atomic_lock_release(&otty->sta_lock);
+			RETHROW();
+		}
+	}
+
+	atomic_lock_acquire(&ntty->sta_lock);
+	assert(!(ntty->sta_flags & SVGA_TTYACCESS_F_ACTIVE));
+	/* If this tty is active, mark the caller-given accessor as active. */
+	if (self->sty_active) {
+		ntty->sta_flags |= SVGA_TTYACCESS_F_ACTIVE;
+		/* Also invoke the accessor's activation-callback. */
+		(*ntty->sta_activate)(ntty);
+	}
+
+	/* Remember the new tty as active. */
+	arref_set(&self->sty_tty, ntty);
+	atomic_lock_release(&ntty->sta_lock);
+}
+
+
 
 
 /* Set the SVGA video mode to `mode' */
@@ -211,7 +488,7 @@ svgadev_vnewttyf(struct svgadev *__restrict self,
 		RETHROW();
 	}
 
-	/* SVGA-tty objects get auto-destroyed once they're no longer referenced.
+	/* SVGA-tty objects get  auto-destroyed once they're  no longer  referenced.
 	 * Because `device_registerf()' set the GLOBAL bit, we simply clear it here. */
 	if (ATOMIC_FETCHAND(result->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
 		decref_nokill(result);
@@ -241,7 +518,7 @@ svgadev_activate_tty(struct svgadev *__restrict self,
 	struct svga_ttyaccess *nt;
 	REF struct mfile *old_active;
 	struct svgatty *oldtty;
-	/* One of the except branches below wouldn't be NOEXCEPT if preemption wasn't enabled... */
+	/* One of the branches below wouldn't be NOEXCEPT if preemption wasn't enabled... */
 	if (!PREEMPTION_ENABLED())
 		THROW(E_WOULDBLOCK_PREEMPTED);
 again:
@@ -311,9 +588,12 @@ got_old_active:
 	/* Mark the old tty as inactive. */
 	if (oldtty) {
 		struct svga_ttyaccess *ot;
+		assert(oldtty->sty_active);
 		ot = arref_ptr(&oldtty->sty_tty); /* This can't change because we're holding the chipset lock! */
 		atomic_lock_acquire(&ot->sta_lock);
+		assert(ot->sta_flags & SVGA_TTYACCESS_F_ACTIVE);
 		ot->sta_flags &= ~SVGA_TTYACCESS_F_ACTIVE;
+		oldtty->sty_active = 0;
 		atomic_lock_release(&ot->sta_lock);
 	}
 
@@ -328,6 +608,7 @@ got_old_active:
 			struct svga_ttyaccess *ot;
 			ot = arref_ptr(&oldtty->sty_tty);   /* This can't change because we're holding the chipset lock! */
 			atomic_lock_acquire(&ot->sta_lock); /* NOTHROW because preemption is enabled (s.a. above) */
+			oldtty->sty_active = 1;
 			ot->sta_flags |= SVGA_TTYACCESS_F_ACTIVE;
 			(*ot->sta_activate)(ot);
 			atomic_lock_release(&ot->sta_lock);
@@ -373,71 +654,303 @@ got_old_active:
 	awref_set(&self->svd_active, tty);
 }
 
-//TODO: /* Allocate  and activate a new userlock for a given SVGA device.
-//TODO:  * If another lock already exists, this function will block until
-//TODO:  * said lock is released. */
-//TODO: INTERN BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct svgalck *FCALL
-//TODO: svgadev_newuserlock(struct svgadev *__restrict self)
-//TODO: 		THROWS(E_WOULDBLOCK) {
-//TODO: 	/* TODO */
-//TODO: }
+/* Allocate  and activate a new userlock for a given SVGA device.
+ * If another lock already exists, this function will block until
+ * said lock is released. */
+INTERN BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct svgalck *FCALL
+svgadev_newuserlock(struct svgadev *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	REF struct svgalck *result;
+	/* One of the branches below wouldn't be NOEXCEPT if preemption wasn't enabled... */
+	if (!PREEMPTION_ENABLED())
+		THROW(E_WOULDBLOCK_PREEMPTED);
+	result = (REF struct svgalck *)kmalloc(offsetof(struct svgalck, slc_xregs) +
+	                                       self->svd_chipset.sc_ops.sco_regsize,
+	                                       GFP_NORMAL);
+	TRY {
+		REF struct mfile *active;
+		struct svgatty *active_tty;
+again:
+		active = awref_get(&self->svd_active);
+		if (!active) {
+			if (awref_ptr(&self->svd_active) == NULL)
+				goto got_active;
+			/* wait for the lock to fully go again. */
+			task_connect(&self->svd_chipset.sc_lock.sl_wrwait);
+			active = awref_get(&self->svd_active);
+			if unlikely(active) {
+				task_disconnectall();
+				goto got_active;
+			}
+			task_waitfor();
+			goto again;
+		}
+got_active:
 
+		/* Check if the active object is another lock. */
+		FINALLY_XDECREF_UNLIKELY(active);
+		if (active && svga_active_islock(active)) {
+			/* Wait for the lock to go away. */
+			task_connect(&self->svd_chipset.sc_lock.sl_wrwait);
+			if (awref_ptr(&self->svd_active) != active) {
+				task_disconnectall();
+				goto again;
+			}
+			task_waitfor();
+			goto again;
+		}
+		assert(!active || svga_active_istty(active));
+		active_tty = (struct svgatty *)mfile_asansitty(active);
 
+		/* All right! Now get a lock to the chipset and
+		 * check  that the active object didn't change. */
+		svga_chipset_write(&self->svd_chipset);
+		RAII_FINALLY { svga_chipset_endwrite(&self->svd_chipset); };
+		if unlikely(awref_ptr(&self->svd_active) != active_tty)
+			goto again;
 
-/* Default graphics mode hints.
- *
- * Note that modes can always be switched via ioctl(2).
- * These are on hints used to select the initial  mode. */
-DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resx, "xres", 1024);
-DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resy, "yres", 768);
-DEFINE_CMDLINE_PARAM_UINT8_VAR(default_bpp, "bpp", 32);
+		/* Disable the active tty. */
+		if (active_tty) {
+			struct svga_ttyaccess *tty;
+			tty = arref_ptr(&active_tty->sty_tty);
+			atomic_lock_acquire(&tty->sta_lock);
+			assert(active_tty->sty_active);
+			assert(tty->sta_flags & SVGA_TTYACCESS_F_ACTIVE);
+			tty->sta_flags &= ~SVGA_TTYACCESS_F_ACTIVE;
+			active_tty->sty_active = 0;
+			atomic_lock_release(&tty->sta_lock);
+		}
+		TRY {
+			/* Save Base-VGA registers. */
+			basevga_getregs(&result->slc_vmode);
 
+			/* Save chipset-specific registers. */
+			(*self->svd_chipset.sc_ops.sco_getregs)(&self->svd_chipset, result->slc_xregs);
+		} EXCEPT {
+			/* Re-activate the old TTY */
+			if (active_tty) {
+				struct svga_ttyaccess *tty;
+				tty = arref_ptr(&active_tty->sty_tty);
+				atomic_lock_acquire(&tty->sta_lock); /* NOTHROW because preemption is enabled! */
+				tty->sta_flags |= SVGA_TTYACCESS_F_ACTIVE;
+				active_tty->sty_active = 1;
+				(*tty->sta_activate)(tty);
+				atomic_lock_release(&tty->sta_lock);
+			}
+			RETHROW();
+		}
 
-PRIVATE NOBLOCK ATTR_FREETEXT WUNUSED NONNULL((1)) uint64_t
-NOTHROW(FCALL calculate_mode_cost)(struct svga_modeinfo const *__restrict mode,
-                                   uint32_t xres, uint32_t yres, uint8_t bpp) {
-	uint64_t result = 0;
-	result += abs((int32_t)xres - (int32_t)mode->smi_resx);
-	result += abs((int32_t)yres - (int32_t)mode->smi_resy);
-	result += abs((int8_t)bpp - (int8_t)mode->smi_bits_per_pixel);
-	if (mode->smi_bits_per_pixel > 32)
-		return (uint64_t)-1; /* We only support BPP up to 32-bit! */
-#if 1 /* TODO: multiple-pixels-per-byte graphics modes! */
-	if (mode->smi_bits_per_pixel <= 4)
-		return (uint64_t)-1;
-#endif
-#if 1 /* TODO: paged memory access! */
-	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
-		return (uint64_t)-1;
-#endif
+		/* NOEXCEPT FROM HERE ON! */
+
+		/* Fill remaining fields. */
+		_mfile_init(result, &svgalck_ops, PAGESHIFT, PAGESHIFT);
+		result->mf_parts             = MFILE_PARTS_ANONYMOUS;
+		result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
+		result->mf_flags = MFILE_F_READONLY | MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+		                   MFILE_F_NOATIME | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+		                   MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE;
+		atomic64_init(&result->mf_filesize,
+		              sizeof(struct vga_mode) +
+		              self->svd_chipset.sc_ops.sco_regsize);
+		result->mf_atime = realtime();
+		result->mf_mtime = result->mf_atime;
+		result->mf_ctime = result->mf_atime;
+		incref(self);       /* For `result->slc_dev' */
+		incref(active_tty); /* For `result->slc_oldtty' */
+		result->slc_dev    = self;
+		result->slc_oldtty = active_tty;
+		result->slc_mode   = NULL; /* No video mode override (yet) */
+		DBG_memset(&result->slc_rstor, 0xcc, sizeof(result->slc_rstor));
+
+		/* Remember that `result' is now active. */
+		awref_set(&self->svd_active, result);
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
 	return result;
 }
 
-PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *
-NOTHROW(FCALL select_closest_video_mode)(struct svgadev *__restrict self,
-                                         uint32_t xres, uint32_t yres, uint8_t bpp) {
-	size_t i;
-	uint64_t winner_cost;
-	struct svga_modeinfo const *winner;
-	winner      = svgadev_supmode(self, 0);
-	winner_cost = calculate_mode_cost(winner, xres, yres, bpp);
-	for (i = 1; i < self->svd_supmodec; ++i) {
-		struct svga_modeinfo const *mode;
-		uint64_t cost;
-		mode = svgadev_supmode(self, i);
-		cost = calculate_mode_cost(mode, xres, yres, bpp);
-		if (winner_cost > cost) {
-			winner_cost = cost;
-			winner      = mode;
-		}
-	}
-	return winner;
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* Operators for the SVGA ansitty devices.                              */
+/************************************************************************/
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svgatty_async_v_destroy)(struct async *__restrict self) {
+	struct svgatty *me = _svgatty_fromasyncrestore(self);
+
+	/* Clear remaining references. */
+	decref_unlikely(me->sty_dev);
+	xdecref_unlikely(me->sty_oldtty);
+
+	/* Destroy the original underlying character-device. */
+	chrdev_v_destroy(me);
 }
 
-PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *
-NOTHROW(FCALL get_default_video_mode)(struct svgadev *__restrict self) {
-	return select_closest_video_mode(self, default_resx, default_resy, default_bpp);
+PRIVATE NONNULL((1)) ktime_t FCALL
+svgatty_async_v_connect(struct async *__restrict self) {
+	struct svgatty *me = _svgatty_fromasyncrestore(self);
+	shared_rwlock_pollconnect_write(&me->sty_dev->svd_chipset.sc_lock);
+	return KTIME_INFINITE;
 }
+
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+svgatty_async_v_test(struct async *__restrict self) {
+	struct svgatty *me = _svgatty_fromasyncrestore(self);
+	return svga_chipset_canwrite(&me->sty_dev->svd_chipset);
+}
+
+PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL
+svgatty_async_v_work(struct async *__restrict self) {
+	struct svgatty *me = _svgatty_fromasyncrestore(self);
+	struct svgatty *nt = me->sty_oldtty;
+	struct svgadev *dv = me->sty_dev;
+	struct svga_ttyaccess *ac;
+	assert(PREEMPTION_ENABLED());
+	if (!svga_chipset_trywrite(&dv->svd_chipset))
+		return ASYNC_RESUME;
+	RAII_FINALLY { svga_chipset_endwrite(&dv->svd_chipset); };
+	assert(me->sty_active);
+	assert(awref_ptr(&dv->svd_active) == me);
+
+	/* Set the video mode used by `nt'
+	 * NOTE: Because we're holding a lock to `dv', the tty access object can't change! */
+	ac = arref_ptr(&nt->sty_tty);
+	assert(!wasdestroyed(ac));
+	assert(!(ac->sta_flags & SVGA_TTYACCESS_F_ACTIVE));
+	assert(!nt->sty_active);
+	svgadev_setmode(dv, ac->sta_mode);
+
+	/* Mark the tty as active. */
+	atomic_lock_acquire(&ac->sta_lock);       /* This can't throw because preemption is enabled. */
+	ac->sta_flags |= SVGA_TTYACCESS_F_ACTIVE; /* Mark TTY accessor as active */
+	nt->sty_active = 1;                       /* Mark TTY as active */
+	(*ac->sta_activate)(ac);                  /* This is NOBLOCK+NOTHROW */
+	awref_set(&dv->svd_active, nt);           /* Remember TTY as active */
+	atomic_lock_release(&ac->sta_lock);
+	return ASYNC_FINISHED;
+}
+
+
+PRIVATE struct async_ops const svgatty_async_v_ops = {
+	.ao_driver  = &drv_self,
+	.ao_destroy = &svgatty_async_v_destroy,
+	.ao_connect = &svgatty_async_v_connect,
+	.ao_test    = &svgatty_async_v_test,
+	.ao_work    = &svgatty_async_v_work,
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL svgatty_v_destroy)(struct mfile *__restrict self) {
+	struct async *rstor;
+	struct svgatty *me = (struct svgatty *)mfile_aschrdev(self);
+	arref_fini(&me->sty_tty);
+	if (!me->sty_active) {
+		ansittydev_v_destroy(self);
+		return;
+	}
+	/* NOTE: ansitty-specific fields would have to be finalized here,
+	 *       but none of those require any special finalization as of
+	 *       right now. */
+
+	/* Setup an async job to restore another tty. */
+	rstor = _svgatty_toasyncrestore(me);
+	async_init(rstor, &svgatty_async_v_ops);
+	decref_unlikely(async_start(rstor));
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgatty_ioctl_getmode(struct svgatty *__restrict self,
+                      USER UNCHECKED struct svga_modeinfo *modeinfo) {
+	REF struct svga_ttyaccess *tty;
+	validate_writable(modeinfo, sizeof(*modeinfo));
+	tty = arref_get(&self->sty_tty);
+	FINALLY_DECREF_UNLIKELY(tty);
+	memcpy(modeinfo, tty->sta_mode, sizeof(struct svga_modeinfo));
+	return 0;
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgatty_ioctl_setmode(struct svgatty *__restrict self,
+                      USER UNCHECKED struct svga_modeinfo const *modeinfo) {
+	REF struct svga_ttyaccess *newtty;
+	struct svga_modeinfo const *newmode;
+	validate_readable(modeinfo, sizeof(*modeinfo));
+
+	/* New special permissions to set the video mode.
+	 * For this purpose, you need to be allowed to also do this on your own! */
+	require(CAP_SYS_RAWIO);
+
+	/* Lookup the requested mode. */
+	newmode = svgadev_findmode(self->sty_dev, modeinfo);
+
+	/* Allocate a new tty */
+	newtty = svgadev_makettyaccess(self->sty_dev, newmode);
+	FINALLY_DECREF_UNLIKELY(newtty);
+
+	/* Set the new tty. */
+	svgatty_settty(self, newtty);
+	return 0;
+}
+
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgatty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+	struct svgatty *me = (struct svgatty *)mfile_asansitty(self);
+	switch (cmd) {
+
+	case SVGA_IOC_ACTIVATE:
+		require(CAP_SYS_RAWIO);
+		svgadev_activate_tty(me->sty_dev, me);
+		break;
+
+	case SVGA_IOC_GETMODE:
+		return svgatty_ioctl_getmode(me, (USER UNCHECKED struct svga_modeinfo *)arg);
+
+	case SVGA_IOC_SETMODE:
+		return svgatty_ioctl_setmode(me, (USER UNCHECKED struct svga_modeinfo const *)arg);
+
+	case SVGA_IOC_GETDEFMODE:
+		return svgadev_ioctl_getdefmode(me->sty_dev, (USER UNCHECKED struct svga_modeinfo *)arg);
+
+	case SVGA_IOC_SETDEFMODE:
+		return svgadev_ioctl_setdefmode(me->sty_dev, (USER UNCHECKED struct svga_modeinfo const *)arg);
+
+	case SVGA_IOC_LSMODES:
+		return svgadev_ioctl_lsmodes(me->sty_dev, (USER UNCHECKED struct svga_lsmodes *)arg);
+
+	default:
+		return ansittydev_v_ioctl(self, cmd, arg, mode);
+		break;
+	}
+	return 0;
+}
+
+/* SVGA TTY device operators. */
+PRIVATE struct mfile_stream_ops const svgatty_v_stream_ops = {
+	.mso_write = &ansittydev_v_write,
+	.mso_ioctl = &svgatty_v_ioctl,
+	.mso_hop   = &ansittydev_v_hop,
+	.mso_tryas = &ansittydev_v_tryas,
+};
+
+INTERN_CONST struct ansittydev_ops const svgatty_ops = {{{{{
+	.no_file = {
+		.mo_destroy = &svgatty_v_destroy,
+		.mo_changed = &ansittydev_v_changed,
+		.mo_stream  = &svgatty_v_stream_ops,
+	},
+	.no_wrattr = &ansittydev_v_wrattr,
+}}}}};
+
 
 
 
@@ -460,42 +973,108 @@ svgadev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	struct svgadev *me = (struct svgadev *)mfile_asansitty(self);
 	switch (cmd) {
 
-	case SVGA_IOC_MAKEDEFTTY: {
+	case SVGA_IOC_GETMODE:
+	case SVGA_IOC_SETMODE: {
+		/* Forward  these ioctls to the currently "active" tty,
+		 * or the tty that will become active once a video lock
+		 * is released. */
+		REF struct svgatty *tty;
+		tty = svgadev_getactivetty(me);
+		if unlikely(!tty)
+			THROW(E_NO_SUCH_OBJECT);
+		FINALLY_DECREF_UNLIKELY(tty);
+		return svgatty_v_ioctl(tty, cmd, arg, mode);
+	}	break;
+
+	case SVGA_IOC_GETDEFMODE:
+		return svgadev_ioctl_getdefmode(me, (USER UNCHECKED struct svga_modeinfo *)arg);
+	case SVGA_IOC_SETDEFMODE:
+		return svgadev_ioctl_setdefmode(me, (USER UNCHECKED struct svga_modeinfo const *)arg);
+
+	case SVGA_IOC_MAKETTY: {
+		USER CHECKED struct svga_maketty *info;
+		USER CHECKED char const *name;
 		struct handle hand;
 		REF struct svgatty *tty;
-		tty = svgadev_newttyf(me, get_default_video_mode(me),
-		                      MKDEV(DEV_MAJOR_AUTO, 0), "tty1");
+		require(CAP_SYS_RAWIO);
+		info = (USER CHECKED struct svga_maketty *)arg;
+		validate_readable(info, sizeof(*info));
+		name = ATOMIC_READ(info->smt_name);
+		validate_readable(name, 1);
+		/* Create the new TTY */
+		tty = svgadev_newttyf(me, svgadev_findmode(me, &info->smt_mode),
+		                      MKDEV(DEV_MAJOR_AUTO, 0), "%s", name);
 		FINALLY_DECREF_UNLIKELY(tty);
-		svgadev_activate_tty(me, tty);
 		hand.h_type = HANDLE_TYPE_MFILE;
 		hand.h_mode = IO_RDWR;
 		hand.h_data = tty;
-		return handle_install(THIS_HANDLE_MANAGER, hand);
+		return handle_installhop(&info->smt_res, hand);
 	}	break;
 
-		/* TODO: the promised ioctls for creating locks and ttys. */
+	case SVGA_IOC_MAKELCK: {
+		struct handle hand;
+		REF struct svgalck *lck;
+
+		/* Require raw I/O.  - Without  this, the  lock
+		 * probably wouldn't do you any good anyways... */
+		require(CAP_SYS_RAWIO);
+
+		/* Create lock object. */
+		lck = svgadev_newuserlock(me);
+		FINALLY_DECREF_UNLIKELY(lck);
+
+		/* Store lock object in a handle. */
+		hand.h_type = HANDLE_TYPE_MFILE;
+		hand.h_mode = IO_RDWR;
+		hand.h_data = lck;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hand);
+	}	break;
 
 	default:
+		return chrdev_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
-
-	/* Fallback: forward the currently active TTY */
-	{
-		REF struct svgatty *tty;
-		tty = svgadev_getactivetty(me);
-		if (tty) {
-			FINALLY_DECREF_UNLIKELY(tty);
-			return mfile_uioctl(tty, cmd, arg, mode);
-		}
-	}
-	/* If no TTY is active, do a generic chrdev ioctl on the primary SVGA controller. */
-	return chrdev_v_ioctl(self, cmd, arg, mode);
+	return 0;
 }
 
+
+PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+svgadev_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
+                size_t num_bytes, iomode_t mode) THROWS(...) {
+	/* Writes to an SVGA master device go to the currently active tty. */
+	struct svgadev *me = (struct svgadev *)mfile_asansitty(self);
+	REF struct svgatty *tty;
+	tty = svgadev_getactivetty(me);
+	if unlikely(!tty)
+		return 0; /* Indicate EOF */
+	FINALLY_DECREF_UNLIKELY(tty);
+	assert(tty->mf_ops->mo_stream != NULL &&
+	       tty->mf_ops->mo_stream->mso_write == &ansittydev_v_write);
+	return ansittydev_v_write(tty, src, num_bytes, mode);
+}
+
+PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+svgadev_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
+                 size_t num_bytes, iomode_t mode) THROWS(...) {
+	/* Writes to an SVGA master device go to the currently active tty. */
+	struct svgadev *me = (struct svgadev *)mfile_asansitty(self);
+	REF struct svgatty *tty;
+	tty = svgadev_getactivetty(me);
+	if unlikely(!tty)
+		return 0; /* Indicate EOF */
+	FINALLY_DECREF_UNLIKELY(tty);
+	assert(tty->mf_ops->mo_stream != NULL &&
+	       tty->mf_ops->mo_stream->mso_write == &ansittydev_v_write);
+	return mfile_uwritev(tty, src, num_bytes, mode);
+}
+
+
 PRIVATE struct mfile_stream_ops const svgadev_v_stream_ops = {
-	.mso_ioctl = &svgadev_v_ioctl,
-	.mso_hop   = &chrdev_v_hop,
-	.mso_tryas = &chrdev_v_tryas,
+	.mso_write  = &svgadev_v_write,
+	.mso_writev = &svgadev_v_writev,
+	.mso_ioctl  = &svgadev_v_ioctl,
+	.mso_hop    = &chrdev_v_hop,
+	.mso_tryas  = &chrdev_v_tryas,
 };
 
 /* Operators for `struct svgadev' */
