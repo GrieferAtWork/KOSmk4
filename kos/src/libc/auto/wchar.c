@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4de82fb4 */
+/* HASH CRC-32:0xf11f115f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2593,6 +2593,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -2723,6 +2724,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -2848,6 +2850,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -2964,6 +2967,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -3153,6 +3157,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -3283,6 +3288,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -3408,6 +3414,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -3524,6 +3531,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;

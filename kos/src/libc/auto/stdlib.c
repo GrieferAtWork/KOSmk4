@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a65f7fd */
+/* HASH CRC-32:0x6bccbaeb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -777,6 +777,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -911,6 +912,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -1049,6 +1051,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -1182,6 +1185,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;

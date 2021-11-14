@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd21b8c3a */
+/* HASH CRC-32:0x3e877c36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,6 +97,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sto64_r))(__CHAR32_TYPE__ const *_
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--__num_start;
 			}
 		} else {
 			__base = 10;

@@ -1099,6 +1099,7 @@ $uint32_t strtou32_r([[nonnull]] char const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -1220,6 +1221,7 @@ $int32_t strto32_r([[nonnull]] char const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -1348,6 +1350,7 @@ $uint64_t strtou64_r([[nonnull]] char const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
@@ -1469,6 +1472,7 @@ $int64_t strto64_r([[nonnull]] char const *__restrict nptr,
 				/* Don't  consume the `0',  but handle it implicitly.
 				 * That way, we can just always check that the number
 				 * part of the integer is non-empty! */
+				--num_start;
 			}
 		} else {
 			base = 10;
