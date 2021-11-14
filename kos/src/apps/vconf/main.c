@@ -60,8 +60,8 @@ PRIVATE NONNULL((3)) void CC
 printmode(size_t id, size_t maxidlen,
           struct svga_modeinfo const *__restrict mode,
           bool highlight) {
-	printf(highlight ? (AC_WHITE("%-?" PRIuSIZ) ": " AC_WHITE("%" PRIu32) "x" AC_WHITE("%" PRIu32) "x" AC_WHITE("%" PRIu8))
-	                 : ("%-?" PRIuSIZ ": " "%" PRIu32 "x" "%" PRIu32 "x" "%" PRIu8),
+	printf(highlight ? (AC_WHITE("%?" PRIuSIZ) ": " AC_WHITE("%" PRIu32) "x" AC_WHITE("%" PRIu32) "x" AC_WHITE("%" PRIu8))
+	                 : ("%?" PRIuSIZ ": " "%" PRIu32 "x" "%" PRIu32 "x" "%" PRIu8),
 	       maxidlen, id,
 	       mode->smi_resx,
 	       mode->smi_resy,
@@ -144,8 +144,8 @@ int main(int argc, char *argv[]) {
 			iter  = strend(iter) + 1;
 			value = iter;
 			iter  = strend(iter) + 1;
-			printf(otty ? "\tcs.%-?s : '" AC_WHITE("%#q") "'\n"
-			            : "\tcs.%-?s : '%#q'\n",
+			printf(otty ? "\t%-?s : '" AC_WHITE("%#q") "'\n"
+			            : "\t%-?s : '%#q'\n",
 			       longestnamelen, name, value);
 		}
 	} else if (strcmp(command, "mode") == 0) {
