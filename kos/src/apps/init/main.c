@@ -170,6 +170,7 @@ done_tmpfs:
 		{
 			/* Construct ansitty device /dev/svga1 */
 			struct svga_maketty tty;
+			memset(&tty, 0, sizeof(tty));
 			tty.smt_res.of_mode  = HOP_OPENFD_MODE_AUTO;
 			tty.smt_res.of_flags = IO_CLOEXEC | IO_CLOFORK;
 			Ioctl(display, SVGA_IOC_GETDEFMODE, &tty.smt_mode);

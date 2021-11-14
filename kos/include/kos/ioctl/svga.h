@@ -32,10 +32,14 @@
 
 __DECL_BEGIN
 
-/* IO control codes for /dev/svga and ttys/locks created with it.
+/* IO control codes for `/dev/svga' and ttys/locks created with it.
+ *
  * NOTES:
  *  - SVGA_IOC_GETMODE: [svga] Throws `E_NO_SUCH_OBJECT' if no tty/lck is active
- *  - SVGA_IOC_GETMODE: [lck]  Throws `E_NO_SUCH_OBJECT' if no video mode has been set, yet
+ *  - SVGA_IOC_GETMODE: [lck]  Throws `E_NO_SUCH_OBJECT' if no video mode has been set, yet.
+ *                             This only happens if a video lock is set when no tty had been
+ *                             active. When a tty was active before, its video mode will  be
+ *                             inherited during `SVGA_IOC_MAKELCK'.
  *  - SVGA_IOC_SETMODE: [svga] Throws `E_NO_SUCH_OBJECT' if no tty/lck is active
  *  - Commands marked with [io] require the caller to have `CAP_SYS_RAWIO'
  *  - SVGA_IOC_GETDEFMODE/SVGA_IOC_SETDEFMODE is the same for svga and all derived objects
@@ -56,7 +60,7 @@ __DECL_BEGIN
  *                             which can be done with `libsvga'.
  *
  * The video lock object:
- *  - This object must be created before you should perform direct access to  video
+ *  - This object should  be created  before you make  any direct  access to  video
  *    registers. Once created, this object's continued existence (iow: don't  close
  *    it until you're done) will prevent  system TTYs from really being  activated,
  *    in that `SVGA_IOC_ACTIVATE' will not truly activate the tty, but will instead
@@ -77,17 +81,41 @@ __DECL_BEGIN
 #define SVGA_IOC_GETDEFMODE _IOR_KOS('S', 0x02, struct svga_modeinfo) /* [   svga|tty|lck] Get default video mode */
 #define SVGA_IOC_SETDEFMODE _IOW_KOS('S', 0x02, struct svga_modeinfo) /* [io:svga|tty|lck] Set default video mode (@throw: E_NO_SUCH_OBJECT: Not a supported mode) */
 #define SVGA_IOC_LSMODES    _IOR_KOS('S', 0x03, struct svga_lsmodes)  /* [   svga|tty|lck] List available modes */
-#define SVGA_IOC_MAKETTY    _IOR_KOS('S', 0x04, struct svga_maketty)  /* [io:svga        ] Create a new TTY */
-#define SVGA_IOC_MAKELCK    _IOR_KOS('S', 0x05, struct hop_openfd)    /* [io:svga        ] Create a new video lock */
-#define SVGA_IOC_ACTIVATE   _IO_KOS('S', 0x05)                        /* [io:     tty    ] Activate TTY */
-/* TODO: ioctls to query chipset name & strings */
+#define SVGA_IOC_GETCSNAME  _IOR_KOS('S', 0x04, char[SVGA_CSNAMELEN]) /* [   svga|tty|lck] Get chipset name */
+#define SVGA_IOC_CSSTRINGS  _IOR_KOS('S', 0x05, struct svga_strings)  /* [   svga|tty|lck] Get chipset strings */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x06, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x07, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x08, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x09, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x0a, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x0b, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x0c, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x0d, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x0e, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x0f, ...)                   * ... */
+#define SVGA_IOC_MAKETTY    _IOR_KOS('S', 0x10, struct svga_maketty)  /* [io:svga        ] Create a new TTY */
+#define SVGA_IOC_MAKELCK    _IOR_KOS('S', 0x11, struct hop_openfd)    /* [io:svga        ] Create a new video lock */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x12, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x13, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x14, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x15, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x16, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x17, ...)                   * ... */
+#define SVGA_IOC_ACTIVATE    _IO_KOS('S', 0x18)                       /* [io:     tty    ] Activate TTY */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x19, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x1a, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x1b, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x1c, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x1d, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x1e, ...)                   * ... */
+/*      SVGA_IOC_           _IO*_KOS('S', 0x1f, ...)                   * ... */
+
 
 #ifdef __CC__
 struct svga_lsmodes {
 	__uint32_t                svl_offset; /* Start enumeration with the `svl_offset'th mode */
-	__uint32_t                svl_count;  /* [in]  max # of modes to enumerate
-	                                       * [out] #  of   modes  actually   enumerated.
-	                                       * When `svl_offset >= MODE_COUNT', set to `0' */
+	__uint32_t                svl_count;  /* [in]  max # of modes to enumerate.
+	                                       * [out] Total number of modes minus `svl_offset' */
 	union {
 		struct svga_modeinfo *svl_buf;    /* [0..svl_count] Mode list buffer. */
 		__uint64_t           _svl_albuf;  /* Align... */
@@ -101,6 +129,23 @@ struct svga_maketty {
 		__uint64_t      _smt_alname; /* Align... */
 	};
 	struct svga_modeinfo smt_mode;   /* Video mode to set for this tty. */
+};
+
+struct svga_strings {
+	__uint64_t      svs_start; /* Start enumeration with the `svs_start'th name/value pair. */
+	__uint64_t      svs_count; /* [in]  Max # of strings to write.
+	                            * [out] # of written name/value pairs. */
+	__uint64_t      svs_bufsz; /* [in]  Input buffer size (in bytes)
+	                            * [out] Required buffer size (in bytes) to write up to
+	                            *       in:svs_count name/value pairs >= `svs_start'. */
+	union {
+		char       *svs_buf;   /* [0..svs_bufsz] String buffer. Strings are written as:
+		                        * "name1\0value1\0name2\0value2\0lastname\0lastvalue\0"
+		                        * The  last string must be detected by out:`svs_bufsz',
+		                        * which points after the  "\0" of `"lastvalue"', or  by
+		                        * counting the # of `\0', which equals `svs_count * 2'. */
+		__uint64_t _svs_albuf; /* Align... */
+	};
 };
 
 #endif /* __CC__ */

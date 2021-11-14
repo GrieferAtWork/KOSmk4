@@ -24,7 +24,11 @@
 /**/
 
 #include <bits/types.h>
-#include <kos/sched/shared-rwlock.h>
+#include <kos/sched/shared-lock.h>
+
+#ifndef SVGA_CSNAMELEN
+#define SVGA_CSNAMELEN 16
+#endif /* !SVGA_CSNAMELEN */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -94,13 +98,13 @@ struct svga_chipset_ops {
 	/* [const][== sizeof(struct MYCHIPSET_svga_modeinfo)] */
 	__size_t sco_modeinfosize;
 
-	/* [0..1][const][lock(WRITE(sc_lock))]
+	/* [0..1][const][lock(sc_lock)]
 	 * Enumerate chipset-specific identification strings. */
 	__ATTR_NONNULL((1, 2)) __ssize_t
 	(LIBSVGA_CC *sco_strings)(struct svga_chipset *__restrict self,
 	                          svga_chipset_enumstring_t cb, void *arg);
 
-	/* [1..1][const][lock(WRITE(sc_lock))]
+	/* [1..1][const][lock(sc_lock)]
 	 * - Return  information about the first mode with a cs-specific ID that
 	 *   is `>= *p_index'. If no such mode exists, return `false'. Otherwise
 	 *   advance `*p_index' to point to the next mode and return `true'.
@@ -117,7 +121,7 @@ struct svga_chipset_ops {
 	                          __uintptr_t *__restrict p_index)
 			__THROWS(E_IOERROR);
 
-	/* [1..1][const][lock(WRITE(sc_lock))]
+	/* [1..1][const][lock(sc_lock)]
 	 * - Set a given video `mode' and update `self->sc_mode' to match `mode'
 	 * - The contents of `mode' have previously been retrieved via `sco_getmode'
 	 * - Prior to this function being  called for the first  time,
@@ -127,7 +131,7 @@ struct svga_chipset_ops {
 	(LIBSVGA_CC *sco_setmode)(struct svga_chipset *__restrict self,
 	                          struct svga_modeinfo const *__restrict mode);
 
-	/* [1..1][const][lock(WRITE(sc_lock))]
+	/* [1..1][const][lock(sc_lock)]
 	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'
 	 * - These functions can be used  to save/restore the current video  mode
 	 *   even before `sco_setmode' was called for the first time. They should
@@ -147,7 +151,7 @@ struct svga_chipset_ops {
 	 * Additionally, they may not actually be initialized prior to the first call to
 	 * `sco_setmode()'. */
 
-	/* [1..1][lock(WRITE(sc_lock))]
+	/* [1..1][lock(sc_lock)]
 	 * - Set the current display window to the `window'th 64K chunk
 	 * - This function makes it so that the 64K physical memory at A0000-AFFFF
 	 *   will be mapped to video card memory `VIDEO_MEMORY + window * 0x10000'
@@ -162,16 +166,16 @@ struct svga_chipset_ops {
 	__ATTR_NONNULL((1)) void
 	(LIBSVGA_CC *sco_setwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
-	/* [1..1][lock(WRITE(sc_lock))] Same as `sco_setwindow', but *may* only update `sc_rdwindow' */
+	/* [1..1][lock(sc_lock)] Same as `sco_setwindow', but *may* only update `sc_rdwindow' */
 	__ATTR_NONNULL((1)) void
 	(LIBSVGA_CC *sco_setrdwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
-	/* [1..1][lock(WRITE(sc_lock))] Same as `sco_setwindow', but *may* only update `sc_wrwindow' */
+	/* [1..1][lock(sc_lock)] Same as `sco_setwindow', but *may* only update `sc_wrwindow' */
 	__ATTR_NONNULL((1)) void
 	(LIBSVGA_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 
-	/* [1..1][lock(WRITE(sc_lock))]
+	/* [1..1][lock(sc_lock)]
 	 * - Set display start offset to `offset' pixels from `self->sc_mode.smi_vmembase'
 	 * - Set `self->sc_displaystart = offset;'
 	 * - Not available in text-mode video modes.
@@ -183,7 +187,7 @@ struct svga_chipset_ops {
 	(LIBSVGA_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
 			__THROWS(E_IOERROR);
 
-	/* [1..1][lock(WRITE(sc_lock))]
+	/* [1..1][lock(sc_lock)]
 	 * - Set  logical screen width  to `offset' bytes and
 	 *   write the new value into `self->sc_logicalwidth'
 	 * - The  logical screen  width is  the #  of bytes the
@@ -204,7 +208,7 @@ struct svga_chipset_ops {
 
 struct svga_chipset {
 	struct svga_chipset_ops sc_ops;                /* [const] Chipset operators. */
-	struct shared_rwlock    sc_lock;               /* Lock for this chipset. */
+	struct shared_lock      sc_lock;               /* Lock for this chipset. */
 	__size_t                sc_vmemsize;           /* [const] Video memory size (in bytes; usually a multiple of 64K). */
 	__size_t                sc_rdwindow;           /* [lock(sc_lock)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
 	                                                * Current display window for reads. */
@@ -224,33 +228,17 @@ struct svga_chipset {
 	/* Chipset-specific data goes here. */
 };
 
-/* Helpers for accessing `struct svga_chipset::sc_lock' */
-#define /*        */ _svga_chipset_reap(self)        (void)0
-#define /*        */ svga_chipset_reap(self)         (void)0
-#define /*        */ svga_chipset_mustreap(self)     0
-#define /*BLOCKING*/ svga_chipset_write(self)        shared_rwlock_write(&(self)->sc_lock)
-#define /*BLOCKING*/ svga_chipset_write_nx(self)     shared_rwlock_write_nx(&(self)->sc_lock)
-#define /*        */ svga_chipset_trywrite(self)     shared_rwlock_trywrite(&(self)->sc_lock)
-#define /*        */ svga_chipset_endwrite(self)     (shared_rwlock_endwrite(&(self)->sc_lock), svga_chipset_reap(self))
-#define /*        */ _svga_chipset_endwrite(self)    shared_rwlock_endwrite(&(self)->sc_lock)
-#define /*BLOCKING*/ svga_chipset_read(self)         shared_rwlock_read(&(self)->sc_lock)
-#define /*BLOCKING*/ svga_chipset_read_nx(self)      shared_rwlock_read_nx(&(self)->sc_lock)
-#define /*        */ svga_chipset_tryread(self)      shared_rwlock_tryread(&(self)->sc_lock)
-#define /*        */ _svga_chipset_endread(self)     shared_rwlock_endread(&(self)->sc_lock)
-#define /*        */ svga_chipset_endread(self)      (void)(shared_rwlock_endread(&(self)->sc_lock) && (svga_chipset_reap(self), 0))
-#define /*        */ _svga_chipset_end(self)         shared_rwlock_end(&(self)->sc_lock)
-#define /*        */ svga_chipset_end(self)          (void)(shared_rwlock_end(&(self)->sc_lock) && (svga_chipset_reap(self), 0))
-#define /*BLOCKING*/ svga_chipset_upgrade(self)      shared_rwlock_upgrade(&(self)->sc_lock)
-#define /*        */ svga_chipset_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->sc_lock)
-#define /*        */ svga_chipset_downgrade(self)    shared_rwlock_downgrade(&(self)->sc_lock)
-#define /*        */ svga_chipset_reading(self)      shared_rwlock_reading(&(self)->sc_lock)
-#define /*        */ svga_chipset_writing(self)      shared_rwlock_writing(&(self)->sc_lock)
-#define /*        */ svga_chipset_canread(self)      shared_rwlock_canread(&(self)->sc_lock)
-#define /*        */ svga_chipset_canwrite(self)     shared_rwlock_canwrite(&(self)->sc_lock)
-#define /*BLOCKING*/ svga_chipset_waitread(self)     shared_rwlock_waitread(&(self)->sc_lock)
-#define /*BLOCKING*/ svga_chipset_waitwrite(self)    shared_rwlock_waitwrite(&(self)->sc_lock)
-#define /*BLOCKING*/ svga_chipset_waitread_nx(self)  shared_rwlock_waitread_nx(&(self)->sc_lock)
-#define /*BLOCKING*/ svga_chipset_waitwrite_nx(self) shared_rwlock_waitwrite_nx(&(self)->sc_lock)
+/* Helper macros for `struct svga_chipset::sc_lock' */
+#define _svga_chipset_reap(self)      (void)0
+#define svga_chipset_reap(self)       (void)0
+#define svga_chipset_mustreap(self)   0
+#define svga_chipset_tryacquire(self) shared_lock_tryacquire(&(self)->sc_lock)
+#define svga_chipset_acquire(self)    shared_lock_acquire(&(self)->sc_lock)
+#define svga_chipset_acquire_nx(self) shared_lock_acquire_nx(&(self)->sc_lock)
+#define _svga_chipset_release(self)   shared_lock_release(&(self)->sc_lock)
+#define svga_chipset_release(self)    (shared_lock_release(&(self)->sc_lock), svga_chipset_reap(self))
+#define svga_chipset_acquired(self)   shared_lock_acquired(&(self)->sc_lock)
+#define svga_chipset_available(self)  shared_lock_available(&(self)->sc_lock)
 
 
 struct svga_chipset_driver {
@@ -264,7 +252,7 @@ struct svga_chipset_driver {
 	(LIBSVGA_CC *scd_probe)(struct svga_chipset *__restrict self);
 
 	/* Chipset name. */
-	char scd_name[16];
+	char scd_name[SVGA_CSNAMELEN];
 };
 
 

@@ -102,27 +102,108 @@ PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgadev_ioctl_lsmodes(struct svgadev *__restrict self,
                       USER UNCHECKED struct svga_lsmodes *info)
 		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
-	size_t i, avail;
+	size_t i, ncopy, count;
 	struct svga_lsmodes req;
 	validate_readwrite(info, sizeof(*info));
 	memcpy(&req, info, sizeof(req));
 	validate_writablem(req.svl_buf, req.svl_count,
 	                   sizeof(struct svga_modeinfo));
-	if (OVERFLOW_USUB(self->svd_supmodec, req.svl_offset, &avail))
-		avail = 0;
-	if (avail > req.svl_count)
-		avail = req.svl_count;
+	if (OVERFLOW_USUB(self->svd_supmodec, req.svl_offset, &count))
+		count = 0;
+	ncopy = count;
+	if (ncopy > req.svl_count)
+		ncopy = req.svl_count;
 
 	/* Copy mode information into user-space. */
-	for (i = 0; i < avail; ++i) {
+	for (i = 0; i < ncopy; ++i) {
 		struct svga_modeinfo const *mode;
-		mode = svgadev_supmode(self, i);
+		mode = svgadev_supmode(self, req.svl_offset + i);
 		memcpy(&req.svl_buf[i], mode, sizeof(struct svga_modeinfo));
 	}
 
 	/* Write-back the # of written modes. */
 	COMPILER_WRITE_BARRIER();
-	info->svl_count = avail;
+	info->svl_count = count;
+	return 0;
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgadev_ioctl_getcsname(struct svgadev *__restrict self,
+                        USER UNCHECKED char *result)
+		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
+	validate_writable(result, SVGA_CSNAMELEN * sizeof(char));
+	memcpy(result, self->svd_csdriver->scd_name,
+	       SVGA_CSNAMELEN, sizeof(char));
+	return 0;
+}
+
+
+struct cs_strings_printer {
+	struct svga_strings csp_req;    /* User-request. */
+	size_t              csp_count;  /* # of written strings. */
+	size_t              csp_reqbuf; /* Required buffer size. */
+};
+
+PRIVATE NONNULL((2, 3)) ssize_t LIBSVGA_CC
+cs_strings_printer_cb(void *arg,
+                      char const *__restrict name,
+                      char const *__restrict value) {
+	unsigned int i;
+	char const *strings[] = { name, value };
+	struct cs_strings_printer *me;
+	me = (struct cs_strings_printer *)arg;
+	if (me->csp_req.svs_start != 0) {
+		--me->csp_req.svs_start;
+		return 0; /* Skip this pair... */
+	}
+	for (i = 0; i < COMPILER_LENOF(strings); ++i) {
+		char const *str;
+		size_t len;
+		str = strings[i];
+		len = strlen(str);
+		len = (len + 1) * sizeof(char);
+		me->csp_reqbuf += (len + 1) * sizeof(char);
+		if (len > me->csp_req.svs_bufsz)
+			len = me->csp_req.svs_bufsz;
+		me->csp_req.svs_buf = (USER CHECKED char *)mempcpy(me->csp_req.svs_buf,
+		                                                   str, len);
+		me->csp_req.svs_bufsz -= len;
+	}
+	++me->csp_count;
+	--me->csp_req.svs_count;
+	if (!me->csp_req.svs_count)
+		return -1; /* Stop enumeration */
+	return 0;
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgadev_ioctl_getcsstrings(struct svgadev *__restrict self,
+                           USER UNCHECKED struct svga_strings *info)
+		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
+	struct cs_strings_printer req;
+	validate_readwrite(info, sizeof(*info));
+	memcpy(&req.csp_req, info, sizeof(req.csp_req));
+	validate_writable(req.csp_req.svs_buf, (size_t)req.csp_req.svs_bufsz);
+
+	/* Setup buffer requirements as empty. */
+	req.csp_count  = 0;
+	req.csp_reqbuf = 0;
+
+	/* Check if we should (and can) enumerate strings. */
+	if (req.csp_req.svs_count != 0 &&
+	    self->svd_chipset.sc_ops.sco_strings != NULL) {
+		svga_chipset_acquire(&self->svd_chipset);
+		RAII_FINALLY { svga_chipset_release(&self->svd_chipset); };
+		/* Enumerate strings. */
+		(*self->svd_chipset.sc_ops.sco_strings)(&self->svd_chipset,
+		                                        &cs_strings_printer_cb,
+		                                        &req);
+	}
+
+	/* Write back string count information. */
+	COMPILER_WRITE_BARRIER();
+	info->svs_count = req.csp_count;
+	info->svs_bufsz = req.csp_reqbuf;
 	return 0;
 }
 
@@ -149,14 +230,14 @@ NOTHROW(FCALL svgalck_async_v_destroy)(struct async *__restrict self) {
 PRIVATE NONNULL((1)) ktime_t FCALL
 svgalck_async_v_connect(struct async *__restrict self) {
 	struct svgalck *me = container_of(self, struct svgalck, slc_rstor);
-	shared_rwlock_pollconnect_write(&me->slc_dev->svd_chipset.sc_lock);
+	shared_lock_pollconnect(&me->slc_dev->svd_chipset.sc_lock);
 	return KTIME_INFINITE;
 }
 
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 svgalck_async_v_test(struct async *__restrict self) {
 	struct svgalck *me = container_of(self, struct svgalck, slc_rstor);
-	return svga_chipset_canwrite(&me->slc_dev->svd_chipset);
+	return svga_chipset_available(&me->slc_dev->svd_chipset);
 }
 
 PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL
@@ -166,9 +247,9 @@ svgalck_async_v_work(struct async *__restrict self) {
 	struct svgadev *dv = me->slc_dev;
 	struct svga_ttyaccess *ac;
 	assert(PREEMPTION_ENABLED());
-	if (!svga_chipset_trywrite(&dv->svd_chipset))
+	if (!svga_chipset_tryacquire(&dv->svd_chipset))
 		return ASYNC_RESUME;
-	RAII_FINALLY { svga_chipset_endwrite(&dv->svd_chipset); };
+	RAII_FINALLY { svga_chipset_release(&dv->svd_chipset); };
 	assert(awref_ptr(&dv->svd_active) == me);
 
 	/* Restore extended registers. (Only do this once if `svgadev_setmode()' below throws) */
@@ -234,8 +315,8 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		struct svga_modeinfo const *newmode;
 		validate_readable(arg, sizeof(struct svga_modeinfo));
 		newmode = svgadev_findmode(me->slc_dev, (USER CHECKED struct svga_modeinfo *)arg);
-		svga_chipset_write(&dv->svd_chipset);
-		RAII_FINALLY { svga_chipset_endwrite(&dv->svd_chipset); };
+		svga_chipset_acquire(&dv->svd_chipset);
+		RAII_FINALLY { svga_chipset_release(&dv->svd_chipset); };
 
 		/* Set new video mode. */
 		svgadev_setmode(dv, newmode);
@@ -250,12 +331,14 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 	case SVGA_IOC_GETDEFMODE:
 		return svgadev_ioctl_getdefmode(me->slc_dev, (USER UNCHECKED struct svga_modeinfo *)arg);
-
 	case SVGA_IOC_SETDEFMODE:
 		return svgadev_ioctl_setdefmode(me->slc_dev, (USER UNCHECKED struct svga_modeinfo const *)arg);
-
 	case SVGA_IOC_LSMODES:
 		return svgadev_ioctl_lsmodes(me->slc_dev, (USER UNCHECKED struct svga_lsmodes *)arg);
+	case SVGA_IOC_GETCSNAME:
+		return svgadev_ioctl_getcsname(me->slc_dev, (USER UNCHECKED char *)arg);
+	case SVGA_IOC_CSSTRINGS:
+		return svgadev_ioctl_getcsstrings(me->slc_dev, (USER UNCHECKED struct svga_strings *)arg);
 
 	default:
 		return mfile_v_ioctl(self, cmd, arg, mode);
@@ -267,6 +350,7 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 PRIVATE struct mfile_stream_ops const svgalck_v_stream_ops = {
 	.mso_ioctl = &svgalck_v_ioctl,
+	/* TODO: mmap (including support for automatic bank switching) */
 };
 
 INTERN_CONST struct mfile_ops const svgalck_ops = {
@@ -282,21 +366,103 @@ INTERN_CONST struct mfile_ops const svgalck_ops = {
 /* SVGATTY                                                              */
 /************************************************************************/
 
+/* Try to do optical character recognition on `cell->sgc_lines'
+ * It sound more fancy than it is. - We just compare the  lines
+ * with `basevga_defaultfont' and see if we get a match.
+ *
+ * Upon error, return `0' (which should be disabled as U+FFFD: �) */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) byte_t
+NOTHROW(FCALL try_ocr_on_gfxcell)(struct svga_gfxcell const *__restrict cell) {
+	unsigned int i;
+	for (i = 0; i < 256; ++i) {
+		if (memcmp(basevga_defaultfont[i], cell->sgc_lines, 16) == 0)
+			break;
+	}
+	return i & 0xff;
+}
+
+/* Convert the contents of `otty' into `ntty' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL convert_tty_contents)(struct svga_ttyaccess const *__restrict _otty,
+                                    struct svga_ttyaccess *__restrict _ntty) {
+	uintptr_half_t x, y, common_resx, common_resy;
+	common_resx = _otty->sta_resx;
+	common_resy = _otty->sta_resy;
+	if (common_resx > _ntty->sta_resx)
+		common_resx = _ntty->sta_resx;
+	if (common_resy > _ntty->sta_resy)
+		common_resy = _ntty->sta_resy;
+	if (svga_ttyaccess_istxt(_otty)) {
+		struct svga_ttyaccess_txt *otty;
+		otty = (struct svga_ttyaccess_txt *)_otty;
+		if (svga_ttyaccess_istxt(_ntty)) {
+			struct svga_ttyaccess_txt *ntty;
+			ntty = (struct svga_ttyaccess_txt *)_ntty;
+			for (y = 0; y < common_resy; ++y) {
+				for (x = 0; x < common_resx; ++x) {
+					uint16_t cell;
+					cell = otty->stt_display[x + y * otty->sta_scan];
+					ntty->stt_display[x + y * ntty->sta_scan] = cell;
+				}
+			}
+		} else {
+			struct svga_ttyaccess_gfx *ntty;
+			ntty = (struct svga_ttyaccess_gfx *)_ntty;
+			for (y = 0; y < common_resy; ++y) {
+				for (x = 0; x < common_resx; ++x) {
+					uint16_t cell = otty->stt_display[x + y * otty->sta_scan];
+					memcpy(ntty->stx_display[x + y * ntty->sta_resx].sgc_lines,
+					       basevga_defaultfont[cell & 0xff], 16);
+					ntty->stx_display[x + y * ntty->sta_resx].sgc_color = (cell >> 8) & 0xff;
+				}
+			}
+		}
+	} else {
+		struct svga_ttyaccess_gfx *otty;
+		otty = (struct svga_ttyaccess_gfx *)_otty;
+		if (svga_ttyaccess_istxt(_ntty)) {
+			struct svga_ttyaccess_txt *ntty;
+			ntty = (struct svga_ttyaccess_txt *)_ntty;
+			for (y = 0; y < common_resy; ++y) {
+				for (x = 0; x < common_resx; ++x) {
+					struct svga_gfxcell const *cell;
+					uint16_t word;
+					cell = &otty->stx_display[x + y * otty->sta_scan];
+					word = cell->sgc_color << 8;
+					word |= try_ocr_on_gfxcell(cell);
+					ntty->stt_display[x + y * ntty->sta_scan] = word;
+				}
+			}
+		} else {
+			struct svga_ttyaccess_gfx *ntty;
+			ntty = (struct svga_ttyaccess_gfx *)_ntty;
+			for (y = 0; y < common_resy; ++y) {
+				for (x = 0; x < common_resx; ++x) {
+					memcpy(&ntty->stx_display[x + y * ntty->sta_resx],
+					       &otty->stx_display[x + y * otty->sta_resx],
+					       sizeof(struct svga_gfxcell));
+				}
+			}
+		}
+	}
+}
+
 /* Safely update the tty pointed-to by `self->sty_tty' */
 INTERN BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
 svgatty_settty(struct svgatty *__restrict self,
                struct svga_ttyaccess *__restrict ntty) {
 	struct svga_ttyaccess *otty;
 	struct svgadev *dev;
+
 	/* One of the branches below wouldn't be NOEXCEPT if preemption wasn't enabled... */
 	if (!PREEMPTION_ENABLED())
 		THROW(E_WOULDBLOCK_PREEMPTED);
 	dev = self->sty_dev;
-	atomic_lock_waitfor(&ntty->sta_lock);
-	svga_chipset_write(&dev->svd_chipset);
-	RAII_FINALLY { svga_chipset_endwrite(&dev->svd_chipset); };
+	svga_chipset_acquire(&dev->svd_chipset);
+	RAII_FINALLY { svga_chipset_release(&dev->svd_chipset); };
 	otty = arref_ptr(&self->sty_tty);
 	assertf(otty != ntty, "Only pass new ttys!");
+	assertf(!isshared(ntty), "Only pass new ttys!");
 
 	/* Mark the old tty as inactive. */
 	atomic_lock_acquire(&otty->sta_lock);
@@ -316,9 +482,35 @@ svgatty_settty(struct svgatty *__restrict self,
 		}
 	}
 
+	/* Copy tty cell contents of d-buffers from `otty' to `ntty' */
+	convert_tty_contents(otty, ntty);
+
+	/* Copy some attributes from `otty' to `ntty' */
+	assert(!(ntty->sta_flags & SVGA_TTYACCESS_F_EOL));
+	ntty->sta_flags |= otty->sta_flags & SVGA_TTYACCESS_F_EOL;
+	ntty->sta_cursor = otty->sta_cursor;
+	if (ntty->sta_cursor.stc_cellx >= ntty->sta_resx)
+		ntty->sta_cursor.stc_cellx = ntty->sta_resx - 1;
+	if (ntty->sta_cursor.stc_celly >= ntty->sta_resy) {
+		ntty->sta_cursor.stc_celly = ntty->sta_resy - 1;
+		if (ntty->sta_flags & SVGA_TTYACCESS_F_EOL)
+			ntty->sta_cursor.stc_celly = ntty->sta_resy;
+	}
+	ntty->sta_scroll_ystart = otty->sta_scroll_ystart;
+	ntty->sta_scroll_yend   = otty->sta_scroll_yend;
+	if (ntty->sta_scroll_ystart > ntty->sta_resy)
+		ntty->sta_scroll_ystart = ntty->sta_resy;
+	if (ntty->sta_scroll_yend > ntty->sta_resy)
+		ntty->sta_scroll_yend = ntty->sta_resy;
+	/* Special case: if the old tty's scroll region covered the whole
+	 *               screen, then  let the  new  tty's do  the  same! */
+	if (otty->sta_scroll_yend == otty->sta_resy)
+		ntty->sta_scroll_yend = ntty->sta_resy;
+	svga_ttyaccess__update_scrl(ntty);
+
+	/* If this tty is active, mark the caller-given accessor as active. */
 	atomic_lock_acquire(&ntty->sta_lock);
 	assert(!(ntty->sta_flags & SVGA_TTYACCESS_F_ACTIVE));
-	/* If this tty is active, mark the caller-given accessor as active. */
 	if (self->sty_active) {
 		ntty->sta_flags |= SVGA_TTYACCESS_F_ACTIVE;
 		/* Also invoke the accessor's activation-callback. */
@@ -414,7 +606,7 @@ again:
 		/* Because async destruction takes a write-lock to the chipset, we can
 		 * just  wait for a write-lock to be released in order to wait for the
 		 * active tty to finish unloading. */
-		task_connect(&self->svd_chipset.sc_lock.sl_wrwait);
+		shared_lock_pollconnect(&self->svd_chipset.sc_lock);
 		active = awref_get(&self->svd_active);
 		if unlikely(active) {
 			task_disconnectall();
@@ -438,9 +630,9 @@ got_active:
 		assert(lck->slc_dev == self);
 		/* In order to read from `slc_oldtty', we need a lock to the chipset driver. */
 		FINALLY_DECREF_UNLIKELY(lck);
-		svga_chipset_read(&self->svd_chipset);
+		svga_chipset_acquire(&self->svd_chipset);
 		result = (REF struct svgatty *)xincref(lck->slc_oldtty);
-		svga_chipset_endread(&self->svd_chipset);
+		svga_chipset_release(&self->svd_chipset);
 		return result;
 	}
 }
@@ -529,7 +721,7 @@ again:
 		/* Because async destruction takes a write-lock to the chipset, we can
 		 * just  wait for a write-lock to be released in order to wait for the
 		 * active tty to finish unloading. */
-		task_connect(&self->svd_chipset.sc_lock.sl_wrwait);
+		shared_lock_pollconnect(&self->svd_chipset.sc_lock);
 		old_active = awref_get(&self->svd_active);
 		if unlikely(old_active) {
 			task_disconnectall();
@@ -542,8 +734,8 @@ got_old_active:
 
 	/* Acquire a lock to the chipset. */
 	FINALLY_XDECREF_UNLIKELY(old_active);
-	svga_chipset_write(&self->svd_chipset);
-	RAII_FINALLY { svga_chipset_endwrite(&self->svd_chipset); };
+	svga_chipset_acquire(&self->svd_chipset);
+	RAII_FINALLY { svga_chipset_release(&self->svd_chipset); };
 
 	/* Check if the active object changed. */
 	COMPILER_READ_BARRIER();
@@ -620,6 +812,7 @@ got_old_active:
 	/* Activate the tty accessor for the new active TTY */
 	atomic_lock_acquire(&nt->sta_lock); /* NOTHROW because preemption is enabled (s.a. above) */
 	nt->sta_flags |= SVGA_TTYACCESS_F_ACTIVE;
+	tty->sty_active = 1;
 	(*nt->sta_activate)(nt);
 	atomic_lock_release(&nt->sta_lock);
 
@@ -676,7 +869,7 @@ again:
 			if (awref_ptr(&self->svd_active) == NULL)
 				goto got_active;
 			/* wait for the lock to fully go again. */
-			task_connect(&self->svd_chipset.sc_lock.sl_wrwait);
+			shared_lock_pollconnect(&self->svd_chipset.sc_lock);
 			active = awref_get(&self->svd_active);
 			if unlikely(active) {
 				task_disconnectall();
@@ -691,7 +884,7 @@ got_active:
 		FINALLY_XDECREF_UNLIKELY(active);
 		if (active && svga_active_islock(active)) {
 			/* Wait for the lock to go away. */
-			task_connect(&self->svd_chipset.sc_lock.sl_wrwait);
+			shared_lock_pollconnect(&self->svd_chipset.sc_lock);
 			if (awref_ptr(&self->svd_active) != active) {
 				task_disconnectall();
 				goto again;
@@ -704,8 +897,8 @@ got_active:
 
 		/* All right! Now get a lock to the chipset and
 		 * check  that the active object didn't change. */
-		svga_chipset_write(&self->svd_chipset);
-		RAII_FINALLY { svga_chipset_endwrite(&self->svd_chipset); };
+		svga_chipset_acquire(&self->svd_chipset);
+		RAII_FINALLY { svga_chipset_release(&self->svd_chipset); };
 		if unlikely(awref_ptr(&self->svd_active) != active_tty)
 			goto again;
 
@@ -760,6 +953,11 @@ got_active:
 		result->slc_dev    = self;
 		result->slc_oldtty = active_tty;
 		result->slc_mode   = NULL; /* No video mode override (yet) */
+
+		/* If we're overriding  an active TTY,  then
+		 * we know what the previous video-mode was! */
+		if (active_tty != NULL)
+			result->slc_mode = arref_ptr(&active_tty->sty_tty)->sta_mode;
 		DBG_memset(&result->slc_rstor, 0xcc, sizeof(result->slc_rstor));
 
 		/* Remember that `result' is now active. */
@@ -797,14 +995,14 @@ NOTHROW(FCALL svgatty_async_v_destroy)(struct async *__restrict self) {
 PRIVATE NONNULL((1)) ktime_t FCALL
 svgatty_async_v_connect(struct async *__restrict self) {
 	struct svgatty *me = _svgatty_fromasyncrestore(self);
-	shared_rwlock_pollconnect_write(&me->sty_dev->svd_chipset.sc_lock);
+	shared_lock_pollconnect(&me->sty_dev->svd_chipset.sc_lock);
 	return KTIME_INFINITE;
 }
 
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 svgatty_async_v_test(struct async *__restrict self) {
 	struct svgatty *me = _svgatty_fromasyncrestore(self);
-	return svga_chipset_canwrite(&me->sty_dev->svd_chipset);
+	return svga_chipset_available(&me->sty_dev->svd_chipset);
 }
 
 PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL
@@ -814,9 +1012,9 @@ svgatty_async_v_work(struct async *__restrict self) {
 	struct svgadev *dv = me->sty_dev;
 	struct svga_ttyaccess *ac;
 	assert(PREEMPTION_ENABLED());
-	if (!svga_chipset_trywrite(&dv->svd_chipset))
+	if (!svga_chipset_tryacquire(&dv->svd_chipset))
 		return ASYNC_RESUME;
-	RAII_FINALLY { svga_chipset_endwrite(&dv->svd_chipset); };
+	RAII_FINALLY { svga_chipset_release(&dv->svd_chipset); };
 	assert(me->sty_active);
 	assert(awref_ptr(&dv->svd_active) == me);
 
@@ -920,12 +1118,14 @@ svgatty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 	case SVGA_IOC_GETDEFMODE:
 		return svgadev_ioctl_getdefmode(me->sty_dev, (USER UNCHECKED struct svga_modeinfo *)arg);
-
 	case SVGA_IOC_SETDEFMODE:
 		return svgadev_ioctl_setdefmode(me->sty_dev, (USER UNCHECKED struct svga_modeinfo const *)arg);
-
 	case SVGA_IOC_LSMODES:
 		return svgadev_ioctl_lsmodes(me->sty_dev, (USER UNCHECKED struct svga_lsmodes *)arg);
+	case SVGA_IOC_GETCSNAME:
+		return svgadev_ioctl_getcsname(me->sty_dev, (USER UNCHECKED char *)arg);
+	case SVGA_IOC_CSSTRINGS:
+		return svgadev_ioctl_getcsstrings(me->sty_dev, (USER UNCHECKED struct svga_strings *)arg);
 
 	default:
 		return ansittydev_v_ioctl(self, cmd, arg, mode);
@@ -990,6 +1190,12 @@ svgadev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		return svgadev_ioctl_getdefmode(me, (USER UNCHECKED struct svga_modeinfo *)arg);
 	case SVGA_IOC_SETDEFMODE:
 		return svgadev_ioctl_setdefmode(me, (USER UNCHECKED struct svga_modeinfo const *)arg);
+	case SVGA_IOC_LSMODES:
+		return svgadev_ioctl_lsmodes(me, (USER UNCHECKED struct svga_lsmodes *)arg);
+	case SVGA_IOC_GETCSNAME:
+		return svgadev_ioctl_getcsname(me, (USER UNCHECKED char *)arg);
+	case SVGA_IOC_CSSTRINGS:
+		return svgadev_ioctl_getcsstrings(me, (USER UNCHECKED struct svga_strings *)arg);
 
 	case SVGA_IOC_MAKETTY: {
 		USER CHECKED struct svga_maketty *info;

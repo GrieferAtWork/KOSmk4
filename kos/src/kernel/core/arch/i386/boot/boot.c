@@ -982,14 +982,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Remove the old kernel <sched/shared_[rw]lock.h> headers */
 
 	/* TODO: We can emulate banked video memory as linear by using a
-	 *       custom mfile that maps overrides a new operator that's
-	 *       yet to be added but will behave similar to what is
-	 *       currently being done for physical identity on x86_64,
-	 *       in that it allows for custom behavior routing of phys
+	 *       custom mfile that maps overrides a new operator  that's
+	 *       yet to  be added  but will  behave similar  to what  is
+	 *       currently  being done for  physical identity on x86_64,
+	 *       in that it allows for  custom behavior routing of  phys
 	 *       addresses.
 	 * Combined with a modified version of `mfile_parts_denywrite_or_unlock'
-	 * that not only denies write but also reads, it becomes possible to
-	 * do lazy bank switching as linear memory of different banks gets
+	 * that  not only  denies write but  also reads, it  becomes possible to
+	 * do  lazy  bank switching  as linear  memory  of different  banks gets
 	 * accessed!
 	 *
 	 * For this purpose, we need 3 operators:
@@ -1009,6 +1009,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  - Select modes
 	 *  - Create TTYs
 	 */
+
+	/* TODO: Add a way for driver parameters to be supplemented by the kernel commandline.
+	 *       Drivers loaded later should  still be able to  take parameters from the  boot
+	 *       commandline, such as the default-resolution arguments of modsvga which should
+	 *       really also be read from the that source! */
 
 	return state;
 }

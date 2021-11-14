@@ -176,6 +176,14 @@ INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_destroy)(struct svga_ttyaccess *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct svga_ttyaccess, sta_refcnt, svga_ttyaccess_destroy);
 
+/* Check what kind of tty sub-class you're dealing with. */
+#define svga_ttyaccess_istxt(self) ((self)->sta_setcell == &svga_ttyaccess_v_setcell_txt)
+#define svga_ttyaccess_isgfx(self) ((self)->sta_setcell != &svga_ttyaccess_v_setcell_txt)
+INTDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL svga_ttyaccess_v_setcell_txt)(struct svga_ttyaccess *__restrict self,
+                                            struct svgatty *__restrict tty,
+                                            uintptr_t address, char32_t ch);
+
 
 /* TEXT tty sub-class. */
 struct svga_ttyaccess_txt: svga_ttyaccess {
@@ -183,6 +191,7 @@ struct svga_ttyaccess_txt: svga_ttyaccess {
 };
 #define svga_ttyaccess_txt_vmem(self) ((uint16_t *)mnode_getaddr(&(self)->sta_vmem))
 #define svga_ttyaccess_txt_dmem(self) ((self)->stt_display)
+
 
 
 /* GFX tty sub-class. */

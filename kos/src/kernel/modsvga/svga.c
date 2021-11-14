@@ -160,11 +160,11 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 			byte_t *modev;
 			size_t modec;
 
-			/* Free unused memory. */
+			/* Free unused memory. (Use *_in_place because init by `scd_probe()' mustn't be relocated) */
 			self = (struct svgadev *)krealloc_in_place(self,
-			                                               offsetof(struct svgadev, svd_chipset)+
-			                                               drivers[i].scd_cssize,
-			                                               GFP_NORMAL);
+			                                           offsetof(struct svgadev, svd_chipset) +
+			                                           drivers[i].scd_cssize,
+			                                           GFP_NORMAL);
 
 			self->svd_csdriver = &drivers[i];
 			printk(FREESTR(KERN_INFO "[svga] Video chipset detected: %s\n"),
@@ -173,8 +173,8 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 			/* Print chipset-specific strings. */
 			if (self->svd_chipset.sc_ops.sco_strings) {
 				(*self->svd_chipset.sc_ops.sco_strings)(&self->svd_chipset,
-				                                      &svga_init_enumstring_callback,
-				                                      (void *)self->svd_csdriver);
+				                                        &svga_init_enumstring_callback,
+				                                        (void *)self->svd_csdriver);
 			}
 
 			/* Found the chipset. - Now to enumerate all of its supported video modes. */
@@ -189,8 +189,8 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 				uintptr_t iterator;
 
 				/* Might not make much sense to force a lock here, but it's part of the contract... */
-				svga_chipset_write(&self->svd_chipset);
-				RAII_FINALLY { svga_chipset_endwrite(&self->svd_chipset); };
+				svga_chipset_acquire(&self->svd_chipset);
+				RAII_FINALLY { svga_chipset_release(&self->svd_chipset); };
 
 				iterator = 0;
 				for (;;) {
