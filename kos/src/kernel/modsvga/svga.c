@@ -70,9 +70,9 @@ svga_init_enumstring_callback(void *arg,
  *
  * Note that modes can always be switched via ioctl(2).
  * These are on hints used to select the initial  mode. */
-DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resx, "xres", 1024);
+DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resx, "xres", 1280);
 DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resy, "yres", 768);
-DEFINE_CMDLINE_PARAM_UINT8_VAR(default_bpp, "bpp", 32);
+DEFINE_CMDLINE_PARAM_UINT8_VAR(default_bpp, "bpp", 16);
 
 
 PRIVATE NOBLOCK ATTR_FREETEXT WUNUSED NONNULL((1)) uint64_t
