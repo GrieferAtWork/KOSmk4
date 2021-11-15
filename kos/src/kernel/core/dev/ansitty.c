@@ -85,7 +85,7 @@ ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 	switch (cmd) {
 
 	case TIOCGWINSZ:
-	case _IOR(_IOC_TYPE(TIOCGWINSZ), _IOC_NR(TIOCGWINSZ), struct winsize): {
+	case _IO_WITHTYPE(TIOCGWINSZ, struct winsize): {
 		struct winsize ws;
 		ansitty_coord_t sxy[2];
 		validate_writable(arg, sizeof(struct winsize));
@@ -108,7 +108,7 @@ ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 			++sxy[0];
 			++sxy[1];
 		}
-		if (sxy[0] == 1 && sxy[1] == 1) {
+		if (sxy[0] <= 1 && sxy[1] <= 1) {
 			/* If we couldn't get anything useful, default to some sane values. */
 			sxy[0] = 80;
 			sxy[1] = 25;
@@ -116,7 +116,7 @@ ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 		ws.ws_col = sxy[0]; /* X */
 		ws.ws_row = sxy[1]; /* Y */
 		/* Set some sane values for pixel sizes. */
-		ws.ws_xpixel = ws.ws_col * 8;
+		ws.ws_xpixel = ws.ws_col * 9;
 		ws.ws_ypixel = ws.ws_row * 16;
 		COMPILER_WRITE_BARRIER();
 		/* Copy collected data into user-space. */

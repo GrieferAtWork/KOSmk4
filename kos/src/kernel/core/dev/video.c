@@ -26,6 +26,7 @@
 #include <dev/video.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
+#include <kernel/user.h>
 #include <sched/async.h>
 #include <sched/cred.h>
 #include <sched/task.h>
@@ -36,6 +37,7 @@
 #include <kos/except.h>
 #include <kos/hop/openfd.h>
 #include <kos/ioctl/video.h>
+#include <sys/ioctl.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -95,7 +97,7 @@ got_old_active:
 		assert(lck->vlc_dev == dv);
 		incref(self); /* For `lck->vlc_oldtty' */
 
-		/* Check if `self' is already part of the restore  chain.
+		/* Check if `self' is already part of the restore chain.
 		 * If so, remove it before re-inserting it at the front. */
 		if (lck->vlc_oldtty) {
 			struct vidtty **p_iter, *iter;
@@ -143,7 +145,7 @@ got_old_active:
 		(*dv_ops->vdo_setttyvideomode)(dv, nt);
 	} EXCEPT {
 		/* NOTE: This right here assumes that `viddev_setmode()' throwing
-		 *       didn't  leave  chipset registers  in an  undefined state! */
+		 *       didn't leave chipset  registers in  an undefined  state! */
 		if (oldtty) {
 			struct vidttyaccess *ot;
 			ot = arref_ptr(&oldtty->vty_tty);   /* This can't change because we're holding the chipset lock! */
@@ -294,6 +296,23 @@ vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		require(CAP_SYS_RAWIO);
 		vidtty_activate(me);
 		return 0;
+
+	case TIOCGWINSZ:
+	case _IO_WITHTYPE(TIOCGWINSZ, struct winsize): {
+		/* Because we know the actual cell sizes, we can implement
+		 * GWINSZ  more correctly than the generic ansitty's ioctl */
+		USER CHECKED struct winsize *result;
+		REF struct vidttyaccess *tty;
+		validate_writable(arg, sizeof(struct winsize));
+		result = (USER CHECKED struct winsize *)arg;
+		tty    = vidtty_getaccess(me);
+		FINALLY_DECREF_UNLIKELY(tty);
+		result->ws_col    = (typeof(result->ws_col))tty->vta_resx;
+		result->ws_row    = (typeof(result->ws_row))tty->vta_resy;
+		result->ws_xpixel = (typeof(result->ws_xpixel))(tty->vta_resx * tty->vta_cellw);
+		result->ws_ypixel = (typeof(result->ws_ypixel))(tty->vta_resy * tty->vta_cellh);
+		return 0;
+	}	break;
 
 	default:
 		return ansittydev_v_ioctl(self, cmd, arg, mode);
@@ -864,7 +883,7 @@ got_active:
 	}
 	TRY {
 		/* Use the designated operator to allocate the raw video lock,
-		 * and populate its device-specific data-area with a snapshot
+		 * and  populate its device-specific data-area with a snapshot
 		 * of the current register state. */
 		struct viddev_ops const *ops;
 		ops    = viddev_getops(self);
@@ -934,6 +953,17 @@ viddev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		hand.h_mode = IO_RDWR;
 		hand.h_data = lck;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hand);
+	}	break;
+
+		/* Forward these ioctls to the currently active tty. */
+	case TIOCGWINSZ:
+	case _IO_WITHTYPE(TIOCGWINSZ, struct winsize): {
+		REF struct vidtty *tty;
+		tty = viddev_getactivetty(me);
+		if unlikely(!tty)
+			THROW(E_NO_SUCH_OBJECT);
+		FINALLY_DECREF_UNLIKELY(tty);
+		return mfile_uioctl(tty, cmd, arg, mode);
 	}	break;
 
 	default:
