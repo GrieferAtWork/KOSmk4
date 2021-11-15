@@ -155,25 +155,28 @@ handle_pending:
 					 * it starting again by the thread sending itself the signal again! */
 					if (rpc->pr_flags & RPC_CONTEXT_SIGNAL) {
 						user_sighandler_func_t func;
-						struct sighand_ptr *handptr = THIS_SIGHAND_PTR;
-						struct sighand *hand;
-						if (!atomic_rwlock_read_nx(&handptr->sp_lock)) {
-							assert(!PREEMPTION_ENABLED());
-							PREEMPTION_ENABLE();
-							icpustate_setpreemption(ctx.rc_state, 1);
+						struct sighand_ptr *handptr;
+						func    = SIG_DFL;
+						handptr = THIS_SIGHAND_PTR;
+						if (handptr != NULL) {
+							struct sighand *hand;
+							if (!atomic_rwlock_read_nx(&handptr->sp_lock)) {
+								assert(!PREEMPTION_ENABLED());
+								PREEMPTION_ENABLE();
+								icpustate_setpreemption(ctx.rc_state, 1);
 #ifdef LOCAL_NOEXCEPT
-							result |= TASK_SERVE_NX_DIDRUN;
+								result |= TASK_SERVE_NX_DIDRUN;
 #else /* LOCAL_NOEXCEPT */
-							did_serve_rpcs = true;
+								did_serve_rpcs = true;
 #endif /* !LOCAL_NOEXCEPT */
-							/* This can't throw  because it only  could when  preemption
-							 * were disabled, which it isn't because we just enabled it! */
-							atomic_rwlock_read(&handptr->sp_lock);
+								/* This can't throw  because it only  could when  preemption
+								 * were disabled, which it isn't because we just enabled it! */
+								atomic_rwlock_read(&handptr->sp_lock);
+							}
+							if ((hand = handptr->sp_hand) != NULL)
+								func = hand->sh_actions[signo - 1].sa_handler;
+							atomic_rwlock_endread(&handptr->sp_lock);
 						}
-						func = SIG_DFL;
-						if ((hand = handptr->sp_hand) != NULL)
-							func = hand->sh_actions[signo - 1].sa_handler;
-						atomic_rwlock_endread(&handptr->sp_lock);
 						if (func == SIG_DFL)
 							func = sighand_default_action(signo);
 						if (func == SIG_IGN) {
@@ -184,7 +187,6 @@ handle_pending:
 							pending_rpc_free(rpc);
 							continue;
 						}
-						atomic_rwlock_endread(&handptr->sp_lock);
 					}
 				}
 
