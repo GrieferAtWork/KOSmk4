@@ -192,8 +192,8 @@ svgadev_ioctl_getcsstrings(struct svgadev *__restrict self,
 	/* Check if we should (and can) enumerate strings. */
 	if (req.csp_req.svs_count != 0 &&
 	    self->svd_chipset.sc_ops.sco_strings != NULL) {
-		svga_chipset_acquire(&self->svd_chipset);
-		RAII_FINALLY { svga_chipset_release(&self->svd_chipset); };
+		svgadev_acquire(self);
+		RAII_FINALLY { svgadev_release(self); };
 		/* Enumerate strings. */
 		(*self->svd_chipset.sc_ops.sco_strings)(&self->svd_chipset,
 		                                        &cs_strings_printer_cb,
@@ -230,14 +230,14 @@ NOTHROW(FCALL svgalck_async_v_destroy)(struct async *__restrict self) {
 PRIVATE NONNULL((1)) ktime_t FCALL
 svgalck_async_v_connect(struct async *__restrict self) {
 	struct svgalck *me = container_of(self, struct svgalck, slc_rstor);
-	shared_lock_pollconnect(&me->slc_dev->svd_chipset.sc_lock);
+	shared_lock_pollconnect(&me->slc_dev->svd_lock);
 	return KTIME_INFINITE;
 }
 
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 svgalck_async_v_test(struct async *__restrict self) {
 	struct svgalck *me = container_of(self, struct svgalck, slc_rstor);
-	return svga_chipset_available(&me->slc_dev->svd_chipset);
+	return svgadev_available(me->slc_dev);
 }
 
 PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL
@@ -247,9 +247,9 @@ svgalck_async_v_work(struct async *__restrict self) {
 	struct svgadev *dv = me->slc_dev;
 	struct svga_ttyaccess *ac;
 	assert(PREEMPTION_ENABLED());
-	if (!svga_chipset_tryacquire(&dv->svd_chipset))
+	if (!svgadev_tryacquire(dv))
 		return ASYNC_RESUME;
-	RAII_FINALLY { svga_chipset_release(&dv->svd_chipset); };
+	RAII_FINALLY { svgadev_release(dv); };
 	assert(awref_ptr(&dv->svd_active) == me);
 
 	/* Restore extended registers. (Only do this once if `svgadev_setmode()' below throws) */
@@ -315,8 +315,8 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		struct svga_modeinfo const *newmode;
 		validate_readable(arg, sizeof(struct svga_modeinfo));
 		newmode = svgadev_findmode(me->slc_dev, (USER CHECKED struct svga_modeinfo *)arg);
-		svga_chipset_acquire(&dv->svd_chipset);
-		RAII_FINALLY { svga_chipset_release(&dv->svd_chipset); };
+		svgadev_acquire(dv);
+		RAII_FINALLY { svgadev_release(dv); };
 
 		/* Set new video mode. */
 		svgadev_setmode(dv, newmode);
@@ -458,8 +458,8 @@ svgatty_settty(struct svgatty *__restrict self,
 	if (!PREEMPTION_ENABLED())
 		THROW(E_WOULDBLOCK_PREEMPTED);
 	dev = self->sty_dev;
-	svga_chipset_acquire(&dev->svd_chipset);
-	RAII_FINALLY { svga_chipset_release(&dev->svd_chipset); };
+	svgadev_acquire(dev);
+	RAII_FINALLY { svgadev_release(dev); };
 	otty = arref_ptr(&self->sty_tty);
 	assertf(otty != ntty, "Only pass new ttys!");
 	assertf(!isshared(ntty), "Only pass new ttys!");
@@ -606,7 +606,7 @@ again:
 		/* Because async destruction takes a write-lock to the chipset, we can
 		 * just  wait for a write-lock to be released in order to wait for the
 		 * active tty to finish unloading. */
-		shared_lock_pollconnect(&self->svd_chipset.sc_lock);
+		shared_lock_pollconnect(&self->svd_lock);
 		active = awref_get(&self->svd_active);
 		if unlikely(active) {
 			task_disconnectall();
@@ -630,9 +630,9 @@ got_active:
 		assert(lck->slc_dev == self);
 		/* In order to read from `slc_oldtty', we need a lock to the chipset driver. */
 		FINALLY_DECREF_UNLIKELY(lck);
-		svga_chipset_acquire(&self->svd_chipset);
+		svgadev_acquire(self);
 		result = (REF struct svgatty *)xincref(lck->slc_oldtty);
-		svga_chipset_release(&self->svd_chipset);
+		svgadev_release(self);
 		return result;
 	}
 }
@@ -721,7 +721,7 @@ again:
 		/* Because async destruction takes a write-lock to the chipset, we can
 		 * just  wait for a write-lock to be released in order to wait for the
 		 * active tty to finish unloading. */
-		shared_lock_pollconnect(&self->svd_chipset.sc_lock);
+		shared_lock_pollconnect(&self->svd_lock);
 		old_active = awref_get(&self->svd_active);
 		if unlikely(old_active) {
 			task_disconnectall();
@@ -734,8 +734,8 @@ got_old_active:
 
 	/* Acquire a lock to the chipset. */
 	FINALLY_XDECREF_UNLIKELY(old_active);
-	svga_chipset_acquire(&self->svd_chipset);
-	RAII_FINALLY { svga_chipset_release(&self->svd_chipset); };
+	svgadev_acquire(self);
+	RAII_FINALLY { svgadev_release(self); };
 
 	/* Check if the active object changed. */
 	COMPILER_READ_BARRIER();
@@ -869,7 +869,7 @@ again:
 			if (awref_ptr(&self->svd_active) == NULL)
 				goto got_active;
 			/* wait for the lock to fully go again. */
-			shared_lock_pollconnect(&self->svd_chipset.sc_lock);
+			shared_lock_pollconnect(&self->svd_lock);
 			active = awref_get(&self->svd_active);
 			if unlikely(active) {
 				task_disconnectall();
@@ -884,7 +884,7 @@ got_active:
 		FINALLY_XDECREF_UNLIKELY(active);
 		if (active && svga_active_islock(active)) {
 			/* Wait for the lock to go away. */
-			shared_lock_pollconnect(&self->svd_chipset.sc_lock);
+			shared_lock_pollconnect(&self->svd_lock);
 			if (awref_ptr(&self->svd_active) != active) {
 				task_disconnectall();
 				goto again;
@@ -897,8 +897,8 @@ got_active:
 
 		/* All right! Now get a lock to the chipset and
 		 * check  that the active object didn't change. */
-		svga_chipset_acquire(&self->svd_chipset);
-		RAII_FINALLY { svga_chipset_release(&self->svd_chipset); };
+		svgadev_acquire(self);
+		RAII_FINALLY { svgadev_release(self); };
 		if unlikely(awref_ptr(&self->svd_active) != active_tty)
 			goto again;
 
@@ -995,14 +995,14 @@ NOTHROW(FCALL svgatty_async_v_destroy)(struct async *__restrict self) {
 PRIVATE NONNULL((1)) ktime_t FCALL
 svgatty_async_v_connect(struct async *__restrict self) {
 	struct svgatty *me = _svgatty_fromasyncrestore(self);
-	shared_lock_pollconnect(&me->sty_dev->svd_chipset.sc_lock);
+	shared_lock_pollconnect(&me->sty_dev->svd_lock);
 	return KTIME_INFINITE;
 }
 
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 svgatty_async_v_test(struct async *__restrict self) {
 	struct svgatty *me = _svgatty_fromasyncrestore(self);
-	return svga_chipset_available(&me->sty_dev->svd_chipset);
+	return svgadev_available(me->sty_dev);
 }
 
 PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL
@@ -1012,9 +1012,9 @@ svgatty_async_v_work(struct async *__restrict self) {
 	struct svgadev *dv = me->sty_dev;
 	struct svga_ttyaccess *ac;
 	assert(PREEMPTION_ENABLED());
-	if (!svga_chipset_tryacquire(&dv->svd_chipset))
+	if (!svgadev_tryacquire(dv))
 		return ASYNC_RESUME;
-	RAII_FINALLY { svga_chipset_release(&dv->svd_chipset); };
+	RAII_FINALLY { svgadev_release(dv); };
 	assert(me->sty_active);
 	assert(awref_ptr(&dv->svd_active) == me);
 

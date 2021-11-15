@@ -30,6 +30,7 @@
 
 #include <hw/video/vga.h>
 #include <kos/aref.h>
+#include <kos/sched/shared-lock.h>
 
 #include <libsvga/chipset.h>
 
@@ -80,7 +81,7 @@ union svga_tty_cursor {
 
 /* Flags for `struct svga_ttyaccess::sta_flags' */
 #define SVGA_TTYACCESS_F_NORMAL 0x0000 /* Normal flags */
-#define SVGA_TTYACCESS_F_ACTIVE 0x0001 /* [lock(sta_lock && svd_chipset.sc_lock)]
+#define SVGA_TTYACCESS_F_ACTIVE 0x0001 /* [lock(sta_lock && svd_lock)]
                                         * This TTY is currently active.
                                         * When not set, `sta_vmem' may not be accessed. */
 #define SVGA_TTYACCESS_F_EOL    0x8000 /* [lock(sta_lock)] Set while `sta_cursor.stc_cellx == 0' as
@@ -226,12 +227,12 @@ ARREF(svga_ttyaccess_arref, svga_ttyaccess);
 struct svgatty: ansittydev {
 	REF struct svgadev         *sty_dev;    /* [1..1][const] SVGA device. */
 	REF struct svgatty         *sty_oldtty; /* [0..1][const_if(wasdestroyed(self))]
-	                                         * [lock(slc_dev->svd_chipset.sc_lock)]
+	                                         * [lock(slc_dev->svd_lock)]
 	                                         * TTY that is made active when this tty is destroyed. */
-	unsigned int                sty_active; /* [lock(sty_dev->svd_chipset.sc_lock)]
+	unsigned int                sty_active; /* [lock(sty_dev->svd_lock)]
 	                                         * [const_if(wasdestroyed(self))]
 	                                         * Non-zero if this tty is currently active. */
-	struct svga_ttyaccess_arref sty_tty;    /* [1..1][lock(WRITE(sty_dev->svd_chipset.sc_lock))]
+	struct svga_ttyaccess_arref sty_tty;    /* [1..1][lock(WRITE(sty_dev->svd_lock))]
 	                                         * Only the pointed-to may have the `SVGA_TTYACCESS_F_ACTIVE'
 	                                         * flag set. When you with to set a new tty access object (as
 	                                         * the result of a mode-change  request), you must clear  the
@@ -265,11 +266,11 @@ STATIC_ASSERT(sizeof(struct async) <= sizeof(struct ansitty));
 
 struct svgalck: mfile {
 	REF struct svgadev             *slc_dev;    /* [1..1][const] SVGA device. */
-	REF struct svgatty             *slc_oldtty; /* [0..1][lock(slc_dev->svd_chipset.sc_lock)] TTY that is made active when this tty is destroyed. */
-	struct svga_modeinfo const     *slc_mode;   /* [0..1][lock(slc_dev->svd_chipset.sc_lock)] Current video mode (for `SVGA_IOC_GETMODE' / `SVGA_IOC_SETMODE') */
+	REF struct svgatty             *slc_oldtty; /* [0..1][lock(slc_dev->svd_lock)] TTY that is made active when this tty is destroyed. */
+	struct svga_modeinfo const     *slc_mode;   /* [0..1][lock(slc_dev->svd_lock)] Current video mode (for `SVGA_IOC_GETMODE' / `SVGA_IOC_SETMODE') */
 	struct async                    slc_rstor;  /* A pre-allocated async controller used to release the lock. */
-	struct vga_mode                 slc_vmode;  /* [lock(slc_dev->svd_chipset.sc_lock)] Standard VGA registers to restore upon release. */
-	COMPILER_FLEXIBLE_ARRAY(byte_t, slc_xregs); /* [lock(slc_dev->svd_chipset.sc_lock)][0..slc_dev->svd_chipset.sco_regsize]
+	struct vga_mode                 slc_vmode;  /* [lock(slc_dev->svd_lock)] Standard VGA registers to restore upon release. */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, slc_xregs); /* [lock(slc_dev->svd_lock)][0..slc_dev->svd_chipset.sco_regsize]
 	                                             * Extended registers (restored with `sul_screen.sty_dev->svd_chipset.sco_setregs') */
 };
 
@@ -280,7 +281,8 @@ AWREF(mfile_awref, mfile);
 #endif /* !__mfile_awref_defined */
 
 struct svgadev: chrdev {
-	struct mfile_awref                svd_active;   /* [0..1][lock(WRITE(svd_chipset.sc_lock))] Active TTY or  user-lock.
+	struct shared_lock                svd_lock;     /* Lock for this video device. */
+	struct mfile_awref                svd_active;   /* [0..1][lock(WRITE(svd_lock))] Active TTY or  user-lock.
 	                                                 * When this points to a dead file, that file _must_ clean up itself! */
 	byte_t const                     *svd_supmodev; /* [0..n][const][owned] Array of supported video modes. */
 	size_t                            svd_supmodec; /* [!0][const] # of supported video modes. */
@@ -289,6 +291,19 @@ struct svgadev: chrdev {
 	struct svga_chipset_driver const *svd_csdriver; /* [1..1][const] SVGA driver. */
 	struct svga_chipset               svd_chipset;  /* SVGA Chipset driver. */
 };
+
+/* Helper macros for `struct svgadev::svd_lock' */
+#define _svgadev_reap(self)      (void)0
+#define svgadev_reap(self)       (void)0
+#define svgadev_mustreap(self)   0
+#define svgadev_tryacquire(self) shared_lock_tryacquire(&(self)->svd_lock)
+#define svgadev_acquire(self)    shared_lock_acquire(&(self)->svd_lock)
+#define svgadev_acquire_nx(self) shared_lock_acquire_nx(&(self)->svd_lock)
+#define _svgadev_release(self)   shared_lock_release(&(self)->svd_lock)
+#define svgadev_release(self)    (shared_lock_release(&(self)->svd_lock), svgadev_reap(self))
+#define svgadev_acquired(self)   shared_lock_acquired(&(self)->svd_lock)
+#define svgadev_available(self)  shared_lock_available(&(self)->svd_lock)
+
 
 INTDEF struct ansitty_operators const svga_ansitty_ops; /* ANSI TTY operators. */
 INTDEF struct ansittydev_ops const svgatty_ops;         /* Operators for `struct svgatty' */

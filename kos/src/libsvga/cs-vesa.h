@@ -38,15 +38,15 @@ struct vesa_modeinfo: svga_modeinfo {
 };
 
 struct vesa_chipset: svga_chipset {
-	struct vbe_modeinfo    vc_mode;        /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Extension for `struct svga_chipset::sc_mode' */
-	uint16_t               vc_modeid;      /* [lock(sc_lock)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Current mode ID */
+	struct vbe_modeinfo    vc_mode;        /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Extension for `struct svga_chipset::sc_mode' */
+	uint16_t               vc_modeid;      /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Current mode ID */
 	struct bios86_emulator vc_emu;         /* BIOS emulator. */
 	struct vbe_biosinfo   *vc_info;        /* [const] VESA BIOS information. */
 	uint16_t const        *vc_modelist;    /* [1..1][const] VESA mode info list. */
 	uint16_t               vc_regsavebits; /* [const] Set of registers to save/load in AX=4F04h (default to 0x0E;
 	                                        * all except controller registers which  are standard across VGA  and
 	                                        * normally saved by the caller) */
-	shift_t                vc_wingranshift;/* [lock(sc_lock)] ilog2 of current mode window granularity */
+	shift_t                vc_wingranshift;/* [lock(EXTERNAL)] ilog2 of current mode window granularity */
 };
 
 /* BIOS Buffer offsets (info `vc_emu.b86e_bios.b86_biosbase') */

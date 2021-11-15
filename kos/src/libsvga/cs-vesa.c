@@ -605,7 +605,6 @@ cs_vesa_probe(struct svga_chipset *__restrict self) {
 		DBG_memset(&me->vc_mode, 0xcc, sizeof(me->vc_mode));
 		me->sc_mode.smi_bits_per_pixel = 0; /* Uninitialized */
 		me->sc_logicalwidth_align      = 1; /* ??? */
-		shared_rwlock_init(&me->sc_lock);
 		me->sc_vmemsize = bi->vbi_vmemsize * 64 * 1024;
 
 		/* Initialize operators. */

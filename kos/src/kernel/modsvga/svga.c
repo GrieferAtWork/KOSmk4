@@ -187,11 +187,6 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 				modev = (byte_t *)kmalloc(self->svd_supmodeS, GFP_NORMAL);
 			TRY {
 				uintptr_t iterator;
-
-				/* Might not make much sense to force a lock here, but it's part of the contract... */
-				svga_chipset_acquire(&self->svd_chipset);
-				RAII_FINALLY { svga_chipset_release(&self->svd_chipset); };
-
 				iterator = 0;
 				for (;;) {
 					struct svga_modeinfo *mode;
@@ -299,6 +294,7 @@ again_load_mode:
 				/* Fill in remaining fields. */
 				self->fn_mode   = S_IFCHR | 0600;
 				self->dv_driver = incref(&drv_self);
+				shared_lock_init(&self->svd_lock);
 
 				/* Register the device. */
 				TRY {
