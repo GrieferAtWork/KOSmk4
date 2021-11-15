@@ -24,6 +24,7 @@
 /**/
 
 #include <bits/types.h>
+#include <kos/anno.h>
 
 #ifndef SVGA_CSNAMELEN
 #define SVGA_CSNAMELEN 16

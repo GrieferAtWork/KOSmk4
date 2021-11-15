@@ -285,16 +285,12 @@ again_load_mode:
 				/* Select the default video mode. */
 				self->svd_defmode = get_default_video_mode(self);
 
-				/* By default, nothing is active. */
-				awref_init(&self->svd_active, NULL);
-
-				/* Initialize underlying device objects. */
-				_chrdev_init(self, &svgadev_ops);
+				/* Initialize underlying video device. */
+				_viddev_init(self, &svgadev_ops);
 
 				/* Fill in remaining fields. */
 				self->fn_mode   = S_IFCHR | 0600;
 				self->dv_driver = incref(&drv_self);
-				shared_lock_init(&self->svd_lock);
 
 				/* Register the device. */
 				TRY {

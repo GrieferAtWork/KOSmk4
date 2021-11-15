@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #define BPP 24
-#include "svga-dcoltty.c"
+#include "dcoltty.c"
 #endif /* __INTELLISENSE__ */
 
 #ifndef BPP
@@ -51,8 +51,8 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyacc
 	uintptr_half_t y;
 	byte_t *dest;
 	uint32_t bgfg[2];
-	cellx = address % self->sta_scan;
-	celly = address / self->sta_scan;
+	cellx = address % self->vta_scan;
+	celly = address / self->vta_scan;
 	dest  = (byte_t *)mnode_getaddr(&self->sta_vmem);
 	dest += celly * self->stx_cellscan;
 	dest += cellx * CELLSIZE_X * BYTES_PER_PIXEL;
@@ -97,7 +97,7 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyacc
 #else /* ADVPIXEL */
 		SETPIXEL(iter, bgfg[mask & 1]); /* Repeat the last pixel. */
 #endif /* !ADVPIXEL */
-		dest += self->sta_mode->smi_scanline;
+		dest += self->stx_scanline;
 	}
 #undef ADVPIXEL
 #undef SETPIXEL
@@ -105,8 +105,8 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyacc
 
 
 #ifndef CURSOR_Y_OFFSET
-#define CURSOR_X_OFFSET 0          /* X-offset for cursor */
-#define CURSOR_Y_OFFSET 13         /* Y-offset for cursor */
+#define CURSOR_X_OFFSET 0          /* X-offset (in pixels) for cursor */
+#define CURSOR_Y_OFFSET 13         /* Y-offset (in pixels) for cursor */
 #define CURSOR_HEIGHT   2          /* Height (in pixels) of cursor */
 #define CURSOR_WIDTH    CELLSIZE_X /* Width (in pixels) of cursor */
 #endif /* !CURSOR_Y_OFFSET */
@@ -121,34 +121,32 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyacc
 
 
 INTERN NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttyaccess *__restrict self) {
-	struct svga_ttyaccess_gfx *me;
+NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttyaccess_gfx *__restrict self) {
 	byte_t *dst;
 	unsigned int y;
-	me = (struct svga_ttyaccess_gfx *)self;
 
 	/* Figure out where the cursor goes. */
-	dst = (byte_t *)mnode_getaddr(&me->sta_vmem);
-	dst += me->stx_swcur.stc_celly * me->stx_cellscan;             /* Go to top-left of current line */
-	dst += me->stx_swcur.stc_cellx * CELLSIZE_X * BYTES_PER_PIXEL; /* Go to top-left of current cell */
-	dst += CURSOR_Y_OFFSET * me->sta_mode->smi_scanline;           /* Go to left of top-most cursor block */
-	dst += CURSOR_X_OFFSET * BYTES_PER_PIXEL;                      /* To to start of cursor block. */
+	dst = (byte_t *)mnode_getaddr(&self->sta_vmem);
+	dst += self->stx_swcur.vtc_celly * self->stx_cellscan;           /* Go to top-left of current line */
+	dst += self->stx_swcur.vtc_cellx * CELLSIZE_X * BYTES_PER_PIXEL; /* Go to top-left of current cell */
+	dst += CURSOR_Y_OFFSET * self->stx_scanline;                     /* Go to left of top-most cursor block */
+	dst += CURSOR_X_OFFSET * BYTES_PER_PIXEL;                        /* To to start of cursor block. */
 	for (y = 0; y < CURSOR_HEIGHT; ++y) {
 #if BYTES_PER_PIXEL == 4
-		memsetl(dst, (uint32_t)me->stx_ccolor, CURSOR_WIDTH);
+		memsetl(dst, (uint32_t)self->stx_ccolor, CURSOR_WIDTH);
 #elif BYTES_PER_PIXEL == 2
-		memsetw(dst, (uint16_t)me->stx_ccolor, CURSOR_WIDTH);
+		memsetw(dst, (uint16_t)self->stx_ccolor, CURSOR_WIDTH);
 #elif BYTES_PER_PIXEL == 1
-		memset(dst, (uint8_t)me->stx_ccolor, CURSOR_WIDTH);
+		memset(dst, (uint8_t)self->stx_ccolor, CURSOR_WIDTH);
 #elif BYTES_PER_PIXEL == 3
 		unsigned int x;
 		byte_t *iter = dst;
 		for (x = 0; x < CURSOR_WIDTH; ++x)
-			iter = (byte_t *)mempcpy(iter, &me->stx_ccolor, 3);
+			iter = (byte_t *)mempcpy(iter, &self->stx_ccolor, 3);
 #else /* BYTES_PER_PIXEL == ... */
 #error "Unsupported BYTES_PER_PIXEL"
 #endif /* BYTES_PER_PIXEL != ... */
-		dst += me->sta_mode->smi_scanline;
+		dst += self->stx_scanline;
 	}
 }
 

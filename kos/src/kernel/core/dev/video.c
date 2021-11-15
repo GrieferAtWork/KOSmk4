@@ -1,0 +1,884 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_SRC_DEV_VIDEO_C
+#define GUARD_KERNEL_SRC_DEV_VIDEO_C 1
+#define _KOS_SOURCE 1
+
+#include <kernel/compiler.h>
+
+#include <dev/video.h>
+#include <kernel/driver.h>
+#include <kernel/handle.h>
+#include <sched/async.h>
+#include <sched/cred.h>
+#include <sched/task.h>
+
+#include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
+
+#include <kos/except.h>
+#include <kos/hop/openfd.h>
+#include <kos/ioctl/video.h>
+
+#include <assert.h>
+#include <stddef.h>
+
+DECL_BEGIN
+
+/************************************************************************/
+/* VIDEO TTY                                                            */
+/************************************************************************/
+
+/* Activate a given TTY. If an active userlock exists, the tty will not actually
+ * be  made active, but will instead be  linked such that the userlock's release
+ * will make the tty active. */
+PUBLIC BLOCKING NOCONNECT NONNULL((1)) void FCALL
+vidtty_activate(struct vidtty *__restrict self)
+		THROWS(E_IOERROR) {
+	struct viddev *dv = self->vty_dev;
+	struct vidttyaccess *nt;
+	REF struct mfile *old_active;
+	struct vidtty *oldtty;
+	/* One of the branches below wouldn't be NOEXCEPT if preemption wasn't enabled... */
+	if (!PREEMPTION_ENABLED())
+		THROW(E_WOULDBLOCK_PREEMPTED);
+again:
+	old_active = awref_get(&dv->vd_active);
+	if (!old_active) {
+		if (awref_ptr(&dv->vd_active) == NULL)
+			goto got_old_active; /* Initial activation. */
+		/* Because async destruction takes a write-lock to the chipset, we can
+		 * just  wait for a write-lock to be released in order to wait for the
+		 * active tty to finish unloading. */
+		shared_lock_pollconnect(&dv->vd_lock);
+		old_active = awref_get(&dv->vd_active);
+		if unlikely(old_active) {
+			task_disconnectall();
+			goto got_old_active;
+		}
+		task_waitfor();
+		goto again;
+	}
+got_old_active:
+
+	/* Acquire a lock to the chipset. */
+	FINALLY_XDECREF_UNLIKELY(old_active);
+	viddev_acquire(dv);
+	RAII_FINALLY { viddev_release(dv); };
+
+	/* Check if the active object changed. */
+	COMPILER_READ_BARRIER();
+	if (awref_ptr(&dv->vd_active) != old_active)
+		goto again; /* Try again... */
+
+	/* Special handling when the active object is a user-lock. */
+	if (old_active && !mfile_isvidtty(old_active)) {
+		struct vidlck *lck;
+		lck = mfile_asvidlck(old_active);
+		assert(lck->vlc_dev == dv);
+		incref(self); /* For `lck->vlc_oldtty' */
+
+		/* Check if `self' is already part of the restore  chain.
+		 * If so, remove it before re-inserting it at the front. */
+		if (lck->vlc_oldtty) {
+			struct vidtty **p_iter, *iter;
+			p_iter = &lck->vlc_oldtty;
+			while ((iter = *p_iter) != NULL) {
+				if (iter == self) {
+					*p_iter = self->vty_oldtty; /* Unlink. */
+					decref_nokill(self);
+					break;
+				}
+				p_iter = &iter->vty_oldtty;
+			}
+			/* Append the list of old ttys to the end `self' */
+			if (lck->vlc_oldtty) {
+				struct vidtty *last_tty;
+				last_tty = container_of(p_iter, struct vidtty, vty_oldtty);
+				last_tty->vty_oldtty = self->vty_oldtty;
+				self->vty_oldtty     = lck->vlc_oldtty;
+			}
+		}
+		lck->vlc_oldtty = self;
+		return;
+	}
+
+	/* No userlock is active. -> activate this tty. */
+	oldtty = mfile_asvidtty(old_active);
+
+	/* Mark the old tty as inactive. */
+	if (oldtty) {
+		struct vidttyaccess *ot;
+		assert(oldtty->vty_active);
+		ot = arref_ptr(&oldtty->vty_tty); /* This can't change because we're holding the chipset lock! */
+		atomic_lock_acquire(&ot->vta_lock);
+		assert(ot->vta_flags & VIDTTYACCESS_F_ACTIVE);
+		ot->vta_flags &= ~VIDTTYACCESS_F_ACTIVE;
+		oldtty->vty_active = 0;
+		atomic_lock_release(&ot->vta_lock);
+	}
+
+	/* Load the video mode of the caller's tty. */
+	nt = arref_ptr(&self->vty_tty); /* This can't change because we're holding the chipset lock! */
+	TRY {
+		struct viddev_ops const *dv_ops;
+		dv_ops = viddev_getops(dv);
+		(*dv_ops->vdo_setttyvideomode)(dv, nt);
+	} EXCEPT {
+		/* NOTE: This right here assumes that `viddev_setmode()' throwing
+		 *       didn't  leave  chipset registers  in an  undefined state! */
+		if (oldtty) {
+			struct vidttyaccess *ot;
+			ot = arref_ptr(&oldtty->vty_tty);   /* This can't change because we're holding the chipset lock! */
+			atomic_lock_acquire(&ot->vta_lock); /* NOTHROW because preemption is enabled (s.a. above) */
+			oldtty->vty_active = 1;
+			ot->vta_flags |= VIDTTYACCESS_F_ACTIVE;
+			(*ot->vta_activate)(ot);
+			atomic_lock_release(&ot->vta_lock);
+		}
+		RETHROW();
+	}
+	/* NOTHROW FROM HERE ON! */
+
+	/* Activate the tty accessor for the new active TTY */
+	atomic_lock_acquire(&nt->vta_lock); /* NOTHROW because preemption is enabled (s.a. above) */
+	nt->vta_flags |= VIDTTYACCESS_F_ACTIVE;
+	self->vty_active = 1;
+	(*nt->vta_activate)(nt);
+	atomic_lock_release(&nt->vta_lock);
+
+	/* Link old tty into restore list. */
+	if (oldtty) {
+		if (self->vty_oldtty) {
+			struct vidtty **p_iter, *iter;
+			p_iter = &self->vty_oldtty;
+			while ((iter = *p_iter) != NULL) {
+				if (iter == oldtty) {
+					*p_iter = oldtty->vty_oldtty; /* Unlink. */
+					decref_nokill(oldtty);
+					break;
+				}
+				p_iter = &iter->vty_oldtty;
+			}
+			/* Append the list of old ttys to the end `self' */
+			if (self->vty_oldtty) {
+				struct vidtty *last_tty;
+				last_tty = container_of(p_iter, struct vidtty, vty_oldtty);
+				last_tty->vty_oldtty = oldtty->vty_oldtty;
+				oldtty->vty_oldtty = self->vty_oldtty;
+			}
+		}
+
+		/* Set-up the old-tty-restore link. */
+		incref(oldtty);
+		self->vty_oldtty = oldtty;
+	}
+
+	/* Set as active. */
+	awref_set(&dv->vd_active, self);
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vidtty_async_v_destroy)(struct async *__restrict self) {
+	struct vidtty *me = _vidtty_fromasyncrestore(self);
+
+	/* Clear remaining references. */
+	decref_unlikely(me->vty_dev);
+	xdecref_unlikely(me->vty_oldtty);
+
+	/* Destroy the original underlying character-device. */
+	chrdev_v_destroy(me);
+}
+
+PRIVATE NONNULL((1)) ktime_t FCALL
+vidtty_async_v_connect(struct async *__restrict self) {
+	struct vidtty *me = _vidtty_fromasyncrestore(self);
+	shared_lock_pollconnect(&me->vty_dev->vd_lock);
+	return KTIME_INFINITE;
+}
+
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+vidtty_async_v_test(struct async *__restrict self) {
+	struct vidtty *me = _vidtty_fromasyncrestore(self);
+	return viddev_available(me->vty_dev);
+}
+
+PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL
+vidtty_async_v_work(struct async *__restrict self) {
+	struct viddev_ops const *dv_ops;
+	struct vidtty *me = _vidtty_fromasyncrestore(self);
+	struct vidtty *nt = me->vty_oldtty;
+	struct viddev *dv = me->vty_dev;
+	struct vidttyaccess *ac;
+	assert(PREEMPTION_ENABLED());
+	if (!viddev_tryacquire(dv))
+		return ASYNC_RESUME;
+	RAII_FINALLY { viddev_release(dv); };
+	assert(me->vty_active);
+	assert(awref_ptr(&dv->vd_active) == me);
+
+	/* Set the video mode used by `nt'
+	 * NOTE: Because we're holding a lock to `dv', the tty access object can't change! */
+	ac = arref_ptr(&nt->vty_tty);
+	assert(!wasdestroyed(ac));
+	assert(!(ac->vta_flags & VIDTTYACCESS_F_ACTIVE));
+	assert(!nt->vty_active);
+	dv_ops = viddev_getops(dv);
+	(*dv_ops->vdo_setttyvideomode)(dv, ac);
+
+	/* Mark the tty as active. */
+	atomic_lock_acquire(&ac->vta_lock);     /* This can't throw because preemption is enabled. */
+	ac->vta_flags |= VIDTTYACCESS_F_ACTIVE; /* Mark TTY accessor as active */
+	nt->vty_active = 1;                     /* Mark TTY as active */
+	(*ac->vta_activate)(ac);                /* This is NOBLOCK+NOTHROW */
+	awref_set(&dv->vd_active, nt);          /* Remember TTY as active */
+	atomic_lock_release(&ac->vta_lock);
+	return ASYNC_FINISHED;
+}
+
+PRIVATE struct async_ops const vidtty_async_v_ops = {
+	.ao_driver  = &drv_self,
+	.ao_destroy = &vidtty_async_v_destroy,
+	.ao_connect = &vidtty_async_v_connect,
+	.ao_test    = &vidtty_async_v_test,
+	.ao_work    = &vidtty_async_v_work,
+};
+
+/* Default vidtty operators. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vidtty_v_destroy)(struct mfile *__restrict self) {
+	struct async *rstor;
+	struct vidtty *me = mfile_asvidtty(self);
+	arref_fini(&me->vty_tty);
+	if (!me->vty_active) {
+		ansittydev_v_destroy(self);
+		return;
+	}
+
+	/* NOTE: ansitty-specific fields would have to be finalized here,
+	 *       but none of those require any special finalization as of
+	 *       right now. */
+
+	/* Setup an async job to restore another tty. */
+	rstor = _vidtty_toasyncrestore(me);
+	async_init(rstor, &vidtty_async_v_ops);
+	decref_unlikely(async_start(rstor));
+}
+
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
+vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+               USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+	struct vidtty *me = mfile_asvidtty(self);
+	switch (cmd) {
+
+	case VID_IOC_ACTIVATE:
+		/* Activate TTY */
+		require(CAP_SYS_RAWIO);
+		vidtty_activate(me);
+		return 0;
+
+	default:
+		return chrdev_v_ioctl(self, cmd, arg, mode);
+		break;
+	}
+	return 0;
+}
+
+
+
+
+/* Scroll up once */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vidtty_scrollone)(struct vidttyaccess *__restrict me,
+                                struct vidtty *__restrict tty) {
+	(*me->vta_copycell)(me, me->_vta_scrl1_to, me->_vta_scrl1_from, me->_vta_scrl1_cnt);
+	(*me->vta_fillcells)(me, tty, me->_vta_scrl1_fil, ' ', me->vta_resx);
+}
+
+PUBLIC NONNULL((1)) void LIBANSITTY_CC
+vidtty_v_putc(struct ansitty *__restrict self,
+              char32_t ch) {
+	REF struct vidttyaccess *me;
+	me = ansitty_getvidttyaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	atomic_lock_acquire(&me->vta_lock);
+	switch (ch) {
+
+	case 7: /* BEL */
+		/* TODO */
+		break;
+
+	case '\t': {
+#define TABSIZE 8
+		uintptr_half_t advance;
+		/* Check if we need to scroll. */
+		if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
+			me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
+			vidtty_scrollone(me, ansitty_asvidtty(self));
+		}
+		advance = TABSIZE - (me->vta_cursor.vtc_cellx % TABSIZE);
+		if ((me->vta_cursor.vtc_cellx + advance) > me->vta_resx)
+			advance = me->vta_resx - me->vta_cursor.vtc_cellx;
+		(*me->vta_fillcells)(me, ansitty_asvidtty(self),
+		                     me->vta_cursor.vtc_cellx +
+		                     me->vta_cursor.vtc_celly *
+		                     me->vta_scan,
+		                     ' ', advance);
+		me->vta_cursor.vtc_cellx += advance;
+		if (me->vta_cursor.vtc_cellx >= me->vta_resx) {
+			me->vta_cursor.vtc_cellx = 0;
+			++me->vta_cursor.vtc_celly;
+
+			/* Set the EOL flag after an implicit line-feed */
+			me->vta_flags |= VIDTTYACCESS_F_EOL;
+			goto maybe_hide_cursor_after_eol;
+		}
+	}	break;
+
+	case '\b':
+		if (OVERFLOW_USUB(me->vta_cursor.vtc_cellx, 1, &me->vta_cursor.vtc_cellx)) {
+			me->vta_cursor.vtc_cellx = me->vta_resx - 1;
+			if (OVERFLOW_USUB(me->vta_cursor.vtc_celly, 1, &me->vta_cursor.vtc_celly)) {
+				/* Stay in the top-left. */
+				me->vta_cursor.vtc_cellx = 0;
+				me->vta_cursor.vtc_celly = 0;
+			}
+		}
+		/* Check if we need to scroll. */
+		if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
+			me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
+			vidtty_scrollone(me, ansitty_asvidtty(self));
+		}
+		break;
+
+	case '\r':
+		if (me->vta_flags & VIDTTYACCESS_F_EOL) {
+			/* Go to the original line after a line-wrap. */
+			me->vta_cursor.vtc_cellx = 0;
+			--me->vta_cursor.vtc_celly;
+			break;
+		}
+		if (self->at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE) {
+			/* Clear trailing spaces */
+			(*me->vta_fillcells)(me, ansitty_asvidtty(self),
+			                     me->vta_cursor.vtc_cellx +
+			                     me->vta_cursor.vtc_celly *
+			                     me->vta_scan,
+			                     ' ',
+			                     me->vta_resx - me->vta_cursor.vtc_cellx);
+		}
+		me->vta_cursor.vtc_cellx = 0;
+		break;
+
+	case '\n':
+		/* Ignore '\n' after an implicit line-wrap. */
+		if (!(me->vta_flags & VIDTTYACCESS_F_EOL))
+			++me->vta_cursor.vtc_celly;
+		if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
+			me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
+			vidtty_scrollone(me, ansitty_asvidtty(self));
+		}
+		break;
+
+	default: {
+		/* Check if we need to scroll. */
+		if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
+			me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
+			vidtty_scrollone(me, ansitty_asvidtty(self));
+		}
+
+		/* Print the character to the screen. */
+		(*me->vta_setcell)(me, ansitty_asvidtty(self),
+		                   me->vta_cursor.vtc_cellx +
+		                   me->vta_cursor.vtc_celly *
+		                   me->vta_scan,
+		                   ch);
+
+		/* Advance the cursor. */
+		++me->vta_cursor.vtc_cellx;
+
+		/* Check for line overflow. */
+		if (me->vta_cursor.vtc_cellx >= me->vta_resx) {
+			me->vta_cursor.vtc_cellx = 0;
+			++me->vta_cursor.vtc_celly;
+
+			/* Set the EOL flag after an implicit line-feed */
+			me->vta_flags |= VIDTTYACCESS_F_EOL;
+maybe_hide_cursor_after_eol:
+			if (me->vta_cursor.vtc_celly >= me->vta_resy) {
+				/* Hide the hardware cursor (if it was visible before) */
+				if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
+				    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+					(*me->vta_hidecursor)(me);
+				goto after_clear_eol_nocursor;
+			}
+			goto after_clear_eol;
+		}
+	}	break;
+
+	}
+
+	/* Clear the EOL flag. */
+	me->vta_flags &= ~VIDTTYACCESS_F_EOL;
+after_clear_eol:
+	if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
+	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+		(*me->vta_showcursor)(me); /* Update hardware cursor. */
+after_clear_eol_nocursor:
+	atomic_lock_release(&me->vta_lock);
+}
+
+PUBLIC NONNULL((1)) void LIBANSITTY_CC
+vidtty_v_setcursor(struct ansitty *__restrict self,
+                   ansitty_coord_t x, ansitty_coord_t y,
+                   bool update_hw_cursor) {
+	REF struct vidttyaccess *me;
+	me = ansitty_getvidttyaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	if unlikely(x >= me->vta_resx)
+		x = me->vta_resx - 1;
+	if unlikely(y >= me->vta_resy)
+		y = me->vta_resy - 1;
+	atomic_lock_acquire(&me->vta_lock);
+	me->vta_cursor.vtc_cellx = x;
+	me->vta_cursor.vtc_celly = y;
+	me->vta_flags &= ~VIDTTYACCESS_F_EOL;
+	if (update_hw_cursor &&
+	    !(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
+	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+		(*me->vta_showcursor)(me); /* Update hardware cursor. */
+	atomic_lock_release(&me->vta_lock);
+}
+
+PUBLIC NONNULL((1, 2)) void LIBANSITTY_CC
+vidtty_v_getcursor(struct ansitty *__restrict self,
+                   ansitty_coord_t ppos[2]) {
+	union vidtty_cursor cur;
+	REF struct vidttyaccess *me;
+	me = ansitty_getvidttyaccess(self);
+	cur.vtc_word = ATOMIC_READ(me->vta_cursor.vtc_word);
+	ppos[0]      = cur.vtc_cellx;
+	ppos[1]      = cur.vtc_celly;
+	decref_unlikely(me);
+}
+
+PUBLIC NONNULL((1, 2)) void LIBANSITTY_CC
+vidtty_v_getsize(struct ansitty *__restrict self,
+                 ansitty_coord_t psize[2]) {
+	REF struct vidttyaccess *me;
+	me = ansitty_getvidttyaccess(self);
+	psize[0] = me->vta_resx;
+	psize[1] = me->vta_resy;
+	decref_unlikely(me);
+}
+
+PUBLIC NONNULL((1)) void LIBANSITTY_CC
+vidtty_v_copycell(struct ansitty *__restrict self,
+                  ansitty_offset_t dst_offset,
+                  ansitty_coord_t count) {
+	REF struct vidttyaccess *me;
+	uintptr_t srcaddr, dstaddr, copyend, dispend;
+	me = ansitty_getvidttyaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	atomic_lock_acquire(&me->vta_lock);
+	srcaddr = me->vta_cursor.vtc_celly;
+	/* Yes: vta_resx (and not `vta_scan'); s.a. the documentation of `vta_copycell' */
+	srcaddr *= me->vta_resx;
+	srcaddr += me->vta_cursor.vtc_cellx;
+	dstaddr = srcaddr + dst_offset;
+
+	/* Limit copy range at the start of destination */
+	if ((intptr_t)dstaddr < 0) {
+		size_t underflow;
+		underflow = (size_t)0 - dstaddr;
+		dstaddr   = 0;
+		if (OVERFLOW_UADD(srcaddr, underflow, &srcaddr))
+			goto done;
+	}
+
+	/* Limit copy range at the end of the destination */
+	if (OVERFLOW_UADD(dstaddr, count, &copyend)) {
+		count   = ((uintptr_t)-1) - dstaddr;
+		copyend = ((uintptr_t)-1);
+	}
+	dispend = me->vta_resy * me->vta_resx;
+	if (copyend > dispend) {
+		size_t overflow = copyend - me->vta_resy;
+		if (OVERFLOW_USUB(count, overflow, &count))
+			goto done;
+	}
+
+	/* Limit copy range at the end of the source */
+	if unlikely(OVERFLOW_UADD(srcaddr, count, &copyend) || copyend > dispend) {
+		size_t maxcount, overflow;
+		maxcount = dispend - srcaddr;
+		overflow = count - maxcount;
+
+		/* Do the actual cell-copy. */
+		assert(srcaddr <= dispend);
+		assert(dstaddr <= dispend);
+		assert((srcaddr + maxcount) <= dispend);
+		assert((dstaddr + maxcount) <= dispend);
+		(*me->vta_copycell)(me, dstaddr, srcaddr, maxcount);
+
+		/* Fill `overflow' cells at `dstaddr + maxcount' with ' ' */
+		dstaddr += maxcount;
+		if (me->vta_scan > me->vta_resx) {
+			size_t delta = me->vta_scan - me->vta_resx;
+			dstaddr += (dstaddr / me->vta_resx) * delta;
+		}
+		(*me->vta_fillcells)(me, ansitty_asvidtty(self),
+		                     dstaddr, ' ', overflow);
+	} else {
+		/* Do the actual cell-copy. */
+		assert(srcaddr <= dispend);
+		assert(dstaddr <= dispend);
+		assert((srcaddr + count) <= dispend);
+		assert((dstaddr + count) <= dispend);
+		(*me->vta_copycell)(me, dstaddr, srcaddr, count);
+	}
+
+done:
+	atomic_lock_release(&me->vta_lock);
+}
+
+PUBLIC NONNULL((1)) void LIBANSITTY_CC
+vidtty_v_fillcell(struct ansitty *__restrict self,
+                  char32_t ch,
+                  ansitty_coord_t count) {
+	REF struct vidttyaccess *me;
+	uintptr_t dstaddr, fillend, dispend;
+	me = ansitty_getvidttyaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	atomic_lock_acquire(&me->vta_lock);
+	dstaddr = me->vta_cursor.vtc_cellx +
+	          me->vta_cursor.vtc_celly *
+	          me->vta_resx;
+	dispend = me->vta_resy * me->vta_resx;
+	/* Limit `count' to what can be put on-screen. */
+	if (OVERFLOW_UADD(dstaddr, count, &fillend) || fillend > dispend) {
+		if unlikely(OVERFLOW_USUB(dispend, dstaddr, &count))
+			goto done;
+	}
+
+	/* Adjust `count' for scanlines */
+	if (me->vta_scan > me->vta_resx) {
+		size_t aligned_size;
+		size_t delta = me->vta_scan - me->vta_resx;
+		dstaddr      = me->vta_cursor.vtc_cellx + me->vta_cursor.vtc_celly * me->vta_scan;
+		aligned_size = dstaddr % me->vta_scan; /* # of characters before first line */
+		aligned_size += count;                 /* Total number of characters from start of first line */
+		aligned_size /= me->vta_resx;          /* Number of line-feeds included in the fill. */
+		count += aligned_size * delta;         /* Include delta induced by line-feeds. */
+	}
+
+	/* Do the fill. */
+	(*me->vta_fillcells)(me, ansitty_asvidtty(self),
+	                     dstaddr, ch, count);
+done:
+	atomic_lock_release(&me->vta_lock);
+}
+
+PUBLIC NONNULL((1)) void LIBANSITTY_CC
+vidtty_v_setttymode(struct ansitty *__restrict self,
+                    uint16_t new_ttymode) {
+	REF struct vidttyaccess *me;
+	me = ansitty_getvidttyaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	atomic_lock_acquire(&me->vta_lock);
+	if likely(me->vta_flags & VIDTTYACCESS_F_ACTIVE) {
+		/* Update the state of the on-screen cursor. */
+		if (new_ttymode & ANSITTY_MODE_HIDECURSOR) {
+			(*me->vta_hidecursor)(me);
+		} else if (me->vta_cursor.vtc_celly < me->vta_resy) {
+			(*me->vta_showcursor)(me);
+		}
+	}
+	atomic_lock_release(&me->vta_lock);
+}
+
+PUBLIC NONNULL((1)) void LIBANSITTY_CC
+vidtty_v_scrollregion(struct ansitty *__restrict self,
+                      ansitty_coord_t start_line,
+                      ansitty_coord_t end_line) {
+	REF struct vidttyaccess *me;
+	me = ansitty_getvidttyaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	atomic_lock_acquire(&me->vta_lock);
+	if (start_line < 0)
+		start_line = 0;
+	if (end_line > me->vta_resy)
+		end_line = me->vta_resy;
+	if (start_line > end_line)
+		start_line = end_line;
+	me->vta_scroll_ystart = start_line;
+	me->vta_scroll_yend   = end_line;
+	_vidttyaccess_update_scrl(me);
+	atomic_lock_release(&me->vta_lock);
+}
+
+PUBLIC_CONST struct ansitty_operators const vidtty_ansitty_ops = {
+	.ato_putc         = &vidtty_v_putc,
+	.ato_setcursor    = &vidtty_v_setcursor,
+	.ato_getcursor    = &vidtty_v_getcursor,
+	.ato_getsize      = &vidtty_v_getsize,
+	.ato_copycell     = &vidtty_v_copycell,
+	.ato_fillcell     = &vidtty_v_fillcell,
+	.ato_setttymode   = &vidtty_v_setttymode,
+	.ato_scrollregion = &vidtty_v_scrollregion,
+	.ato_output       = &_vidtty_v_output,
+	.ato_setled       = &_vidtty_v_setled,
+	.ato_termios      = &_vidtty_v_termios,
+};
+
+
+
+
+
+
+/************************************************************************/
+/* VIDEO LOCK                                                           */
+/************************************************************************/
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vidlck_async_v_destroy)(struct async *__restrict self) {
+	struct vidlck *me = container_of(self, struct vidlck, vlc_rstor);
+
+	/* Clear remaining references. */
+	decref_unlikely(me->vlc_dev);
+	xdecref_unlikely(me->vlc_oldtty);
+
+	/* Destroy the original underlying character-device. */
+	chrdev_v_destroy(me);
+}
+
+PRIVATE NONNULL((1)) ktime_t FCALL
+vidlck_async_v_connect(struct async *__restrict self) {
+	struct vidlck *me = container_of(self, struct vidlck, vlc_rstor);
+	shared_lock_pollconnect(&me->vlc_dev->vd_lock);
+	return KTIME_INFINITE;
+}
+
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+vidlck_async_v_test(struct async *__restrict self) {
+	struct vidlck *me = container_of(self, struct vidlck, vlc_rstor);
+	return viddev_available(me->vlc_dev);
+}
+
+PRIVATE WUNUSED NONNULL((1)) unsigned int FCALL
+vidlck_async_v_work(struct async *__restrict self) {
+	struct vidlck *me = container_of(self, struct vidlck, vlc_rstor);
+	struct vidtty *nt = me->vlc_oldtty;
+	struct viddev *dv = me->vlc_dev;
+	struct vidttyaccess *ac;
+	struct viddev_ops const *dv_ops;
+	assert(PREEMPTION_ENABLED());
+	if (!viddev_tryacquire(dv))
+		return ASYNC_RESUME;
+	RAII_FINALLY { viddev_release(dv); };
+	assert(awref_ptr(&dv->vd_active) == me);
+
+	/* Restore extended registers. (Only do this once if `vdo_setttyvideomode()' below throws) */
+	if (!(me->mf_flags & _MFILE_FN__RBRED)) {
+		struct vidlck_ops const *ops;
+		ops = vidlck_getops(me);
+		(*ops->vlo_restore)(me, dv);
+		me->mf_flags |= _MFILE_FN__RBRED;
+	}
+
+	/* Set the video mode used by `nt'
+	 * NOTE: Because we're holding a lock to `dv', the tty access object can't change! */
+	ac = arref_ptr(&nt->vty_tty);
+	assert(!wasdestroyed(ac));
+	assert(!(ac->vta_flags & VIDTTYACCESS_F_ACTIVE));
+	assert(!nt->vty_active);
+	dv_ops = viddev_getops(dv);
+	(*dv_ops->vdo_setttyvideomode)(dv, ac);
+
+	/* Mark the tty as active. */
+	atomic_lock_acquire(&ac->vta_lock);     /* This can't throw because preemption is enabled. */
+	ac->vta_flags |= VIDTTYACCESS_F_ACTIVE; /* Mark TTY accessor as active */
+	nt->vty_active = 1;                     /* Mark TTY as active */
+	(*ac->vta_activate)(ac);                /* This is NOBLOCK+NOTHROW */
+	awref_set(&dv->vd_active, nt);          /* Remember TTY as active */
+	atomic_lock_release(&ac->vta_lock);
+	return ASYNC_FINISHED;
+}
+
+
+PRIVATE struct async_ops const vidlck_async_v_ops = {
+	.ao_driver  = &drv_self,
+	.ao_destroy = &vidlck_async_v_destroy,
+	.ao_connect = &vidlck_async_v_connect,
+	.ao_test    = &vidlck_async_v_test,
+	.ao_work    = &vidlck_async_v_work,
+};
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vidlck_v_destroy)(struct mfile *__restrict self) {
+	struct vidlck *me = mfile_asvidlck(self);
+	assert(!(me->mf_flags & _MFILE_FN__RBRED));
+	/* Setup an async job to restore another tty. */
+	async_init(&me->vlc_rstor, &vidlck_async_v_ops);
+	decref_unlikely(async_start(&me->vlc_rstor));
+}
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* VIDEO DEVICE                                                         */
+/************************************************************************/
+
+/* Return a reference to the currently "active" tty (or the one that will become
+ * active after a currently held user-lock is released). If no such TTY  exists,
+ * return NULL instead. */
+PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) REF struct vidtty *FCALL
+viddev_getactivetty(struct viddev *__restrict self) {
+	REF struct mfile *active;
+again:
+	active = awref_get(&self->vd_active);
+	if (!active) {
+		/* This can happen for 2 reasons:
+		 *  - No TTY is active
+		 *  - The active tty is being destroyed
+		 *
+		 * In the later case, we must want for the async destruction to finish! */
+		if (awref_ptr(&self->vd_active) == NULL)
+			return NULL;
+
+		/* Because async destruction takes a write-lock to the chipset, we can
+		 * just  wait for a write-lock to be released in order to wait for the
+		 * active tty to finish unloading. */
+		shared_lock_pollconnect(&self->vd_lock);
+		active = awref_get(&self->vd_active);
+		if unlikely(active) {
+			task_disconnectall();
+			goto got_active;
+		}
+		task_waitfor();
+		goto again;
+	}
+got_active:
+
+	/* If the active object is a TTY, then we know that's the active TTY */
+	if (mfile_isvidtty(active))
+		return mfile_asvidtty(active);
+
+	/* Last case: the active object is a userlock.
+	 * In this case, return a reference to the tty that will be restored once that lock is released. */
+	{
+		struct vidlck *lck;
+		REF struct vidtty *result;
+		lck = mfile_asvidlck(active);
+		assert(lck->vlc_dev == self);
+		/* In order to read from `vlc_oldtty', we need a lock to the chipset driver. */
+		FINALLY_DECREF_UNLIKELY(lck);
+		viddev_acquire(self);
+		result = lck->vlc_oldtty;
+		xincref(result);
+		viddev_release(self);
+		return result;
+	}
+}
+
+/* Default operators for `struct viddev'. */
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
+viddev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+               USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+	struct viddev *me = mfile_asviddev(self);
+	switch (cmd) {
+
+	case VID_IOC_MAKELCK: {
+		struct handle hand;
+		REF struct vidlck *lck;
+
+		/* Require raw I/O.  - Without  this, the  lock
+		 * probably wouldn't do you any good anyways... */
+		require(CAP_SYS_RAWIO);
+
+		/* Create lock object. */
+		lck = viddev_newlck(me);
+		FINALLY_DECREF_UNLIKELY(lck);
+
+		/* Store lock object in a handle. */
+		hand.h_type = HANDLE_TYPE_MFILE;
+		hand.h_mode = IO_RDWR;
+		hand.h_data = lck;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hand);
+	}	break;
+
+	default:
+		return chrdev_v_ioctl(self, cmd, arg, mode);
+		break;
+	}
+	return 0;
+}
+
+PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+viddev_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
+               size_t num_bytes, iomode_t mode) THROWS(...) {
+	/* Direct writes to an video device go to the currently active tty. */
+	struct viddev *me = (struct viddev *)mfile_asansitty(self);
+	REF struct vidtty *tty;
+	tty = viddev_getactivetty(me);
+	if unlikely(!tty)
+		return 0; /* Indicate EOF */
+	FINALLY_DECREF_UNLIKELY(tty);
+	assert(tty->mf_ops->mo_stream != NULL &&
+	       tty->mf_ops->mo_stream->mso_write == &ansittydev_v_write);
+	return ansittydev_v_write(tty, src, num_bytes, mode);
+}
+
+PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+viddev_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
+                size_t num_bytes, iomode_t mode) THROWS(...) {
+	/* Direct writes to an video device go to the currently active tty. */
+	struct viddev *me = (struct viddev *)mfile_asansitty(self);
+	REF struct vidtty *tty;
+	tty = viddev_getactivetty(me);
+	if unlikely(!tty)
+		return 0; /* Indicate EOF */
+	FINALLY_DECREF_UNLIKELY(tty);
+	assert(tty->mf_ops->mo_stream != NULL &&
+	       tty->mf_ops->mo_stream->mso_write == &ansittydev_v_write);
+	return mfile_uwritev(tty, src, num_bytes, mode);
+}
+
+PUBLIC_CONST struct mfile_stream_ops const viddev_v_stream_ops = {
+	.mso_write  = &viddev_v_write,
+	.mso_writev = &viddev_v_writev,
+	.mso_ioctl  = &viddev_v_ioctl,
+	.mso_hop    = &viddev_v_hop,
+	.mso_tryas  = &viddev_v_tryas,
+};
+
+
+
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_SRC_DEV_VIDEO_C */

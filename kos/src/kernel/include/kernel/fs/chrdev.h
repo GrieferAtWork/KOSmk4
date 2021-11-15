@@ -78,8 +78,8 @@ struct chrdev
  *  - self->_chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
  *  - self->_chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
  *  - self->_chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
- * @param: struct chrdev     *self: Character device to initialize.
- * @param: struct chrdev_ops *ops:  Character device operators. */
+ * @param: struct chrdev           *self: Character device to initialize.
+ * @param: struct chrdev_ops const *ops:  Character device operators. */
 #define _chrdev_init(self, ops)                                                                                           \
 	(_device_init(_chrdev_asdev(self), &(ops)->cdo_dev),                                                                  \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags = (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | \

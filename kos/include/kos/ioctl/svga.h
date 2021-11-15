@@ -17,16 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_IOCTL_VIDEO_H
-#define _KOS_IOCTL_VIDEO_H 1
+#ifndef _KOS_IOCTL_SVGA_H
+#define _KOS_IOCTL_SVGA_H 1
 
-/* KOS-specific video-device system interface. */
+/* KOS-specific /dev/svga system interface. */
 
 #include <__stdinc.h>
 
 #include <asm/ioctl.h>
 #include <bits/types.h>
 #include <kos/hop/openfd.h>
+#include <kos/ioctl/video.h>
 
 #include <libsvga/chipset.h>
 
@@ -76,6 +77,9 @@ __DECL_BEGIN
  *    can  (and _should_) be  used by user-space  programs to gain exclusive
  *    access to the video chipset.
  */
+#define SVGA_IOC_MAKELCK    VID_IOC_MAKELCK                           /* [io:svga        ] Create a new video lock */
+#define SVGA_IOC_ACTIVATE   VID_IOC_ACTIVATE                          /* [io:     tty    ] Activate TTY */
+#define SVGA_IOC_MAKETTY    _IOR_KOS('S', 0x00, struct svga_maketty)  /* [io:svga        ] Create a new TTY */
 #define SVGA_IOC_GETMODE    _IOR_KOS('S', 0x01, struct svga_modeinfo) /* [   svga|tty|lck] Get current video mode */
 #define SVGA_IOC_SETMODE    _IOW_KOS('S', 0x01, struct svga_modeinfo) /* [io:svga|tty|lck] Set current video mode (@throw: E_NO_SUCH_OBJECT: Not a supported mode) */
 #define SVGA_IOC_GETDEFMODE _IOR_KOS('S', 0x02, struct svga_modeinfo) /* [   svga|tty|lck] Get default video mode */
@@ -85,30 +89,6 @@ __DECL_BEGIN
 #define SVGA_IOC_CSSTRINGS  _IOR_KOS('S', 0x05, struct svga_strings)  /* [   svga|tty|lck] Get chipset strings */
 /*      SVGA_IOC_           _IO*_KOS('S', 0x06, ...)                   * ... */
 /*      SVGA_IOC_           _IO*_KOS('S', 0x07, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x08, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x09, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x0a, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x0b, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x0c, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x0d, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x0e, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x0f, ...)                   * ... */
-#define SVGA_IOC_MAKETTY    _IOR_KOS('S', 0x10, struct svga_maketty)  /* [io:svga        ] Create a new TTY */
-#define SVGA_IOC_MAKELCK    _IOR_KOS('S', 0x11, struct hop_openfd)    /* [io:svga        ] Create a new video lock */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x12, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x13, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x14, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x15, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x16, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x17, ...)                   * ... */
-#define SVGA_IOC_ACTIVATE    _IO_KOS('S', 0x18)                       /* [io:     tty    ] Activate TTY */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x19, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x1a, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x1b, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x1c, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x1d, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x1e, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x1f, ...)                   * ... */
 
 
 #ifdef __CC__
@@ -152,4 +132,4 @@ struct svga_strings {
 
 __DECL_END
 
-#endif /* !_KOS_IOCTL_VIDEO_H */
+#endif /* !_KOS_IOCTL_SVGA_H */
