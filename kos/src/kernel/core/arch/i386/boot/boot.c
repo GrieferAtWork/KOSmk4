@@ -1002,6 +1002,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    into a different library (which can then be called libsvga)
 	 */
 
+	/* TODO: There's a missing incref() relating to mktty.
+	 * Replicate bug:
+	 *  - Repeatedly press CTRL+D on the busybox prompt
+	 *  - After a couple of restarts, the kernel will panic because /dev/console got destroyed
+	 * Only logical conclusion: there's a missing incref() somewhere. */
+
 	return state;
 }
 
