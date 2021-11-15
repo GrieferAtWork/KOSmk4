@@ -76,8 +76,8 @@ struct svgatty;
  * Used for encoding TTY display mode info and the like. */
 struct svga_ttyaccess: vidttyaccess {
 	struct svga_modeinfo const *sta_mode; /* [1..1][const] Associated SVGA mode. */
-	struct mnode                sta_vmem; /* [const] Video memory mapping. (prepared+mapped)
-	                                       * May only be accessed when `VIDTTYACCESS_F_ACTIVE' is set! */
+	struct mnode                sta_vmem; /* [const] Video memory mapping.  (prepared+mapped)
+	                                       * Only access when `VIDTTYACCESS_F_ACTIVE' is set! */
 };
 
 INTDEF NOBLOCK NONNULL((1)) void
@@ -97,7 +97,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct svga_ttyaccess, vta_refcnt, svga_ttyaccess_dest
 #define svga_ttyaccess_isgfx(self) ((self)->vta_setcell != &svga_ttyaccess_v_setcell_txt)
 INTDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL svga_ttyaccess_v_setcell_txt)(struct vidttyaccess *__restrict self,
-                                            struct vidtty *__restrict tty,
+                                            struct ansitty *__restrict tty,
                                             uintptr_t address, char32_t ch);
 
 
@@ -160,8 +160,20 @@ struct svgalck: vidlck {
 #define vidlck_assvga(self)   ((struct svgalck *)(self))
 #define mfile_assvgalck(self) vidlck_assvga(mfile_asvidlck(self))
 
+#ifdef CONFIG_HAVE_DEBUGGER
+/* Register-save structure for the builtin debugger. */
+struct svga_dbgregs {
+	bool                            sdr_hasxregs; /* Set to true if `sdr_xdata' contains chipset registers. */
+	struct vga_mode                 sdr_vmode;    /* Saved standard VGA registers. */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, sdr_xdata);   /* Chipset register buffer + clobbered video-memory buffer (in that order) */
+};
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 struct svgadev: viddev {
+#ifdef CONFIG_HAVE_DEBUGGER
+	REF struct svga_ttyaccess        *svd_dbgtty;   /* [1..1][const] TTY accessor for the builtin debugger. */
+	struct svga_dbgregs              *svd_dbgsav;   /* [1..1][const] Saved VGA registers while within the builtin debugger. */
+#endif /* CONFIG_HAVE_DEBUGGER */
 	byte_t const                     *svd_supmodev; /* [0..n][const][owned] Array of supported video modes. */
 	size_t                            svd_supmodec; /* [!0][const] # of supported video modes. */
 	size_t                            svd_supmodeS; /* [const] Aligned sizeof() supported video modes. */
@@ -215,6 +227,11 @@ svgadev_newttyf(struct svgadev *__restrict self,
 		THROWS(E_WOULDBLOCK);
 
 
+#ifdef CONFIG_HAVE_DEBUGGER
+/* SVGA device debugger integration. */
+INTDEF FREE NONNULL((1)) void FCALL svgadev_dbg_init(struct svgadev *__restrict self);
+INTDEF NONNULL((1)) void NOTHROW(FCALL svgadev_dbg_fini)(struct svgadev *__restrict self);
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 
@@ -227,6 +244,9 @@ INTDEF struct vga_palcolor const basevga_defaultpal[16];
 
 /* Default text-mode font for KOS. */
 INTDEF byte_t const basevga_defaultfont[256][32];
+
+/* Map from `VGA_SR03_CSET_*' to the actual offset within plane #2. */
+INTDEF uint16_t const basevga_fontoffset[8];
 
 /* Return the font-map index (iow: the value that should be written
  * to plane#0) in order to represent a given UTF-32 character `ch'. */

@@ -227,7 +227,7 @@ again_load_mode:
 					}
 					++modec; /* Remember that we've got another mode now! */
 
-#if !defined(NDEBUG) && 1 /* XXX: Remove me */
+#if !defined(NDEBUG) && 1 /* TODO: Remove me */
 					{
 						char modenamebuf[64];
 						char flagsbuf[64] = "", *ptr = flagsbuf;
@@ -292,15 +292,28 @@ again_load_mode:
 				self->fn_mode   = S_IFCHR | 0600;
 				self->dv_driver = incref(&drv_self);
 
-				/* Register the device. */
-				TRY {
-					device_registerf(self, MKDEV(DEV_MAJOR_AUTO, 0), "svga");
-				} EXCEPT {
-					decref_nokill(&drv_self);
+#ifdef CONFIG_HAVE_DEBUGGER
+				/* Allocate+initialize a tty for the builtin debugger. */
+				svgadev_dbg_init(self);
+				TRY
+#endif /* CONFIG_HAVE_DEBUGGER */
+				{
+					/* Register the device. */
+					TRY {
+						device_registerf(self, MKDEV(DEV_MAJOR_AUTO, 0), "svga");
+					} EXCEPT {
+						decref_nokill(&drv_self);
+						RETHROW();
+					}
+				}
+#ifdef CONFIG_HAVE_DEBUGGER
+				EXCEPT {
+					svgadev_dbg_fini(self);
 					RETHROW();
 				}
+#endif /* CONFIG_HAVE_DEBUGGER */
 			} EXCEPT {
-				kfree(modev);
+				kfree((void *)self->svd_supmodev);
 				RETHROW();
 			}
 		} EXCEPT {
@@ -311,6 +324,10 @@ again_load_mode:
 		kfree(self);
 		RETHROW();
 	}
+
+	/* If none has already been defined, remember `self' as the default video adapter. */
+	axref_cmpxch(&viddev_default, NULL, self);
+	decref_unlikely(self);
 }
 
 

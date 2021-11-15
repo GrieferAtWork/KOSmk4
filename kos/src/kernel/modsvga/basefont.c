@@ -63,6 +63,19 @@ INTERN_CONST struct vga_palcolor const basevga_defaultpal[16] = {
 };
 
 
+/* Map from `VGA_SR03_CSET_*' to the actual offset within plane #2. */
+INTERN_CONST uint16_t const basevga_fontoffset[8] = {
+	[VGA_SR03_CSET_0000_1FFF] = 0x0000,
+	[VGA_SR03_CSET_4000_5FFF] = 0x4000,
+	[VGA_SR03_CSET_8000_9FFF] = 0x8000,
+	[VGA_SR03_CSET_C000_DFFF] = 0xC000,
+	[VGA_SR03_CSET_2000_3FFF] = 0x2000,
+	[VGA_SR03_CSET_6000_7FFF] = 0x6000,
+	[VGA_SR03_CSET_A000_BFFF] = 0xA000,
+	[VGA_SR03_CSET_E000_FFFF] = 0xE000,
+};
+
+
 
 #define CPVGA_ASCII_MIN 0x20 /* First ASCII-compatible ordinal */
 #define CPVGA_ASCII_MAX 0x7E /* Last ASCII-compatible ordinal */

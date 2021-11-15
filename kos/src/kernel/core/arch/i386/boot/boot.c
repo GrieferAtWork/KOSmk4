@@ -985,6 +985,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  #1: Indicate function that should be marked as [kernel] in libc/magic
 	 *  #2: Need to be inlined into .text */
 
+	/* TODO: Get  rid of the  `NOCONNECT' annotation. -  (almost) anything that's BLOCKING
+	 *       is also inherently NOCONNECT, and generally speaking, the NOCONNECT annoation
+	 *       is pretty much useless in terms of a programming aid (it feels more like it's
+	 *       just there to clobber...) */
 
 	/* TODO: Generalize the modsvga data system into an in-kernel interface.
 	 *  - This system must also include operators usable for the builtin

@@ -22,9 +22,12 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <dev/ansitty.h>
 #include <kernel/fs/chrdev.h>
 #include <sched/async.h>
+
+#include <hybrid/__minmax.h>
 
 #include <kos/aref.h>
 #include <kos/sched/shared-lock.h>
@@ -134,7 +137,7 @@ struct vidttyaccess {
 	 * @param: address: == CELL_X + CELL_Y * vta_scan */
 	NOBLOCK NONNULL((1, 2)) void
 	/*NOTHROW*/ (FCALL *vta_setcell)(struct vidttyaccess *__restrict self,
-	                                 struct vidtty *__restrict tty,
+	                                 struct ansitty *__restrict tty,
 	                                 uintptr_t address, char32_t ch);
 
 	/* [1..1][lock(vta_lock)] Hide the hardware cursor
@@ -162,7 +165,7 @@ struct vidttyaccess {
 	 * >> while (num_cells--) (*vta_setcell)(self, tty, start++, ch); */
 	NOBLOCK NONNULL((1, 2)) void
 	/*NOTHROW*/ (FCALL *vta_fillcells)(struct vidttyaccess *__restrict self,
-	                                   struct vidtty *__restrict tty,
+	                                   struct ansitty *__restrict tty,
 	                                   uintptr_t start, char32_t ch, size_t num_cells);
 
 	/* [1..1][lock(vta_lock)] Do additional stuff needed after to activate this tty.
@@ -210,13 +213,6 @@ struct vidtty
 #define _vidtty_asansi(x) x
 #define _vidtty_ansi_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
-	REF struct viddev        *vty_dev;    /* [1..1][const] Video device. */
-	REF struct vidtty        *vty_oldtty; /* [0..1][const_if(wasdestroyed(self))]
-	                                       * [lock(vlc_dev->vd_lock)]
-	                                       * TTY that is made active when this tty is destroyed. */
-	unsigned int              vty_active; /* [lock(vty_dev->vd_lock)]
-	                                       * [const_if(wasdestroyed(self))]
-	                                       * Non-zero if this tty is currently active. */
 	struct vidttyaccess_arref vty_tty;    /* [1..1][lock(WRITE(vty_dev->vd_lock))]
 	                                       * Only the pointed-to  may have the  `VIDTTYACCESS_F_ACTIVE'
 	                                       * flag set. When you with to set a new tty access object (as
@@ -229,6 +225,13 @@ struct vidtty
 	                                       * one create a new tty-access object for the new tty, and
 	                                       * clear the  `VIDTTYACCESS_F_ACTIVE'  flag  for  the  old
 	                                       * tty's access object. */
+	REF struct viddev        *vty_dev;    /* [1..1][const] Video device. */
+	REF struct vidtty        *vty_oldtty; /* [0..1][const_if(wasdestroyed(self))]
+	                                       * [lock(vlc_dev->vd_lock)]
+	                                       * TTY that is made active when this tty is destroyed. */
+	unsigned int              vty_active; /* [lock(vty_dev->vd_lock)]
+	                                       * [const_if(wasdestroyed(self))]
+	                                       * Non-zero if this tty is currently active. */
 };
 
 /* Operator access */
@@ -247,10 +250,10 @@ struct vidtty
 #define devnode_asvidtty(self)    ansittydev_asvidtty(devnode_asansitty(self))
 #define fnode_asvidtty(self)      ansittydev_asvidtty(fnode_asansitty(self))
 #define mfile_asvidtty(self)      ansittydev_asvidtty(mfile_asansitty(self))
-#define ansitty_asvidtty(self)    __COMPILER_CONTAINER_OF(self, struct vidtty, at_ansi)
+#define ansitty_asvidtty(self)    __COMPILER_CONTAINER_OF(self, struct vidtty, _vidtty_ansi_ at_ansi)
 
 /* Helper macros for checking if some object is a `struct vidtty'. */
-#define ansittydev_isvidtty(self) ((self)->at_ansi.at_ops.ato_putc == &_vidtty_v_putc)
+#define ansittydev_isvidtty(self) ((self)->_vidtty_ansi_ at_ansi.at_ops.ato_putc == &_vidtty_v_putc)
 #define chrdev_isvidtty(self)     (chrdev_isansitty(self) && ansittydev_isvidtty(chrdev_asansitty(self)))
 #define device_isvidtty(self)     (device_isansitty(self) && ansittydev_isvidtty(device_asansitty(self)))
 #define devnode_isvidtty(self)    (devnode_isansitty(self) && ansittydev_isvidtty(devnode_asansitty(self)))
@@ -260,9 +263,9 @@ struct vidtty
 /* Async job  started to  revert  to the  old  display
  * mode when this TTY is destroyed while `vty_active'. */
 #define _vidtty_toasyncrestore(self) \
-	((struct async *)&(self)->at_ansi)
+	((struct async *)&(self)->_vidtty_ansi_ at_ansi)
 #define _vidtty_fromasyncrestore(self) \
-	__COMPILER_CONTAINER_OF((struct ansitty *)__COMPILER_REQTYPE(struct async *, self), struct vidtty, at_ansi)
+	__COMPILER_CONTAINER_OF((struct ansitty *)__COMPILER_REQTYPE(struct async *, self), struct vidtty, _vidtty_ansi_ at_ansi)
 STATIC_ASSERT(sizeof(struct async) <= sizeof(struct ansitty));
 
 /* Activate a given TTY. If an active userlock exists, the tty will not actually
@@ -401,7 +404,7 @@ struct vidlck
 	                     MFILE_F_NOATIME | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |    \
 	                     MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE),                  \
 	 (self)->mf_ctime = (self)->mf_mtime = (self)->mf_atime = realtime())
-	
+
 /* Finalize a partially initialized `struct vidlck' (as initialized by `_vidlck_init()') */
 #define _vidlck_fini(self) (void)0
 
@@ -455,6 +458,28 @@ struct viddev_ops {
 	(FCALL *vdo_alloclck)(struct viddev *__restrict self,
 	                      struct vidtty *active_tty)
 			THROWS(E_IOERROR, E_WOULDBLOCK);
+
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* [1..1] Activate  and return a video tty object  for use within the builtin debugger.
+	 * - Called while the debugger is already active (dbg_active).
+	 * - Must _NOT_ clear the contents of the display buffer of the returned  tty.
+	 *   Instead,  anything which  may still be  stored within the  buffer must be
+	 *   displayed on-screen as-is. If the caller wishes to clear the screen, they
+	 *   must  do so themselves, even if this would mean getting a glimpse at what
+	 *   was displayed just before the debugger was exited the last time.
+	 * - No requirements on minimal terminal size are made, but try to aim for 80x25,
+	 *   as  this is  the resolution which  most debugger applets  were designed for. */
+	ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vidttyaccess *
+	/*NOTHROW*/ (FCALL *vdo_enterdbg)(struct viddev *__restrict self);
+
+	/* [1..1] Restore video registers as the result of exiting the builtin debugger.
+	 * - Called while the debugger is already active (dbg_active).
+	 * - s.a. `vdo_enterdbg()'
+	 * - This function and `vdo_enterdbg()' are also used to implement the `screen' command */
+	NONNULL((1)) void
+	/*NOTHROW*/ (FCALL *vdo_leavedbg)(struct viddev *__restrict self);
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 };
 
 /* Video device. */
@@ -551,8 +576,13 @@ DATDEF struct mfile_stream_ops const viddev_v_stream_ops;
 /* Finalize a partially initialized `struct viddev' (as initialized by `_viddev_init()') */
 #define _viddev_fini(self) _chrdev_fini(_viddev_aschr(self))
 
+#ifndef __viddev_axref_defined
+#define __viddev_axref_defined
+AXREF(viddev_axref, viddev);
+#endif /* !__viddev_axref_defined */
 
-
+/* [0..1] Default video device adapter. (Used to implement output in the builtin debugger) */
+DATDEF struct viddev_axref viddev_default;
 
 DECL_END
 #endif /* __CC__ */

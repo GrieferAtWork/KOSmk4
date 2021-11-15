@@ -308,7 +308,7 @@ vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 /* Scroll up once */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL vidtty_scrollone)(struct vidttyaccess *__restrict me,
-                                struct vidtty *__restrict tty) {
+                                struct ansitty *__restrict tty) {
 	(*me->vta_copycell)(me, me->_vta_scrl1_to, me->_vta_scrl1_from, me->_vta_scrl1_cnt);
 	(*me->vta_fillcells)(me, tty, me->_vta_scrl1_fil, ' ', me->vta_resx);
 }
@@ -332,12 +332,12 @@ vidtty_v_putc(struct ansitty *__restrict self,
 		/* Check if we need to scroll. */
 		if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
 			me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
-			vidtty_scrollone(me, ansitty_asvidtty(self));
+			vidtty_scrollone(me, self);
 		}
 		advance = TABSIZE - (me->vta_cursor.vtc_cellx % TABSIZE);
 		if ((me->vta_cursor.vtc_cellx + advance) > me->vta_resx)
 			advance = me->vta_resx - me->vta_cursor.vtc_cellx;
-		(*me->vta_fillcells)(me, ansitty_asvidtty(self),
+		(*me->vta_fillcells)(me, self,
 		                     me->vta_cursor.vtc_cellx +
 		                     me->vta_cursor.vtc_celly *
 		                     me->vta_scan,
@@ -365,7 +365,7 @@ vidtty_v_putc(struct ansitty *__restrict self,
 		/* Check if we need to scroll. */
 		if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
 			me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
-			vidtty_scrollone(me, ansitty_asvidtty(self));
+			vidtty_scrollone(me, self);
 		}
 		break;
 
@@ -378,7 +378,7 @@ vidtty_v_putc(struct ansitty *__restrict self,
 		}
 		if (self->at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE) {
 			/* Clear trailing spaces */
-			(*me->vta_fillcells)(me, ansitty_asvidtty(self),
+			(*me->vta_fillcells)(me, self,
 			                     me->vta_cursor.vtc_cellx +
 			                     me->vta_cursor.vtc_celly *
 			                     me->vta_scan,
@@ -394,7 +394,7 @@ vidtty_v_putc(struct ansitty *__restrict self,
 			++me->vta_cursor.vtc_celly;
 		if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
 			me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
-			vidtty_scrollone(me, ansitty_asvidtty(self));
+			vidtty_scrollone(me, self);
 		}
 		break;
 
@@ -402,11 +402,11 @@ vidtty_v_putc(struct ansitty *__restrict self,
 		/* Check if we need to scroll. */
 		if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
 			me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
-			vidtty_scrollone(me, ansitty_asvidtty(self));
+			vidtty_scrollone(me, self);
 		}
 
 		/* Print the character to the screen. */
-		(*me->vta_setcell)(me, ansitty_asvidtty(self),
+		(*me->vta_setcell)(me, self,
 		                   me->vta_cursor.vtc_cellx +
 		                   me->vta_cursor.vtc_celly *
 		                   me->vta_scan,
@@ -545,8 +545,7 @@ vidtty_v_copycell(struct ansitty *__restrict self,
 			size_t delta = me->vta_scan - me->vta_resx;
 			dstaddr += (dstaddr / me->vta_resx) * delta;
 		}
-		(*me->vta_fillcells)(me, ansitty_asvidtty(self),
-		                     dstaddr, ' ', overflow);
+		(*me->vta_fillcells)(me, self, dstaddr, ' ', overflow);
 	} else {
 		/* Do the actual cell-copy. */
 		assert(srcaddr <= dispend);
@@ -591,8 +590,7 @@ vidtty_v_fillcell(struct ansitty *__restrict self,
 	}
 
 	/* Do the fill. */
-	(*me->vta_fillcells)(me, ansitty_asvidtty(self),
-	                     dstaddr, ch, count);
+	(*me->vta_fillcells)(me, self, dstaddr, ch, count);
 done:
 	atomic_lock_release(&me->vta_lock);
 }
@@ -984,6 +982,8 @@ PUBLIC_CONST struct mfile_stream_ops const viddev_v_stream_ops = {
 };
 
 
+/* [0..1] Default video device adapter. (Used to implement output in the builtin debugger) */
+PUBLIC struct viddev_axref viddev_default = AXREF_INIT(NULL);
 
 
 DECL_END

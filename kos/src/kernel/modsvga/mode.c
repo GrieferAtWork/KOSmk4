@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
@@ -42,6 +43,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -258,8 +260,16 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		svgadev_setmode(dv, newmode);
 
 		/* For text modes, also load the default font! */
-		if (newmode->smi_flags & SVGA_MODEINFO_F_TXT)
-			basevga_wrvmem(0x20000, basevga_defaultfont, sizeof(basevga_defaultfont));
+		if (newmode->smi_flags & SVGA_MODEINFO_F_TXT) {
+			uint32_t fontbase;
+			uint8_t cmap;
+			cmap = baseega_registers.vm_seq_character_map;
+			if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
+				cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
+			cmap     = VGA_SR03_CSETA_GET(cmap);
+			fontbase = 0x20000 + basevga_fontoffset[cmap];
+			basevga_wrvmem(fontbase, basevga_defaultfont, sizeof(basevga_defaultfont));
+		}
 
 		/* Remember last-set mode. */
 		ATOMIC_WRITE(me->slc_mode, newmode);
@@ -687,7 +697,11 @@ svgadev_newttyf(struct svgadev *__restrict self,
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL svgadev_v_destroy)(struct mfile *__restrict self) {
-	struct svgadev *me = (struct svgadev *)mfile_aschrdev(self);
+	struct svgadev *me;
+	me = (struct svgadev *)mfile_aschrdev(self);
+#ifdef CONFIG_HAVE_DEBUGGER
+	svgadev_dbg_fini(me);
+#endif /* CONFIG_HAVE_DEBUGGER */
 	kfree((void *)me->svd_supmodev);
 	(*me->svd_chipset.sc_ops.sco_fini)(&me->svd_chipset);
 	chrdev_v_destroy(self);
@@ -803,6 +817,252 @@ PRIVATE struct mfile_stream_ops const svgadev_v_stream_ops = {
 	.mso_tryas  = &viddev_v_tryas,
 };
 
+
+#ifdef CONFIG_HAVE_DEBUGGER
+
+PRIVATE NOBLOCK ATTR_FREETEXT WUNUSED NONNULL((1)) uint64_t
+NOTHROW(FCALL calculate_dbgmode_cost)(struct svga_modeinfo const *__restrict mode) {
+	uint64_t result = 0;
+	if (mode->smi_bits_per_pixel > 32)
+		return (uint64_t)-1; /* We only support BPP up to 32-bit! */
+#if 1 /* TODO: multiple-pixels-per-byte graphics modes! */
+	if (mode->smi_bits_per_pixel <= 4)
+		return (uint64_t)-1;
+#endif
+#if 1 /* TODO: paged memory access! */
+	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+		return (uint64_t)-1;
+#endif
+	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
+		result += abs((int32_t)80 - (int32_t)mode->smi_resx);
+		result += abs((int32_t)25 - (int32_t)mode->smi_resy);
+	} else {
+		result += abs((int32_t)(80 * 9) - (int32_t)mode->smi_resx);
+		result += abs((int32_t)(25 * 16) - (int32_t)mode->smi_resy);
+		result += abs((int8_t)16 - (int8_t)mode->smi_bits_per_pixel);
+		result += UINT64_C(0x100000000);
+	}
+	return result;
+}
+
+/* Select and return the video mode that should be used for the builtin debugger. */
+PRIVATE NOBLOCK ATTR_FREETEXT NONNULL((1)) struct svga_modeinfo const *
+NOTHROW(FCALL svgadev_dbg_selectmode)(struct svgadev *__restrict self) {
+	size_t i;
+	uint64_t winner_cost;
+	struct svga_modeinfo const *winner;
+	winner      = svgadev_supmode(self, 0);
+	winner_cost = calculate_dbgmode_cost(winner);
+	for (i = 1; i < self->svd_supmodec; ++i) {
+		struct svga_modeinfo const *mode;
+		uint64_t cost;
+		mode = svgadev_supmode(self, i);
+		cost = calculate_dbgmode_cost(mode);
+		if (winner_cost > cost) {
+			winner_cost = cost;
+			winner      = mode;
+		}
+	}
+	return winner;
+}
+
+/* SVGA device debugger integration. */
+INTERN ATTR_FREETEXT NONNULL((1)) void FCALL
+svgadev_dbg_init(struct svgadev *__restrict self) {
+	struct svga_modeinfo const *mode;
+	size_t dregsize;
+
+	/* Select the video mode that will be used in the builtin debugger.
+	 * As  documented, we try to use an  80x25 text mode for this, esp.
+	 * because this minimizes the amount of video memory that might get
+	 * clobbered. (And thus has to be saved+restored) */
+	mode = svgadev_dbg_selectmode(self);
+
+	/* Figure out how large the extended register must needs to be. */
+	dregsize = offsetof(struct svga_dbgregs, sdr_xdata);
+	dregsize += self->svd_chipset.sc_ops.sco_regsize;
+	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
+		dregsize += mode->smi_resx * mode->smi_resy * 2; /* On-screen text. */
+		dregsize += 256 * 16;                            /* Text-mode font storage. */
+	} else {
+		/* If  the debugger can't use hardware text-mode, then
+		 * we need to preserve the actual display memory (oof) */
+		dregsize += mode->smi_resx * mode->smi_scanline;
+	}
+
+	/* Allocate a sufficiently sized buffer for the debugger TTY.
+	 * Note  that we allocate this stuff with GFP_LOCKED+PREALLOC
+	 * so that using it from within the debugger doesn't fault.
+	 *
+	 * Technically, we don't need to do that, but it improves the
+	 * chances of still working  even when after being  poisoned. */
+	self->svd_dbgsav = (struct svga_dbgregs *)kmalloc(dregsize, GFP_LOCKED | GFP_PREFLT);
+	TRY {
+		/* Allocate a tty-access object for use by the builtin debugger. */
+		self->svd_dbgtty = svgadev_makettyaccess(self, mode);
+	} EXCEPT {
+		kfree(self->svd_dbgsav);
+		RETHROW();
+	}
+}
+
+INTERN NONNULL((1)) void
+NOTHROW(FCALL svgadev_dbg_fini)(struct svgadev *__restrict self) {
+	assert(self->svd_dbgtty->vta_refcnt == 1);
+	destroy(self->svd_dbgtty);
+	kfree(self->svd_dbgsav);
+}
+
+
+/* Save video memory to `buf', as may get clobbered by `tty' */
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(FCALL dbg_save_vmem)(struct svga_ttyaccess *__restrict tty,
+                             byte_t buf[]) {
+	struct svga_modeinfo const *mode = tty->sta_mode;
+	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
+		uint32_t fontbase;
+		uint8_t cmap;
+		size_t i;
+		byte_t *vmem;
+
+		/* Save the text-mode page. */
+		vmem = (byte_t *)mnode_getaddr(&tty->sta_vmem);
+		for (i = 0; i < tty->vta_resy; ++i) {
+			memcpy(buf, vmem, tty->vta_resx * 2);
+			vmem += mode->smi_scanline;
+			buf += tty->vta_resx * 2;
+		}
+
+		/* Save memory re-used for the text-mode font. */
+		cmap = baseega_registers.vm_seq_character_map;
+		if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
+			cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
+		cmap     = VGA_SR03_CSETA_GET(cmap);
+		fontbase = 0x20000 + basevga_fontoffset[cmap];
+		for (i = 0; i < 256; ++i) {
+			basevga_rdvmem(fontbase + i * 32, buf, 16);
+			buf += 16;
+		}
+	} else {
+		/* Save the entire screen. */
+		memcpy(buf, mnode_getaddr(&tty->sta_vmem),
+		       mode->smi_resx * mode->smi_scanline);
+	}
+}
+
+/* Load video memory from `buf', as may get clobbered by `tty' */
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(FCALL dbg_load_vmem)(struct svga_ttyaccess *__restrict tty,
+                             byte_t const buf[]) {
+	struct svga_modeinfo const *mode = tty->sta_mode;
+	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
+		uint32_t fontbase;
+		uint8_t cmap;
+		size_t i;
+		byte_t *vmem;
+
+		/* Restore the text-mode page. */
+		vmem = (byte_t *)mnode_getaddr(&tty->sta_vmem);
+		for (i = 0; i < tty->vta_resy; ++i) {
+			memcpy(vmem, buf, tty->vta_resx * 2);
+			vmem += mode->smi_scanline;
+			buf += tty->vta_resx * 2;
+		}
+
+		/* Restore memory re-used for the text-mode font. */
+		cmap = baseega_registers.vm_seq_character_map;
+		if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
+			cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
+		cmap     = VGA_SR03_CSETA_GET(cmap);
+		fontbase = 0x20000 + basevga_fontoffset[cmap];
+		for (i = 0; i < 256; ++i) {
+			basevga_wrvmem(fontbase + i * 32, buf, 16);
+			buf += 16;
+		}
+	} else {
+		/* Restore the entire screen. */
+		memcpy(mnode_getaddr(&tty->sta_vmem), buf,
+		       mode->smi_resx * mode->smi_scanline);
+	}
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vidttyaccess *
+NOTHROW(FCALL svgadev_v_enterdbg)(struct viddev *__restrict self) {
+	struct svga_ttyaccess *tty;
+	struct svgadev *me;
+	struct svga_dbgregs *sav;
+	me  = viddev_assvga(self);
+	tty = me->svd_dbgtty;
+	sav = me->svd_dbgsav;
+
+	/* Don't do unnecessary assertions in here! */
+	/*assert(tty->vta_refcnt == 1);*/
+
+	/* Save VGA registers into the designated state. */
+	basevga_getregs(&sav->sdr_vmode);
+
+	/* Save extended registers. */
+	sav->sdr_hasxregs = true;
+	NESTED_TRY {
+		(*me->svd_chipset.sc_ops.sco_getregs)(&me->svd_chipset,
+		                                      sav->sdr_xdata);
+	} EXCEPT {
+		/* This is a really bad sign, but let's try to keep
+		 * on  moving, even if it's all we can really do at
+		 * this point. */
+		sav->sdr_hasxregs = false;
+	}
+
+	/* Switch display hardware into the video mode used by the debugger's tty.
+	 * We  can only hope that this doesn't  throw an exception, but there's no
+	 * way around this short of forcing the debugger-tty to always be visible,
+	 * which wouldn't make any sense at all... */
+	svgadev_setmode(me, tty->sta_mode);
+
+	/* Preserve video memory that might get clobbered by `tty' */
+	dbg_save_vmem(tty, sav->sdr_xdata + me->svd_chipset.sc_ops.sco_regsize);
+
+	/* Activate the debugger tty. */
+	tty->vta_flags |= VIDTTYACCESS_F_ACTIVE;
+	(*tty->vta_activate)(tty);
+
+	/* Return a pointer to the debugger's tty. */
+	return tty;
+}
+
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL svgadev_v_leavedbg)(struct viddev *__restrict self) {
+	struct svga_ttyaccess *tty;
+	struct svgadev *me;
+	struct svga_dbgregs *sav;
+	me  = viddev_assvga(self);
+	tty = me->svd_dbgtty;
+	sav = me->svd_dbgsav;
+
+	/* Don't do unnecessary assertions in here! */
+	/*assert(tty->vta_refcnt == 1);*/
+
+	/* Restore video memory that might have gotten clobbered by `tty' */
+	dbg_load_vmem(tty, sav->sdr_xdata + me->svd_chipset.sc_ops.sco_regsize);
+
+	/* Deactivate the tty. */
+	tty->vta_flags &= ~VIDTTYACCESS_F_ACTIVE;
+
+	/* Restore extended chipset registers. */
+	if (sav->sdr_hasxregs) {
+		NESTED_TRY {
+			(*me->svd_chipset.sc_ops.sco_setregs)(&me->svd_chipset,
+			                                      sav->sdr_xdata);
+		} EXCEPT {
+		}
+	}
+
+	/* Restore basic VGA registers. */
+	basevga_setregs(&sav->sdr_vmode);
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+
 /* Operators for `struct svgadev' */
 INTERN_CONST struct viddev_ops const svgadev_ops = {
 	.vdo_chr = {{{{
@@ -815,6 +1075,10 @@ INTERN_CONST struct viddev_ops const svgadev_ops = {
 	}}}},
 	.vdo_setttyvideomode = &svgadev_v_setttyvideomode,
 	.vdo_alloclck        = &svgadev_v_alloclck,
+#ifdef CONFIG_HAVE_DEBUGGER
+	.vdo_enterdbg = &svgadev_v_enterdbg,
+	.vdo_leavedbg = &svgadev_v_leavedbg,
+#endif /* CONFIG_HAVE_DEBUGGER */
 };
 
 

@@ -117,20 +117,27 @@ NOTHROW(FCALL svga_ttyaccess_destroy)(struct vidttyaccess *__restrict self) {
 
 PRIVATE NOBLOCK WUNUSED NONNULL((2)) uint16_t
 NOTHROW(FCALL svga_ttyaccess_makecell_txt)(char32_t ch,
-                                           struct svgatty *__restrict tty) {
+                                           struct ansitty *__restrict tty) {
 	uint16_t result;
 	result = (uint16_t)basevga_defaultfont_encode(ch);
-	result |= (uint16_t)tty->at_ansi.at_color << 8;
+	result |= (uint16_t)tty->at_color << 8;
 	return result;
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_v_activate_txt)(struct vidttyaccess *__restrict self) {
 	struct svga_ttyaccess_txt *me;
+	uint32_t fontbase;
+	uint8_t cmap;
 	me = vidttyaccess_assvga_txt(self);
 
 	/* Load the default font into video memory. */
-	basevga_wrvmem(0x20000, basevga_defaultfont, sizeof(basevga_defaultfont));
+	cmap = baseega_registers.vm_seq_character_map;
+	if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
+		cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
+	cmap     = VGA_SR03_CSETA_GET(cmap);
+	fontbase = 0x20000 + basevga_fontoffset[cmap];
+	basevga_wrvmem(fontbase, basevga_defaultfont, sizeof(basevga_defaultfont));
 
 	/* Populate the video text page with the expected contents. */
 	memcpy(svga_ttyaccess_txt_vmem(me),
@@ -140,12 +147,12 @@ NOTHROW(FCALL svga_ttyaccess_v_activate_txt)(struct vidttyaccess *__restrict sel
 
 INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL svga_ttyaccess_v_setcell_txt)(struct vidttyaccess *__restrict self,
-                                            struct vidtty *__restrict tty,
+                                            struct ansitty *__restrict tty,
                                             uintptr_t address, char32_t ch) {
 	u16 word;
 	struct svga_ttyaccess_txt *me;
 	me   = vidttyaccess_assvga_txt(self);
-	word = svga_ttyaccess_makecell_txt(ch, vidtty_assvga(tty));
+	word = svga_ttyaccess_makecell_txt(ch, tty);
 	svga_ttyaccess_txt_dmem(me)[address] = word;
 	if likely(me->vta_flags & VIDTTYACCESS_F_ACTIVE)
 		svga_ttyaccess_txt_vmem(me)[address] = word;
@@ -244,12 +251,12 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_txt_overscan)(struct vidttyaccess *__res
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL svga_ttyaccess_v_fillcells_txt)(struct vidttyaccess *__restrict self,
-                                              struct vidtty *__restrict tty,
+                                              struct ansitty *__restrict tty,
                                               uintptr_t start, char32_t ch, size_t num_cells) {
 	u16 word;
 	struct svga_ttyaccess_txt *me;
 	me = vidttyaccess_assvga_txt(self);
-	word = svga_ttyaccess_makecell_txt(ch, vidtty_assvga(tty));
+	word = svga_ttyaccess_makecell_txt(ch, tty);
 	memsetw(&svga_ttyaccess_txt_dmem(me)[start], word, num_cells);
 	if (me->vta_flags & VIDTTYACCESS_F_ACTIVE)
 		memsetw(&svga_ttyaccess_txt_vmem(me)[start], word, num_cells);
@@ -374,13 +381,13 @@ NOTHROW(FCALL svga_ttyaccess_v_activate_gfx)(struct vidttyaccess *__restrict sel
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL svga_ttyaccess_v_setcell_gfx)(struct vidttyaccess *__restrict self,
-                                            struct vidtty *__restrict tty,
+                                            struct ansitty *__restrict tty,
                                             uintptr_t address, char32_t ch) {
 	struct svga_ttyaccess_gfx *me = vidttyaccess_assvga_gfx(self);
 	byte_t const *pattern;
 	pattern = basevga_defaultfont[basevga_defaultfont_encode(ch)];
 	memcpy(me->stx_display[address].sgc_lines, pattern, 16);
-	me->stx_display[address].sgc_color = tty->at_ansi.at_color;
+	me->stx_display[address].sgc_color = tty->at_color;
 
 	/* Don't touch display memory when not active! */
 	if unlikely(!(me->vta_flags & VIDTTYACCESS_F_ACTIVE))
@@ -400,7 +407,7 @@ NOTHROW(FCALL svga_ttyaccess_v_setcell_gfx)(struct vidttyaccess *__restrict self
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct vidttyaccess *__restrict self,
-                                              struct vidtty *__restrict tty,
+                                              struct ansitty *__restrict tty,
                                               uintptr_t start, char32_t ch, size_t num_cells) {
 	struct svga_ttyaccess_gfx *me = vidttyaccess_assvga_gfx(self);
 	struct svga_gfxcell *src, *dst;
@@ -412,7 +419,7 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct vidttyaccess *__restrict se
 	pattern = basevga_defaultfont[basevga_defaultfont_encode(ch)];
 	src     = &me->stx_display[start];
 	memcpy(src->sgc_lines, pattern, 16);
-	src->sgc_color = tty->at_ansi.at_color;
+	src->sgc_color = tty->at_color;
 	count          = num_cells - 1;
 	if unlikely(!count) {
 		/* Don't touch display memory when not active! */
@@ -613,12 +620,12 @@ svgadev_makettyaccess(struct svgadev *__restrict self,
 	/* Fill in missing standard fields. */
 	result->vta_refcnt  = 1;
 	atomic_lock_init(&result->vta_lock);
-	result->sta_mode            = mode;
 	result->vta_flags           = VIDTTYACCESS_F_NORMAL;
 	result->vta_cursor.vtc_word = 0;
-	result->vta_cellw   = 9;
-	result->vta_cellh   = 16;
-	result->vta_destroy = &svga_ttyaccess_destroy;
+	result->vta_cellw           = 9;
+	result->vta_cellh           = 16;
+	result->vta_destroy         = &svga_ttyaccess_destroy;
+	result->sta_mode            = mode;
 	return result;
 }
 
