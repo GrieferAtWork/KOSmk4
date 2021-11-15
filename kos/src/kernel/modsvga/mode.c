@@ -28,9 +28,11 @@
 #include <kernel/driver.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/rt/except-handler.h> /* userexcept_sysret_inject_self() */
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
+#include <sched/posix-signal.h> /* task_raisesignalprocessgroup() */
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -398,7 +400,7 @@ NOTHROW(FCALL convert_tty_contents)(struct svga_ttyaccess const *__restrict _ott
 }
 
 /* Safely update the tty pointed-to by `self->vty_tty' */
-INTERN BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
+PRIVATE BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
 svgatty_settty(struct svgatty *__restrict self,
                struct svga_ttyaccess *__restrict ntty) {
 	struct svga_ttyaccess *otty;
@@ -472,6 +474,37 @@ svgatty_settty(struct svgatty *__restrict self,
 	atomic_lock_release(&ntty->vta_lock);
 }
 
+/* Same   as  `svgatty_settty()',  but  follow  up  by  sending
+ * SIGWINCH to the foreground process group of an attached tty. */
+PRIVATE BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
+svgatty_settty_with_winch(struct svgatty *__restrict self,
+                          struct svga_ttyaccess *__restrict ntty) {
+	REF struct mkttydev *utty;
+	REF struct taskpid *fgpid;
+	REF struct task *fgproc;
+	svgatty_settty(self, ntty);
+	utty = awref_get(&self->at_tty);
+	if (!utty)
+		return; /* No tty attached. */
+	fgpid = axref_get(&utty->t_fproc);
+	decref_unlikely(utty);
+	if (!fgpid)
+		return; /* No foreground process. */
+	fgproc = taskpid_gettask(fgpid);
+	decref_unlikely(fgpid);
+	if (!fgproc)
+		return; /* Foreground process died. */
+	{
+		FINALLY_DECREF_UNLIKELY(fgproc);
+		task_raisesignalprocessgroup(fgproc, SIGWINCH);
+	}
+
+	/* In case the calling process is part of the same group,
+	 * enqueue the calling thread to try serving the signal
+	 * after the current system call returns. */
+	userexcept_sysret_inject_self();
+}
+
 
 
 
@@ -513,7 +546,7 @@ svgatty_ioctl_setmode(struct svgatty *__restrict self,
 	FINALLY_DECREF_UNLIKELY(newtty);
 
 	/* Set the new tty. */
-	svgatty_settty(self, newtty);
+	svgatty_settty_with_winch(self, newtty);
 	return 0;
 }
 

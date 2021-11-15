@@ -143,11 +143,6 @@ struct svgatty: vidtty { };
 #define fnode_assvgatty(self)      vidtty_assvga(fnode_asansitty(self))
 #define mfile_assvgatty(self)      vidtty_assvga(mfile_asansitty(self))
 
-/* Safely update the tty pointed-to by `self->sty_tty' */
-INTDEF BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
-svgatty_settty(struct svgatty *__restrict self,
-               struct svga_ttyaccess *__restrict tty);
-
 
 
 
