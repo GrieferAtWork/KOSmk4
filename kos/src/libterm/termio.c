@@ -34,6 +34,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <limits.h> /* _POSIX_MAX_INPUT, _POSIX_MAX_CANON */
 #include <signal.h>
 #include <string.h>
@@ -1482,6 +1483,8 @@ libterminal_iread(struct terminal *__restrict self,
 #endif /* !__KERNEL__ */
 	if (!(mode & IO_NONBLOCK)) {
 		if (!result) {
+			if unlikely(!num_bytes)
+				return 0; /* Don't block in this case! */
 			/* Do a blocking read. */
 			result = libterminal_do_iread_chk_eofing(self, dst, num_bytes);
 #ifndef __KERNEL__
@@ -1512,6 +1515,16 @@ libterminal_iread(struct terminal *__restrict self,
 				result += temp;
 			}
 		}
+	} else if (result == 0 && num_bytes != 0 && !(mode & IO_NODATAZERO) &&
+	           !ringbuffer_closed(&self->t_ibuf)) {
+		/* Handle the case of a non-blocking read with no data available. */
+#ifdef __KERNEL__
+		/* No data available. */
+		THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+#else /* __KERNEL__ */
+		errno  = EWOULDBLOCK;
+		result = -1;
+#endif /* !__KERNEL__ */
 	}
 #ifndef __KERNEL__
 done:
