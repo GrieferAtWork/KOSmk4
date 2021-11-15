@@ -765,110 +765,33 @@ svgadev_v_setttyvideomode(struct viddev *__restrict self,
  * If another lock already exists, this function will block until
  * said lock is released. */
 PRIVATE BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vidlck *FCALL
-svgadev_v_newlck(struct viddev *__restrict self)
+svgadev_v_alloclck(struct viddev *__restrict self, struct vidtty *active_tty)
 		THROWS(E_IOERROR, E_WOULDBLOCK) {
 	struct svgadev *me = viddev_assvga(self);
 	REF struct svgalck *result;
-	/* One of the branches below wouldn't be NOEXCEPT if preemption wasn't enabled... */
-	if (!PREEMPTION_ENABLED())
-		THROW(E_WOULDBLOCK_PREEMPTED);
 	result = (REF struct svgalck *)kmalloc(offsetof(struct svgalck, slc_xregs) +
 	                                       me->svd_chipset.sc_ops.sco_regsize,
 	                                       GFP_NORMAL);
 	TRY {
-		REF struct mfile *active;
-		struct svgatty *active_tty;
-again:
-		active = awref_get(&me->vd_active);
-		if (!active) {
-			if (awref_ptr(&me->vd_active) == NULL)
-				goto got_active;
-			/* wait for the lock to fully go again. */
-			shared_lock_pollconnect(&me->vd_lock);
-			active = awref_get(&me->vd_active);
-			if unlikely(active) {
-				task_disconnectall();
-				goto got_active;
-			}
-			task_waitfor();
-			goto again;
-		}
-got_active:
+		/* Save Base-VGA registers. */
+		basevga_getregs(&result->slc_vmode);
 
-		/* Check if the active object is another lock. */
-		FINALLY_XDECREF_UNLIKELY(active);
-		if (active && svga_active_islck(active)) {
-			/* Wait for the lock to go away. */
-			shared_lock_pollconnect(&me->vd_lock);
-			if (awref_ptr(&me->vd_active) != active) {
-				task_disconnectall();
-				goto again;
-			}
-			task_waitfor();
-			goto again;
-		}
-		assert(!active || svga_active_istty(active));
-		active_tty = (struct svgatty *)mfile_asansitty(active);
-
-		/* All right! Now get a lock to the chipset and
-		 * check  that the active object didn't change. */
-		viddev_acquire(me);
-		RAII_FINALLY { viddev_release(me); };
-		if unlikely(awref_ptr(&me->vd_active) != active_tty)
-			goto again;
-
-		/* Disable the active tty. */
-		if (active_tty) {
-			struct svga_ttyaccess *tty;
-			tty = vidttyaccess_assvga(arref_ptr(&active_tty->vty_tty));
-			atomic_lock_acquire(&tty->vta_lock);
-			assert(active_tty->vty_active);
-			assert(tty->vta_flags & VIDTTYACCESS_F_ACTIVE);
-			tty->vta_flags &= ~VIDTTYACCESS_F_ACTIVE;
-			active_tty->vty_active = 0;
-			atomic_lock_release(&tty->vta_lock);
-		}
-		TRY {
-			/* Save Base-VGA registers. */
-			basevga_getregs(&result->slc_vmode);
-
-			/* Save chipset-specific registers. */
-			(*me->svd_chipset.sc_ops.sco_getregs)(&me->svd_chipset, result->slc_xregs);
-		} EXCEPT {
-			/* Re-activate the old TTY */
-			if (active_tty) {
-				struct vidttyaccess *tty;
-				tty = arref_ptr(&active_tty->vty_tty);
-				atomic_lock_acquire(&tty->vta_lock); /* NOTHROW because preemption is enabled! */
-				tty->vta_flags |= VIDTTYACCESS_F_ACTIVE;
-				active_tty->vty_active = 1;
-				(*tty->vta_activate)(tty);
-				atomic_lock_release(&tty->vta_lock);
-			}
-			RETHROW();
-		}
-
-		/* NOEXCEPT FROM HERE ON! */
-
-		/* Fill remaining fields. */
-		_vidlck_init(result, &svgalck_ops);
-		incref(me);       /* For `result->vlc_dev' */
-		incref(active_tty); /* For `result->vlc_oldtty' */
-		result->vlc_dev    = me;
-		result->vlc_oldtty = active_tty;
-		result->slc_mode   = NULL; /* No video mode override (yet) */
-
-		/* If we're overriding  an active TTY,  then
-		 * we know what the previous video-mode was! */
-		if (active_tty != NULL)
-			result->slc_mode = vidttyaccess_assvga(arref_ptr(&active_tty->vty_tty))->sta_mode;
-
-		/* Remember that `result' is now active. */
-		awref_set(&me->vd_active, result);
+		/* Save chipset-specific registers. */
+		(*me->svd_chipset.sc_ops.sco_getregs)(&me->svd_chipset, result->slc_xregs);
 	} EXCEPT {
 		kfree(result);
 		RETHROW();
 	}
+
+	/* Fill in operators. (as requirested by the caller) */
+	result->mf_ops = &svgalck_ops.vlo_file;
+
+	/* If we're overriding an active TTY, then we know what the current video-mode is! */
+	result->slc_mode = NULL;
+	if (active_tty != NULL)
+		result->slc_mode = vidttyaccess_assvga(arref_ptr(&active_tty->vty_tty))->sta_mode;
+
+	/* All other fields of `result' are filled by the caller! */
 	return result;
 }
 
@@ -891,7 +814,7 @@ INTERN_CONST struct viddev_ops const svgadev_ops = {
 		.no_wrattr = &viddev_v_wrattr,
 	}}}},
 	.vdo_setttyvideomode = &svgadev_v_setttyvideomode,
-	.vdo_newlck          = &svgadev_v_newlck,
+	.vdo_alloclck        = &svgadev_v_alloclck,
 };
 
 

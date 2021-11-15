@@ -414,8 +414,9 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 /* Default operators for `struct vidlck' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vidlck_v_destroy)(struct mfile *__restrict self);
-#define vidlck_v_hop   mfile_v_hop
-#define vidlck_v_ioctl mfile_v_ioctl
+#define vidlck_v_hop        mfile_v_hop
+#define vidlck_v_ioctl      mfile_v_ioctl
+#define vidlck_v_stream_ops UNDEFINED
 
 
 
@@ -445,9 +446,14 @@ struct viddev_ops {
 	                             struct vidttyaccess const *__restrict tty)
 			THROWS(E_IOERROR);
 
-	/* [1..1] Create a new video lock. */
-	BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vidlck *
-	(FCALL *vdo_newlck)(struct viddev *__restrict self)
+	/* [1..1][lock(self->vd_lock)]
+	 * Allocate a new video lock. This operator must _ONLY_ initialize the fields:
+	 *  - return->_vidlck_file_ mf_ops = &MY_vidlck_ops.vlo_file; # Something that includes a destructor that calls `vidlck_v_destroy()'
+	 *  - return->...                                             # Sub-class specific fields (primarily including video registers)
+	 * All other fields are initialized by the caller. */
+	BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vidlck *
+	(FCALL *vdo_alloclck)(struct viddev *__restrict self,
+	                      struct vidtty *active_tty)
 			THROWS(E_IOERROR, E_WOULDBLOCK);
 };
 
@@ -501,8 +507,8 @@ FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) REF struct vidtty *FCALL
 viddev_getactivetty(struct viddev *__restrict self);
 
 /* Create a new video lock object for a given video device. */
-#define viddev_newlck(self) \
-	((*viddev_getops(self)->vdo_newlck)(self))
+FUNDEF BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vidlck *FCALL
+viddev_newlck(struct viddev *__restrict self);
 
 
 /* Default operators for `struct viddev'. */

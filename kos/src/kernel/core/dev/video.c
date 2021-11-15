@@ -805,6 +805,113 @@ got_active:
 	}
 }
 
+/* Create a new video lock object for a given video device. */
+PUBLIC BLOCKING NOCONNECT WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vidlck *FCALL
+viddev_newlck(struct viddev *__restrict self) {
+	REF struct vidlck *result;
+	REF struct mfile *active;
+	struct vidtty *active_tty;
+	/* One of the branches below wouldn't be NOEXCEPT if preemption wasn't enabled... */
+	if (!PREEMPTION_ENABLED())
+		THROW(E_WOULDBLOCK_PREEMPTED);
+again:
+	active = awref_get(&self->vd_active);
+	if (!active) {
+		if (awref_ptr(&self->vd_active) == NULL)
+			goto got_active;
+		/* wait for the lock to fully go again. */
+		shared_lock_pollconnect(&self->vd_lock);
+		active = awref_get(&self->vd_active);
+		if unlikely(active) {
+			task_disconnectall();
+			goto got_active;
+		}
+		task_waitfor();
+		goto again;
+	}
+got_active:
+
+	/* Check if the active object is another lock. */
+	FINALLY_XDECREF_UNLIKELY(active);
+	if (active && !mfile_isvidtty(active)) {
+		/* Wait for the lock to go away. */
+		shared_lock_pollconnect(&self->vd_lock);
+		if (awref_ptr(&self->vd_active) != active) {
+			task_disconnectall();
+			goto again;
+		}
+		task_waitfor();
+		goto again;
+	}
+	assert(!active || mfile_isvidtty(active));
+	active_tty = mfile_asvidtty(active);
+
+	/* All right! Now get a lock to the chipset and
+	 * check  that the active object didn't change. */
+	viddev_acquire(self);
+	RAII_FINALLY { viddev_release(self); };
+	if unlikely(awref_ptr(&self->vd_active) != active_tty)
+		goto again;
+
+	/* Disable the active tty. */
+	if (active_tty) {
+		struct vidttyaccess *tty;
+		tty = arref_ptr(&active_tty->vty_tty);
+		atomic_lock_acquire(&tty->vta_lock);
+		assert(active_tty->vty_active);
+		assert(tty->vta_flags & VIDTTYACCESS_F_ACTIVE);
+		tty->vta_flags &= ~VIDTTYACCESS_F_ACTIVE;
+		active_tty->vty_active = 0;
+		atomic_lock_release(&tty->vta_lock);
+	}
+	TRY {
+		/* Use the designated operator to allocate the raw video lock,
+		 * and populate its device-specific data-area with a snapshot
+		 * of the current register state. */
+		struct viddev_ops const *ops;
+		ops    = viddev_getops(self);
+		result = (*ops->vdo_alloclck)(self, active_tty);
+	} EXCEPT {
+		/* Re-activate the old TTY */
+		if (active_tty) {
+			struct vidttyaccess *tty;
+			tty = arref_ptr(&active_tty->vty_tty);
+			atomic_lock_acquire(&tty->vta_lock); /* NOTHROW because preemption is enabled! */
+			tty->vta_flags |= VIDTTYACCESS_F_ACTIVE;
+			active_tty->vty_active = 1;
+			(*tty->vta_activate)(tty);
+			atomic_lock_release(&tty->vta_lock);
+		}
+		RETHROW();
+	}
+
+	/* NOEXCEPT FROM HERE ON! */
+	assert(result->mf_ops);
+	assert(result->mf_ops->mo_destroy);
+
+	/* Fill remaining fields. */
+	__mfile_init_wrlockpc(result) _mfile_init_common(result);
+	_mfile_init_blockshift(result, PAGESHIFT, PAGESHIFT);
+	result->mf_parts             = MFILE_PARTS_ANONYMOUS;
+	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
+	atomic64_init(&result->mf_filesize, 0),
+	result->mf_flags = (MFILE_F_READONLY | MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+	                    MFILE_F_NOATIME | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+	                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE),
+	result->mf_atime = realtime();
+	result->mf_mtime = result->mf_atime;
+	result->mf_ctime = result->mf_atime;
+	incref(self);       /* For `result->vlc_dev' */
+	incref(active_tty); /* For `result->vlc_oldtty' */
+	result->vlc_dev    = self;
+	result->vlc_oldtty = active_tty;
+
+	/* Remember that `result' is now active. */
+	awref_set(&self->vd_active, result);
+	return result;
+}
+
+
 /* Default operators for `struct viddev'. */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 viddev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
