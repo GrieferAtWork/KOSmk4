@@ -27,7 +27,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/ioctl/video.h>
 #include <kos/types.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -90,19 +89,27 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
 	return result;
 }
 
+
+#if 0
 PRIVATE NONNULL((1)) void LIBVIDEO_CODEC_CC
 screen_pal_destroy(struct video_palette *__restrict self) {
 	free(self->vp_cache);
 	free(self);
 }
 
-
 PRIVATE struct video_rambuffer *screen_buffer = NULL;
+#endif
+
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
  * Note that  screen buffer  access  is only  granted to  ROOT  and the  window  server */
 INTERN WUNUSED /*REF*/ struct video_buffer *CC
 libvideo_buffer_screen(void) {
+#if 1
+	/* TODO: Re-implement for svga */
+	errno = ENOSYS;
+	return NULL;
+#else
 	fd_t driver;
 	struct video_rambuffer *result;
 	struct vd_format format;
@@ -170,6 +177,7 @@ err_r:
 	free(result);
 err:
 	return NULL;
+#endif
 }
 
 

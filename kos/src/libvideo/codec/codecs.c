@@ -1246,7 +1246,7 @@ pal_pixel2color(struct video_format const *__restrict format,
 	assert(pal);
 	if (pixel >= pal->vp_cnt)
 		return VIDEO_COLOR_RGB(0, 0, 0);
-	return pal->vp_pal.vdp_pal[pixel];
+	return pal->vp_pal[pixel];
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
@@ -1323,7 +1323,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	case codec: {                                                       \
 		PRIVATE struct video_codec const _codec_##codec = {             \
 			/* .vc_codec                  = */ codec,                   \
-			/* ._vc_flags                 = */ VD_FORMAT_FLAG_NORMAL,   \
+			/* ._vc_flags                 = */ VIDEO_CODEC_FLAG_NORMAL, \
 			/* .vc_align                  = */ align,                   \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements, \
 			/* .vc_getpixel               = */ &getpixel,               \
@@ -1342,7 +1342,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	case codec: {                                                               \
 		PRIVATE struct video_codec _codec_##codec = {                           \
 			/* .vc_codec  = */ codec,                                           \
-			/* ._vc_flags = */ VD_FORMAT_FLAG_NORMAL,                           \
+			/* ._vc_flags = */ VIDEO_CODEC_FLAG_NORMAL,                         \
 			/* .vc_align  = */ align                                            \
 		};                                                                      \
 		if (!_codec_##codec.vc_color2pixel) {                                   \

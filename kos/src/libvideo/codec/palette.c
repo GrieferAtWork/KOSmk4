@@ -65,7 +65,7 @@ calculate_best_matching_palette_pixel(struct video_palette const *__restrict sel
 		size_t delta;
 		video_color_t color2;
 		uint8_t r2, g2, b2;
-		color2 = self->vp_pal.vdp_pal[i];
+		color2 = self->vp_pal[i];
 		r2     = VIDEO_COLOR_GET_RED(color2);
 		g2     = VIDEO_COLOR_GET_GREEN(color2);
 		b2     = VIDEO_COLOR_GET_BLUE(color2);

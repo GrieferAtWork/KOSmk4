@@ -947,38 +947,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    provided buffer to the operator.
 	 */
 
-	/* TODO: New library `libsvgalib'.
-	 *
-	 * Design:
-	 *   /kos/include/libsvga
-	 *     - Includes emulations of the normal svgalib's headers
-	 *     - Includes additional kos-specific headers, including
-	 *       those for individual VGA card drivers
-	 *   /kos/src/libsvga
-	 *     - Source. Can be compiled both in user- and kernel-space
-	 *     - Both versions are pretty much  the same, but the  kernel
-	 *       version may be stripped down, but also include a special
-	 *       VGA display mode where  the kernel won't interfere  with
-	 *       user-space  (except  for  when the  builtin  debugger is
-	 *       being shown)
-	 *     - Includes normal VGA driver and one that takes to the BIOS
-	 *       Once those are working, maybe  take a closer look at  the
-	 *       svga sources for more drivers. (Be careful about license)
-	 *   /kos/src/kernel/modsvga
-	 *     - Includes the sources from /kos/src/libsvga
-	 *     - When loaded as a driver, tries to switch to graphics
-	 *       mode which it uses to emulate a high-resolution tty.
-	 *       If graphics mode cannot be enabled, fall back to the
-	 *       normal 80x25 text mode
-	 *
-	 * Once all of this has been implemented, get rid of the current
-	 * modvga  and libvgastate; all of this stuff will be handled by
-	 * the new libsvga
-	 *
-	 * Also: the builtin debugger must consult with modsvga (if loaded)
-	 * and (if  not loaded)  will contain  minimal code  to set-up  the
-	 * normal 80x25 text mode. */
-
 	/* TODO: Remove the old kernel <sched/shared_[rw]lock.h> headers */
 
 	/* TODO: We can emulate banked video memory as linear by using a
@@ -1004,16 +972,31 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *                            faulted area.
 	 */
 
-	/* TODO: Write a user-space program with which to control svga video modes:
-	 *  - List modes
-	 *  - Select modes
-	 *  - Create TTYs
-	 */
-
 	/* TODO: Add a way for driver parameters to be supplemented by the kernel commandline.
 	 *       Drivers loaded later should  still be able to  take parameters from the  boot
 	 *       commandline, such as the default-resolution arguments of modsvga which should
 	 *       really also be read from the that source! */
+
+	/* TODO: vesa exposes the preferred resolution via a command:
+	 *       https://wiki.osdev.org/EDID
+	 * Use this as default values in modsvga! */
+
+	/* TODO: Check out `readelf kernel.bin' for .text.local.* sections that:
+	 *  #1: Indicate function that should be marked as [kernel] in libc/magic
+	 *  #2: Need to be inlined into .text */
+
+
+	/* TODO: Generalize the modsvga data system into an in-kernel interface.
+	 *  - This system must also include operators usable for the builtin
+	 *    debugger to obtain a simple text-mode console via some kind of
+	 *    "default video adapter" (if this adapter isn't present, _then_
+	 *    an arch-specific fallback should be used)
+	 *  - Once all of this has been done, get rid of libvgastate
+	 *  - Once that too has been done, probably rename all of the "svga"
+	 *    stuff into "vga". - Our "libsvga" (then "libvga") should  only
+	 *    concern itself with chipset drivers; anything beyond should go
+	 *    into a different library (which can then be called libsvga)
+	 */
 
 	return state;
 }

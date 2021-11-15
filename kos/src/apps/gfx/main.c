@@ -25,7 +25,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/ioctl/video.h>
 #include <kos/refptr.h>
 #include <kos/types.h>
 #include <linux/kd.h>

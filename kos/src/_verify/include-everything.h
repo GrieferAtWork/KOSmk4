@@ -650,7 +650,6 @@ incdir("");
 #include <kos/ioctl/keyboard.h>
 #include <kos/ioctl/mouse.h>
 #include <kos/ioctl/tty.h>
-#include <kos/ioctl/video.h>
 #include <kos/kernel/handle.h>
 #include <kos/kernel/memory.h>
 #include <kos/kernel/syscalls.h>

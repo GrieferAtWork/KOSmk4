@@ -28,7 +28,6 @@
 #include <hybrid/atomic.h>
 
 #include <bits/types.h>
-#include <kos/ioctl/video.h>
 #include <kos/refcnt.h>
 
 #include "pixel.h"
@@ -43,10 +42,10 @@ struct video_palette {
 	/* [1..1][const] Destruction callback (invoked when `vp_refcnt' reaches `0') */
 	__ATTR_NONNULL((1)) void
 	(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
-	__uintptr_t                 vp_refcnt; /* Reference counter. */
-	struct video_palette_cache *vp_cache;  /* [0..1][owned(malloc)][lock(WRITE_ONCE)] Color->pixel converter cache */
-	__size_t                    vp_cnt;    /* [const] # of colors (== VIDEO_CODEC_PALSIZ(...)). */
-	struct vd_palette           vp_pal;    /* [const] OS palette data. */
+	__uintptr_t                            vp_refcnt; /* Reference counter. */
+	struct video_palette_cache            *vp_cache;  /* [0..1][owned(malloc)][lock(WRITE_ONCE)] Color->pixel converter cache */
+	__size_t                               vp_cnt;    /* [const] # of colors (== VIDEO_CODEC_PALSIZ(...)). */
+	COMPILER_FLEXIBLE_ARRAY(video_color_t, vp_pal);   /* [VIDEO_CODEC_PALSIZ(*)] Palette colors. */
 };
 
 #define video_palette_destroy(self) (*(self)->vp_destroy)(self)

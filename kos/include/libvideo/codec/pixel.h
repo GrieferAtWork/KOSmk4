@@ -25,7 +25,6 @@
 #include <hybrid/byteorder.h>
 
 #include <bits/types.h>
-#include <kos/ioctl/video.h>
 
 __DECL_BEGIN
 
@@ -40,7 +39,7 @@ __DECL_BEGIN
 #define VIDEO_COLOR_BLUE_SHIFT   16
 #define VIDEO_COLOR_ALPHA_MASK   __UINT32_C(0xff000000)
 #define VIDEO_COLOR_ALPHA_SHIFT  24
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 #define VIDEO_COLOR_RED_MASK     __UINT32_C(0xff000000)
 #define VIDEO_COLOR_RED_SHIFT    24
 #define VIDEO_COLOR_GREEN_MASK   __UINT32_C(0x00ff0000)
@@ -49,7 +48,7 @@ __DECL_BEGIN
 #define VIDEO_COLOR_BLUE_SHIFT   8
 #define VIDEO_COLOR_ALPHA_MASK   __UINT32_C(0x000000ff)
 #define VIDEO_COLOR_ALPHA_SHIFT  0
-#endif
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 #define VIDEO_COLOR_GET_RED(color)   __CCAST(__uint8_t)(((color) & VIDEO_COLOR_RED_MASK) >> VIDEO_COLOR_RED_SHIFT)
 #define VIDEO_COLOR_GET_GREEN(color) __CCAST(__uint8_t)(((color) & VIDEO_COLOR_GREEN_MASK) >> VIDEO_COLOR_GREEN_SHIFT)
@@ -90,8 +89,8 @@ __DECL_BEGIN
 #define VIDEO_COLOR_DARK_GRAY  VIDEO_COLOR_GREY
 
 #ifdef __CC__
-typedef vd_color_t video_color_t; /* General-purpose */
-typedef vd_pixel_t video_pixel_t; /* Codec-specific */
+typedef __uint32_t video_color_t; /* General-purpose */
+typedef __uint32_t video_pixel_t; /* Codec-specific */
 #endif /* __CC__ */
 
 __DECL_END

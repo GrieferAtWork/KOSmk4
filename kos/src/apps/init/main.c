@@ -154,32 +154,25 @@ done_tmpfs:
 
 	/* Construct /dev/console from the VGA display, and a keyboard. */
 	{
+		struct svga_maketty tty;
 		fd_t i, console, display, keyboard;
 		keyboard = open("/dev/usbkba", O_RDONLY | O_CLOEXEC, 0);
 		if (keyboard < 0)
 			keyboard = open("/dev/ps2kbd1", O_RDONLY | O_CLOEXEC, 0);
 		if (keyboard < 0)
 			keyboard = Open("/dev/ps2kbd2", O_RDONLY | O_CLOEXEC, 0);
-		display = open("/dev/svga", O_WRONLY | O_CLOEXEC, 0);
-#if 1 /* Backwards compat (for now) */
-		if (display < 0) {
-			KSysctlInsmod("vga", NULL);
-			display = Open("/dev/vga", O_WRONLY | O_CLOEXEC, 0);
-		} else
-#endif
-		{
-			/* Construct ansitty device /dev/svga1 */
-			struct svga_maketty tty;
-			memset(&tty, 0, sizeof(tty));
-			tty.smt_res.of_mode  = HOP_OPENFD_MODE_AUTO;
-			tty.smt_res.of_flags = IO_CLOEXEC | IO_CLOFORK;
-			Ioctl(display, SVGA_IOC_GETDEFMODE, &tty.smt_mode);
-			tty.smt_name = "svga1";
-			Ioctl(display, SVGA_IOC_MAKETTY, &tty);
-			close(display);
-			display = tty.smt_res.of_hint;
-			Ioctl(display, SVGA_IOC_ACTIVATE);
-		}
+		display = Open("/dev/svga", O_WRONLY | O_CLOEXEC, 0);
+
+		/* Construct ansitty device /dev/svga1 */
+		memset(&tty, 0, sizeof(tty));
+		tty.smt_res.of_mode  = HOP_OPENFD_MODE_AUTO;
+		tty.smt_res.of_flags = IO_CLOEXEC;
+		Ioctl(display, SVGA_IOC_GETDEFMODE, &tty.smt_mode);
+		tty.smt_name = "svga1";
+		Ioctl(display, SVGA_IOC_MAKETTY, &tty);
+		close(display);
+		display = tty.smt_res.of_hint;
+		Ioctl(display, SVGA_IOC_ACTIVATE);
 
 		console = sys_Xmktty("console", keyboard, display, 0);
 		close(keyboard);

@@ -925,9 +925,11 @@ svga_makettyaccess_gfx(struct svgadev *__restrict UNUSED(self),
 			struct vga_palcolor col;
 			uint32_t dcl; /* DirectCoLor */
 			col = basevga_defaultpal[i];
-			dcl = (((col.vpc_r << 2) >> (8 - mode->smi_rbits)) << mode->smi_rshift) |
-			      (((col.vpc_g << 2) >> (8 - mode->smi_gbits)) << mode->smi_gshift) |
-			      (((col.vpc_b << 2) >> (8 - mode->smi_bbits)) << mode->smi_bshift);
+#define sixbit2eight(x) ((((x) + 1) << 2) - 1)
+			dcl = ((sixbit2eight(col.vpc_r) >> (8 - mode->smi_rbits)) << mode->smi_rshift) |
+			      ((sixbit2eight(col.vpc_g) >> (8 - mode->smi_gbits)) << mode->smi_gshift) |
+			      ((sixbit2eight(col.vpc_b) >> (8 - mode->smi_bbits)) << mode->smi_bshift);
+#undef sixbit2eight
 			result->stx_colors[i] = dcl;
 		}
 	}

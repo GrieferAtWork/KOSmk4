@@ -27,7 +27,6 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <kos/ioctl/video.h>
 
 #include "pixel.h"
 
@@ -89,8 +88,11 @@ __DECL_BEGIN
 #define VIDEO_CODEC_PALSIZ(x) (__CCAST(__size_t)1 << ((x) & 0xf))
 
 
+/* Normal codec flags. */
+#define VIDEO_CODEC_FLAG_NORMAL 0x0000
+
 #ifdef __CC__
-typedef vd_codec_t video_codec_t; /* One of `VIDEO_CODEC_*' */
+typedef __uint16_t video_codec_t; /* One of `VIDEO_CODEC_*' */
 
 struct video_rambuffer_requirements {
 	__size_t vbs_bufsize; /* Minimal buffer size (in bytes) */
@@ -101,7 +103,7 @@ struct video_format;
 struct video_codec {
 	/* Video format operations. */
 	video_codec_t vc_codec; /* [const] Video format codec (One of `VIDEO_FORMAT_*') */
-	__uint16_t   _vc_flags; /* [const] Video format flags (Set of `VD_FORMAT_FLAG_*') */
+	__uint16_t   _vc_flags; /* [const] Video format flags (Set of `VIDEO_CODEC_FLAG_*') */
 	__uint32_t    vc_align; /* [!0][const] Byte alignment requirements for base_addr/stride of buffers using this codec. */
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 
