@@ -140,9 +140,9 @@ NOTHROW(FCALL svga_ttyaccess_v_activate_txt)(struct vidttyaccess *__restrict sel
 	basevga_wrvmem(fontbase, basevga_defaultfont, sizeof(basevga_defaultfont));
 
 	/* Populate the video text page with the expected contents. */
-	memcpy(svga_ttyaccess_txt_vmem(me),
-	       svga_ttyaccess_txt_dmem(me),
-	       me->vta_scan * me->vta_resx);
+	memcpyw(svga_ttyaccess_txt_vmem(me),
+	        svga_ttyaccess_txt_dmem(me),
+	        me->vta_scan * me->vta_resy);
 }
 
 INTERN NOBLOCK NONNULL((1, 2)) void
@@ -338,11 +338,10 @@ svga_makettyaccess_txt(struct svgadev *__restrict UNUSED(self),
 	result->vta_scroll_yend   = result->vta_resy;
 	_vidttyaccess_update_scrl(result);
 
-	/* Fill in the saved display state.
-	 * This is the only time we read from display memory! */
-	memcpy(svga_ttyaccess_txt_dmem(result),
-	       svga_ttyaccess_txt_vmem(result),
-	       dispsz);
+	/* Fill in the saved display state. */
+	memsetw(svga_ttyaccess_txt_dmem(result),
+	        ' ' | (ANSITTY_CL_DEFAULT << 8),
+	        result->vta_scan * result->vta_resy);
 	return result;
 }
 
