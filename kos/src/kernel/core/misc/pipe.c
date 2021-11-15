@@ -35,6 +35,8 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
+#include <sched/posix-signal.h>
+#include <sched/rpc.h>
 
 #include <hybrid/atomic.h>
 
@@ -466,6 +468,17 @@ handle_pipe_hop(struct pipe *__restrict self,
 
 
 
+INTERN ATTR_NORETURN void KCALL pipe_throw_broken_pipe(void) {
+	/* Posix requires that we raise(SIGPIPE) in this scenario... */
+	task_raisesignalthread(THIS_TASK, SIGPIPE);
+	task_serve();
+
+	/* If SIGPIPE is being ignored, we must instead throw some
+	 * exception that  causes user-space  to set  errno=EPIPE. */
+	THROW(E_INVALID_ARGUMENT_BAD_STATE,
+	      E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS);
+}
+
 INTERN size_t KCALL
 handle_pipe_read(struct pipe *__restrict self,
                  USER CHECKED void *dst,
@@ -488,10 +501,14 @@ handle_pipe_write(struct pipe *__restrict self,
 	size_t result;
 	if (mode & IO_NONBLOCK) {
 		result = ringbuffer_write_nonblock(&self->p_buffer, src, num_bytes);
-		if (!result && num_bytes && !(mode & IO_NODATAZERO) && !ringbuffer_closed(&self->p_buffer))
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 	} else {
 		result = ringbuffer_write(&self->p_buffer, src, num_bytes);
+	}
+	if (!result && num_bytes) {
+		if (ringbuffer_closed(&self->p_buffer))
+			pipe_throw_broken_pipe(); /* Pipe has been broken. */
+		if (/*(mode & IO_NONBLOCK) && */!(mode & IO_NODATAZERO))
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 	}
 	return result;
 }
@@ -530,12 +547,18 @@ handle_pipe_writev(struct pipe *__restrict self,
 	IOV_BUFFER_FOREACH(ent, src) {
 		if (result) {
 			temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ive_base, ent.ive_size);
-		} else if (mode & IO_NONBLOCK) {
-			temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ive_base, ent.ive_size);
-			if (!temp && ent.ive_size && !(mode & IO_NODATAZERO) && !ringbuffer_closed(&self->p_buffer))
-				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 		} else {
-			temp = ringbuffer_write(&self->p_buffer, ent.ive_base, ent.ive_size);
+			if (mode & IO_NONBLOCK) {
+				temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ive_base, ent.ive_size);
+			} else {
+				temp = ringbuffer_write(&self->p_buffer, ent.ive_base, ent.ive_size);
+			}
+			if (!temp && ent.ive_size) {
+				if (ringbuffer_closed(&self->p_buffer))
+					pipe_throw_broken_pipe(); /* Pipe has been broken. */
+				if (/*(mode & IO_NONBLOCK) && */ !(mode & IO_NODATAZERO))
+					THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
+			}
 		}
 		result += temp;
 		if (temp < ent.ive_size)

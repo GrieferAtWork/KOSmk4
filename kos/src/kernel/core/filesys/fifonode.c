@@ -168,6 +168,9 @@ again_read_ent:
 	return result;
 }
 
+/* From "misc/pipe.c" */
+INTDEF ATTR_NORETURN void KCALL pipe_throw_broken_pipe(void);
+
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 ffifonode_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
                   size_t num_bytes, iomode_t mode) THROWS(...) {
@@ -176,14 +179,7 @@ ffifonode_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
 again:
 	if (!ATOMIC_READ(me->ff_rdcnt)) {
 no_readers:
-		/* Posix requires that we raise(SIGPIPE) in this scenario... */
-		task_raisesignalthread(THIS_TASK, SIGPIPE);
-		task_serve();
-
-		/* If SIGPIPE is being ignored, we must instead throw some
-		 * exception that  causes user-space  to set  errno=EPIPE. */
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			  E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS);
+		pipe_throw_broken_pipe();
 	}
 	result = ringbuffer_write_nonblock(&me->ff_buffer,
 	                                   src, num_bytes);
@@ -233,14 +229,7 @@ ffifonode_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict 
 	(void)num_bytes;
 	if (!ATOMIC_READ(me->ff_rdcnt)) {
 no_readers:
-		/* Posix requires that we raise(SIGPIPE) in this scenario... */
-		task_raisesignalthread(THIS_TASK, SIGPIPE);
-		task_serve();
-
-		/* If SIGPIPE is being ignored, we must instead throw some
-		 * exception that  causes user-space  to set  errno=EPIPE. */
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			  E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS);
+		pipe_throw_broken_pipe();
 	}
 	IOV_BUFFER_FOREACH(ent, src) {
 again_write_ent:
