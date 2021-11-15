@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
 	struct svga_lsmodes lsm;
 	struct svga_modeinfo curmode;
 	size_t curmodeid;
+	bool has_curmode;
 	if likely(argc) {
 		--argc;
 		++argv;
@@ -101,17 +102,20 @@ int main(int argc, char *argv[]) {
 		err(1, "malloc(%" PRIuSIZ ", %" PRIuSIZ ")", lsm.svl_count, sizeof(struct svga_modeinfo));
 	if (ioctl(svga, SVGA_IOC_LSMODES, &lsm) < 0)
 		err(1, "ioctl(SVGA_IOC_LSMODES)");
-	if (ioctl(svga, SVGA_IOC_GETMODE, &curmode) < 0)
-		err(1, "ioctl(SVGA_IOC_GETMODE)");
-	for (curmodeid = 0; curmodeid < lsm.svl_count; ++curmodeid) {
-		if (memcmp(&lsm.svl_buf[curmodeid], &curmode, sizeof(struct svga_modeinfo)) == 0)
-			break;
+	has_curmode = ioctl(svga, SVGA_IOC_GETMODE, &curmode) >= 0;
+	curmodeid   = lsm.svl_count;
+	if (has_curmode) {
+		for (curmodeid = 0; curmodeid < lsm.svl_count; ++curmodeid) {
+			if (memcmp(&lsm.svl_buf[curmodeid], &curmode, sizeof(struct svga_modeinfo)) == 0)
+				break;
+		}
 	}
 	if (strcmp(command, "info") == 0) {
 		char *iter;
 		size_t i, longestnamelen;
 		struct svga_strings strings;
 		char csname[SVGA_CSNAMELEN];
+		struct winsize ws;
 		if (ioctl(svga, SVGA_IOC_GETCSNAME, csname) < 0)
 			err(1, "ioctl(SVGA_IOC_GETCSNAME)");
 		memset(&strings, 0, sizeof(strings));
@@ -131,12 +135,23 @@ int main(int argc, char *argv[]) {
 			iter += namelen + 1;     /* Skip name */
 			iter = strend(iter) + 1; /* Skip value */
 		}
-		printf("mode:    ");
-		printmode(curmodeid, 0, &curmode, otty);
-		printf(otty ? "\n"
-		              "chipset: " AC_WHITE("%s") "\n"
-		            : "\n"
-		              "chipset: %s\n",
+		if (ioctl(svga, TIOCGWINSZ, &ws) >= 0) {
+			printf(otty ? "ttydim:  " AC_WHITE("%u") "x"
+			                          AC_WHITE("%u") " ("
+			                          AC_WHITE("%u") "x"
+			                          AC_WHITE("%u") ")\n"
+			            : "ttydim:  %ux%u (%ux%u)\n",
+			       ws.ws_col, ws.ws_row,
+			       ws.ws_xpixel / ws.ws_col,
+			       ws.ws_ypixel / ws.ws_row);
+		}
+		if (has_curmode) {
+			printf("mode:    ");
+			printmode(curmodeid, 0, &curmode, otty);
+			putchar('\n');
+		}
+		printf(otty ? "chipset: " AC_WHITE("%s") "\n"
+		            : "chipset: %s\n",
 		       csname);
 		for (i = 0, iter = strings.svs_buf; i < strings.svs_count; ++i) {
 			char const *name, *value;
