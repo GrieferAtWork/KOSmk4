@@ -296,7 +296,7 @@ vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		return 0;
 
 	default:
-		return chrdev_v_ioctl(self, cmd, arg, mode);
+		return ansittydev_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
 	return 0;
