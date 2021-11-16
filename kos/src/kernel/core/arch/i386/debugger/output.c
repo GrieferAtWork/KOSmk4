@@ -32,6 +32,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/output.h>
 #ifdef CONFIG_USE_UNIFIED_OUTPUT
 #include <debugger/hook.h>
 #include <debugger/io.h>

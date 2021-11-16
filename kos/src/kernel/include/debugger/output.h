@@ -37,6 +37,12 @@
 #include <libansitty/ctl.h>
 #include <libc/string.h>
 
+
+#undef CONFIG_USE_UNIFIED_OUTPUT
+#if 1
+#define CONFIG_USE_UNIFIED_OUTPUT
+#endif
+
 DECL_BEGIN
 
 #ifdef __CC__

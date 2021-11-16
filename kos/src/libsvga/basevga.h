@@ -42,10 +42,6 @@ typedef __port_t port_t;
 INTDEF uint32_t basevga_flags;
 #define BASEVGA_FLAG_ISEGA 0x0001 /* FLAG: Video card is EGA-derived */
 
-INTDEF port_t basevga_CRT_I; /* Either `VGA_CRT_IC' or `VGA_CRT_IM' (as appropriate) */
-INTDEF port_t basevga_CRT_D; /* Either `VGA_CRT_DC' or `VGA_CRT_DM' (as appropriate) */
-INTDEF port_t basevga_IS1_R; /* Either `VGA_IS1_RC' or `VGA_IS1_RM' (as appropriate) */
-
 
 /* Initialize base-vga global variables.
  * This function initializes:
@@ -57,16 +53,16 @@ INTDEF void CC basevga_init(void);
 /* Get/Set standard VGA registers.
  * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
  * NOTE: Setting the basevga register state leaves the screen turned off! */
-INTDEF NONNULL((1)) void CC basevga_getregs(struct vga_mode *__restrict regs);
-INTDEF NONNULL((1)) void CC basevga_setregs(struct vga_mode const *__restrict regs);
+INTDEF NONNULL((1)) void CC basevga_getregs(struct vga_regs *__restrict regs);
+INTDEF NONNULL((1)) void CC basevga_setregs(struct vga_regs const *__restrict regs);
 
 /* Same as `basevga_setregs()', but preserve the state of reserved bits.
  * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
  * NOTE: This function leaves the screen turned off! */
-INTDEF NONNULL((1)) void CC basevga_setmode(struct vga_mode const *__restrict regs);
+INTDEF NONNULL((1)) void CC basevga_setmode(struct vga_mode const *__restrict mode);
 
 /* Current (assumed) EGA register state. */
-INTDEF struct vga_mode baseega_registers;
+INTDEF struct vga_regs baseega_registers;
 
 /* Read/write to/from the current color palette.
  * @param: color_index: Starting palette color index.

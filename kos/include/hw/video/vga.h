@@ -347,6 +347,19 @@ struct __ATTR_PACKED vga_mode {
 };
 
 
+/* Full VGA register state (not just mode registers) */
+struct __ATTR_PACKED vga_regs {
+	struct vga_mode vr_mode;      /* Mode registers. */
+	__uint8_t       vr_seq_reset; /* VGA_SEQ_RESET. */
+	__uint8_t       vr_ftc;       /* VGA_FTC_R. */
+	__uint8_t       vr_crt_index; /* VGA_CRT_DC / VGA_CRT_IC. */
+	__uint8_t       vr_seq_index; /* VGA_SEQ_I. */
+	__uint8_t       vr_gfx_index; /* VGA_GFX_I. */
+	__uint8_t       vr_att_index; /* VGA_ATT_IW. */
+
+};
+
+
 
 #if 1 /* DEPRECATED */
 struct __ATTR_PACKED vga_color {

@@ -129,16 +129,23 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_v_activate_txt)(struct vidttyaccess *__restrict self) {
 	struct svga_ttyaccess_txt *me;
 	uint32_t fontbase;
-	uint8_t cmap;
+	uint8_t temp;
 	me = vidttyaccess_assvga_txt(self);
 
 	/* Load the default font into video memory. */
-	cmap = baseega_registers.vm_seq_character_map;
+	temp = baseega_registers.vr_mode.vm_seq_character_map;
 	if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
-		cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
-	cmap     = VGA_SR03_CSETA_GET(cmap);
-	fontbase = 0x20000 + basevga_fontoffset[cmap];
+		temp = vga_rseq(VGA_SEQ_CHARACTER_MAP);
+	temp     = VGA_SR03_CSETA_GET(temp);
+	fontbase = 0x20000 + basevga_fontoffset[temp];
 	basevga_wrvmem(fontbase, basevga_defaultfont, sizeof(basevga_defaultfont));
+
+	temp = baseega_registers.vr_mode.vm_mis;
+	if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
+		temp = vga_rmis();
+	me->stt_crt_icX = VGA_CRT_IC;
+	if (!(temp & VGA_MIS_FCOLOR))
+		me->stt_crt_icX = VGA_CRT_IM;
 
 	/* Populate the video text page with the expected contents. */
 	memcpyw(svga_ttyaccess_txt_vmem(me),
@@ -164,7 +171,13 @@ NOTHROW(FCALL svga_ttyaccess_v_hidecursor_txt)(struct vidttyaccess *__restrict s
 	struct svga_ttyaccess_txt *me;
 	me = vidttyaccess_assvga_txt(self);
 	if (!(me->vta_flags & _SVGA_TTYACCESS_F_HWCUROFF)) {
-		vga_wcrt(VGA_CRTC_CURSOR_START, vga_rcrt(VGA_CRTC_CURSOR_START) | VGA_CRA_FCURSOR_DISABLE);
+		uint8_t temp;
+		temp = baseega_registers.vr_mode.vm_crt_cursor_start;
+		if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
+			temp = vga_rcrt(me->stt_crt_icX, VGA_CRTC_CURSOR_START);
+		temp |= VGA_CRA_FCURSOR_DISABLE;
+		vga_wcrt(me->stt_crt_icX, VGA_CRTC_CURSOR_START, temp);
+		baseega_registers.vr_mode.vm_crt_cursor_start = temp;
 		me->vta_flags |= _SVGA_TTYACCESS_F_HWCUROFF;
 	}
 }
@@ -179,13 +192,18 @@ NOTHROW(FCALL svga_ttyaccess_v_showcursor_txt)(struct vidttyaccess *__restrict s
 	address = me->vta_cursor.vtc_cellx +
 	          me->vta_cursor.vtc_celly *
 	          me->vta_scan;
-	vga_wcrt(VGA_CRTC_CURSOR_HI, (uint8_t)(address >> 8));
-	vga_wcrt(VGA_CRTC_CURSOR_LO, (uint8_t)(address));
+	vga_wcrt(me->stt_crt_icX, VGA_CRTC_CURSOR_HI, (uint8_t)(address >> 8));
+	vga_wcrt(me->stt_crt_icX, VGA_CRTC_CURSOR_LO, (uint8_t)(address));
 
 	/* Show the cursor if it was hidden before. */
 	if (me->vta_flags & _SVGA_TTYACCESS_F_HWCUROFF) {
-		vga_wcrt(VGA_CRTC_CURSOR_START, vga_rcrt(VGA_CRTC_CURSOR_START) & ~VGA_CRA_FCURSOR_DISABLE);
-		me->vta_flags &= ~_SVGA_TTYACCESS_F_HWCUROFF;
+		uint8_t temp;
+		temp = baseega_registers.vr_mode.vm_crt_cursor_start;
+		if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
+			temp = vga_rcrt(me->stt_crt_icX, VGA_CRTC_CURSOR_START);
+		temp &= ~VGA_CRA_FCURSOR_DISABLE;
+		vga_wcrt(me->stt_crt_icX, VGA_CRTC_CURSOR_START, temp);
+		baseega_registers.vr_mode.vm_crt_cursor_start = temp;
 	}
 }
 

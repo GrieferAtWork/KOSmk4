@@ -43,12 +43,6 @@ DECL_BEGIN
 /* Basic VGA adapter flags. (Set of `BASEVGA_FLAG_*') */
 INTERN uint32_t basevga_flags = 0;
 
-/* Initialized in `basevga_init()' */
-INTERN port_t basevga_CRT_I = 0; /* Either `VGA_CRT_IC' or `VGA_CRT_IM' (as appropriate) */
-INTERN port_t basevga_CRT_D = 0; /* Either `VGA_CRT_DC' or `VGA_CRT_DM' (as appropriate) */
-INTERN port_t basevga_IS1_R = 0; /* Either `VGA_IS1_RC' or `VGA_IS1_RM' (as appropriate) */
-
-
 /* Check if we're dealing */
 PRIVATE bool CC probe_ega(void) {
 	uint8_t saved, readback;
@@ -66,111 +60,110 @@ PRIVATE bool CC probe_ega(void) {
  * - basevga_IS1_R
  * Called during chipset driver probe functions. */
 INTERN void CC basevga_init(void) {
-	bool hascolor;
 	basevga_flags = 0;
 
 	/* Check if we've got an EGA board */
 	if (probe_ega())
 		basevga_flags |= BASEVGA_FLAG_ISEGA;
-
-	/* Check if we've got color emulation. */
-	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
-		hascolor = true; /* Special case for EGA */
-	} else {
-		hascolor = (inb(VGA_MIS_R) & 0x01) != 0;
-	}
-
-	/* Set-up the correct registers for color/mono mode. */
-	if (hascolor) {
-		basevga_IS1_R = VGA_IS1_RC;
-		basevga_CRT_I = VGA_CRT_IC;
-		basevga_CRT_D = VGA_CRT_DC;
-	} else {
-		basevga_IS1_R = VGA_IS1_RM;
-		basevga_CRT_I = VGA_CRT_IM;
-		basevga_CRT_D = VGA_CRT_DM;
-	}
 }
 
 
 /* Current (assumed) EGA register state. */
-INTERN struct vga_mode baseega_registers = VGAMODE_INIT_EGA_TEXT;
+INTERN struct vga_regs baseega_registers = {
+	.vr_mode = VGAMODE_INIT_EGA_TEXT,
+};
 
 /* Get/Set standard VGA registers.
  * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
  * NOTE: Setting the basevga register state leaves the screen turned off! */
 INTERN NONNULL((1)) void CC
-basevga_getregs(struct vga_mode *__restrict regs) {
+basevga_getregs(struct vga_regs *__restrict regs) {
 	unsigned int i;
+	port_t crc_ix, is1_rx;
 
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
 		/* Special case for EGA */
-		memcpy(regs, &baseega_registers, sizeof(struct vga_mode));
+		memcpy(regs, &baseega_registers, sizeof(struct vga_regs));
 		return;
 	}
 
-	/* Write registers. */
-	regs->vm_mis = vga_r(VGA_MIS_W);
+	/* Misc registers. */
+	regs->vr_mode.vm_mis = vga_rmis();
+	regs->vr_ftc         = vga_r(VGA_FTC_R);
+
+	/* Select ports. */
+	crc_ix = VGA_CRT_IC;
+	is1_rx = VGA_IS1_RC;
+	if (!(regs->vr_mode.vm_mis & VGA_MIS_FCOLOR)) {
+		crc_ix = VGA_CRT_IM;
+		is1_rx = VGA_IS1_RM;
+	}
+
+	/* Index registers. */
+	regs->vr_crt_index = vga_r(crc_ix);           /* VGA_CRT_DC / VGA_CRT_IC. */
+	regs->vr_seq_index = vga_r(VGA_SEQ_I);        /* VGA_SEQ_I. */
+	regs->vr_gfx_index = vga_r(VGA_GFX_I);        /* VGA_GFX_I. */
+	regs->vr_att_index = vga_rattr_index(is1_rx); /* VGA_ATT_IW. */
 
 	/* Sequencer... */
-	regs->vm_seq_clock_mode    = vga_rseq(VGA_SEQ_CLOCK_MODE);
-	regs->vm_seq_plane_write   = vga_rseq(VGA_SEQ_PLANE_WRITE);
-	regs->vm_seq_character_map = vga_rseq(VGA_SEQ_CHARACTER_MAP);
-	regs->vm_seq_memory_mode   = vga_rseq(VGA_SEQ_MEMORY_MODE);
+	regs->vr_mode.vm_seq_clock_mode    = vga_rseq(VGA_SEQ_CLOCK_MODE);
+	regs->vr_mode.vm_seq_plane_write   = vga_rseq(VGA_SEQ_PLANE_WRITE);
+	regs->vr_mode.vm_seq_character_map = vga_rseq(VGA_SEQ_CHARACTER_MAP);
+	regs->vr_mode.vm_seq_memory_mode   = vga_rseq(VGA_SEQ_MEMORY_MODE);
+	regs->vr_seq_reset                 = vga_rseq(VGA_SEQ_RESET);
 
 	/* CRT... */
-	regs->vm_crt_h_total       = vga_rcrt(VGA_CRTC_H_TOTAL);
-	regs->vm_crt_h_disp        = vga_rcrt(VGA_CRTC_H_DISP);
-	regs->vm_crt_h_blank_start = vga_rcrt(VGA_CRTC_H_BLANK_START);
-	regs->vm_crt_h_blank_end   = vga_rcrt(VGA_CRTC_H_BLANK_END);
-	regs->vm_crt_h_sync_start  = vga_rcrt(VGA_CRTC_H_SYNC_START);
-	regs->vm_crt_h_sync_end    = vga_rcrt(VGA_CRTC_H_SYNC_END);
-	regs->vm_crt_v_total       = vga_rcrt(VGA_CRTC_V_TOTAL);
-	regs->vm_crt_overflow      = vga_rcrt(VGA_CRTC_OVERFLOW);
-	regs->vm_crt_preset_row    = vga_rcrt(VGA_CRTC_PRESET_ROW);
-	regs->vm_crt_max_scan      = vga_rcrt(VGA_CRTC_MAX_SCAN);
-	regs->vm_crt_cursor_start  = vga_rcrt(VGA_CRTC_CURSOR_START);
-	regs->vm_crt_cursor_end    = vga_rcrt(VGA_CRTC_CURSOR_END);
-	regs->vm_crt_start_hi      = vga_rcrt(VGA_CRTC_START_HI);
-	regs->vm_crt_start_lo      = vga_rcrt(VGA_CRTC_START_LO);
-	regs->vm_crt_cursor_hi     = vga_rcrt(VGA_CRTC_CURSOR_HI);
-	regs->vm_crt_cursor_lo     = vga_rcrt(VGA_CRTC_CURSOR_LO);
-	regs->vm_crt_v_sync_start  = vga_rcrt(VGA_CRTC_V_SYNC_START);
-	regs->vm_crt_v_sync_end    = vga_rcrt(VGA_CRTC_V_SYNC_END);
-	regs->vm_crt_v_disp_end    = vga_rcrt(VGA_CRTC_V_DISP_END);
-	regs->vm_crt_offset        = vga_rcrt(VGA_CRTC_OFFSET);
-	regs->vm_crt_underline     = vga_rcrt(VGA_CRTC_UNDERLINE);
-	regs->vm_crt_v_blank_start = vga_rcrt(VGA_CRTC_V_BLANK_START);
-	regs->vm_crt_v_blank_end   = vga_rcrt(VGA_CRTC_V_BLANK_END);
-	regs->vm_crt_mode          = vga_rcrt(VGA_CRTC_MODE);
-	regs->vm_crt_line_compare  = vga_rcrt(VGA_CRTC_LINE_COMPARE);
+	regs->vr_mode.vm_crt_h_total       = vga_rcrt(crc_ix, VGA_CRTC_H_TOTAL);
+	regs->vr_mode.vm_crt_h_disp        = vga_rcrt(crc_ix, VGA_CRTC_H_DISP);
+	regs->vr_mode.vm_crt_h_blank_start = vga_rcrt(crc_ix, VGA_CRTC_H_BLANK_START);
+	regs->vr_mode.vm_crt_h_blank_end   = vga_rcrt(crc_ix, VGA_CRTC_H_BLANK_END);
+	regs->vr_mode.vm_crt_h_sync_start  = vga_rcrt(crc_ix, VGA_CRTC_H_SYNC_START);
+	regs->vr_mode.vm_crt_h_sync_end    = vga_rcrt(crc_ix, VGA_CRTC_H_SYNC_END);
+	regs->vr_mode.vm_crt_v_total       = vga_rcrt(crc_ix, VGA_CRTC_V_TOTAL);
+	regs->vr_mode.vm_crt_overflow      = vga_rcrt(crc_ix, VGA_CRTC_OVERFLOW);
+	regs->vr_mode.vm_crt_preset_row    = vga_rcrt(crc_ix, VGA_CRTC_PRESET_ROW);
+	regs->vr_mode.vm_crt_max_scan      = vga_rcrt(crc_ix, VGA_CRTC_MAX_SCAN);
+	regs->vr_mode.vm_crt_cursor_start  = vga_rcrt(crc_ix, VGA_CRTC_CURSOR_START);
+	regs->vr_mode.vm_crt_cursor_end    = vga_rcrt(crc_ix, VGA_CRTC_CURSOR_END);
+	regs->vr_mode.vm_crt_start_hi      = vga_rcrt(crc_ix, VGA_CRTC_START_HI);
+	regs->vr_mode.vm_crt_start_lo      = vga_rcrt(crc_ix, VGA_CRTC_START_LO);
+	regs->vr_mode.vm_crt_cursor_hi     = vga_rcrt(crc_ix, VGA_CRTC_CURSOR_HI);
+	regs->vr_mode.vm_crt_cursor_lo     = vga_rcrt(crc_ix, VGA_CRTC_CURSOR_LO);
+	regs->vr_mode.vm_crt_v_sync_start  = vga_rcrt(crc_ix, VGA_CRTC_V_SYNC_START);
+	regs->vr_mode.vm_crt_v_sync_end    = vga_rcrt(crc_ix, VGA_CRTC_V_SYNC_END);
+	regs->vr_mode.vm_crt_v_disp_end    = vga_rcrt(crc_ix, VGA_CRTC_V_DISP_END);
+	regs->vr_mode.vm_crt_offset        = vga_rcrt(crc_ix, VGA_CRTC_OFFSET);
+	regs->vr_mode.vm_crt_underline     = vga_rcrt(crc_ix, VGA_CRTC_UNDERLINE);
+	regs->vr_mode.vm_crt_v_blank_start = vga_rcrt(crc_ix, VGA_CRTC_V_BLANK_START);
+	regs->vr_mode.vm_crt_v_blank_end   = vga_rcrt(crc_ix, VGA_CRTC_V_BLANK_END);
+	regs->vr_mode.vm_crt_mode          = vga_rcrt(crc_ix, VGA_CRTC_MODE);
+	regs->vr_mode.vm_crt_line_compare  = vga_rcrt(crc_ix, VGA_CRTC_LINE_COMPARE);
 
 	/* Graphics controller. */
-	regs->vm_gfx_sr_value      = vga_rgfx(VGA_GFX_SR_VALUE);
-	regs->vm_gfx_sr_enable     = vga_rgfx(VGA_GFX_SR_ENABLE);
-	regs->vm_gfx_compare_value = vga_rgfx(VGA_GFX_COMPARE_VALUE);
-	regs->vm_gfx_data_rotate   = vga_rgfx(VGA_GFX_DATA_ROTATE);
-	regs->vm_gfx_plane_read    = vga_rgfx(VGA_GFX_PLANE_READ);
-	regs->vm_gfx_mode          = vga_rgfx(VGA_GFX_MODE);
-	regs->vm_gfx_misc          = vga_rgfx(VGA_GFX_MISC);
-	regs->vm_gfx_compare_mask  = vga_rgfx(VGA_GFX_COMPARE_MASK);
-	regs->vm_gfx_bit_mask      = vga_rgfx(VGA_GFX_BIT_MASK);
+	regs->vr_mode.vm_gfx_sr_value      = vga_rgfx(VGA_GFX_SR_VALUE);
+	regs->vr_mode.vm_gfx_sr_enable     = vga_rgfx(VGA_GFX_SR_ENABLE);
+	regs->vr_mode.vm_gfx_compare_value = vga_rgfx(VGA_GFX_COMPARE_VALUE);
+	regs->vr_mode.vm_gfx_data_rotate   = vga_rgfx(VGA_GFX_DATA_ROTATE);
+	regs->vr_mode.vm_gfx_plane_read    = vga_rgfx(VGA_GFX_PLANE_READ);
+	regs->vr_mode.vm_gfx_mode          = vga_rgfx(VGA_GFX_MODE);
+	regs->vr_mode.vm_gfx_misc          = vga_rgfx(VGA_GFX_MISC);
+	regs->vr_mode.vm_gfx_compare_mask  = vga_rgfx(VGA_GFX_COMPARE_MASK);
+	regs->vr_mode.vm_gfx_bit_mask      = vga_rgfx(VGA_GFX_BIT_MASK);
 
 	/* Attribute controller. */
-	vga_setpas(basevga_IS1_R, 0);
 	for (i = 0; i < 16; ++i)
-		regs->vm_att_pal[i] = vga_rattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i);
-	regs->vm_att_mode         = vga_rattr(basevga_IS1_R, VGA_ATC_MODE);
-	regs->vm_att_overscan     = vga_rattr(basevga_IS1_R, VGA_ATC_OVERSCAN);
-	regs->vm_att_plane_enable = vga_rattr(basevga_IS1_R, VGA_ATC_PLANE_ENABLE);
-	regs->vm_att_pel          = vga_rattr(basevga_IS1_R, VGA_ATC_PEL);
-	regs->vm_att_color_page   = vga_rattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE);
-	vga_setpas(basevga_IS1_R, VGA_ATT_IW_PAS);
+		regs->vr_mode.vm_att_pal[i] = vga_rattr(is1_rx, VGA_ATC_PALETTE0 + i);
+	regs->vr_mode.vm_att_mode         = vga_rattr(is1_rx, VGA_ATC_MODE);
+	regs->vr_mode.vm_att_overscan     = vga_rattr(is1_rx, VGA_ATC_OVERSCAN);
+	regs->vr_mode.vm_att_plane_enable = vga_rattr(is1_rx, VGA_ATC_PLANE_ENABLE);
+	regs->vr_mode.vm_att_pel          = vga_rattr(is1_rx, VGA_ATC_PEL);
+	regs->vr_mode.vm_att_color_page   = vga_rattr(is1_rx, VGA_ATC_COLOR_PAGE);
 }
 
 INTERN NONNULL((1)) void CC
-basevga_setregs(struct vga_mode const *__restrict regs) {
+basevga_setregs(struct vga_regs const *__restrict regs) {
 	unsigned int i;
+	port_t crc_ix, is1_rx;
 
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
 		/* Unlock graphics registers */
@@ -178,81 +171,83 @@ basevga_setregs(struct vga_mode const *__restrict regs) {
 		outb(EGA_GFX_E1, 0x01);
 	}
 
+	/* Select ports. */
+	crc_ix = VGA_CRT_IC;
+	is1_rx = VGA_IS1_RC;
+	if (!(regs->vr_mode.vm_mis & VGA_MIS_FCOLOR)) {
+		crc_ix = VGA_CRT_IM;
+		is1_rx = VGA_IS1_RM;
+	}
+
 	/* Write registers. */
-	vga_w(VGA_MIS_W, regs->vm_mis);
+	vga_wmis(regs->vr_mode.vm_mis);
 
 	/* Sequencer... */
-	vga_wseq(VGA_SEQ_RESET, 1);
-	vga_wseq(VGA_SEQ_CLOCK_MODE, regs->vm_seq_clock_mode | VGA_SR01_FSCREEN_OFF);
-	vga_wseq(VGA_SEQ_PLANE_WRITE, regs->vm_seq_plane_write);
-	vga_wseq(VGA_SEQ_CHARACTER_MAP, regs->vm_seq_character_map);
-	vga_wseq(VGA_SEQ_MEMORY_MODE, regs->vm_seq_memory_mode);
-	vga_wseq(VGA_SEQ_RESET, 3);
+	vga_wseq(VGA_SEQ_CLOCK_MODE, regs->vr_mode.vm_seq_clock_mode);
+	vga_wseq(VGA_SEQ_PLANE_WRITE, regs->vr_mode.vm_seq_plane_write);
+	vga_wseq(VGA_SEQ_CHARACTER_MAP, regs->vr_mode.vm_seq_character_map);
+	vga_wseq(VGA_SEQ_MEMORY_MODE, regs->vr_mode.vm_seq_memory_mode);
+	vga_wseq(VGA_SEQ_RESET, regs->vr_seq_reset);
 
 	/* CRT... */
-	if (!(basevga_flags & BASEVGA_FLAG_ISEGA)) /* Unlock CRT registers. */
-		vga_wcrt(VGA_CRTC_V_SYNC_END, vga_rcrt(VGA_CRTC_V_SYNC_END) & ~VGA_CR11_FLOCK_CR0_CR7);
-	vga_wcrt(VGA_CRTC_H_TOTAL, regs->vm_crt_h_total);
-	vga_wcrt(VGA_CRTC_H_DISP, regs->vm_crt_h_disp);
-	vga_wcrt(VGA_CRTC_H_BLANK_START, regs->vm_crt_h_blank_start);
-	vga_wcrt(VGA_CRTC_H_BLANK_END, regs->vm_crt_h_blank_end);
-	vga_wcrt(VGA_CRTC_H_SYNC_START, regs->vm_crt_h_sync_start);
-	vga_wcrt(VGA_CRTC_H_SYNC_END, regs->vm_crt_h_sync_end);
-	vga_wcrt(VGA_CRTC_V_TOTAL, regs->vm_crt_v_total);
-	vga_wcrt(VGA_CRTC_OVERFLOW, regs->vm_crt_overflow);
-	vga_wcrt(VGA_CRTC_PRESET_ROW, regs->vm_crt_preset_row);
-	vga_wcrt(VGA_CRTC_MAX_SCAN, regs->vm_crt_max_scan);
-	vga_wcrt(VGA_CRTC_CURSOR_START, regs->vm_crt_cursor_start);
-	vga_wcrt(VGA_CRTC_CURSOR_END, regs->vm_crt_cursor_end);
-	vga_wcrt(VGA_CRTC_START_HI, regs->vm_crt_start_hi);
-	vga_wcrt(VGA_CRTC_START_LO, regs->vm_crt_start_lo);
-	vga_wcrt(VGA_CRTC_CURSOR_HI, regs->vm_crt_cursor_hi);
-	vga_wcrt(VGA_CRTC_CURSOR_LO, regs->vm_crt_cursor_lo);
-	vga_wcrt(VGA_CRTC_V_SYNC_START, regs->vm_crt_v_sync_start);
-	/* IMPORTANT: `VGA_CRTC_V_SYNC_END' must be set _AFTER_ CR0-CR7:
-	 *  - VGA_CRTC_H_TOTAL
-	 *  - VGA_CRTC_H_DISP
-	 *  - VGA_CRTC_H_BLANK_START
-	 *  - VGA_CRTC_H_BLANK_END
-	 *  - VGA_CRTC_H_SYNC_START
-	 *  - VGA_CRTC_H_SYNC_END
-	 *  - VGA_CRTC_V_TOTAL
-	 *  - VGA_CRTC_OVERFLOW
-	 * This is because `VGA_CRTC_V_SYNC_END' includes `VGA_CR11_FLOCK_CR0_CR7' */
-	vga_wcrt(VGA_CRTC_V_SYNC_END, regs->vm_crt_v_sync_end);
-	vga_wcrt(VGA_CRTC_V_DISP_END, regs->vm_crt_v_disp_end);
-	vga_wcrt(VGA_CRTC_OFFSET, regs->vm_crt_offset);
-	vga_wcrt(VGA_CRTC_UNDERLINE, regs->vm_crt_underline);
-	vga_wcrt(VGA_CRTC_V_BLANK_START, regs->vm_crt_v_blank_start);
-	vga_wcrt(VGA_CRTC_V_BLANK_END, regs->vm_crt_v_blank_end);
-	vga_wcrt(VGA_CRTC_MODE, regs->vm_crt_mode);
-	vga_wcrt(VGA_CRTC_LINE_COMPARE, regs->vm_crt_line_compare);
+	vga_wcrt(crc_ix, VGA_CRTC_V_SYNC_END, 0); /* Unlock registers. */
+	vga_wcrt(crc_ix, VGA_CRTC_H_TOTAL, regs->vr_mode.vm_crt_h_total);
+	vga_wcrt(crc_ix, VGA_CRTC_H_DISP, regs->vr_mode.vm_crt_h_disp);
+	vga_wcrt(crc_ix, VGA_CRTC_H_BLANK_START, regs->vr_mode.vm_crt_h_blank_start);
+	vga_wcrt(crc_ix, VGA_CRTC_H_BLANK_END, regs->vr_mode.vm_crt_h_blank_end);
+	vga_wcrt(crc_ix, VGA_CRTC_H_SYNC_START, regs->vr_mode.vm_crt_h_sync_start);
+	vga_wcrt(crc_ix, VGA_CRTC_H_SYNC_END, regs->vr_mode.vm_crt_h_sync_end);
+	vga_wcrt(crc_ix, VGA_CRTC_V_TOTAL, regs->vr_mode.vm_crt_v_total);
+	vga_wcrt(crc_ix, VGA_CRTC_OVERFLOW, regs->vr_mode.vm_crt_overflow);
+	vga_wcrt(crc_ix, VGA_CRTC_PRESET_ROW, regs->vr_mode.vm_crt_preset_row);
+	vga_wcrt(crc_ix, VGA_CRTC_MAX_SCAN, regs->vr_mode.vm_crt_max_scan);
+	vga_wcrt(crc_ix, VGA_CRTC_CURSOR_START, regs->vr_mode.vm_crt_cursor_start);
+	vga_wcrt(crc_ix, VGA_CRTC_CURSOR_END, regs->vr_mode.vm_crt_cursor_end);
+	vga_wcrt(crc_ix, VGA_CRTC_START_HI, regs->vr_mode.vm_crt_start_hi);
+	vga_wcrt(crc_ix, VGA_CRTC_START_LO, regs->vr_mode.vm_crt_start_lo);
+	vga_wcrt(crc_ix, VGA_CRTC_CURSOR_HI, regs->vr_mode.vm_crt_cursor_hi);
+	vga_wcrt(crc_ix, VGA_CRTC_CURSOR_LO, regs->vr_mode.vm_crt_cursor_lo);
+	vga_wcrt(crc_ix, VGA_CRTC_V_SYNC_START, regs->vr_mode.vm_crt_v_sync_start);
+	vga_wcrt(crc_ix, VGA_CRTC_V_DISP_END, regs->vr_mode.vm_crt_v_disp_end);
+	vga_wcrt(crc_ix, VGA_CRTC_OFFSET, regs->vr_mode.vm_crt_offset);
+	vga_wcrt(crc_ix, VGA_CRTC_UNDERLINE, regs->vr_mode.vm_crt_underline);
+	vga_wcrt(crc_ix, VGA_CRTC_V_BLANK_START, regs->vr_mode.vm_crt_v_blank_start);
+	vga_wcrt(crc_ix, VGA_CRTC_V_BLANK_END, regs->vr_mode.vm_crt_v_blank_end);
+	vga_wcrt(crc_ix, VGA_CRTC_MODE, regs->vr_mode.vm_crt_mode);
+	vga_wcrt(crc_ix, VGA_CRTC_LINE_COMPARE, regs->vr_mode.vm_crt_line_compare);
+	/* This one has to come last! */
+	vga_wcrt(crc_ix, VGA_CRTC_V_SYNC_END, regs->vr_mode.vm_crt_v_sync_end);
 
 	/* Graphics controller. */
-	vga_wgfx(VGA_GFX_SR_VALUE, regs->vm_gfx_sr_value);
-	vga_wgfx(VGA_GFX_SR_ENABLE, regs->vm_gfx_sr_enable);
-	vga_wgfx(VGA_GFX_COMPARE_VALUE, regs->vm_gfx_compare_value);
-	vga_wgfx(VGA_GFX_DATA_ROTATE, regs->vm_gfx_data_rotate);
-	vga_wgfx(VGA_GFX_PLANE_READ, regs->vm_gfx_plane_read);
-	vga_wgfx(VGA_GFX_MODE, regs->vm_gfx_mode);
-	vga_wgfx(VGA_GFX_MISC, regs->vm_gfx_misc);
-	vga_wgfx(VGA_GFX_COMPARE_MASK, regs->vm_gfx_compare_mask);
-	vga_wgfx(VGA_GFX_BIT_MASK, regs->vm_gfx_bit_mask);
+	vga_wgfx(VGA_GFX_SR_VALUE, regs->vr_mode.vm_gfx_sr_value);
+	vga_wgfx(VGA_GFX_SR_ENABLE, regs->vr_mode.vm_gfx_sr_enable);
+	vga_wgfx(VGA_GFX_COMPARE_VALUE, regs->vr_mode.vm_gfx_compare_value);
+	vga_wgfx(VGA_GFX_DATA_ROTATE, regs->vr_mode.vm_gfx_data_rotate);
+	vga_wgfx(VGA_GFX_PLANE_READ, regs->vr_mode.vm_gfx_plane_read);
+	vga_wgfx(VGA_GFX_MODE, regs->vr_mode.vm_gfx_mode);
+	vga_wgfx(VGA_GFX_MISC, regs->vr_mode.vm_gfx_misc);
+	vga_wgfx(VGA_GFX_COMPARE_MASK, regs->vr_mode.vm_gfx_compare_mask);
+	vga_wgfx(VGA_GFX_BIT_MASK, regs->vr_mode.vm_gfx_bit_mask);
 
 	/* Attribute controller. */
-	vga_setpas(basevga_IS1_R, 0);
 	for (i = 0; i < 16; ++i)
-		vga_wattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i, regs->vm_att_pal[i]);
-	vga_wattr(basevga_IS1_R, VGA_ATC_MODE, regs->vm_att_mode);
-	vga_wattr(basevga_IS1_R, VGA_ATC_OVERSCAN, regs->vm_att_overscan);
-	vga_wattr(basevga_IS1_R, VGA_ATC_PLANE_ENABLE, regs->vm_att_plane_enable);
-	vga_wattr(basevga_IS1_R, VGA_ATC_PEL, regs->vm_att_pel);
-	vga_wattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page);
-	vga_setpas(basevga_IS1_R, VGA_ATT_IW_PAS);
+		vga_wattr(is1_rx, VGA_ATC_PALETTE0 + i, regs->vr_mode.vm_att_pal[i]);
+	vga_wattr(is1_rx, VGA_ATC_MODE, regs->vr_mode.vm_att_mode);
+	vga_wattr(is1_rx, VGA_ATC_OVERSCAN, regs->vr_mode.vm_att_overscan);
+	vga_wattr(is1_rx, VGA_ATC_PLANE_ENABLE, regs->vr_mode.vm_att_plane_enable);
+	vga_wattr(is1_rx, VGA_ATC_PEL, regs->vr_mode.vm_att_pel);
+	vga_wattr(is1_rx, VGA_ATC_COLOR_PAGE, regs->vr_mode.vm_att_color_page);
+	vga_wattr_index(is1_rx, regs->vr_att_index);
+
+	/* Restore index registers. */
+	vga_w(VGA_SEQ_I, regs->vr_seq_index);
+	vga_w(crc_ix, regs->vr_crt_index);
+	vga_w(VGA_GFX_I, regs->vr_gfx_index);
+	vga_w(is1_rx, regs->vr_ftc); /* ??? */
 
 	/* Remember EGA register state. */
 	if (basevga_flags & BASEVGA_FLAG_ISEGA)
-		memcpy(&baseega_registers, regs, sizeof(struct vga_mode));
+		memcpy(&baseega_registers, regs, sizeof(struct vga_regs));
 }
 
 
@@ -261,13 +256,13 @@ basevga_setregs(struct vga_mode const *__restrict regs) {
 PRIVATE ATTR_NOINLINE NONNULL((1)) void CC
 ega_setmode(struct vga_mode const *__restrict regs) {
 	unsigned int i;
-	struct vga_mode newregs;
-	memcpy(&newregs, regs, sizeof(struct vga_mode));
+	struct vga_regs newregs;
+	memcpy(&newregs, &baseega_registers, sizeof(struct vga_regs));
 
 	/* Load reserved bits from expected register state `baseega_registers'. */
 #define MASK_REGISTER(name, reserved_mask) \
-	(newregs.name &= ~reserved_mask,       \
-	 newregs.name |= baseega_registers.name & reserved_mask)
+	(newregs.vr_mode.name &= reserved_mask,       \
+	 newregs.vr_mode.name |= regs->name & ~reserved_mask)
 	MASK_REGISTER(vm_seq_clock_mode, VGA_SR01_FRESERVED);
 	MASK_REGISTER(vm_seq_plane_write, VGA_SR02_FRESERVED);
 	MASK_REGISTER(vm_seq_character_map, VGA_SR03_FRESERVED);
@@ -302,80 +297,87 @@ ega_setmode(struct vga_mode const *__restrict regs) {
  * NOTE: Must be called while holding a lock to the true VGA Chipset driver.
  * NOTE: This function leaves the screen turned off! */
 INTERN NONNULL((1)) void CC
-basevga_setmode(struct vga_mode const *__restrict regs) {
+basevga_setmode(struct vga_mode const *__restrict mode) {
 	unsigned int i;
+	port_t crc_ix, is1_rx;
 
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
 		/* Special case: EGA doesn't allow (normal) register reads. As such,
 		 * we must  fix-up `regs'  and apply  them via  `basevga_setregs()'! */
-		ega_setmode(regs);
+		ega_setmode(mode);
 		return;
 	}
 
+	/* Select ports. */
+	crc_ix = VGA_CRT_IC;
+	is1_rx = VGA_IS1_RC;
+	if (!(mode->vm_mis & VGA_MIS_FCOLOR)) {
+		crc_ix = VGA_CRT_IM;
+		is1_rx = VGA_IS1_RM;
+	}
+
 	/* Write registers. */
-	vga_w(VGA_MIS_W, regs->vm_mis);
+	vga_wmis(mode->vm_mis);
 
 	/* Sequencer... */
 	vga_wseq(VGA_SEQ_RESET, 1);
-	vga_wseq_res(VGA_SEQ_CLOCK_MODE, regs->vm_seq_clock_mode | VGA_SR01_FSCREEN_OFF, VGA_SR01_FRESERVED);
-	vga_wseq_res(VGA_SEQ_PLANE_WRITE, regs->vm_seq_plane_write, VGA_SR02_FRESERVED);
-	vga_wseq_res(VGA_SEQ_CHARACTER_MAP, regs->vm_seq_character_map, VGA_SR03_FRESERVED);
-	vga_wseq_res(VGA_SEQ_MEMORY_MODE, regs->vm_seq_memory_mode, VGA_SR04_FRESERVED);
+	vga_wseq_res(VGA_SEQ_CLOCK_MODE, mode->vm_seq_clock_mode | VGA_SR01_FSCREEN_OFF, VGA_SR01_FRESERVED);
+	vga_wseq_res(VGA_SEQ_PLANE_WRITE, mode->vm_seq_plane_write, VGA_SR02_FRESERVED);
+	vga_wseq_res(VGA_SEQ_CHARACTER_MAP, mode->vm_seq_character_map, VGA_SR03_FRESERVED);
+	vga_wseq_res(VGA_SEQ_MEMORY_MODE, mode->vm_seq_memory_mode, VGA_SR04_FRESERVED);
 	vga_wseq(VGA_SEQ_RESET, 3);
 
 	/* CRT... */
 	if (!(basevga_flags & BASEVGA_FLAG_ISEGA)) /* Unlock CRT registers. */
-		vga_wcrt(VGA_CRTC_V_SYNC_END, vga_rcrt(VGA_CRTC_V_SYNC_END) & ~VGA_CR11_FLOCK_CR0_CR7);
-	vga_wcrt(VGA_CRTC_H_TOTAL, regs->vm_crt_h_total);
-	vga_wcrt(VGA_CRTC_H_DISP, regs->vm_crt_h_disp);
-	vga_wcrt(VGA_CRTC_H_BLANK_START, regs->vm_crt_h_blank_start);
-	vga_wcrt(VGA_CRTC_H_BLANK_END, regs->vm_crt_h_blank_end | VGA_CR3_FALWAYS1);
-	vga_wcrt(VGA_CRTC_H_SYNC_START, regs->vm_crt_h_sync_start);
-	vga_wcrt(VGA_CRTC_H_SYNC_END, regs->vm_crt_h_sync_end);
-	vga_wcrt(VGA_CRTC_V_TOTAL, regs->vm_crt_v_total);
-	vga_wcrt(VGA_CRTC_OVERFLOW, regs->vm_crt_overflow);
-	vga_wcrt_res(VGA_CRTC_PRESET_ROW, regs->vm_crt_preset_row, VGA_CR8_FRESERVED);
-	vga_wcrt(VGA_CRTC_MAX_SCAN, regs->vm_crt_max_scan);
-	vga_wcrt_res(VGA_CRTC_CURSOR_START, regs->vm_crt_cursor_start, VGA_CRA_FRESERVED);
-	vga_wcrt_res(VGA_CRTC_CURSOR_END, regs->vm_crt_cursor_end, VGA_CRB_FRESERVED);
-	vga_wcrt(VGA_CRTC_START_HI, regs->vm_crt_start_hi);
-	vga_wcrt(VGA_CRTC_START_LO, regs->vm_crt_start_lo);
-	vga_wcrt(VGA_CRTC_CURSOR_HI, regs->vm_crt_cursor_hi);
-	vga_wcrt(VGA_CRTC_CURSOR_LO, regs->vm_crt_cursor_lo);
-	vga_wcrt(VGA_CRTC_V_SYNC_START, regs->vm_crt_v_sync_start);
-	vga_wcrt_res(VGA_CRTC_V_SYNC_END, regs->vm_crt_v_sync_end, VGA_CR11_FRESERVED);
-	vga_wcrt(VGA_CRTC_V_DISP_END, regs->vm_crt_v_disp_end);
-	vga_wcrt(VGA_CRTC_OFFSET, regs->vm_crt_offset);
-	vga_wcrt(VGA_CRTC_UNDERLINE, regs->vm_crt_underline);
-	vga_wcrt(VGA_CRTC_V_BLANK_START, regs->vm_crt_v_blank_start);
-	vga_wcrt_res(VGA_CRTC_V_BLANK_END, regs->vm_crt_v_blank_end, VGA_CR16_FRESERVED);
-	vga_wcrt_res(VGA_CRTC_MODE, regs->vm_crt_mode, VGA_CR17_FRESERVED);
-	vga_wcrt(VGA_CRTC_LINE_COMPARE, regs->vm_crt_line_compare);
+		vga_wcrt(crc_ix, VGA_CRTC_V_SYNC_END, vga_rcrt(crc_ix, VGA_CRTC_V_SYNC_END) & ~VGA_CR11_FLOCK_CR0_CR7);
+	vga_wcrt(crc_ix, VGA_CRTC_H_TOTAL, mode->vm_crt_h_total);
+	vga_wcrt(crc_ix, VGA_CRTC_H_DISP, mode->vm_crt_h_disp);
+	vga_wcrt(crc_ix, VGA_CRTC_H_BLANK_START, mode->vm_crt_h_blank_start);
+	vga_wcrt(crc_ix, VGA_CRTC_H_BLANK_END, mode->vm_crt_h_blank_end | VGA_CR3_FALWAYS1);
+	vga_wcrt(crc_ix, VGA_CRTC_H_SYNC_START, mode->vm_crt_h_sync_start);
+	vga_wcrt(crc_ix, VGA_CRTC_H_SYNC_END, mode->vm_crt_h_sync_end);
+	vga_wcrt(crc_ix, VGA_CRTC_V_TOTAL, mode->vm_crt_v_total);
+	vga_wcrt(crc_ix, VGA_CRTC_OVERFLOW, mode->vm_crt_overflow);
+	vga_wcrt_res(crc_ix, VGA_CRTC_PRESET_ROW, mode->vm_crt_preset_row, VGA_CR8_FRESERVED);
+	vga_wcrt(crc_ix, VGA_CRTC_MAX_SCAN, mode->vm_crt_max_scan);
+	vga_wcrt_res(crc_ix, VGA_CRTC_CURSOR_START, mode->vm_crt_cursor_start, VGA_CRA_FRESERVED);
+	vga_wcrt_res(crc_ix, VGA_CRTC_CURSOR_END, mode->vm_crt_cursor_end, VGA_CRB_FRESERVED);
+	vga_wcrt(crc_ix, VGA_CRTC_START_HI, mode->vm_crt_start_hi);
+	vga_wcrt(crc_ix, VGA_CRTC_START_LO, mode->vm_crt_start_lo);
+	vga_wcrt(crc_ix, VGA_CRTC_CURSOR_HI, mode->vm_crt_cursor_hi);
+	vga_wcrt(crc_ix, VGA_CRTC_CURSOR_LO, mode->vm_crt_cursor_lo);
+	vga_wcrt(crc_ix, VGA_CRTC_V_SYNC_START, mode->vm_crt_v_sync_start);
+	vga_wcrt_res(crc_ix, VGA_CRTC_V_SYNC_END, mode->vm_crt_v_sync_end, VGA_CR11_FRESERVED);
+	vga_wcrt(crc_ix, VGA_CRTC_V_DISP_END, mode->vm_crt_v_disp_end);
+	vga_wcrt(crc_ix, VGA_CRTC_OFFSET, mode->vm_crt_offset);
+	vga_wcrt(crc_ix, VGA_CRTC_UNDERLINE, mode->vm_crt_underline);
+	vga_wcrt(crc_ix, VGA_CRTC_V_BLANK_START, mode->vm_crt_v_blank_start);
+	vga_wcrt_res(crc_ix, VGA_CRTC_V_BLANK_END, mode->vm_crt_v_blank_end, VGA_CR16_FRESERVED);
+	vga_wcrt_res(crc_ix, VGA_CRTC_MODE, mode->vm_crt_mode, VGA_CR17_FRESERVED);
+	vga_wcrt(crc_ix, VGA_CRTC_LINE_COMPARE, mode->vm_crt_line_compare);
 
 	/* Graphics controller. */
-	vga_wgfx_res(VGA_GFX_SR_VALUE, regs->vm_gfx_sr_value, VGA_GR00_FRESERVED);
-	vga_wgfx_res(VGA_GFX_SR_ENABLE, regs->vm_gfx_sr_enable, VGA_GR01_FRESERVED);
-	vga_wgfx_res(VGA_GFX_COMPARE_VALUE, regs->vm_gfx_compare_value, VGA_GR02_FRESERVED);
-	vga_wgfx_res(VGA_GFX_DATA_ROTATE, regs->vm_gfx_data_rotate, VGA_GR03_FRESERVED);
-	vga_wgfx_res(VGA_GFX_PLANE_READ, regs->vm_gfx_plane_read, VGA_GR04_FRESERVED);
-	vga_wgfx_res(VGA_GFX_MODE, regs->vm_gfx_mode, VGA_GR05_FRESERVED);
-	vga_wgfx_res(VGA_GFX_MISC, regs->vm_gfx_misc, VGA_GR06_FRESERVED);
-	vga_wgfx_res(VGA_GFX_COMPARE_MASK, regs->vm_gfx_compare_mask, VGA_GR07_FRESERVED);
-	vga_wgfx(VGA_GFX_BIT_MASK, regs->vm_gfx_bit_mask);
+	vga_wgfx_res(VGA_GFX_SR_VALUE, mode->vm_gfx_sr_value, VGA_GR00_FRESERVED);
+	vga_wgfx_res(VGA_GFX_SR_ENABLE, mode->vm_gfx_sr_enable, VGA_GR01_FRESERVED);
+	vga_wgfx_res(VGA_GFX_COMPARE_VALUE, mode->vm_gfx_compare_value, VGA_GR02_FRESERVED);
+	vga_wgfx_res(VGA_GFX_DATA_ROTATE, mode->vm_gfx_data_rotate, VGA_GR03_FRESERVED);
+	vga_wgfx_res(VGA_GFX_PLANE_READ, mode->vm_gfx_plane_read, VGA_GR04_FRESERVED);
+	vga_wgfx_res(VGA_GFX_MODE, mode->vm_gfx_mode, VGA_GR05_FRESERVED);
+	vga_wgfx_res(VGA_GFX_MISC, mode->vm_gfx_misc, VGA_GR06_FRESERVED);
+	vga_wgfx_res(VGA_GFX_COMPARE_MASK, mode->vm_gfx_compare_mask, VGA_GR07_FRESERVED);
+	vga_wgfx(VGA_GFX_BIT_MASK, mode->vm_gfx_bit_mask);
 
 	/* Attribute controller. */
-	vga_setpas(basevga_IS1_R, 0);
 	for (i = 0; i < 16; ++i) {
-		vga_wattr_res(basevga_IS1_R,
-		              VGA_ATC_PALETTE0 + i, regs->vm_att_pal[i],
+		vga_wattr_res(is1_rx,
+		              VGA_ATC_PALETTE0 + i, mode->vm_att_pal[i],
 		              VGA_ATC_PALETTEn_FRESERVED);
 	}
-	vga_wattr_res(basevga_IS1_R, VGA_ATC_MODE, regs->vm_att_mode, VGA_AT10_FRESERVED);
-	vga_wattr(basevga_IS1_R, VGA_ATC_OVERSCAN, regs->vm_att_overscan);
-	vga_wattr_res(basevga_IS1_R, VGA_ATC_PLANE_ENABLE, regs->vm_att_plane_enable, VGA_AT12_FRESERVED);
-	vga_wattr_res(basevga_IS1_R, VGA_ATC_PEL, regs->vm_att_pel, VGA_AT13_FRESERVED);
-	vga_wattr_res(basevga_IS1_R, VGA_ATC_COLOR_PAGE, regs->vm_att_color_page, VGA_AT14_FRESERVED);
-	vga_setpas(basevga_IS1_R, VGA_ATT_IW_PAS);
+	vga_wattr_res(is1_rx, VGA_ATC_MODE, mode->vm_att_mode, VGA_AT10_FRESERVED);
+	vga_wattr(is1_rx, VGA_ATC_OVERSCAN, mode->vm_att_overscan);
+	vga_wattr_res(is1_rx, VGA_ATC_PLANE_ENABLE, mode->vm_att_plane_enable, VGA_AT12_FRESERVED);
+	vga_wattr_res(is1_rx, VGA_ATC_PEL, mode->vm_att_pel, VGA_AT13_FRESERVED);
+	vga_wattr_res(is1_rx, VGA_ATC_COLOR_PAGE, mode->vm_att_color_page, VGA_AT14_FRESERVED);
 }
 
 
@@ -443,10 +445,10 @@ basevga_rdvmem(uint32_t addr, void *buf, uint32_t num_bytes) {
 	uint8_t saved_VGA_GFX_MISC;
 	uint8_t saved_VGA_SEQ_MEMORY_MODE;
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
-		saved_VGA_GFX_PLANE_READ  = baseega_registers.vm_gfx_plane_read;
-		saved_VGA_GFX_MODE        = baseega_registers.vm_gfx_mode;
-		saved_VGA_GFX_MISC        = baseega_registers.vm_gfx_misc;
-		saved_VGA_SEQ_MEMORY_MODE = baseega_registers.vm_seq_memory_mode;
+		saved_VGA_GFX_PLANE_READ  = baseega_registers.vr_mode.vm_gfx_plane_read;
+		saved_VGA_GFX_MODE        = baseega_registers.vr_mode.vm_gfx_mode;
+		saved_VGA_GFX_MISC        = baseega_registers.vr_mode.vm_gfx_misc;
+		saved_VGA_SEQ_MEMORY_MODE = baseega_registers.vr_mode.vm_seq_memory_mode;
 		/* TODO: EGA had less video memory than VGA, meaning  this
 		 *       function probably won't work with an EGA adapter.
 		 * Question is if this makes EGA's plane-select work differently,
@@ -497,10 +499,10 @@ basevga_wrvmem(uint32_t addr, void const *buf, uint32_t num_bytes) {
 	uint8_t saved_VGA_SEQ_MEMORY_MODE;
 	uint8_t saved_VGA_SEQ_PLANE_WRITE;
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
-		saved_VGA_SEQ_PLANE_WRITE = baseega_registers.vm_seq_plane_write;
-		saved_VGA_GFX_MODE        = baseega_registers.vm_gfx_mode;
-		saved_VGA_GFX_MISC        = baseega_registers.vm_gfx_misc;
-		saved_VGA_SEQ_MEMORY_MODE = baseega_registers.vm_seq_memory_mode;
+		saved_VGA_SEQ_PLANE_WRITE = baseega_registers.vr_mode.vm_seq_plane_write;
+		saved_VGA_GFX_MODE        = baseega_registers.vr_mode.vm_gfx_mode;
+		saved_VGA_GFX_MISC        = baseega_registers.vr_mode.vm_gfx_misc;
+		saved_VGA_SEQ_MEMORY_MODE = baseega_registers.vr_mode.vm_seq_memory_mode;
 	} else {
 		saved_VGA_GFX_MODE        = vga_rgfx(VGA_GFX_MODE);
 		saved_VGA_GFX_MISC        = vga_rgfx(VGA_GFX_MISC);

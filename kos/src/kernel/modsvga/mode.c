@@ -230,7 +230,7 @@ svgalck_v_restore(struct vidlck *__restrict self,
 	(*dv->svd_chipset.sc_ops.sco_setregs)(&dv->svd_chipset, me->slc_xregs);
 
 	/* Restore base-vga registers. */
-	basevga_setregs(&me->slc_vmode);
+	basevga_setregs(&me->slc_vregs);
 }
 
 
@@ -265,7 +265,7 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		if (newmode->smi_flags & SVGA_MODEINFO_F_TXT) {
 			uint32_t fontbase;
 			uint8_t cmap;
-			cmap = baseega_registers.vm_seq_character_map;
+			cmap = baseega_registers.vr_mode.vm_seq_character_map;
 			if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
 				cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
 			cmap     = VGA_SR03_CSETA_GET(cmap);
@@ -620,46 +620,48 @@ svgadev_setmode(struct svgadev *__restrict self,
 	/* Load default VGA font if `tty' uses hardware text mode. */
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
 
-		/* Enable palette access */
-		vga_setpas(basevga_IS1_R, 0);
-
 		/* Write attribute registers relating to palette values. */
 		if (basevga_flags & BASEVGA_FLAG_ISEGA) {
+			port_t is1_rx;
 			uint8_t i;
-			baseega_registers.vm_att_color_page &= VGA_AT14_FRESERVED;
-			baseega_registers.vm_att_color_page |= 0;
-			vga_wattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE, baseega_registers.vm_att_color_page);
+			baseega_registers.vr_mode.vm_att_color_page &= VGA_AT14_FRESERVED;
+			baseega_registers.vr_mode.vm_att_color_page |= 0;
+			is1_rx = VGA_IS1_RC;
+			if (!(baseega_registers.vr_mode.vm_mis & VGA_MIS_FCOLOR))
+				is1_rx = VGA_IS1_RM;
+			vga_wattr(is1_rx, VGA_ATC_COLOR_PAGE, baseega_registers.vr_mode.vm_att_color_page);
 			for (i = 0; i < 16; ++i) {
 				uint8_t temp;
-				temp = baseega_registers.vm_att_pal[i];
+				temp = baseega_registers.vr_mode.vm_att_pal[i];
 				temp &= VGA_ATC_PALETTEn_FRESERVED;
 				temp |= i;
-				vga_wattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i, temp);
-				baseega_registers.vm_att_pal[i] = temp;
+				vga_wattr(is1_rx, VGA_ATC_PALETTE0 + i, temp);
+				baseega_registers.vr_mode.vm_att_pal[i] = temp;
 			}
-			baseega_registers.vm_att_mode &= ~VGA_AT10_FBLINK;
-			baseega_registers.vm_att_mode |= VGA_AT10_FDUP9;
-			vga_wattr(basevga_IS1_R, VGA_ATC_MODE, baseega_registers.vm_att_mode);
+			baseega_registers.vr_mode.vm_att_mode &= ~VGA_AT10_FBLINK;
+			baseega_registers.vr_mode.vm_att_mode |= VGA_AT10_FDUP9;
+			vga_wattr(is1_rx, VGA_ATC_MODE, baseega_registers.vr_mode.vm_att_mode);
 		} else {
+			port_t is1_rx;
 			uint8_t i, temp;
-			temp = vga_rattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE);
+			is1_rx = VGA_IS1_RC;
+			if (!(vga_rmis() & VGA_MIS_FCOLOR))
+				is1_rx = VGA_IS1_RM;
+			temp = vga_rattr(is1_rx, VGA_ATC_COLOR_PAGE);
 			temp &= VGA_AT14_FRESERVED;
-			vga_wattr(basevga_IS1_R, VGA_ATC_COLOR_PAGE, temp);
+			vga_wattr(is1_rx, VGA_ATC_COLOR_PAGE, temp);
 			for (i = 0; i < 16; ++i) {
-				temp = vga_rattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i);
+				temp = vga_rattr(is1_rx, VGA_ATC_PALETTE0 + i);
 				temp &= VGA_ATC_PALETTEn_FRESERVED;
 				temp |= i;
-				vga_wattr(basevga_IS1_R, VGA_ATC_PALETTE0 + i, temp);
+				vga_wattr(is1_rx, VGA_ATC_PALETTE0 + i, temp);
 			}
 
 			/* Disable "blinky" if it was enabled by the chip.
 			 * Also enable `VGA_AT10_FDUP9' while we're at it. */
-			temp = vga_rattr(basevga_IS1_R, VGA_ATC_MODE);
-			vga_wattr(basevga_IS1_R, VGA_ATC_MODE, (temp & ~VGA_AT10_FBLINK) | VGA_AT10_FDUP9);
+			temp = vga_rattr(is1_rx, VGA_ATC_MODE);
+			vga_wattr(is1_rx, VGA_ATC_MODE, (temp & ~VGA_AT10_FBLINK) | VGA_AT10_FDUP9);
 		}
-
-		/* Disable palette access */
-		vga_setpas(basevga_IS1_R, VGA_ATT_IW_PAS);
 	}
 
 	/* Load an ANSI-compatible color palette (if used by this mode) */
@@ -821,7 +823,7 @@ svgadev_v_alloclck(struct viddev *__restrict self, struct vidtty *active_tty)
 	                                       GFP_NORMAL);
 	TRY {
 		/* Save Base-VGA registers. */
-		basevga_getregs(&result->slc_vmode);
+		basevga_getregs(&result->slc_vregs);
 
 		/* Save chipset-specific registers. */
 		(*me->svd_chipset.sc_ops.sco_getregs)(&me->svd_chipset, result->slc_xregs);
@@ -967,7 +969,7 @@ NOTHROW(FCALL dbg_save_vmem)(struct svga_ttyaccess *__restrict tty,
 		}
 
 		/* Save memory re-used for the text-mode font. */
-		cmap = baseega_registers.vm_seq_character_map;
+		cmap = baseega_registers.vr_mode.vm_seq_character_map;
 		if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
 			cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
 		cmap     = VGA_SR03_CSETA_GET(cmap);
@@ -1003,7 +1005,7 @@ NOTHROW(FCALL dbg_load_vmem)(struct svga_ttyaccess *__restrict tty,
 		}
 
 		/* Restore memory re-used for the text-mode font. */
-		cmap = baseega_registers.vm_seq_character_map;
+		cmap = baseega_registers.vr_mode.vm_seq_character_map;
 		if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
 			cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
 		cmap     = VGA_SR03_CSETA_GET(cmap);

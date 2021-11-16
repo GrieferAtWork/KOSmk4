@@ -39,7 +39,9 @@ struct vga_modeinfo {
 };
 
 struct vga_chipset: svga_chipset {
-	uint8_t gcs_modeid; /* VGA Mode ID (index into `vga_modelist') */
+	uint8_t gcs_modeid;  /* VGA Mode ID (index into `vga_modelist') */
+	port_t  gcs_crt_icX; /* Either `VGA_CRT_IC' or `VGA_CRT_IM' */
+
 };
 
 

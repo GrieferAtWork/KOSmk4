@@ -73,21 +73,33 @@ __DECL_BEGIN
 /* You're gonna get problems when arguments have side-effects!          */
 /************************************************************************/
 
+__FORCELOCAL __ATTR_WUNUSED __uint8_t vga_rmis(void) {
+	return vga_r(VGA_MIS_R);
+}
+__FORCELOCAL void vga_wmis(__uint8_t __val) {
+	vga_w(VGA_MIS_W, __val);
+}
+
+
+
+__STATIC_ASSERT((VGA_CRT_DC - VGA_CRT_IC) == (VGA_CRT_DM - VGA_CRT_IM));
+
 /* VGA CRTC register read/write
- * @param: reg: One of `VGA_CRTC_*' */
-__FORCELOCAL __ATTR_WUNUSED __uint8_t vga_rcrt(__uint8_t __reg) {
-	vga_w(VGA_CRT_IC, __reg);
-	return vga_r(VGA_CRT_DC);
+ * @param: reg:     One of `VGA_CRTC_*'
+ * @param: crt_icX: Either `VGA_CRT_IC' or `VGA_CRT_IM' (depending on `vga_rmis() & VGA_MIS_FCOLOR') */
+__FORCELOCAL __ATTR_WUNUSED __uint8_t vga_rcrt(__port_t __crt_icX, __uint8_t __reg) {
+	vga_w(__crt_icX, __reg);
+	return vga_r(__crt_icX + (VGA_CRT_DC - VGA_CRT_IC));
 }
-__FORCELOCAL void vga_wcrt(__uint8_t __reg, __uint8_t __val) {
-	__VGA_OUTW_SELECTOR(vga_w, VGA_CRT_IC, VGA_CRT_DC, __reg, __val);
+__FORCELOCAL void vga_wcrt(__port_t __crt_icX, __uint8_t __reg, __uint8_t __val) {
+	__VGA_OUTW_SELECTOR(vga_w, __crt_icX, __crt_icX + (VGA_CRT_DC - VGA_CRT_IC), __reg, __val);
 }
-__FORCELOCAL void vga_wcrt_res(__uint8_t __reg, __uint8_t __val, __uint8_t __resmask) {
+__FORCELOCAL void vga_wcrt_res(__port_t __crt_icX, __uint8_t __reg, __uint8_t __val, __uint8_t __resmask) {
 	__hybrid_assert(!(__val & __resmask));
 	if __untraced(__resmask) {
-		vga_wcrt(__reg, (vga_rcrt(__reg) & __resmask) | __val);
+		vga_wcrt(__crt_icX, __reg, (vga_rcrt(__crt_icX, __reg) & __resmask) | __val);
 	} else {
-		vga_wcrt(__reg, __val);
+		vga_wcrt(__crt_icX, __reg, __val);
 	}
 }
 
@@ -132,38 +144,48 @@ __FORCELOCAL void vga_wgfx_res(__uint8_t __reg, __uint8_t __val, __uint8_t __res
 }
 
 
+__FORCELOCAL __ATTR_WUNUSED __uint8_t vga_rattr_index(__port_t __is1_rX) {
+	vga_r_p(__is1_rX); /* Reset flip/flop */
+	return vga_r_p(VGA_ATT_IW);
+}
+
+__FORCELOCAL void vga_wattr_index(__port_t __is1_rX, __uint8_t __val) {
+	vga_r_p(__is1_rX); /* Reset flip/flop */
+	vga_w_p(VGA_ATT_IW, __val);
+}
 
 /* VGA attribute controller register read/write
- * @param: is1_rX:      Either `VGA_IS1_RC' or `VGA_IS1_RM'
- * @param: reg_and_pas: One of `VGA_ATC_*', optionally or'd with `VGA_ATT_IW_PAS',
- *                      depending on `pas_or_0' previously passed to `vga_setpas'. */
-__FORCELOCAL __ATTR_WUNUSED __uint8_t vga_rattr(__port_t __is1_rX, __uint8_t __reg_and_pas) {
+ * @param: is1_rX: Either `VGA_IS1_RC' or `VGA_IS1_RM'
+ * @param: reg:    One of `VGA_ATC_*'. */
+__FORCELOCAL __ATTR_WUNUSED __uint8_t vga_rattr(__port_t __is1_rX, __uint8_t __reg) {
+	__uint8_t __res, __pas;
 	vga_r_p(__is1_rX); /* Reset flip/flop */
-	vga_w_p(VGA_ATT_IW, __reg_and_pas);
-	return vga_r_p(VGA_ATT_R);
+	__pas = vga_r_p(VGA_ATT_IW);
+	vga_w_p(VGA_ATT_IW, __reg);
+	__res = vga_r_p(VGA_ATT_R);
+	vga_r_p(__is1_rX); /* Reset flip/flop */
+	vga_w_p(VGA_ATT_IW, __pas);
+	return __res;
 }
-__FORCELOCAL void vga_wattr(__port_t __is1_rX, __uint8_t __reg_and_pas, __uint8_t __val) {
+__FORCELOCAL void vga_wattr(__port_t __is1_rX, __uint8_t __reg, __uint8_t __val) {
+	__uint8_t __pas;
 	vga_r_p(__is1_rX); /* Reset flip/flop */
-	vga_w_p(VGA_ATT_IW, __reg_and_pas);
+	__pas = vga_r_p(VGA_ATT_IW);
+	vga_w_p(VGA_ATT_IW, __reg);
 	vga_w_p(VGA_ATT_W, __val);
+	vga_w_p(VGA_ATT_IW, __pas);
 }
-__FORCELOCAL void vga_wattr_res(__port_t __is1_rX, __uint8_t __reg_and_pas,
+__FORCELOCAL void vga_wattr_res(__port_t __is1_rX, __uint8_t __reg,
                                 __uint8_t __val, __uint8_t __resmask) {
+	__uint8_t __oldval, __pas;
 	__hybrid_assert(!(__val & __resmask));
-	if __untraced(__resmask) {
-		vga_wattr(__is1_rX, __reg_and_pas, (vga_rattr(__is1_rX, __reg_and_pas) & __resmask) | __val);
-	} else {
-		vga_wattr(__is1_rX, __reg_and_pas, __val);
-	}
+	vga_r_p(__is1_rX);
+	__pas = vga_r_p(VGA_ATT_IW);
+	vga_w_p(VGA_ATT_IW, __reg);
+	__oldval = vga_r_p(VGA_ATT_R);
+	vga_w_p(VGA_ATT_W, (__oldval & __resmask) | __val);
+	vga_w_p(VGA_ATT_IW, __pas);
 }
-
-/* Enable/disable color palette access.
- * WARNING: While enabled, nothing (may) be displayed on-screen!
- * @param: pas_or_0: Either `0' (to enable), or `VGA_ATT_IW_PAS' (to disable) */
-#define vga_setpas(is1_rX, pas_or_0)        \
-	(vga_r_p(is1_rX) /* Reset flip/flop */, \
-	 vga_w_p(VGA_ATT_IW, pas_or_0))
-
 
 __DECL_END
 #endif /* __CC__ */

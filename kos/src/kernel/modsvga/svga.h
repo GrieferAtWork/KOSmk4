@@ -103,7 +103,8 @@ NOTHROW(FCALL svga_ttyaccess_v_setcell_txt)(struct vidttyaccess *__restrict self
 
 /* TEXT tty sub-class. */
 struct svga_ttyaccess_txt: svga_ttyaccess {
-	COMPILER_FLEXIBLE_ARRAY(uint16_t, stt_display);   /* [vta_scan * vta_resy][lock(vta_lock)] Display contents. */
+	port_t                            stt_crt_icX;  /* [lock(vta_lock)] Either `VGA_CRT_IC' or `VGA_CRT_IM' */
+	COMPILER_FLEXIBLE_ARRAY(uint16_t, stt_display); /* [vta_scan * vta_resy][lock(vta_lock)] Display contents. */
 };
 #define svga_ttyaccess_txt_vmem(self) ((uint16_t *)mnode_getaddr(&(self)->sta_vmem))
 #define svga_ttyaccess_txt_dmem(self) ((self)->stt_display)
@@ -148,7 +149,7 @@ struct svgatty: vidtty { };
 
 struct svgalck: vidlck {
 	struct svga_modeinfo const     *slc_mode;   /* [0..1][lock(vlc_dev->vd_lock)] Current video mode (for `SVGA_IOC_GETMODE' / `SVGA_IOC_SETMODE') */
-	struct vga_mode                 slc_vmode;  /* [lock(vlc_dev->vd_lock)] Standard VGA registers to restore upon release. */
+	struct vga_regs                 slc_vregs;  /* [lock(vlc_dev->vd_lock)] Standard VGA registers to restore upon release. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, slc_xregs); /* [lock(vlc_dev->vd_lock)][0..vlc_dev->svd_chipset.sco_regsize]
 	                                             * Extended registers (restored with `sul_screen.sty_dev->svd_chipset.sco_setregs') */
 };
@@ -159,7 +160,7 @@ struct svgalck: vidlck {
 /* Register-save structure for the builtin debugger. */
 struct svga_dbgregs {
 	bool                            sdr_hasxregs; /* Set to true if `sdr_xdata' contains chipset registers. */
-	struct vga_mode                 sdr_vmode;    /* Saved standard VGA registers. */
+	struct vga_regs                 sdr_vmode;    /* Saved standard VGA registers. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, sdr_xdata);   /* Chipset register buffer + clobbered video-memory buffer (in that order) */
 };
 #endif /* CONFIG_HAVE_DEBUGGER */
