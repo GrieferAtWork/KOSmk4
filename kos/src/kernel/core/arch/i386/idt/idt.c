@@ -33,7 +33,6 @@
 #include <kernel/x86/idt.h>
 #include <kernel/x86/pic.h>
 #include <sched/cpu.h>
-#include <sched/shared_rwlock.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -41,6 +40,7 @@
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/segment.h>
+#include <kos/sched/shared-lock.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -136,7 +136,7 @@ PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_dbgaltcoreidt_ptr = {
 #endif /* !CONFIG_NO_DEBUGGER */
 
 /* Lock used to guard against multiple threads modifying the IDT */
-PRIVATE ATTR_COLDBSS struct shared_rwlock x86_idt_modify_lock = SHARED_RWLOCK_INIT;
+PRIVATE ATTR_COLDBSS struct shared_lock x86_idt_modify_lock = SHARED_LOCK_INIT;
 
 /* [0..1][lock(x86_idt_modify_lock)]
  * The temporary IDT copy that is in-use while the original IDT is getting modified. */
@@ -249,11 +249,11 @@ PUBLIC ATTR_COLDTEXT bool FCALL x86_idt_modify_begin(bool nx)
 		copy = (struct idt_segment *)kmalloc(256 * sizeof(struct idt_segment),
 		                                     GFP_LOCKED | GFP_PREFLT);
 	}
-	if (!shared_rwlock_trywrite(&x86_idt_modify_lock)) {
+	if (!shared_lock_tryacquire(&x86_idt_modify_lock)) {
 		if (nx)
 			return false;
 		TRY {
-			shared_rwlock_write(&x86_idt_modify_lock);
+			shared_lock_acquire(&x86_idt_modify_lock);
 		} EXCEPT {
 			kfree(copy);
 			RETHROW();
@@ -281,17 +281,21 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 		return;
 	}
 #endif /* CONFIG_HAVE_DEBUGGER */
-	assert(shared_rwlock_writing(&x86_idt_modify_lock));
+	assert(shared_lock_acquired(&x86_idt_modify_lock));
 	assert(x86_idt_modify_copy);
 	copy = x86_idt_modify_copy;
 	x86_idt_modify_copy = NULL;
+
 	/* Check if we're supposed to discard any changes made. */
 	if (discard_changes)
 		memcpy(x86_idt, copy, 256, sizeof(struct idt_segment));
+
 	/* Restore the used IDT within all CPUs */
 	x86_idt_setcurrent(&x86_idt_ptr);
+
 	/* Release the IDT modifications lock. */
-	shared_rwlock_endwrite(&x86_idt_modify_lock);
+	shared_lock_release(&x86_idt_modify_lock);
+
 	/* Free the temporary IDT copy */
 	kfree(copy);
 }
