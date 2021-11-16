@@ -20,7 +20,6 @@
 #ifndef _LIBSVGA_UTIL_VGAIO_H
 #define _LIBSVGA_UTIL_VGAIO_H 1
 
-#include <hybrid/__assert.h>
 #include <hybrid/byteorder.h>
 
 #include <bits/types.h>
@@ -95,9 +94,10 @@ __FORCELOCAL void vga_wcrt(__port_t __crt_icX, __uint8_t __reg, __uint8_t __val)
 	__VGA_OUTW_SELECTOR(vga_w, __crt_icX, __crt_icX + (VGA_CRT_DC - VGA_CRT_IC), __reg, __val);
 }
 __FORCELOCAL void vga_wcrt_res(__port_t __crt_icX, __uint8_t __reg, __uint8_t __val, __uint8_t __resmask) {
-	__hybrid_assert(!(__val & __resmask));
 	if __untraced(__resmask) {
-		vga_wcrt(__crt_icX, __reg, (vga_rcrt(__crt_icX, __reg) & __resmask) | __val);
+		vga_wcrt(__crt_icX, __reg,
+		         (vga_rcrt(__crt_icX, __reg) & __resmask) |
+		         (__val & ~__resmask));
 	} else {
 		vga_wcrt(__crt_icX, __reg, __val);
 	}
@@ -115,9 +115,10 @@ __FORCELOCAL void vga_wseq(__uint8_t __reg, __uint8_t __val) {
 	__VGA_OUTW_SELECTOR(vga_w, VGA_SEQ_I, VGA_SEQ_D, __reg, __val);
 }
 __FORCELOCAL void vga_wseq_res(__uint8_t __reg, __uint8_t __val, __uint8_t __resmask) {
-	__hybrid_assert(!(__val & __resmask));
 	if __untraced(__resmask) {
-		vga_wseq(__reg, (vga_rseq(__reg) & __resmask) | __val);
+		vga_wseq(__reg,
+		         (vga_rseq(__reg) & __resmask) |
+		         (__val & ~__resmask));
 	} else {
 		vga_wseq(__reg, __val);
 	}
@@ -135,9 +136,10 @@ __FORCELOCAL void vga_wgfx(__uint8_t __reg, __uint8_t __val) {
 	__VGA_OUTW_SELECTOR(vga_w, VGA_GFX_I, VGA_GFX_D, __reg, __val);
 }
 __FORCELOCAL void vga_wgfx_res(__uint8_t __reg, __uint8_t __val, __uint8_t __resmask) {
-	__hybrid_assert(!(__val & __resmask));
 	if __untraced(__resmask) {
-		vga_wgfx(__reg, (vga_rgfx(__reg) & __resmask) | __val);
+		vga_wgfx(__reg,
+		         (vga_rgfx(__reg) & __resmask) |
+		         (__val & ~__resmask));
 	} else {
 		vga_wgfx(__reg, __val);
 	}
@@ -178,12 +180,12 @@ __FORCELOCAL void vga_wattr(__port_t __is1_rX, __uint8_t __reg, __uint8_t __val)
 __FORCELOCAL void vga_wattr_res(__port_t __is1_rX, __uint8_t __reg,
                                 __uint8_t __val, __uint8_t __resmask) {
 	__uint8_t __oldval, __pas;
-	__hybrid_assert(!(__val & __resmask));
 	vga_r_p(__is1_rX);
 	__pas = vga_r_p(VGA_ATT_IW);
 	vga_w_p(VGA_ATT_IW, __reg);
 	__oldval = vga_r_p(VGA_ATT_R);
-	vga_w_p(VGA_ATT_W, (__oldval & __resmask) | __val);
+	vga_w_p(VGA_ATT_W, (__oldval & __resmask) |
+	                   (__val & ~__resmask));
 	vga_w_p(VGA_ATT_IW, __pas);
 }
 

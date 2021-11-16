@@ -56,7 +56,7 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_TEXT] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_lfb            = 0xb8000,
+				.smi_lfb            = 0xB8000,
 				.smi_flags          = SVGA_MODEINFO_F_LFB | SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_TXT,
 				.smi_scanline       = 160,
 				.smi_resx           = 80,
@@ -148,7 +148,8 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 	[CS_VGAMODE_320X200X256] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_flags          = SVGA_MODEINFO_F_PAL,
+				.smi_lfb            = 0xA0000,
+				.smi_flags          = SVGA_MODEINFO_F_LFB | SVGA_MODEINFO_F_PAL,
 				.smi_scanline       = 320,
 				.smi_resx           = 320,
 				.smi_resy           = 200,
@@ -227,7 +228,7 @@ INTERN_CONST struct vga_known_mode const ega_modelist[CS_EGAMODE_COUNT] = {
 	[CS_EGAMODE_TEXT] = {
 		.vkm_info = {
 			.gmi_base = {
-				.smi_lfb            = 0xb8000,
+				.smi_lfb            = 0xB8000,
 				.smi_flags          = SVGA_MODEINFO_F_LFB | SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_TXT,
 				.smi_scanline       = 160,
 				.smi_resx           = 80,
@@ -416,6 +417,7 @@ vga_v_setmode(struct svga_chipset *__restrict self,
 	case 1: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_16; break;
 	case 2: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_256; break;
 	case 8: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_linear; break;
+	case 16: break; /* Text-mode. */
 	default: __builtin_unreachable();
 	}
 	me->sc_displaystart = 0;
