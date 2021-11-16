@@ -173,7 +173,7 @@ struct epoll_controller {
 	                                                  * the `ehm_wtest' field */
 	struct sig                        ec_avail;      /* Send once every time that `ec_raised' becomes non-NULL. */
 	size_t                            ec_used;       /* [lock(ec_lock)] Amount of used (non-NULL and non-deleted) entries */
-	size_t                            ec_size;       /* [lock(ec_lock)] Amount of (non-NULL) entires. */
+	size_t                            ec_size;       /* [lock(ec_lock)] Amount of (non-NULL) entries. */
 	size_t                            ec_mask;       /* [lock(ec_lock)] Hash-mask for `pn_list' */
 	struct epoll_controller_ent      *ec_list;       /* [1..sc_mask+1][owned][lock(ec_lock)] Hash-vector of monitors.
 	                                                  * For  hashing,  the  `h_data'  pointer  of  handles  is  used. */

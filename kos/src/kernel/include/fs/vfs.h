@@ -108,7 +108,7 @@ struct path {
 	LIST_ENTRY(path)            p_dirnext; /* [0..1][lock(p_parent->p_lock)][valid_if(p_parent != NULL)]
 	                                        * Next sibling directory  with the same  `p_dirent->de_hash' */
 	size_t                      p_cldmask; /* [lock(p_lock)] Mask for the `p_cldlist' hash-map. */
-	size_t                      p_cldsize; /* [lock(p_lock)] Amount of entires within the `p_cldlist' hash-map. */
+	size_t                      p_cldsize; /* [lock(p_lock)] Amount of entries within the `p_cldlist' hash-map. */
 	struct path               **p_cldlist; /* [0..1][lock(p_lock)][0..p_cldmask + 1][lock(p_lock)][owned] Child paths. */
 	struct path                *p_delpend; /* [0..1][CHAIN(->p_delpend)][lock(p_lock)] Chain of paths that are pending removal from `p_cldlist'. */
 	LIST_ENTRY(path)            p_recent;  /* [0..1][lock(p_vfs->v_recent_lock)] Chain of recently used paths. */

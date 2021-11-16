@@ -487,7 +487,7 @@ struct pidns {
 	                                      * The parenting PID namespace with one less indirection. */
 	struct atomic_rwlock pn_lock;        /* Lock for accessing the hash-vector below. */
 	size_t               pn_used;        /* [lock(pn_lock)] Amount of used (non-NULL and non-DUMMY) PIDs */
-	size_t               pn_size;        /* [lock(pn_lock)] Amount of (non-NULL) PIDs entires. */
+	size_t               pn_size;        /* [lock(pn_lock)] Amount of (non-NULL) PIDs entries. */
 	size_t               pn_mask;        /* [lock(pn_lock)] Hash-mask for `pn_list' */
 	struct pidns_entry  *pn_list;        /* [1..pn_mask+1][owned_if(!= INTERNAL(empty_pidns_list))]
 	                                      * Hash-vector of PIDs. */

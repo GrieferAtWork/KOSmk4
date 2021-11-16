@@ -451,7 +451,7 @@ ProcFS_PerProc_RootDirectory_Lookup(struct directory_node *__restrict self,
 	REF struct fdirent *result;
 	result = ProcFS_PerProc_Directory_Locate(self, name, namelen, hash, mode);
 	if (result) {
-		/* Deal with special entires. */
+		/* Deal with special entries. */
 		result = ProcFS_PerProc_RootDirectory_TranslateSpecialEntry(self, result);
 		if (result) {
 			/* Create the unique copy */
@@ -471,7 +471,7 @@ ProcFS_PerProc_RootDirectory_Enum(struct directory_node *__restrict self,
 	struct fdirent *dent;
 	data = (struct fdirent **)self->i_fsdata;
 	for (i = 0; (dent = data[i]) != NULL; ++i) {
-		/* Deal with special entires. */
+		/* Deal with special entries. */
 		dent = ProcFS_PerProc_RootDirectory_TranslateSpecialEntry(self, dent);
 		if (dent) {
 			ino_t real_ino;

@@ -3436,7 +3436,7 @@ function loadSystemHeaderDefinitions(
 		local currentPrototypes = [("1", { currentPrototype })];
 		local currentKosLibraryFunction: LibraryFunction = none;
 		local currentDosLibraryFunction: LibraryFunction = none;
-		/* # of leading entires in @current.bindings that should appear before the self-binding */
+		/* # of leading entries in @current.bindings that should appear before the self-binding */
 		local numPreferredBindings = 0;
 		@@Additional function bindings that will be
 		local lateFunctionBindings: {FunctionBinding...} = ();

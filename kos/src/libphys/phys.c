@@ -242,8 +242,8 @@ NOTHROW(CC libphys_mmapphys)(PHYS physaddr_t addr, size_t num_bytes) {
 	void *result;
 	/* NOTE: As an  extension, KOS's  mmap(2) system  call automatically  does
 	 *       all of the  in-page-offset alignment  when it has  been given  an
-	 *       unaligned file-offset  or fixed  based address.  - It  will  only
-	 *       error  out of  a fixed address  is given, and  its in-page offset
+	 *       unaligned  file-offset  or fixed  base  address. -  It  will only
+	 *       error  out if  a fixed address  is given, and  its in-page offset
 	 *       differs  from that used  by the file  position. However, since we
 	 *       only pass a fixed file position, that case can never happen here. */
 	WITHMEM((result = mmap64(NULL, num_bytes, PROT_READ | PROT_WRITE,
@@ -257,7 +257,7 @@ INTERN NOBLOCK void
 NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes) {
 	/* For now, this is a simple wrapper, but in the future, a cache of
 	 * recently used physical memory location may be added to  libphys,
-	 * at which point this function would be used to mark cache entires
+	 * at which point this function would be used to mark cache entries
 	 * as no-longer-in-use. */
 	munmap(base, num_bytes);
 }

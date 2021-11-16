@@ -151,7 +151,7 @@ DATDEF unsigned int const dbg_screen_cellsize; /* Debug TTY cell size (in bytes)
 DATDEF unsigned int dbg_tabsize;
 #define DBG_TABSIZE_DEFAULT 4 /* Default TAB size */
 
-/* Cursor X-position assign after a line-feed */
+/* Cursor X-position assigned after a line-feed */
 DATDEF unsigned int dbg_indent;
 
 /* The ANSI TTY used for printing screen-output within the builtin debugger */

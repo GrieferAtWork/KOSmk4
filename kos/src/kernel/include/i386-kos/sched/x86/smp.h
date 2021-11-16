@@ -60,12 +60,12 @@ typedef struct ATTR_PACKED {
 	char       tab_productid[12];  /* Product ID (Padded with spaces). */
 	u32        tab_oemtab;         /* [0..1] Address of the OEM table. */
 	u16        tab_oemtabsize;     /* Size of the OEM table. */
-	u16        tab_entryc;         /* Amount of entires following this configuration table. */
+	u16        tab_entryc;         /* Amount of entries following this configuration table. */
 	u32        tab_lapicaddr;      /* Memory-mapped address of local APICs. */
 	u16        tab_extab_length;   /* Extended table length. */
 	u8         tab_extab_checksum; /* Extended table checksum. */
 	u8         tab_reserved;       /* Reserved... */
-	/* Inlined  vector of MP  entires, containing `tab_entryc' entires
+	/* Inlined  vector of MP  entries, containing `tab_entryc' entries
 	 * for a total of `tab_length-sizeof(MpConfigurationTable)' bytes. */
 } MpConfigurationTable;
 

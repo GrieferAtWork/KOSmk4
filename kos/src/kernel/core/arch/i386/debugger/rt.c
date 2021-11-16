@@ -443,7 +443,7 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 		target = cpu_vector[i];
 		if (target == calling_cpu)
 			continue;
-		/* At one point during early boot, the entires of the `cpu_vector'
+		/* At one point during early boot, the entries of the `cpu_vector'
 		 * are used to carry a 16-bit  block of information about the  how
 		 * the associated CPU will be addressed physically.
 		 * Since we known  that the  kernel lives  in upper  memory, and  that

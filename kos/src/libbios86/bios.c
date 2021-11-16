@@ -58,9 +58,7 @@ typedef __port_t port_t;
 
 
 /* >> bios86_init(3)
- * Initialize the bios86 library and return the base address for
- * the BIOS memory mapping (if called again at a later point  in
- * time, the base address is simply re-returned)
+ * Initialize a BIOS interrupt emulator `self'
  * @return:  0: Success.
  * @return: -1: Failed to initialize (s.a. `errno'). */
 DEFINE_PUBLIC_ALIAS(bios86_init, libbios86_init);
@@ -235,7 +233,6 @@ libbios86_emulator_int(struct bios86_emulator *__restrict self,
 	        "Emulator not initialized");
 
 	/* Fill in register state */
-	self->b86e_vm.vr_intr        = NULL;
 	self->b86e_vm.vr_regs.vr_esp = BIOS86_MEM_SP & 0xffff;
 	self->b86e_vm.vr_regs.vr_ss  = (BIOS86_MEM_SP & 0xf0000) >> 4;
 	self->b86e_vm.vr_regs.vr_eip = 0xffff;

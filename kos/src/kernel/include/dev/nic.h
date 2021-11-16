@@ -71,7 +71,7 @@ struct nic_packet {
 	byte_t           *np_tailend;  /* [1..1] End of tail data (grows down) */
 	/* TODO: Add a field `REF struct mman *np_payldmm; // [0..1][lock(WRITE_ONCE)]'
 	 *       that contains a  non-NULL pointer  when the VM  containing the  memory
-	 *       regions  described  by payload  entires  differs from  the  current VM
+	 *       regions  described  by payload  entries  differs from  the  current VM
 	 *       of the calling thread.
 	 * -> Right now, a lot of VM context switching happens as part  of
 	 *    outbound packet routing, and  we could drastically cut  down

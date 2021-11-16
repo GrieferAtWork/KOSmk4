@@ -741,7 +741,7 @@ syslog_printer(void *level,
 		THROWS(E_SEGFAULT) {
 	ssize_t result = (ssize_t)datalen;
 	struct syslog_buffer *buffer;
-	/* Quick check: are log entires of level enabled. */
+	/* Quick check: are log entries of level enabled. */
 	if (!(syslog_levels & ((uintptr_t)1 << (shift_t)(uintptr_t)level)))
 		goto done;
 	/* Check for special case: empty message */

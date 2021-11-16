@@ -651,7 +651,7 @@ NOTHROW(FCALL handle_manager_rebind_indirect)(struct handle_manager *__restrict 
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL handle_manager_flatten_handle_vector)(struct handle_manager *__restrict self) {
-	/* Try to re-bind handle mappings, so-as not to leave any unused entires. */
+	/* Try to re-bind handle mappings, so-as not to leave any unused entries. */
 	unsigned int dst_index = 0; /* Target index. */
 	unsigned int src_index = 0; /* Origin index. */
 	struct handle *vec;
@@ -781,13 +781,13 @@ NOTHROW(FCALL handle_manager_try_downhash)(struct handle_manager *__restrict sel
 		self->hm_hashvector.hm_hashvec = new_hashvec;
 		self->hm_hashvector.hm_hashmsk = new_mask;
 		/* All of the deleted handles have been removed, meaning  that
-		 * the amount of used entires now matches the amount of mapped
+		 * the amount of used entries now matches the amount of mapped
 		 * handles. */
 		self->hm_hashvector.hm_hashuse = self->hm_count;
 	}
 check_truncate_hashvec:
 	assert(self->hm_hashvector.hm_alloc >= self->hm_count);
-	/* Try to re-bind handle mappings, so-as not to leave any unused entires. */
+	/* Try to re-bind handle mappings, so-as not to leave any unused entries. */
 	if (self->hm_hashvector.hm_alloc >= self->hm_count + 32)
 		handle_manager_flatten_handle_vector(self);
 }
@@ -1426,7 +1426,7 @@ handle_manage_switch_to_hashmode_for_handle(struct handle_manager *__restrict se
 		self->hm_hashvector.hm_hashmsk = used_mask;
 		self->hm_hashvector.hm_hashuse = self->hm_count;
 		self->hm_hashvector.hm_vecfree = self->hm_minfree;
-		/* Try to re-bind handle mappings, so-as not to leave any unused entires. */
+		/* Try to re-bind handle mappings, so-as not to leave any unused entries. */
 		if (self->hm_hashvector.hm_alloc >= self->hm_count + 32)
 			handle_manager_flatten_handle_vector(self);
 		return result;
@@ -1509,7 +1509,7 @@ handle_manage_rehash(struct handle_manager *__restrict self)
 	}
 	self->hm_hashvector.hm_hashvec = new_map;
 	self->hm_hashvector.hm_hashmsk = used_mask;
-	/* All deleted entires have been removed, so HASHUSE is set to COUNT */
+	/* All deleted entries have been removed, so HASHUSE is set to COUNT */
 	self->hm_hashvector.hm_hashuse = self->hm_count;
 	return result;
 }

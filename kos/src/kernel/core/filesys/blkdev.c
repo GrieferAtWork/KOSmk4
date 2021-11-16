@@ -565,7 +565,7 @@ fail_bad_partition_vector:
 	       device_getname(self), efi_entbase, blkdev_getsectorsize(self));
 	return false;
 fail_ent_toosmall:
-	printk(KERN_ERR "[blk] EFI partition entires in %#" PRIx64 " on "
+	printk(KERN_ERR "[blk] EFI partition entries in %#" PRIx64 " on "
 	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) are too small (%" PRIu32 " bytes)\n",
 	       efipart_sectormin, MAJOR(self->dn_devno), MINOR(self->dn_devno),

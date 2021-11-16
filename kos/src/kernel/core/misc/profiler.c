@@ -134,7 +134,7 @@ branchstat_listsection(branchstat_callback_t cb, void *arg,
                        struct driver_section *__restrict sect,
                        bool annotated, bool is_driver) {
 	ssize_t result;
-	/* Enumerate all entires contains within the given section. */
+	/* Enumerate all entries contains within the given section. */
 	byte_t *data;
 	size_t size;
 	data   = module_section_getaddr_inflate(sect, &size);

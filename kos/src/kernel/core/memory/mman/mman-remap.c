@@ -289,7 +289,7 @@ something_changed:
 	pagedir_unprepare_p(self->mm_pagedir_p, result, map.mmwu_map.mfm_size);
 
 	/* If some other mapping was there before, then we must invalidate
-	 * the page directory  cache so-as to  prevent any stale  entires.
+	 * the page directory  cache so-as to  prevent any stale  entries.
 	 * This has to happen before we  unlock the mman, and destroy  the
 	 * old mappings, though!
 	 * NOTE: We don't do  this unconditionally though,  because this  isn't

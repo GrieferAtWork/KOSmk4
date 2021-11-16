@@ -3352,7 +3352,7 @@ class SystemHeader {
 	public member functionsByName: {string: (Function | _DuplicateFunctionMarker)} = Dict();
 
 	@@Same as @functionsByName, but for local functions
-	@@Duplicate entires aren't allowed
+	@@Duplicate entries aren't allowed
 	public member localFunctionsByName: {string: LocalFunction} = Dict();
 
 	public function preload() {

@@ -178,11 +178,11 @@ File.stdout = File.open("kos/misc/scripts/routes-x86_64.txt", "w");
  * huge number of  various automated systems  working together in  order to form  them,
  * including all of the system call compatibility checks done by generate_syscalls.dee,
  * along  to the way that system call tables are generated, along to system calls being
- * implemented, alongside possibly aliasing entires in various other tables) */
+ * implemented, alongside possibly aliasing entries in various other tables) */
 dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 
 	/* 64-bit, high-level SYSVABI-compatible  tables
-	 * In general, entires of this table are `sys_*' */
+	 * In general, entries of this table are `sys_*' */
 	"x86_sysroute0_c",
 	"x86_sysroute1_c",
 
@@ -198,7 +198,7 @@ dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 	 * need any form of adjustment  being done to convert 32-bit  registers
 	 * into 64-bit argument), then this table directly contains a `sys32_*'
 	 * function pointer.
-	 * In general, entires of this table are `__x86_asm32_sysrun32_*' */
+	 * In general, entries of this table are `__x86_asm32_sysrun32_*' */
 	"x86_sysroute0_runc32",
 	"x86_sysroute1_runc32",
 
@@ -209,7 +209,7 @@ dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 	 * located  at `0(%rsp)',  with all  other registers  (including %rax, but
 	 * excluding  any  register found  int he  IRET  tail) still  having their
 	 * original user-space values.
-	 * In general, entires of this table are `__x86_asm64_syscall_*' */
+	 * In general, entries of this table are `__x86_asm64_syscall_*' */
 	"x86_sysroute0_asm64_syscall",
 	"x86_sysroute1_asm64_syscall",
 
@@ -221,7 +221,7 @@ dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 	 * only that the register state matches what the 32-bit system call invocation
 	 * ABI (aka. REG0=%ebx, REG1=%ecx, etc...)
 	 * Additionally, a `struct irregs64' structure can be found at `0(%rsp)'
-	 * In  general,  entires   of  this   table  are   `__x86_asm32_int80_*' */
+	 * In  general,  entries   of  this   table  are   `__x86_asm32_int80_*' */
 	"x86_sysroute0_asm32_int80",
 	"x86_sysroute1_asm32_int80",
 
@@ -233,7 +233,7 @@ dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 	 * via   `0(%ebp)'   and   `4(%ebp)'   (s.a.   `x86_syscall32_sysenter')
 	 * Note   that  the  `struct irregs64'   structure  found  at  `0(%rsp)'
 	 * is   also   present   when   one   of   these   wrapper   is  called.
-	 * In  general,  entires   of  this   table  are   `__x86_asm32_int80_*'
+	 * In  general,  entries   of  this   table  are   `__x86_asm32_int80_*'
 	 * NOTE: Becaues     binary     compatibility     with     `x86_sysrouteN_asm32_int80'     is
 	 *       possible  when   a   system   call's   register  count   is   `<= 4',   the   actual
 	 *       entry points used  in these  cases are shared  with the  `x86_sysrouteN_asm32_int80'

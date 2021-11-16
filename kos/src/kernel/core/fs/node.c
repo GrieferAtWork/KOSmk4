@@ -1411,7 +1411,7 @@ set_unimplemented:
 		return NULL;
 	}
 continue_reading:
-	/* Read more entires. */
+	/* Read more entries. */
 	last_directory_position = self->d_dirend;
 #ifndef NDEBUG
 	entry_start_position = last_directory_position;
@@ -1541,7 +1541,7 @@ set_unimplemented:
 		return NULL;
 	}
 continue_reading:
-	/* Read more entires. */
+	/* Read more entries. */
 	last_directory_position = self->d_dirend;
 #ifndef NDEBUG
 	entry_start_position = last_directory_position;
@@ -2092,7 +2092,7 @@ NOTHROW(KCALL directory_addentry)(struct directory_node *__restrict self,
 	entry->de_next = *pdirent; /* Inherit reference. */
 	*pdirent       = entry;    /* Inherit reference. */
 
-	/* Track the total number of directory entires. */
+	/* Track the total number of directory entries. */
 	++self->d_size;
 
 	if (self->d_size >= (self->d_mask / 3) * 2)
@@ -2135,7 +2135,7 @@ NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
 		pdirent = &iter->de_next;
 	}
 	*pdirent = entry->de_next;
-	/* Track the total number of directory entires. */
+	/* Track the total number of directory entries. */
 	assert(self->d_size);
 	--self->d_size;
 	if (self->d_size <= (self->d_mask / 3))
@@ -2926,7 +2926,7 @@ acquire_sourcedir_writelock:
 						source_entry = NULL;
 					}
 					/* Must add the new entry _after_ removing the old one, since the act
-					 * of  adding new entires  may realloc() the  d_map vector, which the
+					 * of  adding new entries  may realloc() the  d_map vector, which the
 					 * `psource_entry' above may point into.
 					 * So this has to happen afterwards, else  we run the risk of writing  to
 					 * free()'d memory in the line: `*psource_entry = source_entry->de_next;' */

@@ -34,9 +34,7 @@
 DECL_BEGIN
 
 /* >> bios86_init(3)
- * Initialize the bios86 library and return the base address for
- * the BIOS memory mapping (if called again at a later point  in
- * time, the base address is simply re-returned)
+ * Initialize a BIOS interrupt emulator `self'
  * @return:  0: Success.
  * @return: -1: Failed to initialize (s.a. `errno'). */
 #ifdef __KERNEL__

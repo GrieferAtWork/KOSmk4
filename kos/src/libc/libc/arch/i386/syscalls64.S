@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b3bd118 */
+/* HASH CRC-32:0xa523624f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3776,7 +3776,7 @@ DEFINE_PUBLIC_ALIAS(sys_userviofd, libc_sys_userviofd)
  *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
  * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
  *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
- *                           Note that earlier  entires within this  vector are further  up the call-stack,  with
+ *                           Note that earlier  entries within this  vector are further  up the call-stack,  with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
  *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
  *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
@@ -8734,7 +8734,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xuserviofd, libc_sys_Xuserviofd)
  *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
  * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
  *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
- *                           Note that earlier  entires within this  vector are further  up the call-stack,  with
+ *                           Note that earlier  entries within this  vector are further  up the call-stack,  with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
  *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
  *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.

@@ -1508,13 +1508,13 @@ NOTHROW(KCALL lfn_checksum)(char const *__restrict dos83_name) {
 
 /* Generate the sequence of FAT file-entries required to represent the
  * given `new_node', using `target_dirent' as name in a FAT directory.
- * When LFN entires are required, those are generated as-needed,  with
+ * When LFN entries are required, those are generated as-needed,  with
  * the final entry then describing a regular DOS 8.3 filename.
  * NOTE: Of the trailing 8.3 file entry, the caller must still initialize
  *       the   `f_clusterhi',   `f_clusterlo'   and   `f_size'    fields!
  * @param: pbuffer_length: [in|out] The    amount   of   allocated   space   for   `struct fat_dirent'
  *                                  structures   in   `buffer'  (bytes   /  sizeof(struct fat_dirent))
- *                                  Upon success, the amount of used entires is stored here.
+ *                                  Upon success, the amount of used entries is stored here.
  *                                  NOTE: Must be non-zero on entry!
  * @param: cookie: A cookie used to disambiguate the 8.3 filename
  * @param: inhert_heap_buffer: When true, inherit `buffer' as a kmalloc() pointer
@@ -1657,7 +1657,7 @@ Fat_GenerateFileEntries(struct fat_dirent *__restrict buffer,
 			return buffer;
 		}
 	}
-	/* Need to use LFN entires! */
+	/* Need to use LFN entries! */
 #define FAT_8DOT3_MAX_DISAMBIGUATION (0xffff * 9)
 	{
 		unsigned int matchsize;
@@ -1736,7 +1736,7 @@ Fat_GenerateFileEntries(struct fat_dirent *__restrict buffer,
 		/* Fill unused characters of the last file with `0xFFFF' */
 		memsetw(&lfn_name[lfn_length], 0xffff,
 		        (req_files * LFN_NAME) - lfn_length);
-		/* Now to generate the LFN entires! */
+		/* Now to generate the LFN entries! */
 		avail_files = *pbuffer_length;
 		if (inhert_heap_buffer)
 			avail_files = (u32)(kmalloc_usable_size(buffer) / sizeof(struct fat_dirent));

@@ -129,7 +129,7 @@ function scanDirectoryForIncludeMacros(path: string) {
 /* Step #1: Search for #include file macros */
 scanDirectoryForIncludeMacros(FT2_INCPATH);
 
-/* Step #2: Remove entires that are ambiguous */
+/* Step #2: Remove entries that are ambiguous */
 again_remove_ambig:
 for (local a, b: incmacros) {
 	if (b === false) {

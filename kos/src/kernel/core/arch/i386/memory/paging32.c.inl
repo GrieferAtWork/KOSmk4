@@ -190,7 +190,7 @@ NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
 	if __untraced(HAVE_4MIB_PAGES) {
 		__wrcr4(__rdcr4() | CR4_PSE);
 		/* TODO: Merge  whole  4MiB pages  within  the kernel  core,  thus saving  on the
-		 *       amount of needed TLB entires to translate kernel-space memory addresses. */
+		 *       amount of needed TLB entries to translate kernel-space memory addresses. */
 	}
 	/* TODO: Add support for  `PSE-36' to  map 4MiB  pages to  40-bit physical  addresses.
 	 *       Implementing this shouldn't be too  difficult, but would require a  dedicated
@@ -212,7 +212,7 @@ INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 	if __untraced(HAVE_2MIB_PAGES) {
 		/* TODO: Merge  whole  2MiB pages  within  the kernel  core,  thus saving  on the
-		 *       amount of needed TLB entires to translate kernel-space memory addresses. */
+		 *       amount of needed TLB entries to translate kernel-space memory addresses. */
 	}
 	if __untraced(!HAVE_EXECUTE_DISABLE) {
 		unsigned int i;

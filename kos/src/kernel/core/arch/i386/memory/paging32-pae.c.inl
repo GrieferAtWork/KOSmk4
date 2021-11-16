@@ -508,7 +508,7 @@ NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 const e1_p[51
 	}
 	if (e1.p_word != PAE_PAGE_ABSENT)
 		return false; /* Non-present, but with meta-data (hint/prepared) -> Cannot flatten. */
-	/* Check if all entires are marked as ABSENT */
+	/* Check if all entries are marked as ABSENT */
 	for (vec1 = 1; vec1 < 512; ++vec1) {
 		e1.p_word = ATOMIC_READ64(e1_p[vec1].p_word);
 		if (vec1 == still_prepared_vec2 && !PAE_PDIR_E1_ISHINT(e1.p_word))
@@ -1793,7 +1793,7 @@ pae_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
 	if (data->ed_prevsize) {
 		if ((byte_t *)data->ed_prevstart >= (byte_t *)PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) {
 			++data->ed_identcnt;
-			goto done_print; /* Skip entires within the identity mapping. */
+			goto done_print; /* Skip entries within the identity mapping. */
 		}
 		pae_doenum(data, data->ed_prevstart, data->ed_prevsize, data->ed_prevword, data->ed_mask);
 	}

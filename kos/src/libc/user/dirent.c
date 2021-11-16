@@ -378,7 +378,7 @@ again:
 		return result;
 	}
 
-	/* Read more entires. */
+	/* Read more entries. */
 	load_size = kreaddir(dirp->ds_fd,
 	                     dirp->ds_buf,
 	                     dirp->ds_bufsize,

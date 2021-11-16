@@ -59,7 +59,7 @@ global final WCHAR_REPLACEMENT_CC:    (string, string) = { "LIBDCALL", "LIBKCALL
 global final WCHAR_REPLACEMENT_VCC:   (string, string) = { "VLIBDCALL", "VLIBKCALL" };
 
 @@Mapping of all wchar functions ever defined (by name)
-@@Duplicate entires aren't allowed
+@@Duplicate entries aren't allowed
 global allWcharFunctionsByName: {string: WcharFunction} = Dict();
 
 @@Replace a single, given @keyword with its wchar replacement

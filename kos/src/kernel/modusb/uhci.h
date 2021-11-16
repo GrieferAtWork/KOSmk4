@@ -204,7 +204,7 @@ struct uhci_controller: usb_controller {
 	unsigned int               uc_suspdelay;      /* Delay (in milliseconds) before the controller is suspended. */
 	alignas(UHCI_FLE_ALIGN)
 	struct uhci_osqh           uc_qhstart;        /* [lock(INSERT(uc_lock))] Queue head start (Entries of `uc_framelist' first point to
-	                                               * optional isochronous, and eventually to this one) Afterwards, all entires point to
+	                                               * optional isochronous, and eventually to this one) Afterwards, all entries point to
 	                                               * this one, allowing one-time transfer  descriptors to be scheduled following  after
 	                                               * this queue.
 	                                               * NOTE: The hardware pointer of the last queue head always points back

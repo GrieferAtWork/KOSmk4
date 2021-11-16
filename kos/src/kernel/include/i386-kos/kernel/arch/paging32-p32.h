@@ -60,13 +60,13 @@ DECL_BEGIN
  *    0 8 6 4 2 0 8 6 4 2 0
  * ```
  *
- * NOTE: All entires of  E2 >=  768 are always  allocated (these  are the  ones
+ * NOTE: All entries of  E2 >=  768 are always  allocated (these  are the  ones
  *       responsible for  mapping kernel-space  at 0xc0000000-0xffffffff),  and
  *       always point to  E1-vectors, or  [const] and present  4MiB pages  that
  *       will never go away for the entire duration of KOS running (these pages
  *       may contain the kernel core itself,  which is done as an  optimization
  *       to simplify management of the core itself by allowing the CPU to cache
- *       the entire kernel core using only 1 or 2 TLB entires.
+ *       the entire kernel core using only 1 or 2 TLB entries.
  *    -> Since only 2 indirections exist (`struct p32_pdir::p_e2' and `union p32_pdir_e2::p_e1'), both
  *       of which are always pre-allocated/or const-initialized for addresses >= 0xc0000000, there  is
  *       no need to  prepare kernel-space  memory for  paging before  mapping memory.  I.e.: when  PAE

@@ -170,7 +170,7 @@ PUBLIC_CONST ATTR_DBGRODATA unsigned int const dbg_screen_cellsize = 2;
 /* Alignment of TAB characters (default: `DBG_TABSIZE_DEFAULT') */
 PUBLIC ATTR_DBGBSS unsigned int dbg_tabsize = 0;
 
-/* Cursor X-position assign after a line-feed */
+/* Cursor X-position assigned after a line-feed */
 PUBLIC ATTR_DBGBSS unsigned int dbg_indent = 0;
 
 /* The logecho-enabled state for debugger output.

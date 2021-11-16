@@ -92,7 +92,7 @@ DECL_BEGIN
  * >>
  * >> // Reference counter control for `P32_PDIR_E2_IDENTITY[vec2]'
  * >> // NOTE: Reference counting is implemented by combining the `d_unused1_ign'
- * >> //       fields of all of the E1-entires pointed to by the indexed E2-vector.
+ * >> //       fields of all of the E1-entries pointed to by the indexed E2-vector.
  * >> INTDEF NOBLOCK __BOOL NOTHROW(FCALL p32_pagedir_refe2_incref)(unsigned int vec2); // true: OK; false: Failed to incref
  * >> INTDEF NOBLOCK __BOOL NOTHROW(FCALL p32_pagedir_refe2_decref)(unsigned int vec2); // true: OK; false: Last ref has gone away (you must free the vector now)
  * >> INTDEF NOBLOCK __BOOL NOTHROW(FCALL p32_pagedir_refe2_isshrd)(unsigned int vec2); // true: At least 2 references; false: 1 reference

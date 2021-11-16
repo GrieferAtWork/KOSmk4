@@ -103,10 +103,11 @@ struct vidttyaccess {
 	uintptr_half_t              vta_cellh;         /* [const] Character cell height (usually `16') */
 	uintptr_half_t              vta_resx;          /* [const] # of character cells in X */
 	uintptr_half_t              vta_resy;          /* [const] # of character cells in Y */
-	size_t                      vta_scan;          /* [const] Scanline size (in characters cells) */
+	size_t                      vta_scan;          /* [const] Scanline size (in characters cells; usually the same as `vta_resx') */
 	uintptr_half_t              vta_scroll_ystart; /* [lock(vta_lock)][<= vta_scroll_yend && <= vta_resy] Start scroll line (usualy `0') */
 	uintptr_half_t              vta_scroll_yend;   /* [lock(vta_lock)][>= vta_scroll_ystart && <= vta_resy] End scroll line (usualy `vta_resy') */
 	union vidtty_cursor         vta_cursor;        /* [lock(vta_lock)] Current cursor position. */
+	uintptr_half_t             _vta_pad;           /* ... */
 	uintptr_half_t             _vta_scrl_ymax;     /* [lock(vta_lock)][== vta_scroll_yend - 1] */
 	uintptr_t                  _vta_scrl1_to;      /* [lock(vta_lock)][== vta_scroll_ystart * vta_resx] */
 	uintptr_t                  _vta_scrl1_from;    /* [lock(vta_lock)][== (vta_scroll_ystart + 1) * vta_resx] */

@@ -101,7 +101,7 @@ block_device_autopart_efi_impl(struct blkdev *__restrict self,
 	if ((u32)efi.gpt_hdrsize < offsetafter(struct efi_descriptor, gpt_partition_entsz))
 		efi.gpt_partition_entsz = (le32)128;
 	else if ((u32)efi.gpt_partition_entsz < offsetafter(struct efi_partition, p_part_end)) {
-		printk(KERN_ERR "[blk] EFI partition entires in %#" PRIx64 "...%#" PRIx64 " on "
+		printk(KERN_ERR "[blk] EFI partition entries in %#" PRIx64 "...%#" PRIx64 " on "
 		                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 		                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) are too small (%" PRIu32 " bytes)\n",
 		       (u64)part_min, (u64)part_max,

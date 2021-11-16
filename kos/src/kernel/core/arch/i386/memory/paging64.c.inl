@@ -836,7 +836,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[51
 	}
 	if (e1.p_word != P64_PAGE_ABSENT)
 		return false; /* Non-present, but with meta-data (hint/prepared) -> Cannot flatten. */
-	/* Check if all entires are marked as ABSENT */
+	/* Check if all entries are marked as ABSENT */
 	for (vec1 = 1; vec1 < 512; ++vec1) {
 		e1.p_word = ATOMIC_READ(e1_p[vec1].p_word);
 		if (vec1 == still_prepared_vec2 && !P64_PDIR_E1_ISHINT(e1.p_word))
@@ -886,7 +886,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e2_vector)(union p64_pdir_e2 const e2_p[51
 		*new_e3_word = e2.p_word;
 		return true;
 	}
-	/* Check if all entires are marked as NON-PRESENT
+	/* Check if all entries are marked as NON-PRESENT
 	 * NOTE: This  differs  from E1-vectors  in that  we simply
 	 *       consider anything without the  `P64_PAGE_FPRESENT'
 	 *       flag to be what E1 calls ABSENT, since unlike  E1,
@@ -912,7 +912,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e3_vector)(union p64_pdir_e3 const e3_p[51
 		/* There are no 512GiB pages, so we can't flatten this one... */
 		return false;
 	}
-	/* Check if all entires are marked as NON-PRESENT
+	/* Check if all entries are marked as NON-PRESENT
 	 * NOTE: This  differs  from E1-vectors  in that  we simply
 	 *       consider anything without the  `P64_PAGE_FPRESENT'
 	 *       flag to be what E1 calls ABSENT, since unlike  E1,
@@ -2820,7 +2820,7 @@ p64_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
 		    (byte_t *)data->ed_prevstart + data->ed_prevsize <= (byte_t *)(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE +
 		                                                                   P64_MMAN_KERNEL_PDIR_IDENTITY_SIZE)) {
 			++data->ed_identcnt;
-			goto done_print; /* Skip entires within the identity mapping. */
+			goto done_print; /* Skip entries within the identity mapping. */
 		}
 		p64_doenum(data, data->ed_prevstart, data->ed_prevsize, data->ed_prevword, data->ed_mask);
 	}

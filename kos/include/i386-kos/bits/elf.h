@@ -346,14 +346,14 @@ typedef struct {
 typedef struct {
 	Elf32_Word      nf_count;  /* Amount of stored file mappings. */
 	Elf32_Word      nf_pagesz; /* == getpagesize(). */
-/*	Elf32_Ntfileent nf_files[nf_count]; */    /* Vector of file entires. */
+/*	Elf32_Ntfileent nf_files[nf_count]; */    /* Vector of file entries. */
 /*	char            nf_names[nf_count][?]; */ /* Inline vector of ZERO-terminated strings, matching 'nf_files' (Iterate with: `iter = strend(iter) + 1') */
 } Elf32_Ntfile; /* Note section header content for `NT_FILE'. */
 
 typedef struct {
 	Elf64_Xword     nf_count;  /* Amount of stored file mappings. */
 	Elf64_Xword     nf_pagesz; /* == getpagesize(). */
-/*	Elf64_Ntfileent nf_files[nf_count]; */    /* Vector of file entires. */
+/*	Elf64_Ntfileent nf_files[nf_count]; */    /* Vector of file entries. */
 /*	char            nf_names[nf_count][?]; */ /* Inline vector of ZERO-terminated strings, matching 'nf_files' (Iterate with: `iter = strend(iter) + 1') */
 } Elf64_Ntfile; /* Note section header content for `NT_FILE'. */
 

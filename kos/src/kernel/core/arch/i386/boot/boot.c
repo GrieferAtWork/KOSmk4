@@ -120,11 +120,17 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      <cpuid: brand_string="BOCHS         Intel(R) Pentium(R) 4 CPU        ">
 	 *       in your .bxrc file
 	 */
-	if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U'))
+	if (/* Raw QEMU */
+	    (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) ||
+	    /* QEMU when running with `-accel hax' */
+	    (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('V', 'i', 'r', 't') &&
+	     bootcpu_x86_cpuid.ci_80000002b == MAKE_DWORD('u', 'a', 'l', ' ') &&
+	     bootcpu_x86_cpuid.ci_80000002c == MAKE_DWORD('C', 'P', 'U', ' ') &&
+	     bootcpu_x86_cpuid.ci_80000002d == MAKE_DWORD('\0', '\0', '\0', '\0'))) {
 		x86_syslog_port = (port_t)0x3f8;
-	else if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
+	} else if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
 		x86_syslog_port = (port_t)0xe9;
-	else if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('V', 'B', 'o', 'x')) {
+	} else if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('V', 'B', 'o', 'x')) {
 		x86_syslog_port = (port_t)0x504;
 #ifdef CONFIG_VBOXGDB
 		if (bootcpu_x86_cpuid.ci_80000002b == MAKE_DWORD(' ', 'G', 'D', 'B'))
@@ -990,17 +996,50 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       is pretty much useless in terms of a programming aid (it feels more like it's
 	 *       just there to clobber...) */
 
-	/* TODO: Generalize the modsvga data system into an in-kernel interface.
-	 *  - This system must also include operators usable for the builtin
-	 *    debugger to obtain a simple text-mode console via some kind of
-	 *    "default video adapter" (if this adapter isn't present, _then_
-	 *    an arch-specific fallback should be used)
-	 *  - Once all of this has been done, get rid of libvgastate
-	 *  - Once that too has been done, probably rename all of the "svga"
-	 *    stuff into "vga". - Our "libsvga" (then "libvga") should  only
-	 *    concern itself with chipset drivers; anything beyond should go
-	 *    into a different library (which can then be called libsvga)
+	/* TODO: Refactor all of the ioctls from <kos/ioctl/...> to use the <SYSTEM>_IOC_<COMMAND> format. */
+
+	/* TODO: Add SVGA_IOC_* ioctls for:
+	 *  - sco_setwindow
+	 *  - sco_setrdwindow
+	 *  - sco_setwrwindow
+	 *  - sco_setdisplaystart
+	 *  - sco_setlogicalwidth
+	 * Also add corresponding read-ioctls that will read the relevant properties.
 	 */
+
+	/* TODO: rename all of the "svga" stuff into "vga".
+	 * - Our  "libsvga"  (then  "libvga") should  only  concern itself  with  chipset drivers;
+	 *   anything beyond should go into a different library (which can then be called libsvga)
+	 * - This way, we won't have to do a whole bunch of #ifdef-s to keep all of the generic
+	 *   drawing stuff out  of modsvga (modvga),  since none of  them are actually  needed. */
+
+	/* TODO: Rewrite the builtin debugger's output system  to try make use of  `viddev_default',
+	 *       and only if that one's not present, fall back to assuming the presence of a generic
+	 *       80x25 VGA terminal.
+	 * HINTS:
+	 *  - dbg_beginupdate(): Clear `VIDTTYACCESS_F_ACTIVE'
+	 *  - dbg_endupdate():   Set `VIDTTYACCESS_F_ACTIVE' and call `vta_activate()'
+	 *                       XXX: `vta_activate()' normally also reloads the font.
+	 *                            It should take a flag  to prevent it from  doing
+	 *                            that in this case!
+	 *  - dbg_(g|s)etscreendata and dbg_screen_cellsize probably need  additional
+	 *    operators, as these will need to directly copy to/from the SVGA display
+	 *    buffers (which aren't exposed).
+	 *    For  this purpose, probably  add operators `vta_getcelldata()' and
+	 *    `vta_setcelldata()', as well as a field `vta_cellsz' (which can be
+	 *    a  uintptr_half_t that shares a word with `vta_scan' which in turn
+	 *    can be changed from `size_t' into another `uintptr_half_t')
+	 *    - These operators will also be important to facilitate scrolling, which
+	 *      can then be done  by copying the  top row of  cells into an  external
+	 *      buffer prior to calling `vta_copycell()' in order to move the screen.
+	 *  - dbg_(begin|end)showscreen can just be  done by temporarily unloading  the
+	 *    debugger terminal (which is done via `vdo_leavedbg()' / `vdo_enterdbg()')
+	 *
+	 * Once this is done, get rid of `libvgastate'
+	 */
+
+	/* TODO: modsvga shouldn't just blindly throw `E_NO_SUCH_OBJECT' in ioctls.
+	 * Instead, it should throw E_INVALID_ARGUMENT_* with custom context codes! */
 
 	/* TODO: There's a missing incref() relating to mktty.
 	 * Replicate bug:

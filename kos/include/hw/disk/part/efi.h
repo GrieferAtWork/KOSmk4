@@ -56,7 +56,7 @@ struct __ATTR_PACKED efi_descriptor {
 	__le64   gpt_lastpart;           /* Last usable LBA for partitions */
 	guid_t   gpt_guid;               /* Disk GUID */
 	__le64   gpt_partition_start;    /* Starting LBA for partition entries */
-	__le32   gpt_partition_count;    /* Size of the partition vector (in entires) */
+	__le32   gpt_partition_count;    /* Size of the partition vector (in entries) */
 	__le32   gpt_partition_entsz;    /* Size of a single partition entry (Usually 128) */
 	__le32   gpt_partition_crc32;    /* CRC-32 checksum for the partition vector */
 	/* NOTE: When creating a GPT partition table, remaining sector data is zeroed out */

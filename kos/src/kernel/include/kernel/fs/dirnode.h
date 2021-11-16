@@ -63,7 +63,7 @@ struct fdirenum_ops {
 
 	/* [1..1] Directory reader callback.
 	 * When end-of-file has been reached, `0' is returned.
-	 * NOTE: This function mustn't enumerate the `.' and `..' entires! */
+	 * NOTE: This function mustn't enumerate the `.' and `..' entries! */
 	BLOCKING NONNULL((1)) size_t
 	(KCALL *deo_readdir)(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
 	                     size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
@@ -76,10 +76,10 @@ struct fdirenum_ops {
 	 * Other  than this, it is undefined what an absolute `offset' actually
 	 * represents.  - It may be an index (seeking to the n'th entry), or an
 	 * absolute position within the containing directory file, or something
-	 * entirety different. (multiple directory entires are even allowed  to
+	 * entirety different. (multiple directory entries are even allowed  to
 	 * share the same  ~position~, meaning that  reading the position,  and
 	 * later restoring it is _not_ a  usage-case that has to be  supported)
-	 * NOTE: This function mustn't enumerate the `.' and `..' entires!
+	 * NOTE: This function mustn't enumerate the `.' and `..' entries!
 	 * @return: * : The new position (however that may be defined) within
 	 *              the directory stream.
 	 * @throw: E_OVERFLOW: File position would overflow or underflow.

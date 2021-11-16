@@ -51,7 +51,7 @@ DECL_BEGIN
  *                     will be required  to eventually  unlock VM DMA  locks in  accordance to  the
  *                     bits set in `*pflags' if `AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector'
  *                     was called.
- * @return: > prd_siz: ERROR: More than `prd_siz' PRD entires would be required for the encoding
+ * @return: > prd_siz: ERROR: More than `prd_siz' PRD entries would be required for the encoding
  *                     to  succeed. - In this case, the  caller should re-attempt the call after
  *                     re-allocating to match a total of at least `return' AtaPRD entries passed
  *                     to `prd_buf', and update `prd_siz' accordingly.

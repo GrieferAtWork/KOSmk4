@@ -93,7 +93,7 @@ typedef struct {
 #define ATA_AIO_HANDLE_FONEDMA  0x0004  /* `hd_dmalock' is used, as opposed to `hd_dmalockvec'. */
 	union {
 		u16           hd_prd0_bufsize;  /* [valid_if(ATA_AIO_HANDLE_FONEPRD)] Physical buffer size (in bytes) */
-		u16           hd_prd_count;     /* [valid_if(!ATA_AIO_HANDLE_FONEPRD)][!0] Number of required PRD entires. */
+		u16           hd_prd_count;     /* [valid_if(!ATA_AIO_HANDLE_FONEPRD)][!0] Number of required PRD entries. */
 	};
 } AtaAIOHandleData;
 
@@ -286,7 +286,7 @@ NOTHROW(FCALL AtaBus_StartNextDmaOperation)(AtaBus *__restrict self);
 /* Initialize a given PRD from various sources.
  * @return: <= prd_siz: SUCCESS. In this case, the return value specifies the number of encoded
  *                      PRD entries, starting at `prd_buf'.
- * @return: > prd_siz: ERROR: More than `prd_siz' PRD entires would be required for the encoding
+ * @return: > prd_siz: ERROR: More than `prd_siz' PRD entries would be required for the encoding
  *                     to  succeed. - In this case, the  caller should re-attempt the call after
  *                     re-allocating to match a total of at least `return' AtaPRD entries passed
  *                     to `prd_buf', and update `prd_siz' accordingly.

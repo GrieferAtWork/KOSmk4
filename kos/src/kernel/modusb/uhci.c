@@ -310,7 +310,7 @@ NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
 			self->uc_qhlast = prev != &self->uc_qhstart ? prev : NULL;
 		} else if (prev != &self->uc_qhstart) {
 			/* We may have been the last queue entry in line,
-			 * but  there are still  other entires before us.
+			 * but  there are still  other entries before us.
 			 * As such, point back to the first queue  entry. */
 			assert(self->uc_qhstart.qh_next != NULL);
 			hw_pointer = self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
@@ -387,7 +387,7 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 	}
 	/* Special  case:  This  is the  first  interrupt that  will  get executed
 	 * In  this case, we must have all ~empty~ frame lists entries point to it
-	 * instead of pointing  to `uc_qhstart'. Frame  list entires that  already
+	 * instead of pointing  to `uc_qhstart'. Frame  list entries that  already
 	 * contain pointers to isochronous interrupt handlers must be updated such
 	 * that  the last TD  of the last isochronous  interrupt handler points to
 	 * the first TD of our interrupt */
@@ -1602,7 +1602,7 @@ uhci_construct_tds(struct uhci_ostd ***__restrict ppnexttd,
 		cs |= UHCI_TDCS_LSD;
 	tok |= ((u32)endp->ue_dev << UHCI_TDTOK_DEVS) & UHCI_TDTOK_DEVM;
 	tok |= ((u32)endp->ue_endp << UHCI_TDTOK_ENDPTS) & UHCI_TDTOK_ENDPTM;
-	/* Construct TD entires of up to `endp->ue_maxpck' bytes. */
+	/* Construct TD entries of up to `endp->ue_maxpck' bytes. */
 	do {
 		u16 mysize;
 		struct uhci_ostd *td;
@@ -2259,7 +2259,7 @@ uhci_construct_tds_for_interrupt(struct uhci_ostd ***__restrict ppnexttd,
 	         (start > (physaddr_t)0xffffffff ||
 	          (start + num_bytes) > (physaddr_t)0xffffffff)));
 #endif /* __SIZEOF_PHYSADDR_T__ > 4 */
-	/* Construct TD entires of up to `endp->ue_maxpck' bytes. */
+	/* Construct TD entries of up to `endp->ue_maxpck' bytes. */
 	do {
 		u16 mysize;
 		struct uhci_ostd *td;

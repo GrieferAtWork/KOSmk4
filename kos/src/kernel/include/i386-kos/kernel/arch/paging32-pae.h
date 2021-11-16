@@ -227,7 +227,7 @@ union pae_pdir_e3 {
 
 struct pae_pdir {
 	/* Page-directory (4-entry/32-byte vector of `union pae_pdir_e3') */
-	union pae_pdir_e3 p_e3[4]; /* NOTE: All entires are always pre-allocated! */
+	union pae_pdir_e3 p_e3[4]; /* NOTE: All entries are always pre-allocated! */
 };
 
 #endif /* __CC__ */

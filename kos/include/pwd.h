@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadb72d42 */
+/* HASH CRC-32:0xe28ba300 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __SYSDECL_BEGIN
 /* Ignore this value. It's  just some nonsensical constant  here
  * for  historic  purposes and  posix compliance.  All functions
  * found in this header are able to operate on arbitrarily-sized
- * user password database entires,  and so should your  program,
+ * user password database entries,  and so should your  program,
  * meaning this value is entirely pointless and should  actually
  * be considered as INFINITE.
  * Also: there's a `_SC_GETPW_R_SIZE_MAX' which also just returns

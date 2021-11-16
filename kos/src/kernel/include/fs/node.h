@@ -908,7 +908,7 @@ inode_file_pwritev_with_pwrite(struct inode *__restrict self,
                                    * This  flag  is set  atomically  in conjunction  with  the node  being chained
                                    * to the list of changed nodes found in the superblock. (s.a. `i_changed_next') */
 #define INODE_FATTRLOADED  0x0008 /* [lock(WRITE_ONCE)] The node's attributes have been loaded. */
-#define INODE_FDIRLOADED   0x0010 /* [lock(WRITE_ONCE)] The entires of a directory INode has been fully loaded. */
+#define INODE_FDIRLOADED   0x0010 /* [lock(WRITE_ONCE)] The entries of a directory INode has been fully loaded. */
 #define INODE_FLNK_DONT_FOLLOW_FINAL_LINK 0x2000 /* - Don't follow the symlink of this INode if it's the final link of some given path.
                                                   * This flag is  used to  implement open() for  procfs's `/proc/[pid]/fd/[no]'  files. */
 #define INODE_FSUPERDEL    0x4000 /* Set  alongside  `INODE_FDELETED'  when the  INode  was closed  because  of the
@@ -1075,7 +1075,7 @@ struct fdirent {
 	WEAK refcnt_t                      de_refcnt;  /* Reference counter for this data structure. */
 	size_t                             de_heapsize;/* [const] Allocated heap size. */
 	struct fdirent            *de_next;    /* [0..1][lock(this)] Next directory entry with the same hash. */
-	LIST_ENTRY(fdirent)        de_bypos;   /* [lock(this)] Chain of directory entires, sorted by their in-directory position.
+	LIST_ENTRY(fdirent)        de_bypos;   /* [lock(this)] Chain of directory entries, sorted by their in-directory position.
 	                                                * NOTE: When a directory entry is removed, this link is set to NULL,
 	                                                *       meaning that enumerating a directory is as simple as  taking
 	                                                *      `:d_bypos' of the directory node while holding `this'
