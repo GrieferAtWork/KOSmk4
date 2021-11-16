@@ -946,8 +946,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    provided buffer to the operator.
 	 */
 
-	/* TODO: Remove the old kernel <sched/shared_[rw]lock.h> headers */
-
 	/* TODO: We can emulate banked video memory as linear by using a
 	 *       custom mfile that maps overrides a new operator  that's
 	 *       yet to  be added  but will  behave similar  to what  is

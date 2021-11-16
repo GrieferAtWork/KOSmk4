@@ -27,13 +27,13 @@
 #else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/dirent.h>
 #include <kernel/types.h>
-#include <sched/shared_rwlock.h>
 
 #include <hybrid/sequence/list.h>
 
 #include <asm/os/fcntl.h>
 #include <bits/crt/format-printer.h>
 #include <kos/lockop.h>
+#include <kos/sched/shared-rwlock.h>
 
 #ifndef CONFIG_NO_SMP
 #ifndef __INTELLISENSE__

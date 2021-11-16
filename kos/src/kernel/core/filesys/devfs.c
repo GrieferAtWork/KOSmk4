@@ -46,7 +46,6 @@
 #include <kernel/mman/driver.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <sched/shared_rwlock.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -57,6 +56,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/guid.h>
 #include <kos/kernel/handle.h>
+#include <kos/sched/shared-rwlock.h>
 
 #include <assert.h>
 #include <format-printer.h>

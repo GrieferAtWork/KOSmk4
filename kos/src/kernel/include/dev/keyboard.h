@@ -26,11 +26,11 @@
 #include <dev/char.h>
 #include <dev/mktty.h>
 #include <kernel/types.h>
-#include <sched/shared_lock.h>
 #include <sched/signal.h>
 
 #include <kos/aref.h>
 #include <kos/keyboard.h>
+#include <kos/sched/shared-lock.h>
 #include <linux/kd.h> /* Needed to emulate the linux keyboard interface */
 
 #include <stdbool.h>

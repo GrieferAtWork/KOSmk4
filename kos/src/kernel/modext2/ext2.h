@@ -31,7 +31,8 @@ DECL_END
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/regnode.h>
 #include <sched/atomic64.h>
-#include <sched/shared_rwlock.h>
+
+#include <kos/sched/shared-rwlock.h>
 #else /* CONFIG_USE_NEW_FS */
 #include <fs/node.h>
 #endif /* !CONFIG_USE_NEW_FS */

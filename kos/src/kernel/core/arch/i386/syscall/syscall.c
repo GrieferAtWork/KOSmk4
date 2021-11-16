@@ -44,7 +44,6 @@
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
-#include <sched/shared_lock.h>
 #include <sched/task.h>
 #include <sched/x86/tss.h>
 
@@ -64,6 +63,7 @@
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/tss-compat.h>
 #include <kos/kernel/tss.h>
+#include <kos/sched/shared-lock.h>
 #include <sys/wait.h>
 
 #include <assert.h>

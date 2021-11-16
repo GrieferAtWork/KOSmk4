@@ -40,7 +40,8 @@
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/types.h>
-#include <sched/shared_rwlock.h>
+
+#include <kos/sched/shared-rwlock.h>
 
 #ifdef __CC__
 DECL_BEGIN

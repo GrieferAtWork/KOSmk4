@@ -28,7 +28,6 @@ struct inode_data;
 DECL_END
 #define FNODE_FSDATA_T struct inode_data
 
-#include <kernel/types.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/flat.h>
@@ -36,9 +35,11 @@ DECL_END
 #include <kernel/fs/node.h>
 #include <kernel/fs/regnode.h>
 #include <kernel/fs/super.h>
-#include <sched/shared_rwlock.h>
+#include <kernel/types.h>
 
 #include <hybrid/minmax.h>
+
+#include <kos/sched/shared-rwlock.h>
 #else /* CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 #include <sched/rwlock.h>
