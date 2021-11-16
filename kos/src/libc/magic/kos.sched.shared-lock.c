@@ -153,7 +153,7 @@ void shared_lock_acquire([[nonnull]] struct shared_lock *__restrict self) {
 			@task_disconnectall@();
 			break;
 		}
-		@task_waitfor@();
+		@task_waitfor@(@KTIME_INFINITE@);
 	}
 success:
 @@pp_else@@
@@ -227,7 +227,7 @@ void shared_lock_waitfor([[nonnull]] struct shared_lock *__restrict self) {
 			@task_disconnectall@();
 			break;
 		}
-		@task_waitfor@();
+		@task_waitfor@(@KTIME_INFINITE@);
 	}
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
@@ -349,7 +349,7 @@ $bool shared_lock_acquire_nx([[nonnull]] struct shared_lock *__restrict self) {
 			@task_disconnectall@();
 			break;
 		}
-		if (!@task_waitfor_nx@())
+		if (!@task_waitfor_nx@(@KTIME_INFINITE@))
 			return false;
 	}
 success:
@@ -411,7 +411,7 @@ $bool shared_lock_waitfor_nx([[nonnull]] struct shared_lock *__restrict self) {
 			@task_disconnectall@();
 			break;
 		}
-		if (!@task_waitfor_nx@())
+		if (!@task_waitfor_nx@(@KTIME_INFINITE@))
 			return false;
 	}
 success:

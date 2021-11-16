@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e083e76 */
+/* HASH CRC-32:0xce33ed52 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1))
 			task_disconnectall();
 			break;
 		}
-		task_waitfor();
+		task_waitfor(KTIME_INFINITE);
 	}
 success:
 #else /* __KERNEL__ */
@@ -126,7 +126,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING __NOCONNECT NONNULL((1))
 			task_disconnectall();
 			break;
 		}
-		task_waitfor();
+		task_waitfor(KTIME_INFINITE);
 	}
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
@@ -264,7 +264,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 			task_disconnectall();
 			break;
 		}
-		if (!task_waitfor_nx())
+		if (!task_waitfor_nx(KTIME_INFINITE))
 			return false;
 	}
 success:
@@ -320,7 +320,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 			task_disconnectall();
 			break;
 		}
-		if (!task_waitfor_nx())
+		if (!task_waitfor_nx(KTIME_INFINITE))
 			return false;
 	}
 success:

@@ -315,7 +315,7 @@ void shared_rwlock_read([[nonnull]] struct shared_rwlock *__restrict self) {
 			@task_disconnectall@();
 			break;
 		}
-		@task_waitfor@();
+		@task_waitfor@(@KTIME_INFINITE@);
 	}
 success:
 @@pp_else@@
@@ -347,7 +347,7 @@ void shared_rwlock_write([[nonnull]] struct shared_rwlock *__restrict self) {
 			@task_disconnectall@();
 			break;
 		}
-		@task_waitfor@();
+		@task_waitfor@(@KTIME_INFINITE@);
 	}
 success:
 @@pp_else@@
@@ -471,7 +471,7 @@ void shared_rwlock_waitread([[nonnull]] struct shared_rwlock *__restrict self) {
 			@task_disconnectall@();
 			break;
 		}
-		@task_waitfor@();
+		@task_waitfor@(@KTIME_INFINITE@);
 	}
 success:
 @@pp_else@@
@@ -504,7 +504,7 @@ void shared_rwlock_waitwrite([[nonnull]] struct shared_rwlock *__restrict self) 
 			@task_disconnectall@();
 			break;
 		}
-		@task_waitfor@();
+		@task_waitfor@(@KTIME_INFINITE@);
 	}
 success:
 @@pp_else@@
@@ -718,7 +718,7 @@ $bool shared_rwlock_read_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 			@task_disconnectall@();
 			break;
 		}
-		if (!@task_waitfor_nx@())
+		if (!@task_waitfor_nx@(@KTIME_INFINITE@))
 			return false;
 	}
 success:
@@ -749,7 +749,7 @@ $bool shared_rwlock_write_nx([[nonnull]] struct shared_rwlock *__restrict self) 
 			@task_disconnectall@();
 			break;
 		}
-		if (!@task_waitfor_nx@())
+		if (!@task_waitfor_nx@(@KTIME_INFINITE@))
 			return false;
 	}
 success:
@@ -842,7 +842,7 @@ $bool shared_rwlock_waitread_nx([[nonnull]] struct shared_rwlock *__restrict sel
 			@task_disconnectall@();
 			break;
 		}
-		if (!@task_waitfor_nx@())
+		if (!@task_waitfor_nx@(@KTIME_INFINITE@))
 			return false;
 	}
 success:
@@ -873,7 +873,7 @@ $bool shared_rwlock_waitwrite_nx([[nonnull]] struct shared_rwlock *__restrict se
 			@task_disconnectall@();
 			break;
 		}
-		if (!@task_waitfor_nx@())
+		if (!@task_waitfor_nx@(@KTIME_INFINITE@))
 			return false;
 	}
 success:

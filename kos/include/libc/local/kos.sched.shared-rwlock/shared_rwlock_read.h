@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe23098b4 */
+/* HASH CRC-32:0xda874046 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,7 +120,7 @@ __LOCAL_LIBC(shared_rwlock_read) __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) void
 			task_disconnectall();
 			break;
 		}
-		task_waitfor();
+		task_waitfor(KTIME_INFINITE);
 	}
 __success:
 #else /* __KERNEL__ */
