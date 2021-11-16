@@ -36,6 +36,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
 #include <hw/video/vga.h>
 #include <kos/except.h>
@@ -255,12 +256,33 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_txt)(struct vidttyaccess *__restrict se
                                               uintptr_t start, char32_t ch, size_t num_cells) {
 	u16 word;
 	struct svga_ttyaccess_txt *me;
-	me = vidttyaccess_assvga_txt(self);
+	me   = vidttyaccess_assvga_txt(self);
 	word = svga_ttyaccess_makecell_txt(ch, tty);
 	memsetw(&svga_ttyaccess_txt_dmem(me)[start], word, num_cells);
 	if (me->vta_flags & VIDTTYACCESS_F_ACTIVE)
 		memsetw(&svga_ttyaccess_txt_vmem(me)[start], word, num_cells);
 }
+
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL svga_ttyaccess_v_getcelldata_txt)(struct vidttyaccess *__restrict self,
+                                                uintptr_t address, byte_t buf[]) {
+	struct svga_ttyaccess_txt *me;
+	me = vidttyaccess_assvga_txt(self);
+	UNALIGNED_SET16((u16 *)buf, svga_ttyaccess_txt_dmem(me)[address]);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL svga_ttyaccess_v_setcelldata_txt)(struct vidttyaccess *__restrict self,
+                                                uintptr_t address, byte_t const buf[]) {
+	uint16_t word = UNALIGNED_GET16((u16 const *)buf);
+	struct svga_ttyaccess_txt *me;
+	me = vidttyaccess_assvga_txt(self);
+	svga_ttyaccess_txt_dmem(me)[address] = word;
+	if (me->vta_flags & VIDTTYACCESS_F_ACTIVE)
+		svga_ttyaccess_txt_vmem(me)[address] = word;
+}
+
+
 
 /* Initialize `self->sta_vmem' as the relevant physical memory mapping. */
 PRIVATE NONNULL((1, 2)) void FCALL
@@ -323,15 +345,18 @@ svga_makettyaccess_txt(struct svgadev *__restrict UNUSED(self),
 		kfree(result);
 		RETHROW();
 	}
-	result->vta_resx       = mode->smi_resx;
-	result->vta_resy       = mode->smi_resy;
-	result->vta_scan       = mode->smi_scanline / 2;
-	result->vta_activate   = &svga_ttyaccess_v_activate_txt;
-	result->vta_setcell    = &svga_ttyaccess_v_setcell_txt;
-	result->vta_hidecursor = &svga_ttyaccess_v_hidecursor_txt;
-	result->vta_showcursor = &svga_ttyaccess_v_showcursor_txt;
-	result->vta_copycell   = &svga_ttyaccess_v_copycell_txt_nooverscan;
-	result->vta_fillcells  = &svga_ttyaccess_v_fillcells_txt;
+	result->vta_resx        = mode->smi_resx;
+	result->vta_resy        = mode->smi_resy;
+	result->vta_scan        = mode->smi_scanline / 2;
+	result->vta_cellsize    = 2;
+	result->vta_activate    = &svga_ttyaccess_v_activate_txt;
+	result->vta_setcell     = &svga_ttyaccess_v_setcell_txt;
+	result->vta_hidecursor  = &svga_ttyaccess_v_hidecursor_txt;
+	result->vta_showcursor  = &svga_ttyaccess_v_showcursor_txt;
+	result->vta_copycell    = &svga_ttyaccess_v_copycell_txt_nooverscan;
+	result->vta_fillcells   = &svga_ttyaccess_v_fillcells_txt;
+	result->vta_getcelldata = &svga_ttyaccess_v_getcelldata_txt;
+	result->vta_setcelldata = &svga_ttyaccess_v_setcelldata_txt;
 	if (result->vta_scan > result->vta_resx)
 		result->vta_copycell = &svga_ttyaccess_v_copycell_txt_overscan;
 	result->vta_scroll_ystart = 0;
@@ -497,6 +522,23 @@ NOTHROW(FCALL svga_ttyaccess_v_hidecursor_gfx)(struct vidttyaccess *__restrict s
 	}
 }
 
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL svga_ttyaccess_v_getcelldata_gfx)(struct vidttyaccess *__restrict self,
+                                                uintptr_t address, byte_t buf[]) {
+	struct svga_ttyaccess_gfx *me;
+	me = vidttyaccess_assvga_gfx(self);
+	memcpy(buf, &me->stx_display[address], sizeof(struct svga_gfxcell));
+}
+
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL svga_ttyaccess_v_setcelldata_gfx)(struct vidttyaccess *__restrict self,
+                                                uintptr_t address, byte_t const buf[]) {
+	struct svga_ttyaccess_gfx *me;
+	me = vidttyaccess_assvga_gfx(self);
+	memcpy(&me->stx_display[address], buf, sizeof(struct svga_gfxcell));
+	if (me->vta_flags & VIDTTYACCESS_F_ACTIVE)
+		(*me->stx_redraw_cell)(me, address);
+}
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess_gfx *FCALL
 svga_makettyaccess_gfx(struct svgadev *__restrict UNUSED(self),
@@ -531,12 +573,15 @@ svga_makettyaccess_gfx(struct svgadev *__restrict UNUSED(self),
 	_vidttyaccess_update_scrl(result);
 
 	/* Configure operators. */
-	result->vta_setcell    = &svga_ttyaccess_v_setcell_gfx;
-	result->vta_showcursor = &svga_ttyaccess_v_showcursor_gfx;
-	result->vta_hidecursor = &svga_ttyaccess_v_hidecursor_gfx;
-	result->vta_copycell   = &svga_ttyaccess_v_copycell_gfx;
-	result->vta_fillcells  = &svga_ttyaccess_v_fillcells_gfx;
-	result->vta_activate   = &svga_ttyaccess_v_activate_gfx;
+	result->vta_setcell     = &svga_ttyaccess_v_setcell_gfx;
+	result->vta_showcursor  = &svga_ttyaccess_v_showcursor_gfx;
+	result->vta_hidecursor  = &svga_ttyaccess_v_hidecursor_gfx;
+	result->vta_copycell    = &svga_ttyaccess_v_copycell_gfx;
+	result->vta_fillcells   = &svga_ttyaccess_v_fillcells_gfx;
+	result->vta_activate    = &svga_ttyaccess_v_activate_gfx;
+	result->vta_cellsize    = sizeof(struct svga_gfxcell);
+	result->vta_getcelldata = &svga_ttyaccess_v_getcelldata_gfx;
+	result->vta_setcelldata = &svga_ttyaccess_v_setcelldata_gfx;
 
 	/* BPP-specific operators. */
 	switch (mode->smi_bits_per_pixel) {

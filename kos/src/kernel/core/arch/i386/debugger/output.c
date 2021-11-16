@@ -32,6 +32,28 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_USE_UNIFIED_OUTPUT
+#include <debugger/hook.h>
+#include <debugger/io.h>
+
+DECL_BEGIN
+
+
+/* Arch-specific, fallback functions  for acquiring a  terminal.
+ * These work the same as `vdo_enterdbg' / `vdo_leavedbg' when a
+ * proper  video adapter has been configured in `viddev_default' */
+INTERN ATTR_RETNONNULL WUNUSED struct vidttyaccess *
+NOTHROW(FCALL dbg_fallback_acquiretty)(void) {
+	/* TODO */
+}
+
+INTERN void NOTHROW(FCALL dbg_fallback_releasetty)(void) {
+	/* TODO */
+}
+
+
+DECL_END
+#else /* CONFIG_USE_UNIFIED_OUTPUT */
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <kernel/arch/syslog.h>
@@ -1513,6 +1535,7 @@ done:
 }
 
 DECL_END
+#endif /* !CONFIG_USE_UNIFIED_OUTPUT */
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_OUTPUT_C */

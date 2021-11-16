@@ -103,7 +103,8 @@ struct vidttyaccess {
 	uintptr_half_t              vta_cellh;         /* [const] Character cell height (usually `16') */
 	uintptr_half_t              vta_resx;          /* [const] # of character cells in X */
 	uintptr_half_t              vta_resy;          /* [const] # of character cells in Y */
-	size_t                      vta_scan;          /* [const] Scanline size (in characters cells; usually the same as `vta_resx') */
+	uintptr_half_t              vta_scan;          /* [const] Scanline size (in characters cells; usually the same as `vta_resx') */
+	uintptr_half_t              vta_cellsize;      /* [const] Cell buffer size (in bytes); As expected by `vta_getcelldata' and `vta_setcelldata' */
 	uintptr_half_t              vta_scroll_ystart; /* [lock(vta_lock)][<= vta_scroll_yend && <= vta_resy] Start scroll line (usualy `0') */
 	uintptr_half_t              vta_scroll_yend;   /* [lock(vta_lock)][>= vta_scroll_ystart && <= vta_resy] End scroll line (usualy `vta_resy') */
 	union vidtty_cursor         vta_cursor;        /* [lock(vta_lock)] Current cursor position. */
@@ -113,7 +114,7 @@ struct vidttyaccess {
 	uintptr_t                  _vta_scrl1_from;    /* [lock(vta_lock)][== (vta_scroll_ystart + 1) * vta_resx] */
 	uintptr_t                  _vta_scrl1_cnt;     /* [lock(vta_lock)][== vta_resx * ((vta_scroll_yend - vta_scroll_ystart) - 1)] */
 	uintptr_t                  _vta_scrl1_fil;     /* [lock(vta_lock)][== (vta_scroll_yend - 1) * vta_scan] */
-#define _vidttyaccess_update_scrl(self)                                                                          \
+#define _vidttyaccess_update_scrl(self)                                                                        \
 	((self)->_vta_scrl_ymax  = (self)->vta_scroll_yend - 1,                                                    \
 	 (self)->_vta_scrl1_to   = (self)->vta_scroll_ystart * (self)->vta_resx,                                   \
 	 (self)->_vta_scrl1_from = ((self)->vta_scroll_ystart + 1) * (self)->vta_resx,                             \
@@ -175,6 +176,20 @@ struct vidttyaccess {
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (FCALL *vta_activate)(struct vidttyaccess *__restrict self);
+
+	/* [1..1][lock(vta_lock)] Get data for the cell at `address'
+	 * @param: address: == CELL_X + CELL_Y * vta_scan
+	 * @param: buf:     A buffer of exactly `vta_cellsize' bytes. */
+	NOBLOCK NONNULL((1, 3)) void
+	/*NOTHROW*/ (FCALL *vta_getcelldata)(struct vidttyaccess *__restrict self,
+	                                     uintptr_t address, byte_t buf[]);
+
+	/* [1..1][lock(vta_lock)] Set data for the cell at `address'
+	 * @param: address: == CELL_X + CELL_Y * vta_scan
+	 * @param: buf:     A buffer of exactly `vta_cellsize' bytes. */
+	NOBLOCK NONNULL((1, 3)) void
+	/*NOTHROW*/ (FCALL *vta_setcelldata)(struct vidttyaccess *__restrict self,
+	                                     uintptr_t address, byte_t const buf[]);
 };
 
 #define vidttyaccess_destroy(self) (*(self)->vta_destroy)(self)
@@ -461,7 +476,7 @@ struct viddev_ops {
 			THROWS(E_IOERROR, E_WOULDBLOCK);
 
 #ifdef CONFIG_HAVE_DEBUGGER
-	/* [1..1] Activate  and return a video tty object  for use within the builtin debugger.
+	/* [0..1] Activate and return a video tty object for use within the builtin debugger.
 	 * - Called while the debugger is already active (dbg_active).
 	 * - Must _NOT_ clear the contents of the display buffer of the returned  tty.
 	 *   Instead,  anything which  may still be  stored within the  buffer must be
@@ -473,7 +488,7 @@ struct viddev_ops {
 	ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vidttyaccess *
 	/*NOTHROW*/ (FCALL *vdo_enterdbg)(struct viddev *__restrict self);
 
-	/* [1..1] Restore video registers as the result of exiting the builtin debugger.
+	/* [0..1] Restore video registers as the result of exiting the builtin debugger.
 	 * - Called while the debugger is already active (dbg_active).
 	 * - s.a. `vdo_enterdbg()'
 	 * - This function and `vdo_enterdbg()' are also used to implement the `screen' command */
