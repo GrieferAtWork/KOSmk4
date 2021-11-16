@@ -277,6 +277,7 @@ __SYSDECL_BEGIN
 #   define VGA_GR06_FMM_32K_LO      0x08 /* B0000h-B7FFFh (32K region) */
 #   define VGA_GR06_FMM_32K_HI      0x0c /* B8000h-BFFFFh (32K region) */
 #   define VGA_GR06_FMM_MASK        0x0c /* Mask for memory mode */
+#   define VGA_GR06_FMM_SHIFT       2    /* Shift for memory mode */
 #   define VGA_GR06_FRESERVED       0xf0 /* Mask of reserved registers */
 #define VGA_GFX_COMPARE_MASK    0x07
 #   define VGA_GR07_FRESERVED       0xf0 /* Mask of reserved registers */

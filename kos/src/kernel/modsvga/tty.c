@@ -204,6 +204,7 @@ NOTHROW(FCALL svga_ttyaccess_v_showcursor_txt)(struct vidttyaccess *__restrict s
 		temp &= ~VGA_CRA_FCURSOR_DISABLE;
 		vga_wcrt(me->stt_crt_icX, VGA_CRTC_CURSOR_START, temp);
 		baseega_registers.vr_mode.vm_crt_cursor_start = temp;
+		me->vta_flags &= ~_SVGA_TTYACCESS_F_HWCUROFF;
 	}
 }
 

@@ -1053,6 +1053,8 @@ NOTHROW(KCALL dbg_finalize_tty)(void) {
 /* Internal reset (called when resetting the debugger) */
 INTERN ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_reset_tty)(void) {
+	uintptr_half_t x, y;
+
 	/* Make sure we're not in show-screen mode from before. */
 	dbg_endshowscreen();
 	ansitty_init(&dbg_tty, &dbgtty_operators);
@@ -1060,7 +1062,23 @@ NOTHROW(KCALL dbg_reset_tty)(void) {
 	dbg_tabsize          = DBG_TABSIZE_DEFAULT;
 	dbg_indent           = 0;
 	dbg_update_recursion = 0;
+
+	/* Reset tty config. */
+	dbg_vtty->vta_scroll_ystart   = 0;
+	dbg_vtty->vta_scroll_yend     = dbg_vtty->vta_resy;
+	dbg_vtty->vta_cursor.vtc_word = 0;
+	_vidttyaccess_update_scrl(dbg_vtty);
+
+	/* Load the tty. */
 	dbgtty_init4tty(dbg_vtty);
+
+	/* Clear display buffer. */
+	for (y = 0; y < dbg_vtty->vta_resy; ++y) {
+		for (x = 0; x < dbg_vtty->vta_resx; ++x) {
+			uintptr_t addr = x + y * dbg_vtty->vta_scan;
+			(*dbg_vtty->vta_setcell)(dbg_vtty, &dbg_tty, addr, ' ');
+		}
+	}
 }
 
 

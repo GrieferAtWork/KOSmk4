@@ -39,7 +39,7 @@
 
 
 #undef CONFIG_USE_UNIFIED_OUTPUT
-#if 0
+#if 1
 #define CONFIG_USE_UNIFIED_OUTPUT
 #endif
 

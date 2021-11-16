@@ -522,19 +522,39 @@ NOTHROW(KCALL copyinphys)(PHYS physaddr_t dst,
 	if (bufsize > PAGESIZE)
 		bufsize = PAGESIZE;
 	buf = (byte_t *)alloca(bufsize);
-	for (;;) {
-		size_t loadsize;
-		loadsize = num_bytes;
-		if (loadsize > bufsize)
-			loadsize = bufsize;
-		/* Transfer data using our intermediate buffer. */
-		copyfromphys(buf, src, loadsize);
-		copytophys(dst, buf, loadsize);
-		if (loadsize >= num_bytes)
-			break;
-		src += loadsize;
-		dst += loadsize;
-		num_bytes -= loadsize;
+	/* Memmove-semantics */
+	if (dst <= src) {
+		for (;;) {
+			size_t loadsize;
+			loadsize = num_bytes;
+			if (loadsize > bufsize)
+				loadsize = bufsize;
+			/* Transfer data using our intermediate buffer. */
+			copyfromphys(buf, src, loadsize);
+			copytophys(dst, buf, loadsize);
+			if (loadsize >= num_bytes)
+				break;
+			src += loadsize;
+			dst += loadsize;
+			num_bytes -= loadsize;
+		}
+	} else {
+		dst += num_bytes;
+		src += num_bytes;
+		for (;;) {
+			size_t loadsize;
+			loadsize = num_bytes;
+			if (loadsize > bufsize)
+				loadsize = bufsize;
+			dst -= loadsize;
+			src -= loadsize;
+			/* Transfer data using our intermediate buffer. */
+			copyfromphys(buf, src, loadsize);
+			copytophys(dst, buf, loadsize);
+			if (loadsize >= num_bytes)
+				break;
+			num_bytes -= loadsize;
+		}
 	}
 }
 
