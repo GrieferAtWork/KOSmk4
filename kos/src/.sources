@@ -131,7 +131,6 @@ BEGIN
 		DEFINE_SIMPLE_LIBRARY("libvm86")
 		DEFINE_SIMPLE_LIBRARY("libemu86")
 		DEFINE_SIMPLE_LIBRARY("libbios86")
-		DEFINE_SIMPLE_LIBRARY("libvgastate", USELIB("libvm86") USELIB("libphys"))
 		DEFINE_SIMPLE_LIBRARY("libpciaccess", USELIB("libphys") LD_FLAGS({ "-fini=libpci_fini" }))
 		DEFINE_SIMPLE_LIBRARY("libsvga", USELIB("libbios86") USELIB("libphys"))
 	}

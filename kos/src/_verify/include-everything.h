@@ -452,6 +452,7 @@ incdir("");
 #include <compat/kos/exec/rtld.h>
 #include <compat/kos/futex.h>
 #include <compat/kos/types.h>
+#include <compat/linux/msdos_fs.h>
 #include <compat/pointer.h>
 #include <compat/signal.h>
 #include <compat/sys/ucontext.h>
@@ -498,6 +499,9 @@ incdir("");
 #include <hw/bus/pci.h>
 #include <hw/bus/serial.h>
 #include <hw/disk/ata.h>
+#include <hw/disk/part/efi.h>
+#include <hw/disk/part/embr.h>
+#include <hw/disk/part/mbr.h>
 #include <hw/disk/scsi.h>
 #include <hw/hid/ps2.h>
 #include <hw/hid/usb-hid.h>
@@ -513,6 +517,7 @@ incdir("");
 #include <hw/usb/uhci.h>
 #include <hw/usb/usb.h>
 #include <hw/video/vga.h>
+#include <hw/video/vgamodes.h>
 #include <hybrid/__alloca.h>
 #include <hybrid/__altint.h>
 #include <hybrid/__asm.h>
@@ -592,6 +597,8 @@ incdir("");
 #include <kos/bits/futex.h>
 #include <kos/bits/lockop.h>
 #include <kos/bits/rtm.h>
+#include <kos/bits/shared-lock.h>
+#include <kos/bits/shared-rwlock.h>
 #include <kos/bits/syscall-info.h>
 #include <kos/bits/thread.h>
 #include <kos/bits/ukern-struct.h>
@@ -622,6 +629,7 @@ incdir("");
 #include <kos/exec/elf-rel.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
+#include <kos/exec/ifunc.h>
 #include <kos/exec/lazybind.h>
 #include <kos/exec/module.h>
 #include <kos/exec/peb.h>
@@ -648,10 +656,14 @@ incdir("");
 #include <kos/io.h>
 #include <kos/ioctl/clock.h>
 #include <kos/ioctl/keyboard.h>
+#include <kos/ioctl/leaks.h>
 #include <kos/ioctl/mouse.h>
+#include <kos/ioctl/svga.h>
 #include <kos/ioctl/tty.h>
+#include <kos/ioctl/video.h>
 #include <kos/kernel/handle.h>
 #include <kos/kernel/memory.h>
+#include <kos/kernel/printk.h>
 #include <kos/kernel/syscalls.h>
 #include <kos/kernel/types.h>
 #include <kos/keyboard.h>
@@ -667,6 +679,8 @@ incdir("");
 #include <kos/refptr.h>
 #include <kos/rpc.h>
 #include <kos/rtm.h>
+#include <kos/sched/shared-lock.h>
+#include <kos/sched/shared-rwlock.h>
 #include <kos/sys/epoll.h>
 #include <kos/sys/ioctl.h>
 #include <kos/sys/mman.h>
@@ -681,6 +695,8 @@ incdir("");
 #include <libansitty/ansitty.h>
 #include <libansitty/api.h>
 #include <libansitty/ctl.h>
+#include <libbios86/api.h>
+#include <libbios86/bios.h>
 #include <libbuffer/api.h>
 #include <libbuffer/linebuffer.h>
 #include <libbuffer/packetbuffer.h>
@@ -840,6 +856,12 @@ incdir("");
 #include <libservice/client.h>
 #include <libservice/server.h>
 #include <libservice/types.h>
+#include <libsvga/api.h>
+#include <libsvga/chipset.h>
+#include <libsvga/chipsets/vesa.h>
+#include <libsvga/chipsets/vga.h>
+#include <libsvga/svga.h>
+#include <libsvga/util/vgaio.h>
 #include <libterm/api.h>
 #include <libterm/termio.h>
 #include <libunwind/api.h>
@@ -852,8 +874,6 @@ incdir("");
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
 #include <libutil.h>
-#include <libvgastate/api.h>
-#include <libvgastate/vga.h>
 #include <libvideo/codec/api.h>
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>

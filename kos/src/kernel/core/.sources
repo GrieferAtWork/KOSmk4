@@ -91,9 +91,6 @@ BEGIN
 //		"../../libviocore/*.c", /* Empty folder... */
 		"../../libviocore/arch/" + XARCH + "/*.c",
 
-		/* Required for: Video mode switching within the builtin debugger */
-		"../../libvgastate/*.c",
-
 		/* Pull in some hard-coded drivers */
 
 		/* Required for: executing ELF files. */
@@ -108,11 +105,6 @@ BEGIN
 
 		/* Required for: disk file access */
 		"../modfat/*.c",
-
-		"../modsvga/*.c",    /* TODO: Remove me */
-		"../../libsvga/*.c", /* TODO: Remove me */
-
-		"../moddbx/*.c", /* TODO: Remove me */
 
 		/* Pull in the actual kernel sources */
 		"debugger/*.c",

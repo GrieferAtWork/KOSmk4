@@ -393,13 +393,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	kernel_initialize_selftest();
 #endif /* CONFIG_SELFTEST */
 
-#if 1 /* TODO: Remove me */
-	{
-		extern void KCALL kernel_initialize_svga_driver(void);
-		kernel_initialize_svga_driver();
-	}
-#endif
-
 	__hybrid_assert(!kmalloc_leaks());
 
 	/* Update the given initial user-state to start
@@ -1012,31 +1005,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *   anything beyond should go into a different library (which can then be called libsvga)
 	 * - This way, we won't have to do a whole bunch of #ifdef-s to keep all of the generic
 	 *   drawing stuff out  of modsvga (modvga),  since none of  them are actually  needed. */
-
-	/* TODO: Rewrite the builtin debugger's output system  to try make use of  `viddev_default',
-	 *       and only if that one's not present, fall back to assuming the presence of a generic
-	 *       80x25 VGA terminal.
-	 * HINTS:
-	 *  - dbg_beginupdate(): Clear `VIDTTYACCESS_F_ACTIVE'
-	 *  - dbg_endupdate():   Set `VIDTTYACCESS_F_ACTIVE' and call `vta_activate()'
-	 *                       XXX: `vta_activate()' normally also reloads the font.
-	 *                            It should take a flag  to prevent it from  doing
-	 *                            that in this case!
-	 *  - dbg_(g|s)etscreendata and dbg_screen_cellsize probably need  additional
-	 *    operators, as these will need to directly copy to/from the SVGA display
-	 *    buffers (which aren't exposed).
-	 *    For  this purpose, probably  add operators `vta_getcelldata()' and
-	 *    `vta_setcelldata()', as well as a field `vta_cellsz' (which can be
-	 *    a  uintptr_half_t that shares a word with `vta_scan' which in turn
-	 *    can be changed from `size_t' into another `uintptr_half_t')
-	 *    - These operators will also be important to facilitate scrolling, which
-	 *      can then be done  by copying the  top row of  cells into an  external
-	 *      buffer prior to calling `vta_copycell()' in order to move the screen.
-	 *  - dbg_(begin|end)showscreen can just be  done by temporarily unloading  the
-	 *    debugger terminal (which is done via `vdo_leavedbg()' / `vdo_enterdbg()')
-	 *
-	 * Once this is done, get rid of `libvgastate'
-	 */
 
 	/* TODO: modsvga shouldn't just blindly throw `E_NO_SUCH_OBJECT' in ioctls.
 	 * Instead, it should throw E_INVALID_ARGUMENT_* with custom context codes! */

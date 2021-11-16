@@ -136,8 +136,7 @@ done_tmpfs:
 
 	/* Load some additional drivers that we need for the I/O console. */
 	KSysctlInsmod("ps2", NULL); /* Keyboard */
-	if (access("/dev/svga", F_OK) != 0) /* TODO: Remove me once modsvga is no longer hard-coded into the kernel. */
-		ksysctl_insmod("svga", NULL); /* Display */
+	KSysctlInsmod("svga", NULL); /* Display */
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
 	 *       emulation, such that we only need to load the usb-hid drivers
@@ -165,7 +164,9 @@ done_tmpfs:
 
 		/* Construct ansitty device /dev/svga1 */
 		memset(&tty, 0, sizeof(tty));
-		tty.smt_res.of_mode  = HOP_OPENFD_MODE_AUTO;
+#if HOP_OPENFD_MODE_AUTO != 0 /* When `0', will have already been done by memset() */
+		tty.smt_res.of_mode = HOP_OPENFD_MODE_AUTO;
+#endif /* HOP_OPENFD_MODE_AUTO != 0 */
 		tty.smt_res.of_flags = IO_CLOEXEC;
 		Ioctl(display, SVGA_IOC_GETDEFMODE, &tty.smt_mode);
 		tty.smt_name = "svga1";

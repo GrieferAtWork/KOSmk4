@@ -33,7 +33,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/output.h>
-#ifdef CONFIG_USE_UNIFIED_OUTPUT
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <dev/video.h>
@@ -1359,7 +1358,6 @@ NOTHROW(FCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int siz
 
 
 DECL_END
-#endif /* CONFIG_USE_UNIFIED_OUTPUT */
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_OUTPUT_C */
