@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_BASEVGA_C
-#define GUARD_LIBSVGA_BASEVGA_C 1
+#ifndef GUARD_LIBSVGADRV_BASEVGA_C
+#define GUARD_LIBSVGADRV_BASEVGA_C 1
 #define _KOS_ALTERATIONS_SOURCE 1 /* Want sensical parameter order for outb/outw/outl */
 
 #include "api.h"
@@ -32,9 +32,9 @@
 #include <string.h>
 
 #include <libphys/phys.h>
-#include <libsvga/chipset.h>
-#include <libsvga/chipsets/vga.h>
-#include <libsvga/util/vgaio.h>
+#include <libsvgadrv/chipset.h>
+#include <libsvgadrv/chipsets/vga.h>
+#include <libsvgadrv/util/vgaio.h>
 
 #include "basevga.h"
 
@@ -542,4 +542,4 @@ basevga_wrvmem(uint32_t addr, void const *buf, uint32_t num_bytes) {
 
 DECL_END
 
-#endif /* !GUARD_LIBSVGA_BASEVGA_C */
+#endif /* !GUARD_LIBSVGADRV_BASEVGA_C */

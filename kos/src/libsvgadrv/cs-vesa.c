@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_CS_VESA_C
-#define GUARD_LIBSVGA_CS_VESA_C 1
+#ifndef GUARD_LIBSVGADRV_CS_VESA_C
+#define GUARD_LIBSVGADRV_CS_VESA_C 1
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -637,4 +637,4 @@ err_emu:
 DECL_END
 #endif /* CONFIG_SVGA_HAVE_CHIPSET_VESA */
 
-#endif /* !GUARD_LIBSVGA_CS_VESA_C */
+#endif /* !GUARD_LIBSVGADRV_CS_VESA_C */

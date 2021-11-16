@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBSVGA_CHIPSETS_VESA_H
-#define _LIBSVGA_CHIPSETS_VESA_H 1
+#ifndef _LIBSVGADRV_CHIPSETS_VESA_H
+#define _LIBSVGADRV_CHIPSETS_VESA_H 1
 
 #include "../api.h"
 /**/
@@ -142,4 +142,4 @@ struct __ATTR_PACKED vbe_modeinfo {
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_LIBSVGA_CHIPSETS_VESA_H */
+#endif /* !_LIBSVGADRV_CHIPSETS_VESA_H */

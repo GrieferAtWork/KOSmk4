@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_CS_VGA_H
-#define GUARD_LIBSVGA_CS_VGA_H 1
+#ifndef GUARD_LIBSVGADRV_CS_VGA_H
+#define GUARD_LIBSVGADRV_CS_VGA_H 1
 
 #include "api.h"
 /**/
@@ -28,8 +28,8 @@
 
 #include <stdbool.h>
 
-#include <libsvga/chipset.h>
-#include <libsvga/chipsets/vga.h>
+#include <libsvgadrv/chipset.h>
+#include <libsvgadrv/chipsets/vga.h>
 
 DECL_BEGIN
 
@@ -97,4 +97,4 @@ cs_vga_probe(struct svga_chipset *__restrict self);
 DECL_END
 #endif /* CONFIG_SVGA_HAVE_CHIPSET_VGA */
 
-#endif /* !GUARD_LIBSVGA_CS_VGA_H */
+#endif /* !GUARD_LIBSVGADRV_CS_VGA_H */

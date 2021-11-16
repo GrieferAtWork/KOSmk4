@@ -45,8 +45,8 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libsvga/chipset.h>
-#include <libsvga/util/vgaio.h>
+#include <libsvgadrv/chipset.h>
+#include <libsvgadrv/util/vgaio.h>
 
 /**/
 #include "svga.h"

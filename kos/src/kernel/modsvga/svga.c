@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libsvga/chipset.h>
+#include <libsvgadrv/chipset.h>
 
 /**/
 #include "svga.h"
@@ -54,7 +54,7 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 
-PRIVATE ATTR_FREETEXT NONNULL((2, 3)) ssize_t LIBSVGA_CC
+PRIVATE ATTR_FREETEXT NONNULL((2, 3)) ssize_t LIBSVGADRV_CC
 svga_init_enumstring_callback(void *arg,
                               char const *__restrict name,
                               char const *__restrict value) {

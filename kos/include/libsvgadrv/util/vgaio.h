@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBSVGA_UTIL_VGAIO_H
-#define _LIBSVGA_UTIL_VGAIO_H 1
+#ifndef _LIBSVGADRV_UTIL_VGAIO_H
+#define _LIBSVGADRV_UTIL_VGAIO_H 1
 
 #include <hybrid/byteorder.h>
 
@@ -192,4 +192,4 @@ __FORCELOCAL void vga_wattr_res(__port_t __is1_rX, __uint8_t __reg,
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_LIBSVGA_UTIL_VGAIO_H */
+#endif /* !_LIBSVGADRV_UTIL_VGAIO_H */

@@ -17,18 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_API_H
-#define GUARD_LIBSVGA_API_H 1
+#ifndef GUARD_LIBSVGADRV_API_H
+#define GUARD_LIBSVGADRV_API_H 1
 #define LIBBIOS86_WANT_PROTOTYPES
 #define LIBPHYS_WANT_PROTOTYPES
 
-#include <libsvga/api.h>
+#include <libsvgadrv/api.h>
 /**/
 
 #include <kos/anno.h>
 #include <hybrid/compiler.h>
 
-#define CC LIBSVGA_CC
+#define CC LIBSVGADRV_CC
 
 #ifndef NOBLOCK
 #define NOBLOCK __NOBLOCK
@@ -55,4 +55,4 @@
 #define CONFIG_SVGA_HAVE_CHIPSET_VGA
 
 
-#endif /* !GUARD_LIBSVGA_API_H */
+#endif /* !GUARD_LIBSVGADRV_API_H */

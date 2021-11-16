@@ -17,41 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBSVGA_API_H
-#define _LIBSVGA_API_H 1
+#ifndef GUARD_LIBSVGADRV_SVGA_H
+#define GUARD_LIBSVGADRV_SVGA_H 1
 
-#include <__stdinc.h>
-#include <hybrid/host.h>
+#include "api.h"
+/**/
 
-#if defined(__i386__) && !defined(__x86_64__)
-#define LIBSVGA_CC __ATTR_FASTCALL
-#else /* ... */
-#define LIBSVGA_CC /* nothing */
-#endif /* !... */
+DECL_BEGIN
 
-#if (!defined(LIBSVGA_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__))
-#define LIBSVGA_WANT_PROTOTYPES
-#endif /* ... */
 
-#if (defined(__KOS__) && defined(__KERNEL__) && \
-     defined(CONFIG_BUILDING_KERNEL_CORE))
-#define LIBSVGA_DECL __PUBDEF
-#elif defined(__LIBSVGA_STATIC)
-#define LIBSVGA_DECL __INTDEF
-#else /* ... */
-#define LIBSVGA_DECL __IMPDEF
-#endif /* !... */
+DECL_END
 
-/* Library name for use with `dlopen()' */
-#define LIBSVGA_LIBRARY_NAME "libsvga.so"
-
-#ifndef __NOTHROW_KERNEL
-#ifdef __KERNEL__
-#define __NOTHROW_KERNEL __NOTHROW
-#else /* __KERNEL__ */
-#define __NOTHROW_KERNEL /*__THROWING*/
-#endif /* !__KERNEL__ */
-#endif /* !__NOTHROW_KERNEL */
-
-#endif /* !_LIBSVGA_API_H */
+#endif /* !GUARD_LIBSVGADRV_SVGA_H */

@@ -17,15 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_SVGA_H
-#define GUARD_LIBSVGA_SVGA_H 1
+#ifndef GUARD_LIBSVGADRV_SVGA_C
+#define GUARD_LIBSVGADRV_SVGA_C 1
 
 #include "api.h"
 /**/
+
+#include "svga.h"
 
 DECL_BEGIN
 
 
 DECL_END
 
-#endif /* !GUARD_LIBSVGA_SVGA_H */
+#endif /* !GUARD_LIBSVGADRV_SVGA_C */

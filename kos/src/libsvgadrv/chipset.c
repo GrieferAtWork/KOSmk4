@@ -17,17 +17,57 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_SVGA_C
-#define GUARD_LIBSVGA_SVGA_C 1
+#ifndef GUARD_LIBSVGADRV_CHIPSET_C
+#define GUARD_LIBSVGADRV_CHIPSET_C 1
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
 
-#include "svga.h"
+#include <kos/kernel/types.h>
+#include <kos/types.h>
+
+#include <stddef.h>
+
+#include <libsvgadrv/chipset.h>
+
+#include "basevga.h"
+#include "chipset.h"
+
+/* Include headers of supported chipset drivers. */
+#include "cs-vesa.h"
+#include "cs-vga.h"
 
 DECL_BEGIN
 
 
+/* List of supported drivers. - Keep sorted most-specific to most-generic. */
+PRIVATE struct svga_chipset_driver svga_drivers[] = {
+#ifdef SVGA_CHIPSET_DRIVER_INIT_VESA
+	SVGA_CHIPSET_DRIVER_INIT_VESA,
+#endif /* SVGA_CHIPSET_DRIVER_INIT_VESA */
+#ifdef SVGA_CHIPSET_DRIVER_INIT_VGA
+	SVGA_CHIPSET_DRIVER_INIT_VGA,
+#endif /* SVGA_CHIPSET_DRIVER_INIT_VGA */
+	{ 0, NULL },
+};
+
+
+/* Return the list of supported VGA chipset drivers (terminated by a bzero'd entry)
+ * This list is sorted from most specific- to most generic driver. As such, some of
+ * the later drivers might also  be usable even when one  of the former ones  could
+ * also be used.
+ *
+ * As such, when probing for devices you should simply iterate this list until you
+ * find a driver  for which probing  succeeds. Once that  happens, simply keep  on
+ * using that driver. */
+DEFINE_PUBLIC_ALIAS(svga_chipset_getdrivers, libsvga_chipset_getdrivers);
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED struct svga_chipset_driver const *
+NOTHROW(CC libsvga_chipset_getdrivers)(void) {
+	COMPILER_IMPURE();
+	return svga_drivers;
+}
+
 DECL_END
 
-#endif /* !GUARD_LIBSVGA_SVGA_C */
+#endif /* !GUARD_LIBSVGADRV_CHIPSET_C */

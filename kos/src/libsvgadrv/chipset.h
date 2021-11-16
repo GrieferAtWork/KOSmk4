@@ -17,20 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBSVGA_SVGA_H
-#define _LIBSVGA_SVGA_H 1
+#ifndef GUARD_LIBSVGADRV_CHIPSET_H
+#define GUARD_LIBSVGADRV_CHIPSET_H 1
 
 #include "api.h"
 /**/
 
-#include <bits/types.h>
+#include <libsvgadrv/chipset.h>
 
-#ifdef __CC__
-__DECL_BEGIN
+DECL_BEGIN
 
-/* TODO */
+/* Return the list of supported VGA chipset drivers (terminated by a bzero'd entry)
+ * This list is sorted from most specific- to most generic driver. As such, some of
+ * the later drivers might also  be usable even when one  of the former ones  could
+ * also be used.
+ *
+ * As such, when probing for devices you should simply iterate this list until you
+ * find a driver  for which probing  succeeds. Once that  happens, simply keep  on
+ * using that driver. */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct svga_chipset_driver const *
+NOTHROW(CC libsvga_chipset_getdrivers)(void);
 
-__DECL_END
-#endif /* __CC__ */
+DECL_END
 
-#endif /* !_LIBSVGA_SVGA_H */
+#endif /* !GUARD_LIBSVGADRV_CHIPSET_H */

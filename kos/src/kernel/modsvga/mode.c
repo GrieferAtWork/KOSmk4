@@ -49,7 +49,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libsvga/util/vgaio.h>
+#include <libsvgadrv/util/vgaio.h>
 
 /**/
 #include "svga.h"
@@ -148,7 +148,7 @@ struct cs_strings_printer {
 	size_t              csp_reqbuf; /* Required buffer size. */
 };
 
-PRIVATE NONNULL((2, 3)) ssize_t LIBSVGA_CC
+PRIVATE NONNULL((2, 3)) ssize_t LIBSVGADRV_CC
 cs_strings_printer_cb(void *arg,
                       char const *__restrict name,
                       char const *__restrict value) {

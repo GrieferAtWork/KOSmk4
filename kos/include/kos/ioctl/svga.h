@@ -29,7 +29,7 @@
 #include <kos/hop/openfd.h>
 #include <kos/ioctl/video.h>
 
-#include <libsvga/chipset.h>
+#include <libsvgadrv/chipset.h>
 
 __DECL_BEGIN
 
@@ -58,7 +58,7 @@ __DECL_BEGIN
  *  - SVGA_IOC_SETMODE: [lck]  Sets the reference video mode of this lock.  Note
  *                             that this  is not  really necessary,  as a  video
  *                             lock allows you to directly talk to the hardware,
- *                             which can be done with `libsvga'.
+ *                             which can be done with `libsvgadrv'.
  *
  * The video lock object:
  *  - This object should  be created  before you make  any direct  access to  video

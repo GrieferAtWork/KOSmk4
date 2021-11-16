@@ -856,12 +856,11 @@ incdir("");
 #include <libservice/client.h>
 #include <libservice/server.h>
 #include <libservice/types.h>
-#include <libsvga/api.h>
-#include <libsvga/chipset.h>
-#include <libsvga/chipsets/vesa.h>
-#include <libsvga/chipsets/vga.h>
-#include <libsvga/svga.h>
-#include <libsvga/util/vgaio.h>
+#include <libsvgadrv/api.h>
+#include <libsvgadrv/chipset.h>
+#include <libsvgadrv/chipsets/vesa.h>
+#include <libsvgadrv/chipsets/vga.h>
+#include <libsvgadrv/util/vgaio.h>
 #include <libterm/api.h>
 #include <libterm/termio.h>
 #include <libunwind/api.h>

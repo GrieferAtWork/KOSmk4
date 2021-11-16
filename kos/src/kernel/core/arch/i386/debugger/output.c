@@ -47,7 +47,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stddef.h>
 #include <string.h>
 
-#include <libsvga/util/vgaio.h>
+#include <libsvgadrv/util/vgaio.h>
 
 DECL_BEGIN
 

@@ -32,11 +32,11 @@
 #include <kos/aref.h>
 #include <kos/sched/shared-lock.h>
 
-#include <libsvga/chipset.h>
+#include <libsvgadrv/chipset.h>
 
-/* Include internal headers from libsvga */
-#include "../../libsvga/basevga.h"
-#include "../../libsvga/chipset.h"
+/* Include internal headers from `libsvgadrv' */
+#include "../../libsvgadrv/basevga.h"
+#include "../../libsvgadrv/chipset.h"
 
 DECL_BEGIN
 

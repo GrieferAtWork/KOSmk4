@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBSVGA_CHIPSET_H
-#define _LIBSVGA_CHIPSET_H 1
+#ifndef _LIBSVGADRV_CHIPSET_H
+#define _LIBSVGADRV_CHIPSET_H 1
 
 #include "api.h"
 /**/
@@ -84,7 +84,7 @@ struct svga_chipset;
  * @param: value: Spec string value.
  * @return: * :   pformatprinter-compatible return value. */
 typedef __ATTR_NONNULL((2, 3)) __ssize_t
-(LIBSVGA_CC *svga_chipset_enumstring_t)(void *arg,
+(LIBSVGADRV_CC *svga_chipset_enumstring_t)(void *arg,
                                         char const *__restrict name,
                                         char const *__restrict value);
 
@@ -93,7 +93,7 @@ struct svga_chipset_ops {
 
 	/* [1..1][const] Chipset-specific finalization. */
 	__NOBLOCK __ATTR_NONNULL((1)) void
-	/*NOTHROW*/ (LIBSVGA_CC *sco_fini)(struct svga_chipset *__restrict self);
+	/*NOTHROW*/ (LIBSVGADRV_CC *sco_fini)(struct svga_chipset *__restrict self);
 
 	/* [const][== sizeof(struct MYCHIPSET_svga_modeinfo)] */
 	__size_t sco_modeinfosize;
@@ -101,8 +101,8 @@ struct svga_chipset_ops {
 	/* [0..1][const][lock(EXTERNAL)]
 	 * Enumerate chipset-specific identification strings. */
 	__ATTR_NONNULL((1, 2)) __ssize_t
-	(LIBSVGA_CC *sco_strings)(struct svga_chipset *__restrict self,
-	                          svga_chipset_enumstring_t cb, void *arg);
+	(LIBSVGADRV_CC *sco_strings)(struct svga_chipset *__restrict self,
+	                             svga_chipset_enumstring_t cb, void *arg);
 
 	/* [1..1][const][lock(EXTERNAL)]
 	 * - Return  information about the first mode with a cs-specific ID that
@@ -116,9 +116,9 @@ struct svga_chipset_ops {
 	 * @return: true:  Another mode was retrieved.
 	 * @return: false: All modes enumerated. */
 	__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __BOOL
-	(LIBSVGA_CC *sco_getmode)(struct svga_chipset *__restrict self,
-	                          struct svga_modeinfo *__restrict result,
-	                          __uintptr_t *__restrict p_index)
+	(LIBSVGADRV_CC *sco_getmode)(struct svga_chipset *__restrict self,
+	                             struct svga_modeinfo *__restrict result,
+	                             __uintptr_t *__restrict p_index)
 			__THROWS(E_IOERROR);
 
 	/* [1..1][const][lock(EXTERNAL)]
@@ -128,8 +128,8 @@ struct svga_chipset_ops {
 	 *   `self->sc_mode.smi_bits_per_pixel' may be `0' to indicate
 	 *   that the current video mode is unknown. */
 	__ATTR_NONNULL((1, 2)) void
-	(LIBSVGA_CC *sco_setmode)(struct svga_chipset *__restrict self,
-	                          struct svga_modeinfo const *__restrict mode);
+	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
+	                             struct svga_modeinfo const *__restrict mode);
 
 	/* [1..1][const][lock(EXTERNAL)]
 	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'
@@ -138,9 +138,9 @@ struct svga_chipset_ops {
 	 *   also  be used before  exclusive display control is  handed to a user
 	 *   application, and after that application relinquishes control. */
 	__ATTR_NONNULL((1, 2)) void
-	(LIBSVGA_CC *sco_getregs)(struct svga_chipset *__restrict self, __byte_t regbuf[]);
+	(LIBSVGADRV_CC *sco_getregs)(struct svga_chipset *__restrict self, __byte_t regbuf[]);
 	__ATTR_NONNULL((1, 2)) void
-	(LIBSVGA_CC *sco_setregs)(struct svga_chipset *__restrict self, __byte_t const regbuf[]);
+	(LIBSVGADRV_CC *sco_setregs)(struct svga_chipset *__restrict self, __byte_t const regbuf[]);
 
 	/* [const] Required buffer size for `sco_getregs' / `sco_setregs'. */
 	__size_t sco_regsize;
@@ -164,15 +164,15 @@ struct svga_chipset_ops {
 	 * @assume(window < CEILDIV(self->sc_vmemsize, 64 * 1024));
 	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_LFB)); */
 	__ATTR_NONNULL((1)) void
-	(LIBSVGA_CC *sco_setwindow)(struct svga_chipset *__restrict self, __size_t window)
+	(LIBSVGADRV_CC *sco_setwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 	/* [1..1][lock(EXTERNAL)] Same as `sco_setwindow', but *may* only update `sc_rdwindow' */
 	__ATTR_NONNULL((1)) void
-	(LIBSVGA_CC *sco_setrdwindow)(struct svga_chipset *__restrict self, __size_t window)
+	(LIBSVGADRV_CC *sco_setrdwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 	/* [1..1][lock(EXTERNAL)] Same as `sco_setwindow', but *may* only update `sc_wrwindow' */
 	__ATTR_NONNULL((1)) void
-	(LIBSVGA_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
+	(LIBSVGADRV_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 
 	/* [1..1][lock(EXTERNAL)]
@@ -184,7 +184,7 @@ struct svga_chipset_ops {
 	 * @assume(offset <= self->sc_vmemsize * 8 / self->sc_mode.smi_bits_per_pixel);
 	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_TXT)); */
 	__ATTR_NONNULL((1)) void
-	(LIBSVGA_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
+	(LIBSVGADRV_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
 			__THROWS(E_IOERROR);
 
 	/* [1..1][lock(EXTERNAL)]
@@ -202,7 +202,7 @@ struct svga_chipset_ops {
 	 * @assume(offset <= sc_logicalwidth_max);
 	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_TXT)); */
 	__ATTR_NONNULL((1)) void
-	(LIBSVGA_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t offset)
+	(LIBSVGADRV_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t offset)
 			__THROWS(E_IOERROR);
 };
 
@@ -236,7 +236,7 @@ struct svga_chipset_driver {
 	 * @return: true:  Chipset found.
 	 * @return: false: Chipset isn't present. */
 	__ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
-	(LIBSVGA_CC *scd_probe)(struct svga_chipset *__restrict self);
+	(LIBSVGADRV_CC *scd_probe)(struct svga_chipset *__restrict self);
 
 	/* Chipset name. */
 	char scd_name[SVGA_CSNAMELEN];
@@ -253,14 +253,14 @@ struct svga_chipset_driver {
  * find a driver  for which probing  succeeds. Once that  happens, simply keep  on
  * using that driver. */
 typedef __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED struct svga_chipset_driver const *
-/*__NOTHROW*/ (LIBSVGA_CC *PSVGA_CHIPSET_GETDRIVERS)(void);
-#ifdef LIBSVGA_WANT_PROTOTYPES
-LIBSVGA_DECL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED struct svga_chipset_driver const *
-__NOTHROW(LIBSVGA_CC svga_chipset_getdrivers)(void);
-#endif /* LIBSVGA_WANT_PROTOTYPES */
+/*__NOTHROW*/ (LIBSVGADRV_CC *PSVGA_CHIPSET_GETDRIVERS)(void);
+#ifdef LIBSVGADRV_WANT_PROTOTYPES
+LIBSVGADRV_DECL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED struct svga_chipset_driver const *
+__NOTHROW(LIBSVGADRV_CC svga_chipset_getdrivers)(void);
+#endif /* LIBSVGADRV_WANT_PROTOTYPES */
 
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_LIBSVGA_CHIPSET_H */
+#endif /* !_LIBSVGADRV_CHIPSET_H */

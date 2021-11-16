@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBSVGA_CHIPSETS_VGA_H
-#define _LIBSVGA_CHIPSETS_VGA_H 1
+#ifndef _LIBSVGADRV_CHIPSETS_VGA_H
+#define _LIBSVGADRV_CHIPSETS_VGA_H 1
 
 #include "../api.h"
 /**/
@@ -28,4 +28,4 @@
 
 /* Standard VGA driver (with none of those fancy nick-nacks) */
 
-#endif /* !_LIBSVGA_CHIPSETS_VGA_H */
+#endif /* !_LIBSVGADRV_CHIPSETS_VGA_H */

@@ -1000,12 +1000,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Also add corresponding read-ioctls that will read the relevant properties.
 	 */
 
-	/* TODO: rename all of the "svga" stuff into "vga".
-	 * - Our  "libsvga"  (then  "libvga") should  only  concern itself  with  chipset drivers;
-	 *   anything beyond should go into a different library (which can then be called libsvga)
-	 * - This way, we won't have to do a whole bunch of #ifdef-s to keep all of the generic
-	 *   drawing stuff out  of modsvga (modvga),  since none of  them are actually  needed. */
-
 	/* TODO: modsvga shouldn't just blindly throw `E_NO_SUCH_OBJECT' in ioctls.
 	 * Instead, it should throw E_INVALID_ARGUMENT_* with custom context codes! */
 

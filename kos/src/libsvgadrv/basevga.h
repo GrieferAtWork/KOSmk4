@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_BASEVGA_H
-#define GUARD_LIBSVGA_BASEVGA_H 1
+#ifndef GUARD_LIBSVGADRV_BASEVGA_H
+#define GUARD_LIBSVGADRV_BASEVGA_H 1
 
 #include "api.h"
 /**/
@@ -103,4 +103,4 @@ INTDEF NONNULL((2)) void CC basevga_wrvmem(uint32_t addr, void const *buf, uint3
 
 DECL_END
 
-#endif /* !GUARD_LIBSVGA_BASEVGA_H */
+#endif /* !GUARD_LIBSVGADRV_BASEVGA_H */

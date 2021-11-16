@@ -17,27 +17,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_CHIPSET_H
-#define GUARD_LIBSVGA_CHIPSET_H 1
+#ifndef _LIBSVGADRV_API_H
+#define _LIBSVGADRV_API_H 1
 
-#include "api.h"
-/**/
+#include <__stdinc.h>
+#include <hybrid/host.h>
 
-#include <libsvga/chipset.h>
+#if defined(__i386__) && !defined(__x86_64__)
+#define LIBSVGADRV_CC __ATTR_FASTCALL
+#else /* ... */
+#define LIBSVGADRV_CC /* nothing */
+#endif /* !... */
 
-DECL_BEGIN
+#if (!defined(LIBSVGADRV_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBSVGADRV_WANT_PROTOTYPES
+#endif /* ... */
 
-/* Return the list of supported VGA chipset drivers (terminated by a bzero'd entry)
- * This list is sorted from most specific- to most generic driver. As such, some of
- * the later drivers might also  be usable even when one  of the former ones  could
- * also be used.
- *
- * As such, when probing for devices you should simply iterate this list until you
- * find a driver  for which probing  succeeds. Once that  happens, simply keep  on
- * using that driver. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct svga_chipset_driver const *
-NOTHROW(CC libsvga_chipset_getdrivers)(void);
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
+#define LIBSVGADRV_DECL __PUBDEF
+#elif defined(__LIBSVGADRV_STATIC)
+#define LIBSVGADRV_DECL __INTDEF
+#else /* ... */
+#define LIBSVGADRV_DECL __IMPDEF
+#endif /* !... */
 
-DECL_END
+/* Library name for use with `dlopen()' */
+#define LIBSVGADRV_LIBRARY_NAME "libsvgadrv.so"
 
-#endif /* !GUARD_LIBSVGA_CHIPSET_H */
+#ifndef __NOTHROW_KERNEL
+#ifdef __KERNEL__
+#define __NOTHROW_KERNEL __NOTHROW
+#else /* __KERNEL__ */
+#define __NOTHROW_KERNEL /*__THROWING*/
+#endif /* !__KERNEL__ */
+#endif /* !__NOTHROW_KERNEL */
+
+#endif /* !_LIBSVGADRV_API_H */

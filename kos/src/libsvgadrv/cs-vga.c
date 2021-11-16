@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGA_CS_VGA_C
-#define GUARD_LIBSVGA_CS_VGA_C 1
+#ifndef GUARD_LIBSVGADRV_CS_VGA_C
+#define GUARD_LIBSVGADRV_CS_VGA_C 1
 #define _KOS_ALTERATIONS_SOURCE 1 /* Want sensical parameter order for outb/outw/outl */
 
 #include "api.h"
@@ -32,9 +32,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libsvga/chipset.h>
-#include <libsvga/chipsets/vga.h>
-#include <libsvga/util/vgaio.h>
+#include <libsvgadrv/chipset.h>
+#include <libsvgadrv/chipsets/vga.h>
+#include <libsvgadrv/util/vgaio.h>
 
 #include "basevga.h"
 #include "cs-vga.h"
@@ -487,4 +487,4 @@ cs_vga_probe(struct svga_chipset *__restrict self) {
 DECL_END
 #endif /* CONFIG_SVGA_HAVE_CHIPSET_VGA */
 
-#endif /* !GUARD_LIBSVGA_CS_VGA_C */
+#endif /* !GUARD_LIBSVGADRV_CS_VGA_C */
