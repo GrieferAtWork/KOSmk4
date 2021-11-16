@@ -124,19 +124,19 @@ LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC memsetphys)(__PHYS physaddr_t d
  *
  * @return: * :         Base address of the newly created memory mapping.
  * @return: MAP_FAILED: Operation failed (s.a. `errno') */
-typedef __NOBLOCK void * /*__NOTHROW*/ (LIBPHYS_CC *PMMAPPHYS)(__PHYS physaddr_t addr, size_t num_bytes);
+typedef __NOBLOCK __ATTR_WUNUSED void * /*__NOTHROW*/ (LIBPHYS_CC *PMMAPPHYS)(__PHYS physaddr_t addr, size_t num_bytes);
 typedef __NOBLOCK void /*__NOTHROW*/ (LIBPHYS_CC *PMUNMAPPHYS)(void *base, size_t num_bytes);
 #ifdef LIBPHYS_WANT_PROTOTYPES
-LIBPHYS_DECL __NOBLOCK void *__NOTHROW(LIBPHYS_CC mmapphys)(__PHYS physaddr_t addr, size_t num_bytes);
+LIBPHYS_DECL __NOBLOCK __ATTR_WUNUSED void *__NOTHROW(LIBPHYS_CC mmapphys)(__PHYS physaddr_t addr, size_t num_bytes);
 LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC munmapphys)(void *base, size_t num_bytes);
 #endif /* LIBPHYS_WANT_PROTOTYPES */
 /************************************************************************/
 
 
 /* Return a file descriptor for /dev/mem (or -1 with `errno' modified) */
-typedef __NOBLOCK __fd_t /*__NOTHROW*/ (LIBPHYS_CC PGETDEVMEM)(void);
+typedef __NOBLOCK __ATTR_WUNUSED __fd_t /*__NOTHROW*/ (LIBPHYS_CC PGETDEVMEM)(void);
 #ifdef LIBPHYS_WANT_PROTOTYPES
-LIBPHYS_DECL __NOBLOCK __fd_t __NOTHROW(LIBPHYS_CC getdevmem)(void);
+LIBPHYS_DECL __NOBLOCK __ATTR_WUNUSED __fd_t __NOTHROW(LIBPHYS_CC getdevmem)(void);
 #endif /* LIBPHYS_WANT_PROTOTYPES */
 
 

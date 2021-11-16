@@ -237,7 +237,7 @@ NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst,
  *
  * @return: * :         Base address of the newly created memory mapping.
  * @return: MAP_FAILED: Operation failed (s.a. `errno') */
-INTERN NOBLOCK void *
+INTERN NOBLOCK WUNUSED void *
 NOTHROW(CC libphys_mmapphys)(PHYS physaddr_t addr, size_t num_bytes) {
 	void *result;
 	/* NOTE: As an  extension, KOS's  mmap(2) system  call automatically  does
@@ -265,7 +265,7 @@ NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes) {
 
 
 /* Return a file descriptor for /dev/mem (or -1 with `errno' modified) */
-INTERN NOBLOCK fd_t
+INTERN NOBLOCK WUNUSED fd_t
 NOTHROW(CC libphys_getdevmem)(void) {
 	if unlikely(dev_mem == -1)
 		openmem();

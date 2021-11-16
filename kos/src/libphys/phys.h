@@ -87,7 +87,7 @@ INTDEF NOBLOCK void NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst, int byte
  *
  * @return: * :         Base address of the newly created memory mapping.
  * @return: MAP_FAILED: Operation failed (s.a. `errno') */
-INTDEF NOBLOCK void *
+INTDEF NOBLOCK WUNUSED void *
 NOTHROW(CC libphys_mmapphys)(PHYS physaddr_t addr, size_t num_bytes);
 INTDEF NOBLOCK void
 NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes);
@@ -95,7 +95,7 @@ NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes);
 
 
 /* Return a file descriptor for /dev/mem (or -1 with `errno' modified) */
-INTDEF NOBLOCK fd_t NOTHROW(CC libphys_getdevmem)(void);
+INTDEF NOBLOCK WUNUSED fd_t NOTHROW(CC libphys_getdevmem)(void);
 
 
 DECL_END
