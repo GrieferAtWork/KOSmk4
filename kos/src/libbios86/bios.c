@@ -66,7 +66,7 @@ DEFINE_PUBLIC_ALIAS(bios86_init, libbios86_init);
 INTERN NONNULL((1)) void CC
 libbios86_init(struct bios86 *__restrict self)
 #else /* __KERNEL__ */
-INTERN NONNULL((1)) int
+INTERN WUNUSED NONNULL((1)) int
 NOTHROW(CC libbios86_init)(struct bios86 *__restrict self)
 #endif /* !__KERNEL__ */
 {
@@ -188,7 +188,7 @@ DEFINE_PUBLIC_ALIAS(bios86_emulator_init, libbios86_emulator_init);
 INTERN NONNULL((1)) void CC
 libbios86_emulator_init(struct bios86_emulator *__restrict self)
 #else /* __KERNEL__ */
-INTERN NONNULL((1)) int
+INTERN WUNUSED NONNULL((1)) int
 NOTHROW(CC libbios86_emulator_init)(struct bios86_emulator *__restrict self)
 #endif /* !__KERNEL__ */
 {

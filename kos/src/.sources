@@ -132,7 +132,7 @@ BEGIN
 		DEFINE_SIMPLE_LIBRARY("libemu86")
 		DEFINE_SIMPLE_LIBRARY("libbios86")
 		DEFINE_SIMPLE_LIBRARY("libpciaccess", USELIB("libphys") LD_FLAGS({ "-fini=libpci_fini" }))
-		DEFINE_SIMPLE_LIBRARY("libsvgadrv", USELIB("libbios86") USELIB("libphys"))
+		DEFINE_SIMPLE_LIBRARY("libsvgadrv", USELIB("libphys"))
 	}
 
 	BEGIN GROUP("libs.libvideo-codec") { COMPILE, LINK, ARCHIVE, MCOPY };

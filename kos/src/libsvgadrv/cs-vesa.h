@@ -38,15 +38,21 @@ struct vesa_modeinfo: svga_modeinfo {
 };
 
 struct vesa_chipset: svga_chipset {
-	struct vbe_modeinfo    vc_mode;        /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Extension for `struct svga_chipset::sc_mode' */
-	uint16_t               vc_modeid;      /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Current mode ID */
-	struct bios86_emulator vc_emu;         /* BIOS emulator. */
-	struct vbe_biosinfo   *vc_info;        /* [const] VESA BIOS information. */
-	uint16_t const        *vc_modelist;    /* [1..1][const] VESA mode info list. */
-	uint16_t               vc_regsavebits; /* [const] Set of registers to save/load in AX=4F04h (default to 0x0E;
-	                                        * all except controller registers which  are standard across VGA  and
-	                                        * normally saved by the caller) */
-	shift_t                vc_wingranshift;/* [lock(EXTERNAL)] ilog2 of current mode window granularity */
+	struct vbe_modeinfo    vc_mode;         /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Extension for `struct svga_chipset::sc_mode' */
+	uint16_t               vc_modeid;       /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Current mode ID */
+	struct bios86_emulator vc_emu;          /* BIOS emulator. */
+	struct vbe_biosinfo   *vc_info;         /* [const] VESA BIOS information. */
+	uint16_t const        *vc_modelist;     /* [1..1][const] VESA mode info list. */
+	uint16_t               vc_regsavebits;  /* [const] Set of registers to save/load in AX=4F04h (default to 0x0E;
+	                                         * all except controller registers which  are standard across VGA  and
+	                                         * normally saved by the caller) */
+	shift_t                vc_wingranshift; /* [lock(EXTERNAL)] ilog2 of current mode window granularity */
+#ifndef __KERNEL__
+	/* libbios86 library bindings. */
+	void                 *_vc_bios86;       /* [1..1][const] dlopen(3) library binding */
+	PBIOS86_EMULATOR_INT  _vc_bios86_int;   /* [1..1][const] Library function */
+	PBIOS86_EMULATOR_FINI _vc_bios86_fini;  /* [1..1][const] Library function */
+#endif /* !__KERNEL__ */
 };
 
 /* BIOS Buffer offsets (info `vc_emu.b86e_bios.b86_biosbase') */

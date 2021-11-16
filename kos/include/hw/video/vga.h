@@ -289,7 +289,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 struct __ATTR_PACKED vga_palcolor {
-	/* NOTE: Yes, VGA palette colors are only 6-bit per color! */
+	/* NOTE: Yes, VGA palette colors are only 6-bit per channel! */
 	__uint8_t vpc_r; /* Red color component (00h-3fh). */
 	__uint8_t vpc_g; /* Green color component (00h-3fh). */
 	__uint8_t vpc_b; /* Blue color component (00h-3fh). */

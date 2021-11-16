@@ -41,7 +41,7 @@ DECL_BEGIN
 INTDEF NONNULL((1)) void CC
 libbios86_init(struct bios86 *__restrict self);
 #else /* __KERNEL__ */
-INTDEF NONNULL((1)) int
+INTDEF WUNUSED NONNULL((1)) int
 NOTHROW(CC libbios86_init)(struct bios86 *__restrict self);
 #endif /* !__KERNEL__ */
 
@@ -60,7 +60,7 @@ NOTHROW(CC libbios86_fini)(struct bios86 *__restrict self);
 INTDEF NONNULL((1)) void CC
 libbios86_emulator_init(struct bios86_emulator *__restrict self);
 #else /* __KERNEL__ */
-INTDEF NONNULL((1)) int
+INTDEF WUNUSED NONNULL((1)) int
 NOTHROW(CC libbios86_emulator_init)(struct bios86_emulator *__restrict self);
 #endif /* !__KERNEL__ */
 

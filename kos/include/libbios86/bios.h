@@ -106,10 +106,10 @@ LIBBIOS86_DECL __ATTR_NONNULL((1)) void
 (LIBBIOS86_CC bios86_init)(struct bios86 *__restrict self);
 #endif /* LIBBIOS86_WANT_PROTOTYPES */
 #else /* __KERNEL__ */
-typedef int __ATTR_NONNULL((1))
+typedef __ATTR_WUNUSED int __ATTR_NONNULL((1))
 /*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_INIT)(struct bios86 *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
-LIBBIOS86_DECL __ATTR_NONNULL((1)) int
+LIBBIOS86_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW(LIBBIOS86_CC bios86_init)(struct bios86 *__restrict self);
 #endif /* LIBBIOS86_WANT_PROTOTYPES */
 #endif /* !__KERNEL__ */
@@ -150,10 +150,10 @@ LIBBIOS86_DECL __ATTR_NONNULL((1)) void
 (LIBBIOS86_CC bios86_emulator_init)(struct bios86_emulator *__restrict self);
 #endif /* LIBBIOS86_WANT_PROTOTYPES */
 #else /* __KERNEL__ */
-typedef __ATTR_NONNULL((1)) int
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 /*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_EMULATOR_INIT)(struct bios86_emulator *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
-LIBBIOS86_DECL __ATTR_NONNULL((1)) int
+LIBBIOS86_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW(LIBBIOS86_CC bios86_emulator_init)(struct bios86_emulator *__restrict self);
 #endif /* LIBBIOS86_WANT_PROTOTYPES */
 #endif /* !__KERNEL__ */

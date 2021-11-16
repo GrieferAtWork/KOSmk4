@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_LIBSVGADRV_API_H
 #define GUARD_LIBSVGADRV_API_H 1
-#define LIBBIOS86_WANT_PROTOTYPES
 #define LIBPHYS_WANT_PROTOTYPES
 
 #include <libsvgadrv/api.h>
