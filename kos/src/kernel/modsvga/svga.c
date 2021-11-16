@@ -79,8 +79,16 @@ PRIVATE NOBLOCK ATTR_FREETEXT WUNUSED NONNULL((1)) uint64_t
 NOTHROW(FCALL calculate_mode_cost)(struct svga_modeinfo const *__restrict mode,
                                    uint32_t xres, uint32_t yres, uint8_t bpp) {
 	uint64_t result = 0;
-	result += abs((int32_t)xres - (int32_t)mode->smi_resx);
-	result += abs((int32_t)yres - (int32_t)mode->smi_resy);
+	int32_t real_mode_resx;
+	int32_t real_mode_resy;
+	real_mode_resx = (int32_t)mode->smi_resx;
+	real_mode_resy = (int32_t)mode->smi_resy;
+	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
+		real_mode_resx *= 9;
+		real_mode_resy *= 16;
+	}
+	result += abs((int32_t)xres - real_mode_resx);
+	result += abs((int32_t)yres - real_mode_resy);
 	result += abs((int8_t)bpp - (int8_t)mode->smi_bits_per_pixel);
 	if (mode->smi_bits_per_pixel > 32)
 		return (uint64_t)-1; /* We only support BPP up to 32-bit! */
