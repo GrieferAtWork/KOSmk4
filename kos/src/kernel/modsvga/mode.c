@@ -918,7 +918,7 @@ svgadev_dbg_init(struct svgadev *__restrict self) {
 	dregsize += self->svd_chipset.sc_ops.sco_regsize;
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
 		dregsize += mode->smi_resx * mode->smi_resy * 2; /* On-screen text. */
-		dregsize += 256 * 16;                            /* Text-mode font storage. */
+		dregsize += 256 * 32;                            /* Text-mode font storage. */
 	} else {
 		/* If  the debugger can't use hardware text-mode, then
 		 * we need to preserve the actual display memory (oof) */
@@ -955,7 +955,6 @@ NOTHROW(FCALL dbg_save_vmem)(struct svga_ttyaccess *__restrict tty,
                              byte_t buf[]) {
 	struct svga_modeinfo const *mode = tty->sta_mode;
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
-		uint32_t fontbase;
 		uint8_t cmap;
 		size_t i;
 		byte_t *vmem;
@@ -972,12 +971,8 @@ NOTHROW(FCALL dbg_save_vmem)(struct svga_ttyaccess *__restrict tty,
 		cmap = baseega_registers.vr_mode.vm_seq_character_map;
 		if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
 			cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
-		cmap     = VGA_SR03_CSETA_GET(cmap);
-		fontbase = 0x20000 + basevga_fontoffset[cmap];
-		for (i = 0; i < 256; ++i) {
-			basevga_rdvmem(fontbase + i * 32, buf, 16);
-			buf += 16;
-		}
+		cmap = VGA_SR03_CSETA_GET(cmap);
+		basevga_rdvmem(0x20000 + basevga_fontoffset[cmap], buf, 256 * 32);
 	} else {
 		/* Save the entire screen. */
 		memcpy(buf, mnode_getaddr(&tty->sta_vmem),
@@ -991,7 +986,6 @@ NOTHROW(FCALL dbg_load_vmem)(struct svga_ttyaccess *__restrict tty,
                              byte_t const buf[]) {
 	struct svga_modeinfo const *mode = tty->sta_mode;
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
-		uint32_t fontbase;
 		uint8_t cmap;
 		size_t i;
 		byte_t *vmem;
@@ -1008,12 +1002,8 @@ NOTHROW(FCALL dbg_load_vmem)(struct svga_ttyaccess *__restrict tty,
 		cmap = baseega_registers.vr_mode.vm_seq_character_map;
 		if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
 			cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
-		cmap     = VGA_SR03_CSETA_GET(cmap);
-		fontbase = 0x20000 + basevga_fontoffset[cmap];
-		for (i = 0; i < 256; ++i) {
-			basevga_wrvmem(fontbase + i * 32, buf, 16);
-			buf += 16;
-		}
+		cmap = VGA_SR03_CSETA_GET(cmap);
+		basevga_wrvmem(0x20000 + basevga_fontoffset[cmap], buf, 256 * 32);
 	} else {
 		/* Restore the entire screen. */
 		memcpy(mnode_getaddr(&tty->sta_vmem), buf,
@@ -1036,6 +1026,9 @@ NOTHROW(FCALL svgadev_v_enterdbg)(struct viddev *__restrict self) {
 	/* Save VGA registers into the designated state. */
 	basevga_getregs(&sav->sdr_vmode);
 
+	/* Preserve video memory that might get clobbered by `tty' */
+	dbg_save_vmem(tty, sav->sdr_xdata + me->svd_chipset.sc_ops.sco_regsize);
+
 	/* Save extended registers. */
 	sav->sdr_hasxregs = true;
 	NESTED_TRY {
@@ -1053,9 +1046,6 @@ NOTHROW(FCALL svgadev_v_enterdbg)(struct viddev *__restrict self) {
 	 * way around this short of forcing the debugger-tty to always be visible,
 	 * which wouldn't make any sense at all... */
 	svgadev_setmode(me, tty->sta_mode);
-
-	/* Preserve video memory that might get clobbered by `tty' */
-	dbg_save_vmem(tty, sav->sdr_xdata + me->svd_chipset.sc_ops.sco_regsize);
 
 	/* Activate the debugger tty. */
 	tty->vta_flags |= VIDTTYACCESS_F_ACTIVE;
@@ -1077,9 +1067,6 @@ NOTHROW(FCALL svgadev_v_leavedbg)(struct viddev *__restrict self) {
 	/* Don't do unnecessary assertions in here! */
 	/*assert(tty->vta_refcnt == 1);*/
 
-	/* Restore video memory that might have gotten clobbered by `tty' */
-	dbg_load_vmem(tty, sav->sdr_xdata + me->svd_chipset.sc_ops.sco_regsize);
-
 	/* Deactivate the tty. */
 	tty->vta_flags &= ~VIDTTYACCESS_F_ACTIVE;
 
@@ -1091,6 +1078,9 @@ NOTHROW(FCALL svgadev_v_leavedbg)(struct viddev *__restrict self) {
 		} EXCEPT {
 		}
 	}
+
+	/* Restore video memory that might have gotten clobbered by `tty' */
+	dbg_load_vmem(tty, sav->sdr_xdata + me->svd_chipset.sc_ops.sco_regsize);
 
 	/* Restore basic VGA registers. */
 	basevga_setregs(&sav->sdr_vmode);
