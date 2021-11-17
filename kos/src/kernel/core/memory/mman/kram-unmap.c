@@ -1551,6 +1551,7 @@ again_service_lops:
 		Toblockop(mman) *next;
 		Tobpostlockop(mman) *later;
 		next = SLIST_NEXT(iter, olo_link);
+
 		/* Special handling for unmap-kram jobs with inline-memory.
 		 * For  efficiency,  these  get  merged  with  each  other. */
 		if (iter->olo_func == &lockop_kram_cb) {
@@ -1562,8 +1563,11 @@ again_service_lops:
 				goto continue_with_next;
 			}
 		}
+
 		/* Invoke the lock operation. */
+		assert(pagedir_ismapped((void *)iter->olo_func));
 		later = (*iter->olo_func)(iter, self);
+
 		/* Enqueue operations for later execution. */
 		if (later != NULL) {
 			assert(pagedir_ismapped(later));
@@ -1576,8 +1580,10 @@ continue_with_next:
 	 * for unmapping kernel  RAM, which have  already been sorted  by
 	 * their base address. */
 	if (!SLIST_EMPTY(&krlist)) {
+
 		/* Merge adjacent krlist operations */
 		krulist_merge_adjacent(&krlist);
+
 		/* Invoke unmap-kernel-ram lops */
 		do {
 			struct mman_unmap_kram_job *job;
@@ -1614,6 +1620,7 @@ continue_with_next:
 		Tobpostlockop(mman) *op;
 		op = SLIST_FIRST(&post);
 		SLIST_REMOVE_HEAD(&post, oplo_link);
+		assert(pagedir_ismapped((void *)op->oplo_func));
 		(*op->oplo_func)(op, self);
 
 		/* To ease debugging, keep `op' visible during unwinding,

@@ -998,9 +998,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 */
 
 	/* TODO: Add SVGA_IOC_* ioctls for:
-	 *  - sco_setwindow
-	 *  - sco_setrdwindow
-	 *  - sco_setwrwindow
 	 *  - sco_setdisplaystart
 	 *  - sco_setlogicalwidth
 	 * Also add corresponding read-ioctls that will read the relevant properties.

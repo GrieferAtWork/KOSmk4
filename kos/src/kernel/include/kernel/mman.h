@@ -109,7 +109,7 @@ DATDEF struct mman mman_kernel;
 /* The mman that is currently active within the calling thread */
 DATDEF ATTR_PERTASK REF struct mman *this_mman;
 #define THIS_MMAN  PERTASK_GET(this_mman)
-#define PERMMAN(x) (*(__typeof__(&(x)))((uintptr_t)THIS_MMAN + (uintptr_t)&(x)))
+#define PERMMAN(x) FORMMAN(THIS_MMAN, x)
 
 /* Memory manager reference counting control. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_free)(struct mman *__restrict self);
@@ -117,8 +117,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_destroy)(struct mman *__rest
 DEFINE_REFCOUNT_FUNCTIONS(struct mman, mm_refcnt, mman_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct mman, mm_weakrefcnt, mman_free)
 
-/* Memory   manager   construction    functions.
- * NOTE: mman_fork() will fork the current mman. */
+/* Memory manager construction functions.
+ * - mman_fork() will fork the current mman.
+ * - mman_new() is used by exec(2) after vfork(2). */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_new(void) THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_fork(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
 
@@ -151,13 +152,23 @@ DATDEF Toblockop_slist(mman) mman_kernel_lockops;
 /* Reap lock operations of the given mman. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
+#ifdef __NO_builtin_constant_p
 #define mman_lockops_mustreap(self) \
 	(__hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
+#else /* __NO_builtin_constant_p */
+/* By directly accessing `mman_kernel_lockops' if known at compile-time, generated
+ * assembly doesn't have to do the otherwise necessary addition between two known-
+ * link-time-constant values. */
+#define mman_lockops_mustreap(self)                                                       \
+	((__builtin_constant_p((self) == &mman_kernel) && (self) == &mman_kernel)             \
+	 ? __hybrid_atomic_load(mman_kernel_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR \
+	 : __hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
+#endif /* !__NO_builtin_constant_p */
 #ifdef __OPTIMIZE_SIZE__
 #define mman_lockops_reap(self) _mman_lockops_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
-#define mman_lockops_reap(self)                      \
-	(void)(!mman_lockops_mustreap(self) ||           \
+#define mman_lockops_reap(self)            \
+	(void)(!mman_lockops_mustreap(self) || \
 	       (_mman_lockops_reap(self), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
