@@ -35,6 +35,7 @@
 #include "chipset.h"
 
 /* Include headers of supported chipset drivers. */
+#include "cs-bochsvbe.h"
 #include "cs-vesa.h"
 #include "cs-vga.h"
 
@@ -43,6 +44,9 @@ DECL_BEGIN
 
 /* List of supported drivers. - Keep sorted most-specific to most-generic. */
 PRIVATE struct svga_chipset_driver svga_drivers[] = {
+#ifdef SVGA_CHIPSET_DRIVER_INIT_BOCHSVBE
+	SVGA_CHIPSET_DRIVER_INIT_BOCHSVBE,
+#endif /* SVGA_CHIPSET_DRIVER_INIT_BOCHSVBE */
 #ifdef SVGA_CHIPSET_DRIVER_INIT_VESA
 	SVGA_CHIPSET_DRIVER_INIT_VESA,
 #endif /* SVGA_CHIPSET_DRIVER_INIT_VESA */

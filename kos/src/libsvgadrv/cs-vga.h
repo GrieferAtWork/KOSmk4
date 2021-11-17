@@ -33,25 +33,22 @@
 
 DECL_BEGIN
 
-struct vga_modeinfo {
-	struct svga_modeinfo gmi_base;   /* Underlying mode info (should be c++-inherited) */
-	uint8_t              gmi_modeid; /* VGA Mode ID (index into `vga_modelist') */
-};
+#ifndef __port_t_defined
+#define __port_t_defined
+typedef __port_t port_t;
+#endif /* !__port_t_defined */
 
 struct vga_chipset: svga_chipset {
-	uint8_t gcs_modeid;  /* VGA Mode ID (index into `vga_modelist') */
-	port_t  gcs_crt_icX; /* Either `VGA_CRT_IC' or `VGA_CRT_IM' */
+	port_t gcs_crt_icX; /* Either `VGA_CRT_IC' or `VGA_CRT_IM' */
 
 };
-
-
 
 /************************************************************************/
 /* Known VGA video modes                                                */
 /************************************************************************/
 struct vga_known_mode {
-	struct vga_modeinfo vkm_info; /* Video mode info. */
-	struct vga_mode     vkm_regs; /* VGA register states. */
+	struct svga_modeinfo vkm_info; /* Video mode info. */
+	struct vga_mode      vkm_regs; /* VGA register states. */
 };
 
 /* Indices for `vga_modelist' */
@@ -78,6 +75,18 @@ struct vga_known_mode {
 /* List of supported VGA modes. */
 INTDEF struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT];
 INTDEF struct vga_known_mode const ega_modelist[CS_EGAMODE_COUNT];
+
+
+/* Functions for use by other chipset drivers to include standard VGA modes as fallback.
+ * For this purpose, `result' / `mode' for std-vga don't include any additional  fields. */
+INTDEF WUNUSED NONNULL((1, 2, 3)) bool CC
+vga_v_getmode(struct svga_chipset *__restrict UNUSED(self),
+              struct svga_modeinfo *__restrict result,
+              uintptr_t *__restrict p_index)
+		THROWS(E_IOERROR);
+INTDEF NONNULL((1, 2)) void CC
+vga_v_setmode(struct svga_chipset *__restrict self,
+              struct svga_modeinfo const *__restrict mode);
 
 
 /* Probe for VGA support.

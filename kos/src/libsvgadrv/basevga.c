@@ -58,7 +58,7 @@ PRIVATE bool CC probe_ega(void) {
  * This function initializes:
  * - basevga_flags
  * - basevga_IS1_R
- * Called during chipset driver probe functions. */
+ * Must be called before chipset driver probe functions. */
 INTERN void CC basevga_init(void) {
 	basevga_flags = 0;
 

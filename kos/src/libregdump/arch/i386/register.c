@@ -216,7 +216,7 @@ libregdump_register_name(pformatprinter printer, void *arg,
 
 		/* Print the register name */
 		prefix = numbered_register_prefixes[NUMBERED_CLASS_INDEXOF(regno)];
-		len    = sprintf(regname, "%?4s%u", prefix, regno & X86_REGISTER_IDMASK);
+		len    = sprintf(regname, "%4s%u", prefix, regno & X86_REGISTER_IDMASK);
 		if (prefix[COMPILER_STRLEN(numbered_register_prefixes[0]) - 1] == '(')
 			regname[len++] = ')';
 		result = (*printer)(arg, regname, len);

@@ -38,8 +38,8 @@ struct vesa_modeinfo: svga_modeinfo {
 };
 
 struct vesa_chipset: svga_chipset {
-	struct vbe_modeinfo    vc_mode;         /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Extension for `struct svga_chipset::sc_mode' */
-	uint16_t               vc_modeid;       /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)] Current mode ID */
+	struct vbe_modeinfo    vc_mode;         /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))]
+	                                         * VBE mode information  for the  current video  mode. */
 	struct bios86_emulator vc_emu;          /* BIOS emulator. */
 	struct vbe_biosinfo   *vc_info;         /* [const] VESA BIOS information. */
 	uint16_t const        *vc_modelist;     /* [1..1][const] VESA mode info list. */

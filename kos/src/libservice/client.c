@@ -289,13 +289,11 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 								struct msghdr msg;
 								struct cmsghdr *cmsg;
 								char fd_buf[CMSG_SPACE(sizeof(fd_t))];
-								char msg_buf[COMPILER_STRLEN(LIBSERVICE_COM_HANDSHAKE_MESSAGE)];
 								struct iovec iov[1];
 								memset(fd_buf, 0, sizeof(fd_buf));
 								memset(&msg, 0, sizeof(msg));
-								memcpy(msg_buf, LIBSERVICE_COM_HANDSHAKE_MESSAGE, sizeof(msg_buf));
-								iov[0].iov_base    = msg_buf;
-								iov[0].iov_len     = sizeof(msg_buf);
+								iov[0].iov_base    = (void *)LIBSERVICE_COM_HANDSHAKE_MESSAGE;
+								iov[0].iov_len     = sizeof(LIBSERVICE_COM_HANDSHAKE_MESSAGE);
 								msg.msg_iov        = iov;
 								msg.msg_iovlen     = COMPILER_LENOF(iov);
 								msg.msg_control    = fd_buf;

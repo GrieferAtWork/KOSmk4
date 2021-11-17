@@ -17,42 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBSVGADRV_API_H
-#define GUARD_LIBSVGADRV_API_H 1
-#define LIBPHYS_WANT_PROTOTYPES
+#ifndef _LIBSVGADRV_CHIPSETS_BOCHSVBE_H
+#define _LIBSVGADRV_CHIPSETS_BOCHSVBE_H 1
 
-#include <libsvgadrv/api.h>
+#include "../api.h"
 /**/
 
-#include <kos/anno.h>
-#include <hybrid/compiler.h>
+#include <bits/types.h>
+#include <hw/video/bochsvbe.h>
 
-#define CC LIBSVGADRV_CC
-
-#ifndef NOBLOCK
-#define NOBLOCK __NOBLOCK
-#endif /* !NOBLOCK */
-
-#ifndef THROWS
-#define THROWS __THROWS
-#endif /* !THROWS */
-
-#ifndef NOTHROW_KERNEL
-#define NOTHROW_KERNEL __NOTHROW_KERNEL
-#endif /* !NOTHROW_KERNEL */
-
-/* Shut up GCC! I'm using offsetof() in a completely sensical way and
- * I  won't make my  code unreadable just because  you don't like it! */
-#if defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
-#pragma GCC diagnostic ignored "-Winvalid-offsetof"
-#endif
-
-
-
-/* Configure supported chipsets. */
-#define CONFIG_SVGA_HAVE_CHIPSET_BOCHSVBE
-#define CONFIG_SVGA_HAVE_CHIPSET_VESA
-#define CONFIG_SVGA_HAVE_CHIPSET_VGA
-
-
-#endif /* !GUARD_LIBSVGADRV_API_H */
+#endif /* !_LIBSVGADRV_CHIPSETS_BOCHSVBE_H */

@@ -140,6 +140,9 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 	struct svga_chipset_driver const *drivers;
 	size_t i, maxsize;
 
+	/* Initialize the base-VGA system. */
+	basevga_init();
+
 	/* Load available chipset drivers. */
 	drivers = libsvga_chipset_getdrivers();
 
@@ -321,7 +324,7 @@ again_load_mode:
 				}
 #endif /* CONFIG_HAVE_DEBUGGER */
 			} EXCEPT {
-				kfree((void *)self->svd_supmodev);
+				kfree(modev);
 				RETHROW();
 			}
 		} EXCEPT {

@@ -47,7 +47,7 @@ INTDEF uint32_t basevga_flags;
  * This function initializes:
  * - basevga_flags
  * - basevga_IS1_R
- * Called during chipset driver probe functions. */
+ * Must be called before chipset driver probe functions. */
 INTDEF void CC basevga_init(void);
 
 /* Get/Set standard VGA registers.

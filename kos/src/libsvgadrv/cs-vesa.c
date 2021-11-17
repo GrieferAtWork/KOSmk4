@@ -58,12 +58,6 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-STATIC_ASSERT((offsetof(struct vesa_chipset, vc_mode) - offsetof(struct vesa_chipset, sc_mode)) ==
-              (offsetof(struct vesa_modeinfo, vm_vesa)));
-STATIC_ASSERT((offsetof(struct vesa_chipset, vc_modeid) - offsetof(struct vesa_chipset, sc_mode)) ==
-              (offsetof(struct vesa_modeinfo, vm_modeid)));
-
-
 #ifdef __KERNEL__
 #define vesa_chipset_bios86_int(self, intno) \
 	bios86_emulator_int(&(self)->vc_emu, intno)
@@ -394,15 +388,15 @@ vesa_getdisplaystart(struct svga_chipset *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) void CC
-vesa_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t offset) {
+vesa_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t width) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
 	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f06;
-	me->vc_emu.b86e_vm.vr_regs.vr_bl = 0x02; /* SET_SCAN_LINE_LENGTH_IN_BYTES */
-	me->vc_emu.b86e_vm.vr_regs.vr_dx = (uint16_t)offset;
+	me->vc_emu.b86e_vm.vr_regs.vr_bl = 0x00; /* SET_SCAN_LINE_LENGTH_IN_PIXELS */
+	me->vc_emu.b86e_vm.vr_regs.vr_dx = (uint16_t)width;
 	if (!vesa_chipset_bios86_int(me, 0x10))
 		THROW(E_IOERROR);
-	me->sc_logicalwidth = offset;
+	me->sc_logicalwidth = width;
 }
 
 PRIVATE WUNUSED NONNULL((1)) uint16_t CC
@@ -437,9 +431,17 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 	DBG_memset(&me->sc_wrwindow, 0xcc, sizeof(me->sc_wrwindow));
 
 	/* Remember current mode. */
-	memcpy(&me->sc_mode, mode, sizeof(struct vesa_modeinfo));
-	me->sc_displaystart     = vesa_getdisplaystart(me);
-	me->sc_logicalwidth_max = vesa_getlogicalwidth_max(me);
+	memcpy(&me->vc_mode, &mode->vm_vesa, sizeof(struct vbe_modeinfo));
+	me->sc_displaystart       = vesa_getdisplaystart(me);
+	me->sc_logicalwidth_max   = vesa_getlogicalwidth_max(me);
+	me->sc_logicalwidth_align = 1;
+	if (mode->smi_bits_per_pixel <= 1) {
+		me->sc_logicalwidth_align = 8;
+	} else if (mode->smi_bits_per_pixel <= 2) {
+		me->sc_logicalwidth_align = 4;
+	} if (mode->smi_bits_per_pixel <= 4) {
+		me->sc_logicalwidth_align = 2;
+	}
 
 	/* Technically, we should read from BIOS, but if this were to
 	 * differ from the mode's scanline right after we've just set
@@ -634,11 +636,8 @@ cs_vesa_probe(struct svga_chipset *__restrict self) {
 		DBG_memset(&me->sc_wrwindow, 0xcc, sizeof(me->sc_wrwindow));
 		DBG_memset(&me->sc_displaystart, 0xcc, sizeof(me->sc_displaystart));
 		DBG_memset(&me->sc_logicalwidth, 0xcc, sizeof(me->sc_logicalwidth));
-		DBG_memset(&me->sc_mode, 0xcc, sizeof(me->sc_mode));
 		DBG_memset(&me->vc_mode, 0xcc, sizeof(me->vc_mode));
-		me->sc_mode.smi_bits_per_pixel = 0; /* Uninitialized */
-		me->sc_logicalwidth_align      = 1; /* ??? */
-		me->sc_vmemsize = bi->vbi_vmemsize * 64 * 1024;
+		me->sc_vmemsize           = bi->vbi_vmemsize * 64 * 1024;
 
 		/* Initialize operators. */
 		DBG_memset(&me->sc_ops, 0xcc, sizeof(me->sc_ops));
@@ -654,9 +653,6 @@ cs_vesa_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_regsize = vesa_getregsbufsize(me);
 		me->sc_ops.sco_getregs = &vesa_v_getregs;
 		me->sc_ops.sco_setregs = &vesa_v_setregs;
-
-		/* Lastly, initialize the base-VGA system. */
-		basevga_init();
 	} EXCEPT {
 		vesa_v_fini(me);
 		RETHROW();

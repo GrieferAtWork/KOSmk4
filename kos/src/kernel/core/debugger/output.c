@@ -264,7 +264,7 @@ NOTHROW(FCALL dbgtty_showscrollpos)(void) {
 	size_t textlen;
 	uintptr_t i, txtaddr;
 	uint8_t saved_color;
-	char text[COMPILER_STRLEN("65535/65535")];
+	char text[COMPILER_LENOF("65535/65535")];
 	textlen = sprintf(text, "%" PRIu16 "/%" PRIu16,
 	                  dbgtty_scrolllen - dbgtty_scrollpos,
 	                  dbgtty_scrolllen);

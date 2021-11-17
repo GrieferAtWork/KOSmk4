@@ -66,7 +66,8 @@ struct svga_modeinfo {
 	                                      *      Usually is `>= CEIL_ALIGN(smi_resy, sc_logicalwidth_align)' */
 	__uint16_t   smi_resx;               /* [!0] Resolution in X (when `SVGA_MODEINFO_F_TXT': # of character cells in X) */
 	__uint16_t   smi_resy;               /* [!0] Resolution in Y (when `SVGA_MODEINFO_F_TXT': # of character cells in Y) */
-	__shift_t    smi_bits_per_pixel;     /* [!0] Bits per pixel (when `SVGA_MODEINFO_F_TXT': 16) */
+	__shift_t    smi_bits_per_pixel;     /* [!0] Bits per pixel (when `SVGA_MODEINFO_F_TXT': 16)
+	                                      * Usually one of `1', `2', `4', `8', `16', `24', `32'. */
 	__shift_t    smi_colorbits;          /* [!0][valid_if(!SVGA_MODEINFO_F_TXT)]
 	                                      * # of bits per pixel that encode color (usually <= smi_bits_per_pixel, unless in
 	                                      * `SVGA_MODEINFO_F_PLANAR').  Use  as  `NUM_PALETTE_COLORS = 1 << smi_colorbits'. */
@@ -85,8 +86,8 @@ struct svga_chipset;
  * @return: * :   pformatprinter-compatible return value. */
 typedef __ATTR_NONNULL((2, 3)) __ssize_t
 (LIBSVGADRV_CC *svga_chipset_enumstring_t)(void *arg,
-                                        char const *__restrict name,
-                                        char const *__restrict value);
+                                           char const *__restrict name,
+                                           char const *__restrict value);
 
 
 struct svga_chipset_ops {
@@ -122,11 +123,11 @@ struct svga_chipset_ops {
 			__THROWS(E_IOERROR);
 
 	/* [1..1][const][lock(EXTERNAL)]
-	 * - Set a given video `mode' and update `self->sc_mode' to match `mode'
+	 * - Set a given video mode to `mode'
 	 * - The contents of `mode' have previously been retrieved via `sco_getmode'
-	 * - Prior to this function being  called for the first  time,
-	 *   `self->sc_mode.smi_bits_per_pixel' may be `0' to indicate
-	 *   that the current video mode is unknown. */
+	 * - Prior to this function being called for the first time, any  function
+	 *   that documents making use of `CURRENT_VIDEO_MODE' must not be called;
+	 *   iow: be considered `[valid_if(WAS_CALLED(sco_setmode))]' */
 	__ATTR_NONNULL((1, 2)) void
 	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
 	                             struct svga_modeinfo const *__restrict mode);
@@ -162,7 +163,7 @@ struct svga_chipset_ops {
 	 * @assume(windows != sc_rdwindow || windows != sc_wrwindow); // as relevant
 	 * @assume(WAS_CALLED(sco_setmode));
 	 * @assume(window < CEILDIV(self->sc_vmemsize, 64 * 1024));
-	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_LFB)); */
+	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_LFB)); */
 	__ATTR_NONNULL((1)) void
 	(LIBSVGADRV_CC *sco_setwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
@@ -176,54 +177,59 @@ struct svga_chipset_ops {
 			__THROWS(E_IOERROR);
 
 	/* [1..1][lock(EXTERNAL)]
-	 * - Set display start offset to `offset' pixels from `self->sc_mode.smi_vmembase'
+	 * - Set  display start offset  to `offset' pixels from
+	 *   `CURRENT_VIDEO_MODE.smi_lfb' or the start of video
+	 *   memory
+	 * - The offset is calculated as `X + Y * self->sc_logicalwidth'
+	 * - It is undefined what happens when `sco_setlogicalwidth' is  used
+	 *   to alter `sc_logicalwidth', as its value affects the calculation
+	 *   of  the display start  offset, so you  should probably call this
+	 *   function after changing the logical display width.
 	 * - Set `self->sc_displaystart = offset;'
 	 * - Not available in text-mode video modes.
 	 * @assume(WAS_CALLED(sco_setmode));
-	 * @assume(self->sc_displaystart != offset);
-	 * @assume(offset <= self->sc_vmemsize * 8 / self->sc_mode.smi_bits_per_pixel);
-	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_TXT)); */
+	 * @assume(offset <= self->sc_vmemsize * 8 / CURRENT_VIDEO_MODE.smi_bits_per_pixel);
+	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_TXT)); */
 	__ATTR_NONNULL((1)) void
 	(LIBSVGADRV_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
 			__THROWS(E_IOERROR);
 
 	/* [1..1][lock(EXTERNAL)]
-	 * - Set  logical screen width  to `offset' bytes and
+	 * - Set  logical screen width  to `width' pixels and
 	 *   write the new value into `self->sc_logicalwidth'
-	 * - The  logical screen  width is  the #  of bytes the
+	 * - The logical screen  width is the  # of pixels  the
 	 *   video card  will add  to the  start of  a line  in
 	 *   order to get the memory location of the next line.
 	 * - The value must be aligned by `self->sc_logicalwidth_align'
 	 * - The default value is `smi_scanline'
 	 * - Not available in text-mode video modes.
 	 * @assume(WAS_CALLED(sco_setmode));
-	 * @assume(self->sc_logicalwidth != offset);
-	 * @assume(IS_ALIGNED(offset, self->sc_logicalwidth_align));
-	 * @assume(offset <= sc_logicalwidth_max);
-	 * @assume(!(self->sc_mode.smi_flags & SVGA_MODEINFO_F_TXT)); */
+	 * @assume(IS_ALIGNED(width, self->sc_logicalwidth_align));
+	 * @assume(width <= sc_logicalwidth_max);
+	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_TXT)); */
 	__ATTR_NONNULL((1)) void
-	(LIBSVGADRV_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t offset)
+	(LIBSVGADRV_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t width)
 			__THROWS(E_IOERROR);
 };
 
 struct svga_chipset {
 	struct svga_chipset_ops sc_ops;                /* [const] Chipset operators. */
 	__size_t                sc_vmemsize;           /* [const] Video memory size (in bytes; usually a multiple of 64K). */
-	__size_t                sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	__size_t                sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode))]
 	                                                * Current display window for reads. */
-	__size_t                sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
+	__size_t                sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode))]
 	                                                * Current display window for writes. */
-	__size_t                sc_displaystart;       /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                                * Current display start  (pixels from  `sc_mode.smi_vmembase'
-	                                                * to the beginning of the screen; usually top-left corner) */
-	__uint32_t              sc_logicalwidth;       /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                                * Current logical screen width (in bytes; updated by `sco_setlogicalwidth') */
-	__uint32_t              sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                                * Max value allowed for `sc_logicalwidth' */
-	__uint32_t              sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                                * Alignment requirements of `sc_logicalwidth' */
-	struct svga_modeinfo    sc_mode;               /* [lock(EXTERNAL)][valid_if(sc_mode.smi_bits_per_pixel != 0)]
-	                                                * Current display mode */
+	__size_t                sc_displaystart;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))]
+	                                                * Current display start (pixels from `CURRENT_VIDEO_MODE.smi_lfb', or the start
+	                                                * of  video memory, to  the beginning of the  screen; usually top-left corner). */
+	__uint32_t              sc_logicalwidth;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))]
+	                                                * Current logical screen width (in pixels; updated by `sco_setlogicalwidth')
+	                                                * This  is the # of pixel between the  start of two lines, commonly known as
+	                                                * the scanline, only this time expressed in pixels, rather than bytes.  Also
+	                                                * note that because scanlines always have to start on whole bytes, there  is
+	                                                * a alignment requirement of `sc_logicalwidth_align' pixels. */
+	__uint32_t              sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))] Max value allowed for `sc_logicalwidth' */
+	__uint32_t              sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))] Alignment requirements of `sc_logicalwidth' */
 	/* Chipset-specific data goes here. */
 };
 
