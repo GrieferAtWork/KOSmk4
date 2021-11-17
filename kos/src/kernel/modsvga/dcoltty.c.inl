@@ -18,7 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#define BPP 24
+#define BPP 1
+#define PLANAR
 #include "dcoltty.c"
 #endif /* __INTELLISENSE__ */
 
@@ -31,6 +32,8 @@
 
 #include <string.h>
 
+#include <libsvgadrv/util/vgaio.h>
+
 DECL_BEGIN
 
 #if BPP >= 5
@@ -41,6 +44,23 @@ DECL_BEGIN
 #define CELLSIZE_X 9
 #define CELLSIZE_Y 16
 #endif /* !CELLSIZE_X */
+
+#ifndef CURSOR_Y_OFFSET
+#define CURSOR_X_OFFSET 0          /* X-offset (in pixels) for cursor */
+#define CURSOR_Y_OFFSET 13         /* Y-offset (in pixels) for cursor */
+#define CURSOR_HEIGHT   2          /* Height (in pixels) of cursor */
+#define CURSOR_WIDTH    CELLSIZE_X /* Width (in pixels) of cursor */
+#endif /* !CURSOR_Y_OFFSET */
+
+#if (CURSOR_Y_OFFSET + CURSOR_HEIGHT) > CELLSIZE_Y
+#error "Invalid configuration"
+#endif /* ... */
+
+#if (CURSOR_X_OFFSET + CURSOR_WIDTH) > CELLSIZE_X
+#error "Invalid configuration"
+#endif /* ... */
+
+
 
 #ifdef BYTES_PER_PIXEL
 INTERN NOBLOCK NONNULL((1)) void
@@ -104,22 +124,6 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyacc
 }
 
 
-#ifndef CURSOR_Y_OFFSET
-#define CURSOR_X_OFFSET 0          /* X-offset (in pixels) for cursor */
-#define CURSOR_Y_OFFSET 13         /* Y-offset (in pixels) for cursor */
-#define CURSOR_HEIGHT   2          /* Height (in pixels) of cursor */
-#define CURSOR_WIDTH    CELLSIZE_X /* Width (in pixels) of cursor */
-#endif /* !CURSOR_Y_OFFSET */
-
-#if (CURSOR_Y_OFFSET + CURSOR_HEIGHT) > CELLSIZE_Y
-#error "Invalid configuration"
-#endif /* ... */
-
-#if (CURSOR_X_OFFSET + CURSOR_WIDTH) > CELLSIZE_X
-#error "Invalid configuration"
-#endif /* ... */
-
-
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttyaccess_gfx *__restrict self) {
 	byte_t *dst;
@@ -150,6 +154,134 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttya
 	}
 }
 
+#elif BPP == 4
+#error TODO
+#elif BPP == 2
+#error TODO
+#elif BPP == 1
+
+/* TODO: 1BPP + planar (-> 16-color) */
+
+#ifdef PLANAR
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1_p)(struct svga_ttyaccess_gfx *__restrict self,
+                                                   uintptr_t address)
+#else /* PLANAR */
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__restrict self,
+                                                 uintptr_t address)
+#endif /* !PLANAR */
+{
+	struct svga_gfxcell const *cell;
+	uintptr_half_t cellx, celly;
+	uintptr_half_t y, xoff;
+	byte_t *dest;
+#ifdef PLANAR
+	byte_t *base;
+	uint8_t plane;
+#endif /* PLANAR */
+
+	cellx = address % self->vta_scan;
+	celly = address / self->vta_scan;
+	dest  = (byte_t *)mnode_getaddr(&self->sta_vmem);
+	dest += (uintptr_half_t)(celly * self->stx_cellscan);
+	dest += (uintptr_half_t)(cellx * CELLSIZE_X) / 8;
+	xoff = (uintptr_half_t)(cellx * CELLSIZE_X) % 8;
+
+	/* Load colors. */
+	cell = &self->stx_display[address];
+
+	/* Go through scanlines. */
+#ifdef PLANAR
+	base = dest;
+	for (plane = 0; plane < 4; ++plane)
+#endif /* PLANAR */
+	{
+#ifdef PLANAR
+		/* Select the appropriate plane. */
+		vga_wseq(VGA_SEQ_PLANE_WRITE, (vga_rseq(VGA_SEQ_PLANE_WRITE) & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(plane));
+		vga_wgfx(VGA_GFX_PLANE_READ, (vga_rgfx(VGA_GFX_PLANE_READ) & ~VGA_GR04_FREADMAP) | VGA_GR04_READMAP(plane));
+#endif /* PLANAR */
+		for (y = 0; y < CELLSIZE_Y; ++y) {
+			uint8_t mask;
+			union {
+				uint8_t b[2];
+				uint16_t w;
+			} vmem;
+	
+			mask = cell->sgc_lines[y];
+
+#ifdef PLANAR
+			/* Apply colors (XXX: I feel like this could be done faster with bit magic...) */
+			{
+				uint8_t fgbit, bgbit, i, bit;
+				fgbit = (cell->sgc_color >> plane) & 1;
+				bgbit = (cell->sgc_color >> (4 + plane)) & 1;
+				for (i = 0; i < 8; ++i) {
+					bit = mask & (1 << i);
+					mask &= ~(1 << i);
+					mask |= (bit ? fgbit : bgbit) << i;
+				}
+			}
+#endif /* PLANAR */
+			switch (xoff) {
+	
+			case 0:
+				/* 76543210|0_______ */
+				vmem.b[0] = mask;
+				vmem.b[1] = dest[1];
+				vmem.b[1] &= 0x7f;
+				vmem.b[1] |= (mask & 1) << 7;
+				break;
+	
+#define BITMASK(n) ((1 << (n)) - 1)
+#define OVERRIDE_BITS(xoff)                                        \
+				vmem.w = UNALIGNED_GET16((u16 const *)dest);       \
+				vmem.b[0] &= ~BITMASK(8 - xoff);                   \
+				vmem.b[0] |= mask >> xoff;                         \
+				vmem.b[1] &= BITMASK(8 - (xoff + 1));              \
+				vmem.b[1] |= (mask & BITMASK(xoff)) << (8 - xoff); \
+				vmem.b[1] |= (mask & 1) << (8 - (xoff + 1));
+			case 1: OVERRIDE_BITS(1); break; /* _7654321|00______ */
+			case 2: OVERRIDE_BITS(2); break; /* __765432|100_____ */
+			case 3: OVERRIDE_BITS(3); break; /* ___76543|2100____ */
+			case 4: OVERRIDE_BITS(4); break; /* ____7654|32100___ */
+			case 5: OVERRIDE_BITS(5); break; /* _____765|432100__ */
+			case 6: OVERRIDE_BITS(6); break; /* ______76|5432100_ */
+#undef OVERRIDE_BITS
+	
+			case 7:
+				/* _______7|65432100 */
+				vmem.b[0] = dest[0];
+				vmem.b[1] = (mask << 1) | (mask & 1);
+				vmem.b[0] &= 0xfe;
+				vmem.b[0] |= (mask & 0x80) >> 7;
+				break;
+	
+			default: __builtin_unreachable();
+			}
+			UNALIGNED_SET16((u16 *)dest, vmem.w);
+			dest += self->stx_scanline;
+		}
+#ifdef PLANAR
+		dest = base;
+#endif /* PLANAR */
+	}
+}
+
+
+#ifdef PLANAR
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1_p)(struct svga_ttyaccess_gfx *__restrict self)
+#else /* PLANAR */
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__restrict self)
+#endif /* !PLANAR */
+{
+	(void)self;
+	/* TODO */
+}
+
 #else /* BYTES_PER_PIXEL */
 #error TODO
 #endif /* !BYTES_PER_PIXEL */
@@ -158,4 +290,5 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttya
 
 DECL_END
 
+#undef PLANAR
 #undef BPP

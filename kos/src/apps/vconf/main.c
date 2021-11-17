@@ -65,9 +65,11 @@ printmode(size_t id, size_t maxidlen,
 	       maxidlen, id,
 	       mode->smi_resx,
 	       mode->smi_resy,
-	       mode->smi_bits_per_pixel);
+	       mode->smi_colorbits);
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT)
 		printf(highlight ? " [" AC_WHITE("text") "]" : " [text]");
+	if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR)
+		printf(highlight ? " [" AC_WHITE("planar") "]" : " [planar]");
 }
 
 int main(int argc, char *argv[]) {

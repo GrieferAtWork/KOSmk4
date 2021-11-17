@@ -112,7 +112,7 @@ struct svga_ttyaccess_txt: svga_ttyaccess {
 /* GFX tty sub-class. */
 struct svga_gfxcell {
 	uint8_t sgc_lines[16]; /* Bitmasks to select fg/bg colors for each pixel. */
-	uint8_t sgc_color;     /* fg/bg color for this color. */
+	uint8_t sgc_color;     /* fg/bg color for this cell. */
 };
 struct svga_ttyaccess_gfx: svga_ttyaccess {
 	/* [1..1][lock(vta_lock)] Redraw the cell at `address' (index into `stx_display')

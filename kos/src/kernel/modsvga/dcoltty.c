@@ -33,8 +33,11 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "svga.h"
 
 #ifndef __INTELLISENSE__
-//TODO:#define BPP 1
-//TODO:#include "dcoltty.c.inl"
+#define BPP 1
+#include "dcoltty.c.inl"
+#define BPP 1
+#define PLANAR
+#include "dcoltty.c.inl"
 //TODO:#define BPP 2
 //TODO:#include "dcoltty.c.inl"
 //TODO:#define BPP 4

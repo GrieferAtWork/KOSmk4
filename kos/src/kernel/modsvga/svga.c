@@ -92,12 +92,8 @@ NOTHROW(FCALL calculate_mode_cost)(struct svga_modeinfo const *__restrict mode,
 	result += abs((int8_t)bpp - (int8_t)mode->smi_bits_per_pixel);
 	if (mode->smi_bits_per_pixel > 32)
 		return (uint64_t)-1; /* We only support BPP up to 32-bit! */
-#if 1 /* TODO: multiple-pixels-per-byte graphics modes! */
-	if (mode->smi_bits_per_pixel <= 4)
-		return (uint64_t)-1;
-#endif
-#if 1 /* TODO: paged memory access! */
-	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+#if 1 /* TODO: 2-bit mode */
+	if (mode->smi_bits_per_pixel <= 4 && mode->smi_bits_per_pixel != 1)
 		return (uint64_t)-1;
 #endif
 	return result;

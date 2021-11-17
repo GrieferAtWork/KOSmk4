@@ -310,6 +310,7 @@ svga_ttyaccess_initvmem(struct svga_ttyaccess *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	void *mapbase;
 	size_t vmemsize;
+	physaddr_t mapaddr;
 
 	/* Initialize the `sta_vmem' node of `self' */
 	vmemsize = mode->smi_scanline * mode->smi_resy;
@@ -340,7 +341,10 @@ svga_ttyaccess_initvmem(struct svga_ttyaccess *__restrict self,
 	mman_lock_endwrite(&mman_kernel);
 
 	/* Bind video memory to our custom buffer mapping. */
-	pagedir_map(mapbase, vmemsize, (physaddr_t)mode->smi_lfb,
+	mapaddr = (physaddr_t)mode->smi_lfb;
+	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+		mapaddr = (physaddr_t)0xA0000;
+	pagedir_map(mapbase, vmemsize, mapaddr,
 	            PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 }
 
@@ -612,7 +616,14 @@ svga_makettyaccess_gfx(struct svgadev *__restrict UNUSED(self),
 		result->stx_redraw_cell   = &PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, bpp);   \
 		result->stx_redraw_cursor = &PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, bpp); \
 	}
-//TODO:	case 1:         SETOPS(1);  break;
+	case 1:
+		if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR) {
+			SETOPS(1_p);
+		} else {
+			SETOPS(1);
+		}
+		break;
+
 //TODO:	case 2:         SETOPS(2);  break;
 //TODO:	case 3 ... 4:   SETOPS(4);  break;
 	case 5 ... 8:   SETOPS(8);  break;

@@ -46,7 +46,7 @@
 		.vm_mis               = VGA_MIS_FCLOCK_25175_640 | VGA_MIS_FCOLOR |       \
 		                        VGA_MIS_FSEL_HIGH_PAGE | VGA_MIS_FENB_MEM_ACCESS, \
 		.vm_gfx_sr_value      = 0x00,                                             \
-		.vm_gfx_sr_enable     = 0x0f,                                             \
+		.vm_gfx_sr_enable     = 0x00,                                             \
 		.vm_gfx_compare_value = 0x00,                                             \
 		.vm_gfx_data_rotate   = 0x00,                                             \
 		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                              \
@@ -100,7 +100,7 @@
 		.vm_mis               = VGA_MIS_FCLOCK_25175_640 | VGA_MIS_FCOLOR |       \
 		                        VGA_MIS_FSEL_HIGH_PAGE | VGA_MIS_FENB_MEM_ACCESS, \
 		.vm_gfx_sr_value      = 0x00,                                             \
-		.vm_gfx_sr_enable     = 0x0f,                                             \
+		.vm_gfx_sr_enable     = 0x00,                                             \
 		.vm_gfx_compare_value = 0x00,                                             \
 		.vm_gfx_data_rotate   = 0x00,                                             \
 		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                              \
@@ -155,7 +155,7 @@
 		                        VGA_MIS_FENB_MEM_ACCESS | VGA_MIS_FVSYNCPOL |        \
 		                        0x04,                                                \
 		.vm_gfx_sr_value      = 0x00,                                                \
-		.vm_gfx_sr_enable     = 0x0f,                                                \
+		.vm_gfx_sr_enable     = 0x00,                                                \
 		.vm_gfx_compare_value = 0x00,                                                \
 		.vm_gfx_data_rotate   = 0x00,                                                \
 		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                                 \
@@ -340,7 +340,7 @@
 		.vm_mis               = VGA_MIS_FCOLOR | VGA_MIS_FSEL_HIGH_PAGE |            \
 		                        VGA_MIS_FENB_MEM_ACCESS | VGA_MIS_FHSYNCPOL,         \
 		.vm_gfx_sr_value      = 0x00,                                                \
-		.vm_gfx_sr_enable     = 0x0f,                                                \
+		.vm_gfx_sr_enable     = 0x00,                                                \
 		.vm_gfx_compare_value = 0x00,                                                \
 		.vm_gfx_data_rotate   = 0x20,                                                \
 		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                                 \
@@ -396,7 +396,7 @@
 		.vm_mis               = VGA_MIS_FCOLOR | VGA_MIS_FSEL_HIGH_PAGE |            \
 		                        VGA_MIS_FENB_MEM_ACCESS | VGA_MIS_FHSYNCPOL,         \
 		.vm_gfx_sr_value      = 0x00,                                                \
-		.vm_gfx_sr_enable     = 0x0f,                                                \
+		.vm_gfx_sr_enable     = 0x00,                                                \
 		.vm_gfx_compare_value = 0x00,                                                \
 		.vm_gfx_data_rotate   = 0x20,                                                \
 		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                                 \
@@ -452,7 +452,7 @@
 		.vm_mis               = VGA_MIS_FCOLOR | VGA_MIS_FSEL_HIGH_PAGE |            \
 		                        VGA_MIS_FENB_MEM_ACCESS | VGA_MIS_FVSYNCPOL,         \
 		.vm_gfx_sr_value      = 0x00,                                                \
-		.vm_gfx_sr_enable     = 0x0f,                                                \
+		.vm_gfx_sr_enable     = 0x00,                                                \
 		.vm_gfx_compare_value = 0x00,                                                \
 		.vm_gfx_data_rotate   = 0x20,                                                \
 		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                                 \
@@ -509,7 +509,7 @@
 		                        VGA_MIS_FENB_MEM_ACCESS | VGA_MIS_FHSYNCPOL |        \
 		                        VGA_MIS_FVSYNCPOL,                                   \
 		.vm_gfx_sr_value      = 0x00,                                                \
-		.vm_gfx_sr_enable     = 0x0f,                                                \
+		.vm_gfx_sr_enable     = 0x00,                                                \
 		.vm_gfx_compare_value = 0x00,                                                \
 		.vm_gfx_data_rotate   = 0x20,                                                \
 		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                                 \
@@ -797,7 +797,7 @@
 		                        VGA_MIS_FENB_MEM_ACCESS | VGA_MIS_FVSYNCPOL |        \
 		                        0x04,                                                \
 		.vm_gfx_sr_value      = 0x00,                                                \
-		.vm_gfx_sr_enable     = 0x0f,                                                \
+		.vm_gfx_sr_enable     = 0x00,                                                \
 		.vm_gfx_compare_value = 0x00,                                                \
 		.vm_gfx_data_rotate   = 0x20,                                                \
 		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                                 \
