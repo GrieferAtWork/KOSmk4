@@ -83,13 +83,13 @@ struct bga_mode {
 
 PRIVATE struct bga_mode const bochs_modes[] = {
 	/* Supported video modes (resolutions are stolen from what VESA reports under QEMU) */
-#define DEFINE_ANYBPP_FOR_RES(resx, resy)             \
-	{ resx, resy, 4 },  /* 16-color mode */           \
-	{ resx, resy, 8 },  /* 256-color mode */          \
-	{ resx, resy, 15 }, /* 5-5-5 true-color mode */   \
-	{ resx, resy, 16 }, /* 5-6-5 true-color mode */   \
-	{ resx, resy, 24 }, /* 8-8-8 true-color mode */   \
-	{ resx, resy, 32 }, /* 8-8-8-X true-color mode */
+#define DEFINE_ANYBPP_FOR_RES(resx, resy)                               \
+	{ resx, resy, VBE_DISPI_BPP_PAL16 },    /* 16-color mode */         \
+	{ resx, resy, VBE_DISPI_BPP_PAL256 },   /* 256-color mode */        \
+	{ resx, resy, VBE_DISPI_BPP_BGR555 },   /* 5-5-5 true-color mode */ \
+	{ resx, resy, VBE_DISPI_BPP_BGR565 },   /* 5-6-5 true-color mode */ \
+	{ resx, resy, VBE_DISPI_BPP_BGR888 },   /* 8-8-8 true-color mode */ \
+	{ resx, resy, VBE_DISPI_BPP_BGRX8888 }, /* 8-8-8-X true-color mode */
 	DEFINE_ANYBPP_FOR_RES(320, 200)
 	DEFINE_ANYBPP_FOR_RES(640, 400)
 	DEFINE_ANYBPP_FOR_RES(800, 600)
@@ -154,20 +154,20 @@ next:
 	result->smi_bits_per_pixel = bm->bm_bpp;
 	switch (bm->bm_bpp) {
 
-	case 4:
+	case VBE_DISPI_BPP_PAL16:
 		result->smi_flags |= SVGA_MODEINFO_F_PAL;
 		result->smi_scanline = bm->bm_resx / 2;
 		break;
 
-	case 8:
+	case VBE_DISPI_BPP_PAL256:
 		result->smi_flags |= SVGA_MODEINFO_F_PAL;
 		result->smi_scanline = bm->bm_resx;
 		break;
 
-	case 15:
+	case VBE_DISPI_BPP_BGR555:
 		result->smi_bits_per_pixel = 16;
 		ATTR_FALLTHROUGH
-	case 16:
+	case VBE_DISPI_BPP_BGR565:
 		result->smi_scanline = bm->bm_resx * 2;
 		result->smi_bshift   = 0;
 		result->smi_gshift   = 5;
@@ -175,16 +175,16 @@ next:
 		result->smi_bbits    = 5;
 		result->smi_rbits    = 5;
 		result->smi_gbits    = 5;
-		if (bm->bm_bpp == 16) {
+		if (bm->bm_bpp == VBE_DISPI_BPP_BGR565) {
 			result->smi_rshift = 11;
 			result->smi_gbits  = 6;
 		}
 		break;
 
-	case 24:
+	case VBE_DISPI_BPP_BGR888:
 		result->smi_scanline = bm->bm_resx * 3;
 		__IF0 {
-	case 32:
+	case VBE_DISPI_BPP_BGRX8888:
 			result->smi_scanline = bm->bm_resx * 4;
 		}
 		result->smi_bshift = 0;
@@ -211,31 +211,33 @@ bochs_v_setmode(struct svga_chipset *__restrict self,
 	struct bochs_chipset *me          = (struct bochs_chipset *)self;
 	struct bochs_modeinfo const *mode = (struct bochs_modeinfo const *)_mode;
 	struct bga_mode const *bm;
-	/* Disable BGA */
-	bga_wrreg(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_DISABLED);
 
+	/* Disable Bochs VBE */
+	dispi_wrreg(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_DISABLED);
+
+	/* Support for standard VGA modes. */
 	if (mode->bmi_modeid >= COMPILER_LENOF(bochs_modes)) {
-		vga_v_setmode(self, mode); /* Standard VGA mode. */
+		vga_v_setmode(self, mode);
 		return;
 	}
 
 	/* Load a new video mode. */
 	bm = &bochs_modes[mode->bmi_modeid];
-	bga_wrreg(VBE_DISPI_INDEX_BPP, bm->bm_bpp);
-	bga_wrreg(VBE_DISPI_INDEX_XRES, bm->bm_resx);
-	bga_wrreg(VBE_DISPI_INDEX_YRES, bm->bm_resy);
-	bga_wrreg(VBE_DISPI_INDEX_BANK, 0);
+	dispi_wrreg(VBE_DISPI_INDEX_BPP, bm->bm_bpp);
+	dispi_wrreg(VBE_DISPI_INDEX_XRES, bm->bm_resx);
+	dispi_wrreg(VBE_DISPI_INDEX_YRES, bm->bm_resy);
+	dispi_wrreg(VBE_DISPI_INDEX_BANK, 0);
 
 	/* Enable video. */
-	bga_wrreg(VBE_DISPI_INDEX_ENABLE,
-	          VBE_DISPI_ENABLED |
-	          VBE_DISPI_NOCLEARMEM |
-	          VBE_DISPI_LFB_ENABLED);
+	dispi_wrreg(VBE_DISPI_INDEX_ENABLE,
+	            VBE_DISPI_ENABLED |
+	            VBE_DISPI_NOCLEARMEM |
+	            VBE_DISPI_LFB_ENABLED);
 
 	/* Read additional information. */
-	me->sc_logicalwidth = bga_rdreg(VBE_DISPI_INDEX_VIRT_WIDTH);
-	me->sc_displaystart = bga_rdreg(VBE_DISPI_INDEX_X_OFFSET) +
-	                      bga_rdreg(VBE_DISPI_INDEX_Y_OFFSET) *
+	me->sc_logicalwidth = dispi_rdreg(VBE_DISPI_INDEX_VIRT_WIDTH);
+	me->sc_displaystart = dispi_rdreg(VBE_DISPI_INDEX_X_OFFSET) +
+	                      dispi_rdreg(VBE_DISPI_INDEX_Y_OFFSET) *
 	                      me->sc_logicalwidth;
 	me->sc_logicalwidth_align = 1;
 	if (bm->bm_bpp <= 1) {
@@ -254,16 +256,16 @@ bochs_v_getregs(struct svga_chipset *__restrict UNUSED(self), byte_t regbuf[]) {
 	reginfo = (struct bochs_regs *)regbuf;
 	index   = inw(VBE_DISPI_IOPORT_INDEX);
 	UNALIGNED_SET16(&reginfo->be_index, index);
-	UNALIGNED_SET16(&reginfo->be_saved_id, bga_rdreg(VBE_DISPI_INDEX_ID));
-	UNALIGNED_SET16(&reginfo->be_saved_xres, bga_rdreg(VBE_DISPI_INDEX_XRES));
-	UNALIGNED_SET16(&reginfo->be_saved_yres, bga_rdreg(VBE_DISPI_INDEX_YRES));
-	UNALIGNED_SET16(&reginfo->be_saved_bpp, bga_rdreg(VBE_DISPI_INDEX_BPP));
-	UNALIGNED_SET16(&reginfo->be_saved_enable, bga_rdreg(VBE_DISPI_INDEX_ENABLE));
-	UNALIGNED_SET16(&reginfo->be_saved_bank, bga_rdreg(VBE_DISPI_INDEX_BANK));
-	UNALIGNED_SET16(&reginfo->be_saved_virt_width, bga_rdreg(VBE_DISPI_INDEX_VIRT_WIDTH));
-	UNALIGNED_SET16(&reginfo->be_saved_virt_height, bga_rdreg(VBE_DISPI_INDEX_VIRT_HEIGHT));
-	UNALIGNED_SET16(&reginfo->be_saved_x_offset, bga_rdreg(VBE_DISPI_INDEX_X_OFFSET));
-	UNALIGNED_SET16(&reginfo->be_saved_y_offset, bga_rdreg(VBE_DISPI_INDEX_Y_OFFSET));
+	UNALIGNED_SET16(&reginfo->be_saved_id, dispi_rdreg(VBE_DISPI_INDEX_ID));
+	UNALIGNED_SET16(&reginfo->be_saved_xres, dispi_rdreg(VBE_DISPI_INDEX_XRES));
+	UNALIGNED_SET16(&reginfo->be_saved_yres, dispi_rdreg(VBE_DISPI_INDEX_YRES));
+	UNALIGNED_SET16(&reginfo->be_saved_bpp, dispi_rdreg(VBE_DISPI_INDEX_BPP));
+	UNALIGNED_SET16(&reginfo->be_saved_enable, dispi_rdreg(VBE_DISPI_INDEX_ENABLE));
+	UNALIGNED_SET16(&reginfo->be_saved_bank, dispi_rdreg(VBE_DISPI_INDEX_BANK));
+	UNALIGNED_SET16(&reginfo->be_saved_virt_width, dispi_rdreg(VBE_DISPI_INDEX_VIRT_WIDTH));
+	UNALIGNED_SET16(&reginfo->be_saved_virt_height, dispi_rdreg(VBE_DISPI_INDEX_VIRT_HEIGHT));
+	UNALIGNED_SET16(&reginfo->be_saved_x_offset, dispi_rdreg(VBE_DISPI_INDEX_X_OFFSET));
+	UNALIGNED_SET16(&reginfo->be_saved_y_offset, dispi_rdreg(VBE_DISPI_INDEX_Y_OFFSET));
 	outw(VBE_DISPI_IOPORT_INDEX, index);
 }
 
@@ -274,17 +276,17 @@ bochs_v_setregs(struct svga_chipset *__restrict UNUSED(self), byte_t const regbu
 	reginfo = (struct bochs_regs const *)regbuf;
 	enabled = UNALIGNED_GET16(&reginfo->be_saved_enable);
 	if (enabled & VBE_DISPI_ENABLED) {
-		bga_wrreg(VBE_DISPI_INDEX_ID, UNALIGNED_GET16(&reginfo->be_saved_id));
-		bga_wrreg(VBE_DISPI_INDEX_XRES, UNALIGNED_GET16(&reginfo->be_saved_xres));
-		bga_wrreg(VBE_DISPI_INDEX_YRES, UNALIGNED_GET16(&reginfo->be_saved_yres));
-		bga_wrreg(VBE_DISPI_INDEX_BPP, UNALIGNED_GET16(&reginfo->be_saved_bpp));
-		bga_wrreg(VBE_DISPI_INDEX_BANK, UNALIGNED_GET16(&reginfo->be_saved_bank));
-		bga_wrreg(VBE_DISPI_INDEX_VIRT_WIDTH, UNALIGNED_GET16(&reginfo->be_saved_virt_width));
-		bga_wrreg(VBE_DISPI_INDEX_VIRT_HEIGHT, UNALIGNED_GET16(&reginfo->be_saved_virt_height));
-		bga_wrreg(VBE_DISPI_INDEX_X_OFFSET, UNALIGNED_GET16(&reginfo->be_saved_x_offset));
-		bga_wrreg(VBE_DISPI_INDEX_Y_OFFSET, UNALIGNED_GET16(&reginfo->be_saved_y_offset));
+		dispi_wrreg(VBE_DISPI_INDEX_ID, UNALIGNED_GET16(&reginfo->be_saved_id));
+		dispi_wrreg(VBE_DISPI_INDEX_XRES, UNALIGNED_GET16(&reginfo->be_saved_xres));
+		dispi_wrreg(VBE_DISPI_INDEX_YRES, UNALIGNED_GET16(&reginfo->be_saved_yres));
+		dispi_wrreg(VBE_DISPI_INDEX_BPP, UNALIGNED_GET16(&reginfo->be_saved_bpp));
+		dispi_wrreg(VBE_DISPI_INDEX_BANK, UNALIGNED_GET16(&reginfo->be_saved_bank));
+		dispi_wrreg(VBE_DISPI_INDEX_VIRT_WIDTH, UNALIGNED_GET16(&reginfo->be_saved_virt_width));
+		dispi_wrreg(VBE_DISPI_INDEX_VIRT_HEIGHT, UNALIGNED_GET16(&reginfo->be_saved_virt_height));
+		dispi_wrreg(VBE_DISPI_INDEX_X_OFFSET, UNALIGNED_GET16(&reginfo->be_saved_x_offset));
+		dispi_wrreg(VBE_DISPI_INDEX_Y_OFFSET, UNALIGNED_GET16(&reginfo->be_saved_y_offset));
 	}
-	bga_wrreg(VBE_DISPI_INDEX_ENABLE, enabled);
+	dispi_wrreg(VBE_DISPI_INDEX_ENABLE, enabled);
 	outw(VBE_DISPI_IOPORT_INDEX, UNALIGNED_GET16(&reginfo->be_index));
 }
 
@@ -293,8 +295,8 @@ bochs_v_setdisplaystart(struct svga_chipset *__restrict self, size_t offset)
 		THROWS(E_IOERROR) {
 	struct bochs_chipset *me = (struct bochs_chipset *)self;
 	uint32_t logicalwidth    = me->sc_logicalwidth;
-	bga_wrreg(VBE_DISPI_INDEX_X_OFFSET, offset % logicalwidth);
-	bga_wrreg(VBE_DISPI_INDEX_Y_OFFSET, offset / logicalwidth);
+	dispi_wrreg(VBE_DISPI_INDEX_X_OFFSET, offset % logicalwidth);
+	dispi_wrreg(VBE_DISPI_INDEX_Y_OFFSET, offset / logicalwidth);
 	me->sc_displaystart = offset;
 }
 
@@ -302,7 +304,7 @@ PRIVATE NONNULL((1)) void CC
 bochs_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t width)
 		THROWS(E_IOERROR) {
 	struct bochs_chipset *me = (struct bochs_chipset *)self;
-	bga_wrreg(VBE_DISPI_INDEX_VIRT_WIDTH, width);
+	dispi_wrreg(VBE_DISPI_INDEX_VIRT_WIDTH, width);
 	me->sc_logicalwidth = width;
 }
 
@@ -389,8 +391,8 @@ cs_bochs_probe(struct svga_chipset *__restrict self) {
 	    inw(VBE_DISPI_IOPORT_DATA) == 0xffff)
 		return false; /* In ports don't seem to be present, don't try to write to them... */
 	/* We want version 5 (XXX: What happens if this one's not supported?) */
-	bga_wrreg(VBE_DISPI_INDEX_ID, VBE_DISPI_ID5);
-	if (bga_rdreg(VBE_DISPI_INDEX_ID) != VBE_DISPI_ID5)
+	dispi_wrreg(VBE_DISPI_INDEX_ID, VBE_DISPI_ID5);
+	if (dispi_rdreg(VBE_DISPI_INDEX_ID) != VBE_DISPI_ID5)
 		return false;
 
 #ifndef __KERNEL__
@@ -420,8 +422,8 @@ cs_bochs_probe(struct svga_chipset *__restrict self) {
 
 		/* Find the relevant PCI device. */
 		for (; pci; pci = SLIST_NEXT(pci, _pd_link)) {
-			if (pci->pd_vendor_id == 0x1234 &&
-			    pci->pd_device_id == 0x1111)
+			if (pci->pd_vendor_id == VBE_DISPI_PCI_VENDOR_ID &&
+			    pci->pd_device_id == VBE_DISPI_PCI_DEVICE_ID)
 				break;
 		}
 
@@ -442,25 +444,25 @@ cs_bochs_probe(struct svga_chipset *__restrict self) {
 				goto err_initfailed; /* This shouldn't happen... */
 			me->bc_lfbaddr = (physaddr_t)pci->pd_regions[0].pmr_addr;
 		}
-		me->sc_vmemsize = bga_rdreg(VBE_DISPI_INDEX_VIDEO_MEMORY_64K);
+		me->sc_vmemsize = dispi_rdreg(VBE_DISPI_INDEX_VIDEO_MEMORY_64K);
 		me->sc_vmemsize *= 64 * 1024;
 
 		/* Load video limits */
-		saved_enable = bga_rdreg(VBE_DISPI_INDEX_ENABLE);
-		bga_wrreg(VBE_DISPI_INDEX_ENABLE, saved_enable | VBE_DISPI_GETCAPS);
-		me->bc_maxresx = bga_rdreg(VBE_DISPI_INDEX_XRES);
-		me->bc_maxresy = bga_rdreg(VBE_DISPI_INDEX_YRES);
-		me->bc_maxbpp  = bga_rdreg(VBE_DISPI_INDEX_BPP);
-		bga_wrreg(VBE_DISPI_INDEX_ENABLE, saved_enable);
+		saved_enable = dispi_rdreg(VBE_DISPI_INDEX_ENABLE);
+		dispi_wrreg(VBE_DISPI_INDEX_ENABLE, saved_enable | VBE_DISPI_GETCAPS);
+		me->bc_maxresx = dispi_rdreg(VBE_DISPI_INDEX_XRES);
+		me->bc_maxresy = dispi_rdreg(VBE_DISPI_INDEX_YRES);
+		me->bc_maxbpp  = dispi_rdreg(VBE_DISPI_INDEX_BPP);
+		dispi_wrreg(VBE_DISPI_INDEX_ENABLE, saved_enable);
 
 		/* Verify that limits are acceptable. */
-		if unlikely(me->bc_maxbpp < 8) {
-			printk(KERN_ERR "[bochsvbe] max:bpp(%" PRIu16 ") too small; need at least 8\n",
+		if unlikely(me->bc_maxbpp < 4) {
+			printk(KERN_ERR "[bochsvbe] max:bpp(%" PRIu16 ") too small; need at least 4\n",
 			       me->bc_maxbpp);
 			goto err_initfailed;
 		}
-		if unlikely(me->bc_maxresx < 640 || me->bc_maxresy < 480) {
-			printk(KERN_ERR "[bochsvbe] max:res(%" PRIu16 "x%" PRIu16 ") too small; need at least 640x480\n",
+		if unlikely(me->bc_maxresx < 320 || me->bc_maxresy < 200) {
+			printk(KERN_ERR "[bochsvbe] max:res(%" PRIu16 "x%" PRIu16 ") too small; need at least 320x200\n",
 			       me->bc_maxresx, me->bc_maxresy);
 			goto err_initfailed;
 		}
