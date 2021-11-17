@@ -40,7 +40,8 @@ __DECL_BEGIN
 /* Flags for `struct svga_modeinfo::smi_flags' */
 #define SVGA_MODEINFO_F_LFB    0x0001 /* Linear frame buffer is available. */
 #define SVGA_MODEINFO_F_PAL    0x0002 /* Palette-driven video mode. (Get/set palette colors `VGA_PEL_MSK' / `VGA_PEL_IW' / `VGA_PEL_D') */
-#define SVGA_MODEINFO_F_BW     0x0004 /* Black-and-white video mode (`smi_colors' is # of possible gray-scale values) */
+#define SVGA_MODEINFO_F_BW     0x0004 /* Black-and-white video mode (`1 << smi_colorbits' is  # of possible gray-scale  values)
+                                       * May still be combined with `SVGA_MODEINFO_F_PAL' for emulation of specific b/w colors. */
 #define SVGA_MODEINFO_F_TXT    0x0008 /* Text video mode. When set, you may also assume that `SVGA_MODEINFO_F_LFB' and
                                        * `SVGA_MODEINFO_F_PAL' are also set.
                                        * With this, `smi_lfb' points at a `smi_scanline * smi_resy'-large buffer,  where

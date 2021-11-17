@@ -238,6 +238,9 @@ INTDEF NONNULL((1)) void NOTHROW(FCALL svgadev_dbg_fini)(struct svgadev *__restr
 /* Default text-mode palette colors for KOS (these are set-up for ANSI TTY compatibility) */
 INTDEF struct vga_palcolor const basevga_defaultpal[16];
 
+/* Monochrome emulation palette. */
+INTDEF struct vga_palcolor const basevga_monopal[16];
+
 /* Default text-mode font for KOS. */
 INTDEF byte_t const basevga_defaultfont[256][32];
 

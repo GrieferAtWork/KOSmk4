@@ -411,7 +411,6 @@ ega_v_setmode(struct svga_chipset *__restrict self,
  * @return: false: Chipset isn't present. */
 INTERN WUNUSED NONNULL((1)) bool CC
 cs_vga_probe(struct svga_chipset *__restrict self) {
-	/* XXX: Maybe check if PCI says that VGA exists? */
 
 	/* Initialize the VGA chipset controller. */
 	DBG_memset(self, 0xcc, sizeof(struct vga_chipset));
@@ -426,12 +425,11 @@ cs_vga_probe(struct svga_chipset *__restrict self) {
 		self->sc_ops.sco_setmode = &vga_v_setmode;
 		self->sc_vmemsize        = 4 * 16 * 1024; /* Standard VGA has 256K of video memory */
 	}
-	self->sc_ops.sco_modeinfosize    = sizeof(struct svga_modeinfo);
-	self->sc_ops.sco_strings         = NULL;
-	self->sc_ops.sco_getregs         = &vga_v_getregs;
-	self->sc_ops.sco_setregs         = &vga_v_setregs;
-	self->sc_ops.sco_regsize         = 0;
-
+	self->sc_ops.sco_modeinfosize = sizeof(struct svga_modeinfo);
+	self->sc_ops.sco_strings      = NULL;
+	self->sc_ops.sco_getregs      = &vga_v_getregs;
+	self->sc_ops.sco_setregs      = &vga_v_setregs;
+	self->sc_ops.sco_regsize      = 0;
 	return true;
 }
 

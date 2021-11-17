@@ -681,7 +681,7 @@ svgadev_makettyaccess(struct svgadev *__restrict self,
 	}
 
 	/* Fill in missing standard fields. */
-	result->vta_refcnt  = 1;
+	result->vta_refcnt = 1;
 	atomic_lock_init(&result->vta_lock);
 	result->vta_flags           = VIDTTYACCESS_F_NORMAL;
 	result->vta_cursor.vtc_word = 0;
