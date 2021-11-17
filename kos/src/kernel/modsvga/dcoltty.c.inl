@@ -157,10 +157,9 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttya
 #elif BPP == 4
 #error TODO
 #elif BPP == 2
-#error TODO
+#error TODO: with PLANAR
+#error TODO: without PLANAR
 #elif BPP == 1
-
-/* TODO: 1BPP + planar (-> 16-color) */
 
 #ifdef PLANAR
 INTERN NOBLOCK NONNULL((1)) void
@@ -238,7 +237,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 	
 #define BITMASK(n) ((1 << (n)) - 1)
 #define OVERRIDE_BITS(xoff)                                        \
-				vmem.w = UNALIGNED_GET16((u16 const *)dst);       \
+				vmem.w = UNALIGNED_GET16((u16 const *)dst);        \
 				vmem.b[0] &= ~BITMASK(8 - xoff);                   \
 				vmem.b[0] |= mask >> xoff;                         \
 				vmem.b[1] &= BITMASK(8 - (xoff + 1));              \
@@ -317,7 +316,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 			switch (xoff) {
 	
 			case 0:
-				/* 76543210|0_______ */
+				/* 87654321|0_______ */
 				vmem.b[0] = (CSHAPE >> 1);
 				vmem.b[1] = dst[1];
 				vmem.b[1] &= 0x7f;
@@ -332,16 +331,16 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 				vmem.b[1] &= BITMASK(8 - (xoff + 1));                       \
 				vmem.b[1] |= ((CSHAPE >> 1) & BITMASK(xoff)) << (8 - xoff); \
 				vmem.b[1] |= (CSHAPE & 1) << (8 - (xoff + 1));
-			case 1: OVERRIDE_BITS(1); break; /* _7654321|00______ */
-			case 2: OVERRIDE_BITS(2); break; /* __765432|100_____ */
-			case 3: OVERRIDE_BITS(3); break; /* ___76543|2100____ */
-			case 4: OVERRIDE_BITS(4); break; /* ____7654|32100___ */
-			case 5: OVERRIDE_BITS(5); break; /* _____765|432100__ */
-			case 6: OVERRIDE_BITS(6); break; /* ______76|5432100_ */
+			case 1: OVERRIDE_BITS(1); break; /* _8765432|10______ */
+			case 2: OVERRIDE_BITS(2); break; /* __876543|210_____ */
+			case 3: OVERRIDE_BITS(3); break; /* ___87654|3210____ */
+			case 4: OVERRIDE_BITS(4); break; /* ____8765|43210___ */
+			case 5: OVERRIDE_BITS(5); break; /* _____876|543210__ */
+			case 6: OVERRIDE_BITS(6); break; /* ______87|6543210_ */
 #undef OVERRIDE_BITS
 	
 			case 7:
-				/* _______7|65432100 */
+				/* _______8|76543210 */
 				vmem.b[0] = dst[0];
 				vmem.b[1] = CSHAPE & 0xff;
 				vmem.b[0] &= 0xfe;
