@@ -275,6 +275,7 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 		/* Remember last-set mode. */
 		ATOMIC_WRITE(me->slc_mode, newmode);
+		return 0;
 	}	break;
 
 	case SVGA_IOC_GETDEFMODE:
@@ -289,10 +290,9 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		return svgadev_ioctl_getcsstrings(viddev_assvga(me->vlc_dev), (USER UNCHECKED struct svga_strings *)arg);
 
 	default:
-		return vidlck_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
-	return 0;
+	return vidlck_v_ioctl(self, cmd, arg, mode);
 }
 
 
@@ -573,10 +573,9 @@ svgatty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		return svgadev_ioctl_getcsstrings(viddev_assvga(me->vty_dev), (USER UNCHECKED struct svga_strings *)arg);
 
 	default:
-		return vidtty_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
-	return 0;
+	return vidtty_v_ioctl(self, cmd, arg, mode);
 }
 
 /* SVGA TTY device operators. */
@@ -768,10 +767,10 @@ svgadev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		 * is released. */
 		REF struct svgatty *tty;
 		tty = vidtty_assvga(viddev_getactivetty(me));
-		if unlikely(!tty)
-			THROW(E_NO_SUCH_OBJECT);
-		FINALLY_DECREF_UNLIKELY(tty);
-		return svgatty_v_ioctl(tty, cmd, arg, mode);
+		if likely(tty) {
+			FINALLY_DECREF_UNLIKELY(tty);
+			return svgatty_v_ioctl(tty, cmd, arg, mode);
+		}
 	}	break;
 
 	case SVGA_IOC_GETDEFMODE:
@@ -806,10 +805,9 @@ svgadev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 	}	break;
 
 	default:
-		return viddev_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
-	return 0;
+	return viddev_v_ioctl(self, cmd, arg, mode);
 }
 
 

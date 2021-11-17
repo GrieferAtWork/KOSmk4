@@ -39,5 +39,42 @@
  * @throw: E_INSUFFICIENT_RIGHTS: Caller doesn't have `CAP_SYS_RAWIO' */
 #define VID_IOC_MAKELCK _IOR_KOS('V', 0x01, struct hop_openfd)
 
+/* Video TTY ioctl codes.
+ * When used on a video controller device, these commands are forwarded to the currently active tty. */
+#define VID_IOC_GETTTYINFO  _IOR_KOS('V', 0x10, struct vidttyinfo)     /* Get TTY information */
+#define VID_IOC_GETCELLDATA _IOR_KOS('V', 0x11, struct vidttycelldata) /* Get TTY cell data; @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: ... */
+#define VID_IOC_SETCELLDATA _IOW_KOS('V', 0x11, struct vidttycelldata) /* Set TTY cell data; @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: ... */
+#define VID_IOC_GETCURSOR   _IOR_KOS('V', 0x12, __uint16_t[2])         /* Get 0-based cursor x,y position (same data-source as "\e[6n") */
+#define VID_IOC_SETCURSOR   _IOW_KOS('V', 0x12, __uint16_t[2])         /* Set 0-based cursor x,y position; @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: ... */
+
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct vidttyinfo {
+	__uint16_t vti_cellw;    /* [const] Character cell width in pixels (usually `9') */
+	__uint16_t vti_cellh;    /* [const] Character cell height in pixels (usually `16') */
+	__uint16_t vti_resx;     /* [const] # of character cells in X */
+	__uint16_t vti_resy;     /* [const] # of character cells in Y */
+	__uint16_t vti_cellsize; /* [const] Cell buffer size (in bytes) */
+};
+
+struct vidttycelldata {
+	__uint16_t      vcd_x;     /* First cell X position (0-based) */
+	__uint16_t      vcd_y;     /* First cell Y position (0-based) */
+	__uint16_t      vcd_w;     /* # of cells to read/write in X */
+	__uint16_t      vcd_h;     /* # of cells to read/write in Y */
+	union {
+		__byte_t   *vcd_dat;   /* [vcd_w * vcd_h * vti_cellsize] Cell data  buffer.
+		                        * Format is device-specific, but using this you can
+		                        * easily preserve+restore specific areas of display
+		                        * memory. */
+		__uint64_t _vcd_aldat; /* ... */
+	};
+};
+
+__DECL_END
+#endif /* __CC__ */
+
 
 #endif /* !_KOS_IOCTL_VIDEO_H */

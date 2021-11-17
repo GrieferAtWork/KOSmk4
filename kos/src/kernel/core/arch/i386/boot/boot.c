@@ -989,6 +989,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Refactor all of the ioctls from <kos/ioctl/...> to use the <SYSTEM>_IOC_<COMMAND> format. */
 
+	/* TODO: KOS's emulation of the "bound" instruction is wrong!
+	 * X86 Documented behavior:
+	 *   - throws when !(INDEX >= BOUNDS[0] && INDEX <= BOUNDS[1] + {2|4}))
+	 *     Where {2|4} is the operand size in bytes
+	 * Current KOS behavior:
+	 *   - throws when !(INDEX >= BOUNDS[0] && INDEX <= BOUNDS[1]))
+	 */
+
 	/* TODO: Add SVGA_IOC_* ioctls for:
 	 *  - sco_setwindow
 	 *  - sco_setrdwindow

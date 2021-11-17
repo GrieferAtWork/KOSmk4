@@ -36,12 +36,12 @@ __DECL_BEGIN
 /* IO control codes for `/dev/svga' and ttys/locks created with it.
  *
  * NOTES:
- *  - SVGA_IOC_GETMODE: [svga] Throws `E_NO_SUCH_OBJECT' if no tty/lck is active
+ *  - SVGA_IOC_GETMODE: [svga] Throws `E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND' if no tty/lck is active
  *  - SVGA_IOC_GETMODE: [lck]  Throws `E_NO_SUCH_OBJECT' if no video mode has been set, yet.
  *                             This only happens if a video lock is set when no tty had been
  *                             active. When a tty was active before, its video mode will  be
  *                             inherited during `SVGA_IOC_MAKELCK'.
- *  - SVGA_IOC_SETMODE: [svga] Throws `E_NO_SUCH_OBJECT' if no tty/lck is active
+ *  - SVGA_IOC_SETMODE: [svga] Throws `E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND' if no tty/lck is active
  *  - Commands marked with [io] require the caller to have `CAP_SYS_RAWIO'
  *  - SVGA_IOC_GETDEFMODE/SVGA_IOC_SETDEFMODE is the same for svga and all derived objects
  *  - `lck' can be  mmap'd after  `SVGA_IOC_SETMODE' was  used to  set a  mode.
@@ -77,18 +77,25 @@ __DECL_BEGIN
  *    can  (and _should_) be  used by user-space  programs to gain exclusive
  *    access to the video chipset.
  */
-#define SVGA_IOC_MAKELCK    VID_IOC_MAKELCK                           /* [io:svga        ] Create a new video lock */
-#define SVGA_IOC_ACTIVATE   VID_IOC_ACTIVATE                          /* [io:     tty    ] Activate TTY */
-#define SVGA_IOC_MAKETTY    _IOR_KOS('S', 0x00, struct svga_maketty)  /* [io:svga        ] Create a new TTY */
-#define SVGA_IOC_GETMODE    _IOR_KOS('S', 0x01, struct svga_modeinfo) /* [   svga|tty|lck] Get current video mode */
-#define SVGA_IOC_SETMODE    _IOW_KOS('S', 0x01, struct svga_modeinfo) /* [io:svga|tty|lck] Set current video mode (@throw: E_NO_SUCH_OBJECT: Not a supported mode) */
-#define SVGA_IOC_GETDEFMODE _IOR_KOS('S', 0x02, struct svga_modeinfo) /* [   svga|tty|lck] Get default video mode */
-#define SVGA_IOC_SETDEFMODE _IOW_KOS('S', 0x02, struct svga_modeinfo) /* [io:svga|tty|lck] Set default video mode (@throw: E_NO_SUCH_OBJECT: Not a supported mode) */
-#define SVGA_IOC_LSMODES    _IOR_KOS('S', 0x03, struct svga_lsmodes)  /* [   svga|tty|lck] List available modes */
-#define SVGA_IOC_GETCSNAME  _IOR_KOS('S', 0x04, char[SVGA_CSNAMELEN]) /* [   svga|tty|lck] Get chipset name */
-#define SVGA_IOC_CSSTRINGS  _IOR_KOS('S', 0x05, struct svga_strings)  /* [   svga|tty|lck] Get chipset strings */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x06, ...)                   * ... */
-/*      SVGA_IOC_           _IO*_KOS('S', 0x07, ...)                   * ... */
+#define SVGA_IOC_MAKELCK     VID_IOC_MAKELCK                           /* [io:svga        ] Create a new video lock */
+#define SVGA_IOC_ACTIVATE    VID_IOC_ACTIVATE                          /* [io:     tty    ] Activate TTY */
+#define SVGA_IOC_MAKETTY     _IOR_KOS('S', 0x00, struct svga_maketty)  /* [io:svga        ] Create a new TTY */
+#define SVGA_IOC_GETMODE     _IOR_KOS('S', 0x01, struct svga_modeinfo) /* [   svga|tty|lck] Get current video mode */
+#define SVGA_IOC_SETMODE     _IOW_KOS('S', 0x01, struct svga_modeinfo) /* [io:svga|tty|lck] Set current video mode (@throw: E_NO_SUCH_OBJECT: Not a supported mode) */
+#define SVGA_IOC_GETDEFMODE  _IOR_KOS('S', 0x02, struct svga_modeinfo) /* [   svga|tty|lck] Get default video mode */
+#define SVGA_IOC_SETDEFMODE  _IOW_KOS('S', 0x02, struct svga_modeinfo) /* [io:svga|tty|lck] Set default video mode (@throw: E_NO_SUCH_OBJECT: Not a supported mode) */
+#define SVGA_IOC_LSMODES     _IOR_KOS('S', 0x03, struct svga_lsmodes)  /* [   svga|tty|lck] List available modes */
+#define SVGA_IOC_GETCSNAME   _IOR_KOS('S', 0x04, char[SVGA_CSNAMELEN]) /* [   svga|tty|lck] Get chipset name */
+#define SVGA_IOC_CSSTRINGS   _IOR_KOS('S', 0x05, struct svga_strings)  /* [   svga|tty|lck] Get chipset strings */
+/*      SVGA_IOC_            _IO*_KOS('S', 0x06, ...)                   * ... */
+/*      SVGA_IOC_            _IO*_KOS('S', 0x07, ...)                   * ... */
+
+/* Misc tty functions. */
+#define SVGA_IOC_GETTTYINFO  VID_IOC_GETTTYINFO                        /* [   svga|tty    ] Get TTY information */
+#define SVGA_IOC_GETCELLDATA VID_IOC_GETCELLDATA                       /* [   svga|tty    ] Get TTY cell data; @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: ... */
+#define SVGA_IOC_SETCELLDATA VID_IOC_SETCELLDATA                       /* [   svga|tty    ] Set TTY cell data; @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: ... */
+#define SVGA_IOC_GETCURSOR   VID_IOC_GETCURSOR                         /* [   svga|tty    ] Get 0-based cursor x,y position (same data-source as "\e[6n") */
+#define SVGA_IOC_SETCURSOR   VID_IOC_SETCURSOR                         /* [   svga|tty    ] Set 0-based cursor x,y position; @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: ... */
 
 
 #ifdef __CC__

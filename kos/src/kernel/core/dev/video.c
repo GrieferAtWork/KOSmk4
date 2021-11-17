@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_DEV_VIDEO_C
 #define GUARD_KERNEL_SRC_DEV_VIDEO_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -39,8 +40,11 @@
 #include <kos/ioctl/video.h>
 #include <sys/ioctl.h>
 
+#include <alloca.h>
 #include <assert.h>
+#include <errno.h>
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -314,11 +318,121 @@ vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		return 0;
 	}	break;
 
+	case VID_IOC_GETTTYINFO: {
+		REF struct vidttyaccess *tty;
+		USER CHECKED struct vidttyinfo *info;
+		info = (USER CHECKED struct vidttyinfo *)arg;
+		validate_writable(info, sizeof(*info));
+		tty = vidtty_getaccess(me);
+		FINALLY_DECREF_UNLIKELY(tty);
+		info->vti_cellw    = tty->vta_cellw;
+		info->vti_cellh    = tty->vta_cellh;
+		info->vti_resx     = tty->vta_resx;
+		info->vti_resy     = tty->vta_resy;
+		info->vti_cellsize = tty->vta_cellsize;
+		return 0;
+	}	break;
+
+	case VID_IOC_GETCELLDATA:
+	case VID_IOC_SETCELLDATA: {
+		byte_t *temp;
+		REF struct vidttyaccess *tty;
+		USER CHECKED byte_t *buffer;
+		struct vidttycelldata info;
+		uint16_t x, y, xend, yend;
+		validate_readable(arg, sizeof(info));
+		memcpy(&info, arg, sizeof(info));
+		tty = vidtty_getaccess(me);
+		FINALLY_DECREF_UNLIKELY(tty);
+		/* Verify bounds. */
+		if unlikely(info.vcd_x + info.vcd_w > tty->vta_resx) {
+			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
+			      info.vcd_x + info.vcd_w,
+			      0, tty->vta_resx);
+		}
+		if unlikely(info.vcd_y + info.vcd_h > tty->vta_resy) {
+			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
+			      info.vcd_y + info.vcd_h,
+			      0, tty->vta_resy);
+		}
+		xend = info.vcd_x + info.vcd_w;
+		yend = info.vcd_y + info.vcd_h;
+		temp = (byte_t *)alloca(tty->vta_cellsize);
+
+		/* Transfer cell data. */
+		if (cmd == VID_IOC_GETCELLDATA) {
+			validate_writable(info.vcd_dat, info.vcd_w * info.vcd_h * tty->vta_cellsize);
+			for (y = info.vcd_y; y < info.vcd_h; ++y) {
+				for (x = info.vcd_x; x < info.vcd_w; ++x) {
+					uintptr_t addr = x + y * tty->vta_scan;
+					atomic_lock_acquire(&tty->vta_lock);
+					(*tty->vta_getcelldata)(tty, addr, temp);
+					atomic_lock_release(&tty->vta_lock);
+					info.vcd_dat = (byte_t *)mempcpy(info.vcd_dat, temp,
+					                                 tty->vta_cellsize);
+				}
+			}
+		} else {
+			validate_readable(info.vcd_dat, info.vcd_w * info.vcd_h * tty->vta_cellsize);
+			for (y = info.vcd_y; y < info.vcd_h; ++y) {
+				for (x = info.vcd_x; x < info.vcd_w; ++x) {
+					uintptr_t addr = x + y * tty->vta_scan;
+					memcpy(temp, info.vcd_dat, tty->vta_cellsize);
+					info.vcd_dat += tty->vta_cellsize;
+					atomic_lock_acquire(&tty->vta_lock);
+					(*tty->vta_setcelldata)(tty, addr, temp);
+					atomic_lock_release(&tty->vta_lock);
+				}
+			}
+		}
+		return 0;
+	}	break;
+
+	case VID_IOC_GETCURSOR: {
+		REF struct vidttyaccess *tty;
+		union vidtty_cursor cur;
+		validate_writable(arg, 4);
+		tty = vidtty_getaccess(me);
+		/* Get cursor position word */
+		{
+			FINALLY_DECREF_UNLIKELY(tty);
+			atomic_lock_acquire(&tty->vta_lock);
+			cur.vtc_word = tty->vta_cursor.vtc_word;
+			atomic_lock_release(&tty->vta_lock);
+		}
+		((USER CHECKED uint16_t *)arg)[0] = cur.vtc_cellx;
+		((USER CHECKED uint16_t *)arg)[1] = cur.vtc_celly;
+		return 0;
+	}	break;
+
+	case VID_IOC_SETCURSOR: {
+		REF struct vidttyaccess *tty;
+		union vidtty_cursor cur;
+		validate_readable(arg, 4);
+		cur.vtc_cellx = ((USER CHECKED uint16_t const *)arg)[0];
+		cur.vtc_celly = ((USER CHECKED uint16_t const *)arg)[1];
+		tty           = vidtty_getaccess(me);
+		FINALLY_DECREF_UNLIKELY(tty);
+
+		/* Verify bounds. */
+		if unlikely(cur.vtc_cellx >= tty->vta_resx)
+			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, cur.vtc_cellx, tty->vta_resx - 1);
+		if unlikely(cur.vtc_celly >= tty->vta_resy)
+			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, cur.vtc_celly, tty->vta_resy - 1);
+
+		/* Set cursor position word */
+		atomic_lock_acquire(&tty->vta_lock);
+		tty->vta_cursor.vtc_word = cur.vtc_word;
+		if (tty->vta_flags & VIDTTYACCESS_F_ACTIVE)
+			(*tty->vta_showcursor)(tty);
+		atomic_lock_release(&tty->vta_lock);
+		return 0;
+	}	break;
+
 	default:
-		return ansittydev_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
-	return 0;
+	return ansittydev_v_ioctl(self, cmd, arg, mode);
 }
 
 
@@ -955,22 +1069,23 @@ viddev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hand);
 	}	break;
 
-		/* Forward these ioctls to the currently active tty. */
-	case TIOCGWINSZ:
-	case _IO_WITHTYPE(TIOCGWINSZ, struct winsize): {
-		REF struct vidtty *tty;
-		tty = viddev_getactivetty(me);
-		if unlikely(!tty)
-			THROW(E_NO_SUCH_OBJECT);
-		FINALLY_DECREF_UNLIKELY(tty);
-		return mfile_uioctl(tty, cmd, arg, mode);
-	}	break;
-
 	default:
-		return chrdev_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
-	return 0;
+
+	/* Forward these ioctls to the currently active tty. */
+	if (_IOC_TYPE(cmd) == _IOC_TYPE(TIOCGWINSZ) ||
+	    _IOC_TYPE(cmd) == _IOC_TYPE(VID_IOC_GETTTYINFO)) {
+		REF struct vidtty *tty;
+		tty = viddev_getactivetty(me);
+		if likely(tty) {
+			FINALLY_DECREF_UNLIKELY(tty);
+			return mfile_uioctl(tty, cmd, arg, mode);
+		}
+	}
+
+	/* Do a generic character-device ioctl */
+	return chrdev_v_ioctl(self, cmd, arg, mode);
 }
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL

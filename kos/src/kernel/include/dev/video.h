@@ -99,8 +99,8 @@ struct vidttyaccess {
 	union {struct {
 #endif /* __WANT_VIDTTYACCESS__vta_mmlop */
 	uintptr_t                   vta_flags;         /* [lock(vta_lock)] Set of `VIDTTYACCESS_F_*' */
-	uintptr_half_t              vta_cellw;         /* [const] Character cell width (usually `9') */
-	uintptr_half_t              vta_cellh;         /* [const] Character cell height (usually `16') */
+	uintptr_half_t              vta_cellw;         /* [const] Character cell width in pixels (usually `9') */
+	uintptr_half_t              vta_cellh;         /* [const] Character cell height in pixels (usually `16') */
 	uintptr_half_t              vta_resx;          /* [const] # of character cells in X */
 	uintptr_half_t              vta_resy;          /* [const] # of character cells in Y */
 	uintptr_half_t              vta_scan;          /* [const] Scanline size (in characters cells; usually the same as `vta_resx') */

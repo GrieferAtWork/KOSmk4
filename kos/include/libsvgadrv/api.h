@@ -29,19 +29,15 @@
 #define LIBSVGADRV_CC /* nothing */
 #endif /* !... */
 
-#if (!defined(LIBSVGADRV_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__))
+#if 0
 #define LIBSVGADRV_WANT_PROTOTYPES
 #endif /* ... */
 
-#if (defined(__KOS__) && defined(__KERNEL__) && \
-     defined(CONFIG_BUILDING_KERNEL_CORE))
-#define LIBSVGADRV_DECL __PUBDEF
-#elif defined(__LIBSVGADRV_STATIC)
+#ifdef __LIBSVGADRV_STATIC
 #define LIBSVGADRV_DECL __INTDEF
-#else /* ... */
+#else /* __LIBSVGADRV_STATIC */
 #define LIBSVGADRV_DECL __IMPDEF
-#endif /* !... */
+#endif /* !__LIBSVGADRV_STATIC */
 
 /* Library name for use with `dlopen()' */
 #define LIBSVGADRV_LIBRARY_NAME "libsvgadrv.so"

@@ -70,7 +70,7 @@ ansittydev_v_write(struct chrdev *__restrict self,
 #ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ansittydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
-                   USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...)
+                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
 #else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
@@ -121,15 +121,21 @@ ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 		COMPILER_WRITE_BARRIER();
 		/* Copy collected data into user-space. */
 		memcpy(arg, &ws, sizeof(struct winsize));
+		return 0;
 	}	break;
 
 	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-		      cmd);
 		break;
 	}
+
+#ifdef CONFIG_USE_NEW_FS
+	return chrdev_v_ioctl(self, cmd, arg, mode);
+#else /* CONFIG_USE_NEW_FS */
+	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+	      cmd);
 	return 0;
+#endif /* !CONFIG_USE_NEW_FS */
 }
 
 PUBLIC NONNULL((1)) void LIBANSITTY_CC
