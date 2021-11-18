@@ -126,7 +126,7 @@ INTERN_CONST struct vga_known_mode const vga_modelist[CS_VGAMODE_COUNT] = {
 
 	[CS_VGAMODE_320X200X256] = {
 		.vkm_info = {
-				.smi_lfb            = 0xA0000,
+			.smi_lfb            = 0xA0000,
 			.smi_flags          = SVGA_MODEINFO_F_LFB | SVGA_MODEINFO_F_PAL,
 			.smi_scanline       = 320,
 			.smi_resx           = 320,
