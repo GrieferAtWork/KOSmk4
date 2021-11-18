@@ -33,6 +33,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/anno.h>
 #include <kos/keyboard.h>
 
 #include <assert.h>
@@ -528,9 +529,9 @@ PRIVATE uint8_t const ansipal[16][3] = {
 };
 
 
-PRIVATE ATTR_CONST WUNUSED uint16_t CC
-color_distance(uint8_t ra, uint8_t ga, uint8_t ba,
-               uint8_t rb, uint8_t gb, uint8_t bb) {
+PRIVATE NOBLOCK ATTR_CONST WUNUSED uint16_t
+NOTHROW(CC color_distance)(uint8_t ra, uint8_t ga, uint8_t ba,
+                           uint8_t rb, uint8_t gb, uint8_t bb) {
 	uint16_t dist_r = (unsigned int)abs((int)ra - (int)rb);
 	uint16_t dist_g = (unsigned int)abs((int)ga - (int)gb);
 	uint16_t dist_b = (unsigned int)abs((int)ba - (int)bb);
@@ -1050,7 +1051,7 @@ do_handle_unich:
 
 
 /* "\e]{arg[arglen]:%s}\e[" */
-PRIVATE bool CC
+PRIVATE NONNULL((1, 2)) bool CC
 ansi_OSC(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	char *pos;
@@ -1074,7 +1075,7 @@ ansi_OSC(struct ansitty *__restrict self,
 }
 
 /* "\eP{arg[arglen]:%s}\e[" */
-PRIVATE bool CC
+PRIVATE NONNULL((1, 2)) bool CC
 ansi_DCS(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	/* ??? */
@@ -1085,7 +1086,7 @@ ansi_DCS(struct ansitty *__restrict self,
 }
 
 /* "\eX{arg[arglen]:%s}\e[" */
-PRIVATE bool CC
+PRIVATE NONNULL((1, 2)) bool CC
 ansi_SOS(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	/* ??? */
@@ -1096,7 +1097,7 @@ ansi_SOS(struct ansitty *__restrict self,
 }
 
 /* "\e^{arg[arglen]:%s}\e[" */
-PRIVATE bool CC
+PRIVATE NONNULL((1, 2)) bool CC
 ansi_PM(struct ansitty *__restrict self,
         char *__restrict arg, size_t arglen) {
 	/* ??? */
@@ -1107,7 +1108,7 @@ ansi_PM(struct ansitty *__restrict self,
 }
 
 /* "\e_{arg[arglen]:%s}\e[" */
-PRIVATE bool CC
+PRIVATE NONNULL((1, 2)) bool CC
 ansi_APC(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	/* ??? */
@@ -1119,7 +1120,7 @@ ansi_APC(struct ansitty *__restrict self,
 
 
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 do_ident_DA(struct ansitty *__restrict self) {
 	/* Do what linux does: Report `\e[?6c` */
 	OUTPUT(CC_SESC "[?6c"); /* VT102 */
@@ -1176,7 +1177,7 @@ do_ident_DA(struct ansitty *__restrict self) {
 	}
 
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 ansitty_do_hscroll(struct ansitty *__restrict self, int offset) {
 	ansitty_coord_t xy[2];
 	ansitty_coord_t y, x_size;
@@ -1226,7 +1227,7 @@ ansitty_do_hscroll(struct ansitty *__restrict self, int offset) {
 
 
 /* "\e[{arg[arglen]:%s}{lastch}" */
-PRIVATE bool CC
+PRIVATE NONNULL((1, 2)) bool CC
 ansi_CSI(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen,
          char lastch) {
@@ -2646,8 +2647,8 @@ ansitty_invoke_string_command(struct ansitty *__restrict self,
 	return result;
 }
 
-PRIVATE ATTR_CONST char CC
-get_string_command_start_character(uintptr_t state) {
+PRIVATE NOBLOCK ATTR_CONST char
+NOTHROW(CC get_string_command_start_character)(uintptr_t state) {
 	char result;
 	switch (state) {
 
@@ -3390,6 +3391,7 @@ do_process_string_command:
 			WARN_UNKNOWN_SEQUENCE3C('Y', 32 + STATE_ESC_Y1_VAL(self), ch);
 			goto reset_state;
 		}
+
 		/* Set the cursor position. */
 		SETCURSOR((byte_t)ch - 32, STATE_ESC_Y1_VAL(self), true);
 		goto set_text_and_done;
@@ -3407,12 +3409,14 @@ INTERN NONNULL((1)) void CC
 libansitty_putuni(struct ansitty *__restrict self, char32_t ch) {
 	char utf8_seq[UNICODE_UTF8_CURLEN];
 	size_t i, utf8_len;
+
 	/* Simple case: Default state and non-escaping character */
 	if (self->at_state == STATE_TEXT_UTF8) {
 		if (!handle_control_character(self, ch))
 			PUTUNILAST(ch);
 		return;
 	}
+
 	/* Encode as utf-8 and use `libansitty_putc()'. */
 	utf8_len = (size_t)(unicode_writeutf8(utf8_seq, ch) - utf8_seq);
 	for (i = 0; i < utf8_len; ++i)
