@@ -465,7 +465,7 @@ after_file_size_changed:
 		 * as a mem-part got init-blocks, we're not allowed to make it anon. */
 		assert(!mpart_isanon(part));
 		DBG_memset(&part->mp_filent.rb_lhs, 0xcc, sizeof(part->mp_filent.rb_lhs));
-		DBG_memset(&part->mp_filent.rb_rhs, 0xcc, sizeof(part->mp_filent.rb_rhs));
+		part->mp_filent.rb_rhs = NULL; /* Indicator for `mpart_trim()' */
 
 		/* Mark the part as anonymous */
 		ATOMIC_WRITE(part->mp_filent.rb_par, (struct mpart *)-1);

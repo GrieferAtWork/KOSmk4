@@ -131,7 +131,7 @@ again:
 				/* Dead mem-part. (remove from tree) */
 				mpart_tree_removenode(&self->mf_parts, result);
 				DBG_memset(&result->mp_filent.rb_lhs, 0xcc, sizeof(result->mp_filent.rb_lhs));
-				DBG_memset(&result->mp_filent.rb_rhs, 0xcc, sizeof(result->mp_filent.rb_rhs));
+				result->mp_filent.rb_rhs = NULL; /* Indicator for `mpart_trim()' */
 				ATOMIC_WRITE(result->mp_filent.rb_par, (struct mpart *)-1);
 				goto again;
 			}
