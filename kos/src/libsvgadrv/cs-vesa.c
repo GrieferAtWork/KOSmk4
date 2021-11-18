@@ -49,7 +49,8 @@ DECL_BEGIN
 
 /*
  * VESA driver. Based on:
- * https://www.lowlevel.eu/wiki/VESA_BIOS_Extensions
+ * - https://www.lowlevel.eu/wiki/VESA_BIOS_Extensions (german)
+ * - http://www.phatcode.net/res/221/files/vbe20.pdf
  */
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)

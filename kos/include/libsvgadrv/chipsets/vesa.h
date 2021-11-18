@@ -28,7 +28,11 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* Based on info from (german): https://www.lowlevel.eu/wiki/VESA_BIOS_Extensions */
+/*
+ * VESA driver. Based on:
+ * - https://www.lowlevel.eu/wiki/VESA_BIOS_Extensions (german)
+ * - http://www.phatcode.net/res/221/files/vbe20.pdf
+ */
 
 
 /* Flags for `struct vbe_biosinfo::vbi_capabilities' */
