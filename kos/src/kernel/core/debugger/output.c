@@ -709,7 +709,9 @@ NOTHROW(LIBANSITTY_CC dbgtty_putc)(struct ansitty *__restrict UNUSED(self),
 		                           ' ', advance);
 		dbg_vtty->vta_cursor.vtc_cellx += advance;
 		if (dbg_vtty->vta_cursor.vtc_cellx >= dbg_screen_width) {
-			dbg_vtty->vta_cursor.vtc_cellx = 0;
+			if (dbg_indent >= dbg_screen_width)
+				dbg_indent = dbg_screen_width - 1;
+			dbg_vtty->vta_cursor.vtc_cellx = dbg_indent;
 			++dbg_vtty->vta_cursor.vtc_celly;
 
 			/* Set the EOL flag after an implicit line-feed */
@@ -735,9 +737,11 @@ NOTHROW(LIBANSITTY_CC dbgtty_putc)(struct ansitty *__restrict UNUSED(self),
 		break;
 
 	case '\r':
+		if (dbg_indent >= dbg_screen_width)
+			dbg_indent = dbg_screen_width - 1;
 		if (dbg_vtty->vta_flags & VIDTTYACCESS_F_EOL) {
 			/* Go to the original line after a line-wrap. */
-			dbg_vtty->vta_cursor.vtc_cellx = 0;
+			dbg_vtty->vta_cursor.vtc_cellx = dbg_indent;
 			--dbg_vtty->vta_cursor.vtc_celly;
 			break;
 		}
@@ -750,7 +754,7 @@ NOTHROW(LIBANSITTY_CC dbgtty_putc)(struct ansitty *__restrict UNUSED(self),
 			                           ' ',
 			                           dbg_screen_width - dbg_vtty->vta_cursor.vtc_cellx);
 		}
-		dbg_vtty->vta_cursor.vtc_cellx = 0;
+		dbg_vtty->vta_cursor.vtc_cellx = dbg_indent;
 		break;
 
 	case '\n':
@@ -771,7 +775,9 @@ NOTHROW(LIBANSITTY_CC dbgtty_putc)(struct ansitty *__restrict UNUSED(self),
 			dbg_vtty->vta_cursor.vtc_celly = dbg_vtty->_vta_scrl_ymax;
 			dbgtty_scrollone();
 		}
-		dbg_vtty->vta_cursor.vtc_cellx = 0;
+		if (dbg_indent >= dbg_screen_width)
+			dbg_indent = dbg_screen_width - 1;
+		dbg_vtty->vta_cursor.vtc_cellx = dbg_indent;
 		break;
 
 	default: {
@@ -793,7 +799,9 @@ NOTHROW(LIBANSITTY_CC dbgtty_putc)(struct ansitty *__restrict UNUSED(self),
 
 		/* Check for line overflow. */
 		if (dbg_vtty->vta_cursor.vtc_cellx >= dbg_screen_width) {
-			dbg_vtty->vta_cursor.vtc_cellx = 0;
+			if (dbg_indent >= dbg_screen_width)
+				dbg_indent = dbg_screen_width - 1;
+			dbg_vtty->vta_cursor.vtc_cellx = dbg_indent;
 			++dbg_vtty->vta_cursor.vtc_celly;
 
 			/* Set the EOL flag after an implicit line-feed */
