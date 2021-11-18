@@ -178,6 +178,10 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 #ifdef PLANAR
 	byte_t *base;
 	uint8_t plane;
+	uint8_t saved_seq_plane_write;
+	uint8_t saved_gfx_plane_read;
+	saved_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
+	saved_gfx_plane_read  = vga_rgfx(VGA_GFX_PLANE_READ);
 #endif /* PLANAR */
 
 	cellx = address % self->vta_scan;
@@ -199,8 +203,8 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 
 		/* Select the appropriate plane. */
 #ifdef PLANAR
-		vga_wseq(VGA_SEQ_PLANE_WRITE, (vga_rseq(VGA_SEQ_PLANE_WRITE) & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(plane));
-		vga_wgfx(VGA_GFX_PLANE_READ, (vga_rgfx(VGA_GFX_PLANE_READ) & ~VGA_GR04_FREADMAP) | VGA_GR04_READMAP(plane));
+		vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(plane));
+		vga_wgfx(VGA_GFX_PLANE_READ, (saved_gfx_plane_read & ~VGA_GR04_FREADMAP) | VGA_GR04_READMAP(plane));
 #endif /* PLANAR */
 
 		for (y = 0; y < CELLSIZE_Y; ++y) {
@@ -209,11 +213,44 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 				uint8_t b[2];
 				uint16_t w;
 			} vmem;
-	
+
 			mask = cell->sgc_lines[y];
 
 #ifdef PLANAR
-			/* Apply colors (XXX: I feel like this could be done faster with bit magic...) */
+			/* Apply colors
+			 *
+			 * Repeat for each of the 8 bits in `mask':
+			 * ```
+			 *     mask   fg   bg    result
+			 *        0    0    0    0
+			 *        0    0    1    1
+			 *        0    1    0    0
+			 *        0    1    1    1
+			 *        1    0    0    0
+			 *        1    0    1    0
+			 *        1    1    0    1
+			 *        1    1    1    1
+			 * ```
+			 * Solution: `result = (fg & mask) | (bg & ~mask);'
+			 *
+			 * Verbose code:
+			 * >> uint8_t bgfgbits[2], i, bit;
+			 * >> bgfgbits[0] = (cell->sgc_color >> (4 + plane)) & 1;
+			 * >> bgfgbits[1] = (cell->sgc_color >> plane) & 1;
+			 * >> for (i = 0; i < 8; ++i) {
+			 * >>     bit = (mask >> i) & 1;
+			 * >>     mask &= ~(1 << i);
+			 * >>     mask |= bgfgbits[bit] << i;
+			 * >> }
+			 */
+#if 1
+			{
+				uint8_t bg, fg;
+				bg   = ((cell->sgc_color >> (4 + plane)) & 1) * 0xff;
+				fg   = ((cell->sgc_color >> plane) & 1) * 0xff;
+				mask = (fg & mask) | (bg & ~mask);
+			}
+#else
 			{
 				uint8_t bgfgbits[2], i, bit;
 				bgfgbits[0] = (cell->sgc_color >> (4 + plane)) & 1;
@@ -224,9 +261,10 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 					mask |= bgfgbits[bit] << i;
 				}
 			}
+#endif
 #endif /* PLANAR */
 			switch (xoff) {
-	
+
 			case 0:
 				/* 76543210|0_______ */
 				vmem.b[0] = mask;
@@ -234,7 +272,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 				vmem.b[1] &= 0x7f;
 				vmem.b[1] |= (mask & 1) << 7;
 				break;
-	
+
 #define BITMASK(n) ((1 << (n)) - 1)
 #define OVERRIDE_BITS(xoff)                                        \
 				vmem.w = UNALIGNED_GET16((u16 const *)dst);        \
@@ -250,7 +288,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 			case 5: OVERRIDE_BITS(5); break; /* _____765|432100__ */
 			case 6: OVERRIDE_BITS(6); break; /* ______76|5432100_ */
 #undef OVERRIDE_BITS
-	
+
 			case 7:
 				/* _______7|65432100 */
 				vmem.b[0] = dst[0];
@@ -258,7 +296,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 				vmem.b[0] &= 0xfe;
 				vmem.b[0] |= (mask & 0x80) >> 7;
 				break;
-	
+
 			default: __builtin_unreachable();
 			}
 			UNALIGNED_SET16((u16 *)dst, vmem.w);
@@ -286,6 +324,10 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 #ifdef PLANAR
 	byte_t *base;
 	uint8_t plane;
+	uint8_t saved_seq_plane_write;
+	uint8_t saved_gfx_plane_read;
+	saved_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
+	saved_gfx_plane_read  = vga_rgfx(VGA_GFX_PLANE_READ);
 #endif /* PLANAR */
 
 	/* Figure out where the cursor goes. */
@@ -303,8 +345,8 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 
 		/* Select the appropriate plane. */
 #ifdef PLANAR
-		vga_wseq(VGA_SEQ_PLANE_WRITE, (vga_rseq(VGA_SEQ_PLANE_WRITE) & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(plane));
-		vga_wgfx(VGA_GFX_PLANE_READ, (vga_rgfx(VGA_GFX_PLANE_READ) & ~VGA_GR04_FREADMAP) | VGA_GR04_READMAP(plane));
+		vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(plane));
+		vga_wgfx(VGA_GFX_PLANE_READ, (saved_gfx_plane_read & ~VGA_GR04_FREADMAP) | VGA_GR04_READMAP(plane));
 #endif /* PLANAR */
 
 		for (y = 0; y < CURSOR_HEIGHT; ++y) {
@@ -314,7 +356,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 				uint16_t w;
 			} vmem;
 			switch (xoff) {
-	
+
 			case 0:
 				/* 87654321|0_______ */
 				vmem.b[0] = (CSHAPE >> 1);
@@ -322,7 +364,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 				vmem.b[1] &= 0x7f;
 				vmem.b[1] |= (CSHAPE & 1) << 7;
 				break;
-	
+
 #define BITMASK(n) ((1 << (n)) - 1)
 #define OVERRIDE_BITS(xoff)                                                 \
 				vmem.w = UNALIGNED_GET16((u16 const *)dst);                 \
@@ -338,7 +380,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 			case 5: OVERRIDE_BITS(5); break; /* _____876|543210__ */
 			case 6: OVERRIDE_BITS(6); break; /* ______87|6543210_ */
 #undef OVERRIDE_BITS
-	
+
 			case 7:
 				/* _______8|76543210 */
 				vmem.b[0] = dst[0];
@@ -346,7 +388,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 				vmem.b[0] &= 0xfe;
 				vmem.b[0] |= (CSHAPE & 0x100) >> 8;
 				break;
-	
+
 			default: __builtin_unreachable();
 			}
 			UNALIGNED_SET16((u16 *)dst, vmem.w);
