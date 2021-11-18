@@ -438,6 +438,11 @@ FUNDEF NOBLOCK size_t
 NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
                                  pid_t *p_alloc_roottid);
 
+/* Print a traceback for `ptr' to the given `printer'.
+ * WARNING: Don't kfree(ptr) while this function is running! */
+FUNDEF NOBLOCK ssize_t KCALL
+kmalloc_printtrace(void *ptr, __pformatprinter printer, void *arg);
+
 /* Validate that headers/footers of data blocks returned by kmalloc() haven't
  * been  modified (which can accidentally happen as the result of programming
  * errors, such as array over-/under-runs)

@@ -34,6 +34,8 @@
 #ifdef CONFIG_TRACE_MALLOC
 #include <debugger/config.h>
 #include <debugger/hook.h>
+#include <debugger/io.h>
+#include <debugger/util.h>
 #include <kernel/addr2line.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -665,14 +667,13 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
 	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
 	if unlikely(!node) {
 		lock_break();
-		kernel_panic_n(/* n_skip: */ 1,
-		               "kmalloc_traceback(%p): No node at this address",
-		               ptr);
 		return 0;
 	}
+
 	/* Write-back the TID of the thread that originally allocated the node. */
 	if (p_alloc_roottid)
 		*p_alloc_roottid = node->tn_tid;
+
 	/* Check if this node has a traceback */
 	if (!TRACE_NODE_KIND_HAS_TRACEBACK(node->tn_kind)) {
 		result = 0;
@@ -685,6 +686,32 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
 	lock_release();
 	return result;
 }
+
+/* Print a traceback for `ptr' to the given `printer'.
+ * WARNING: Don't kfree(ptr) while this function is running! */
+FUNDEF NOBLOCK ssize_t KCALL
+kmalloc_printtrace(void *ptr, __pformatprinter printer, void *arg) {
+	ssize_t result = 0;
+	struct trace_node *node;
+	if unlikely(!ptr)
+		return 0;
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+	if (KERNEL_SLAB_CHECKPTR(ptr))
+		return 0;
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+	lock_acquire();
+	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
+	if unlikely(!node) {
+		lock_break();
+		return 0;
+	}
+	lock_release();
+	if (TRACE_NODE_KIND_HAS_TRACEBACK(node->tn_kind))
+		result = trace_node_print_traceback(node, printer, arg);
+	return result;
+}
+
+
 
 #if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
 #define HAVE_kmalloc_validate_node
@@ -2218,6 +2245,21 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	trace_node_free(node);
 }
 
+#ifdef CONFIG_HAVE_DEBUGGER
+DBG_COMMAND(kmtrace,
+            "kmtrace ptr...\n"
+            "\tPrint tracebacks for where ptr was allocated from\n",
+            argc, argv) {
+	for (; argc >= 2; --argc, ++argv) {
+		uintptr_t addr;
+		if (!dbg_evaladdr(argv[1], &addr))
+			return DBG_STATUS_INVALID_ARGUMENTS;
+		dbg_printf(DBGSTR("kmalloc %p:\n"), addr);
+		kmalloc_printtrace((void *)addr, &dbg_printer, NULL);
+	}
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END
