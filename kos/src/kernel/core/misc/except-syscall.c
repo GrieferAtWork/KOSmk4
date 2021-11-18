@@ -146,14 +146,6 @@ NOTHROW(KCALL reset_user_except_handler)(void) {
 	hand->ueh_stack = EXCEPT_HANDLER_SP_CURRENT;
 	/* Reset the TID address of the calling thread. */
 	PERTASK_SET(this_tid_address, (pid_t *)NULL);
-#ifdef CONFIG_HAVE_USERPROCMASK
-	/* Clear the userprocmask flag for our thread.
-	 * Note that our caller will have already loaded userspace's
-	 * final  process mask into our kernel-space sigmask buffer.
-	 *
-	 * s.a. `kernel_do_execveat_impl()' */
-	ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FUSERPROCMASK);
-#endif /* CONFIG_HAVE_USERPROCMASK */
 }
 
 

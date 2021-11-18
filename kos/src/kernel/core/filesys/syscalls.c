@@ -2229,22 +2229,40 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		task_serve();
 	} else {
 		args->ea_mman = THIS_MMAN;
-		mman_exec(args);
 #ifdef CONFIG_HAVE_USERPROCMASK
-		/* If the previous process used to have a userprocmask, and didn't make  proper
-		 * use  of calling `sys_sigmask_check()',  we check for  pending signals in the
-		 * context of the new process, just so it gets to start out with a clean slate.
-		 *
-		 * Note though that assuming the original program used the userprocmask API
-		 * correctly, there shouldn't be any unmasked, pending signals from  before
-		 * the  call to exec() at this point (of course, there could always be some
-		 * from during the call...) */
-		if (thread_flags & TASK_FUSERPROCMASK)
+		if (thread_flags & TASK_FUSERPROCMASK) {
+			/* Disable USERPROCMASK during the exec.
+			 * This is necessary so the task_serve() below, as well as any such
+			 * called made from  within `mman_exec()' use  the kernel's  signal
+			 * mask, rather than the user's! */
+			ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FUSERPROCMASK);
+			TRY {
+				mman_exec(args);
+			} EXCEPT {
+				/* Re-enable USERPROCMASK if the exec() failed. */
+				ATOMIC_OR(THIS_TASK->t_flags, TASK_FUSERPROCMASK);
+				RETHROW();
+			}
+
+			/* If the previous process used to have a userprocmask, and didn't make  proper
+			 * use  of calling `sys_sigmask_check()',  we check for  pending signals in the
+			 * context of the new process, just so it gets to start out with a clean slate.
+			 *
+			 * Note though that assuming the original program used the userprocmask API
+			 * correctly, there shouldn't be any unmasked, pending signals from  before
+			 * the  call to exec() at this point (of course, there could always be some
+			 * from during the call...) */
 			task_serve();
+		} else
 #endif /* CONFIG_HAVE_USERPROCMASK */
+		{
+			mman_exec(args);
+		}
 	}
+
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 	run_permman_onexec();
+
 #ifndef CONFIG_EVERYONE_IS_ROOT
 	cred_onexec(args->ea_xfile);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
