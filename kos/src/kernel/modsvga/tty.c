@@ -631,16 +631,39 @@ svga_makettyaccess_gfx(struct svgadev *__restrict UNUSED(self),
 		SETOPS(2_p);
 		break;
 
-//TODO:	case 3 ... 4:   SETOPS(4);  break;
-	case 5 ... 8:   SETOPS(8);  break;
-	case 9 ... 16:  SETOPS(16); break;
-	case 17 ... 24: SETOPS(24); break;
-	case 25 ... 32: SETOPS(32); break;
+//TODO:	case 3 ... 4:
+//TODO:		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+//TODO:			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+//TODO:		SETOPS(4);
+//TODO:		break;
+
+	case 5 ... 8:
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+		SETOPS(8);
+		break;
+
+	case 9 ... 16:
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+		SETOPS(16);
+		break;
+
+	case 17 ... 24:
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+		SETOPS(24);
+		break;
+
+	case 25 ... 32:
+		SETOPS(32);
+		break;
 #undef SETOPS
 #endif /* !__INTELLISENSE__ */
 
 	default:
 		/* Unsupported # of bits-per-pixel. */
+notsup:
 		destroy(result);
 		THROW(E_NOT_IMPLEMENTED_UNSUPPORTED);
 		break;

@@ -335,9 +335,8 @@ vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 	case VID_IOC_GETCELLDATA:
 	case VID_IOC_SETCELLDATA: {
-		byte_t *temp;
+		byte_t *buf;
 		REF struct vidttyaccess *tty;
-		USER CHECKED byte_t *buffer;
 		struct vidttycelldata info;
 		uint16_t x, y, xend, yend;
 		validate_readable(arg, sizeof(info));
@@ -357,30 +356,30 @@ vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		}
 		xend = info.vcd_x + info.vcd_w;
 		yend = info.vcd_y + info.vcd_h;
-		temp = (byte_t *)alloca(tty->vta_cellsize);
+		buf  = (byte_t *)alloca(tty->vta_cellsize);
 
 		/* Transfer cell data. */
 		if (cmd == VID_IOC_GETCELLDATA) {
 			validate_writable(info.vcd_dat, info.vcd_w * info.vcd_h * tty->vta_cellsize);
-			for (y = info.vcd_y; y < info.vcd_h; ++y) {
-				for (x = info.vcd_x; x < info.vcd_w; ++x) {
+			for (y = info.vcd_y; y < yend; ++y) {
+				for (x = info.vcd_x; x < xend; ++x) {
 					uintptr_t addr = x + y * tty->vta_scan;
 					atomic_lock_acquire(&tty->vta_lock);
-					(*tty->vta_getcelldata)(tty, addr, temp);
+					(*tty->vta_getcelldata)(tty, addr, buf);
 					atomic_lock_release(&tty->vta_lock);
-					info.vcd_dat = (byte_t *)mempcpy(info.vcd_dat, temp,
+					info.vcd_dat = (byte_t *)mempcpy(info.vcd_dat, buf,
 					                                 tty->vta_cellsize);
 				}
 			}
 		} else {
 			validate_readable(info.vcd_dat, info.vcd_w * info.vcd_h * tty->vta_cellsize);
-			for (y = info.vcd_y; y < info.vcd_h; ++y) {
-				for (x = info.vcd_x; x < info.vcd_w; ++x) {
+			for (y = info.vcd_y; y < yend; ++y) {
+				for (x = info.vcd_x; x < xend; ++x) {
 					uintptr_t addr = x + y * tty->vta_scan;
-					memcpy(temp, info.vcd_dat, tty->vta_cellsize);
+					memcpy(buf, info.vcd_dat, tty->vta_cellsize);
 					info.vcd_dat += tty->vta_cellsize;
 					atomic_lock_acquire(&tty->vta_lock);
-					(*tty->vta_setcelldata)(tty, addr, temp);
+					(*tty->vta_setcelldata)(tty, addr, buf);
 					atomic_lock_release(&tty->vta_lock);
 				}
 			}
@@ -729,15 +728,14 @@ done:
 }
 
 PUBLIC NONNULL((1)) void LIBANSITTY_CC
-vidtty_v_setttymode(struct ansitty *__restrict self,
-                    uint16_t new_ttymode) {
+vidtty_v_setttymode(struct ansitty *__restrict self) {
 	REF struct vidttyaccess *me;
 	me = ansitty_getvidttyaccess(self);
 	FINALLY_DECREF_UNLIKELY(me);
 	atomic_lock_acquire(&me->vta_lock);
 	if likely(me->vta_flags & VIDTTYACCESS_F_ACTIVE) {
 		/* Update the state of the on-screen cursor. */
-		if (new_ttymode & ANSITTY_MODE_HIDECURSOR) {
+		if (self->at_ttymode & ANSITTY_MODE_HIDECURSOR) {
 			(*me->vta_hidecursor)(me);
 		} else if (me->vta_cursor.vtc_celly < me->vta_resy) {
 			(*me->vta_showcursor)(me);
@@ -747,21 +745,21 @@ vidtty_v_setttymode(struct ansitty *__restrict self,
 }
 
 PUBLIC NONNULL((1)) void LIBANSITTY_CC
-vidtty_v_scrollregion(struct ansitty *__restrict self,
-                      ansitty_coord_t start_line,
-                      ansitty_coord_t end_line) {
+vidtty_v_scrollregion(struct ansitty *__restrict self) {
+	ansitty_coord_t sl = self->at_scroll_sl;
+	ansitty_coord_t el = self->at_scroll_el;
 	REF struct vidttyaccess *me;
+	if (sl < 0)
+		sl = 0;
 	me = ansitty_getvidttyaccess(self);
 	FINALLY_DECREF_UNLIKELY(me);
+	if (el > me->vta_resy)
+		el = me->vta_resy;
+	if (sl > el)
+		sl = el;
 	atomic_lock_acquire(&me->vta_lock);
-	if (start_line < 0)
-		start_line = 0;
-	if (end_line > me->vta_resy)
-		end_line = me->vta_resy;
-	if (start_line > end_line)
-		start_line = end_line;
-	me->vta_scroll_ystart = start_line;
-	me->vta_scroll_yend   = end_line;
+	me->vta_scroll_ystart = sl;
+	me->vta_scroll_yend   = el;
 	_vidttyaccess_update_scrl(me);
 	atomic_lock_release(&me->vta_lock);
 }

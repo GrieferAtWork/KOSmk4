@@ -24,7 +24,7 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBANSITTY_CC __ATTR_STDCALL
+#define LIBANSITTY_CC __ATTR_FASTCALL
 #else /* ... */
 #define LIBANSITTY_CC /* nothing */
 #endif /* !... */

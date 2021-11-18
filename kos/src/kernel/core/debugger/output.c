@@ -963,11 +963,10 @@ done:
 }
 
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
-dbgtty_setttymode(struct ansitty *__restrict UNUSED(self),
-                  uint16_t new_ttymode) {
+dbgtty_setttymode(struct ansitty *__restrict self) {
 	if likely(dbg_vtty->vta_flags & VIDTTYACCESS_F_ACTIVE) {
 		/* Update the state of the on-screen cursor. */
-		if (new_ttymode & ANSITTY_MODE_HIDECURSOR) {
+		if (self->at_ttymode & ANSITTY_MODE_HIDECURSOR) {
 			(*dbg_vtty->vta_hidecursor)(dbg_vtty);
 		} else if (dbg_vtty->vta_cursor.vtc_celly < dbg_screen_height) {
 			(*dbg_vtty->vta_showcursor)(dbg_vtty);
@@ -976,17 +975,17 @@ dbgtty_setttymode(struct ansitty *__restrict UNUSED(self),
 }
 
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
-dbgtty_scrollregion(struct ansitty *__restrict UNUSED(self),
-                    ansitty_coord_t start_line,
-                    ansitty_coord_t end_line) {
-	if (start_line < 0)
-		start_line = 0;
-	if (end_line > dbg_screen_height)
-		end_line = dbg_screen_height;
-	if (start_line > end_line)
-		start_line = end_line;
-	dbg_vtty->vta_scroll_ystart = start_line;
-	dbg_vtty->vta_scroll_yend   = end_line;
+dbgtty_scrollregion(struct ansitty *__restrict self) {
+	ansitty_coord_t sl = self->at_scroll_sl;
+	ansitty_coord_t el = self->at_scroll_el;
+	if (sl < 0)
+		sl = 0;
+	if (el > dbg_screen_height)
+		el = dbg_screen_height;
+	if (sl > el)
+		sl = el;
+	dbg_vtty->vta_scroll_ystart = sl;
+	dbg_vtty->vta_scroll_yend   = el;
 	_vidttyaccess_update_scrl(dbg_vtty);
 }
 
@@ -1331,7 +1330,7 @@ NOTHROW(FCALL dbg_setcur_visible)(bool visible) {
 		dbg_tty.at_ttymode &= ~ANSITTY_MODE_HIDECURSOR;
 		if (!visible)
 			dbg_tty.at_ttymode |= ANSITTY_MODE_HIDECURSOR;
-		(*dbg_tty.at_ops.ato_setttymode)(&dbg_tty, dbg_tty.at_ttymode);
+		dbgtty_setttymode(&dbg_tty);
 	}
 	return result;
 }

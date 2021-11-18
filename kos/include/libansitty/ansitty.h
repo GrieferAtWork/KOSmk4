@@ -224,9 +224,9 @@ struct ansitty_operators {
 	 *    cases, and also because `dbg_printf()' doesn't feed through  the
 	 *    libtermios layer that would normally translate LF->CRLF.
 	 */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_putc)(struct ansitty *__restrict self,
-	                               __CHAR32_TYPE__ ch);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_putc)(struct ansitty *__restrict self,
+	                          __CHAR32_TYPE__ ch);
 
 	/* [0..1] Set the position of the cursor.
 	 * NOTE: The given `x'  and `y'  must be clamped  to COLUMNS-1/ROWS-1,  meaning
@@ -235,17 +235,17 @@ struct ansitty_operators {
 	 * @param: update_hw_cursor: When true,  also update  the hardware  cursor.
 	 *                           Otherwise, the position of the hardware cursor
 	 *                           should be left unchanged. */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_setcursor)(struct ansitty *__restrict self,
-	                                    ansitty_coord_t x, ansitty_coord_t y,
-	                                    __BOOL update_hw_cursor);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_setcursor)(struct ansitty *__restrict self,
+	                               ansitty_coord_t x, ansitty_coord_t y,
+	                               __BOOL update_hw_cursor);
 
 	/* [0..1] Returns the position of the cursor.
 	 * @param: ppos[0]: Store X-position here.
 	 * @param: ppos[1]: Store Y-position here. */
-	__ATTR_NONNULL((1, 2))
-	void (LIBANSITTY_CC *ato_getcursor)(struct ansitty *__restrict self,
-	                                    ansitty_coord_t ppos[2]);
+	__ATTR_NONNULL((1, 2)) void
+	(LIBANSITTY_CC *ato_getcursor)(struct ansitty *__restrict self,
+	                               ansitty_coord_t ppos[2]);
 
 	/* [0..1] Returns the size of the terminal.
 	 * NOTE: When implementing this function, you are _required_ never to fill
@@ -254,9 +254,9 @@ struct ansitty_operators {
 	 *       where it may be impossible to handle them.
 	 * @param: psize[0]: Number of cells in X (width/columns).
 	 * @param: psize[1]: Number of cells in Y (height/rows). */
-	__ATTR_NONNULL((1, 2))
-	void (LIBANSITTY_CC *ato_getsize)(struct ansitty *__restrict self,
-	                                  ansitty_coord_t psize[2]);
+	__ATTR_NONNULL((1, 2)) void
+	(LIBANSITTY_CC *ato_getsize)(struct ansitty *__restrict self,
+	                             ansitty_coord_t psize[2]);
 
 	/* [0..1] Copy the contents of cells starting at CURSOR into cells at
 	 *        CURSOR+dst_offset (added together  such that values  beyond
@@ -265,20 +265,20 @@ struct ansitty_operators {
 	 *        The  number of  cells to-be  copied is  given by `count'
 	 *        When `count' would overflow past the end of the display,
 	 *        it must be clamped before being used. */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_copycell)(struct ansitty *__restrict self,
-	                                   ansitty_offset_t dst_offset,
-	                                   ansitty_coord_t count);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_copycell)(struct ansitty *__restrict self,
+	                              ansitty_offset_t dst_offset,
+	                              ansitty_coord_t count);
 
 	/* [0..1] Print the given character `ch' (which is always a graphical
 	 *        character, rather than a control character) up to `count'
 	 *        times, without ever scrolling, and stopping if the end of
 	 *        the display is reached.
 	 *        The actual cursor position remains unchanged. */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_fillcell)(struct ansitty *__restrict self,
-	                                   __CHAR32_TYPE__ ch,
-	                                   ansitty_coord_t count);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_fillcell)(struct ansitty *__restrict self,
+	                              __CHAR32_TYPE__ ch,
+	                              ansitty_coord_t count);
 
 	/* [0..1] Shift terminal lines by offset, where a positive value shifts
 	 *        lines up (like a \n at the bottom of the screen would), and a
@@ -287,54 +287,54 @@ struct ansitty_operators {
 	 *        characters.
 	 * E.g.: When the end of the terminal is reached, the driver may
 	 *       implement this as `(*to_scroll)(..., 1);' */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_scroll)(struct ansitty *__restrict self,
-	                                 ansitty_offset_t offset);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_scroll)(struct ansitty *__restrict self,
+	                            ansitty_offset_t offset);
 
 	/* [0..1] Clear text from the screen.
 	 * @param: mode: One of `ANSITTY_CLS_*' */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_cls)(struct ansitty *__restrict self, unsigned int mode);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_cls)(struct ansitty *__restrict self,
+	                         unsigned int mode);
 
 	/* [0..1] Clear text from the current line.
 	 * @param: mode: One of `ANSITTY_EL_*' */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_el)(struct ansitty *__restrict self, unsigned int mode);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_el)(struct ansitty *__restrict self,
+	                        unsigned int mode);
 
 	/* [0..1] Set the current text color.
-	 * Called whenever a different color is selected.
-	 * @param: color: == */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_setcolor)(struct ansitty *__restrict self,
-	                                   __uint8_t color);
+	 * Called whenever a different color is selected; iow: one of ... changed:
+	 *  - self->at_color
+	 *  - self->at_tcolorfg
+	 *  - self->at_tcolorbg
+	 * NOTE: If the driver has support for more than the standard 16 ANSI colors,
+	 *       this can be exposed by using `self->at_tcolor{fg|bg}' instead of the
+	 *       the normal `self->at_color'. */
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_setcolor)(struct ansitty *__restrict self);
 
 	/* [0..1] Set the current text attributes.
-	 * Called whenever text attributes change.
-	 * @param: new_attrib: == self->at_attrib */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_setattrib)(struct ansitty *__restrict self,
-	                                    __uint16_t new_attrib);
+	 * Called whenever text attributes change; iow: `self->at_attrib' changed. */
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_setattrib)(struct ansitty *__restrict self);
 
-	/* [0..1] Set  the  current  tty   mode.
-	 * Called whenever the tty mode changes.
-	 * @param: new_ttymode: == self->at_ttymode */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_setttymode)(struct ansitty *__restrict self,
-	                                     __uint16_t new_ttymode);
+	/* [0..1] Set the current tty mode.
+	 * Called whenever the tty mode changes; iow: `self->at_ttymode' changed. */
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_setttymode)(struct ansitty *__restrict self);
 
 	/* [0..1] Set the scroll region (s.a. `ato_scroll()')
-	 * Called   whenever   the  scroll   region  changes.
-	 * @param: start_line: == self->at_scroll_sl
-	 * @param: end_line:   == self->at_scroll_el */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_scrollregion)(struct ansitty *__restrict self,
-	                                       ansitty_coord_t start_line,
-	                                       ansitty_coord_t end_line);
+	 * Called whenever the scroll region changes; iow: one of ... changed:
+	 * - self->at_scroll_sl
+	 * - self->at_scroll_el */
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_scrollregion)(struct ansitty *__restrict self);
 
 	/* [0..1] Set the window title of the terminal. */
-	__ATTR_NONNULL((1, 2))
-	void (LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
-	                                   /*utf-8*/ char const *__restrict text);
+	__ATTR_NONNULL((1, 2)) void
+	(LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
+	                              /*utf-8*/ char const *__restrict text);
 
 	/* [0..1] Output `data' to the slave process (`write(amaster, data, datalen)';
 	 *        amaster from <pty.h>:openpty, or alternatively identical to keyboard
@@ -342,9 +342,9 @@ struct ansitty_operators {
 	 *        Certain control  sequences produce  response strings  that are  then
 	 *        passed to string function in order to become readable by the issuing
 	 *        process. */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_output)(struct ansitty *__restrict self,
-	                                 void const *data, __size_t datalen);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_output)(struct ansitty *__restrict self,
+	                            void const *data, __size_t datalen);
 
 	/* [0..1] Turn LEDs on/off, such that NEW_LEDS = (OLD_LEDS & mask) | flag.
 	 * For  this purpose,  both mask and  flag are bitsets  of LEDs enumerated
@@ -355,9 +355,9 @@ struct ansitty_operators {
 	 *   0x02: KEYBOARD_LED_NUMLOCK
 	 *   0x04: KEYBOARD_LED_CAPSLOCK
 	 *   0x08: Undefined (ignore if it wouldn't have any meaning) */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_setled)(struct ansitty *__restrict self,
-	                                 __uint8_t mask, __uint8_t flag);
+	__ATTR_NONNULL((1)) void
+	(LIBANSITTY_CC *ato_setled)(struct ansitty *__restrict self,
+	                            __uint8_t mask, __uint8_t flag);
 
 	/* [0..1] Try to get/set the terminal IOS descriptor of the associated terminal.
 	 * This function can be used in 2 different modes:
@@ -369,10 +369,10 @@ struct ansitty_operators {
 	 *      If they  differ,  leave  `oldios' undefined,  and  return  `false'
 	 *      If they match, set `newios' as the new IOS state and return `true'
 	 */
-	__ATTR_NONNULL((1, 2))
-	__BOOL (LIBANSITTY_CC *ato_termios)(struct ansitty *__restrict self,
-	                                    struct termios *__restrict oldios,
-	                                    struct termios const *newios);
+	__ATTR_NONNULL((1, 2)) __BOOL
+	(LIBANSITTY_CC *ato_termios)(struct ansitty *__restrict self,
+	                             struct termios *__restrict oldios,
+	                             struct termios const *newios);
 };
 
 #ifdef LIBANSITTY_EXPOSE_INTERNALS
@@ -386,6 +386,8 @@ struct ansitty {
 	__uint8_t                 at_color;       /* Selected color index (0xf0: bg; 0x0f: fg). */
 	__uint8_t                 at_defcolor;    /* Default color index (usually `ANSITTY_CL_DEFAULT').
 	                                           * This  index  is  used  when  `\ec'  is  encountered */
+	__uint8_t                 at_tcolorfg[3]; /* RGB for foreground color (`at_color & 0x0f' is the closest ANSI color) */
+	__uint8_t                 at_tcolorbg[3]; /* RGB for background color (`at_color & 0xf0' is the closest ANSI color) */
 	__uint16_t                ANSITTY_INTERNAL(at_ttyflag); /* Internal TTY mode flags. */
 	__uint16_t                at_ttymode;     /* TTY mode (Set of `ANSITTY_MODE_*') */
 	__uint16_t                at_attrib;      /* Text mode attributes (set of `ANSITTY_ATTRIB_*'). */

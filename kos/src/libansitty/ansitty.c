@@ -137,9 +137,9 @@ DECL_BEGIN
 #define GETCURSOR(pxy)              ((*self->at_ops.ato_getcursor)(self, pxy), TRACE_OPERATION("getcur:{%u,%u}\n", (pxy)[0], (pxy)[1]))
 #define GETSIZE(pxy)                ((*self->at_ops.ato_getsize)(self, pxy), TRACE_OPERATION("getsiz:{%u,%u}\n", (pxy)[0], (pxy)[1]))
 #define SETCURSOR(x, y, uhwc)       (TRACE_OPERATION("setcur(%u,%u,%s)\n", x, y, (uhwc) ? "true" : "false"), (*self->at_ops.ato_setcursor)(self, x, y, uhwc))
-#define SETCOLOR(color)             (TRACE_OPERATION("setcolor(%#x)\n", color), (*self->at_ops.ato_setcolor)(self, color))
-#define SETTTYMODE(ttymode)         (TRACE_OPERATION("setttymode(%#x)\n", ttymode), self->at_ops.ato_setttymode ? (*self->at_ops.ato_setttymode)(self, ttymode) : (void)0)
-#define SETATTRIB(attrib)           (TRACE_OPERATION("setattrib(%#x)\n", attrib), self->at_ops.ato_setattrib ? (*self->at_ops.ato_setattrib)(self, attrib) : (void)0)
+#define NOTIFY_SETCOLOR()           (TRACE_OPERATION("setcolor(%#x)\n", self->at_color), (*self->at_ops.ato_setcolor)(self))
+#define NOTIFY_SETTTYMODE()         (TRACE_OPERATION("setttymode(%#x)\n", self->at_ttymode), self->at_ops.ato_setttymode ? (*self->at_ops.ato_setttymode)(self) : (void)0)
+#define NOTIFY_SETATTRIB()          (TRACE_OPERATION("setattrib(%#x)\n", self->at_attrib), self->at_ops.ato_setattrib ? (*self->at_ops.ato_setattrib)(self) : (void)0)
 #define SETTITLE(title)             (TRACE_OPERATION("settitle(%q)\n", title), (self->at_ops.ato_settitle ? (*self->at_ops.ato_settitle)(self, title) : (void)0))
 #define DOOUTPUT(text, len)         (TRACE_OPERATION("output(%$q)\n", len, text), (*self->at_ops.ato_output)(self, text, len))
 #define OUTPUT(text)                (TRACE_OPERATION("output(%q)\n", text), self->at_ops.ato_output ? (*self->at_ops.ato_output)(self, text, COMPILER_STRLEN(text)) : (void)0)
@@ -149,10 +149,12 @@ DECL_BEGIN
 #define CLS(mode)                   (TRACE_OPERATION("cls(%u)\n", mode), (*self->at_ops.ato_cls)(self, mode))
 #define EL(mode)                    (TRACE_OPERATION("el(%u)\n", mode), (*self->at_ops.ato_el)(self, mode))
 #define SETLED(mask, flag)          (TRACE_OPERATION("setled(%#x,%#x)\n", mask, flag), self->at_ops.ato_setled ? (*self->at_ops.ato_setled)(self, mask, flag) : (void)0)
-#define SCROLLREGION(sl, el)                           \
-	(TRACE_OPERATION("scrollregion(%u,%u)\n", sl, el), \
-	 self->at_ops.ato_scrollregion                     \
-	 ? (*self->at_ops.ato_scrollregion)(self, sl, el)  \
+#define NOTIFY_SCROLLREGION()                 \
+	(TRACE_OPERATION("scrollregion(%u,%u)\n", \
+	                 self->at_scroll_sl,      \
+	                 self->at_scroll_el),     \
+	 self->at_ops.ato_scrollregion            \
+	 ? (*self->at_ops.ato_scrollregion)(self) \
 	 : (void)0)
 
 #define MAXCOORD        ((ansitty_coord_t)-1)
@@ -244,14 +246,14 @@ STATIC_ASSERT_MSG(CP_UTF8 == 0,
 		if (!(_old_ttymode & ANSITTY_MODE_HIDECURSOR)) {                     \
 			uint16_t _new_ttymode = _old_ttymode & ~ANSITTY_MODE_HIDECURSOR; \
 			self->at_ttymode      = _new_ttymode;                            \
-			SETTTYMODE(_new_ttymode);                                        \
+			NOTIFY_SETTTYMODE();                                             \
 		}                                                                    \
 		do
 #define HIDECURSOR_END()                                 \
 		__WHILE0;                                        \
 		if (!(_old_ttymode & ANSITTY_MODE_HIDECURSOR)) { \
 			self->at_ttymode = _old_ttymode;             \
-			SETTTYMODE(_old_ttymode);                    \
+			NOTIFY_SETTTYMODE();                         \
 		}                                                \
 	}	__WHILE0
 #else /* CONFIG_HIDE_CURSOR_DURING_NAVIGATION */
@@ -263,8 +265,7 @@ STATIC_ASSERT_MSG(CP_UTF8 == 0,
 
 
 PRIVATE NONNULL((1)) void CC
-stub_setcolor(struct ansitty *__restrict UNUSED(self),
-              uint8_t UNUSED(color)) {
+stub_setcolor(struct ansitty *__restrict UNUSED(self)) {
 	/* no-op */
 }
 
@@ -505,37 +506,140 @@ libansitty_init(struct ansitty *__restrict self,
 	self->at_lastch     = ' ';
 }
 
+PRIVATE uint8_t const ansipal[16][3] = {
+#define RGB(r, g, b) { r, g, b }
+	/* [0x0] = */ RGB(0x00, 0x00, 0x00),
+	/* [0x1] = */ RGB(0xaa, 0x00, 0x00),
+	/* [0x2] = */ RGB(0x00, 0xaa, 0x00),
+	/* [0x3] = */ RGB(0xaa, 0x55, 0x00),
+	/* [0x4] = */ RGB(0x00, 0x00, 0xaa),
+	/* [0x5] = */ RGB(0xaa, 0x00, 0xaa),
+	/* [0x6] = */ RGB(0x00, 0xaa, 0xaa),
+	/* [0x7] = */ RGB(0xaa, 0xaa, 0xaa),
+	/* [0x8] = */ RGB(0x55, 0x55, 0x55),
+	/* [0x9] = */ RGB(0xff, 0x55, 0x55),
+	/* [0xa] = */ RGB(0x55, 0xff, 0x55),
+	/* [0xb] = */ RGB(0xff, 0xff, 0x55),
+	/* [0xc] = */ RGB(0x55, 0x55, 0xff),
+	/* [0xd] = */ RGB(0xff, 0x55, 0xff),
+	/* [0xe] = */ RGB(0x55, 0xff, 0xff),
+	/* [0xf] = */ RGB(0xff, 0xff, 0xff),
+#undef RGB
+};
 
-PRIVATE void CC
-setcolor(struct ansitty *__restrict self,
-         uint8_t color) {
-	if (self->at_color == color)
+
+PRIVATE ATTR_CONST WUNUSED uint16_t CC
+color_distance(uint8_t ra, uint8_t ga, uint8_t ba,
+               uint8_t rb, uint8_t gb, uint8_t bb) {
+	uint16_t dist_r = (unsigned int)abs((int)ra - (int)rb);
+	uint16_t dist_g = (unsigned int)abs((int)ga - (int)gb);
+	uint16_t dist_b = (unsigned int)abs((int)ba - (int)bb);
+	/* Crude, hacky way of favoring colors best seen by the human eye. */
+	return (dist_r) +
+	       (dist_g * 2) +
+	       (dist_b / 2);
+}
+
+PRIVATE NOBLOCK ATTR_CONST WUNUSED uint8_t
+NOTHROW(CC colorindex)(uint8_t r, uint8_t g, uint8_t b) {
+	uint8_t i, winner_index = 0;
+	uint16_t winner_distance = (uint16_t)-1;
+	for (i = 0; i < COMPILER_LENOF(ansipal); ++i) {
+		uint16_t distance;
+		distance = color_distance(r, g, b,
+		                          ansipal[i][0],
+		                          ansipal[i][1],
+		                          ansipal[i][2]);
+		if (distance < winner_distance) {
+			winner_distance = distance;
+			winner_index    = i;
+		}
+	}
+	return winner_index;
+}
+
+
+PRIVATE NONNULL((1)) void CC
+setcolor_rgb_fg(struct ansitty *__restrict self,
+                uint8_t r, uint8_t g, uint8_t b) {
+	if unlikely(self->at_ttyflag & ANSITTY_FLAG_CONCEIL) {
+		r = self->at_tcolorbg[0];
+		g = self->at_tcolorbg[1];
+		b = self->at_tcolorbg[2];
+	}
+	if (self->at_tcolorfg[0] == r &&
+	    self->at_tcolorfg[1] == g &&
+	    self->at_tcolorfg[2] == b)
 		return; /* Unchanged. */
-	self->at_color = color;
-	if (self->at_ttyflag & ANSITTY_FLAG_CONCEIL) {
+
+	/* Load new color index. */
+	self->at_color = ANSITTY_PALETTE_INDEX(colorindex(r, g, b),
+	                                       ANSITTY_PALETTE_INDEX_BG(self->at_color));
+
+	/* Set color values. */
+	self->at_tcolorfg[0] = r;
+	self->at_tcolorfg[1] = g;
+	self->at_tcolorfg[2] = b;
+	NOTIFY_SETCOLOR();
+}
+
+PRIVATE NONNULL((1)) void CC
+setcolor_rgb_bg(struct ansitty *__restrict self,
+                uint8_t r, uint8_t g, uint8_t b) {
+	uint8_t color;
+	if (self->at_tcolorbg[0] == r &&
+	    self->at_tcolorbg[1] == g &&
+	    self->at_tcolorbg[2] == b)
+		return; /* Unchanged. */
+	color = ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_FG(self->at_color),
+	                              colorindex(r, g, b));
+	if unlikely(self->at_ttyflag & ANSITTY_FLAG_CONCEIL) {
+		self->at_tcolorfg[0] = r;
+		self->at_tcolorfg[1] = g;
+		self->at_tcolorfg[2] = b;
 		color = ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_BG(color),
 		                              ANSITTY_PALETTE_INDEX_BG(color));
 	}
-	SETCOLOR(color);
+	self->at_color       = color;
+	self->at_tcolorbg[0] = r;
+	self->at_tcolorbg[1] = g;
+	self->at_tcolorbg[2] = b;
+	NOTIFY_SETCOLOR();
 }
 
-PRIVATE void CC
+
+PRIVATE NONNULL((1)) void CC
+setcolor(struct ansitty *__restrict self,
+         uint8_t color) {
+	if unlikely(self->at_ttyflag & ANSITTY_FLAG_CONCEIL) {
+		color = ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_BG(color),
+		                              ANSITTY_PALETTE_INDEX_BG(color));
+	}
+	if (self->at_color == color)
+		return; /* Unchanged. */
+	self->at_color = color;
+	memcpy(self->at_tcolorfg, ansipal[ANSITTY_PALETTE_INDEX_FG(color)], sizeof(self->at_tcolorfg));
+	memcpy(self->at_tcolorbg, ansipal[ANSITTY_PALETTE_INDEX_BG(color)], sizeof(self->at_tcolorbg));
+	NOTIFY_SETCOLOR();
+}
+
+PRIVATE NONNULL((1)) void CC
 setttymode(struct ansitty *__restrict self, uint16_t new_ttymode) {
 	if (self->at_ttymode == new_ttymode)
 		return;
 	self->at_ttymode = new_ttymode;
-	SETTTYMODE(new_ttymode);
+	NOTIFY_SETTTYMODE();
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 setattrib(struct ansitty *__restrict self, uint16_t new_attrib) {
 	if (self->at_attrib == new_attrib)
 		return;
 	self->at_attrib = new_attrib;
-	SETATTRIB(new_attrib);
+	NOTIFY_SETATTRIB();
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 setflags(struct ansitty *__restrict self, uint16_t new_flags) {
 	if (self->at_ttyflag == new_flags)
 		return;
@@ -544,7 +648,7 @@ setflags(struct ansitty *__restrict self, uint16_t new_flags) {
 		if (new_flags & ANSITTY_FLAG_CONCEIL)
 			used_color = ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_BG(used_color),
 			                                   ANSITTY_PALETTE_INDEX_BG(used_color));
-		SETCOLOR(used_color);
+		NOTIFY_SETCOLOR();
 	}
 	self->at_ttyflag = new_flags;
 }
@@ -552,19 +656,19 @@ setflags(struct ansitty *__restrict self, uint16_t new_flags) {
 
 
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 savecursor(struct ansitty *__restrict self) {
 	GETCURSOR(self->at_savecur);
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 loadcursor(struct ansitty *__restrict self) {
 	SETCURSOR(self->at_savecur[0],
 	          self->at_savecur[1],
 	          true);
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 setscrollregion(struct ansitty *__restrict self,
                 ansitty_coord_t sl,
                 ansitty_coord_t el) {
@@ -573,10 +677,10 @@ setscrollregion(struct ansitty *__restrict self,
 		return;
 	self->at_scroll_sl = sl;
 	self->at_scroll_el = el;
-	SCROLLREGION(sl, el);
+	NOTIFY_SCROLLREGION();
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 setscrollmargin(struct ansitty *__restrict self,
                 ansitty_coord_t sc,
                 ansitty_coord_t ec) {
@@ -585,7 +689,7 @@ setscrollmargin(struct ansitty *__restrict self,
 }
 
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 resetterminal(struct ansitty *__restrict self,
               bool soft_reset) {
 	(void)soft_reset;
@@ -1013,57 +1117,6 @@ ansi_APC(struct ansitty *__restrict self,
 	return false;
 }
 
-
-
-struct rgb_color {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-};
-
-struct ansi_palette {
-	struct rgb_color pal[16];
-};
-
-PRIVATE struct ansi_palette const vga_pal = {
-	{
-		{ 0, 0, 0 },       { 170, 0, 0 },     { 0, 170, 0 },     { 170, 85, 0 },
-		{ 0, 0, 170 },     { 170, 0, 170 },   { 0, 170, 170 },   { 170, 170, 170 },
-		{ 85, 85, 85 },    { 255, 85, 85 },   { 85, 255, 85 },   { 255, 255, 85 },
-		{ 85, 85, 255 },   { 255, 85, 255 },  { 85, 255, 255 },  { 255, 255, 255 }
-	}
-};
-
-
-PRIVATE ATTR_CONST WUNUSED unsigned int CC
-color_distance(uint8_t ra, uint8_t ga, uint8_t ba,
-               uint8_t rb, uint8_t gb, uint8_t bb) {
-	unsigned int dist_r = (unsigned int)abs((int)ra - (int)rb);
-	unsigned int dist_g = (unsigned int)abs((int)ga - (int)gb);
-	unsigned int dist_b = (unsigned int)abs((int)ba - (int)bb);
-	/* Crude, hacky way of favoring colors best seen by the human eye. */
-	return (dist_r) +
-	       (dist_g * 2) +
-	       (dist_b / 2);
-}
-
-PRIVATE ATTR_CONST WUNUSED unsigned int CC
-get_index_for_color(uint8_t r, uint8_t g, uint8_t b) {
-	unsigned int i, winner_index = 0;
-	unsigned int winner_distance = (unsigned int)-1;
-	for (i = 0; i < COMPILER_LENOF(vga_pal.pal); ++i) {
-		unsigned int distance;
-		distance = color_distance(r, g, b,
-		                          vga_pal.pal[i].r,
-		                          vga_pal.pal[i].g,
-		                          vga_pal.pal[i].b);
-		if (distance < winner_distance) {
-			winner_distance = distance;
-			winner_index    = i;
-		}
-	}
-	return winner_index;
-}
 
 
 PRIVATE void CC
@@ -1584,7 +1637,7 @@ done_insert_ansitty_flag_hedit:
 		if (!arglen)
 			CLS(ANSITTY_CLS_AFTER);
 		else {
-			ARGUMENT_CODE_SWITCH_BEGIN()
+			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 			case ANSITTY_CLS_AFTER:
 			case ANSITTY_CLS_BEFORE:
@@ -1593,6 +1646,7 @@ done_insert_ansitty_flag_hedit:
 				CLS(code);
 				break;
 
+			}
 			ARGUMENT_CODE_SWITCH_END()
 		}
 		break;
@@ -1601,7 +1655,7 @@ done_insert_ansitty_flag_hedit:
 		if (!arglen)
 			EL(ANSITTY_EL_AFTER);
 		else {
-			ARGUMENT_CODE_SWITCH_BEGIN()
+			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 			case ANSITTY_EL_AFTER:
 			case ANSITTY_EL_BEFORE:
@@ -1609,6 +1663,7 @@ done_insert_ansitty_flag_hedit:
 				EL(code);
 				break;
 
+			}
 			ARGUMENT_CODE_SWITCH_END()
 		}
 		break;
@@ -1618,7 +1673,7 @@ done_insert_ansitty_flag_hedit:
 		if (!arglen)
 			self->at_ttyflag |= ANSITTY_FLAG_INSDEL_SCRN;
 		else {
-			ARGUMENT_CODE_SWITCH_BEGIN()
+			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 			case 0: /* \e[0Q   [Q = Insert/delete character affects rest of display */
 				self->at_ttyflag |= ANSITTY_FLAG_INSDEL_SCRN;
@@ -1630,6 +1685,7 @@ done_insert_ansitty_flag_hedit:
 			/* TODO: \e[2Q   ICH/DCH affect current field (between tab stops) only */
 			/* TODO: \e[3Q   ICH/DCH affect qualified area (between protected fields) */
 
+			}
 			ARGUMENT_CODE_SWITCH_END()
 		}
 		break;
@@ -1638,10 +1694,13 @@ done_insert_ansitty_flag_hedit:
 		if (!arglen) {
 			do_ident_DA(self);
 		} else {
-			ARGUMENT_CODE_SWITCH_BEGIN()
+			ARGUMENT_CODE_SWITCH_BEGIN() {
+
 			case 0:
 				do_ident_DA(self);
 				break;
+
+			}
 			ARGUMENT_CODE_SWITCH_END()
 		}
 		break;
@@ -1652,7 +1711,7 @@ done_insert_ansitty_flag_hedit:
 			/* Undefined */
 			goto nope;
 		} else {
-			ARGUMENT_CODE_QSWITCH_BEGIN()
+			ARGUMENT_CODE_QSWITCH_BEGIN() {
 
 			case 0:
 				/* Must be ignored. */
@@ -1805,7 +1864,7 @@ done_insert_ansitty_flag_hedit:
 				}
 				break;
 
-			ARGUMENT_CODE_QSWITCH_ELSE()
+			} ARGUMENT_CODE_QSWITCH_ELSE() {
 
 			case 0:
 				/* Must be ignored. */
@@ -1945,6 +2004,7 @@ done_insert_ansitty_flag_hedit:
 				}
 				break;
 
+			}
 			ARGUMENT_CODE_QSWITCH_END()
 		}
 		break;
@@ -1955,7 +2015,7 @@ done_insert_ansitty_flag_hedit:
 			/* Undefined */
 			goto nope;
 		} else {
-			ARGUMENT_CODE_QSWITCH_BEGIN()
+			ARGUMENT_CODE_QSWITCH_BEGIN() {
 
 			case 0: /* \e[?0i Graphics screen dump goes to graphics printer VT125,VT240 */
 			case 1: /* \e[?1i Print cursor line, terminated by CR LF */
@@ -1963,7 +2023,7 @@ done_insert_ansitty_flag_hedit:
 			case 3: /* \e[?4i Disable auto print */
 			case 4: /* \e[?5i Auto print, send a line at a time when linefeed received */
 
-			ARGUMENT_CODE_QSWITCH_ELSE()
+			} ARGUMENT_CODE_QSWITCH_ELSE() {
 
 			case 0: /* \e[0i  Send contents of text screen to printer */
 			case 1: /* \e[1i  Fill screen from auxiliary input (printer's keyboard) */
@@ -1977,6 +2037,7 @@ done_insert_ansitty_flag_hedit:
 			case 6: /* \e[6i  Turn off copying received data to secondary output (VT125) */
 			case 7: /* \e[7i  Turn on copying received data to secondary output (VT125) */
 
+			}
 			ARGUMENT_CODE_QSWITCH_END()
 		}
 		break;
@@ -1988,7 +2049,7 @@ done_insert_ansitty_flag_hedit:
 			/* Undefined */
 			goto nope;
 		} else {
-			ARGUMENT_CODE_QSWITCH_BEGIN()
+			ARGUMENT_CODE_QSWITCH_BEGIN() {
 
 			case 20: /* \e[?20j Portrait    Extended N. American letter Yes */
 			case 21: /* \e[?21j Landscape   Extended N. American letter Yes */
@@ -1999,7 +2060,7 @@ done_insert_ansitty_flag_hedit:
 			case 26: /* \e[?26j Portrait    Extended B Yes */
 			case 27: /* \e[?27j Landscape   Extended B Yes */
 
-			ARGUMENT_CODE_QSWITCH_ELSE()
+			} ARGUMENT_CODE_QSWITCH_ELSE() {
 
 			case 0:  /* \e[0j   Portrait    Normal text N. American letter No */
 			case 1:  /* \e[1j   Landscape   Normal text N. American letter No */
@@ -2012,6 +2073,7 @@ done_insert_ansitty_flag_hedit:
 			case 8:  /* \e[8j   Portrait    Extended Legal No */
 			case 9:  /* \e[9j   Landscape   Extended Legal No */
 
+			}
 			ARGUMENT_CODE_QSWITCH_END()
 		}
 		break;
@@ -2023,7 +2085,7 @@ done_insert_ansitty_flag_hedit:
 			setattrib(self, ANSITTY_ATTRIB_DEFAULT);
 			setflags(self, self->at_ttyflag & ~ANSITTY_FLAG_RENDERMASK);
 		} else {
-			ARGUMENT_CODE_SWITCH_BEGIN()
+			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 			case 0: /* Reset colors and text attributes */
 				setcolor(self, self->at_defcolor);
@@ -2079,8 +2141,9 @@ done_insert_ansitty_flag_hedit:
 
 			case 21:
 			case 22:
-				setcolor(self, (self->at_color & ~ANSITTY_IFSTRONG) |
-				               (self->at_defcolor & ANSITTY_IFSTRONG));
+				setcolor(self,
+				         (self->at_color & ~ANSITTY_IFSTRONG) |
+				         (self->at_defcolor & ANSITTY_IFSTRONG));
 				break;
 
 			case 23:
@@ -2158,20 +2221,25 @@ done_insert_ansitty_flag_hedit:
 						g = 0xff;
 					if unlikely(b > 0xff)
 						b = 0xff;
-					used_color_index = get_index_for_color((uint8_t)r,
-					                                       (uint8_t)g,
-					                                       (uint8_t)b);
+					/* True color support (if provided by drivers) */
+					if (code == 38) {
+						setcolor_rgb_fg(self, (uint8_t)r, (uint8_t)g, (uint8_t)b);
+					} else {
+						setcolor_rgb_bg(self, (uint8_t)r, (uint8_t)g, (uint8_t)b);
+					}
+					break;
 				} else {
 					/*assert(color_mode == 5);*/
 					used_color_index = strtoui(_args_end, &_args_end, 10);
 					if (*_args_end != ';' && _args_end != arg + arglen)
 						goto nope;
 				}
-				setcolor(self, code == 38
-				               ? ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_FG(used_color_index),
-				                                       ANSITTY_PALETTE_INDEX_BG(self->at_color))
-				               : ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_FG(self->at_color),
-				                                       ANSITTY_PALETTE_INDEX_BG(used_color_index)));
+				setcolor(self,
+				         code == 38
+				         ? ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_FG(used_color_index),
+				                                 ANSITTY_PALETTE_INDEX_BG(self->at_color))
+				         : ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_FG(self->at_color),
+				                                 ANSITTY_PALETTE_INDEX_BG(used_color_index)));
 			}	break;
 
 			case 51:
@@ -2201,15 +2269,18 @@ done_insert_ansitty_flag_hedit:
 				break; /* Ignored... */
 
 			case 90 ... 97:
-				setcolor(self, ANSITTY_PALETTE_INDEX(ANSITTY_IFSTRONG + (code - 90),
-				                                     ANSITTY_PALETTE_INDEX_BG(self->at_color)));
+				setcolor(self,
+				         ANSITTY_PALETTE_INDEX(ANSITTY_IFSTRONG + (code - 90),
+				                               ANSITTY_PALETTE_INDEX_BG(self->at_color)));
 				break;
 
 			case 100 ... 107:
-				setcolor(self, ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_FG(self->at_color),
-				                                     ANSITTY_IFSTRONG + (code - 100)));
+				setcolor(self,
+				         ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_FG(self->at_color),
+				                               ANSITTY_IFSTRONG + (code - 100)));
 				break;
 
+			}
 			ARGUMENT_CODE_SWITCH_END()
 		}
 		break;
@@ -2219,7 +2290,7 @@ done_insert_ansitty_flag_hedit:
 			/* Undefined */
 			goto nope;
 		} else {
-			ARGUMENT_CODE_QSWITCH_BEGIN()
+			ARGUMENT_CODE_QSWITCH_BEGIN() {
 
 			case 15:
 				/* Command to terminal requesting printer status
@@ -2230,7 +2301,7 @@ done_insert_ansitty_flag_hedit:
 				OUTPUT(CC_SESC "[?13n"); /* no printer */
 				break;
 
-			ARGUMENT_CODE_QSWITCH_ELSE()
+			} ARGUMENT_CODE_QSWITCH_ELSE() {
 
 			case 5:
 				/* Query Device Status
@@ -2256,6 +2327,7 @@ done_insert_ansitty_flag_hedit:
 				}
 				break;
 
+			}
 			ARGUMENT_CODE_QSWITCH_END()
 		}
 		break;
@@ -2359,7 +2431,7 @@ done_insert_ansitty_flag_hedit:
 			/* Undefined */
 			goto nope;
 		} else {
-			ARGUMENT_CODE_SWITCH_BEGIN()
+			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 				/* 2;1:  Confidence power up test (no-op) */
 				/* 2;2:  Confidence loopback test (no-op) */
@@ -2371,6 +2443,7 @@ done_insert_ansitty_flag_hedit:
 			case 10:
 				break;
 
+			}
 			ARGUMENT_CODE_SWITCH_END()
 		}
 		break;
@@ -2380,7 +2453,7 @@ done_insert_ansitty_flag_hedit:
 			/* ledsoff DECLL0 */
 			SETLED(~0xf, 0x0);
 		} else {
-			ARGUMENT_CODE_SWITCH_BEGIN()
+			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 			case 0:
 				/* ledsoff DECLL0 */
@@ -2401,6 +2474,7 @@ done_insert_ansitty_flag_hedit:
 				SETLED(~(0x01 << (code - 21)), 0);
 				break;
 
+			}
 			ARGUMENT_CODE_SWITCH_END()
 		}
 		break;
