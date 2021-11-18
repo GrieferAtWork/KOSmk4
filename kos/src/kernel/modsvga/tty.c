@@ -620,11 +620,17 @@ svga_makettyaccess_gfx(struct svgadev *__restrict UNUSED(self),
 		if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR) {
 			SETOPS(1_p);
 		} else {
+			/* This right here is monochrome! */
 			SETOPS(1);
 		}
 		break;
 
-//TODO:	case 2:         SETOPS(2);  break;
+	case 2:
+		/* 2-bpp non-planar  wouldn't make  any sense,  so
+		 * we assume that `SVGA_MODEINFO_F_PLANAR' is set. */
+		SETOPS(2_p);
+		break;
+
 //TODO:	case 3 ... 4:   SETOPS(4);  break;
 	case 5 ... 8:   SETOPS(8);  break;
 	case 9 ... 16:  SETOPS(16); break;

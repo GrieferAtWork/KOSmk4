@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#define BPP 1
+#define BPP 2
 #define PLANAR
 #include "gfxtty.c"
 #endif /* __INTELLISENSE__ */
@@ -157,8 +157,191 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttya
 #elif BPP == 4
 #error TODO
 #elif BPP == 2
-#error TODO: with PLANAR
-#error TODO: without PLANAR
+
+#ifndef PLANAR
+#error "BPP == 2 only exists in PLANAR mode"
+#endif /* !PLANAR */
+
+
+/* 2-bits-per-pixel mode is super-weird:
+ * - In actuality, every pixel is 8 bits
+ * - But the address of a pixel is:
+ *   >> PLANE = X % 4
+ *   >> OFFST = X / 4 + Y * scanline
+ */
+
+/* Functions to set pixel colors in planar mode. */
+#define SETCELL_P0_X0 { dst[0] = CELLPIXEL(0); dst[1] = CELLPIXEL(4); dst[2] = CELLPIXEL(7); /* 8 */ }
+#define SETCELL_P1_X0 { dst[0] = CELLPIXEL(1); dst[1] = CELLPIXEL(5); }
+#define SETCELL_P2_X0 { dst[0] = CELLPIXEL(2); dst[1] = CELLPIXEL(6); }
+#define SETCELL_P3_X0 { dst[0] = CELLPIXEL(3); dst[1] = CELLPIXEL(7); }
+
+#define SETCELL_P1_X1 { dst[0] = CELLPIXEL(0); dst[1] = CELLPIXEL(4); dst[2] = CELLPIXEL(7); /* 8 */ }
+#define SETCELL_P2_X1 { dst[0] = CELLPIXEL(1); dst[1] = CELLPIXEL(5); }
+#define SETCELL_P3_X1 { dst[0] = CELLPIXEL(2); dst[1] = CELLPIXEL(6); }
+#define SETCELL_P0_X1 { dst[1] = CELLPIXEL(3); dst[2] = CELLPIXEL(7); }
+
+#define SETCELL_P2_X2 { dst[0] = CELLPIXEL(0); dst[1] = CELLPIXEL(4); dst[2] = CELLPIXEL(7); /* 8 */ }
+#define SETCELL_P3_X2 { dst[0] = CELLPIXEL(1); dst[1] = CELLPIXEL(5); }
+#define SETCELL_P0_X2 { dst[1] = CELLPIXEL(2); dst[2] = CELLPIXEL(6); }
+#define SETCELL_P1_X2 { dst[1] = CELLPIXEL(3); dst[2] = CELLPIXEL(7); }
+
+#define SETCELL_P3_X3 { dst[0] = CELLPIXEL(0); dst[1] = CELLPIXEL(4); dst[2] = CELLPIXEL(7); /* 8 */ }
+#define SETCELL_P0_X3 { dst[1] = CELLPIXEL(1); dst[2] = CELLPIXEL(5); }
+#define SETCELL_P1_X3 { dst[1] = CELLPIXEL(2); dst[2] = CELLPIXEL(6); }
+#define SETCELL_P2_X3 { dst[1] = CELLPIXEL(3); dst[2] = CELLPIXEL(7); }
+
+#define SETCELL_P0_Xi(i)                     \
+	switch (i) {                             \
+	case 0: SETCELL_P0_X0; break;            \
+	case 1: SETCELL_P0_X1; break;            \
+	case 2: SETCELL_P0_X2; break;            \
+	case 3: SETCELL_P0_X3; break;            \
+	default: __builtin_unreachable(); break; \
+	}
+#define SETCELL_P1_Xi(i)                     \
+	switch (i) {                             \
+	case 0: SETCELL_P1_X0; break;            \
+	case 1: SETCELL_P1_X1; break;            \
+	case 2: SETCELL_P1_X2; break;            \
+	case 3: SETCELL_P1_X3; break;            \
+	default: __builtin_unreachable(); break; \
+	}
+#define SETCELL_P2_Xi(i)                     \
+	switch (i) {                             \
+	case 0: SETCELL_P2_X0; break;            \
+	case 1: SETCELL_P2_X1; break;            \
+	case 2: SETCELL_P2_X2; break;            \
+	case 3: SETCELL_P2_X3; break;            \
+	default: __builtin_unreachable(); break; \
+	}
+#define SETCELL_P3_Xi(i)                     \
+	switch (i) {                             \
+	case 0: SETCELL_P3_X0; break;            \
+	case 1: SETCELL_P3_X1; break;            \
+	case 2: SETCELL_P3_X2; break;            \
+	case 3: SETCELL_P3_X3; break;            \
+	default: __builtin_unreachable(); break; \
+	}
+
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx2_p)(struct svga_ttyaccess_gfx *__restrict self,
+                                                   uintptr_t address) {
+	struct svga_gfxcell const *cell;
+	uintptr_half_t cellx, celly;
+	uintptr_half_t y, xoff;
+	byte_t *dst, *base;
+	uint8_t colors[2];
+	uint8_t saved_seq_plane_write;
+	saved_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
+
+	cellx = address % self->vta_scan;
+	celly = address / self->vta_scan;
+	base  = (byte_t *)mnode_getaddr(&self->sta_vmem);
+	base += (uintptr_half_t)(celly * self->stx_cellscan);
+	base += (uintptr_half_t)(cellx * CELLSIZE_X) / 4;
+	xoff = (uintptr_half_t)(cellx * CELLSIZE_X) % 4;
+
+	/* Load colors. */
+	cell = &self->stx_display[address];
+
+	colors[0] = self->stx_colors[(cell->sgc_color >> 4) & 0xf];
+	colors[1] = self->stx_colors[(cell->sgc_color) & 0xf];
+#define CELLPIXEL(x) colors[(mask >> (7 - (x))) & 1]
+
+	/* Write to plane 0. */
+	vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(0));
+	for (dst = base, y = 0; y < CELLSIZE_Y; ++y) {
+		uint8_t mask;
+		mask = cell->sgc_lines[y];
+		SETCELL_P0_Xi(xoff);
+		dst += self->stx_scanline;
+	}
+	COMPILER_WRITE_BARRIER();
+
+	/* Write to plane 1. */
+	vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(1));
+	for (dst = base, y = 0; y < CELLSIZE_Y; ++y) {
+		uint8_t mask;
+		mask = cell->sgc_lines[y];
+		SETCELL_P1_Xi(xoff);
+		dst += self->stx_scanline;
+	}
+	COMPILER_WRITE_BARRIER();
+
+	/* Write to plane 2. */
+	vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(2));
+	for (dst = base, y = 0; y < CELLSIZE_Y; ++y) {
+		uint8_t mask;
+		mask = cell->sgc_lines[y];
+		SETCELL_P2_Xi(xoff);
+		dst += self->stx_scanline;
+	}
+	COMPILER_WRITE_BARRIER();
+
+	/* Write to plane 3. */
+	vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(3));
+	for (dst = base, y = 0; y < CELLSIZE_Y; ++y) {
+		uint8_t mask;
+		mask = cell->sgc_lines[y];
+		SETCELL_P3_Xi(xoff);
+		dst += self->stx_scanline;
+	}
+	COMPILER_WRITE_BARRIER();
+#undef CELLPIXEL
+}
+
+
+#if CURSOR_WIDTH == 9
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx2_p)(struct svga_ttyaccess_gfx *__restrict self) {
+	uintptr_half_t xoff, y;
+	byte_t *dst, *base;
+	uint8_t color = (uint8_t)self->stx_ccolor;
+	uint8_t saved_seq_plane_write;
+	saved_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
+
+	/* Figure out where the cursor goes. */
+	base = (byte_t *)mnode_getaddr(&self->sta_vmem);
+	base += self->stx_swcur.vtc_celly * self->stx_cellscan; /* Go to top-left of current line */
+	base += CURSOR_Y_OFFSET * self->stx_scanline;           /* Go to left of top-most cursor block */
+	base += (uintptr_half_t)((self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET) / 4;
+	xoff = (uintptr_half_t)((self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET) % 4;
+
+#define CELLPIXEL(i) color
+	vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(0));
+	for (dst = base, y = 0; y < CURSOR_HEIGHT; ++y) {
+		SETCELL_P0_Xi(xoff);
+		dst += self->stx_scanline;
+	}
+	COMPILER_WRITE_BARRIER();
+
+	vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(1));
+	for (dst = base, y = 0; y < CURSOR_HEIGHT; ++y) {
+		SETCELL_P1_Xi(xoff);
+		dst += self->stx_scanline;
+	}
+	COMPILER_WRITE_BARRIER();
+
+	vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(2));
+	for (dst = base, y = 0; y < CURSOR_HEIGHT; ++y) {
+		SETCELL_P2_Xi(xoff);
+		dst += self->stx_scanline;
+	}
+	COMPILER_WRITE_BARRIER();
+
+	vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(3));
+	for (dst = base, y = 0; y < CURSOR_HEIGHT; ++y) {
+		SETCELL_P3_Xi(xoff);
+		dst += self->stx_scanline;
+	}
+	COMPILER_WRITE_BARRIER();
+#undef CELLPIXEL
+}
+#else /* CURSOR_WIDTH == 9 */
+#error "Unsupported `CURSOR_WIDTH'"
+#endif /* CURSOR_WIDTH != 9 */
+
 #elif BPP == 1
 
 #ifdef PLANAR
@@ -203,8 +386,10 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 
 		/* Select the appropriate plane. */
 #ifdef PLANAR
+		COMPILER_WRITE_BARRIER();
 		vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(plane));
 		vga_wgfx(VGA_GFX_PLANE_READ, (saved_gfx_plane_read & ~VGA_GR04_FREADMAP) | VGA_GR04_READMAP(plane));
+		COMPILER_WRITE_BARRIER();
 #endif /* PLANAR */
 
 		for (y = 0; y < CELLSIZE_Y; ++y) {
@@ -345,8 +530,10 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 
 		/* Select the appropriate plane. */
 #ifdef PLANAR
+		COMPILER_WRITE_BARRIER();
 		vga_wseq(VGA_SEQ_PLANE_WRITE, (saved_seq_plane_write & ~VGA_SR02_FALL_PLANES) | VGA_SR02_FPLANE(plane));
 		vga_wgfx(VGA_GFX_PLANE_READ, (saved_gfx_plane_read & ~VGA_GR04_FREADMAP) | VGA_GR04_READMAP(plane));
+		COMPILER_WRITE_BARRIER();
 #endif /* PLANAR */
 
 		for (y = 0; y < CURSOR_HEIGHT; ++y) {
@@ -404,9 +591,9 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 #else /* CURSOR_WIDTH == 9 */
 #error "Unsupported `CURSOR_WIDTH'"
 #endif /* CURSOR_WIDTH != 9 */
-#else /* BYTES_PER_PIXEL */
-#error TODO
-#endif /* !BYTES_PER_PIXEL */
+#else /* ... */
+#error "Unsupported BPP"
+#endif /* !... */
 
 #undef BYTES_PER_PIXEL
 

@@ -500,7 +500,7 @@ svgatty_settty_with_winch(struct svgatty *__restrict self,
 	}
 
 	/* In case the calling process is part of the same group,
-	 * enqueue the calling thread to try serving the signal
+	 * enqueue the calling thread  to try serving the  signal
 	 * after the current system call returns. */
 	userexcept_sysret_inject_self();
 }
@@ -620,8 +620,8 @@ svgadev_setmode(struct svgadev *__restrict self,
 	if (mode->smi_flags & SVGA_MODEINFO_F_PAL) {
 
 		/* In 16-color palette modes, as well as when in text-mode,
-		 * program ATC palette registers as REG[i] = i. This way,
-		 * text colors can be programmed directly using the first
+		 * program ATC palette registers as  REG[i] = i. This  way,
+		 * text colors can be  programmed directly using the  first
 		 * 16 colors of the ~actual~ palette. */
 		if ((mode->smi_flags & SVGA_MODEINFO_F_TXT) ||
 		    (mode->smi_colorbits <= 4)) {

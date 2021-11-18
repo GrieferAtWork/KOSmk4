@@ -1055,7 +1055,7 @@ struct __locale_struct;
  * However, this  makes debugging  much harder  than it  needs to  be, so  to
  * make our lives a bit easier, provide a functions that gets called in these
  * situations, with the equivalent effect of `abort()' and `std::terminate()' */
-#if !defined(NDEBUG) && defined(__CRT_HAVE___crt_unreachable)
+#if !defined(NDEBUG) && !defined(NDEBUG_UNREACHABLE) && defined(__CRT_HAVE___crt_unreachable)
 __DECL_BEGIN
 __CDECLARE_VOID(__ATTR_NORETURN,,__crt_unreachable,(void),())
 __DECL_END
