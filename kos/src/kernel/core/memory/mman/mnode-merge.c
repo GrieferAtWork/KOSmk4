@@ -777,6 +777,7 @@ PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self) {
 	struct mnode *result;
 	struct mpart *part;
+	assert(!(self->mn_flags & MNODE_F_UNMAPPED));
 
 	/* Deal with special case: no backing part (RESERVED node) */
 	if unlikely((part = self->mn_part) == NULL)
@@ -916,7 +917,6 @@ NOTHROW(FCALL mnode_trymerge_with_partlock)(struct mnode *__restrict self,
 	struct mnode *merged, *neighbor;
 	bool result = false;
 	REF struct mman *mm;
-	assert(self->mn_part == *p_part);
 	mm = self->mn_mman;
 
 	/* Try to get a reference to the mman. Note that we must use `tryincref()',
@@ -928,6 +928,8 @@ NOTHROW(FCALL mnode_trymerge_with_partlock)(struct mnode *__restrict self,
 
 	/* Try to acquire a lock to the mman. */
 	if (!mman_lock_tryacquire(mm)) {
+		if unlikely(ATOMIC_READ(self->mn_flags) & MNODE_F_UNMAPPED)
+			goto done_decref;
 		/* Must attempt an async merge of all nodes! */
 		async_mergenodes(mm);
 		_mman_lockops_reap(mm);
@@ -940,8 +942,10 @@ NOTHROW(FCALL mnode_trymerge_with_partlock)(struct mnode *__restrict self,
 	if unlikely(self->mn_flags & MNODE_F_UNMAPPED)
 		goto done_decref_unlock;
 
+	/* Only assert this when the part's not marked as unmapped! */
+	assert(self->mn_part == *p_part);
+
 	if ((neighbor = mnode_tree_prevnode(self)) != NULL && mnode_canmerge(neighbor, self)) {
-		assert(self->mn_part == *p_part);
 		merged = mnode_domerge_with_part_lock(neighbor, self, *p_part);
 		if unlikely(merged == MNODE_MERGE_ASYNC_WAITFOR)
 			goto done_decref_unlock;
