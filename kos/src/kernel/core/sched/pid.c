@@ -1465,18 +1465,20 @@ task_setpid(struct task *__restrict self,
 restart_acquire_locks:
 		ns_iter = ns;
 		do {
-			if (!sync_trywrite(ns_iter) ||
-			    !pidns_prepare_for_insert_nx(ns_iter)) {
+			if (!sync_trywrite(ns_iter)) {
+do_prepare_for_insert:
 				/* Release all previously acquired locks. */
 				for (ns_altiter = ns; ns_altiter != ns_iter;
 				     ns_altiter = ns_altiter->pn_parent)
 					sync_endwrite(ns_altiter);
 				/* Forceably acquire a lock to `ns_iter' */
-				{
-					SCOPED_WRITELOCK(ns_iter);
-					pidns_prepare_for_insert(ns_iter);
-				}
+				SCOPED_WRITELOCK(ns_iter);
+				pidns_prepare_for_insert(ns_iter);
 				goto restart_acquire_locks;
+			}
+			if (!pidns_prepare_for_insert_nx(ns_iter)) {
+				sync_endwrite(ns_iter);
+				goto do_prepare_for_insert;
 			}
 		} while ((ns_iter = ns_iter->pn_parent) != NULL);
 	} EXCEPT {
