@@ -22,8 +22,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODSVGA_DCOLTTY_C
-#define GUARD_MODSVGA_DCOLTTY_C 1
+#ifndef GUARD_MODSVGA_GFXTTY_C
+#define GUARD_MODSVGA_GFXTTY_C 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
@@ -34,22 +34,24 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #ifndef __INTELLISENSE__
 #define BPP 1
-#include "dcoltty.c.inl"
+#include "gfxtty.c.inl"
 #define BPP 1
 #define PLANAR
-#include "dcoltty.c.inl"
+#include "gfxtty.c.inl"
 //TODO:#define BPP 2
-//TODO:#include "dcoltty.c.inl"
+//TODO:#include "gfxtty.c.inl"
+//TODO:#define PLANAR
+//TODO:#include "gfxtty.c.inl"
 //TODO:#define BPP 4
-//TODO:#include "dcoltty.c.inl"
+//TODO:#include "gfxtty.c.inl"
 #define BPP 8
-#include "dcoltty.c.inl"
+#include "gfxtty.c.inl"
 #define BPP 16
-#include "dcoltty.c.inl"
+#include "gfxtty.c.inl"
 #define BPP 24
-#include "dcoltty.c.inl"
+#include "gfxtty.c.inl"
 #define BPP 32
-#include "dcoltty.c.inl"
+#include "gfxtty.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_MODSVGA_DCOLTTY_C */
+#endif /* !GUARD_MODSVGA_GFXTTY_C */

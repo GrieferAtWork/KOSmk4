@@ -20,7 +20,7 @@
 #ifdef __INTELLISENSE__
 #define BPP 1
 #define PLANAR
-#include "dcoltty.c"
+#include "gfxtty.c"
 #endif /* __INTELLISENSE__ */
 
 #ifndef BPP
