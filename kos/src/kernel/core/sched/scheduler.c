@@ -1307,6 +1307,15 @@ do_use_sleeping_thread_timeout:
 				       sched_quantum_min, new_quantum_min);
 				sched_quantum_min = new_quantum_min;
 			}
+			if unlikely(deadline == sched_quantum_max) {
+				ktime_t new_quantum_max;
+				new_quantum_max = sched_quantum_max * 2;
+				printk(KERN_WARNING "[sched] Raise maximum quantum "
+				                    "%" PRIuN(__SIZEOF_KTIME_T__) " -> "
+				                    "%" PRIuN(__SIZEOF_KTIME_T__) "\n",
+				       sched_quantum_max, new_quantum_max);
+				sched_quantum_max = new_quantum_max;
+			}
 			goto again_with_tsc_now;
 		}
 	}
