@@ -348,7 +348,7 @@
 	__ASM_L(pushl_cfi %fs)                      \
 	__ASM_L(.cfi_restore_iret_fs_or_offset -12) \
 	__ASM_L(pushl_cfi %gs)                      \
-	__ASM_L(.cfi_restore_iret_fs_or_offset -16) \
+	__ASM_L(.cfi_restore_iret_gs_or_offset -16) \
 	__ASM_L(pushal_cfi_r)
 
 /* Do the reverse of `ASM_PUSH_SCPUSTATE_AFTER_HW_IRET_CFI_R' */
