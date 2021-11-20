@@ -545,7 +545,6 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	part->mp_state  = MPART_ST_MEM;
 	part->mp_file   = incref(&mcore_file);
 	LIST_INIT(&part->mp_copy);
-	part->mp_share.lh_first = node;
 	SLIST_INIT(&part->mp_lockops);
 	LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
@@ -565,9 +564,10 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	node->mn_fsname       = NULL;
 	node->mn_mman         = &mman_kernel;
 	node->mn_partoff      = 0;
-	node->mn_link.le_next = NULL;
-	node->mn_link.le_prev = &part->mp_share.lh_first;
 	node->mn_module       = NULL;
+	part->mp_share.lh_first = node;
+	node->mn_link.le_next   = NULL;
+	node->mn_link.le_prev   = &part->mp_share.lh_first;
 
 	/* Load the mem-node into the kernel mman. */
 	LIST_INSERT_HEAD(&mman_kernel.mm_writable, node, mn_writable);

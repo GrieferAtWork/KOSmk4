@@ -1020,11 +1020,11 @@ pcopy_free_unused_block_status:
 			mpart_lock_release(part);
 
 			/* Set-up the copy <--> node link */
-			copy->mp_copy.lh_first = node;
 			node->mn_part          = copy; /* A reference to the original `part' is inherited here.
 			                                * That   reference   is   destroyed   further    below! */
 			node->mn_partoff       = 0;    /* The newly created node is a perfect fit for the accessed range! */
 			self->mfl_offs         = 0;    /* *ditto* */
+			copy->mp_copy.lh_first = node;
 			node->mn_link.le_prev  = &copy->mp_copy.lh_first;
 			node->mn_link.le_next  = NULL;
 			/*noderel_offset = 0;*/ /* Would be unused... */

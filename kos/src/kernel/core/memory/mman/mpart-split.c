@@ -896,6 +896,7 @@ relock_with_data:
 			 * s.a. `mnode_getmapminaddr() ... mnode_getmapmaxaddr()' */
 			if (min < data.msd_offset && data.msd_offset <= max) {
 				struct mnode *hinode;
+				struct mnode_list *list;
 				size_t noderel_offset;
 				/* This one must be split! */
 				assertf(!(lonode->mn_flags & MNODE_F_NOSPLIT),
@@ -913,8 +914,8 @@ relock_with_data:
 				hinode->mn_part    = hipart;
 				++hipart->mp_refcnt;
 				hinode->mn_partoff = lonode->mn_partoff + data.msd_offset;
-				LIST_INSERT_HEAD(mpart_getnodlst_from_mnodeflags(hipart, hinode->mn_flags),
-				                 hinode, mn_link);
+				list = mpart_getnodlst_from_mnodeflags(hipart, hinode->mn_flags);
+				LIST_INSERT_HEAD(list, hinode, mn_link);
 				LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 				if (LIST_ISBOUND(lonode, mn_writable))
 					LIST_INSERT_HEAD(&hinode->mn_mman->mm_writable, hinode, mn_writable);

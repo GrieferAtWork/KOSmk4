@@ -459,10 +459,11 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 		/* Insert the node into the copy- or share-list of the associated part. */
 		assert((node->mn_part == NULL) == mfile_map_isreserved(map));
 		if ((part = node->mn_part) != NULL) {
+			struct mnode_list *list;
 
 			/* Add the new node to the part's appropriate node-list. */
-			LIST_INSERT_HEAD(mpart_getnodlst_from_mnodeflags(part, mapinfo->mi_nodeflags),
-			                 node, mn_link);
+			list = mpart_getnodlst_from_mnodeflags(part, mapinfo->mi_nodeflags);
+			LIST_INSERT_HEAD(list, node, mn_link);
 
 			/* Set the MLOCK  flag for  the backing  mem-part when  MAP_LOCKED is  given.
 			 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */

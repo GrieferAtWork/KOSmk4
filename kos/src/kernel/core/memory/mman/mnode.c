@@ -404,10 +404,13 @@ reload_lonode_after_mman_lock:
 		goto reload_lonode_after_mman_lock;
 	}
 
-	/* Insert the new mem-node into the backing part's list of either
-	 * copy-on-write, or shared mappings. */
-	LIST_INSERT_HEAD(mpart_getnodlst_from_mnodeflags(part, hinode->mn_flags),
-	                 hinode, mn_link);
+	/* Insert the new mem-node into the backing part's
+	 * list of either copy-on-write, or shared mappings. */
+	{
+		struct mnode_list *list;
+		list = mpart_getnodlst_from_mnodeflags(part, hinode->mn_flags);
+		LIST_INSERT_HEAD(list, hinode, mn_link);
+	}
 	mpart_lock_release(part);
 	incref(part); /* The reference stored in `hinode->mn_part' */
 done_nopart:

@@ -469,6 +469,7 @@ again_lock_mfile_map:
 		/* Do the actual work of injecting the new mem-nodes into the mman. */
 #ifdef HAVE_FILE
 		while (!SLIST_EMPTY(&map.mmwu_map.mfm_nodes)) {
+			struct mnode_list *list;
 			struct mnode *node;
 			struct mpart *part;
 			u16 map_prot;
@@ -478,8 +479,8 @@ again_lock_mfile_map:
 			node->mn_flags = mnode_flags;
 			node->mn_mman  = self;
 			/* Insert the node into the share- or copy-list of the associated part. */
-			LIST_INSERT_HEAD(mpart_getnodlst_from_mnodeflags(part, mnode_flags),
-			                 node, mn_link);
+			list = mpart_getnodlst_from_mnodeflags(part, mnode_flags);
+			LIST_INSERT_HEAD(list, node, mn_link);
 			node->mn_fspath = xincref(file_fspath);
 			node->mn_fsname = xincref(file_fsname);
 			node->mn_module = NULL;
