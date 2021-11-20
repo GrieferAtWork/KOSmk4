@@ -327,7 +327,7 @@ NOTHROW(FCALL mpart_load_all_mhint_nodes)(struct mpart *__restrict self) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if unlikely(wasdestroyed(node->mn_mman))
 				continue;
-			assert(node->mn_part == self);
+			assert(node->mn_part == self || (node->mn_flags & MNODE_F_UNMAPPED));
 			if unlikely(node->mn_flags & MNODE_F_MHINT) {
 				assert(!(node->mn_flags & MNODE_F_UNMAPPED));
 				mnode_load_mhint(node);
@@ -454,9 +454,9 @@ NOTHROW(FCALL mpart_lstrip_nodes)(struct mpart *__restrict self,
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if unlikely(wasdestroyed(node->mn_mman))
 				continue;
-			assert(node->mn_part == self);
 			if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
 				continue; /* Skip unmapped nodes... */
+			assert(node->mn_part == self); /* Only assert this when `MNODE_F_UNMAPPED' isn't set! */
 			assert(node->mn_partoff >= num_bytes);
 			/* Deal with MHINT'd nodes! */
 			if unlikely(node->mn_flags & MNODE_F_MHINT)
@@ -923,11 +923,11 @@ NOTHROW(FCALL mpart_async_split_before)(struct mpart *__restrict self,
 			LIST_INIT(&lopart->_mp_nodlsts[i]);
 again_enum_hipart_nodlst:
 			LIST_FOREACH (node, &hipart->_mp_nodlsts[i], mn_link) {
-				assert(node->mn_part == hipart);
 				if unlikely(wasdestroyed(node->mn_mman))
 					continue; /* Skip nodes of dead mmans... */
 				if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
 					continue; /* Skip unmapped nodes... */
+				assert(node->mn_part == hipart); /* Only assert this when `MNODE_F_UNMAPPED' isn't set! */
 				if (node->mn_partoff >= addr)
 					break; /* Keep all nodes starting w/ this one! */
 
