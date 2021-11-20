@@ -1306,7 +1306,8 @@ again:
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) REF struct mpart *
 NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct mpart *lopart,
                                             /*inherit(on_success)*/ REF struct mpart *hipart,
-                                            struct mpart *orig_part) {
+                                            struct mpart *orig_part,
+                                            struct mman *locked_mman) {
 	bool hasmeta;
 	size_t losize = mpart_getsize(lopart);
 	size_t hisize = mpart_getsize(hipart);
@@ -1751,8 +1752,15 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 #endif /* ARCH_HAVE_RTM */
 			mpartmeta_ftxlock_endwrite(hipart->mp_meta, hipart);
 		}
+
+		/* Release locks from mmans with UNMAPPED mappings to `hipart' */
+		mpart_unlock_all_mmans_after(hipart, lopart, NULL, locked_mman);
+		mpart_decref_all_mmans(hipart);
+
+		/* Release our lock to the mem-part itself. */
 		mpart_assert_integrity(hipart);
 		mpart_lock_release(hipart);
+
 		/* Drop the reference that was originally given to us by the caller. */
 		decref_unlikely(hipart);
 	}
@@ -1787,7 +1795,8 @@ err_cannot_merge:
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) REF struct mpart *
 NOTHROW(FCALL mpart_domerge_with_all_locks_noftx)(/*inherit(on_success)*/ REF struct mpart *lopart,
                                                   /*inherit(on_success)*/ REF struct mpart *hipart,
-                                                  struct mpart *orig_part) {
+                                                  struct mpart *orig_part,
+                                                  struct mman *locked_mman) {
 	REF struct mpart *result;
 	struct mpartmeta *meta;
 	if ((meta = lopart->mp_meta) != NULL) {
@@ -1812,7 +1821,9 @@ NOTHROW(FCALL mpart_domerge_with_all_locks_noftx)(/*inherit(on_success)*/ REF st
 		result = MPART_MERGE_CANNOT_MERGE;
 	} else {
 		/* Do the actual work of merging the 2 parts. */
-		result = mpart_domerge_with_all_locks(lopart, hipart, orig_part);
+		result = mpart_domerge_with_all_locks(lopart, hipart,
+		                                      orig_part,
+		                                      locked_mman);
 	}
 
 	/* Release locks... */
@@ -1896,7 +1907,9 @@ waitfor_blocking_mman:
 	}
 
 	/* Do the actual work of merging the 2 parts. */
-	result = mpart_domerge_with_all_locks_noftx(lopart, hipart, orig_part);
+	result = mpart_domerge_with_all_locks_noftx(lopart, hipart,
+	                                            orig_part,
+	                                            locked_mman);
 
 	/* Release the file-lock from above, if it was acquired. */
 	if (file != NULL)
@@ -1972,7 +1985,7 @@ waitfor_blocking_mman:
 	 *   - mman_lock_acquired(hipart->mp_share.each->mn_mman); */
 
 	/* Do the actual work of merging the 2 parts. */
-	result = mpart_domerge_with_all_locks_noftx(lopart, hipart, orig_part);
+	result = mpart_domerge_with_all_locks_noftx(lopart, hipart, orig_part, NULL);
 
 	/* Release locks and drop references... */
 	if (result == MPART_MERGE_CANNOT_MERGE ||
