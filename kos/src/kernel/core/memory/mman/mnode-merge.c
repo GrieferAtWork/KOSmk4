@@ -1641,9 +1641,11 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		unsigned int i;
 		for (i = 0; i < COMPILER_LENOF(hipart->_mp_nodlsts); ++i) {
 			struct mnode *node, *next;
-			struct mnode_list keep_nodes;
-			LIST_INIT(&keep_nodes);
-			for (node = LIST_FIRST(&hipart->_mp_nodlsts[i]); node; node = next) {
+			struct mnode_list *list;
+			list = &hipart->_mp_nodlsts[i];
+			node = LIST_FIRST(list);
+			LIST_INIT(list);
+			for (; node; node = next) {
 				next = LIST_NEXT(node, mn_link);
 
 				/* Don't fiddle around with nodes that have been unmapped. */
@@ -1657,10 +1659,9 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 					LIST_INSERT_HEAD(&lopart->_mp_nodlsts[i], node, mn_link);
 				} else {
 					/* Keep this node. */
-					LIST_INSERT_HEAD(&keep_nodes, node, mn_link);
+					LIST_INSERT_HEAD(list, node, mn_link);
 				}
 			}
-			hipart->_mp_nodlsts[i] = keep_nodes;
 		}
 	}
 
