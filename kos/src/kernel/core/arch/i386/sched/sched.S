@@ -244,6 +244,12 @@ PUBLIC_FUNCTION(task_yield_nx)
 	ttest  mask=EFLAGS_IF, loc=0(%Psp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield_nx
+#ifdef CONFIG_HAVE_DEBUGGER
+	EXTERN(dbg_active)
+	cmpb   $0, dbg_active
+	jne    .Lillegal_task_yield_nx
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 	pushP_cfi_r_kernel_cs             /* ir_cs */
 	pushP_cfi %Pax                    /* ir_rip */
 	.cfi_rel_offset %Pip, 0
