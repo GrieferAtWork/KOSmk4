@@ -1708,7 +1708,26 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		hipart->mp_blkst_ptr = NULL;
 		ATOMIC_AND(hipart->mp_flags, ~MPART_F_BLKST_INL);
 		hipart->mp_file = incref(&mfile_anon[lopart->mp_file->mf_blockshift]);
-		_mpart_init_asanon(hipart);
+
+		/* Important: _ONLY_ re-initialize as anon when the part wasn't anon before!
+		 * - This might seen pointless, but `_mpart_init_asanon()' does a little  more
+		 *   than ~just~ setting the anon indicator. - It also marks the part as being
+		 *   ready to be trimmed.
+		 * - In the situation where  the part is currently  being trimmed (such that  it
+		 *   is  waiting for  a lock-op,  as set-up  in `mpart_trim_locked_ftx()'), then
+		 *   us doing an unconditional init-as-anon would result in the trim-in-progress
+		 *   indicator (`hipart->_mp_trmlop_mm.olo_func') being set to `NULL'.
+		 * - When `hipart' is also part of a  lock-op pending list (such as the  pending
+		 *   list  of an mman), then it won't actually be removed from the pending list,
+		 *   but the lockop entry that would (attempted to) be executed would look like:
+		 *   >> { olo_link: 0xcccccccc, olo_func: NULL }
+		 *   Which obviously causes the kernel to panic.
+		 * - By only initializing as anon conditionally if the part wasn't anon  already,
+		 *   while also holding a  lock to `hipart', we  prevent all possible data  races
+		 *   relating to `mpart_trim()' having been called recently, or even being called
+		 *   right now! */
+		if (!mpart_isanon(hipart))
+			_mpart_init_asanon(hipart);
 
 		/* Don't re-initialize node lists here. These lists may still contain UNMAPPED nodes
 		 * which are using lock-ops in order to remove themselves from these lists. As such,

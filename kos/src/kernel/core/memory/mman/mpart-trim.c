@@ -1521,6 +1521,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx)(struct mpart *__restrict self) {
 		if unlikely(blocking_mm) {
 			incref(blocking_mm);
 			mpart_decref_all_mmans(self);
+
 			/* asynchronously wait for the lock of this mman to become available. */
 			ATOMIC_WRITE(self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
 			incref(self); /* Inherited by `mpart_trim_mmlop()' */
