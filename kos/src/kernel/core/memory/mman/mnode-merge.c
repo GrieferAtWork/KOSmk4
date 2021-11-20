@@ -1641,21 +1641,26 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		unsigned int i;
 		for (i = 0; i < COMPILER_LENOF(hipart->_mp_nodlsts); ++i) {
 			struct mnode *node, *next;
-			for (node = LIST_FIRST(&hipart->_mp_nodlsts[i]);
-			     node; node = next) {
+			struct mnode_list keep_nodes;
+			LIST_INIT(&keep_nodes);
+			for (node = LIST_FIRST(&hipart->_mp_nodlsts[i]); node; node = next) {
 				next = LIST_NEXT(node, mn_link);
 
-				/* Update the part/partoff fields of this node. */
-				assert(node->mn_part == hipart);
-				decref_nokill(hipart);
-				node->mn_part = incref(lopart);
-				node->mn_partoff += losize;
-
-				/* Re-insert the node into the proper node-list of `lopart' */
-				LIST_INSERT_HEAD(&lopart->_mp_nodlsts[i], node, mn_link);
+				/* Don't fiddle around with nodes that have been unmapped. */
+				if likely(!(node->mn_flags & MNODE_F_UNMAPPED)) {
+					/* Update the part/partoff fields of this node. */
+					assert(node->mn_part == hipart);
+					decref_nokill(hipart);
+					node->mn_part = incref(lopart);
+					node->mn_partoff += losize;
+					/* Re-insert the node into the proper node-list of `lopart' */
+					LIST_INSERT_HEAD(&lopart->_mp_nodlsts[i], node, mn_link);
+				} else {
+					/* Keep this node. */
+					LIST_INSERT_HEAD(&keep_nodes, node, mn_link);
+				}
 			}
-			DBG_memset(&hipart->_mp_nodlsts[i], 0xcc,
-			           sizeof(hipart->_mp_nodlsts[i]));
+			hipart->_mp_nodlsts[i] = keep_nodes;
 		}
 	}
 
@@ -1673,6 +1678,11 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	decref_nokill(hipart->mp_file); /* Nokill, because `lopart' still has a REF! */
 	DBG_memset(&hipart->mp_mem_sc, 0xcc, sizeof(hipart->mp_mem_sc));
 	if (ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)) {
+		assertf(LIST_EMPTY(&hipart->mp_copy) &&
+		        LIST_EMPTY(&hipart->mp_share),
+		        "Mem-nodes with the `MNODE_F_UNMAPPED' should use a lock-op "
+		        "which in turn should have been holding a reference to this "
+		        "part, meaning we would have been unable to decref-to-0!");
 		if (hipart->mp_meta)
 			mpartmeta_destroy(hipart->mp_meta);
 		if (LIST_ISBOUND(hipart, mp_allparts)) {
@@ -1699,8 +1709,12 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		ATOMIC_AND(hipart->mp_flags, ~MPART_F_BLKST_INL);
 		hipart->mp_file = incref(&mfile_anon[lopart->mp_file->mf_blockshift]);
 		_mpart_init_asanon(hipart);
-		LIST_INIT(&hipart->mp_copy);
-		LIST_INIT(&hipart->mp_share);
+
+		/* Don't re-initialize node lists here. These lists may still contain UNMAPPED nodes
+		 * which are using lock-ops in order to remove themselves from these lists. As such,
+		 * let them do their thing. */
+		/*LIST_INIT(&hipart->mp_copy);*/
+		/*LIST_INIT(&hipart->mp_share);*/
 		if (hipart->mp_meta) {
 			/* Increment the RTM version field. This way, anyone that may be
 			 * monitoring `hipart' for RTM changes will know that  something
