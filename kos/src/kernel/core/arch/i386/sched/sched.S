@@ -40,6 +40,10 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
+#ifndef SIZEOF_POINTER
+#define SIZEOF_POINTER __SIZEOF_POINTER__
+#endif /* !SIZEOF_POINTER */
+
 #ifdef __x86_64__
 #define Ldo_yield_to_thread_Pax_cpu_Pbx Ldo_yield_to_thread_rax_cpu_rbx
 #define x86_load_thread_Pax_cpu_Pbx     x86_load_thread_rax_cpu_rbx
@@ -75,19 +79,36 @@ PUBLIC_FUNCTION(task_yield)
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
 #ifdef __x86_64__
-	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
+	movP   %Psp, %Pcx
+	pushP_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rcx                    /* ir_rsp */
-	.cfi_rel_offset %rsp, 0
+	pushP_cfi %Pcx                    /* ir_Psp */
+	.cfi_rel_offset %Psp, 0
 #endif /* __x86_64__ */
-	pushfP_cfi_r                      /* ir_rflags */
+	pushfP_cfi_r                      /* ir_Pflags */
 	ttest  mask=EFLAGS_IF, loc=0(%Psp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield
 	pushP_cfi_r_kernel_cs             /* ir_cs */
-	pushP_cfi %Pax                    /* ir_rip */
+	pushP  %Pax                       /* ir_Pip */
+#ifdef __x86_64__
+	.cfi_adjust_cfa_offset SIZEOF_POINTER
 	.cfi_rel_offset %Pip, 0
+#endif /* __x86_64__ */
+
+#ifndef __x86_64__
+	/* Switch over to a canonical IRET frame. */
+	.cfi_def_cfa %Psp, 0
+	.cfi_restore_iret_eip
+	.cfi_restore_iret_cs
+	.cfi_restore_iret_eflags
+	.cfi_restore_iret_esp
+	.cfi_restore_iret_ss
+	.cfi_restore_iret_es
+	.cfi_restore_iret_ds
+	.cfi_restore_iret_fs
+	.cfi_restore_iret_gs
+#endif /* !__x86_64__ */
 
 #ifdef __x86_64__
 INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
