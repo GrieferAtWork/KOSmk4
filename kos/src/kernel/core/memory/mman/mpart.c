@@ -217,8 +217,6 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
-	assert(!(self->mp_flags & MPART_F_GLOBAL_REF));
-
 	/* If valid, free the block-status extension vector. */
 	if (!(self->mp_flags & MPART_F_BLKST_INL))
 		kfree(self->mp_blkst_ptr);

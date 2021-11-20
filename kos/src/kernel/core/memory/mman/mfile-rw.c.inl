@@ -1086,33 +1086,28 @@ extend_failed:
 		mfile_trunclock_inc(self);
 		inserted_part = mfile_insert_and_merge_part_and_unlock(self, part);
 		if unlikely(!inserted_part) {
+#ifndef LOCAL_BUFFER_IS_PHYS
+			mpart_reladdr_t partoff;
+#endif /* !LOCAL_BUFFER_IS_PHYS */
 			mfile_trunclock_dec(self);
 handle_part_insert_failure:
 			mfile_lock_endwrite(self);
-#ifndef LOCAL_BUFFER_IS_PHYS
-			/* To prevent repeated reads from memory that may be backed by  VIO,
-			 * handle this case by simply (ab-)using `part' as the source buffer
-			 * from which to take memory to-be written to the file. */
-			TRY {
-				mpart_reladdr_t partoff;
-				partoff = (mpart_reladdr_t)(offset - mpart_getminaddr(part));
-				assert(partoff <= self->mf_part_amask);
-				assert(part->mp_state == MPART_ST_MEM ||
-				       part->mp_state == MPART_ST_MEM_SC);
-				mfile_write_from_mempart_buffer(self, part, partoff, num_bytes, offset);
-			} EXCEPT {
+			RAII_FINALLY {
 				LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 				part->mp_refcnt = 0;
 				mpart_destroy(part);
-				RETHROW();
-			}
-#endif /* !LOCAL_BUFFER_IS_PHYS */
-			LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
-			part->mp_refcnt = 0;
-			mpart_destroy(part);
+			};
 #ifdef LOCAL_BUFFER_IS_PHYS
 			goto again;
 #else /* LOCAL_BUFFER_IS_PHYS */
+			/* To prevent repeated reads from memory that may be backed by  VIO,
+			 * handle this case by simply (ab-)using `part' as the source buffer
+			 * from which to take memory to-be written to the file. */
+			partoff = (mpart_reladdr_t)(offset - mpart_getminaddr(part));
+			assert(partoff <= self->mf_part_amask);
+			assert(part->mp_state == MPART_ST_MEM ||
+			       part->mp_state == MPART_ST_MEM_SC);
+			mfile_write_from_mempart_buffer(self, part, partoff, num_bytes, offset);
 			result += num_bytes;
 			goto done;
 #endif /* !LOCAL_BUFFER_IS_PHYS */
