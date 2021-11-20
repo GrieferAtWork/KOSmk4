@@ -236,7 +236,6 @@ something_changed:
 		ATOMIC_OR(removeme->mn_flags, MNODE_F_UNMAPPED);
 		DBG_memset(&removeme->mn_writable, 0xcc, sizeof(removeme->mn_writable));
 		DBG_memset(&removeme->mn_module, 0xcc, sizeof(removeme->mn_module));
-		DBG_memset(&removeme->mn_mman, 0xcc, sizeof(removeme->mn_mman));
 		SLIST_INSERT(&old_mappings, removeme, _mn_dead);
 	}
 
@@ -649,7 +648,6 @@ err_cannot_prepare:
 				ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
 				DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
 				DBG_memset(&node->mn_module, 0xcc, sizeof(node->mn_module));
-				DBG_memset(&node->mn_mman, 0xcc, sizeof(node->mn_mman));
 				SLIST_INSERT(&old_mappings, node, _mn_dead);
 			}
 
