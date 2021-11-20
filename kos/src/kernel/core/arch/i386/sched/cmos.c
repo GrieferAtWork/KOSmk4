@@ -30,7 +30,6 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 
 #include <kernel/driver.h>
 #include <kernel/x86/pit.h> /* X86_PIT_EARLY_HZ */
-#include <kernel/printk.h>
 #include <sched/cpu.h>
 #include <sched/signal.h>
 #include <sched/tsc.h>
@@ -283,12 +282,32 @@ INTERN NOBLOCK NOPREEMPT void
 NOTHROW(KCALL x86_cmos_interrupt)(void) {
 	time_t cmos_now, then;
 	ktime_t now;
+
+	/* Still need to acquire a lock here in SMP-mode in case
+	 * some other CPU is currently doing `tsc_resync_init()'
+	 * which calls `tsc_resync_realtime()'
+	 *
+	 * If we're not careful, some other CPU might also access
+	 * the  CMOS at the  same time as us,  in which case they
+	 * might  alter the selected  register while we're trying
+	 * to update the alarm. We might then accidentally change
+	 * the  system time  which would  result in  all sorts of
+	 * troubles if the scheduler ends up thinking a couple of
+	 * years  just passed over  the span of  just a couple of
+	 * TSC ticks... */
+	x86_cmos_lock_acquire_nopr();
+
 	/* Clear pending interrupt flags. */
 	cmos_rd(CMOS_STATE_C);
 	cmos_now = cmos_gettime(false);
+	x86_cmos_lock_release_nopr();
 again:
 	now = (ktime_t)(cmos_now - boottime.tv_sec) * NSEC_PER_SEC;
+
+	/* Re-sync TSC timings. */
 	tsc_resync_interrupt(now);
+
+	/* Also re-sync TSC timings on other CPUs. */
 #ifndef CONFIG_NO_SMP
 	{
 		void *args[CPU_IPI_ARGCOUNT];
@@ -302,13 +321,27 @@ again:
 		                         CPU_IPI_FNORMAL);
 	}
 #endif /* !CONFIG_NO_SMP */
+
+	/* Like above: need to acquire the CMOS lock to prevent other CPUs
+	 *             from changing the  currently selected register  and
+	 *             possibly causing us to change the system time. */
+	x86_cmos_lock_acquire_nopr();
+
 	/* Set the new alarm for 2 seconds from the original read.
 	 * TODO: This interval should be configurable via a commandline option! */
 	cmos_now += 2;
 	cmos_setalarm(cmos_now);
+
+	/* Prime the alarm. */
 	cmos_wr(CMOS_STATE_B, x86_cmos.cr_stb);
-	/* Check for the unlikely case that the alarm has already expired. */
+
+	/* Re-read  the current RTC time to see  if the alarm might have already
+	 * expired. (very unlikely, we have to ensure that we don't accidentally
+	 * miss it firing!) */
 	then = cmos_gettime(false);
+	x86_cmos_lock_release_nopr();
+
+	/* Check for the unlikely case that the alarm has already expired. */
 	if unlikely(then >= cmos_now) {
 		cmos_now = then;
 		goto again;
@@ -342,7 +375,7 @@ NOTHROW(KCALL x86_initialize_cmos)(void) {
 
 	//x86_cmos.cr_century = ...; /* TODO: This can be read from the ACPI descriptor table. */
 	/* Initialize the initial system boot timestamp. */
-	boottime_.tv_sec  = cmos_gettime(true);
+	boottime_.tv_sec  = cmos_gettime(false);
 	boottime_.tv_nsec = 0;
 }
 
@@ -352,7 +385,7 @@ NOTHROW(KCALL x86_initialize_tsc_resync)(void) {
 	/* Initialize the RTC interrupt to perform periodic re-sync.
 	 * Also enable use of realtime() for retrieving the  actual,
 	 * current system time. */
-	time_t then, then2;
+	time_t then;
 	PREEMPTION_DISABLE();
 	x86_cmos_lock_acquire_nopr();
 	x86_cmos.cr_alarm_hour   = cmos_rd(CMOS_ALARM_HOUR);
@@ -365,7 +398,7 @@ NOTHROW(KCALL x86_initialize_tsc_resync)(void) {
 	cmos_setalarm(then + 1);
 	cmos_wr(CMOS_STATE_B, x86_cmos.cr_stb);
 	for (;;) {
-		then2 = cmos_gettime(false);
+		time_t then2 = cmos_gettime(false);
 		if likely(then2 <= then)
 			break;
 		/* Alarm may not have triggered! */
