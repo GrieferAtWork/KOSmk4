@@ -1139,8 +1139,17 @@
 			}                                                                   \
 		}                                                                       \
 	}	__WHILE0
+#if (defined(NDEBUG) || defined(NDEBUG_QUEUE) || \
+     !defined(__COMPILER_HAVE_TYPEOF) || defined(__NO_XBLOCK))
 #define __HYBRID_SLIST_P_REMOVE(p_elem, X, _) \
-	__HYBRID_SLIST_P_REMOVE_R(p_elem, *(p_elem), X, _)
+	(void)(*(p_elem) = X(_, *(p_elem)).sle_next)
+#else /* ... */
+#define __HYBRID_SLIST_P_REMOVE(p_elem, X, _)                  \
+	__XBLOCK({                                                 \
+		__typeof__(*(p_elem)) __hslpr_elem = *(p_elem);        \
+		__HYBRID_SLIST_P_REMOVE_R(p_elem, __hslpr_elem, X, _); \
+	})
+#endif /* !... */
 #define __HYBRID_SLIST_P_REMOVE_R(p_lo_elem, hi_elem, X, _) \
 	(void)(*(p_lo_elem) = X(_, hi_elem).sle_next,           \
 	       __HYBRID_Q_BADPTR(X(_, hi_elem).sle_next))
