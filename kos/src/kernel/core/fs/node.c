@@ -4372,9 +4372,9 @@ superblock_open(struct superblock_type *__restrict type,
 			result->mf_refcnt = 1;
 			result->mf_ops      = &inode_datablock_type;
 			atomic_rwlock_cinit(&result->mf_lock);
-#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+#ifdef CONFIG_MFILE_TRACE_LOCKPC
 			result->_mf_wrlockpc = NULL;
-#endif /* CONFIG_MFILE_TRACE_WRLOCK_PC */
+#endif /* CONFIG_MFILE_TRACE_LOCKPC */
 			assert(result->mf_vio == NULL);
 			assert(result->mf_parts == NULL);
 			sig_cinit(&result->mf_initdone);

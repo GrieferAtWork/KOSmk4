@@ -47,10 +47,10 @@
 #endif /* __WANT_MFILE__mf_compl */
 
 /* Trace program counters of write-locks to mfile objects. */
-#undef CONFIG_MFILE_TRACE_WRLOCK_PC
-#ifndef NDEBUG
-#define CONFIG_MFILE_TRACE_WRLOCK_PC
-#endif /* !NDEBUG */
+#undef CONFIG_MFILE_TRACE_LOCKPC
+#if 1
+#define CONFIG_MFILE_TRACE_LOCKPC
+#endif
 
 
 #ifdef __CC__
@@ -701,9 +701,9 @@ struct mfile {
 	struct vio_operators const   *mf_vio;        /* [0..1][const] VIO operators. (deprecated field!) */
 #endif /* !CONFIG_USE_NEW_FS */
 	struct atomic_rwlock          mf_lock;       /* Lock for this file. */
-#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+#ifdef CONFIG_MFILE_TRACE_LOCKPC
 	void const                  *_mf_wrlockpc;   /* [lock(mf_lock)] Write-lock program counter. */
-#endif /* CONFIG_MFILE_TRACE_WRLOCK_PC */
+#endif /* CONFIG_MFILE_TRACE_LOCKPC */
 	RBTREE_ROOT(mpart)            mf_parts;      /* [0..n][lock(mf_lock)] File parts. (or `MFILE_PARTS_ANONYMOUS') */
 	struct sig                    mf_initdone;   /* Signal broadcast whenever one of the blocks of one of
 	                                              * the contained parts changes state from INIT to  LOAD. */
@@ -730,11 +730,11 @@ struct mfile {
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_refcnt(mf_refcnt) mf_refcnt
 #define MFILE_INIT_mf_ops(mf_ops)       mf_ops
-#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+#ifdef CONFIG_MFILE_TRACE_LOCKPC
 #define MFILE_INIT_mf_lock ATOMIC_RWLOCK_INIT, __NULLPTR
-#else /* CONFIG_MFILE_TRACE_WRLOCK_PC */
+#else /* CONFIG_MFILE_TRACE_LOCKPC */
 #define MFILE_INIT_mf_lock ATOMIC_RWLOCK_INIT
-#endif /* !CONFIG_MFILE_TRACE_WRLOCK_PC */
+#endif /* !CONFIG_MFILE_TRACE_LOCKPC */
 #define MFILE_INIT_mf_parts(mf_parts)           mf_parts
 #define MFILE_INIT_mf_initdone                  SIG_INIT
 #define MFILE_INIT_mf_lockops                   SLIST_HEAD_INITIALIZER(~)
@@ -954,15 +954,15 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	                                        : PAGESHIFT)) -                     \
 	                         1)
 #endif /* !CONFIG_USE_NEW_FS */
-#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+#ifdef CONFIG_MFILE_TRACE_LOCKPC
 #define __MFILE_INIT_WRLOCKPC        __NULLPTR,
 #define __mfile_init_wrlockpc(self)  (self)->_mf_wrlockpc = __NULLPTR,
 #define __mfile_cinit_wrlockpc(self) __hybrid_assert((self)->_mf_wrlockpc == __NULLPTR),
-#else /* CONFIG_MFILE_TRACE_WRLOCK_PC */
+#else /* CONFIG_MFILE_TRACE_LOCKPC */
 #define __MFILE_INIT_WRLOCKPC        /* nothing */
 #define __mfile_init_wrlockpc(self)  /* nothing */
 #define __mfile_cinit_wrlockpc(self) /* nothing */
-#endif /* !CONFIG_MFILE_TRACE_WRLOCK_PC */
+#endif /* !CONFIG_MFILE_TRACE_LOCKPC */
 
 
 #ifdef CONFIG_USE_NEW_FS
@@ -1099,7 +1099,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lockops_mustreap(self) (__hybrid_atomic_load((self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 /* Lock accessor helpers for `struct mfile' */
-#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+#ifdef CONFIG_MFILE_TRACE_LOCKPC
 #include <asm/intrin.h>
 #define __mfile_trace_wrlock_setpc(self) (void)((self)->_mf_wrlockpc = __rdip())
 #define __mfile_trace_wrlock_clrpc(self) (void)((self)->_mf_wrlockpc = __NULLPTR)
@@ -1114,7 +1114,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lock_upgrade_nx(self) ({ unsigned int __ok = atomic_rwlock_upgrade_nx(&(self)->mf_lock); if (__ok != 0) __mfile_trace_wrlock_setpc(self); __ok; })
 #define mfile_lock_tryupgrade(self) (atomic_rwlock_tryupgrade(&(self)->mf_lock) ? (__mfile_trace_wrlock_setpc(self), 1) : 0)
 #define mfile_lock_downgrade(self)  (__mfile_trace_wrlock_clrpc(self), atomic_rwlock_downgrade(&(self)->mf_lock))
-#else /* CONFIG_MFILE_TRACE_WRLOCK_PC */
+#else /* CONFIG_MFILE_TRACE_LOCKPC */
 #define mfile_lock_write(self)      atomic_rwlock_write(&(self)->mf_lock)
 #define mfile_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mf_lock)
 #define mfile_lock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mf_lock)
@@ -1126,7 +1126,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->mf_lock)
 #define mfile_lock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->mf_lock)
 #define mfile_lock_downgrade(self)  atomic_rwlock_downgrade(&(self)->mf_lock)
-#endif /* !CONFIG_MFILE_TRACE_WRLOCK_PC */
+#endif /* !CONFIG_MFILE_TRACE_LOCKPC */
 #define mfile_lock_read(self)         atomic_rwlock_read(&(self)->mf_lock)
 #define mfile_lock_read_nx(self)      atomic_rwlock_read_nx(&(self)->mf_lock)
 #define mfile_lock_tryread(self)      atomic_rwlock_tryread(&(self)->mf_lock)

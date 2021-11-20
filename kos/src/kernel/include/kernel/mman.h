@@ -51,6 +51,13 @@
 #include <hybrid/sync/atomic-rwlock.h>
 #endif /* CONFIG_USE_RWLOCK_FOR_MMAN */
 
+/* Trace program counters of write-locks to mfile objects. */
+#undef CONFIG_MMAN_TRACE_LOCKPC
+#if 1
+#define CONFIG_MMAN_TRACE_LOCKPC
+#endif
+
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -81,6 +88,9 @@ struct mman {
 #else /* CONFIG_USE_RWLOCK_FOR_MMAN */
 	struct atomic_lock   mm_lock;        /* Lock for this mman. */
 #endif /* !CONFIG_USE_RWLOCK_FOR_MMAN */
+#ifdef CONFIG_MMAN_TRACE_LOCKPC
+	void const         *_mm_wrlockpc;    /* [lock(mm_lock)] Write-lock program counter. */
+#endif /* CONFIG_MMAN_TRACE_LOCKPC */
 	RBTREE_ROOT(mnode)   mm_mappings;    /* [owned][0..n][lock(mm_lock)] Known file mappings. */
 	PHYS pagedir_phys_t  mm_pagedir_p;   /* [1..1][const] Physical pointer of the page directory */
 	struct mnode_list    mm_writable;    /* [0..n][lock(mm_lock)] List of nodes that contain writable mappings. */
@@ -196,28 +206,55 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 
 
 
+#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#define __MMAN_INIT_WRLOCKPC        __NULLPTR,
+#define __mman_init_wrlockpc(self)  (self)->_mm_wrlockpc = __NULLPTR,
+#define __mman_cinit_wrlockpc(self) __hybrid_assert((self)->_mm_wrlockpc == __NULLPTR),
+#else /* CONFIG_MMAN_TRACE_LOCKPC */
+#define __MMAN_INIT_WRLOCKPC        /* nothing */
+#define __mman_init_wrlockpc(self)  /* nothing */
+#define __mman_cinit_wrlockpc(self) /* nothing */
+#endif /* !CONFIG_MMAN_TRACE_LOCKPC */
+
+#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#include <asm/intrin.h>
+#define __mman_trace_wrlock_setpc(self) (self)->_mm_wrlockpc = __rdip()
+#define __mman_trace_wrlock_clrpc(self) (self)->_mm_wrlockpc = __NULLPTR
+#endif /* CONFIG_MMAN_TRACE_LOCKPC */
+
+
 /* Lock accessor helpers for `struct mman' */
 #ifdef CONFIG_USE_RWLOCK_FOR_MMAN
+#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#define mman_lock_trywrite(self)   (atomic_rwlock_trywrite(&(self)->mm_lock) && (__mman_trace_wrlock_setpc(self), 1))
+#define mman_lock_write(self)      (atomic_rwlock_write(&(self)->mm_lock), __mman_trace_wrlock_setpc(self))
+#define mman_lock_write_nx(self)   (atomic_rwlock_write_nx(&(self)->mm_lock) && (__mman_trace_wrlock_setpc(self), 1))
+#define _mman_lock_endwrite(self)  (__mman_trace_wrlock_clrpc(self), atomic_rwlock_endwrite(&(self)->mm_lock))
+#define _mman_lock_end(self)       (mman_lock_writing(self) && (__mman_trace_wrlock_clrpc(self), 1), atomic_rwlock_end(&(self)->mm_lock))
+#define mman_lock_tryupgrade(self) (atomic_rwlock_tryupgrade(&(self)->mm_lock) && (__mman_trace_wrlock_setpc(self), 1))
+#define mman_lock_upgrade(self)    (atomic_rwlock_upgrade(&(self)->mm_lock), __mman_trace_wrlock_setpc(self))
+#define mman_lock_downgrade(self)  (__mman_trace_wrlock_clrpc(self), atomic_rwlock_downgrade(&(self)->mm_lock))
+#else /* CONFIG_MMAN_TRACE_LOCKPC */
+#define mman_lock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mm_lock)
+#define mman_lock_write(self)      atomic_rwlock_write(&(self)->mm_lock)
+#define mman_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mm_lock)
+#define _mman_lock_endwrite(self)  atomic_rwlock_endwrite(&(self)->mm_lock)
+#define _mman_lock_end(self)       atomic_rwlock_end(&(self)->mm_lock)
+#define mman_lock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->mm_lock)
+#define mman_lock_upgrade(self)    atomic_rwlock_upgrade(&(self)->mm_lock)
+#define mman_lock_downgrade(self)  atomic_rwlock_downgrade(&(self)->mm_lock)
+#endif /* !CONFIG_MMAN_TRACE_LOCKPC */
 #define mman_lock_tryread(self)      atomic_rwlock_tryread(&(self)->mm_lock)
-#define mman_lock_trywrite(self)     atomic_rwlock_trywrite(&(self)->mm_lock)
 #define mman_lock_read(self)         atomic_rwlock_read(&(self)->mm_lock)
 #define mman_lock_read_nx(self)      atomic_rwlock_read_nx(&(self)->mm_lock)
-#define mman_lock_write(self)        atomic_rwlock_write(&(self)->mm_lock)
-#define mman_lock_write_nx(self)     atomic_rwlock_write_nx(&(self)->mm_lock)
 #define mman_lock_endread(self)      (atomic_rwlock_endread(&(self)->mm_lock) ? mman_lockops_reap(self) : (void)0)
-#define mman_lock_endwrite(self)     (atomic_rwlock_endwrite(&(self)->mm_lock), mman_lockops_reap(self))
-#define mman_lock_end(self)          (atomic_rwlock_end(&(self)->mm_lock) ? mman_lockops_reap(self) : (void)0)
 #define _mman_lock_endread(self)     atomic_rwlock_endread(&(self)->mm_lock)
-#define _mman_lock_endwrite(self)    atomic_rwlock_endwrite(&(self)->mm_lock)
-#define _mman_lock_end(self)         atomic_rwlock_end(&(self)->mm_lock)
+#define mman_lock_endwrite(self)     (_mman_lock_endwrite(self), mman_lockops_reap(self))
+#define mman_lock_end(self)          (_mman_lock_end(self) ? mman_lockops_reap(self) : (void)0)
 #define mman_lock_reading(self)      atomic_rwlock_reading(&(self)->mm_lock)
 #define mman_lock_writing(self)      atomic_rwlock_writing(&(self)->mm_lock)
 #define mman_lock_canread(self)      atomic_rwlock_canread(&(self)->mm_lock)
 #define mman_lock_canwrite(self)     atomic_rwlock_canwrite(&(self)->mm_lock)
-#define mman_lock_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->mm_lock)
-#define mman_lock_upgrade(self)      atomic_rwlock_upgrade(&(self)->mm_lock)
-#define mman_lock_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->mm_lock)
-#define mman_lock_downgrade(self)    atomic_rwlock_downgrade(&(self)->mm_lock)
 #define mman_lock_waitread(self)     atomic_rwlock_waitread(&(self)->mm_lock)
 #define mman_lock_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->mm_lock)
 #define mman_lock_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->mm_lock)
@@ -235,11 +272,18 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_lock_waitfor    mman_lock_waitwrite
 #define mman_lock_waitfor_nx mman_lock_waitwrite_nx
 #else /* CONFIG_USE_RWLOCK_FOR_MMAN */
+#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#define mman_lock_tryacquire(self) (atomic_lock_tryacquire(&(self)->mm_lock) && (__mman_trace_wrlock_setpc(self), 1))
+#define mman_lock_acquire(self)    (atomic_lock_acquire(&(self)->mm_lock), __mman_trace_wrlock_setpc(self))
+#define mman_lock_acquire_nx(self) (atomic_lock_acquire_nx(&(self)->mm_lock) && (__mman_trace_wrlock_setpc(self), 1))
+#define _mman_lock_release(self)   (__mman_trace_wrlock_clrpc(self), atomic_lock_release(&(self)->mm_lock))
+#else /* CONFIG_MMAN_TRACE_LOCKPC */
 #define mman_lock_tryacquire(self) atomic_lock_tryacquire(&(self)->mm_lock)
 #define mman_lock_acquire(self)    atomic_lock_acquire(&(self)->mm_lock)
 #define mman_lock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->mm_lock)
-#define mman_lock_release(self)    (atomic_lock_release(&(self)->mm_lock), mman_lockops_reap(self))
 #define _mman_lock_release(self)   atomic_lock_release(&(self)->mm_lock)
+#endif /* !CONFIG_MMAN_TRACE_LOCKPC */
+#define mman_lock_release(self)    (_mman_lock_release(self), mman_lockops_reap(self))
 #define mman_lock_acquired(self)   atomic_lock_acquired(&(self)->mm_lock)
 #define mman_lock_available(self)  atomic_lock_available(&(self)->mm_lock)
 #define mman_lock_waitfor(self)    atomic_lock_waitfor(&(self)->mm_lock)
@@ -268,7 +312,6 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_lock_waitwrite_nx     mman_lock_waitfor_nx
 #define mman_lock_tryupgrade(self) 1
 #define mman_lock_upgrade(self)    1
-#define mman_lock_upgrade_nx(self) 1
 #define mman_lock_downgrade(self)  (void)0
 #endif /* !CONFIG_USE_RWLOCK_FOR_MMAN */
 

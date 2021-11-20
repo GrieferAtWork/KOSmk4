@@ -47,6 +47,7 @@ DECL_BEGIN
 	.mm_refcnt      = 4, /* mman_kernel, this_mman@{boottask,bootidle,asyncwork} */          \
 	.mm_weakrefcnt  = 1,                                                                     \
 	.mm_lock        = __MMAN_KERNEL_INIT_MM_LOCK,                                            \
+	__MMAN_INIT_WRLOCKPC                                                                     \
 	.mm_mappings    = __NULLPTR, /* XXX: Statically initialize the initial mappings tree? */ \
 	.mm_pagedir_p   = pagedir_kernel_phys,                                                   \
 	.mm_writable    = LIST_HEAD_INITIALIZER(&mman_kernel.mm_writable),                       \
