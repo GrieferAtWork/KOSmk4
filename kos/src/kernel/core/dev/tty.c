@@ -61,9 +61,9 @@
 DECL_BEGIN
 
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
-NOTHROW(KCALL ttybase_log_setsession)(struct ttydev *__restrict self,
-                                      struct task *__restrict UNUSED(session),
-                                      struct taskpid *__restrict session_pid) {
+NOTHROW(KCALL ttydev_log_setsession)(struct ttydev *__restrict self,
+                                     struct task *__restrict UNUSED(session),
+                                     struct taskpid *__restrict session_pid) {
 	chrdev_getname_lock_acquire(self);
 	printk(KERN_NOTICE "[ctty][+] Assign tty %q as controller for session %u\n",
 	       chrdev_getname(self), taskpid_getrootpid(session_pid));
@@ -71,9 +71,9 @@ NOTHROW(KCALL ttybase_log_setsession)(struct ttydev *__restrict self,
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
-NOTHROW(KCALL ttybase_log_delsession)(struct ttydev *__restrict self,
-                                      struct task *__restrict UNUSED(session),
-                                      struct taskpid *__restrict session_pid) {
+NOTHROW(KCALL ttydev_log_delsession)(struct ttydev *__restrict self,
+                                     struct task *__restrict UNUSED(session),
+                                     struct taskpid *__restrict session_pid) {
 	chrdev_getname_lock_acquire(self);
 	printk(KERN_NOTICE "[ctty][-] Remove tty %q as controller for session %u\n",
 	       chrdev_getname(self), taskpid_getrootpid(session_pid));
@@ -343,7 +343,7 @@ NOTHROW(KCALL ttydev_v_fini)(struct chrdev *__restrict self)
 	struct ttydev *me = (struct ttydev *)self;
 #endif /* !CONFIG_USE_NEW_FS */
 	assertf(!awref_ptr(&me->t_cproc),
-	        "An session leader should be holding a reference to their CTTY, "
+	        "A session leader should be holding a reference to their CTTY, "
 	        "meaning that if we truly were supposed to be a CTTY, the "
 	        "associated session should have kept us from being destroyed");
 	terminal_fini(&me->t_term);
@@ -1120,7 +1120,7 @@ again_check_t_cproc_inner:
 					old_cproc_task = taskpid_gettask(old_cproc);
 					if likely(old_cproc_task) {
 						if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
-							ttybase_log_delsession(self, old_cproc_task, old_cproc);
+							ttydev_log_delsession(self, old_cproc_task, old_cproc);
 						decref_unlikely(old_cproc_task);
 					}
 					goto remove_from_old_ctty_and_succeed;
@@ -1140,8 +1140,8 @@ again_check_t_cproc_inner:
 			/* Remove the calling session from the old TTY's session link */
 remove_from_old_ctty_and_succeed:
 			if (awref_cmpxch(&old_ctty->t_cproc, session_pid, NULL))
-				ttybase_log_delsession(old_ctty, session, session_pid);
-			ttybase_log_setsession(self, session, session_pid);
+				ttydev_log_delsession(old_ctty, session, session_pid);
+			ttydev_log_setsession(self, session, session_pid);
 			return TTYDEV_SETCTTY_SUCCESS;
 		}
 	}
@@ -1171,10 +1171,10 @@ again_check_t_cproc:
 			old_cproc_task = taskpid_gettask(old_cproc);
 			if likely(old_cproc_task) {
 				if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
-					ttybase_log_delsession(self, old_cproc_task, old_cproc);
+					ttydev_log_delsession(self, old_cproc_task, old_cproc);
 				decref_unlikely(old_cproc_task);
 			}
-			ttybase_log_setsession(self, session, session_pid);
+			ttydev_log_setsession(self, session, session_pid);
 			return TTYDEV_SETCTTY_SUCCESS;
 		}
 	}
@@ -1188,7 +1188,7 @@ again_check_t_cproc:
 		awref_cmpxch(&self->t_cproc, FORTASK(session, this_taskpid), NULL);
 		goto again_check_tg_ctty;
 	}
-	ttybase_log_setsession(self, session, session_pid);
+	ttydev_log_setsession(self, session, session_pid);
 	return TTYDEV_SETCTTY_SUCCESS;
 }
 
@@ -1196,7 +1196,7 @@ again_check_t_cproc:
  * @param: old_ctty:  The expected old CTTY, or NULL if the CTTY should always be given up.
  * @param: pold_ctty: When non-NULL, store the old CTTY here upon success.
  * @return: * : One of `TTYDEV_HUPCTTY_*' */
-PUBLIC NOBLOCK NONNULL((1)) int
+PUBLIC NOBLOCK int
 NOTHROW(KCALL ttydev_hupctty)(struct ttydev *required_old_ctty,
                               bool caller_must_be_leader,
                               REF struct ttydev **pold_ctty) {
@@ -1223,7 +1223,7 @@ again_my_ctty_pointer_cmpxch:
 			return TTYDEV_HUPCTTY_DIFFERENT;
 		}
 		if (awref_cmpxch(&required_old_ctty->t_cproc, session_pid, NULL))
-			ttybase_log_delsession(required_old_ctty, session, session_pid);
+			ttydev_log_delsession(required_old_ctty, session, session_pid);
 		if (pold_ctty) {
 			incref(required_old_ctty);
 			*pold_ctty = required_old_ctty;
@@ -1234,7 +1234,7 @@ again_my_ctty_pointer_cmpxch:
 		if (!old_ctty)
 			return TTYDEV_HUPCTTY_ALREADY;
 		if (awref_cmpxch(&old_ctty->t_cproc, session_pid, NULL))
-			ttybase_log_delsession(old_ctty, session, session_pid);
+			ttydev_log_delsession(old_ctty, session, session_pid);
 		if (pold_ctty) {
 			*pold_ctty = old_ctty;
 		} else {

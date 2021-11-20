@@ -1742,11 +1742,11 @@ $fd_t openat64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 	mode_t mode;
 	va_start(args, oflags);
 	mode = va_arg(args, mode_t);
-#ifdef O_LARGEFILE
+@@pp_ifdef O_LARGEFILE@@
 	result = openat32(dirfd, filename, oflags | O_LARGEFILE, mode);
-#else /* O_LARGEFILE */
+@@pp_else@@
 	result = openat32(dirfd, filename, oflags, mode);
-#endif /* !O_LARGEFILE */
+@@pp_endif@@
 	va_end(args);
 	return result;
 }

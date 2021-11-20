@@ -174,7 +174,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 
 #else /* CONFIG_USE_NEW_FS */
-/* Check if a given character device is actually a ttybase */
+/* Check if a given character device is actually a ttydev */
 #define chrdev_istty(self)                                                         \
 	((self)->cd_heapsize >= sizeof(struct ttydev) &&                               \
 	 ((struct ttydev *)(self))->t_term.t_chk_sigttou == &__ttydev_v_chk_sigttou && \
@@ -223,7 +223,7 @@ NOTHROW(KCALL ttydev_v_fini)(struct chrdev *__restrict self);
  * @param: override_different_ctty:  If the calling session already had a CTTY assigned, override it.
  * @param: caller_must_be_leader:    Fail if the calling process isn't the session leader.
  * @return: * : One of `TTYDEV_SETCTTY_*' */
-FUNDEF NOBLOCK int
+FUNDEF NOBLOCK NONNULL((1)) int
 NOTHROW(KCALL ttydev_setctty)(struct ttydev *__restrict self,
                               __BOOL caller_must_be_leader DFL(1),
                               __BOOL steal_from_other_session DFL(0),

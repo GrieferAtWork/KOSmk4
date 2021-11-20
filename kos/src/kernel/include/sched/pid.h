@@ -191,10 +191,10 @@ LIST_HEAD(taskpid_list, REF taskpid);
 LIST_HEAD(task_list, WEAK task);
 #endif /* !__task_list_defined */
 
-#ifndef __ttybase_device_axref_defined
-#define __ttybase_device_axref_defined
-AXREF(ttybase_device_axref, ttydev);
-#endif /* !__ttybase_device_axref_defined */
+#ifndef __ttydev_device_axref_defined
+#define __ttydev_device_axref_defined
+AXREF(ttydev_device_axref, ttydev);
+#endif /* !__ttydev_device_axref_defined */
 
 
 struct taskgroup {
@@ -274,7 +274,7 @@ struct taskgroup {
 	                                                      * The session leader of the this process group.
 	                                                      * When set to `THIS_TASKPID', then the calling thread is that leader. */
 	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
-	struct ttybase_device_axref  tg_ctty;                /* [0..1] The controlling terminal  (/dev/tty) associated  with this  session
+	struct ttydev_device_axref   tg_ctty;                /* [0..1] The controlling terminal  (/dev/tty) associated  with this  session
 	                                                      * When non-NULL, `tg_ctty->t_cproc == THIS_TASKPID' (for the session leader) */
 };
 

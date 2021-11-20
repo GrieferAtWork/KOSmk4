@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbf720e9 */
+/* HASH CRC-32:0x2720bb81 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,9 +37,9 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(openat64))(__fd_t __dirfd, char cons
 	__mode = __builtin_va_arg(__args, __mode_t);
 #ifdef __O_LARGEFILE
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_openat32)(__dirfd, __filename, __oflags | __O_LARGEFILE, __mode);
-#else /* O_LARGEFILE */
+#else /* __O_LARGEFILE */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_openat32)(__dirfd, __filename, __oflags, __mode);
-#endif /* !O_LARGEFILE */
+#endif /* !__O_LARGEFILE */
 	__builtin_va_end(__args);
 	return __result;
 }
