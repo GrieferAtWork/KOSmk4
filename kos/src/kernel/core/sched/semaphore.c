@@ -34,7 +34,7 @@ DECL_BEGIN
 /* Acquire a ticked from the given semaphore, or block until `abs_timeout'.
  * @return: true:  Successfully acquired a ticket.
  * @return: false: The given `abs_timeout' has expired. */
-PUBLIC BLOCKING NOCONNECT NONNULL((1)) bool FCALL
+PUBLIC BLOCKING NONNULL((1)) bool FCALL
 semaphore_wait(struct semaphore *__restrict self, ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK) {
 	uintptr_t count;
@@ -71,7 +71,7 @@ do_exchange:
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) bool
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
                                  ktime_t abs_timeout) {
 	uintptr_t count;

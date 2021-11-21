@@ -287,7 +287,7 @@ STATIC_ASSERT(sizeof(struct async) <= sizeof(struct ansitty));
 /* Activate a given TTY. If an active userlock exists, the tty will not actually
  * be  made active, but will instead be  linked such that the userlock's release
  * will make the tty active. */
-FUNDEF BLOCKING NOCONNECT NONNULL((1)) void FCALL
+FUNDEF BLOCKING NONNULL((1)) void FCALL
 vidtty_activate(struct vidtty *__restrict self)
 		THROWS(E_IOERROR);
 
@@ -470,7 +470,7 @@ struct viddev_ops {
 	 *  - return->_vidlck_file_ mf_ops = &MY_vidlck_ops.vlo_file; # Something that includes a destructor that calls `vidlck_v_destroy()'
 	 *  - return->...                                             # Sub-class specific fields (primarily including video registers)
 	 * All other fields are initialized by the caller. */
-	BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vidlck *
+	BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vidlck *
 	(FCALL *vdo_alloclck)(struct viddev *__restrict self,
 	                      struct vidtty *active_tty)
 			THROWS(E_IOERROR, E_WOULDBLOCK);
@@ -544,11 +544,11 @@ struct viddev
 /* Return a reference to the currently "active" tty (or the one that will become
  * active after a currently held user-lock is released). If no such TTY  exists,
  * return NULL instead. */
-FUNDEF BLOCKING NOCONNECT WUNUSED NONNULL((1)) REF struct vidtty *FCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1)) REF struct vidtty *FCALL
 viddev_getactivetty(struct viddev *__restrict self);
 
 /* Create a new video lock object for a given video device. */
-FUNDEF BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vidlck *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vidlck *FCALL
 viddev_newlck(struct viddev *__restrict self);
 
 

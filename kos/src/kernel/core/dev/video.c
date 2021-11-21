@@ -55,7 +55,7 @@ DECL_BEGIN
 /* Activate a given TTY. If an active userlock exists, the tty will not actually
  * be  made active, but will instead be  linked such that the userlock's release
  * will make the tty active. */
-PUBLIC BLOCKING NOCONNECT NONNULL((1)) void FCALL
+PUBLIC BLOCKING NONNULL((1)) void FCALL
 vidtty_activate(struct vidtty *__restrict self)
 		THROWS(E_IOERROR) {
 	struct viddev *dv = self->vty_dev;
@@ -885,7 +885,7 @@ NOTHROW(KCALL vidlck_v_destroy)(struct mfile *__restrict self) {
 /* Return a reference to the currently "active" tty (or the one that will become
  * active after a currently held user-lock is released). If no such TTY  exists,
  * return NULL instead. */
-PUBLIC BLOCKING NOCONNECT WUNUSED NONNULL((1)) REF struct vidtty *FCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct vidtty *FCALL
 viddev_getactivetty(struct viddev *__restrict self) {
 	REF struct mfile *active;
 again:
@@ -935,7 +935,7 @@ got_active:
 }
 
 /* Create a new video lock object for a given video device. */
-PUBLIC BLOCKING NOCONNECT WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vidlck *FCALL
+PUBLIC BLOCKING WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vidlck *FCALL
 viddev_newlck(struct viddev *__restrict self) {
 	REF struct vidlck *result;
 	REF struct mfile *active;

@@ -973,10 +973,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  #1: Indicate function that should be marked as [kernel] in libc/magic
 	 *  #2: Need to be inlined into .text */
 
-	/* TODO: Get  rid of the  `NOCONNECT' annotation. -  (almost) anything that's BLOCKING
-	 *       is also inherently NOCONNECT, and generally speaking, the NOCONNECT annoation
-	 *       is pretty much useless in terms of a programming aid (it feels more like it's
-	 *       just there to clobber...) */
+	/* TODO: LIBFOO_CC macros for some of the recently added libraries are missing from cpp.hint */
 
 	/* TODO: Refactor all of the ioctls from <kos/ioctl/...> to use the <SYSTEM>_IOC_<COMMAND> format. */
 

@@ -65,8 +65,6 @@
 #define __BLOCKING        /* Annotation for functions that may block indefinitely (as well as service RPCs and be a cancellation point, unless otherwise documented) */
 #define __BLOCKING_IF(x)  /* Annotation for functions that may block indefinitely (as well as service RPCs and be a cancellation point, unless otherwise documented) */
 #define __NOPREEMPT       /* Annotation for functions that may only be called with preemption disabled. */
-#define __NOCONNECT       /* Annotation for  functions which  may only  be called  when the  calling
-                           * thread isn't already connected to a signal. (only affects kernel-space) */
 #define __ABNORMAL_RETURN /* Annotation for functions that (may) not return normally, or by throwing an exception.
                            * Functions with this annotation must not be  called if there are any finally  handlers
                            * on-stack  which need to perform cleanup, or any EXCEPT-handlers that would want to do

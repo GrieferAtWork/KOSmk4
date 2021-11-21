@@ -210,7 +210,7 @@ __NOTHROW(ringbuffer_closed)(struct ringbuffer *__restrict self);
  * NOTE:  `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
  *        it may call `task_yield()'  when trying to acquire  `self->rb_lock'
  * @return: * : The number of bytes read. */
-typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __BLOCKING __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_READ)(struct ringbuffer *__restrict __self,
                                  __USER __CHECKED void *__dst,
                                  __size_t __num_bytes)
@@ -221,7 +221,7 @@ typedef __ATTR_NONNULL((1)) __size_t
                                           __size_t __num_bytes)
 		/*__THROWS(E_SEGFAULT, E_WOULDBLOCK)*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
+LIBBUFFER_DECL __BLOCKING __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_read(struct ringbuffer *__restrict __self,
                 __USER __CHECKED void *__dst, __size_t __num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...);
@@ -247,13 +247,13 @@ ringbuffer_read_nonblock(struct ringbuffer *__restrict __self,
  *        or when allocating more heap memory.
  * @return: * : The number of bytes written.
  * @return: -1: [USERSPACE] Failed to increase the buffer size (s.a. `errno = ENOMEM') */
-typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __BLOCKING __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITE)(struct ringbuffer *__restrict __self,
                                   __USER __CHECKED void const *__src,
                                   __size_t __num_bytes)
 /*		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...))*/;
-typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __BLOCKING __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITESOME)(struct ringbuffer *__restrict __self,
                                       __USER __CHECKED void const *__src,
                                       __size_t __num_bytes)
@@ -266,12 +266,12 @@ typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 /*		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK))*/;
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
+LIBBUFFER_DECL __BLOCKING __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_write(struct ringbuffer *__restrict __self,
                  __USER __CHECKED void const *__src, __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
-LIBBUFFER_DECL __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
+LIBBUFFER_DECL __BLOCKING __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_writesome(struct ringbuffer *__restrict __self,
                      __USER __CHECKED void const *__src, __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
@@ -298,7 +298,7 @@ ringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict __self,
 
 /* XXX: Dedicated functions for these? */
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-__FORCELOCAL __NOCONNECT __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
+__FORCELOCAL __BLOCKING __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_putc(struct ringbuffer *__restrict __self, __byte_t __ch)
 		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...)) {

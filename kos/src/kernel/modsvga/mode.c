@@ -404,7 +404,7 @@ NOTHROW(FCALL convert_tty_contents)(struct svga_ttyaccess const *__restrict _ott
 }
 
 /* Safely update the tty pointed-to by `self->vty_tty' */
-PRIVATE BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
+PRIVATE BLOCKING NONNULL((1, 2)) void FCALL
 svgatty_settty(struct svgatty *__restrict self,
                struct svga_ttyaccess *__restrict ntty) {
 	struct svga_ttyaccess *otty;
@@ -480,7 +480,7 @@ svgatty_settty(struct svgatty *__restrict self,
 
 /* Same   as  `svgatty_settty()',  but  follow  up  by  sending
  * SIGWINCH to the foreground process group of an attached tty. */
-PRIVATE BLOCKING NOCONNECT NONNULL((1, 2)) void FCALL
+PRIVATE BLOCKING NONNULL((1, 2)) void FCALL
 svgatty_settty_with_winch(struct svgatty *__restrict self,
                           struct svga_ttyaccess *__restrict ntty) {
 	REF struct mkttydev *utty;
@@ -828,7 +828,7 @@ svgadev_v_setttyvideomode(struct viddev *__restrict self,
 /* Allocate  and activate a new userlock for a given SVGA device.
  * If another lock already exists, this function will block until
  * said lock is released. */
-PRIVATE BLOCKING NOCONNECT ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vidlck *FCALL
+PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vidlck *FCALL
 svgadev_v_alloclck(struct viddev *__restrict self, struct vidtty *active_tty)
 		THROWS(E_IOERROR, E_WOULDBLOCK) {
 	struct svgadev *me = viddev_assvga(self);

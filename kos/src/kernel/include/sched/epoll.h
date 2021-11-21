@@ -287,11 +287,12 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
  * as raised once again, and be  back onto the queue of  pending
  * events. The same thing also happens when writing to  `events'
  * would result in a SEGFAULT.
+ * NOTE: The caller must ensure that !task_wasconnected()
  * @param: maxevents: The max number of events to consume (asserted to be >= 1)
  * @return: * : The actual number of consumed events.
  * @return: 0 : No monitors have  been raised at  this time. Once  any
  *              monitor becomes raised, `self->ec_avail' will be send. */
-FUNDEF NOCONNECT NONNULL((1)) size_t KCALL
+FUNDEF NONNULL((1)) size_t KCALL
 epoll_controller_trywait(struct epoll_controller *__restrict self,
                          USER CHECKED struct epoll_event *events,
                          size_t maxevents)
@@ -304,7 +305,7 @@ epoll_controller_trywait(struct epoll_controller *__restrict self,
  * expired from  the get-go,  this function  will still  try to  consume
  * already-pending  events,  thus  behaving  identical  to  a  call   to
  * `epoll_controller_trywait()') */
-FUNDEF NONNULL((1)) size_t KCALL
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL
 epoll_controller_wait(struct epoll_controller *__restrict self,
                       USER CHECKED struct epoll_event *events,
                       size_t maxevents,

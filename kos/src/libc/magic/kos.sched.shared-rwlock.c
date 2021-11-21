@@ -225,7 +225,7 @@ void shared_rwlock_downgrade([[nonnull]] struct shared_rwlock *__restrict self) 
 @@      re-load local copies of affected resources.
 @@@return: true:  Upgrade was performed without the read-lock being lost
 @@@return: false: The read-lock had to be released before a write-lock was acquired
-[[wunused, attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[wunused, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[extern_inline, kernel, decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[requires_function(shared_rwlock_endread, shared_rwlock_write)]]
 [[impl_include("<hybrid/__atomic.h>")]]
@@ -299,7 +299,7 @@ DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX
 @@>> shared_rwlock_read(3)
 @@Acquire a read-lock to the given shared_rwlock.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 void shared_rwlock_read([[nonnull]] struct shared_rwlock *__restrict self) {
@@ -331,7 +331,7 @@ success:
 @@>> shared_rwlock_write(3)
 @@Acquire a write-lock to the given shared_rwlock.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
 void shared_rwlock_write([[nonnull]] struct shared_rwlock *__restrict self) {
@@ -365,7 +365,7 @@ success:
 @@@return: true:  Successfully acquired a read-lock.
 @@@return: false: The given `abs_timeout' has expired.
 [[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_read_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_read_with_timeout64")]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
@@ -407,7 +407,7 @@ success:
 @@@return: true:  Successfully acquired a write-lock.
 @@@return: false: The given `abs_timeout' has expired.
 [[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_write_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_write_with_timeout64")]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
@@ -455,7 +455,7 @@ success:
 @@>> shared_rwlock_waitread(3)
 @@Wait until acquiring a read-lock to `self' no longer blocks
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 void shared_rwlock_waitread([[nonnull]] struct shared_rwlock *__restrict self) {
@@ -488,7 +488,7 @@ success:
 @@>> shared_rwlock_waitwrite(3)
 @@Wait until acquiring a write-lock to `self' no longer blocks
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
 void shared_rwlock_waitwrite([[nonnull]] struct shared_rwlock *__restrict self) {
@@ -523,7 +523,7 @@ success:
 @@@return: true:  A read-lock became available.
 @@@return: false: The given `abs_timeout' has expired.
 [[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_waitread_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_waitread_with_timeout64")]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
@@ -567,7 +567,7 @@ success:
 @@@return: true:  A write-lock became available.
 @@@return: false: The given `abs_timeout' has expired.
 [[kernel, wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_waitwrite_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_waitwrite_with_timeout64")]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
@@ -613,7 +613,7 @@ success:
 %#if !defined(__KERNEL__) && defined(__USE_TIME64)
 [[preferred_time64_variant_of(shared_rwlock_read_with_timeout), doc_alias("shared_rwlock_read_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX)]]
 $bool shared_rwlock_read_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
@@ -631,7 +631,7 @@ $bool shared_rwlock_read_with_timeout64([[nonnull]] struct shared_rwlock *__rest
 
 [[preferred_time64_variant_of(shared_rwlock_write_with_timeout), doc_alias("shared_rwlock_write_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX)]]
 $bool shared_rwlock_write_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
@@ -649,7 +649,7 @@ $bool shared_rwlock_write_with_timeout64([[nonnull]] struct shared_rwlock *__res
 
 [[preferred_time64_variant_of(shared_rwlock_waitread_with_timeout), doc_alias("shared_rwlock_waitread_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX)]]
 $bool shared_rwlock_waitread_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
@@ -669,7 +669,7 @@ $bool shared_rwlock_waitread_with_timeout64([[nonnull]] struct shared_rwlock *__
 
 [[preferred_time64_variant_of(shared_rwlock_waitwrite_with_timeout), doc_alias("shared_rwlock_waitwrite_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExpr64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX)]]
 $bool shared_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
@@ -704,7 +704,7 @@ $bool shared_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_rwlock *_
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_rwlock_read_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -735,7 +735,7 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_rwlock_write_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -766,7 +766,7 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_rwlock_read_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
                                          __shared_rwlock_timespec abs_timeout) {
@@ -798,7 +798,7 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_rwlock_write_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
                                           __shared_rwlock_timespec abs_timeout) {
@@ -828,7 +828,7 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_rwlock_waitread_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -859,7 +859,7 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_rwlock_waitwrite_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -890,7 +890,7 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_rwlock_waitread_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
                                              __shared_rwlock_timespec abs_timeout) {
@@ -922,7 +922,7 @@ success:
 @@@return: false: There are pending X-RPCs that could not be serviced.
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
-[[attribute(__BLOCKING, __NOCONNECT), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
+[[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
 $bool shared_rwlock_waitwrite_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
                                               __shared_rwlock_timespec abs_timeout) {

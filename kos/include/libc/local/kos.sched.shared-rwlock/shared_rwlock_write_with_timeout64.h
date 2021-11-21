@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8633365e */
+/* HASH CRC-32:0x371efcd5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ static struct lfutexexpr const __shared_rwlock_waitwriteexpr[] = {
 __NAMESPACE_LOCAL_END
 #endif /* !__SHARED_RWLOCK_WAITWRITEEXPR_DEFINED */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_rwlock_write_with_timeout64) __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL
+__LOCAL_LIBC(shared_rwlock_write_with_timeout64) __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_rwlock_write_with_timeout64))(struct shared_rwlock *__restrict __self, struct __timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(__self)) {
 		__hybrid_atomic_store(__self->sl_wrwait, 1, __ATOMIC_SEQ_CST);

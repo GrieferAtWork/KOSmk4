@@ -408,7 +408,7 @@ NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread);
  *                                 unconditionally  by  `sched_super_override_start()',
  *                                 unless `thiscpu_sched_override' was already non-NULL
  *                                 before  `sched_super_override_start()'  was  called. */
-FUNDEF NOCONNECT void FCALL sched_super_override_start(void) THROWS(E_WOULDBLOCK, ...);
+FUNDEF BLOCKING void FCALL sched_super_override_start(void) THROWS(E_WOULDBLOCK, ...);
 FUNDEF NOBLOCK void NOTHROW(FCALL sched_super_override_end)(__BOOL release_sched_override DFL(1));
 
 /* Same as `sched_super_override_start()', but fail and return

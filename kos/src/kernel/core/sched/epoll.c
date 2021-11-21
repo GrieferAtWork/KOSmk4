@@ -1465,11 +1465,12 @@ NOTHROW(FCALL epoll_handle_monitor_dc_chain)(struct epoll_handle_monitor *chain)
  * as raised once again, and be  back onto the queue of  pending
  * events. The same thing also happens when writing to  `events'
  * would result in a SEGFAULT.
+ * NOTE: The caller must ensure that !task_wasconnected()
  * @param: maxevents: The max number of events to consume (asserted to be >= 1)
  * @return: * : The actual number of consumed events.
  * @return: 0 : No monitors have  been raised at  this time. Once  any
  *              monitor becomes raised, `self->ec_avail' will be send. */
-PUBLIC NOCONNECT NONNULL((1)) size_t KCALL
+PUBLIC NONNULL((1)) size_t KCALL
 epoll_controller_trywait(struct epoll_controller *__restrict self,
                          USER CHECKED struct epoll_event *events,
                          size_t maxevents)
@@ -1533,7 +1534,7 @@ scan_monitors:
 						if (!what) {
 							/* Monitor isn't  actually  raised  (spurious
 							 * signal, or edge has already fallen again).
-							 * -> Handle this case by prime `monitor' once again. */
+							 * -> Handle this case by priming `monitor' once again. */
 							DBG_memset(&monitor->ehm_rnext, 0xcc, sizeof(monitor->ehm_rnext));
 							COMPILER_WRITE_BARRIER();
 							ATOMIC_WRITE(monitor->ehm_raised, 0);
@@ -1717,7 +1718,7 @@ done:
  * expired from  the get-go,  this function  will still  try to  consume
  * already-pending  events,  thus  behaving  identical  to  a  call   to
  * `epoll_controller_trywait()') */
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 epoll_controller_wait(struct epoll_controller *__restrict self,
                       USER CHECKED struct epoll_event *events,
                       size_t maxevents, ktime_t abs_timeout)

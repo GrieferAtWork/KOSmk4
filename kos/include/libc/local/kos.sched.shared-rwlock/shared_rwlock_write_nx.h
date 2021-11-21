@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23c96711 */
+/* HASH CRC-32:0x14acb4d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 #include <sched/signal.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_rwlock_write_nx) __ATTR_WUNUSED __BLOCKING __NOCONNECT __ATTR_NONNULL((1)) __BOOL
+__LOCAL_LIBC(shared_rwlock_write_nx) __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_rwlock_write_nx))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
 	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(__self)) {

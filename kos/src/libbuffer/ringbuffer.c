@@ -52,6 +52,12 @@
 
 DECL_BEGIN
 
+#ifndef BLOCKING
+#define BLOCKING __BLOCKING
+#endif /* !BLOCKING */
+#ifndef THROWS
+#define THROWS __THROWS
+#endif /* !THROWS */
 
 #ifndef __KERNEL__
 typedef struct {
@@ -189,10 +195,10 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
  * NOTE:  `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
  *        it may call `task_yield()'  when trying to acquire  `self->rb_lock'
  * @return: * : The number of bytes read. */
-INTERN __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
+INTERN BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_read(struct ringbuffer *__restrict self,
                    __USER __CHECKED void *dst, size_t num_bytes)
-		__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...) {
+		THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...) {
 	size_t result, temp;
 	IF_KERNEL(assert(!task_wasconnected()));
 	result = libringbuffer_read_nonblock(self, dst, num_bytes);
@@ -249,7 +255,7 @@ again_connect:
 INTERN NONNULL((1)) size_t CC
 libringbuffer_read_nonblock(struct ringbuffer *__restrict self,
                             __USER __CHECKED void *dst, size_t num_bytes)
-		__THROWS(E_SEGFAULT, E_WOULDBLOCK) {
+		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	bool was_full;
 	size_t result = 0;
 	size_t temp;
@@ -426,11 +432,11 @@ done:
  *        or when allocating more heap memory.
  * @return: * : The number of bytes written.
  * @return: -1: [USERSPACE] Failed to increase the buffer size (s.a. `errno = ENOMEM') */
-INTERN __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
+INTERN BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_write(struct ringbuffer *__restrict self,
                     __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)) {
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	KERNEL_SELECT(size_t, ssize_t) result, temp;
 	IF_KERNEL(assert(!task_wasconnected()));
 	result = libringbuffer_write_nonblock(self, src, num_bytes);
@@ -502,11 +508,11 @@ again_connect:
 	goto again_connect;
 }
 
-INTERN __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
+INTERN BLOCKING NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_writesome(struct ringbuffer *__restrict self,
                         __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)) {
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	KERNEL_SELECT(size_t, ssize_t) result, temp;
 	IF_KERNEL(assert(!task_wasconnected()));
 	result = libringbuffer_write_nonblock(self, src, num_bytes);
@@ -581,8 +587,8 @@ again_connect:
 INTERN NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_write_nonblock(struct ringbuffer *__restrict self,
                              __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK)) {
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK)) {
 	size_t result;
 again:
 	result = libringbuffer_write_nonblock_noalloc(self, src, num_bytes);
@@ -679,7 +685,7 @@ done:
 INTERN NONNULL((1)) size_t CC
 libringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict self,
                                      __USER __CHECKED void const *src, size_t num_bytes)
-		__THROWS(E_SEGFAULT, E_WOULDBLOCK) {
+		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	bool was_empty;
 	size_t result = 0;
 	size_t temp;
@@ -847,7 +853,7 @@ done:
 INTERN NONNULL((1)) size_t CC
 libringbuffer_unread(struct ringbuffer *__restrict self,
                      size_t num_bytes, size_t *p_rdtot)
-		__THROWS(E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK) {
 	size_t result;
 	bool was_empty = false;
 	ringbuffer_lock_write(self);
@@ -882,7 +888,7 @@ libringbuffer_unread(struct ringbuffer *__restrict self,
 INTERN NONNULL((1)) size_t CC
 libringbuffer_skipread(struct ringbuffer *__restrict self,
                        size_t num_bytes, size_t *p_rdtot)
-		__THROWS(E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK) {
 	size_t result;
 	bool was_full;
 	ringbuffer_lock_write(self);
@@ -912,7 +918,7 @@ libringbuffer_skipread(struct ringbuffer *__restrict self,
  * The return value is always the new total number of read bytes since the last re-size. */
 INTERN NONNULL((1)) size_t CC
 libringbuffer_rseek(struct ringbuffer *__restrict self, ssize_t offset)
-		__THROWS(E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK) {
 	size_t result;
 	if (offset < 0) {
 		libringbuffer_unread(self, (size_t)-offset, &result);
@@ -930,7 +936,7 @@ libringbuffer_rseek(struct ringbuffer *__restrict self, ssize_t offset)
 INTERN NONNULL((1)) size_t CC
 libringbuffer_unwrite(struct ringbuffer *__restrict self,
                       size_t num_bytes, size_t *p_wrtot)
-		__THROWS(E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK) {
 	size_t result;
 	bool was_full;
 	ringbuffer_lock_write(self);
@@ -952,7 +958,7 @@ libringbuffer_unwrite(struct ringbuffer *__restrict self,
  * The return value is always the new total number of written bytes since the last re-size. */
 INTERN NONNULL((1)) size_t CC
 libringbuffer_wseek(struct ringbuffer *__restrict self, ssize_t offset)
-		__THROWS(E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK) {
 	size_t result;
 	if (offset < 0) {
 		libringbuffer_unwrite(self, (size_t)-offset, &result);
@@ -969,7 +975,7 @@ libringbuffer_wseek(struct ringbuffer *__restrict self, ssize_t offset)
  * @return: * : The actual number of now written bytes. */
 INTERN NONNULL((1)) size_t CC
 libringbuffer_setwritten(struct ringbuffer *__restrict self, size_t num_bytes)
-		__THROWS(E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK) {
 	size_t result;
 	bool was_full;
 	ringbuffer_lock_write(self);

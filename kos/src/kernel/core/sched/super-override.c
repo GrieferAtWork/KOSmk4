@@ -128,8 +128,9 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	ATOMIC_DEC(super_override_ack);
 }
 
-PRIVATE NOBLOCK NOCONNECT ATTR_COLDTEXT bool FCALL
-sched_super_override_start_impl(bool force) THROWS(E_WOULDBLOCK, ...) {
+PRIVATE BLOCKING_IF(force) ATTR_COLDTEXT bool FCALL
+sched_super_override_start_impl(bool force)
+		THROWS(E_WOULDBLOCK, ...) {
 	struct cpu *me;
 	bool was_already_override;
 	assert(!task_wasconnected());
@@ -269,7 +270,7 @@ again:
  *                                 unconditionally  by  `sched_super_override_start()',
  *                                 unless `thiscpu_sched_override' was already non-NULL
  *                                 before  `sched_super_override_start()'  was  called. */
-PUBLIC NOBLOCK NOCONNECT ATTR_COLDTEXT void FCALL
+PUBLIC BLOCKING ATTR_COLDTEXT void FCALL
 sched_super_override_start(void) THROWS(E_WOULDBLOCK, ...) {
 	sched_super_override_start_impl(true);
 }
