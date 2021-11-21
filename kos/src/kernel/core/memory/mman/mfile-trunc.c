@@ -195,8 +195,18 @@ handle_newsize_ge_oldsize:
 	}
 
 	/* Check if we're allowed to modify the file's size. */
-	if unlikely(self->mf_flags & MFILE_F_FIXEDFILESIZE)
+	if unlikely(self->mf_flags & MFILE_F_FIXEDFILESIZE) {
+		/* Special case: you are allowed to truncate(2) a file to a size of `0'
+		 *               when that file is also  anonymous, even if the  file's
+		 *               size doesn't match  `0', and the  file itself has  the
+		 *               FIXEDFILESIZE flag set.
+		 * This is needed to get something like `echo 32 > /proc/kos/futexfd-maxexpr'
+		 * working properly, as the ">"  operator includes O_TRUNC, which causes  the
+		 * open to do `mfile_utruncate(node, 0)' during the open operation. */
+		if (new_size == 0 && mfile_isanon(self))
+			return;
 		THROW(E_FSERROR_READONLY);
+	}
 
 	/* Check that the new file size is allowed by the filesystem. */
 	if (mfile_isnode(self)) {
