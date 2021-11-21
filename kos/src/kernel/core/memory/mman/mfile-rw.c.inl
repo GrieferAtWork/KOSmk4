@@ -264,11 +264,20 @@ again:
 			/* TODO: Handling for VIO */
 		}
 #endif /* LIBVIO_CONFIG_ENABLED */
+
+#ifdef LOCAL_WRITING
+		/* Cannot write to anonymous files. If you try to, you'll get a READONLY error. */
+		if likely(result == 0)
+			THROW(E_FSERROR_READONLY);
+#endif /* LOCAL_WRITING */
 		goto done;
 	}
+
 #ifdef LOCAL_WRITING
 	if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) {
 		mfile_lock_endread(self);
+		if unlikely(result)
+			goto done;
 		THROW(E_FSERROR_READONLY);
 	}
 #endif /* LOCAL_WRITING */
