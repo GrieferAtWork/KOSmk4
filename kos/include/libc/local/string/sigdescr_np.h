@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef799282 */
+/* HASH CRC-32:0x81277ca8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,51 @@
 #include <__crt.h>
 #include <bits/types.h>
 #include <asm/os/signal.h>
+#ifndef ___local_sys_siglist_defined
+#define ___local_sys_siglist_defined
+#if defined(__CRT_HAVE___p_sys_siglist)
+#ifndef ____p_sys_siglist_defined
+#define ____p_sys_siglist_defined
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,__p_sys_siglist,(void),())
+#endif /* !____p_sys_siglist_defined */
+#ifndef _sys_siglist
+#define _sys_siglist __p_sys_siglist()
+#endif /* !_sys_siglist */
+#ifndef sys_siglist
+#define sys_siglist  __p_sys_siglist()
+#endif /* !sys_siglist */
+#elif defined(__CRT_HAVE_sys_siglist)
+#if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
+__LIBC char const *const _sys_siglist[__NSIG] __ASMNAME("sys_siglist");
+#else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
+#ifndef _sys_siglist
+#define _sys_siglist sys_siglist
+#endif /* !_sys_siglist */
+#endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
+#ifndef sys_siglist
+__LIBC char const *const sys_siglist[__NSIG];
+#endif /* !sys_siglist */
+#elif defined(__CRT_HAVE__sys_siglist)
+#ifndef sys_siglist
+#ifndef __NO_ASMNAME
+__LIBC char const *const sys_siglist[__NSIG] __ASMNAME("_sys_siglist");
+#else /* !__NO_ASMNAME */
+#define sys_siglist _sys_siglist
+#endif /* __NO_ASMNAME */
+#endif /* !sys_siglist */
+#ifndef _sys_siglist
+__LIBC char const *const _sys_siglist[__NSIG];
+#endif /* !_sys_siglist */
+#endif /* sys_siglist... */
+#endif /* !___local_sys_siglist_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigdescr_np) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sigdescr_np))(__signo_t __signum) {
+#ifdef _sys_siglist
+	if __unlikely((unsigned int)__signum < __NSIG)
+		return __NULLPTR;
+	return _sys_siglist[__signum];
+#else /* _sys_siglist */
 	char const *__result;
 	switch (__signum) {
 
@@ -260,6 +302,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sigdescr_np))(__signo_t __signum) {
 		break;
 	}
 	return __result;
+#endif /* !_sys_siglist */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigdescr_np_defined

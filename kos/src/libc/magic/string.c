@@ -2638,59 +2638,8 @@ print("	};");
 @@When the given `signum' isn't  recognized, `NULL' is returned  instead.
 [[decl_include("<bits/types.h>"), export_alias("signalname")]]
 [[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
-[[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
-#ifndef ___local_sys_siglist_defined
-#define ___local_sys_siglist_defined
-#if defined(__CRT_HAVE___p_sys_siglist)
-#ifndef ____p_sys_siglist_defined
-#define ____p_sys_siglist_defined
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,@__p_sys_siglist@,(void),())
-#endif /* !____p_sys_siglist_defined */
-#ifndef @_sys_siglist@
-#define @_sys_siglist@ @__p_sys_siglist@()
-#endif /* !_sys_siglist */
-#ifndef @sys_siglist@
-#define @sys_siglist@  @__p_sys_siglist@()
-#endif /* !sys_siglist */
-#elif defined(__CRT_HAVE_sys_siglist)
-#if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
-__LIBC char const *const @_sys_siglist@[__NSIG] __ASMNAME("sys_siglist");
-#else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
-#ifndef @_sys_siglist@
-#define @_sys_siglist@ @sys_siglist@
-#endif /* !_sys_siglist */
-#endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
-#ifndef @sys_siglist@
-__LIBC char const *const @sys_siglist@[__NSIG];
-#endif /* !sys_siglist */
-#elif defined(__CRT_HAVE__sys_siglist)
-#ifndef @sys_siglist@
-#ifndef __NO_ASMNAME
-__LIBC char const *const @sys_siglist@[__NSIG] __ASMNAME("_sys_siglist");
-#else /* !__NO_ASMNAME */
-#define @sys_siglist@ @_sys_siglist@
-#endif /* __NO_ASMNAME */
-#endif /* !sys_siglist */
-#ifndef @_sys_siglist@
-__LIBC char const *const @_sys_siglist@[__NSIG];
-#endif /* !_sys_siglist */
-#endif /* sys_siglist... */
-#endif /* !___local_sys_siglist_defined */
-)]]
+[[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>")]]
 char const *sigabbrev_np($signo_t signum) {
-#if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
-	char const *result;
-	if unlikely((unsigned int)signum < __NSIG)
-		return NULL;
-	result = @_sys_siglist@[signum];
-	if likely(result) {
-		if (result[0] == 'S' &&
-		    result[1] == 'I' &&
-		    result[2] == 'G')
-			result += 3;
-	}
-	return result;
-#else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
 	char const *result;
 	switch (signum) {
 
@@ -2927,7 +2876,6 @@ char const *sigabbrev_np($signo_t signum) {
 		break;
 	}
 	return result;
-#endif /* !__CRT_HAVE___p_sys_siglist && !__CRT_HAVE_sys_siglist && !__CRT_HAVE__sys_siglist */
 }
 
 @@>> sigdescr_np(3)
@@ -2935,8 +2883,51 @@ char const *sigabbrev_np($signo_t signum) {
 @@If the given `signum' isn't recognized, return `NULL' instead.
 [[decl_include("<bits/types.h>")]]
 [[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
-[[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>")]]
+[[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
+#ifndef ___local_sys_siglist_defined
+#define ___local_sys_siglist_defined
+#if defined(__CRT_HAVE___p_sys_siglist)
+#ifndef ____p_sys_siglist_defined
+#define ____p_sys_siglist_defined
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,@__p_sys_siglist@,(void),())
+#endif /* !____p_sys_siglist_defined */
+#ifndef @_sys_siglist@
+#define @_sys_siglist@ @__p_sys_siglist@()
+#endif /* !_sys_siglist */
+#ifndef @sys_siglist@
+#define @sys_siglist@  @__p_sys_siglist@()
+#endif /* !sys_siglist */
+#elif defined(__CRT_HAVE_sys_siglist)
+#if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
+__LIBC char const *const @_sys_siglist@[__NSIG] __ASMNAME("sys_siglist");
+#else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
+#ifndef @_sys_siglist@
+#define @_sys_siglist@ @sys_siglist@
+#endif /* !_sys_siglist */
+#endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
+#ifndef @sys_siglist@
+__LIBC char const *const @sys_siglist@[__NSIG];
+#endif /* !sys_siglist */
+#elif defined(__CRT_HAVE__sys_siglist)
+#ifndef @sys_siglist@
+#ifndef __NO_ASMNAME
+__LIBC char const *const @sys_siglist@[__NSIG] __ASMNAME("_sys_siglist");
+#else /* !__NO_ASMNAME */
+#define @sys_siglist@ @_sys_siglist@
+#endif /* __NO_ASMNAME */
+#endif /* !sys_siglist */
+#ifndef @_sys_siglist@
+__LIBC char const *const @_sys_siglist@[__NSIG];
+#endif /* !_sys_siglist */
+#endif /* sys_siglist... */
+#endif /* !___local_sys_siglist_defined */
+)]]
 char const *sigdescr_np($signo_t signum) {
+@@pp_if defined(@_sys_siglist@)@@
+	if unlikely((unsigned int)signum < __NSIG)
+		return NULL;
+	return @_sys_siglist@[signum];
+@@pp_else@@
 	char const *result;
 	switch (signum) {
 
@@ -3171,6 +3162,7 @@ char const *sigdescr_np($signo_t signum) {
 		break;
 	}
 	return result;
+@@pp_endif@@
 }
 
 %#endif /* __USE_GNU */
