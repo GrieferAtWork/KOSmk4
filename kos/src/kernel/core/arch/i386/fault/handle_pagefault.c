@@ -828,7 +828,7 @@ do_handle_iob_node_access:
 				RETHROW();
 			}
 			args.vea_args.va_file = incref(part->mp_file);
-			args.vea_args.va_ops  = mfile_getvio(args.vea_args.va_file);
+			args.vea_args.va_ops  = args.vea_args.va_file->mf_ops->mo_vio;
 			mpart_lock_release(part);
 
 			/* Ensure that VIO operators are present. */

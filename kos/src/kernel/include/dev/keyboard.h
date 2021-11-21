@@ -84,9 +84,7 @@ struct kbdbuf {
 
 struct kbddev;
 struct kbddev_ops {
-#ifdef CONFIG_USE_NEW_FS
 	struct chrdev_ops ko_cdev; /* Character device operators. */
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* [0..1] Set which leds are currently lit.
 	 * @param: new_leds: Set of `KEYBOARD_LED_*'
@@ -118,9 +116,6 @@ struct kbddev
 #define _kbddev_aschr(x) x
 #define _kbddev_chr_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
-#ifndef CONFIG_USE_NEW_FS
-	struct kbddev_ops     kd_ops;        /* [const] Keyboard device operators. */
-#endif /* !CONFIG_USE_NEW_FS */
 	struct kbdbuf         kd_buf;        /* Keyboard input buffer. */
 	WEAK uintptr_t        kd_flags;      /* Keyboard operation flags (set of `KEYBOARD_DEVICE_FLAG_*').
 	                                      * NOTE: When  changed, you  must broadcast  `kd_buf.kb_avail' */
@@ -178,8 +173,6 @@ struct kbddev
 #define kbddev_leds_acquired(self)   shared_lock_acquired(&(self)->kd_leds_lock)
 #define kbddev_leds_available(self)  shared_lock_available(&(self)->kd_leds_lock)
 
-
-#ifdef CONFIG_USE_NEW_FS
 
 /* Operator access */
 #define kbddev_getops(self) \
@@ -280,36 +273,12 @@ DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
 /* Finalize a partially initialized `struct kbddev' (as initialized by `_kbddev_init()') */
 #define _kbddev_fini(self) _chrdev_fini(_kbddev_aschr(self))
 
-#else /* CONFIG_USE_NEW_FS */
-#define chrdev_iskbd(self)                           \
-	((self)->cd_heapsize >= sizeof(struct kbddev) && \
-	 (self)->cd_type.ct_read == &kbddev_v_read)
-#define kbddev_getops(self) (&(self)->kd_ops)
 
-/* Keyboard character device operators */
-FUNDEF NONNULL((1)) size_t KCALL kbddev_v_read(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL kbddev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL kbddev_v_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL kbddev_v_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL kbddev_v_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
 
-/* Initialize/finalize the given keyboard device.
- * NOTE: Drivers that override  the `ct_fini' operator  of a given  keyboard
- *       must ensure that `keyboard_device_fini()' is still invoked by their
- *       override.
- * NOTE: The following operators are intrinsically provided by keyboard,
- *       get  initialized  by   `kbddev_init()',  and   should  not   be
- *       overwritten:
- *         - ct_read
- *         - ct_ioctl
- *         - ct_stat
- *         - ct_poll */
-FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL kbddev_init)(struct kbddev *__restrict self,
-                           struct kbddev_ops const *__restrict ops);
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL keyboard_device_fini)(struct kbddev *__restrict self);
-#endif /* !CONFIG_USE_NEW_FS */
+
+/************************************************************************/
+/* Keyboard API functions                                               */
+/************************************************************************/
 
 /* Add a given key to the keyboard user-input  buffer.
  * NOTE: The caller must not pass `KEY_NONE' for `key'

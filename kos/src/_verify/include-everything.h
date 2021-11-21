@@ -61,7 +61,6 @@ local badFiles = List({
 	"hybrid/__atomic-gasm.h",
 	"hybrid/__atomic-libatomic.h",
 	"hybrid/__atomic-msvc.h",
-	"hybrid/sequence/atree-abi.h",
 	"hybrid/sequence/rbtree-abi.h",
 	"hybrid/__pointer-cxx-impl.h",
 	"hybrid/sync/service-lock.h",
@@ -557,7 +556,6 @@ incdir("");
 #include <hybrid/sched/__gettid.h>
 #include <hybrid/sched/__yield.h>
 #include <hybrid/sched/yield.h>
-#include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/bitset.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/list.h>
@@ -640,7 +638,6 @@ incdir("");
 #include <kos/futexexpr.h>
 #include <kos/guid.h>
 #include <kos/hop/api.h>
-#include <kos/hop/blkdev.h>
 #include <kos/hop/filehandle.h>
 #include <kos/hop/futex.h>
 #include <kos/hop/handle.h>

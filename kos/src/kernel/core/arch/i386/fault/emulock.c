@@ -274,11 +274,11 @@ handle_vio_or_not_faulted:
 			file = incref(part->mp_file);
 			mpart_lock_release(part);
 			FINALLY_DECREF_UNLIKELY(file);
-			if (mfile_getvio(file)) {
+			if (file->mf_ops->mo_vio) {
 				/* Handle VIO memory access. */
 				struct vioargs args;
 				vio_addr_t vio_addr;
-				args.va_ops          = mfile_getvio(file);
+				args.va_ops          = file->mf_ops->mo_vio;
 				args.va_file         = file;
 				args.va_acmap_offset = part_minaddr;
 				args.va_acmap_page   = node_minaddr;

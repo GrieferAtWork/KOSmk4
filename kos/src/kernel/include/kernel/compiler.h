@@ -43,36 +43,6 @@
 #   endif
 #endif /* !CONFIG_NO_SMP */
 
-#undef CONFIG_USE_NEW_FS
-#if 1 /* s.a. "core/.sources" */
-#define CONFIG_USE_NEW_FS
-#endif
-
-#ifdef CONFIG_USE_NEW_FS
-/* Backward-compatibility */
-#define inode           fnode
-#define regular_node    fregnode
-#define directory_node  fdirnode
-#define superblock      fsuper
-#define symlink_node    flnknode
-#define fifo_node       ffifonode
-#define socket_node     fsocknode
-#define superblock_type ffilesys
-#else /* CONFIG_USE_NEW_FS */
-/* Forward-compatibility */
-#define fnode     inode
-#define fregnode  regular_node
-#define fdirnode  directory_node
-#define fsuper    superblock
-#define flnknode  symlink_node
-#define ffifonode fifo_node
-#define fsocknode socket_node
-#define ffilesys  superblock_type
-#endif /* !CONFIG_USE_NEW_FS */
-
-
-
-
 #if defined(__CC__) && defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif

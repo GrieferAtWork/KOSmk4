@@ -120,42 +120,35 @@ struct icpustate;
 struct mman;
 struct path;
 struct fdirent;
-#ifndef CONFIG_USE_NEW_FS
-struct regular_node;
-#endif /* !CONFIG_USE_NEW_FS */
 
 struct execargs {
-	struct mman                *ea_mman;        /* [1..1] The mman into which to map the executable.
-	                                             * This must not be the kernel mman, which causes an assertion failure.
-	                                             * NOTE: When `ea_change_mman_to_effective_mman' is `true', prior to a successful
-	                                             *       return of `execabi::ea_exec', it will also do a `task_setmman(ea_mman)',
-	                                             *       meaning that the caller will become apart of the given mman. */
-	struct icpustate           *ea_state;       /* [1..1] The user-space CPU state to update upon success in a manner
-	                                             *        that proper execution of the loaded binary is possible.
-	                                             * Note however that  in the  case of a  dynamic binary,  a dynamic  linker
-	                                             * may be injected to perform dynamic linking whilst already in user-space. */
-	REF struct path            *ea_xpath;       /* [0..1] Filesystem path for the directory inside of which `ea_xfile' is located. */
-	REF struct fdirent         *ea_xdentry;     /* [0..1] Directory entry containing the filename of `ea_xfile'. */
-#ifdef CONFIG_USE_NEW_FS
-	REF struct mfile           *ea_xfile;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
-#else /* CONFIG_USE_NEW_FS */
-	REF struct regular_node    *ea_xfile;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
-#endif /* !CONFIG_USE_NEW_FS */
-	byte_t                      ea_header[CONFIG_EXECABI_MAXHEADER];
-	                                            /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xfile'. Of this  buffer,
-	                                             * the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If  the
-	                                             * executable file is smaller than `CONFIG_EXECABI_MAXHEADER', trailing bytes
-	                                             * are simply zero-initialized. */
-	bool                        ea_change_mman_to_effective_mman;
-	                                            /* When set to `true', `ea_mman' should be set as the effective mman upon a
-	                                             * successful return of `execabi::ea_exec'. */
+	struct mman        *ea_mman;        /* [1..1] The mman into which to map the executable.
+	                                     * This must not be the kernel mman, which causes an assertion failure.
+	                                     * NOTE: When `ea_change_mman_to_effective_mman' is `true', prior to a successful
+	                                     *       return of `execabi::ea_exec', it will also do a `task_setmman(ea_mman)',
+	                                     *       meaning that the caller will become apart of the given mman. */
+	struct icpustate   *ea_state;       /* [1..1] The user-space CPU state to update upon success in a manner
+	                                     *        that proper execution of the loaded binary is possible.
+	                                     * Note however that  in the  case of a  dynamic binary,  a dynamic  linker
+	                                     * may be injected to perform dynamic linking whilst already in user-space. */
+	REF struct path    *ea_xpath;       /* [0..1] Filesystem path for the directory inside of which `ea_xfile' is located. */
+	REF struct fdirent *ea_xdentry;     /* [0..1] Directory entry containing the filename of `ea_xfile'. */
+	REF struct mfile   *ea_xfile;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
+	byte_t              ea_header[CONFIG_EXECABI_MAXHEADER];
+	                                    /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xfile'. Of this  buffer,
+	                                     * the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If  the
+	                                     * executable file is smaller than `CONFIG_EXECABI_MAXHEADER', trailing bytes
+	                                     * are simply zero-initialized. */
+	bool                ea_change_mman_to_effective_mman;
+	                                    /* When set to `true', `ea_mman' should be set as the effective mman upon a
+	                                     * successful return of `execabi::ea_exec'. */
 #ifdef __ARCH_HAVE_COMPAT
-	bool                        ea_argv_is_compat; /* When `true', `ea_argv' and `ea_envp' are compatibility-mode vectors. */
+	bool                ea_argv_is_compat; /* When `true', `ea_argv' and `ea_envp' are compatibility-mode vectors. */
 #endif /* !__ARCH_HAVE_COMPAT */
-	execabi_strings_t           ea_argv;        /* [0..1] NULL-terminated vector of arguments to-be passed to program being loaded. */
-	execabi_strings_t           ea_envp;        /* [0..1] NULL-terminated vector of environment variables to-be passed to program being loaded. */
-	size_t                      ea_argc_inject; /* The number of arguments from `ea_argv_inject' to inject at the beginning of the user-space argc/argv vector. */
-	char                      **ea_argv_inject; /* [1..1][owned][ea_argc_inject][owned] Vector of arguments to inject at the beginning of the user-space argc/argv vector. */
+	execabi_strings_t   ea_argv;        /* [0..1] NULL-terminated vector of arguments to-be passed to program being loaded. */
+	execabi_strings_t   ea_envp;        /* [0..1] NULL-terminated vector of environment variables to-be passed to program being loaded. */
+	size_t              ea_argc_inject; /* The number of arguments from `ea_argv_inject' to inject at the beginning of the user-space argc/argv vector. */
+	char              **ea_argv_inject; /* [1..1][owned][ea_argc_inject][owned] Vector of arguments to inject at the beginning of the user-space argc/argv vector. */
 };
 
 /* Finalize the given set of exec() arguments. */

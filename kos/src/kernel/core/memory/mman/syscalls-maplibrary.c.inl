@@ -246,13 +246,8 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 #endif /* !NO_PHYS_IDENTITY */
 						/* Copy leading file data into the part's backing page. */
 						/* TODO: Check bounds of `file.hmi_minaddr' / `file.hmi_maxaddr' */
-#ifdef CONFIG_USE_NEW_FS
 						mapsize_gap = mfile_read_p(file.hmi_file, paddr, mapsize_gap, fpos);
-#else /* CONFIG_USE_NEW_FS */
-						if unlikely(!vm_datablock_isinode(file.hmi_file))
-							THROW(E_FSERROR);
-						mapsize_gap = inode_read_phys((struct inode *)file.hmi_file, paddr, mapsize_gap, fpos);
-#endif /* !CONFIG_USE_NEW_FS */
+
 						/* Zero-initialize trailing .bss */
 						if (!page_iszero(part->mp_mem.mc_start))
 							memsetphys_onepage(paddr + mapsize_gap, 0, PAGESIZE - mapsize_gap);

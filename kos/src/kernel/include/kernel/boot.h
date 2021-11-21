@@ -55,24 +55,9 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_user_mman)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_loaded_drivers)(void);
 
 /* Initialize builtin core drivers. */
-#ifndef CONFIG_USE_NEW_FS
-INTDEF FREE void NOTHROW(KCALL kernel_initialize_devfs_driver)(void);
-#endif /* !CONFIG_USE_NEW_FS */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_ide_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_fat_driver)(void);
-#ifdef CONFIG_USE_NEW_FS
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_rootfs)(void);
-#endif /* CONFIG_USE_NEW_FS */
-
-#ifndef CONFIG_USE_NEW_FS
-/* Initialize special builtin character devices (/dev/null, /dev/zero, etc.) */
-INTDEF FREE void NOTHROW(KCALL kernel_initialize_null_devices)(void);
-#endif /* !CONFIG_USE_NEW_FS */
-
-#ifndef CONFIG_USE_NEW_FS
-/* Initialize the /dev/tty alias device */
-INTDEF FREE void NOTHROW(KCALL kernel_initialize_ctty_device)(void);
-#endif /* !CONFIG_USE_NEW_FS */
 
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_bootpid)(void);
 

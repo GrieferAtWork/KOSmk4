@@ -36,11 +36,9 @@ DECL_BEGIN
 AWREF(mkttydev_awref, mkttydev);
 #endif /* !__mkttydev_awref_defined */
 
-#ifdef CONFIG_USE_NEW_FS
 struct ansittydev_ops {
 	struct chrdev_ops ato_cdev; /* Character device operators. */
 };
-#endif /* CONFIG_USE_NEW_FS */
 
 struct ansittydev
 #ifndef __WANT_FS_INLINE_STRUCTURES
@@ -59,8 +57,6 @@ struct ansittydev
 	struct mkttydev_awref at_tty;  /* [0..1] Weak reference to a connected TTY (used for injecting keyboard input) */
 };
 
-
-#ifdef CONFIG_USE_NEW_FS
 
 /* Operator access */
 #define ansittydev_getops(self) \
@@ -143,36 +139,6 @@ FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC __ansittydev_v_termios(struct ansitt
 	 awref_cinit(&(self)->at_tty, __NULLPTR))
 /* Finalize a partially initialized `struct ansittydev' (as initialized by `_ansittydev_init()') */
 #define _ansittydev_fini(self) _chrdev_fini(_ansittydev_aschr(self))
-
-#else /* CONFIG_USE_NEW_FS */
-#define chrdev_isansitty(self)                           \
-	((self)->cd_heapsize >= sizeof(struct ansittydev) && \
-	 (self)->cd_type.ct_write == &ansittydev_v_write)
-
-
-FUNDEF NONNULL((1)) size_t KCALL
-ansittydev_v_write(struct chrdev *__restrict self,
-                   USER CHECKED void const *src,
-                   size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL
-ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-#define ansittydev_v_fini(self) (void)0 /* For now... */
-
-
-/* Initialize a given ansitty device.
- * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
- *       The internal routing of this callback to injecting keyboard output
- *       is done dynamically when the ANSI  TTY is connected to the  output
- *       channel of a `struct mkttydev'
- * This function initializes the following operators:
- *   - cd_type.ct_write = &ansittydev_v_write;  // Mustn't be re-assigned!
- *   - cd_type.ct_fini  = &ansittydev_v_fini;   // Must be called by an override
- *   - cd_type.ct_ioctl = &ansittydev_v_ioctl;  // Must be called by an override */
-FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL ansittydev_cinit)(struct ansittydev *__restrict self,
-                                struct ansitty_operators const *__restrict ops);
-#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* __CC__ */
 

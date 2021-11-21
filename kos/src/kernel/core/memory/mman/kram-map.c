@@ -82,7 +82,6 @@ PUBLIC_CONST struct mfile_ops const mfile_dbgheap_ops = {
 };
 
 /* Special file used to initialize debug-heap memory. */
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC struct mfile mfile_dbgheap = {
 	MFILE_INIT_mf_refcnt(1), /* +1: mfile_dbgheap */
 	MFILE_INIT_mf_ops(&mfile_dbgheap_ops),
@@ -101,9 +100,6 @@ PUBLIC struct mfile mfile_dbgheap = {
 	MFILE_INIT_mf_mtime(0, 0),
 	MFILE_INIT_mf_ctime(0, 0),
 };
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC struct mfile mfile_dbgheap = MFILE_INIT_ANON(&mfile_dbgheap_ops, PAGESHIFT);
-#endif /* !CONFIG_USE_NEW_FS */
 #endif /* CONFIG_DEBUG_HEAP */
 
 

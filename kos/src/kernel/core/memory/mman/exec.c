@@ -157,27 +157,14 @@ INTERN ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	struct execargs args;
 	bzero(&args, sizeof(args)); /* For fields which we don't use */
-#ifdef CONFIG_USE_NEW_FS
 	args.ea_xfile = path_traversefull(AT_FDCWD, kernel_init_binary, 0,
 	                                  &args.ea_xpath, &args.ea_xdentry);
-#else /* CONFIG_USE_NEW_FS */
-	args.ea_xfile = (REF struct regular_node *)path_traversefull(THIS_FS,
-	                                                             kernel_init_binary,
-	                                                             true,
-	                                                             FS_MODE_FNORMAL,
-	                                                             NULL,
-	                                                             &args.ea_xpath,
-	                                                             NULL,
-	                                                             &args.ea_xdentry);
-#endif /* !CONFIG_USE_NEW_FS */
 
 	/* In order to allow for execution, the file itself must support mmaping.
 	 * It's  not OK if the file can be mmap'd indirectly, or if mmap has been
 	 * disabled for the file. */
-#ifdef CONFIG_USE_NEW_FS
 	if unlikely(!mfile_hasrawio(args.ea_xfile))
 		THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* Fill in the remaining fields of `args' (which we make use of) */
 	args.ea_mman        = THIS_MMAN;

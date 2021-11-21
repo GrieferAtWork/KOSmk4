@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/clnknode.h>
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/dirent.h>
@@ -363,10 +360,7 @@ DATDEF struct ffilesys ramfs_filesys;
 #define ramfs_new(args) \
 	ffilesys_open(&ramfs_filesys, __NULLPTR, args))
 
-
-
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_RAMFS_H */

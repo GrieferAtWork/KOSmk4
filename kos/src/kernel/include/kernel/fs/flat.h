@@ -22,6 +22,13 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/dirnode.h>
+#include <kernel/fs/super.h>
+#include <kernel/types.h>
+
+#include <kos/sched/shared-rwlock.h>
+
 /*
  * Helpers for "flat" filesystems:
  *  - Directory data is read/written like regular files
@@ -31,17 +38,6 @@
  *
  * Pretty much all on-disk filesystem drivers are derived from this model.
  */
-
-
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
-#include <kernel/fs/dirent.h>
-#include <kernel/fs/dirnode.h>
-#include <kernel/fs/super.h>
-#include <kernel/types.h>
-
-#include <kos/sched/shared-rwlock.h>
 
 #ifdef __CC__
 DECL_BEGIN
@@ -796,6 +792,5 @@ flatsuper_opennode(struct flatdirnode *__restrict dir,
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_FLAT_H */

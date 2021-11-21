@@ -546,8 +546,7 @@ PRIVATE ATTR_DBGBSS volatile u8 initok = 0;
 #define INITOK_TASKFLAGS             0x04
 #define INITOK_PSP0                  0x08
 #define INITOK_SCHED_OVERRIDE        0x10
-#define INITOK_READLOCKS             0x20
-#define INITOK_CONNECTIONS           0x40
+#define INITOK_CONNECTIONS           0x20
 
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_dbg_psp0threadstate_save_stacknode(struct x86_dbg_psp0threadstate *__restrict self,
@@ -692,17 +691,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		initok |= INITOK_SCHED_OVERRIDE;
 	}
 	FORCPU(me, thiscpu_sched_override) = mythread;
-
-	/* Save held read-locks, and re-initialize the per-thread descriptor. */
-	if (!(initok & INITOK_READLOCKS)) {
-		memcpy(&x86_dbg_hostbackup.dhs_readlocks,
-		       &FORTASK(mythread, this_read_locks),
-		       sizeof(struct read_locks));
-		initok |= INITOK_READLOCKS;
-	}
-
-	/* Re-initialize the readlock TLS area. */
-	pertask_readlocks_reinit(mythread);
 
 	/* Make sure that the signal connections sub-system is initialized. */
 	if (!FORTASK(mythread, this_connections) ||
@@ -966,9 +954,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	FORCPU(me, thiscpu_sched_override) = mythread;
 	x86_init_psp0(me, mythread);
 
-	/* Re-initialize the readlock TLS area. */
-	pertask_readlocks_reinit(mythread);
-
 	/* Make sure that the signal connections sub-system is (still) initialized. */
 	if (!FORTASK(mythread, this_connections) ||
 	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
@@ -1083,19 +1068,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 		x86_load_psp0(me, mythread);
 	if (initok & INITOK_SCHED_OVERRIDE)
 		FORCPU(me, thiscpu_sched_override) = x86_dbg_hostbackup.dhs_override;
-	if (initok & INITOK_READLOCKS) {
-		/* Read-locks may result in per-task  heap allocations. This can  also
-		 * happen within the debugger itself, and when it does we have to free
-		 * them them to prevent memory leaks.
-		 * But note that we  only do so if  the kernel hasn't been  poisoned.
-		 * No need to stretch our luck if stuff is already in an inconsistent
-		 * state! */
-		if (!kernel_poisoned())
-			pertask_readlocks_fini(mythread);
-		memcpy(&FORTASK(mythread, this_read_locks),
-		       &x86_dbg_hostbackup.dhs_readlocks,
-		       sizeof(struct read_locks));
-	}
 	if (initok & INITOK_CONNECTIONS) {
 		if (FORTASK(mythread, this_connections) == &x86_dbg_hostbackup.dhs_signals)
 			task_popconnections();

@@ -967,7 +967,7 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	assert(args.vea_args.va_file);
 
 	/* Load the VIO dispatch table */
-	args.vea_args.va_ops = mfile_getvio(args.vea_args.va_file);
+	args.vea_args.va_ops = args.vea_args.va_file->mf_ops->mo_vio;
 	assert(args.vea_args.va_ops);
 
 	/* Setup meta-data for where VIO is mapped

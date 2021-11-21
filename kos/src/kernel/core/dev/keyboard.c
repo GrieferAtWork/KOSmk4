@@ -625,12 +625,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct kbddev *__restrict self,
 done:
 		atty = NULL;
 		tty  = awref_get(&self->kd_tty);
-#ifdef CONFIG_USE_NEW_FS
-		if (tty && tty->mtd_ohandle_typ == HANDLE_TYPE_MFILE)
-#else /* CONFIG_USE_NEW_FS */
-		if (tty && tty->mtd_ohandle_typ == HANDLE_TYPE_CHRDEV)
-#endif /* !CONFIG_USE_NEW_FS */
-		{
+		if (tty && tty->mtd_ohandle_typ == HANDLE_TYPE_MFILE) {
 			struct ansittydev *ttydev;
 			ttydev = (struct ansittydev *)tty->mtd_ohandle_ptr;
 			if (chrdev_isansitty(ttydev))
@@ -660,13 +655,8 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct kbddev *__restrict self,
 	tty = awref_get(&self->kd_tty);
 	if (!tty)
 		goto done;
-#ifdef CONFIG_USE_NEW_FS
 	if (tty->mtd_ohandle_typ != HANDLE_TYPE_MFILE)
 		goto done_tty;
-#else /* CONFIG_USE_NEW_FS */
-	if (tty->mtd_ohandle_typ != HANDLE_TYPE_CHRDEV)
-		goto done_tty;
-#endif /* !CONFIG_USE_NEW_FS */
 	atty = (struct ansittydev *)tty->mtd_ohandle_ptr;
 	if (!chrdev_isansitty(atty))
 		goto done_tty;
@@ -895,23 +885,11 @@ done:
 
 
 /* Keyboard character device operators */
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
 kbddev_v_read(struct mfile *__restrict self,
               USER CHECKED void *dst, size_t num_bytes,
-              iomode_t mode) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) size_t KCALL
-kbddev_v_read(struct chrdev *__restrict self,
-              USER CHECKED void *dst, size_t num_bytes,
-              iomode_t mode) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+              iomode_t mode) THROWS(...) {
 	struct kbddev *me = mfile_askbd(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct kbddev *me = (struct kbddev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
 	size_t result;
 	for (result = 0; result < num_bytes; ++result) {
 		int ch;
@@ -945,7 +923,6 @@ do_append_ch:
 	return result;
 }
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
 kbddev_v_stat(struct mfile *__restrict self,
               USER CHECKED struct stat *result) THROWS(...) {
@@ -955,19 +932,6 @@ kbddev_v_stat(struct mfile *__restrict self,
 	bufsize += ATOMIC_READ(me->kd_buf.kb_bufstate.bs_state.s_used); /* XXX: This is inexact */
 	result->st_size = bufsize;
 }
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) void KCALL
-kbddev_v_stat(struct chrdev *__restrict self,
-              USER CHECKED struct stat *result) THROWS(...) {
-	struct kbddev *me;
-	size_t bufsize;
-	me = (struct kbddev *)self;
-	result->st_blksize = sizeof(char);
-	bufsize = ATOMIC_READ(me->kd_pendsz);
-	bufsize += ATOMIC_READ(me->kd_buf.kb_bufstate.bs_state.s_used); /* XXX: This is inexact */
-	result->st_size = bufsize;
-}
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 LOCAL bool KCALL
@@ -979,7 +943,6 @@ keyboard_device_canread(struct kbddev *__restrict self) {
 	return used != 0;
 }
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
 kbddev_v_pollconnect(struct mfile *__restrict self,
                      poll_mode_t what) THROWS(...) {
@@ -998,28 +961,6 @@ kbddev_v_polltest(struct mfile *__restrict self,
 	}
 	return 0;
 }
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) void KCALL
-kbddev_v_pollconnect(struct chrdev *__restrict self,
-                            poll_mode_t what) THROWS(...) {
-	struct kbddev *me;
-	me = (struct kbddev *)self;
-	if (what & POLLINMASK)
-		task_connect_for_poll(&me->kd_buf.kb_avail);
-}
-
-PUBLIC NONNULL((1)) poll_mode_t KCALL
-kbddev_v_polltest(struct chrdev *__restrict self,
-                  poll_mode_t what) THROWS(...) {
-	struct kbddev *me;
-	me = (struct kbddev *)self;
-	if (what & POLLINMASK) {
-		if (keyboard_device_canread(me))
-			return POLLINMASK;
-	}
-	return 0;
-}
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 
@@ -1069,23 +1010,11 @@ linux_keyboard_setmeta(struct kbddev *__restrict self,
 
 
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 kbddev_v_ioctl(struct mfile *__restrict self,
                syscall_ulong_t cmd, USER UNCHECKED void *arg,
-               iomode_t mode) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) syscall_slong_t KCALL
-kbddev_v_ioctl(struct chrdev *__restrict self,
-               syscall_ulong_t cmd, USER UNCHECKED void *arg,
-               iomode_t mode) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+               iomode_t mode) THROWS(...) {
 	struct kbddev *me = mfile_askbd(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct kbddev *me = (struct kbddev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
 	(void)mode;
 	switch (cmd) {
 
@@ -1511,13 +1440,7 @@ continue_copy_keymap:
 	 *       had to be freshly cached then (the ones that weren't) */
 
 	default:
-#ifdef CONFIG_USE_NEW_FS
 		return chrdev_v_ioctl(me, cmd, arg, mode);
-#else /* CONFIG_USE_NEW_FS */
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-		      cmd);
-#endif /* !CONFIG_USE_NEW_FS */
 		break;
 	}
 	return 0;
@@ -1525,7 +1448,6 @@ continue_copy_keymap:
 
 
 
-#ifdef CONFIG_USE_NEW_FS
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL kbddev_v_destroy)(struct mfile *__restrict self) {
 	struct kbddev *me = mfile_askbd(self);
@@ -1543,47 +1465,6 @@ PUBLIC_CONST struct mfile_stream_ops const kbddev_v_stream_ops = {
 	.mso_hop         = &kbddev_v_hop,
 	.mso_tryas       = &kbddev_v_tryas,
 };
-
-#else /* CONFIG_USE_NEW_FS */
-
-/* Initialize/finalize the given keyboard device.
- * NOTE: Drivers that override  the `ct_fini' operator  of a given  keyboard
- *       must ensure that `keyboard_device_fini()' is still invoked by their
- *       override.
- * NOTE: The following operators are intrinsically provided by keyboard,
- *       get  initialized  by   `kbddev_init()',  and   should  not   be
- *       overwritten:
- *         - ct_read
- *         - ct_ioctl
- *         - ct_stat
- *         - ct_poll */
-PUBLIC NOBLOCK void
-NOTHROW(KCALL kbddev_init)(struct kbddev *__restrict self,
-                                    struct kbddev_ops const *__restrict ops) {
-	memcpy(&self->kd_ops, ops, sizeof(struct kbddev_ops));
-	assert(self->cd_type.ct_driver != NULL);
-	self->cd_type.ct_fini        = (void(KCALL *)(struct chrdev *__restrict))&keyboard_device_fini;
-	self->cd_type.ct_read        = &kbddev_v_read;
-	self->cd_type.ct_ioctl       = &kbddev_v_ioctl;
-	self->cd_type.ct_stat        = &kbddev_v_stat;
-	self->cd_type.ct_pollconnect = &kbddev_v_pollconnect;
-	self->cd_type.ct_polltest    = &kbddev_v_polltest;
-	self->kd_flags = K_UNICODE; /* Use unicode by default. */
-	/* Enable DBGF12 by default when building with the builtin debugger enabled. */
-#if !defined(CONFIG_NO_DEBUGGER) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
-	self->kd_flags |= KEYBOARD_DEVICE_FLAG_DBGF12;
-#endif /* !CONFIG_NO_DEBUGGER && KEYBOARD_DEVICE_FLAG_DBGF12 */
-	keymap_init_en_US(&self->kd_map);
-	shared_lock_cinit(&self->kd_leds_lock);
-	atomic_rwlock_cinit(&self->kd_map_lock);
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL keyboard_device_fini)(struct kbddev *__restrict self) {
-	kfree((byte_t *)self->kd_map.km_ext);
-}
-#endif /* !CONFIG_USE_NEW_FS */
-
 
 
 DECL_END

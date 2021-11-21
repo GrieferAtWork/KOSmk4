@@ -22,12 +22,9 @@
 
 #include <kernel/compiler.h>
 
-/* Special sub-class of `struct flnknode' with a fixed (constant) string expansion. */
-
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/lnknode.h>
+
+/* Special sub-class of `struct flnknode' with a fixed (constant) string expansion. */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -107,6 +104,5 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_CLNKNODE_H */

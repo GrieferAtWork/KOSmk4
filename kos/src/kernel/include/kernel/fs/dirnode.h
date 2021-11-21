@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/node.h>
 #include <kernel/types.h>
 
@@ -623,9 +620,7 @@ fdirnode_rename(struct fdirnode *__restrict self,
 		THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_IOERROR, ...);
 
-
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_DIRNODE_H */

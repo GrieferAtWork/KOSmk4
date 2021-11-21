@@ -82,30 +82,6 @@ NOTHROW(KCALL ttydev_log_delsession)(struct ttydev *__restrict self,
 
 
 
-#ifndef CONFIG_USE_NEW_FS
-/* Initialize a given TTY character device. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ttydev_cinit)(struct ttydev *__restrict self,
-                                    pterminal_oprinter_t oprinter) {
-	awref_cinit(&self->t_cproc, NULL);
-	axref_cinit(&self->t_fproc, NULL);
-	self->cd_type.ct_fini        = &ttydev_v_fini;
-	self->cd_type.ct_read        = &ttydev_v_read;
-	self->cd_type.ct_write       = &ttydev_v_write;
-	self->cd_type.ct_pollconnect = &ttydev_v_pollconnect;
-	self->cd_type.ct_polltest    = &ttydev_v_polltest;
-	self->cd_type.ct_ioctl       = &ttydev_v_ioctl;
-	self->cd_type.ct_stat        = &ttydev_v_stat;
-	/* Initialize the terminal driver. */
-	terminal_init(&self->t_term,
-	              oprinter,
-	              &__ttydev_v_raise,
-	              &__ttydev_v_chk_sigttou);
-}
-#endif /* !CONFIG_USE_NEW_FS */
-
-
-
 PRIVATE NONNULL((1)) void KCALL
 kernel_terminal_check_sigtty(struct terminal *__restrict self,
                              bool is_SIGTTOU) {
@@ -277,80 +253,42 @@ ttydev_v_raise(struct terminal *__restrict self,
 }
 
 /* Default tty operators. */
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
 ttydev_v_read(struct mfile *__restrict self,
               USER CHECKED void *dst,
-              size_t num_bytes, iomode_t mode) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) size_t KCALL
-ttydev_v_read(struct chrdev *__restrict self,
-              USER CHECKED void *dst,
-              size_t num_bytes, iomode_t mode) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
+              size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
-#ifdef CONFIG_USE_NEW_FS
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
-#else /* CONFIG_USE_NEW_FS */
-	struct ttydev *me = (struct ttydev *)self;
-	assert(chrdev_istty(self));
-#endif /* !CONFIG_USE_NEW_FS */
 	kernel_terminal_check_sigtty(&me->t_term, false);
 	result = terminal_iread(&me->t_term, dst, num_bytes, mode);
 	assert(result <= num_bytes);
 	return result;
 }
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
 ttydev_v_write(struct mfile *__restrict self,
                USER CHECKED void const *src,
-               size_t num_bytes, iomode_t mode) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) size_t KCALL
-ttydev_v_write(struct chrdev *__restrict self,
-               USER CHECKED void const *src,
-               size_t num_bytes, iomode_t mode) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
+               size_t num_bytes, iomode_t mode) THROWS(...) {
 	ssize_t result;
-#ifdef CONFIG_USE_NEW_FS
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
-#else /* CONFIG_USE_NEW_FS */
-	struct ttydev *me = (struct ttydev *)self;
-	assert(chrdev_istty(self));
-#endif /* !CONFIG_USE_NEW_FS */
 	result = terminal_owrite(&me->t_term, src, num_bytes, mode);
 	assert((size_t)result <= num_bytes);
 	return (size_t)result;
 }
 
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ttydev_v_destroy)(struct mfile *__restrict self)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ttydev_v_fini)(struct chrdev *__restrict self)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+NOTHROW(KCALL ttydev_v_destroy)(struct mfile *__restrict self) {
 	struct ttydev *me = mfile_astty(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct ttydev *me = (struct ttydev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
 	assertf(!awref_ptr(&me->t_cproc),
 	        "A session leader should be holding a reference to their CTTY, "
 	        "meaning that if we truly were supposed to be a CTTY, the "
 	        "associated session should have kept us from being destroyed");
 	terminal_fini(&me->t_term);
 	axref_fini(&me->t_fproc);
-#ifdef CONFIG_USE_NEW_FS
 	chrdev_v_destroy(self);
-#endif /* CONFIG_USE_NEW_FS */
 }
 
 
@@ -455,23 +393,11 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 
 
 /* @return: -EINVAL: Unsupported `cmd' */
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 _ttydev_tryioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
-                 USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) syscall_slong_t KCALL
-_ttydev_tryioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-                 USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+                 USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
-#else /* CONFIG_USE_NEW_FS */
-	struct ttydev *me = (struct ttydev *)self;
-	assert(chrdev_istty(self));
-#endif /* !CONFIG_USE_NEW_FS */
 	switch (cmd) {
 
 	case TCGETS:
@@ -958,47 +884,21 @@ done:
 }
 
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ttydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
-               USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ttydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-               USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
+               USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	syscall_slong_t result;
 	result = _ttydev_tryioctl(self, cmd, arg, mode);
-	if (result == -EINVAL) {
-#ifdef CONFIG_USE_NEW_FS
-		return chrdev_v_ioctl(self, cmd, arg, mode);
-#else /* CONFIG_USE_NEW_FS */
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-		      cmd);
-#endif /* !CONFIG_USE_NEW_FS */
-	}
+	if (result == -EINVAL)
+		result = chrdev_v_ioctl(self, cmd, arg, mode);
 	return result;
 }
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
 ttydev_v_pollconnect(struct mfile *__restrict self,
-                     poll_mode_t what) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) void KCALL
-ttydev_v_pollconnect(struct chrdev *__restrict self,
-                     poll_mode_t what) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+                     poll_mode_t what) THROWS(...) {
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
-#else /* CONFIG_USE_NEW_FS */
-	struct ttydev *me = (struct ttydev *)self;
-	assert(chrdev_istty(self));
-#endif /* !CONFIG_USE_NEW_FS */
 	if (what & POLLINMASK)
 		terminal_pollconnect_iread(&me->t_term);
 	if (what & POLLOUTMASK) {
@@ -1009,24 +909,12 @@ ttydev_v_pollconnect(struct chrdev *__restrict self,
 	}
 }
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) poll_mode_t KCALL
 ttydev_v_polltest(struct mfile *__restrict self,
-                  poll_mode_t what) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) poll_mode_t KCALL
-ttydev_v_polltest(struct chrdev *__restrict self,
-                  poll_mode_t what) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
+                  poll_mode_t what) THROWS(...) {
 	poll_mode_t result = 0;
-#ifdef CONFIG_USE_NEW_FS
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
-#else /* CONFIG_USE_NEW_FS */
-	struct ttydev *me = (struct ttydev *)self;
-	assert(chrdev_istty(self));
-#endif /* !CONFIG_USE_NEW_FS */
 	if (what & POLLINMASK) {
 		if (terminal_caniread(&me->t_term))
 			result |= POLLINMASK;
@@ -1040,23 +928,11 @@ ttydev_v_polltest(struct chrdev *__restrict self,
 }
 
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
 ttydev_v_stat(struct mfile *__restrict self,
-              USER CHECKED struct stat *result) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) void KCALL
-ttydev_v_stat(struct chrdev *__restrict self,
-              USER CHECKED struct stat *result) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+              USER CHECKED struct stat *result) THROWS(...) {
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
-#else /* CONFIG_USE_NEW_FS */
-	struct ttydev *me = (struct ttydev *)self;
-	assert(chrdev_istty(self));
-#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Try to give user-space an estimate on the number of unread input bytes. */
 	result->st_size = ATOMIC_READ(me->t_term.t_ibuf.rb_avail) +

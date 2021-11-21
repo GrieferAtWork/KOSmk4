@@ -137,42 +137,12 @@ NOTHROW(KCALL nic_packet_destroy)(struct nic_packet *__restrict self) {
 
 
 
-#ifdef CONFIG_USE_NEW_FS
-
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL nicdev_v_destroy)(struct mfile *__restrict self) {
 	struct nicdev *me = mfile_asnic(self);
 	network_fini(&me->nd_net);
 	chrdev_v_destroy(self);
 }
-
-#else /* CONFIG_USE_NEW_FS */
-/* Initialize a given NIC device. */
-PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL nicdev_cinit)(struct nicdev *__restrict self,
-                                struct nicdev_ops const *__restrict ops) {
-	assert(ops);
-	assert(ops->nd_send);
-	assert(ops->nd_setflags);
-	network_cinit(&self->nd_net);
-	memcpy(&self->nd_ops, ops, sizeof(struct nicdev_ops));
-	self->cd_type.ct_write = &nicdev_v_write;
-	self->cd_type.ct_fini  = &nicdev_v_fini;
-	/* Default-configure the nic's IP address to broadcast, so
-	 * we can already send/receive IP packets before acquiring
-	 * a proper IP address from DHCP or some other source. */
-	self->nd_addr.na_ip = htonl(INADDR_BROADCAST);
-}
-
-/* Default finalizer for NIC devices.
- * NOTE: Must be called by drivers when `cd_type.ct_fini' gets overwritten. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL nicdev_v_fini)(struct chrdev *__restrict self) {
-	struct nicdev *me;
-	me = (struct nicdev *)self,
-	network_fini(&me->nd_net);
-}
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 
@@ -209,26 +179,13 @@ nicdev_send_background(struct nicdev *__restrict self,
 
 
 /* Default write-operator for NIC devices. */
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
 nicdev_v_write(struct mfile *__restrict self,
                USER CHECKED void const *src,
                size_t num_bytes, iomode_t UNUSED(mode))
-		THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) size_t KCALL
-nicdev_v_write(struct chrdev *__restrict self,
-               USER CHECKED void const *src,
-               size_t num_bytes, iomode_t UNUSED(mode))
-		THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-	REF struct nic_packet *packet;
-#ifdef CONFIG_USE_NEW_FS
+		THROWS(...) {
 	struct nicdev *me = mfile_asnic(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct nicdev *me = (struct nicdev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
+	REF struct nic_packet *packet;
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 
@@ -246,14 +203,12 @@ nicdev_v_write(struct chrdev *__restrict self,
 	return num_bytes;
 }
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC_CONST struct mfile_stream_ops const nicdev_v_stream_ops = {
 	.mso_write = &nicdev_v_write,
 	.mso_ioctl = &nicdev_v_ioctl,
 	.mso_hop   = &nicdev_v_hop,
 	.mso_tryas = &nicdev_v_tryas,
 };
-#endif /* CONFIG_USE_NEW_FS */
 
 
 

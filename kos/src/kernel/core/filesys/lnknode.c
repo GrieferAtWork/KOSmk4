@@ -52,7 +52,7 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
 
 	/* Load the link text length and assert that it is correct. */
 	COMPILER_READ_BARRIER();
-	result = (size_t)__atomic64_val(self->mf_filesize);
+	result = (size_t)mfile_getsize_nonatomic(self);
 	assert(result >= strlen(linkstr) * sizeof(char));
 
 	/* Copy link text into user-space buffer. */
@@ -74,7 +74,7 @@ clnknode_v_readlink(struct flnknode *__restrict self,
 	struct clnknode *me;
 	size_t result;
 	me     = (struct clnknode *)self;
-	result = (size_t)__atomic64_val(me->mf_filesize);
+	result = (size_t)mfile_getsize_nonatomic(me);
 	if (bufsize > result)
 		bufsize = result;
 	memcpy(buf, me->lnc_text, bufsize);

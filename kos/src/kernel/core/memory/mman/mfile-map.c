@@ -52,11 +52,9 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-#ifdef CONFIG_USE_NEW_FS
 #define IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)                            \
 	(((file)->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) == MFILE_F_READONLY && \
 	 ((self)->mfm_prot & (PROT_WRITE | PROT_SHARED | PROT_FORCEWRITE)) == (PROT_WRITE | PROT_SHARED))
-#endif /* CONFIG_USE_NEW_FS */
 
 
 PUBLIC NONNULL((1)) void
@@ -320,12 +318,10 @@ again_getpart:
 				decref(part);
 				goto again_getpart;
 			}
-#ifdef CONFIG_USE_NEW_FS
 			if unlikely(IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)) {
 				mpart_lock_release(part);
 				THROW(E_FSERROR_READONLY);
 			}
-#endif /* CONFIG_USE_NEW_FS */
 		} EXCEPT {
 			decref(part);
 			RETHROW();
@@ -832,13 +828,11 @@ again:
 		goto again;
 	}
 
-#ifdef CONFIG_USE_NEW_FS
 	/* Make sure that the file isn't read-only if we're mapping as SHARED|WRITE */
 	if unlikely(IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)) {
 		mfile_map_release(self);
 		THROW(E_FSERROR_READONLY);
 	}
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* Populate the mapping if the callers wants this. */
 	if (self->mfm_flags & MAP_POPULATE) {
@@ -891,13 +885,11 @@ mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
 		goto fail;
 	}
 
-#ifdef CONFIG_USE_NEW_FS
 	/* Make sure that the file isn't read-only if we're mapping as SHARED|WRITE */
 	if unlikely(IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)) {
 		mfile_map_release(self);
 		THROW(E_FSERROR_READONLY);
 	}
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* Populate the mapping if the callers wants this. */
 	if (self->mfm_flags & MAP_POPULATE) {

@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/node.h>
 #include <kernel/fs/super.h>
 #include <kernel/mman/mfile.h>
@@ -153,7 +152,7 @@ mfile_truncate(struct mfile *__restrict self, pos_t new_size)
 	pos_t aligned_old_size;
 	pos_t aligned_new_size;
 again:
-	old_size = (pos_t)atomic64_read(&self->mf_filesize);
+	old_size = mfile_getsize(self);
 	if (new_size >= old_size) {
 handle_newsize_ge_oldsize:
 		if (new_size == old_size)
@@ -268,7 +267,7 @@ handle_newsize_ge_oldsize:
 		/* Verify that  the foreign  trunc-lock still  exists.
 		 * Also check that the file-size hasn't changed again. */
 		if unlikely(ATOMIC_READ(self->mf_trunclock) != 0 ||
-		            old_size != (pos_t)atomic64_read(&self->mf_filesize)) {
+		            old_size != mfile_getsize(self)) {
 			task_disconnectall();
 			goto again;
 		}
@@ -377,7 +376,7 @@ again_handle_overlapping_part:
 again_reacquire_after_split:
 			TRY {
 				/* Check-check if stuff changed. */
-				old_size = (pos_t)atomic64_read(&self->mf_filesize);
+				old_size = mfile_getsize(self);
 				if unlikely(new_size >= old_size) {
 					decref_unlikely(mpart_merge(overlapping_part));
 					goto handle_newsize_ge_oldsize;
@@ -522,7 +521,5 @@ after_file_size_changed:
 
 
 DECL_END
-
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_TRUNC_C */

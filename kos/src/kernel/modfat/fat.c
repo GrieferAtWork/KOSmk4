@@ -28,7 +28,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_FS
 #include <kernel/driver-callbacks.h>
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
@@ -3290,7 +3289,5 @@ PRIVATE DRIVER_FINI void KCALL Fat_Fini(void) {
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 
 DECL_END
-
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_MODFAT_FAT_C */

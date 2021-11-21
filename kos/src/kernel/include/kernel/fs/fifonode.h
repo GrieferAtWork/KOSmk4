@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/node.h>
 #include <kernel/types.h>
 
@@ -260,6 +257,5 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_FIFONODE_H */

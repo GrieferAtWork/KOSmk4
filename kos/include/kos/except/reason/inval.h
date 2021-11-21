@@ -61,20 +61,6 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE,                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `writef()' could not be masked by `IO_USERF_MASK'. */
 	E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE,                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `preadf()' could not be masked by `IO_USERF_MASK'. */
 	E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `pwritef()' could not be masked by `IO_USERF_MASK'. */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_OPENNODE_FLAGS,       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_OPENNODE_FLAG_*' flag passed in `hop_directory_opennode::don_flags' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_CREATFILE_OFLAGS,     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed in `hop_directory_creatfile::dcf_oflags' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_CREATFILE_MODE,       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `hop_directory_creatfile::dcf_mode' cannot be masked by `07777'. */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_REMOVE_FLAGS,         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_REMOVE_FLAG_*' flag passed in `hop_directory_remove::drm_flags'
-	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Neither `HOP_DIRECTORY_REMOVE_FLAG_REGULAR', nor `HOP_DIRECTORY_REMOVE_FLAG_DIRECTORY' was given in `hop_directory_remove::dr_flags' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_RENAME_FLAGS,         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_RENAME_FLAG_*' flag passed in `hop_directory_rename::drn_flags' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_LINK_FLAGS,           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_LINK_FLAG_*' flag passed in `hop_directory_link::dli_flags' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_SYMLINK_FLAGS,        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_SYMLINK_FLAG_*' flag passed in `hop_directory_symlink::dsl_flags' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_SYMLINK_MODE,         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `hop_directory_symlink::dsl_mode' cannot be masked by `07777'. */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_FLAGS,          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_MKNOD_FLAG_*' flag passed in `hop_directory_mknod::dmn_flags' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_MODE,           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The mode argument passed in `hop_directory_mknod::dmn_mode' cannot be masked by `07777 | S_IFMT'.
-	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_MASK: When masked by `S_IFMT', the mode argument passed in `hop_directory_mknod::dmn_mode' doesn't evaluate to one of `S_IFREG', `S_IFCHR' or `S_IFBLK' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKDIR_FLAGS,          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_MKDIR_FLAG_*' flag passed in `hop_directory_mkdir::dmd_flags' */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKDIR_MODE,           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The mode argument passed in `hop_directory_mkdir::dmd_mode' cannot be masked by `07777'. */
 	E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL,                       /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
 	E_INVALID_ARGUMENT_CONTEXT_FREALPATH4_FLAGS,                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `frealpath4' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_ALTPATH|AT_READLINK_REQSIZE|AT_DOSPATH' */
 	E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value for `whence' in `lseek()' */
@@ -289,20 +275,6 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE                        E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `writef()' could not be masked by `IO_USERF_MASK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE                        E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `preadf()' could not be masked by `IO_USERF_MASK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE                       E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `pwritef()' could not be masked by `IO_USERF_MASK'. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_OPENNODE_FLAGS       E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_OPENNODE_FLAGS       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_OPENNODE_FLAG_*' flag passed in `hop_directory_opennode::don_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_CREATFILE_OFLAGS     E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_CREATFILE_OFLAGS     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed in `hop_directory_creatfile::dcf_oflags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_CREATFILE_MODE       E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_CREATFILE_MODE       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `hop_directory_creatfile::dcf_mode' cannot be masked by `07777'. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_REMOVE_FLAGS         E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_REMOVE_FLAGS         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_REMOVE_FLAG_*' flag passed in `hop_directory_remove::drm_flags'
-                                                                                                                                     * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Neither `HOP_DIRECTORY_REMOVE_FLAG_REGULAR', nor `HOP_DIRECTORY_REMOVE_FLAG_DIRECTORY' was given in `hop_directory_remove::dr_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_RENAME_FLAGS         E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_RENAME_FLAGS         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_RENAME_FLAG_*' flag passed in `hop_directory_rename::drn_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_LINK_FLAGS           E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_LINK_FLAGS           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_LINK_FLAG_*' flag passed in `hop_directory_link::dli_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_SYMLINK_FLAGS        E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_SYMLINK_FLAGS        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_SYMLINK_FLAG_*' flag passed in `hop_directory_symlink::dsl_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_SYMLINK_MODE         E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_SYMLINK_MODE         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `hop_directory_symlink::dsl_mode' cannot be masked by `07777'. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_FLAGS          E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_FLAGS          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_MKNOD_FLAG_*' flag passed in `hop_directory_mknod::dmn_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_MODE           E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_MODE           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The mode argument passed in `hop_directory_mknod::dmn_mode' cannot be masked by `07777 | S_IFMT'.
-                                                                                                                                     * E_INVALID_ARGUMENT_BAD_FLAG_MASK: When masked by `S_IFMT', the mode argument passed in `hop_directory_mknod::dmn_mode' doesn't evaluate to one of `S_IFREG', `S_IFCHR' or `S_IFBLK' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKDIR_FLAGS          E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKDIR_FLAGS          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_MKDIR_FLAG_*' flag passed in `hop_directory_mkdir::dmd_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKDIR_MODE           E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKDIR_MODE           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The mode argument passed in `hop_directory_mkdir::dmd_mode' cannot be masked by `07777'. */
 #define E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL                       E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL                       /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
 #define E_INVALID_ARGUMENT_CONTEXT_FREALPATH4_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_FREALPATH4_FLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `frealpath4' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_ALTPATH|AT_READLINK_REQSIZE|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE                       E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value for `whence' in `lseek()' */
@@ -514,198 +486,184 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE                        25  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `writef()' could not be masked by `IO_USERF_MASK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE                        26  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `preadf()' could not be masked by `IO_USERF_MASK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE                       27  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `pwritef()' could not be masked by `IO_USERF_MASK'. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_OPENNODE_FLAGS       28  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_OPENNODE_FLAG_*' flag passed in `hop_directory_opennode::don_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_CREATFILE_OFLAGS     29  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed in `hop_directory_creatfile::dcf_oflags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_CREATFILE_MODE       30  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `hop_directory_creatfile::dcf_mode' cannot be masked by `07777'. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_REMOVE_FLAGS         31  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_REMOVE_FLAG_*' flag passed in `hop_directory_remove::drm_flags'
-                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Neither `HOP_DIRECTORY_REMOVE_FLAG_REGULAR', nor `HOP_DIRECTORY_REMOVE_FLAG_DIRECTORY' was given in `hop_directory_remove::dr_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_RENAME_FLAGS         32  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_RENAME_FLAG_*' flag passed in `hop_directory_rename::drn_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_LINK_FLAGS           33  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_LINK_FLAG_*' flag passed in `hop_directory_link::dli_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_SYMLINK_FLAGS        34  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_SYMLINK_FLAG_*' flag passed in `hop_directory_symlink::dsl_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_SYMLINK_MODE         35  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `hop_directory_symlink::dsl_mode' cannot be masked by `07777'. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_FLAGS          36  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_MKNOD_FLAG_*' flag passed in `hop_directory_mknod::dmn_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_MODE           37  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The mode argument passed in `hop_directory_mknod::dmn_mode' cannot be masked by `07777 | S_IFMT'.
-                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_MASK: When masked by `S_IFMT', the mode argument passed in `hop_directory_mknod::dmn_mode' doesn't evaluate to one of `S_IFREG', `S_IFCHR' or `S_IFBLK' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKDIR_FLAGS          38  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `HOP_DIRECTORY_MKDIR_FLAG_*' flag passed in `hop_directory_mkdir::dmd_flags' */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKDIR_MODE           39  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The mode argument passed in `hop_directory_mkdir::dmd_mode' cannot be masked by `07777'. */
-#define E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL                       40  /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
-#define E_INVALID_ARGUMENT_CONTEXT_FREALPATH4_FLAGS                   41  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `frealpath4' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_ALTPATH|AT_READLINK_REQSIZE|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE                       42  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value for `whence' in `lseek()' */
-#define E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE                      43  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' contains invalid/unknown flags
+#define E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL                       28  /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
+#define E_INVALID_ARGUMENT_CONTEXT_FREALPATH4_FLAGS                   29  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `frealpath4' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_ALTPATH|AT_READLINK_REQSIZE|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE                       30  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value for `whence' in `lseek()' */
+#define E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE                      31  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' contains invalid/unknown flags
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `mode & READDIR_MODEMASK' isn't recognized */
-#define E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_FLAGS                  44  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid set of `MAP_*' flags passed to `loadlibrary()' */
-#define E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_NOMAPPINGS             45  /* E_INVALID_ARGUMENT_BAD_VALUE: No non-empty program headers were given. */
-#define E_INVALID_ARGUMENT_CONTEXT_KFSTATAT_FLAGS                     46  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `kfstatat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_FREADLINKAT_FLAGS                  47  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `freadlinkat' isn't a set of `0|AT_READLINK_REQSIZE|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_FCHMODAT_FLAGS                     48  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchmodat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS                     49  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchownat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS                     50  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `execveat' isn't a set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS                     51  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `options' argument passed to `waitid()' isn't a set of `WNOHANG|WNOREAP|WEXITED|WSTOPPED|WCONTINUED'
+#define E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_FLAGS                  32  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid set of `MAP_*' flags passed to `loadlibrary()' */
+#define E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_NOMAPPINGS             33  /* E_INVALID_ARGUMENT_BAD_VALUE: No non-empty program headers were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_KFSTATAT_FLAGS                     34  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `kfstatat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_FREADLINKAT_FLAGS                  35  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `freadlinkat' isn't a set of `0|AT_READLINK_REQSIZE|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_FCHMODAT_FLAGS                     36  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchmodat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS                     37  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchownat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS                     38  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `execveat' isn't a set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS                     39  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `options' argument passed to `waitid()' isn't a set of `WNOHANG|WNOREAP|WEXITED|WSTOPPED|WCONTINUED'
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: The `options' argument passed to `waitid()' contains none of `WEXITED|WSTOPPED|WCONTINUED' */
-#define E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH                       52  /* E_INVALID_ARGUMENT_BAD_VALUE: The `which' value passed to `waitid()' isn't one of `P_ALL,P_PID,P_PGID' */
-#define E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS                      53  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `options' argument passed to `wait4()' isn't a set of `WNOHANG|WUNTRACED|WCONTINUED|WNOWAIT' */
-#define E_INVALID_ARGUMENT_CONTEXT_USERKERN_BASE                      54  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to set a user-space address as the base of the `struct userkern' segment */
-#define E_INVALID_ARGUMENT_CONTEXT_USERKERN_PPID                      55  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write a value other than `0' to `struct userkern::ut_ppid' */
-#define E_INVALID_ARGUMENT_CONTEXT_USERKERN_SID                       56  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid value to `struct userkern::ut_sid' */
-#define E_INVALID_ARGUMENT_CONTEXT_MPROTECT_PROT                      57  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `prot' argument passed to `mprotect()' isn't a set of `PROT_EXEC|PROT_WRITE|PROT_READ' */
-#define E_INVALID_ARGUMENT_CONTEXT_FCHDIRAT_FLAGS                     58  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchdirat()' isn't a set of `0|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_FLAGS                 59  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `rpc_schedule()' is malformed */
-#define E_INVALID_ARGUMENT_CONTEXT_KREADDIRF_IOMODE                   60  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `iomode' passed to `kreaddirf()' could not be masked by `IO_USERF_MASK'. */
-#define E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                        61  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
-#define E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                    62  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
-#define E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT                      63  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `sysctl_driver_insmod::im_format', `sysctl_driver_delmod::dm_format' or `sysctl_driver_getmod::gm_format' wasn't one of `SYSCTL_DRIVER_FORMAT_*', or wasn't recognized as valid in the specific context */
-#define E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS                       64  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_insmod::im_flags' cannot be masked by `KSYSCTL_DRIVER_INSMOD_F*' */
-#define E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                       65  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `KSYSCTL_DRIVER_DELMOD_F*' */
-#define E_INVALID_ARGUMENT_CONTEXT_RENAMEAT2_FLAGS                    66  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `renameat2()' isn't a set of `0|AT_DOSPATH|RENAME_NOREPLACE|RENAME_EXCHANGE|RENAME_MOVETODIR|RENAME_WHITEOUT'
+#define E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH                       40  /* E_INVALID_ARGUMENT_BAD_VALUE: The `which' value passed to `waitid()' isn't one of `P_ALL,P_PID,P_PGID' */
+#define E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS                      41  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `options' argument passed to `wait4()' isn't a set of `WNOHANG|WUNTRACED|WCONTINUED|WNOWAIT' */
+#define E_INVALID_ARGUMENT_CONTEXT_USERKERN_BASE                      42  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to set a user-space address as the base of the `struct userkern' segment */
+#define E_INVALID_ARGUMENT_CONTEXT_USERKERN_PPID                      43  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write a value other than `0' to `struct userkern::ut_ppid' */
+#define E_INVALID_ARGUMENT_CONTEXT_USERKERN_SID                       44  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid value to `struct userkern::ut_sid' */
+#define E_INVALID_ARGUMENT_CONTEXT_MPROTECT_PROT                      45  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `prot' argument passed to `mprotect()' isn't a set of `PROT_EXEC|PROT_WRITE|PROT_READ' */
+#define E_INVALID_ARGUMENT_CONTEXT_FCHDIRAT_FLAGS                     46  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchdirat()' isn't a set of `0|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_FLAGS                 47  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `rpc_schedule()' is malformed */
+#define E_INVALID_ARGUMENT_CONTEXT_KREADDIRF_IOMODE                   48  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `iomode' passed to `kreaddirf()' could not be masked by `IO_USERF_MASK'. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                        49  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
+#define E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                    50  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
+#define E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT                      51  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `sysctl_driver_insmod::im_format', `sysctl_driver_delmod::dm_format' or `sysctl_driver_getmod::gm_format' wasn't one of `SYSCTL_DRIVER_FORMAT_*', or wasn't recognized as valid in the specific context */
+#define E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS                       52  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_insmod::im_flags' cannot be masked by `KSYSCTL_DRIVER_INSMOD_F*' */
+#define E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                       53  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `KSYSCTL_DRIVER_DELMOD_F*' */
+#define E_INVALID_ARGUMENT_CONTEXT_RENAMEAT2_FLAGS                    54  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `renameat2()' isn't a set of `0|AT_DOSPATH|RENAME_NOREPLACE|RENAME_EXCHANGE|RENAME_MOVETODIR|RENAME_WHITEOUT'
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: both `AT_RENAME_NOREPLACE' and `AT_RENAME_EXCHANGE' were given to `renameat2()' */
-#define E_INVALID_ARGUMENT_CONTEXT_FSYMLINKAT_FLAGS                   67  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fsymlinkat()' isn't a set of `0|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS                     68  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmknodat()' isn't a set of `0|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_FMKDIRAT_FLAGS                     69  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmkdirat()' isn't a set of `0|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_TCXONC_COMMAND                     70  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCXONC)' isn't one of `TC(I|O)(ON|OFF)' */
-#define E_INVALID_ARGUMENT_CONTEXT_TCFLSH_COMMAND                     71  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCFLSH)' isn't one of `TC(I|O|IO)FLUSH' */
-#define E_INVALID_ARGUMENT_CONTEXT_SET_EXCEPTION_HANDLER_MODE         72  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `mode & EXCEPT_HANDLER_MODE_MASK' isn't one of `EXCEPT_HANDLER_MODE_*'
+#define E_INVALID_ARGUMENT_CONTEXT_FSYMLINKAT_FLAGS                   55  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fsymlinkat()' isn't a set of `0|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS                     56  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmknodat()' isn't a set of `0|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_FMKDIRAT_FLAGS                     57  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmkdirat()' isn't a set of `0|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_TCXONC_COMMAND                     58  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCXONC)' isn't one of `TC(I|O)(ON|OFF)' */
+#define E_INVALID_ARGUMENT_CONTEXT_TCFLSH_COMMAND                     59  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCFLSH)' isn't one of `TC(I|O|IO)FLUSH' */
+#define E_INVALID_ARGUMENT_CONTEXT_SET_EXCEPTION_HANDLER_MODE         60  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `mode & EXCEPT_HANDLER_MODE_MASK' isn't one of `EXCEPT_HANDLER_MODE_*'
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG:    The given `mode & ~EXCEPT_HANDLER_MODE_MASK' isn't a set of `EXCEPT_HANDLER_FLAG_*' */
-#define E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER                 73  /* E_INVALID_ARGUMENT_BAD_VALUE: One of the register values passed to sigreturn is invalid (`value' is the arch-specific register ID; e.g. `X86_REGISTER_SEGMENT_SS') */
-#define E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO                        74  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad signal number passed to `raise()', `kill()', `tgkill()', etc. */
-#define E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO                       75  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad trap number passed to `debugtrap()' */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETRDKEY_BADMODE       76  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, KBDIO_SETRDKEY, ...)' */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_TOO_LARGE    77  /* E_INVALID_ARGUMENT_BAD_VALUE: The specified keymap data block is too large */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_BAD_MAPTEXT  78  /* E_INVALID_ARGUMENT_BAD_VALUE: The text contained within the keymap is corrupted/invalid */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_BAD_ENCODING 79  /* E_INVALID_ARGUMENT_BAD_VALUE: The specified default encoding is invalid */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSEIO_SETABSMODE_BADMODE   80  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, MOUSEIO_SETABSMODE, ...)' */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSEIO_SETABSRECT_BADBOUNDS 81  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t minx, miny, maxx, maxy] The bounds specified are invalid and cannot be used */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETDBGF12_BADDMODE     82  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid (or unsupported) value passed as argument to `ioctl(fd, KBDIO_SETDBGF12, ...)' */
-#define E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE                 83  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t given_sigset_size] The sigset size passed to one of the RT signal system calls is incorrect */
-#define E_INVALID_ARGUMENT_CONTEXT_SIGACTION_ACT_FLAGS                84  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to sigaction() or rt_sigaction() isn't a set of `SA_*' */
-#define E_INVALID_ARGUMENT_CONTEXT_SIGPROCMASK_HOW                    85  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `how' passed to `sigprocmask()' (must be one of { SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK }) */
-#define E_INVALID_ARGUMENT_CONTEXT_RAISE_PID                          86  /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_pid] Bad pid value to one of the signal functions */
-#define E_INVALID_ARGUMENT_CONTEXT_RAISE_TID                          87  /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_tid] Bad tid value to one of the signal functions */
-#define E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE              88  /* E_INVALID_ARGUMENT_BAD_VALUE: [int given_code] Attempted to raise a signal using `rt_sigqueueinfo()' or `rt_tgsigqueueinfo()' with a bad `si_code' */
-#define E_INVALID_ARGUMENT_CONTEXT_MKTTY_FLAGS                        89  /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [syscall_ulong_t reserved] The `reserved' argument passed to `mktty()' is non-zero */
-#define E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME                         90  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t namelen, max_namelen] The `name' argument passed to `mktty()' is too long */
-#define E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_TYPE                     91  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `type' argument passed to `faccessat()' isn't a set of `F_OK|R_OK|W_OK|X_OK' */
-#define E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_FLAGS                    92  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `faccessat()' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_EACCESS|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_BUFSIZE                    93  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to read()/write() to/from an eventfd object using a buffer size less that 8 */
-#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_WRITE_FFFFFFFFFFFFFFFFh    94  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t value] Attempted to write 0xffffffffffffffff to an eventfd object */
-#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS                      95  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not masked by `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
-#define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                     96  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
-#define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_BUFSIZE                   97  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to read()/write() to/from an signal object using a buffer size less that sizeof(struct signalfd_siginfo) */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE               98  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER                        99  /* E_INVALID_ARGUMENT_BAD_VALUE: [int intval] Attempted to write an invalid integer to a system configuration file */
-#define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       100 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    101 /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+#define E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER                 61  /* E_INVALID_ARGUMENT_BAD_VALUE: One of the register values passed to sigreturn is invalid (`value' is the arch-specific register ID; e.g. `X86_REGISTER_SEGMENT_SS') */
+#define E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO                        62  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad signal number passed to `raise()', `kill()', `tgkill()', etc. */
+#define E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO                       63  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad trap number passed to `debugtrap()' */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETRDKEY_BADMODE       64  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, KBDIO_SETRDKEY, ...)' */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_TOO_LARGE    65  /* E_INVALID_ARGUMENT_BAD_VALUE: The specified keymap data block is too large */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_BAD_MAPTEXT  66  /* E_INVALID_ARGUMENT_BAD_VALUE: The text contained within the keymap is corrupted/invalid */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_BAD_ENCODING 67  /* E_INVALID_ARGUMENT_BAD_VALUE: The specified default encoding is invalid */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSEIO_SETABSMODE_BADMODE   68  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, MOUSEIO_SETABSMODE, ...)' */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSEIO_SETABSRECT_BADBOUNDS 69  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t minx, miny, maxx, maxy] The bounds specified are invalid and cannot be used */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETDBGF12_BADDMODE     70  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid (or unsupported) value passed as argument to `ioctl(fd, KBDIO_SETDBGF12, ...)' */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE                 71  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t given_sigset_size] The sigset size passed to one of the RT signal system calls is incorrect */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGACTION_ACT_FLAGS                72  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to sigaction() or rt_sigaction() isn't a set of `SA_*' */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGPROCMASK_HOW                    73  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `how' passed to `sigprocmask()' (must be one of { SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK }) */
+#define E_INVALID_ARGUMENT_CONTEXT_RAISE_PID                          74  /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_pid] Bad pid value to one of the signal functions */
+#define E_INVALID_ARGUMENT_CONTEXT_RAISE_TID                          75  /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_tid] Bad tid value to one of the signal functions */
+#define E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE              76  /* E_INVALID_ARGUMENT_BAD_VALUE: [int given_code] Attempted to raise a signal using `rt_sigqueueinfo()' or `rt_tgsigqueueinfo()' with a bad `si_code' */
+#define E_INVALID_ARGUMENT_CONTEXT_MKTTY_FLAGS                        77  /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [syscall_ulong_t reserved] The `reserved' argument passed to `mktty()' is non-zero */
+#define E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME                         78  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t namelen, max_namelen] The `name' argument passed to `mktty()' is too long */
+#define E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_TYPE                     79  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `type' argument passed to `faccessat()' isn't a set of `F_OK|R_OK|W_OK|X_OK' */
+#define E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_FLAGS                    80  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `faccessat()' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_EACCESS|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_BUFSIZE                    81  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to read()/write() to/from an eventfd object using a buffer size less that 8 */
+#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_WRITE_FFFFFFFFFFFFFFFFh    82  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t value] Attempted to write 0xffffffffffffffff to an eventfd object */
+#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS                      83  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not masked by `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                     84  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_BUFSIZE                   85  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to read()/write() to/from an signal object using a buffer size less that sizeof(struct signalfd_siginfo) */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE               86  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER                        87  /* E_INVALID_ARGUMENT_BAD_VALUE: [int intval] Attempted to write an invalid integer to a system configuration file */
+#define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       88  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    89  /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
-#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          102 /* E_INVALID_ARGUMENT_BAD_VALUE:     [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()' or `lfutexexpr()' is invalid.
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          90  /* E_INVALID_ARGUMENT_BAD_VALUE:     [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()' or `lfutexexpr()' is invalid.
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  `LFUTEX_FDBIT' was given to `lfutexexpr(2)', but other flags were also given.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
-#define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         103 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
-#define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       104 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
-#define E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                      105 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t turn_on] The `turn_on' argument is neither `0' nor `1' */
-#define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           106 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
-#define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         107 /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
-#define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        108 /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              109 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
-#define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         110 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
-#define E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         111 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
-#define E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               112 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND                   113 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `listen(2)' on a socket without first calling `bind(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             114 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          115 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 116 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED                 117 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `recv(2)' on a socket without first calling `connect(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED          118 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `connect(2)' or `sendto(2)' on a socket that had already been `connect(2)'ed before. */
-#define E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND                 119 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `bind(2)' or `recvfrom(2)' on a socket that had already been `bind(2)'ed before. */
-#define E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY          120 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `bind()'). */
-#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY       121 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `connect()'). */
-#define E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY        122 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `sendto()'). */
-#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY                  123 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `family' argument passed to `socket(2)' is unknown or unsupported. */
-#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE                    124 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `socket(2)' is unknown or unsupported by the given `family'. */
-#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL                125 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `protocol' argument passed to `socket(2)' is unknown or unsupported by the given `family' and `type'. */
-#define E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS                 126 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of socket flags passed to `sys_accept()' is not masked by `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-#define E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS                     127 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_send()', `sys_sendto()', `sys_sendmsg()' or `sys_sendmmsg()' is not masked by `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-#define E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS                     128 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_recv()', `sys_recvfrom()', `sys_recvmsg()' or `sys_recvmmsg()' is not masked by `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW                       129 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `how' passed to `sys_shutdown()' isn't one of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
-#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    130 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
-#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 131 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
-#define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    132 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
-#define E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS        133 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `open(O_WRONLY | O_NONBLOCK)' a fifo without any readers already connected. */
-#define E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              134 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
-#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS                   135 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_open(2)' was non-zero. */
-#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS                  136 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_getfd(2)' was non-zero. */
-#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS      137 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_send_signal(2)' was non-zero. */
-#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER              138 /* E_INVALID_ARGUMENT_BAD_STATE: The thread specified by `pid' in a call to `pidfd_open(2)' isn't a process leader. */
-#define E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO                      139 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: In a call to `rt_sigqueueinfo(2)', `rt_tgsigqueueinfo(2)' or `pidfd_send_signal(2)',
+#define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         91  /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
+#define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       92  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
+#define E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                      93  /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t turn_on] The `turn_on' argument is neither `0' nor `1' */
+#define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           94  /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
+#define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         95  /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
+#define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        96  /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
+#define E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              97  /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
+#define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         98  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         99  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
+#define E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               100 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND                   101 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `listen(2)' on a socket without first calling `bind(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             102 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          103 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 104 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED                 105 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `recv(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED          106 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `connect(2)' or `sendto(2)' on a socket that had already been `connect(2)'ed before. */
+#define E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND                 107 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `bind(2)' or `recvfrom(2)' on a socket that had already been `bind(2)'ed before. */
+#define E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY          108 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `bind()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY       109 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `connect()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY        110 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `sendto()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY                  111 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `family' argument passed to `socket(2)' is unknown or unsupported. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE                    112 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `socket(2)' is unknown or unsupported by the given `family'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL                113 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `protocol' argument passed to `socket(2)' is unknown or unsupported by the given `family' and `type'. */
+#define E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS                 114 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of socket flags passed to `sys_accept()' is not masked by `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS                     115 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_send()', `sys_sendto()', `sys_sendmsg()' or `sys_sendmmsg()' is not masked by `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+#define E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS                     116 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_recv()', `sys_recvfrom()', `sys_recvmsg()' or `sys_recvmmsg()' is not masked by `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW                       117 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `how' passed to `sys_shutdown()' isn't one of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    118 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
+#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 119 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
+#define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    120 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS        121 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `open(O_WRONLY | O_NONBLOCK)' a fifo without any readers already connected. */
+#define E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              122 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS                   123 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_open(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS                  124 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_getfd(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS      125 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_send_signal(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER              126 /* E_INVALID_ARGUMENT_BAD_STATE: The thread specified by `pid' in a call to `pidfd_open(2)' isn't a process leader. */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO                      127 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: In a call to `rt_sigqueueinfo(2)', `rt_tgsigqueueinfo(2)' or `pidfd_send_signal(2)',
                                                                            *                                        `uinfo' was given, but the pointed-to signal number didn't match the given  `usigno' */
-#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                    140 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME         141 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
-#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       142 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
+#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                    128 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME         129 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
+#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       130 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:  The `what' argument passed to `unshare(2)' isn't a subset of:
                                                                            * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                            *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
-#define E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                          143 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
-#define E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS                144 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
-#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS                145 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `epoll_create1(2)' cannot be masked by `EPOLL_CLOEXEC | EPOLL_CLOFORK' */
-#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                       146 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
-#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS          147 /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
-#define E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED          148 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getsockopt(SOL_SOCKET, SO_PEERCRED)' on a socket that isn't `connect(2)'-ed and wasn't returned by `accept(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   149 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  150 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
-#define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            151 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
-#define E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  152 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
-#define E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL                 153 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FLAGS                       154 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MREMAP_*' flag */
-#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLD_SIZE                    155 /* E_INVALID_ARGUMENT_BAD_VALUE: `old_size' is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE                    156 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_size' is `0' or is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS                 157 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `new_address' isn't aligned with `old_address' in a valid way. */
-#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE            158 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `MREMAP_FIXED' was specified without `MREMAP_MAYMOVE'. */
-#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE           159 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `old_size' was `0', but `MREMAP_MAYMOVE' wasn't given. */
-#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE        160 /* E_INVALID_ARGUMENT_BAD_STATE: `old_size' was `0', but the mapping pointed-to by `old_address' isn't `PROT_SHARED'. */
-#define E_INVALID_ARGUMENT_CONTEXT_MLOCK_SIZE                         161 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mlock(2)' (or `mlock2(2)') is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS                       162 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlock2(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE                       163 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `munlock(2)' is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS                     164 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlockall(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE                         165 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `msync(2)' is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS                        166 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `msync(2)'.
+#define E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                          131 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
+#define E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS                132 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
+#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS                133 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `epoll_create1(2)' cannot be masked by `EPOLL_CLOEXEC | EPOLL_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                       134 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
+#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS          135 /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
+#define E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED          136 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getsockopt(SOL_SOCKET, SO_PEERCRED)' on a socket that isn't `connect(2)'-ed and wasn't returned by `accept(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                   137 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  138 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
+#define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            139 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
+#define E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  140 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL                 141 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FLAGS                       142 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MREMAP_*' flag */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLD_SIZE                    143 /* E_INVALID_ARGUMENT_BAD_VALUE: `old_size' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE                    144 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_size' is `0' or is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS                 145 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `new_address' isn't aligned with `old_address' in a valid way. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE            146 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `MREMAP_FIXED' was specified without `MREMAP_MAYMOVE'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE           147 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `old_size' was `0', but `MREMAP_MAYMOVE' wasn't given. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE        148 /* E_INVALID_ARGUMENT_BAD_STATE: `old_size' was `0', but the mapping pointed-to by `old_address' isn't `PROT_SHARED'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCK_SIZE                         149 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mlock(2)' (or `mlock2(2)') is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS                       150 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlock2(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE                       151 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `munlock(2)' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS                     152 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlockall(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE                         153 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `msync(2)' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS                        154 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `msync(2)'.
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MS_SYNC' and `MS_ASYNC' were given. */
-#define E_INVALID_ARGUMENT_CONTEXT_MINCORE_ADDR                       167 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: The `addr' argument isn't aligned by `PAGESIZE'. */
-#define E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE                       168 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mincore(2)' is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY                      169 /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeySet(3)' is invalid. */
-#define E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS             170 /* E_INVALID_ARGUMENT_BAD_VALUE: The `access_rights' argument passed to `PKeySet(3)' is invalid. */
-#define E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                      171 /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
-#define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                    172 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                  173 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       174 /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PROG_PARAMS_MAX'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            175 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY                 176 /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_MEMORY_MAX' byte locations. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX                  177 /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_FUTEX_MAX' futex objects locations. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW         178 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to push stack value with full stack */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW        179 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to pop stack value with empty stack */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER       180 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access an unknown register */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WORD_SIZE          181 /* E_INVALID_ARGUMENT_BAD_VALUE: The size-operand of `RPC_OP_deref_size' or `RPC_OP_write_size' is invalid */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD       182 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sc_info' is invalid */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO             183 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `RPC_OP_push_sc_info' or `RPC_OP_sppush_sc_info' was used, but no syscall info is available. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB        184 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD        185 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE      186 /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH              187 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
-#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_MOD_RPC                      188 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `EPOLL_CTL_MOD' an RPC monitor, which isn't allowed. */
-#define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID                   189 /* E_INVALID_ARGUMENT_BAD_VALUE: The `uid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
-#define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID                   190 /* E_INVALID_ARGUMENT_BAD_VALUE: The `gid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
-#define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG         191 /* E_INVALID_ARGUMENT_BAD_VALUE: the `name' given `memfd_create(2)' to longer than `249' bytes (excluding the trailing NUL) */
-#define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS                 192 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `memfd_create(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR      193 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:         The flags given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)' isn't a set of `FATATTR_RO | FATATTR_HIDDEN | FATATTR_SYS | FATATTR_VOLUME | FATATTR_DIR | FATATTR_ARCH'.
+#define E_INVALID_ARGUMENT_CONTEXT_MINCORE_ADDR                       155 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: The `addr' argument isn't aligned by `PAGESIZE'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE                       156 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mincore(2)' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY                      157 /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeySet(3)' is invalid. */
+#define E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS             158 /* E_INVALID_ARGUMENT_BAD_VALUE: The `access_rights' argument passed to `PKeySet(3)' is invalid. */
+#define E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                      159 /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
+#define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                    160 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                  161 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       162 /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PROG_PARAMS_MAX'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            163 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY                 164 /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_MEMORY_MAX' byte locations. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX                  165 /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_FUTEX_MAX' futex objects locations. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW         166 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to push stack value with full stack */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW        167 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to pop stack value with empty stack */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER       168 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access an unknown register */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WORD_SIZE          169 /* E_INVALID_ARGUMENT_BAD_VALUE: The size-operand of `RPC_OP_deref_size' or `RPC_OP_write_size' is invalid */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD       170 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sc_info' is invalid */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO             171 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `RPC_OP_push_sc_info' or `RPC_OP_sppush_sc_info' was used, but no syscall info is available. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB        172 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD        173 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE      174 /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH              175 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
+#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_MOD_RPC                      176 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `EPOLL_CTL_MOD' an RPC monitor, which isn't allowed. */
+#define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID                   177 /* E_INVALID_ARGUMENT_BAD_VALUE: The `uid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
+#define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID                   178 /* E_INVALID_ARGUMENT_BAD_VALUE: The `gid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
+#define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG         179 /* E_INVALID_ARGUMENT_BAD_VALUE: the `name' given `memfd_create(2)' to longer than `249' bytes (excluding the trailing NUL) */
+#define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS                 180 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `memfd_create(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR      181 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:         The flags given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)' isn't a set of `FATATTR_RO | FATATTR_HIDDEN | FATATTR_SYS | FATATTR_VOLUME | FATATTR_DIR | FATATTR_ARCH'.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG:        Attempted to change the `FATATTR_VOLUME' or `FATATTR_DIR' flag.
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: All flags from `FATATTR_LFN' were given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                   194 /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
-#define E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT           195 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to use `BLKRRPART' on a block device partition. */
-#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE            196 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Argument to `LEAKS_IOC_SETONCLOSE' isn't one of `LEAKS_ONCLOSE_*' */
-#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               197 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
-#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                198 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
-#define E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT              199 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
-#define E_INVALID_ARGUMENT_CONTEXT_SVGA_INVALID_MODE                  200 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid/unsupported mode given to `SVGA_IOC_SETMODE' / `SVGA_IOC_SETDEFMODE' / `SVGA_IOC_MAKETTY' */
-#define E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET                   201 /* E_INVALID_ARGUMENT_BAD_STATE: `SVGA_IOC_GETMODE' used on a video lock when no mode has been set. */
+#define E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG                   182 /* E_INVALID_ARGUMENT_BAD_VALUE: The name passed to `FS_IOC_SETFSLABEL' is too long. */
+#define E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT           183 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to use `BLKRRPART' on a block device partition. */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE            184 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Argument to `LEAKS_IOC_SETONCLOSE' isn't one of `LEAKS_ONCLOSE_*' */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               185 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
+#define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                186 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT              187 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
+#define E_INVALID_ARGUMENT_CONTEXT_SVGA_INVALID_MODE                  188 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid/unsupported mode given to `SVGA_IOC_SETMODE' / `SVGA_IOC_SETDEFMODE' / `SVGA_IOC_MAKETTY' */
+#define E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET                   189 /* E_INVALID_ARGUMENT_BAD_STATE: `SVGA_IOC_GETMODE' used on a video lock when no mode has been set. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

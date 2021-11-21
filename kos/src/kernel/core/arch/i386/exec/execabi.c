@@ -38,7 +38,6 @@ INTDEF byte_t execabi_system_rtld32_startpage_p[];
 INTDEF byte_t execabi_system_rtld32_numpages[];
 #endif /* __x86_64__ */
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC struct mramfile execabi_system_rtld_file = {
 	.mrf_file = {
 		MFILE_INIT_mf_refcnt(1), /* +1: mfile_ndef */
@@ -90,22 +89,6 @@ PUBLIC struct mramfile execabi_system_rtld32_file = {
 	                            execabi_system_rtld32_size),
 };
 #endif /* __x86_64__ */
-
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC struct mramfile execabi_system_rtld_file =
-MRAMFILE_INIT(execabi_system_rtld_file,
-              (physpage_t)execabi_system_rtld_startpage_p,
-              (size_t)execabi_system_rtld_numpages,
-              execabi_system_rtld_size);
-
-#ifdef __x86_64__
-PUBLIC struct mramfile execabi_system_rtld32_file =
-MRAMFILE_INIT(execabi_system_rtld32_file,
-              (physpage_t)execabi_system_rtld32_startpage_p,
-              (size_t)execabi_system_rtld32_numpages,
-              execabi_system_rtld32_size);
-#endif /* __x86_64__ */
-#endif /* !CONFIG_USE_NEW_FS */
 
 DECL_END
 

@@ -72,12 +72,9 @@ struct mouse_state {
 #define MOUSE_DEVICE_FLAG_NORMAL 0x0000 /* Normal mouse device flags. */
 #define MOUSE_DEVICE_FLAG_GENABS 0x0001 /* Generate absolute mouse packets. */
 
-#ifdef CONFIG_USE_NEW_FS
 struct mousedev_ops {
 	struct chrdev_ops mo_cdev; /* Character device operators. */
 };
-#endif /* CONFIG_USE_NEW_FS */
-
 
 struct mousedev
 #ifndef __WANT_FS_INLINE_STRUCTURES
@@ -100,8 +97,6 @@ struct mousedev
 #endif /* !CONFIG_NO_SMP */
 	WEAK uintptr_t       md_flags; /* Mouse device flags (Set of `MOUSE_DEVICE_FLAG_*') */
 };
-
-#ifdef CONFIG_USE_NEW_FS
 
 /* Operator access */
 #define mousedev_getops(self) \
@@ -190,36 +185,13 @@ mousedev_v_polltest(struct mfile *__restrict self,
 /* Finalize a partially initialized `struct mousedev' (as initialized by `_mousedev_init()') */
 #define _mousedev_fini(self) _chrdev_fini(_mousedev_aschr(self))
 
-#else /* CONFIG_USE_NEW_FS */
-
-#define chrdev_ismouse(self)                           \
-	((self)->cd_heapsize >= sizeof(struct mousedev) && \
-	 (self)->cd_type.ct_read == &mousedev_v_read)
-
-/* Initialize/finalize the given mouse device.
- * NOTE: Drivers that override the `ct_fini' operator of a given  mouse
- *       must ensure that `mousedev_v_fini()' is still invoked by their
- *       override.
- * NOTE: The following operators are intrinsically provided by mouse,
- *       get  initialized  by  `mousedev_init()', and  should  not be
- *       overwritten:
- *         - ct_read
- *         - ct_ioctl
- *         - ct_stat
- *         - ct_poll */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL mousedev_init)(struct mousedev *__restrict self);
-#define mousedev_v_fini(self) (void)0 /* No-op (for now) */
 
 
-/* Mouse character device operators */
-FUNDEF NONNULL((1)) size_t KCALL mousedev_v_read(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL mousedev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL mousedev_v_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL mousedev_v_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL mousedev_v_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-#endif /* !CONFIG_USE_NEW_FS */
 
+
+/************************************************************************/
+/* Mouse API Functions                                                  */
+/************************************************************************/
 
 /* Read packets from a given mouse device buffer. */
 FUNDEF NOBLOCK NONNULL((1)) mouse_packet_t NOTHROW(KCALL mousebuf_trygetpacket)(struct mousebuf *__restrict self);

@@ -1393,7 +1393,7 @@ DEFINE_SYSCALL0(errno_t, sync) {
 #ifdef __ARCH_WANT_SYSCALL_SYNCFS
 DEFINE_SYSCALL1(errno_t, syncfs, fd_t, fd) {
 	REF struct fsuper *super;
-	super = handle_get_super_relaxed((unsigned int)fd);
+	super = handle_get_fsuper_relaxed((unsigned int)fd);
 	FINALLY_DECREF_UNLIKELY(super);
 	fsuper_sync(super);
 	return -EOK;
@@ -1518,7 +1518,7 @@ bad_handle_type:
 			      (unsigned int)fd,
 			      HANDLE_TYPE_PATH,
 			      hand.h_type,
-			      HANDLE_TYPEKIND_PATH_GENERIC,
+			      HANDLE_TYPEKIND_GENERIC,
 			      handle_typekind(&hand));
 			break;
 		}
@@ -2699,7 +2699,7 @@ DEFINE_SYSCALL2(errno_t, fstatfs, fd_t, fd,
 	struct statfs data;
 #endif /* !_STATFS_MATCHES_STATFS64 */
 	validate_writable(result, sizeof(*result));
-	super = handle_get_super_relaxed((unsigned int)fd);
+	super = handle_get_fsuper_relaxed((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
 #ifdef _STATFS_MATCHES_STATFS64
@@ -2722,7 +2722,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs, fd_t, fd,
 	REF struct fsuper *super;
 	struct statfs data;
 	validate_writable(result, sizeof(*result));
-	super = handle_get_super_relaxed((unsigned int)fd);
+	super = handle_get_fsuper_relaxed((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
 		fsuper_statfs(super, &data);
@@ -2738,7 +2738,7 @@ DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
                 USER UNCHECKED struct_statfs64 *, result) {
 	REF struct fsuper *super;
 	validate_writable(result, sizeof(*result));
-	super = handle_get_super_relaxed((unsigned int)fd);
+	super = handle_get_fsuper_relaxed((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
 #ifdef __USE_FILE_OFFSET64
@@ -2761,7 +2761,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
 	REF struct fsuper *super;
 	struct statfs data;
 	validate_writable(result, sizeof(*result));
-	super = handle_get_super_relaxed((unsigned int)fd);
+	super = handle_get_fsuper_relaxed((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
 		fsuper_statfs(super, &data);

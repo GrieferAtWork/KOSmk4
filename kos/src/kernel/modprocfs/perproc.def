@@ -17,106 +17,98 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-
-
-/* @param: files: Space-seperated list of:
- *                  `F(parent_id, name, type, id)'
- *                Terminated by `F_END'
- *                The specified `parent_id' must match the `id' argument
- *                passed  to  the   surrounding  `MKDIR()'   invocation. */
-#ifndef MKDIR
-#define MKDIR(id, mode, files)
-#endif /* !MKDIR */
-
+#ifndef ROOTENT
+#define ROOTENT(name, type, perm, fnode_ops_ptr, hash)
+#endif /* !ROOTENT */
+#ifndef MKDIR_BEGIN
+#define MKDIR_BEGIN(ops_symbol_name)
+#endif /* !MKDIR_BEGIN */
+#ifndef MKDIR_ENT
+#define MKDIR_ENT(name, type, perm, fnode_ops_ptr, hash)
+#endif /* !MKDIR_ENT */
+#ifndef MKDIR_END
+#define MKDIR_END
+#endif /* !MKDIR_END */
 #ifndef MKREG_RO
-#define MKREG_RO(id, mode, printer)
+#define MKREG_RO(ops_symbol_name, printer)
 #endif /* !MKREG_RO */
-
 #ifndef MKREG_RW
-#define MKREG_RW(id, mode, reader, writer)
+#define MKREG_RW(ops_symbol_name, printer, writer)
 #endif /* !MKREG_RW */
+#ifndef MKLNK
+#define MKLNK(ops_symbol_name, readlink)
+#endif /* !MKLNK */
 
-#ifndef DYNAMIC_SYMLINK
-#define DYNAMIC_SYMLINK(id, mode, readlink)
-#endif /* !DYNAMIC_SYMLINK */
+#include <__stdinc.h>
+#include <hybrid/compiler.h>
 
-#ifndef CUSTOM
-#define CUSTOM(id, mode, inode_type)
-#endif /* !CUSTOM */
+#include <hybrid/host.h>
 
-#ifndef PERPROC_DIRECTORY_ENTRY
-#define PERPROC_DIRECTORY_ENTRY(name, type, id)
-#endif /* !PERPROC_DIRECTORY_ENTRY */
+/* clang-format off */
 
+
+
+/* NOTE: All filename listings must be sorted lexicographically ascending */
+
+/* /proc/[PID] */
+ROOTENT("attr",      DT_DIR, 0555, &procfs_pp_attr,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x6181769, 0x72747461, 0x6d181802, 0x72747461)/*[[[end]]]*/)
+ROOTENT("cmdline",   DT_REG, 0444, &procfs_pp_cmdline,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xcfed46e4, 0x656e696c646d63, 0x7f3df635, 0x656e696c646d63)/*[[[end]]]*/)
+ROOTENT("cwd",       DT_LNK, 0777, &procfs_pp_cwd,       /*[[[fdirent_hash]]]*/0x647763/*[[[end]]]*/)
+ROOTENT("environ",   DT_REG, 0444, &procfs_pp_environ,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb59850ff, 0x6e6f7269766e65, 0x91509923, 0x6e6f7269766e65)/*[[[end]]]*/)
+ROOTENT("exe",       DT_LNK, 0777, &procfs_pp_exe,       /*[[[fdirent_hash]]]*/0x657865/*[[[end]]]*/)
+ROOTENT("fd",        DT_DIR, 0500, &procfs_pp_fd,        /*[[[fdirent_hash]]]*/0x6466/*[[[end]]]*/)
+ROOTENT("kos",       DT_DIR, 0555, &procfs_pp_kos,       /*[[[fdirent_hash]]]*/0x736f6b/*[[[end]]]*/)
+ROOTENT("map_files", DT_DIR, 0500, &procfs_pp_map_files, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc35e8886, 0x90cfb4995af36d48, 0x35895e0f, 0xd86cf35a99b4d000)/*[[[end]]]*/)
+ROOTENT("maps",      DT_REG, 0444, &procfs_pp_maps,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xef36cd5, 0x7370616d, 0xd86cf40b, 0x7370616d)/*[[[end]]]*/)
+ROOTENT("mounts",    DT_REG, 0444, &procfs_pp_mounts,    /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xe2215e49, 0x73746e756f6d, 0xd8eb9452, 0x73746e756f6d)/*[[[end]]]*/)
+ROOTENT("root",      DT_LNK, 0777, &procfs_pp_root,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x17eaeb02, 0x746f6f72, 0x5eaeb14, 0x746f6f72)/*[[[end]]]*/)
+ROOTENT("smaps",     DT_REG, 0444, &procfs_pp_smaps,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xf36cd97e, 0x7370616d73, 0xed86d63, 0x7370616d73)/*[[[end]]]*/)
+ROOTENT("stat",      DT_REG, 0444, &procfs_pp_stat,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d180b, 0x74617473, 0xf176d14, 0x74617473)/*[[[end]]]*/)
+ROOTENT("status",    DT_REG, 0444, &procfs_pp_status,    /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d8b80, 0x737574617473, 0xf17e089, 0x737574617473)/*[[[end]]]*/)
+#ifndef DEFINE_PERTASK_ROOT_DIRECTORY
+ROOTENT("task",      DT_DIR, 0555, &procfs_pp_task,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc70e6d14, 0x6b736174, 0x176d0ec3, 0x6b736174)/*[[[end]]]*/)
+#endif /* !DEFINE_PERTASK_ROOT_DIRECTORY */
+#if defined(__x86_64__) || defined(__i386__)
+ROOTENT("x86",       DT_DIR, 0555, &procfs_pp_x86,       /*[[[fdirent_hash]]]*/0x363878/*[[[end]]]*/)
+#endif /* __x86_64__ || __i386__ */
+
+MKREG_RO(procfs_pp_cmdline, ProcFS_PerProc_Cmdline_Printer)
+MKREG_RO(procfs_pp_environ, ProcFS_PerProc_Environ_Printer)
+MKREG_RO(procfs_pp_maps, ProcFS_PerProc_Maps_Printer)
+MKREG_RO(procfs_pp_mounts, ProcFS_PerProc_Mounts_Printer)
+MKREG_RO(procfs_pp_smaps, ProcFS_PerProc_SMaps_Printer)
+MKREG_RO(procfs_pp_stat, ProcFS_PerProc_Stat_Printer)
+MKREG_RO(procfs_pp_status, ProcFS_PerProc_Status_Printer)
+
+
+/* /proc/[PID]/attr */
+MKDIR_BEGIN(procfs_pp_attr)
+	MKDIR_ENT("current", DT_REG, 0666, &procfs_pp_attr_current, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x67a8ee0, 0x746e6572727563, 0x7f957467, 0x746e6572727563)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RO(procfs_pp_attr_current, ProcFS_PerProc_Attr_Current_Printer)
+
+/* /proc/[PID]/kos */
+MKDIR_BEGIN(procfs_pp_kos)
+	MKDIR_ENT("dcwd",   DT_DIR, 0555, &procfs_pp_kos_dcwd,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x88327e84, 0x64776364, 0x877f3284, 0x64776364)/*[[[end]]]*/)
+	MKDIR_ENT("drives", DT_DIR, 0555, &procfs_pp_kos_drives, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x29b578e9, 0x736576697264, 0x8806288b, 0x736576697264)/*[[[end]]]*/)
+MKDIR_END
 
 #if defined(__x86_64__) || defined(__i386__)
-#include "arch/i386/perproc.def"
-#else
-/* ... */
-#endif
+/* /proc/[PID]/x86 */
+MKDIR_BEGIN(procfs_pp_x86)
+	MKDIR_ENT("iopl", DT_REG, 0666, &procfs_pp_x86_iopl, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xcff3eab1, 0x6c706f69, 0xb4eaf3cc, 0x6c706f69)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RW(procfs_pp_x86_iopl, ProcFS_PerProc_X86_Iopl_Print, ProcFS_PerProc_X86_Iopl_Write)
+#endif /* __x86_64__ || __i386__ */
 
 
-/* Enumerate arch-specific files in /proc/[PID]/attr/... */
-#ifndef ARCH_ENUMERATE_PERPROC_ATTR
-#define ARCH_ENUMERATE_PERPROC_ATTR /* nothing */
-#endif /* !ARCH_ENUMERATE_PERPROC_ATTR */
+/* clang-format on */
 
-/* Enumerate arch-specific files in /proc/[PID]/kos/... */
-#ifndef ARCH_ENUMERATE_PERPROC_KOS
-#define ARCH_ENUMERATE_PERPROC_KOS /* nothing */
-#endif /* !ARCH_ENUMERATE_PERPROC_KOS */
-
-
-PERPROC_DIRECTORY_ENTRY("attr", DT_DIR, attr)
-MKDIR(attr, 0555,
-      F(attr, "current", DT_REG, attr_current)
-      ARCH_ENUMERATE_PERPROC_ATTR
-      F_END)
-
-MKREG_RO(attr_current, 0666, ProcFS_PerProc_Attr_Current_Printer)
-
-PERPROC_DIRECTORY_ENTRY("cmdline", DT_REG, cmdline)
-MKREG_RO(cmdline, 0222, ProcFS_PerProc_Cmdline_Printer)
-
-PERPROC_DIRECTORY_ENTRY("cwd", DT_LNK, cwd)
-DYNAMIC_SYMLINK(cwd, 0777, ProcFS_PerProc_Cwd_Printer)
-
-PERPROC_DIRECTORY_ENTRY("environ", DT_REG, environ)
-MKREG_RO(environ, 0222, ProcFS_PerProc_Environ_Printer)
-
-PERPROC_DIRECTORY_ENTRY("exe", DT_LNK, exe)
-DYNAMIC_SYMLINK(exe, 0777, ProcFS_PerProc_Exe_Printer)
-
-PERPROC_DIRECTORY_ENTRY("fd", DT_DIR, fd)
-CUSTOM(fd, S_IFDIR | 0300, ProcFS_PerProc_Fd_Type)
-
-PERPROC_DIRECTORY_ENTRY("kos", DT_DIR, kos)
-MKDIR(kos, 0555,
-      F(attr, "drives", DT_DIR, kos_drives)
-      F(attr, "dcwd", DT_DIR, kos_dcwd)
-      ARCH_ENUMERATE_PERPROC_KOS
-      F_END)
-CUSTOM(kos_drives, S_IFDIR | 0300, ProcFS_PerProc_Kos_Drives_Type)
-CUSTOM(kos_dcwd, S_IFDIR | 0300, ProcFS_PerProc_Kos_DrivesCwd_Type)
-
-PERPROC_DIRECTORY_ENTRY("map_files", DT_DIR, map_files)
-CUSTOM(map_files, S_IFDIR | 0300, ProcFS_PerProc_MapFiles_Type)
-
-PERPROC_DIRECTORY_ENTRY("maps", DT_REG, maps)
-MKREG_RO(maps, 0222, ProcFS_PerProc_Maps_Printer)
-
-PERPROC_DIRECTORY_ENTRY("root", DT_LNK, root)
-DYNAMIC_SYMLINK(root, 0777, ProcFS_PerProc_Root_Printer)
-
-PERPROC_DIRECTORY_ENTRY("stat", DT_REG, stat)
-MKREG_RO(stat, 0222, ProcFS_PerProc_Stat_Printer)
-
-PERPROC_DIRECTORY_ENTRY("task", DT_DIR, task)
-CUSTOM(task, S_IFDIR | 0555, ProcFS_PerProc_Task_Type)
-
-#undef PERPROC_DIRECTORY_ENTRY
-#undef CUSTOM
-#undef DYNAMIC_SYMLINK
-#undef MKREG_RW
+#undef ROOTENT
+#undef MKDIR_BEGIN
+#undef MKDIR_ENT
+#undef MKDIR_END
+#undef MKDIR_EN
 #undef MKREG_RO
-#undef MKDIR
+#undef MKREG_RW
+#undef MKLNK

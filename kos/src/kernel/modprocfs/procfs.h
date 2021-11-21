@@ -22,345 +22,171 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/printnode.h>
+#include <kernel/types.h>
 
-#include <format-printer.h>
-#include <stdint.h>
-
-/* Declare statics / include headers */
-#include "singleton.def"
+/*
+ * Procfs API design:
+ *
+ * - Inode  numbers don't matter; file lookup is entirely
+ *   facilitated via custom fdirent opennode() operators,
+ *   and fn_ino is set to `0', and mso_stat is defined to
+ *   fill in stat INO fields with `skew_kernel_pointer()'
+ *   For per-process nodes, INO is filled with the skewed
+ *   pointer `self->mf_ops ^ self->TASKPID'.
+ * - All singleton procfs objects are statically allocated
+ * - Per-process  nodes use the fsdata pointer to directly
+ *   store a pointer to the taskpid of the thread, or have
+ *   it point to later in the struct where said taskpid is
+ *   then stored instead.
+ *   As such, there are no  race conditions in regards  to
+ *   paths going away and being replaced by some new same-
+ *   pid process.
+ * - Per-process nodes all have `MFILE_FN_FLEETING' set
+ * - Per-process nodes all have `MFILE_FN_ATTRREADONLY' set
+ *
+ * TODO: Custom access checks  for per-process nodes  (since
+ *       we fill in the uid/gid field with `0', access tests
+ *       must be altered to compare against the active  cred
+ *       of the target thread instead)
+ */
 
 DECL_BEGIN
 
-/* Mask and shift for the type of some given INode.
- * All remaining bits of any given INO are interpreted depending of the type mask,
- * which is one of the `PROCFS_INOTYPE_*' constants. */
-#define PROCFS_INO_TYPEMASK UINT64_C(0xff00000000000000)
-#define PROCFS_INO_TYPESHFT 56
-
-#define PROCFS_INOTYPE_SINGLETON        0x00   /* Singleton INode (anything that appears only once in /proc) */
-#define PROCFS_INOTYPE_SINGLETON_IDMASK 0xffff /* Mask for the ID of a singleton */
-/* @param: id: One of PROCFS_SINGLETON_* */
-#define PROCFS_INOMAKE_SINGLETON(id) \
-	(((ino_t)PROCFS_INOTYPE_SINGLETON << PROCFS_INO_TYPESHFT) | (id))
-
-/* Per-process data */
-#define PROCFS_INOTYPE_PERPROC         0x01                         /* Per-process INode */
-#define PROCFS_INOTYPE_PERPROC_PIDMASK UINT64_C(0x000000007fffffff) /* PID mask */
-#define PROCFS_INOTYPE_PERPROC_IDMASK  UINT64_C(0x0000ffff00000000) /* ID mask */
-#define PROCFS_INOTYPE_PERPROC_IDSHIFT 32
-/* @param: id: One of PROCFS_PERPROC_* */
-#define PROCFS_INOMAKE_PERPROC(pid, id)                       \
-	(((ino_t)PROCFS_INOTYPE_PERPROC << PROCFS_INO_TYPESHFT) | \
-	 ((ino_t)(id) << PROCFS_INOTYPE_PERPROC_IDSHIFT) | (ino_t)(pid))
-
-/* DOS Drive bindings. `readlink /proc/[pid]/kos/drives/[a-z]' */
-#define PROCFS_INOTYPE_DRIVE          0x02                         /* Per-process drives */
-#define PROCFS_INOTYPE_DRIVE_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
-#define PROCFS_INOTYPE_DRIVE_DRVMASK  UINT64_C(0x0000001f00000000) /* DOS Drive id ('a' + .) */
-#define PROCFS_INOTYPE_DRIVE_DRVSHIFT 32
-#define PROCFS_INOMAKE_DRIVE(pid, drive_id)                 \
-	(((ino_t)PROCFS_INOTYPE_DRIVE << PROCFS_INO_TYPESHFT) | \
-	 ((ino_t)(drive_id) << PROCFS_INOTYPE_DRIVE_DRVSHIFT) | (ino_t)(pid))
-
-/* DOS Drive cwd bindings. `readlink /proc/[pid]/kos/dcwd/[a-z]' */
-#define PROCFS_INOTYPE_DCWD          0x03                         /* Per-process drives */
-#define PROCFS_INOTYPE_DCWD_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
-#define PROCFS_INOTYPE_DCWD_DRVMASK  UINT64_C(0x0000001f00000000) /* DOS Drive id ('a' + .) */
-#define PROCFS_INOTYPE_DCWD_DRVSHIFT 32
-#define PROCFS_INOMAKE_DCWD(pid, drive_id)                 \
-	(((ino_t)PROCFS_INOTYPE_DCWD << PROCFS_INO_TYPESHFT) | \
-	 ((ino_t)(drive_id) << PROCFS_INOTYPE_DCWD_DRVSHIFT) | (ino_t)(pid))
-
-/* File memory mappings. `readlink /proc/[pid]/map_files/[from-to]' */
-#define PROCFS_INOTYPE_MAPFILES          0x04                         /* Per-process drives */
-#define PROCFS_INOTYPE_MAPFILES_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
-#define PROCFS_INOTYPE_MAPFILES_NUMMASK  UINT64_C(0x00ffffff80000000) /* Mapping number shift */
-#define PROCFS_INOTYPE_MAPFILES_NUMSHIFT 31
-#define PROCFS_INOMAKE_MAPFILES(pid, num)                      \
-	(((ino_t)PROCFS_INOTYPE_MAPFILES << PROCFS_INO_TYPESHFT) | \
-	 ((ino_t)(num) << PROCFS_INOTYPE_MAPFILES_NUMSHIFT) | (ino_t)(pid))
-
-/* File handle bindings. `readlink /proc/[pid]/fd/[id]' */
-#define PROCFS_INOTYPE_FD_LO      0x80                         /* Per-process file handles */
-#define PROCFS_INOTYPE_FD_HI      0xff                         /* Per-process file handles */
-#define PROCFS_INOTYPE_FD_PIDMASK UINT64_C(0x000000007fffffff) /* PID mask */
-#define PROCFS_INOTYPE_FD_FDMASK  UINT64_C(0x7fffffff80000000) /* File handle number */
-#define PROCFS_INOTYPE_FD_FDSHIFT 31
-#define PROCFS_INOMAKE_FD(pid, fd)                          \
-	(((ino_t)PROCFS_INOTYPE_FD_LO << PROCFS_INO_TYPESHFT) | \
-	 ((ino_t)(fd) << PROCFS_INOTYPE_FD_FDSHIFT) | (ino_t)(pid))
+#ifndef __pformatprinter_defined
+#define __pformatprinter_defined
+typedef __pformatprinter pformatprinter;
+typedef __pformatgetc pformatgetc;
+typedef __pformatungetc pformatungetc;
+#endif /* !__pformatprinter_defined */
 
 
-
-#define PROCFS_SINGLETON_DATA_FIELDS                                                                                          \
-	struct timespec psd_atime; /* File last-accessed timestamp (initialized to the time when the procfs driver was loaded) */ \
-	struct timespec psd_mtime; /* File last-modified timestamp (initialized to the time when the procfs driver was loaded) */ \
-	struct timespec psd_ctime; /* File creation timestamp (initialized to the time when the procfs driver was loaded) */      \
-	mode_t          psd_mode;  /* File access mode (NOTE: Also encodes the file type, however that part is [const]) */        \
-	uid_t           psd_uid;   /* File owner UID (initialized to 0) */                                                        \
-	gid_t           psd_gid;   /* File group GID (initialized to 0) */
-
-struct procfs_singleton_data {
-	/* Pointed to by the `struct inode_data *i_fsdata' of singleton INodes.
-	 * These are the saved, non-volatile values of various file attributes,
-	 * thus allowing user-space to (e.g.) change the access permissions, or
-	 * ownership of some given file under /proc, so-long as that file is  a
-	 * singleton inside of the filesystem */
-	PROCFS_SINGLETON_DATA_FIELDS
+struct procfs_regfile
+#ifndef __WANT_FS_INLINE_STRUCTURES
+    : printnode                /* Underlying print file */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+{
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct printnode prf_node; /* Underlying print file */
+#endif /* __WANT_FS_INLINE_STRUCTURES */
+	/* [1..1] Print callback. */
+	void (KCALL *prf_print)(pformatprinter printer, void *arg, size_t offset_hint);
+	/* [0..1] Write callback. (when NULL, file is read-only) */
+	void (KCALL *prf_write)(USER CHECKED void const *buf, size_t bufsize);
 };
 
-struct procfs_singleton_dir_data {
-	/* FS-data for singletons defined as `MKDIR()' */
-	PROCFS_SINGLETON_DATA_FIELDS
-	COMPILER_FLEXIBLE_ARRAY(REF struct fdirent *, pdd_ents); /* [1..1|SENTINEL(NULL)][const]
-	                                                                  * NULL-terminated list of contained files
-	                                                                  * Hash set to `(uintptr_t)-1' are calculated lazily. */
-};
-
-/* Prototype for printer functions defined by `MKREG_RO()' */
-typedef NONNULL((1, 2)) ssize_t
-(KCALL *PROCFS_REG_PRINTER)(struct regular_node *__restrict self,
-                            pformatprinter printer, void *arg);
-typedef NONNULL((1)) void
-(KCALL *PROCFS_REG_WRITER)(struct regular_node *__restrict self,
-                           USER CHECKED void const *buf, size_t buflen);
-
-struct procfs_singleton_reg_ro_data {
-	PROCFS_SINGLETON_DATA_FIELDS
-	PROCFS_REG_PRINTER psr_printer; /* [1..1][const] Printer for generating the contents of the file. */
+struct procfs_txtfile
+#ifndef __WANT_FS_INLINE_STRUCTURES
+    : printnode                /* Underlying print file */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+{
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct printnode ptf_node; /* Underlying print file */
+#endif /* __WANT_FS_INLINE_STRUCTURES */
+	char const *ptf_string; /* [1..1][const] The string that gets printed. */
 };
 
 
-#define STRUCT_PROCFS_SINGLETON_REG_TXT_DATA(textlen)                                                     \
-	struct {                                                                                              \
-		PROCFS_SINGLETON_DATA_FIELDS                                                                      \
-		PROCFS_REG_PRINTER            psr_printer; /* [1..1][const][== &ProcFs_RegTxtDataPrinter] */      \
-		size_t                        psr_textlen; /* [const] Length of `psr_text' (in bytes) */          \
-		char                          psr_text[textlen];   /* [const] The text that should be printed. */ \
-	}
+/************************************************************************/
+/* Root/static types                                                    */
+/************************************************************************/
+INTDEF struct fsuper procfs_super;
+INTDEF struct ffilesys procfs_filesys;
+INTDEF struct fsuper_ops const procfs_super_ops;      /* Operators for `procfs_super' */
+INTDEF struct printnode_ops const procfs_regfile_ops; /* Operators for `struct procfs_regfile' */
+INTDEF struct printnode_ops const procfs_txtfile_ops; /* Operators for `struct procfs_txtfile' */
 
-struct procfs_singleton_reg_txt_data {
-	PROCFS_SINGLETON_DATA_FIELDS
-	PROCFS_REG_PRINTER            psr_printer; /* [1..1][const][== &ProcFs_RegTxtDataPrinter]. */
-	size_t                        psr_textlen; /* [const] Length of `psr_text' (in bytes) */
-	COMPILER_FLEXIBLE_ARRAY(char, psr_text);   /* [const] The text that should be printed. */
+
+/************************************************************************/
+/* Per-process types                                                    */
+/************************************************************************/
+struct taskpid;
+struct procfs_perproc_root_dirent {
+	/* Directory entry for the PID number of a /proc/PID directory. */
+	REF struct taskpid *pprd_pid; /* [1..1][const] PID of the thread */
+	struct fdirent      pprd_ent; /* Underlying directory entry. */
 };
-
-struct procfs_singleton_reg_ext_data {
-	PROCFS_SINGLETON_DATA_FIELDS
-	PROCFS_REG_PRINTER psr_printer; /* [1..1][const][== &ProcFs_RegTxtDataPrinter]. */
-	char const        *psr_string;  /* [0..1] External string pointer. (A line-feed will be appended to this) */
-};
-
-/* Printer for `struct procfs_singleton_reg_txt_data'-style INodes */
-INTDEF NONNULL((1, 2)) ssize_t KCALL
-ProcFs_RegTxtDataPrinter(struct regular_node *__restrict self,
-                         pformatprinter printer, void *arg);
-
-/* Printer for `struct procfs_singleton_reg_ext_data'-style INodes */
-INTDEF NONNULL((1, 2)) ssize_t KCALL
-ProcFs_RegExtDataPrinter(struct regular_node *__restrict self,
-                         pformatprinter printer, void *arg);
+#define fdirent_asperprocroot(self) COMPILER_CONTAINER_OF(self, struct procfs_perproc_root_dirent, pprd_ent)
 
 
-struct procfs_singleton_reg_rw_data {
-	PROCFS_SINGLETON_DATA_FIELDS
-	PROCFS_REG_PRINTER psr_printer; /* [1..1][const] Printer for generating the contents of the file. */
-	PROCFS_REG_WRITER  psr_writer;  /* [1..1][const] Writer for setting the contents of the file. */
-};
+/* Operators for `procfs_perproc_root_dirent' */
+INTDEF struct fdirent_ops const procfs_perproc_root_dirent_ops;
+INTDEF struct fdirent_ops const procfs_pertask_root_dirent_ops; /* /proc/[pid]/task/[tid] */
 
-struct procfs_perproc_reg_rw_data {
-	PROCFS_REG_PRINTER ppr_printer; /* [1..1][const] Printer for generating the contents of the file. */
-	PROCFS_REG_WRITER  ppr_writer;  /* [1..1][const] Writer for setting the contents of the file. */
-};
+/* Operators for `/proc/[pid]/'
+ * NOTE: For this directory, `fn_fsdata' is a `REF struct taskpid *' [1..1] */
+INTDEF struct fdirnode_ops const procfs_perproc_root_ops;
+INTDEF struct fdirnode_ops const procfs_pertask_root_ops; /* /proc/[pid]/task/[tid] */
 
-/* Prototype for printer functions defined by `SYMLINK()' */
-typedef NONNULL((2)) size_t (KCALL *PROCFS_SYMLINK_READLINK)(struct symlink_node *__restrict self,
-                                                             USER CHECKED /*utf-8*/ char *buf,
-                                                             size_t bufsize);
+/* Permissions operators for per-process files. */
+INTDEF struct fnode_perm_ops const procfs_perproc_v_perm_ops;
 
-struct procfs_singleton_dynamic_symlink_data {
-	PROCFS_SINGLETON_DATA_FIELDS
-	PROCFS_SYMLINK_READLINK pss_readlink; /* [1..1][const] Dynamically invoked readlink() function. */
-};
-
-
-/* Values for singleton Inodes (for use with `PROCFS_INOMAKE_SINGLETON(PROCFS_SINGLETON_*)'). */
-enum {
-	PROCFS_SINGLETON_ROOT = 0, /* /proc  (Must always remain `0') */
-
-#define MKDIR(id, mode, files) PROCFS_SINGLETON_ID_##id,
-#include "singleton.def"
-	PROCFS_SINGLETON_START_REG_RO,
-	__PROCFS_SINGLETON_START_REG_RO = PROCFS_SINGLETON_START_REG_RO - 1,
-#define MKREG_RO(id, mode, printer)  PROCFS_SINGLETON_ID_##id,
-#define MKREG_TXT(id, mode, printer) PROCFS_SINGLETON_ID_##id,
-#define MKREG_EXT(id, mode, printer) PROCFS_SINGLETON_ID_##id,
-#include "singleton.def"
-	PROCFS_SINGLETON_START_REG_RW,
-	__PROCFS_SINGLETON_START_REG_RW = PROCFS_SINGLETON_START_REG_RW - 1,
-#define MKREG_RW(id, mode, reader, writer) PROCFS_SINGLETON_ID_##id,
-#include "singleton.def"
-	PROCFS_SINGLETON_START_LNK_DYN,
-	__PROCFS_SINGLETON_START_LNK_DYN = PROCFS_SINGLETON_START_LNK_DYN - 1,
-#define DYNAMIC_SYMLINK(id, mode, readlink) PROCFS_SINGLETON_ID_##id,
-#include "singleton.def"
-#ifndef PROCFS_NO_CUSTOM
-	PROCFS_SINGLETON_START_CUSTOM,
-	__PROCFS_SINGLETON_START_CUSTOM = PROCFS_SINGLETON_START_CUSTOM - 1,
-#define CUSTOM(id, type) PROCFS_SINGLETON_ID_##id,
-#include "singleton.def"
-#endif /* !PROCFS_NO_CUSTOM */
-	PROCFS_SINGLETON_COUNT
-};
-
-
-enum {
-	PROCFS_PERPROC_ROOT = 0, /* /proc/[pid]  (Must always remain `0') */
-#define MKDIR(id, mode, files) PROCFS_PERPROC_ID_##id,
-#include "perproc.def"
-	PROCFS_PERPROC_START_REG_RO,
-	__PROCFS_PERPROC_START_REG_RO = PROCFS_PERPROC_START_REG_RO - 1,
-#define MKREG_RO(id, mode, printer) PROCFS_PERPROC_ID_##id,
-#include "perproc.def"
-	PROCFS_PERPROC_START_REG_RW,
-	__PROCFS_PERPROC_START_REG_RW = PROCFS_PERPROC_START_REG_RW - 1,
-#define MKREG_RW(id, mode, reader, writer) PROCFS_PERPROC_ID_##id,
-#include "perproc.def"
-	PROCFS_PERPROC_START_LNK_DYN,
-	__PROCFS_PERPROC_START_LNK_DYN = PROCFS_PERPROC_START_LNK_DYN - 1,
-#define DYNAMIC_SYMLINK(id, mode, readlink) PROCFS_PERPROC_ID_##id,
-#include "perproc.def"
-#ifndef PROCFS_PERPROC_NO_CUSTOM
-	PROCFS_PERPROC_START_CUSTOM,
-	__PROCFS_PERPROC_START_CUSTOM = PROCFS_PERPROC_START_CUSTOM - 1,
-#define CUSTOM(id, mode, type) PROCFS_PERPROC_ID_##id,
-#include "perproc.def"
-#endif /* !PROCFS_PERPROC_NO_CUSTOM */
-	PROCFS_PERPROC_COUNT
-};
+/* Calculate+return the INO of a given taskpid-pointer and INode operators table.
+ * @param: context_object_ptr: Pointer an unique object  with a unique address  that
+ *                             identifies the current context (for per-thread files,
+ *                             this is  `struct taskpid';  for  fd-files,  it's  the
+ *                             handle data pointer, etc...)
+ */
+#define procfs_perproc_ino(context_object_ptr, node_ops)         \
+	(ino_t)((uintptr_t)skew_kernel_pointer(context_object_ptr) ^ \
+	        (uintptr_t)skew_kernel_pointer(node_ops))
+/************************************************************************/
 
 
 
-/* [1..1][*] Fs-specific data pointers for singleton nodes.
- * The index to this  array is one of  `PROCFS_SINGLETON_*' */
-INTDEF struct procfs_singleton_data *const ProcFS_Singleton_FsData[PROCFS_SINGLETON_COUNT];
-#ifndef PROCFS_NO_CUSTOM
-INTDEF struct inode_type *const ProcFS_Singleton_CustomTypes[PROCFS_SINGLETON_COUNT - PROCFS_SINGLETON_START_CUSTOM];
-#endif /* !PROCFS_NO_CUSTOM */
-INTDEF struct inode_type ProcFS_Singleton_Directory_Type;      /* Type for general-purpose singleton directories */
-INTDEF struct inode_type ProcFS_Singleton_RegularRo_Type;      /* Type for general-purpose singleton read-only files */
-INTDEF struct inode_type ProcFS_Singleton_RegularRw_Type;      /* Type for general-purpose singleton read/write files */
-INTDEF struct inode_type ProcFS_Singleton_DynamicSymlink_Type; /* Type for general-purpose singleton dynamic symlink files */
-
-/* For MIDIR:           `REF struct fdirent **'
- * For MKREG_RO:        `PROCFS_REG_PRINTER'
- * For DYNAMIC_SYMLINK: `PROCFS_SYMLINK_READLINK'
- * For CUSTOM:          `NULL' */
-INTDEF void *const ProcFS_PerProc_FsData[PROCFS_PERPROC_COUNT];
-INTDEF mode_t const ProcFS_PerProc_FileMode[PROCFS_PERPROC_COUNT];
-#ifndef PROCFS_PERPROC_NO_CUSTOM
-INTDEF struct inode_type *const ProcFS_PerProc_CustomTypes[PROCFS_PERPROC_COUNT - PROCFS_PERPROC_START_CUSTOM];
-#endif /* !PROCFS_PERPROC_NO_CUSTOM */
-INTDEF struct inode_type ProcFS_PerProc_Directory_Type;      /* Type for general-purpose singleton directories */
-INTDEF struct inode_type ProcFS_PerProc_RegularRo_Type;      /* Type for general-purpose singleton read-only files */
-INTDEF struct inode_type ProcFS_PerProc_RegularRw_Type;      /* Type for general-purpose singleton read/write files */
-INTDEF struct inode_type ProcFS_PerProc_DynamicSymlink_Type; /* Type for general-purpose singleton dynamic symlink files */
-
-INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_LoadAttr(struct inode *__restrict self) THROWS(E_IOERROR, ...);
-INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_SaveAttr(struct inode *__restrict self) THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_READONLY, E_IOERROR, ...);
-
-/* ProcFS_Singleton_Directory_Type.it_directory.d_oneshot.o_lookup */
-INTDEF NONNULL((1, 2)) REF struct fdirent *KCALL
-ProcFS_Singleton_Directory_Lookup(struct directory_node *__restrict self,
-                                  CHECKED USER /*utf-8*/ char const *__restrict name,
-                                  u16 namelen, uintptr_t hash, fsmode_t mode)
-		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
-		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
-
-/* ProcFS_Singleton_Directory_Type.it_directory.d_oneshot.o_enum */
-INTDEF NONNULL((1, 2)) void KCALL
-ProcFS_Singleton_Directory_Enum(struct directory_node *__restrict self,
-                                directory_enum_callback_t callback,
-                                void *arg)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
-
-/* Per-process stat() operator for procfs INode objects. */
-INTDEF NONNULL((1)) void KCALL
-ProcFS_PerProc_StatInode(struct inode *__restrict self,
-                         USER CHECKED struct stat *result)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 
-INTDEF REF struct fdirent *ProcFS_PerProcRootDirectory_FsData[];
-INTDEF struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData;
-INTDEF struct inode_type ProcFS_RootDirectory_Type;            /* /proc */
-INTDEF struct inode_type ProcFS_PerProcRootDirectory_Type;     /* /proc/[pid]       (for `PROCFS_PERPROC_ROOT') */
-INTDEF struct inode_type ProcFS_PerProc_Task_Type;             /* /proc/[pid]/task  (for `PROCFS_PERPROC_TASK') */
-INTDEF struct inode_type ProcFS_PerProc_Kos_Drives_Entry_Type; /* For `PROCFS_INOTYPE_DRIVE' */
-INTDEF struct inode_type ProcFS_PerProc_Kos_Dcwd_Entry_Type;   /* For `PROCFS_INOTYPE_DCWD' */
-INTDEF struct inode_type ProcFS_PerProc_MapFiles_Entry_Type;   /* For `PROCFS_INOTYPE_MAPFILES' */
-INTDEF struct inode_type ProcFS_PerProc_Fd_Entry_Type;         /* For `PROCFS_INOTYPE_FD_(LO|HI)' */
+/************************************************************************/
+/* Helpers for printing/parsing user-space values.                      */
+/************************************************************************/
 
-INTDEF struct superblock_type ProcFS_Type;
-INTDEF struct superblock ProcFS;
+/* Print a string "0\n" or "1\n" depending on `value' */
+INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintBool(pformatprinter printer, void *arg, bool value);
+INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintU32(pformatprinter printer, void *arg, u32 value);
+INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintU64(pformatprinter printer, void *arg, u64 value);
 
-INTDEF NONNULL((1, 2, 3, 4)) void KCALL
-ProcFS_OpenNode(struct superblock *__restrict self,
-                struct inode *__restrict node,
-                struct directory_node *__restrict parent_directory,
-                struct fdirent *__restrict parent_dirent)
-		THROWS(E_IOERROR, E_BADALLOC, ...) ;
+/* Parse  a given user-space buffer from being  a string `0' or `1', which
+ * may optionally be surrounded by space characters that are automatically
+ * stripped prior to being parsed.
+ * If the buffer  contains anything other  than `[SPC]0|1[SPC]', then  a
+ * `E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER'
+ * exception is thrown.
+ * If the buffer has an incorrect length, then a `E_BUFFER_TOO_SMALL'
+ * exception is thrown instead. */
+INTDEF NONNULL((1)) bool FCALL
+ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
+INTDEF NONNULL((1)) u32 FCALL
+ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval DFL(0), u32 maxval DFL((u32)-1))
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
+INTDEF NONNULL((1)) u64 FCALL
+ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval DFL(0), u64 maxval DFL((u64)-1))
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
 
+#if __SIZEOF_SIZE_T__ >= 8
+#define ProcFS_ParseSize ProcFS_ParseU64
+#define ProcFS_PrintSize ProcFS_PrintU64
+#else /* __SIZEOF_SIZE_T__ >= 8 */
+#define ProcFS_ParseSize ProcFS_ParseU32
+#define ProcFS_PrintSize ProcFS_PrintU32
+#endif /* __SIZEOF_SIZE_T__ < 8 */
 
-/* Define printer functions used by singleton files */
-#define DYNAMIC_SYMLINK(id, mode, readlink)                                         \
-	INTDEF NONNULL((1)) size_t KCALL readlink(struct symlink_node *__restrict self, \
-	                                          USER CHECKED /*utf-8*/ char *buf,     \
-	                                          size_t bufsize);
-#define MKREG_RO(id, mode, printer)                                                    \
-	INTDEF NONNULL((1, 2)) ssize_t KCALL printer(struct regular_node *__restrict self, \
-	                                             pformatprinter printer_, void *arg);
-#define MKREG_RW(id, mode, reader, writer)                                            \
-	INTDEF NONNULL((1, 2)) ssize_t KCALL reader(struct regular_node *__restrict self, \
-	                                            pformatprinter printer_, void *arg);  \
-	INTDEF NONNULL((1)) void KCALL writer(struct regular_node *__restrict self,     \
-	                                      USER CHECKED void const *buf, size_t buflen);
-#define CUSTOM(id, type) \
-	INTDEF struct inode_type type;
-#include "singleton.def"
+#if __SIZEOF_INT__ >= 8
+#define ProcFS_ParseUInt ProcFS_ParseU64
+#define ProcFS_PrintUInt ProcFS_PrintU64
+#else /* __SIZEOF_INT__ >= 8 */
+#define ProcFS_ParseUInt ProcFS_ParseU32
+#define ProcFS_PrintUInt ProcFS_PrintU32
+#endif /* __SIZEOF_INT__ < 8 */
 
-
-/* Define printer functions used by singleton files */
-#define DYNAMIC_SYMLINK(id, mode, readlink)                                         \
-	INTDEF NONNULL((1)) size_t KCALL readlink(struct symlink_node *__restrict self, \
-	                                          USER CHECKED /*utf-8*/ char *buf,     \
-	                                          size_t bufsize);
-#define MKREG_RO(id, mode, printer)                                                    \
-	INTDEF NONNULL((1, 2)) ssize_t KCALL printer(struct regular_node *__restrict self, \
-	                                             pformatprinter printer_, void *arg);
-#define MKREG_RW(id, mode, reader, writer)                                            \
-	INTDEF NONNULL((1, 2)) ssize_t KCALL reader(struct regular_node *__restrict self, \
-	                                            pformatprinter printer_, void *arg);  \
-	INTDEF NONNULL((1)) void KCALL writer(struct regular_node *__restrict self,     \
-	                                      USER CHECKED void const *buf, size_t buflen);
-#define CUSTOM(id, mode, type) \
-	INTDEF struct inode_type type;
-#include "perproc.def"
-
-
-/* Helper for wrapping the task_enum_* functions with `directory_enum_callback_t' */
-typedef struct {
-	directory_enum_callback_t epc_cb;     /* [1..1] The underlying callback */
-	void                     *epc_arg;    /* Argument for `epc_cb' */
-	size_t                    epc_ns_ind; /* PID namespace indirection. */
-} ProcFS_EnumProcessCallback_Data;
-
-/* NOTE: This function should be used as a `task_enum_cb_t' */
-INTDEF ssize_t KCALL
-ProcFS_EnumProcessCallback(/*ProcFS_EnumProcessCallback_Data*/ void *arg,
-                           struct task *thread, struct taskpid *tpid);
+#if __SIZEOF_PID_T__ >= 8
+#define ProcFS_ParseUPid ProcFS_ParseU64
+#define ProcFS_PrintUPid ProcFS_PrintU64
+#else /* __SIZEOF_PID_T__ >= 8 */
+#define ProcFS_ParseUPid ProcFS_ParseU32
+#define ProcFS_PrintUPid ProcFS_PrintU32
+#endif /* __SIZEOF_PID_T__ < 8 */
 
 
 DECL_END

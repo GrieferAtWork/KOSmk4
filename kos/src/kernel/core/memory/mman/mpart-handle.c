@@ -95,55 +95,47 @@ handle_mpart_stat(struct mpart *__restrict self,
 	mpart_lock_release(self);
 	FINALLY_DECREF_UNLIKELY(file);
 
-	/* TODO: Better integration for `CONFIG_USE_NEW_FS' */
-	if (vm_datablock_isinode(file)) {
+	if (mfile_isnode(file)) {
 		dev_t devno = 0;
-		struct inode *ino  = (struct inode *)file;
-#ifdef CONFIG_USE_NEW_FS
+		struct fnode *node = (struct fnode *)file;
 		struct mfile *dev;
-		dev = ino->fn_super->fs_dev;
+		dev = node->fn_super->fs_dev;
 		if (dev && mfile_isdevnode(dev))
 			devno = mfile_asdevnode(dev)->dn_devno;
-#else /* CONFIG_USE_NEW_FS */
-		struct blkdev *dev;
-		dev = ino->i_super->s_device;
-		if (dev)
-			devno = blkdev_devno(dev);
-#endif /* !CONFIG_USE_NEW_FS */
 
-		result->st_dev   = (__dev_t)devno;
-		result->st_ino   = (__FS_TYPE(ino))ino->i_fileino;
-		result->st_mode  = (__mode_t)ino->i_filemode;
-		result->st_nlink = (__nlink_t)ino->i_filenlink;
-		result->st_uid   = (__uid_t)ino->i_fileuid;
-		result->st_gid   = (__gid_t)ino->i_filegid;
-		result->st_rdev  = (__dev_t)devno;
+		result->st_dev   = (typeof(result->st_dev))devno;
+		result->st_ino   = (typeof(result->st_ino))node->i_fileino;
+		result->st_mode  = (typeof(result->st_mode))node->i_filemode;
+		result->st_nlink = (typeof(result->st_nlink))node->i_filenlink;
+		result->st_uid   = (typeof(result->st_uid))node->i_fileuid;
+		result->st_gid   = (typeof(result->st_gid))node->i_filegid;
+		result->st_rdev  = (typeof(result->st_rdev))devno;
 #ifdef __TIMESPEC64_HAVE_TV_PAD
 		/* Don't accidentally leak kernel data! */
 		{
 			struct timespec temp;
-			temp.tv_sec   = ino->i_fileatime.tv_sec;
-			temp.tv_nsec  = ino->i_fileatime.tv_nsec;
+			temp.tv_sec   = node->i_fileatime.tv_sec;
+			temp.tv_nsec  = node->i_fileatime.tv_nsec;
 			temp.__tv_pad = 0;
 			COMPILER_WRITE_BARRIER();
 			result->st_atimespec = temp;
 
-			temp.tv_sec   = ino->i_filemtime.tv_sec;
-			temp.tv_nsec  = ino->i_filemtime.tv_nsec;
+			temp.tv_sec   = node->i_filemtime.tv_sec;
+			temp.tv_nsec  = node->i_filemtime.tv_nsec;
 			temp.__tv_pad = 0;
 			COMPILER_WRITE_BARRIER();
 			result->st_mtimespec = temp;
 
-			temp.tv_sec   = ino->i_filectime.tv_sec;
-			temp.tv_nsec  = ino->i_filectime.tv_nsec;
+			temp.tv_sec   = node->i_filectime.tv_sec;
+			temp.tv_nsec  = node->i_filectime.tv_nsec;
 			temp.__tv_pad = 0;
 			COMPILER_WRITE_BARRIER();
 			result->st_ctimespec = temp;
 		}
 #else /* __TIMESPEC64_HAVE_TV_PAD */
-		result->st_atimespec = ino->i_fileatime;
-		result->st_mtimespec = ino->i_filemtime;
-		result->st_ctimespec = ino->i_filectime;
+		result->st_atimespec = node->i_fileatime;
+		result->st_mtimespec = node->i_filemtime;
+		result->st_ctimespec = node->i_filectime;
 #endif /* !__TIMESPEC64_HAVE_TV_PAD */
 	} else {
 		result->st_dev   = 0;

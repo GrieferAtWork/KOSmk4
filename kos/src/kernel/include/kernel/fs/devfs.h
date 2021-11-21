@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/super.h>
@@ -423,10 +420,7 @@ device_lookup_bystring(USER CHECKED char const *string,
                        size_t stringlen, mode_t st_mode DFL(0))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
-
-
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_DEVFS_H */

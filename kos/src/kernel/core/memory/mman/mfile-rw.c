@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_FS
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
@@ -500,7 +499,6 @@ _mfile_buffered_tailwritev(struct mfile *__restrict self,
 }
 
 DECL_END
-#endif /* CONFIG_USE_NEW_FS */
 
 
 #ifndef __INTELLISENSE__

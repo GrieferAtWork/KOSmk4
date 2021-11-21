@@ -88,19 +88,12 @@ NOTHROW(FCALL nameof_special_datablock)(struct mfile *__restrict self) {
 	if (self == &compat_execabi_system_rtld_file.mrf_file)
 		return "[" COMPAT_RTLD_LIBDL "]";
 #endif /* __ARCH_HAVE_COMPAT */
-#ifdef CONFIG_USE_NEW_FS
 	/* Since the new FS, these are literally the device files
 	 * from  /dev/,  so don't  inclued  those [...]-brackets! */
 	if (self == &mfile_phys)
 		return "/dev/mem";
 	if (self == &mfile_zero)
 		return "/dev/zero";
-#else /* CONFIG_USE_NEW_FS */
-	if (self == &mfile_phys)
-		return "[/dev/mem]";
-	if (self == &mfile_zero)
-		return "[/dev/zero]";
-#endif /* !CONFIG_USE_NEW_FS */
 	if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon))
 		return "[anon]";
 	if (self == &mfile_ndef)
@@ -114,19 +107,12 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 	dev_t dev = 0;
 	ino_t ino = 0;
 	if (info->mmi_file && mfile_isnode(info->mmi_file)) {
-		struct inode *node = (struct inode *)info->mmi_file;
-#ifdef CONFIG_USE_NEW_FS
+		struct fnode *node = mfile_asnode(info->mmi_file);
 		struct mfile *superdev;
 		superdev = node->fn_super->fs_dev;
 		if (superdev && mfile_isdevnode(superdev))
 			dev = mfile_asdevnode(superdev)->dn_devno;
-#else /* CONFIG_USE_NEW_FS */
-		struct blkdev *superdev;
-		superdev = node->i_super->s_device;
-		if (superdev)
-			dev = blkdev_devno(superdev);
-#endif /* !CONFIG_USE_NEW_FS */
-		ino = node->i_fileino;
+		ino = node->fn_ino;
 	}
 	dbg_printf(DBGSTR(AC_WHITE("%.8" PRIxPTR) "-"           /* from- */
 	                  AC_WHITE("%.8" PRIxPTR) " "           /* to */
@@ -134,7 +120,7 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 	                  "%.8" PRIxN(__SIZEOF_OFF64_T__) " "   /* offset */
 	                  "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"   /* dev:major */
 	                  "%.2" PRIxN(__SIZEOF_MINOR_T__) " "   /* dev:minor */
-	                  "%-7" PRIuN(__SIZEOF_INO64_T__) " "), /* inode */
+	                  "%-7" PRIuN(__SIZEOF_INO64_T__) " "), /* ino */
 	           info->mmi_min, info->mmi_max,
 	           info->mmi_flags & MNODE_F_PREAD /* */ ? 'r' : '-',
 	           info->mmi_flags & MNODE_F_PWRITE /**/ ? 'w' : '-',

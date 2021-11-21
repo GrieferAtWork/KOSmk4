@@ -420,18 +420,12 @@ NOTHROW(FCALL cred_restore_special_fsuid_caps)(struct cred *__restrict self) {
 DEFINE_CMDLINE_FLAG_VAR(boot_no_file_caps, "no_file_caps");
 
 /* Update program credentials as has to be done as part of an exec() system call. */
-#ifdef CONFIG_USE_NEW_FS
 INTERN void FCALL
 cred_onexec(struct mfile *__restrict program_file)
-		THROWS(E_BADALLOC)
-#else /* CONFIG_USE_NEW_FS */
-INTERN void FCALL
-cred_onexec(struct inode *__restrict program_file)
-		THROWS(E_BADALLOC)
-#endif /* !CONFIG_USE_NEW_FS */
-{
+		THROWS(E_BADALLOC) {
 	uid_t new_euid;
 	struct cred *self = THIS_CRED;
+
 	/* Unshare credentials if more the reference counter indicates that we must do so. */
 	if (isshared(self)) {
 		REF struct cred *copy;
@@ -442,22 +436,16 @@ cred_onexec(struct inode *__restrict program_file)
 		self = copy;
 	}
 	COMPILER_READ_BARRIER();
+
 	/* NOTE: Because we've unshared `self', we don't have to acquire a lock,
 	 *       since we  already  know  that no-one  can  modify  it  anymore! */
 	new_euid = self->c_euid;
-#ifdef CONFIG_USE_NEW_FS
 	if (!self->c_no_new_privs && mfile_isnode(program_file) &&
-	    !(mfile_asnode(program_file)->fn_super->fs_root.mf_flags & MFILE_FS_NOSUID))
-#else /* CONFIG_USE_NEW_FS */
-	if (!self->c_no_new_privs &&
-	    !(program_file->i_super->s_flags & SUPERBLOCK_FNOSUID))
-#endif /* !CONFIG_USE_NEW_FS */
-	{
+	    !(mfile_asnode(program_file)->fn_super->fs_root.mf_flags & MFILE_FS_NOSUID)) {
 		/* Check for set-user-id/set-group-id */
 		mode_t program_mode;
 		uid_t program_uid;
 		gid_t program_gid;
-#ifdef CONFIG_USE_NEW_FS
 		struct fnode *node;
 		struct fnode_perm_ops const *perm_ops;
 		node     = mfile_asnode(program_file);
@@ -474,12 +462,6 @@ cred_onexec(struct inode *__restrict program_file)
 			program_gid  = node->fn_gid;
 			mfile_tslock_release(node);
 		}
-#else /* CONFIG_USE_NEW_FS */
-		inode_loadattr(program_file);
-		program_mode = program_file->i_filemode;
-		program_uid  = program_file->i_fileuid;
-		program_gid  = program_file->i_filegid;
-#endif /* !CONFIG_USE_NEW_FS */
 
 		if (program_mode & S_ISUID) {
 			new_euid = program_uid;

@@ -213,6 +213,7 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 	size_t result;
 	struct mpart_physloc physloc;
 	mpart_reladdr_t part_offs, part_size;
+
 	/* Deal with VIO parts. */
 #ifdef LIBVIO_CONFIG_ENABLED
 	if unlikely(self->mp_state == MPART_ST_VIO) {
@@ -220,12 +221,15 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 		mpart_lock_acquire(self);
 		file = incref(self->mp_file);
 		mpart_lock_release(self);
+
 		/* Directly read to/from VIO */
 		FINALLY_DECREF_UNLIKELY(file);
+
 		/* The file may have been changed to something that doesn't support VIO
 		 * This  is unlikely, but  can happen if the  file has been anonymized! */
-		if unlikely(mfile_getvio(file) == NULL)
+		if unlikely(file->mf_ops->mo_vio == NULL)
 			return 0;
+
 		/* Technically, we're supposed to check that `filepos' is still in-bounds
 		 * of our mem-part, but  doing so is kind-of  redundant, which is why  we
 		 * don't actually do that check! */

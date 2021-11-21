@@ -22,13 +22,9 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/regnode.h>
 #include <bits/crt/format-printer.h>
 #include <kernel/types.h>
-
 
 /*
  * Special sub-class for regular files: Printed Nodes
@@ -52,7 +48,6 @@
  * using stat yields `0'
  *
  */
-
 
 #ifdef __CC__
 DECL_BEGIN
@@ -193,9 +188,7 @@ printnode_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                        struct aio_multihandle *__restrict aio)
 		THROWS(...);
 
-
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_PRINTNODE_H */

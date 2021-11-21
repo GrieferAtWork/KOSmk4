@@ -62,6 +62,9 @@ find_eol(char *line, size_t len) {
 INTERN WUNUSED NONNULL((1)) unsigned int FCALL
 shebang_exec(struct execargs *__restrict args) {
 	char *ext_header;
+	char *execfile, *execline_end;
+	char *execfile_end;
+	char *optarg_start;
 
 	/* shebang can't be used without an execution path! */
 	if unlikely(!args->ea_xpath)
@@ -72,193 +75,157 @@ shebang_exec(struct execargs *__restrict args) {
 	 *            Optional                       Mandatory            Optional
 	 *            whitespace                     whitespace           whitespace */
 	ext_header = NULL;
+	RAII_FINALLY {
+		if unlikely(ext_header != NULL)
+			kfree(ext_header);
+	};
 
 	/* Check for simple case: the linefeed is already apart of the pre-loaded `exec_header' */
-	TRY {
-		char *execfile, *execline_end;
-		char *execfile_end;
-		char *optarg_start;
-		execfile     = (char *)args->ea_header + 2;
-		execline_end = find_eol(execfile, CONFIG_EXECABI_MAXHEADER - 2);
-		if unlikely(!execline_end) {
-			size_t extlen;
-			char *ptr;
-			/* The end of the leading line may be apart of an extended header. */
-			ext_header = (char *)kmalloc(CONFIG_SHEBANG_INTERPRETER_LINE_MAX, GFP_NORMAL);
-			ptr        = (char *)mempcpy(ext_header, args->ea_header + 2, CONFIG_EXECABI_MAXHEADER - 2);
+	execfile     = (char *)args->ea_header + 2;
+	execline_end = find_eol(execfile, CONFIG_EXECABI_MAXHEADER - 2);
+	if unlikely(!execline_end) {
+		size_t extlen;
+		char *ptr;
+		/* The end of the leading line may be apart of an extended header. */
+		ext_header = (char *)kmalloc(CONFIG_SHEBANG_INTERPRETER_LINE_MAX, GFP_NORMAL);
+		ptr        = (char *)mempcpy(ext_header, args->ea_header + 2, CONFIG_EXECABI_MAXHEADER - 2);
 #define MAX_EXTSIZE (CONFIG_SHEBANG_INTERPRETER_LINE_MAX - (CONFIG_EXECABI_MAXHEADER - 2))
-			extlen = inode_read(args->ea_xfile, ptr, MAX_EXTSIZE, (pos_t)(CONFIG_EXECABI_MAXHEADER - 2));
-			if (extlen < MAX_EXTSIZE)
-				memset(ptr + extlen, 0, MAX_EXTSIZE - extlen);
+		extlen = mfile_read(args->ea_xfile, ptr, MAX_EXTSIZE, (pos_t)(CONFIG_EXECABI_MAXHEADER - 2));
+		if (extlen < MAX_EXTSIZE)
+			memset(ptr + extlen, 0, MAX_EXTSIZE - extlen);
 #undef MAX_EXTSIZE
-			execfile     = ext_header;
-			execline_end = find_eol(execfile, CONFIG_SHEBANG_INTERPRETER_LINE_MAX);
-			if unlikely(!execline_end) {
-				/* NOTE: `kfree(ext_header);' is called by an EXCEPT below! */
-				THROW(E_NOT_EXECUTABLE_FAULTY,
-				      E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG,
-				      E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC);
-			}
+		execfile     = ext_header;
+		execline_end = find_eol(execfile, CONFIG_SHEBANG_INTERPRETER_LINE_MAX);
+		if unlikely(!execline_end) {
+			/* NOTE: `kfree(ext_header);' is called by an EXCEPT below! */
+			THROW(E_NOT_EXECUTABLE_FAULTY,
+			      E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG,
+			      E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC);
 		}
-		/* Trim leading+trailing space characters. */
-		for (;;) {
-			if unlikely(execfile >= execline_end) {
-				/* Empty interpreter line. */
-				THROW(E_NOT_EXECUTABLE_FAULTY,
-				      E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG,
-				      E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_NO_INTERP);
-			}
-			if (isspace(execfile[0])) {
-				++execfile;
-				continue;
-			}
-			if (isspace(execline_end[-1])) {
-				--execline_end;
-				continue;
-			}
+	}
+
+	/* Trim leading+trailing space characters. */
+	for (;;) {
+		if unlikely(execfile >= execline_end) {
+			/* Empty interpreter line. */
+			THROW(E_NOT_EXECUTABLE_FAULTY,
+			      E_NOT_EXECUTABLE_FAULTY_FORMAT_SHEBANG,
+			      E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_NO_INTERP);
+		}
+		if (isspace(execfile[0])) {
+			++execfile;
+			continue;
+		}
+		if (isspace(execline_end[-1])) {
+			--execline_end;
+			continue;
+		}
+		break;
+	}
+	/* Figure out where the filename of the executable ends. */
+	execfile_end = execfile + 1;
+	while (execfile_end < execline_end) {
+		if (isspace(*execfile_end))
 			break;
-		}
-		/* Figure out where the filename of the executable ends. */
-		execfile_end = execfile + 1;
-		while (execfile_end < execline_end) {
-			if (isspace(*execfile_end))
-				break;
-			++execfile_end;
-		}
-		*execfile_end = '\0'; /* Terminate the interpreter name. */
-		optarg_start = execfile_end + 1;
-		/* Strip leading space from the optional argument. */
-		while (optarg_start < execline_end) {
-			if (!isspace(*optarg_start))
-				break;
-			++optarg_start;
-		}
-		/* At this point:
-		 *   FILENAME      = [execfile, execfile_end)
-		 *   OPTARG_EXISTS = optarg_start < execline_end
-		 *   OPTARG        = [optarg_start, execline_end) */
+		++execfile_end;
+	}
+	*execfile_end = '\0'; /* Terminate the interpreter name. */
+	optarg_start = execfile_end + 1;
+	/* Strip leading space from the optional argument. */
+	while (optarg_start < execline_end) {
+		if (!isspace(*optarg_start))
+			break;
+		++optarg_start;
+	}
+	/* At this point:
+	 *   FILENAME      = [execfile, execfile_end)
+	 *   OPTARG_EXISTS = optarg_start < execline_end
+	 *   OPTARG        = [optarg_start, execline_end) */
 #define HAS_OPTIONAL_ARGUMENT() (optarg_start < execline_end)
-		{
-			/* Load the interpreter program. */
-			REF struct path /*           */ *interp_path;
-			REF struct fdirent /**/ *interp_dentry;
-#ifdef CONFIG_USE_NEW_FS
-			REF struct fnode *interp_node;
-			{
-				u32 lnks = ATOMIC_READ(THIS_FS->fs_lnkmax);
-				interp_node = path_traversefull_ex(args->ea_xpath, &lnks, execfile, 0,
-				                                   &interp_path, &interp_dentry);
-			}
-#else /* CONFIG_USE_NEW_FS */
-			REF struct regular_node /*   */ *interp_node;
-			{
-				struct fs *myfs = THIS_FS;
-				REF struct path *search_root;
-				sync_read(&myfs->f_pathlock);
-				search_root = incref(myfs->f_root);
-				sync_endread(&myfs->f_pathlock);
-				FINALLY_DECREF_UNLIKELY(search_root);
-				/* NOTE: Relative paths are  interpreted relative  to the  directory
-				 *       containing the script file itself.  I feel like that  makes
-				 *       more sense that using the calling process's current working
-				 *       directory. */
-				interp_node = (REF struct regular_node *)path_traversefull_ex(myfs,
-				                                                              args->ea_xpath,
-				                                                              search_root,
-				                                                              execfile,
-				                                                              true,
-				                                                              ATOMIC_READ(myfs->f_mode.f_atflag),
-				                                                              NULL,
-				                                                              &interp_path,
-				                                                              NULL,
-				                                                              &interp_dentry);
-			}
-#endif /* !CONFIG_USE_NEW_FS */
-			TRY {
-				char *inject_arg0, *inject_arg1;
-				size_t more_argc;
-
-				/* In order to allow for execution, the file itself must support mmaping.
-				 * It's  not OK if the file can be mmap'd indirectly, or if mmap has been
-				 * disabled for the file. */
-#ifdef CONFIG_USE_NEW_FS
-				if unlikely(!mfile_hasrawio(interp_node))
-					THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
-#endif /* CONFIG_USE_NEW_FS */
-
-				/* Check for execute permissions? */
-				inode_access(interp_node, R_OK | X_OK);
-
-				/* Construct a new set to arguments to-be injected. */
-				more_argc = 1;
-				if (HAS_OPTIONAL_ARGUMENT())
-					more_argc = 2;
-				args->ea_argv_inject = (char **)krealloc(args->ea_argv_inject,
-				                                         (args->ea_argc_inject +
-				                                          more_argc) *
-				                                         sizeof(char *),
-				                                         GFP_NORMAL);
-				/* Duplicate the 1-2 arguments we want to inject. */
-				inject_arg0 = (char *)kmalloc((size_t)((execfile_end - execfile) + 1) *
-				                              sizeof(char),
-				                              GFP_NORMAL);
-				*(char *)mempcpy(inject_arg0, execfile,
-				                 (size_t)(execfile_end - execfile),
-				                 sizeof(char)) = '\0';
-				inject_arg1 = NULL;
-				if (HAS_OPTIONAL_ARGUMENT()) {
-					TRY {
-						inject_arg1 = (char *)kmalloc((size_t)((execline_end - optarg_start) + 1) *
-						                              sizeof(char),
-						                              GFP_NORMAL);
-						*(char *)mempcpy(inject_arg1, optarg_start,
-						                 (size_t)(execline_end - optarg_start),
-						                 sizeof(char)) = '\0';
-					} EXCEPT {
-						kfree(inject_arg0);
-						RETHROW();
-					}
-				}
-
-				/* Keep arguments that were already supposed to be
-				 * injected, however inject  those after the  ones
-				 * that we're supposed to inject. */
-				memmoveup(args->ea_argv_inject + more_argc,
-				          args->ea_argv_inject,
-				          args->ea_argc_inject,
-				          sizeof(char *));
-
-				/* Actually inject the 2 arguments. */
-				args->ea_argv_inject[0] = inject_arg0;
-				if (inject_arg1)
-					args->ea_argv_inject[1] = inject_arg1;
-				args->ea_argc_inject += more_argc;
-			} EXCEPT {
-				decref_unlikely(interp_path);
-				decref_unlikely(interp_dentry);
-				decref_unlikely(interp_node);
-				RETHROW();
-			}
-
-			/* Replace the exec-path with that of the interpreter. */
-			decref_unlikely(args->ea_xpath);
-			xdecref_unlikely(args->ea_xdentry);
-			decref_unlikely(args->ea_xfile);
-			args->ea_xpath   = interp_path;   /* Inherit reference */
-			args->ea_xdentry = interp_dentry; /* Inherit reference */
-			args->ea_xfile   = interp_node;   /* Inherit reference */
-		}
-#undef HAS_OPTIONAL_ARGUMENT
-	} EXCEPT {
-		kfree(ext_header);
-		RETHROW();
-	}
-#ifndef __OPTIMIZE_SIZE__
-	if unlikely(ext_header != NULL)
-#endif /* !__OPTIMIZE_SIZE__ */
 	{
-		kfree(ext_header);
+		/* Load the interpreter program. */
+		REF struct path /*           */ *interp_path;
+		REF struct fdirent /**/ *interp_dentry;
+		REF struct fnode *interp_node;
+		{
+			u32 lnks = ATOMIC_READ(THIS_FS->fs_lnkmax);
+			interp_node = path_traversefull_ex(args->ea_xpath, &lnks, execfile, 0,
+			                                   &interp_path, &interp_dentry);
+		}
+		TRY {
+			char *inject_arg0, *inject_arg1;
+			size_t more_argc;
+
+			/* In order to allow for execution, the file itself must support mmaping.
+			 * It's  not OK if the file can be mmap'd indirectly, or if mmap has been
+			 * disabled for the file. */
+			if unlikely(!mfile_hasrawio(interp_node))
+				THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
+
+			/* Check for execute permissions? */
+			inode_access(interp_node, R_OK | X_OK);
+
+			/* Construct a new set to arguments to-be injected. */
+			more_argc = 1;
+			if (HAS_OPTIONAL_ARGUMENT())
+				more_argc = 2;
+			args->ea_argv_inject = (char **)krealloc(args->ea_argv_inject,
+			                                         (args->ea_argc_inject +
+			                                          more_argc) *
+			                                         sizeof(char *),
+			                                         GFP_NORMAL);
+			/* Duplicate the 1-2 arguments we want to inject. */
+			inject_arg0 = (char *)kmalloc((size_t)((execfile_end - execfile) + 1) *
+			                              sizeof(char),
+			                              GFP_NORMAL);
+			*(char *)mempcpy(inject_arg0, execfile,
+			                 (size_t)(execfile_end - execfile),
+			                 sizeof(char)) = '\0';
+			inject_arg1 = NULL;
+			if (HAS_OPTIONAL_ARGUMENT()) {
+				TRY {
+					inject_arg1 = (char *)kmalloc((size_t)((execline_end - optarg_start) + 1) *
+					                              sizeof(char),
+					                              GFP_NORMAL);
+					*(char *)mempcpy(inject_arg1, optarg_start,
+					                 (size_t)(execline_end - optarg_start),
+					                 sizeof(char)) = '\0';
+				} EXCEPT {
+					kfree(inject_arg0);
+					RETHROW();
+				}
+			}
+
+			/* Keep arguments that were already supposed to be
+			 * injected, however inject  those after the  ones
+			 * that we're supposed to inject. */
+			memmoveup(args->ea_argv_inject + more_argc,
+			          args->ea_argv_inject,
+			          args->ea_argc_inject,
+			          sizeof(char *));
+
+			/* Actually inject the 2 arguments. */
+			args->ea_argv_inject[0] = inject_arg0;
+			if (inject_arg1)
+				args->ea_argv_inject[1] = inject_arg1;
+			args->ea_argc_inject += more_argc;
+		} EXCEPT {
+			decref_unlikely(interp_path);
+			decref_unlikely(interp_dentry);
+			decref_unlikely(interp_node);
+			RETHROW();
+		}
+
+		/* Replace the exec-path with that of the interpreter. */
+		decref_unlikely(args->ea_xpath);
+		xdecref_unlikely(args->ea_xdentry);
+		decref_unlikely(args->ea_xfile);
+		args->ea_xpath   = interp_path;   /* Inherit reference */
+		args->ea_xdentry = interp_dentry; /* Inherit reference */
+		args->ea_xfile   = interp_node;   /* Inherit reference */
 	}
+#undef HAS_OPTIONAL_ARGUMENT
+
 	/* Tell our caller to restart interpretation. */
 	return EXECABI_EXEC_RESTART;
 }

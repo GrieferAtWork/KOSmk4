@@ -732,51 +732,16 @@ NOTHROW(KCALL mousedev_hwheel_nopr)(struct mousedev *__restrict self,
 
 
 
-#ifndef CONFIG_USE_NEW_FS
-/* Initialize/finalize the given mouse device.
- * NOTE: Drivers that override the `ct_fini' operator of a given  mouse
- *       must ensure that `mousedev_v_fini()' is still invoked by their
- *       override.
- * NOTE: The following operators are intrinsically provided by mouse,
- *       get  initialized  by  `mousedev_init()', and  should  not be
- *       overwritten:
- *         - ct_read
- *         - ct_ioctl
- *         - ct_stat
- *         - ct_poll */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL mousedev_init)(struct mousedev *__restrict self) {
-	assert(self->cd_type.ct_driver != NULL);
-	self->cd_type.ct_read        = &mousedev_v_read;
-	self->cd_type.ct_ioctl       = &mousedev_v_ioctl;
-	self->cd_type.ct_stat        = &mousedev_v_stat;
-	self->cd_type.ct_pollconnect = &mousedev_v_pollconnect;
-	self->cd_type.ct_polltest    = &mousedev_v_polltest;
-	atomic_rwlock_cinit(&self->md_lock);
-}
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 /* Mouse character device operators */
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
 mousedev_v_read(struct mfile *__restrict self,
                 USER CHECKED void *dst, size_t num_bytes,
-                iomode_t mode) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) size_t KCALL
-mousedev_v_read(struct chrdev *__restrict self,
-                USER CHECKED void *dst, size_t num_bytes,
-                iomode_t mode) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-	size_t result;
-	mouse_packet_t packet;
-#ifdef CONFIG_USE_NEW_FS
+                iomode_t mode) THROWS(...) {
 	struct mousedev *me = mfile_asmouse(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct mousedev *me = (struct mousedev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
+	mouse_packet_t packet;
+	size_t result;
 	if unlikely(num_bytes < sizeof(mouse_packet_t)) {
 		if (num_bytes != 0)
 			THROW(E_BUFFER_TOO_SMALL, sizeof(mouse_packet_t), num_bytes);
@@ -810,21 +775,11 @@ empty:
 	return 0;
 }
 
-#ifdef CONFIG_USE_NEW_FS
+
 PUBLIC NONNULL((1)) void KCALL
 mousedev_v_stat(struct mfile *__restrict self,
-                USER CHECKED struct stat *result) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) void KCALL
-mousedev_v_stat(struct chrdev *__restrict self,
-                USER CHECKED struct stat *result) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
-	struct mousedev *me = mfile_asmouse(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct mousedev *me = (struct mousedev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
+                USER CHECKED struct stat *result) THROWS(...) {
+	struct mousedev *me  = mfile_asmouse(self);
 	uintptr_half_t count = ATOMIC_READ(me->md_buf.mb_bufstate.bs_state.s_used);
 
 	/* Write info to user-space. */
@@ -841,7 +796,6 @@ mouse_device_canread(struct mousedev *__restrict self) {
 }
 
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
 mousedev_v_pollconnect(struct mfile *__restrict self,
                        poll_mode_t what) THROWS(...) {
@@ -860,47 +814,13 @@ mousedev_v_polltest(struct mfile *__restrict self,
 	}
 	return 0;
 }
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) void KCALL
-mousedev_v_pollconnect(struct chrdev *__restrict self,
-                       poll_mode_t what) THROWS(...) {
-	struct mousedev *me;
-	me = (struct mousedev *)self;
-	if (what & POLLINMASK)
-		task_connect_for_poll(&me->md_buf.mb_avail);
-}
-
-PUBLIC NONNULL((1)) poll_mode_t KCALL
-mousedev_v_polltest(struct chrdev *__restrict self,
-                      poll_mode_t what) THROWS(...) {
-	struct mousedev *me;
-	me = (struct mousedev *)self;
-	if (what & POLLINMASK) {
-		if (mouse_device_canread(me))
-			return POLLINMASK;
-	}
-	return 0;
-}
-#endif /* !CONFIG_USE_NEW_FS */
 
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 mousedev_v_ioctl(struct mfile *__restrict self,
                  syscall_ulong_t cmd, USER UNCHECKED void *arg,
-                 iomode_t mode) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) syscall_slong_t KCALL
-mousedev_v_ioctl(struct chrdev *__restrict self,
-                 syscall_ulong_t cmd, USER UNCHECKED void *arg,
-                 iomode_t mode) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+                 iomode_t mode) THROWS(...) {
 	struct mousedev *me = mfile_asmouse(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct mousedev *me = (struct mousedev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
 	(void)mode;
 	switch (cmd) {
 

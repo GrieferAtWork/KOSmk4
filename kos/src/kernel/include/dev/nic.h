@@ -164,9 +164,7 @@ struct nic_addresses {
 
 
 struct nicdev_ops {
-#ifdef CONFIG_USE_NEW_FS
 	struct chrdev_ops nd_cdev; /* Character device operators. */
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* [1..1] Send a packet.
 	 * WARNING: Any NIC packet can only ever be sent _once_ at the same  time!
@@ -207,9 +205,6 @@ struct nicdev
 #define _nicdev_aschr(x) x
 #define _nicdev_chr_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
-#ifndef CONFIG_USE_NEW_FS
-	struct nicdev_ops       nd_ops;     /* Device operators. */
-#endif /* !CONFIG_USE_NEW_FS */
 	WEAK uintptr_t          nd_ifflags; /* [lock(INTERN)] Netword interface flags (set of `IFF_*') */
 	struct nic_device_stat  nd_stat;    /* Usage statistics */
 	gfp_t                   nd_hdgfp;   /* [const] Additional GFP  flags for  packet header/tail  buffers.
@@ -219,8 +214,6 @@ struct nicdev
 	struct network          nd_net;     /* A description of the attached network. */
 };
 
-
-#ifdef CONFIG_USE_NEW_FS
 
 /* Operator access */
 #define nicdev_getops(self) \
@@ -297,35 +290,14 @@ nicdev_v_write(struct mfile *__restrict self,
 /* Finalize a partially initialized `struct nicdev' (as initialized by `_nicdev_init()') */
 #define _nicdev_fini(self) _chrdev_fini(_nicdev_aschr(self))
 
-#else /* CONFIG_USE_NEW_FS */
-
-/* Check if a given character device is a NIC. */
-#define chrdev_isnic(self)                           \
-	((self)->cd_heapsize >= sizeof(struct nicdev) && \
-	 (self)->cd_type.ct_write == &nicdev_v_write)
-#define nicdev_getops(self) (&(self)->nd_ops)
-
-
-/* Mandatory write-operator for NIC devices. */
-FUNDEF NONNULL((1)) size_t KCALL
-nicdev_v_write(struct chrdev *__restrict self,
-               USER CHECKED void const *src,
-               size_t num_bytes, iomode_t mode) THROWS(...);
-
-/* Initialize a given NIC device. */
-FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL nicdev_cinit)(struct nicdev *__restrict self,
-                            struct nicdev_ops const *__restrict ops);
-
-/* Default finalizer for NIC devices.
- * NOTE: Must be called by drivers when `cd_type.ct_fini' gets overwritten. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL nicdev_v_fini)(struct chrdev *__restrict self);
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 
 
+
+/************************************************************************/
+/* NIC API Functions                                                    */
+/************************************************************************/
 
 /* Allocate  a new NIC packet which may be used to send the given payload.
  * Reserve sufficient space for headers and footers of up to the specified

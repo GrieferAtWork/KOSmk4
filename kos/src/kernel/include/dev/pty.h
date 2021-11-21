@@ -90,8 +90,6 @@ struct ptymaster
 	struct ptyslave_awref  pm_slave; /* [0..1] The terminal's slave side (cleared when destroyed) */
 };
 
-#ifdef CONFIG_USE_NEW_FS
-
 /* Operators used by `struct ptyslave' */
 DATDEF struct ttydev_ops const ptyslave_ops;
 
@@ -123,19 +121,6 @@ DATDEF struct chrdev_ops const ptymaster_ops;
 #define device_asptymaster(self)  devnode_asptymaster(_device_asdevnode(self))
 #define chrdev_isptymaster(self)  device_isptymaster(_chrdev_asdev(self))
 #define chrdev_asptymaster(self)  device_asptymaster(_chrdev_asdev(self))
-
-#else /* CONFIG_USE_NEW_FS */
-
-/* Check if a given TTY/character device is a `struct ptyslave'. */
-#define ttydev_isptyslave(self) ((self)->t_term.t_oprint == &ptyslave_v_oprinter)
-#define chrdev_isptyslave(self) (chrdev_istty(self) && ttydev_isptyslave((struct ttydev *)(self)))
-
-/* oprinter callback for `struct ptyslave' tty objects. */
-FUNDEF ssize_t LIBTERM_CC
-ptyslave_v_oprinter(struct terminal *__restrict term,
-                    void const *__restrict src,
-                    size_t num_bytes, iomode_t mode);
-#endif /* !CONFIG_USE_NEW_FS */
 
 /* Allocate a new PTY master/slave pair.
  * Note that the device pair will have already been registered. */

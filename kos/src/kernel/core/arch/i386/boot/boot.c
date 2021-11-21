@@ -50,13 +50,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libpciaccess/pciaccess.h> /* pci_system_init() */
 
-#ifndef CONFIG_USE_NEW_FS /* Only used for boot_partition-init */
-#include <dev/block.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
-#include <kernel/panic.h>
-#endif /* !CONFIG_USE_NEW_FS */
-
 DECL_BEGIN
 
 PUBLIC ATTR_USED ATTR_SECTION(".bss")
@@ -330,9 +323,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	kernel_initialize_commandline_options_stable();
 
 	/* Initialize builtin core drivers. */
-#ifndef CONFIG_USE_NEW_FS
-	kernel_initialize_devfs_driver();
-#endif /* !CONFIG_USE_NEW_FS */
 	pci_system_init();
 	kernel_initialize_ide_driver();
 	kernel_initialize_fat_driver(); /* TODO: This can be done with static init! */
@@ -344,16 +334,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * NOTE: This can only be done after bootloader drivers, since drivers provided
 	 *       by  the   bootloader  are   themself  mapped   as  preserved   memory. */
 	minfo_release_preservations();
-
-#ifndef CONFIG_USE_NEW_FS
-	/* Initialize special builtin character devices (/dev/null, /dev/zero, etc.) */
-	kernel_initialize_null_devices();
-#endif /* !CONFIG_USE_NEW_FS */
-
-#ifndef CONFIG_USE_NEW_FS
-	/* Initialize the /dev/tty alias device */
-	kernel_initialize_ctty_device();
-#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Initialize (load dependencies, apply relocations & call constructors)
 	 * all of the drivers provided by the bootloader. */
@@ -372,21 +352,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       (u8)boot_device.bdi_sub_sub_partition);
 
 	/* Mount the root filesystem. */
-#ifdef CONFIG_USE_NEW_FS
 	kernel_initialize_rootfs();
-#else /* CONFIG_USE_NEW_FS */
-	/* Make sure that we've managed to detect a single, valid boot partition, or
-	 * that the user started the  kernel with a boot=... commandline  parameter. */
-	if unlikely(boot_partition == NULL)
-		kernel_panic(FREESTR("Unable to detect boot partition (reboot with `boot=...')"));
-	if unlikely(boot_partition == (struct blkdev *)-1)
-		kernel_panic(FREESTR("Detected boot partition is ambiguous (reboot with `boot=...')"));
-
-	/* TODO: Don't hard-code fat here. - Instead, try every currently loaded filesystem driver.
-	 *       After   all:   The    bootloader   may   have    loaded   additional    drivers... */
-	/* TODO: Move this mount() call into a different file. */
-	path_mount(THIS_VFS, "fat", boot_partition, SUPERBLOCK_FNORMAL, NULL, NULL, true);
-#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Run self-tests. (if enabled) */
 #ifdef CONFIG_SELFTEST
@@ -805,13 +771,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       correctly  with all of  the special AT_RENAME_*  flags, since they were
 	 *       implemented before I learned about unix rename() semantics... */
 
-	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, <hybrid/sequence/atree.h>
-	 *       can finally go away! (also: deemon doesn't use it, so don't  worry) */
-
-	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, get rid of `<sched/rwlock.h>' */
-
-	/* TODO: Once CONFIG_USE_NEW_FS becomes mandatory, get rid of `<sched/sync.h>' */
-
 	/* TODO: Rewrite `handle_manager' to make it  possible for fds to be  allocated
 	 *       in a 2-step process: #1: reserve, #2: commit (where commit must behave
 	 *       as NOBLOCK+NOTHROW, and can also be aborted/undone)
@@ -988,6 +947,35 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  - sco_setlogicalwidth
 	 * Also add corresponding read-ioctls that will read the relevant properties.
 	 */
+
+	/* TODO: Re-write "moddbx/obnode.c" from scratch, now that `CONFIG_USE_NEW_FS' is mandatory. */
+
+	/* TODO: Get rid of HANDLE_TYPE_MPART */
+
+	/* TODO: Get rid of HANDLE_TYPE_MFUTEX */
+
+	/* TODO: Get rid of HANDLE_TYPE_FS */
+
+	/* TODO: Get rid of HANDLE_TYPE_VFS */
+
+	/* TODO: Get rid of HANDLE_TYPE_MMAN */
+
+	/* TODO: Get rid of HANDLE_TYPE_MODULE_SECTION */
+
+	/* TODO: Get rid of HANDLE_TYPE_PIDNS */
+
+	/* TODO: `HOP_SUPERBLOCK_FEATURES' is used by `fpathconf(3)', but is no longer being implemented
+	 *       Look at  what's actually  being used  and add  kos-specific ioctls  for what's  needed! */
+
+	/* TODO: Rename `HANDLE_TYPE_FDIRENT' to `HANDLE_TYPE_DIRENT' */
+
+	/* TODO: `HANDLE_TYPEKIND_MFILE_*' needs to be expanded with all of the new sub-classes of MFILE,
+	 *       as well as all of the subclasses of those types. The system should be designed such that
+	 *       sub-class  type IDs can easily be used to test for parent classes, given a precise child
+	 *       class ID; e.g. `HANDLE_TYPEKIND_MFILE_ISNODE(x)' checks for FNODE and all fnode-subs. */
+
+	/* TODO: Add  an ioctl around mfile_tailread() for user-space.
+	 *       Could be used to implement an efficient `tail(1) -f'. */
 
 	/* TODO: There's a missing incref() relating to mktty.
 	 * Replicate bug:

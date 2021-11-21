@@ -23,7 +23,6 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#ifdef CONFIG_USE_NEW_FS
 
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
@@ -206,6 +205,5 @@ DEFINE_SYSCALL2(fd_t, memfd_create,
 
 
 DECL_END
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MEMFD_C */

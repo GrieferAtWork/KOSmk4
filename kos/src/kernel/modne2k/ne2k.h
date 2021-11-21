@@ -24,13 +24,11 @@
 
 #include <dev/nic.h>
 #include <kernel/types.h>
-#include <sched/rwlock.h>
 #include <sched/signal.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/sequence/list.h>
-#include <hybrid/sync/atomic-rwlock.h>
 
 #include <hw/net/ne2k.h>
 #include <linux/if_ether.h>
@@ -136,13 +134,11 @@ typedef struct ne2k_device: nicdev {
 } Ne2kDevice;
 
 #define nicdev_asne2k(self)  ((Ne2kDevice *)(self))
-#ifdef CONFIG_USE_NEW_FS
-#define chrdev_asne2k(self)  ((Ne2kDevice *)chrdev_asnic(self))
-#define device_asne2k(self)  ((Ne2kDevice *)device_asnic(self))
-#define devnode_asne2k(self) ((Ne2kDevice *)devnode_asnic(self))
-#define fnode_asne2k(self)   ((Ne2kDevice *)fnode_asnic(self))
-#define mfile_asne2k(self)   ((Ne2kDevice *)mfile_asnic(self))
-#endif /* CONFIG_USE_NEW_FS */
+#define chrdev_asne2k(self)  nicdev_asne2k(chrdev_asnic(self))
+#define device_asne2k(self)  nicdev_asne2k(device_asnic(self))
+#define devnode_asne2k(self) nicdev_asne2k(devnode_asnic(self))
+#define fnode_asne2k(self)   nicdev_asne2k(fnode_asnic(self))
+#define mfile_asne2k(self)   nicdev_asne2k(mfile_asnic(self))
 
 /* Reset the network card via `NE_RESET()'. */
 INTDEF void KCALL Ne2k_ResetCard(port_t iobase) THROWS(E_IOERROR_TIMEOUT);

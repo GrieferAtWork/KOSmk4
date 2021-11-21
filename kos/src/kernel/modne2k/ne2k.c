@@ -1239,30 +1239,15 @@ Ne2k_SetFlags(struct nicdev *__restrict self,
 
 
 
-#ifdef CONFIG_USE_NEW_FS
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL Ne2k_Destroy)(struct mfile *__restrict self)
-#else /* CONFIG_USE_NEW_FS */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL Ne2k_Fini)(struct chrdev *__restrict self)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+NOTHROW(KCALL Ne2k_Destroy)(struct mfile *__restrict self) {
 	Ne2kDevice *me = mfile_asne2k(self);
-#else /* CONFIG_USE_NEW_FS */
-	Ne2kDevice *me = (Ne2kDevice *)self;
-#endif /* !CONFIG_USE_NEW_FS */
 	hisr_unregister(&Ne2k_InterruptHandler, me);
 	unregister_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
-#ifdef CONFIG_USE_NEW_FS
 	nicdev_v_destroy(me);
-#else /* CONFIG_USE_NEW_FS */
-	nicdev_v_fini(me);
-#endif /* !CONFIG_USE_NEW_FS */
 }
 
 PRIVATE struct nicdev_ops const Ne2k_NICDeviceOps = {
-#ifdef CONFIG_USE_NEW_FS
 	.nd_cdev = {{{{
 		.no_file = {
 			.mo_destroy = &Ne2k_Destroy,
@@ -1271,7 +1256,6 @@ PRIVATE struct nicdev_ops const Ne2k_NICDeviceOps = {
 		},
 		.no_wrattr = &nicdev_v_wrattr,
 	}}}},
-#endif /* CONFIG_USE_NEW_FS */
 	.nd_send     = &Ne2k_SendPacket,
 	.nd_setflags = &Ne2k_SetFlags,
 };
@@ -1331,19 +1315,11 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	NE2K_DEBUG("[ne2k] PROM:\n%$[hex]\n", sizeof(prom), prom);
 
 	/* Construct the device. */
-#ifdef CONFIG_USE_NEW_FS
 	self = (REF Ne2kDevice *)kmalloc(sizeof(Ne2kDevice), GFP_CALLOC);
 	_nicdev_cinit(self, &Ne2k_NICDeviceOps);
 	self->fn_mode   = S_IFCHR | 0644;
 	self->dv_driver = incref(&drv_self);
-	TRY
-#else /* CONFIG_USE_NEW_FS */
-	self = CHRDEV_ALLOC(Ne2kDevice);
-	FINALLY_DECREF_UNLIKELY(self);
-	nicdev_cinit(self, &Ne2k_NICDeviceOps);
-	self->cd_type.ct_fini = &Ne2k_Fini;
-#endif /* !CONFIG_USE_NEW_FS */
-	{
+	TRY {
 		sig_cinit(&self->nk_stidle);
 		sig_cinit(&self->nk_stpkld);
 		sig_cinit(&self->nk_uioint);
@@ -1388,7 +1364,6 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 		}
 #endif /* !NDEBUG */
 
-#ifdef CONFIG_USE_NEW_FS
 		/* Register device. */
 		TRY {
 			device_registerf(self, MKDEV(DEV_MAJOR_AUTO, 0),
@@ -1398,26 +1373,13 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 			unregister_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
 			RETHROW();
 		}
-#else /* CONFIG_USE_NEW_FS */
-		{
-			static unsigned int n = 0; /* XXX: Better naming */
-			sprintf(self->cd_name, "ne2k%u", n++);
-		}
-
-		self->fn_mode          = S_IFCHR | 0644;
-		self->dv_driver        = incref(&drv_self);
-		chrdev_register_auto(self);
-#endif /* !CONFIG_USE_NEW_FS */
-	}
-#ifdef CONFIG_USE_NEW_FS
-	EXCEPT {
+	} EXCEPT {
 		decref_nokill(&drv_self);
 		_nicdev_fini(self);
 		kfree(self);
 		RETHROW();
 	}
 	FINALLY_DECREF_UNLIKELY(self);
-#endif /* CONFIG_USE_NEW_FS */
 
 
 	/* XXX: Collect a list of devices, then use some kind of config

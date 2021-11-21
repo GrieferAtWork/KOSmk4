@@ -34,10 +34,6 @@
 
 #include <stdbool.h>
 
-#ifdef CONFIG_USE_NEW_FS
-#define handle_get_fnode handle_get_fnode
-#endif /* CONFIG_USE_NEW_FS */
-
 DECL_BEGIN
 
 /* Management of user-space descriptors  for kernel data, here  called
@@ -681,33 +677,21 @@ FUNDEF WUNUSED REF struct handle FCALL
 handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
-#ifndef CONFIG_USE_NEW_FS
-FUNDEF WUNUSED bool FCALL
-handle_existsin(unsigned int fd, struct handle_manager *__restrict self)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
-#endif /* !CONFIG_USE_NEW_FS */
-
 /* Same as `handle_lookup()', but don't allow for symbolic handles. */
 FUNDEF WUNUSED REF struct handle FCALL
 handle_lookup_nosym(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 
-struct inode;
-struct regular_node;
-struct directory_node;
-struct symlink_node;
-struct fifo_node;
-struct socket_node;
+struct fnode;
 struct fdirent;
 struct mfile;
-struct superblock;
+struct fsuper;
 struct path;
 struct taskpid;
 struct task;
 struct mman;
 struct fs;
-struct vfs;
 struct pipe;
 struct driver;
 struct pidns;
@@ -720,33 +704,13 @@ handle_getas(unsigned int fd, uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *FCALL
 handle_get_fnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
-handle_get_regnode(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
-handle_get_dirnode(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fdirent *FCALL
-handle_get_fdirent(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
-handle_get_super(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
-handle_get_super_relaxed(unsigned int fd)
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
+handle_get_fsuper_relaxed(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
@@ -760,11 +724,8 @@ handle_get_task(unsigned int fd)
 #define handle_get_fdirent(fd)          ((REF struct fdirent *)handle_getas(fd, HANDLE_TYPE_FDIRENT))
 #define handle_get_path(fd)             ((REF struct path *)handle_getas(fd, HANDLE_TYPE_PATH))
 #define handle_get_taskpid(fd)          ((REF struct taskpid *)handle_getas(fd, HANDLE_TYPE_TASK))
-#define handle_get_mman(fd)             ((REF struct mman *)handle_getas(fd, HANDLE_TYPE_MMAN))
-#define handle_get_fs(fd)               ((REF struct fs *)handle_getas(fd, HANDLE_TYPE_FS))
 #define handle_get_pipe(fd)             ((REF struct pipe *)handle_getas(fd, HANDLE_TYPE_PIPE))
 #define handle_get_module(fd)           ((REF struct driver *)handle_getas(fd, HANDLE_TYPE_MODULE))
-#define handle_get_pidns(fd)            ((REF struct pidns *)handle_getas(fd, HANDLE_TYPE_PIDNS))
 #define handle_get_socket(fd)           ((REF struct socket *)handle_getas(fd, HANDLE_TYPE_SOCKET))
 #define handle_get_epoll_controller(fd) ((REF struct epoll_controller *)handle_getas(fd, HANDLE_TYPE_EPOLL))
 
@@ -798,36 +759,12 @@ handle_tryas_noinherit(struct handle const *__restrict self,
 }
 
 /* Extended handle converted functions */
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fnode *FCALL
 handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct regular_node *FCALL
-handle_as_regnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_node *FCALL
-handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
-handle_as_super(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
-handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct symlink_node *FCALL
-handle_as_lnknode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_node *FCALL
-handle_as_fifonode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct socket_node *FCALL
-handle_as_socketnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
 /* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
@@ -835,17 +772,14 @@ FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
-#define handle_as_mfile(self)            ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
-#define handle_as_fdirent(self)          ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_FDIRENT))
-#define handle_as_path(self)             ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
-#define handle_as_taskpid(self)          ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_TASK))
-#define handle_as_mman(self)             ((REF struct mman *)handle_as(self, HANDLE_TYPE_MMAN))
-#define handle_as_fs(self)               ((REF struct fs *)handle_as(self, HANDLE_TYPE_FS))
-#define handle_as_pipe(self)             ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
-#define handle_as_module(self)           ((REF struct driver *)handle_as(self, HANDLE_TYPE_MODULE))
-#define handle_as_pidns(self)            ((REF struct pidns *)handle_as(self, HANDLE_TYPE_PIDNS))
-#define handle_as_socket(self)           ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))
-#define handle_as_epoll_controller(self) ((REF struct epoll_controller *)handle_as(self, HANDLE_TYPE_EPOLL))
+#define handle_as_mfile(self)   ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
+#define handle_as_fdirent(self) ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_FDIRENT))
+#define handle_as_path(self)    ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
+#define handle_as_taskpid(self) ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_TASK))
+#define handle_as_fs(self)      ((REF struct fs *)handle_as(self, HANDLE_TYPE_FS))
+#define handle_as_pipe(self)    ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
+#define handle_as_module(self)  ((REF struct driver *)handle_as(self, HANDLE_TYPE_MODULE))
+#define handle_as_socket(self)  ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))
 
 #if defined(__cplusplus) && !defined(NO_CXX_HANDLE_AS_OVERLOADS)
 extern "C++" {
@@ -869,25 +803,13 @@ handle_tryas_noinherit(struct handle const &__restrict self,
 	return handle_tryas_noinherit(&self, wanted_type);
 }
 
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *FCALL
 handle_as_fnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fnode");
 
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
-handle_as_regnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_regnode");
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
-handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_dirnode");
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
-handle_as_super(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_super");
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
-handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_super_relaxed");
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
+handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const &__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fsuper_relaxed");
 
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct task *FCALL
 handle_as_task(/*inherit(on_success)*/ REF struct handle const &__restrict self)

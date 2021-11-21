@@ -48,11 +48,9 @@ AWREF(taskpid_awref, taskpid);
 #endif /* !__taskpid_awref_defined */
 
 
-#ifdef CONFIG_USE_NEW_FS
 struct ttydev_ops {
 	struct chrdev_ops to_cdev; /* Character device operators. */
 };
-#endif /* CONFIG_USE_NEW_FS */
 
 struct ttydev
 #ifndef __WANT_FS_INLINE_STRUCTURES
@@ -81,8 +79,6 @@ struct ttydev
 FUNDEF NONNULL((1)) ssize_t LIBTERM_CC __ttydev_v_chk_sigttou(struct terminal *__restrict self) ASMNAME("ttydev_v_chk_sigttou");
 FUNDEF NONNULL((1)) ssize_t LIBTERM_CC __ttydev_v_raise(struct terminal *__restrict self, signo_t signo) ASMNAME("ttydev_v_raise");
 
-
-#ifdef CONFIG_USE_NEW_FS
 
 /* Operator access */
 #define ttydev_getops(self) \
@@ -173,50 +169,12 @@ _ttydev_tryioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 #define _ttydev_fini(self) _chrdev_fini(_ttydev_aschr(self))
 
 
-#else /* CONFIG_USE_NEW_FS */
-/* Check if a given character device is actually a ttydev */
-#define chrdev_istty(self)                                                         \
-	((self)->cd_heapsize >= sizeof(struct ttydev) &&                               \
-	 ((struct ttydev *)(self))->t_term.t_chk_sigttou == &__ttydev_v_chk_sigttou && \
-	 ((struct ttydev *)(self))->t_term.t_raise == &__ttydev_v_raise)
-
-
-/* Default character-device read/write  operator implementations  for tty  devices
- * These functions will call forward to `terminal_iread()' and `terminal_owrite()'
- * NOTE: The implementation of these functions assumes that the oprinter associated
- *       with the terminal never returns negative values! */
-FUNDEF NONNULL((1)) size_t KCALL ttydev_v_read(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL ttydev_v_write(struct chrdev *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL ttydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-/* @return: -EINVAL: Unsupported `cmd' */
-FUNDEF NONNULL((1)) syscall_slong_t KCALL _ttydev_tryioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL ttydev_v_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL ttydev_v_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL ttydev_v_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-
-/* Initialize a given TTY character device.
- * NOTE: This function initializes the following operators:
- *   - cd_type.ct_fini        = &ttydev_v_fini;  // Must be called as fallback by overrides
- *   - cd_type.ct_read        = &ttydev_v_read;
- *   - cd_type.ct_write       = &ttydev_v_write;
- *   - cd_type.ct_ioctl       = &ttydev_v_ioctl; // Must be called as fallback by overrides
- *   - cd_type.ct_pollconnect = &ttydev_v_pollconnect;
- *   - cd_type.ct_polltest    = &ttydev_v_polltest;
- *   - cd_type.ct_stat        = &ttydev_v_stat; */
-FUNDEF NOBLOCK void
-NOTHROW(KCALL ttydev_cinit)(struct ttydev *__restrict self,
-                            pterminal_oprinter_t oprinter);
-
-/* Finalize a given TTY character device.
- * NOTE: This function must be called from a user-provided, device-level finalizer,
- *       or  in other words: You must call this from a function which you must then
- *       assign to `self->cd_type.ct_fini'! */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ttydev_v_fini)(struct chrdev *__restrict self);
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 
+/************************************************************************/
+/* TTY Device API Functions                                             */
+/************************************************************************/
 
 /* [IMPL(TIOCSCTTY)] Set the given tty device as the controlling terminal of the calling session.
  * @param: steal_from_other_session: Allow the terminal to be stolen from another session.

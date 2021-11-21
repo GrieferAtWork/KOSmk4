@@ -35,10 +35,12 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #ifdef CONFIG_HAVE_DEBUGGER
 
 #include <debugger/rt.h>
-#include <fs/node.h>
+#include <kernel/fs/dirent.h>
 #include <kernel/mman.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/panic.h>
 #include <kernel/types.h>
+#include <sched/task.h>
 
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
@@ -544,8 +546,7 @@ NOTHROW(FCALL module_get_libdl_DlModule_address)(struct module *__restrict self,
 
 	/* Load the ELF header. */
 	TRY {
-		inode_readallk((struct inode *)self->md_file,
-		               &ehdr, sizeof(ehdr), 0);
+		mfile_readall(self->md_file, &ehdr, sizeof(ehdr), 0);
 	} EXCEPT {
 		goto nope;
 	}
@@ -566,11 +567,11 @@ NOTHROW(FCALL module_get_libdl_DlModule_address)(struct module *__restrict self,
 
 	/* Load program headers. (so we can find the PT_DYNAMIC header) */
 	TRY {
-		inode_readallk((struct inode *)self->md_file,
-		               ElfV_any(phdr),
-		               ElfV_field(self, ehdr, e_phnum) *
-		               ElfV_field(self, ehdr, e_phentsize),
-		               (pos_t)ElfV_field(self, ehdr, e_phoff));
+		mfile_readall(self->md_file,
+		              ElfV_any(phdr),
+		              ElfV_field(self, ehdr, e_phnum) *
+		              ElfV_field(self, ehdr, e_phentsize),
+		              (pos_t)ElfV_field(self, ehdr, e_phoff));
 	} EXCEPT {
 		goto nope_phdr;
 	}
@@ -3323,14 +3324,14 @@ got_symbol_type:
 				    expr.v_module->cm_module->md_fspath == NULL &&
 				    expr.v_module->cm_module->md_fsname != NULL) {
 					struct fdirent *dent = expr.v_module->cm_module->md_fsname;
-					if ((dent->de_hash == _RTLD_LIBDL_HASH &&
-					     dent->de_namelen == COMPILER_STRLEN(RTLD_LIBDL) &&
-					     memcmp(dent->de_name, RTLD_LIBDL, sizeof(RTLD_LIBDL)) == 0)
+					if ((dent->fd_hash == _RTLD_LIBDL_HASH &&
+					     dent->fd_namelen == COMPILER_STRLEN(RTLD_LIBDL) &&
+					     memcmp(dent->fd_name, RTLD_LIBDL, sizeof(RTLD_LIBDL)) == 0)
 #ifdef __ARCH_HAVE_COMPAT
 					    ||
-					    (dent->de_hash == _COMPAT_RTLD_LIBDL_HASH &&
-					     dent->de_namelen == COMPILER_STRLEN(COMPAT_RTLD_LIBDL) &&
-					     memcmp(dent->de_name, COMPAT_RTLD_LIBDL, sizeof(COMPAT_RTLD_LIBDL)) == 0)
+					    (dent->fd_hash == _COMPAT_RTLD_LIBDL_HASH &&
+					     dent->fd_namelen == COMPILER_STRLEN(COMPAT_RTLD_LIBDL) &&
+					     memcmp(dent->fd_name, COMPAT_RTLD_LIBDL, sizeof(COMPAT_RTLD_LIBDL)) == 0)
 #endif /* __ARCH_HAVE_COMPAT */
 					    ) {
 						char const *name;

@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/file.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/dirnode.h> /* struct fdirenum */
 #include <kernel/types.h>
 #include <sched/atomic64.h>
@@ -83,6 +80,5 @@ dirhandle_new(struct fdirnode *__restrict self,
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_DIRHANDLE_H */

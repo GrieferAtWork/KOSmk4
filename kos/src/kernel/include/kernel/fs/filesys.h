@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/mman/module.h>
 #include <kernel/types.h>
 
@@ -276,9 +273,7 @@ FUNDEF WUNUSED REF struct ffilesys *FCALL
 ffilesys_next(struct ffilesys *prev)
 		THROWS(E_WOULDBLOCK);
 
-
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_FILESYS_H */

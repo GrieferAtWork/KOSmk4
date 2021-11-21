@@ -49,7 +49,6 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-#ifdef CONFIG_USE_NEW_FS
 PRIVATE WUNUSED NONNULL((1, 2, 3)) bool
 NOTHROW(KCALL mman_mapinfo_and_unlock)(struct mman *__restrict self,
                                        struct mmapinfo *__restrict info,
@@ -175,9 +174,7 @@ handle_blocking_part:
 	info->mmi_min = mnode_getminaddr(lo);
 	info->mmi_max = mnode_getmaxaddr(hi);
 	mman_lock_endread(self);
-#ifdef CONFIG_USE_NEW_FS
 	info->_mmi_node = lo;
-#endif /* CONFIG_USE_NEW_FS */
 	info->mmi_offset = offset_at_addr;
 	info->mmi_offset -= (size_t)((byte_t *)addr - (byte_t *)mnode_getminaddr(lo));
 	return true;
@@ -227,7 +224,6 @@ mman_mapinfo_above(struct mman *__restrict self,
 	} while (!mman_mapinfo_and_unlock(self, info, mima.mm_min));
 	return true;
 }
-#endif /* CONFIG_USE_NEW_FS */
 
 DECL_END
 

@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/vfs.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 #include <sched/atomic64.h>
 #include <sched/pertask.h>
@@ -154,6 +151,5 @@ EIDECLARE(ATTR_PURE WUNUSED,atflag_t,NOTHROW,FCALL,fs_atflags,(atflag_t atflags)
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_FS_H */

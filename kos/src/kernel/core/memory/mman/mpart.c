@@ -699,36 +699,29 @@ again:
 
 		/* Now to do the actual work: */
 		incref(file);
-#ifdef CONFIG_USE_NEW_FS
 		mfile_trunclock_inc(file);
-#endif /* CONFIG_USE_NEW_FS */
 		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		_mpart_lock_release(self);
 		TRY {
-			pos_t addr;
+			pos_t addr, filesize;
 			size_t num_bytes;
 
 			/* Account for synced pages. */
 			addr      = self->mp_minaddr + (start << file->mf_blockshift);
 			num_bytes = (end - start) << file->mf_blockshift;
 
-#ifdef CONFIG_USE_NEW_FS
-			{
-				pos_t filesize;
-				filesize = (pos_t)atomic64_read(&file->mf_filesize);
-				if (!OVERFLOW_UADD(filesize, file->mf_part_amask, &filesize)) {
-					filesize = mfile_addr_flooralign(file, filesize);
-					/* Limit the write-back address range by the size of the file,
-					 * or do nothing if the entirety of said range lies outside of
-					 * the file's effective bounds. */
-					if unlikely(addr + num_bytes > filesize) {
-						if (addr >= filesize)
-							goto done_writeback;
-						num_bytes = (size_t)(filesize - addr);
-					}
+			filesize = mfile_getsize(file);
+			if (!OVERFLOW_UADD(filesize, file->mf_part_amask, &filesize)) {
+				filesize = mfile_addr_flooralign(file, filesize);
+				/* Limit the write-back address range by the size of the file,
+				 * or do nothing if the entirety of said range lies outside of
+				 * the file's effective bounds. */
+				if unlikely(addr + num_bytes > filesize) {
+					if (addr >= filesize)
+						goto done_writeback;
+					num_bytes = (size_t)(filesize - addr);
 				}
 			}
-#endif /* CONFIG_USE_NEW_FS */
 
 			/* Actually do the save. */
 			result += num_bytes;
@@ -740,24 +733,18 @@ again:
 			 * init-done signal of the associated file. */
 			for (i = start; i < end; ++i)
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
-#ifdef CONFIG_USE_NEW_FS
 			mfile_trunclock_dec_nosignal(file);
-#endif /* CONFIG_USE_NEW_FS */
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
 			mpart_lockops_reap(self);
 			RETHROW();
 		}
-#ifdef CONFIG_USE_NEW_FS
 done_writeback:
-#endif /* CONFIG_USE_NEW_FS */
 
 		/* Change the states of all saved pages back to ST_LOAD */
 		for (i = start; i < end; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
-#ifdef CONFIG_USE_NEW_FS
 		mfile_trunclock_dec_nosignal(file);
-#endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
 		/* Scan for more changes. */

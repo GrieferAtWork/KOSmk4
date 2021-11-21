@@ -43,7 +43,6 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/list.h>
 
 #include <assert.h>

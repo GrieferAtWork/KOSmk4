@@ -473,11 +473,7 @@ cred_setgroups(/*inherit(on_success)*/ REF struct cred_groups *__restrict new_gr
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* Update program credentials as has to be done as part of an exec() system call. */
-#ifdef CONFIG_USE_NEW_FS
 INTDEF void FCALL cred_onexec(struct mfile *__restrict program_file) THROWS(E_BADALLOC);
-#else /* CONFIG_USE_NEW_FS */
-INTDEF void FCALL cred_onexec(struct inode *__restrict program_file) THROWS(E_BADALLOC);
-#endif /* !CONFIG_USE_NEW_FS */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 /* Check if the calling thread is considered to be apart of the given group `gid' */

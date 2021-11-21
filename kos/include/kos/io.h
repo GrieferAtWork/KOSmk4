@@ -380,29 +380,6 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 
 
-/* File system mode (`atflag_t') */
-/* TODO: Once `CONFIG_USE_NEW_FS' becomes  the default, remove  all of  these
- *       flags. Instead of these, the kernel just directly uses `AT_*' flags! */
-#ifndef FS_MODE_FNORMAL
-#define FS_MODE_FNORMAL                   0x00000000 /* Operate normally. */
-#define FS_MODE_FIGNORE_TRAILING_SLASHES  0x00000002 /* Ignore empty trailing path segments. */
-#define FS_MODE_FSYMLINK_NOFOLLOW         0x00000100 /* If the last path component is a symlink, don't follow it. */
-#define FS_MODE_FNO_AUTOMOUNT             0x00000800 /* Suppress terminal automount traversal. */
-#define FS_MODE_FEMPTY_PATH               0x00001000 /* Allow empty relative pathname. */
-#define FS_MODE_FSYMLINK_REGULAR          0x00002000 /* Treat  symbolic  links similar  to like  regular  files and  throw an
-                                                      * `E_FSERROR_TOO_MANY_SYMBOLIC_LINKS' error during the first encounter. */
-#define FS_MODE_FDOSPATH                  0x00100000 /* Interpret '\\' as '/', and ignore casing during path resolution. */
-
-#define FS_MODE_FALWAYS0MASK              0xffefc7ff /* Mask of bits always 0 in `struct fs::f_atmask' */
-#define FS_MODE_FALWAYS1MASK              0x00000100 /* Mask of bits always 1 in `struct fs::f_atmask' */
-#define FS_MODE_FALWAYS0FLAG              0xffefc7ff /* Mask of bits always 0 in `struct fs::f_atflag' */
-#define FS_MODE_FALWAYS1FLAG              0x00000000 /* Mask of bits always 1 in `struct fs::f_atflag' */
-#endif /* !FS_MODE_FNORMAL */
-
-
-
-
-
 #ifndef READDIR_DEFAULT
 #define READDIR_DEFAULT  0x0000 /* Yield to next entry when `buf' was of sufficient size. */
 #define READDIR_CONTINUE 0x0001 /* Always yield to next entry. */

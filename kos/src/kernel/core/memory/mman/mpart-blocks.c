@@ -444,7 +444,6 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 		                             next, part));
 
 		/* Mark the file as changed (and update the last-modified timestamp). */
-#ifdef CONFIG_USE_NEW_FS
 		{
 			uintptr_t changes = MFILE_F_CHANGED;
 			if (!(self->mf_flags & MFILE_F_NOMTIME)) {
@@ -459,10 +458,6 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 			}
 			mfile_changed(self, changes);
 		}
-#else /* CONFIG_USE_NEW_FS */
-		if (self->mf_ops->mo_changed != NULL)
-			(*self->mf_ops->mo_changed)(self, part);
-#endif /* !CONFIG_USE_NEW_FS */
 	}
 }
 
@@ -667,10 +662,11 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	/* With  INIT now set for all of the parts in min...max,
 	 * we can proceed to actually do the initialization now! */
 	incref(file);
-#ifdef CONFIG_USE_NEW_FS
+
 	/* Prevent the file's size from being lowered. */
 	mfile_trunclock_inc(file);
-#endif /* CONFIG_USE_NEW_FS */
+
+	/* Release locks. */
 	_mpart_lock_release(self);
 	unlockinfo_xunlock(unlock);
 	mpart_lockops_reap(self);
@@ -690,9 +686,8 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		addr      = self->mp_minaddr + (min << file->mf_blockshift);
 		num_bytes = ((max - min) + 1) << file->mf_blockshift;
 
-#ifdef CONFIG_USE_NEW_FS
 		if (!mfile_isanon(file)) {
-			pos_t filesize = (pos_t)atomic64_read(&file->mf_filesize);
+			pos_t filesize = mfile_getsize(file);
 			if (!OVERFLOW_UADD(filesize, file->mf_part_amask, &filesize)) {
 				filesize = mfile_addr_flooralign(file, filesize);
 
@@ -738,32 +733,26 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 				}
 			}
 		}
-#endif /* CONFIG_USE_NEW_FS */
+
 		if likely(mo_loadblocks != NULL)
 			mfile_dosyncio(file, mo_loadblocks, addr, min_addr, num_bytes);
 	} EXCEPT {
 		/* Change back all INIT-parts to UNDEF */
 		for (i = min; i <= max; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
-#ifdef CONFIG_USE_NEW_FS
 		mfile_trunclock_dec_nosignal(file);
-#endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
 		RETHROW();
 	}
-#ifdef CONFIG_USE_NEW_FS
 initdone:
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* Mark all INIT-pages as loaded. */
 	for (i = min; i <= max; ++i)
 		mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
 
 	/* Broadcast that init has finished. */
-#ifdef CONFIG_USE_NEW_FS
 	mfile_trunclock_dec_nosignal(file);
-#endif /* CONFIG_USE_NEW_FS */
 	sig_broadcast(&file->mf_initdone);
 
 	decref_unlikely(file);

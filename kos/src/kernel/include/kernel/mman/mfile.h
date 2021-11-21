@@ -38,9 +38,9 @@
 
 #include <libvio/api.h> /* LIBVIO_CONFIG_ENABLED */
 
-#if defined(__WANT_FS_INIT) || !defined(CONFIG_USE_NEW_FS)
+#ifdef __WANT_FS_INIT
 #include <hybrid/__minmax.h>
-#endif /* __WANT_FS_INIT || !CONFIG_USE_NEW_FS */
+#endif /* __WANT_FS_INIT */
 
 #ifdef __WANT_MFILE__mf_compl
 #include <sched/signal-completion.h>
@@ -124,7 +124,6 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
  */
 
 
-#ifdef CONFIG_USE_NEW_FS
 struct handle_mmap_info;
 struct stat;
 struct path;
@@ -379,7 +378,6 @@ FUNDEF BLOCKING NONNULL((1, 2)) void KCALL
 mfile_open(struct mfile *__restrict self, struct handle *__restrict hand,
            struct path *access_path, struct fdirent *access_dent)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-#endif /* CONFIG_USE_NEW_FS */
 
 struct aio_multihandle;
 
@@ -524,7 +522,6 @@ struct mfile_ops {
 	                       physaddr_t buf, size_t num_bytes,
 	                       struct aio_multihandle *__restrict aio);
 
-#ifdef CONFIG_USE_NEW_FS
 	/* [0..1] Called after `MFILE_F_CHANGED' and/or `MFILE_F_ATTRCHANGED' becomes set.
 	 * @param: oldflags: Old file flags. (set of `MFILE_F_*')
 	 * @param: newflags: New file flags. (set of `MFILE_F_*')
@@ -543,45 +540,9 @@ struct mfile_ops {
 	 * though should still be set to `NULL' for consistency. */
 	struct vio_operators const *mo_vio;
 #endif /* LIBVIO_CONFIG_ENABLED */
-
-#else /* CONFIG_USE_NEW_FS */
-	/* [0..1] Called the first time the `MPART_F_CHANGED' flag is set for `part'.
-	 * WARNING: This  function  is  called  while  a  lock  to  `part'  is  held!
-	 * NOTE: Not invoked if a new change part is created as the result
-	 *       of  an   already-known-as-changed   part   being   split. */
-	NOBLOCK NONNULL((1, 2)) void
-	/*NOTHROW*/ (KCALL *mo_changed)(struct mfile *__restrict self,
-	                                struct mpart *__restrict part);
-
-	/* Hacky forward-compatibility... */
-
-	/* [0..1] Optional operators for when read(2) or write(2) is used with
-	 *        a file descriptor pointing to a mfile of this type.
-	 * These callbacks are  used by UVIO  datablocks to implement  the
-	 * server/client architecture for user-space driven VIO emulation.
-	 * They are also used to implement flexible-context files such  as
-	 * those found under `/proc' */
-	WUNUSED NONNULL((1)) size_t
-	(KCALL *mo_stream_read)(struct mfile *__restrict self,
-	                        USER CHECKED void *dst,
-	                        size_t num_bytes, iomode_t mode) THROWS(...);
-	WUNUSED NONNULL((1)) size_t
-	(KCALL *mo_stream_write)(struct mfile *__restrict self,
-	                         USER CHECKED void const *src,
-	                         size_t num_bytes, iomode_t mode) THROWS(...);
-	/* [0..1] Same as above, but used  when polling for data being  available.
-	 * When not implemented (i.e. when set to `NULL'), poll is implemented for
-	 * the datablock through use of  `rwlock_poll(read|write)(&self->mf_lock)' */
-	NONNULL((1)) void
-	(KCALL *dt_handle_pollconnect)(struct mfile *__restrict self,
-	                               poll_mode_t what) THROWS(...);
-	WUNUSED NONNULL((1)) poll_mode_t
-	(KCALL *dt_handle_polltest)(struct mfile *__restrict self,
-	                            poll_mode_t what) THROWS(...);
-#endif /* !CONFIG_USE_NEW_FS */
 };
 
-#ifdef CONFIG_USE_NEW_FS
+
 /* Flags defined here also map to:
  *  - `ST_*' from <sys/statvfs.h>
  *  - `MS_*' from <sys/mount.h>
@@ -692,14 +653,11 @@ struct fsuper;
 #ifdef __WANT_MFILE__mf_delfnodes
 struct fnode;
 #endif /* __WANT_MFILE__mf_delfnodes */
-#endif /* CONFIG_USE_NEW_FS */
+
 
 struct mfile {
 	WEAK refcnt_t                 mf_refcnt;     /* Reference counter. */
 	struct mfile_ops const       *mf_ops;        /* [1..1][const] File operators. */
-#ifndef CONFIG_USE_NEW_FS
-	struct vio_operators const   *mf_vio;        /* [0..1][const] VIO operators. (deprecated field!) */
-#endif /* !CONFIG_USE_NEW_FS */
 	struct atomic_rwlock          mf_lock;       /* Lock for this file. */
 #ifdef CONFIG_MFILE_TRACE_LOCKPC
 	void const                  *_mf_wrlockpc;   /* [lock(mf_lock)] Write-lock program counter. */
@@ -719,14 +677,11 @@ struct mfile {
 	                                              * described by parts, minus one (meaning  it can be used as  a
 	                                              * mask) */
 	shift_t                       mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
-#ifdef CONFIG_USE_NEW_FS
 	shift_t                       mf_iobashift;  /* [const][<= mf_blockshift] == log2(REQUIRED_BLOCK_BUFFER_ALIGNMENT) */
 #if ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0
 	byte_t                       _mf_pad[sizeof(size_t) - ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__)]; /* ... */
 #endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0 */
-#endif /* CONFIG_USE_NEW_FS */
 
-#ifdef CONFIG_USE_NEW_FS
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_refcnt(mf_refcnt) mf_refcnt
 #define MFILE_INIT_mf_ops(mf_ops)       mf_ops
@@ -870,12 +825,10 @@ struct mfile {
 	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
 	                                              *      before proceeding to use the data you've just read! */
 #endif /* !__WANT_MFILE__mf_... */
-#endif /* CONFIG_USE_NEW_FS */
 };
 
 
 
-#ifdef CONFIG_USE_NEW_FS
 /* Increment or decrement the size-lock counter. In order to use these  functions,
  * the caller must currently be holding a lock to `self->mf_lock', or at least one
  * of the parts found in the tree of `self->mf_parts'.
@@ -935,10 +888,9 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	if (old_flags != new_flags && self->mf_ops->mo_changed)
 		(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
 }
-#endif /* CONFIG_USE_NEW_FS */
+
 
 #define _mfile_cinit_blockshift _mfile_init_blockshift
-#ifdef CONFIG_USE_NEW_FS
 #define _mfile_init_blockshift(self, blockshift, iobashift)                     \
 	((self)->mf_blockshift = (blockshift),                                      \
 	 (self)->mf_iobashift  = (iobashift),                                       \
@@ -946,14 +898,6 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	                                        ? ((self)->mf_blockshift)           \
 	                                        : PAGESHIFT)) -                     \
 	                         1)
-#else /* CONFIG_USE_NEW_FS */
-#define _mfile_init_blockshift(self, blockshift)                                \
-	((self)->mf_blockshift = (blockshift),                                      \
-	 (self)->mf_part_amask = ((size_t)1 << (((self)->mf_blockshift) > PAGESHIFT \
-	                                        ? ((self)->mf_blockshift)           \
-	                                        : PAGESHIFT)) -                     \
-	                         1)
-#endif /* !CONFIG_USE_NEW_FS */
 #ifdef CONFIG_MFILE_TRACE_LOCKPC
 #define __MFILE_INIT_WRLOCKPC        __NULLPTR,
 #define __mfile_init_wrlockpc(self)  (self)->_mf_wrlockpc = __NULLPTR,
@@ -965,7 +909,6 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 #endif /* !CONFIG_MFILE_TRACE_LOCKPC */
 
 
-#ifdef CONFIG_USE_NEW_FS
 /* Initialize common fields. The caller must still initialize:
  *  - mf_ops,  mf_parts,   mf_changed,  mf_part_amask,   mf_blockshift,
  *    mf_iobashift, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime */
@@ -994,73 +937,6 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	 (self)->mf_ops = (ops),                            \
 	 __mfile_cinit_wrlockpc(self)                       \
 	 _mfile_cinit_blockshift(self, block_shift, iobashift))
-#else /* CONFIG_USE_NEW_FS */
-#define mfile_init(self, ops, block_shift) \
-	((self)->mf_refcnt = 1,                \
-	 (self)->mf_ops    = (ops),            \
-	 (self)->mf_vio    = __NULLPTR,        \
-	 __mfile_init_wrlockpc(self)           \
-	 atomic_rwlock_init(&(self)->mf_lock), \
-	 (self)->mf_parts = __NULLPTR,         \
-	 sig_init(&(self)->mf_initdone),       \
-	 SLIST_INIT(&(self)->mf_lockops),      \
-	 SLIST_INIT(&(self)->mf_changed),      \
-	 _mfile_init_blockshift(self, block_shift))
-#define mfile_cinit(self, ops, block_shift)             \
-	((self)->mf_refcnt = 1,                             \
-	 (self)->mf_ops    = (ops),                         \
-	 __hybrid_assert((self)->mf_vio == __NULLPTR),      \
-	 __mfile_cinit_wrlockpc(self)                       \
-	 atomic_rwlock_cinit(&(self)->mf_lock),             \
-	 __hybrid_assert((self)->mf_parts == __NULLPTR),    \
-	 sig_cinit(&(self)->mf_initdone),                   \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_lockops)), \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_changed)), \
-	 _mfile_init_blockshift(self, block_shift))
-#endif /* !CONFIG_USE_NEW_FS */
-
-/* Get a [0..1]-pointer to the VIO operators of `self'
- * TODO: Remove this macro once `CONFIG_USE_NEW_FS' becomes the default */
-#ifdef LIBVIO_CONFIG_ENABLED
-#ifndef CONFIG_USE_NEW_FS
-#define mfile_getvio(self) ((self)->mf_vio)
-#else /* !CONFIG_USE_NEW_FS */
-#define mfile_getvio(self) ((self)->mf_ops->mo_vio)
-#endif /* CONFIG_USE_NEW_FS */
-#endif /* LIBVIO_CONFIG_ENABLED */
-
-
-#ifndef CONFIG_USE_NEW_FS
-#define MFILE_INIT_EX(refcnt, ops, parts, changed, blockshift)                         \
-	{                                                                                  \
-		/* .mf_refcnt     = */ refcnt,                                                 \
-		/* .mf_ops        = */ ops,                                                    \
-		/* .mf_vio        = */ __NULLPTR,                                              \
-		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC               \
-		/* .mf_parts      = */ parts,                                                  \
-		/* .mf_initdone   = */ SIG_INIT,                                               \
-		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),                              \
-		/* .mf_changed    = */ { changed },                                            \
-		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
-		/* .mf_blockshift = */ blockshift,                                             \
-	}
-#define MFILE_INIT_VIO_EX(type, vio, parts, pageshift)                   \
-	{                                                                    \
-		/* .mf_refcnt     = */ 1,                                        \
-		/* .mf_ops        = */ type,                                     \
-		/* .mf_vio        = */ vio,                                      \
-		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC \
-		/* .mf_parts      = */ parts,                                    \
-		/* .mf_initdone   = */ SIG_INIT,                                 \
-		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),                \
-		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),                \
-		/* .mf_blockshift = */ PAGESHIFT - (pageshift),                  \
-		/* .mf_part_amask = */ PAGESIZE - 1,                             \
-	}
-#define MFILE_INIT_VIO(vio) MFILE_INIT_VIO_EX(&mfile_ndef_ops, vio, __NULLPTR, 0)
-#define MFILE_INIT(ops, blockshift)      MFILE_INIT_EX(1, ops, __NULLPTR, __NULLPTR, blockshift)
-#define MFILE_INIT_ANON(ops, blockshift) MFILE_INIT_EX(1, ops, MFILE_PARTS_ANONYMOUS, MFILE_PARTS_ANONYMOUS, blockshift)
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 /* Allocate physical memory for use with mem-parts created for `self'
@@ -1142,7 +1018,6 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lock_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->mf_lock)
 
 
-#ifdef CONFIG_USE_NEW_FS
 /* Make the given file anonymous+deleted. What this means is that (in order):
  *  - The `MFILE_F_DELETED' flag is set for the file.
  *  - The `MFILE_F_PERSISTENT' flag is cleared for the file.
@@ -1185,23 +1060,6 @@ mfile_truncate(struct mfile *__restrict self, pos_t new_size)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY,
 		       E_FSERROR_FILE_TOO_BIG, ...);
 
-#else /* CONFIG_USE_NEW_FS */
-/* Make the given file anonymous+deleted. What this means is that:
- *  - Existing mappings of all  mem-parts are altered to  point
- *    at anonymous memory files. For this purpose, the nodes of
- *    all existing mappings are altered. (s.a. `mfile_anon')
- *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
- *  - The `mf_parts' and `mf_changed' are set to `MFILE_PARTS_ANONYMOUS'
- * The result of all of this is that it is no longer possible to
- * trace  back  mappings  of  parts  of  `self'  to  that  file.
- *
- * This function is called when the given file `self' should be deleted,
- * or has become  unavailable for  some other reason  (e.g. the  backing
- * filesystem has been unmounted) */
-FUNDEF NONNULL((1)) void FCALL
-mfile_delete(struct mfile *__restrict self)
-		THROWS(E_WOULDBLOCK);
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 /* Sync unwritten changes made to parts within the given address range.
@@ -1438,8 +1296,6 @@ mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
 		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, E_INSUFFICIENT_RIGHTS);
 
 
-#ifdef CONFIG_USE_NEW_FS
-
 /* Check if the file's raw I/O interface should be used by default.
  * that is: its mmap operator isn't overwritten, and user-space  is
  * allowed to mmap() the file itself.
@@ -1504,7 +1360,6 @@ FUNDEF BLOCKING NONNULL((1)) size_t KCALL _mfile_buffered_tailwrite(struct mfile
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_tailwritev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-#endif /* CONFIG_USE_NEW_FS */
 
 /* Helpers for directly reading to/from VIO space. */
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -1544,8 +1399,13 @@ DATDEF struct mfile /*     */ mfile_anon[BITSOF(void *)];
 DATDEF struct mfile_ops const mfile_anon_ops[BITSOF(void *)];
 
 
+/* Check if `self' is "/dev/zero" or one of the anonymous files, all of which
+ * are  set-up such  that memory mapped  by `self' is  initialized to zeroes. */
+#define mfile_isdevzero(self) \
+	((self) == &mfile_zero || ((self) >= mfile_anon && (self) < COMPILER_ENDOF(mfile_anon)))
+
+
 /* User-visible mem-file access API. (same as the handle access API) */
-#ifdef CONFIG_USE_NEW_FS
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_uread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_uwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_utailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
@@ -1569,7 +1429,6 @@ FUNDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL mfile_upolltest(struct mf
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL mfile_uhop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) REF void *KCALL mfile_utryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 FUNDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL mfile_uprintlink(struct mfile *__restrict self, __pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
-#endif /* CONFIG_USE_NEW_FS */
 
 DECL_END
 #endif /* __CC__ */

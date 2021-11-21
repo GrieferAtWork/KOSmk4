@@ -28,16 +28,20 @@ gcc_opt.removeif([](x) -> x.startswith("-O")); // TODO: Why are optimizations di
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/special-node.h>
-#include <fs/vfs.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/dirnode.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/socknode.h>
 #include <kernel/malloc.h>
 #include <sched/async.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
+#include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -274,6 +278,7 @@ refuse_everyone:
 						break;
 					iter = next;
 				}
+
 				/* Set the last accepted client to the
 				 * predecessor of the original  `iter' */
 				acceptme_last = container_of(piter, struct unix_client, uc_next);
@@ -282,8 +287,10 @@ refuse_everyone:
 			piter = &iter->uc_next;
 		}
 	}
+
 	/* Terminate the chain. */
 	acceptme_last->uc_next = NULL;
+
 	/* Install the chain.
 	 * In  the  case  that some  other  chain got
 	 * installed in the mean time, merge with it. */
@@ -296,11 +303,13 @@ refuse_everyone:
 			if (ATOMIC_CMPXCH_WEAK(self->us_acceptme, NULL, acceptme_first)) {
 				/* Indicate that clients that need accept(2)-ing have become available. */
 				sig_broadcast(&self->us_acceptme_sig);
+
 				/* Successfully installed the chain. */
 				break;
 			}
 			continue;
 		}
+
 		/* Another chain was installed in the mean time.
 		 * -> Merge with it! */
 		if (!ATOMIC_CMPXCH_WEAK(self->us_acceptme, chain, NULL))
@@ -361,6 +370,7 @@ NOTHROW(FCALL unix_server_pop_acceptme)(struct unix_server *__restrict self) {
 			/* Re-append all of the other clients. */
 			unix_server_append_acceptme(self, next, last, NULL);
 		}
+
 		/* Invalidate the next-pointer, now that this client
 		 * is  no longer apart of the waiting-clients-chain. */
 		DBG_memset(&result->uc_next, 0xcc, sizeof(result->uc_next));
@@ -383,12 +393,14 @@ NOTHROW(FCALL unix_server_remove_acceptme)(struct unix_server *__restrict self,
 			return false; /* Server was shut down. */
 	} while (!ATOMIC_CMPXCH_WEAK(self->us_acceptme,
 	                             chain, NULL));
+
 	/* Search `chain' for `client' */
 	piter = &chain;
 	while ((iter = *piter) != NULL) {
 		if (iter == client) {
 			/* Found it! */
 			*piter = iter->uc_next;
+
 			/* Re-install all of the remaining clients. */
 			if (chain) {
 				/* Find the nearest, still-valid client descriptor. */
@@ -402,6 +414,7 @@ NOTHROW(FCALL unix_server_remove_acceptme)(struct unix_server *__restrict self,
 					iter = iter->uc_next;
 				unix_server_append_acceptme(self, chain, iter, NULL);
 			}
+
 			/* Nokill, because the caller must still be holding a reference */
 			decref_nokill(client);
 			return true;
@@ -417,11 +430,12 @@ NOTHROW(FCALL unix_server_remove_acceptme)(struct unix_server *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL UnixSocket_Fini)(struct socket *__restrict self) {
 	UnixSocket *me = (UnixSocket *)self;
-	assertf(me->us_node != (struct socket_node *)-1,
+	assertf(me->us_node != (struct fsocknode *)-1,
 	        "Inconsistent state shouldn't happen, because this can only "
 	        "be the case when the socket is currently being bound on some "
 	        "other CPU in an SMP environment");
 	if (me->us_node) {
+
 		/* If this is the server socket, then we must:
 		 * - Set `us_max_backlog' to 0
 		 * - Wake up all waiting client sockets from the accept-queue.
@@ -432,7 +446,7 @@ NOTHROW(KCALL UnixSocket_Fini)(struct socket *__restrict self) {
 		 * All of this is done by `unix_server_shutdown_listen()' */
 		if (!me->us_client) {
 			/* Server-socket */
-			unix_server_shutdown_listen(&me->us_node->s_server);
+			unix_server_shutdown_listen(&me->us_node->sun_server);
 		} else {
 			/* Client-socket */
 			/* NOTE: If `me->us_client' won't get destroyed here, then we
@@ -443,6 +457,7 @@ NOTHROW(KCALL UnixSocket_Fini)(struct socket *__restrict self) {
 			unix_client_close_connection(me->us_client);
 			decref(me->us_client);
 		}
+
 		/* Cleanup references to the bound filesystem location. */
 		decref(me->us_nodepath);
 		decref(me->us_nodename);
@@ -456,46 +471,45 @@ UnixSocket_GetName(UnixSocket *__restrict self,
                    socklen_t addr_len,
                    bool error_if_not_bound) {
 	size_t result, bufsize;
-	struct socket_node *node;
+	struct fsocknode *node;
 	if (addr_len >= offsetafter(struct sockaddr_un, sun_family))
 		addr->sun_family = AF_UNIX;
 	node = ATOMIC_READ(self->us_node);
+
 	/* Check if the socket is bound/connected */
-	if (!node || node == (struct socket_node *)-1) {
+	if (!node || node == (struct fsocknode *)-1) {
 		if (error_if_not_bound) {
 			THROW(E_INVALID_ARGUMENT_BAD_STATE,
 			      E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED);
 		}
+
 		/* Follow what linux does and kind-of break the rules:
 		 *  - Write a NUL-byte to the sun_path[0] of `addr',
 		 *    but return to indicate like we didn't actually
 		 *    touch that field. */
 		if (addr_len >= offsetof(struct sockaddr_un, sun_path) + sizeof(char))
 			addr->sun_path[0] = '\0';
+
 		/* This should technically be `offsetof(struct sockaddr_un, sun_path) + 1'... */
 		return offsetof(struct sockaddr_un, sun_path);
 	}
+
 	/* Figure out how much buffer space we've got for the actual path. */
 	if (OVERFLOW_USUB(addr_len, offsetof(struct sockaddr_un, sun_path), &bufsize))
 		bufsize = 0;
+
 	/* Print and return the bound path.
 	 * NOTE: `path_sprintent()' always returns to include the trailing NUL-byte! */
-#ifdef CONFIG_USE_NEW_FS
 	{
 		REF struct path *root = fs_getroot(THIS_FS);
 		FINALLY_DECREF_UNLIKELY(root);
 		result = path_sprintent(self->us_nodepath,
-		                        self->us_nodename->de_name,
-		                        self->us_nodename->de_namelen,
+		                        self->us_nodename->fd_name,
+		                        self->us_nodename->fd_namelen,
 		                        addr->sun_path, bufsize,
 		                        fs_atflags(0), root);
 	}
-#else /* CONFIG_USE_NEW_FS */
-	result = path_sprintent(addr->sun_path, bufsize,
-	                        self->us_nodepath,
-	                        self->us_nodename->de_name,
-	                        self->us_nodename->de_namelen);
-#endif /* !CONFIG_USE_NEW_FS */
+
 	/* Account for the path-offset. */
 	result += offsetof(struct sockaddr_un, sun_path);
 	return result;
@@ -531,24 +545,18 @@ UnixSocket_Bind(struct socket *__restrict self,
 	UnixSocket *me = (UnixSocket *)self;
 	USER CHECKED struct sockaddr_un *addr_un;
 	REF struct path *bind_path;
-#ifdef CONFIG_USE_NEW_FS
 	char *nulterm_filename;
 	struct fmkfile_info mki;
-#else /* CONFIG_USE_NEW_FS */
-	u32 fsmode;
-	USER CHECKED char const *socket_filename_ptr;
-	u16 socket_filename_len;
-	REF struct fdirent *bind_name;
-	REF struct socket_node *bind_node;
-#endif /* !CONFIG_USE_NEW_FS */
 
 	addr_un = (USER CHECKED struct sockaddr_un *)addr;
+
 	/* We need  at  least  1  character  in  the  path-buffer.
 	 * The shortest valid bind-path is a single-character path
 	 * that contains the filename of  the socket, and will  be
 	 * created in the current working directory. */
 	if unlikely(addr_len < offsetof(struct sockaddr_un, sun_path) + 1)
 		THROW(E_BUFFER_TOO_SMALL, offsetof(struct sockaddr_un, sun_path) + 1, addr_len);
+
 	/* Verify that the given address-family is correct. */
 	{
 		sa_family_t fam;
@@ -567,7 +575,6 @@ UnixSocket_Bind(struct socket *__restrict self,
 	                  offsetof(struct sockaddr_un, sun_path));
 
 	/* Traverse the path to the location where we should do the bind. */
-#ifdef CONFIG_USE_NEW_FS
 	nulterm_filename = (char *)malloca(pathlen + 1, sizeof(char));
 	RAII_FINALLY { freea(nulterm_filename); };
 	*(char *)mempcpy(nulterm_filename, addr_un->sun_path, pathlen, sizeof(char)) = '\0';
@@ -577,20 +584,10 @@ UnixSocket_Bind(struct socket *__restrict self,
 	bind_path = path_traverse(AT_FDCWD, nulterm_filename,
 	                          &mki.mkf_name, &mki.mkf_namelen,
 	                          mki.mkf_flags);
-#else /* CONFIG_USE_NEW_FS */
-	fsmode    = ATOMIC_READ(THIS_FS->f_mode.f_atflag);
-	bind_path = path_traversen(THIS_FS,
-	                           addr_un->sun_path,
-	                           pathlen,
-	                           &socket_filename_ptr,
-	                           &socket_filename_len,
-	                           fsmode,
-	                           NULL);
-#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Start the  binding process,  and ensure  that the  socket  isn't
 	 * already bound, or is currently being bound by some other thread. */
-	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct socket_node *)-1)) {
+	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct fsocknode *)-1)) {
 		decref_unlikely(bind_path);
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 		      E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND);
@@ -598,7 +595,6 @@ UnixSocket_Bind(struct socket *__restrict self,
 	/* At this point, we need to create a socket-file within `bind_path',
 	 * under   the   name   `socket_filename_ptr...+=socket_filename_len' */
 	TRY {
-#ifdef CONFIG_USE_NEW_FS
 		mki.mkf_hash          = FLOOKUP_INFO_HASH_UNSET;
 		mki.mkf_fmode         = S_IFSOCK | (0777 & ~THIS_FS->fs_umask);
 		mki.mkf_creat.c_owner = cred_getfsuid();
@@ -610,58 +606,22 @@ UnixSocket_Bind(struct socket *__restrict self,
 		/* Create the new file */
 		if (fdirnode_mkfile(bind_path->p_dir, &mki) == FDIRNODE_MKFILE_EXISTS)
 			THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-
-#else /* CONFIG_USE_NEW_FS */
-		REF struct directory_node *bind_path_dir;
-		sync_read(bind_path);
-		bind_path_dir = (REF struct directory_node *)incref(bind_path->p_inode);
-		sync_endread(bind_path);
-		TRY {
-			/* Actually create the socket filesystem node. */
-			bind_node = (struct socket_node *)directory_mknod(bind_path_dir,
-			                                                  socket_filename_ptr,
-			                                                  socket_filename_len,
-			                                                  S_IFSOCK | (0777 & ~THIS_FS->f_umask),
-			                                                  fs_getuid(THIS_FS),
-			                                                  fs_getgid(THIS_FS),
-			                                                  (dev_t)0,
-			                                                  fsmode & FS_MODE_FDOSPATH ? DIRECTORY_MKNOD_FNOCASE
-			                                                                            : DIRECTORY_MKNOD_FNORMAL,
-			                                                  &bind_name);
-		} EXCEPT {
-			if (was_thrown(E_FSERROR_FILE_ALREADY_EXISTS)) {
-				/* Convert `E_FSERROR_FILE_ALREADY_EXISTS' into `E_NET_ADDRESS_IN_USE' */
-				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_NET_ADDRESS_IN_USE));
-				PERTASK_SET(this_exception_args.e_net_error.ne_address_in_use.iu_context,
-				            E_NET_ADDRESS_IN_USE_CONTEXT_BIND);
-			}
-			decref_unlikely(bind_path_dir);
-			RETHROW();
-		}
-		decref_unlikely(bind_path_dir);
-#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		decref_unlikely(bind_path);
 		/* Switch back to indicating that the socket isn't bound. */
 		ATOMIC_WRITE(me->us_node, NULL);
 		RETHROW();
 	}
+
 	/* And with that, we've created the socket node, and all that's left
 	 * to be done is to have our unix-socket object inherit the pointers
 	 * to the binding context.
 	 * Note the order here: `us_node' _must_ be written last! */
 	me->us_nodepath = bind_path; /* Inherit reference */
-#ifdef CONFIG_USE_NEW_FS
 	me->us_nodename = mki.mkf_dent; /* Inherit reference */
 	COMPILER_WRITE_BARRIER();
 	me->us_node = mki.mkf_rsock; /* Inherit reference */
 	COMPILER_WRITE_BARRIER();
-#else /* CONFIG_USE_NEW_FS */
-	me->us_nodename = bind_name; /* Inherit reference */
-	COMPILER_WRITE_BARRIER();
-	me->us_node = bind_node; /* Inherit reference */
-	COMPILER_WRITE_BARRIER();
-#endif /* !CONFIG_USE_NEW_FS */
 }
 
 
@@ -670,7 +630,7 @@ struct async_accept_wait: async {
 	/* NOTE: All of the following are [1..1] before
 	 * `UnixSocket_WaitForAccept_Work()' finishes the async job. */
 	REF struct unix_client *aw_client;    /* [0..1] The client descriptor. */
-	REF struct socket_node *aw_bind_node; /* [0..1] The socket to which to connect */
+	REF struct fsocknode *aw_bind_node; /* [0..1] The socket to which to connect */
 	REF struct path        *aw_bind_path; /* [0..1] The path containing `ac_bind_node' */
 	REF struct fdirent     *aw_bind_name; /* [0..1] The name of `ac_bind_node' */
 };
@@ -693,8 +653,10 @@ PRIVATE NONNULL((1)) ktime_t FCALL
 UnixSocket_WaitForAccept_Connect(struct async *__restrict self) {
 	struct async_accept_wait *me = (struct async_accept_wait *)self;
 	struct unix_client *client   = me->aw_client;
+
 	/* Connect to the status-changed signal */
 	task_connect_for_poll(&client->uc_status_sig);
+
 	/* XXX: We could easily implement a timeout for connect()-attempt */
 	return KTIME_INFINITE;
 }
@@ -714,6 +676,7 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 	client = me->aw_client;
 	if (ATOMIC_READ(client->uc_status) == UNIX_CLIENT_STATUS_PENDING)
 		return ASYNC_RESUME; /* Still some work left to do! */
+
 	/* The connection has been established! */
 	socket = me->aw_socket;
 	if unlikely(!tryincref(socket)) {
@@ -723,6 +686,7 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 		ATOMIC_WRITE(socket->us_node, NULL);
 		return ASYNC_FINISHED;
 	}
+
 	/* Fill in fields of the socket. */
 	socket->us_recvbuf  = &client->uc_fromserver;
 	socket->us_sendbuf  = &client->uc_fromclient;
@@ -733,6 +697,7 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 	me->aw_bind_name    = NULL;             /* Inherited by `socket->us_nodename' */
 	me->aw_client       = NULL;             /* Inherited by `socket->us_client' */
 	COMPILER_WRITE_BARRIER();
+
 	/* Fill  in the node-pointer, thus marking the socket
 	 * as having been connected (from its own view-point) */
 	ATOMIC_WRITE(socket->us_node, me->aw_bind_node); /* Inherit reference */
@@ -757,7 +722,7 @@ UnixSocket_WaitForAccept_Cancel(struct async *__restrict self) {
 	client = me->aw_client;
 
 	/* Remove myself from the chain of pending clients. */
-	unix_server_remove_acceptme(&me->aw_bind_node->s_server, client);
+	unix_server_remove_acceptme(&me->aw_bind_node->sun_server, client);
 
 	/* Try to change the state of the client to  refused.
 	 * Note that this might fail if the server was faster
@@ -793,17 +758,19 @@ UnixSocket_Connect(struct socket *__restrict self,
 		                E_NET_UNREACHABLE, E_BUFFER_TOO_SMALL) {
 	size_t pathlen;
 	UnixSocket *me = (UnixSocket *)self;
-	REF struct socket_node *bind_node;
+	REF struct fsocknode *bind_node;
 	REF struct path *bind_path;
 	REF struct fdirent *bind_name;
 	USER CHECKED struct sockaddr_un *addr_un;
 	addr_un = (USER CHECKED struct sockaddr_un *)addr;
+
 	/* We need  at  least  1  character  in  the  path-buffer.
 	 * The shortest valid bind-path is a single-character path
 	 * that contains the filename of  the socket, and will  be
 	 * created in the current working directory. */
 	if unlikely(addr_len < offsetof(struct sockaddr_un, sun_path) + 1)
 		THROW(E_BUFFER_TOO_SMALL, offsetof(struct sockaddr_un, sun_path) + 1, addr_len);
+
 	/* Verify that the given address-family is correct. */
 	{
 		sa_family_t fam;
@@ -815,17 +782,17 @@ UnixSocket_Connect(struct socket *__restrict self,
 			      fam, AF_INET);
 		}
 	}
+
 	/* Figure out the actual length of the given path. */
 	pathlen = strnlen(addr_un->sun_path,
 	                  addr_len -
 	                  offsetof(struct sockaddr_un, sun_path));
-	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct socket_node *)-1)) {
+	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct fsocknode *)-1)) {
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 		      E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED);
 	}
 	TRY {
 		/* Traverse the given path to find the associated socket. */
-#ifdef CONFIG_USE_NEW_FS
 		{
 			char *nulterm_filename;
 			nulterm_filename = (char *)malloca(pathlen + 1, sizeof(char));
@@ -837,29 +804,19 @@ UnixSocket_Connect(struct socket *__restrict self,
 			                                                      fs_atflags(0),
 			                                                      &bind_path, &bind_name);
 		}
-#else /* CONFIG_USE_NEW_FS */
-		bind_node = (REF struct socket_node *)path_traversenfull(THIS_FS,
-		                                                         addr_un->sun_path,
-		                                                         pathlen,
-		                                                         true,
-		                                                         THIS_FS->f_mode.f_atflag,
-		                                                         NULL,
-		                                                         &bind_path,
-		                                                         NULL,
-		                                                         &bind_name);
-#endif /* !CONFIG_USE_NEW_FS */
 		TRY {
 			struct async *job;
 			struct async_accept_wait *con;
 			REF struct unix_client *client;
+
 			/* Make sure that what we've found is actually a socket INode */
-			if unlikely(!INODE_ISSOCK(bind_node))
+			if unlikely(!fnode_issock(bind_node))
 				THROW(E_NET_CONNECTION_REFUSED);
 
 #ifndef __OPTIMIZE_SIZE__
 			/* Check that someone is listening to `bind_node'
 			 * NOTE: This check is also performed implicitly by `unix_server_append_acceptme()' */
-			if unlikely(!ATOMIC_READ(bind_node->s_server.us_max_backlog))
+			if unlikely(!ATOMIC_READ(bind_node->sun_server.us_max_backlog))
 				THROW(E_NET_CONNECTION_REFUSED);
 #endif /* !__OPTIMIZE_SIZE__ */
 
@@ -896,10 +853,10 @@ UnixSocket_Connect(struct socket *__restrict self,
 					/* Inform the server that we're trying to connect to it */
 					REF struct unix_client *next, *last;
 					do {
-						next = ATOMIC_READ(bind_node->s_server.us_acceptme);
+						next = ATOMIC_READ(bind_node->sun_server.us_acceptme);
 						if unlikely(next == UNIX_SERVER_ACCEPTME_SHUTDOWN)
 							THROW(E_NET_CONNECTION_REFUSED); /* The server got shut down. */
-					} while (!ATOMIC_CMPXCH_WEAK(bind_node->s_server.us_acceptme,
+					} while (!ATOMIC_CMPXCH_WEAK(bind_node->sun_server.us_acceptme,
 					                             next, NULL));
 					last = next;
 					if (last) {
@@ -908,11 +865,13 @@ UnixSocket_Connect(struct socket *__restrict self,
 					} else {
 						last = client;
 					}
+
 					/* Insert our new client. */
 					client->uc_next = next;
+
 					/* Re-install the  chain of  _all_ new  clients, as  well  as
 					 * check that the total # of pending clients isn't too large. */
-					if (!unix_server_append_acceptme(&bind_node->s_server,
+					if (!unix_server_append_acceptme(&bind_node->sun_server,
 					                                 client, last, client))
 						THROW(E_NET_CONNECTION_REFUSED);
 
@@ -951,15 +910,16 @@ UnixSocket_Listen(struct socket *__restrict self,
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_HANDLE_NET_OPERATION) {
 	syscall_ulong_t old_max_backlog;
 	UnixSocket *me = (UnixSocket *)self;
-	struct socket_node *server_node;
+	struct fsocknode *server_node;
 	server_node = ATOMIC_READ(me->us_node);
 	COMPILER_READ_BARRIER();
 	/* Verify that we've been bound. */
-	if unlikely(!server_node || server_node == (struct socket_node *)-1) {
+	if unlikely(!server_node || server_node == (struct fsocknode *)-1) {
 socket_is_not_bound:
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 		      E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND);
 	}
+
 	/* Verify  that  we're  a  server  socket.  (i.e.  don't  have  one  of   those
 	 * client     descriptors     as    mentioned     in    `UnixSocket_Connect()')
 	 * If  we  do   have  one,  throw   E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND
@@ -970,11 +930,12 @@ socket_is_not_bound:
 
 	/* Save `max_backlog' within `server_node', thus indicating
 	 * that   we're   now    accepting   client    connections. */
-	old_max_backlog = ATOMIC_XCH(server_node->s_server.us_max_backlog,
+	old_max_backlog = ATOMIC_XCH(server_node->sun_server.us_max_backlog,
 	                             max_backlog);
+
 	/* Limit the # of pending clients. */
 	if (max_backlog < old_max_backlog)
-		unix_server_reinstall_acceptme(&server_node->s_server);
+		unix_server_reinstall_acceptme(&server_node->sun_server);
 }
 
 
@@ -1000,10 +961,11 @@ UnixSocket_Accept(struct socket *__restrict self, iomode_t mode)
 	REF UnixSocket *result;
 	REF struct unix_client *result_client;
 	UnixSocket *me = (UnixSocket *)self;
-	struct socket_node *server_node;
+	struct fsocknode *server_node;
 	server_node = ATOMIC_READ(me->us_node);
+
 	/* Verify that we've been bound. */
-	if unlikely(!server_node || server_node == (struct socket_node *)-1) {
+	if unlikely(!server_node || server_node == (struct fsocknode *)-1) {
 socket_is_not_bound:
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 		      E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING);
@@ -1018,7 +980,7 @@ socket_is_not_bound:
 		/* When in non-blocking mode, check if there are any connection requests.
 		 * Doing  this now  will safe us  the unnecessary allocation  of a socket
 		 * object in the event that we're unable to accept anyone. */
-		if (ATOMIC_READ(server_node->s_server.us_acceptme) == NULL)
+		if (ATOMIC_READ(server_node->sun_server.us_acceptme) == NULL)
 			return NULL; /* No pending connections. */
 	}
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -1032,7 +994,7 @@ socket_is_not_bound:
 		/* Wait for a client that we can accept. */
 again_wait_for_client:
 		for (;;) {
-			result_client = unix_server_pop_acceptme(&server_node->s_server);
+			result_client = unix_server_pop_acceptme(&server_node->sun_server);
 			if (result_client)
 				break;
 			if (mode & IO_NONBLOCK) {
@@ -1048,12 +1010,15 @@ again_wait_for_client:
 				kfree(result);
 				return NULL;
 			}
+
 			/* Connect to the signal that gets broadcast when new clients become available. */
-			task_connect(&server_node->s_server.us_acceptme_sig);
+			task_connect(&server_node->sun_server.us_acceptme_sig);
+
 			/* Check for clients while interlocked with their signal. */
-			result_client = unix_server_pop_acceptme(&server_node->s_server);
+			result_client = unix_server_pop_acceptme(&server_node->sun_server);
 			if (result_client)
 				break;
+
 			/* Wait for clients. */
 			task_waitfor();
 		}
@@ -1074,11 +1039,12 @@ again_wait_for_client:
 		kfree(result);
 		RETHROW();
 	}
+
 	/* Fill in the fields of our new, server-sided client socket. */
 	result->us_client   = result_client;
 	result->us_nodepath = incref(me->us_nodepath);
 	result->us_nodename = incref(me->us_nodename);
-	result->us_node     = (REF struct socket_node *)incref(me->us_node);
+	result->us_node     = (REF struct fsocknode *)incref(me->us_node);
 	result->us_recvbuf  = &result_client->uc_fromclient;
 	result->us_sendbuf  = &result_client->uc_fromserver;
 	return result;
@@ -1109,10 +1075,10 @@ PRIVATE NONNULL((1)) void KCALL
 UnixSocket_PollConnect(struct socket *__restrict self,
                        poll_mode_t what) {
 	UnixSocket *me;
-	struct socket_node *node;
+	struct fsocknode *node;
 	me   = (UnixSocket *)self;
 	node = ATOMIC_READ(me->us_node);
-	if (!node || node == (struct socket_node *)-1) {
+	if (!node || node == (struct fsocknode *)-1) {
 	} else if (me->us_client) {
 		/* Client socket (poll against recv()) */
 		pb_buffer_pollconnect_read(me->us_recvbuf);
@@ -1121,7 +1087,7 @@ UnixSocket_PollConnect(struct socket *__restrict self,
 		/* Server socket (poll against accept()) */
 		if (what & POLLINMASK) {
 			/* Connect to the clients-became-available signal. */
-			task_connect_for_poll(&node->s_server.us_acceptme_sig);
+			task_connect_for_poll(&node->sun_server.us_acceptme_sig);
 		}
 	}
 }
@@ -1131,21 +1097,23 @@ UnixSocket_PollTest(struct socket *__restrict self,
                     poll_mode_t what) {
 	poll_mode_t result = 0;
 	UnixSocket *me;
-	struct socket_node *node;
+	struct fsocknode *node;
 	me   = (UnixSocket *)self;
 	node = ATOMIC_READ(me->us_node);
-	if (!node || node == (struct socket_node *)-1) {
+	if (!node || node == (struct fsocknode *)-1) {
 		/* Technically true, as neither will block (both
 		 * `recv()' and `accept()'  will throw  errors!) */
 		result |= what & POLLINMASK;
 	} else if (me->us_client) {
 		struct unix_client *client;
 		client = me->us_client;
+
 		/* Client socket (poll against recv()) */
 		if (what & POLLINMASK) {
 			if (pb_buffer_canread(me->us_recvbuf))
 				result |= POLLINMASK;
 		}
+
 		/* Always poll for HUP conditions */
 		if (unix_client_test_hup(client)) {
 			result |= POLLHUP;
@@ -1158,7 +1126,7 @@ UnixSocket_PollTest(struct socket *__restrict self,
 	} else {
 		/* Server socket (poll against accept()) */
 		if (what & POLLINMASK) {
-			if (unix_server_can_accept(&node->s_server))
+			if (unix_server_can_accept(&node->sun_server))
 				result |= POLLINMASK;
 		}
 	}
@@ -1195,16 +1163,20 @@ again:
 	if (avail <= CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT))
 		return 0; /* Insufficient space to create any more packets. */
 	avail -= CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT);
+
 	/* Limit how much we're actually going to send. */
 	if (avail > bufsize)
 		avail = bufsize;
+
 	/* Limit what is actually possible. */
 	if (avail > PB_PACKET_MAX_PAYLOAD)
 		avail = PB_PACKET_MAX_PAYLOAD;
+
 	/* Try to start the packet. */
 	packet = pb_buffer_startwrite(self, avail, 0);
 	if unlikely(!PB_BUFFER_STARTWRITE_ISOK(packet))
 		goto again; /* Race condition: Something changed in the mean time. */
+
 	/* Fill in packet data. */
 	TRY {
 		iov_buffer_copytomem(buf,
@@ -1266,6 +1238,7 @@ AsyncSend_Test(struct async *__restrict self) {
 		goto nope; /* Insufficient space to create any more packets. */
 	if (me->as_socket->sk_type == SOCK_STREAM)
 		return true; /* Can send data now! */
+
 	/* Check if there is enough space for the entire packet, now. */
 	used = pb_packet_get_totalsize_s(me->as_payload_size,
 	                                 me->as_ancillary_size);
@@ -1333,6 +1306,7 @@ again_start_packet:
 		}
 		return ASYNC_RESUME;
 	}
+
 	/* Populate the packet */
 	TRY {
 		/* Copy over the payload */
@@ -1350,6 +1324,7 @@ again_start_packet:
 		pb_buffer_endwrite_abort(pbuf, packet);
 		RETHROW();
 	}
+
 	/* Commit the packet. */
 	pb_buffer_endwrite_commit(pbuf, packet);
 	return ASYNC_FINISHED;
@@ -1387,19 +1362,22 @@ UnixSocket_Sendv(struct socket *__restrict self,
 	(void)msg_flags;
 	me = (UnixSocket *)self;
 	{
-		struct socket_node *node;
+		struct fsocknode *node;
 		node = ATOMIC_READ(me->us_node);
+
 		/* make sure we're actually connected. */
-		if unlikely(node == NULL || node == (struct socket_node *)-1) {
+		if unlikely(node == NULL || node == (struct fsocknode *)-1) {
 			THROW(E_INVALID_ARGUMENT_BAD_STATE,
 			      E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED);
 		}
+
 		/* make sure that this one's a client-socket. */
 		if unlikely(!me->us_client) {
 			THROW(E_INVALID_ARGUMENT_BAD_STATE,
 			      E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED);
 		}
 	}
+
 	/* At this point, we can send data via `me->us_sendbuf' */
 	pbuf = me->us_sendbuf;
 	assert(pbuf);
@@ -1411,8 +1389,8 @@ UnixSocket_Sendv(struct socket *__restrict self,
 		                                          ANCILLARY_MESSAGE_ARG__msg_flags);
 	}
 
-	offset = 0;
 	/* Try to initiate a new packet. */
+	offset = 0;
 again_start_packet:
 	packet = pb_buffer_startwrite(pbuf, bufsize, ancillary_size);
 	if unlikely(!PB_BUFFER_STARTWRITE_ISOK(packet)) {
@@ -1451,6 +1429,7 @@ again_start_packet:
 			aio_handle_init_noop_retval(aio, offset);
 			return;
 		}
+
 		/* Optional optimization: Pre-cancel the AIO operation in non-blocking mode. */
 		if (msg_flags & MSG_DONTWAIT) {
 			aio_handle_init_noop(aio, AIO_COMPLETION_CANCEL);
@@ -1470,6 +1449,7 @@ again_start_packet:
 				async_free(aj);
 				RETHROW();
 			}
+
 			/* Fill in data members of the async job. */
 			job->as_socket = (REF UnixSocket *)incref(me);
 			job->as_ancillary_size = ancillary_size;
@@ -1504,6 +1484,7 @@ again_start_packet:
 		pb_buffer_endwrite_abort(pbuf, packet);
 		RETHROW();
 	}
+
 	/* Commit the packet. */
 	pb_buffer_endwrite_commit(pbuf, packet);
 
@@ -1529,19 +1510,22 @@ UnixSocket_Recvv(struct socket *__restrict self,
 	assert(!task_wasconnected());
 	me = (UnixSocket *)self;
 	{
-		struct socket_node *node;
+		struct fsocknode *node;
 		node = ATOMIC_READ(me->us_node);
+
 		/* make sure we're actually connected. */
-		if unlikely(node == NULL || node == (struct socket_node *)-1) {
+		if unlikely(node == NULL || node == (struct fsocknode *)-1) {
 			THROW(E_INVALID_ARGUMENT_BAD_STATE,
 			      E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED);
 		}
+
 		/* make sure that this one's a client-socket. */
 		if unlikely(!me->us_client) {
 			THROW(E_INVALID_ARGUMENT_BAD_STATE,
 			      E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED);
 		}
 	}
+
 	/* At this point, we can receive data via `me->us_recvbuf' */
 	pbuf = me->us_recvbuf;
 	result = 0;
@@ -1569,6 +1553,7 @@ again_read_packet:
 			task_disconnectall();
 			goto done; /* EOF */
 		}
+
 		/* Wait for a packet to become available. */
 		if (!task_waitfor(abs_timeout))
 			THROW(E_NET_TIMEOUT);
@@ -1621,6 +1606,7 @@ again_read_packet:
 				pb_buffer_endread_restore(pbuf, packet);
 				goto done;
 			}
+
 			/* Read the whole packet. */
 			iov_buffer_copyfrommem(buf, result,
 			                       pb_packet_payload(packet),
@@ -1657,8 +1643,10 @@ again_read_packet:
 				*presult_flags = 0;
 			if (msg_control) /* Inform the user about the absence of control information. */
 				ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
+
 			/* Consume the packet, since it's now empty. */
 			pb_buffer_endread_consume(pbuf, packet);
+
 			/* If we've still got some space left, then try to read more. */
 			if (bufsize)
 				goto again_read_packet;
@@ -1697,6 +1685,7 @@ again_read_packet:
 				pb_buffer_endread_restore(pbuf, packet);
 				goto done;
 			}
+
 			/* Read the whole packet. */
 			iov_buffer_copyfrommem(buf, result,
 			                       pb_packet_payload(packet),
@@ -1722,6 +1711,7 @@ again_read_packet:
 			}
 			if (msg_control) /* Inform the user about the absence of control information. */
 				ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
+
 			/* Consume the packet, since it's now empty. */
 			pb_buffer_endread_consume(pbuf, packet);
 			if (presult_flags)
@@ -1744,20 +1734,20 @@ UnixSocket_Shutdown(struct socket *__restrict self,
                     syscall_ulong_t how)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
 	UnixSocket *me;
-	me = (UnixSocket *)self;
-	{
-		struct socket_node *node;
-		node = ATOMIC_READ(me->us_node);
-		/* make sure we're actually connected. */
-		if unlikely(node == NULL || node == (struct socket_node *)-1) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
-		}
-		/* make sure that this one's a client-socket. */
-		if unlikely(!me->us_client) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
-		}
+	struct fsocknode *node;
+	me   = (UnixSocket *)self;
+	node = ATOMIC_READ(me->us_node);
+
+	/* make sure we're actually connected. */
+	if unlikely(node == NULL || node == (struct fsocknode *)-1) {
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
+	}
+
+	/* make sure that this one's a client-socket. */
+	if unlikely(!me->us_client) {
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
 	}
 	/* Simply close the specified buffers. */
 	if (SHUT_ISRD(how))
@@ -1771,11 +1761,12 @@ UnixSocket_GetClient(struct unix_socket *__restrict self,
 					 unsigned int error_context)
 		THROWS(TODO) {
 	struct unix_client *result;
-	struct socket_node *server_node;
+	struct fsocknode *server_node;
 	server_node = ATOMIC_READ(self->us_node);
 	COMPILER_READ_BARRIER();
+
 	/* Verify that we've been bound. */
-	if unlikely(!server_node || server_node == (struct socket_node *)-1) {
+	if unlikely(!server_node || server_node == (struct fsocknode *)-1) {
 not_connected:
 		THROW(E_INVALID_ARGUMENT_BAD_STATE, error_context);
 	}

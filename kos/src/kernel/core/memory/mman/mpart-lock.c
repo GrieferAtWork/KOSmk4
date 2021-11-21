@@ -909,9 +909,8 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		incref(self);
 		incref(file);
-#ifdef CONFIG_USE_NEW_FS
 		mfile_trunclock_inc(file);
-#endif /* CONFIG_USE_NEW_FS */
+
 		/* Release the lock from the part, so we can load
 		 * blocks without holding that non-recursive, and
 		 * non-preemptive lock! */
@@ -925,9 +924,8 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 			addr      = self->mp_minaddr + (start << file->mf_blockshift);
 			num_bytes = (end - start) << file->mf_blockshift;
 
-#ifdef CONFIG_USE_NEW_FS
 			if (!mfile_isanon(file)) {
-				pos_t filesize = (pos_t)atomic64_read(&file->mf_filesize);
+				pos_t filesize = mfile_getsize(file);
 				if (!OVERFLOW_UADD(filesize, file->mf_part_amask, &filesize)) {
 					filesize = mfile_addr_flooralign(file, filesize);
 
@@ -970,38 +968,32 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 					}
 				}
 			}
-#endif /* CONFIG_USE_NEW_FS */
 			if likely(mo_loadblocks != NULL)
 				mfile_dosyncio(file, mo_loadblocks, addr, loc.mppl_addr, num_bytes);
 		} EXCEPT {
 			/* Set block states back to NDEF */
 			for (i = start; i < end; ++i)
 				mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
-#ifdef CONFIG_USE_NEW_FS
 			mfile_trunclock_dec_nosignal(file);
-#endif /* CONFIG_USE_NEW_FS */
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
 			decref_unlikely(self);
 			RETHROW();
 		}
-#ifdef CONFIG_USE_NEW_FS
 initdone:
-#endif /* CONFIG_USE_NEW_FS */
 
 		/* Set loaded states back to LOAD */
 		for (i = start; i < end; ++i)
 			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
-#ifdef CONFIG_USE_NEW_FS
 		mfile_trunclock_dec_nosignal(file);
-#endif /* CONFIG_USE_NEW_FS */
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
 		decref_unlikely(self);
 		return false;
 	}
+
+	/* Wait for init-parts to go away! */
 	if (has_init) {
-		/* Wait for init-parts to go away! */
 		incref(self);
 		FINALLY_DECREF_UNLIKELY(self);
 		TRY {

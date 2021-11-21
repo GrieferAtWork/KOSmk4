@@ -230,7 +230,7 @@ _mfile_newpart(struct mfile *__restrict self,
 		result->mp_state = MPART_ST_VOID;
 		result->mp_meta  = NULL;
 #ifdef LIBVIO_CONFIG_ENABLED
-		if unlikely(mfile_getvio(self) != NULL)
+		if unlikely(self->mf_ops->mo_vio != NULL)
 			result->mp_state = MPART_ST_VIO;
 #endif /* LIBVIO_CONFIG_ENABLED */
 	}
@@ -256,10 +256,8 @@ mfile_makepart(struct mfile *__restrict self,
 	result->mp_refcnt = 1;
 	result->mp_xflags = MPART_XF_NORMAL;
 	result->mp_file   = self;
-#ifdef CONFIG_USE_NEW_FS
-	if (self->mf_flags & MFILE_F_DELETED)
+	if unlikely(self->mf_flags & MFILE_F_DELETED)
 		result->mp_file = &mfile_anon[self->mf_blockshift];
-#endif /* CONFIG_USE_NEW_FS */
 	incref(result->mp_file);
 	LIST_INIT(&result->mp_copy);
 	LIST_INIT(&result->mp_share);
@@ -328,12 +326,11 @@ makeanon:
 		loadmax   = (pos_t)-1;
 	}
 
-#ifdef CONFIG_USE_NEW_FS
 	/* Check if `addr'  lies in-bounds of  the file, and  limit the max  #
 	 * of bytes for the new mem-part to always stop just shy of the block-
 	 * aligned ceil-size of the underlying mem-part. */
 	{
-		pos_t filsiz = (pos_t)atomic64_read(&self->mf_filesize);
+		pos_t filsiz = mfile_getsize(self);
 		if (!OVERFLOW_UADD(filsiz, self->mf_part_amask, &filsiz)) {
 			filsiz &= ~(pos_t)self->mf_part_amask;
 			if likely(filsiz >= self->mf_part_amask) {
@@ -352,7 +349,6 @@ makeanon:
 			}
 		}
 	}
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* Limit the given `num_bytes' by the distance
 	 * until the  next  already-present  mem-part. */
@@ -406,12 +402,12 @@ again_extend_part:
 				num_bytes = (size_t)((pos_t)0 - addr);
 				loadmax   = (pos_t)-1;
 			}
-#ifdef CONFIG_USE_NEW_FS
+
 			/* Check if `addr'  lies in-bounds of  the file, and  limit the max  #
 			 * of bytes for the new mem-part to always stop just shy of the block-
 			 * aligned ceil-size of the underlying mem-part. */
 			{
-				pos_t filsiz = (pos_t)atomic64_read(&self->mf_filesize);
+				pos_t filsiz = mfile_getsize(self);
 				if (!OVERFLOW_UADD(filsiz, self->mf_part_amask, &filsiz)) {
 					filsiz &= ~(pos_t)self->mf_part_amask;
 					if likely(filsiz >= self->mf_part_amask) {
@@ -431,7 +427,6 @@ again_extend_part:
 					}
 				}
 			}
-#endif /* CONFIG_USE_NEW_FS */
 			mpart_tree_minmaxlocate(self->mf_parts, addr, loadmax, &mima);
 			if (mima.mm_min != NULL) {
 				assert(addr < mpart_getminaddr(mima.mm_min));
@@ -469,14 +464,12 @@ again_extend_part:
 	result->mp_flags |= MPART_F_GLOBAL_REF;
 
 	/* Mark the part as persistent if our file is, too. */
-#ifdef CONFIG_USE_NEW_FS
 #if MFILE_F_PERSISTENT == MPART_F_PERSISTENT
 	result->mp_flags |= self->mf_flags & MPART_F_PERSISTENT;
 #else /* MFILE_F_PERSISTENT == MPART_F_PERSISTENT */
 	if (self->mf_flags & MFILE_F_PERSISTENT)
 		result->mp_flags |= MPART_F_PERSISTENT;
 #endif /* MFILE_F_PERSISTENT != MPART_F_PERSISTENT */
-#endif /* CONFIG_USE_NEW_FS */
 
 	TRY {
 		mfile_lock_write(self);
@@ -490,9 +483,8 @@ again_extend_part:
 	/* Verify that nothing's changed in the mean time. */
 	if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS)
 		goto startover;
-#ifdef CONFIG_USE_NEW_FS
 	{
-		pos_t filsiz = (pos_t)atomic64_read(&self->mf_filesize);
+		pos_t filsiz = mfile_getsize(self);
 		if (filsiz < (loadmax + 1) || loadmax == (pos_t)-1) {
 			if (!OVERFLOW_UADD(filsiz, self->mf_part_amask, &filsiz)) {
 				filsiz &= ~(pos_t)self->mf_part_amask;
@@ -502,7 +494,6 @@ again_extend_part:
 			}
 		}
 	}
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* Add the new part to the list of all parts. (but only if it's not a VIO part) */
 #ifdef LIBVIO_CONFIG_ENABLED

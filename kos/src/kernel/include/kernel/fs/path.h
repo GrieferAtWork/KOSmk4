@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/vfs.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/dirent.h>
 #include <kernel/types.h>
 
@@ -755,6 +752,5 @@ path_open(fd_t fd_cwd, USER CHECKED char const *filename,
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_PATH_H */

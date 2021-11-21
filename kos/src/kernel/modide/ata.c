@@ -22,11 +22,10 @@
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
-#include <kernel/compiler.h>
-
-#ifdef CONFIG_USE_NEW_FS
 #include "ata.h"
 /**/
+
+#include <kernel/compiler.h>
 
 #include <kernel/aio.h>
 #include <kernel/driver-callbacks.h>
@@ -1636,8 +1635,6 @@ PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL AtaInit(void)
 	}
 }
 
-
 DECL_END
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_MODIDE_ATA	_C */

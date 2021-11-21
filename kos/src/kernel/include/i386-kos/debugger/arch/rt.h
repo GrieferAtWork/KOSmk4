@@ -30,7 +30,7 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
-#include <sched/rwlock-intern.h>
+#include <sched/signal.h>
 
 #include <hybrid/host.h>
 #include <hybrid/sequence/list.h>
@@ -154,7 +154,6 @@ struct x86_dbg_hoststate {
 	uintptr_t                dhs_taskflags; /* Saved `this_task.t_flags' */
 	struct x86_dbg_psp0state dhs_psp0;      /* Saved `this_x86_kernel_psp0' */
 	struct task             *dhs_override;  /* Saved `THIS_CPU->c_override' */
-	struct read_locks        dhs_readlocks; /* Saved `this_read_locks' */
 	struct task_connections  dhs_signals;   /* Saved signal connections. */
 	bool                     dhs_pint;      /* Set to true if preemptive interrupts were enabled. */
 #ifndef CONFIG_NO_SMP

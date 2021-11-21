@@ -78,7 +78,7 @@ LOCAL_mfile_vio_rw(struct mfile *__restrict self,
                    size_t num_bytes, pos_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct vioargs args;
-	args.va_ops = mfile_getvio(self);
+	args.va_ops = self->mf_ops->mo_vio;
 	assert(args.va_ops);
 	args.va_acmap_page   = NULL;
 	args.va_acmap_offset = 0;

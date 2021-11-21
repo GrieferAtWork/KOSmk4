@@ -207,7 +207,6 @@ PUBLIC struct mpart userkern_segment_part = {
 };
 
 
-#ifdef CONFIG_USE_NEW_FS
 PRIVATE struct mfile_ops const userkern_segment_file_ops = {
 	.mo_vio = &userkern_segment_vio
 };
@@ -229,20 +228,6 @@ PUBLIC struct mfile userkern_segment_file = {
 	.mf_mtime      = { .tv_sec = 0, .tv_nsec = 0 },
 	.mf_ctime      = { .tv_sec = 0, .tv_nsec = 0 },
 };
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC struct mfile userkern_segment_file = {
-	.mf_refcnt     = 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
-	.mf_ops        = &mfile_ndef_ops,
-	.mf_vio        = &userkern_segment_vio,
-	.mf_lock       = ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC
-	.mf_parts      = &userkern_segment_part,
-	.mf_initdone   = SIG_INIT,
-	.mf_lockops    = SLIST_HEAD_INITIALIZER(userkern_segment_file.mf_lockops),
-	.mf_changed    = SLIST_HEAD_INITIALIZER(userkern_segment_file.mf_changed),
-	.mf_part_amask = PAGEMASK,
-	.mf_blockshift = PAGESHIFT,
-};
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 
@@ -348,7 +333,6 @@ PUBLIC struct mpart userkern_segment_part_compat = {
 	MPART_INIT_mp_meta(NULL)
 };
 
-#ifdef CONFIG_USE_NEW_FS
 PRIVATE struct mfile_ops const userkern_segment_file_compat_ops = {
 	.mo_vio = &userkern_segment_vio_compat
 };
@@ -370,20 +354,6 @@ PUBLIC struct mfile userkern_segment_file_compat = {
 	.mf_mtime      = { .tv_sec = 0, .tv_nsec = 0 },
 	.mf_ctime      = { .tv_sec = 0, .tv_nsec = 0 },
 };
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC struct mfile userkern_segment_file_compat = {
-	.mf_refcnt     = 2, /* +1: `userkern_segment_file_compat', +1: `userkern_segment_part.mn_file' */
-	.mf_ops        = &mfile_ndef_ops,
-	.mf_vio        = &userkern_segment_vio_compat,
-	.mf_lock       = ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC
-	.mf_parts      = &userkern_segment_part_compat,
-	.mf_initdone   = SIG_INIT,
-	.mf_lockops    = SLIST_HEAD_INITIALIZER(userkern_segment_file_compat.mf_lockops),
-	.mf_changed    = SLIST_HEAD_INITIALIZER(userkern_segment_file_compat.mf_changed),
-	.mf_part_amask = PAGEMASK,
-	.mf_blockshift = PAGESHIFT,
-};
-#endif /* !CONFIG_USE_NEW_FS */
 #endif /* __ARCH_HAVE_COMPAT */
 
 

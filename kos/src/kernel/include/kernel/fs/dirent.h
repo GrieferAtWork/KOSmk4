@@ -22,18 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-
-/* struct fdirent */
-#define fd_refcnt  de_refcnt
-#define fd_ino     de_ino
-#define fd_hash    de_hash
-#define fd_namelen de_namelen
-#define fd_type    de_type
-#define fd_name    de_name
-
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 
 #include <hybrid/byteorder.h>
@@ -119,6 +107,5 @@ fdirent_hash(CHECKED USER /*utf-8*/ char const *text, u16 textlen)
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_DIRENT_H */

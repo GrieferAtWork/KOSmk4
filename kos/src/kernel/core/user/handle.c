@@ -1679,46 +1679,6 @@ handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
 	return result;
 }
 
-#ifndef CONFIG_USE_NEW_FS
-PUBLIC WUNUSED bool FCALL
-handle_existsin(unsigned int fd, struct handle_manager *__restrict self)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
-	sync_read(&self->hm_lock);
-	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
-		assert(self->hm_count <= self->hm_linear.hm_alloc);
-		if unlikely(fd >= self->hm_linear.hm_alloc)
-			goto nope;
-		if unlikely(self->hm_linear.hm_vector[fd].h_type == HANDLE_TYPE_UNDEFINED)
-			goto nope;
-	} else {
-		unsigned int i, perturb;
-		assert(self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR);
-		assert(self->hm_hashvector.hm_hashvec);
-		assert(self->hm_count <= self->hm_hashvector.hm_alloc);
-		i = perturb = fd & self->hm_hashvector.hm_hashmsk;
-		for (;; handle_manager_hashnext(i, perturb)) {
-			struct handle_hashent *hashent;
-			unsigned int vecid;
-			hashent = &self->hm_hashvector.hm_hashvec[i & self->hm_hashvector.hm_hashmsk];
-			if (hashent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
-				goto nope;
-			if (hashent->hh_handle_id != fd)
-				continue; /* Some other handle. */
-			/* Found it! */
-			vecid = hashent->hh_vector_index;
-			if (vecid == (unsigned int)-1)
-				goto nope; /* Handle has already been deleted! */
-			break;
-		}
-	}
-	sync_endread(&self->hm_lock);
-	return true;
-nope:
-	sync_endread(&self->hm_lock);
-	return false;
-}
-#endif /* !CONFIG_USE_NEW_FS */
-
 PUBLIC WUNUSED REF struct handle FCALL
 handle_lookup_nosym(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
@@ -1885,7 +1845,6 @@ handle_tryclose_symolic(unsigned int fd)
 		REF struct path *oldp;
 		id = (fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
 		require(CAP_MOUNT_DRIVES);
-#ifdef CONFIG_USE_NEW_FS
 		vfs_driveslock_write(myvfs);
 		oldp = myvfs->vf_drives[id]; /* Inherit reference */
 		if unlikely(!oldp) {
@@ -1908,19 +1867,6 @@ handle_tryclose_symolic(unsigned int fd)
 		}
 		vfs_driveslock_endwrite(myvfs);
 		decref_unlikely(oldp); /* Old reference from `myvfs->vf_drives[id];' */
-#else /* CONFIG_USE_NEW_FS */
-		sync_write(&myvfs->v_drives_lock);
-		oldp = myvfs->v_drives[id];
-		myvfs->v_drives[id] = NULL;
-		if (oldp) {
-			assert(oldp->p_isdrive != 0);
-			ATOMIC_DEC(oldp->p_isdrive);
-		}
-		sync_endwrite(&myvfs->v_drives_lock);
-		xdecref_unlikely(oldp);
-		if unlikely(!oldp)
-			throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
-#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	default:
@@ -2025,7 +1971,6 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		/* Bind DOS drives */
 		id   = (dst_fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
 		newp = handle_as_path_noinherit(hnd);
-#ifdef CONFIG_USE_NEW_FS
 		TRY {
 			vfs_driveslock_write(myvfs);
 		} EXCEPT {
@@ -2049,23 +1994,6 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		}
 		vfs_driveslock_endwrite(myvfs);
 		xdecref_unlikely(oldp);
-#else /* CONFIG_USE_NEW_FS */
-		TRY {
-			sync_read(&myvfs->v_drives_lock);
-		} EXCEPT {
-			decref(newp);
-			RETHROW();
-		}
-		ATOMIC_INC(newp->p_isdrive);
-		oldp = myvfs->v_drives[id];
-		myvfs->v_drives[id] = newp; /* Inherit reference */
-		if (oldp) {
-			assert(oldp->p_isdrive != 0);
-			ATOMIC_DEC(oldp->p_isdrive);
-		}
-		sync_endread(&myvfs->v_drives_lock);
-		xdecref(oldp);
-#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	default:
@@ -2357,11 +2285,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 		} else if (temp.h_type == HANDLE_TYPE_FIFOHANDLE) {
 			struct fifohandle *me;
 			me = (struct fifohandle *)temp.h_data;
-#ifdef CONFIG_USE_NEW_FS
 			rb = &me->fu_fifo->ff_buffer;
-#else /* CONFIG_USE_NEW_FS */
-			rb = &me->fu_fifo->f_fifo.ff_buffer;
-#endif /* !CONFIG_USE_NEW_FS */
 		} else {
 			THROW(E_INVALID_HANDLE_FILETYPE, fd,
 			      HANDLE_TYPE_PIPE, temp.h_type,
@@ -2395,11 +2319,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 		} else if (temp.h_type == HANDLE_TYPE_FIFOHANDLE) {
 			struct fifohandle *me;
 			me = (struct fifohandle *)temp.h_data;
-#ifdef CONFIG_USE_NEW_FS
 			rb = &me->fu_fifo->ff_buffer;
-#else /* CONFIG_USE_NEW_FS */
-			rb = &me->fu_fifo->f_fifo.ff_buffer;
-#endif /* !CONFIG_USE_NEW_FS */
 		} else {
 			THROW(E_INVALID_HANDLE_FILETYPE, fd,
 			      HANDLE_TYPE_PIDNS, temp.h_type,

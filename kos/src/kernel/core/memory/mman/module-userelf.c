@@ -113,24 +113,14 @@ uem_shdrs(struct userelf_module *__restrict self) {
 	shsize         = self->um_shnum * UM_sizeof(self, UM_ElfW_Shdr);
 	UM_any(result) = (typeof(UM_any(result)))kmalloc(shsize, GFP_PREFLT);
 	TRY {
-#ifdef CONFIG_USE_NEW_FS
 		mfile_readall(self->md_file, UM_any(result),
 		              shsize, self->um_shoff);
-#else /* CONFIG_USE_NEW_FS */
-		if (!vm_datablock_isinode(self->md_file)) {
-			kfree(UM_any(result));
-			UM_any(result) = NULL;
-			return result;
-		}
-		inode_readallk((struct inode *)self->md_file,
-		               UM_any(result), shsize,
-		               self->um_shoff);
-#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		kfree(UM_any(result));
 		RETHROW();
 	}
-	if (!ATOMIC_CMPXCH(UM_any(self->um_shdrs), NULL, UM_any(result)))
+	if unlikely(!ATOMIC_CMPXCH(UM_any(self->um_shdrs),
+	                           NULL, UM_any(result)))
 		kfree(UM_any(result));
 	return self->um_shdrs;
 }
@@ -153,18 +143,8 @@ uem_shstrtab(struct userelf_module *__restrict self) {
 		return NULL;
 	shstrtab_str = (char *)kmalloc((shstrtab_siz + 1) * sizeof(char), GFP_PREFLT);
 	TRY {
-#ifdef CONFIG_USE_NEW_FS
 		mfile_readall(self->md_file, shstrtab_str,
 		              shstrtab_siz, shstrtab_pos);
-#else /* CONFIG_USE_NEW_FS */
-		if (!vm_datablock_isinode(self->md_file)) {
-			kfree(shstrtab_str);
-			return NULL;
-		}
-		inode_readallk((struct inode *)self->md_file,
-		               shstrtab_str, shstrtab_siz,
-		               shstrtab_pos);
-#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		kfree(shstrtab_str);
 		RETHROW();
@@ -215,14 +195,7 @@ scan_dynamic_for_DT_PLTGOT(struct mfile *__restrict file,
 		goto done;
 	total_size = dynamic_count * sizeof(Elf32_Dyn);
 	dynamic    = (Elf32_Dyn *)alloca(total_size);
-#ifdef CONFIG_USE_NEW_FS
 	mfile_readall(file, dynamic, total_size, dynamic_offset);
-#else /* CONFIG_USE_NEW_FS */
-	if (!vm_datablock_isinode(file))
-		goto done;
-	inode_readallk((struct inode *)file, dynamic,
-	               total_size, dynamic_offset);
-#endif /* !CONFIG_USE_NEW_FS */
 	for (i = 0; i < dynamic_count; ++i) {
 		if (dynamic[i].d_tag == DT_PLTGOT) {
 			result = dynamic[i].d_un.d_ptr;
@@ -984,10 +957,6 @@ uem_create_from_mapping(struct mman *__restrict self,
                         struct mfile *__restrict file,
                         USER CHECKED byte_t *node_addr,
                         pos_t node_fpos) {
-#ifndef CONFIG_USE_NEW_FS
-#define mfile_read(self, dst, num_bytes, pos) inode_readk((struct inode *)(self), dst, num_bytes, pos)
-#endif /* !CONFIG_USE_NEW_FS */
-
 	/* NOTE: Since the addr<==>file values were loaded from mem-nodes,
 	 *       we can assume  that they're always  properly aligned,  as
 	 *       it's impossible  for file  mappings to  be created,  such
@@ -1066,12 +1035,7 @@ uem_create_from_mapping(struct mman *__restrict self,
 	if (UM_field_r(sizeof_pointer, ehdr, .e_shentsize) != UM_sizeof_r(sizeof_pointer, UM_ElfW_Shdr))
 		goto not_an_elf_file;
 
-#ifdef CONFIG_USE_NEW_FS
-	file_size = (pos_t)atomic64_read(&file->mf_filesize);
-#else /* CONFIG_USE_NEW_FS */
-	inode_loadattr((struct inode *)file);
-	file_size = ((struct inode *)file)->i_filesize;
-#endif /* !CONFIG_USE_NEW_FS */
+	file_size = mfile_getsize(file);
 
 	/* Validate section indices/offsets */
 	shnum = UM_field_r(sizeof_pointer, ehdr, .e_shnum);
@@ -1296,14 +1260,7 @@ something_changed:
 					actual_fpos   = mnode_getfileaddr(node);
 					if (expected_fpos != actual_fpos)
 						goto not_an_elf_file_phdrv_result_mmlock;
-#ifdef CONFIG_USE_NEW_FS
-				} else if (node_file >= &mfile_zero) {
-					/* Allow zero-memory  for .bss-style  mappings!
-					 * It used to  be that `mfile_zero'  is one  of
-					 * the `mfile_anon' files, but that's no longer
-					 * the case. */
-#endif /* CONFIG_USE_NEW_FS */
-				} else if (node_file >= mfile_anon && node_file < COMPILER_ENDOF(mfile_anon)) {
+				} else if (mfile_isdevzero(node_file)) {
 					/* Allow zero-memory for .bss-style mappings! */
 				} else {
 					/* Unexpected file mapping... (not a valid UserELF mapping!) */
@@ -1511,7 +1468,6 @@ again:
 	result = axref_get(rtld_fsfile);
 	if (!result && !kernel_poisoned()) {
 		TRY {
-#ifdef CONFIG_USE_NEW_FS
 			REF struct path *root;
 			u32 remaining_symlinks;
 			vfs_rootlock_read(&vfs_kernel);
@@ -1519,30 +1475,14 @@ again:
 			vfs_rootlock_endread(&vfs_kernel);
 			FINALLY_DECREF_UNLIKELY(root);
 			remaining_symlinks = SYMLOOP_MAX;
+
 			/* Open the libdl file. (+1 because we want to be relative to the root) */
 			result = path_traversefull_ex(root, &remaining_symlinks, rtld_name->fd_name + 1);
-			if unlikely(!mfile_isreg(result)) {
+			if unlikely(!mfile_hasrawio(result)) {
 				decref_unlikely(result);
 				THROW(E_FSERROR);
 			}
-#else /* CONFIG_USE_NEW_FS */
-			result = path_traversefull_ex(/* filesystem:            */ &fs_kernel,
-			                              /* cwd:                   */ &vfs_kernel,
-			                              /* root:                  */ &vfs_kernel,
-			                              /* upath:                 */ rtld_name->de_name,
-			                              /* follow_final_link:     */ true,
-			                              /* mode:                  */ FS_MODE_FNORMAL,
-			                              /* premaining_symlinks:   */ NULL,
-			                              /* pcontaining_path:      */ NULL,
-			                              /* pcontaining_directory: */ NULL,
-			                              /* pcontaining_dirent:    */ NULL);
-#endif /* !CONFIG_USE_NEW_FS */
-#ifndef CONFIG_USE_NEW_FS
-			if (!vm_datablock_isinode(result)) {
-				decref_unlikely(result);
-				THROW(E_FSERROR);
-			}
-#endif /* !CONFIG_USE_NEW_FS */
+
 			/* Try to cache the resulting file object. */
 			if (!axref_cmpxch(rtld_fsfile, NULL, result)) {
 				decref_likely(result);
@@ -1638,12 +1578,7 @@ uem_create_system_rtld(struct mman *__restrict self,
 		if (UM_field_r(sizeof_pointer, ehdr, .e_phnum) != RTLD_PHDR_COUNT)
 			goto not_an_elf_file;
 
-#ifdef CONFIG_USE_NEW_FS
-		file_size = (pos_t)atomic64_read(&file->mf_filesize);
-#else /* CONFIG_USE_NEW_FS */
-		inode_loadattr((struct inode *)file);
-		file_size = ((struct inode *)file)->i_filesize;
-#endif /* !CONFIG_USE_NEW_FS */
+		file_size = mfile_getsize(file);
 
 		/* Validate section indices/offsets */
 		shnum = UM_field_r(sizeof_pointer, ehdr, .e_shnum);
@@ -1699,9 +1634,7 @@ uem_create_system_rtld(struct mman *__restrict self,
 				goto not_an_elf_file;
 			UM_any(shdrs) = (typeof(UM_any(shdrs)))kmalloc(shsize, GFP_PREFLT);
 			TRY {
-				inode_readallk((struct inode *)file,
-				               UM_any(shdrs), shsize,
-				               shoff);
+				mfile_readall(file, UM_any(shdrs), shsize, shoff);
 			} EXCEPT {
 				kfree(UM_any(shdrs));
 				RETHROW();
@@ -1930,7 +1863,6 @@ not_an_elf_file:
 
 PRIVATE struct mfile_axref system_rtld_fsfile = AXREF_INIT(NULL);
 PRIVATE struct fdirent system_rtld_dirent = {
-#ifdef CONFIG_USE_NEW_FS
 	.fd_refcnt  = 1,
 	.fd_ops     = &fdirent_empty_ops,
 	.fd_ino     = 0,
@@ -1938,25 +1870,11 @@ PRIVATE struct fdirent system_rtld_dirent = {
 	.fd_namelen = COMPILER_STRLEN(RTLD_LIBDL),
 	.fd_type    = DT_REG,
 	/* .fd_name = */ RTLD_LIBDL
-#else /* CONFIG_USE_NEW_FS */
-	.de_refcnt   = 1, /* +1: system_rtld_dirent */
-	.de_heapsize = offsetof(struct fdirent, de_name) + sizeof(RTLD_LIBDL),
-	.de_next     = NULL,
-	.de_bypos    = LIST_ENTRY_UNBOUND_INITIALIZER,
-	.de_fsdata   = {},
-	.de_pos      = 0,
-	.de_ino      = 0,
-	.de_hash     = _RTLD_LIBDL_HASH,
-	.de_namelen  = COMPILER_STRLEN(RTLD_LIBDL),
-	.de_type     = DT_REG,
-	RTLD_LIBDL
-#endif /* !CONFIG_USE_NEW_FS */
 };
 
 #ifdef __ARCH_HAVE_COMPAT
 PRIVATE struct mfile_axref compat_system_rtld_fsfile = AXREF_INIT(NULL);
 PRIVATE struct fdirent compat_system_rtld_dirent = {
-#ifdef CONFIG_USE_NEW_FS
 	.fd_refcnt  = 1,
 	.fd_ops     = &fdirent_empty_ops,
 	.fd_ino     = 0,
@@ -1964,19 +1882,6 @@ PRIVATE struct fdirent compat_system_rtld_dirent = {
 	.fd_namelen = COMPILER_STRLEN(COMPAT_RTLD_LIBDL),
 	.fd_type    = DT_REG,
 	/* .fd_name = */ COMPAT_RTLD_LIBDL
-#else /* CONFIG_USE_NEW_FS */
-	.de_refcnt   = 1, /* +1: compat_system_rtld_dirent */
-	.de_heapsize = offsetof(struct fdirent, de_name) + sizeof(COMPAT_RTLD_LIBDL),
-	.de_next     = NULL,
-	.de_bypos    = LIST_ENTRY_UNBOUND_INITIALIZER,
-	.de_fsdata   = {},
-	.de_pos      = 0,
-	.de_ino      = 0,
-	.de_hash     = _COMPAT_RTLD_LIBDL_HASH,
-	.de_namelen  = COMPILER_STRLEN(COMPAT_RTLD_LIBDL),
-	.de_type     = DT_REG,
-	COMPAT_RTLD_LIBDL
-#endif /* !CONFIG_USE_NEW_FS */
 };
 #endif /* __ARCH_HAVE_COMPAT */
 
@@ -2107,13 +2012,7 @@ uem_trycreate(struct mman *__restrict self,
 	}
 
 	did_unlock = false;
-#ifdef CONFIG_USE_NEW_FS
-	if (file == &mfile_zero ||
-	    (file >= mfile_anon && file < COMPILER_ENDOF(mfile_anon)))
-#else /* CONFIG_USE_NEW_FS */
-	if (file >= mfile_anon && file < COMPILER_ENDOF(mfile_anon))
-#endif /* !CONFIG_USE_NEW_FS */
-	{
+	if (mfile_isdevzero(file)) {
 		/* Special case: zero-initialized memory.
 		 * In this case, we may be dealing with a .bss segment
 		 * of a UserELF module, in which case we should try to
@@ -2282,17 +2181,6 @@ anon_mem_not_a_module:
 		return result;
 	}
 #endif /* __ARCH_HAVE_COMPAT */
-
-#ifndef CONFIG_USE_NEW_FS
-	if (!vm_datablock_isinode(file)) {
-		mpart_lock_release(part);
-		if (did_unlock) {
-			mman_lock_release(self);
-			return UEM_TRYCREATE_UNLOCKED_NOUEM;
-		}
-		return NULL;
-	}
-#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Assume that we're dealing with an actual file-mapping. */
 	{

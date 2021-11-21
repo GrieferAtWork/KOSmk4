@@ -128,17 +128,11 @@ mman_enum_ex(struct mman *__restrict self, mman_enum_ex_callback_t cb, void *arg
 #else /* DEFINE_mman_enum */
 	struct mmapinfo_ex mi;
 #endif /* !DEFINE_mman_enum */
-#ifndef CONFIG_USE_NEW_FS
-	size_t num_nodes = 0;
-#endif /* !CONFIG_USE_NEW_FS */
 	while (enum_minaddr <= enum_maxaddr) {
 		struct mnode_tree_minmax mima;
 		struct mnode *node;
 		struct mpart *part;
 again_lookup_node:
-#ifndef CONFIG_USE_NEW_FS
-		mi.mmi_index = num_nodes++;
-#endif /* !CONFIG_USE_NEW_FS */
 #ifdef DEFINE_mman_enum_ex
 		mi.mmix_locked  = 0;
 		mi.mmix_alloc   = 0;
@@ -230,17 +224,12 @@ again_lookup_node:
 						break;
 				}
 				/* The secondary node is considered to be apart of the same mapping! */
-#ifndef CONFIG_USE_NEW_FS
-				++num_nodes;
-#endif /* !CONFIG_USE_NEW_FS */
 			}
 
 			/* Limit the enumerated address range to the requested range */
 			if (mi.mmi_max > enum_maxaddr)
 				mi.mmi_max = enum_maxaddr;
-#ifdef CONFIG_USE_NEW_FS
 			mi._mmi_node = mima.mm_min;
-#endif /* CONFIG_USE_NEW_FS */
 
 			/* Invoke the given callback. */
 			temp = (*cb)(arg, &mi);
@@ -268,9 +257,6 @@ waitfor_part:
 					mman_lock_endread(self);
 					FINALLY_DECREF_UNLIKELY(part);
 					mpart_lock_waitfor(part);
-#ifndef CONFIG_USE_NEW_FS
-					num_nodes = mi.mmi_index;
-#endif /* !CONFIG_USE_NEW_FS */
 					goto again_lookup_node;
 				}
 				mi.mmi_file   = incref(part->mp_file);
@@ -348,9 +334,6 @@ waitfor_part:
 						break;
 				}
 				/* The secondary node is considered to be apart of the same mapping! */
-#ifndef CONFIG_USE_NEW_FS
-				++num_nodes;
-#endif /* !CONFIG_USE_NEW_FS */
 			}
 			mman_lock_endread(self);
 
@@ -362,9 +345,7 @@ waitfor_part:
 			FINALLY_XDECREF_UNLIKELY(mi.mmi_file);
 			FINALLY_XDECREF_UNLIKELY(mi.mmi_fsname);
 			FINALLY_XDECREF_UNLIKELY(mi.mmi_fspath);
-#ifdef CONFIG_USE_NEW_FS
 			mi._mmi_node = mima.mm_min;
-#endif /* CONFIG_USE_NEW_FS */
 			temp = (*cb)(arg, &mi);
 		}
 		if unlikely(temp < 0)

@@ -42,7 +42,7 @@ DECL_BEGIN
  *
  *  #1: unix_socket_create()
  *  #2: unix_socket_ops.so_bind("/path/to/some/file")
- *      Creates an fs-level `struct socket_node' using mknod(S_IFSOCK).
+ *      Creates an fs-level `struct fsocknode' using mknod(S_IFSOCK).
  *  #3: Communication happens over the unix domain socket
  *  #4: All references  to the  S_IFSOCK-node are  closed
  *  #5:  User-space  calls `unlink("/path/to/some/file")'
@@ -50,7 +50,7 @@ DECL_BEGIN
 
 struct path;
 struct fdirent;
-struct socket_node;
+struct fsocknode;
 
 #define UNIX_CLIENT_STATUS_PENDING  0 /* Client is pending to be accept(2)-ed
                                        * May transition to:
@@ -103,7 +103,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct unix_client, uc_refcnt, unix_client_destroy)
 
 
 struct unix_server {
-	/* HINT: This structure is in-lined in `struct socket_node' INode objects! */
+	/* HINT: This structure is in-lined in `struct fsocknode' INode objects! */
 	syscall_ulong_t         us_max_backlog;  /* [lock(READ(ATOMIC), WRITE(PRIVATE(SERVER)))]
 	                                          * The max # of clients that may be in-queue as
 	                                          * pending    sockets    to-be     accept(2)-ed
@@ -142,25 +142,25 @@ struct unix_socket
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct socket               us_sock;     /* The underlying socket. */
+	struct socket           us_sock;     /* The underlying socket. */
 #endif /* !__cplusplus */
-	REF struct socket_node     *us_node;     /* [0..1][valid_if(!= -1)][lock(WRITE_ONCE)]
-	                                          * The bound `struct socket_node' S_IFSOCK-inode object:
-	                                          *   - us_node == NULL: Socket is unbound
-	                                          *   - us_node == -1:   Socket   is   currently   being   bound.
-	                                          *                      Note that  becoming bound  might take  a
-	                                          *                      while in the case of this not being  the
-	                                          *                      server socket: If this is a client, then
-	                                          *                      the socket only  becomes bound once  the
-	                                          *                      server accept(2)'s the client!
-	                                          *   - else:            Socket is bound/connected */
-	REF struct path            *us_nodepath; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
-	REF struct fdirent *us_nodename; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
-	REF struct unix_client     *us_client;   /* [0..1][valid_if(us_node)][lock(WRITE_ONCE)]
-	                                          * Set  during  bind(== NULL)  and  connect(!= NULL)
-	                                          * When non-NULL, this is a connected client socket.
-	                                          * Otherwise, if `us_node' is valid, this is a bound
-	                                          * server socket. */
+	REF struct fsocknode   *us_node;     /* [0..1][valid_if(!= -1)][lock(WRITE_ONCE)]
+	                                      * The bound `struct fsocknode' S_IFSOCK-inode object:
+	                                      *   - us_node == NULL: Socket is unbound
+	                                      *   - us_node == -1:   Socket   is   currently   being   bound.
+	                                      *                      Note that  becoming bound  might take  a
+	                                      *                      while in the case of this not being  the
+	                                      *                      server socket: If this is a client, then
+	                                      *                      the socket only  becomes bound once  the
+	                                      *                      server accept(2)'s the client!
+	                                      *   - else:            Socket is bound/connected */
+	REF struct path        *us_nodepath; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
+	REF struct fdirent     *us_nodename; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
+	REF struct unix_client *us_client;   /* [0..1][valid_if(us_node)][lock(WRITE_ONCE)]
+	                                      * Set  during  bind(== NULL)  and  connect(!= NULL)
+	                                      * When non-NULL, this is a connected client socket.
+	                                      * Otherwise, if `us_node' is valid, this is a bound
+	                                      * server socket. */
 	union {
 		struct {
 			/* Need to  differentiate  between  client-side-sockets  and  server-side-sockets.
@@ -168,10 +168,10 @@ struct unix_socket
 			 * produced  as the  result of socket()+connect(),  but when it  comes to actually
 			 * sending data, we  need to make  a difference  between the two,  such that  recv
 			 * and send read/write to/from the correct packet buffers! */
-			struct pb_buffer           *us_recvbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
-			                                          * One  of   `us_client->uc_bufs'   (used   for   `recv()') */
-			struct pb_buffer           *us_sendbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
-			                                          * One  of   `us_client->uc_bufs'   (used   for   `send()') */
+			struct pb_buffer *us_recvbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
+			                                * One  of   `us_client->uc_bufs'   (used   for   `recv()') */
+			struct pb_buffer *us_sendbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
+			                                * One  of   `us_client->uc_bufs'   (used   for   `send()') */
 		};
 		/* The following are only valid until `us_client' is set! */
 		struct {

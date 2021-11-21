@@ -22,12 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_FS
 #include <kernel/mman/mfile.h>
 
 /*
  * Mem-fd objects (for `memfd_create(2)')
- *
  */
 
 #ifdef __CC__
@@ -58,9 +56,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED REF struct memfd *FCALL
 memfd_new(USER CHECKED char const *name)
 		THROWS(E_SEGFAULT, E_BADALLOC, E_INVALID_ARGUMENT_BAD_VALUE);
 
-
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_MEMFD_H */

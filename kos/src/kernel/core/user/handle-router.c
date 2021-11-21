@@ -352,7 +352,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         =  "futexfd",
 		[HANDLE_TYPE_DIRHANDLE]       =  "dirhandle",
 		[HANDLE_TYPE_MFILE]           =  "mfile",
-		[HANDLE_TYPE_BLKDEV]          =  "blkdev",
 		[HANDLE_TYPE_FDIRENT]         =  "fdirent",
 		[HANDLE_TYPE_PATH]            =  "path",
 		[HANDLE_TYPE_FS]              =  "fs",
@@ -361,7 +360,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          =  "module",
 		[HANDLE_TYPE_PIDNS]           =  "pidns",
 		[HANDLE_TYPE_DRIVER_LOADLIST] =  "driver_loadlist",
-		[HANDLE_TYPE_CHRDEV]          =  "chrdev",
 		[HANDLE_TYPE_MPART]           =  "mpart",
 		[HANDLE_TYPE_MODULE_SECTION]  =  "module_section",
 		[HANDLE_TYPE_REFCOUNTABLE]    =  "refcountable"
@@ -382,7 +380,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (refcnt_t (FCALL *)(void const *__restrict))&handle_futexfd_refcnt,
 		[HANDLE_TYPE_DIRHANDLE]       = (refcnt_t (FCALL *)(void const *__restrict))&handle_dirhandle_refcnt,
 		[HANDLE_TYPE_MFILE]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_mfile_refcnt,
-		[HANDLE_TYPE_BLKDEV]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_blkdev_refcnt,
 		[HANDLE_TYPE_FDIRENT]         = (refcnt_t (FCALL *)(void const *__restrict))&handle_fdirent_refcnt,
 		[HANDLE_TYPE_PATH]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_path_refcnt,
 		[HANDLE_TYPE_FS]              = (refcnt_t (FCALL *)(void const *__restrict))&handle_fs_refcnt,
@@ -391,7 +388,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_module_refcnt,
 		[HANDLE_TYPE_PIDNS]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_pidns_refcnt,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_loadlist_refcnt,
-		[HANDLE_TYPE_CHRDEV]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_chrdev_refcnt,
 		[HANDLE_TYPE_MPART]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_mpart_refcnt,
 		[HANDLE_TYPE_MODULE_SECTION]  = (refcnt_t (FCALL *)(void const *__restrict))&handle_module_section_refcnt,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (refcnt_t (FCALL *)(void const *__restrict))&handle_refcountable_refcnt
@@ -412,7 +408,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(void *__restrict))&handle_futexfd_incref,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(void *__restrict))&handle_dirhandle_incref,
 		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(void *__restrict))&handle_mfile_incref,
-		[HANDLE_TYPE_BLKDEV]          = (void (FCALL *)(void *__restrict))&handle_blkdev_incref,
 		[HANDLE_TYPE_FDIRENT]         = (void (FCALL *)(void *__restrict))&handle_fdirent_incref,
 		[HANDLE_TYPE_PATH]            = (void (FCALL *)(void *__restrict))&handle_path_incref,
 		[HANDLE_TYPE_FS]              = (void (FCALL *)(void *__restrict))&handle_fs_incref,
@@ -421,7 +416,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(void *__restrict))&handle_module_incref,
 		[HANDLE_TYPE_PIDNS]           = (void (FCALL *)(void *__restrict))&handle_pidns_incref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(void *__restrict))&handle_driver_loadlist_incref,
-		[HANDLE_TYPE_CHRDEV]          = (void (FCALL *)(void *__restrict))&handle_chrdev_incref,
 		[HANDLE_TYPE_MPART]           = (void (FCALL *)(void *__restrict))&handle_mpart_incref,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (FCALL *)(void *__restrict))&handle_module_section_incref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(void *__restrict))&handle_refcountable_incref
@@ -442,7 +436,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(REF void *__restrict))&handle_futexfd_decref,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(REF void *__restrict))&handle_dirhandle_decref,
 		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(REF void *__restrict))&handle_mfile_decref,
-		[HANDLE_TYPE_BLKDEV]          = (void (FCALL *)(REF void *__restrict))&handle_blkdev_decref,
 		[HANDLE_TYPE_FDIRENT]         = (void (FCALL *)(REF void *__restrict))&handle_fdirent_decref,
 		[HANDLE_TYPE_PATH]            = (void (FCALL *)(REF void *__restrict))&handle_path_decref,
 		[HANDLE_TYPE_FS]              = (void (FCALL *)(REF void *__restrict))&handle_fs_decref,
@@ -451,7 +444,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(REF void *__restrict))&handle_module_decref,
 		[HANDLE_TYPE_PIDNS]           = (void (FCALL *)(REF void *__restrict))&handle_pidns_decref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(REF void *__restrict))&handle_driver_loadlist_decref,
-		[HANDLE_TYPE_CHRDEV]          = (void (FCALL *)(REF void *__restrict))&handle_chrdev_decref,
 		[HANDLE_TYPE_MPART]           = (void (FCALL *)(REF void *__restrict))&handle_mpart_decref,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (FCALL *)(REF void *__restrict))&handle_module_section_decref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(REF void *__restrict))&handle_refcountable_decref
@@ -472,7 +464,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (__BOOL (FCALL *)(void *__restrict))&handle_futexfd_tryincref,
 		[HANDLE_TYPE_DIRHANDLE]       = (__BOOL (FCALL *)(void *__restrict))&handle_dirhandle_tryincref,
 		[HANDLE_TYPE_MFILE]           = (__BOOL (FCALL *)(void *__restrict))&handle_mfile_tryincref,
-		[HANDLE_TYPE_BLKDEV]          = (__BOOL (FCALL *)(void *__restrict))&handle_blkdev_tryincref,
 		[HANDLE_TYPE_FDIRENT]         = (__BOOL (FCALL *)(void *__restrict))&handle_fdirent_tryincref,
 		[HANDLE_TYPE_PATH]            = (__BOOL (FCALL *)(void *__restrict))&handle_path_tryincref,
 		[HANDLE_TYPE_FS]              = (__BOOL (FCALL *)(void *__restrict))&handle_fs_tryincref,
@@ -481,7 +472,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (__BOOL (FCALL *)(void *__restrict))&handle_module_tryincref,
 		[HANDLE_TYPE_PIDNS]           = (__BOOL (FCALL *)(void *__restrict))&handle_pidns_tryincref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (__BOOL (FCALL *)(void *__restrict))&handle_driver_loadlist_tryincref,
-		[HANDLE_TYPE_CHRDEV]          = (__BOOL (FCALL *)(void *__restrict))&handle_chrdev_tryincref,
 		[HANDLE_TYPE_MPART]           = (__BOOL (FCALL *)(void *__restrict))&handle_mpart_tryincref,
 		[HANDLE_TYPE_MODULE_SECTION]  = (__BOOL (FCALL *)(void *__restrict))&handle_module_section_tryincref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (__BOOL (FCALL *)(void *__restrict))&handle_refcountable_tryincref
@@ -502,7 +492,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (WEAK REF void *(FCALL *)(void *__restrict))&handle_futexfd_weakgetref,
 		[HANDLE_TYPE_DIRHANDLE]       = (WEAK REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weakgetref,
 		[HANDLE_TYPE_MFILE]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_mfile_weakgetref,
-		[HANDLE_TYPE_BLKDEV]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_blkdev_weakgetref,
 		[HANDLE_TYPE_FDIRENT]         = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fdirent_weakgetref,
 		[HANDLE_TYPE_PATH]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_path_weakgetref,
 		[HANDLE_TYPE_FS]              = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fs_weakgetref,
@@ -511,7 +500,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_module_weakgetref,
 		[HANDLE_TYPE_PIDNS]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pidns_weakgetref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weakgetref,
-		[HANDLE_TYPE_CHRDEV]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_chrdev_weakgetref,
 		[HANDLE_TYPE_MPART]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_mpart_weakgetref,
 		[HANDLE_TYPE_MODULE_SECTION]  = (WEAK REF void *(FCALL *)(void *__restrict))&handle_module_section_weakgetref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (WEAK REF void *(FCALL *)(void *__restrict))&handle_refcountable_weakgetref
@@ -532,7 +520,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (REF void *(FCALL *)(void *__restrict))&handle_futexfd_weaklckref,
 		[HANDLE_TYPE_DIRHANDLE]       = (REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weaklckref,
 		[HANDLE_TYPE_MFILE]           = (REF void *(FCALL *)(void *__restrict))&handle_mfile_weaklckref,
-		[HANDLE_TYPE_BLKDEV]          = (REF void *(FCALL *)(void *__restrict))&handle_blkdev_weaklckref,
 		[HANDLE_TYPE_FDIRENT]         = (REF void *(FCALL *)(void *__restrict))&handle_fdirent_weaklckref,
 		[HANDLE_TYPE_PATH]            = (REF void *(FCALL *)(void *__restrict))&handle_path_weaklckref,
 		[HANDLE_TYPE_FS]              = (REF void *(FCALL *)(void *__restrict))&handle_fs_weaklckref,
@@ -541,7 +528,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (REF void *(FCALL *)(void *__restrict))&handle_module_weaklckref,
 		[HANDLE_TYPE_PIDNS]           = (REF void *(FCALL *)(void *__restrict))&handle_pidns_weaklckref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weaklckref,
-		[HANDLE_TYPE_CHRDEV]          = (REF void *(FCALL *)(void *__restrict))&handle_chrdev_weaklckref,
 		[HANDLE_TYPE_MPART]           = (REF void *(FCALL *)(void *__restrict))&handle_mpart_weaklckref,
 		[HANDLE_TYPE_MODULE_SECTION]  = (REF void *(FCALL *)(void *__restrict))&handle_module_section_weaklckref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (REF void *(FCALL *)(void *__restrict))&handle_refcountable_weaklckref
@@ -562,7 +548,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(WEAK REF void *__restrict))&handle_futexfd_weakdecref,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(WEAK REF void *__restrict))&handle_dirhandle_weakdecref,
 		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_mfile_weakdecref,
-		[HANDLE_TYPE_BLKDEV]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_blkdev_weakdecref,
 		[HANDLE_TYPE_FDIRENT]         = (void (FCALL *)(WEAK REF void *__restrict))&handle_fdirent_weakdecref,
 		[HANDLE_TYPE_PATH]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_path_weakdecref,
 		[HANDLE_TYPE_FS]              = (void (FCALL *)(WEAK REF void *__restrict))&handle_fs_weakdecref,
@@ -571,7 +556,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_module_weakdecref,
 		[HANDLE_TYPE_PIDNS]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_pidns_weakdecref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_loadlist_weakdecref,
-		[HANDLE_TYPE_CHRDEV]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_chrdev_weakdecref,
 		[HANDLE_TYPE_MPART]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_mpart_weakdecref,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (FCALL *)(WEAK REF void *__restrict))&handle_module_section_weakdecref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(WEAK REF void *__restrict))&handle_refcountable_weakdecref
@@ -592,7 +576,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_futexfd_read,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_dirhandle_read,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mfile_read,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_blkdev_read,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fdirent_read,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_path_read,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fs_read,
@@ -601,7 +584,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_module_read,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pidns_read,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_driver_loadlist_read,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_chrdev_read,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mpart_read,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_module_section_read,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_refcountable_read
@@ -622,7 +604,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_futexfd_write,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_dirhandle_write,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mfile_write,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_blkdev_write,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fdirent_write,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_path_write,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fs_write,
@@ -631,7 +612,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_module_write,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pidns_write,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_driver_loadlist_write,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_chrdev_write,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mpart_write,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_module_section_write,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_refcountable_write
@@ -652,7 +632,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_futexfd_pread,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_dirhandle_pread,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mfile_pread,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_blkdev_pread,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fdirent_pread,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_path_pread,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fs_pread,
@@ -661,7 +640,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_module_pread,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pidns_pread,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pread,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_chrdev_pread,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mpart_pread,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_module_section_pread,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_refcountable_pread
@@ -682,7 +660,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_futexfd_pwrite,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_dirhandle_pwrite,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mfile_pwrite,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_blkdev_pwrite,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fdirent_pwrite,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_path_pwrite,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fs_pwrite,
@@ -691,7 +668,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_module_pwrite,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pidns_pwrite,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwrite,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_chrdev_pwrite,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mpart_pwrite,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_module_section_pwrite,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_refcountable_pwrite
@@ -712,7 +688,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futexfd_readv,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_readv,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mfile_readv,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_blkdev_readv,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fdirent_readv,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_readv,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fs_readv,
@@ -721,7 +696,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_readv,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pidns_readv,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_readv,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_chrdev_readv,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mpart_readv,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_section_readv,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_refcountable_readv
@@ -742,7 +716,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futexfd_writev,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_writev,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mfile_writev,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_blkdev_writev,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fdirent_writev,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_writev,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fs_writev,
@@ -751,7 +724,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_writev,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pidns_writev,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_writev,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_chrdev_writev,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mpart_writev,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_section_writev,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_refcountable_writev
@@ -772,7 +744,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_preadv,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_preadv,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mfile_preadv,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_blkdev_preadv,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fdirent_preadv,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_preadv,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_preadv,
@@ -781,7 +752,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_preadv,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pidns_preadv,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_preadv,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_chrdev_preadv,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mpart_preadv,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_section_preadv,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_refcountable_preadv
@@ -802,7 +772,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_pwritev,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_pwritev,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mfile_pwritev,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_blkdev_pwritev,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fdirent_pwritev,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_pwritev,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_pwritev,
@@ -811,7 +780,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_pwritev,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pidns_pwritev,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwritev,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_chrdev_pwritev,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mpart_pwritev,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_section_pwritev,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_refcountable_pwritev
@@ -832,7 +800,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_futexfd_readdir,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_dirhandle_readdir,
 		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mfile_readdir,
-		[HANDLE_TYPE_BLKDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_blkdev_readdir,
 		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fdirent_readdir,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_path_readdir,
 		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fs_readdir,
@@ -841,7 +808,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_module_readdir,
 		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pidns_readdir,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_driver_loadlist_readdir,
-		[HANDLE_TYPE_CHRDEV]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_chrdev_readdir,
 		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mpart_readdir,
 		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_module_section_readdir,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_refcountable_readdir
@@ -862,7 +828,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_futexfd_seek,
 		[HANDLE_TYPE_DIRHANDLE]       = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_dirhandle_seek,
 		[HANDLE_TYPE_MFILE]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mfile_seek,
-		[HANDLE_TYPE_BLKDEV]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_blkdev_seek,
 		[HANDLE_TYPE_FDIRENT]         = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fdirent_seek,
 		[HANDLE_TYPE_PATH]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_path_seek,
 		[HANDLE_TYPE_FS]              = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fs_seek,
@@ -871,7 +836,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_module_seek,
 		[HANDLE_TYPE_PIDNS]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pidns_seek,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_driver_loadlist_seek,
-		[HANDLE_TYPE_CHRDEV]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_chrdev_seek,
 		[HANDLE_TYPE_MPART]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mpart_seek,
 		[HANDLE_TYPE_MODULE_SECTION]  = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_module_section_seek,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_refcountable_seek
@@ -892,7 +856,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_ioctl,
 		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_ioctl,
 		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_ioctl,
-		[HANDLE_TYPE_BLKDEV]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_blkdev_ioctl,
 		[HANDLE_TYPE_FDIRENT]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fdirent_ioctl,
 		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_ioctl,
 		[HANDLE_TYPE_FS]              = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_ioctl,
@@ -901,7 +864,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_ioctl,
 		[HANDLE_TYPE_PIDNS]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pidns_ioctl,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_ioctl,
-		[HANDLE_TYPE_CHRDEV]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_chrdev_ioctl,
 		[HANDLE_TYPE_MPART]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mpart_ioctl,
 		[HANDLE_TYPE_MODULE_SECTION]  = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_section_ioctl,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_ioctl
@@ -922,7 +884,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, pos_t))&handle_futexfd_truncate,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, pos_t))&handle_dirhandle_truncate,
 		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, pos_t))&handle_mfile_truncate,
-		[HANDLE_TYPE_BLKDEV]          = (void (KCALL *)(void *__restrict, pos_t))&handle_blkdev_truncate,
 		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict, pos_t))&handle_fdirent_truncate,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, pos_t))&handle_path_truncate,
 		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict, pos_t))&handle_fs_truncate,
@@ -931,7 +892,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, pos_t))&handle_module_truncate,
 		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict, pos_t))&handle_pidns_truncate,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, pos_t))&handle_driver_loadlist_truncate,
-		[HANDLE_TYPE_CHRDEV]          = (void (KCALL *)(void *__restrict, pos_t))&handle_chrdev_truncate,
 		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict, pos_t))&handle_mpart_truncate,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict, pos_t))&handle_module_section_truncate,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, pos_t))&handle_refcountable_truncate
@@ -952,7 +912,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_futexfd_mmap,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_dirhandle_mmap,
 		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mfile_mmap,
-		[HANDLE_TYPE_BLKDEV]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_blkdev_mmap,
 		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fdirent_mmap,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_path_mmap,
 		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fs_mmap,
@@ -961,7 +920,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_module_mmap,
 		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pidns_mmap,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_driver_loadlist_mmap,
-		[HANDLE_TYPE_CHRDEV]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_chrdev_mmap,
 		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mpart_mmap,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_module_section_mmap,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_refcountable_mmap
@@ -982,7 +940,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_futexfd_allocate,
 		[HANDLE_TYPE_DIRHANDLE]       = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirhandle_allocate,
 		[HANDLE_TYPE_MFILE]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mfile_allocate,
-		[HANDLE_TYPE_BLKDEV]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_blkdev_allocate,
 		[HANDLE_TYPE_FDIRENT]         = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fdirent_allocate,
 		[HANDLE_TYPE_PATH]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_path_allocate,
 		[HANDLE_TYPE_FS]              = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fs_allocate,
@@ -991,7 +948,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_module_allocate,
 		[HANDLE_TYPE_PIDNS]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pidns_allocate,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_driver_loadlist_allocate,
-		[HANDLE_TYPE_CHRDEV]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_chrdev_allocate,
 		[HANDLE_TYPE_MPART]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mpart_allocate,
 		[HANDLE_TYPE_MODULE_SECTION]  = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_module_section_allocate,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_refcountable_allocate
@@ -1012,7 +968,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict))&handle_futexfd_sync,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict))&handle_dirhandle_sync,
 		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict))&handle_mfile_sync,
-		[HANDLE_TYPE_BLKDEV]          = (void (KCALL *)(void *__restrict))&handle_blkdev_sync,
 		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict))&handle_fdirent_sync,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict))&handle_path_sync,
 		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict))&handle_fs_sync,
@@ -1021,7 +976,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict))&handle_module_sync,
 		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict))&handle_pidns_sync,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict))&handle_driver_loadlist_sync,
-		[HANDLE_TYPE_CHRDEV]          = (void (KCALL *)(void *__restrict))&handle_chrdev_sync,
 		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict))&handle_mpart_sync,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict))&handle_module_section_sync,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict))&handle_refcountable_sync
@@ -1042,7 +996,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict))&handle_futexfd_datasync,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict))&handle_dirhandle_datasync,
 		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict))&handle_mfile_datasync,
-		[HANDLE_TYPE_BLKDEV]          = (void (KCALL *)(void *__restrict))&handle_blkdev_datasync,
 		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict))&handle_fdirent_datasync,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict))&handle_path_datasync,
 		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict))&handle_fs_datasync,
@@ -1051,7 +1004,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict))&handle_module_datasync,
 		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict))&handle_pidns_datasync,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict))&handle_driver_loadlist_datasync,
-		[HANDLE_TYPE_CHRDEV]          = (void (KCALL *)(void *__restrict))&handle_chrdev_datasync,
 		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict))&handle_mpart_datasync,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict))&handle_module_section_datasync,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict))&handle_refcountable_datasync
@@ -1072,7 +1024,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_futexfd_stat,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_dirhandle_stat,
 		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mfile_stat,
-		[HANDLE_TYPE_BLKDEV]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_blkdev_stat,
 		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fdirent_stat,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_path_stat,
 		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fs_stat,
@@ -1081,7 +1032,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_module_stat,
 		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pidns_stat,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_driver_loadlist_stat,
-		[HANDLE_TYPE_CHRDEV]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_chrdev_stat,
 		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mpart_stat,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_module_section_stat,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_refcountable_stat
@@ -1102,7 +1052,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_pollconnect,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_pollconnect,
 		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mfile_pollconnect,
-		[HANDLE_TYPE_BLKDEV]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_blkdev_pollconnect,
 		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fdirent_pollconnect,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_path_pollconnect,
 		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_pollconnect,
@@ -1111,7 +1060,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_module_pollconnect,
 		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_pollconnect,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_pollconnect,
-		[HANDLE_TYPE_CHRDEV]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_chrdev_pollconnect,
 		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mpart_pollconnect,
 		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_module_section_pollconnect,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_pollconnect
@@ -1132,7 +1080,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_polltest,
 		[HANDLE_TYPE_DIRHANDLE]       = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_polltest,
 		[HANDLE_TYPE_MFILE]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mfile_polltest,
-		[HANDLE_TYPE_BLKDEV]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_blkdev_polltest,
 		[HANDLE_TYPE_FDIRENT]         = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fdirent_polltest,
 		[HANDLE_TYPE_PATH]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_path_polltest,
 		[HANDLE_TYPE_FS]              = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_polltest,
@@ -1141,7 +1088,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_module_polltest,
 		[HANDLE_TYPE_PIDNS]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_polltest,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_polltest,
-		[HANDLE_TYPE_CHRDEV]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_chrdev_polltest,
 		[HANDLE_TYPE_MPART]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mpart_polltest,
 		[HANDLE_TYPE_MODULE_SECTION]  = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_module_section_polltest,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_polltest
@@ -1162,7 +1108,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_hop,
 		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_hop,
 		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_hop,
-		[HANDLE_TYPE_BLKDEV]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_blkdev_hop,
 		[HANDLE_TYPE_FDIRENT]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fdirent_hop,
 		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_hop,
 		[HANDLE_TYPE_FS]              = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_hop,
@@ -1171,7 +1116,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_hop,
 		[HANDLE_TYPE_PIDNS]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pidns_hop,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_hop,
-		[HANDLE_TYPE_CHRDEV]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_chrdev_hop,
 		[HANDLE_TYPE_MPART]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mpart_hop,
 		[HANDLE_TYPE_MODULE_SECTION]  = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_section_hop,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_hop
@@ -1192,7 +1136,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_futexfd_tryas,
 		[HANDLE_TYPE_DIRHANDLE]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_dirhandle_tryas,
 		[HANDLE_TYPE_MFILE]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mfile_tryas,
-		[HANDLE_TYPE_BLKDEV]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_blkdev_tryas,
 		[HANDLE_TYPE_FDIRENT]         = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fdirent_tryas,
 		[HANDLE_TYPE_PATH]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_path_tryas,
 		[HANDLE_TYPE_FS]              = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fs_tryas,
@@ -1201,7 +1144,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_module_tryas,
 		[HANDLE_TYPE_PIDNS]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pidns_tryas,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_loadlist_tryas,
-		[HANDLE_TYPE_CHRDEV]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_chrdev_tryas,
 		[HANDLE_TYPE_MPART]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mpart_tryas,
 		[HANDLE_TYPE_MODULE_SECTION]  = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_module_section_tryas,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_refcountable_tryas
@@ -1222,7 +1164,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_FUTEXFD]         = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_futexfd_printlink,
 		[HANDLE_TYPE_DIRHANDLE]       = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_dirhandle_printlink,
 		[HANDLE_TYPE_MFILE]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_mfile_printlink,
-		[HANDLE_TYPE_BLKDEV]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_blkdev_printlink,
 		[HANDLE_TYPE_FDIRENT]         = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fdirent_printlink,
 		[HANDLE_TYPE_PATH]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_path_printlink,
 		[HANDLE_TYPE_FS]              = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fs_printlink,
@@ -1231,7 +1172,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_module_printlink,
 		[HANDLE_TYPE_PIDNS]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pidns_printlink,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_driver_loadlist_printlink,
-		[HANDLE_TYPE_CHRDEV]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_chrdev_printlink,
 		[HANDLE_TYPE_MPART]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_mpart_printlink,
 		[HANDLE_TYPE_MODULE_SECTION]  = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_module_section_printlink,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_refcountable_printlink
@@ -1716,40 +1656,6 @@ handle_mfile_printlink(struct mfile *__restrict self, pformatprinter printer, vo
 	return handle_generic_printlink(self, HANDLE_TYPE_MFILE, printer, arg);
 }
 
-/* Weakly define operators for `HANDLE_TYPE_BLKDEV' (`struct blkdev') */
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_blkdev_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_blkdev.printlink") ssize_t KCALL
-handle_blkdev_printlink(struct blkdev *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_BLKDEV, printer, arg);
-}
-
 /* Weakly define operators for `HANDLE_TYPE_FDIRENT' (`struct fdirent') */
 DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_incref, handle_undefined_incref);
@@ -2020,40 +1926,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_driver_loadlist.printlink") ssize_t KCALL
 handle_driver_loadlist_printlink(struct driver_loadlist *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
 	return handle_generic_printlink(self, HANDLE_TYPE_DRIVER_LOADLIST, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_CHRDEV' (`struct chrdev') */
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_chrdev.printlink") ssize_t KCALL
-handle_chrdev_printlink(struct chrdev *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_CHRDEV, printer, arg);
 }
 
 /* Weakly define operators for `HANDLE_TYPE_MPART' (`struct mpart') */

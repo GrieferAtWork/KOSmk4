@@ -144,16 +144,10 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 		if (dent) {
 			if (dent->de_refcnt == 0)
 				goto badobj;
-			exec_name    = dent->de_name;
-			exec_namelen = dent->de_namelen;
-#ifdef CONFIG_USE_NEW_FS
+			exec_name    = dent->fd_name;
+			exec_namelen = dent->fd_namelen;
 			if (!ADDR_ISKERN(dent->fd_ops))
 				goto badobj;
-#else /* CONFIG_USE_NEW_FS */
-			if (dent->de_heapsize < offsetof(struct fdirent, de_name) +
-			                        (exec_namelen + 1) * sizeof(char))
-				goto badobj;
-#endif /* !CONFIG_USE_NEW_FS */
 			if (exec_namelen > 16)
 				exec_namelen = 16;
 			readmem(exec_name, exec_namelen * sizeof(char));
@@ -237,25 +231,6 @@ badobj:
 }
 
 
-#ifndef CONFIG_USE_NEW_FS
-PRIVATE bool
-NOTHROW(FCALL verify_driver)(struct driver *__restrict me) {
-	TRY {
-		if (__driver_refcnt(me) == 0)
-			goto badobj;
-		if (__driver_weakrefcnt(me) == 0)
-			goto badobj;
-		if (!ADDR_ISKERN(me->d_name))
-			goto badobj;
-	} EXCEPT {
-		goto badobj;
-	}
-	return true;
-badobj:
-	return false;
-}
-#endif /* !CONFIG_USE_NEW_FS */
-
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_module)(pformatprinter printer, void *arg,
                            KERNEL CHECKED void const *pointer,
@@ -281,8 +256,8 @@ NOTHROW(KCALL note_module)(pformatprinter printer, void *arg,
 		} else {
 			if (!ADDR_ISKERN(me->md_fsname))
 				goto badobj;
-			module_name    = me->md_fsname->de_name;
-			module_namelen = me->md_fsname->de_namelen;
+			module_name    = me->md_fsname->fd_name;
+			module_namelen = me->md_fsname->fd_namelen;
 			if (!ADDRRANGE_ISKERN(module_name,
 			                      module_name + module_namelen))
 				goto badobj;
@@ -384,8 +359,8 @@ NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
 				} else {
 					if (!ADDR_ISKERN(mod->md_fsname))
 						goto badobj;
-					module_name    = mod->md_fsname->de_name;
-					module_namelen = mod->md_fsname->de_namelen;
+					module_name    = mod->md_fsname->fd_name;
+					module_namelen = mod->md_fsname->fd_namelen;
 					if (!ADDRRANGE_ISKERN(module_name,
 					                      module_name + module_namelen))
 						goto badobj;
@@ -471,18 +446,12 @@ NOTHROW(KCALL note_fdirent)(pformatprinter printer, void *arg,
 	TRY {
 		if (me->de_refcnt == 0)
 			goto badobj;
-		dent_name    = me->de_name;
-		dent_namelen = me->de_namelen;
-#ifdef CONFIG_USE_NEW_FS
+		dent_name    = me->fd_name;
+		dent_namelen = me->fd_namelen;
 		if (!ADDR_ISKERN(me->fd_ops))
 			goto badobj;
-#else /* CONFIG_USE_NEW_FS */
-		if (me->de_heapsize < offsetof(struct fdirent, de_name) +
-		                      (dent_namelen + 1) * sizeof(char))
-			goto badobj;
-#endif /* !CONFIG_USE_NEW_FS */
-		dent_type    = me->de_type;
-		if (me->de_hash != fdirent_hash(dent_name, dent_namelen))
+		dent_type = me->fd_type;
+		if (me->fd_hash != fdirent_hash(dent_name, dent_namelen))
 			goto badobj;
 		readmem(dent_name, dent_namelen * sizeof(char));
 		/* TODO: Verify  `dent_type',  and  print  its  name.
@@ -499,58 +468,6 @@ badobj:
 	return 0;
 }
 
-
-#ifndef CONFIG_USE_NEW_FS
-PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_chrdev)(pformatprinter printer, void *arg,
-                           KERNEL CHECKED void const *pointer,
-                           unsigned int *__restrict pstatus) {
-	struct chrdev *me = (struct chrdev *)pointer;
-	char const *dev_name;
-	size_t dev_namelen;
-	TRY {
-		if (me->cd_refcnt == 0)
-			goto badobj;
-		if (me->cd_heapsize < sizeof(struct chrdev))
-			goto badobj;
-		if (!verify_driver(me->cd_type.ct_driver))
-			goto badobj;
-		dev_name    = me->cd_name;
-		dev_namelen = strnlen(me->cd_name, COMPILER_LENOF(me->cd_name));
-		readmem(dev_name, dev_namelen * sizeof(char));
-	} EXCEPT {
-		goto badobj;
-	}
-	return (*printer)(arg, dev_name, dev_namelen);
-badobj:
-	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
-	return 0;
-}
-
-PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_block_device)(pformatprinter printer, void *arg,
-                                 KERNEL CHECKED void const *pointer,
-                                 unsigned int *__restrict pstatus) {
-	struct block_device *me = (struct block_device *)pointer;
-	char const *dev_name;
-	size_t dev_namelen;
-	TRY {
-		if (me->bd_refcnt == 0)
-			goto badobj;
-		if (me->bd_heapsize < sizeof(struct block_device))
-			goto badobj;
-		dev_name    = me->bd_name;
-		dev_namelen = strnlen(me->bd_name, COMPILER_LENOF(me->bd_name));
-		readmem(dev_name, dev_namelen * sizeof(char));
-	} EXCEPT {
-		goto badobj;
-	}
-	return (*printer)(arg, dev_name, dev_namelen);
-badobj:
-	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
-	return 0;
-}
-#endif /* !CONFIG_USE_NEW_FS */
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_cpu)(pformatprinter printer, void *arg,
@@ -586,7 +503,6 @@ NOTHROW(KCALL note_path_impl)(pformatprinter printer, void *arg,
 	TRY {
 		if (me->p_refcnt == 0)
 			goto badobj;
-#ifdef CONFIG_USE_NEW_FS
 		if (me->_p_vfs == NULL || !ADDR_ISKERN(me->_p_vfs))
 			goto badobj;
 		if (!path_isroot(me)) {
@@ -595,18 +511,6 @@ NOTHROW(KCALL note_path_impl)(pformatprinter printer, void *arg,
 				goto badobj;
 		}
 		dent = me->p_name;
-#else /* CONFIG_USE_NEW_FS */
-		if (me->p_vfs == NULL || !ADDR_ISKERN(me->p_vfs))
-			goto badobj;
-		parent_path = me->p_parent;
-		if (parent_path && !ADDR_ISKERN(parent_path))
-			goto badobj;
-		if ((parent_path == NULL) != (me == me->p_vfs))
-			goto badobj;
-		if (me->p_vfs->p_refcnt == 0)
-			goto badobj;
-		dent = me->p_dirent;
-#endif /* !CONFIG_USE_NEW_FS */
 		if (!dent || !ADDR_ISKERN(dent))
 			goto badobj;
 	} EXCEPT {
@@ -778,25 +682,15 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
 	} else if (self == &mfile_dbgheap) {
 		result = "[dbgheap]";
 #endif /* CONFIG_DEBUG_HEAP */
-#ifdef CONFIG_USE_NEW_FS
 	} else if (self == &mfile_zero) {
 		result = "/dev/zero";
-#else /* CONFIG_USE_NEW_FS */
-	} else if (self == &mfile_zero) {
-		result = "[/dev/zero]";
-#endif /* !CONFIG_USE_NEW_FS */
 	} else if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon)) {
 		result = buf;
 		sprintf(buf, "[/dev/zero:anon:%u]", (unsigned int)(self - mfile_anon));
 	} else if (self == &mfile_ndef) {
 		result = "[undef]";
-#ifdef CONFIG_USE_NEW_FS
 	} else if (self == &mfile_phys) {
 		result = "/dev/mem";
-#else /* CONFIG_USE_NEW_FS */
-	} else if (self == &mfile_phys) {
-		result = "[/dev/mem]";
-#endif /* !CONFIG_USE_NEW_FS */
 	} else if (ops >= mfile_anon_ops && ops < COMPILER_ENDOF(mfile_anon_ops)) {
 		result = buf;
 		sprintf(buf, "[?/dev/zero:anon:%u]", (unsigned int)(ops - mfile_anon_ops));
@@ -1016,9 +910,7 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 		ops = me->mf_ops;
 		if (!ADDR_ISKERN(ops))
 			goto badobj;
-#ifdef CONFIG_USE_NEW_FS
 		/* TODO: if it's a device file, extract the devfs filename. */
-#endif /* CONFIG_USE_NEW_FS */
 		if (!mfile_extract_name(me, &file_path, &file_dent, pstatus))
 			goto badobj;
 	} EXCEPT {
@@ -1231,16 +1123,11 @@ badobj:
 }
 
 
-#ifdef CONFIG_USE_NEW_FS
-#define note_chrdev       note_mfile
-#define note_block_device note_mfile
-#endif /* CONFIG_USE_NEW_FS */
-
 PRIVATE struct obnote_entry const notes[] = {
-	{ "ansittydev", &note_chrdev },
-	{ "blkdev", &note_block_device },
-	{ "block_device", &note_block_device },
-	{ "chrdev", &note_chrdev },
+	{ "ansittydev", &note_mfile },
+	{ "blkdev", &note_mfile },
+	{ "block_device", &note_mfile },
+	{ "chrdev", &note_mfile },
 	{ "cpu", &note_cpu },
 	{ "dirhandle", &note_file },
 	{ "driver", &note_module },
@@ -1248,7 +1135,7 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "fdirent", &note_fdirent },
 	{ "filehandle", &note_file },
 	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
-	{ "kbddev", &note_chrdev },
+	{ "kbddev", &note_mfile },
 	{ "mbnode", &note_mnode },
 	{ "mfile", &note_mfile },
 	{ "mfutex", &note_mfutex },
@@ -1256,15 +1143,15 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "mnode", &note_mnode },
 	{ "module", &note_module },
 	{ "module_section", &note_module_section },
-	{ "mousedev", &note_chrdev },
+	{ "mousedev", &note_mfile },
 	{ "mpart", &note_mpart },
-	{ "nicdev", &note_chrdev },
+	{ "nicdev", &note_mfile },
 	{ "path", &note_path },
-	{ "ptymaster", &note_chrdev },
-	{ "ptyslave", &note_chrdev },
+	{ "ptymaster", &note_mfile },
+	{ "ptyslave", &note_mfile },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
-	{ "ttydev", &note_chrdev },
+	{ "ttydev", &note_mfile },
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
 };

@@ -22,7 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/blkdev.h>
 #include <kernel/malloc.h>
 #include <kernel/refcountable.h>
@@ -154,7 +153,6 @@ struct ata_drive: blkdev {
 #define _AtaDrive_Alloc()    ((AtaDrive *)kmalloc(sizeof(AtaDrive), GFP_LOCKED | GFP_PREFLT))
 #define _AtaDrive_Free(self) kfree(self)
 
-
 #if defined(__INTELLISENSE__) || 0
 #define CONFIG_ATA_DYNAMIC_SECTOR_SIZE 1
 #define AtaDrive_GetSectorSize(dev)  blkdev_getsectormask(dev)
@@ -166,10 +164,6 @@ struct ata_drive: blkdev {
 #define AtaDrive_GetSectorShift(dev) DEFAULT_ATA_SECTOR_SHIFT
 #endif /* !... */
 
-
-
-
 DECL_END
-#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_MODIDE_ATA_H */

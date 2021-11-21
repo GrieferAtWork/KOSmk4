@@ -24,21 +24,22 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/block.h>
-#include <dev/char.h>
 #include <dev/keyboard.h>
 #include <dev/mktty.h>
 #include <dev/mouse.h>
 #include <dev/pty.h>
 #include <dev/tty.h>
-#include <fs/fifo.h>
-#include <fs/file.h>
-#include <fs/node.h>
-#include <fs/ramfs.h>
-#include <fs/special-node.h>
-#include <fs/vfs.h>
+#include <kernel/except.h>
+#include <kernel/fs/dirhandle.h>
+#include <kernel/fs/dirnode.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
+#include <kernel/fs/filehandle.h>
+#include <kernel/fs/lnknode.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/regnode.h>
+#include <kernel/fs/super.h>
 #include <kernel/handle.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/module.h>
@@ -47,9 +48,11 @@
 #include <kernel/user.h>
 #include <sched/atomic64.h>
 #include <sched/pid.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
+#include <kos/except.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -66,57 +69,24 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 	switch (self->h_type) {
 
 	case HANDLE_TYPE_MFILE:
-		if (vm_datablock_isinode((struct mfile *)self->h_data)) {
-			if (INODE_ISSUPER((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_MFILE_SUPERBLOCK;
-			if (INODE_ISREG((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_MFILE_REGULARNODE;
-			if (INODE_ISDIR((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_MFILE_DIRECTORY;
-			if (INODE_ISLNK((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_MFILE_SYMLINKNODE;
-			if (INODE_ISFIFO((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_MFILE_FIFONODE;
-			if (INODE_ISSOCK((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_MFILE_SOCKETNODE;
-			return HANDLE_TYPEKIND_MFILE_INODE;
+		if (mfile_isnode((struct mfile *)self->h_data)) {
+			struct fnode *node = mfile_asnode((struct mfile *)self->h_data);
+			/* TODO: With all of the subclasses that exist now, this really needs to be rethought! */
+			if (fnode_issuper(node))
+				return HANDLE_TYPEKIND_MFILE_FSUPER;
+			if (fnode_isreg(node))
+				return HANDLE_TYPEKIND_MFILE_FREGNODE;
+			if (fnode_isdir(node))
+				return HANDLE_TYPEKIND_MFILE_FDIRNODE;
+			if (fnode_islnk(node))
+				return HANDLE_TYPEKIND_MFILE_FLNKNODE;
+			if (fnode_isfifo(node))
+				return HANDLE_TYPEKIND_MFILE_FFIFONODE;
+			if (fnode_issock(node))
+				return HANDLE_TYPEKIND_MFILE_FSOCKNODE;
+			return HANDLE_TYPEKIND_MFILE_FNODE;
 		}
 		break;
-
-#ifndef CONFIG_USE_NEW_FS
-	case HANDLE_TYPE_BLKDEV:
-		if (blkdev_ispart((struct block_device *)self->h_data))
-			return HANDLE_TYPEKIND_BLKDEV_PARTITION;
-		return HANDLE_TYPEKIND_BLKDEV_DRIVEROOT;
-		break;
-
-	case HANDLE_TYPE_CHRDEV: {
-		struct chrdev *me;
-		me = (struct chrdev *)self;
-		if (chrdev_istty(me)) {
-			if (ttydev_isptyslave((struct ttydev *)me))
-				return HANDLE_TYPEKIND_CHRDEV_PTY;
-			if (ttydev_ismktty((struct ttydev *)me))
-				return HANDLE_TYPEKIND_CHRDEV_TTY;
-			return HANDLE_TYPEKIND_CHRDEV_TTYBASE;
-		}
-		if (chrdev_iskbd(me))
-			return HANDLE_TYPEKIND_CHRDEV_KEYBOARD;
-		if (chrdev_ismouse(me))
-			return HANDLE_TYPEKIND_CHRDEV_MOUSE;
-	}	break;
-#endif /* !CONFIG_USE_NEW_FS */
-
-	case HANDLE_TYPE_PATH: {
-		struct path *me = (struct path *)self->h_data;
-#ifdef CONFIG_USE_NEW_FS
-		if (path_isroot(me))
-			return HANDLE_TYPEKIND_PATH_VFSROOT;
-#else /* CONFIG_USE_NEW_FS */
-		if (me->p_vfs == me)
-			return HANDLE_TYPEKIND_PATH_VFSROOT;
-#endif /* !CONFIG_USE_NEW_FS */
-	}	break;
 
 	case HANDLE_TYPE_MODULE: {
 		struct module *me = (struct module *)self->h_data;
@@ -137,32 +107,10 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 }
 
 
-#ifndef CONFIG_USE_NEW_FS
-LOCAL WUNUSED NONNULL((1, 2)) bool KCALL
-chrdev_datasize(struct chrdev *__restrict self,
-                pos_t *__restrict presult) {
-	struct stat st;
-	if (!self->cd_type.ct_stat)
-		return false;
-	/* Check if the stat-operator fills in the size-field. */
-	st.st_size = UINT64_C(0xaaaaaaaaaaaaaaaa);
-	(*self->cd_type.ct_stat)(self, &st);
-	if (st.st_size == UINT64_C(0xaaaaaaaaaaaaaaaa)) {
-		st.st_size = UINT64_C(0x5555555555555555);
-		(*self->cd_type.ct_stat)(self, &st);
-		if (st.st_size == UINT64_C(0x5555555555555555))
-			return false; /* The size-field isn't filled in. */
-	}
-	*presult = (pos_t)st.st_size;
-	return true;
-}
-#endif /* !CONFIG_USE_NEW_FS */
-
-#ifdef CONFIG_USE_NEW_FS
 LOCAL WUNUSED NONNULL((1)) pos_t KCALL
 mfile_datasize(struct mfile *__restrict self) {
 	pos_t result;
-	result = (pos_t)atomic64_read(&self->mf_filesize);
+	result = mfile_getsize(self);
 	if (mfile_isanon(self))
 		result = 0;
 	if (self->mf_ops->mo_stream &&
@@ -174,7 +122,6 @@ mfile_datasize(struct mfile *__restrict self) {
 	}
 	return result;
 }
-#endif /* CONFIG_USE_NEW_FS */
 
 
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
@@ -187,90 +134,28 @@ handle_datasize(struct handle const *__restrict self,
 	switch (self->h_type) {
 
 	case HANDLE_TYPE_MFILE: {
-#ifdef CONFIG_USE_NEW_FS
 		struct mfile *me;
 		me    = (struct mfile *)self->h_data;
 		value = mfile_datasize(me);
-#else /* CONFIG_USE_NEW_FS */
-		struct inode *me;
-		me = (struct inode *)self->h_data;
-		if (!vm_datablock_isinode(me))
-			goto badtype;
-		inode_loadattr(me);
-#ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
-		value = ATOMIC_READ(me->i_filesize);
-#else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-		{
-			SCOPED_READLOCK(me);
-			value = me->i_filesize;
-		}
-#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
-
-#ifndef CONFIG_USE_NEW_FS
-	case HANDLE_TYPE_BLKDEV: {
-		struct blkdev *me;
-		me = (struct blkdev *)self->h_data;
-		value = ((pos_t)me->bd_sector_count *
-		         (pos_t)me->bd_sector_size);
-	}	break;
-
-	case HANDLE_TYPE_CHRDEV: {
-		struct chrdev *me;
-		me = (struct chrdev *)self->h_data;
-		return chrdev_datasize(me, presult);
-	}	break;
-#endif /* !CONFIG_USE_NEW_FS */
 
 	case HANDLE_TYPE_FDIRENT: {
 		struct fdirent *me;
-		me = (struct fdirent *)self->h_data;
-		value = (pos_t)me->de_namelen;
+		me    = (struct fdirent *)self->h_data;
+		value = (pos_t)me->fd_namelen;
 	}	break;
 
 	case HANDLE_TYPE_FILEHANDLE:
 	case HANDLE_TYPE_DIRHANDLE: {
 		struct filehandle *me;
 		me = (struct filehandle *)self->h_data;
-#ifdef CONFIG_USE_NEW_FS
 		value = mfile_datasize(me->fh_file);
-#else /* CONFIG_USE_NEW_FS */
-		inode_loadattr(me->f_node);
-#ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
-		value = ATOMIC_READ(me->f_node->i_filesize);
-#else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-		{
-			SCOPED_READLOCK(me->f_node);
-			value = me->f_node->i_filesize;
-		}
-#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	case HANDLE_TYPE_PATH: {
-#ifdef CONFIG_USE_NEW_FS
 		struct path *me;
 		me    = (struct path *)self->h_data;
 		value = mfile_datasize(me->p_dir);
-#else /* CONFIG_USE_NEW_FS */
-		struct path *me;
-		REF struct inode *node;
-		me = (struct path *)self->h_data;
-		sync_read(me);
-		node = (REF struct inode *)incref(me->p_inode);
-		sync_endread(me);
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_loadattr(node);
-#ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
-		value = ATOMIC_READ(node->i_filesize);
-#else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-		{
-			SCOPED_READLOCK(node);
-			value = node->i_filesize;
-		}
-#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	case HANDLE_TYPE_MMAN:
@@ -311,17 +196,10 @@ handle_datasize(struct handle const *__restrict self,
 	case HANDLE_TYPE_FIFOHANDLE: {
 		struct fifohandle *me;
 		me    = (struct fifohandle *)self->h_data;
-#ifdef CONFIG_USE_NEW_FS
 		value = (pos_t)ATOMIC_READ(me->fu_fifo->ff_buffer.rb_avail);
-#else /* CONFIG_USE_NEW_FS */
-		value = (pos_t)ATOMIC_READ(me->fu_fifo->f_fifo.ff_buffer.rb_avail);
-#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	default:
-#ifndef CONFIG_USE_NEW_FS
-badtype:
-#endif /* !CONFIG_USE_NEW_FS */
 		return false;
 	}
 	*presult = value;
@@ -388,7 +266,7 @@ handle_getas(unsigned int fd, uintptr_half_t wanted_type)
 	}
 }
 
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *FCALL
 handle_get_fnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
@@ -402,56 +280,14 @@ handle_get_fnode(unsigned int fd)
 	}
 }
 
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
-handle_get_regnode(unsigned int fd)
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
+handle_get_fsuper_relaxed(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
 	REF struct handle hnd;
 	hnd = handle_lookup(fd);
 	TRY {
-		return handle_as_regnode(&hnd);
-	} EXCEPT {
-		decref_unlikely(hnd);
-		handle_getas_complete_except(fd);
-	}
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
-handle_get_dirnode(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE) {
-	REF struct handle hnd;
-	hnd = handle_lookup(fd);
-	TRY {
-		return handle_as_dirnode(&hnd);
-	} EXCEPT {
-		decref_unlikely(hnd);
-		handle_getas_complete_except(fd);
-	}
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
-handle_get_super(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE) {
-	REF struct handle hnd;
-	hnd = handle_lookup(fd);
-	TRY {
-		return handle_as_super(&hnd);
-	} EXCEPT {
-		decref_unlikely(hnd);
-		handle_getas_complete_except(fd);
-	}
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
-handle_get_super_relaxed(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE) {
-	REF struct handle hnd;
-	hnd = handle_lookup(fd);
-	TRY {
-		return handle_as_super_relaxed(&hnd);
+		return handle_as_fsuper_relaxed(&hnd);
 	} EXCEPT {
 		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
@@ -499,221 +335,57 @@ handle_get_task(unsigned int fd)
 
 
 /* Extended handle converted functions */
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fnode *FCALL
 handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	REF struct inode *result;
 	/* Special case: The handle already has the correct typing */
 	if (self->h_type == HANDLE_TYPE_MFILE) {
-		result = (REF struct inode *)self->h_data;
-		if likely(vm_datablock_isinode(result))
-			return result; /* inherit */
-	} else {
-		result = (REF struct inode *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(result) {
-			if likely(vm_datablock_isinode(result)) {
-				handle_decref(*self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(result);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_INODE);
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct regular_node *FCALL
-handle_as_regnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	REF struct regular_node *result;
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		result = (REF struct regular_node *)self->h_data;
-		if likely(vm_datablock_isinode(result) && INODE_ISREG(result))
-			return result; /* inherit */
-	} else {
-		result = (REF struct regular_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(result) {
-			if likely(vm_datablock_isinode(result) && INODE_ISREG(result)) {
-				handle_decref(*self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(result);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_REGULARNODE);
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_node *FCALL
-handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	REF struct directory_node *result;
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		result = (REF struct directory_node *)self->h_data;
-		if likely(vm_datablock_isinode(result) && INODE_ISDIR(result))
-			return result; /* inherit */
-	} else {
-		result = (REF struct directory_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(result) {
-			if likely(vm_datablock_isinode(result) && INODE_ISDIR(result)) {
-				handle_decref(*self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(result);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_DIRECTORY);
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
-handle_as_super(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-#ifdef CONFIG_USE_NEW_FS
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		struct mfile *mf = (struct mfile *)self->h_data;
-		if (mfile_issuper(mf))
-			return mfile_assuper(mf); /* inherit */
+		if likely(mfile_isnode((struct mfile *)self->h_data))
+			return mfile_asnode((REF struct mfile *)self->h_data); /* inherit */
 	} else {
 		REF struct mfile *result;
 		result = (REF struct mfile *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(result) {
-			if (mfile_issuper(result)) {
+			if likely(mfile_isnode(result)) {
 				handle_decref(*self); /* inherit: on_success */
-				return mfile_assuper(result);
+				return mfile_asnode(result);
 			}
 			decref_unlikely(result);
 		}
 	}
-#else /* CONFIG_USE_NEW_FS */
-	REF struct superblock *result;
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		result = (REF struct superblock *)self->h_data;
-		if likely(vm_datablock_isinode(result) && INODE_ISSUPER(result))
-			return result; /* inherit */
-	} else {
-		result = (REF struct superblock *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(result) {
-			if likely(vm_datablock_isinode(result) && INODE_ISSUPER(result)) {
-				handle_decref(*self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(result);
-		}
-	}
-#endif /* !CONFIG_USE_NEW_FS */
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_SUPERBLOCK);
+	                          HANDLE_TYPEKIND_MFILE_FNODE);
 }
 
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
-handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	REF struct superblock *result;
-	REF struct inode *ino;
 	/* Special case: The handle already has the correct typing */
 	if (self->h_type == HANDLE_TYPE_MFILE) {
-		ino = (REF struct inode *)self->h_data;
-		if likely(vm_datablock_isinode(ino)) {
-			result = (REF struct superblock *)incref(ino->i_super);
-			decref_unlikely(ino); /* inherit: on_success */
+		if likely(mfile_isnode((struct mfile *)self->h_data)) {
+			REF struct fsuper *result;
+			result = incref(mfile_asnode(self->h_data)->fn_super);
+			decref_unlikely((struct mfile *)self->h_data); /* inherit: on_success */
 			return result;
 		}
 	} else {
-		ino = (REF struct inode *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(ino) {
-			if likely(vm_datablock_isinode(ino)) {
-				result = (REF struct superblock *)incref(ino->i_super);
-				decref_unlikely(ino);
+		REF struct mfile *file;
+		file = (REF struct mfile *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
+		if likely(file) {
+			if likely(mfile_isnode(file)) {
+				REF struct fsuper *result;
+				result = incref(mfile_asnode(file)->fn_super);
+				decref_unlikely(file);
 				handle_decref(*self); /* inherit: on_success */
 				return result;
 			}
-			decref_unlikely(ino);
+			decref_unlikely(file);
 		}
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_SUPERBLOCK);
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct symlink_node *FCALL
-handle_as_lnknode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	REF struct symlink_node *result;
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		result = (REF struct symlink_node *)self->h_data;
-		if likely(vm_datablock_isinode(result) && INODE_ISLNK(result))
-			return result; /* inherit */
-	} else {
-		result = (REF struct symlink_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(result) {
-			if likely(vm_datablock_isinode(result) && INODE_ISLNK(result)) {
-				handle_decref(*self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(result);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_SYMLINKNODE);
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_node *FCALL
-handle_as_fifonode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	REF struct fifo_node *result;
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		result = (REF struct fifo_node *)self->h_data;
-		if likely(vm_datablock_isinode(result) && INODE_ISFIFO(result))
-			return result; /* inherit */
-	} else {
-		result = (REF struct fifo_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(result) {
-			if likely(vm_datablock_isinode(result) && INODE_ISFIFO(result)) {
-				handle_decref(*self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(result);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_FIFONODE);
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct socket_node *FCALL
-handle_as_socketnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	REF struct socket_node *result;
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		result = (REF struct socket_node *)self->h_data;
-		if likely(vm_datablock_isinode(result) && INODE_ISSOCK(result))
-			return result; /* inherit */
-	} else {
-		result = (REF struct socket_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(result) {
-			if likely(vm_datablock_isinode(result) && INODE_ISSOCK(result)) {
-				handle_decref(*self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(result);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_SOCKETNODE);
+	                          HANDLE_TYPEKIND_MFILE_FSUPER);
 }
 
 /* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */

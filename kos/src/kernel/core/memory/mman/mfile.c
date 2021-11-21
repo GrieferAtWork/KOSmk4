@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/null.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
@@ -44,9 +45,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef CONFIG_USE_NEW_FS
-#include <kernel/fs/null.h>
-#endif /* CONFIG_USE_NEW_FS */
 
 DECL_BEGIN
 
@@ -194,7 +192,6 @@ mfile_sync(struct mfile *__restrict self)
 		THROWS(E_WOULDBLOCK, ...) {
 	pos_t result = 0;
 	REF struct mpart *changes;
-#ifdef CONFIG_USE_NEW_FS
 	/* Clear the changed flag.
 	 * This  has to be happen _before_ we read out the changed-part
 	 * list, such that changed parts added after we've consumed all
@@ -211,7 +208,6 @@ mfile_sync(struct mfile *__restrict self)
 		if (ATOMIC_CMPXCH_WEAK(self->mf_flags, flags, flags & ~MFILE_F_CHANGED))
 			break;
 	}
-#endif /* CONFIG_USE_NEW_FS */
 	do {
 		changes = ATOMIC_READ(self->mf_changed.slh_first);
 		if (!changes || changes == MFILE_PARTS_ANONYMOUS)
@@ -235,8 +231,10 @@ mfile_sync(struct mfile *__restrict self)
 }
 
 
-PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = { NULL, };
-#ifdef CONFIG_USE_NEW_FS
+PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = {
+	NULL,
+};
+
 PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_refcnt(1), /* +1: mfile_ndef */
 	MFILE_INIT_mf_ops(&mfile_ndef_ops),
@@ -255,9 +253,6 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_mtime(0, 0),
 	MFILE_INIT_mf_ctime(0, 0),
 };
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC struct mfile mfile_ndef = MFILE_INIT_ANON(&mfile_ndef_ops, PAGESHIFT);
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 
@@ -267,7 +262,6 @@ PUBLIC struct mfile mfile_ndef = MFILE_INIT_ANON(&mfile_ndef_ops, PAGESHIFT);
  * As such, these files are used by `mfile_delete()' as replacement mappings
  * of the original file. */
 PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
-#ifdef CONFIG_USE_NEW_FS
 #define INIT_ANON_FILE(i)                                           \
 	{                                                               \
 		MFILE_INIT_mf_refcnt(1), /* +1: mfile_ndef */               \
@@ -287,9 +281,6 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 		MFILE_INIT_mf_mtime(0, 0),                                  \
 		MFILE_INIT_mf_ctime(0, 0),                                  \
 	}
-#else /* CONFIG_USE_NEW_FS */
-#define INIT_ANON_FILE(i) MFILE_INIT_ANON(&mfile_anon_ops[i], i)
-#endif /* !CONFIG_USE_NEW_FS */
 	INIT_ANON_FILE(0),
 	INIT_ANON_FILE(1),
 	INIT_ANON_FILE(2),
@@ -371,11 +362,7 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 	((i) == PAGESHIFT ? &mfile_zero_loadpages \
 	                  : &mfile_zero_loadblocks)
 
-#ifdef CONFIG_USE_NEW_FS
-INTERN NONNULL((1)) void /* INTERN because also used in `filesys/null.c' (for dev_zero) */
-#else /* CONFIG_USE_NEW_FS */
-PRIVATE NONNULL((1)) void
-#endif /* !CONFIG_USE_NEW_FS */
+INTERN NONNULL((1)) void /* INTERN because also used in `filesys/null.c' (for `dev_zero') */
 NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict UNUSED(self),
                                     pos_t UNUSED(addr),
                                     physaddr_t buf, size_t num_bytes,
@@ -493,37 +480,6 @@ PUBLIC_CONST struct mfile_ops const mfile_anon_ops[BITSOF(void *)] = {
 #undef INIT_ANON_OPS
 #undef ANON_LOADBLOCKS_CALLBACK
 };
-
-
-
-
-#ifndef CONFIG_USE_NEW_FS
-PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
-mfile_phys_newpart(struct mfile *__restrict UNUSED(self),
-                   PAGEDIR_PAGEALIGNED pos_t minaddr,
-                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
-	REF struct mpart *result;
-	result = (REF struct mpart *)kmalloc(sizeof(struct mpart), GFP_LOCKED | GFP_PREFLT);
-	/* (re-)configure the part to point to static, physical memory. */
-	result->mp_flags        = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN | MPART_F_NOFREE;
-	result->mp_state        = MPART_ST_MEM;
-	result->mp_blkst_ptr    = NULL; /* Disable block status (thus having the system act like all
-	                                 * blocks  were using `MPART_BLOCK_ST_CHNG' as their status) */
-	result->mp_mem.mc_start = (physpage_t)minaddr >> PAGESHIFT;
-	result->mp_mem.mc_size  = num_bytes >> PAGESHIFT;
-	result->mp_meta         = NULL;
-
-	/* Define the alias symbols for the builtin zero-memory file. */
-	DEFINE_PUBLIC_SYMBOL(mfile_zero, &mfile_anon[PAGESHIFT], sizeof(struct mfile));
-	return result;
-}
-
-PRIVATE struct mfile_ops const mfile_phys_ops = {
-	.mo_newpart = &mfile_phys_newpart,
-};
-PUBLIC struct mfile mfile_phys = MFILE_INIT_ANON(&mfile_phys_ops, PAGESHIFT);
-#endif /* !CONFIG_USE_NEW_FS */
-
 
 DECL_END
 

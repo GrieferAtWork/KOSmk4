@@ -59,7 +59,6 @@
 
 #include <libvio/access.h>
 
-#ifdef CONFIG_USE_NEW_FS
 DECL_BEGIN
 
 #ifndef DBG_memset
@@ -283,7 +282,7 @@ again:
 #endif /* LOCAL_WRITING */
 
 	/* Load the current file size. */
-	filesize = (pos_t)atomic64_read(&self->mf_filesize);
+	filesize = mfile_getsize(self);
 
 #ifndef LOCAL_TAILIO
 	/* Check if the given `offset' is in-bounds of the allocated file size. */
@@ -382,7 +381,7 @@ restart_after_extendpart:
 					goto again;
 				}
 				/* Also make sure that the file hasn't been truncated in the mean time. */
-				if unlikely((pos_t)atomic64_read(&self->mf_filesize) < filesize)
+				if unlikely(mfile_getsize(self) < filesize)
 					goto restart_after_extendpart;
 				goto again_extend_part;
 			}
@@ -448,7 +447,7 @@ destroy_new_part_and_try_again:
 
 		/* Do I/O with the newly created part. */
 		mfile_trunclock_inc(self);
-		if unlikely((pos_t)atomic64_read(&self->mf_filesize) < filesize) {
+		if unlikely(mfile_getsize(self) < filesize) {
 			mfile_trunclock_dec(self);
 			goto destroy_new_part_and_try_again;
 		}
@@ -616,7 +615,7 @@ part_setcore:
 					while (!mpart_setcore_or_unlock(part, &unlock, &sc_data)) {
 						/* Re-acquire locks and make sure that nothing's changed. */
 						mfile_lock_write(self);
-						if (filesize != (pos_t)atomic64_read(&self->mf_filesize) || mfile_isanon(self) ||
+						if (filesize != mfile_getsize(self) || mfile_isanon(self) ||
 						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
@@ -644,7 +643,7 @@ part_setcore:
 					while (!mpart_unsharecow_or_unlock(part, &unlock, &uc_data, reladdr, io_bytes)) {
 						/* Re-acquire locks and make sure that nothing's changed. */
 						mfile_lock_write(self);
-						if (filesize != (pos_t)atomic64_read(&self->mf_filesize) || mfile_isanon(self) ||
+						if (filesize != mfile_getsize(self) || mfile_isanon(self) ||
 						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
@@ -806,7 +805,7 @@ restart_after_extendpart_tail:
 			}
 			if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
 				goto restart_after_extendpart_tail;
-			if unlikely((pos_t)atomic64_read(&self->mf_filesize) != filesize)
+			if unlikely(mfile_getsize(self) != filesize)
 				goto restart_after_extendpart_tail;
 			part = mpart_tree_locate(self->mf_parts, newpart_minaddr);
 			if unlikely(part && !wasdestroyed(part))
@@ -1195,7 +1194,6 @@ done:
 #undef LOCAL_WRITING
 
 DECL_END
-#endif /* CONFIG_USE_NEW_FS */
 
 #undef DEFINE_mfile_read
 #undef DEFINE_mfile_read_p

@@ -116,7 +116,6 @@ again:
 			if (!mfault_lockpart_or_unlock(&mf))
 				goto again;
 
-#ifdef CONFIG_USE_NEW_FS
 			/* `mfault_or_unlock()' would normally throw E_FSERROR_READONLY when
 			 * trying to write-fault a SHARED mapping of a READONLY file, but we
 			 * don't want that here.
@@ -135,7 +134,6 @@ again:
 				mpart_lock_release(mf.mfl_part);
 				goto unlock_and_done;
 			}
-#endif /* CONFIG_USE_NEW_FS */
 
 			if (!mfault_or_unlock(&mf))
 				goto again;
@@ -698,7 +696,6 @@ mfault_or_unlock(struct mfault *__restrict self)
 		/* Deal with writes to shared memory mappings. */
 		if (node->mn_flags & MNODE_F_SHARED) {
 
-#ifdef CONFIG_USE_NEW_FS
 			/* Ensure that the backing file isn't marked as READONLY
 			 *
 			 * This can happen if the memory mapping was created before the READONLY
@@ -719,7 +716,6 @@ mfault_or_unlock(struct mfault *__restrict self)
 				unlockinfo_unlock(&self->mfl_unlck);
 				THROW(E_FSERROR_READONLY);
 			}
-#endif /* CONFIG_USE_NEW_FS */
 
 			if (LIST_EMPTY(&part->mp_copy)) {
 				if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))

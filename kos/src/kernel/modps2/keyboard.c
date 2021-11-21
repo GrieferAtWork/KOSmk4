@@ -426,7 +426,6 @@ ps2_keyboard_setleds(struct kbddev *__restrict self,
 
 
 PRIVATE struct kbddev_ops const ps2_keyboard_ops = {
-#ifdef CONFIG_USE_NEW_FS
 	.ko_cdev = {{{{
 		.no_file = {
 			.mo_destroy = &kbddev_v_destroy,
@@ -435,7 +434,6 @@ PRIVATE struct kbddev_ops const ps2_keyboard_ops = {
 		},
 		.no_wrattr = &kbddev_v_wrattr,
 	}}}},
-#endif /* CONFIG_USE_NEW_FS */
 	.ko_setleds = &ps2_keyboard_setleds
 };
 
@@ -468,25 +466,13 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 		used_scanset = 2;
 	}
 
-#ifdef CONFIG_USE_NEW_FS
 	kbd = (REF struct ps2_keyboard *)kmalloc(sizeof(struct ps2_keyboard), GFP_CALLOC);
 	_kbddev_cinit(kbd, &ps2_keyboard_ops);
 	kbd->fn_mode   = S_IFCHR | 0644;
 	kbd->dv_driver = incref(&drv_self);
-#else /* CONFIG_USE_NEW_FS */
-	kbd = CHRDEV_ALLOC(struct ps2_keyboard);
-#endif /* !CONFIG_USE_NEW_FS */
 	TRY {
-#ifndef CONFIG_USE_NEW_FS
-		kbddev_init(kbd, &ps2_keyboard_ops);
-#endif /* !CONFIG_USE_NEW_FS */
-
 		mutex_cinit(&kbd->pk_cmdlock);
 		kbd->pk_portno = portno;
-#ifndef CONFIG_USE_NEW_FS
-		sprintf(kbd->cd_name, "ps2kbd%u", portno + 1);
-#endif /* !CONFIG_USE_NEW_FS */
-
 		switch (used_scanset) {
 		case 1:
 			kbd->pk_state = PS2_KEYBOARD_STATE_SS1;
@@ -502,24 +488,16 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 		COMPILER_BARRIER();
 		hisr_register_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
 		TRY {
-#ifdef CONFIG_USE_NEW_FS
 			device_registerf(kbd, MKDEV(DEV_MAJOR_AUTO, 0),
 			                 "ps2kbd%u", portno + 1);
-#else /* CONFIG_USE_NEW_FS */
-			chrdev_register_auto(kbd);
-#endif /* !CONFIG_USE_NEW_FS */
 		} EXCEPT {
 			hisr_unregister_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
 			RETHROW();
 		}
 	} EXCEPT {
-#ifdef CONFIG_USE_NEW_FS
 		_kbddev_fini(kbd);
 		decref_unlikely(&drv_self);
 		kfree(kbd);
-#else /* CONFIG_USE_NEW_FS */
-		destroy(kbd);
-#endif /* !CONFIG_USE_NEW_FS */
 		RETHROW();
 	}
 	ps2_keyboards[portno] = kbd;
@@ -530,9 +508,7 @@ PRIVATE DRIVER_FINI void KCALL ps2_keyboard_driver_fini(void) {
 		hisr_unregister_at(PS2_GET_ISR_FOR_PORT(PS2_PORT1),
 		                   &ps2_keyboard_isr_handler,
 		                   ps2_keyboards[0]);
-#ifdef CONFIG_USE_NEW_FS
 		device_delete(ps2_keyboards[0]);
-#endif /* CONFIG_USE_NEW_FS */
 		decref(ps2_keyboards[0]);
 		ps2_keyboards[0] = NULL;
 	}
@@ -540,9 +516,7 @@ PRIVATE DRIVER_FINI void KCALL ps2_keyboard_driver_fini(void) {
 		hisr_unregister_at(PS2_GET_ISR_FOR_PORT(PS2_PORT2),
 		                   &ps2_keyboard_isr_handler,
 		                   ps2_keyboards[1]);
-#ifdef CONFIG_USE_NEW_FS
 		device_delete(ps2_keyboards[1]);
-#endif /* CONFIG_USE_NEW_FS */
 		decref(ps2_keyboards[1]);
 		ps2_keyboards[1] = NULL;
 	}

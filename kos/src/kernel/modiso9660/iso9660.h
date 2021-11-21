@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#endif /* !CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 
 DECL_BEGIN
@@ -159,26 +156,9 @@ typedef struct ATTR_PACKED {
 } DirectoryEntry;
 
 
-#ifdef CONFIG_USE_NEW_FS
-
 /* Return the on-disk address of a given file-node. */
 #define fnode_getdiskaddr(self, filepos) \
 	(((pos_t)(u32)(self)->fn_fsdataint << (self)->mf_blockshift) + (filepos))
-
-
-/* ... */
-#else /* CONFIG_USE_NEW_FS */
-typedef struct iso9660_superblock Iso9660Superblock;
-struct iso9660_superblock: public superblock {
-//  struct timespec   is_ctime; /* CD creation file */
-//  struct timespec   is_mtime; /* CD last-modified file */
-};
-
-
-INTDEF struct inode_type Iso9660_RegType;
-INTDEF struct inode_type Iso9660_DirType;
-#endif /* !CONFIG_USE_NEW_FS */
-
 
 DECL_END
 

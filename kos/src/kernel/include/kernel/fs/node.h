@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/node.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/mman/mfile.h>
 #include <kernel/types.h>
 
@@ -644,6 +641,5 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL fnode_tree_minmaxlocate)(struct f
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_NODE_H */

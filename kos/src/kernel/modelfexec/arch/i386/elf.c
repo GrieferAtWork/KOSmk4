@@ -151,7 +151,6 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 	buflen = 0;
 	for (;;) {
 		size_t reqlen;
-#ifdef CONFIG_USE_NEW_FS
 		if (exec_path && exec_dentry) {
 			REF struct path *myroot = fs_getroot(THIS_FS);
 			FINALLY_DECREF_UNLIKELY(myroot);
@@ -170,13 +169,6 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 			if (buflen)
 				((USER char *)user_state_sp - buflen)[0] = '\0';
 		}
-#else /* CONFIG_USE_NEW_FS */
-		reqlen = path_sprintent((USER char *)user_state_sp - buflen,
-		                        buflen,
-		                        exec_path,
-		                        exec_dentry->de_name,
-		                        exec_dentry->de_namelen);
-#endif /* !CONFIG_USE_NEW_FS */
 		if (reqlen <= buflen)
 			break;
 		buflen = (reqlen + 7) & ~7;
@@ -348,7 +340,6 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 	buflen = 0;
 	for (;;) {
 		size_t reqlen;
-#ifdef CONFIG_USE_NEW_FS
 		if (exec_path && exec_dentry) {
 			REF struct path *myroot = fs_getroot(THIS_FS);
 			FINALLY_DECREF_UNLIKELY(myroot);
@@ -367,13 +358,6 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 			if (buflen)
 				((USER char *)user_state_sp - buflen)[0] = '\0';
 		}
-#else /* CONFIG_USE_NEW_FS */
-		reqlen = path_sprintent((USER char *)user_state_sp - buflen,
-		                        buflen,
-		                        exec_path,
-		                        exec_dentry->de_name,
-		                        exec_dentry->de_namelen);
-#endif /* !CONFIG_USE_NEW_FS */
 		if (reqlen <= buflen)
 			break;
 		buflen = (reqlen + 3) & ~3;

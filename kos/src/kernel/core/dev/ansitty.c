@@ -43,23 +43,11 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
 ansittydev_v_write(struct mfile *__restrict self,
                    USER CHECKED void const *src,
-                   size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) size_t KCALL
-ansittydev_v_write(struct chrdev *__restrict self,
-                   USER CHECKED void const *src,
-                   size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+                   size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansittydev *me = mfile_asansitty(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct ansittydev *me = (struct ansittydev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
 #if !defined(NDEBUG) && 0
 	printk(KERN_DEBUG "[ansittydev_v_write] %$q\n", num_bytes, src);
 #endif
@@ -67,21 +55,10 @@ ansittydev_v_write(struct chrdev *__restrict self,
 }
 
 
-#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ansittydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
-                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
-#else /* CONFIG_USE_NEW_FS */
-PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-                   USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...)
-#endif /* !CONFIG_USE_NEW_FS */
-{
-#ifdef CONFIG_USE_NEW_FS
+                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct ansittydev *me = mfile_asansitty(self);
-#else /* CONFIG_USE_NEW_FS */
-	struct ansittydev *me = (struct ansittydev *)self;
-#endif /* !CONFIG_USE_NEW_FS */
 	switch (cmd) {
 
 	case TIOCGWINSZ:
@@ -128,14 +105,7 @@ ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 		break;
 	}
 
-#ifdef CONFIG_USE_NEW_FS
 	return chrdev_v_ioctl(self, cmd, arg, mode);
-#else /* CONFIG_USE_NEW_FS */
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-	      cmd);
-	return 0;
-#endif /* !CONFIG_USE_NEW_FS */
 }
 
 PUBLIC NONNULL((1)) void LIBANSITTY_CC
@@ -175,21 +145,11 @@ ansittydev_v_setled(struct ansitty *__restrict self,
 	output = awref_get(&me->at_tty);
 	if (output) {
 		FINALLY_DECREF_UNLIKELY(output);
-#ifdef CONFIG_USE_NEW_FS
 		if (output->mtd_ihandle_typ == HANDLE_TYPE_MFILE &&
-		    mfile_iskbd((struct mfile *)output->mtd_ihandle_ptr))
-#else /* CONFIG_USE_NEW_FS */
-		if (output->mtd_ihandle_typ == HANDLE_TYPE_CHRDEV &&
-		    chrdev_iskbd((struct chrdev *)output->mtd_ihandle_ptr))
-#endif /* !CONFIG_USE_NEW_FS */
-		{
+		    mfile_iskbd((struct mfile *)output->mtd_ihandle_ptr)) {
 			struct kbddev *kbd;
 			uintptr_t new_leds;
-#ifdef CONFIG_USE_NEW_FS
 			kbd = mfile_askbd((struct mfile *)output->mtd_ihandle_ptr);
-#else /* CONFIG_USE_NEW_FS */
-			kbd = (struct kbddev *)output->mtd_ihandle_ptr;
-#endif /* !CONFIG_USE_NEW_FS */
 			kbddev_leds_acquire(kbd);
 			RAII_FINALLY { kbddev_leds_release(kbd); };
 			new_leds = (kbd->kd_leds & (mask | ~0xf)) | (flag & 0xf);
@@ -223,36 +183,6 @@ ansittydev_v_termios(struct ansitty *__restrict self,
 	}
 	return true;
 }
-
-
-#ifndef CONFIG_USE_NEW_FS
-/* Initialize a given ansitty device.
- * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
- *       The internal routing of this callback to injecting keyboard output
- *       is done dynamically when the ANSI  TTY is connected to the  output
- *       channel of a `struct mkttydev'
- * This function initializes the following operators:
- *   - cd_type.ct_write = &ansittydev_v_write;  // Mustn't be re-assigned!
- *   - cd_type.ct_fini  = &ansittydev_v_fini;   // Must be called by an override
- *   - cd_type.ct_ioctl = &ansittydev_v_ioctl;  // Must be called by an override */
-PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL ansittydev_cinit)(struct ansittydev *__restrict self,
-                                struct ansitty_operators const *__restrict ops) {
-	assert(self);
-	assert(ops);
-	assertf(!ops->ato_output, "Don't provided operator `ato_output'!");
-	assertf(!ops->ato_setled, "Don't provided operator `ato_setled'!");
-	assertf(!ops->ato_termios, "Don't provided operator `ato_termios'!");
-	ansitty_init(&self->at_ansi, ops);
-	/* Provide standard operators. */
-	self->cd_type.ct_write = &ansittydev_v_write;
-	self->cd_type.ct_ioctl = &ansittydev_v_ioctl;
-	/* Override the TTY output operator to try to inject responses into the keyboard queue. */
-	self->at_ansi.at_ops.ato_output  = &ansittydev_v_output;
-	self->at_ansi.at_ops.ato_setled  = &ansittydev_v_setled;
-	self->at_ansi.at_ops.ato_termios = &ansittydev_v_termios;
-}
-#endif /* !CONFIG_USE_NEW_FS */
 
 
 DECL_END

@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_FS
-#include <fs/vfs.h>
-#else /* !CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 #include <sched/pertask.h>
 
@@ -211,6 +208,5 @@ vfs_mount_location(struct vfs *__restrict self,
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_VFS_H */

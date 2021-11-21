@@ -125,23 +125,13 @@ BEGIN
 #define DEFINE_SIMPLE_ARCH_DRIVER_LIBRARY(name) DEFINE_SIMPLE_ARCH_DRIVER_EX("../lib", name)
 
 
-#ifndef CONFIG_USE_NEW_FS /* TODO: These drivers have yet to be ported */
+#if 0 /* TODO: These drivers have yet to be ported to the new FS system. */
 		DEFINE_SIMPLE_DRIVER("usb-hid", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
-		DEFINE_SIMPLE_DRIVER("procfs",
-			SOURCE({
-				"modprocfs/files/*.c",
-				"modprocfs/arch/" + XARCH + "/*.c"
-			}))
 		DEFINE_SIMPLE_DRIVER("usb")
-#elif 1
-		BEGIN GROUP("mod.procfs") { COMPILE, LINK, MCOPY };
-			SET_OUTPUT("/os/drivers/procfs")
-			LD_FLAGS({ "-soname=procfs" })
-			SOURCE({ "modprocfsnew/*.c" })
-		END
 #endif
 
+		DEFINE_SIMPLE_DRIVER("procfs")
 		DEFINE_SIMPLE_DRIVER("ext2")
 		DEFINE_SIMPLE_DRIVER("iso9660")
 		DEFINE_SIMPLE_DRIVER("ne2k")

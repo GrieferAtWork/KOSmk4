@@ -83,8 +83,6 @@ struct mkttydev
 };
 
 
-#ifdef CONFIG_USE_NEW_FS
-
 /* Operators used by `struct mkttydev' */
 DATDEF struct ttydev_ops const mkttydev_ops;
 
@@ -113,35 +111,6 @@ mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
              uintptr_half_t ohandle_typ, void *ohandle_ptr,
              USER CHECKED char const *name, size_t namelen)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
-
-#else /* CONFIG_USE_NEW_FS */
-#define ttydev_ismktty(self) \
-	((self)->cd_type.ct_pollconnect == &mkttydev_v_pollconnect)
-#define chrdev_ismktty(self) \
-	((self)->cd_type.ct_pollconnect == &mkttydev_v_pollconnect)
-FUNDEF NONNULL((1)) void KCALL mkttydev_v_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL mkttydev_v_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-
-/* Create (but don't register) a new TTY device that connects the two given handles,
- * such that character-based keyboard input  is taken from `ihandle_ptr', and  ansi-
- * compliant display output is written to `ohandle_ptr'.
- *
- * For this purpose, special handling is done for certain handles:
- *   - `ohandle_typ == HANDLE_TYPE_CHRDEV && chrdev_isansitty(ohandle_ptr)':
- *     `((struct ansittydev *)ohandle_ptr)->at_tty' will  be bound  to the  newly created  tty  device
- *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'
- *     When the returned tty device is destroyed, this link gets severed automatically.
- * Upon success, the caller should:
- *   - Initialize `return->cd_name'
- *   - Register the device using one of:
- *      - `chrdev_register(return, ...)'
- *      - `chrdev_register_auto(return)'
- * NOTE: The TTY is created with data forwarding disabled. */
-FUNDEF ATTR_RETNONNULL REF struct mkttydev *KCALL
-mkttydev_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
-               uintptr_half_t ohandle_typ, void *ohandle_ptr)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-#endif /* !CONFIG_USE_NEW_FS */
 
 /* Start/Stop forwarding  input  handle  data  on  the  given  TTY
  * Note that for any given input handle, only a single TTY  should

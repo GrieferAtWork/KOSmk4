@@ -281,13 +281,8 @@ LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL GDBFs_HasMountedFileSystem)(void) {
 	if unlikely(!GDBFs.fi_fs)
 		return false; /* No filesystem loaded. */
-#ifdef CONFIG_USE_NEW_FS
 	if unlikely(!ATOMIC_READ(GDBFs.fi_fs->fs_vfs->vf_root))
 		return false; /* The root filesystem hasn't been mounted, yet. */
-#else /* CONFIG_USE_NEW_FS */
-	if unlikely(!ATOMIC_READ(GDBFs.fi_fs->f_vfs->p_inode))
-		return false; /* The root filesystem hasn't been mounted, yet. */
-#endif /* !CONFIG_USE_NEW_FS */
 	return true;
 }
 
@@ -312,6 +307,7 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 		          filename, (unsigned int)oflags, (unsigned int)mode);
 		return GDB_EINVAL;
 	}
+
 	/* Ensure that a filesystem has been loaded. */
 	if unlikely(!GDBFs_HasMountedFileSystem()) {
 		GDB_DEBUG("[gdb] Cannot open(%q, %#x, %#x): No filesystem mounted\n",
@@ -322,7 +318,6 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 	          filename, (unsigned int)oflags, (unsigned int)mode);
 	/* Set the I/O mode. */
 	TRY {
-#ifdef CONFIG_USE_NEW_FS
 		oflag_t os_oflags;
 		if ((oflags & GDB_O_ACCMODE) == GDB_O_RDONLY) {
 			os_oflags = O_RDONLY;
@@ -331,7 +326,7 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 		} else if ((oflags & GDB_O_ACCMODE) == GDB_O_RDWR) {
 			os_oflags = O_RDWR;
 		} else {
-			return GDB_ErrnoEncode(EINVAL);
+			return GDB_EINVAL;
 		}
 		if (oflags & GDB_O_APPEND)
 			os_oflags |= O_APPEND;
@@ -348,125 +343,6 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 			RAII_FINALLY { decref_unlikely(task_setfs(saved_fs)); };
 			*result = path_open(AT_FDROOT, filename, os_oflags, mode);
 		}
-
-#else /* CONFIG_USE_NEW_FS */
-		REF struct inode *node;
-		switch (oflags & GDB_O_ACCMODE) {
-		default:
-	/*	case GDB_O_RDONLY: */
-			result->h_mode = IO_RDONLY;
-			break;
-		case GDB_O_WRONLY:
-			result->h_mode = IO_WRONLY;
-			break;
-		case GDB_O_RDWR:
-			result->h_mode = IO_RDWR;
-			break;
-		}
-		if (oflags & GDB_O_APPEND)
-			result->h_mode |= IO_APPEND;
-		if (oflags & GDB_O_CREAT) {
-			REF struct directory_node *result_containing_directory;
-			REF struct path *dir;
-			char const *last_seg;
-			u16 last_seglen;
-			bool was_newly_created;
-			dir = path_traverse(GDBFs.fi_fs,
-			                    filename,
-			                    &last_seg,
-			                    &last_seglen,
-			                    ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
-			                    NULL);
-			{
-				FINALLY_DECREF(dir);
-				sync_read(dir);
-				result_containing_directory = (REF struct directory_node *)incref(dir->p_inode);
-				sync_endread(dir);
-			}
-			{
-				FINALLY_DECREF(result_containing_directory);
-				/* Create/open an existing INode within the associated directory. */
-				node = directory_creatfile(result_containing_directory,
-				                           last_seg,
-				                           last_seglen,
-				                           oflags & GDB_O_CREAT ? O_CREAT : 0,
-				                           fs_getuid(GDBFs.fi_fs),
-				                           fs_getgid(GDBFs.fi_fs),
-				                           GDB_ModeDecode(mode),
-				                           NULL,
-				                           &was_newly_created);
-			}
-			if (!was_newly_created) {
-				if (oflags & GDB_O_EXCL)
-					THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-				goto do_check_truncate;
-			}
-#if 0 /* XXX: O_CREAT on an existing symlink */
-			if unlikely(INODE_ISLNK(node)) {
-			}
-#endif
-		} else {
-			node = path_traversefull(GDBFs.fi_fs,
-			                         filename,
-			                         true,
-			                         ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
-			                         NULL,
-			                         NULL,
-			                         NULL,
-			                         NULL);
-do_check_truncate:
-			if (oflags & GDB_O_TRUNC) {
-				TRY {
-					inode_truncate(node, 0);
-				} EXCEPT {
-					decref(node);
-					RETHROW();
-				}
-			}
-		}
-		switch (node->i_filemode & S_IFMT) {
-
-		case S_IFBLK: {
-			dev_t devno;
-			inode_loadattr(node);
-			COMPILER_READ_BARRIER();
-			devno = node->i_filerdev;
-			COMPILER_READ_BARRIER();
-			decref(node);
-			result->h_data = blkdev_lookup(devno);
-			if unlikely(!result->h_data)
-				THROW(E_NO_DEVICE /*, E_NO_DEVICE_KIND_BLKDEV, devno*/);
-			result->h_type = HANDLE_TYPE_BLKDEV;
-		}	break;
-
-		case S_IFCHR: {
-			/* Open the associated character-device. */
-			dev_t devno;
-			REF struct chrdev *cdev;
-			inode_loadattr(node);
-			COMPILER_READ_BARRIER();
-			devno = node->i_filerdev;
-			COMPILER_READ_BARRIER();
-			decref(node);
-			cdev = chrdev_lookup(devno);
-			if unlikely(!cdev)
-				THROW(E_NO_DEVICE /*, E_NO_DEVICE_KIND_CHRDEV, devno*/);
-			result->h_data = cdev;
-			result->h_type = HANDLE_TYPE_CHRDEV;
-			if (cdev->cd_type.ct_open) {
-				incref(cdev);
-				FINALLY_DECREF_UNLIKELY(cdev);
-				(*cdev->cd_type.ct_open)(cdev, result);
-			}
-		}	break;
-
-		default: {
-			result->h_data = node;
-			result->h_type = HANDLE_TYPE_MFILE;
-		}	break;
-
-		}
-#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		errno_t error;
 		error = error_as_errno(error_data());
@@ -488,7 +364,6 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
 		char const *last_seg;
 		u16 last_seglen;
 		REF struct path *p;
-#ifdef CONFIG_USE_NEW_FS
 		atflag_t atflags;
 		REF struct fs *saved_fs = task_setfs(GDBFs.fi_fs);
 		RAII_FINALLY { decref_unlikely(task_setfs(saved_fs)); };
@@ -496,26 +371,6 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
 		p       = path_traverse(AT_FDCWD, filename, &last_seg, &last_seglen, atflags);
 		FINALLY_DECREF_UNLIKELY(p);
 		path_remove(p, last_seg, last_seglen, atflags);
-#else /* CONFIG_USE_NEW_FS */
-		p = path_traverse(GDBFs.fi_fs,
-		                  filename,
-		                  &last_seg,
-		                  &last_seglen,
-		                  ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
-		                  NULL);
-		{
-			FINALLY_DECREF_UNLIKELY(p);
-			path_remove(p,
-			            last_seg,
-			            last_seglen,
-			            fdirent_hash(last_seg, last_seglen),
-			            DIRECTORY_REMOVE_FREGULAR,
-			            NULL,
-			            NULL,
-			            NULL,
-			            NULL);
-		}
-#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		errno_t error;
 		error = error_as_errno(error_data());
@@ -538,7 +393,6 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename, char *buf,
 	}
 	GDB_DEBUG("[gdb] vFile:readlink(%q)\n", filename);
 	TRY {
-#ifdef CONFIG_USE_NEW_FS
 		size_t avail, used;
 		REF struct flnknode *lnk;
 		REF struct fs *saved_fs = task_setfs(GDBFs.fi_fs);
@@ -554,33 +408,6 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename, char *buf,
 		if unlikely(used > avail)
 			used = avail; /* Posix semantics (ugh...) */
 		*pbuflen = used;
-#else /* CONFIG_USE_NEW_FS */
-		REF struct symlink_node *lnk;
-		lnk = (REF struct symlink_node *)path_traversefull(GDBFs.fi_fs,
-		                                                         filename,
-		                                                         false,
-		                                                         ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
-		                                                         NULL,
-		                                                         NULL,
-		                                                         NULL,
-		                                                         NULL);
-		/* Check that the named INode is actually a symbolic link. */
-		if (!INODE_ISLNK((struct inode *)lnk)) {
-			decref_unlikely(lnk);
-			/* THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK); */
-			return GDB_ENOENT;
-		}
-		{
-			size_t avail, used;
-			FINALLY_DECREF_UNLIKELY((struct inode *)lnk);
-			/* Read the contents of the symbolic link. */
-			avail = *pbuflen;
-			used  = symlink_node_readlink(lnk, buf, avail);
-			if unlikely(used > avail)
-				used = avail; /* Posix semantics (ugh...) */
-			*pbuflen = used;
-		}
-#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		errno_t error;
 		error = error_as_errno(error_data());

@@ -23,15 +23,18 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/except.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cache.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/personality.h>
 #include <kernel/profiler.h>
 #include <kernel/syscall.h>
@@ -39,6 +42,7 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
@@ -84,55 +88,52 @@ load_driver_from_file_handles(unsigned int fd_node,
                               bool *pnew_driver_loaded,
                               unsigned int flags) {
 	REF struct driver *result;
-	REF struct regular_node *driver_node;
+	REF struct mfile *driver_node;
 	REF struct path *driver_path;
 	REF struct fdirent *driver_dentry;
+	REF struct handle nodehand;
 	driver_path   = NULL;
 	driver_dentry = NULL;
 	driver_node   = NULL;
-	if (fd_path != (unsigned int)-1)
-		driver_path = handle_get_path(fd_path);
-	TRY {
-		REF struct handle nodehand;
-		if (fd_dent != (unsigned int)-1)
-			driver_dentry = handle_get_fdirent(fd_dent);
-		nodehand = handle_lookup(fd_node);
-		TRY {
-			/* (Try to) fill in missing filesystem information from `f_node' */
-			if (!driver_path)
-				driver_path = (REF struct path *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_PATH);
-			if (!driver_dentry)
-				driver_dentry = (REF struct fdirent *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_FDIRENT);
-			/* Lookup the actual INode from which to load the driver. */
-			driver_node = handle_as_regnode(nodehand);
-		} EXCEPT {
-			if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
-				if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd))
-					PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd_node);
-			}
-			RETHROW();
-		}
-		require(CAP_SYS_MODULE);
-		result = flags & KSYSCTL_DRIVER_INSMOD_FNOINIT
-		         ? driver_loadmod(driver_node,
-		                          driver_path,
-		                          driver_dentry,
-		                          driver_cmdline,
-		                          pnew_driver_loaded)
-		         : driver_insmod(driver_node,
-		                         driver_path,
-		                         driver_dentry,
-		                         driver_cmdline,
-		                         pnew_driver_loaded);
-	} EXCEPT {
+	RAII_FINALLY {
 		xdecref_unlikely(driver_path);
 		xdecref_unlikely(driver_dentry);
-		xdecref_unlikely(driver_node);
+		decref_unlikely(driver_node);
+	};
+	if (fd_path != (unsigned int)-1)
+		driver_path = handle_get_path(fd_path);
+	if (fd_dent != (unsigned int)-1)
+		driver_dentry = handle_get_fdirent(fd_dent);
+	nodehand = handle_lookup(fd_node);
+	TRY {
+		/* (Try to) fill in missing filesystem information from `f_node' */
+		if (!driver_path)
+			driver_path = (REF struct path *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_PATH);
+		if (!driver_dentry)
+			driver_dentry = (REF struct fdirent *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_FDIRENT);
+		/* Lookup the actual INode from which to load the driver. */
+		driver_node = handle_as_mfile(nodehand);
+	} EXCEPT {
+		if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
+			if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd))
+				PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd_node);
+		}
 		RETHROW();
 	}
-	xdecref_unlikely(driver_path);
-	xdecref_unlikely(driver_dentry);
-	decref_unlikely(driver_node);
+	require(CAP_SYS_MODULE);
+	if (flags & KSYSCTL_DRIVER_INSMOD_FNOINIT) {
+		result = driver_loadmod(driver_node,
+		                        driver_path,
+		                        driver_dentry,
+		                        driver_cmdline,
+		                        pnew_driver_loaded);
+	} else {
+		result = driver_insmod(driver_node,
+		                       driver_path,
+		                       driver_dentry,
+		                       driver_cmdline,
+		                       pnew_driver_loaded);
+	}
 	return result;
 }
 
@@ -315,11 +316,11 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		switch (format) {
 
 		case KSYSCTL_DRIVER_FORMAT_FILE: {
-			REF struct regular_node *node;
-			node = handle_get_regnode((unsigned int)ATOMIC_READ(data->dm_file));
-			FINALLY_DECREF_UNLIKELY(node);
+			REF struct mfile *file;
+			file = handle_get_mfile((unsigned int)ATOMIC_READ(data->dm_file));
+			FINALLY_DECREF_UNLIKELY(file);
 			require(CAP_SYS_MODULE);
-			error = driver_delmod(node, delmod_flags);
+			error = driver_delmod(file, delmod_flags);
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
@@ -360,14 +361,14 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_FILE: {
-			REF struct regular_node *node;
+			REF struct mfile *file;
 			unsigned int fileno;
 			fileno = (unsigned int)ATOMIC_READ(data->gm_file);
 			COMPILER_READ_BARRIER();
-			node = handle_get_regnode(fileno);
-			FINALLY_DECREF_UNLIKELY(node);
+			file = handle_get_mfile(fileno);
+			FINALLY_DECREF_UNLIKELY(file);
 			require(CAP_DRIVER_QUERY);
-			drv = driver_fromfile(node);
+			drv = driver_fromfile(file);
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
