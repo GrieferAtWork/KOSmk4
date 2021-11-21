@@ -457,11 +457,11 @@ struct service_shm_free {
 #define SERVICE_SHM_FREE_REDBIT 1 /* For `service_shm_free::ssf_size': this is a red node */
 
 
-/* The minimum size of a free block of SHM memory, and thus also the minimum
- * size for an allocation. We subtract */
+/* The minimum size of a  free block of SHM  memory,
+ * and thus also the minimum size for an allocation. */
 #define SERVICE_SHM_ALLOC_MINSIZE sizeof(struct service_shm_free)
 #define SERVICE_SHM_ALLOC_ALIGN   sizeof(void *)
-#define SERVICE_SHM_ALLOC_EXTRA   sizeof(size_t) /* # of extra bytes that must always be allocated  */
+#define SERVICE_SHM_ALLOC_EXTRA   sizeof(size_t) /* # of extra bytes that must always be allocated to bookkeeping */
 
 
 /* Helpers for operating with free range tree functions. */

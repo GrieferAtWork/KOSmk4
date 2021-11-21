@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3853d4ea */
+/* HASH CRC-32:0x4bec31a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1099,11 +1099,11 @@
 #define __NRAN1_mktty                        keyboard
 #define __NRAN2_mktty                        display
 #define __NRAN3_mktty                        rsvd
-#define __NRAN0_lfutexexpr                   ulockaddr
+#define __NRAN0_lfutexexpr                   futexaddr
 #define __NRAN1_lfutexexpr                   base
 #define __NRAN2_lfutexexpr                   expr
 #define __NRAN3_lfutexexpr                   timeout
-#define __NRAN4_lfutexexpr                   timeout_flags
+#define __NRAN4_lfutexexpr                   flags
 #define __NRAN0_lseek64                      fd
 #define __NRAN1_lseek64                      offset
 #define __NRAN2_lseek64                      whence
@@ -2831,11 +2831,11 @@
 #define __NRATR2_mktty                        SC_REPR_FD_T                                                         /* display */ 
 #define __NRATR3_mktty                        SC_REPR_SYSCALL_ULONG_T                                              /* rsvd */ 
 #define __NRRTR_mktty                         SC_REPR_FD_T                                                         /* return */
-#define __NRATR0_lfutexexpr                   SC_REPR_POINTER                                                      /* ulockaddr */ 
+#define __NRATR0_lfutexexpr                   SC_REPR_POINTER                                                      /* futexaddr */ 
 #define __NRATR1_lfutexexpr                   SC_REPR_POINTER                                                      /* base */ 
 #define __NRATR2_lfutexexpr                   SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* expr */ 
 #define __NRATR3_lfutexexpr                   SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
-#define __NRATR4_lfutexexpr                   SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* timeout_flags */ 
+#define __NRATR4_lfutexexpr                   SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* flags */ 
 #define __NRRTR_lfutexexpr                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_lseek64                      SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_lseek64                      SC_REPR_INT64_T                                                      /* offset */ 

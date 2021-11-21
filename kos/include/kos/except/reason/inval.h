@@ -144,8 +144,9 @@ enum {
 	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,                          /* E_INVALID_ARGUMENT_BAD_VALUE:     [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()' or `lfutexexpr()' is invalid.
 	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  `LFUTEX_FDBIT' was given to `lfutexexpr(2)', but other flags were also given.
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
-	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
+	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 	E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL,                         /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 	E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE,                       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
@@ -249,6 +250,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE,            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Argument to `LEAKS_IOC_SETONCLOSE' isn't one of `LEAKS_ONCLOSE_*' */
 	E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB,               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
 	E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX,                /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
+	E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT,              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -368,8 +370,9 @@ enum {
                                                                                                                                      * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          /* E_INVALID_ARGUMENT_BAD_VALUE:     [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()' or `lfutexexpr()' is invalid.
                                                                                                                                      * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+                                                                                                                                     * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  `LFUTEX_FDBIT' was given to `lfutexexpr(2)', but other flags were also given.
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
-                                                                                                                                     * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
+                                                                                                                                     * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
@@ -473,6 +476,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE            E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Argument to `LEAKS_IOC_SETONCLOSE' isn't one of `LEAKS_ONCLOSE_*' */
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT              E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -589,8 +593,9 @@ enum {
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          102 /* E_INVALID_ARGUMENT_BAD_VALUE:     [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()' or `lfutexexpr()' is invalid.
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+                                                                           * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  `LFUTEX_FDBIT' was given to `lfutexexpr(2)', but other flags were also given.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
-                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
+                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         103 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       104 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
@@ -694,6 +699,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_CLOSEMODE            196 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Argument to `LEAKS_IOC_SETONCLOSE' isn't one of `LEAKS_ONCLOSE_*' */
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               197 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                198 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT              199 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

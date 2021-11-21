@@ -804,6 +804,34 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
 	}
 }
 
+/* Return a direct pointer to the physical address at `partrel_offset'.
+ * The  # of bytes which can be  read from this address directly depend
+ * on  the alignment of `partrel_offset'. (s.a. `mpart_memaddr_direct') */
+PUBLIC NOBLOCK NONNULL((1)) physaddr_t
+NOTHROW(FCALL mpart_getphysaddr)(struct mpart *__restrict self,
+                                 mpart_reladdr_t partrel_offset) {
+	physaddr_t result;
+	assert(partrel_offset < mpart_getsize(self));
+	if (self->mp_state == MPART_ST_MEM) {
+		/* Simple case: Everything is linear physical memory. */
+		result = physpage2addr(self->mp_mem.mc_start) + partrel_offset;
+	} else {
+		size_t i, chunk_size;
+		assert(self->mp_state == MPART_ST_MEM_SC);
+		/* Difficult case: Must find the chunk containing the given offset. */
+		for (i = 0;;) {
+			assert(i < self->mp_mem_sc.ms_c);
+			chunk_size = self->mp_mem_sc.ms_v[i].mc_size * PAGESIZE;
+			if (partrel_offset < chunk_size)
+				break;
+			partrel_offset -= chunk_size;
+			++i;
+		}
+		result = physpage2addr(self->mp_mem_sc.ms_v[i].mc_start) + partrel_offset;
+	}
+	return result;
+}
+
 
 
 /* Mark all blocks that overlap with the given address range as CHNG.

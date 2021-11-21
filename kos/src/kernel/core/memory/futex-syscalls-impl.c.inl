@@ -22,8 +22,10 @@
 //#define DEFINE_COMPAT_FUTEX 1
 #endif /* __INTELLISENSE__ */
 
-#include <sched/tsc.h>
+#include <kernel/handle.h>
+#include <kernel/mman/futexfd.h>
 #include <sched/rpc.h>
+#include <sched/tsc.h>
 
 #ifdef DEFINE_COMPAT_FUTEX
 #define FUNC(x)         compat_##x
@@ -224,14 +226,6 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 #undef APPLY_MASK
 	}	break;
 
-	case LFUTEX_NOP:
-		/* NOTE: Intentionally don't validate `futex_op & LFUTEX_FLAGMASK',
-		 *       since this command's purpose  is to literally do  nothing,
-		 *       meaning that also doing nothing  for unknown flags is  the
-		 *       correct thing to do in terms of forward-compatibility. */
-		result = 0;
-		break;
-
 	case LFUTEX_WAIT_LOCK: {
 		FUNC(lfutex_t) oldval, newval;
 		validate_writable(uaddr, sizeof(*uaddr));
@@ -307,15 +301,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_BITMASK, validate_readable, (ATOMIC_READ(*uaddr) & val) != val2);
 #undef DEFINE_WAIT_WHILE_OPERATOR
 
-	/* TODO: Futex FD support */
-#define LFUTEX_FDWAIT               (LFUTEX_FDBIT | LFUTEX_WAIT)
-#define LFUTEX_FDWAIT_LOCK          (LFUTEX_FDBIT | LFUTEX_WAIT_LOCK)
-#define LFUTEX_FDWAIT_WHILE         (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE)
-#define LFUTEX_FDWAIT_UNTIL         (LFUTEX_FDBIT | LFUTEX_WAIT_UNTIL)
-#define LFUTEX_FDWAIT_WHILE_ABOVE   (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_ABOVE)
-#define LFUTEX_FDWAIT_WHILE_BELOW   (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_BELOW)
-#define LFUTEX_FDWAIT_WHILE_BITMASK (LFUTEX_FDBIT | LFUTEX_WAIT_WHILE_BITMASK)
-#define LFUTEX_FDWAIT_UNTIL_BITMASK (LFUTEX_FDBIT | LFUTEX_WAIT_UNTIL_BITMASK)
+	/* TODO: Futex FD support (LFUTEX_FDBIT) */
 
 	default:
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -342,14 +328,14 @@ DEFINE_COMPAT_SYSCALL5(errno_t, lfutexexpr,
                        USER UNCHECKED void *, base,
                        USER UNCHECKED struct compat_lfutexexpr const *, expr,
                        USER UNCHECKED struct compat_timespec64 const *, timeout,
-                       syscall_ulong_t, timeout_flags)
+                       syscall_ulong_t, flags)
 #else /* DEFINE_COMPAT_FUTEX */
 DEFINE_SYSCALL5(errno_t, lfutexexpr,
                 USER UNCHECKED uintptr_t *, ulockaddr,
                 USER UNCHECKED void *, base,
                 USER UNCHECKED struct lfutexexpr const *, expr,
                 USER UNCHECKED struct timespec64 const *, timeout,
-                syscall_ulong_t, timeout_flags)
+                syscall_ulong_t, flags)
 #endif /* !DEFINE_COMPAT_FUTEX */
 {
 	errno_t result;
@@ -360,7 +346,31 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 	FINALLY_DECREF(f);
 
 	/* Connect to the named futex. */
-	if (timeout_flags & LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) {
+	if (flags & (LFUTEX_FDBIT | LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL)) {
+		if (flags & LFUTEX_FDBIT) {
+			struct handle hand;
+			REF struct mfutexfd *mfd;
+			if unlikely(timeout != NULL) {
+				THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
+				      E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT);
+			}
+			VALIDATE_FLAGSET(flags, LFUTEX_FDBIT,
+			                 E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP);
+
+			/* Create a new futex-fd object. */
+#ifdef DEFINE_COMPAT_FUTEX
+			mfd = compat_mfutexfd_new(f, base, expr);
+#else /* DEFINE_COMPAT_FUTEX */
+			mfd = mfutexfd_new(f, base, expr);
+#endif /* !DEFINE_COMPAT_FUTEX */
+			FINALLY_DECREF_UNLIKELY(mfd);
+
+			/* Install a new handle for the futex fd. */
+			hand.h_type = HANDLE_TYPE_FUTEXFD;
+			hand.h_mode = IO_RDWR;
+			hand.h_data = mfd;
+			return handle_install(THIS_HANDLE_MANAGER, hand);
+		}
 		mfutex_connect_for_poll(f);
 	} else {
 		mfutex_connect(f);
@@ -441,7 +451,7 @@ bad_opcode:
 	}
 must_wait:
 	/* Do the wait */
-	result = FUNC(task_waitfor_futex)(timeout_flags, timeout);
+	result = FUNC(task_waitfor_futex)(flags, timeout);
 done:
 	return result;
 }

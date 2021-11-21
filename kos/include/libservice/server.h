@@ -93,7 +93,7 @@ struct service_specs {
 	 * This  function is allowed to call `service_api_context()', which
 	 * simply  returns `ctx', as  well as `service_api_getpid()', which
 	 * will return  the PID  of the  newly attached  client. When  this
-	 * function returns with an exception, the client will be  forcably
+	 * function returns with an exception, the client will be forceably
 	 * detached, and `ss_context_fini()' will be invoked (if non-NULL). */
 	void (LIBSERVICE_CC *ss_context_init)(void *ctx);
 
@@ -177,7 +177,7 @@ __NOTHROW(LIBSERVICE_CC service_api_cred)(void);
 /* Exception-enabled variants of the above functions. */
 typedef __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
 (LIBSERVICE_CC *PSERVICEAPICREATE)(char const *__restrict filename,
-                                    struct service_specs const *__restrict specs);
+                                   struct service_specs const *__restrict specs);
 #ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
 (LIBSERVICE_CC ServiceApiCreate)(char const *__restrict filename,

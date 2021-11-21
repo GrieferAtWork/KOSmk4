@@ -422,6 +422,7 @@ struct mnode {
 
 /* Return the file-absolute address mapped at `vaddr' */
 #define mnode_getfileaddrat(self, vaddr) (mnode_getfileaddr(self) + ((byte_t *)(vaddr) - (self)->mn_minaddr))
+#define mnode_getmapaddrat(self, vaddr)  (mnode_getmapaddr(self) + ((byte_t *)(vaddr) - (self)->mn_minaddr))
 
 
 /* Free/destroy a given mem-node */

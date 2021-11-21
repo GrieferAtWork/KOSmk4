@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbedae76 */
+/* HASH CRC-32:0x3f89f5d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1122,28 +1122,31 @@
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
  * hold true before the scheduler will suspend the calling thread.
- * @param: ulockaddr:     The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @param: futexaddr: The futex on which to wait
+ * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
+ * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
+ * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
+ * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
  * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
+ *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
+ *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
+ *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define SYS_lfutexexpr               __NR_lfutexexpr               /* errno_t lfutexexpr(uint64_t *ulockaddr, void *base, struct lfutexexprx64 const *expr, struct timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+#define SYS_lfutexexpr               __NR_lfutexexpr               /* errno_t lfutexexpr(uint64_t *futexaddr, void *base, struct lfutexexprx64 const *expr, struct timespecx64 const *timeout, syscall_ulong_t flags) */
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
- *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
  *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)

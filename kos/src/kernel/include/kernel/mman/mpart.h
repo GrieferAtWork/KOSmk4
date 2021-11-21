@@ -1138,6 +1138,13 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
                                     mpart_reladdr_t partrel_offset,
                                     struct mpart_physloc *__restrict result);
 
+/* Return a direct pointer to the physical address at `partrel_offset'.
+ * The  # of bytes which can be  read from this address directly depend
+ * on  the alignment of `partrel_offset'. (s.a. `mpart_memaddr_direct') */
+FUNDEF NOBLOCK NONNULL((1)) physaddr_t
+NOTHROW(FCALL mpart_getphysaddr)(struct mpart *__restrict self,
+                                 mpart_reladdr_t partrel_offset);
+
 /* Mark all blocks that overlap with the given address range as CHNG.
  * For this purpose, the caller must ensure that:
  * >> !OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) && endaddr <= mpart_getsize(self)
