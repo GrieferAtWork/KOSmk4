@@ -1008,16 +1008,12 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		}
 
 		/* Do a regular, old memory fault. */
-		TRY {
-			if (!mfault_lockpart_or_unlock(&mf))
-				goto again_lock_mman;
-			if (!mfault_or_unlock(&mf))
-				goto again_lock_mman;
-		} EXCEPT {
-			mfault_fini(&mf);
-			RETHROW();
-		}
+		if (!mfault_lockpart_or_unlock(&mf))
+			goto again_lock_mman;
+		if (!mfault_or_unlock(&mf))
+			goto again_lock_mman;
 	} EXCEPT {
+		mfault_fini(&mf);
 		task_popconnections();
 		if (ecode & X86_PAGEFAULT_ECODE_USERSPACE)
 			PERTASK_SET(this_exception_faultaddr, pc);
