@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x210ca1af */
+/* HASH CRC-32:0xa3b548ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1778,19 +1778,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_np, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* !__CRT_HAVE_strerrorname_np */
 #ifdef __CRT_HAVE_sigabbrev_np
 /* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),(__signum))
 #elif defined(__CRT_HAVE_signalname)
 /* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),signalname,(__signum))
 #else /* ... */
 #include <libc/local/string/sigabbrev_np.h>
 /* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigabbrev_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL sigabbrev_np)(__signo_t __signum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigabbrev_np))(__signum); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdescr_np

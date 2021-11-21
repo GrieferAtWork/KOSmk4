@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77d1a7ec */
+/* HASH CRC-32:0x4ca4b38d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,12 +32,12 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signum);
 /* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_sigabbrev_np)(signo_t signum);
 /* >> sigdescr_np(3)
  * Return a description for the given signal.

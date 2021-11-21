@@ -2634,8 +2634,8 @@ print("	};");
 }
 
 @@>> sigabbrev_np(3)
-@@Return the name of a given signal, without the leading `SIG*' prefix.
-@@If the  given  `signum'  isn't  recognized,  return  `NULL'  instead.
+@@Return the name of a given signal, _without_ the leading `SIG*' prefix.
+@@When the given `signum' isn't  recognized, `NULL' is returned  instead.
 [[decl_include("<bits/types.h>"), export_alias("signalname")]]
 [[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
 [[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
@@ -2679,236 +2679,246 @@ __LIBC char const *const @_sys_siglist@[__NSIG];
 )]]
 char const *sigabbrev_np($signo_t signum) {
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
-	return (unsigned int)signum < __NSIG ? @_sys_siglist@[signum] : NULL;
+	char const *result;
+	if unlikely((unsigned int)signum < __NSIG)
+		return NULL;
+	result = @_sys_siglist@[signum];
+	if likely(result) {
+		if (result[0] == 'S' &&
+		    result[1] == 'I' &&
+		    result[2] == 'G')
+			result += 3;
+	}
+	return result;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
 	char const *result;
 	switch (signum) {
 
 @@pp_ifdef SIGABRT_COMPAT@@
 	case SIGABRT_COMPAT:
-		result = "SIGABRT_COMPAT";
+		result = "ABRT_COMPAT";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGBREAK@@
 	case SIGBREAK:
-		result = "SIGBREAK";
+		result = "BREAK";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGHUP@@
 	case SIGHUP:
-		result = "SIGHUP";
+		result = "HUP";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGINT@@
 	case SIGINT:
-		result = "SIGINT";
+		result = "INT";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGQUIT@@
 	case SIGQUIT:
-		result = "SIGQUIT";
+		result = "QUIT";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGILL@@
 	case SIGILL:
-		result = "SIGILL";
+		result = "ILL";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGTRAP@@
 	case SIGTRAP:
-		result = "SIGTRAP";
+		result = "TRAP";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGABRT@@
 	case SIGABRT:
-		result = "SIGABRT";
+		result = "ABRT";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGBUS@@
 	case SIGBUS:
-		result = "SIGBUS";
+		result = "BUS";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGFPE@@
 	case SIGFPE:
-		result = "SIGFPE";
+		result = "FPE";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGKILL@@
 	case SIGKILL:
-		result = "SIGKILL";
+		result = "KILL";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGUSR1@@
 	case SIGUSR1:
-		result = "SIGUSR1";
+		result = "USR1";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGSEGV@@
 	case SIGSEGV:
-		result = "SIGSEGV";
+		result = "SEGV";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGUSR2@@
 	case SIGUSR2:
-		result = "SIGUSR2";
+		result = "USR2";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGPIPE@@
 	case SIGPIPE:
-		result = "SIGPIPE";
+		result = "PIPE";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGALRM@@
 	case SIGALRM:
-		result = "SIGALRM";
+		result = "ALRM";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGTERM@@
 	case SIGTERM:
-		result = "SIGTERM";
+		result = "TERM";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGSTKFLT@@
 	case SIGSTKFLT:
-		result = "SIGSTKFLT";
+		result = "STKFLT";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGCHLD@@
 	case SIGCHLD:
-		result = "SIGCHLD";
+		result = "CHLD";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGCONT@@
 	case SIGCONT:
-		result = "SIGCONT";
+		result = "CONT";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGSTOP@@
 	case SIGSTOP:
-		result = "SIGSTOP";
+		result = "STOP";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGTSTP@@
 	case SIGTSTP:
-		result = "SIGTSTP";
+		result = "TSTP";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGTTOU@@
 	case SIGTTOU:
-		result = "SIGTTOU";
+		result = "TTOU";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGURG@@
 	case SIGURG:
-		result = "SIGURG";
+		result = "URG";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGXCPU@@
 	case SIGXCPU:
-		result = "SIGXCPU";
+		result = "XCPU";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGXFSZ@@
 	case SIGXFSZ:
-		result = "SIGXFSZ";
+		result = "XFSZ";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGVTALRM@@
 	case SIGVTALRM:
-		result = "SIGVTALRM";
+		result = "VTALRM";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGPROF@@
 	case SIGPROF:
-		result = "SIGPROF";
+		result = "PROF";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGWINCH@@
 	case SIGWINCH:
-		result = "SIGWINCH";
+		result = "WINCH";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGIO@@
 	case SIGIO:
-		result = "SIGIO";
+		result = "IO";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGSYS@@
 	case SIGSYS:
-		result = "SIGSYS";
+		result = "SYS";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGEMT@@
 	case SIGEMT:
-		result = "SIGEMT";
+		result = "EMT";
 		break;
 @@pp_endif@@
 
 @@pp_ifdef SIGLOST@@
 	case SIGLOST:
-		result = "SIGLOST";
+		result = "LOST";
 		break;
 @@pp_endif@@
 
 @@pp_if defined(SIGTTIN) && (!defined(SIGBREAK) || SIGBREAK != SIGTTIN)@@
 	case SIGTTIN:
-		result = "SIGTTIN";
+		result = "TTIN";
 		break;
 @@pp_endif@@
 
 @@pp_if defined(SIGCLD) && (!defined(SIGCHLD) || SIGCLD != SIGCHLD)@@
 	case SIGCLD:
-		result = "SIGCLD";
+		result = "CLD";
 		break;
 @@pp_endif@@
 
 @@pp_if defined(SIGIOT) && (!defined(SIGABRT) || SIGIOT != SIGABRT)@@
 	case SIGIOT:
-		result = "SIGIOT";
+		result = "IOT";
 		break;
 @@pp_endif@@
 
 @@pp_if defined(SIGPOLL) && (!defined(SIGIO) || SIGPOLL != SIGIO)@@
 	case SIGPOLL:
-		result = "SIGPOLL";
+		result = "POLL";
 		break;
 @@pp_endif@@
 
 @@pp_if defined(SIGPWR) && (!defined(SIGLOST) || SIGPWR != SIGLOST)@@
 	case SIGPWR:
-		result = "SIGPWR";
+		result = "PWR";
 		break;
 @@pp_endif@@
 
