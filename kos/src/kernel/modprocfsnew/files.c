@@ -31,6 +31,7 @@
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/futexfd.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/pipe.h>
 #include <kernel/uname.h>
@@ -238,8 +239,27 @@ ProcFS_Kos_RamInfo_Printer(pformatprinter printer, void *arg,
 
 
 
+/************************************************************************/
+/* /proc/kos/futexfd-maxexpr                                            */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_kos_futexfd_maxexpr_print(pformatprinter printer, void *arg,
+                                 size_t UNUSED(offset_hint)) {
+	ProcFS_PrintSize(printer, arg, mfutexfd_maxexpr);
+}
+INTERN void KCALL
+procfs_kos_futexfd_maxexpr_write(USER CHECKED void const *buf,
+                                 size_t bufsize) {
+	size_t newmax;
+	newmax = ProcFS_ParseSize(buf, bufsize, 1, (size_t)-1);
+	ATOMIC_WRITE(mfutexfd_maxexpr, newmax);
+}
+
+
+
+
 #if defined(__x86_64__) || defined(__i386__)
-PRIVATE NONNULL((1)) void KCALL
+PRIVATE void KCALL
 KeepIopl_Write(USER CHECKED void const *buf, size_t bufsize, bool *pvalue) {
 	bool new_value;
 	new_value = ProcFS_ParseBool(buf, bufsize);
@@ -273,7 +293,7 @@ ProcFS_Sys_X86_KeepIopl_Fork_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_fork);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_X86_KeepIopl_Fork_Write(USER CHECKED void const *buf,
                                    size_t bufsize) {
 	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_fork);
@@ -289,7 +309,7 @@ ProcFS_Sys_X86_KeepIopl_Clone_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_clone);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_X86_KeepIopl_Clone_Write(USER CHECKED void const *buf,
                                     size_t bufsize) {
 	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_clone);
@@ -309,7 +329,7 @@ ProcFS_Sys_X86_KeepIopl_Exec_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintBool(printer, arg, keep);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_X86_KeepIopl_Exec_Write(USER CHECKED void const *buf, size_t bufsize) {
 	bool keep;
 	union x86_user_eflags_mask_union oldmask, newmask;
@@ -338,7 +358,7 @@ ProcFS_Sys_Fs_PipeMaxSize_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintSize(printer, arg, ATOMIC_READ(pipe_max_bufsize_unprivileged));
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Fs_PipeMaxSize_Write(USER CHECKED void const *buf,
                                 size_t bufsize) {
 	size_t newsize;
@@ -358,7 +378,7 @@ ProcFS_Sys_Kernel_Domainname_Print(pformatprinter printer, void *arg,
 	printf("%s\n", kernel_uname.domainname);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Kernel_Domainname_Write(USER CHECKED void const *buf,
                                    size_t bufsize) {
 	char temp[_UTSNAME_DOMAIN_LENGTH];
@@ -387,7 +407,7 @@ ProcFS_Sys_Kernel_Hostname_Print(pformatprinter printer, void *arg,
 	printf("%s\n", kernel_uname.nodename);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Kernel_Hostname_Write(USER CHECKED void const *buf,
                                  size_t bufsize) {
 	char temp[_UTSNAME_NODENAME_LENGTH];
@@ -416,7 +436,7 @@ ProcFS_Sys_Kernel_PidMax_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintUPid(printer, arg, ATOMIC_READ(pid_recycle_threshold));
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Kernel_PidMax_Write(USER CHECKED void const *buf,
                                size_t bufsize) {
 	upid_t newvalue;
@@ -443,7 +463,7 @@ ProcFS_Sys_Kernel_RandomizeVaSpace_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintUInt(printer, arg, mman_findunmapped_aslr_getenabled() ? 2 : 0);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Kernel_RandomizeVaSpace_Write(USER CHECKED void const *buf,
                                          size_t bufsize) {
 	unsigned int mode;
@@ -461,7 +481,7 @@ ProcFS_Sys_Kernel_SchedChildRunsFirst_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintBool(printer, arg, (task_start_default_flags & TASK_START_FHIGHPRIO) != 0);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Kernel_SchedChildRunsFirst_Write(USER CHECKED void const *buf,
                                             size_t bufsize) {
 	bool mode;
@@ -483,7 +503,7 @@ ProcFS_Sys_Net_Core_RmemDefault_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintSize(printer, arg, socket_default_rcvbufsiz);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Net_Core_RmemDefault_Write(USER CHECKED void const *buf, size_t bufsize) {
 	size_t newval;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_RCVBUFMIN, socket_default_rcvbufmax);
@@ -500,7 +520,7 @@ ProcFS_Sys_Net_Core_WmemDefault_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintSize(printer, arg, socket_default_sndbufsiz);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Net_Core_WmemDefault_Write(USER CHECKED void const *buf, size_t bufsize) {
 	size_t newval;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_SNDBUFMIN, socket_default_sndbufmax);
@@ -517,7 +537,7 @@ ProcFS_Sys_Net_Core_RmemMax_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintSize(printer, arg, socket_default_rcvbufmax);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Net_Core_RmemMax_Write(USER CHECKED void const *buf, size_t bufsize) {
 	size_t newval, old_dfl;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_RCVBUFMIN);
@@ -540,7 +560,7 @@ ProcFS_Sys_Net_Core_WmemMax_Print(pformatprinter printer, void *arg,
 	ProcFS_PrintSize(printer, arg, socket_default_sndbufmax);
 }
 
-INTERN NONNULL((1)) void KCALL
+INTERN void KCALL
 ProcFS_Sys_Net_Core_WmemMax_Write(USER CHECKED void const *buf, size_t bufsize) {
 	size_t newval, old_dfl;
 	newval = ProcFS_ParseSize(buf, bufsize, SOCKET_SNDBUFMIN);
