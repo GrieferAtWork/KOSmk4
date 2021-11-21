@@ -195,10 +195,8 @@ handle_newsize_ge_oldsize:
 	}
 
 	/* Check if we're allowed to modify the file's size. */
-	if unlikely(self->mf_flags & MFILE_F_FIXEDFILESIZE) {
-		mfile_lock_endwrite(self);
+	if unlikely(self->mf_flags & MFILE_F_FIXEDFILESIZE)
 		THROW(E_FSERROR_READONLY);
-	}
 
 	/* Check that the new file size is allowed by the filesystem. */
 	if (mfile_isnode(self)) {
