@@ -441,35 +441,6 @@ err_exited:
 	      taskpid_getpid(self, THIS_PIDNS));
 }
 
-
-INTERN NONNULL((1)) REF void *KCALL
-handle_task_tryas(struct taskpid *__restrict self,
-                  uintptr_half_t wanted_type)
-		THROWS(E_WOULDBLOCK) {
-	switch (wanted_type) {
-
-	case HANDLE_TYPE_MMAN:
-		if (self != THIS_TASKPID)
-			break;
-		return incref(THIS_MMAN);
-
-	case HANDLE_TYPE_FS:
-		if (self != THIS_TASKPID)
-			break;
-		return incref(THIS_FS);
-
-	case HANDLE_TYPE_PIDNS:
-		if (self != THIS_TASKPID)
-			break;
-		return incref(THIS_PIDNS);
-
-	default: break;
-	}
-	return NULL;
-}
-
-
-
 DECL_END
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_TASK_HANDLE_C */

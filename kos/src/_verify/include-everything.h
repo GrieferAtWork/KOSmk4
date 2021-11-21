@@ -638,15 +638,10 @@ incdir("");
 #include <kos/futexexpr.h>
 #include <kos/guid.h>
 #include <kos/hop/api.h>
-#include <kos/hop/filehandle.h>
-#include <kos/hop/futex.h>
 #include <kos/hop/handle.h>
 #include <kos/hop/mfile.h>
 #include <kos/hop/module.h>
-#include <kos/hop/mpart.h>
 #include <kos/hop/openfd.h>
-#include <kos/hop/path.h>
-#include <kos/hop/pidns.h>
 #include <kos/hop/pipe.h>
 #include <kos/hop/task.h>
 #include <kos/hybrid/heap.h>

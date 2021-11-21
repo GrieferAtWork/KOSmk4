@@ -1202,7 +1202,7 @@ device_v_tryas(struct mfile *__restrict self,
 	case HANDLE_TYPE_PATH:
 		return vfs_mount_location(THIS_VFS, &devfs.fs_root);
 
-	case HANDLE_TYPE_FDIRENT: {
+	case HANDLE_TYPE_DIRENT: {
 		REF struct fdirent *result;
 		device_getname_lock_acquire(me);
 		result = incref(&me->dv_dirent->dd_dirent);

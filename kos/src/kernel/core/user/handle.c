@@ -2322,7 +2322,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 			rb = &me->fu_fifo->ff_buffer;
 		} else {
 			THROW(E_INVALID_HANDLE_FILETYPE, fd,
-			      HANDLE_TYPE_PIDNS, temp.h_type,
+			      HANDLE_TYPE_PIPE, temp.h_type,
 			      HANDLE_TYPEKIND_GENERIC,
 			      handle_typekind(&temp));
 		}

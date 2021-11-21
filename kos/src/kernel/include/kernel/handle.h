@@ -691,7 +691,6 @@ struct path;
 struct taskpid;
 struct task;
 struct mman;
-struct fs;
 struct pipe;
 struct driver;
 struct pidns;
@@ -721,7 +720,7 @@ handle_get_task(unsigned int fd)
 		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
 #define handle_get_mfile(fd)            ((REF struct mfile *)handle_getas(fd, HANDLE_TYPE_MFILE))
-#define handle_get_fdirent(fd)          ((REF struct fdirent *)handle_getas(fd, HANDLE_TYPE_FDIRENT))
+#define handle_get_fdirent(fd)          ((REF struct fdirent *)handle_getas(fd, HANDLE_TYPE_DIRENT))
 #define handle_get_path(fd)             ((REF struct path *)handle_getas(fd, HANDLE_TYPE_PATH))
 #define handle_get_taskpid(fd)          ((REF struct taskpid *)handle_getas(fd, HANDLE_TYPE_TASK))
 #define handle_get_pipe(fd)             ((REF struct pipe *)handle_getas(fd, HANDLE_TYPE_PIPE))
@@ -773,10 +772,9 @@ handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
 #define handle_as_mfile(self)   ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
-#define handle_as_fdirent(self) ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_FDIRENT))
+#define handle_as_fdirent(self) ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_DIRENT))
 #define handle_as_path(self)    ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
 #define handle_as_taskpid(self) ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_TASK))
-#define handle_as_fs(self)      ((REF struct fs *)handle_as(self, HANDLE_TYPE_FS))
 #define handle_as_pipe(self)    ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
 #define handle_as_module(self)  ((REF struct driver *)handle_as(self, HANDLE_TYPE_MODULE))
 #define handle_as_socket(self)  ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))

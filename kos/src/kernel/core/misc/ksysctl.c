@@ -25,9 +25,7 @@
 
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
-#include <kernel/fs/fs.h>
 #include <kernel/fs/path.h>
-#include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
@@ -110,7 +108,7 @@ load_driver_from_file_handles(unsigned int fd_node,
 		if (!driver_path)
 			driver_path = (REF struct path *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_PATH);
 		if (!driver_dentry)
-			driver_dentry = (REF struct fdirent *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_FDIRENT);
+			driver_dentry = (REF struct fdirent *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_DIRENT);
 		/* Lookup the actual INode from which to load the driver. */
 		driver_node = handle_as_mfile(nodehand);
 	} EXCEPT {
@@ -515,42 +513,6 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_MODULE;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &kernel_driver;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
-	}	break;
-
-	case KSYSCTL_OPEN_KERNEL_VFS: {
-		struct handle temp;
-		cred_require_sysadmin();
-		temp.h_type = HANDLE_TYPE_PATH;
-		temp.h_mode = IO_RDWR;
-		temp.h_data = &vfs_kernel;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
-	}	break;
-
-	case KSYSCTL_OPEN_KERNEL_FS: {
-		struct handle temp;
-		require(CAP_KERNEL_QUERY);
-		temp.h_type = HANDLE_TYPE_FS;
-		temp.h_mode = IO_RDWR;
-		temp.h_data = &fs_kernel;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
-	}	break;
-
-	case KSYSCTL_OPEN_KERNEL_MMAN: {
-		struct handle temp;
-		require(CAP_KERNEL_QUERY);
-		temp.h_type = HANDLE_TYPE_MMAN;
-		temp.h_mode = IO_RDWR;
-		temp.h_data = &mman_kernel;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
-	}	break;
-
-	case KSYSCTL_OPEN_ROOT_PIDNS: {
-		struct handle temp;
-		require(CAP_KERNEL_QUERY);
-		temp.h_type = HANDLE_TYPE_PIDNS;
-		temp.h_mode = IO_RDWR;
-		temp.h_data = &pidns_root;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 

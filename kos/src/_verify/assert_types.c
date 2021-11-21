@@ -438,12 +438,8 @@ local files = {
 	"../../include/kos/exec/elf.h",
 	"../../include/kos/hop/api.h",
 	"../../include/kos/hop/module.h",
-	"../../include/kos/hop/filehandle.h",
-	"../../include/kos/hop/futex.h",
 	"../../include/kos/hop/handle.h",
 	"../../include/kos/hop/openfd.h",
-	"../../include/kos/hop/path.h",
-	"../../include/kos/hop/pidns.h",
 	"../../include/kos/hop/pipe.h",
 	"../../include/kos/hop/task.h",
 	"../../include/kos/ksysctl.h",
@@ -1716,12 +1712,6 @@ static_assert(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
 
 
 
-#include <kos/hop/mpart.h>
-
-
-
-
-
 #include <kos/hop/module.h>
 
 /* struct hop_driver_stat */
@@ -1756,25 +1746,6 @@ static_assert(sizeof(struct hop_driver_open_dependency) == __SIZEOF_HOP_DRIVER_O
 
 
 
-#include <kos/hop/filehandle.h>
-
-/* struct hop_filehandle_cmpxchg_offset */
-static_assert(offsetof(struct hop_filehandle_cmpxchg_offset, cxo_expoffset) == __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_EXPOFFSET);
-static_assert(offsetof(struct hop_filehandle_cmpxchg_offset, cxo_newoffset) == __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_NEWOFFSET);
-static_assert(offsetof(struct hop_filehandle_cmpxchg_offset, cxo_oldoffset) == __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_OLDOFFSET);
-static_assert(offsetof(struct hop_filehandle_cmpxchg_offset, cxo_struct_size) == __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_STRUCT_SIZE);
-static_assert(sizeof(struct hop_filehandle_cmpxchg_offset) == __SIZEOF_HOP_FILEHANDLE_CMPXCHG_OFFSET);
-
-
-
-
-
-#include <kos/hop/futex.h>
-
-
-
-
-
 #include <kos/hop/handle.h>
 
 /* struct hop_handle_stat */
@@ -1798,18 +1769,6 @@ static_assert(offsetof(struct hop_openfd, of_flags) == __OFFSET_HOP_OPENFD_FLAGS
 static_assert(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
 static_assert(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
 static_assert(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
-
-
-
-
-
-#include <kos/hop/path.h>
-
-
-
-
-
-#include <kos/hop/pidns.h>
 
 
 

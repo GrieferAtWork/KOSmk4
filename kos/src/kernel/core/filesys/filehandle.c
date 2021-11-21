@@ -290,7 +290,7 @@ handle_filehandle_tryas(struct filehandle *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 	case HANDLE_TYPE_MFILE: return incref(self->fh_file);
-	case HANDLE_TYPE_FDIRENT: return xincref(self->fh_dirent);
+	case HANDLE_TYPE_DIRENT: return xincref(self->fh_dirent);
 	case HANDLE_TYPE_PATH: return xincref(self->fh_path);
 	default: break;
 	}

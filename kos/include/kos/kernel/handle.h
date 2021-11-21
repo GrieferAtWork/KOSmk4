@@ -51,61 +51,48 @@
  * $ deemon -F kos/src/kernel/core/user/handle-router.c kos/src/kernel/include/kernel/handle-proto.h && touch kos/src/kernel/include/kernel/handle.h
  */
 #define HANDLE_TYPE_UNDEFINED       0x0000 /* Undefined/unused handle */
-#define HANDLE_TYPE_FILEHANDLE      0x0001 /* `struct filehandle'
-                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_FDIRENT */
-#define HANDLE_TYPE_SOCKET          0x0002 /* `struct socket' */
-#define HANDLE_TYPE_EPOLL           0x0003 /* `struct epoll_controller' */
-#define HANDLE_TYPE_PIPE            0x0004 /* `struct pipe' */
-#define HANDLE_TYPE_PIPE_READER     0x0005 /* `struct pipe_reader' */
-#define HANDLE_TYPE_PIPE_WRITER     0x0006 /* `struct pipe_writer' */
-#define HANDLE_TYPE_FIFOHANDLE      0x0007 /* `struct fifohandle' */
-#define HANDLE_TYPE_EVENTFD_FENCE   0x0008 /* `struct eventfd' (without `EFD_SEMAPHORE') */
-#define HANDLE_TYPE_EVENTFD_SEMA    0x0009 /* `struct eventfd' (with `EFD_SEMAPHORE') */
-#define HANDLE_TYPE_SIGNALFD        0x000a /* `struct signalfd' */
-#define HANDLE_TYPE_FUTEX           0x000b /* `struct mfutex' */
-#define HANDLE_TYPE_FUTEXFD         0x000c /* `struct mfutexfd' */
-#define HANDLE_TYPE_DIRHANDLE       0x000d /* `struct dirhandle'
-                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_FDIRENT */
-#define HANDLE_TYPE_MFILE           0x000e /* `struct mfile' */
-#define HANDLE_TYPE_FDIRENT         0x000f /* `struct fdirent' */
-#define HANDLE_TYPE_PATH            0x0010 /* `struct path'
-                                            * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_FDIRENT */
-#define HANDLE_TYPE_FS              0x0011 /* `struct fs' */
-#define HANDLE_TYPE_MMAN            0x0012 /* `struct mman' */
-#define HANDLE_TYPE_TASK            0x0013 /* `struct taskpid'
-                                            * Castable into: HANDLE_TYPE_FS, HANDLE_TYPE_MMAN, HANDLE_TYPE_PIDNS */
-#define HANDLE_TYPE_MODULE          0x0014 /* `struct module' */
-#define HANDLE_TYPE_PIDNS           0x0015 /* `struct pidns' */
-#define HANDLE_TYPE_DRIVER_LOADLIST 0x0016 /* `struct driver_loadlist' */
-#define HANDLE_TYPE_MPART           0x0017 /* `struct mpart' */
-#define HANDLE_TYPE_MODULE_SECTION  0x0018 /* `struct module_section' */
-#define HANDLE_TYPE_REFCOUNTABLE    0x0019 /* `struct refcountable' */
-#define HANDLE_TYPE_COUNT           0x001a /* # of recognized handle types
+#define HANDLE_TYPE_MFILE           0x0001 /* `struct mfile' */
+#define HANDLE_TYPE_DIRENT          0x0002 /* `struct fdirent' */
+#define HANDLE_TYPE_PATH            0x0003 /* `struct path'
+                                            * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRENT */
+#define HANDLE_TYPE_FILEHANDLE      0x0004 /* `struct filehandle'
+                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRENT */
+#define HANDLE_TYPE_DIRHANDLE       0x0005 /* `struct dirhandle'
+                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRENT */
+#define HANDLE_TYPE_FIFOHANDLE      0x0006 /* `struct fifohandle' */
+#define HANDLE_TYPE_SOCKET          0x0007 /* `struct socket' */
+#define HANDLE_TYPE_EPOLL           0x0008 /* `struct epoll_controller' */
+#define HANDLE_TYPE_PIPE            0x0009 /* `struct pipe' */
+#define HANDLE_TYPE_PIPE_READER     0x000a /* `struct pipe_reader' */
+#define HANDLE_TYPE_PIPE_WRITER     0x000b /* `struct pipe_writer' */
+#define HANDLE_TYPE_EVENTFD_FENCE   0x000c /* `struct eventfd' (without `EFD_SEMAPHORE') */
+#define HANDLE_TYPE_EVENTFD_SEMA    0x000d /* `struct eventfd' (with `EFD_SEMAPHORE') */
+#define HANDLE_TYPE_SIGNALFD        0x000e /* `struct signalfd' */
+#define HANDLE_TYPE_FUTEXFD         0x000f /* `struct mfutexfd' */
+#define HANDLE_TYPE_TASK            0x0010 /* `struct taskpid' */
+#define HANDLE_TYPE_MODULE          0x0011 /* `struct module' */
+#define HANDLE_TYPE_DRIVER_LOADLIST 0x0012 /* `struct driver_loadlist' */
+#define HANDLE_TYPE_REFCOUNTABLE    0x0013 /* `struct refcountable' */
+#define HANDLE_TYPE_COUNT           0x0014 /* # of recognized handle types
                                             * NOTE: After changing  this value,  be sure  to
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
-#define HANDLE_FOREACH_TYPE(cb)                           \
-	cb(HANDLE_TYPE_MFILE, struct mfile)                   \
-	cb(HANDLE_TYPE_FDIRENT, struct fdirent)               \
-	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)         \
-	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)           \
-	cb(HANDLE_TYPE_PATH, struct path)                     \
-	cb(HANDLE_TYPE_FS, struct fs)                         \
-	cb(HANDLE_TYPE_MMAN, struct mman)                     \
-	cb(HANDLE_TYPE_TASK, struct taskpid)                  \
-	cb(HANDLE_TYPE_MODULE, struct driver)                 \
-	cb(HANDLE_TYPE_PIPE, struct pipe)                     \
-	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)       \
-	cb(HANDLE_TYPE_PIPE_WRITER, struct pipe_writer)       \
-	cb(HANDLE_TYPE_PIDNS, struct pidns)                   \
-	cb(HANDLE_TYPE_DRIVER_LOADLIST, struct driver_state)  \
-	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)             \
-	cb(HANDLE_TYPE_MPART, struct mpart)                   \
-	cb(HANDLE_TYPE_FUTEX, struct mfutex)                  \
-	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)              \
-	cb(HANDLE_TYPE_MODULE_SECTION, struct driver_section) \
-	cb(HANDLE_TYPE_SOCKET, struct socket)                 \
+#define HANDLE_FOREACH_TYPE(cb)                          \
+	cb(HANDLE_TYPE_MFILE, struct mfile)                  \
+	cb(HANDLE_TYPE_DIRENT, struct fdirent)              \
+	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)        \
+	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)          \
+	cb(HANDLE_TYPE_PATH, struct path)                    \
+	cb(HANDLE_TYPE_TASK, struct taskpid)                 \
+	cb(HANDLE_TYPE_MODULE, struct driver)                \
+	cb(HANDLE_TYPE_PIPE, struct pipe)                    \
+	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)      \
+	cb(HANDLE_TYPE_PIPE_WRITER, struct pipe_writer)      \
+	cb(HANDLE_TYPE_DRIVER_LOADLIST, struct driver_state) \
+	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)            \
+	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)             \
+	cb(HANDLE_TYPE_SOCKET, struct socket)                \
 	cb(HANDLE_TYPE_REFCOUNTABLE, struct refcountable)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle  type
@@ -113,7 +100,6 @@
  * as `register_async_worker()' or `hisr_register()') */
 #define HANDLE_FOREACH_CUSTOMTYPE(cb)     \
 	cb(HANDLE_TYPE_MFILE, struct mfile)   \
-	cb(HANDLE_TYPE_MMAN, struct mman)     \
 	cb(HANDLE_TYPE_MODULE, struct driver) \
 	cb(HANDLE_TYPE_SOCKET, struct socket) \
 	cb(HANDLE_TYPE_REFCOUNTABLE, struct refcountable)
@@ -136,10 +122,6 @@
 /* Handle kinds for `HANDLE_TYPE_MODULE' */
 #define HANDLE_TYPEKIND_MODULE_GENERIC        0x0000 /* The handle refers to a `struct module' */
 #define HANDLE_TYPEKIND_MODULE_DRIVER         0x0001 /* The handle refers to a `struct driver' */
-
-/* Handle kinds for `HANDLE_TYPE_MODULE_SECTION' */
-#define HANDLE_TYPEKIND_MODULE_SECTION_GENERIC 0x0000 /* The handle refers to a `struct module_section' */
-#define HANDLE_TYPEKIND_MODULE_SECTION_DRIVER  0x0001 /* The handle refers to a `struct driver_section' */
 
 
 #endif /* !_KOS_KERNEL_HANDLE_H */

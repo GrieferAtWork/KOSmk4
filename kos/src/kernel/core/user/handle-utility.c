@@ -94,13 +94,6 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 			return HANDLE_TYPEKIND_MODULE_DRIVER;
 	}	break;
 
-	case HANDLE_TYPE_MODULE_SECTION: {
-		struct module_section *me = (struct module_section *)self->h_data;
-		struct module *mod        = me->ms_module;
-		if (module_isdriver(mod))
-			return HANDLE_TYPEKIND_MODULE_SECTION_DRIVER;
-	}	break;
-
 	default: break;
 	}
 	return HANDLE_TYPEKIND_GENERIC;
@@ -139,7 +132,7 @@ handle_datasize(struct handle const *__restrict self,
 		value = mfile_datasize(me);
 	}	break;
 
-	case HANDLE_TYPE_FDIRENT: {
+	case HANDLE_TYPE_DIRENT: {
 		struct fdirent *me;
 		me    = (struct fdirent *)self->h_data;
 		value = (pos_t)me->fd_namelen;
@@ -158,10 +151,6 @@ handle_datasize(struct handle const *__restrict self,
 		value = mfile_datasize(me->p_dir);
 	}	break;
 
-	case HANDLE_TYPE_MMAN:
-		value = ((pos_t)(uintptr_t)-1) + 1;
-		break;
-
 	case HANDLE_TYPE_MODULE: {
 		struct driver *me;
 		me = (struct driver *)self->h_data;
@@ -179,12 +168,6 @@ handle_datasize(struct handle const *__restrict self,
 		struct pipe_reader *me;
 		me    = (struct pipe_reader *)self->h_data;
 		value = (pos_t)ATOMIC_READ(me->pr_pipe->p_buffer.rb_avail);
-	}	break;
-
-	case HANDLE_TYPE_PIDNS: {
-		struct pidns *me;
-		me    = (struct pidns *)self->h_data;
-		value = (pos_t)ATOMIC_READ(me->pn_size);
 	}	break;
 
 	case HANDLE_TYPE_DRIVER_LOADLIST: {

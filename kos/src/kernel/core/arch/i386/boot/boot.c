@@ -950,24 +950,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Re-write "moddbx/obnode.c" from scratch, now that `CONFIG_USE_NEW_FS' is mandatory. */
 
-	/* TODO: Get rid of HANDLE_TYPE_MPART */
-
-	/* TODO: Get rid of HANDLE_TYPE_MFUTEX */
-
-	/* TODO: Get rid of HANDLE_TYPE_FS */
-
-	/* TODO: Get rid of HANDLE_TYPE_VFS */
-
-	/* TODO: Get rid of HANDLE_TYPE_MMAN */
-
-	/* TODO: Get rid of HANDLE_TYPE_MODULE_SECTION */
-
-	/* TODO: Get rid of HANDLE_TYPE_PIDNS */
-
 	/* TODO: `HOP_SUPERBLOCK_FEATURES' is used by `fpathconf(3)', but is no longer being implemented
 	 *       Look at  what's actually  being used  and add  kos-specific ioctls  for what's  needed! */
-
-	/* TODO: Rename `HANDLE_TYPE_FDIRENT' to `HANDLE_TYPE_DIRENT' */
 
 	/* TODO: `HANDLE_TYPEKIND_MFILE_*' needs to be expanded with all of the new sub-classes of MFILE,
 	 *       as well as all of the subclasses of those types. The system should be designed such that

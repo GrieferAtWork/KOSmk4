@@ -343,7 +343,7 @@ handle_dirhandle_tryas(struct dirhandle *__restrict self,
 	switch (wanted_type) {
 	case HANDLE_TYPE_MFILE:
 		return incref(self->dh_enum.de_dir);
-	case HANDLE_TYPE_FDIRENT:
+	case HANDLE_TYPE_DIRENT:
 		return xincref(self->dh_dirent);
 	case HANDLE_TYPE_PATH:
 		return xincref(self->dh_path);

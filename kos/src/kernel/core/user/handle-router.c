@@ -338,847 +338,769 @@ INTERN BLOCKING NONNULL((1, 2)) ATTR_SECTION(".text.kernel.handle_undefined.prin
 PUBLIC_CONST struct handle_types const handle_type_db = {
 	.h_typename = {
 		[HANDLE_TYPE_UNDEFINED]       =  "undefined",
+		[HANDLE_TYPE_MFILE]           =  "mfile",
+		[HANDLE_TYPE_DIRENT]          =  "dirent",
+		[HANDLE_TYPE_PATH]            =  "path",
 		[HANDLE_TYPE_FILEHANDLE]      =  "filehandle",
+		[HANDLE_TYPE_DIRHANDLE]       =  "dirhandle",
+		[HANDLE_TYPE_FIFOHANDLE]      =  "fifohandle",
 		[HANDLE_TYPE_SOCKET]          =  "socket",
 		[HANDLE_TYPE_EPOLL]           =  "epoll",
 		[HANDLE_TYPE_PIPE]            =  "pipe",
 		[HANDLE_TYPE_PIPE_READER]     =  "pipe_reader",
 		[HANDLE_TYPE_PIPE_WRITER]     =  "pipe_writer",
-		[HANDLE_TYPE_FIFOHANDLE]      =  "fifohandle",
 		[HANDLE_TYPE_EVENTFD_FENCE]   =  "eventfd_fence",
 		[HANDLE_TYPE_EVENTFD_SEMA]    =  "eventfd_sema",
 		[HANDLE_TYPE_SIGNALFD]        =  "signalfd",
-		[HANDLE_TYPE_FUTEX]           =  "futex",
 		[HANDLE_TYPE_FUTEXFD]         =  "futexfd",
-		[HANDLE_TYPE_DIRHANDLE]       =  "dirhandle",
-		[HANDLE_TYPE_MFILE]           =  "mfile",
-		[HANDLE_TYPE_FDIRENT]         =  "fdirent",
-		[HANDLE_TYPE_PATH]            =  "path",
-		[HANDLE_TYPE_FS]              =  "fs",
-		[HANDLE_TYPE_MMAN]            =  "mman",
 		[HANDLE_TYPE_TASK]            =  "task",
 		[HANDLE_TYPE_MODULE]          =  "module",
-		[HANDLE_TYPE_PIDNS]           =  "pidns",
 		[HANDLE_TYPE_DRIVER_LOADLIST] =  "driver_loadlist",
-		[HANDLE_TYPE_MPART]           =  "mpart",
-		[HANDLE_TYPE_MODULE_SECTION]  =  "module_section",
 		[HANDLE_TYPE_REFCOUNTABLE]    =  "refcountable"
 	},
 	.h_refcnt = {
 		[HANDLE_TYPE_UNDEFINED]       = (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
+		[HANDLE_TYPE_MFILE]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_mfile_refcnt,
+		[HANDLE_TYPE_DIRENT]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_dirent_refcnt,
+		[HANDLE_TYPE_PATH]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_path_refcnt,
 		[HANDLE_TYPE_FILEHANDLE]      = (refcnt_t (FCALL *)(void const *__restrict))&handle_filehandle_refcnt,
+		[HANDLE_TYPE_DIRHANDLE]       = (refcnt_t (FCALL *)(void const *__restrict))&handle_dirhandle_refcnt,
+		[HANDLE_TYPE_FIFOHANDLE]      = (refcnt_t (FCALL *)(void const *__restrict))&handle_fifohandle_refcnt,
 		[HANDLE_TYPE_SOCKET]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_socket_refcnt,
 		[HANDLE_TYPE_EPOLL]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_epoll_refcnt,
 		[HANDLE_TYPE_PIPE]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_refcnt,
 		[HANDLE_TYPE_PIPE_READER]     = (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_reader_refcnt,
 		[HANDLE_TYPE_PIPE_WRITER]     = (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_writer_refcnt,
-		[HANDLE_TYPE_FIFOHANDLE]      = (refcnt_t (FCALL *)(void const *__restrict))&handle_fifohandle_refcnt,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_fence_refcnt,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_sema_refcnt,
 		[HANDLE_TYPE_SIGNALFD]        = (refcnt_t (FCALL *)(void const *__restrict))&handle_signalfd_refcnt,
-		[HANDLE_TYPE_FUTEX]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_futex_refcnt,
 		[HANDLE_TYPE_FUTEXFD]         = (refcnt_t (FCALL *)(void const *__restrict))&handle_futexfd_refcnt,
-		[HANDLE_TYPE_DIRHANDLE]       = (refcnt_t (FCALL *)(void const *__restrict))&handle_dirhandle_refcnt,
-		[HANDLE_TYPE_MFILE]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_mfile_refcnt,
-		[HANDLE_TYPE_FDIRENT]         = (refcnt_t (FCALL *)(void const *__restrict))&handle_fdirent_refcnt,
-		[HANDLE_TYPE_PATH]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_path_refcnt,
-		[HANDLE_TYPE_FS]              = (refcnt_t (FCALL *)(void const *__restrict))&handle_fs_refcnt,
-		[HANDLE_TYPE_MMAN]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_mman_refcnt,
 		[HANDLE_TYPE_TASK]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_task_refcnt,
 		[HANDLE_TYPE_MODULE]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_module_refcnt,
-		[HANDLE_TYPE_PIDNS]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_pidns_refcnt,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_loadlist_refcnt,
-		[HANDLE_TYPE_MPART]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_mpart_refcnt,
-		[HANDLE_TYPE_MODULE_SECTION]  = (refcnt_t (FCALL *)(void const *__restrict))&handle_module_section_refcnt,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (refcnt_t (FCALL *)(void const *__restrict))&handle_refcountable_refcnt
 	},
 	.h_incref = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (FCALL *)(void *__restrict))&handle_undefined_incref,
+		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(void *__restrict))&handle_mfile_incref,
+		[HANDLE_TYPE_DIRENT]          = (void (FCALL *)(void *__restrict))&handle_dirent_incref,
+		[HANDLE_TYPE_PATH]            = (void (FCALL *)(void *__restrict))&handle_path_incref,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (FCALL *)(void *__restrict))&handle_filehandle_incref,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(void *__restrict))&handle_dirhandle_incref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(void *__restrict))&handle_fifohandle_incref,
 		[HANDLE_TYPE_SOCKET]          = (void (FCALL *)(void *__restrict))&handle_socket_incref,
 		[HANDLE_TYPE_EPOLL]           = (void (FCALL *)(void *__restrict))&handle_epoll_incref,
 		[HANDLE_TYPE_PIPE]            = (void (FCALL *)(void *__restrict))&handle_pipe_incref,
 		[HANDLE_TYPE_PIPE_READER]     = (void (FCALL *)(void *__restrict))&handle_pipe_reader_incref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (FCALL *)(void *__restrict))&handle_pipe_writer_incref,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(void *__restrict))&handle_fifohandle_incref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (FCALL *)(void *__restrict))&handle_eventfd_fence_incref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(void *__restrict))&handle_eventfd_sema_incref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(void *__restrict))&handle_signalfd_incref,
-		[HANDLE_TYPE_FUTEX]           = (void (FCALL *)(void *__restrict))&handle_futex_incref,
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(void *__restrict))&handle_futexfd_incref,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(void *__restrict))&handle_dirhandle_incref,
-		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(void *__restrict))&handle_mfile_incref,
-		[HANDLE_TYPE_FDIRENT]         = (void (FCALL *)(void *__restrict))&handle_fdirent_incref,
-		[HANDLE_TYPE_PATH]            = (void (FCALL *)(void *__restrict))&handle_path_incref,
-		[HANDLE_TYPE_FS]              = (void (FCALL *)(void *__restrict))&handle_fs_incref,
-		[HANDLE_TYPE_MMAN]            = (void (FCALL *)(void *__restrict))&handle_mman_incref,
 		[HANDLE_TYPE_TASK]            = (void (FCALL *)(void *__restrict))&handle_task_incref,
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(void *__restrict))&handle_module_incref,
-		[HANDLE_TYPE_PIDNS]           = (void (FCALL *)(void *__restrict))&handle_pidns_incref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(void *__restrict))&handle_driver_loadlist_incref,
-		[HANDLE_TYPE_MPART]           = (void (FCALL *)(void *__restrict))&handle_mpart_incref,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (FCALL *)(void *__restrict))&handle_module_section_incref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(void *__restrict))&handle_refcountable_incref
 	},
 	.h_decref = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (FCALL *)(REF void *__restrict))&handle_undefined_decref,
+		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(REF void *__restrict))&handle_mfile_decref,
+		[HANDLE_TYPE_DIRENT]          = (void (FCALL *)(REF void *__restrict))&handle_dirent_decref,
+		[HANDLE_TYPE_PATH]            = (void (FCALL *)(REF void *__restrict))&handle_path_decref,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (FCALL *)(REF void *__restrict))&handle_filehandle_decref,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(REF void *__restrict))&handle_dirhandle_decref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(REF void *__restrict))&handle_fifohandle_decref,
 		[HANDLE_TYPE_SOCKET]          = (void (FCALL *)(REF void *__restrict))&handle_socket_decref,
 		[HANDLE_TYPE_EPOLL]           = (void (FCALL *)(REF void *__restrict))&handle_epoll_decref,
 		[HANDLE_TYPE_PIPE]            = (void (FCALL *)(REF void *__restrict))&handle_pipe_decref,
 		[HANDLE_TYPE_PIPE_READER]     = (void (FCALL *)(REF void *__restrict))&handle_pipe_reader_decref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (FCALL *)(REF void *__restrict))&handle_pipe_writer_decref,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(REF void *__restrict))&handle_fifohandle_decref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (FCALL *)(REF void *__restrict))&handle_eventfd_fence_decref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(REF void *__restrict))&handle_eventfd_sema_decref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(REF void *__restrict))&handle_signalfd_decref,
-		[HANDLE_TYPE_FUTEX]           = (void (FCALL *)(REF void *__restrict))&handle_futex_decref,
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(REF void *__restrict))&handle_futexfd_decref,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(REF void *__restrict))&handle_dirhandle_decref,
-		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(REF void *__restrict))&handle_mfile_decref,
-		[HANDLE_TYPE_FDIRENT]         = (void (FCALL *)(REF void *__restrict))&handle_fdirent_decref,
-		[HANDLE_TYPE_PATH]            = (void (FCALL *)(REF void *__restrict))&handle_path_decref,
-		[HANDLE_TYPE_FS]              = (void (FCALL *)(REF void *__restrict))&handle_fs_decref,
-		[HANDLE_TYPE_MMAN]            = (void (FCALL *)(REF void *__restrict))&handle_mman_decref,
 		[HANDLE_TYPE_TASK]            = (void (FCALL *)(REF void *__restrict))&handle_task_decref,
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(REF void *__restrict))&handle_module_decref,
-		[HANDLE_TYPE_PIDNS]           = (void (FCALL *)(REF void *__restrict))&handle_pidns_decref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(REF void *__restrict))&handle_driver_loadlist_decref,
-		[HANDLE_TYPE_MPART]           = (void (FCALL *)(REF void *__restrict))&handle_mpart_decref,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (FCALL *)(REF void *__restrict))&handle_module_section_decref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(REF void *__restrict))&handle_refcountable_decref
 	},
 	.h_tryincref = {
 		[HANDLE_TYPE_UNDEFINED]       = (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
+		[HANDLE_TYPE_MFILE]           = (__BOOL (FCALL *)(void *__restrict))&handle_mfile_tryincref,
+		[HANDLE_TYPE_DIRENT]          = (__BOOL (FCALL *)(void *__restrict))&handle_dirent_tryincref,
+		[HANDLE_TYPE_PATH]            = (__BOOL (FCALL *)(void *__restrict))&handle_path_tryincref,
 		[HANDLE_TYPE_FILEHANDLE]      = (__BOOL (FCALL *)(void *__restrict))&handle_filehandle_tryincref,
+		[HANDLE_TYPE_DIRHANDLE]       = (__BOOL (FCALL *)(void *__restrict))&handle_dirhandle_tryincref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (__BOOL (FCALL *)(void *__restrict))&handle_fifohandle_tryincref,
 		[HANDLE_TYPE_SOCKET]          = (__BOOL (FCALL *)(void *__restrict))&handle_socket_tryincref,
 		[HANDLE_TYPE_EPOLL]           = (__BOOL (FCALL *)(void *__restrict))&handle_epoll_tryincref,
 		[HANDLE_TYPE_PIPE]            = (__BOOL (FCALL *)(void *__restrict))&handle_pipe_tryincref,
 		[HANDLE_TYPE_PIPE_READER]     = (__BOOL (FCALL *)(void *__restrict))&handle_pipe_reader_tryincref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (__BOOL (FCALL *)(void *__restrict))&handle_pipe_writer_tryincref,
-		[HANDLE_TYPE_FIFOHANDLE]      = (__BOOL (FCALL *)(void *__restrict))&handle_fifohandle_tryincref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_fence_tryincref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_sema_tryincref,
 		[HANDLE_TYPE_SIGNALFD]        = (__BOOL (FCALL *)(void *__restrict))&handle_signalfd_tryincref,
-		[HANDLE_TYPE_FUTEX]           = (__BOOL (FCALL *)(void *__restrict))&handle_futex_tryincref,
 		[HANDLE_TYPE_FUTEXFD]         = (__BOOL (FCALL *)(void *__restrict))&handle_futexfd_tryincref,
-		[HANDLE_TYPE_DIRHANDLE]       = (__BOOL (FCALL *)(void *__restrict))&handle_dirhandle_tryincref,
-		[HANDLE_TYPE_MFILE]           = (__BOOL (FCALL *)(void *__restrict))&handle_mfile_tryincref,
-		[HANDLE_TYPE_FDIRENT]         = (__BOOL (FCALL *)(void *__restrict))&handle_fdirent_tryincref,
-		[HANDLE_TYPE_PATH]            = (__BOOL (FCALL *)(void *__restrict))&handle_path_tryincref,
-		[HANDLE_TYPE_FS]              = (__BOOL (FCALL *)(void *__restrict))&handle_fs_tryincref,
-		[HANDLE_TYPE_MMAN]            = (__BOOL (FCALL *)(void *__restrict))&handle_mman_tryincref,
 		[HANDLE_TYPE_TASK]            = (__BOOL (FCALL *)(void *__restrict))&handle_task_tryincref,
 		[HANDLE_TYPE_MODULE]          = (__BOOL (FCALL *)(void *__restrict))&handle_module_tryincref,
-		[HANDLE_TYPE_PIDNS]           = (__BOOL (FCALL *)(void *__restrict))&handle_pidns_tryincref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (__BOOL (FCALL *)(void *__restrict))&handle_driver_loadlist_tryincref,
-		[HANDLE_TYPE_MPART]           = (__BOOL (FCALL *)(void *__restrict))&handle_mpart_tryincref,
-		[HANDLE_TYPE_MODULE_SECTION]  = (__BOOL (FCALL *)(void *__restrict))&handle_module_section_tryincref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (__BOOL (FCALL *)(void *__restrict))&handle_refcountable_tryincref
 	},
 	.h_weakgetref = {
 		[HANDLE_TYPE_UNDEFINED]       = (WEAK REF void *(FCALL *)(void *__restrict))&handle_undefined_weakgetref,
+		[HANDLE_TYPE_MFILE]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_mfile_weakgetref,
+		[HANDLE_TYPE_DIRENT]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_dirent_weakgetref,
+		[HANDLE_TYPE_PATH]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_path_weakgetref,
 		[HANDLE_TYPE_FILEHANDLE]      = (WEAK REF void *(FCALL *)(void *__restrict))&handle_filehandle_weakgetref,
+		[HANDLE_TYPE_DIRHANDLE]       = (WEAK REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weakgetref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fifohandle_weakgetref,
 		[HANDLE_TYPE_SOCKET]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_socket_weakgetref,
 		[HANDLE_TYPE_EPOLL]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_epoll_weakgetref,
 		[HANDLE_TYPE_PIPE]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_weakgetref,
 		[HANDLE_TYPE_PIPE_READER]     = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_reader_weakgetref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_writer_weakgetref,
-		[HANDLE_TYPE_FIFOHANDLE]      = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fifohandle_weakgetref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_fence_weakgetref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weakgetref,
 		[HANDLE_TYPE_SIGNALFD]        = (WEAK REF void *(FCALL *)(void *__restrict))&handle_signalfd_weakgetref,
-		[HANDLE_TYPE_FUTEX]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_futex_weakgetref,
 		[HANDLE_TYPE_FUTEXFD]         = (WEAK REF void *(FCALL *)(void *__restrict))&handle_futexfd_weakgetref,
-		[HANDLE_TYPE_DIRHANDLE]       = (WEAK REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weakgetref,
-		[HANDLE_TYPE_MFILE]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_mfile_weakgetref,
-		[HANDLE_TYPE_FDIRENT]         = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fdirent_weakgetref,
-		[HANDLE_TYPE_PATH]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_path_weakgetref,
-		[HANDLE_TYPE_FS]              = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fs_weakgetref,
-		[HANDLE_TYPE_MMAN]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_mman_weakgetref,
 		[HANDLE_TYPE_TASK]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_task_weakgetref,
 		[HANDLE_TYPE_MODULE]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_module_weakgetref,
-		[HANDLE_TYPE_PIDNS]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pidns_weakgetref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weakgetref,
-		[HANDLE_TYPE_MPART]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_mpart_weakgetref,
-		[HANDLE_TYPE_MODULE_SECTION]  = (WEAK REF void *(FCALL *)(void *__restrict))&handle_module_section_weakgetref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (WEAK REF void *(FCALL *)(void *__restrict))&handle_refcountable_weakgetref
 	},
 	.h_weaklckref = {
 		[HANDLE_TYPE_UNDEFINED]       = (REF void *(FCALL *)(void *__restrict))&handle_undefined_weaklckref,
+		[HANDLE_TYPE_MFILE]           = (REF void *(FCALL *)(void *__restrict))&handle_mfile_weaklckref,
+		[HANDLE_TYPE_DIRENT]          = (REF void *(FCALL *)(void *__restrict))&handle_dirent_weaklckref,
+		[HANDLE_TYPE_PATH]            = (REF void *(FCALL *)(void *__restrict))&handle_path_weaklckref,
 		[HANDLE_TYPE_FILEHANDLE]      = (REF void *(FCALL *)(void *__restrict))&handle_filehandle_weaklckref,
+		[HANDLE_TYPE_DIRHANDLE]       = (REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weaklckref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (REF void *(FCALL *)(void *__restrict))&handle_fifohandle_weaklckref,
 		[HANDLE_TYPE_SOCKET]          = (REF void *(FCALL *)(void *__restrict))&handle_socket_weaklckref,
 		[HANDLE_TYPE_EPOLL]           = (REF void *(FCALL *)(void *__restrict))&handle_epoll_weaklckref,
 		[HANDLE_TYPE_PIPE]            = (REF void *(FCALL *)(void *__restrict))&handle_pipe_weaklckref,
 		[HANDLE_TYPE_PIPE_READER]     = (REF void *(FCALL *)(void *__restrict))&handle_pipe_reader_weaklckref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (REF void *(FCALL *)(void *__restrict))&handle_pipe_writer_weaklckref,
-		[HANDLE_TYPE_FIFOHANDLE]      = (REF void *(FCALL *)(void *__restrict))&handle_fifohandle_weaklckref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (REF void *(FCALL *)(void *__restrict))&handle_eventfd_fence_weaklckref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weaklckref,
 		[HANDLE_TYPE_SIGNALFD]        = (REF void *(FCALL *)(void *__restrict))&handle_signalfd_weaklckref,
-		[HANDLE_TYPE_FUTEX]           = (REF void *(FCALL *)(void *__restrict))&handle_futex_weaklckref,
 		[HANDLE_TYPE_FUTEXFD]         = (REF void *(FCALL *)(void *__restrict))&handle_futexfd_weaklckref,
-		[HANDLE_TYPE_DIRHANDLE]       = (REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weaklckref,
-		[HANDLE_TYPE_MFILE]           = (REF void *(FCALL *)(void *__restrict))&handle_mfile_weaklckref,
-		[HANDLE_TYPE_FDIRENT]         = (REF void *(FCALL *)(void *__restrict))&handle_fdirent_weaklckref,
-		[HANDLE_TYPE_PATH]            = (REF void *(FCALL *)(void *__restrict))&handle_path_weaklckref,
-		[HANDLE_TYPE_FS]              = (REF void *(FCALL *)(void *__restrict))&handle_fs_weaklckref,
-		[HANDLE_TYPE_MMAN]            = (REF void *(FCALL *)(void *__restrict))&handle_mman_weaklckref,
 		[HANDLE_TYPE_TASK]            = (REF void *(FCALL *)(void *__restrict))&handle_task_weaklckref,
 		[HANDLE_TYPE_MODULE]          = (REF void *(FCALL *)(void *__restrict))&handle_module_weaklckref,
-		[HANDLE_TYPE_PIDNS]           = (REF void *(FCALL *)(void *__restrict))&handle_pidns_weaklckref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weaklckref,
-		[HANDLE_TYPE_MPART]           = (REF void *(FCALL *)(void *__restrict))&handle_mpart_weaklckref,
-		[HANDLE_TYPE_MODULE_SECTION]  = (REF void *(FCALL *)(void *__restrict))&handle_module_section_weaklckref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (REF void *(FCALL *)(void *__restrict))&handle_refcountable_weaklckref
 	},
 	.h_weakdecref = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (FCALL *)(WEAK REF void *__restrict))&handle_undefined_weakdecref,
+		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_mfile_weakdecref,
+		[HANDLE_TYPE_DIRENT]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_dirent_weakdecref,
+		[HANDLE_TYPE_PATH]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_path_weakdecref,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (FCALL *)(WEAK REF void *__restrict))&handle_filehandle_weakdecref,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(WEAK REF void *__restrict))&handle_dirhandle_weakdecref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(WEAK REF void *__restrict))&handle_fifohandle_weakdecref,
 		[HANDLE_TYPE_SOCKET]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_socket_weakdecref,
 		[HANDLE_TYPE_EPOLL]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_epoll_weakdecref,
 		[HANDLE_TYPE_PIPE]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_weakdecref,
 		[HANDLE_TYPE_PIPE_READER]     = (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_reader_weakdecref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_writer_weakdecref,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(WEAK REF void *__restrict))&handle_fifohandle_weakdecref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_fence_weakdecref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_sema_weakdecref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(WEAK REF void *__restrict))&handle_signalfd_weakdecref,
-		[HANDLE_TYPE_FUTEX]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_futex_weakdecref,
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(WEAK REF void *__restrict))&handle_futexfd_weakdecref,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(WEAK REF void *__restrict))&handle_dirhandle_weakdecref,
-		[HANDLE_TYPE_MFILE]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_mfile_weakdecref,
-		[HANDLE_TYPE_FDIRENT]         = (void (FCALL *)(WEAK REF void *__restrict))&handle_fdirent_weakdecref,
-		[HANDLE_TYPE_PATH]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_path_weakdecref,
-		[HANDLE_TYPE_FS]              = (void (FCALL *)(WEAK REF void *__restrict))&handle_fs_weakdecref,
-		[HANDLE_TYPE_MMAN]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_mman_weakdecref,
 		[HANDLE_TYPE_TASK]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_task_weakdecref,
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_module_weakdecref,
-		[HANDLE_TYPE_PIDNS]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_pidns_weakdecref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_loadlist_weakdecref,
-		[HANDLE_TYPE_MPART]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_mpart_weakdecref,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (FCALL *)(WEAK REF void *__restrict))&handle_module_section_weakdecref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(WEAK REF void *__restrict))&handle_refcountable_weakdecref
 	},
 	.h_read = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_undefined_read,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mfile_read,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_dirent_read,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_path_read,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_filehandle_read,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_dirhandle_read,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fifohandle_read,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_socket_read,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_epoll_read,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_read,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_reader_read,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_writer_read,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fifohandle_read,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_eventfd_fence_read,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_eventfd_sema_read,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_signalfd_read,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_futex_read,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_futexfd_read,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_dirhandle_read,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mfile_read,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fdirent_read,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_path_read,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fs_read,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mman_read,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_task_read,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_module_read,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pidns_read,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_driver_loadlist_read,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mpart_read,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_module_section_read,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_refcountable_read
 	},
 	.h_write = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_undefined_write,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mfile_write,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_dirent_write,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_path_write,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_filehandle_write,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_dirhandle_write,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fifohandle_write,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_socket_write,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_epoll_write,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_write,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_reader_write,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_writer_write,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fifohandle_write,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_eventfd_fence_write,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_eventfd_sema_write,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_signalfd_write,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_futex_write,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_futexfd_write,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_dirhandle_write,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mfile_write,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fdirent_write,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_path_write,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fs_write,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mman_write,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_task_write,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_module_write,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pidns_write,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_driver_loadlist_write,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mpart_write,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_module_section_write,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_refcountable_write
 	},
 	.h_pread = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_undefined_pread,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mfile_pread,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_dirent_pread,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_path_pread,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_filehandle_pread,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_dirhandle_pread,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fifohandle_pread,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_socket_pread,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_epoll_pread,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_pread,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_reader_pread,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_writer_pread,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fifohandle_pread,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_eventfd_fence_pread,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_eventfd_sema_pread,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_signalfd_pread,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_futex_pread,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_futexfd_pread,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_dirhandle_pread,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mfile_pread,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fdirent_pread,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_path_pread,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fs_pread,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mman_pread,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_task_pread,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_module_pread,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pidns_pread,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pread,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mpart_pread,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_module_section_pread,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_refcountable_pread
 	},
 	.h_pwrite = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_undefined_pwrite,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mfile_pwrite,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_dirent_pwrite,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_path_pwrite,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_filehandle_pwrite,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_dirhandle_pwrite,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fifohandle_pwrite,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_socket_pwrite,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_epoll_pwrite,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_pwrite,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_reader_pwrite,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_writer_pwrite,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fifohandle_pwrite,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_eventfd_fence_pwrite,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_eventfd_sema_pwrite,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_signalfd_pwrite,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_futex_pwrite,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_futexfd_pwrite,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_dirhandle_pwrite,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mfile_pwrite,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fdirent_pwrite,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_path_pwrite,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fs_pwrite,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mman_pwrite,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_task_pwrite,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_module_pwrite,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pidns_pwrite,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwrite,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mpart_pwrite,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_module_section_pwrite,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_refcountable_pwrite
 	},
 	.h_readv = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_undefined_readv,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mfile_readv,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirent_readv,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_readv,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_filehandle_readv,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_readv,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifohandle_readv,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_socket_readv,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_epoll_readv,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_readv,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_reader_readv,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_writer_readv,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifohandle_readv,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_fence_readv,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_sema_readv,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_signalfd_readv,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futex_readv,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futexfd_readv,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_readv,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mfile_readv,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fdirent_readv,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_readv,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fs_readv,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mman_readv,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_task_readv,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_readv,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pidns_readv,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_readv,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mpart_readv,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_section_readv,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_refcountable_readv
 	},
 	.h_writev = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_undefined_writev,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mfile_writev,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirent_writev,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_writev,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_filehandle_writev,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_writev,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifohandle_writev,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_socket_writev,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_epoll_writev,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_writev,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_reader_writev,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_writer_writev,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifohandle_writev,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_fence_writev,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_sema_writev,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_signalfd_writev,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futex_writev,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futexfd_writev,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_writev,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mfile_writev,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fdirent_writev,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_writev,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fs_writev,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mman_writev,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_task_writev,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_writev,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pidns_writev,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_writev,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mpart_writev,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_section_writev,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_refcountable_writev
 	},
 	.h_preadv = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_preadv,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mfile_preadv,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirent_preadv,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_preadv,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_filehandle_preadv,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_preadv,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifohandle_preadv,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_preadv,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_epoll_preadv,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_preadv,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_reader_preadv,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_writer_preadv,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifohandle_preadv,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_fence_preadv,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_sema_preadv,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_signalfd_preadv,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futex_preadv,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_preadv,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_preadv,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mfile_preadv,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fdirent_preadv,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_preadv,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_preadv,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mman_preadv,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_task_preadv,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_preadv,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pidns_preadv,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_preadv,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mpart_preadv,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_section_preadv,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_refcountable_preadv
 	},
 	.h_pwritev = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_pwritev,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mfile_pwritev,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirent_pwritev,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_pwritev,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_filehandle_pwritev,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_pwritev,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifohandle_pwritev,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_pwritev,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_epoll_pwritev,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_pwritev,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_reader_pwritev,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_writer_pwritev,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifohandle_pwritev,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_fence_pwritev,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_sema_pwritev,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_signalfd_pwritev,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futex_pwritev,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_pwritev,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_pwritev,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mfile_pwritev,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fdirent_pwritev,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_pwritev,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_pwritev,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mman_pwritev,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_task_pwritev,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_pwritev,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pidns_pwritev,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwritev,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mpart_pwritev,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_section_pwritev,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_refcountable_pwritev
 	},
 	.h_readdir = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_undefined_readdir,
+		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mfile_readdir,
+		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_dirent_readdir,
+		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_path_readdir,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_filehandle_readdir,
+		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_dirhandle_readdir,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fifohandle_readdir,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_socket_readdir,
 		[HANDLE_TYPE_EPOLL]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_epoll_readdir,
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_readdir,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_reader_readdir,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_writer_readdir,
-		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fifohandle_readdir,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_eventfd_fence_readdir,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_eventfd_sema_readdir,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_signalfd_readdir,
-		[HANDLE_TYPE_FUTEX]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_futex_readdir,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_futexfd_readdir,
-		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_dirhandle_readdir,
-		[HANDLE_TYPE_MFILE]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mfile_readdir,
-		[HANDLE_TYPE_FDIRENT]         = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fdirent_readdir,
-		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_path_readdir,
-		[HANDLE_TYPE_FS]              = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fs_readdir,
-		[HANDLE_TYPE_MMAN]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mman_readdir,
 		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_task_readdir,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_module_readdir,
-		[HANDLE_TYPE_PIDNS]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pidns_readdir,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_driver_loadlist_readdir,
-		[HANDLE_TYPE_MPART]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mpart_readdir,
-		[HANDLE_TYPE_MODULE_SECTION]  = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_module_section_readdir,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_refcountable_readdir
 	},
 	.h_seek = {
 		[HANDLE_TYPE_UNDEFINED]       = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_undefined_seek,
+		[HANDLE_TYPE_MFILE]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mfile_seek,
+		[HANDLE_TYPE_DIRENT]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_dirent_seek,
+		[HANDLE_TYPE_PATH]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_path_seek,
 		[HANDLE_TYPE_FILEHANDLE]      = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_filehandle_seek,
+		[HANDLE_TYPE_DIRHANDLE]       = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_dirhandle_seek,
+		[HANDLE_TYPE_FIFOHANDLE]      = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fifohandle_seek,
 		[HANDLE_TYPE_SOCKET]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_socket_seek,
 		[HANDLE_TYPE_EPOLL]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_epoll_seek,
 		[HANDLE_TYPE_PIPE]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_seek,
 		[HANDLE_TYPE_PIPE_READER]     = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_reader_seek,
 		[HANDLE_TYPE_PIPE_WRITER]     = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_writer_seek,
-		[HANDLE_TYPE_FIFOHANDLE]      = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fifohandle_seek,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_eventfd_fence_seek,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_eventfd_sema_seek,
 		[HANDLE_TYPE_SIGNALFD]        = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_signalfd_seek,
-		[HANDLE_TYPE_FUTEX]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_futex_seek,
 		[HANDLE_TYPE_FUTEXFD]         = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_futexfd_seek,
-		[HANDLE_TYPE_DIRHANDLE]       = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_dirhandle_seek,
-		[HANDLE_TYPE_MFILE]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mfile_seek,
-		[HANDLE_TYPE_FDIRENT]         = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fdirent_seek,
-		[HANDLE_TYPE_PATH]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_path_seek,
-		[HANDLE_TYPE_FS]              = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fs_seek,
-		[HANDLE_TYPE_MMAN]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mman_seek,
 		[HANDLE_TYPE_TASK]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_task_seek,
 		[HANDLE_TYPE_MODULE]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_module_seek,
-		[HANDLE_TYPE_PIDNS]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pidns_seek,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_driver_loadlist_seek,
-		[HANDLE_TYPE_MPART]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mpart_seek,
-		[HANDLE_TYPE_MODULE_SECTION]  = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_module_section_seek,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_refcountable_seek
 	},
 	.h_ioctl = {
 		[HANDLE_TYPE_UNDEFINED]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_ioctl,
+		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_ioctl,
+		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirent_ioctl,
+		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_ioctl,
 		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_ioctl,
+		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_ioctl,
+		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_ioctl,
 		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_ioctl,
 		[HANDLE_TYPE_EPOLL]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_epoll_ioctl,
 		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_ioctl,
 		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_ioctl,
 		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_ioctl,
-		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_ioctl,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_ioctl,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_ioctl,
 		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_ioctl,
-		[HANDLE_TYPE_FUTEX]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futex_ioctl,
 		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_ioctl,
-		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_ioctl,
-		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_ioctl,
-		[HANDLE_TYPE_FDIRENT]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fdirent_ioctl,
-		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_ioctl,
-		[HANDLE_TYPE_FS]              = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_ioctl,
-		[HANDLE_TYPE_MMAN]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mman_ioctl,
 		[HANDLE_TYPE_TASK]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_task_ioctl,
 		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_ioctl,
-		[HANDLE_TYPE_PIDNS]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pidns_ioctl,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_ioctl,
-		[HANDLE_TYPE_MPART]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mpart_ioctl,
-		[HANDLE_TYPE_MODULE_SECTION]  = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_section_ioctl,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_ioctl
 	},
 	.h_truncate = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, pos_t))&handle_undefined_truncate,
+		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, pos_t))&handle_mfile_truncate,
+		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, pos_t))&handle_dirent_truncate,
+		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, pos_t))&handle_path_truncate,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, pos_t))&handle_filehandle_truncate,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, pos_t))&handle_dirhandle_truncate,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, pos_t))&handle_fifohandle_truncate,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, pos_t))&handle_socket_truncate,
 		[HANDLE_TYPE_EPOLL]           = (void (KCALL *)(void *__restrict, pos_t))&handle_epoll_truncate,
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_truncate,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_reader_truncate,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_writer_truncate,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, pos_t))&handle_fifohandle_truncate,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, pos_t))&handle_eventfd_fence_truncate,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, pos_t))&handle_eventfd_sema_truncate,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, pos_t))&handle_signalfd_truncate,
-		[HANDLE_TYPE_FUTEX]           = (void (KCALL *)(void *__restrict, pos_t))&handle_futex_truncate,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, pos_t))&handle_futexfd_truncate,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, pos_t))&handle_dirhandle_truncate,
-		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, pos_t))&handle_mfile_truncate,
-		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict, pos_t))&handle_fdirent_truncate,
-		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, pos_t))&handle_path_truncate,
-		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict, pos_t))&handle_fs_truncate,
-		[HANDLE_TYPE_MMAN]            = (void (KCALL *)(void *__restrict, pos_t))&handle_mman_truncate,
 		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict, pos_t))&handle_task_truncate,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, pos_t))&handle_module_truncate,
-		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict, pos_t))&handle_pidns_truncate,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, pos_t))&handle_driver_loadlist_truncate,
-		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict, pos_t))&handle_mpart_truncate,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict, pos_t))&handle_module_section_truncate,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, pos_t))&handle_refcountable_truncate
 	},
 	.h_mmap = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_undefined_mmap,
+		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mfile_mmap,
+		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_dirent_mmap,
+		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_path_mmap,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_filehandle_mmap,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_dirhandle_mmap,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fifohandle_mmap,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_socket_mmap,
 		[HANDLE_TYPE_EPOLL]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_epoll_mmap,
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pipe_mmap,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pipe_reader_mmap,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pipe_writer_mmap,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fifohandle_mmap,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_eventfd_fence_mmap,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_eventfd_sema_mmap,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_signalfd_mmap,
-		[HANDLE_TYPE_FUTEX]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_futex_mmap,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_futexfd_mmap,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_dirhandle_mmap,
-		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mfile_mmap,
-		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fdirent_mmap,
-		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_path_mmap,
-		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fs_mmap,
-		[HANDLE_TYPE_MMAN]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mman_mmap,
 		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_task_mmap,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_module_mmap,
-		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pidns_mmap,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_driver_loadlist_mmap,
-		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mpart_mmap,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_module_section_mmap,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_refcountable_mmap
 	},
 	.h_allocate = {
 		[HANDLE_TYPE_UNDEFINED]       = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_undefined_allocate,
+		[HANDLE_TYPE_MFILE]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mfile_allocate,
+		[HANDLE_TYPE_DIRENT]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirent_allocate,
+		[HANDLE_TYPE_PATH]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_path_allocate,
 		[HANDLE_TYPE_FILEHANDLE]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_filehandle_allocate,
+		[HANDLE_TYPE_DIRHANDLE]       = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirhandle_allocate,
+		[HANDLE_TYPE_FIFOHANDLE]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fifohandle_allocate,
 		[HANDLE_TYPE_SOCKET]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_socket_allocate,
 		[HANDLE_TYPE_EPOLL]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_epoll_allocate,
 		[HANDLE_TYPE_PIPE]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_allocate,
 		[HANDLE_TYPE_PIPE_READER]     = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_reader_allocate,
 		[HANDLE_TYPE_PIPE_WRITER]     = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_writer_allocate,
-		[HANDLE_TYPE_FIFOHANDLE]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fifohandle_allocate,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_eventfd_fence_allocate,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_eventfd_sema_allocate,
 		[HANDLE_TYPE_SIGNALFD]        = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_signalfd_allocate,
-		[HANDLE_TYPE_FUTEX]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_futex_allocate,
 		[HANDLE_TYPE_FUTEXFD]         = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_futexfd_allocate,
-		[HANDLE_TYPE_DIRHANDLE]       = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirhandle_allocate,
-		[HANDLE_TYPE_MFILE]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mfile_allocate,
-		[HANDLE_TYPE_FDIRENT]         = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fdirent_allocate,
-		[HANDLE_TYPE_PATH]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_path_allocate,
-		[HANDLE_TYPE_FS]              = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fs_allocate,
-		[HANDLE_TYPE_MMAN]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mman_allocate,
 		[HANDLE_TYPE_TASK]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_task_allocate,
 		[HANDLE_TYPE_MODULE]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_module_allocate,
-		[HANDLE_TYPE_PIDNS]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pidns_allocate,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_driver_loadlist_allocate,
-		[HANDLE_TYPE_MPART]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mpart_allocate,
-		[HANDLE_TYPE_MODULE_SECTION]  = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_module_section_allocate,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_refcountable_allocate
 	},
 	.h_sync = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict))&handle_undefined_sync,
+		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict))&handle_mfile_sync,
+		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict))&handle_dirent_sync,
+		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict))&handle_path_sync,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict))&handle_filehandle_sync,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict))&handle_dirhandle_sync,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict))&handle_fifohandle_sync,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict))&handle_socket_sync,
 		[HANDLE_TYPE_EPOLL]           = (void (KCALL *)(void *__restrict))&handle_epoll_sync,
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict))&handle_pipe_sync,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict))&handle_pipe_reader_sync,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict))&handle_pipe_writer_sync,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict))&handle_fifohandle_sync,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict))&handle_eventfd_fence_sync,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict))&handle_eventfd_sema_sync,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict))&handle_signalfd_sync,
-		[HANDLE_TYPE_FUTEX]           = (void (KCALL *)(void *__restrict))&handle_futex_sync,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict))&handle_futexfd_sync,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict))&handle_dirhandle_sync,
-		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict))&handle_mfile_sync,
-		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict))&handle_fdirent_sync,
-		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict))&handle_path_sync,
-		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict))&handle_fs_sync,
-		[HANDLE_TYPE_MMAN]            = (void (KCALL *)(void *__restrict))&handle_mman_sync,
 		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict))&handle_task_sync,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict))&handle_module_sync,
-		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict))&handle_pidns_sync,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict))&handle_driver_loadlist_sync,
-		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict))&handle_mpart_sync,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict))&handle_module_section_sync,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict))&handle_refcountable_sync
 	},
 	.h_datasync = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict))&handle_undefined_datasync,
+		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict))&handle_mfile_datasync,
+		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict))&handle_dirent_datasync,
+		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict))&handle_path_datasync,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict))&handle_filehandle_datasync,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict))&handle_dirhandle_datasync,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict))&handle_fifohandle_datasync,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict))&handle_socket_datasync,
 		[HANDLE_TYPE_EPOLL]           = (void (KCALL *)(void *__restrict))&handle_epoll_datasync,
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict))&handle_pipe_datasync,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict))&handle_pipe_reader_datasync,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict))&handle_pipe_writer_datasync,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict))&handle_fifohandle_datasync,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict))&handle_eventfd_fence_datasync,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict))&handle_eventfd_sema_datasync,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict))&handle_signalfd_datasync,
-		[HANDLE_TYPE_FUTEX]           = (void (KCALL *)(void *__restrict))&handle_futex_datasync,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict))&handle_futexfd_datasync,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict))&handle_dirhandle_datasync,
-		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict))&handle_mfile_datasync,
-		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict))&handle_fdirent_datasync,
-		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict))&handle_path_datasync,
-		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict))&handle_fs_datasync,
-		[HANDLE_TYPE_MMAN]            = (void (KCALL *)(void *__restrict))&handle_mman_datasync,
 		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict))&handle_task_datasync,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict))&handle_module_datasync,
-		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict))&handle_pidns_datasync,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict))&handle_driver_loadlist_datasync,
-		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict))&handle_mpart_datasync,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict))&handle_module_section_datasync,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict))&handle_refcountable_datasync
 	},
 	.h_stat = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_undefined_stat,
+		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mfile_stat,
+		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_dirent_stat,
+		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_path_stat,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_filehandle_stat,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_dirhandle_stat,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fifohandle_stat,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_socket_stat,
 		[HANDLE_TYPE_EPOLL]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_epoll_stat,
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_stat,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_reader_stat,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_writer_stat,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fifohandle_stat,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_eventfd_fence_stat,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_eventfd_sema_stat,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_signalfd_stat,
-		[HANDLE_TYPE_FUTEX]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_futex_stat,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_futexfd_stat,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_dirhandle_stat,
-		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mfile_stat,
-		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fdirent_stat,
-		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_path_stat,
-		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fs_stat,
-		[HANDLE_TYPE_MMAN]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mman_stat,
 		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_task_stat,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_module_stat,
-		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pidns_stat,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_driver_loadlist_stat,
-		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mpart_stat,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_module_section_stat,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_refcountable_stat
 	},
 	.h_pollconnect = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_pollconnect,
+		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mfile_pollconnect,
+		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_dirent_pollconnect,
+		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_path_pollconnect,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_filehandle_pollconnect,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_pollconnect,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fifohandle_pollconnect,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_pollconnect,
 		[HANDLE_TYPE_EPOLL]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_epoll_pollconnect,
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_pollconnect,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_pollconnect,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_writer_pollconnect,
-		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fifohandle_pollconnect,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_pollconnect,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_pollconnect,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_pollconnect,
-		[HANDLE_TYPE_FUTEX]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_futex_pollconnect,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_pollconnect,
-		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_pollconnect,
-		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mfile_pollconnect,
-		[HANDLE_TYPE_FDIRENT]         = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fdirent_pollconnect,
-		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_path_pollconnect,
-		[HANDLE_TYPE_FS]              = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_pollconnect,
-		[HANDLE_TYPE_MMAN]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mman_pollconnect,
 		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_task_pollconnect,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_module_pollconnect,
-		[HANDLE_TYPE_PIDNS]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_pollconnect,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_pollconnect,
-		[HANDLE_TYPE_MPART]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mpart_pollconnect,
-		[HANDLE_TYPE_MODULE_SECTION]  = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_module_section_pollconnect,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_pollconnect
 	},
 	.h_polltest = {
 		[HANDLE_TYPE_UNDEFINED]       = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_polltest,
+		[HANDLE_TYPE_MFILE]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mfile_polltest,
+		[HANDLE_TYPE_DIRENT]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_dirent_polltest,
+		[HANDLE_TYPE_PATH]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_path_polltest,
 		[HANDLE_TYPE_FILEHANDLE]      = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_filehandle_polltest,
+		[HANDLE_TYPE_DIRHANDLE]       = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_polltest,
+		[HANDLE_TYPE_FIFOHANDLE]      = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fifohandle_polltest,
 		[HANDLE_TYPE_SOCKET]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_polltest,
 		[HANDLE_TYPE_EPOLL]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_epoll_polltest,
 		[HANDLE_TYPE_PIPE]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_polltest,
 		[HANDLE_TYPE_PIPE_READER]     = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_polltest,
 		[HANDLE_TYPE_PIPE_WRITER]     = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_writer_polltest,
-		[HANDLE_TYPE_FIFOHANDLE]      = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fifohandle_polltest,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_polltest,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_polltest,
 		[HANDLE_TYPE_SIGNALFD]        = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_polltest,
-		[HANDLE_TYPE_FUTEX]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futex_polltest,
 		[HANDLE_TYPE_FUTEXFD]         = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_polltest,
-		[HANDLE_TYPE_DIRHANDLE]       = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_polltest,
-		[HANDLE_TYPE_MFILE]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mfile_polltest,
-		[HANDLE_TYPE_FDIRENT]         = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fdirent_polltest,
-		[HANDLE_TYPE_PATH]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_path_polltest,
-		[HANDLE_TYPE_FS]              = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_polltest,
-		[HANDLE_TYPE_MMAN]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mman_polltest,
 		[HANDLE_TYPE_TASK]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_task_polltest,
 		[HANDLE_TYPE_MODULE]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_module_polltest,
-		[HANDLE_TYPE_PIDNS]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_polltest,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_polltest,
-		[HANDLE_TYPE_MPART]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mpart_polltest,
-		[HANDLE_TYPE_MODULE_SECTION]  = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_module_section_polltest,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_polltest
 	},
 	.h_hop = {
 		[HANDLE_TYPE_UNDEFINED]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
+		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_hop,
+		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirent_hop,
+		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_hop,
 		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_hop,
+		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_hop,
+		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_hop,
 		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_hop,
 		[HANDLE_TYPE_EPOLL]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_epoll_hop,
 		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_hop,
 		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_hop,
 		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_hop,
-		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_hop,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_hop,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_hop,
 		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_hop,
-		[HANDLE_TYPE_FUTEX]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futex_hop,
 		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_hop,
-		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_hop,
-		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_hop,
-		[HANDLE_TYPE_FDIRENT]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fdirent_hop,
-		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_hop,
-		[HANDLE_TYPE_FS]              = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_hop,
-		[HANDLE_TYPE_MMAN]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mman_hop,
 		[HANDLE_TYPE_TASK]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_task_hop,
 		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_hop,
-		[HANDLE_TYPE_PIDNS]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pidns_hop,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_hop,
-		[HANDLE_TYPE_MPART]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mpart_hop,
-		[HANDLE_TYPE_MODULE_SECTION]  = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_section_hop,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_hop
 	},
 	.h_tryas = {
 		[HANDLE_TYPE_UNDEFINED]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_undefined_tryas,
+		[HANDLE_TYPE_MFILE]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mfile_tryas,
+		[HANDLE_TYPE_DIRENT]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_dirent_tryas,
+		[HANDLE_TYPE_PATH]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_path_tryas,
 		[HANDLE_TYPE_FILEHANDLE]      = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_filehandle_tryas,
+		[HANDLE_TYPE_DIRHANDLE]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_dirhandle_tryas,
+		[HANDLE_TYPE_FIFOHANDLE]      = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fifohandle_tryas,
 		[HANDLE_TYPE_SOCKET]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_socket_tryas,
 		[HANDLE_TYPE_EPOLL]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_epoll_tryas,
 		[HANDLE_TYPE_PIPE]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_tryas,
 		[HANDLE_TYPE_PIPE_READER]     = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_reader_tryas,
 		[HANDLE_TYPE_PIPE_WRITER]     = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_writer_tryas,
-		[HANDLE_TYPE_FIFOHANDLE]      = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fifohandle_tryas,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_fence_tryas,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_sema_tryas,
 		[HANDLE_TYPE_SIGNALFD]        = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_signalfd_tryas,
-		[HANDLE_TYPE_FUTEX]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_futex_tryas,
 		[HANDLE_TYPE_FUTEXFD]         = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_futexfd_tryas,
-		[HANDLE_TYPE_DIRHANDLE]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_dirhandle_tryas,
-		[HANDLE_TYPE_MFILE]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mfile_tryas,
-		[HANDLE_TYPE_FDIRENT]         = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fdirent_tryas,
-		[HANDLE_TYPE_PATH]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_path_tryas,
-		[HANDLE_TYPE_FS]              = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fs_tryas,
-		[HANDLE_TYPE_MMAN]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mman_tryas,
 		[HANDLE_TYPE_TASK]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_task_tryas,
 		[HANDLE_TYPE_MODULE]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_module_tryas,
-		[HANDLE_TYPE_PIDNS]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pidns_tryas,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_loadlist_tryas,
-		[HANDLE_TYPE_MPART]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mpart_tryas,
-		[HANDLE_TYPE_MODULE_SECTION]  = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_module_section_tryas,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_refcountable_tryas
 	},
 	.h_printlink = {
 		[HANDLE_TYPE_UNDEFINED]       = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_undefined_printlink,
+		[HANDLE_TYPE_MFILE]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_mfile_printlink,
+		[HANDLE_TYPE_DIRENT]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_dirent_printlink,
+		[HANDLE_TYPE_PATH]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_path_printlink,
 		[HANDLE_TYPE_FILEHANDLE]      = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_filehandle_printlink,
+		[HANDLE_TYPE_DIRHANDLE]       = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_dirhandle_printlink,
+		[HANDLE_TYPE_FIFOHANDLE]      = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fifohandle_printlink,
 		[HANDLE_TYPE_SOCKET]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_socket_printlink,
 		[HANDLE_TYPE_EPOLL]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_epoll_printlink,
 		[HANDLE_TYPE_PIPE]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pipe_printlink,
 		[HANDLE_TYPE_PIPE_READER]     = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pipe_reader_printlink,
 		[HANDLE_TYPE_PIPE_WRITER]     = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pipe_writer_printlink,
-		[HANDLE_TYPE_FIFOHANDLE]      = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fifohandle_printlink,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_eventfd_fence_printlink,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_eventfd_sema_printlink,
 		[HANDLE_TYPE_SIGNALFD]        = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_signalfd_printlink,
-		[HANDLE_TYPE_FUTEX]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_futex_printlink,
 		[HANDLE_TYPE_FUTEXFD]         = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_futexfd_printlink,
-		[HANDLE_TYPE_DIRHANDLE]       = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_dirhandle_printlink,
-		[HANDLE_TYPE_MFILE]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_mfile_printlink,
-		[HANDLE_TYPE_FDIRENT]         = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fdirent_printlink,
-		[HANDLE_TYPE_PATH]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_path_printlink,
-		[HANDLE_TYPE_FS]              = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fs_printlink,
-		[HANDLE_TYPE_MMAN]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_mman_printlink,
 		[HANDLE_TYPE_TASK]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_task_printlink,
 		[HANDLE_TYPE_MODULE]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_module_printlink,
-		[HANDLE_TYPE_PIDNS]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pidns_printlink,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_driver_loadlist_printlink,
-		[HANDLE_TYPE_MPART]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_mpart_printlink,
-		[HANDLE_TYPE_MODULE_SECTION]  = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_module_section_printlink,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_refcountable_printlink
 	},
 };
 
 
+
+/* Weakly define operators for `HANDLE_TYPE_MFILE' (`struct mfile') */
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_tryas, handle_undefined_tryas);
+INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_mfile.printlink") ssize_t KCALL
+handle_mfile_printlink(struct mfile *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_MFILE, printer, arg);
+}
+
+/* Weakly define operators for `HANDLE_TYPE_DIRENT' (`struct fdirent') */
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_tryas, handle_undefined_tryas);
+INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_dirent.printlink") ssize_t KCALL
+handle_dirent_printlink(struct fdirent *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_DIRENT, printer, arg);
+}
+
+/* Weakly define operators for `HANDLE_TYPE_PATH' (`struct path') */
+DEFINE_INTERN_WEAK_ALIAS(handle_path_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_tryas, handle_undefined_tryas);
+INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_path.printlink") ssize_t KCALL
+handle_path_printlink(struct path *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_PATH, printer, arg);
+}
 
 /* Weakly define operators for `HANDLE_TYPE_FILEHANDLE' (`struct filehandle') */
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_refcnt, handle_undefined_refcnt);
@@ -1212,6 +1134,74 @@ DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_filehandle.printlink") ssize_t KCALL
 handle_filehandle_printlink(struct filehandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
 	return handle_generic_printlink(self, HANDLE_TYPE_FILEHANDLE, printer, arg);
+}
+
+/* Weakly define operators for `HANDLE_TYPE_DIRHANDLE' (`struct dirhandle') */
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_tryas, handle_undefined_tryas);
+INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_dirhandle.printlink") ssize_t KCALL
+handle_dirhandle_printlink(struct dirhandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_DIRHANDLE, printer, arg);
+}
+
+/* Weakly define operators for `HANDLE_TYPE_FIFOHANDLE' (`struct fifohandle') */
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_tryas, handle_undefined_tryas);
+INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fifohandle.printlink") ssize_t KCALL
+handle_fifohandle_printlink(struct fifohandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_FIFOHANDLE, printer, arg);
 }
 
 /* Weakly define operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
@@ -1384,40 +1374,6 @@ handle_pipe_writer_printlink(struct pipe_writer *__restrict self, pformatprinter
 	return handle_generic_printlink(self, HANDLE_TYPE_PIPE_WRITER, printer, arg);
 }
 
-/* Weakly define operators for `HANDLE_TYPE_FIFOHANDLE' (`struct fifohandle') */
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fifohandle.printlink") ssize_t KCALL
-handle_fifohandle_printlink(struct fifohandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_FIFOHANDLE, printer, arg);
-}
-
 /* Weakly define operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_incref, handle_undefined_incref);
@@ -1520,40 +1476,6 @@ handle_signalfd_printlink(struct signalfd *__restrict self, pformatprinter print
 	return handle_generic_printlink(self, HANDLE_TYPE_SIGNALFD, printer, arg);
 }
 
-/* Weakly define operators for `HANDLE_TYPE_FUTEX' (`struct mfutex') */
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_futex.printlink") ssize_t KCALL
-handle_futex_printlink(struct mfutex *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_FUTEX, printer, arg);
-}
-
 /* Weakly define operators for `HANDLE_TYPE_FUTEXFD' (`struct mfutexfd') */
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_incref, handle_undefined_incref);
@@ -1586,210 +1508,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_futexfd.printlink") ssize_t KCALL
 handle_futexfd_printlink(struct mfutexfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
 	return handle_generic_printlink(self, HANDLE_TYPE_FUTEXFD, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_DIRHANDLE' (`struct dirhandle') */
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_dirhandle.printlink") ssize_t KCALL
-handle_dirhandle_printlink(struct dirhandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_DIRHANDLE, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_MFILE' (`struct mfile') */
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_mfile.printlink") ssize_t KCALL
-handle_mfile_printlink(struct mfile *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_MFILE, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_FDIRENT' (`struct fdirent') */
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fdirent.printlink") ssize_t KCALL
-handle_fdirent_printlink(struct fdirent *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_FDIRENT, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_PATH' (`struct path') */
-DEFINE_INTERN_WEAK_ALIAS(handle_path_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_path.printlink") ssize_t KCALL
-handle_path_printlink(struct path *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_PATH, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_FS' (`struct fs') */
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fs.printlink") ssize_t KCALL
-handle_fs_printlink(struct fs *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_FS, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_MMAN' (`struct mman') */
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_mman_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_mman.printlink") ssize_t KCALL
-handle_mman_printlink(struct mman *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_MMAN, printer, arg);
 }
 
 /* Weakly define operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
@@ -1860,40 +1578,6 @@ handle_module_printlink(struct module *__restrict self, pformatprinter printer, 
 	return handle_generic_printlink(self, HANDLE_TYPE_MODULE, printer, arg);
 }
 
-/* Weakly define operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_pidns.printlink") ssize_t KCALL
-handle_pidns_printlink(struct pidns *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_PIDNS, printer, arg);
-}
-
 /* Weakly define operators for `HANDLE_TYPE_DRIVER_LOADLIST' (`struct driver_loadlist') */
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_incref, handle_undefined_incref);
@@ -1926,74 +1610,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_driver_loadlist.printlink") ssize_t KCALL
 handle_driver_loadlist_printlink(struct driver_loadlist *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
 	return handle_generic_printlink(self, HANDLE_TYPE_DRIVER_LOADLIST, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_MPART' (`struct mpart') */
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_mpart_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_mpart.printlink") ssize_t KCALL
-handle_mpart_printlink(struct mpart *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_MPART, printer, arg);
-}
-
-/* Weakly define operators for `HANDLE_TYPE_MODULE_SECTION' (`struct module_section') */
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_section_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_module_section.printlink") ssize_t KCALL
-handle_module_section_printlink(struct module_section *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_MODULE_SECTION, printer, arg);
 }
 
 /* Weakly define operators for `HANDLE_TYPE_REFCOUNTABLE' (`struct refcountable') */

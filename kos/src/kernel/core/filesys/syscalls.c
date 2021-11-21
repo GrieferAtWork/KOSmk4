@@ -1501,17 +1501,6 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 			result = path_sprint((struct path *)hand.h_data, buf, buflen, atflags, root);
 			break;
 
-		case HANDLE_TYPE_FS: {
-			REF struct path *pwd;
-			struct fs *me;
-			me = (struct fs *)hand.h_data;
-			fs_pathlock_read(me);
-			pwd = incref(me->fs_cwd);
-			fs_pathlock_endread(me);
-			FINALLY_DECREF_UNLIKELY(pwd);
-			result = path_sprint(pwd, buf, buflen, atflags, root);
-		}	break;
-
 		default:
 bad_handle_type:
 			THROW(E_INVALID_HANDLE_FILETYPE,
@@ -2409,7 +2398,7 @@ kernel_execveat(fd_t dirfd,
 
 		/* Convert  the handle into  the 3 relevant  objects. If any of
 		 * these conversions fail, then the given handle can't be used. */
-		args.ea_xdentry = (REF struct fdirent *)handle_tryas_noinherit(hand, HANDLE_TYPE_FDIRENT);
+		args.ea_xdentry = (REF struct fdirent *)handle_tryas_noinherit(hand, HANDLE_TYPE_DIRENT);
 		TRY {
 			args.ea_xpath = (REF struct path *)handle_tryas_noinherit(hand, HANDLE_TYPE_PATH);
 			TRY {

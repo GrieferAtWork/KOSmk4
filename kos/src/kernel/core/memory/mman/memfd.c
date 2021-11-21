@@ -70,7 +70,7 @@ PRIVATE WUNUSED NONNULL((1)) REF void *
 NOTHROW(KCALL memfd_v_tryas)(struct mfile *__restrict self,
                              uintptr_half_t wanted_type) {
 	struct memfd *me = mfile_asmemfd(self);
-	if (wanted_type == HANDLE_TYPE_FDIRENT)
+	if (wanted_type == HANDLE_TYPE_DIRENT)
 		return incref(me->mfd_name);
 	return NULL;
 }
