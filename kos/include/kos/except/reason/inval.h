@@ -251,6 +251,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB,               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
 	E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX,                /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
 	E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT,              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
+	E_INVALID_ARGUMENT_CONTEXT_SVGA_INVALID_MODE,                  /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid/unsupported mode given to `SVGA_IOC_SETMODE' / `SVGA_IOC_SETDEFMODE' / `SVGA_IOC_MAKETTY' */
+	E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET,                   /* E_INVALID_ARGUMENT_BAD_STATE: `SVGA_IOC_GETMODE' used on a video lock when no mode has been set. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -477,6 +479,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT              E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
+#define E_INVALID_ARGUMENT_CONTEXT_SVGA_INVALID_MODE                  E_INVALID_ARGUMENT_CONTEXT_SVGA_INVALID_MODE                  /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid/unsupported mode given to `SVGA_IOC_SETMODE' / `SVGA_IOC_SETDEFMODE' / `SVGA_IOC_MAKETTY' */
+#define E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET                   E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET                   /* E_INVALID_ARGUMENT_BAD_STATE: `SVGA_IOC_GETMODE' used on a video lock when no mode has been set. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -700,6 +704,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_ATTRIB               197 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid leak attribute in `struct leakattr::la_attr' of `LEAKS_IOC_LEAKATTR' */
 #define E_INVALID_ARGUMENT_CONTEXT_LEAKS_INVALID_INDEX                198 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid memory leak index. */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT              199 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
+#define E_INVALID_ARGUMENT_CONTEXT_SVGA_INVALID_MODE                  200 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid/unsupported mode given to `SVGA_IOC_SETMODE' / `SVGA_IOC_SETDEFMODE' / `SVGA_IOC_MAKETTY' */
+#define E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET                   201 /* E_INVALID_ARGUMENT_BAD_STATE: `SVGA_IOC_GETMODE' used on a video lock when no mode has been set. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

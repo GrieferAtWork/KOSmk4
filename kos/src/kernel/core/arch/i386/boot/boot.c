@@ -994,9 +994,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Also add corresponding read-ioctls that will read the relevant properties.
 	 */
 
-	/* TODO: modsvga shouldn't just blindly throw `E_NO_SUCH_OBJECT' in ioctls.
-	 * Instead, it should throw E_INVALID_ARGUMENT_* with custom context codes! */
-
 	/* TODO: There's a missing incref() relating to mktty.
 	 * Replicate bug:
 	 *  - Repeatedly press CTRL+D on the busybox prompt

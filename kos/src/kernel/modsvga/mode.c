@@ -40,6 +40,7 @@
 
 #include <hw/video/vga.h>
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <kos/ioctl/svga.h>
 
 #include <assert.h>
@@ -70,7 +71,7 @@ DECL_BEGIN
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *FCALL
 svgadev_findmode(struct svgadev *__restrict self,
                  USER CHECKED struct svga_modeinfo const *mode)
-		THROWS(E_SEGFAULT, E_NO_SUCH_OBJECT) {
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
 	struct svga_modeinfo const *result;
 	size_t i;
 	for (i = 0; i < self->svd_supmodec; ++i) {
@@ -78,7 +79,8 @@ svgadev_findmode(struct svgadev *__restrict self,
 		if (memcmp(result, mode, sizeof(struct svga_modeinfo)) == 0)
 			return result;
 	}
-	THROW(E_NO_SUCH_OBJECT);
+	THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+	      E_INVALID_ARGUMENT_CONTEXT_SVGA_INVALID_MODE);
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
@@ -244,8 +246,10 @@ svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		struct svga_modeinfo const *mymode;
 		validate_writable(arg, sizeof(struct svga_modeinfo));
 		mymode = ATOMIC_READ(me->slc_mode);
-		if (!mymode)
-			THROW(E_NO_SUCH_OBJECT);
+		if (!mymode) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET);
+		}
 		memcpy(arg, mymode, sizeof(struct svga_modeinfo));
 		return 0;
 	}	break;
