@@ -21,7 +21,7 @@
 #define _KOS_BITS_FUTEX_EXPR_H 1
 
 #include <__stdinc.h>
-#include <kos/bits/futex.h>
+
 #include <bits/types.h>
 
 #ifdef __CC__

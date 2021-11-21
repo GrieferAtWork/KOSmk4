@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _COMPAT_KOS_BITS_FUTEX_H
-#define _COMPAT_KOS_BITS_FUTEX_H 1
+#ifndef _COMPAT_KOS_ASM_FUTEX_H
+#define _COMPAT_KOS_ASM_FUTEX_H 1
 
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
@@ -34,4 +34,4 @@
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER < 8 */
 #endif /* __ARCH_HAVE_COMPAT */
 
-#endif /* !_COMPAT_KOS_BITS_FUTEX_H */
+#endif /* !_COMPAT_KOS_ASM_FUTEX_H */

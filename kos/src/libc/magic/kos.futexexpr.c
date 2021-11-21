@@ -28,7 +28,7 @@
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 )]%[insert:prefix(
 #include <kos/bits/futex-expr.h>
 )]%[insert:prefix(

@@ -24,8 +24,8 @@
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/types.h>
+#include <compat/kos/asm/futex.h>
 #include <compat/kos/bits/futex-expr.h>
-#include <compat/kos/bits/futex.h>
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -34,7 +34,6 @@ __DECL_BEGIN
 #define __compat_lfutex_t_defined
 typedef __compat_uintptr_t compat_lfutex_t;
 #endif /* !__compat_lfutex_t_defined */
-
 
 __DECL_END
 #endif /* __CC__ */

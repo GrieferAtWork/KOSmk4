@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4a2d5b9 */
+/* HASH CRC-32:0xbc47a3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_LFutexExpr64_except_defined */
 __NAMESPACE_LOCAL_END
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_LOCK_WAITEXPR_DEFINED
 #define __SHARED_LOCK_WAITEXPR_DEFINED

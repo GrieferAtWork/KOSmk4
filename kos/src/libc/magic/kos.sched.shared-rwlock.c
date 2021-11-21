@@ -43,11 +43,11 @@
 #include <sched/signal.h>
 #else /* __KERNEL__ */
 }%[insert:prefix(
-#include <kos/bits/futex.h>
+#include <bits/os/timespec.h>
+)]%[insert:prefix(
+#include <kos/asm/futex.h>
 )]%[insert:prefix(
 #include <kos/syscalls.h>
-)]%[insert:prefix(
-#include <bits/os/timespec.h>
 )]%{
 #endif /* !__KERNEL__ */
 
@@ -141,7 +141,7 @@ $bool shared_rwlock_trywrite([[nonnull]] struct shared_rwlock *__restrict self) 
 @@Release a a write-lock from `self'
 [[extern_inline, nothrow, kernel, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
-[[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 void shared_rwlock_endwrite([[nonnull]] struct shared_rwlock *__restrict self) {
 	__COMPILER_BARRIER();
@@ -158,7 +158,7 @@ void shared_rwlock_endwrite([[nonnull]] struct shared_rwlock *__restrict self) {
 @@@return: false: The lock is still held by something.
 [[extern_inline, nothrow, kernel, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
-[[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 $bool shared_rwlock_endread([[nonnull]] struct shared_rwlock *__restrict self) {
 	$uintptr_t __result;
@@ -178,7 +178,7 @@ $bool shared_rwlock_endread([[nonnull]] struct shared_rwlock *__restrict self) {
 @@@return: false: The lock is still held by something.
 [[extern_inline, nothrow, kernel, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
-[[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 $bool shared_rwlock_end([[nonnull]] struct shared_rwlock *__restrict self) {
 	__COMPILER_BARRIER();
@@ -204,7 +204,7 @@ $bool shared_rwlock_end([[nonnull]] struct shared_rwlock *__restrict self) {
 @@Downgrade a write-lock to a read-lock (Always succeeds).
 [[extern_inline, nothrow, kernel, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
-[[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 void shared_rwlock_downgrade([[nonnull]] struct shared_rwlock *__restrict self) {
 	__COMPILER_WRITE_BARRIER();
@@ -247,7 +247,7 @@ $bool shared_rwlock_upgrade([[nonnull]] struct shared_rwlock *__restrict self) {
 /************************************************************************/
 %[define(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX =
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 @@pp_ifndef __SHARED_RWLOCK_WAITREADEXPR_DEFINED@@
 #define __SHARED_RWLOCK_WAITREADEXPR_DEFINED
@@ -263,7 +263,7 @@ static struct @lfutexexpr@ const @__shared_rwlock_waitreadexpr@[] = {
 
 %[define(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX =
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 @@pp_ifndef __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED@@
 #define __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED

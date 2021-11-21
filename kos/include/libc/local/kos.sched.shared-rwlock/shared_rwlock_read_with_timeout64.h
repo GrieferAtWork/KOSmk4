@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25e37e67 */
+/* HASH CRC-32:0x190328df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __
 #endif /* !__local___localdep_shared_rwlock_tryread_defined */
 __NAMESPACE_LOCAL_END
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_RWLOCK_WAITREADEXPR_DEFINED
 #define __SHARED_RWLOCK_WAITREADEXPR_DEFINED

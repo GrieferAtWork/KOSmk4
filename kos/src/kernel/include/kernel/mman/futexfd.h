@@ -25,8 +25,8 @@
 #include <kernel/types.h>
 
 #include <compat/config.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
-#include <kos/bits/futex.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/bits/futex-expr.h>

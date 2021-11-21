@@ -433,10 +433,10 @@ incdir("");
 #include <compat/bits/typesizes.h>
 #include <compat/bits/va_list-struct.h>
 #include <compat/config.h>
+#include <compat/kos/asm/futex.h>
 #include <compat/kos/bits/coredump.h>
 #include <compat/kos/bits/except-handler.h>
 #include <compat/kos/bits/futex-expr.h>
-#include <compat/kos/bits/futex.h>
 #include <compat/kos/bits/syscall-info.h>
 #include <compat/kos/compat/linux-dirent.h>
 #include <compat/kos/compat/linux-olddirent.h>
@@ -516,6 +516,7 @@ incdir("");
 #include <hw/usb/ohci.h>
 #include <hw/usb/uhci.h>
 #include <hw/usb/usb.h>
+#include <hw/video/bochsvbe.h>
 #include <hw/video/vga.h>
 #include <hw/video/vgamodes.h>
 #include <hybrid/__alloca.h>
@@ -582,6 +583,7 @@ incdir("");
 #include <jmp_buf.h>
 #include <kos/anno.h>
 #include <kos/aref.h>
+#include <kos/asm/futex.h>
 #include <kos/asm/rpc.h>
 #include <kos/asm/rtm.h>
 #include <kos/asm/syscall.h>
@@ -594,7 +596,6 @@ incdir("");
 #include <kos/bits/exception_nest.h>
 #include <kos/bits/fastexcept.h>
 #include <kos/bits/futex-expr.h>
-#include <kos/bits/futex.h>
 #include <kos/bits/lockop.h>
 #include <kos/bits/rtm.h>
 #include <kos/bits/shared-lock.h>
@@ -858,6 +859,7 @@ incdir("");
 #include <libservice/types.h>
 #include <libsvgadrv/api.h>
 #include <libsvgadrv/chipset.h>
+#include <libsvgadrv/chipsets/bochsvbe.h>
 #include <libsvgadrv/chipsets/vesa.h>
 #include <libsvgadrv/chipsets/vga.h>
 #include <libsvgadrv/util/vgaio.h>

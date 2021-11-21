@@ -26,7 +26,7 @@
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
@@ -330,7 +330,7 @@ $ssize_t lfutex64([[nonnull]] lfutex_t *uaddr, $syscall_ulong_t futex_op,
 @@Wake up to `MAX_WAKE' threads waiting for `*UADDR'
 @@@return: * : The number of woken threads
 @@@return: -1:EFAULT: A faulty pointer was given
-[[decl_include("<bits/types.h>"), impl_include("<kos/bits/futex.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<kos/asm/futex.h>")]]
 [[userimpl, requires_function(lfutex64)]]
 $ssize_t futex_wake([[nonnull]] lfutex_t *uaddr, $size_t max_wake) {
 	return lfutex64(uaddr, @LFUTEX_WAKE@, max_wake);
@@ -350,7 +350,7 @@ $ssize_t futex_wakeall([[nonnull]] lfutex_t *uaddr) {
 @@@return: * : The number of woken threads
 @@@return: -1:EFAULT: A faulty pointer was given
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex64)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex64)]]
 $ssize_t futex_wakemask([[nonnull]] lfutex_t *uaddr, $size_t max_wake,
                         lfutex_t mask_and, lfutex_t mask_or) {
 	return lfutex64(uaddr, @LFUTEX_WAKEMASK@, max_wake, mask_and, mask_or);
@@ -363,7 +363,7 @@ $ssize_t futex_wakemask([[nonnull]] lfutex_t *uaddr, $size_t max_wake,
 @@the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
 @@when there are no more waiting threads.
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<hybrid/__atomic.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<kos/asm/futex.h>")]]
 [[requires_function(futex_wakemask)]]
 $ssize_t futexlock_wake([[nonnull]] lfutex_t *ulockaddr, $size_t max_wake) {
 	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))
@@ -372,7 +372,7 @@ $ssize_t futexlock_wake([[nonnull]] lfutex_t *ulockaddr, $size_t max_wake) {
 }
 
 [[doc_alias("futexlock_wake"), decl_include("<bits/types.h>")]]
-[[impl_include("<hybrid/__atomic.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<kos/asm/futex.h>")]]
 [[requires_function(futex_wakeall)]]
 $ssize_t futexlock_wakeall([[nonnull]] lfutex_t *ulockaddr) {
 @@pp_ifndef __OPTIMIZE_SIZE__@@
@@ -390,7 +390,7 @@ $ssize_t futexlock_wakeall([[nonnull]] lfutex_t *ulockaddr) {
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex64)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex64)]]
 int futex_waitwhile([[nonnull]] lfutex_t *uaddr, lfutex_t equal_to_value) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE@, equal_to_value, (struct timespec64 const *)NULL);
 }
@@ -401,7 +401,7 @@ int futex_waitwhile([[nonnull]] lfutex_t *uaddr, lfutex_t equal_to_value) {
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex64)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex64)]]
 int futex_waituntil([[nonnull]] lfutex_t *uaddr, lfutex_t not_equal_to_value) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL@, not_equal_to_value, (struct timespec64 const *)NULL);
 }
@@ -415,7 +415,7 @@ futex_waitwhile_notequal(*) = futex_waituntil;
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>")]]
 [[userimpl, requires_function(lfutex64)]]
 int futex_waitwhile_above([[nonnull]] lfutex_t *uaddr, lfutex_t above_value) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_value, (struct timespec64 const *)NULL);
@@ -427,7 +427,7 @@ int futex_waitwhile_above([[nonnull]] lfutex_t *uaddr, lfutex_t above_value) {
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>")]]
 [[userimpl, requires_function(lfutex64)]]
 int futex_waitwhile_below([[nonnull]] lfutex_t *uaddr, lfutex_t below_value) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_value, (struct timespec64 const *)NULL);
@@ -439,7 +439,7 @@ int futex_waitwhile_below([[nonnull]] lfutex_t *uaddr, lfutex_t below_value) {
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>", "<hybrid/__assert.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>", "<hybrid/__assert.h>")]]
 [[userimpl, requires_function(lfutex64)]]
 int futex_waitwhile_aboveequal([[nonnull]] lfutex_t *uaddr, lfutex_t above_equal_value) {
 	__hybrid_assert(above_equal_value != 0);
@@ -452,7 +452,7 @@ int futex_waitwhile_aboveequal([[nonnull]] lfutex_t *uaddr, lfutex_t above_equal
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>", "<hybrid/__assert.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>", "<hybrid/__assert.h>")]]
 [[userimpl, requires_function(lfutex64)]]
 int futex_waitwhile_belowequal([[nonnull]] lfutex_t *uaddr, lfutex_t below_equal_value) {
 	__hybrid_assert(above_equal_value != (lfutex_t)-1);
@@ -466,7 +466,7 @@ int futex_waitwhile_belowequal([[nonnull]] lfutex_t *uaddr, lfutex_t below_equal
 @@@return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value)
 [[cp, userimpl, requires_function(lfutex64)]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>")]]
 int futex_waitlock([[nonnull]] lfutex_t *uaddr) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_LOCK@, 0, (struct timespec64 const *)NULL);
 }
@@ -479,7 +479,7 @@ int futex_waitlock([[nonnull]] lfutex_t *uaddr) {
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, userimpl, requires_function(lfutex64)]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>")]]
 int futex_waitwhile_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, (struct timespec64 const *)NULL, setmask);
 }
@@ -491,7 +491,7 @@ int futex_waitwhile_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfu
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, userimpl, requires_function(lfutex64)]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>")]]
 int futex_waituntil_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, (struct timespec64 const *)NULL, setmask);
 }
@@ -503,7 +503,7 @@ int futex_waituntil_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfu
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, userimpl, requires_function(lfutex64)]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>")]]
 int futex_waitwhile_anybit([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, (struct timespec64 const *)NULL, 0);
 }
@@ -515,7 +515,7 @@ int futex_waitwhile_anybit([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) {
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, userimpl, requires_function(lfutex64)]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/bits/futex.h>")]]
+[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>")]]
 int futex_waitwhile_allbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, (struct timespec64 const *)NULL, bitmask);
 }
@@ -540,7 +540,7 @@ int futex_waitwhile_allbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) {
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile64")]]
-[[impl_include("<kos/bits/futex.h>")]]
+[[impl_include("<kos/asm/futex.h>")]]
 [[userimpl, requires_function(lfutex)]]
 int futex_timedwaitwhile([[nonnull]] lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE@, equal_to_value, rel_timeout);
@@ -555,7 +555,7 @@ int futex_timedwaitwhile([[nonnull]] lfutex_t *uaddr, lfutex_t equal_to_value, s
 [[cp, decl_include("<bits/types.h>"), decl_include("<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaituntil")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaituntil64")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaituntil([[nonnull]] lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_UNTIL@, not_equal_to_value, rel_timeout);
 }
@@ -572,7 +572,7 @@ futex_timedwaitwhile_notequal(*) = futex_timedwaituntil;
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_above")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_above64")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaitwhile_above([[nonnull]] lfutex_t *uaddr, lfutex_t above_value, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_value, rel_timeout);
 }
@@ -586,7 +586,7 @@ int futex_timedwaitwhile_above([[nonnull]] lfutex_t *uaddr, lfutex_t above_value
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_below")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_below64")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaitwhile_below([[nonnull]] lfutex_t *uaddr, lfutex_t below_value, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_value, rel_timeout);
 }
@@ -600,7 +600,7 @@ int futex_timedwaitwhile_below([[nonnull]] lfutex_t *uaddr, lfutex_t below_value
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_aboveequal64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_aboveequal")]]
-[[impl_include("<kos/bits/futex.h>", "<hybrid/__assert.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>", "<hybrid/__assert.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaitwhile_aboveequal([[nonnull]] lfutex_t *uaddr, lfutex_t above_equal_value, struct timespec const *rel_timeout) {
 	__hybrid_assert(above_equal_value != 0);
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_equal_value - 1, rel_timeout);
@@ -615,7 +615,7 @@ int futex_timedwaitwhile_aboveequal([[nonnull]] lfutex_t *uaddr, lfutex_t above_
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_belowequal")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_belowequal64")]]
-[[impl_include("<kos/bits/futex.h>", "<hybrid/__assert.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>", "<hybrid/__assert.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaitwhile_belowequal([[nonnull]] lfutex_t *uaddr, lfutex_t below_equal_value, struct timespec const *rel_timeout) {
 	__hybrid_assert(above_equal_value != (lfutex_t)-1);
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_equal_value + 1, rel_timeout);
@@ -630,7 +630,7 @@ int futex_timedwaitwhile_belowequal([[nonnull]] lfutex_t *uaddr, lfutex_t below_
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitlock")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitlock64")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaitlock([[nonnull]] lfutex_t *uaddr, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_LOCK@, 0, rel_timeout);
 }
@@ -644,7 +644,7 @@ int futex_timedwaitlock([[nonnull]] lfutex_t *uaddr, struct timespec const *rel_
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_exactbits")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_exactbits64")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaitwhile_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, rel_timeout, setmask);
 }
@@ -657,7 +657,7 @@ int futex_timedwaitwhile_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaituntil_exactbits")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaituntil_exactbits64")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaituntil_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, setmask);
 }
@@ -670,7 +670,7 @@ int futex_timedwaituntil_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_anybit")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_anybit64")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaitwhile_anybit([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, 0);
 }
@@ -683,7 +683,7 @@ int futex_timedwaitwhile_anybit([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, s
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_allbits")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitwhile_allbits64")]]
-[[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
+[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
 int futex_timedwaitwhile_allbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout) {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, rel_timeout, bitmask);
 }
@@ -695,14 +695,14 @@ int futex_timedwaitwhile_allbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, 
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile), doc_alias("futex_timedwaitwhile")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaitwhile64([[nonnull]] lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE@, equal_to_value, rel_timeout);
 }
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaituntil), doc_alias("futex_timedwaituntil")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaituntil64([[nonnull]] lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL@, not_equal_to_value, rel_timeout);
 }
@@ -712,21 +712,21 @@ futex_timedwaitwhile_notequal64(*) = futex_timedwaituntil64;
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile_above), doc_alias("futex_timedwaitwhile_above")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaitwhile_above64([[nonnull]] lfutex_t *uaddr, lfutex_t above_value, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_value, rel_timeout);
 }
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile_below), doc_alias("futex_timedwaitwhile_below")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaitwhile_below64([[nonnull]] lfutex_t *uaddr, lfutex_t below_value, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_value, rel_timeout);
 }
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile_aboveequal), doc_alias("futex_timedwaitwhile_aboveequal")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>", "<hybrid/__assert.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>", "<hybrid/__assert.h>")]]
 int futex_timedwaitwhile_aboveequal64([[nonnull]] lfutex_t *uaddr, lfutex_t above_equal_value, struct timespec64 const *rel_timeout) {
 	__hybrid_assert(above_equal_value != 0);
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_equal_value - 1, rel_timeout);
@@ -734,7 +734,7 @@ int futex_timedwaitwhile_aboveequal64([[nonnull]] lfutex_t *uaddr, lfutex_t abov
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile_belowequal), doc_alias("futex_timedwaitwhile_belowequal")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>", "<hybrid/__assert.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>", "<hybrid/__assert.h>")]]
 int futex_timedwaitwhile_belowequal64([[nonnull]] lfutex_t *uaddr, lfutex_t below_equal_value, struct timespec64 const *rel_timeout) {
 	__hybrid_assert(above_equal_value != (lfutex_t)-1);
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_equal_value + 1, rel_timeout);
@@ -742,35 +742,35 @@ int futex_timedwaitwhile_belowequal64([[nonnull]] lfutex_t *uaddr, lfutex_t belo
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitlock), doc_alias("futex_timedwaitlock")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaitlock64([[nonnull]] lfutex_t *uaddr, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_LOCK@, 0, rel_timeout);
 }
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile_exactbits), doc_alias("futex_timedwaitwhile_exactbits")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaitwhile_exactbits64([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, rel_timeout, setmask);
 }
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaituntil_exactbits), doc_alias("futex_timedwaituntil_exactbits")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaituntil_exactbits64([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, setmask);
 }
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile_anybit), doc_alias("futex_timedwaitwhile_anybit")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaitwhile_anybit64([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, 0);
 }
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile_allbits), doc_alias("futex_timedwaitwhile_allbits")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/bits/futex.h>")]]
+[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaitwhile_allbits64([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, rel_timeout, bitmask);
 }

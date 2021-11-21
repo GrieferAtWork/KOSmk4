@@ -42,7 +42,7 @@
 #include <sched/signal.h>
 #else /* __KERNEL__ */
 #include <bits/os/timespec.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/syscalls.h>
 #endif /* !__KERNEL__ */
 
@@ -111,7 +111,7 @@ __SYSDECL_BEGIN
 
 %[define(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX =
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 @@pp_ifndef __SHARED_LOCK_WAITEXPR_DEFINED@@
 #define __SHARED_LOCK_WAITEXPR_DEFINED

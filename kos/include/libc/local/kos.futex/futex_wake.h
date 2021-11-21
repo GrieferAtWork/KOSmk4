@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x824621fb */
+/* HASH CRC-32:0xb83e5050 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_lfutex64_defined */
 __NAMESPACE_LOCAL_END
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futex_wake) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futex_wake))(__uintptr_t *__uaddr, __SIZE_TYPE__ __max_wake) {

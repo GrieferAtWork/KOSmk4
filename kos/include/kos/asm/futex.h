@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_FUTEX_H
-#define _KOS_BITS_FUTEX_H 1
+#ifndef _KOS_ASM_FUTEX_H
+#define _KOS_ASM_FUTEX_H 1
 
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
@@ -125,4 +125,4 @@
 #define LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME 0x80000000 /* The given timeout argument is in absolute realtime (`CLOCK_REALTIME') */
 #define LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL  0x20000000 /* Connect to signals for polling. (s.a. `task_connect_for_poll()') */
 
-#endif /* !_KOS_BITS_FUTEX_H */
+#endif /* !_KOS_ASM_FUTEX_H */

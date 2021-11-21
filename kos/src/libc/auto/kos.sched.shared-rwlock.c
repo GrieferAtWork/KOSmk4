@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7813c18 */
+/* HASH CRC-32:0x1c2ca5fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ NOTHROW(__FCALL libc_shared_rwlock_trywrite)(struct shared_rwlock *__restrict se
 	return true;
 }
 #include <hybrid/__assert.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 /* >> shared_rwlock_endwrite(3)
  * Release a a write-lock from `self' */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK NONNULL((1)) void
@@ -133,7 +133,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 #include <sched/signal.h>
 #else /* __KERNEL__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_RWLOCK_WAITREADEXPR_DEFINED
 #define __SHARED_RWLOCK_WAITREADEXPR_DEFINED
@@ -179,7 +179,7 @@ success:
 #include <sched/signal.h>
 #else /* __KERNEL__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
 #define __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
@@ -426,7 +426,7 @@ success:
 DEFINE_INTERN_ALIAS(libc_shared_rwlock_read_with_timeout64, libc_shared_rwlock_read_with_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_RWLOCK_WAITREADEXPR_DEFINED
 #define __SHARED_RWLOCK_WAITREADEXPR_DEFINED
@@ -461,7 +461,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 DEFINE_INTERN_ALIAS(libc_shared_rwlock_write_with_timeout64, libc_shared_rwlock_write_with_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
 #define __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
@@ -496,7 +496,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 DEFINE_INTERN_ALIAS(libc_shared_rwlock_waitread_with_timeout64, libc_shared_rwlock_waitread_with_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_RWLOCK_WAITREADEXPR_DEFINED
 #define __SHARED_RWLOCK_WAITREADEXPR_DEFINED
@@ -533,7 +533,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 DEFINE_INTERN_ALIAS(libc_shared_rwlock_waitwrite_with_timeout64, libc_shared_rwlock_waitwrite_with_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED
 #define __SHARED_RWLOCK_WAITWRITEEXPR_DEFINED

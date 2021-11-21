@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce33ed52 */
+/* HASH CRC-32:0xa23db662 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 #include <sched/signal.h>
 #else /* __KERNEL__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_LOCK_WAITEXPR_DEFINED
 #define __SHARED_LOCK_WAITEXPR_DEFINED
@@ -177,7 +177,7 @@ success:
 DEFINE_INTERN_ALIAS(libc_shared_lock_acquire_with_timeout64, libc_shared_lock_acquire_with_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_LOCK_WAITEXPR_DEFINED
 #define __SHARED_LOCK_WAITEXPR_DEFINED
@@ -212,7 +212,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING __NOCONNECT NONN
 DEFINE_INTERN_ALIAS(libc_shared_lock_waitfor_with_timeout64, libc_shared_lock_waitfor_with_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
 #ifndef __SHARED_LOCK_WAITEXPR_DEFINED
 #define __SHARED_LOCK_WAITEXPR_DEFINED

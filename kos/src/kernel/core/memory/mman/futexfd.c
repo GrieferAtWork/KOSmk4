@@ -34,8 +34,8 @@
 #include <sched/cred.h>
 
 #include <compat/config.h>
+#include <kos/asm/futex.h>
 #include <kos/bits/futex-expr.h>
-#include <kos/bits/futex.h>
 #include <kos/except.h>
 #include <sys/poll.h>
 

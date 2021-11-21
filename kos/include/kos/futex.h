@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99028fef */
+/* HASH CRC-32:0xede683d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 #include <bits/types.h>
 #include <bits/os/timespec.h>
 #include <hybrid/__atomic.h>

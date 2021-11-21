@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d822616 */
+/* HASH CRC-32:0xe3f22a21 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <hybrid/__atomic.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 /* >> futexlock_wake(3), futexlock_wakeall(3)
  * A more efficient variant of `futex_wake()' that does  nothing
  * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_futexlock_wake)(lfutex_t *ulockaddr,
 	return libc_futex_wakemask(ulockaddr, max_wake, ~(lfutex_t)LFUTEX_WAIT_LOCK_WAITERS, 0);
 }
 #include <hybrid/__atomic.h>
-#include <kos/bits/futex.h>
+#include <kos/asm/futex.h>
 /* >> futexlock_wake(3), futexlock_wakeall(3)
  * A more efficient variant of `futex_wake()' that does  nothing
  * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x283f33d */
+/* HASH CRC-32:0x3be1ab48 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@
 #include <kernel/types.h> /* ktime_t */
 #include <sched/signal.h>
 #else /* __KERNEL__ */
-#include <kos/bits/futex.h>
-#include <kos/syscalls.h>
 #include <bits/os/timespec.h>
+#include <kos/asm/futex.h>
+#include <kos/syscalls.h>
 #endif /* !__KERNEL__ */
 
 #ifndef __cplusplus
