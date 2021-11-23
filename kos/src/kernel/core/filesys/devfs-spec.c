@@ -50,6 +50,9 @@
 #include <stdio.h>
 #include <string.h>
 
+/**/
+#include "devfs-spec.h"
+
 DECL_BEGIN
 
 /*
@@ -84,7 +87,7 @@ devfs_spec_v_stat_with_boottime(struct mfile *__restrict self,
 	fdirnode_v_stat(self, result);
 }
 
-PRIVATE struct mfile_stream_ops const devfs_spec_v_stream_ops_with_boottime = {
+INTERN_CONST struct mfile_stream_ops const devfs_spec_v_stream_ops_with_boottime = {
 	.mso_open  = &fdirnode_v_open,
 	.mso_stat  = &devfs_spec_v_stat_with_boottime,
 	.mso_ioctl = &fdirnode_v_ioctl,
@@ -209,12 +212,6 @@ devicelink_new(char const *__restrict prefix, struct device *__restrict dev) {
 	return result;
 }
 
-struct devicelink_dirent {
-	char const        *dld_pfx; /* [1..1][const] Prefix for link strings. */
-	REF struct device *dld_dev; /* [1..1][const] Pointed-to device. */
-	struct fdirent     dld_ent; /* Underlying directory entry */
-};
-
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL devicelink_dirent_v_destroy)(struct fdirent *__restrict self) {
 	struct devicelink_dirent *me;
@@ -241,7 +238,7 @@ devicelink_dirent_v_getino(struct fdirent *__restrict self,
 	return DEVFS_INO_DYN((uintptr_t)me->dld_dev ^ (uintptr_t)me->dld_pfx);
 }
 
-PRIVATE struct fdirent_ops const devicelink_dirent_ops = {
+INTERN_CONST struct fdirent_ops const devicelink_dirent_ops = {
 	.fdo_destroy  = &devicelink_dirent_v_destroy,
 	.fdo_opennode = &devicelink_dirent_v_opennode,
 	.fdo_getino   = &devicelink_dirent_v_getino,
@@ -249,7 +246,7 @@ PRIVATE struct fdirent_ops const devicelink_dirent_ops = {
 
 /* Construct a new directory entry for a device symlink.
  * The caller must still initialize `return->dld_ent.fd_name' and `fd_hash' */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((2, 3)) REF struct devicelink_dirent *KCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((2, 3)) REF struct devicelink_dirent *KCALL
 devicelink_dirent_new(u16 namelen, char const *pfx, struct device *__restrict dev) {
 	REF struct devicelink_dirent *result;
 	result = (REF struct devicelink_dirent *)kmalloc(offsetof(struct devicelink_dirent, dld_ent.fd_name) +
@@ -266,30 +263,13 @@ devicelink_dirent_new(u16 namelen, char const *pfx, struct device *__restrict de
 	return result;
 }
 
-#ifndef __fnode_axref_defined
-#define __fnode_axref_defined
-AXREF(fnode_axref, fnode);
-#endif /* !__fnode_axref_defined */
-
-
-/* Base structure for the enumeration of devices. */
-struct devenum: fdirenum {
-	struct fnode_axref de_nextfil; /* [0..1] Next device to enumerate. */
-};
-#define devenum_after(prev) \
-	fsuper_nodeafter(&devfs, prev)
-LOCAL NONNULL((1)) void
-NOTHROW(FCALL devenum_init)(struct devenum *__restrict self) {
-	REF struct fnode *dev = devenum_after(NULL);
-	axref_init(&self->de_nextfil, dev);
-}
-PRIVATE NOBLOCK NONNULL((1)) void
+INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL devenum_v_fini)(struct fdirenum *__restrict self) {
 	struct devenum *me = (struct devenum *)self;
 	axref_fini(&me->de_nextfil);
 }
 
-PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
+INTERN BLOCKING NONNULL((1)) pos_t KCALL
 devenum_v_seekdir(struct fdirenum *__restrict self, off_t offset, unsigned int whence)
 		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...) {
 	pos_t result;
@@ -297,7 +277,7 @@ devenum_v_seekdir(struct fdirenum *__restrict self, off_t offset, unsigned int w
 	switch (whence) {
 
 		/* TODO: Full seek support by using the inode number of devices as offset.
-		 *       Because  we're using an  LLRB-tree, we can  find the first device
+		 *       Because we're  using an  LLRB-tree, we  can find  the first  file
 		 *       with an `INO >= offset' in O(log2(N)) time. */
 
 	case SEEK_SET: {
@@ -556,33 +536,6 @@ devfs_cpu_v_enum(struct fdirenum *__restrict result)
 
 
 
-/************************************************************************/
-/* /dev/disk                                                             */
-/************************************************************************/
-PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-devfs_disk_v_lookup(struct fdirnode *__restrict UNUSED(self),
-                    struct flookup_info *__restrict info)
-		THROWS(E_SEGFAULT, E_IOERROR, ...) {
-	/* TODO */
-	(void)info;
-	COMPILER_IMPURE();
-	return NULL;
-}
-
-struct disk_enum: fdirenum {
-	/* TODO */
-};
-
-PRIVATE BLOCKING NONNULL((1)) void KCALL
-devfs_disk_v_enum(struct fdirenum *__restrict result)
-		THROWS(E_IOERROR, ...) {
-	/* TODO */
-	result->de_ops = &fdirenum_empty_ops;
-}
-
-
-
-
 
 
 
@@ -617,13 +570,6 @@ INTERN_CONST struct fdirnode_ops const devfs_cpu_ops   = {
 	.dno_lookup = &devfs_cpu_v_lookup,
 	.dno_enumsz = sizeof(struct cpu_enum),
 	.dno_enum   = &devfs_cpu_v_enum,
-};
-
-INTERN_CONST struct fdirnode_ops const devfs_disk_ops  = {
-	.dno_node   = INIT_SPEC_FNODE_OPS,
-	.dno_lookup = &devfs_disk_v_lookup,
-	.dno_enumsz = sizeof(struct disk_enum),
-	.dno_enum   = &devfs_disk_v_enum,
 };
 
 #undef INIT_SPEC_FNODE_OPS
