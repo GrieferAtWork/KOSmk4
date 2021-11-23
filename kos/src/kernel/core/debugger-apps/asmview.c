@@ -592,8 +592,10 @@ NOTHROW(FCALL av_main)(void *addr) {
 	if (dbg_current_iscompat())
 		av_instrlen_da.d_target = DISASSEMBLER_TARGET_I386;
 #elif defined(__i386__)
+#ifndef __I386_NO_VM86
 	if (x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_EFLAGS) & EFLAGS_VM)
 		av_instrlen_da.d_target = DISASSEMBLER_TARGET_8086;
+#endif /* !__I386_NO_VM86 */
 #endif /* ... */
 
 	start_addr = av_instr_pred_n(addr, (dbg_screen_height - 1) / 2);

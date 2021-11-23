@@ -386,6 +386,21 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_XOP_BEXTR_IMM 1 /* Emulate non-standard instructions */
 
 
+/* Without support for hardware vm86, we don't need to emulate these instructions! */
+#ifdef __I386_NO_VM86
+#undef EMU86_EMULATE_CONFIG_WANT_IRET
+#undef EMU86_EMULATE_CONFIG_WANT_PUSHF
+#undef EMU86_EMULATE_CONFIG_WANT_POPF
+#undef EMU86_EMULATE_CONFIG_WANT_CLI
+#undef EMU86_EMULATE_CONFIG_WANT_STI
+#define EMU86_EMULATE_CONFIG_WANT_IRET  0
+#define EMU86_EMULATE_CONFIG_WANT_PUSHF 0
+#define EMU86_EMULATE_CONFIG_WANT_POPF  0
+#define EMU86_EMULATE_CONFIG_WANT_CLI   0
+#define EMU86_EMULATE_CONFIG_WANT_STI   0
+#endif /* __I386_NO_VM86 */
+
+
 
 #define EMU86_EMULATE_DECL          PRIVATE
 #define EMU86_EMULATE_ATTR          ATTR_RETNONNULL NONNULL((1))
@@ -582,7 +597,11 @@ NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict st
 #endif /* !__x86_64__ */
 			}
 		}
-		if (!segval && BAD_USAGE_ECODE(usage) == 0) {
+		if (!segval && BAD_USAGE_ECODE(usage) == 0 &&
+#if !defined(__x86_64__) && !defined(__I386_NO_VM86)
+		    !icpustate_isvm86(state) &&
+#endif /* !__x86_64__ && !__I386_NO_VM86 */
+		    1) {
 			/* Throw a NULL-segment exception. */
 			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),
 			                                    /* opcode:   */ opcode,
@@ -593,6 +612,7 @@ NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict st
 			                                    /* regval:   */ 0,
 			                                    /* regval2:  */ 0);
 		}
+
 #ifdef __x86_64__
 		/* On x86_64, a #GPF is thrown when attempting to access a non-canonical address.
 		 * However, the kernel expects that the only exception that might be thrown  when
@@ -621,6 +641,7 @@ NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict st
 			                : E_SEGFAULT_CONTEXT_NONCANON);
 		}
 #endif /* __x86_64__ */
+
 		/* If  the  error originated  from  user-space, default  to  assuming it's
 		 * because of some  privileged instruction not  explicitly handled  (maybe
 		 * because we don't know about it, or maybe because of some other reason). */
@@ -637,6 +658,7 @@ NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict st
 			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE),
 			                                    opcode, op_flags, 0, 0, 0, 0, 0);
 		}
+
 		/* In kernel space, this one's a wee bit more complicated... */
 		throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT),
 		                                    opcode, op_flags, BAD_USAGE_INTNO(usage),
@@ -844,25 +866,25 @@ PRIVATE u64 NOTHROW(KCALL emulate_rdtsc)(void) {
 		}                                                                 \
 		/* syscall emulation */                                           \
 		x86_syscall_emulate64_int80h_r(_state);                           \
-	} __WHILE0
+	}	__WHILE0
 #define NEED_return_unsupported_instruction
 #define EMU86_EMULATE_RETURN_AFTER_SYSENTER()      \
 	do {                                           \
 		/* Only allowed from 32-bit user-space. */ \
 		if unlikely(!EMU86_F_IS32(op_flags))       \
 			goto return_unsupported_instruction;   \
-		__hybrid_assert(EMU86_ISUSER());           \
+		assert(EMU86_ISUSER());                    \
 		/* sysenter emulation */                   \
 		x86_syscall_emulate32_sysenter_r(_state);  \
 		__builtin_unreachable();                   \
-	} __WHILE0
+	}	__WHILE0
 #else /* __x86_64__ */
 #define EMU86_EMULATE_RETURN_AFTER_SYSENTER()      \
 	do {                                           \
-		__hybrid_assert(EMU86_ISUSER());           \
+		assert(EMU86_ISUSER());                    \
 		x86_syscall_emulate32_sysenter_r(_state);  \
 		__builtin_unreachable();                   \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !__x86_64__ */
 
 
@@ -921,17 +943,17 @@ setgsbase(uintptr_t value)
 
 #define EMU86_ISUSER() icpustate_isuser(_state)
 
-#ifdef __x86_64__
-#define EMU86_EMULATE_CONFIG_VM86    0
+#if defined(__x86_64__) || defined(__I386_NO_VM86)
+#define EMU86_EMULATE_CONFIG_VM86 0
 #define EMU86_ISUSER_NOVM86() EMU86_ISUSER()
-#else /* __x86_64__ */
+#else /* __x86_64__ || __I386_NO_VM86 */
 #define EMU86_EMULATE_CONFIG_VM86 1
 #define EMU86_EMULATE_VM86_GETIF()            0 /* TODO */
 #define EMU86_EMULATE_VM86_SETIF(v)           (void)0
 #define EMU86_EMULATE_RETURN_AFTER_HLT_VM86() /* TODO */
 #define EMU86_ISUSER_NOVM86() icpustate_isuser_novm86(_state)
 #define EMU86_ISVM86()        icpustate_isvm86(_state)
-#endif /* !__x86_64__ */
+#endif /* !__x86_64__ && !__I386_NO_VM86 */
 
 
 
@@ -998,19 +1020,19 @@ dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 		if ((uintptr_t)(addr) >= KERNELSPACE_BASE)                       \
 			assert_user_address_range(_state, (void *)(uintptr_t)(addr), \
 			                          num_bytes, true, false);           \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_VALIDATE_WRITABLE(addr, num_bytes)                         \
 	do {                                                                 \
 		if ((uintptr_t)(addr) >= KERNELSPACE_BASE)                       \
 			assert_user_address_range(_state, (void *)(uintptr_t)(addr), \
 			                          num_bytes, false, true);           \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_VALIDATE_READWRITE(addr, num_bytes)                        \
 	do {                                                                 \
 		if ((uintptr_t)(addr) >= KERNELSPACE_BASE)                       \
 			assert_user_address_range(_state, (void *)(uintptr_t)(addr), \
 			                          num_bytes, true, true);            \
-	} __WHILE0
+	}	__WHILE0
 PRIVATE void KCALL
 assert_user_address_range(struct icpustate *__restrict state,
                           void const *addr, size_t num_bytes,
@@ -1148,7 +1170,7 @@ assert_canonical_address(struct icpustate *__restrict state,
 	do {                                                          \
 		if unlikely(ADDR_IS_NONCANON(addr))                       \
 			EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON(addr); \
-	} __WHILE0
+	}	__WHILE0
 #else /* __x86_64__ */
 #define EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP 1
 #define EMU86_UNSUPPORTED_MEMACCESS(addr, num_bytes, reading, writing) (void)0
@@ -1211,35 +1233,33 @@ i386_getsegment_base(struct icpustate32 *__restrict state,
 	pflag_t was;
 	struct segment *seg;
 	struct desctab dt;
+
+#ifndef __I386_NO_VM86
+	if (icpustate_isvm86(state)) {
+		switch (segment_regno) {
+		case EMU86_R_ES: segment_index = icpustate32_getes_vm86(state); break;
+		case EMU86_R_CS: segment_index = icpustate32_getcs(state); break;
+		case EMU86_R_SS: segment_index = icpustate32_getss(state); break;
+		case EMU86_R_DS: segment_index = icpustate32_getds_vm86(state); break;
+		case EMU86_R_FS: segment_index = icpustate32_getfs_vm86(state); break;
+		case EMU86_R_GS: segment_index = icpustate32_getgs_vm86(state); break;
+		default: __builtin_unreachable();
+		}
+		return segment_index << 4;
+	}
+#endif /* !__I386_NO_VM86 */
+
 	/* Determine the segment's index. */
 	switch (segment_regno) {
-
-	case EMU86_R_ES:
-		segment_index = icpustate_getes(state);
-		break;
-
-	case EMU86_R_CS:
-		segment_index = icpustate_getcs(state);
-		break;
-
-	case EMU86_R_SS:
-		segment_index = icpustate_getcs(state);
-		break;
-
-	case EMU86_R_DS:
-		segment_index = icpustate_getds(state);
-		break;
-
-	case EMU86_R_FS:
-		segment_index = icpustate_getfs(state);
-		break;
-
-	case EMU86_R_GS:
-		segment_index = __rdgs();
-		break;
-
+	case EMU86_R_ES: segment_index = icpustate_getes_novm86(state); break;
+	case EMU86_R_CS: segment_index = icpustate_getcs(state); break;
+	case EMU86_R_SS: segment_index = icpustate_getss(state); break;
+	case EMU86_R_DS: segment_index = icpustate_getds_novm86(state); break;
+	case EMU86_R_FS: segment_index = icpustate_getfs_novm86(state); break;
+	case EMU86_R_GS: segment_index = icpustate_getgs_novm86(state); break;
 	default: __builtin_unreachable();
 	}
+
 	/* Handle known segment indices without disabling preemption. */
 	switch (segment_index & ~3) {
 

@@ -330,6 +330,14 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 	switch (regno) {
 
 	case GDB_REGISTER_I386_ESP:
+#ifdef __I386_NO_VM86
+		GETSET4(thread == GDBServer_Host
+		        ? icpustate32_getesp(STATE)
+		        : ((STATE->ics_irregs.ir_cs16 & 3)
+		           ? icpustate32_getuseresp(STATE)
+		           : icpustate32_getkernelesp(STATE)),
+		        *pstate = icpustate32_setesp_p(*pstate, value));
+#else /* __I386_NO_VM86 */
 		GETSET4(thread == GDBServer_Host
 		        ? icpustate32_getesp(STATE)
 		        : (((STATE->ics_irregs.ir_cs16 & 3) ||
@@ -337,6 +345,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		           ? icpustate32_getuseresp(STATE)
 		           : icpustate32_getkernelesp(STATE)),
 		        *pstate = icpustate32_setesp_p(*pstate, value));
+#endif /* !__I386_NO_VM86 */
 		break;
 
 	case GDB_REGISTER_I386_EIP:
@@ -374,7 +383,10 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 				goto getset_kernel_ss;
 			}
 		} else if ((STATE->ics_irregs.ir_cs16 & 3) ||
-		           (STATE->ics_irregs.ir_eflags & EFLAGS_VM)) {
+#ifndef __I386_NO_VM86
+		           (STATE->ics_irregs.ir_eflags & EFLAGS_VM) ||
+#endif /* !__I386_NO_VM86 */
+		           0) {
 			FIELD4(STATE->ics_irregs_u.ir_ss);
 		} else {
 getset_kernel_ss:
@@ -388,9 +400,13 @@ getset_kernel_ss:
 			GETSET4(icpustate32_getds(STATE),
 			        icpustate32_setds(STATE, value));
 		} else {
+#ifdef __I386_NO_VM86
+			FIELD4(STATE->ics_ds);
+#else /* __I386_NO_VM86 */
 			FIELD4(*((STATE->ics_irregs.ir_eflags & EFLAGS_VM)
 			         ? &STATE->ics_irregs_v.ir_ds
 			         : &STATE->ics_ds));
+#endif /* !__I386_NO_VM86 */
 		}
 		break;
 
@@ -399,9 +415,13 @@ getset_kernel_ss:
 			GETSET4(icpustate32_getes(STATE),
 			        icpustate32_setes(STATE, value));
 		} else {
+#ifdef __I386_NO_VM86
+			FIELD4(STATE->ics_es);
+#else /* __I386_NO_VM86 */
 			FIELD4(*((STATE->ics_irregs.ir_eflags & EFLAGS_VM)
 			         ? &STATE->ics_irregs_v.ir_es
 			         : &STATE->ics_es));
+#endif /* !__I386_NO_VM86 */
 		}
 		break;
 
@@ -410,9 +430,13 @@ getset_kernel_ss:
 			GETSET4(icpustate32_getfs(STATE),
 			        icpustate32_setfs(STATE, value));
 		} else {
+#ifdef __I386_NO_VM86
+			FIELD4(STATE->ics_fs);
+#else /* __I386_NO_VM86 */
 			FIELD4(*((STATE->ics_irregs.ir_eflags & EFLAGS_VM)
 			         ? &STATE->ics_irregs_v.ir_fs
 			         : &STATE->ics_fs));
+#endif /* !__I386_NO_VM86 */
 		}
 		break;
 
@@ -420,9 +444,13 @@ getset_kernel_ss:
 		if (thread == GDBServer_Host) {
 			GETSET4(icpustate32_getgs(STATE),
 			        icpustate32_setgs(STATE, value));
-		} else if (STATE->ics_irregs.ir_eflags & EFLAGS_VM) {
+		}
+#ifndef __I386_NO_VM86
+		else if (STATE->ics_irregs.ir_eflags & EFLAGS_VM) {
 			FIELD4(STATE->ics_irregs_v.ir_gs);
-		} else {
+		}
+#endif /* !__I386_NO_VM86 */
+		else {
 			goto thread_register;
 		}
 		break;

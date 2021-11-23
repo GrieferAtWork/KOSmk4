@@ -494,7 +494,9 @@ struct icpustate32 { /* i -- Interrupts */
 		struct irregs32_kernel ics_irregs;
 		struct irregs32_kernel ics_irregs_k;
 		struct irregs32_user   ics_irregs_u;
+#ifndef __I386_NO_VM86
 		struct irregs32_vm86   ics_irregs_v;
+#endif /* !__I386_NO_VM86 */
 	};
 };
 #endif /* __CC__ */
@@ -521,7 +523,9 @@ struct scpustate32 { /* s -- Scheduling */
 		struct irregs32_kernel scs_irregs;
 		struct irregs32_kernel scs_irregs_k;
 		struct irregs32_user   scs_irregs_u;
+#ifndef __I386_NO_VM86
 		struct irregs32_vm86   scs_irregs_v;
+#endif /* !__I386_NO_VM86 */
 	};
 };
 #endif /* __CC__ */

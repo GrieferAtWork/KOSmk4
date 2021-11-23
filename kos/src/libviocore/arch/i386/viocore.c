@@ -1424,14 +1424,15 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 		libviocore_complete_except(self, _EMU86_GETOPCODE(), op_flags); \
 	}
 #define EMU86_EMULATE_GETOPFLAGS() _CS(emu86_opflags_from)(self->vea_args.va_state)
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(__I386_NO_VM86)
 #define EMU86_EMULATE_CONFIG_VM86 0
-#else /* __x86_64__ */
+#else /* __x86_64__ || __I386_NO_VM86 */
 #define EMU86_EMULATE_CONFIG_VM86 1
 #define EMU86_EMULATE_VM86_GETIF()  0       /* TODO: Get vm86 #IF bit */
 #define EMU86_EMULATE_VM86_SETIF(v) (void)0 /* TODO: Set vm86 #IF bit */
 /* TODO: vm86 I/O functions (used by ins and outs) */
-#endif /* !__x86_64__ */
+#endif /* !__x86_64__ && !__I386_NO_VM86 */
+
 #ifdef __KERNEL__
 #define EMU86_EMULATE_CONFIG_CHECKUSER 1
 #define EMU86_ISUSER()        icpustate_isuser(self->vea_args.va_state)
@@ -1555,35 +1556,33 @@ i386_getsegment_base(struct icpustate32 *__restrict state,
 	pflag_t was;
 	struct segment *seg;
 	struct desctab dt;
+
+#ifndef __I386_NO_VM86
+	if (icpustate_isvm86(state)) {
+		switch (segment_regno) {
+		case EMU86_R_ES: segment_index = icpustate32_getes_vm86(state); break;
+		case EMU86_R_CS: segment_index = icpustate32_getcs(state); break;
+		case EMU86_R_SS: segment_index = icpustate32_getss(state); break;
+		case EMU86_R_DS: segment_index = icpustate32_getds_vm86(state); break;
+		case EMU86_R_FS: segment_index = icpustate32_getfs_vm86(state); break;
+		case EMU86_R_GS: segment_index = icpustate32_getgs_vm86(state); break;
+		default: __builtin_unreachable();
+		}
+		return segment_index << 4;
+	}
+#endif /* !__I386_NO_VM86 */
+
 	/* Determine the segment's index. */
 	switch (segment_regno) {
-
-	case EMU86_R_ES:
-		segment_index = icpustate_getes(state);
-		break;
-
-	case EMU86_R_CS:
-		segment_index = icpustate_getcs(state);
-		break;
-
-	case EMU86_R_SS:
-		segment_index = icpustate_getcs(state);
-		break;
-
-	case EMU86_R_DS:
-		segment_index = icpustate_getds(state);
-		break;
-
-	case EMU86_R_FS:
-		segment_index = icpustate_getfs(state);
-		break;
-
-	case EMU86_R_GS:
-		segment_index = __rdgs();
-		break;
-
+	case EMU86_R_ES: segment_index = icpustate_getes_novm86(state); break;
+	case EMU86_R_CS: segment_index = icpustate_getcs(state); break;
+	case EMU86_R_SS: segment_index = icpustate_getss(state); break;
+	case EMU86_R_DS: segment_index = icpustate_getds_novm86(state); break;
+	case EMU86_R_FS: segment_index = icpustate_getfs_novm86(state); break;
+	case EMU86_R_GS: segment_index = icpustate_getgs_novm86(state); break;
 	default: __builtin_unreachable();
 	}
+
 	/* Handle known segment indices without disabling preemption. */
 	switch (segment_index & ~3) {
 
@@ -1653,35 +1652,18 @@ PRIVATE WUNUSED NONNULL((1)) void CC
 i386_setsegment_base(struct icpustate32 *__restrict state,
                      u8 segment_regno, u32 value) {
 	u16 segment_index;
+
 	/* Determine the segment's index. */
 	switch (segment_regno) {
-
-	case EMU86_R_ES:
-		segment_index = icpustate_getes(state);
-		break;
-
-	case EMU86_R_CS:
-		segment_index = icpustate_getcs(state);
-		break;
-
-	case EMU86_R_SS:
-		segment_index = icpustate_getcs(state);
-		break;
-
-	case EMU86_R_DS:
-		segment_index = icpustate_getds(state);
-		break;
-
-	case EMU86_R_FS:
-		segment_index = icpustate_getfs(state);
-		break;
-
-	case EMU86_R_GS:
-		segment_index = __rdgs();
-		break;
-
+	case EMU86_R_ES: segment_index = icpustate_getes(state); break;
+	case EMU86_R_CS: segment_index = icpustate_getcs(state); break;
+	case EMU86_R_SS: segment_index = icpustate_getss(state); break;
+	case EMU86_R_DS: segment_index = icpustate_getds(state); break;
+	case EMU86_R_FS: segment_index = icpustate_getfs(state); break;
+	case EMU86_R_GS: segment_index = icpustate_getgs(state); break;
 	default: __builtin_unreachable();
 	}
+
 	/* Only the user fs/gs base register can be modified. */
 	switch (segment_index & ~3) {
 
@@ -1704,6 +1686,7 @@ i386_setsegment_base(struct icpustate32 *__restrict state,
 		      segment_index);                          /* regval */
 		break;
 	}
+
 	/* Reload manually if user-space %gs was modified.
 	 * All other register get automatically reloaded upon return to user-space. */
 	if (segment_regno == EMU86_R_GS)
@@ -1713,6 +1696,7 @@ i386_setsegment_base(struct icpustate32 *__restrict state,
 
 #endif /* !__x86_64__ */
 #else /* __KERNEL__ */
+
 /* If  the base of any of these  segments wasn't 0, then this library
  * couldn't even work (since C expects a flat address space, and this
  * library is written in C) */
@@ -1757,19 +1741,19 @@ i386_setsegment_base(struct icpustate32 *__restrict state,
 #define EMU86_EMULATE_POP(old_sp, num_bytes) (void)0
 #if !defined(__x86_64__) && defined(__KERNEL__)
 /* Simplifications for accessing VM86 registers. */
-#define EMU86_GETCS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_cs16
+#define EMU86_GETCS_VM86()   (self->vea_args.va_state->ics_irregs_v.ir_cs16)
 #define EMU86_SETCS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_cs = (u16)(v))
-#define EMU86_GETESP_VM86()   self->vea_args.va_state->ics_irregs_v.ir_esp
+#define EMU86_GETESP_VM86()  (self->vea_args.va_state->ics_irregs_v.ir_esp)
 #define EMU86_SETESP_VM86(v) (self->vea_args.va_state->ics_irregs_v.ir_esp = (u32)(v))
-#define EMU86_GETSS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_ss16
+#define EMU86_GETSS_VM86()   (self->vea_args.va_state->ics_irregs_v.ir_ss16)
 #define EMU86_SETSS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_ss = (u16)(v))
-#define EMU86_GETES_VM86()    self->vea_args.va_state->ics_irregs_v.ir_es16
+#define EMU86_GETES_VM86()   (self->vea_args.va_state->ics_irregs_v.ir_es16)
 #define EMU86_SETES_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_es = (u16)(v))
-#define EMU86_GETDS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_ds16
+#define EMU86_GETDS_VM86()   (self->vea_args.va_state->ics_irregs_v.ir_ds16)
 #define EMU86_SETDS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_ds = (u16)(v))
-#define EMU86_GETFS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_fs16
+#define EMU86_GETFS_VM86()   (self->vea_args.va_state->ics_irregs_v.ir_fs16)
 #define EMU86_SETFS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_fs = (u16)(v))
-#define EMU86_GETGS_VM86()    self->vea_args.va_state->ics_irregs_v.ir_gs16
+#define EMU86_GETGS_VM86()   (self->vea_args.va_state->ics_irregs_v.ir_gs16)
 #define EMU86_SETGS_VM86(v)  (self->vea_args.va_state->ics_irregs_v.ir_gs = (u16)(v))
 #endif /* !__x86_64__ && __KERNEL__ */
 

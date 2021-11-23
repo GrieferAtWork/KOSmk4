@@ -56,8 +56,10 @@ PUBLIC_FUNCTION(__i386_syscall_iret)
 	jne    .Ldo_iret
 
 	/* When returning to vm86, we also cannot make use of `sysexit' */
+#ifndef __I386_NO_VM86
 	ttest  mask=EFLAGS_VM, loc=OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    .Ldo_iret
+#endif /* !__I386_NO_VM86 */
 	.cfi_remember_state
 
 	/* Technically, we'd also have to check for EFLAGS_IF being set,

@@ -1950,7 +1950,9 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		                           ucpustate_getpflags(&vm.rv_cpu),
 		                           cred_allow_eflags_modify_mask());
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (!(ucpustate_getpflags(&vm.rv_cpu) & EFLAGS_VM))
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		{
 			/* Validate segment register indices before actually restoring them. */
@@ -2019,12 +2021,14 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 
 		/* Write-back register modifications. */
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (ucpustate_getpflags(&vm.rv_cpu) & EFLAGS_VM) {
 			state->ics_irregs_v.ir_es = ucpustate_getes(&vm.rv_cpu);
 			state->ics_irregs_v.ir_ds = ucpustate_getds(&vm.rv_cpu);
 			state->ics_irregs_v.ir_fs = ucpustate_getfs(&vm.rv_cpu);
 			state->ics_irregs_v.ir_gs = ucpustate_getgs(&vm.rv_cpu);
 		} else
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		{
 			icpustate_setgs_novm86(state, ucpustate_getgs(&vm.rv_cpu));

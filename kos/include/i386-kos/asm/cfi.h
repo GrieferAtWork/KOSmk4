@@ -512,6 +512,164 @@ __ASM_L(.endm)
 
 
 
+#ifdef __I386_NO_VM86
+__ASM_L(.macro .cfi_restore_iret_esp iret_offset=0)
+/*[[[cfi{arch='i386', register='%esp'}
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_CS+\iret_offset     # CFA, CS
+	deref                                     # CFA, [CS]
+	and    $3                                 # CFA, [CS] & 3
+	jnz    pop, 1f                            # CFA, if (CS & 3) goto 1f;
+	# Kernel-space return location (must unwind ESP to point after irregs)
+	plus   $SIZEOF_IRREGS_KERNEL+\iret_offset # CFA + SIZEOF_IRREGS_KERNEL
+	ret
+1:	# User-space or VM86 return location
+	plus   $OFFSET_IRREGS_ESP+\iret_offset    # ESP
+	deref                                     # [ESP]
+]]]*/
+__ASM_L(.if __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 115)
+__ASM_L(	.cfi_escape 22,4,17,18,35,__ASM_ARG(\iret_offset)+4,6,51,26,40,5,0,35,__ASM_ARG(\iret_offset)+12,47,3)
+__ASM_L(	.cfi_escape 0,35,__ASM_ARG(\iret_offset)+12,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -12 && __ASM_ARG(\iret_offset) <= 115)
+__ASM_L(	.cfi_escape 22,4,18,18,9,__ASM_ARG(\iret_offset)+4,34,6,51,26,40,5,0,35,__ASM_ARG(\iret_offset)+12,47)
+__ASM_L(	.cfi_escape 3,0,35,__ASM_ARG(\iret_offset)+12,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 123)
+__ASM_L(	.cfi_escape 22,4,19,18,35,__ASM_ARG(\iret_offset)+4,6,51,26,40,6,0,8,__ASM_ARG(\iret_offset)+12,34,47)
+__ASM_L(	.cfi_escape 4,0,8,__ASM_ARG(\iret_offset)+12,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -132 && __ASM_ARG(\iret_offset) <= 115)
+__ASM_L(	.cfi_escape 22,4,20,18,9,__ASM_ARG(\iret_offset)+4,34,6,51,26,40,6,0,9,__ASM_ARG(\iret_offset)+12,34)
+__ASM_L(	.cfi_escape 47,4,0,9,__ASM_ARG(\iret_offset)+12,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 243)
+__ASM_L(	.cfi_escape 22,4,20,18,8,__ASM_ARG(\iret_offset)+4,34,6,51,26,40,6,0,8,__ASM_ARG(\iret_offset)+12,34)
+__ASM_L(	.cfi_escape 47,4,0,8,__ASM_ARG(\iret_offset)+12,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -140 && __ASM_ARG(\iret_offset) <= 115)
+__ASM_L(	.cfi_escape 22,4,21,18,11,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,6,0,9,__ASM_ARG(\iret_offset)+12)
+__ASM_L(	.cfi_escape 34,47,4,0,9,__ASM_ARG(\iret_offset)+12,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 251)
+__ASM_L(	.cfi_escape 22,4,22,18,8,__ASM_ARG(\iret_offset)+4,34,6,51,26,40,7,0,11,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8)
+__ASM_L(	.cfi_escape 34,47,5,0,11,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -32772 && __ASM_ARG(\iret_offset) <= 32755)
+__ASM_L(	.cfi_escape 22,4,23,18,11,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,7,0,11,(__ASM_ARG(\iret_offset)+12)&0xff)
+__ASM_L(	.cfi_escape ((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,47,5,0,11,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -12 && __ASM_ARG(\iret_offset) <= 32763)
+__ASM_L(	.cfi_escape 22,4,23,18,11,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,7,0,10,(__ASM_ARG(\iret_offset)+12)&0xff)
+__ASM_L(	.cfi_escape ((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,47,5,0,10,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 65523)
+__ASM_L(	.cfi_escape 22,4,23,18,10,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,7,0,10,(__ASM_ARG(\iret_offset)+12)&0xff)
+__ASM_L(	.cfi_escape ((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,47,5,0,10,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -32780 && __ASM_ARG(\iret_offset) <= 32755)
+__ASM_L(	.cfi_escape 22,4,25,18,13,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,((__ASM_ARG(\iret_offset)+4)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+4)&0xff000000)>>24,34,6,51,26,40,7,0)
+__ASM_L(	.cfi_escape 11,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,47,5,0,11,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 65531)
+__ASM_L(	.cfi_escape 22,4,27,18,10,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,9,0,13,(__ASM_ARG(\iret_offset)+12)&0xff)
+__ASM_L(	.cfi_escape ((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,((__ASM_ARG(\iret_offset)+12)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+12)&0xff000000)>>24,34,47,7,0,13,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,((__ASM_ARG(\iret_offset)+12)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+12)&0xff000000)>>24,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -2147483652 && __ASM_ARG(\iret_offset) <= 2147483635)
+__ASM_L(	.cfi_escape 22,4,29,18,13,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,((__ASM_ARG(\iret_offset)+4)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+4)&0xff000000)>>24,34,6,51,26,40,9,0)
+__ASM_L(	.cfi_escape 13,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,((__ASM_ARG(\iret_offset)+12)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+12)&0xff000000)>>24,34,47,7,0,13,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,((__ASM_ARG(\iret_offset)+12)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+12)&0xff000000)>>24,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -12 && __ASM_ARG(\iret_offset) <= 2147483643)
+__ASM_L(	.cfi_escape 22,4,29,18,13,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,((__ASM_ARG(\iret_offset)+4)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+4)&0xff000000)>>24,34,6,51,26,40,9,0)
+__ASM_L(	.cfi_escape 12,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,((__ASM_ARG(\iret_offset)+12)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+12)&0xff000000)>>24,34,47,7,0,12,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,((__ASM_ARG(\iret_offset)+12)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+12)&0xff000000)>>24,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 4294967283)
+__ASM_L(	.cfi_escape 22,4,29,18,12,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,((__ASM_ARG(\iret_offset)+4)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+4)&0xff000000)>>24,34,6,51,26,40,9,0)
+__ASM_L(	.cfi_escape 12,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,((__ASM_ARG(\iret_offset)+12)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+12)&0xff000000)>>24,34,47,7,0,12,(__ASM_ARG(\iret_offset)+12)&0xff,((__ASM_ARG(\iret_offset)+12)&0xff00)>>8,((__ASM_ARG(\iret_offset)+12)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+12)&0xff000000)>>24,34,6)
+__ASM_L(.else)
+__ASM_L(	.error "Input arguments too large")
+__ASM_L(.endif)
+/*[[[end]]]*/
+__ASM_L(.endm)
+
+
+__ASM_L(.macro .cfi_restore_iret_ss iret_offset=0)
+/*[[[cfi{arch='i386', register='%ss'}
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_CS+\iret_offset     # CFA, CS
+	deref                                     # CFA, [CS]
+	and    $3                                 # CFA, [CS] & 3
+	jnz    pop, 1f                            # CFA, if (CS & 3) goto 1f;
+	# Kernel-space return location
+	push   %ss
+	ret
+1:	# User-space return location
+	plus   $OFFSET_IRREGS_SS+\iret_offset     # SS
+	deref                                     # [SS]
+]]]*/
+__ASM_L(.if __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 111)
+__ASM_L(	.cfi_escape 22,42,18,18,35,__ASM_ARG(\iret_offset)+4,6,51,26,40,6,0,146,42,0,47)
+__ASM_L(	.cfi_escape 3,0,35,__ASM_ARG(\iret_offset)+16,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 123)
+__ASM_L(	.cfi_escape 22,42,19,18,35,__ASM_ARG(\iret_offset)+4,6,51,26,40,6,0,146,42,0,47)
+__ASM_L(	.cfi_escape 4,0,8,__ASM_ARG(\iret_offset)+16,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -16 && __ASM_ARG(\iret_offset) <= 111)
+__ASM_L(	.cfi_escape 22,42,19,18,9,__ASM_ARG(\iret_offset)+4,34,6,51,26,40,6,0,146,42,0)
+__ASM_L(	.cfi_escape 47,3,0,35,__ASM_ARG(\iret_offset)+16,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -132 && __ASM_ARG(\iret_offset) <= 111)
+__ASM_L(	.cfi_escape 22,42,20,18,9,__ASM_ARG(\iret_offset)+4,34,6,51,26,40,6,0,146,42,0)
+__ASM_L(	.cfi_escape 47,4,0,9,__ASM_ARG(\iret_offset)+16,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 239)
+__ASM_L(	.cfi_escape 22,42,20,18,8,__ASM_ARG(\iret_offset)+4,34,6,51,26,40,6,0,146,42,0)
+__ASM_L(	.cfi_escape 47,4,0,8,__ASM_ARG(\iret_offset)+16,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 251)
+__ASM_L(	.cfi_escape 22,42,21,18,8,__ASM_ARG(\iret_offset)+4,34,6,51,26,40,6,0,146,42,0)
+__ASM_L(	.cfi_escape 47,5,0,11,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -144 && __ASM_ARG(\iret_offset) <= 111)
+__ASM_L(	.cfi_escape 22,42,21,18,11,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,6,0,146,42)
+__ASM_L(	.cfi_escape 0,47,4,0,9,__ASM_ARG(\iret_offset)+16,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -32772 && __ASM_ARG(\iret_offset) <= 32751)
+__ASM_L(	.cfi_escape 22,42,22,18,11,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,6,0,146,42)
+__ASM_L(	.cfi_escape 0,47,5,0,11,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -16 && __ASM_ARG(\iret_offset) <= 32763)
+__ASM_L(	.cfi_escape 22,42,22,18,11,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,6,0,146,42)
+__ASM_L(	.cfi_escape 0,47,5,0,10,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 65519)
+__ASM_L(	.cfi_escape 22,42,22,18,10,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,6,0,146,42)
+__ASM_L(	.cfi_escape 0,47,5,0,10,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 65531)
+__ASM_L(	.cfi_escape 22,42,24,18,10,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,34,6,51,26,40,6,0,146,42)
+__ASM_L(	.cfi_escape 0,47,7,0,13,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,((__ASM_ARG(\iret_offset)+16)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+16)&0xff000000)>>24,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -32784 && __ASM_ARG(\iret_offset) <= 32751)
+__ASM_L(	.cfi_escape 22,42,24,18,13,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,((__ASM_ARG(\iret_offset)+4)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+4)&0xff000000)>>24,34,6,51,26,40,6,0)
+__ASM_L(	.cfi_escape 146,42,0,47,5,0,11,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -2147483652 && __ASM_ARG(\iret_offset) <= 2147483631)
+__ASM_L(	.cfi_escape 22,42,26,18,13,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,((__ASM_ARG(\iret_offset)+4)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+4)&0xff000000)>>24,34,6,51,26,40,6,0)
+__ASM_L(	.cfi_escape 146,42,0,47,7,0,13,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,((__ASM_ARG(\iret_offset)+16)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+16)&0xff000000)>>24,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -16 && __ASM_ARG(\iret_offset) <= 2147483643)
+__ASM_L(	.cfi_escape 22,42,26,18,13,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,((__ASM_ARG(\iret_offset)+4)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+4)&0xff000000)>>24,34,6,51,26,40,6,0)
+__ASM_L(	.cfi_escape 146,42,0,47,7,0,12,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,((__ASM_ARG(\iret_offset)+16)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+16)&0xff000000)>>24,34,6)
+__ASM_L(.elseif __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 4294967279)
+__ASM_L(	.cfi_escape 22,42,26,18,12,(__ASM_ARG(\iret_offset)+4)&0xff,((__ASM_ARG(\iret_offset)+4)&0xff00)>>8,((__ASM_ARG(\iret_offset)+4)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+4)&0xff000000)>>24,34,6,51,26,40,6,0)
+__ASM_L(	.cfi_escape 146,42,0,47,7,0,12,(__ASM_ARG(\iret_offset)+16)&0xff,((__ASM_ARG(\iret_offset)+16)&0xff00)>>8,((__ASM_ARG(\iret_offset)+16)&0xff0000)>>16,((__ASM_ARG(\iret_offset)+16)&0xff000000)>>24,34,6)
+__ASM_L(.else)
+__ASM_L(	.error "Input arguments too large")
+__ASM_L(.endif)
+/*[[[end]]]*/
+__ASM_L(.endm)
+
+__ASM_L(.macro .cfi_restore_iret_es iret_offset=0)
+__ASM_L(	.cfi_same_value %es)
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_restore_iret_ds iret_offset=0)
+__ASM_L(	.cfi_same_value %ds)
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_restore_iret_fs iret_offset=0)
+__ASM_L(	.cfi_same_value %fs)
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_restore_iret_gs iret_offset=0)
+__ASM_L(	.cfi_same_value %gs)
+__ASM_L(.endm)
+
+__ASM_L(.macro .cfi_restore_iret_es_or_offset novm86_offset:req iret_offset=0)
+__ASM_L(	.cfi_offset %es, __ASM_ARG(\novm86_offset))
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_restore_iret_ds_or_offset novm86_offset:req iret_offset=0)
+__ASM_L(	.cfi_offset %ds, __ASM_ARG(\novm86_offset))
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_restore_iret_fs_or_offset novm86_offset:req iret_offset=0)
+__ASM_L(	.cfi_offset %fs, __ASM_ARG(\novm86_offset))
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_restore_iret_gs_or_offset novm86_offset:req iret_offset=0)
+__ASM_L(	.cfi_offset %gs, __ASM_ARG(\novm86_offset))
+__ASM_L(.endm)
+#else /* __I386_NO_VM86 */
 __ASM_L(.macro .cfi_restore_iret_esp iret_offset=0)
 /*[[[cfi{arch='i386', register='%esp'}
 	dup                                       # CFA, CFA
@@ -1021,6 +1179,7 @@ __ASM_L(.endif)
 __ASM_L(.endm)
 
 
+
 __ASM_L(.macro .cfi_restore_iret_es_or_offset novm86_offset:req iret_offset=0)
 /*[[[cfi{arch='i386', register='%es'}
 	dup                                       # CFA, CFA
@@ -1275,6 +1434,7 @@ __ASM_L(	.error "Input arguments too large")
 __ASM_L(.endif)
 /*[[[end]]]*/
 __ASM_L(.endm)
+#endif /* !__I386_NO_VM86 */
 
 
 

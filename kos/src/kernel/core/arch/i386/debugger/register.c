@@ -36,6 +36,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/mman.h>
 #include <kernel/x86/breakpoint.h>
 #include <sched/scheduler.h>
+#include <sched/task.h>
 
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
@@ -304,7 +305,10 @@ NOTHROW(KCALL saveorig)(void) {
 		ammend->dca_sgregs.sg_fs = x86_dbg_origstate.fcs_sgregs.sg_fs16;
 		ammend->dca_sgregs.sg_gs = x86_dbg_origstate.fcs_sgregs.sg_gs16;
 #else /* __x86_64__ */
-		if (!(x86_dbg_origstate.fcs_Pflags & EFLAGS_VM)) {
+#ifndef __I386_NO_VM86
+		if (!(x86_dbg_origstate.fcs_Pflags & EFLAGS_VM))
+#endif /* !__I386_NO_VM86 */
+		{
 			ammend->dca_gs = x86_dbg_origstate.fcs_sgregs.sg_gs;
 			ammend->dca_ss = x86_dbg_origstate.fcs_sgregs.sg_ss;
 		}
@@ -434,6 +438,7 @@ NOTHROW(KCALL loadview)(void) {
 			x86_dbg_origstate.fcs_sgregs.sg_fs = ammend->dca_sgregs.sg_fs16;
 			x86_dbg_origstate.fcs_sgregs.sg_gs = ammend->dca_sgregs.sg_gs16;
 #else /* __x86_64__ */
+#ifndef __I386_NO_VM86
 			if (x86_dbg_origstate.fcs_Pflags & EFLAGS_VM) {
 				/* Vm86 IRET tail */
 				x86_dbg_origstate.fcs_sgregs.sg_es = ist->ics_irregs_v.ir_es16;
@@ -442,7 +447,9 @@ NOTHROW(KCALL loadview)(void) {
 				x86_dbg_origstate.fcs_sgregs.sg_gs = ist->ics_irregs_v.ir_gs16;
 				x86_dbg_origstate.fcs_sgregs.sg_ss = ist->ics_irregs_v.ir_ss16;
 				psp                                = ist->ics_irregs_v.ir_Psp;
-			} else {
+			} else
+#endif /* !__I386_NO_VM86 */
+			{
 				x86_dbg_origstate.fcs_sgregs.sg_es = ist->ics_es16;
 				x86_dbg_origstate.fcs_sgregs.sg_ds = ist->ics_ds16;
 				x86_dbg_origstate.fcs_sgregs.sg_fs = ist->ics_fs16;

@@ -216,12 +216,14 @@ sys_sigreturn32_impl(struct icpustate *__restrict state,
 		                           eflags,
 		                           cred_allow_eflags_modify_mask());
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (eflags & EFLAGS_VM) {
 			state->ics_irregs_v.ir_es = es;
 			state->ics_irregs_v.ir_ds = ds;
 			state->ics_irregs_v.ir_fs = fs;
 			state->ics_irregs_v.ir_gs = gs;
 		} else
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		{
 			/* Validate segment register indices before actually restoring them. */

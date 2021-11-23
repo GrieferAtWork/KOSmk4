@@ -108,7 +108,10 @@ LOCAL_ucpustate_decode(struct icpustate const *__restrict return_state,
 	                           ucpustate_getpflags(result),
 	                           cred_allow_eflags_modify_mask());
 #ifdef DEFINE_sys32_coredump
-	if (!icpustate_isvm86(return_state)) {
+#ifndef __I386_NO_VM86
+	if (!icpustate_isvm86(return_state))
+#endif /* !__I386_NO_VM86 */
+	{
 		cpustate_verify_usercs(result->ucs_cs16);
 		cpustate_verify_userss(result->ucs_ss16);
 		cpustate_verify_usergs(result->ucs_sgregs.sg_gs16);

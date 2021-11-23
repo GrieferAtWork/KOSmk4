@@ -48,12 +48,14 @@ NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 	if (cs & 3)
 		return true;
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 	{
 		u32 eflags;
 		eflags = ATOMIC_READ(self->ir_eflags);
 		if unlikely(eflags & EFLAGS_VM)
 			return true;
 	}
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 	if (cs != SEGMENT_KERNEL_CODE)
 		return false;
@@ -63,7 +65,7 @@ NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 	return false;
 }
 
-/* get:`self->ir_Pip' */
+/* get: `self->ir_Pip' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
 	uintptr_t result = ATOMIC_READ(self->ir_Pip);
@@ -72,7 +74,7 @@ NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
 	return result;
 }
 
-/* get:`self->ir_cs16' */
+/* get: `self->ir_cs16' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 	u16 result = ATOMIC_READ(self->ir_cs16);
@@ -84,7 +86,7 @@ NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 	return result;
 }
 
-/* get:`self->ir_Pflags' */
+/* get: `self->ir_Pflags' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 	uintptr_t result = ATOMIC_READ(self->ir_Pflags);
@@ -96,7 +98,7 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 	return result;
 }
 
-/* get:`self->ir_rsp' */
+/* get: `self->ir_rsp' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 #ifdef __x86_64__
@@ -112,8 +114,10 @@ NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 	u16 cs = ATOMIC_READ(self->ir_cs16);
 	if (cs & 3)
 		goto is_user_iret;
+#ifndef __I386_NO_VM86
 	if (ATOMIC_READ(self->ir_eflags) & EFLAGS_VM)
 		goto is_user_iret;
+#endif /* !__I386_NO_VM86 */
 	if (cs == SEGMENT_KERNEL_CODE) {
 		u32 eip;
 		eip = ATOMIC_READ(self->ir_eip);
@@ -126,7 +130,7 @@ is_user_iret:
 #endif /* !__x86_64__ */
 }
 
-/* set:`self->ir_Pip' */
+/* set: `self->ir_Pip' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t value) {
 	uintptr_t oldval;
@@ -139,7 +143,7 @@ NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t valu
 	} while unlikely(!ATOMIC_CMPXCH_WEAK(self->ir_Pip, oldval, value));
 }
 
-/* set:`self->ir_cs' */
+/* set: `self->ir_cs' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 	pflag_t was;
@@ -154,7 +158,7 @@ NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 	PREEMPTION_POP(was);
 }
 
-/* set:`self->ir_Pflags' */
+/* set: `self->ir_Pflags' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t value) {
 	pflag_t was;
@@ -169,7 +173,7 @@ NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t v
 	PREEMPTION_POP(was);
 }
 
-/* set:`self->ir_Pflags = (self->ir_Pflags & mask) | flags' */
+/* set: `self->ir_Pflags = (self->ir_Pflags & mask) | flags' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
                                uintptr_t mask, uintptr_t flags) {
@@ -209,7 +213,7 @@ NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
 	return false;
 }
 
-/* get:`self->ir_ss16' */
+/* get: `self->ir_ss16' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
 	u16 result = ATOMIC_READ(self->ir_ss16);
@@ -221,7 +225,7 @@ NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
 	return result;
 }
 
-/* set:`self->ir_rsp' */
+/* set: `self->ir_rsp' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value) {
 	pflag_t was;
@@ -236,7 +240,7 @@ NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value) {
 	PREEMPTION_POP(was);
 }
 
-/* set:`self->ir_ss' */
+/* set: `self->ir_ss' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 	pflag_t was;
@@ -253,7 +257,8 @@ NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 
 #else /* __x86_64__ */
 
-/* Not guarantied to return `1' for vm86 interrupt registers. */
+#ifndef __I386_NO_VM86
+/* Check if `self' returns to user-space (return value is undefined if vm86). */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self) {
 	u16 cs;
@@ -281,6 +286,8 @@ NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self) {
 	}
 	return false;
 }
+#endif /* !__I386_NO_VM86 */
+
 #endif /* !__x86_64__ */
 
 

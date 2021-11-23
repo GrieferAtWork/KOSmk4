@@ -324,35 +324,33 @@ NOTHROW(KCALL i386_getsegment_base)(struct icpustate32 const *__restrict state,
 	pflag_t was;
 	struct segment *seg;
 	struct desctab dt;
+
+#ifndef __I386_NO_VM86
+	if (icpustate_isvm86(state)) {
+		switch (segment_regno) {
+		case EMU86_R_ES: segment_index = icpustate32_getes_vm86(state); break;
+		case EMU86_R_CS: segment_index = icpustate32_getcs(state); break;
+		case EMU86_R_SS: segment_index = icpustate32_getss(state); break;
+		case EMU86_R_DS: segment_index = icpustate32_getds_vm86(state); break;
+		case EMU86_R_FS: segment_index = icpustate32_getfs_vm86(state); break;
+		case EMU86_R_GS: segment_index = icpustate32_getgs_vm86(state); break;
+		default: __builtin_unreachable();
+		}
+		return segment_index << 4;
+	}
+#endif /* !__I386_NO_VM86 */
+
 	/* Determine the segment's index. */
 	switch (segment_regno) {
-
-	case EMU86_R_ES:
-		segment_index = icpustate_getes(state);
-		break;
-
-	case EMU86_R_CS:
-		segment_index = icpustate_getcs(state);
-		break;
-
-	case EMU86_R_SS:
-		segment_index = icpustate_getcs(state);
-		break;
-
-	case EMU86_R_DS:
-		segment_index = icpustate_getds(state);
-		break;
-
-	case EMU86_R_FS:
-		segment_index = icpustate_getfs(state);
-		break;
-
-	case EMU86_R_GS:
-		segment_index = __rdgs();
-		break;
-
+	case EMU86_R_ES: segment_index = icpustate_getes_novm86(state); break;
+	case EMU86_R_CS: segment_index = icpustate_getcs(state); break;
+	case EMU86_R_SS: segment_index = icpustate_getss(state); break;
+	case EMU86_R_DS: segment_index = icpustate_getds_novm86(state); break;
+	case EMU86_R_FS: segment_index = icpustate_getfs_novm86(state); break;
+	case EMU86_R_GS: segment_index = icpustate_getgs_novm86(state); break;
 	default: __builtin_unreachable();
 	}
+
 	/* Handle known segment indices without disabling preemption. */
 	switch (segment_index & ~3) {
 
@@ -926,13 +924,13 @@ emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 #define EMU86_ISUSER() self->r_mem.rm_chkuser
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(__I386_NO_VM86)
 #define EMU86_EMULATE_CONFIG_VM86 0
 #define EMU86_ISUSER_NOVM86()     EMU86_ISUSER()
 #ifdef EMU86_ISUSER_IS_ONE
 #define EMU86_ISUSER_NOVM86_IS_ONE 1
 #endif /* EMU86_ISUSER_IS_ONE */
-#else /* __x86_64__ */
+#else /* __x86_64__ || __I386_NO_VM86 */
 #define EMU86_EMULATE_CONFIG_VM86             1
 #define EMU86_EMULATE_VM86_GETIF()            0 /* TODO */
 #define EMU86_EMULATE_VM86_SETIF(v)           (void)0
@@ -943,7 +941,7 @@ emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 #define EMU86_ISUSER_NOVM86()                 (self->r_mem.rm_chkuser && !icpustate32_isvm86(self->r_icstate))
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 #define EMU86_ISVM86()                        (icpustate32_isvm86(self->r_icstate))
-#endif /* !__x86_64__ */
+#endif /* !__x86_64__ && !__I386_NO_VM86 */
 
 #define EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP 1
 #define EMU86_UNSUPPORTED_MEMACCESS(addr, num_bytes, reading, writing) (void)0

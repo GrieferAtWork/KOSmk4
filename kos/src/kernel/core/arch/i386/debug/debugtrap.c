@@ -236,7 +236,10 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 		cpustate_verify_userpflags(icpustate_getpflags(return_state),
 		                           eflags, eflags_mask);
 #ifndef __x86_64__
-		if (icpustate_isvm86(return_state)) {
+#ifndef __I386_NO_VM86
+		if (icpustate_isvm86(return_state))
+#endif /* !__I386_NO_VM86 */
+		{
 			return_state->ics_irregs_v.ir_es = es;
 			return_state->ics_irregs_v.ir_ds = ds;
 			return_state->ics_irregs_v.ir_fs = fs;

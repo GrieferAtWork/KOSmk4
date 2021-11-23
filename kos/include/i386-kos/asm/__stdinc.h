@@ -20,6 +20,13 @@
 #ifndef _I386_KOS_ASM___STDINC_H
 #define _I386_KOS_ASM___STDINC_H 1
 
+#if (defined(__KOS__) && defined(__KERNEL__) && defined(__i386__) && !defined(__x86_64__) && \
+     (defined(CONFIG_NO_VM86) || (defined(CONFIG_VM86) && (-CONFIG_VM86 - 1) == -1)))
+/* Disable support for hardware vm86 mode (iow: no special handling for `EFLAGS_VM' in interrupts)
+ * -> This does not affect software-emulation of vm86, as can be done with libvm86! */
+#define __I386_NO_VM86
+#endif /* ... */
+
 #if (!defined(__INTELLISENSE__) && defined(__CC__) && \
      defined(__KOS__) && defined(__KERNEL__) &&       \
      defined(__COMPILER_HAVE_GCC_ASM) && !defined(__HAVE_FPU))

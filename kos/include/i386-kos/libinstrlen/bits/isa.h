@@ -37,12 +37,16 @@
 #endif /* !__x86_64__ */
 
 /* ISA codes. */
-#ifdef __x86_64__
+#if __SIZEOF_POINTER__ == 8
 #define INSTRLEN_ISA_X86_64 0
 #define INSTRLEN_ISA_I386   1
-#else /* __x86_64__ */
-#define INSTRLEN_ISA_I386   0
-#define INSTRLEN_ISA_8086   1
+#elif __SIZEOF_POINTER__ == 4
+#define INSTRLEN_ISA_I386 0
+#ifndef __I386_NO_VM86
+#define INSTRLEN_ISA_8086 1
+#endif /* !__I386_NO_VM86 */
+#elif __SIZEOF_POINTER__ == 2
+#define INSTRLEN_ISA_8086 0
 #endif /* !__x86_64__ */
 
 /* Default ISA type. */
@@ -142,16 +146,24 @@ _instrlen_isa_getcs_from_unwind_getreg(unsigned int (LIBUNWIND_CC *__reg_getter)
 	return __result;
 }
 #else /* __x86_64__ */
+#ifdef __I386_NO_VM86
+#define instrlen_isa_from_icpustate(s)                     INSTRLEN_ISA_I386
+#define instrlen_isa_from_scpustate(s)                     INSTRLEN_ISA_I386
+#define instrlen_isa_from_ucpustate(s)                     INSTRLEN_ISA_I386
+#define instrlen_isa_from_fcpustate(s)                     INSTRLEN_ISA_I386
+#define instrlen_isa_from_unwind_getreg(reg_getter, state) INSTRLEN_ISA_I386
+#else /* __I386_NO_VM86 */
 #define instrlen_isa_from_icpustate(s) (likely(!icpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
 #define instrlen_isa_from_scpustate(s) (likely(!scpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
 #define instrlen_isa_from_ucpustate(s) (likely(!ucpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
-#define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_I386
-#define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_I386
 #define instrlen_isa_from_fcpustate(s) (likely(!fcpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
 #define instrlen_isa_from_unwind_getreg(reg_getter, state)                                                             \
 	(likely(!(_instrlen_isa_geteflags_from_unwind_getreg(reg_getter, state) & __UINT32_C(0x00020000) /* EFLAGS_VM */)) \
 	 ? INSTRLEN_ISA_I386                                                                                               \
 	 : INSTRLEN_ISA_8086)
+#endif /* !__I386_NO_VM86 */
+#define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_I386
+#define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_I386
 __LOCAL __uintptr_t
 _instrlen_isa_geteflags_from_unwind_getreg(unsigned int (LIBUNWIND_CC *__reg_getter)(void const *__arg,
                                                                                      __UINTPTR_HALF_TYPE__ __dw_regno,

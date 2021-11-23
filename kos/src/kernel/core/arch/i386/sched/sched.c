@@ -184,6 +184,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 
 
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 PRIVATE NOBLOCK ATTR_COLD u32
 NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	struct ucpustate st, ost;
@@ -281,6 +282,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	PREEMPTION_POP(was);
 	return result;
 }
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 
 

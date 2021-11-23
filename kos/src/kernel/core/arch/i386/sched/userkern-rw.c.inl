@@ -189,10 +189,12 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 
 	case offsetof(USERKERN_STRUCT, uk_regs.ucs_sgregs.sg_gs):
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (icpustate_isvm86(state)) {
 			state->ics_irregs_v.ir_gs = value & 0xffff;
 			break;
 		}
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		cpustate_verify_usergs(value);
 		icpustate_setgs_novm86(state, value);
@@ -200,10 +202,12 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 
 	case offsetof(USERKERN_STRUCT, uk_regs.ucs_sgregs.sg_fs):
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (icpustate_isvm86(state)) {
 			state->ics_irregs_v.ir_fs = value & 0xffff;
 			break;
 		}
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		cpustate_verify_userfs(value);
 		icpustate_setfs_novm86(state, value);
@@ -211,10 +215,12 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 
 	case offsetof(USERKERN_STRUCT, uk_regs.ucs_sgregs.sg_es):
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (icpustate_isvm86(state)) {
 			state->ics_irregs_v.ir_es = value & 0xffff;
 			break;
 		}
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		cpustate_verify_useres(value);
 		icpustate_setes_novm86(state, value);
@@ -222,10 +228,12 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 
 	case offsetof(USERKERN_STRUCT, uk_regs.ucs_sgregs.sg_ds):
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (icpustate_isvm86(state)) {
 			state->ics_irregs_v.ir_ds = value & 0xffff;
 			break;
 		}
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		cpustate_verify_userds(value);
 		icpustate_setds_novm86(state, value);
@@ -233,7 +241,9 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 
 	case offsetof(USERKERN_STRUCT, uk_regs.ucs_cs):
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (!icpustate_isvm86(state))
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		{
 			cpustate_verify_usercs(value);
@@ -243,7 +253,9 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 
 	case offsetof(USERKERN_STRUCT, uk_regs.ucs_ss):
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 		if (!icpustate_isvm86(state))
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 		{
 			cpustate_verify_userss(value);

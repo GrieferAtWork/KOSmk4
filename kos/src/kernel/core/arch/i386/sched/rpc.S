@@ -164,9 +164,12 @@ END(task_asyncrpc_execnow)
  * >> redirect_iret_for_sysret() {
  * >>     struct irregs_kernel *irr;
  * >>     PREEMPTION_DISABLE(); // Redirection is only
+ * >> #ifndef __I386_NO_VM86
  * >>     if (IS_VM86_TASK) {
  * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_vm86);
- * >>     } else {
+ * >>     } else
+ * >> #endif // !__I386_NO_VM86
+ * >>     {
  * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_user);
  * >>     }
  * >>     memcpy(&PERTASK(this_x86_sysret_iret),irr,
@@ -231,8 +234,10 @@ for (local reg: ["rip", "cs", "rflags", "rsp", "ss"])
 print("#else /" "* __x86_64__ *" "/");
 for (local reg: ["eip", "cs", "eflags"])
 	restoreSimpleRegister('i386', reg);
+print("#ifndef __I386_NO_VM86");
 for (local reg: { "es", "ds", "fs", "gs" })
 	restoreVm86Register(reg);
+print("#endif /" "* __I386_NO_VM86 *" "/");
 print("#endif /" "* !__x86_64__ *" "/");
 ]]]*/
 #ifdef __x86_64__
@@ -253,6 +258,7 @@ __ASM_L(	.cfi_escape 22,41,19,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OF
 __ASM_L(	.cfi_escape 47,3,0,146,41,0)
 __ASM_L(	.cfi_escape 22,9,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS,155,6)
 __ASM_L(	.cfi_escape 47,2,0,121,0)
+#ifndef __I386_NO_VM86
 __ASM_L(	.cfi_escape 22,40,31,47,3,0,75,79,83,47,19,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS,155,6)
 __ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,8,6,47,3,0,146)
 __ASM_L(	.cfi_escape 40,0)
@@ -265,6 +271,7 @@ __ASM_L(	.cfi_escape 44,0)
 __ASM_L(	.cfi_escape 22,45,31,47,3,0,75,79,83,47,19,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS,155,6)
 __ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,20,6,47,3,0,146)
 __ASM_L(	.cfi_escape 45,0)
+#endif /* __I386_NO_VM86 */
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
 	.cfi_def_cfa %Psp, -SIZEOF_IRREGS_KERNEL
@@ -379,6 +386,8 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 
 #ifdef __x86_64__
 #define MAX_SIZEOF_ICPUSTATE (SIZEOF_ICPUSTATE64)
+#elif defined(__I386_NO_VM86)
+#define MAX_SIZEOF_ICPUSTATE (OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS32_USER)
 #else /* __x86_64__ */
 #define MAX_SIZEOF_ICPUSTATE (OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS32_VM86)
 #endif /* !__x86_64__ */
@@ -409,13 +418,15 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	/* Set `%Psp' such that it points at the correct IRET tail. */
 #ifdef __x86_64__
 	leaP   -SIZEOF_IRREGS64(%Pbp), %Psp
-#else /* __x86_64__ */
+#elif defined(__I386_NO_VM86)
+	leaP   -SIZEOF_IRREGS32_USER(%Pbp), %Psp
+#else /* ... */
 	movP   $(-SIZEOF_IRREGS32_USER), %Pax
 	movP   $(-SIZEOF_IRREGS32_VM86), %Pdi
 	ttest  mask=EFLAGS_VM, loc=OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P)
 	cmovnzP %Pdi, %Pax /* if (ucpustate_isvm86(state)) %Pax = %Pdi */
 	leaP   (%Pbp,%Pax,1), %Psp
-#endif /* !__x86_64__ */
+#endif /* !... */
 
 	/* Check if the current IRET location points to `x86_userexcept_sysret' */
 	cmpP   $(x86_userexcept_sysret), OFFSET_IRREGS_PIP(%Psp)
@@ -483,6 +494,7 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	 * Time  to  construct  the  rest  of  the  `struct icpustate'! */
 
 #ifndef __x86_64__
+#ifndef __I386_NO_VM86
 	ttest  mask=EFLAGS_VM, loc=OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P)
 	jz     .Lpush_icpustate_sgregs_novm86
 	/* Copy vm86 segment registers into the IRET tail where they belong! */
@@ -498,6 +510,7 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	pushP  $(SEGMENT_USER_DATA_RPL)   /* ics_es */
 	pushP  $(SEGMENT_USER_FSBASE_RPL) /* ics_fs */
 	jmp    .Lpush_icpustate_sgregs_done
+#endif /* !__I386_NO_VM86 */
 .Lpush_icpustate_sgregs_novm86:
 	pushP  OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS(%R_fcall0P) /* ics_ds */
 	pushP  OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES(%R_fcall0P) /* ics_es */

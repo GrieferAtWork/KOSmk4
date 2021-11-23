@@ -401,6 +401,7 @@ __NOTHROW_NCX(icpustate32_to_ucpustate64_ex)(struct icpustate32 const *__restric
 	__result->ucs_sgbase.sg_fsbase = __v_sg_fsbase;
 	__result->ucs_rflags = icpustate32_geteflags(__self);
 	__result->ucs_cs     = icpustate32_getcs(__self);
+#ifndef __I386_NO_VM86
 	if (__result->ucs_rflags & 0x20000) {
 		__result->ucs_sgregs.sg_gs = __self->ics_irregs_v.ir_gs16;
 		__result->ucs_sgregs.sg_fs = __self->ics_irregs_v.ir_fs16;
@@ -408,7 +409,9 @@ __NOTHROW_NCX(icpustate32_to_ucpustate64_ex)(struct icpustate32 const *__restric
 		__result->ucs_sgregs.sg_ds = __self->ics_irregs_v.ir_ds16;
 		__result->ucs_ss           = icpustate32_getuserss(__self);
 		__effective_esp            = icpustate32_getuseresp(__self);
-	} else {
+	} else
+#endif /* !__I386_NO_VM86 */
+	{
 		if (__result->ucs_cs & 3) {
 			__result->ucs_ss = icpustate32_getuserss(__self);
 			__effective_esp  = icpustate32_getuseresp(__self);

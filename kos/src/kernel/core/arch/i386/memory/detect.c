@@ -103,7 +103,7 @@ NOTHROW(KCALL x86_initialize_default_memory_banks)(void) {
 #define VM86_BUFFER_SEG     ((VM86_BASE & 0xf0000) >> 4)
 
 
-PRIVATE WUNUSED NONNULL((1)) void *LIBVM86_TRANSLATE_CC
+PRIVATE ATTR_FREETEXT WUNUSED NONNULL((1)) void *LIBVM86_TRANSLATE_CC
 vm86_translate(vm86_state_t *__restrict UNUSED(self), void *ptr) {
 	return (void *)((uintptr_t)ptr + VM86_VIRT_OFFSET);
 }

@@ -27,7 +27,7 @@
 DECL_BEGIN
 
 #ifdef __CC__
-#if !defined(CONFIG_NO_VM86) && !defined(__x86_64__)
+#if !defined(__I386_NO_VM86) && !defined(__x86_64__)
 FUNDEF u8 KCALL x86_vm86_inb(struct icpustate *__restrict state, u16 port) THROWS(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 FUNDEF u16 KCALL x86_vm86_inw(struct icpustate *__restrict state, u16 port) THROWS(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 FUNDEF u32 KCALL x86_vm86_inl(struct icpustate *__restrict state, u16 port) THROWS(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
@@ -40,7 +40,7 @@ FUNDEF void KCALL x86_vm86_outl(struct icpustate *__restrict state, u16 port, u3
 /* TODO: pushf */
 /* TODO: popf */
 /* TODO: iret */
-#endif /* !CONFIG_NO_VM86 && !__x86_64__ */
+#endif /* !__I386_NO_VM86 && !__x86_64__ */
 #endif
 
 

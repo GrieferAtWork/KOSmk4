@@ -167,6 +167,7 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%ecx), %edx
 	.cfi_same_value %edx
 	/* Check if we need to construct a vm86 IRET tail. */
+#ifndef __I386_NO_VM86
 	ttest  mask=EFLAGS_VM, loc=OFFSET_UCPUSTATE_EFLAGS(%ecx)
 	jz     1f
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%ecx)
@@ -174,6 +175,7 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS)(%ecx)
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES)(%ecx)
 	jmp    2f
+#endif /* !__I386_NO_VM86 */
 1:	/* Load segment registers normally. */
 	movl   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%ecx), %eax
 	movl   %eax, %gs
@@ -353,6 +355,7 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	movl   (OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%ecx), %edx
 	.cfi_same_value %edx
 
+#ifndef __I386_NO_VM86
 	ttest  mask=EFLAGS_VM, loc=OFFSET_FCPUSTATE_EFLAGS(%ecx)
 	jz     1f
 	/* Return to vm86 */
@@ -381,6 +384,8 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	.cfi_reg_offset %gs, 32, %esp
 	iret
 	.cfi_restore_state
+#endif /* !__I386_NO_VM86 */
+
 1:	movw   OFFSET_FCPUSTATE_ES(%ecx), %ax
 	movw   %ax, %es
 	.cfi_same_value %es

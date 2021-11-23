@@ -318,9 +318,12 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
  * >> redirect_iret_for_sysret() {
  * >>     struct irregs_kernel *irr;
  * >>     PREEMPTION_DISABLE(); // Redirection is only
+ * >> #ifndef __I386_NO_VM86
  * >>     if (IS_VM86_TASK) {
  * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_vm86);
- * >>     } else {
+ * >>     } else
+ * >> #endif // !__I386_NO_VM86
+ * >>     {
  * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_user);
  * >>     }
  * >>     memcpy(&PERTASK(this_x86_sysret_iret),irr,
@@ -366,8 +369,19 @@ struct irregs_user;
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
  *       and that  `thread' is  hosted by  the calling  CPU. */
+#ifdef __I386_NO_VM86
+#define x86_get_irregs(thread) \
+	((struct irregs_user *)FORTASK(thread, *(uintptr_t *)&this_x86_kernel_psp0) - 1)
+#ifndef ___this_x86_kernel_psp0_defined
+#define ___this_x86_kernel_psp0_defined
+/* [== mnode_getendaddr(THIS_KERNEL_STACK)]
+ * The per-task value written to `t_psp0' during scheduler preemption. */
+DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
+#endif /* !___this_x86_kernel_psp0_defined */
+#else /* __I386_NO_VM86 */
 FUNDEF NOBLOCK ATTR_CONST ATTR_RETNONNULL NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 
 
@@ -377,36 +391,36 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self);
 
-/* get:`self->ir_Pip' */
+/* get: `self->ir_Pip' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self);
 
-/* get:`self->ir_cs16' */
+/* get: `self->ir_cs16' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self);
 
-/* get:`self->ir_Pflags' */
+/* get: `self->ir_Pflags' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self);
 
-/* set:`self->ir_Pip' */
+/* set: `self->ir_Pip' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t value);
 
-/* set:`self->ir_cs' */
+/* set: `self->ir_cs' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value);
 
-/* set:`self->ir_Pflags' */
+/* set: `self->ir_Pflags' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t value);
 
-/* set:`self->ir_Pflags = (self->ir_Pflags & mask) | flags' */
+/* set: `self->ir_Pflags = (self->ir_Pflags & mask) | flags' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
                                uintptr_t mask, uintptr_t flags);
 
-/* get:`self->ir_Psp' (with accounting for kernel-space return-sp on i386) */
+/* get: `self->ir_Psp' (with accounting for kernel-space return-sp on i386) */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self);
 
@@ -416,26 +430,32 @@ NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self);
 
-/* get:`self->ir_ss16' */
+/* get: `self->ir_ss16' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self);
 
-/* set:`self->ir_rsp' */
+/* set: `self->ir_rsp' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value);
 
-/* set:`self->ir_ss' */
+/* set: `self->ir_ss' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value);
 #else /* __x86_64__ */
 
-/* Check if `self' returns to user-space (but returns `false' if it returns to vm86). */
+#ifdef __I386_NO_VM86
+#define irregs_isuser_novm86 irregs_isuser
+#define irregs_isvm86(self)  0
+#else /* __I386_NO_VM86 */
+/* Check if `self' returns to user-space (return value is undefined if vm86). */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self);
 
 /* Check if `self' returns to vm86. */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self);
+#endif /* !__I386_NO_VM86 */
+
 #endif /* !__x86_64__ */
 
 #endif /* __CC__ */

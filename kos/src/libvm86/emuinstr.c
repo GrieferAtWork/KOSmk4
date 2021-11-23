@@ -25,12 +25,11 @@ opt.append("-Os");
  */
 #ifndef GUARD_LIBVM86_EMUINSTR_C
 #define GUARD_LIBVM86_EMUINSTR_C 1
-
 #define DISABLE_BRANCH_PROFILING
 #define CONFIG_LIBEMU86_WANT_16BIT 1
 #define CONFIG_LIBEMU86_WANT_32BIT 0
 #define CONFIG_LIBEMU86_WANT_64BIT 0
-#define __LIBEMU86_STATIC          1
+#define __LIBEMU86_STATIC 1
 
 #include "api.h"
 /**/

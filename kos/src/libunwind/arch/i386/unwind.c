@@ -1041,6 +1041,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base_p)(struct scpustate **__restri
 		u32 newval, oldval;
 		newval = *(u32 const *)src;
 		oldval = scpustate_getpflags(self);
+
 		/* Must not switch to/from vm86 contexts. */
 		if ((oldval & EFLAGS_VM) != (newval & EFLAGS_VM))
 			goto badreg;
@@ -1124,9 +1125,9 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base_p)(struct icpustate **__restri
 		u32 newval, oldval;
 		newval = *(u32 const *)src;
 		oldval = icpustate_getpflags(self);
+
 		/* Must not switch to/from vm86 contexts. */
-		if ((oldval & EFLAGS_VM) !=
-		    (newval & EFLAGS_VM))
+		if ((oldval & EFLAGS_VM) != (newval & EFLAGS_VM))
 			goto badreg;
 		icpustate_setpflags(self, newval);
 	}	break;

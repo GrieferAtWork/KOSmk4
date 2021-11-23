@@ -120,6 +120,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	movl   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX), %eax
 
 	/* Check if we're about to return to VM86 */
+#ifndef __I386_NO_VM86
 	ttest  mask=EFLAGS_VM, loc=(x86_dbg_exitstate + OFFSET_FCPUSTATE_EFLAGS)
 	jz     1f
 	EXTERN(thiscpu_idle_x86_kernel_psp0)
@@ -136,6 +137,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	pushl  (x86_dbg_exitstate + OFFSET_FCPUSTATE_CS)
 	pushl  (x86_dbg_exitstate + OFFSET_FCPUSTATE_EIP)
 	jmp    .Lunlock_and_iret
+#endif /* !__I386_NO_VM86 */
 
 	/* Restore segment registers. */
 1:	movw   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GS), %gs

@@ -288,7 +288,11 @@ is_io_instruction_and_not_memory_access(byte_t const *pc,
 #ifdef __x86_64__
 	pfx66 = 0;
 #else /* __x86_64__ */
+#ifdef __I386_NO_VM86
+	pfx66 = 0;
+#else /* __I386_NO_VM86 */
 	pfx66 = (icpustate_getpflags(state) & EFLAGS_VM) ? 1 : 0;
+#endif /* !__I386_NO_VM86 */
 #endif /* !__x86_64__ */
 	opcode = *pc++;
 	/* Parse prefix bytes. */
