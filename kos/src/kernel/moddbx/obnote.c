@@ -62,6 +62,7 @@
 #include <sched/pid.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/unaligned.h>
@@ -76,6 +77,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "include/obnote.h"
 
@@ -87,6 +89,7 @@
 #endif /* !ELF_ARCH_MAXSHSTRTAB_SIZ */
 
 #ifdef __ARCH_HAVE_COMPAT
+#include <compat/kos/types.h>
 #include <compat/kos/exec/rtld.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
@@ -1508,16 +1511,296 @@ badobj:
 	return 0;
 }
 
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW(KCALL note_time_t_value)(pformatprinter printer, void *arg, time_t value) {
+	struct tm t;
+	localtime_r(&value, &t);
+	return format_printf(printer, arg,
+	                     "%.4u-%.2u-%.2uT%.2u:%.2u:%.2u",
+	                     t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
+	                     t.tm_hour, t.tm_min, t.tm_sec);
+}
+
+#if __SIZEOF_TIME_T__ == 4
+#define NEED__note_timeu32_t
+#define note_time_t _note_timeu32_t
+#elif __SIZEOF_TIME_T__ == 8
+#define NEED__note_timeu64_t
+#define note_time_t _note_timeu64_t
+#else /* __SIZEOF_TIME_T__ == 8 */
+#error "Unsupported __SIZEOF_TIME_T__"
+#endif /* __SIZEOF_TIME_T__ != 8 */
+
+#if __SIZEOF_TIME32_T__ == 4
+#define NEED__note_timeu32_t
+#define note_time32_t _note_timeu32_t
+#elif __SIZEOF_TIME32_T__ == 8
+#define NEED__note_timeu64_t
+#define note_time32_t _note_timeu64_t
+#else /* __SIZEOF_TIME32_T__ == 8 */
+#error "Unsupported __SIZEOF_TIME32_T__"
+#endif /* __SIZEOF_TIME32_T__ != 8 */
+
+#if __SIZEOF_TIME64_T__ == 4
+#define NEED__note_timeu32_t
+#define note_time64_t _note_timeu32_t
+#elif __SIZEOF_TIME64_T__ == 8
+#define NEED__note_timeu64_t
+#define note_time64_t _note_timeu64_t
+#else /* __SIZEOF_TIME64_T__ == 8 */
+#error "Unsupported __SIZEOF_TIME64_T__"
+#endif /* __SIZEOF_TIME64_T__ != 8 */
+
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_TIME32_T == 4
+#define NEED__note_timeu32_t
+#define note_compat_time32_t _note_timeu32_t
+#elif __ARCH_COMPAT_SIZEOF_TIME32_T == 8
+#define NEED__note_timeu64_t
+#define note_compat_time32_t _note_timeu64_t
+#else /* __ARCH_COMPAT_SIZEOF_TIME32_T == 8 */
+#error "Unsupported __ARCH_COMPAT_SIZEOF_TIME32_T"
+#endif /* __ARCH_COMPAT_SIZEOF_TIME32_T != 8 */
+
+#if __ARCH_COMPAT_SIZEOF_TIME64_T == 4
+#define NEED__note_timeu32_t
+#define note_compat_time64_t _note_timeu32_t
+#elif __ARCH_COMPAT_SIZEOF_TIME64_T == 8
+#define NEED__note_timeu64_t
+#define note_compat_time64_t _note_timeu64_t
+#else /* __ARCH_COMPAT_SIZEOF_TIME64_T == 8 */
+#error "Unsupported __ARCH_COMPAT_SIZEOF_TIME64_T"
+#endif /* __ARCH_COMPAT_SIZEOF_TIME64_T != 8 */
+#endif /* __ARCH_HAVE_COMPAT */
+
+
+
+
+#ifdef NEED__note_timeu32_t
+#undef NEED__note_timeu32_t
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL _note_timeu32_t)(pformatprinter printer, void *arg,
+                               KERNEL CHECKED void const *pointer,
+                               unsigned int *__restrict pstatus) {
+	time_t tmval;
+	TRY {
+		tmval = (time_t)UNALIGNED_GET((uint32_t const *)pointer);
+	} EXCEPT {
+		goto badobj;
+	}
+	return note_time_t_value(printer, arg, tmval);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+#endif /* NEED__note_timeu32_t */
+
+
+#ifdef NEED__note_timeu64_t
+#undef NEED__note_timeu64_t
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL _note_timeu64_t)(pformatprinter printer, void *arg,
+                               KERNEL CHECKED void const *pointer,
+                               unsigned int *__restrict pstatus) {
+	time_t tmval;
+	TRY {
+		tmval = (time_t)UNALIGNED_GET((uint64_t const *)pointer);
+	} EXCEPT {
+		goto badobj;
+	}
+	return note_time_t_value(printer, arg, tmval);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+#endif /* NEED__note_timeu64_t */
+
+
+PRIVATE NONNULL((1, 5)) ssize_t
+NOTHROW(KCALL note_timespec_value)(pformatprinter printer, void *arg,
+                                   time_t tv_sec, syscall_ulong_t tv_nsec,
+                                   unsigned int *__restrict pstatus) {
+	ssize_t result, temp;
+	if unlikely(tv_nsec >= NSEC_PER_SEC)
+		goto badobj;
+	result = note_time_t_value(printer, arg, tv_sec);
+	if likely(result >= 0) {
+		temp = format_printf(printer, arg, ".%.9" PRIu32, tv_nsec);
+		if unlikely(temp < 0)
+			return temp;
+		result += temp;
+	}
+	return result;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+PRIVATE NONNULL((1, 5)) ssize_t
+NOTHROW(KCALL note_timeval_value)(pformatprinter printer, void *arg,
+                                  time_t tv_sec, syscall_ulong_t tv_usec,
+                                  unsigned int *__restrict pstatus) {
+	ssize_t result, temp;
+	if unlikely(tv_usec >= USEC_PER_SEC)
+		goto badobj;
+	result = note_time_t_value(printer, arg, tv_sec);
+	if likely(result >= 0) {
+		temp = format_printf(printer, arg, ".%.6" PRIu32, tv_usec);
+		if unlikely(temp < 0)
+			return temp;
+		result += temp;
+	}
+	return result;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+
+#define DEFINE_TIMESTRUCT_NOTE(name, T, note_time_value, a, b)     \
+	PRIVATE NONNULL((1, 3, 4)) ssize_t                             \
+	NOTHROW(KCALL name)(pformatprinter printer, void *arg,         \
+	                    KERNEL CHECKED void const *pointer,        \
+	                    unsigned int *__restrict pstatus) {        \
+		T tv;                                                      \
+		TRY {                                                      \
+			memcpy(&tv, pointer, sizeof(tv));                      \
+		} EXCEPT {                                                 \
+			goto badobj;                                           \
+		}                                                          \
+		return note_time_value(printer, arg, tv.a, tv.b, pstatus); \
+	badobj:                                                        \
+		*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;                     \
+		return 0;                                                  \
+	}
+#define note_timespec32 note___timespec32
+#define note_timeval32  note___timeval32
+#define note_timespec64 note___timespec64
+#define note_timeval64  note___timeval64
+DEFINE_TIMESTRUCT_NOTE(note___timespec32, struct __timespec32, note_timespec_value, tv_sec, tv_nsec)
+DEFINE_TIMESTRUCT_NOTE(note___timeval32, struct __timeval32, note_timeval_value, tv_sec, tv_usec)
+#ifdef __HAVE_TIMESPEC32_IS_TIMESPEC64
+#define note___timespec64 note___timespec32
+#else /* __HAVE_TIMESPEC32_IS_TIMESPEC64 */
+DEFINE_TIMESTRUCT_NOTE(note___timespec64, struct __timespec64, note_timespec_value, tv_sec, tv_nsec)
+#endif /* !__HAVE_TIMESPEC32_IS_TIMESPEC64 */
+
+#ifdef __HAVE_TIMEVAL32_IS_TIMEVAL64
+#define note___timeval64 note___timeval32
+#else /* __HAVE_TIMEVAL32_IS_TIMEVAL64 */
+DEFINE_TIMESTRUCT_NOTE(note___timeval64, struct __timeval64, note_timeval_value, tv_sec, tv_usec)
+#endif /* !__HAVE_TIMEVAL32_IS_TIMEVAL64 */
+
+#ifdef __ARCH_HAVE_COMPAT
+#ifdef __HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32
+#define note_compat_timespec32 note_timespec32
+#elif defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC64)
+#define note_compat_timespec32 note_timespec64
+#else /* ... */
+DEFINE_TIMESTRUCT_NOTE(note_compat_timespec32, struct compat_timespec32, note_timespec_value, tv_sec, tv_nsec)
+#endif /* !... */
+
+#ifdef __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64
+#define note_compat_timespec64 note_compat_timespec32
+#elif defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC32)
+#define note_compat_timespec64 note_timespec32
+#elif defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64)
+#define note_compat_timespec64 note_timespec64
+#else  /* ... */
+DEFINE_TIMESTRUCT_NOTE(note_compat_timespec64, struct compat_timespec64, note_timespec_value, tv_sec, tv_nsec)
+#endif /* !... */
+
+#ifdef __HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32
+#define note_compat_timeval32 note_timeval32
+#elif defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL64)
+#define note_compat_timeval32 note_timeval64
+#else /* ... */
+DEFINE_TIMESTRUCT_NOTE(note_compat_timeval32, struct compat_timeval32, note_timeval_value, tv_sec, tv_usec)
+#endif /* !... */
+
+#ifdef __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64
+#define note_compat_timeval64 note_compat_timeval32
+#elif defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL32)
+#define note_compat_timeval64 note_timeval32
+#elif defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64)
+#define note_compat_timeval64 note_timeval64
+#else  /* ... */
+DEFINE_TIMESTRUCT_NOTE(note_compat_timeval64, struct compat_timeval64, note_timeval_value, tv_sec, tv_usec)
+#endif /* !... */
+#endif /* __ARCH_HAVE_COMPAT */
+
+
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
+#define note_timespec note_timespec64
+#define note_timeval  note_timeval64
+#elif __SIZEOF_TIME_T__ == __SIZEOF_TIME32_T__
+#define note_timespec note_timespec32
+#define note_timeval  note_timeval32
+#else /* __SIZEOF_TIME_T__ == ... */
+#error "Unsupported `__SIZEOF_TIME_T__'"
+#endif /* __SIZEOF_TIME_T__ != ... */
+
+
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW(KCALL note_ktime_t_value)(pformatprinter printer, void *arg,
+                                  ktime_t ktm, unsigned int *__restrict pstatus) {
+	struct timespec tms;
+	if (ktm == KTIME_NONBLOCK)
+		return RAWPRINT("NONBLOCK");
+	if (ktm == KTIME_INFINITE)
+		return RAWPRINT("INFINITE");
+	tms = ktime_to_timespec(ktm);
+	return note_timespec(printer, arg, &tms, pstatus);
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_ktime_t)(pformatprinter printer, void *arg,
+                            KERNEL CHECKED void const *pointer,
+                            unsigned int *__restrict pstatus) {
+	ktime_t tmval;
+	TRY {
+		tmval = (ktime_t)UNALIGNED_GET((__CRT_PRIVATE_UINT(__SIZEOF_KTIME_T__) const *)pointer);
+	} EXCEPT {
+		goto badobj;
+	}
+	return note_ktime_t_value(printer, arg, tmval, pstatus);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+
+
+
+
 
 
 /* NOTE: This list must be sorted lexicographically ascending! */
 PRIVATE struct obnote_entry const notes[] = {
-	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
+#ifdef __ARCH_HAVE_COMPAT
+	{ "__compat_time32_t", &note_compat_time32_t },
+	{ "__compat_time64_t", &note_compat_time64_t },
+#endif /* __ARCH_HAVE_COMPAT */
 	{ "__fd_t", &note_fd_t },
+	{ "__time_t", &note_time_t },
+	{ "__time32_t", &note_time32_t },
+	{ "__time64_t", &note_time64_t },
+	{ "__timespec32", &note___timespec64 },
+	{ "__timespec64", &note___timespec64 },
+	{ "__timeval32", &note___timeval64 },
+	{ "__timeval64", &note___timeval64 },
 	{ "ansittydev", &note_mfile },
 	{ "blkdev", &note_mfile },
 	{ "chrdev", &note_mfile },
 	{ "clnknode", &note_mfile },
+#ifdef __ARCH_HAVE_COMPAT
+	{ "compat_time32_t", &note_compat_time32_t },
+	{ "compat_time64_t", &note_compat_time64_t },
+	{ "compat_timespec32", &note_compat_timespec32 },
+	{ "compat_timespec64", &note_compat_timespec64 },
+	{ "compat_timeval32", &note_compat_timeval32 },
+	{ "compat_timeval64", &note_compat_timeval64 },
+#endif /* __ARCH_HAVE_COMPAT */
 	{ "constdir", &note_mfile },
 	{ "cpu", &note_cpu },
 	{ "device", &note_mfile },
@@ -1540,6 +1823,7 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "fsuper", &note_fsuper },
 	{ "handle", &note_handle },
 	{ "kbddev", &note_mfile },
+	{ "ktime_t", &note_ktime_t },
 	{ "mbnode", &note_mnode },
 	{ "mfile", &note_mfile },
 	{ "mfutex", &note_mfutex },
@@ -1561,6 +1845,15 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "ramfs_super", &note_fsuper },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
+	{ "time_t", &note_time_t },
+	{ "time32_t", &note_time32_t },
+	{ "time64_t", &note_time64_t },
+	{ "timespec32", &note_timespec32 },
+	{ "timespec64", &note_timespec64 },
+	{ "timespec", &note_timespec },
+	{ "timeval32", &note_timeval32 },
+	{ "timeval64", &note_timeval64 },
+	{ "timeval", &note_timeval },
 	{ "ttydev", &note_mfile },
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
