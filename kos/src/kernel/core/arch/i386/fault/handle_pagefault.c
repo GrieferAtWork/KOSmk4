@@ -48,6 +48,7 @@
 #include <kernel/x86/phys2virt64.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
+#include <sched/task.h>
 #include <sched/userkern.h>
 #include <sched/x86/iobm.h>
 #include <sched/x86/tss.h>
@@ -1102,7 +1103,16 @@ pop_connections_and_throw_segfault:
 		 * -> Try to unwind this happening. */
 		IF_X64(bool is_compat;)
 		void const *callsite_pc;
-		byte_t const *sp = icpustate_getsp(state);
+		byte_t const *sp;
+
+#ifdef __x86_64__
+		/* Special handling required for work-around to QEMU bug.
+		 * See `handle_noncanon_as_gpf:'  below  for  more  info! */
+		if unlikely(ADDR_IS_NONCANON(addr))
+			goto handle_noncanon_as_gpf;
+#endif /* __x86_64__ */
+
+		sp = icpustate_getsp(state);
 		if (sp >= (byte_t const *)KERNELSPACE_BASE &&
 		    ((void const *)sp != (void const *)(&state->ics_irregs + 1) || FAULT_IS_USER))
 			goto not_a_badcall;
@@ -1195,6 +1205,21 @@ set_exception_pointers2:
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_args.e_pointers[i], 0);
 	}
+#ifdef __x86_64__
+	/* Even though the CPU is supposed to raise a #GPF when trying to
+	 * access a non-canon address, I've  seen newer versions of  QEMU
+	 * still throw a #PF in this case.
+	 *
+	 * This  actually breaks the  "test-fault.c" system-test, so to
+	 * normalize the behavior for this sort of situation, just call
+	 * into the GPF handler when we see a non-canon address! */
+	if unlikely(ADDR_IS_NONCANON(addr)) {
+handle_noncanon_as_gpf:
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+		return x86_handle_gpf(state, 0);
+	}
+#endif /* __x86_64__ */
+
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, pc);
 	pc = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
@@ -1203,6 +1228,7 @@ set_exception_pointers2:
 	       icpustate_getpc(state), pc, ecode);
 	icpustate_setpc(state, pc);
 do_unwind_state:
+
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);

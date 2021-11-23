@@ -407,8 +407,9 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 			 * may be scattered around the  actually accessed location by  the
 			 * max # number of bytes on the data-bus minus 1 */
 			assert_range(error_data()->e_args.e_segfault.s_addr, addr, WORDMASK);
+
 			/* VIO  writes may first perform reads in order to then write-back
-			 * a larger data word (i.e. `pokeb(addr, v)' may be dispatched as:
+			 * a larger data word (e.g. `pokeb(addr, v)' may be dispatched as:
 			 * >> a.word = peekw(addr & ~1);
 			 * >> a.bytes[addr & 1] = v;
 			 * >> pokew(addr & ~1, a.word);
