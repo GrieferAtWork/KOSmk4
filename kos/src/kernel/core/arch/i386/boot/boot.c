@@ -956,9 +956,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       sub-class  type IDs can easily be used to test for parent classes, given a precise child
 	 *       class ID; e.g. `HANDLE_TYPEKIND_MFILE_ISNODE(x)' checks for FNODE and all fnode-subs. */
 
-	/* TODO: Add  an ioctl around mfile_tailread() for user-space.
-	 *       Could be used to implement an efficient `tail(1) -f'. */
-
 	/* TODO: There's a missing incref() relating to mktty.
 	 * Replicate bug:
 	 *  - Repeatedly press CTRL+D on the busybox prompt

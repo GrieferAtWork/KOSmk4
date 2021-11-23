@@ -27,12 +27,12 @@
 #define __BLKROSET      _IO(0x12, 93)  /* [int const *arg] Set device read-only (0 = read-write) */
 #define __BLKROGET      _IO(0x12, 94)  /* [int *arg] Get read-only status (0 = read_write) */
 #define __BLKRRPART     _IO(0x12, 95)  /* Re-read partition table */
-#define __BLKGETSIZE    _IO(0x12, 96)  /* [long *arg] Return device size/512 */
+#define __BLKGETSIZE    _IO(0x12, 96)  /* [ulongptr_t *arg] Return device size/512 */
 #define __BLKFLSBUF     _IO(0x12, 97)  /* Flush buffer cache */
-#define __BLKRASET      _IO(0x12, 98)  /* [unsigned long const *arg] Set read ahead for block device */
-#define __BLKRAGET      _IO(0x12, 99)  /* [unsigned long *arg] Get current read ahead setting */
-#define __BLKFRASET     _IO(0x12, 100) /* [unsigned long const *arg] Set filesystem read-ahead. */
-#define __BLKFRAGET     _IO(0x12, 101) /* [unsigned long *arg] Get filesystem read-ahead. */
+#define __BLKRASET      _IO(0x12, 98)  /* [ulongptr_t const *arg] Set read ahead for block device */
+#define __BLKRAGET      _IO(0x12, 99)  /* [ulongptr_t *arg] Get current read ahead setting */
+#define __BLKFRASET     _IO(0x12, 100) /* [ulongptr_t const *arg] Set filesystem read-ahead. */
+#define __BLKFRAGET     _IO(0x12, 101) /* [ulongptr_t *arg] Get filesystem read-ahead. */
 #define __BLKSECTSET    _IO(0x12, 102) /* [u16 const *arg] Set max sectors per request. */
 #define __BLKSECTGET    _IO(0x12, 103) /* [u16 *arg] Get max sectors per request. */
 #define __BLKSSZGET     _IO(0x12, 104) /* [unsigned int *arg] Get block device sector size */

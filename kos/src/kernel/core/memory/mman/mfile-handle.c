@@ -48,6 +48,7 @@
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
+#include <kos/ioctl/file.h>
 #include <linux/fs.h>
 #include <sys/stat.h>
 
@@ -140,6 +141,40 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		}
 		break;
 
+	case FILE_IOC_TAILREAD: {
+		pos_t offset;
+		size_t num_bytes;
+		USER CHECKED void *buf;
+		USER CHECKED struct file_tailread *info;
+		validate_readwrite(arg, sizeof(struct file_tailread));
+		info = (USER CHECKED struct file_tailread *)arg;
+		/* Load arguments. */
+		buf       = info->ftr_buf;
+		num_bytes = info->ftr_siz;
+		offset    = (pos_t)info->ftr_pos;
+		COMPILER_READ_BARRIER();
+		validate_writable(buf, num_bytes);
+
+		/* Check if the file supports tail reading. */
+		if (mfile_hasrawio(self) &&
+		    (self->mf_ops->mo_stream == NULL ||
+		     (self->mf_ops->mo_stream->mso_pread == NULL &&
+		      self->mf_ops->mo_stream->mso_preadv == NULL))) {
+			/* Reminder: when `offset >= mfile_getsize(self)',  this
+			 *           blocks until at least 1 byte could be read. */
+			num_bytes = mfile_tailread(self, buf, num_bytes, offset);
+		} else {
+			/* Fallback: do a normal pread() with non-block. */
+			num_bytes = mfile_upread(self, buf, num_bytes, offset,
+			                         mode | IO_NONBLOCK);
+		}
+
+		/* Write-back the # of read bytes. */
+		COMPILER_WRITE_BARRIER();
+		info->ftr_siz = num_bytes;
+		return 0;
+	}	break;
+
 	default:
 		break;
 	}
@@ -176,6 +211,7 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		return ioctl_intarg_setsize(cmd, arg, mfile_getblocksize(self));
 
 	case _IO_WITHSIZE(BLKGETSIZE64, 0):
+		cmd = _IO_WITHSIZE(BLKGETSIZE64, sizeof(u64)); /* The ioctl code of this one is screwed up... */
 		return ioctl_intarg_setu64(cmd, arg, (uint64_t)mfile_getsize(self));
 
 	default:

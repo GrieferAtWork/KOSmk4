@@ -230,7 +230,7 @@ again:
 			mpart_lock_release(root);
 		} else {
 			/* We can't do the merge right now since we're not allowed
-			 * to release/change `dont_unlock_me', but what we can do
+			 * to  release/change `dont_unlock_me', but what we can do
 			 * is enqueue the merge to be done later. */
 			mpart_start_asyncjob(root, MPART_XF_WILLMERGE);
 		}
@@ -460,6 +460,13 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 
 	/* Set the file size to zero. */
 	atomic64_write(&file->mf_filesize, 0);
+
+	/* In order to wake up threads which may be doing tail-reads,
+	 * we broadcast the `mf_initdone' signal, which is also  used
+	 * during mfile_tailread() to  wait for more  data to  become
+	 * available. */
+	sig_broadcast(&file->mf_initdone);
+
 
 	/* As post-operations, destroy all dead parts, and drop a reference from `file' */
 	if (!mpart_delete_postop_builder_isempty(&deadparts)) {

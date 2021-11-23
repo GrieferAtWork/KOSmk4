@@ -23,11 +23,11 @@
 //#define      DEFINE_mfile_read_p
 //#define       DEFINE_mfile_readv
 //#define     DEFINE_mfile_readv_p
-//#define    DEFINE_mfile_tailread
+#define    DEFINE_mfile_tailread
 //#define  DEFINE_mfile_tailread_p
 //#define   DEFINE_mfile_tailreadv
 //#define DEFINE_mfile_tailreadv_p
-#define       DEFINE_mfile_write
+//#define       DEFINE_mfile_write
 //#define      DEFINE_mfile_write_p
 //#define       DEFINE_mfile_writev
 //#define     DEFINE_mfile_writev_p
@@ -218,12 +218,12 @@ again:
 #else /* LOCAL_BUFFER_IS_IOVEC */
 	result = LOCAL_mfile_normrw(self, buffer, num_bytes, offset);
 #endif /* !LOCAL_BUFFER_IS_IOVEC */
-	if (!result) {
+	if (result == 0 && !mfile_isanon(self)) {
 		/* Wait for data to become available. */
-		struct task_connections cons;
 		task_connect(&self->mf_initdone);
-		task_pushconnections(&cons);
 		{
+			struct task_connections cons;
+			task_pushconnections(&cons);
 			RAII_FINALLY { task_popconnections(); };
 #ifdef LOCAL_BUFFER_IS_IOVEC
 			result = LOCAL_mfile_normrw(self, buffer, buf_offset, num_bytes, offset);
@@ -231,7 +231,7 @@ again:
 			result = LOCAL_mfile_normrw(self, buffer, num_bytes, offset);
 #endif /* !LOCAL_BUFFER_IS_IOVEC */
 		}
-		if likely(result == 0) {
+		if likely(result == 0 && !mfile_isanon(self)) {
 			task_waitfor();
 			goto again;
 		}
