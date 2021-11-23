@@ -297,8 +297,10 @@ DECL_END
 #ifndef __INTELLISENSE__
 #define DEFINE_mfutexfd_new
 #include "futexfd-new.c.inl"
+#ifdef __ARCH_HAVE_COMPAT
 #define DEFINE_compat_mfutexfd_new
 #include "futexfd-new.c.inl"
+#endif /* __ARCH_HAVE_COMPAT */
 #endif /* !__INTELLISENSE__ */
 
 
