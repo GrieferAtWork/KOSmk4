@@ -109,8 +109,8 @@ struct flnknode_ops {
 	 * @return: NULL: Same as not implementing this operator (use normal semantics) */
 	BLOCKING WUNUSED NONNULL((1, 2, 3, 4)) REF struct fnode *
 	(KCALL *lno_expandlink)(struct flnknode *__restrict self,
-	                        /*out[1..1]_opt*/ REF struct path **__restrict presult_path,
-	                        /*out[1..1]_opt*/ REF struct fdirent **__restrict presult_dirent,
+	                        /*out[1..1]*/ REF struct path **__restrict presult_path,
+	                        /*out[1..1]*/ REF struct fdirent **__restrict presult_dirent,
 	                        /*in|out*/ u32 *__restrict premaining_symlinks)
 			THROWS(E_IOERROR, E_BADALLOC, ...);
 
@@ -143,6 +143,15 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
 #define flnknode_v_destroy    fnode_v_destroy
 #define flnknode_v_ioctl      fnode_v_ioctl
 #define flnknode_v_hop        fnode_v_hop
+
+/* Fallback operator for `mso_stat' that populates `st_size'
+ * with  the return value  of the `lno_readlink()' operator. */
+FUNDEF BLOCKING NONNULL((1)) void KCALL
+flnknode_v_stat_readlink_size(struct mfile *__restrict self,
+                              USER CHECKED struct stat *result)
+		THROWS(...);
+/* Stream operator table that includes `flnknode_v_stat_readlink_size' */
+DATDEF struct mfile_stream_ops const flnknode_v_stream_ops_readlink_size;
 
 
 struct flnknode

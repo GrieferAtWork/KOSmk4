@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/devfs.h>
+#include <kernel/user.h>
 
 /* Inode numbers for special devfs files. */
 #define DEVFS_SPECINO(id)          (__CCAST(ino_t)(DEVFS_INONS_SPEC | ((id) << 3)))
@@ -37,6 +38,9 @@
 #define DEVFS_INO_DISK_BYPARTUUID  DEVFS_SPECINO(0x14) /* /dev/disk/by-partuuid */
 #define DEVFS_INO_DISK_BYPATH      DEVFS_SPECINO(0x15) /* /dev/disk/by-path */
 #define DEVFS_INO_DISK_BYUUID      DEVFS_SPECINO(0x16) /* /dev/disk/by-uuid */
+
+/* Inode numbers for dynamically created devfs files. */
+#define DEVFS_INO_DYN(ptr) (__CCAST(ino_t)(DEVFS_INONS_DYN | ((uintptr_t)skew_kernel_pointer(ptr) << 3)))
 
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_DEVFS_SPEC_H */

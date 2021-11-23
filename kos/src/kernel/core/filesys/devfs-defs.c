@@ -81,6 +81,40 @@ INTERN struct fdirnode devfs_cpu   = INIT_SPECIAL_DEVFS_SUBDIR(devfs_cpu_ops, DE
 INTERN struct fdirnode devfs_disk  = INIT_SPECIAL_DEVFS_SUBDIR(devfs_disk_ops, DEVFS_INO_DISK);
 #undef INIT_SPECIAL_DEVFS_SUBDIR
 
+/* Template for symbolic device links, as found in /dev/block/, /dev/char/ and /dev/disk/by-xxx/ */
+INTDEF struct flnknode_ops const devicelink_ops;
+INTERN_CONST struct flnknode const devicelink_template = {
+	.ln_node = {
+		.fn_file = {
+			MFILE_INIT_mf_refcnt(1),
+			MFILE_INIT_mf_ops(&devicelink_ops.lno_node.no_file),
+			MFILE_INIT_mf_lock,
+			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_lockops,
+			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+			MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+			                    MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY),
+			MFILE_INIT_mf_trunclock,
+			MFILE_INIT_mf_filesize((uint64_t)-1),
+			MFILE_INIT_mf_atime(0, 0),
+			MFILE_INIT_mf_mtime(0, 0),
+			MFILE_INIT_mf_ctime(0, 0),
+		},
+		FNODE_INIT_fn_nlink(1),
+		FNODE_INIT_fn_mode(S_IFLNK | 0444),
+		FNODE_INIT_fn_uid(0), /* root */
+		FNODE_INIT_fn_gid(0), /* root */
+		FNODE_INIT_fn_ino(DEVFS_INO_ROOT),
+		FNODE_INIT_fn_super(&devfs.rs_sup),
+		FNODE_INIT_fn_changed,
+		FNODE_INIT_fn_supent,
+		FNODE_INIT_fn_allnodes,
+	},
+};
+
+
 
 
 /* Operators for the /dev root directory and superblock. */

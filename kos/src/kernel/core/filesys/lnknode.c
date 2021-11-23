@@ -29,6 +29,7 @@
 #include <sched/atomic64.h>
 
 #include <kos/except.h>
+#include <sys/stat.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -61,6 +62,28 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
 	memcpy(buf, linkstr, result);
 	return result;
 }
+
+/* Fallback operator for `mso_stat' that populates `st_size'
+ * with  the return value  of the `lno_readlink()' operator. */
+PUBLIC BLOCKING NONNULL((1)) void KCALL
+flnknode_v_stat_readlink_size(struct mfile *__restrict self,
+                              USER CHECKED struct stat *result)
+		THROWS(...) {
+	struct flnknode *me = mfile_aslnk(self);
+	struct flnknode_ops const *ops;
+	ops             = flnknode_getops(me);
+	result->st_size = (typeof(result->st_size))(*ops->lno_readlink)(me, NULL, 0);
+}
+
+/* Stream operator table that includes `flnknode_v_stat_readlink_size' */
+PUBLIC_CONST struct mfile_stream_ops const flnknode_v_stream_ops_readlink_size = {
+	.mso_stat  = &flnknode_v_stat_readlink_size,
+	.mso_ioctl = &flnknode_v_ioctl,
+	.mso_hop   = &flnknode_v_hop,
+};
+
+
+
 
 /************************************************************************/
 /* Operators for `struct clnknode'                                     */
