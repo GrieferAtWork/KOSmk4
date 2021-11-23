@@ -1764,7 +1764,7 @@ handle_lookup_ptr(unsigned int fd, struct handle_manager *__restrict self)
 				      fd_limit);
 			}
 			result = &self->hm_hashvector.hm_vector[vecid];
-			assert(result->h_type != HANDLE_TYPEKIND_GENERIC);
+			assert(result->h_type != HANDLE_TYPE_UNDEFINED);
 			break;
 		}
 	}

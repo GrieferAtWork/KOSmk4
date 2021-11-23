@@ -30,8 +30,7 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 
 /**/
-#include <dev/block.h>
-#include <dev/char.h>
+#include <debugger/rt.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/execabi.h>
@@ -47,10 +46,12 @@
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/vfs.h>
+#include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
+#include <kernel/mman/futexfd.h>
 #include <kernel/mman/memfd.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
@@ -63,10 +64,12 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
+#include <hybrid/unaligned.h>
 
 #include <compat/config.h>
 #include <kos/dev.h>
 #include <kos/exec/rtld.h>
+#include <sys/poll.h>
 
 #include <format-printer.h>
 #include <inttypes.h>
@@ -1296,9 +1299,221 @@ badobj:
 }
 
 
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_mfutexfd)(pformatprinter printer, void *arg,
+                             KERNEL CHECKED void const *pointer,
+                             unsigned int *__restrict pstatus) {
+	ssize_t result, temp;
+	struct mfutexfd *me = (struct mfutexfd *)pointer;
+	struct mman *mm;
+	struct mfutex *ftx;
+	TRY {
+		mm  = me->mfd_mman;
+		ftx = me->mfd_futex;
+		if (!mm || !ADDR_ISKERN(mm))
+			goto badobj;
+		if (!ftx || !ADDR_ISKERN(ftx))
+			goto badobj;
+		if (wasdestroyed(mm))
+			mm = NULL;
+	} EXCEPT {
+		goto badobj;
+	}
+	result = 0;
+	if (mm) {
+		result = note_mman(printer, arg, mm, pstatus);
+		if unlikely(result < 0)
+			goto done;
+		if (*pstatus != OBNOTE_PRINT_STATUS_SUCCESS)
+			goto done;
+		PRINT(":");
+	}
+	DO(note_mfutex(printer, arg, ftx, pstatus));
+done:
+	return result;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+err:
+	return temp;
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_handle)(pformatprinter printer, void *arg,
+                           KERNEL CHECKED void const *pointer,
+                           unsigned int *__restrict pstatus);
+
+PRIVATE NONNULL((1, 4, 5)) ssize_t
+NOTHROW(KCALL print_path_with_prefix)(pformatprinter printer, void *arg,
+                                      KERNEL CHECKED void const *pointer,
+                                      unsigned int *__restrict pstatus,
+                                      char const *__restrict prefix) {
+	ssize_t result, temp;
+	result = rawprint(prefix, strlen(prefix));
+	if unlikely(result < 0)
+		return result;
+	temp = note_path(printer, arg, pointer, pstatus);
+	if unlikely(temp < 0)
+		return temp;
+	return result + temp;
+}
+
+PRIVATE NONNULL((1, 4)) ssize_t
+NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
+                               unsigned int fd,
+                               unsigned int *__restrict pstatus) {
+	struct handle hand;
+	struct handle_manager *hman;
+	TRY {
+		if (!dbg_current || !ADDR_ISKERN(dbg_current))
+			goto badobj;
+		hman = FORTASK(dbg_current, this_handle_manager);
+		if (!hman || !ADDR_ISKERN(hman))
+			goto badobj;
+		if ((fd_t)fd < 0) {
+			/* Symbolic handles */
+			struct fs *curfs = FORTASK(dbg_current, this_fs);
+			struct vfs *curvfs;
+			if (!curfs || !ADDR_ISKERN(curfs))
+				goto badobj;
+			curvfs = curfs->fs_vfs;
+			if (!curvfs || !ADDR_ISKERN(curvfs))
+				goto badobj;
+			switch (fd) {
+
+			case HANDLE_SYMBOLIC_FDCWD: {
+				struct path *p = curfs->fs_cwd;
+				if (!p || !ADDR_ISKERN(p))
+					goto badobj;
+				return print_path_with_prefix(printer, arg, p, pstatus, "AT_FDCWD:");
+			}	break;
+	
+			case HANDLE_SYMBOLIC_FDROOT: {
+				struct path *p = curfs->fs_root;
+				if (!p || !ADDR_ISKERN(p))
+					goto badobj;
+				return print_path_with_prefix(printer, arg, p, pstatus, "AT_FDROOT:");
+			}	break;
+	
+			case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
+			     HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX):
+			case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
+			     HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX): {
+				char prefixstr[32];
+				struct path *p = curfs->fs_dcwd[fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN)];
+				if (!p || (fd >= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) &&
+				           fd <= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX)))
+					p = curvfs->vf_drives[fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN)];
+				if (!p || !ADDR_ISKERN(p))
+					goto badobj;
+				sprintf(prefixstr, "AT_FDDRIVE_%s('%c')",
+				        fd >= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) &&
+				        fd <= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX)
+				        ? "ROOT"
+				        : "CWD",
+				        'A' + ((fd >= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) &&
+				                fd <= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX))
+				               ? (fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN))
+				               : (fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN))));
+				return print_path_with_prefix(printer, arg, p, pstatus, prefixstr);
+			}	break;
+	
+			default:
+				break;
+			}
+		}
+		switch (hman->hm_mode) {
+
+		case HANDLE_MANAGER_MODE_LINEAR:
+			if (!hman->hm_linear.hm_vector || !ADDR_ISKERN(hman->hm_linear.hm_vector))
+				goto badobj;
+			if (fd >= hman->hm_linear.hm_alloc)
+				goto badobj;
+			hand = hman->hm_linear.hm_vector[fd];
+			break;
+
+		case HANDLE_MANAGER_MODE_HASHVECTOR: {
+			unsigned int i, perturb, count;
+			if (!hman->hm_hashvector.hm_hashvec || !ADDR_ISKERN(hman->hm_hashvector.hm_hashvec))
+				goto badobj;
+			if (hman->hm_count <= hman->hm_hashvector.hm_alloc)
+				goto badobj;
+			i = perturb = fd & hman->hm_hashvector.hm_hashmsk;
+			count = 0;
+			for (;; handle_manager_hashnext(i, perturb)) {
+				struct handle_hashent *hashent;
+				unsigned int vecid;
+				if (count >= hman->hm_count)
+					goto badobj;
+				++count;
+				hashent = &hman->hm_hashvector.hm_hashvec[i & hman->hm_hashvector.hm_hashmsk];
+				if (hashent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
+					goto badobj;
+				if (hashent->hh_handle_id != fd)
+					continue; /* Some other handle. */
+				/* Found it! */
+				vecid = hashent->hh_vector_index;
+				if (vecid == (unsigned int)-1)
+					goto badobj;
+				hand = hman->hm_hashvector.hm_vector[vecid];
+				break;
+			}
+		}	break;
+
+		default:
+			goto badobj;
+		}
+		if (hand.h_type == HANDLE_TYPE_UNDEFINED)
+			goto badobj;
+	} EXCEPT {
+		goto badobj;
+	}
+	return note_handle(printer, arg, &hand, pstatus);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_fd_t)(pformatprinter printer, void *arg,
+                         KERNEL CHECKED void const *pointer,
+                         unsigned int *__restrict pstatus) {
+	fd_t fdval;
+	TRY {
+		fdval = (fd_t)UNALIGNED_GET((unsigned int const *)pointer);
+	} EXCEPT {
+		goto badobj;
+	}
+	return note_fd_t_value(printer, arg, fdval, pstatus);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_pollfd)(pformatprinter printer, void *arg,
+                           KERNEL CHECKED void const *pointer,
+                           unsigned int *__restrict pstatus) {
+	struct pollfd *me;
+	fd_t fd;
+	TRY {
+		me = (struct pollfd *)pointer;
+		fd = me->fd;
+	} EXCEPT {
+		goto badobj;
+	}
+	return note_fd_t_value(printer, arg, fd, pstatus);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+
+
 /* NOTE: This list must be sorted lexicographically ascending! */
 PRIVATE struct obnote_entry const notes[] = {
 	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
+	{ "__fd_t", &note_fd_t },
 	{ "ansittydev", &note_mfile },
 	{ "blkdev", &note_mfile },
 	{ "chrdev", &note_mfile },
@@ -1309,6 +1524,7 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "dirhandle", &note_dirhandle },
 	{ "driver", &note_module },
 	{ "driver_section", &note_module_section },
+	{ "fd_t", &note_fd_t },
 	{ "fdevnode", &note_mfile },
 	{ "fdirent", &note_fdirent },
 	{ "fdirnode", &note_mfile },
@@ -1322,10 +1538,12 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "fregnode", &note_mfile },
 	{ "fsocknode", &note_mfile },
 	{ "fsuper", &note_fsuper },
+	{ "handle", &note_handle },
 	{ "kbddev", &note_mfile },
 	{ "mbnode", &note_mnode },
 	{ "mfile", &note_mfile },
 	{ "mfutex", &note_mfutex },
+	{ "mfutexfd", &note_mfutexfd },
 	{ "mkttydev", &note_mfile },
 	{ "mman", &note_mman },
 	{ "mnode", &note_mnode },
@@ -1335,6 +1553,7 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "mpart", &note_mpart },
 	{ "nicdev", &note_mfile },
 	{ "path", &note_path },
+	{ "pollfd", &note_pollfd },
 	{ "printnode", &note_mfile },
 	{ "ptymaster", &note_mfile },
 	{ "ptyslave", &note_mfile },
@@ -1348,6 +1567,76 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "videodev", &note_mfile },
 };
 
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) struct obnote_entry const *
+NOTHROW(KCALL obnote_entry_byname)(char const *__restrict name) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(notes); ++i) {
+		if (strcmp(notes[i].one_name, name) == 0)
+			return &notes[i];
+	}
+	return NULL;
+}
+
+
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_handle)(pformatprinter printer, void *arg,
+                           KERNEL CHECKED void const *pointer,
+                           unsigned int *__restrict pstatus) {
+	static char const accmode[4][2] = {
+		[IO_RDONLY]   = { 'r', 'o' },
+		[IO_WRONLY]   = { 'w', 'r' },
+		[IO_RDWR]     = { 'r', 'w' },
+		[IO_RDWR_ALT] = { 'r', 'w' },
+	};
+	ssize_t result, temp;
+	struct handle hand;
+	struct handle *me = (struct handle *)pointer;
+	TRY {
+		memcpy(&hand, me, sizeof(struct handle));
+	} EXCEPT {
+		goto badobj;
+	}
+	if (!hand.h_data || !ADDR_ISKERN(hand.h_data))
+		goto badobj;
+	if (hand.h_type >= HANDLE_TYPE_COUNT)
+		goto badobj;
+	result = rawprint(accmode[hand.h_mode & IO_ACCMODE], 2);
+	if unlikely(result < 0)
+		goto done;
+	if (hand.h_mode & IO_CLOEXEC)
+		PRINT(",cx");
+	if (hand.h_mode & IO_CLOFORK)
+		PRINT(",cf");
+	if (hand.h_mode & IO_APPEND)
+		PRINT(",ap");
+	if (hand.h_mode & IO_NONBLOCK)
+		PRINT(",nb");
+	if (hand.h_mode & IO_DSYNC)
+		PRINT(",ds");
+	if (hand.h_mode & IO_ASYNC)
+		PRINT(",as");
+	if (hand.h_mode & IO_DIRECT)
+		PRINT(",d");
+	PRINTF(":%s", handle_type_db.h_typename[hand.h_type]);
+	/* Print handle-type-specific notes. */
+	{
+		struct obnote_entry const *ent;
+		ent = obnote_entry_byname(handle_type_db.h_typename[hand.h_type]);
+		if (ent) {
+			PRINT(":");
+			DO((*ent->one_cb)(printer, arg, hand.h_data, pstatus));
+		}
+	}
+done:
+	return result;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+err:
+	return temp;
+}
+
 
 /* Print extended information (if available)
  * that   related   to  the   given  `name'.
@@ -1358,13 +1647,12 @@ NOTHROW(KCALL obnote_print)(pformatprinter printer, void *arg,
                             KERNEL CHECKED void const *pointer,
                             char const *__restrict name,
                             unsigned int *__restrict pstatus) {
-	size_t i;
-	for (i = 0; i < COMPILER_LENOF(notes); ++i) {
-		if (strcmp(notes[i].one_name, name) == 0) {
-			/* Found the note! */
-			*pstatus = OBNOTE_PRINT_STATUS_SUCCESS;
-			return (*notes[i].one_cb)(printer, arg, pointer, pstatus);
-		}
+	struct obnote_entry const *ent;
+	ent = obnote_entry_byname(name);
+	if (ent) {
+		/* Found the note! */
+		*pstatus = OBNOTE_PRINT_STATUS_SUCCESS;
+		return (*ent->one_cb)(printer, arg, pointer, pstatus);
 	}
 	*pstatus = OBNOTE_PRINT_STATUS_BADNAME;
 	return 0;

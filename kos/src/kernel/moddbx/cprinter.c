@@ -29,13 +29,15 @@
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/mman.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/types.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 
@@ -1095,6 +1097,62 @@ NOTHROW(KCALL get_name_and_offset_of_containing_sections)(uintptr_t module_relat
 
 
 
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL
+print_object_note(char const *__restrict name,
+                  struct cprinter const *__restrict printer,
+                  void const *ptr) {
+	ssize_t temp, result = 0;
+	unsigned int status;
+	/* Custom representations of pointers to objects from the kernel core. */
+	status = OBNOTE_PRINT_STATUS_BADNAME;
+	obnote_print(&is_nonempty_printer, NULL, ptr, name, &status);
+	if (status == OBNOTE_PRINT_STATUS_BADOBJ) {
+		/* Bad/Corrupt object */
+		PRINT(" ");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BADNOTES_PREFIX);
+		PRINTF("(%s)", name);
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BADNOTES_SUFFIX);
+	} else if (status == OBNOTE_PRINT_STATUS_SUCCESS) {
+		/* Print a normal object note. */
+		PRINT(" ");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+		PRINTF("(%s ", name);
+		DO(obnote_print(P_PRINTER, P_ARG, ptr, name, &status));
+		PRINT(")");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+	}
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL
+print_named_struct(struct ctype *__restrict self,
+                   struct cprinter const *__restrict printer,
+                   void const *ptr) {
+	ssize_t temp, result = 0;
+	struct cmodule *mod;
+	mod = self->ct_struct.ct_info.cd_mod;
+	if (cmodule_iskern(mod)) {
+		if (mod->cm_module != (REF module_t *)&kernel_driver) {
+			/* If the type was declared by a driver, it may actually
+			 * originate from the kernel core. In this case, try  to
+			 * load the pointed-to type. */
+			ctype_struct_enumfields(self, &ctype_struct_is_nonempty_callback, NULL);
+			mod = self->ct_struct.ct_info.cd_mod;
+		}
+		/*if (mod->cm_module == (REF module_t *)&kernel_driver)*/ {
+			char const *name = ctype_struct_getname(self);
+			if (name)
+				DO(print_object_note(name, printer, ptr));
+		}
+	}
+	return result;
+err:
+	return temp;
+}
+
 PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4)) ssize_t KCALL
 print_named_pointer(struct ctyperef const *__restrict self,
                     struct cprinter const *__restrict printer,
@@ -1278,13 +1336,13 @@ print_named_pointer(struct ctyperef const *__restrict self,
 				PRINT("(");
 				if (node->mn_fspath) {
 					temp = path_printent(node->mn_fspath,
-					                     node->mn_fsname->de_name,
-					                     node->mn_fsname->de_namelen,
+					                     node->mn_fsname->fd_name,
+					                     node->mn_fsname->fd_namelen,
 					                     P_PRINTER, P_ARG);
 				} else {
 					temp = (*P_PRINTER)(P_ARG,
-					                    node->mn_fsname->de_name,
-					                    node->mn_fsname->de_namelen);
+					                    node->mn_fsname->fd_name,
+					                    node->mn_fsname->fd_namelen);
 				}
 				if unlikely(temp < 0)
 					goto err;
@@ -1584,10 +1642,6 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 		ATTR_FALLTHROUGH
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM): {
 		/* Enum or integer */
-		/* TODO: Certain integer types should be printed alongside custom
-		 *       object hints, such as  `fd_t', which should include  the
-		 *       associated  text  from `readlink  /proc/self/fd/$FD`, if
-		 *       any. */
 		if (CTYPE_KIND_SIZEOF(kind) <= sizeof(intmax_t)) {
 			union {
 				intmax_t s;
@@ -1724,6 +1778,14 @@ print_integer_value_as_hex:
 				DO((*P_PRINTER)(P_ARG, suffix, strlen(suffix)));
 		}
 		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+		if (!CTYPE_KIND_ISENUM(kind) && self->ct_info.ci_name != NULL &&
+		    (self->ct_info.ci_nameref == NULL || cmodule_iskern(self->ct_info.ci_nameref))) {
+			/* Certain integer types should be printed alongside custom
+			 * object hints, such as  `fd_t', which should include  the
+			 * associated  text  from `readlink  /proc/self/fd/$FD`, if
+			 * any. */
+			DO(print_object_note(self->ct_info.ci_name, printer, buf));
+		}
 	}	break;
 
 	case CTYPE_KIND_STRUCT: {
@@ -1821,6 +1883,9 @@ done_struct:
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
 		PRINT("}");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+		/* Also include obnote hints for `struct'-style objects. */
+		if (!(flags & CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER) && ADDR_ISKERN(buf))
+			DO(print_named_struct(me, printer, buf));
 	}	break;
 
 	case CTYPE_KIND_ARRAY: {
