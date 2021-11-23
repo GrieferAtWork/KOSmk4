@@ -47,7 +47,7 @@ struct constdirent {
 	 * init in such a situation:
 	 * "initialization of flexible array member in a nested context" */
 	WEAK refcnt_t                           cd_refcnt;   /* Reference counter. */
-	struct fdirent_ops const               *cd_ops;      /* [0..1][lock(WRITE_ONCE)] Operators. (When `NULL', set to `constdirent_ops') */
+	struct fdirent_ops const               *cd_ops;      /* [1..1][const] Operators. */
 	ino_t                                   cd_ino;      /* [const][== cd_node->fn_ino] INode number of this directory entry. */
 	uintptr_t                               cd_hash;     /* [const][== fdirent_hash(fd_name, fd_namelen)] Hash of this directory entry. */
 	u16                                     cd_namelen;  /* [const][!0] Length of the directory entry name (in characters). */
@@ -65,13 +65,8 @@ struct constdirent {
 
 /* Static initializer for `struct constdirent'
  * NOTE: `fd_hash' can be auto-generated via `libgen.fdirent_hash' */
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-#define CONSTDIRENT_INIT(node, fd_ino, fd_type, fd_name, fd_hash) \
-	{ node, 1, __NULLPTR, fd_ino, fd_hash, (sizeof(fd_name) / sizeof(char)) - 1, fd_type, fd_name }
-#else /* CONFIG_BUILDING_KERNEL_CORE */
 #define CONSTDIRENT_INIT(node, fd_ino, fd_type, fd_name, fd_hash) \
 	{ node, 1, &constdirent_ops, fd_ino, fd_hash, (sizeof(fd_name) / sizeof(char)) - 1, fd_type, fd_name }
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
 
 /* Operators used to facilitate `struct constdirent' */
 DATDEF struct fdirent_ops const constdirent_ops;

@@ -557,19 +557,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the system call via `x86_sysrouteN_c[32|64]'
 	 *       This way, we may be able to reduce the kernel's binary size. */
 
-	/* TODO: Add special files to /proc, and add symlinks to /dev to implement:
-	 *       /dev/                   -- Just like right now, contains system devices by-name
-	 *       /dev/block/             -- Contains symlinks for the /dev device, such as 8:0 -> ../sda
-	 *       /dev/char/              -- Contains symlinks for the /dev device, such as 1:1 -> ../mem
-	 *       /dev/cpu/[id]/cpuid     -- A readable file to access `cpuid' data for a given CPU.
-	 *       /dev/disk/by-id/        -- Symlinks for block-devices
-	 *       /dev/disk/by-label/     -- Symlinks for block-devices
-	 *       /dev/disk/by-partlabel/ -- Symlinks for block-devices
-	 *       /dev/disk/by-partuuid/  -- Symlinks for block-devices
-	 *       /dev/disk/by-path/      -- Symlinks for block-devices
-	 *       /dev/disk/by-uuid/      -- Symlinks for block-devices
-	 * Alternatively (and arguably even better), make /dev a dynamic file system, similar to /proc */
-
 	/* XXX: Add a smart, arch-specific unwinder to libdebuginfo that will inspect
 	 *      the instruction  stream  to  figure  out how  to  unwind  the  stack.
 	 *      This unwinder should assume the default calling convention for  every

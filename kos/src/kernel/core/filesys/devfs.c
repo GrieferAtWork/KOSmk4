@@ -33,6 +33,8 @@
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/blkdev.h>
 #include <kernel/fs/chrdev.h>
+#include <kernel/fs/constdir.h>
+#include <kernel/fs/devfs-spec.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/dirent.h>
@@ -200,49 +202,71 @@ PUBLIC struct ffilesys devfs_filesys = {
 };
 
 
-/* TODO:
- *       /dev/disk/by-id/        -- Symlinks for block-devices
- *       /dev/disk/by-label/     -- Symlinks for block-devices
- *       /dev/disk/by-partlabel/ -- Symlinks for block-devices
- *       /dev/disk/by-partuuid/  -- Symlinks for block-devices
- *       /dev/disk/by-path/      -- Symlinks for block-devices
- *       /dev/disk/by-uuid/      -- Symlinks for block-devices
- *       /dev/block/             -- Contains symlinks for the /dev device, such as 8:0 -> ../sda
- *       /dev/char/              -- Contains symlinks for the /dev device, such as 1:1 -> ../mem
- *       /dev/cpu/[id]/cpuid     -- A readable file to access `cpuid' data for a given CPU.
- * All of these should be implemented in "devfs.c" by dynamic means (similar to how /proc/ works)
- * Also  note that unlike the root directory, these special sub-directories are _NOT_ writable on
- * KOS. The files found within cannot be renamed, moved, deleted, etc. and no custom files can be
- * created  either. Only the root directory, and  any dynamically created sub-directory is usable
- * for the purpose of RAMFS.
- *
- * Enumeration here is  done in O(N)  by walking `devfs.fs_nodes'.  The additional complexity  of
- * adding individual trees/maps for each  of these would be  too great, though information  about
- * what  filenames appear in these folders must still  be stored on a per-device basis. Also note
- * that some of those folders contain more than just partitions; namely: the actual root devices.
- *
- * TODO: The  devfs root directory node should have INO=1.  Because we use mask &7 for encoding
- *       different  INO namespaces (&7=0 for RAMFS, and &7=7 for by-name devices), we also need
- *       one more namespace for special directories like root, and another for dynamic files as
- *       those described above!
- *
- * NOTE: All of  these  special INodes  actually  _DONT_  appear in  `devfs.fs_nodes'!  This  can
- *       be achieved because INode access within the new fs is not done via `super_opennode' with
- *       the  associated inode number,  but instead via `fdirent_opennode()',  which hides all of
- *       the association details for fdirent->fnode mapping from prying eyes. Technically, it  is
- *       actually possible to create a filesystem that  _NEVER_ makes use of `fs_nodes', and  the
- *       only  reason why unique inode number ~should~ still be assigned is for the sake of user-
- *       space  and programs that rely on the POSIX-guarantied unique-ness of stat::st_dev:st_ino
- *
- */
+/* Special sub-directories of /dev/
+ * - "./devfs-defs.c": definition
+ * - "./devfs-spec.c": implementation */
+INTDEF struct fdirnode devfs_block;
+INTDEF struct fdirnode devfs_char;
+INTDEF struct fdirnode devfs_cpu;
+INTDEF struct fdirnode devfs_disk;
+
+/* Directory entries for special /dev/ sub-directories. */
+PRIVATE struct constdirent devfs_dirent_block =
+CONSTDIRENT_INIT(&devfs_block, DEVFS_INO_BLOCK, DT_DIR, "block", /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x7eeacfdd, 0x6b636f6c62, 0x75cfeae6, 0x6b636f6c62)/*[[[end]]]*/);
+PRIVATE struct constdirent devfs_dirent_char =
+CONSTDIRENT_INIT(&devfs_char, DEVFS_INO_CHAR, DT_DIR, "char", /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x56cab7b, 0x72616863, 0x7eab6d02, 0x72616863)/*[[[end]]]*/);
+PRIVATE struct constdirent devfs_dirent_cpu =
+CONSTDIRENT_INIT(&devfs_cpu, DEVFS_INO_CPU, DT_DIR, "cpu", /*[[[fdirent_hash]]]*/0x757063/*[[[end]]]*/);
+PRIVATE struct constdirent devfs_dirent_disk =
+CONSTDIRENT_INIT(&devfs_disk, DEVFS_INO_DISK, DT_DIR, "disk", /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc70eb484, 0x6b736964, 0x87b50ec3, 0x6b736964)/*[[[end]]]*/);
+
+/* List of special directory entries in /dev/
+ * NOTE: This list _MUST_ be sorted lexicographically ascendingly! */
+PRIVATE struct fdirent *const devfs_rootspec[] = {
+	constdirent_asent(&devfs_dirent_block), /* "block" */
+	constdirent_asent(&devfs_dirent_char),  /* "char" */
+	constdirent_asent(&devfs_dirent_cpu),   /* "cpu" */
+	constdirent_asent(&devfs_dirent_disk),  /* "disk" */
+};
+
+/* Check if a given directory entry is one of `devfs_rootspec' */
+#define fdirent_isspec(x) ((x)->fd_ops == &constdirent_ops)
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) struct fdirent *KCALL
+devfs_rootspec_lookup(struct flookup_info const *__restrict info)
+		THROWS(E_SEGFAULT) {
+	unsigned int lo, hi;
+	lo = 0;
+	hi = COMPILER_LENOF(devfs_rootspec);
+	while (lo < hi) {
+		struct fdirent *ent;
+		size_t i;
+		int cmp;
+		i = (lo + hi) / 2;
+		ent = devfs_rootspec[i];
+		cmp = strcmpz(ent->fd_name, info->flu_name, info->flu_namelen);
+		if (cmp > 0) {
+			hi = i;
+		} else if (cmp < 0) {
+			lo = i + 1;
+		} else {
+			return ent;
+		}
+	}
+	return NULL;
+}
+
+
+
 
 
 /* Lookup a device file by name, or fall back  to
  * searching the ramfs portion of the devfs root. */
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 devfs_super_v_lookup(struct fdirnode *__restrict self,
-                    struct flookup_info *__restrict info) {
+                     struct flookup_info *__restrict info) {
 	struct device *node;
+	REF struct fdirent *result;
 	assert(self == &devfs.fs_root);
 
 	/* Check if we can find a device with the specified name. */
@@ -251,12 +275,16 @@ devfs_super_v_lookup(struct fdirnode *__restrict self,
 	if (!node && (info->flu_flags & AT_DOSPATH))
 		node = devfs_byname_caselocate(info->flu_name, info->flu_namelen);
 	if (node) {
-		REF struct fdirent *result;
 		result = incref(&node->dv_dirent->dd_dirent);
 		devfs_byname_endread();
 		return result;
 	}
 	devfs_byname_endread();
+
+	/* Check for special files. */
+	result = devfs_rootspec_lookup(info);
+	if (result)
+		return incref(result);
 
 	/* Fallback to searching through the ramfs portion. */
 	return ramfs_dirnode_v_lookup(self, info);
@@ -315,12 +343,54 @@ NOTHROW(FCALL device_fixdeleted)(struct devdirent const *__restrict self) {
 }
 
 
+PRIVATE WUNUSED REF struct fdirent *KCALL
+devfs_root_first_ramfs_dirent(void) {
+	REF struct fdirent *result = NULL;
+	struct ramfs_dirent *ent;
+	/* Start enumeration at the left-most node */
+	ramfs_dirdata_treelock_read(&devfs.rs_dat);
+	ent = devfs.rs_dat.rdd_tree;
+	if likely(ent) {
+		while (ent->rde_treenode.rb_lhs)
+			ent = ent->rde_treenode.rb_lhs;
+		result = incref(&ent->rde_ent);
+	}
+	ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+	return result;
+}
+
+PRIVATE WUNUSED REF struct fdirent *KCALL
+devfs_root_first_device_dirent(void) {
+	struct device *node;
+	REF struct fdirent *firstent;
+	devfs_byname_read();
+	node = devfs_byname_tree;
+	if likely(node) {
+		while (node->dv_byname_node.rb_lhs)
+			node = node->dv_byname_node.rb_lhs;
+		firstent = incref(&node->dv_dirent->dd_dirent);
+		devfs_byname_endread();
+	} else {
+		devfs_byname_endread();
+		firstent = devfs_root_first_ramfs_dirent();
+	}
+	return firstent;
+}
+
+
 /* Returns `NULL' if there is no next node */
 PRIVATE WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 devfs_root_next(struct fdirent *__restrict self)
 		THROWS(...) {
 	REF struct fdirent *result = NULL;
-	if (fdirent_isdevfs(self)) {
+	if (fdirent_isspec(self)) {
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(devfs_rootspec) - 1; ++i) {
+			if (devfs_rootspec[i] == self)
+				return incref(devfs_rootspec[i + 1]);
+		}
+		result = devfs_root_first_device_dirent();
+	} else if (fdirent_isdevfs(self)) {
 		struct devdirent *me;
 		REF struct device *curr;
 		me = fdirent_asdevfs(self);
@@ -340,18 +410,9 @@ devfs_root_next(struct fdirent *__restrict self)
 				result = incref(&next->dv_dirent->dd_dirent);
 				devfs_byname_endread();
 			} else {
-				struct ramfs_dirent *first;
 unlock_byname_and_return_first_ramfs:
 				devfs_byname_endread();
-				/* Return the first file from the ramfs portion. */
-				ramfs_dirdata_treelock_read(&devfs.rs_dat);
-				first = devfs.rs_dat.rdd_tree;
-				if likely(first) {
-					while (first->rde_treenode.rb_lhs)
-						first = first->rde_treenode.rb_lhs;
-					result = incref(&first->rde_ent);
-				}
-				ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+				result = devfs_root_first_ramfs_dirent();
 			}
 		}
 	} else {
@@ -409,41 +470,6 @@ again:
 	return (size_t)result;
 }
 
-PRIVATE WUNUSED REF struct fdirent *KCALL
-devfs_root_first_ramfs_dirent(void) {
-	REF struct fdirent *result = NULL;
-	struct ramfs_dirent *ent;
-	/* Start enumeration at the left-most node */
-	ramfs_dirdata_treelock_read(&devfs.rs_dat);
-	ent = devfs.rs_dat.rdd_tree;
-	if likely(ent) {
-		while (ent->rde_treenode.rb_lhs)
-			ent = ent->rde_treenode.rb_lhs;
-		result = incref(&ent->rde_ent);
-	}
-	ramfs_dirdata_treelock_endread(&devfs.rs_dat);
-	return result;
-}
-
-PRIVATE WUNUSED REF struct fdirent *KCALL
-devfs_root_first_dirent(void) {
-	struct device *node;
-	REF struct fdirent *firstent;
-	devfs_byname_read();
-	node = devfs_byname_tree;
-	if likely(node) {
-		while (node->dv_byname_node.rb_lhs)
-			node = node->dv_byname_node.rb_lhs;
-		firstent = incref(&node->dv_dirent->dd_dirent);
-		devfs_byname_endread();
-	} else {
-		devfs_byname_endread();
-		firstent = devfs_root_first_ramfs_dirent();
-	}
-	return firstent;
-}
-
-
 PRIVATE NONNULL((1)) pos_t KCALL
 devfs_root_direnum_v_seekdir(struct fdirenum *__restrict self,
                              off_t offset, unsigned int whence)
@@ -454,7 +480,7 @@ devfs_root_direnum_v_seekdir(struct fdirenum *__restrict self,
 	 *      to also  allow all  of the  other seek  operations. */
 	if (offset == 0 && whence == SEEK_SET) {
 		REF struct fdirent *firstent;
-		firstent = devfs_root_first_dirent();
+		firstent = incref(devfs_rootspec[0]);
 		axref_set_inherit(&me->drd_next, firstent);
 	} else {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
@@ -479,7 +505,7 @@ devfs_super_v_enum(struct fdirenum *__restrict result) {
 	REF struct fdirent *firstent;
 	assert(result->de_dir == &devfs.fs_root);
 	rt = (struct devfs_root_direnum *)result;
-	firstent   = devfs_root_first_dirent();
+	firstent   = incref(devfs_rootspec[0]);
 	rt->de_ops = &devfs_root_direnum_ops;
 	axref_init(&rt->drd_next, firstent); /* Inherit reference. */
 }
@@ -527,6 +553,17 @@ devfs_super_v_mkfile(struct fdirnode *__restrict self,
 	REF struct fnode *new_node;
 	assert(self == &devfs.fs_root);
 	(void)self;
+
+	/* Check if the caller's name referrs to one of the special files. */
+	{
+		struct fdirent *old_dirent;
+		old_dirent = devfs_rootspec_lookup(&info->mkf_lookup_info);
+		if unlikely(old_dirent != NULL) {
+			info->mkf_dent  = incref(old_dirent);
+			info->mkf_rnode = mfile_asnode(incref(fdirent_asconst(old_dirent)->cd_node));
+			return FDIRNODE_MKFILE_EXISTS;
+		}
+	}
 
 	/* Check check for already-exists. */
 #ifndef __OPTIMIZE_SIZE__
@@ -743,7 +780,6 @@ devfs_super_v_unlink(struct fdirnode *__restrict self,
 	(void)self;
 
 	/* Check for device files. */
-	assert(fdirent_isramfs(entry) || fdirent_isdevfs(entry));
 	if (fdirent_isdevfs(entry)) {
 		struct devdirent *real_entry;
 		struct device *real_file;
@@ -771,6 +807,13 @@ devfs_super_v_unlink(struct fdirnode *__restrict self,
 
 		return FDIRNODE_UNLINK_SUCCESS;
 	}
+
+	/* Only call the normal ramfs unlink function for ramfs directory entries.
+	 * If the entry belongs to `devfs_rootspec', then indicate that the entry
+	 * cannot be removed. */
+	if (!fdirent_isramfs(entry))
+		THROW(E_FSERROR_READONLY);
+
 	return ramfs_dirnode_v_unlink(self, entry, file);
 }
 
@@ -783,8 +826,6 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
 	assert(self == &devfs.fs_root);
-	assert(fdirent_isdevfs(info->frn_oldent) ||
-	       fdirent_isramfs(info->frn_oldent));
 	if (info->frn_flags & AT_RENAME_EXCHANGE)
 		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO */
 	if (fdirent_isdevfs(info->frn_oldent)) {
@@ -893,11 +934,15 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 
 		/* Write-back results. */
 		info->frn_dent = &new_dirent->dd_dirent; /* Inherit reference */
+	} else if (!fdirent_isramfs(info->frn_oldent)) {
+		/* Only call the normal ramfs unlink function for ramfs directory entries.
+		 * If the entry belongs to `devfs_rootspec', then indicate that the entry
+		 * cannot be removed. */
+		THROW(E_FSERROR_READONLY);
 	} else {
 		struct ramfs_dirent *new_dirent;
 		struct ramfs_dirnode *olddir = (struct ramfs_dirnode *)info->frn_olddir;
 		struct ramfs_dirent *old_dirent;
-		assert(fdirent_isramfs(info->frn_oldent));
 
 		/* Allocate the new directory entry. */
 		new_dirent = (REF struct ramfs_dirent *)kmalloc(offsetof(struct ramfs_dirent, rde_ent.fd_name) +

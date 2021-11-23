@@ -36,15 +36,26 @@
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
 
+
+/* The /dev filesystem contains files of a number of different types.
+ * To differentiate between all of these, we use the least significant
+ * few bits of the INO number. */
+#define DEVFS_INONS_MASK 7 /* Mark for INO-NS */
+#define DEVFS_INONS_RAM  0 /* Ramfs files */
+#define DEVFS_INONS_SPEC 1 /* Fixed, special files (/dev/disk, /dev/block, etc...) */
+#define DEVFS_INONS_DYN  2 /* Dynamically generated special files (/dev/char/1:1, etc...) */
+#define DEVFS_INONS_DEV  7 /* Dynamically constructed device files */
+
+
 /* Construct the INode number for a device file within `devfs.fs_nodes', given
  * that file's typing (`st_mode & S_IFMT' must be `S_IFCHR' or `S_IFBLK'),  as
  * well as the device number `st_rdev'. */
 #if (S_IFCHR == 0x2000 && S_IFBLK == 0x6000) && __SIZEOF_INO_T__ == 8
 #define devfs_devnode_makeino(st_mode, st_rdev) \
-	((__CCAST(ino_t)(st_rdev) << 3) | (__CCAST(ino_t)((st_mode) & 0x4000) << 49) | __CCAST(ino_t)7)
+	((__CCAST(ino_t)(st_rdev) << 3) | (__CCAST(ino_t)((st_mode) & 0x4000) << 49) | __CCAST(ino_t)DEVFS_INONS_DEV)
 #elif (S_IFCHR == 0x2000 && S_IFBLK == 0x6000) && __SIZEOF_INO_T__ == 4
 #define devfs_devnode_makeino(st_mode, st_rdev) \
-	((__CCAST(ino_t)(st_rdev) << 3) | (__CCAST(ino_t)((st_mode) & 0x4000) << 17) | __CCAST(ino_t)7)
+	((__CCAST(ino_t)(st_rdev) << 3) | (__CCAST(ino_t)((st_mode) & 0x4000) << 17) | __CCAST(ino_t)DEVFS_INONS_DEV)
 #else /* ... */
 #error "Unsupported configuration"
 #endif /* !... */
