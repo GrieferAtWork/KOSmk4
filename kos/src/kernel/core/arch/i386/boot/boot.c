@@ -948,9 +948,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Also add corresponding read-ioctls that will read the relevant properties.
 	 */
 
-	/* TODO: `HOP_SUPERBLOCK_FEATURES' is used by `fpathconf(3)', but is no longer being implemented
-	 *       Look at  what's actually  being used  and add  kos-specific ioctls  for what's  needed! */
-
 	/* TODO: `HANDLE_TYPEKIND_MFILE_*' needs to be expanded with all of the new sub-classes of MFILE,
 	 *       as well as all of the subclasses of those types. The system should be designed such that
 	 *       sub-class  type IDs can easily be used to test for parent classes, given a precise child

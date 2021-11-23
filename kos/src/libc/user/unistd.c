@@ -30,7 +30,7 @@
 
 #include <asm/pagesize.h>
 #include <kos/exec/idata.h>
-#include <kos/hop/mfile.h> /* Needed for fpathconf() */
+#include <kos/ioctl/file.h> /* needed for pathconf() */
 #include <kos/ioctl/tty.h>
 #include <kos/syscalls.h>
 #include <sys/ioctl.h>
@@ -1918,8 +1918,8 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] =
 	[_PC_NAME_MAX]           = PATHCONF_VARYING_LIMIT,
 	[_PC_PATH_MAX]           = PATH_MAX,
 	[_PC_PIPE_BUF]           = PIPE_BUF,
-	[_PC_CHOWN_RESTRICTED]   = _POSIX_CHOWN_RESTRICTED,
-	[_PC_NO_TRUNC]           = _POSIX_NO_TRUNC,
+	[_PC_CHOWN_RESTRICTED]   = 1, /* All filesystems supported by KOS implement posix ownership rules. */
+	[_PC_NO_TRUNC]           = 1, /* No, filenames are never silently truncated. */
 	[_PC_VDISABLE]           = 1, /* All   KOS  terminals  support  disabling  control  characters.  All
 	                               * related functionality is implemented in `/kos/src/libterm/termio.c' */
 #ifdef _POSIX_SYNC_IO
@@ -1971,30 +1971,6 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] =
 #endif /* __SIZEOF_POINTER__ > 4 */
 #define FIELD_UNDEFINED UINT8_MAX
 
-PRIVATE ATTR_SECTION(".rodata.crt.fs.property") u8 const pc_superblock_features_offset[] = {
-	[_PC_LINK_MAX]           = FIELD64_OFFSET(offsetof(struct hop_superblock_features, sbf_link_max)),
-	[_PC_MAX_CANON]          = FIELD_UNDEFINED,
-	[_PC_MAX_INPUT]          = FIELD_UNDEFINED,
-	[_PC_NAME_MAX]           = FIELD64_OFFSET(offsetof(struct hop_superblock_features, sbf_name_max)),
-	[_PC_PATH_MAX]           = FIELD_UNDEFINED,
-	[_PC_PIPE_BUF]           = FIELD_UNDEFINED,
-	[_PC_CHOWN_RESTRICTED]   = FIELD_UNDEFINED,
-	[_PC_NO_TRUNC]           = FIELD_UNDEFINED,
-	[_PC_VDISABLE]           = FIELD_UNDEFINED,
-	[_PC_SYNC_IO]            = FIELD_UNDEFINED,
-	[_PC_ASYNC_IO]           = FIELD_UNDEFINED,
-	[_PC_PRIO_IO]            = FIELD_UNDEFINED,
-	[_PC_SOCK_MAXBUF]        = FIELD_UNDEFINED,
-	[_PC_FILESIZEBITS]       = FIELD_UNDEFINED, /* Custom! */
-	[_PC_REC_INCR_XFER_SIZE] = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_incr_xfer_size)),
-	[_PC_REC_MAX_XFER_SIZE]  = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_max_xfer_size)),
-	[_PC_REC_MIN_XFER_SIZE]  = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_min_xfer_size)),
-	[_PC_REC_XFER_ALIGN]     = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_xfer_align)),
-	[_PC_ALLOC_SIZE_MIN]     = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_xfer_align)),
-	[_PC_SYMLINK_MAX]        = FIELD64_OFFSET(offsetof(struct hop_superblock_features, sbf_symlink_max)),
-	[_PC_2_SYMLINKS]         = FIELD_UNDEFINED, /* Custom! */
-};
-
 /*[[[head:libc_fpathconf,hash:CRC-32=0xb1c5ff53]]]*/
 /* >> fpathconf(2)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
@@ -2008,8 +1984,6 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 /*[[[body:libc_fpathconf]]]*/
 {
 	longptr_t result;
-	STATIC_ASSERT(COMPILER_LENOF(pc_superblock_features_offset) >=
-	              COMPILER_LENOF(pc_constants));
 	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
 		result = libc_seterrno(EINVAL);
 	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
@@ -2030,41 +2004,63 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 				result = (longptr_t)value;
 		}	break;
 
-		default: {
-			struct hop_superblock_features feat;
-			/* Default case: Derive path information from superblock features. */
-			feat.sbf_struct_size = sizeof(feat);
-			result = hop(fd, HOP_SUPERBLOCK_FEATURES, &feat);
+			/* Superblock attributes */
+		case _PC_LINK_MAX:
+		case _PC_NAME_MAX:
+		case _PC_FILESIZEBITS:
+		case _PC_REC_INCR_XFER_SIZE:
+		case _PC_REC_MAX_XFER_SIZE:
+		case _PC_REC_MIN_XFER_SIZE:
+		case _PC_REC_XFER_ALIGN:
+		case _PC_ALLOC_SIZE_MIN:
+		case _PC_SYMLINK_MAX:
+		case _PC_2_SYMLINKS: {
+			alignas(alignof(uint64_t))
+			byte_t buf[sizeof(uint64_t)];
+			static uint32_t const ioctl_codes[] = {
+				[_PC_LINK_MAX]           = FILE_IOC_GETFSLINKMAX,
+				[_PC_MAX_CANON]          = 0,
+				[_PC_MAX_INPUT]          = 0,
+				[_PC_NAME_MAX]           = FILE_IOC_GETFSNAMEMAX,
+				[_PC_PATH_MAX]           = 0,
+				[_PC_PIPE_BUF]           = 0,
+				[_PC_CHOWN_RESTRICTED]   = 0,
+				[_PC_NO_TRUNC]           = 0,
+				[_PC_VDISABLE]           = 0,
+				[_PC_SYNC_IO]            = 0,
+				[_PC_ASYNC_IO]           = 0,
+				[_PC_PRIO_IO]            = 0,
+				[_PC_SOCK_MAXBUF]        = 0,
+				[_PC_FILESIZEBITS]       = FILE_IOC_GETFSSIZBITS,
+				[_PC_REC_INCR_XFER_SIZE] = FILE_IOC_GETFSXFERINC,
+				[_PC_REC_MAX_XFER_SIZE]  = FILE_IOC_GETFSXFERMAX,
+				[_PC_REC_MIN_XFER_SIZE]  = FILE_IOC_GETFSXFERMIN,
+				[_PC_REC_XFER_ALIGN]     = FILE_IOC_GETFSXFERALN,
+				[_PC_ALLOC_SIZE_MIN]     = FILE_IOC_GETFSXFERALN,
+				[_PC_SYMLINK_MAX]        = FILE_IOC_GETFSSYMMAX,
+				[_PC_2_SYMLINKS]         = FILE_IOC_GETFSSYMMAX,
+			};
+			uint32_t cmd;
+			cmd    = ioctl_codes[name];
+			result = ioctl(fd, cmd, buf);
 			if (result >= 0) {
-				u8 offset;
-				offset = pc_superblock_features_offset[name];
-				if (offset != FIELD_UNDEFINED) {
-#if __SIZEOF_POINTER__ <= 4
-					result = (longptr_t)(*(u32 const *)((byte_t const *)&feat + offset));
-#else /* __SIZEOF_POINTER__ <= 4 */
-					void const *field_addr;
-					field_addr = (byte_t const *)&feat + (offset & 0x7f);
-					if (offset & 0x80) {
-						/* 32-bit field. */
-						result = (longptr_t)(*(u32 const *)field_addr);
-					} else {
-						/* 64-bit field. */
-						result = (longptr_t)(*(u64 const *)field_addr);
-					}
-#endif /* __SIZEOF_POINTER__ > 4 */
+				if (name == _PC_2_SYMLINKS) {
+					result = *(uint64_t const *)buf != 0;
+				} else if (_IOC_SIZE(cmd) == 1) {
+					result = *(uint8_t const *)buf;
+				} else if (_IOC_SIZE(cmd) == 2) {
+					result = *(uint16_t const *)buf;
+				} else if (_IOC_SIZE(cmd) == 4) {
+					result = *(uint32_t const *)buf;
 				} else {
-					/* Custom field. */
-					if (name == _PC_FILESIZEBITS) {
-						result = feat.sbf_filesizebits; /* 8-bit field */
-					} else if (name == _PC_2_SYMLINKS) {
-						result = feat.sbf_features & HOP_SUPERBLOCK_FEAT_SYMLINKS ? 1 : 0; /* 1-bit field */
-					} else {
-						/* Shouldn't get here... */
-						result = PATHCONF_VARYING_LIMIT;
-					}
+					assert(_IOC_SIZE(cmd) == 8);
+					result = (longptr_t)*(uint64_t const *)buf;
 				}
 			}
 		}	break;
+
+		default:
+			break;
 		}
 	}
 	return result;
@@ -2084,13 +2080,10 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
 /*[[[body:libc_pathconf]]]*/
 {
 	longptr_t result;
-#ifndef __OPTIMIZE_SIZE__
 	/* Try not to open `path' if `name' is invalid, or has a constant value */
 	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
 		result = libc_seterrno(EINVAL);
-	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT)
-#endif /* !__OPTIMIZE_SIZE__ */
-	{
+	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
 		fd_t fd;
 		fd = open(path, O_RDONLY);
 		if unlikely(fd < 0)

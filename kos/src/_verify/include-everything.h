@@ -639,7 +639,6 @@ incdir("");
 #include <kos/guid.h>
 #include <kos/hop/api.h>
 #include <kos/hop/handle.h>
-#include <kos/hop/mfile.h>
 #include <kos/hop/module.h>
 #include <kos/hop/openfd.h>
 #include <kos/hop/pipe.h>

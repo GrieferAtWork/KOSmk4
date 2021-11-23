@@ -472,13 +472,18 @@ again_confstr:
 		errno = EOK;
 		value = type == CONFTYPE_PATHCONF ? pathconf(path, id)
 		                                  : sysconf(id);
+		if (value == -1 && errno != EOK)
+			goto err;
 		/* Check for unlimited/undefined config name. */
-		if ((id >= _SC_CHAR_BIT && id <= _SC_USHRT_MAX) && type == CONFTYPE_SYSCONF) {
+		if ((type == CONFTYPE_SYSCONF &&
+		     (id >= _SC_CHAR_BIT && id <= _SC_USHRT_MAX)) ||
+		    (type == CONFTYPE_PATHCONF &&
+		     ((id >= _PC_LINK_MAX && id <= _PC_PIPE_BUF) ||
+		      (id >= _PC_SOCK_MAXBUF && id <= _PC_SYMLINK_MAX)))) {
 			/* Special case: Print (some of) these as unsigned! */
-			if (value == -1 && errno != EOK)
-				goto err;
-			if (id == _SC_CHAR_MIN || id == _SC_INT_MIN ||
-			    id == _SC_SCHAR_MIN || id == _SC_SHRT_MIN) {
+			if ((id == _SC_CHAR_MIN || id == _SC_INT_MIN ||
+			     id == _SC_SCHAR_MIN || id == _SC_SHRT_MIN) &&
+			    type == CONFTYPE_SYSCONF) {
 				/* Still print these as signed! */
 				result = dprintf(fd, "%ld\n", value);
 			} else {
@@ -486,8 +491,6 @@ again_confstr:
 			}
 		} else if (value == -1) {
 			PRIVATE char const undefined[] = "undefined\n";
-			if (errno != EOK)
-				goto err;
 			result = write(fd, undefined, sizeof(undefined) - sizeof(char));
 		} else {
 			/* Print the value. */

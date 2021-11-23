@@ -75,9 +75,23 @@
  *       instead return with `ftr_siz = 0'. */
 #define FILE_IOC_TAILREAD _IOWR_KOS('F', 0x01, struct file_tailread)
 
+
+/* Return `_PC_*' for the superblock associated with the given file.
+ * - This ioctl is only support for `fnode'-derived files */
+#define FILE_IOC_GETFSLINKMAX _IOR_KOS('F', 0x10, __nlink_t)      /* _PC_LINK_MAX:           `struct fsuper::fs_feat::sf_link_max' */
+#define FILE_IOC_GETFSNAMEMAX _IOR_KOS('F', 0x11, __uint16_t)     /* _PC_NAME_MAX:           `struct fsuper::fs_feat::sf_name_max' */
+#define FILE_IOC_GETFSSIZBITS _IOR_KOS('F', 0x12, __SHIFT_TYPE__) /* _PC_FILESIZEBITS:       `struct fsuper::fs_feat::sf_filesizebits' */
+#define FILE_IOC_GETFSXFERINC _IOR_KOS('F', 0x13, __uint32_t)     /* _PC_REC_INCR_XFER_SIZE: `struct fsuper::fs_feat::sf_rec_incr_xfer_size' */
+#define FILE_IOC_GETFSXFERMAX _IOR_KOS('F', 0x14, __uint32_t)     /* _PC_REC_MAX_XFER_SIZE:  `struct fsuper::fs_feat::sf_rec_max_xfer_size' */
+#define FILE_IOC_GETFSXFERMIN _IOR_KOS('F', 0x15, __uint32_t)     /* _PC_REC_MIN_XFER_SIZE:  `struct fsuper::fs_feat::sf_rec_min_xfer_size' */
+#define FILE_IOC_GETFSXFERALN _IOR_KOS('F', 0x16, __uint32_t)     /* _PC_REC_XFER_ALIGN:     `struct fsuper::fs_feat::sf_rec_xfer_align' (also re-used for `_PC_ALLOC_SIZE_MIN') */
+#define FILE_IOC_GETFSSYMMAX  _IOR_KOS('F', 0x17, __uint64_t)     /* _PC_SYMLINK_MAX:        `struct fsuper::fs_feat::sf_symlink_max' (non-zero-ness determines `_PC_2_SYMLINKS') */
+
+
 #ifdef __CC__
 __DECL_BEGIN
 
+/* Argument type for `FILE_IOC_TAILREAD' */
 struct file_tailread {
 	__uint64_t      ftr_pos;   /* [in] Absolute file position at which to start reading */
 	__uint64_t      ftr_siz;   /* [in]  Input buffer size (in bytes) / max # of bytes to read

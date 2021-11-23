@@ -1900,12 +1900,18 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 "SIOCPROTOPRIVATE\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCDEVPRIVATE";
 
 #define GETBASE_KOS_IOCTLS(result, index) \
-	(((index) >= 0x4b00 && (index) <= 0x4b08) ? ((index) -= 0x4b00, (result) = repr_KOS_IOCTLS_4b00h, true) : \
+	(((index) >= 0x4601 && (index) <= 0x4617) ? ((index) -= 0x4601, (result) = repr_KOS_IOCTLS_4601h, true) : \
+	 ((index) >= 0x4b00 && (index) <= 0x4b08) ? ((index) -= 0x4b00, (result) = repr_KOS_IOCTLS_4b00h, true) : \
 	 ((index) >= 0x4c01 && (index) <= 0x4c06) ? ((index) -= 0x4c01, (result) = repr_KOS_IOCTLS_4c01h, true) : \
 	 ((index) >= 0x4d00 && (index) <= 0x4d07) ? ((index) -= 0x4d00, (result) = repr_KOS_IOCTLS_4d00h, true) : \
 	 ((index) >= 0x5300 && (index) <= 0x5305) ? ((index) -= 0x5300, (result) = repr_KOS_IOCTLS_5300h, true) : \
 	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
-	 ((index) >= 0x5600 && (index) <= 0x5601) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : false)
+	 ((index) >= 0x5600 && (index) <= 0x5612) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : false)
+PRIVATE char const repr_KOS_IOCTLS_4601h[] =
+"FILE_IOC_TAILREAD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FILE_IOC_GETFSLINKMAX\0FILE_IOC_G"
+"ETFSNAMEMAX\0FILE_IOC_GETFSSIZBITS\0FILE_IOC_GETFSXFERINC\0FILE_IOC"
+"_GETFSXFERMAX\0FILE_IOC_GETFSXFERMIN\0FILE_IOC_GETFSXFERALN\0FILE_I"
+"OC_GETFSSYMMAX";
 PRIVATE char const repr_KOS_IOCTLS_4b00h[] =
 "KBDIO_TRYGETKEY\0KBDIO_GETKEY\0KBDIO_MASKLED\0KBDIO_SETKEYMAP\0KBDIO"
 "_FLUSHPENDING\0KBDIO_PUTCHAR\0KBDIO_PUTKEY\0KBDIO_GETDBGF12\0KBDIO_M"
@@ -1918,13 +1924,14 @@ PRIVATE char const repr_KOS_IOCTLS_4d00h[] =
 "SETPOS\0MOUSEIO_PUTBUTTON\0MOUSEIO_PUTVWHEEL\0MOUSEIO_PUTHWHEEL\0MOU"
 "SEIO_FLUSHPENDING";
 PRIVATE char const repr_KOS_IOCTLS_5300h[] =
-"SVGA_IOC_MAKETTY\0SVGA_IOC_SETMODE\0SVGA_IOC_SETDEFMODE\0SVGA_IOC_L"
+"SVGA_IOC_MAKETTY\0SVGA_IOC_GETMODE\0SVGA_IOC_SETDEFMODE\0SVGA_IOC_L"
 "SMODES\0SVGA_IOC_GETCSNAME\0SVGA_IOC_CSSTRINGS";
 PRIVATE char const repr_KOS_IOCTLS_5400h[] =
 "TTYIO_IBUF_GETLIMIT\0TTYIO_CANON_SETLIMIT\0TTYIO_OPEND_SETLIMIT\0TT"
 "YIO_IPEND_GETLIMIT";
 PRIVATE char const repr_KOS_IOCTLS_5600h[] =
-"VID_IOC_ACTIVATE\0VID_IOC_MAKELCK";
+"VID_IOC_ACTIVATE\0VID_IOC_MAKELCK\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0VID_IOC_GETTTYINF"
+"O\0VID_IOC_GETCELLDATA\0VID_IOC_GETCURSOR";
 //[[[end]]]
 
 PRIVATE ATTR_CONST WUNUSED char const *CC

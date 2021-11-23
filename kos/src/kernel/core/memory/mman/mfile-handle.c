@@ -42,6 +42,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/minmax.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/ioctl.h>
@@ -119,7 +120,7 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		if (mfile_isnode(self)) {
 			struct fsuper *super;
 			super = mfile_asnode(self)->fn_super;
-			validate_readable(arg, FSLABEL_MAX * sizeof(char));
+			validate_writable(arg, FSLABEL_MAX * sizeof(char));
 			if (fsuper_getlabel(super, (USER CHECKED char *)arg))
 				return 0;
 		}
@@ -172,6 +173,42 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		/* Write-back the # of read bytes. */
 		COMPILER_WRITE_BARRIER();
 		info->ftr_siz = num_bytes;
+		return 0;
+	}	break;
+
+	/* All of the following ioctls are used to read attributes from the superblock. */
+	case FILE_IOC_GETFSLINKMAX:  /* struct fsuper::fs_feat::sf_link_max */
+	case FILE_IOC_GETFSNAMEMAX:  /* struct fsuper::fs_feat::sf_name_max */
+	case FILE_IOC_GETFSSIZBITS:  /* struct fsuper::fs_feat::sf_filesizebits */
+	case FILE_IOC_GETFSXFERINC:  /* struct fsuper::fs_feat::sf_rec_incr_xfer_size */
+	case FILE_IOC_GETFSXFERMAX:  /* struct fsuper::fs_feat::sf_rec_max_xfer_size */
+	case FILE_IOC_GETFSXFERMIN:  /* struct fsuper::fs_feat::sf_rec_min_xfer_size */
+	case FILE_IOC_GETFSXFERALN:  /* struct fsuper::fs_feat::sf_rec_xfer_align */
+	case FILE_IOC_GETFSSYMMAX: { /* struct fsuper::fs_feat::sf_symlink_max */
+		/* Generate offset table for attributes referenced by ioctl codes. */
+		enum {
+			MINID = MIN_C(_IOC_NR(FILE_IOC_GETFSLINKMAX), _IOC_NR(FILE_IOC_GETFSNAMEMAX),
+			              _IOC_NR(FILE_IOC_GETFSSIZBITS), _IOC_NR(FILE_IOC_GETFSXFERINC),
+			              _IOC_NR(FILE_IOC_GETFSXFERMAX), _IOC_NR(FILE_IOC_GETFSXFERMIN),
+			              _IOC_NR(FILE_IOC_GETFSXFERALN), _IOC_NR(FILE_IOC_GETFSSYMMAX))
+		};
+		static uint16_t const super_attrib_offsets[] = {
+			[(_IOC_NR(FILE_IOC_GETFSLINKMAX) - MINID)] = offsetof(struct fsuper, fs_feat.sf_link_max),
+			[(_IOC_NR(FILE_IOC_GETFSNAMEMAX) - MINID)] = offsetof(struct fsuper, fs_feat.sf_name_max),
+			[(_IOC_NR(FILE_IOC_GETFSSIZBITS) - MINID)] = offsetof(struct fsuper, fs_feat.sf_filesizebits),
+			[(_IOC_NR(FILE_IOC_GETFSXFERINC) - MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_incr_xfer_size),
+			[(_IOC_NR(FILE_IOC_GETFSXFERMAX) - MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_max_xfer_size),
+			[(_IOC_NR(FILE_IOC_GETFSXFERMIN) - MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_min_xfer_size),
+			[(_IOC_NR(FILE_IOC_GETFSXFERALN) - MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_xfer_align),
+			[(_IOC_NR(FILE_IOC_GETFSSYMMAX) - MINID)]  = offsetof(struct fsuper, fs_feat.sf_symlink_max),
+		};
+		struct fsuper *super;
+		if (!mfile_isnode(self))
+			break; /* These ioctls are only supported for fnode-based files. */
+		super = mfile_asnode(self)->fn_super;
+		validate_writable(arg, _IOC_SIZE(cmd));
+		/* Copy attribute into user-provided buffer. */
+		memcpy(arg, (byte_t *)super + super_attrib_offsets[_IOC_NR(cmd) - MINID], _IOC_SIZE(cmd));
 		return 0;
 	}	break;
 
