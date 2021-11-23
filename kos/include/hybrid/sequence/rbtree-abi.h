@@ -1125,7 +1125,7 @@ again:
 	return root;
 }
 
-RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((1, 2, 3)), void,
+RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_NONNULL((1, 2, 3)), void,
                        RBTREE_NOTHROW, RBTREE_CC, RBTREE(_insert_repair),
                        (RBTREE_T **__restrict proot, RBTREE_T *__restrict node, RBTREE_T *__restrict parent),
                        (proot, node, parent)) {
