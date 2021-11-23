@@ -734,10 +734,10 @@ NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 		index  = (lo + hi) / 2;
 		result = &self->mst_symv[index];
 		symname = cmodsym_name(result, mod);
-		cmp     = strcmpz(name, symname, namelen);
-		if (cmp < 0) {
+		cmp     = strcmpz(symname, name, namelen);
+		if (cmp > 0) {
 			hi = index;
-		} else if (cmp > 0) {
+		} else if (cmp < 0) {
 			lo = index + 1;
 		} else {
 			/* Found it! */
