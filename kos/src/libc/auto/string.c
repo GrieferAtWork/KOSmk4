@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44ca06b7 */
+/* HASH CRC-32:0x48943ca3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1971,7 +1971,7 @@ print("	};");
 	case ELIBBAD:         result = "ELIBBAD\0Accessing a corrupted shared lib"; break;
 #endif /* ELIBBAD */
 #ifdef ELIBSCN
-	case ELIBSCN:         result = ".ELIBSCN\0lib section in a.out corrupted"; break;
+	case ELIBSCN:         result = "ELIBSCN\0.lib section in a.out corrupted"; break;
 #endif /* ELIBSCN */
 #ifdef ELIBMAX
 	case ELIBMAX:         result = "ELIBMAX\0Attempting to link in too many libs"; break;

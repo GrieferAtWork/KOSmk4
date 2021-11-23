@@ -2547,7 +2547,7 @@ print("	};");
 	case ELIBBAD:         result = "ELIBBAD\0Accessing a corrupted shared lib"; break;
 @@pp_endif@@
 @@pp_ifdef ELIBSCN@@
-	case ELIBSCN:         result = ".ELIBSCN\0lib section in a.out corrupted"; break;
+	case ELIBSCN:         result = "ELIBSCN\0.lib section in a.out corrupted"; break;
 @@pp_endif@@
 @@pp_ifdef ELIBMAX@@
 	case ELIBMAX:         result = "ELIBMAX\0Attempting to link in too many libs"; break;
