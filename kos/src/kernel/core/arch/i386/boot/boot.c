@@ -948,8 +948,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Also add corresponding read-ioctls that will read the relevant properties.
 	 */
 
-	/* TODO: Re-write "moddbx/obnode.c" from scratch, now that `CONFIG_USE_NEW_FS' is mandatory. */
-
 	/* TODO: `HOP_SUPERBLOCK_FEATURES' is used by `fpathconf(3)', but is no longer being implemented
 	 *       Look at  what's actually  being used  and add  kos-specific ioctls  for what's  needed! */
 

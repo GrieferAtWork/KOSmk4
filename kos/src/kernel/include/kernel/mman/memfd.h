@@ -46,6 +46,7 @@ struct memfd
 };
 
 #define mfile_asmemfd(self) ((struct memfd *)(self))
+#define mfile_ismemfd(self) ((self)->mf_ops == &memfd_ops)
 
 /* Operators used for memfd files. */
 DATDEF struct mfile_ops const memfd_ops;

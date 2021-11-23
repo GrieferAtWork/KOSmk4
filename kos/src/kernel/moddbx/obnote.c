@@ -32,16 +32,26 @@
 /**/
 #include <dev/block.h>
 #include <dev/char.h>
-#include <fs/file.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/execabi.h>
+#include <kernel/fs/devfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/dirhandle.h>
+#include <kernel/fs/fifohandle.h>
+#include <kernel/fs/filehandle.h>
+#include <kernel/fs/filesys.h>
+#include <kernel/fs/flat.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/ramfs.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
+#include <kernel/mman/memfd.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -55,6 +65,7 @@
 #include <hybrid/align.h>
 
 #include <compat/config.h>
+#include <kos/dev.h>
 #include <kos/exec/rtld.h>
 
 #include <format-printer.h>
@@ -84,10 +95,11 @@ DECL_BEGIN
 			goto err;            \
 		result += temp;          \
 	}	__WHILE0
-#define RAWPRINT(str)     (*printer)(arg, str, COMPILER_STRLEN(str))
-#define PRINT(str)        DO(RAWPRINT(str))
-#define REPEAT(ch, count) DO(format_repeat(printer, arg, ch, count))
-#define PRINTF(...)       DO(format_printf(printer, arg, __VA_ARGS__))
+#define rawprint(str, len) (*printer)(arg, str, len)
+#define RAWPRINT(str)      (*printer)(arg, str, COMPILER_STRLEN(str))
+#define PRINT(str)         DO(RAWPRINT(str))
+#define REPEAT(ch, count)  DO(format_repeat(printer, arg, ch, count))
+#define PRINTF(...)        DO(format_printf(printer, arg, __VA_ARGS__))
 
 /* Touch at least 1 byte from every page within the given address range. */
 PRIVATE void KCALL
@@ -142,7 +154,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 		execinfo      = &FORMMAN(thread->t_mman, thismman_execinfo);
 		dent          = execinfo->mei_dent;
 		if (dent) {
-			if (dent->de_refcnt == 0)
+			if (dent->fd_refcnt == 0)
 				goto badobj;
 			exec_name    = dent->fd_name;
 			exec_namelen = dent->fd_namelen;
@@ -435,37 +447,67 @@ badobj:
 	return 0;
 }
 
+PRIVATE ATTR_CONST WUNUSED char const *
+NOTHROW(KCALL get_dirent_type_name)(unsigned char dt_type) {
+	switch (dt_type) {
+	case DT_UNKNOWN: return "unknown";
+	case DT_FIFO:    return "fifo";
+	case DT_CHR:     return "chr";
+	case DT_DIR:     return "dir";
+	case DT_BLK:     return "blk";
+	case DT_REG:     return "reg";
+	case DT_LNK:     return "lnk";
+	case DT_SOCK:    return "sock";
+	case DT_WHT:     return "wht";
+	default: break;
+	}
+	return NULL;
+}
+
 PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_fdirent)(pformatprinter printer, void *arg,
-                            KERNEL CHECKED void const *pointer,
-                            unsigned int *__restrict pstatus) {
+NOTHROW(KCALL note_fdirent_ex)(pformatprinter printer, void *arg,
+                               KERNEL CHECKED void const *pointer,
+                               unsigned int *__restrict pstatus,
+                               bool print_type) {
+	ssize_t result, temp;
+	char const *typnam;
 	struct fdirent *me = (struct fdirent *)pointer;
 	char const *dent_name;
 	size_t dent_namelen;
-	unsigned char dent_type;
 	TRY {
-		if (me->de_refcnt == 0)
+		if (me->fd_refcnt == 0)
 			goto badobj;
 		dent_name    = me->fd_name;
 		dent_namelen = me->fd_namelen;
 		if (!ADDR_ISKERN(me->fd_ops))
 			goto badobj;
-		dent_type = me->fd_type;
 		if (me->fd_hash != fdirent_hash(dent_name, dent_namelen))
 			goto badobj;
 		readmem(dent_name, dent_namelen * sizeof(char));
-		/* TODO: Verify  `dent_type',  and  print  its  name.
-		 *       as  `reg'  for `DT_REG',  etc...,  such that
-		 *       the actual string printed is something like:
-		 *       `reg:init' */
-		(void)dent_type;
+		typnam = get_dirent_type_name(me->fd_type);
+		if unlikely(!typnam)
+			goto badobj;
 	} EXCEPT {
 		goto badobj;
 	}
-	return (*printer)(arg, dent_name, dent_namelen);
+	result = 0;
+	if (print_type)
+		result = format_printf(printer, arg, "%s:", typnam);
+	if likely(result >= 0)
+		DO((*printer)(arg, dent_name, dent_namelen));
+	return result;
 badobj:
 	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
 	return 0;
+err:
+	return temp;
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_fdirent)(pformatprinter printer, void *arg,
+                            KERNEL CHECKED void const *pointer,
+                            unsigned int *__restrict pstatus) {
+	return note_fdirent_ex(printer, arg, pointer, pstatus, true);
 }
 
 
@@ -530,7 +572,7 @@ NOTHROW(KCALL note_path_impl)(pformatprinter printer, void *arg,
 			goto err;
 		result += temp;
 	}
-	temp = note_fdirent(printer, arg, dent, pstatus);
+	temp = note_fdirent_ex(printer, arg, dent, pstatus, false);
 	if unlikely(temp < 0)
 		goto err;
 	result += temp;
@@ -565,7 +607,7 @@ NOTHROW(KCALL note_pathpair)(pformatprinter printer, void *arg,
 			goto err;
 		result += temp;
 	}
-	temp = note_fdirent(printer, arg, d, pstatus);
+	temp = note_fdirent_ex(printer, arg, d, pstatus, false);
 	if unlikely(temp < 0)
 		goto err;
 	result += temp;
@@ -591,10 +633,10 @@ NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
 		if (me->mm_weakrefcnt == 0)
 			goto badobj;
 #ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
-		if (me->mm_pagedir_p != (PHYS pagedir_t *)(uintptr_t)pagedir_translate(me))
+		if (me->mm_pagedir_p != (PHYS pagedir_t *)(uintptr_t)pagedir_translate(&me->mm_pagedir))
 			goto badobj;
 #else /* ARCH_PAGEDIR_GETSET_USES_POINTER */
-		if (me->mm_pagedir_p != pagedir_translate(me))
+		if (me->mm_pagedir_p != pagedir_translate(&me->mm_pagedir))
 			goto badobj;
 #endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
 		exec_path = FORMMAN(me, thismman_execinfo).mei_path;
@@ -616,46 +658,6 @@ NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
 		result = note_pathpair(printer, arg,
 		                       exec_path,
 		                       exec_dent,
-		                       pstatus);
-	} else {
-		result = RAWPRINT("??" "?");
-	}
-	return result;
-badobj:
-	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
-	return 0;
-}
-
-PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_file)(pformatprinter printer, void *arg,
-                         KERNEL CHECKED void const *pointer,
-                         unsigned int *__restrict pstatus) {
-	ssize_t result;
-	struct filehandle *me = (struct filehandle *)pointer;
-	struct path *file_path;
-	struct fdirent *file_dent;
-	TRY {
-		if (me->f_refcnt == 0)
-			goto badobj;
-		if (!me->f_node || !ADDR_ISKERN(me->f_node))
-			goto badobj;
-		file_path = me->f_path;
-		file_dent = me->f_dirent;
-		if (!file_dent)
-			file_path = NULL;
-		else {
-			if (!ADDR_ISKERN(file_dent))
-				goto badobj;
-			if (file_path && !ADDR_ISKERN(file_path))
-				goto badobj;
-		}
-	} EXCEPT {
-		goto badobj;
-	}
-	if (file_dent) {
-		result = note_pathpair(printer, arg,
-		                       file_path,
-		                       file_dent,
 		                       pstatus);
 	} else {
 		result = RAWPRINT("??" "?");
@@ -910,7 +912,18 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 		ops = me->mf_ops;
 		if (!ADDR_ISKERN(ops))
 			goto badobj;
-		/* TODO: if it's a device file, extract the devfs filename. */
+		/* if it's a device file, extract the devfs filename. */
+		if (ops->mo_changed == &fnode_v_changed &&
+		    S_ISDEV(mfile_asnode(me)->fn_mode) &&
+		    mfile_asnode(me)->fn_super == _ramfs_super_assuper(&devfs) &&
+		    ops != &ramfs_devnode_ops.dno_node.no_file) {
+			REF struct devdirent *name;
+			name = mfile_asdevice(me)->dv_dirent;
+			if (!name || !ADDR_ISKERN(name))
+				goto badobj;
+			file_dent = &name->dd_dirent;
+			goto do_print_devfs_name;
+		}
 		if (!mfile_extract_name(me, &file_path, &file_dent, pstatus))
 			goto badobj;
 	} EXCEPT {
@@ -926,15 +939,118 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 		if (known_name) {
 			DO((*printer)(arg, known_name, strlen(known_name)));
 		} else {
+			/* Special printing for specific sub-classes of `mfile' */
+			TRY {
+				if (ops->mo_changed == &fnode_v_changed) {
+					struct fnode *node   = mfile_asnode(me);
+					struct fsuper *super = node->fn_super;
+					struct ffilesys *sys;
+					struct mfile *dev;
+					struct pathmount *somemount;
+					char const *typnam;
+					if (!super || !ADDR_ISKERN(super))
+						goto badobj;
+					sys = super->fs_sys;
+					if (!sys || !ADDR_ISKERN(sys))
+						goto badobj;
+					dev = super->fs_dev;
+					if (dev && (!ADDR_ISKERN(dev) || dev == &super->fs_root))
+						goto badobj;
+					typnam = get_dirent_type_name(IFTODT(node->fn_mode));
+					if unlikely(!typnam)
+						goto badobj;
+
+					/* Print super-related information. */
+					somemount = LIST_FIRST(&super->fs_mounts);
+					result = rawprint(sys->ffs_name, strlen(sys->ffs_name));
+					if unlikely(result < 0)
+						goto done;
+					PRINT(":");
+					if (dev) {
+						PRINT("[");
+						DO(note_mfile(printer, arg, dev, pstatus));
+						if (*pstatus != OBNOTE_PRINT_STATUS_SUCCESS)
+							goto done;
+						PRINT("]");
+					}
+					PRINT(":");
+					if (somemount != NULL &&
+					    somemount != FSUPER_MOUNTS_DELETED) {
+						if (!ADDR_ISKERN(somemount))
+							goto badobj;
+						DO(note_path(printer, arg, (struct path *)somemount, pstatus));
+						if (*pstatus != OBNOTE_PRINT_STATUS_SUCCESS)
+							goto done;
+					}
+					if (node == &super->fs_root) {
+						if (!S_ISDIR(node->fn_mode))
+							goto badobj;
+						goto done;
+					}
+					PRINTF(":%s:%04o:%" PRIuN(__SIZEOF_INO_T__),
+					       typnam, node->fn_mode & 07777,
+					       node->fn_ino);
+					if (S_ISDEV(node->fn_mode)) {
+						struct fdevnode *devnode;
+						dev_t devno;
+						devnode = fnode_asdevnode(node);
+						devno   = devnode->dn_devno;
+						PRINTF(":[%" PRIuN(__SIZEOF_MAJOR_T__) ":%" PRIuN(__SIZEOF_MINOR_T__) "]",
+						       MAJOR(devno), MINOR(devno));
+					}
+					if (fnode_islnk(node)) {
+						struct flnknode_ops const *lnkops;
+						lnkops = container_of(ops, struct flnknode_ops, lno_node.no_file);
+						if (lnkops->lno_linkstr == &clnknode_v_linkstr) {
+							struct clnknode *clnk = (struct clnknode *)fnode_aslnk(node);
+							PRINTF(":%#q", clnk->lnc_text);
+						}
+					}
+					goto done;
+				}
+				if (ops == &memfd_ops) {
+					struct memfd *mfd    = mfile_asmemfd(me);
+					struct fdirent *name = mfd->mfd_name;
+					if (!name || !ADDR_ISKERN(name))
+						goto badobj;
+					result = RAWPRINT("memfd:");
+					DO(note_fdirent_ex(printer, arg, name, pstatus, false));
+					goto done;
+				}
+			} EXCEPT {
+				goto badobj;
+			}
+			/* Fallback: don't know... */
 			PRINT("??" "?");
 		}
 	}
+done:
+	return result;
+do_print_devfs_name:
+	result = RAWPRINT("/dev/");
+	DO(note_fdirent_ex(printer, arg, file_dent, pstatus, false));
 	return result;
 err:
 	return temp;
 badobj:
 	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
 	return 0;
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_fsuper)(pformatprinter printer, void *arg,
+                           KERNEL CHECKED void const *pointer,
+                           unsigned int *__restrict pstatus) {
+	struct fsuper *me = (struct fsuper *)pointer;
+	return note_mfile(printer, arg, &me->fs_root, pstatus);
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_flatsuper)(pformatprinter printer, void *arg,
+                              KERNEL CHECKED void const *pointer,
+                              unsigned int *__restrict pstatus) {
+	struct flatsuper *me = (struct flatsuper *)pointer;
+	return note_mfile(printer, arg, &me->ffs_super, pstatus);
 }
 
 
@@ -1018,6 +1134,63 @@ err:
 badobj:
 	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
 	return 0;
+}
+
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_filehandle_impl)(pformatprinter printer, void *arg,
+                                    KERNEL CHECKED void const *pointer,
+                                    unsigned int *__restrict pstatus,
+                                    bool is_dirhandle) {
+	ssize_t result;
+	struct filehandle *me = (struct filehandle *)pointer;
+	struct path *file_path;
+	struct fdirent *file_dent;
+	struct mfile *file;
+	TRY {
+		if (me->fh_refcnt == 0)
+			goto badobj;
+		file_path = me->fh_path;
+		file_dent = me->fh_dirent;
+		if (!file_dent)
+			file_path = NULL;
+		else {
+			if (!ADDR_ISKERN(file_dent))
+				goto badobj;
+			if (file_path && !ADDR_ISKERN(file_path))
+				goto badobj;
+		}
+		file = me->fh_file;
+		if (is_dirhandle)
+			file = ((struct dirhandle *)me)->dh_enum.de_dir;
+		if (!file || !ADDR_ISKERN(file))
+			goto badobj;
+	} EXCEPT {
+		goto badobj;
+	}
+	if (file_dent) {
+		result = note_pathpair(printer, arg, file_path, file_dent, pstatus);
+	} else {
+		result = note_mfile(printer, arg, file, pstatus);
+	}
+	return result;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_filehandle)(pformatprinter printer, void *arg,
+                               KERNEL CHECKED void const *pointer,
+                               unsigned int *__restrict pstatus) {
+	return note_filehandle_impl(printer, arg, pointer, pstatus, false);
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_dirhandle)(pformatprinter printer, void *arg,
+                              KERNEL CHECKED void const *pointer,
+                              unsigned int *__restrict pstatus) {
+	return note_filehandle_impl(printer, arg, pointer, pstatus, true);
 }
 
 
@@ -1123,22 +1296,37 @@ badobj:
 }
 
 
+/* NOTE: This list must be sorted lexicographically ascending! */
 PRIVATE struct obnote_entry const notes[] = {
+	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
 	{ "ansittydev", &note_mfile },
 	{ "blkdev", &note_mfile },
-	{ "block_device", &note_mfile },
 	{ "chrdev", &note_mfile },
+	{ "clnknode", &note_mfile },
+	{ "constdir", &note_mfile },
 	{ "cpu", &note_cpu },
-	{ "dirhandle", &note_file },
+	{ "device", &note_mfile },
+	{ "dirhandle", &note_dirhandle },
 	{ "driver", &note_module },
 	{ "driver_section", &note_module_section },
+	{ "fdevnode", &note_mfile },
 	{ "fdirent", &note_fdirent },
-	{ "filehandle", &note_file },
-	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
+	{ "fdirnode", &note_mfile },
+	{ "ffifonode", &note_mfile },
+	{ "fifohandle", &note_filehandle },
+	{ "filehandle", &note_filehandle },
+	{ "flatdirnode", &note_mfile },
+	{ "flatsuper", &note_flatsuper },
+	{ "flnknode", &note_mfile },
+	{ "fnode", &note_mfile },
+	{ "fregnode", &note_mfile },
+	{ "fsocknode", &note_mfile },
+	{ "fsuper", &note_fsuper },
 	{ "kbddev", &note_mfile },
 	{ "mbnode", &note_mnode },
 	{ "mfile", &note_mfile },
 	{ "mfutex", &note_mfutex },
+	{ "mkttydev", &note_mfile },
 	{ "mman", &note_mman },
 	{ "mnode", &note_mnode },
 	{ "module", &note_module },
@@ -1147,13 +1335,17 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "mpart", &note_mpart },
 	{ "nicdev", &note_mfile },
 	{ "path", &note_path },
+	{ "printnode", &note_mfile },
 	{ "ptymaster", &note_mfile },
 	{ "ptyslave", &note_mfile },
+	{ "ramfs_dirnode", &note_mfile },
+	{ "ramfs_super", &note_fsuper },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
 	{ "ttydev", &note_mfile },
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
+	{ "videodev", &note_mfile },
 };
 
 
