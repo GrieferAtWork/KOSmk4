@@ -1180,8 +1180,13 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 				 * If handles cannot be converted, we should invoke the HOP on the original
 				 * handle, for example allowing FIFO-related handles to re-use PIPE-hop()s! */
 				REF void *new_data;
+				if unlikely(wanted_type >= HANDLE_TYPE_COUNT)
+					THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+					      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
+					      cmd);
 				new_data = handle_tryas(hand, wanted_type);
 				if (new_data) {
+					handle_decref(hand);
 					hand.h_data = new_data; /* Inherit reference */
 					hand.h_type = wanted_type;
 				}
@@ -1217,6 +1222,26 @@ DEFINE_SYSCALL4(syscall_slong_t, hopf,
 		if ((cmd & 0xffff0000) == (HOP_HANDLE_STAT & 0xffff0000)) {
 			result = hop_do_generic_operation(&hand, cmd, (unsigned int)fd, arg);
 		} else {
+			uintptr_half_t wanted_type;
+			/* Do implicit handle casting based on the expected type encoded in `cmd >> 16'.
+			 * e.g.: A   DATABLOCK   command   on   a   FILE   object   should   be  allowed */
+			wanted_type = (u16)(cmd >> 16);
+			if (wanted_type != hand.h_type) {
+				/* This should be a try-as!
+				 * If handles cannot be converted, we should invoke the HOP on the original
+				 * handle, for example allowing FIFO-related handles to re-use PIPE-hop()s! */
+				REF void *new_data;
+				if unlikely(wanted_type >= HANDLE_TYPE_COUNT)
+					THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+					      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
+					      cmd);
+				new_data = handle_tryas(hand, wanted_type);
+				if (new_data) {
+					handle_decref(hand);
+					hand.h_data = new_data; /* Inherit reference */
+					hand.h_type = wanted_type;
+				}
+			}
 			result = (*handle_type_db.h_hop[hand.h_type])(hand.h_data,
 			                                              cmd,
 			                                              arg,
