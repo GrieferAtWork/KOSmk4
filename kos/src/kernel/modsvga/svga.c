@@ -75,7 +75,7 @@ DEFINE_CMDLINE_PARAM_UINT32_VAR(default_resy, "yres", 768);
 DEFINE_CMDLINE_PARAM_UINT8_VAR(default_bpp, "bpp", 8);
 
 
-PRIVATE NOBLOCK ATTR_FREETEXT WUNUSED NONNULL((1)) uint64_t
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_PURE WUNUSED NONNULL((1)) uint64_t
 NOTHROW(FCALL calculate_mode_cost)(struct svga_modeinfo const *__restrict mode,
                                    uint32_t xres, uint32_t yres, uint8_t bpp) {
 	uint64_t result = 0;
@@ -99,7 +99,7 @@ NOTHROW(FCALL calculate_mode_cost)(struct svga_modeinfo const *__restrict mode,
 	return result;
 }
 
-PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL ATTR_PURE WUNUSED NONNULL((1)) struct svga_modeinfo const *
 NOTHROW(FCALL select_closest_video_mode)(struct svgadev *__restrict self,
                                          uint32_t xres, uint32_t yres, uint8_t bpp) {
 	size_t i;
@@ -120,7 +120,7 @@ NOTHROW(FCALL select_closest_video_mode)(struct svgadev *__restrict self,
 	return winner;
 }
 
-PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL ATTR_PURE WUNUSED NONNULL((1)) struct svga_modeinfo const *
 NOTHROW(FCALL get_default_video_mode)(struct svgadev *__restrict self) {
 	return select_closest_video_mode(self, default_resx, default_resy, default_bpp);
 }

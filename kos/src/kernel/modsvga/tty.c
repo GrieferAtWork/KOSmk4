@@ -116,7 +116,7 @@ NOTHROW(FCALL svga_ttyaccess_destroy)(struct vidttyaccess *__restrict self) {
 
 
 
-PRIVATE NOBLOCK WUNUSED NONNULL((2)) uint16_t
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((2)) uint16_t
 NOTHROW(FCALL svga_ttyaccess_makecell_txt)(char32_t ch,
                                            struct ansitty *__restrict tty) {
 	uint16_t result;
@@ -224,7 +224,7 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_txt_nooverscan)(struct vidttyaccess *__r
 	}
 }
 
-PRIVATE NOBLOCK NONNULL((1)) uint16_t
+PRIVATE NOBLOCK ATTR_PURE NONNULL((1)) uint16_t
 NOTHROW(FCALL svga_ttyaccess_getcell_txt_without_overscan)(struct svga_ttyaccess_txt *__restrict self,
                                                            uintptr_t screen_index) {
 	size_t delta = self->vta_scan - self->vta_resx;

@@ -165,23 +165,30 @@ kmalloc_leaks_print(kmalloc_leaks_t UNUSED(leaks),
 	return 0;
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_PURE WUNUSED size_t
+
+/* Even though they've already been marked as ATTR_CONST,
+ * gcc keeps complaining that I should mark the as  const
+ * >> WHEN THEY'RE ALREADY MARKED AS SUCH!!! << */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=const"
+PUBLIC NOBLOCK ATTR_CONST ATTR_WEAK WUNUSED size_t
 NOTHROW(KCALL kmalloc_leaks_count)(kmalloc_leaks_t UNUSED(leaks)) {
 	return 0;
 }
 
-PUBLIC NOBLOCK ATTR_WEAK void
-NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t UNUSED(leaks),
-                                     unsigned int UNUSED(now)) {
-}
-
-
-PUBLIC NOBLOCK ATTR_WEAK ATTR_PURE memleak_t
+PUBLIC NOBLOCK ATTR_CONST ATTR_WEAK memleak_t
 NOTHROW(FCALL memleak_next)(kmalloc_leaks_t UNUSED(leaks),
                             memleak_t UNUSED(prev)) {
 	return NULL;
 }
 DEFINE_PUBLIC_WEAK_ALIAS(memleak_getattr, memleak_next);
+#pragma GCC diagnostic pop
+
+
+PUBLIC NOBLOCK ATTR_WEAK void
+NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t UNUSED(leaks),
+                                     unsigned int UNUSED(now)) {
+}
 
 PUBLIC ATTR_WEAK ATTR_CONST NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
 NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),

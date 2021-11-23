@@ -327,7 +327,7 @@ INTERN_CONST struct vidlck_ops const svgalck_ops = {
  * with `basevga_defaultfont' and see if we get a match.
  *
  * Upon error, return `0' (which should be disabled as U+FFFD: �) */
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) byte_t
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) byte_t
 NOTHROW(FCALL try_ocr_on_gfxcell)(struct svga_gfxcell const *__restrict cell) {
 	unsigned int i;
 	for (i = 0; i < 256; ++i) {
@@ -870,7 +870,7 @@ PRIVATE struct mfile_stream_ops const svgadev_v_stream_ops = {
 
 #ifdef CONFIG_HAVE_DEBUGGER
 
-PRIVATE NOBLOCK ATTR_FREETEXT WUNUSED NONNULL((1)) uint64_t
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_PURE WUNUSED NONNULL((1)) uint64_t
 NOTHROW(FCALL calculate_dbgmode_cost)(struct svga_modeinfo const *__restrict mode) {
 	uint64_t result = 0;
 	if (mode->smi_bits_per_pixel > 32)
@@ -896,7 +896,7 @@ NOTHROW(FCALL calculate_dbgmode_cost)(struct svga_modeinfo const *__restrict mod
 }
 
 /* Select and return the video mode that should be used for the builtin debugger. */
-PRIVATE NOBLOCK ATTR_FREETEXT NONNULL((1)) struct svga_modeinfo const *
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_PURE NONNULL((1)) struct svga_modeinfo const *
 NOTHROW(FCALL svgadev_dbg_selectmode)(struct svgadev *__restrict self) {
 	size_t i;
 	uint64_t winner_cost;
