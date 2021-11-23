@@ -97,7 +97,7 @@ INTERN_CONST struct mfile_stream_ops const devfs_spec_v_stream_ops_with_boottime
 
 /* Decode a string such as "4:5" into a devno.
  * When the given `name' can't be decoded as such, return `DEV_UNSET' */
-PRIVATE WUNUSED NONNULL((1)) dev_t KCALL
+PRIVATE ATTR_PURE WUNUSED dev_t KCALL
 decode_devno(USER CHECKED char const *name, u16 namelen)
 		THROWS(E_SEGFAULT) {
 	char const *end = name + namelen;
@@ -229,7 +229,7 @@ devicelink_dirent_v_opennode(struct fdirent *__restrict self,
 	return devicelink_new(me->dld_pfx, me->dld_dev);
 }
 
-PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ino_t FCALL
+PRIVATE BLOCKING ATTR_PURE WUNUSED NONNULL((1, 2)) ino_t FCALL
 devicelink_dirent_v_getino(struct fdirent *__restrict self,
                            struct fdirnode *__restrict UNUSED(dir))
 		THROWS(E_IOERROR, ...) {

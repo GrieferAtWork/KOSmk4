@@ -79,22 +79,24 @@ __SYSDECL_BEGIN
 	((self)->sl_sig ? (void)sys_Xlfutex(&(self)->sl_sig, LFUTEX_WAKE, (__uintptr_t)-1, __NULLPTR, 0) : (void)0)
 #endif /* !__KERNEL__ */
 
+/* Try to acquire a lock to a given `struct shared_lock *self' */
 #define shared_lock_tryacquire(self) \
 	(__hybrid_atomic_xch((self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
 
 #ifdef __KERNEL__
 #define __shared_lock_send(self) \
 	sig_send(&(self)->sl_sig)
-#else /* __KERNEL__ */
+#elif __CRT_HAVE_XSC(lfutex)
 /* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
 #define __shared_lock_send(self) \
 	((self)->sl_sig ? (sys_Xlfutex(&(self)->sl_sig, LFUTEX_WAKEMASK, 1, __NULLPTR, 0) != 0) : 0)
-#endif /* !__KERNEL__ */
+#endif /* ... */
 
 /* Release a lock from a given shared_lock.
  * @return: true:  A waiting thread was signaled.
  * @return: false: Either no  thread was  signaled, or  the
  *                 lock remains held by the calling thread. */
+#ifdef __shared_lock_send
 #if defined(NDEBUG) || defined(NDEBUG_SYNC)
 #define shared_lock_release(self)                                 \
 	(__hybrid_atomic_store((self)->sl_lock, 0, __ATOMIC_RELEASE), \
@@ -105,6 +107,7 @@ __SYSDECL_BEGIN
 	 __hybrid_atomic_store((self)->sl_lock, 0, __ATOMIC_RELEASE), \
 	 __shared_lock_send(self))
 #endif /* !NDEBUG || !NDEBUG_SYNC */
+#endif /* __shared_lock_send */
 
 }
 

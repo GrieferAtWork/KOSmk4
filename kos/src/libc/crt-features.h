@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18610cbc */
+/* HASH CRC-32:0xd2844e36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4736,6 +4736,8 @@
 #define __CRT_HAVE_lockop_reap_atomic_lock
 #define __CRT_HAVE_lockop_reap_atomic_rwlock
 #define __CRT_HAVE_lockop_reap_ex
+#define __CRT_HAVE_lockop_reap_shared_lock
+#define __CRT_HAVE_lockop_reap_shared_rwlock
 #ifndef __KERNEL__
 #define __CRT_HAVE_log
 #define __CRT_HAVE_log10
@@ -5029,6 +5031,8 @@
 #define __CRT_HAVE_oblockop_reap_atomic_lock
 #define __CRT_HAVE_oblockop_reap_atomic_rwlock
 #define __CRT_HAVE_oblockop_reap_ex
+#define __CRT_HAVE_oblockop_reap_shared_lock
+#define __CRT_HAVE_oblockop_reap_shared_rwlock
 #ifndef __KERNEL__
 #define __CRT_HAVE_obstack_printf
 #define __CRT_HAVE_obstack_vprintf

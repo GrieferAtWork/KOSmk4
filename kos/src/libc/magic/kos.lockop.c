@@ -27,12 +27,25 @@
 #include <kos/anno.h>
 )]%[insert:prefix(
 #include <kos/bits/lockop.h>
+)]%[insert:prefix(
+#include <kos/bits/shared-lock.h>
+)]%[insert:prefix(
+#include <kos/bits/shared-rwlock.h>
 )]%{
+
+#ifndef __KERNEL__
+}%[insert:prefix(
+#include <kos/syscalls.h>
+)]%{
+#endif /* !__KERNEL__ */
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
 #endif /* __cplusplus */
 
+#ifndef __CRT_HAVE_XSC
+#define __CRT_HAVE_XSC(name) 0
+#endif /* !__CRT_HAVE_XSC */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -271,6 +284,8 @@ template<class __T> struct _Tobpostlockop_slist { struct _Tobpostlockop<__T> *sl
 
 struct atomic_lock;
 struct atomic_rwlock;
+struct shared_lock;
+struct shared_rwlock;
 
 }
 
@@ -383,20 +398,32 @@ void _oblockop_reap_ex([[nonnull]] struct oblockop_slist *__restrict self,
 %{
 
 /* >> void lockop_reap_atomic_lock(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+ * >> void lockop_reap_shared_lock(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock);
  * >> void lockop_reap_atomic_rwlock(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+ * >> void lockop_reap_shared_rwlock(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock);
  * >> void oblockop_reap_atomic_lock(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *obj);
+ * >> void oblockop_reap_shared_lock(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *obj);
  * >> void oblockop_reap_atomic_rwlock(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *obj);
+ * >> void oblockop_reap_shared_rwlock(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *obj);
  * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap_atomic_lock(self, lock)          _lockop_reap_atomic_lock(self, lock)
 #define lockop_reap_atomic_rwlock(self, lock)        _lockop_reap_atomic_rwlock(self, lock)
 #define oblockop_reap_atomic_lock(self, lock, obj)   _oblockop_reap_atomic_lock(self, lock, obj)
 #define oblockop_reap_atomic_rwlock(self, lock, obj) _oblockop_reap_atomic_rwlock(self, lock, obj)
+#define lockop_reap_shared_lock(self, lock)          _lockop_reap_shared_lock(self, lock)
+#define lockop_reap_shared_rwlock(self, lock)        _lockop_reap_shared_rwlock(self, lock)
+#define oblockop_reap_shared_lock(self, lock, obj)   _oblockop_reap_shared_lock(self, lock, obj)
+#define oblockop_reap_shared_rwlock(self, lock, obj) _oblockop_reap_shared_rwlock(self, lock, obj)
 #else /* __OPTIMIZE_SIZE__ */
 #define lockop_reap_atomic_lock(self, lock)          (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_lock(self, lock), 0))
 #define lockop_reap_atomic_rwlock(self, lock)        (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_rwlock(self, lock), 0))
 #define oblockop_reap_atomic_lock(self, lock, obj)   (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_lock(self, lock, obj), 0))
 #define oblockop_reap_atomic_rwlock(self, lock, obj) (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_rwlock(self, lock, obj), 0))
+#define lockop_reap_shared_lock(self, lock)          (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_lock(self, lock), 0))
+#define lockop_reap_shared_rwlock(self, lock)        (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_rwlock(self, lock), 0))
+#define oblockop_reap_shared_lock(self, lock, obj)   (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_lock(self, lock, obj), 0))
+#define oblockop_reap_shared_rwlock(self, lock, obj) (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_rwlock(self, lock, obj), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 }
@@ -477,14 +504,96 @@ void _oblockop_reap_atomic_rwlock([[nonnull]] struct oblockop_slist *__restrict 
 }
 
 
+[[decl_include("<kos/anno.h>"), decl_prefix(DEFINE_LOCKOP_CC)]]
+[[nothrow, attribute(__NOBLOCK), crt_name("lockop_reap_shared_lock")]]
+[[decl_prefix(struct lockop_slist;), decl_prefix(struct shared_lock;)]]
+[[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
+[[if(defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)), crt_intern_kos_alias("libc_oblockop_reap_shared_lock")]]
+[[impl_prefix(MAYBE_INCLUDE_KOS_LOCKOP_H)]]
+[[impl_include("<hybrid/__atomic.h>", "<kos/sched/shared-lock.h>")]]
+[[requires_include("<kos/syscalls.h>"), requires(__CRT_HAVE_XSC(@lfutex@))]]
+void _lockop_reap_shared_lock([[nonnull]] struct lockop_slist *__restrict self,
+                              [[nonnull]] struct shared_lock *__restrict lock) {
+#ifndef __INTELLISENSE__
+#define __LOCAL_self      self
+#undef __LOCAL_obj
+#define __LOCAL_trylock() @shared_lock_tryacquire@(lock)
+#define __LOCAL_unlock()  @shared_lock_release@(lock)
+#include <libc/template/lockop.h>
+#endif /* !__INTELLISENSE__ */
+}
+
+
+[[decl_include("<kos/anno.h>"), decl_prefix(DEFINE_LOCKOP_CC)]]
+[[nothrow, attribute(__NOBLOCK), crt_name("oblockop_reap_shared_lock")]]
+[[decl_prefix(struct oblockop_slist;), decl_prefix(struct shared_lock;)]]
+[[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
+[[impl_prefix(MAYBE_INCLUDE_KOS_LOCKOP_H)]]
+[[impl_include("<hybrid/__atomic.h>", "<kos/sched/shared-lock.h>")]]
+[[requires_include("<kos/syscalls.h>"), requires(__CRT_HAVE_XSC(@lfutex@))]]
+void _oblockop_reap_shared_lock([[nonnull]] struct oblockop_slist *__restrict self,
+                                [[nonnull]] struct shared_lock *__restrict lock,
+                                [[nonnull]] void *__restrict obj) {
+#ifndef __INTELLISENSE__
+#define __LOCAL_self      self
+#define __LOCAL_obj       obj
+#define __LOCAL_trylock() @shared_lock_tryacquire@(lock)
+#define __LOCAL_unlock()  @shared_lock_release@(lock)
+#include <libc/template/lockop.h>
+#endif /* !__INTELLISENSE__ */
+}
+
+
+[[decl_include("<kos/anno.h>"), decl_prefix(DEFINE_LOCKOP_CC)]]
+[[nothrow, attribute(__NOBLOCK), crt_name("lockop_reap_shared_rwlock")]]
+[[decl_prefix(struct lockop_slist;), decl_prefix(struct shared_rwlock;)]]
+[[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
+[[if(defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)), crt_intern_kos_alias("libc_oblockop_reap_shared_rwlock")]]
+[[impl_prefix(MAYBE_INCLUDE_KOS_LOCKOP_H)]]
+[[requires_function(shared_rwlock_trywrite, shared_rwlock_endwrite)]]
+void _lockop_reap_shared_rwlock([[nonnull]] struct lockop_slist *__restrict self,
+                                [[nonnull]] struct shared_rwlock *__restrict lock) {
+#ifndef __INTELLISENSE__
+#define __LOCAL_self      self
+#undef __LOCAL_obj
+#define __LOCAL_trylock() shared_rwlock_trywrite(lock)
+#define __LOCAL_unlock()  shared_rwlock_endwrite(lock)
+#include <libc/template/lockop.h>
+#endif /* !__INTELLISENSE__ */
+}
+
+
+[[decl_include("<kos/anno.h>"), decl_prefix(DEFINE_LOCKOP_CC)]]
+[[nothrow, attribute(__NOBLOCK), crt_name("oblockop_reap_shared_rwlock")]]
+[[decl_prefix(struct oblockop_slist;), decl_prefix(struct shared_rwlock;)]]
+[[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
+[[impl_prefix(MAYBE_INCLUDE_KOS_LOCKOP_H)]]
+[[requires_function(shared_rwlock_trywrite, shared_rwlock_endwrite)]]
+void _oblockop_reap_shared_rwlock([[nonnull]] struct oblockop_slist *__restrict self,
+                                  [[nonnull]] struct shared_rwlock *__restrict lock,
+                                  [[nonnull]] void *__restrict obj) {
+#ifndef __INTELLISENSE__
+#define __LOCAL_self      self
+#define __LOCAL_obj       obj
+#define __LOCAL_trylock() shared_rwlock_trywrite(lock)
+#define __LOCAL_unlock()  shared_rwlock_endwrite(lock)
+#include <libc/template/lockop.h>
+#endif /* !__INTELLISENSE__ */
+}
+
+
 %
 %#ifdef __cplusplus
 %{
 
 /* >> void lockop_reap(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+ * >> void lockop_reap(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock);
  * >> void lockop_reap(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+ * >> void lockop_reap(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock);
  * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *obj);
+ * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *obj);
  * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *obj);
+ * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *obj);
  * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap(self, lock)        _lockop_reap(self, lock)
@@ -496,14 +605,18 @@ void _oblockop_reap_atomic_rwlock([[nonnull]] struct oblockop_slist *__restrict 
 
 }
 
-%[insert:function(_lockop_reap = _lockop_reap_atomic_lock, externLinkageOverride: "C++")]
-%[insert:function(_lockop_reap = _lockop_reap_atomic_rwlock, externLinkageOverride: "C++")]
+%[insert:function(_lockop_reap   = _lockop_reap_atomic_lock, externLinkageOverride: "C++")]
+%[insert:function(_lockop_reap   = _lockop_reap_atomic_rwlock, externLinkageOverride: "C++")]
 %[insert:function(_oblockop_reap = _oblockop_reap_atomic_lock, externLinkageOverride: "C++")]
 %[insert:function(_oblockop_reap = _oblockop_reap_atomic_rwlock, externLinkageOverride: "C++")]
+%[insert:function(_lockop_reap   = _lockop_reap_shared_lock, externLinkageOverride: "C++")]
+%[insert:function(_lockop_reap   = _lockop_reap_shared_rwlock, externLinkageOverride: "C++")]
+%[insert:function(_oblockop_reap = _oblockop_reap_shared_lock, externLinkageOverride: "C++")]
+%[insert:function(_oblockop_reap = _oblockop_reap_shared_rwlock, externLinkageOverride: "C++")]
 
 %
+%extern "C++" {
 %{
-extern "C++" {
 
 template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap_atomic_lock)(_Toblockop_slist<__T> *__restrict __self,
@@ -530,8 +643,44 @@ __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
 	(_oblockop_reap_atomic_rwlock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
 }
 
-} /* extern "C++" */
 } /* % */
+
+%[insert:pp_if($has_function(_oblockop_reap_shared_lock))]
+%{
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC _oblockop_reap_shared_lock)(_Toblockop_slist<__T> *__restrict __self,
+                                                  struct shared_lock *__restrict __lock,
+                                                  __T *__restrict __obj) {
+	(_oblockop_reap_shared_lock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
+}
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
+                                      struct shared_lock *__restrict __lock,
+                                      __T *__restrict __obj) {
+	(_oblockop_reap_shared_lock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
+}
+} /* % */
+%[insert:pp_endif]
+
+%[insert:pp_if($has_function(_oblockop_reap_shared_rwlock))]
+%{
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC _oblockop_reap_shared_rwlock)(_Toblockop_slist<__T> *__restrict __self,
+                                                    struct shared_rwlock *__restrict __lock,
+                                                    __T *__restrict __obj) {
+	(_oblockop_reap_shared_rwlock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
+}
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
+                                      struct shared_rwlock *__restrict __lock,
+                                      __T *__restrict __obj) {
+	(_oblockop_reap_shared_rwlock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
+}
+} /* % */
+%[insert:pp_endif]
+
+
+%} /* extern "C++" */
 %#endif /* __cplusplus */
 
 

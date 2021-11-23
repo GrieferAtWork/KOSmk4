@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeabd7290 */
+/* HASH CRC-32:0xc5285704 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,10 @@ INTDEF __NOBLOCK NONNULL((1, 2)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_atomi
 INTDEF __NOBLOCK NONNULL((1, 2, 3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *__restrict obj);
 INTDEF __NOBLOCK NONNULL((1, 2)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_rwlock)(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
 INTDEF __NOBLOCK NONNULL((1, 2, 3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock)(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *__restrict obj);
+INTDEF __NOBLOCK NONNULL((1, 2)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_lock)(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock);
+INTDEF __NOBLOCK NONNULL((1, 2, 3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_lock)(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *__restrict obj);
+INTDEF __NOBLOCK NONNULL((1, 2)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_rwlock)(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock);
+INTDEF __NOBLOCK NONNULL((1, 2, 3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_rwlock)(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *__restrict obj);
 
 DECL_END
 

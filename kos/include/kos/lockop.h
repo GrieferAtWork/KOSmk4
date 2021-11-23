@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ad9472e */
+/* HASH CRC-32:0xcfde95a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,11 +32,20 @@
 #include <hybrid/__atomic.h>
 #include <kos/anno.h>
 #include <kos/bits/lockop.h>
+#include <kos/bits/shared-lock.h>
+#include <kos/bits/shared-rwlock.h>
+
+#ifndef __KERNEL__
+#include <kos/syscalls.h>
+#endif /* !__KERNEL__ */
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
 #endif /* __cplusplus */
 
+#ifndef __CRT_HAVE_XSC
+#define __CRT_HAVE_XSC(name) 0
+#endif /* !__CRT_HAVE_XSC */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -275,6 +284,8 @@ template<class __T> struct _Tobpostlockop_slist { struct _Tobpostlockop<__T> *sl
 
 struct atomic_lock;
 struct atomic_rwlock;
+struct shared_lock;
+struct shared_rwlock;
 
 
 /* >> void lockop_enqueue(struct lockop_slist *__restrict self, struct lockop *__restrict lop);
@@ -332,20 +343,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_oblockop_reap_ex, __FORCELOCAL __ATTR_ARTIFICIA
 #endif /* !__CRT_HAVE_oblockop_reap_ex */
 
 /* >> void lockop_reap_atomic_lock(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+ * >> void lockop_reap_shared_lock(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock);
  * >> void lockop_reap_atomic_rwlock(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+ * >> void lockop_reap_shared_rwlock(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock);
  * >> void oblockop_reap_atomic_lock(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *obj);
+ * >> void oblockop_reap_shared_lock(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *obj);
  * >> void oblockop_reap_atomic_rwlock(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *obj);
+ * >> void oblockop_reap_shared_rwlock(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *obj);
  * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap_atomic_lock(self, lock)          _lockop_reap_atomic_lock(self, lock)
 #define lockop_reap_atomic_rwlock(self, lock)        _lockop_reap_atomic_rwlock(self, lock)
 #define oblockop_reap_atomic_lock(self, lock, obj)   _oblockop_reap_atomic_lock(self, lock, obj)
 #define oblockop_reap_atomic_rwlock(self, lock, obj) _oblockop_reap_atomic_rwlock(self, lock, obj)
+#define lockop_reap_shared_lock(self, lock)          _lockop_reap_shared_lock(self, lock)
+#define lockop_reap_shared_rwlock(self, lock)        _lockop_reap_shared_rwlock(self, lock)
+#define oblockop_reap_shared_lock(self, lock, obj)   _oblockop_reap_shared_lock(self, lock, obj)
+#define oblockop_reap_shared_rwlock(self, lock, obj) _oblockop_reap_shared_rwlock(self, lock, obj)
 #else /* __OPTIMIZE_SIZE__ */
 #define lockop_reap_atomic_lock(self, lock)          (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_lock(self, lock), 0))
 #define lockop_reap_atomic_rwlock(self, lock)        (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_rwlock(self, lock), 0))
 #define oblockop_reap_atomic_lock(self, lock, obj)   (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_lock(self, lock, obj), 0))
 #define oblockop_reap_atomic_rwlock(self, lock, obj) (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_rwlock(self, lock, obj), 0))
+#define lockop_reap_shared_lock(self, lock)          (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_lock(self, lock), 0))
+#define lockop_reap_shared_rwlock(self, lock)        (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_rwlock(self, lock), 0))
+#define oblockop_reap_shared_lock(self, lock, obj)   (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_lock(self, lock, obj), 0))
+#define oblockop_reap_shared_rwlock(self, lock, obj) (void)(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_rwlock(self, lock, obj), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 #ifdef __CRT_HAVE_lockop_reap_atomic_lock
@@ -372,13 +395,41 @@ __COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2, 3)),__NOTHROW,__
 #include <libc/local/kos.lockop/_oblockop_reap_atomic_rwlock.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_oblockop_reap_atomic_rwlock, __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2, 3)) void __NOTHROW(__LOCKOP_CC _oblockop_reap_atomic_rwlock)(struct oblockop_slist *__restrict __self, struct atomic_rwlock *__restrict __lock, void *__restrict __obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_oblockop_reap_atomic_rwlock))(__self, __lock, __obj); })
 #endif /* !__CRT_HAVE_oblockop_reap_atomic_rwlock */
+#ifdef __CRT_HAVE_lockop_reap_shared_lock
+__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2)),__NOTHROW,__LOCKOP_CC,_lockop_reap_shared_lock,(struct lockop_slist *__restrict __self, struct shared_lock *__restrict __lock),lockop_reap_shared_lock,(__self,__lock))
+#elif __CRT_HAVE_XSC(lfutex)
+#include <libc/local/kos.lockop/_lockop_reap_shared_lock.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_lockop_reap_shared_lock, __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2)) void __NOTHROW(__LOCKOP_CC _lockop_reap_shared_lock)(struct lockop_slist *__restrict __self, struct shared_lock *__restrict __lock) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lockop_reap_shared_lock))(__self, __lock); })
+#endif /* ... */
+#ifdef __CRT_HAVE_oblockop_reap_shared_lock
+__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2, 3)),__NOTHROW,__LOCKOP_CC,_oblockop_reap_shared_lock,(struct oblockop_slist *__restrict __self, struct shared_lock *__restrict __lock, void *__restrict __obj),oblockop_reap_shared_lock,(__self,__lock,__obj))
+#elif __CRT_HAVE_XSC(lfutex)
+#include <libc/local/kos.lockop/_oblockop_reap_shared_lock.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_oblockop_reap_shared_lock, __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2, 3)) void __NOTHROW(__LOCKOP_CC _oblockop_reap_shared_lock)(struct oblockop_slist *__restrict __self, struct shared_lock *__restrict __lock, void *__restrict __obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_oblockop_reap_shared_lock))(__self, __lock, __obj); })
+#endif /* ... */
+#ifdef __CRT_HAVE_lockop_reap_shared_rwlock
+__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2)),__NOTHROW,__LOCKOP_CC,_lockop_reap_shared_rwlock,(struct lockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock),lockop_reap_shared_rwlock,(__self,__lock))
+#elif defined(__CRT_HAVE_shared_rwlock_endwrite) || defined(__shared_rwlock_wrwait_send)
+#include <libc/local/kos.lockop/_lockop_reap_shared_rwlock.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_lockop_reap_shared_rwlock, __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2)) void __NOTHROW(__LOCKOP_CC _lockop_reap_shared_rwlock)(struct lockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lockop_reap_shared_rwlock))(__self, __lock); })
+#endif /* ... */
+#ifdef __CRT_HAVE_oblockop_reap_shared_rwlock
+__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2, 3)),__NOTHROW,__LOCKOP_CC,_oblockop_reap_shared_rwlock,(struct oblockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock, void *__restrict __obj),oblockop_reap_shared_rwlock,(__self,__lock,__obj))
+#elif defined(__CRT_HAVE_shared_rwlock_endwrite) || defined(__shared_rwlock_wrwait_send)
+#include <libc/local/kos.lockop/_oblockop_reap_shared_rwlock.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_oblockop_reap_shared_rwlock, __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2, 3)) void __NOTHROW(__LOCKOP_CC _oblockop_reap_shared_rwlock)(struct oblockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock, void *__restrict __obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_oblockop_reap_shared_rwlock))(__self, __lock, __obj); })
+#endif /* ... */
 
 #ifdef __cplusplus
 
 /* >> void lockop_reap(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+ * >> void lockop_reap(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock);
  * >> void lockop_reap(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+ * >> void lockop_reap(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock);
  * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *obj);
+ * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *obj);
  * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *obj);
+ * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *obj);
  * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap(self, lock)        _lockop_reap(self, lock)
@@ -421,6 +472,38 @@ __COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2, 3)),__NOTHROW,__
 extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2, 3)) void __NOTHROW(__LOCKOP_CC _oblockop_reap)(struct oblockop_slist *__restrict __self, struct atomic_rwlock *__restrict __lock, void *__restrict __obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_oblockop_reap_atomic_rwlock))(__self, __lock, __obj); }
 #endif /* !__CRT_HAVE_oblockop_reap_atomic_rwlock */
+#ifdef __CRT_HAVE_lockop_reap_shared_lock
+__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2)),__NOTHROW,__LOCKOP_CC,_lockop_reap,(struct lockop_slist *__restrict __self, struct shared_lock *__restrict __lock),lockop_reap_shared_lock,(__self,__lock))
+#elif __CRT_HAVE_XSC(lfutex)
+} /* extern "C++" */
+#include <libc/local/kos.lockop/_lockop_reap_shared_lock.h>
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2)) void __NOTHROW(__LOCKOP_CC _lockop_reap)(struct lockop_slist *__restrict __self, struct shared_lock *__restrict __lock) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lockop_reap_shared_lock))(__self, __lock); }
+#endif /* ... */
+#ifdef __CRT_HAVE_lockop_reap_shared_rwlock
+__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2)),__NOTHROW,__LOCKOP_CC,_lockop_reap,(struct lockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock),lockop_reap_shared_rwlock,(__self,__lock))
+#elif defined(__CRT_HAVE_shared_rwlock_endwrite) || defined(__shared_rwlock_wrwait_send)
+} /* extern "C++" */
+#include <libc/local/kos.lockop/_lockop_reap_shared_rwlock.h>
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2)) void __NOTHROW(__LOCKOP_CC _lockop_reap)(struct lockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lockop_reap_shared_rwlock))(__self, __lock); }
+#endif /* ... */
+#ifdef __CRT_HAVE_oblockop_reap_shared_lock
+__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2, 3)),__NOTHROW,__LOCKOP_CC,_oblockop_reap,(struct oblockop_slist *__restrict __self, struct shared_lock *__restrict __lock, void *__restrict __obj),oblockop_reap_shared_lock,(__self,__lock,__obj))
+#elif __CRT_HAVE_XSC(lfutex)
+} /* extern "C++" */
+#include <libc/local/kos.lockop/_oblockop_reap_shared_lock.h>
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2, 3)) void __NOTHROW(__LOCKOP_CC _oblockop_reap)(struct oblockop_slist *__restrict __self, struct shared_lock *__restrict __lock, void *__restrict __obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_oblockop_reap_shared_lock))(__self, __lock, __obj); }
+#endif /* ... */
+#ifdef __CRT_HAVE_oblockop_reap_shared_rwlock
+__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2, 3)),__NOTHROW,__LOCKOP_CC,_oblockop_reap,(struct oblockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock, void *__restrict __obj),oblockop_reap_shared_rwlock,(__self,__lock,__obj))
+#elif defined(__CRT_HAVE_shared_rwlock_endwrite) || defined(__shared_rwlock_wrwait_send)
+} /* extern "C++" */
+#include <libc/local/kos.lockop/_oblockop_reap_shared_rwlock.h>
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2, 3)) void __NOTHROW(__LOCKOP_CC _oblockop_reap)(struct oblockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock, void *__restrict __obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_oblockop_reap_shared_rwlock))(__self, __lock, __obj); }
+#endif /* ... */
 } /* extern "C++" */
 
 extern "C++" {
@@ -450,6 +533,34 @@ __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
 	(_oblockop_reap_atomic_rwlock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
 }
 
+#if defined(__CRT_HAVE_oblockop_reap_shared_lock) || __CRT_HAVE_XSC(lfutex)
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC _oblockop_reap_shared_lock)(_Toblockop_slist<__T> *__restrict __self,
+                                                  struct shared_lock *__restrict __lock,
+                                                  __T *__restrict __obj) {
+	(_oblockop_reap_shared_lock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
+}
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
+                                      struct shared_lock *__restrict __lock,
+                                      __T *__restrict __obj) {
+	(_oblockop_reap_shared_lock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
+}
+#endif /* __CRT_HAVE_oblockop_reap_shared_lock || __CRT_HAVE_XSC(lfutex) */
+#if defined(__CRT_HAVE_oblockop_reap_shared_rwlock) || defined(__CRT_HAVE_shared_rwlock_endwrite) || defined(__shared_rwlock_wrwait_send)
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC _oblockop_reap_shared_rwlock)(_Toblockop_slist<__T> *__restrict __self,
+                                                    struct shared_rwlock *__restrict __lock,
+                                                    __T *__restrict __obj) {
+	(_oblockop_reap_shared_rwlock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
+}
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
+                                      struct shared_rwlock *__restrict __lock,
+                                      __T *__restrict __obj) {
+	(_oblockop_reap_shared_rwlock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
+}
+#endif /* __CRT_HAVE_oblockop_reap_shared_rwlock || __CRT_HAVE_shared_rwlock_endwrite || __shared_rwlock_wrwait_send */
 } /* extern "C++" */
 #endif /* __cplusplus */
 

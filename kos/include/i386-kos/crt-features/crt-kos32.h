@@ -2828,6 +2828,8 @@
 #define __CRT_HAVE_lockop_reap_atomic_lock
 #define __CRT_HAVE_lockop_reap_atomic_rwlock
 #define __CRT_HAVE_lockop_reap_ex
+#define __CRT_HAVE_lockop_reap_shared_lock
+#define __CRT_HAVE_lockop_reap_shared_rwlock
 #define __CRT_HAVE_log
 #define __CRT_HAVE_log10
 #define __CRT_HAVE_log10f
@@ -3106,6 +3108,8 @@
 #define __CRT_HAVE_oblockop_reap_atomic_lock
 #define __CRT_HAVE_oblockop_reap_atomic_rwlock
 #define __CRT_HAVE_oblockop_reap_ex
+#define __CRT_HAVE_oblockop_reap_shared_lock
+#define __CRT_HAVE_oblockop_reap_shared_rwlock
 #define __CRT_HAVE_obstack_printf
 #define __CRT_HAVE_obstack_vprintf
 #define __CRT_HAVE_on_exit
