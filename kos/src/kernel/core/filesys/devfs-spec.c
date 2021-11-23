@@ -31,6 +31,7 @@
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 #include <sched/atomic64.h>
@@ -40,6 +41,8 @@
 #include <hybrid/overflow.h>
 
 #include <kos/dev.h>
+#include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <sys/stat.h>
 
 #include <inttypes.h>
@@ -117,17 +120,25 @@ decode_devno(USER CHECKED char const *name, u16 namelen)
 	}
 	if unlikely(name >= end)
 		goto err;
-	do {
-		ch = *name++;
-		if ((ch >= '1' && ch <= '9') ||
-		    (ch == '0' && minor != 0)) {
-			if (OVERFLOW_UMUL(minor, 10, &minor) ||
-			    OVERFLOW_UADD(minor, ch - '0', &minor))
-				goto err;
-		} else {
+	ch = *name++;
+	if (ch == '0') {
+		/* minor number is supposed to be `0' */
+		if (name != end)
 			goto err;
+	} else {
+		for (;;) {
+			if (ch >= '0' && ch <= '9') {
+				if (OVERFLOW_UMUL(minor, 10, &minor) ||
+				    OVERFLOW_UADD(minor, ch - '0', &minor))
+					goto err;
+			} else {
+				goto err;
+			}
+			if (name >= end)
+				break;
+			ch = *name++;
 		}
-	} while (name < end);
+	}
 	if (major > MAJORMASK)
 		goto err;
 	if (minor > MINORMASK)
@@ -139,7 +150,7 @@ err:
 
 
 /* Symlink file node that expands to the name of a device
- * `dl_devname', prefixed by `(char const *)fn_fsdata' */
+ * `dl_devname',  prefixed  by  `(char const *)fn_fsdata' */
 struct devicelink: flnknode {
 	REF struct devdirent *dl_devname; /* [1..1][const] Device name. */
 };
@@ -255,6 +266,63 @@ devicelink_dirent_new(u16 namelen, char const *pfx, struct device *__restrict de
 	return result;
 }
 
+#ifndef __fnode_axref_defined
+#define __fnode_axref_defined
+AXREF(fnode_axref, fnode);
+#endif /* !__fnode_axref_defined */
+
+
+/* Base structure for the enumeration of devices. */
+struct devenum: fdirenum {
+	struct fnode_axref de_nextfil; /* [0..1] Next device to enumerate. */
+};
+#define devenum_after(prev) \
+	fsuper_nodeafter(&devfs, prev)
+LOCAL NONNULL((1)) void
+NOTHROW(FCALL devenum_init)(struct devenum *__restrict self) {
+	REF struct fnode *dev = devenum_after(NULL);
+	axref_init(&self->de_nextfil, dev);
+}
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL devenum_v_fini)(struct fdirenum *__restrict self) {
+	struct devenum *me = (struct devenum *)self;
+	axref_fini(&me->de_nextfil);
+}
+
+PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
+devenum_v_seekdir(struct fdirenum *__restrict self, off_t offset, unsigned int whence)
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...) {
+	pos_t result;
+	struct devenum *me = (struct devenum *)self;
+	switch (whence) {
+
+		/* TODO: Full seek support by using the inode number of devices as offset.
+		 *       Because  we're using an  LLRB-tree, we can  find the first device
+		 *       with an `INO >= offset' in O(log2(N)) time. */
+
+	case SEEK_SET: {
+		REF struct fnode *dev;
+		if (offset != 0)
+			goto invarg;
+		dev = devenum_after(NULL);
+		axref_set_inherit(&me->de_nextfil, dev);
+		result = 0;
+	}	break;
+
+	default:
+invarg:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+		break;
+	}
+	return result;
+}
+
+
+
+
+
 
 
 
@@ -270,8 +338,8 @@ devicelink_dirent_new(u16 namelen, char const *pfx, struct device *__restrict de
 /************************************************************************/
 PRIVATE char const devfs_block_lnkpfx[] = "../";
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-devfs_block_lookup(struct fdirnode *__restrict UNUSED(self),
-                   struct flookup_info *__restrict info)
+devfs_block_v_lookup(struct fdirnode *__restrict UNUSED(self),
+                     struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	dev_t devno = decode_devno(info->flu_name, info->flu_namelen);
 	if (devno != DEV_UNSET) {
@@ -293,15 +361,71 @@ devfs_block_lookup(struct fdirnode *__restrict UNUSED(self),
 	return NULL;
 }
 
-struct block_enum: fdirenum {
-	/* TODO */
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+devfs_block_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                           size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	ssize_t result;
+#if __SIZEOF_MAJOR_T__ == 4 && __SIZEOF_MINOR_T__ == 4
+	char namebuf[COMPILER_LENOF("4294967295:4294967295")];
+#else /* __SIZEOF_MAJOR_T__ == ... && __SIZEOF_MINOR_T__ == ... */
+#error "Unsupported configuration"
+#endif /* __SIZEOF_MAJOR_T__ != ... || __SIZEOF_MINOR_T__ != ... */
+	u16 namelen;
+	struct devenum *me = (struct devenum *)self;
+	REF struct fnode *olddev, *mydev, *newdev;
+again:
+	olddev = axref_get(&me->de_nextfil);
+	mydev  = olddev; /* Inherit reference */
+
+	/* Find the next block device. */
+	for (;;) {
+		if (!mydev)
+			return 0; /* EOF */
+		if (fnode_isblkdev(mydev))
+			break; /* Found a block device! */
+		FINALLY_DECREF_UNLIKELY(mydev);
+		mydev = devenum_after(mydev);
+	}
+	FINALLY_DECREF_UNLIKELY(mydev);
+
+	/* Generate directory entry name. */
+	namelen = (u16)sprintf(namebuf,
+	                       "%" PRIuN(__SIZEOF_MAJOR_T__) ":%" PRIuN(__SIZEOF_MINOR_T__),
+	                       MAJOR(fnode_asblkdev(mydev)->dn_devno),
+	                       MINOR(fnode_asblkdev(mydev)->dn_devno));
+
+	/* Yield directory entry. */
+	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+	                             DEVFS_INO_DYN((uintptr_t)mydev ^ (uintptr_t)devfs_block_lnkpfx),
+	                             DT_LNK, namelen, namebuf);
+	if (result < 0)
+		return (size_t)~result; /* Don't advance directory position. */
+
+	/* Update the nextdev field of the enumerator. */
+	newdev = devenum_after(mydev);
+	if (!axref_cmpxch_inherit_new(&me->de_nextfil, olddev, newdev)) {
+		decref_unlikely(newdev);
+		goto again;
+	}
+	return (size_t)result;
+}
+
+
+PRIVATE struct fdirenum_ops const devfs_block_enum_ops = {
+	.deo_fini    = &devenum_v_fini,
+	.deo_readdir = &devfs_block_enum_v_readdir,
+	.deo_seekdir = &devenum_v_seekdir,
 };
 
+
 PRIVATE BLOCKING NONNULL((1)) void KCALL
-devfs_block_dno_enum(struct fdirenum *__restrict result)
+devfs_block_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_IOERROR, ...) {
-	/* TODO */
-	result->de_ops = &fdirenum_empty_ops;
+	struct devenum *me;
+	me         = (struct devenum *)result;
+	me->de_ops = &devfs_block_enum_ops;
+	devenum_init(me);
 }
 
 
@@ -312,8 +436,8 @@ devfs_block_dno_enum(struct fdirenum *__restrict result)
 /************************************************************************/
 PRIVATE char const devfs_char_lnkpfx[] = "../"; /* Must be distinct from `devfs_block_lnkpfx'! */
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-devfs_char_lookup(struct fdirnode *__restrict UNUSED(self),
-                  struct flookup_info *__restrict info)
+devfs_char_v_lookup(struct fdirnode *__restrict UNUSED(self),
+                    struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	dev_t devno = decode_devno(info->flu_name, info->flu_namelen);
 	if (devno != DEV_UNSET) {
@@ -335,15 +459,71 @@ devfs_char_lookup(struct fdirnode *__restrict UNUSED(self),
 	return NULL;
 }
 
-struct char_enum: fdirenum {
-	/* TODO */
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+devfs_char_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                          size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	ssize_t result;
+#if __SIZEOF_MAJOR_T__ == 4 && __SIZEOF_MINOR_T__ == 4
+	char namebuf[COMPILER_LENOF("4294967295:4294967295")];
+#else /* __SIZEOF_MAJOR_T__ == ... && __SIZEOF_MINOR_T__ == ... */
+#error "Unsupported configuration"
+#endif /* __SIZEOF_MAJOR_T__ != ... || __SIZEOF_MINOR_T__ != ... */
+	u16 namelen;
+	struct devenum *me = (struct devenum *)self;
+	REF struct fnode *olddev, *mydev, *newdev;
+again:
+	olddev = axref_get(&me->de_nextfil);
+	mydev  = olddev; /* Inherit reference */
+
+	/* Find the next character device. */
+	for (;;) {
+		if (!mydev)
+			return 0; /* EOF */
+		if (fnode_ischrdev(mydev))
+			break; /* Found a character device! */
+		FINALLY_DECREF_UNLIKELY(mydev);
+		mydev = devenum_after(mydev);
+	}
+	FINALLY_DECREF_UNLIKELY(mydev);
+
+	/* Generate directory entry name. */
+	namelen = (u16)sprintf(namebuf,
+	                       "%" PRIuN(__SIZEOF_MAJOR_T__) ":%" PRIuN(__SIZEOF_MINOR_T__),
+	                       MAJOR(fnode_aschrdev(mydev)->dn_devno),
+	                       MINOR(fnode_aschrdev(mydev)->dn_devno));
+
+	/* Yield directory entry. */
+	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+	                             DEVFS_INO_DYN((uintptr_t)mydev ^ (uintptr_t)devfs_char_lnkpfx),
+	                             DT_LNK, namelen, namebuf);
+	if (result < 0)
+		return (size_t)~result; /* Don't advance directory position. */
+
+	/* Update the nextdev field of the enumerator. */
+	newdev = devenum_after(mydev);
+	if (!axref_cmpxch_inherit_new(&me->de_nextfil, olddev, newdev)) {
+		decref_unlikely(newdev);
+		goto again;
+	}
+	return (size_t)result;
+}
+
+
+PRIVATE struct fdirenum_ops const devfs_char_enum_ops = {
+	.deo_fini    = &devenum_v_fini,
+	.deo_readdir = &devfs_char_enum_v_readdir,
+	.deo_seekdir = &devenum_v_seekdir,
 };
 
+
 PRIVATE BLOCKING NONNULL((1)) void KCALL
-devfs_char_dno_enum(struct fdirenum *__restrict result)
+devfs_char_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_IOERROR, ...) {
-	/* TODO */
-	result->de_ops = &fdirenum_empty_ops;
+	struct devenum *me;
+	me         = (struct devenum *)result;
+	me->de_ops = &devfs_char_enum_ops;
+	devenum_init(me);
 }
 
 
@@ -353,8 +533,8 @@ devfs_char_dno_enum(struct fdirenum *__restrict result)
 /* /dev/cpu                                                             */
 /************************************************************************/
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-devfs_cpu_lookup(struct fdirnode *__restrict UNUSED(self),
-                 struct flookup_info *__restrict info)
+devfs_cpu_v_lookup(struct fdirnode *__restrict UNUSED(self),
+                   struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	/* TODO */
 	(void)info;
@@ -367,7 +547,7 @@ struct cpu_enum: fdirenum {
 };
 
 PRIVATE BLOCKING NONNULL((1)) void KCALL
-devfs_cpu_dno_enum(struct fdirenum *__restrict result)
+devfs_cpu_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_IOERROR, ...) {
 	/* TODO */
 	result->de_ops = &fdirenum_empty_ops;
@@ -380,8 +560,8 @@ devfs_cpu_dno_enum(struct fdirenum *__restrict result)
 /* /dev/disk                                                             */
 /************************************************************************/
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-devfs_disk_lookup(struct fdirnode *__restrict UNUSED(self),
-                  struct flookup_info *__restrict info)
+devfs_disk_v_lookup(struct fdirnode *__restrict UNUSED(self),
+                    struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	/* TODO */
 	(void)info;
@@ -394,7 +574,7 @@ struct disk_enum: fdirenum {
 };
 
 PRIVATE BLOCKING NONNULL((1)) void KCALL
-devfs_disk_dno_enum(struct fdirenum *__restrict result)
+devfs_disk_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_IOERROR, ...) {
 	/* TODO */
 	result->de_ops = &fdirenum_empty_ops;
@@ -420,30 +600,30 @@ devfs_disk_dno_enum(struct fdirenum *__restrict result)
 
 INTERN_CONST struct fdirnode_ops const devfs_block_ops = {
 	.dno_node   = INIT_SPEC_FNODE_OPS,
-	.dno_lookup = &devfs_block_lookup,
-	.dno_enumsz = sizeof(struct block_enum),
-	.dno_enum   = &devfs_block_dno_enum,
+	.dno_lookup = &devfs_block_v_lookup,
+	.dno_enumsz = sizeof(struct devenum),
+	.dno_enum   = &devfs_block_v_enum,
 };
 
 INTERN_CONST struct fdirnode_ops const devfs_char_ops  = {
 	.dno_node   = INIT_SPEC_FNODE_OPS,
-	.dno_lookup = &devfs_char_lookup,
-	.dno_enumsz = sizeof(struct char_enum),
-	.dno_enum   = &devfs_char_dno_enum,
+	.dno_lookup = &devfs_char_v_lookup,
+	.dno_enumsz = sizeof(struct devenum),
+	.dno_enum   = &devfs_char_v_enum,
 };
 
 INTERN_CONST struct fdirnode_ops const devfs_cpu_ops   = {
 	.dno_node   = INIT_SPEC_FNODE_OPS,
-	.dno_lookup = &devfs_cpu_lookup,
+	.dno_lookup = &devfs_cpu_v_lookup,
 	.dno_enumsz = sizeof(struct cpu_enum),
-	.dno_enum   = &devfs_cpu_dno_enum,
+	.dno_enum   = &devfs_cpu_v_enum,
 };
 
 INTERN_CONST struct fdirnode_ops const devfs_disk_ops  = {
 	.dno_node   = INIT_SPEC_FNODE_OPS,
-	.dno_lookup = &devfs_disk_lookup,
+	.dno_lookup = &devfs_disk_v_lookup,
 	.dno_enumsz = sizeof(struct disk_enum),
-	.dno_enum   = &devfs_disk_dno_enum,
+	.dno_enum   = &devfs_disk_v_enum,
 };
 
 #undef INIT_SPEC_FNODE_OPS
