@@ -71,6 +71,26 @@ PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+#define typeof_field(s, m) typeof(((s *)0)->m)
+#define sizeof_field(s, m) sizeof(((s *)0)->m)
+	/* Generate offset table for attributes referenced by ioctl codes. */
+	enum {
+		USER_ATTRIB_MINID = MIN_C(_IOC_NR(FILE_IOC_GETFSLINKMAX), _IOC_NR(FILE_IOC_GETFSNAMEMAX),
+		              _IOC_NR(FILE_IOC_GETFSSIZBITS), _IOC_NR(FILE_IOC_GETFSXFERINC),
+		              _IOC_NR(FILE_IOC_GETFSXFERMAX), _IOC_NR(FILE_IOC_GETFSXFERMIN),
+		              _IOC_NR(FILE_IOC_GETFSXFERALN), _IOC_NR(FILE_IOC_GETFSSYMMAX))
+	};
+	static uint16_t const super_attrib_offsets[] = {
+		[(_IOC_NR(FILE_IOC_GETFSLINKMAX) - USER_ATTRIB_MINID)] = offsetof(struct fsuper, fs_feat.sf_link_max),
+		[(_IOC_NR(FILE_IOC_GETFSNAMEMAX) - USER_ATTRIB_MINID)] = offsetof(struct fsuper, fs_feat.sf_name_max),
+		[(_IOC_NR(FILE_IOC_GETFSSIZBITS) - USER_ATTRIB_MINID)] = offsetof(struct fsuper, fs_feat.sf_filesizebits),
+		[(_IOC_NR(FILE_IOC_GETFSXFERINC) - USER_ATTRIB_MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_incr_xfer_size),
+		[(_IOC_NR(FILE_IOC_GETFSXFERMAX) - USER_ATTRIB_MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_max_xfer_size),
+		[(_IOC_NR(FILE_IOC_GETFSXFERMIN) - USER_ATTRIB_MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_min_xfer_size),
+		[(_IOC_NR(FILE_IOC_GETFSXFERALN) - USER_ATTRIB_MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_xfer_align),
+		[(_IOC_NR(FILE_IOC_GETFSSYMMAX) - USER_ATTRIB_MINID)]  = offsetof(struct fsuper, fs_feat.sf_symlink_max),
+	};
+
 	switch (cmd) {
 
 	case _IO_WITHTYPE(FS_IOC_GETFLAGS, u32):
@@ -176,39 +196,22 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return 0;
 	}	break;
 
-	/* All of the following ioctls are used to read attributes from the superblock. */
-	case FILE_IOC_GETFSLINKMAX:  /* struct fsuper::fs_feat::sf_link_max */
-	case FILE_IOC_GETFSNAMEMAX:  /* struct fsuper::fs_feat::sf_name_max */
-	case FILE_IOC_GETFSSIZBITS:  /* struct fsuper::fs_feat::sf_filesizebits */
-	case FILE_IOC_GETFSXFERINC:  /* struct fsuper::fs_feat::sf_rec_incr_xfer_size */
-	case FILE_IOC_GETFSXFERMAX:  /* struct fsuper::fs_feat::sf_rec_max_xfer_size */
-	case FILE_IOC_GETFSXFERMIN:  /* struct fsuper::fs_feat::sf_rec_min_xfer_size */
-	case FILE_IOC_GETFSXFERALN:  /* struct fsuper::fs_feat::sf_rec_xfer_align */
-	case FILE_IOC_GETFSSYMMAX: { /* struct fsuper::fs_feat::sf_symlink_max */
-		/* Generate offset table for attributes referenced by ioctl codes. */
-		enum {
-			MINID = MIN_C(_IOC_NR(FILE_IOC_GETFSLINKMAX), _IOC_NR(FILE_IOC_GETFSNAMEMAX),
-			              _IOC_NR(FILE_IOC_GETFSSIZBITS), _IOC_NR(FILE_IOC_GETFSXFERINC),
-			              _IOC_NR(FILE_IOC_GETFSXFERMAX), _IOC_NR(FILE_IOC_GETFSXFERMIN),
-			              _IOC_NR(FILE_IOC_GETFSXFERALN), _IOC_NR(FILE_IOC_GETFSSYMMAX))
-		};
-		static uint16_t const super_attrib_offsets[] = {
-			[(_IOC_NR(FILE_IOC_GETFSLINKMAX) - MINID)] = offsetof(struct fsuper, fs_feat.sf_link_max),
-			[(_IOC_NR(FILE_IOC_GETFSNAMEMAX) - MINID)] = offsetof(struct fsuper, fs_feat.sf_name_max),
-			[(_IOC_NR(FILE_IOC_GETFSSIZBITS) - MINID)] = offsetof(struct fsuper, fs_feat.sf_filesizebits),
-			[(_IOC_NR(FILE_IOC_GETFSXFERINC) - MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_incr_xfer_size),
-			[(_IOC_NR(FILE_IOC_GETFSXFERMAX) - MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_max_xfer_size),
-			[(_IOC_NR(FILE_IOC_GETFSXFERMIN) - MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_min_xfer_size),
-			[(_IOC_NR(FILE_IOC_GETFSXFERALN) - MINID)] = offsetof(struct fsuper, fs_feat.sf_rec_xfer_align),
-			[(_IOC_NR(FILE_IOC_GETFSSYMMAX) - MINID)]  = offsetof(struct fsuper, fs_feat.sf_symlink_max),
-		};
+		/* All of the following ioctls are used to read attributes from the superblock. */
+	case _IO_WITHTYPE(FILE_IOC_GETFSLINKMAX, typeof_field(struct fsuper, fs_feat.sf_link_max)):
+	case _IO_WITHTYPE(FILE_IOC_GETFSNAMEMAX, typeof_field(struct fsuper, fs_feat.sf_name_max)):
+	case _IO_WITHTYPE(FILE_IOC_GETFSSIZBITS, typeof_field(struct fsuper, fs_feat.sf_filesizebits)):
+	case _IO_WITHTYPE(FILE_IOC_GETFSXFERINC, typeof_field(struct fsuper, fs_feat.sf_rec_incr_xfer_size)):
+	case _IO_WITHTYPE(FILE_IOC_GETFSXFERMAX, typeof_field(struct fsuper, fs_feat.sf_rec_max_xfer_size)):
+	case _IO_WITHTYPE(FILE_IOC_GETFSXFERMIN, typeof_field(struct fsuper, fs_feat.sf_rec_min_xfer_size)):
+	case _IO_WITHTYPE(FILE_IOC_GETFSXFERALN, typeof_field(struct fsuper, fs_feat.sf_rec_xfer_align)):
+	case _IO_WITHTYPE(FILE_IOC_GETFSSYMMAX,  typeof_field(struct fsuper, fs_feat.sf_symlink_max)): {
 		struct fsuper *super;
 		if (!mfile_isnode(self))
 			break; /* These ioctls are only supported for fnode-based files. */
 		super = mfile_asnode(self)->fn_super;
 		validate_writable(arg, _IOC_SIZE(cmd));
 		/* Copy attribute into user-provided buffer. */
-		memcpy(arg, (byte_t *)super + super_attrib_offsets[_IOC_NR(cmd) - MINID], _IOC_SIZE(cmd));
+		memcpy(arg, (byte_t *)super + super_attrib_offsets[_IOC_NR(cmd) - USER_ATTRIB_MINID], _IOC_SIZE(cmd));
 		return 0;
 	}	break;
 
@@ -251,6 +254,63 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		cmd = _IO_WITHSIZE(BLKGETSIZE64, sizeof(u64)); /* The ioctl code of this one is screwed up... */
 		return ioctl_intarg_setu64(cmd, arg, (uint64_t)mfile_getsize(self));
 
+	case _IO_WITHSIZE(FILE_IOC_DELETED, 0):
+		return ioctl_intarg_setbool(cmd, arg, (ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) != 0);
+
+	case _IO_WITHSIZE(FILE_IOC_HASRAWIO, 0):
+		return ioctl_intarg_setbool(cmd, arg, mfile_hasrawio(self));
+
+	case _IO_WITHSIZE(FILE_IOC_DCHANGED, 0):
+		return ioctl_intarg_setbool(cmd, arg, mfile_haschanged(self));
+
+	case _IO_WITHSIZE(FILE_IOC_CHANGED, 0): {
+		uintptr_t flags;
+		flags = ATOMIC_READ(self->mf_flags) & (MFILE_F_DELETED | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED);
+		return ioctl_intarg_setbool(cmd, arg, flags != 0 && !(flags & MFILE_F_DELETED));
+	}	break;
+
+	case _IO_WITHSIZE(FILE_IOC_GETFSLINKMAX, 0):
+	case _IO_WITHSIZE(FILE_IOC_GETFSNAMEMAX, 0):
+	case _IO_WITHSIZE(FILE_IOC_GETFSSIZBITS, 0):
+	case _IO_WITHSIZE(FILE_IOC_GETFSXFERINC, 0):
+	case _IO_WITHSIZE(FILE_IOC_GETFSXFERMAX, 0):
+	case _IO_WITHSIZE(FILE_IOC_GETFSXFERMIN, 0):
+	case _IO_WITHSIZE(FILE_IOC_GETFSXFERALN, 0):
+	case _IO_WITHSIZE(FILE_IOC_GETFSSYMMAX, 0): {
+		struct fsuper *super;
+		uint64_t value;
+		byte_t *pvalue;
+		size_t dsize;
+		if (!mfile_isnode(self))
+			break; /* These ioctls are only supported for fnode-based files. */
+		super = mfile_asnode(self)->fn_super;
+		validate_writable(arg, _IOC_SIZE(cmd));
+
+		/* Copy attribute into user-provided buffer. */
+		pvalue = (byte_t *)super + super_attrib_offsets[_IOC_NR(cmd) - USER_ATTRIB_MINID];
+		switch (_IOC_NR(cmd)) {
+#define DEFINE_FIELD(ioc, s, m)                              \
+		case _IOC_NR(ioc):                                   \
+			value = (uint64_t)*(typeof_field(s, m) *)pvalue; \
+			dsize = sizeof_field(s, m);                      \
+			break
+		DEFINE_FIELD(FILE_IOC_GETFSLINKMAX, struct fsuper, fs_feat.sf_link_max);
+		DEFINE_FIELD(FILE_IOC_GETFSNAMEMAX, struct fsuper, fs_feat.sf_name_max);
+		DEFINE_FIELD(FILE_IOC_GETFSSIZBITS, struct fsuper, fs_feat.sf_filesizebits);
+		DEFINE_FIELD(FILE_IOC_GETFSXFERINC, struct fsuper, fs_feat.sf_rec_incr_xfer_size);
+		DEFINE_FIELD(FILE_IOC_GETFSXFERMAX, struct fsuper, fs_feat.sf_rec_max_xfer_size);
+		DEFINE_FIELD(FILE_IOC_GETFSXFERMIN, struct fsuper, fs_feat.sf_rec_min_xfer_size);
+		DEFINE_FIELD(FILE_IOC_GETFSXFERALN, struct fsuper, fs_feat.sf_rec_xfer_align);
+		DEFINE_FIELD(FILE_IOC_GETFSSYMMAX, struct fsuper, fs_feat.sf_symlink_max);
+#undef DEFINE_FIELD
+		default: __builtin_unreachable();
+		}
+		if (_IOC_SIZE(cmd) == 0)
+			cmd = _IO_WITHSIZE(cmd, dsize);
+		return ioctl_intarg_setu64(cmd, arg, value);
+	}	break;
+
+
 	default:
 		break;
 	}
@@ -258,6 +318,8 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
 	      cmd);
+#undef sizeof_field
+#undef typeof_field
 }
 
 /* Default hop(2) operator for mfiles. (currently unconditionally,

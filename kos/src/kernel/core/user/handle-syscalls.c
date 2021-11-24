@@ -69,6 +69,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <format-printer.h>
 #include <malloca.h>
 #include <signal.h>
 #include <stdint.h>
@@ -248,6 +249,30 @@ err_bad_handle_type:
 
 		/* Install the new handle. */
 		*result = handle_installopenfd(&cast->fc_resfd, newhand);
+		goto done;
+	}	break;
+
+	case FD_IOC_DESC: {
+		size_t reqlen;
+		struct fddesc desc;
+		struct format_snprintf_data pdat;
+
+		/* Load arguments. */
+		validate_readwrite(arg, sizeof(desc));
+		memcpy(&desc, arg, sizeof(desc));
+		COMPILER_READ_BARRIER();
+
+		/* Setup an snprintf-style printer */
+		pdat.sd_buffer = desc.fdc_buf;
+		pdat.sd_bufsiz = (size_t)desc.fdc_len;
+		validate_writable(pdat.sd_buffer, pdat.sd_bufsiz);
+
+		/* Print the link's text. */
+		reqlen = handle_printlink(*hand, &format_snprintf_printer, &pdat);
+		COMPILER_WRITE_BARRIER();
+
+		/* Write-back the required buffer size */
+		((USER CHECKED struct fddesc *)arg)->fdc_len = reqlen;
 		goto done;
 	}	break;
 

@@ -42,9 +42,10 @@
 
 /* KOS-specific ioctls. */
 #define FD_IOC_NOOP        _IO_KOS('f', 0x00)                /* Does nothing; ioctl(2) returns `0' */
-#define FD_IOC_DUPFD     _IOWR_KOS('f', 0x01, struct openfd) /* Duplicate the handle for this file. (ioctl(2) returns `arg->of_hint') */
-#define FD_IOC_CAST      _IOWR_KOS('f', 0x02, struct fdcast) /* Cast handle into a different type. - Usually, casting is done implicitly, but this does it explicitly. */
-#define FD_IOC_POLLTEST  _IOWR_KOS('f', 0x03, unsigned int)  /* do `*(poll_mode_t *)arg = handle_polltest(fd, *(poll_mode_t *)arg);' */
+#define FD_IOC_POLLTEST  _IOWR_KOS('f', 0x01, unsigned int)  /* do `*(poll_mode_t *)arg = handle_polltest(fd, *(poll_mode_t *)arg);' */
+#define FD_IOC_DUPFD     _IOWR_KOS('f', 0x10, struct openfd) /* Duplicate the handle for this file. (ioctl(2) returns `arg->fo_hint') */
+#define FD_IOC_CAST      _IOWR_KOS('f', 0x11, struct fdcast) /* Cast handle into a different type. - Usually, casting is done implicitly, but this does it explicitly. */
+#define FD_IOC_DESC      _IOWR_KOS('f', 0x12, struct fddesc) /* Get description string, as also appears in `readlink("/proc/self/fd/[fdno]")' (Not NUL-terminated!) */
 #define FD_IOC_GETTYPE    _IOR_KOS('f', 0x80, __uint32_t)    /* Get handle type (one of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
 #define FD_IOC_GETKIND    _IOR_KOS('f', 0x81, __uint32_t)    /* Get handle kind (one of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
 #define FD_IOC_GETMODE    _IOR_KOS('f', 0x82, __uint32_t)    /* Get handle mode (set of `IO_*' from <kos/io.h>) */
@@ -62,6 +63,15 @@ struct fdcast {
 	/* NOTE: When a handle cannot be cast, `E_INVALID_HANDLE_FILETYPE' is thrown. */
 	__uint32_t    fc_rqtyp; /* Requested handle type (one of `HANDLE_TYPE_*') */
 	struct openfd fc_resfd; /* Target slot for resulting handle. */
+};
+
+struct fddesc {
+	__uint64_t      fdc_len;   /* [in]  Available buffer length
+	                            * [out] Required buffer length (w/o trailing NUL) */
+	union {
+		char       *fdc_buf;   /* [0..fdc_len] Buffer space. */
+		__uint64_t _fdc_albuf; /* ... */
+	};
 };
 
 __DECL_END

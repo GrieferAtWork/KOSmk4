@@ -308,7 +308,7 @@ again:
 /* Deny  write  access  to anyone  currently  mapping any  part  of `self'.
  * The caller must be holding a write-lock to `self', as well as individual
  * locks to every part associated with it, as well as be holding references
- * to all of teh parts of `self' (`mfile_incref_and_lock_parts_or_unlock').
+ * to all of the parts of `self' (`mfile_incref_and_lock_parts_or_unlock').
  *
  * @return: true:  Success: write access has been denied to all parts.
  * @return: false: Locks were lost and you must try again.

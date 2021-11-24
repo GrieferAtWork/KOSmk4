@@ -1897,22 +1897,28 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 "SIOCPROTOPRIVATE\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCDEVPRIVATE";
 
 #define GETBASE_KOS_IOCTLS(result, index) \
-	(((index) >= 0x4601 && (index) <= 0x4617) ? ((index) -= 0x4601, (result) = repr_KOS_IOCTLS_4601h, true) : \
+	(((index) >= 0x4600 && (index) <= 0x4603) ? ((index) -= 0x4600, (result) = repr_KOS_IOCTLS_4600h, true) : \
+	 ((index) == 0x4620) ? ((index) = 0, (result) = repr_KOS_IOCTLS_4620h, true) : \
+	 ((index) >= 0x4680 && (index) <= 0x4687) ? ((index) -= 0x4680, (result) = repr_KOS_IOCTLS_4680h, true) : \
 	 ((index) >= 0x4b00 && (index) <= 0x4b08) ? ((index) -= 0x4b00, (result) = repr_KOS_IOCTLS_4b00h, true) : \
 	 ((index) >= 0x4c01 && (index) <= 0x4c06) ? ((index) -= 0x4c01, (result) = repr_KOS_IOCTLS_4c01h, true) : \
 	 ((index) >= 0x4d00 && (index) <= 0x4d07) ? ((index) -= 0x4d00, (result) = repr_KOS_IOCTLS_4d00h, true) : \
 	 ((index) >= 0x5300 && (index) <= 0x5305) ? ((index) -= 0x5300, (result) = repr_KOS_IOCTLS_5300h, true) : \
 	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
 	 ((index) >= 0x5600 && (index) <= 0x5612) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : \
-	 ((index) >= 0x6600 && (index) <= 0x6603) ? ((index) -= 0x6600, (result) = repr_KOS_IOCTLS_6600h, true) : \
+	 ((index) >= 0x6600 && (index) <= 0x6612) ? ((index) -= 0x6600, (result) = repr_KOS_IOCTLS_6600h, true) : \
 	 ((index) >= 0x6680 && (index) <= 0x6685) ? ((index) -= 0x6680, (result) = repr_KOS_IOCTLS_6680h, true) : \
 	 ((index) >= 0x66c0 && (index) <= 0x66c1) ? ((index) -= 0x66c0, (result) = repr_KOS_IOCTLS_66c0h, true) : \
 	 ((index) >= 0x7000 && (index) <= 0x700c) ? ((index) -= 0x7000, (result) = repr_KOS_IOCTLS_7000h, true) : false)
-PRIVATE char const repr_KOS_IOCTLS_4601h[] =
-"FILE_IOC_TAILREAD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FILE_IOC_GETFSLINKMAX\0FILE_IOC_G"
-"ETFSNAMEMAX\0FILE_IOC_GETFSSIZBITS\0FILE_IOC_GETFSXFERINC\0FILE_IOC"
-"_GETFSXFERMAX\0FILE_IOC_GETFSXFERMIN\0FILE_IOC_GETFSXFERALN\0FILE_I"
-"OC_GETFSSYMMAX";
+PRIVATE char const repr_KOS_IOCTLS_4600h[] =
+"FILE_IOC_DELETED\0FILE_IOC_HASRAWIO\0FILE_IOC_DCHANGED\0FILE_IOC_CH"
+"ANGED";
+PRIVATE char const repr_KOS_IOCTLS_4620h[] =
+"FILE_IOC_TAILREAD";
+PRIVATE char const repr_KOS_IOCTLS_4680h[] =
+"FILE_IOC_GETFSLINKMAX\0FILE_IOC_GETFSNAMEMAX\0FILE_IOC_GETFSSIZBIT"
+"S\0FILE_IOC_GETFSXFERINC\0FILE_IOC_GETFSXFERMAX\0FILE_IOC_GETFSXFER"
+"MIN\0FILE_IOC_GETFSXFERALN\0FILE_IOC_GETFSSYMMAX";
 PRIVATE char const repr_KOS_IOCTLS_4b00h[] =
 "KBDIO_TRYGETKEY\0KBDIO_GETKEY\0KBDIO_MASKLED\0KBDIO_SETKEYMAP\0KBDIO"
 "_FLUSHPENDING\0KBDIO_PUTCHAR\0KBDIO_PUTKEY\0KBDIO_GETDBGF12\0KBDIO_M"
@@ -1934,7 +1940,8 @@ PRIVATE char const repr_KOS_IOCTLS_5600h[] =
 "VID_IOC_ACTIVATE\0VID_IOC_MAKELCK\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0VID_IOC_GETTTYINF"
 "O\0VID_IOC_GETCELLDATA\0VID_IOC_GETCURSOR";
 PRIVATE char const repr_KOS_IOCTLS_6600h[] =
-"FD_IOC_NOOP\0FD_IOC_DUPFD\0FD_IOC_CAST\0FD_IOC_POLLTEST";
+"FD_IOC_NOOP\0FD_IOC_POLLTEST\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FD_IOC_DUPFD\0FD_IOC_CA"
+"ST\0FD_IOC_DESC";
 PRIVATE char const repr_KOS_IOCTLS_6680h[] =
 "FD_IOC_GETTYPE\0FD_IOC_GETKIND\0FD_IOC_GETMODE\0FD_IOC_GETADDR\0FD_I"
 "OC_GETRADDR\0FD_IOC_GETREFCNT";
