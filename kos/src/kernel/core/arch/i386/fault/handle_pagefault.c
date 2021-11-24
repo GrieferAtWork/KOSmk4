@@ -550,6 +550,13 @@ again_lock_mman:
 			struct mman *mm = mf.mfl_mman;
 			mman_lock_release(mm);
 			mfault_fini(&mf);
+			__mfault_init(&mf);
+			mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
+			mf.mfl_mman = mm;
+			mf.mfl_size  = PAGESIZE;
+			mf.mfl_flags = MMAN_FAULT_F_NORMAL;
+			if (FAULT_IS_WRITE)
+				mf.mfl_flags |= MMAN_FAULT_F_WRITE;
 			if (mm != &mman_kernel) {
 				if (ADDR_ISKERN(addr)) {
 					if (FAULT_IS_USER) {
@@ -604,13 +611,6 @@ again_lock_mman:
 						 * that area of memory  is something that  cannot be done  when hosted by  a
 						 * 32-bit kernel) */
 
-						mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
-						mf.mfl_mman = mm;
-						__mfault_init(&mf);
-						mf.mfl_size  = PAGESIZE;
-						mf.mfl_flags = MMAN_FAULT_F_NORMAL;
-						if (FAULT_IS_WRITE)
-							mf.mfl_flags |= MMAN_FAULT_F_WRITE;
 						mman_lock_acquire(mm);
 						mf.mfl_node = mnode_tree_locate(mm->mm_mappings,
 						                                mf.mfl_addr);
@@ -669,6 +669,7 @@ got_node_and_lock:
 				struct mnode *node;
 				node = mf.mfl_node;
 				mfault_fini(&mf);
+				__mfault_init(&mf);
 				mf.mfl_node = node;
 			}
 
@@ -825,6 +826,7 @@ do_handle_iob_node_access:
 			part                          = incref(mf.mfl_part);
 			mman_lock_release(mf.mfl_mman);
 			mfault_fini(&mf);
+			__mfault_init(&mf);
 
 			TRY {
 				mpart_lock_acquire(part);
