@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2629b6a6 */
+/* HASH CRC-32:0x3054ba44 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@
 #define __NR_inotify_init1          0x1a  /* errno_t inotify_init1(int TODO_PROTOTYPE) */
 #define __NR_inotify_add_watch      0x1b  /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
 #define __NR_inotify_rm_watch       0x1c  /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
-#define __NR_ioctl                  0x1d  /* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+#define __NR_ioctl                  0x1d  /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
  * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
 #define __NR_ioprio_set             0x1e  /* errno_t ioprio_set(syscall_ulong_t who, syscall_ulong_t id, syscall_ulong_t ioprio) */
@@ -759,7 +759,7 @@
 #define __NR_stat                   0x419 /* errno_t stat(char const *filename, struct linux_stat *statbuf) */
 #define __NR_lstat                  0x41a /* errno_t lstat(char const *filename, struct linux_stat *statbuf) */
 #define __NR_fstat                  0x41b /* errno_t fstat(fd_t fd, struct linux_stat *statbuf) */
-#define __NR_fcntl                  0x41c /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+#define __NR_fcntl                  0x41c /* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 #define __NR_fadvise64              0x41d /* errno_t fadvise64(int TODO_PROTOTYPE) */
 #define __NR_newfstatat             0x41e /* errno_t newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
 #define __NR_fstatfs                0x41f /* errno_t fstatfs(fd_t file, struct statfs *buf) */

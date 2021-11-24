@@ -818,7 +818,7 @@ mousedev_v_polltest(struct mfile *__restrict self,
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 mousedev_v_ioctl(struct mfile *__restrict self,
-                 syscall_ulong_t cmd, USER UNCHECKED void *arg,
+                 ioctl_t cmd, USER UNCHECKED void *arg,
                  iomode_t mode) THROWS(...) {
 	struct mousedev *me = mfile_asmouse(self);
 	(void)mode;

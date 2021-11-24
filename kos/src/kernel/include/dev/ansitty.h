@@ -93,7 +93,7 @@ ansittydev_v_write(struct mfile *__restrict self,
                    USER CHECKED void const *src,
                    size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-ansittydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+ansittydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Mandatory TTY operators for ansitty objects. (automatically installed) */

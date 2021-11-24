@@ -237,7 +237,7 @@ svgalck_v_restore(struct vidlck *__restrict self,
 
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-svgalck_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct svgalck *me = vidlck_assvga(self);
 	switch (cmd) {
@@ -556,7 +556,7 @@ svgatty_ioctl_setmode(struct svgatty *__restrict self,
 
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-svgatty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+svgatty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct svgatty *me = (struct svgatty *)mfile_asansitty(self);
 	switch (cmd) {
@@ -759,7 +759,7 @@ NOTHROW(KCALL svgadev_v_destroy)(struct mfile *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-svgadev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+svgadev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct svgadev *me = mfile_assvgadev(self);
 	switch (cmd) {

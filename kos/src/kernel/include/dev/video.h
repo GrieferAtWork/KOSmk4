@@ -301,7 +301,7 @@ NOTHROW(KCALL vidtty_v_destroy)(struct mfile *__restrict self);
 #define vidtty_v_tryas   ansittydev_v_tryas
 #define vidtty_v_write   ansittydev_v_write /* Cannot be overwritten! */
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 DATDEF struct ansitty_operators const vidtty_ansitty_ops;
 /* Functions, as referenced in `vidtty_ansitty_ops' (you should never need these) */
@@ -565,7 +565,7 @@ FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 viddev_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
                 size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-viddev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+viddev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 DATDEF struct mfile_stream_ops const viddev_v_stream_ops;
 

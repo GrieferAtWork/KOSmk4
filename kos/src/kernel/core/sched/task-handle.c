@@ -103,7 +103,7 @@ require_pidfd_open(struct task *__restrict self) {
 
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
-handle_task_ioctl(struct taskpid *__restrict self, syscall_ulong_t cmd,
+handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 

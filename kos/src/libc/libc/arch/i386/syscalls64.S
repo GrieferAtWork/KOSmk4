@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79cbbbf3 */
+/* HASH CRC-32:0x4e5b438 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,7 +203,7 @@ INTERN_FUNCTION(libc_sys_rt_sigreturn)
 END(libc_sys_rt_sigreturn)
 DEFINE_PUBLIC_ALIAS(sys_rt_sigreturn, libc_sys_rt_sigreturn)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_ioctl)
 	movq   $(0x10), %rax
 	syscall
@@ -866,7 +866,7 @@ INTERN_FUNCTION(libc_sys_msgctl)
 END(libc_sys_msgctl)
 DEFINE_PUBLIC_ALIAS(sys_msgctl, libc_sys_msgctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_fcntl)
 	movq   $(0x48), %rax
 	syscall
@@ -3557,7 +3557,7 @@ INTERN_FUNCTION(libc_sys_fmkdirat)
 END(libc_sys_fmkdirat)
 DEFINE_PUBLIC_ALIAS(sys_fmkdirat, libc_sys_fmkdirat)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_ksysctl)
 	movq   $(0xffffffffffffff64), %rax
 	syscall
@@ -3961,7 +3961,7 @@ INTERN_FUNCTION(libc_sys_pread64f)
 END(libc_sys_pread64f)
 DEFINE_PUBLIC_ALIAS(sys_pread64f, libc_sys_pread64f)
 
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 INTERN_FUNCTION(libc_sys_ioctlf)
 	movq   $(0xfffffffffffffff0), %rax
 	movq   %rcx, %r10
@@ -4238,7 +4238,7 @@ INTERN_FUNCTION(libc_sys_kstat)
 END(libc_sys_kstat)
 DEFINE_PUBLIC_ALIAS(sys_kstat, libc_sys_kstat)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 INTERN_FUNCTION(libc_sys_hopf)
 	movq   $(0xfffffffffffffffd), %rax
 	movq   %rcx, %r10
@@ -4247,7 +4247,7 @@ INTERN_FUNCTION(libc_sys_hopf)
 END(libc_sys_hopf)
 DEFINE_PUBLIC_ALIAS(sys_hopf, libc_sys_hopf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_hop)
 	movq   $(0xfffffffffffffffe), %rax
 	syscall
@@ -4454,7 +4454,7 @@ INTERN_FUNCTION(libc_sys_Xrt_sigprocmask)
 END(libc_sys_Xrt_sigprocmask)
 DEFINE_PUBLIC_ALIAS(sys_Xrt_sigprocmask, libc_sys_Xrt_sigprocmask)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xioctl)
 	movq   $(0x10), %rax
 	std /* Enable exceptions */
@@ -5229,7 +5229,7 @@ INTERN_FUNCTION(libc_sys_Xmsgctl)
 END(libc_sys_Xmsgctl)
 DEFINE_PUBLIC_ALIAS(sys_Xmsgctl, libc_sys_Xmsgctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xfcntl)
 	movq   $(0x48), %rax
 	std /* Enable exceptions */
@@ -8492,7 +8492,7 @@ INTERN_FUNCTION(libc_sys_Xfmkdirat)
 END(libc_sys_Xfmkdirat)
 DEFINE_PUBLIC_ALIAS(sys_Xfmkdirat, libc_sys_Xfmkdirat)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xksysctl)
 	movq   $(0xffffffffffffff64), %rax
 	std /* Enable exceptions */
@@ -8942,7 +8942,7 @@ INTERN_FUNCTION(libc_sys_Xpread64f)
 END(libc_sys_Xpread64f)
 DEFINE_PUBLIC_ALIAS(sys_Xpread64f, libc_sys_Xpread64f)
 
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 INTERN_FUNCTION(libc_sys_Xioctlf)
 	movq   $(0xfffffffffffffff0), %rax
 	movq   %rcx, %r10
@@ -9245,7 +9245,7 @@ INTERN_FUNCTION(libc_sys_Xkstat)
 END(libc_sys_Xkstat)
 DEFINE_PUBLIC_ALIAS(sys_Xkstat, libc_sys_Xkstat)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 INTERN_FUNCTION(libc_sys_Xhopf)
 	movq   $(0xfffffffffffffffd), %rax
 	movq   %rcx, %r10
@@ -9256,7 +9256,7 @@ INTERN_FUNCTION(libc_sys_Xhopf)
 END(libc_sys_Xhopf)
 DEFINE_PUBLIC_ALIAS(sys_Xhopf, libc_sys_Xhopf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xhop)
 	movq   $(0xfffffffffffffffe), %rax
 	std /* Enable exceptions */

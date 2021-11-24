@@ -1884,7 +1884,7 @@ FatDir_DirentChanged(struct fnode *__restrict self,
 /* FAT ioctl(2) integration                                             */
 /************************************************************************/
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
-Fat_Ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+Fat_Ioctl(struct mfile *__restrict self, ioctl_t cmd,
           USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct fnode *me = mfile_asnode(self);
@@ -1987,7 +1987,7 @@ Fat_Ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 
 	default: {
 		BLOCKING NONNULL((1)) syscall_slong_t
-		(KCALL *super_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
+		(KCALL *super_ioctl)(struct mfile *__restrict self, ioctl_t cmd,
 		                     USER UNCHECKED void *arg, iomode_t mode)
 				THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
@@ -2189,7 +2189,7 @@ next_next_ent:
 }
 
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
-fatdirenum_v_ioctl(struct fdirenum *__restrict self, syscall_ulong_t cmd,
+fatdirenum_v_ioctl(struct fdirenum *__restrict self, ioctl_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct flatdirenum *me = fdirenum_asflat(self);

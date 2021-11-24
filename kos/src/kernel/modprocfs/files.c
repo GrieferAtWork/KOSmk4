@@ -672,7 +672,7 @@ get_nth_leak(struct memleaks *__restrict self, uint64_t nth)
 }
 
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
-memleaks_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct memleaks *me = (struct memleaks *)mfile_asprintnode(self);

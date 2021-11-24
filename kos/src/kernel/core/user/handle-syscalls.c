@@ -53,6 +53,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/hop/handle.h>
 #include <kos/io.h>
+#include <kos/ioctl/fd.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <linux/fs.h>
@@ -155,14 +156,9 @@ DEFINE_SYSCALL3(fd_t, dup3, fd_t, oldfd, fd_t, newfd, oflag_t, flags) {
 /* fcntl()                                                              */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FCNTL
-DEFINE_SYSCALL3(syscall_slong_t, fcntl,
-                fd_t, fd,
-                syscall_ulong_t, command,
-                UNCHECKED USER void *, arg) {
-	return handle_fcntl(THIS_HANDLE_MANAGER,
-	                    fd,
-	                    command,
-	                    arg);
+DEFINE_SYSCALL3(syscall_slong_t, fcntl, fd_t, fd,
+                fcntl_t, command, UNCHECKED USER void *, arg) {
+	return handle_fcntl(THIS_HANDLE_MANAGER, fd, command, arg);
 }
 #endif /* __ARCH_WANT_SYSCALL_FCNTL */
 
@@ -188,114 +184,69 @@ NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
 	}
 }
 
-PRIVATE bool KCALL
-ioctl_generic(syscall_ulong_t command,
+PRIVATE WUNUSED NONNULL((3, 5)) bool KCALL
+ioctl_generic(ioctl_t cmd,
               unsigned int fd,
               struct handle const *__restrict hand,
               USER UNCHECKED void *arg,
               syscall_slong_t *__restrict result) {
-	switch (command) {
+	/* Check for specific commands. */
+	switch (cmd) {
 
-	case FIOCLEX:
+	case FIOCLEX: /* FD_IOC_CLEX */
 		/* Set IO_CLOEXEC */
 		if (hand->h_mode & IO_CLOEXEC)
 			break;
 		handle_chflags(THIS_HANDLE_MANAGER, fd, ~0, IO_CLOEXEC);
 		break;
 
-	case FIONCLEX:
+	case FIONCLEX: /* FD_IOC_NCLEX */
 		/* Clear IO_CLOEXEC */
 		if (!(hand->h_mode & IO_CLOEXEC))
 			break;
 		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_CLOEXEC, 0);
 		break;
 
-	case FIONBIO:
-	case _IOW(_IOC_TYPE(FIONBIO), _IOC_NR(FIONBIO), int): {
-		int mode;
+	default:
+		break;
+	}
+
+	/* Commands for which we accept any size value. */
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(FIONBIO, 0): /* FD_IOC_NBIO */
 		/* Set/clear IO_NONBLOCK */
-		validate_readable(arg, sizeof(int));
-		mode = ATOMIC_READ(*(int *)arg);
-		/* XXX: Verify mode == 0/1 */
-		handle_chflags(THIS_HANDLE_MANAGER,
-		               fd,
-		               ~IO_NONBLOCK,
-		               mode ? IO_NONBLOCK : 0);
-	}	break;
+		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_NONBLOCK,
+		               ioctl_intarg_getbool(cmd, arg) ? IO_NONBLOCK : 0);
+		break;
 
-	case FIOASYNC:
-	case _IOW(_IOC_TYPE(FIOASYNC), _IOC_NR(FIOASYNC), int): {
+	case _IO_WITHSIZE(FIOASYNC, 0): /* FD_IOC_ASYNC */
 		/* Set/clear IO_ASYNC */
-		int mode;
-		validate_readable(arg, sizeof(int));
-		COMPILER_READ_BARRIER();
-		mode = *(USER CHECKED int *)arg;
-		COMPILER_READ_BARRIER();
-		/* XXX: Verify mode == 0/1 */
-		handle_chflags(THIS_HANDLE_MANAGER,
-		               fd,
-		               ~IO_ASYNC,
-		               mode ? IO_ASYNC
-		                    : 0);
-	}	break;
+		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_ASYNC,
+		               ioctl_intarg_getbool(cmd, arg) ? IO_ASYNC : 0);
+		break;
 
-#if __SIZEOF_LOFF_T__ == 8
-	case FIOQSIZE:
-#endif /* __SIZEOF_LOFF_T__ == 8 */
-	case _IOR(_IOC_TYPE(FIOQSIZE), _IOC_NR(FIOQSIZE), u64): {
+	case _IO_WITHSIZE(FIOQSIZE, 0): { /* FD_IOC_QSIZE */
 		pos_t value;
-		if unlikely(!handle_datasize(hand, &value)) {
-			*result = -ENOTTY;
-			return true;
-		}
-		validate_writable(arg, sizeof(u64));
-		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED u64 *)arg = (u64)value;
+		if (_IOC_SIZE(cmd) == 0)
+			cmd = _IO_WITHSIZE(cmd, sizeof(loff_t));
+		if unlikely(!handle_datasize(hand, &value))
+			goto return_ENOTTY;
+		ioctl_intarg_setu64(cmd, arg, (u64)value);
 	}	break;
 
-#if __SIZEOF_LOFF_T__ == 4
-	case FIOQSIZE:
-#endif /* __SIZEOF_LOFF_T__ == 4 */
-	case _IOR(_IOC_TYPE(FIOQSIZE), _IOC_NR(FIOQSIZE), u32): {
-		pos_t value;
-		if unlikely(!handle_datasize(hand, &value)) {
-			*result = -ENOTTY;
-			return true;
-		}
-		validate_writable(arg, sizeof(u32));
-		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED u32 *)arg = (u32)value;
-	}	break;
-
-	case FIGETBSZ:
-	case _IOR(_IOC_TYPE(FIGETBSZ), _IOC_NR(FIGETBSZ), int): {
+	case _IO_WITHSIZE(FIGETBSZ, 0): { /* FD_IOC_GETBSZ */
 		struct stat st;
-		validate_writable(arg, sizeof(int));
 		handle_stat(*hand, &st);
-		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED int *)arg = (int)(unsigned int)st.st_blksize;
+		ioctl_intarg_setuint(cmd, arg, st.st_blksize);
 	}	break;
 
 	default:
-		if (_IOC_TYPE(command) == 'T') {
-			/* All KOS-specific ioctl commands with type='T' are
-			 * tty-specific, so we must return `-ENOTTY' for all
-			 * of them! */
-			if (_IOC_ISKOS(command))
-				goto do_return_notty;
-			switch (_IOC_NR(command)) {
-
-			case _IOC_NR(TCGETS) ... _IOC_NR(TIOCPKT):
-			case _IOC_NR(TIOCNOTTY) ... _IOC_NR(TIOCGEXCL):
-			case _IOC_NR(TIOCSERCONFIG) ... _IOC_NR(TIOCGICOUNT):
-				/* TTY-specific ioctl()s (user-space uses one of these to implement `isatty()') */
-do_return_notty:
-				*result = -ENOTTY;
-				return true;
-
-			default:
-				break;
-			}
+		if (_IOC_TYPE(cmd) == 'T') {
+			/* Return -ENOTTY for unsupported tty-ioctls */
+return_ENOTTY:
+			*result = -ENOTTY;
+			return true;
 		}
 		return false;
 	}
@@ -306,10 +257,8 @@ do_return_notty:
 #endif /* __ARCH_WANT_SYSCALL_IOCTL || __ARCH_WANT_SYSCALL_IOCTLF */
 
 #ifdef __ARCH_WANT_SYSCALL_IOCTL
-DEFINE_SYSCALL3(syscall_slong_t, ioctl,
-                fd_t, fd,
-                syscall_ulong_t, command,
-                UNCHECKED USER void *, arg) {
+DEFINE_SYSCALL3(syscall_slong_t, ioctl, fd_t, fd,
+                ioctl_t, command, UNCHECKED USER void *, arg) {
 	struct handle hand;
 	syscall_slong_t result;
 	hand = handle_lookup((unsigned int)fd);
@@ -337,9 +286,8 @@ done:
 #endif /* __ARCH_WANT_SYSCALL_IOCTL */
 
 #ifdef __ARCH_WANT_SYSCALL_IOCTLF
-DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
-                fd_t, fd, syscall_ulong_t, command,
-                iomode_t, mode,
+DEFINE_SYSCALL4(syscall_slong_t, ioctlf, fd_t, fd,
+                ioctl_t, command, iomode_t, mode,
                 USER UNCHECKED void *, arg) {
 	struct handle hand;
 	syscall_slong_t result;
@@ -1157,7 +1105,7 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 
 #ifdef __ARCH_WANT_SYSCALL_HOP
 DEFINE_SYSCALL3(syscall_slong_t, hop,
-                fd_t, fd, syscall_ulong_t, cmd,
+                fd_t, fd, ioctl_t, cmd,
                 USER UNCHECKED void *, arg) {
 	struct handle hand;
 	syscall_slong_t result;
@@ -1204,8 +1152,7 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 
 #ifdef __ARCH_WANT_SYSCALL_HOPF
 DEFINE_SYSCALL4(syscall_slong_t, hopf,
-                fd_t, fd, syscall_ulong_t, cmd,
-                iomode_t, mode,
+                fd_t, fd, ioctl_t, cmd, iomode_t, mode,
                 USER UNCHECKED void *, arg) {
 	struct handle hand;
 	syscall_slong_t result;

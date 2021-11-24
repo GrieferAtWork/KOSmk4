@@ -19,6 +19,7 @@
  */
 %[default:section(".text.crt{|.dos}.kos.syscalls")]
 %[default:nodos]
+%[define_replacement(ioctl_t = __ioctl_t)]
 
 %[insert:prefix(
 #include <hybrid/typecore.h>
@@ -65,10 +66,10 @@ __SYSDECL_BEGIN
 @@Perform a handle operation specified by `cmd'
 @@@param: cmd: One of `HOP_<type>_<command>'
 [[guard, vartypes(void *), decl_include("<bits/types.h>")]]
-$syscall_slong_t hop($fd_t fd, $syscall_ulong_t cmd, ... /*, void *arg*/);
+$syscall_slong_t hop($fd_t fd, $ioctl_t cmd, ... /*, void *arg*/);
 
 [[guard, vartypes(void *), doc_alias("hop"), decl_include("<bits/types.h>")]]
-$syscall_slong_t hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, void *arg*/);
+$syscall_slong_t hopf($fd_t fd, $ioctl_t cmd, $iomode_t mode, ... /*, void *arg*/);
 
 
 %
@@ -79,10 +80,10 @@ $syscall_slong_t hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, vo
 
 
 [[guard, vartypes(void *), throws, doc_alias("hop"), decl_include("<bits/types.h>")]]
-$syscall_slong_t Hop($fd_t fd, $syscall_ulong_t cmd, ... /*, void *arg*/);
+$syscall_slong_t Hop($fd_t fd, $ioctl_t cmd, ... /*, void *arg*/);
 
 [[guard, vartypes(void *), throws, doc_alias("Hop"), decl_include("<bits/types.h>")]]
-$syscall_slong_t Hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, void *arg*/);
+$syscall_slong_t Hopf($fd_t fd, $ioctl_t cmd, $iomode_t mode, ... /*, void *arg*/);
 
 
 %{

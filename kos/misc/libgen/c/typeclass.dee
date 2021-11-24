@@ -158,6 +158,10 @@ global knownTypeClasses: {string: string} = Dict({
 	/* From <bits/types.h> */
 	"fd_t"              : "TIn(__SIZEOF_FD_T__)",
 	"__fd_t"            : "TIn(__SIZEOF_FD_T__)",
+	"fcntl_t"           : "TIn(__SIZEOF_FCNTL_T__)",
+	"__fcntl_t"         : "TIn(__SIZEOF_FCNTL_T__)",
+	"ioctl_t"           : "TIn(__SIZEOF_IOCTL_T__)",
+	"__ioctl_t"         : "TIn(__SIZEOF_IOCTL_T__)",
 	"errno_t"           : "TIn(__SIZEOF_ERRNO_T__)",
 	"__errno_t"         : "TIn(__SIZEOF_ERRNO_T__)",
 	"signo_t"           : "TIn(__SIZEOF_SIGNO_T__)",

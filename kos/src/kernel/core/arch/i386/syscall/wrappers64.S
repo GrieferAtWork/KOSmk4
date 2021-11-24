@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95436054 */
+/* HASH CRC-32:0x983997bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -566,7 +566,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigreturn)
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigreturn)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 .section .text.x86.asm64_syscall.ioctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctl)
 	.cfi_startproc simple
@@ -2461,7 +2461,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_msgctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 .section .text.x86.asm64_syscall.fcntl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fcntl)
 	.cfi_startproc simple
@@ -11444,7 +11444,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmkdirat)
 	.cfi_endproc
 END(__x86_asm64_syscall_fmkdirat)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 .section .text.x86.asm64_syscall.ksysctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ksysctl)
 	.cfi_startproc simple
@@ -12354,7 +12354,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pread64f)
 	.cfi_endproc
 END(__x86_asm64_syscall_pread64f)
 
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm64_syscall.ioctlf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctlf)
 	.cfi_startproc simple
@@ -12917,7 +12917,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
 	.cfi_endproc
 END(__x86_asm64_syscall_kstat)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm64_syscall.hopf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
 	.cfi_startproc simple
@@ -12948,7 +12948,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
 	.cfi_endproc
 END(__x86_asm64_syscall_hopf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 .section .text.x86.asm64_syscall.hop
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hop)
 	.cfi_startproc simple
@@ -14353,7 +14353,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lock)
 	.cfi_endproc
 END(__x86_asm32_int80_lock)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 .section .text.x86.asm32_syscall_int80.ioctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctl)
 	.cfi_startproc simple
@@ -14378,7 +14378,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctl)
 	.cfi_endproc
 END(__x86_asm32_int80_ioctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 .section .text.x86.asm32_syscall_int80.fcntl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl)
 	.cfi_startproc simple
@@ -18589,7 +18589,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents64)
 	.cfi_endproc
 END(__x86_asm32_int80_getdents64)
 
-/* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl64(fd_t fd, fcntl_t command, void *arg) */
 .section .text.x86.asm32_syscall_int80.fcntl64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl64)
 	.cfi_startproc simple
@@ -24693,7 +24693,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve)
 	.cfi_endproc
 END(__x86_asm32_int80_rpc_serve)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 .section .text.x86.asm32_syscall_int80.ksysctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 	.cfi_startproc simple
@@ -25064,7 +25064,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
 	.cfi_endproc
 END(__x86_asm32_int80_fsmode)
 
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm32_syscall_int80.ioctlf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
 	.cfi_startproc simple
@@ -26139,7 +26139,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	.cfi_endproc
 END(__x86_asm32_int80_readf)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm32_syscall_int80.hopf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	.cfi_startproc simple
@@ -26166,7 +26166,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	.cfi_endproc
 END(__x86_asm32_int80_hopf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 .section .text.x86.asm32_syscall_int80.hop
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
 	.cfi_startproc simple
@@ -26459,10 +26459,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_umount2, __x86_asm32_int80_umount2
 /* errno_t lock(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_lock, __x86_asm32_int80_lock)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioctl, __x86_asm32_int80_ioctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fcntl, __x86_asm32_int80_fcntl)
 
 /* errno_t mpx(void) */
@@ -27510,7 +27510,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_madvise, __x86_asm32_int80_madvise
 /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getdents64, __x86_asm32_int80_getdents64)
 
-/* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl64(fd_t fd, fcntl_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fcntl64, __x86_asm32_int80_fcntl64)
 
 /* pid_t gettid(void) */
@@ -30029,7 +30029,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nanosleep64, __x86_asm32_int80_nan
 /* errno_t rpc_serve(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_serve, __x86_asm32_int80_rpc_serve)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ksysctl, __x86_asm32_int80_ksysctl)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
@@ -30167,7 +30167,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrusage64, __x86_asm32_int80_get
 /* uint64_t fsmode(uint64_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsmode, __x86_asm32_int80_fsmode)
 
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioctlf, __x86_asm32_int80_ioctlf)
 
 /* Check if a transaction is currently in progress
@@ -30794,10 +30794,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writef, __x86_asm32_int80_writef)
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readf, __x86_asm32_int80_readf)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hopf, __x86_asm32_int80_hopf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hop, __x86_asm32_int80_hop)
 
 
@@ -31350,7 +31350,7 @@ END(__x86_asm32_sysrun32_umount2)
 /* errno_t lock(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_lock, sys32_lock); */
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.ioctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctl)
 	.cfi_startproc
@@ -31362,7 +31362,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ioctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.fcntl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fcntl)
 	.cfi_startproc
@@ -33268,7 +33268,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getdents64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getdents64)
 
-/* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl64(fd_t fd, fcntl_t command, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.fcntl64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fcntl64)
 	.cfi_startproc
@@ -36323,7 +36323,7 @@ END(__x86_asm32_sysrun32_nanosleep64)
 /* errno_t rpc_serve(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_serve, sys32_rpc_serve); */
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.ksysctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ksysctl)
 	.cfi_startproc
@@ -36516,7 +36516,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsmode)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fsmode)
 
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.ioctlf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctlf)
 	.cfi_startproc
@@ -37166,7 +37166,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_readf)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.hopf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hopf)
 	.cfi_startproc
@@ -37179,7 +37179,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hopf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_hopf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.hop
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hop)
 	.cfi_startproc

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x131038b9 */
+/* HASH CRC-32:0x1456c6bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd, char const *
 INTDEF fd_t NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET offset, __PIO_OFFSET length);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd, __STDC_INT_AS_UINT_T cmd, ...);
+INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd, fcntl_t cmd, ...);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ad20f16 */
+/* HASH CRC-32:0x6a72e7f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1118,10 +1118,10 @@
 #define __NR32AT0_umount2                      (char const *, char const *)
 #define __NR32AT1_umount2                      (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_ioctl                        (fd_t, __fd_t)
-#define __NR32AT1_ioctl                        (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_ioctl                        (ioctl_t, __ioctl_t)
 #define __NR32AT2_ioctl                        (void *, void *)
 #define __NR32AT0_fcntl                        (fd_t, __fd_t)
-#define __NR32AT1_fcntl                        (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_fcntl                        (fcntl_t, __fcntl_t)
 #define __NR32AT2_fcntl                        (void *, void *)
 #define __NR32AT0_setpgid                      (pid_t, __pid_t)
 #define __NR32AT1_setpgid                      (pid_t, __pid_t)
@@ -1440,7 +1440,7 @@
 #define __NR32AT1_getdents64                   (struct linux_dirent64 *, struct linux_dirent64 *)
 #define __NR32AT2_getdents64                   (size_t, __size_t)
 #define __NR32AT0_fcntl64                      (fd_t, __fd_t)
-#define __NR32AT1_fcntl64                      (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_fcntl64                      (fcntl_t, __fcntl_t)
 #define __NR32AT2_fcntl64                      (void *, void *)
 #define __NR32AT0_readahead                    (fd_t, __fd_t)
 #define __NR32AT1_readahead                    (uint64_t, __uint64_t)
@@ -2053,7 +2053,7 @@
 #define __NR32AT4_pread64f                     (iomode_t, __iomode_t)
 #define __NR32AT0_nanosleep64                  (struct timespecx32_64 const *, struct __timespecx32_64 const *)
 #define __NR32AT1_nanosleep64                  (struct timespecx32_64 *, struct __timespecx32_64 *)
-#define __NR32AT0_ksysctl                      (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT0_ksysctl                      (ioctl_t, __ioctl_t)
 #define __NR32AT1_ksysctl                      (void *, void *)
 #define __NR32AT0_writevf                      (fd_t, __fd_t)
 #define __NR32AT1_writevf                      (struct iovecx32 const *, struct __iovecx32 const *)
@@ -2094,7 +2094,7 @@
 #define __NR32AT1_getrusage64                  (struct rusagex32_64 *, struct __rusagex32_64 *)
 #define __NR32AT0_fsmode                       (uint64_t, __uint64_t)
 #define __NR32AT0_ioctlf                       (fd_t, __fd_t)
-#define __NR32AT1_ioctlf                       (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_ioctlf                       (ioctl_t, __ioctl_t)
 #define __NR32AT2_ioctlf                       (iomode_t, __iomode_t)
 #define __NR32AT3_ioctlf                       (void *, void *)
 #define __NR32AT0_rtm_abort                    (syscall_ulong_t, __syscall_ulong_t)
@@ -2169,11 +2169,11 @@
 #define __NR32AT2_readf                        (size_t, __size_t)
 #define __NR32AT3_readf                        (iomode_t, __iomode_t)
 #define __NR32AT0_hopf                         (fd_t, __fd_t)
-#define __NR32AT1_hopf                         (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_hopf                         (ioctl_t, __ioctl_t)
 #define __NR32AT2_hopf                         (iomode_t, __iomode_t)
 #define __NR32AT3_hopf                         (void *, void *)
 #define __NR32AT0_hop                          (fd_t, __fd_t)
-#define __NR32AT1_hop                          (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_hop                          (ioctl_t, __ioctl_t)
 #define __NR32AT2_hop                          (void *, void *)
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
 #endif /* __WANT_SYSCALL_ARGUMENT_TYPES */
@@ -2239,8 +2239,8 @@
 #define __NR32AM_acct(a, b, c, d, e, f)                         (char const *)a
 #define __NR32AM_umount2(a, b, c, d, e, f)                      (char const *)a, (__syscall_ulong_t)b
 #define __NR32AM_lock(a, b, c, d, e, f)                         /* nothing */
-#define __NR32AM_ioctl(a, b, c, d, e, f)                        (__fd_t)a, (__syscall_ulong_t)b, (void *)c
-#define __NR32AM_fcntl(a, b, c, d, e, f)                        (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NR32AM_ioctl(a, b, c, d, e, f)                        (__fd_t)a, (__ioctl_t)b, (void *)c
+#define __NR32AM_fcntl(a, b, c, d, e, f)                        (__fd_t)a, (__fcntl_t)b, (void *)c
 #define __NR32AM_mpx(a, b, c, d, e, f)                          /* nothing */
 #define __NR32AM_setpgid(a, b, c, d, e, f)                      (__pid_t)a, (__pid_t)b
 #define __NR32AM_ulimit(a, b, c, d, e, f)                       /* nothing */
@@ -2406,7 +2406,7 @@
 #define __NR32AM_mincore(a, b, c, d, e, f)                      (void *)a, (__size_t)b, (__uint8_t *)c
 #define __NR32AM_madvise(a, b, c, d, e, f)                      (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR32AM_getdents64(a, b, c, d, e, f)                   (__fd_t)a, (struct linux_dirent64 *)b, (__size_t)c
-#define __NR32AM_fcntl64(a, b, c, d, e, f)                      (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NR32AM_fcntl64(a, b, c, d, e, f)                      (__fd_t)a, (__fcntl_t)b, (void *)c
 #define __NR32AM_gettid(a, b, c, d, e, f)                       /* nothing */
 #define __NR32AM_readahead(a, b, c, d, e, f)                    (__fd_t)a, (__uint64_t)((__uint64_t)b | (__uint64_t)c << 32), (__size_t)d
 #define __NR32AM_setxattr(a, b, c, d, e, f)                     (char const *)a, (char const *)b, (void const *)c, (__size_t)d, (__syscall_ulong_t)e
@@ -2633,7 +2633,7 @@
 #define __NR32AM_pread64f(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NR32AM_nanosleep64(a, b, c, d, e, f)                  (struct __timespecx32_64 const *)a, (struct __timespecx32_64 *)b
 #define __NR32AM_rpc_serve(a, b, c, d, e, f)                    /* nothing */
-#define __NR32AM_ksysctl(a, b, c, d, e, f)                      (__syscall_ulong_t)a, (void *)b
+#define __NR32AM_ksysctl(a, b, c, d, e, f)                      (__ioctl_t)a, (void *)b
 #define __NR32AM_writevf(a, b, c, d, e, f)                      (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__iomode_t)d
 #define __NR32AM_readvf(a, b, c, d, e, f)                       (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__iomode_t)d
 #define __NR32AM_kreaddir(a, b, c, d, e, f)                     (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
@@ -2646,7 +2646,7 @@
 #define __NR32AM_gettimeofday64(a, b, c, d, e, f)               (struct __timevalx32_64 *)a, (struct timezone *)b
 #define __NR32AM_getrusage64(a, b, c, d, e, f)                  (__syscall_slong_t)a, (struct __rusagex32_64 *)b
 #define __NR32AM_fsmode(a, b, c, d, e, f)                       (__uint64_t)((__uint64_t)a | (__uint64_t)b << 32)
-#define __NR32AM_ioctlf(a, b, c, d, e, f)                       (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
+#define __NR32AM_ioctlf(a, b, c, d, e, f)                       (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
 #define __NR32AM_rtm_test(a, b, c, d, e, f)                     /* nothing */
 #define __NR32AM_rtm_abort(a, b, c, d, e, f)                    (__syscall_ulong_t)a
 #define __NR32AM_rtm_end(a, b, c, d, e, f)                      /* nothing */
@@ -2675,8 +2675,8 @@
 #define __NR32AM_detach(a, b, c, d, e, f)                       (__pid_t)a
 #define __NR32AM_writef(a, b, c, d, e, f)                       (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #define __NR32AM_readf(a, b, c, d, e, f)                        (__fd_t)a, (void *)b, (__size_t)c, (__iomode_t)d
-#define __NR32AM_hopf(a, b, c, d, e, f)                         (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
-#define __NR32AM_hop(a, b, c, d, e, f)                          (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NR32AM_hopf(a, b, c, d, e, f)                         (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
+#define __NR32AM_hop(a, b, c, d, e, f)                          (__fd_t)a, (__ioctl_t)b, (void *)c
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */
 

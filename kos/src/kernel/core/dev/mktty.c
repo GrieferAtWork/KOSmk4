@@ -193,7 +193,7 @@ NOTHROW(KCALL mkttydev_stopfwd)(struct mkttydev *__restrict self) {
 
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-mkttydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+mkttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct mkttydev *me = mfile_asmktty(self);
 	switch (cmd) {

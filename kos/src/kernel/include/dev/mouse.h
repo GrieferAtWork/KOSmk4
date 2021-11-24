@@ -131,7 +131,7 @@ FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and 
 mousedev_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
                 size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-mousedev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+mousedev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL
 mousedev_v_stat(struct mfile *__restrict self,

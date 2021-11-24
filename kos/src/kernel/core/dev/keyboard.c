@@ -1012,7 +1012,7 @@ linux_keyboard_setmeta(struct kbddev *__restrict self,
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 kbddev_v_ioctl(struct mfile *__restrict self,
-               syscall_ulong_t cmd, USER UNCHECKED void *arg,
+               ioctl_t cmd, USER UNCHECKED void *arg,
                iomode_t mode) THROWS(...) {
 	struct kbddev *me = mfile_askbd(self);
 	(void)mode;

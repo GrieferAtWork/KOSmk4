@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac6e5a11 */
+/* HASH CRC-32:0x9aa72fd3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -355,7 +355,7 @@ DFUN(".text.crt.dos.io.utility", libd_name_to_handle_at, libc_name_to_handle_at,
 DFUN(".text.crt.dos.io.utility", libd_open_by_handle_at, libc_open_by_handle_at, TIn(__SIZEOF_FD_T__), 3, TIn(__SIZEOF_FD_T__), TP, TD)
 DFUN(".text.crt.dos.io.utility", libd_fallocate, libc_fallocate, TD, 4, TIn(__SIZEOF_FD_T__), TD, TIn(__SIZEOF_OFF32_T__), TIn(__SIZEOF_OFF32_T__))
 DFUN(".text.crt.dos.io.utility", libd_fallocate64, libc_fallocate64, TD, 4, TIn(__SIZEOF_FD_T__), TD, TIn(__SIZEOF_OFF64_T__), TIn(__SIZEOF_OFF64_T__))
-DFUN(".text.crt.dos.io.utility", libd_fcntl, libc_fcntl, TD, 3, TIn(__SIZEOF_FD_T__), TD, TP)
+DFUN(".text.crt.dos.io.utility", libd_fcntl, libc_fcntl, TD, 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FCNTL_T__), TP)
 DFUN(".text.crt.dos.io.utility", libd_posix_fadvise, libc_posix_fadvise, TD, 4, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF32_T__), TIn(__SIZEOF_OFF32_T__), TD)
 DFUN(".text.crt.dos.io.utility", libd_posix_fallocate, libc_posix_fallocate, TD, 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF32_T__), TIn(__SIZEOF_OFF32_T__))
 DFUN(".text.crt.dos.io.large.utility", libd_posix_fadvise64, libc_posix_fadvise64, TD, 4, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF64_T__), TIn(__SIZEOF_OFF64_T__), TD)
@@ -1909,7 +1909,7 @@ DFUN(".text.crt.dos.sched.user", libd_setfsuid, libc_setfsuid, TD, 1, TIn(__SIZE
 DFUN(".text.crt.dos.sched.user", libd_setfsgid, libc_setfsgid, TD, 1, TIn(__SIZEOF_GID_T__))
 
 /* sys.ioctl */
-DFUN(".text.crt.dos.io.utility", libd_ioctl, libc_ioctl, TD, 3, TIn(__SIZEOF_FD_T__), TP, TP)
+DFUN(".text.crt.dos.io.utility", libd_ioctl, libc_ioctl, TD, 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_IOCTL_T__), TP)
 
 /* sys.ipc */
 DFUN(".text.crt.dos.unsorted", libd_ftok, libc_ftok, TIn(__SIZEOF_KEY_T__), 2, TP, TD)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fbfdad */
+/* HASH CRC-32:0x6d780265 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -753,7 +753,7 @@
 #define __NRAT0_inotify_add_watch      (int, int)
 #define __NRAT0_inotify_rm_watch       (int, int)
 #define __NRAT0_ioctl                  (fd_t, __fd_t)
-#define __NRAT1_ioctl                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_ioctl                  (ioctl_t, __ioctl_t)
 #define __NRAT2_ioctl                  (void *, void *)
 #define __NRAT0_ioprio_set             (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_ioprio_set             (syscall_ulong_t, __syscall_ulong_t)
@@ -1359,7 +1359,7 @@
 #define __NRAT0_fstat                  (fd_t, __fd_t)
 #define __NRAT1_fstat                  (struct linux_stat *, struct linux_stat *)
 #define __NRAT0_fcntl                  (fd_t, __fd_t)
-#define __NRAT1_fcntl                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_fcntl                  (fcntl_t, __fcntl_t)
 #define __NRAT2_fcntl                  (void *, void *)
 #define __NRAT0_fadvise64              (int, int)
 #define __NRAT0_newfstatat             (fd_t, __fd_t)
@@ -1459,7 +1459,7 @@
 #define __NRAM_inotify_init1(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_inotify_add_watch(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (int)a
 #define __NRAM_inotify_rm_watch(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)       (int)a
-#define __NRAM_ioctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NRAM_ioctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__ioctl_t)b, (void *)c
 #define __NRAM_ioprio_set(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAM_ioprio_get(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAM_flock(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__syscall_ulong_t)b
@@ -1715,7 +1715,7 @@
 #define __NRAM_stat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (char const *)a, (struct linux_stat *)b
 #define __NRAM_lstat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (struct linux_stat *)b
 #define __NRAM_fstat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (struct linux_stat *)b
-#define __NRAM_fcntl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NRAM_fcntl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__fcntl_t)b, (void *)c
 #define __NRAM_fadvise64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (int)a
 #define __NRAM_newfstatat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__fd_t)a, (char const *)b, (struct linux64_stat32 *)c, (__atflag_t)d
 #define __NRAM_fstatfs(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct statfs *)b

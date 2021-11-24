@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6aa3b106 */
+/* HASH CRC-32:0xea0d2696 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@
 #define SYS_inotify_init1          __NR_inotify_init1          /* errno_t inotify_init1(int TODO_PROTOTYPE) */
 #define SYS_inotify_add_watch      __NR_inotify_add_watch      /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
 #define SYS_inotify_rm_watch       __NR_inotify_rm_watch       /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
-#define SYS_ioctl                  __NR_ioctl                  /* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_ioctl                  __NR_ioctl                  /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
  * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
 #define SYS_ioprio_set             __NR_ioprio_set             /* errno_t ioprio_set(syscall_ulong_t who, syscall_ulong_t id, syscall_ulong_t ioprio) */
@@ -762,7 +762,7 @@
 #define SYS_stat                   __NR_stat                   /* errno_t stat(char const *filename, struct linux_stat *statbuf) */
 #define SYS_lstat                  __NR_lstat                  /* errno_t lstat(char const *filename, struct linux_stat *statbuf) */
 #define SYS_fstat                  __NR_fstat                  /* errno_t fstat(fd_t fd, struct linux_stat *statbuf) */
-#define SYS_fcntl                  __NR_fcntl                  /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_fcntl                  __NR_fcntl                  /* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 #define SYS_fadvise64              __NR_fadvise64              /* errno_t fadvise64(int TODO_PROTOTYPE) */
 #define SYS_newfstatat             __NR_newfstatat             /* errno_t newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
 #define SYS_fstatfs                __NR_fstatfs                /* errno_t fstatfs(fd_t file, struct statfs *buf) */

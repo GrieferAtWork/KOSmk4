@@ -287,7 +287,7 @@ struct mfile_stream_ops {
 	 * this callback has completely unfiltered control over the `ioctl(2)' syscall.
 	 * When `NULL', same as `mfile_v_ioctl'. */
 	BLOCKING NONNULL((1)) syscall_slong_t
-	(KCALL *mso_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
+	(KCALL *mso_ioctl)(struct mfile *__restrict self, ioctl_t cmd,
 	                   USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
@@ -297,7 +297,7 @@ struct mfile_stream_ops {
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * When `NULL', same as `mfile_v_hop'. */
 	BLOCKING NONNULL((1)) syscall_slong_t
-	(KCALL *mso_hop)(struct mfile *__restrict self, syscall_ulong_t cmd,
+	(KCALL *mso_hop)(struct mfile *__restrict self, ioctl_t cmd,
 	                 USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(...);
 
@@ -329,7 +329,7 @@ struct mfile_stream_ops {
  *  - BLKSSZGET, BLKBSZGET,
  *  - BLKGETSIZE, BLKGETSIZE64 */
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
-mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
@@ -337,7 +337,7 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
  * throws `E_INVALID_ARGUMENT_UNKNOWN_COMMAND', but should be used
  * by sub-class overrides as fallback) */
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
-mfile_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
+mfile_v_hop(struct mfile *__restrict self, ioctl_t cmd,
             USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
@@ -1417,7 +1417,7 @@ FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_utailwritev(struct mf
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_upreadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_upwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) pos_t KCALL mfile_useek(struct mfile *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL mfile_uioctl(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL mfile_uioctl(struct mfile *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_utruncate(struct mfile *__restrict self, pos_t new_size) THROWS(...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_ummap(struct mfile *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) pos_t KCALL mfile_uallocate(struct mfile *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
@@ -1426,7 +1426,7 @@ FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_udatasync(struct mfile *__restrict
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_ustat(struct mfile *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_upollconnect(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL mfile_upolltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL mfile_uhop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL mfile_uhop(struct mfile *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) REF void *KCALL mfile_utryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 FUNDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL mfile_uprintlink(struct mfile *__restrict self, __pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 

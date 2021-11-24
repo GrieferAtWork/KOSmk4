@@ -1025,7 +1025,7 @@ devtty_v_seek(struct mfile *__restrict UNUSED(self), off_t offset,
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-devtty_v_ioctl(struct mfile *__restrict UNUSED(self), syscall_ulong_t cmd,
+devtty_v_ioctl(struct mfile *__restrict UNUSED(self), ioctl_t cmd,
                USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	REF struct device *dev = getctty();
@@ -1102,7 +1102,7 @@ devtty_v_polltest(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-devtty_v_hop(struct mfile *__restrict UNUSED(self), syscall_ulong_t cmd,
+devtty_v_hop(struct mfile *__restrict UNUSED(self), ioctl_t cmd,
              USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	REF struct device *dev = getctty();

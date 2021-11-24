@@ -34,7 +34,7 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_ioctl,hash:CRC-32=0x47187e9e]]]*/
+/*[[[head:libc_ioctl,hash:CRC-32=0xb9c981c8]]]*/
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
  * Many I/O  control operations  except  an additional  argument,  though
@@ -46,7 +46,7 @@ DECL_BEGIN
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.io.utility") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
-                                  ulongptr_t request,
+                                  ioctl_t request,
                                   ...)
 /*[[[body:libc_ioctl]]]*/
 {

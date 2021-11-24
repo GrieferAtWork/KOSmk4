@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f89f5d4 */
+/* HASH CRC-32:0x20f96186 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@
  * one  system call invocation  method. However on  x86_64, no such registers
  * exist, requiring the use of a custom protocol. */
 #define SYS_rt_sigreturn             __NR_rt_sigreturn             /* void rt_sigreturn(void) */
-#define SYS_ioctl                    __NR_ioctl                    /* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_ioctl                    __NR_ioctl                    /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 #define SYS_pread64                  __NR_pread64                  /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define SYS_pwrite64                 __NR_pwrite64                 /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
@@ -346,7 +346,7 @@
 #define SYS_msgsnd                   __NR_msgsnd                   /* errno_t msgsnd(int TODO_PROTOTYPE) */
 #define SYS_msgrcv                   __NR_msgrcv                   /* errno_t msgrcv(int TODO_PROTOTYPE) */
 #define SYS_msgctl                   __NR_msgctl                   /* errno_t msgctl(int TODO_PROTOTYPE) */
-#define SYS_fcntl                    __NR_fcntl                    /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_fcntl                    __NR_fcntl                    /* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 #define SYS_flock                    __NR_flock                    /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
 /* Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
@@ -973,7 +973,7 @@
 #define SYS_fmknodat                 __NR_fmknodat                 /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fmkdirat                 __NR_fmkdirat                 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-#define SYS_ksysctl                  __NR_ksysctl                  /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+#define SYS_ksysctl                  __NR_ksysctl                  /* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
@@ -1205,7 +1205,7 @@
 #define SYS_readvf                   __NR_readvf                   /* ssize_t readvf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 #define SYS_pwrite64f                __NR_pwrite64f                /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define SYS_pread64f                 __NR_pread64f                 /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-#define SYS_ioctlf                   __NR_ioctlf                   /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+#define SYS_ioctlf                   __NR_ioctlf                   /* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
@@ -1385,8 +1385,8 @@
 #define SYS_klstat                   __NR_klstat                   /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 #define SYS_kfstat                   __NR_kfstat                   /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
 #define SYS_kstat                    __NR_kstat                    /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
-#define SYS_hopf                     __NR_hopf                     /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-#define SYS_hop                      __NR_hop                      /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_hopf                     __NR_hopf                     /* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
+#define SYS_hop                      __NR_hop                      /* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
  * possible at the time the call was made, and throw `E_WOULDBLOCK' if

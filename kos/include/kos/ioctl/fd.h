@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xb1d636c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,32 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_KOS_HOP_API_H
-#define GUARD_LIBC_USER_KOS_HOP_API_H 1
+#ifndef _KOS_IOCTL_FD_H
+#define _KOS_IOCTL_FD_H 1
 
-#include "../api.h"
+/* ioctl control code that operate at the handle-level.
+ * -> These can be used on _ALL_ file descriptors, without exception! */
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <kos/hop/api.h>
+#include <__stdinc.h>
 
-DECL_BEGIN
+#include <asm/ioctl.h>
+#include <asm/os/block.h>
+#include <asm/os/tty.h>
 
-#ifndef __KERNEL__
-/* Perform a handle operation specified by `cmd'
- * @param: cmd: One of `HOP_<type>_<command>' */
-INTDEF syscall_slong_t NOTHROW_NCX(VLIBCCALL libc_hop)(fd_t fd, ioctl_t cmd, ...);
-/* Perform a handle operation specified by `cmd'
- * @param: cmd: One of `HOP_<type>_<command>' */
-INTDEF syscall_slong_t NOTHROW_NCX(VLIBCCALL libc_hopf)(fd_t fd, ioctl_t cmd, iomode_t mode, ...);
-/* Perform a handle operation specified by `cmd'
- * @param: cmd: One of `HOP_<type>_<command>' */
-INTDEF syscall_slong_t (VLIBCCALL libc_Hop)(fd_t fd, ioctl_t cmd, ...) THROWS(...);
-/* Perform a handle operation specified by `cmd'
- * @param: cmd: One of `HOP_<type>_<command>' */
-INTDEF syscall_slong_t (VLIBCCALL libc_Hopf)(fd_t fd, ioctl_t cmd, iomode_t mode, ...) THROWS(...);
-#endif /* !__KERNEL__ */
+/* NOTE: By default, trying to  invoke an ioctl with  type='T'
+ *       that isn't supported has ioctl(2) return with ENOTTY! */
+#define FD_IOC_NCLEX  __FIONCLEX /* Clear O_CLOEXEC / IO_CLOEXEC */
+#define FD_IOC_CLEX   __FIOCLEX  /* Set O_CLOEXEC / IO_CLOEXEC */
+#define FD_IOC_ASYNC  __FIOASYNC /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
+#define FD_IOC_NBIO   __FIONBIO  /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
+#define FD_IOC_QSIZE  __FIOQSIZE /* [loff_t *arg] Return object data-size (not supported by all types of objects) */
+#define FD_IOC_GETBSZ __FIGETBSZ /* [int *arg] Return `struct stat::st_blksize' */
 
-DECL_END
+/*  */
 
-#endif /* !GUARD_LIBC_USER_KOS_HOP_API_H */
+
+
+#endif /* !_KOS_IOCTL_FD_H */

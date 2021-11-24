@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3640d3cc */
+/* HASH CRC-32:0x8129d9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -404,7 +404,7 @@ __CDECLARE_SC(,__errno_t,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __group),
 __CDECLARE_SC(,__errno_t,fchownat,(__fd_t __dirfd, char const *__filename, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dirfd,__filename,__owner,__group,__flags))
 #endif /* __CRT_HAVE_SC(fchownat) */
 #if __CRT_HAVE_SC(fcntl)
-__CDECLARE_SC(,__syscall_slong_t,fcntl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_SC(,__syscall_slong_t,fcntl,(__fd_t __fd, __fcntl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_SC(fcntl) */
 #if __CRT_HAVE_SC(fdatasync)
 /* Synchronize only the data of a file (not its descriptor which contains
@@ -656,7 +656,7 @@ __CDECLARE_SC(,__errno_t,io_setup,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,io_submit,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(io_submit) */
 #if __CRT_HAVE_SC(ioctl)
-__CDECLARE_SC(,__syscall_slong_t,ioctl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_SC(,__syscall_slong_t,ioctl,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_SC(ioctl) */
 #if __CRT_HAVE_SC(ioprio_get)
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
@@ -1861,7 +1861,7 @@ __CDECLARE_XSC(,__errno_t,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __group)
 __CDECLARE_XSC(,__errno_t,fchownat,(__fd_t __dirfd, char const *__filename, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dirfd,__filename,__owner,__group,__flags))
 #endif /* __CRT_HAVE_XSC(fchownat) */
 #if __CRT_HAVE_XSC(fcntl)
-__CDECLARE_XSC(,__syscall_slong_t,fcntl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_XSC(,__syscall_slong_t,fcntl,(__fd_t __fd, __fcntl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_XSC(fcntl) */
 #if __CRT_HAVE_XSC(fdatasync)
 /* Synchronize only the data of a file (not its descriptor which contains
@@ -2113,7 +2113,7 @@ __CDECLARE_XSC(,__errno_t,io_setup,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,io_submit,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(io_submit) */
 #if __CRT_HAVE_XSC(ioctl)
-__CDECLARE_XSC(,__syscall_slong_t,ioctl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_XSC(,__syscall_slong_t,ioctl,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_XSC(ioctl) */
 #if __CRT_HAVE_XSC(ioprio_get)
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)

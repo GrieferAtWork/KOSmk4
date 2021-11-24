@@ -440,10 +440,10 @@ NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd,
 /*[[[end:libc_fallocate64]]]*/
 
 
-/*[[[head:libc_fcntl,hash:CRC-32=0xdf511ecc]]]*/
+/*[[[head:libc_fcntl,hash:CRC-32=0x57021137]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
-                                  __STDC_INT_AS_UINT_T cmd,
+                                  fcntl_t cmd,
                                   ...)
 /*[[[body:libc_fcntl]]]*/
 {

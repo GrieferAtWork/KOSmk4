@@ -290,7 +290,7 @@ NOTHROW(KCALL vidtty_v_destroy)(struct mfile *__restrict self) {
 }
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-vidtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct vidtty *me = mfile_asvidtty(self);
 	switch (cmd) {
@@ -1043,7 +1043,7 @@ got_active:
 
 /* Default operators for `struct viddev'. */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-viddev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+viddev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct viddev *me = mfile_asviddev(self);
 	switch (cmd) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65a651c8 */
+/* HASH CRC-32:0x163b39d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -141,8 +141,8 @@
 #define __NR_acct                         0x33                   /* errno_t acct(char const *filename) */
 #define __NR_umount2                      0x34                   /* errno_t umount2(char const *special_file, syscall_ulong_t flags) */
 #define __NR_lock                         0x35                   /* errno_t lock(void) */
-#define __NR_ioctl                        0x36                   /* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
-#define __NR_fcntl                        0x37                   /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+#define __NR_ioctl                        0x36                   /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
+#define __NR_fcntl                        0x37                   /* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 #define __NR_mpx                          0x38                   /* errno_t mpx(void) */
 #define __NR_setpgid                      0x39                   /* errno_t setpgid(pid_t pid, pid_t pgid) */
 #define __NR_ulimit                       0x3a                   /* errno_t ulimit(void) */
@@ -518,7 +518,7 @@
 /* @return: * : The actual number of read entries
  * @return: 0 : End-of-directory */
 #define __NR_getdents64                   0xdc                   /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
-#define __NR_fcntl64                      0xdd                   /* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
+#define __NR_fcntl64                      0xdd                   /* syscall_slong_t fcntl64(fd_t fd, fcntl_t command, void *arg) */
 #define __NR_gettid                       0xe0                   /* pid_t gettid(void) */
 #define __NR_readahead                    0xe1                   /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
@@ -1128,7 +1128,7 @@
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
 #define __NR_rpc_serve                    __UINT32_C(0xffffff62) /* errno_t rpc_serve(void) */
-#define __NR_ksysctl                      __UINT32_C(0xffffff6b) /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+#define __NR_ksysctl                      __UINT32_C(0xffffff6b) /* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
  * write  data from `count'  separate buffers, though  still return the actual
  * number of written bytes.
@@ -1174,7 +1174,7 @@
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define __NR_getrusage64                  __UINT32_C(0xffffffb3) /* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 #define __NR_fsmode                       __UINT32_C(0xffffffc4) /* uint64_t fsmode(uint64_t mode) */
-#define __NR_ioctlf                       __UINT32_C(0xffffffca) /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+#define __NR_ioctlf                       __UINT32_C(0xffffffca) /* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
@@ -1544,8 +1544,8 @@
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 #define __NR_readf                        __UINT32_C(0xfffffffd) /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-#define __NR_hopf                         __UINT32_C(0xfffffffe) /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-#define __NR_hop                          __UINT32_C(0xffffffff) /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+#define __NR_hopf                         __UINT32_C(0xfffffffe) /* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
+#define __NR_hop                          __UINT32_C(0xffffffff) /* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 
 
 /************************************************************************/

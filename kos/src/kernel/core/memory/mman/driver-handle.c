@@ -123,7 +123,7 @@ require_driver(struct module *__restrict self) {
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_module_hop(struct module *__restrict self,
-                  syscall_ulong_t cmd,
+                  ioctl_t cmd,
                   USER UNCHECKED void *arg,
                   iomode_t mode)
 		THROWS(...) {
@@ -273,7 +273,7 @@ handle_module_hop(struct module *__restrict self,
 /************************************************************************/
 INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_driver_loadlist_hop(struct driver_loadlist *__restrict self,
-                           syscall_ulong_t cmd,
+                           ioctl_t cmd,
                            USER UNCHECKED void *arg,
                            iomode_t mode)
 		THROWS(...) {
@@ -340,7 +340,7 @@ handle_driver_loadlist_hop(struct driver_loadlist *__restrict self,
 /************************************************************************/
 INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_driver_section_hop(struct driver_section *__restrict self,
-                          syscall_ulong_t cmd,
+                          ioctl_t cmd,
                           USER UNCHECKED void *arg,
                           iomode_t mode)
 		THROWS(...) {

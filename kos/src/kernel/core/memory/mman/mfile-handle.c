@@ -68,7 +68,7 @@ DECL_BEGIN
  *  - BLKSSZGET, BLKBSZGET,
  *  - BLKGETSIZE, BLKGETSIZE64 */
 PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
-mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	switch (cmd) {
@@ -264,7 +264,7 @@ mfile_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
  * throws `E_INVALID_ARGUMENT_UNKNOWN_COMMAND', but should be used
  * by sub-class overrides as fallback) */
 PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
-mfile_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
+mfile_v_hop(struct mfile *__restrict self, ioctl_t cmd,
             USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	/* TODO: Default HOP operations. */
@@ -789,11 +789,11 @@ handle_mfile_seek(struct mfile *__restrict self,
 }
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
-handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+handle_mfile_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	BLOCKING NONNULL((1)) syscall_slong_t
-	(KCALL *mso_ioctl)(struct mfile *__restrict self, syscall_ulong_t cmd,
+	(KCALL *mso_ioctl)(struct mfile *__restrict self, ioctl_t cmd,
 	                   USER UNCHECKED void *arg, iomode_t mode);
 	struct mfile_stream_ops const *stream;
 	mso_ioctl = &mfile_v_ioctl;
@@ -1039,12 +1039,12 @@ handle_mfile_polltest(struct mfile *__restrict self,
 }
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
-handle_mfile_hop(struct mfile *__restrict self,
-                 syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode)
+handle_mfile_hop(struct mfile *__restrict self, ioctl_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
 	BLOCKING NONNULL((1)) syscall_slong_t
-	(KCALL *mso_hop)(struct mfile *__restrict self, syscall_ulong_t cmd,
+	(KCALL *mso_hop)(struct mfile *__restrict self, ioctl_t cmd,
 	                 USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(...);
 	mso_hop = &mfile_v_hop;

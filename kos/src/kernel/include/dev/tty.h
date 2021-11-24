@@ -119,7 +119,7 @@ FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and 
 ttydev_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-ttydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+ttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL
 ttydev_v_stat(struct mfile *__restrict self,
@@ -133,7 +133,7 @@ ttydev_v_polltest(struct mfile *__restrict self,
 
 /* @return: -EINVAL: Unsupported `cmd' */
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-_ttydev_tryioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+_ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Initialize common+basic fields. The caller must still initialize:

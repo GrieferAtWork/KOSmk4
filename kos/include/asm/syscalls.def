@@ -40,10 +40,10 @@
 %[typesize(*:[unsigned,signed,uint] = int)]
 %[typesize(*:[ulong] = long)]
 %[typesize(*:[ullong] = llong)]
-%[typesize(*:[errno_t,signo_t,mode_t,oflag_t,fd_t] = int)]
+%[typesize(*:[errno_t,signo_t,mode_t,oflag_t,fd_t,fcntl_t] = int)]
 %[typesize(*:[syscall_ulong_t] = ulong)]
 %[typesize(*:[syscall_slong_t] = syscall_ulong_t)]
-%[typesize(*:[socklen_t,size_t] = syscall_ulong_t)]
+%[typesize(*:[socklen_t,size_t,ioctl_t] = syscall_ulong_t)]
 %[typesize(*:[uintptr_t] = size_t)]
 %[typesize(*:[intptr_t] = uintptr_t)]
 %[typesize(*:[intptr_half_t] = uintptr_half_t)]
@@ -614,12 +614,12 @@ dup2:(fd_t oldfd, fd_t newfd) -> fd_t;
 @@@param: flags:  Set of `O_CLOEXEC | O_CLOFORK'
 dup3:(fd_t oldfd, fd_t newfd, [tostr(OFLAG__CLOEXEC__CLOFORK)] oflag_t flags) -> fd_t;
 
-[cp] ioctl:(fd_t fd, [tostr(IOCTL_COMMAND)] syscall_ulong_t command, [tostr(IOCTL_ARG:command)] void *arg) -> syscall_slong_t;
-[cp] ioctlf:(fd_t fd, [tostr(IOCTL_COMMAND)] syscall_ulong_t command, iomode_t mode, [tostr(IOCTL_ARG:command)] void *arg) -> syscall_slong_t;
-[cp] hop:(fd_t fd, [tostr(HOP_COMMAND)] syscall_ulong_t command, [tostr(HOP_ARG:command)] void *arg) -> syscall_slong_t;
-[cp] hopf:(fd_t fd, [tostr(HOP_COMMAND)] syscall_ulong_t command, iomode_t mode, [tostr(HOP_ARG:command)] void *arg) -> syscall_slong_t;
-[cp] fcntl:(fd_t fd, [tostr(FCNTL_COMMAND)] syscall_ulong_t command, [tostr(FCNTL_ARG:command)] void *arg) -> syscall_slong_t;
-[cp] fcntl64:(fd_t fd, [tostr(FCNTL64_COMMAND)] syscall_ulong_t command, [tostr(FCNTL64_ARG:command)] void *arg) -> syscall_slong_t; /* UNIMPLEMENTED! */
+[cp] ioctl:(fd_t fd, [tostr(IOCTL_COMMAND)] ioctl_t command, [tostr(IOCTL_ARG:command)] void *arg) -> syscall_slong_t;
+[cp] ioctlf:(fd_t fd, [tostr(IOCTL_COMMAND)] ioctl_t command, iomode_t mode, [tostr(IOCTL_ARG:command)] void *arg) -> syscall_slong_t;
+[cp] hop:(fd_t fd, [tostr(HOP_COMMAND)] ioctl_t command, [tostr(HOP_ARG:command)] void *arg) -> syscall_slong_t;
+[cp] hopf:(fd_t fd, [tostr(HOP_COMMAND)] ioctl_t command, iomode_t mode, [tostr(HOP_ARG:command)] void *arg) -> syscall_slong_t;
+[cp] fcntl:(fd_t fd, [tostr(FCNTL_COMMAND)] fcntl_t command, [tostr(FCNTL_ARG:command)] void *arg) -> syscall_slong_t;
+[cp] fcntl64:(fd_t fd, [tostr(FCNTL64_COMMAND)] fcntl_t command, [tostr(FCNTL64_ARG:command)] void *arg) -> syscall_slong_t; /* UNIMPLEMENTED! */
 [cp] flock:(fd_t fd, syscall_ulong_t operation) -> errno_t; /* UNIMPLEMENTED! */
 readahead:(fd_t fd, [reg64] uint64_t offset, size_t count) -> ssize_t; /* UNIMPLEMENTED! */
 
@@ -2698,7 +2698,7 @@ setdomainname:([tostr(STRING:len)] char const *name, size_t len) -> errno_t;
 
 [cp] sysinfo:([tostr(out:STRUCT_SYSINFO)] struct sysinfo *info) -> errno_t; /* UNIMPLEMENTED! */
 
-[cp] ksysctl:([tostr(KSYSCTL_COMMAND)] syscall_ulong_t command,
+[cp] ksysctl:([tostr(KSYSCTL_COMMAND)] ioctl_t command,
               [tostr(KSYSCTL_ARG:command)] void *arg) -> syscall_slong_t;
 
 @@Load a  kernel  driver  from an  ELF  image  `module_image...+=len'

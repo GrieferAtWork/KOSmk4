@@ -221,7 +221,7 @@ done:
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_filehandle_ioctl(struct filehandle *__restrict self, syscall_ulong_t cmd,
+handle_filehandle_ioctl(struct filehandle *__restrict self, ioctl_t cmd,
                         USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return mfile_uioctl(self->fh_file, cmd, arg, mode);
 }
@@ -278,7 +278,7 @@ handle_filehandle_polltest(struct filehandle *__restrict self,
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_filehandle_hop(struct filehandle *__restrict self, syscall_ulong_t cmd,
+handle_filehandle_hop(struct filehandle *__restrict self, ioctl_t cmd,
                       USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	/* XXX: filehandle-specific HOPs? */
 	return mfile_uhop(self->fh_file, cmd, arg, mode);

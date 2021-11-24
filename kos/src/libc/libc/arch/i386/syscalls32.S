@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe0e0733 */
+/* HASH CRC-32:0xb7c135ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -649,14 +649,14 @@ INTERN_FUNCTION(libc_sys_lock)
 END(libc_sys_lock)
 DEFINE_PUBLIC_ALIAS(sys_lock, libc_sys_lock)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_ioctl)
 	movl   $(0x36), %eax
 	jmp    libc_x86_exec_syscall3
 END(libc_sys_ioctl)
 DEFINE_PUBLIC_ALIAS(sys_ioctl, libc_sys_ioctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_fcntl)
 	movl   $(0x37), %eax
 	jmp    libc_x86_exec_syscall3
@@ -2028,7 +2028,7 @@ INTERN_FUNCTION(libc_sys_getdents64)
 END(libc_sys_getdents64)
 DEFINE_PUBLIC_ALIAS(sys_getdents64, libc_sys_getdents64)
 
-/* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl64(fd_t fd, fcntl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_fcntl64)
 	movl   $(0xdd), %eax
 	jmp    libc_x86_exec_syscall3
@@ -4000,7 +4000,7 @@ INTERN_FUNCTION(libc_sys_rpc_serve)
 END(libc_sys_rpc_serve)
 DEFINE_PUBLIC_ALIAS(sys_rpc_serve, libc_sys_rpc_serve)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_ksysctl)
 	movl   $(0xffffff6b), %eax
 	jmp    libc_x86_exec_syscall2
@@ -4124,7 +4124,7 @@ INTERN_FUNCTION(libc_sys_fsmode)
 END(libc_sys_fsmode)
 DEFINE_PUBLIC_ALIAS(sys_fsmode, libc_sys_fsmode)
 
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 INTERN_FUNCTION(libc_sys_ioctlf)
 	movl   $(0xffffffca), %eax
 	jmp    libc_x86_exec_syscall4
@@ -4668,14 +4668,14 @@ INTERN_FUNCTION(libc_sys_readf)
 END(libc_sys_readf)
 DEFINE_PUBLIC_ALIAS(sys_readf, libc_sys_readf)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 INTERN_FUNCTION(libc_sys_hopf)
 	movl   $(0xfffffffe), %eax
 	jmp    libc_x86_exec_syscall4
 END(libc_sys_hopf)
 DEFINE_PUBLIC_ALIAS(sys_hopf, libc_sys_hopf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_hop)
 	movl   $(0xffffffff), %eax
 	jmp    libc_x86_exec_syscall3
@@ -5124,14 +5124,14 @@ INTERN_FUNCTION(libc_sys_Xlock)
 END(libc_sys_Xlock)
 DEFINE_PUBLIC_ALIAS(sys_Xlock, libc_sys_Xlock)
 
-/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xioctl)
 	movl   $(0x36), %eax
 	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xioctl)
 DEFINE_PUBLIC_ALIAS(sys_Xioctl, libc_sys_Xioctl)
 
-/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xfcntl)
 	movl   $(0x37), %eax
 	jmp    libc_x86_exec_Xsyscall3
@@ -6477,7 +6477,7 @@ INTERN_FUNCTION(libc_sys_Xgetdents64)
 END(libc_sys_Xgetdents64)
 DEFINE_PUBLIC_ALIAS(sys_Xgetdents64, libc_sys_Xgetdents64)
 
-/* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t fcntl64(fd_t fd, fcntl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xfcntl64)
 	movl   $(0xdd), %eax
 	jmp    libc_x86_exec_Xsyscall3
@@ -8449,7 +8449,7 @@ INTERN_FUNCTION(libc_sys_Xrpc_serve)
 END(libc_sys_Xrpc_serve)
 DEFINE_PUBLIC_ALIAS(sys_Xrpc_serve, libc_sys_Xrpc_serve)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xksysctl)
 	movl   $(0xffffff6b), %eax
 	jmp    libc_x86_exec_Xsyscall2
@@ -8573,7 +8573,7 @@ INTERN_FUNCTION(libc_sys_Xfsmode)
 END(libc_sys_Xfsmode)
 DEFINE_PUBLIC_ALIAS(sys_Xfsmode, libc_sys_Xfsmode)
 
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 INTERN_FUNCTION(libc_sys_Xioctlf)
 	movl   $(0xffffffca), %eax
 	jmp    libc_x86_exec_Xsyscall4
@@ -9117,14 +9117,14 @@ INTERN_FUNCTION(libc_sys_Xreadf)
 END(libc_sys_Xreadf)
 DEFINE_PUBLIC_ALIAS(sys_Xreadf, libc_sys_Xreadf)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 INTERN_FUNCTION(libc_sys_Xhopf)
 	movl   $(0xfffffffe), %eax
 	jmp    libc_x86_exec_Xsyscall4
 END(libc_sys_Xhopf)
 DEFINE_PUBLIC_ALIAS(sys_Xhopf, libc_sys_Xhopf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xhop)
 	movl   $(0xffffffff), %eax
 	jmp    libc_x86_exec_Xsyscall3

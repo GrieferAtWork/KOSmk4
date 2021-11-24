@@ -160,7 +160,7 @@ DATDEF struct mfile_stream_ops const blkdev_v_stream_ops;
 
 /* Implements `BLK*' ioctls from <linux/fs.h> */
 FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
-blkdev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 

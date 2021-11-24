@@ -394,7 +394,7 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 
 /* @return: -EINVAL: Unsupported `cmd' */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-_ttydev_tryioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+_ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
                  USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
@@ -885,7 +885,7 @@ done:
 
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ttydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+ttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	syscall_slong_t result;
 	result = _ttydev_tryioctl(self, cmd, arg, mode);

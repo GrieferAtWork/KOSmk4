@@ -180,10 +180,8 @@ ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
 }
 
 INTERN syscall_slong_t KCALL
-_ringbuffer_pipe_tryhop(struct ringbuffer *__restrict self,
-                        syscall_ulong_t cmd,
-                        USER UNCHECKED void *arg,
-                        iomode_t mode) {
+_ringbuffer_pipe_tryhop(struct ringbuffer *__restrict self, ioctl_t cmd,
+                        USER UNCHECKED void *arg, iomode_t mode) {
 	switch (cmd) {
 
 	case HOP_PIPE_STAT: {
@@ -406,10 +404,8 @@ _ringbuffer_pipe_tryhop(struct ringbuffer *__restrict self,
 
 
 INTERN syscall_slong_t KCALL
-handle_pipe_hop(struct pipe *__restrict self,
-                syscall_ulong_t cmd,
-                USER UNCHECKED void *arg,
-                iomode_t mode) {
+handle_pipe_hop(struct pipe *__restrict self, ioctl_t cmd,
+                USER UNCHECKED void *arg, iomode_t mode) {
 	switch (cmd) {
 
 	case HOP_PIPE_OPEN_PIPE: {
@@ -658,8 +654,7 @@ handle_pipe_reader_polltest(struct pipe_reader *__restrict self,
 }
 
 INTERN syscall_slong_t KCALL
-handle_pipe_reader_hop(struct pipe_reader *__restrict self,
-                       syscall_ulong_t cmd,
+handle_pipe_reader_hop(struct pipe_reader *__restrict self, ioctl_t cmd,
                        USER UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_hop(self->pr_pipe, cmd, arg,
 	                       (mode & ~IO_ACCMODE) |
@@ -719,8 +714,8 @@ handle_pipe_writer_polltest(struct pipe_writer *__restrict self, poll_mode_t wha
 }
 
 INTERN syscall_slong_t KCALL
-handle_pipe_writer_hop(struct pipe_writer *__restrict self,
-                       syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
+handle_pipe_writer_hop(struct pipe_writer *__restrict self, ioctl_t cmd,
+                       USER UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_hop(self->pw_pipe, cmd, arg,
 	                       (mode & ~IO_ACCMODE) |
 	                       IO_WRONLY);
@@ -756,20 +751,18 @@ handle_pipe_writer_awritev(struct pipe_writer *__restrict self,
 
 #if 0
 INTERN syscall_slong_t KCALL
-handle_pipe_ioctl(struct pipe *__restrict self,
-                  syscall_ulong_t cmd,
-                  USER UNCHECKED void *arg,
-                  iomode_t mode) {
+handle_pipe_ioctl(struct pipe *__restrict self, ioctl_t cmd,
+                  USER UNCHECKED void *arg, iomode_t mode) {
 	return 0;
 }
 INTERN syscall_slong_t KCALL
-handle_pipe_reader_ioctl(struct pipe_reader *__restrict self,
-                         syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
+handle_pipe_reader_ioctl(struct pipe_reader *__restrict self, ioctl_t cmd,
+                         USER UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_ioctl(self->pr_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_RDONLY);
 }
 INTERN syscall_slong_t KCALL
-handle_pipe_writer_ioctl(struct pipe_writer *__restrict self,
-                         syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
+handle_pipe_writer_ioctl(struct pipe_writer *__restrict self, ioctl_t cmd,
+                         USER UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_ioctl(self->pw_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_WRONLY);
 }
 #endif

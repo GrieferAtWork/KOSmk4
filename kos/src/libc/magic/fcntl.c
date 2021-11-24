@@ -44,6 +44,7 @@
 %[define_replacement(pos32_t = __pos32_t)]
 %[define_replacement(pos64_t = __pos64_t)]
 %[define_replacement(oflag_t = __oflag_t)]
+%[define_replacement(fcntl_t = __fcntl_t)]
 
 
 
@@ -1630,7 +1631,7 @@ int fallocate64($fd_t fd, __STDC_INT_AS_UINT_T mode,
 
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[vartypes(void *), guard, export_alias("__fcntl", "__libc_fcntl")]]
-__STDC_INT_AS_SSIZE_T fcntl($fd_t fd, __STDC_INT_AS_UINT_T cmd, ...);
+__STDC_INT_AS_SSIZE_T fcntl($fd_t fd, $fcntl_t cmd, ...);
 
 %[default:section(".text.crt{|.dos}.io.access")]
 

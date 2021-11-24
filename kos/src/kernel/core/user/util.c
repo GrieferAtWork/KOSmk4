@@ -39,7 +39,7 @@ DECL_BEGIN
 
 /* Read a boolean value from a a variable-sized (but defaulting to sizeof(int)) buffer `arg' */
 PUBLIC WUNUSED bool FCALL
-ioctl_intarg_getbool(syscall_ulong_t cmd,
+ioctl_intarg_getbool(ioctl_t cmd,
                      USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT) {
 	size_t i, argsz = _IOC_SIZE(cmd);
@@ -58,7 +58,7 @@ ioctl_intarg_getbool(syscall_ulong_t cmd,
 /* Write a boolean 0/1 value into a variable-sized (but defaulting to sizeof(int)) buffer `arg'
  * @return: 0 : Always returns `0' */
 PUBLIC syscall_slong_t FCALL
-ioctl_intarg_setbool(syscall_ulong_t cmd,
+ioctl_intarg_setbool(ioctl_t cmd,
                      USER UNCHECKED void *arg,
                      bool value)
 		THROWS(E_SEGFAULT) {
@@ -87,7 +87,7 @@ ioctl_intarg_setbool(syscall_ulong_t cmd,
 /* Read a 32-bit-value from a a variable-sized (but defaulting to 4) buffer `arg'
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 PUBLIC WUNUSED u32 FCALL
-ioctl_intarg_getu32(syscall_ulong_t cmd,
+ioctl_intarg_getu32(ioctl_t cmd,
                     USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	u32 result;
@@ -112,7 +112,7 @@ ioctl_intarg_getu32(syscall_ulong_t cmd,
 /* Read a 64-bit-value from a a variable-sized (but defaulting to 8) buffer `arg'
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 PUBLIC WUNUSED u64 FCALL
-ioctl_intarg_getu64(syscall_ulong_t cmd,
+ioctl_intarg_getu64(ioctl_t cmd,
                     USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	u64 result;
@@ -137,7 +137,7 @@ ioctl_intarg_getu64(syscall_ulong_t cmd,
 /* Write a 32-bit-value into a variable-sized (but defaulting to 4) buffer `arg'
  * @return: 0 : Always returns `0' */
 PUBLIC syscall_slong_t FCALL
-ioctl_intarg_setu32(syscall_ulong_t cmd, USER UNCHECKED void *arg, u32 value)
+ioctl_intarg_setu32(ioctl_t cmd, USER UNCHECKED void *arg, u32 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	size_t argsz = _IOC_SIZE(cmd);
 	if (argsz == 0)
@@ -159,7 +159,7 @@ ioctl_intarg_setu32(syscall_ulong_t cmd, USER UNCHECKED void *arg, u32 value)
 /* Write a 75-bit-value into a variable-sized (but defaulting to 8) buffer `arg'
  * @return: 0 : Always returns `0' */
 PUBLIC syscall_slong_t FCALL
-ioctl_intarg_setu64(syscall_ulong_t cmd, USER UNCHECKED void *arg, u64 value)
+ioctl_intarg_setu64(ioctl_t cmd, USER UNCHECKED void *arg, u64 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	size_t argsz = _IOC_SIZE(cmd);
 	if (argsz == 0)
@@ -196,7 +196,7 @@ DEFINE_PUBLIC_ALIAS(ioctl_intarg_setsize, ioctl_intarg_setu64);
  * - This function includes special handling for compatibility (if present and necessary)
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 PUBLIC WUNUSED size_t FCALL
-ioctl_intarg_getsize(syscall_ulong_t cmd,
+ioctl_intarg_getsize(ioctl_t cmd,
                      USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	size_t result;
@@ -229,7 +229,7 @@ ioctl_intarg_getsize(syscall_ulong_t cmd,
 /* Write a size_t-value into a variable-sized (but defaulting to sizeof(size_t)) buffer `arg'
  * @return: 0 : Always returns `0' */
 PUBLIC syscall_slong_t FCALL
-ioctl_intarg_setsize(syscall_ulong_t cmd, USER UNCHECKED void *arg, size_t value)
+ioctl_intarg_setsize(ioctl_t cmd, USER UNCHECKED void *arg, size_t value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	size_t argsz = _IOC_SIZE(cmd);
 	if (argsz == 0) {

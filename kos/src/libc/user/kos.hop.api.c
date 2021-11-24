@@ -28,12 +28,12 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_hop,hash:CRC-32=0xadf62b1e]]]*/
+/*[[[head:libc_hop,hash:CRC-32=0x2e52d779]]]*/
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 INTERN ATTR_SECTION(".text.crt.kos.syscalls") syscall_slong_t
 NOTHROW_NCX(VLIBCCALL libc_hop)(fd_t fd,
-                                syscall_ulong_t cmd,
+                                ioctl_t cmd,
                                 ...)
 /*[[[body:libc_hop]]]*/
 {
@@ -46,12 +46,12 @@ NOTHROW_NCX(VLIBCCALL libc_hop)(fd_t fd,
 }
 /*[[[end:libc_hop]]]*/
 
-/*[[[head:libc_hopf,hash:CRC-32=0xd730ae8e]]]*/
+/*[[[head:libc_hopf,hash:CRC-32=0x44dd98f9]]]*/
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 INTERN ATTR_SECTION(".text.crt.kos.syscalls") syscall_slong_t
 NOTHROW_NCX(VLIBCCALL libc_hopf)(fd_t fd,
-                                 syscall_ulong_t cmd,
+                                 ioctl_t cmd,
                                  iomode_t mode,
                                  ...)
 /*[[[body:libc_hopf]]]*/

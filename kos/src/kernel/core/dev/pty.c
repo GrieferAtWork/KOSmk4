@@ -64,10 +64,8 @@ ptyslave_v_oprinter(struct terminal *__restrict term,
 
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-ptyslave_v_ioctl(struct mfile *__restrict self,
-                 syscall_ulong_t cmd,
-                 USER UNCHECKED void *arg,
-                 iomode_t mode)
+ptyslave_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	struct ptyslave *me = mfile_asptyslave(self);
 	switch (cmd) {
@@ -223,7 +221,7 @@ again_write:
 
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-ptymaster_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+ptymaster_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                   USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
 	struct ptymaster *me = mfile_asptymaster(self);

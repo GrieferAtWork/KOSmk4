@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4176535 */
+/* HASH CRC-32:0xce0fad55 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -895,7 +895,7 @@
 #define __NRAT2_rt_sigprocmask           (struct __sigset_struct *, struct __sigset_struct *)
 #define __NRAT3_rt_sigprocmask           (size_t, __size_t)
 #define __NRAT0_ioctl                    (fd_t, __fd_t)
-#define __NRAT1_ioctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_ioctl                    (ioctl_t, __ioctl_t)
 #define __NRAT2_ioctl                    (void *, void *)
 #define __NRAT0_pread64                  (fd_t, __fd_t)
 #define __NRAT1_pread64                  (void *, void *)
@@ -1036,7 +1036,7 @@
 #define __NRAT0_msgrcv                   (int, int)
 #define __NRAT0_msgctl                   (int, int)
 #define __NRAT0_fcntl                    (fd_t, __fd_t)
-#define __NRAT1_fcntl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_fcntl                    (fcntl_t, __fcntl_t)
 #define __NRAT2_fcntl                    (void *, void *)
 #define __NRAT0_flock                    (fd_t, __fd_t)
 #define __NRAT1_flock                    (syscall_ulong_t, __syscall_ulong_t)
@@ -1660,7 +1660,7 @@
 #define __NRAT1_fmkdirat                 (char const *, char const *)
 #define __NRAT2_fmkdirat                 (mode_t, __mode_t)
 #define __NRAT3_fmkdirat                 (atflag_t, __atflag_t)
-#define __NRAT0_ksysctl                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_ksysctl                  (ioctl_t, __ioctl_t)
 #define __NRAT1_ksysctl                  (void *, void *)
 #define __NRAT0_maplibrary               (void *, void *)
 #define __NRAT1_maplibrary               (syscall_ulong_t, __syscall_ulong_t)
@@ -1725,7 +1725,7 @@
 #define __NRAT3_pread64f                 (uint64_t, __uint64_t)
 #define __NRAT4_pread64f                 (iomode_t, __iomode_t)
 #define __NRAT0_ioctlf                   (fd_t, __fd_t)
-#define __NRAT1_ioctlf                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_ioctlf                   (ioctl_t, __ioctl_t)
 #define __NRAT2_ioctlf                   (iomode_t, __iomode_t)
 #define __NRAT3_ioctlf                   (void *, void *)
 #define __NRAT0_set_exception_handler    (syscall_ulong_t, __syscall_ulong_t)
@@ -1765,11 +1765,11 @@
 #define __NRAT0_kstat                    (char const *, char const *)
 #define __NRAT1_kstat                    (struct __kos_statx64 *, struct __kos_statx64 *)
 #define __NRAT0_hopf                     (fd_t, __fd_t)
-#define __NRAT1_hopf                     (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_hopf                     (ioctl_t, __ioctl_t)
 #define __NRAT2_hopf                     (iomode_t, __iomode_t)
 #define __NRAT3_hopf                     (void *, void *)
 #define __NRAT0_hop                      (fd_t, __fd_t)
-#define __NRAT1_hop                      (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_hop                      (ioctl_t, __ioctl_t)
 #define __NRAT2_hop                      (void *, void *)
 #define __NRAT0_writef                   (fd_t, __fd_t)
 #define __NRAT1_writef                   (void const *, void const *)
@@ -1801,7 +1801,7 @@
 #define __NRAM_rt_sigaction(a, b, c, d, e, f)             (__signo_t)a, (struct __sigactionx64 const *)b, (struct __sigactionx64 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigreturn(a, b, c, d, e, f)             /* nothing */
-#define __NRAM_ioctl(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NRAM_ioctl(a, b, c, d, e, f)                    (__fd_t)a, (__ioctl_t)b, (void *)c
 #define __NRAM_pread64(a, b, c, d, e, f)                  (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d
 #define __NRAM_pwrite64(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d
 #define __NRAM_readv(a, b, c, d, e, f)                    (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c
@@ -1857,7 +1857,7 @@
 #define __NRAM_msgsnd(a, b, c, d, e, f)                   (int)a
 #define __NRAM_msgrcv(a, b, c, d, e, f)                   (int)a
 #define __NRAM_msgctl(a, b, c, d, e, f)                   (int)a
-#define __NRAM_fcntl(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NRAM_fcntl(a, b, c, d, e, f)                    (__fd_t)a, (__fcntl_t)b, (void *)c
 #define __NRAM_flock(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b
 #define __NRAM_fsync(a, b, c, d, e, f)                    (__fd_t)a
 #define __NRAM_fdatasync(a, b, c, d, e, f)                (__fd_t)a
@@ -2143,7 +2143,7 @@
 #define __NRAM_kfstatat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
 #define __NRAM_fmknodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NRAM_fmkdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
-#define __NRAM_ksysctl(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (void *)b
+#define __NRAM_ksysctl(a, b, c, d, e, f)                  (__ioctl_t)a, (void *)b
 #define __NRAM_maplibrary(a, b, c, d, e, f)               (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr const *)d, (__size_t)e
 #define __NRAM_fsmode(a, b, c, d, e, f)                   (__uint64_t)a
 #define __NRAM_fchdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__atflag_t)c
@@ -2166,7 +2166,7 @@
 #define __NRAM_readvf(a, b, c, d, e, f)                   (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__iomode_t)d
 #define __NRAM_pwrite64f(a, b, c, d, e, f)                (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NRAM_pread64f(a, b, c, d, e, f)                 (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
-#define __NRAM_ioctlf(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
+#define __NRAM_ioctlf(a, b, c, d, e, f)                   (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
 #define __NRAM_set_exception_handler(a, b, c, d, e, f)    (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NRAM_get_exception_handler(a, b, c, d, e, f)    (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
 #define __NRAM_openpty(a, b, c, d, e, f)                  (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
@@ -2179,8 +2179,8 @@
 #define __NRAM_klstat(a, b, c, d, e, f)                   (char const *)a, (struct __kos_statx64 *)b
 #define __NRAM_kfstat(a, b, c, d, e, f)                   (__fd_t)a, (struct __kos_statx64 *)b
 #define __NRAM_kstat(a, b, c, d, e, f)                    (char const *)a, (struct __kos_statx64 *)b
-#define __NRAM_hopf(a, b, c, d, e, f)                     (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
-#define __NRAM_hop(a, b, c, d, e, f)                      (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NRAM_hopf(a, b, c, d, e, f)                     (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
+#define __NRAM_hop(a, b, c, d, e, f)                      (__fd_t)a, (__ioctl_t)b, (void *)c
 #define __NRAM_writef(a, b, c, d, e, f)                   (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */

@@ -145,7 +145,7 @@ struct handle_types {
 	/* Perform an ioctl() operation.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
-	syscall_slong_t (BLOCKING NONNULL((1)) KCALL *h_ioctl[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t cmd,
+	syscall_slong_t (BLOCKING NONNULL((1)) KCALL *h_ioctl[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, ioctl_t cmd,
 	                                                                          USER UNCHECKED void *arg, iomode_t mode)
 			/*THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...)*/;
 
@@ -183,7 +183,7 @@ struct handle_types {
 
 	/* Implement handle control operations (s.a. `<kos/hop/[...].h>')
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment) */
-	syscall_slong_t (BLOCKING NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t cmd,
+	syscall_slong_t (BLOCKING NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, ioctl_t cmd,
 	                                                                        USER UNCHECKED void *arg, iomode_t mode)
 			/*THROWS(...)*/;
 
@@ -650,7 +650,7 @@ handle_installinto_sym(unsigned int dst_fd,
  * @param: cmd: One of `F_*' from <kos/io.h> */
 FUNDEF NONNULL((1)) syscall_ulong_t KCALL
 handle_fcntl(struct handle_manager *__restrict self,
-             unsigned int fd, syscall_ulong_t cmd,
+             unsigned int fd, fcntl_t cmd,
              UNCHECKED USER void *arg)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,

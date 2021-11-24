@@ -110,42 +110,37 @@ FUNDEF void KCALL validate_executable_opt(UNCHECKED USER void const *base) THROW
 
 /* Read a boolean value from a a variable-sized (but defaulting to sizeof(int)) buffer `arg' */
 FUNDEF WUNUSED __BOOL FCALL
-ioctl_intarg_getbool(syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg)
+ioctl_intarg_getbool(ioctl_t cmd, USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT);
 
 /* Write a boolean 0/1 value into a variable-sized (but defaulting to sizeof(int)) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setbool(syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg,
-                     __BOOL value)
+ioctl_intarg_setbool(ioctl_t cmd, USER UNCHECKED void *arg, __BOOL value)
 		THROWS(E_SEGFAULT);
 
 /* Read a 32-bit-value from a a variable-sized (but defaulting to 4) buffer `arg'
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 FUNDEF WUNUSED u32 FCALL
-ioctl_intarg_getu32(syscall_ulong_t cmd,
-                    USER UNCHECKED void *arg)
+ioctl_intarg_getu32(ioctl_t cmd, USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Read a 64-bit-value from a a variable-sized (but defaulting to 8) buffer `arg'
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 FUNDEF WUNUSED u64 FCALL
-ioctl_intarg_getu64(syscall_ulong_t cmd,
-                    USER UNCHECKED void *arg)
+ioctl_intarg_getu64(ioctl_t cmd, USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Write a 32-bit-value into a variable-sized (but defaulting to 4) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setu32(syscall_ulong_t cmd, USER UNCHECKED void *arg, u32 value)
+ioctl_intarg_setu32(ioctl_t cmd, USER UNCHECKED void *arg, u32 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Write a 75-bit-value into a variable-sized (but defaulting to 8) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setu64(syscall_ulong_t cmd, USER UNCHECKED void *arg, u64 value)
+ioctl_intarg_setu64(ioctl_t cmd, USER UNCHECKED void *arg, u64 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 #if __SIZEOF_INT__ >= 8
@@ -161,14 +156,13 @@ ioctl_intarg_setu64(syscall_ulong_t cmd, USER UNCHECKED void *arg, u64 value)
  * - This function includes special handling for compatibility (if present and necessary)
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
 FUNDEF WUNUSED size_t FCALL
-ioctl_intarg_getsize(syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg)
+ioctl_intarg_getsize(ioctl_t cmd, USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Write a size_t-value into a variable-sized (but defaulting to sizeof(size_t)) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
-ioctl_intarg_setsize(syscall_ulong_t cmd, USER UNCHECKED void *arg, size_t value)
+ioctl_intarg_setsize(ioctl_t cmd, USER UNCHECKED void *arg, size_t value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 

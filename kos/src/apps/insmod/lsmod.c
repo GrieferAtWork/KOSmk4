@@ -46,7 +46,7 @@ PRIVATE fd_t OpenDriverList(void) {
 }
 
 PRIVATE size_t
-GetDriverStringBuf(fd_t driver, syscall_ulong_t cmd,
+GetDriverStringBuf(fd_t driver, ioctl_t cmd,
                    u64 index, char *buf, size_t buflen) {
 	struct hop_driver_string h;
 	memset(&h, 0, sizeof(h));
@@ -60,7 +60,7 @@ GetDriverStringBuf(fd_t driver, syscall_ulong_t cmd,
 
 PRIVATE char *
 GetDriverString(fd_t driver,
-                syscall_ulong_t cmd, u64 index,
+                ioctl_t cmd, u64 index,
                 size_t *pstringlen_with_nul) {
 	size_t buflen = 256;
 	size_t new_buflen;
@@ -84,7 +84,7 @@ again_getpath:
 }
 
 PRIVATE fd_t
-OpenDriverDependency(fd_t driver, syscall_ulong_t cmd, u64 index) {
+OpenDriverDependency(fd_t driver, ioctl_t cmd, u64 index) {
 	struct hop_driver_open_dependency d;
 	memset(&d, 0, sizeof(d));
 	d.dod_struct_size     = sizeof(d);

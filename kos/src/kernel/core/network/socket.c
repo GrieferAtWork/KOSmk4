@@ -1852,7 +1852,7 @@ done:
 /* Custom I/O control command handler for this socket type.
  * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
+socket_ioctl(struct socket *__restrict self, ioctl_t cmd,
              USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	syscall_slong_t result;
@@ -2017,7 +2017,7 @@ handle_socket_stat(struct socket *__restrict self,
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_socket_hop(struct socket *__restrict self, syscall_ulong_t cmd,
+handle_socket_hop(struct socket *__restrict self, ioctl_t cmd,
                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35a00ea1 */
+/* HASH CRC-32:0x22142997 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -895,7 +895,7 @@
 #define __NR64AT2_rt_sigprocmask           (struct __sigset_struct *, struct __sigset_struct *)
 #define __NR64AT3_rt_sigprocmask           (size_t, __size_t)
 #define __NR64AT0_ioctl                    (fd_t, __fd_t)
-#define __NR64AT1_ioctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_ioctl                    (ioctl_t, __ioctl_t)
 #define __NR64AT2_ioctl                    (void *, void *)
 #define __NR64AT0_pread64                  (fd_t, __fd_t)
 #define __NR64AT1_pread64                  (void *, void *)
@@ -1036,7 +1036,7 @@
 #define __NR64AT0_msgrcv                   (int, int)
 #define __NR64AT0_msgctl                   (int, int)
 #define __NR64AT0_fcntl                    (fd_t, __fd_t)
-#define __NR64AT1_fcntl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_fcntl                    (fcntl_t, __fcntl_t)
 #define __NR64AT2_fcntl                    (void *, void *)
 #define __NR64AT0_flock                    (fd_t, __fd_t)
 #define __NR64AT1_flock                    (syscall_ulong_t, __syscall_ulong_t)
@@ -1660,7 +1660,7 @@
 #define __NR64AT1_fmkdirat                 (char const *, char const *)
 #define __NR64AT2_fmkdirat                 (mode_t, __mode_t)
 #define __NR64AT3_fmkdirat                 (atflag_t, __atflag_t)
-#define __NR64AT0_ksysctl                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_ksysctl                  (ioctl_t, __ioctl_t)
 #define __NR64AT1_ksysctl                  (void *, void *)
 #define __NR64AT0_maplibrary               (void *, void *)
 #define __NR64AT1_maplibrary               (syscall_ulong_t, __syscall_ulong_t)
@@ -1725,7 +1725,7 @@
 #define __NR64AT3_pread64f                 (uint64_t, __uint64_t)
 #define __NR64AT4_pread64f                 (iomode_t, __iomode_t)
 #define __NR64AT0_ioctlf                   (fd_t, __fd_t)
-#define __NR64AT1_ioctlf                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_ioctlf                   (ioctl_t, __ioctl_t)
 #define __NR64AT2_ioctlf                   (iomode_t, __iomode_t)
 #define __NR64AT3_ioctlf                   (void *, void *)
 #define __NR64AT0_set_exception_handler    (syscall_ulong_t, __syscall_ulong_t)
@@ -1765,11 +1765,11 @@
 #define __NR64AT0_kstat                    (char const *, char const *)
 #define __NR64AT1_kstat                    (struct __kos_statx64 *, struct __kos_statx64 *)
 #define __NR64AT0_hopf                     (fd_t, __fd_t)
-#define __NR64AT1_hopf                     (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_hopf                     (ioctl_t, __ioctl_t)
 #define __NR64AT2_hopf                     (iomode_t, __iomode_t)
 #define __NR64AT3_hopf                     (void *, void *)
 #define __NR64AT0_hop                      (fd_t, __fd_t)
-#define __NR64AT1_hop                      (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_hop                      (ioctl_t, __ioctl_t)
 #define __NR64AT2_hop                      (void *, void *)
 #define __NR64AT0_writef                   (fd_t, __fd_t)
 #define __NR64AT1_writef                   (void const *, void const *)
@@ -1801,7 +1801,7 @@
 #define __NR64AM_rt_sigaction(a, b, c, d, e, f)             (__signo_t)a, (struct __sigactionx64 const *)b, (struct __sigactionx64 *)c, (__size_t)d
 #define __NR64AM_rt_sigprocmask(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NR64AM_rt_sigreturn(a, b, c, d, e, f)             /* nothing */
-#define __NR64AM_ioctl(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NR64AM_ioctl(a, b, c, d, e, f)                    (__fd_t)a, (__ioctl_t)b, (void *)c
 #define __NR64AM_pread64(a, b, c, d, e, f)                  (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d
 #define __NR64AM_pwrite64(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d
 #define __NR64AM_readv(a, b, c, d, e, f)                    (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c
@@ -1857,7 +1857,7 @@
 #define __NR64AM_msgsnd(a, b, c, d, e, f)                   (int)a
 #define __NR64AM_msgrcv(a, b, c, d, e, f)                   (int)a
 #define __NR64AM_msgctl(a, b, c, d, e, f)                   (int)a
-#define __NR64AM_fcntl(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NR64AM_fcntl(a, b, c, d, e, f)                    (__fd_t)a, (__fcntl_t)b, (void *)c
 #define __NR64AM_flock(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b
 #define __NR64AM_fsync(a, b, c, d, e, f)                    (__fd_t)a
 #define __NR64AM_fdatasync(a, b, c, d, e, f)                (__fd_t)a
@@ -2143,7 +2143,7 @@
 #define __NR64AM_kfstatat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
 #define __NR64AM_fmknodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NR64AM_fmkdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
-#define __NR64AM_ksysctl(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (void *)b
+#define __NR64AM_ksysctl(a, b, c, d, e, f)                  (__ioctl_t)a, (void *)b
 #define __NR64AM_maplibrary(a, b, c, d, e, f)               (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr const *)d, (__size_t)e
 #define __NR64AM_fsmode(a, b, c, d, e, f)                   (__uint64_t)a
 #define __NR64AM_fchdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__atflag_t)c
@@ -2166,7 +2166,7 @@
 #define __NR64AM_readvf(a, b, c, d, e, f)                   (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__iomode_t)d
 #define __NR64AM_pwrite64f(a, b, c, d, e, f)                (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NR64AM_pread64f(a, b, c, d, e, f)                 (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
-#define __NR64AM_ioctlf(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
+#define __NR64AM_ioctlf(a, b, c, d, e, f)                   (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
 #define __NR64AM_set_exception_handler(a, b, c, d, e, f)    (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NR64AM_get_exception_handler(a, b, c, d, e, f)    (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
 #define __NR64AM_openpty(a, b, c, d, e, f)                  (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
@@ -2179,8 +2179,8 @@
 #define __NR64AM_klstat(a, b, c, d, e, f)                   (char const *)a, (struct __kos_statx64 *)b
 #define __NR64AM_kfstat(a, b, c, d, e, f)                   (__fd_t)a, (struct __kos_statx64 *)b
 #define __NR64AM_kstat(a, b, c, d, e, f)                    (char const *)a, (struct __kos_statx64 *)b
-#define __NR64AM_hopf(a, b, c, d, e, f)                     (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
-#define __NR64AM_hop(a, b, c, d, e, f)                      (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NR64AM_hopf(a, b, c, d, e, f)                     (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
+#define __NR64AM_hop(a, b, c, d, e, f)                      (__fd_t)a, (__ioctl_t)b, (void *)c
 #define __NR64AM_writef(a, b, c, d, e, f)                   (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */

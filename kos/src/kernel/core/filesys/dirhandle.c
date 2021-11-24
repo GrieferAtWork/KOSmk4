@@ -318,7 +318,7 @@ do_normal_seek:
 }
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
-handle_dirhandle_ioctl(struct dirhandle *__restrict self, syscall_ulong_t cmd,
+handle_dirhandle_ioctl(struct dirhandle *__restrict self, ioctl_t cmd,
                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return fdirenum_ioctl(&self->dh_enum, cmd, arg, mode);
 }
@@ -330,7 +330,7 @@ handle_dirhandle_stat(struct dirhandle *__restrict self,
 }
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
-handle_dirhandle_hop(struct dirhandle *__restrict self, syscall_ulong_t cmd,
+handle_dirhandle_hop(struct dirhandle *__restrict self, ioctl_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	/* XXX: dirhandle-specific HOPs? */
 	return mfile_uhop(self->dh_enum.de_dir, cmd, arg, mode);

@@ -90,7 +90,7 @@ struct fdirenum_ops {
 	 * directory reader. When `NULL', do `mfile_uioctl()' on the associated
 	 * directory instead. */
 	BLOCKING NONNULL((1)) syscall_slong_t
-	(KCALL *deo_ioctl)(struct fdirenum *__restrict self, syscall_ulong_t cmd,
+	(KCALL *deo_ioctl)(struct fdirenum *__restrict self, ioctl_t cmd,
 	                   USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 };

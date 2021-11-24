@@ -79,7 +79,7 @@ handle_fifohandle_writev(struct fifohandle *__restrict self,
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_fifohandle_ioctl(struct fifohandle *__restrict self, syscall_ulong_t cmd,
+handle_fifohandle_ioctl(struct fifohandle *__restrict self, ioctl_t cmd,
                         USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return mfile_uioctl(self->fu_fifo, cmd, arg, mode);
 }
@@ -119,7 +119,7 @@ handle_fifohandle_polltest(struct fifohandle *__restrict self,
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_fifohandle_hop(struct fifohandle *__restrict self, syscall_ulong_t cmd,
+handle_fifohandle_hop(struct fifohandle *__restrict self, ioctl_t cmd,
                       USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return ffifonode_v_hop(self->fu_fifo, cmd, arg, mode);
 }

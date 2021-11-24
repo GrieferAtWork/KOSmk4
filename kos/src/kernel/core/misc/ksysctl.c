@@ -140,7 +140,7 @@ load_driver_from_file_handles(unsigned int fd_node,
 
 #ifdef __ARCH_WANT_SYSCALL_KSYSCTL
 DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
-                syscall_ulong_t, command,
+                ioctl_t, command,
                 USER UNCHECKED void *, arg) {
 	switch (command) {
 

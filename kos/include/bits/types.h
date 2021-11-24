@@ -25,6 +25,7 @@
 
 #include <__crt.h>
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/typecore.h>
 
@@ -180,6 +181,12 @@ __DECL_BEGIN
 #ifndef __SIZEOF_SA_FAMILY_T__
 #define __SIZEOF_SA_FAMILY_T__      2
 #endif /* !__SIZEOF_SA_FAMILY_T__ */
+#ifndef __SIZEOF_IOCTL_T__
+#define __SIZEOF_IOCTL_T__          __SIZEOF_SYSCALL_LONG_T__
+#endif /* !__SIZEOF_IOCTL_T__ */
+#ifndef __SIZEOF_FCNTL_T__
+#define __SIZEOF_FCNTL_T__          __SIZEOF_INT__
+#endif /* !__SIZEOF_FCNTL_T__ */
 
 
 #ifdef __CC__
@@ -406,6 +413,8 @@ typedef __bitwise__ __UINT64_TYPE__ __be64;
 #define __time32_t        __CRT_PRIVATE_SINT(__SIZEOF_TIME32_T__)
 #define _TIME64_T_DEFINED 1
 #define __time64_t        __CRT_PRIVATE_SINT(__SIZEOF_TIME64_T__)
+#define __ioctl_t         __CRT_PRIVATE_ULNG(__SIZEOF_IOCTL_T__) /* Type for `ioctl(2)'s `cmd' argument. */
+#define __fcntl_t         __CRT_PRIVATE_UINT(__SIZEOF_FCNTL_T__) /* Type for `fcntl(2)'s `cmd' argument. */
 
 /* Types that change sign based on feature flags. */
 #ifdef __USE_KOS_ALTERATIONS

@@ -99,7 +99,7 @@ handle_path_seek(struct path *__restrict self,
 }
 
 INTDEF NONNULL((1)) syscall_slong_t KCALL
-handle_path_ioctl(struct path *__restrict self, syscall_ulong_t cmd,
+handle_path_ioctl(struct path *__restrict self, ioctl_t cmd,
                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return mfile_uioctl(self->p_dir, cmd, arg, mode);
 }
@@ -163,7 +163,7 @@ handle_path_polltest(struct path *__restrict self,
 }
 
 INTDEF NONNULL((1)) syscall_slong_t KCALL
-handle_path_hop(struct path *__restrict self, syscall_ulong_t cmd,
+handle_path_hop(struct path *__restrict self, ioctl_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	/* TODO: PATH-specific HOP commands */
 	return mfile_uhop(self->p_dir, cmd, arg, mode);

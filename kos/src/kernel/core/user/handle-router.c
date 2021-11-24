@@ -320,7 +320,7 @@ INTERN BLOCKING WUNUSED NONNULL((1, 2)) ATTR_SECTION(".text.kernel.handle_undefi
 INTERN BLOCKING NONNULL((1, 2)) ATTR_SECTION(".text.kernel.handle_undefined.pwritev") size_t KCALL handle_undefined_pwritev(void *__restrict UNUSED(self), struct iov_buffer *__restrict UNUSED(src), size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PWRITE); }
 INTERN BLOCKING WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.readdir") size_t KCALL handle_undefined_readdir(void *__restrict UNUSED(self), USER CHECKED struct dirent *UNUSED(buf), size_t UNUSED(bufsize), readdir_mode_t UNUSED(readdir_mode), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READDIR); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.seek") pos_t KCALL handle_undefined_seek(void *__restrict UNUSED(self), off_t UNUSED(offset), unsigned int UNUSED(whence)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SEEK); }
-INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.ioctl") syscall_slong_t KCALL handle_undefined_ioctl(void *__restrict UNUSED(self), syscall_ulong_t cmd, USER UNCHECKED void *UNUSED(arg), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND, cmd); }
+INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.ioctl") syscall_slong_t KCALL handle_undefined_ioctl(void *__restrict UNUSED(self), ioctl_t cmd, USER UNCHECKED void *UNUSED(arg), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND, cmd); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.truncate") void KCALL handle_undefined_truncate(void *__restrict UNUSED(self), pos_t UNUSED(new_size)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_TRUNC); }
 INTERN BLOCKING NONNULL((1, 2)) ATTR_SECTION(".text.kernel.handle_undefined.mmap") void KCALL handle_undefined_mmap(void *__restrict UNUSED(self), struct handle_mmap_info *__restrict UNUSED(info)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_MMAP); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.allocate") pos_t KCALL handle_undefined_allocate(void *__restrict UNUSED(self), fallocate_mode_t UNUSED(mode), pos_t UNUSED(start), pos_t UNUSED(length)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_ALLOCATE); }
@@ -329,7 +329,7 @@ INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.datasyn
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.stat") void KCALL handle_undefined_stat(void *__restrict UNUSED(self), USER CHECKED struct stat *UNUSED(result)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.pollconnect") void KCALL handle_undefined_pollconnect(void *__restrict UNUSED(self), poll_mode_t UNUSED(what)) THROWS(...) {  }
 INTERN BLOCKING WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.polltest") poll_mode_t KCALL handle_undefined_polltest(void *__restrict UNUSED(self), poll_mode_t UNUSED(what)) THROWS(...) { return 0; }
-INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.hop") syscall_slong_t KCALL handle_undefined_hop(void *__restrict UNUSED(self), syscall_ulong_t cmd, USER UNCHECKED void *UNUSED(arg), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND, cmd); }
+INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.hop") syscall_slong_t KCALL handle_undefined_hop(void *__restrict UNUSED(self), ioctl_t cmd, USER UNCHECKED void *UNUSED(arg), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND, cmd); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.tryas") REF void *KCALL handle_undefined_tryas(void *__restrict UNUSED(self), uintptr_half_t UNUSED(wanted_type)) THROWS(E_WOULDBLOCK) { return NULL; }
 INTERN BLOCKING NONNULL((1, 2)) ATTR_SECTION(".text.kernel.handle_undefined.printlink") ssize_t KCALL handle_undefined_printlink(void *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) { return handle_generic_printlink(self, HANDLE_TYPE_UNDEFINED, printer, arg); }
 
@@ -733,26 +733,26 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_refcountable_seek
 	},
 	.h_ioctl = {
-		[HANDLE_TYPE_UNDEFINED]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_ioctl,
-		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_ioctl,
-		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirent_ioctl,
-		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_ioctl,
-		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_ioctl,
-		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_ioctl,
-		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_ioctl,
-		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_ioctl,
-		[HANDLE_TYPE_EPOLL]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_epoll_ioctl,
-		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_ioctl,
-		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_ioctl,
-		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_ioctl,
-		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_ioctl,
-		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_ioctl,
-		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_ioctl,
-		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_ioctl,
-		[HANDLE_TYPE_TASK]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_task_ioctl,
-		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_ioctl,
-		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_ioctl,
-		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_ioctl
+		[HANDLE_TYPE_UNDEFINED]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_undefined_ioctl,
+		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_mfile_ioctl,
+		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirent_ioctl,
+		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_path_ioctl,
+		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_ioctl,
+		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_ioctl,
+		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_ioctl,
+		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_socket_ioctl,
+		[HANDLE_TYPE_EPOLL]           = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_epoll_ioctl,
+		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_ioctl,
+		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_ioctl,
+		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_ioctl,
+		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_ioctl,
+		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_ioctl,
+		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_ioctl,
+		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_ioctl,
+		[HANDLE_TYPE_TASK]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_task_ioctl,
+		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_module_ioctl,
+		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_ioctl,
+		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_ioctl
 	},
 	.h_truncate = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, pos_t))&handle_undefined_truncate,
@@ -931,26 +931,26 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_REFCOUNTABLE]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_polltest
 	},
 	.h_hop = {
-		[HANDLE_TYPE_UNDEFINED]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
-		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_hop,
-		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirent_hop,
-		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_hop,
-		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_hop,
-		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_hop,
-		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_hop,
-		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_hop,
-		[HANDLE_TYPE_EPOLL]           = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_epoll_hop,
-		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_hop,
-		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_hop,
-		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_hop,
-		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_hop,
-		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_hop,
-		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_hop,
-		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_hop,
-		[HANDLE_TYPE_TASK]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_task_hop,
-		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_hop,
-		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_hop,
-		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_hop
+		[HANDLE_TYPE_UNDEFINED]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
+		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_mfile_hop,
+		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirent_hop,
+		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_path_hop,
+		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_hop,
+		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_hop,
+		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_hop,
+		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_socket_hop,
+		[HANDLE_TYPE_EPOLL]           = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_epoll_hop,
+		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_hop,
+		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_hop,
+		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_hop,
+		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_hop,
+		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_hop,
+		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_hop,
+		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_hop,
+		[HANDLE_TYPE_TASK]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_task_hop,
+		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_module_hop,
+		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_hop,
+		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_hop
 	},
 	.h_tryas = {
 		[HANDLE_TYPE_UNDEFINED]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_undefined_tryas,

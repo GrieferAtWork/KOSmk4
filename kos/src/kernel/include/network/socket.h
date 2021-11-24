@@ -537,7 +537,7 @@ struct socket_ops {
 	 * Custom I/O control command handler for this socket type.
 	 * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
 	NONNULL((1)) syscall_slong_t
-	(KCALL *so_ioctl)(struct socket *__restrict self, syscall_ulong_t cmd,
+	(KCALL *so_ioctl)(struct socket *__restrict self, ioctl_t cmd,
 	                  USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
@@ -1039,7 +1039,7 @@ socket_setsockopt(struct socket *__restrict self,
 /* Custom I/O control command handler for this socket type.
  * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
+socket_ioctl(struct socket *__restrict self, ioctl_t cmd,
              USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 

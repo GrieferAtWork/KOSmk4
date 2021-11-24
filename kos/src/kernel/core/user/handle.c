@@ -2146,7 +2146,7 @@ ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
 /* The kernel-space equivalent of the user-space `fcntl()' function. */
 PUBLIC NONNULL((1)) syscall_ulong_t KCALL
 handle_fcntl(struct handle_manager *__restrict self,
-             unsigned int fd, syscall_ulong_t cmd,
+             unsigned int fd, fcntl_t cmd,
              UNCHECKED USER void *arg)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,

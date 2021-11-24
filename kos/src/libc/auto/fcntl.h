@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7383e59 */
+/* HASH CRC-32:0x91b319f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_name_to_handle_at)(fd_t dirfd, char const *
 INTDEF fd_t NOTHROW_RPC(LIBDCALL libd_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET offset, __PIO_OFFSET length);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate64)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fcntl)(fd_t fd, __STDC_INT_AS_UINT_T cmd, ...);
+INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fcntl)(fd_t fd, fcntl_t cmd, ...);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length, __STDC_INT_AS_UINT_T advise);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fallocate)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length, __STDC_INT_AS_UINT_T advise);

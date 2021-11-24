@@ -290,6 +290,16 @@ typedef __gid_t gid_t; /* Group ID */
 #endif /* !__KERNEL__ */
 #endif /* !__gid_t_defined */
 
+#ifndef __ioctl_t_defined
+#define __ioctl_t_defined
+typedef __ioctl_t ioctl_t;
+#endif /* !__ioctl_t_defined */
+
+#ifndef __fcntl_t_defined
+#define __fcntl_t_defined
+typedef __fcntl_t fcntl_t;
+#endif /* !__fcntl_t_defined */
+
 #ifndef __char16_t_defined
 #define __char16_t_defined
 typedef __CHAR16_TYPE__ char16_t;

@@ -56,7 +56,7 @@ ansittydev_v_write(struct mfile *__restrict self,
 
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ansittydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+ansittydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct ansittydev *me = mfile_asansitty(self);
 	switch (cmd) {

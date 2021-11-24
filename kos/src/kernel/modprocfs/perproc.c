@@ -36,10 +36,12 @@ DECL_END
 #include <kernel/fs/node.h>
 #include <kernel/fs/printnode.h>
 #include <kernel/fs/super.h>
+#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/user.h>
 #include <sched/pid.h>
 
+#include <kos/ioctl/task.h>
 #include <kos/kernel/handle.h>
 
 #include <assert.h>
@@ -648,6 +650,23 @@ procfs_perproc_root_v_enum(struct fdirenum *__restrict result) {
 	                         result);
 }
 
+#define procfs_perproc_root_v_hop fdirnode_v_hop
+
+PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
+procfs_perproc_root_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
+                            USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	struct fdirnode *me = mfile_asdir(self);
+
+	/* Forward ioctls from <kos/ioctl/task.h> to the bound taskpid object. */
+	if (_IOC_ISKOS(cmd) && _IOC_TYPE(cmd) == _IOC_TYPE(TASK_IOC_GETTID)) {
+		return (*handle_type_db.h_ioctl[HANDLE_TYPE_TASK])(me->dn_node.fn_fsdata,
+		                                                   cmd, arg, mode);
+	}
+
+	/* Fallback: do an ioctl on the directory itself. */
+	return fdirnode_v_ioctl(self, cmd, arg, mode);
+}
 
 PRIVATE WUNUSED NONNULL((1)) REF void *KCALL
 procfs_perproc_root_v_tryas(struct mfile *__restrict self,
@@ -663,8 +682,7 @@ procfs_perproc_root_v_tryas(struct mfile *__restrict self,
 		return incref(me->dn_node.fn_fsdata);
 	return NULL;
 }
-#define procfs_perproc_root_v_ioctl fdirnode_v_ioctl
-#define procfs_perproc_root_v_hop   fdirnode_v_hop
+
 
 PRIVATE struct mfile_stream_ops const procfs_perproc_root_v_stream_ops = {
 	.mso_open  = &fdirnode_v_open,

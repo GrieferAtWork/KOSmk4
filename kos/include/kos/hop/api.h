@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x324213c3 */
+/* HASH CRC-32:0x34287c17 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,13 +65,13 @@ __SYSDECL_BEGIN
 #define __hop_defined
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
-__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __CASMNAME_SAME("hop");
+__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hop)(__fd_t __fd, __ioctl_t __cmd, ...) __CASMNAME_SAME("hop");
 #endif /* !__hop_defined && __CRT_HAVE_hop */
 #if !defined(__hopf_defined) && defined(__CRT_HAVE_hopf)
 #define __hopf_defined
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
-__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __CASMNAME_SAME("hopf");
+__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __ioctl_t __cmd, __iomode_t __mode, ...) __CASMNAME_SAME("hopf");
 #endif /* !__hopf_defined && __CRT_HAVE_hopf */
 
 
@@ -82,13 +82,13 @@ __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_
 #define __Hop_defined
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
-__LIBC __syscall_slong_t (__VLIBCCALL Hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __THROWS(...) __CASMNAME_SAME("Hop");
+__LIBC __syscall_slong_t (__VLIBCCALL Hop)(__fd_t __fd, __ioctl_t __cmd, ...) __THROWS(...) __CASMNAME_SAME("Hop");
 #endif /* !__Hop_defined && __CRT_HAVE_Hop */
 #if !defined(__Hopf_defined) && defined(__CRT_HAVE_Hopf)
 #define __Hopf_defined
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
-__LIBC __syscall_slong_t (__VLIBCCALL Hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __THROWS(...) __CASMNAME_SAME("Hopf");
+__LIBC __syscall_slong_t (__VLIBCCALL Hopf)(__fd_t __fd, __ioctl_t __cmd, __iomode_t __mode, ...) __THROWS(...) __CASMNAME_SAME("Hopf");
 #endif /* !__Hopf_defined && __CRT_HAVE_Hopf */
 
 __SYSDECL_END

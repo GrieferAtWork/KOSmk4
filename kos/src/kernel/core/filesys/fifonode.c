@@ -302,14 +302,12 @@ ffifonode_v_stat(struct mfile *__restrict self,
 }
 
 INTDEF syscall_slong_t KCALL /* From "pipe.c" */
-_ringbuffer_pipe_tryhop(struct ringbuffer *__restrict self,
-                        syscall_ulong_t cmd,
-                        USER UNCHECKED void *arg,
-                        iomode_t mode);
+_ringbuffer_pipe_tryhop(struct ringbuffer *__restrict self, ioctl_t cmd,
+                        USER UNCHECKED void *arg, iomode_t mode);
 
 /* Implements some `HOP_PIPE_OPEN_*' commands */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
+ffifonode_v_hop(struct mfile *__restrict self, ioctl_t cmd,
                 USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	struct ffifonode *me = mfile_asfifo(self);

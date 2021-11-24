@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4046038 */
+/* HASH CRC-32:0x7c0a65f8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,8 +144,8 @@
 #define SYS_acct                         __NR_acct                         /* errno_t acct(char const *filename) */
 #define SYS_umount2                      __NR_umount2                      /* errno_t umount2(char const *special_file, syscall_ulong_t flags) */
 #define SYS_lock                         __NR_lock                         /* errno_t lock(void) */
-#define SYS_ioctl                        __NR_ioctl                        /* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t command, void *arg) */
-#define SYS_fcntl                        __NR_fcntl                        /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_ioctl                        __NR_ioctl                        /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
+#define SYS_fcntl                        __NR_fcntl                        /* syscall_slong_t fcntl(fd_t fd, fcntl_t command, void *arg) */
 #define SYS_mpx                          __NR_mpx                          /* errno_t mpx(void) */
 #define SYS_setpgid                      __NR_setpgid                      /* errno_t setpgid(pid_t pid, pid_t pgid) */
 #define SYS_ulimit                       __NR_ulimit                       /* errno_t ulimit(void) */
@@ -521,7 +521,7 @@
 /* @return: * : The actual number of read entries
  * @return: 0 : End-of-directory */
 #define SYS_getdents64                   __NR_getdents64                   /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
-#define SYS_fcntl64                      __NR_fcntl64                      /* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_fcntl64                      __NR_fcntl64                      /* syscall_slong_t fcntl64(fd_t fd, fcntl_t command, void *arg) */
 #define SYS_gettid                       __NR_gettid                       /* pid_t gettid(void) */
 #define SYS_readahead                    __NR_readahead                    /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
@@ -1131,7 +1131,7 @@
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
 #define SYS_rpc_serve                    __NR_rpc_serve                    /* errno_t rpc_serve(void) */
-#define SYS_ksysctl                      __NR_ksysctl                      /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+#define SYS_ksysctl                      __NR_ksysctl                      /* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
  * write  data from `count'  separate buffers, though  still return the actual
  * number of written bytes.
@@ -1177,7 +1177,7 @@
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define SYS_getrusage64                  __NR_getrusage64                  /* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 #define SYS_fsmode                       __NR_fsmode                       /* uint64_t fsmode(uint64_t mode) */
-#define SYS_ioctlf                       __NR_ioctlf                       /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+#define SYS_ioctlf                       __NR_ioctlf                       /* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
@@ -1547,7 +1547,7 @@
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 #define SYS_readf                        __NR_readf                        /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-#define SYS_hopf                         __NR_hopf                         /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-#define SYS_hop                          __NR_hop                          /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_hopf                         __NR_hopf                         /* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
+#define SYS_hop                          __NR_hop                          /* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 
 #endif /* !_I386_KOS_BITS_SYSCALLS32_H */

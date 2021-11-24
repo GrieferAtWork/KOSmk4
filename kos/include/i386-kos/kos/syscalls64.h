@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfff16f76 */
+/* HASH CRC-32:0xc332116d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -608,7 +608,7 @@ __CDECLARE_SC(,__errno_t,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __group),
 __CDECLARE_SC(,__errno_t,fchownat,(__fd_t __dirfd, char const *__filename, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dirfd,__filename,__owner,__group,__flags))
 #endif /* __CRT_HAVE_SC(fchownat) */
 #if __CRT_HAVE_SC(fcntl)
-__CDECLARE_SC(,__syscall_slong_t,fcntl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_SC(,__syscall_slong_t,fcntl,(__fd_t __fd, __fcntl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_SC(fcntl) */
 #if __CRT_HAVE_SC(fdatasync)
 /* Synchronize only the data of a file (not its descriptor which contains
@@ -897,10 +897,10 @@ __CDECLARE_SC(,__uid_t,getuid,(void),())
 __CDECLARE_SC(,__ssize_t,getxattr,(char const *__path, char const *__name, void *__buf, __size_t __bufsize),(__path,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_SC(getxattr) */
 #if __CRT_HAVE_SC(hop)
-__CDECLARE_SC(,__syscall_slong_t,hop,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_SC(,__syscall_slong_t,hop,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_SC(hop) */
 #if __CRT_HAVE_SC(hopf)
-__CDECLARE_SC(,__syscall_slong_t,hopf,(__fd_t __fd, __syscall_ulong_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
+__CDECLARE_SC(,__syscall_slong_t,hopf,(__fd_t __fd, __ioctl_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
 #endif /* __CRT_HAVE_SC(hopf) */
 #if __CRT_HAVE_SC(init_module)
 /* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
@@ -954,10 +954,10 @@ __CDECLARE_SC(,__errno_t,io_uring_register,(int __TODO_PROTOTYPE),(__TODO_PROTOT
 __CDECLARE_SC(,__errno_t,io_uring_setup,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(io_uring_setup) */
 #if __CRT_HAVE_SC(ioctl)
-__CDECLARE_SC(,__syscall_slong_t,ioctl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_SC(,__syscall_slong_t,ioctl,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_SC(ioctl) */
 #if __CRT_HAVE_SC(ioctlf)
-__CDECLARE_SC(,__syscall_slong_t,ioctlf,(__fd_t __fd, __syscall_ulong_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
+__CDECLARE_SC(,__syscall_slong_t,ioctlf,(__fd_t __fd, __ioctl_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
 #endif /* __CRT_HAVE_SC(ioctlf) */
 #if __CRT_HAVE_SC(ioperm)
 __CDECLARE_SC(,__errno_t,ioperm,(__syscall_ulong_t __from, __syscall_ulong_t __num, __syscall_ulong_t __turn_on),(__from,__num,__turn_on))
@@ -1016,7 +1016,7 @@ __CDECLARE_SC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t 
 __CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(kstat) */
 #if __CRT_HAVE_SC(ksysctl)
-__CDECLARE_SC(,__syscall_slong_t,ksysctl,(__syscall_ulong_t __command, void *__arg),(__command,__arg))
+__CDECLARE_SC(,__syscall_slong_t,ksysctl,(__ioctl_t __command, void *__arg),(__command,__arg))
 #endif /* __CRT_HAVE_SC(ksysctl) */
 #if __CRT_HAVE_SC(lchown)
 __CDECLARE_SC(,__errno_t,lchown,(char const *__filename, __uid_t __owner, __gid_t __group),(__filename,__owner,__group))
@@ -2770,7 +2770,7 @@ __CDECLARE_XSC(,__errno_t,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __group)
 __CDECLARE_XSC(,__errno_t,fchownat,(__fd_t __dirfd, char const *__filename, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dirfd,__filename,__owner,__group,__flags))
 #endif /* __CRT_HAVE_XSC(fchownat) */
 #if __CRT_HAVE_XSC(fcntl)
-__CDECLARE_XSC(,__syscall_slong_t,fcntl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_XSC(,__syscall_slong_t,fcntl,(__fd_t __fd, __fcntl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_XSC(fcntl) */
 #if __CRT_HAVE_XSC(fdatasync)
 /* Synchronize only the data of a file (not its descriptor which contains
@@ -3059,10 +3059,10 @@ __CDECLARE_XSC(,__uid_t,getuid,(void),())
 __CDECLARE_XSC(,__ssize_t,getxattr,(char const *__path, char const *__name, void *__buf, __size_t __bufsize),(__path,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_XSC(getxattr) */
 #if __CRT_HAVE_XSC(hop)
-__CDECLARE_XSC(,__syscall_slong_t,hop,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_XSC(,__syscall_slong_t,hop,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_XSC(hop) */
 #if __CRT_HAVE_XSC(hopf)
-__CDECLARE_XSC(,__syscall_slong_t,hopf,(__fd_t __fd, __syscall_ulong_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
+__CDECLARE_XSC(,__syscall_slong_t,hopf,(__fd_t __fd, __ioctl_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
 #endif /* __CRT_HAVE_XSC(hopf) */
 #if __CRT_HAVE_XSC(init_module)
 /* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
@@ -3116,10 +3116,10 @@ __CDECLARE_XSC(,__errno_t,io_uring_register,(int __TODO_PROTOTYPE),(__TODO_PROTO
 __CDECLARE_XSC(,__errno_t,io_uring_setup,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(io_uring_setup) */
 #if __CRT_HAVE_XSC(ioctl)
-__CDECLARE_XSC(,__syscall_slong_t,ioctl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
+__CDECLARE_XSC(,__syscall_slong_t,ioctl,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_XSC(ioctl) */
 #if __CRT_HAVE_XSC(ioctlf)
-__CDECLARE_XSC(,__syscall_slong_t,ioctlf,(__fd_t __fd, __syscall_ulong_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
+__CDECLARE_XSC(,__syscall_slong_t,ioctlf,(__fd_t __fd, __ioctl_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
 #endif /* __CRT_HAVE_XSC(ioctlf) */
 #if __CRT_HAVE_XSC(ioperm)
 __CDECLARE_XSC(,__errno_t,ioperm,(__syscall_ulong_t __from, __syscall_ulong_t __num, __syscall_ulong_t __turn_on),(__from,__num,__turn_on))
@@ -3178,7 +3178,7 @@ __CDECLARE_XSC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t
 __CDECLARE_XSC(,__errno_t,kstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(kstat) */
 #if __CRT_HAVE_XSC(ksysctl)
-__CDECLARE_XSC(,__syscall_slong_t,ksysctl,(__syscall_ulong_t __command, void *__arg),(__command,__arg))
+__CDECLARE_XSC(,__syscall_slong_t,ksysctl,(__ioctl_t __command, void *__arg),(__command,__arg))
 #endif /* __CRT_HAVE_XSC(ksysctl) */
 #if __CRT_HAVE_XSC(lchown)
 __CDECLARE_XSC(,__errno_t,lchown,(char const *__filename, __uid_t __owner, __gid_t __group),(__filename,__owner,__group))
