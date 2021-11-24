@@ -29,8 +29,8 @@
 #include <hybrid/minmax.h>
 
 #include <kos/exec/elf.h>
-#include <kos/hop/handle.h>
 #include <kos/io.h>
+#include <kos/ioctl/fd.h>
 #include <kos/syscalls.h>
 #include <sys/param.h>
 
@@ -323,15 +323,15 @@ INTERN struct atomic_rwlock DlModule_AllLock  = ATOMIC_RWLOCK_INIT;
 INTERN WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd) {
 	enum { MAX_RESERVED_FD = MAX_C(STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO) };
 	if unlikely((unsigned int)fd <= (unsigned int)MAX_RESERVED_FD) {
-		struct hop_openfd ofd;
+		struct openfd ofd;
 		syscall_slong_t error;
-		ofd.of_mode  = HOP_OPENFD_MODE_HINT;
+		ofd.of_mode  = OPENFD_MODE_HINT;
 		ofd.of_flags = IO_CLOEXEC;
 		ofd.of_hint  = MAX_RESERVED_FD + 1;
-		error = sys_hop(fd, HOP_HANDLE_REOPEN, &ofd);
-		if (E_ISOK(error)) {
+		error = sys_ioctl(fd, FD_IOC_DUPFD, &ofd);
+		if likely(E_ISOK(error)) {
 			sys_close(fd);
-			return (fd_t)ofd.of_hint;
+			return (fd_t)error;
 		}
 	}
 	return fd;

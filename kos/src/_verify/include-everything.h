@@ -638,7 +638,6 @@ incdir("");
 #include <kos/futexexpr.h>
 #include <kos/guid.h>
 #include <kos/hop/api.h>
-#include <kos/hop/handle.h>
 #include <kos/hop/module.h>
 #include <kos/hop/openfd.h>
 #include <kos/hop/pipe.h>
@@ -646,6 +645,7 @@ incdir("");
 #include <kos/hybrid/sched-signal.h>
 #include <kos/io.h>
 #include <kos/ioctl/_openfd.h>
+#include <kos/ioctl/fd.h>
 #include <kos/ioctl/file.h>
 #include <kos/ioctl/keyboard.h>
 #include <kos/ioctl/leaks.h>

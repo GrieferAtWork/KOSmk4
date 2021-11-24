@@ -1904,6 +1904,9 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 	 ((index) >= 0x5300 && (index) <= 0x5305) ? ((index) -= 0x5300, (result) = repr_KOS_IOCTLS_5300h, true) : \
 	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
 	 ((index) >= 0x5600 && (index) <= 0x5612) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : \
+	 ((index) >= 0x6600 && (index) <= 0x6603) ? ((index) -= 0x6600, (result) = repr_KOS_IOCTLS_6600h, true) : \
+	 ((index) >= 0x6680 && (index) <= 0x6685) ? ((index) -= 0x6680, (result) = repr_KOS_IOCTLS_6680h, true) : \
+	 ((index) >= 0x66c0 && (index) <= 0x66c1) ? ((index) -= 0x66c0, (result) = repr_KOS_IOCTLS_66c0h, true) : \
 	 ((index) >= 0x7000 && (index) <= 0x700c) ? ((index) -= 0x7000, (result) = repr_KOS_IOCTLS_7000h, true) : false)
 PRIVATE char const repr_KOS_IOCTLS_4601h[] =
 "FILE_IOC_TAILREAD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FILE_IOC_GETFSLINKMAX\0FILE_IOC_G"
@@ -1930,6 +1933,13 @@ PRIVATE char const repr_KOS_IOCTLS_5400h[] =
 PRIVATE char const repr_KOS_IOCTLS_5600h[] =
 "VID_IOC_ACTIVATE\0VID_IOC_MAKELCK\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0VID_IOC_GETTTYINF"
 "O\0VID_IOC_GETCELLDATA\0VID_IOC_GETCURSOR";
+PRIVATE char const repr_KOS_IOCTLS_6600h[] =
+"FD_IOC_NOOP\0FD_IOC_DUPFD\0FD_IOC_CAST\0FD_IOC_POLLTEST";
+PRIVATE char const repr_KOS_IOCTLS_6680h[] =
+"FD_IOC_GETTYPE\0FD_IOC_GETKIND\0FD_IOC_GETMODE\0FD_IOC_GETADDR\0FD_I"
+"OC_GETRADDR\0FD_IOC_GETREFCNT";
+PRIVATE char const repr_KOS_IOCTLS_66c0h[] =
+"FD_IOC_INCREF\0FD_IOC_DECREF";
 PRIVATE char const repr_KOS_IOCTLS_7000h[] =
 "TASK_IOC_GETTID\0TASK_IOC_GETPID\0TASK_IOC_GETPPID\0TASK_IOC_GETPGI"
 "D\0TASK_IOC_GETSID\0\0\0\0\0TASK_IOC_OPENPID\0TASK_IOC_OPENPPID\0TASK_IO"

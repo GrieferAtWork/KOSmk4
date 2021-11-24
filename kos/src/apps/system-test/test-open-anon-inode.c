@@ -25,19 +25,20 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/ioctl/fd.h>
 #include <kos/types.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <kos/hop/handle.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <sys/stat.h>
 
 DECL_BEGIN
 
@@ -125,9 +126,9 @@ DEFINE_TEST(open_anon_inode) {
 	 * is the same object as rw[0] */
 	{
 		uint64_t addr1, addr2;
-		error = hop(rw[0], HOP_HANDLE_GET_ADDRESS, &addr1);
+		error = ioctl(rw[0], FD_IOC_GETADDR, &addr1);
 		ASSERT_ERROR_OK(error == 0);
-		error = hop(dupres, HOP_HANDLE_GET_ADDRESS, &addr2);
+		error = ioctl(dupres, FD_IOC_GETADDR, &addr2);
 		ASSERT_ERROR_OK(error == 0);
 		assertf(addr1 == addr2,
 		        "Not the same kernel object: %I64p != %I64p",

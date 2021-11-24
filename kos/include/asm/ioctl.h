@@ -61,6 +61,7 @@
  *  KOS    0x53 ('S')  SVGA_IOC_*          <kos/ioctl/svga.h>
  *  KOS    0x54 ('T')  TTYIO_*             <kos/ioctl/tty.h>
  *  KOS    0x56 ('V')  VID_IOC_*           <kos/ioctl/video.h>
+ *  KOS    0x66 ('f')  FD_IOC_*            <kos/ioctl/fd.h>
  *  KOS    0x70 ('p')  TASK_IOC_*          <kos/ioctl/task.h>
  *
  * TODO: The above list is incomplete

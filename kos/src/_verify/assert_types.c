@@ -437,9 +437,6 @@ local files = {
 	"../../include/kos/exec/bits/peb.h",
 	"../../include/kos/exec/elf.h",
 	"../../include/kos/ioctl/_openfd.h",
-	"../../include/kos/hop/api.h",
-	"../../include/kos/hop/module.h",
-	"../../include/kos/hop/handle.h",
 	"../../include/kos/ksysctl.h",
 	"../../include/linux/if_arp.h",
 	"../../include/linux/if_ether.h",
@@ -1711,62 +1708,6 @@ static_assert(offsetof(struct openfd, of_flags) == __OFFSET_OPENFD_FLAGS);
 static_assert(offsetof(struct openfd, of_hint) == __OFFSET_OPENFD_HINT);
 static_assert(offsetof(struct openfd, of_mode) == __OFFSET_OPENFD_MODE);
 static_assert(sizeof(struct openfd) == __SIZEOF_OPENFD);
-
-
-
-
-
-#include <kos/hop/api.h>
-
-
-
-
-
-#include <kos/hop/module.h>
-
-/* struct hop_driver_stat */
-static_assert(offsetof(struct hop_driver_stat, ds_argc) == __OFFSET_HOP_DRIVER_STAT_ARGC);
-static_assert(offsetof(struct hop_driver_stat, ds_depc) == __OFFSET_HOP_DRIVER_STAT_DEPC);
-static_assert(offsetof(struct hop_driver_stat, ds_flags) == __OFFSET_HOP_DRIVER_STAT_FLAGS);
-static_assert(offsetof(struct hop_driver_stat, ds_loadaddr) == __OFFSET_HOP_DRIVER_STAT_LOADADDR);
-static_assert(offsetof(struct hop_driver_stat, ds_loadend) == __OFFSET_HOP_DRIVER_STAT_LOADEND);
-static_assert(offsetof(struct hop_driver_stat, ds_loadstart) == __OFFSET_HOP_DRIVER_STAT_LOADSTART);
-static_assert(offsetof(struct hop_driver_stat, ds_shnum) == __OFFSET_HOP_DRIVER_STAT_SHNUM);
-static_assert(offsetof(struct hop_driver_stat, ds_shstrtabsz) == __OFFSET_HOP_DRIVER_STAT_SHSTRTABSZ);
-static_assert(offsetof(struct hop_driver_stat, ds_state) == __OFFSET_HOP_DRIVER_STAT_STATE);
-static_assert(offsetof(struct hop_driver_stat, ds_strtabsz) == __OFFSET_HOP_DRIVER_STAT_STRTABSZ);
-static_assert(offsetof(struct hop_driver_stat, ds_struct_size) == __OFFSET_HOP_DRIVER_STAT_STRUCT_SIZE);
-static_assert(offsetof(struct hop_driver_stat, ds_symcnt) == __OFFSET_HOP_DRIVER_STAT_SYMCNT);
-static_assert(sizeof(struct hop_driver_stat) == __SIZEOF_HOP_DRIVER_STAT);
-
-/* struct hop_driver_string */
-static_assert(offsetof(struct hop_driver_string, ds_buf) == __OFFSET_HOP_DRIVER_STRING_BUF);
-static_assert(offsetof(struct hop_driver_string, ds_index) == __OFFSET_HOP_DRIVER_STRING_INDEX);
-static_assert(offsetof(struct hop_driver_string, ds_size) == __OFFSET_HOP_DRIVER_STRING_SIZE);
-static_assert(offsetof(struct hop_driver_string, ds_struct_size) == __OFFSET_HOP_DRIVER_STRING_STRUCT_SIZE);
-static_assert(sizeof(struct hop_driver_string) == __SIZEOF_HOP_DRIVER_STRING);
-
-/* struct hop_driver_open_dependency */
-static_assert(offsetof(struct hop_driver_open_dependency, dod_depno) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_DEPNO);
-static_assert(offsetof(struct hop_driver_open_dependency, dod_result) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_RESULT);
-static_assert(offsetof(struct hop_driver_open_dependency, dod_struct_size) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_STRUCT_SIZE);
-static_assert(sizeof(struct hop_driver_open_dependency) == __SIZEOF_HOP_DRIVER_OPEN_DEPENDENCY);
-
-
-
-
-
-#include <kos/hop/handle.h>
-
-/* struct hop_handle_stat */
-static_assert(offsetof(struct hop_handle_stat, hs_address) == __OFFSET_HOP_HANDLE_STAT_ADDRESS);
-static_assert(offsetof(struct hop_handle_stat, hs_kind) == __OFFSET_HOP_HANDLE_STAT_KIND);
-static_assert(offsetof(struct hop_handle_stat, hs_mode) == __OFFSET_HOP_HANDLE_STAT_MODE);
-static_assert(offsetof(struct hop_handle_stat, hs_refcnt) == __OFFSET_HOP_HANDLE_STAT_REFCNT);
-static_assert(offsetof(struct hop_handle_stat, hs_struct_size) == __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE);
-static_assert(offsetof(struct hop_handle_stat, hs_type) == __OFFSET_HOP_HANDLE_STAT_TYPE);
-static_assert(offsetof(struct hop_handle_stat, hs_typename) == __OFFSET_HOP_HANDLE_STAT_TYPENAME);
-static_assert(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
 
 
 

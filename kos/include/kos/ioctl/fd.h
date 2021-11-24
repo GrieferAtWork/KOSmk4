@@ -29,6 +29,8 @@
 #include <asm/os/block.h>
 #include <asm/os/tty.h>
 
+#include "_openfd.h"
+
 /* NOTE: By default, trying to  invoke an ioctl with  type='T'
  *       that isn't supported has ioctl(2) return with ENOTTY! */
 #define FD_IOC_NCLEX  __FIONCLEX /* Clear O_CLOEXEC / IO_CLOEXEC */
@@ -38,8 +40,32 @@
 #define FD_IOC_QSIZE  __FIOQSIZE /* [loff_t *arg] Return object data-size (not supported by all types of objects) */
 #define FD_IOC_GETBSZ __FIGETBSZ /* [int *arg] Return `struct stat::st_blksize' */
 
-/*  */
+/* KOS-specific ioctls. */
+#define FD_IOC_NOOP        _IO_KOS('f', 0x00)                /* Does nothing; ioctl(2) returns `0' */
+#define FD_IOC_DUPFD     _IOWR_KOS('f', 0x01, struct openfd) /* Duplicate the handle for this file. (ioctl(2) returns `arg->of_hint') */
+#define FD_IOC_CAST      _IOWR_KOS('f', 0x02, struct fdcast) /* Cast handle into a different type. - Usually, casting is done implicitly, but this does it explicitly. */
+#define FD_IOC_POLLTEST  _IOWR_KOS('f', 0x03, unsigned int)  /* do `*(poll_mode_t *)arg = handle_polltest(fd, *(poll_mode_t *)arg);' */
+#define FD_IOC_GETTYPE    _IOR_KOS('f', 0x80, __uint32_t)    /* Get handle type (one of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
+#define FD_IOC_GETKIND    _IOR_KOS('f', 0x81, __uint32_t)    /* Get handle kind (one of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
+#define FD_IOC_GETMODE    _IOR_KOS('f', 0x82, __uint32_t)    /* Get handle mode (set of `IO_*' from <kos/io.h>) */
+#define FD_IOC_GETADDR    _IOR_KOS('f', 0x83, __uint64_t)    /* Get handle address (skewed, but guarantied unqiue) */
+#define FD_IOC_GETRADDR   _IOR_KOS('f', 0x84, __uint64_t)    /* Get handle address (non-skewed; requires `CAP_SYS_MODULE') */
+#define FD_IOC_GETREFCNT  _IOR_KOS('f', 0x85, __uint64_t)    /* Get reference counter of handle (close(2) decrements; dup(2) increments; never returns `0') */
+#define _FD_IOC_INCREF     _IO_KOS('f', 0xc0)                /* increment reference counter and set `_KERNEL_POISON_NO_WARRANTY'; requires `CAP_SYS_MODULE'; not available in NDEBUG kernels. */
+#define _FD_IOC_DECREF     _IO_KOS('f', 0xc1)                /* decrement reference counter and set `_KERNEL_POISON_NO_WARRANTY'; requires `CAP_SYS_MODULE'; not available in NDEBUG kernels. */
 
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct fdcast {
+	/* NOTE: When a handle cannot be cast, `E_INVALID_HANDLE_FILETYPE' is thrown. */
+	__uint32_t    fc_rqtyp; /* Requested handle type (one of `HANDLE_TYPE_*') */
+	struct openfd fc_resfd; /* Target slot for resulting handle. */
+};
+
+__DECL_END
+#endif /* __CC__ */
 
 
 #endif /* !_KOS_IOCTL_FD_H */

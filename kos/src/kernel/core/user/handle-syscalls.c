@@ -33,6 +33,7 @@
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
 #include <kernel/mman.h>
+#include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
@@ -51,7 +52,6 @@
 #include <compat/config.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
-#include <kos/hop/handle.h>
 #include <kos/io.h>
 #include <kos/ioctl/fd.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -207,51 +207,157 @@ ioctl_generic(ioctl_t cmd,
 		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_CLOEXEC, 0);
 		break;
 
-	default:
-		break;
-	}
+	case FD_IOC_DUPFD:
+		*result = handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
+		goto done;
 
-	/* Commands for which we accept any size value. */
-	switch (_IO_WITHSIZE(cmd, 0)) {
-
-	case _IO_WITHSIZE(FIONBIO, 0): /* FD_IOC_NBIO */
-		/* Set/clear IO_NONBLOCK */
-		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_NONBLOCK,
-		               ioctl_intarg_getbool(cmd, arg) ? IO_NONBLOCK : 0);
+	case FD_IOC_NOOP:
+		/* Intentional no-op */
 		break;
 
-	case _IO_WITHSIZE(FIOASYNC, 0): /* FD_IOC_ASYNC */
-		/* Set/clear IO_ASYNC */
-		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_ASYNC,
-		               ioctl_intarg_getbool(cmd, arg) ? IO_ASYNC : 0);
-		break;
+	case FD_IOC_CAST: {
+		struct handle newhand;
+		USER CHECKED struct fdcast *cast;
+		uintptr_half_t reqtype;
+		validate_readwrite(arg, sizeof(*cast));
+		cast = (USER CHECKED struct fdcast *)arg;
+		COMPILER_READ_BARRIER();
+		reqtype = cast->fc_rqtyp;
+		COMPILER_READ_BARRIER();
+		newhand = *hand;
+		if (reqtype == hand->h_type) {
+			handle_incref(newhand);
+		} else {
+			if unlikely(reqtype >= HANDLE_TYPE_COUNT) {
+err_bad_handle_type:
+				THROW(E_INVALID_HANDLE_FILETYPE,
+				      /* fd:                 */ fd, /* Filled in the caller */
+				      /* needed_handle_type: */ reqtype,
+				      /* actual_handle_type: */ hand->h_type,
+				      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+				      /* actual_handle_kind: */ handle_typekind(hand));
+			}
 
-	case _IO_WITHSIZE(FIOQSIZE, 0): { /* FD_IOC_QSIZE */
-		pos_t value;
-		if (_IOC_SIZE(cmd) == 0)
-			cmd = _IO_WITHSIZE(cmd, sizeof(loff_t));
-		if unlikely(!handle_datasize(hand, &value))
-			goto return_ENOTTY;
-		ioctl_intarg_setu64(cmd, arg, (u64)value);
-	}	break;
-
-	case _IO_WITHSIZE(FIGETBSZ, 0): { /* FD_IOC_GETBSZ */
-		struct stat st;
-		handle_stat(*hand, &st);
-		ioctl_intarg_setuint(cmd, arg, st.st_blksize);
-	}	break;
-
-	default:
-		if (_IOC_TYPE(cmd) == 'T') {
-			/* Return -ENOTTY for unsupported tty-ioctls */
-return_ENOTTY:
-			*result = -ENOTTY;
-			return true;
+			/* Do the requested cast. */
+			newhand.h_data = _handle_tryas(newhand, reqtype);
+			if unlikely(!newhand.h_data)
+				goto err_bad_handle_type;
+			newhand.h_type = reqtype;
 		}
-		return false;
+		RAII_FINALLY { handle_decref(newhand); };
+
+		/* Install the new handle. */
+		*result = handle_installopenfd(&cast->fc_resfd, newhand);
+		goto done;
+	}	break;
+
+
+#if !defined(NDEBUG) && !defined(NDEBUG_HANDLE_REFCNT)
+		/* Debug commands for direct reference control.
+		 *
+		 * You should never need these, and the only reason
+		 * they  are here, is in case they might one day be
+		 * useful for the purpose of debugging.
+		 *
+		 * The logic behind requiring `CAP_SYS_MODULE' is
+		 * that there would be no point in keeping a user
+		 * from directly modifying the reference counters
+		 * of handles, so-long as that user would already
+		 * be  able to just load a hacked driver to do it
+		 * for them! */
+	case _FD_IOC_INCREF:
+		require(CAP_SYS_MODULE);
+		kernel_poison(_KERNEL_POISON_NO_WARRANTY);
+		handle_incref(*hand);
+		break;
+
+	case _FD_IOC_DECREF:
+		require(CAP_SYS_MODULE);
+		kernel_poison(_KERNEL_POISON_NO_WARRANTY);
+		handle_decref(*hand);
+		break;
+#endif /* !NDEBUG && !NDEBUG_HANDLE_REFCNT */
+
+	default:
+		/* Commands for which we accept any size value. */
+		switch (_IO_WITHSIZE(cmd, 0)) {
+
+		case _IO_WITHSIZE(FIONBIO, 0): /* FD_IOC_NBIO */
+			/* Set/clear IO_NONBLOCK */
+			handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_NONBLOCK,
+			               ioctl_intarg_getbool(cmd, arg) ? IO_NONBLOCK : 0);
+			break;
+
+		case _IO_WITHSIZE(FIOASYNC, 0): /* FD_IOC_ASYNC */
+			/* Set/clear IO_ASYNC */
+			handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_ASYNC,
+			               ioctl_intarg_getbool(cmd, arg) ? IO_ASYNC : 0);
+			break;
+
+		case _IO_WITHSIZE(FIOQSIZE, 0): { /* FD_IOC_QSIZE */
+			pos_t value;
+			if (_IOC_SIZE(cmd) == 0)
+				cmd = _IO_WITHSIZE(cmd, sizeof(loff_t));
+			if unlikely(!handle_datasize(hand, &value))
+				goto return_ENOTTY;
+			*result = ioctl_intarg_setu64(cmd, arg, (u64)value);
+			goto done;
+		}	break;
+
+		case _IO_WITHSIZE(FIGETBSZ, 0): { /* FD_IOC_GETBSZ */
+			struct stat st;
+			handle_stat(*hand, &st);
+			*result = ioctl_intarg_setuint(cmd, arg, st.st_blksize);
+			goto done;
+		}	break;
+
+
+		case _IO_WITHSIZE(FD_IOC_GETTYPE, 0):
+			*result = ioctl_intarg_setu32(cmd, arg, hand->h_type);
+			goto done;
+
+		case _IO_WITHSIZE(FD_IOC_GETKIND, 0):
+			*result = ioctl_intarg_setu32(cmd, arg, handle_typekind(hand));
+			goto done;
+
+		case _IO_WITHSIZE(FD_IOC_GETMODE, 0):
+			*result = ioctl_intarg_setu32(cmd, arg, hand->h_mode);
+			goto done;
+
+		case _IO_WITHSIZE(FD_IOC_GETADDR, 0):
+			*result = ioctl_intarg_setu64(cmd, arg, (uint64_t)(uintptr_t)skew_kernel_pointer(hand->h_data));
+			goto done;
+
+		case _IO_WITHSIZE(FD_IOC_GETRADDR, 0):
+			require(CAP_SYS_MODULE);
+			*result = ioctl_intarg_setu64(cmd, arg, (uint64_t)(uintptr_t)hand->h_data);
+			goto done;
+
+		case _IO_WITHSIZE(FD_IOC_GETREFCNT, 0):
+			*result = ioctl_intarg_setu64(cmd, arg, (uint64_t)handle_refcnt(*hand));
+			goto done;
+
+		case _IO_WITHSIZE(FD_IOC_POLLTEST, 0): {
+			poll_mode_t what;
+			what    = (poll_mode_t)ioctl_intarg_getu32(cmd, arg);
+			what    = handle_polltest(*hand, what);
+			*result = ioctl_intarg_setu32(cmd, arg, (uint32_t)what);
+			goto done;
+		}	break;
+
+		default:
+			if (_IOC_TYPE(cmd) == 'T') {
+				/* Return -ENOTTY for unsupported tty-ioctls */
+return_ENOTTY:
+				*result = -ENOTTY;
+				return true;
+			}
+			return false;
+		}
+		break;
 	}
 	*result = 0;
-/*done:*/
+done:
 	return true;
 }
 #endif /* __ARCH_WANT_SYSCALL_IOCTL || __ARCH_WANT_SYSCALL_IOCTLF */
@@ -958,110 +1064,6 @@ DEFINE_SYSCALL1(errno_t, fdatasync, fd_t, fd) {
 /* hop(), hopf()                                                        */
 /************************************************************************/
 #if defined(__ARCH_WANT_SYSCALL_HOP) || defined(__ARCH_WANT_SYSCALL_HOPF)
-#define hop_do_generic_operation(hand, hop_command, fd, arg) \
-	hop_do_generic_operation(hand, hop_command, arg)
-PRIVATE syscall_slong_t
-(KCALL hop_do_generic_operation)(struct handle *__restrict hand,
-                                 uintptr_t hop_command,
-                                 USER UNCHECKED void *arg) {
-	switch (hop_command) {
-
-	case HOP_HANDLE_STAT: {
-		USER CHECKED struct hop_handle_stat *info;
-		struct hop_handle_stat st;
-		size_t info_size;
-		char const *name;
-		memset(&st, 0, sizeof(st));
-		st.hs_struct_size = sizeof(st);
-		st.hs_mode        = hand->h_mode;
-		st.hs_type        = hand->h_type;
-		st.hs_kind        = handle_typekind(hand);
-		st.hs_refcnt      = (*handle_type_db.h_refcnt[hand->h_type])(hand->h_data);
-		st.hs_address     = (u64)(uintptr_t)skew_kernel_pointer(hand->h_data);
-		name              = handle_type_db.h_typename[hand->h_type];
-		memcpy(st.hs_typename, name,
-		       strnlen(name, COMPILER_LENOF(st.hs_typename) - 1),
-		       sizeof(char));
-		COMPILER_BARRIER();
-		info = (USER CHECKED struct hop_handle_stat *)arg;
-		validate_readwrite(info, sizeof(*info));
-		info_size = ATOMIC_READ(info->hs_struct_size);
-		if (info_size != sizeof(*info))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(*info), info_size);
-		memcpy(info, &st, sizeof(*info));
-	}	break;
-
-	case HOP_HANDLE_REOPEN:
-		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, *hand);
-		break;
-
-	case HOP_HANDLE_NOOP:
-		break;
-
-	case HOP_HANDLE_GET_REFCNT:
-		validate_writable(arg, sizeof(u64));
-		*(u64 *)arg = (u64)handle_refcnt(*hand);
-		break;
-
-	case HOP_HANDLE_GET_ADDRESS:
-		validate_writable(arg, sizeof(u64));
-		*(USER CHECKED u64 *)arg = (u64)(uintptr_t)skew_kernel_pointer(hand->h_data);
-		break;
-
-	case HOP_HANDLE_GET_TYPE:
-		validate_writable(arg, sizeof(uint16_t));
-		*(USER CHECKED uint16_t *)arg = (uint16_t)hand->h_type;
-		break;
-
-	case HOP_HANDLE_GET_KIND:
-		validate_writable(arg, sizeof(uint16_t));
-		*(USER CHECKED uint16_t *)arg = (uint16_t)handle_typekind(hand);
-		break;
-
-	case HOP_HANDLE_GET_MODE:
-		validate_writable(arg, sizeof(uint16_t));
-		*(USER CHECKED uint16_t *)arg = (uint16_t)hand->h_mode;
-		break;
-
-	case HOP_HANDLE_DUP: {
-		struct handle dup;
-		dup = *hand;
-		dup.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-		return handle_install(THIS_HANDLE_MANAGER, dup);
-	}	break;
-
-	case HOP_HANDLE_DUP_CLOEXEC: {
-		struct handle dup;
-		dup = *hand;
-		dup.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-		dup.h_mode |= IO_CLOEXEC;
-		return handle_install(THIS_HANDLE_MANAGER, dup);
-	}	break;
-
-	case HOP_HANDLE_DUP_CLOFORK: {
-		struct handle dup;
-		dup = *hand;
-		dup.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-		dup.h_mode |= IO_CLOFORK;
-		return handle_install(THIS_HANDLE_MANAGER, dup);
-	}	break;
-
-	case HOP_HANDLE_DUP_CLOEXEC_CLOFORK: {
-		struct handle dup;
-		dup = *hand;
-		dup.h_mode |= (IO_CLOEXEC | IO_CLOFORK);
-		return handle_install(THIS_HANDLE_MANAGER, dup);
-	}	break;
-
-	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-		      hop_command);
-		break;
-	}
-	return 0;
-}
-
 PRIVATE NOBLOCK void
 NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
                                            unsigned int fd,
@@ -1111,34 +1113,27 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 	syscall_slong_t result;
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if ((cmd & 0xffff0000) == (HOP_HANDLE_STAT & 0xffff0000)) {
-			result = hop_do_generic_operation(&hand, cmd, (unsigned int)fd, arg);
-		} else {
-			uintptr_half_t wanted_type;
-			/* Do implicit handle casting based on the expected type encoded in `cmd >> 16'.
-			 * e.g.: A   DATABLOCK   command   on   a   FILE   object   should   be  allowed */
-			wanted_type = (u16)(cmd >> 16);
-			if (wanted_type != hand.h_type) {
-				/* This should be a try-as!
-				 * If handles cannot be converted, we should invoke the HOP on the original
-				 * handle, for example allowing FIFO-related handles to re-use PIPE-hop()s! */
-				REF void *new_data;
-				if unlikely(wanted_type >= HANDLE_TYPE_COUNT)
-					THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-					      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-					      cmd);
-				new_data = handle_tryas(hand, wanted_type);
-				if (new_data) {
-					handle_decref(hand);
-					hand.h_data = new_data; /* Inherit reference */
-					hand.h_type = wanted_type;
-				}
+		uintptr_half_t wanted_type;
+		/* Do implicit handle casting based on the expected type encoded in `cmd >> 16'.
+		 * e.g.: A   DATABLOCK   command   on   a   FILE   object   should   be  allowed */
+		wanted_type = (u16)(cmd >> 16);
+		if (wanted_type != hand.h_type) {
+			/* This should be a try-as!
+			 * If handles cannot be converted, we should invoke the HOP on the original
+			 * handle, for example allowing FIFO-related handles to re-use PIPE-hop()s! */
+			REF void *new_data;
+			if unlikely(wanted_type >= HANDLE_TYPE_COUNT)
+				THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+				      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
+				      cmd);
+			new_data = handle_tryas(hand, wanted_type);
+			if (new_data) {
+				handle_decref(hand);
+				hand.h_data = new_data; /* Inherit reference */
+				hand.h_type = wanted_type;
 			}
-			result = (*handle_type_db.h_hop[wanted_type])(hand.h_data,
-			                                              cmd,
-			                                              arg,
-			                                              hand.h_mode);
 		}
+		result = (*handle_type_db.h_hop[wanted_type])(hand.h_data, cmd, arg, hand.h_mode);
 	} EXCEPT {
 		/* Auto-complete some exceptions with handle-specific information. */
 		hop_complete_exception_info(&hand, (unsigned int)fd, cmd);
@@ -1161,34 +1156,28 @@ DEFINE_SYSCALL4(syscall_slong_t, hopf,
 	                 E_INVALID_ARGUMENT_CONTEXT_HOPF_MODE);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if ((cmd & 0xffff0000) == (HOP_HANDLE_STAT & 0xffff0000)) {
-			result = hop_do_generic_operation(&hand, cmd, (unsigned int)fd, arg);
-		} else {
-			uintptr_half_t wanted_type;
-			/* Do implicit handle casting based on the expected type encoded in `cmd >> 16'.
-			 * e.g.: A   DATABLOCK   command   on   a   FILE   object   should   be  allowed */
-			wanted_type = (u16)(cmd >> 16);
-			if (wanted_type != hand.h_type) {
-				/* This should be a try-as!
-				 * If handles cannot be converted, we should invoke the HOP on the original
-				 * handle, for example allowing FIFO-related handles to re-use PIPE-hop()s! */
-				REF void *new_data;
-				if unlikely(wanted_type >= HANDLE_TYPE_COUNT)
-					THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-					      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-					      cmd);
-				new_data = handle_tryas(hand, wanted_type);
-				if (new_data) {
-					handle_decref(hand);
-					hand.h_data = new_data; /* Inherit reference */
-					hand.h_type = wanted_type;
-				}
+		uintptr_half_t wanted_type;
+		/* Do implicit handle casting based on the expected type encoded in `cmd >> 16'.
+		 * e.g.: A   DATABLOCK   command   on   a   FILE   object   should   be  allowed */
+		wanted_type = (u16)(cmd >> 16);
+		if (wanted_type != hand.h_type) {
+			/* This should be a try-as!
+			 * If handles cannot be converted, we should invoke the HOP on the original
+			 * handle, for example allowing FIFO-related handles to re-use PIPE-hop()s! */
+			REF void *new_data;
+			if unlikely(wanted_type >= HANDLE_TYPE_COUNT)
+				THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+				      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
+				      cmd);
+			new_data = handle_tryas(hand, wanted_type);
+			if (new_data) {
+				handle_decref(hand);
+				hand.h_data = new_data; /* Inherit reference */
+				hand.h_type = wanted_type;
 			}
-			result = (*handle_type_db.h_hop[hand.h_type])(hand.h_data,
-			                                              cmd,
-			                                              arg,
-			                                              (hand.h_mode & ~IO_USERF_MASK) | mode);
 		}
+		result = (*handle_type_db.h_hop[hand.h_type])(hand.h_data, cmd, arg,
+		                                              (hand.h_mode & ~IO_USERF_MASK) | mode);
 	} EXCEPT {
 		/* Auto-complete some exceptions with handle-specific information. */
 		hop_complete_exception_info(&hand, (unsigned int)fd, cmd);
