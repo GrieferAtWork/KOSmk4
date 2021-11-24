@@ -334,7 +334,7 @@ INTERN struct fsuper procfs_super = {
 			FNODE_INIT_fn_ino(0),
 			FNODE_INIT_fn_super(&procfs_super),
 			FNODE_INIT_fn_changed,
-			FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+			FNODE_INIT_fn_supent,
 			FNODE_INIT_fn_allnodes,
 		},
 	},

@@ -39,7 +39,8 @@ DECL_BEGIN
 struct blkdev;
 struct devdiskruledir;
 
-/* Lookup a block-device for this rule, given its name (Used to implement `dno_lookup') */
+/* Lookup a block-device for this rule, given its name (Used to implement `dno_lookup')
+ * @return: NULL: No known block device is being named. */
 typedef WUNUSED NONNULL((1, 2)) REF struct blkdev *
 (KCALL *devdiskruledir_byname_t)(struct devdiskruledir *__restrict self,
                                  struct flookup_info *__restrict info);
@@ -65,15 +66,15 @@ struct devdiskruledir
 #ifdef __WANT_FS_INLINE_STRUCTURES
 	struct fdirnode         ddrd_dir;       /* Underlying directory. */
 #endif /* __WANT_FS_INLINE_STRUCTURES */
-	char                   _ddrd_prefix[8]; /* [const] The string "../../" */
+	char                   _ddrd_prefix[8]; /* [const] The string "../../\0" */
 	devdiskruledir_byname_t ddrd_byname;    /* [1..1][const] Lookup a block-device for this rule, given its name. */
 	devdiskruledir_toname_t ddrd_toname;    /* [1..1][const] Print the name of a given device. */
+	REF struct driver      *ddrd_drv;       /* [1..1][const] Associated driver. */
 };
 
 /* Directory entry type for /dev/disk/by-xxx folders themself. */
 struct devdiskrule {
 	REF struct devdiskruledir *ddre_rule; /* [1..1][const] Associated rule directory. */
-	REF struct driver         *ddre_drv;  /* [1..1][const] Associated driver. */
 	union {
 		struct lockop         _ddre_lop;  /* Used internally by `devdiskrule_delete()' */
 		struct postlockop     _ddre_plop; /* Used internally by `devdiskrule_delete()' */
@@ -94,18 +95,33 @@ struct devdiskrule {
 
 #define __devdiskrule_destroy(self) fdirent_destroy(devdiskrule_asdirent(self))
 #ifdef __WANT_FS_INLINE_STRUCTURES
-#define devdiskrule_asdirent(self) ((struct fdirent *)&(self)->fd_refcnt)
+#define devdiskrule_asdirent(self)   ((struct fdirent *)&(self)->fd_refcnt)
+#define devdiskrule_fromdirent(self) COMPILER_CONTAINER_OF(&(self)->fd_refcnt, struct devdiskrule, fd_refcnt)
 DEFINE_REFCOUNT_FUNCTIONS(struct devdiskrule, fd_refcnt, __devdiskrule_destroy)
 #else /* __WANT_FS_INLINE_STRUCTURES */
 #define devdiskrule_asdirent(self) (&(self)->ddre_ent)
+#define devdiskrule_fromdirent(self) COMPILER_CONTAINER_OF(self, struct devdiskrule, ddre_ent)
 DEFINE_REFCOUNT_FUNCTIONS(struct devdiskrule, ddre_ent.fd_refcnt, __devdiskrule_destroy)
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 
 
-/* Operators used for `devdiskrule' and `devdiskruledir'
- * -> You may use these to identify instances of these objects. */
+/* Default operators used for `devdiskrule' and `devdiskruledir'
+ * WARNING: Sub-classes are allowed to override any of these! */
 DATDEF struct fdirent_ops const devdiskrule_ops;
 DATDEF struct fdirnode_ops const devdiskruledir_ops;
+
+/* Default operators for `devdiskruledir_ops' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL devdiskruledir_v_destroy)(struct mfile *__restrict self);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+devdiskruledir_v_lookup(struct fdirnode *__restrict self,
+                        struct flookup_info *__restrict info)
+		THROWS(E_SEGFAULT, E_IOERROR, ...);
+FUNDEF BLOCKING NONNULL((1)) void KCALL
+devdiskruledir_v_enum(struct fdirenum *__restrict result)
+		THROWS(E_IOERROR, ...);
+DATDEF byte_t __devdiskruledir_v_enumsz[] ASMNAME("devdiskruledir_v_enumsz");
+#define devdiskruledir_v_enumsz ((size_t)__devdiskruledir_v_enumsz)
 
 
 /* Default list of /dev/disk/by-xxx rules.
@@ -162,24 +178,24 @@ DATDEF struct lockop_slist devdiskrules_lops;
 /************************************************************************/
 
 /* Allocate a new disk rule object. The caller must still initialize:
- * - return->ddre_drv               = incref(&drv_self); # Must _always_ be done!
+ * - return->ddre_rule->ddrd_drv    = incref(&drv_self); # Must _always_ be done!
  * - return->ddre_rule->ddrd_byname = ...;               # Only mandatory if `devdiskrule_register()' is called
  * - return->ddre_rule->ddrd_toname = ...;               # Only mandatory if `devdiskrule_register()' is called
  * - return->ddre_rule->...;                             # Sub-class specific fields
  * @param: sizeof_devdiskruledir: sizeof(struct MY_SUBCLASS_FOR_devdiskruledir)
  * @param: namef: The name of the rule.  Should probably include the "by-"  prefix.
  *                Note that this string is interpreted as a printf-format argument.
- * HINT: Those cases where the returned object should be destroyed can simply
- *       be handled  by filling  in `ddre_drv'  and doing  `destroy(return)'. */
+ * HINT: Those cases where the returned object should be destroyed can simply  be
+ *       handled by filling in `ddre_rule->ddrd_drv' and doing `destroy(return)'. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct devdiskrule *VCALL
 devdiskrule_allocf(size_t sizeof_devdiskruledir,
                    char const *__restrict namef, ...)
-		THROWS(E_BADALLOC);
+		THROWS(E_BADALLOC, E_FSERROR_ILLEGAL_PATH);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct devdiskrule *FCALL
 devdiskrule_vallocf(size_t sizeof_devdiskruledir,
                     char const *__restrict namef,
                     __builtin_va_list args)
-		THROWS(E_BADALLOC);
+		THROWS(E_BADALLOC, E_FSERROR_ILLEGAL_PATH);
 
 
 /* Register a  fully initialized  /dev/disk/by-xxx rule  object.

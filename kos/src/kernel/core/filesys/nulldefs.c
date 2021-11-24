@@ -135,7 +135,6 @@ local MAKEINO_FUNCTIONS = {
 
 function generateInoTree(fun): Cell with llrbtree.RbNode {
 	local result = Cell(none);
-	llrbtree.insert(result, llrbtree.RbNode(minkey: 0, maxkey: 0, val: "devfs_rootdir.rdn_dir.dn_node"));
 	for (local name, st_mode, st_rdev: DEVICES) {
 		local ino = fun(st_mode, st_rdev);
 		llrbtree.insert(result, llrbtree.RbNode(minkey: ino, maxkey: ino, val: "dev_" + name + ".dv_devnode.dn_node"));
@@ -416,8 +415,8 @@ PRIVATE struct devdirent dirent_dev_tty = {
 	}
 };
 DEFINE_INTERN_ALIAS(_fallnodes_list__INIT, dev_mem);
-__SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_random),
-             DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_random));
+__SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port),
+             DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port));
 DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, dev_port);
 INTDEF struct chrdev_ops const dev_mem_ops;
 INTDEF struct chrdev_ops const dev_kmem_ops;
@@ -462,8 +461,8 @@ PUBLIC struct device dev_mem = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&devfs_rootdir.rdn_dir.dn_node, &devfs_rootdir.rdn_dir.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_kmem.dv_devnode.dn_node, &dev_kmem.dv_devnode.dn_node),
+				.rb_lhs = __SELECT_INO(NULL, NULL),
+				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_kmem.dv_devnode.dn_node,
@@ -513,8 +512,8 @@ PUBLIC struct device dev_kmem = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = __SELECT_INO(&dev_mem.dv_devnode.dn_node, &dev_mem.dv_devnode.dn_node),
+				.rb_rhs = __SELECT_INO(&dev_null.dv_devnode.dn_node, &dev_null.dv_devnode.dn_node),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_null.dv_devnode.dn_node,
@@ -549,7 +548,7 @@ PUBLIC struct device dev_null = {
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
+				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -564,8 +563,8 @@ PUBLIC struct device dev_null = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_mem.dv_devnode.dn_node, &dev_mem.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_zero.dv_devnode.dn_node, &dev_zero.dv_devnode.dn_node),
+				.rb_lhs = __SELECT_INO(NULL, NULL),
+				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_port.dv_devnode.dn_node,
@@ -615,8 +614,8 @@ PUBLIC struct device dev_port = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = __SELECT_INO(&dev_kmem.dv_devnode.dn_node, &dev_kmem.dv_devnode.dn_node),
+				.rb_rhs = __SELECT_INO(&dev_urandom.dv_devnode.dn_node, &dev_urandom.dv_devnode.dn_node),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_zero.dv_devnode.dn_node,
@@ -665,8 +664,8 @@ PUBLIC struct device dev_zero = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_port.dv_devnode.dn_node, &dev_port.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_full.dv_devnode.dn_node, &dev_full.dv_devnode.dn_node),
+				.rb_lhs = __SELECT_INO(NULL, NULL),
+				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_full.dv_devnode.dn_node,
@@ -702,7 +701,7 @@ PUBLIC struct device dev_full = {
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
-				                    __SELECT_INO(0, 0)),
+				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -717,8 +716,8 @@ PUBLIC struct device dev_full = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = __SELECT_INO(&dev_zero.dv_devnode.dn_node, &dev_zero.dv_devnode.dn_node),
+				.rb_rhs = __SELECT_INO(&dev_random.dv_devnode.dn_node, &dev_random.dv_devnode.dn_node),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_random.dv_devnode.dn_node,
@@ -768,8 +767,8 @@ PUBLIC struct device dev_random = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_null.dv_devnode.dn_node, &dev_null.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_kmsg.dv_devnode.dn_node, &dev_kmsg.dv_devnode.dn_node),
+				.rb_lhs = __SELECT_INO(NULL, NULL),
+				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_urandom.dv_devnode.dn_node,
@@ -820,8 +819,8 @@ PUBLIC struct device dev_urandom = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = __SELECT_INO(&dev_full.dv_devnode.dn_node, &dev_full.dv_devnode.dn_node),
+				.rb_rhs = __SELECT_INO(&dev_tty.dv_devnode.dn_node, &dev_tty.dv_devnode.dn_node),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_kmsg.dv_devnode.dn_node,
@@ -857,7 +856,7 @@ PUBLIC struct device dev_kmsg = {
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
-				                    __SELECT_INO(0, 0)),
+				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -872,8 +871,8 @@ PUBLIC struct device dev_kmsg = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_urandom.dv_devnode.dn_node, &dev_urandom.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_tty.dv_devnode.dn_node, &dev_tty.dv_devnode.dn_node),
+				.rb_lhs = __SELECT_INO(NULL, NULL),
+				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_tty.dv_devnode.dn_node,
@@ -924,7 +923,7 @@ PUBLIC struct device dev_tty = {
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = __SELECT_INO(&dev_kmsg.dv_devnode.dn_node, &dev_kmsg.dv_devnode.dn_node),
 				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
 			{.fn_allnodes = {

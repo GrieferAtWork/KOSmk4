@@ -26,18 +26,13 @@
 #include <kernel/user.h>
 
 /* Inode numbers for special devfs files. */
-#define DEVFS_SPECINO(id)          (__CCAST(ino_t)(DEVFS_INONS_SPEC | ((id) << 3)))
-#define DEVFS_INO_ROOT             DEVFS_SPECINO(0x00) /* /dev */
-#define DEVFS_INO_BLOCK            DEVFS_SPECINO(0x01) /* /dev/block */
-#define DEVFS_INO_CHAR             DEVFS_SPECINO(0x02) /* /dev/char */
-#define DEVFS_INO_CPU              DEVFS_SPECINO(0x03) /* /dev/cpu */
-#define DEVFS_INO_DISK             DEVFS_SPECINO(0x10) /* /dev/disk */
-#define DEVFS_INO_DISK_BYID        DEVFS_SPECINO(0x11) /* /dev/disk/by-id */
-#define DEVFS_INO_DISK_BYLABEL     DEVFS_SPECINO(0x12) /* /dev/disk/by-label */
-#define DEVFS_INO_DISK_BYPARTLABEL DEVFS_SPECINO(0x13) /* /dev/disk/by-partlabel */
-#define DEVFS_INO_DISK_BYPARTUUID  DEVFS_SPECINO(0x14) /* /dev/disk/by-partuuid */
-#define DEVFS_INO_DISK_BYPATH      DEVFS_SPECINO(0x15) /* /dev/disk/by-path */
-#define DEVFS_INO_DISK_BYUUID      DEVFS_SPECINO(0x16) /* /dev/disk/by-uuid */
+#define DEVFS_SPECINO(id)  (__CCAST(ino_t)(DEVFS_INONS_SPEC | ((id) << 3)))
+#define DEVFS_INO_ROOT     DEVFS_SPECINO(0x00) /* /dev */
+#define DEVFS_INO_BLOCK    DEVFS_SPECINO(0x01) /* /dev/block */
+#define DEVFS_INO_CHAR     DEVFS_SPECINO(0x02) /* /dev/char */
+#define DEVFS_INO_CPU      DEVFS_SPECINO(0x03) /* /dev/cpu */
+#define DEVFS_INO_DISK     DEVFS_SPECINO(0x04) /* /dev/disk */
+#define DEVFS_INO_MISC(id) DEVFS_SPECINO(0x80 + (id)) /* Misc, internal files (default disk rules) */
 
 /* Inode numbers for dynamically created devfs files. */
 #define DEVFS_INO_DYN(ptr) (__CCAST(ino_t)(DEVFS_INONS_DYN | ((uintptr_t)skew_kernel_pointer(ptr) << 3)))

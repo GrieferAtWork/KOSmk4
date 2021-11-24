@@ -291,12 +291,12 @@ struct fnode
 		LLRBTREE_NODE(fnode)    fn_supent;   /* ... */
 	};
 #ifdef __WANT_FS_INIT
-#define FNODE_INIT_fn_supent           { { __NULLPTR, __NULLPTR } }
+#define FNODE_INIT_fn_supent           { { __NULLPTR, FSUPER_NODES_DELETED } }
 #define FNODE_INIT_fn_supent_EX(...)   { __VA_ARGS__ }
 #endif /* __WANT_FS_INIT */
 #else /* __WANT_FNODE__fn_suplop */
 #ifdef __WANT_FS_INIT
-#define FNODE_INIT_fn_supent           { __NULLPTR, __NULLPTR }
+#define FNODE_INIT_fn_supent           { __NULLPTR, FSUPER_NODES_DELETED }
 #define FNODE_INIT_fn_supent_EX(...)   __VA_ARGS__
 #endif /* __WANT_FS_INIT */
 	LLRBTREE_NODE(fnode)        fn_supent;   /* [lock(fn_super->fs_nodeslock)][LIST(fn_super->fs_nodes)]

@@ -188,7 +188,7 @@ PRIVATE struct fnode const procfs_perproc_reg_template = {
 	FNODE_INIT_fn_ino(0),
 	FNODE_INIT_fn_super(&procfs_super),
 	FNODE_INIT_fn_changed,
-	FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+	FNODE_INIT_fn_supent,
 	FNODE_INIT_fn_allnodes,
 };
 PRIVATE struct fnode const procfs_perproc_nomap_template = {
@@ -218,7 +218,7 @@ PRIVATE struct fnode const procfs_perproc_nomap_template = {
 	FNODE_INIT_fn_ino(0),
 	FNODE_INIT_fn_super(&procfs_super),
 	FNODE_INIT_fn_changed,
-	FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+	FNODE_INIT_fn_supent,
 	FNODE_INIT_fn_allnodes,
 };
 
@@ -252,7 +252,7 @@ INTERN_CONST struct flnknode const procfs_fdlnk_template = {
 		FNODE_INIT_fn_ino(0),
 		FNODE_INIT_fn_super(&procfs_super),
 		FNODE_INIT_fn_changed,
-		FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+		FNODE_INIT_fn_supent,
 		FNODE_INIT_fn_allnodes,
 	},
 };
@@ -287,7 +287,7 @@ INTERN_CONST struct flnknode const procfs_perproc_dcwdlink_template = {
 		FNODE_INIT_fn_ino(0),
 		FNODE_INIT_fn_super(&procfs_super),
 		FNODE_INIT_fn_changed,
-		FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+		FNODE_INIT_fn_supent,
 		FNODE_INIT_fn_allnodes,
 	},
 };
@@ -322,7 +322,7 @@ INTERN_CONST struct flnknode const procfs_perproc_drivelink_template = {
 		FNODE_INIT_fn_ino(0),
 		FNODE_INIT_fn_super(&procfs_super),
 		FNODE_INIT_fn_changed,
-		FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+		FNODE_INIT_fn_supent,
 		FNODE_INIT_fn_allnodes,
 	},
 };
@@ -358,7 +358,7 @@ INTERN_CONST struct flnknode const perproc_mapfile_lnknode_template = {
 		FNODE_INIT_fn_ino(0),
 		FNODE_INIT_fn_super(&procfs_super),
 		FNODE_INIT_fn_changed,
-		FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+		FNODE_INIT_fn_supent,
 		FNODE_INIT_fn_allnodes,
 	},
 };
