@@ -75,7 +75,7 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 /* Assert that string buffers from `blkdev' are big enough for what they're meant to hold. */
-STATIC_ASSERT(COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid) >
+STATIC_ASSERT(COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid) ==
               COMPILER_LENOF(((struct mbr_sector *)0)->mbr_diskuid));
 STATIC_ASSERT(COMPILER_LENOF(((struct blkdev *)0)->bd_partinfo.bp_efi_name) >
               UNICODE_16TO8_MAXBUF(COMPILER_LENOF(((struct efi_partition *)0)->p_name)));
@@ -324,7 +324,7 @@ NOTHROW(FCALL blkdev_list_overlaps)(struct blkdev_list const *__restrict self,
 
 struct blkdev_makeparts_info {
 	/* New value for `struct blkdev::br_mbr_diskuid' */
-	char br_mbr_diskuid[COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid)];
+	byte_t br_mbr_diskuid[COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid)];
 
 	/* New value for `struct blkdev::br_efi_guid' */
 	guid_t br_efi_guid;
@@ -771,20 +771,9 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 	if unlikely(mbr->mbr_sig[1] != MBR_SIG1)
 		return;
 
-	/* Save MBR's "diskuid" (and strip leading/trailing spaces) */
-	if (info) {
-		char *writer;
-		writer = (char *)mempcpy(info->br_mbr_diskuid, mbr->mbr_diskuid, sizeof(mbr->mbr_diskuid));
-		*writer = '\0';
-		writer = strend(info->br_mbr_diskuid);
-		while (writer > info->br_mbr_diskuid && isspace(writer[-1]))
-			--writer;
-		while (info->br_mbr_diskuid[0] && isspace(info->br_mbr_diskuid[0])) {
-			memmovedown(&info->br_mbr_diskuid[0], &info->br_mbr_diskuid[1],
-			            COMPILER_LENOF(info->br_mbr_diskuid) - 1,
-			            sizeof(char));
-		}
-	}
+	/* Save MBR's "diskuid" */
+	if (info)
+		memcpy(info->br_mbr_diskuid, mbr->mbr_diskuid, sizeof(mbr->mbr_diskuid));
 
 	/* Load MBR partitions. */
 	for (i = 0; i < COMPILER_LENOF(mbr->mbr_part); ++i) {

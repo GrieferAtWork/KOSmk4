@@ -121,9 +121,10 @@ fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
 		buf->d_type   = (typeof(buf->d_type))feed_d_type;
 		buf->d_namlen = (typeof(buf->d_namlen))feed_d_namlen;
 		bufsize -= offsetof(struct dirent, d_name);
-		if (bufsize >= (size_t)(feed_d_namlen + 1))
-			bufsize = (size_t)(feed_d_namlen + 1);
-		else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
+		if (bufsize >= (size_t)(feed_d_namlen + 1)) {
+			bufsize = (size_t)feed_d_namlen;
+			buf->d_name[feed_d_namlen] = '\0'; /* NUL termination */
+		} else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
 			result ^= (size_t)-1; /* Don't yield */
 		}
 

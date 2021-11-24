@@ -105,7 +105,7 @@ struct blkdev
 			char                    br_ata_serial_no[21]; /* [const] NUL-termianted string (`struct hd_driveid::serial_no', or empty if unknown or N/A) */
 			char                    br_ata_fw_rev[9];     /* [const] NUL-termianted string (`struct hd_driveid::fw_rev', or empty if unknown or N/A) */
 			char                    br_ata_model[41];     /* [const] NUL-termianted string (`struct hd_driveid::model', or empty if unknown or N/A) */
-			char                    br_mbr_diskuid[11];   /* [lock(br_partslock)] MBR disk uid (`struct mbr_sector::mbr_diskuid', or empty if unknown or N/A) */
+			byte_t                  br_mbr_diskuid[10];   /* [lock(br_partslock)] MBR disk uid (`struct mbr_sector::mbr_diskuid', or all zeroes if unknown or N/A) */
 			guid_t                  br_efi_guid;          /* [lock(br_partslock)] EFI disk GUID (`struct efi_descriptor::gpt_guid', or all zeroes if unknown or N/A) */
 		} bd_rootinfo; /* [valid_if(blkdev_isroot(this))] */
 
@@ -244,21 +244,21 @@ blkdev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
  *  - self->bd_rootinfo.br_ata_model
  * @param: struct blkdev     *self: Block device to initialize.
  * @param: struct blkdev_ops *ops:  Block device operators. */
-#define _blkdev_init(self, ops)                                        \
-	(__blkdev_init_common(self, ops),                                  \
-	 atomic_lock_init(&(self)->bd_rootinfo.br_partslock),              \
-	 SLIST_INIT(&(self)->bd_rootinfo.br_partslops),                    \
-	 LIST_INIT(&(self)->bd_rootinfo.br_parts),                         \
-	 (self)->bd_rootinfo.br_max_retry      = BLKDEV_MAX_RETRY_DEFAULT, \
-	 (self)->bd_rootinfo.br_mbr_diskuid[0] = '\0',                     \
+#define _blkdev_init(self, ops)                                   \
+	(__blkdev_init_common(self, ops),                             \
+	 atomic_lock_init(&(self)->bd_rootinfo.br_partslock),         \
+	 SLIST_INIT(&(self)->bd_rootinfo.br_partslops),               \
+	 LIST_INIT(&(self)->bd_rootinfo.br_parts),                    \
+	 (self)->bd_rootinfo.br_max_retry = BLKDEV_MAX_RETRY_DEFAULT, \
+	 __libc_memset((self)->bd_rootinfo.br_mbr_diskuid, 0,         \
+	               sizeof((self)->bd_rootinfo.br_mbr_diskuid)),   \
 	 __libc_memset(&(self)->bd_rootinfo.br_efi_guid, 0, sizeof(guid_t)))
 #define _blkdev_cinit(self, ops)                                      \
 	(__blkdev_cinit_common(self, ops),                                \
 	 atomic_lock_cinit(&(self)->bd_rootinfo.br_partslock),            \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->bd_rootinfo.br_partslops)), \
 	 __hybrid_assert(LIST_EMPTY(&(self)->bd_rootinfo.br_parts)),      \
-	 (self)->bd_rootinfo.br_max_retry = BLKDEV_MAX_RETRY_DEFAULT,     \
-	 __hybrid_assert((self)->bd_rootinfo.br_mbr_diskuid[0] == '\0'))
+	 (self)->bd_rootinfo.br_max_retry = BLKDEV_MAX_RETRY_DEFAULT)
 
 /* Finalize a partially initialized `struct blkdev' (as initialized by `_blkdev_init()') */
 #define _blkdev_fini(self) __blkdev_fini_common(self)

@@ -105,7 +105,7 @@ union __ATTR_PACKED mbr_partition {
 #ifdef __CC__
 /* http://wiki.osdev.org/MBR_(x86) */
 struct __ATTR_PACKED mbr_data {          /* Master boot record */
-	char                mbr_diskuid[10]; /* Optional "unique" disk ID */
+	__u8                mbr_diskuid[10]; /* Optional "unique" disk ID */
 	union mbr_partition mbr_part[4];     /* Partition table entries */
 	__u8                mbr_sig[2];      /* "Valid bootsector" signature bytes (== MBR_SIG0, MBR_SIG1) */
 };
@@ -113,7 +113,7 @@ struct __ATTR_PACKED mbr_data {          /* Master boot record */
 /* http://wiki.osdev.org/MBR_(x86) */
 struct __ATTR_PACKED mbr_sector {           /* Master boot record */
 	__u8                mbr_bootstrap[436]; /* MBR Bootstrap (flat binary executable code) */
-	char                mbr_diskuid[10];    /* Optional "unique" disk ID */
+	__u8                mbr_diskuid[10];    /* Optional "unique" disk ID */
 	union mbr_partition mbr_part[4];        /* Partition table entries */
 	__u8                mbr_sig[2];         /* "Valid bootsector" signature bytes (== MBR_SIG0, MBR_SIG1) */
 };

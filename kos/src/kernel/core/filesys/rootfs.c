@@ -60,10 +60,8 @@ DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_root_partition, KERNEL_COMMANDLINE_OPTIO
  * - Sorted in order of descending priority. */
 #define FIND_UNIQUE_BLKDEV_BYACTIVE    0
 #define FIND_UNIQUE_BLKDEV_BYPARTNAME  1
-#define FIND_UNIQUE_BLKDEV_BYDISKNAME  2
-#define FIND_UNIQUE_BLKDEV_BYPARTNAME2 3
-#define FIND_UNIQUE_BLKDEV_BYDISKNAME2 4
-#define FIND_UNIQUE_BLKDEV_COUNT       5
+#define FIND_UNIQUE_BLKDEV_BYPARTNAME2 2
+#define FIND_UNIQUE_BLKDEV_COUNT       3
 
 
 /* Search the devfs device tree for a unique block-device matching `criteria' */
@@ -85,20 +83,8 @@ again:
 			ismatch = strcasecmp(me->bd_partinfo.bp_efi_name, "kos") == 0;
 			break;
 
-		case FIND_UNIQUE_BLKDEV_BYDISKNAME:
-			ismatch = LIST_NEXT(me, bd_partinfo.bp_partlink) == NULL &&
-			          LIST_FIRST(&me->bd_partinfo.bp_master->bd_rootinfo.br_parts) == me &&
-			          strcasecmp(me->bd_partinfo.bp_master->bd_rootinfo.br_mbr_diskuid, "kos") == 0;
-			break;
-
 		case FIND_UNIQUE_BLKDEV_BYPARTNAME2:
 			ismatch = strcasestr(me->bd_partinfo.bp_efi_name, "kos") != NULL;
-			break;
-
-		case FIND_UNIQUE_BLKDEV_BYDISKNAME2:
-			ismatch = LIST_NEXT(me, bd_partinfo.bp_partlink) == NULL &&
-			          LIST_FIRST(&me->bd_partinfo.bp_master->bd_rootinfo.br_parts) == me &&
-			          strcasestr(me->bd_partinfo.bp_master->bd_rootinfo.br_mbr_diskuid, "kos") != NULL;
 			break;
 
 		default: __builtin_unreachable();

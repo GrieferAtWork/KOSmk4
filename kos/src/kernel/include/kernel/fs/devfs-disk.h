@@ -46,11 +46,16 @@ typedef WUNUSED NONNULL((1, 2)) REF struct blkdev *
                                  struct flookup_info *__restrict info);
 
 /* Print the name for a given device (Used to implement `dno_enum')
- * When `dev' shouldn't appear in the directory `self', return `0'. */
+ * When `dev' shouldn't appear in the directory `self', return `0'.
+ * @param: variant: When a device is listed with multiple names,  the
+ *                  `variant' number (which  starts at  `0') is  used
+ *                  to enumerate the different names. Enumation stops
+ *                  on the first variant that returns `0'. */
 typedef WUNUSED NONNULL((1, 2, 3)) ssize_t
 (KCALL *devdiskruledir_toname_t)(struct devdiskruledir *__restrict self,
                                  struct blkdev *__restrict dev,
-                                 __pformatprinter printer, void *arg);
+                                 __pformatprinter printer, void *arg,
+                                 uintptr_t variant);
 
 
 

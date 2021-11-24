@@ -2044,8 +2044,8 @@ do_dump_blkdev(struct blkdev *__restrict self,
 			dbg_printf(DBGSTR("\tfw_rev: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_ata_fw_rev);
 		if (*self->bd_rootinfo.br_ata_model != '\0')
 			dbg_printf(DBGSTR("\tmodel: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_ata_model);
-		if (*self->bd_rootinfo.br_mbr_diskuid != '\0')
-			dbg_printf(DBGSTR("\tdiskuid: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_mbr_diskuid);
+//		if (*self->bd_rootinfo.br_mbr_diskuid != '\0')
+//			dbg_printf(DBGSTR("\tdiskuid: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_mbr_diskuid);
 		if (memxchr(&self->bd_rootinfo.br_efi_guid, 0, sizeof(self->bd_rootinfo.br_efi_guid)))
 			dbg_printf(DBGSTR("\tguid: " AC_WHITE(FORMAT_GUID_T) "\n"), FORMAT_GUID_T_ARGS(self->bd_rootinfo.br_efi_guid));
 	}

@@ -158,7 +158,10 @@ devdiskruledir_v_lookup(struct fdirnode *__restrict self,
 	/* Print device filename. */
 	TRY {
 		ssize_t error;
-		error = (*me->ddrd_toname)(me, result_dev, &devicelink_dirent_printer, &pdat);
+		/* FIXME: Mustn't use the default variant; must use the original user-string
+		 *        instead, though this leaves a problem when user-space changes the
+		 *        name after `ddrd_byname' used it... */
+		error = (*me->ddrd_toname)(me, result_dev, &devicelink_dirent_printer, &pdat, 0);
 		if unlikely(error <= 0 || pdat.ddp_used > (u16)-1) {
 			kfree(pdat.ddp_base);
 			return NULL;
@@ -260,14 +263,15 @@ nextdev:
 
 	/* Print the name for this device. */
 	TRY {
+		/* TODO: Support for multiple name variants! */
 		namelen = (*dir->ddrd_toname)(dir, fnode_asblkdev(mydev),
 		                              &format_snprintf_printer,
-		                              &snprintf_data);
+		                              &snprintf_data, 0);
 		if (namelen <= 0)
 			goto nextdev;
 
 		/* Yield directory entry. */
-		if (namelen > COMPILER_LENOF(namebuf)) {
+		if ((size_t)namelen > COMPILER_LENOF(namebuf)) {
 			/* Need a larger buffer for the name. - For this purpose, we use a heap buffer */
 			struct heap_printer_data dat;
 			dat.hp_base  = NULL;
@@ -275,7 +279,7 @@ nextdev:
 			dat.hp_used  = 0;
 			RAII_FINALLY { kfree(dat.hp_base); };
 			namelen = (*dir->ddrd_toname)(dir, fnode_asblkdev(mydev),
-			                              &heap_printer, &dat);
+			                              &heap_printer, &dat, 0);
 			if unlikely(namelen <= 0 || dat.hp_used > (u16)-1)
 				goto nextdev;
 			result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
@@ -457,7 +461,7 @@ NOTHROW(KCALL disk_enum_v_fini)(struct fdirenum *__restrict self) {
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
 disk_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
-                    size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
+                    size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t lo, hi;
 	ssize_t result;
@@ -753,7 +757,7 @@ devdiskrule_vallocf(size_t sizeof_devdiskruledir,
 
 	TRY {
 		/* Print rule name. */
-		format_vprintf(&devicelink_dirent_printer, &pdat, namef, args);
+		format_vprintf(&devdiskrule_printer, &pdat, namef, args);
 		if unlikely(pdat.ddp_used > (u16)-1)
 			THROW(E_FSERROR_ILLEGAL_PATH);
 
