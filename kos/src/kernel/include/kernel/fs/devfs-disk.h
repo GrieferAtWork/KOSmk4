@@ -51,10 +51,10 @@ typedef WUNUSED NONNULL((1, 2)) REF struct blkdev *
  *                  `variant' number (which  starts at  `0') is  used
  *                  to enumerate the different names. Enumation stops
  *                  on the first variant that returns `0'. */
-typedef WUNUSED NONNULL((1, 2, 3)) ssize_t
+typedef WUNUSED NONNULL((1, 2, 4)) ssize_t
 (KCALL *devdiskruledir_toname_t)(struct devdiskruledir *__restrict self,
-                                 struct blkdev *__restrict dev,
                                  __pformatprinter printer, void *arg,
+                                 struct blkdev *__restrict dev,
                                  uintptr_t variant);
 
 

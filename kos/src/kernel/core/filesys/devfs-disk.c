@@ -29,20 +29,25 @@
 #include <kernel/fs/devfs-spec.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/malloc.h>
+#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/overflow.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
+#include <ctype.h>
+#include <dirent.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /**/
@@ -86,46 +91,102 @@ NOTHROW(KCALL devdiskruledir_v_destroy)(struct mfile *__restrict self) {
 	kfree(me);
 }
 
-struct devicelink_dirent_printer_data {
-	struct devicelink_dirent *ddp_base;  /* [1..ddp_used|ALLOC(ddp_used+ddp_aval)][owned] Buffer */
-	size_t                    ddp_aval; /* Unused filename buffer size */
-	size_t                    ddp_used;  /* Used filename buffer size */
-};
+#define devdiskrule_mustescape(ch) \
+	(!isalnum(ch) && !strchr("_-.,+", ch))
 
-PRIVATE WUNUSED NONNULL((1, 2)) ssize_t KCALL
-devicelink_dirent_printer(/*struct devicelink_dirent_printer_data **/ void *arg,
-                          /*utf-8*/ char const *__restrict data,
-                          size_t datalen) {
-	struct devicelink_dirent_printer_data *info;
-	info = (struct devicelink_dirent_printer_data *)arg;
-	if (info->ddp_aval < datalen) {
-		struct devicelink_dirent *newbuf;
-		size_t min_alloc = info->ddp_used + datalen;
-		size_t new_alloc = info->ddp_used + info->ddp_aval;
-		if (!new_alloc)
-			new_alloc = 8;
-		while (new_alloc < min_alloc)
-			new_alloc *= 2;
-		newbuf = (struct devicelink_dirent *)krealloc_nx(info->ddp_base,
-		                                                 offsetof(struct devicelink_dirent, dld_ent.fd_name) +
-		                                                 (new_alloc + 1) * sizeof(char),
-		                                                 GFP_NORMAL);
-		if unlikely(!newbuf) {
-			newbuf = (struct devicelink_dirent *)krealloc(info->ddp_base,
-			                                              offsetof(struct devicelink_dirent, dld_ent.fd_name) +
-			                                              (min_alloc + 1) * sizeof(char),
-			                                              GFP_NORMAL);
+
+
+/* Unescape the filename encoded in `info', or return `NULL' if `info' is invalid.
+ * Of the returned directory entry, only the following fields are initialized:
+ *  - dld_ent.fd_namelen
+ *  - dld_ent.fd_name     # Including a trailing NUL! */
+PRIVATE WUNUSED NONNULL((1)) struct devicelink_dirent *FCALL
+devdiskruledir_unescape(struct flookup_info *__restrict info)
+		THROWS(E_SEGFAULT, E_BADALLOC) {
+	struct devicelink_dirent *result;
+	USER CHECKED char const *src, *end;
+	char *dst;
+	if unlikely(!info->flu_namelen)
+		return NULL;
+	result = (struct devicelink_dirent *)kmalloc_nx(offsetof(struct devicelink_dirent, dld_ent.fd_name) +
+	                                                (info->flu_namelen + 1) * sizeof(char),
+	                                                GFP_NORMAL);
+
+	/* Setup pointers */
+	dst = result->dld_ent.fd_name;
+	src = info->flu_name;
+	end = src + info->flu_namelen;
+	TRY {
+		while (src < end) {
+			char ch = *src++;
+			COMPILER_READ_BARRIER();
+			if (ch == '\\') {
+				uint8_t b;
+				if unlikely(src >= end)
+					goto err_r;
+				ch = *src++;
+				if unlikely(!(ch == 'x' || (ch == 'X' && (info->flu_flags & AT_DOSPATH))))
+					goto err_r;
+				if unlikely(src >= end)
+					goto err_r;
+				ch = *src++;
+				if (info->flu_flags & AT_DOSPATH)
+					ch = tolower(ch);
+				if (isdigit(ch)) {
+					b = ch - '0';
+				} else if (ch >= 'a' && ch <= 'f') {
+					b = 10 + ch - 'a';
+				} else {
+					goto err_r;
+				}
+				if unlikely(src >= end)
+					goto err_r;
+				ch = *src++;
+				b <<= 4;
+				if (info->flu_flags & AT_DOSPATH)
+					ch = tolower(ch);
+				if (isdigit(ch)) {
+					b |= ch - '0';
+				} else if (ch >= 'a' && ch <= 'f') {
+					b |= 10 + ch - 'a';
+				} else {
+					goto err_r;
+				}
+				if (b == 0 || !devdiskrule_mustescape(b))
+					goto err_r;
+				*dst++ = b;
+			} else {
+				if (devdiskrule_mustescape(ch))
+					goto err_r;
+				*dst++ = ch;
+			}
 		}
-		info->ddp_base = newbuf;
-		info->ddp_aval = kmalloc_usable_size(newbuf);
-		info->ddp_aval -= (info->ddp_used + 1) * sizeof(char);
-		info->ddp_aval -= offsetof(struct devicelink_dirent, dld_ent.fd_name);
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
 	}
-	memcpy(info->ddp_base->dld_ent.fd_name + info->ddp_used, data, datalen, sizeof(char));
-	info->ddp_aval -= datalen;
-	info->ddp_used  += datalen;
-	return (ssize_t)datalen;
+
+	/* Finalize the filename. */
+	*dst = '\0';
+	result->dld_ent.fd_namelen = (u16)(size_t)(dst - result->dld_ent.fd_name);
+
+	/* Free unused data. */
+	if unlikely(result->dld_ent.fd_namelen < info->flu_namelen) {
+		struct devicelink_dirent *newent;
+		newent = (struct devicelink_dirent *)krealloc_nx(result,
+		                                                 offsetof(struct devicelink_dirent, dld_ent.fd_name) +
+		                                                 (result->dld_ent.fd_namelen + 1) * sizeof(char),
+		                                                 GFP_NORMAL);
+		if likely(newent)
+			result = newent;
+	}
+	return result;
+err_r:
+	kfree(result);
+	return NULL;
 }
+
+
 
 
 PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
@@ -133,202 +194,269 @@ devdiskruledir_v_lookup(struct fdirnode *__restrict self,
                         struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	REF struct blkdev *result_dev;
+	struct devicelink_dirent *result;
 	struct devdiskruledir *me;
-	struct devicelink_dirent_printer_data pdat;
-
 	me = (struct devdiskruledir *)mfile_asdir(self);
 
-	/* Query block device by name. */
-	result_dev = (*me->ddrd_byname)(me, info);
-	if (!result_dev)
+	/* Unescape the given filename. */
+	result = devdiskruledir_unescape(info);
+	if unlikely(!result)
 		return NULL;
-	FINALLY_DECREF_UNLIKELY(result_dev);
-	pdat.ddp_used = 0;
-	pdat.ddp_aval = 128;
-	pdat.ddp_base = (struct devicelink_dirent *)kmalloc_nx(offsetof(struct devicelink_dirent, dld_ent.fd_name) +
-	                                                       (128 + 1) * sizeof(char),
-	                                                       GFP_NORMAL);
-	if (!pdat.ddp_base) {
-		pdat.ddp_aval = 1;
-		pdat.ddp_base = (struct devicelink_dirent *)kmalloc(offsetof(struct devicelink_dirent, dld_ent.fd_name) +
-		                                                    (1 + 1) * sizeof(char),
-		                                                    GFP_NORMAL);
-	}
-
-	/* Print device filename. */
 	TRY {
-		ssize_t error;
-		/* FIXME: Mustn't use the default variant; must use the original user-string
-		 *        instead, though this leaves a problem when user-space changes  the
-		 *        name after `ddrd_byname' used it...
-		 * Solution: enumeration already has to be adjusted so that it escapes illegal
-		 *           characters  within path names.  As such, we also  need to do some
-		 *           unescaping, which in turn also requires us to pre-parse the user-
-		 *           provided  string, at which point we'll already have our own copy! */
-		error = (*me->ddrd_toname)(me, result_dev, &devicelink_dirent_printer, &pdat, 0);
-		if unlikely(error <= 0 || pdat.ddp_used > (u16)-1) {
-			kfree(pdat.ddp_base);
+		struct flookup_info newinfo;
+		newinfo.flu_name    = result->dld_ent.fd_name;
+		newinfo.flu_hash    = FLOOKUP_INFO_HASH_UNSET;
+		newinfo.flu_namelen = result->dld_ent.fd_namelen;
+		newinfo.flu_flags   = info->flu_flags;
+
+		/* Query block device by name. */
+		result_dev = (*me->ddrd_byname)(me, &newinfo);
+		if (!result_dev) {
+			kfree(result);
 			return NULL;
 		}
+
+		/* XXX: Technically, we'd need to re-escape the `result' filename here... */
+
+		/* Fill in the resulting of `result' */
+		assert(newinfo.flu_name == result->dld_ent.fd_name);
+		assert(newinfo.flu_namelen == result->dld_ent.fd_namelen);
+		if likely(newinfo.flu_hash == FLOOKUP_INFO_HASH_UNSET)
+			newinfo.flu_hash = fdirent_hash(newinfo.flu_name, newinfo.flu_namelen);
+		result->dld_ent.fd_hash   = newinfo.flu_hash;
+		result->dld_ent.fd_ops    = &devicelink_dirent_ops;
+		result->dld_ent.fd_refcnt = 1;
+		result->dld_ent.fd_type   = DT_LNK;
+		result->dld_dev           = result_dev; /* Inherit reference */
+		result->dld_pfx           = me->_ddrd_prefix;
 	} EXCEPT {
-		kfree(pdat.ddp_base);
+		kfree(result);
 		RETHROW();
 	}
-
-	/* Free unused data. */
-	if likely(pdat.ddp_aval != 0) {
-		struct devicelink_dirent *newent;
-		newent = (struct devicelink_dirent *)krealloc_nx(pdat.ddp_base,
-		                                                 offsetof(struct devicelink_dirent, dld_ent.fd_name) +
-		                                                 (pdat.ddp_used + 1) * sizeof(char),
-		                                                 GFP_NORMAL);
-		if likely(newent)
-			pdat.ddp_base = newent;
-	}
-
-	/* Finalize name. */
-	pdat.ddp_base->dld_ent.fd_name[(u16)pdat.ddp_used] = '\0';
-	pdat.ddp_base->dld_ent.fd_namelen = (u16)pdat.ddp_used;
-
-	/* Fill in remaining fields. */
-	pdat.ddp_base->dld_ent.fd_type   = DT_LNK;
-	pdat.ddp_base->dld_ent.fd_hash   = fdirent_hash(pdat.ddp_base->dld_ent.fd_name, (u16)pdat.ddp_used);
-	pdat.ddp_base->dld_ent.fd_ino    = DEVFS_INO_DYN((uintptr_t)result_dev ^ (uintptr_t)me->_ddrd_prefix);
-	pdat.ddp_base->dld_ent.fd_ops    = &devicelink_dirent_ops;
-	pdat.ddp_base->dld_ent.fd_refcnt = 1;
-	pdat.ddp_base->dld_dev           = mfile_asdevice(incref(result_dev));
-	pdat.ddp_base->dld_pfx           = me->_ddrd_prefix;
-
-	/* Return the newly constructed directory entry. */
-	return &pdat.ddp_base->dld_ent;
+	return &result->dld_ent;
 }
 
 
-struct heap_printer_data {
-	char  *hp_base;  /* [0..hp_used|ALLOC(hp_used+hp_avail)][owned] Buffer */
-	size_t hp_avail; /* Unused buffer size */
-	size_t hp_used;  /* Used buffer size */
+
+struct devruleenum: fdirenum {
+#ifndef CONFIG_NO_SMP
+	struct atomic_lock dre_lock;    /* SMP lock */
+#endif /* !CONFIG_NO_SMP */
+	REF struct fnode  *dre_nextfil; /* [0..1][lock(SMP(dre_lock))] Next file to enumerate. */
+	uintptr_t          dre_nextvar; /* [lock(SMP(dre_lock))] Next variant to enumerate. */
 };
 
-PRIVATE WUNUSED NONNULL((1, 2)) ssize_t KCALL
-heap_printer(/*struct heap_printer_data **/ void *arg,
-             /*utf-8*/ char const *__restrict data,
-             size_t datalen) {
-	struct heap_printer_data *info;
-	info = (struct heap_printer_data *)arg;
-	if (info->hp_avail < datalen) {
-		char *newbuf;
-		size_t min_alloc = info->hp_used + datalen;
-		size_t new_alloc = info->hp_used + info->hp_avail;
-		if (!new_alloc)
-			new_alloc = 8;
-		while (new_alloc < min_alloc)
-			new_alloc *= 2;
-		newbuf = (char *)krealloc_nx(info->hp_base, new_alloc * sizeof(char), GFP_NORMAL);
-		if unlikely(!newbuf)
-			newbuf = (char *)krealloc(info->hp_base, min_alloc * sizeof(char), GFP_NORMAL);
-		info->hp_base  = newbuf;
-		info->hp_avail = kmalloc_usable_size(newbuf) - info->hp_used;
+#ifndef CONFIG_NO_SMP
+#define devruleenum_tryacquire_nopr(self) atomic_lock_tryacquire(&(self)->dre_lock)
+#define devruleenum_acquire_nopr(self)    atomic_lock_acquire_nopr(&(self)->dre_lock)
+#define devruleenum_release_nopr(self)    atomic_lock_release(&(self)->dre_lock)
+#define devruleenum_acquired(self)        atomic_lock_acquired(&(self)->dre_lock)
+#define devruleenum_available(self)       atomic_lock_available(&(self)->dre_lock)
+#else /* !CONFIG_NO_SMP */
+#define devruleenum_tryacquire_nopr(self) 1
+#define devruleenum_acquire_nopr(self)    (void)0
+#define devruleenum_release_nopr(self)    (void)0
+#define devruleenum_acquired(self)        (!PREEMPTION_ENABLED())
+#define devruleenum_available(self)       1
+#endif /* CONFIG_NO_SMP */
+#define devruleenum_acquire(self)                 \
+	do {                                          \
+		pflag_t __dre_was = PREEMPTION_PUSHOFF(); \
+		devruleenum_acquire_nopr(self)
+#define devruleenum_break(self)          \
+		(devruleenum_release_nopr(self), \
+		 PREEMPTION_POP(__dre_was))
+#define devruleenum_release(self)       \
+		devruleenum_release_nopr(self); \
+		PREEMPTION_POP(__dre_was);      \
+	}	__WHILE0
+
+
+struct devdiskruledir_readdata {
+	/*USER CHECKED*/ char *rd_buf;     /* File name buffer */
+	size_t                 rd_bufsize; /* File name buffer size */
+	size_t                 rd_reqsize; /* Required name size */
+};
+
+
+PRIVATE ssize_t FORMATPRINTER_CC
+escape_printer(void *arg, /*utf-8*/ char const *__restrict data, size_t datalen) {
+	size_t i;
+	struct devdiskruledir_readdata *info;
+	info = (struct devdiskruledir_readdata *)arg;
+#define putc(ch)                                       \
+	(++info->rd_reqsize,                               \
+	 info->rd_bufsize ? (void)(*info->rd_buf++ = (ch), \
+	                           --info->rd_bufsize)     \
+	                  : (void)0)
+	for (i = 0; i < datalen; ++i) {
+		unsigned char ch = (unsigned char)data[i];
+		if (devdiskrule_mustescape(ch)) {
+			putc('\\');
+			putc('x');
+			putc(_itoa_lower_digits[ch >> 4]);
+			putc(_itoa_lower_digits[ch & 0xf]);
+		} else {
+			putc(ch);
+		}
 	}
-	memcpy(info->hp_base + info->hp_used, data, datalen, sizeof(char));
-	info->hp_avail -= datalen;
-	info->hp_used  += datalen;
+#undef putc
 	return (ssize_t)datalen;
 }
 
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
-devdiskruledir_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
-                         size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+devruleenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                      size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
-	ssize_t result;
-	char namebuf[128];
-	ssize_t namelen;
-	struct format_snprintf_data snprintf_data;
+	bool should_yield;
+	struct devdiskruledir_readdata rdat;
 	struct devdiskruledir *dir;
-	struct devenum *me = (struct devenum *)self;
-	REF struct fnode *olddev, *mydev, *newdev;
+	struct devruleenum *me = (struct devruleenum *)self;
+	REF struct fnode *olddev, *mydev;
+	uintptr_t oldvar, myvar;
 	dir = (struct devdiskruledir *)mfile_asdir(me->de_dir);
-	format_snprintf_init(&snprintf_data, namebuf, COMPILER_LENOF(namebuf));
 again:
-	olddev = axref_get(&me->de_nextfil);
-	mydev  = olddev; /* Inherit reference */
+	devruleenum_acquire(me);
+	olddev = me->dre_nextfil;
+	if unlikely(!olddev) {
+		devruleenum_break(me);
+		return 0; /* EOF */
+	}
+	incref(olddev);
+	oldvar = me->dre_nextvar;
+	devruleenum_release(me);
+	FINALLY_DECREF_UNLIKELY(olddev);
 
-	/* Find the next block device. */
+	rdat.rd_buf     = buf->d_name;
+	rdat.rd_bufsize = bufsize;
+	if (OVERFLOW_USUB(rdat.rd_bufsize,
+	                  offsetof(struct dirent, d_name),
+	                  &rdat.rd_bufsize))
+		rdat.rd_bufsize = 0;
+	rdat.rd_reqsize = 0;
+
+	/* Find the next device to enumerate. */
+	mydev = mfile_asnode(incref(olddev));
+	myvar = oldvar;
 	for (;;) {
+		ssize_t status;
+		FINALLY_DECREF_UNLIKELY(mydev);
+		status = 0;
+		if (fnode_isblkdev(mydev)) {
+			status = (*dir->ddrd_toname)(dir, &escape_printer, &rdat,
+			                             mfile_asblkdev(mydev), myvar);
+		}
+		if (status > 0) {
+			incref(mydev);
+			break;
+		}
+		myvar = 0;
+		mydev = fsuper_nodeafter(&devfs, mydev);
 		if (!mydev)
 			return 0; /* EOF */
-		if (fnode_isblkdev(mydev))
-			break; /* Found a block device! */
-nextdev:
-		FINALLY_DECREF_UNLIKELY(mydev);
-		mydev = devenum_after(mydev);
-	}
-
-	/* Print the name for this device. */
-	TRY {
-		/* TODO: Support for multiple name variants! */
-		/* TODO: Must escape illegal bytes. E.g. ' ' --> "\x20" */
-		namelen = (*dir->ddrd_toname)(dir, fnode_asblkdev(mydev),
-		                              &format_snprintf_printer,
-		                              &snprintf_data, 0);
-		if (namelen <= 0)
-			goto nextdev;
-
-		/* Yield directory entry. */
-		if ((size_t)namelen > COMPILER_LENOF(namebuf)) {
-			/* Need a larger buffer for the name. - For this purpose, we use a heap buffer */
-			struct heap_printer_data dat;
-			dat.hp_base  = NULL;
-			dat.hp_avail = 0;
-			dat.hp_used  = 0;
-			RAII_FINALLY { kfree(dat.hp_base); };
-			namelen = (*dir->ddrd_toname)(dir, fnode_asblkdev(mydev),
-			                              &heap_printer, &dat, 0);
-			if unlikely(namelen <= 0 || dat.hp_used > (u16)-1)
-				goto nextdev;
-			result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
-			                             DEVFS_INO_DYN((uintptr_t)mydev ^
-			                                           (uintptr_t)dir->_ddrd_prefix),
-			                             DT_LNK, (u16)dat.hp_used, dat.hp_base);
-		} else {
-			result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
-			                             DEVFS_INO_DYN((uintptr_t)mydev ^
-			                                           (uintptr_t)dir->_ddrd_prefix),
-			                             DT_LNK, (u16)(size_t)namelen, namebuf);
-		}
-	} EXCEPT {
-		decref_unlikely(mydev);
-		RETHROW();
 	}
 	FINALLY_DECREF_UNLIKELY(mydev);
-	if (result < 0)
-		return (size_t)~result; /* Don't advance directory position. */
 
-	/* Update the nextdev field of the enumerator. */
-	newdev = devenum_after(mydev);
-	if (!axref_cmpxch_inherit_new(&me->de_nextfil, olddev, newdev)) {
-		decref_unlikely(newdev);
-		goto again;
+	/* Write-back additional data to the user-provided directory entry buffer. */
+	should_yield = true;
+	if (bufsize >= offsetof(struct dirent, d_name)) {
+		buf->d_ino    = (typeof(buf->d_ino))DEVFS_INO_DYN((uintptr_t)mydev ^ (uintptr_t)dir->_ddrd_prefix);
+		buf->d_type   = (typeof(buf->d_type))DT_LNK;
+		buf->d_namlen = (typeof(buf->d_namlen))rdat.rd_reqsize;
+		if (bufsize >= (offsetof(struct dirent, d_name) + rdat.rd_reqsize + 1)) {
+			/* Add trailing NUL */
+			buf->d_name[rdat.rd_reqsize] = '\0';
+		} else {
+			if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT)
+				should_yield = false; /* Don't yield */
+		}
+		if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
+			should_yield = false; /* Don't yield */
+	} else {
+		if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
+			should_yield = false; /* Don't yield */
 	}
-	return (size_t)result;
+
+	/* If requested, advance to the next entry. */
+	if (should_yield) {
+		devruleenum_acquire(me);
+		if (olddev != me->dre_nextfil ||
+		    oldvar != me->dre_nextvar) {
+			devruleenum_break(me);
+			goto again;
+		}
+		me->dre_nextfil = mfile_asnode(incref(mydev)); /* Inherit reference (x2) */
+		me->dre_nextvar = myvar + 1;
+		devruleenum_release(me);
+		decref_unlikely(olddev);
+	}
+
+	return ((offsetof(struct dirent, d_name)) +
+	        (rdat.rd_reqsize + 1) * sizeof(char));
 }
 
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL devruleenum_v_fini)(struct fdirenum *__restrict self) {
+	struct devruleenum *me = (struct devruleenum *)self;
+	decref_unlikely(me->dre_nextfil);
+}
+
+PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
+devruleenum_v_seekdir(struct fdirenum *__restrict self,
+                      off_t offset, unsigned int whence)
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...) {
+	pos_t result;
+	struct devruleenum *me = (struct devruleenum *)self;
+	switch (whence) {
+
+	case SEEK_SET: {
+		REF struct fnode *olddev;
+		REF struct fnode *newdev;
+		if (offset != 0)
+			goto invarg;
+		newdev = fsuper_nodeafter(&devfs, NULL);
+		devruleenum_acquire(me);
+		olddev = me->dre_nextfil;
+		me->dre_nextfil = newdev;
+		me->dre_nextvar = 0;
+		devruleenum_release(me);
+		xdecref_unlikely(olddev);
+		result = 0;
+	}	break;
+
+	default:
+invarg:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+		break;
+	}
+	return result;
+}
+
+
 PRIVATE struct fdirenum_ops const devdiskruledir_enum_ops = {
-	.deo_fini    = &devenum_v_fini,
-	.deo_readdir = &devdiskruledir_v_readdir,
-	.deo_seekdir = &devenum_v_seekdir,
+	.deo_fini    = &devruleenum_v_fini,
+	.deo_readdir = &devruleenum_v_readdir,
+	.deo_seekdir = &devruleenum_v_seekdir,
 };
 
 PUBLIC BLOCKING NONNULL((1)) void KCALL
 devdiskruledir_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_IOERROR, ...) {
-	struct devenum *me;
+	struct devruleenum *me;
 #undef devdiskruledir_v_enumsz
-	DEFINE_PUBLIC_SYMBOL(devdiskruledir_v_enumsz, sizeof(struct devenum), 0);
-	me         = (struct devenum *)result;
+	DEFINE_PUBLIC_SYMBOL(devdiskruledir_v_enumsz, sizeof(struct devruleenum), 0);
+#define devdiskruledir_v_enumsz sizeof(struct devruleenum)
+	me         = (struct devruleenum *)result;
 	me->de_ops = &devdiskruledir_enum_ops;
-	devenum_init(me);
+#ifndef CONFIG_NO_SMP
+	atomic_lock_init(&me->dre_lock);
+#endif /* !CONFIG_NO_SMP */
+	me->dre_nextfil = fsuper_nodeafter(&devfs, NULL);
+	me->dre_nextvar = 0;
 }
 
 PUBLIC_CONST struct fdirnode_ops const devdiskruledir_ops = {
@@ -342,7 +470,7 @@ PUBLIC_CONST struct fdirnode_ops const devdiskruledir_ops = {
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 	.dno_lookup = &devdiskruledir_v_lookup,
-	.dno_enumsz = sizeof(struct devenum),
+	.dno_enumsz = devdiskruledir_v_enumsz,
 	.dno_enum   = &devdiskruledir_v_enum,
 };
 
@@ -359,7 +487,7 @@ INTERN_CONST struct fdirnode_ops const _devdiskruledir_default_ops = {
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 	.dno_lookup = &devdiskruledir_v_lookup,
-	.dno_enumsz = sizeof(struct devenum),
+	.dno_enumsz = devdiskruledir_v_enumsz,
 	.dno_enum   = &devdiskruledir_v_enum,
 };
 

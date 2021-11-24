@@ -63,11 +63,10 @@ devdisk_label_byname(struct devdiskruledir *__restrict UNUSED(self),
 	return NULL;
 }
 
-INTERN WUNUSED NONNULL((1, 2, 3)) ssize_t KCALL
+INTERN WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL
 devdisk_label_toname(struct devdiskruledir *__restrict UNUSED(self),
-                     struct blkdev *__restrict dev,
                      __pformatprinter printer, void *arg,
-                     uintptr_t variant) {
+                     struct blkdev *__restrict dev, uintptr_t variant) {
 	COMPILER_IMPURE();
 	(void)variant;
 	(void)dev;
@@ -92,11 +91,10 @@ devdisk_uuid_byname(struct devdiskruledir *__restrict UNUSED(self),
 	return NULL;
 }
 
-INTERN WUNUSED NONNULL((1, 2, 3)) ssize_t KCALL
+INTERN WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL
 devdisk_uuid_toname(struct devdiskruledir *__restrict UNUSED(self),
-                    struct blkdev *__restrict dev,
                     __pformatprinter printer, void *arg,
-                    uintptr_t variant) {
+                    struct blkdev *__restrict dev, uintptr_t variant) {
 	COMPILER_IMPURE();
 	(void)variant;
 	(void)dev;
@@ -144,11 +142,10 @@ devdisk_partlabel_byname(struct devdiskruledir *__restrict UNUSED(self),
 	return NULL;
 }
 
-INTERN WUNUSED NONNULL((1, 2, 3)) ssize_t KCALL
+INTERN WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL
 devdisk_partlabel_toname(struct devdiskruledir *__restrict UNUSED(self),
-                         struct blkdev *__restrict dev,
                          __pformatprinter printer, void *arg,
-                         uintptr_t variant) {
+                         struct blkdev *__restrict dev, uintptr_t variant) {
 	if (variant != 0)
 		return 0;
 	if (!blkdev_ispart(dev))
@@ -237,11 +234,10 @@ devdisk_partuuid_byname(struct devdiskruledir *__restrict UNUSED(self),
 	return NULL;
 }
 
-INTERN WUNUSED NONNULL((1, 2, 3)) ssize_t KCALL
+INTERN WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL
 devdisk_partuuid_toname(struct devdiskruledir *__restrict UNUSED(self),
-                        struct blkdev *__restrict dev,
                         __pformatprinter printer, void *arg,
-                        uintptr_t variant) {
+                        struct blkdev *__restrict dev, uintptr_t variant) {
 	uint32_t mbr_partid;
 	if (variant != 0)
 		return 0;
@@ -284,11 +280,10 @@ devdisk_id_byname(struct devdiskruledir *__restrict UNUSED(self),
 	return NULL;
 }
 
-INTERN WUNUSED NONNULL((1, 2, 3)) ssize_t KCALL
+INTERN WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL
 devdisk_id_toname(struct devdiskruledir *__restrict UNUSED(self),
-                  struct blkdev *__restrict dev,
                   __pformatprinter printer, void *arg,
-                  uintptr_t variant) {
+                  struct blkdev *__restrict dev, uintptr_t variant) {
 	/* TODO */
 	COMPILER_IMPURE();
 	(void)variant;
@@ -315,11 +310,10 @@ devdisk_path_byname(struct devdiskruledir *__restrict UNUSED(self),
 	return NULL;
 }
 
-INTERN WUNUSED NONNULL((1, 2, 3)) ssize_t KCALL
+INTERN WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL
 devdisk_path_toname(struct devdiskruledir *__restrict UNUSED(self),
-                    struct blkdev *__restrict dev,
                     __pformatprinter printer, void *arg,
-                    uintptr_t variant) {
+                    struct blkdev *__restrict dev, uintptr_t variant) {
 	/* TODO */
 	COMPILER_IMPURE();
 	(void)variant;

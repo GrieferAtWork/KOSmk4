@@ -90,10 +90,10 @@ INTDEF struct fdirnode_ops const _devdiskruledir_default_ops;
 	INTDEF WUNUSED NONNULL((1, 2)) REF struct blkdev *KCALL                                          \
 	symbol_byname(struct devdiskruledir *__restrict self,                                            \
 	              struct flookup_info *__restrict info);                                             \
-	INTDEF WUNUSED NONNULL((1, 2, 3)) ssize_t KCALL                                                  \
+	INTDEF WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL                                                  \
 	symbol_toname(struct devdiskruledir *__restrict self,                                            \
-	              struct blkdev *__restrict dev,                                                     \
 	              __pformatprinter printer, void *arg,                                               \
+	              struct blkdev *__restrict dev,                                                     \
 	              uintptr_t variant);                                                                \
 	PRIVATE struct devdiskruledir _dir_##devdiskrule_name = {                                        \
 		.ddrd_dir = {                                                                                \
