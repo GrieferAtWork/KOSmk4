@@ -159,8 +159,12 @@ devdiskruledir_v_lookup(struct fdirnode *__restrict self,
 	TRY {
 		ssize_t error;
 		/* FIXME: Mustn't use the default variant; must use the original user-string
-		 *        instead, though this leaves a problem when user-space changes the
-		 *        name after `ddrd_byname' used it... */
+		 *        instead, though this leaves a problem when user-space changes  the
+		 *        name after `ddrd_byname' used it...
+		 * Solution: enumeration already has to be adjusted so that it escapes illegal
+		 *           characters  within path names.  As such, we also  need to do some
+		 *           unescaping, which in turn also requires us to pre-parse the user-
+		 *           provided  string, at which point we'll already have our own copy! */
 		error = (*me->ddrd_toname)(me, result_dev, &devicelink_dirent_printer, &pdat, 0);
 		if unlikely(error <= 0 || pdat.ddp_used > (u16)-1) {
 			kfree(pdat.ddp_base);
@@ -264,6 +268,7 @@ nextdev:
 	/* Print the name for this device. */
 	TRY {
 		/* TODO: Support for multiple name variants! */
+		/* TODO: Must escape illegal bytes. E.g. ' ' --> "\x20" */
 		namelen = (*dir->ddrd_toname)(dir, fnode_asblkdev(mydev),
 		                              &format_snprintf_printer,
 		                              &snprintf_data, 0);

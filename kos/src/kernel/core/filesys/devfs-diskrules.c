@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_FILESYS_DEVFS_DISKRULES_C
 #define GUARD_KERNEL_CORE_FILESYS_DEVFS_DISKRULES_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -28,7 +29,13 @@
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/ramfs.h>
 
+#include <hybrid/unaligned.h>
+
+#include <ctype.h>
+#include <format-printer.h>
+#include <inttypes.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 /*
@@ -159,12 +166,74 @@ devdisk_partlabel_toname(struct devdiskruledir *__restrict UNUSED(self),
 /* /dev/disk/by-partuuid                                                */
 /************************************************************************/
 /* Either `bp_efi_partguid', or `TOHEX(*(u32 *)&br_mbr_diskuid[4]) + "-%.2x" % PARTNO' */
+
 INTERN WUNUSED NONNULL((1, 2)) REF struct blkdev *KCALL
 devdisk_partuuid_byname(struct devdiskruledir *__restrict UNUSED(self),
                         struct flookup_info *__restrict info) {
-	/* TODO */
-	COMPILER_IMPURE();
-	(void)info;
+	if (info->flu_namelen == COMPILER_STRLEN("00000000-0000-0000-0000-000000000000")) {
+		REF struct fnode *node;
+		guid_t guid;
+		unsigned int i;
+		char text[COMPILER_STRLEN("00000000-0000-0000-0000-000000000000")];
+		memcpy(text, info->flu_name, sizeof(text));
+		if (info->flu_flags & AT_DOSPATH) {
+			for (i = 0; i < COMPILER_LENOF(text); ++i)
+				text[i] = tolower(text[i]);
+		}
+		for (i = 0; i < COMPILER_LENOF(text); ++i) {
+			if (!islower(text[i]) && !isdigit(text[i]) && text[i] != '-')
+				return NULL;
+		}
+		if (!guid_fromstr(text, &guid))
+			return NULL;
+		if (GUID_EQUALS(guid, 00000000, 0000, 0000, 0000, 000000000000))
+			return NULL;
+		node = fsuper_nodeafter(&devfs, NULL);
+		while (node) {
+			FINALLY_DECREF_UNLIKELY(node);
+			if (fnode_isblkpart(node)) {
+				struct blkdev *dev = fnode_asblkdev(node);
+				if (memcmp(&dev->bd_partinfo.bp_efi_partguid, &guid, sizeof(guid)) == 0)
+					return mfile_asblkdev(incref(dev));
+			}
+			node = fsuper_nodeafter(&devfs, node);
+		}
+		return NULL;
+	}
+
+	if (info->flu_namelen == COMPILER_STRLEN("00000000-00")) {
+		REF struct fnode *node;
+		unsigned int i;
+		char text[COMPILER_STRLEN("00000000-00\0")];
+		uint32_t mbrsig;
+		uint8_t partno;
+		*(char *)mempcpy(text, info->flu_name, sizeof(text) - sizeof(char)) = '\0';
+		if (info->flu_flags & AT_DOSPATH) {
+			for (i = 0; i < COMPILER_LENOF(text); ++i)
+				text[i] = tolower(text[i]);
+		}
+		for (i = 0; i < COMPILER_STRLEN("00000000-00"); ++i) {
+			if (i == COMPILER_STRLEN("00000000")
+			    ? text[i] != '-'
+			    : (!islower(text[i]) &&
+			       !isdigit(text[i])))
+				return NULL;
+		}
+		mbrsig = strtou32(text + 0, NULL, 16);
+		partno = (uint8_t)strtou32(text + 9, NULL, 16);
+		node   = fsuper_nodeafter(&devfs, NULL);
+		while (node) {
+			FINALLY_DECREF_UNLIKELY(node);
+			if (fnode_isblkpart(node)) {
+				struct blkdev *dev = fnode_asblkdev(node);
+				if (dev->bd_partinfo.bp_partno == partno &&
+				    blkdev_get_mbr_disksig(dev->bd_partinfo.bp_master) == mbrsig)
+					return mfile_asblkdev(incref(dev));
+			}
+			node = fsuper_nodeafter(&devfs, node);
+		}
+		return NULL;
+	}
 	return NULL;
 }
 
@@ -173,12 +242,28 @@ devdisk_partuuid_toname(struct devdiskruledir *__restrict UNUSED(self),
                         struct blkdev *__restrict dev,
                         __pformatprinter printer, void *arg,
                         uintptr_t variant) {
-	/* TODO */
-	COMPILER_IMPURE();
-	(void)variant;
-	(void)dev;
-	(void)printer;
-	(void)arg;
+	uint32_t mbr_partid;
+	if (variant != 0)
+		return 0;
+	if (!blkdev_ispart(dev))
+		return 0;
+	if (!GUID_EQUALS(dev->bd_partinfo.bp_efi_partguid, 00000000, 0000, 0000, 0000, 000000000000)) {
+		/* EFI partition GUID. */
+		return format_printf(printer, arg,
+		                     "%.8" PRIx32 "-%.4" PRIx16 "-%.4" PRIx16 "-%.4" PRIx16 "-%.12" PRIx64,
+		                     GUID_A(dev->bd_partinfo.bp_efi_partguid),
+		                     GUID_B(dev->bd_partinfo.bp_efi_partguid),
+		                     GUID_C(dev->bd_partinfo.bp_efi_partguid),
+		                     GUID_D(dev->bd_partinfo.bp_efi_partguid),
+		                     GUID_E(dev->bd_partinfo.bp_efi_partguid));
+	}
+
+	/* Fallback: MBR partition id. */
+	mbr_partid = blkdev_get_mbr_disksig(dev->bd_partinfo.bp_master);
+	if (mbr_partid != 0) {
+		return format_printf(printer, arg, "%.8" PRIx32 "-%.2" PRIx8,
+		                     mbr_partid, (uint8_t)dev->bd_partinfo.bp_partno);
+	}
 	return 0;
 }
 /************************************************************************/

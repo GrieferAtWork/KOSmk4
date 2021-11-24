@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71c542f3 */
+/* HASH CRC-32:0x94a02f18 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,7 +107,7 @@ typedef union __ATTR_PACKED {
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 /* Length of the string representation of a GUID */
-#define GUID_STRLEN 37
+#define GUID_STRLEN 36
 
 /* Printf helpers for GUID printing */
 #define FORMAT_GUID_T         "%" __PRINP_4 "-%" __PRINP_2 "-%" __PRINP_2 "-%" __PRINP_2 "-%.12" __PRI8_PREFIX "X"

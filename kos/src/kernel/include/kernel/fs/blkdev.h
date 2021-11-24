@@ -24,6 +24,7 @@
 
 #include <kernel/fs/devfs.h>
 
+#include <hybrid/__unaligned.h>
 #include <hybrid/sync/atomic-lock.h>
 
 #include <kos/guid.h>
@@ -108,6 +109,8 @@ struct blkdev
 			byte_t                  br_mbr_diskuid[10];   /* [lock(br_partslock)] MBR disk uid (`struct mbr_sector::mbr_diskuid', or all zeroes if unknown or N/A) */
 			guid_t                  br_efi_guid;          /* [lock(br_partslock)] EFI disk GUID (`struct efi_descriptor::gpt_guid', or all zeroes if unknown or N/A) */
 		} bd_rootinfo; /* [valid_if(blkdev_isroot(this))] */
+#define blkdev_get_mbr_disksig(self) \
+	__hybrid_unaligned_get32((uint32_t const *)&(self)->bd_rootinfo.br_mbr_diskuid[4])
 
 		/* Device partition information. */
 		struct {
