@@ -2261,6 +2261,82 @@ fatdir_v_enum(struct fdirenum *__restrict result)
 	rt->de_ops = &fatdirenum_ops;
 }
 
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ssize_t KCALL
+fat_v_printlink_open(struct mfile *__restrict self, __pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	ssize_t result, temp;
+	FatNodeData *dat = mfile_asnode(self)->fn_fsdata;
+	FatSuperblock *super;
+	REF struct fatdirent *file_ent;
+	REF FatDirNode *file_dir;
+	FatNodeData_Read(dat);
+	file_ent = dat->fn_ent;
+	file_dir = dat->fn_dir;
+	xincref(file_ent);
+	xincref(file_dir);
+	FatNodeData_EndRead(dat);
+	if (file_dir) {
+		FINALLY_DECREF_UNLIKELY(file_dir);
+		FINALLY_XDECREF_UNLIKELY(file_ent);
+		result = fat_v_printlink_open(file_dir, printer, arg);
+		if unlikely(result < 0)
+			return result;
+		temp = (*printer)(arg, "/", 1);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+		if likely(file_ent) {
+			temp = (*printer)(arg,
+			                  file_ent->fad_ent.fde_ent.fd_name,
+			                  file_ent->fad_ent.fde_ent.fd_namelen);
+		} else {
+			temp = (*printer)(arg, "?", 1);
+		}
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+		return result;
+	}
+	xdecref_unlikely(file_ent);
+	super  = fsuper_asfat(mfile_asnode(self)->fn_super);
+	result = (*printer)(arg, "inode:[fatfs:", 13);
+	if unlikely(result < 0)
+		return result;
+	temp = mfile_uprintlink(super->ft_super.ffs_super.fs_dev, printer, arg);
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+	temp = (*printer)(arg, ":", 1);
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ssize_t KCALL
+fat_v_printlink(struct mfile *__restrict self, __pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	ssize_t result;
+	result = fat_v_printlink_open(self, printer, arg);
+	if likely(result >= 0) {
+		ssize_t temp;
+		if (mfile_issuper(self)) {
+			temp = (*printer)(arg, "/", 1);
+			if unlikely(temp < 0)
+				return temp;
+			result += temp;
+		}
+		temp = (*printer)(arg, "]", 1);
+		if unlikely(temp < 0)
+			return temp;
+		result += temp;
+	}
+	return result;
+}
+
+
 
 
 /************************************************************************/
@@ -2268,8 +2344,9 @@ fatdir_v_enum(struct fdirenum *__restrict result)
 /************************************************************************/
 PRIVATE struct mfile_stream_ops const FatReg_StreamOps = {
 	/* TODO: Truncate operator (call the underlying truncate before freeing out-of-bounds clusters) */
-	.mso_ioctl = &Fat_Ioctl,
-	.mso_hop   = &fregnode_v_hop,
+	.mso_ioctl     = &Fat_Ioctl,
+	.mso_hop       = &fregnode_v_hop,
+	.mso_printlink = &fat_v_printlink,
 };
 
 PRIVATE struct fregnode_ops const Fat_RegOps = {
@@ -2286,10 +2363,11 @@ PRIVATE struct fregnode_ops const Fat_RegOps = {
 };
 
 PRIVATE struct mfile_stream_ops const FatDir_StreamOps = {
-	.mso_open  = &flatdirnode_v_open,
-	.mso_stat  = &flatdirnode_v_stat,
-	.mso_ioctl = &Fat_Ioctl,
-	.mso_hop   = &flatdirnode_v_hop,
+	.mso_open      = &flatdirnode_v_open,
+	.mso_stat      = &flatdirnode_v_stat,
+	.mso_ioctl     = &Fat_Ioctl,
+	.mso_hop       = &flatdirnode_v_hop,
+	.mso_printlink = &fat_v_printlink,
 };
 PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 	.fdno_dir = {
@@ -2323,9 +2401,10 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 };
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 PRIVATE struct mfile_stream_ops const Fat_LnkStreamOps = {
-	.mso_stat  = &FatLnk_Stat,
-	.mso_ioctl = &Fat_Ioctl,
-	.mso_hop   = &flnknode_v_hop,
+	.mso_stat      = &FatLnk_Stat,
+	.mso_ioctl     = &Fat_Ioctl,
+	.mso_hop       = &flnknode_v_hop,
+	.mso_printlink = &fat_v_printlink,
 };
 PRIVATE struct flnknode_ops const Fat_LnkOps = {
 	.lno_node = {
