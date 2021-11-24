@@ -2087,13 +2087,13 @@ fatdirenum_do_ioctl_readdir(struct fatdirent *__restrict ent,
 		result[0].d_off    = 0;            /* *ditto* */
 		result[0].d_reclen = usedname_len; /* Contrary to the name, this is the length of the filename! */
 		memcpy(result[0].d_name, usedname, usedname_len + 1, sizeof(char));
-	
+
 		if (flags & FATDIRENUM_IOCTL_READDIR_F_BOTH) {
 			/* Fill in the second entry with the long filename. */
 			uint16_t longlen = ent->fad_ent.fde_ent.fd_namelen;
 			if (longlen > 255) {
 				/* We're dealing with fixed buffers, meaning we're limited to this many characters.
-				 * Linux doesn't say what should happen if the long filename is longer than this,
+				 * Linux doesn't say what should happen if  the long filename is longer than  this,
 				 * and I would like to mention that yes: IT CAN BE LONGER THAN THIS. As a matter of
 				 * fact, the longest theoretical name is 780 characters long:
 				 * >> 780 == LFN_SEQNUM_MAXCOUNT * UNICODE_16TO8_MAXBUF(LFN_NAME)
@@ -2425,6 +2425,58 @@ PRIVATE struct flnknode_ops const Fat_LnkOps = {
 /************************************************************************/
 /* FAT Superblock operators.                                            */
 /************************************************************************/
+struct multifat_sync_file: mfile {
+	REF struct mfile *mfsf_dev;              /* Underlying device. */
+	uint64_t          mfsf_fat_delta;        /* [const] Relative on-disk delta between different FAT copies. */
+	u8                mfsf_fat_count;        /* [const] Total # of FAT copies. */
+	bool              mfsf_delta_is_aligned; /* [const] `true' if `mfsf_fat_delta' is aligned according to `mfsf_dev' */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL multifat_sync_file_destroy)(struct mfile *__restrict self) {
+	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
+	decref_unlikely(me->mfsf_dev);
+	kfree(me);
+}
+
+PRIVATE NONNULL((1, 5)) void KCALL
+multifat_sync_file_loadblocks(struct mfile *__restrict self, pos_t addr,
+                              physaddr_t buf, size_t num_bytes,
+                              struct aio_multihandle *__restrict aio) {
+	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
+	/* The initial FAT is always properly aligned. */
+	mfile_rdblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+}
+
+PRIVATE NONNULL((1, 5)) void KCALL
+multifat_sync_file_saveblocks(struct mfile *__restrict self, pos_t addr,
+                              physaddr_t buf, size_t num_bytes,
+                              struct aio_multihandle *__restrict aio) {
+	u8 i;
+	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
+	if ((me->mfsf_dev->mf_flags & MFILE_F_READONLY) ||
+	    (me->mfsf_dev->mf_ops->mo_saveblocks == NULL))
+		THROW(E_FSERROR_READONLY);
+
+	/* The initial FAT is always properly aligned. */
+	mfile_wrblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+	for (i = 1; i < me->mfsf_fat_count; ++i) {
+		addr += me->mfsf_fat_delta;
+		if likely(me->mfsf_delta_is_aligned) {
+			mfile_wrblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+		} else {
+			/* oof... Have to use buffered I/O... */
+			mfile_write_p(me->mfsf_dev, buf, num_bytes, addr);
+		}
+	}
+}
+
+PRIVATE struct mfile_ops const multifat_sync_file_ops = {
+	.mo_destroy    = &multifat_sync_file_destroy,
+	.mo_loadblocks = &multifat_sync_file_loadblocks,
+	.mo_saveblocks = &multifat_sync_file_saveblocks,
+};
+
 PRIVATE NONNULL((1, 5)) void KCALL
 Fat16Root_LoadBlocks(struct mfile *__restrict self, pos_t addr,
                      physaddr_t buf, size_t num_bytes,
@@ -2474,6 +2526,16 @@ NOTHROW(KCALL FatSuper_Destroy)(struct mfile *__restrict self) {
 	mman_unmap_kram_and_kfree(me->ft_fat_table,
 	                          me->ft_fat_size,
 	                          me->ft_freefat);
+	/* If the fat file is an instance of the special multifat  wrapper,
+	 * then we must delete it when the superblock is closed. Otherwise,
+	 * its mem-parts will continue to  remain dangling within the  list
+	 * of all mem-parts!
+	 *
+	 * Only do this for the multifat case. - The other case where the
+	 * fat file is a proper device must not result in the file  being
+	 * deleted (anonymized). */
+	if (me->ft_fat_file->mf_ops == &multifat_sync_file_ops)
+		mfile_delete(me->ft_fat_file);
 	decref(me->ft_fat_file);
 	flatsuper_v_destroy(self);
 }
@@ -2987,61 +3049,6 @@ trimspecstring(char *__restrict buf, size_t size) {
 	buf[size] = '\0';
 }
 
-
-struct multifat_sync_file: mfile {
-	REF struct mfile *mfsf_dev;              /* Underlying device. */
-	uint64_t          mfsf_fat_delta;        /* [const] Relative on-disk delta between different FAT copies. */
-	u8                mfsf_fat_count;        /* [const] Total # of FAT copies. */
-	bool              mfsf_delta_is_aligned; /* [const] `true' if `mfsf_fat_delta' is aligned according to `mfsf_dev' */
-};
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL multifat_sync_file_destroy)(struct mfile *__restrict self) {
-	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
-	decref_unlikely(me->mfsf_dev);
-	kfree(me);
-}
-
-PRIVATE NONNULL((1, 5)) void KCALL
-multifat_sync_file_loadblocks(struct mfile *__restrict self, pos_t addr,
-                              physaddr_t buf, size_t num_bytes,
-                              struct aio_multihandle *__restrict aio) {
-	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
-	/* The initial FAT is always properly aligned. */
-	mfile_rdblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
-}
-
-PRIVATE NONNULL((1, 5)) void KCALL
-multifat_sync_file_saveblocks(struct mfile *__restrict self, pos_t addr,
-                              physaddr_t buf, size_t num_bytes,
-                              struct aio_multihandle *__restrict aio) {
-	u8 i;
-	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
-	if ((me->mfsf_dev->mf_flags & MFILE_F_READONLY) ||
-	    (me->mfsf_dev->mf_ops->mo_saveblocks == NULL))
-		THROW(E_FSERROR_READONLY);
-
-	/* The initial FAT is always properly aligned. */
-	mfile_wrblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
-	for (i = 1; i < me->mfsf_fat_count; ++i) {
-		addr += me->mfsf_fat_delta;
-		if likely(me->mfsf_delta_is_aligned) {
-			mfile_wrblocks_async(me->mfsf_dev, addr, buf, num_bytes, aio);
-		} else {
-			/* oof... Have to use buffered I/O... */
-			mfile_write_p(me->mfsf_dev, buf, num_bytes, addr);
-		}
-	}
-}
-
-PRIVATE struct mfile_ops const multifat_sync_file_ops = {
-	.mo_destroy    = &multifat_sync_file_destroy,
-	.mo_loadblocks = &multifat_sync_file_loadblocks,
-	.mo_saveblocks = &multifat_sync_file_saveblocks,
-};
-
-
-
 PRIVATE WUNUSED NONNULL((1)) struct fsuper *KCALL
 Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
                    struct mfile *dev, UNCHECKED USER char *args) {
@@ -3270,57 +3277,59 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 				kfree(result->ft_fdat.fn_clusterv);
 			RETHROW();
 		}
-
-		/* Fill in mandatory superblock fields. */
-		/*result->ft_super.ffs_super.fs_root.mf_blockshift       = result->ft_sectorshift;*/ /* It's the same field! */
-		result->ft_super.ffs_super.fs_root.mf_iobashift          = dev->mf_iobashift;
-		result->ft_super.ffs_super.fs_root.fn_ino                = 0;
-		result->ft_super.ffs_super.fs_feat.sf_filesize_max       = (pos_t)UINT32_MAX;
-		result->ft_super.ffs_super.fs_feat.sf_uid_max            = 0;
-		result->ft_super.ffs_super.fs_feat.sf_gid_max            = 0;
-		result->ft_super.ffs_super.fs_feat.sf_symlink_max        = 0;
-		result->ft_super.ffs_super.fs_feat.sf_link_max           = 1;
-		result->ft_super.ffs_super.fs_feat.sf_magic              = MSDOS_SUPER_MAGIC;
-		result->ft_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->ft_sectormask + 1;
-		result->ft_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->ft_sectormask + 1;
-		result->ft_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->ft_sectormask + 1;
-		result->ft_super.ffs_super.fs_feat.sf_rec_xfer_align     = (u32)1 << dev->mf_iobashift;
-		result->ft_super.ffs_super.fs_feat.sf_name_max           = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
-		result->ft_super.ffs_super.fs_feat.sf_filesizebits       = 32;
-		result->ft_super.ffs_super.fs_root.fn_fsdata             = &result->ft_fdat;
-		result->ft_super.ffs_super.fs_root.mf_atime              = realtime();
-		result->ft_super.ffs_super.fs_root.mf_mtime              = result->ft_super.ffs_super.fs_root.mf_atime;
-		result->ft_super.ffs_super.fs_root.mf_ctime              = result->ft_super.ffs_super.fs_root.mf_atime;
-		result->ft_super.ffs_super.fs_root.fn_nlink              = 1;
-		result->ft_super.ffs_super.fs_root.fn_uid                = 0;
-		result->ft_super.ffs_super.fs_root.fn_gid                = 0;
-		result->ft_fdat.fn_ent                                   = NULL;
-		result->ft_fdat.fn_dir                                   = NULL;
-		result->_ft_1dot                                         = (uint32_t)-1;
-		result->_ft_2dot                                         = (uint32_t)-1;
-
-		/* Special case for when uid/gid support is available. */
-		if (result->ft_features & FAT_FEATURE_UGID) {
-			result->ft_super.ffs_super.fs_feat.sf_uid_max = (uid_t)0xff;
-			result->ft_super.ffs_super.fs_feat.sf_gid_max = (gid_t)0xff;
-		}
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-		if (!(result->ft_features & FAT_FEATURE_NO_CYGWIN_SYMLINK))
-			result->ft_super.ffs_super.fs_feat.sf_symlink_max = (pos_t)FAT_SYMLINK_FILE_TEXTLEN(UINT32_MAX);
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
-
-		/* Select root directory operators. */
-		result->ft_super.ffs_super.fs_root.mf_ops = result->ft_type == FAT32
-		                                            ? &Fat32_SuperOps.ffso_super.so_fdir.dno_node.no_file
-		                                            : &Fat16_SuperOps.ffso_super.so_fdir.dno_node.no_file;
-
-		/* Fill in fields relating to `flatsuper' */
-		result->ft_super.ffs_features = FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO;
-		flatdirdata_init(&result->ft_super.ffs_rootdata);
 	} EXCEPT {
 		kfree(result);
 		RETHROW();
 	}
+
+	/* Fill in mandatory superblock fields. */
+	/*result->ft_super.ffs_super.fs_root.mf_blockshift       = result->ft_sectorshift;*/ /* It's the same field! */
+	result->ft_super.ffs_super.fs_root.mf_iobashift          = dev->mf_iobashift;
+	result->ft_super.ffs_super.fs_root.fn_ino                = 0;
+	result->ft_super.ffs_super.fs_feat.sf_filesize_max       = (pos_t)UINT32_MAX;
+	result->ft_super.ffs_super.fs_feat.sf_uid_max            = 0;
+	result->ft_super.ffs_super.fs_feat.sf_gid_max            = 0;
+	result->ft_super.ffs_super.fs_feat.sf_symlink_max        = 0;
+	result->ft_super.ffs_super.fs_feat.sf_link_max           = 1;
+	result->ft_super.ffs_super.fs_feat.sf_magic              = MSDOS_SUPER_MAGIC;
+	result->ft_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->ft_sectormask + 1;
+	result->ft_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->ft_sectormask + 1;
+	result->ft_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->ft_sectormask + 1;
+	result->ft_super.ffs_super.fs_feat.sf_rec_xfer_align     = (u32)1 << dev->mf_iobashift;
+	result->ft_super.ffs_super.fs_feat.sf_name_max           = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
+	result->ft_super.ffs_super.fs_feat.sf_filesizebits       = 32;
+	result->ft_super.ffs_super.fs_root.fn_fsdata             = &result->ft_fdat;
+	result->ft_super.ffs_super.fs_root.mf_atime              = realtime();
+	result->ft_super.ffs_super.fs_root.mf_mtime              = result->ft_super.ffs_super.fs_root.mf_atime;
+	result->ft_super.ffs_super.fs_root.mf_ctime              = result->ft_super.ffs_super.fs_root.mf_atime;
+	result->ft_super.ffs_super.fs_root.fn_nlink              = 1;
+	result->ft_super.ffs_super.fs_root.fn_uid                = 0;
+	result->ft_super.ffs_super.fs_root.fn_gid                = 0;
+	result->ft_fdat.fn_ent                                   = NULL;
+	result->ft_fdat.fn_dir                                   = NULL;
+	result->_ft_1dot                                         = (uint32_t)-1;
+	result->_ft_2dot                                         = (uint32_t)-1;
+
+	/* Special case for when uid/gid support is available. */
+	if (result->ft_features & FAT_FEATURE_UGID) {
+		result->ft_super.ffs_super.fs_feat.sf_uid_max = (uid_t)0xff;
+		result->ft_super.ffs_super.fs_feat.sf_gid_max = (gid_t)0xff;
+	}
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+	if (!(result->ft_features & FAT_FEATURE_NO_CYGWIN_SYMLINK))
+		result->ft_super.ffs_super.fs_feat.sf_symlink_max = (pos_t)FAT_SYMLINK_FILE_TEXTLEN(UINT32_MAX);
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+
+	/* Select root directory operators. */
+	result->ft_super.ffs_super.fs_root.mf_ops = result->ft_type == FAT32
+	                                            ? &Fat32_SuperOps.ffso_super.so_fdir.dno_node.no_file
+	                                            : &Fat16_SuperOps.ffso_super.so_fdir.dno_node.no_file;
+
+	/* Fill in fields relating to `flatsuper' */
+	result->ft_super.ffs_features = FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO;
+	flatdirdata_init(&result->ft_super.ffs_rootdata);
+
+
 	printk(KERN_INFO "[fat] Loaded FAT%u-filesystem "
 	                 "[oem=%q] [label=%q] [sysname=%q]\n",
 	       result->ft_type == FAT12 ? 12 : result->ft_type == FAT16 ? 16 : 32,
