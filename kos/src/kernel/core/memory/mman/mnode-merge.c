@@ -1690,7 +1690,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		if (LIST_ISBOUND(hipart, mp_allparts)) {
 			/* Must remove from the global list of all known parts. */
 			if (mpart_all_tryacquire()) {
-				LIST_REMOVE(hipart, mp_allparts);
+				_mpart_all_list_remove(hipart);
 				mpart_all_release();
 			} else {
 				struct lockop *lop;

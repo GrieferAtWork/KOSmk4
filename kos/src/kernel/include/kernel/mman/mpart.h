@@ -508,24 +508,24 @@ struct mpart {
 
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_filent_asanon() MPART_INIT_mp_filent({  })
-#define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)     \
-	{                                                                \
-		MPART_INIT_mp_refcnt(1),                                     \
-		MPART_INIT_mp_flags(MPART_F_NOFREE | MPART_F_NOSPLIT |       \
-		                    MPART_F_MLOCK | MPART_F_MLOCK_FROZEN),   \
-		MPART_INIT_mp_state(MPART_ST_MEM),                           \
-		MPART_INIT_mp_file(file),                                    \
-		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(~)),                \
-		MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(~)),               \
-		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(~)),            \
-		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),      \
-		MPART_INIT_mp_minaddr(0),                                    \
-		MPART_INIT_mp_maxaddr((num_bytes)-1),                        \
-		MPART_INIT_mp_changed({}),                                   \
-		MPART_INIT_mp_filent_asanon(),                               \
-		MPART_INIT_mp_blkst_ptr(__NULLPTR),                          \
-		MPART_INIT_mp_mem(first_page, page_count),                   \
-		MPART_INIT_mp_meta(__NULLPTR)                                \
+#define MPART_INIT_PHYS(file, first_page, page_count, num_bytes)   \
+	{                                                              \
+		MPART_INIT_mp_refcnt(1),                                   \
+		MPART_INIT_mp_flags(MPART_F_NOFREE | MPART_F_NOSPLIT |     \
+		                    MPART_F_MLOCK | MPART_F_MLOCK_FROZEN), \
+		MPART_INIT_mp_state(MPART_ST_MEM),                         \
+		MPART_INIT_mp_file(file),                                  \
+		MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(~)),              \
+		MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(~)),             \
+		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(~)),          \
+		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),    \
+		MPART_INIT_mp_minaddr(0),                                  \
+		MPART_INIT_mp_maxaddr((num_bytes)-1),                      \
+		MPART_INIT_mp_changed({}),                                 \
+		MPART_INIT_mp_filent_asanon(),                             \
+		MPART_INIT_mp_blkst_ptr(__NULLPTR),                        \
+		MPART_INIT_mp_mem(first_page, page_count),                 \
+		MPART_INIT_mp_meta(__NULLPTR)                              \
 	}
 #endif /* __WANT_MPART_INIT */
 
@@ -1512,6 +1512,39 @@ DATDEF struct atomic_lock mpart_all_lock;
  * NOTE: This list holds a reference to every contain part that wasn't
  *       already destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
 DATDEF struct mpart_list mpart_all_list;
+
+#ifndef CONFIG_NO_MPART_ALL_SIZE
+/* [lock(mpart_all_lock)] The # of parts stored in `mpart_all_list' */
+DATDEF size_t mpart_all_size;
+#define __mpart_all_size_inc() (void)++mpart_all_size
+#define __mpart_all_size_dec() (void)--mpart_all_size
+#else /* !CONFIG_NO_MPART_ALL_SIZE */
+#define __mpart_all_size_inc() (void)0
+#define __mpart_all_size_dec() (void)0
+#endif /* CONFIG_NO_MPART_ALL_SIZE */
+
+/* Direct insert/remove a given part from `mpart_all_list'
+ * The caller must be holding a  lock to `mpart_all_lock'! */
+#define _mpart_all_list_insert(part) (LIST_INSERT_HEAD(&mpart_all_list, part, mp_allparts), __mpart_all_size_inc())
+#define _mpart_all_list_remove(part) (__mpart_all_size_dec(), LIST_REMOVE(part, mp_allparts))
+
+/* Return the # of items stored in `mpart_all_list' */
+#ifdef CONFIG_NO_MPART_ALL_SIZE
+#define _mpart_all_getsize() \
+	LIST_COUNT(&mpart_all_list, mp_allparts)
+#define mpart_all_getsize()                                   \
+	({                                                        \
+		size_t __mac_res;                                     \
+		mpart_all_acquire();                                  \
+		LIST_COUNT(&mpart_all_list, &__mac_res, mp_allparts); \
+		mpart_all_release();                                  \
+		__mac_res;                                            \
+	})
+#else /* CONFIG_NO_MPART_ALL_SIZE */
+#define _mpart_all_getsize() ((size_t)mpart_all_size)
+#define mpart_all_getsize()  __hybrid_atomic_load(mpart_all_size, __ATOMIC_ACQUIRE)
+#endif /* !CONFIG_NO_MPART_ALL_SIZE */
+
 
 /* [0..n][lock(ATOMIC)] List of lock-ops for `mpart_all_list' */
 DATDEF struct lockop_slist mpart_all_lops;

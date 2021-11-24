@@ -98,6 +98,8 @@
  * [1              ]  T*   [*]_PREV_UNSAFE(elem, self, [type], key)           (Return predecessor (undef if no prev-elem exists))
  * [        1      ]  T*   [*]_LOOP_PREV(self, elem, key)                     (NOTE: *_PREV(elem, key) for RINGQ)
  * [---------------]
+ * [N              ]  void [*]_COUNT(self, [presult], [type], key)  # TODO: Implement for all sequence types
+ * [---------------]
  * [1 1 1     1 1  ]  void [*]_INSERT_AFTER(predecessor, elem, key)
  * [      1 1      ]  void [*]_INSERT_AFTER(self, predecessor, elem, key)
  * [1 1 1     1 1  ]  void [*]_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)      { ..., predecessor, lo_elem...hi_elem, predecessor.next, ... }
@@ -474,15 +476,36 @@
 #define LIST_P_PREV_P(p_elem, self, type, getpath)                                 ((p_elem) == &(self)->lh_first ? __NULLPTR : (__HYBRID_Q_STRUCT type *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next))
 #define LIST_P_PREV_UNSAFE_P(p_elem, type, getpath)                                (__HYBRID_Q_STRUCT type *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
+#if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
+#define __HYBRID_LIST_COUNT_2(self, key)                                                   __XBLOCK({ __SIZE_TYPE__ __hlc_res; __HYBRID_LIST_COUNT_3(self, &__hlc_res, key); __XRETURN __hlc_res; })
+#define __HYBRID_LIST_COUNT_3(self, presult, key)                                          __HYBRID_LIST_COUNT(self, presult, __typeof__(*(self)->lh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_COUNT_4(self, presult, type, key)                                    __HYBRID_LIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_COUNT_P_2(self, getpath)                                             __XBLOCK({ __SIZE_TYPE__ __hlc_res; __HYBRID_LIST_COUNT_P_3(self, &__hlc_res, getpath); __XRETURN __hlc_res; })
+#define __HYBRID_LIST_COUNT_P_3(self, presult, getpath)                                    __HYBRID_LIST_COUNT(self, presult, __typeof__(*(self)->lh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_COUNT_P_4(self, presult, type, getpath)                              __HYBRID_LIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define LIST_COUNT(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_COUNT_, (__VA_ARGS__))(__VA_ARGS__)   /* LIST_COUNT(self, [presult], [type], key) */
+#define LIST_COUNT_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_COUNT_P_, (__VA_ARGS__))(__VA_ARGS__) /* LIST_COUNT_P(self, [presult], [type], getpath) */
+#else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
+#define LIST_COUNT(self, presult, type, key)       __HYBRID_LIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define LIST_COUNT_P(self, presult, type, getpath) __HYBRID_LIST_COUNT(self, presult, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
-
+#define __HYBRID_LIST_COUNT(self, presult, T, X, _)     \
+	/* Sorry, this one must be a statement */           \
+	do {                                                \
+		T *__hlc_iter;                                  \
+		*(presult) = 0;                                 \
+		for (__hlc_iter = (self)->lh_first; __hlc_iter; \
+		     __hlc_iter = X(_, __hlc_iter).le_next)     \
+			++*(presult);                               \
+	}	__WHILE0
 #define __HYBRID_LIST_CONCAT(dst, src, T, X, _)                               \
 	/* Sorry, this one must be a statement */                                 \
 	do {                                                                      \
 		if ((src)->lh_first != __NULLPTR) {                                   \
 			T **__hlc_dst_last = &(dst)->lh_first;                            \
 			while (*__hlc_dst_last)                                           \
-				__hlc_dst_last = &X(_, *__hlc_dst_last)->le_next;             \
+				__hlc_dst_last = &X(_, *__hlc_dst_last).le_next;              \
 			X(_, *__hlc_dst_last = (src)->lh_first).le_prev = __hlc_dst_last; \
 			(src)->lh_first = __NULLPTR;                                      \
 		}                                                                     \

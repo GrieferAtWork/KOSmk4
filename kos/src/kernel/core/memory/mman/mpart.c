@@ -279,7 +279,9 @@ NOTHROW(FCALL mpart_destroy_lop_rmall_async)(struct lockop *__restrict self) {
 	me = mpart_destroy_lockop_decode(self);
 
 	/* Remove the part from the all-parts list. */
-	LIST_REMOVE(me, mp_allparts);
+	COMPILER_READ_BARRIER();
+	if (LIST_ISBOUND(me, mp_allparts))
+		_mpart_all_list_remove(me);
 
 	/* Call mpart_free() once the caller has released their lock to `mpart_all_lock' */
 	plop           = mpart_destroy_postlockop_encode(me);
@@ -295,7 +297,9 @@ NOTHROW(FCALL mpart_destroy_lop_rmall)(Tobpostlockop(mfile) *__restrict self,
 	if (LIST_ISBOUND(me, mp_allparts)) {
 		/* Must remove from the global list of all known parts. */
 		if (mpart_all_tryacquire()) {
-			LIST_REMOVE(me, mp_allparts);
+			COMPILER_READ_BARRIER();
+			if (LIST_ISBOUND(me, mp_allparts))
+				_mpart_all_list_remove(me);
 			mpart_all_release();
 		} else {
 			struct lockop *lop;
@@ -343,7 +347,9 @@ remove_node_from_globals:
 		if (LIST_ISBOUND(self, mp_allparts)) {
 			/* Must remove from the global list of all known parts. */
 			if (mpart_all_tryacquire()) {
-				LIST_REMOVE(self, mp_allparts);
+				COMPILER_READ_BARRIER();
+				if (LIST_ISBOUND(self, mp_allparts))
+					_mpart_all_list_remove(self);
 				mpart_all_release();
 			} else {
 				struct lockop *lop;
@@ -897,6 +903,12 @@ PUBLIC struct mpart_list mpart_all_list = LIST_HEAD_INITIALIZER(mpart_all_list);
 /* [0..n][lock(ATOMIC)] List of lock-ops for `mpart_all_list' */
 PUBLIC struct lockop_slist mpart_all_lops = SLIST_HEAD_INITIALIZER(mpart_all_lops);
 
+#ifndef CONFIG_NO_MPART_ALL_SIZE
+/* [lock(mpart_all_lock)] The # of parts stored in `mpart_all_list' */
+PUBLIC size_t mpart_all_size = 0;
+#endif /* !CONFIG_NO_MPART_ALL_SIZE */
+
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_add2all_mpart_destroy_postlop_cb)(struct postlockop *__restrict self) {
 	struct mpart *me;
@@ -914,7 +926,7 @@ NOTHROW(FCALL async_add2all_mpart_lop_cb)(struct lockop *__restrict self) {
 		me->_mp_plopall.plo_func = &async_add2all_mpart_destroy_postlop_cb;
 		return &me->_mp_plopall;
 	}
-	LIST_INSERT_HEAD(&mpart_all_list, me, mp_allparts);
+	_mpart_all_list_insert(me);
 	return NULL;
 }
 
@@ -929,7 +941,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self) {
 	if (mpart_all_tryacquire()) {
 		/* Directly insert into the global part list. */
-		LIST_INSERT_HEAD(&mpart_all_list, self, mp_allparts);
+		_mpart_all_list_insert(self);
 		mpart_all_release();
 	} else {
 		STATIC_ASSERT_MSG(offsetof(struct mpart, mp_allparts.le_prev) ==

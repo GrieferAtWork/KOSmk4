@@ -43,10 +43,10 @@
 #define FILE_IOC_BLOCKSIZE  BLKBSZGET         /* [size_t *arg] Get *actual* block size */
 #define FILE_IOC_GETSIZE    BLKGETSIZE64      /* [uint64_t *arg] Return `st_size' */
 
+
 /************************************************************************/
 /* Actually KOS-specific ioctls.                                        */
 /************************************************************************/
-
 #define FILE_IOC_DELETED   _IOR_KOS('F', 0x00, int)                  /* Check if the file deleted (as per `unlink(2)') */
 #define FILE_IOC_HASRAWIO  _IOR_KOS('F', 0x01, int)                  /* Check if the file supports "raw io" (s.a. `mfile_hasrawio()') */
 #define FILE_IOC_DCHANGED  _IOR_KOS('F', 0x02, int)                  /* Check if data of the file has changed (s.a. `fdatasync(2)', `mfile_haschanged()') */
