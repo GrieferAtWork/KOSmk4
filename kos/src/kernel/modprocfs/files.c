@@ -223,10 +223,13 @@ procfs_kos_mm_stat_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 /* /proc/kos/mm/parts                                                   */
 /************************************************************************/
+INTDEF NOBLOCK WUNUSED NONNULL((1)) char const *
+NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL
 print_mpart_desc(struct mpart *__restrict self,
                  pformatprinter printer, void *arg) {
 	ssize_t result;
+	char const *specname;
 	REF struct mfile *file;
 	pos_t minaddr, maxaddr;
 	uintptr_quarter_t state;
@@ -234,8 +237,10 @@ print_mpart_desc(struct mpart *__restrict self,
 	char const *statename;
 	REF struct mman *firstcopy;
 	bool has_mappings;
+	refcnt_t refcnt;
 	firstcopy    = NULL;
 	mpart_lock_acquire(self);
+	refcnt  = ATOMIC_READ(self->mp_refcnt) - 1;
 	minaddr = self->mp_minaddr;
 	maxaddr = self->mp_maxaddr;
 	state   = self->mp_state;
@@ -279,10 +284,12 @@ print_mpart_desc(struct mpart *__restrict self,
 		statename = "?";
 		break;
 	}
+	if (flags & MPART_F_GLOBAL_REF)
+		--refcnt;
 	result = format_printf(printer, arg,
-	                       "%s\t%#.6" PRIx64 "-%#.6" PRIx64 "\t"
+	                       "%" PRIuSIZ ",%s\t%#.6" PRIx64 "-%#.6" PRIx64 "\t"
 	                       "%c%c%c%c\t",
-	                       statename, minaddr, maxaddr,
+	                       refcnt, statename, minaddr, maxaddr,
 	                       flags & MPART_F_GLOBAL_REF ? 'g' : '-',
 	                       flags & MPART_F_PERSISTENT ? 'p' : '-',
 	                       flags & MPART_F_CHANGED ? 'c' : '-',
@@ -332,7 +339,12 @@ print_no_exe:
 	result = (*printer)(arg, "\t", 1);
 	if (result < 0)
 		return result;
-	result = mfile_uprintlink(file, printer, arg);
+	specname = nameof_special_file(file);
+	if (specname) {
+		result = (*printer)(arg, specname, strlen(specname));
+	} else {
+		result = mfile_uprintlink(file, printer, arg);
+	}
 	if (result < 0)
 		return result;
 	return (*printer)(arg, "\n", 1);
