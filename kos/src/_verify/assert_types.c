@@ -436,12 +436,10 @@ local files = {
 	"../../include/kos/bits/userprocmask.h",
 	"../../include/kos/exec/bits/peb.h",
 	"../../include/kos/exec/elf.h",
+	"../../include/kos/ioctl/_openfd.h",
 	"../../include/kos/hop/api.h",
 	"../../include/kos/hop/module.h",
 	"../../include/kos/hop/handle.h",
-	"../../include/kos/hop/openfd.h",
-	"../../include/kos/hop/pipe.h",
-	"../../include/kos/hop/task.h",
 	"../../include/kos/ksysctl.h",
 	"../../include/linux/if_arp.h",
 	"../../include/linux/if_ether.h",
@@ -1706,6 +1704,18 @@ static_assert(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
 
 
 
+#include <kos/ioctl/_openfd.h>
+
+/* struct openfd */
+static_assert(offsetof(struct openfd, of_flags) == __OFFSET_OPENFD_FLAGS);
+static_assert(offsetof(struct openfd, of_hint) == __OFFSET_OPENFD_HINT);
+static_assert(offsetof(struct openfd, of_mode) == __OFFSET_OPENFD_MODE);
+static_assert(sizeof(struct openfd) == __SIZEOF_OPENFD);
+
+
+
+
+
 #include <kos/hop/api.h>
 
 
@@ -1757,95 +1767,6 @@ static_assert(offsetof(struct hop_handle_stat, hs_struct_size) == __OFFSET_HOP_H
 static_assert(offsetof(struct hop_handle_stat, hs_type) == __OFFSET_HOP_HANDLE_STAT_TYPE);
 static_assert(offsetof(struct hop_handle_stat, hs_typename) == __OFFSET_HOP_HANDLE_STAT_TYPENAME);
 static_assert(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
-
-
-
-
-
-#include <kos/hop/openfd.h>
-
-/* struct hop_openfd */
-static_assert(offsetof(struct hop_openfd, of_flags) == __OFFSET_HOP_OPENFD_FLAGS);
-static_assert(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
-static_assert(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
-static_assert(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
-
-
-
-
-
-#include <kos/hop/pipe.h>
-
-/* struct hop_pipe_stat */
-static_assert(offsetof(struct hop_pipe_stat, ps_avail) == __OFFSET_HOP_PIPE_STAT_AVAIL);
-static_assert(offsetof(struct hop_pipe_stat, ps_bufcur) == __OFFSET_HOP_PIPE_STAT_BUFCUR);
-static_assert(offsetof(struct hop_pipe_stat, ps_buflim) == __OFFSET_HOP_PIPE_STAT_BUFLIM);
-static_assert(offsetof(struct hop_pipe_stat, ps_rdtotal) == __OFFSET_HOP_PIPE_STAT_RDTOTAL);
-static_assert(offsetof(struct hop_pipe_stat, ps_struct_size) == __OFFSET_HOP_PIPE_STAT_STRUCT_SIZE);
-static_assert(sizeof(struct hop_pipe_stat) == __SIZEOF_HOP_PIPE_STAT);
-
-/* struct hop_pipe_writesome */
-static_assert(offsetof(struct hop_pipe_writesome, pws_buf) == __OFFSET_HOP_PIPE_WRITESOME_BUF);
-static_assert(offsetof(struct hop_pipe_writesome, pws_buflen) == __OFFSET_HOP_PIPE_WRITESOME_BUFLEN);
-static_assert(offsetof(struct hop_pipe_writesome, pws_struct_size) == __OFFSET_HOP_PIPE_WRITESOME_STRUCT_SIZE);
-static_assert(offsetof(struct hop_pipe_writesome, pws_written) == __OFFSET_HOP_PIPE_WRITESOME_WRITTEN);
-static_assert(sizeof(struct hop_pipe_writesome) == __SIZEOF_HOP_PIPE_WRITESOME);
-
-/* struct hop_pipe_vwritesome */
-static_assert(offsetof(struct hop_pipe_vwritesome, pvws_buf) == __OFFSET_HOP_PIPE_VWRITESOME_BUF);
-static_assert(offsetof(struct hop_pipe_vwritesome, pvws_bufcnt) == __OFFSET_HOP_PIPE_VWRITESOME_BUFCNT);
-static_assert(offsetof(struct hop_pipe_vwritesome, pvws_struct_size) == __OFFSET_HOP_PIPE_VWRITESOME_STRUCT_SIZE);
-static_assert(offsetof(struct hop_pipe_vwritesome, pvws_written) == __OFFSET_HOP_PIPE_VWRITESOME_WRITTEN);
-static_assert(sizeof(struct hop_pipe_vwritesome) == __SIZEOF_HOP_PIPE_VWRITESOME);
-
-/* struct hop_pipe_skipdata */
-static_assert(offsetof(struct hop_pipe_skipdata, psd_num_bytes) == __OFFSET_HOP_PIPE_SKIPDATA_NUM_BYTES);
-static_assert(offsetof(struct hop_pipe_skipdata, psd_rdpos) == __OFFSET_HOP_PIPE_SKIPDATA_RDPOS);
-static_assert(offsetof(struct hop_pipe_skipdata, psd_skipped) == __OFFSET_HOP_PIPE_SKIPDATA_SKIPPED);
-static_assert(offsetof(struct hop_pipe_skipdata, psd_struct_size) == __OFFSET_HOP_PIPE_SKIPDATA_STRUCT_SIZE);
-static_assert(sizeof(struct hop_pipe_skipdata) == __SIZEOF_HOP_PIPE_SKIPDATA);
-
-/* struct hop_pipe_unread */
-static_assert(offsetof(struct hop_pipe_unread, pur_num_bytes) == __OFFSET_HOP_PIPE_UNREAD_NUM_BYTES);
-static_assert(offsetof(struct hop_pipe_unread, pur_rdpos) == __OFFSET_HOP_PIPE_UNREAD_RDPOS);
-static_assert(offsetof(struct hop_pipe_unread, pur_struct_size) == __OFFSET_HOP_PIPE_UNREAD_STRUCT_SIZE);
-static_assert(offsetof(struct hop_pipe_unread, pur_unread) == __OFFSET_HOP_PIPE_UNREAD_UNREAD);
-static_assert(sizeof(struct hop_pipe_unread) == __SIZEOF_HOP_PIPE_UNREAD);
-
-/* struct hop_pipe_unwrite */
-static_assert(offsetof(struct hop_pipe_unwrite, puw_num_bytes) == __OFFSET_HOP_PIPE_UNWRITE_NUM_BYTES);
-static_assert(offsetof(struct hop_pipe_unwrite, puw_struct_size) == __OFFSET_HOP_PIPE_UNWRITE_STRUCT_SIZE);
-static_assert(offsetof(struct hop_pipe_unwrite, puw_unwritten) == __OFFSET_HOP_PIPE_UNWRITE_UNWRITTEN);
-static_assert(offsetof(struct hop_pipe_unwrite, puw_wrpos) == __OFFSET_HOP_PIPE_UNWRITE_WRPOS);
-static_assert(sizeof(struct hop_pipe_unwrite) == __SIZEOF_HOP_PIPE_UNWRITE);
-
-
-
-
-
-#include <kos/hop/task.h>
-
-/* struct hop_task_join */
-static_assert(offsetof(struct hop_task_join, tj_reltimeout_nsec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_NSEC);
-static_assert(offsetof(struct hop_task_join, tj_reltimeout_sec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_SEC);
-static_assert(offsetof(struct hop_task_join, tj_status) == __OFFSET_HOP_TASK_JOIN_STATUS);
-static_assert(offsetof(struct hop_task_join, tj_struct_size) == __OFFSET_HOP_TASK_JOIN_STRUCT_SIZE);
-static_assert(sizeof(struct hop_task_join) == __SIZEOF_HOP_TASK_JOIN);
-
-/* struct hop_task_setprocessgroupleader */
-static_assert(offsetof(struct hop_task_setprocessgroupleader, tspgl_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_LEADER);
-static_assert(offsetof(struct hop_task_setprocessgroupleader, tspgl_new_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_NEW_LEADER);
-static_assert(offsetof(struct hop_task_setprocessgroupleader, tspgl_old_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_OLD_LEADER);
-static_assert(offsetof(struct hop_task_setprocessgroupleader, tspgl_struct_size) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_STRUCT_SIZE);
-static_assert(sizeof(struct hop_task_setprocessgroupleader) == __SIZEOF_HOP_TASK_SETPROCESSGROUPLEADER);
-
-/* struct hop_task_setsessionleader */
-static_assert(offsetof(struct hop_task_setsessionleader, tssl_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_LEADER);
-static_assert(offsetof(struct hop_task_setsessionleader, tssl_new_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_NEW_LEADER);
-static_assert(offsetof(struct hop_task_setsessionleader, tssl_old_grp_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_GRP_LEADER);
-static_assert(offsetof(struct hop_task_setsessionleader, tssl_old_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_LEADER);
-static_assert(offsetof(struct hop_task_setsessionleader, tssl_struct_size) == __OFFSET_HOP_TASK_SETSESSIONLEADER_STRUCT_SIZE);
-static_assert(sizeof(struct hop_task_setsessionleader) == __SIZEOF_HOP_TASK_SETSESSIONLEADER);
 
 
 

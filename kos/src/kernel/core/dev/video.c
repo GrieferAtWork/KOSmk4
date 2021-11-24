@@ -1064,7 +1064,7 @@ viddev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		hand.h_type = HANDLE_TYPE_MFILE;
 		hand.h_mode = IO_RDWR;
 		hand.h_data = lck;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hand);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, hand);
 	}	break;
 
 	default:

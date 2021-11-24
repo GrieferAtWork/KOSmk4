@@ -322,7 +322,7 @@ ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		temp.h_type = HANDLE_TYPE_MFILE;
 		temp.h_mode = mode;
 		temp.h_data = me;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_PIPE_CREATE_READER: {
@@ -332,7 +332,7 @@ ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_RDONLY;
 		temp.h_data = fifohandle_new(me, temp.h_mode, NULL, NULL);
 		FINALLY_DECREF_UNLIKELY((REF struct fifohandle *)temp.h_data);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_PIPE_CREATE_WRITER: {
@@ -342,7 +342,7 @@ ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_WRONLY;
 		temp.h_data = fifohandle_new(me, temp.h_mode, NULL, NULL);
 		FINALLY_DECREF_UNLIKELY((REF struct fifohandle *)temp.h_data);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	default:

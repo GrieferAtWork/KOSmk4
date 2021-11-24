@@ -26,10 +26,11 @@
 
 #include <asm/ioctl.h>
 #include <bits/types.h>
-#include <kos/hop/openfd.h>
 #include <kos/ioctl/video.h>
 
 #include <libsvgadrv/chipset.h>
+
+#include "_openfd.h"
 
 __DECL_BEGIN
 
@@ -110,7 +111,7 @@ struct svga_lsmodes {
 };
 
 struct svga_maketty {
-	struct hop_openfd    smt_res;    /* [out] Handle for the newly created ansitty. */
+	struct openfd        smt_res;    /* [out] Handle for the newly created ansitty. */
 	union {
 		char const      *smt_name;   /* [1..1] TTY Device name. (Filename for /dev) */
 		__uint64_t      _smt_alname; /* Align... */

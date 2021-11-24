@@ -52,8 +52,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE,                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open()' cannot be masked by `07777'. */
 	E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND,                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 	E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown ioctl() command */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFS_FLAGS,                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `hop_openfd'-compatible HOP command contained flags other than `IO_CLOEXEC|IO_CLOFORK'. */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFD_MODE,                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `hop_openfd'-compatible HOP command wasn't one of `HOP_OPENFD_MODE_*'. */
+	E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `struct openfd' contained flags other than `IO_CLOEXEC | IO_CLOFORK'. */
+	E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE,                        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `HOP_OPENFD_MODE_*'. */
 	E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,                        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `hop()' wasn't recognized by the associated handle. */
 	E_INVALID_ARGUMENT_CONTEXT_HOPF_MODE,                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `hopf()' could not be masked by `IO_USERF_MASK'. */
 	E_INVALID_ARGUMENT_CONTEXT_IOCTLF_MODE,                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `ioctlf()' could not be masked by `IO_USERF_MASK'. */
@@ -266,8 +266,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                          E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open()' cannot be masked by `07777'. */
 #define E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                      E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND                      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown ioctl() command */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFS_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFS_FLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `hop_openfd'-compatible HOP command contained flags other than `IO_CLOEXEC|IO_CLOFORK'. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFD_MODE                    E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFD_MODE                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `hop_openfd'-compatible HOP command wasn't one of `HOP_OPENFD_MODE_*'. */
+#define E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                       E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `struct openfd' contained flags other than `IO_CLOEXEC | IO_CLOFORK'. */
+#define E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                        E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `HOP_OPENFD_MODE_*'. */
 #define E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND                        E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND                        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `hop()' wasn't recognized by the associated handle. */
 #define E_INVALID_ARGUMENT_CONTEXT_HOPF_MODE                          E_INVALID_ARGUMENT_CONTEXT_HOPF_MODE                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `hopf()' could not be masked by `IO_USERF_MASK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTLF_MODE                        E_INVALID_ARGUMENT_CONTEXT_IOCTLF_MODE                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `ioctlf()' could not be masked by `IO_USERF_MASK'. */
@@ -477,8 +477,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                          16  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open()' cannot be masked by `07777'. */
 #define E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                      17  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND                      18  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown ioctl() command */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFS_FLAGS                   19  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `hop_openfd'-compatible HOP command contained flags other than `IO_CLOEXEC|IO_CLOFORK'. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFD_MODE                    20  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `hop_openfd'-compatible HOP command wasn't one of `HOP_OPENFD_MODE_*'. */
+#define E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                       19  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `struct openfd' contained flags other than `IO_CLOEXEC | IO_CLOFORK'. */
+#define E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                        20  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `HOP_OPENFD_MODE_*'. */
 #define E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND                        21  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `hop()' wasn't recognized by the associated handle. */
 #define E_INVALID_ARGUMENT_CONTEXT_HOPF_MODE                          22  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `hopf()' could not be masked by `IO_USERF_MASK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTLF_MODE                        23  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `mode' passed to `ioctlf()' could not be masked by `IO_USERF_MASK'. */

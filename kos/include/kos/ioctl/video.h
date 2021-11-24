@@ -26,7 +26,8 @@
 
 #include <asm/ioctl.h>
 #include <bits/types.h>
-#include <kos/hop/openfd.h>
+
+#include "_openfd.h"
 
 
 /* Activate a video TTY (only  applicable to video TTY  objects)
@@ -37,7 +38,7 @@
 
 /* Create a new video lock object for a given video device.
  * @throw: E_INSUFFICIENT_RIGHTS: Caller doesn't have `CAP_SYS_RAWIO' */
-#define VID_IOC_MAKELCK _IOR_KOS('V', 0x01, struct hop_openfd)
+#define VID_IOC_MAKELCK _IOR_KOS('V', 0x01, struct openfd)
 
 /* Video TTY ioctl codes.
  * When used on a video controller device, these commands are forwarded to the currently active tty. */

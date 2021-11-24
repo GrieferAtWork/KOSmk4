@@ -212,7 +212,7 @@ handle_module_hop(struct module *__restrict self,
 		d.h_type = HANDLE_TYPE_MFILE;
 		d.h_mode = mode;
 		d.h_data = file;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, d);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, d);
 	}	break;
 
 	case HOP_DRIVER_OPEN_DEPENDENCY: {
@@ -243,7 +243,7 @@ handle_module_hop(struct module *__restrict self,
 		d.h_data = axref_get(&me->d_depvec[(uintptr_t)depno]);
 		if unlikely(!d.h_data)
 			THROW(E_NO_SUCH_OBJECT);
-		return handle_installhop(&data->dod_result, d);
+		return handle_installopenfd(&data->dod_result, d);
 	}	break;
 
 	case HOP_DRIVER_INITIALIZE: {
@@ -320,7 +320,7 @@ handle_driver_loadlist_hop(struct driver_loadlist *__restrict self,
 			THROW(E_NO_SUCH_OBJECT); /* Dead driver */
 		{
 			FINALLY_DECREF_UNLIKELY(result_driver);
-			result = handle_installhop(&data->dod_result, d);
+			result = handle_installopenfd(&data->dod_result, d);
 		}
 		return result;
 	}	break;

@@ -45,6 +45,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except/reason/inval.h>
+#include <kos/hop/openfd.h>
 #include <kos/ksysctl.h>
 
 #include <errno.h>
@@ -208,7 +209,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		temp.h_mode = IO_RDWR;
 		temp.h_data = get_driver_loadlist();
 		FINALLY_DECREF_UNLIKELY((struct driver_loadlist *)temp.h_data);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_DRIVER_INSMOD: {
@@ -280,7 +281,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 				temp.h_type = HANDLE_TYPE_MODULE;
 				temp.h_mode = IO_RDWR;
 				temp.h_data = drv;
-				return handle_installhop(drv_fd, temp);
+				return handle_installopenfd(drv_fd, temp);
 			}
 		}
 	}	break;
@@ -391,7 +392,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			temp.h_type = HANDLE_TYPE_MODULE;
 			temp.h_mode = IO_RDWR;
 			temp.h_data = drv;
-			return handle_installhop((struct hop_openfd *)&data->gm_driver, temp);
+			return handle_installopenfd((struct hop_openfd *)&data->gm_driver, temp);
 		}
 	}	break;
 
@@ -513,7 +514,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_MODULE;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &kernel_driver;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_OPEN_BOOT_TASK: {
@@ -522,7 +523,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_TASK;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = FORTASK(&boottask, this_taskpid);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 #ifdef CONFIG_HAVE_HACKY_REBOOT

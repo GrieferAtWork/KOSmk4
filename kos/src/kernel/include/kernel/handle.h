@@ -569,13 +569,13 @@ handle_installxchg(struct handle_manager *__restrict self,
 
 
 
-struct hop_openfd;
+struct openfd;
 /* Do everything required to install a handle via a open openfd
  * command data  packet that  has been  passed via  user-space.
  * Note that `data' is an UNCHECKED user pointer! */
 FUNDEF NONNULL((2)) unsigned int FCALL
-handle_installhop(USER UNCHECKED struct hop_openfd *data,
-                  struct handle const *__restrict hnd)
+handle_installopenfd(USER UNCHECKED struct openfd *data,
+                     struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE,
@@ -628,13 +628,13 @@ handle_installxchg(struct handle_manager *__restrict self,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)
 		ASMNAME("handle_installxchg");
 FUNDEF unsigned int FCALL
-handle_installhop(USER UNCHECKED struct hop_openfd *data,
-                  struct handle const &__restrict hnd)
+handle_installopenfd(USER UNCHECKED struct openfd *data,
+                     struct handle const &__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE,
 		       E_SEGFAULT, E_INVALID_ARGUMENT)
-		ASMNAME("handle_installhop");
+		ASMNAME("handle_installopenfd");
 FUNDEF void FCALL
 handle_installinto_sym(unsigned int dst_fd,
                        struct handle const &__restrict hnd)

@@ -805,7 +805,7 @@ svgadev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
 		hand.h_type = HANDLE_TYPE_MFILE;
 		hand.h_mode = IO_RDWR;
 		hand.h_data = tty;
-		return handle_installhop(&info->smt_res, hand);
+		return handle_installopenfd(&info->smt_res, hand);
 	}	break;
 
 	default:

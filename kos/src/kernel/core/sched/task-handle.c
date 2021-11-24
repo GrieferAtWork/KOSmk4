@@ -23,27 +23,40 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/mman.h>
+#include <kernel/personality.h>
+#include <kernel/syscall.h>
+#include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
+#include <sched/posix-signal.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
+#include <compat/config.h>
 #include <kos/except/reason/inval.h>
-#include <kos/hop/task.h>
+#include <kos/io.h>
+#include <kos/ioctl/task.h>
+#include <kos/kernel/handle.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 
 #include <assert.h>
 #include <errno.h>
+#include <signal.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/os/siginfo-convert.h>
+#include <compat/bits/os/siginfo.h>
+#include <compat/signal.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -77,369 +90,291 @@ handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) {
 	return result;
 }
 
-INTERN syscall_slong_t KCALL
-handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd,
-                USER UNCHECKED void *arg, iomode_t mode) {
+
+/* Ensure that the calling thread has permission to do `pidfd_open(self)' */
+PRIVATE NONNULL((1)) void FCALL
+require_pidfd_open(struct task *__restrict self) {
+	/* TODO */
+	(void)self;
+	COMPILER_IMPURE();
+}
+
+
+
+
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
+handle_task_ioctl(struct taskpid *__restrict self, syscall_ulong_t cmd,
+                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
-	case HOP_TASK_JOIN: {
-		size_t struct_size;
-		USER CHECKED struct hop_task_join *data;
-		validate_readwrite(arg, sizeof(struct hop_task_join));
-		data        = (struct hop_task_join *)arg;
-		struct_size = ATOMIC_READ(data->tj_struct_size);
-		if (struct_size != sizeof(struct hop_task_join))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_task_join), struct_size);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		COMPILER_BARRIER();
-		if (WIFEXITED(self->tp_status)) {
-			ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
-		} else {
-			ktime_t abs_timeout;
-			struct timespec ts;
-			COMPILER_READ_BARRIER();
-			ts.tv_sec  = data->tj_reltimeout_sec;
-			ts.tv_nsec = data->tj_reltimeout_nsec;
-			COMPILER_READ_BARRIER();
-			abs_timeout = relktime_from_user_rel(&ts);
-			if (abs_timeout != 0)
-				abs_timeout += ktime();
-again_waitfor:
-			task_connect_for_poll(&self->tp_changed);
-			COMPILER_READ_BARRIER();
-			if (WIFEXITED(self->tp_status)) {
-				task_disconnectall();
-				ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
-				break;
-			}
-			if (!task_waitfor(abs_timeout)) {
-				task_disconnectall();
-				ATOMIC_WRITE(data->tj_status, 0);
-				return -ETIMEDOUT; /* Timeout */
-			}
-			assert(!task_wasconnected());
-			if (WIFEXITED(self->tp_status)) {
-				ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
-				break;
-			}
-			goto again_waitfor;
+	case TASK_IOC_GETTID: {
+		validate_writable(arg, sizeof(pid_t));
+		*(USER CHECKED pid_t *)arg = taskpid_getpid(self, THIS_PIDNS);
+		return 0;
+	}	break;
+
+	case TASK_IOC_GETPID: {
+		REF struct task *thread;
+		validate_writable(arg, sizeof(pid_t));
+		thread = taskpid_gettask_srch(self);
+		FINALLY_DECREF_UNLIKELY(thread);
+		*(USER CHECKED pid_t *)arg = task_getpid_of_s(thread);
+		return 0;
+	}	break;
+
+	case TASK_IOC_GETPPID: {
+		REF struct task *thread;
+		REF struct taskpid *parent_pid;
+		validate_writable(arg, sizeof(pid_t));
+		thread = taskpid_gettask_srch(self);
+		{
+			FINALLY_DECREF_UNLIKELY(thread);
+			parent_pid = task_getprocessparentpid_of(thread);
 		}
-	}	break;
-
-	case HOP_TASK_GETTID:
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		return taskpid_getpid(self, THIS_PIDNS);
-
-	case HOP_TASK_GETPID: {
-		upid_t result;
-		REF struct task *thread;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		result = task_getpid_of_s(thread);
-		decref_unlikely(thread);
-		return result;
-	}	break;
-
-	case HOP_TASK_GETPPID: {
-		upid_t result;
-		REF struct task *thread;
-		REF struct task *parent;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		parent = task_getprocessparent_of(thread);
-		if unlikely(!parent)
-			result = 0;
-		else {
-			result = task_gettid_of_s(parent);
-			decref_unlikely(parent);
-		}
-		return result;
-	}	break;
-
-	case HOP_TASK_GETPGID: {
-		upid_t result;
-		REF struct task *thread;
-		REF struct taskpid *leader;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		leader = task_getprocessgroupleaderpid_of(thread);
-		result = taskpid_getpid_s(leader);
-		decref_unlikely(leader);
-		return result;
-	}	break;
-
-	case HOP_TASK_GETSID: {
-		upid_t result;
-		REF struct task *thread;
-		REF struct taskpid *leader;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		leader = task_getsessionleaderpid_of(thread);
-		result = taskpid_getpid_s(leader);
-		decref_unlikely(leader);
-		return result;
-	}	break;
-
-	case HOP_TASK_OPEN_PROCESS: {
-		REF struct task *thread;
-		struct handle leader;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		leader.h_type = HANDLE_TYPE_TASK;
-		leader.h_mode = mode;
-		leader.h_data = task_getprocesspid_of(thread);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, leader);
-	}	break;
-
-	case HOP_TASK_OPEN_PROCESS_PARENT: {
-		REF struct task *thread;
-		struct handle parent;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		parent.h_type = HANDLE_TYPE_TASK;
-		parent.h_mode = mode;
-		parent.h_data = task_getprocessparentpid_of(thread);
-		if unlikely(!parent.h_data)
+		if unlikely(!parent_pid)
 			THROW(E_NO_SUCH_PROCESS);
-		FINALLY_DECREF_UNLIKELY((struct taskpid *)parent.h_data);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, parent);
+		FINALLY_DECREF_UNLIKELY(parent_pid);
+		*(USER CHECKED pid_t *)arg = taskpid_getpid(parent_pid, THIS_PIDNS);
+		return 0;
 	}	break;
 
-	case HOP_TASK_OPEN_PROCESS_GROUP_LEADER: {
+	case TASK_IOC_GETPGID: {
 		REF struct task *thread;
-		struct handle leader;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		leader.h_type = HANDLE_TYPE_TASK;
-		leader.h_mode = mode;
-		leader.h_data = task_getprocessgroupleaderpid_of(thread);
-		FINALLY_DECREF_UNLIKELY((struct taskpid *)leader.h_data);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, leader);
-	}	break;
-
-	case HOP_TASK_OPEN_SESSION_LEADER: {
-		REF struct task *thread;
-		struct handle leader;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		leader.h_type = HANDLE_TYPE_TASK;
-		leader.h_mode = mode;
-		leader.h_data = task_getsessionleaderpid_of(thread);
-		FINALLY_DECREF_UNLIKELY((struct taskpid *)leader.h_data);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, leader);
-	}	break;
-
-	case HOP_TASK_IS_PROCESS_LEADER: {
-		REF struct task *thread;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		return task_isprocessleader_p(thread) ? 1 : 0;
-	}	break;
-
-	case HOP_TASK_IS_PROCESS_GROUP_LEADER: {
-		REF struct task *thread;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		return task_isprocessgroupleader_p(thread) ? 1 : 0;
-	}	break;
-
-	case HOP_TASK_IS_SESSION_LEADER: {
-		REF struct task *thread;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		return task_issessionleader_p(thread) ? 1 : 0;
-	}	break;
-
-	case HOP_TASK_DETACH: {
-		REF struct task *thread;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		return task_detach(thread) ? 1 : 0;
-	}	break;
-
-	case HOP_TASK_DETACH_CHILDREN: {
-		REF struct task *thread;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		thread = taskpid_gettask(self);
-		if unlikely(!thread)
-			goto err_exited;
-		FINALLY_DECREF_UNLIKELY(thread);
-		return task_detach_children(task_getprocess_of(thread));
-	}	break;
-
-	case HOP_TASK_SETPROCESSGROUPLEADER: {
-		REF struct task *thread;
-		REF struct task *leader;
-		REF struct taskpid *leader_pid;
-		REF struct taskpid *old_group_leader;
-		REF struct taskpid *new_group_leader;
-		unsigned int error;
-		size_t struct_size;
-		USER CHECKED struct hop_task_setprocessgroupleader *data;
-		STATIC_ASSERT(HOP_TASK_SETPROCESSGROUPLEADER_SUCCESS == TASK_SETPROCESSGROUPLEADER_SUCCESS);
-		STATIC_ASSERT(HOP_TASK_SETPROCESSGROUPLEADER_LEADER == TASK_SETPROCESSGROUPLEADER_LEADER);
-		STATIC_ASSERT(HOP_TASK_SETPROCESSGROUPLEADER_EXITED == TASK_SETPROCESSGROUPLEADER_EXITED);
-		validate_readwrite(arg, sizeof(struct hop_task_setprocessgroupleader));
-		data        = (struct hop_task_setprocessgroupleader *)arg;
-		struct_size = ATOMIC_READ(data->tspgl_struct_size);
-		if (struct_size != sizeof(struct hop_task_setprocessgroupleader))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_task_setprocessgroupleader), struct_size);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		COMPILER_BARRIER();
+		REF struct taskpid *group_pid;
+		validate_writable(arg, sizeof(pid_t));
+		thread = taskpid_gettask_srch(self);
 		{
-			thread = taskpid_gettask(self);
-			if unlikely(!thread)
-				goto err_exited;
 			FINALLY_DECREF_UNLIKELY(thread);
-			{
-				leader_pid = handle_get_taskpid(ATOMIC_READ(data->tspgl_leader));
-				FINALLY_DECREF_UNLIKELY(leader_pid);
-				leader = taskpid_gettask(leader_pid);
-				if unlikely(!leader)
-					return HOP_TASK_SETPROCESSGROUPLEADER_EXITED;
-			}
-			FINALLY_DECREF_UNLIKELY(leader);
-			error = task_setprocessgroupleader(thread,
-			                                   leader,
-			                                   &old_group_leader,
-			                                   &new_group_leader);
-			if (error != TASK_SETPROCESSGROUPLEADER_SUCCESS)
-				return error;
+			group_pid = task_getprocessgroupleaderpid_of(thread);
 		}
-		FINALLY_DECREF_UNLIKELY(old_group_leader);
-		FINALLY_DECREF_UNLIKELY(new_group_leader);
-		{
-			USER UNCHECKED struct hop_openfd *fd;
-			fd = ATOMIC_READ(data->tspgl_old_leader);
-			if (fd) {
-				struct handle temp;
-				temp.h_type = HANDLE_TYPE_TASK;
-				temp.h_mode = mode;
-				temp.h_data = old_group_leader;
-				handle_installhop(fd, temp);
-			}
-			fd = ATOMIC_READ(data->tspgl_new_leader);
-			if (fd) {
-				struct handle temp;
-				temp.h_type = HANDLE_TYPE_TASK;
-				temp.h_mode = mode;
-				temp.h_data = new_group_leader;
-				handle_installhop(fd, temp);
-			}
-		}
+		if unlikely(!group_pid)
+			THROW(E_NO_SUCH_PROCESS);
+		FINALLY_DECREF_UNLIKELY(group_pid);
+		*(USER CHECKED pid_t *)arg = taskpid_getpid(group_pid, THIS_PIDNS);
+		return 0;
 	}	break;
 
-	case HOP_TASK_SETSESSIONLEADER: {
+	case TASK_IOC_GETSID: {
 		REF struct task *thread;
-		REF struct task *leader;
-		REF struct taskpid *old_group_leader;
-		REF struct taskpid *old_session_leader;
-		REF struct taskpid *new_session_leader;
-		unsigned int error;
-		size_t struct_size;
-		USER CHECKED struct hop_task_setsessionleader *data;
-		STATIC_ASSERT(HOP_TASK_SETSESSIONLEADER_SUCCESS == TASK_SETSESSIONLEADER_SUCCESS);
-		STATIC_ASSERT(HOP_TASK_SETSESSIONLEADER_LEADER == TASK_SETSESSIONLEADER_LEADER);
-		validate_readwrite(arg, sizeof(struct hop_task_setsessionleader));
-		data        = (struct hop_task_setsessionleader *)arg;
-		struct_size = ATOMIC_READ(data->tssl_struct_size);
-		if (struct_size != sizeof(struct hop_task_setsessionleader))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_task_setsessionleader), struct_size);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		COMPILER_BARRIER();
+		REF struct taskpid *session_pid;
+		validate_writable(arg, sizeof(pid_t));
+		thread = taskpid_gettask_srch(self);
 		{
-			thread = taskpid_gettask(self);
-			if unlikely(!thread)
-				goto err_exited;
 			FINALLY_DECREF_UNLIKELY(thread);
-			leader = handle_get_task(ATOMIC_READ(data->tssl_leader));
-			FINALLY_DECREF_UNLIKELY(leader);
-			error = task_setsessionleader(thread,
-			                              leader,
-			                              &old_group_leader,
-			                              &old_session_leader,
-			                              &new_session_leader);
-			if (error != TASK_SETSESSIONLEADER_SUCCESS)
-				return error;
+			session_pid = task_getsessionleaderpid_of(thread);
 		}
-		FINALLY_DECREF_UNLIKELY(old_group_leader);
-		FINALLY_DECREF_UNLIKELY(old_session_leader);
-		FINALLY_DECREF_UNLIKELY(new_session_leader);
+		if unlikely(!session_pid)
+			THROW(E_NO_SUCH_PROCESS);
+		FINALLY_DECREF_UNLIKELY(session_pid);
+		*(USER CHECKED pid_t *)arg = taskpid_getpid(session_pid, THIS_PIDNS);
+		return 0;
+	}	break;
+
+	case TASK_IOC_OPENPID: {
+		struct handle hand;
+		REF struct task *thread;
+		thread = taskpid_gettask_srch(self);
+		FINALLY_DECREF_UNLIKELY(thread);
+		thread = task_getprocess_of(thread);
+		require_pidfd_open(thread);
+		hand.h_type = HANDLE_TYPE_TASK;
+		hand.h_mode = mode;
+		hand.h_data = FORTASK(thread, this_taskpid);
+		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
+	}	break;
+
+	case TASK_IOC_OPENPPID: {
+		struct handle hand;
+		REF struct task *thread;
+		thread = taskpid_gettask_srch(self);
 		{
-			USER UNCHECKED struct hop_openfd *fd;
-			fd = ATOMIC_READ(data->tssl_old_grp_leader);
-			if (fd) {
-				struct handle temp;
-				temp.h_type = HANDLE_TYPE_TASK;
-				temp.h_mode = mode;
-				temp.h_data = old_group_leader;
-				handle_installhop(fd, temp);
-			}
-			fd = ATOMIC_READ(data->tssl_old_leader);
-			if (fd) {
-				struct handle temp;
-				temp.h_type = HANDLE_TYPE_TASK;
-				temp.h_mode = mode;
-				temp.h_data = old_session_leader;
-				handle_installhop(fd, temp);
-			}
-			fd = ATOMIC_READ(data->tssl_new_leader);
-			if (fd) {
-				struct handle temp;
-				temp.h_type = HANDLE_TYPE_TASK;
-				temp.h_mode = mode;
-				temp.h_data = new_session_leader;
-				handle_installhop(fd, temp);
-			}
+			FINALLY_DECREF_UNLIKELY(thread);
+			thread = task_getprocessparent_of(thread);
 		}
+		if unlikely(!thread)
+			THROW(E_NO_SUCH_PROCESS);
+		FINALLY_DECREF_UNLIKELY(thread);
+		require_pidfd_open(thread);
+		hand.h_type = HANDLE_TYPE_TASK;
+		hand.h_mode = mode;
+		hand.h_data = FORTASK(thread, this_taskpid);
+		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
+	}	break;
+
+	case TASK_IOC_OPENPGID: {
+		struct handle hand;
+		REF struct task *thread;
+		thread = taskpid_gettask_srch(self);
+		{
+			FINALLY_DECREF_UNLIKELY(thread);
+			thread = task_getprocessgroupleader_srch_of(thread);
+		}
+		FINALLY_DECREF_UNLIKELY(thread);
+		require_pidfd_open(thread);
+		hand.h_type = HANDLE_TYPE_TASK;
+		hand.h_mode = mode;
+		hand.h_data = FORTASK(thread, this_taskpid);
+		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
+	}	break;
+
+	case TASK_IOC_OPENSID: {
+		struct handle hand;
+		REF struct task *thread;
+		thread = taskpid_gettask_srch(self);
+		{
+			FINALLY_DECREF_UNLIKELY(thread);
+			thread = task_getsessionleader_srch_of(thread);
+		}
+		FINALLY_DECREF_UNLIKELY(thread);
+		require_pidfd_open(thread);
+		hand.h_type = HANDLE_TYPE_TASK;
+		hand.h_mode = mode;
+		hand.h_data = FORTASK(thread, this_taskpid);
+		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
 	}	break;
 
 	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-		      cmd);
 		break;
 	}
-	return 0;
-err_exited:
-	THROW(E_PROCESS_EXITED,
-	      taskpid_getpid(self, THIS_PIDNS));
+	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+	      cmd);
 }
+
+
+
+#ifdef __ARCH_WANT_SYSCALL_PIDFD_OPEN
+DEFINE_SYSCALL2(fd_t, pidfd_open,
+                pid_t, pid,
+                syscall_ulong_t, flags) {
+	unsigned int result;
+	struct handle hand;
+	REF struct taskpid *thread_pid;
+	REF struct task *thread;
+	if unlikely(flags != 0) {
+		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
+		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS);
+	}
+	thread_pid = pidns_lookup(THIS_PIDNS, (upid_t)pid);
+	FINALLY_DECREF_UNLIKELY(thread_pid);
+	thread = taskpid_gettask_srch(thread_pid);
+	{
+		FINALLY_DECREF_UNLIKELY(thread);
+		/* Only allow pidfd_open() for process leaders */
+		if (!task_isprocessleader_p(thread) && !has_personality(KP_PIDFD_OPEN_THREAD)) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER);
+		}
+
+		/* Verify that the caller can access `pid' */
+		require_pidfd_open(thread);
+	}
+
+	hand.h_type = HANDLE_TYPE_TASK;
+	hand.h_mode = IO_RDWR | IO_CLOEXEC;
+	hand.h_data = thread_pid;
+
+	/* Install the handle within our handle namespace. */
+	result = handle_install(THIS_HANDLE_MANAGER, hand);
+	return (fd_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PIDFD_OPEN */
+
+
+#ifdef __ARCH_WANT_SYSCALL_PIDFD_GETFD
+DEFINE_SYSCALL3(fd_t, pidfd_getfd,
+                fd_t, pidfd,
+                fd_t, foreign_fd,
+                syscall_ulong_t, flags) {
+	unsigned int result;
+	REF struct handle foreign_handle;
+	REF struct task *thread;
+	REF struct handle_manager *handman;
+	if unlikely(flags != 0) {
+		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
+		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS);
+	}
+	thread = handle_get_task((unsigned int)pidfd);
+	{
+		FINALLY_DECREF_UNLIKELY(thread);
+		handman = task_gethandlemanager(thread);
+	}
+	{
+		FINALLY_DECREF_UNLIKELY(handman);
+		/* XXX: Support  for symbolic handles? It'd be kind-of
+		 *      neat to access, say, PWD of a process by doing
+		 *      `pidfd_getfd(pidfd_open(PID), AT_FDCWD)' as an
+		 *      alias for `open("/proc/[PID]/cwd")'... */
+		foreign_handle = handle_lookupin((unsigned int)foreign_fd, handman);
+	}
+	RAII_FINALLY { decref_unlikely(foreign_handle); };
+	foreign_handle.h_mode &= ~IO_CLOFORK;
+	foreign_handle.h_mode |= IO_CLOEXEC;
+	/* Install the handle into our own table. */
+	result = handle_install(THIS_HANDLE_MANAGER,
+	                        foreign_handle);
+	return (fd_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PIDFD_GETFD */
+
+
+#if (defined(__ARCH_WANT_SYSCALL_PIDFD_SEND_SIGNAL) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PIDFD_SEND_SIGNAL))
+
+PRIVATE NONNULL((2)) errno_t KCALL
+pidfd_send_signal_impl(fd_t pidfd,
+                       siginfo_t const *__restrict info,
+                       syscall_ulong_t flags) {
+	REF struct task *target;
+	if unlikely(flags != 0) {
+		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
+		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS);
+	}
+	target = handle_get_task((unsigned int)pidfd);
+	FINALLY_DECREF_UNLIKELY(target);
+	/* Don't allow sending arbitrary signals to other processes. */
+	if ((info->si_code >= 0 || info->si_code == SI_TKILL) &&
+	    (task_getprocess_of(target) != task_getprocess()))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
+		      info->si_code);
+	if (info->si_signo != 0) {
+		if (!task_raisesignalprocess(target, info))
+			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
+	}
+	return -EOK;
+}
+
+
+#ifdef __ARCH_WANT_SYSCALL_PIDFD_SEND_SIGNAL
+INTDEF NONNULL((1)) void KCALL /* from "posix-signal.c" */
+siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
+                  USER UNCHECKED siginfo_t const *uinfo);
+DEFINE_SYSCALL4(errno_t, pidfd_send_signal,
+                fd_t, pidfd, signo_t, usigno,
+                USER UNCHECKED siginfo_t const *, uinfo,
+                syscall_ulong_t, flags) {
+	siginfo_t info;
+	siginfo_from_user(&info, usigno, uinfo);
+	return pidfd_send_signal_impl(pidfd, &info, flags);
+}
+#endif /* __ARCH_WANT_SYSCALL_PIDFD_SEND_SIGNAL */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PIDFD_SEND_SIGNAL
+INTDEF NONNULL((1)) void KCALL /* from "posix-signal.c" */
+siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
+                         USER UNCHECKED compat_siginfo_t const *uinfo);
+DEFINE_COMPAT_SYSCALL4(errno_t, pidfd_send_signal,
+                       fd_t, pidfd, signo_t, usigno,
+                       USER UNCHECKED compat_siginfo_t const *, uinfo,
+                       syscall_ulong_t, flags) {
+	siginfo_t info;
+	siginfo_from_compat_user(&info, usigno, uinfo);
+	return pidfd_send_signal_impl(pidfd, &info, flags);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PIDFD_SEND_SIGNAL */
+
+#endif /* __ARCH_WANT_SYSCALL_PIDFD_SEND_SIGNAL || __ARCH_WANT_COMPAT_SYSCALL_PIDFD_SEND_SIGNAL */
 
 DECL_END
 

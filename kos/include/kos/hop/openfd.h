@@ -20,39 +20,17 @@
 #ifndef _KOS_HOP_OPENFD_H
 #define _KOS_HOP_OPENFD_H 1
 
-#include <__crt.h>
-#include <__stdinc.h>
+#include <kos/ioctl/_openfd.h>
 
-#include <hybrid/typecore.h>
-
-#include <bits/types.h>
-
-
-/* Values for `struct hop_openfd::of_mode' */
-#define HOP_OPENFD_MODE_AUTO       0x0000 /* Ignore `of_hint' and automatically select an appropriate handle
-                                           * This  is  the same  as `HOP_OPENFD_MODE_HINT'  with `of_hint=0' */
-#define HOP_OPENFD_MODE_HINT       0x0001 /* Install the newly opened handle into the lowest unused handle that is `>= of_hint' */
-#define HOP_OPENFD_MODE_INTO       0x0002 /* Install the newly opened handle into `of_hint', automatically
-                                           * closing any handle that may  have been stored inside  before.
-                                           * Additionally, `of_hint' may be any writable symbolic handle (e.g. `AT_FDCWD') */
-#define HOP_OPENFD_MODE_INTO_EXACT 0x0003 /* Same as `HOP_OPENFD_MODE_INTO', but don't recognize symbolic
-                                           * handles, and throw an `E_INVALID_HANDLE_FILE' error instead. */
-
-
-#define __OFFSET_HOP_OPENFD_MODE  0
-#define __OFFSET_HOP_OPENFD_FLAGS 2
-#define __OFFSET_HOP_OPENFD_HINT  4
-#define __SIZEOF_HOP_OPENFD       8
-#ifdef __CC__
-__DECL_BEGIN
-struct hop_openfd /*[PREFIX(of_)]*/ {
-	__uint16_t of_mode;  /* Open mode (One of `HOP_OPENFD_MODE_*') */
-	__uint16_t of_flags; /* Set of `IO_CLOEXEC|IO_CLOFORK' */
-	__uint32_t of_hint;  /* [IN]  Open hint (s.a. `HOP_OPENFD_MODE_INTO')
-	                      * [OUT] The ID of the handle that has been opened (must be close(2)'ed). */
-};
-__DECL_END
-#endif /* __CC__ */
-
+/* DEPRECATED HEADER! */
+#define HOP_OPENFD_MODE_AUTO       OPENFD_MODE_AUTO
+#define HOP_OPENFD_MODE_HINT       OPENFD_MODE_HINT
+#define HOP_OPENFD_MODE_INTO       OPENFD_MODE_INTO
+#define HOP_OPENFD_MODE_INTO_EXACT OPENFD_MODE_INTO_EXACT
+#define __OFFSET_HOP_OPENFD_MODE   __OFFSET_OPENFD_MODE
+#define __OFFSET_HOP_OPENFD_FLAGS  __OFFSET_OPENFD_FLAGS
+#define __OFFSET_HOP_OPENFD_HINT   __OFFSET_OPENFD_HINT
+#define __SIZEOF_HOP_OPENFD        __SIZEOF_OPENFD
+#define hop_openfd                 openfd
 
 #endif /* !_KOS_HOP_OPENFD_H */

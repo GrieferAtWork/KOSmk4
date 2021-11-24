@@ -51,7 +51,7 @@
 
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
-#include <kos/hop/openfd.h>
+#include <kos/ioctl/_openfd.h>
 
 #include <assert.h>
 #include <fcntl.h>
@@ -2382,8 +2382,8 @@ handle_fcntl(struct handle_manager *__restrict self,
 /* Do everything required to install a handle via a open openfd
  * command data  packet that  has been  passed via  user-space. */
 PUBLIC NONNULL((2)) unsigned int FCALL
-handle_installhop(USER UNCHECKED struct hop_openfd *data,
-                  struct handle const *__restrict hnd)
+handle_installopenfd(USER UNCHECKED struct openfd *data,
+                     struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE,
@@ -2400,7 +2400,7 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 	COMPILER_READ_BARRIER();
 	if (flags & ~(IO_CLOEXEC | IO_CLOFORK)) {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFS_FLAGS,
+		      E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS,
 		      flags,
 		      ~(IO_CLOEXEC | IO_CLOFORK),
 		      0);
@@ -2409,18 +2409,18 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 	used_hnd.h_mode |= flags;
 	switch (mode) {
 
-	case HOP_OPENFD_MODE_AUTO:
+	case OPENFD_MODE_AUTO:
 		result_fd = handle_install(man, used_hnd);
 		break;
 
-	case HOP_OPENFD_MODE_HINT:
+	case OPENFD_MODE_HINT:
 		COMPILER_READ_BARRIER();
 		result_fd = (unsigned int)data->of_hint;
 		COMPILER_READ_BARRIER();
 		result_fd = handle_installat(man, result_fd, used_hnd);
 		break;
 
-	case HOP_OPENFD_MODE_INTO:
+	case OPENFD_MODE_INTO:
 		COMPILER_READ_BARRIER();
 		result_fd = (unsigned int)data->of_hint;
 		COMPILER_READ_BARRIER();
@@ -2428,7 +2428,7 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 		handle_installinto_sym(result_fd, used_hnd);
 		return result_fd;
 
-	case HOP_OPENFD_MODE_INTO_EXACT:
+	case OPENFD_MODE_INTO_EXACT:
 		COMPILER_READ_BARRIER();
 		result_fd = (unsigned int)data->of_hint;
 		COMPILER_READ_BARRIER();
@@ -2438,7 +2438,7 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_OPENFD_MODE,
+		      E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE,
 		      mode);
 		break;
 	}

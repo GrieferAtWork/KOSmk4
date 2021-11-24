@@ -321,14 +321,7 @@ INTERN struct atomic_rwlock DlModule_AllLock  = ATOMIC_RWLOCK_INIT;
 
 
 INTERN WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd) {
-	enum {
-		MAX_RESERVED_FD_2 = STDIN_FILENO > STDOUT_FILENO
-		                    ? STDIN_FILENO
-		                    : STDOUT_FILENO,
-		MAX_RESERVED_FD = MAX_RESERVED_FD_2 > STDERR_FILENO
-		                  ? MAX_RESERVED_FD_2
-		                  : STDERR_FILENO
-	};
+	enum { MAX_RESERVED_FD = MAX_C(STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO) };
 	if unlikely((unsigned int)fd <= (unsigned int)MAX_RESERVED_FD) {
 		struct hop_openfd ofd;
 		syscall_slong_t error;

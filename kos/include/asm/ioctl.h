@@ -7,15 +7,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-/* ioctl  command  encoding:  32  bits  total,  command  in  lower  16  bits,
- * size of the parameter structure in the lower 14 bits of the upper 16 bits.
- * Encoding  the  size  of  the  parameter  structure  in  the  ioctl request
- * is   useful   for   catching   programs   compiled   with   old   versions
- * and  to  avoid  overwriting  user  space  outside  the  user  buffer area.
- * The highest  2  bits  are reserved  for  indicating  the  ``access mode''.
- * NOTE: This limits the max parameter size to 16kB -1 !
- *
- * IOCTL format layout:
+/* IOCTL format layout:
  *
  * 0xc0000000
  * | 0x40000000
@@ -34,9 +26,28 @@
  * dir
  *
  *  _IOC(dir, type, nr, size)
- *
- *
  */
+
+/*
+ * The following "type" codes are defined:
+ *
+ * Domain  Type        Name                Header                    Comment
+ * ======  ====        ====                ======                    =======
+ *  Linux  0x12        BLK*                <linux/fs.h>
+ *  Linux  0x54 ('T')  T*                  <sys/ioctl.h>             TTY & standard
+ *  Linux  0x58 ('X')  FI*                 <linux/fs.h>
+ *  KOS    0x46 ('F')  FILE_IOC_*          <kos/ioctl/file.h>
+ *  KOS    0x4B ('K')  KBDIO_*             <kos/ioctl/keyboard.h>
+ *  KOS    0x4C ('L')  LEAKS_IOC_*         <kos/ioctl/leaks.h>
+ *  KOS    0x4D ('M')  MOUSEIO_*           <kos/ioctl/mouse.h>
+ *  KOS    0x53 ('S')  SVGA_IOC_*          <kos/ioctl/svga.h>
+ *  KOS    0x54 ('T')  TTYIO_*             <kos/ioctl/tty.h>
+ *  KOS    0x56 ('V')  VID_IOC_*           <kos/ioctl/video.h>
+ *  KOS    0x70 ('p')  TASK_IOC_*          <kos/ioctl/task.h>
+ *
+ * TODO: The above list is incomplete
+ */
+
 
 #define _IOC_NRBITS   8
 #define _IOC_TYPEBITS 8

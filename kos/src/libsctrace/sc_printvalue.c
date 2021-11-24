@@ -1802,7 +1802,6 @@ printStrendNDatabase("KOS_IOCTLS", kos_ioctls);
 	 ((index) == 0x290) ? ((index) = 0, (result) = repr_IOCTLS_290h, true) : \
 	 ((index) >= 0x301 && (index) <= 0x32b) ? ((index) -= 0x301, (result) = repr_IOCTLS_301h, true) : \
 	 ((index) >= 0x125d && (index) <= 0x127f) ? ((index) -= 0x125d, (result) = repr_IOCTLS_125dh, true) : \
-	 ((index) >= 0x4300 && (index) <= 0x4303) ? ((index) -= 0x4300, (result) = repr_IOCTLS_4300h, true) : \
 	 ((index) >= 0x4b2f && (index) <= 0x4b72) ? ((index) -= 0x4b2f, (result) = repr_IOCTLS_4b2fh, true) : \
 	 ((index) >= 0x4bfa && (index) <= 0x4bfb) ? ((index) -= 0x4bfa, (result) = repr_IOCTLS_4bfah, true) : \
 	 ((index) >= 0x5301 && (index) <= 0x5322) ? ((index) -= 0x5301, (result) = repr_IOCTLS_5301h, true) : \
@@ -1834,8 +1833,6 @@ PRIVATE char const repr_IOCTLS_125dh[] =
 "ACESTOP\0BLKTRACETEARDOWN\0BLKDISCARD\0BLKIOMIN\0BLKIOOPT\0BLKALIGNOF"
 "F\0BLKPBSZGET\0BLKDISCARDZEROES\0BLKSECDISCARD\0BLKROTATIONAL\0BLKZER"
 "OOUT";
-PRIVATE char const repr_IOCTLS_4300h[] =
-"CDIO_GETTIME\0\0CDIO_GETBASE\0CDIO_SETWALLCLOCK";
 PRIVATE char const repr_IOCTLS_4b2fh[] =
 "KIOCSOUND\0KDMKTONE\0KDGETLED\0KDSETLED\0KDGKBTYPE\0KDADDIO\0KDDELIO\0K"
 "DENABIO\0KDDISABIO\0\0\0KDSETMODE\0KDGETMODE\0KDMAPDISP\0KDUNMAPDISP\0\0\0"
@@ -1906,7 +1903,8 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 	 ((index) >= 0x4d00 && (index) <= 0x4d07) ? ((index) -= 0x4d00, (result) = repr_KOS_IOCTLS_4d00h, true) : \
 	 ((index) >= 0x5300 && (index) <= 0x5305) ? ((index) -= 0x5300, (result) = repr_KOS_IOCTLS_5300h, true) : \
 	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
-	 ((index) >= 0x5600 && (index) <= 0x5612) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : false)
+	 ((index) >= 0x5600 && (index) <= 0x5612) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : \
+	 ((index) >= 0x7000 && (index) <= 0x700c) ? ((index) -= 0x7000, (result) = repr_KOS_IOCTLS_7000h, true) : false)
 PRIVATE char const repr_KOS_IOCTLS_4601h[] =
 "FILE_IOC_TAILREAD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FILE_IOC_GETFSLINKMAX\0FILE_IOC_G"
 "ETFSNAMEMAX\0FILE_IOC_GETFSSIZBITS\0FILE_IOC_GETFSXFERINC\0FILE_IOC"
@@ -1932,6 +1930,10 @@ PRIVATE char const repr_KOS_IOCTLS_5400h[] =
 PRIVATE char const repr_KOS_IOCTLS_5600h[] =
 "VID_IOC_ACTIVATE\0VID_IOC_MAKELCK\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0VID_IOC_GETTTYINF"
 "O\0VID_IOC_GETCELLDATA\0VID_IOC_GETCURSOR";
+PRIVATE char const repr_KOS_IOCTLS_7000h[] =
+"TASK_IOC_GETTID\0TASK_IOC_GETPID\0TASK_IOC_GETPPID\0TASK_IOC_GETPGI"
+"D\0TASK_IOC_GETSID\0\0\0\0\0TASK_IOC_OPENPID\0TASK_IOC_OPENPPID\0TASK_IO"
+"C_OPENPGID\0TASK_IOC_OPENSID";
 //[[[end]]]
 
 PRIVATE ATTR_CONST WUNUSED char const *CC

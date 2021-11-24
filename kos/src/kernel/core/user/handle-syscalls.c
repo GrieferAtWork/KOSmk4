@@ -315,9 +315,7 @@ DEFINE_SYSCALL3(syscall_slong_t, ioctl,
 	hand = handle_lookup((unsigned int)fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	TRY {
-		result = handle_ioctl(hand,
-		                      command,
-		                      arg);
+		result = handle_ioctl(hand, command, arg);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
 		    PERTASK_EQ(this_exception_args.e_invalid_argument.ia_context,
@@ -351,10 +349,7 @@ DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
 	hand = handle_lookup((unsigned int)fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	TRY {
-		result = handle_ioctlf(hand,
-		                       command,
-		                       arg,
-		                       mode);
+		result = handle_ioctlf(hand, command, arg, mode);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
 		    PERTASK_EQ(this_exception_args.e_invalid_argument.ia_context,
@@ -1049,7 +1044,7 @@ PRIVATE syscall_slong_t
 	}	break;
 
 	case HOP_HANDLE_REOPEN:
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, *hand);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, *hand);
 		break;
 
 	case HOP_HANDLE_NOOP:

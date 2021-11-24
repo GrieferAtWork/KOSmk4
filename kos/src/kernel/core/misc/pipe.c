@@ -419,7 +419,7 @@ handle_pipe_hop(struct pipe *__restrict self,
 		temp.h_type = HANDLE_TYPE_PIPE;
 		temp.h_mode = mode;
 		temp.h_data = self;
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_PIPE_CREATE_READER: {
@@ -432,7 +432,7 @@ handle_pipe_hop(struct pipe *__restrict self,
 		RAII_FINALLY { ATOMIC_DEC(self->p_rdcnt); };
 		temp.h_data = pipe_reader_create(self);
 		FINALLY_DECREF((struct pipe_reader *)temp.h_data);
-		result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		result = handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 		return result;
 	}	break;
 
@@ -446,7 +446,7 @@ handle_pipe_hop(struct pipe *__restrict self,
 		RAII_FINALLY { ATOMIC_DEC(self->p_wrcnt); };
 		temp.h_data = pipe_writer_create(self);
 		FINALLY_DECREF((struct pipe_writer *)temp.h_data);
-		result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		result = handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
 		return result;
 	}	break;
 

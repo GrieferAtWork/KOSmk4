@@ -26,7 +26,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <kos/hop/openfd.h>
+#include <kos/ioctl/_openfd.h>
 
 #ifdef __CC__
 #ifndef NO_KSYSCTL_HELPER_FUNCTIONS
@@ -102,7 +102,7 @@ struct ksysctl_driver_insmod /*[PREFIX(im_)]*/ {
 	__uint8_t            __im_pad1[3];         /* ... */
 	char const            *im_cmdline;         /* [0..1] Commandline for the driver. */
 	__KSYSCTL_PAD_POINTER(__im_pad2);          /* ... */
-	struct hop_openfd     *im_driver;          /* [OUT|OPT] A handle to the loaded driver. */
+	struct openfd         *im_driver;          /* [OUT|OPT] A handle to the loaded driver. */
 	__KSYSCTL_PAD_POINTER(__im_pad3);          /* ... */
 	union {
 		struct {
@@ -194,7 +194,7 @@ struct ksysctl_driver_getmod /*[PREFIX(gm_)]*/ {
 	                                        * structure version. */
 	__uint16_t             gm_format;      /* Driver format (One of `KSYSCTL_DRIVER_FORMAT_*') */
 	__uint16_t           __gm_pad1;
-	struct hop_openfd      gm_driver;      /* [OUT] A handle to the loaded driver. */
+	struct openfd          gm_driver;      /* [OUT] A handle to the loaded driver. */
 	union {
 		void              *gm_addr;        /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_BLOB)]
 		                                    * A pointer apart of the driver's static binary image. */
@@ -282,7 +282,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #define KSYSCTL_KERNEL_SET_PERSONALITY         0x005f0002 /* [int kp << 1 | (enabled & 1)] Enable/Disable the given personality `kp'. (return 0/1 indicative of the old state) */
 
 /* Driver related */
-#define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct hop_openfd *result] Capture a snapshot of all currently loaded kernel
+#define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct openfd *result] Capture a snapshot of all currently loaded kernel
                                                            * drivers, and return a `HANDLE_TYPE_DRIVER_LOADLIST' handle for that snapshot.
                                                            * WARNING: None of the drivers loaded at the point this call is made can be
                                                            *          fully unloaded  before  the  returned handle  has  been  closed!
@@ -303,9 +303,9 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 /* TODO: Wrapper for `chrdev_lookup' */
 /* TODO: Wrapper for `chrdev_lookup_name' */
 
-#define KSYSCTL_OPEN_KERNEL_DRIVER             0xfffe0001 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_MODULE' to `kernel_driver'
+#define KSYSCTL_OPEN_KERNEL_DRIVER             0xfffe0001 /* [struct openfd *result] Open a handle `HANDLE_TYPE_MODULE' to `kernel_driver'
                                                            * @return: == result->of_hint */
-#define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0002 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_TASK' to `boottask'
+#define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0002 /* [struct openfd *result] Open a handle `HANDLE_TYPE_TASK' to `boottask'
                                                            * @return: == result->of_hint */
 
 

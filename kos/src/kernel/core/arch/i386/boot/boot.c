@@ -506,19 +506,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * TODO: When opening a dec file, use mmap() (if available) and malloc()+read()
 	 *       as    fall-back,    rather   than    always    using   malloc()+read() */
 
-	/* TODO: HOP_HANDLE_CREATE_STREAM
-	 *       Constructs a wrapper  for another  handle object that  includes a  `pos_t'
-	 *       file  offset to implement read(), write() and lseek() by dispatching these
-	 *       operators through pread(), pwrite() and fstat() (fstat for `stat::st_size'
-	 *       with lseek(SEEK_END))
-	 *       -> Useful for turning UVIO objects into file-like objects. */
-
 	/* TODO: Play around with `no_caller_saved_registers'
 	 *       It may be possible to cut down on boiler-plate assembly needed to wrap
 	 *       simple C-level interrupt handlers and/or system calls, by not  needing
 	 *       to save registers that wouldn't be used in any case! */
-
-	/* TODO: renameat2() is missing from <stdio.h> */
 
 	/* TODO: Add auto-completion to the `cpuid' debugger command.
 	 *       We can easily determine valid leafs by looking at the value of CPUID[0].EAX! */
