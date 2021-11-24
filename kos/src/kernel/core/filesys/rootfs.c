@@ -241,6 +241,7 @@ NOTHROW(KCALL kernel_open_rootfs_trydev)(struct blkdev *__restrict dev,
 	if (result) {
 		if (*pnewly_created)
 			ffilesys_open_done(dev);
+		fsuper_delete(result);
 		decref_likely(result);
 	}
 	return NULL;
@@ -270,10 +271,12 @@ NOTHROW(KCALL kernel_open_rootfs_bydev)(bool *__restrict pnewly_created,
 					/* Ambiguous... :( */
 					if (result_newly_created)
 						ffilesys_open_done(result->fs_dev);
-					decref_unlikely(result);
+					fsuper_delete(result);
+					decref_likely(result);
 					if (*pnewly_created)
 						ffilesys_open_done(new_result->fs_dev);
-					decref_unlikely(new_result);
+					fsuper_delete(new_result);
+					decref_likely(new_result);
 					return NULL;
 				}
 				result               = new_result;
