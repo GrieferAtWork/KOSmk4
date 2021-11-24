@@ -24,14 +24,20 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/dirent.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/path.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/mman/futexfd.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/pipe.h>
 #include <kernel/uname.h>
@@ -198,6 +204,197 @@ ProcFS_KCore_Printer(pformatprinter printer, void *arg,
 	/* TODO: Print a coredump for the kernel core itself */
 	PRINT("TODO");
 }
+
+
+/************************************************************************/
+/* /proc/kos/mm/stat                                                    */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_kos_mm_stat_printer(pformatprinter printer, void *arg,
+                           size_t UNUSED(offset_hint)) {
+	size_t partcount = mpart_all_getsize();
+	printf("mparts: %" PRIuSIZ "\n",
+	       partcount);
+}
+
+
+
+
+/************************************************************************/
+/* /proc/kos/mm/parts                                                   */
+/************************************************************************/
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL
+print_mpart_desc(struct mpart *__restrict self,
+                 pformatprinter printer, void *arg) {
+	ssize_t result;
+	REF struct mfile *file;
+	pos_t minaddr, maxaddr;
+	uintptr_quarter_t state;
+	uintptr_half_t flags;
+	char const *statename;
+	REF struct mman *firstcopy;
+	bool has_mappings;
+	firstcopy    = NULL;
+	mpart_lock_acquire(self);
+	minaddr = self->mp_minaddr;
+	maxaddr = self->mp_maxaddr;
+	state   = self->mp_state;
+	flags   = self->mp_flags;
+	file    = incref(self->mp_file);
+	has_mappings = !LIST_EMPTY(&self->mp_copy) ||
+	               !LIST_EMPTY(&self->mp_share);
+	if (!LIST_EMPTY(&self->mp_copy)) {
+		struct mnode *node;
+		node = LIST_FIRST(&self->mp_copy);
+		do {
+			if (tryincref(node->mn_mman)) {
+				firstcopy = node->mn_mman;
+				break;
+			}
+			node = LIST_NEXT(node, mn_link);
+		} while (node);
+	}
+	mpart_lock_release(self);
+	FINALLY_DECREF_UNLIKELY(file);
+	FINALLY_XDECREF_UNLIKELY(firstcopy);
+
+	switch (state) {
+	case MPART_ST_VOID:
+		statename = "void";
+		break;
+	case MPART_ST_SWP:
+	case MPART_ST_SWP_SC:
+		statename = "swap";
+		break;
+	case MPART_ST_MEM:
+	case MPART_ST_MEM_SC:
+		statename = "mem";
+		break;
+#ifdef LIBVIO_CONFIG_ENABLED
+	case MPART_ST_VIO:
+		statename = "vio";
+		break;
+#endif /* LIBVIO_CONFIG_ENABLED */
+	default:
+		statename = "?";
+		break;
+	}
+	result = format_printf(printer, arg,
+	                       "%s\t%#.6" PRIx64 "-%#.6" PRIx64 "\t"
+	                       "%c%c%c%c\t",
+	                       statename, minaddr, maxaddr,
+	                       flags & MPART_F_GLOBAL_REF ? 'g' : '-',
+	                       flags & MPART_F_PERSISTENT ? 'p' : '-',
+	                       flags & MPART_F_CHANGED ? 'c' : '-',
+	                       flags & MPART_F_MLOCK
+	                       ? (flags & MPART_F_MLOCK_FROZEN ? 'L' : 'l')
+	                       : '-');
+	if (result < 0)
+		return result;
+	if (firstcopy == &mman_kernel) {
+		result = (*printer)(arg, "<kernel>", 8);
+	} else if (firstcopy) {
+		/* Print the main executable of the first mman with a copy-on-write mapping. */
+		REF struct fdirent *exec_dent;
+		REF struct path *exec_path;
+		struct mexecinfo *info;
+		info = &FORMMAN(firstcopy, thismman_execinfo);
+		mman_lock_read(firstcopy);
+		exec_dent = xincref(info->mei_dent);
+		exec_path = xincref(info->mei_path);
+		mman_lock_endread(firstcopy);
+		FINALLY_XDECREF_UNLIKELY(exec_path);
+		if unlikely(!exec_dent)
+			goto print_no_exe;
+		FINALLY_DECREF_UNLIKELY(exec_dent);
+		if (exec_path) {
+			REF struct path *myroot = fs_getroot(THIS_FS);
+			FINALLY_DECREF_UNLIKELY(myroot);
+			result = path_printent(exec_path, exec_dent->fd_name, exec_dent->fd_namelen,
+			                       printer, arg, fs_atflags(0) | AT_PATHPRINT_INCTRAIL,
+			                       myroot);
+		} else if (exec_dent->fd_name[0] == '/') {
+			result = (*printer)(arg, exec_dent->fd_name, exec_dent->fd_namelen);
+		} else {
+			result = format_printf(printer, arg, "?/%$s",
+			                       (size_t)exec_dent->fd_namelen,
+			                       exec_dent->fd_name);
+		}
+	} else {
+print_no_exe:
+		result = (*printer)(arg,
+		                    has_mappings ? "<mapped>"
+		                                 : "<cached>",
+		                    8);
+	}
+	if (result < 0)
+		return result;
+	result = (*printer)(arg, "\t", 1);
+	if (result < 0)
+		return result;
+	result = mfile_uprintlink(file, printer, arg);
+	if (result < 0)
+		return result;
+	return (*printer)(arg, "\n", 1);
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
+                            size_t UNUSED(offset_hint)) {
+	REF struct mpart *part;
+	REF struct mpart *prev = NULL;
+	size_t index = 0;
+	mpart_all_acquire();
+	part = LIST_FIRST(&mpart_all_list);
+	for (;;) {
+		REF struct mpart *next;
+		size_t num_destroyed;
+		num_destroyed = 0;
+		while (part && !tryincref(part)) {
+			part = LIST_NEXT(part, mp_allparts);
+			++num_destroyed;
+		}
+		mpart_all_release();
+		xdecref_unlikely(prev);
+		TRY {
+			if (num_destroyed != 0) {
+				index += num_destroyed;
+				if (printf("<destroyed> (x%" PRIuSIZ ")\n", num_destroyed) < 0)
+					break;
+			}
+			if (!part)
+				break;
+			if (print_mpart_desc(part, printer, arg) < 0)
+				break;
+		} EXCEPT {
+			xdecref_unlikely(part);
+			RETHROW();
+		}
+		prev = part;
+		mpart_all_acquire();
+		if (!LIST_ISBOUND(part, mp_allparts)) {
+			/* Find  the `index'th part in the global list.
+			 * This is not failsafe (elements before `part'
+			 * may have been removed, so `index' may not be
+			 * correct), but it's better than nothing. */
+			size_t i;
+			part = LIST_FIRST(&mpart_all_list);
+			for (i = 0; part && i < index; ++i) {
+				part = LIST_NEXT(part, mp_allparts);
+			}
+			if (!part) {
+				mpart_all_release();
+				break;
+			}
+		}
+		next = LIST_NEXT(part, mp_allparts);
+		part = next;
+		++index;
+	}
+	xdecref_unlikely(part);
+}
+
+
 
 
 /************************************************************************/

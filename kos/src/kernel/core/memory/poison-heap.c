@@ -420,7 +420,7 @@ PRIVATE ATTR_NOINLINE ATTR_PURE ATTR_COLDTEXT size_t
 NOTHROW(KCALL phcore_usable_size)(void *ptr) {
 	if (!ptr)
 		return 0;
-	TRY {
+	NESTED_TRY {
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 		if (KERNEL_SLAB_CHECKPTR(ptr))
 			return SLAB_GET(ptr)->s_size;

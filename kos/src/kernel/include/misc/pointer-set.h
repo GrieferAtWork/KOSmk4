@@ -245,7 +245,7 @@ pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
 		new_mask = (new_mask << 1) | 1;
 	old_map = self->ps_list;
 	if (self->ps_list == self->ps_buf)
-		old_map = NULL;
+		old_map = __NULLPTR;
 	new_map = (uintptr_t *)krealloc_nx(old_map,
 	                                   (new_mask + 1) * sizeof(uintptr_t),
 #if POINTER_SET_SENTINAL == 0
@@ -291,7 +291,7 @@ NOTHROW(KCALL pointer_set_clear_and_rehash_nx)(struct pointer_set *__restrict se
 		new_mask = (new_mask << 1) | 1;
 	old_map = self->ps_list;
 	if (self->ps_list == self->ps_buf)
-		old_map = NULL;
+		old_map = __NULLPTR;
 	new_map = (uintptr_t *)krealloc_nx(old_map,
 	                                   (new_mask + 1) *
 	                                   sizeof(uintptr_t),
