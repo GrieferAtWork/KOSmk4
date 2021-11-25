@@ -968,26 +968,37 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 	if (((uintptr_t)ptr & (sizeof(void *) - 1)) != 0)
 		return 0;
 
-#if __SIZEOF_POINTER__ == 4 /* TODO: Generic check each word for ADDR_ISKERN() in a pp expression */
+#if __SIZEOF_POINTER__ == 4
 #ifdef CONFIG_DEBUG_HEAP
 	if ((uintptr_t)ptr == DEBUGHEAP_NO_MANS_LAND)
 		return 0; /* Optimization: No mans land */
 	if ((uintptr_t)ptr == DEBUGHEAP_FRESH_MEMORY)
 		return 0; /* Optimization: Fresh memory. */
 #endif /* CONFIG_DEBUG_HEAP */
-	if ((uintptr_t)ptr == 0xcccccccc)
-		return 0; /* Optimization: Stack pre-initialization. */
-#endif /* __SIZEOF_POINTER__ == 4 */
+	if ((uintptr_t)ptr == UINT32_C(0xcccccccc))
+		return 0; /* Optimization: debug filler. */
+#elif __SIZEOF_POINTER__ == 8
+#ifdef CONFIG_DEBUG_HEAP
+	if ((uintptr_t)ptr == ((uint64_t)DEBUGHEAP_NO_MANS_LAND |
+	                       (uint64_t)DEBUGHEAP_NO_MANS_LAND << 32))
+		return 0; /* Optimization: No mans land */
+	if ((uintptr_t)ptr == ((uint64_t)DEBUGHEAP_FRESH_MEMORY |
+	                       (uint64_t)DEBUGHEAP_FRESH_MEMORY << 32))
+		return 0; /* Optimization: Fresh memory. */
+#endif /* CONFIG_DEBUG_HEAP */
+	if ((uintptr_t)ptr == UINT32_C(0xcccccccccccccccc))
+		return 0; /* Optimization: debug filler. */
+#endif /* __SIZEOF_POINTER__ == ... */
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
 	/* Special handling for slab pointers. */
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return gc_reachable_slab_pointer(ptr);
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
 	if (!node) {
-		/* Check for struct-blocks allocated by mcoreheap */
+		/* Special handling for mcoreheap */
 		struct mcorepage *cp, *iter;
 		unsigned int index, i;
 		struct mnode *ptrnode = mman_mappings_locate(&mman_kernel, ptr);
@@ -1019,10 +1030,10 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 				if (iter == cp) {
 					/* Yes: this really is a reachable coreheap object! */
 					size_t result;
-	
+
 					/* Prevent recursion by remembering reachability */
 					INUSE_BITSET_TURNON(cp->_mcp_reach, index);
-	
+
 					/* Recursively visit pointed-to data. */
 					result = gc_reachable_data(&cp->mcp_part[index], sizeof(cp->mcp_part[index]));
 					return result + 1;
@@ -1031,6 +1042,8 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 		}
 		return 0;
 	}
+
+	/* Normal traced memory. */
 	if (node->tn_reach == gc_version)
 		return 0; /* Already reached. */
 	if (node->tn_kind == TRACE_NODE_KIND_BITSET) {
@@ -1261,55 +1274,78 @@ NOTHROW(KCALL gc_reachable_thread)(void *UNUSED(arg),
 
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_reachable_allmparts)(void) {
-	size_t result = 0;
-	struct mpart *iter;
-	LIST_FOREACH (iter, &mpart_all_list, mp_allparts) {
-		if (!wasdestroyed(iter) && (iter->mp_flags & MPART_F_GLOBAL_REF))
-			result += gc_reachable_pointer(iter);
+NOTHROW(KCALL gc_reachable_allmparts)(struct mpart **list) {
+	size_t i, result = 0;
+	struct mpart *elem;
+	if (list) {
+		for (i = 0; (elem = list[i]) != NULL; ++i) {
+			if (!wasdestroyed(elem) && (elem->mp_flags & MPART_F_GLOBAL_REF))
+				result += gc_reachable_pointer(elem);
+		}
 	}
 	return result;
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_reachable_fallnodes)(void) {
-	size_t result = 0;
-	struct fnode *iter;
-	LIST_FOREACH (iter, &fallnodes_list, fn_allnodes) {
-		if (!wasdestroyed(iter) && (iter->mf_flags & MFILE_FN_GLOBAL_REF))
-			result += gc_reachable_pointer(iter);
+NOTHROW(KCALL gc_reachable_fallnodes)(struct fnode **list) {
+	size_t i, result = 0;
+	struct fnode *elem;
+	if (list) {
+		for (i = 0; (elem = list[i]) != NULL; ++i) {
+			if (!wasdestroyed(elem) && (elem->mf_flags & MFILE_FN_GLOBAL_REF))
+				result += gc_reachable_pointer(elem);
+		}
 	}
 	return result;
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_reachable_fallsuper)(void) {
-	size_t result = 0;
-	struct fsuper *iter;
-	LIST_FOREACH (iter, &fallsuper_list, fs_root.fn_allsuper) {
-		if (!wasdestroyed(iter) && (iter->fs_root.mf_flags & MFILE_FN_GLOBAL_REF))
-			result += gc_reachable_pointer(iter);
+NOTHROW(KCALL gc_reachable_fallsuper)(struct fsuper **list) {
+	size_t i, result = 0;
+	struct fsuper *elem;
+	if (list) {
+		for (i = 0; (elem = list[i]) != NULL; ++i) {
+			if (!wasdestroyed(elem) && (elem->fs_root.mf_flags & MFILE_FN_GLOBAL_REF))
+				result += gc_reachable_pointer(elem);
+		}
 	}
 	return result;
 }
+
+
+/* Backup descriptor for global objects chains that should not partake in in
+ * recursive reachability detection. For this,  we unchain the global  lists
+ * `mpart_all_list', `fallnodes_list' and `fallsuper_list', such that one of
+ * the elements being reachable doesn't implicitly mean that all of them are
+ *
+ * Instead, we manually mark only those  objects as reachable which have  the
+ * `MPART_F_GLOBAL_REF' / `MFILE_FN_GLOBAL_REF' bits set. - All other objects
+ * must be reachable through some other manner.
+ *
+ * To facilitate this, we allocate linear vectors of pointers to all of the
+ * global objects that represent their owner within the global lists. Then,
+ * we  clear all of  the in-object neighbor-links by  setting them to NULL.
+ * Afterwards, we do a normal scan of global variables, including a  manual
+ * scan of objects from our backup lists, where we manually mark those that
+ * are marked with GLOBAL_REF as reachable.
+ *
+ * Finally, once scanning is done, we restore the state of the global lists
+ * to  be identical to what it was before. And because gc leak detection is
+ * run in the context of a super-lock, we know that no other cpu could have
+ * possibly witnessed us doing this! */
+struct gc_glink_backup {
+	heapptr_t ggb_allparts; /* [owned] Pointer to an array `struct mpart **', terminated by NULL */
+	heapptr_t ggb_allnodes; /* [owned] Pointer to an array `struct fnode **', terminated by NULL */
+	heapptr_t ggb_allsuper; /* [owned] Pointer to an array `struct fsuper **', terminated by NULL */
+};
+#define gc_glink_backup_allparts(self) (struct mpart **)heapptr_getptr((self)->ggb_allparts)
+#define gc_glink_backup_allnodes(self) (struct fnode **)heapptr_getptr((self)->ggb_allnodes)
+#define gc_glink_backup_allsuper(self) (struct fsuper **)heapptr_getptr((self)->ggb_allsuper)
 
 
 /* Scan the kernel for all reachable, traced pointers. */
 PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL gc_find_reachable)(void) {
-	/* TODO: Improve the accuracy of  memory leak detection relating  to
-	 *       mpart, fnode and fsuper, it would be appropriate to  unbind
-	 *       the global list links between all of these for the duration
-	 *       of scanning memory for leaks.
-	 * Otherwise,  we'll never detect leaks for any of these (they must
-	 * be considered leaks if the  *GLOBAL_REF flag isn't set, and  the
-	 * only way to  reach them is  via the global  list), since all  it
-	 * takes for none of them to be considered leaks, is any non-leaked
-	 * object of the same class  to be reachable. (because using  those
-	 * link pointers,  all others,  including those  that are  actually
-	 * leaks can be reached) */
-
-
+NOTHROW(KCALL gc_find_reachable_impl)(struct gc_glink_backup *__restrict glnk) {
 	/* Search for memory leaks.
 	 * The idea here is not to be able to find all memory blocks that were
 	 * leaked,  but rather  to find  anything that  ~might~ be referenced.
@@ -1342,13 +1378,13 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	 * the sake of semantics, _only_  those parts which have  MPART_F_GLOBAL_REF
 	 * set may be considered as *actually* reachable. */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #3.1: Scan globally referenced mem-parts\n");
-	gc_reachable_allmparts();
+	gc_reachable_allmparts(gc_glink_backup_allparts(glnk));
 
 	/* Same as with global mem-parts; only `MFILE_FN_GLOBAL_REF' files may be
 	 * considered as non-leaks! */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #3.2: Scan globally referenced file-nodes\n");
-	gc_reachable_fallnodes();
-	gc_reachable_fallsuper();
+	gc_reachable_fallnodes(gc_glink_backup_allnodes(glnk));
+	gc_reachable_fallsuper(gc_glink_backup_allsuper(glnk));
 
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Scan loaded drivers\n");
@@ -1390,6 +1426,169 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 			PRINT_LEAKS_SEARCH_PHASE("Phase #5: Reached %" PRIuSIZ " pointers\n", num_found);
 		} while (num_found);
 	}
+}
+
+
+
+#define trace_heap_alloc_heapptr(num_bytes) \
+	heap_alloc_untraced(&trace_heap, num_bytes, TRACE_HEAP_FLAGS);
+#define trace_heap_free_heapptr(hptr)        \
+	heap_free_untraced(&trace_heap,          \
+	                   heapptr_getptr(hptr), \
+	                   heapptr_getsiz(hptr), \
+	                   TRACE_HEAP_FLAGS);
+
+struct abstract_object {
+	LIST_ENTRY(abstract_object) ao_link;
+};
+
+
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
+NOTHROW(KCALL count_objects_in_list)(void *first, ptrdiff_t offsetof_object_list_entry) {
+	size_t result = 0;
+	while (first) {
+		struct abstract_object *link;
+		++result;
+		link  = (struct abstract_object *)((byte_t *)first + offsetof_object_list_entry);
+		first = link->ao_link.le_next;
+	}
+	return result;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL capture_object_list)(void **p_list_head, void **object_array,
+                                   ptrdiff_t offsetof_object_list_entry) {
+	void *object;
+	while ((object = *p_list_head) != NULL) {
+		struct abstract_object *link;
+		/* Append object to array. */
+		*object_array++ = object;
+		link = (struct abstract_object *)((byte_t *)object + offsetof_object_list_entry);
+
+		/* Unlink object. */
+		assert((void **)link->ao_link.le_prev == p_list_head);
+		link->ao_link.le_prev = NULL;
+		*p_list_head          = NULL;
+
+		/* Load next object. */
+		p_list_head = (void **)&link->ao_link.le_next;
+	}
+
+	/* Append sentinel entry. */
+	*object_array = NULL;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_glink_backup_freebuffers)(struct gc_glink_backup *__restrict self) {
+	/* Free local buffers. */
+	if (heapptr_getptr(self->ggb_allsuper) != NULL)
+		trace_heap_free_heapptr(self->ggb_allsuper);
+	if (heapptr_getptr(self->ggb_allnodes) != NULL)
+		trace_heap_free_heapptr(self->ggb_allnodes);
+	if (heapptr_getptr(self->ggb_allparts) != NULL)
+		trace_heap_free_heapptr(self->ggb_allparts);
+}
+
+
+PRIVATE ATTR_COLDTEXT void KCALL
+gc_glink_backup_init(struct gc_glink_backup *__restrict self) {
+	size_t n_parts, n_nodes, n_super;
+	memset(self, 0, sizeof(*self));
+
+	/* Count the # of objects in global lists. */
+	n_parts = count_objects_in_list((void *)mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
+	n_nodes = count_objects_in_list((void *)fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
+	n_super = count_objects_in_list((void *)fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
+
+	/* Allocate buffers. */
+	TRY {
+		if (n_parts != 0)
+			self->ggb_allparts = trace_heap_alloc_heapptr((n_parts + 1) * sizeof(void *));
+		if (n_nodes != 0)
+			self->ggb_allnodes = trace_heap_alloc_heapptr((n_nodes + 1) * sizeof(void *));
+		if (n_super != 0)
+			self->ggb_allsuper = trace_heap_alloc_heapptr((n_super + 1) * sizeof(void *));
+	} EXCEPT {
+		gc_glink_backup_freebuffers(self);
+		RETHROW();
+	}
+
+	/* Capture global lists. */
+	if (n_parts != 0) {
+		capture_object_list((void **)&mpart_all_list.lh_first,
+		                    (void **)gc_glink_backup_allparts(self),
+		                    offsetof(struct mpart, mp_allparts));
+	}
+	if (n_nodes != 0) {
+		capture_object_list((void **)&fallnodes_list.lh_first,
+		                    (void **)gc_glink_backup_allnodes(self),
+		                    offsetof(struct fnode, fn_allnodes));
+	}
+	if (n_super != 0) {
+		capture_object_list((void **)&fallsuper_list.lh_first,
+		                    (void **)gc_glink_backup_allsuper(self),
+		                    offsetof(struct fsuper, fs_root.fn_allsuper));
+	}
+}
+
+
+/* Restore a `LIST_HEAD()'-style `*p_list_head' with objects from
+ * a NULL-terminated array `object_array'. Each object has a link
+ * entry at offset `offsetof_object_list_entry'. */
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL restore_object_list)(void **p_list_head, void **object_array,
+                                   ptrdiff_t offsetof_object_list_entry) {
+	if likely(object_array != NULL) {
+		size_t i;
+		void *object;
+		for (i = 0; (object = object_array[i]) != NULL; ++i) {
+			struct abstract_object *link;
+			link = (struct abstract_object *)((byte_t *)object + offsetof_object_list_entry);
+			/* Append the object at the back of the list. */
+			*p_list_head          = object;
+			link->ao_link.le_prev = (struct abstract_object **)p_list_head;
+			p_list_head           = (void **)&link->ao_link.le_next;
+		}
+	}
+
+	/* Terminate the list. */
+	*p_list_head = NULL;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_glink_backup_fini)(struct gc_glink_backup *__restrict self) {
+	/* Assert the expected state for global lists. */
+	assert(mpart_all_list.lh_first == NULL);
+	assert(fallnodes_list.lh_first == NULL);
+	assert(fallsuper_list.lh_first == NULL);
+
+	/* Restore global lists. */
+	restore_object_list((void **)&mpart_all_list.lh_first,
+	                    (void **)gc_glink_backup_allparts(self),
+	                    offsetof(struct mpart, mp_allparts));
+	restore_object_list((void **)&fallnodes_list.lh_first,
+	                    (void **)gc_glink_backup_allnodes(self),
+	                    offsetof(struct fnode, fn_allnodes));
+	restore_object_list((void **)&fallsuper_list.lh_first,
+	                    (void **)gc_glink_backup_allsuper(self),
+	                    offsetof(struct fsuper, fs_root.fn_allsuper));
+
+	/* Free local buffers. */
+	gc_glink_backup_freebuffers(self);
+}
+
+
+/* Scan the kernel for all reachable, traced pointers. */
+PRIVATE ATTR_COLDTEXT void KCALL gc_find_reachable(void) {
+	struct gc_glink_backup glnk;
+	/* Unlink global object lists. */
+	gc_glink_backup_init(&glnk);
+
+	/* Scan for reachable objects. */
+	gc_find_reachable_impl(&glnk);
+
+	/* Restore global object lists. */
+	gc_glink_backup_fini(&glnk);
 }
 
 
@@ -1534,7 +1733,7 @@ again:
 /* Called after having become a super-override */
 PRIVATE ATTR_COLDTEXT struct trace_node *KCALL
 kmalloc_leaks_gather(void) {
-	struct trace_node *result = NULL;
+	struct trace_node *result;
 
 	/* Get a new GC version. */
 	++gc_version;
@@ -1544,23 +1743,36 @@ kmalloc_leaks_gather(void) {
 	/* Reset reachable bits for coreheap objects. */
 	gc_coreheap_reset_reach();
 
-	/* Search for reachable data. */
-	gc_find_reachable();
-
 	/* Clear the  is-reachable bits  from all  of
 	 * the different slabs that could be reached. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	RAII_FINALLY { gc_slab_reset_reach(); };
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
-	/* Gather memory leaks from `mcoreheap_alloc()' */
-	gc_gather_unreachable_coreheap(&result);
+	/* Search for reachable data. */
+	gc_find_reachable();
+
+	/* Gather memory leaks. */
+	result = NULL;
+	TRY {
+		/* Gather memory leaks from `mcoreheap_alloc()' */
+		gc_gather_unreachable_coreheap(&result);
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-	/* Gather memory leaks from slabs.
-	 * NOTE: This right here may cause new memory to be allocated. */
-	gc_gather_unreachable_slabs(&result);
+		/* Gather memory leaks from slabs.
+		 * NOTE: This right here may cause new memory to be allocated. */
+		gc_gather_unreachable_slabs(&result);
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+	} EXCEPT {
+		/* Free dynamically allocated leak descriptors. */
+		while (result) {
+			struct trace_node *next;
+			next = trace_node_leak_next(result);
+			trace_node_free(result);
+			result = next;
+		}
+		RETHROW();
+	}
 
 	/* Gather leaks from trace nodes. */
 	/* Because of how removing nodes  from an RB-tree works, the  act
@@ -1720,7 +1932,14 @@ again:
 		goto again;
 	}
 
-	/* Also ensure that `kernel_locked_heap' and `trace_heap' can be locked. */
+	/* Also ensure that all of the default heaps can be locked. */
+	if (!sync_canwrite(&kernel_default_heap.h_lock)) {
+		mman_lock_endwrite(&mman_kernel);
+		sched_super_override_end();
+		while (!sync_canwrite(&kernel_default_heap.h_lock))
+			task_yield();
+		goto again;
+	}
 	if (!sync_canwrite(&kernel_locked_heap.h_lock)) {
 		mman_lock_endwrite(&mman_kernel);
 		sched_super_override_end();
@@ -1858,6 +2077,10 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			break;
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
+		case TRACE_NODE_KIND_CORE:
+			method = "coreheap-memory";
+			break;
+
 		default:
 			method = "heap-memory";
 			break;
@@ -1927,6 +2150,15 @@ NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
 	while (node) {
 		next = trace_node_leak_next(node);
 		if (how == KMALLOC_LEAKS_RELEASE_FREE) {
+			/* TODO: When the leak  was caused by  an unreferenced global  object,
+			 *       then we mustn't blindly free the associated object when we're
+			 *       supposed to discard leaks.
+			 * As a matter of fact: there is no way to (safely; iow: without blocking)
+			 * free  such a memory leak, as it would first have to be removed from the
+			 * relevant global list, which in  turn we also could  only do if it  were
+			 * still unreachable at this point, which  we could only confirm by  doing
+			 * another scan for memory leaks. */
+
 			/* Try  to release the memory pointed to by the memory leaks.
 			 * However, we can only do this for kmalloc() and slab-leaks.
 			 * Custom traced regions cannot be blindly free'd! */
@@ -1943,9 +2175,13 @@ NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 			case TRACE_NODE_KIND_SLAB:
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 				slab_free(trace_node_uaddr(node));
 				break;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+			case TRACE_NODE_KIND_CORE:
+				mcoreheap_free((union mcorepart *)trace_node_uaddr(node));
+				break;
 
 			default:
 				break;
@@ -1955,6 +2191,7 @@ NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 		    node->tn_kind != TRACE_NODE_KIND_SLAB &&
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+		    node->tn_kind != TRACE_NODE_KIND_CORE &&
 		    1) {
 			lock_acquire();
 			trace_node_tree_insert(&nodes, node);
