@@ -901,12 +901,14 @@ NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 	if unlikely(index >= (size_t)SLAB_SEGMENT_COUNT(s->s_size))
 		return 0; /* Not a valid slab user-segment pointer. */
 	bits = (uintptr_t *)(s + 1);
+
 	/* Check if `ptr' is actually allocated inside of `s', and wasn't already reached. */
 	word  = _SLAB_SEGMENT_STATUS_WORD(index);
 	shift = _SLAB_SEGMENT_STATUS_SHFT(index);
 	value = bits[word];
 	if (((value >> shift) & SLAB_SEGMENT_STATUS_MASK) != SLAB_SEGMENT_STATUS_ALLOC)
 		return 0;
+
 	/* Alright! So we've got a reachable slab-pointer!
 	 * -> Mark it as such! */
 #if (SLAB_SEGMENT_STATUS_REACH & SLAB_SEGMENT_STATUS_ALLOC) != 0
@@ -1011,6 +1013,7 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 		struct mnode *ptrnode = mman_mappings_locate(&mman_kernel, ptr);
 		if (!ptrnode)
 			return 0;
+
 		/* Do some quick checks on `ptrnode' for requirements on mcoreheap memory. */
 		if (!ptrnode->mn_part)
 			return 0;
@@ -1053,10 +1056,12 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 	/* Normal traced memory. */
 	if (node->tn_reach == gc_version)
 		return 0; /* Already reached. */
+
 	if (node->tn_kind == TRACE_NODE_KIND_BITSET) {
 		/* When node is `TRACE_NODE_KIND_BITSET', then only mark it
 		 * as reachable when `ptr' points into its traced  portion. */
 		size_t index;
+
 		/* HINT: We already know that `ptr' is POINTER-aligned (see the other check above) */
 		index = ((uintptr_t)ptr - trace_node_umin(node)) / sizeof(void *);
 		if (!trace_node_bitset_bitget(node, index))
@@ -1082,6 +1087,7 @@ NOTHROW(KCALL gc_reachable_data)(void const *base, size_t num_bytes) {
 	while (num_bytes >= sizeof(void *)) {
 		void *ptr;
 		size_t page_bytes = PAGESIZE - ((uintptr_t)base & PAGEMASK);
+
 		/* Only scan writable pages. */
 		if (!pagedir_iswritable((void *)base)) {
 			/* FIXME: What if `base' isn't writable because it was written to SWAP?
@@ -1106,6 +1112,7 @@ NOTHROW(KCALL gc_reachable_data)(void const *base, size_t num_bytes) {
 			COMPILER_READ_BARRIER();
 			ptr = *(void **)base;
 			COMPILER_READ_BARRIER();
+
 			/* Check if this is a heap pointer, and if so: mark it as reachable. */
 			result += gc_reachable_pointer(ptr);
 			base = (byte_t *)base + sizeof(void *);
@@ -1121,15 +1128,18 @@ PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task *__restrict thread,
                                              struct scpustate *__restrict context) {
 	size_t result = 0;
+
 	/* Search the registers of this thread. */
 	if (scpustate_isuser(context)) {
 		/* Thread is currently in user-space (meaning its kernel stack is unused) */
 	} else {
 		unsigned int i;
 		void *sp, *stack_min, *stack_end;
+
 		/* Search general-purpose registers. */
 		for (i = 0; i < (sizeof(struct gpregs) / sizeof(void *)); ++i)
 			result += gc_reachable_pointer(((void **)&context->scs_gpregs)[i]);
+
 		stack_min = mnode_getminaddr(&FORTASK(thread, this_kernel_stacknode));
 		stack_end = mnode_getendaddr(&FORTASK(thread, this_kernel_stacknode));
 #ifdef scpustate_getkernelsp
@@ -1161,8 +1171,10 @@ NOTHROW(KCALL gc_reachable_this_thread)(void) {
 	void *sp, *stack_min, *stack_end;
 	struct lcpustate context;
 	struct mnode const *my_stack;
+
 	/* Search the registers of this thread. */
 	lcpustate_current(&context);
+
 	/* Search general-purpose registers. */
 	for (i = 0; i < (sizeof(struct lcpustate) / sizeof(void *)); ++i)
 		result += gc_reachable_pointer(((void **)&context)[i]);
@@ -1174,6 +1186,7 @@ NOTHROW(KCALL gc_reachable_this_thread)(void) {
 		result += gc_reachable_data((byte_t *)sp,
 		                            (size_t)((byte_t *)stack_end -
 		                                     (byte_t *)sp));
+
 		/* If we're running from a custom stack, also search the original kernel stack! */
 		if (stack_end != (byte_t *)mnode_getendaddr(my_stack))
 			goto do_search_kernel_stack;
@@ -1212,6 +1225,7 @@ again:
 			for (i = 0; i < count; ++i) {
 				if (!trace_node_bitset_bitget(node, i))
 					continue;
+
 				/* Found a traced range (find its end) */
 				start = i;
 				for (;;) {
@@ -1221,6 +1235,7 @@ again:
 					if (!trace_node_bitset_bitget(node, i))
 						break;
 				}
+
 				/* Scan the contents of this particular (still-traced) range. */
 				result += gc_reachable_data(minaddr + start * sizeof(void *),
 				                            (i - start) * sizeof(void *));
@@ -1280,6 +1295,7 @@ NOTHROW(KCALL gc_reachable_thread)(void *UNUSED(arg),
 #endif
 
 
+#if 0
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_allmparts)(struct mpart **list) {
 	size_t i, result = 0;
@@ -1312,12 +1328,13 @@ NOTHROW(KCALL gc_reachable_fallsuper)(struct fsuper **list) {
 	struct fsuper *elem;
 	if (list) {
 		for (i = 0; (elem = list[i]) != NULL; ++i) {
-			if (!wasdestroyed(elem) && (elem->fs_root.mf_flags & MFILE_FN_GLOBAL_REF))
+			if (!wasdestroyed(elem)/* && (elem->fs_root.mf_flags & MFILE_FN_GLOBAL_REF)*/)
 				result += gc_reachable_pointer(elem);
 		}
 	}
 	return result;
 }
+#endif
 
 
 /* Backup descriptor for global objects chains that should not partake in in
@@ -1378,23 +1395,63 @@ NOTHROW(KCALL gc_find_reachable_impl)(struct gc_glink_backup *__restrict glnk) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");
 	gc_reachable_this_thread();
 
-	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan special locations\n");
-
-	/* To  facilitate file caching, KOS keeps track of a global list of all mem-
-	 * parts. Technically, any mem-part found in this list is reachable, but for
-	 * the sake of semantics, _only_  those parts which have  MPART_F_GLOBAL_REF
-	 * set may be considered as *actually* reachable. */
-	PRINT_LEAKS_SEARCH_PHASE("Phase #3.1: Scan globally referenced mem-parts\n");
+	/*
+	 * NOTE: Technically speaking, we'd need to scan `mpart_all_list' at this
+	 *       point, as  available  through  `gc_glink_backup_allparts(glnk)',
+	 *       and do the same for `fallnodes_list' and `fallsuper_list'.
+	 * However, that's actually a bad idea:
+	 *  - There  is only 1 reason why some  mem-part should really be apart of
+	 *    the global list of mem-parts, that reason being: the associated file
+	 *    hasn't been unloaded yet for the purpose of staying cached.
+	 *  - As an extension, the same also goes for parts that have been marked
+	 *    as changed, but have yet to be written to disk.
+	 *
+	 * We can detect parts marked as changed via MPART_F_CHANGED, but then the
+	 * question becomes: how do we detect mem-parts that have a right to exist
+	 * due to representing cached files?
+	 *
+	 * The answer is: We don't!
+	 *
+	 * Think about why these global lists exist:
+	 *  - mpart_all_list: Keep parts alive for cached/changed files
+	 *  - fallnodes_list: Keep file nodes alive so they don't have to be reloaded constantly
+	 *  - fallsuper_list: Not really used for anything (yet?)
+	 * NOTE: sync(2) is implemented via `fchangedsuper_list', so doesn't use `fallsuper_list'
+	 *
+	 * To tell me: what reason is there for anything reachable via these lists to
+	 *             be considered globally visible  from a logical (not  semantic)
+	 *             stance?
+	 * Answer: there is no reason; any object found in those lists always has
+	 *         to be reachable through some other mechanism so-as to actually
+	 *         be reachable.
+	 * >> e.g. SOME_THREAD->fs->vfs->pathmount->fsuper->fnode->mpart
+	 * Our  normal gc-based detection logic is already able to traverse links
+	 * such as that example, and we already scan all threads-local variables,
+	 * meaning that something like the above mustn't be considered a leaf for
+	 * that reason already.
+	 *
+	 * Furthermore,  in order to  do proper cleanup of  objects found in those
+	 * global  lists, you'll have  to use stuff  like `fsuper_delete()' or the
+	 * underlying `mfile_delete()'. And if there  isn't a thread that  somehow
+	 * references a filesystem that is non-the-less still allocated, then yes:
+	 * it should be considered a leak, even if it could (theoretically)  still
+	 * be accessed via global lists.
+	 *
+	 * So in the end, by never scanning global file lists and relying on all
+	 * files being reachable through other  means, we can detect  situations
+	 * where  code forgot to  call `mfile_delete()' for  what they are; that
+	 * being >>Memory Leaks<<
+	 */
+#if 0
+	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan global objects\n");
 	gc_reachable_allmparts(gc_glink_backup_allparts(glnk));
-
-	/* Same as with global mem-parts; only `MFILE_FN_GLOBAL_REF' files may be
-	 * considered as non-leaks! */
-	PRINT_LEAKS_SEARCH_PHASE("Phase #3.2: Scan globally referenced file-nodes\n");
 	gc_reachable_fallnodes(gc_glink_backup_allnodes(glnk));
 	gc_reachable_fallsuper(gc_glink_backup_allsuper(glnk));
+#endif
+	(void)glnk;
 
 
-	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Scan loaded drivers\n");
+	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan loaded drivers\n");
 	{
 		struct driver_loadlist *dll;
 		size_t i;
@@ -1423,14 +1480,14 @@ NOTHROW(KCALL gc_find_reachable_impl)(struct gc_glink_backup *__restrict glnk) {
 		}
 	}
 
-	PRINT_LEAKS_SEARCH_PHASE("Phase #5: Recursively scan reached pointers\n");
+	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Recursively scan reached pointers\n");
 	if (tm_nodes) {
 		size_t num_found;
 		/* With all data collected, recursively scan the data blocks of all reachable nodes.
 		 * The recursion takes place  because we keep scanning  until nothing new shows  up. */
 		do {
 			num_found = gc_reachable_recursion(tm_nodes);
-			PRINT_LEAKS_SEARCH_PHASE("Phase #5: Reached %" PRIuSIZ " pointers\n", num_found);
+			PRINT_LEAKS_SEARCH_PHASE("Phase #4: Reached %" PRIuSIZ " pointers\n", num_found);
 		} while (num_found);
 	}
 }
@@ -1898,6 +1955,39 @@ kmalloc_leaks_sort(struct trace_node *leaks) {
 
 
 
+
+/* Ensure that required locks are available, or release
+ * the super-override and wait  for them to become  so. */
+PRIVATE ATTR_COLDTEXT bool KCALL
+waitfor_locks_or_unlock(void) THROWS(E_WOULDBLOCK) {
+#define local_unlock() sched_super_override_end()
+#define require_lock(available, waitfor) \
+	if (!(available)) {                  \
+		local_unlock();                  \
+		waitfor;                         \
+		goto fail;                       \
+	}
+
+	/* Basic locks to memory-related base components. */
+	require_lock(mman_lock_available(&mman_kernel), mman_lock_waitwrite(&mman_kernel));
+	require_lock(atomic_lock_available(&kernel_default_heap.h_lock), atomic_lock_waitfor(&kernel_default_heap.h_lock));
+	require_lock(atomic_lock_available(&kernel_locked_heap.h_lock), atomic_lock_waitfor(&kernel_locked_heap.h_lock));
+	require_lock(atomic_lock_available(&trace_heap.h_lock), atomic_lock_waitfor(&trace_heap.h_lock));
+
+	/* Locks for global object lists. */
+	require_lock(mpart_all_available(), mpart_all_waitfor());
+	require_lock(fallnodes_available(), fallnodes_waitfor());
+	require_lock(fallsuper_available(), fallsuper_waitfor());
+
+	/* All required locks are available! */
+	return true;
+fail:
+	return false;
+#undef require_lock
+#undef local_unlock
+}
+
+
 /* Collect, print and discard memory leaks. */
 PUBLIC ATTR_COLDTEXT kmalloc_leaks_t KCALL
 kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
@@ -1933,52 +2023,13 @@ again:
 	 *       we don't actually have to deal with that one at all! */
 	sched_super_override_start();
 
-	if (!mman_lock_trywrite(&mman_kernel)) {
-		sched_super_override_end();
-		mman_lock_waitwrite(&mman_kernel);
+	/* Ensure that required locks are available.
+	 * Because we're running single-threaded, we don't actually have  to
+	 * acquire those locks proper, but  to ensure consistency, we  still
+	 * need to make sure they're available (because if they aren't, then
+	 * relevant data structures may be in an inconsistent state) */
+	if (!waitfor_locks_or_unlock())
 		goto again;
-	}
-
-	/* Also ensure that all of the default heaps can be locked. */
-	if (!sync_canwrite(&kernel_default_heap.h_lock)) {
-		mman_lock_endwrite(&mman_kernel);
-		sched_super_override_end();
-		while (!sync_canwrite(&kernel_default_heap.h_lock))
-			task_yield();
-		goto again;
-	}
-	if (!sync_canwrite(&kernel_locked_heap.h_lock)) {
-		mman_lock_endwrite(&mman_kernel);
-		sched_super_override_end();
-		while (!sync_canwrite(&kernel_locked_heap.h_lock))
-			task_yield();
-		goto again;
-	}
-	if (!sync_canwrite(&trace_heap.h_lock)) {
-		mman_lock_endwrite(&mman_kernel);
-		sched_super_override_end();
-		while (!sync_canwrite(&trace_heap.h_lock))
-			task_yield();
-		goto again;
-	}
-	if (!mpart_all_available()) {
-		mman_lock_endwrite(&mman_kernel);
-		sched_super_override_end();
-		mpart_all_waitfor();
-		goto again;
-	}
-	if (!fallnodes_available()) {
-		mman_lock_endwrite(&mman_kernel);
-		sched_super_override_end();
-		mpart_all_waitfor();
-		goto again;
-	}
-
-	/* At  this point we're the only running thread, so there's really
-	 * no point in still  holding on to our  lock to the kernel  mman.
-	 * At this point we can do pretty much anything while disregarding
-	 * any sort of locking! */
-	mman_lock_endwrite(&mman_kernel);
 
 	/* Actually search for memory leaks. */
 	result = kmalloc_leaks_gather();
