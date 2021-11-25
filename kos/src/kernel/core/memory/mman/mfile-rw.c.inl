@@ -23,11 +23,11 @@
 //#define      DEFINE_mfile_read_p
 //#define       DEFINE_mfile_readv
 //#define     DEFINE_mfile_readv_p
-#define    DEFINE_mfile_tailread
+//#define    DEFINE_mfile_tailread
 //#define  DEFINE_mfile_tailread_p
 //#define   DEFINE_mfile_tailreadv
 //#define DEFINE_mfile_tailreadv_p
-//#define       DEFINE_mfile_write
+#define       DEFINE_mfile_write
 //#define      DEFINE_mfile_write_p
 //#define       DEFINE_mfile_writev
 //#define     DEFINE_mfile_writev_p
@@ -1164,6 +1164,9 @@ handle_part_insert_failure:
 
 		mfile_changed(self, changes);
 		result += num_bytes;
+
+		/* Drop the reference from `mfile_insert_and_merge_part_and_unlock()' */
+		decref_unlikely(inserted_part);
 	} /* Scope.... */
 
 	/* Since we've just written _all_ of the trailing data, we're
