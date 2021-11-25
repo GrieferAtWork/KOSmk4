@@ -287,7 +287,7 @@ print_mpart_desc(struct mpart *__restrict self,
 	if (flags & MPART_F_GLOBAL_REF)
 		--refcnt;
 	result = format_printf(printer, arg,
-	                       "%" PRIuSIZ ",%s\t%#.6" PRIx64 "-%#.6" PRIx64 "\t"
+	                       "%" PRIuSIZ ",%s\t%.6" PRIx64 "-%.6" PRIx64 "\t"
 	                       "%c%c%c%c\t",
 	                       refcnt, statename, minaddr, maxaddr,
 	                       flags & MPART_F_GLOBAL_REF ? 'g' : '-',
