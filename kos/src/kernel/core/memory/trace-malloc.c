@@ -87,7 +87,6 @@
 
 DECL_BEGIN
 
-
 #ifndef CONFIG_MALL_HEAD_PATTERN
 #define CONFIG_MALL_HEAD_PATTERN 0x33333333
 #endif /* !CONFIG_MALL_HEAD_PATTERN */
@@ -118,6 +117,7 @@ DECL_BEGIN
 #define TRACE_NODE_KIND_SLAB   0x03 /* Does not actually appear in the nodes tree.
                                      * Only used  when  dumping/discarding  leaks. */
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#define TRACE_NODE_KIND_CORE   0x04 /* Like slab, referencing `mcoreheap_alloc()' */
 
 #define TRACE_NODE_KIND_HAS_PADDING(kind)   ((kind) == TRACE_NODE_KIND_MALL)
 #define TRACE_NODE_KIND_HAS_TRACEBACK(kind) ((kind) != TRACE_NODE_KIND_BITSET)
@@ -918,6 +918,30 @@ NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 
 
 
+#ifndef SIZEOF_POINTER
+#define SIZEOF_POINTER __SIZEOF_POINTER__
+#endif /* !SIZEOF_POINTER */
+
+#define INUSE_BITSET_INDEXOF(index)         ((index) / (SIZEOF_POINTER * NBBY))
+#define INUSE_BITSET_SHIFTOF(index)         ((index) % (SIZEOF_POINTER * NBBY))
+#define INUSE_BITSET_GET(bitset, index)     ((bitset[INUSE_BITSET_INDEXOF(index)] >> INUSE_BITSET_SHIFTOF(index)) & 1)
+#define INUSE_BITSET_TURNOFF(bitset, index) (bitset[INUSE_BITSET_INDEXOF(index)] &= ~((uintptr_t)1 << INUSE_BITSET_SHIFTOF(index)))
+#define INUSE_BITSET_TURNON(bitset, index)  (bitset[INUSE_BITSET_INDEXOF(index)] |= ((uintptr_t)1 << INUSE_BITSET_SHIFTOF(index)))
+
+
+
+
+/* Reset coreheap reachability flags. */
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_coreheap_reset_reach)(void) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
+		struct mcorepage *iter;
+		SLIST_FOREACH (iter, &mcoreheap_lists[i], mcp_link)
+			memset(iter->_mcp_reach, 0, sizeof(iter->_mcp_reach));
+	}
+}
+
 
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
@@ -962,8 +986,51 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
-	if (!node)
+	if (!node) {
+		/* Check for struct-blocks allocated by mcoreheap */
+		struct mcorepage *cp, *iter;
+		unsigned int index, i;
+		struct mnode *ptrnode = mman_mappings_locate(&mman_kernel, ptr);
+		if (!ptrnode)
+			return 0;
+		/* Do some quick checks on `ptrnode' for requirements on mcoreheap memory. */
+		if (!ptrnode->mn_part)
+			return 0;
+		if ((ptrnode->mn_flags & (MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC)) !=
+		    /*                */ (MNODE_F_PREAD | MNODE_F_PWRITE))
+			return 0;
+		cp    = (struct mcorepage *)FLOOR_ALIGN((uintptr_t)ptr, PAGESIZE);
+		index = (unsigned int)((byte_t *)ptr - (byte_t *)cp->mcp_part);
+		index /= sizeof(union mcorepart);
+		if (index >= COMPILER_LENOF(cp->mcp_part))
+			return 0; /* Invalid index. */
+		TRY {
+			if (!INUSE_BITSET_GET(cp->mcp_used, index))
+				return 0; /* Not allocated. */
+			if (INUSE_BITSET_GET(cp->_mcp_reach, index))
+				return 0; /* Already reached. */
+		} EXCEPT {
+			return 0;
+		}
+
+		/* Check that `cp' really is one of the coreheap pages. */
+		for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
+			SLIST_FOREACH (iter, &mcoreheap_lists[i], mcp_link) {
+				if (iter == cp) {
+					/* Yes: this really is a reachable coreheap object! */
+					size_t result;
+	
+					/* Prevent recursion by remembering reachability */
+					INUSE_BITSET_TURNON(cp->_mcp_reach, index);
+	
+					/* Recursively visit pointed-to data. */
+					result = gc_reachable_data(&cp->mcp_part[index], sizeof(cp->mcp_part[index]));
+					return result + 1;
+				}
+			}
+		}
 		return 0;
+	}
 	if (node->tn_reach == gc_version)
 		return 0; /* Already reached. */
 	if (node->tn_kind == TRACE_NODE_KIND_BITSET) {
@@ -1176,16 +1243,6 @@ INTDEF byte_t __debug_malloc_tracked_size[];
 ARREF(driver_loadlist_arref, driver_loadlist);
 #endif /* !__driver_loadlist_arref_defined */
 
-PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_reachable_corepage_chain)(struct mcorepage *chain) {
-	size_t result = 0;
-	for (; chain; chain = LIST_NEXT(chain, mcp_link)) {
-		result += gc_reachable_data((byte_t *)chain->mcp_part,
-		                            sizeof(chain->mcp_part));
-	}
-	return result;
-}
-
 PRIVATE NOBLOCK ATTR_COLDTEXT ssize_t
 NOTHROW(KCALL gc_reachable_thread)(void *UNUSED(arg),
                                    struct task *thread,
@@ -1240,6 +1297,19 @@ NOTHROW(KCALL gc_reachable_fallsuper)(void) {
 /* Scan the kernel for all reachable, traced pointers. */
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_find_reachable)(void) {
+	/* TODO: Improve the accuracy of  memory leak detection relating  to
+	 *       mpart, fnode and fsuper, it would be appropriate to  unbind
+	 *       the global list links between all of these for the duration
+	 *       of scanning memory for leaks.
+	 * Otherwise,  we'll never detect leaks for any of these (they must
+	 * be considered leaks if the  *GLOBAL_REF flag isn't set, and  the
+	 * only way to  reach them is  via the global  list), since all  it
+	 * takes for none of them to be considered leaks, is any non-leaked
+	 * object of the same class  to be reachable. (because using  those
+	 * link pointers,  all others,  including those  that are  actually
+	 * leaks can be reached) */
+
+
 	/* Search for memory leaks.
 	 * The idea here is not to be able to find all memory blocks that were
 	 * leaked,  but rather  to find  anything that  ~might~ be referenced.
@@ -1265,19 +1335,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");
 	gc_reachable_this_thread();
 
-	/* Scan all allocated COREBASE pointers from the kernel mman.
-	 * Since those are  randomly sprinkled into  the kernel  mman
-	 * tree, they normally wouldn't be able to forward  contained
-	 * data pointers, which would then result in us not realizing
-	 * that  any  dynamic node  pointed  to by  them  is actually
-	 * reachable.
-	 * NOTE: COREBASE couldn't use `mall_trace()' because  that
-	 *       could cause infinite recursion when `mall_trace()'
-	 *       tried to allocate a new recursion descriptor.
-	 */
-	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan core base\n");
-	gc_reachable_corepage_chain(LIST_FIRST(&mcoreheap_freelist));
-	gc_reachable_corepage_chain(LIST_FIRST(&mcoreheap_usedlist));
+	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan special locations\n");
 
 	/* To  facilitate file caching, KOS keeps track of a global list of all mem-
 	 * parts. Technically, any mem-part found in this list is reachable, but for
@@ -1405,6 +1463,45 @@ gc_gather_unreachable_slabs(struct trace_node **__restrict pleaks) {
 }
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 
+
+PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
+gc_gather_unreachable_coreheap(struct trace_node **__restrict pleaks) {
+	/* Search for allocated, but not reachable parts. */
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
+		struct mcorepage *iter;
+		SLIST_FOREACH (iter, &mcoreheap_lists[i], mcp_link) {
+			unsigned int partno;
+			for (partno = 0; partno < COMPILER_LENOF(iter->mcp_part); ++partno) {
+				struct trace_node *node;
+				heapptr_t node_ptr;
+				if (!INUSE_BITSET_GET(iter->mcp_used, partno))
+					continue; /* This one's not allocated */
+				if (INUSE_BITSET_GET(iter->_mcp_reach, partno))
+					continue; /* This one's reachable... */
+				/* Ooops; found a leak :( */
+				node_ptr = heap_alloc_untraced(&trace_heap,
+				                               offsetof(struct trace_node, tn_trace),
+				                               TRACE_HEAP_FLAGS);
+				node = (struct trace_node *)heapptr_getptr(node_ptr);
+				trace_node_initlink(node, &iter->mcp_part[partno],
+				                    sizeof(iter->mcp_part[partno]));
+				node->tn_size  = heapptr_getsiz(node_ptr);
+				node->tn_reach = gc_version - 1;
+				node->tn_visit = 0;
+				node->tn_kind  = TRACE_NODE_KIND_CORE;
+				node->tn_flags = 0;
+				node->tn_tid   = 0;
+				if (trace_node_traceback_count(node))
+					trace_node_traceback_vector(node)[0] = NULL;
+				trace_node_leak_next(node) = *pleaks;
+				*pleaks = node;
+			}
+		}
+	}
+}
+
+
 PRIVATE NOBLOCK ATTR_COLDTEXT bool
 NOTHROW(KCALL gc_gather_unreachable_nodes)(struct trace_node *__restrict node,
                                            struct trace_node **__restrict pleaks) {
@@ -1437,23 +1534,27 @@ again:
 /* Called after having become a super-override */
 PRIVATE ATTR_COLDTEXT struct trace_node *KCALL
 kmalloc_leaks_gather(void) {
-	struct trace_node *result;
+	struct trace_node *result = NULL;
 
 	/* Get a new GC version. */
 	++gc_version;
 	if unlikely(gc_version == 0)
 		gc_version = 1; /* Don't recycle version #0 */
 
+	/* Reset reachable bits for coreheap objects. */
+	gc_coreheap_reset_reach();
+
 	/* Search for reachable data. */
 	gc_find_reachable();
-
-	result = NULL;
 
 	/* Clear the  is-reachable bits  from all  of
 	 * the different slabs that could be reached. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	RAII_FINALLY { gc_slab_reset_reach(); };
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+	/* Gather memory leaks from `mcoreheap_alloc()' */
+	gc_gather_unreachable_coreheap(&result);
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	/* Gather memory leaks from slabs.
@@ -1582,6 +1683,8 @@ kmalloc_leaks_sort(struct trace_node *leaks) {
 PUBLIC ATTR_COLDTEXT kmalloc_leaks_t KCALL
 kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
 	struct trace_node *result;
+	NESTED_EXCEPTION;
+
 again:
 	/* Acquire a scheduler super-override, thus ensuring that we're
 	 * the only  thread  running  anywhere on  the  entire  system.
@@ -1783,7 +1886,7 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			}
 			FOREACH_XREF_END();
 		}
-		if (tracesize) {
+		if (tracesize && pc) {
 			DO(addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 			                    instruction_trypred(pc, INSTRLEN_ISA_DEFAULT),
 			                    pc, "Allocated here"));

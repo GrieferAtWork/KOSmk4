@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
 #include <kernel/mman.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mcoreheap.h>
@@ -90,25 +91,33 @@ STATIC_ASSERT(sizeof(struct mcorepage) <= PAGESIZE);
 
 
 /* The initial mem-core page. (needed to kick-start the mem-core system) */
+#ifdef CONFIG_TRACE_MALLOC
+ATTR_MALL_UNTRACKED
+#endif /* CONFIG_TRACE_MALLOC */
 PRIVATE ATTR_ALIGNED(PAGESIZE) struct mcorepage _mcore_initpage = {
-	.mcp_link = { NULL, &mcoreheap_freelist.lh_first },
+	.mcp_link = { NULL },
 	.mcp_used = { 0, },
 	/* ... */
 };
 
-/* [0..n][lock(mman_kernel.mm_lock)]
- * List of (fully; as in: all bits in `mcp_used' are set) mcoreheap pages. */
-PUBLIC struct mcorepage_list mcoreheap_usedlist = LIST_HEAD_INITIALIZER(&mcoreheap_usedlist);
 
-/* [1..n][lock(mman_kernel.mm_lock)]
- * List of mcoreheap pages that still contain available parts.
- * NOTE: This list must _always_ be non-empty, and there  must
- *       _always_ be at  least 2 additional  core parts  ready
- *       for allocation at any time. This is required, because
- *       in  order to allocate additional pages, the mcoreheap
- *       allocator itself already requires 2 parts in order to
- *       do replicate itself! */
-PUBLIC struct mcorepage_list mcoreheap_freelist = { &_mcore_initpage };
+/* Internal lists for mcoreheap. */
+PUBLIC struct mcorepage_slist mcoreheap_lists[2] = {
+	/* [0..n][lock(mman_kernel.mm_lock)]
+	 * List of (fully; as in: all bits in `mcp_used' are set) mcoreheap pages. */
+	[0] = LIST_HEAD_INITIALIZER(&mcoreheap_usedlist),
+
+	/* [1..n][lock(mman_kernel.mm_lock)]
+	 * List of mcoreheap pages that still contain available parts.
+	 * NOTE: This list must _always_ be non-empty, and there  must
+	 *       _always_ be at  least 2 additional  core parts  ready
+	 *       for allocation at any time. This is required, because
+	 *       in  order to allocate additional pages, the mcoreheap
+	 *       allocator itself already requires 2 parts in order to
+	 *       do replicate itself! */
+	[1] = { &_mcore_initpage },
+};
+
 
 /* [>= 2][lock(mman_kernel.mm_lock)]
  * The total # of free core parts currently available through `mcoreheap_free' */
@@ -236,7 +245,7 @@ NOTHROW(FCALL mcoreheap_alloc_impl)(void) {
 	unsigned int index;
 
 	/* Pick the first known free-list. */
-	page = LIST_FIRST(&mcoreheap_freelist);
+	page = SLIST_FIRST(&mcoreheap_freelist);
 	assert(!mcorepage_allused(page));
 	index  = mcorepage_findfree(page);
 	result = &page->mcp_part[index];
@@ -248,8 +257,9 @@ NOTHROW(FCALL mcoreheap_alloc_impl)(void) {
 	/* Check if the page has become fully in-use. */
 	if (mcorepage_allused(page)) {
 		/* Remove from the free-list, and add to the fully-used list. */
-		LIST_REMOVE(page, mcp_link);
-		LIST_INSERT_HEAD(&mcoreheap_usedlist, page, mcp_link);
+		assert(page == SLIST_FIRST(&mcoreheap_freelist));
+		SLIST_REMOVE_HEAD(&mcoreheap_freelist, mcp_link);
+		SLIST_INSERT_HEAD(&mcoreheap_usedlist, page, mcp_link);
 	}
 	return result;
 }
@@ -262,7 +272,7 @@ NOTHROW(FCALL mcoreheap_provide_page)(struct mcorepage *__restrict page) {
 	memset(page->mcp_used, 0, sizeof(page->mcp_used));
 
 	/* Insert the page into the free-list. */
-	LIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);
+	SLIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);
 
 	/* Account for all of the newly added parts. */
 	mcoreheap_freecount += MCOREPAGE_PARTCOUNT;
@@ -447,7 +457,7 @@ NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
 PRIVATE NOBLOCK bool
 NOTHROW(FCALL mcoreheap_replicate_extend)(void) {
 	struct mcorepage *page;
-	LIST_FOREACH (page, &mcoreheap_usedlist, mcp_link) {
+	SLIST_FOREACH (page, &mcoreheap_usedlist, mcp_link) {
 		struct mnode *node;
 		if (page == &_mcore_initpage)
 			continue; /* We can never extend this one... */
@@ -630,7 +640,7 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 
 /* Do all of the  necessary locking and  throw an exception  if the allocation  failed.
  * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx()' */
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL union mcorepart *FCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED union mcorepart *FCALL
 mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	union mcorepart *result;
 	mman_lock_acquire(&mman_kernel);
@@ -697,8 +707,8 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 	if (was_all_used) {
 		/* Move the page from the `mcoreheap_usedlist'
 		 * list  into  the  `mcoreheap_freelist'  list */
-		LIST_REMOVE(page, mcp_link);
-		LIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);
+		SLIST_REMOVE(&mcoreheap_usedlist, page, mcp_link);
+		SLIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);
 	} else if (mcoreheap_freecount > (MCOREPAGE_PARTCOUNT + 2)) {
 		/* If the page was fully free'd, then unmap the backing memory
 		 * from the kernel mman.
@@ -706,7 +716,7 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 		 * Note that (with the exception of `_mcore_initpage'), we can
 		 * just  use  `mman_unmap_kram_locked()'  to  free  the  page! */
 		if (page != &_mcore_initpage && mcorepage_allfree(page)) {
-			LIST_REMOVE(page, mcp_link);
+			SLIST_REMOVE(&mcoreheap_freelist, page, mcp_link);
 			mcoreheap_freecount -= MCOREPAGE_PARTCOUNT;
 			mman_unmap_kram_locked(page, PAGESIZE);
 		}

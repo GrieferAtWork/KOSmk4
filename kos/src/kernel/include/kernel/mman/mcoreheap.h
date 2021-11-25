@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
@@ -76,13 +77,17 @@ union mcorepart {
  *       at least 2 pointers for the  list-link, and 1 more pointer  for
  *       the smallest-sized in-use  bitset. But also  align that  offset
  *       to match the alignment requirements of core-heap-parts. */
-#define _MCOREPAGE_PARTCOUNT             ((PAGESIZE - (((3 * __SIZEOF_POINTER__) + __ALIGNOF_MCOREPART - 1) & ~(__ALIGNOF_MCOREPART - 1))) / __SIZEOF_MCOREPART)
+#define _MCOREPAGE_PARTCOUNT             ((PAGESIZE - (((2 * __SIZEOF_POINTER__) + __ALIGNOF_MCOREPART - 1) & ~(__ALIGNOF_MCOREPART - 1))) / __SIZEOF_MCOREPART)
 #else /* __ALIGNOF_MCOREPART > __SIZEOF_POINTER__ */
-#define _MCOREPAGE_PARTCOUNT             ((PAGESIZE - (3 * __SIZEOF_POINTER__)) / __SIZEOF_MCOREPART)
+#define _MCOREPAGE_PARTCOUNT             ((PAGESIZE - (2 * __SIZEOF_POINTER__)) / __SIZEOF_MCOREPART)
 #endif /* __ALIGNOF_MCOREPART <= __SIZEOF_POINTER__ */
 #define _MCOREPAGE_BITSET_LENGTH         ((_MCOREPAGE_PARTCOUNT + (__SIZEOF_POINTER__ * __CHAR_BIT__) - 1) / (__SIZEOF_POINTER__ * __CHAR_BIT__))
+#ifdef CONFIG_TRACE_MALLOC
+#define _MCOREPAGE_BITSET_SIZE           (_MCOREPAGE_BITSET_LENGTH * __SIZEOF_POINTER__ * 2)
+#else /* CONFIG_TRACE_MALLOC */
 #define _MCOREPAGE_BITSET_SIZE           (_MCOREPAGE_BITSET_LENGTH * __SIZEOF_POINTER__)
-#define _MCOREPAGE_HEADER_SIZE_UNALIGNED ((2 * __SIZEOF_POINTER__) + _MCOREPAGE_BITSET_SIZE)
+#endif /* !CONFIG_TRACE_MALLOC */
+#define _MCOREPAGE_HEADER_SIZE_UNALIGNED ((1 * __SIZEOF_POINTER__) + _MCOREPAGE_BITSET_SIZE)
 #if __ALIGNOF_MCOREPART > __SIZEOF_POINTER__
 #define _MCOREPAGE_HEADER_SIZE ((_MCOREPAGE_HEADER_SIZE_UNALIGNED + __ALIGNOF_MCOREPART - 1) & ~(__ALIGNOF_MCOREPART - 1))
 #else /* __ALIGNOF_MCOREPART > __SIZEOF_POINTER__ */
@@ -101,12 +106,15 @@ union mcorepart {
 
 /* On a level as low as the mcoreheap is implemented at, all allocations
  * have  to be done in multiples of  whole pages. As such, the mcoreheap
- * allocator is implemented as a slab-style allocator for */
+ * allocator is implemented as a slab-style allocator. */
 struct mcorepage;
-LIST_HEAD(mcorepage_list, mcorepage);
+SLIST_HEAD(mcorepage_slist, mcorepage);
 struct mcorepage {
-	LIST_ENTRY(mcorepage)  mcp_link;                           /* [lock(mman_kernel.mm_lock)] Chain of allocated/free core pages. */
-	uintptr_t              mcp_used[_MCOREPAGE_BITSET_LENGTH]; /* [lock(mman_kernel.mm_lock)] Bitset of currently allocated parts. */
+	SLIST_ENTRY(mcorepage) mcp_link;                            /* [lock(mman_kernel.mm_lock)] Chain of allocated/free core pages. */
+	uintptr_t              mcp_used[_MCOREPAGE_BITSET_LENGTH];  /* [lock(mman_kernel.mm_lock)] Bitset of currently allocated parts. */
+#ifdef CONFIG_TRACE_MALLOC
+	uintptr_t             _mcp_reach[_MCOREPAGE_BITSET_LENGTH]; /* Used internally to mark reachable parts. */
+#endif /* CONFIG_TRACE_MALLOC */
 #if _MCOREPAGE_HEADER_SIZE > _MCOREPAGE_HEADER_SIZE_UNALIGNED
 	byte_t               __mcp_pad[_MCOREPAGE_HEADER_SIZE - _MCOREPAGE_HEADER_SIZE_UNALIGNED]; /* ... */
 #endif /* _MCOREPAGE_HEADER_SIZE > _MCOREPAGE_HEADER_SIZE_UNALIGNED */
@@ -114,10 +122,12 @@ struct mcorepage {
 };
 
 
+/* Internal lists for mcoreheap. */
+DATDEF struct mcorepage_slist mcoreheap_lists[2];
 
 /* [0..n][lock(mman_kernel.mm_lock)]
  * List of (fully; as in: all bits in `mcp_used' are set) mcoreheap pages. */
-DATDEF struct mcorepage_list mcoreheap_usedlist;
+#define mcoreheap_usedlist mcoreheap_lists[0]
 
 /* [1..n][lock(mman_kernel.mm_lock)]
  * List of mcoreheap pages that still contain available parts.
@@ -127,7 +137,7 @@ DATDEF struct mcorepage_list mcoreheap_usedlist;
  *       in  order to allocate additional pages, the mcoreheap
  *       allocator itself already requires 2 parts in order to
  *       do replicate itself! */
-DATDEF struct mcorepage_list mcoreheap_freelist;
+#define mcoreheap_freelist mcoreheap_lists[1]
 
 /* [>= 2][lock(mman_kernel.mm_lock)]
  * The total # of free core parts currently available through `mcoreheap_free' */
@@ -158,7 +168,7 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void);
 
 /* Do all of the  necessary locking and  throw an exception  if the allocation  failed.
  * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx()' */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL union mcorepart *FCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED union mcorepart *FCALL
 mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Free the given mem-core-heap part. */
