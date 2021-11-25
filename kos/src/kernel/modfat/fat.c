@@ -833,14 +833,36 @@ fatlnk_v_readlink(struct flnknode *__restrict self,
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t result;
 	FatLnkNode *me = flnknode_asfat(self);
+	pos_t filepos;
 	result = (size_t)__atomic64_val(me->mf_filesize);
 	assert(result >= FAT_SYMLINK_FILE_MINSIZE);
 	result = FAT_SYMLINK_FILE_TEXTLEN(result);
 	if (bufsize > result)
 		bufsize = result;
 
+	/* Try to make use of the cache already loaded during `fatdir_v_readdir()'
+	 * As such, anything that falls into the first file sect we read directly
+	 * from disk. */
+#if 1
+	filepos = (pos_t)FAT_SYMLINK_FILE_TEXTOFF;
+	if likely(mfile_getblocksize(me) >= FAT_SYMLINK_FILE_TEXTOFF) {
+		pos_t diskpos;
+		size_t disksiz;
+		diskpos = Fat_GetAbsDiskPos(self, filepos);
+		disksiz = mfile_getblocksize(me) - (size_t)filepos;
+		if (disksiz > bufsize)
+			disksiz = bufsize;
+		mfile_readall(me->fn_super->fs_dev, buf, disksiz, diskpos);
+		if likely(disksiz >= bufsize)
+			return result;
+		buf = (USER CHECKED char *)((byte_t *)buf + disksiz);
+		bufsize -= disksiz;
+		filepos += disksiz;
+	}
+#endif
+
 	/* Read file contents */
-	mfile_readall(me, buf, bufsize, (pos_t)FAT_SYMLINK_FILE_TEXTOFF);
+	mfile_readall(me, buf, bufsize, filepos);
 	return result;
 }
 
@@ -1107,9 +1129,6 @@ dos_8dot3:
 					byte_t hdr[sizeof(Fat_CygwinSymlinkMagic)];
 					pos_t diskpos = FAT_CLUSTERADDR(super, cluster);
 					TRY {
-						/* XXX: This read kind-of  pollutes the  device cache,  especially
-						 *      considering that `fatlnk_v_readlink()' doesn't make use of
-						 *      this same cache! */
 						mfile_readall(super->ft_super.ffs_super.fs_dev, hdr, sizeof(hdr), diskpos);
 					} EXCEPT {
 						kfree(result);
