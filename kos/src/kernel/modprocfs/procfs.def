@@ -76,6 +76,7 @@ MKLNK(procfs_r_thread_self, 0777, ProcFS_ThreadSelf_Printer)
 
 /* /proc/kos */
 MKDIR_BEGIN(procfs_r_kos, 0555)
+	MKDIR_ENT("fs",      DT_DIR, &procfs_r_kos_fs,      /*[[[fdirent_hash]]]*/0x7366/*[[[end]]]*/)
 	MKDIR_ENT("futexfd-maxexpr", DT_REG, &procfs_r_kos_futexfd_maxexpr, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xd71498bb, 0x98fa0ab3f6908203, 0xb5bdd1df, 0x9a938809a111e702)/*[[[end]]]*/)
 #ifdef CONFIG_TRACE_MALLOC
 	MKDIR_ENT("leaks",   DT_REG, &procfs_r_kos_leaks,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc66c913f, 0x736b61656c, 0xcf906d36, 0x736b61656c)/*[[[end]]]*/)
@@ -86,6 +87,15 @@ MKDIR_BEGIN(procfs_r_kos, 0555)
 MKDIR_END
 MKREG_RW(procfs_r_kos_futexfd_maxexpr, 0644, procfs_kos_futexfd_maxexpr_print, procfs_kos_futexfd_maxexpr_write)
 MKREG_RO(procfs_r_kos_raminfo, 0444, ProcFS_Kos_RamInfo_Printer)
+
+
+/* /proc/kos/fs */
+MKDIR_BEGIN(procfs_r_kos_fs, 0555)
+	MKDIR_ENT("nodes",   DT_REG, &procfs_r_kos_fs_nodes,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x9087eb51, 0x7365646f6e, 0xe1ea8800, 0x7365646f6e)/*[[[end]]]*/)
+	MKDIR_ENT("stat",    DT_REG, &procfs_r_kos_fs_stat,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d180b, 0x74617473, 0xf176d14, 0x74617473)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RO(procfs_r_kos_fs_nodes, 0444, procfs_kos_fs_nodes_printer)
+MKREG_RO(procfs_r_kos_fs_stat, 0444, procfs_kos_fs_stat_printer)
 
 
 /* /proc/kos/mm */

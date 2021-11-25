@@ -352,11 +352,6 @@ NOTHROW(KCALL kernel_initialize_rootfs)(void) {
 	REF struct fsuper *super;
 	bool newly_created;
 
-#ifdef CONFIG_TRACE_MALLOC
-	/* Must be initialized here because of `ATTR_MALL_UNTRACKED' */
-	fallsuper_list.lh_first = &devfs;
-#endif /* CONFIG_TRACE_MALLOC */
-
 	/* Open the filesystem of the partition */
 	super = kernel_open_rootfs(&newly_created);
 
@@ -390,23 +385,28 @@ again_acquire_locks:
 	fsuper_mounts_write(super);
 	if (!vfs_rootlock_trywrite(&vfs_kernel)) {
 		fsuper_mounts_endwrite(super);
-		vfs_rootlock_write(&vfs_kernel);
-		vfs_rootlock_endwrite(&vfs_kernel);
+		vfs_rootlock_waitwrite(&vfs_kernel);
 		goto again_acquire_locks;
 	}
 	if (!vfs_mountslock_tryacquire(&vfs_kernel)) {
 		fsuper_mounts_endwrite(super);
 		vfs_rootlock_endwrite(&vfs_kernel);
-		vfs_mountslock_acquire(&vfs_kernel);
-		vfs_mountslock_release(&vfs_kernel);
+		vfs_mountslock_waitfor(&vfs_kernel);
 		goto again_acquire_locks;
 	}
 	if (!fs_pathlock_trywrite(&fs_kernel)) {
 		vfs_mountslock_release(&vfs_kernel);
 		fsuper_mounts_endwrite(super);
 		vfs_rootlock_endwrite(&vfs_kernel);
-		fs_pathlock_write(&fs_kernel);
+		fs_pathlock_waitwrite(&fs_kernel);
+		goto again_acquire_locks;
+	}
+	if (!fallsuper_tryacquire()) {
 		fs_pathlock_endwrite(&fs_kernel);
+		vfs_mountslock_release(&vfs_kernel);
+		fsuper_mounts_endwrite(super);
+		vfs_rootlock_endwrite(&vfs_kernel);
+		fallsuper_waitfor();
 		goto again_acquire_locks;
 	}
 
@@ -417,8 +417,10 @@ again_acquire_locks:
 	vfs_kernel.vf_root = mount;                                 /* Inherit reference */
 	fs_kernel.fs_root  = mount;                                 /* Inherit reference */
 	fs_kernel.fs_cwd   = mount;                                 /* Inherit reference */
+	fallsuper_insert(super);
 
 	/* Release locks. */
+	fallsuper_release();
 	fsuper_mounts_endwrite(super);
 	fs_pathlock_endwrite(&fs_kernel);
 	vfs_mountslock_release(&vfs_kernel);

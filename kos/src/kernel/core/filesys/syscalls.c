@@ -968,7 +968,7 @@ again_open_superblock:
 			}
 			super->fs_root.mf_refcnt = 2;
 			COMPILER_WRITE_BARRIER();
-			LIST_INSERT_HEAD(&fallsuper_list, super, fs_root.fn_allsuper);
+			fallsuper_insert(super);
 			fallsuper_release();
 			if (dev != NULL)
 				ffilesys_open_done(dev);

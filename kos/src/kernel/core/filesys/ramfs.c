@@ -815,7 +815,7 @@ again_acquire_lock_for_insert:
 
 				/* Make the newly created node globally visible. */
 				fsuper_nodes_insert(super, new_node);
-				LIST_INSERT_HEAD(&fallnodes_list, new_node, fn_allnodes);
+				fallnodes_insert(new_node);
 
 				/* Release locks. */
 				fallnodes_release();

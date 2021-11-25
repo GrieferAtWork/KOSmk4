@@ -179,7 +179,7 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmallsuper_lop)(struct lockop *__restrict self
 	struct fsuper *me = container_of(self, struct fsuper, fs_root._mf_lop);
 	assert(me->fs_root._fn_alllop.lo_func != &fnode_addtoall_lop);
 	if (LIST_ISBOUND(me, fs_root.fn_allsuper))
-		LIST_REMOVE(me, fs_root.fn_allsuper);
+		fallsuper_remove(me);
 	me->fs_root._mf_plop.plo_func = &fnode_v_destroy_rmall_postlop;
 	return &me->fs_root._mf_plop;
 }
@@ -194,7 +194,7 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmallnodes_lop)(struct lockop *__restrict self
 		return NULL;
 	}
 	if (LIST_ISBOUND(me, fn_allnodes))
-		LIST_REMOVE(me, fn_allnodes);
+		fallnodes_remove(me);
 	me->_mf_plop.plo_func = &fnode_v_destroy_rmall_postlop;
 	return &me->_mf_plop;
 }
@@ -216,7 +216,7 @@ again_unbind_allnodes:
 				goto again_unbind_allnodes;
 			}
 			if (LIST_ISBOUND(me, fn_allnodes))
-				LIST_REMOVE(me, fn_allnodes);
+				fallnodes_remove(me);
 			fallnodes_release();
 		} else {
 			DBG_memset(me->_mf_lopX, 0xcc, sizeof(me->_mf_lopX));
@@ -269,7 +269,7 @@ NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self) {
 			if (fallsuper_tryacquire()) {
 				assert(super->fs_root._fn_alllop.lo_func != &fnode_addtoall_lop);
 				if (LIST_ISBOUND(super, fs_root.fn_allsuper))
-					LIST_REMOVE(super, fs_root.fn_allsuper);
+					fallsuper_remove(super);
 				fallsuper_release();
 			} else {
 				DBG_memset(super->fs_root._mf_lopX, 0xcc, sizeof(super->fs_root._mf_lopX));
@@ -316,7 +316,7 @@ again_unbind_allnodes:
 					goto again_unbind_allnodes;
 				}
 				if (LIST_ISBOUND(me, fn_allnodes))
-					LIST_REMOVE(me, fn_allnodes);
+					fallnodes_remove(me);
 				fallnodes_release();
 			} else {
 				DBG_memset(me->_mf_lopX, 0xcc, sizeof(me->_mf_lopX));
@@ -406,6 +406,7 @@ NOTHROW(LOCKOP_CC fnode_addtoall_lop)(struct lockop *__restrict self) {
 	ATOMIC_WRITE(me->fn_allnodes.le_prev, &fallnodes_list.lh_first); /* This write needs to be atomic */
 	if ((me->fn_allnodes.le_next = fallnodes_list.lh_first) != NULL)
 		me->fn_allnodes.le_next->fn_allnodes.le_prev = &me->fn_allnodes.le_next;
+	__fallnodes_size_inc();
 	return NULL;
 }
 
@@ -425,7 +426,7 @@ NOTHROW(FCALL fnode_init_addtoall)(struct fnode *__restrict self) {
 	/* Yes: we do a raw init! */
 	DBG_memset(&self->fn_allnodes, 0xcc, sizeof(self->fn_allnodes));
 	if (fallnodes_tryacquire()) {
-		LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
+		fallnodes_insert(self);
 		fallnodes_release();
 	} else {
 		/* Use a lock operator. */
@@ -1058,8 +1059,10 @@ NOTHROW(LOCKOP_CC fnode_delete_remove_from_allnodes_lop)(struct lockop *__restri
 	REF struct fnode *me;
 	me = container_of(self, struct fnode, _mf_lop);
 	COMPILER_READ_BARRIER();
-	if (LIST_ISBOUND(me, fn_allnodes))
-		LIST_UNBIND(me, fn_allnodes);
+	if (LIST_ISBOUND(me, fn_allnodes)) {
+		fallnodes_remove(me);
+		LIST_ENTRY_UNBOUND_INIT(&me->fn_allnodes);
+	}
 	me->_mf_plop.plo_func = &fnode_delete_remove_from_allnodes_postlop; /* Inherit reference */
 	return &me->_mf_plop;
 }
@@ -1077,8 +1080,10 @@ NOTHROW(LOCKOP_CC fnode_delete_remove_from_changed_postlop)(Tobpostlockop(fsuper
 		COMPILER_READ_BARRIER();
 		if (fallnodes_tryacquire()) {
 			COMPILER_READ_BARRIER();
-			if (LIST_ISBOUND(me, fn_allnodes))
-				LIST_UNBIND(me, fn_allnodes);
+			if (LIST_ISBOUND(me, fn_allnodes)) {
+				fallnodes_remove(me);
+				LIST_ENTRY_UNBOUND_INIT(&me->fn_allnodes);
+			}
 			COMPILER_READ_BARRIER();
 			fallnodes_release();
 		} else {

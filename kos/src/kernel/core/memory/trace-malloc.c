@@ -1415,7 +1415,7 @@ NOTHROW(KCALL gc_find_reachable_impl)(struct gc_glink_backup *__restrict glnk) {
 	 * Think about why these global lists exist:
 	 *  - mpart_all_list: Keep parts alive for cached/changed files
 	 *  - fallnodes_list: Keep file nodes alive so they don't have to be reloaded constantly
-	 *  - fallsuper_list: Not really used for anything (yet?)
+	 *  - fallsuper_list: `fsuper_opendev()' when already opened.
 	 * NOTE: sync(2) is implemented via `fchangedsuper_list', so doesn't use `fallsuper_list'
 	 *
 	 * To tell me: what reason is there for anything reachable via these lists to

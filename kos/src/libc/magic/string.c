@@ -8032,6 +8032,44 @@ miss:
 [[impl_include("<asm/os/stat.h>"), decl_include("<bits/types.h>")]]
 void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	char ch;
+
+@@pp_ifndef S_IRUSR@@
+#define S_IRUSR 0400 /* Read by owner. */
+@@pp_endif@@
+@@pp_ifndef S_IWUSR@@
+#define S_IWUSR 0200 /* Write by owner. */
+@@pp_endif@@
+@@pp_ifndef S_IXUSR@@
+#define S_IXUSR 0100 /* Execute by owner. */
+@@pp_endif@@
+@@pp_ifndef S_IRWXU@@
+#define S_IRWXU 0700
+@@pp_endif@@
+@@pp_ifndef S_IRGRP@@
+#define S_IRGRP 0040 /* Read by group. */
+@@pp_endif@@
+@@pp_ifndef S_IWGRP@@
+#define S_IWGRP 0020 /* Write by group. */
+@@pp_endif@@
+@@pp_ifndef S_IXGRP@@
+#define S_IXGRP 0010 /* Execute by group. */
+@@pp_endif@@
+@@pp_ifndef S_IRWXG@@
+#define S_IRWXG 0070
+@@pp_endif@@
+@@pp_ifndef S_IROTH@@
+#define S_IROTH 0004 /* Read by others. */
+@@pp_endif@@
+@@pp_ifndef S_IWOTH@@
+#define S_IWOTH 0002 /* Write by others. */
+@@pp_endif@@
+@@pp_ifndef S_IXOTH@@
+#define S_IXOTH 0001 /* Execute by others. */
+@@pp_endif@@
+@@pp_ifndef S_IRWXO@@
+#define S_IRWXO 0007
+@@pp_endif@@
+
 	/* First character: File type */
 	ch = '?';
 @@pp_ifdef S_IFMT@@
@@ -8062,19 +8100,10 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 @@pp_endif@@
 	*p++ = ch;
 
-@@pp_ifdef S_IRUSR@@
 	*p++ = mode & S_IRUSR ? 'r' : '-';
-@@pp_else@@
-	*p++ = '-';
-@@pp_endif@@
-
-@@pp_ifdef S_IWUSR@@
 	*p++ = mode & S_IWUSR ? 'w' : '-';
-@@pp_else@@
-	*p++ = '-';
-@@pp_endif@@
 
-@@pp_if defined(S_IXUSR) && defined(S_ISUID)@@
+@@pp_ifdef S_ISUID@@
 	switch (mode & (S_IXUSR | S_ISUID)) {
 	case 0:                 ch = '-'; break;
 	case S_IXUSR:           ch = 'x'; break;
@@ -8082,28 +8111,15 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	case S_IXUSR | S_ISUID: ch = 's'; break;
 	default: __builtin_unreachable();
 	}
-@@pp_elif defined(S_IXUSR)@@
-	ch = mode & S_IXUSR ? 'x' : '-';
-@@pp_elif defined(S_ISUID)@@
-	ch = mode & S_ISUID ? 'S' : '-';
 @@pp_else@@
-	ch = '-';
+	ch = mode & S_IXUSR ? 'x' : '-';
 @@pp_endif@@
 	*p++ = ch;
 
-@@pp_ifdef S_IRGRP@@
 	*p++ = mode & S_IRGRP ? 'r' : '-';
-@@pp_else@@
-	*p++ = '-';
-@@pp_endif@@
-
-@@pp_ifdef S_IWGRP@@
 	*p++ = mode & S_IWGRP ? 'w' : '-';
-@@pp_else@@
-	*p++ = '-';
-@@pp_endif@@
 
-@@pp_if defined(S_IXGRP) && defined(S_ISGID)@@
+@@pp_ifdef S_ISGID@@
 	switch (mode & (S_IXGRP | S_ISGID)) {
 	case 0:                 ch = '-'; break;
 	case S_IXGRP:           ch = 'x'; break;
@@ -8111,28 +8127,15 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	case S_IXGRP | S_ISGID: ch = 's'; break;
 	default: __builtin_unreachable();
 	}
-@@pp_elif defined(S_IXGRP)@@
-	ch = mode & S_IXGRP ? 'x' : '-';
-@@pp_elif defined(S_ISGID)@@
-	ch = mode & S_ISGID ? 'S' : '-';
 @@pp_else@@
-	ch = '-';
+	ch = mode & S_IXGRP ? 'x' : '-';
 @@pp_endif@@
 	*p++ = ch;
 
-@@pp_ifdef S_IROTH@@
 	*p++ = mode & S_IROTH ? 'r' : '-';
-@@pp_else@@
-	*p++ = '-';
-@@pp_endif@@
-
-@@pp_ifdef S_IWOTH@@
 	*p++ = mode & S_IWOTH ? 'w' : '-';
-@@pp_else@@
-	*p++ = '-';
-@@pp_endif@@
 
-@@pp_if defined(S_IXOTH) && defined(S_ISVTX)@@
+@@pp_ifdef S_ISVTX@@
 	switch (mode & (S_IXOTH | S_ISVTX)) {
 	case 0:                 ch = '-'; break;
 	case S_IXOTH:           ch = 'x'; break;
@@ -8140,12 +8143,8 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	case S_IXOTH | S_ISVTX: ch = 't'; break;
 	default: __builtin_unreachable();
 	}
-@@pp_elif defined(S_IXOTH)@@
-	ch = mode & S_IXOTH ? 'x' : '-';
-@@pp_elif defined(S_ISVTX)@@
-	ch = mode & S_ISVTX ? 'T' : '-';
 @@pp_else@@
-	ch = '-';
+	ch = mode & S_IXOTH ? 'x' : '-';
 @@pp_endif@@
 	*p++ = ch;
 

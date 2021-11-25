@@ -1118,8 +1118,10 @@ NOTHROW(FCALL device_unlink_from_globals)(struct device *__restrict self) {
 	}
 
 	/* fallnodes_list... */
-	if (LIST_ISBOUND(self, fn_allnodes))
-		LIST_UNBIND(self, fn_allnodes);
+	if (LIST_ISBOUND(self, fn_allnodes)) {
+		fallnodes_remove(self);
+		LIST_ENTRY_UNBOUND_INIT(&self->fn_allnodes);
+	}
 	COMPILER_BARRIER();
 }
 
@@ -1255,9 +1257,10 @@ blkdev_repart(struct blkdev *__restrict self)
 		/* Insert into the INO tree of the devfs superblock. */
 		devfs_insert_into_inode_tree(dev);
 
-		/* Insert into the all-parts list. */
-		LIST_INSERT_HEAD(&fallnodes_list, dev, fn_allnodes);
+		/* Insert into the all-nodes list. */
+		fallnodes_insert(dev);
 
+		/* Setup global reference */
 		assert(!(dev->mf_flags & MFILE_FN_GLOBAL_REF));
 		if (self->mf_flags & MFILE_FN_GLOBAL_REF) {
 			dev->mf_flags |= MFILE_FN_GLOBAL_REF;
@@ -1353,7 +1356,7 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 		devfs_byname_insert(self);
 	}
 	devfs_insert_into_inode_tree(self);
-	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
+	fallnodes_insert(self);
 	if likely(!(self->mf_flags & MFILE_FN_GLOBAL_REF)) {
 		self->mf_flags |= MFILE_FN_GLOBAL_REF;
 		++self->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
@@ -1373,7 +1376,7 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 		devfs_insert_into_inode_tree(dev);
 
 		/* Insert into the all-parts list. */
-		LIST_INSERT_HEAD(&fallnodes_list, dev, fn_allnodes);
+		fallnodes_insert(dev);
 
 		assert(!(dev->mf_flags & MFILE_FN_GLOBAL_REF));
 		dev->mf_flags |= MFILE_FN_GLOBAL_REF;

@@ -59,8 +59,9 @@ DECL_BEGIN
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC fsuper_add2changed_lop)(struct lockop *__restrict self) {
 	/* Insert into the changed list (our caller is holding its lock) */
-	REF struct fsuper *me = container_of(self, struct fsuper, _fs_changedsuper_lop);
-	LIST_INSERT_HEAD(&fchangedsuper_list, me, fs_changedsuper);
+	REF struct fsuper *me;
+	me = container_of(self, struct fsuper, _fs_changedsuper_lop);
+	fchangedsuper_insert(me); /* Inherit reference */
 	return NULL;
 }
 
@@ -88,7 +89,7 @@ NOTHROW(FCALL fsuper_add2changed)(struct fsuper *__restrict self) {
 			COMPILER_BARRIER();
 			if (!LIST_ISBOUND(self, fs_changedsuper)) {
 				incref(self);
-				LIST_INSERT_HEAD(&fchangedsuper_list, self, fs_changedsuper);
+				fchangedsuper_insert(self);
 				result = true;
 			}
 			fchangedsuper_release();
@@ -230,8 +231,10 @@ PUBLIC BLOCKING void KCALL fsuper_syncall(void)
 		 * writes are made, then devfs is  marked as changed and would  be
 		 * also be synced at a later point. */
 		changed_superblock = LIST_FIRST(&fchangedsuper_list);
-		if (changed_superblock != NULL)
-			LIST_UNBIND(changed_superblock, fs_changedsuper);
+		if (changed_superblock != NULL) {
+			fchangedsuper_remove(changed_superblock);
+			LIST_ENTRY_UNBOUND_INIT(&changed_superblock->fs_changedsuper);
+		}
 		fchangedsuper_release();
 		if (!changed_superblock)
 			break;
@@ -449,8 +452,10 @@ NOTHROW(LOCKOP_CC fnode_remove_from_allnodes_lop)(struct lockop *__restrict self
 		lockop_enqueue(&fallnodes_lockops, &me->_mf_lop);
 		return NULL;
 	}
-	if (LIST_ISBOUND(me, fn_allnodes))
-		LIST_UNBIND(me, fn_allnodes);
+	if (LIST_ISBOUND(me, fn_allnodes)) {
+		fallnodes_remove(me);
+		LIST_ENTRY_UNBOUND_INIT(&me->fn_allnodes);
+	}
 	me->_mf_plop.plo_func = &fnode_remove_from_allnodes_postlop;
 	return &me->_mf_plop;
 }
@@ -469,8 +474,10 @@ again_unbind_allnodes:
 				fallnodes_release(); /* This should reap & invoke fnode_addtoall_lop() */
 				goto again_unbind_allnodes;
 			}
-			if (LIST_ISBOUND(self, fn_allnodes))
-				LIST_UNBIND(self, fn_allnodes);
+			if (LIST_ISBOUND(self, fn_allnodes)) {
+				fallnodes_remove(self);
+				LIST_ENTRY_UNBOUND_INIT(&self->fn_allnodes);
+			}
 			fallnodes_release();
 		} else {
 			self->_mf_lop.lo_func = &fnode_remove_from_allnodes_lop;
@@ -646,8 +653,10 @@ NOTHROW(LOCKOP_CC fsuper_delete_remove_from_all_lop)(struct lockop *__restrict s
 	REF struct fsuper *me;
 	me = container_of(self, struct fsuper, fs_root._mf_lop);
 	COMPILER_READ_BARRIER();
-	if (LIST_ISBOUND(me, fs_root.fn_allsuper))
-		LIST_UNBIND(me, fs_root.fn_allsuper);
+	if (LIST_ISBOUND(me, fs_root.fn_allsuper)) {
+		fallsuper_remove(me);
+		LIST_ENTRY_UNBOUND_INIT(&me->fs_root.fn_allsuper);
+	}
 	me->fs_root._mf_plop.plo_func = &fsuper_delete_remove_from_all_postlop;
 	return &me->fs_root._mf_plop;
 }
@@ -698,8 +707,10 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
 	if (LIST_ISBOUND(self, fs_root.fn_allsuper)) {
 		if (fallsuper_tryacquire()) {
 			COMPILER_READ_BARRIER();
-			if (LIST_ISBOUND(self, fs_root.fn_allsuper))
-				LIST_UNBIND(self, fs_root.fn_allsuper);
+			if (LIST_ISBOUND(self, fs_root.fn_allsuper)) {
+				fallsuper_remove(self);
+				LIST_ENTRY_UNBOUND_INIT(&self->fs_root.fn_allsuper);
+			}
 			fallsuper_release();
 		} else {
 			self->fs_root._mf_lop.lo_func = &fsuper_delete_remove_from_all_lop; /* Inherit reference */

@@ -80,6 +80,21 @@ DATDEF struct lockop_slist fallnodes_lockops;
 #define fallnodes_waitfor()    atomic_lock_waitfor(&fallnodes_lock)
 #define fallnodes_waitfor_nx() atomic_lock_waitfor_nx(&fallnodes_lock)
 
+/* Insert/remove nodes from/into `fallnodes_list' */
+#define fallnodes_insert(node) (LIST_INSERT_HEAD(&fallnodes_list, node, fn_allnodes), __fallnodes_size_inc())
+#define fallnodes_remove(node) (__fallnodes_size_dec(), LIST_REMOVE(node, fn_allnodes))
+#define __fallnodes_size_inc() (void)0
+#define __fallnodes_size_dec() (void)0
+#define _fallnodes_getsize()   LIST_COUNT(&fallnodes_list, fn_allnodes)
+#define fallnodes_getsize()                                   \
+	({                                                        \
+		size_t __fas_res;                                     \
+		fallnodes_acquire();                                  \
+		LIST_COUNT(&fallnodes_list, &__fas_res, fn_allnodes); \
+		fallnodes_release();                                  \
+		__fas_res;                                            \
+	})
+
 
 
 /************************************************************************/
@@ -110,6 +125,21 @@ DATDEF struct lockop_slist fallsuper_lockops;
 #define fallsuper_waitfor()    atomic_lock_waitfor(&fallsuper_lock)
 #define fallsuper_waitfor_nx() atomic_lock_waitfor_nx(&fallsuper_lock)
 
+/* Insert/remove superblocks from/into `fallsuper_list' */
+#define fallsuper_insert(super) (LIST_INSERT_HEAD(&fallsuper_list, super, fs_root.fn_allsuper), __fallsuper_size_inc())
+#define fallsuper_remove(super) (__fallsuper_size_dec(), LIST_REMOVE(super, fs_root.fn_allsuper))
+#define __fallsuper_size_inc()  (void)0
+#define __fallsuper_size_dec()  (void)0
+#define _fallsuper_getsize()    LIST_COUNT(&fallsuper_list, fs_root.fn_allsuper)
+#define fallsuper_getsize()                                           \
+	({                                                                \
+		size_t __fas_res;                                             \
+		fallsuper_acquire();                                          \
+		LIST_COUNT(&fallsuper_list, &__fas_res, fs_root.fn_allsuper); \
+		fallsuper_release();                                          \
+		__fas_res;                                                    \
+	})
+
 
 
 /************************************************************************/
@@ -138,6 +168,21 @@ DATDEF struct lockop_slist fchangedsuper_lockops;
 #define fchangedsuper_available()  atomic_lock_available(&fchangedsuper_lock)
 #define fchangedsuper_waitfor()    atomic_lock_waitfor(&fchangedsuper_lock)
 #define fchangedsuper_waitfor_nx() atomic_lock_waitfor_nx(&fchangedsuper_lock)
+
+/* Insert/remove superblocks from/into `fchangedsuper_list' */
+#define fchangedsuper_insert(super) (LIST_INSERT_HEAD(&fchangedsuper_list, super, fs_changedsuper), __fchangedsuper_size_inc())
+#define fchangedsuper_remove(super) (__fchangedsuper_size_dec(), LIST_REMOVE(super, fs_changedsuper))
+#define __fchangedsuper_size_inc()  (void)0
+#define __fchangedsuper_size_dec()  (void)0
+#define _fchangedsuper_getsize()    LIST_COUNT(&fchangedsuper_list, fs_changedsuper)
+#define fchangedsuper_getsize()                                       \
+	({                                                                \
+		size_t __fcs_res;                                             \
+		fchangedsuper_acquire();                                      \
+		LIST_COUNT(&fchangedsuper_list, &__fcs_res, fs_changedsuper); \
+		fchangedsuper_release();                                      \
+		__fcs_res;                                                    \
+	})
 
 
 

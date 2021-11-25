@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe18f33f3 */
+/* HASH CRC-32:0xacfd60b5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,44 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strmode) __ATTR_NONNULL((2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[12]) {
 	char __ch;
+
+#ifndef __S_IRUSR
+#define __S_IRUSR 0400 /* Read by owner. */
+#endif /* !__S_IRUSR */
+#ifndef __S_IWUSR
+#define __S_IWUSR 0200 /* Write by owner. */
+#endif /* !__S_IWUSR */
+#ifndef __S_IXUSR
+#define __S_IXUSR 0100 /* Execute by owner. */
+#endif /* !__S_IXUSR */
+#ifndef __S_IRWXU
+#define __S_IRWXU 0700
+#endif /* !__S_IRWXU */
+#ifndef __S_IRGRP
+#define __S_IRGRP 0040 /* Read by group. */
+#endif /* !__S_IRGRP */
+#ifndef __S_IWGRP
+#define __S_IWGRP 0020 /* Write by group. */
+#endif /* !__S_IWGRP */
+#ifndef __S_IXGRP
+#define __S_IXGRP 0010 /* Execute by group. */
+#endif /* !__S_IXGRP */
+#ifndef __S_IRWXG
+#define __S_IRWXG 0070
+#endif /* !__S_IRWXG */
+#ifndef __S_IROTH
+#define __S_IROTH 0004 /* Read by others. */
+#endif /* !__S_IROTH */
+#ifndef __S_IWOTH
+#define __S_IWOTH 0002 /* Write by others. */
+#endif /* !__S_IWOTH */
+#ifndef __S_IXOTH
+#define __S_IXOTH 0001 /* Execute by others. */
+#endif /* !__S_IXOTH */
+#ifndef __S_IRWXO
+#define __S_IRWXO 0007
+#endif /* !__S_IRWXO */
+
 	/* First character: File type */
 	__ch = '?';
 #ifdef __S_IFMT
@@ -57,19 +95,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 #endif /* __S_IFMT */
 	*__p++ = __ch;
 
-#ifdef __S_IRUSR
 	*__p++ = __mode & __S_IRUSR ? 'r' : '-';
-#else /* __S_IRUSR */
-	*__p++ = '-';
-#endif /* !__S_IRUSR */
-
-#ifdef __S_IWUSR
 	*__p++ = __mode & __S_IWUSR ? 'w' : '-';
-#else /* __S_IWUSR */
-	*__p++ = '-';
-#endif /* !__S_IWUSR */
 
-#if defined(__S_IXUSR) && defined(__S_ISUID)
+#ifdef __S_ISUID
 	switch (__mode & (__S_IXUSR | __S_ISUID)) {
 	case 0:                 __ch = '-'; break;
 	case __S_IXUSR:           __ch = 'x'; break;
@@ -77,28 +106,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 	case __S_IXUSR | __S_ISUID: __ch = 's'; break;
 	default: __builtin_unreachable();
 	}
-#elif defined(__S_IXUSR)
+#else /* __S_ISUID */
 	__ch = __mode & __S_IXUSR ? 'x' : '-';
-#elif defined(__S_ISUID)
-	__ch = __mode & __S_ISUID ? 'S' : '-';
-#else /* ... */
-	__ch = '-';
-#endif /* !... */
+#endif /* !__S_ISUID */
 	*__p++ = __ch;
 
-#ifdef __S_IRGRP
 	*__p++ = __mode & __S_IRGRP ? 'r' : '-';
-#else /* __S_IRGRP */
-	*__p++ = '-';
-#endif /* !__S_IRGRP */
-
-#ifdef __S_IWGRP
 	*__p++ = __mode & __S_IWGRP ? 'w' : '-';
-#else /* __S_IWGRP */
-	*__p++ = '-';
-#endif /* !__S_IWGRP */
 
-#if defined(__S_IXGRP) && defined(__S_ISGID)
+#ifdef __S_ISGID
 	switch (__mode & (__S_IXGRP | __S_ISGID)) {
 	case 0:                 __ch = '-'; break;
 	case __S_IXGRP:           __ch = 'x'; break;
@@ -106,28 +122,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 	case __S_IXGRP | __S_ISGID: __ch = 's'; break;
 	default: __builtin_unreachable();
 	}
-#elif defined(__S_IXGRP)
+#else /* __S_ISGID */
 	__ch = __mode & __S_IXGRP ? 'x' : '-';
-#elif defined(__S_ISGID)
-	__ch = __mode & __S_ISGID ? 'S' : '-';
-#else /* ... */
-	__ch = '-';
-#endif /* !... */
+#endif /* !__S_ISGID */
 	*__p++ = __ch;
 
-#ifdef __S_IROTH
 	*__p++ = __mode & __S_IROTH ? 'r' : '-';
-#else /* __S_IROTH */
-	*__p++ = '-';
-#endif /* !__S_IROTH */
-
-#ifdef __S_IWOTH
 	*__p++ = __mode & __S_IWOTH ? 'w' : '-';
-#else /* __S_IWOTH */
-	*__p++ = '-';
-#endif /* !__S_IWOTH */
 
-#if defined(__S_IXOTH) && defined(__S_ISVTX)
+#ifdef __S_ISVTX
 	switch (__mode & (__S_IXOTH | __S_ISVTX)) {
 	case 0:                 __ch = '-'; break;
 	case __S_IXOTH:           __ch = 'x'; break;
@@ -135,13 +138,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 	case __S_IXOTH | __S_ISVTX: __ch = 't'; break;
 	default: __builtin_unreachable();
 	}
-#elif defined(__S_IXOTH)
+#else /* __S_ISVTX */
 	__ch = __mode & __S_IXOTH ? 'x' : '-';
-#elif defined(__S_ISVTX)
-	__ch = __mode & __S_ISVTX ? 'T' : '-';
-#else /* ... */
-	__ch = '-';
-#endif /* !... */
+#endif /* !__S_ISVTX */
 	*__p++ = __ch;
 
 	/* Always space in this implementation */

@@ -735,7 +735,7 @@ again_acquire_lock_for_insert:
 
 				/* Make the newly created node globally visible. */
 				fsuper_nodes_insert(&devfs, new_node);
-				LIST_INSERT_HEAD(&fallnodes_list, new_node, fn_allnodes);
+				fallnodes_insert(new_node);
 
 				/* Release locks. */
 				fallnodes_release();
@@ -1352,7 +1352,7 @@ device_tryregister(struct device *__restrict self)
 	/* Doesn't exist yet -> register our new one! */
 	fsuper_nodes_insert(&devfs, self);
 	devfs_byname_insert(self);
-	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
+	fallnodes_insert(self);
 	devfs_log_new_device(self);
 
 	/* Indicate success */
@@ -1489,7 +1489,7 @@ device_register(struct device *__restrict self)
 	fsuper_nodes_insert(&devfs, self);
 
 	/* Insert into the all-nodes list. */
-	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
+	fallnodes_insert(self);
 
 	/* Create the global reference (if not created already). */
 	if (!(self->mf_flags & MFILE_FN_GLOBAL_REF)) {
@@ -1657,8 +1657,10 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_allnodes_lop)(struct lockop *__restr
 	REF struct device *me;
 	me = container_of(self, struct device, _mf_lop);
 	COMPILER_READ_BARRIER();
-	if (LIST_ISBOUND(me, fn_allnodes))
-		LIST_UNBIND(me, fn_allnodes);
+	if (LIST_ISBOUND(me, fn_allnodes)) {
+		fallnodes_remove(me);
+		LIST_ENTRY_UNBOUND_INIT(&me->fn_allnodes);
+	}
 	me->_mf_plop.plo_func = &device_delete_remove_from_allnodes_postlop; /* Inherit reference */
 	return &me->_mf_plop;
 }
@@ -1678,8 +1680,10 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_changed_postlop)(Tobpostlockop(fsupe
 		COMPILER_READ_BARRIER();
 		if (fallnodes_tryacquire()) {
 			COMPILER_READ_BARRIER();
-			if (LIST_ISBOUND(me, fn_allnodes))
-				LIST_UNBIND(me, fn_allnodes);
+			if (LIST_ISBOUND(me, fn_allnodes)) {
+				fallnodes_remove(me);
+				LIST_ENTRY_UNBOUND_INIT(&me->fn_allnodes);
+			}
 			COMPILER_READ_BARRIER();
 			fallnodes_release();
 		} else {

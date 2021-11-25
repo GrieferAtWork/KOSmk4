@@ -21,9 +21,11 @@
 #define GUARD_MODPROCFS_FILES_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _BSD_SOURCE 1 /* strmode() */
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/allnodes.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/filesys.h>
@@ -88,6 +90,10 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+INTDEF NOBLOCK WUNUSED NONNULL((1)) char const *
+NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
+
 
 /* Create forward declarations. (Prevent declaration errors below) */
 #define MKDIR_BEGIN(symbol_name, perm) \
@@ -207,6 +213,131 @@ ProcFS_KCore_Printer(pformatprinter printer, void *arg,
 }
 
 
+
+/************************************************************************/
+/* /proc/kos/fs/nodes                                                   */
+/************************************************************************/
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL
+print_fnode_desc(struct fnode *__restrict self,
+                 pformatprinter printer, void *arg) {
+	refcnt_t refcnt;
+	ssize_t result;
+	char const *specname;
+	char modename[12];
+	mode_t mode;
+	uintptr_t flags;
+	mfile_tslock_acquire(self);
+	refcnt = ATOMIC_READ(self->mf_refcnt);
+	mode   = self->fn_mode;
+	flags  = self->mf_flags;
+	mfile_tslock_release(self);
+	--refcnt;
+	if (flags & MFILE_FN_GLOBAL_REF)
+		--refcnt;
+
+	/* Basic attribute information */
+	strmode(mode, modename);
+	result = format_printf(printer, arg,
+	                       "%" PRIuSIZ "\t%s\t%s\t"
+	                       "%s,%c%c%c%c%c%c\t",
+	                       refcnt, self->fn_super->fs_sys->ffs_name, modename,
+	                       flags & MFILE_F_READONLY ? "ro" : "rw",
+	                       flags & MFILE_FN_GLOBAL_REF ? 'g' : '-',
+	                       flags & MFILE_F_DELETED ? 'D' : '-',
+	                       flags & MFILE_F_ATTRCHANGED ? 'a' : '-',
+	                       flags & MFILE_F_CHANGED ? 'c' : '-',
+	                       flags & MFILE_F_PERSISTENT ? 'p' : '-',
+	                       flags & MFILE_FN_ATTRREADONLY ? 'R' : '-');
+	if (result < 0)
+		return result;
+
+	/* Generic file info. */
+	specname = nameof_special_file(self);
+	if (specname) {
+		result = (*printer)(arg, specname, strlen(specname));
+	} else {
+		result = mfile_uprintlink(self, printer, arg);
+	}
+	if (result < 0)
+		return result;
+	return (*printer)(arg, "\n", 1);
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_kos_fs_nodes_printer(pformatprinter printer, void *arg,
+                            size_t UNUSED(offset_hint)) {
+	REF struct fnode *node;
+	REF struct fnode *prev = NULL;
+	size_t index = 0;
+	fallnodes_acquire();
+	node = LIST_FIRST(&fallnodes_list);
+	for (;;) {
+		REF struct fnode *next;
+		size_t num_destroyed;
+		num_destroyed = 0;
+		while (node && !tryincref(node)) {
+			node = LIST_NEXT(node, fn_allnodes);
+			++num_destroyed;
+		}
+		fallnodes_release();
+		xdecref_unlikely(prev);
+		TRY {
+			if (num_destroyed != 0) {
+				index += num_destroyed;
+				if (printf("<destroyed> (x%" PRIuSIZ ")\n", num_destroyed) < 0)
+					break;
+			}
+			if (!node)
+				break;
+			if (print_fnode_desc(node, printer, arg) < 0)
+				break;
+		} EXCEPT {
+			xdecref_unlikely(node);
+			RETHROW();
+		}
+		prev = node;
+		fallnodes_acquire();
+		if (!LIST_ISBOUND(node, fn_allnodes)) {
+			/* Find  the `index'th node in the global list.
+			 * This is not failsafe (elements before `node'
+			 * may have been removed, so `index' may not be
+			 * correct), but it's better than nothing. */
+			size_t i;
+			node = LIST_FIRST(&fallnodes_list);
+			for (i = 0; node && i < index; ++i) {
+				node = LIST_NEXT(node, fn_allnodes);
+			}
+			if (!node) {
+				fallnodes_release();
+				break;
+			}
+		}
+		next = LIST_NEXT(node, fn_allnodes);
+		node = next;
+		++index;
+	}
+	xdecref_unlikely(node);
+}
+
+
+
+/************************************************************************/
+/* /proc/kos/fs/stat                                                    */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_kos_fs_stat_printer(pformatprinter printer, void *arg,
+                           size_t UNUSED(offset_hint)) {
+	size_t allnodes    = fallnodes_getsize();
+	size_t allsuper    = fallsuper_getsize();
+	size_t changesuper = fchangedsuper_getsize();
+	printf("nodes:\t%" PRIuSIZ "\n"
+	       "super:\t%" PRIuSIZ "\n"
+	       "super (changed):\t%" PRIuSIZ "\n",
+	       allnodes, allsuper, changesuper);
+}
+
+
+
 /************************************************************************/
 /* /proc/kos/mm/stat                                                    */
 /************************************************************************/
@@ -214,7 +345,7 @@ INTERN NONNULL((1)) void KCALL
 procfs_kos_mm_stat_printer(pformatprinter printer, void *arg,
                            size_t UNUSED(offset_hint)) {
 	size_t partcount = mpart_all_getsize();
-	printf("mparts: %" PRIuSIZ "\n",
+	printf("mparts:\t%" PRIuSIZ "\n",
 	       partcount);
 }
 
@@ -224,8 +355,6 @@ procfs_kos_mm_stat_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 /* /proc/kos/mm/parts                                                   */
 /************************************************************************/
-INTDEF NOBLOCK WUNUSED NONNULL((1)) char const *
-NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL
 print_mpart_desc(struct mpart *__restrict self,
                  pformatprinter printer, void *arg) {
@@ -288,7 +417,7 @@ print_mpart_desc(struct mpart *__restrict self,
 	if (flags & MPART_F_GLOBAL_REF)
 		--refcnt;
 	result = format_printf(printer, arg,
-	                       "%" PRIuSIZ ",%s\t%.6" PRIx64 "-%.6" PRIx64 "\t",
+	                       "%" PRIuSIZ "\t%s\t%.6" PRIx64 "-%.6" PRIx64 "\t",
 	                       refcnt, statename, minaddr, maxaddr);
 	if (result < 0)
 		return result;
