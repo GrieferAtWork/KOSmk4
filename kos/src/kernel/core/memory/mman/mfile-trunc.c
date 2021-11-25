@@ -492,6 +492,7 @@ after_file_size_changed:
 				SLIST_REMOVE(&self->mf_changed, part, mp_changed);
 			}
 			ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
+			decref_nokill(part);
 		}
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 
