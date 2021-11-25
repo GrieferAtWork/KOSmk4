@@ -1199,14 +1199,16 @@ AtaInit_InitializeDrive(struct ata_ports *__restrict ports,
                         /*(in|out)_opt*/ REF AtaBus **__restrict p_bus,
                         u8 drive_id, bool is_primary_bus,
                         bool is_default_ide) {
-	u8 initial_status, cl, ch;
+	AtaBus *bus = *p_bus;
+	AtaDrive *drive;
+	u8 initial_status;
 	struct hd_driveid specs;
 	assert(drive_id == ATA_DRIVE_MASTER ||
 	       drive_id == ATA_DRIVE_SLAVE);
 	printk(FREESTR(KERN_INFO "[ata] Attempting to initialize %s %s ATA device {"
-	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
-	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
-	                         "%#" PRIxN(__SIZEOF_PORT_T__) "} (default_ide: %u)\n"),
+	                         "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "ctl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "dma:%#" PRIxN(__SIZEOF_PORT_T__) "} (default_ide: %u)\n"),
 	       is_primary_bus ? FREESTR("primary") : FREESTR("secondary"),
 	       drive_id == ATA_DRIVE_MASTER ? FREESTR("master") : FREESTR("slave"),
 	       ports->a_bus, ports->a_ctrl,
@@ -1216,6 +1218,7 @@ AtaInit_InitializeDrive(struct ata_ports *__restrict ports,
 	initial_status = inb(ports->a_bus + ATA_STATUS);
 	if (initial_status == 0xff)
 		return false; /* Floating bus */
+	ATA_VERBOSE("[ata] initial_status: %#" PRIx8 "\n", initial_status);
 
 	/* Do a soft reset on both ATA device control ports. */
 	AtaBus_HW_ResetBus_P(ports->a_ctrl);
@@ -1228,242 +1231,226 @@ AtaInit_InitializeDrive(struct ata_ports *__restrict ports,
 	if (AtaBus_HW_WaitForBusy_P(ports->a_ctrl, relktime_from_seconds(3)) != ATA_ERROR_OK)
 		return false;
 
-	/* Figure out what kind of drive this is. */
-	cl = inb(ports->a_bus + ATA_ADDRESS2);
-	ch = inb(ports->a_bus + ATA_ADDRESS3);
-
-	if ((cl == 0x00 && ch == 0x00) || /* PATA */
-	    (cl == 0x3c && ch == 0xc3)) { /* SATA */
-		AtaBus *bus = *p_bus;
-		AtaDrive *drive;
-
-		/* Allocate the bus controller (if necessary) */
-		if (bus == NULL) {
-			bus = _AtaBus_Alloc();
-			bus->rca_refcnt     = 1;
-			bus->rca_destroy    = &AtaBus_Destroy;
-			bus->ab_state       = ATA_BUS_STATE_READY;
-			bus->ab_aio_pending = NULL;
-			bus->ab_aio_current = NULL;
-			sig_init(&bus->ab_ready);
-			sig_init(&bus->ab_piointr);
-			DBG_memset(&bus->ab_prdt, 0xcc, sizeof(bus->ab_prdt));
-			bus->ab_busio       = ports->a_bus;
-			bus->ab_ctrlio      = ports->a_ctrl;
-			bus->ab_dmaio       = ports->a_dma;
-			bus->ab_dma_retry   = 3;
-			bus->ab_pio_retry   = 3;
-			bus->ab_timeout_BSY = relktime_from_seconds(3);
-			bus->ab_timeout_DRQ = relktime_from_seconds(3);
-			bus->ab_timeout_dat = relktime_from_seconds(2);
-			if (bus->ab_dmaio != (port_t)-1) {
-				physaddr_t phys;
-				/* Allocate `ab_prdt' */
-				TRY {
-					/* Must allocate in 32-bit space (because the PRD register is only 32 bits large) */
-					PAGEDIR_PAGEALIGNED void *addr;
-					addr = mman_map_kram(MHINT_GETADDR(KERNEL_MHINT_DEVICE), PAGESIZE,
-					                     gfp_from_mapflags(MHINT_GETMODE(KERNEL_MHINT_DEVICE)) |
-					                     GFP_LOCKED | GFP_PREFLT | GFP_MAP_32BIT);
-					/* Remember the address */
-					bus->ab_prdt = (PAGEDIR_PAGEALIGNED AtaPRD *)addr;
-				} EXCEPT {
-					kfree(bus);
-					RETHROW();
-				}
-
-				/* Tell the bus where the PRD is located. */
-				phys = pagedir_translate(bus->ab_prdt);
-				assert(phys <= (physaddr_t)UINT32_MAX);
-				outl(bus->ab_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
-			}
+	/* Allocate the bus controller (if necessary) */
+	if (bus == NULL) {
+		bus = _AtaBus_Alloc();
+		bus->rca_refcnt     = 1;
+		bus->rca_destroy    = &AtaBus_Destroy;
+		bus->ab_state       = ATA_BUS_STATE_READY;
+		bus->ab_aio_pending = NULL;
+		bus->ab_aio_current = NULL;
+		sig_init(&bus->ab_ready);
+		sig_init(&bus->ab_piointr);
+		DBG_memset(&bus->ab_prdt, 0xcc, sizeof(bus->ab_prdt));
+		bus->ab_busio       = ports->a_bus;
+		bus->ab_ctrlio      = ports->a_ctrl;
+		bus->ab_dmaio       = ports->a_dma;
+		bus->ab_dma_retry   = 3;
+		bus->ab_pio_retry   = 3;
+		bus->ab_timeout_BSY = relktime_from_seconds(3);
+		bus->ab_timeout_DRQ = relktime_from_seconds(3);
+		bus->ab_timeout_dat = relktime_from_seconds(2);
+		if (bus->ab_dmaio != (port_t)-1) {
+			physaddr_t phys;
+			/* Allocate `ab_prdt' */
 			TRY {
-				/* The BUS structure must be registered alongside an interrupt registration. */
-				hisr_register_at(is_primary_bus ? X86_INTNO_PIC2_ATA1 /* TODO: Non-portable! */
-				                                : X86_INTNO_PIC2_ATA2,
-				                 (isr_function_t)AtaBus_HW_GetInterruptHandler(bus),
-				                 bus);
+				/* Must allocate in 32-bit space (because the PRD register is only 32 bits large) */
+				PAGEDIR_PAGEALIGNED void *addr;
+				addr = mman_map_kram(MHINT_GETADDR(KERNEL_MHINT_DEVICE), PAGESIZE,
+				                     gfp_from_mapflags(MHINT_GETMODE(KERNEL_MHINT_DEVICE)) |
+				                     GFP_LOCKED | GFP_PREFLT | GFP_MAP_32BIT);
+				/* Remember the address */
+				bus->ab_prdt = (PAGEDIR_PAGEALIGNED AtaPRD *)addr;
 			} EXCEPT {
-				AtaBus_Destroy(bus);
+				kfree(bus);
 				RETHROW();
 			}
-			*p_bus = bus; /* Inherit reference */
+
+			/* Tell the bus where the PRD is located. */
+			phys = pagedir_translate(bus->ab_prdt);
+			assert(phys <= (physaddr_t)UINT32_MAX);
+			outl(bus->ab_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 		}
+		TRY {
+			/* The BUS structure must be registered alongside an interrupt registration. */
+			hisr_register_at(is_primary_bus ? X86_INTNO_PIC2_ATA1 /* TODO: Non-portable! */
+			                                : X86_INTNO_PIC2_ATA2,
+			                 (isr_function_t)AtaBus_HW_GetInterruptHandler(bus),
+			                 bus);
+		} EXCEPT {
+			AtaBus_Destroy(bus);
+			RETHROW();
+		}
+		*p_bus = bus; /* Inherit reference */
+	}
 
-		/* Construct and initialize a new ATA drive for this bus. */
-		{
-			/* Get a PIO lock on this bus. */
-			AtaBus_LockPIO(bus);
-			RAII_FINALLY { AtaBus_UnlockPIO(bus); };
-			if (AtaBus_HW_WaitForBusy(bus) != ATA_ERROR_OK)
-				return false;
-			task_connect(&bus->ab_piointr);
+	/* Construct and initialize a new ATA drive for this bus. */
+	{
+		/* Get a PIO lock on this bus. */
+		AtaBus_LockPIO(bus);
+		RAII_FINALLY { AtaBus_UnlockPIO(bus); };
+		if (AtaBus_HW_WaitForBusy(bus) != ATA_ERROR_OK)
+			return false;
+		task_connect(&bus->ab_piointr);
 
-			/* Ask for specifications about the drive we want to load (IDENTIFY) */
-			TRY {
-				outb(bus->ab_busio + ATA_DRIVE_SELECT,
-				     0xa0 + (drive_id - ATA_DRIVE_MASTER));
-				AtaBus_HW_SelectDelay_P(ports->a_ctrl);
-				outb(bus->ab_busio + ATA_ADDRESS1, 0);
-				outb(bus->ab_busio + ATA_ADDRESS2, 0);
-				outb(bus->ab_busio + ATA_ADDRESS3, 0);
-				outb(bus->ab_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
-			} EXCEPT {
-				task_disconnectall();
-				RETHROW();
-			}
-			if (!task_trywait()) {
-				struct sig *signal;
-				u8 status;
-				status = inb(bus->ab_ctrlio);
-				if (status == 0) {
-					signal = task_receiveall();
-					if unlikely(signal)
-						goto got_identify_signal;
-					/* Drive doesn't exist (graceful exit) */
-					printk(FREESTR(KERN_INFO "[ata] No drive connected [status:0]\n"));
-					goto reset_bus_and_fail;
-				}
-				if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF)) {
-					task_disconnectall();
-					goto reset_bus_and_fail;
-				}
-				if (!task_waitfor(ktime() + relktime_from_seconds(2))) {
-					printk(FREESTR(KERN_ERR "[ata] Timeout while waiting for ATA_COMMAND_IDENTIFY "
-					                        "[status={then:%#" PRIx8 ",now:%#" PRIx8 "}]\n"),
-					       status, inb(bus->ab_ctrlio));
-reset_bus_and_fail:
-					AtaBus_HW_ResetBusAuto(bus);
-					return false;
-				}
-			}
-got_identify_signal:
-			if (AtaBus_HW_WaitForDrq(bus) != ATA_ERROR_OK)
+		/* Ask for specifications about the drive we want to load (IDENTIFY) */
+		TRY {
+			outb(bus->ab_busio + ATA_DRIVE_SELECT,
+			     0xa0 + (drive_id - ATA_DRIVE_MASTER));
+			AtaBus_HW_SelectDelay_P(ports->a_ctrl);
+			outb(bus->ab_busio + ATA_ADDRESS1, 0);
+			outb(bus->ab_busio + ATA_ADDRESS2, 0);
+			outb(bus->ab_busio + ATA_ADDRESS3, 0);
+			outb(bus->ab_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
+		if (!task_trywait()) {
+			struct sig *signal;
+			u8 status;
+			status = inb(bus->ab_ctrlio);
+			if (status == 0) {
+				signal = task_receiveall();
+				if unlikely(signal)
+					goto got_identify_signal;
+				/* Drive doesn't exist (graceful exit) */
+				printk(FREESTR(KERN_INFO "[ata] No drive connected [status:0]\n"));
 				goto reset_bus_and_fail;
-			insw(bus->ab_busio + ATA_DATA, &specs, 256);
-			outb(bus->ab_busio + ATA_FEATURES, 0); /* ??? */
-		}
-
-		/* Fix specifications to properly represent implications. */
-		if (bus->ab_dmaio == (port_t)-1)
-			specs.capability &= ~HD_DRIVEID_CAPABILITY_DMA;
-
-		/* Without 28-bit LBA, there can't be 48-bit. */
-		if (!(specs.capability & HD_DRIVEID_CAPABILITY_LBA))
-			specs.command_set_2 &= ~HD_DRIVEID_COMMAND_SET_2_LBA48;
-
-		/* Even if 48-bit LBA is supported, we don't want to use it if 28 bit is enough. */
-		if ((specs.capability & HD_DRIVEID_CAPABILITY_LBA) &&
-		    (u64)specs.lba_capacity_2 == (u64)specs.lba_capacity &&
-		    specs.lba_capacity < (u32)1 << 28)
-			specs.command_set_2 &= ~HD_DRIVEID_COMMAND_SET_2_LBA48;
-
-		/* Allocate a new drive object. */
-		drive = _AtaDrive_Alloc();
-
-		/* Figure out which set of operators to use. */
-		{
-			struct blkdev_ops const *ops;
-			if (specs.command_set_2 & HD_DRIVEID_COMMAND_SET_2_LBA48) {
-				ops                    = &AtaDrive_Lba48Ops;
-				drive->ad_sector_count = specs.lba_capacity_2;
-			} else if (specs.capability & HD_DRIVEID_CAPABILITY_LBA) {
-				ops                    = &AtaDrive_Lba28Ops;
-				drive->ad_sector_count = specs.lba_capacity;
-			} else {
-				ops                    = &AtaDrive_ChsOps;
-				drive->ad_sector_count = (uint64_t)(uint8_t)specs.heads *
-				                         (uint64_t)(uint16_t)specs.cyls *
-				                         (uint64_t)(uint8_t)specs.sectors;
 			}
-			/* Remember non-DMA fallback operators. */
+			if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF)) {
+				task_disconnectall();
+				goto reset_bus_and_fail;
+			}
+			if (!task_waitfor(ktime() + relktime_from_seconds(2))) {
+				printk(FREESTR(KERN_ERR "[ata] Timeout while waiting for ATA_COMMAND_IDENTIFY "
+				                        "[status={then:%#" PRIx8 ",now:%#" PRIx8 "}]\n"),
+				       status, inb(bus->ab_ctrlio));
+reset_bus_and_fail:
+				AtaBus_HW_ResetBusAuto(bus);
+				return false;
+			}
+		}
+got_identify_signal:
+		if (AtaBus_HW_WaitForDrq(bus) != ATA_ERROR_OK)
+			goto reset_bus_and_fail;
+		insw(bus->ab_busio + ATA_DATA, &specs, 256);
+		outb(bus->ab_busio + ATA_FEATURES, 0); /* ??? */
+	}
+
+	/* Fix specifications to properly represent implications. */
+	if (bus->ab_dmaio == (port_t)-1)
+		specs.capability &= ~HD_DRIVEID_CAPABILITY_DMA;
+
+	/* Without 28-bit LBA, there can't be 48-bit. */
+	if (!(specs.capability & HD_DRIVEID_CAPABILITY_LBA))
+		specs.command_set_2 &= ~HD_DRIVEID_COMMAND_SET_2_LBA48;
+
+	/* Even if 48-bit LBA is supported, we don't want to use it if 28 bit is enough. */
+	if ((specs.capability & HD_DRIVEID_CAPABILITY_LBA) &&
+	    (u64)specs.lba_capacity_2 == (u64)specs.lba_capacity &&
+	    specs.lba_capacity < (u32)1 << 28)
+		specs.command_set_2 &= ~HD_DRIVEID_COMMAND_SET_2_LBA48;
+
+	/* Allocate a new drive object. */
+	drive = _AtaDrive_Alloc();
+
+	/* Figure out which set of operators to use. */
+	{
+		struct blkdev_ops const *ops;
+		if (specs.command_set_2 & HD_DRIVEID_COMMAND_SET_2_LBA48) {
+			ops                    = &AtaDrive_Lba48Ops;
+			drive->ad_sector_count = specs.lba_capacity_2;
+		} else if (specs.capability & HD_DRIVEID_CAPABILITY_LBA) {
+			ops                    = &AtaDrive_Lba28Ops;
+			drive->ad_sector_count = specs.lba_capacity;
+		} else {
+			ops                    = &AtaDrive_ChsOps;
+			drive->ad_sector_count = (uint64_t)(uint8_t)specs.heads *
+			                         (uint64_t)(uint16_t)specs.cyls *
+			                         (uint64_t)(uint8_t)specs.sectors;
+		}
+		/* Remember non-DMA fallback operators. */
 #ifdef ATADRIVE_HAVE_PIO_IOSECTORS
-			drive->ad_pio_rdsectors = ops->bdo_dev.do_node.dno_node.no_file.mo_loadblocks;
-			drive->ad_pio_wrsectors = ops->bdo_dev.do_node.dno_node.no_file.mo_saveblocks;
+		drive->ad_pio_rdsectors = ops->bdo_dev.do_node.dno_node.no_file.mo_loadblocks;
+		drive->ad_pio_wrsectors = ops->bdo_dev.do_node.dno_node.no_file.mo_saveblocks;
 #endif /* ATADRIVE_HAVE_PIO_IOSECTORS */
-			if (specs.capability & HD_DRIVEID_CAPABILITY_DMA)
-				ops = &AtaDrive_DmaOps;
-			_blkdev_init(drive, ops);
-		}
-
-		/* Initialize blkdev fields */
-		drive->mf_part_amask = MAX(PAGESIZE, 1 << DEFAULT_ATA_SECTOR_SHIFT) - 1;
-		drive->mf_blockshift = DEFAULT_ATA_SECTOR_SHIFT;
-
-		/* 2-byte (1 == log2(2)) alignment is all ATA needs (I think...)
-		 *
-		 * As far as I can  tell, this could actually  be set to `0',  but
-		 * I still set it to `1' (2-byte alignment) so that when not doing
-		 * DMA transfers, we're  operating on  properly aligned  addresses
-		 * during our  insw() /  outsw(), and  don't have  to worry  about
-		 * some individual word needing to be written to 2 pages (iow:  we
-		 * can use `insphysw()' and `outsphysw()' directly, both of  which
-		 * documents a 2-byte alignment requirement). */
-		drive->mf_iobashift = 1;
-
-		atomic64_init(&drive->mf_filesize, drive->ad_sector_count << AtaDrive_GetSectorShift(drive));
-		drive->dv_driver = incref(&drv_self);
-		drive->fn_mode   = S_IFBLK | 0644;
-		LIST_ENTRY_UNBOUND_INIT(&drive->fn_allnodes);                            /* Initialized later (by `blkdev_repart_and_register()') */
-		DBG_memset(&drive->fn_supent, 0xcc, sizeof(drive->fn_supent));           /* *ditto* */
-		drive->fn_supent.rb_rhs = FSUPER_NODES_DELETED;                          /* *ditto* */
-		DBG_memset(&drive->fn_ino, 0xcc, sizeof(drive->fn_ino));                 /* *ditto* */
-		DBG_memset(&drive->dn_devno, 0xcc, sizeof(drive->dn_devno));             /* *ditto* */
-		drive->dv_dirent = NULL;                                                 /* *ditto* */
-		DBG_memset(&drive->dv_byname_node, 0xcc, sizeof(drive->dv_byname_node)); /* *ditto* */
-		drive->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;                    /* *ditto* */
-
-		/* Initialize stuff relating to `AtaDrive' */
-		drive->ad_bus                   = (REF AtaBus *)incref(bus);
-		drive->ad_drive                 = drive_id;
-		drive->ad_chs_number_of_heads   = (u8)specs.heads;
-		drive->ad_chs_cylinders         = (u16)specs.cyls;
-		drive->ad_chs_sectors_per_track = (u8)specs.sectors;
-		drive->ad_features              = ATA_DRIVE_FEATURE_F_NORMAL;
-		if (specs.command_set_2 & HD_DRIVEID_COMMAND_SET_2_FLUSH)
-			drive->ad_features |= ATA_DRIVE_FEATURE_F_FLUSH;
-		FINALLY_DECREF_UNLIKELY(drive);
-
-		/* Fill in ATA serial information. */
-		*(char *)mempcpy(drive->bd_rootinfo.br_ata_serial_no, specs.serial_no, 20) = '\0';
-		*(char *)mempcpy(drive->bd_rootinfo.br_ata_fw_rev, specs.fw_rev, 8) = '\0';
-		*(char *)mempcpy(drive->bd_rootinfo.br_ata_model, specs.model, 40) = '\0';
-
-		/* Assign the devno & devfs filename for the device. */
-		{
-			dev_t devno;
-			REF struct devdirent *name;
-			if (is_default_ide) {
-				devno = MKDEV(is_primary_bus ? 3 : 22, drive_id == ATA_DRIVE_MASTER ? 0 : 64);
-				name  = devdirent_newf("hd%c", (is_primary_bus ? 'a' : 'c') + (drive_id == ATA_DRIVE_MASTER ? 0 : 1));
-			} else {
-				devno = MKDEV(DEV_MAJOR_AUTO, 0);
-				name  = devdirent_newf("hdX"
-				                       "%" PRIxN(__SIZEOF_PORT_T__) "."
-				                       "%" PRIxN(__SIZEOF_PORT_T__) "."
-				                       "%" PRIxN(__SIZEOF_PORT_T__) "."
-				                       "%c",
-				                       ports->a_bus, ports->a_ctrl, ports->a_dma,
-				                       drive_id == ATA_DRIVE_MASTER ? 'm' : 's');
-			}
-			/* Initialize device fields relating to devfs integration. */
-			drive->dn_devno         = devno;
-			drive->dv_dirent        = name; /* Inherit reference */
-			drive->fn_ino           = devfs_devnode_makeino(S_IFBLK, devno);
-			name->dd_dirent.fd_ino = drive->fn_ino;
-			awref_init(&name->dd_dev, drive);
-		}
-
-		/* Register + repart the new drive. */
-		blkdev_repart_and_register(drive);
-		return true;
+		if (specs.capability & HD_DRIVEID_CAPABILITY_DMA)
+			ops = &AtaDrive_DmaOps;
+		_blkdev_init(drive, ops);
 	}
 
-	if ((cl == 0x14 && ch == 0xeb) || /* PATAPI */
-	    (cl == 0x69 && ch == 0x96)) { /* SATAPI */
-		/* TODO (CD drives and the like...) */
+	/* Initialize blkdev fields */
+	drive->mf_part_amask = MAX(PAGESIZE, 1 << DEFAULT_ATA_SECTOR_SHIFT) - 1;
+	drive->mf_blockshift = DEFAULT_ATA_SECTOR_SHIFT;
+
+	/* 2-byte (1 == log2(2)) alignment is all ATA needs (I think...)
+	 *
+	 * As far as I can  tell, this could actually  be set to `0',  but
+	 * I still set it to `1' (2-byte alignment) so that when not doing
+	 * DMA transfers, we're  operating on  properly aligned  addresses
+	 * during our  insw() /  outsw(), and  don't have  to worry  about
+	 * some individual word needing to be written to 2 pages (iow:  we
+	 * can use `insphysw()' and `outsphysw()' directly, both of  which
+	 * documents a 2-byte alignment requirement). */
+	drive->mf_iobashift = 1;
+
+	atomic64_init(&drive->mf_filesize, drive->ad_sector_count << AtaDrive_GetSectorShift(drive));
+	drive->dv_driver = incref(&drv_self);
+	drive->fn_mode   = S_IFBLK | 0644;
+	LIST_ENTRY_UNBOUND_INIT(&drive->fn_allnodes);                            /* Initialized later (by `blkdev_repart_and_register()') */
+	DBG_memset(&drive->fn_supent, 0xcc, sizeof(drive->fn_supent));           /* *ditto* */
+	drive->fn_supent.rb_rhs = FSUPER_NODES_DELETED;                          /* *ditto* */
+	DBG_memset(&drive->fn_ino, 0xcc, sizeof(drive->fn_ino));                 /* *ditto* */
+	DBG_memset(&drive->dn_devno, 0xcc, sizeof(drive->dn_devno));             /* *ditto* */
+	drive->dv_dirent = NULL;                                                 /* *ditto* */
+	DBG_memset(&drive->dv_byname_node, 0xcc, sizeof(drive->dv_byname_node)); /* *ditto* */
+	drive->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;                    /* *ditto* */
+
+	/* Initialize stuff relating to `AtaDrive' */
+	drive->ad_bus                   = (REF AtaBus *)incref(bus);
+	drive->ad_drive                 = drive_id;
+	drive->ad_chs_number_of_heads   = (u8)specs.heads;
+	drive->ad_chs_cylinders         = (u16)specs.cyls;
+	drive->ad_chs_sectors_per_track = (u8)specs.sectors;
+	drive->ad_features              = ATA_DRIVE_FEATURE_F_NORMAL;
+	if (specs.command_set_2 & HD_DRIVEID_COMMAND_SET_2_FLUSH)
+		drive->ad_features |= ATA_DRIVE_FEATURE_F_FLUSH;
+	FINALLY_DECREF_UNLIKELY(drive);
+
+	/* Fill in ATA serial information. */
+	*(char *)mempcpy(drive->bd_rootinfo.br_ata_serial_no, specs.serial_no, 20) = '\0';
+	*(char *)mempcpy(drive->bd_rootinfo.br_ata_fw_rev, specs.fw_rev, 8) = '\0';
+	*(char *)mempcpy(drive->bd_rootinfo.br_ata_model, specs.model, 40) = '\0';
+
+	/* Assign the devno & devfs filename for the device. */
+	{
+		dev_t devno;
+		REF struct devdirent *name;
+		if (is_default_ide) {
+			devno = MKDEV(is_primary_bus ? 3 : 22, drive_id == ATA_DRIVE_MASTER ? 0 : 64);
+			name  = devdirent_newf("hd%c", (is_primary_bus ? 'a' : 'c') + (drive_id == ATA_DRIVE_MASTER ? 0 : 1));
+		} else {
+			devno = MKDEV(DEV_MAJOR_AUTO, 0);
+			name  = devdirent_newf("hdX"
+			                       "%" PRIxN(__SIZEOF_PORT_T__) "."
+			                       "%" PRIxN(__SIZEOF_PORT_T__) "."
+			                       "%" PRIxN(__SIZEOF_PORT_T__) "."
+			                       "%c",
+			                       ports->a_bus, ports->a_ctrl, ports->a_dma,
+			                       drive_id == ATA_DRIVE_MASTER ? 'm' : 's');
+		}
+		/* Initialize device fields relating to devfs integration. */
+		drive->dn_devno         = devno;
+		drive->dv_dirent        = name; /* Inherit reference */
+		drive->fn_ino           = devfs_devnode_makeino(S_IFBLK, devno);
+		name->dd_dirent.fd_ino = drive->fn_ino;
+		awref_init(&name->dd_dev, drive);
 	}
-	return false;
+
+	/* Register + repart the new drive. */
+	blkdev_repart_and_register(drive);
+	return true;
 }
 
 PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
@@ -1504,11 +1491,11 @@ AtaInit_InitializeIde(struct ide_ports *__restrict self, bool is_default_ide) {
 	struct ata_ports a;
 	bool result;
 	printk(FREESTR(KERN_INFO "[ata] Attempting to initialize IDE device {"
-	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
-	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
-	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
-	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
-	                         "%#" PRIxN(__SIZEOF_PORT_T__) "} "
+	                         "pbus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "pctl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "sbus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "sctl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "dma:%#" PRIxN(__SIZEOF_PORT_T__) "} "
 	                         "(default_ide: %u)\n"),
 	       self->i_primary_bus, self->i_primary_ctrl,
 	       self->i_secondary_bus, self->i_secondary_ctrl,
@@ -1596,16 +1583,12 @@ AtaInit_LoadPciIDE(struct pci_device *__restrict dev) {
 	i.i_dma_ctrl = (port_t)-1;
 
 	/* Check if this IDE may support DMA mode. */
-	if (dev->pd_regions[4].pmr_is_IO && dev->pd_regions[4].pmr_size >= 16) {
+	if (!ide_nodma && dev->pd_regions[4].pmr_is_IO && dev->pd_regions[4].pmr_size >= 16) {
 		i.i_dma_ctrl = (port_t)dev->pd_regions[4].pmr_addr;
 		pci_device_cfg_writel(dev, PCI_DEV4,
 		                      (pci_device_cfg_readl(dev, PCI_DEV4) & ~(PCI_CDEV4_NOIRQ)) |
 		                      (PCI_CDEV4_BUSMASTER | PCI_CDEV4_ALLOW_MEMWRITE));
 	}
-
-	/* Forceably disable DMA, the same way a bus without support would */
-	if (ide_nodma)
-		i.i_dma_ctrl = (port_t)-1;
 	if (!AtaInit_InitializeIde(&i, result))
 		result = false;
 	return result;
