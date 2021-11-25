@@ -1593,6 +1593,27 @@ gc_glink_backup_init(struct gc_glink_backup *__restrict self) {
 		                    (void **)gc_glink_backup_allsuper(self),
 		                    offsetof(struct fsuper, fs_root.fn_allsuper));
 	}
+
+	/* TODO: During leak scans, `mnode::mn_minaddr' is set-up such that  it
+	 *       can point to practically any memory location, however we don't
+	 *       actually  want that point to be considered as pointing to data
+	 *       that should be considered reachable.
+	 * Solution:
+	 *  - Because `mn_minaddr' is normally PAGE-aligned, and we only accept
+	 *    values that are pointer aligned, we normally also recognize  this
+	 *    field  as a  pointer. To work  around this, just  |=1 the minaddr
+	 *    field of every mnode in existence.
+	 *  - Then, once scanning of memory is done, we just &=~1 all of those
+	 *    fields.
+	 *  - Fun fact: this won't even break the rb-trees!
+	 * Only problem is that we need some way of enumerating all mmans  on
+	 * the entire system. Also, while we're at it, `mn_link' must also be
+	 * changed such that it doesn't carry over to neighboring nodes.
+	 *
+	 * XXX: This whole |=1 idea seems kind-of useful; why not use this trick
+	 *      for global object lists as well?  That way, we wouldn't have  to
+	 *      do dynamic memory allocation!
+	 */
 }
 
 

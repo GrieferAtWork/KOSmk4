@@ -25,12 +25,14 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/event.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/printk.h>
 #include <kernel/paging.h>
 #include <sched/arch/userkern.h>
 #include <sched/cpu.h>
@@ -130,14 +132,36 @@ extern byte_t __kernel_permman_size[];
 
 
 #define _sizeof_mman ((size_t)__kernel_permman_size + PAGEDIR_SIZE)
-#define _mman_alloc()                                                                              \
+#define _mman_alloc_untraced()                                                                     \
 	(struct mman *)mman_map_kram(MHINT_GETADDR(KERNEL_MHINT_MMAN), _sizeof_mman,                   \
 	                             gfp_from_mapflags(MHINT_GETMODE(KERNEL_MHINT_MMAN)) |             \
 	                             GFP_MAP_32BIT | /*TODO: `GFP_MAP_32BIT' is only needed on i386!*/ \
 	                             GFP_LOCKED | GFP_PREFLT,                                          \
 	                             MAX_C(PAGEDIR_ALIGN, alignof(struct mman)))
-#define _mman_free(self) \
+#define _mman_free_untraced(self) \
 	mman_unmap_kram(self, _sizeof_mman)
+
+#ifdef CONFIG_TRACE_MALLOC
+PRIVATE ATTR_RETNONNULL WUNUSED struct mman *KCALL _mman_alloc(void) {
+	void *result;
+	result = _mman_alloc_untraced();
+	TRY {
+		/* Trace memory, excluding the leading page directory. */
+		kmalloc_trace((byte_t *)result + PAGEDIR_SIZE,
+		              (size_t)__kernel_permman_size,
+		              GFP_NORMAL);
+	} EXCEPT {
+		_mman_free_untraced(result);
+		RETHROW();
+	}
+	return (struct mman *)result;
+}
+#define _mman_free(self) \
+	(kmalloc_untrace((byte_t *)(self) + PAGEDIR_SIZE), _mman_free_untraced(self))
+#else /* CONFIG_TRACE_MALLOC */
+#define _mman_alloc _mman_alloc_untraced
+#define _mman_free  _mman_free_untraced
+#endif /* !CONFIG_TRACE_MALLOC */
 
 
 
@@ -146,6 +170,7 @@ extern byte_t __kernel_permman_size[];
 /* Memory manager reference counting control. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_free)(struct mman *__restrict self) {
+	printk(KERN_DEBUG "_mman_free(%p)\n", self);
 	_mman_free(self);
 }
 
@@ -210,6 +235,7 @@ PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
 mman_new(void) THROWS(E_BADALLOC) {
 	REF struct mman *result;
 	result = _mman_alloc();
+	printk(KERN_DEBUG "_mman_alloc() -> %p\n", result);
 
 	/* Copy the PER-VM initialization template. */
 	memcpy((byte_t *)result + PAGEDIR_SIZE, __kernel_permman_start,
