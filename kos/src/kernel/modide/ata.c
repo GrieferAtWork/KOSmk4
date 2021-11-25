@@ -1188,6 +1188,7 @@ PRIVATE struct blkdev_ops const AtaDrive_Lba48Ops = INITIALIZE_DRIVE_OPS(&AtaDri
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL AtaBus_Destroy)(struct refcountable *__restrict self) {
 	AtaBus *me = (AtaBus *)self;
+	hisr_unregister((isr_function_t)AtaBus_HW_GetInterruptHandler(me), me);
 	if (me->ab_dmaio != (port_t)-1)
 		mman_unmap_kram(me->ab_prdt, PAGESIZE);
 	_AtaBus_Free(me);
