@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/heap.h>
 #include <kernel/malloc-defs.h>
 #include <kernel/mman.h>
 #include <kernel/mman/kram.h>
@@ -621,7 +622,7 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 
 	/* Check if there are still enough parts left for self-replication. */
 	if (mcoreheap_freecount >= 2)
-		return result;
+		goto done;
 
 	/* We're down to the last couple of (for this purpose reserved) nodes.
 	 * As such,  use  the last  2  of  them to  replicate  the  core-heap. */
@@ -633,7 +634,12 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 	 * assert that a mem-core-page is capable of holding at least that many
 	 * core-parts. */
 	assert(mcoreheap_freecount >= 3);
-	return mcoreheap_alloc_impl();
+	result = mcoreheap_alloc_impl();
+done:
+#ifdef CONFIG_DEBUG_HEAP
+	mempatl(result, DEBUGHEAP_FRESH_MEMORY, sizeof(*result));
+#endif /* CONFIG_DEBUG_HEAP */
+	return result;
 }
 
 
@@ -698,6 +704,10 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 	assertf(INUSE_BITSET_GET(page, index),
 	        "Part at %p (index %u in page at %p) not marked as allocated",
 	        part, index, page);
+#ifdef CONFIG_DEBUG_HEAP
+	mempatl(part, DEBUGHEAP_NO_MANS_LAND, sizeof(*part));
+#endif /* CONFIG_DEBUG_HEAP */
+
 	was_all_used = mcorepage_allused(page);
 
 	/* Clear the in-use bit of the part. */

@@ -111,7 +111,9 @@ NOTHROW(KCALL FUNC(slab_service_pending))(void) {
 	while (pend) {
 		next = pend->spf_next;
 		assert(KERNEL_SLAB_CHECKPTR(pend));
+#ifdef CONFIG_DEBUG_HEAP
 		mempatl(pend, DEBUGHEAP_NO_MANS_LAND, sizeof(void *));
+#endif /* CONFIG_DEBUG_HEAP */
 		FUNC(slab_dofreeptr)(SLAB_GET(pend), pend, GFP_NORMAL);
 		pend = next;
 	}
