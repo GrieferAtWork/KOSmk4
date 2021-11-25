@@ -937,20 +937,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  - After a couple of restarts, the kernel will panic because /dev/console got destroyed
 	 * Only logical conclusion: there's a missing incref() somewhere. */
 
-	/* TODO: There is a design with how parts of memfd files are kept:
-	 *  - User-space holds a reference to the mfile
-	 *  - Each of the mfile's parts holds a reference to the file
-	 *  - Each of the parts is referenced by MPART_F_GLOBAL_REF
-	 * Problem:  parts will continue to exist even after the memfd is close(2)'d
-	 * Solution: There needs to be a wrapper object for memfd that forwards all
-	 *           operators to the normal memfd, but when close(2)'d, will  call
-	 *           `mfile_delete()' prior to decref'ing the memfd.
-	 * Idea:     Add a new handle type HANDLE_TYPE_TEMPHANDLE that uses the  same
-	 *           operators as `filehandle', but defines a custom destroy operator
-	 *           which calls mfile_delete() before decref()ing the inner file.
-	 * This way, all of the memfd's parts will be made anonymous, which will also
-	 * clear the GLOBAL_REF flags (and references). */
-
 	return state;
 }
 
