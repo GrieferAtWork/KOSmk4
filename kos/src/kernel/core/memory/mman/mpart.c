@@ -892,20 +892,20 @@ NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
 
 
 /* Lock for `mpart_all_list' */
-PUBLIC struct atomic_lock mpart_all_lock = ATOMIC_LOCK_INIT;
+PUBLIC ATTR_MALL_UNTRACKED struct atomic_lock mpart_all_lock = ATOMIC_LOCK_INIT;
 
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
  * NOTE: This list holds a reference to every contain part that wasn't
  *       already destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
-PUBLIC struct mpart_list mpart_all_list = LIST_HEAD_INITIALIZER(mpart_all_list);
+PUBLIC ATTR_MALL_UNTRACKED struct mpart_list mpart_all_list = LIST_HEAD_INITIALIZER(mpart_all_list);
 
 /* [0..n][lock(ATOMIC)] List of lock-ops for `mpart_all_list' */
 PUBLIC struct lockop_slist mpart_all_lops = SLIST_HEAD_INITIALIZER(mpart_all_lops);
 
 #ifndef CONFIG_NO_MPART_ALL_SIZE
 /* [lock(mpart_all_lock)] The # of parts stored in `mpart_all_list' */
-PUBLIC size_t mpart_all_size = 0;
+PUBLIC ATTR_MALL_UNTRACKED size_t mpart_all_size = 0;
 #endif /* !CONFIG_NO_MPART_ALL_SIZE */
 
 

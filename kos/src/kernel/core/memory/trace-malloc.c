@@ -38,11 +38,15 @@
 #include <debugger/util.h>
 #include <kernel/addr2line.h>
 #include <kernel/except.h>
+#include <kernel/fs/allnodes.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/super.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
@@ -1199,6 +1203,40 @@ NOTHROW(KCALL gc_reachable_thread)(void *UNUSED(arg),
 #endif
 
 
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
+NOTHROW(KCALL gc_reachable_allmparts)(void) {
+	size_t result = 0;
+	struct mpart *iter;
+	LIST_FOREACH (iter, &mpart_all_list, mp_allparts) {
+		if (!wasdestroyed(iter) && (iter->mp_flags & MPART_F_GLOBAL_REF))
+			result += gc_reachable_pointer(iter);
+	}
+	return result;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
+NOTHROW(KCALL gc_reachable_fallnodes)(void) {
+	size_t result = 0;
+	struct fnode *iter;
+	LIST_FOREACH (iter, &fallnodes_list, fn_allnodes) {
+		if (!wasdestroyed(iter) && (iter->mf_flags & MFILE_FN_GLOBAL_REF))
+			result += gc_reachable_pointer(iter);
+	}
+	return result;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
+NOTHROW(KCALL gc_reachable_fallsuper)(void) {
+	size_t result = 0;
+	struct fsuper *iter;
+	LIST_FOREACH (iter, &fallsuper_list, fs_root.fn_allsuper) {
+		if (!wasdestroyed(iter) && (iter->fs_root.mf_flags & MFILE_FN_GLOBAL_REF))
+			result += gc_reachable_pointer(iter);
+	}
+	return result;
+}
+
+
 /* Scan the kernel for all reachable, traced pointers. */
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_find_reachable)(void) {
@@ -1240,6 +1278,19 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan core base\n");
 	gc_reachable_corepage_chain(LIST_FIRST(&mcoreheap_freelist));
 	gc_reachable_corepage_chain(LIST_FIRST(&mcoreheap_usedlist));
+
+	/* To  facilitate file caching, KOS keeps track of a global list of all mem-
+	 * parts. Technically, any mem-part found in this list is reachable, but for
+	 * the sake of semantics, _only_  those parts which have  MPART_F_GLOBAL_REF
+	 * set may be considered as *actually* reachable. */
+	PRINT_LEAKS_SEARCH_PHASE("Phase #3.1: Scan globally referenced mem-parts\n");
+	gc_reachable_allmparts();
+
+	/* Same as with global mem-parts; only `MFILE_FN_GLOBAL_REF' files may be
+	 * considered as non-leaks! */
+	PRINT_LEAKS_SEARCH_PHASE("Phase #3.2: Scan globally referenced file-nodes\n");
+	gc_reachable_fallnodes();
+	gc_reachable_fallsuper();
 
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Scan loaded drivers\n");
@@ -1579,6 +1630,18 @@ again:
 		sched_super_override_end();
 		while (!sync_canwrite(&trace_heap.h_lock))
 			task_yield();
+		goto again;
+	}
+	if (!mpart_all_available()) {
+		mman_lock_endwrite(&mman_kernel);
+		sched_super_override_end();
+		mpart_all_waitfor();
+		goto again;
+	}
+	if (!fallnodes_available()) {
+		mman_lock_endwrite(&mman_kernel);
+		sched_super_override_end();
+		mpart_all_waitfor();
 		goto again;
 	}
 

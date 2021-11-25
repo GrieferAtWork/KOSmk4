@@ -25,6 +25,7 @@
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/ramfs.h>
+#include <kernel/malloc.h>
 
 DECL_BEGIN
 
@@ -32,13 +33,13 @@ DECL_BEGIN
 /* List of all file-nodes (excluding superblock root nodes)             */
 /************************************************************************/
 
-extern struct fnode _fallnodes_list__INIT[];
 /* [0..n][lock(fallnodes_list)] List of all file nodes */
+
 REF_IF([*]._fnode_file_ mf_flags & MFILE_FN_GLOBAL_REF)
-PUBLIC struct fnode_list fallnodes_list = { _fallnodes_list__INIT };
+PUBLIC ATTR_MALL_UNTRACKED struct fnode_list fallnodes_list = LIST_HEAD_INITIALIZER(fallnodes_list);
 
 /* Lock for `fallnodes_list' */
-PUBLIC struct atomic_lock fallnodes_lock = ATOMIC_LOCK_INIT;
+PUBLIC ATTR_MALL_UNTRACKED struct atomic_lock fallnodes_lock = ATOMIC_LOCK_INIT;
 
 /* Lock operations for `fallnodes_list' */
 PUBLIC struct lockop_slist fallnodes_lockops = SLIST_HEAD_INITIALIZER(fallnodes_lockops);
@@ -52,10 +53,15 @@ PUBLIC struct lockop_slist fallnodes_lockops = SLIST_HEAD_INITIALIZER(fallnodes_
 
 /* [0..n][lock(fallsuper_list)] List of all super blocks */
 REF_IF([*].fs_root._fdirnode_node_ _fnode_file_ mf_flags & MFILE_FN_GLOBAL_REF)
+#ifdef CONFIG_TRACE_MALLOC
+ATTR_MALL_UNTRACKED /* Initialized in `kernel_initialize_rootfs()' */
+PUBLIC struct fsuper_list fallsuper_list = LIST_HEAD_INITIALIZER(fallsuper_list);
+#else /* CONFIG_TRACE_MALLOC */
 PUBLIC struct fsuper_list fallsuper_list = { &devfs };
+#endif /* !CONFIG_TRACE_MALLOC */
 
 /* Lock for `fallsuper_list' */
-PUBLIC struct atomic_lock fallsuper_lock = ATOMIC_LOCK_INIT;
+PUBLIC ATTR_MALL_UNTRACKED struct atomic_lock fallsuper_lock = ATOMIC_LOCK_INIT;
 
 /* Lock operations for `fallsuper_list' */
 PUBLIC struct lockop_slist fallsuper_lockops = SLIST_HEAD_INITIALIZER(fallsuper_lockops);

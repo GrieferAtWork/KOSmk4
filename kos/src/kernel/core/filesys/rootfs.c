@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver-param.h>
+#include <kernel/fs/allnodes.h>
 #include <kernel/fs/blkdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/filesys.h>
@@ -350,6 +351,11 @@ NOTHROW(KCALL kernel_initialize_rootfs)(void) {
 	struct pathmount *mount;
 	REF struct fsuper *super;
 	bool newly_created;
+
+#ifdef CONFIG_TRACE_MALLOC
+	/* Must be initialized here because of `ATTR_MALL_UNTRACKED' */
+	fallsuper_list.lh_first = &devfs;
+#endif /* CONFIG_TRACE_MALLOC */
 
 	/* Open the filesystem of the partition */
 	super = kernel_open_rootfs(&newly_created);

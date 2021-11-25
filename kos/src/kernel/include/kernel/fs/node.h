@@ -306,6 +306,9 @@ struct fnode
 	                                          * nodes. In this case, the `MFILE_F_PERSISTENT' flag may be
 	                                          * assumed to have already been cleared. */
 #endif /* !__WANT_FNODE__fn_suplop */
+#ifdef __WANT_FS_INIT
+#define FNODE_INIT_fn_allnodes { LIST_ENTRY_UNBOUND_INITIALIZER }
+#endif /* __WANT_FS_INIT */
 	union {
 		LIST_ENTRY(fnode)       fn_allnodes; /* [0..1][lock(:fnode_all_lock && REMOVE_ONCE)][valid_if(!fnode_issuper(self))]
 		                                      * Link entry within the global list of all file nodes. When `MFILE_FN_GLOBAL_REF'

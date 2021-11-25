@@ -145,19 +145,6 @@ local byInoTrees: {(string, Callable, Cell with llrbtree.RbNode)...} = List(
 	for (local c, fun: MAKEINO_FUNCTIONS)
 		(c, fun, generateInoTree(fun)));
 
-// Generate the static initialization for the all-nodes list
-local allNodesList: {string: (string, string)} = Dict();
-for (local i: [:#DEVICES]) {
-	local name = DEVICES[i].first;
-	local prevName = i
-		? "&dev_{}.dv_devnode.dn_node.fn_allnodes.le_next".format({ DEVICES[i-1].first })
-		: "&fallnodes_list.lh_first";
-	local nextName = (i + 1) < #DEVICES
-		? "&dev_{}.dv_devnode.dn_node".format({ DEVICES[i+1].first })
-		: "NULL";
-	allNodesList[name] = (prevName, nextName);
-}
-
 print("STATIC_ASSERT(offsetof(struct ramfs_dirnode, rdn_dir.dn_node) == 0);");
 print("STATIC_ASSERT(offsetof(struct device, dv_devnode.dn_node) == 0);");
 print("#undef __CCAST");
@@ -193,7 +180,6 @@ for (local name, st_mode, st_rdev: DEVICES) {
 }
 
 // Print static initialization symbols
-print("DEFINE_INTERN_ALIAS(_fallnodes_list__INIT, dev_", DEVICES.first.first, ");");
 print("__SELECT_INO(", ",\n             ".join(
 	for (local none, none, tree: byInoTrees)
 		"DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, {})"
@@ -221,7 +207,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("	.dv_devnode = {");
 	print("		.dn_node = {");
 	print("			.fn_file = {");
-	print("				MFILE_INIT_mf_refcnt(2), /" "* +1: dev_", name, ", +1: MFILE_FN_GLOBAL_REF *" "/");
+	print("				MFILE_INIT_mf_refcnt(1), /" "* +1: dev_", name, " *" "/");
 	print("				MFILE_INIT_mf_ops(&dev_", name, "_ops.cdo_dev.do_node.dno_node.no_file),");
 	print("				MFILE_INIT_mf_lock,");
 	print("				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),");
@@ -229,9 +215,9 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("				MFILE_INIT_mf_lockops,");
 	print("				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),");
 	print("				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),");
-	print("				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |");
-	print("				                    MFILE_F_CHANGED | MFILE_F_NOATIME |");
-	print("				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |");
+	print("				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |");
+	print("				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |");
+	print("				                    MFILE_F_FIXEDFILESIZE |");
 	local extFlags = DEVICE_EXTFLAGS.get(name);
 	if (extFlags !is none)
 		print("				                    ", extFlags, " |");
@@ -260,10 +246,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("				.rb_lhs = __SELECT_INO(", ", ".join(for (local none, node: inoNodes) node.lhs is none ? "NULL" : ("&" + node.lhs.val)), "),");
 	print("				.rb_rhs = __SELECT_INO(", ", ".join(for (local none, node: inoNodes) node.rhs is none ? "NULL" : ("&" + node.rhs.val)), "),");
 	print("			},");
-	print("			{.fn_allnodes = {");
-	print("				.le_next = ", allNodesList[name].last, ",");
-	print("				.le_prev = ", allNodesList[name].first, ",");
-	print("			}},");
+	print("			FNODE_INIT_fn_allnodes,");
 	print("		},");
 	print("		.dn_devno = MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")");
 	print("	},");
@@ -414,7 +397,6 @@ PRIVATE struct devdirent dirent_dev_tty = {
 		.fd_name    = "tty"
 	}
 };
-DEFINE_INTERN_ALIAS(_fallnodes_list__INIT, dev_mem);
 __SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port),
              DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port));
 DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, dev_port);
@@ -434,7 +416,7 @@ PUBLIC struct device dev_mem = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_mem, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_mem */
 				MFILE_INIT_mf_ops(&dev_mem_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -442,9 +424,9 @@ PUBLIC struct device dev_mem = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -464,10 +446,7 @@ PUBLIC struct device dev_mem = {
 				.rb_lhs = __SELECT_INO(NULL, NULL),
 				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_kmem.dv_devnode.dn_node,
-				.le_prev = &fallnodes_list.lh_first,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 1)
 	},
@@ -485,7 +464,7 @@ PUBLIC struct device dev_kmem = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_kmem, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_kmem */
 				MFILE_INIT_mf_ops(&dev_kmem_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -493,9 +472,9 @@ PUBLIC struct device dev_kmem = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -515,10 +494,7 @@ PUBLIC struct device dev_kmem = {
 				.rb_lhs = __SELECT_INO(&dev_mem.dv_devnode.dn_node, &dev_mem.dv_devnode.dn_node),
 				.rb_rhs = __SELECT_INO(&dev_null.dv_devnode.dn_node, &dev_null.dv_devnode.dn_node),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_null.dv_devnode.dn_node,
-				.le_prev = &dev_mem.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 2)
 	},
@@ -536,7 +512,7 @@ PUBLIC struct device dev_null = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_null, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_null */
 				MFILE_INIT_mf_ops(&dev_null_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -544,9 +520,9 @@ PUBLIC struct device dev_null = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -566,10 +542,7 @@ PUBLIC struct device dev_null = {
 				.rb_lhs = __SELECT_INO(NULL, NULL),
 				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_port.dv_devnode.dn_node,
-				.le_prev = &dev_kmem.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 3)
 	},
@@ -587,7 +560,7 @@ PUBLIC struct device dev_port = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_port, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_port */
 				MFILE_INIT_mf_ops(&dev_port_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -595,9 +568,9 @@ PUBLIC struct device dev_port = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -617,10 +590,7 @@ PUBLIC struct device dev_port = {
 				.rb_lhs = __SELECT_INO(&dev_kmem.dv_devnode.dn_node, &dev_kmem.dv_devnode.dn_node),
 				.rb_rhs = __SELECT_INO(&dev_urandom.dv_devnode.dn_node, &dev_urandom.dv_devnode.dn_node),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_zero.dv_devnode.dn_node,
-				.le_prev = &dev_null.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 4)
 	},
@@ -638,7 +608,7 @@ PUBLIC struct device dev_zero = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_zero, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_zero */
 				MFILE_INIT_mf_ops(&dev_zero_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -646,9 +616,9 @@ PUBLIC struct device dev_zero = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
@@ -667,10 +637,7 @@ PUBLIC struct device dev_zero = {
 				.rb_lhs = __SELECT_INO(NULL, NULL),
 				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_full.dv_devnode.dn_node,
-				.le_prev = &dev_port.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 5)
 	},
@@ -688,7 +655,7 @@ PUBLIC struct device dev_full = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_full, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_full */
 				MFILE_INIT_mf_ops(&dev_full_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -696,9 +663,9 @@ PUBLIC struct device dev_full = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
@@ -719,10 +686,7 @@ PUBLIC struct device dev_full = {
 				.rb_lhs = __SELECT_INO(&dev_zero.dv_devnode.dn_node, &dev_zero.dv_devnode.dn_node),
 				.rb_rhs = __SELECT_INO(&dev_random.dv_devnode.dn_node, &dev_random.dv_devnode.dn_node),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_random.dv_devnode.dn_node,
-				.le_prev = &dev_zero.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 7)
 	},
@@ -740,7 +704,7 @@ PUBLIC struct device dev_random = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_random, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_random */
 				MFILE_INIT_mf_ops(&dev_random_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -748,9 +712,9 @@ PUBLIC struct device dev_random = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -770,10 +734,7 @@ PUBLIC struct device dev_random = {
 				.rb_lhs = __SELECT_INO(NULL, NULL),
 				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_urandom.dv_devnode.dn_node,
-				.le_prev = &dev_full.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 8)
 	},
@@ -791,7 +752,7 @@ PUBLIC struct device dev_urandom = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_urandom, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_urandom */
 				MFILE_INIT_mf_ops(&dev_urandom_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -799,9 +760,9 @@ PUBLIC struct device dev_urandom = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
@@ -822,10 +783,7 @@ PUBLIC struct device dev_urandom = {
 				.rb_lhs = __SELECT_INO(&dev_full.dv_devnode.dn_node, &dev_full.dv_devnode.dn_node),
 				.rb_rhs = __SELECT_INO(&dev_tty.dv_devnode.dn_node, &dev_tty.dv_devnode.dn_node),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_kmsg.dv_devnode.dn_node,
-				.le_prev = &dev_random.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 9)
 	},
@@ -843,7 +801,7 @@ PUBLIC struct device dev_kmsg = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_kmsg, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_kmsg */
 				MFILE_INIT_mf_ops(&dev_kmsg_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -851,9 +809,9 @@ PUBLIC struct device dev_kmsg = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
@@ -874,10 +832,7 @@ PUBLIC struct device dev_kmsg = {
 				.rb_lhs = __SELECT_INO(NULL, NULL),
 				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
-			{.fn_allnodes = {
-				.le_next = &dev_tty.dv_devnode.dn_node,
-				.le_prev = &dev_urandom.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(1, 11)
 	},
@@ -895,7 +850,7 @@ PUBLIC struct device dev_tty = {
 	.dv_devnode = {
 		.dn_node = {
 			.fn_file = {
-				MFILE_INIT_mf_refcnt(2), /* +1: dev_tty, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_refcnt(1), /* +1: dev_tty */
 				MFILE_INIT_mf_ops(&dev_tty_ops.cdo_dev.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
@@ -903,9 +858,9 @@ PUBLIC struct device dev_tty = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
-				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
-				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
+				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
+				                    MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
@@ -926,10 +881,7 @@ PUBLIC struct device dev_tty = {
 				.rb_lhs = __SELECT_INO(&dev_kmsg.dv_devnode.dn_node, &dev_kmsg.dv_devnode.dn_node),
 				.rb_rhs = __SELECT_INO(NULL, NULL),
 			},
-			{.fn_allnodes = {
-				.le_next = NULL,
-				.le_prev = &dev_kmsg.dv_devnode.dn_node.fn_allnodes.le_next,
-			}},
+			FNODE_INIT_fn_allnodes,
 		},
 		.dn_devno = MKDEV(5, 0)
 	},
