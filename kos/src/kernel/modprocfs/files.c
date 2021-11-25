@@ -47,6 +47,7 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
@@ -287,9 +288,32 @@ print_mpart_desc(struct mpart *__restrict self,
 	if (flags & MPART_F_GLOBAL_REF)
 		--refcnt;
 	result = format_printf(printer, arg,
-	                       "%" PRIuSIZ ",%s\t%.6" PRIx64 "-%.6" PRIx64 "\t"
+	                       "%" PRIuSIZ ",%s\t%.6" PRIx64 "-%.6" PRIx64 "\t",
+	                       refcnt, statename, minaddr, maxaddr);
+	if (result < 0)
+		return result;
+	{
+		size_t sizeval;
+		char const *unit;
+		sizeval = (size_t)((maxaddr - minaddr) + 1);
+		if (sizeval >= 1024 * 1024 * 1024) {
+			sizeval = CEILDIV(sizeval, 1024 * 1024 * 1024);
+			unit    = "GiB";
+		} else if (sizeval >= 1024 * 1024) {
+			sizeval = CEILDIV(sizeval, 1024 * 1024);
+			unit    = "MiB";
+		} else if (sizeval >= 1024) {
+			sizeval = CEILDIV(sizeval, 1024);
+			unit    = "KiB";
+		} else {
+			unit = "b";
+		}
+		result = format_printf(printer, arg, "%" PRIuSIZ "%s\t", sizeval, unit);
+		if (result < 0)
+			return result;
+	}
+	result = format_printf(printer, arg,
 	                       "%c%c%c%c\t",
-	                       refcnt, statename, minaddr, maxaddr,
 	                       flags & MPART_F_GLOBAL_REF ? 'g' : '-',
 	                       flags & MPART_F_PERSISTENT ? 'p' : '-',
 	                       flags & MPART_F_CHANGED ? 'c' : '-',
