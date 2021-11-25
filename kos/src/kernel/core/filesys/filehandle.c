@@ -23,15 +23,18 @@
 #include <kernel/compiler.h>
 
 #include <fs/vfs.h>
+#include <kernel/fs/devfs.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirhandle.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/filehandle.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
@@ -323,6 +326,67 @@ handle_filehandle_printlink(struct filehandle *__restrict self,
 	return mfile_uprintlink(self->fh_file, printer, arg);
 }
 
+
+/************************************************************************/
+/* Handle operators for `HANDLE_TYPE_TEMPHANDLE'                        */
+/************************************************************************/
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL handle_temphandle_decref)(REF struct filehandle *__restrict self) {
+	struct mfile *file;
+
+	/* Decrement reference counter. */
+	if (ATOMIC_DECFETCH(self->fh_refcnt) != 0)
+		return;
+
+	/* Delete the pointed-to file, using the most appropriate delete function. */
+	file = self->fh_file;
+	if (mfile_isnode(file)) {
+		struct fnode *node = mfile_asnode(file);
+		if (fnode_isdevice(node)) {
+			device_delete(fnode_asdevice(node));
+		} else if (fnode_issuper(node)) {
+			fsuper_delete(fnode_assuper(node));
+		} else {
+			fnode_delete(node);
+		}
+	} else {
+		/* Default: just delete a regular, old file. */
+		mfile_delete(file);
+	}
+
+	/* Invoke the normal destroy function for filehandle objects. */
+	filehandle_destroy(self);
+}
+
+DEFINE_INTERN_ALIAS(handle_temphandle_refcnt, handle_filehandle_refcnt);
+DEFINE_INTERN_ALIAS(handle_temphandle_incref, handle_filehandle_incref);
+/*DEFINE_INTERN_ALIAS(handle_temphandle_decref, handle_filehandle_decref);*/ /* Special handling! */
+DEFINE_INTERN_ALIAS(handle_temphandle_tryincref, handle_filehandle_tryincref);
+DEFINE_INTERN_ALIAS(handle_temphandle_weakgetref, handle_filehandle_weakgetref);
+DEFINE_INTERN_ALIAS(handle_temphandle_weaklckref, handle_filehandle_weaklckref);
+DEFINE_INTERN_ALIAS(handle_temphandle_weakdecref, handle_filehandle_weakdecref);
+DEFINE_INTERN_ALIAS(handle_temphandle_read, handle_filehandle_read);
+DEFINE_INTERN_ALIAS(handle_temphandle_write, handle_filehandle_write);
+DEFINE_INTERN_ALIAS(handle_temphandle_pread, handle_filehandle_pread);
+DEFINE_INTERN_ALIAS(handle_temphandle_pwrite, handle_filehandle_pwrite);
+DEFINE_INTERN_ALIAS(handle_temphandle_readv, handle_filehandle_readv);
+DEFINE_INTERN_ALIAS(handle_temphandle_writev, handle_filehandle_writev);
+DEFINE_INTERN_ALIAS(handle_temphandle_preadv, handle_filehandle_preadv);
+DEFINE_INTERN_ALIAS(handle_temphandle_pwritev, handle_filehandle_pwritev);
+/*DEFINE_INTERN_ALIAS(handle_temphandle_readdir, handle_filehandle_readdir);*/
+DEFINE_INTERN_ALIAS(handle_temphandle_seek, handle_filehandle_seek);
+DEFINE_INTERN_ALIAS(handle_temphandle_ioctl, handle_filehandle_ioctl);
+DEFINE_INTERN_ALIAS(handle_temphandle_truncate, handle_filehandle_truncate);
+DEFINE_INTERN_ALIAS(handle_temphandle_mmap, handle_filehandle_mmap);
+DEFINE_INTERN_ALIAS(handle_temphandle_allocate, handle_filehandle_allocate);
+DEFINE_INTERN_ALIAS(handle_temphandle_sync, handle_filehandle_sync);
+DEFINE_INTERN_ALIAS(handle_temphandle_datasync, handle_filehandle_datasync);
+DEFINE_INTERN_ALIAS(handle_temphandle_stat, handle_filehandle_stat);
+DEFINE_INTERN_ALIAS(handle_temphandle_pollconnect, handle_filehandle_pollconnect);
+DEFINE_INTERN_ALIAS(handle_temphandle_polltest, handle_filehandle_polltest);
+DEFINE_INTERN_ALIAS(handle_temphandle_hop, handle_filehandle_hop);
+DEFINE_INTERN_ALIAS(handle_temphandle_tryas, handle_filehandle_tryas);
+DEFINE_INTERN_ALIAS(handle_temphandle_printlink, handle_filehandle_printlink);
 
 DECL_END
 

@@ -466,6 +466,37 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_filehandle_hop(struct 
 INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_filehandle_tryas(struct filehandle *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_filehandle_printlink(struct filehandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
+/* Handle operators for `HANDLE_TYPE_TEMPHANDLE' (`struct filehandle') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_temphandle_refcnt)(struct filehandle const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_temphandle_incref)(struct filehandle *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_temphandle_decref)(REF struct filehandle *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_temphandle_tryincref)(struct filehandle *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_temphandle_weakgetref)(struct filehandle *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct filehandle *NOTHROW(FCALL handle_temphandle_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_temphandle_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_temphandle_read(struct filehandle *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_temphandle_write(struct filehandle *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_temphandle_pread(struct filehandle *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_temphandle_pwrite(struct filehandle *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_temphandle_readv(struct filehandle *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_temphandle_writev(struct filehandle *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_temphandle_preadv(struct filehandle *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_temphandle_pwritev(struct filehandle *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_temphandle_readdir(struct filehandle *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_temphandle_seek(struct filehandle *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_temphandle_ioctl(struct filehandle *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_truncate(struct filehandle *__restrict self, pos_t new_size) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_temphandle_mmap(struct filehandle *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_temphandle_allocate(struct filehandle *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_sync(struct filehandle *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_datasync(struct filehandle *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_stat(struct filehandle *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_pollconnect(struct filehandle *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_temphandle_polltest(struct filehandle *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_temphandle_hop(struct filehandle *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_temphandle_tryas(struct filehandle *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_temphandle_printlink(struct filehandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
+
 /* Handle operators for `HANDLE_TYPE_DIRHANDLE' (`struct dirhandle') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_dirhandle_refcnt)(struct dirhandle const *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_dirhandle_incref)(struct dirhandle *__restrict self);

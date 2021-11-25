@@ -138,7 +138,8 @@ handle_datasize(struct handle const *__restrict self,
 		value = (pos_t)me->fd_namelen;
 	}	break;
 
-	case HANDLE_TYPE_FILEHANDLE: {
+	case HANDLE_TYPE_FILEHANDLE:
+	case HANDLE_TYPE_TEMPHANDLE: {
 		struct filehandle *me;
 		me = (struct filehandle *)self->h_data;
 		value = mfile_datasize(me->fh_file);

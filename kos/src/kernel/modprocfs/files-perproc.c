@@ -1719,6 +1719,7 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 	switch (me->pfl_handtyp) {
 
 	case HANDLE_TYPE_FILEHANDLE:
+	case HANDLE_TYPE_TEMPHANDLE:
 	case HANDLE_TYPE_FIFOHANDLE: {
 		struct filehandle *hand;
 		STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));

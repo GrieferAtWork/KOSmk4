@@ -1480,6 +1480,7 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		switch (hand.h_type) {
 
 		case HANDLE_TYPE_FILEHANDLE:
+		case HANDLE_TYPE_TEMPHANDLE:
 		case HANDLE_TYPE_DIRHANDLE:
 		case HANDLE_TYPE_FIFOHANDLE: {
 			STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct dirhandle, dh_path));

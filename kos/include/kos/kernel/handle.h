@@ -57,23 +57,26 @@
                                             * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRENT */
 #define HANDLE_TYPE_FILEHANDLE      0x0004 /* `struct filehandle'
                                             * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRENT */
-#define HANDLE_TYPE_DIRHANDLE       0x0005 /* `struct dirhandle'
+#define HANDLE_TYPE_TEMPHANDLE      0x0005 /* `struct filehandle'
+                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRENT
+                                            * Like `HANDLE_TYPE_FILEHANDLE', but bound file is deleted on `close(2)' */
+#define HANDLE_TYPE_DIRHANDLE       0x0006 /* `struct dirhandle'
                                             * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRENT */
-#define HANDLE_TYPE_FIFOHANDLE      0x0006 /* `struct fifohandle' */
-#define HANDLE_TYPE_SOCKET          0x0007 /* `struct socket' */
-#define HANDLE_TYPE_EPOLL           0x0008 /* `struct epoll_controller' */
-#define HANDLE_TYPE_PIPE            0x0009 /* `struct pipe' */
-#define HANDLE_TYPE_PIPE_READER     0x000a /* `struct pipe_reader' */
-#define HANDLE_TYPE_PIPE_WRITER     0x000b /* `struct pipe_writer' */
-#define HANDLE_TYPE_EVENTFD_FENCE   0x000c /* `struct eventfd' (without `EFD_SEMAPHORE') */
-#define HANDLE_TYPE_EVENTFD_SEMA    0x000d /* `struct eventfd' (with `EFD_SEMAPHORE') */
-#define HANDLE_TYPE_SIGNALFD        0x000e /* `struct signalfd' */
-#define HANDLE_TYPE_FUTEXFD         0x000f /* `struct mfutexfd' */
-#define HANDLE_TYPE_TASK            0x0010 /* `struct taskpid' */
-#define HANDLE_TYPE_MODULE          0x0011 /* `struct module' */
-#define HANDLE_TYPE_DRIVER_LOADLIST 0x0012 /* `struct driver_loadlist' */
-#define HANDLE_TYPE_REFCOUNTABLE    0x0013 /* `struct refcountable' */
-#define HANDLE_TYPE_COUNT           0x0014 /* # of recognized handle types
+#define HANDLE_TYPE_FIFOHANDLE      0x0007 /* `struct fifohandle' */
+#define HANDLE_TYPE_SOCKET          0x0008 /* `struct socket' */
+#define HANDLE_TYPE_EPOLL           0x0009 /* `struct epoll_controller' */
+#define HANDLE_TYPE_PIPE            0x000a /* `struct pipe' */
+#define HANDLE_TYPE_PIPE_READER     0x000b /* `struct pipe_reader' */
+#define HANDLE_TYPE_PIPE_WRITER     0x000c /* `struct pipe_writer' */
+#define HANDLE_TYPE_EVENTFD_FENCE   0x000d /* `struct eventfd' (without `EFD_SEMAPHORE') */
+#define HANDLE_TYPE_EVENTFD_SEMA    0x000e /* `struct eventfd' (with `EFD_SEMAPHORE') */
+#define HANDLE_TYPE_SIGNALFD        0x000f /* `struct signalfd' */
+#define HANDLE_TYPE_FUTEXFD         0x0010 /* `struct mfutexfd' */
+#define HANDLE_TYPE_TASK            0x0011 /* `struct taskpid' */
+#define HANDLE_TYPE_MODULE          0x0012 /* `struct module' */
+#define HANDLE_TYPE_DRIVER_LOADLIST 0x0013 /* `struct driver_loadlist' */
+#define HANDLE_TYPE_REFCOUNTABLE    0x0014 /* `struct refcountable' */
+#define HANDLE_TYPE_COUNT           0x0015 /* # of recognized handle types
                                             * NOTE: After changing  this value,  be sure  to
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 

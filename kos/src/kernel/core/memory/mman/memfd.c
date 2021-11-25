@@ -189,7 +189,11 @@ DEFINE_SYSCALL2(fd_t, memfd_create,
 	                 E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS);
 
 	/* Construct the new mem-fd object. */
-	hand.h_type = HANDLE_TYPE_FILEHANDLE;
+
+	/* Use TEMPHANDLE, so the memfd is deleted during close()
+	 * If we used a normal FILEHANDLE, we'd get a reference leak:
+	 *       mpart_all_list->mpart->memfd */
+	hand.h_type = HANDLE_TYPE_TEMPHANDLE;
 	hand.h_mode = IO_RDWR;
 	if (flags & MFD_CLOEXEC)
 		hand.h_mode |= IO_CLOEXEC;

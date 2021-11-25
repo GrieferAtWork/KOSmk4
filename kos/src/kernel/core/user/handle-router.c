@@ -342,6 +342,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          =  "dirent",
 		[HANDLE_TYPE_PATH]            =  "path",
 		[HANDLE_TYPE_FILEHANDLE]      =  "filehandle",
+		[HANDLE_TYPE_TEMPHANDLE]      =  "temphandle",
 		[HANDLE_TYPE_DIRHANDLE]       =  "dirhandle",
 		[HANDLE_TYPE_FIFOHANDLE]      =  "fifohandle",
 		[HANDLE_TYPE_SOCKET]          =  "socket",
@@ -364,6 +365,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_dirent_refcnt,
 		[HANDLE_TYPE_PATH]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_path_refcnt,
 		[HANDLE_TYPE_FILEHANDLE]      = (refcnt_t (FCALL *)(void const *__restrict))&handle_filehandle_refcnt,
+		[HANDLE_TYPE_TEMPHANDLE]      = (refcnt_t (FCALL *)(void const *__restrict))&handle_temphandle_refcnt,
 		[HANDLE_TYPE_DIRHANDLE]       = (refcnt_t (FCALL *)(void const *__restrict))&handle_dirhandle_refcnt,
 		[HANDLE_TYPE_FIFOHANDLE]      = (refcnt_t (FCALL *)(void const *__restrict))&handle_fifohandle_refcnt,
 		[HANDLE_TYPE_SOCKET]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_socket_refcnt,
@@ -386,6 +388,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (FCALL *)(void *__restrict))&handle_dirent_incref,
 		[HANDLE_TYPE_PATH]            = (void (FCALL *)(void *__restrict))&handle_path_incref,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (FCALL *)(void *__restrict))&handle_filehandle_incref,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (FCALL *)(void *__restrict))&handle_temphandle_incref,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(void *__restrict))&handle_dirhandle_incref,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(void *__restrict))&handle_fifohandle_incref,
 		[HANDLE_TYPE_SOCKET]          = (void (FCALL *)(void *__restrict))&handle_socket_incref,
@@ -408,6 +411,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (FCALL *)(REF void *__restrict))&handle_dirent_decref,
 		[HANDLE_TYPE_PATH]            = (void (FCALL *)(REF void *__restrict))&handle_path_decref,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (FCALL *)(REF void *__restrict))&handle_filehandle_decref,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (FCALL *)(REF void *__restrict))&handle_temphandle_decref,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(REF void *__restrict))&handle_dirhandle_decref,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(REF void *__restrict))&handle_fifohandle_decref,
 		[HANDLE_TYPE_SOCKET]          = (void (FCALL *)(REF void *__restrict))&handle_socket_decref,
@@ -430,6 +434,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (__BOOL (FCALL *)(void *__restrict))&handle_dirent_tryincref,
 		[HANDLE_TYPE_PATH]            = (__BOOL (FCALL *)(void *__restrict))&handle_path_tryincref,
 		[HANDLE_TYPE_FILEHANDLE]      = (__BOOL (FCALL *)(void *__restrict))&handle_filehandle_tryincref,
+		[HANDLE_TYPE_TEMPHANDLE]      = (__BOOL (FCALL *)(void *__restrict))&handle_temphandle_tryincref,
 		[HANDLE_TYPE_DIRHANDLE]       = (__BOOL (FCALL *)(void *__restrict))&handle_dirhandle_tryincref,
 		[HANDLE_TYPE_FIFOHANDLE]      = (__BOOL (FCALL *)(void *__restrict))&handle_fifohandle_tryincref,
 		[HANDLE_TYPE_SOCKET]          = (__BOOL (FCALL *)(void *__restrict))&handle_socket_tryincref,
@@ -452,6 +457,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_dirent_weakgetref,
 		[HANDLE_TYPE_PATH]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_path_weakgetref,
 		[HANDLE_TYPE_FILEHANDLE]      = (WEAK REF void *(FCALL *)(void *__restrict))&handle_filehandle_weakgetref,
+		[HANDLE_TYPE_TEMPHANDLE]      = (WEAK REF void *(FCALL *)(void *__restrict))&handle_temphandle_weakgetref,
 		[HANDLE_TYPE_DIRHANDLE]       = (WEAK REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weakgetref,
 		[HANDLE_TYPE_FIFOHANDLE]      = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fifohandle_weakgetref,
 		[HANDLE_TYPE_SOCKET]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_socket_weakgetref,
@@ -474,6 +480,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (REF void *(FCALL *)(void *__restrict))&handle_dirent_weaklckref,
 		[HANDLE_TYPE_PATH]            = (REF void *(FCALL *)(void *__restrict))&handle_path_weaklckref,
 		[HANDLE_TYPE_FILEHANDLE]      = (REF void *(FCALL *)(void *__restrict))&handle_filehandle_weaklckref,
+		[HANDLE_TYPE_TEMPHANDLE]      = (REF void *(FCALL *)(void *__restrict))&handle_temphandle_weaklckref,
 		[HANDLE_TYPE_DIRHANDLE]       = (REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weaklckref,
 		[HANDLE_TYPE_FIFOHANDLE]      = (REF void *(FCALL *)(void *__restrict))&handle_fifohandle_weaklckref,
 		[HANDLE_TYPE_SOCKET]          = (REF void *(FCALL *)(void *__restrict))&handle_socket_weaklckref,
@@ -496,6 +503,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_dirent_weakdecref,
 		[HANDLE_TYPE_PATH]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_path_weakdecref,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (FCALL *)(WEAK REF void *__restrict))&handle_filehandle_weakdecref,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (FCALL *)(WEAK REF void *__restrict))&handle_temphandle_weakdecref,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (FCALL *)(WEAK REF void *__restrict))&handle_dirhandle_weakdecref,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(WEAK REF void *__restrict))&handle_fifohandle_weakdecref,
 		[HANDLE_TYPE_SOCKET]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_socket_weakdecref,
@@ -518,6 +526,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_dirent_read,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_path_read,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_filehandle_read,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_temphandle_read,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_dirhandle_read,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fifohandle_read,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_socket_read,
@@ -540,6 +549,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_dirent_write,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_path_write,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_filehandle_write,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_temphandle_write,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_dirhandle_write,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fifohandle_write,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_socket_write,
@@ -562,6 +572,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_dirent_pread,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_path_pread,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_filehandle_pread,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_temphandle_pread,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_dirhandle_pread,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fifohandle_pread,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_socket_pread,
@@ -584,6 +595,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_dirent_pwrite,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_path_pwrite,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_filehandle_pwrite,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_temphandle_pwrite,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_dirhandle_pwrite,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fifohandle_pwrite,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_socket_pwrite,
@@ -606,6 +618,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirent_readv,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_readv,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_filehandle_readv,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_temphandle_readv,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_readv,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifohandle_readv,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_socket_readv,
@@ -628,6 +641,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirent_writev,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_writev,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_filehandle_writev,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_temphandle_writev,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_writev,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifohandle_writev,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_socket_writev,
@@ -650,6 +664,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirent_preadv,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_preadv,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_filehandle_preadv,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_temphandle_preadv,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_preadv,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifohandle_preadv,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_preadv,
@@ -672,6 +687,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirent_pwritev,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_pwritev,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_filehandle_pwritev,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_temphandle_pwritev,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_pwritev,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifohandle_pwritev,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_pwritev,
@@ -694,6 +710,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_dirent_readdir,
 		[HANDLE_TYPE_PATH]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_path_readdir,
 		[HANDLE_TYPE_FILEHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_filehandle_readdir,
+		[HANDLE_TYPE_TEMPHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_temphandle_readdir,
 		[HANDLE_TYPE_DIRHANDLE]       = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_dirhandle_readdir,
 		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fifohandle_readdir,
 		[HANDLE_TYPE_SOCKET]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_socket_readdir,
@@ -716,6 +733,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_dirent_seek,
 		[HANDLE_TYPE_PATH]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_path_seek,
 		[HANDLE_TYPE_FILEHANDLE]      = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_filehandle_seek,
+		[HANDLE_TYPE_TEMPHANDLE]      = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_temphandle_seek,
 		[HANDLE_TYPE_DIRHANDLE]       = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_dirhandle_seek,
 		[HANDLE_TYPE_FIFOHANDLE]      = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fifohandle_seek,
 		[HANDLE_TYPE_SOCKET]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_socket_seek,
@@ -738,6 +756,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirent_ioctl,
 		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_path_ioctl,
 		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_ioctl,
+		[HANDLE_TYPE_TEMPHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_temphandle_ioctl,
 		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_ioctl,
 		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_ioctl,
 		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_socket_ioctl,
@@ -760,6 +779,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, pos_t))&handle_dirent_truncate,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, pos_t))&handle_path_truncate,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, pos_t))&handle_filehandle_truncate,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (KCALL *)(void *__restrict, pos_t))&handle_temphandle_truncate,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, pos_t))&handle_dirhandle_truncate,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, pos_t))&handle_fifohandle_truncate,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, pos_t))&handle_socket_truncate,
@@ -782,6 +802,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_dirent_mmap,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_path_mmap,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_filehandle_mmap,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_temphandle_mmap,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_dirhandle_mmap,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fifohandle_mmap,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_socket_mmap,
@@ -804,6 +825,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirent_allocate,
 		[HANDLE_TYPE_PATH]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_path_allocate,
 		[HANDLE_TYPE_FILEHANDLE]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_filehandle_allocate,
+		[HANDLE_TYPE_TEMPHANDLE]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_temphandle_allocate,
 		[HANDLE_TYPE_DIRHANDLE]       = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirhandle_allocate,
 		[HANDLE_TYPE_FIFOHANDLE]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fifohandle_allocate,
 		[HANDLE_TYPE_SOCKET]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_socket_allocate,
@@ -826,6 +848,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict))&handle_dirent_sync,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict))&handle_path_sync,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict))&handle_filehandle_sync,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (KCALL *)(void *__restrict))&handle_temphandle_sync,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict))&handle_dirhandle_sync,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict))&handle_fifohandle_sync,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict))&handle_socket_sync,
@@ -848,6 +871,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict))&handle_dirent_datasync,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict))&handle_path_datasync,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict))&handle_filehandle_datasync,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (KCALL *)(void *__restrict))&handle_temphandle_datasync,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict))&handle_dirhandle_datasync,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict))&handle_fifohandle_datasync,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict))&handle_socket_datasync,
@@ -870,6 +894,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_dirent_stat,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_path_stat,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_filehandle_stat,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_temphandle_stat,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_dirhandle_stat,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fifohandle_stat,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_socket_stat,
@@ -892,6 +917,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_dirent_pollconnect,
 		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_path_pollconnect,
 		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_filehandle_pollconnect,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_temphandle_pollconnect,
 		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_pollconnect,
 		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fifohandle_pollconnect,
 		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_pollconnect,
@@ -914,6 +940,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_dirent_polltest,
 		[HANDLE_TYPE_PATH]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_path_polltest,
 		[HANDLE_TYPE_FILEHANDLE]      = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_filehandle_polltest,
+		[HANDLE_TYPE_TEMPHANDLE]      = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_temphandle_polltest,
 		[HANDLE_TYPE_DIRHANDLE]       = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_polltest,
 		[HANDLE_TYPE_FIFOHANDLE]      = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fifohandle_polltest,
 		[HANDLE_TYPE_SOCKET]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_polltest,
@@ -936,6 +963,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirent_hop,
 		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_path_hop,
 		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_hop,
+		[HANDLE_TYPE_TEMPHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_temphandle_hop,
 		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_hop,
 		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_hop,
 		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_socket_hop,
@@ -958,6 +986,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_dirent_tryas,
 		[HANDLE_TYPE_PATH]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_path_tryas,
 		[HANDLE_TYPE_FILEHANDLE]      = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_filehandle_tryas,
+		[HANDLE_TYPE_TEMPHANDLE]      = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_temphandle_tryas,
 		[HANDLE_TYPE_DIRHANDLE]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_dirhandle_tryas,
 		[HANDLE_TYPE_FIFOHANDLE]      = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fifohandle_tryas,
 		[HANDLE_TYPE_SOCKET]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_socket_tryas,
@@ -980,6 +1009,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRENT]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_dirent_printlink,
 		[HANDLE_TYPE_PATH]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_path_printlink,
 		[HANDLE_TYPE_FILEHANDLE]      = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_filehandle_printlink,
+		[HANDLE_TYPE_TEMPHANDLE]      = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_temphandle_printlink,
 		[HANDLE_TYPE_DIRHANDLE]       = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_dirhandle_printlink,
 		[HANDLE_TYPE_FIFOHANDLE]      = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fifohandle_printlink,
 		[HANDLE_TYPE_SOCKET]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_socket_printlink,
@@ -1134,6 +1164,40 @@ DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_filehandle.printlink") ssize_t KCALL
 handle_filehandle_printlink(struct filehandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
 	return handle_generic_printlink(self, HANDLE_TYPE_FILEHANDLE, printer, arg);
+}
+
+/* Weakly define operators for `HANDLE_TYPE_TEMPHANDLE' (`struct filehandle') */
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_tryas, handle_undefined_tryas);
+INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_temphandle.printlink") ssize_t KCALL
+handle_temphandle_printlink(struct filehandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_TEMPHANDLE, printer, arg);
 }
 
 /* Weakly define operators for `HANDLE_TYPE_DIRHANDLE' (`struct dirhandle') */

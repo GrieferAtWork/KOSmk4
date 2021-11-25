@@ -37,7 +37,7 @@ struct path;
 struct fdirent;
 
 struct filehandle {
-	/* [HANDLE_TYPE(HANDLE_TYPE_FILEHANDLE)] */
+	/* [HANDLE_TYPE(HANDLE_TYPE_FILEHANDLE, HANDLE_TYPE_TEMPHANDLE)] */
 	WEAK refcnt_t       fh_refcnt; /* File reference counter. */
 	REF struct mfile   *fh_file;   /* [1..1][const] The opened file INode. */
 	REF struct path    *fh_path;   /* [0..1][const] The path from which `fh_file' was opened (if any). */

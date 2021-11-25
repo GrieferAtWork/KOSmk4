@@ -1089,9 +1089,9 @@ procfs_r_kos_leaks_v_open(struct mfile *__restrict self,
 	fh = filehandle_new(file, access_path, access_dent);
 
 	/* Write-back the file-handle wrapper. */
-	hand->h_type = HANDLE_TYPE_FILEHANDLE;
-	hand->h_data = fh;   /* Inherit reference */
-	decref_nokill(self); /* Old reference from `hand->h_data' */
+	hand->h_type = HANDLE_TYPE_TEMPHANDLE; /* Self-delete on `close()' */
+	hand->h_data = fh;                     /* Inherit reference */
+	decref_nokill(self);                   /* Old reference from `hand->h_data' */
 }
 
 PRIVATE struct mfile_stream_ops const procfs_r_kos_leaks_v_stream_ops = {
