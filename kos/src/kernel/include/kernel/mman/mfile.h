@@ -669,9 +669,26 @@ struct mfile {
 	struct REF mpart_slist        mf_changed;    /* [0..n][lock(APPEND: ATOMIC,
 	                                              *             CLEAR:  ATOMIC && mf_lock)]
 	                                              * Chain of references to parts that contain unsaved changes.
-	                                              * NOTE: Set to `MFILE_PARTS_ANONYMOUS' if changed parts should
-	                                              *       always  be ignored unconditionally,  the same way they
-	                                              *       would be when `mf_ops->mo_saveblocks' is `NULL'. */
+	                                              * NOTE: Set to `MFILE_PARTS_ANONYMOUS'  if changed parts  should
+	                                              *       always be ignored unconditionally. When no save callback
+	                                              *       is defined (`mf_ops->mo_saveblocks == NULL'), this  must
+	                                              *       always be kept `NULL' or `MFILE_PARTS_ANONYMOUS'.
+	                                              * The following implications can be made:
+	                                              * - IN(struct mpart *part):
+	                                              *   A part with `MPART_F_CHANGED' set implies that the associated
+	                                              *   file  either has  an anonymous  changed list,  or a non-empty
+	                                              *   changed  list while also implementing the `mo_saveblocks' op.
+	                                              *   >> (part->mp_flags & MPART_F_CHANGED) != 0 -->
+	                                              *   >>     part->mp_file->mf_changed == MFILE_PARTS_ANONYMOUS ||
+	                                              *   >>     (part->mp_file->mf_changed != NULL &&
+	                                              *   >>      part->mp_file->mf_ops->mo_saveblocks != NULL)
+	                                              * - IN(struct mfile *file):
+	                                              *   A file with an `mo_saveblocks' op always has its changed list
+	                                              *   set to `MFILE_PARTS_ANONYMOUS' or `NULL'
+	                                              *   >> file->mf_ops->mo_saveblocks == NULL -->
+	                                              *   >>     file->mf_changed == MFILE_PARTS_ANONYMOUS ||
+	                                              *   >>     file->mf_changed == NULL
+	                                              */
 	size_t                        mf_part_amask; /* [const] == MAX(PAGESIZE, 1 << mf_blockshift) - 1
 	                                              * This field describes the minimum alignment of file positions
 	                                              * described by parts, minus one (meaning  it can be used as  a

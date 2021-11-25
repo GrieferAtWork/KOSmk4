@@ -210,7 +210,8 @@ mfile_sync(struct mfile *__restrict self)
 	}
 	do {
 		changes = ATOMIC_READ(self->mf_changed.slh_first);
-		if (!changes || changes == MFILE_PARTS_ANONYMOUS)
+		if (/*changes == NULL || */ /* The NULL-case is implicitly handled below */
+		    changes == MFILE_PARTS_ANONYMOUS)
 			return 0;
 	} while (!ATOMIC_CMPXCH_WEAK(self->mf_changed.slh_first,
 	                             changes, NULL));

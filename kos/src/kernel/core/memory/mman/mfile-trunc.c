@@ -107,6 +107,7 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 					DBG_memset(&iter->mp_changed, 0xcc, sizeof(iter->mp_changed));
 				} else {
 					struct mpartmeta *meta = iter->mp_meta;
+					assert(self->mf_changed.slh_first != NULL);
 					if (meta != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
 						/* Have to wait for this one... */
 						incref(iter);
@@ -123,7 +124,6 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
 					}
 				}
 			}
-
 
 			if (iter == mima.mm_max)
 				break;
@@ -486,13 +486,14 @@ after_file_size_changed:
 			assertf(!part->mp_meta ||
 			        !part->mp_meta->mpm_dmalocks,
 			        "Ensured by `mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref()'");
-			if (self->mf_ops->mo_saveblocks) {
+			if likely(self->mf_changed.slh_first != MFILE_PARTS_ANONYMOUS) {
+				assertf(self->mf_ops->mo_saveblocks != NULL,
+				        "MPART_F_CHANGED+mf_changed!=ANON imply the presence of this operator");
 				/* Remove from the list of changed mem-parts. */
-				assert(self->mf_changed.slh_first != MFILE_PARTS_ANONYMOUS);
 				SLIST_REMOVE(&self->mf_changed, part, mp_changed);
+				decref_nokill(part); /* From `self->mf_changed' */
 			}
 			ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
-			decref_nokill(part);
 		}
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 

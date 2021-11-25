@@ -1086,6 +1086,8 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 				hipart->mp_flags &= ~MPART_F_CHANGED;
 				break;
 			}
+			assertf(file->mf_ops->mo_saveblocks != NULL,
+			        "MPART_F_CHANGED+mf_changed!=ANON imply the presence of this operator");
 			hipart->mp_changed.sle_next = next;
 			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(file->mf_changed.slh_first,

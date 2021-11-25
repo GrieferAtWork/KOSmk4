@@ -28,6 +28,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/rand.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -158,9 +159,29 @@ NOTHROW(FCALL mfile_insert_and_merge_part_and_unlock)(struct mfile *__restrict s
 		struct mpart *next_changed;
 		do {
 			next_changed = ATOMIC_READ(self->mf_changed.slh_first);
-			if unlikely(next_changed == MFILE_PARTS_ANONYMOUS) {
+			if unlikely(next_changed == MFILE_PARTS_ANONYMOUS ||
+			            self->mf_ops->mo_saveblocks == NULL) {
+				assertf(self->mf_ops->mo_saveblocks == NULL ? (next_changed == MFILE_PARTS_ANONYMOUS ||
+				                                               next_changed == NULL)
+				                                            : 1,
+				        "This is an invariant that must never be broken");
+
+				/* Can't add the part to the list of changed parts for one of 2 reasons:
+				 * - `next_changed == MFILE_PARTS_ANONYMOUS': Changed parts are not being tracked
+				 * - `self->mf_ops->mo_saveblocks == NULL':   The file is unable to save changes
+				 *
+				 * NOTE: As far as semantics go, we're  allowed to leave the MPART_F_CHANGED  flag
+				 *       in-tact when `next_changed == MFILE_PARTS_ANONYMOUS', since the flag must
+				 *       be ignored in that  case. To harden code  against the eventuality of  the
+				 *       flag being set in cases  where its meaning is  invalid, we only clear  it
+				 *       when we have to, or randomly. */
 				--part->mp_refcnt;
-				part->mp_flags &= ~MPART_F_CHANGED;
+#ifndef NDEBUG
+				if (next_changed != MFILE_PARTS_ANONYMOUS || (krand() & 1))
+#endif /* !NDEBUG */
+				{
+					part->mp_flags &= ~MPART_F_CHANGED;
+				}
 				break;
 			}
 			part->mp_changed.sle_next = next_changed;
