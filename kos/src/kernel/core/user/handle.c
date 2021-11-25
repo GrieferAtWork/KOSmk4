@@ -1773,10 +1773,12 @@ handle_lookup_ptr(unsigned int fd, struct handle_manager *__restrict self)
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 handle_as_path_noinherit(struct handle const *__restrict hnd) {
+	/* TODO: Invoke the tryas operator */
 	REF struct path *result;
 	switch (hnd->h_type) {
 
 	case HANDLE_TYPE_FILEHANDLE:
+	case HANDLE_TYPE_FIFOHANDLE:
 	case HANDLE_TYPE_DIRHANDLE:
 		result = incref(((struct filehandle *)hnd->h_data)->f_path);
 		break;

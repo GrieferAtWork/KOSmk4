@@ -138,11 +138,16 @@ handle_datasize(struct handle const *__restrict self,
 		value = (pos_t)me->fd_namelen;
 	}	break;
 
-	case HANDLE_TYPE_FILEHANDLE:
-	case HANDLE_TYPE_DIRHANDLE: {
+	case HANDLE_TYPE_FILEHANDLE: {
 		struct filehandle *me;
 		me = (struct filehandle *)self->h_data;
 		value = mfile_datasize(me->fh_file);
+	}	break;
+
+	case HANDLE_TYPE_DIRHANDLE: {
+		struct dirhandle *me;
+		me = (struct dirhandle *)self->h_data;
+		value = mfile_datasize(me->dh_enum.de_dir);
 	}	break;
 
 	case HANDLE_TYPE_PATH: {
