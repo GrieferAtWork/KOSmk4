@@ -158,6 +158,16 @@ handle_newsize_ge_oldsize:
 		if (new_size == old_size)
 			return; /* Nothing changed... */
 
+		/* Check that the new file size is allowed by the filesystem. */
+		if (mfile_isnode(self)) {
+			struct fnode *node = mfile_asnode(self);
+			/* Just like `mfile_write()', we throw a file-too-big error
+			 * when trying to increase a file beyond the logical limits
+			 * of the underlying physical medium. */
+			if unlikely(new_size > node->fn_super->fs_feat.sf_filesize_max)
+				THROW(E_FSERROR_FILE_TOO_BIG);
+		}
+
 		/* Simple  case: increasing a file's size is as simple as getting
 		 * a write-lock to `self->mf_lock', then using that lock to  also
 		 * get a trunc-lock, before finally doing a cmpxch to set the new
@@ -205,16 +215,6 @@ handle_newsize_ge_oldsize:
 		if (new_size == 0 && mfile_isanon(self))
 			return;
 		THROW(E_FSERROR_READONLY);
-	}
-
-	/* Check that the new file size is allowed by the filesystem. */
-	if (mfile_isnode(self)) {
-		struct fnode *node = mfile_asnode(self);
-		/* Just like `mfile_write()', we throw a file-too-big error
-		 * when trying to increase a file beyond the logical limits
-		 * of the underlying physical medium. */
-		if unlikely(new_size > node->fn_super->fs_feat.sf_filesize_max)
-			THROW(E_FSERROR_FILE_TOO_BIG);
 	}
 
 	/* The complicated case: need to _reduce_ the file size:
