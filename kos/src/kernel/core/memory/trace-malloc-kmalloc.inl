@@ -385,7 +385,7 @@ again_nonnull_ptr:
 	/* The actual meat of the krealloc() function: Resizing an existing pointer */
 	lock_acquire();
 	/* Remove the existing node from the nodes-tree */
-	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
+	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -424,7 +424,7 @@ again_nonnull_ptr:
 	/* Verify head/tail integrity of `node' */
 #ifdef HAVE_kmalloc_validate_node
 	if unlikely(!kmalloc_validate_node(1, node)) {
-		node = trace_node_tree_remove(&nodes, (uintptr_t)ptr);
+		node = tm_nodes_remove(ptr);
 		lock_break();
 		trace_node_free(node);
 		goto do_normal_malloc;
@@ -450,7 +450,7 @@ again_nonnull_ptr:
 		if (num_free >= HEAP_MINSIZE) {
 			void *free_base;
 			u8 node_flags = node->tn_flags;
-			trace_node_tree_removenode(&nodes, node);
+			tm_nodes_removenode(node);
 
 			/* Reduce the effective size of the user-data-block. */
 			node->tn_link.rb_max -= num_free;
@@ -470,7 +470,7 @@ again_nonnull_ptr:
 #endif /* CONFIG_MALL_TAIL_SIZE != 0 */
 
 			/* Re-insert the node, so-as to continue tracking it. */
-			trace_node_tree_insert(&nodes, node);
+			tm_nodes_insert(node);
 			lock_break();
 
 			/* Now just free trailing memory. */
@@ -523,7 +523,7 @@ realloc_unchanged:
 			                        heapptr_getsiz(result));
 			lock_regain();
 again_remove_node_for_newchunk:
-			node = trace_node_tree_remove(&nodes, (uintptr_t)ptr);
+			node = tm_nodes_remove(ptr);
 			/* Check to make sure that the associated node hasn't changed. */
 			if unlikely(!node ||
 			            (node->tn_kind != TRACE_NODE_KIND_MALL) ||
@@ -531,7 +531,7 @@ again_remove_node_for_newchunk:
 			            (extension_base != trace_node_uend(node)) ||
 			            ((extension_flags & __GFP_HEAPMASK) != (node->tn_flags & __GFP_HEAPMASK))) {
 				if (node)
-					trace_node_tree_insert(&nodes, node);
+					tm_nodes_insert(node);
 				lock_break();
 				if (flags & GFP_CALLOC) {
 					BZERO_USER_POINTER_HEADTAIL(heapptr_getptr(result),
@@ -555,12 +555,12 @@ again_remove_node_for_newchunk:
 			trace_node_initlink(node, heapptr_getptr(result), heapptr_getsiz(result));
 
 			/* This can fail due to other bitset nodes, and we must handle it when that happens! */
-			if unlikely(!trace_node_tree_tryinsert(&nodes, node)) {
+			if unlikely(!tm_nodes_tryinsert(node)) {
 				/* Roll-back: We must restore the old node, then resolve the  existing
 				 *            (possibly-bitset) node with which our new node overlaps. */
 				node->tn_flags = extension_flags & __GFP_HEAPMASK;
 				trace_node_initlink(node, oldblock_base, oldblock_size);
-				trace_node_tree_insert(&nodes, node);
+				tm_nodes_insert(node);
 #ifdef DEFINE_X_except
 				TRY {
 					LOCAL_insert_trace_node_resolve((uintptr_t)heapptr_getptr(result),
@@ -598,7 +598,7 @@ again_remove_node_for_newchunk:
 		}
 		lock_regain();
 again_remove_node_for_oldchunk:
-		node = trace_node_tree_remove(&nodes, (uintptr_t)ptr);
+		node = tm_nodes_remove(ptr);
 		/* Check to make sure that the associated node hasn't changed. */
 		if unlikely(!node ||
 		            (node->tn_kind != TRACE_NODE_KIND_MALL) ||
@@ -606,7 +606,7 @@ again_remove_node_for_oldchunk:
 		            (extension_base != trace_node_uend(node)) ||
 		            ((extension_flags & __GFP_HEAPMASK) != (node->tn_flags & __GFP_HEAPMASK))) {
 			if (node)
-				trace_node_tree_insert(&nodes, node);
+				tm_nodes_insert(node);
 			lock_break();
 			assert(!(extension_flags & GFP_CALLOC));
 			heap_free_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
@@ -631,11 +631,11 @@ again_remove_node_for_oldchunk:
 		/* Re-insert the node, so-as to continue tracking it. */
 
 		/* This can fail due to other bitset nodes, and we must handle it when that happens! */
-		if unlikely(!trace_node_tree_tryinsert(&nodes, node)) {
+		if unlikely(!tm_nodes_tryinsert(node)) {
 			/* Roll-back: We must restore the old node, then resolve the  existing
 			 *            (possibly-bitset) node with which our new node overlaps. */
 			node->tn_link.rb_max -= num_allocated;
-			trace_node_tree_insert(&nodes, node);
+			tm_nodes_insert(node);
 #ifdef DEFINE_X_except
 			TRY {
 				LOCAL_insert_trace_node_resolve((uintptr_t)extension_base,

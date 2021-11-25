@@ -290,10 +290,10 @@ DECL_BEGIN
 
 /* SMP-lock for accessing internal TRACE-malloc structures. */
 #ifndef CONFIG_NO_SMP
-PRIVATE ATTR_MALL_UNTRACKED struct atomic_lock smplock = ATOMIC_LOCK_INIT;
-DEFINE_DBG_BZERO_OBJECT(smplock);
-#define smplock_acquire_nopr() atomic_lock_acquire_nopr(&smplock)
-#define smplock_release_nopr() atomic_lock_release(&smplock)
+PRIVATE ATTR_MALL_UNTRACKED struct atomic_lock tm_smplock = ATOMIC_LOCK_INIT;
+DEFINE_DBG_BZERO_OBJECT(tm_smplock);
+#define smplock_acquire_nopr() atomic_lock_acquire_nopr(&tm_smplock)
+#define smplock_release_nopr() atomic_lock_release(&tm_smplock)
 #else /* !CONFIG_NO_SMP */
 #define smplock_acquire_nopr() (void)0
 #define smplock_release_nopr() (void)0
@@ -319,7 +319,14 @@ DEFINE_DBG_BZERO_OBJECT(smplock);
 
 
 /* [0..1] Tree of traced nodes */
-PRIVATE ATTR_MALL_UNTRACKED RBTREE_ROOT(trace_node) nodes = NULL;
+PRIVATE ATTR_MALL_UNTRACKED RBTREE_ROOT(trace_node) tm_nodes = NULL;
+#define tm_nodes_locate(ptr)       trace_node_tree_locate(tm_nodes, (uintptr_t)(ptr))
+#define tm_nodes_remove(ptr)       trace_node_tree_remove(&tm_nodes, (uintptr_t)(ptr))
+#define tm_nodes_rremove(min, max) trace_node_tree_rremove(&tm_nodes, min, max)
+#define tm_nodes_removenode(node)  trace_node_tree_removenode(&tm_nodes, node)
+#define tm_nodes_insert(node)      trace_node_tree_insert(&tm_nodes, node)
+#define tm_nodes_tryinsert(node)   trace_node_tree_tryinsert(&tm_nodes, node)
+
 
 /* Debug-heap used for allocating `struct trace_node' objects. */
 INTERN struct heap trace_heap =
@@ -390,7 +397,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 		return;
 	ptr = (void *)CEIL_ALIGN((uintptr_t)ptr, sizeof(void *));
 	lock_acquire();
-	node = trace_node_tree_remove(&nodes, (uintptr_t)ptr);
+	node = tm_nodes_remove(ptr);
 	if unlikely(!node) {
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -443,7 +450,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 		for (i = minbit; i <= maxbit; ++i)
 			trace_node_bitset_bitoff(node, i);
 		/* Re-insert the node into the tree */
-		trace_node_tree_insert(&nodes, node);
+		tm_nodes_insert(node);
 		lock_break();
 		return;
 	}	break;
@@ -478,7 +485,7 @@ again_while_num_bytes:
 	while (num_bytes) {
 		struct trace_node *node;
 		lock_acquire();
-		node = trace_node_tree_remove(&nodes, (uintptr_t)base);
+		node = tm_nodes_remove(base);
 		if unlikely(!node) {
 			lock_break();
 			kernel_panic_n(/* n_skip: */ n_skip + 1,
@@ -545,7 +552,7 @@ again_while_num_bytes:
 			uend                 = trace_node_uend(node);
 			node->tn_link.rb_max = (uintptr_t)base - 1;
 			base                 = uend;
-			trace_node_tree_insert(&nodes, node);
+			tm_nodes_insert(node);
 			lock_break();
 			num_bytes = endaddr - (uintptr_t)base;
 			goto again_while_num_bytes; /* Don't use `continue'! That one interferes with `lock_acquire()' */
@@ -578,7 +585,7 @@ again_while_num_bytes:
 				}
 			}
 			node->tn_link.rb_min = endaddr;
-			trace_node_tree_insert(&nodes, node);
+			tm_nodes_insert(node);
 			lock_break();
 			break;
 		}
@@ -595,7 +602,7 @@ again_while_num_bytes:
 				assert(trace_node_bitset_bitget(node, i));
 				trace_node_bitset_bitoff(node, i);
 			}
-			trace_node_tree_insert(&nodes, node);
+			tm_nodes_insert(node);
 			lock_break();
 			break;
 		}
@@ -620,7 +627,7 @@ again_while_num_bytes:
 			for (i = minbit; i <= maxbit; ++i)
 				trace_node_bitset_bitoff(node, i);
 		}
-		trace_node_tree_insert(&nodes, node);
+		tm_nodes_insert(node);
 		lock_release();
 		break;
 	}
@@ -668,7 +675,7 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
 		return 0;
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	lock_acquire();
-	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
+	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
 		lock_break();
 		return 0;
@@ -704,7 +711,7 @@ kmalloc_printtrace(void *ptr, __pformatprinter printer, void *arg) {
 		return 0;
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	lock_acquire();
-	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
+	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
 		lock_break();
 		return 0;
@@ -805,8 +812,8 @@ PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_validate)(void) {
 #if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
 	lock_acquire();
-	if (nodes != NULL)
-		kmalloc_validate_walktree(1, nodes);
+	if (tm_nodes != NULL)
+		kmalloc_validate_walktree(1, tm_nodes);
 	lock_release();
 #else /* CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0 */
 	/* nothing... */
@@ -996,7 +1003,7 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 		return gc_reachable_slab_pointer(ptr);
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
-	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
+	node = tm_nodes_locate(ptr);
 	if (!node) {
 		/* Special handling for mcoreheap */
 		struct mcorepage *cp, *iter;
@@ -1417,12 +1424,12 @@ NOTHROW(KCALL gc_find_reachable_impl)(struct gc_glink_backup *__restrict glnk) {
 	}
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #5: Recursively scan reached pointers\n");
-	if (nodes) {
+	if (tm_nodes) {
 		size_t num_found;
 		/* With all data collected, recursively scan the data blocks of all reachable nodes.
 		 * The recursion takes place  because we keep scanning  until nothing new shows  up. */
 		do {
-			num_found = gc_reachable_recursion(nodes);
+			num_found = gc_reachable_recursion(tm_nodes);
 			PRINT_LEAKS_SEARCH_PHASE("Phase #5: Reached %" PRIuSIZ " pointers\n", num_found);
 		} while (num_found);
 	}
@@ -1708,7 +1715,7 @@ again:
 	if (node->tn_reach != gc_version) {
 		/* This node wasn't reached. (but ignore if the node has the NOLEAK flag set) */
 		if (!(node->tn_flags & TRACE_NODE_FLAG_NOLEAK)) {
-			trace_node_tree_removenode(&nodes, node);
+			tm_nodes_removenode(node);
 			trace_node_leak_next(node) = *pleaks;
 			*pleaks = node;
 			return true;
@@ -1781,7 +1788,7 @@ kmalloc_leaks_gather(void) {
 	 * nodes during a single pass. As such, we must keep on  scanning
 	 * the tree until  it's become  empty (unlikely) or  until we  no
 	 * longer find any more leaks. */
-	while (nodes && gc_gather_unreachable_nodes(nodes, &result))
+	while (tm_nodes && gc_gather_unreachable_nodes(tm_nodes, &result))
 		;
 
 	return result;
@@ -2194,7 +2201,7 @@ NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
 		    node->tn_kind != TRACE_NODE_KIND_CORE &&
 		    1) {
 			lock_acquire();
-			trace_node_tree_insert(&nodes, node);
+			tm_nodes_insert(node);
 			lock_release();
 		} else {
 			trace_node_free(node);
@@ -2434,7 +2441,7 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 		return SLAB_GET(ptr)->s_size;
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	lock_acquire();
-	node = trace_node_tree_locate(nodes, (uintptr_t)ptr);
+	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -2496,7 +2503,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	lock_acquire();
-	node = trace_node_tree_remove(&nodes, (uintptr_t)ptr);
+	node = tm_nodes_remove(ptr);
 	if unlikely(!node) {
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -2505,7 +2512,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 		return;
 	}
 	if unlikely(node->tn_kind != TRACE_NODE_KIND_MALL) {
-		trace_node_tree_insert(&nodes, node);
+		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -2516,7 +2523,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 		return;
 	}
 	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE) {
-		trace_node_tree_insert(&nodes, node);
+		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -2536,7 +2543,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	 * the block's life-time. */
 #ifdef HAVE_kmalloc_validate_node
 	if (!kmalloc_validate_node(1, node)) {
-		trace_node_tree_insert(&nodes, node);
+		tm_nodes_insert(node);
 		lock_break();
 		return;
 	}
@@ -2584,7 +2591,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	lock_acquire();
-	node = trace_node_tree_remove(&nodes, (uintptr_t)ptr);
+	node = tm_nodes_remove(ptr);
 	if unlikely(!node) {
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -2593,7 +2600,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		return;
 	}
 	if unlikely(node->tn_kind != TRACE_NODE_KIND_MALL) {
-		trace_node_tree_insert(&nodes, node);
+		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -2604,7 +2611,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		return;
 	}
 	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE) {
-		trace_node_tree_insert(&nodes, node);
+		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -2624,7 +2631,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	 * the block's life-time. */
 #ifdef HAVE_kmalloc_validate_node
 	if unlikely(!kmalloc_validate_node(1, node)) {
-		trace_node_tree_insert(&nodes, node);
+		tm_nodes_insert(node);
 		lock_break();
 		return;
 	}

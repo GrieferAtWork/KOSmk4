@@ -135,8 +135,8 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 	/* Don't panic yet: We might get here because of an existing  BITSET-node
 	 *                  that already has all of the area in which it overlaps
 	 *                  with our new node set to be fully untraced. */
-	oldnode = trace_node_tree_rremove(&nodes, umin, umax);
-	assertf(oldnode, "Then why did trace_node_tree_tryinsert() fail for %p...%p?",
+	oldnode = tm_nodes_rremove(umin, umax);
+	assertf(oldnode, "Then why did tm_nodes_tryinsert() fail for %p...%p?",
 	        umin, umax);
 	if unlikely(oldnode->tn_kind != TRACE_NODE_KIND_BITSET) {
 		lock_break();
@@ -249,7 +249,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		new_node_size *= sizeof(trace_node_bitset_t);                        /* new_node_size = sizeof(BITSET) */
 		new_node_size += offsetof(struct trace_node, tn_trace);              /* Header addend. */
 		/* Allocate the tracing node. */
-		trace_node_tree_insert(&nodes, oldnode);
+		tm_nodes_insert(oldnode);
 		lock_break();
 		node_ptr = LOCAL_heap_alloc_untraced(&trace_heap, new_node_size,
 		                                     TRACE_HEAP_FLAGS |
@@ -260,9 +260,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 #endif /* DEFINE_X_noexcept */
 		lock_regain();
 		/* Verify that the old node didn't change. */
-		oldnode = trace_node_tree_rremove(&nodes,
-		                                  umin,
-		                                  umax);
+		oldnode = tm_nodes_rremove(umin, umax);
 #define FREE_NODE_PTR()                              \
 		heap_free_untraced(&trace_heap,              \
 		                   heapptr_getptr(node_ptr), \
@@ -272,7 +270,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 			goto again_free_node_ptr;
 		if unlikely(oldnode->tn_kind != TRACE_NODE_KIND_BITSET) {
 again_free_node_ptr_insert_oldnode:
-			trace_node_tree_insert(&nodes, oldnode);
+			tm_nodes_insert(oldnode);
 again_free_node_ptr:
 			FREE_NODE_PTR();
 			goto success;
@@ -377,15 +375,15 @@ again_free_node_ptr:
 		hi_node->tn_link.rb_max = hi_node_max;
 
 		/* And finally, re-insert both the lo- and hi-nodes */
-		trace_node_tree_insert(&nodes, lo_node);
-		trace_node_tree_insert(&nodes, hi_node);
+		tm_nodes_insert(lo_node);
+		tm_nodes_insert(hi_node);
 
 		/* At this point, there should be a gap between the lo- and hi-nodes
 		 * that we can now use to insert the caller's `node' into the  tree. */
 		goto success;
 	}
 	/* Re-insert `oldnode' now that it's been truncated */
-	trace_node_tree_insert(&nodes, oldnode);
+	tm_nodes_insert(oldnode);
 success:
 #ifdef DEFINE_X_noexcept
 	return true
@@ -406,7 +404,7 @@ NOTHROW(FCALL LOCAL_insert_trace_node)(struct trace_node *__restrict node,
 #endif /* ... */
 {
 	lock_acquire();
-	while (unlikely(!trace_node_tree_tryinsert(&nodes, node))) {
+	while unlikely(!tm_nodes_tryinsert(node)) {
 #ifdef DEFINE_X_except
 		LOCAL_insert_trace_node_resolve(trace_node_umin(node),
 		                                trace_node_umax(node),

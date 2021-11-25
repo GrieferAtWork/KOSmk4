@@ -500,7 +500,7 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 	call   sched_override_start
 	movP   %Pax, %Pbx
 1:	/* %Pbx = struct cpu *THIS_CPU;
-	 * %Psp = struct icpustate *state;
+	 * %Psp = struct scpustate *state;
 	 * %Pbp = struct task *old_sched_override; */
 
 	/* Save the current register state. */
