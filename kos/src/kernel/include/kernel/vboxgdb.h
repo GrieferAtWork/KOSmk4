@@ -32,7 +32,7 @@
 #define CONFIG_NO_VBOXGDB 1
 #elif defined(__i386__) || defined(__x86_64__)
 /* VirtualBox can only emulate x86 machines, so there's no point
- * in try  to  support  vboxgdb when  targeting  anything  else! */
+ * in trying to  support vboxgdb when  targeting anything  else! */
 #define CONFIG_VBOXGDB 1
 #else /* ... */
 #define CONFIG_NO_VBOXGDB 1

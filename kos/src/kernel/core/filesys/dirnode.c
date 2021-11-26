@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirhandle.h>
 #include <kernel/fs/dirnode.h>
@@ -31,6 +32,7 @@
 #include <kernel/handle.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <sys/stat.h>
 
@@ -402,6 +404,7 @@ again_lookup:
 			RETHROW();
 		}
 		if unlikely(!node) {
+			/* Race condition: file was deleted after we did the lookup above. */
 			decref_unlikely(ent);
 			goto again_lookup;
 		}
@@ -409,10 +412,42 @@ again_lookup:
 		info->mkf_rnode = node; /* Inherit reference */
 		return FDIRNODE_MKFILE_EXISTS;
 	}
-	/* TODO: If this throws `E_FSERROR_UNSUPPORTED_OPERATION' with context == 0,
-	 *       try to fill in the correct `E_FILESYSTEM_OPERATION_*' context based
-	 *       on `info->mkf_fmode'. */
-	return (*ops->dno_mkfile)(self, info);
+	TRY {
+		return (*ops->dno_mkfile)(self, info);
+	} EXCEPT {
+		/* If `dno_mkfile' throws `E_FSERROR_UNSUPPORTED_OPERATION', try to
+		 * fill  in the correct `E_FILESYSTEM_OPERATION_*' context based on
+		 * `info->mkf_fmode'. */
+		if (was_thrown(E_FSERROR_UNSUPPORTED_OPERATION) &&
+		    PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) == 0) {
+			uintptr_t context = 0;
+			switch (info->mkf_fmode & S_IFMT) {
+			case 0:
+				/* IFMT=0 is used to have fs drivers create hard links! */
+				context = E_FILESYSTEM_OPERATION_LINK;
+				break;
+			case S_IFREG:
+			case S_IFSOCK: /* XXX: Custom code for sockets? */
+				context = E_FILESYSTEM_OPERATION_CREAT;
+				break;
+			case S_IFDIR:
+				context = E_FILESYSTEM_OPERATION_MKDIR;
+				break;
+			case S_IFLNK:
+				context = E_FILESYSTEM_OPERATION_SYMLINK;
+				break;
+			case S_IFBLK:
+			case S_IFCHR:
+			case S_IFIFO:
+				context = E_FILESYSTEM_OPERATION_MKNOD;
+				break;
+			default:
+				break;
+			}
+			PERTASK_SET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id, context);
+		}
+		RETHROW();
+	}
 }
 
 /* Delete the specified file from this directory
