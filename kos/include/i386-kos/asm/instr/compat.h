@@ -86,6 +86,37 @@
 #define R_sysvabi5q r9
 #define R_sysvabi5P r9
 
+/* Register arguments for system calls */
+#define R_syscall0b dil
+#define R_syscall0w di
+#define R_syscall0l edi
+#define R_syscall0q rdi
+#define R_syscall0P rdi
+#define R_syscall1b sil
+#define R_syscall1w si
+#define R_syscall1l esi
+#define R_syscall1q rsi
+#define R_syscall1P rsi
+#define R_syscall2b dl
+#define R_syscall2w dx
+#define R_syscall2l edx
+#define R_syscall2q rdx
+#define R_syscall2P rdx
+#define R_syscall3b r10l
+#define R_syscall3w r10w
+#define R_syscall3l r10d
+#define R_syscall3q r10
+#define R_syscall3P r10
+#define R_syscall4b r8l
+#define R_syscall4w r8w
+#define R_syscall4l r8d
+#define R_syscall4q r8
+#define R_syscall4P r8
+#define R_syscall5b r9l
+#define R_syscall5w r9w
+#define R_syscall5l r9d
+#define R_syscall5q r9
+#define R_syscall5P r9
 
 /* Instructions */
 #define movsbP       movsbq
@@ -226,6 +257,29 @@
 #define R_fcall1w dx
 #define R_fcall1l edx
 #define R_fcall1P edx
+
+/* Register arguments for system calls */
+#define R_syscall0b bl
+#define R_syscall0w bx
+#define R_syscall0l ebx
+#define R_syscall0P ebx
+#define R_syscall1b cl
+#define R_syscall1w cx
+#define R_syscall1l ecx
+#define R_syscall1P ecx
+#define R_syscall2b dl
+#define R_syscall2w dx
+#define R_syscall2l edx
+#define R_syscall2P rdx
+#define R_syscall3w si
+#define R_syscall3l esi
+#define R_syscall3P esi
+#define R_syscall4w di
+#define R_syscall4l edi
+#define R_syscall4P edi
+#define R_syscall5w bp
+#define R_syscall5l ebp
+#define R_syscall5P ebp
 
 /* Instructions */
 #define movzbP       movzbl

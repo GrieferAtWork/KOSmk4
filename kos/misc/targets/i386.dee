@@ -100,4 +100,22 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 			{ "gcc", "c", "dl" },
 			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
 		));
+	toolchain.provideStdlibCache(
+		("assembler-with-cpp", ()), (
+			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+				"binutils/i386-kos/i686-kos/lib",
+				"binutils/i386-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("assembler-with-cpp", ("-fstack-protector-strong",)), (
+			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+				"binutils/i386-kos/i686-kos/lib",
+				"binutils/i386-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "ssp_nonshared", "ssp", "gcc", "c", "dl", "gcc" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
 }

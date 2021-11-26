@@ -45,6 +45,12 @@ DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
 
 if (TARGET_ARCH in ["i386", "x86_64"]) {
 	DEFINE_SIMPLE_C_APPLICATION("scanpci", USELIB("libpciaccess"))
+	BEGIN GROUP("apps.leaks") { COMPILE, LINK, MCOPY };
+		SET_NOSTDLIB()
+		SET_LANGUAGE("assembler-with-cpp")
+		SET_OUTPUT("/bin/leaks")
+		SOURCE({ "misc/leaks.S" })
+	END
 }
 
 
