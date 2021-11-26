@@ -54,6 +54,19 @@
 #endif /* __KERNEL__ */
 
 
+#if 1
+#define rdpptr_as16(p_ptr) (*(u16 const *)(p_ptr))
+#define rdpptr_as32(p_ptr) (*(u32 const *)(p_ptr))
+#define rdpptr_as64(p_ptr) (*(u64 const *)(p_ptr))
+#else
+#define rdpptr_as16(p_ptr) ((u16)(*(uintptr_t const *)(p_ptr)))
+#define rdpptr_as32(p_ptr) ((u32)(*(uintptr_t const *)(p_ptr)))
+#define rdpptr_as64(p_ptr) ((u64)(*(uintptr_t const *)(p_ptr)))
+#endif
+#define wrpptr(p_ptr, value) (*(uintptr_t *)(p_ptr) = (value))
+
+
+
 DECL_BEGIN
 
 #ifdef __x86_64__
@@ -105,7 +118,7 @@ INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_scpustate
 INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_scpustate_exclusive))(struct scpustate IRREGS_INDIRECTION __restrict self, unwind_regno_t dw_regno, void const *__restrict src);
 INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_icpustate_exclusive)(struct icpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
 INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_icpustate_exclusive))(struct icpustate IRREGS_INDIRECTION __restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-#endif /* __KERNEL__ || __INTELLISENSE */
+#endif /* __KERNEL__ || __INTELLISENSE__ */
 #if !defined(__KERNEL__) || defined(__INTELLISENSE__)
 INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_ucontext)(struct ucontext const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
 INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_ucontext)(struct ucontext *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
@@ -115,7 +128,7 @@ INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_ucontext_
 INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_ucontext_exclusive)(struct ucontext *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
 INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_exclusive)(struct mcontext const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
 INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_exclusive)(struct mcontext *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-#endif /* !__KERNEL__ || __INTELLISENSE */
+#endif /* !__KERNEL__ || __INTELLISENSE__ */
 
 #define MY_CS     SEGMENT_CURRENT_CODE_RPL
 #define MY_SS     SEGMENT_CURRENT_DATA_RPL
@@ -142,31 +155,33 @@ INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_
 PRIVATE NONNULL((2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_implicit)(unwind_regno_t dw_regno,
                                              void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
 #ifdef __x86_64__
-	case CFI_X86_64_UNWIND_REGISTER_ES:     *(u64 *)dst = MY_ES; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     *(u64 *)dst = MY_CS; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     *(u64 *)dst = MY_SS; break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     *(u64 *)dst = MY_DS; break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     *(u64 *)dst = MY_FS; break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     *(u64 *)dst = MY_GS; break;
-	case CFI_X86_64_UNWIND_REGISTER_FSBASE: *(u64 *)dst = MY_FSBASE; break;
-	case CFI_X86_64_UNWIND_REGISTER_GSBASE: *(u64 *)dst = MY_GSBASE; break;
-	case CFI_X86_64_UNWIND_REGISTER_TR:     *(u64 *)dst = MY_TR; break;
-	case CFI_X86_64_UNWIND_REGISTER_LDTR:   *(u64 *)dst = MY_LDTR; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     value = MY_ES; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     value = MY_CS; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     value = MY_SS; break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     value = MY_DS; break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     value = MY_FS; break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     value = MY_GS; break;
+	case CFI_X86_64_UNWIND_REGISTER_FSBASE: value = MY_FSBASE; break;
+	case CFI_X86_64_UNWIND_REGISTER_GSBASE: value = MY_GSBASE; break;
+	case CFI_X86_64_UNWIND_REGISTER_TR:     value = MY_TR; break;
+	case CFI_X86_64_UNWIND_REGISTER_LDTR:   value = MY_LDTR; break;
 #else /* __x86_64__ */
-	case CFI_386_UNWIND_REGISTER_ES:   *(u32 *)dst = MY_ES; break;
-	case CFI_386_UNWIND_REGISTER_CS:   *(u32 *)dst = MY_CS; break;
-	case CFI_386_UNWIND_REGISTER_SS:   *(u32 *)dst = MY_SS; break;
-	case CFI_386_UNWIND_REGISTER_DS:   *(u32 *)dst = MY_DS; break;
-	case CFI_386_UNWIND_REGISTER_FS:   *(u32 *)dst = MY_FS; break;
-	case CFI_386_UNWIND_REGISTER_GS:   *(u32 *)dst = MY_GS; break;
-	case CFI_386_UNWIND_REGISTER_TR:   *(u32 *)dst = MY_TR; break;
-	case CFI_386_UNWIND_REGISTER_LDTR: *(u32 *)dst = MY_LDTR; break;
+	case CFI_386_UNWIND_REGISTER_ES:   value = MY_ES; break;
+	case CFI_386_UNWIND_REGISTER_CS:   value = MY_CS; break;
+	case CFI_386_UNWIND_REGISTER_SS:   value = MY_SS; break;
+	case CFI_386_UNWIND_REGISTER_DS:   value = MY_DS; break;
+	case CFI_386_UNWIND_REGISTER_FS:   value = MY_FS; break;
+	case CFI_386_UNWIND_REGISTER_GS:   value = MY_GS; break;
+	case CFI_386_UNWIND_REGISTER_TR:   value = MY_TR; break;
+	case CFI_386_UNWIND_REGISTER_LDTR: value = MY_LDTR; break;
 #endif /* !__x86_64__ */
 	default:
 		return UNWIND_INVALID_REGISTER;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 }
 
@@ -185,11 +200,11 @@ NOTHROW_NCX(CC libuw_unwind_setreg_implicit)(unwind_regno_t dw_regno,
 	case CFI_X86_64_UNWIND_REGISTER_TR:     expected_value = MY_TR; break;
 	case CFI_X86_64_UNWIND_REGISTER_LDTR:   expected_value = MY_LDTR; break;
 	case CFI_X86_64_UNWIND_REGISTER_FSBASE:
-		if (*(u64 const *)src != MY_FSBASE)
+		if (rdpptr_as64(src) != MY_FSBASE)
 			goto badreg;
 		return UNWIND_SUCCESS;
 	case CFI_X86_64_UNWIND_REGISTER_GSBASE:
-		if (*(u64 const *)src != MY_GSBASE)
+		if (rdpptr_as64(src) != MY_GSBASE)
 			goto badreg;
 		return UNWIND_SUCCESS;
 #else /* __x86_64__ */
@@ -204,7 +219,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_implicit)(unwind_regno_t dw_regno,
 #endif /* !__x86_64__ */
 	default: goto badreg;
 	}
-	if ((u16)(*(uintptr_t const *)src) != expected_value)
+	if (rdpptr_as16(src) != expected_value)
 		goto badreg;
 	return UNWIND_SUCCESS;
 badreg:
@@ -212,7 +227,6 @@ badreg:
 }
 
 
-/* TODO: Many of the things below can be optimized by using indexed offset tables! */
 #ifdef __x86_64__
 
 
@@ -220,18 +234,19 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_base)(struct lcpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_R15: *(u64 *)dst = self->lcs_r15; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14: *(u64 *)dst = self->lcs_r14; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13: *(u64 *)dst = self->lcs_r13; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12: *(u64 *)dst = self->lcs_r12; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP: *(u64 *)dst = self->lcs_rbp; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP: *(u64 *)dst = self->lcs_rsp; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX: *(u64 *)dst = self->lcs_rbx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP: *(u64 *)dst = self->lcs_rip; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_R15: value = self->lcs_r15; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14: value = self->lcs_r14; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13: value = self->lcs_r13; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12: value = self->lcs_r12; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP: value = self->lcs_rbp; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP: value = self->lcs_rsp; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX: value = self->lcs_rbx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP: value = self->lcs_rip; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -241,17 +256,17 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_base)(struct lcpustate *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void const *__restrict src) {
+	uintptr_t value = rdpptr_as64(src);
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_R15: self->lcs_r15 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14: self->lcs_r14 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13: self->lcs_r13 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12: self->lcs_r12 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP: self->lcs_rbp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP: self->lcs_rsp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX: self->lcs_rbx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP: self->lcs_rip = *(u64 const *)src; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_R15: self->lcs_r15 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14: self->lcs_r14 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13: self->lcs_r13 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12: self->lcs_r12 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP: self->lcs_rbp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP: self->lcs_rsp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX: self->lcs_rbx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP: self->lcs_rip = value; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -262,36 +277,37 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate_base)(struct ucpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->ucs_gpregs.gp_rax; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->ucs_gpregs.gp_rdx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    *(u64 *)dst = self->ucs_gpregs.gp_rcx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    *(u64 *)dst = self->ucs_gpregs.gp_rbx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    *(u64 *)dst = self->ucs_gpregs.gp_rsi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    *(u64 *)dst = self->ucs_gpregs.gp_rdi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    *(u64 *)dst = self->ucs_gpregs.gp_rbp; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    *(u64 *)dst = self->ucs_gpregs.gp_rsp; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     *(u64 *)dst = self->ucs_gpregs.gp_r8; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     *(u64 *)dst = self->ucs_gpregs.gp_r9; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    *(u64 *)dst = self->ucs_gpregs.gp_r10; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    *(u64 *)dst = self->ucs_gpregs.gp_r11; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    *(u64 *)dst = self->ucs_gpregs.gp_r12; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    *(u64 *)dst = self->ucs_gpregs.gp_r13; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    *(u64 *)dst = self->ucs_gpregs.gp_r14; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    *(u64 *)dst = self->ucs_gpregs.gp_r15; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    *(u64 *)dst = self->ucs_rip; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: *(u64 *)dst = self->ucs_rflags; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     *(u64 *)dst = self->ucs_sgregs.sg_es16; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     *(u64 *)dst = self->ucs_cs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     *(u64 *)dst = self->ucs_ss16; break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     *(u64 *)dst = self->ucs_sgregs.sg_ds16; break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     *(u64 *)dst = self->ucs_sgregs.sg_fs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     *(u64 *)dst = self->ucs_sgregs.sg_gs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_FSBASE: *(u64 *)dst = self->ucs_sgbase.sg_fsbase; break;
-	case CFI_X86_64_UNWIND_REGISTER_GSBASE: *(u64 *)dst = self->ucs_sgbase.sg_gsbase; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    value = self->ucs_gpregs.gp_rax; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    value = self->ucs_gpregs.gp_rdx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    value = self->ucs_gpregs.gp_rcx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    value = self->ucs_gpregs.gp_rbx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    value = self->ucs_gpregs.gp_rsi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    value = self->ucs_gpregs.gp_rdi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    value = self->ucs_gpregs.gp_rbp; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    value = self->ucs_gpregs.gp_rsp; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     value = self->ucs_gpregs.gp_r8; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     value = self->ucs_gpregs.gp_r9; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    value = self->ucs_gpregs.gp_r10; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    value = self->ucs_gpregs.gp_r11; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    value = self->ucs_gpregs.gp_r12; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    value = self->ucs_gpregs.gp_r13; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    value = self->ucs_gpregs.gp_r14; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    value = self->ucs_gpregs.gp_r15; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    value = self->ucs_rip; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: value = self->ucs_rflags; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     value = self->ucs_sgregs.sg_es16; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     value = self->ucs_cs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     value = self->ucs_ss16; break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     value = self->ucs_sgregs.sg_ds16; break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     value = self->ucs_sgregs.sg_fs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     value = self->ucs_sgregs.sg_gs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_FSBASE: value = self->ucs_sgbase.sg_fsbase; break;
+	case CFI_X86_64_UNWIND_REGISTER_GSBASE: value = self->ucs_sgbase.sg_gsbase; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -301,35 +317,35 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_base)(struct ucpustate *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void const *__restrict src) {
+	uintptr_t value = rdpptr_as64(src);
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->ucs_gpregs.gp_rax = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->ucs_gpregs.gp_rdx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->ucs_gpregs.gp_rcx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->ucs_gpregs.gp_rbx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->ucs_gpregs.gp_rsi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->ucs_gpregs.gp_rdi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->ucs_gpregs.gp_rbp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->ucs_gpregs.gp_rsp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     self->ucs_gpregs.gp_r8 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     self->ucs_gpregs.gp_r9 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    self->ucs_gpregs.gp_r10 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    self->ucs_gpregs.gp_r11 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    self->ucs_gpregs.gp_r12 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    self->ucs_gpregs.gp_r13 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    self->ucs_gpregs.gp_r14 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    self->ucs_gpregs.gp_r15 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->ucs_rip = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->ucs_rflags = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     self->ucs_sgregs.sg_es = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     self->ucs_cs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     self->ucs_ss = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     self->ucs_sgregs.sg_ds = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     self->ucs_sgregs.sg_fs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     self->ucs_sgregs.sg_gs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->ucs_sgbase.sg_fsbase = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->ucs_sgbase.sg_gsbase = *(u64 const *)src; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->ucs_gpregs.gp_rax = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->ucs_gpregs.gp_rdx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->ucs_gpregs.gp_rcx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->ucs_gpregs.gp_rbx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->ucs_gpregs.gp_rsi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->ucs_gpregs.gp_rdi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->ucs_gpregs.gp_rbp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->ucs_gpregs.gp_rsp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     self->ucs_gpregs.gp_r8 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     self->ucs_gpregs.gp_r9 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    self->ucs_gpregs.gp_r10 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    self->ucs_gpregs.gp_r11 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    self->ucs_gpregs.gp_r12 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    self->ucs_gpregs.gp_r13 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    self->ucs_gpregs.gp_r14 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    self->ucs_gpregs.gp_r15 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->ucs_rip = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->ucs_rflags = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     self->ucs_sgregs.sg_es = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     self->ucs_cs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     self->ucs_ss = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     self->ucs_sgregs.sg_ds = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     self->ucs_sgregs.sg_fs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     self->ucs_sgregs.sg_gs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->ucs_sgbase.sg_fsbase = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->ucs_sgbase.sg_gsbase = value; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -340,28 +356,29 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate_base)(struct kcpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->kcs_gpregs.gp_rax; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->kcs_gpregs.gp_rdx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    *(u64 *)dst = self->kcs_gpregs.gp_rcx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    *(u64 *)dst = self->kcs_gpregs.gp_rbx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    *(u64 *)dst = self->kcs_gpregs.gp_rsi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    *(u64 *)dst = self->kcs_gpregs.gp_rdi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    *(u64 *)dst = self->kcs_gpregs.gp_rbp; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    *(u64 *)dst = self->kcs_gpregs.gp_rsp; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     *(u64 *)dst = self->kcs_gpregs.gp_r8; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     *(u64 *)dst = self->kcs_gpregs.gp_r9; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    *(u64 *)dst = self->kcs_gpregs.gp_r10; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    *(u64 *)dst = self->kcs_gpregs.gp_r11; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    *(u64 *)dst = self->kcs_gpregs.gp_r12; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    *(u64 *)dst = self->kcs_gpregs.gp_r13; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    *(u64 *)dst = self->kcs_gpregs.gp_r14; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    *(u64 *)dst = self->kcs_gpregs.gp_r15; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    *(u64 *)dst = self->kcs_rip; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: *(u64 *)dst = self->kcs_rflags; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    value = self->kcs_gpregs.gp_rax; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    value = self->kcs_gpregs.gp_rdx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    value = self->kcs_gpregs.gp_rcx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    value = self->kcs_gpregs.gp_rbx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    value = self->kcs_gpregs.gp_rsi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    value = self->kcs_gpregs.gp_rdi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    value = self->kcs_gpregs.gp_rbp; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    value = self->kcs_gpregs.gp_rsp; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     value = self->kcs_gpregs.gp_r8; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     value = self->kcs_gpregs.gp_r9; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    value = self->kcs_gpregs.gp_r10; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    value = self->kcs_gpregs.gp_r11; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    value = self->kcs_gpregs.gp_r12; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    value = self->kcs_gpregs.gp_r13; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    value = self->kcs_gpregs.gp_r14; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    value = self->kcs_gpregs.gp_r15; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    value = self->kcs_rip; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: value = self->kcs_rflags; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -371,27 +388,27 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate_base)(struct kcpustate *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void const *__restrict src) {
+	uintptr_t value = rdpptr_as64(src);
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->kcs_gpregs.gp_rax = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->kcs_gpregs.gp_rdx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->kcs_gpregs.gp_rcx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->kcs_gpregs.gp_rbx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->kcs_gpregs.gp_rsi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->kcs_gpregs.gp_rdi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->kcs_gpregs.gp_rbp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->kcs_gpregs.gp_rsp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     self->kcs_gpregs.gp_r8 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     self->kcs_gpregs.gp_r9 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    self->kcs_gpregs.gp_r10 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    self->kcs_gpregs.gp_r11 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    self->kcs_gpregs.gp_r12 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    self->kcs_gpregs.gp_r13 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    self->kcs_gpregs.gp_r14 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    self->kcs_gpregs.gp_r15 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->kcs_rip = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->kcs_rflags = *(u64 const *)src; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->kcs_gpregs.gp_rax = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->kcs_gpregs.gp_rdx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->kcs_gpregs.gp_rcx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->kcs_gpregs.gp_rbx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->kcs_gpregs.gp_rsi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->kcs_gpregs.gp_rdi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->kcs_gpregs.gp_rbp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->kcs_gpregs.gp_rsp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     self->kcs_gpregs.gp_r8 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     self->kcs_gpregs.gp_r9 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    self->kcs_gpregs.gp_r10 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    self->kcs_gpregs.gp_r11 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    self->kcs_gpregs.gp_r12 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    self->kcs_gpregs.gp_r13 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    self->kcs_gpregs.gp_r14 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    self->kcs_gpregs.gp_r15 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->kcs_rip = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->kcs_rflags = value; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -403,36 +420,37 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_scpustate_base)(struct scpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->scs_gpregs.gp_rax; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->scs_gpregs.gp_rdx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    *(u64 *)dst = self->scs_gpregs.gp_rcx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    *(u64 *)dst = self->scs_gpregs.gp_rbx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    *(u64 *)dst = self->scs_gpregs.gp_rsi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    *(u64 *)dst = self->scs_gpregs.gp_rdi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    *(u64 *)dst = self->scs_gpregs.gp_rbp; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    *(u64 *)dst = self->scs_irregs.ir_rsp; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     *(u64 *)dst = self->scs_gpregs.gp_r8; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     *(u64 *)dst = self->scs_gpregs.gp_r9; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    *(u64 *)dst = self->scs_gpregs.gp_r10; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    *(u64 *)dst = self->scs_gpregs.gp_r11; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    *(u64 *)dst = self->scs_gpregs.gp_r12; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    *(u64 *)dst = self->scs_gpregs.gp_r13; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    *(u64 *)dst = self->scs_gpregs.gp_r14; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    *(u64 *)dst = self->scs_gpregs.gp_r15; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    *(u64 *)dst = self->scs_irregs.ir_rip; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: *(u64 *)dst = self->scs_irregs.ir_rflags; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     *(u64 *)dst = self->scs_sgregs.sg_es16; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     *(u64 *)dst = self->scs_irregs.ir_cs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     *(u64 *)dst = self->scs_irregs.ir_ss16; break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     *(u64 *)dst = self->scs_sgregs.sg_ds16; break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     *(u64 *)dst = self->scs_sgregs.sg_fs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     *(u64 *)dst = self->scs_sgregs.sg_gs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_FSBASE: *(u64 *)dst = self->scs_sgbase.sg_fsbase; break;
-	case CFI_X86_64_UNWIND_REGISTER_GSBASE: *(u64 *)dst = self->scs_sgbase.sg_gsbase; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    value = self->scs_gpregs.gp_rax; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    value = self->scs_gpregs.gp_rdx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    value = self->scs_gpregs.gp_rcx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    value = self->scs_gpregs.gp_rbx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    value = self->scs_gpregs.gp_rsi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    value = self->scs_gpregs.gp_rdi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    value = self->scs_gpregs.gp_rbp; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    value = self->scs_irregs.ir_rsp; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     value = self->scs_gpregs.gp_r8; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     value = self->scs_gpregs.gp_r9; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    value = self->scs_gpregs.gp_r10; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    value = self->scs_gpregs.gp_r11; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    value = self->scs_gpregs.gp_r12; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    value = self->scs_gpregs.gp_r13; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    value = self->scs_gpregs.gp_r14; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    value = self->scs_gpregs.gp_r15; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    value = self->scs_irregs.ir_rip; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: value = self->scs_irregs.ir_rflags; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     value = self->scs_sgregs.sg_es16; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     value = self->scs_irregs.ir_cs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     value = self->scs_irregs.ir_ss16; break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     value = self->scs_sgregs.sg_ds16; break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     value = self->scs_sgregs.sg_fs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     value = self->scs_sgregs.sg_gs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_FSBASE: value = self->scs_sgbase.sg_fsbase; break;
+	case CFI_X86_64_UNWIND_REGISTER_GSBASE: value = self->scs_sgbase.sg_gsbase; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -442,35 +460,35 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base)(struct scpustate *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void const *__restrict src) {
+	uintptr_t value = rdpptr_as64(src);
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->scs_gpregs.gp_rax = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->scs_gpregs.gp_rdx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->scs_gpregs.gp_rcx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->scs_gpregs.gp_rbx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->scs_gpregs.gp_rsi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->scs_gpregs.gp_rdi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->scs_gpregs.gp_rbp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->scs_irregs.ir_rsp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     self->scs_gpregs.gp_r8 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     self->scs_gpregs.gp_r9 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    self->scs_gpregs.gp_r10 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    self->scs_gpregs.gp_r11 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    self->scs_gpregs.gp_r12 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    self->scs_gpregs.gp_r13 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    self->scs_gpregs.gp_r14 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    self->scs_gpregs.gp_r15 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->scs_irregs.ir_rip = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->scs_irregs.ir_rflags = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     self->scs_sgregs.sg_es = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     self->scs_irregs.ir_cs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     self->scs_irregs.ir_ss = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     self->scs_sgregs.sg_ds = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     self->scs_sgregs.sg_fs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     self->scs_sgregs.sg_gs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->scs_sgbase.sg_fsbase = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->scs_sgbase.sg_gsbase = *(u64 const *)src; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->scs_gpregs.gp_rax = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->scs_gpregs.gp_rdx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->scs_gpregs.gp_rcx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->scs_gpregs.gp_rbx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->scs_gpregs.gp_rsi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->scs_gpregs.gp_rdi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->scs_gpregs.gp_rbp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->scs_irregs.ir_rsp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     self->scs_gpregs.gp_r8 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     self->scs_gpregs.gp_r9 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    self->scs_gpregs.gp_r10 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    self->scs_gpregs.gp_r11 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    self->scs_gpregs.gp_r12 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    self->scs_gpregs.gp_r13 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    self->scs_gpregs.gp_r14 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    self->scs_gpregs.gp_r15 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->scs_irregs.ir_rip = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->scs_irregs.ir_rflags = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     self->scs_sgregs.sg_es = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     self->scs_irregs.ir_cs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     self->scs_irregs.ir_ss = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     self->scs_sgregs.sg_ds = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     self->scs_sgregs.sg_fs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     self->scs_sgregs.sg_gs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->scs_sgbase.sg_fsbase = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->scs_sgbase.sg_gsbase = value; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -481,30 +499,31 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_icpustate_base)(struct icpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->ics_gpregs.gp_rax; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->ics_gpregs.gp_rdx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    *(u64 *)dst = self->ics_gpregs.gp_rcx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    *(u64 *)dst = self->ics_gpregs.gp_rbx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    *(u64 *)dst = self->ics_gpregs.gp_rsi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    *(u64 *)dst = self->ics_gpregs.gp_rdi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    *(u64 *)dst = self->ics_gpregs.gp_rbp; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    *(u64 *)dst = self->ics_irregs.ir_rsp; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     *(u64 *)dst = self->ics_gpregs.gp_r8; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     *(u64 *)dst = self->ics_gpregs.gp_r9; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    *(u64 *)dst = self->ics_gpregs.gp_r10; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    *(u64 *)dst = self->ics_gpregs.gp_r11; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    *(u64 *)dst = self->ics_gpregs.gp_r12; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    *(u64 *)dst = self->ics_gpregs.gp_r13; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    *(u64 *)dst = self->ics_gpregs.gp_r14; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    *(u64 *)dst = self->ics_gpregs.gp_r15; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    *(u64 *)dst = self->ics_irregs.ir_rip; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: *(u64 *)dst = self->ics_irregs.ir_rflags; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     *(u64 *)dst = self->ics_irregs.ir_cs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     *(u64 *)dst = self->ics_irregs.ir_ss16; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    value = self->ics_gpregs.gp_rax; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    value = self->ics_gpregs.gp_rdx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    value = self->ics_gpregs.gp_rcx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    value = self->ics_gpregs.gp_rbx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    value = self->ics_gpregs.gp_rsi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    value = self->ics_gpregs.gp_rdi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    value = self->ics_gpregs.gp_rbp; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    value = self->ics_irregs.ir_rsp; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     value = self->ics_gpregs.gp_r8; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     value = self->ics_gpregs.gp_r9; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    value = self->ics_gpregs.gp_r10; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    value = self->ics_gpregs.gp_r11; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    value = self->ics_gpregs.gp_r12; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    value = self->ics_gpregs.gp_r13; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    value = self->ics_gpregs.gp_r14; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    value = self->ics_gpregs.gp_r15; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    value = self->ics_irregs.ir_rip; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: value = self->ics_irregs.ir_rflags; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     value = self->ics_irregs.ir_cs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     value = self->ics_irregs.ir_ss16; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -514,29 +533,29 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base)(struct icpustate *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void const *__restrict src) {
+	uintptr_t value = rdpptr_as64(src);
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->ics_gpregs.gp_rax = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->ics_gpregs.gp_rdx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->ics_gpregs.gp_rcx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->ics_gpregs.gp_rbx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->ics_gpregs.gp_rsi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->ics_gpregs.gp_rdi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->ics_gpregs.gp_rbp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->ics_irregs.ir_rsp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     self->ics_gpregs.gp_r8 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     self->ics_gpregs.gp_r9 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    self->ics_gpregs.gp_r10 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    self->ics_gpregs.gp_r11 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    self->ics_gpregs.gp_r12 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    self->ics_gpregs.gp_r13 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    self->ics_gpregs.gp_r14 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    self->ics_gpregs.gp_r15 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->ics_irregs.ir_rip = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->ics_irregs.ir_rflags = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     self->ics_irregs.ir_cs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     self->ics_irregs.ir_ss = (u16)(*(u64 const *)src); break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->ics_gpregs.gp_rax = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->ics_gpregs.gp_rdx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->ics_gpregs.gp_rcx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->ics_gpregs.gp_rbx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->ics_gpregs.gp_rsi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->ics_gpregs.gp_rdi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->ics_gpregs.gp_rbp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->ics_irregs.ir_rsp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     self->ics_gpregs.gp_r8 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     self->ics_gpregs.gp_r9 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    self->ics_gpregs.gp_r10 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    self->ics_gpregs.gp_r11 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    self->ics_gpregs.gp_r12 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    self->ics_gpregs.gp_r13 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    self->ics_gpregs.gp_r14 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    self->ics_gpregs.gp_r15 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->ics_irregs.ir_rip = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->ics_irregs.ir_rflags = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     self->ics_irregs.ir_cs = (u16)value; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     self->ics_irregs.ir_ss = (u16)value; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -549,38 +568,39 @@ INTERN NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict self,
                                               unwind_regno_t dw_regno,
                                               void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->fcs_gpregs.gp_rax; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->fcs_gpregs.gp_rdx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    *(u64 *)dst = self->fcs_gpregs.gp_rcx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    *(u64 *)dst = self->fcs_gpregs.gp_rbx; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    *(u64 *)dst = self->fcs_gpregs.gp_rsi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    *(u64 *)dst = self->fcs_gpregs.gp_rdi; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    *(u64 *)dst = self->fcs_gpregs.gp_rbp; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    *(u64 *)dst = self->fcs_gpregs.gp_rsp; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     *(u64 *)dst = self->fcs_gpregs.gp_r8; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     *(u64 *)dst = self->fcs_gpregs.gp_r9; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    *(u64 *)dst = self->fcs_gpregs.gp_r10; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    *(u64 *)dst = self->fcs_gpregs.gp_r11; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    *(u64 *)dst = self->fcs_gpregs.gp_r12; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    *(u64 *)dst = self->fcs_gpregs.gp_r13; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    *(u64 *)dst = self->fcs_gpregs.gp_r14; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    *(u64 *)dst = self->fcs_gpregs.gp_r15; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    *(u64 *)dst = self->fcs_rip; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: *(u64 *)dst = self->fcs_rflags; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     *(u64 *)dst = self->fcs_sgregs.sg_es16; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     *(u64 *)dst = self->fcs_sgregs.sg_cs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     *(u64 *)dst = self->fcs_sgregs.sg_ss16; break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     *(u64 *)dst = self->fcs_sgregs.sg_ds16; break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     *(u64 *)dst = self->fcs_sgregs.sg_fs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     *(u64 *)dst = self->fcs_sgregs.sg_gs16; break;
-	case CFI_X86_64_UNWIND_REGISTER_FSBASE: *(u64 *)dst = self->fcs_sgbase.sg_fsbase; break;
-	case CFI_X86_64_UNWIND_REGISTER_GSBASE: *(u64 *)dst = self->fcs_sgbase.sg_gsbase; break;
-	case CFI_X86_64_UNWIND_REGISTER_TR:     *(u64 *)dst = self->fcs_sgregs.sg_tr16; break;
-	case CFI_X86_64_UNWIND_REGISTER_LDTR:   *(u64 *)dst = self->fcs_sgregs.sg_ldt16; break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    value = self->fcs_gpregs.gp_rax; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    value = self->fcs_gpregs.gp_rdx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    value = self->fcs_gpregs.gp_rcx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    value = self->fcs_gpregs.gp_rbx; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    value = self->fcs_gpregs.gp_rsi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    value = self->fcs_gpregs.gp_rdi; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    value = self->fcs_gpregs.gp_rbp; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    value = self->fcs_gpregs.gp_rsp; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     value = self->fcs_gpregs.gp_r8; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     value = self->fcs_gpregs.gp_r9; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    value = self->fcs_gpregs.gp_r10; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    value = self->fcs_gpregs.gp_r11; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    value = self->fcs_gpregs.gp_r12; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    value = self->fcs_gpregs.gp_r13; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    value = self->fcs_gpregs.gp_r14; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    value = self->fcs_gpregs.gp_r15; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    value = self->fcs_rip; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: value = self->fcs_rflags; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     value = self->fcs_sgregs.sg_es16; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     value = self->fcs_sgregs.sg_cs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     value = self->fcs_sgregs.sg_ss16; break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     value = self->fcs_sgregs.sg_ds16; break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     value = self->fcs_sgregs.sg_fs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     value = self->fcs_sgregs.sg_gs16; break;
+	case CFI_X86_64_UNWIND_REGISTER_FSBASE: value = self->fcs_sgbase.sg_fsbase; break;
+	case CFI_X86_64_UNWIND_REGISTER_GSBASE: value = self->fcs_sgbase.sg_gsbase; break;
+	case CFI_X86_64_UNWIND_REGISTER_TR:     value = self->fcs_sgregs.sg_tr16; break;
+	case CFI_X86_64_UNWIND_REGISTER_LDTR:   value = self->fcs_sgregs.sg_ldt16; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -591,190 +611,42 @@ INTERN NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self,
                                               unwind_regno_t dw_regno,
                                               void const *__restrict src) {
+	uintptr_t value = rdpptr_as64(src);
 	switch (dw_regno) {
-	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->fcs_gpregs.gp_rax = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->fcs_gpregs.gp_rdx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->fcs_gpregs.gp_rcx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->fcs_gpregs.gp_rbx = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->fcs_gpregs.gp_rsi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->fcs_gpregs.gp_rdi = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->fcs_gpregs.gp_rbp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->fcs_gpregs.gp_rsp = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R8:     self->fcs_gpregs.gp_r8 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R9:     self->fcs_gpregs.gp_r9 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R10:    self->fcs_gpregs.gp_r10 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R11:    self->fcs_gpregs.gp_r11 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R12:    self->fcs_gpregs.gp_r12 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R13:    self->fcs_gpregs.gp_r13 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R14:    self->fcs_gpregs.gp_r14 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_R15:    self->fcs_gpregs.gp_r15 = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->fcs_rip = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->fcs_rflags = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     self->fcs_sgregs.sg_es = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     self->fcs_sgregs.sg_cs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     self->fcs_sgregs.sg_ss = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     self->fcs_sgregs.sg_ds = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     self->fcs_sgregs.sg_fs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     self->fcs_sgregs.sg_gs = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->fcs_sgbase.sg_fsbase = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->fcs_sgbase.sg_gsbase = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_TR:     self->fcs_sgregs.sg_tr = (u16)(*(u64 const *)src); break;
-	case CFI_X86_64_UNWIND_REGISTER_LDTR:   self->fcs_sgregs.sg_ldt = (u16)(*(u64 const *)src); break;
-	default:
-		goto badreg;
+	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->fcs_gpregs.gp_rax = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->fcs_gpregs.gp_rdx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RCX:    self->fcs_gpregs.gp_rcx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBX:    self->fcs_gpregs.gp_rbx = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSI:    self->fcs_gpregs.gp_rsi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RDI:    self->fcs_gpregs.gp_rdi = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RBP:    self->fcs_gpregs.gp_rbp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RSP:    self->fcs_gpregs.gp_rsp = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R8:     self->fcs_gpregs.gp_r8 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R9:     self->fcs_gpregs.gp_r9 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R10:    self->fcs_gpregs.gp_r10 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R11:    self->fcs_gpregs.gp_r11 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R12:    self->fcs_gpregs.gp_r12 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R13:    self->fcs_gpregs.gp_r13 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R14:    self->fcs_gpregs.gp_r14 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_R15:    self->fcs_gpregs.gp_r15 = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->fcs_rip = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->fcs_rflags = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     self->fcs_sgregs.sg_es = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     self->fcs_sgregs.sg_cs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     self->fcs_sgregs.sg_ss = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     self->fcs_sgregs.sg_ds = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     self->fcs_sgregs.sg_fs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     self->fcs_sgregs.sg_gs = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->fcs_sgbase.sg_fsbase = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->fcs_sgbase.sg_gsbase = value; break;
+	case CFI_X86_64_UNWIND_REGISTER_TR:     self->fcs_sgregs.sg_tr = value & 0xffff; break;
+	case CFI_X86_64_UNWIND_REGISTER_LDTR:   self->fcs_sgregs.sg_ldt = value & 0xffff; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
 }
-
-#if !defined(__KERNEL__) || defined(__INTELLISENSE__)
-LOCAL NONNULL((1, 3)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_base)(struct mcontext const *__restrict self,
-                                                  unwind_regno_t dw_regno,
-                                                  void *__restrict dst) {
-	switch (dw_regno) {
-
-	case CFI_X86_64_UNWIND_REGISTER_MM0 ... CFI_X86_64_UNWIND_REGISTER_MM7:
-		dw_regno -= CFI_X86_64_UNWIND_REGISTER_MM0;
-		goto do_fpreg;
-	case CFI_X86_64_UNWIND_REGISTER_ST0 ... CFI_X86_64_UNWIND_REGISTER_ST7:
-		dw_regno -= CFI_X86_64_UNWIND_REGISTER_ST0;
-do_fpreg:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
-			} else {
-				memcpy((byte_t *)dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10);
-				memset((byte_t *)dst + 10, 0, 6);
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_XMM0 ... CFI_X86_64_UNWIND_REGISTER_XMM15:
-		dw_regno -= CFI_X86_64_UNWIND_REGISTER_XMM0;
-		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
-			memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_xmm[dw_regno], 16);
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_FCW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				*(u32 *)dst = self->mc_fpu.f_xsave.fx_fcw;
-			} else {
-				*(u32 *)dst = self->mc_fpu.f_ssave.fs_fcw;
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_FSW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				*(u32 *)dst = self->mc_fpu.f_xsave.fx_fsw;
-			} else {
-				*(u32 *)dst = self->mc_fpu.f_ssave.fs_fsw;
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_MXCSR:
-		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
-			*(u32 *)dst = self->mc_fpu.f_xsave.fx_mxcsr;
-		} else {
-			goto badreg;
-		}
-		break;
-
-	default:
-		return libuw_unwind_getreg_ucpustate_base(&self->mc_context, dw_regno, dst);
-	}
-	return UNWIND_SUCCESS;
-badreg:
-	return UNWIND_INVALID_REGISTER;
-}
-
-LOCAL NONNULL((1, 3)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_base)(struct mcontext *__restrict self,
-                                                  unwind_regno_t dw_regno,
-                                                  void const *__restrict src) {
-	switch (dw_regno) {
-
-	case CFI_X86_64_UNWIND_REGISTER_MM0 ... CFI_X86_64_UNWIND_REGISTER_MM7:
-		dw_regno -= CFI_X86_64_UNWIND_REGISTER_MM0;
-		goto do_fpreg;
-	case CFI_X86_64_UNWIND_REGISTER_ST0 ... CFI_X86_64_UNWIND_REGISTER_ST7:
-		dw_regno -= CFI_X86_64_UNWIND_REGISTER_ST0;
-do_fpreg:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				memcpy(&self->mc_fpu.f_xsave.fx_regs[dw_regno], src, 16);
-			} else {
-				memcpy(&self->mc_fpu.f_ssave.fs_regs[dw_regno], src, 10);
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_XMM0 ... CFI_X86_64_UNWIND_REGISTER_XMM15:
-		dw_regno -= CFI_X86_64_UNWIND_REGISTER_XMM0;
-		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
-			memcpy(&self->mc_fpu.f_xsave.fx_xmm[dw_regno], src, 16);
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_FCW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				self->mc_fpu.f_xsave.fx_fcw = (u16)(*(u32 const *)src);
-			} else {
-				self->mc_fpu.f_ssave.fs_fcw = (u16)(*(u32 const *)src);
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_FSW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				self->mc_fpu.f_xsave.fx_fsw = (u16)(*(u32 const *)src);
-			} else {
-				self->mc_fpu.f_ssave.fs_fsw = (u16)(*(u32 const *)src);
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_MXCSR:
-		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
-			self->mc_fpu.f_xsave.fx_mxcsr = *(u32 const *)src;
-		} else {
-			goto badreg;
-		}
-		break;
-
-	default:
-		return libuw_unwind_setreg_ucpustate_base(&self->mc_context, dw_regno, src);
-	}
-	return UNWIND_SUCCESS;
-badreg:
-	return UNWIND_INVALID_REGISTER;
-}
-#endif /* !__KERNEL__ || __INTELLISENSE */
-
 
 #else /* __x86_64__ */
 
@@ -834,16 +706,17 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_base)(struct lcpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI: *(u32 *)dst = self->lcs_edi; break;
-	case CFI_386_UNWIND_REGISTER_ESI: *(u32 *)dst = self->lcs_esi; break;
-	case CFI_386_UNWIND_REGISTER_EBP: *(u32 *)dst = self->lcs_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP: *(u32 *)dst = self->lcs_esp; break;
-	case CFI_386_UNWIND_REGISTER_EBX: *(u32 *)dst = self->lcs_ebx; break;
-	case CFI_386_UNWIND_REGISTER_EIP: *(u32 *)dst = self->lcs_eip; break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI: value = self->lcs_edi; break;
+	case CFI_386_UNWIND_REGISTER_ESI: value = self->lcs_esi; break;
+	case CFI_386_UNWIND_REGISTER_EBP: value = self->lcs_ebp; break;
+	case CFI_386_UNWIND_REGISTER_ESP: value = self->lcs_esp; break;
+	case CFI_386_UNWIND_REGISTER_EBX: value = self->lcs_ebx; break;
+	case CFI_386_UNWIND_REGISTER_EIP: value = self->lcs_eip; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -853,15 +726,15 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_base)(struct lcpustate *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void const *__restrict src) {
+	uintptr_t value = rdpptr_as32(src);
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI: self->lcs_edi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESI: self->lcs_esi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBP: self->lcs_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP: self->lcs_esp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBX: self->lcs_ebx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EIP: self->lcs_eip = *(u32 const *)src; break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI: self->lcs_edi = value; break;
+	case CFI_386_UNWIND_REGISTER_ESI: self->lcs_esi = value; break;
+	case CFI_386_UNWIND_REGISTER_EBP: self->lcs_ebp = value; break;
+	case CFI_386_UNWIND_REGISTER_ESP: self->lcs_esp = value; break;
+	case CFI_386_UNWIND_REGISTER_EBX: self->lcs_ebx = value; break;
+	case CFI_386_UNWIND_REGISTER_EIP: self->lcs_eip = value; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -872,26 +745,27 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate_base)(struct ucpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->ucs_gpregs.gp_edi; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->ucs_gpregs.gp_esi; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    *(u32 *)dst = self->ucs_gpregs.gp_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = self->ucs_gpregs.gp_esp; break;
-	case CFI_386_UNWIND_REGISTER_EBX:    *(u32 *)dst = self->ucs_gpregs.gp_ebx; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    *(u32 *)dst = self->ucs_gpregs.gp_edx; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    *(u32 *)dst = self->ucs_gpregs.gp_ecx; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    *(u32 *)dst = self->ucs_gpregs.gp_eax; break;
-	case CFI_386_UNWIND_REGISTER_GS:     *(u32 *)dst = self->ucs_sgregs.sg_gs16; break;
-	case CFI_386_UNWIND_REGISTER_FS:     *(u32 *)dst = self->ucs_sgregs.sg_fs16; break;
-	case CFI_386_UNWIND_REGISTER_ES:     *(u32 *)dst = self->ucs_sgregs.sg_es16; break;
-	case CFI_386_UNWIND_REGISTER_DS:     *(u32 *)dst = self->ucs_sgregs.sg_ds16; break;
-	case CFI_386_UNWIND_REGISTER_CS:     *(u32 *)dst = self->ucs_cs16; break;
-	case CFI_386_UNWIND_REGISTER_SS:     *(u32 *)dst = self->ucs_ss16; break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: *(u32 *)dst = self->ucs_eflags; break;
-	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = self->ucs_eip; break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI:    value = self->ucs_gpregs.gp_edi; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    value = self->ucs_gpregs.gp_esi; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    value = self->ucs_gpregs.gp_ebp; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    value = self->ucs_gpregs.gp_esp; break;
+	case CFI_386_UNWIND_REGISTER_EBX:    value = self->ucs_gpregs.gp_ebx; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    value = self->ucs_gpregs.gp_edx; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    value = self->ucs_gpregs.gp_ecx; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    value = self->ucs_gpregs.gp_eax; break;
+	case CFI_386_UNWIND_REGISTER_GS:     value = self->ucs_sgregs.sg_gs16; break;
+	case CFI_386_UNWIND_REGISTER_FS:     value = self->ucs_sgregs.sg_fs16; break;
+	case CFI_386_UNWIND_REGISTER_ES:     value = self->ucs_sgregs.sg_es16; break;
+	case CFI_386_UNWIND_REGISTER_DS:     value = self->ucs_sgregs.sg_ds16; break;
+	case CFI_386_UNWIND_REGISTER_CS:     value = self->ucs_cs16; break;
+	case CFI_386_UNWIND_REGISTER_SS:     value = self->ucs_ss16; break;
+	case CFI_386_UNWIND_REGISTER_EFLAGS: value = self->ucs_eflags; break;
+	case CFI_386_UNWIND_REGISTER_EIP:    value = self->ucs_eip; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -901,25 +775,25 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_base)(struct ucpustate *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void const *__restrict src) {
+	uintptr_t value = rdpptr_as32(src);
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    self->ucs_gpregs.gp_edi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    self->ucs_gpregs.gp_esi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    self->ucs_gpregs.gp_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    self->ucs_gpregs.gp_esp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBX:    self->ucs_gpregs.gp_ebx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    self->ucs_gpregs.gp_edx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    self->ucs_gpregs.gp_ecx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    self->ucs_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_GS:     self->ucs_sgregs.sg_gs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_FS:     self->ucs_sgregs.sg_fs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_ES:     self->ucs_sgregs.sg_es = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_DS:     self->ucs_sgregs.sg_ds = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_CS:     self->ucs_cs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_SS:     self->ucs_ss = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: self->ucs_eflags = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EIP:    self->ucs_eip = *(u32 const *)src; break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI:    self->ucs_gpregs.gp_edi = value; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    self->ucs_gpregs.gp_esi = value; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    self->ucs_gpregs.gp_ebp = value; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    self->ucs_gpregs.gp_esp = value; break;
+	case CFI_386_UNWIND_REGISTER_EBX:    self->ucs_gpregs.gp_ebx = value; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    self->ucs_gpregs.gp_edx = value; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    self->ucs_gpregs.gp_ecx = value; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    self->ucs_gpregs.gp_eax = value; break;
+	case CFI_386_UNWIND_REGISTER_GS:     self->ucs_sgregs.sg_gs = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_FS:     self->ucs_sgregs.sg_fs = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_ES:     self->ucs_sgregs.sg_es = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_DS:     self->ucs_sgregs.sg_ds = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_CS:     self->ucs_cs = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_SS:     self->ucs_ss = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_EFLAGS: self->ucs_eflags = value; break;
+	case CFI_386_UNWIND_REGISTER_EIP:    self->ucs_eip = value; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -930,20 +804,21 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate_base)(struct kcpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->kcs_gpregs.gp_edi; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->kcs_gpregs.gp_esi; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    *(u32 *)dst = self->kcs_gpregs.gp_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = self->kcs_gpregs.gp_esp; break;
-	case CFI_386_UNWIND_REGISTER_EBX:    *(u32 *)dst = self->kcs_gpregs.gp_ebx; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    *(u32 *)dst = self->kcs_gpregs.gp_edx; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    *(u32 *)dst = self->kcs_gpregs.gp_ecx; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    *(u32 *)dst = self->kcs_gpregs.gp_eax; break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: *(u32 *)dst = self->kcs_eflags; break;
-	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = self->kcs_eip; break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI:    value = self->kcs_gpregs.gp_edi; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    value = self->kcs_gpregs.gp_esi; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    value = self->kcs_gpregs.gp_ebp; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    value = self->kcs_gpregs.gp_esp; break;
+	case CFI_386_UNWIND_REGISTER_EBX:    value = self->kcs_gpregs.gp_ebx; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    value = self->kcs_gpregs.gp_edx; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    value = self->kcs_gpregs.gp_ecx; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    value = self->kcs_gpregs.gp_eax; break;
+	case CFI_386_UNWIND_REGISTER_EFLAGS: value = self->kcs_eflags; break;
+	case CFI_386_UNWIND_REGISTER_EIP:    value = self->kcs_eip; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -953,19 +828,19 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate_base)(struct kcpustate *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void const *__restrict src) {
+	uintptr_t value = rdpptr_as32(src);
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    self->kcs_gpregs.gp_edi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    self->kcs_gpregs.gp_esi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    self->kcs_gpregs.gp_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    self->kcs_gpregs.gp_esp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBX:    self->kcs_gpregs.gp_ebx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    self->kcs_gpregs.gp_edx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    self->kcs_gpregs.gp_ecx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    self->kcs_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: self->kcs_eflags = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EIP:    self->kcs_eip = *(u32 const *)src; break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI:    self->kcs_gpregs.gp_edi = value; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    self->kcs_gpregs.gp_esi = value; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    self->kcs_gpregs.gp_ebp = value; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    self->kcs_gpregs.gp_esp = value; break;
+	case CFI_386_UNWIND_REGISTER_EBX:    self->kcs_gpregs.gp_ebx = value; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    self->kcs_gpregs.gp_edx = value; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    self->kcs_gpregs.gp_ecx = value; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    self->kcs_gpregs.gp_eax = value; break;
+	case CFI_386_UNWIND_REGISTER_EFLAGS: self->kcs_eflags = value; break;
+	case CFI_386_UNWIND_REGISTER_EIP:    self->kcs_eip = value; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -978,26 +853,27 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_scpustate_base)(struct scpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->scs_gpregs.gp_edi; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->scs_gpregs.gp_esi; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    *(u32 *)dst = self->scs_gpregs.gp_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = scpustate_getpsp(self); break;
-	case CFI_386_UNWIND_REGISTER_EBX:    *(u32 *)dst = self->scs_gpregs.gp_ebx; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    *(u32 *)dst = self->scs_gpregs.gp_edx; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    *(u32 *)dst = self->scs_gpregs.gp_ecx; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    *(u32 *)dst = self->scs_gpregs.gp_eax; break;
-	case CFI_386_UNWIND_REGISTER_GS:     *(u32 *)dst = scpustate_getgs(self); break;
-	case CFI_386_UNWIND_REGISTER_FS:     *(u32 *)dst = scpustate_getfs(self); break;
-	case CFI_386_UNWIND_REGISTER_ES:     *(u32 *)dst = scpustate_getes(self); break;
-	case CFI_386_UNWIND_REGISTER_DS:     *(u32 *)dst = scpustate_getds(self); break;
-	case CFI_386_UNWIND_REGISTER_CS:     *(u32 *)dst = scpustate_getcs(self); break;
-	case CFI_386_UNWIND_REGISTER_SS:     *(u32 *)dst = scpustate_getss(self); break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: *(u32 *)dst = scpustate_getpflags(self); break;
-	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = scpustate_getpip(self); break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI:    value = self->scs_gpregs.gp_edi; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    value = self->scs_gpregs.gp_esi; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    value = self->scs_gpregs.gp_ebp; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    value = scpustate_getpsp(self); break;
+	case CFI_386_UNWIND_REGISTER_EBX:    value = self->scs_gpregs.gp_ebx; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    value = self->scs_gpregs.gp_edx; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    value = self->scs_gpregs.gp_ecx; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    value = self->scs_gpregs.gp_eax; break;
+	case CFI_386_UNWIND_REGISTER_GS:     value = scpustate_getgs(self); break;
+	case CFI_386_UNWIND_REGISTER_FS:     value = scpustate_getfs(self); break;
+	case CFI_386_UNWIND_REGISTER_ES:     value = scpustate_getes(self); break;
+	case CFI_386_UNWIND_REGISTER_DS:     value = scpustate_getds(self); break;
+	case CFI_386_UNWIND_REGISTER_CS:     value = scpustate_getcs(self); break;
+	case CFI_386_UNWIND_REGISTER_SS:     value = scpustate_getss(self); break;
+	case CFI_386_UNWIND_REGISTER_EFLAGS: value = scpustate_getpflags(self); break;
+	case CFI_386_UNWIND_REGISTER_EIP:    value = scpustate_getpip(self); break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -1008,28 +884,29 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base_p)(struct scpustate **__restri
                                                      unwind_regno_t dw_regno,
                                                      void const *__restrict src) {
 	struct scpustate *self = *pself;
+	uintptr_t value = rdpptr_as32(src);
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI: self->scs_gpregs.gp_edi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESI: self->scs_gpregs.gp_esi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBP: self->scs_gpregs.gp_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP: *pself = scpustate_setpsp_p(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EBX: self->scs_gpregs.gp_ebx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EDX: self->scs_gpregs.gp_edx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ECX: self->scs_gpregs.gp_ecx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EAX: self->scs_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_GS:  scpustate_setgs(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_FS:  scpustate_setfs(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_ES:  scpustate_setes(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_DS:  scpustate_setds(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EIP: scpustate_setpip(self, *(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_EDI: self->scs_gpregs.gp_edi = value; break;
+	case CFI_386_UNWIND_REGISTER_ESI: self->scs_gpregs.gp_esi = value; break;
+	case CFI_386_UNWIND_REGISTER_EBP: self->scs_gpregs.gp_ebp = value; break;
+	case CFI_386_UNWIND_REGISTER_ESP: *pself = scpustate_setpsp_p(self, value); break;
+	case CFI_386_UNWIND_REGISTER_EBX: self->scs_gpregs.gp_ebx = value; break;
+	case CFI_386_UNWIND_REGISTER_EDX: self->scs_gpregs.gp_edx = value; break;
+	case CFI_386_UNWIND_REGISTER_ECX: self->scs_gpregs.gp_ecx = value; break;
+	case CFI_386_UNWIND_REGISTER_EAX: self->scs_gpregs.gp_eax = value; break;
+	case CFI_386_UNWIND_REGISTER_GS:  scpustate_setgs(self, value & 0xffff); break;
+	case CFI_386_UNWIND_REGISTER_FS:  scpustate_setfs(self, value & 0xffff); break;
+	case CFI_386_UNWIND_REGISTER_ES:  scpustate_setes(self, value & 0xffff); break;
+	case CFI_386_UNWIND_REGISTER_DS:  scpustate_setds(self, value & 0xffff); break;
+	case CFI_386_UNWIND_REGISTER_EIP: scpustate_setpip(self, value); break;
 	case CFI_386_UNWIND_REGISTER_SS:
-		if (!scpustate_trysetuserss(self, *(u32 const *)src))
+		if (!scpustate_trysetuserss(self, value))
 			goto badreg;
 		break;
 
 	case CFI_386_UNWIND_REGISTER_CS: {
 		u16 newval, oldval;
-		newval = (u16)(*(u32 const *)src);
+		newval = value & 0xffff;
 		oldval = scpustate_getcs(self);
 		/* Must not switch between user-space/kernel-space contexts. */
 		if (((newval & 3) != 0) != ((oldval & 3) != 0))
@@ -1039,7 +916,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base_p)(struct scpustate **__restri
 
 	case CFI_386_UNWIND_REGISTER_EFLAGS: {
 		u32 newval, oldval;
-		newval = *(u32 const *)src;
+		newval = value;
 		oldval = scpustate_getpflags(self);
 
 		/* Must not switch to/from vm86 contexts. */
@@ -1048,8 +925,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base_p)(struct scpustate **__restri
 		scpustate_setpflags(self, newval);
 	}	break;
 
-	default:
-		goto badreg;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -1060,26 +936,27 @@ LOCAL NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_icpustate_base)(struct icpustate const *__restrict self,
                                                    unwind_regno_t dw_regno,
                                                    void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->ics_gpregs.gp_edi; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->ics_gpregs.gp_esi; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    *(u32 *)dst = self->ics_gpregs.gp_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = icpustate_getpsp(self); break;
-	case CFI_386_UNWIND_REGISTER_EBX:    *(u32 *)dst = self->ics_gpregs.gp_ebx; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    *(u32 *)dst = self->ics_gpregs.gp_edx; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    *(u32 *)dst = self->ics_gpregs.gp_ecx; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    *(u32 *)dst = self->ics_gpregs.gp_eax; break;
-	case CFI_386_UNWIND_REGISTER_GS:     *(u32 *)dst = icpustate_getgs(self); break;
-	case CFI_386_UNWIND_REGISTER_FS:     *(u32 *)dst = icpustate_getfs(self); break;
-	case CFI_386_UNWIND_REGISTER_ES:     *(u32 *)dst = icpustate_getes(self); break;
-	case CFI_386_UNWIND_REGISTER_DS:     *(u32 *)dst = icpustate_getds(self); break;
-	case CFI_386_UNWIND_REGISTER_CS:     *(u32 *)dst = icpustate_getcs(self); break;
-	case CFI_386_UNWIND_REGISTER_SS:     *(u32 *)dst = icpustate_getss(self); break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: *(u32 *)dst = icpustate_getpflags(self); break;
-	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = icpustate_getpip(self); break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI:    value = self->ics_gpregs.gp_edi; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    value = self->ics_gpregs.gp_esi; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    value = self->ics_gpregs.gp_ebp; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    value = icpustate_getpsp(self); break;
+	case CFI_386_UNWIND_REGISTER_EBX:    value = self->ics_gpregs.gp_ebx; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    value = self->ics_gpregs.gp_edx; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    value = self->ics_gpregs.gp_ecx; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    value = self->ics_gpregs.gp_eax; break;
+	case CFI_386_UNWIND_REGISTER_GS:     value = icpustate_getgs(self); break;
+	case CFI_386_UNWIND_REGISTER_FS:     value = icpustate_getfs(self); break;
+	case CFI_386_UNWIND_REGISTER_ES:     value = icpustate_getes(self); break;
+	case CFI_386_UNWIND_REGISTER_DS:     value = icpustate_getds(self); break;
+	case CFI_386_UNWIND_REGISTER_CS:     value = icpustate_getcs(self); break;
+	case CFI_386_UNWIND_REGISTER_SS:     value = icpustate_getss(self); break;
+	case CFI_386_UNWIND_REGISTER_EFLAGS: value = icpustate_getpflags(self); break;
+	case CFI_386_UNWIND_REGISTER_EIP:    value = icpustate_getpip(self); break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -1090,28 +967,29 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base_p)(struct icpustate **__restri
                                                      unwind_regno_t dw_regno,
                                                      void const *__restrict src) {
 	struct icpustate *self = *pself;
+	uintptr_t value = rdpptr_as32(src);
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    self->ics_gpregs.gp_edi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    self->ics_gpregs.gp_esi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    self->ics_gpregs.gp_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *pself = icpustate_setpsp_p(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EBX:    self->ics_gpregs.gp_ebx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    self->ics_gpregs.gp_edx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    self->ics_gpregs.gp_ecx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    self->ics_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_GS:     icpustate_setgs(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_FS:     icpustate_setfs(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_ES:     icpustate_setes(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_DS:     icpustate_setds(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EIP:    icpustate_setpip(self, *(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_EDI:    self->ics_gpregs.gp_edi = value; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    self->ics_gpregs.gp_esi = value; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    self->ics_gpregs.gp_ebp = value; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    *pself = icpustate_setpsp_p(self, value); break;
+	case CFI_386_UNWIND_REGISTER_EBX:    self->ics_gpregs.gp_ebx = value; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    self->ics_gpregs.gp_edx = value; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    self->ics_gpregs.gp_ecx = value; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    self->ics_gpregs.gp_eax = value; break;
+	case CFI_386_UNWIND_REGISTER_GS:     icpustate_setgs(self, value & 0xffff); break;
+	case CFI_386_UNWIND_REGISTER_FS:     icpustate_setfs(self, value & 0xffff); break;
+	case CFI_386_UNWIND_REGISTER_ES:     icpustate_setes(self, value & 0xffff); break;
+	case CFI_386_UNWIND_REGISTER_DS:     icpustate_setds(self, value & 0xffff); break;
+	case CFI_386_UNWIND_REGISTER_EIP:    icpustate_setpip(self, value); break;
 	case CFI_386_UNWIND_REGISTER_SS:
-		if (!icpustate_trysetuserss(self, *(u32 const *)src))
+		if (!icpustate_trysetuserss(self, value))
 			goto badreg;
 		break;
 
 	case CFI_386_UNWIND_REGISTER_CS: {
 		u16 newval, oldval;
-		newval = (u16)(*(u32 const *)src);
+		newval = value & 0xffff;
 		oldval = icpustate_getcs(self);
 		if (oldval == newval)
 			break;
@@ -1123,7 +1001,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base_p)(struct icpustate **__restri
 
 	case CFI_386_UNWIND_REGISTER_EFLAGS: {
 		u32 newval, oldval;
-		newval = *(u32 const *)src;
+		newval = value;
 		oldval = icpustate_getpflags(self);
 
 		/* Must not switch to/from vm86 contexts. */
@@ -1132,8 +1010,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base_p)(struct icpustate **__restri
 		icpustate_setpflags(self, newval);
 	}	break;
 
-	default:
-		goto badreg;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -1146,28 +1023,29 @@ INTERN NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict self,
                                               unwind_regno_t dw_regno,
                                               void *__restrict dst) {
+	uintptr_t value;
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->fcs_gpregs.gp_edi; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->fcs_gpregs.gp_esi; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    *(u32 *)dst = self->fcs_gpregs.gp_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = self->fcs_gpregs.gp_esp; break;
-	case CFI_386_UNWIND_REGISTER_EBX:    *(u32 *)dst = self->fcs_gpregs.gp_ebx; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    *(u32 *)dst = self->fcs_gpregs.gp_edx; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    *(u32 *)dst = self->fcs_gpregs.gp_ecx; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    *(u32 *)dst = self->fcs_gpregs.gp_eax; break;
-	case CFI_386_UNWIND_REGISTER_GS:     *(u32 *)dst = self->fcs_sgregs.sg_gs16; break;
-	case CFI_386_UNWIND_REGISTER_FS:     *(u32 *)dst = self->fcs_sgregs.sg_fs16; break;
-	case CFI_386_UNWIND_REGISTER_ES:     *(u32 *)dst = self->fcs_sgregs.sg_es16; break;
-	case CFI_386_UNWIND_REGISTER_DS:     *(u32 *)dst = self->fcs_sgregs.sg_ds16; break;
-	case CFI_386_UNWIND_REGISTER_CS:     *(u32 *)dst = self->fcs_sgregs.sg_cs16; break;
-	case CFI_386_UNWIND_REGISTER_SS:     *(u32 *)dst = self->fcs_sgregs.sg_ss16; break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: *(u32 *)dst = self->fcs_eflags; break;
-	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = self->fcs_eip; break;
-	case CFI_386_UNWIND_REGISTER_TR:     *(u32 *)dst = self->fcs_sgregs.sg_tr16; break;
-	case CFI_386_UNWIND_REGISTER_LDTR:   *(u32 *)dst = self->fcs_sgregs.sg_ldt16; break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI:    value = self->fcs_gpregs.gp_edi; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    value = self->fcs_gpregs.gp_esi; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    value = self->fcs_gpregs.gp_ebp; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    value = self->fcs_gpregs.gp_esp; break;
+	case CFI_386_UNWIND_REGISTER_EBX:    value = self->fcs_gpregs.gp_ebx; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    value = self->fcs_gpregs.gp_edx; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    value = self->fcs_gpregs.gp_ecx; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    value = self->fcs_gpregs.gp_eax; break;
+	case CFI_386_UNWIND_REGISTER_GS:     value = self->fcs_sgregs.sg_gs16; break;
+	case CFI_386_UNWIND_REGISTER_FS:     value = self->fcs_sgregs.sg_fs16; break;
+	case CFI_386_UNWIND_REGISTER_ES:     value = self->fcs_sgregs.sg_es16; break;
+	case CFI_386_UNWIND_REGISTER_DS:     value = self->fcs_sgregs.sg_ds16; break;
+	case CFI_386_UNWIND_REGISTER_CS:     value = self->fcs_sgregs.sg_cs16; break;
+	case CFI_386_UNWIND_REGISTER_SS:     value = self->fcs_sgregs.sg_ss16; break;
+	case CFI_386_UNWIND_REGISTER_EFLAGS: value = self->fcs_eflags; break;
+	case CFI_386_UNWIND_REGISTER_EIP:    value = self->fcs_eip; break;
+	case CFI_386_UNWIND_REGISTER_TR:     value = self->fcs_sgregs.sg_tr16; break;
+	case CFI_386_UNWIND_REGISTER_LDTR:   value = self->fcs_sgregs.sg_ldt16; break;
+	default: goto badreg;
 	}
+	wrpptr(dst, value);
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
@@ -1178,214 +1056,32 @@ INTERN NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self,
                                               unwind_regno_t dw_regno,
                                               void const *__restrict src) {
+	uintptr_t value = rdpptr_as32(src);
 	switch (dw_regno) {
-	case CFI_386_UNWIND_REGISTER_EDI:    self->fcs_gpregs.gp_edi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    self->fcs_gpregs.gp_esi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    self->fcs_gpregs.gp_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    self->fcs_gpregs.gp_esp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBX:    self->fcs_gpregs.gp_ebx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    self->fcs_gpregs.gp_edx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    self->fcs_gpregs.gp_ecx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    self->fcs_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_GS:     self->fcs_sgregs.sg_gs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_FS:     self->fcs_sgregs.sg_fs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_ES:     self->fcs_sgregs.sg_es = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_DS:     self->fcs_sgregs.sg_ds = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_CS:     self->fcs_sgregs.sg_cs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_SS:     self->fcs_sgregs.sg_ss = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: self->fcs_eflags = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EIP:    self->fcs_eip = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_TR:     self->fcs_sgregs.sg_tr = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_LDTR:   self->fcs_sgregs.sg_ldt = (u16)(*(u32 const *)src); break;
-	default:
-		goto badreg;
+	case CFI_386_UNWIND_REGISTER_EDI:    self->fcs_gpregs.gp_edi = value; break;
+	case CFI_386_UNWIND_REGISTER_ESI:    self->fcs_gpregs.gp_esi = value; break;
+	case CFI_386_UNWIND_REGISTER_EBP:    self->fcs_gpregs.gp_ebp = value; break;
+	case CFI_386_UNWIND_REGISTER_ESP:    self->fcs_gpregs.gp_esp = value; break;
+	case CFI_386_UNWIND_REGISTER_EBX:    self->fcs_gpregs.gp_ebx = value; break;
+	case CFI_386_UNWIND_REGISTER_EDX:    self->fcs_gpregs.gp_edx = value; break;
+	case CFI_386_UNWIND_REGISTER_ECX:    self->fcs_gpregs.gp_ecx = value; break;
+	case CFI_386_UNWIND_REGISTER_EAX:    self->fcs_gpregs.gp_eax = value; break;
+	case CFI_386_UNWIND_REGISTER_GS:     self->fcs_sgregs.sg_gs = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_FS:     self->fcs_sgregs.sg_fs = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_ES:     self->fcs_sgregs.sg_es = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_DS:     self->fcs_sgregs.sg_ds = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_CS:     self->fcs_sgregs.sg_cs = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_SS:     self->fcs_sgregs.sg_ss = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_EFLAGS: self->fcs_eflags = value; break;
+	case CFI_386_UNWIND_REGISTER_EIP:    self->fcs_eip = value; break;
+	case CFI_386_UNWIND_REGISTER_TR:     self->fcs_sgregs.sg_tr = value & 0xffff; break;
+	case CFI_386_UNWIND_REGISTER_LDTR:   self->fcs_sgregs.sg_ldt = value & 0xffff; break;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
 }
-
-#if !defined(__KERNEL__) || defined(__INTELLISENSE__)
-LOCAL NONNULL((1, 3)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_base)(struct mcontext const *__restrict self,
-                                                  unwind_regno_t dw_regno,
-                                                  void *__restrict dst) {
-	switch (dw_regno) {
-
-	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_edi; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_esi; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_esp; break;
-	case CFI_386_UNWIND_REGISTER_EBX:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_ebx; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_edx; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_ecx; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_eax; break;
-	case CFI_386_UNWIND_REGISTER_GS:     *(u32 *)dst = self->mc_context.ucs_sgregs.sg_gs16; break;
-	case CFI_386_UNWIND_REGISTER_FS:     *(u32 *)dst = self->mc_context.ucs_sgregs.sg_fs16; break;
-	case CFI_386_UNWIND_REGISTER_ES:     *(u32 *)dst = self->mc_context.ucs_sgregs.sg_es16; break;
-	case CFI_386_UNWIND_REGISTER_DS:     *(u32 *)dst = self->mc_context.ucs_sgregs.sg_ds16; break;
-	case CFI_386_UNWIND_REGISTER_CS:     *(u32 *)dst = self->mc_context.ucs_cs16; break;
-	case CFI_386_UNWIND_REGISTER_SS:     *(u32 *)dst = self->mc_context.ucs_ss16; break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: *(u32 *)dst = self->mc_context.ucs_eflags; break;
-	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = self->mc_context.ucs_eip; break;
-
-	case CFI_386_UNWIND_REGISTER_MM0 ... CFI_386_UNWIND_REGISTER_MM7:
-		dw_regno -= CFI_386_UNWIND_REGISTER_MM0;
-		goto do_fpreg;
-	case CFI_386_UNWIND_REGISTER_ST0 ... CFI_386_UNWIND_REGISTER_ST7:
-		dw_regno -= CFI_386_UNWIND_REGISTER_ST0;
-do_fpreg:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
-			} else {
-				memcpy((byte_t *)dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10);
-				memset((byte_t *)dst + 10, 0, 6);
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_386_UNWIND_REGISTER_XMM0 ... CFI_386_UNWIND_REGISTER_XMM7:
-		dw_regno -= CFI_386_UNWIND_REGISTER_XMM0;
-		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
-			memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_xmm[dw_regno], 16);
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_386_UNWIND_REGISTER_FCW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				*(u32 *)dst = self->mc_fpu.f_xsave.fx_fcw;
-			} else {
-				*(u32 *)dst = self->mc_fpu.f_ssave.fs_fcw;
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_386_UNWIND_REGISTER_FSW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				*(u32 *)dst = self->mc_fpu.f_xsave.fx_fsw;
-			} else {
-				*(u32 *)dst = self->mc_fpu.f_ssave.fs_fsw;
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_386_UNWIND_REGISTER_MXCSR:
-		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
-			*(u32 *)dst = self->mc_fpu.f_xsave.fx_mxcsr;
-		} else {
-			goto badreg;
-		}
-		break;
-
-	default:
-		goto badreg;
-	}
-	return UNWIND_SUCCESS;
-badreg:
-	return UNWIND_INVALID_REGISTER;
-}
-
-LOCAL NONNULL((1, 3)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_base)(struct mcontext *__restrict self,
-                                                  unwind_regno_t dw_regno,
-                                                  void const *__restrict src) {
-	switch (dw_regno) {
-
-	case CFI_386_UNWIND_REGISTER_EDI:    self->mc_context.ucs_gpregs.gp_edi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESI:    self->mc_context.ucs_gpregs.gp_esi = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBP:    self->mc_context.ucs_gpregs.gp_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    self->mc_context.ucs_gpregs.gp_esp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EBX:    self->mc_context.ucs_gpregs.gp_ebx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EDX:    self->mc_context.ucs_gpregs.gp_edx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ECX:    self->mc_context.ucs_gpregs.gp_ecx = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EAX:    self->mc_context.ucs_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_GS:     self->mc_context.ucs_sgregs.sg_gs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_FS:     self->mc_context.ucs_sgregs.sg_fs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_ES:     self->mc_context.ucs_sgregs.sg_es = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_DS:     self->mc_context.ucs_sgregs.sg_ds = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_CS:     self->mc_context.ucs_cs = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_SS:     self->mc_context.ucs_ss = (u16)(*(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EFLAGS: self->mc_context.ucs_eflags = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_EIP:    self->mc_context.ucs_eip = *(u32 const *)src; break;
-
-	case CFI_386_UNWIND_REGISTER_MM0 ... CFI_386_UNWIND_REGISTER_MM7:
-		dw_regno -= CFI_386_UNWIND_REGISTER_MM0;
-		goto do_fpreg;
-	case CFI_386_UNWIND_REGISTER_ST0 ... CFI_386_UNWIND_REGISTER_ST7:
-		dw_regno -= CFI_386_UNWIND_REGISTER_ST0;
-do_fpreg:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				memcpy(&self->mc_fpu.f_xsave.fx_regs[dw_regno], src, 16);
-			} else {
-				memcpy(&self->mc_fpu.f_ssave.fs_regs[dw_regno], src, 10);
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_386_UNWIND_REGISTER_XMM0 ... CFI_386_UNWIND_REGISTER_XMM7:
-		dw_regno -= CFI_386_UNWIND_REGISTER_XMM0;
-		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
-			memcpy(&self->mc_fpu.f_xsave.fx_xmm[dw_regno], src, 16);
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_386_UNWIND_REGISTER_FCW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				self->mc_fpu.f_xsave.fx_fcw = (u16)(*(u32 const *)src);
-			} else {
-				self->mc_fpu.f_ssave.fs_fcw = (u16)(*(u32 const *)src);
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_386_UNWIND_REGISTER_FSW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-			if (fpustate_isxsave(&self->mc_fpu)) {
-				self->mc_fpu.f_xsave.fx_fsw = (u16)(*(u32 const *)src);
-			} else {
-				self->mc_fpu.f_ssave.fs_fsw = (u16)(*(u32 const *)src);
-			}
-		} else {
-			goto badreg;
-		}
-		break;
-
-	case CFI_386_UNWIND_REGISTER_MXCSR:
-		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
-			self->mc_fpu.f_xsave.fx_mxcsr = *(u32 const *)src;
-		} else {
-			goto badreg;
-		}
-		break;
-
-	default:
-		goto badreg;
-	}
-	return UNWIND_SUCCESS;
-badreg:
-	return UNWIND_INVALID_REGISTER;
-}
-#endif /* !__KERNEL__ || __INTELLISENSE */
-
 #endif /* !__x86_64__ */
 
 
@@ -1475,15 +1171,14 @@ do_fpreg:
 		break;
 
 	case CFI_UNWIND_REGISTER_FCW:
-		*(uintptr_t *)dst = self->fs_fcw;
+		wrpptr(dst, self->fs_fcw);
 		break;
 
 	case CFI_UNWIND_REGISTER_FSW:
-		*(uintptr_t *)dst = self->fs_fsw;
+		wrpptr(dst, self->fs_fsw);
 		break;
 
-	default:
-		goto badreg;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -1506,15 +1201,14 @@ do_fpreg:
 		break;
 
 	case CFI_UNWIND_REGISTER_FCW:
-		self->fs_fcw = (u16)(*(uintptr_t const *)src);
+		self->fs_fcw = rdpptr_as16(src);
 		break;
 
 	case CFI_UNWIND_REGISTER_FSW:
-		self->fs_fsw = (u16)(*(uintptr_t const *)src);
+		self->fs_fsw = rdpptr_as16(src);
 		break;
 
-	default:
-		goto badreg;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -1537,15 +1231,15 @@ do_fpreg:
 		break;
 
 	case CFI_UNWIND_REGISTER_FCW:
-		*(uintptr_t *)dst = self->fx_fcw;
+		wrpptr(dst, self->fx_fcw);
 		break;
 
 	case CFI_UNWIND_REGISTER_FSW:
-		*(uintptr_t *)dst = self->fx_fsw;
+		wrpptr(dst, self->fx_fsw);
 		break;
 
 	case CFI_UNWIND_REGISTER_MXCSR:
-		*(uintptr_t *)dst = self->fx_mxcsr;
+		wrpptr(dst, self->fx_mxcsr);
 		break;
 
 #ifdef __x86_64__
@@ -1556,8 +1250,7 @@ do_fpreg:
 		memcpy(dst, &self->fx_xmm[dw_regno - CFI_UNWIND_REGISTER_XMM0], 16);
 		break;
 
-	default:
-		goto badreg;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
@@ -1580,15 +1273,15 @@ do_fpreg:
 		break;
 
 	case CFI_UNWIND_REGISTER_FCW:
-		self->fx_fcw = (u16)(*(uintptr_t const *)src);
+		self->fx_fcw = rdpptr_as16(src);
 		break;
 
 	case CFI_UNWIND_REGISTER_FSW:
-		self->fx_fsw = (u16)(*(uintptr_t const *)src);
+		self->fx_fsw = rdpptr_as16(src);
 		break;
 
 	case CFI_UNWIND_REGISTER_MXCSR:
-		self->fx_mxcsr = (u32)(*(uintptr_t const *)src);
+		self->fx_mxcsr = rdpptr_as32(src);
 		break;
 
 #ifdef __x86_64__
@@ -1599,13 +1292,156 @@ do_fpreg:
 		memcpy(&self->fx_xmm[dw_regno - CFI_UNWIND_REGISTER_XMM0], src, 16);
 		break;
 
-	default:
-		goto badreg;
+	default: goto badreg;
 	}
 	return UNWIND_SUCCESS;
 badreg:
 	return UNWIND_INVALID_REGISTER;
 }
+
+
+#if !defined(__KERNEL__) || defined(__INTELLISENSE__)
+LOCAL NONNULL((1, 3)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_base)(struct mcontext const *__restrict self,
+                                                  unwind_regno_t dw_regno,
+                                                  void *__restrict dst) {
+	switch (dw_regno) {
+
+	case CFI_UNWIND_REGISTER_MM0 ... CFI_UNWIND_REGISTER_MM7:
+		dw_regno -= CFI_UNWIND_REGISTER_MM0;
+		goto do_fpreg;
+	case CFI_UNWIND_REGISTER_ST0 ... CFI_UNWIND_REGISTER_ST7:
+		dw_regno -= CFI_UNWIND_REGISTER_ST0;
+do_fpreg:
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if (fpustate_isxsave(&self->mc_fpu)) {
+			memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
+		} else {
+			memcpy((byte_t *)dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10);
+			memset((byte_t *)dst + 10, 0, 6);
+		}
+		break;
+
+#ifdef __x86_64__
+	case CFI_UNWIND_REGISTER_XMM0 ... CFI_UNWIND_REGISTER_XMM15:
+#else /* __x86_64__ */
+	case CFI_UNWIND_REGISTER_XMM0 ... CFI_UNWIND_REGISTER_XMM7:
+#endif /* !__x86_64__ */
+		dw_regno -= CFI_UNWIND_REGISTER_XMM0;
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if unlikely(!fpustate_isxsave(&self->mc_fpu))
+			goto badreg;
+		memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_xmm[dw_regno], 16);
+		break;
+
+	case CFI_UNWIND_REGISTER_FCW:
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if (fpustate_isxsave(&self->mc_fpu)) {
+			wrpptr(dst, self->mc_fpu.f_xsave.fx_fcw);
+		} else {
+			wrpptr(dst, self->mc_fpu.f_ssave.fs_fcw);
+		}
+		break;
+
+	case CFI_UNWIND_REGISTER_FSW:
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if (fpustate_isxsave(&self->mc_fpu)) {
+			wrpptr(dst, self->mc_fpu.f_xsave.fx_fsw);
+		} else {
+			wrpptr(dst, self->mc_fpu.f_ssave.fs_fsw);
+		}
+		break;
+
+	case CFI_UNWIND_REGISTER_MXCSR:
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if unlikely(!fpustate_isxsave(&self->mc_fpu))
+			goto badreg;
+		wrpptr(dst, self->mc_fpu.f_xsave.fx_mxcsr);
+		break;
+
+	default:
+		return libuw_unwind_getreg_ucpustate_base(&self->mc_context, dw_regno, dst);
+	}
+	return UNWIND_SUCCESS;
+badreg:
+	return UNWIND_INVALID_REGISTER;
+}
+
+LOCAL NONNULL((1, 3)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_base)(struct mcontext *__restrict self,
+                                                  unwind_regno_t dw_regno,
+                                                  void const *__restrict src) {
+	switch (dw_regno) {
+
+	case CFI_UNWIND_REGISTER_MM0 ... CFI_UNWIND_REGISTER_MM7:
+		dw_regno -= CFI_UNWIND_REGISTER_MM0;
+		goto do_fpreg;
+	case CFI_UNWIND_REGISTER_ST0 ... CFI_UNWIND_REGISTER_ST7:
+		dw_regno -= CFI_UNWIND_REGISTER_ST0;
+do_fpreg:
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if (fpustate_isxsave(&self->mc_fpu)) {
+			memcpy(&self->mc_fpu.f_xsave.fx_regs[dw_regno], src, 16);
+		} else {
+			memcpy(&self->mc_fpu.f_ssave.fs_regs[dw_regno], src, 10);
+		}
+		break;
+
+#ifdef __x86_64__
+	case CFI_UNWIND_REGISTER_XMM0 ... CFI_UNWIND_REGISTER_XMM15:
+#else /* __x86_64__ */
+	case CFI_UNWIND_REGISTER_XMM0 ... CFI_UNWIND_REGISTER_XMM7:
+#endif /* !__x86_64__ */
+		dw_regno -= CFI_UNWIND_REGISTER_XMM0;
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if unlikely(!fpustate_isxsave(&self->mc_fpu))
+			goto badreg;
+		memcpy(&self->mc_fpu.f_xsave.fx_xmm[dw_regno], src, 16);
+		break;
+
+	case CFI_UNWIND_REGISTER_FCW:
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if (fpustate_isxsave(&self->mc_fpu)) {
+			self->mc_fpu.f_xsave.fx_fcw = rdpptr_as16(src);
+		} else {
+			self->mc_fpu.f_ssave.fs_fcw = rdpptr_as16(src);
+		}
+		break;
+
+	case CFI_UNWIND_REGISTER_FSW:
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if (fpustate_isxsave(&self->mc_fpu)) {
+			self->mc_fpu.f_xsave.fx_fsw = rdpptr_as16(src);
+		} else {
+			self->mc_fpu.f_ssave.fs_fsw = rdpptr_as16(src);
+		}
+		break;
+
+	case CFI_UNWIND_REGISTER_MXCSR:
+		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
+			goto badreg;
+		if unlikely(!fpustate_isxsave(&self->mc_fpu))
+			goto badreg;
+		self->mc_fpu.f_xsave.fx_mxcsr = rdpptr_as32(src);
+		break;
+
+	default:
+		return libuw_unwind_setreg_ucpustate_base(&self->mc_context, dw_regno, src);
+	}
+	return UNWIND_SUCCESS;
+badreg:
+	return UNWIND_INVALID_REGISTER;
+}
+#endif /* !__KERNEL__ || __INTELLISENSE__ */
 
 
 
@@ -1754,7 +1590,7 @@ DEFINE_PUBLIC_ALIAS(unwind_getreg_scpustate_exclusive, libuw_unwind_getreg_scpus
 DEFINE_PUBLIC_ALIAS(IRREGS_NAME(unwind_setreg_scpustate_exclusive), IRREGS_NAME(libuw_unwind_setreg_scpustate_exclusive));
 DEFINE_PUBLIC_ALIAS(unwind_getreg_icpustate_exclusive, libuw_unwind_getreg_icpustate_exclusive);
 DEFINE_PUBLIC_ALIAS(IRREGS_NAME(unwind_setreg_icpustate_exclusive), IRREGS_NAME(libuw_unwind_setreg_icpustate_exclusive));
-#endif /* __KERNEL__ || __INTELLISENSE */
+#endif /* __KERNEL__ || __INTELLISENSE__ */
 
 #if !defined(__KERNEL__) || defined(__INTELLISENSE__)
 DEFINE_PUBLIC_ALIAS(unwind_getreg_ucontext, libuw_unwind_getreg_ucontext);
@@ -1765,7 +1601,7 @@ DEFINE_PUBLIC_ALIAS(unwind_getreg_ucontext_exclusive, libuw_unwind_getreg_uconte
 DEFINE_PUBLIC_ALIAS(unwind_setreg_ucontext_exclusive, libuw_unwind_setreg_ucontext_exclusive);
 DEFINE_PUBLIC_ALIAS(unwind_getreg_mcontext_exclusive, libuw_unwind_getreg_mcontext_exclusive);
 DEFINE_PUBLIC_ALIAS(unwind_setreg_mcontext_exclusive, libuw_unwind_setreg_mcontext_exclusive);
-#endif /* !__KERNEL__ || __INTELLISENSE */
+#endif /* !__KERNEL__ || __INTELLISENSE__ */
 
 DEFINE_PUBLIC_ALIAS(unwind_getreg_sfpustate, libuw_unwind_getreg_sfpustate);
 DEFINE_PUBLIC_ALIAS(unwind_setreg_sfpustate, libuw_unwind_setreg_sfpustate);
