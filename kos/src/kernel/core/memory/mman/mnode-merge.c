@@ -1893,11 +1893,16 @@ NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpa
 	blocking_mman = mpart_lock_all_mmans(lopart, locked_mman);
 	if unlikely(blocking_mman != NULL) {
 waitfor_blocking_mman:
+		assert(blocking_mman != locked_mman);
+		incref(blocking_mman);
+		mpart_decref_all_mmans(hipart);
+		mpart_decref_all_mmans(lopart);
 		/* Release the file-lock from above, if it was acquired. */
 		if (file != NULL)
 			mfile_lock_endwrite(file);
 		if (async_waitfor_mman_and_mergepart(blocking_mman, orig_part))
 			_mman_lockops_reap(blocking_mman);
+		decref_unlikely(blocking_mman);
 		return MPART_MERGE_ASYNC_WAITFOR;
 	}
 	blocking_mman = mpart_lock_all_mmans_after(hipart, lopart, locked_mman);
@@ -1964,8 +1969,12 @@ NOTHROW(FCALL mpart_domerge_with_file_lock)(/*inherit(on_success)*/ REF struct m
 	blocking_mman = mpart_lock_all_mmans(lopart);
 	if unlikely(blocking_mman != NULL) {
 waitfor_blocking_mman:
+		incref(blocking_mman);
+		mpart_decref_all_mmans(hipart);
+		mpart_decref_all_mmans(lopart);
 		if (async_waitfor_mman_and_mergepart(blocking_mman, orig_part))
 			_mman_lockops_reap(blocking_mman);
+		decref_unlikely(blocking_mman);
 		return MPART_MERGE_ASYNC_WAITFOR;
 	}
 	blocking_mman = mpart_lock_all_mmans_after(hipart, lopart);

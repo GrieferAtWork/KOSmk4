@@ -1650,7 +1650,6 @@ handle_error:
 			}
 		}
 	} else {
-		REF struct task *thread;
 		thread = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
 		FINALLY_DECREF_UNLIKELY(thread);
 		if ((upid_t)pgid == 0 || (upid_t)pgid == (upid_t)pid) {

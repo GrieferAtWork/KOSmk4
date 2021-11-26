@@ -701,7 +701,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 			 * This can happen if the memory mapping was created before the READONLY
 			 * flag  was set (but note that setting  the flag causes denywrite to be
 			 * called for all parts, meaning that we may very well have gotten  here
-			 * because)
+			 * because somebody revoked write access)
 			 *
 			 * This check is synonymous to the IS_WRITESHARE_MAPPING_OF_READONLY_FILE
 			 * check done when trying to create  file mappings, only that this  check
