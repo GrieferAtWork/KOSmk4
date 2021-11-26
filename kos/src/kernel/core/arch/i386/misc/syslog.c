@@ -178,7 +178,16 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 	pflag_t was;
 	/* Write to a debug port. */
 	if (level < COMPILER_LENOF(level_prefix)) {
-		char buf[64];
+#if __SIZEOF_PID_T__ <= 4 && __SIZEOF_INT__ <= 4
+		/* Note that the max values here may not make perfect sense in
+		 * some cases, but we want to guaranty that there is no change
+		 * of this ever overflowing. */
+		char buf[COMPILER_LENOF("[4294967295-4294967295-4294967295"
+		                        "T4294967295T23:4294967295T23:4294967295T23"
+		                        ".4294967295T23:notice][4294967295] ")];
+#else /* __SIZEOF_PID_T__ <= ... && __SIZEOF_INT__ <= ... */
+#error "Unsupported configuration"
+#endif /* __SIZEOF_PID_T__ > ... || __SIZEOF_INT__ > ... */
 		struct tm t;
 		size_t len;
 		localtime_r(&packet->sp_time, &t);

@@ -39,6 +39,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/x86/pic.h>
+#include <sched/task.h>
 
 #include <asm/intrin.h>
 #include <hw/hid/ps2.h>
