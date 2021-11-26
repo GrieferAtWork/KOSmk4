@@ -1009,30 +1009,18 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 	if (!node) {
 		/* Special handling for mcoreheap */
 		struct mcorepage *cp, *iter;
-		unsigned int index, i;
-		struct mnode *ptrnode = mman_mappings_locate(&mman_kernel, ptr);
-		if (!ptrnode)
-			return 0;
-
-		/* Do some quick checks on `ptrnode' for requirements on mcoreheap memory. */
-		if (!ptrnode->mn_part)
-			return 0;
-		if ((ptrnode->mn_flags & (MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC)) !=
-		    /*                */ (MNODE_F_PREAD | MNODE_F_PWRITE))
-			return 0;
+		uintptr_t index, i;
 		cp    = (struct mcorepage *)FLOOR_ALIGN((uintptr_t)ptr, PAGESIZE);
-		index = (unsigned int)((byte_t *)ptr - (byte_t *)cp->mcp_part);
+		index = (uintptr_t)((byte_t *)ptr - (byte_t *)cp->mcp_part);
 		index /= sizeof(union mcorepart);
 		if (index >= COMPILER_LENOF(cp->mcp_part))
-			return 0; /* Invalid index. */
-		TRY {
-			if (!INUSE_BITSET_GET(cp->mcp_used, index))
-				return 0; /* Not allocated. */
-			if (INUSE_BITSET_GET(cp->_mcp_reach, index))
-				return 0; /* Already reached. */
-		} EXCEPT {
-			return 0;
-		}
+			return 0; /* Invalid index. (including the underflow case) */
+		if (!pagedir_iswritable((void *)cp))
+			return 0; /* Page isn't writable. -> This can't be one of them! */
+		if (!INUSE_BITSET_GET(cp->mcp_used, index))
+			return 0; /* Not allocated. */
+		if (INUSE_BITSET_GET(cp->_mcp_reach, index))
+			return 0; /* Already reached. */
 
 		/* Check that `cp' really is one of the coreheap pages. */
 		for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
@@ -1056,7 +1044,6 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 	/* Normal traced memory. */
 	if (node->tn_reach == gc_version)
 		return 0; /* Already reached. */
-
 	if (node->tn_kind == TRACE_NODE_KIND_BITSET) {
 		/* When node is `TRACE_NODE_KIND_BITSET', then only mark it
 		 * as reachable when `ptr' points into its traced  portion. */
@@ -1494,7 +1481,7 @@ struct abstract_object {
 };
 
 PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
-NOTHROW(KCALL skew_object_list)(void **p_list_head, ptrdiff_t offsetof_object_list_entry) {
+NOTHROW(KCALL gc_list_skew)(void **p_list_head, ptrdiff_t offsetof_object_list_entry) {
 	void *object;
 	while ((object = *p_list_head) != NULL) {
 		struct abstract_object *link;
@@ -1510,7 +1497,7 @@ NOTHROW(KCALL skew_object_list)(void **p_list_head, ptrdiff_t offsetof_object_li
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
-NOTHROW(KCALL unskew_object_list)(void **p_list_head, ptrdiff_t offsetof_object_list_entry) {
+NOTHROW(KCALL gc_list_unskew)(void **p_list_head, ptrdiff_t offsetof_object_list_entry) {
 	void *object;
 	for (;;) {
 		struct abstract_object *link;
@@ -1528,39 +1515,134 @@ NOTHROW(KCALL unskew_object_list)(void **p_list_head, ptrdiff_t offsetof_object_
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL gc_skew_globals)(void) {
-	skew_object_list((void **)&mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
-	skew_object_list((void **)&fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
-	skew_object_list((void **)&fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
-
-	/* TODO: During leak scans, `mnode::mn_minaddr' is set-up such that  it
-	 *       can point to practically any memory location, however we don't
-	 *       actually  want that point to be considered as pointing to data
-	 *       that should be considered reachable.
-	 * Solution:
-	 *  - Because `mn_minaddr' is normally PAGE-aligned, and we only accept
-	 *    values that are pointer aligned, we normally also recognize  this
-	 *    field  as a  pointer. To work  around this, just  |=1 the minaddr
-	 *    field of every mnode in existence.
-	 *  - Then, once scanning of memory is done, we just &=~1 all of those
-	 *    fields.
-	 *  - Fun fact: this won't even break the rb-trees!
-	 * Only problem is that we need some way of enumerating all mmans  on
-	 * the entire system. Also, while we're at it, `mn_link' must also be
-	 * changed such that it doesn't carry over to neighboring nodes.
+NOTHROW(KCALL gc_mnode_skew)(struct mnode *__restrict self) {
+	/* We  skew the minaddr  attribute of all  mem-nodes because it might
+	 * otherwise point into allocated kernel objects, which should  none-
+	 * the-less be considered as memory leaks, simply because the minaddr
+	 * pointer isn't meant to be  dereferenced, but only as an  indicator
+	 * for where the mapping is located.
 	 *
-	 * XXX: This whole |=1 idea seems kind-of useful; why not use this trick
-	 *      for global object lists as well?  That way, we wouldn't have  to
-	 *      do dynamic memory allocation!
-	 */
+	 * We don't have to worry about `mn_maxaddr' because that one already
+	 * is set-up like `(. & PAGEMASK) == PAGEMASK', meaning that it's not
+	 * a pointed-aligned data-word! */
+	gc_skew((void **)&self->mn_minaddr);
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL gc_unskew_globals)(void) {
-	/* Restore global lists. */
-	unskew_object_list((void **)&mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
-	unskew_object_list((void **)&fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
-	unskew_object_list((void **)&fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
+NOTHROW(KCALL gc_mnode_unskew)(struct mnode *__restrict self) {
+	gc_unskew((void **)&self->mn_minaddr);
+}
+
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_mnode_tree_skew)(struct mnode *__restrict self) {
+	struct mnode *lo, *hi;
+again:
+	lo = self->mn_mement.rb_lhs;
+	hi = self->mn_mement.rb_rhs;
+	gc_mnode_skew(self);
+	if (lo) {
+		if (hi)
+			gc_mnode_tree_skew(hi);
+		self = lo;
+		goto again;
+	}
+	if (hi) {
+		self = hi;
+		goto again;
+	}
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_mnode_tree_unskew)(struct mnode *__restrict self) {
+	struct mnode *lo, *hi;
+again:
+	lo = self->mn_mement.rb_lhs;
+	hi = self->mn_mement.rb_rhs;
+	gc_mnode_unskew(self);
+	if (lo) {
+		if (hi)
+			gc_mnode_tree_unskew(hi);
+		self = lo;
+		goto again;
+	}
+	if (hi) {
+		self = hi;
+		goto again;
+	}
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_mman_skew)(struct mman *__restrict self) {
+	if (!self->mm_mappings || gc_isskewed(self->mm_mappings->mn_minaddr))
+		return; /* Already skewed */
+	gc_mnode_tree_skew(self->mm_mappings);
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_mman_unskew)(struct mman *__restrict self) {
+	if (!self->mm_mappings || !gc_isskewed(self->mm_mappings->mn_minaddr))
+		return; /* Already unskewed */
+	gc_mnode_tree_unskew(self->mm_mappings);
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_task_skew)(struct task *__restrict self) {
+	gc_mman_skew(self->t_mman);
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_task_unskew)(struct task *__restrict self) {
+	gc_mman_unskew(self->t_mman);
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT ssize_t
+NOTHROW(KCALL _gc_task_skew_enum_cb)(void *UNUSED(arg),
+                                     struct task *thread,
+                                     struct taskpid *UNUSED(pid)) {
+	if (thread)
+		gc_task_skew(thread);
+	return 0;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT ssize_t
+NOTHROW(KCALL _gc_task_unskew_enum_cb)(void *UNUSED(arg),
+                                       struct task *thread,
+                                       struct taskpid *UNUSED(pid)) {
+	if (thread)
+		gc_task_unskew(thread);
+	return 0;
+}
+
+
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_globals_skew)(void) {
+	/* Prevent traversal of global object lists during GC leak detection.
+	 * -> s.a. the rationale for why `Phase #3: Scan global objects' is disabled. */
+	gc_list_skew((void **)&mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
+	gc_list_skew((void **)&fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
+	gc_list_skew((void **)&fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
+
+	/* Skew the kernel mman. */
+	gc_mman_skew(&mman_kernel);
+
+	/* Skew global pointers relating to threads. */
+	task_enum_all_noipi_nb(&_gc_task_skew_enum_cb, NULL);
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_globals_unskew)(void) {
+	/* Unskew global lists. */
+	gc_list_unskew((void **)&mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
+	gc_list_unskew((void **)&fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
+	gc_list_unskew((void **)&fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
+
+	/* Unskew the kernel mman. */
+	gc_mman_unskew(&mman_kernel);
+
+	/* Unskew global pointers relating to threads. */
+	task_enum_all_noipi_nb(&_gc_task_unskew_enum_cb, NULL);
 }
 
 
@@ -1568,13 +1650,13 @@ NOTHROW(KCALL gc_unskew_globals)(void) {
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_find_reachable)(void) {
 	/* Skew global object lists. */
-	gc_skew_globals();
+	gc_globals_skew();
 
 	/* Scan for reachable objects. */
 	gc_find_reachable_impl();
 
 	/* Unskew global object lists. */
-	gc_unskew_globals();
+	gc_globals_unskew();
 }
 
 

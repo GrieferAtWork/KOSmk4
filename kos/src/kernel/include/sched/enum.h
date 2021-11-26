@@ -152,11 +152,12 @@ FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_mman_nb)(task_enu
  * rather  than sending IPIs  and letting those CPUs  access their own structures.
  * Doing it this  way must  be done when  the caller  knows that no  other CPU  is
  * actively running. */
+FUNDEF NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_all_noipi_nb)(task_enum_cb_t cb, void *arg)
 #ifdef CONFIG_NO_SMP
-FUNDEF NONNULL((1)) ssize_t NOTHROW(KCALL task_enum_all_noipi_nb)(task_enum_cb_t cb, void *arg) ASMNAME("task_enum_all_nb");
-#else /* CONFIG_NO_SMP */
-FUNDEF NONNULL((1)) ssize_t NOTHROW(KCALL task_enum_all_noipi_nb)(task_enum_cb_t cb, void *arg);
-#endif /* !CONFIG_NO_SMP */
+		ASMNAME("task_enum_all_nb")
+#endif /* CONFIG_NO_SMP */
+		;
 
 
 struct task_list_buffer {
