@@ -131,16 +131,28 @@ extern byte_t __kernel_permman_start[];
 extern byte_t __kernel_permman_size[];
 
 
+/* Architectures may define additional GFP_* flags used when allocating
+ * the  backing memory of  a `struct mman' (and  in turn: its pagedir).
+ *
+ * This is needed by (e.g.) the i386 paging implementation to restrict
+ * physical memory to 32-bit, as  nothing larger would fit into  %cr3. */
+#ifndef ARCH_PAGEDIR_ALLOC_GFP
+#define ARCH_PAGEDIR_ALLOC_GFP 0
+#endif /* !ARCH_PAGEDIR_ALLOC_GFP */
+
+/* Total size of `struct mman' */
 #define _sizeof_mman ((size_t)__kernel_permman_size + PAGEDIR_SIZE)
-#define _mman_alloc_untraced()                                                                     \
-	(struct mman *)mman_map_kram(MHINT_GETADDR(KERNEL_MHINT_MMAN), _sizeof_mman,                   \
-	                             gfp_from_mapflags(MHINT_GETMODE(KERNEL_MHINT_MMAN)) |             \
-	                             GFP_MAP_32BIT | /*TODO: `GFP_MAP_32BIT' is only needed on i386!*/ \
-	                             GFP_LOCKED | GFP_PREFLT,                                          \
+
+/* Low-level (untraced) alloc/free for `struct mman' */
+#define _mman_alloc_untraced()                                                         \
+	(struct mman *)mman_map_kram(MHINT_GETADDR(KERNEL_MHINT_MMAN), _sizeof_mman,       \
+	                             gfp_from_mapflags(MHINT_GETMODE(KERNEL_MHINT_MMAN)) | \
+	                             ARCH_PAGEDIR_ALLOC_GFP | GFP_LOCKED | GFP_PREFLT,     \
 	                             MAX_C(PAGEDIR_ALIGN, alignof(struct mman)))
 #define _mman_free_untraced(self) \
 	mman_unmap_kram(self, _sizeof_mman)
 
+/* Raw alloc/free functions for `struct mman' */
 #ifdef CONFIG_TRACE_MALLOC
 PRIVATE ATTR_RETNONNULL WUNUSED struct mman *KCALL _mman_alloc(void) {
 	void *result;
@@ -417,9 +429,9 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread) {
 }
 
 
-/* Allocate an set a new VM for /bin/init during booting.
- * This function is used to assign a new VM for the initial user-space process,
- * so-as not to launch that process in the context of the special  `kernel_vm',
+/* Allocate an set a new mman for /bin/init during booting.
+ * This function is used to assign a new mman for the initial user-space process,
+ * so-as not to launch that process in the context of the special  `mman_kernel',
  * which shouldn't contain mappings for anything user-space related. */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_user_mman)(void) {

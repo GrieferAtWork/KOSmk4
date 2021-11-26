@@ -445,9 +445,9 @@ mfault_pcopy_makememdat_or_unlock(struct mfault *__restrict self) {
 	                                       self->mfl_size);
 }
 
-#define unlockall(self)                      \
+#define unlockall(self)                     \
 	(_mpart_lock_release((self)->mfl_part), \
-	 mman_lock_release((self)->mfl_mman),    \
+	 mman_lock_release((self)->mfl_mman),   \
 	 mpart_lockops_reap((self)->mfl_part))
 
 /* Allocate `self->mfl_pcopy[0]' (and possibly `self->mfl_pcopy[1]') if necessary */

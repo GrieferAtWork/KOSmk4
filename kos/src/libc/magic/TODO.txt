@@ -14,7 +14,6 @@
 <gnu-versions.h>       (GLibc!)
 <gnu/libc-version.h>   (GLibc!)
 <gshadow.h>            (GLibc!)
-<iconv.h>              (GLibc!)
 <langinfo.h>           (GLibc!)
 <libintl.h>            (GLibc!)
 <mbctype.h>            (msvcrt)

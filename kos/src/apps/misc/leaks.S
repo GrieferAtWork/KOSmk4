@@ -17,11 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_APPS_MISC_LEAKS_S
+#define GUARD_APPS_MISC_LEAKS_S 1
 #define __ASSEMBLER__ 1
-#include <syscall.h>
+
 #include <hybrid/host.h>
-#include <kos/ksysctl.h>
+
 #include <asm/instr/compat.h>
+#include <kos/ksysctl.h>
+
+#include <syscall.h>
 
 #ifndef __x86_64__
 #define syscall int $0x80
@@ -45,3 +50,5 @@ _start:
 	syscall
 	jmp   .Lexit
 .size _start, . - _start
+
+#endif /* !GUARD_APPS_MISC_LEAKS_S */

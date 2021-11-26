@@ -166,6 +166,17 @@
 #endif /* !CONFIG_... */
 
 
+/* Page directory allocation requirements */
+#undef ARCH_PAGEDIR_ALLOC_GFP
+/* 32-bit  PAE allows for physical addresses > 2^32.
+ * However,  %cr3 remains 32-bit, so when allocating
+ * physical memory for a page directory, that memory
+ * must originate from the first 4GiB of RAM.
+ *
+ * This config option is used by `mman_new()' */
+#define ARCH_PAGEDIR_ALLOC_GFP GFP_MAP_32BIT
+
+
 
 /* Page protection flags. */
 #ifndef PAGEDIR_PROT_MASK

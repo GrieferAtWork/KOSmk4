@@ -26,9 +26,9 @@
 #include <hw/ic/apic.h>
 #include <sys/mmio.h>
 
+#ifdef __CC__
 DECL_BEGIN
 
-#ifdef __CC__
 /* [const] Virtual  base  addresses  of  the  local  (per-cpu) APIC.
  * HINT: APIC stands for Advanced Programmable Interrupt Controller. */
 DATDEF VIRT volatile __byte_t *const x86_lapicbase;
@@ -43,8 +43,7 @@ DATDEF ATTR_PERCPU __u8 const thiscpu_x86_lapicid;
  *                            This is one of `APICVER_*' from `<sched/smp.h>' */
 DATDEF ATTR_PERCPU __u8 const thiscpu_x86_lapicversion;
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_APIC_H */
