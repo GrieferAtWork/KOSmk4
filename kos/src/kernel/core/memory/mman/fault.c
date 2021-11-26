@@ -489,17 +489,20 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
 	}
 	if (reqcnt == 1)
 		return true; /* Got everything we need! */
-	/* Must also allocate the second node. */
-	node = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
-	                                  GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-	if unlikely(!node) {
-		unlockall(self);
-		node = (struct mnode *)kmalloc(sizeof(struct mnode),
-		                               GFP_LOCKED | GFP_PREFLT);
+	if likely(!self->mfl_pcopy[1]) {
+		/* Must also allocate the second node. */
+		node = (struct mnode *)kmalloc_nx(sizeof(struct mnode),
+		                                  GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if unlikely(!node) {
+			unlockall(self);
+			node = (struct mnode *)kmalloc(sizeof(struct mnode),
+			                               GFP_LOCKED | GFP_PREFLT);
+			self->mfl_pcopy[1] = node;
+			assert(self->mfl_pcopy[0] != NULL);
+			return false;
+		}
 		self->mfl_pcopy[1] = node;
-		return false;
 	}
-	self->mfl_pcopy[1] = node;
 	return true;
 }
 
