@@ -1526,11 +1526,22 @@ NOTHROW(KCALL gc_mnode_skew)(struct mnode *__restrict self) {
 	 * is set-up like `(. & PAGEMASK) == PAGEMASK', meaning that it's not
 	 * a pointed-aligned data-word! */
 	gc_skew((void **)&self->mn_minaddr);
+
+	/* We don't want the mpart->nodes lists to be traversed during leak
+	 * detection, so we skew those pointers as well! */
+	if (self->mn_part) {
+		gc_skew((void **)&self->mn_link.le_prev);
+		gc_skew((void **)&self->mn_link.le_next);
+	}
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_mnode_unskew)(struct mnode *__restrict self) {
 	gc_unskew((void **)&self->mn_minaddr);
+	if (self->mn_part) {
+		gc_unskew((void **)&self->mn_link.le_prev);
+		gc_unskew((void **)&self->mn_link.le_next);
+	}
 }
 
 
