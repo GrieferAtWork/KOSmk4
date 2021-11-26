@@ -1295,81 +1295,70 @@ NOTHROW(KCALL gc_reachable_thread)(void *UNUSED(arg),
 #endif
 
 
+
+/* To prevent gc traversal of certain object pointers, we take advantage of the
+ * fact  that all inter-object  pointers (iow: pointers to  object that in turn
+ * also point to more object) are always pointer-aligned (since a struct T that
+ * contains pointers must  have alignof(T)  >= alignof(void *)).  This is  also
+ * assumed by `gc_reachable_pointer()', which simply ignores pointers that  are
+ * not properly aligned.
+ *
+ * We  (ab-)use this fact  to prevent certain  inter-object pointers from being
+ * used for traversal, as we don't want links between global object lists to be
+ * considered as a viable method of reaching other global objects.
+ *
+ * As such, we assume that bit#0 is normally clear for inter-object pointers,
+ * and simply set it to 1 to prevent the link from being traversed. Once leak
+ * detection has finished, we change it back to clear.
+ *
+ * s.a. the discussion on why `Phase #3: Scan global objects' is disabled above */
+#define gc_isskewed(p) ((uintptr_t)(p) & 1)
+#define gc_skewed(p)   ((typeof(p))((uintptr_t)(p) | 1))
+#define gc_unskewed(p) ((typeof(p))((uintptr_t)(p) & ~1))
+#define gc_skew(p_p)   (void)(*(uintptr_t *)(p_p) |= 1)
+#define gc_unskew(p_p) (void)(*(uintptr_t *)(p_p) &= ~1)
+
+
+
 #if 0
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_reachable_allmparts)(struct mpart **list) {
-	size_t i, result = 0;
-	struct mpart *elem;
-	if (list) {
-		for (i = 0; (elem = list[i]) != NULL; ++i) {
-			if (!wasdestroyed(elem) && (elem->mp_flags & MPART_F_GLOBAL_REF))
-				result += gc_reachable_pointer(elem);
-		}
+NOTHROW(KCALL gc_reachable_allmparts)(struct mpart *first) {
+	size_t result = 0;
+	for (gc_unskew(&first); first != NULL;
+	     first = gc_unskewed(LIST_NEXT(first, mp_allparts))) {
+		if (!wasdestroyed(first) && (first->mp_flags & MPART_F_GLOBAL_REF))
+			result += gc_reachable_pointer(first);
 	}
 	return result;
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_reachable_fallnodes)(struct fnode **list) {
-	size_t i, result = 0;
-	struct fnode *elem;
-	if (list) {
-		for (i = 0; (elem = list[i]) != NULL; ++i) {
-			if (!wasdestroyed(elem) && (elem->mf_flags & MFILE_FN_GLOBAL_REF))
-				result += gc_reachable_pointer(elem);
-		}
+NOTHROW(KCALL gc_reachable_fallnodes)(struct fnode *first) {
+	size_t result = 0;
+	for (gc_unskew(&first); first != NULL;
+	     first = gc_unskewed(LIST_NEXT(first, fn_allnodes))) {
+		if (!wasdestroyed(first) && (first->mf_flags & MFILE_FN_GLOBAL_REF))
+			result += gc_reachable_pointer(first);
 	}
 	return result;
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_reachable_fallsuper)(struct fsuper **list) {
-	size_t i, result = 0;
-	struct fsuper *elem;
-	if (list) {
-		for (i = 0; (elem = list[i]) != NULL; ++i) {
-			if (!wasdestroyed(elem)/* && (elem->fs_root.mf_flags & MFILE_FN_GLOBAL_REF)*/)
-				result += gc_reachable_pointer(elem);
-		}
+NOTHROW(KCALL gc_reachable_fallsuper)(struct fsuper *first) {
+	size_t result = 0;
+	for (gc_unskew(&first); first != NULL;
+	     first = gc_unskewed(LIST_NEXT(first, fs_root.fn_allsuper))) {
+		if (!wasdestroyed(first)/* && (first->fs_root.mf_flags & MFILE_FN_GLOBAL_REF)*/)
+			result += gc_reachable_pointer(first);
 	}
 	return result;
 }
 #endif
 
 
-/* Backup descriptor for global objects chains that should not partake in in
- * recursive reachability detection. For this,  we unchain the global  lists
- * `mpart_all_list', `fallnodes_list' and `fallsuper_list', such that one of
- * the elements being reachable doesn't implicitly mean that all of them are
- *
- * Instead, we manually mark only those  objects as reachable which have  the
- * `MPART_F_GLOBAL_REF' / `MFILE_FN_GLOBAL_REF' bits set. - All other objects
- * must be reachable through some other manner.
- *
- * To facilitate this, we allocate linear vectors of pointers to all of the
- * global objects that represent their owner within the global lists. Then,
- * we  clear all of  the in-object neighbor-links by  setting them to NULL.
- * Afterwards, we do a normal scan of global variables, including a  manual
- * scan of objects from our backup lists, where we manually mark those that
- * are marked with GLOBAL_REF as reachable.
- *
- * Finally, once scanning is done, we restore the state of the global lists
- * to  be identical to what it was before. And because gc leak detection is
- * run in the context of a super-lock, we know that no other cpu could have
- * possibly witnessed us doing this! */
-struct gc_glink_backup {
-	heapptr_t ggb_allparts; /* [owned] Pointer to an array `struct mpart **', terminated by NULL */
-	heapptr_t ggb_allnodes; /* [owned] Pointer to an array `struct fnode **', terminated by NULL */
-	heapptr_t ggb_allsuper; /* [owned] Pointer to an array `struct fsuper **', terminated by NULL */
-};
-#define gc_glink_backup_allparts(self) (struct mpart **)heapptr_getptr((self)->ggb_allparts)
-#define gc_glink_backup_allnodes(self) (struct fnode **)heapptr_getptr((self)->ggb_allnodes)
-#define gc_glink_backup_allsuper(self) (struct fsuper **)heapptr_getptr((self)->ggb_allsuper)
-
-
 /* Scan the kernel for all reachable, traced pointers. */
 PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL gc_find_reachable_impl)(struct gc_glink_backup *__restrict glnk) {
+NOTHROW(KCALL gc_find_reachable_impl)(void) {
 	/* Search for memory leaks.
 	 * The idea here is not to be able to find all memory blocks that were
 	 * leaked,  but rather  to find  anything that  ~might~ be referenced.
@@ -1396,9 +1385,8 @@ NOTHROW(KCALL gc_find_reachable_impl)(struct gc_glink_backup *__restrict glnk) {
 	gc_reachable_this_thread();
 
 	/*
-	 * NOTE: Technically speaking, we'd need to scan `mpart_all_list' at this
-	 *       point, as  available  through  `gc_glink_backup_allparts(glnk)',
-	 *       and do the same for `fallnodes_list' and `fallsuper_list'.
+	 * NOTE: Technically speaking, we'd need to scan `mpart_all_list' at  this
+	 *       point, and do the same for `fallnodes_list' and `fallsuper_list'.
 	 * However, that's actually a bad idea:
 	 *  - There  is only 1 reason why some  mem-part should really be apart of
 	 *    the global list of mem-parts, that reason being: the associated file
@@ -1444,11 +1432,10 @@ NOTHROW(KCALL gc_find_reachable_impl)(struct gc_glink_backup *__restrict glnk) {
 	 */
 #if 0
 	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan global objects\n");
-	gc_reachable_allmparts(gc_glink_backup_allparts(glnk));
-	gc_reachable_fallnodes(gc_glink_backup_allnodes(glnk));
-	gc_reachable_fallsuper(gc_glink_backup_allsuper(glnk));
+	gc_reachable_allmparts(LIST_FIRST(&mpart_all_list));
+	gc_reachable_fallnodes(LIST_FIRST(&fallnodes_list));
+	gc_reachable_fallsuper(LIST_FIRST(&fallsuper_list));
 #endif
-	(void)glnk;
 
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan loaded drivers\n");
@@ -1506,93 +1493,45 @@ struct abstract_object {
 	LIST_ENTRY(abstract_object) ao_link;
 };
 
-
-PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL count_objects_in_list)(void *first, ptrdiff_t offsetof_object_list_entry) {
-	size_t result = 0;
-	while (first) {
-		struct abstract_object *link;
-		++result;
-		link  = (struct abstract_object *)((byte_t *)first + offsetof_object_list_entry);
-		first = link->ao_link.le_next;
-	}
-	return result;
-}
-
 PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
-NOTHROW(KCALL capture_object_list)(void **p_list_head, void **object_array,
-                                   ptrdiff_t offsetof_object_list_entry) {
+NOTHROW(KCALL skew_object_list)(void **p_list_head, ptrdiff_t offsetof_object_list_entry) {
 	void *object;
 	while ((object = *p_list_head) != NULL) {
 		struct abstract_object *link;
-		/* Append object to array. */
-		*object_array++ = object;
+		assert(!gc_isskewed(object));
 		link = (struct abstract_object *)((byte_t *)object + offsetof_object_list_entry);
-
-		/* Unlink object. */
 		assert((void **)link->ao_link.le_prev == p_list_head);
-		link->ao_link.le_prev = NULL;
-		*p_list_head          = NULL;
-
-		/* Load next object. */
+		assert(!gc_isskewed(link->ao_link.le_prev));
+		gc_skew((void **)&link->ao_link.le_prev);
+		gc_skew((void **)p_list_head);
 		p_list_head = (void **)&link->ao_link.le_next;
 	}
+	gc_skew((void **)p_list_head);
+}
 
-	/* Append sentinel entry. */
-	*object_array = NULL;
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL unskew_object_list)(void **p_list_head, ptrdiff_t offsetof_object_list_entry) {
+	void *object;
+	for (;;) {
+		struct abstract_object *link;
+		assert(gc_isskewed(*p_list_head));
+		gc_unskew((void **)p_list_head);
+		object = *p_list_head;
+		if (object == NULL)
+			break;
+		link = (struct abstract_object *)((byte_t *)object + offsetof_object_list_entry);
+		assert(gc_isskewed(link->ao_link.le_prev));
+		gc_unskew((void **)&link->ao_link.le_prev);
+		assert((void **)link->ao_link.le_prev == p_list_head);
+		p_list_head = (void **)&link->ao_link.le_next;
+	}
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL gc_glink_backup_freebuffers)(struct gc_glink_backup *__restrict self) {
-	/* Free local buffers. */
-	if (heapptr_getptr(self->ggb_allsuper) != NULL)
-		trace_heap_free_heapptr(self->ggb_allsuper);
-	if (heapptr_getptr(self->ggb_allnodes) != NULL)
-		trace_heap_free_heapptr(self->ggb_allnodes);
-	if (heapptr_getptr(self->ggb_allparts) != NULL)
-		trace_heap_free_heapptr(self->ggb_allparts);
-}
-
-
-PRIVATE ATTR_COLDTEXT void KCALL
-gc_glink_backup_init(struct gc_glink_backup *__restrict self) {
-	size_t n_parts, n_nodes, n_super;
-	memset(self, 0, sizeof(*self));
-
-	/* Count the # of objects in global lists. */
-	n_parts = count_objects_in_list((void *)mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
-	n_nodes = count_objects_in_list((void *)fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
-	n_super = count_objects_in_list((void *)fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
-
-	/* Allocate buffers. */
-	TRY {
-		if (n_parts != 0)
-			self->ggb_allparts = trace_heap_alloc_heapptr((n_parts + 1) * sizeof(void *));
-		if (n_nodes != 0)
-			self->ggb_allnodes = trace_heap_alloc_heapptr((n_nodes + 1) * sizeof(void *));
-		if (n_super != 0)
-			self->ggb_allsuper = trace_heap_alloc_heapptr((n_super + 1) * sizeof(void *));
-	} EXCEPT {
-		gc_glink_backup_freebuffers(self);
-		RETHROW();
-	}
-
-	/* Capture global lists. */
-	if (n_parts != 0) {
-		capture_object_list((void **)&mpart_all_list.lh_first,
-		                    (void **)gc_glink_backup_allparts(self),
-		                    offsetof(struct mpart, mp_allparts));
-	}
-	if (n_nodes != 0) {
-		capture_object_list((void **)&fallnodes_list.lh_first,
-		                    (void **)gc_glink_backup_allnodes(self),
-		                    offsetof(struct fnode, fn_allnodes));
-	}
-	if (n_super != 0) {
-		capture_object_list((void **)&fallsuper_list.lh_first,
-		                    (void **)gc_glink_backup_allsuper(self),
-		                    offsetof(struct fsuper, fs_root.fn_allsuper));
-	}
+NOTHROW(KCALL gc_skew_globals)(void) {
+	skew_object_list((void **)&mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
+	skew_object_list((void **)&fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
+	skew_object_list((void **)&fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
 
 	/* TODO: During leak scans, `mnode::mn_minaddr' is set-up such that  it
 	 *       can point to practically any memory location, however we don't
@@ -1616,64 +1555,26 @@ gc_glink_backup_init(struct gc_glink_backup *__restrict self) {
 	 */
 }
 
-
-/* Restore a `LIST_HEAD()'-style `*p_list_head' with objects from
- * a NULL-terminated array `object_array'. Each object has a link
- * entry at offset `offsetof_object_list_entry'. */
-PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
-NOTHROW(KCALL restore_object_list)(void **p_list_head, void **object_array,
-                                   ptrdiff_t offsetof_object_list_entry) {
-	if likely(object_array != NULL) {
-		size_t i;
-		void *object;
-		for (i = 0; (object = object_array[i]) != NULL; ++i) {
-			struct abstract_object *link;
-			link = (struct abstract_object *)((byte_t *)object + offsetof_object_list_entry);
-			/* Append the object at the back of the list. */
-			*p_list_head          = object;
-			link->ao_link.le_prev = (struct abstract_object **)p_list_head;
-			p_list_head           = (void **)&link->ao_link.le_next;
-		}
-	}
-
-	/* Terminate the list. */
-	*p_list_head = NULL;
-}
-
 PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL gc_glink_backup_fini)(struct gc_glink_backup *__restrict self) {
-	/* Assert the expected state for global lists. */
-	assert(mpart_all_list.lh_first == NULL);
-	assert(fallnodes_list.lh_first == NULL);
-	assert(fallsuper_list.lh_first == NULL);
-
+NOTHROW(KCALL gc_unskew_globals)(void) {
 	/* Restore global lists. */
-	restore_object_list((void **)&mpart_all_list.lh_first,
-	                    (void **)gc_glink_backup_allparts(self),
-	                    offsetof(struct mpart, mp_allparts));
-	restore_object_list((void **)&fallnodes_list.lh_first,
-	                    (void **)gc_glink_backup_allnodes(self),
-	                    offsetof(struct fnode, fn_allnodes));
-	restore_object_list((void **)&fallsuper_list.lh_first,
-	                    (void **)gc_glink_backup_allsuper(self),
-	                    offsetof(struct fsuper, fs_root.fn_allsuper));
-
-	/* Free local buffers. */
-	gc_glink_backup_freebuffers(self);
+	unskew_object_list((void **)&mpart_all_list.lh_first, offsetof(struct mpart, mp_allparts));
+	unskew_object_list((void **)&fallnodes_list.lh_first, offsetof(struct fnode, fn_allnodes));
+	unskew_object_list((void **)&fallsuper_list.lh_first, offsetof(struct fsuper, fs_root.fn_allsuper));
 }
 
 
 /* Scan the kernel for all reachable, traced pointers. */
-PRIVATE ATTR_COLDTEXT void KCALL gc_find_reachable(void) {
-	struct gc_glink_backup glnk;
-	/* Unlink global object lists. */
-	gc_glink_backup_init(&glnk);
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_find_reachable)(void) {
+	/* Skew global object lists. */
+	gc_skew_globals();
 
 	/* Scan for reachable objects. */
-	gc_find_reachable_impl(&glnk);
+	gc_find_reachable_impl();
 
-	/* Restore global object lists. */
-	gc_glink_backup_fini(&glnk);
+	/* Unskew global object lists. */
+	gc_unskew_globals();
 }
 
 
