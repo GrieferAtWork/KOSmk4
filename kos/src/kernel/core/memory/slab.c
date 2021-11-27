@@ -51,14 +51,33 @@
 
 DECL_BEGIN
 
+#ifndef __slab_slist_defined
+#define __slab_slist_defined
+SLIST_HEAD(slab_slist, slab);
+#endif /* !__slab_slist_defined */
+
 struct slab_pool {
 	/* Descriptor for the pool of free slab pages. */
 	struct atomic_lock sp_lock;  /* Lock for free pages. */
-	struct slab       *sp_free;  /* [0..1][lock(sp_lock)] Chain of fully free slab pages. */
+	struct slab_slist  sp_free;  /* [0..1][lock(sp_lock)] Chain of fully free slab pages. */
 	size_t             sp_count; /* [lock(sp_lock)] Current amount of free pool pages */
 	size_t             sp_limit; /* [lock(sp_lock)] Max amount of free pool pages, before further pages must be freed. */
-	WEAK struct slab  *sp_pend;  /* Chain of pages pending to-be freed. */
+	struct slab_slist  sp_pend;  /* [lock(ATOMIC)] Chain of pages pending to-be freed. */
 };
+
+/* Helper macros for `struct slab_pool::sp_lock' */
+#define slab_pool_reap(self)       (!slab_pool_mustreap(self) || (_slab_pool_reap(self), 0))
+#define slab_pool_mustreap(self)   (__hybrid_atomic_load((self)->sp_pend.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define slab_pool_tryacquire(self) atomic_lock_tryacquire(&(self)->sp_lock)
+#define slab_pool_acquire(self)    atomic_lock_acquire(&(self)->sp_lock)
+#define slab_pool_acquire_nx(self) atomic_lock_acquire_nx(&(self)->sp_lock)
+#define _slab_pool_release(self)   atomic_lock_release(&(self)->sp_lock)
+#define slab_pool_release(self)    (atomic_lock_release(&(self)->sp_lock), slab_pool_reap(self))
+#define slab_pool_acquired(self)   atomic_lock_acquired(&(self)->sp_lock)
+#define slab_pool_available(self)  atomic_lock_available(&(self)->sp_lock)
+#define slab_pool_waitfor(self)    atomic_lock_waitfor(&(self)->sp_lock)
+#define slab_pool_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->sp_lock)
+
 
 
 #ifndef SLAB_POOL_DEFAULT_LIMIT
@@ -69,16 +88,16 @@ struct slab_pool {
 PRIVATE struct slab_pool slab_freepool[2] = {
 	{   /* SLAB_FNORMAL / GFP_NORMAL */
 		.sp_lock  = ATOMIC_LOCK_INIT,
-		.sp_free  = NULL,
+		.sp_free  = SLIST_HEAD_INITIALIZER(slab_freepool[0].sp_free),
 		.sp_count = 0,
 		.sp_limit = SLAB_POOL_DEFAULT_LIMIT,
-		.sp_pend  = NULL
+		.sp_pend  = SLIST_HEAD_INITIALIZER(slab_freepool[0].sp_pend),
 	}, { /* SLAB_FLOCKED / GFP_LOCKED */
 		.sp_lock  = ATOMIC_LOCK_INIT,
-		.sp_free  = NULL,
+		.sp_free  = SLIST_HEAD_INITIALIZER(slab_freepool[1].sp_free),
 		.sp_count = 0,
 		.sp_limit = SLAB_POOL_DEFAULT_LIMIT,
-		.sp_pend  = NULL
+		.sp_pend  = SLIST_HEAD_INITIALIZER(slab_freepool[1].sp_pend),
 	}
 };
 
@@ -87,55 +106,51 @@ LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL pool_do_free)(struct slab_pool *__restrict self,
                             struct slab *__restrict page) {
 	if (self->sp_count < self->sp_limit) {
-		page->s_next  = self->sp_free;
-		self->sp_free = page;
+		SLIST_INSERT(&self->sp_free, page, s_slink);
 		++self->sp_count;
 		return;
 	}
+
 	/* Actually release the page as kernel-RAM. */
 	mman_unmap_kram(page, PAGESIZE, GFP_NORMAL);
 }
 
+/* Reap pending free slabs of `self' */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pool_clear_pending)(struct slab_pool *__restrict self) {
+NOTHROW(KCALL _slab_pool_reap)(struct slab_pool *__restrict self) {
 	struct slab *pend, *next;
-	pend = ATOMIC_XCH(self->sp_pend, NULL);
-	while (pend) {
-		next = pend->s_next;
+again:
+	pend = SLIST_ATOMIC_CLEAR(&self->sp_pend);
+	if unlikely(!pend)
+		return;
+	if unlikely(!slab_pool_tryacquire(self)) {
+		if (!ATOMIC_CMPXCH(self->sp_pend.slh_first, NULL, pend)) {
+			struct slab *more;
+			next = pend;
+			while (SLIST_NEXT(next, s_slink))
+				next = SLIST_NEXT(next, s_slink);
+			do {
+				more = ATOMIC_READ(self->sp_pend.slh_first);
+				next->s_slink.sle_next = more;
+				COMPILER_WRITE_BARRIER();
+			} while (!ATOMIC_CMPXCH_WEAK(self->sp_pend.slh_first, more, pend));
+		}
+		if unlikely(slab_pool_available(self))
+			goto again;
+		return;
+	}
+	do {
+		next = SLIST_NEXT(pend, s_slink);
 		pool_do_free(self, pend);
 		pend = next;
-	}
-}
-
-PRIVATE NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL pool_lock_trywrite)(struct slab_pool *__restrict self) {
-	if (!sync_trywrite(&self->sp_lock))
-		return false;
-	pool_clear_pending(self);
-	return true;
-}
-
-PRIVATE NONNULL((1)) bool
-NOTHROW(KCALL pool_lock_write)(struct slab_pool *__restrict self) {
-	if (!sync_write_nx(&self->sp_lock))
-		return false;
-	pool_clear_pending(self);
-	return true;
-}
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pool_lock_endwrite)(struct slab_pool *__restrict self) {
-again:
-	sync_endwrite(&self->sp_lock);
-	if (ATOMIC_READ(self->sp_pend)) {
-		if (sync_trywrite(&self->sp_lock)) {
-			pool_clear_pending(self);
-			goto again;
-		}
-	}
+	} while (pend);
+	_slab_pool_release(self);
+	if unlikely(slab_pool_mustreap(self))
+		goto again;
 }
 
 
+/* Free a given slab `self', without ever blocking */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 	struct slab_pool *pool;
@@ -144,17 +159,12 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 #else /* SLAB_FLOCKED == 1 */
 	pool = &slab_freepool[(self->s_flags & SLAB_FLOCKED) ? 1 : 0];
 #endif /* SLAB_FLOCKED != 1 */
-	if (pool_lock_trywrite(pool)) {
+	if (slab_pool_tryacquire(pool)) {
 		pool_do_free(pool, self);
-		pool_lock_endwrite(pool);
+		slab_pool_release(pool);
 	} else {
-		struct slab *next;
-		do {
-			next = ATOMIC_READ(pool->sp_pend);
-			self->s_next = next;
-		} while (!ATOMIC_CMPXCH_WEAK(pool->sp_pend, next, self));
-		if (pool_lock_trywrite(pool))
-			pool_lock_endwrite(pool);
+		SLIST_ATOMIC_INSERT(&pool->sp_pend, self, s_slink);
+		_slab_pool_reap(pool);
 	}
 }
 
@@ -190,20 +200,20 @@ NOTHROW(KCALL slab_alloc_page)(gfp_t flags) {
 	pool = &slab_freepool[(flags & GFP_LOCKED) ? 1 : 0];
 #endif /* GFP_LOCKED != 1 */
 again:
-	if unlikely(!pool_lock_trywrite(pool)) {
+	if unlikely(!slab_pool_tryacquire(pool)) {
 		if (flags & GFP_ATOMIC)
 			goto err;
-		if unlikely(!pool_lock_write(pool))
+		if unlikely(!slab_pool_acquire_nx(pool))
 			goto err;
 	}
-	assert((pool->sp_free != NULL) ==
-	       (pool->sp_count != 0));
-	result = pool->sp_free;
+	assert(!!SLIST_EMPTY(&pool->sp_free) == (pool->sp_count == 0));
+	result = SLIST_FIRST(&pool->sp_free);
 	if (result) {
 		/* Re-use an already allocated slab page. */
-		pool->sp_free = result->s_next;
+		SLIST_REMOVE_HEAD(&pool->sp_free, s_slink);
 		--pool->sp_count;
-		pool_lock_endwrite(pool);
+		slab_pool_release(pool);
+
 		/* Pre-initialize the resulting slab page. */
 #ifdef CONFIG_DEBUG_HEAP
 #if GFP_CALLOC == SLAB_FCALLOC
@@ -224,28 +234,30 @@ again:
 #endif /* !CONFIG_DEBUG_HEAP */
 		return result;
 	}
-	pool_lock_endwrite(pool);
+	slab_pool_release(pool);
 	COMPILER_READ_BARRIER();
 	if unlikely(ATOMIC_READ(pool->sp_count) != 0)
 		goto again;
+
 	/* Must allocate a new slab page. */
 again_lock_mman_kernel:
-	if (flags & GFP_ATOMIC) {
-		if unlikely(!mman_lock_tryacquire(&mman_kernel))
+	if (!mman_lock_tryacquire(&mman_kernel)) {
+		if (flags & GFP_ATOMIC)
 			goto err;
-	} else {
 		if unlikely(!mman_lock_acquire_nx(&mman_kernel))
 			goto err;
 	}
 	{
 		void *next_slab_addr;
 		void *slab_end_addr;
-		slab_end_addr  = kernel_slab_break;
+		slab_end_addr = kernel_slab_break;
+
 		/* Make sure that sufficient memory is available within the slab-region. */
 		next_slab_addr = mman_findunmapped(&mman_kernel,
 		                                   MHINT_GETADDR(KERNEL_MHINT_SLAB), PAGESIZE,
 		                                   MHINT_GETMODE(KERNEL_MHINT_SLAB));
 		mman_lock_release(&mman_kernel);
+
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
 		if (next_slab_addr == MAP_FAILED || next_slab_addr < (byte_t *)slab_end_addr - PAGESIZE)
 #else /* CONFIG_SLAB_GROWS_DOWNWARDS */
@@ -255,10 +267,9 @@ again_lock_mman_kernel:
 			syscache_version_t version = SYSCACHE_VERSION_INIT;
 			mman_lock_release(&mman_kernel);
 again_next_slab_page_tryhard:
-			if (flags & GFP_ATOMIC) {
-				if unlikely(!mman_lock_tryacquire(&mman_kernel))
+			if (!mman_lock_tryacquire(&mman_kernel)) {
+				if (flags & GFP_ATOMIC)
 					goto err;
-			} else {
 				if unlikely(!mman_lock_acquire_nx(&mman_kernel))
 					goto err;
 			}

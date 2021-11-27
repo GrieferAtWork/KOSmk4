@@ -56,9 +56,9 @@ DECL_BEGIN
 
 INTERN struct slab_descriptor LOCAL_desc = {
 	.sd_lock = ATOMIC_LOCK_INIT,
-	.sd_free = NULL,
+	.sd_free = LIST_HEAD_INITIALIZER(LOCAL_desc.sd_free),
 #ifdef CONFIG_TRACE_MALLOC
-	.sd_used = NULL,
+	.sd_used = LIST_HEAD_INITIALIZER(LOCAL_desc.sd_used),
 #endif /* CONFIG_TRACE_MALLOC */
 	.sd_pend = NULL,
 };
@@ -86,29 +86,29 @@ NOTHROW(KCALL LOCAL_slab_dofreeptr)(struct slab *__restrict self,
 	        (size_t)SEGMENT_SIZE, ptr, self, index,
 	        (size_t)self->s_free);
 	assert(self->s_free < SEGMENT_COUNT);
+
 	/* Clear the is-allocated bit. */
 	(INUSE_BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)]) &= ~SLAB_SEGMENT_STATUS_ALLOC_N(index);
+
+	/* Keep track of how many elements are free. */
 	++self->s_free;
 	assert(self->s_free <= SEGMENT_COUNT);
+
+	/* Handle special cases. */
 	if (self->s_free == SEGMENT_COUNT) {
 		/* Free this slab. */
-		if ((*self->s_pself = self->s_next) != NULL)
-			self->s_next->s_pself = self->s_pself;
+		LIST_REMOVE(self, s_link);
 		slab_freepage(self);
 	} else if (self->s_free == 1) {
 		/* Slab was fully allocated, but became partially allocated. */
+
 #ifdef CONFIG_TRACE_MALLOC
 		/* Unlink from `sd_used' */
-		if ((*self->s_pself = self->s_next) != NULL)
-			self->s_next->s_pself = self->s_pself;
+		LIST_REMOVE(self, s_link);
 #endif /* CONFIG_TRACE_MALLOC */
+
 		/* Insert into `LOCAL_desc.sd_free' */
-		if ((self->s_next = LOCAL_desc.sd_free) != NULL) {
-			assert(LOCAL_desc.sd_free->s_pself == &LOCAL_desc.sd_free);
-			LOCAL_desc.sd_free->s_pself = &self->s_next;
-		}
-		self->s_pself = &LOCAL_desc.sd_free;
-		LOCAL_desc.sd_free  = self;
+		LIST_INSERT_HEAD(&LOCAL_desc.sd_free, self, s_link);
 	}
 }
 
@@ -134,8 +134,9 @@ again:
 				COMPILER_WRITE_BARRIER();
 			} while (!ATOMIC_CMPXCH_WEAK(LOCAL_desc.sd_pend, more, pend));
 		}
-		if (slab_descriptor_available(&LOCAL_desc))
+		if unlikely(slab_descriptor_available(&LOCAL_desc))
 			goto again;
+		return;
 	}
 	do {
 		next = pend->spf_next;
@@ -193,10 +194,10 @@ again:
 		if unlikely(!slab_descriptor_acquire_nx(&LOCAL_desc))
 			goto err;
 	}
-	result_page = LOCAL_desc.sd_free;
+	result_page = LIST_FIRST(&LOCAL_desc.sd_free);
 	if likely(result_page) {
 		unsigned int i, j;
-		assert(result_page->s_pself == &LOCAL_desc.sd_free);
+		assert(result_page->s_link.le_prev == &LOCAL_desc.sd_free.lh_first);
 		assert(result_page->s_free != 0);
 		assert(result_page->s_size == SEGMENT_SIZE);
 		for (i = 0;; ++i) {
@@ -226,18 +227,10 @@ again:
 			COMPILER_READ_BARRIER();
 			result = &SEGMENTS(result_page)[j + i * (BITS_PER_POINTER / SLAB_SEGMENT_STATUS_BITS)];
 			if (--result_page->s_free == 0) {
-				LOCAL_desc.sd_free = result_page->s_next;
-				if (LOCAL_desc.sd_free)
-					LOCAL_desc.sd_free->s_pself = &LOCAL_desc.sd_free;
+				LIST_REMOVE(result_page, s_link);
 #ifdef CONFIG_TRACE_MALLOC
-				if ((result_page->s_next = LOCAL_desc.sd_used) != NULL)
-					LOCAL_desc.sd_used->s_pself = &result_page->s_next;
-				result_page->s_pself = &LOCAL_desc.sd_used;
-				LOCAL_desc.sd_used         = result_page;
-#else /* CONFIG_TRACE_MALLOC */
-				result_page->s_pself = NULL;
-				DBG_memset(&result_page->s_next, 0xcc, sizeof(result_page->s_next));
-#endif /* !CONFIG_TRACE_MALLOC */
+				LIST_INSERT_HEAD(&LOCAL_desc.sd_used, result_page, s_link);
+#endif /* CONFIG_TRACE_MALLOC */
 			}
 			slab_descriptor_release(&LOCAL_desc);
 #ifdef CONFIG_DEBUG_HEAP
@@ -273,10 +266,10 @@ again:
 	if (flags & GFP_CALLOC)
 		result_page->s_flags |= SLAB_FCALLOC;
 #endif /* GFP_LOCKED != SLAB_FLOCKED || GFP_CALLOC != SLAB_FCALLOC */
-	result_page->s_free  = SEGMENT_COUNT - 1; /* One of the segments gets returned to the caller */
-	result_page->s_size  = SEGMENT_SIZE;
-	result_page->s_pself = &LOCAL_desc.sd_free;
-	result_page->s_next  = NULL;
+	result_page->s_free = SEGMENT_COUNT - 1; /* One of the segments gets returned to the caller */
+	result_page->s_size = SEGMENT_SIZE;
+	result_page->s_link.le_prev = &LOCAL_desc.sd_free.lh_first;
+	result_page->s_link.le_next = NULL;
 	if (!(flags & GFP_CALLOC))
 		memset(&INUSE_BITSET(result_page)[1], 0, SIZEOF_BITSET - sizeof(uintptr_t));
 	(INUSE_BITSET(result_page)[0]) = SLAB_SEGMENT_STATUS_ALLOC;
@@ -292,14 +285,14 @@ again:
 
 	/* Check if new free-pages have appeared in the mean time. */
 	COMPILER_READ_BARRIER();
-	if unlikely(LOCAL_desc.sd_free != NULL) {
+	if unlikely(!LIST_EMPTY(&LOCAL_desc.sd_free)) {
 		slab_descriptor_release(&LOCAL_desc);
 		slab_freepage(result_page);
 		goto again;
 	}
 
 	/* Save the new free-page. */
-	LOCAL_desc.sd_free = result_page;
+	LOCAL_desc.sd_free.lh_first = result_page;
 	slab_descriptor_release(&LOCAL_desc);
 	return result;
 err_result_page:

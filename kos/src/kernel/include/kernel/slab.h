@@ -25,6 +25,7 @@
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
+#include <hybrid/sequence/list.h>
 #include <hybrid/typecore.h>
 
 #include <kos/kernel/paging.h> /* KERNEL_MHINT_SLAB */
@@ -67,19 +68,21 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct slab {
-	struct slab **s_pself; /* [1..1][?..1] Self pointer. */
-	struct slab  *s_next;  /* [0..1] Next slab (either next in-use, or next free) */
+	union {
+		SLIST_ENTRY(slab) s_slink; /* [0..1] Used internally to chain fully free slabs. */
+		LIST_ENTRY(slab)  s_link;  /* [0..1] Prev/next slab (either in-use, or free) */
+	};
 #define SLAB_FNORMAL 0x00  /* Normal slab flags. */
 #define SLAB_FLOCKED 0x01  /* The slab kernel page is locked into memory. */
 #define SLAB_FCALLOC 0x04  /* Slab memory (of unused slabs) is zero-initialized. */
 #if __SIZEOF_POINTER__ >= 8
-	u16           s_flags; /* Slab flags (Set of `SLAB_F*'). */
-	u16           s_size;  /* [const] Slab segment size (in bytes) */
-	WEAK u32      s_free;  /* Amount of free segments in this slab. */
+	u16              s_flags; /* Slab flags (Set of `SLAB_F*'). */
+	u16              s_size;  /* [const] Slab segment size (in bytes) */
+	WEAK u32         s_free;  /* Amount of free segments in this slab. */
 #else /* __SIZEOF_POINTER__ >= 8 */
-	u8            s_flags; /* Slab flags (Set of `SLAB_F*'). */
-	u8            s_size;  /* [const] Slab segment size (in bytes) */
-	WEAK u16      s_free;  /* Amount of free segments in this slab. */
+	u8               s_flags; /* Slab flags (Set of `SLAB_F*'). */
+	u8               s_size;  /* [const] Slab segment size (in bytes) */
+	WEAK u16         s_free;  /* Amount of free segments in this slab. */
 #endif /* __SIZEOF_POINTER__ < 8 */
 	/* A bitset of allocated segments goes here (every segment has `SLAB_SEGMENT_STATUS_BITS'
 	 * consecutive  status bits in  within this bitset, that  form an integer  that is one of
@@ -225,14 +228,16 @@ DATDEF void *kernel_slab_break;
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 struct slab_pending_free {
+	/* TODO: Use SLIST_ENTRY() */
 	struct slab_pending_free *spf_next; /* [0..1] Next pending free. */
 };
+LIST_HEAD(slab_list, slab);
 struct slab_descriptor {
 	/* Data descriptor for some fixed-length-segment slab. */
 	struct atomic_lock             sd_lock; /* Lock for this slab descriptor. */
-	struct slab                   *sd_free; /* [0..1][lock(sd_lock)] Chain of partially free slab pages. */
+	struct slab_list               sd_free; /* [0..n][lock(sd_lock)] Chain of partially free slab pages. */
 #ifdef CONFIG_TRACE_MALLOC
-	struct slab                   *sd_used; /* [0..1][lock(sd_lock)] Chain of fully allocated slab pages. */
+	struct slab_list               sd_used; /* [0..n][lock(sd_lock)] Chain of fully allocated slab pages. */
 #endif /* CONFIG_TRACE_MALLOC */
 	WEAK struct slab_pending_free *sd_pend; /* [0..1] Chain of pending free segments. */
 };

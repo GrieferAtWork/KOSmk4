@@ -868,23 +868,26 @@ NOTHROW(KCALL gc_slab_reset_reach_slab)(struct slab *__restrict self) {
 #endif /* (SLAB_SEGMENT_STATUS_REACH & SLAB_SEGMENT_STATUS_ALLOC) == 0 */
 }
 
-PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL gc_slab_reset_reach_slab_chain)(struct slab *self) {
-	for (; self; self = self->s_next)
-		gc_slab_reset_reach_slab(self);
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL gc_slab_reset_reach_slab_chain)(struct slab_list const *__restrict self) {
+	struct slab *iter;
+	LIST_FOREACH (iter, self, s_link) {
+		gc_slab_reset_reach_slab(iter);
+	}
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
-NOTHROW(KCALL gc_slab_reset_reach_desc)(struct slab_descriptor *__restrict self) {
-	gc_slab_reset_reach_slab_chain(self->sd_free);
-	gc_slab_reset_reach_slab_chain(self->sd_used);
+NOTHROW(KCALL gc_slab_reset_reach_desc)(struct slab_descriptor const *__restrict self) {
+	gc_slab_reset_reach_slab_chain(&self->sd_free);
+	gc_slab_reset_reach_slab_chain(&self->sd_used);
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_slab_reset_reach)(void) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(gc_slab_descs); ++i)
+	for (i = 0; i < COMPILER_LENOF(gc_slab_descs); ++i) {
 		gc_slab_reset_reach_desc(gc_slab_descs[i]);
+	}
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
@@ -1302,8 +1305,8 @@ NOTHROW(KCALL gc_reachable_thread)(void *UNUSED(arg),
 #define gc_isskewed(p) ((uintptr_t)(p) & 1)
 #define gc_skewed(p)   ((typeof(p))((uintptr_t)(p) | 1))
 #define gc_unskewed(p) ((typeof(p))((uintptr_t)(p) & ~1))
-#define gc_skew(p_p)   (void)(*(uintptr_t *)(p_p) |= 1)
-#define gc_unskew(p_p) (void)(*(uintptr_t *)(p_p) &= ~1)
+#define gc_skew(p_p)   (void)(*(p_p) = gc_skewed(*(p_p)))
+#define gc_unskew(p_p) (void)(*(p_p) = gc_unskewed(*(p_p)))
 
 
 
@@ -1719,25 +1722,28 @@ gc_gather_unreachable_slab(struct trace_node **__restrict pleaks,
 	}
 }
 
-PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
+PRIVATE ATTR_COLDTEXT NONNULL((1, 2)) void KCALL
 gc_gather_unreachable_slab_chain(struct trace_node **__restrict pleaks,
-                                 struct slab *self) {
-	for (; self; self = self->s_next)
-		gc_gather_unreachable_slab(pleaks, self);
+                                 struct slab_list const *__restrict self) {
+	struct slab *iter;
+	LIST_FOREACH (iter, self, s_link) {
+		gc_gather_unreachable_slab(pleaks, iter);
+	}
 }
 
 PRIVATE ATTR_COLDTEXT NONNULL((1, 2)) void KCALL
 gc_gather_unreachable_slab_descriptor(struct trace_node **__restrict pleaks,
-                                      struct slab_descriptor *__restrict self) {
-	gc_gather_unreachable_slab_chain(pleaks, self->sd_free);
-	gc_gather_unreachable_slab_chain(pleaks, self->sd_used);
+                                      struct slab_descriptor const *__restrict self) {
+	gc_gather_unreachable_slab_chain(pleaks, &self->sd_free);
+	gc_gather_unreachable_slab_chain(pleaks, &self->sd_used);
 }
 
 PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
 gc_gather_unreachable_slabs(struct trace_node **__restrict pleaks) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(gc_slab_descs); ++i)
+	for (i = 0; i < COMPILER_LENOF(gc_slab_descs); ++i) {
 		gc_gather_unreachable_slab_descriptor(pleaks, gc_slab_descs[i]);
+	}
 }
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 

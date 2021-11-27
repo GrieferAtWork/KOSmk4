@@ -95,7 +95,7 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-INTDEF NOBLOCK WUNUSED NONNULL((1)) char const *
+INTDEF NOBLOCK ATTR_CONST WUNUSED NONNULL((1)) char const *
 NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
 
 

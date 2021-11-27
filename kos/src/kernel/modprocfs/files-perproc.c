@@ -831,7 +831,7 @@ procfs_pp_environ_printer(struct printnode *__restrict self,
 /* /proc/[PID]/maps                                                     */
 /************************************************************************/
 /* Check if `self' has a special names, and if so: return that name. */
-INTERN NOBLOCK WUNUSED NONNULL((1)) char const *
+INTERN NOBLOCK ATTR_CONST WUNUSED NONNULL((1)) char const *
 NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self) {
 	/* The libdl program hard-coded into the kernel. */
 	if (self == &execabi_system_rtld_file.mrf_file)
