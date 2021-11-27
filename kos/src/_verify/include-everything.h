@@ -63,7 +63,6 @@ local badFiles = List({
 	"hybrid/__atomic-msvc.h",
 	"hybrid/sequence/rbtree-abi.h",
 	"hybrid/__pointer-cxx-impl.h",
-	"hybrid/sync/service-lock.h",
 	"asm/os/",
 	"bits/os/",
 	"compat/asm/os/",
