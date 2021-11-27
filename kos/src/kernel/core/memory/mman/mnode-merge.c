@@ -930,6 +930,7 @@ NOTHROW(FCALL mnode_trymerge_with_partlock)(struct mnode *__restrict self,
 	if (!mman_lock_tryacquire(mm)) {
 		if unlikely(ATOMIC_READ(self->mn_flags) & MNODE_F_UNMAPPED)
 			goto done_decref;
+
 		/* Must attempt an async merge of all nodes! */
 		async_mergenodes(mm);
 		_mman_lockops_reap(mm);
@@ -1650,7 +1651,8 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 				next = LIST_NEXT(node, mn_link);
 
 				/* Don't fiddle around with nodes that have been unmapped. */
-				if likely(!(node->mn_flags & MNODE_F_UNMAPPED)) {
+				if likely(!(node->mn_flags & MNODE_F_UNMAPPED) &&
+				          !wasdestroyed(node->mn_mman)) {
 					/* Update the part/partoff fields of this node. */
 					assert(node->mn_part == hipart);
 					decref_nokill(hipart);

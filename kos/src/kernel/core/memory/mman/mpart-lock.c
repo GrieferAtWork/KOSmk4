@@ -1448,7 +1448,7 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
 		if unlikely(wasdestroyed(start_node->mn_mman))
 			continue; /* Skip dead nodes. */
 		if (start_node->mn_flags & (MNODE_F_MPREPARED | MNODE_F_UNMAPPED))
-			continue; /* Skip nodes already prepared, or ones that were unmapped. */
+			continue; /* Skip nodes always prepared, or ones that were unmapped. */
 		pagedir_unprepare_p(start_node->mn_mman->mm_pagedir_p,
 		                    mnode_getaddr(start_node),
 		                    mnode_getsize(start_node));

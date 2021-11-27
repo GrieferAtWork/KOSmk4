@@ -191,8 +191,8 @@ struct mnode {
 	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
-	/*REF*/ struct mpart               *mn_part;     /* [0..1][const][valid_if(!MNODE_F_UNMAPPED)] The bound mem-part.
-	                                                  * When set to NULL, then  this node represents a reserved  node. */
+	/*REF*/ struct mpart               *mn_part;     /* [0..1][const][valid_if(!MNODE_F_UNMAPPED && !wasdestroyed(mn_mman))]
+	                                                  * The bound mem-part. When set to NULL, then this node represents a reserved node. */
 	/*REF*/ struct path                *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	/*REF*/ struct fdirent             *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 #ifdef __WANT_MNODE__mn_alloc
@@ -251,8 +251,8 @@ struct mnode {
 	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
-	REF struct mpart                   *mn_part;     /* [0..1][const] The bound mem-part.
-	                                                  * When set to NULL, then this node represents a reserved node. */
+	REF struct mpart                   *mn_part;     /* [0..1][const][valid_if(!MNODE_F_UNMAPPED && !wasdestroyed(mn_mman))]
+	                                                  * The bound mem-part. When set to NULL, then this node represents a reserved node. */
 	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
 	REF struct fdirent                 *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 #ifdef __WANT_MNODE__mn_alloc
