@@ -357,7 +357,7 @@ struct mnode {
 
 
 
-/* Begin/end  using free use of `_mn_ilink' of `self'.
+/* Begin/end  allow free use of `_mn_ilink' of `self'.
  * The caller must be holding a lock to the associated
  * mman, which must not  be released before all  ilink
  * fields are deactivated via  `mnode_use_ilink_end()' */
@@ -406,13 +406,13 @@ struct mnode {
 #define mnode_iskern(self)     ADDRRANGE_ISKERN((self)->mn_minaddr, (self)->mn_maxaddr + 1)
 #define mnode_isuser(self)     ADDRRANGE_ISUSER((self)->mn_minaddr, (self)->mn_maxaddr + 1)
 /* Return the part-relative min-/max-address that is being mapped. */
-#define mnode_getmapaddr(self)    ((mpart_reladdr_t)((self)->mn_partoff))
-#define mnode_getmapminaddr(self) ((mpart_reladdr_t)((self)->mn_partoff))
-#define mnode_getmapmaxaddr(self) ((mpart_reladdr_t)((self)->mn_partoff + ((size_t)((self)->mn_maxaddr - (self)->mn_minaddr))))
-#define mnode_getmapendaddr(self) ((mpart_reladdr_t)((self)->mn_partoff + mnode_getsize(self)))
+#define mnode_getpartaddr(self)    ((mpart_reladdr_t)((self)->mn_partoff))
+#define mnode_getpartminaddr(self) ((mpart_reladdr_t)((self)->mn_partoff))
+#define mnode_getpartmaxaddr(self) ((mpart_reladdr_t)((self)->mn_partoff + ((size_t)((self)->mn_maxaddr - (self)->mn_minaddr))))
+#define mnode_getpartendaddr(self) ((mpart_reladdr_t)((self)->mn_partoff + mnode_getsize(self)))
 #define mnode_ismapping(self, partrel_minaddr, partrel_maxaddr) \
-	((partrel_maxaddr) >= mnode_getmapminaddr(self) &&          \
-	 (partrel_minaddr) <= mnode_getmapmaxaddr(self))
+	((partrel_maxaddr) >= mnode_getpartminaddr(self) &&         \
+	 (partrel_minaddr) <= mnode_getpartmaxaddr(self))
 
 /* Return the file-absolute min-/max-address that is being mapped. (caller must ensure a non-NULL `mn_part') */
 #define mnode_getfileaddr(self)    (mpart_getminaddr((self)->mn_part) + (self)->mn_partoff)
@@ -422,7 +422,7 @@ struct mnode {
 
 /* Return the file-absolute address mapped at `vaddr' */
 #define mnode_getfileaddrat(self, vaddr) (mnode_getfileaddr(self) + ((byte_t *)(vaddr) - (self)->mn_minaddr))
-#define mnode_getmapaddrat(self, vaddr)  (mnode_getmapaddr(self) + ((byte_t *)(vaddr) - (self)->mn_minaddr))
+#define mnode_getpartaddrat(self, vaddr) (mnode_getpartaddr(self) + ((byte_t *)(vaddr) - (self)->mn_minaddr))
 
 
 /* Free/destroy a given mem-node */
@@ -456,7 +456,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_destroy)(struct mnode *__re
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self);
 #define MNODE_CLEAR_WRITE_SUCCESS    0 /* Success (or no-op when `self' wasn't mapped with write-access, or the associated mman was destroyed) */
-#define MNODE_CLEAR_WRITE_WOULDBLOCK 1 /* ERROR: The operation would have blocked (The caller must blocking-wait for `sync_write(self->mmn_mman)') */
+#define MNODE_CLEAR_WRITE_WOULDBLOCK 1 /* ERROR: The operation would have blocked (The caller must blocking-wait for `mman_lock_canwrite(self->mmn_mman)') */
 #define MNODE_CLEAR_WRITE_BADALLOC   2 /* ERROR: Failed to prepare the underlying page directory for making modifications to the associated mapping. */
 
 /* Same as `mnode_clear_write', but the caller is already holding a lock to `mm',

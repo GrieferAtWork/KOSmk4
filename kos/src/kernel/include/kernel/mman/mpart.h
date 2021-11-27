@@ -1401,9 +1401,9 @@ NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
 #define mpart_iswritable(self, addr, num_bytes, node)                                 \
 	((node)->mn_flags & MNODE_F_SHARED ? mpart_issharewritable(self, addr, num_bytes) \
 	                                   : mpart_iscopywritable(self, addr, num_bytes, node))
-#define mnode_iscopywritable(self)  mpart_iscopywritable((self)->mn_part, mnode_getmapaddr(self), mnode_getsize(self), self)
-#define mnode_issharewritable(self) mpart_issharewritable((self)->mn_part, mnode_getmapaddr(self), mnode_getsize(self))
-#define mnode_iswritable(self)      mpart_iswritable((self)->mn_part, mnode_getmapaddr(self), mnode_getsize(self), self)
+#define mnode_iscopywritable(self)  mpart_iscopywritable((self)->mn_part, mnode_getpartaddr(self), mnode_getsize(self), self)
+#define mnode_issharewritable(self) mpart_issharewritable((self)->mn_part, mnode_getpartaddr(self), mnode_getsize(self))
+#define mnode_iswritable(self)      mpart_iswritable((self)->mn_part, mnode_getpartaddr(self), mnode_getsize(self), self)
 
 
 /* A slightly smarter equivalent of:

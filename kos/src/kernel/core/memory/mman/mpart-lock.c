@@ -1174,8 +1174,8 @@ NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restri
 			continue;
 		if (wasdestroyed(node->mn_mman))
 			continue;
-		min = mnode_getmapminaddr(node);
-		max = mnode_getmapmaxaddr(node);
+		min = mnode_getpartminaddr(node);
+		max = mnode_getpartmaxaddr(node);
 		if (self->ucb_mapmin > min)
 			self->ucb_mapmin = min;
 		if (self->ucb_mapmax < max)

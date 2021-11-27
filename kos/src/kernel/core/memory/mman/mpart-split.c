@@ -390,14 +390,14 @@ NOTHROW(FCALL mpart_count_needed_nodes_in_list)(struct mpart_split_data const *_
 			continue; /* Skip nodes that were destroyed. */
 		if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
 			continue; /* Skip nodes that were unmapped. (NOTE: We're holding a lock to `node->mn_mman') */
-		min = mnode_getmapminaddr(node);
-		max = mnode_getmapmaxaddr(node);
+		min = mnode_getpartminaddr(node);
+		max = mnode_getpartmaxaddr(node);
 		assert(min <= max);
 		assert(max < mpart_getsize(self->msd_lopart));
 		/* NOTE: We _only_ have to create new nodes for those cases where
 		 *       the split position  lies _inside_ of  the range that  is
 		 *       actually being mapped by some node!
-		 * s.a. `mnode_getmapminaddr() ... mnode_getmapmaxaddr()' */
+		 * s.a. `mnode_getpartminaddr() ... mnode_getpartmaxaddr()' */
 		if (min < self->msd_offset && self->msd_offset <= max)
 			++result; /* This node has to be split in 2 */
 	}
@@ -886,14 +886,14 @@ relock_with_data:
 			if unlikely(lonode->mn_flags & MNODE_F_UNMAPPED)
 				continue; /* Skip nodes that were unmapped. (NOTE: We're holding a lock to `lonode->mn_mman') */
 			assert(lonode->mn_part == lopart);
-			min = mnode_getmapminaddr(lonode);
-			max = mnode_getmapmaxaddr(lonode);
+			min = mnode_getpartminaddr(lonode);
+			max = mnode_getpartmaxaddr(lonode);
 			assert(min <= max);
 			assert(max < mpart_getsize(lopart));
 			/* NOTE: We _only_ have to create new nodes for those cases where
 			 *       the split position  lies _inside_ of  the range that  is
 			 *       actually being mapped by some node!
-			 * s.a. `mnode_getmapminaddr() ... mnode_getmapmaxaddr()' */
+			 * s.a. `mnode_getpartminaddr() ... mnode_getpartmaxaddr()' */
 			if (min < data.msd_offset && data.msd_offset <= max) {
 				struct mnode *hinode;
 				struct mnode_list *list;

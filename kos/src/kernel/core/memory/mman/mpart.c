@@ -859,8 +859,8 @@ NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
 		struct mnode *iter;
 		LIST_FOREACH (iter, &self->_mp_nodlsts[i], mn_link) {
 			if (!RANGE_OVERLAPS(addr, addr + num_bytes,
-			                    mnode_getmapaddr(iter),
-			                    mnode_getmapendaddr(iter)))
+			                    mnode_getpartaddr(iter),
+			                    mnode_getpartendaddr(iter)))
 				continue; /* No overlap here! */
 			if (iter == node)
 				continue; /* This one's allowed! */
@@ -880,8 +880,8 @@ NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
 	struct mnode *iter;
 	LIST_FOREACH (iter, &self->mp_copy, mn_link) {
 		if (RANGE_OVERLAPS(addr, addr + num_bytes,
-		                   mnode_getmapaddr(iter),
-		                   mnode_getmapendaddr(iter)))
+		                   mnode_getpartaddr(iter),
+		                   mnode_getpartendaddr(iter)))
 			return false; /* oops: overlap! */
 	}
 	return true; /* Everything OK! */

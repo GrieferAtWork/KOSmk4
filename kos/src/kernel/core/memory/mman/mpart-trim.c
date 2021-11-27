@@ -931,8 +931,8 @@ again_enum_hipart_nodlst:
 				if (node->mn_partoff >= addr)
 					break; /* Keep all nodes starting w/ this one! */
 
-				assertf(!(addr >= mnode_getmapminaddr(node) &&
-				          addr <= mnode_getmapmaxaddr(node)),
+				assertf(!(addr >= mnode_getpartminaddr(node) &&
+				          addr <= mnode_getpartmaxaddr(node)),
 				        "Node is mapped directly in the middle of the split.\n"
 				        "This shouldn't be possible since our caller only ever "
 				        "creates splits such that they appear within entirely "
@@ -941,7 +941,7 @@ again_enum_hipart_nodlst:
 				        "Node part range:    %#" PRIxSIZ "-%#" PRIxSIZ "\n"
 				        "addr:               %#" PRIxSIZ "\n",
 				        mnode_getminaddr(node), mnode_getmaxaddr(node),
-				        mnode_getmapminaddr(node), mnode_getmapmaxaddr(node),
+				        mnode_getpartminaddr(node), mnode_getpartmaxaddr(node),
 				        addr);
 
 				if unlikely(node->mn_flags & MNODE_F_MHINT)
@@ -1271,7 +1271,7 @@ again_enum_nodes:
 		if (!next)
 			break; /* Last node reached. */
 		/* Figure out of there's some part that's not mapped. */
-		node_endaddr = mnode_getmapendaddr(node);
+		node_endaddr = mnode_getpartendaddr(node);
 
 again_check_next_same_base:
 		if (next->mn_partoff == node->mn_partoff) {
@@ -1280,11 +1280,11 @@ again_check_next_same_base:
 			 *               the same base address.
 			 * When this is the case, we have to scan all adjacent  same-base-address
 			 * nodes for the one that is the largest (iow: has the greatest mpart end
-			 * address; i.e. `mnode_getmapendaddr()').
+			 * address; i.e. `mnode_getpartendaddr()').
 			 * Otherwise, we'd only use the last node from a set of same-base-address
 			 * nodes, which may not necessarily be the largest! */
 			mpart_reladdr_t next_endaddr;
-			next_endaddr = mnode_getmapendaddr(next);
+			next_endaddr = mnode_getpartendaddr(next);
 			if (node_endaddr < next_endaddr) {
 				node_endaddr = next_endaddr; /* Use the end-address of the largest node! */
 				node         = next;         /* Node needs to stay the one which extends the greatest amount. */
@@ -1320,14 +1320,14 @@ again_check_next_same_base:
 		 * Fix this problem by simply skipping nodes that are
 		 * entirely   contained   within   preceding   nodes. */
 again_check_next_inside_current:
-		if (mnode_getmapendaddr(next) <= node_endaddr) {
+		if (mnode_getpartendaddr(next) <= node_endaddr) {
 			next = mpart_node_iterator_next(&iter);
 			if (!next)
 				break; /* Last node reached. */
 			goto again_check_next_inside_current;
 		}
 
-		next_basaddr = mnode_getmapaddr(next);
+		next_basaddr = mnode_getpartaddr(next);
 		if (node_endaddr < next_basaddr) {
 			/* Align addresses by the mandatory file alignment. */
 			node_endaddr += self->mp_file->mf_part_amask;
@@ -1354,7 +1354,7 @@ again_check_next_inside_current:
 	{
 		mpart_reladdr_t node_endaddr;
 		mpart_reladdr_t part_endaddr;
-		node_endaddr = mnode_getmapendaddr(node);
+		node_endaddr = mnode_getpartendaddr(node);
 		part_endaddr = mpart_getsize(self);
 		assert(node_endaddr <= part_endaddr);
 		assert((part_endaddr & self->mp_file->mf_part_amask) == 0);

@@ -153,10 +153,10 @@ NOTHROW(FCALL mnode_canmerge)(struct mnode *lonode,
 				 * overlap. - If they do,  then this mean that  the
 				 * same memory is mapped  more than once, and  that
 				 * we can't actually merge the 2 parts. */
-				if (RANGES_OVERLAP(mnode_getmapminaddr(lonode),
-				                   mnode_getmapmaxaddr(lonode),
-				                   mnode_getmapminaddr(hinode),
-				                   mnode_getmapmaxaddr(hinode)))
+				if (RANGES_OVERLAP(mnode_getpartminaddr(lonode),
+				                   mnode_getpartmaxaddr(lonode),
+				                   mnode_getpartminaddr(hinode),
+				                   mnode_getpartmaxaddr(hinode)))
 					goto nope;
 			} else {
 				/* For differing anonymous parts, we can simply merge  the
@@ -506,7 +506,7 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 	assert(mpart_lock_acquired(lonode->mn_part));
 
 	/* Figure out the relative mapping addresses of the 2 parts. */
-	if (mnode_getmapendaddr(lonode) == mnode_getmapaddr(hinode)) {
+	if (mnode_getpartendaddr(lonode) == mnode_getpartaddr(hinode)) {
 		/* Simple case: the in-part offsets mapped by the 2 nodes are
 		 * already set-up such that  the memory they're mapping  uses
 		 * adjacent in-part offsets. */
@@ -516,10 +516,10 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 		 * more than once, in which case merging isn't possible, since
 		 * we  must maintain the expected invariant of the part of the
 		 * mapping being a duplicate of another part. */
-		if (RANGES_OVERLAP(mnode_getmapminaddr(lonode),
-		                   mnode_getmapmaxaddr(lonode),
-		                   mnode_getmapminaddr(hinode),
-		                   mnode_getmapmaxaddr(hinode)))
+		if (RANGES_OVERLAP(mnode_getpartminaddr(lonode),
+		                   mnode_getpartmaxaddr(lonode),
+		                   mnode_getpartminaddr(hinode),
+		                   mnode_getpartmaxaddr(hinode)))
 			return MNODE_MERGE_CANNOT_MERGE;
 		/* It ~is~ possible that we might be able to plug the  2
 		 * portions of the mem-part that are being mapped out of

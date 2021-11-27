@@ -163,8 +163,8 @@ NOTHROW(FCALL _mnode_list_maps)(struct mnode_list const *__restrict self,
 	do {
 		mpart_reladdr_t node_minaddr;
 		mpart_reladdr_t node_maxaddr;
-		node_minaddr = mnode_getmapminaddr(node);
-		node_maxaddr = mnode_getmapmaxaddr(node);
+		node_minaddr = mnode_getpartminaddr(node);
+		node_maxaddr = mnode_getpartmaxaddr(node);
 		if (RANGE_OVERLAPS(node_minaddr, node_maxaddr, minaddr, maxaddr))
 			return true;
 	} while ((node = LIST_NEXT(node, mn_link)) != NULL);
@@ -203,8 +203,8 @@ mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
 
 		if (self->mfm_prot & PROT_WRITE) {
 			mpart_reladdr_t minaddr, maxaddr;
-			minaddr = mnode_getmapminaddr(node);
-			maxaddr = mnode_getmapmaxaddr(node);
+			minaddr = mnode_getpartminaddr(node);
+			maxaddr = mnode_getpartmaxaddr(node);
 			if (self->mfm_prot & PROT_SHARED) {
 				/* Check if we must unshare copy-on-write mappings from this node.  */
 				if (mpart_must_unshare_copy(part, minaddr, maxaddr)) {

@@ -173,7 +173,7 @@ begin_first_expression:
 	}
 
 	/* Make sure the range accessed by the caller is allocated. */
-	expraddr = mnode_getmapaddrat(node, expr->fe_offset);
+	expraddr = mnode_getpartaddrat(node, expr->fe_offset);
 	if (!mpart_load_or_unlock(part, &unlock, expraddr,
 	                          LFUTEXEXPR_CMD_SIZEOF(expr->fe_condition)))
 		goto again_lock_mman;
