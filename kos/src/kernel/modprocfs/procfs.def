@@ -82,12 +82,13 @@ MKDIR_BEGIN(procfs_r_kos, 0555)
 #ifdef CONFIG_TRACE_MALLOC
 	MKDIR_ENT("leaks",   DT_REG, &procfs_r_kos_leaks,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc66c913f, 0x736b61656c, 0xcf906d36, 0x736b61656c)/*[[[end]]]*/)
 #endif /* CONFIG_TRACE_MALLOC */
-	/* TODO: meminfo   (userspace interface for `DATDEF struct pmeminfo minfo;') */
+	MKDIR_ENT("meminfo", DT_REG, &procfs_r_kos_meminfo, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547f743, 0x6f666e696d656d, 0xd9003f1f, 0x6f666e696d656d)/*[[[end]]]*/)
 	MKDIR_ENT("mm",      DT_DIR, &procfs_r_kos_mm,      /*[[[fdirent_hash]]]*/0x6d6d/*[[[end]]]*/)
 	MKDIR_ENT("raminfo", DT_REG, &procfs_r_kos_raminfo, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547d370, 0x6f666e696d6172, 0x5dc3f1f, 0x6f666e696d6172)/*[[[end]]]*/)
 MKDIR_END
-MKREG_RO(procfs_r_kos_kstat, 0444, procfs_kos_kstat_printer)
 MKREG_RW(procfs_r_kos_futexfd_maxexpr, 0644, procfs_kos_futexfd_maxexpr_print, procfs_kos_futexfd_maxexpr_write)
+MKREG_RO(procfs_r_kos_kstat, 0444, procfs_kos_kstat_printer)
+MKREG_RO(procfs_r_kos_meminfo, 0444, procfs_kos_meminfo_printer)
 MKREG_RO(procfs_r_kos_raminfo, 0444, procfs_kos_raminfo_printer)
 
 

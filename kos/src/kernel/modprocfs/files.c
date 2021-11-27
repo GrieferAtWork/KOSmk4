@@ -119,7 +119,7 @@ NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
 
 
 PRIVATE NONNULL((1)) ssize_t KCALL
-print_size_with_unit(pformatprinter printer, void *arg, size_t sizeval) {
+print_size_with_unit(pformatprinter printer, void *arg, uint64_t sizeval) {
 	char const *unit;
 	if (sizeval >= 1024 * 1024 * 1024) {
 		sizeval = CEILDIV(sizeval, 1024 * 1024 * 1024);
@@ -133,7 +133,7 @@ print_size_with_unit(pformatprinter printer, void *arg, size_t sizeval) {
 	} else {
 		unit = "b";
 	}
-	return format_printf(printer, arg, "%" PRIuSIZ "%s", sizeval, unit);
+	return format_printf(printer, arg, "%" PRIu64 "%s", sizeval, unit);
 }
 
 
@@ -639,6 +639,32 @@ procfs_kos_kstat_printer(pformatprinter printer, void *arg,
 			return;
 	}
 	printf("symbols:\t%" PRIuSIZ "\n", get_kernel_symbol_count());
+}
+
+
+
+
+/************************************************************************/
+/* /proc/kos/raminfo                                                    */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_kos_meminfo_printer(pformatprinter printer, void *arg,
+                           size_t UNUSED(offset_hint)) {
+	size_t i;
+	for (i = 0; i < minfo.mb_bankc; ++i) {
+		struct pmembank *bank;
+		bank = &minfo.mb_banks[i];
+		if (bank->mb_type == PMEMBANK_TYPE_UNDEF)
+			continue;
+		printf("%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
+		       "%" PRIpN(__SIZEOF_PHYSADDR_T__) "\t"
+		       "%-11s\t",
+		       PMEMBANK_MINADDR(*bank), PMEMBANK_MAXADDR(*bank),
+		       bank->mb_type < PMEMBANK_TYPE_COUNT ? pmembank_type_names[bank->mb_type] : "?");
+		print_size_with_unit(printer, arg, (uint64_t)PMEMBANK_SIZE(*bank));
+		if (PRINT("\n") < 0)
+			return;
+	}
 }
 
 
