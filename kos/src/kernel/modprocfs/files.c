@@ -144,7 +144,7 @@ print_size_with_unit(pformatprinter printer, void *arg, uint64_t sizeval) {
 /* /proc/self                                                           */
 /************************************************************************/
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-ProcFS_Self_Printer(struct flnknode *__restrict UNUSED(self),
+procfs_self_printer(struct flnknode *__restrict UNUSED(self),
                     USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__), task_getpid_s());
@@ -155,7 +155,7 @@ ProcFS_Self_Printer(struct flnknode *__restrict UNUSED(self),
 /* /proc/thread-self                                                    */
 /************************************************************************/
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-ProcFS_ThreadSelf_Printer(struct flnknode *__restrict UNUSED(self),
+procfs_threadself_printer(struct flnknode *__restrict UNUSED(self),
                           USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__) "/task/"
@@ -168,7 +168,7 @@ ProcFS_ThreadSelf_Printer(struct flnknode *__restrict UNUSED(self),
 /* /proc/cmdline                                                        */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
-ProcFS_Cmdline_Printer(pformatprinter printer, void *arg,
+procfs_cmdline_printer(pformatprinter printer, void *arg,
                        size_t UNUSED(offset_hint)) {
 	cmdline_encode(printer, arg, kernel_driver.d_argc, kernel_driver.d_argv);
 	(*printer)(arg, "\n", 1);
@@ -179,7 +179,7 @@ ProcFS_Cmdline_Printer(pformatprinter printer, void *arg,
 /* /proc/filesystems                                                    */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
-ProcFS_Filesystems_Printer(pformatprinter printer, void *arg,
+procfs_filesystems_printer(pformatprinter printer, void *arg,
                            size_t UNUSED(offset_hint)) {
 	REF struct ffilesys *iter;
 	iter = ffilesys_next(NULL);
@@ -214,7 +214,7 @@ ProcFS_Filesystems_Printer(pformatprinter printer, void *arg,
 /* /proc/mounts                                                         */
 /************************************************************************/
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-ProcFS_Mounts_Printer(struct flnknode *__restrict UNUSED(self),
+procfs_mounts_printer(struct flnknode *__restrict UNUSED(self),
                       USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
 	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__) "/mounts", task_getpid_s());
@@ -224,10 +224,83 @@ ProcFS_Mounts_Printer(struct flnknode *__restrict UNUSED(self),
 
 
 /************************************************************************/
+/* /proc/modules                                                        */
+/************************************************************************/
+
+/* Check if `dependency' is a dependency of `self' */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL driver_depends_on)(struct driver *self,
+                                 struct driver *dependency) {
+	size_t i;
+	for (i = 0; i < self->d_depcnt; ++i) {
+		if (axref_ptr(&self->d_depvec[i]) == dependency)
+			return true;
+	}
+	return false;
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_modules_printer(pformatprinter printer, void *arg,
+                       size_t UNUSED(offset_hint)) {
+	bool show_pointers = capable(CAP_SYS_MODULE);
+	REF struct driver_loadlist *ll;
+	size_t i, j;
+	ll = get_driver_loadlist();
+	FINALLY_DECREF_UNLIKELY(ll);
+	for (i = 0; i < ll->dll_count; ++i) {
+		uintptr_t state;
+		bool got_something;
+		REF struct driver *drv = ll->dll_drivers[i];
+		if (!tryincref(drv))
+			continue;
+		FINALLY_DECREF_UNLIKELY(drv);
+		printf("%s %" PRIuSIZ " %" PRIuPTR " ",
+		       drv->d_name,
+		       (size_t)(drv->md_loadmax - drv->md_loadmin) + 1,
+		       /* Subtract 1 from refcnt because we're holding one ourselves! */
+		       ATOMIC_READ(drv->md_refcnt) - 1);
+		/* Print a list of all drivers that have dependencies on this one. */
+		got_something = false;
+		for (j = 0; j < ll->dll_count; ++j) {
+			REF struct driver *other;
+			other = ll->dll_drivers[j];
+			if (!tryincref(other))
+				continue;
+			FINALLY_DECREF_UNLIKELY(other);
+			if (!driver_depends_on(other, drv))
+				continue;
+			/* Found a driver which `drv' is a dependency of */
+			printf("%s,", other->d_name);
+			got_something = true;
+		}
+		if (drv == &kernel_driver) {
+			PRINT("[permanent],");
+			got_something = true;
+		}
+		if (!got_something)
+			PRINT("-");
+		state = ATOMIC_READ(drv->d_state);
+		if (printf(" %s %#" PRIxPTR "\n",
+		           state < DRIVER_STATE_LOADED
+		           ? "Loading"
+		           : state == DRIVER_STATE_LOADED
+		             ? "Live"
+		             : "Unloading",
+		           show_pointers
+		           ? drv->md_loadaddr
+		           : 0) < 0)
+			return;
+	}
+}
+
+
+
+
+/************************************************************************/
 /* /proc/kcore                                                          */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
-ProcFS_KCore_Printer(pformatprinter printer, void *arg,
+procfs_kcore_printer(pformatprinter printer, void *arg,
                      size_t UNUSED(offset_hint)) {
 	/* TODO: Print a coredump for the kernel core itself */
 	PRINT("TODO");
