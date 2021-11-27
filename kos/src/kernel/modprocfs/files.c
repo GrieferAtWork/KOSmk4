@@ -591,6 +591,38 @@ print_kernel_section_size(pformatprinter printer, void *arg,
 	return PRINT(")\n");
 }
 
+/* Internal structures for used by `kernel_symbol_table' (from `/kos/kernel/core/fs/driver.c') */
+struct kernel_syment {
+	char const *ks_name; /* [0..1] Symbol name (NULL for sentinel) */
+	void       *ks_addr; /* Symbol address */
+	u32         ks_size; /* Symbol size */
+	u32         ks_hash; /* Symbol hash (s.a. `elf_symhash()') */
+};
+struct kernel_symtab {
+	uintptr_t                                     ds_mask;  /* Hash mask. */
+	COMPILER_FLEXIBLE_ARRAY(struct kernel_syment, ds_list); /* Symbol map. */
+};
+
+PRIVATE NOBLOCK ATTR_PURE WUNUSED size_t
+NOTHROW(FCALL get_kernel_symbol_count)(void) {
+	size_t result;
+	static size_t symcount = 0;
+	result = symcount;
+	if (result == 0) {
+		size_t i;
+		struct kernel_symtab *ksymtab;
+		ksymtab = (struct kernel_symtab *)driver_dlsym(&kernel_driver, "kernel_symbol_table");
+		if likely(ksymtab) {
+			for (i = 0; i <= ksymtab->ds_mask; ++i) {
+				if (ksymtab->ds_list[i].ks_name != NULL)
+					++result;
+			}
+		}
+		symcount = result;
+	}
+	return result;
+}
+
 INTERN NONNULL((1)) void KCALL
 procfs_kos_kstat_printer(pformatprinter printer, void *arg,
                          size_t UNUSED(offset_hint)) {
@@ -606,6 +638,7 @@ procfs_kos_kstat_printer(pformatprinter printer, void *arg,
 		if (print_kernel_section_size(printer, arg, section_names[i]) < 0)
 			return;
 	}
+	printf("symbols:\t%" PRIuSIZ "\n", get_kernel_symbol_count());
 }
 
 

@@ -94,8 +94,7 @@ DECL_BEGIN
 
 
 
-/* Internal structures for used by `kernel_symbol_table'
- * Stolen      from       `/kos/kernel/core/fs/driver.c' */
+/* Internal structures for used by `kernel_symbol_table' (from `/kos/kernel/core/fs/driver.c') */
 struct kernel_syment {
 	char const *ks_name; /* [0..1] Symbol name (NULL for sentinel) */
 	void       *ks_addr; /* Symbol address */
