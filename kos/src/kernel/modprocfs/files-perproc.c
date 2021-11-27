@@ -58,7 +58,10 @@ DECL_END
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
+#include <sched/epoll.h>
+#include <sched/eventfd.h>
 #include <sched/pid.h>
+#include <sched/posix-signalfd.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -143,6 +146,49 @@ DECL_BEGIN
 #define procfs_perproc_v_free    (*((void(KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1))
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
+
+/* NIBBLES_PER_PTR == __SIZEOF_POINTER__*2 */
+#if __SIZEOF_POINTER__ == 8
+#define NIBBLES_PER_PTR 16
+#elif __SIZEOF_POINTER__ == 4
+#define NIBBLES_PER_PTR 8
+#elif __SIZEOF_POINTER__ == 2
+#define NIBBLES_PER_PTR 4
+#elif __SIZEOF_POINTER__ == 1
+#define NIBBLES_PER_PTR 2
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported `__SIZEOF_POINTER__'"
+#endif /* __SIZEOF_POINTER__ != ... */
+
+/* Print a signal set in that hexadecimal format that linux likes to use. */
+PRIVATE NONNULL((1, 3)) ssize_t KCALL
+print_sigset(pformatprinter printer, void *arg,
+             sigset_t const *__restrict ss) {
+	ssize_t temp, result = 0;
+	bool got_nonzero = false;
+	unsigned int i;
+	i = COMPILER_LENOF(ss->__val) - 1;
+	for (;;) {
+		ulongptr_t val;
+		val = ATOMIC_READ(ss->__val[i]);
+		if (val != 0 || got_nonzero || i < CEILDIV(64, BITSOF(ulongptr_t))) {
+			temp = printf(got_nonzero ? "%." PP_STR(NIBBLES_PER_PTR) PRIxPTR
+			                          : "%" PRIxPTR,
+			              val);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+			got_nonzero = true;
+		}
+		if (i == 0)
+			break;
+		--i;
+	}
+	return result;
+err:
+	return temp;
+}
+
 
 PRIVATE BLOCKING NONNULL((1, 2, 3)) void KCALL
 procfs_perproc_v_getown(struct fnode *__restrict self,
@@ -236,16 +282,21 @@ procfs_perproc_lnknode_v_stat(struct mfile *__restrict self,
 	result->st_blocks = CEILDIV(lnksize, PAGESIZE);
 	result->st_size   = lnksize;
 }
-#define procfs_perproc_lnknode_v_destroy    procfs_perproc_v_destroy
-#define procfs_perproc_lnknode_v_changed    procfs_perproc_v_changed
-#define procfs_perproc_lnknode_v_ioctl      flnknode_v_ioctl
-#define procfs_perproc_lnknode_v_hop        flnknode_v_hop
-#define procfs_perproc_lnknode_v_free       procfs_perproc_v_free
-#define procfs_perproc_lnknode_v_wrattr     procfs_perproc_v_wrattr
-#define procfs_perproc_lnknode_v_perm_ops   procfs_perproc_v_perm_ops
-#define procfs_perproc_printnode_v_ioctl    printnode_v_ioctl
-#define procfs_perproc_printnode_v_hop      printnode_v_hop
-#define procfs_perproc_printnode_v_perm_ops procfs_perproc_v_perm_ops
+#define procfs_perproc_lnknode_v_destroy      procfs_perproc_v_destroy
+#define procfs_perproc_lnknode_v_changed      procfs_perproc_v_changed
+#define procfs_perproc_lnknode_v_ioctl        flnknode_v_ioctl
+#define procfs_perproc_lnknode_v_hop          flnknode_v_hop
+#define procfs_perproc_lnknode_v_free         procfs_perproc_v_free
+#define procfs_perproc_lnknode_v_wrattr       procfs_perproc_v_wrattr
+#define procfs_perproc_lnknode_v_perm_ops     procfs_perproc_v_perm_ops
+#define procfs_perproc_printnode_v_destroy    procfs_perproc_v_destroy
+#define procfs_perproc_printnode_v_loadblocks printnode_v_loadblocks
+#define procfs_perproc_printnode_v_changed    procfs_perproc_v_changed
+#define procfs_perproc_printnode_v_free       procfs_perproc_v_free
+#define procfs_perproc_printnode_v_wrattr     procfs_perproc_v_wrattr
+#define procfs_perproc_printnode_v_ioctl      printnode_v_ioctl
+#define procfs_perproc_printnode_v_hop        printnode_v_hop
+#define procfs_perproc_printnode_v_perm_ops   procfs_perproc_v_perm_ops
 
 INTERN_CONST struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops = {
 	.mso_stat  = &procfs_perproc_lnknode_v_stat,
@@ -660,9 +711,9 @@ compat_peb_print_cmdline(struct mman *__restrict mm, pformatprinter printer,
 #endif /* __ARCH_HAVE_COMPAT */
 
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_Cmdline_Printer(struct printnode *__restrict self,
-                               pformatprinter printer, void *arg,
-                               size_t UNUSED(offset_hint)) {
+procfs_pp_cmdline_printer(struct printnode *__restrict self,
+                          pformatprinter printer, void *arg,
+                          size_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	USER CHECKED void *peb;
@@ -749,9 +800,9 @@ compat_peb_print_environ(struct mman *__restrict mm, pformatprinter printer,
 #endif /* __ARCH_HAVE_COMPAT */
 
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_Environ_Printer(struct printnode *__restrict self,
-                               pformatprinter printer, void *arg,
-                               size_t UNUSED(offset_hint)) {
+procfs_pp_environ_printer(struct printnode *__restrict self,
+                          pformatprinter printer, void *arg,
+                          size_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	USER CHECKED void *peb;
@@ -902,9 +953,9 @@ err:
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_Maps_Printer(struct printnode *__restrict self,
-                            pformatprinter printer, void *arg,
-                            size_t UNUSED(offset_hint)) {
+procfs_pp_maps_printer(struct printnode *__restrict self,
+                       pformatprinter printer, void *arg,
+                       size_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	struct maps_printer_data pd;
@@ -1004,9 +1055,9 @@ smaps_printer_cb(void *maps_arg, struct mmapinfo_ex *__restrict info) {
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_SMaps_Printer(struct printnode *__restrict self,
-                             pformatprinter printer, void *arg,
-                             size_t UNUSED(offset_hint)) {
+procfs_pp_smaps_printer(struct printnode *__restrict self,
+                        pformatprinter printer, void *arg,
+                        size_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	struct maps_printer_data pd;
@@ -1097,9 +1148,9 @@ err:
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_Mounts_Printer(struct printnode *__restrict self,
-                              pformatprinter printer, void *arg,
-                              size_t UNUSED(offset_hint)) {
+procfs_pp_mounts_printer(struct printnode *__restrict self,
+                         pformatprinter printer, void *arg,
+                         size_t UNUSED(offset_hint)) {
 	REF struct path *fsroot;
 	REF struct pathmount *iter;
 	REF struct vfs *threadvfs;
@@ -1156,9 +1207,9 @@ NOTHROW(FCALL mman_get_total_mapped_bytes)(struct mman const *__restrict self) {
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_Stat_Printer(struct printnode *__restrict self,
-                            pformatprinter printer, void *arg,
-                            size_t UNUSED(offset_hint)) {
+procfs_pp_stat_printer(struct printnode *__restrict self,
+                       pformatprinter printer, void *arg,
+                       size_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *mm = NULL;
 	struct taskpid *tpid;
@@ -1413,9 +1464,9 @@ NOTHROW(FCALL credcap_as_u64)(struct credcap const *__restrict self) {
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_Status_Printer(struct printnode *__restrict self,
-                              pformatprinter printer, void *arg,
-                              size_t UNUSED(offset_hint)) {
+procfs_pp_status_printer(struct printnode *__restrict self,
+                         pformatprinter printer, void *arg,
+                         size_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *thread_mm             = NULL;
 	REF struct taskpid *parent_pid         = NULL;
@@ -1584,9 +1635,9 @@ no_exec:
 /* /proc/[PID]/attr/current                                             */
 /************************************************************************/
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_Attr_Current_Printer(struct printnode *__restrict self,
-                                    pformatprinter printer, void *arg,
-                                    size_t UNUSED(offset_hint)) {
+procfs_pp_attr_current_printer(struct printnode *__restrict self,
+                               pformatprinter printer, void *arg,
+                               size_t UNUSED(offset_hint)) {
 	(void)self;
 	PRINT("unconfined");
 }
@@ -1598,9 +1649,9 @@ ProcFS_PerProc_Attr_Current_Printer(struct printnode *__restrict self,
 /************************************************************************/
 #if defined(__x86_64__) || defined(__i386__)
 INTERN NONNULL((1, 2)) void KCALL
-ProcFS_PerProc_X86_Iopl_Print(struct printnode *__restrict self,
-                              pformatprinter printer, void *arg,
-                              size_t UNUSED(offset_hint)) {
+procfs_pp_x86_iopl_print(struct printnode *__restrict self,
+                         pformatprinter printer, void *arg,
+                         size_t UNUSED(offset_hint)) {
 	unsigned int iopl;
 	REF struct task *thread;
 	thread = taskpid_gettask_srch(self->fn_fsdata);
@@ -1612,8 +1663,8 @@ ProcFS_PerProc_X86_Iopl_Print(struct printnode *__restrict self,
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-ProcFS_PerProc_X86_Iopl_Write(struct mfile *__restrict self, USER CHECKED void const *src,
-                              size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+procfs_pp_x86_iopl_write(struct mfile *__restrict self, USER CHECKED void const *src,
+                         size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	struct fnode *me = mfile_asnode(self);
 	unsigned int new_iopl;
 	REF struct task *thread;
@@ -1801,7 +1852,7 @@ procfs_fd_lnknode_v_walklink(struct flnknode *__restrict self,
 #endif /* !__OPTIMIZE_SIZE__ */
 
 
-INTERN_CONST struct flnknode_ops const procfs_perproc_fdlnk_ops = {
+INTERN_CONST struct flnknode_ops const procfs_pp_fdlnk_ops = {
 	.lno_node = {
 		.no_file = {
 			.mo_destroy = &procfs_fd_lnknode_v_destroy,
@@ -1824,7 +1875,7 @@ INTERN_CONST struct flnknode_ops const procfs_perproc_fdlnk_ops = {
  * Has to be defined in "./perproc.c" because the
  * static init needs  `__WANT_FS_INIT', which  we
  * don't define. */
-INTDEF struct flnknode const procfs_fdlnk_template;
+INTDEF struct flnknode const procfs_pp_fdlnk_template;
 
 
 struct procfs_fd_dirent {
@@ -1850,11 +1901,11 @@ procfs_fd_dirent_v_opennode(struct fdirent *__restrict self,
 	struct procfs_fd_dirent *me = fdirent_asfd(self);
 	REF struct procfs_fd_lnknode *result;
 	result = (REF struct procfs_fd_lnknode *)memcpy(kmalloc(sizeof(REF struct procfs_fd_lnknode), GFP_NORMAL),
-	                                                &procfs_fdlnk_template, sizeof(struct flnknode));
+	                                                &procfs_pp_fdlnk_template, sizeof(struct flnknode));
 	result->pfl_handtyp = me->pfd_handtyp;
 	result->pfl_handdat = me->pfd_handptr;
 	result->fn_fsdata   = incref(me->pfd_thread);
-	result->fn_ino      = procfs_perproc_ino(me->pfd_handptr, &procfs_perproc_fdlnk_ops);
+	result->fn_ino      = procfs_perproc_ino(me->pfd_handptr, &procfs_pp_fdlnk_ops);
 	(*handle_type_db.h_incref[me->pfd_handtyp])(me->pfd_handptr);
 	return result;
 }
@@ -1863,7 +1914,7 @@ PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) ino_t
 NOTHROW(FCALL procfs_fd_dirent_v_getino)(struct fdirent *__restrict self,
                                          struct fdirnode *__restrict UNUSED(dir)) {
 	struct procfs_fd_dirent *me = fdirent_asfd(self);
-	return procfs_perproc_ino(me->pfd_handptr, &procfs_perproc_fdlnk_ops);
+	return procfs_perproc_ino(me->pfd_handptr, &procfs_pp_fdlnk_ops);
 }
 
 PRIVATE struct fdirent_ops const procfs_fd_dirent_ops = {
@@ -1928,7 +1979,7 @@ procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
 		result->pfd_ent.fd_hash   = info->flu_hash;
 		result->pfd_ent.fd_refcnt = 1; /* +1: return */
 		result->pfd_ent.fd_ops    = &procfs_fd_dirent_ops;
-//		result->pfd_ent.fd_ino    = procfs_perproc_ino(hand.h_data, &procfs_perproc_fdlnk_ops); /* Not needed; we've got `fdo_getino()' */
+//		result->pfd_ent.fd_ino    = procfs_perproc_ino(hand.h_data, &procfs_pp_fdlnk_ops); /* Not needed; we've got `fdo_getino()' */
 		DBG_memset(&result->pfd_ent.fd_ino, 0xcc, sizeof(result->pfd_ent.fd_ino));
 		result->pfd_ent.fd_type   = DT_LNK;
 		return &result->pfd_ent;
@@ -1963,6 +2014,7 @@ procfs_fd_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct d
 	ssize_t result;
 	struct procfs_fd_enum *me;
 	u16 namelen;
+	void *hdata;
 #if __SIZEOF_INT__ == 4
 	char namebuf[sizeof("4294967295")];
 #elif __SIZEOF_INT__ == 8
@@ -1977,14 +2029,13 @@ again:
 	index = ATOMIC_READ(me->pfe_fd);
 
 	/* Find the next handle. */
-	newindex = handle_trynextfd(index, me->pfe_hman);
+	newindex = handle_trynextfd(index, me->pfe_hman, &hdata);
 	if (newindex == (unsigned int)-1)
 		return 0; /* End-of-directory */
 	namelen = (u16)sprintf(namebuf, "%u", newindex);
 	/* Feed directory entry. */
 	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
-	                             procfs_perproc_ino(self->de_dir->fn_fsdata,
-	                                                &procfs_perproc_fdlnk_ops),
+	                             procfs_perproc_ino(hdata, &procfs_pp_fdlnk_ops),
 	                             DT_LNK, namelen, namebuf);
 	if (result < 0)
 		return (size_t)~result; /* Don't advance directory position. */
@@ -2118,6 +2169,431 @@ INTERN_CONST struct fdirnode_ops const procfs_pp_fd = {
 	.dno_lookup = &procfs_perproc_fd_v_lookup,
 	.dno_enumsz = procfs_perproc_fd_v_enumsz,
 	.dno_enum   = &procfs_perproc_fd_v_enum,
+};
+
+
+
+/************************************************************************/
+/* /proc/[pid]/fdinfo                                                   */
+/************************************************************************/
+
+struct procfs_fdinfo_regnode: printnode {
+	struct handle pfir_hand; /* [const] Relevant handle. */
+};
+
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_pp_fdinfo_v_destroy)(struct mfile *__restrict self) {
+	struct procfs_fdinfo_regnode *me;
+	me = (struct procfs_fdinfo_regnode *)mfile_asreg(self);
+	assert(!LIST_ISBOUND(me, fn_allnodes));
+	assert(me->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
+	assert(me->mf_parts == MFILE_PARTS_ANONYMOUS);
+	(*handle_type_db.h_decref[me->pfir_hand.h_type])(me->pfir_hand.h_data);
+	decref_unlikely(me->fn_fsdata);
+	kfree(me);
+}
+
+/* Return the effective file-position of `ptr' */
+PRIVATE BLOCKING NONNULL((2)) pos_t KCALL
+handle_get_fpos(uintptr_half_t typ, void *__restrict ptr)
+		THROWS(...) {
+	pos_t fpos;
+	switch (typ) {
+
+	case HANDLE_TYPE_FILEHANDLE:
+	case HANDLE_TYPE_TEMPHANDLE: {
+		struct filehandle *hand;
+		hand = (struct filehandle *)ptr;
+		fpos = (pos_t)atomic64_read(&hand->fh_offset);
+	}	break;
+
+	case HANDLE_TYPE_DIRHANDLE: {
+		struct dirhandle *hand;
+		hand = (struct dirhandle *)ptr;
+		TRY {
+			fpos = fdirenum_seekdir(&hand->dh_enum, 0, SEEK_CUR);
+		} EXCEPT {
+			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND))
+				RETHROW();
+			fpos = 0;
+		}
+	}	break;
+
+	default:
+		fpos = 0;
+		break;
+	}
+	return fpos;
+}
+
+PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
+procfs_pp_fdinfo_v_print(struct printnode *__restrict self,
+                         pformatprinter printer, void *arg,
+                         size_t UNUSED(offset_hint))
+		THROWS(...) {
+	pos_t fpos;
+	struct procfs_fdinfo_regnode *me;
+	me = (struct procfs_fdinfo_regnode *)self;
+
+	/* Figure out the handle's file position. */
+	fpos = handle_get_fpos(me->pfir_hand.h_type, me->pfir_hand.h_data);
+
+	/* Print basic file information. */
+	if (printf("pos:\t%" PRIuN(__SIZEOF_POS_T__) "\n"
+	           "flags:\t%" PRIoN(__SIZEOF_OFLAG_T__) "\n"
+	           "mnt_id:\t0\n", /* TODO: Related to (currently missing) "/proc/[pid]/mountinfo" */
+	           (pos_t)fpos,
+	           (oflag_t)IO_TO_OPENFLAG(me->pfir_hand.h_mode)) < 0)
+		return;
+
+	/* Some handles have type-specific fields. */
+	switch (me->pfir_hand.h_type) {
+
+	case HANDLE_TYPE_EVENTFD_FENCE:
+	case HANDLE_TYPE_EVENTFD_SEMA: {
+		struct eventfd *hand;
+		uint64_t tickets;
+		hand    = (struct eventfd *)me->pfir_hand.h_data;
+		tickets = atomic64_read(&hand->ef_value);
+		if (printf("eventfd-count:\t%" PRIu64 "\n", tickets) < 0)
+			return;
+	}	break;
+
+	case HANDLE_TYPE_EPOLL: {
+		size_t i;
+		struct epoll_controller *hand;
+		hand = (struct epoll_controller *)me->pfir_hand.h_data;
+		for (i = 0;;) {
+			struct epoll_handle_monitor *mon;
+			uint32_t mon_fdkey;
+			uint32_t mon_events;
+			union epoll_data mon_data;
+			uintptr_half_t mon_hand_typ;
+			REF void *mon_hand_ptr;
+			REF struct mfile *mon_hand_mf;
+			pos_t mon_hand_fpos;
+#ifdef CONFIG_HAVE_EPOLL_RPC
+			bool mon_isrpc;
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+			epoll_controller_lock_acquire(hand);
+epoll_nextmon_locked:
+			if (i > hand->ec_mask) {
+				epoll_controller_lock_release(hand);
+				break;
+			}
+			mon = hand->ec_list[i].ece_mon;
+			++i;
+			if (mon == NULL || mon->ehm_handtyp == HANDLE_TYPE_UNDEFINED)
+				goto epoll_nextmon_locked;
+			mon_fdkey    = mon->ehm_fdkey;
+			mon_events   = mon->ehm_events;
+			mon_data     = mon->ehm_data;
+			mon_hand_typ = mon->ehm_handtyp;
+			mon_hand_ptr = mon->ehm_handptr;
+			(*handle_type_db.h_incref[mon_hand_typ])(mon_hand_ptr);
+#ifdef CONFIG_HAVE_EPOLL_RPC
+			mon_isrpc = epoll_handle_monitor_isrpc(mon);
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+			epoll_controller_lock_release(hand);
+			RAII_FINALLY { (*handle_type_db.h_decref[mon_hand_typ])(mon_hand_ptr); };
+			printf("tfd: %8" PRIu32 " events: %8" PRIx32 " ", mon_fdkey, mon_events);
+#ifdef CONFIG_HAVE_EPOLL_RPC
+			/* For RPC monitors, this would be `mon_data' becomes `ehm_rpc',
+			 * which is a pointers to internal kernel data that must not  be
+			 * exposed! */
+			if (mon_isrpc) {
+				PRINT("rpc: 1 ");
+			} else
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+			{
+				printf("data: %16" PRIx64 " ", mon_data.u64);
+			}
+			mon_hand_fpos = handle_get_fpos(mon_hand_typ, mon_hand_ptr);
+			printf("pos:%" PRIuN(__SIZEOF_POS_T__), (pos_t)mon_hand_fpos);
+			if (mon_hand_typ == HANDLE_TYPE_MFILE) {
+				mon_hand_mf = incref((REF struct mfile *)mon_hand_ptr);
+			} else {
+				mon_hand_mf = (REF struct mfile *)(*handle_type_db.h_tryas[mon_hand_typ])(mon_hand_ptr, HANDLE_TYPE_MFILE);
+			}
+			/* Linux includes all of the below fields unconditionally since it assigns
+			 * inode numbers and device files to everything, even if doing so wouldn't
+			 * make sense.
+			 * Because KOS likes to make sense (for  the most part ;), it only  assigns
+			 * inode  numbers and devices  for objects that are  actually apart of some
+			 * filesystem. As  such, file  descriptors don't  automatically have  inode
+			 * and device numbers, so we only print them here for handles that actually
+			 * do. */
+			if (mon_hand_mf) {
+				FINALLY_DECREF_UNLIKELY(mon_hand_mf);
+				if (mfile_isnode(mon_hand_mf)) {
+					ino_t ino;
+					struct fnode *fn = mfile_asnode(mon_hand_mf);
+					struct mfile *dev;
+					mfile_tslock_acquire(fn);
+					ino = fn->fn_ino;
+					mfile_tslock_release(fn);
+					printf(" ino:%" PRIxN(__SIZEOF_INO_T__), ino);
+					dev = fn->fn_super->fs_dev;
+					if (dev && mfile_isdevice(dev)) {
+						dev_t devno = mfile_asdevice(dev)->dn_devno;
+						printf(" sdev:%" PRIxN(__SIZEOF_DEV_T__), devno);
+					}
+				}
+			}
+			if (PRINT("\n") < 0)
+				return;
+		}
+	}	break;
+
+	case HANDLE_TYPE_SIGNALFD: {
+		struct signalfd *hand;
+		hand = (struct signalfd *)me->pfir_hand.h_data;
+		PRINT("sigmask:\t");
+		print_sigset(printer, arg, &hand->sf_mask);
+		PRINT("\n");
+	}	break;
+
+	case HANDLE_TYPE_TASK: {
+		struct pidns *myns = THIS_PIDNS;
+		struct taskpid *hand;
+		pid_t tpid;
+		hand = (struct taskpid *)me->pfir_hand.h_data;
+		tpid = -1;
+		if likely(myns->pn_indirection <= hand->tp_pidns->pn_indirection)
+			tpid = (pid_t)hand->tp_pids[myns->pn_indirection];
+		if (printf("Pid:\t%" PRIdN(__SIZEOF_PID_T__) "\n", tpid) < 0)
+			return;
+		if likely(myns->pn_indirection >= hand->tp_pidns->pn_indirection) {
+			size_t i;
+			PRINT("NSpid:");
+			for (i = myns->pn_indirection; i <= hand->tp_pidns->pn_indirection; ++i) {
+				if (printf("\t%" PRIdN(__SIZEOF_PID_T__), hand->tp_pids[i]) < 0)
+					return;
+			}
+			PRINT("\n");
+		}
+	}	break;
+
+	default:
+		fpos = 0;
+		break;
+	}
+}
+
+
+#define procfs_pp_fdinfo_v_loadblocks procfs_perproc_printnode_v_loadblocks
+#define procfs_pp_fdinfo_v_changed    procfs_perproc_printnode_v_changed
+#define procfs_pp_fdinfo_v_wrattr     procfs_perproc_printnode_v_wrattr
+#define procfs_pp_fdinfo_v_perm_ops   procfs_perproc_printnode_v_perm_ops
+#define procfs_pp_fdinfo_v_free       procfs_perproc_printnode_v_free
+#define procfs_pp_fdinfo_v_stream_ops procfs_perproc_printnode_v_stream_ops
+
+INTERN_CONST struct printnode_ops const procfs_pp_fdinfo_ops = {
+	.pno_reg = {{
+		.no_file = {
+			.mo_destroy    = &procfs_pp_fdinfo_v_destroy,
+			.mo_loadblocks = &procfs_pp_fdinfo_v_loadblocks,
+			.mo_changed    = &procfs_pp_fdinfo_v_changed,
+			.mo_stream     = &procfs_pp_fdinfo_v_stream_ops,
+		},
+		.no_free   = &procfs_pp_fdinfo_v_free,
+		.no_wrattr = &procfs_pp_fdinfo_v_wrattr,
+		.no_perm   = &procfs_pp_fdinfo_v_perm_ops,
+	}},
+	.pno_print = &procfs_pp_fdinfo_v_print,
+};
+
+/* Template for files from  "/proc/[PID]/fdinfo/[NO]" */
+INTDEF struct printnode const procfs_pp_fdinfo_template;
+
+struct procfs_fdinfo_dirent {
+	REF struct taskpid *pfd_thread;  /* [1..1][const] The thread being accessed. */
+	struct handle       pfd_hand;    /* [const] Associated handle. */
+	struct fdirent      pfd_ent;     /* Underlying directory entry. */
+};
+#define fdirent_asfdinfo(self) container_of(self, struct procfs_fdinfo_dirent, pfd_ent)
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_fdinfo_dirent_v_destroy)(struct fdirent *__restrict self) {
+	struct procfs_fdinfo_dirent *me = fdirent_asfdinfo(self);
+	(*handle_type_db.h_decref[me->pfd_hand.h_type])(me->pfd_hand.h_data);
+	decref_unlikely(me->pfd_thread);
+	kfree(me);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+procfs_fdinfo_dirent_v_opennode(struct fdirent *__restrict self,
+                                struct fdirnode *__restrict UNUSED(dir)) {
+	struct procfs_fdinfo_dirent *me = fdirent_asfdinfo(self);
+	REF struct procfs_fdinfo_regnode *result;
+	result = (REF struct procfs_fdinfo_regnode *)memcpy(kmalloc(sizeof(REF struct procfs_fdinfo_regnode), GFP_NORMAL),
+	                                                    &procfs_pp_fdinfo_template, sizeof(struct printnode));
+	result->pfir_hand = me->pfd_hand;
+	result->fn_fsdata = incref(me->pfd_thread);
+	result->fn_ino    = procfs_perproc_ino(me->pfd_hand.h_data, &procfs_pp_fdinfo_ops);
+	(*handle_type_db.h_incref[me->pfd_hand.h_type])(me->pfd_hand.h_data);
+	return result;
+}
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) ino_t
+NOTHROW(FCALL procfs_fdinfo_dirent_v_getino)(struct fdirent *__restrict self,
+                                             struct fdirnode *__restrict UNUSED(dir)) {
+	struct procfs_fdinfo_dirent *me = fdirent_asfdinfo(self);
+	return procfs_perproc_ino(me->pfd_hand.h_data, &procfs_pp_fdinfo_ops);
+}
+
+PRIVATE struct fdirent_ops const procfs_fdinfo_dirent_ops = {
+	.fdo_destroy  = &procfs_fdinfo_dirent_v_destroy,
+	.fdo_opennode = &procfs_fdinfo_dirent_v_opennode,
+	.fdo_getino   = &procfs_fdinfo_dirent_v_getino,
+};
+
+
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+procfs_perproc_fdinfo_v_lookup(struct fdirnode *__restrict self,
+                               struct flookup_info *__restrict info) {
+	struct taskpid *pid = self->fn_fsdata;
+	REF struct task *thread;
+	REF struct handle_manager *hm;
+	char ch;
+
+	thread = taskpid_gettask(pid);
+	if (!thread)
+		return NULL;
+	hm = task_gethandlemanager(thread);
+	decref_unlikely(thread);
+	FINALLY_DECREF_UNLIKELY(hm);
+
+	/* Decode handle number */
+	if unlikely(info->flu_namelen == 0)
+		goto notanfd;
+	ch = ATOMIC_READ(info->flu_name[0]);
+	if ((ch >= '1' && ch <= '9') || (ch == '0' && info->flu_namelen == 1)) {
+		REF struct procfs_fdinfo_dirent *result;
+		unsigned int fdno = (unsigned int)(ch - '0');
+		struct handle hand;
+		size_t i;
+
+		for (i = 1; i < info->flu_namelen; ++i) {
+			ch = ATOMIC_READ(info->flu_name[i]);
+			if unlikely(!(ch >= '0' && ch <= '9'))
+				goto notanfd;
+			fdno *= 10;
+			fdno += (unsigned int)(ch - '0');
+		}
+
+		/* Lookup the handle in question. */
+		hand = handle_trylookup(hm, fdno);
+		if (hand.h_type == HANDLE_TYPE_UNDEFINED)
+			return NULL; /* No such handle */
+
+		/* Allocate the new directory entry. */
+		result = (REF struct procfs_fdinfo_dirent *)kmalloc(offsetof(struct procfs_fdinfo_dirent, pfd_ent.fd_name) +
+		                                                    (info->flu_namelen + 1) * sizeof(char),
+		                                                    GFP_NORMAL);
+
+		/* Fill in the directory entry. */
+		result->pfd_hand           = hand; /* Inherit reference */
+		result->pfd_thread         = incref(pid);
+		result->pfd_ent.fd_namelen = (u16)sprintf(result->pfd_ent.fd_name, "%u", fdno);
+		assert(result->pfd_ent.fd_namelen == info->flu_namelen);
+		if (info->flu_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->flu_name))
+			info->flu_hash = fdirent_hash(result->pfd_ent.fd_name, result->pfd_ent.fd_namelen);
+		result->pfd_ent.fd_hash   = info->flu_hash;
+		result->pfd_ent.fd_refcnt = 1; /* +1: return */
+		result->pfd_ent.fd_ops    = &procfs_fdinfo_dirent_ops;
+//		result->pfd_ent.fd_ino    = procfs_perproc_ino(hand.h_data, &procfs_pp_fdinfo_ops); /* Not needed; we've got `fdo_getino()' */
+		DBG_memset(&result->pfd_ent.fd_ino, 0xcc, sizeof(result->pfd_ent.fd_ino));
+		result->pfd_ent.fd_type   = DT_REG;
+		return &result->pfd_ent;
+	}
+notanfd:
+	return NULL;
+}
+
+
+#define procfs_fdinfo_enum_v_fini procfs_fd_enum_v_fini
+PRIVATE NONNULL((1)) size_t KCALL
+procfs_fdinfo_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                             size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(...) {
+	unsigned int index, newindex;
+	ssize_t result;
+	struct procfs_fd_enum *me;
+	u16 namelen;
+	void *hdata;
+#if __SIZEOF_INT__ == 4
+	char namebuf[sizeof("4294967295")];
+#elif __SIZEOF_INT__ == 8
+	char namebuf[sizeof("18446744073709551615")];
+#else /* __SIZEOF_INT__ == ... */
+#error "Unsupported sizeof(pid_t)"
+#endif /* __SIZEOF_INT__ != ... */
+	me = (struct procfs_fd_enum *)self;
+
+again:
+	/* Read current index. */
+	index = ATOMIC_READ(me->pfe_fd);
+
+	/* Find the next handle. */
+	newindex = handle_trynextfd(index, me->pfe_hman, &hdata);
+	if (newindex == (unsigned int)-1)
+		return 0; /* End-of-directory */
+	namelen = (u16)sprintf(namebuf, "%u", newindex);
+	/* Feed directory entry. */
+	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+	                             procfs_perproc_ino(hdata, &procfs_pp_fdinfo_ops),
+	                             DT_REG, namelen, namebuf);
+	if (result < 0)
+		return (size_t)~result; /* Don't advance directory position. */
+	/* Advance directory position. */
+	if (!ATOMIC_CMPXCH(me->pfe_fd, index, newindex + 1))
+		goto again;
+	return (size_t)result;
+}
+
+#define procfs_fdinfo_enum_v_seekdir procfs_fd_enum_v_seekdir
+
+PRIVATE struct fdirenum_ops const procfs_fdinfo_enum_ops = {
+	.deo_fini    = &procfs_fdinfo_enum_v_fini,
+	.deo_readdir = &procfs_fdinfo_enum_v_readdir,
+	.deo_seekdir = &procfs_fdinfo_enum_v_seekdir,
+};
+
+#define procfs_perproc_fdinfo_v_enumsz procfs_perproc_fd_v_enumsz
+PRIVATE NONNULL((1)) void KCALL
+procfs_perproc_fdinfo_v_enum(struct fdirenum *__restrict result) {
+	REF struct task *thread;
+	struct procfs_fd_enum *rt = (struct procfs_fd_enum *)result;
+	struct taskpid *pid       = rt->de_dir->fn_fsdata;
+	thread = taskpid_gettask(pid);
+	if unlikely(!thread) {
+		/* Thread has already terminated. -> Set-up an empty directory */
+		rt->de_ops = &fdirenum_empty_ops;
+	} else {
+		rt->pfe_hman = task_gethandlemanager(thread);
+		decref_unlikely(thread);
+		rt->de_ops = &procfs_fdinfo_enum_ops;
+		rt->pfe_fd = 0;
+	}
+}
+
+INTERN_CONST struct fdirnode_ops const procfs_pp_fdinfo = {
+	.dno_node = {
+		.no_file = {
+			.mo_destroy = &procfs_perproc_dir_v_destroy,
+			.mo_changed = &procfs_perproc_dir_v_changed,
+			.mo_stream  = &procfs_perproc_dir_v_stream_ops,
+		},
+		.no_free   = &procfs_perproc_dir_v_free,
+		.no_wrattr = &procfs_perproc_dir_v_wrattr,
+		.no_perm   = &procfs_perproc_dir_v_perm_ops,
+	},
+	.dno_lookup = &procfs_perproc_fdinfo_v_lookup,
+	.dno_enumsz = procfs_perproc_fdinfo_v_enumsz,
+	.dno_enum   = &procfs_perproc_fdinfo_v_enum,
 };
 
 

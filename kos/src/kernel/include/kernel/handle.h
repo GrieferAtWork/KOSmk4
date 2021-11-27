@@ -375,7 +375,7 @@ struct handle_manager {
 		}                hm_linear;   /* HANDLE_MANAGER_MODE_LINEAR */
 		struct {
 			unsigned int   hm_alloc;  /* [lock(hm_lock)] Allocated size of `hm_vector'. */
-			struct handle *hm_vector; /* [0..hm_alloc][owned] Vector of handles. (index == hm_hashvec[*]) */
+			struct handle *hm_vector; /* [0..hm_alloc][owned] Vector of handles. (index == hm_hashvec[*].hh_vector_index) */
 			struct handle_hashent
 			              *hm_hashvec;/* [lock(hm_lock)][1..hm_hashmsk+1][owned] Hash-vector for translating
 			                           * handle  IDs   from  `fd_t'   into   an  index   into   `hm_vector'. */
@@ -501,10 +501,12 @@ FUNDEF NONNULL((2)) unsigned int FCALL
 handle_nextfd(unsigned int startfd,
               struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
-/* Same as `handle_nextfd()', but return `(unsigned int)-1' instead of throwing `E_INVALID_HANDLE_FILE' */
-FUNDEF NONNULL((2)) unsigned int FCALL
+/* Same as `handle_nextfd()', but return `(unsigned int)-1' instead of throwing `E_INVALID_HANDLE_FILE'
+ * @param: p_data: Filled with `HANDLE.h_data' (used for ino numbers in procfs) */
+FUNDEF NONNULL((2, 3)) unsigned int FCALL
 handle_trynextfd(unsigned int startfd,
-                 struct handle_manager *__restrict self)
+                 struct handle_manager *__restrict self,
+                 void **__restrict p_data)
 		THROWS(E_WOULDBLOCK);
 
 

@@ -942,7 +942,8 @@ NOTHROW(FCALL handle_manager_get_max_hashvector_fd_plus_one)(struct handle_manag
 
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL handle_manager_hashvector_isvalid)(struct handle_manager const *__restrict self,
-                                                 unsigned int fd) {
+                                                 unsigned int fd,
+                                                 void **p_data) {
 	unsigned int i, perturb;
 	assert(self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR);
 	assert(self->hm_hashvector.hm_hashvec);
@@ -954,6 +955,8 @@ NOTHROW(FCALL handle_manager_hashvector_isvalid)(struct handle_manager const *__
 			break; /* end-of-chain */
 		if (hashent->hh_handle_id != fd)
 			continue; /* Some other handle. */
+		if (p_data)
+			*p_data = self->hm_hashvector.hm_vector[hashent->hh_vector_index].h_data;
 		/* Found it! */
 		return true;
 	}
@@ -1219,7 +1222,7 @@ throw_f_next_unallocated:
 				break; /* This one's in use! */
 			++result;
 		}
-	} else if (handle_manager_hashvector_isvalid(self, startfd)) {
+	} else if (handle_manager_hashvector_isvalid(self, startfd, NULL)) {
 		/* Simple (and  pretty likely)  case: the  given FD  exists.
 		 * Given  the use case  of this fcntl  to iterate over one's
 		 * file descriptor table to find  open files, and given  the
@@ -1251,11 +1254,10 @@ throw_f_next_unallocated:
 		mask = self->hm_hashvector.hm_hashmsk;
 		/* Go through the FD table and  */
 		for (i = 0; i <= mask; ++i) {
-			unsigned int fdno;
 			if (map[i].hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
 				continue;
-			fdno = map[i].hh_vector_index;
-			if (fdno != (unsigned int)-1) {
+			if (map[i].hh_vector_index != (unsigned int)-1) {
+				unsigned int fdno = map[i].hh_handle_id;
 				if (max_fd <= fdno)
 					max_fd = fdno + 1;
 				if (fdno >= startfd && fdno < result)
@@ -1272,10 +1274,12 @@ throw_f_next_unallocated:
 	return result;
 }
 
-/* Same as `handle_nextfd()', but return `(unsigned int)-1' instead of throwing `E_INVALID_HANDLE_FILE' */
-PUBLIC NONNULL((2)) unsigned int FCALL
+/* Same as `handle_nextfd()', but return `(unsigned int)-1' instead of throwing `E_INVALID_HANDLE_FILE'
+ * @param: p_data: Filled with `HANDLE.h_data' (used for ino numbers in procfs) */
+PUBLIC NONNULL((2, 3)) unsigned int FCALL
 handle_trynextfd(unsigned int startfd,
-                 struct handle_manager *__restrict self)
+                 struct handle_manager *__restrict self,
+                 void **__restrict p_data)
 		THROWS(E_WOULDBLOCK) {
 	unsigned int result;
 	sync_read(&self->hm_lock);
@@ -1287,58 +1291,38 @@ throw_f_next_unallocated:
 				sync_endread(&self->hm_lock);
 				return (unsigned int)-1;
 			}
-			if (self->hm_linear.hm_vector[result].h_type != HANDLE_TYPE_UNDEFINED)
+			if (self->hm_linear.hm_vector[result].h_type != HANDLE_TYPE_UNDEFINED) {
+				*p_data = self->hm_linear.hm_vector[result].h_data;
 				break; /* This one's in use! */
+			}
 			++result;
 		}
-	} else if (handle_manager_hashvector_isvalid(self, startfd)) {
-		/* Simple (and  pretty likely)  case: the  given FD  exists.
-		 * Given  the use case  of this fcntl  to iterate over one's
-		 * file descriptor table to find  open files, and given  the
-		 * possibility that `fd - 1' had already been tested before,
-		 * then it stands to reason  that some cluster of  allocated
-		 * files has a size that is greater than 1:
-		 * >> int fd = -1;
-		 * >> while ((fd = fcntl(fd + 1, F_NEXT)) >= 0) {
-		 * >>     printf("open fd: %d\n", fd);
-		 * >> }
-		 * Possible output:
-		 *    open fd: 0
-		 *    open fd: 1
-		 *    open fd: 2
-		 *    open fd: 3
-		 *    open fd: 4
-		 */
+	} else if (handle_manager_hashvector_isvalid(self, startfd, p_data)) {
 		result = startfd;
 	} else {
-		unsigned int i, mask, max_fd;
+		unsigned int i, mask;
 		struct handle_hashent *map;
 		/* The slow case: Must scan the entire hash-table to find:
 		 *  - The lowest valid handle `>= fd'
 		 *  - The greatest valid fd, period. (needed if we end up throwing an `E_INVALID_HANDLE_FILE')
 		 */
 		result = (unsigned int)-1;
-		max_fd = 0;
 		map  = self->hm_hashvector.hm_hashvec;
 		mask = self->hm_hashvector.hm_hashmsk;
 		/* Go through the FD table and  */
 		for (i = 0; i <= mask; ++i) {
-			unsigned int fdno;
 			if (map[i].hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
 				continue;
-			fdno = map[i].hh_vector_index;
-			if (fdno != (unsigned int)-1) {
-				if (max_fd <= fdno)
-					max_fd = fdno + 1;
-				if (fdno >= startfd && fdno < result)
-					result = fdno;
+			if (map[i].hh_vector_index != (unsigned int)-1) {
+				unsigned int fdno = map[i].hh_handle_id;
+				if (fdno >= startfd && fdno < result) {
+					result  = fdno;
+					*p_data = self->hm_hashvector.hm_vector[map[i].hh_vector_index].h_data;
+				}
 			}
 		}
-		if unlikely(result == (unsigned int)-1) {
-			/* No valid handle found... */
-			result = max_fd;
-			goto throw_f_next_unallocated;
-		}
+		if unlikely(result == (unsigned int)-1)
+			goto throw_f_next_unallocated; /* No valid handle found... */
 	}
 	sync_endread(&self->hm_lock);
 	return result;
