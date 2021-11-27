@@ -131,7 +131,9 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 
 	xdecref(self->mn_fspath);
 	xdecref(self->mn_fsname);
-	if ((part = self->mn_part) != NULL) {
+	part = self->mn_part;
+	DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
+	if (part != NULL) {
 		/* Try to unlink the node from the copy- or share-chain of the associated part. */
 		if (mpart_lock_tryacquire(part)) {
 			LIST_REMOVE(self, mn_link);
@@ -144,7 +146,6 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			Toblockop(mpart) *lop;
 			/* Must insert the node into the part's list of deleted nodes. */
 			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
-			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
 
 			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
