@@ -1758,8 +1758,8 @@ UnixSocket_Shutdown(struct socket *__restrict self,
 
 PRIVATE ATTR_RETNONNULL struct unix_client *KCALL
 UnixSocket_GetClient(struct unix_socket *__restrict self,
-					 unsigned int error_context)
-		THROWS(TODO) {
+                     unsigned int error_context)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
 	struct unix_client *result;
 	struct fsocknode *server_node;
 	server_node = ATOMIC_READ(self->us_node);

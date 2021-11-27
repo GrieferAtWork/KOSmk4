@@ -45,11 +45,6 @@
  *   pid process.
  * - Per-process nodes all have `MFILE_FN_FLEETING' set
  * - Per-process nodes all have `MFILE_FN_ATTRREADONLY' set
- *
- * TODO: Custom access checks  for per-process nodes  (since
- *       we fill in the uid/gid field with `0', access tests
- *       must be altered to compare against the active  cred
- *       of the target thread instead)
  */
 
 DECL_BEGIN

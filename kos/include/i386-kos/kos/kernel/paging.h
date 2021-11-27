@@ -44,8 +44,7 @@
 #define COMPAT_KERNELSPACE_BASE __UINT32_C(0xc0000000) /* lower address space limit for kernel-space (as exposed to programs running in compatibility mode) */
 
 /* Check if a given physical address range is identity mapped. */
-#if 1 /* TODO: Add a configuration option for this.
-       * TODO: Must test the x86_64 kernel with _and_ without the physical identity mapping! */
+#if 1 /* TODO: Add a configuration option for this. */
 
 /* First first half of the kernel address space is used as identity mapping
  * for the  first  64TiB  (yes:  that is  Terrabyte)  of  physical  memory. */

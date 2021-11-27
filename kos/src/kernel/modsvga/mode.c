@@ -875,8 +875,8 @@ NOTHROW(FCALL calculate_dbgmode_cost)(struct svga_modeinfo const *__restrict mod
 	uint64_t result = 0;
 	if (mode->smi_bits_per_pixel > 32)
 		return (uint64_t)-1; /* We only support BPP up to 32-bit! */
-#if 1 /* TODO: multiple-pixels-per-byte graphics modes! */
-	if (mode->smi_bits_per_pixel <= 4)
+#if 1 /* TODO: 4-bit mode */
+	if (mode->smi_bits_per_pixel == 4)
 		return (uint64_t)-1;
 #endif
 #if 1 /* TODO: paged memory access! */
