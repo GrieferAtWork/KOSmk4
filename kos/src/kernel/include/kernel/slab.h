@@ -236,6 +236,22 @@ struct slab_descriptor {
 #endif /* CONFIG_TRACE_MALLOC */
 	WEAK struct slab_pending_free *sd_pend; /* [0..1] Chain of pending free segments. */
 };
+
+/* Helper macros for `struct slab_descriptor::sd_lock' */
+#define _slab_descriptor_reap(self)      LOCAL_slab_descriptor_service_pending() /* Define locally to clear our `sd_pend' */
+#define slab_descriptor_reap(self)       (!slab_descriptor_mustreap(self) || (_slab_descriptor_reap(self), 0))
+#define slab_descriptor_mustreap(self)   (__hybrid_atomic_load((self)->sd_pend, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define slab_descriptor_tryacquire(self) atomic_lock_tryacquire(&(self)->sd_lock)
+#define slab_descriptor_acquire(self)    atomic_lock_acquire(&(self)->sd_lock)
+#define slab_descriptor_acquire_nx(self) atomic_lock_acquire_nx(&(self)->sd_lock)
+#define _slab_descriptor_release(self)   atomic_lock_release(&(self)->sd_lock)
+#define slab_descriptor_release(self)    (atomic_lock_release(&(self)->sd_lock), slab_descriptor_reap(self))
+#define slab_descriptor_acquired(self)   atomic_lock_acquired(&(self)->sd_lock)
+#define slab_descriptor_available(self)  atomic_lock_available(&(self)->sd_lock)
+#define slab_descriptor_waitfor(self)    atomic_lock_waitfor(&(self)->sd_lock)
+#define slab_descriptor_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->sd_lock)
+
+
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */

@@ -26,11 +26,6 @@
 #define FUNC2(x, y) FUNC3(x, y)
 #define FUNC(x)     FUNC2(x, SEGMENT_SIZE)
 
-#define SEGMENT_OFFSET  SLAB_SEGMENT_OFFSET(SEGMENT_SIZE)
-#define SEGMENT_COUNT   SLAB_SEGMENT_COUNT(SEGMENT_SIZE)
-#define SIZEOF_BITSET   SLAB_SIZEOF_BITSET(SEGMENT_SIZE)
-#define LENGTHOF_BITSET SLAB_LENGTHOF_BITSET(SEGMENT_SIZE)
-
 DECL_BEGIN
 
 #ifndef DBG_memset
@@ -41,11 +36,25 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 #endif /* !DBG_memset */
 
-#define DESC            FUNC(slab_desc)
-#define INUSE_BITSET(s) ((uintptr_t *)((struct slab *)(s) + 1))
-#define SEGMENTS(s)     ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
+#define SEGMENT_OFFSET  SLAB_SEGMENT_OFFSET(SEGMENT_SIZE)
+#define SEGMENT_COUNT   SLAB_SEGMENT_COUNT(SEGMENT_SIZE)
+#define SIZEOF_BITSET   SLAB_SIZEOF_BITSET(SEGMENT_SIZE)
+#define LENGTHOF_BITSET SLAB_LENGTHOF_BITSET(SEGMENT_SIZE)
 
-INTERN struct slab_descriptor DESC = {
+#define LOCAL_segment   FUNC(segment)
+#define LOCAL_desc      FUNC(slab_desc)
+#define INUSE_BITSET(s) ((uintptr_t *)((struct slab *)(s) + 1))
+#define SEGMENTS(s)     ((struct LOCAL_segment *)((byte_t *)(s) + SEGMENT_OFFSET))
+
+/* Local symbols. */
+#define LOCAL_slab_dofreeptr                  FUNC(slab_dofreeptr)
+#define LOCAL_slab_freeptr                    FUNC(slab_freeptr)
+#define LOCAL_slab_descriptor_service_pending FUNC(slab_service_pending)
+#define LOCAL_slab_malloc                     FUNC(slab_malloc)
+#define LOCAL_slab_kmalloc                    FUNC(slab_kmalloc)
+#define LOCAL_slab_kmalloc_nx                 FUNC(slab_kmalloc_nx)
+
+INTERN struct slab_descriptor LOCAL_desc = {
 	.sd_lock = ATOMIC_LOCK_INIT,
 	.sd_free = NULL,
 #ifdef CONFIG_TRACE_MALLOC
@@ -54,12 +63,12 @@ INTERN struct slab_descriptor DESC = {
 	.sd_pend = NULL,
 };
 
-struct FUNC(segment) {
+struct LOCAL_segment {
 	byte_t s_data[SEGMENT_SIZE];
 };
 
 LOCAL NONNULL((1, 2)) void
-NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
+NOTHROW(KCALL LOCAL_slab_dofreeptr)(struct slab *__restrict self,
                                     void *__restrict ptr,
                                     gfp_t flags) {
 	size_t index;
@@ -69,7 +78,7 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 		memset(ptr, 0, SEGMENT_SIZE);
 	index = (((uintptr_t)ptr & PAGEMASK) - SEGMENT_OFFSET) / SEGMENT_SIZE;
 	assert(index < SEGMENT_COUNT);
-	assert(index == (size_t)((struct FUNC(segment) *)ptr - SEGMENTS(self)));
+	assert(index == (size_t)((struct LOCAL_segment *)ptr - SEGMENTS(self)));
 	assertf(INUSE_BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)] & SLAB_SEGMENT_STATUS_ALLOC_N(index),
 	        "Double free of %" PRIuSIZ "-byte segment at %p, in page at %p\n"
 	        "index        = %" PRIuSIZ "\n"
@@ -93,34 +102,56 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 		if ((*self->s_pself = self->s_next) != NULL)
 			self->s_next->s_pself = self->s_pself;
 #endif /* CONFIG_TRACE_MALLOC */
-		/* Insert into `DESC.sd_free' */
-		if ((self->s_next = DESC.sd_free) != NULL) {
-			assert(DESC.sd_free->s_pself == &DESC.sd_free);
-			DESC.sd_free->s_pself = &self->s_next;
+		/* Insert into `LOCAL_desc.sd_free' */
+		if ((self->s_next = LOCAL_desc.sd_free) != NULL) {
+			assert(LOCAL_desc.sd_free->s_pself == &LOCAL_desc.sd_free);
+			LOCAL_desc.sd_free->s_pself = &self->s_next;
 		}
-		self->s_pself = &DESC.sd_free;
-		DESC.sd_free  = self;
+		self->s_pself = &LOCAL_desc.sd_free;
+		LOCAL_desc.sd_free  = self;
 	}
 }
 
 
+/* Service pending free operations. */
 LOCAL void
-NOTHROW(KCALL FUNC(slab_service_pending))(void) {
+NOTHROW(KCALL LOCAL_slab_descriptor_service_pending)(void) {
 	struct slab_pending_free *pend, *next;
-	pend = ATOMIC_XCH(DESC.sd_pend, NULL);
-	while (pend) {
-		next = pend->spf_next;
-		assert(KERNEL_SLAB_CHECKPTR(pend));
-#ifdef CONFIG_DEBUG_HEAP
-		mempatl(pend, DEBUGHEAP_NO_MANS_LAND, sizeof(void *));
-#endif /* CONFIG_DEBUG_HEAP */
-		FUNC(slab_dofreeptr)(SLAB_GET(pend), pend, GFP_NORMAL);
-		pend = next;
+again:
+	pend = ATOMIC_XCH(LOCAL_desc.sd_pend, NULL);
+	if unlikely(!pend)
+		return;
+	assert(KERNEL_SLAB_CHECKPTR(pend));
+	if unlikely(!slab_descriptor_tryacquire(&LOCAL_desc)) {
+		if (!ATOMIC_CMPXCH(LOCAL_desc.sd_pend, NULL, pend)) {
+			struct slab_pending_free *more;
+			next = pend;
+			while (next->spf_next)
+				next = next->spf_next;
+			do {
+				more = ATOMIC_READ(LOCAL_desc.sd_pend);
+				next->spf_next = more;
+				COMPILER_WRITE_BARRIER();
+			} while (!ATOMIC_CMPXCH_WEAK(LOCAL_desc.sd_pend, more, pend));
+		}
+		if (slab_descriptor_available(&LOCAL_desc))
+			goto again;
 	}
+	do {
+		next = pend->spf_next;
+#ifdef CONFIG_DEBUG_HEAP
+		mempatl(&pend->spf_next, DEBUGHEAP_NO_MANS_LAND, sizeof(pend->spf_next));
+#endif /* CONFIG_DEBUG_HEAP */
+		LOCAL_slab_dofreeptr(SLAB_GET(pend), pend, GFP_NORMAL);
+		pend = next;
+	} while (pend);
+	_slab_descriptor_release(&LOCAL_desc);
+	if unlikely(slab_descriptor_mustreap(&LOCAL_desc))
+		goto again;
 }
 
 LOCAL NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL FUNC(slab_freeptr))(struct slab *__restrict self,
+NOTHROW(KCALL LOCAL_slab_freeptr)(struct slab *__restrict self,
                                   void *__restrict ptr,
                                   gfp_t flags) {
 	assert(self->s_size == SEGMENT_SIZE);
@@ -128,12 +159,9 @@ NOTHROW(KCALL FUNC(slab_freeptr))(struct slab *__restrict self,
 	if (!(flags & GFP_CALLOC))
 		mempatl(ptr, DEBUGHEAP_NO_MANS_LAND, SEGMENT_SIZE);
 #endif /* CONFIG_DEBUG_HEAP */
-	if likely(sync_trywrite(&DESC.sd_lock)) {
-		FUNC(slab_service_pending)();
-		FUNC(slab_dofreeptr)(self, ptr, flags);
-		sync_endwrite(&DESC.sd_lock);
-		if unlikely(ATOMIC_READ(DESC.sd_pend) != NULL)
-			goto again_try_service;
+	if likely(slab_descriptor_tryacquire(&LOCAL_desc)) {
+		LOCAL_slab_dofreeptr(self, ptr, flags);
+		slab_descriptor_release(&LOCAL_desc);
 	} else {
 		struct slab_pending_free *pend, *next;
 #ifdef CONFIG_DEBUG_HEAP
@@ -144,47 +172,31 @@ NOTHROW(KCALL FUNC(slab_freeptr))(struct slab *__restrict self,
 #endif /* CONFIG_DEBUG_HEAP */
 		pend = (struct slab_pending_free *)ptr;
 		do {
-			next = ATOMIC_READ(DESC.sd_pend);
+			next = ATOMIC_READ(LOCAL_desc.sd_pend);
 			pend->spf_next = next;
-		} while unlikely(!ATOMIC_CMPXCH_WEAK(DESC.sd_pend, next, pend));
-again_try_service:
-		if (sync_trywrite(&DESC.sd_lock)) {
-			FUNC(slab_service_pending)();
-			sync_endwrite(&DESC.sd_lock);
-			if unlikely(ATOMIC_READ(DESC.sd_pend) != NULL)
-				goto again_try_service;
-		}
-	}
-}
-
-LOCAL NOBLOCK void
-NOTHROW(KCALL FUNC(slab_endwrite))(void) {
-again:
-	sync_endwrite(&DESC.sd_lock);
-	if unlikely(ATOMIC_READ(DESC.sd_pend) != NULL) {
-		if likely(sync_trywrite(&DESC.sd_lock)) {
-			FUNC(slab_service_pending)();
-			goto again;
-		}
+			COMPILER_WRITE_BARRIER();
+		} while unlikely(!ATOMIC_CMPXCH_WEAK(LOCAL_desc.sd_pend,
+		                                     next, pend));
+		LOCAL_slab_descriptor_service_pending();
 	}
 }
 
 
 PUBLIC NOBLOCK ATTR_MALLOC WUNUSED VIRT void *
-NOTHROW(KCALL FUNC(slab_malloc))(gfp_t flags) {
+NOTHROW(KCALL LOCAL_slab_malloc)(gfp_t flags) {
 	void *result;
 	struct slab *result_page;
 again:
-	if unlikely(!sync_trywrite(&DESC.sd_lock)) {
+	if unlikely(!slab_descriptor_tryacquire(&LOCAL_desc)) {
 		if (flags & GFP_ATOMIC)
 			goto err;
-		if unlikely(!sync_write_nx(&DESC.sd_lock))
+		if unlikely(!slab_descriptor_acquire_nx(&LOCAL_desc))
 			goto err;
 	}
-	result_page = DESC.sd_free;
+	result_page = LOCAL_desc.sd_free;
 	if likely(result_page) {
 		unsigned int i, j;
-		assert(result_page->s_pself == &DESC.sd_free);
+		assert(result_page->s_pself == &LOCAL_desc.sd_free);
 		assert(result_page->s_free != 0);
 		assert(result_page->s_size == SEGMENT_SIZE);
 		for (i = 0;; ++i) {
@@ -214,20 +226,20 @@ again:
 			COMPILER_READ_BARRIER();
 			result = &SEGMENTS(result_page)[j + i * (BITS_PER_POINTER / SLAB_SEGMENT_STATUS_BITS)];
 			if (--result_page->s_free == 0) {
-				DESC.sd_free = result_page->s_next;
-				if (DESC.sd_free)
-					DESC.sd_free->s_pself = &DESC.sd_free;
+				LOCAL_desc.sd_free = result_page->s_next;
+				if (LOCAL_desc.sd_free)
+					LOCAL_desc.sd_free->s_pself = &LOCAL_desc.sd_free;
 #ifdef CONFIG_TRACE_MALLOC
-				if ((result_page->s_next = DESC.sd_used) != NULL)
-					DESC.sd_used->s_pself = &result_page->s_next;
-				result_page->s_pself = &DESC.sd_used;
-				DESC.sd_used         = result_page;
+				if ((result_page->s_next = LOCAL_desc.sd_used) != NULL)
+					LOCAL_desc.sd_used->s_pself = &result_page->s_next;
+				result_page->s_pself = &LOCAL_desc.sd_used;
+				LOCAL_desc.sd_used         = result_page;
 #else /* CONFIG_TRACE_MALLOC */
 				result_page->s_pself = NULL;
 				DBG_memset(&result_page->s_next, 0xcc, sizeof(result_page->s_next));
 #endif /* !CONFIG_TRACE_MALLOC */
 			}
-			FUNC(slab_endwrite)();
+			slab_descriptor_release(&LOCAL_desc);
 #ifdef CONFIG_DEBUG_HEAP
 			if (page_flags & SLAB_FCALLOC) {
 				if (!(flags & GFP_CALLOC))
@@ -244,11 +256,13 @@ again:
 			return result;
 		}
 	}
-	FUNC(slab_endwrite)();
+	slab_descriptor_release(&LOCAL_desc);
+
 	/* Must allocate a new SLAB page. */
 	result_page = slab_alloc_page(flags);
 	if unlikely(!result_page)
 		goto err;
+
 	/* Initialize the new page. */
 #if GFP_LOCKED == SLAB_FLOCKED && GFP_CALLOC == SLAB_FCALLOC
 	result_page->s_flags = flags & (GFP_LOCKED | GFP_CALLOC);
@@ -261,29 +275,32 @@ again:
 #endif /* GFP_LOCKED != SLAB_FLOCKED || GFP_CALLOC != SLAB_FCALLOC */
 	result_page->s_free  = SEGMENT_COUNT - 1; /* One of the segments gets returned to the caller */
 	result_page->s_size  = SEGMENT_SIZE;
-	result_page->s_pself = &DESC.sd_free;
+	result_page->s_pself = &LOCAL_desc.sd_free;
 	result_page->s_next  = NULL;
 	if (!(flags & GFP_CALLOC))
 		memset(&INUSE_BITSET(result_page)[1], 0, SIZEOF_BITSET - sizeof(uintptr_t));
 	(INUSE_BITSET(result_page)[0]) = SLAB_SEGMENT_STATUS_ALLOC;
 	result = &SEGMENTS(result_page)[0];
 
-	if unlikely(!sync_trywrite(&DESC.sd_lock)) {
+	/* Re-acquire locks. */
+	if unlikely(!slab_descriptor_tryacquire(&LOCAL_desc)) {
 		if (flags & GFP_ATOMIC)
 			goto err_result_page;
-		if unlikely(!sync_write_nx(&DESC.sd_lock))
+		if unlikely(!slab_descriptor_acquire_nx(&LOCAL_desc))
 			goto err_result_page;
 	}
-	COMPILER_READ_BARRIER();
+
 	/* Check if new free-pages have appeared in the mean time. */
-	if unlikely(ATOMIC_READ(DESC.sd_free) != NULL) {
-		FUNC(slab_endwrite)();
+	COMPILER_READ_BARRIER();
+	if unlikely(LOCAL_desc.sd_free != NULL) {
+		slab_descriptor_release(&LOCAL_desc);
 		slab_freepage(result_page);
 		goto again;
 	}
+
 	/* Save the new free-page. */
-	DESC.sd_free = result_page;
-	FUNC(slab_endwrite)();
+	LOCAL_desc.sd_free = result_page;
+	slab_descriptor_release(&LOCAL_desc);
 	return result;
 err_result_page:
 	slab_freepage(result_page);
@@ -300,15 +317,17 @@ err:
 
 
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
-FUNC(slab_kmalloc)(gfp_t flags) {
-	/* Try to allocate from slab memory */
+LOCAL_slab_kmalloc(gfp_t flags) {
 	void *result;
 #ifdef CONFIG_TRACE_MALLOC
 	/* XXX: When `GFP_NOLEAK / GFP_NOWALK' are given, never allocate slab memory? */
 #endif /* !CONFIG_TRACE_MALLOC */
-	result = FUNC(slab_malloc)(flags);
-	if likely(result)
+
+	/* Try to allocate from slab memory */
+	result = LOCAL_slab_malloc(flags);
+	if likely(result != NULL)
 		return result;
+
 	/* Fall back to allocating without the slab engine */
 	return __os_malloc_noslab(CEIL_ALIGN(SEGMENT_SIZE,
 	                                     HEAP_ALIGNMENT),
@@ -316,15 +335,17 @@ FUNC(slab_kmalloc)(gfp_t flags) {
 }
 
 PUBLIC ATTR_MALLOC WUNUSED VIRT void *
-NOTHROW(KCALL FUNC(slab_kmalloc_nx))(gfp_t flags) {
-	/* Try to allocate from slab memory */
+NOTHROW(KCALL LOCAL_slab_kmalloc_nx)(gfp_t flags) {
 	void *result;
 #ifdef CONFIG_TRACE_MALLOC
 	/* XXX: When `GFP_NOLEAK / GFP_NOWALK' are given, never allocate slab memory? */
 #endif /* !CONFIG_TRACE_MALLOC */
-	result = FUNC(slab_malloc)(flags);
-	if likely(result)
+
+	/* Try to allocate from slab memory */
+	result = LOCAL_slab_malloc(flags);
+	if likely(result != NULL)
 		return result;
+
 	/* Fall back to allocating without the slab engine */
 	return __os_malloc_noslab_nx(CEIL_ALIGN(SEGMENT_SIZE,
 	                                        HEAP_ALIGNMENT),
@@ -332,9 +353,17 @@ NOTHROW(KCALL FUNC(slab_kmalloc_nx))(gfp_t flags) {
 }
 
 
+#undef LOCAL_slab_dofreeptr
+#undef LOCAL_slab_freeptr
+#undef LOCAL_slab_descriptor_service_pending
+#undef LOCAL_slab_malloc
+#undef LOCAL_slab_kmalloc
+#undef LOCAL_slab_kmalloc_nx
+
 #undef SEGMENTS
 #undef INUSE_BITSET
-#undef DESC
+#undef LOCAL_segment
+#undef LOCAL_desc
 
 DECL_END
 
