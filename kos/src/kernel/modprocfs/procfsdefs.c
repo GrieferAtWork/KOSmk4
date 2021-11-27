@@ -93,12 +93,12 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 	INTDEF struct constdirent PP_CAT2(procfs_root_dirent_, __LINE__);
 #define MKDIR_BEGIN(symbol_name, perm) \
 	INTDEF struct constdir symbol_name;
-#define MKREG_RO(symbol_name, perm, printer)                                          \
-	INTDEF void KCALL printer(pformatprinter printer, void *arg, size_t offset_hint); \
+#define MKREG_RO(symbol_name, perm, printer)                                         \
+	INTDEF void KCALL printer(pformatprinter printer, void *arg, pos_t offset_hint); \
 	INTDEF struct procfs_regfile symbol_name;
-#define MKREG_RW(symbol_name, perm, printer, writer)                                  \
-	INTDEF void KCALL printer(pformatprinter printer, void *arg, size_t offset_hint); \
-	INTDEF void KCALL writer(USER CHECKED void const *buf, size_t bufsize);           \
+#define MKREG_RW(symbol_name, perm, printer, writer)                                 \
+	INTDEF void KCALL printer(pformatprinter printer, void *arg, pos_t offset_hint); \
+	INTDEF void KCALL writer(USER CHECKED void const *buf, size_t bufsize);          \
 	INTDEF struct procfs_regfile symbol_name;
 #define MKREG_CONSTSTR(symbol_name, perm, string_ptr) \
 	INTDEF struct procfs_txtfile symbol_name;

@@ -194,7 +194,7 @@ ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval, u64 ma
 PRIVATE NONNULL((1, 2)) void KCALL
 procfs_regfile_v_print(struct printnode *__restrict self,
                        pformatprinter printer, void *arg,
-                       size_t offset_hint) {
+                       pos_t offset_hint) {
 	struct procfs_regfile *me = (struct procfs_regfile *)self;
 	(*me->prf_print)(printer, arg, offset_hint);
 }
@@ -250,7 +250,7 @@ INTERN_CONST struct printnode_ops const procfs_regfile_ops = {
 PRIVATE NONNULL((1, 2)) void KCALL
 procfs_txtfile_v_print(struct printnode *__restrict self,
                        pformatprinter printer, void *arg,
-                       size_t UNUSED(offset_hint)) {
+                       pos_t UNUSED(offset_hint)) {
 	struct procfs_txtfile *me = (struct procfs_txtfile *)self;
 	(*printer)(arg, me->ptf_string, strlen(me->ptf_string));
 	(*printer)(arg, "\n", 1);

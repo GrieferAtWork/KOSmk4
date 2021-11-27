@@ -85,7 +85,7 @@ struct printnode_ops {
 	BLOCKING NONNULL((1, 2)) void
 	(KCALL *pno_print)(struct printnode *__restrict self,
 	                   pformatprinter printer, void *arg,
-	                   size_t offset_hint)
+	                   pos_t offset_hint)
 			THROWS(...);
 
 	/* More operators would go here... */

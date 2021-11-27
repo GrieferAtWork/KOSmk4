@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_APPS_INSMOD_RMMOD_C
 #define GUARD_APPS_INSMOD_RMMOD_C 1
-#define _KOS_SOURCE               1
+#define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
 

@@ -66,7 +66,7 @@ struct procfs_regfile
 	struct printnode prf_node; /* Underlying print file */
 #endif /* __WANT_FS_INLINE_STRUCTURES */
 	/* [1..1] Print callback. */
-	void (KCALL *prf_print)(pformatprinter printer, void *arg, size_t offset_hint);
+	void (KCALL *prf_print)(pformatprinter printer, void *arg, pos_t offset_hint);
 	/* [0..1] Write callback. (when NULL, file is read-only) */
 	void (KCALL *prf_write)(USER CHECKED void const *buf, size_t bufsize);
 };

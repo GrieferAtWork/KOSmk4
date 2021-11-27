@@ -54,7 +54,7 @@ printnode_v_stat(struct mfile *__restrict UNUSED(self),
 struct vprinter_data {
 	USER CHECKED byte_t *vpd_buf; /* [?..?] Destination buffer. */
 	size_t               vpd_siz; /* Remaining buffer space. */
-	size_t               vpd_pos; /* # of leading bytes to skip. */
+	pos_t                vpd_pos; /* # of leading bytes to skip. */
 };
 
 PRIVATE NONNULL((1)) ssize_t FORMATPRINTER_CC
@@ -66,8 +66,8 @@ vprinter_cb(void *arg, char const *__restrict data, size_t datalen) {
 			me->vpd_pos -= datalen;
 			return 0;
 		}
-		data += me->vpd_pos;
-		datalen -= me->vpd_pos;
+		data += (size_t)me->vpd_pos;
+		datalen -= (size_t)me->vpd_pos;
 		me->vpd_pos = 0;
 	}
 	if (me->vpd_siz <= datalen) {
@@ -91,26 +91,16 @@ printnode_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
 	struct vprinter_data data;
 	struct printnode_ops const *ops;
 	struct printnode *me;
-#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-	size_t io_end;
-	if unlikely(OVERFLOW_UADD(addr, num_bytes, &io_end)) {
-		if unlikely(addr > (pos_t)SIZE_MAX)
-			return 0;
-		io_end = (size_t)0 - addr;
-		if unlikely(num_bytes > io_end)
-			num_bytes = io_end;
-	}
-#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 	me  = mfile_asprintnode(self);
 	ops = printnode_getops(me);
 
 	/* Fill in printer data. */
 	data.vpd_buf = (USER CHECKED byte_t *)dst;
 	data.vpd_siz = num_bytes;
-	data.vpd_pos = (size_t)addr;
+	data.vpd_pos = addr;
 
 	/* Invoke the printer. */
-	(*ops->pno_print)(me, &vprinter_cb, &data, (size_t)addr);
+	(*ops->pno_print)(me, &vprinter_cb, &data, addr);
 
 	/* Return the number of written bytes (== input_size - unused_size) */
 	return num_bytes - data.vpd_siz;
@@ -123,7 +113,7 @@ struct vvprinter_data {
 	struct iov_entry          vvpd_ent; /* Current IOV entry. */
 	size_t                    vvpd_nxt; /* Index of next `vvpd_ent' to load from `vvpd_buf' */
 	size_t                    vvpd_siz; /* Remaining buffer space. */
-	size_t                    vvpd_pos; /* # of leading bytes to skip. */
+	pos_t                     vvpd_pos; /* # of leading bytes to skip. */
 };
 
 PRIVATE NONNULL((1)) void FCALL
@@ -169,8 +159,8 @@ vvprinter_cb(void *arg, char const *__restrict data, size_t datalen) {
 			me->vvpd_pos -= datalen;
 			return 0;
 		}
-		data += me->vvpd_pos;
-		datalen -= me->vvpd_pos;
+		data += (size_t)me->vvpd_pos;
+		datalen -= (size_t)me->vvpd_pos;
 		me->vvpd_pos = 0;
 	}
 	if (me->vvpd_siz <= datalen) {
@@ -194,16 +184,6 @@ printnode_v_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict 
 	struct vvprinter_data data;
 	struct printnode_ops const *ops;
 	struct printnode *me;
-#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-	size_t io_end;
-	if unlikely(OVERFLOW_UADD(addr, num_bytes, &io_end)) {
-		if unlikely(addr > (pos_t)SIZE_MAX)
-			return 0;
-		io_end = (size_t)0 - addr;
-		if unlikely(num_bytes > io_end)
-			num_bytes = io_end;
-	}
-#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 	me  = mfile_asprintnode(self);
 	ops = printnode_getops(me);
 
@@ -212,10 +192,10 @@ printnode_v_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict 
 	data.vvpd_ent = dst->iv_head;
 	data.vvpd_nxt = 1;
 	data.vvpd_siz = num_bytes;
-	data.vvpd_pos = (size_t)addr;
+	data.vvpd_pos = addr;
 
 	/* Invoke the printer. */
-	(*ops->pno_print)(me, &vvprinter_cb, &data, (size_t)addr);
+	(*ops->pno_print)(me, &vvprinter_cb, &data, addr);
 
 	/* Return the number of written bytes (== input_size - unused_size) */
 	return num_bytes - data.vvpd_siz;
@@ -237,7 +217,7 @@ PUBLIC_CONST struct mfile_stream_ops const printnode_v_stream_ops = {
 struct pprinter_data {
 	physaddr_t ppd_buf; /* Physical destination buffer address. */
 	size_t     ppd_siz; /* Remaining buffer space. */
-	size_t     ppd_pos; /* # of leading bytes to skip. */
+	pos_t      ppd_pos; /* # of leading bytes to skip. */
 };
 
 PRIVATE NONNULL((1)) ssize_t FORMATPRINTER_CC
@@ -249,8 +229,8 @@ pprinter_cb(void *arg, char const *__restrict data, size_t datalen) {
 			me->ppd_pos -= datalen;
 			return 0;
 		}
-		data += me->ppd_pos;
-		datalen -= me->ppd_pos;
+		data += (size_t)me->ppd_pos;
+		datalen -= (size_t)me->ppd_pos;
 		me->ppd_pos = 0;
 	}
 	if (me->ppd_siz <= datalen) {
@@ -275,30 +255,16 @@ printnode_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 	struct pprinter_data data;
 	struct printnode_ops const *ops;
 	struct printnode *me;
-#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-	size_t io_end;
-	if unlikely(OVERFLOW_UADD(addr, num_bytes, &io_end)) {
-		if unlikely(addr > (pos_t)SIZE_MAX) {
-			bzerophyscc(buf, num_bytes);
-			return;
-		}
-		io_end = (size_t)0 - addr;
-		if unlikely(num_bytes > io_end) {
-			bzerophyscc(buf + io_end, num_bytes - io_end);
-			num_bytes = io_end;
-		}
-	}
-#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 	me  = mfile_asprintnode(self);
 	ops = printnode_getops(me);
 
 	/* Fill in printer data. */
 	data.ppd_buf = buf;
 	data.ppd_siz = num_bytes;
-	data.ppd_pos = (size_t)addr;
+	data.ppd_pos = addr;
 
 	/* Invoke the printer. */
-	(*ops->pno_print)(me, &pprinter_cb, &data, (size_t)addr);
+	(*ops->pno_print)(me, &pprinter_cb, &data, addr);
 
 	/* Fill any unused bytes with all zeroes. */
 	bzerophyscc(data.ppd_buf, data.ppd_siz);

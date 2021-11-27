@@ -587,7 +587,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 	INTDEF NONNULL((1, 2)) void KCALL                                    \
 	printer(struct printnode *__restrict self,                           \
 	        pformatprinter printer_, void *arg,                          \
-	        size_t offset_hint);                                         \
+	        pos_t offset_hint);                                          \
 	INTERN_CONST struct printnode_ops const ops_symbol_name = {          \
 		.pno_reg = {{                                                    \
 			.no_file = {                                                 \
@@ -606,7 +606,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 	INTDEF NONNULL((1, 2)) void KCALL                                          \
 	printer(struct printnode *__restrict self,                                 \
 	        pformatprinter printer_, void *arg,                                \
-	        size_t offset_hint);                                               \
+	        pos_t offset_hint);                                                \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL                                   \
 	writer(struct mfile *__restrict self, USER CHECKED void const *src,        \
 	       size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);           \

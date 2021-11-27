@@ -59,10 +59,12 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/exec/elf.h>
 #include <kos/ioctl/leaks.h>
 #include <network/socket.h>
 
 #include <assert.h>
+#include <elf.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -101,10 +103,10 @@ NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
 #define MKDIR_BEGIN(symbol_name, perm) \
 	INTDEF struct constdir symbol_name;
 #define MKREG_RO(symbol_name, perm, printer)                                          \
-	INTDEF void KCALL printer(pformatprinter printer, void *arg, size_t offset_hint); \
+	INTDEF void KCALL printer(pformatprinter printer, void *arg, pos_t offset_hint); \
 	INTDEF struct procfs_regfile symbol_name;
 #define MKREG_RW(symbol_name, perm, printer, writer)                                  \
-	INTDEF void KCALL printer(pformatprinter printer, void *arg, size_t offset_hint); \
+	INTDEF void KCALL printer(pformatprinter printer, void *arg, pos_t offset_hint); \
 	INTDEF void KCALL writer(USER CHECKED void const *buf, size_t bufsize);           \
 	INTDEF struct procfs_regfile symbol_name;
 #define MKREG_CONSTSTR(symbol_name, perm, string_ptr) \
@@ -169,7 +171,7 @@ procfs_threadself_printer(struct flnknode *__restrict UNUSED(self),
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 procfs_cmdline_printer(pformatprinter printer, void *arg,
-                       size_t UNUSED(offset_hint)) {
+                       pos_t UNUSED(offset_hint)) {
 	cmdline_encode(printer, arg, kernel_driver.d_argc, kernel_driver.d_argv);
 	(*printer)(arg, "\n", 1);
 }
@@ -180,7 +182,7 @@ procfs_cmdline_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 procfs_filesystems_printer(pformatprinter printer, void *arg,
-                           size_t UNUSED(offset_hint)) {
+                           pos_t UNUSED(offset_hint)) {
 	REF struct ffilesys *iter;
 	iter = ffilesys_next(NULL);
 	while (iter) {
@@ -241,7 +243,7 @@ NOTHROW(FCALL driver_depends_on)(struct driver *self,
 
 INTERN NONNULL((1)) void KCALL
 procfs_modules_printer(pformatprinter printer, void *arg,
-                       size_t UNUSED(offset_hint)) {
+                       pos_t UNUSED(offset_hint)) {
 	bool show_pointers = capable(CAP_SYS_MODULE);
 	REF struct driver_loadlist *ll;
 	size_t i, j;
@@ -299,9 +301,49 @@ procfs_modules_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 /* /proc/kcore                                                          */
 /************************************************************************/
+
+#define kcore_ehdr_size sizeof(ElfW(Ehdr))
+PRIVATE ElfW(Ehdr) const kcore_ehdr_template = {
+	.e_ident = {
+		[EI_MAG0]       = ELFMAG0,
+		[EI_MAG1]       = ELFMAG1,
+		[EI_MAG2]       = ELFMAG2,
+		[EI_MAG3]       = ELFMAG3,
+		[EI_CLASS]      = ELF_ARCH_CLASS,
+		[EI_DATA]       = ELF_ARCH_DATA,
+		[EI_VERSION]    = EV_CURRENT,
+		[EI_OSABI]      = ELFOSABI_SYSV, /* XXX: Something just for KOS? */
+		[EI_ABIVERSION] = 0,
+	},
+	.e_type      = ET_CORE,
+	.e_machine   = ELF_ARCH_MACHINE,
+	.e_version   = EV_CURRENT,
+	.e_phoff     = kcore_ehdr_size,
+	.e_ehsize    = kcore_ehdr_size,
+	.e_phentsize = sizeof(ElfW(Phdr)),
+	.e_phnum     = 0, /* Will be overwritten */
+};
+
+PRIVATE ssize_t KCALL
+kcore_ehdr_print(pformatprinter printer, void *arg) {
+	ElfW(Ehdr) ehdr;
+	memcpy(&ehdr, &kcore_ehdr_template, sizeof(ElfW(Ehdr)));
+	/* TODO */
+	return (*printer)(arg, (char *)&ehdr, sizeof(ehdr));
+}
+
 INTERN NONNULL((1)) void KCALL
 procfs_kcore_printer(pformatprinter printer, void *arg,
-                     size_t UNUSED(offset_hint)) {
+                     pos_t offset_hint) {
+	/* ELF executable header */
+	if (offset_hint < kcore_ehdr_size) {
+		if (kcore_ehdr_print(printer, arg) < 0)
+			return;
+	} else {
+		(*printer)(arg, NULL, kcore_ehdr_size);
+	}
+
+
 	/* TODO: Print a coredump for the kernel core itself */
 	PRINT("TODO");
 }
@@ -359,7 +401,7 @@ print_fnode_desc(struct fnode *__restrict self,
 
 INTERN NONNULL((1)) void KCALL
 procfs_kos_fs_nodes_printer(pformatprinter printer, void *arg,
-                            size_t UNUSED(offset_hint)) {
+                            pos_t UNUSED(offset_hint)) {
 	REF struct fnode *node;
 	REF struct fnode *prev = NULL;
 	size_t index = 0;
@@ -420,7 +462,7 @@ procfs_kos_fs_nodes_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 procfs_kos_fs_stat_printer(pformatprinter printer, void *arg,
-                           size_t UNUSED(offset_hint)) {
+                           pos_t UNUSED(offset_hint)) {
 	size_t allnodes    = fallnodes_getsize();
 	size_t allsuper    = fallsuper_getsize();
 	size_t changesuper = fchangedsuper_getsize();
@@ -437,7 +479,7 @@ procfs_kos_fs_stat_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 procfs_kos_mm_stat_printer(pformatprinter printer, void *arg,
-                           size_t UNUSED(offset_hint)) {
+                           pos_t UNUSED(offset_hint)) {
 	size_t partcount = mpart_all_getsize();
 	printf("mparts:\t%" PRIuSIZ "\n",
 	       partcount);
@@ -582,7 +624,7 @@ print_no_exe:
 
 INTERN NONNULL((1)) void KCALL
 procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
-                            size_t UNUSED(offset_hint)) {
+                            pos_t UNUSED(offset_hint)) {
 	REF struct mpart *part;
 	REF struct mpart *prev = NULL;
 	size_t index = 0;
@@ -698,7 +740,7 @@ NOTHROW(FCALL get_kernel_symbol_count)(void) {
 
 INTERN NONNULL((1)) void KCALL
 procfs_kos_kstat_printer(pformatprinter printer, void *arg,
-                         size_t UNUSED(offset_hint)) {
+                         pos_t UNUSED(offset_hint)) {
 	static char const section_names[][18] = {
 		".pertask", ".permman", ".percpu", ".text", ".rodata",
 		".gcc_except_table", ".eh_frame", ".data", ".bss",
@@ -722,7 +764,7 @@ procfs_kos_kstat_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 procfs_kos_meminfo_printer(pformatprinter printer, void *arg,
-                           size_t UNUSED(offset_hint)) {
+                           pos_t UNUSED(offset_hint)) {
 	size_t i;
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		struct pmembank *bank;
@@ -763,7 +805,7 @@ print_pagecount(pformatprinter printer, void *arg, physpagecnt_t count) {
 
 INTERN NONNULL((1)) void KCALL
 procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
-                           size_t UNUSED(offset_hint)) {
+                           pos_t UNUSED(offset_hint)) {
 	struct pmemstat st;
 	unsigned int usage_percent;
 	page_stat(&st);
@@ -787,7 +829,7 @@ procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 procfs_kos_futexfd_maxexpr_print(pformatprinter printer, void *arg,
-                                 size_t UNUSED(offset_hint)) {
+                                 pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintSize(printer, arg, mfutexfd_maxexpr);
 }
 INTERN void KCALL
@@ -832,7 +874,7 @@ KeepIopl_Write(USER CHECKED void const *buf, size_t bufsize, bool *pvalue) {
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Fork_Print(pformatprinter printer, void *arg,
-                                   size_t UNUSED(offset_hint)) {
+                                   pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_fork);
 }
 
@@ -848,7 +890,7 @@ ProcFS_Sys_X86_KeepIopl_Fork_Write(USER CHECKED void const *buf,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Clone_Print(pformatprinter printer, void *arg,
-                                    size_t UNUSED(offset_hint)) {
+                                    pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_clone);
 }
 
@@ -864,7 +906,7 @@ ProcFS_Sys_X86_KeepIopl_Clone_Write(USER CHECKED void const *buf,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Exec_Print(pformatprinter printer, void *arg,
-                                   size_t UNUSED(offset_hint)) {
+                                   pos_t UNUSED(offset_hint)) {
 	bool keep;
 	union x86_user_eflags_mask_union mask;
 	mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
@@ -897,7 +939,7 @@ ProcFS_Sys_X86_KeepIopl_Exec_Write(USER CHECKED void const *buf, size_t bufsize)
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Fs_PipeMaxSize_Print(pformatprinter printer, void *arg,
-                                size_t UNUSED(offset_hint)) {
+                                pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintSize(printer, arg, ATOMIC_READ(pipe_max_bufsize_unprivileged));
 }
 
@@ -917,7 +959,7 @@ ProcFS_Sys_Fs_PipeMaxSize_Write(USER CHECKED void const *buf,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Kernel_Domainname_Print(pformatprinter printer, void *arg,
-                                   size_t UNUSED(offset_hint)) {
+                                   pos_t UNUSED(offset_hint)) {
 	printf("%s\n", kernel_uname.domainname);
 }
 
@@ -946,7 +988,7 @@ ProcFS_Sys_Kernel_Domainname_Write(USER CHECKED void const *buf,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Kernel_Hostname_Print(pformatprinter printer, void *arg,
-                                 size_t UNUSED(offset_hint)) {
+                                 pos_t UNUSED(offset_hint)) {
 	printf("%s\n", kernel_uname.nodename);
 }
 
@@ -975,7 +1017,7 @@ ProcFS_Sys_Kernel_Hostname_Write(USER CHECKED void const *buf,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Kernel_PidMax_Print(pformatprinter printer, void *arg,
-                               size_t UNUSED(offset_hint)) {
+                               pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintUPid(printer, arg, ATOMIC_READ(pid_recycle_threshold));
 }
 
@@ -1002,7 +1044,7 @@ ProcFS_Sys_Kernel_PidMax_Write(USER CHECKED void const *buf,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Kernel_RandomizeVaSpace_Print(pformatprinter printer, void *arg,
-                                         size_t UNUSED(offset_hint)) {
+                                         pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintUInt(printer, arg, mman_findunmapped_aslr_getenabled() ? 2 : 0);
 }
 
@@ -1020,7 +1062,7 @@ ProcFS_Sys_Kernel_RandomizeVaSpace_Write(USER CHECKED void const *buf,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Kernel_SchedChildRunsFirst_Print(pformatprinter printer, void *arg,
-                                            size_t UNUSED(offset_hint)) {
+                                            pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintBool(printer, arg, (task_start_default_flags & TASK_START_FHIGHPRIO) != 0);
 }
 
@@ -1042,7 +1084,7 @@ ProcFS_Sys_Kernel_SchedChildRunsFirst_Write(USER CHECKED void const *buf,
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Net_Core_RmemDefault_Print(pformatprinter printer, void *arg,
-                                      size_t UNUSED(offset_hint)) {
+                                      pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintSize(printer, arg, socket_default_rcvbufsiz);
 }
 
@@ -1059,7 +1101,7 @@ ProcFS_Sys_Net_Core_RmemDefault_Write(USER CHECKED void const *buf, size_t bufsi
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Net_Core_WmemDefault_Print(pformatprinter printer, void *arg,
-                                      size_t UNUSED(offset_hint)) {
+                                      pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintSize(printer, arg, socket_default_sndbufsiz);
 }
 
@@ -1076,7 +1118,7 @@ ProcFS_Sys_Net_Core_WmemDefault_Write(USER CHECKED void const *buf, size_t bufsi
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Net_Core_RmemMax_Print(pformatprinter printer, void *arg,
-                                  size_t UNUSED(offset_hint)) {
+                                  pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintSize(printer, arg, socket_default_rcvbufmax);
 }
 
@@ -1099,7 +1141,7 @@ ProcFS_Sys_Net_Core_RmemMax_Write(USER CHECKED void const *buf, size_t bufsize) 
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Net_Core_WmemMax_Print(pformatprinter printer, void *arg,
-                                  size_t UNUSED(offset_hint)) {
+                                  pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintSize(printer, arg, socket_default_sndbufmax);
 }
 
@@ -1138,7 +1180,7 @@ NOTHROW(KCALL memleaks_v_destroy)(struct mfile *__restrict self) {
 PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
 memleaks_v_print(struct printnode *__restrict self,
                  pformatprinter printer, void *arg,
-                 size_t UNUSED(offset_hint))
+                 pos_t UNUSED(offset_hint))
 		THROWS(...) {
 	struct memleaks *me = (struct memleaks *)self;
 	kmalloc_leaks_print(me->ml_leaks, printer, arg);
