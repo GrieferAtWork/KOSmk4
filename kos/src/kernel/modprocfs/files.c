@@ -25,6 +25,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver.h>
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/filehandle.h>
@@ -35,6 +36,7 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/futexfd.h>
@@ -114,6 +116,25 @@ NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self);
 	         size_t bufsize) THROWS(E_SEGFAULT, ...); \
 	INTDEF struct flnknode symbol_name;
 #include "procfs.def"
+
+
+PRIVATE NONNULL((1)) ssize_t KCALL
+print_size_with_unit(pformatprinter printer, void *arg, size_t sizeval) {
+	char const *unit;
+	if (sizeval >= 1024 * 1024 * 1024) {
+		sizeval = CEILDIV(sizeval, 1024 * 1024 * 1024);
+		unit    = "GiB";
+	} else if (sizeval >= 1024 * 1024) {
+		sizeval = CEILDIV(sizeval, 1024 * 1024);
+		unit    = "MiB";
+	} else if (sizeval >= 1024) {
+		sizeval = CEILDIV(sizeval, 1024);
+		unit    = "KiB";
+	} else {
+		unit = "b";
+	}
+	return format_printf(printer, arg, "%" PRIuSIZ "%s", sizeval, unit);
+}
 
 
 
@@ -421,28 +442,11 @@ print_mpart_desc(struct mpart *__restrict self,
 	                       refcnt, statename, minaddr, maxaddr);
 	if (result < 0)
 		return result;
-	{
-		size_t sizeval;
-		char const *unit;
-		sizeval = (size_t)((maxaddr - minaddr) + 1);
-		if (sizeval >= 1024 * 1024 * 1024) {
-			sizeval = CEILDIV(sizeval, 1024 * 1024 * 1024);
-			unit    = "GiB";
-		} else if (sizeval >= 1024 * 1024) {
-			sizeval = CEILDIV(sizeval, 1024 * 1024);
-			unit    = "MiB";
-		} else if (sizeval >= 1024) {
-			sizeval = CEILDIV(sizeval, 1024);
-			unit    = "KiB";
-		} else {
-			unit = "b";
-		}
-		result = format_printf(printer, arg, "%" PRIuSIZ "%s\t", sizeval, unit);
-		if (result < 0)
-			return result;
-	}
+	result = print_size_with_unit(printer, arg, (size_t)((maxaddr - minaddr) + 1));
+	if (result < 0)
+		return result;
 	result = format_printf(printer, arg,
-	                       "%c%c%c%c\t",
+	                       "\t%c%c%c%c\t",
 	                       flags & MPART_F_GLOBAL_REF ? 'g' : '-',
 	                       flags & MPART_F_PERSISTENT ? 'p' : '-',
 	                       flags & MPART_F_CHANGED ? 'c' : '-',
@@ -563,6 +567,51 @@ procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
 
 
 /************************************************************************/
+/* /proc/kos/kstat                                                      */
+/************************************************************************/
+/* This file contains static text describing the KOS system configuration. */
+PRIVATE NONNULL((1, 3)) ssize_t KCALL
+print_kernel_section_size(pformatprinter printer, void *arg,
+                          char const *__restrict section_name) {
+	size_t section_size;
+	REF struct module_section *sect;
+	sect = module_locksection(&kernel_driver, section_name);
+	if (!sect)
+		return 0;
+	section_size = sect->ms_size;
+	decref_unlikely(sect); /* More like *_nokill, but whatever... */
+
+	/* Special case for .permman, which normally doesn't include the page directory size. */
+	if (strcmp(section_name, ".permman") == 0)
+		section_size += sizeof(pagedir_t);
+
+	/* Print section size. */
+	printf("%s:\t%" PRIuSIZ " (", section_name, section_size);
+	print_size_with_unit(printer, arg, section_size);
+	return PRINT(")\n");
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_kos_kstat_printer(pformatprinter printer, void *arg,
+                         size_t UNUSED(offset_hint)) {
+	static char const section_names[][18] = {
+		".pertask", ".permman", ".percpu", ".text", ".rodata",
+		".gcc_except_table", ".eh_frame", ".data", ".bss",
+		".dbg.hooks", ".shstrtab", ".debug_line", ".debug_info",
+		".debug_aranges", ".debug_abbrev", ".debug_str",
+		".debug_ranges", ".debug_loc",
+	};
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(section_names); ++i) {
+		if (print_kernel_section_size(printer, arg, section_names[i]) < 0)
+			return;
+	}
+}
+
+
+
+
+/************************************************************************/
 /* /proc/kos/raminfo                                                    */
 /************************************************************************/
 PRIVATE NONNULL((1)) void KCALL
@@ -581,7 +630,7 @@ print_pagecount(pformatprinter printer, void *arg, physpagecnt_t count) {
 }
 
 INTERN NONNULL((1)) void KCALL
-ProcFS_Kos_RamInfo_Printer(pformatprinter printer, void *arg,
+procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
                            size_t UNUSED(offset_hint)) {
 	struct pmemstat st;
 	unsigned int usage_percent;

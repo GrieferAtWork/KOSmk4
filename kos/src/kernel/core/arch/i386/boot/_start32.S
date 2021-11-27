@@ -150,12 +150,17 @@ INTERN_FUNCTION(_start)
 
 #ifndef CONFIG_NO_SMP
 	/* memcpy(&bootcpu, __kernel_percpu_start, (size_t)__kernel_percpu_size); */
+	EXTERN(bootcpu)
+	EXTERN(__kernel_percpu_start)
+	EXTERN(__kernel_percpu_size)
 	movl   $(V2P(bootcpu)), %edi
 	movl   $(V2P(__kernel_percpu_start)), %esi
 	movl   $(__kernel_percpu_size), %ecx
 	rep    movsb
 
 	/* memcpy(&bootcpu_x86_tss, __kernel_percpu_tss, SIZEOF_TSS); */
+	EXTERN(bootcpu_x86_tss)
+	EXTERN(__kernel_percpu_tss)
 	movl   $(V2P(bootcpu_x86_tss)), %edi
 	movl   $(V2P(__kernel_percpu_tss)), %esi
 #if IS_ALIGNED(SIZEOF_TSS, 4)
@@ -171,6 +176,9 @@ INTERN_FUNCTION(_start)
 #endif /* !CONFIG_NO_SMP */
 
 	/* memcpy(&bootidle, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
+	EXTERN(bootidle)
+	EXTERN(__kernel_pertask_start)
+	EXTERN(__kernel_pertask_size)
 	movl   $(V2P(bootidle)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
 	movl   $(__kernel_pertask_size), %ecx
@@ -192,12 +200,15 @@ INTERN_FUNCTION(_start)
 
 	/* memcpy((byte_t *)&mman_kernel + PAGEDIR_SIZE, __kernel_permman_start, (size_t)__kernel_permman_size); */
 	EXTERN(mman_kernel)
+	EXTERN(__kernel_permman_start)
+	EXTERN(__kernel_permman_size)
 	movl   $(V2P(mman_kernel) + PAGEDIR_SIZE), %edi
 	movl   $(V2P(__kernel_permman_start)), %esi
 	movl   $(__kernel_permman_size), %ecx
 	rep    movsb
 
 	/* Set the DIDINIT flag for the boot cpu's feature table. */
+	EXTERN(bootcpu_x86_cpufeatures)
 	orl    $(CPU_FEATURE_FDIDINIT), V2P(bootcpu_x86_cpufeatures)
 
 	/* Check if CPUID is supported. */
