@@ -2418,8 +2418,9 @@ kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 
 
 
-INTERN void /* Must be INTERN, because this function gets overwritten
-             * when   `nomall'   is   passed   on   the   commandline */
+/* Must be INTERN, because this function gets overwritten
+ * when   `nomall'   is   passed   on   the   commandline */
+INTERN ATTR_NOINLINE NONNULL((1, 3)) void
 NOTHROW(KCALL trace_malloc_generate_traceback)(void const **__restrict buffer, size_t buflen,
                                                struct lcpustate *__restrict state,
                                                unsigned int n_skip) {
@@ -2434,7 +2435,8 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void const **__restrict buffer, s
 	 * But the reason this is done isn't only for this, but rather to ensure that throwing
 	 * exceptions  and the like don't just randomly  fail because the kernel couldn't find
 	 * enough memory... */
-	do {
+	for (;;) {
+		unsigned int unwind_error;
 		if (n_skip == 0) {
 			*buffer++ = lcpustate_getpc(state);
 			if (!--buflen)
@@ -2442,10 +2444,40 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void const **__restrict buffer, s
 		} else {
 			--n_skip;
 		}
-		oldstate = *state;
-	} while (unwind(lcpustate_getpc(&oldstate) - 1,
-	                &unwind_getreg_lcpustate, &oldstate,
-	                &unwind_setreg_lcpustate, state) == UNWIND_SUCCESS);
+		memcpy(&oldstate, state, sizeof(struct lcpustate));
+		unwind_error = unwind(lcpustate_getpc(&oldstate) - 1,
+		                      &unwind_getreg_lcpustate, &oldstate,
+		                      &unwind_setreg_lcpustate, state);
+		if (unwind_error != UNWIND_SUCCESS) {
+			if (unwind_error == UNWIND_INVALID_REGISTER) {
+				struct kcpustate kc;
+				/* Try to continue unwinding with a larger register pool */
+				lcpustate_to_kcpustate(&oldstate, &kc);
+				unwind_error = unwind(lcpustate_getpc(&oldstate) - 1,
+				                      &unwind_getreg_lcpustate, &oldstate,
+				                      &unwind_setreg_kcpustate, &kc);
+				if (unwind_error == UNWIND_SUCCESS) {
+					struct kcpustate nc;
+					for (;;) {
+						if (n_skip == 0) {
+							*buffer++ = kcpustate_getpc(&kc);
+							if (!--buflen)
+								return;
+						} else {
+							--n_skip;
+						}
+						memcpy(&nc, &kc, sizeof(struct kcpustate));
+						unwind_error = unwind(kcpustate_getpc(&nc) - 1,
+						                      &unwind_getreg_kcpustate, &nc,
+						                      &unwind_setreg_kcpustate, &kc);
+						if (unwind_error != UNWIND_SUCCESS)
+							break;
+					}
+				}
+			}
+			break;
+		}
+	}
 #endif
 	/* Make sure that when there are unused entries, the chain is NULL-terminated */
 	if (buflen)
