@@ -592,32 +592,68 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
 		return heapptr_make(old_ptr, old_bytes);
 	}
 	missing_bytes = new_bytes - old_bytes;
-	missing_bytes = LOCAL_heap_allat_untraced(self,
-	                                          (byte_t *)old_ptr + old_bytes,
-	                                          missing_bytes,
-	                                          alloc_flags);
+	missing_bytes = LOCAL_heap_allat_untraced(self, (byte_t *)old_ptr + old_bytes,
+	                                          missing_bytes, alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
+		struct trace_node *node;
+
+		/* Try to extend an existing trace-node at `old_ptr+old_bytes-1'
+		 *
+		 * This is required to ensure that any pointer into the returned
+		 * data-block is considered  as a valid  method of marking  said
+		 * block as reachable.
+		 *
+		 * If we were to create individual blocks for each realloc'd part
+		 * of a larger chunk of memory, then pointers would have to exist
+		 * that point into each individual chunk, or we'd consider  those
+		 * chunks without pointers as leaks! */
+		lock_acquire();
+		node = tm_nodes_remove((byte_t *)old_ptr + old_bytes - 1);
+		if likely(node) {
+			if unlikely(node->tn_link.rb_max != (uintptr_t)((byte_t *)old_ptr + old_bytes - 1)) {
+				tm_nodes_insert(node);
+				node = trace_node_dupa_tb(node);
+				lock_break();
+				kernel_panic_n(/* n_skip: */ 1,
+				               PP_STR(LOCAL_heap_realloc) "(%p,%" PRIuSIZ ",%" PRIuSIZ ",%#x,%#x): "
+				               "New allocation %p-%p overlaps with node %p-%p\n"
+				               "%[gen:c]",
+				               old_ptr, old_bytes, new_bytes, alloc_flags, free_flags,
+				               (byte_t *)old_ptr + old_bytes,
+				               (byte_t *)old_ptr + old_bytes + missing_bytes - 1,
+				               trace_node_umin(node), trace_node_umax(node),
+				               &trace_node_print_traceback, node);
+				lock_regain();
+			} else {
+				/* Expand the existing node. */
+				node->tn_link.rb_max += missing_bytes;
+				tm_nodes_insert(node);
+				lock_break();
+				goto inplace_success;
+			}
+		}
+		lock_release();
+
+		/* Create  a new  node for  the block  as a whole.
+		 * This is the case when the original block wasn't
+		 * being  traced, but after realloc is becomes so. */
 #ifdef DEFINE_X_except
 		TRY {
-			kmalloc_trace((byte_t *)old_ptr + old_bytes,
-			              missing_bytes, alloc_flags, 1);
+			kmalloc_trace((byte_t *)old_ptr, old_bytes + missing_bytes, alloc_flags, 1);
 		} EXCEPT
 #elif defined(DEFINE_X_noexcept)
-		if unlikely(!kmalloc_trace_nx((byte_t *)old_ptr + old_bytes,
-		                              missing_bytes, alloc_flags, 1))
+		if unlikely(!kmalloc_trace_nx((byte_t *)old_ptr, old_bytes + missing_bytes, alloc_flags, 1))
 #endif /* ... */
 		{
-			heap_free_untraced(self,
-			                   (byte_t *)old_ptr + old_bytes,
-			                   missing_bytes,
-			                   alloc_flags);
+			heap_free_untraced(self, (byte_t *)old_ptr + old_bytes, missing_bytes, alloc_flags);
 #ifdef DEFINE_X_except
 			RETHROW();
 #elif defined(DEFINE_X_noexcept)
 			goto err;
 #endif /* ... */
 		}
+inplace_success:
 		return heapptr_make(old_ptr, old_bytes + missing_bytes);
 	}
 	if (alloc_flags & GFP_NOMOVE)
@@ -681,32 +717,69 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
 		return heapptr_make(old_ptr, old_bytes);
 	}
 	missing_bytes = new_bytes - old_bytes;
-	missing_bytes = LOCAL_heap_allat_untraced(self,
-	                                          (byte_t *)old_ptr + old_bytes,
-	                                          missing_bytes,
-	                                          alloc_flags);
+	missing_bytes = LOCAL_heap_allat_untraced(self, (byte_t *)old_ptr + old_bytes,
+	                                          missing_bytes, alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
+		struct trace_node *node;
+
+		/* Try to extend an existing trace-node at `old_ptr+old_bytes-1'
+		 *
+		 * This is required to ensure that any pointer into the returned
+		 * data-block is considered  as a valid  method of marking  said
+		 * block as reachable.
+		 *
+		 * If we were to create individual blocks for each realloc'd part
+		 * of a larger chunk of memory, then pointers would have to exist
+		 * that point into each individual chunk, or we'd consider  those
+		 * chunks without pointers as leaks! */
+		lock_acquire();
+		node = tm_nodes_remove((byte_t *)old_ptr + old_bytes - 1);
+		if likely(node) {
+			if unlikely(node->tn_link.rb_max != (uintptr_t)((byte_t *)old_ptr + old_bytes - 1)) {
+				tm_nodes_insert(node);
+				node = trace_node_dupa_tb(node);
+				lock_break();
+				kernel_panic_n(/* n_skip: */ 1,
+				               PP_STR(LOCAL_heap_realign) "(%p,%" PRIuSIZ ",%" PRIuSIZ ",%" PRIuSIZ ",%" PRIdSIZ ",%#x,%#x): "
+				               "New allocation %p-%p overlaps with node %p-%p\n"
+				               "%[gen:c]",
+				               old_ptr, old_bytes, min_alignment, offset, new_bytes, alloc_flags, free_flags,
+				               (byte_t *)old_ptr + old_bytes,
+				               (byte_t *)old_ptr + old_bytes + missing_bytes - 1,
+				               trace_node_umin(node), trace_node_umax(node),
+				               &trace_node_print_traceback, node);
+				lock_regain();
+			} else {
+				/* Expand the existing node. */
+				node->tn_link.rb_max += missing_bytes;
+				tm_nodes_insert(node);
+				lock_break();
+				goto inplace_success;
+			}
+		}
+		lock_release();
+
+		/* Create  a new  node for  the block  as a whole.
+		 * This is the case when the original block wasn't
+		 * being  traced, but after realloc is becomes so. */
 #ifdef DEFINE_X_except
 		TRY {
-			kmalloc_trace((byte_t *)old_ptr + old_bytes,
-			              missing_bytes, alloc_flags, 1);
+			kmalloc_trace((byte_t *)old_ptr, old_bytes + missing_bytes, alloc_flags, 1);
 		} EXCEPT
 #elif defined(DEFINE_X_noexcept)
-		if unlikely(!kmalloc_trace_nx((byte_t *)old_ptr + old_bytes,
-		                              missing_bytes, alloc_flags, 1))
+		if unlikely(!kmalloc_trace_nx((byte_t *)old_ptr, old_bytes + missing_bytes, alloc_flags, 1))
 #endif /* ... */
 		{
-			heap_free_untraced(self,
-			                   (byte_t *)old_ptr + old_bytes,
-			                   missing_bytes,
-			                   alloc_flags);
+			heap_free_untraced(self, (byte_t *)old_ptr + old_bytes, missing_bytes, alloc_flags);
 #ifdef DEFINE_X_except
 			RETHROW();
 #elif defined(DEFINE_X_noexcept)
 			goto err;
 #endif /* ... */
 		}
+
+inplace_success:
 		return heapptr_make(old_ptr, old_bytes + missing_bytes);
 	}
 	if (alloc_flags & GFP_NOMOVE)
