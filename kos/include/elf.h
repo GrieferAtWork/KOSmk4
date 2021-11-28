@@ -1161,7 +1161,7 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 #define STT_SECTION     3               /* Symbol associated with a section */
 #define STT_FILE        4               /* Symbol's name is file name */
 #define STT_COMMON      5               /* Symbol is a common data object */
-#define STT_TLS         6               /* Symbol is thread-local data object*/
+#define STT_TLS         6               /* Symbol is thread-local data object */
 #define STT_NUM         7               /* Number of defined types */
 #define STT_RELC        8               /* Complex relocation expression */
 #define STT_SRELC       9               /* Signed Complex relocation expression */

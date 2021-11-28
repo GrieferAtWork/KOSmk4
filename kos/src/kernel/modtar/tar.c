@@ -59,6 +59,10 @@
 
 DECL_BEGIN
 
+STATIC_ASSERT(offsetof(struct tarhdr, th_type) == 156);
+STATIC_ASSERT(offsetof(struct tarhdr, th_devmajor) == 329);
+STATIC_ASSERT(sizeof(struct tarhdr) == 500);
+
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
 #else /* !NDEBUG && !NDEBUG_FINI */
@@ -164,7 +168,7 @@ again:
 	/* Fill in mem-file fields. */
 	__mfile_init_wrlockpc(result)
 	_mfile_init_common(result);
-	_mfile_init_blockshift(result, TARFS_BLOCKSHIFT, super->ts_super.fs_root.mf_iobashift);
+	_mfile_init_blockshift(result, TBLOCKSHIFT, super->ts_super.fs_root.mf_iobashift);
 	result->mf_refcnt            = 2; /* +1: result, +1: MFILE_FN_GLOBAL_REF */
 	result->mf_parts             = MFILE_PARTS_ANONYMOUS;
 	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
@@ -360,7 +364,7 @@ tardir_v_lookup(struct fdirnode *__restrict self,
 	 *       as  in: the first and last already-loaded file apart of the parent dir. Then,
 	 *       walk  all those files  and strcasecmp() their  `basename(3)' to the requested
 	 *       filename. */
-	/* TODO: Keep on scanning for  the requested file via  `tarsuper_readdir_or_endread()'.
+	/* TODO: Keep on scanning  for the requested  file via  `tarsuper_readdir_or_unlock()'.
 	 *       When that function returns `TARSUPER_READDIR_EOF', give up. When that function
 	 *       returns `TARSUPER_READDIR_AGAIN', start over by re-acquiring the read-lock and
 	 *       scanning for the requested file. */
@@ -681,7 +685,7 @@ tarfile_new(struct tarhdr const *__restrict self,
 	char const *fstr_start, *fstr_end;
 	size_t descsiz;
 	uint32_t fsize;
-	is_ustar   = memcmp(self->th_ustar, "ustar", 6) == 0;
+	is_ustar   = memcmp(self->th_ustar, TMAGIC, TMAGLEN) == 0;
 	pstr_start = NULL;
 	pstr_end   = NULL;
 	fstr_start = self->th_filename;
@@ -727,14 +731,14 @@ tarfile_new(struct tarhdr const *__restrict self,
 	*p_filesize = fsize;
 
 	/* Figure out the proper file mode. */
-	switch (self->th_type) {
+	switch (self->th_type[0]) {
 
-	case TARHDR_TYPE_REG3:
+	case TCONTTYPE:
 		if (!is_ustar)
 			return NULL;
 		ATTR_FALLTHROUGH
-	case TARHDR_TYPE_REG:  /* Normal file */
-	case TARHDR_TYPE_REG2: /* Regular file (alias) */
+	case TREGTYPE:  /* Normal file */
+	case TAREGTYPE: /* Regular file (alias) */
 		if (!is_ustar && (fstr_start < fstr_end &&
 		                  fstr_end[-1] == '/')) {
 			--fstr_end;
@@ -744,33 +748,33 @@ tarfile_new(struct tarhdr const *__restrict self,
 		}
 		break;
 
-	case TARHDR_TYPE_HRD:
+	case TLNKTYPE:
 		mode |= 0;
 		break;
 
-	case TARHDR_TYPE_SYM:
+	case TSYMTYPE:
 		mode |= S_IFLNK;
 		break;
 
-	case TARHDR_TYPE_CHR:
+	case TCHRTYPE:
 		if (!is_ustar)
 			return NULL;
 		mode |= S_IFCHR;
 		break;
 
-	case TARHDR_TYPE_BLK:
+	case TBLKTYPE:
 		if (!is_ustar)
 			return NULL;
 		mode |= S_IFBLK;
 		break;
 
-	case TARHDR_TYPE_DIR:
+	case TDIRTYPE:
 		if (!is_ustar)
 			return NULL;
 		mode |= S_IFDIR;
 		break;
 
-	case TARHDR_TYPE_FIFO:
+	case TFIFOTYPE:
 		if (!is_ustar)
 			return NULL;
 		mode |= S_IFIFO;
@@ -930,7 +934,7 @@ fill_common_fields:
  * @return: TARSUPER_READDIR_EOF:   Read-lock released
  * @return: TARSUPER_READDIR_AGAIN: Read-lock released */
 INTERN BLOCKING WUNUSED struct tarfile *FCALL
-tarsuper_readdir_or_endread(struct tarsuper *__restrict self)
+tarsuper_readdir_or_unlock(struct tarsuper *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	/* TODO */
 	tarsuper_endread(self);
@@ -951,9 +955,9 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	struct tarhdr *hdr;
 	struct tarfile *firstfile;
 	uint32_t first_filesize;
-	if (mfile_getblocksize(dev) <= TARFS_BLOCKSIZE) {
-		hdr = (struct tarhdr *)aligned_alloca(TARFS_BLOCKSIZE, TARFS_BLOCKSIZE);
-		mfile_rdblocks(dev, 0, pagedir_translate(hdr), TARFS_BLOCKSIZE);
+	if (mfile_getblockshift(dev) <= TBLOCKSHIFT) {
+		hdr = (struct tarhdr *)aligned_alloca(TBLOCKSIZE, TBLOCKSIZE);
+		mfile_rdblocks(dev, 0, pagedir_translate(hdr), TBLOCKSIZE);
 	} else {
 		hdr = (struct tarhdr *)alloca(sizeof(struct tarhdr));
 		mfile_readall(dev, hdr, sizeof(struct tarhdr), 0);
@@ -973,7 +977,7 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	 * on are treated as corrupted-filesystem errors, rather than  not-a-tar-fs
 	 * errors. */
 	if (firstfile)
-		firstfile->tf_pos = (pos_t)TARFS_BLOCKSIZE;
+		firstfile->tf_pos = (pos_t)TBLOCKSIZE;
 	TRY {
 		result = (struct tarsuper *)kmalloc(sizeof(struct tarsuper), GFP_NORMAL);
 		TRY {
@@ -994,7 +998,7 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	shared_rwlock_init(&result->ts_lock);
 	result->ts_filev[0]      = firstfile;
 	result->ts_filec         = firstfile ? 1 : 0;
-	result->ts_nfile         = (pos_t)(TARFS_BLOCKSIZE + CEIL_ALIGN(first_filesize, TARFS_BLOCKSIZE));
+	result->ts_nfile         = (pos_t)(TBLOCKSIZE + CEIL_ALIGN(first_filesize, TBLOCKSIZE));
 	result->ts_fdat.tfd_filp = NULL;
 	result->ts_fdat.tfd_name = NULL;
 	result->ts_fdat.tfd_nlen = 0;
@@ -1003,7 +1007,7 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->ts_super.fs_root.mf_ops               = &tarsuper_ops.so_fdir.dno_node.no_file;
 	result->ts_super.fs_root.mf_parts             = MFILE_PARTS_ANONYMOUS;
 	result->ts_super.fs_root.mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
-	result->ts_super.fs_root.mf_blockshift        = TARFS_BLOCKSHIFT;
+	result->ts_super.fs_root.mf_blockshift        = TBLOCKSHIFT;
 	result->ts_super.fs_root.mf_iobashift         = dev->mf_iobashift;
 	atomic64_init(&result->ts_super.fs_root.mf_filesize, (uint64_t)-1);
 	result->ts_super.fs_root.mf_atime = realtime();
@@ -1026,10 +1030,10 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->ts_super.fs_feat.sf_symlink_max        = (pos_t)100;
 	result->ts_super.fs_feat.sf_link_max           = (nlink_t)-1;
 	result->ts_super.fs_feat.sf_magic              = ENCODE_INT32('t', 'a', 'r', 0); /* <linux/magic.h> doesn't have a constant for this, so we improvise... */
-	result->ts_super.fs_feat.sf_rec_incr_xfer_size = TARFS_BLOCKSIZE;
-	result->ts_super.fs_feat.sf_rec_max_xfer_size  = TARFS_BLOCKSIZE;
-	result->ts_super.fs_feat.sf_rec_min_xfer_size  = TARFS_BLOCKSIZE;
-	result->ts_super.fs_feat.sf_rec_xfer_align     = TARFS_BLOCKSIZE;
+	result->ts_super.fs_feat.sf_rec_incr_xfer_size = TBLOCKSIZE;
+	result->ts_super.fs_feat.sf_rec_max_xfer_size  = TBLOCKSIZE;
+	result->ts_super.fs_feat.sf_rec_min_xfer_size  = TBLOCKSIZE;
+	result->ts_super.fs_feat.sf_rec_xfer_align     = TBLOCKSIZE;
 	result->ts_super.fs_feat.sf_name_max           = 255;
 	result->ts_super.fs_feat.sf_filesizebits       = 32;
 	return &result->ts_super;

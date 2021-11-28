@@ -45,50 +45,9 @@ DECL_END
 #include <kos/sched/shared-rwlock.h>
 
 #include <stddef.h>
+#include <tar.h>
 
 DECL_BEGIN
-
-/* Tar filesystem constants. */
-#define TARFS_BLOCKSIZE  512
-#define TARFS_BLOCKSHIFT 9 /* == log2(TARFS_BLOCKSIZE) */
-
-
-/* Possible values for `struct tarhdr::th_type' */
-#define TARHDR_TYPE_REG  '0'  /* Normal file */
-#define TARHDR_TYPE_REG2 '\0' /* Regular file (alias) */
-#define TARHDR_TYPE_HRD  '1'  /* Hard-link */
-#define TARHDR_TYPE_SYM  '2'  /* Symlink */
-#define TARHDR_TYPE_CHR  '3'  /* [valid_if(th_ustar == "ustar\0")] Character special */
-#define TARHDR_TYPE_BLK  '4'  /* [valid_if(th_ustar == "ustar\0")] Block special */
-#define TARHDR_TYPE_DIR  '5'  /* [valid_if(th_ustar == "ustar\0")] Directory */
-#define TARHDR_TYPE_FIFO '6'  /* [valid_if(th_ustar == "ustar\0")] FIFO */
-#define TARHDR_TYPE_REG3 '7'  /* [valid_if(th_ustar == "ustar\0")] Another alias for regular files */
-
-struct tarhdr {
-	char th_filename[100]; /* Absolute filename. */
-	char th_mode[8];       /* File mode (octal-ascii). */
-	char th_uid[8];        /* File uid (octal-ascii). */
-	char th_gid[8];        /* File gid (octal-ascii). */
-	char th_size[12];      /* File size (in bytes; octal-ascii). */
-	char th_mtime[12];     /* Last-modified time (seconds-since-01.01.1970T00:00; octal-ascii). */
-	char th_chksum[8];     /* Checksum (octal-ascii). */
-	char th_type;          /* File type (one of `TARHDR_TYPE_*'). */
-	char th_lnkname[100];  /* [valid_if(th_type == TARHDR_TYPE_HRD || th_type == TARHDR_TYPE_SYM)]
-	                        * Linked file filename, or symlink text. */
-	/* Everything that follows is [valid_if(th_ustar == "ustar\0")] */
-	char th_ustar[6];      /* The string "ustar\0" (if ustar format is used) */
-	char th_uvers[2];      /* ustar version string ("00") */
-	char th_uname[32];     /* Name for `th_uid' */
-	char th_gname[32];     /* Name for `th_gid' */
-	char th_devmajor[8];   /* [valid_if(TARHDR_TYPE_CHR || TARHDR_TYPE_BLK)] Major number for device. */
-	char th_devminor[8];   /* [valid_if(TARHDR_TYPE_CHR || TARHDR_TYPE_BLK)] Minor number for device. */
-	char th_filepfx[155];  /* Prefix for `th_filename' */
-};
-
-STATIC_ASSERT(offsetof(struct tarhdr, th_type) == 156);
-STATIC_ASSERT(offsetof(struct tarhdr, th_devmajor) == 329);
-STATIC_ASSERT(sizeof(struct tarhdr) == 500);
-
 
 /* Decoded tar file information */
 struct tarfile {
@@ -238,10 +197,10 @@ INTDEF struct fsuper_ops const tarsuper_ops;     /* For `struct tarsuper' */
  * @return: TARSUPER_READDIR_EOF:   Read-lock released
  * @return: TARSUPER_READDIR_AGAIN: Read-lock released */
 INTDEF BLOCKING WUNUSED struct tarfile *FCALL
-tarsuper_readdir_or_endread(struct tarsuper *__restrict self)
+tarsuper_readdir_or_unlock(struct tarsuper *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
-/* Special return values for `tarsuper_readdir_or_endread()' */
+/* Special return values for `tarsuper_readdir_or_unlock()' */
 #define TARSUPER_READDIR_EOF   NULL                   /* All files read */
 #define TARSUPER_READDIR_AGAIN ((struct tarfile *)-1) /* Lock released; try again */
 
