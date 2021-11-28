@@ -640,16 +640,11 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 				linebuffer_capture(&self->t_canon, &capture);
 				if unlikely(!capture.lc_size) {
 					/* Use rewrite in case a buffer was allocated, so that the buffer can be re-used */
-					TRY {
-						IF_NOT_KERNEL(temp = )linebuffer_rewrite(&self->t_canon, &capture);
+					IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
 #ifndef __KERNEL__
-						if unlikely(temp < 0)
-							goto err_capture;
+					if unlikely(temp < 0)
+						goto err;
 #endif /* !__KERNEL__ */
-					} EXCEPT {
-						linecapture_fini(&capture);
-						RETHROW();
-					}
 					if (iflag & IMAXBEL) {
 						/* Cannot erase character from empty canon */
 						temp = libterminal_do_owrite_echo(self, bell, COMPILER_LENOF(bell), mode,
@@ -661,16 +656,11 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 				} else {
 					byte_t delch;
 					delch = capture.lc_base[--capture.lc_size];
-					TRY {
-						IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
+					IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
 #ifndef __KERNEL__
-						if unlikely(temp < 0)
-							goto err_capture;
+					if unlikely(temp < 0)
+						goto err;
 #endif /* !__KERNEL__ */
-					} EXCEPT {
-						linecapture_fini(&capture);
-						RETHROW();
-					}
 					temp = libterminal_do_iwrite_erase(self, &delch, 1, mode, lflag, iflag);
 					if unlikely(temp < 0)
 						goto err;
@@ -688,23 +678,18 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					goto done;
 				/* Clear the entire input */
 				linebuffer_capture(&self->t_canon, &capture);
+				RAII_FINALLY { linecapture_fini(&capture); };
 				if (lflag & ECHOKE) { /* Only echo when `ECHOKE' is set. */
-					TRY {
-						/* Erase the entire input line. */
-						temp = libterminal_do_iwrite_erase(self,
-						                                   capture.lc_base,
-						                                   capture.lc_size,
-						                                   mode,
-						                                   lflag,
-						                                   iflag);
-					} EXCEPT {
-						linecapture_fini(&capture);
-						RETHROW();
-					}
+					/* Erase the entire input line. */
+					temp = libterminal_do_iwrite_erase(self,
+					                                   capture.lc_base,
+					                                   capture.lc_size,
+					                                   mode,
+					                                   lflag,
+					                                   iflag);
 					if unlikely(temp < 0)
-						goto err_capture;
+						goto err;
 				}
-				linecapture_fini(&capture);
 				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VWERASE] && (lflag & (ECHOE | IEXTEN))) {
@@ -730,6 +715,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 						}
 					} else {
 						size_t new_size = capture.lc_size;
+
 						/* Erase word (while (isspace(last)) erase(); while (!isspace(last)) erase()) */
 						if (iflag & IUTF8) {
 							char32_t ch;
@@ -756,6 +742,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 							while (new_size && !isspace(capture.lc_base[new_size - 1]))
 								--new_size;
 						}
+
 						/* Echo erased characters. */
 						temp = libterminal_do_iwrite_erase(self,
 						                                   capture.lc_base + new_size,
@@ -765,22 +752,24 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 						                                   iflag);
 						if unlikely(temp < 0)
 							goto err_capture;
-						/* Re-writed the truncated canon */
+
+						/* Re-write the truncated canon */
 						capture.lc_size = new_size;
 					}
-					IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
-#ifndef __KERNEL__
-					if unlikely(temp < 0)
-						goto err_capture;
-#endif /* !__KERNEL__ */
 				} EXCEPT {
 					linecapture_fini(&capture);
 					RETHROW();
 				}
+				IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
+#ifndef __KERNEL__
+				if unlikely(temp < 0)
+					goto err;
+#endif /* !__KERNEL__ */
 				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VREPRINT] && (lflag & IEXTEN)) {
 				size_t count;
+
 				/* Re-echo the contents of the canon */
 				count = (size_t)(iter - flush_start);
 				temp  = libterminal_do_iwrite_canon(self, flush_start, count, mode, iflag, lflag);
@@ -791,6 +780,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					goto done;
 				++result; /* Account for the control character */
 				flush_start = iter + 1;
+
 				/* Clear the entire input */
 				linebuffer_capture(&self->t_canon, &capture);
 				TRY {
@@ -803,15 +793,15 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					                                   lflag);
 					if unlikely(temp < 0)
 						goto err_capture;
-					IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
-#ifndef __KERNEL__
-					if unlikely(temp < 0)
-						goto err_capture;
-#endif /* !__KERNEL__ */
 				} EXCEPT {
 					linecapture_fini(&capture);
 					RETHROW();
 				}
+				IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
+#ifndef __KERNEL__
+				if unlikely(temp < 0)
+					goto err;
+#endif /* !__KERNEL__ */
 			}
 		}
 		if (flush_start < end) {

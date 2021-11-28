@@ -69,10 +69,10 @@ struct linecapture {
 #elif defined(__CRT_HAVE_free)
 #define linecapture_fini(self) \
 	__libc_free((self)->lc_base)
-#else
+#else /* ... */
 #define linecapture_fini(self) \
 	(void)0
-#endif /* !__KERNEL__ */
+#endif /* !... */
 
 
 

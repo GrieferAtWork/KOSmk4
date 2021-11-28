@@ -113,7 +113,13 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
 	linebuffer_retval_t result;
 	if unlikely(!capture->lc_alloc)
 		return 0;
-	atomic_lock_acquire(&self->lb_lock);
+	TRY {
+		atomic_lock_acquire(&self->lb_lock);
+	} EXCEPT {
+		HEAP_FREE(capture->lc_base,
+		          capture->lc_alloc);
+		RETHROW();
+	}
 	if likely(!self->lb_line.lc_alloc) {
 		self->lb_line = *capture;
 		result        = capture->lc_size;
