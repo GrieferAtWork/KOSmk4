@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/rt/except-handler.h>
 #include <kernel/types.h>
 
 #include <kos/bits/syscall-info.h>
@@ -249,6 +250,66 @@ NOTHROW(FCALL userexcept_sysret_inject_with_state_nopr)(struct icpustate *__rest
  * and  has  yet   to  terminate  (iow:   `TASK_FTERMINATING'  isn't   set) */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_inject_nopr)(struct task *__restrict thread);
+
+/* Check if the calling thread's IRET tail was redirected. */
+#ifndef ARCH_HAVE_USEREXCEPT_SYSRET_INJECTED
+FUNDEF NOBLOCK WUNUSED __BOOL
+NOTHROW(FCALL userexcept_sysret_injected)(void);
+#endif /* !ARCH_HAVE_USEREXCEPT_SYSRET_INJECTED */
+
+/* Same as `userexcept_sysret_injected()', but allowed to given false
+ * positives, though  is  _NOT_  allowed to  given  false  negatives. */
+#ifndef ARCH_HAVE_USEREXCEPT_SYSRET_MAYBE_INJECTED
+#define userexcept_sysret_maybe_injected() userexcept_sysret_injected()
+#endif /* !ARCH_HAVE_USEREXCEPT_SYSRET_MAYBE_INJECTED */
+
+
+/* Repeat a given expression if  the caller's IRET tail  might
+ * have been redirected after/during the first call. This way,
+ * we can assert that the  `expr' is called with a  consistent
+ * context in regards to sysret having been injected.
+ *
+ * This is highly important to prevent an inconsistent register
+ * state in situations such as exception unwinding, as a random
+ * sysret injection can alter  stack values while they're  also
+ * being read by the  unwind system, which assumes  consistency
+ * in regards to memory reads.
+ *
+ * Also note that when preemption is disabled, you do not need
+ * to make use of this, as preemption being enabled is one  of
+ * the requirements for sysret to be randomly injected. */
+#if 0
+#define __call_with_consistent_sysret(expr)                           \
+	({                                                                \
+		__BOOL __cwfsr_was      = userexcept_sysret_maybe_injected(); \
+		__auto_type __cwfsr_res = expr;                               \
+		if (!__cwfsr_was && userexcept_sysret_maybe_injected())       \
+			__cwfsr_res = expr;                                       \
+		__cwfsr_res;                                                  \
+	})
+#else
+/* Less efficient after re-direct, but still guaranties consistency. */
+#define __call_with_consistent_sysret(expr)     \
+	({                                          \
+		__auto_type __cwfsr_res = expr;         \
+		if (userexcept_sysret_maybe_injected()) \
+			__cwfsr_res = expr;                 \
+		__cwfsr_res;                            \
+	})
+#endif
+
+
+/* Helper macros to perform the specified operations in a manner that is safe
+ * to be done with preemption enabled, even in a situation where unwinding is
+ * done  on the caller  thread's stack, and even  if another thread redirects
+ * the caller's IRET tail while unwinding is being performed. */
+#define unwind_cfa_apply_sysret_safe(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg) \
+	__call_with_consistent_sysret(unwind_cfa_apply(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
+#define unwind_cfa_sigframe_apply_sysret_safe(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg) \
+	__call_with_consistent_sysret(unwind_cfa_sigframe_apply(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
+#define unwind_sysret_safe(absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg) \
+	__call_with_consistent_sysret(unwind(absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
+
 
 
 

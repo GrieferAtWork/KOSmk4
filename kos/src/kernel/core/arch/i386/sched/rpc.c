@@ -281,6 +281,7 @@ NOTHROW(FCALL userexcept_sysret_inject_nopr)(struct task *__restrict thread) {
 }
 
 
+
 /* Arch-specific function: Behaves identical to:
  * >> pflag_t was = PREEMPTION_PUSHOFF();
  * >> userexcept_sysret_inject_nopr(THIS_TASK);

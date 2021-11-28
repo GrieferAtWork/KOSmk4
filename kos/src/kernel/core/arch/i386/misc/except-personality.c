@@ -101,9 +101,9 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind
 	error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
-	error = unwind_cfa_sigframe_apply(&cfa, fde, pc,
-	                                  &unwind_getreg_kcpustate, state,
-	                                  &unwind_setreg_ucpustate, &ustate);
+	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, fde, pc,
+	                                              &unwind_getreg_kcpustate, state,
+	                                              &unwind_setreg_ucpustate, &ustate);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	assert(ucpustate_isuser(&ustate) ||
@@ -121,29 +121,26 @@ INTERN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unwind_fde_struct *__restrict fde,
                                                                       struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
-	unsigned int error;
 	struct rpc_syscall_info sc_info;
+	unwind_cfa_sigframe_state_t cfa;
+	unsigned int error;
+	void const *pc;
 	kcpustate_to_ucpustate(state, &ustate);
-	{
-		unwind_cfa_sigframe_state_t cfa;
-		void const *pc = ucpustate_getpc(&ustate) - 1;
-		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
-		if unlikely(error != UNWIND_SUCCESS)
-			goto err;
-		error = unwind_cfa_sigframe_apply(&cfa, fde, pc,
-		                                  &unwind_getreg_kcpustate, state,
-		                                  &unwind_setreg_ucpustate, &ustate);
-		if unlikely(error != UNWIND_SUCCESS)
-			goto err;
-	}
+	pc = ucpustate_getpc(&ustate) - 1;
+	error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+	if unlikely(error != UNWIND_SUCCESS)
+		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
+	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, fde, pc,
+	                                              &unwind_getreg_kcpustate, state,
+	                                              &unwind_setreg_ucpustate, &ustate);
+	if unlikely(error != UNWIND_SUCCESS)
+		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
 	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
 	rpc_syscall_info_get32_sysenter_nx(&sc_info, &ustate);
 	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
-err:
-	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 
 
@@ -157,29 +154,26 @@ INTERN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwind_fde_struct *__restrict fde,
                                                                      struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
-	unsigned int error;
 	struct rpc_syscall_info sc_info;
+	unwind_cfa_sigframe_state_t cfa;
+	unsigned int error;
+	void const *pc;
 	kcpustate_to_ucpustate(state, &ustate);
-	{
-		unwind_cfa_sigframe_state_t cfa;
-		void const *pc = ucpustate_getpc(&ustate) - 1;
-		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
-		if unlikely(error != UNWIND_SUCCESS)
-			goto err;
-		error = unwind_cfa_sigframe_apply(&cfa, fde, pc,
-		                                  &unwind_getreg_kcpustate, state,
-		                                  &unwind_setreg_ucpustate, &ustate);
-		if unlikely(error != UNWIND_SUCCESS)
-			goto err;
-	}
+	pc = ucpustate_getpc(&ustate) - 1;
+	error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+	if unlikely(error != UNWIND_SUCCESS)
+		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
+	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, fde, pc,
+	                                              &unwind_getreg_kcpustate, state,
+	                                              &unwind_setreg_ucpustate, &ustate);
+	if unlikely(error != UNWIND_SUCCESS)
+		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
 	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
 	rpc_syscall_info_get64_int80h(&sc_info, &ustate);
 	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
-err:
-	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 #endif /* __x86_64__ */
 
