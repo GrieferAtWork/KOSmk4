@@ -93,7 +93,10 @@ STATIC_ASSERT(sizeof(struct tarhdr) == 500);
 /* Decoded tar file information */
 struct tarfile {
 	pos_t                         tf_pos;     /* [const] On-disk starting position of file data (also re-used as INode number) */
-	TAILQ_ENTRY(tarfile)          tf_bypos;   /* [lock(:ts_lock)] List of all files, sorted by `tf_pos'. */
+	union {
+		TAILQ_ENTRY(tarfile)      tf_bypos;   /* [lock(:ts_lock)] List of all files, sorted by `tf_pos'. */
+		SLIST_ENTRY(tarfile)     _tf_dead;    /* Used internally. */
+	};
 	refcnt_t                      tf_refcnt;  /* Reference counter. */
 	uint32_t                      tf_size;    /* [const] File size (in bytes) */
 	int32_t                       tf_mtim;    /* [const] Last-modified timestamp */
@@ -161,6 +164,7 @@ struct tardirent {
 	struct fdirent      td_ent;  /* Underlying directory entry. */
 };
 
+SLIST_HEAD(tarfile_slist, tarfile);
 TAILQ_HEAD(tarfile_tailq, tarfile);
 
 /* Tar superblock. */
@@ -182,6 +186,34 @@ struct tarsuper {
 	struct fsuper        ts_super;  /* Underlying superblock. */
 	struct tarfdat       ts_fdat;   /* Root directory file data. */
 };
+
+/* Helpers for accessing `struct tarsuper::ts_lock' */
+#define /*        */ _tarsuper_reap(self)        (void)0
+#define /*        */ tarsuper_reap(self)         (void)0
+#define /*        */ tarsuper_mustreap(self)     0
+#define /*BLOCKING*/ tarsuper_write(self)        shared_rwlock_write(&(self)->ts_lock)
+#define /*BLOCKING*/ tarsuper_write_nx(self)     shared_rwlock_write_nx(&(self)->ts_lock)
+#define /*        */ tarsuper_trywrite(self)     shared_rwlock_trywrite(&(self)->ts_lock)
+#define /*        */ tarsuper_endwrite(self)     (shared_rwlock_endwrite(&(self)->ts_lock), tarsuper_reap(self))
+#define /*        */ _tarsuper_endwrite(self)    shared_rwlock_endwrite(&(self)->ts_lock)
+#define /*BLOCKING*/ tarsuper_read(self)         shared_rwlock_read(&(self)->ts_lock)
+#define /*BLOCKING*/ tarsuper_read_nx(self)      shared_rwlock_read_nx(&(self)->ts_lock)
+#define /*        */ tarsuper_tryread(self)      shared_rwlock_tryread(&(self)->ts_lock)
+#define /*        */ _tarsuper_endread(self)     shared_rwlock_endread(&(self)->ts_lock)
+#define /*        */ tarsuper_endread(self)      (void)(shared_rwlock_endread(&(self)->ts_lock) && (tarsuper_reap(self), 0))
+#define /*        */ _tarsuper_end(self)         shared_rwlock_end(&(self)->ts_lock)
+#define /*        */ tarsuper_end(self)          (void)(shared_rwlock_end(&(self)->ts_lock) && (tarsuper_reap(self), 0))
+#define /*BLOCKING*/ tarsuper_upgrade(self)      shared_rwlock_upgrade(&(self)->ts_lock)
+#define /*        */ tarsuper_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->ts_lock)
+#define /*        */ tarsuper_downgrade(self)    shared_rwlock_downgrade(&(self)->ts_lock)
+#define /*        */ tarsuper_reading(self)      shared_rwlock_reading(&(self)->ts_lock)
+#define /*        */ tarsuper_writing(self)      shared_rwlock_writing(&(self)->ts_lock)
+#define /*        */ tarsuper_canread(self)      shared_rwlock_canread(&(self)->ts_lock)
+#define /*        */ tarsuper_canwrite(self)     shared_rwlock_canwrite(&(self)->ts_lock)
+#define /*BLOCKING*/ tarsuper_waitread(self)     shared_rwlock_waitread(&(self)->ts_lock)
+#define /*BLOCKING*/ tarsuper_waitwrite(self)    shared_rwlock_waitwrite(&(self)->ts_lock)
+#define /*BLOCKING*/ tarsuper_waitread_nx(self)  shared_rwlock_waitread_nx(&(self)->ts_lock)
+#define /*BLOCKING*/ tarsuper_waitwrite_nx(self) shared_rwlock_waitwrite_nx(&(self)->ts_lock)
 
 
 /* Operator tables. */

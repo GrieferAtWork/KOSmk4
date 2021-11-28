@@ -135,6 +135,11 @@ struct handle;
 typedef unsigned int fallocate_mode_t; /* TODO */
 #endif /* !__fallocate_mode_t_defined */
 
+#ifndef __gfp_t_defined
+#define __gfp_t_defined
+typedef unsigned int gfp_t;
+#endif /* !__gfp_t_defined */
+
 
 /* Extended operators used for implementing stream interface
  * functions and/or overriding the behavior of certain user-
@@ -320,6 +325,31 @@ struct mfile_stream_ops {
 	BLOCKING NONNULL((1)) void
 	(KCALL *mso_sync)(struct mfile *__restrict self)
 			THROWS(E_WOULDBLOCK, E_IOERROR, ...);
+
+	/* [0..1] Clear internal object caches. This function must be NOBLOCK when
+	 *        `gfp & GFP_ATOMIC' is given. Otherwise, this function is allowed
+	 *        to block, but not throw an exception (iow: it may use  functions
+	 *        such as `atomic_lock_acquire_nx()')
+	 *
+	 * Generally speaking, this function should acquire locks like:
+	 * >> if (!mylock_tryacquire(self)) {
+	 * >>     if (gfp & GFP_ATOMIC)
+	 * >>         return 0; // Not allowed to block :(
+	 * >>     if (!mylock_acquire_nx(self))
+	 * >>         return 0; // Cannot acquire lock...
+	 * >> }
+	 * >> ...
+	 * >> mylock_release(self);
+	 *
+	 * @param: gfp: Set of  `0 | GFP_ATOMIC'  (other  flags  may  also  be  set).
+	 *              This is also what should be passed in call to `kmalloc_nx()',
+	 *              and similar functions as flags  mode, as it may also  contain
+	 *              other flags such as `GFP_NOCLRC' to prevent recursion in case
+	 *              this function is  called as part  of clearing system  caches.
+	 * @return: * : An approximation of how much memory has become available.
+	 * @return: 0 : No resources could be released. */
+	NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) size_t
+	/*NOTHROW*/ (KCALL *mso_cc)(struct mfile *__restrict self, gfp_t gfp);
 };
 
 /* Default ioctl(2) operator for mfiles. Implements:

@@ -42,6 +42,7 @@
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
+#include <hybrid/atomic.h>
 #include <hybrid/wordbits.h>
 
 #include <kos/dev.h>
@@ -50,6 +51,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <ctype.h>
+#include <format-printer.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -283,6 +285,39 @@ again_acquire_locks:
 
 
 /************************************************************************/
+/* Common operators.                                                    */
+/************************************************************************/
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ssize_t KCALL
+tarnode_v_printlink(struct mfile *__restrict self, pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	struct fnode *me   = mfile_asnode(self);
+	struct tarfdat *fd = me->fn_fsdata;
+	ssize_t temp, result;
+	result = (*printer)(arg, "inode:[tarfs:", 13);
+	if unlikely(result < 0)
+		goto done;
+	temp = mfile_uprintlink(me->fn_super->fs_dev, printer, arg);
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+	temp = format_printf(printer, arg, ":/%$s]",
+	                     (size_t)fd->tfd_nlen,
+	                     fd->tfd_name);
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+
+done:
+	return result;
+err:
+	return temp;
+}
+
+
+
+
+
+/************************************************************************/
 /* Directory operators.                                                 */
 /************************************************************************/
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -435,6 +470,74 @@ NOTHROW(KCALL tarsuper_v_free)(struct fnode *__restrict self) {
 	kfree(me);
 }
 
+PRIVATE NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) size_t
+NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self, gfp_t gfp) {
+	size_t i, result = 0;
+	struct tarfile_slist deadfiles;
+	struct tarsuper *me;
+	SLIST_INIT(&deadfiles);
+	me = container_of(mfile_assuper(self), struct tarsuper, ts_super);
+
+	if (!tarsuper_trywrite(me)) {
+		if (gfp & GFP_ATOMIC)
+			return 0; /* Not allowed to block :( */
+		if (!tarsuper_write_nx(me))
+			return 0; /* Cannot acquire lock... */
+	}
+
+	/* Remove all tar files that are not being used from the file list. */
+	for (i = 0; i < me->ts_filec;) {
+		struct tarfile *tf;
+		tf = me->ts_filev[i];
+		if (!ATOMIC_CMPXCH(tf->tf_refcnt, 1, 0)) {
+			++i;
+			continue;
+		}
+
+		/* Delete this file. */
+		TAILQ_REMOVE(&me->ts_bypos, tf, tf_bypos);
+		SLIST_INSERT(&deadfiles, tf, _tf_dead);
+		if (me->ts_nfile > tf->tf_pos)
+			me->ts_nfile = tf->tf_pos; /* Keep track of the first missing file. */
+		--me->ts_filec;
+		memmovedown(&me->ts_filev[i],
+		            &me->ts_filev[i + 1],
+		            me->ts_filec - i,
+		            sizeof(me->ts_filev[i]));
+	}
+
+	/* Free unused memory from the file table. */
+	if (!SLIST_EMPTY(&deadfiles)) {
+		size_t old_usable;
+		REF struct tarfile **newlist;
+		old_usable = kmalloc_usable_size(me->ts_filev);
+		/* Truncate the list */
+		newlist = me->ts_filev;
+		newlist = (REF struct tarfile **)krealloc_nx(newlist,
+		                                             me->ts_filec * sizeof(REF struct tarfile *),
+		                                             GFP_NORMAL);
+		if likely(newlist) {
+			size_t new_usable = kmalloc_usable_size(me->ts_filev);
+			me->ts_filev = newlist;
+			assert(old_usable >= new_usable);
+			result += old_usable - new_usable;
+		}
+	}
+	tarsuper_endwrite(me);
+
+	/* Destroy files that we removed from the table. */
+	while (!SLIST_EMPTY(&deadfiles)) {
+		struct tarfile *tf;
+		tf = SLIST_FIRST(&deadfiles);
+		SLIST_REMOVE_HEAD(&deadfiles, _tf_dead);
+		result += kmalloc_usable_size(tf);
+		tarfile_destroy(tf);
+	}
+
+	return result;
+}
+
+
 
 
 
@@ -447,12 +550,20 @@ INTERN_CONST struct fdirent_ops const tardirent_ops = {
 	.fdo_opennode = &tardirent_v_opennode,
 };
 
+PRIVATE struct mfile_stream_ops const tardirnode_v_stream_ops = {
+	.mso_open      = &fdirnode_v_open,
+	.mso_stat      = &fdirnode_v_stat,
+	.mso_ioctl     = &fdirnode_v_ioctl,
+	.mso_hop       = &fdirnode_v_hop,
+	.mso_printlink = &tarnode_v_printlink,
+};
+
 INTERN_CONST struct fdirnode_ops const tardirnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &tardir_v_destroy,
 			.mo_changed = &fdirnode_v_changed,
-			.mo_stream  = &fdirnode_v_stream_ops,
+			.mo_stream  = &tardirnode_v_stream_ops,
 		},
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
@@ -461,36 +572,55 @@ INTERN_CONST struct fdirnode_ops const tardirnode_ops = {
 	.dno_enum   = &tardir_v_enum,
 };
 
+PRIVATE struct mfile_stream_ops const tarregnode_v_stream_ops = {
+	.mso_printlink = &tarnode_v_printlink,
+};
+
 INTERN_CONST struct fregnode_ops const tarregnode_ops = {
 	.rno_node = {
 		.no_file = {
 			.mo_destroy    = &tarreg_v_destroy,
 			.mo_loadblocks = &tarreg_v_loadblocks,
 			.mo_changed    = &fregnode_v_changed,
+			.mo_stream     = &tarregnode_v_stream_ops,
 		},
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 };
 
+#define tarlnknode_v_stream_ops tarregnode_v_stream_ops
 INTERN_CONST struct flnknode_ops const tarlnknode_ops = {
 	.lno_node = {
 		.no_file = {
 			.mo_destroy = &tarlnk_v_destroy,
 			.mo_changed = &flnknode_v_changed,
+			.mo_stream  = &tarlnknode_v_stream_ops,
 		},
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 	.lno_linkstr = &tarlnk_v_linkstr,
 };
 
+#define tardevnode_v_stream_ops tarregnode_v_stream_ops
 INTERN_CONST struct fdevnode_ops const tardevnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &tarreg_v_destroy,
 			.mo_changed = &fregnode_v_changed,
+			.mo_stream  = &tardevnode_v_stream_ops,
 		},
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
+};
+
+/* Default stream operators for directories (using `fdirnode_v_open') */
+PRIVATE struct mfile_stream_ops const tarsuper_v_stream_ops = {
+	.mso_open      = &fsuper_v_open,
+	.mso_stat      = &fsuper_v_stat,
+	.mso_ioctl     = &fsuper_v_ioctl,
+	.mso_hop       = &fsuper_v_hop,
+	.mso_printlink = &tarnode_v_printlink,
+	.mso_cc        = &tarsuper_v_cc,
 };
 
 INTERN_CONST struct fsuper_ops const tarsuper_ops = {
@@ -499,7 +629,7 @@ INTERN_CONST struct fsuper_ops const tarsuper_ops = {
 			.no_file = {
 				.mo_destroy = &tarsuper_v_destroy,
 				.mo_changed = &fsuper_v_changed,
-				.mo_stream  = &fsuper_v_stream_ops,
+				.mo_stream  = &tarsuper_v_stream_ops,
 			},
 			.no_free   = &tarsuper_v_free,
 			.no_wrattr = &fnode_v_wrattr_noop,
@@ -803,7 +933,7 @@ INTERN BLOCKING WUNUSED struct tarfile *FCALL
 tarsuper_readdir_or_endread(struct tarsuper *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	/* TODO */
-	shared_rwlock_endread(&self->ts_lock); /* TODO: Use a designated macro for working with the lock! */
+	tarsuper_endread(self);
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
