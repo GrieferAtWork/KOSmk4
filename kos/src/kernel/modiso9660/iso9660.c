@@ -310,7 +310,7 @@ PRIVATE struct flatsuper_ops const iso9660_super_ops = {
 };
 
 
-PRIVATE WUNUSED NONNULL((1)) struct fsuper *KCALL
+PRIVATE WUNUSED NONNULL((1, 2)) struct fsuper *KCALL
 iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
                struct mfile *dev, UNCHECKED USER char *args) {
 	struct flatsuper *result;

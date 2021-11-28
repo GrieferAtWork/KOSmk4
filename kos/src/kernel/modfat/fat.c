@@ -3097,8 +3097,8 @@ trimspecstring(char *__restrict buf, size_t size) {
 }
 
 PRIVATE WUNUSED NONNULL((1)) struct fsuper *KCALL
-Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
-                   struct mfile *dev, UNCHECKED USER char *args) {
+fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
+           struct mfile *dev, UNCHECKED USER char *args) {
 	FatSuperblock *result;
 	FatDiskHeader *disk;
 	u16 sector_size;
@@ -3389,9 +3389,9 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 /************************************************************************/
 /* FAT Filesystem Type                                                  */
 /************************************************************************/
-PRIVATE struct ffilesys Fat_Filesys = {
+PRIVATE struct ffilesys fat_filesys = {
 	.ffs_drv = &drv_self,
-	{ .ffs_open = &Fat_OpenFileSystem },
+	{ .ffs_open = &fatfs_open },
 	.ffs_flags = FFILESYS_F_NORMAL,
 	/* .ffs_name = */ "fat",
 };
@@ -3411,15 +3411,15 @@ STATIC_ASSERT((offsetof(FatSuperblock, ft_fdat) -
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_fat_driver(void)
 #else  /* CONFIG_BUILDING_KERNEL_CORE */
-PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL Fat_Init(void)
+PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL init(void)
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 {
-	ffilesys_register(&Fat_Filesys);
+	ffilesys_register(&fat_filesys);
 }
 
 #ifndef CONFIG_BUILDING_KERNEL_CORE
-PRIVATE DRIVER_FINI void KCALL Fat_Fini(void) {
-	ffilesys_unregister(&Fat_Filesys);
+PRIVATE DRIVER_FINI void KCALL fini(void) {
+	ffilesys_unregister(&fat_filesys);
 }
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 
