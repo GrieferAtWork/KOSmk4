@@ -26,6 +26,8 @@
 #include <__crt.h>
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
+
 #define CC LIBBUFFER_CC
 
 #ifdef __KERNEL__
@@ -39,8 +41,19 @@
 #endif /* !__KERNEL__ */
 
 #ifndef NOBLOCK
-#include <kos/anno.h>
 #define NOBLOCK __NOBLOCK
 #endif /* !NOBLOCK */
+
+#ifndef THROWS
+#define THROWS __THROWS
+#endif /* !THROWS */
+
+#ifndef USER
+#define USER __USER
+#endif /* !USER */
+
+#ifndef CHECKED
+#define CHECKED __CHECKED
+#endif /* !CHECKED */
 
 #endif /* !GUARD_LIBBUFFER_API_H */

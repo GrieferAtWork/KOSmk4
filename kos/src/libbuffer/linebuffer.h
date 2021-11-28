@@ -48,8 +48,8 @@ typedef ssize_t linebuffer_retval_t;
 INTDEF NONNULL((1, 2)) linebuffer_retval_t CC
 liblinebuffer_rewrite(struct linebuffer *__restrict self,
                       /*inherit(always)*/ struct linecapture *__restrict capture)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 
 /* Append up to `num_bytes' of data from `src' to the current  line.
  * If the line is too small to contain all data, wait until the line
@@ -60,9 +60,9 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTDEF NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_write(struct linebuffer *__restrict self,
-                    __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
+                    USER CHECKED void const *src, size_t num_bytes)
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 
 /* Similar to `linebuffer_write()',  but only  block if the  line was  full
  * the first time  the function  was called.  If the  linebuffer is  closed
@@ -71,9 +71,9 @@ liblinebuffer_write(struct linebuffer *__restrict self,
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTDEF NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_writesome(struct linebuffer *__restrict self,
-                        __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
+                        USER CHECKED void const *src, size_t num_bytes)
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT));
 
 /* Similar to `linebuffer_write()', but  never block before writing  data.
  * If the given buffer was full at the time of this function being called,
@@ -81,9 +81,9 @@ liblinebuffer_writesome(struct linebuffer *__restrict self,
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTDEF NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_write_nonblock(struct linebuffer *__restrict self,
-                             __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK));
+                             USER CHECKED void const *src, size_t num_bytes)
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK));
 
 
 DECL_END

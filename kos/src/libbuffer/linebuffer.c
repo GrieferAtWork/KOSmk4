@@ -108,8 +108,8 @@ linebuffer_waitfor(struct linebuffer *__restrict self) {
 INTERN NONNULL((1, 2)) linebuffer_retval_t CC
 liblinebuffer_rewrite(struct linebuffer *__restrict self,
                       /*inherit(always)*/ struct linecapture *__restrict capture)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
 	linebuffer_retval_t result;
 	if unlikely(!capture->lc_alloc)
 		return 0;
@@ -120,7 +120,7 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
 		          capture->lc_alloc);
 		RETHROW();
 	}
-	if likely(!self->lb_line.lc_alloc) {
+	if likely(self->lb_line.lc_alloc == 0) {
 		self->lb_line = *capture;
 		result        = capture->lc_size;
 		atomic_lock_release(&self->lb_lock);
@@ -147,9 +147,9 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTERN NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_write(struct linebuffer *__restrict self,
-                    __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
+                    USER CHECKED void const *src, size_t num_bytes)
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
 	linebuffer_retval_t temp, result = 0;
 #ifdef __KERNEL__
 	assert(!task_wasconnected());
@@ -214,9 +214,9 @@ done:
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTERN NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_writesome(struct linebuffer *__restrict self,
-                        __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
+                        USER CHECKED void const *src, size_t num_bytes)
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT)) {
 	linebuffer_retval_t result;
 #ifdef __KERNEL__
 	assert(!task_wasconnected());
@@ -263,9 +263,9 @@ again:
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
 INTERN NONNULL((1)) linebuffer_retval_t CC
 liblinebuffer_write_nonblock(struct linebuffer *__restrict self,
-                             __USER __CHECKED void const *src, size_t num_bytes)
-		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
-		              __THROWS(E_SEGFAULT, E_WOULDBLOCK)) {
+                             USER CHECKED void const *src, size_t num_bytes)
+		KERNEL_SELECT(THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
+		              THROWS(E_SEGFAULT, E_WOULDBLOCK)) {
 #ifdef __KERNEL__
 	size_t temp, result = 0;
 #endif /* !__KERNEL__ */
@@ -307,7 +307,7 @@ again_locked:
 #endif /* !__KERNEL__ */
 		if unlikely(new_size > limit)
 			new_size = limit;
-		assert(new_size > self->lb_line.lc_size);
+		assert(new_size >= self->lb_line.lc_size);
 #ifdef __KERNEL__
 		newline = heap_realloc_nx(&kernel_default_heap,
 		                          self->lb_line.lc_base,
@@ -350,7 +350,7 @@ again_locked:
 			atomic_lock_acquire(&self->lb_lock);
 			COMPILER_READ_BARRIER();
 			/* Check for race condition: Another thread expanded the buffer in
-			 * the mean time,  or the buffer  was closed/before more  limited. */
+			 * the mean time,  or the buffer  was closed/became more  limited. */
 			limit = ATOMIC_READ(self->lb_limt);
 			if likely(self->lb_line.lc_alloc < heapptr_getsiz(newline) && new_size <= limit) {
 				assert(self->lb_line.lc_size <= self->lb_line.lc_alloc);

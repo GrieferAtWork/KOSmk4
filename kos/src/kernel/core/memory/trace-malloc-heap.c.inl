@@ -522,7 +522,7 @@ done:
 
 
 
-PUBLIC heapptr_t
+PUBLIC WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_alloc)(struct heap *__restrict self,
                                       size_t num_bytes, gfp_t flags) {
 	heapptr_t result;
@@ -534,7 +534,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_alloc)(struct heap *__restrict self,
 }
 
 
-PUBLIC heapptr_t
+PUBLIC WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_align)(struct heap *__restrict self,
                                       size_t min_alignment, ptrdiff_t offset,
                                       size_t num_bytes, gfp_t flags) {
@@ -549,7 +549,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align)(struct heap *__restrict self,
 }
 
 
-PUBLIC heapptr_t
+PUBLIC WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
                                         size_t new_bytes, gfp_t alloc_flags,
@@ -638,7 +638,7 @@ err:
 	return heapptr_make(NULL, 0);
 }
 
-PUBLIC heapptr_t
+PUBLIC WUNUSED NONNULL((1)) heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
                                         size_t min_alignment, ptrdiff_t offset,

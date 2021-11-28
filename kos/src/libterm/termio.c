@@ -678,7 +678,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					goto done;
 				/* Clear the entire input */
 				linebuffer_capture(&self->t_canon, &capture);
-				RAII_FINALLY { linecapture_fini(&capture); };
+				RAII_FINALLY { linebuffer_release(&self->t_canon, &capture); };
 				if (lflag & ECHOKE) { /* Only echo when `ECHOKE' is set. */
 					/* Erase the entire input line. */
 					temp = libterminal_do_iwrite_erase(self,
@@ -757,7 +757,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 						capture.lc_size = new_size;
 					}
 				} EXCEPT {
-					linecapture_fini(&capture);
+					linebuffer_release(&self->t_canon, &capture);
 					RETHROW();
 				}
 				IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
@@ -794,7 +794,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					if unlikely(temp < 0)
 						goto err_capture;
 				} EXCEPT {
-					linecapture_fini(&capture);
+					linebuffer_release(&self->t_canon, &capture);
 					RETHROW();
 				}
 				IF_NOT_KERNEL(temp =) linebuffer_rewrite(&self->t_canon, &capture);
@@ -1309,7 +1309,7 @@ libterminal_flush_obuf(struct terminal *__restrict self,
 	ssize_t result;
 	struct linecapture cap;
 	linebuffer_capture(&self->t_opend, &cap);
-	RAII_FINALLY { linecapture_fini(&cap); };
+	RAII_FINALLY { linebuffer_release(&self->t_opend, &cap); };
 	result = libterminal_do_owrite_nostop_nobuf(self, cap.lc_base, cap.lc_size, mode, lflag);
 	return result;
 }
@@ -1320,7 +1320,7 @@ libterminal_flush_ibuf(struct terminal *__restrict self,
 	ssize_t result;
 	struct linecapture cap;
 	linebuffer_capture(&self->t_ipend, &cap);
-	RAII_FINALLY { linecapture_fini(&cap); };
+	RAII_FINALLY { linebuffer_release(&self->t_ipend, &cap); };
 	result = libterminal_do_iwrite(self, cap.lc_base, cap.lc_size, mode, iflag);
 	return result;
 }
