@@ -1374,6 +1374,22 @@ NOTHROW(KCALL gc_find_reachable_impl)(void) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");
 	gc_reachable_this_thread();
 
+#ifndef CONFIG_NO_SMP
+	PRINT_LEAKS_SEARCH_PHASE("Phase #2.2: Scan secondary CPU control structures\n");
+	/* The `struct cpu' of secondary CPUs is dynamically allocated, but not normally  traced.
+	 * This is especially important because `struct cpu' contains some inlined `struct mnode'
+	 * objects, which in turn must be considered reachable, as well as any other objects that
+	 * are only reachable by traversing the kernel mman's mnode-tree from that on forth. */
+	{
+		unsigned int i;
+		INTDEF byte_t __kernel_percpu_full_bytes[];
+		for (i = 1; i < cpu_count; ++i) {
+			struct cpu *c = cpu_vector[i];
+			gc_reachable_data(c, (size_t)__kernel_percpu_full_bytes);
+		}
+	}
+#endif /* !CONFIG_NO_SMP */
+
 	/*
 	 * NOTE: Technically speaking, we'd need to scan `mpart_all_list' at  this
 	 *       point, and do the same for `fallnodes_list' and `fallsuper_list'.
