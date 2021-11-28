@@ -415,16 +415,26 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	cli /* Disable interrupts to  prevent async-RPCs from  trying to redirect  the
 	     * iret, especially given how we're about to modify/re-write it ourselves! */
 
+	/* NOTE: The given `state' (%R_fcall0P) may represent one of 2 locations:
+	 *  #1: It may point to `x86_userexcept_sysret'
+	 *  #2: It may point into user-space. In this case, an IRET redirection
+	 *      might  have still  happened, and  left `state'  pointing at the
+	 *      original user-space state (as mirrored in this_x86_sysret_iret) */
+
 	/* Set `%Psp' such that it points at the correct IRET tail. */
 #ifdef __x86_64__
 	leaP   -SIZEOF_IRREGS64(%Pbp), %Psp
 #elif defined(__I386_NO_VM86)
 	leaP   -SIZEOF_IRREGS32_USER(%Pbp), %Psp
 #else /* ... */
+	movP   %segtls:this_x86_sysret_iret+OFFSET_IRREGS_PFLAGS, %Psi
+	movP   OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P), %Pdi
+	cmpP   $(x86_userexcept_sysret), OFFSET_UCPUSTATE_PIP(%R_fcall0P)
+	cmoveP %Psi, %Pdi /* %Pdi is the actual user-space %Pflags */
 	movP   $(-SIZEOF_IRREGS32_USER), %Pax
-	movP   $(-SIZEOF_IRREGS32_VM86), %Pdi
-	ttest  mask=EFLAGS_VM, loc=OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P)
-	cmovnzP %Pdi, %Pax /* if (ucpustate_isvm86(state)) %Pax = %Pdi */
+	movP   $(-SIZEOF_IRREGS32_VM86), %Psi
+	ttest  mask=EFLAGS_VM, loc=%Pdi
+	cmovnzP %Psi, %Pax /* if (%Pdi & EFLAGS_VM) %Pax = -SIZEOF_IRREGS32_VM86 */
 	leaP   (%Pbp,%Pax,1), %Psp
 #endif /* !... */
 
@@ -436,25 +446,12 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	/* Debug assertions. */
 #ifndef NDEBUG
 #define ASSERT_CC(cc) j##cc 991f; int3; 991:
-	cmpP   $(x86_userexcept_sysret), %segtls:OFFSET_IRREGS_PIP+this_x86_sysret_iret
+	cmpP   $(x86_userexcept_sysret), %segtls:this_x86_sysret_iret+OFFSET_IRREGS_PIP
 	ASSERT_CC(ne) /* assert(PERTASK_GET(this_x86_sysret_iret.ir_Pip) != (uintptr_t)&x86_userexcept_sysret); */
 	cmpP   $(0), OFFSET_IRREGS_PFLAGS(%Psp)
 	ASSERT_CC(e) /* assert(return_state->ics_irregs.ir_Pflags == 0); */
-	cmpP   $(0), OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P)
-	ASSERT_CC(e) /* assert(state->ucs_Pflags == 0); */
 	cmpw   $(SEGMENT_KERNEL_CODE), OFFSET_IRREGS_CS(%Psp)
 	ASSERT_CC(e) /* assert(SEGMENT_IS_VALID_KERNCODE(return_state->ics_irregs.ir_cs16)); */
-	cmpw   $(SEGMENT_KERNEL_CODE), OFFSET_UCPUSTATE_CS(%R_fcall0P)
-	ASSERT_CC(e) /* assert(SEGMENT_IS_VALID_KERNCODE(state->ucs_cs16)); */
-#ifdef __x86_64__
-	/* assert(state->ucs_gpregs.gp_rsp == return_state->ics_irregs.ir_rsp); */
-	movP   OFFSET_IRREGS_PSP(%Psp), %Pax
-#else /* __x86_64__ */
-	/* assert(state->ucs_gpregs.gp_esp == (u32)&return_state->ics_irregs_u.ir_esp); */
-	leaP   OFFSET_IRREGS_PSP(%Psp), %Pax
-#endif /* !__x86_64__ */
-	cmpP   %Pax, OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_PSP(%R_fcall0P)
-	ASSERT_CC(e)
 #undef ASSERT_CC
 #endif /* !NDEBUG */
 
@@ -472,13 +469,19 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	movP   %Pax, OFFSET_IRREGS_SS(%Psp)
 #else /* __x86_64__ */
 	/* Still initialized correctly:
-	 * >> return_state->ics_irregs_u.ir_ss  = return_state->ics_irregs_u.ir_ss16;
-	 * >> return_state->ics_irregs_u.ir_esp = return_state->ics_irregs_u.ir_esp; */
+	 * >> return_state->ics_irregs_u.ir_ss  = ...;
+	 * >> return_state->ics_irregs_u.ir_esp = ...; */
 #endif /* !__x86_64__ */
 	jmp    .Lfill_iret_done
 .Lfill_iret_from_state:
 	/* Copy from the caller-given `state' */
 	movP   OFFSET_UCPUSTATE_PIP(%R_fcall0P), %Pax
+#ifndef NDEBUG
+#define ASSERT_CC(cc) j##cc 991f; int3; 991:
+	cmpP   $(x86_userexcept_sysret), %Pax
+	ASSERT_CC(ne) /* assert(state->ucs_Pip != (uintptr_t)&x86_userexcept_sysret); */
+#undef ASSERT_CC
+#endif /* !NDEBUG */
 	movP   %Pax, OFFSET_IRREGS_PIP(%Psp)
 	movzwP OFFSET_UCPUSTATE_CS(%R_fcall0P), %Pax
 	movP   %Pax, OFFSET_IRREGS_CS(%Psp)
@@ -624,10 +627,10 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	 *
 	 * Note that this sort of wrapper should be implemented at the  lowest
 	 * possible level (iow: not in actual C code), and also note that this
-	 * only affects interrupt handles  capable of throwing exceptions,  as
+	 * only affects interrupt handlers capable of throwing exceptions,  as
 	 * well as performing blocking operations (iow: device interrupts  are
 	 * unaffected by this,  though any access  to lazily initialized  file
-	 * mappings, and as a consequence,  any user-space memory access  must
+	 * mappings, and as a consequence, any user-space memory access,  must
 	 * be considered as potentially blocking) */
 
 	movP   %Pax, %Psp

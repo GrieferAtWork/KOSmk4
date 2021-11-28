@@ -1165,18 +1165,28 @@ search_fde:
 		                         &unwind_setreg_kcpustate, state);
 	}
 
-	/* When unwinding to user-space, well get an error `UNWIND_INVALID_REGISTER' */
+	/* When unwinding to user-space, we'll get an error `UNWIND_INVALID_REGISTER' */
 	if (error == UNWIND_INVALID_REGISTER) {
 		struct ucpustate ustate;
 		unwind_cfa_sigframe_state_t sigframe_cfa;
+		pflag_t was;
 		kcpustate_to_ucpustate(&old_state, &ustate);
+
 		/* Assume that we're unwinding a signal frame when returning to user-space. */
 		error = unwind_fde_sigframe_exec(&fde, &sigframe_cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
+
+		/* Must disable preemption while applying register rules.
+		 * Otherwise,  another thread might  inject a sysret into
+		 * our thread while we're loading unwind registers, which
+		 * might lead to an inconsistent register state, such  as
+		 * a user-space PC with kernel-space CS, or the  reverse. */
+		was   = PREEMPTION_PUSHOFF();
 		error = unwind_cfa_sigframe_apply(&sigframe_cfa, &fde, pc,
 		                                  &unwind_getreg_kcpustate, &old_state,
 		                                  &unwind_setreg_ucpustate, &ustate);
+		PREEMPTION_POP(was);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
 		if (ucpustate_isuser(&ustate)) {
