@@ -52,6 +52,7 @@
 #include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/syslog.h>
+#include <sched/cpu.h>
 #include <sched/enum.h>
 #include <sched/pid.h>
 #include <sched/scheduler.h>
@@ -127,9 +128,9 @@ DECL_BEGIN
 #define TRACE_NODE_FLAG_ISRED  0x40 /* Reg flag. */
 
 
-#if ((GFP_NOLEAK >> 8) == TRACE_NODE_FLAG_NOLEAK && \
-     (GFP_NOWALK >> 8) == TRACE_NODE_FLAG_NOWALK)
-#define TRACE_NODE_FLAG_FROM_GFP(gfp) (((gfp) & (GFP_NOLEAK | GFP_NOWALK)) >> 8)
+#if ((GFP_NOLEAK >> 12) == TRACE_NODE_FLAG_NOLEAK && \
+     (GFP_NOWALK >> 12) == TRACE_NODE_FLAG_NOWALK)
+#define TRACE_NODE_FLAG_FROM_GFP(gfp) (((gfp) & (GFP_NOLEAK | GFP_NOWALK)) >> 12)
 #else /* ... */
 #define TRACE_NODE_FLAG_FROM_GFP(gfp)                    \
 	(((gfp) & GFP_NOLEAK ? TRACE_NODE_FLAG_NOLEAK : 0) | \
