@@ -32,6 +32,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cache.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/panic.h>
@@ -167,6 +168,54 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 		_slab_pool_reap(pool);
 	}
 }
+
+
+/************************************************************************/
+/* Cache clearing                                                       */
+/************************************************************************/
+
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_perslabpool)(struct slab_pool *__restrict self,
+                                     struct ccinfo *__restrict info) {
+	struct slab_slist freelist;
+	if (!slab_pool_tryacquire(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!slab_pool_acquire_nx(self))
+			return;
+	}
+
+	/* Steal all free slab pages. */
+	freelist = self->sp_free;
+	assert(!SLIST_EMPTY(&freelist) == (self->sp_count != 0));
+	SLIST_INIT(&self->sp_free);
+	self->sp_count = 0;
+	slab_pool_release(self);
+
+	/* Release all unused slab pages. */
+	while (!SLIST_EMPTY(&freelist)) {
+		struct slab *page;
+		page = SLIST_FIRST(&freelist);
+		SLIST_REMOVE_HEAD(&freelist, s_slink);
+		mman_unmap_kram(page, PAGESIZE, GFP_NORMAL);
+		ccinfo_account(info, PAGESIZE);
+	}
+}
+
+/* Free pre-allocated pages of slab memory. */
+INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_slab_prealloc)(struct ccinfo *__restrict info) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(slab_freepool); ++i) {
+		system_cc_perslabpool(&slab_freepool[i], info);
+		if (ccinfo_isdone(info))
+			break;
+	}
+}
+
+
+
+
 
 
 #define CORE_ALLOC_FLAGS                                                        \

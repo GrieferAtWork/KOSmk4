@@ -75,6 +75,8 @@ INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
                                            struct ccinfo *__restrict info);
 #endif /* CONFIG_HAVE_USERELF_MODULES */
+INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_slab_prealloc)(struct ccinfo *__restrict info);
 /*...*/
 
 
@@ -656,6 +658,7 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 #ifdef CONFIG_HAVE_USERELF_MODULES
 	DOCC(system_cc_rtld_fsfile(info));
 #endif /* CONFIG_HAVE_USERELF_MODULES */
+	DOCC(system_cc_slab_prealloc(info));
 	DOCC(system_cc_heaps(info));
 
 	/* TODO: There a couple more things we can do to free up physical memory:
