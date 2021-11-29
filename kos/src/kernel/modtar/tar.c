@@ -1097,9 +1097,9 @@ NOTHROW(KCALL tarsuper_v_free)(struct fnode *__restrict self) {
 	kfree(me);
 }
 
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
-                             struct ccinfo *__restrict cc) {
+                             struct ccinfo *__restrict info) {
 	size_t i;
 	struct tarfile_slist deadfiles;
 	struct tarsuper *me;
@@ -1107,7 +1107,7 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
 	me = container_of(mfile_assuper(self), struct tarsuper, ts_super);
 
 	if (!tarsuper_trywrite(me)) {
-		if (ccinfo_noblock(cc))
+		if (ccinfo_noblock(info))
 			return; /* Not allowed to block :( */
 		if (!tarsuper_write_nx(me))
 			return; /* Cannot acquire lock... */
@@ -1148,7 +1148,7 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
 			size_t new_usable = kmalloc_usable_size(me->ts_filev);
 			me->ts_filev = newlist;
 			assert(old_usable >= new_usable);
-			ccinfo_account(cc, old_usable - new_usable);
+			ccinfo_account(info, old_usable - new_usable);
 		}
 	}
 	tarsuper_endwrite(me);
@@ -1158,7 +1158,7 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
 		struct tarfile *tf;
 		tf = SLIST_FIRST(&deadfiles);
 		SLIST_REMOVE_HEAD(&deadfiles, _tf_dead);
-		ccinfo_account(cc, kmalloc_usable_size(tf));
+		ccinfo_account(info, kmalloc_usable_size(tf));
 		tarfile_destroy(tf);
 	}
 }

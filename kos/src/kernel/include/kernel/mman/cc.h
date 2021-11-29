@@ -67,7 +67,7 @@ DATDEF unsigned int system_cc_maxattempts;
  * @return: true:  At least something (may) have become available
  *                 since the last time you tried to clear caches.
  * @return: false: Nothing could be cleared :( */
-FUNDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) __BOOL
+FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) __BOOL
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info);
 
 

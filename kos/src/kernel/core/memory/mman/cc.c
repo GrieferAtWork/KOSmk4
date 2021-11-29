@@ -51,7 +51,7 @@
 
 DECL_BEGIN
 
-typedef NOBLOCK_IF(ccinfo_noblock(cc)) void
+typedef NOBLOCK_IF(ccinfo_noblock(info)) void
 /*NOTHROW*/ (KCALL *PSYSTEMCC)(struct ccinfo *__restrict info);
 
 #define DOCC(expr)               \
@@ -64,14 +64,14 @@ typedef NOBLOCK_IF(ccinfo_noblock(cc)) void
 
 
 /* Cache-clear functions from around the kernel core... */
-INTDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_async_aio_handles)(struct ccinfo *__restrict info);
-INTDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_module_section_cache)(struct ccinfo *__restrict info);
 #ifdef CONFIG_HAVE_USERELF_MODULES
-INTDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_rtld_fsfile)(struct ccinfo *__restrict info);
-INTDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
                                            struct ccinfo *__restrict info);
 #endif /* CONFIG_HAVE_USERELF_MODULES */
@@ -103,7 +103,7 @@ NOTHROW(FCALL system_cc_driver_fdecache)(struct driver *__restrict self,
 }
 
 /* Clear caches associated with a given driver. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_perdriver)(struct driver *__restrict self,
                                    struct ccinfo *__restrict info) {
 	PSYSTEMCC func;
@@ -116,7 +116,7 @@ NOTHROW(KCALL system_cc_perdriver)(struct driver *__restrict self,
 }
 
 /* Clear caches defined by drivers. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_drivers)(struct ccinfo *__restrict info) {
 	size_t i;
 	REF struct driver_loadlist *ll;
@@ -146,7 +146,7 @@ NOTHROW(KCALL system_cc_drivers)(struct ccinfo *__restrict info) {
 /************************************************************************/
 
 /* Clear per-mman caches. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_permman)(struct mman *__restrict self,
                                  struct ccinfo *__restrict info) {
 #ifdef CONFIG_HAVE_USERELF_MODULES
@@ -171,7 +171,7 @@ SLIST_HEAD(path_slist, path);
 #endif /* !__path_slist_defined */
 
 /* Clear VFS recently-used-paths cache. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_vfs_recent_paths)(struct vfs *__restrict self,
                                           struct ccinfo *__restrict info) {
 	struct path_slist deadpaths;
@@ -212,14 +212,14 @@ NOTHROW(FCALL system_cc_vfs_recent_paths)(struct vfs *__restrict self,
 }
 
 /* Clear per-vfs caches. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_pervfs)(struct vfs *__restrict self,
                                 struct ccinfo *__restrict info) {
 	DOCC(system_cc_vfs_recent_paths(self, info));
 }
 
 /* Clear per-fs caches. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_perfs)(struct fs *__restrict self,
                                struct ccinfo *__restrict info) {
 	DOCC(system_cc_pervfs(self->fs_vfs, info));
@@ -233,7 +233,7 @@ NOTHROW(FCALL system_cc_perfs)(struct fs *__restrict self,
 /************************************************************************/
 
 /* Clear per-thread caches. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
                                  struct ccinfo *__restrict info) {
 	/* Clear per-mman caches. */
@@ -280,7 +280,7 @@ NOTHROW(KCALL system_cc_pertask_cb)(void *arg,
 
 
 /* Enumerate threads and call `system_cc_pertask()'. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_threads)(struct ccinfo *__restrict info) {
 	if (ccinfo_noblock(info)) {
 		/* Not allowed to block -> can enumerate threads using the non-blocking method. */
@@ -308,7 +308,7 @@ NOTHROW(KCALL system_cc_threads)(struct ccinfo *__restrict info) {
 /************************************************************************/
 
 /* Trim the given heap. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_heap)(struct heap *__restrict self,
                               struct ccinfo *__restrict info) {
 	ccinfo_account(info, heap_trim(self, 0, info->ci_gfp));
@@ -320,7 +320,7 @@ INTDEF ATTR_WEAK struct heap trace_heap;
 
 
 /* Trim system heaps. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_heaps)(struct ccinfo *__restrict info) {
 	size_t i;
 	for (i = 0; i < __GFP_HEAPCOUNT; ++i)
@@ -339,7 +339,7 @@ NOTHROW(KCALL system_cc_heaps)(struct ccinfo *__restrict info) {
 /************************************************************************/
 
 /* Clear unreferenced (cached) mem-parts from the global part list. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_allparts_unload)(struct ccinfo *__restrict info) {
 	struct mpart *iter;
 	struct mpart_slist deadlist;
@@ -420,7 +420,7 @@ SLIST_HEAD(fnode_slist, fnode);
 #endif /* !__fnode_slist_defined */
 
 /* Clear unreferenced (cached) files nodes from the global file-node-list. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_allnodes_unload)(struct ccinfo *__restrict info) {
 	struct fnode *iter;
 	struct fnode_slist deadlist;
@@ -499,7 +499,7 @@ done:
 
 
 /* Invoke cache-clear callbacks for the given file-node. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_perfnode)(struct fnode *__restrict self,
                                   struct ccinfo *__restrict info) {
 	struct mfile_stream_ops const *ops;
@@ -510,7 +510,7 @@ NOTHROW(KCALL system_cc_perfnode)(struct fnode *__restrict self,
 
 
 /* Invoke cache-clear callbacks for all file-nodes. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
 	REF struct fnode *node;
 	REF struct fnode *prev = NULL;
@@ -570,7 +570,7 @@ NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
 
 
 /* Invoke cache-clear callbacks for the given superblock. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_persuper)(struct fsuper *__restrict self,
                                   struct ccinfo *__restrict info) {
 	system_cc_perfnode(&self->fs_root, info);
@@ -578,7 +578,7 @@ NOTHROW(KCALL system_cc_persuper)(struct fsuper *__restrict self,
 
 
 /* Invoke cache-clear callbacks for all superblocks. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 	REF struct fsuper *super;
 	REF struct fsuper *prev = NULL;
@@ -641,7 +641,7 @@ NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 
 
 /* Clear all system caches according to `info'. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	DOCC(system_cc_drivers(info));               /* Invoke clear-cache operators from drivers */
 	DOCC(system_cc_threads(info));               /* Clear caches relating to per-thread fields */
@@ -702,7 +702,7 @@ PUBLIC ATTR_READMOSTLY unsigned int system_cc_maxattempts = 64;
  * @return: true:  At least something (may) have become available
  *                 since the last time you tried to clear caches.
  * @return: false: Nothing could be cleared :( */
-PUBLIC NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) bool
+PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) bool
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	unsigned int version;
 	uintptr_t inside;

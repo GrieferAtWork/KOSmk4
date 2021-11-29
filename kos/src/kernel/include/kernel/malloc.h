@@ -384,8 +384,8 @@ FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL
 kmalloc_trace(void *base, size_t num_bytes, gfp_t gfp, unsigned int tb_skip DFL(0))
 	THROWS(E_BADALLOC, E_WOULDBLOCK);
 
-/* Same as `kmalloc_trace()', but don't throw an exception. If the operation fails,
- * rather  than   re-returning   `base',   `NULL'   will   be   returned   instead. */
+/* Same as `kmalloc_trace()', but don't throw an exception. If the operation
+ * fails, rather than re-returning `base', `NULL' will be returned  instead. */
 FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
 NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
                                 gfp_t gfp, unsigned int tb_skip DFL(0));
@@ -517,7 +517,7 @@ DECL_END
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss")
 #endif /* !CONFIG_TRACE_MALLOC */
 
-/* Memory leak release modes. (for use with `kmalloc_leaks_release()') */
+/* Memory leak release modes. (For use with `kmalloc_leaks_release()') */
 #define KMALLOC_LEAKS_RELEASE_RESTORE 0 /* Restore leaks; future calls to `kmalloc_leaks_collect()' will re-yield them. */
 #define KMALLOC_LEAKS_RELEASE_DISCARD 1 /* Discard leaks but don't free leaked memory. */
 #define KMALLOC_LEAKS_RELEASE_FREE    2 /* Discard leaks and free leaked memory. (Only possible for `kmalloc()'; not possible for `heap_alloc()') */

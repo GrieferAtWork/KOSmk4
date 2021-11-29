@@ -324,16 +324,16 @@ struct mfile_stream_ops {
 	/* [0..1] Clear internal object caches.
 	 * Generally speaking, locking done by this function should locks like:
 	 * >> if (!mylock_tryacquire(self)) {
-	 * >>     if (ccinfo_noblock(cc))
+	 * >>     if (ccinfo_noblock(info))
 	 * >>         return 0; // Not allowed to block :(
 	 * >>     if (!mylock_acquire_nx(self))
 	 * >>         return 0; // Cannot acquire lock...
 	 * >> }
 	 * >> ...
 	 * >> mylock_release(self); */
-	NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *mso_cc)(struct mfile *__restrict self,
-	                            struct ccinfo *__restrict cc);
+	                            struct ccinfo *__restrict info);
 };
 
 /* Default ioctl(2) operator for mfiles. Implements:
