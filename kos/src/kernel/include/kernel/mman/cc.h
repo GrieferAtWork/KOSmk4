@@ -71,6 +71,22 @@ FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) __BOOL
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info);
 
 
+/************************************************************************/
+/* Helper functions to clear the caches of known objects.               */
+/************************************************************************/
+struct ringbuffer;
+struct linebuffer;
+
+/* Free unused space from `self'. */
+FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_ringbuffer)(struct ringbuffer *__restrict self,
+                                    struct ccinfo *__restrict info);
+
+/* Free unused space from `self'. */
+FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_linebuffer)(struct linebuffer *__restrict self,
+                                    struct ccinfo *__restrict info);
+
 
 DECL_END
 #endif /* __CC__ */

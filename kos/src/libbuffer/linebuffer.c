@@ -114,7 +114,7 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
 	if unlikely(!capture->lc_alloc)
 		return 0;
 	TRY {
-		atomic_lock_acquire(&self->lb_lock);
+		linebuffer_lock_acquire(self);
 	} EXCEPT {
 		HEAP_FREE(capture->lc_base,
 		          capture->lc_alloc);
@@ -123,9 +123,9 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
 	if likely(self->lb_line.lc_alloc == 0) {
 		self->lb_line = *capture;
 		result        = capture->lc_size;
-		atomic_lock_release(&self->lb_lock);
+		linebuffer_lock_release(self);
 	} else {
-		atomic_lock_release(&self->lb_lock);
+		linebuffer_lock_release(self);
 		RAII_FINALLY {
 			HEAP_FREE(capture->lc_base,
 			          capture->lc_alloc);
@@ -271,14 +271,14 @@ liblinebuffer_write_nonblock(struct linebuffer *__restrict self,
 #endif /* !__KERNEL__ */
 	size_t maxwrite, limit;
 again:
-	atomic_lock_acquire(&self->lb_lock);
+	linebuffer_lock_acquire(self);
 #ifdef __KERNEL__
 	assert(result <= num_bytes);
 again_locked:
 #endif /* __KERNEL__ */
 	limit = ATOMIC_READ(self->lb_limt);
 	if unlikely(self->lb_line.lc_size >= limit) {
-		atomic_lock_release(&self->lb_lock);
+		linebuffer_lock_release(self);
 		return 0; /* Cannot write anything now... */
 	}
 	assert(self->lb_line.lc_alloc >= self->lb_line.lc_size);
@@ -334,7 +334,7 @@ again_locked:
 			size_t oldline_siz;
 #endif /* __KERNEL__ */
 			/* Need to release the line-lock to allocate a new buffer. */
-			atomic_lock_release(&self->lb_lock);
+			linebuffer_lock_release(self);
 #ifdef __KERNEL__
 			newline = heap_alloc(&kernel_default_heap,
 			                     new_size,
@@ -347,7 +347,7 @@ again_locked:
 #ifdef __KERNEL__
 			oldline_siz = heapptr_getsiz(newline);
 #endif /* __KERNEL__ */
-			atomic_lock_acquire(&self->lb_lock);
+			linebuffer_lock_acquire(self);
 			COMPILER_READ_BARRIER();
 			/* Check for race condition: Another thread expanded the buffer in
 			 * the mean time,  or the buffer  was closed/became more  limited. */
@@ -362,7 +362,7 @@ again_locked:
 				self->lb_line.lc_base  = (byte_t *)heapptr_getptr(newline);
 				self->lb_line.lc_alloc = heapptr_getsiz(newline);
 			}
-			atomic_lock_release(&self->lb_lock);
+			linebuffer_lock_release(self);
 			/* We could keep our lock to `lb_lock' here, but it's better to
 			 * only  ever be holding atomic locks for as short as possible. */
 			HEAP_FREE(oldline_ptr, oldline_siz);
@@ -388,12 +388,12 @@ again_locked:
 		maxwrite -= temp;
 		result += maxwrite;
 		assert(result <= num_bytes);
-		atomic_lock_release(&self->lb_lock);
+		linebuffer_lock_release(self);
 		/* Need to copy a single byte from the user-buffer. */
 		COMPILER_READ_BARRIER();
 		next_byte = ((byte_t const *)src)[result];
 		COMPILER_READ_BARRIER();
-		atomic_lock_acquire(&self->lb_lock);
+		linebuffer_lock_acquire(self);
 		COMPILER_READ_BARRIER();
 		if likely(self->lb_line.lc_size < self->lb_line.lc_alloc) {
 			self->lb_line.lc_base[self->lb_line.lc_size] = next_byte;
@@ -413,7 +413,7 @@ again_locked:
 	self->lb_line.lc_size += maxwrite;
 	assert(self->lb_line.lc_size <= self->lb_line.lc_alloc);
 /*done:*/
-	atomic_lock_release(&self->lb_lock);
+	linebuffer_lock_release(self);
 #ifdef __KERNEL__
 	assert(result <= num_bytes);
 	return result;

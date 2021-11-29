@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.removeif([](x) -> x.startswith("-O")))
+	gcc_opt.append("-Os"); // Optimize this file for size
+]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +28,15 @@
 #define __WANT_MPART__mp_dead
 #define __WANT_MFILE__mf_deadnod
 #define __WANT_PATH__p_dead
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
+#include <dev/pty.h>
+#include <dev/tty.h>
 #include <kernel/driver.h>
 #include <kernel/fs/allnodes.h>
+#include <kernel/fs/fifonode.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
@@ -45,6 +54,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 /**/
 #include "module-userelf.h" /* CONFIG_HAVE_USERELF_MODULES */
@@ -500,6 +510,111 @@ done:
 }
 
 
+/* Free unused space from `self'. */
+PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_ringbuffer)(struct ringbuffer *__restrict self,
+                                    struct ccinfo *__restrict info) {
+	if (!ringbuffer_lock_trywrite(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!ringbuffer_lock_write_nx(self))
+			return;
+	}
+	if (self->rb_avail < self->rb_size) {
+		if (self->rb_avail != 0) {
+			heapptr_t newbuf;
+			/* If necessary, defragment the buffer. */
+			if (self->rb_rptr) {
+				do {
+					/* Shift buffer space so that all  data is stored at the  start,
+					 * which in turn will allow us to realloc the buffer as a whole. */
+					byte_t temp;
+					temp = self->rb_data[0];
+					memmovedown(self->rb_data,
+					            self->rb_data + 1,
+					            self->rb_size - 1);
+					self->rb_data[self->rb_size - 1] = temp;
+					--self->rb_rptr;
+				} while (self->rb_rptr);
+			}
+			self->rb_rdtot = 0;
+
+			/* Resize the buffer. */
+			newbuf = heap_realloc_nx(&kernel_default_heap,
+			                          self->rb_data,
+			                          self->rb_size,
+			                          self->rb_avail,
+			                          GFP_ATOMIC | info->ci_gfp,
+			                          GFP_NORMAL);
+			if likely(heapptr_getsiz(newbuf) != 0) {
+				assert(heapptr_getsiz(newbuf) >= self->rb_avail);
+				if (self->rb_size > heapptr_getsiz(newbuf))
+					ccinfo_account(info, self->rb_size - heapptr_getsiz(newbuf));
+				self->rb_data = (byte_t *)heapptr_getptr(newbuf);
+				self->rb_size = heapptr_getsiz(newbuf);
+			}
+		} else /*if (self->rb_size != 0)*/ {
+			byte_t *buf_data;
+			size_t buf_size;
+			/* Free an unused buffer */
+			buf_data       = self->rb_data;
+			buf_size       = self->rb_size;
+			self->rb_data  = NULL;
+			self->rb_size  = 0;
+			self->rb_rptr  = 0;
+			self->rb_rdtot = 0;
+			ringbuffer_lock_endwrite(self);
+
+			/* free the buffer as a whole. */
+			heap_free(&kernel_default_heap, buf_data, buf_size, GFP_NORMAL);
+			ccinfo_account(info, buf_size);
+			return;
+		}
+	}
+	ringbuffer_lock_endwrite(self);
+}
+
+/* Free unused space from `self'. */
+PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_linebuffer)(struct linebuffer *__restrict self,
+                                    struct ccinfo *__restrict info) {
+	if (!linebuffer_lock_tryacquire(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!linebuffer_lock_acquire_nx(self))
+			return;
+	}
+	if (self->lb_line.lc_size == 0) {
+		struct linecapture oldline;
+		oldline                = self->lb_line;
+		self->lb_line.lc_base  = NULL;
+		self->lb_line.lc_alloc = 0;
+		linebuffer_lock_release(self);
+		if (oldline.lc_alloc != 0) {
+			ccinfo_account(info, oldline.lc_alloc);
+			linecapture_fini(&oldline);
+		}
+		return;
+	} else if (self->lb_line.lc_size < self->lb_line.lc_alloc) {
+		heapptr_t newline;
+		/* Truncate buffer. */
+		newline = heap_realloc_nx(&kernel_default_heap,
+		                          self->lb_line.lc_base,
+		                          self->lb_line.lc_alloc,
+		                          self->lb_line.lc_size,
+		                          GFP_ATOMIC | info->ci_gfp,
+		                          GFP_NORMAL);
+		if (heapptr_getsiz(newline) != 0) {
+			if (self->lb_line.lc_alloc > heapptr_getsiz(newline))
+				ccinfo_account(info, self->lb_line.lc_alloc - heapptr_getsiz(newline));
+			self->lb_line.lc_base  = (byte_t *)heapptr_getptr(newline);
+			self->lb_line.lc_alloc = heapptr_getsiz(newline);
+		}
+	}
+	linebuffer_lock_release(self);
+}
+
+
 /* Invoke cache-clear callbacks for the given file-node. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_perfnode)(struct fnode *__restrict self,
@@ -507,7 +622,23 @@ NOTHROW(KCALL system_cc_perfnode)(struct fnode *__restrict self,
 	struct mfile_stream_ops const *ops;
 	ops = self->mf_ops->mo_stream;
 	if (ops && ops->mso_cc)
-		(*ops->mso_cc)(self, info);
+		DOCC((*ops->mso_cc)(self, info));
+	if (fnode_isfifo(self)) {
+		/* In this case, we can clear  */
+		struct ffifonode *me = fnode_asfifo(self);
+		DOCC(system_cc_ringbuffer(&me->ff_buffer, info));
+	}
+	if (fnode_istty(self)) {
+		struct ttydev *me = fnode_astty(self);
+		DOCC(system_cc_ringbuffer(&me->t_term.t_ibuf, info));
+		DOCC(system_cc_linebuffer(&me->t_term.t_canon, info));
+		DOCC(system_cc_linebuffer(&me->t_term.t_opend, info));
+		DOCC(system_cc_linebuffer(&me->t_term.t_ipend, info));
+		if (ttydev_isptyslave(me)) {
+			struct ptyslave *ps = ttydev_asptyslave(me);
+			DOCC(system_cc_ringbuffer(&ps->ps_obuf, info));
+		}
+	}
 }
 
 
@@ -661,13 +792,16 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	DOCC(system_cc_slab_prealloc(info));
 	DOCC(system_cc_heaps(info));
 
+	/* TODO: Clear unused buffer space from every HANDLE_TYPE_PIPE(|_READER|_WRITER)
+	 *       - Find these by enumerating thread->handles */
+
 	/* TODO: There a couple more things we can do to free up physical memory:
 	 *  - We're  already unloading cached files and file-parts, but we can even
 	 *    unload file parts that are currently in use (so-long as they  haven't
 	 *    been modified). This can be done by changing a loaded, but unmodified
 	 *    mpart back to MPART_ST_VOID
-	 *  - We can also do `pagedir_unmap_userspace()' for every user-space mman
-	 *    out there, and mappings re-populate themselves upon the next access.
+	 *  - We can  also do  `pagedir_unmap_userspace()' for  every user-space  mman
+	 *    out there, and let mappings re-populate themselves upon the next access.
 	 */
 
 	if (!(info->ci_gfp & GFP_NOSWAP)) {

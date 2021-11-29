@@ -120,6 +120,21 @@ struct linebuffer {
 	 linecapture_fini(&(self)->lb_line))
 
 
+/* Helper macros for `struct linebuffer::lb_lock' */
+#define _linebuffer_lock_reap(self)      (void)0
+#define linebuffer_lock_reap(self)       (void)0
+#define linebuffer_lock_mustreap(self)   0
+#define linebuffer_lock_tryacquire(self) atomic_lock_tryacquire(&(self)->lb_lock)
+#define linebuffer_lock_acquire(self)    atomic_lock_acquire(&(self)->lb_lock)
+#define linebuffer_lock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->lb_lock)
+#define _linebuffer_lock_release(self)   atomic_lock_release(&(self)->lb_lock)
+#define linebuffer_lock_release(self)    (atomic_lock_release(&(self)->lb_lock), linebuffer_lock_reap(self))
+#define linebuffer_lock_acquired(self)   atomic_lock_acquired(&(self)->lb_lock)
+#define linebuffer_lock_available(self)  atomic_lock_available(&(self)->lb_lock)
+#define linebuffer_lock_waitfor(self)    atomic_lock_waitfor(&(self)->lb_lock)
+#define linebuffer_lock_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->lb_lock)
+
+
 /* Poll for writing to become possible. */
 #define linebuffer_canwrite(self)                                      \
 	(__hybrid_atomic_load((self)->lb_line.lc_size, __ATOMIC_ACQUIRE) < \
@@ -271,14 +286,14 @@ __LOCAL __ATTR_NONNULL((1, 2)) void
                                   struct linecapture *__restrict __capture)
 		__THROWS(E_WOULDBLOCK) {
 	__BOOL __was_full;
-	atomic_lock_acquire(&__self->lb_lock);
+	linebuffer_lock_acquire(__self);
 	*__capture = __self->lb_line;
 	__hybrid_assert(__self->lb_line.lc_size <= __self->lb_line.lc_alloc);
 	__was_full = __self->lb_line.lc_size >= __self->lb_line.lc_alloc;
 	__self->lb_line.lc_base  = __NULLPTR;
 	__self->lb_line.lc_alloc = 0;
 	__self->lb_line.lc_size  = 0;
-	atomic_lock_release(&__self->lb_lock);
+	linebuffer_lock_release(__self);
 	if (__was_full)
 		sched_signal_broadcast(&__self->lb_nful);
 }
@@ -288,7 +303,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW(LIBBUFFER_CC linebuffer_capture_nx)(struct linebuffer *__restrict __self,
                                               struct linecapture *__restrict __capture) {
 	__BOOL __was_full;
-	if (!atomic_lock_acquire_nx(&__self->lb_lock))
+	if (!linebuffer_lock_acquire_nx(__self))
 		return 0;
 	*__capture = __self->lb_line;
 	__hybrid_assert(__self->lb_line.lc_size <= __self->lb_line.lc_alloc);
@@ -296,7 +311,7 @@ __NOTHROW(LIBBUFFER_CC linebuffer_capture_nx)(struct linebuffer *__restrict __se
 	__self->lb_line.lc_base  = __NULLPTR;
 	__self->lb_line.lc_alloc = 0;
 	__self->lb_line.lc_size  = 0;
-	atomic_lock_release(&__self->lb_lock);
+	linebuffer_lock_release(__self);
 	if (__was_full)
 		sched_signal_broadcast(&__self->lb_nful);
 	return 1;
@@ -307,7 +322,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW(LIBBUFFER_CC linebuffer_trycapture)(struct linebuffer *__restrict __self,
                                               struct linecapture *__restrict __capture) {
 	__BOOL __was_full;
-	if (!atomic_lock_tryacquire(&__self->lb_lock))
+	if (!linebuffer_lock_tryacquire(__self))
 		return 0;
 	*__capture = __self->lb_line;
 	__hybrid_assert(__self->lb_line.lc_size <= __self->lb_line.lc_alloc);
@@ -315,7 +330,7 @@ __NOTHROW(LIBBUFFER_CC linebuffer_trycapture)(struct linebuffer *__restrict __se
 	__self->lb_line.lc_base  = __NULLPTR;
 	__self->lb_line.lc_alloc = 0;
 	__self->lb_line.lc_size  = 0;
-	atomic_lock_release(&__self->lb_lock);
+	linebuffer_lock_release(__self);
 	if (__was_full)
 		sched_signal_broadcast(&__self->lb_nful);
 	return 1;
@@ -324,16 +339,16 @@ __NOTHROW(LIBBUFFER_CC linebuffer_trycapture)(struct linebuffer *__restrict __se
 __LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW(LIBBUFFER_CC linebuffer_release)(struct linebuffer *__restrict __self,
                                            struct linecapture const *__restrict __capture) {
-	if (atomic_lock_tryacquire(&__self->lb_lock)) {
+	if (linebuffer_lock_tryacquire(__self)) {
 		__COMPILER_READ_BARRIER();
 		if __unlikely(__self->lb_line.lc_alloc != 0) {
-			atomic_lock_release(&__self->lb_lock);
+			linebuffer_lock_release(__self);
 			goto __free_capture;
 		}
 		__hybrid_assert(__self->lb_line.lc_size == 0);
 		__self->lb_line.lc_base  = __capture->lc_base;
 		__self->lb_line.lc_alloc = __capture->lc_alloc;
-		atomic_lock_release(&__self->lb_lock);
+		linebuffer_lock_release(__self);
 	} else {
 __free_capture:
 		linecapture_fini(__capture);

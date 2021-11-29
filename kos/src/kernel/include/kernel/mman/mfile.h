@@ -669,9 +669,9 @@ struct mfile_ops {
 #if defined(__WANT_MFILE__mf_fsuperlop) || defined(__WANT_MFILE__mf_fsuperplop)
 struct fsuper;
 #endif /* __WANT_MFILE__mf_fsuperlop || __WANT_MFILE__mf_fsuperplop */
-#ifdef __WANT_MFILE__mf_delfnodes
+#if defined(__WANT_MFILE__mf_delfnodes) || defined(__WANT_MFILE__mf_deadnod)
 struct fnode;
-#endif /* __WANT_MFILE__mf_delfnodes */
+#endif /* __WANT_MFILE__mf_delfnodes || __WANT_MFILE__mf_deadnod */
 
 
 struct mfile {
