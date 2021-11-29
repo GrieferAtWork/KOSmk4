@@ -518,7 +518,9 @@ struct mfile_ops {
 	 * to wait for all of  the operations to complete, whilst  allowing hardware to perform  all
 	 * of the read/write operations (potentially) in parallel! */
 
-	/* [0..1] Load/initialize the given physical memory buffer (this is the read-from-disk callback)
+	/* [0..1][if(!mfile_isanon(self), [1..1])]
+	 * Load/initialize the given physical memory buffer (this is the read-from-disk callback)
+	 * This operator _must_ be  implementd for files that  aren't anonymous from the  get-go!
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
@@ -535,7 +537,8 @@ struct mfile_ops {
 	                       physaddr_t buf, size_t num_bytes,
 	                       struct aio_multihandle *__restrict aio);
 
-	/* [0..1] Save/write-back the given physical memory buffer (this is the write-to-disk callback)
+	/* [0..1]
+	 * Save/write-back the given physical memory buffer (this is the write-to-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
