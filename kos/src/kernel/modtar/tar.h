@@ -22,6 +22,24 @@
 
 /*
  * Filesystem driver for mounting `*.tar'-files as (read-only) superblocks
+ *
+ * NOTE:
+ *  - Because tar makes directories optional,  and because this driver  does
+ *    not wish to have to  scan an entire archive  in order to determine  if
+ *    an explicit header  exists for some  given directory, descriptors  for
+ *    directories are only recognized/used if they appear _before_ the first
+ *    file which is then stored within.
+ *  - To facilitate INode numbers in tar filesystems, we use the absolute
+ *    on-disk address  of  the  end of  the  associated  `struct tarhdr'.
+ *  - For implicit directories (which don't have a `struct tarhdr'), we  instead
+ *    use the INode number of the first file who's filename makes an implication
+ *    to  the existence  of the directory.  Then, the length  of the directory's
+ *    absolute (within the filesystem) filename is added to this number. Because
+ *    filenames (and in turn: directories) cannot be longer than 255 characters,
+ *    which  is less than  the 512 different ino-values  available for each real
+ *    `struct tarhdr',  this results in  a unique INode  number values for every
+ *    possible implicit directory. And because  we always use the first  on-disk
+ *    header that makes mention of the directory, it is also consistent.
  */
 
 #include <kernel/compiler.h>
@@ -84,7 +102,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct tarfile, tf_refcnt, tarfile_destroy)
 
 /* Return the inode number of this file for the purpose of a leading directory
  * @param: len: The # of characters before the trailing '/' of the leading directory.
- * NOTE: To guaranty the uniqueness of inode numbers of implicit directories, this
+ * NOTE: To  guaranty the uniqueness  of inode numbers  of implicit directories, this
  *       function may only be used on the tarfile with the lowest `tf_pos' who's name
  *       matches the `len' leading characters of the relevant directory. */
 #define tarfile_getdirino(self, len) ((ino_t)(self)->tf_pos + (len))

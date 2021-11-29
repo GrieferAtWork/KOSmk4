@@ -1799,7 +1799,6 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 		TAILQ_INSERT_HEAD(&result->ts_bypos, firstfile, tf_bypos);
 	}
 
-
 	/* Initialize the superblock. */
 	result->ts_super.fs_root.mf_ops               = &tarsuper_ops.so_fdir.dno_node.no_file;
 	result->ts_super.fs_root.mf_parts             = MFILE_PARTS_ANONYMOUS;

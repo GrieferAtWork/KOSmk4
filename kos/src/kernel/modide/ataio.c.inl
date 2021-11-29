@@ -219,6 +219,16 @@ LOCAL_AtaDrive_IO(struct mfile *__restrict self, pos_t addr,
 	num_sectors = num_bytes >> AtaDrive_GetSectorShift(me);
 	assertf(num_sectors != 0, "Specs say num_bytes != 0, and w/ alignment this means this should never happen");
 
+	/* Assert that I/O is in-bounds */
+	assertf(lba + num_sectors > lba &&
+	        lba + num_sectors <= me->ad_sector_count,
+	        "lba                 = %" PRIu64 "\n"
+	        "num_sectors         = %" PRIuSIZ "\n"
+	        "lba+num_sectors     = %" PRIu64 "\n"
+	        "me->ad_sector_count = %" PRIu64 "\n",
+	        lba, num_sectors, lba + num_sectors,
+	        me->ad_sector_count);
+
 #if 0
 	if unlikely(!PREEMPTION_ENABLED()) {
 		/* TODO: Perform I/O without use of interrupts
