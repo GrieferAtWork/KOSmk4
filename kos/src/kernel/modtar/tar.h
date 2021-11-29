@@ -28,7 +28,7 @@
  *    not wish to have to  scan an entire archive  in order to determine  if
  *    an explicit header  exists for some  given directory, descriptors  for
  *    directories are only recognized/used if they appear _before_ the first
- *    file which is then stored within.
+ *    file which is then (possibly recursively) stored within.
  *  - To facilitate INode numbers in tar filesystems, we use the absolute
  *    on-disk address  of  the  end of  the  associated  `struct tarhdr'.
  *  - For implicit directories (which don't have a `struct tarhdr'), we  instead
@@ -37,7 +37,7 @@
  *    absolute (within the filesystem) filename is added to this number. Because
  *    filenames (and in turn: directories) cannot be longer than 255 characters,
  *    which  is less than  the 512 different ino-values  available for each real
- *    `struct tarhdr',  this results in  a unique INode  number values for every
+ *    `struct tarhdr', this results  in a  unique INode number  value for  every
  *    possible implicit directory. And because  we always use the first  on-disk
  *    header that makes mention of the directory, it is also consistent.
  */
@@ -89,13 +89,13 @@ struct tarfile {
 DEFINE_REFCOUNT_FUNCTIONS(struct tarfile, tf_refcnt, tarfile_destroy)
 
 /* Accessors for hidden fields. */
-#define __tarfile_hidden(self)       (strend((self)->tf_name) + 1)
-#define tarfile_getdevno(self)       ((dev_t)(*(uint32_t const *)CEIL_ALIGN((uintptr_t)__tarfile_hidden(self), 4)))
-#define tarfile_getlnkstr(self)      ((char const *)__tarfile_hidden(self))
-#define tarfile_gethrdstr(self)      ((char const *)__tarfile_hidden(self))
-#define tarfile_getnexthdr(self)     ((self)->tf_pos + CEIL_ALIGN((self)->tf_size, TBLOCKSIZE))
-#define tarfile_gethpos(self)        ((self)->tf_pos - TBLOCKSIZE)
-#define tarfile_getdpos(self)        ((self)->tf_pos)
+#define __tarfile_hidden(self)   (strend((self)->tf_name) + 1)
+#define tarfile_getdevno(self)   ((dev_t)(*(uint32_t const *)CEIL_ALIGN((uintptr_t)__tarfile_hidden(self), 4)))
+#define tarfile_getlnkstr(self)  ((char const *)__tarfile_hidden(self))
+#define tarfile_gethrdstr(self)  ((char const *)__tarfile_hidden(self))
+#define tarfile_getnexthdr(self) ((self)->tf_pos + CEIL_ALIGN((self)->tf_size, TBLOCKSIZE))
+#define tarfile_gethpos(self)    ((self)->tf_pos - TBLOCKSIZE)
+#define tarfile_getdpos(self)    ((self)->tf_pos)
 
 /* Return the inode number of this file */
 #define tarfile_getino(self) ((ino_t)(self)->tf_pos)

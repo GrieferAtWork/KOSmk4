@@ -845,7 +845,22 @@ again:
 				if ((tf->tf_name[prefix_len] == '\0' ||
 				     tf->tf_name[prefix_len] == '/') &&
 				    tarfile_gethpos(tf) < tarfile_gethpos(result)) {
-					/* This file would have already enumerated this directory! */
+					/* This file would have already enumerated this directory!
+					 * To more quickly reduce the effective on-disk ranges, we
+					 * skip all adjacent on-disk files that would also match
+					 * the given prefix. */
+skip_already_enumerated_directory:
+					for (;;) {
+						struct tarfile *next;
+						next = TAILQ_NEXT(result, tf_bypos);
+						if (!next)
+							break;
+						if (memcmp(next->tf_name, result->tf_name, prefix_len * sizeof(char)) != 0 ||
+						    (next->tf_name[prefix_len] != '\0' && next->tf_name[prefix_len] != '/'))
+							break; /* Part of different sub-tree */
+						tarsuper_serve_or_unlock(super);
+						result = next;
+					}
 					*p_pos = tarfile_getnexthdr(result);
 					goto again;
 				}
@@ -860,11 +875,8 @@ again:
 				tarsuper_serve_or_unlock(super);
 				if ((tf->tf_name[prefix_len] == '\0' ||
 				     tf->tf_name[prefix_len] == '/') &&
-				    tarfile_gethpos(tf) < tarfile_gethpos(result)) {
-					/* This file would have already enumerated this directory! */
-					*p_pos = tarfile_getnexthdr(result);
-					goto again;
-				}
+				    tarfile_gethpos(tf) < tarfile_gethpos(result))
+					goto skip_already_enumerated_directory;
 			}
 		}
 		/* No  other  file  exists  at  a  lower  position  that  has  the  same   prefix.
