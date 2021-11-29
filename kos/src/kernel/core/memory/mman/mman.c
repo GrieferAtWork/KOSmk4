@@ -32,7 +32,6 @@
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mnode.h>
-#include <kernel/printk.h>
 #include <kernel/paging.h>
 #include <sched/arch/userkern.h>
 #include <sched/cpu.h>
@@ -182,7 +181,6 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct mman *KCALL _mman_alloc(void) {
 /* Memory manager reference counting control. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_free)(struct mman *__restrict self) {
-	printk(KERN_DEBUG "_mman_free(%p)\n", self);
 	_mman_free(self);
 }
 
@@ -247,7 +245,6 @@ PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
 mman_new(void) THROWS(E_BADALLOC) {
 	REF struct mman *result;
 	result = _mman_alloc();
-	printk(KERN_DEBUG "_mman_alloc() -> %p\n", result);
 
 	/* Copy the PER-VM initialization template. */
 	memcpy((byte_t *)result + PAGEDIR_SIZE, __kernel_permman_start,
