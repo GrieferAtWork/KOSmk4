@@ -64,18 +64,18 @@ DECL_BEGIN
  * Additionally, driver commandline arguments can be accessed
  * via custom-named symbols:
  *
- *   - char   dbg_arg$foo$s$bar[];        // == EXISTS("foo=$value") ? "$value" : "bar"
- *   - byte_t dbg_arg$foo$x$00000000[4];  // == EXISTS("foo=$value") ? tohex("$value") : tohex("00000000")
- *   - bool   dbg_arg$foo;                // == EXISTS("foo=$value") ? true : false
- *   - int    dbg_arg$foo$d$42;           // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
- *   - u32    dbg_arg$foo$I32u$42;        // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
+ *   - char   drv_arg$foo$s$bar[];        // == EXISTS("foo=$value") ? "$value" : "bar"
+ *   - byte_t drv_arg$foo$x$00000000[4];  // == EXISTS("foo=$value") ? tohex("$value") : tohex("00000000")
+ *   - bool   drv_arg$foo;                // == EXISTS("foo")        ? true : false
+ *   - int    drv_arg$foo$d$42;           // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
+ *   - u32    drv_arg$foo$I32u$42;        // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
  *
  * *NOTE: The  tohex() function is fairly simple, in that
  *        it will silently skip all non-xdigit characters
  *        during parsing!
  *
  * The format for these symbols is:
- *    "dbg_arg$" <argument_name> "$" <fmt_spec> ["$" <default_value>]
+ *    "drv_arg$" <argument_name> "$" <fmt_spec> ["$" <default_value>]
  *
  *    <argument_name>: The  name  of   the  argument  in   question.
  *                     For this purpose, the driver's argv vector is
@@ -102,14 +102,14 @@ DECL_BEGIN
  *    <default_value>: Default initializer  for  the  argument  value.
  *                     When the driver's  commandline doesn't  contain
  *                     <argument_name>, then act as though an argument
- *                     "<default_value>=<default_value>" had  actually
+ *                     "<argument_name>=<default_value>" had  actually
  *                     been given.
  *                     When no <default_value> is given, and the argument
  *                     isn't given on  the driver  commandline, then  the
  *                     pointed-to blob is simply zero-initialized.
  *
  * Or alternatively:
- *    "dbg_arg$" <argument_name>
+ *    "drv_arg$" <argument_name>
  * which is a special case that forms a variable which points
  * at a non-zero boolean if <argument_name> exists, and at  a
  * zero-boolean if it does exist.
@@ -149,10 +149,10 @@ DEFINE_REFCOUNT_FUNCTIONS_P(struct driver_section, __driver_section_refcnt, __dr
 #ifndef __elfw_hashtable_defined
 #define __elfw_hashtable_defined
 typedef struct elfW(hashtable) {
-	ElfW(Word) ht_nbuckts;      /* # of buckets. */
-	ElfW(Word) ht_nchains;      /* # of symbols. */
-	ElfW(Word) ht_table[1024];  /* [ht_nbuckts] Hash table. */
-/*	ElfW(Word) ht_chains[1024];  * [ht_nchains] Hash chains. */
+	ElfW(Word) ht_nbuckts;       /* # of buckets. */
+	ElfW(Word) ht_nchains;       /* # of symbols. */
+	ElfW(Word) ht_table[1024];   /* [ht_nbuckts] Hash table. */
+/*	ElfW(Word) ht_chains[1024];   * [ht_nchains] Hash chains. */
 } ElfW(HashTable);
 #endif /* !__elfw_hashtable_defined */
 

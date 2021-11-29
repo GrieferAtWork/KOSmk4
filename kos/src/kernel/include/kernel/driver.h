@@ -85,27 +85,18 @@ DATDEF byte_t /*  */ drv_loadaddr[]; /* Absolute load-address of the driver (== 
 DATDEF byte_t /*  */ drv_loadmin[];  /* Absolute min-address of the driver program (== drv_self.md_loadmin) */
 DATDEF byte_t /*  */ drv_loadmax[];  /* Absolute max-address of the driver program (== drv_self.md_loadmax) */
 DATDEF char /*    */ drv_name[];     /* Name of the driver (== drv_self.d_name) */
-DATDEF struct mfile *drv_file;       /* [0..1] Inode of the of the driver (== drv_self.d_file) */
+DATDEF struct mfile *drv_file;       /* [0..1] File object of the driver (== drv_self.d_file) */
 DATDEF char /*    */ drv_cmdline[];  /* Driver commandline as a \0\0-terminated, \0-seperated string (== drv_self.d_cmdline) */
 DATDEF size_t /*  */ drv_argc;       /* Driver argument count (== &drv_self.d_argc) */
 DATDEF char /*   */ *drv_argv[];     /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
 
-/* NOTE: This  function  may  be implemented  by  individual drivers!
- *       This isn't a function that is exported by the kernel itself!
- * Try (as in: never throw, or block) to clear global caches,  releasing
- * heap  memory as those  caches are cleared  before returning the total
- * sum of bytes  that were  cleared by doing  this. (Alternatively,  any
- * non-zero value should be returned if ~some~ kind of optional resource
- * was released, with 0 being _required_ to be returned when nothing was
- * freed at all)
- * This function is  called when the  kernel has run  out of physical  or
- * virtual memory, at which point this  function's purpose is to try  and
- * reclaim resources to  allow the kernel  to continue operation  without
- * (normally) causing an E_BADALLOC exception to be thrown by the caller.
- * @return: * : Some  kind of optional resource(s) was/were freed,
- *              and the caller should re-attempt their allocation.
- * @return: 0 : Nothing could be freed/released (at the moment) */
-FUNDEF NOBLOCK size_t NOTHROW(KCALL drv_clearcache)(void);
+struct ccinfo;
+
+/* NOTE: This function may be implemented by individual drivers,
+ *       and isn't  something that  is exported  by the  kernel!
+ * Try to clear global caches. Called by `system_cc()' */
+FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+NOTHROW(KCALL drv_cc)(struct ccinfo *__restrict info);
 
 #ifndef DRIVER_INIT
 #define DRIVER_INIT __attribute__((__constructor__))

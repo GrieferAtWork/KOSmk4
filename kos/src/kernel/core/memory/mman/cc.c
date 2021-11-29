@@ -61,7 +61,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
-typedef NOBLOCK_IF(ccinfo_noblock(info)) void
+typedef NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 /*NOTHROW*/ (KCALL *PSYSTEMCC)(struct ccinfo *__restrict info);
 
 #define DOCC(expr)               \
@@ -132,7 +132,7 @@ PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_drivers)(struct ccinfo *__restrict info) {
 	size_t i;
 	REF struct driver_loadlist *ll;
-	/* Invoke the `drv_clearcache()' function of every loaded driver. */
+	/* Invoke the `drv_cc()' function of every loaded driver. */
 	ll = get_driver_loadlist();
 	for (i = 0; i < ll->dll_count; ++i) {
 		REF struct driver *drv;
