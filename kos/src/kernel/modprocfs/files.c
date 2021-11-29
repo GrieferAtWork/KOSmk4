@@ -351,6 +351,24 @@ procfs_kcore_printer(pformatprinter printer, void *arg,
 
 
 /************************************************************************/
+/* /proc/kos/fs/allow-fs-oob                                            */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_kos_fs_allow_fs_oob_print(pformatprinter printer, void *arg,
+                                 pos_t UNUSED(offset_hint)) {
+	ProcFS_PrintBool(printer, arg, fsuper_allow_fs_oob);
+}
+INTERN void KCALL
+procfs_kos_fs_allow_fs_oob_write(USER CHECKED void const *buf,
+                                 size_t bufsize) {
+	bool newval;
+	newval = ProcFS_ParseBool(buf, bufsize);
+	ATOMIC_WRITE(fsuper_allow_fs_oob, newval);
+}
+
+
+
+/************************************************************************/
 /* /proc/kos/fs/nodes                                                   */
 /************************************************************************/
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL

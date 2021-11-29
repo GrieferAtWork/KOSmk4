@@ -96,9 +96,11 @@ MKREG_RO(procfs_r_kos_raminfo, 0444, procfs_kos_raminfo_printer)
 
 /* /proc/kos/fs */
 MKDIR_BEGIN(procfs_r_kos_fs, 0555)
-	MKDIR_ENT("nodes",   DT_REG, &procfs_r_kos_fs_nodes,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x9087eb51, 0x7365646f6e, 0xe1ea8800, 0x7365646f6e)/*[[[end]]]*/)
-	MKDIR_ENT("stat",    DT_REG, &procfs_r_kos_fs_stat,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d180b, 0x74617473, 0xf176d14, 0x74617473)/*[[[end]]]*/)
+	MKDIR_ENT("allow-fs-oob", DT_REG, &procfs_r_kos_fs_allow_fs_oob, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x44ffeb75, 0xe9799334d3f3e96, 0xbc091cec, 0x6ccfcfeb93080938)/*[[[end]]]*/)
+	MKDIR_ENT("nodes",        DT_REG, &procfs_r_kos_fs_nodes,        /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x9087eb51, 0x7365646f6e, 0xe1ea8800, 0x7365646f6e)/*[[[end]]]*/)
+	MKDIR_ENT("stat",         DT_REG, &procfs_r_kos_fs_stat,         /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d180b, 0x74617473, 0xf176d14, 0x74617473)/*[[[end]]]*/)
 MKDIR_END
+MKREG_RW(procfs_r_kos_fs_allow_fs_oob, 0644, procfs_kos_fs_allow_fs_oob_print, procfs_kos_fs_allow_fs_oob_write)
 MKREG_RO(procfs_r_kos_fs_nodes, 0444, procfs_kos_fs_nodes_printer)
 MKREG_RO(procfs_r_kos_fs_stat, 0444, procfs_kos_fs_stat_printer)
 
