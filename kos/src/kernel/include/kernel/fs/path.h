@@ -149,11 +149,22 @@ struct path {
 		                                  * Name of this directory (`fdirent_empty' for root directory). */
 	REF struct fdirnode      *p_dir;     /* [1..1][const] Directory to which this path refers. An unmounted
 	                                      * root directory  has this  set to  `fdirnode_unmounted.fs_root'. */
+#ifdef __WANT_PATH__p_dead
+	union {
+		TAILQ_ENTRY(REF path) p_recent;  /* [0..1][lock(:VFS->vf_recent_lock)] Cache entry for recently used paths.
+		                                  * NOTE: Once a path has been marked as deleted (p_cldlist = PATH_CLDLIST_DELETED),
+		                                  *       it should be removed  from the recent  cache by use  of a lock  operation.
+		                                  *       For this purpose, it is the responsibility of whoever marked the paths  as
+		                                  *       deleted (PATH_CLDLIST_DELETED) to initialize this lock operation! */
+		SLIST_ENTRY(path)    _p_dead;    /* Used internally... */
+	};
+#else /* __WANT_PATH__p_dead */
 	TAILQ_ENTRY(REF path)     p_recent;  /* [0..1][lock(:VFS->vf_recent_lock)] Cache entry for recently used paths.
 	                                      * NOTE: Once a path has been marked as deleted (p_cldlist = PATH_CLDLIST_DELETED),
 	                                      *       it should be removed  from the recent  cache by use  of a lock  operation.
 	                                      *       For this purpose, it is the responsibility of whoever marked the paths  as
 	                                      *       deleted (PATH_CLDLIST_DELETED) to initialize this lock operation! */
+#endif /* !__WANT_PATH__p_dead */
 	struct shared_rwlock      p_cldlock; /* Lock for this path. */
 	Toblockop_slist(path)     p_cldlops; /* Lock operations for `p_cldlock'. */
 #ifdef __WANT_PATH__p_LOPS

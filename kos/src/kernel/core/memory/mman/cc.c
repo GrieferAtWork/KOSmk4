@@ -22,12 +22,17 @@
 #define __WANT_DRIVER__d_internals
 #define __WANT_MPART__mp_dead
 #define __WANT_MFILE__mf_deadnod
+#define __WANT_PATH__p_dead
 
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
 #include <kernel/fs/allnodes.h>
+#include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/super.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
@@ -154,21 +159,110 @@ NOTHROW(FCALL system_cc_permman)(struct mman *__restrict self,
 }
 
 
+
+
+/************************************************************************/
+/* FS                                                                   */
+/************************************************************************/
+
+#ifndef __path_slist_defined
+#define __path_slist_defined
+SLIST_HEAD(path_slist, path);
+#endif /* !__path_slist_defined */
+
+/* Clear VFS recently-used-paths cache. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_vfs_recent_paths)(struct vfs *__restrict self,
+                                          struct ccinfo *__restrict info) {
+	struct path_slist deadpaths;
+	struct path *iter;
+	if (vfs_recentlock_tryacquire(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!vfs_recentlock_acquire_nx(self))
+			return;
+	}
+	SLIST_INIT(&deadpaths);
+
+	/* We only remove paths  that are not externally  referenced.
+	 * We could just remove  everything, but doing that  wouldn't
+	 * do us any good since we can only report memory having been
+	 * freed if we actually managed to destroy a path. */
+	TAILQ_FOREACH_SAFE (iter, &self->vf_recent, p_recent) {
+		if (!ATOMIC_CMPXCH(iter->p_refcnt, 1, 0))
+			continue; /* Remove from the recent cache wouldn't kill this one... */
+
+		/* Remove from the recent cache. */
+		assert(self->vf_recentcnt != 0);
+		TAILQ_REMOVE(&self->vf_recent, iter, p_recent);
+		--self->vf_recentcnt;
+		SLIST_INSERT(&deadpaths, iter, _p_dead);
+		ccinfo_account(info, sizeof(struct path));
+		if (ccinfo_isdone(info))
+			break;
+	}
+	vfs_recentlock_release(self);
+
+	/* Destroy dead path objects. */
+	while (!SLIST_EMPTY(&deadpaths)) {
+		iter = SLIST_FIRST(&deadpaths);
+		SLIST_REMOVE_HEAD(&deadpaths, _p_dead);
+		path_destroy(iter);
+	}
+}
+
+/* Clear per-vfs caches. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_pervfs)(struct vfs *__restrict self,
+                                struct ccinfo *__restrict info) {
+	DOCC(system_cc_vfs_recent_paths(self, info));
+}
+
+/* Clear per-fs caches. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_perfs)(struct fs *__restrict self,
+                               struct ccinfo *__restrict info) {
+	DOCC(system_cc_pervfs(self->fs_vfs, info));
+}
+
+
+
+
+/************************************************************************/
+/* THREAD                                                               */
+/************************************************************************/
+
 /* Clear per-thread caches. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
                                  struct ccinfo *__restrict info) {
 	/* Clear per-mman caches. */
 	{
-		REF struct mman *mm;
-		mm = task_getmman(self);
-		system_cc_permman(mm, info);
-		if (ATOMIC_DECFETCH(mm->mm_refcnt) == 0) {
+		REF struct mman *threadmm;
+		threadmm = task_getmman(self);
+		system_cc_permman(threadmm, info);
+		if (ATOMIC_DECFETCH(threadmm->mm_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct mman));
-			mman_destroy(mm);
+			mman_destroy(threadmm);
 		}
 	}
-	/* TODO: There are a whole bunch of other per-task things we could try to clear. */
+	if (ccinfo_isdone(info))
+		return;
+
+	/* Clear per-fs caches. */
+	if (ATOMIC_READ(FORTASK(self, this_fs)) != NULL) { /* May be NULL for kernel threads... */
+		REF struct fs *threadfs;
+		threadfs = task_getfs(self);
+		system_cc_perfs(threadfs, info);
+		if (ATOMIC_DECFETCH(threadfs->fs_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct fs));
+			fs_destroy(threadfs);
+		}
+	}
+	if (ccinfo_isdone(info))
+		return;
+
+	/* TODO: There are probably more per-task things we could try to do. */
 }
 
 PRIVATE NOBLOCK ssize_t
@@ -202,6 +296,12 @@ NOTHROW(KCALL system_cc_threads)(struct ccinfo *__restrict info) {
 }
 
 
+
+
+/************************************************************************/
+/* HEAP                                                                 */
+/************************************************************************/
+
 /* Trim the given heap. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_heap)(struct heap *__restrict self,
@@ -229,9 +329,13 @@ NOTHROW(KCALL system_cc_heaps)(struct ccinfo *__restrict info) {
 
 
 
+/************************************************************************/
+/* FILE/FILESYSTEM CACHES (including preloaded file data!)              */
+/************************************************************************/
+
 /* Clear unreferenced (cached) mem-parts from the global part list. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
-NOTHROW(KCALL system_cc_allparts)(struct ccinfo *__restrict info) {
+NOTHROW(KCALL system_cc_allparts_unload)(struct ccinfo *__restrict info) {
 	struct mpart *iter;
 	struct mpart_slist deadlist;
 	SLIST_INIT(&deadlist);
@@ -312,7 +416,7 @@ SLIST_HEAD(fnode_slist, fnode);
 
 /* Clear unreferenced (cached) files nodes from the global file-node-list. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
-NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
+NOTHROW(KCALL system_cc_allnodes_unload)(struct ccinfo *__restrict info) {
 	struct fnode *iter;
 	struct fnode_slist deadlist;
 	SLIST_INIT(&deadlist);
@@ -389,21 +493,164 @@ done:
 }
 
 
+/* Invoke cache-clear callbacks for the given file-node. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_perfnode)(struct fnode *__restrict self,
+                                  struct ccinfo *__restrict info) {
+	struct mfile_stream_ops const *ops;
+	ops = self->mf_ops->mo_stream;
+	if (ops && ops->mso_cc)
+		(*ops->mso_cc)(self, info);
+}
+
+
+/* Invoke cache-clear callbacks for all file-nodes. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
+	REF struct fnode *node;
+	REF struct fnode *prev = NULL;
+	size_t index           = 0;
+	if (!fallnodes_tryacquire()) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!fallnodes_acquire_nx())
+			return;
+	}
+	node = LIST_FIRST(&fallnodes_list);
+	for (;;) {
+		REF struct fnode *next;
+		while (node && !tryincref(node))
+			node = LIST_NEXT(node, fn_allnodes);
+		fallnodes_release();
+		if (prev && ATOMIC_DECFETCH(prev->mf_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct fnode));
+			mfile_destroy(prev);
+		}
+		if (!node)
+			break;
+		system_cc_perfnode(node, info);
+		if (ccinfo_isdone(info))
+			break;
+		prev = node;
+		if (!fallnodes_tryacquire()) {
+			if (ccinfo_noblock(info))
+				return;
+			if (!fallnodes_acquire_nx())
+				return;
+		}
+		if (!LIST_ISBOUND(node, fn_allnodes)) {
+			/* Find  the `index'th node in the global list.
+			 * This is not failsafe (elements before `node'
+			 * may have been removed, so `index' may not be
+			 * correct), but it's better than nothing. */
+			size_t i;
+			node = LIST_FIRST(&fallnodes_list);
+			for (i = 0; node && i < index; ++i) {
+				node = LIST_NEXT(node, fn_allnodes);
+			}
+			if (!node) {
+				fallnodes_release();
+				break;
+			}
+		}
+		next = LIST_NEXT(node, fn_allnodes);
+		node = next;
+		++index;
+	}
+	if (node && ATOMIC_DECFETCH(node->mf_refcnt) == 0) {
+		ccinfo_account(info, sizeof(struct fnode));
+		mfile_destroy(node);
+	}
+}
+
+
+/* Invoke cache-clear callbacks for the given superblock. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_persuper)(struct fsuper *__restrict self,
+                                  struct ccinfo *__restrict info) {
+	system_cc_perfnode(&self->fs_root, info);
+}
+
+
+/* Invoke cache-clear callbacks for all superblocks. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
+	REF struct fsuper *super;
+	REF struct fsuper *prev = NULL;
+	size_t index            = 0;
+	if (!fallsuper_tryacquire()) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!fallsuper_acquire_nx())
+			return;
+	}
+	super = LIST_FIRST(&fallsuper_list);
+	for (;;) {
+		REF struct fsuper *next;
+		while (super && !tryincref(super))
+			super = LIST_NEXT(super, fs_root.fn_allsuper);
+		fallsuper_release();
+		if (prev && ATOMIC_DECFETCH(prev->fs_root.mf_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct fsuper));
+			mfile_destroy(&prev->fs_root);
+		}
+		if (!super)
+			break;
+		system_cc_persuper(super, info);
+		if (ccinfo_isdone(info))
+			break;
+		prev = super;
+		if (!fallsuper_tryacquire()) {
+			if (ccinfo_noblock(info))
+				return;
+			if (!fallsuper_acquire_nx())
+				return;
+		}
+		if (!LIST_ISBOUND(super, fs_root.fn_allsuper)) {
+			/* Find  the `index'th super in the global list.
+			 * This is not failsafe (elements before `super'
+			 * may have been removed, so `index' may not  be
+			 * correct), but it's better than nothing. */
+			size_t i;
+			super = LIST_FIRST(&fallsuper_list);
+			for (i = 0; super && i < index; ++i) {
+				super = LIST_NEXT(super, fs_root.fn_allsuper);
+			}
+			if (!super) {
+				fallsuper_release();
+				break;
+			}
+		}
+		next = LIST_NEXT(super, fs_root.fn_allsuper);
+		super = next;
+		++index;
+	}
+	if (super && ATOMIC_DECFETCH(super->fs_root.mf_refcnt) == 0) {
+		ccinfo_account(info, sizeof(struct fsuper));
+		mfile_destroy(&super->fs_root);
+	}
+}
+
+
+
 
 
 /* Clear all system caches according to `info'. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
 NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
-	DOCC(system_cc_drivers(info));
-	DOCC(system_cc_threads(info));
-	DOCC(system_cc_async_aio_handles(info));
-	DOCC(system_cc_module_section_cache(info));
+	DOCC(system_cc_drivers(info));               /* Invoke clear-cache operators from drivers */
+	DOCC(system_cc_threads(info));               /* Clear caches relating to per-thread fields */
+	DOCC(system_cc_async_aio_handles(info));     /* ... */
+	DOCC(system_cc_allparts_unload(info));       /* Unload cached, but unused mem-parts */
+	DOCC(system_cc_allnodes_unload(info));       /* Unload cached, but unused files */
+	DOCC(system_cc_allnodes(info));              /* Invoke the clear-cache operator for all files */
+	DOCC(system_cc_allsuper(info));              /* Invoke the clear-cache operator for all superblocks */
+	DOCC(system_cc_permman(&mman_kernel, info)); /* In case more can be done now... */
+	DOCC(system_cc_perfs(&fs_kernel, info));     /* In case not done already... */
+	DOCC(system_cc_module_section_cache(info));  /* Clear pre-loaded module sections (e.g. .debug_info, etc...) */
 #ifdef CONFIG_HAVE_USERELF_MODULES
 	DOCC(system_cc_rtld_fsfile(info));
 #endif /* CONFIG_HAVE_USERELF_MODULES */
-	DOCC(system_cc_permman(&mman_kernel, info));
-	DOCC(system_cc_allparts(info));
-	DOCC(system_cc_allnodes(info));
 	DOCC(system_cc_heaps(info));
 
 	/* TODO: There a couple more things we can do to free up physical memory:
