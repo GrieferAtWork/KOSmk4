@@ -71,7 +71,7 @@ struct flnknode_ops {
 	 *
 	 * This operator is optional and need not necessarily be implemented, but
 	 * if implemented, it must never return `NULL'! */
-	BLOCKING /*ATTR_PURE*/ ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *
+	BLOCKING /*ATTR_PURE*/ ATTR_RETNONNULL NONNULL((1)) char const *
 	(KCALL *lno_linkstr)(struct flnknode *__restrict self)
 			THROWS(E_IOERROR, E_BADALLOC, ...);
 

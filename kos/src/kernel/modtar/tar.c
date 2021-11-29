@@ -243,9 +243,6 @@ again:
 		result->mf_parts             = NULL;
 		result->mf_changed.slh_first = NULL;
 		result->mf_flags &= ~(MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP);
-	} else if (S_ISLNK(result->fn_mode)) {
-		/* Use the symlink text length as filesize. */
-		atomic64_init(&result->mf_filesize, strlen(tarfile_getlnkstr(tfile)));
 	}
 
 	result->fn_super = incref(&super->ts_super);
@@ -1060,12 +1057,17 @@ NOTHROW(KCALL tarlnk_v_destroy)(struct mfile *__restrict self) {
 	flnknode_v_destroy(self);
 }
 
-PRIVATE BLOCKING ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *KCALL
+PRIVATE BLOCKING ATTR_PURE ATTR_RETNONNULL NONNULL((1)) char const *KCALL
 tarlnk_v_linkstr(struct flnknode *__restrict self)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	char const *result;
 	struct tarlnknode *me;
-	me = (struct tarlnknode *)fnode_aslnk(self);
-	return tarfile_getlnkstr(me->tln_fdat.tfd_filp);
+	me     = (struct tarlnknode *)fnode_aslnk(self);
+	result = tarfile_getlnkstr(me->tln_fdat.tfd_filp);
+
+	/* Use the symlink text length as filesize. */
+	atomic64_write(&me->mf_filesize, strlen(result));
+	return result;
 }
 
 
@@ -1212,7 +1214,11 @@ INTERN_CONST struct fregnode_ops const tarregnode_ops = {
 	},
 };
 
-#define tarlnknode_v_stream_ops tarregnode_v_stream_ops
+PRIVATE struct mfile_stream_ops const tarlnknode_v_stream_ops = {
+	.mso_stat      = &flnknode_v_stat_readlink_size,
+	.mso_printlink = &tarnode_v_printlink,
+};
+
 INTERN_CONST struct flnknode_ops const tarlnknode_ops = {
 	.lno_node = {
 		.no_file = {
@@ -1222,7 +1228,8 @@ INTERN_CONST struct flnknode_ops const tarlnknode_ops = {
 		},
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
-	.lno_linkstr = &tarlnk_v_linkstr,
+	.lno_readlink = &flnknode_v_readlink_default,
+	.lno_linkstr  = &tarlnk_v_linkstr,
 };
 
 #define tardevnode_v_stream_ops tarregnode_v_stream_ops

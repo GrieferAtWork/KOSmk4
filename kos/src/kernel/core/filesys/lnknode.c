@@ -59,7 +59,7 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
 	/* Copy link text into user-space buffer. */
 	if (bufsize > result)
 		bufsize = result;
-	memcpy(buf, linkstr, result);
+	memcpy(buf, linkstr, bufsize);
 	return result;
 }
 
@@ -71,8 +71,16 @@ flnknode_v_stat_readlink_size(struct mfile *__restrict self,
 		THROWS(...) {
 	struct flnknode *me = mfile_aslnk(self);
 	struct flnknode_ops const *ops;
-	ops             = flnknode_getops(me);
-	result->st_size = (typeof(result->st_size))(*ops->lno_readlink)(me, NULL, 0);
+	ops = flnknode_getops(me);
+#ifndef __OPTIMIZE_SIZE__
+	if (ops->lno_linkstr != NULL) {
+		(*ops->lno_linkstr)(me);
+		result->st_size = (typeof(result->st_size))mfile_getsize_nonatomic(self);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		result->st_size = (typeof(result->st_size))(*ops->lno_readlink)(me, NULL, 0);
+	}
 }
 
 /* Stream operator table that includes `flnknode_v_stat_readlink_size' */
