@@ -644,8 +644,8 @@ NOTHROW(KCALL heap_truncate_untraced)(struct heap *__restrict self, void *base,
  * future calls to allocating heap functions.
  * NOTE: When `threshold' is lower than `PAGESIZE', `PAGESIZE' is used instead.
  * @return: * : The total number of bytes released back to the core (a multiple of PAGESIZE) */
-FUNDEF NONNULL((1)) size_t
-NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold);
+FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) size_t
+NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold, gfp_t flags);
 
 
 #ifdef CONFIG_DEBUG_HEAP

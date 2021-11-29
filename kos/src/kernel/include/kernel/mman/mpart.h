@@ -63,10 +63,12 @@
 #define MPART_F_NORMAL         0x0000 /* Normal flags. */
 #define MPART_F_LOCKBIT        0x0001 /* Lock-bit for this m-part */
 #define MPART_F_MAYBE_BLK_INIT 0x0002 /* [lock(MPART_F_LOCKBIT)] There may be blocks with `MPART_BLOCK_ST_INIT'. */
-#define MPART_F_GLOBAL_REF     0x0004 /* [lock(CLEAR_ONCE)] `mpart_all_list' holds a reference to this part.
-                                       * When memory is running low, and  the kernel tries to unload  unused
-                                       * memory parts, it  will clear  this flag  for all  parts there  are.
-                                       * Also note that this flag is cleared by default when the  associated
+#define MPART_F_GLOBAL_REF     0x0004 /* [lock(CLEAR(ATOMIC), SET(<WAS_SET_PREVIOUSLY> && MPART_F_LOCKBIT &&
+                                       *                          !mpart_isanon(self) && mpart_all_acquired()))]
+                                       * -> `mpart_all_list' holds a reference to this part.
+                                       * When memory is running low, and the kernel tries to unload  unused
+                                       * memory  parts, it  will clear this  flag for all  parts there are.
+                                       * Also note that this flag is cleared by default when the associated
                                        * file's `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
 /*efine MPART_F_               0x0008  * ... */
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)] The backing block-state bitset exists in-line. */

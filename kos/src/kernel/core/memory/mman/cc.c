@@ -1,0 +1,528 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_CC_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_CC_C 1
+#define __WANT_DRIVER__d_internals
+#define __WANT_MPART__mp_dead
+#define __WANT_MFILE__mf_deadnod
+
+#include <kernel/compiler.h>
+
+#include <kernel/driver.h>
+#include <kernel/fs/allnodes.h>
+#include <kernel/fs/node.h>
+#include <kernel/heap.h>
+#include <kernel/mman.h>
+#include <kernel/mman/cc.h>
+#include <kernel/mman/driver.h>
+#include <kernel/mman/mpart.h>
+#include <sched/enum.h>
+#include <sched/task.h>
+
+#include <hybrid/atomic.h>
+
+#include <assert.h>
+#include <stddef.h>
+
+/**/
+#include "module-userelf.h" /* CONFIG_HAVE_USERELF_MODULES */
+
+DECL_BEGIN
+
+typedef NOBLOCK_IF(ccinfo_noblock(cc)) void
+/*NOTHROW*/ (KCALL *PSYSTEMCC)(struct ccinfo *__restrict info);
+
+#define DOCC(expr)               \
+	do {                         \
+		expr;                    \
+		if (ccinfo_isdone(info)) \
+			return;              \
+	}	__WHILE0
+
+
+
+/* Cache-clear functions from around the kernel core... */
+INTDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_async_aio_handles)(struct ccinfo *__restrict info);
+INTDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_module_section_cache)(struct ccinfo *__restrict info);
+#ifdef CONFIG_HAVE_USERELF_MODULES
+INTDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_rtld_fsfile)(struct ccinfo *__restrict info);
+INTDEF NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
+                                           struct ccinfo *__restrict info);
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+/*...*/
+
+
+
+
+/************************************************************************/
+/* DRIVER                                                               */
+/************************************************************************/
+INTDEF ATTR_USED NOBLOCK NONNULL((1)) size_t /* from "driver.c" */
+NOTHROW(FCALL dfc_freetree)(struct driver_fde_cache *__restrict tree);
+PRIVATE ATTR_USED NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_driver_fdecache)(struct driver *__restrict self,
+                                         struct ccinfo *__restrict info) {
+	struct driver_fde_cache *tree;
+	if (!driver_eh_frame_cache_trywrite(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!driver_eh_frame_cache_write_nx(self))
+			return;
+	}
+	tree = self->d_eh_frame_cache;
+	self->d_eh_frame_cache = NULL;
+	driver_eh_frame_cache_endwrite(self);
+	if (tree != NULL)
+		ccinfo_account(info, dfc_freetree(tree));
+}
+
+/* Clear caches associated with a given driver. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_perdriver)(struct driver *__restrict self,
+                                   struct ccinfo *__restrict info) {
+	PSYSTEMCC func;
+	DOCC(system_cc_driver_fdecache(self, info));
+
+	/* Drivers are allowed to define custom clear-cache functions. */
+	*(void **)&func = driver_dlsym_local(self, "drv_cc");
+	if (func != NULL)
+		DOCC((*func)(info));
+}
+
+/* Clear caches defined by drivers. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_drivers)(struct ccinfo *__restrict info) {
+	size_t i;
+	REF struct driver_loadlist *ll;
+	/* Invoke the `drv_clearcache()' function of every loaded driver. */
+	ll = get_driver_loadlist();
+	for (i = 0; i < ll->dll_count; ++i) {
+		REF struct driver *drv;
+		drv = ll->dll_drivers[i];
+		if (!tryincref(drv))
+			continue; /* Dead driver... */
+		system_cc_perdriver(drv, info);
+		if (ccinfo_isdone(info))
+			break;
+	}
+	if (ATOMIC_DECFETCH(ll->dll_refcnt) == 0) {
+		ccinfo_account(info, offsetof(struct driver_loadlist, dll_drivers));
+		ccinfo_account(info, ll->dll_count * sizeof(REF struct driver *));
+		driver_loadlist_destroy(ll);
+	}
+}
+
+
+
+
+/************************************************************************/
+/* MMAN                                                                 */
+/************************************************************************/
+
+/* Clear per-mman caches. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_permman)(struct mman *__restrict self,
+                                 struct ccinfo *__restrict info) {
+#ifdef CONFIG_HAVE_USERELF_MODULES
+	system_cc_mman_module_cache(self, info);
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+
+	(void)self;
+	(void)info;
+	COMPILER_IMPURE();
+}
+
+
+/* Clear per-thread caches. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
+                                 struct ccinfo *__restrict info) {
+	/* Clear per-mman caches. */
+	{
+		REF struct mman *mm;
+		mm = task_getmman(self);
+		system_cc_permman(mm, info);
+		if (ATOMIC_DECFETCH(mm->mm_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct mman));
+			mman_destroy(mm);
+		}
+	}
+	/* TODO: There are a whole bunch of other per-task things we could try to clear. */
+}
+
+PRIVATE NOBLOCK ssize_t
+NOTHROW(KCALL system_cc_pertask_cb)(void *arg,
+                                    struct task *thread,
+                                    struct taskpid *UNUSED(pid)) {
+	if (thread) {
+		struct ccinfo *info = (struct ccinfo *)arg;
+		system_cc_pertask(thread, info);
+		if (ccinfo_isdone(info))
+			return -1; /* Stop enumeration */
+	}
+	return 0;
+}
+
+
+/* Enumerate threads and call `system_cc_pertask()'. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_threads)(struct ccinfo *__restrict info) {
+	if (ccinfo_noblock(info)) {
+		/* Not allowed to block -> can enumerate threads using the non-blocking method. */
+		task_enum_all_nb(&system_cc_pertask_cb, NULL);
+	} else {
+		gfp_t saved_gfp;
+		/* TODO: do this better */
+		saved_gfp = info->ci_gfp;
+		info->ci_gfp |= GFP_ATOMIC;
+		task_enum_all_nb(&system_cc_pertask_cb, info);
+		info->ci_gfp = saved_gfp;
+	}
+}
+
+
+/* Trim the given heap. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_heap)(struct heap *__restrict self,
+                              struct ccinfo *__restrict info) {
+	ccinfo_account(info, heap_trim(self, 0, info->ci_gfp));
+}
+
+#ifdef CONFIG_TRACE_MALLOC
+INTDEF ATTR_WEAK struct heap trace_heap;
+#endif /* CONFIG_TRACE_MALLOC */
+
+
+/* Trim system heaps. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_heaps)(struct ccinfo *__restrict info) {
+	size_t i;
+	for (i = 0; i < __GFP_HEAPCOUNT; ++i)
+		DOCC(system_cc_heap(&kernel_heaps[i], info));
+#ifdef CONFIG_TRACE_MALLOC
+	if (&trace_heap != NULL)
+		DOCC(system_cc_heap(&trace_heap, info));
+#endif /* CONFIG_TRACE_MALLOC */
+}
+
+
+
+
+/* Clear unreferenced (cached) mem-parts from the global part list. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_allparts)(struct ccinfo *__restrict info) {
+	struct mpart *iter;
+	struct mpart_slist deadlist;
+	SLIST_INIT(&deadlist);
+again:
+	if (!mpart_all_tryacquire()) {
+		if (ccinfo_noblock(info))
+			goto done;
+		if (!mpart_all_acquire_nx())
+			goto done;
+	}
+
+	/* Enumerate all mem-parts. */
+	/* TODO: Would be better to enumerate from least-recent to most-recent
+	 *       Though for this, we should probably chance the list type from
+	 *       `LIST_*' to `TAILQ_*' (which has a O(1) *_LAST operation). */
+	LIST_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
+		if (!(iter->mp_flags & MPART_F_GLOBAL_REF))
+			continue; /* Can't be decref'd */
+		if (ATOMIC_READ(iter->mp_refcnt) != 1)
+			continue; /* External references exist, or already destroyed. */
+
+		/* Try to unload this mem-part. */
+		if (!mpart_lock_tryacquire(iter)) {
+			bool waitfor_ok;
+			if (!tryincref(iter))
+				continue;
+			mpart_all_release();
+			waitfor_ok = mpart_lock_waitfor_nx(iter);
+			if (ATOMIC_DECFETCH(iter->mp_refcnt) == 0) {
+				ccinfo_account(info, sizeof(struct mpart));
+				SLIST_INSERT(&deadlist, iter, _mp_dead);
+			}
+			if (!waitfor_ok)
+				goto done;
+			if (ccinfo_isdone(info))
+				goto done;
+			goto again;
+		}
+		if (!(ATOMIC_FETCHAND(iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
+			goto part_not_unloaded;
+		if (!ATOMIC_CMPXCH(iter->mp_refcnt, 1, 0)) {
+			if (!(ATOMIC_FETCHOR(iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
+				goto part_not_unloaded;
+			/* Someone else set the GLOBAL_REF bit in the mean time?
+			 * Anyways: since they did, they're would have had to incref() the part
+			 *          to do so, so we have to decref() it since we were unable to
+			 *          have the part re-inherit its original global reference. */
+			if (ATOMIC_FETCHDEC(iter->mp_refcnt) != 0)
+				goto part_not_unloaded;
+		}
+		/* Part got destroyed! */
+		assert(!(ATOMIC_READ(iter->mp_flags) & MPART_F_GLOBAL_REF));
+		SLIST_INSERT(&deadlist, iter, _mp_dead);
+		ccinfo_account(info, sizeof(struct mpart));
+		if (ccinfo_isdone(info))
+			break;
+		continue;
+part_not_unloaded:
+		mpart_lock_release(iter);
+	}
+
+	mpart_all_release();
+
+	/* Properly destroy any dead mem-parts. */
+done:
+	while (!SLIST_EMPTY(&deadlist)) {
+		iter = SLIST_FIRST(&deadlist);
+		SLIST_REMOVE_HEAD(&deadlist, _mp_dead);
+		mpart_destroy(iter);
+	}
+}
+
+
+#ifndef __fnode_slist_defined
+#define __fnode_slist_defined
+SLIST_HEAD(fnode_slist, fnode);
+#endif /* !__fnode_slist_defined */
+
+/* Clear unreferenced (cached) files nodes from the global file-node-list. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
+	struct fnode *iter;
+	struct fnode_slist deadlist;
+	SLIST_INIT(&deadlist);
+again:
+	if (!fallnodes_tryacquire()) {
+		if (ccinfo_noblock(info))
+			goto done;
+		if (!fallnodes_acquire_nx())
+			goto done;
+	}
+
+	/* Enumerate all file nodes. */
+	/* TODO: Would be better to enumerate from least-recent to most-recent
+	 *       Though for this, we should probably chance the list type from
+	 *       `LIST_*' to `TAILQ_*' (which has a O(1) *_LAST operation). */
+	LIST_FOREACH_SAFE (iter, &fallnodes_list, fn_allnodes) {
+		if (!(iter->mf_flags & MFILE_FN_GLOBAL_REF))
+			continue; /* Can't be decref'd */
+		if (ATOMIC_READ(iter->mf_refcnt) != 1)
+			continue; /* External references exist, or already destroyed. */
+
+		/* Try to unload this file. */
+		if (!mfile_lock_trywrite(iter)) {
+			bool waitfor_ok;
+			if (!tryincref(iter))
+				continue;
+			mpart_all_release();
+			waitfor_ok = mfile_lock_waitwrite_nx(iter);
+			if (ATOMIC_DECFETCH(iter->mf_refcnt) == 0) {
+				ccinfo_account(info, sizeof(struct mfile));
+				SLIST_INSERT(&deadlist, iter, _mf_deadnod);
+			}
+			if (!waitfor_ok)
+				goto done;
+			if (ccinfo_isdone(info))
+				goto done;
+			goto again;
+		}
+		mfile_tslock_acquire(iter);
+		if (!(ATOMIC_FETCHAND(iter->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)) { /* inherit reference */
+			mfile_tslock_release_br(iter);
+			mfile_lock_endwrite(iter);
+			continue;
+		}
+		if (!ATOMIC_CMPXCH(iter->mf_refcnt, 1, 0)) {
+			if (!(ATOMIC_FETCHOR(iter->mf_flags, MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)) { /* inherit reference */
+				mfile_tslock_release_br(iter);
+				mfile_lock_endwrite(iter);
+				continue;
+			}
+			if (ATOMIC_DECFETCH(iter->mf_refcnt) != 0) {
+				mfile_tslock_release_br(iter);
+				mfile_lock_endwrite(iter);
+				continue;
+			}
+		}
+
+		/* Yes: must destroy this file. */
+		mfile_tslock_release_pronly(iter);
+		SLIST_INSERT(&deadlist, iter, _mf_deadnod);
+		ccinfo_account(info, sizeof(struct mfile));
+		if (ccinfo_isdone(info))
+			break;
+	}
+	fallnodes_release();
+
+	/* Properly destroy any dead files. */
+done:
+	while (!SLIST_EMPTY(&deadlist)) {
+		iter = SLIST_FIRST(&deadlist);
+		SLIST_REMOVE_HEAD(&deadlist, _mf_deadnod);
+		mfile_destroy(iter);
+	}
+}
+
+
+
+
+/* Clear all system caches according to `info'. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
+	DOCC(system_cc_drivers(info));
+	DOCC(system_cc_threads(info));
+	DOCC(system_cc_async_aio_handles(info));
+	DOCC(system_cc_module_section_cache(info));
+#ifdef CONFIG_HAVE_USERELF_MODULES
+	DOCC(system_cc_rtld_fsfile(info));
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+	DOCC(system_cc_permman(&mman_kernel, info));
+	DOCC(system_cc_allparts(info));
+	DOCC(system_cc_allnodes(info));
+	DOCC(system_cc_heaps(info));
+
+	/* TODO: There a couple more things we can do to free up physical memory:
+	 *  - We're  already unloading cached files and file-parts, but we can even
+	 *    unload file parts that are currently in use (so-long as they  haven't
+	 *    been modified). This can be done by changing a loaded, but unmodified
+	 *    mpart back to MPART_ST_VOID
+	 *  - We can also do `pagedir_unmap_userspace()' for every user-space mman
+	 *    out there, and mappings re-populate themselves upon the next access.
+	 */
+
+	if (!(info->ci_gfp & GFP_NOSWAP)) {
+		/* Eh? Eeehhh?? What about it?
+		 * Yes: swap off-loading will go here!
+		 * And no: aside from skipping this part when GFP_ATOMIC is given, there
+		 *         is no way around dealing with swap in a non-blocking context,
+		 *         given that you can get here from: `kmalloc_nx(GFP_ATOMIC)'. */
+	}
+}
+
+
+
+
+
+
+
+/************************************************************************/
+/* High-level wrappers                                                  */
+/************************************************************************/
+
+/* [lock(ATOMIC)][const_if(cc_inside == 0)]
+ * Current system cache version. */
+PRIVATE unsigned int cc_version = 0;
+
+/* [lock(ATOMIC)] # of threads currently clearing caches. */
+PRIVATE uintptr_t cc_inside = 0;
+
+/* Max # of attempts before unconditional give-up. */
+PUBLIC ATTR_READMOSTLY unsigned int system_cc_maxattempts = 64;
+
+
+/* Clear global system caches.
+ * @param: info: [in|out] Specification on how caches should be cleared.
+ * @return: true:  At least something (may) have become available
+ *                 since the last time you tried to clear caches.
+ * @return: false: Nothing could be cleared :( */
+PUBLIC NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) bool
+NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
+	unsigned int version;
+	uintptr_t inside;
+	info->ci_bytes = 0;
+
+	/* Deal with the special case of a zero-request
+	 * -> In this case, we request that at least 1 byte be freed. */
+	if unlikely(info->ci_minbytes == 0)
+		info->ci_minbytes = 1;
+
+	/* Check if we're supposed to give up */
+	if (info->ci_attempt == (unsigned int)-1) {
+		/* Special indicator to infinite attempts. */
+	} else {
+		if (info->ci_attempt >= system_cc_maxattempts &&
+		    info->ci_attempt != 0) /* Always allow at least 1 attempt. */
+			return false; /* D:  -- Oh no! */
+		++info->ci_attempt;
+	}
+
+	/* Start out by trying to clear system caches ourself. */
+	ATOMIC_INC(cc_inside);
+	system_cc_impl(info);
+
+	/* Check if we already managed to release some memory */
+	if (info->ci_bytes != 0) {
+		/* Since something  was cleared,  indicate
+		 * that by incrementing the cache version. */
+		info->ci_version = ATOMIC_FETCHINC(cc_version);
+		ATOMIC_DEC(cc_inside);
+		return true;
+	}
+	version = ATOMIC_READ(cc_version);
+	inside  = ATOMIC_DECFETCH(cc_inside);
+
+	/* If other threads are clearing caches, we try to yield to them. */
+	if (inside != 0) {
+		unsigned int n;
+		for (n = 0; n < 256; ++n) {
+			unsigned int yield_error;
+			yield_error = task_tryyield_or_pause();
+			if (ATOMIC_READ(cc_inside) < inside)
+				break;
+			if (yield_error != TASK_TRYYIELD_SUCCESS)
+				break; /* Cannot yield... */
+		}
+		return true;
+	}
+
+	/* Fix zero-version (which is used to indicate the first cc-attempt) */
+	if (version == 0) {
+		ATOMIC_INC(cc_inside);
+		version = ATOMIC_INCFETCH(cc_version);
+		ATOMIC_DEC(cc_inside);
+	}
+
+	/* If the cache version changed since the
+	 * last clear-attempt, indicate  success. */
+	if (info->ci_version != version) {
+		info->ci_version = version;
+		return true;
+	}
+
+	/* Looks like there's nothing we can really do: no other thread  is
+	 * clearing caches, and nothing became free since the last time our
+	 * caller tried to clear caches.
+	 * -> Memory just can't be forced to become available... */
+	return false;
+}
+
+
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_CC_C */

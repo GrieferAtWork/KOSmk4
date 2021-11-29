@@ -1084,8 +1084,8 @@ return_old_size:
  * to invoke this function manually, as all it really does is slow down
  * future calls to allocating heap functions.
  * @return: * : The total number of bytes released back to the core (a multiple of PAGESIZE) */
-PUBLIC NONNULL((1)) size_t
-NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold) {
+PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) size_t
+NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold, gfp_t flags) {
 	size_t result = 0;
 	struct mfree_list *iter, *end;
 	DEFINE_PUBLIC_SYMBOL(kernel_default_heap, &kernel_heaps[GFP_NORMAL], sizeof(struct heap));
@@ -1098,7 +1098,7 @@ NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold) {
 again:
 	iter = &self->h_size[HEAP_BUCKET_OF(threshold)];
 	end  = COMPILER_ENDOF(self->h_size);
-	if (!heap_acquirelock_nx(self, GFP_NORMAL))
+	if (!heap_acquirelock_nx(self, flags))
 		return 0;
 	for (; iter != end; ++iter) {
 		struct mfree *chain;

@@ -39,7 +39,7 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/cache.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/event.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
@@ -50,6 +50,7 @@
 #include <kernel/mman/module.h>
 #include <kernel/mman/ramfile.h> /* `struct mramfile' */
 #include <kernel/panic.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -581,7 +582,7 @@ NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 				LIST_UNBIND(sect, ms_cache);
 				decref_nokill(sect);
 			}
-			module_section_cache_release_f();
+			_module_section_cache_release();
 			decref_likely(sect);
 			module_section_cache_reap();
 		} else {
@@ -876,14 +877,18 @@ NOTHROW(KCALL fini_thismman_uemc)(struct mman *__restrict self) {
  *
  * The mman module cache never has to be cleared, but may be cleared in
  * order to free up system memory during a shortage. */
-INTERN NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self) {
-	size_t result = 0;
+INTERN NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
+                                           struct ccinfo *__restrict info) {
 	struct userelf_module_slist dead;
 
 	/* Try to acquire the lock because we need to be NOBLOCK! */
-	if (!mman_lock_tryacquire(self))
-		goto done;
+	if (!mman_lock_tryacquire(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!mman_lock_acquire_nx(self))
+			return;
+	}
 
 	/* Clear the UEMC cache. */
 	SLIST_INIT(&dead);
@@ -907,14 +912,12 @@ NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self) {
 		struct userelf_module *mod;
 		mod = SLIST_FIRST(&dead);
 		SLIST_REMOVE_HEAD(&dead, _um_dead);
+		ccinfo_account(info, sizeof(struct userelf_module));
 		uem_destroy(mod);
-		result += sizeof(struct userelf_module);
 	}
 
 	/* Reap lock operations relatively late! */
 	mman_lockops_reap(self);
-done:
-	return result;
 }
 
 /* Special return values for `uem_trycreate()' */
@@ -1886,24 +1889,21 @@ PRIVATE struct fdirent compat_system_rtld_dirent = {
 #endif /* __ARCH_HAVE_COMPAT */
 
 
-DEFINE_SYSCACHE_CLEAR(clear_system_rtld_fsfile_cache);
-PRIVATE ATTR_USED NOBLOCK size_t
-NOTHROW(KCALL clear_system_rtld_fsfile_cache)(void) {
-	size_t result = 0;
+INTERN NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_rtld_fsfile)(struct ccinfo *__restrict info) {
 	REF struct mfile *mf;
 	mf = axref_xch_inherit(&system_rtld_fsfile, NULL);
 	if (mf && ATOMIC_DECFETCH(mf->mf_refcnt) == 0) {
-		result += sizeof(struct mfile);
+		ccinfo_account(info, sizeof(struct mfile));
 		mfile_destroy(mf);
 	}
 #ifdef __ARCH_HAVE_COMPAT
 	mf = axref_xch_inherit(&compat_system_rtld_fsfile, NULL);
 	if (mf && ATOMIC_DECFETCH(mf->mf_refcnt) == 0) {
-		result += sizeof(struct mfile);
+		ccinfo_account(info, sizeof(struct mfile));
 		mfile_destroy(mf);
 	}
 #endif /* __ARCH_HAVE_COMPAT */
-	return result;
 }
 
 

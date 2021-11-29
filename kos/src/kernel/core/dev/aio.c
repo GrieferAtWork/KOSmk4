@@ -27,7 +27,7 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/cache.h>
+#include <kernel/mman/cc.h>
 #include <kernel/types.h>
 #include <sched/signal.h>
 
@@ -520,9 +520,8 @@ nothing_to_restore:
 
 /* Remove all AIO handles that are `aio_handle_completed()'
  * from    `async_aio_handles',    and    kfree()     them. */
-DEFINE_SYSCACHE_CLEAR(async_aio_handles_clear);
-PRIVATE ATTR_USED NOBLOCK size_t
-NOTHROW(KCALL async_aio_handles_clear)(void) {
+INTERN NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_async_aio_handles)(struct ccinfo *__restrict info) {
 	/* TODO: A function similar to this one should be called when the CPU goes into
 	 *       IDLE mode in order to finalize  and kfree() unused AIO handles,  since
 	 *       in-use AIO handles could potentially  slow down the system since  they
@@ -530,13 +529,16 @@ NOTHROW(KCALL async_aio_handles_clear)(void) {
 	 * TODO: This function should be called after driver finalization to delete AIO
 	 *       handles which may still be holding references to the driver (Note that
 	 *       such references would likely be indirect; e.g.: aio->device->driver). */
-	size_t i, result = 0;
+	size_t i;
 	struct async_aio_handle *h;
 	while ((h = aio_handle_async_alloc_exising()) != NULL) {
 free_h:
-		result += sizeof(struct async_aio_handle);
 		aio_handle_async_free(h);
+		ccinfo_account(info, sizeof(struct async_aio_handle));
+		if (ccinfo_isdone(info))
+			return;
 	}
+
 	/* Try to yield to some other thread, who may still be holding AIO handles. */
 	for (i = 0; i < 8; ++i) {
 		if (task_tryyield() != TASK_TRYYIELD_SUCCESS)
@@ -545,7 +547,6 @@ free_h:
 		if (h)
 			goto free_h;
 	}
-	return result;
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void

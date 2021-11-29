@@ -23,6 +23,8 @@
 #include <kernel/compiler.h>
 #include <kernel/types.h>
 
+/* TODO: EVERYTHING IN HERE IS DEPRECATED! (use <kernel/mman/cc.h> instead) */
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -80,15 +82,6 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL syscache_clear)(void);
  *              lack of some necessary resource. */
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL syscache_clear_s)(syscache_version_t *__restrict pversion);
-
-
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-#ifndef DEFINE_SYSCACHE_CLEAR
-/* >> NOBLOCK size_t NOTHROW(KCALL func)(void);
- * Define a function that should be called when `syscache_clear()' is invoked. */
-#define DEFINE_SYSCACHE_CLEAR(func) DEFINE_CALLBACK(".rodata.cold.callback.syscache_clear", func)
-#endif /* !DEFINE_SYSCACHE_CLEAR */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 DECL_END
 #endif /* __CC__ */

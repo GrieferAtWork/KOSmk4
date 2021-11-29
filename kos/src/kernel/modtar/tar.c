@@ -38,6 +38,7 @@
 #include <kernel/fs/regnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/cc.h>
 #include <sched/atomic64.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -1096,19 +1097,20 @@ NOTHROW(KCALL tarsuper_v_free)(struct fnode *__restrict self) {
 	kfree(me);
 }
 
-PRIVATE NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) size_t
-NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self, gfp_t gfp) {
-	size_t i, result = 0;
+PRIVATE NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1, 2)) void
+NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
+                             struct ccinfo *__restrict cc) {
+	size_t i;
 	struct tarfile_slist deadfiles;
 	struct tarsuper *me;
 	SLIST_INIT(&deadfiles);
 	me = container_of(mfile_assuper(self), struct tarsuper, ts_super);
 
 	if (!tarsuper_trywrite(me)) {
-		if (gfp & GFP_ATOMIC)
-			return 0; /* Not allowed to block :( */
+		if (ccinfo_noblock(cc))
+			return; /* Not allowed to block :( */
 		if (!tarsuper_write_nx(me))
-			return 0; /* Cannot acquire lock... */
+			return; /* Cannot acquire lock... */
 	}
 
 	/* Remove all tar files that are not being used from the file list. */
@@ -1146,7 +1148,7 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self, gfp_t gfp) {
 			size_t new_usable = kmalloc_usable_size(me->ts_filev);
 			me->ts_filev = newlist;
 			assert(old_usable >= new_usable);
-			result += old_usable - new_usable;
+			ccinfo_account(cc, old_usable - new_usable);
 		}
 	}
 	tarsuper_endwrite(me);
@@ -1156,11 +1158,9 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self, gfp_t gfp) {
 		struct tarfile *tf;
 		tf = SLIST_FIRST(&deadfiles);
 		SLIST_REMOVE_HEAD(&deadfiles, _tf_dead);
-		result += kmalloc_usable_size(tf);
+		ccinfo_account(cc, kmalloc_usable_size(tf));
 		tarfile_destroy(tf);
 	}
-
-	return result;
 }
 
 

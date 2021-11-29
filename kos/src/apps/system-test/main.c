@@ -135,6 +135,10 @@ int main(int argc, char *argv[], char *envp[]) {
 	 * them function correctly. */
 	KSysctl(KSYSCTL_SYSTEM_CLEARCACHES);
 
+	/* Assert no-leaks a second time (in case CLEARCACHES caused some) */
+	assertf(KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS) == 0,
+	        "Memory leaks detected (see system log)");
+
 	printf("All tests OK" EL "\n");
 	return 0;
 }

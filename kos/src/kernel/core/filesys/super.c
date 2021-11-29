@@ -418,13 +418,6 @@ PRIVATE WUNUSED NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
 	uintptr_t old_flags;
 
-	/* Delete global reference to the superblock. */
-	if (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF |
-	                                      MFILE_F_PERSISTENT)) &
-	    MFILE_FN_GLOBAL_REF) {
-		decref_nokill(self);
-	}
-
 	/* Mark the device as deleted (and make available use of the file fields) */
 	mfile_tslock_acquire(self);
 	old_flags = ATOMIC_FETCHOR(self->mf_flags,
@@ -435,9 +428,16 @@ NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
 	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 	                           MFILE_F_READONLY);
-	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	mfile_tslock_release(self);
+
+	/* Delete global reference to the superblock. */
+	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
+	    (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
+		decref_nokill(self);
+
+	/* Also clear the PERSISTENT flag */
+	if (old_flags & MFILE_F_PERSISTENT)
+		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT);
 
 	/* Already deleted, or deletion already in progress. */
 	return (old_flags & MFILE_F_DELETED) == 0;

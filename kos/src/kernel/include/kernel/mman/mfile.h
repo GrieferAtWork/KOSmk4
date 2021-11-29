@@ -129,17 +129,12 @@ struct stat;
 struct path;
 struct fdirent;
 struct handle;
+struct ccinfo;
 
 #ifndef __fallocate_mode_t_defined
 #define __fallocate_mode_t_defined
 typedef unsigned int fallocate_mode_t; /* TODO */
 #endif /* !__fallocate_mode_t_defined */
-
-#ifndef __gfp_t_defined
-#define __gfp_t_defined
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
-
 
 /* Extended operators used for implementing stream interface
  * functions and/or overriding the behavior of certain user-
@@ -326,30 +321,19 @@ struct mfile_stream_ops {
 	(KCALL *mso_sync)(struct mfile *__restrict self)
 			THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
-	/* [0..1] Clear internal object caches. This function must be NOBLOCK when
-	 *        `gfp & GFP_ATOMIC' is given. Otherwise, this function is allowed
-	 *        to block, but not throw an exception (iow: it may use  functions
-	 *        such as `atomic_lock_acquire_nx()')
-	 *
-	 * Generally speaking, this function should acquire locks like:
+	/* [0..1] Clear internal object caches.
+	 * Generally speaking, locking done by this function should locks like:
 	 * >> if (!mylock_tryacquire(self)) {
-	 * >>     if (gfp & GFP_ATOMIC)
+	 * >>     if (ccinfo_noblock(cc))
 	 * >>         return 0; // Not allowed to block :(
 	 * >>     if (!mylock_acquire_nx(self))
 	 * >>         return 0; // Cannot acquire lock...
 	 * >> }
 	 * >> ...
-	 * >> mylock_release(self);
-	 *
-	 * @param: gfp: Set of  `0 | GFP_ATOMIC'  (other  flags  may  also  be  set).
-	 *              This is also what should be passed in call to `kmalloc_nx()',
-	 *              and similar functions as flags  mode, as it may also  contain
-	 *              other flags such as `GFP_NOCLRC' to prevent recursion in case
-	 *              this function is  called as part  of clearing system  caches.
-	 * @return: * : An approximation of how much memory has become available.
-	 * @return: 0 : No resources could be released. */
-	NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) size_t
-	/*NOTHROW*/ (KCALL *mso_cc)(struct mfile *__restrict self, gfp_t gfp);
+	 * >> mylock_release(self); */
+	NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+	/*NOTHROW*/ (KCALL *mso_cc)(struct mfile *__restrict self,
+	                            struct ccinfo *__restrict cc);
 };
 
 /* Default ioctl(2) operator for mfiles. Implements:
@@ -520,7 +504,7 @@ struct mfile_ops {
 
 	/* [0..1][if(!mfile_isanon(self), [1..1])]
 	 * Load/initialize the given physical memory buffer (this is the read-from-disk callback)
-	 * This operator _must_ be  implementd for files that  aren't anonymous from the  get-go!
+	 * This  operator _must_ be implemented for files  that aren't anonymous from the get-go!
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
@@ -609,7 +593,9 @@ struct mfile_ops {
                                             *       a call to `mfile_parts_denywrite_or_unlock()'. Else, existing write
                                             *       mappings of file parts will continue to have that access! */
 #define MFILE_FS_NOSUID         0x00000002 /* [lock(ATOMIC)] fsuper-specific: Ignore `S_ISGID' and `S_ISUID' bits. */
-#define MFILE_FN_GLOBAL_REF     0x00000004 /* [lock(CLEAR_ONCE)] fnode-specific: The global list of fnode-s or fsuper-s holds a reference to this one. */
+#define MFILE_FN_GLOBAL_REF     0x00000004 /* [lock(CLEAR(ATOMIC), SET(<WAS_SET_PREVIOUSLY> && !MFILE_F_DELETED &&
+                                            *                          _MFILE_F_SMP_TSLOCK && fall[nodes|super]_acquired()))]
+                                            * fnode-specific: The global list of fnode-s or fsuper-s holds a reference to this one. */
 #define MFILE_FS_NOEXEC         0x00000008 /* [lock(ATOMIC)] fsuper-specific: Disallow execution of files. */
 /*      MFILE_F_                0x00000010  * ... Reserved: MS_SYNCHRONOUS */
 #define MFILE_F_DELETED         0x00000020 /* [lock(WRITE_ONCE)] The file has been marked as  deleted. When this flag is  set,
@@ -790,7 +776,7 @@ struct mfile {
      defined(__WANT_MFILE__mf_fsuperlop) || defined(__WANT_MFILE__mf_fsuperplop) || \
      defined(__WANT_MFILE__mf_mfplop) || defined(__WANT_MFILE__mf_deadparts) ||     \
      defined(__WANT_MFILE__mf_mpplop) || defined(__WANT_MFILE__mf_compl) ||         \
-     defined(__WANT_MFILE__mf_lopX))
+     defined(__WANT_MFILE__mf_deadnod) || defined(__WANT_MFILE__mf_lopX))
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) {{ { .tv_sec = mf_atime__tv_sec, .tv_nsec = mf_atime__tv_nsec }
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
@@ -852,6 +838,9 @@ struct mfile {
 #ifdef __WANT_MFILE__mf_compl
 		struct sig_completion    _mf_compl;      /* Signal completion callback. (used for waiting on `mf_trunclock') */
 #endif /* __WANT_MFILE__mf_compl */
+#ifdef __WANT_MFILE__mf_deadnod
+		SLIST_ENTRY(fnode)       _mf_deadnod;    /* Used internally */
+#endif /* __WANT_MFILE__mf_deadnod */
 #ifdef __WANT_MFILE__mf_lopX
 		byte_t _mf_lopX[3 * sizeof(struct timespec)]; /* ... */
 #endif /* __WANT_MFILE__mf_lopX */
@@ -918,6 +907,8 @@ struct mfile {
 		mfile_tslock_acquire_nopr(self)
 #define mfile_tslock_release_br(self) \
 		(mfile_tslock_release_nopr(self), PREEMPTION_POP(_mtsl_was))
+#define mfile_tslock_release_pronly_br(self) \
+		(PREEMPTION_POP(_mtsl_was))
 #define mfile_tslock_acquire_br(self)     \
 	do {                                  \
 		_mtsl_was = PREEMPTION_PUSHOFF(); \
@@ -925,6 +916,9 @@ struct mfile {
 	}	__WHILE0
 #define mfile_tslock_release(self)     \
 		mfile_tslock_release_br(self); \
+	} __WHILE0
+#define mfile_tslock_release_pronly(self)     \
+		mfile_tslock_release_pronly_br(self); \
 	} __WHILE0
 
 
@@ -1020,8 +1014,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_size_aligned(self, size)    (((size) & (self)->mf_part_amask) == 0)
 
 /* Reap lock operations of `self' */
-#define _mfile_lockops_reap(self)    _oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, self)
-#define mfile_lockops_reap(self)     oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, self)
+#define _mfile_lockops_reap(self)    _oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, (struct mfile *)(self))
+#define mfile_lockops_reap(self)     oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, (struct mfile *)(self))
 #define mfile_lockops_mustreap(self) (__hybrid_atomic_load((self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 /* Lock accessor helpers for `struct mfile' */

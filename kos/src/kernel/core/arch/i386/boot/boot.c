@@ -640,11 +640,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     supposed to be done.
 	 */
 
-	/* TODO: When system memory gets low, unload unused (iow: not currently mapped)
-	 *       portions  of mem-parts. This is why we have the `mpart_all_list' list!
-	 * Also: When unloading unused parts isn't enough, we could also try to
-	 *       off-load    not-recently-accessed     parts     into     swap. */
-
 	/* TODO: iconv extensions (take a look at FreeBSD's <iconv.h> header) */
 
 	/* TODO: The "include-everything.h" test has grown so large that there might be

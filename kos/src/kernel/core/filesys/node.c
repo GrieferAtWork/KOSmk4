@@ -1200,13 +1200,6 @@ PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 	uintptr_t old_flags;
 
-	/* Delete global reference to the file-node. */
-	if (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF |
-	                                      MFILE_F_PERSISTENT)) &
-	    MFILE_FN_GLOBAL_REF) {
-		decref_nokill(self);
-	}
-
 	/* Mark the file as deleted (and make available use of the timestamp fields) */
 	mfile_tslock_acquire(self);
 	old_flags = ATOMIC_FETCHOR(self->mf_flags,
@@ -1214,9 +1207,17 @@ NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
 	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
 	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_READONLY);
-	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	mfile_tslock_release(self);
+
+	/* Delete global reference to the file-node. */
+	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
+	    (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
+		decref_nokill(self);
+
+	/* Also clear the PERSISTENT flag */
+	if (old_flags & MFILE_F_PERSISTENT)
+		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT);
+
 	return !(old_flags & MFILE_F_DELETED);
 }
 
@@ -1224,21 +1225,22 @@ PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
 	uintptr_t old_flags;
 
-	/* Delete global reference to the file-node. */
-	if (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF |
-	                                      MFILE_F_PERSISTENT)) &
-	    MFILE_FN_GLOBAL_REF) {
-		decref_nokill(self);
-	}
-
 	/* Mark the file as deleted (and make available use of the timestamp fields) */
 	old_flags = ATOMIC_FETCHOR(self->mf_flags,
 	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
 	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
 	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
 	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_READONLY);
+
+	/* Delete global reference to the file-node. */
+	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
+	    (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
+		decref_nokill(self);
+
+	/* Also clear the PERSISTENT flag */
 	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
+		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT);
+
 	return !(old_flags & MFILE_F_DELETED);
 }
 

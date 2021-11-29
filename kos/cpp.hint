@@ -1336,11 +1336,6 @@
 #define __TYPEFOR_INTIB(n)          int
 #define __TYPEFOR_UINTIB(n)         unsigned
 
-#define DECLARE_PREALLOCATION_CACHE(decl,name,T)          T *name##_alloc(gfp_t alloc_flags); void name##_free(T *p); size_t name##_clear(void);
-#define DECLARE_PREALLOCATION_CACHE_ALLOC_NX(decl,name,T) T *name##_alloc_nx(gfp_t alloc_flags);
-#define DEFINE_PREALLOCATION_CACHE(decl,name,T,max_size)
-#define DEFINE_PREALLOCATION_CACHE_ALLOC_NX(decl,name,T)
-
 #define _os_heap_gfparg(v) ,int v
 #define _os_heap_gfppar(v) ,v
 #define os_heap_gfparg_(v) int v,

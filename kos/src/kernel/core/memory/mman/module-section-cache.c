@@ -25,7 +25,8 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
-#include <kernel/mman/cache.h>
+#include <kernel/malloc.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
 
@@ -35,11 +36,6 @@
 #include <kos/lockop.h>
 
 DECL_BEGIN
-
-#ifndef __module_section_slist_defined
-#define __module_section_slist_defined
-SLIST_HEAD(module_section_slist, module_section);
-#endif /* !__module_section_slist_defined */
 
 /* [0..n][lock(module_section_cache_lock)][link(cms_cache)]
  * Global cache of Module section  objects. In order to  keep
@@ -57,27 +53,37 @@ PUBLIC struct atomic_lock /*       */ module_section_cache_lock = ATOMIC_LOCK_IN
 PUBLIC struct lockop_slist /*      */ module_section_cache_lops = SLIST_HEAD_INITIALIZER(module_section_cache_lops);
 
 
+#ifndef __module_section_slist_defined
+#define __module_section_slist_defined
+SLIST_HEAD(module_section_slist, module_section);
+#endif /* !__module_section_slist_defined */
+
 /* Clear the global cache of module sections, and return a
  * number representative of an approximation of the amount
  * of memory became available as a result of this. */
-DEFINE_SYSCACHE_CLEAR(module_section_clearcache);
-PRIVATE ATTR_USED NOBLOCK size_t
-NOTHROW(KCALL module_section_clearcache)(void) {
-	size_t result = 0;
+INTERN NOBLOCK_IF(ccinfo_noblock(cc)) NONNULL((1)) void
+NOTHROW(KCALL system_cc_module_section_cache)(struct ccinfo *__restrict info) {
 	struct module_section_slist dead;
-	if (!module_section_cache_tryacquire())
-		goto done;
-
-	/* Remove all objects from the cache. */
-	SLIST_INIT(&dead);
-	while (!LIST_EMPTY(&module_section_cache)) {
-		REF struct module_section *sect;
-		sect = LIST_FIRST(&module_section_cache);
-		LIST_UNBIND(sect, ms_cache);
-		if (ATOMIC_DECFETCH(sect->ms_refcnt) == 0)
-			SLIST_INSERT_HEAD(&dead, sect, _ms_dead);
+	struct module_section *sect;
+	if (!module_section_cache_tryacquire()) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!module_section_cache_acquire_nx())
+			return;
 	}
-	module_section_cache_release_f();
+
+	/* Kill objects only held alive by the cache. */
+	SLIST_INIT(&dead);
+	LIST_FOREACH_SAFE(sect, &module_section_cache, ms_cache) {
+		if (!ATOMIC_CMPXCH(sect->ms_refcnt, 1, 0))
+			continue;
+		LIST_UNBIND(sect, ms_cache);
+		SLIST_INSERT_HEAD(&dead, sect, _ms_dead);
+		ccinfo_account(info, sizeof(struct module_section));
+		if (ccinfo_isdone(info))
+			break;
+	}
+	_module_section_cache_release();
 
 	/* Destroy dead sections. */
 	while (!SLIST_EMPTY(&dead)) {
@@ -85,20 +91,9 @@ NOTHROW(KCALL module_section_clearcache)(void) {
 		sect = SLIST_FIRST(&dead);
 		SLIST_REMOVE_HEAD(&dead, _ms_dead);
 		destroy(sect);
-		result += sizeof(struct module_section);
 	}
 	module_section_cache_reap();
-done:
-	return result;
 }
-/************************************************************************/
-
-
-
-
-
-
-
 
 DECL_END
 

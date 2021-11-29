@@ -920,7 +920,7 @@ handle_existing:
 		incref(node);
 	} else {
 		/* Construct the new file-node object. */
-		node = (ops->fdno_flat.fdnx_mkfile)(me, info);
+		node = (*ops->fdno_flat.fdnx_mkfile)(me, info);
 
 		/* Initialize missing fields as per the specs. */
 		node->mf_flags |= MFILE_FN_GLOBAL_REF;
@@ -975,8 +975,7 @@ handle_existing:
 
 					/* Destroy partially constructed objects. */
 					destroy_partially_initialized_flatdirent(ent);
-					if (ATOMIC_FETCHAND(node->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
-						decref_nokill(node);
+					fnode_delete(node);
 					decref_likely(node);
 
 					/* Deal with `existing' */
@@ -1084,8 +1083,7 @@ handle_existing:
 		/* Release lock */
 		flatdirnode_endwrite(me);
 	} EXCEPT {
-		if (ATOMIC_FETCHAND(node->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
-			decref_nokill(node);
+		fnode_delete(node);
 		decref_likely(node);
 		RETHROW();
 	}

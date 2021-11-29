@@ -727,7 +727,10 @@ svgadev_vnewttyf(struct svgadev *__restrict self,
 	}
 
 	/* SVGA-tty objects get  auto-destroyed once they're  no longer  referenced.
-	 * Because `device_registerf()' set the GLOBAL bit, we simply clear it here. */
+	 * Because `device_registerf()' set the GLOBAL bit, we simply clear it here.
+	 *
+	 * XXX: Technically, clearing `MFILE_FN_GLOBAL_REF'  like this is  unsafe, as  someone
+	 *      else might set the flag again because of the `<WAS_SET_PREVIOUSLY>' condition. */
 	if (ATOMIC_FETCHAND(result->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
 		decref_nokill(result);
 	return result;

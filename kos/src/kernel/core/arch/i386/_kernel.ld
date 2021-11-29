@@ -163,7 +163,6 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_##name##_start = ABSOLUTE(.)); \
 		KEEP(*(section))                                       \
 		PROVIDE_HIDDEN(__kernel_##name##_end = ABSOLUTE(.));
-		DEFINE_CALLBACK_VECTOR(syscache_clear, .rodata.cold.callback.syscache_clear)
 
 		DEFINE_CALLBACK_VECTOR(idle_job, .rodata.callback.idle_job)
 		DEFINE_CALLBACK_VECTOR(pertask_init, .rodata.callback.pertask.init)

@@ -2483,7 +2483,7 @@ DECL_END
 
 DECL_BEGIN
 
-PRIVATE ATTR_USED NOBLOCK NONNULL((1)) size_t
+INTERN ATTR_USED NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL dfc_freetree)(struct driver_fde_cache *__restrict tree) {
 	size_t result, temp;
 	struct driver_fde_cache *mi, *ma;
@@ -2504,39 +2504,6 @@ again:
 		tree = ma;
 		goto again;
 	}
-	return result;
-}
-
-/* Try to clear the FDE cache of the given, or of all loaded drivers. */
-PRIVATE ATTR_USED NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL clear_fde_cache)(struct driver *__restrict self) {
-	size_t result = 0;
-	if (driver_eh_frame_cache_trywrite(self)) {
-		struct driver_fde_cache *tree;
-		tree = self->d_eh_frame_cache;
-		self->d_eh_frame_cache = NULL;
-		driver_eh_frame_cache_endwrite(self);
-		if (tree)
-			result = dfc_freetree(tree);
-	}
-	return result;
-}
-
-DEFINE_SYSCACHE_CLEAR(clear_fde_caches);
-PRIVATE ATTR_USED NOBLOCK size_t
-NOTHROW(KCALL clear_fde_caches)(void) {
-	size_t i, result = 0;
-	REF struct driver_loadlist *ll;
-	ll = get_driver_loadlist();
-	for (i = 0; i < ll->dll_count; ++i) {
-		REF struct driver *drv;
-		drv = ll->dll_drivers[i];
-		if (!tryincref(drv))
-			continue;
-		result += clear_fde_cache(drv);
-		decref_unlikely(drv);
-	}
-	decref_unlikely(ll);
 	return result;
 }
 
@@ -4094,7 +4061,7 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 				LIST_UNBIND(&sect->ds_sect, ms_cache);
 				decref_nokill(sect);
 			}
-			module_section_cache_release_f();
+			_module_section_cache_release();
 			decref_likely(sect);
 			module_section_cache_reap();
 		} else {
