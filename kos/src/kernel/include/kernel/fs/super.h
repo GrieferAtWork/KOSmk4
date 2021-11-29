@@ -265,6 +265,43 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 #define fsuper_dev_rdsectors(self, addr, buf, num_bytes)            mfile_dosyncio((self)->fs_dev, (self)->fs_loadblocks, addr, buf, num_bytes)
 #define fsuper_dev_wrsectors(self, addr, buf, num_bytes)            mfile_dosyncio((self)->fs_dev, (self)->fs_saveblocks, addr, buf, num_bytes)
 
+/* Same as `fsuper_dev_*' above, but these perform an explicit check
+ * for the requested address range to actually be in-bounds. When it
+ * isn't, behavior depends on `fsuper_allow_fs_oob':
+ *  - When set to `false' (default), throw `E_IOERROR_BADBOUNDS'
+ *  - When set to `true', out-of-bounds writes are ignored, and reads yield all zeroes.
+ *    In  this case, any area that is actually in-bounds will be forwarded like normal.
+ * @assume(IS_ALIGNED(buf, (size_t)1 << self->fs_root.mf_iobashift));
+ * @assume(IS_ALIGNED(addr, mfile_getblocksize(&self->fs_root)));
+ * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(&self->fs_root)));
+ * @assume(num_bytes != 0); */
+FUNDEF BLOCKING NONNULL((1, 5)) void KCALL
+fsuper_dev_rdsectors_async_chk(struct fsuper *__restrict self, pos_t addr, physaddr_t buf,
+                               size_t num_bytes, struct aio_multihandle *__restrict aio)
+		THROWS(E_IOERROR_BADBOUNDS, ...);
+FUNDEF BLOCKING NONNULL((1, 5)) void KCALL
+fsuper_dev_wrsectors_async_chk(struct fsuper *__restrict self, pos_t addr, physaddr_t buf,
+                               size_t num_bytes, struct aio_multihandle *__restrict aio)
+		THROWS(E_IOERROR_BADBOUNDS, ...);
+FUNDEF BLOCKING NONNULL((1)) void KCALL
+fsuper_dev_rdsectors_chk(struct fsuper *__restrict self, pos_t addr,
+                         physaddr_t buf, size_t num_bytes)
+		THROWS(E_IOERROR_BADBOUNDS, ...);
+FUNDEF BLOCKING NONNULL((1)) void KCALL
+fsuper_dev_wrsectors_chk(struct fsuper *__restrict self, pos_t addr,
+                         physaddr_t buf, size_t num_bytes)
+		THROWS(E_IOERROR_BADBOUNDS, ...);
+
+
+/* Default behavior for filesystem drivers attempting to perform out-of-bounds I/O
+ * The value of this variable  can be controlled via  `/proc/kos/fs/allow-fs-oob'.
+ * When  `true', filesystem driver disk access to out-of-bounds regions behaves as
+ * though  those regions were  part of `/dev/zero', in  that writes are discarded,
+ * and reads yield all zeroes.
+ *
+ * The default for this option is `false' */
+DATDEF bool fsuper_allow_fs_oob;
+
 
 /* Return a pointer to superblock-node operators of `self' */
 #define fsuper_getops(self)                                                                                               \

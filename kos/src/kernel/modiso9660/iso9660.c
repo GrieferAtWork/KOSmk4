@@ -114,7 +114,7 @@ iso9660_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 	struct fnode *me   = mfile_asnode(self);
 	pos_t diskaddr     = fnode_getdiskaddr(me, addr);
 	struct fsuper *sup = me->fn_super;
-	fsuper_dev_rdsectors_async(sup, diskaddr, buf, num_bytes, aio);
+	fsuper_dev_rdsectors_async_chk(sup, diskaddr, buf, num_bytes, aio);
 }
 
 

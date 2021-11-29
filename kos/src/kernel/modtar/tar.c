@@ -46,6 +46,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
+#include <hybrid/overflow.h>
 #include <hybrid/wordbits.h>
 
 #include <kos/dev.h>
@@ -1030,9 +1031,9 @@ tarreg_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                     struct aio_multihandle *__restrict aio) {
 	struct tarregnode *me  = (struct tarregnode *)mfile_asreg(self);
 	struct tarsuper *super = container_of(me->fn_super, struct tarsuper, ts_super);
-	fsuper_dev_rdsectors_async(&super->ts_super,
-	                           tarfile_getdpos(me->trn_fdat.tfd_filp) + addr,
-	                           buf, num_bytes, aio);
+	fsuper_dev_rdsectors_async_chk(&super->ts_super,
+	                               tarfile_getdpos(me->trn_fdat.tfd_filp) + addr,
+	                               buf, num_bytes, aio);
 }
 
 
@@ -1662,14 +1663,17 @@ again:
 	}
 
 	TRY {
+		pos_t endpos;
 again_rdhdr:
 		/* Check for end-of-file. */
-		if (pos >= atomic64_read(&self->ts_super.fs_dev->mf_filesize)) {
+		if (OVERFLOW_UADD(pos, TBLOCKSIZE, &endpos) ||
+		    endpos > atomic64_read(&self->ts_super.fs_dev->mf_filesize)) {
 			tarsuper_endread(self);
 			return TARSUPER_READDIR_EOF;
 		}
 
-		/* Read the next file header. */
+		/* Read the next file header.
+		 * We don't have to use the *_chk variant here since we already check for bounds! */
 		fsuper_dev_rdsectors(&self->ts_super, pos, pagedir_translate(hdr), TBLOCKSIZE);
 
 		/* Decode into the associated file. */

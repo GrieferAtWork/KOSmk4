@@ -586,8 +586,8 @@ again:
 			if (max_io > num_bytes)
 				max_io = num_bytes;
 			/* Do disk I/O */
-			fsuper_dev_rdsectors_async(&super->ft_super.ffs_super,
-			                           diskpos, buf, max_io, aio);
+			fsuper_dev_rdsectors_async_chk(&super->ft_super.ffs_super,
+			                               diskpos, buf, max_io, aio);
 			if (max_io >= num_bytes)
 				break;
 			num_bytes -= max_io;
@@ -655,8 +655,8 @@ again:
 			/* Do disk I/O */
 			if unlikely(super->ft_super.ffs_super.fs_dev->mf_flags & MFILE_F_READONLY)
 				THROW(E_FSERROR_READONLY);
-			fsuper_dev_wrsectors_async(&super->ft_super.ffs_super,
-			                           diskpos, buf, max_io, aio);
+			fsuper_dev_wrsectors_async_chk(&super->ft_super.ffs_super,
+			                               diskpos, buf, max_io, aio);
 			if (max_io >= num_bytes)
 				break;
 			num_bytes -= max_io;
@@ -2541,8 +2541,8 @@ fat16root_loadblocks(struct mfile *__restrict self, pos_t addr,
 	addr += me->ft_fdat.fn16_root.r16_rootpos;
 
 	/* Do disk I/O */
-	fsuper_dev_rdsectors_async(&me->ft_super.ffs_super,
-	                           addr, buf, num_bytes, aio);
+	fsuper_dev_rdsectors_async_chk(&me->ft_super.ffs_super,
+	                               addr, buf, num_bytes, aio);
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
@@ -2561,8 +2561,8 @@ fat16root_v_saveblocks(struct mfile *__restrict self, pos_t addr,
 	/* Do disk I/O */
 	if unlikely(me->ft_super.ffs_super.fs_dev->mf_flags & MFILE_F_READONLY)
 		THROW(E_FSERROR_READONLY);
-	fsuper_dev_wrsectors_async(&me->ft_super.ffs_super,
-	                           addr, buf, num_bytes, aio);
+	fsuper_dev_wrsectors_async_chk(&me->ft_super.ffs_super,
+	                               addr, buf, num_bytes, aio);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void

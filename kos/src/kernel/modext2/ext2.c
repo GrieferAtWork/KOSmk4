@@ -151,10 +151,10 @@ ext2iblock_alloc(struct ext2super *__restrict super, ext2_blocki_t addr) {
 	                                                        super->es_blocksize,
 	                                                        GFP_NORMAL);
 	TRY {
-		fsuper_dev_rdsectors(&super->es_super.ffs_super,
-		                     EXT2_BLOCK2ADDR(super, addr),
-		                     pagedir_translate(ext2iblock_blocks(result)),
-		                     super->es_blocksize);
+		fsuper_dev_rdsectors_chk(&super->es_super.ffs_super,
+		                         EXT2_BLOCK2ADDR(super, addr),
+		                         pagedir_translate(ext2iblock_blocks(result)),
+		                         super->es_blocksize);
 	} EXCEPT {
 		kfree_physcont(result);
 		RETHROW();
@@ -170,10 +170,10 @@ ext2iiblock_alloc(struct ext2super *__restrict super, ext2_blockii_t addr) {
 	                                                         ext2iiblock_sizeof(super->es_ind_blocksize),
 	                                                         GFP_CALLOC);
 	TRY {
-		fsuper_dev_rdsectors(&super->es_super.ffs_super,
-		                     EXT2_BLOCK2ADDR(super, addr),
-		                     pagedir_translate(ext2iiblock_blocks(result, super->es_ind_blocksize)),
-		                     super->es_blocksize);
+		fsuper_dev_rdsectors_chk(&super->es_super.ffs_super,
+		                         EXT2_BLOCK2ADDR(super, addr),
+		                         pagedir_translate(ext2iiblock_blocks(result, super->es_ind_blocksize)),
+		                         super->es_blocksize);
 	} EXCEPT {
 		kfree_physcont(result);
 		RETHROW();
@@ -478,9 +478,9 @@ again:
 				io_bytes = num_cont << me->mf_blockshift;
 
 				/* Do disk I/O */
-				fsuper_dev_rdsectors_async(&super->es_super.ffs_super,
-				                           (pos_t)blockindex << me->mf_blockshift,
-				                           buf, io_bytes, aio);
+				fsuper_dev_rdsectors_async_chk(&super->es_super.ffs_super,
+				                               (pos_t)blockindex << me->mf_blockshift,
+				                               buf, io_bytes, aio);
 			}
 
 			/* Advance to the next part. */

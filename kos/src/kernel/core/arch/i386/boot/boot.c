@@ -937,15 +937,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  - After a couple of restarts, the kernel will panic because /dev/console got destroyed
 	 * Only logical conclusion: there's a missing incref() somewhere. */
 
-	/* TODO: Filesystem  drivers usually don't  do any bounds-checking  before doing disk I/O,
-	 *       however because disk I/O addresses are entirely dependent on filesystem contents,
-	 *       it can happen that an out-of-bounds access attempt is made, which currently leads
-	 *       to undefined behavior within disk drivers.
-	 * Solution:
-	 *  - Add new wrappers in <kerenl/fs/super.h> that call forward to the underlying operators
-	 *    after  checking  that I/O  ranges are  actually in-bounds  of the  underlying device.
-	 *  - When bounds are not in-range, an exception is thrown instead. */
-
 	return state;
 }
 
