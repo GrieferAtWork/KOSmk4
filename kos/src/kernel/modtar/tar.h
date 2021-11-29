@@ -71,15 +71,28 @@ struct tarfile {
 DEFINE_REFCOUNT_FUNCTIONS(struct tarfile, tf_refcnt, tarfile_destroy)
 
 /* Accessors for hidden fields. */
-#define __tarfile_hidden(self)  (strend((self)->tf_name) + 1)
-#define tarfile_getdevno(self)  ((dev_t)(*(uint32_t const *)CEIL_ALIGN((uintptr_t)__tarfile_hidden(self), 4)))
-#define tarfile_getlnkstr(self) ((char const *)__tarfile_hidden(self))
-#define tarfile_gethrdstr(self) ((char const *)__tarfile_hidden(self))
+#define __tarfile_hidden(self)       (strend((self)->tf_name) + 1)
+#define tarfile_getdevno(self)       ((dev_t)(*(uint32_t const *)CEIL_ALIGN((uintptr_t)__tarfile_hidden(self), 4)))
+#define tarfile_getlnkstr(self)      ((char const *)__tarfile_hidden(self))
+#define tarfile_gethrdstr(self)      ((char const *)__tarfile_hidden(self))
+#define tarfile_getnexthdr(self)     ((self)->tf_pos + CEIL_ALIGN((self)->tf_size, TBLOCKSIZE))
+#define tarfile_gethpos(self)        ((self)->tf_pos - TBLOCKSIZE)
+#define tarfile_getdpos(self)        ((self)->tf_pos)
+
+/* Return the inode number of this file */
+#define tarfile_getino(self) ((ino_t)(self)->tf_pos)
+
+/* Return the inode number of this file for the purpose of a leading directory
+ * @param: len: The # of characters before the trailing '/' of the leading directory.
+ * NOTE: To guaranty the uniqueness of inode numbers of implicit directories, this
+ *       function may only be used on the tarfile with the lowest `tf_pos' who's name
+ *       matches the `len' leading characters of the relevant directory. */
+#define tarfile_getdirino(self, len) ((ino_t)(self)->tf_pos + (len))
 
 
 /* Allocate a new tarfile descriptor. The caller must still fill in `return->tf_pos'
  * Returns `NULL' for unknown file types (that  will only be defined in the  future) */
-INTDEF WUNUSED struct tarfile *FCALL
+INTDEF WUNUSED NONNULL((1, 2)) struct tarfile *FCALL
 tarfile_new(struct tarhdr const *__restrict self,
             uint32_t *__restrict p_filesize)
 		THROWS(E_FSERROR_CORRUPTED_FILE_SYSTEM);
@@ -192,11 +205,14 @@ INTDEF struct fsuper_ops const tarsuper_ops;     /* For `struct tarsuper' */
  * the  function returning `TARSUPER_READDIR_AGAIN'  (to indicate the loss
  * of the read-lock).
  *
+ * When the tarfile descriptor at `self->ts_nfile' had already been loaded,
+ * that one will just be re-returned.
+ *
  * Locking logic:
  * @return: * :                     No lock was ever released
  * @return: TARSUPER_READDIR_EOF:   Read-lock released
  * @return: TARSUPER_READDIR_AGAIN: Read-lock released */
-INTDEF BLOCKING WUNUSED struct tarfile *FCALL
+INTDEF BLOCKING WUNUSED NONNULL((1)) struct tarfile *FCALL
 tarsuper_readdir_or_unlock(struct tarsuper *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 

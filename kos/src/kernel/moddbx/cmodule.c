@@ -35,6 +35,7 @@
 #include <kernel/mman/module.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <sched/task.h>
 
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>

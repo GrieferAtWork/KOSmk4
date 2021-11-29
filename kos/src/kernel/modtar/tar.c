@@ -38,15 +38,19 @@
 #include <kernel/fs/regnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
+#include <sched/atomic64.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/minmax.h>
 #include <hybrid/wordbits.h>
 
 #include <kos/dev.h>
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -57,8 +61,10 @@
 #include <stdio.h>
 #include <string.h>
 
+
 DECL_BEGIN
 
+#include <kernel/printk.h>
 STATIC_ASSERT(offsetof(struct tarhdr, th_type) == 156);
 STATIC_ASSERT(offsetof(struct tarhdr, th_devmajor) == 329);
 STATIC_ASSERT(sizeof(struct tarhdr) == 500);
@@ -99,14 +105,14 @@ tardirent_v_opennode(struct fdirent *__restrict self,
 	/* Check if this file is already open. */
 again:
 	fsuper_nodes_read(&super->ts_super);
-	result = fsuper_nodes_locate(&super->ts_super, (ino_t)tfile->tf_pos);
+	result = fsuper_nodes_locate(&super->ts_super, me->td_ent.fd_ino);
 	if (result) {
 		if likely(tryincref(result)) {
 			fsuper_nodes_endread(&super->ts_super);
 			return result;
 		}
 		if (!fsuper_nodes_upgrade(&super->ts_super))
-			result = fsuper_nodes_locate(&super->ts_super, (ino_t)tfile->tf_pos);
+			result = fsuper_nodes_locate(&super->ts_super, me->td_ent.fd_ino);
 
 		/* Remove already-deleted files from the superblock's file tree. */
 		if (result) {
@@ -163,7 +169,7 @@ again:
 	rfdat->tfd_filp = incref(tfile);
 	rfdat->tfd_name = tfile->tf_name;
 	rfdat->tfd_nlen = (uint8_t)strlen(tfile->tf_name);
-	assert(me->td_ent.fd_namelen >= rfdat->tfd_nlen);
+	assert(rfdat->tfd_nlen >= me->td_ent.fd_namelen);
 
 	/* Fill in mem-file fields. */
 	__mfile_init_wrlockpc(result)
@@ -190,7 +196,7 @@ again:
 	result->fn_mode  = tfile->tf_mode;
 	result->fn_uid   = (uid_t)tfile->tf_uid;
 	result->fn_gid   = (gid_t)tfile->tf_gid;
-	result->fn_ino   = (ino_t)(pos_t)tfile->tf_pos;
+	result->fn_ino   = me->td_ent.fd_ino;
 	if (me->td_ent.fd_type == DT_DIR) {
 		/* Check if `tfile' is actually the descriptor for this directory. (or just some random file) */
 		uint8_t parent_dir_size;
@@ -201,9 +207,13 @@ again:
 		        "dir->tdn_fdat.tfd_filp->tf_name = %q\n"
 		        "tfile->tf_name                  = %q\n",
 		        dir->tdn_fdat.tfd_filp->tf_name, tfile->tf_name);
-		assertf(tfile->tf_name[parent_dir_size] == '/',
-		        "tfile->tf_name = %q", tfile->tf_name);
-		++parent_dir_size; /* Skip '/' */
+		if (dir->tdn_fdat.tfd_filp != NULL) {
+			assertf(tfile->tf_name[parent_dir_size] == '/',
+			        "tfile->tf_name = %q", tfile->tf_name);
+			++parent_dir_size; /* Skip '/' */
+		} else {
+			assert(parent_dir_size == 0);
+		}
 		local_filename = tfile->tf_name + parent_dir_size;
 		assertf(memcmp(local_filename, me->td_ent.fd_name, me->td_ent.fd_namelen) == 0,
 		        "local_filename     = %q\n"
@@ -213,6 +223,7 @@ again:
 		/* If what we have isn't the actual directory file, then use stub defaults instead. */
 		if (local_filename[me->td_ent.fd_namelen] != '\0') {
 			/* Implicit directory... */
+			rfdat->tfd_nlen = (uint8_t)(size_t)(&local_filename[me->td_ent.fd_namelen] - tfile->tf_name);
 			result->fn_mode = S_IFDIR | 0555;
 			result->fn_uid  = 0;
 			result->fn_gid  = 0;
@@ -333,12 +344,45 @@ NOTHROW(KCALL tardir_v_destroy)(struct mfile *__restrict self) {
 }
 
 
+/* Return a pointer to the tarfile with the lowest  disk-position
+ * who's filename still matches `tf->tf_name...+=dirlen_plus_one'
+ *
+ * @param: tf:              Template tarfile
+ * @param: indexof_tf:      The index of `tf' within `self->ts_filev'
+ * @param: dirlen_plus_one: The # of characters to match from `tf' */
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) struct tarfile *FCALL
+tarsuper_find_first_subtree_file(struct tarsuper const *__restrict self,
+                                 struct tarfile *__restrict tf,
+                                 size_t indexof_tf,
+                                 uint8_t dirlen_plus_one) {
+	struct tarfile *result = tf;
+	size_t i;
+	for (i = indexof_tf; i--; task_serve()) {
+		struct tarfile *ot = self->ts_filev[i];
+		if (memcmp(ot->tf_name, tf->tf_name, dirlen_plus_one * sizeof(char)) != 0)
+			break;
+		if (result->tf_pos > ot->tf_pos)
+			result = ot;
+	}
+	for (i = indexof_tf + 1; i < self->ts_filec; ++i, task_serve()) {
+		struct tarfile *ot = self->ts_filev[i];
+		if (memcmp(ot->tf_name, tf->tf_name, dirlen_plus_one * sizeof(char)) != 0)
+			break;
+		if (result->tf_pos > ot->tf_pos)
+			result = ot;
+	}
+	return result;
+}
+
+
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 tardir_v_lookup(struct fdirnode *__restrict self,
                 struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
-	char filename[256];
-	struct tardirnode *me = (struct tardirnode *)self;
+	struct tarfile *tf;
+	char filename[256]; /* TAR cannot contain filenames longer than this, even with USTAR */
+	struct tardirnode *me  = (struct tardirnode *)self;
+	struct tarsuper *super = container_of(me->fn_super, struct tarsuper, ts_super);
 	char const *prefix_str;
 	uint8_t prefix_len;
 	size_t filename_len;
@@ -355,48 +399,614 @@ tardir_v_lookup(struct fdirnode *__restrict self,
 	if unlikely(filename_len >= COMPILER_LENOF(filename))
 		return NULL; /* Filename is too long and can't appear in a tar archive. */
 
-	/* TODO: Acquire a read-lock to `me->ts_lock' */
-	/* TODO: Search  through `me->ts_filev' for a files that starts with the requested
-	 *       prefix. If one is found that matches `filename' use that one.  Otherwise,
-	 *       if one is found that starts with `filename + "/"', use that one, and have
-	 *       the file reference a directory. */
-	/* TODO: When AT_DOSPATH is given, load min/max bounds of `prefix_str...+=prefix_len',
-	 *       as  in: the first and last already-loaded file apart of the parent dir. Then,
-	 *       walk  all those files  and strcasecmp() their  `basename(3)' to the requested
-	 *       filename. */
-	/* TODO: Keep on scanning  for the requested  file via  `tarsuper_readdir_or_unlock()'.
-	 *       When that function returns `TARSUPER_READDIR_EOF', give up. When that function
-	 *       returns `TARSUPER_READDIR_AGAIN', start over by re-acquiring the read-lock and
-	 *       scanning for the requested file. */
+	/* Acquire a read-lock to `me->ts_lock' */
+again:
+	tarsuper_read(super);
 
-	(void)me;
-	(void)info;
-	(void)filename;
-	(void)filename_len;
+	/* Search  through `me->ts_filev' for a files that starts with the requested
+	 * prefix. If one is found that matches `filename' use that one.  Otherwise,
+	 * if one is found that starts with `filename + "/"', use that one, and have
+	 * the file reference a directory. */
+	TRY {
+		size_t lo, hi;
+		lo = 0;
+		hi = super->ts_filec;
+		while (lo < hi) {
+			size_t i;
+			int cmp;
+			i   = (lo + hi) / 2;
+			tf  = super->ts_filev[i];
+			/* Compare based on requested filename prefix. */
+			cmp = memcmp(tf->tf_name, filename, filename_len * sizeof(char));
+			if (cmp < 0) {
+				lo = i + 1;
+			} else if (cmp > 0) {
+				hi = i;
+			} else {
+				/* Same prefix: check what comes after. */
+				char after;
+				after = tf->tf_name[filename_len];
+				if (after == '\0')
+					goto incref_and_return_tf; /* Found an exact match! */
+				if (after == '/') {
+					/* Implicit directory. - Check if there is an explicit entry for it also. */
+					hi = i; /* We're looking for a trailing '\0', which would come before '/' */
+					while (lo < hi) {
+						struct tarfile *tf2;
+						size_t i2;
+						i2  = (lo + hi) / 2;
+						tf2 = super->ts_filev[i2];
+						/* Compare based on requested filename prefix. */
+						cmp = memcmp(tf2->tf_name, filename, (filename_len + 1) * sizeof(char));
+						if (cmp < 0) {
+							lo = i2 + 1;
+						} else if (cmp > 0) {
+							hi = i2;
+						} else {
+							tf = tf2; /* Explicit entry _does_ exist! */
+							goto incref_and_return_tf;
+						}
+					}
+					/* Must  always  use the  _first_ file  that  describes some  implicit directory!
+					 * This must be done to guaranty consistency of implicit-directory INode numbers. */
+					if (tf->tf_name[filename_len] == '/')
+						tf = tarsuper_find_first_subtree_file(super, tf, i, filename_len + 1);
+					goto incref_and_return_tf;
+				}
+				if (after > MAX_C('\0', '/')) {
+					hi = i;
+				} else if (after < MIN_C('\0', '/')) {
+					lo = i + 1;
+				} else {
+					/* Special case: the file we're looking for may exist as either
+					 *               a direct file ('\0'  tail), or as a  directory
+					 *               ('/' tail). In this case, first search for the
+					 *               direct variant before checking the dir-one. */
+					size_t lo2, hi2;
+					lo2 = lo;
+					hi2 = hi;
+					++filename_len; /* Include trailing NUL in compare */
+					while (lo2 < hi2) {
+						size_t i2;
+						i2 = (lo2 + hi2) / 2;
+						tf = super->ts_filev[i2];
+						/* Compare based on requested filename prefix. */
+						cmp = memcmp(tf->tf_name, filename, filename_len * sizeof(char));
+						if (cmp < 0) {
+							lo2 = i2 + 1;
+						} else if (cmp > 0) {
+							hi2 = i2;
+						} else {
+							/* Found a variant without a trailing '/' */
+							goto incref_and_return_tf;
+						}
+					}
+					--filename_len;
 
-	THROW(E_NOT_IMPLEMENTED_TODO);
+					/* Use the normal code path to search for the trailing-/ variant. */
+					lo = i + 1;
+				}
+			}
+		}
+
+		/* When AT_DOSPATH is given, load min/max bounds of `prefix_str...+=prefix_len',
+		 * as  in: the first and last already-loaded file apart of the parent dir. Then,
+		 * walk  all those files  and strcasecmp() their  `basename(3)' to the requested
+		 * filename. */
+		if (info->flu_flags & AT_DOSPATH) {
+			char const *basename; /* basename(3) of the queried file. */
+			size_t dirlen;        /* Length of the directory prefix in `filename' */
+			dirlen   = filename_len - info->flu_namelen;
+			basename = filename + dirlen;
+			lo = 0;
+			hi = super->ts_filec;
+			while (lo < hi) {
+				size_t i;
+				int cmp;
+				i   = (lo + hi) / 2;
+				tf  = super->ts_filev[i];
+				cmp = memcmp(tf->tf_name, filename, dirlen * sizeof(char));
+				if (cmp > 0) {
+					hi = i;
+				} else if (cmp < 0) {
+					lo = i + 1;
+				} else {
+					lo = i;
+					hi = i + 1;
+					break;
+				}
+			}
+			if (lo < hi) {
+				size_t i;
+				/* Search for the requested file below and above. */
+				for (i = lo;;) {
+					tf = super->ts_filev[i];
+					if (memcmp(tf->tf_name, filename, dirlen * sizeof(char)) != 0)
+						break;
+					/* Check trailing name. */
+					if (memcasecmp(tf->tf_name + dirlen, basename, info->flu_namelen * sizeof(char)) == 0) {
+						if (tf->tf_name[filename_len] == '\0')
+							goto incref_and_return_tf;
+						if (tf->tf_name[filename_len] == '/') {
+							/* Must  always  use the  _first_ file  that  describes some  implicit directory!
+							 * This must be done to guaranty consistency of implicit-directory INode numbers. */
+							tf = tarsuper_find_first_subtree_file(super, tf, i, filename_len + 1);
+							goto incref_and_return_tf;
+						}
+					}
+					if (i == 0)
+						break;
+					--i;
+					task_serve();
+				}
+				for (i = hi; i < super->ts_filec; ++i) {
+					tf = super->ts_filev[i];
+					if (memcmp(tf->tf_name, filename, dirlen * sizeof(char)) != 0)
+						break;
+					/* Check trailing name. */
+					if (memcasecmp(tf->tf_name + dirlen, basename, info->flu_namelen * sizeof(char)) == 0) {
+						if (tf->tf_name[filename_len] == '\0')
+							goto incref_and_return_tf;
+						if (tf->tf_name[filename_len] == '/') {
+							/* Must  always  use the  _first_ file  that  describes some  implicit directory!
+							 * This must be done to guaranty consistency of implicit-directory INode numbers. */
+							tf = tarsuper_find_first_subtree_file(super, tf, i, filename_len + 1);
+							goto incref_and_return_tf;
+						}
+					}
+					task_serve();
+				}
+			}
+		}
+	} EXCEPT {
+		tarsuper_endread(super);
+		RETHROW();
+	}
+
+	/* Keep on scanning  for the requested  file via  `tarsuper_readdir_or_unlock()'.
+	 * When that function returns `TARSUPER_READDIR_EOF', give up. When that function
+	 * returns `TARSUPER_READDIR_AGAIN', start over by re-acquiring the read-lock and
+	 * scanning for the requested file. */
+again_readdir:
+	tf = tarsuper_readdir_or_unlock(super);
+
+	/* Check for special return values. */
+	if (tf == TARSUPER_READDIR_EOF)
+		return NULL; /* No such file :( */
+	if (tf == TARSUPER_READDIR_AGAIN)
+		goto again; /* Lock was lost... */
+
+	/* Check if `tf' is the requested file. (No TRY needed, because `filename' is allocated on the stack) */
+	if (memcmp(tf->tf_name, filename, filename_len * sizeof(char)) == 0 &&
+	    (tf->tf_name[filename_len] == '\0' || tf->tf_name[filename_len] == '/')) {
+incref_and_return_tf:
+		incref(tf);
+		tarsuper_endread(super);
+		goto return_tf;
+	}
+
+	/* Also do the case-insensitive compare. (if necessary) */
+	if (info->flu_flags & AT_DOSPATH) {
+		char const *basename; /* basename(3) of the queried file. */
+		size_t dirlen;        /* Length of the directory prefix in `filename' */
+		dirlen   = filename_len - info->flu_namelen;
+		basename = filename + dirlen;
+		if (memcmp(tf->tf_name, filename, dirlen * sizeof(char)) == 0 &&
+		    memcasecmp(tf->tf_name + dirlen, basename, info->flu_namelen * sizeof(char)) == 0 &&
+		    (tf->tf_name[filename_len] == '\0' || tf->tf_name[filename_len] == '/'))
+			goto incref_and_return_tf;
+	}
+
+	/* Read more files... */
+	goto again_readdir;
+	{
+		REF struct tardirent *result;
+return_tf:
+		TRY {
+			result = (REF struct tardirent *)kmalloc(offsetof(struct tardirent, td_ent.fd_name) +
+			                                         (info->flu_namelen + 1) * sizeof(char),
+			                                         GFP_NORMAL);
+		} EXCEPT {
+			decref_unlikely(tf);
+			RETHROW();
+		}
+
+		/* Fill in the new directory entry. */
+		result->td_filp          = tf; /* Inherit reference */
+		result->td_ent.fd_refcnt = 1;
+		result->td_ent.fd_ops    = &tardirent_ops;
+		result->td_ent.fd_ino    = tarfile_getino(tf);
+		result->td_ent.fd_type   = IFTODT(tf->tf_mode);
+		assert(tf->tf_name[filename_len] == '\0' ||
+		       tf->tf_name[filename_len] == '/');
+		if (tf->tf_name[filename_len] == '/') {
+			printk(KERN_DEBUG "[tarfs] Implicit directory: %$q (file: %q)\n",
+			       (size_t)filename_len, tf->tf_name, tf->tf_name);
+			result->td_ent.fd_type = DT_DIR; /* Implicit directory */
+			result->td_ent.fd_ino  = tarfile_getdirino(tf, filename_len);
+		}
+		result->td_ent.fd_namelen = info->flu_namelen;
+		memcpy(result->td_ent.fd_name,
+		       filename + filename_len - result->td_ent.fd_namelen,
+		       result->td_ent.fd_namelen + 1, sizeof(char));
+		result->td_ent.fd_hash = fdirent_hash(result->td_ent.fd_name, result->td_ent.fd_namelen);
+
+		return &result->td_ent;
+	}
 }
 
+
+
+
+
 struct tardirenum: fdirenum {
-	/* TODO: Enumerate files based  on `tf_pos'  (iow: disk  position)
-	 *       For this purpose, we seekdir() simply alters the absolute
-	 *       on-disk  position, and readdir() yields the first tarfile
-	 *       that  has a name  that starts with the  prefix of the dir
-	 *       being enumerated, doesn't contain any additional '/'s.
+	/* Enumerate files based  on `tf_pos'  (iow: disk  position)
+	 * For this purpose, we seekdir() simply alters the absolute
+	 * on-disk  position, and readdir() yields the first tarfile
+	 * that  has a name  that starts with the  prefix of the dir
+	 * being enumerated, followed by a '/', and doesn't  contain
+	 * any additional '/'s thereafter.
+	 *
 	 * - Use  `ts_nfile' to determine if all files until the min disk
 	 *   address of the next file to-be read have already been loaded
 	 * - Use `ts_bypos' to enumerate files based on disk-order
-	 * - Use `ts_filev' to narrow down files within the current dir.
-	 */
+	 * - Use `ts_filev' to narrow down files within the current dir. */
+	struct tarsuper *tde_super;   /* [1..1][const] Superblock. */
+	atomic64_t       tde_pos;     /* [lock(ATOMIC)] Lower bound for next file to yield. */
+	char const      *tde_dirname; /* [0..tde_dirsize][const] Required filename prefix. (excluding a trailing '/') */
+	uint8_t          tde_dirsize; /* [const] Length of `tde_dirname'. */
 };
+
+LOCAL NONNULL((1)) void FCALL
+tarsuper_serve_or_unlock(struct tarsuper *__restrict self) {
+	TRY {
+		task_serve();
+	} EXCEPT {
+		tarsuper_endread(self);
+		RETHROW();
+	}
+}
+
+/* Return the first file at a position `>= pos' that starts with the
+ * string in `self->tde_dirname...+=self->tde_dirsize', followed  by
+ * a '/'. Returns `NULL' if no such file exists. Locking logic:
+ * @return: * :                     No lock was ever released
+ * @return: TARSUPER_READDIR_EOF:   Read-lock released
+ * @return: TARSUPER_READDIR_AGAIN: Read-lock released */
+PRIVATE WUNUSED NONNULL((1)) struct tarfile *FCALL
+tardirenum_peekfile_raw(struct tardirenum const *__restrict self, pos_t pos) {
+	/* First of: make sure that the disk has been loaded until at least after `pos' */
+	struct tarsuper *super = self->tde_super;
+	struct tarfile *tf;
+	if (pos < super->ts_nfile) {
+		/* Search through already-loaded file with the required
+		 * prefix for  the first  one that  comes after  `pos'. */
+		size_t lo, hi;
+		lo = 0;
+		hi = super->ts_filec;
+		while (lo < hi) {
+			size_t i;
+			int cmp;
+			i   = (lo + hi) / 2;
+			tf  = super->ts_filev[i];
+			cmp = memcmp(tf->tf_name, self->tde_dirname, self->tde_dirsize * sizeof(char));
+			if (cmp > 0) {
+				hi = i;
+			} else if (cmp < 0) {
+				lo = i + 1;
+			} else {
+				lo = i;
+				hi = i + 1;
+				break;
+			}
+		}
+		if (lo < hi) {
+			size_t i;
+			/* Search for the requested file below and above. */
+			tf = NULL;
+			for (i = lo;;) {
+				struct tarfile *ntf;
+				ntf = super->ts_filev[i];
+				if (memcmp(ntf->tf_name, self->tde_dirname, self->tde_dirsize * sizeof(char)) != 0)
+					break;
+				if ((self->tde_dirsize == 0 ||
+				     ntf->tf_name[self->tde_dirsize] == '/') &&
+				    tarfile_gethpos(ntf) >= pos) {
+					if (tarfile_gethpos(ntf) == pos)
+						return ntf; /* Perfect match; can't get any better than this! */
+					if (!tf || tarfile_gethpos(tf) > tarfile_gethpos(ntf))
+						tf = ntf;
+				}
+				if (i == 0)
+					break;
+				--i;
+				tarsuper_serve_or_unlock(super);
+			}
+			for (i = hi; i < super->ts_filec; ++i) {
+				struct tarfile *ntf;
+				ntf = super->ts_filev[i];
+				if (memcmp(ntf->tf_name, self->tde_dirname, self->tde_dirsize * sizeof(char)) != 0)
+					break;
+				if ((self->tde_dirsize == 0 ||
+				     ntf->tf_name[self->tde_dirsize] == '/') &&
+				    tarfile_gethpos(ntf) >= pos) {
+					if (tarfile_gethpos(ntf) == pos)
+						return ntf; /* Perfect match; can't get any better than this! */
+					if (!tf || tarfile_gethpos(tf) > tarfile_gethpos(ntf))
+						tf = ntf;
+				}
+				tarsuper_serve_or_unlock(super);
+			}
+
+			/* Because we know that all files leading up to `pos' are loaded,
+			 * we can just  return the lowest  in-range file detected  above. */
+			if (tf != NULL)
+				return tf;
+		}
+	}
+
+	/* Skip all directory entries which we don't care about. */
+	do {
+		tf = tarsuper_readdir_or_unlock(super);
+		if (tf == TARSUPER_READDIR_EOF || tf == TARSUPER_READDIR_AGAIN)
+			return tf;
+	} while (tarfile_gethpos(tf) < pos);
+
+	/* Check newly read directory entries. */
+	for (;;) {
+		/* Check if `tf' matches. */
+		assert(tarfile_gethpos(tf) >= pos);
+		if (memcmp(tf->tf_name, self->tde_dirname, self->tde_dirsize * sizeof(char)) == 0 &&
+		    (self->tde_dirsize == 0 || tf->tf_name[self->tde_dirsize] == '/'))
+			break; /* Got one! */
+
+		/* Read the next entry. */
+		tf = tarsuper_readdir_or_unlock(super);
+		if (tf == TARSUPER_READDIR_EOF || tf == TARSUPER_READDIR_AGAIN)
+			break;
+		tarsuper_serve_or_unlock(super);
+	}
+	return tf;
+}
+
+
+/* Same as  `tardirenum_peekfile_raw()', but  includes special  handling
+ * to only enumerate the first file from chains of sub-directories, such
+ * that when enumerating "/usr", a file "/usr/bin/env" may be enumerated
+ * only  if no other file with a lower position exists that is also pre-
+ * fixed with "/usr/", or equals "/usr". */
+PRIVATE BLOCKING WUNUSED NONNULL((1, 2, 3, 4)) struct tarfile *FCALL
+tardirenum_peekfile(struct tardirenum const *__restrict self,
+                    pos_t *__restrict p_pos,
+                    char const **__restrict p_basename,
+                    uint8_t *__restrict p_baselen) {
+	struct tarfile *result;
+again:
+	result = tardirenum_peekfile_raw(self, *p_pos);
+	if (result != TARSUPER_READDIR_EOF && result != TARSUPER_READDIR_AGAIN) {
+		size_t lo, hi;
+		char const *basename;
+		char const *baseend;
+		struct tarsuper *super;
+		struct tarfile *tf;
+		uint8_t prefix_len;
+		basename = result->tf_name + self->tde_dirsize;
+		if (self->tde_dirsize != 0)
+			++basename;
+		baseend = strchrnul(basename, '/');
+		assert(tarfile_gethpos(result) >= *p_pos);
+		assert(self->tde_super->ts_nfile > *p_pos);
+		assert(*baseend == '\0' || *baseend == '/');
+
+		/* Write-back additional arguments */
+		*p_basename = basename;
+		*p_baselen  = (uint8_t)(size_t)(baseend - basename);
+
+		/* Check if we should really enumerate this file. */
+		if (*baseend == '\0' && !S_ISDIR(result->tf_mode))
+			return result; /* Immediate sub-file (that isn't a directory) -> always enumerate! */
+
+		/* `result' must be enumerated as some kind of directory.
+		 * In  this case, check that other file with a lower disk
+		 * position than `result->tf_pos' exists that also starts
+		 * with the string `result->tf_name...baseend'.
+		 *
+		 * Because we're still holding a lock to the  superblock,
+		 * we know that any such file _must_ be loaded right now,
+		 * since `tardirenum_peekfile_raw()'  would  have  loaded
+		 * all files leading up to `result', which is  guarantied
+		 * to be located at `>= *p_pos' */
+		super      = self->tde_super;
+		prefix_len = (uint8_t)((size_t)(baseend - result->tf_name));
+		lo         = 0;
+		hi         = super->ts_filec;
+		while (lo < hi) {
+			size_t i;
+			int cmp;
+			i   = (lo + hi) / 2;
+			tf  = super->ts_filev[i];
+			cmp = memcmp(tf->tf_name, result->tf_name, prefix_len);
+			if (cmp > 0) {
+				hi = i;
+			} else if (cmp < 0) {
+				lo = i + 1;
+			} else {
+				lo = i;
+				hi = i + 1;
+				break;
+			}
+		}
+		if (lo < hi) {
+			size_t i;
+			/* Search for the requested file below and above. */
+			for (i = lo;;) {
+				tf = super->ts_filev[i];
+				if (memcmp(tf->tf_name, result->tf_name, prefix_len * sizeof(char)) != 0)
+					break;
+				tarsuper_serve_or_unlock(super);
+				if ((tf->tf_name[prefix_len] == '\0' ||
+				     tf->tf_name[prefix_len] == '/') &&
+				    tarfile_gethpos(tf) < tarfile_gethpos(result)) {
+					/* This file would have already enumerated this directory! */
+					*p_pos = tarfile_getnexthdr(result);
+					goto again;
+				}
+				if (i == 0)
+					break;
+				--i;
+			}
+			for (i = hi; i < super->ts_filec; ++i) {
+				tf = super->ts_filev[i];
+				if (memcmp(tf->tf_name, result->tf_name, prefix_len * sizeof(char)) != 0)
+					break;
+				tarsuper_serve_or_unlock(super);
+				if ((tf->tf_name[prefix_len] == '\0' ||
+				     tf->tf_name[prefix_len] == '/') &&
+				    tarfile_gethpos(tf) < tarfile_gethpos(result)) {
+					/* This file would have already enumerated this directory! */
+					*p_pos = tarfile_getnexthdr(result);
+					goto again;
+				}
+			}
+		}
+		/* No  other  file  exists  at  a  lower  position  that  has  the  same   prefix.
+		 * In other words: we really _are_ supposed to enumerate this file as a directory! */
+	}
+	return result;
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL tardirenum_v_fini)(struct fdirenum *__restrict self) {
+	/* No-op */
+	(void)self;
+}
+
+PRIVATE BLOCKING NONNULL((1)) size_t KCALL
+tardirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                     size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	REF struct tarfile *tf;
+	struct tardirenum *me  = (struct tardirenum *)self;
+	struct tarsuper *super = container_of(me->de_dir->fn_super, struct tarsuper, ts_super);
+	pos_t oldpos, newpos;
+	char const *tf_basename;
+	uint8_t tf_baselen;
+	ssize_t result;
+
+again:
+	/* Load position. */
+	oldpos = (pos_t)atomic64_read(&me->tde_pos);
+	newpos = oldpos;
+
+	/* Query next file to enumerate. */
+again_lock_super:
+	tarsuper_read(super);
+	tf = tardirenum_peekfile(me, &newpos, &tf_basename, &tf_baselen);
+
+	/* Check for special return values. */
+	if (tf == TARSUPER_READDIR_EOF)
+		return 0; /* EOF */
+	if (tf == TARSUPER_READDIR_AGAIN)
+		goto again_lock_super; /* Try again */
+
+	/* Got a file! we're supposed to enumerate! */
+	incref(tf);
+	tarsuper_endread(super);
+
+	/* Enumerate the file. */
+	{
+		unsigned char typ;
+		ino_t ino;
+		typ = IFTODT(tf->tf_mode);
+		ino = tarfile_getino(tf);
+		if (tf_basename[tf_baselen] != '\0') {
+			typ = DT_DIR; /* Implicit directory */
+			ino = tarfile_getdirino(tf, (uint8_t)(size_t)((tf_basename + tf_baselen) - tf->tf_name));
+		}
+		FINALLY_DECREF_UNLIKELY(tf);
+		newpos = tarfile_getnexthdr(tf);
+		result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+		                             ino, typ, tf_baselen,
+		                             tf_basename);
+	}
+	if (result < 0)
+		return (size_t)~result; /* Don't yield! */
+
+	/* Save the new disk position. */
+	if (!atomic64_cmpxch(&me->tde_pos, (uint64_t)oldpos, (uint64_t)newpos))
+		goto again; /* Race condition: someone else did another read in the meantime. */
+	return (size_t)result;
+}
+
+
+PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
+tardirenum_v_seekdir(struct fdirenum *__restrict self,
+                     off_t offset, unsigned int whence)
+		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...) {
+	struct tardirenum *me  = (struct tardirenum *)self;
+	uint64_t newpos;
+	switch (whence) {
+
+	case SEEK_SET:
+		newpos = (uint64_t)(pos_t)offset;
+		break;
+
+	case SEEK_CUR: {
+		/* This is the only case where the new file position depends on the
+		 * old, also making it the only  case where we need CAS  semantics. */
+		uint64_t oldpos;
+		do {
+			oldpos = atomic64_read(&me->tde_pos);
+			newpos = oldpos + (int64_t)offset;
+			if unlikely(offset < 0 ? newpos > oldpos
+			                       : newpos < oldpos)
+				THROW(E_OVERFLOW);
+		} while (!atomic64_cmpxch(&me->tde_pos, oldpos, newpos));
+		goto done;
+	}	break;
+
+	case SEEK_END: {
+		uint64_t filesize;
+		/* Max size is the size of the disk. */
+		filesize = atomic64_read(&me->tde_super->ts_super.fs_dev->mf_filesize);
+		newpos   = filesize + (int64_t)offset;
+		if unlikely(offset < 0 ? newpos > filesize
+		                       : newpos < filesize)
+			THROW(E_OVERFLOW);
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+		break;
+	}
+
+	/* Write-back the new file position. */
+	atomic64_write(&me->tde_pos, newpos);
+done:
+	return (pos_t)newpos;
+}
+
+PRIVATE struct fdirenum_ops const tardirenum_ops = {
+	.deo_fini    = &tardirenum_v_fini,
+	.deo_readdir = &tardirenum_v_readdir,
+	.deo_seekdir = &tardirenum_v_seekdir,
+};
+
 
 PRIVATE BLOCKING NONNULL((1)) void KCALL
 tardir_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_IOERROR, ...) {
-	struct tardirenum *rt = (struct tardirenum *)result;
-	/* TODO */
-	(void)rt;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	struct tardirenum *rt  = (struct tardirenum *)result;
+	struct tardirnode *dir = (struct tardirnode *)rt->de_dir;
+	/* Fill in fields. */
+	rt->de_ops    = &tardirenum_ops;
+	rt->tde_super = container_of(rt->de_dir->fn_super, struct tarsuper, ts_super);
+	atomic64_init(&rt->tde_pos, 0);
+	rt->tde_dirname = dir->tdn_fdat.tfd_name;
+	rt->tde_dirsize = dir->tdn_fdat.tfd_nlen;
 }
 
 
@@ -421,7 +1031,7 @@ tarreg_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 	struct tarregnode *me  = (struct tarregnode *)mfile_asreg(self);
 	struct tarsuper *super = container_of(me->fn_super, struct tarsuper, ts_super);
 	fsuper_dev_rdsectors_async(&super->ts_super,
-	                           me->trn_fdat.tfd_filp->tf_pos + addr,
+	                           tarfile_getdpos(me->trn_fdat.tfd_filp) + addr,
 	                           buf, num_bytes, aio);
 }
 
@@ -501,8 +1111,8 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self, gfp_t gfp) {
 		/* Delete this file. */
 		TAILQ_REMOVE(&me->ts_bypos, tf, tf_bypos);
 		SLIST_INSERT(&deadfiles, tf, _tf_dead);
-		if (me->ts_nfile > tf->tf_pos)
-			me->ts_nfile = tf->tf_pos; /* Keep track of the first missing file. */
+		if (me->ts_nfile > tarfile_gethpos(tf))
+			me->ts_nfile = tarfile_gethpos(tf); /* Keep track of the first missing file. */
 		--me->ts_filec;
 		memmovedown(&me->ts_filev[i],
 		            &me->ts_filev[i + 1],
@@ -674,7 +1284,7 @@ decode_oct(char const *str, size_t len)
 
 /* Allocate a new tarfile descriptor. The caller must still fill in `return->tf_pos'
  * Returns `NULL' for unknown file types (that  will only be defined in the  future) */
-INTERN WUNUSED struct tarfile *FCALL
+INTERN WUNUSED NONNULL((1, 2)) struct tarfile *FCALL
 tarfile_new(struct tarhdr const *__restrict self,
             uint32_t *__restrict p_filesize)
 		THROWS(E_FSERROR_CORRUPTED_FILE_SYSTEM) {
@@ -916,9 +1526,89 @@ fill_common_fields:
 	                 fstr_start,
 	                 (size_t)(fstr_end - fstr_start),
 	                 sizeof(char)) = '\0';
+	printk(KERN_DEBUG "[tarfs] file: %q\n", result->tf_name);
 	return result;
 }
 
+
+
+/* Insert a given file `tf' into `self' */
+INTERN NONNULL((1, 2)) void FCALL
+tarsuper_insertfile(struct tarsuper *__restrict self,
+                    REF struct tarfile *__restrict tf)
+		THROWS(E_BADALLOC) {
+	size_t avail, lo, hi;
+
+	/* Make sure that the file vector has sufficient space */
+	avail = kmalloc_usable_size(self->ts_filev);
+	avail /= sizeof(REF struct tarfile *);
+	if (avail < self->ts_filec + 1) {
+		/* Must allocate more file space. */
+		size_t newalloc;
+		REF struct tarfile **newlist;
+		newalloc = avail * 2;
+		if unlikely(!newalloc)
+			newalloc = 32;
+		newlist = (REF struct tarfile **)krealloc_nx(self->ts_filev,
+		                                             newalloc * sizeof(REF struct tarfile *),
+		                                             GFP_NORMAL);
+		if (!newlist) {
+			newalloc = self->ts_filec + 1;
+			newlist = (REF struct tarfile **)krealloc(self->ts_filev,
+			                                          newalloc * sizeof(REF struct tarfile *),
+			                                          GFP_NORMAL);
+		}
+		self->ts_filev = newlist;
+	}
+
+	/* NOTHROW FROM HERE ON! */
+
+	/* Insert into the by-position list. */
+	if unlikely(TAILQ_EMPTY(&self->ts_bypos)) {
+		TAILQ_INSERT_HEAD(&self->ts_bypos, tf, tf_bypos);
+	} else if likely(tf->tf_pos >= TAILQ_LAST(&self->ts_bypos)->tf_pos) {
+		/* Most likely case: insert at the back. */
+		TAILQ_INSERT_TAIL(&self->ts_bypos, tf, tf_bypos);
+	} else if unlikely(tf->tf_pos <= TAILQ_FIRST(&self->ts_bypos)->tf_pos) {
+		/* Special case: insert in the front. */
+		TAILQ_INSERT_HEAD(&self->ts_bypos, tf, tf_bypos);
+	} else {
+		struct tarfile *pred;
+		pred = TAILQ_LAST(&self->ts_bypos);
+		/* Find the file after which to insert `tf' */
+		do {
+			pred = TAILQ_PREV(pred, tf_bypos);
+		} while (tf->tf_pos < pred->tf_pos);
+		TAILQ_INSERT_AFTER(&self->ts_bypos, pred, tf, tf_bypos);
+	}
+
+	/* Insert into the by-name list. */
+	lo = 0;
+	hi = self->ts_filec;
+	while (lo < hi) {
+		size_t i;
+		struct tarfile *ot;
+		int cmp;
+		i   = (lo + hi) / 2;
+		ot  = self->ts_filev[i];
+		cmp = strcmp(ot->tf_name, tf->tf_name);
+		if (cmp > 0) {
+			hi = i;
+		} else if (cmp < 0) {
+			lo = i + 1;
+		} else {
+			break;
+		}
+	}
+
+	/* Insert at `lo' */
+	memmoveup(&self->ts_filev[lo + 1],
+	          &self->ts_filev[lo],
+	          self->ts_filec - lo,
+	          sizeof(REF struct tarfile *));
+	self->ts_filev[lo] = tf; /* Inherit reference. */
+	++self->ts_filec;
+}
 
 
 /* Read a new tarfile descriptor  at `self->ts_nfile', or endread  `self'.
@@ -929,16 +1619,116 @@ fill_common_fields:
  * the  function returning `TARSUPER_READDIR_AGAIN'  (to indicate the loss
  * of the read-lock).
  *
+ * When the tarfile descriptor at `self->ts_nfile' had already been loaded,
+ * that one will just be re-returned.
+ *
  * Locking logic:
  * @return: * :                     No lock was ever released
  * @return: TARSUPER_READDIR_EOF:   Read-lock released
  * @return: TARSUPER_READDIR_AGAIN: Read-lock released */
-INTERN BLOCKING WUNUSED struct tarfile *FCALL
+INTERN BLOCKING ATTR_NOINLINE WUNUSED NONNULL((1)) struct tarfile *FCALL
 tarsuper_readdir_or_unlock(struct tarsuper *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	/* TODO */
-	tarsuper_endread(self);
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	bool was_lock_lost = false;
+	pos_t pos;
+	struct tarhdr *hdr;
+	struct tarfile *tf;
+	uint32_t hdrsize;
+
+	/* Allocate buffer for the tar header. */
+	hdr = (struct tarhdr *)aligned_alloca(TBLOCKSIZE, TBLOCKSIZE);
+
+	/* Check for special case: the next file may already been loaded. */
+again:
+	pos = self->ts_nfile;
+	if (!TAILQ_EMPTY(&self->ts_bypos)) {
+		tf = TAILQ_LAST(&self->ts_bypos);
+		if (tarfile_gethpos(tf) >= pos) {
+			while (tarfile_gethpos(tf) > pos) {
+				tf = TAILQ_PREV(tf, tf_bypos);
+				if (!tf)
+					break;
+			}
+			if (tf && tarfile_gethpos(tf) == pos) {
+				/* Update position for next file. */
+				if (!was_lock_lost && !tarsuper_upgrade(self)) {
+					was_lock_lost = true;
+					goto again;
+				}
+				self->ts_nfile = tarfile_getnexthdr(tf);
+				goto return_tf_after_wrlock;
+			}
+		}
+	}
+
+	TRY {
+again_rdhdr:
+		/* Check for end-of-file. */
+		if (pos >= atomic64_read(&self->ts_super.fs_dev->mf_filesize)) {
+			tarsuper_endread(self);
+			return TARSUPER_READDIR_EOF;
+		}
+
+		/* Read the next file header. */
+		fsuper_dev_rdsectors(&self->ts_super, pos, pagedir_translate(hdr), TBLOCKSIZE);
+
+		/* Decode into the associated file. */
+		tf      = tarfile_new(hdr, &hdrsize);
+		hdrsize = CEIL_ALIGN(hdrsize, TBLOCKSIZE);
+		if (!tf) {
+			/* Unknown file type (must skip) */
+			pos += TBLOCKSIZE;
+			pos += hdrsize;
+			goto again_rdhdr;
+		}
+	} EXCEPT {
+		tarsuper_endread(self);
+		RETHROW();
+	}
+
+	/* Upgrade to a write-lock. */
+	if (!was_lock_lost) {
+		bool upgrade_ok;
+		TRY {
+			upgrade_ok = tarsuper_upgrade(self);
+		} EXCEPT {
+			destroy(tf);
+			RETHROW();
+		}
+		if (!upgrade_ok) {
+			was_lock_lost = true;
+			destroy(tf);
+			goto again;
+		}
+	}
+
+	/* Fill in missing fields of `tf' */
+	pos += TBLOCKSIZE;
+	tf->tf_pos = pos; /* data-position */
+
+	/* Insert `tf' into relevant data-structures.
+	 * NOTE: This also inherits the reference to `tf' */
+	TRY {
+		tarsuper_insertfile(self, tf);
+	} EXCEPT {
+		tarsuper_endwrite(self);
+		destroy(tf);
+		RETHROW();
+	}
+
+	/* Advance to the next file. */
+	pos += hdrsize;
+	self->ts_nfile = pos;
+
+	/* Downgrade back to a read-lock and return `tf' */
+return_tf_after_wrlock:
+	tarsuper_downgrade(self);
+	if (was_lock_lost) {
+		/* If the lock was lost, must release all locks and return AGAIN */
+		tarsuper_endread(self);
+		tf = TARSUPER_READDIR_AGAIN;
+	}
+	return tf;
 }
 
 
@@ -976,8 +1766,6 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	 * really is a tar filesystem, such that any decode errors from this  point
 	 * on are treated as corrupted-filesystem errors, rather than  not-a-tar-fs
 	 * errors. */
-	if (firstfile)
-		firstfile->tf_pos = (pos_t)TBLOCKSIZE;
 	TRY {
 		result = (struct tarsuper *)kmalloc(sizeof(struct tarsuper), GFP_NORMAL);
 		TRY {
@@ -996,12 +1784,21 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 
 	/* Initialize tarfs-specific fields. */
 	shared_rwlock_init(&result->ts_lock);
-	result->ts_filev[0]      = firstfile;
-	result->ts_filec         = firstfile ? 1 : 0;
-	result->ts_nfile         = (pos_t)(TBLOCKSIZE + CEIL_ALIGN(first_filesize, TBLOCKSIZE));
+	result->ts_filec = 0;
+	result->ts_nfile = (pos_t)(TBLOCKSIZE + CEIL_ALIGN(first_filesize, TBLOCKSIZE));
+	TAILQ_INIT(&result->ts_bypos);
 	result->ts_fdat.tfd_filp = NULL;
 	result->ts_fdat.tfd_name = NULL;
 	result->ts_fdat.tfd_nlen = 0;
+
+	/* Remember the first file. */
+	if (firstfile != NULL) {
+		firstfile->tf_pos   = (pos_t)TBLOCKSIZE; /* data-position */
+		result->ts_filev[0] = firstfile;
+		result->ts_filec    = 1;
+		TAILQ_INSERT_HEAD(&result->ts_bypos, firstfile, tf_bypos);
+	}
+
 
 	/* Initialize the superblock. */
 	result->ts_super.fs_root.mf_ops               = &tarsuper_ops.so_fdir.dno_node.no_file;
