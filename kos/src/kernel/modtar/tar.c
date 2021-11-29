@@ -65,7 +65,6 @@
 
 DECL_BEGIN
 
-#include <kernel/printk.h>
 STATIC_ASSERT(offsetof(struct tarhdr, th_type) == 156);
 STATIC_ASSERT(offsetof(struct tarhdr, th_devmajor) == 329);
 STATIC_ASSERT(sizeof(struct tarhdr) == 500);
@@ -621,8 +620,6 @@ return_tf:
 		assert(tf->tf_name[filename_len] == '\0' ||
 		       tf->tf_name[filename_len] == '/');
 		if (tf->tf_name[filename_len] == '/') {
-			printk(KERN_DEBUG "[tarfs] Implicit directory: %$q (file: %q)\n",
-			       (size_t)filename_len, tf->tf_name, tf->tf_name);
 			result->td_ent.fd_type = DT_DIR; /* Implicit directory */
 			result->td_ent.fd_ino  = tarfile_getdirino(tf, filename_len);
 		}
@@ -1527,7 +1524,6 @@ fill_common_fields:
 	                 fstr_start,
 	                 (size_t)(fstr_end - fstr_start),
 	                 sizeof(char)) = '\0';
-	printk(KERN_DEBUG "[tarfs] file: %q\n", result->tf_name);
 	return result;
 }
 
