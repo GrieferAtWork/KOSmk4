@@ -899,6 +899,13 @@ NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 	uintptr_t *bits;
 	size_t result;
 	shift_t shift;
+	if (!pagedir_iswritable(ptr)) {
+		/* This can happen for stale pointers into slab pages that
+		 * have later been deallocated, as may be done when  doing
+		 * a `system_cc()'. (s.a. `system_cc_perslabpool()') */
+		return 0;
+	}
+
 	s                   = SLAB_GET(ptr);
 	slab_segments_start = (byte_t *)s + SLAB_SEGMENT_OFFSET(s->s_size);
 	index               = (uintptr_t)((byte_t *)ptr - slab_segments_start) / s->s_size;
