@@ -287,7 +287,12 @@ NOTHROW(KCALL system_cc_threads)(struct ccinfo *__restrict info) {
 		task_enum_all_nb(&system_cc_pertask_cb, NULL);
 	} else {
 		gfp_t saved_gfp;
-		/* TODO: do this better */
+		/* TODO: do  this  better (to  be precise:  in a  way that  doesn't require
+		 *       `GFP_ATOMIC' to be set when doing per-task cache-clear operations)
+		 * Solution: It doesn't matter if we enumerate some thread more than once,
+		 *           or even if we accidentally skip one of the threads. The  only
+		 *           thing that _does_ matter is  that we terminate in  guarantied
+		 *           finite time, and do our best to hit every thread out there. */
 		saved_gfp = info->ci_gfp;
 		info->ci_gfp |= GFP_ATOMIC;
 		task_enum_all_nb(&system_cc_pertask_cb, info);
@@ -688,7 +693,7 @@ PRIVATE unsigned int cc_version = 0;
 /* [lock(ATOMIC)] # of threads currently clearing caches. */
 PRIVATE uintptr_t cc_inside = 0;
 
-/* Max # of attempts before unconditional give-up. */
+/* Max # of attempts before unconditional give-up. ("/proc/kos/cc-max-attempts") */
 PUBLIC ATTR_READMOSTLY unsigned int system_cc_maxattempts = 64;
 
 
@@ -710,10 +715,9 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 
 	/* Check if we're supposed to give up */
 	if (info->ci_attempt == (unsigned int)-1) {
-		/* Special indicator to infinite attempts. */
+		/* Special indicator for infinite attempts. */
 	} else {
-		if (info->ci_attempt >= system_cc_maxattempts &&
-		    info->ci_attempt != 0) /* Always allow at least 1 attempt. */
+		if (info->ci_attempt >= system_cc_maxattempts)
 			return false; /* D:  -- Oh no! */
 		++info->ci_attempt;
 	}

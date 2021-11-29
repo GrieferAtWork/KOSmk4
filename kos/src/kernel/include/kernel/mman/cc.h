@@ -58,7 +58,7 @@ struct ccinfo {
 	((self)->ci_bytes += (num_bytes))
 
 
-/* Max # of attempts before unconditional give-up. */
+/* Max # of attempts before unconditional give-up. ("/proc/kos/cc-max-attempts") */
 DATDEF unsigned int system_cc_maxattempts;
 
 

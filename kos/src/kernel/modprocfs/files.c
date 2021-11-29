@@ -37,6 +37,7 @@
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/futexfd.h>
@@ -67,6 +68,8 @@
 #include <elf.h>
 #include <format-printer.h>
 #include <inttypes.h>
+#include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unicode.h>
@@ -843,6 +846,25 @@ procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
 
 
 /************************************************************************/
+/* /proc/kos/cc-max-attempts                                            */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_kos_cc_max_attempts_print(pformatprinter printer, void *arg,
+                                 pos_t UNUSED(offset_hint)) {
+	ProcFS_PrintUInt(printer, arg, system_cc_maxattempts);
+}
+INTERN void KCALL
+procfs_kos_cc_max_attempts_write(USER CHECKED void const *buf,
+                                 size_t bufsize) {
+	unsigned int newmax;
+	newmax = ProcFS_ParseUInt(buf, bufsize, 0, UINT_MAX);
+	ATOMIC_WRITE(system_cc_maxattempts, newmax);
+}
+
+
+
+
+/************************************************************************/
 /* /proc/kos/futexfd-maxexpr                                            */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
@@ -854,7 +876,7 @@ INTERN void KCALL
 procfs_kos_futexfd_maxexpr_write(USER CHECKED void const *buf,
                                  size_t bufsize) {
 	size_t newmax;
-	newmax = ProcFS_ParseSize(buf, bufsize, 1, (size_t)-1);
+	newmax = ProcFS_ParseSize(buf, bufsize, 1, SIZE_MAX);
 	ATOMIC_WRITE(mfutexfd_maxexpr, newmax);
 }
 

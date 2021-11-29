@@ -78,16 +78,18 @@ MKLNK(procfs_r_thread_self, 0777, procfs_threadself_printer)
 
 /* /proc/kos */
 MKDIR_BEGIN(procfs_r_kos, 0555)
-	MKDIR_ENT("fs",      DT_DIR, &procfs_r_kos_fs,      /*[[[fdirent_hash]]]*/0x7366/*[[[end]]]*/)
+	MKDIR_ENT("cc-max-attempts", DT_DIR, &procfs_r_kos_cc_max_attempts, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x7ea7a820, 0x6b0cafdd43fdf2ef, 0xf4fdbc5b, 0x7ef00d48da9f0cdd)/*[[[end]]]*/)
+	MKDIR_ENT("fs",              DT_DIR, &procfs_r_kos_fs,              /*[[[fdirent_hash]]]*/0x7366/*[[[end]]]*/)
 	MKDIR_ENT("futexfd-maxexpr", DT_REG, &procfs_r_kos_futexfd_maxexpr, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xd71498bb, 0x98fa0ab3f6908203, 0xb5bdd1df, 0x9a938809a111e702)/*[[[end]]]*/)
-	MKDIR_ENT("kstat",   DT_REG, &procfs_r_kos_kstat, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x6d180f37, 0x746174736b, 0xc70f17dd, 0x746174736b)/*[[[end]]]*/)
+	MKDIR_ENT("kstat",           DT_REG, &procfs_r_kos_kstat,           /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x6d180f37, 0x746174736b, 0xc70f17dd, 0x746174736b)/*[[[end]]]*/)
 #ifdef CONFIG_TRACE_MALLOC
-	MKDIR_ENT("leaks",   DT_REG, &procfs_r_kos_leaks,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc66c913f, 0x736b61656c, 0xcf906d36, 0x736b61656c)/*[[[end]]]*/)
+	MKDIR_ENT("leaks",           DT_REG, &procfs_r_kos_leaks,           /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc66c913f, 0x736b61656c, 0xcf906d36, 0x736b61656c)/*[[[end]]]*/)
 #endif /* CONFIG_TRACE_MALLOC */
-	MKDIR_ENT("meminfo", DT_REG, &procfs_r_kos_meminfo, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547f743, 0x6f666e696d656d, 0xd9003f1f, 0x6f666e696d656d)/*[[[end]]]*/)
-	MKDIR_ENT("mm",      DT_DIR, &procfs_r_kos_mm,      /*[[[fdirent_hash]]]*/0x6d6d/*[[[end]]]*/)
-	MKDIR_ENT("raminfo", DT_REG, &procfs_r_kos_raminfo, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547d370, 0x6f666e696d6172, 0x5dc3f1f, 0x6f666e696d6172)/*[[[end]]]*/)
+	MKDIR_ENT("meminfo",         DT_REG, &procfs_r_kos_meminfo,         /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547f743, 0x6f666e696d656d, 0xd9003f1f, 0x6f666e696d656d)/*[[[end]]]*/)
+	MKDIR_ENT("mm",              DT_DIR, &procfs_r_kos_mm,              /*[[[fdirent_hash]]]*/0x6d6d/*[[[end]]]*/)
+	MKDIR_ENT("raminfo",         DT_REG, &procfs_r_kos_raminfo,         /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547d370, 0x6f666e696d6172, 0x5dc3f1f, 0x6f666e696d6172)/*[[[end]]]*/)
 MKDIR_END
+MKREG_RW(procfs_r_kos_cc_max_attempts, 0644, procfs_kos_cc_max_attempts_print, procfs_kos_cc_max_attempts_write)
 MKREG_RW(procfs_r_kos_futexfd_maxexpr, 0644, procfs_kos_futexfd_maxexpr_print, procfs_kos_futexfd_maxexpr_write)
 MKREG_RO(procfs_r_kos_kstat, 0444, procfs_kos_kstat_printer)
 MKREG_RO(procfs_r_kos_meminfo, 0444, procfs_kos_meminfo_printer)
