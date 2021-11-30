@@ -27,6 +27,7 @@
 
 #ifdef CONFIG_SVGA_HAVE_CHIPSET_BOCHSVBE
 #include <hybrid/align.h>
+#include <hybrid/minmax.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/unaligned.h>
 
@@ -313,7 +314,12 @@ bochs_v_strings(struct svga_chipset *__restrict self,
                 svga_chipset_enumstring_t cb, void *arg) {
 	ssize_t temp, result;
 	struct bochs_chipset *me;
-	char valbuf[128];
+	char valbuf[MAX_C(COMPILER_LENOF(PRIMAXu16),
+	                  COMPILER_LENOF(PRIMAXxN(__SIZEOF_PHYSADDR_T__)),
+	                  COMPILER_LENOF(PRIMAXx32),
+	                  COMPILER_LENOF("0x" PRIMAXx16 ".0x" PRIMAXx16),
+	                  COMPILER_LENOF("0x" PRIMAXx8 ".0x" PRIMAXx8 "."
+	                                 "0x" PRIMAXx8 ".0x" PRIMAXx8))];
 	me = (struct bochs_chipset *)self;
 
 	sprintf(valbuf, "%" PRIu16, me->bc_maxresx);

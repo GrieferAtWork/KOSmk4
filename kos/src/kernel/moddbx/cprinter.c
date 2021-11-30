@@ -1704,7 +1704,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 			} else {
 				/* Fallback: Print an unsigned integer value, either as decimal, or as hex. */
 				size_t decimal_len;
-				char decimal_repr[CEILDIV(sizeof(value.u) * NBBY, 3) + 1];
+				char decimal_repr[COMPILER_LENOF(PRIMAXdMAX)];
 				decimal_len = sprintf(decimal_repr, "%" PRIdMAX, value.u);
 				if (value.u < 255 || use_decimal_representation(decimal_repr, decimal_len)) {
 					DO((*P_PRINTER)(P_ARG, decimal_repr, decimal_len));

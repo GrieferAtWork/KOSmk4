@@ -2851,7 +2851,7 @@ perproc_mapfile_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED
 	ssize_t result;
 	bool should_enum;
 	struct mmapinfo mminfo;
-	char rangename[2 + (sizeof(void *) * 2 * (NBBY / 4))];
+	char rangename[COMPILER_LENOF(PRIMAXxPTR "-" PRIMAXxPTR)];
 	u16 namelen;
 	struct perproc_mapfile_direnum *me = (struct perproc_mapfile_direnum *)self;
 	UNCHECKED void *oldaddr, *newaddr;
@@ -2881,7 +2881,8 @@ again_lookup:
 	}
 
 	/* Yield info on this range. */
-	namelen = (u16)sprintf(rangename, "%" PRIxPTR "-%" PRIxPTR, mminfo.mmi_min, newaddr);
+	namelen = (u16)sprintf(rangename, "%" PRIxPTR "-%" PRIxPTR,
+	                       mminfo.mmi_min, newaddr);
 	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
 	                             procfs_perproc_ino(mminfo._mmi_node, &perproc_mapfile_lnknode_ops),
 	                             DT_LNK, namelen, rangename);
@@ -3126,7 +3127,6 @@ procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED str
 	REF struct taskpid *pid;
 	upid_t pid_id;
 	u16 namelen;
-	char namebuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_PID_T__))];
 	size_t myind = THIS_PIDNS->pn_indirection;
 	upid_t index, newindex;
 	ssize_t result;
@@ -3158,6 +3158,7 @@ again:
 	pid_id   = pid->tp_pids[myind];
 	newindex = pid_id + 1; /* Next time around, yield a process with a greater PID */
 	{
+		char namebuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_PID_T__))];
 gotpid:
 		FINALLY_DECREF_UNLIKELY(pid);
 		namelen = (u16)sprintf(namebuf, "%" PRIuN(__SIZEOF_PID_T__), pid_id);

@@ -233,42 +233,6 @@ again_load_mode:
 							goto again_load_mode;
 					}
 					++modec; /* Remember that we've got another mode now! */
-
-#if !defined(NDEBUG) && 1 /* TODO: Remove me */
-					{
-						char modenamebuf[64];
-						char flagsbuf[64] = "", *ptr = flagsbuf;
-						if (mode->smi_flags & SVGA_MODEINFO_F_LFB)
-							ptr = stpcpy(ptr, "|lfb");
-						if (mode->smi_flags & SVGA_MODEINFO_F_PAL)
-							ptr = stpcpy(ptr, "|pal");
-						if (mode->smi_flags & SVGA_MODEINFO_F_BW)
-							ptr = stpcpy(ptr, "|bw");
-						if (mode->smi_flags & SVGA_MODEINFO_F_TXT)
-							ptr = stpcpy(ptr, "|txt");
-						if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR)
-							ptr = stpcpy(ptr, "|planar");
-						sprintf(modenamebuf, "%" PRIu32 "x%" PRIu32 "x%" PRIu8,
-						        mode->smi_resx, mode->smi_resy, mode->smi_bits_per_pixel);
-
-						printk(KERN_INFO "[svga] Supported: %-12s {flags:%s",
-						       modenamebuf, flagsbuf + 1);
-						if (mode->smi_flags & SVGA_MODEINFO_F_LFB)
-							printk(KERN_INFO ",lfb:%#" PRIx64, (uint64_t)mode->smi_lfb);
-						printk(KERN_INFO ",scan:%" PRIu32, mode->smi_scanline);
-						if (!(mode->smi_flags & SVGA_MODEINFO_F_TXT))
-							printk(KERN_INFO ",col:%" PRIu8, mode->smi_colorbits);
-						if (!(mode->smi_flags & (SVGA_MODEINFO_F_PAL | SVGA_MODEINFO_F_BW))) {
-							printk(KERN_INFO ",r:%" PRIu8 "@%" PRIu8
-							                 ",g:%" PRIu8 "@%" PRIu8
-							                 ",b:%" PRIu8 "@%" PRIu8,
-							       mode->smi_rbits, mode->smi_rshift,
-							       mode->smi_gbits, mode->smi_gshift,
-							       mode->smi_bbits, mode->smi_bshift);
-						}
-						printk(KERN_INFO "}\n");
-					}
-#endif
 				}
 
 				/* Verify that we've got at least 1 mode. */

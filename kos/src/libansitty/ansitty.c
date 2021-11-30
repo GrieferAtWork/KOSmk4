@@ -19,9 +19,8 @@
  */
 #ifndef GUARD_LIBANSITTY_ANSITTY_C
 #define GUARD_LIBANSITTY_ANSITTY_C 1
-
-#define _KOS_SOURCE                 1
 #define LIBANSITTY_EXPOSE_INTERNALS 1
+#define _KOS_SOURCE 1
 
 /* NOTE: References  used  during the  implementation of  this ansitty
  *       processor can be found in `/kos/include/libansitty/ansitty.h' */
@@ -38,6 +37,7 @@
 
 #include <assert.h>
 #include <format-printer.h> /* FORMATPRINTER_CC */
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2317,7 +2317,7 @@ done_insert_ansitty_flag_hedit:
 			case 6:
 				/* DSR */
 				if (self->at_ops.ato_output) {
-					char buf[32];
+					char buf[COMPILER_LENOF(CC_SESC "[" PRIMAXu ";" PRIMAXu "R")];
 					size_t len;
 					ansitty_coord_t xy[2];
 					GETCURSOR(xy);
@@ -2356,7 +2356,6 @@ done_insert_ansitty_flag_hedit:
 				 * PM = 4 - permanently reset
 				 * NOTE: `PS' is the same as in `\e[<PS>h' and `\e[<PS>l' */
 				size_t len;
-				char buf[32];
 				unsigned int result;
 				switch (name) {
 
@@ -2419,8 +2418,11 @@ done_insert_ansitty_flag_hedit:
 					result = 0;
 					break;
 				}
-				len = sprintf(buf, CC_SESC "[%u;%u$y", name, result);
-				DOOUTPUT(buf, len);
+				{
+					char buf[COMPILER_LENOF(CC_SESC "[" PRIMAXu ";" PRIMAXu "$y")];
+					len = sprintf(buf, CC_SESC "[%u;%u$y", name, result);
+					DOOUTPUT(buf, len);
+				}
 			}
 		}
 
@@ -3286,7 +3288,7 @@ do_process_string_command:
 
 	case STATE_ESC_6:
 		if (ch == 'n') {
-			char buf[32];
+			char buf[COMPILER_LENOF(CC_SESC PRIMAXu ";" PRIMAXu "R")];
 			ansitty_coord_t xy[2];
 			size_t len;
 			/* VT100: getcursor DSR */

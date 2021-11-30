@@ -25,6 +25,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_APPS_THREAD_C
 #define GUARD_KERNEL_SRC_DEBUGGER_APPS_THREAD_C 1
 #define DISABLE_BRANCH_PROFILING
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -47,12 +48,14 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/minmax.h>
 
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -275,22 +278,25 @@ DBG_AUTOCOMPLETE(thread,
 			return;
 		}
 		if (starts_with[0] == 'p') {
-			char pidtext[80];
+			char pidtext[MAX_C(COMPILER_LENOF("p0" PRIMAXoN(__SIZEOF_PID_T__)),
+			                   COMPILER_LENOF("p0x" PRIMAXxN(__SIZEOF_PID_T__)),
+			                   COMPILER_LENOF("p0X" PRIMAXXN(__SIZEOF_PID_T__)),
+			                   COMPILER_LENOF("p0b" PRIMAXbN(__SIZEOF_PID_T__)))];
 			size_t pidtextlen;
 			char const *format = DBGSTR("p%lu");
 			uintptr_t i;
 			if (starts_with_len >= 2 && starts_with[1] == '0') {
-				format = DBGSTR("p0%lo");
+				format = DBGSTR("p0%" PRIoN(__SIZEOF_PID_T__));
 				if (starts_with_len >= 3) {
 					char ns = starts_with[2];
 					if (ns == 'x')
-						format = DBGSTR("p0x%lx");
+						format = DBGSTR("p0x%" PRIxN(__SIZEOF_PID_T__));
 					else if (ns == 'X')
-						format = DBGSTR("p0X%lx");
+						format = DBGSTR("p0X%" PRIXN(__SIZEOF_PID_T__));
 					else if (ns == 'b')
-						format = DBGSTR("p0b%lb");
+						format = DBGSTR("p0b%" PRIbN(__SIZEOF_PID_T__));
 					else if (ns == 'B')
-						format = DBGSTR("p0B%lb");
+						format = DBGSTR("p0B%" PRIbN(__SIZEOF_PID_T__));
 					else if (ns >= '0' && ns <= '7')
 						;
 					else {

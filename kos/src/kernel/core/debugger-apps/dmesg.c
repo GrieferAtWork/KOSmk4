@@ -303,7 +303,7 @@ again_render_screen:
 	}
 	/* Render the status selection index in the status bar. */
 	{
-		char buf[32];
+		char buf[COMPILER_LENOF(PRIMAXu "/" PRIMAXu)];
 		size_t len;
 		len = sprintf(buf, DBGSTR("%u/%u"),
 		              data->rd_selected + 1,

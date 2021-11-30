@@ -331,7 +331,8 @@ devfs_block_v_lookup(struct fdirnode *__restrict UNUSED(self),
 			/* Allocate a new directory entry. */
 			result = devicelink_dirent_new(info->flu_namelen, devfs_block_lnkpfx, dev);
 			sprintf(result->dld_ent.fd_name,
-			        "%" PRIuN(__SIZEOF_MAJOR_T__) ":%" PRIuN(__SIZEOF_MINOR_T__),
+			        "%" PRIuN(__SIZEOF_MAJOR_T__) ":"
+			        "%" PRIuN(__SIZEOF_MINOR_T__),
 			        MAJOR(devno), MINOR(devno));
 			result->dld_ent.fd_hash = fdirent_hash(result->dld_ent.fd_name,
 			                                       result->dld_ent.fd_namelen);
@@ -368,7 +369,8 @@ again:
 
 	/* Generate directory entry name. */
 	namelen = (u16)sprintf(namebuf,
-	                       "%" PRIuN(__SIZEOF_MAJOR_T__) ":%" PRIuN(__SIZEOF_MINOR_T__),
+	                       "%" PRIuN(__SIZEOF_MAJOR_T__) ":"
+	                       "%" PRIuN(__SIZEOF_MINOR_T__),
 	                       MAJOR(fnode_asblkdev(mydev)->dn_devno),
 	                       MINOR(fnode_asblkdev(mydev)->dn_devno));
 
@@ -426,7 +428,8 @@ devfs_char_v_lookup(struct fdirnode *__restrict UNUSED(self),
 			/* Allocate a new directory entry. */
 			result = devicelink_dirent_new(info->flu_namelen, devfs_char_lnkpfx, dev);
 			sprintf(result->dld_ent.fd_name,
-			        "%" PRIuN(__SIZEOF_MAJOR_T__) ":%" PRIuN(__SIZEOF_MINOR_T__),
+			        "%" PRIuN(__SIZEOF_MAJOR_T__) ":"
+			        "%" PRIuN(__SIZEOF_MINOR_T__),
 			        MAJOR(devno), MINOR(devno));
 			result->dld_ent.fd_hash = fdirent_hash(result->dld_ent.fd_name,
 			                                       result->dld_ent.fd_namelen);
@@ -463,7 +466,8 @@ again:
 
 	/* Generate directory entry name. */
 	namelen = (u16)sprintf(namebuf,
-	                       "%" PRIuN(__SIZEOF_MAJOR_T__) ":%" PRIuN(__SIZEOF_MINOR_T__),
+	                       "%" PRIuN(__SIZEOF_MAJOR_T__) ":"
+	                       "%" PRIuN(__SIZEOF_MINOR_T__),
 	                       MAJOR(fnode_aschrdev(mydev)->dn_devno),
 	                       MINOR(fnode_aschrdev(mydev)->dn_devno));
 
