@@ -197,14 +197,110 @@ NOTHROW(KCALL system_cc_permfile)(struct mfile *__restrict self,
 	}
 }
 
+/* Rehash with the given list buffer */
+INTDEF NOBLOCK NONNULL((1, 2)) void /* From "filesys/path.c" */
+NOTHROW(FCALL path_cldlist_rehash_with)(struct path *__restrict self,
+                                        struct path_bucket *__restrict new_list,
+                                        size_t new_mask);
+
+/* Trim buffer of `self->p_cldlist' */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_path_cldlist)(struct path *__restrict self,
+                                      struct ccinfo *__restrict info) {
+again:
+	if (!path_cldlock_tryread(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!path_cldlock_read_nx(self))
+			return;
+	}
+	if (self->p_cldlist != PATH_CLDLIST_DELETED) {
+		if (self->p_cldused == 0) {
+			/* Special case: can delete the entire list. */
+			struct path_bucket *oldlist;
+			oldlist         = self->p_cldlist;
+			self->p_cldsize = 0;
+			self->p_cldmask = 0;
+			self->p_cldlist = path_empty_cldlist;
+			path_cldlock_endread(self);
+			if (oldlist != path_empty_cldlist) {
+				ccinfo_account(info, kmalloc_usable_size(oldlist));
+				kfree(oldlist);
+			}
+			return;
+		} else {
+			size_t minmask;
+			/* Specifications require that `MASK >= USED', and be 2^N-1 */
+			minmask = 1;
+			while (minmask < self->p_cldused)
+				minmask = (minmask << 1) | 1;
+			assert(minmask <= self->p_cldmask);
+			if (minmask < self->p_cldmask) {
+				/* Try to allocate a smaller mask. */
+				struct path_bucket *new_list;
+				size_t old_usable;
+				size_t new_usable;
+				new_list = (struct path_bucket *)kmalloc_nx((minmask + 1) *
+				                                            sizeof(struct path_bucket),
+				                                            info->ci_gfp |
+				                                            GFP_ATOMIC | GFP_CALLOC);
+				if (!new_list && !ccinfo_noblock(info)) {
+					/* Try a blocking allocation. */
+					path_cldlock_endread(self);
+					new_list = (struct path_bucket *)kmalloc_nx((minmask + 1) *
+					                                            sizeof(struct path_bucket),
+					                                            info->ci_gfp | GFP_CALLOC);
+					if (!new_list)
+						return; /* nope... */
+
+					/* Re-acquire lock. */
+					if (!path_cldlock_read_nx(self)) {
+						kfree(new_list);
+						return;
+					}
+
+					/* Check that `new_list' is still allowed, and
+					 * is also more efficient that the existing one. */
+					if unlikely(self->p_cldlist == PATH_CLDLIST_DELETED ||
+					            self->p_cldused > minmask ||
+					            self->p_cldmask <= minmask) {
+						/* Installing our new list wouldn't make any sense; -> try again. */
+						path_cldlock_endread(self);
+						kfree(new_list);
+						goto again;
+					}
+				}
+
+				/* Figure out usable space */
+				assertf(self->p_cldlist != path_empty_cldlist,
+				        "This can't be, because `self->p_cldused != 0'");
+				old_usable = kmalloc_usable_size(self->p_cldlist);
+				new_usable = kmalloc_usable_size(new_list);
+
+				/* Install the new list. (this also frees the old list) */
+				path_cldlist_rehash_with(self, new_list, minmask);
+				path_cldlock_endread(self);
+
+				/* Account for freed memory. */
+				if (old_usable > new_usable)
+					ccinfo_account(info, old_usable - new_usable);
+				return;
+			}
+		}
+	}
+	path_cldlock_endread(self);
+}
+
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_perpath_inherit_reference)(REF struct path *__restrict self,
                                                    struct ccinfo *__restrict info) {
 again:
+	system_cc_path_cldlist(self, info);
+	if (ccinfo_isdone(info))
+		goto done;
 	system_cc_permfile(self->p_dir, info);
 	if (ccinfo_isdone(info))
 		goto done;
-	/* TODO: Trim buffer of `self->p_cldlist' */
 
 	/* Recursively clear caches of parent paths. */
 	if (!path_isroot(self)) {

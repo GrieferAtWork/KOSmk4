@@ -361,7 +361,7 @@ INTERN struct path deleted_path = {
 
 
 /* Rehash with the given list buffer */
-PRIVATE NOBLOCK NONNULL((1, 2)) void
+INTERN NOBLOCK NONNULL((1, 2)) void /* "INTERN" because used in "memory/mman/cc.c" */
 NOTHROW(FCALL path_cldlist_rehash_with)(struct path *__restrict self,
                                         struct path_bucket *__restrict new_list,
                                         size_t new_mask) {
