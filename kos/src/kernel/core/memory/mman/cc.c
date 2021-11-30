@@ -198,20 +198,35 @@ NOTHROW(KCALL system_cc_permfile)(struct mfile *__restrict self,
 }
 
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
-NOTHROW(KCALL system_cc_perpath)(struct path *__restrict self,
-                                 struct ccinfo *__restrict info) {
-	DOCC(system_cc_permfile(self->p_dir, info));
+NOTHROW(KCALL system_cc_perpath_inherit_reference)(REF struct path *__restrict self,
+                                                   struct ccinfo *__restrict info) {
+again:
+	system_cc_permfile(self->p_dir, info);
+	if (ccinfo_isdone(info))
+		goto done;
 	/* TODO: Trim buffer of `self->p_cldlist' */
 
 	/* Recursively clear caches of parent paths. */
 	if (!path_isroot(self)) {
 		REF struct path *parent = path_getparent(self);
-		system_cc_perpath(parent, info);
-		if (ATOMIC_DECFETCH(parent->p_refcnt) == 0) {
+		if (ATOMIC_DECFETCH(self->p_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct path));
-			path_destroy(parent);
+			path_destroy(self);
 		}
+		self = parent;
+		goto again;
 	}
+done:
+	if (ATOMIC_DECFETCH(self->p_refcnt) == 0) {
+		ccinfo_account(info, sizeof(struct path));
+		path_destroy(self);
+	}
+}
+
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_perpath)(struct path *__restrict self,
+                                 struct ccinfo *__restrict info) {
+	system_cc_perpath_inherit_reference(incref(self), info);
 }
 
 /* Clear VFS recently-used-paths cache. */
@@ -390,16 +405,17 @@ NOTHROW(FCALL system_cc_vfs_drives)(struct vfs *__restrict self,
 	for (i = 0; i < COMPILER_LENOF(self->vf_drives); ++i) {
 		if (!paths[i])
 			continue;
-		system_cc_perpath(paths[i], info);
-		if (ccinfo_isdone(info))
+		system_cc_perpath_inherit_reference(paths[i], info);
+		if (ccinfo_isdone(info)) {
+			for (; i < COMPILER_LENOF(self->vf_drives); ++i) {
+				if (!paths[i])
+					continue;
+				if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
+					ccinfo_account(info, sizeof(struct path));
+					path_destroy(paths[i]);
+				}
+			}
 			break;
-	}
-	for (i = 0; i < COMPILER_LENOF(self->vf_drives); ++i) {
-		if (!paths[i])
-			continue;
-		if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
-			ccinfo_account(info, sizeof(struct path));
-			path_destroy(paths[i]);
 		}
 	}
 }
@@ -418,13 +434,8 @@ NOTHROW(FCALL system_cc_vfs_root)(struct vfs *__restrict self,
 	/* Might be NULL if rootfs not yet mounted during early boot... */
 	root = xincref(self->vf_root);
 	vfs_rootlock_endread(self);
-	if likely(root) {
-		system_cc_perpath(root, info);
-		if (ATOMIC_DECFETCH(root->p_refcnt) == 0) {
-			ccinfo_account(info, sizeof(struct path));
-			path_destroy(root);
-		}
-	}
+	if likely(root != NULL)
+		system_cc_perpath_inherit_reference(root, info);
 }
 
 /* Clear per-vfs caches. */
@@ -458,16 +469,17 @@ NOTHROW(FCALL system_cc_fs_paths)(struct fs *__restrict self,
 	for (i = 0; i < COMPILER_LENOF(paths); ++i) {
 		if (!paths[i])
 			continue;
-		system_cc_perpath(paths[i], info);
-		if (ccinfo_isdone(info))
+		system_cc_perpath_inherit_reference(paths[i], info);
+		if (ccinfo_isdone(info)) {
+			for (; i < COMPILER_LENOF(paths); ++i) {
+				if (!paths[i])
+					continue;
+				if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
+					ccinfo_account(info, sizeof(struct path));
+					path_destroy(paths[i]);
+				}
+			}
 			break;
-	}
-	for (i = 0; i < COMPILER_LENOF(paths); ++i) {
-		if (!paths[i])
-			continue;
-		if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
-			ccinfo_account(info, sizeof(struct path));
-			path_destroy(paths[i]);
 		}
 	}
 }
@@ -602,11 +614,13 @@ NOTHROW(FCALL system_cc_mman_execinfo)(struct mman *__restrict self,
 		}
 	}
 	if (exec_path) {
-		if (!ccinfo_isdone(info))
-			system_cc_perpath(exec_path, info);
-		if (ATOMIC_DECFETCH(exec_path->p_refcnt) == 0) {
-			ccinfo_account(info, sizeof(struct path));
-			path_destroy(exec_path);
+		if (!ccinfo_isdone(info)) {
+			system_cc_perpath_inherit_reference(exec_path, info);
+		} else {
+			if (ATOMIC_DECFETCH(exec_path->p_refcnt) == 0) {
+				ccinfo_account(info, sizeof(struct path));
+				path_destroy(exec_path);
+			}
 		}
 	}
 }
