@@ -549,9 +549,9 @@ for (local name: classes.keys.sorted()) {
 			result = EINVAL;
 			break;
 @@pp_endif@@
-@@pp_if defined(ENOTDIR)@@
+@@pp_if defined(EBUSY)@@
 		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_IS_A_MOUNTING_POINT@)):
-			result = ENOTDIR;
+			result = EBUSY;
 			break;
 @@pp_endif@@
 @@pp_if defined(EFBIG)@@

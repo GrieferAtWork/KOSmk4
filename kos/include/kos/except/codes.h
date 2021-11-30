@@ -644,7 +644,7 @@
                                                                        * Attempted to umount() a path that isn't a mounting point */
 #endif /* !E_FSERROR_NOT_A_MOUNTING_POINT */
 #ifndef E_FSERROR_IS_A_MOUNTING_POINT
-#define E_FSERROR_IS_A_MOUNTING_POINT             (E_FSERROR, 0x0019) /* [errno(ENOTDIR), msg("Path is a mounting point")]
+#define E_FSERROR_IS_A_MOUNTING_POINT             (E_FSERROR, 0x0019) /* [errno(EBUSY), msg("Path is a mounting point")]
                                                                        * Attempted to rmdir() or rename() a mounting point */
 #endif /* !E_FSERROR_IS_A_MOUNTING_POINT */
 #ifndef E_FSERROR_FILE_TOO_BIG

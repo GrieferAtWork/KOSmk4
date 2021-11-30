@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f79d12d */
+/* HASH CRC-32:0x6c8de6e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -324,11 +324,11 @@ for (local name: classes.keys.sorted()) {
 			result = EINVAL;
 			break;
 #endif /* EINVAL */
-#ifdef ENOTDIR
+#ifdef EBUSY
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_IS_A_MOUNTING_POINT)):
-			result = ENOTDIR;
+			result = EBUSY;
 			break;
-#endif /* ENOTDIR */
+#endif /* EBUSY */
 #ifdef EFBIG
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_FILE_TOO_BIG)):
 			result = EFBIG;
