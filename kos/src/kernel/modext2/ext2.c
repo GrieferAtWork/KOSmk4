@@ -36,6 +36,7 @@
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/phys.h>
@@ -655,25 +656,33 @@ again:
 /************************************************************************/
 /* File node operators                                                  */
 /************************************************************************/
-PRIVATE NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL ext2iiblock_delete)(struct ext2iiblock *__restrict self,
                                   size_t es_ind_blocksize) {
-	size_t i;
-	for (i = 0; i < es_ind_blocksize; ++i)
-		ext2iblock_free(self->eiib_blocks_c[i]);
+	size_t i, result = ext2iiblock_sizeof(es_ind_blocksize);
+	for (i = 0; i < es_ind_blocksize; ++i) {
+		struct ext2iblock *inner;
+		inner = self->eiib_blocks_c[i];
+		if (inner != NULL) {
+			result += ext2iblock_sizeof(es_ind_blocksize);
+			ext2iblock_free(inner);
+		}
+	}
 	ext2iiblock_free(self);
+	return result;
 }
-PRIVATE NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL ext2iiiblock_delete)(struct ext2iiiblock *__restrict self,
                                    size_t es_ind_blocksize) {
-	size_t i;
+	size_t i, result = ext2iiiblock_sizeof(es_ind_blocksize);
 	for (i = 0; i < es_ind_blocksize; ++i) {
 		struct ext2iiblock *inner;
 		inner = self->eiiib_blocks_c[i];
 		if (inner != NULL)
-			ext2iiblock_delete(inner, es_ind_blocksize);
+			result += ext2iiblock_delete(inner, es_ind_blocksize);
 	}
 	ext2iiiblock_free(self);
+	return result;
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -686,6 +695,48 @@ NOTHROW(KCALL ext2idat_fini)(struct ext2idat *__restrict self,
 		ext2iiblock_delete(self->ei_diblock_c, es_ind_blocksize);
 	if (self->ei_tiblock_c)
 		ext2iiiblock_delete(self->ei_tiblock_c, es_ind_blocksize);
+}
+
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+NOTHROW(KCALL ext2_v_cc)(struct mfile *__restrict self,
+                         struct ccinfo *__restrict info) {
+	size_t total, es_ind_blocksize;
+	struct fnode *me        = mfile_asnode(self);
+	struct ext2super *super = fsuper_asext2(me->fn_super);
+	struct ext2idat *idat   = me->fn_fsdata;
+	struct ext2iblock *old_siblock_c;
+	struct ext2iiblock *old_diblock_c;
+	struct ext2iiiblock *old_tiblock_c;
+	if (!ext2idat_trywrite(idat)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!ext2idat_write_nx(idat))
+			return;
+	}
+	/* Free pre-allocated block-buffers. */
+	old_siblock_c      = idat->ei_siblock_c;
+	old_diblock_c      = idat->ei_diblock_c;
+	old_tiblock_c      = idat->ei_tiblock_c;
+	idat->ei_siblock_c = NULL;
+	idat->ei_diblock_c = NULL;
+	idat->ei_tiblock_c = NULL;
+	ext2idat_endwrite(idat);
+
+	/* Free buffers. */
+	es_ind_blocksize = super->es_ind_blocksize;
+	total            = 0;
+	if (old_siblock_c) {
+		total += ext2iblock_sizeof(es_ind_blocksize);
+		ext2iblock_free(old_siblock_c);
+	}
+	if (old_diblock_c)
+		total += ext2iiblock_delete(old_diblock_c, es_ind_blocksize);
+	if (old_tiblock_c)
+		total += ext2iiiblock_delete(old_tiblock_c, es_ind_blocksize);
+
+	/* Account for free'd memory. */
+	if (total != 0)
+		ccinfo_account(info, total);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -747,6 +798,11 @@ ext2_lnk_v_readlink(struct flnknode *__restrict self,
 /************************************************************************/
 /* File node operator tables                                            */
 /************************************************************************/
+PRIVATE struct mfile_stream_ops const ext2_reg_v_streams_ops = {
+	.mso_ioctl = &fregnode_v_ioctl,
+	.mso_hop   = &fregnode_v_hop,
+	.mso_cc    = &ext2_v_cc,
+};
 PRIVATE struct fregnode_ops const ext2_regops = {
 	.rno_node = {
 		.no_file = {
@@ -754,12 +810,17 @@ PRIVATE struct fregnode_ops const ext2_regops = {
 			.mo_loadblocks = &ext2_v_loadblocks,
 //TODO:		.mo_saveblocks = &ext2_v_saveblocks,
 			.mo_changed    = &fregnode_v_changed,
-#ifdef fregnode_v_stream_ops
-			.mo_stream     = &fregnode_v_stream_ops,
-#endif /* fregnode_v_stream_ops */
+			.mo_stream     = &ext2_reg_v_streams_ops,
 		},
 		.no_wrattr = &ext2_v_wrattr,
 	},
+};
+PRIVATE struct mfile_stream_ops const ext2_dir_v_streams_ops = {
+	.mso_open  = &flatdirnode_v_open,
+	.mso_stat  = &flatdirnode_v_stat,
+	.mso_ioctl = &flatdirnode_v_ioctl,
+	.mso_hop   = &flatdirnode_v_hop,
+	.mso_cc    = &ext2_v_cc,
 };
 PRIVATE struct flatdirnode_ops const ext2_dirops = {
 	.fdno_dir = {
@@ -769,7 +830,7 @@ PRIVATE struct flatdirnode_ops const ext2_dirops = {
 				.mo_loadblocks = &ext2_v_loadblocks,
 //TODO:			.mo_saveblocks = &ext2_v_saveblocks,
 				.mo_changed    = &flatdirnode_v_changed,
-				.mo_stream     = &flatdirnode_v_stream_ops,
+				.mo_stream     = &ext2_dir_v_streams_ops,
 			},
 			.no_wrattr = &ext2_v_wrattr,
 		},
@@ -791,6 +852,11 @@ PRIVATE struct flatdirnode_ops const ext2_dirops = {
 //TODO:	.fdnx_direntchanged = &ext2_dir_v_direntchanged,
 	},
 };
+PRIVATE struct mfile_stream_ops const ext2_lnk_v_streams_ops = {
+	.mso_ioctl = &flnknode_v_ioctl,
+	.mso_hop   = &flnknode_v_hop,
+	.mso_cc    = &ext2_v_cc,
+};
 PRIVATE struct flnknode_ops const ext2_lnkops = {
 	.lno_node = {
 		.no_file = {
@@ -798,9 +864,7 @@ PRIVATE struct flnknode_ops const ext2_lnkops = {
 			.mo_loadblocks = &ext2_v_loadblocks,
 //TODO:		.mo_saveblocks = &ext2_v_saveblocks,
 			.mo_changed    = &flnknode_v_changed,
-#ifdef flnknode_v_stream_ops
-			.mo_stream     = &flnknode_v_stream_ops,
-#endif /* flnknode_v_stream_ops */
+			.mo_stream     = &ext2_lnk_v_streams_ops,
 		},
 		.no_wrattr = &ext2_v_wrattr,
 	},
@@ -913,7 +977,7 @@ PRIVATE struct flatsuper_ops const ext2_super_ops = {
 					.mo_loadblocks = &ext2_v_loadblocks,
 //TODO:				.mo_saveblocks = &ext2_v_saveblocks,
 					.mo_changed    = &flatsuper_v_changed,
-					.mo_stream     = &flatsuper_v_stream_ops,
+					.mo_stream     = &ext2_dir_v_streams_ops,
 				},
 				.no_free   = &ext2_super_v_free,
 				.no_wrattr = &ext2_v_wrattr,
