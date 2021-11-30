@@ -897,8 +897,9 @@ again:
 		/* Remove entry from our directory tree. */
 		ramfs_direnttree_removenode(&me->rdn_dat.rdd_tree, known_entry);
 		known_entry->rde_treenode.rb_lhs = RAMFS_DIRENT_TREENODE_DELETED; /* Mark as deleted. */
-
 		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
+		decref_nokill(known_entry); /* From `me->rdn_dat.rdd_tree' */
+
 		if (delete_started) {
 			incref(filedir);
 			fnode_delete_impl(filedir);
