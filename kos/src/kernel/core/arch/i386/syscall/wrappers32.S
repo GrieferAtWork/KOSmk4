@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x651bb7b7 */
+/* HASH CRC-32:0x29c8404f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4389,7 +4389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapoff)
 	.cfi_endproc
 END(__x86_asm32_int80_swapoff)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox32 *info) */
 .section .text.x86.asm32_syscall_int80.sysinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysinfo)
 	.cfi_startproc simple
@@ -23898,7 +23898,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_swapoff)
 	.cfi_endproc
 END(__x86_asm32_sysenter_swapoff)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox32 *info) */
 .section .text.x86.asm32_syscall_sysenter.sysinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sysinfo)
 	.cfi_startproc simple

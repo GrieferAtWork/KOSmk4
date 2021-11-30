@@ -116,6 +116,7 @@ lstat = lstatx32;
 lstat64 = lstatx32_64;
 stat = statx32;
 stat64 = statx32_64;
+sysinfo = sysinfox32;
 
 getitimer = getitimerx32;
 getitimer64 = getitimerx32_64;

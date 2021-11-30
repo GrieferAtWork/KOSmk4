@@ -165,6 +165,9 @@
 %[typeorg(<kos/compat/linux-stat.h>: linux_stat, linux_stat32, linux_stat64)]
 %[typeorg(<kos/compat/linux-stat.h>: linux_statx32, linux_statx64, linux_statx32_64)]
 %[typeorg(<bits/os/sigevent.h>: sigevent)]
+%[typeorg(<bits/os/sysinfo.h>: sysinfo)]
+%[typeorg(<bits/os/kos/sysinfo32.h>: sysinfox32, __sysinfox32)]
+%[typeorg(<bits/os/kos/sysinfo64.h>: sysinfox64, __sysinfox64)]
 
 /* Define how specific struct names should be escaped in headers */
 %[struct_escape(sigactionx32 = __sigactionx32, sigactionx64 = __sigactionx64)]
@@ -1904,6 +1907,14 @@ timesx32:([tostr(out:STRUCT_TMSX32)] struct tmsx32 *buf) -> clock_t; /* UNIMPLEM
 timesx64:([tostr(out:STRUCT_TMSX64)] struct tmsx64 *buf) -> clock_t; /* UNIMPLEMENTED! */
 %[endgroup]
 
+%[startgroup]
+[cp] sysinfo:([tostr(out:STRUCT_SYSINFO)] struct sysinfo *info) -> errno_t;
+[cp] sysinfox32:([tostr(out:STRUCT_SYSINFO)] struct __sysinfox32 *info) -> errno_t;
+[cp] sysinfox64:([tostr(out:STRUCT_SYSINFO)] struct __sysinfox64 *info) -> errno_t;
+%[endgroup]
+
+
+
 
 
 
@@ -2695,8 +2706,6 @@ olduname:([tostr(out:STRUCT_LINUX_OLDUNAME)] struct linux_olduname *name) -> err
 uname:([tostr(out:STRUCT_UTSNAME)] struct utsname *name) -> errno_t;
 sethostname:([tostr(STRING:len)] char const *name, size_t len) -> errno_t;
 setdomainname:([tostr(STRING:len)] char const *name, size_t len) -> errno_t;
-
-[cp] sysinfo:([tostr(out:STRUCT_SYSINFO)] struct sysinfo *info) -> errno_t; /* UNIMPLEMENTED! */
 
 [cp] ksysctl:([tostr(KSYSCTL_COMMAND)] ioctl_t command,
               [tostr(KSYSCTL_ARG:command)] void *arg) -> syscall_slong_t;

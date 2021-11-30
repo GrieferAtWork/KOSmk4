@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7c135ea */
+/* HASH CRC-32:0x343254f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1122,7 +1122,7 @@ INTERN_FUNCTION(libc_sys_swapoff)
 END(libc_sys_swapoff)
 DEFINE_PUBLIC_ALIAS(sys_swapoff, libc_sys_swapoff)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox32 *info) */
 INTERN_FUNCTION(libc_sys_sysinfo)
 	movl   $(0x74), %eax
 	jmp    libc_x86_exec_syscall1
@@ -5597,7 +5597,7 @@ INTERN_FUNCTION(libc_sys_Xswapoff)
 END(libc_sys_Xswapoff)
 DEFINE_PUBLIC_ALIAS(sys_Xswapoff, libc_sys_Xswapoff)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox32 *info) */
 INTERN_FUNCTION(libc_sys_Xsysinfo)
 	movl   $(0x74), %eax
 	jmp    libc_x86_exec_Xsyscall1

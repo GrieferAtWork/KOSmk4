@@ -17,11 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux     (/include/linux/sysinfo.h) */
-/* (#) Portability: diet libc (/include/linux/sysinfo.h) */
-#ifndef _LINUX_SYSINFO_H
-#define _LINUX_SYSINFO_H 1
+#ifndef _I386_KOS_COMPAT_BITS_OS_KOS_SYSINFO_H
+#define _I386_KOS_COMPAT_BITS_OS_KOS_SYSINFO_H 1
 
-#include <bits/os/sysinfo.h>
+#include <hybrid/host.h>
+#ifdef __x86_64__
+#include <bits/os/kos/sysinfo32.h>
+#define compat_sysinfo __sysinfox32
+#endif /* __x86_64__ */
 
-#endif /* !_LINUX_SYSINFO_H */
+#endif /* !_I386_KOS_COMPAT_BITS_OS_KOS_SYSINFO_H */

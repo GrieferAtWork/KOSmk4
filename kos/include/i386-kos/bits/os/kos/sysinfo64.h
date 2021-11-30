@@ -17,13 +17,50 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_COMPAT_BITS_OS_KOS_CMSGHDR_H
-#define _I386_KOS_COMPAT_BITS_OS_KOS_CMSGHDR_H 1
+#ifndef _I386_KOS_BITS_OS_KOS_SYSINFO64_H
+#define _I386_KOS_BITS_OS_KOS_SYSINFO64_H 1
+
+#include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/host.h>
+#include <hybrid/typecore.h>
+
+#include <bits/types.h>
+
 #ifdef __x86_64__
-#include <bits/os/kos/cmsghdr32.h>
-#define compat_cmsghdr __cmsghdrx32
+#define __sysinfox64  sysinfo
+#define SI_LOAD_SHIFT __SIX64_LOAD_SHIFT
 #endif /* __x86_64__ */
 
-#endif /* !_I386_KOS_COMPAT_BITS_OS_KOS_CMSGHDR_H */
+#define __SIX64_LOAD_SHIFT 16
+
+#ifdef __CC__
+__DECL_BEGIN
+
+#ifdef __USE_KOS_KERNEL
+#define sysinfox64 __sysinfox64
+#endif /* __USE_KOS_KERNEL */
+
+struct __sysinfox64 {
+	__LONG64_TYPE__  uptime;    /* Seconds since boot. */
+	__ULONG64_TYPE__ loads[3];  /* 1, 5, and 15 minute load averages .*/
+	__ULONG64_TYPE__ totalram;  /* Total usable main memory size. */
+	__ULONG64_TYPE__ freeram;   /* Available memory size. */
+	__ULONG64_TYPE__ sharedram; /* Amount of shared memory. */
+	__ULONG64_TYPE__ bufferram; /* Memory used by buffers. */
+	__ULONG64_TYPE__ totalswap; /* Total swap space size. */
+	__ULONG64_TYPE__ freeswap;  /* swap space still available. */
+	__UINT16_TYPE__  procs;     /* Number of current processes. */
+	__UINT16_TYPE__  pad;       /* Explicit padding for m68k. */
+	__UINT32_TYPE__  __si_pad2; /* ... */
+	__ULONG64_TYPE__ totalhigh; /* Total high memory size. */
+	__ULONG64_TYPE__ freehigh;  /* Available high memory size. */
+	__UINT32_TYPE__  mem_unit;  /* Memory unit size in bytes. */
+	char _f[20 - 2 * sizeof(__ULONG64_TYPE__) - sizeof(__u32)]; /* Padding: libc5 uses this... */
+};
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_I386_KOS_BITS_OS_KOS_SYSINFO64_H */

@@ -28,6 +28,7 @@
 #include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -41,10 +42,14 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
+#include <hybrid/atomic.h>
+
+#include <bits/os/sysinfo.h>
 #include <bits/os/timespec.h>
 #include <bits/os/timeval.h>
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
+#include <linux/sysinfo.h>
 #include <sys/time.h>
 #include <sys/timeb.h>
 
@@ -52,9 +57,11 @@
 #include <errno.h>
 #include <sched.h>
 #include <stddef.h>
+#include <string.h>
 #include <time.h>
 
 #ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/os/sysinfo.h>
 #include <compat/bits/os/timeb.h>
 #include <compat/bits/os/timespec.h>
 #include <compat/bits/os/timeval.h>
@@ -492,6 +499,101 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP64 */
+
+
+
+
+
+/************************************************************************/
+/* sysinfo()                                                            */
+/************************************************************************/
+#if defined(__ARCH_WANT_SYSCALL_SYSINFO) || defined(__ARCH_WANT_COMPAT_SYSCALL_SYSINFO)
+PRIVATE WUNUSED size_t
+NOTHROW(KCALL get_total_ram_in_pages)(void) {
+	static size_t known = 0;
+	size_t i, result;
+	result = known;
+	if (result != 0)
+		return result;
+	for (i = 0; i < mzones.pm_zonec; ++i) {
+		result += (size_t)mzones.pm_zones[i]->mz_rmax + 1;
+	}
+	ATOMIC_WRITE(known, result);
+	return result;
+}
+
+PRIVATE WUNUSED size_t
+NOTHROW(KCALL get_free_ram_in_pages)(void) {
+	size_t i, result = 0;
+	for (i = 0; i < mzones.pm_zonec; ++i)
+		result += (size_t)ATOMIC_READ(mzones.pm_zones[i]->mz_cfree);
+	return result;
+}
+
+PRIVATE void KCALL
+do_sysinfo(USER CHECKED struct sysinfo *info) {
+	size_t total, free, used;
+	total = get_total_ram_in_pages();
+	free  = get_free_ram_in_pages();
+
+	info->uptime   = (typeof(info->uptime))(ktime() / NSEC_PER_SEC);
+	info->loads[0] = (typeof(info->loads[0]))1234; /* XXX: Implement me */
+	info->loads[1] = (typeof(info->loads[1]))1234; /* XXX: Implement me */
+	info->loads[2] = (typeof(info->loads[2]))1234; /* XXX: Implement me */
+	info->mem_unit = (typeof(info->mem_unit))PAGESIZE;
+	info->totalram = (typeof(info->totalram))total;
+	info->freeram  = (typeof(info->freeram))free;
+
+	/* Write some sane values for stuff we don't actually keep track of. */
+	used            = total - free;
+	info->sharedram = (typeof(info->sharedram))(used / 2);
+	info->bufferram = (typeof(info->bufferram))(used / 8);
+	info->procs     = 42; /* TODO: # of threads running on the system */
+
+	/* Linux has this weird concept of high memory, but I forget what it was about... */
+	info->totalhigh = (typeof(info->totalhigh))total;
+	info->freehigh  = (typeof(info->freehigh))free;
+
+	/* We don't implement swap, yet. */
+	info->totalswap = (typeof(info->totalswap))0;
+	info->freeswap  = (typeof(info->freeswap))0;
+}
+#endif /* __ARCH_WANT_SYSCALL_SYSINFO || __ARCH_WANT_COMPAT_SYSCALL_SYSINFO */
+
+#ifdef __ARCH_WANT_SYSCALL_SYSINFO
+DEFINE_SYSCALL1(errno_t, sysinfo,
+                USER UNCHECKED struct sysinfo *, info) {
+	validate_writable(info, sizeof(*info));
+	do_sysinfo(info);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SYSINFO */
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SYSINFO
+DEFINE_COMPAT_SYSCALL1(errno_t, sysinfo,
+                       USER UNCHECKED struct compat_sysinfo *, info) {
+	struct sysinfo si;
+	validate_writable(info, sizeof(*info));
+	memset(&si, 0, sizeof(si));
+	do_sysinfo(&si);
+
+	/* Write-back info. */
+	info->uptime    = (typeof(info->uptime))si.uptime;
+	info->loads[0]  = (typeof(info->loads[0]))si.loads[0];
+	info->loads[1]  = (typeof(info->loads[1]))si.loads[1];
+	info->loads[2]  = (typeof(info->loads[2]))si.loads[2];
+	info->totalram  = (typeof(info->totalram))si.totalram;
+	info->freeram   = (typeof(info->freeram))si.freeram;
+	info->sharedram = (typeof(info->sharedram))si.sharedram;
+	info->bufferram = (typeof(info->bufferram))si.bufferram;
+	info->totalswap = (typeof(info->totalswap))si.totalswap;
+	info->freeswap  = (typeof(info->freeswap))si.freeswap;
+	info->procs     = (typeof(info->procs))si.procs;
+	info->totalhigh = (typeof(info->totalhigh))si.totalhigh;
+	info->freehigh  = (typeof(info->freehigh))si.freehigh;
+	info->mem_unit  = (typeof(info->mem_unit))si.mem_unit;
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SYSINFO */
 
 
 

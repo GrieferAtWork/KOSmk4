@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfaaf2a5 */
+/* HASH CRC-32:0x4f6a7693 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -378,7 +378,7 @@
 #define __NR_getrlimit                0x61                           /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define __NR_getrusage                0x62                           /* errno_t getrusage(syscall_slong_t who, struct rusagex64 *tv) */
-#define __NR_sysinfo                  0x63                           /* errno_t sysinfo(struct sysinfo *info) */
+#define __NR_sysinfo                  0x63                           /* errno_t sysinfo(struct __sysinfox64 *info) */
 #define __NR_times                    0x64                           /* clock_t times(struct tmsx64 *buf) */
 #define __NR_ptrace                   0x65                           /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
 /* >> getuid(2)

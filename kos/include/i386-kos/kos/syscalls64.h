@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc332116d */
+/* HASH CRC-32:0x1a219d69 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,7 @@
 #include <bits/os/kos/sigstack64.h>
 #include <bits/os/kos/stat64.h>
 #include <bits/os/kos/statfs64.h>
+#include <bits/os/kos/sysinfo64.h>
 #include <bits/os/kos/tms64.h>
 #include <bits/os/kos/utimbuf64.h>
 #include <bits/os/mqueue.h>
@@ -110,6 +111,7 @@ struct __sigaltstackx64;
 struct __siginfox64_struct;
 struct __sigset_struct;
 struct __statfsx64;
+struct __sysinfox64;
 struct __timespecx64;
 struct __timevalx64;
 struct __tmsx64;
@@ -133,7 +135,6 @@ struct sched_param;
 struct shmid_ds;
 struct sigevent;
 struct sockaddr;
-struct sysinfo;
 struct termios;
 struct timex;
 struct timezone;
@@ -2102,7 +2103,7 @@ __CDECLARE_SC(,__errno_t,syncfs,(__fd_t __fd),(__fd))
 __CDECLARE_SC(,__errno_t,sysfs,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(sysfs) */
 #if __CRT_HAVE_SC(sysinfo)
-__CDECLARE_SC(,__errno_t,sysinfo,(struct sysinfo *__info),(__info))
+__CDECLARE_SC(,__errno_t,sysinfo,(struct __sysinfox64 *__info),(__info))
 #endif /* __CRT_HAVE_SC(sysinfo) */
 #if __CRT_HAVE_SC(syslog)
 __CDECLARE_SC(,__ssize_t,syslog,(__syscall_ulong_t __level, char const *__str, __size_t __len),(__level,__str,__len))
@@ -4247,7 +4248,7 @@ __CDECLARE_XSC(,__errno_t,syncfs,(__fd_t __fd),(__fd))
 __CDECLARE_XSC(,__errno_t,sysfs,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(sysfs) */
 #if __CRT_HAVE_XSC(sysinfo)
-__CDECLARE_XSC(,__errno_t,sysinfo,(struct sysinfo *__info),(__info))
+__CDECLARE_XSC(,__errno_t,sysinfo,(struct __sysinfox64 *__info),(__info))
 #endif /* __CRT_HAVE_XSC(sysinfo) */
 #if __CRT_HAVE_XSC(syslog)
 __CDECLARE_XSC(,__ssize_t,syslog,(__syscall_ulong_t __level, char const *__str, __size_t __len),(__level,__str,__len))

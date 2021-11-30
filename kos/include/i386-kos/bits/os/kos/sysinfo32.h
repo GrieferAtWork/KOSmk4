@@ -17,35 +17,49 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux     (/include/linux/types.h) */
-/* (#) Portability: diet libc (/include/linux/types.h) */
-#ifndef _LINUX_TYPES_H
-#define _LINUX_TYPES_H 1
+#ifndef _I386_KOS_BITS_OS_KOS_SYSINFO32_H
+#define _I386_KOS_BITS_OS_KOS_SYSINFO32_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
 
-#include "posix_types.h"
+#if defined(__i386__) && !defined(__x86_64__)
+#define __sysinfox32  sysinfo
+#define SI_LOAD_SHIFT __SIX32_LOAD_SHIFT
+#endif /* __i386__ && !__x86_64__ */
+
+#define __SIX32_LOAD_SHIFT 16
 
 #ifdef __CC__
 __DECL_BEGIN
 
-typedef __UINT16_TYPE__ __sum16;
-typedef __UINT32_TYPE__ __wsum;
+#ifdef __USE_KOS_KERNEL
+#define sysinfox32 __sysinfox32
+#endif /* __USE_KOS_KERNEL */
 
-#define __aligned_u64  __ATTR_ALIGNED(8) __u64
-#define __aligned_be64 __ATTR_ALIGNED(8) __be64
-#define __aligned_le64 __ATTR_ALIGNED(8) __le64
-
-#ifndef __size_t_defined
-#define __size_t_defined
-typedef __SIZE_TYPE__ size_t;
-#endif /* !__size_t_defined */
+struct __sysinfox32 {
+	__LONG32_TYPE__  uptime;    /* Seconds since boot. */
+	__ULONG32_TYPE__ loads[3];  /* 1, 5, and 15 minute load averages .*/
+	__ULONG32_TYPE__ totalram;  /* Total usable main memory size. */
+	__ULONG32_TYPE__ freeram;   /* Available memory size. */
+	__ULONG32_TYPE__ sharedram; /* Amount of shared memory. */
+	__ULONG32_TYPE__ bufferram; /* Memory used by buffers. */
+	__ULONG32_TYPE__ totalswap; /* Total swap space size. */
+	__ULONG32_TYPE__ freeswap;  /* swap space still available. */
+	__UINT16_TYPE__  procs;     /* Number of current processes. */
+	__UINT16_TYPE__  pad;       /* Explicit padding for m68k. */
+	__ULONG32_TYPE__ totalhigh; /* Total high memory size. */
+	__ULONG32_TYPE__ freehigh;  /* Available high memory size. */
+	__UINT32_TYPE__  mem_unit;  /* Memory unit size in bytes. */
+	char _f[20 - 2 * sizeof(__ULONG32_TYPE__) - sizeof(__u32)]; /* Padding: libc5 uses this... */
+};
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_LINUX_TYPES_H */
+#endif /* !_I386_KOS_BITS_OS_KOS_SYSINFO32_H */

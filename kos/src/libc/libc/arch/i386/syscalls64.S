@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e5b438 */
+/* HASH CRC-32:0x6ec7a1d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1090,7 +1090,7 @@ INTERN_FUNCTION(libc_sys_getrusage)
 END(libc_sys_getrusage)
 DEFINE_PUBLIC_ALIAS(sys_getrusage, libc_sys_getrusage)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox64 *info) */
 INTERN_FUNCTION(libc_sys_sysinfo)
 	movq   $(0x63), %rax
 	syscall
@@ -5507,7 +5507,7 @@ INTERN_FUNCTION(libc_sys_Xgetrusage)
 END(libc_sys_Xgetrusage)
 DEFINE_PUBLIC_ALIAS(sys_Xgetrusage, libc_sys_Xgetrusage)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox64 *info) */
 INTERN_FUNCTION(libc_sys_Xsysinfo)
 	movq   $(0x63), %rax
 	std /* Enable exceptions */

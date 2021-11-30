@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x983997bb */
+/* HASH CRC-32:0x4a48c48 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3279,7 +3279,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrusage)
 	.cfi_endproc
 END(__x86_asm64_syscall_getrusage)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox64 *info) */
 .section .text.x86.asm64_syscall.sysinfo
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sysinfo)
 	.cfi_startproc simple
@@ -15866,7 +15866,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapoff)
 	.cfi_endproc
 END(__x86_asm32_int80_swapoff)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox32 *info) */
 .section .text.x86.asm32_syscall_int80.sysinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysinfo)
 	.cfi_startproc simple
@@ -26718,7 +26718,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_wait4, __x86_asm32_int80_wait4)
 /* errno_t swapoff(char const *pathname) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_swapoff, __x86_asm32_int80_swapoff)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox32 *info) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sysinfo, __x86_asm32_int80_sysinfo)
 
 /* errno_t ipc(int TODO_PROTOTYPE) */
@@ -32001,7 +32001,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_swapoff)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_swapoff)
 
-/* errno_t sysinfo(struct sysinfo *info) */
+/* errno_t sysinfo(struct __sysinfox32 *info) */
 .section .text.x86.asm32_syscall_sysrun32.sysinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sysinfo)
 	.cfi_startproc

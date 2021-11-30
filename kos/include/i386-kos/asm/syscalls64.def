@@ -145,6 +145,7 @@ io_pgetevents = io_pgeteventsx64;
 pidfd_send_signal = pidfd_send_signalx64;
 times = timesx64;
 socketcall = socketcallx64;
+sysinfo = sysinfox64;
 
 
 /* Syscall definition syntax

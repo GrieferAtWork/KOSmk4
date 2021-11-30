@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a72e7f7 */
+/* HASH CRC-32:0x19195c30 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1225,7 +1225,7 @@
 #define __NR32AT2_wait4                        (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT3_wait4                        (struct rusagex32 *, struct __rusagex32 *)
 #define __NR32AT0_swapoff                      (char const *, char const *)
-#define __NR32AT0_sysinfo                      (struct sysinfo *, struct sysinfo *)
+#define __NR32AT0_sysinfo                      (struct __sysinfox32 *, struct __sysinfox32 *)
 #define __NR32AT0_ipc                          (int, int)
 #define __NR32AT0_fsync                        (fd_t, __fd_t)
 #define __NR32AT0_sigreturn                    (struct fpustate32 const *, struct fpustate32 const *)
@@ -2301,7 +2301,7 @@
 #define __NR32AM_vm86old(a, b, c, d, e, f)                      (int)a
 #define __NR32AM_wait4(a, b, c, d, e, f)                        (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex32 *)d
 #define __NR32AM_swapoff(a, b, c, d, e, f)                      (char const *)a
-#define __NR32AM_sysinfo(a, b, c, d, e, f)                      (struct sysinfo *)a
+#define __NR32AM_sysinfo(a, b, c, d, e, f)                      (struct __sysinfox32 *)a
 #define __NR32AM_ipc(a, b, c, d, e, f)                          (int)a
 #define __NR32AM_fsync(a, b, c, d, e, f)                        (__fd_t)a
 #define __NR32AM_sigreturn(a, b, c, d, e, f)                    (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f

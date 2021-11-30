@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c0a65f8 */
+/* HASH CRC-32:0x35f8c689 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,7 +245,7 @@
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #define SYS_wait4                        __NR_wait4                        /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 #define SYS_swapoff                      __NR_swapoff                      /* errno_t swapoff(char const *pathname) */
-#define SYS_sysinfo                      __NR_sysinfo                      /* errno_t sysinfo(struct sysinfo *info) */
+#define SYS_sysinfo                      __NR_sysinfo                      /* errno_t sysinfo(struct __sysinfox32 *info) */
 #define SYS_ipc                          __NR_ipc                          /* errno_t ipc(int TODO_PROTOTYPE) */
 /* Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
