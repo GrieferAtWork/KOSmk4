@@ -85,9 +85,8 @@ DECL_BEGIN
 	 MNODE_F_NOMERGE | MNODE_F_NOCORE)
 
 /* Like `MNODE_F_MERGEMASK', but for `struct mpart::mp_flags' */
-#define MPART_F_MERGEMASK                                    \
-	(MPART_F_NOFREE | MPART_F_PERSISTENT | MPART_F_NOSPLIT | \
-	 MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN)
+#define MPART_F_MERGEMASK \
+	(MPART_F_NOFREE | MPART_F_NOSPLIT | MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN)
 
 
 /* Returns `true' if `self' doesn't have any active DMA  locks.

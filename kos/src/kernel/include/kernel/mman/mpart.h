@@ -74,13 +74,7 @@
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)] The backing block-state bitset exists in-line. */
 #define MPART_F_NOFREE         0x0020 /* [const] Don't page_free() backing physical memory or swap. */
 /*efine MPART_F_               0x0040  * ... */
-#define MPART_F_PERSISTENT     0x0080 /* [lock(CLEAR_ONCE)] The `MPART_F_GLOBAL_REF' flag may not  be cleared to free  up
-                                       * memory. This flag is still cleared when the is being anonymized as the result of
-                                       * a  call to `mfile_delete()'. The only place  where this flag makes a difference,
-                                       * is when the global list  of mem-parts is scanned for  parts which are no  longer
-                                       * in-use, and can  be destroyed by  deleting their global  reference. - This  flag
-                                       * is set by  default for parts  of files that  have the `MFILE_F_PERSISTENT'  flag
-                                       * set. This flag is never set for anonymous parts! */
+/*efine MPART_F_               0x0080  * ... */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 #define MPART_F_CHANGED        0x0200 /* [lock(SET(MPART_F_LOCKBIT),
                                        *       CLEAR((MPART_F_LOCKBIT && mp_meta->mpm_dmalocks == 0) ||

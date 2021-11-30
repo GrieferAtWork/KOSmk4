@@ -579,8 +579,9 @@ print_mpart_desc(struct mpart *__restrict self,
 	char const *statename;
 	REF struct mman *firstcopy;
 	bool has_mappings;
+	bool has_multiple_mmans;
 	refcnt_t refcnt;
-	firstcopy    = NULL;
+	firstcopy = NULL;
 	mpart_lock_acquire(self);
 	refcnt  = ATOMIC_READ(self->mp_refcnt) - 1;
 	minaddr = self->mp_minaddr;
@@ -590,13 +591,18 @@ print_mpart_desc(struct mpart *__restrict self,
 	file    = incref(self->mp_file);
 	has_mappings = !LIST_EMPTY(&self->mp_copy) ||
 	               !LIST_EMPTY(&self->mp_share);
+	has_multiple_mmans = false;
 	if (!LIST_EMPTY(&self->mp_copy)) {
 		struct mnode *node;
 		node = LIST_FIRST(&self->mp_copy);
 		do {
-			if (tryincref(node->mn_mman)) {
+			if (firstcopy) {
+				if (!wasdestroyed(node->mn_mman)) {
+					has_multiple_mmans = true;
+					break;
+				}
+			} else if (tryincref(node->mn_mman)) {
 				firstcopy = node->mn_mman;
-				break;
 			}
 			node = LIST_NEXT(node, mn_link);
 		} while (node);
@@ -636,10 +642,17 @@ print_mpart_desc(struct mpart *__restrict self,
 	result = print_size_with_unit(printer, arg, (size_t)((maxaddr - minaddr) + 1));
 	if (result < 0)
 		return result;
+
+	/* Print flags */
 	result = format_printf(printer, arg,
-	                       "\t%c%c%c%c\t",
-	                       flags & MPART_F_GLOBAL_REF ? 'g' : '-',
-	                       flags & MPART_F_PERSISTENT ? 'p' : '-',
+	                       "\t%c%c%c\t",
+	                       (flags & MPART_F_GLOBAL_REF)
+	                       ? ((ATOMIC_READ(file->mf_flags) & MFILE_F_PERSISTENT)
+	                          ? 'P'  /* global+persistent */
+	                          : 'g') /* global */
+	                       : mfile_isanon(file)
+	                         ? 'a' /* Anonymous */
+	                         : '-',
 	                       flags & MPART_F_CHANGED ? 'c' : '-',
 	                       flags & MPART_F_MLOCK
 	                       ? (flags & MPART_F_MLOCK_FROZEN ? 'L' : 'l')
@@ -647,8 +660,8 @@ print_mpart_desc(struct mpart *__restrict self,
 	if (result < 0)
 		return result;
 	if (firstcopy == &mman_kernel) {
-		result = (*printer)(arg, "<kernel>", 8);
-	} else if (firstcopy) {
+		result = (*printer)(arg, "[kernel]", 8);
+	} else if (firstcopy && !has_multiple_mmans) {
 		/* Print the main executable of the first mman with a copy-on-write mapping. */
 		REF struct fdirent *exec_dent;
 		REF struct path *exec_path;
@@ -678,8 +691,11 @@ print_mpart_desc(struct mpart *__restrict self,
 	} else {
 print_no_exe:
 		result = (*printer)(arg,
-		                    has_mappings ? "<mapped>"
-		                                 : "<cached>",
+		                    has_multiple_mmans
+		                    ? "[shared]"
+		                    : has_mappings
+		                      ? "[mapped]"
+		                      : "[cached]",
 		                    8);
 	}
 	if (result < 0)

@@ -899,6 +899,10 @@ again:
 				goto done;
 			goto again;
 		}
+
+		/* Only unload parts of non-persistent files. */
+		if (iter->mp_file->mf_flags & MFILE_F_PERSISTENT)
+			goto part_not_unloaded;
 		if (!(ATOMIC_FETCHAND(iter->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)) /* Inherit reference */
 			goto part_not_unloaded;
 		if (!ATOMIC_CMPXCH(iter->mp_refcnt, 1, 0)) {
@@ -958,8 +962,8 @@ again:
 	 *       Though for this, we should probably chance the list type from
 	 *       `LIST_*' to `TAILQ_*' (which has a O(1) *_LAST operation). */
 	LIST_FOREACH_SAFE (iter, &fallnodes_list, fn_allnodes) {
-		if (!(iter->mf_flags & MFILE_FN_GLOBAL_REF))
-			continue; /* Can't be decref'd */
+		if ((iter->mf_flags & (MFILE_FN_GLOBAL_REF | MFILE_F_PERSISTENT)) != MFILE_FN_GLOBAL_REF)
+			continue; /* Can't be unloaded via decref */
 		if (ATOMIC_READ(iter->mf_refcnt) != 1)
 			continue; /* External references exist, or already destroyed. */
 
@@ -1266,6 +1270,9 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	/* TODO: Clear unused memory from handle managers (once handle managers have been re-written) */
 
 	/* TODO: Clear unused memory from pid namespace (once pid namespace have been re-written) */
+
+	/* TODO: Trim unmapped sub-regions of mem-parts, similar to `mpart_trim()', only that we should
+	 *       also do so for non-anonymous mem-parts (but only if `MFILE_F_PERSISTENT' isn't set) */
 
 	/* TODO: There a couple more things we can do to free up physical memory:
 	 *  - We're  already unloading cached files and file-parts, but we can even

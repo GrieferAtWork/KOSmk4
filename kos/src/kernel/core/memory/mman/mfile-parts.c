@@ -217,8 +217,7 @@ _mfile_newpart(struct mfile *__restrict self,
 	if (self->mf_ops->mo_newpart) {
 		result = (*self->mf_ops->mo_newpart)(self, addr, num_bytes);
 		assert(!(result->mp_flags & (MPART_F_GLOBAL_REF | MPART_F_LOCKBIT |
-		                             MPART_F_CHANGED | MPART_F_PERSISTENT |
-		                             MPART_F__RBRED)));
+		                             MPART_F_CHANGED | MPART_F__RBRED)));
 	} else {
 		size_t num_blocks;
 		result = (REF struct mpart *)kmalloc(sizeof(struct mpart),
@@ -483,15 +482,6 @@ again_extend_part:
 	DBG_memset(&result->mp_changed, 0xcc, sizeof(result->mp_changed));
 	_mpart_init_asanon(result);
 	result->mp_flags |= MPART_F_GLOBAL_REF;
-
-	/* Mark the part as persistent if our file is, too. */
-#if MFILE_F_PERSISTENT == MPART_F_PERSISTENT
-	result->mp_flags |= self->mf_flags & MPART_F_PERSISTENT;
-#else /* MFILE_F_PERSISTENT == MPART_F_PERSISTENT */
-	if (self->mf_flags & MFILE_F_PERSISTENT)
-		result->mp_flags |= MPART_F_PERSISTENT;
-#endif /* MFILE_F_PERSISTENT != MPART_F_PERSISTENT */
-
 	TRY {
 		mfile_lock_write(self);
 	} EXCEPT {

@@ -413,15 +413,6 @@ restart_after_extendpart:
 		DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 		_mpart_init_asanon(part);
 		part->mp_flags |= MPART_F_GLOBAL_REF;
-
-		/* Mark the part as persistent if our file is, too. */
-#if MFILE_F_PERSISTENT == MPART_F_PERSISTENT
-		part->mp_flags |= self->mf_flags & MPART_F_PERSISTENT;
-#else /* MFILE_F_PERSISTENT == MPART_F_PERSISTENT */
-		if (self->mf_flags & MFILE_F_PERSISTENT)
-			part->mp_flags |= MPART_F_PERSISTENT;
-#endif /* MFILE_F_PERSISTENT != MPART_F_PERSISTENT */
-
 		TRY {
 			mfile_lock_write(self);
 		} EXCEPT {
@@ -980,14 +971,6 @@ extend_failed:
 	/* NOTE: Setting `MPART_F_CHANGED' here will cause `mfile_insert_and_merge_part_and_unlock()'
 	 *       to add  automatically  add  the  part  to  the  list  of  changed  parts  of  `self' */
 	part->mp_flags |= MPART_F_GLOBAL_REF | MPART_F_CHANGED;
-
-	/* Mark the part as persistent if our file is, too. */
-#if MFILE_F_PERSISTENT == MPART_F_PERSISTENT
-	part->mp_flags |= self->mf_flags & MPART_F_PERSISTENT;
-#else /* MFILE_F_PERSISTENT == MPART_F_PERSISTENT */
-	if (self->mf_flags & MFILE_F_PERSISTENT)
-		part->mp_flags |= MPART_F_PERSISTENT;
-#endif /* MFILE_F_PERSISTENT != MPART_F_PERSISTENT */
 
 	/* Make sure that the part has been allocated. Afterwards, copy the
 	 * caller-provided buffer into the correct offset within the  part.

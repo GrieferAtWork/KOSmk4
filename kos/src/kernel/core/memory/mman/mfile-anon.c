@@ -215,9 +215,7 @@ again:
 		newfile = incref(&mfile_anon[file->mf_blockshift]);
 		ATOMIC_WRITE(root->mp_file, newfile);
 		decref_nokill(file);
-		if (ATOMIC_FETCHAND(root->mp_flags, ~(MPART_F_GLOBAL_REF |
-		                                      MPART_F_PERSISTENT)) &
-		    MPART_F_GLOBAL_REF)
+		if (ATOMIC_FETCHAND(root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 			decref_nokill(root);
 
 		/* Try to merge mem-parts after changing the pointed-to file.
@@ -515,7 +513,7 @@ NOTHROW(FCALL mfile_delete_impl)(/*inherit(always)*/ REF struct mfile *__restric
  *  - The `MFILE_F_PERSISTENT' flag is cleared for the file.
  *  - The file-fields of all mem-parts are altered to point
  *    at  anonymous  memory   files.  (s.a.   `mfile_anon')
- *  - The `MPART_F_GLOBAL_REF' and `MPART_F_PERSISTENT' flag is cleared for all parts
+ *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' fields are set to `MFILE_PARTS_ANONYMOUS'
  *  - The `mf_filesize' field is set to `0'.
  * The result of all of this is that it is no longer possible to

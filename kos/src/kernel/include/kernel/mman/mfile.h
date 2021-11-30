@@ -468,8 +468,6 @@ struct mfile_ops {
 	 *  - mp_flags & MPART_F_GLOBAL_REF  (Set if `self' isn't anonymous)
 	 *  - mp_flags & MPART_F_LOCKBIT     (Must not be set)
 	 *  - mp_flags & MPART_F_CHANGED     (Must not be set)
-	 *  - mp_flags & MPART_F_PERSISTENT  (Set if `self' isn't anonymous and
-	 *                                    has the `MFILE_F_PERSISTENT' flag set)
 	 *  - mp_flags & MPART_F__RBRED      (Needed of the file-tree)
 	 *  - mp_file                        (Set to `self' or `mfile_anon[*]')
 	 *  - mp_copy                        (Initialized as empty)
@@ -628,12 +626,12 @@ struct mfile_ops {
 /*efine MFILE_F_                0x00008000  * ... */
 /*      MFILE_F_                0x00010000  * ... Reserved: MS_POSIXACL */
 /*      MFILE_F_                0x00020000  * ... Reserved: MS_UNBINDABLE */
-#define MFILE_F_PERSISTENT      0x00040000 /* [lock(CLEAR_ONCE)] Parts  of this file  should not be  unloaded to free up
-                                            * memory. When this flag is set, then newly created parts (if non-anonymous)
-                                            * will be created with the `MPART_F_PERSISTENT' flag set.
-                                            * This  flag is used to implement ramfs-based filesystems, where it is
-                                            * used to prevent files on such filesystem from being deleted when the
-                                            * kernel tries to reclaim memory.
+#define MFILE_F_PERSISTENT      0x00040000 /* [lock(CLEAR_ONCE)] Parts of this file should not be unloaded to free up
+                                            * memory, even if it may appear  as though no external references  (other
+                                            * than MPART_F_GLOBAl_REF) exist for those parts.
+                                            * This flag  is used  to implement  ramfs-based filesystems,  where
+                                            * is used to prevent files from being deleted when the kernel tries
+                                            * to reclaim memory.
                                             * This flag is cleared when such a file is (intentionally) unlink(2)'d,
                                             * or when the backing superblock is unmounted. */
 #define MFILE_F_FIXEDFILESIZE   0x00080000 /* [lock(WRITE_ONCE)] The  size  of  this  file  cannot  be altered.
@@ -1067,7 +1065,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
  *  - The `MFILE_F_PERSISTENT' flag is cleared for the file.
  *  - The file-fields of all mem-parts are altered to point
  *    at  anonymous  memory   files.  (s.a.   `mfile_anon')
- *  - The `MPART_F_GLOBAL_REF' and `MPART_F_PERSISTENT' flag is cleared for all parts
+ *  - The `MPART_F_GLOBAL_REF' is cleared for all parts
  *  - The `mf_parts' and `mf_changed' fields are set to `MFILE_PARTS_ANONYMOUS'
  *  - The `mf_filesize' field is set to `0'.
  * The result of all of this is that it is no longer possible to

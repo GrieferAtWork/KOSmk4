@@ -65,7 +65,7 @@ DECL_BEGIN
  *   left (+1: current-working-reference, +1: if `MPART_F_GLOBAL_REF' is set).
  *   Note  the check order  here which must interlock  with the invariant that
  *   `MPART_F_GLOBAL_REF' can only ever be cleared once!
- * - If `MPART_F_GLOBAL_REF' is set, check `MPART_F_PERSISTENT' for being set.
+ * - If `MPART_F_GLOBAL_REF' is set, check if the associated file is MFILE_F_PERSISTENT for being set.
  * - If so, goto `cleanup'. Else, acquire a lock to the file (if not anon)
  *   and the global parts list.
  * - If afterwards the reference counter is still 2 and no unsynced changes exist,
