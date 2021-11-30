@@ -429,6 +429,83 @@ procfs_kos_fs_allow_fs_oob_write(USER CHECKED void const *buf,
 /* /proc/kos/fs/nodes                                                   */
 /************************************************************************/
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL
+print_fsuper_mounting_points(struct fsuper *__restrict self,
+                             pformatprinter printer, void *arg) {
+	REF struct path *myroot;
+	ssize_t result = 0;
+	bool is_first = true;
+	REF struct pathmount *iter;
+	REF struct pathmount *prev = NULL;
+	size_t index = 0;
+	myroot = fs_getroot(THIS_FS);
+	FINALLY_DECREF_UNLIKELY(myroot);
+	fsuper_mounts_read(self);
+	iter = LIST_FIRST(&self->fs_mounts);
+	for (;;) {
+		size_t num_destroyed;
+		num_destroyed = 0;
+		while (iter && !tryincref(iter)) {
+			iter = LIST_NEXT(iter, pm_fsmount);
+			++num_destroyed;
+		}
+		fsuper_mounts_endread(self);
+		xdecref_unlikely(prev);
+		TRY {
+			if (num_destroyed != 0) {
+				if (!is_first) {
+					result = PRINT(",");
+					if (result < 0)
+						break;
+				}
+				is_first = false;
+				index += num_destroyed;
+				result = printf("<destroyed> (x%" PRIuSIZ ")", num_destroyed);
+				if (result < 0)
+					break;
+			}
+			if (!iter)
+				break;
+			if (!is_first) {
+				result = PRINT(",");
+				if (result < 0)
+					break;
+			}
+			is_first = false;
+			result   = path_print(iter, printer, arg, fs_atflags(0), myroot);
+			if (result < 0)
+				break;
+			fsuper_mounts_read(self);
+		} EXCEPT {
+			xdecref_unlikely(iter);
+			RETHROW();
+		}
+		prev = iter;
+		if (!LIST_ISBOUND(iter, pm_fsmount)) {
+			/* Find  the `index'th node in the global list.
+			 * This is not failsafe (elements before `node'
+			 * may have been removed, so `index' may not be
+			 * correct), but it's better than nothing. */
+			size_t i;
+			iter = LIST_FIRST(&self->fs_mounts);
+			for (i = 0; iter && i < index; ++i) {
+				iter = LIST_NEXT(iter, pm_fsmount);
+			}
+			if (!iter) {
+				fsuper_mounts_endread(self);
+				iter = prev;
+				break;
+			}
+		}
+		iter = LIST_NEXT(iter, pm_fsmount);
+		++index;
+	}
+	xdecref_unlikely(iter);
+	if (is_first)
+		result = PRINT("-");
+	return result;
+}
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t KCALL
 print_fnode_desc(struct fnode *__restrict self,
                  pformatprinter printer, void *arg) {
 	refcnt_t refcnt;
@@ -449,9 +526,18 @@ print_fnode_desc(struct fnode *__restrict self,
 	/* Basic attribute information */
 	strmode(mode, modename);
 	result = format_printf(printer, arg,
-	                       "%" PRIuSIZ "\t%s\t%s\t"
+	                       "%" PRIuSIZ "\t%s\t",
+	                       refcnt, self->fn_super->fs_sys->ffs_name);
+	if (result < 0)
+		return result;
+	result = print_fsuper_mounting_points(self->fn_super, printer, arg);
+	if (result < 0)
+		return result;
+	strmode(mode, modename);
+	result = format_printf(printer, arg,
+	                       "\t%s\t"
 	                       "%s,%c%c%c%c%c%c\t",
-	                       refcnt, self->fn_super->fs_sys->ffs_name, modename,
+	                       modename,
 	                       flags & MFILE_F_READONLY ? "ro" : "rw",
 	                       flags & MFILE_FN_GLOBAL_REF ? 'g' : '-',
 	                       flags & MFILE_F_DELETED ? 'D' : '-',
@@ -483,7 +569,6 @@ procfs_kos_fs_nodes_printer(pformatprinter printer, void *arg,
 	fallnodes_acquire();
 	node = LIST_FIRST(&fallnodes_list);
 	for (;;) {
-		REF struct fnode *next;
 		size_t num_destroyed;
 		num_destroyed = 0;
 		while (node && !tryincref(node)) {
@@ -524,8 +609,7 @@ procfs_kos_fs_nodes_printer(pformatprinter printer, void *arg,
 				break;
 			}
 		}
-		next = LIST_NEXT(node, fn_allnodes);
-		node = next;
+		node = LIST_NEXT(node, fn_allnodes);
 		++index;
 	}
 	xdecref_unlikely(node);
@@ -723,7 +807,6 @@ procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
 	mpart_all_acquire();
 	part = LIST_FIRST(&mpart_all_list);
 	for (;;) {
-		REF struct mpart *next;
 		size_t num_destroyed;
 		num_destroyed = 0;
 		while (part && !tryincref(part)) {
@@ -764,8 +847,7 @@ procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
 				break;
 			}
 		}
-		next = LIST_NEXT(part, mp_allparts);
-		part = next;
+		part = LIST_NEXT(part, mp_allparts);
 		++index;
 	}
 	xdecref_unlikely(part);
