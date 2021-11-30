@@ -497,6 +497,40 @@ again_unbind_allnodes:
 		}
 	}
 
+	/* TODO: When  `self' is a  ramfs, then we must  recursively go through all
+	 *       directories reachable from `self->fs_root', lock their file trees,
+	 *       and delete all contained files.
+	 * Otherwise, we'll end up with memory leaks because of the reference loop:
+	 *
+	 * ```
+	 *   ramfs_super::rs_dat::rdd_tree
+	 *       ^                  |
+	 *       |                  |
+	 *       +----+             v
+	 *            |         ramfs_dirent::rde_node
+	 *   fnode::fn_super                    |
+	 *     ^                                |
+	 *     |                                |
+	 *     +--------------------------------+
+	 * ```
+	 *
+	 * To reproduce:
+	 *     $ mkdir /tmp/subfs
+	 *     $ mount -t ramfs - /tmp/subfs
+	 *     $ echo hi > /tmp/subfs/myfile.txt
+	 *     $ umount /tmp/subfs
+	 *     $ leaks
+	 * Output will indicate 3 Memory leaks:
+	 *  - ramfs_super:  "/tmp/subfs"
+	 *  - ramfs_dirent: "/tmp/subfs/myfile.txt"
+	 *  - fregnode:     "/tmp/subfs/myfile.txt"
+	 * Which makes sense as these are the 3 objects apart of the loop above.
+	 *
+	 * Solution: Fix this problem by adding a new operator to `fsuper_ops' that is called
+	 *           instead of `mfile_delete_impl()' below, which is then allowed to do some
+	 *           additional cleanup before eventually calling `mfile_delete_impl()'.
+	 */
+
 	/* Delete the mfile-portion. */
 	mfile_delete_impl(self);
 }
@@ -537,8 +571,8 @@ again:
 		/* Try to begin deletion of this file (unless it's already marked as deleted) */
 		if (mfile_begin_delete(tree)) {
 			/* Do the rest of the deletion later. */
-			tree->_mf_delfnodes = self->fs_root._mf_delfnodes; /* Inherit referenece */
-			self->fs_root._mf_delfnodes = tree;                /* Inherit referenece */
+			tree->_mf_delfnodes = self->fs_root._mf_delfnodes; /* Inherit reference */
+			self->fs_root._mf_delfnodes = tree;                /* Inherit reference */
 		} else {
 			decref_unlikely(tree);
 		}
