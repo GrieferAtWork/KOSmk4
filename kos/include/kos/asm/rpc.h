@@ -56,25 +56,25 @@
  *    the stack was set-up to contain a single element equal to what is pushed
  *    by `RPC_OP_push_dorestart'.
  *
- *  - Every RPC program _must_ include checks regarding a system call needing  to
- *    be restarted, or never return to the interrupted location at all. For  this
- *    purpose, the stack starts out with containing information about the need to
- *    restart a system call. When a  system call has been interrupted  restarted,
- *    then accessible registers  are indicative of  where the interrupted  system
- *    call would have returned to, and the RPC program should modify the  program
- *    counter  to  point to  a custom  landing pad  capable of  saving registers,
- *    repeating the system  call, restoring registers,  and finally returning  to
+ *  - Every  RPC program _must_  include checks regarding  a system call needing
+ *    to  be restarted, or never return to  the interrupted location at all. For
+ *    this purpose, the stack starts  out with containing information about  the
+ *    need to restart a  system call. When a  system call has been  interrupted,
+ *    then accessible registers are indicative  of where the interrupted  system
+ *    call would have returned to, and the RPC program should modify the program
+ *    counter to point  to a  custom landing  pad capable  of saving  registers,
+ *    repeating the system call, restoring  registers, and finally returning  to
  *    where the system call would have originally returned to.
  *
- *  - Unaligned memory access is allowed on all architectures, though if you
- *    have to resort it making use of it, you might be doing something wrong
+ *  - Unaligned  memory access is allowed on all architectures, though if you
+ *    have to resort to making use of it, you might be doing something wrong.
  *
  *  - Both register-, memory-, futex- and sigmask modifications will only  become
  *    visible  once the RPC program returns without errors (via `RPC_OP_ret'), at
  *    which  point the RPC can no longer be canceled (though can still be aborted
  *    if writes to VIO memory exist, in which case there is a chance that not all
  *    modifications are applied).
- *    During execution a program may  arbitrarily be aborted or canceled,  where
+ *    During  execution, a program may arbitrarily be aborted or canceled, where
  *    the former happens when SIGKILL or SIGSTOP signals/RPCs are received while
  *    the  program is executing,  and the later when  the original sender didn't
  *    make  use of `RPC_JOIN_F_ASYNC' and themselves received an unmasked RPC or
@@ -82,10 +82,10 @@
  *    - When an RPC is canceled, it won't be restarted but will just be discarded
  *      in its entirety.
  *    - When an RPC is aborted, another attempt to execute it will be made before
- *      the next time the targeted returns to user-space.
+ *      the next time the target thread returns to user-space.
  *
  *  - PUSH_ONTO_USER_STACK(value) works as:
- *    >> int spreg  = CFI_UNWIND_REGISTER_SP(sizeof(void *));
+ *    >> int spreg = CFI_UNWIND_REGISTER_SP(sizeof(void *));
  *    >> void **sp = GET_REGISTER(spreg);
  *    >> #ifdef __ARCH_STACK_GROWS_DOWNWARDS
  *    >> --sp;
@@ -134,7 +134,7 @@
 #define RPC_OP_dup            0x12 /* [+0] PUSH(TOP); */
 #define RPC_OP_drop           0x13 /* [+0] POP(); */
 #define RPC_OP_over           0x14 /* [+0] PUSH(SECOND); */
-#define RPC_OP_pick           0x15 /* [+1] PUSH(NTH(*(u8 const *)pc));  // Where operand=0 is the old TOP */
+#define RPC_OP_pick           0x15 /* [+1] PUSH(NTH(*(u8 const *)pc));  // Where operand=0 means the old TOP */
 #define RPC_OP_swap           0x16 /* [+0] TOP = XCH(SECOND, TOP); */
 #define RPC_OP_rot            0x17 /* [+0] a = TOP; TOP = SECOND; SECOND = THIRD; THIRD = a; */
 #define RPC_OP_abs            0x19 /* [+0] a = POP(); PUSH(a < 0 ? -a : a); */

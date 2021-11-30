@@ -795,6 +795,10 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	/* TODO: Clear unused buffer space from every HANDLE_TYPE_PIPE(|_READER|_WRITER)
 	 *       - Find these by enumerating thread->handles */
 
+	/* TODO: Clear unused memory from handle managers (once handle managers have been re-written) */
+
+	/* TODO: Clear unused memory from pid namespace (once pid namespace have been re-written) */
+
 	/* TODO: There a couple more things we can do to free up physical memory:
 	 *  - We're  already unloading cached files and file-parts, but we can even
 	 *    unload file parts that are currently in use (so-long as they  haven't

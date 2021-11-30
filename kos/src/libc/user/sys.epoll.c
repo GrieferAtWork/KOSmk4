@@ -160,7 +160,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
 }
 /*[[[end:libc_epoll_pwait]]]*/
 
-/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0xc056adf5]]]*/
+/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0xbf04f811]]]*/
 /* >> epoll_rpc_exec(3)
  * Helper  wrapper  for `EPOLL_CTL_RPC_PROG'  that automatically  provides the
  * necessary  arch-specific RPC program to invoke `func(..., event->data.ptr)'
@@ -170,10 +170,10 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
  * as  the RPC  is send, the  associated monitor will  have automatically been
  * deleted.
  *
- * This function can be used to allow for implement asynchronous notification
- * of file events to be delivered to arbitrary threads. Using this, you could
- * implement  asynchronous, non-blocking I/O by sending RPCs to an I/O worker
- * thread that will perform reads/writes as soon as they become possible.
+ * This  function can be used to implement asynchronous notification of file
+ * events to-be  delivered  to  arbitrary threads.  Using  this,  you  could
+ * implement asynchronous, non-blocking I/O by sending RPCs to an I/O worker
+ * thread  that will perform  reads/writes as soon  as they become possible.
  * @param: epfd:       Epoll controller file descriptor
  * @param: fd:         The file to monitor for events
  * @param: event:      Epoll event information, including monitored  events,

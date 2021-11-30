@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde6ca29d */
+/* HASH CRC-32:0xe0685890 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,10 +97,10 @@ INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_epoll_pwait)
  * as  the RPC  is send, the  associated monitor will  have automatically been
  * deleted.
  *
- * This function can be used to allow for implement asynchronous notification
- * of file events to be delivered to arbitrary threads. Using this, you could
- * implement  asynchronous, non-blocking I/O by sending RPCs to an I/O worker
- * thread that will perform reads/writes as soon as they become possible.
+ * This  function can be used to implement asynchronous notification of file
+ * events to-be  delivered  to  arbitrary threads.  Using  this,  you  could
+ * implement asynchronous, non-blocking I/O by sending RPCs to an I/O worker
+ * thread  that will perform  reads/writes as soon  as they become possible.
  * @param: epfd:       Epoll controller file descriptor
  * @param: fd:         The file to monitor for events
  * @param: event:      Epoll event information, including monitored  events,

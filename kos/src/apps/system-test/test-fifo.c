@@ -126,7 +126,7 @@ DEFINE_TEST(fifo) {
 	/* Delete the FIFO */
 	assertf(unlink(FIFO_NAME) == 0, "%m");
 
-	/* Communication  should till  be possible.  - The  fifo simply became
+	/* Communication should still  be possible. -  The fifo simply  became
 	 * anonymous (i.e. more akin to a regular pipe, as created by pipe(2)) */
 	temp = read(rd, buf, 3);
 	assert(temp == -1);

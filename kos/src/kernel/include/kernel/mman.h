@@ -128,7 +128,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mman, mm_refcnt, mman_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct mman, mm_weakrefcnt, mman_free)
 
 /* Memory manager construction functions.
- * - mman_fork() will fork the current mman.
+ * - mman_fork() will fork the current mman; guess what system call uses it (:P)
  * - mman_new() is used by exec(2) after vfork(2). */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_new(void) THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct mman *FCALL mman_fork(void) THROWS(E_BADALLOC, E_WOULDBLOCK);

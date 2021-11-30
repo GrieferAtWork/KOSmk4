@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_EPOLL_RPC_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_EPOLL_RPC_C 1
-#define _KOS_SOURCE 1
+#define _KOS_SOURCE 1 /* epoll RPCs are a KOS-extension. */
 #undef NDEBUG
 
 #include <hybrid/compiler.h>

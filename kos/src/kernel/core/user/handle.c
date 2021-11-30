@@ -2286,9 +2286,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,
 			      newsize);
 		}
-		/* TODO: Special permissions to raise the  limit beyond some sane  value
-		 *       I'm pretty sure linux does the same, and there probably is some
-		 *       procfs file to configure that limit. */
+		/* Permissions checking is done in `ringbuffer_set_pipe_limit()' */
 		ringbuffer_set_pipe_limit(rb, newsize);
 		result = 0;
 	}	break;
