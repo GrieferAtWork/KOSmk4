@@ -58,41 +58,15 @@ PRIVATE ATTR_FREERODATA struct pmembank const default_memory_banks[] = {
 
 INTDEF struct pmembank kernel_membanks_initial[];
 PUBLIC ATTR_COLDDATA struct pmeminfo minfo = {
-	 .mb_total = {
-		/* NOTE: Memory totals are initialized in `x86_initialize_default_memory_banks'
-		 *       technically,  this could be initialized at compile-/link-time, however
-		 *       doing  so would be quite complicated, so I'm going to act like I don't
-		 *       know about this potential optimization for the time being... */
-		/* [PMEMBANK_TYPE_UNDEF]     = */ 0,
-		/* [PMEMBANK_TYPE_RAM]       = */ 0,
-		/* [PMEMBANK_TYPE_PRESERVE]  = */ 0,
-		/* [PMEMBANK_TYPE_ALLOCATED] = */ 0,
-		/* [PMEMBANK_TYPE_KFREE]     = */ 0,
-		/* [PMEMBANK_TYPE_KERNEL]    = */ 0,
-		/* [PMEMBANK_TYPE_NVS]       = */ 0,
-		/* [PMEMBANK_TYPE_DEVICE]    = */ 0,
-		/* [PMEMBANK_TYPE_BADRAM]    = */ 0,
-	},
 	 .mb_bankc = COMPILER_LENOF(default_memory_banks) - 1,
 	 .mb_banks = kernel_membanks_initial
 };
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_default_memory_banks)(void) {
-	unsigned int i;
 	memcpy(kernel_membanks_initial,
 	       default_memory_banks,
 	       sizeof(default_memory_banks));
-	/* Setup initial memory type totals.
-	 * XXX: This could be done at compile-/link-time */
-	for (i = 0; i < COMPILER_LENOF(default_memory_banks); ++i) {
-		physaddr_t size;
-		u16 type;
-		size = PMEMBANK_SIZE(default_memory_banks[i]);
-		type = default_memory_banks[i].mb_type;
-		minfo.mb_total[PMEMBANK_TYPE_UNDEF] -= size;
-		minfo.mb_total[type] += size;
-	}
 }
 
 /* Base address where the virtual memory mapping for vm86 begins. */

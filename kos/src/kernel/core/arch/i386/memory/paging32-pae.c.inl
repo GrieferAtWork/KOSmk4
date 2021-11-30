@@ -163,16 +163,16 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	STATIC_ASSERT(PAE_PDIR_VEC1INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 
-	e3[0] = (u64)page_mallocone();
+	e3[0] = (u64)page_mallocone_for_paging();
 	if unlikely((physpage_t)e3[0] == PHYSPAGE_INVALID)
 		goto err_0;
-	e3[1] = (u64)page_mallocone();
+	e3[1] = (u64)page_mallocone_for_paging();
 	if unlikely((physpage_t)e3[1] == PHYSPAGE_INVALID)
 		goto err_1;
-	e3[2] = (u64)page_mallocone();
+	e3[2] = (u64)page_mallocone_for_paging();
 	if unlikely((physpage_t)e3[2] == PHYSPAGE_INVALID)
 		goto err_2;
-	e3[3] = (u64)page_mallocone();
+	e3[3] = (u64)page_mallocone_for_paging();
 	if unlikely((physpage_t)e3[3] == PHYSPAGE_INVALID)
 		goto err_3;
 	/* Now to initialize our pre-allocated level#3 vectors.
@@ -210,11 +210,11 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	                   4 * 8);
 	return true;
 err_3:
-	page_ccfree((physpage_t)e3[2], 1);
+	page_ccfree_for_paging((physpage_t)e3[2], 1);
 err_2:
-	page_ccfree((physpage_t)e3[1], 1);
+	page_ccfree_for_paging((physpage_t)e3[1], 1);
 err_1:
-	page_ccfree((physpage_t)e3[0], 1);
+	page_ccfree_for_paging((physpage_t)e3[0], 1);
 err_0:
 	return false;
 }
@@ -262,7 +262,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 			e2 = PAE_PDIR_E2_IDENTITY[vec3][vec2];
 			/* Free allocated E1-vectors from E2-entries. */
 			if unlikely(PAE_PDIR_E2_ISVEC1(e2.p_word))
-				page_freeone(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
+				page_freeone_for_paging(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
 		}
 	}
 	pagedir_set(old_pagedir);
@@ -270,7 +270,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 	/* Free the always-allocated E2-vectors */
 	for (vec3 = 0; vec3 < 4; ++vec3) {
 		assert(self->p_e3[vec3].p_vec2.v_present);
-		page_freeone(ppageof(self->p_e3[vec3].p_word & PAE_PAGE_FVECTOR));
+		page_freeone_for_paging(ppageof(self->p_e3[vec3].p_word & PAE_PAGE_FVECTOR));
 	}
 }
 
@@ -323,7 +323,7 @@ again:
 	e2.p_word = ATOMIC_READ64(e2_p->p_word);
 	if (!e2.p_vec1.v_present) {
 		/* Not present */
-		new_e1_vector = page_mallocone();
+		new_e1_vector = page_mallocone_for_paging();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
 		/* Initialize the inner vector.
@@ -358,7 +358,7 @@ again:
 		}
 atomic_set_new_e2_word_or_free_new_e1_vector:
 		if unlikely(!ATOMIC_CMPXCH(e2_p->p_word, e2.p_word, new_e2_word)) {
-			page_freeone(new_e1_vector);
+			page_freeone_for_paging(new_e1_vector);
 			goto again;
 		}
 	} else if (e2.p_2mib.d_2mib_1) {
@@ -369,7 +369,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		 * temporary mapping trampoline to  temporarily map the new  page
 		 * for  initialization  (Because   the  trampoline  always   uses
 		 * `PAE_PAGE_FNOFLATTEN'  when  mapping, it  is  always prepared) */
-		new_e1_vector = page_mallocone();
+		new_e1_vector = page_mallocone_for_paging();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
 		e1.p_word = e2.p_word & ~(PAE_PAGE_F2MIB | PAE_PAGE_FPAT_2MIB);
@@ -654,7 +654,7 @@ again_try_exchange_e2_word:
 		 * NOTE: No need to Shoot-down anything for this, since the new,
 		 *       flattened control word has identical meaning to the old
 		 *       E1-vector. */
-		page_freeone(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
+		page_freeone_for_paging(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
 	}
 }
 
@@ -1339,10 +1339,10 @@ again_read_word:
 				 * they've  already been re-designated as general-purpose RAM, at
 				 * which point they'd start reading garbage, or corrupt pointers. */
 				pagedir_syncall_smp();
-				page_freeone((physpage_t)pageptr);
+				page_freeone_for_paging((physpage_t)pageptr);
 				do {
 					--free_count;
-					page_freeone((physpage_t)free_pages[free_count]);
+					page_freeone_for_paging((physpage_t)free_pages[free_count]);
 				} while (free_count);
 			} else {
 				free_pages[free_count++] = (u64)pageptr;
@@ -1354,7 +1354,7 @@ again_read_word:
 		pagedir_syncall_smp();
 		do {
 			--free_count;
-			page_freeone((physpage_t)free_pages[free_count]);
+			page_freeone_for_paging((physpage_t)free_pages[free_count]);
 		} while (free_count);
 	}
 }
@@ -1379,7 +1379,7 @@ again_read_word:
 			if unlikely(e2.p_word & PAE_PAGE_F2MIB)
 				continue; /* 2MiB page. */
 			pageptr = e2.p_word >> PAE_PAGE_SHIFT;
-			page_freeone((physpage_t)pageptr);
+			page_freeone_for_paging((physpage_t)pageptr);
 		}
 	}
 }

@@ -837,7 +837,7 @@ procfs_kos_kstat_printer(pformatprinter printer, void *arg,
 
 
 /************************************************************************/
-/* /proc/kos/raminfo                                                    */
+/* /proc/kos/meminfo                                                    */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
 procfs_kos_meminfo_printer(pformatprinter printer, void *arg,
@@ -865,37 +865,118 @@ procfs_kos_meminfo_printer(pformatprinter printer, void *arg,
 /************************************************************************/
 /* /proc/kos/raminfo                                                    */
 /************************************************************************/
-PRIVATE NONNULL((1)) void KCALL
-print_pagecount(pformatprinter printer, void *arg, physpagecnt_t count) {
-	physpagecnt_t adjusted_count;
-	char const *unit;
-	if (count >= (0x100000 / PAGESIZE)) {
-		adjusted_count = count / (0x100000 / PAGESIZE);
-		unit           = "MiB";
-	} else {
-		adjusted_count = (count * PAGESIZE) / 1024;
-		unit           = "KiB";
-	}
-	printf("%" PRIuN(__SIZEOF_PHYSPAGE_T__) " (%" PRIuN(__SIZEOF_PHYSPAGE_T__) " %s)",
-	       count, adjusted_count, unit);
+PRIVATE NONNULL((1)) ssize_t KCALL
+print_size_with_unit_and_percent(pformatprinter printer, void *arg,
+                                 uint64_t count, uint64_t total) {
+	ssize_t result;
+	unsigned int usage_percent;
+	result = print_size_with_unit(printer, arg, count);
+	if (result < 0)
+		return result;
+	usage_percent = 0;
+	if (total != 0)
+		usage_percent = (unsigned int)(((u64)count * 100 * 100000) / total);
+	/* Print usage percent */
+	return printf("\t(%u.%.5u%%)",
+	              usage_percent / 100000,
+	              usage_percent % 100000);
 }
 
 INTERN NONNULL((1)) void KCALL
 procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
                            pos_t UNUSED(offset_hint)) {
-	struct pmemstat st;
-	unsigned int usage_percent;
-	page_stat(&st);
-	PRINT("free:");
-	print_pagecount(printer, arg, st.ps_free);
-	PRINT("\nused:");
-	print_pagecount(printer, arg, st.ps_used);
-	PRINT("\nzero:");
-	print_pagecount(printer, arg, st.ps_zfree);
-	usage_percent = (unsigned int)(((u64)st.ps_used * 100 * 100000) / (st.ps_free + st.ps_used));
-	printf("\nusage:%u.%.5u%%\n",
-	       usage_percent / 100000,
-	       usage_percent % 100000);
+	struct pmemstat dynmem_st;
+	struct page_usage_struct dynmem_usage;
+	unsigned int i;
+	uint64_t dynmem_total_reasons;
+	uint64_t dynmem_misc_usage;
+	physpagecnt_t dynmem_total;
+	uint64_t ram_total;
+	uint64_t ram_total_usable;
+	uint64_t ram_total_kernel;
+	uint64_t ram_total_unusable;
+
+	/* Load memory usage stats. */
+	page_stat(&dynmem_st);
+	for (i = 0; i < sizeof(dynmem_usage) / sizeof(size_t); ++i)
+		((size_t *)&dynmem_usage)[i] = ATOMIC_READ(((size_t *)&page_usage)[i]);
+	dynmem_total_reasons = 0;
+	for (i = 0; i < sizeof(dynmem_usage) / sizeof(size_t); ++i)
+		dynmem_total_reasons += ((size_t *)&dynmem_usage)[i];
+	if (OVERFLOW_USUB(dynmem_st.ps_used, dynmem_total_reasons, &dynmem_misc_usage))
+		dynmem_misc_usage = 0;
+	dynmem_total = dynmem_st.ps_free + dynmem_st.ps_used;
+	dynmem_total *= PAGESIZE;
+	dynmem_misc_usage *= PAGESIZE;
+
+	/* Print information */
+	ram_total_usable = 0;
+	ram_total_kernel = 0;
+	ram_total_unusable = 0;
+	for (i = 0; i < minfo.mb_bankc; ++i) {
+		uint64_t banksize = (uint64_t)PMEMBANK_SIZE(minfo.mb_banks[i]);
+		switch (minfo.mb_banks[i].mb_type) {
+		case PMEMBANK_TYPE_RAM:
+			ram_total_usable += banksize;
+			break;
+		case PMEMBANK_TYPE_KFREE:
+		case PMEMBANK_TYPE_KERNEL:
+			ram_total_kernel += banksize;
+			break;
+		case PMEMBANK_TYPE_UNDEF:
+		case PMEMBANK_TYPE_NVS:
+		case PMEMBANK_TYPE_DEVICE:
+			break;
+		default:
+			ram_total_unusable += banksize;
+			break;
+		}
+	}
+	ram_total = ram_total_usable + ram_total_kernel + ram_total_unusable;
+
+	PRINT("ram:\t");
+	if (print_size_with_unit(printer, arg, ram_total) < 0)
+		return;
+	PRINT("\n\tkernel:\t");
+	if (print_size_with_unit_and_percent(printer, arg, ram_total_kernel, ram_total) < 0)
+		return;
+	PRINT("\n\tusable:\t");
+	if (print_size_with_unit_and_percent(printer, arg, ram_total_usable, ram_total) < 0)
+		return;
+	if (ram_total_unusable) {
+		PRINT("\n\tunusable:\t");
+		if (print_size_with_unit_and_percent(printer, arg, ram_total_unusable, ram_total) < 0)
+			return;
+	}
+	PRINT("\ndynmem:\t");
+	if (print_size_with_unit_and_percent(printer, arg, dynmem_total, ram_total) < 0)
+		return;
+#define PAGES(n) ((uint64_t)(n) * PAGESIZE)
+	PRINT("\n\tfree:\t");
+	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_st.ps_free), dynmem_total) < 0)
+		return;
+	PRINT("\n\t\tzero:\t");
+	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_st.ps_zfree), PAGES(dynmem_st.ps_free)) < 0)
+		return;
+	PRINT("\n\tused:\t");
+	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_st.ps_used), dynmem_total) < 0)
+		return;
+	PRINT("\n\t\tmisc:\t");
+	if (print_size_with_unit_and_percent(printer, arg, dynmem_misc_usage, PAGES(dynmem_st.ps_used)) < 0)
+		return;
+	PRINT("\n\t\tpaging:\t");
+	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_usage.pu_paging), PAGES(dynmem_st.ps_used)) < 0)
+		return;
+	PRINT("\n\t\tstatic:\t");
+	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_usage.pu_static), PAGES(dynmem_st.ps_used)) < 0)
+		return;
+#if defined(__x86_64__) || defined(__i386__)
+	PRINT("\n\t\tx86.iobm:\t");
+	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_usage.pu_x86_iobm), dynmem_st.ps_used) < 0)
+		return;
+#endif /* __x86_64__ || __i386__ */
+#undef PAGES
+	PRINT("\n");
 }
 
 

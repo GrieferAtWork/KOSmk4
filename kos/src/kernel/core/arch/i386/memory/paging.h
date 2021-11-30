@@ -60,7 +60,7 @@
 	       addr, (byte_t *)(addr) + (num_bytes)-1)
 #else /* !NDEBUG */
 #define PG_TRACE_MAP(addr, num_bytes, phys, perm) (void)0
-#define PG_TRACE_UNMAP(addr, num_bytes) (void)0
+#define PG_TRACE_UNMAP(addr, num_bytes)           (void)0
 #endif /* NDEBUG */
 
 #define PG_ASSERT_ALIGNED_ADDRESS(addr) \
@@ -74,6 +74,23 @@
 	           (uintptr_t)(addr) + (num_bytes) == 0,                    \
 	           "Invalid range %p...%p",                                 \
 	           (addr), (uintptr_t)(addr) + (num_bytes)-1))
+
+
+/* Helper macros to allocate physical memory for paging */
+#define page_mallocone_for_paging(...)           page_mallocone_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_malloc_for_paging(...)              page_malloc_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_malloc_part_for_paging(...)         page_malloc_part_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_malloc_at_for_paging(...)           page_malloc_at_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_malloc_between_for_paging(...)      page_malloc_between_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_malloc_part_between_for_paging(...) page_malloc_part_between_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_freeone_for_paging(...)             page_freeone_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_free_for_paging(...)                page_free_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_cfree_for_paging(...)               page_cfree_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_ccfree_for_paging(...)              page_ccfree_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_ffree_for_paging(...)               page_ffree_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_malloc32_for_paging(...)            page_malloc32_for(page_usage.pu_paging, ##__VA_ARGS__)
+#define page_mallocone32_for_paging(...)         page_mallocone32_for(page_usage.pu_paging, ##__VA_ARGS__)
+
 
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING_H */

@@ -760,9 +760,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		if (cpu_count_ > 1) {
 			physpage_t entry_page;
 			/* Allocate low physical memory for the SMP initialization entry page. */
-			entry_page = page_malloc_between((physpage_t)((physaddr_t)0x00000000 / PAGESIZE),
-			                                 (physpage_t)((physaddr_t)0x000fffff / PAGESIZE),
-			                                 CEILDIV(x86_smp_entry_size, PAGESIZE));
+			entry_page = page_malloc_between_for(page_usage.pu_static,
+			                                     (physpage_t)((physaddr_t)0x00000000 / PAGESIZE),
+			                                     (physpage_t)((physaddr_t)0x000fffff / PAGESIZE),
+			                                     CEILDIV(x86_smp_entry_size, PAGESIZE));
 			if unlikely(entry_page == PHYSPAGE_INVALID) {
 				printk(FREESTR(KERN_WARNING "[smp] Failed to allocate SMP trampoline (re-configure for single-core mode)\n"));
 				cpu_count_ = 1;

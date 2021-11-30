@@ -1185,6 +1185,22 @@ NOTHROW(KCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages) {
 	return false;
 }
 
+
+
+
+
+#ifndef CONFIG_NO_PAGE_USAGE
+/* Memory usage information.
+ * Keeps track of why certain  physical memory allocation were  made.
+ * Any physical memory allocated that doesn't appear here is  assumed
+ * to be allocated for general-purpose RAM, or some undefined reason. */
+PUBLIC struct page_usage_struct page_usage = { 0, };
+#endif /* !CONFIG_NO_PAGE_USAGE */
+
+
+
+
+
 #ifdef CONFIG_HAVE_DEBUGGER
 DBG_COMMAND(lsram,
             "lsram\n"

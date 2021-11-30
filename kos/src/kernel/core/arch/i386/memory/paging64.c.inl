@@ -41,6 +41,7 @@
 #include <kernel/printk.h>
 #include <kernel/x86/cpuid.h>
 #include <sched/cpu.h>
+#include <sched/task.h>
 #include <sched/userkern.h>
 #include <sched/x86/tss.h>
 
@@ -276,13 +277,13 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 						e2 = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
 						/* Check if this is an allocated E1 vector. */
 						if (P64_PDIR_E2_ISVEC1(e2.p_word)) {
-							page_freeone(ppageof(e2.p_word & P64_PAGE_FVECTOR));
+							page_freeone_for_paging(ppageof(e2.p_word & P64_PAGE_FVECTOR));
 						}
 					}
-					page_freeone(ppageof(e3.p_word & P64_PAGE_FVECTOR));
+					page_freeone_for_paging(ppageof(e3.p_word & P64_PAGE_FVECTOR));
 				}
 			}
-			page_freeone(ppageof(e4.p_word & P64_PAGE_FVECTOR));
+			page_freeone_for_paging(ppageof(e4.p_word & P64_PAGE_FVECTOR));
 		}
 	}
 	if (old_pagedir != NOT_SWITCHED) {
@@ -367,7 +368,7 @@ NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct mptram *__restrict ptram
                                                  unsigned int vec1_prepare_size) {
 	union p64_pdir_e1 e1, *e1_p;
 	physpage_t result;
-	result = page_mallocone();
+	result = page_mallocone_for_paging();
 	if unlikely(result == PHYSPAGE_INVALID)
 		goto done;
 	/* Fill in the E1 vector. */
@@ -427,7 +428,7 @@ NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct mptram *__
 	physpage_t result;
 	union p64_pdir_e2 e2, *e2_p;
 	/* Fill in the E2 vector. */
-	result = page_mallocone();
+	result = page_mallocone_for_paging();
 	if unlikely(result == PHYSPAGE_INVALID)
 		goto done;
 	e2_p = (union p64_pdir_e2 *)mptram_mappage(ptram, result);
@@ -552,18 +553,18 @@ again:
 		 * >> P64_PDIR_E4_IDENTITY[vec4] = VEC3; */
 
 		/* Allocate vectors. */
-		e3_vector = page_mallocone();
+		e3_vector = page_mallocone_for_paging();
 		if unlikely(!e3_vector)
 			goto err;
-		e2_vector = page_mallocone();
+		e2_vector = page_mallocone_for_paging();
 		if unlikely(!e2_vector) {
 err_e3_vector:
-			page_freeone(e3_vector);
+			page_freeone_for_paging(e3_vector);
 			goto err;
 		}
-		e1_vector = page_mallocone();
+		e1_vector = page_mallocone_for_paging();
 		if unlikely(!e1_vector) {
-			page_freeone(e2_vector);
+			page_freeone_for_paging(e2_vector);
 			goto err_e3_vector;
 		}
 		mptram_init(&ptram);
@@ -610,9 +611,9 @@ err_e3_vector:
 		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E4_IDENTITY[vec4].p_word,
 		                           e4.p_word, new_e4_word)) {
 /*word_changed_after_e3_vector:*/
-			page_freeone(e3_vector);
-			page_freeone(e2_vector);
-			page_freeone(e1_vector);
+			page_freeone_for_paging(e3_vector);
+			page_freeone_for_paging(e2_vector);
+			page_freeone_for_paging(e1_vector);
 			goto again;
 		}
 		goto success;
@@ -674,7 +675,7 @@ err_e3_vector:
 		COMPILER_BARRIER();
 		mptram_fini(&ptram);
 		if (e2_vector == PHYSPAGE_INVALID) {
-			page_freeone(e1_vector);
+			page_freeone_for_paging(e1_vector);
 			goto err;
 		}
 		new_e3_word = (u64)e2_vector * 4096;
@@ -692,8 +693,8 @@ err_e3_vector:
 word_changed_after_e2_vector:
 			if (VEC4_IS_USERSPACE)
 				X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
-			page_freeone(e2_vector);
-			page_freeone(e1_vector);
+			page_freeone_for_paging(e2_vector);
+			page_freeone_for_paging(e1_vector);
 			goto again;
 		}
 
@@ -735,7 +736,7 @@ word_changed_after_e2_vector:
 		if unlikely(e4.p_word != new_word) {
 word_changed_after_e1_vector:
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
-			page_freeone(e1_vector);
+			page_freeone_for_paging(e1_vector);
 			goto again;
 		}
 		new_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
@@ -1189,14 +1190,16 @@ again_try_exchange_e2_word:
 				return;
 			goto again_try_exchange_e2_word;
 		}
+
 		/* Sync if necessary. */
 		p64_pagedir_sync_flattened_e1_vector(vec4, vec3, vec2);
+
 		/* Successfully merged the vector.
 		 * At this point, all that's left is to free the vector.
 		 * NOTE: No need to Shoot-down anything for this, since the new,
 		 *       flattened control word has identical meaning to the old
 		 *       E1-vector. */
-		page_freeone(ppageof(e2.p_word & P64_PAGE_FVECTOR));
+		page_freeone_for_paging(ppageof(e2.p_word & P64_PAGE_FVECTOR));
 
 		/* At this  point, we've  flattened the  E1-vector into  an  E2-word.
 		 * With  this in mind,  also try to  flatten the associated E2-vector
@@ -1214,16 +1217,19 @@ again_try_exchange_e2_word:
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
 			return;
 		}
+
 		/* Replace the E3-word for the E2-vector with the new (flattened) control word. */
 		e3.p_word = ATOMIC_XCH(e3_p->p_word, new_e3_word);
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
+
 		/* Sync if necessary. */
 		p64_pagedir_sync_flattened_e2_vector(vec4, vec3);
+
 		/* Free the old E2-vector
 		 * NOTE: No need to Shoot-down anything for this, since the new,
 		 *       flattened control word has identical meaning to the old
 		 *       E2-vector. */
-		page_freeone(ppageof(e3.p_word & P64_PAGE_FVECTOR));
+		page_freeone_for_paging(ppageof(e3.p_word & P64_PAGE_FVECTOR));
 		if (vec4 < 256) {
 			/* There's   still  one   thing  left   which  we're   able  to  flatten:
 			 * The 512GiB E3-vector  pointed to  by `P64_PDIR_E4_IDENTITY[vec4]'  may
@@ -1251,13 +1257,15 @@ again_try_exchange_e2_word:
 			}
 			e4.p_word = ATOMIC_XCH(e4_p->p_word, new_e4_word);
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
+
 			/* Sync if necessary. */
 			p64_pagedir_sync_flattened_e3_vector(vec4);
+
 			/* Free the old E3-vector
 			 * NOTE: No need to Shoot-down anything for this, since the new,
 			 *       flattened control word has identical meaning to the old
 			 *       E3-vector. */
-			page_freeone(ppageof(e4.p_word & P64_PAGE_FVECTOR));
+			page_freeone_for_paging(ppageof(e4.p_word & P64_PAGE_FVECTOR));
 		}
 	}
 }
@@ -2124,10 +2132,10 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 			 * they've already been re-designated as general-purpose RAM, at     \
 			 * which point they'd start reading garbage, or corrupt pointers. */ \
 			pagedir_syncall_smp();                                               \
-			page_freeone(pageptr);                                               \
+			page_freeone_for_paging(pageptr);                                    \
 			do {                                                                 \
 				--free_count;                                                    \
-				page_freeone((physpage_t)free_pages[free_count]);                \
+				page_freeone_for_paging((physpage_t)free_pages[free_count]);     \
 			} while (free_count);                                                \
 		}                                                                        \
 		else {                                                                   \
@@ -2166,7 +2174,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 		pagedir_syncall_smp();
 		do {
 			--free_count;
-			page_freeone((physpage_t)free_pages[free_count]);
+			page_freeone_for_paging((physpage_t)free_pages[free_count]);
 		} while (free_count);
 	}
 #undef FREEPAGE
@@ -2194,13 +2202,13 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace_nosync)(void) {
 				if (!P64_PDIR_E2_ISVEC1(e2.p_word))
 					continue;
 				ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
-				page_freeone((physpage_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
+				page_freeone_for_paging((physpage_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
 			}
 			ATOMIC_WRITE(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
-			page_freeone((physpage_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
+			page_freeone_for_paging((physpage_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
 		}
 		ATOMIC_WRITE(P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
-		page_freeone((physpage_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
+		page_freeone_for_paging((physpage_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
 	}
 }
 

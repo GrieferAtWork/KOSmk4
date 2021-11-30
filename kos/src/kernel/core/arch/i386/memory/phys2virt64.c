@@ -134,11 +134,11 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 		/* TODO: Add a kernel commandline  option to select how  much
 		 *       memory should be reserved for the phys2virt mapping! */
 		metadata_size = CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC * PAGESIZE;
-		pp = page_malloc(CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC);
+		pp = page_malloc_for(page_usage.pu_static, CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC);
 		if unlikely(pp == PHYSPAGE_INVALID) {
 			/* Try again with less memory... */
 			metadata_size = CONFIG_PHYS2VIRT_IDENTITY_MINALLOC * PAGESIZE;
-			pp = page_malloc(CONFIG_PHYS2VIRT_IDENTITY_MINALLOC);
+			pp = page_malloc_for(page_usage.pu_static, CONFIG_PHYS2VIRT_IDENTITY_MINALLOC);
 			if unlikely(pp == PHYSPAGE_INVALID)
 				kernel_panic(FREESTR("Failed to allocate phys2virt control pages"));
 		}

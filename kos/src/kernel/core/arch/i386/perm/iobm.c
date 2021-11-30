@@ -122,7 +122,7 @@ NOTHROW(KCALL clone_this_ioperm_bitmap)(struct task *__restrict new_thread,
 PUBLIC NOBLOCK void
 NOTHROW(FCALL ioperm_bitmap_destroy)(struct ioperm_bitmap *__restrict self) {
 	assert(PERCPU(thiscpu_x86_ioperm_bitmap) != self);
-	page_free(physaddr2page(self->ib_pages), 2);
+	page_free_for(page_usage.pu_x86_iobm, physaddr2page(self->ib_pages), 2);
 	kfree(self);
 }
 
@@ -131,7 +131,7 @@ REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADAL
 	physpage_t iob;
 	REF struct ioperm_bitmap *result;
 	result = (REF struct ioperm_bitmap *)kmalloc(sizeof(struct ioperm_bitmap), flags);
-	iob = page_malloc(2);
+	iob    = page_malloc_for(page_usage.pu_x86_iobm, 2);
 	if unlikely(iob == PHYSPAGE_INVALID) {
 		kfree(result);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2 * PAGESIZE);
@@ -151,7 +151,7 @@ REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags) {
 	REF struct ioperm_bitmap *result;
 	result = (REF struct ioperm_bitmap *)kmalloc_nx(sizeof(struct ioperm_bitmap), flags);
 	if likely(result) {
-		iob = page_malloc(2);
+		iob = page_malloc_for(page_usage.pu_x86_iobm, 2);
 		if unlikely(iob == PHYSPAGE_INVALID) {
 			kfree(result);
 			return NULL;
@@ -181,7 +181,7 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 	physpage_t iob;
 	REF struct ioperm_bitmap *result;
 	result = (REF struct ioperm_bitmap *)kmalloc(sizeof(struct ioperm_bitmap), flags);
-	iob = page_malloc(2);
+	iob = page_malloc_for(page_usage.pu_x86_iobm, 2);
 	if unlikely(iob == PHYSPAGE_INVALID) {
 		kfree(result);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2 * PAGESIZE);
@@ -201,7 +201,7 @@ NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict sel
 	REF struct ioperm_bitmap *result;
 	result = (REF struct ioperm_bitmap *)kmalloc_nx(sizeof(struct ioperm_bitmap), flags);
 	if likely(result) {
-		iob = page_malloc(2);
+		iob = page_malloc_for(page_usage.pu_x86_iobm, 2);
 		if unlikely(iob == PHYSPAGE_INVALID) {
 			kfree(result);
 			return NULL;
