@@ -39,6 +39,7 @@
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/phys.h>
@@ -533,6 +534,41 @@ NOTHROW(FCALL FatNodeData_Fini)(FatNodeData *__restrict self) {
 	xdecref(self->fn_dir);
 	kfree(self->fn_clusterv);
 }
+
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+NOTHROW(KCALL fat_v_cc)(struct mfile *__restrict self,
+                        struct ccinfo *__restrict info) {
+	size_t usable, needed;
+	struct fnode *me = mfile_asnode(self);
+	FatNodeData *dat = me->fn_fsdata;
+	if (fnode_issuper(me) && fnode_asfatsup(me)->ft_type != FAT32)
+		return; /* Special case in which the cluster-vector isn't valid. */
+	if (!FatNodeData_TryWrite(dat)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!FatNodeData_WriteNx(dat))
+			return;
+	}
+
+	/* Try to truncate the cluster vector. */
+	usable = kmalloc_usable_size(dat->fn_clusterv);
+	needed = dat->fn_clusterc * sizeof(FatClusterIndex);
+	assert(usable >= needed);
+	if (usable > needed) {
+		FatClusterIndex *newvec;
+		newvec = (FatClusterIndex *)krealloc_nx(dat->fn_clusterv, needed, info->ci_gfp);
+		if (newvec != NULL) {
+			size_t new_usable;
+			dat->fn_clusterv = newvec;
+			/* Account for how much memory we're now saving. */
+			new_usable = kmalloc_usable_size(dat->fn_clusterv);
+			if (usable > new_usable)
+				ccinfo_account(info, usable - new_usable);
+		}
+	}
+	FatNodeData_EndWrite(dat);
+}
+
 
 PRIVATE NONNULL((1, 5)) void KCALL
 fat_v_loadblocks(struct mfile *__restrict self, pos_t addr,
@@ -2366,6 +2402,7 @@ PRIVATE struct mfile_stream_ops const fatreg_v_stream_ops = {
 	.mso_ioctl     = &fat_v_ioctl,
 	.mso_hop       = &fregnode_v_hop,
 	.mso_printlink = &fat_v_printlink,
+	.mso_cc        = &fat_v_cc,
 };
 
 PRIVATE struct fregnode_ops const Fat_RegOps = {
@@ -2387,6 +2424,7 @@ PRIVATE struct mfile_stream_ops const fatdir_v_stream_ops = {
 	.mso_ioctl     = &fat_v_ioctl,
 	.mso_hop       = &flatdirnode_v_hop,
 	.mso_printlink = &fat_v_printlink,
+	.mso_cc        = &fat_v_cc,
 };
 PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 	.fdno_dir = {
@@ -2424,6 +2462,7 @@ PRIVATE struct mfile_stream_ops const fatlnk_v_stream_ops = {
 	.mso_ioctl     = &fat_v_ioctl,
 	.mso_hop       = &flnknode_v_hop,
 	.mso_printlink = &fat_v_printlink,
+	.mso_cc        = &fat_v_cc,
 };
 PRIVATE struct flnknode_ops const Fat_LnkOps = {
 	.lno_node = {
