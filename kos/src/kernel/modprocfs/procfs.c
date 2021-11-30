@@ -103,11 +103,11 @@ ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
 		--endp;
 	while ((USER CHECKED char const *)buf < endp &&
 	       unicode_isspace(((char const *)buf)[0]))
-		buf = (char *)buf + 1;
+		buf = (USER CHECKED char *)buf + 1;
 	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
 	if (bufsize != 1)
 		THROW(E_BUFFER_TOO_SMALL, 1, bufsize);
-	mode = ATOMIC_READ(*(char *)buf);
+	mode = ATOMIC_READ(*(USER CHECKED char *)buf);
 	if (mode == '0')
 		result = false;
 	else if (mode == '1')
@@ -123,7 +123,7 @@ ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
 INTERN NONNULL((1)) u32 FCALL
 ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval, u32 maxval)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
-	char intbuf[16];
+	char intbuf[COMPILER_LENOF(PRIMAXu32)];
 	USER CHECKED char const *endp;
 	USER CHECKED char *real_endp;
 	u32 result;
@@ -132,7 +132,7 @@ ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval, u32 ma
 	       unicode_isspace(endp[-1]))
 		--endp;
 	while ((USER CHECKED char const *)buf < endp &&
-	       unicode_isspace(((char const *)buf)[0]))
+	       unicode_isspace(((USER CHECKED char const *)buf)[0]))
 		buf = (char *)buf + 1;
 	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
 	if (!bufsize || bufsize >= COMPILER_LENOF(intbuf))
@@ -155,7 +155,7 @@ ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval, u32 ma
 INTERN NONNULL((1)) u64 FCALL
 ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval, u64 maxval)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
-	char intbuf[32];
+	char intbuf[COMPILER_LENOF(PRIMAXu64)];
 	USER CHECKED char const *endp;
 	USER CHECKED char *real_endp;
 	u64 result;
@@ -164,7 +164,7 @@ ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval, u64 ma
 	       unicode_isspace(endp[-1]))
 		--endp;
 	while ((USER CHECKED char const *)buf < endp &&
-	       unicode_isspace(((char const *)buf)[0]))
+	       unicode_isspace(((USER CHECKED char const *)buf)[0]))
 		buf = (char *)buf + 1;
 	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
 	if (!bufsize || bufsize >= COMPILER_LENOF(intbuf))
@@ -481,13 +481,7 @@ again:
 		struct pidns *ns = THIS_PIDNS;
 		upid_t pid_id;
 		u16 namelen;
-#if __SIZEOF_PID_T__ == 4
-		char namebuf[sizeof("4294967295")];
-#elif __SIZEOF_PID_T__ == 8
-		char namebuf[sizeof("18446744073709551615")];
-#else /* __SIZEOF_PID_T__ == ... */
-#error "Unsupported sizeof(pid_t)"
-#endif /* __SIZEOF_PID_T__ != ... */
+		char namebuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_PID_T__))];
 
 		/* Lookup next taskpid entry. */
 		pid = find_first_taskpid_greater_or_equal(ns, (upid_t)(index - PROCFS_ROOT_COUNT));

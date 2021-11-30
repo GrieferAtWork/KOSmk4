@@ -559,10 +559,10 @@ vesa_v_strings(struct svga_chipset *__restrict self,
 
 	/* Print the version number. */
 	{
-		char verbuf[sizeof("255.255")];
+		char verbuf[COMPILER_LENOF(PRIMAXu8 "." PRIMAXu8)];
 		sprintf(verbuf, "%" PRIu8 ".%" PRIu8,
 		        (me->vc_info->vbi_version & 0xff00) >> 8,
-		        me->vc_info->vbi_version & 0xff);
+		        (me->vc_info->vbi_version & 0xff));
 		result = (*cb)(arg, "version", verbuf);
 		if unlikely(result < 0)
 			goto done;

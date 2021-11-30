@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_SYSLOG_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MISC_SYSLOG_C 1
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -178,16 +179,13 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 	pflag_t was;
 	/* Write to a debug port. */
 	if (level < COMPILER_LENOF(level_prefix)) {
-#if __SIZEOF_PID_T__ <= 4 && __SIZEOF_INT__ <= 4
 		/* Note that the max values here may not make perfect sense in
 		 * some cases, but we want to guaranty that there is no change
 		 * of this ever overflowing. */
-		char buf[COMPILER_LENOF("[4294967295-4294967295-4294967295"
-		                        "T4294967295T23:4294967295T23:4294967295T23"
-		                        ".4294967295T23:notice][4294967295] ")];
-#else /* __SIZEOF_PID_T__ <= ... && __SIZEOF_INT__ <= ... */
-#error "Unsupported configuration"
-#endif /* __SIZEOF_PID_T__ > ... || __SIZEOF_INT__ > ... */
+		char buf[COMPILER_LENOF("[" PRIMAXu "-" PRIMAXu "-" PRIMAXu
+		                        "T" PRIMAXu ":" PRIMAXu ":" PRIMAXu
+		                        "." PRIMAXu32 ":notice]["
+		                        "" PRIMAXdN(__SIZEOF_PID_T__) "] ")];
 		struct tm t;
 		size_t len;
 		localtime_r(&packet->sp_time, &t);
@@ -208,11 +206,11 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 #endif /* DBG_MONITOR_MEMORY */
 
 		/* Use ISO-8601-derived format (without the timezone; plus nanoseconds) */
-		len = sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32 "%s%u] ",
+		len = sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32 "%s%" PRIdN(__SIZEOF_PID_T__) "] ",
 		              t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
 		              t.tm_hour, t.tm_min, t.tm_sec,
 		              packet->sp_nsec, level_prefix[level],
-		              packet->sp_tid);
+		              (pid_t)packet->sp_tid);
 		if (packet->sp_msg[0] == '[')
 			--len;
 		x86_syslog_smplock_acquire(was);

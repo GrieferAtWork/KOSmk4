@@ -2015,13 +2015,7 @@ procfs_fd_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct d
 	struct procfs_fd_enum *me;
 	u16 namelen;
 	void *hdata;
-#if __SIZEOF_INT__ == 4
-	char namebuf[sizeof("4294967295")];
-#elif __SIZEOF_INT__ == 8
-	char namebuf[sizeof("18446744073709551615")];
-#else /* __SIZEOF_INT__ == ... */
-#error "Unsupported sizeof(pid_t)"
-#endif /* __SIZEOF_INT__ != ... */
+	char namebuf[COMPILER_LENOF(PRIMAXu)];
 	me = (struct procfs_fd_enum *)self;
 
 again:
@@ -2524,13 +2518,7 @@ procfs_fdinfo_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED stru
 	struct procfs_fd_enum *me;
 	u16 namelen;
 	void *hdata;
-#if __SIZEOF_INT__ == 4
-	char namebuf[sizeof("4294967295")];
-#elif __SIZEOF_INT__ == 8
-	char namebuf[sizeof("18446744073709551615")];
-#else /* __SIZEOF_INT__ == ... */
-#error "Unsupported sizeof(pid_t)"
-#endif /* __SIZEOF_INT__ != ... */
+	char namebuf[COMPILER_LENOF(PRIMAXu)];
 	me = (struct procfs_fd_enum *)self;
 
 again:
@@ -3138,13 +3126,7 @@ procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED str
 	REF struct taskpid *pid;
 	upid_t pid_id;
 	u16 namelen;
-#if __SIZEOF_PID_T__ == 4
-	char namebuf[sizeof("4294967295")];
-#elif __SIZEOF_PID_T__ == 8
-	char namebuf[sizeof("18446744073709551615")];
-#else /* __SIZEOF_PID_T__ == ... */
-#error "Unsupported sizeof(pid_t)"
-#endif /* __SIZEOF_PID_T__ != ... */
+	char namebuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_PID_T__))];
 	size_t myind = THIS_PIDNS->pn_indirection;
 	upid_t index, newindex;
 	ssize_t result;

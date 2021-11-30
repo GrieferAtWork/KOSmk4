@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2416cbb */
+/* HASH CRC-32:0xb6c90765 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -326,6 +326,168 @@ __NAMESPACE_STD_USING(wcstoumax)
 #define PRIuN(sizeof) __PRIN_PREFIX(sizeof) "u"
 #define PRIxN(sizeof) __PRIN_PREFIX(sizeof) "x"
 #define PRIXN(sizeof) __PRIN_PREFIX(sizeof) "X"
+
+
+
+
+
+#define __PRIMAXd1 "-128"                   /* "%" PRId8 */
+#define __PRIMAXi1 "-128"                   /* "%" PRIi8 */
+#define __PRIMAXo1 "377"                    /* "%" PRIo8 */
+#define __PRIMAXu1 "255"                    /* "%" PRIu8 */
+#define __PRIMAXx1 "ff"                     /* "%" PRIx8 */
+#define __PRIMAXX1 "FF"                     /* "%" PRIX8 */
+#define __PRIMAXd2 "-32768"                 /* "%" PRId16 */
+#define __PRIMAXi2 "-32768"                 /* "%" PRIi16 */
+#define __PRIMAXo2 "177777"                 /* "%" PRIo16 */
+#define __PRIMAXu2 "65535"                  /* "%" PRIu16 */
+#define __PRIMAXx2 "ffff"                   /* "%" PRIx16 */
+#define __PRIMAXX2 "FFFF"                   /* "%" PRIX16 */
+#define __PRIMAXd4 "-2147483648"            /* "%" PRId32 */
+#define __PRIMAXi4 "-2147483648"            /* "%" PRIi32 */
+#define __PRIMAXo4 "37777777777"            /* "%" PRIo32 */
+#define __PRIMAXu4 "4294967295"             /* "%" PRIu32 */
+#define __PRIMAXx4 "ffffffff"               /* "%" PRIx32 */
+#define __PRIMAXX4 "FFFFFFFF"               /* "%" PRIX32 */
+#define __PRIMAXd8 "-9223372036854775808"   /* "%" PRId64 */
+#define __PRIMAXi8 "-9223372036854775808"   /* "%" PRIi64 */
+#define __PRIMAXo8 "1777777777777777777777" /* "%" PRIo64 */
+#define __PRIMAXu8 "18446744073709551615"   /* "%" PRIu64 */
+#define __PRIMAXx8 "ffffffffffffffff"       /* "%" PRIx64 */
+#define __PRIMAXX8 "FFFFFFFFFFFFFFFF"       /* "%" PRIX64 */
+
+#define __PRIMAXdN(sizeof) __PRIMAXd##sizeof
+#define __PRIMAXiN(sizeof) __PRIMAXi##sizeof
+#define __PRIMAXoN(sizeof) __PRIMAXo##sizeof
+#define __PRIMAXuN(sizeof) __PRIMAXu##sizeof
+#define __PRIMAXxN(sizeof) __PRIMAXx##sizeof
+#define __PRIMAXXN(sizeof) __PRIMAXX##sizeof
+
+/* PRIMAX[duoxX][...]  -- Longest strings produced by PRI[duoxX][...] modifies.
+ * These can be used to safely determine required buffer sizes for `sprintf(3)'
+ * >> char buf[COMPILER_LENOF(PRIMAXd)];
+ * >> sprintf(buf, "%d", any_value); // Never overflows, and doesn't waste stack memory! */
+#define PRIMAXdN(sizeof) __PRIMAXdN(sizeof)
+#define PRIMAXiN(sizeof) __PRIMAXiN(sizeof)
+#define PRIMAXoN(sizeof) __PRIMAXoN(sizeof)
+#define PRIMAXuN(sizeof) __PRIMAXuN(sizeof)
+#define PRIMAXxN(sizeof) __PRIMAXxN(sizeof)
+#define PRIMAXXN(sizeof) __PRIMAXXN(sizeof)
+
+#define PRIMAXd8  __PRIMAXd1 /* "%" PRId8  -- "-128" */
+#define PRIMAXi8  __PRIMAXi1 /* "%" PRIi8  -- "-128" */
+#define PRIMAXo8  __PRIMAXo1 /* "%" PRIo8  -- "377" */
+#define PRIMAXu8  __PRIMAXu1 /* "%" PRIu8  -- "255" */
+#define PRIMAXx8  __PRIMAXx1 /* "%" PRIx8  -- "ff" */
+#define PRIMAXX8  __PRIMAXX1 /* "%" PRIX8  -- "FF" */
+#define PRIMAXd16 __PRIMAXd2 /* "%" PRId16 -- "-32768" */
+#define PRIMAXi16 __PRIMAXi2 /* "%" PRIi16 -- "-32768" */
+#define PRIMAXo16 __PRIMAXo2 /* "%" PRIo16 -- "177777" */
+#define PRIMAXu16 __PRIMAXu2 /* "%" PRIu16 -- "65535" */
+#define PRIMAXx16 __PRIMAXx2 /* "%" PRIx16 -- "ffff" */
+#define PRIMAXX16 __PRIMAXX2 /* "%" PRIX16 -- "FFFF" */
+#define PRIMAXd32 __PRIMAXd4 /* "%" PRId32 -- "-2147483648" */
+#define PRIMAXi32 __PRIMAXi4 /* "%" PRIi32 -- "-2147483648" */
+#define PRIMAXo32 __PRIMAXo4 /* "%" PRIo32 -- "37777777777" */
+#define PRIMAXu32 __PRIMAXu4 /* "%" PRIu32 -- "4294967295" */
+#define PRIMAXx32 __PRIMAXx4 /* "%" PRIx32 -- "ffffffff" */
+#define PRIMAXX32 __PRIMAXX4 /* "%" PRIX32 -- "FFFFFFFF" */
+#define PRIMAXd64 __PRIMAXd8 /* "%" PRId64 -- "-9223372036854775808" */
+#define PRIMAXi64 __PRIMAXi8 /* "%" PRIi64 -- "-9223372036854775808" */
+#define PRIMAXo64 __PRIMAXo8 /* "%" PRIo64 -- "1777777777777777777777" */
+#define PRIMAXu64 __PRIMAXu8 /* "%" PRIu64 -- "18446744073709551615" */
+#define PRIMAXx64 __PRIMAXx8 /* "%" PRIx64 -- "ffffffffffffffff" */
+#define PRIMAXX64 __PRIMAXX8 /* "%" PRIX64 -- "FFFFFFFFFFFFFFFF" */
+
+#define PRIMAXd        PRIMAXdN(__SIZEOF_INT__)           /* "%d" */
+#define PRIMAXi        PRIMAXiN(__SIZEOF_INT__)           /* "%i" */
+#define PRIMAXo        PRIMAXoN(__SIZEOF_INT__)           /* "%o" */
+#define PRIMAXu        PRIMAXuN(__SIZEOF_INT__)           /* "%u" */
+#define PRIMAXx        PRIMAXxN(__SIZEOF_INT__)           /* "%x" */
+#define PRIMAXX        PRIMAXXN(__SIZEOF_INT__)           /* "%X" */
+#define PRIMAXdSIZ     PRIMAXdN(__SIZEOF_SIZE_T__)        /* "%" PRIdSIZ */
+#define PRIMAXiSIZ     PRIMAXiN(__SIZEOF_SIZE_T__)        /* "%" PRIiSIZ */
+#define PRIMAXoSIZ     PRIMAXoN(__SIZEOF_SIZE_T__)        /* "%" PRIoSIZ */
+#define PRIMAXuSIZ     PRIMAXuN(__SIZEOF_SIZE_T__)        /* "%" PRIuSIZ */
+#define PRIMAXxSIZ     PRIMAXxN(__SIZEOF_SIZE_T__)        /* "%" PRIxSIZ */
+#define PRIMAXXSIZ     PRIMAXXN(__SIZEOF_SIZE_T__)        /* "%" PRIXSIZ */
+#define PRIMAXdPTR     PRIMAXdN(__SIZEOF_POINTER__)       /* "%" PRIdSIZ */
+#define PRIMAXiPTR     PRIMAXiN(__SIZEOF_POINTER__)       /* "%" PRIiSIZ */
+#define PRIMAXoPTR     PRIMAXoN(__SIZEOF_POINTER__)       /* "%" PRIoSIZ */
+#define PRIMAXuPTR     PRIMAXuN(__SIZEOF_POINTER__)       /* "%" PRIuSIZ */
+#define PRIMAXxPTR     PRIMAXxN(__SIZEOF_POINTER__)       /* "%" PRIxSIZ */
+#define PRIMAXXPTR     PRIMAXXN(__SIZEOF_POINTER__)       /* "%" PRIXSIZ */
+#define PRIMAXdMAX     PRIMAXdN(__SIZEOF_INTMAX_T__)      /* "%" PRIdMAX */
+#define PRIMAXiMAX     PRIMAXiN(__SIZEOF_INTMAX_T__)      /* "%" PRIiMAX */
+#define PRIMAXoMAX     PRIMAXoN(__SIZEOF_INTMAX_T__)      /* "%" PRIoMAX */
+#define PRIMAXuMAX     PRIMAXuN(__SIZEOF_INTMAX_T__)      /* "%" PRIuMAX */
+#define PRIMAXxMAX     PRIMAXxN(__SIZEOF_INTMAX_T__)      /* "%" PRIxMAX */
+#define PRIMAXXMAX     PRIMAXXN(__SIZEOF_INTMAX_T__)      /* "%" PRIXMAX */
+#ifdef __SIZEOF_INT_LEAST8_T__
+#define PRIMAXdLEAST8  PRIMAXdN(__SIZEOF_INT_LEAST8_T__)  /* "%" PRIdLEAST8 */
+#define PRIMAXiLEAST8  PRIMAXiN(__SIZEOF_INT_LEAST8_T__)  /* "%" PRIiLEAST8 */
+#define PRIMAXoLEAST8  PRIMAXoN(__SIZEOF_INT_LEAST8_T__)  /* "%" PRIoLEAST8 */
+#define PRIMAXuLEAST8  PRIMAXuN(__SIZEOF_INT_LEAST8_T__)  /* "%" PRIuLEAST8 */
+#define PRIMAXxLEAST8  PRIMAXxN(__SIZEOF_INT_LEAST8_T__)  /* "%" PRIxLEAST8 */
+#define PRIMAXXLEAST8  PRIMAXXN(__SIZEOF_INT_LEAST8_T__)  /* "%" PRIXLEAST8 */
+#endif /* __SIZEOF_INT_LEAST8_T__ */
+#ifdef __SIZEOF_INT_LEAST16_T__
+#define PRIMAXdLEAST16 PRIMAXdN(__SIZEOF_INT_LEAST16_T__) /* "%" PRIdLEAST16 */
+#define PRIMAXiLEAST16 PRIMAXiN(__SIZEOF_INT_LEAST16_T__) /* "%" PRIiLEAST16 */
+#define PRIMAXoLEAST16 PRIMAXoN(__SIZEOF_INT_LEAST16_T__) /* "%" PRIoLEAST16 */
+#define PRIMAXuLEAST16 PRIMAXuN(__SIZEOF_INT_LEAST16_T__) /* "%" PRIuLEAST16 */
+#define PRIMAXxLEAST16 PRIMAXxN(__SIZEOF_INT_LEAST16_T__) /* "%" PRIxLEAST16 */
+#define PRIMAXXLEAST16 PRIMAXXN(__SIZEOF_INT_LEAST16_T__) /* "%" PRIXLEAST16 */
+#endif /* __SIZEOF_INT_LEAST16_T__ */
+#ifdef __SIZEOF_INT_LEAST32_T__
+#define PRIMAXdLEAST32 PRIMAXdN(__SIZEOF_INT_LEAST32_T__) /* "%" PRIdLEAST32 */
+#define PRIMAXiLEAST32 PRIMAXiN(__SIZEOF_INT_LEAST32_T__) /* "%" PRIiLEAST32 */
+#define PRIMAXoLEAST32 PRIMAXoN(__SIZEOF_INT_LEAST32_T__) /* "%" PRIoLEAST32 */
+#define PRIMAXuLEAST32 PRIMAXuN(__SIZEOF_INT_LEAST32_T__) /* "%" PRIuLEAST32 */
+#define PRIMAXxLEAST32 PRIMAXxN(__SIZEOF_INT_LEAST32_T__) /* "%" PRIxLEAST32 */
+#define PRIMAXXLEAST32 PRIMAXXN(__SIZEOF_INT_LEAST32_T__) /* "%" PRIXLEAST32 */
+#endif /* __SIZEOF_INT_LEAST32_T__ */
+#ifdef __SIZEOF_INT_LEAST64_T__
+#define PRIMAXdLEAST64 PRIMAXdN(__SIZEOF_INT_LEAST64_T__) /* "%" PRIdLEAST64 */
+#define PRIMAXiLEAST64 PRIMAXiN(__SIZEOF_INT_LEAST64_T__) /* "%" PRIiLEAST64 */
+#define PRIMAXoLEAST64 PRIMAXoN(__SIZEOF_INT_LEAST64_T__) /* "%" PRIoLEAST64 */
+#define PRIMAXuLEAST64 PRIMAXuN(__SIZEOF_INT_LEAST64_T__) /* "%" PRIuLEAST64 */
+#define PRIMAXxLEAST64 PRIMAXxN(__SIZEOF_INT_LEAST64_T__) /* "%" PRIxLEAST64 */
+#define PRIMAXXLEAST64 PRIMAXXN(__SIZEOF_INT_LEAST64_T__) /* "%" PRIXLEAST64 */
+#endif /* __SIZEOF_INT_LEAST64_T__ */
+#ifdef __SIZEOF_INT_FAST8_T__
+#define PRIMAXdFAST8   PRIMAXdN(__SIZEOF_INT_FAST8_T__)   /* "%" PRIdFAST8 */
+#define PRIMAXiFAST8   PRIMAXiN(__SIZEOF_INT_FAST8_T__)   /* "%" PRIiFAST8 */
+#define PRIMAXoFAST8   PRIMAXoN(__SIZEOF_INT_FAST8_T__)   /* "%" PRIoFAST8 */
+#define PRIMAXuFAST8   PRIMAXuN(__SIZEOF_INT_FAST8_T__)   /* "%" PRIuFAST8 */
+#define PRIMAXxFAST8   PRIMAXxN(__SIZEOF_INT_FAST8_T__)   /* "%" PRIxFAST8 */
+#define PRIMAXXFAST8   PRIMAXXN(__SIZEOF_INT_FAST8_T__)   /* "%" PRIXFAST8 */
+#endif /* __SIZEOF_INT_FAST8_T__ */
+#ifdef __SIZEOF_INT_FAST16_T__
+#define PRIMAXdFAST16  PRIMAXdN(__SIZEOF_INT_FAST16_T__)  /* "%" PRIdFAST16 */
+#define PRIMAXiFAST16  PRIMAXiN(__SIZEOF_INT_FAST16_T__)  /* "%" PRIiFAST16 */
+#define PRIMAXoFAST16  PRIMAXoN(__SIZEOF_INT_FAST16_T__)  /* "%" PRIoFAST16 */
+#define PRIMAXuFAST16  PRIMAXuN(__SIZEOF_INT_FAST16_T__)  /* "%" PRIuFAST16 */
+#define PRIMAXxFAST16  PRIMAXxN(__SIZEOF_INT_FAST16_T__)  /* "%" PRIxFAST16 */
+#define PRIMAXXFAST16  PRIMAXXN(__SIZEOF_INT_FAST16_T__)  /* "%" PRIXFAST16 */
+#endif /* __SIZEOF_INT_FAST16_T__ */
+#ifdef __SIZEOF_INT_FAST32_T__
+#define PRIMAXdFAST32  PRIMAXdN(__SIZEOF_INT_FAST32_T__)  /* "%" PRIdFAST32 */
+#define PRIMAXiFAST32  PRIMAXiN(__SIZEOF_INT_FAST32_T__)  /* "%" PRIiFAST32 */
+#define PRIMAXoFAST32  PRIMAXoN(__SIZEOF_INT_FAST32_T__)  /* "%" PRIoFAST32 */
+#define PRIMAXuFAST32  PRIMAXuN(__SIZEOF_INT_FAST32_T__)  /* "%" PRIuFAST32 */
+#define PRIMAXxFAST32  PRIMAXxN(__SIZEOF_INT_FAST32_T__)  /* "%" PRIxFAST32 */
+#define PRIMAXXFAST32  PRIMAXXN(__SIZEOF_INT_FAST32_T__)  /* "%" PRIXFAST32 */
+#endif /* __SIZEOF_INT_FAST32_T__ */
+#ifdef __SIZEOF_INT_FAST64_T__
+#define PRIMAXdFAST64  PRIMAXdN(__SIZEOF_INT_FAST64_T__)  /* "%" PRIdFAST64 */
+#define PRIMAXiFAST64  PRIMAXiN(__SIZEOF_INT_FAST64_T__)  /* "%" PRIiFAST64 */
+#define PRIMAXoFAST64  PRIMAXoN(__SIZEOF_INT_FAST64_T__)  /* "%" PRIoFAST64 */
+#define PRIMAXuFAST64  PRIMAXuN(__SIZEOF_INT_FAST64_T__)  /* "%" PRIuFAST64 */
+#define PRIMAXxFAST64  PRIMAXxN(__SIZEOF_INT_FAST64_T__)  /* "%" PRIxFAST64 */
+#define PRIMAXXFAST64  PRIMAXXN(__SIZEOF_INT_FAST64_T__)  /* "%" PRIXFAST64 */
+#endif /* __SIZEOF_INT_FAST64_T__ */
+
 #endif /* __USE_KOS */
 
 

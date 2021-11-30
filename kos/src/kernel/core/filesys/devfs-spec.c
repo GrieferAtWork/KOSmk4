@@ -345,12 +345,9 @@ PRIVATE BLOCKING NONNULL((1)) size_t KCALL
 devfs_block_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                            size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	char namebuf[COMPILER_LENOF("" PRIMAXuN(__SIZEOF_MAJOR_T__) ":"
+	                            "" PRIMAXuN(__SIZEOF_MINOR_T__))];
 	ssize_t result;
-#if __SIZEOF_MAJOR_T__ == 4 && __SIZEOF_MINOR_T__ == 4
-	char namebuf[COMPILER_LENOF("4294967295:4294967295")];
-#else /* __SIZEOF_MAJOR_T__ == ... && __SIZEOF_MINOR_T__ == ... */
-#error "Unsupported configuration"
-#endif /* __SIZEOF_MAJOR_T__ != ... || __SIZEOF_MINOR_T__ != ... */
 	u16 namelen;
 	struct devenum *me = (struct devenum *)self;
 	REF struct fnode *olddev, *mydev, *newdev;
@@ -443,12 +440,9 @@ PRIVATE BLOCKING NONNULL((1)) size_t KCALL
 devfs_char_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                           size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	char namebuf[COMPILER_LENOF("" PRIMAXuN(__SIZEOF_MAJOR_T__) ":"
+	                            "" PRIMAXuN(__SIZEOF_MINOR_T__))];
 	ssize_t result;
-#if __SIZEOF_MAJOR_T__ == 4 && __SIZEOF_MINOR_T__ == 4
-	char namebuf[COMPILER_LENOF("4294967295:4294967295")];
-#else /* __SIZEOF_MAJOR_T__ == ... && __SIZEOF_MINOR_T__ == ... */
-#error "Unsupported configuration"
-#endif /* __SIZEOF_MAJOR_T__ != ... || __SIZEOF_MINOR_T__ != ... */
 	u16 namelen;
 	struct devenum *me = (struct devenum *)self;
 	REF struct fnode *olddev, *mydev, *newdev;

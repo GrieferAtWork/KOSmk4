@@ -972,13 +972,7 @@ blkdev_makeparts(struct blkdev *__restrict self,
 			LIST_FOREACH (part, &result, bd_partinfo.bp_partlink) {
 				REF struct devdirent *devname;
 				char *writer;
-#if __SIZEOF_MINOR_T__ == 4
-				char numbuf[sizeof("4294967295")];
-#elif __SIZEOF_MINOR_T__ == 8
-				char numbuf[sizeof("18446744073709551615")];
-#else /* __SIZEOF_MINOR_T__ == ... */
-#error "Unsupported sizeof(minor_t)"
-#endif /* __SIZEOF_MINOR_T__ != ... */
+				char numbuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_MINOR_T__))];
 				size_t numlen, namlen;
 
 				part->bd_partinfo.bp_partno = index++;
