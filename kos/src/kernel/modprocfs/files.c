@@ -47,8 +47,10 @@
 #include <kernel/pipe.h>
 #include <kernel/uname.h>
 #include <kernel/user.h>
+#include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -72,6 +74,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <unicode.h>
 
 #include <libcmdline/encode.h>
@@ -296,6 +299,57 @@ procfs_modules_printer(pformatprinter printer, void *arg,
 		           : 0) < 0)
 			return;
 	}
+}
+
+
+
+
+/************************************************************************/
+/* /proc/uptime                                                         */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_uptime_printer(pformatprinter printer, void *arg,
+                      pos_t UNUSED(offset_hint)) {
+	ktime_t now, idle = 0;
+	unsigned int i;
+	now = ktime();
+
+	/* Figure how much time out CPU's IDLE task has spent being active. */
+	for (i = 0; i < cpu_count; ++i) {
+		struct cpu *c   = cpu_vector[i];
+		struct task *ci = &FORCPU(c, thiscpu_idle);
+		ktime_t ci_active;
+#if __SIZEOF_POINTER__ >= __SIZEOF_KTIME_T__
+		ci_active = ATOMIC_READ(FORTASK(ci, this_activetime));
+#else /* __SIZEOF_POINTER__ >= __SIZEOF_KTIME_T__ */
+		{
+			pflag_t was;
+			was = PREEMPTION_PUSHOFF();
+			if (c == THIS_CPU) {
+				ci_active = FORTASK(ci, this_activetime);
+			} else {
+				unsigned int attempt;
+				for (attempt = 0; attempt < 32; ++i) {
+					COMPILER_READ_BARRIER();
+					ci_active = FORTASK(ci, this_activetime);
+					COMPILER_READ_BARRIER();
+					if unlikely(ci_active <= now)
+						break; /* Makes sense... */
+					/* Maybe the other CPU is changing the variable right now? */
+					task_pause();
+				}
+			}
+			PREEMPTION_POP(was);
+		}
+#endif /* __SIZEOF_POINTER__ < __SIZEOF_KTIME_T__ */
+		idle += ci_active;
+	}
+
+	/* Print information */
+	printf("%" PRIu64 ".%.2u "
+	       "%" PRIu64 ".%.2u\n",
+	       now / NSEC_PER_SEC, (now % NSEC_PER_SEC) / (NSEC_PER_SEC / 100),
+	       idle / NSEC_PER_SEC, (idle % NSEC_PER_SEC) / (NSEC_PER_SEC / 100));
 }
 
 

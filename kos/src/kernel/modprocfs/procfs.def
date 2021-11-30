@@ -67,6 +67,7 @@ ROOTENT("mounts",      DT_LNK, &procfs_r_mounts,      /*[[[fdirent_hash]]]*/FDIR
 ROOTENT("self",        DT_LNK, &procfs_r_self,        /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x99cf910b, 0x666c6573, 0xe90cf96, 0x666c6573)/*[[[end]]]*/)
 ROOTENT("sys",         DT_DIR, &procfs_r_sys,         /*[[[fdirent_hash]]]*/0x737973/*[[[end]]]*/)
 ROOTENT("thread-self", DT_LNK, &procfs_r_thread_self, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x26320082, 0xc98876c916c1879, 0x41f83765, 0x17ac05906cec0570)/*[[[end]]]*/)
+ROOTENT("uptime",      DT_REG, &procfs_r_uptime,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb518598a, 0x656d69747075, 0x20f47d1e, 0x656d69747075)/*[[[end]]]*/)
 MKREG_RO(procfs_r_cmdline, 0444, procfs_cmdline_printer)
 MKREG_RO(procfs_r_filesystems, 0444, procfs_filesystems_printer)
 MKREG_RO(procfs_r_kcore, 0400, procfs_kcore_printer)
@@ -74,6 +75,7 @@ MKREG_RO(procfs_r_modules, 0444, procfs_modules_printer)
 MKLNK(procfs_r_mounts, 0777, procfs_mounts_printer)
 MKLNK(procfs_r_self, 0777, procfs_self_printer)
 MKLNK(procfs_r_thread_self, 0777, procfs_threadself_printer)
+MKREG_RO(procfs_r_uptime, 0444, procfs_uptime_printer)
 
 
 /* /proc/kos */
