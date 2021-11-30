@@ -591,7 +591,7 @@ again_lookup:
 	/* Check for special case: not allowed to hard-link device files.
 	 * Every device file can only ever have a single directory entry! */
 	if ((info->mkf_fmode & S_IFMT) == 0 && S_ISDEV(info->mkf_hrdlnk.hl_node->fn_mode) &&
-	    info->mkf_hrdlnk.hl_node->mf_ops != &ramfs_devnode_ops.dno_node.no_file)
+	    info->mkf_hrdlnk.hl_node->mf_ops != &ramfs_devnode_ops.dvno_node.no_file)
 		THROW(E_FSERROR_TOO_MANY_HARD_LINKS);
 
 /*create_ramfs_file:*/

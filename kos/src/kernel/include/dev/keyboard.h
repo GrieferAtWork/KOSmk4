@@ -180,9 +180,9 @@ struct kbddev
 #ifdef NDEBUG
 #define ___kbddev_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___kbddev_assert_ops_(ops)                                              \
-	__hybrid_assert((ops)->ko_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream), \
-	__hybrid_assert((ops)->ko_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream->mso_read == &kbddev_v_read),
+#define ___kbddev_assert_ops_(ops)                                               \
+	__hybrid_assert((ops)->ko_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
+	__hybrid_assert((ops)->ko_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_read == &kbddev_v_read),
 #endif /* !NDEBUG */
 #define _kbddev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->ko_cdev) ___kbddev_assert_ops_(ops)
 

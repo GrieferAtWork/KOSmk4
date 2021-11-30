@@ -208,7 +208,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("		.dn_node = {");
 	print("			.fn_file = {");
 	print("				MFILE_INIT_mf_refcnt(1), /" "* +1: dev_", name, " *" "/");
-	print("				MFILE_INIT_mf_ops(&dev_", name, "_ops.cdo_dev.do_node.dno_node.no_file),");
+	print("				MFILE_INIT_mf_ops(&dev_", name, "_ops.cdo_dev.do_node.dvno_node.no_file),");
 	print("				MFILE_INIT_mf_lock,");
 	print("				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),");
 	print("				MFILE_INIT_mf_initdone,");
@@ -417,7 +417,7 @@ PUBLIC struct device dev_mem = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_mem */
-				MFILE_INIT_mf_ops(&dev_mem_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_mem_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -465,7 +465,7 @@ PUBLIC struct device dev_kmem = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_kmem */
-				MFILE_INIT_mf_ops(&dev_kmem_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_kmem_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -513,7 +513,7 @@ PUBLIC struct device dev_null = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_null */
-				MFILE_INIT_mf_ops(&dev_null_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_null_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -561,7 +561,7 @@ PUBLIC struct device dev_port = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_port */
-				MFILE_INIT_mf_ops(&dev_port_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_port_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -609,7 +609,7 @@ PUBLIC struct device dev_zero = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_zero */
-				MFILE_INIT_mf_ops(&dev_zero_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_zero_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -656,7 +656,7 @@ PUBLIC struct device dev_full = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_full */
-				MFILE_INIT_mf_ops(&dev_full_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_full_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -705,7 +705,7 @@ PUBLIC struct device dev_random = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_random */
-				MFILE_INIT_mf_ops(&dev_random_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_random_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -753,7 +753,7 @@ PUBLIC struct device dev_urandom = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_urandom */
-				MFILE_INIT_mf_ops(&dev_urandom_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_urandom_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -802,7 +802,7 @@ PUBLIC struct device dev_kmsg = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_kmsg */
-				MFILE_INIT_mf_ops(&dev_kmsg_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_kmsg_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -851,7 +851,7 @@ PUBLIC struct device dev_tty = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(1), /* +1: dev_tty */
-				MFILE_INIT_mf_ops(&dev_tty_ops.cdo_dev.do_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_tty_ops.cdo_dev.do_node.dvno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,

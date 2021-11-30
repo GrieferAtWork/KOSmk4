@@ -111,7 +111,7 @@ PRIVATE struct mfile_stream_ops const ramfs_devnode_v_stream_ops = {
 	.mso_hop   = &ramfs_devnode_v_hop,
 };
 PUBLIC_CONST struct fdevnode_ops const ramfs_devnode_ops = {
-	.dno_node = {
+	.dvno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_devnode_v_destroy,
 			.mo_changed = &ramfs_devnode_v_changed,

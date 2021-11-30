@@ -30,8 +30,7 @@ DECL_BEGIN
 
 struct fdevnode;
 struct fdevnode_ops {
-	/* TODO: Rename `dno_node' to `dvno_node' (prevent conflicts with `struct fdirnode_ops') */
-	struct fnode_ops dno_node; /* FNode operators */
+	struct fnode_ops dvno_node; /* FNode operators */
 	/* More operators would go here... */
 };
 
@@ -56,7 +55,7 @@ struct fdevnode
 #define fdevnode_getops(self) \
 	((struct fdevnode_ops const *)__COMPILER_REQTYPE(struct fdevnode const *, self)->_fdevnode_node_ _fnode_file_ mf_ops)
 #define _fdevnode_assert_ops_(ops) \
-	_fnode_assert_ops_(&(ops)->dno_node)
+	_fnode_assert_ops_(&(ops)->dvno_node)
 
 #define fdevnode_getdevno(self) ((self)->dn_devno)
 
@@ -105,7 +104,7 @@ fdevnode_v_open(struct mfile *__restrict self,
 	                                                   MFILE_F_READONLY | MFILE_F_NOATIME |                            \
 	                                                   MFILE_F_NOMTIME)) |                                             \
 	                                                 MFILE_F_FIXEDFILESIZE,                                            \
-	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dvno_node.no_file,                                   \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \
@@ -120,7 +119,7 @@ fdevnode_v_open(struct mfile *__restrict self,
 	                                                   MFILE_F_READONLY | MFILE_F_NOATIME |                            \
 	                                                   MFILE_F_NOMTIME)) |                                             \
 	                                                 MFILE_F_FIXEDFILESIZE,                                            \
-	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dvno_node.no_file,                                   \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_iobashift  = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_iobashift,  \

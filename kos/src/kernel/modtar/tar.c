@@ -156,7 +156,7 @@ again:
 	case DT_BLK: {
 		struct tardevnode *node;
 		node = (struct tardevnode *)kmalloc(sizeof(struct tardevnode), GFP_NORMAL);
-		node->mf_ops   = &tardevnode_ops.dno_node.no_file;
+		node->mf_ops   = &tardevnode_ops.dvno_node.no_file;
 		node->dn_devno = tarfile_getdevno(tfile);
 		rfdat          = &node->tln_fdat;
 		result         = node;
@@ -1246,7 +1246,7 @@ INTERN_CONST struct flnknode_ops const tarlnknode_ops = {
 
 #define tardevnode_v_stream_ops tarregnode_v_stream_ops
 INTERN_CONST struct fdevnode_ops const tardevnode_ops = {
-	.dno_node = {
+	.dvno_node = {
 		.no_file = {
 			.mo_destroy = &tarreg_v_destroy,
 			.mo_changed = &fregnode_v_changed,

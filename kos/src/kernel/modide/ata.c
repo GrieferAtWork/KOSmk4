@@ -1372,8 +1372,8 @@ got_identify_signal:
 		}
 		/* Remember non-DMA fallback operators. */
 #ifdef ATADRIVE_HAVE_PIO_IOSECTORS
-		drive->ad_pio_rdsectors = ops->bdo_dev.do_node.dno_node.no_file.mo_loadblocks;
-		drive->ad_pio_wrsectors = ops->bdo_dev.do_node.dno_node.no_file.mo_saveblocks;
+		drive->ad_pio_rdsectors = ops->bdo_dev.do_node.dvno_node.no_file.mo_loadblocks;
+		drive->ad_pio_wrsectors = ops->bdo_dev.do_node.dvno_node.no_file.mo_saveblocks;
 #endif /* ATADRIVE_HAVE_PIO_IOSECTORS */
 		if (specs.capability & HD_DRIVEID_CAPABILITY_DMA)
 			ops = &AtaDrive_DmaOps;

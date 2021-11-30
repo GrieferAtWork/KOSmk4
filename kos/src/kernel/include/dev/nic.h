@@ -221,9 +221,9 @@ struct nicdev
 #ifdef NDEBUG
 #define ___nicdev_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___nicdev_assert_ops_(ops)                                              \
-	__hybrid_assert((ops)->nd_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream), \
-	__hybrid_assert((ops)->nd_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream->mso_write == &nicdev_v_write),
+#define ___nicdev_assert_ops_(ops)                                               \
+	__hybrid_assert((ops)->nd_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
+	__hybrid_assert((ops)->nd_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_write == &nicdev_v_write),
 #endif /* !NDEBUG */
 #define _nicdev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->nd_cdev) ___nicdev_assert_ops_(ops)
 

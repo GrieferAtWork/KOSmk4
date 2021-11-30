@@ -467,6 +467,12 @@ struct flatdir_bucket {
 #define FFLATDIR_F_GAP_NOTLARGEST 0x0002 /* `fdd_biggest_gap' may not necessarily be the largest gap. */
 
 struct flatdirdata {
+	/* TODO: Slightly alter the design so it becomes possible to reap cached directory  entries
+	 *       during system_cc(). Currently, that is only possible for `TAILQ_LAST(&fdd_bypos)',
+	 *       as  the assumption is made that `fdd_bypos' contains all entries leading up to the
+	 *       last one already loaded.
+	 * Solution: There has to be a way to indicate that `fdd_bypos' may be incomplete as the
+	 *           result of unused directory entries having been unloaded. */
 	struct shared_rwlock        fdd_lock;        /* Lock for directory data. */
 	struct REF flatdirent_tailq fdd_bypos;       /* [0..n][lock(fdd_lock)] List of files sorted by position in directory  stream.
 	                                              * The files in this list are _IDENTICAL_ to those in `fdd_fileslist'. This list

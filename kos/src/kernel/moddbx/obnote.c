@@ -922,7 +922,7 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 		if (ops->mo_changed == &fnode_v_changed &&
 		    S_ISDEV(mfile_asnode(me)->fn_mode) &&
 		    mfile_asnode(me)->fn_super == _ramfs_super_assuper(&devfs) &&
-		    ops != &ramfs_devnode_ops.dno_node.no_file) {
+		    ops != &ramfs_devnode_ops.dvno_node.no_file) {
 			REF struct devdirent *name;
 			name = mfile_asdevice(me)->dv_dirent;
 			if (!name || !ADDR_ISKERN(name))

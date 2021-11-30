@@ -64,9 +64,9 @@ struct ansittydev
 #ifdef NDEBUG
 #define ___ansittydev_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___ansittydev_assert_ops_(ops)                                           \
-	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream), \
-	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream->mso_write == &ansittydev_v_write),
+#define ___ansittydev_assert_ops_(ops)                                            \
+	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
+	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_write == &ansittydev_v_write),
 #endif /* !NDEBUG */
 #define _ansittydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->ato_cdev) ___ansittydev_assert_ops_(ops)
 

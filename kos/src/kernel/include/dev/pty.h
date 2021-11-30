@@ -97,7 +97,7 @@ DATDEF struct ttydev_ops const ptyslave_ops;
 DATDEF struct chrdev_ops const ptymaster_ops;
 
 /* Helper macros for `struct ptyslave' */
-#define mfile_isptyslave(self)   ((self)->mf_ops == &ptyslave_ops.to_cdev.cdo_dev.do_node.dno_node.no_file)
+#define mfile_isptyslave(self)   ((self)->mf_ops == &ptyslave_ops.to_cdev.cdo_dev.do_node.dvno_node.no_file)
 #define mfile_asptyslave(self)   ((struct ptyslave *)(self))
 #define fnode_isptyslave(self)   mfile_isptyslave(_fnode_asfile(self))
 #define fnode_asptyslave(self)   mfile_asptyslave(_fnode_asfile(self))
@@ -111,7 +111,7 @@ DATDEF struct chrdev_ops const ptymaster_ops;
 #define ttydev_asptyslave(self)  chrdev_asptyslave(_ttydev_aschr(self))
 
 /* Helper macros for `struct ptymaster' */
-#define mfile_isptymaster(self)   ((self)->mf_ops == &ptymaster_ops.cdo_dev.do_node.dno_node.no_file)
+#define mfile_isptymaster(self)   ((self)->mf_ops == &ptymaster_ops.cdo_dev.do_node.dvno_node.no_file)
 #define mfile_asptymaster(self)   ((struct ptymaster *)(self))
 #define fnode_isptymaster(self)   mfile_isptymaster(_fnode_asfile(self))
 #define fnode_asptymaster(self)   mfile_asptymaster(_fnode_asfile(self))

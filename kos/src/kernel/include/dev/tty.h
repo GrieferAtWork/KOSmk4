@@ -86,10 +86,10 @@ FUNDEF NONNULL((1)) ssize_t LIBTERM_CC __ttydev_v_raise(struct terminal *__restr
 #ifdef NDEBUG
 #define ___ttydev_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___ttydev_assert_ops_(ops)                                                                          \
-	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream),                             \
-	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream->mso_read == &ttydev_v_read), \
-	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream->mso_write == &ttydev_v_write),
+#define ___ttydev_assert_ops_(ops)                                                                           \
+	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream),                             \
+	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_read == &ttydev_v_read), \
+	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_write == &ttydev_v_write),
 #endif /* !NDEBUG */
 #define _ttydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->to_cdev) ___ttydev_assert_ops_(ops)
 

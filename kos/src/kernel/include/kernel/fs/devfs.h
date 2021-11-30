@@ -203,25 +203,25 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
  *  - self->dv_byname_node                                # s.a. `device_registerf()'
  * @param: struct device     *self:  Device to initialize.
  * @param: struct device_ops *ops:   Device operators. */
-#define _device_init(self, ops)                                                                       \
-	(_device_assert_ops_(ops) _fnode_init_common(_device_asdevnode(_fdevnode_asnode(self))),          \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dno_node.no_file, \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                 \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                 \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                     \
-	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),          \
-	 (self)->_device_devnode_ fn_nlink                              = 1,                              \
-	 (self)->_device_devnode_ fn_uid                                = 0,                              \
+#define _device_init(self, ops)                                                                        \
+	(_device_assert_ops_(ops) _fnode_init_common(_device_asdevnode(_fdevnode_asnode(self))),           \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dvno_node.no_file, \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                  \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                  \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                      \
+	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),           \
+	 (self)->_device_devnode_ fn_nlink                              = 1,                               \
+	 (self)->_device_devnode_ fn_uid                                = 0,                               \
 	 (self)->_device_devnode_ fn_gid                                = 0)
-#define _device_cinit(self, ops)                                                                      \
-	(_device_assert_ops_(ops) _fnode_cinit_common(_device_asdevnode(_fdevnode_asnode(self))),         \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dno_node.no_file, \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                 \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                 \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                     \
-	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),          \
-	 (self)->_device_devnode_ fn_nlink                              = 1,                              \
-	 __hybrid_assert((self)->_device_devnode_ fn_uid == 0),                                           \
+#define _device_cinit(self, ops)                                                                       \
+	(_device_assert_ops_(ops) _fnode_cinit_common(_device_asdevnode(_fdevnode_asnode(self))),          \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dvno_node.no_file, \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                  \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                  \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                      \
+	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),           \
+	 (self)->_device_devnode_ fn_nlink                              = 1,                               \
+	 __hybrid_assert((self)->_device_devnode_ fn_uid == 0),                                            \
 	 __hybrid_assert((self)->_device_devnode_ fn_gid == 0))
 
 /* Finalize a partially initialized `struct device' (as initialized by `_device_init()') */

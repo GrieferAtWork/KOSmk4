@@ -188,8 +188,8 @@ blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 #define blkdev_isroot(self) (blkdev_getops(self) != &blkpart_ops)
 
 /* Helper macros. */
-#define fdevnode_isblkpart(self) ((self)->_fdevnode_node_ _fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
-#define device_isblkpart(self)   ((self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
+#define fdevnode_isblkpart(self) ((self)->_fdevnode_node_ _fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dvno_node.no_file)
+#define device_isblkpart(self)   ((self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dvno_node.no_file)
 
 /* Return the sector shift/size/count of the block device. */
 #define blkdev_getsectorshift(self) ((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift)

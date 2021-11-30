@@ -87,7 +87,7 @@ struct mkttydev
 DATDEF struct ttydev_ops const mkttydev_ops;
 
 /* Helper macros for `struct mktty' */
-#define mfile_ismktty(self)   ((self)->mf_ops == &mktty_ops.to_cdev.cdo_dev.do_node.dno_node.no_file)
+#define mfile_ismktty(self)   ((self)->mf_ops == &mktty_ops.to_cdev.cdo_dev.do_node.dvno_node.no_file)
 #define mfile_asmktty(self)   ((struct mkttydev *)(self))
 #define fnode_ismktty(self)   mfile_ismktty(_fnode_asfile(self))
 #define fnode_asmktty(self)   mfile_asmktty(_fnode_asfile(self))

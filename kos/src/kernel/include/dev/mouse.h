@@ -104,9 +104,9 @@ struct mousedev
 #ifdef NDEBUG
 #define ___mousedev_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___mousedev_assert_ops_(ops)                                            \
-	__hybrid_assert((ops)->mo_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream), \
-	__hybrid_assert((ops)->mo_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream->mso_read == &mousedev_v_read),
+#define ___mousedev_assert_ops_(ops)                                             \
+	__hybrid_assert((ops)->mo_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
+	__hybrid_assert((ops)->mo_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_read == &mousedev_v_read),
 #endif /* !NDEBUG */
 #define _mousedev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->mo_cdev) ___mousedev_assert_ops_(ops)
 
