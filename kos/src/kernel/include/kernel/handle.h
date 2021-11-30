@@ -508,6 +508,10 @@ handle_trynextfd(unsigned int startfd,
                  struct handle_manager *__restrict self,
                  void **__restrict p_data)
 		THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((2, 3)) unsigned int
+NOTHROW(FCALL handle_trynextfd_locked)(unsigned int startfd,
+                                       struct handle_manager *__restrict self,
+                                       struct handle *__restrict phand);
 
 
 /* Modify the I/O-flags of a given file handle

@@ -148,11 +148,7 @@ struct epoll_controller {
 	 *       the send-queue) */
 	WEAK refcnt_t                     ec_refcnt;     /* Reference counter. */
 	WEAK refcnt_t                     ec_weakrefcnt; /* Weak reference counter. */
-	/* TODO: Do we really need a mutex here? Wouldn't something like a `struct shared_lock',
-	 *       which currently doesn't exist but  is to `atomic_lock' what `shared_rwlock'  is
-	 *       to `atomic_rwlock', that is essentially a non-recursive mutex?
-	 * iow: Is there any piece of code that relies on the ability for a single to acquire
-	 *      a specific mutex multiple times. */
+	/* TODO: Don't use a mutex here; change this to use `atomic_lock' instead! */
 	struct mutex                      ec_lock;       /* Lock  for this epoll  controller. This one has  to be held whenever
 	                                                  * making modifications  to, or  scanning the  set of  monitored  file
 	                                                  * descriptors. Additionally, `epoll_wait(2)' will temporarily acquire

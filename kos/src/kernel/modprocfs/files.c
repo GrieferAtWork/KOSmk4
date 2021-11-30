@@ -448,12 +448,12 @@ procfs_kos_fs_nodes_printer(pformatprinter printer, void *arg,
 				break;
 			if (print_fnode_desc(node, printer, arg) < 0)
 				break;
+			fallnodes_acquire();
 		} EXCEPT {
 			xdecref_unlikely(node);
 			RETHROW();
 		}
 		prev = node;
-		fallnodes_acquire();
 		if (!LIST_ISBOUND(node, fn_allnodes)) {
 			/* Find  the `index'th node in the global list.
 			 * This is not failsafe (elements before `node'
@@ -466,6 +466,7 @@ procfs_kos_fs_nodes_printer(pformatprinter printer, void *arg,
 			}
 			if (!node) {
 				fallnodes_release();
+				node = prev;
 				break;
 			}
 		}
@@ -671,12 +672,12 @@ procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
 				break;
 			if (print_mpart_desc(part, printer, arg) < 0)
 				break;
+			mpart_all_acquire();
 		} EXCEPT {
 			xdecref_unlikely(part);
 			RETHROW();
 		}
 		prev = part;
-		mpart_all_acquire();
 		if (!LIST_ISBOUND(part, mp_allparts)) {
 			/* Find  the `index'th part in the global list.
 			 * This is not failsafe (elements before `part'
@@ -689,6 +690,7 @@ procfs_kos_mm_parts_printer(pformatprinter printer, void *arg,
 			}
 			if (!part) {
 				mpart_all_release();
+				part = prev;
 				break;
 			}
 		}

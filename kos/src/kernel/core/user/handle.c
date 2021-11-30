@@ -943,7 +943,7 @@ NOTHROW(FCALL handle_manager_get_max_hashvector_fd_plus_one)(struct handle_manag
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL handle_manager_hashvector_isvalid)(struct handle_manager const *__restrict self,
                                                  unsigned int fd,
-                                                 void **p_data) {
+                                                 struct handle *p_hand) {
 	unsigned int i, perturb;
 	assert(self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR);
 	assert(self->hm_hashvector.hm_hashvec);
@@ -955,8 +955,8 @@ NOTHROW(FCALL handle_manager_hashvector_isvalid)(struct handle_manager const *__
 			break; /* end-of-chain */
 		if (hashent->hh_handle_id != fd)
 			continue; /* Some other handle. */
-		if (p_data)
-			*p_data = self->hm_hashvector.hm_vector[hashent->hh_vector_index].h_data;
+		if (p_hand)
+			*p_hand = self->hm_hashvector.hm_vector[hashent->hh_vector_index];
 		/* Found it! */
 		return true;
 	}
@@ -1282,22 +1282,32 @@ handle_trynextfd(unsigned int startfd,
                  void **__restrict p_data)
 		THROWS(E_WOULDBLOCK) {
 	unsigned int result;
+	struct handle hand;
 	sync_read(&self->hm_lock);
+	result = handle_trynextfd_locked(startfd, self, &hand);
+	if (result != (unsigned int)-1)
+		*p_data = hand.h_data;
+	sync_endread(&self->hm_lock);
+	return result;
+}
+
+PUBLIC NONNULL((2, 3)) unsigned int
+NOTHROW(FCALL handle_trynextfd_locked)(unsigned int startfd,
+                                       struct handle_manager *__restrict self,
+                                       struct handle *__restrict phand) {
+	unsigned int result;
 	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
 		result = startfd;
 		for (;;) {
-			if unlikely(result >= self->hm_linear.hm_alloc) {
-throw_f_next_unallocated:
-				sync_endread(&self->hm_lock);
+			if unlikely(result >= self->hm_linear.hm_alloc)
 				return (unsigned int)-1;
-			}
 			if (self->hm_linear.hm_vector[result].h_type != HANDLE_TYPE_UNDEFINED) {
-				*p_data = self->hm_linear.hm_vector[result].h_data;
+				*phand = self->hm_linear.hm_vector[result];
 				break; /* This one's in use! */
 			}
 			++result;
 		}
-	} else if (handle_manager_hashvector_isvalid(self, startfd, p_data)) {
+	} else if (handle_manager_hashvector_isvalid(self, startfd, phand)) {
 		result = startfd;
 	} else {
 		unsigned int i, mask;
@@ -1316,15 +1326,12 @@ throw_f_next_unallocated:
 			if (map[i].hh_vector_index != (unsigned int)-1) {
 				unsigned int fdno = map[i].hh_handle_id;
 				if (fdno >= startfd && fdno < result) {
-					result  = fdno;
-					*p_data = self->hm_hashvector.hm_vector[map[i].hh_vector_index].h_data;
+					result = fdno;
+					*phand = self->hm_hashvector.hm_vector[map[i].hh_vector_index];
 				}
 			}
 		}
-		if unlikely(result == (unsigned int)-1)
-			goto throw_f_next_unallocated; /* No valid handle found... */
 	}
-	sync_endread(&self->hm_lock);
 	return result;
 }
 

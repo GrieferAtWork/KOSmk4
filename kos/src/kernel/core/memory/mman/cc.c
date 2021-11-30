@@ -36,7 +36,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <dev/tty.h>
 #include <kernel/driver.h>
 #include <kernel/fs/allnodes.h>
+#include <kernel/fs/dirhandle.h>
+#include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
+#include <kernel/fs/filehandle.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
@@ -46,11 +49,17 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/pipe.h>
 #include <sched/enum.h>
+#include <sched/epoll.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+
+#include <kos/kernel/handle.h>
+#include <network/socket.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -154,26 +163,6 @@ NOTHROW(KCALL system_cc_drivers)(struct ccinfo *__restrict info) {
 
 
 /************************************************************************/
-/* MMAN                                                                 */
-/************************************************************************/
-
-/* Clear per-mman caches. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
-NOTHROW(FCALL system_cc_permman)(struct mman *__restrict self,
-                                 struct ccinfo *__restrict info) {
-#ifdef CONFIG_HAVE_USERELF_MODULES
-	system_cc_mman_module_cache(self, info);
-#endif /* CONFIG_HAVE_USERELF_MODULES */
-
-	(void)self;
-	(void)info;
-	COMPILER_IMPURE();
-}
-
-
-
-
-/************************************************************************/
 /* FS                                                                   */
 /************************************************************************/
 
@@ -182,10 +171,53 @@ NOTHROW(FCALL system_cc_permman)(struct mman *__restrict self,
 SLIST_HEAD(path_slist, path);
 #endif /* !__path_slist_defined */
 
+/* Invoke cache-clear callbacks for the given mem-file. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_permfile)(struct mfile *__restrict self,
+                                  struct ccinfo *__restrict info) {
+	struct mfile_stream_ops const *ops;
+	ops = self->mf_ops->mo_stream;
+	if (ops && ops->mso_cc)
+		DOCC((*ops->mso_cc)(self, info));
+	if (mfile_isfifo(self)) {
+		/* In this case, we can clear  */
+		struct ffifonode *me = mfile_asfifo(self);
+		DOCC(system_cc_ringbuffer(&me->ff_buffer, info));
+	}
+	if (mfile_istty(self)) {
+		struct ttydev *me = mfile_astty(self);
+		DOCC(system_cc_ringbuffer(&me->t_term.t_ibuf, info));
+		DOCC(system_cc_linebuffer(&me->t_term.t_canon, info));
+		DOCC(system_cc_linebuffer(&me->t_term.t_opend, info));
+		DOCC(system_cc_linebuffer(&me->t_term.t_ipend, info));
+		if (ttydev_isptyslave(me)) {
+			struct ptyslave *ps = ttydev_asptyslave(me);
+			DOCC(system_cc_ringbuffer(&ps->ps_obuf, info));
+		}
+	}
+}
+
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_perpath)(struct path *__restrict self,
+                                 struct ccinfo *__restrict info) {
+	DOCC(system_cc_permfile(self->p_dir, info));
+	/* TODO: Trim buffer of `self->p_cldlist' */
+
+	/* Recursively clear caches of parent paths. */
+	if (!path_isroot(self)) {
+		REF struct path *parent = path_getparent(self);
+		system_cc_perpath(parent, info);
+		if (ATOMIC_DECFETCH(parent->p_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct path));
+			path_destroy(parent);
+		}
+	}
+}
+
 /* Clear VFS recently-used-paths cache. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
-NOTHROW(FCALL system_cc_vfs_recent_paths)(struct vfs *__restrict self,
-                                          struct ccinfo *__restrict info) {
+NOTHROW(FCALL system_cc_vfs_recent_paths_unload)(struct vfs *__restrict self,
+                                                 struct ccinfo *__restrict info) {
 	struct path_slist deadpaths;
 	struct path *iter;
 	if (vfs_recentlock_tryacquire(self)) {
@@ -223,20 +255,373 @@ NOTHROW(FCALL system_cc_vfs_recent_paths)(struct vfs *__restrict self,
 	}
 }
 
+/* Invoke operators for paths in the recently-used-paths cache. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_vfs_recent_paths)(struct vfs *__restrict self,
+                                          struct ccinfo *__restrict info) {
+	REF struct path *iter;
+	REF struct path *prev = NULL;
+	size_t index          = 0;
+	if (!vfs_recentlock_tryacquire(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!vfs_recentlock_acquire_nx(self))
+			return;
+	}
+	iter = TAILQ_FIRST(&self->vf_recent);
+	for (;;) {
+		xincref(iter);
+		vfs_recentlock_release(self);
+		if (prev && ATOMIC_DECFETCH(prev->p_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct path));
+			path_destroy(prev);
+		}
+		if (!iter)
+			break;
+		system_cc_perpath(iter, info);
+		if (ccinfo_isdone(info))
+			break;
+		if (!vfs_recentlock_tryacquire(self)) {
+			if (ccinfo_noblock(info))
+				break;
+			if (!vfs_recentlock_acquire_nx(self))
+				break;
+		}
+		prev = iter;
+		if (!TAILQ_ISBOUND(iter, p_recent)) {
+			/* Find  the `index'th node in the global list.
+			 * This is not failsafe (elements before `node'
+			 * may have been removed, so `index' may not be
+			 * correct), but it's better than nothing. */
+			size_t i;
+			iter = TAILQ_FIRST(&self->vf_recent);
+			for (i = 0; iter && i < index; ++i) {
+				iter = TAILQ_NEXT(iter, p_recent);
+			}
+			if (!iter) {
+				vfs_recentlock_release(self);
+				iter = prev;
+				break;
+			}
+		}
+		iter = TAILQ_NEXT(iter, p_recent);
+		++index;
+	}
+	if (iter && ATOMIC_DECFETCH(iter->p_refcnt) == 0) {
+		ccinfo_account(info, sizeof(struct path));
+		path_destroy(iter);
+	}
+}
+
+
+/* Clear caches relating to mounting point paths. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_vfs_mounts)(struct vfs *__restrict self,
+                                    struct ccinfo *__restrict info) {
+	REF struct pathmount *iter;
+	REF struct pathmount *prev = NULL;
+	size_t index               = 0;
+	if (!vfs_mountslock_tryacquire(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!vfs_mountslock_acquire_nx(self))
+			return;
+	}
+	iter = LIST_FIRST(&self->vf_mounts);
+	for (;;) {
+		xincref(iter);
+		vfs_mountslock_release(self);
+		if (prev && ATOMIC_DECFETCH(prev->p_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct path));
+			path_destroy(prev);
+		}
+		if (!iter)
+			break;
+		system_cc_perpath(iter, info);
+		if (ccinfo_isdone(info))
+			break;
+		if (!vfs_mountslock_tryacquire(self)) {
+			if (ccinfo_noblock(info))
+				break;
+			if (!vfs_mountslock_acquire_nx(self))
+				break;
+		}
+		prev = iter;
+		if (!LIST_ISBOUND(iter, pm_vsmount)) {
+			/* Find  the `index'th node in the global list.
+			 * This is not failsafe (elements before `node'
+			 * may have been removed, so `index' may not be
+			 * correct), but it's better than nothing. */
+			size_t i;
+			iter = LIST_FIRST(&self->vf_mounts);
+			for (i = 0; iter && i < index; ++i) {
+				iter = LIST_NEXT(iter, pm_vsmount);
+			}
+			if (!iter) {
+				vfs_mountslock_release(self);
+				iter = prev;
+				break;
+			}
+		}
+		iter = LIST_NEXT(iter, pm_vsmount);
+		++index;
+	}
+	if (iter && ATOMIC_DECFETCH(iter->p_refcnt) == 0) {
+		ccinfo_account(info, sizeof(struct path));
+		path_destroy(iter);
+	}
+}
+
+/* Clear caches relating to DOS drive paths. */
+PRIVATE ATTR_NOINLINE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_vfs_drives)(struct vfs *__restrict self,
+                                    struct ccinfo *__restrict info) {
+	REF struct path *paths[COMPILER_LENOF(self->vf_drives)];
+	unsigned int i;
+	if (!vfs_driveslock_tryread(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!vfs_driveslock_read_nx(self))
+			return;
+	}
+	for (i = 0; i < COMPILER_LENOF(self->vf_drives); ++i)
+		paths[i] = xincref(self->vf_drives[i]);
+	vfs_driveslock_endread(self);
+	for (i = 0; i < COMPILER_LENOF(self->vf_drives); ++i) {
+		if (!paths[i])
+			continue;
+		system_cc_perpath(paths[i], info);
+		if (ccinfo_isdone(info))
+			break;
+	}
+	for (i = 0; i < COMPILER_LENOF(self->vf_drives); ++i) {
+		if (!paths[i])
+			continue;
+		if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct path));
+			path_destroy(paths[i]);
+		}
+	}
+}
+
+/* Clear caches relating to the vfs root path. */
+PRIVATE ATTR_NOINLINE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_vfs_root)(struct vfs *__restrict self,
+                                  struct ccinfo *__restrict info) {
+	REF struct path *root;
+	if (!vfs_rootlock_tryread(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!vfs_rootlock_read_nx(self))
+			return;
+	}
+	/* Might be NULL if rootfs not yet mounted during early boot... */
+	root = xincref(self->vf_root);
+	vfs_rootlock_endread(self);
+	if likely(root) {
+		system_cc_perpath(root, info);
+		if (ATOMIC_DECFETCH(root->p_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct path));
+			path_destroy(root);
+		}
+	}
+}
+
 /* Clear per-vfs caches. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_pervfs)(struct vfs *__restrict self,
                                 struct ccinfo *__restrict info) {
+	DOCC(system_cc_vfs_recent_paths_unload(self, info));
 	DOCC(system_cc_vfs_recent_paths(self, info));
+	DOCC(system_cc_vfs_mounts(self, info));
+	DOCC(system_cc_vfs_drives(self, info));
+	DOCC(system_cc_vfs_root(self, info));
 }
 
 /* Clear per-fs caches. */
+PRIVATE ATTR_NOINLINE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_fs_paths)(struct fs *__restrict self,
+                                  struct ccinfo *__restrict info) {
+	REF struct path *paths[2 + COMPILER_LENOF(self->fs_dcwd)];
+	unsigned int i;
+	if (!fs_pathlock_tryread(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!fs_pathlock_read_nx(self))
+			return;
+	}
+	paths[0] = xincref(self->fs_root);
+	paths[1] = xincref(self->fs_cwd);
+	for (i = 0; i < COMPILER_LENOF(self->fs_dcwd); ++i)
+		paths[2 + i] = xincref(self->fs_dcwd[i]);
+	fs_pathlock_endread(self);
+	for (i = 0; i < COMPILER_LENOF(paths); ++i) {
+		if (!paths[i])
+			continue;
+		system_cc_perpath(paths[i], info);
+		if (ccinfo_isdone(info))
+			break;
+	}
+	for (i = 0; i < COMPILER_LENOF(paths); ++i) {
+		if (!paths[i])
+			continue;
+		if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct path));
+			path_destroy(paths[i]);
+		}
+	}
+}
+
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_perfs)(struct fs *__restrict self,
                                struct ccinfo *__restrict info) {
 	DOCC(system_cc_pervfs(self->fs_vfs, info));
+	DOCC(system_cc_fs_paths(self, info));
 }
 
+
+
+
+
+
+/************************************************************************/
+/* HANDLES                                                              */
+/************************************************************************/
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((2, 3)) void
+NOTHROW(KCALL system_cc_perhandle)(uintptr_half_t handle_typ,
+                                   void *__restrict handle_ptr,
+                                   struct ccinfo *__restrict info) {
+	switch (handle_typ) {
+
+	case HANDLE_TYPE_MFILE: {
+		struct mfile *me = (struct mfile *)handle_ptr;
+		DOCC(system_cc_permfile(me, info));
+	}	break;
+
+	case HANDLE_TYPE_PATH: {
+		struct path *me = (struct path *)handle_ptr;
+		DOCC(system_cc_perpath(me, info));
+	}	break;
+
+	case HANDLE_TYPE_FILEHANDLE:
+	case HANDLE_TYPE_TEMPHANDLE:
+	case HANDLE_TYPE_FIFOHANDLE: {
+		struct filehandle *me = (struct filehandle *)handle_ptr;
+		DOCC(system_cc_permfile(me->fh_file, info));
+		DOCC(system_cc_perpath(me->fh_path, info));
+	}	break;
+
+	case HANDLE_TYPE_DIRHANDLE: {
+		struct dirhandle *me = (struct dirhandle *)handle_ptr;
+		DOCC(system_cc_permfile(me->dh_enum.de_dir, info));
+		DOCC(system_cc_perpath(me->dh_path, info));
+	}	break;
+
+	case HANDLE_TYPE_SOCKET: {
+		struct socket *me = (struct socket *)handle_ptr;
+		/* TODO: Clear socket-level buffers */
+		(void)me;
+	}	break;
+
+	case HANDLE_TYPE_EPOLL: {
+		struct epoll_controller *me = (struct epoll_controller *)handle_ptr;
+		/* TODO: Truncate `me->ec_list' */
+		(void)me;
+	}	break;
+
+	case HANDLE_TYPE_PIPE_READER:
+	case HANDLE_TYPE_PIPE_WRITER: {
+		STATIC_ASSERT(offsetof(struct pipe_reader, pr_pipe) ==
+		              offsetof(struct pipe_writer, pw_pipe));
+		handle_ptr = ((struct pipe_reader *)handle_ptr)->pr_pipe;
+	}	ATTR_FALLTHROUGH
+	case HANDLE_TYPE_PIPE: {
+		struct pipe *me = (struct pipe *)handle_ptr;
+		DOCC(system_cc_ringbuffer(&me->p_buffer, info));
+	}	break;
+
+	default:
+		break;
+	}
+}
+
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_perhman)(struct handle_manager *__restrict self,
+                                 struct ccinfo *__restrict info) {
+	unsigned int fdno = 0;
+	for (;;) {
+		REF struct handle hand;
+		if (!handle_manager_tryread(self)) {
+			if (ccinfo_noblock(info))
+				return;
+			if (!handle_manager_read_nx(self))
+				return;
+		}
+		/* Find the first handle with an index >= fdno */
+		fdno = handle_trynextfd_locked(fdno, self, &hand);
+		if (fdno != (unsigned int)-1)
+			handle_incref(hand);
+		handle_manager_endread(self);
+		if (fdno == (unsigned int)-1)
+			break;
+		system_cc_perhandle(hand.h_type, hand.h_data, info);
+		handle_decref(hand);
+		if (ccinfo_isdone(info))
+			break;
+		++fdno;
+	}
+}
+
+
+
+
+/************************************************************************/
+/* MMAN                                                                 */
+/************************************************************************/
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_mman_execinfo)(struct mman *__restrict self,
+                                       struct ccinfo *__restrict info) {
+	REF struct mfile *exec_file;
+	REF struct path *exec_path;
+	struct mexecinfo *ei;
+	ei = &FORMMAN(self, thismman_execinfo);
+	if (!mman_lock_tryread(self)) {
+		if (ccinfo_noblock(info))
+			return;
+		if (!mman_lock_read_nx(self))
+			return;
+	}
+	exec_file = xincref(ei->mei_file);
+	exec_path = xincref(ei->mei_path);
+	mman_lock_endread(self);
+	if (exec_file) {
+		system_cc_permfile(exec_file, info);
+		if (ATOMIC_DECFETCH(exec_file->mf_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct mfile));
+			mfile_destroy(exec_file);
+		}
+	}
+	if (exec_path) {
+		if (!ccinfo_isdone(info))
+			system_cc_perpath(exec_path, info);
+		if (ATOMIC_DECFETCH(exec_path->p_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct path));
+			path_destroy(exec_path);
+		}
+	}
+}
+
+/* Clear per-mman caches. */
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(FCALL system_cc_permman)(struct mman *__restrict self,
+                                 struct ccinfo *__restrict info) {
+#ifdef CONFIG_HAVE_USERELF_MODULES
+	DOCC(system_cc_mman_module_cache(self, info));
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+
+	/* Files relating to exec-info */
+	DOCC(system_cc_mman_execinfo(self, info));
+}
 
 
 
@@ -269,6 +654,19 @@ NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
 		if (ATOMIC_DECFETCH(threadfs->fs_refcnt) == 0) {
 			ccinfo_account(info, sizeof(struct fs));
 			fs_destroy(threadfs);
+		}
+	}
+	if (ccinfo_isdone(info))
+		return;
+
+	/* Clear per-handle-manager caches. */
+	if (ATOMIC_READ(FORTASK(self, this_handle_manager)) != NULL) { /* May be NULL for kernel threads... */
+		REF struct handle_manager *threadhm;
+		threadhm = task_gethandlemanager(self);
+		system_cc_perhman(threadhm, info);
+		if (ATOMIC_DECFETCH(threadhm->hm_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct handle_manager));
+			handle_manager_destroy(threadhm);
 		}
 	}
 	if (ccinfo_isdone(info))
@@ -615,33 +1013,6 @@ NOTHROW(KCALL system_cc_linebuffer)(struct linebuffer *__restrict self,
 }
 
 
-/* Invoke cache-clear callbacks for the given file-node. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
-NOTHROW(KCALL system_cc_perfnode)(struct fnode *__restrict self,
-                                  struct ccinfo *__restrict info) {
-	struct mfile_stream_ops const *ops;
-	ops = self->mf_ops->mo_stream;
-	if (ops && ops->mso_cc)
-		DOCC((*ops->mso_cc)(self, info));
-	if (fnode_isfifo(self)) {
-		/* In this case, we can clear  */
-		struct ffifonode *me = fnode_asfifo(self);
-		DOCC(system_cc_ringbuffer(&me->ff_buffer, info));
-	}
-	if (fnode_istty(self)) {
-		struct ttydev *me = fnode_astty(self);
-		DOCC(system_cc_ringbuffer(&me->t_term.t_ibuf, info));
-		DOCC(system_cc_linebuffer(&me->t_term.t_canon, info));
-		DOCC(system_cc_linebuffer(&me->t_term.t_opend, info));
-		DOCC(system_cc_linebuffer(&me->t_term.t_ipend, info));
-		if (ttydev_isptyslave(me)) {
-			struct ptyslave *ps = ttydev_asptyslave(me);
-			DOCC(system_cc_ringbuffer(&ps->ps_obuf, info));
-		}
-	}
-}
-
-
 /* Invoke cache-clear callbacks for all file-nodes. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
@@ -656,7 +1027,6 @@ NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
 	}
 	node = LIST_FIRST(&fallnodes_list);
 	for (;;) {
-		REF struct fnode *next;
 		while (node && !tryincref(node))
 			node = LIST_NEXT(node, fn_allnodes);
 		fallnodes_release();
@@ -666,16 +1036,16 @@ NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
 		}
 		if (!node)
 			break;
-		system_cc_perfnode(node, info);
+		system_cc_permfile(node, info);
 		if (ccinfo_isdone(info))
 			break;
-		prev = node;
 		if (!fallnodes_tryacquire()) {
 			if (ccinfo_noblock(info))
-				return;
+				break;
 			if (!fallnodes_acquire_nx())
-				return;
+				break;
 		}
+		prev = node;
 		if (!LIST_ISBOUND(node, fn_allnodes)) {
 			/* Find  the `index'th node in the global list.
 			 * This is not failsafe (elements before `node'
@@ -688,25 +1058,17 @@ NOTHROW(KCALL system_cc_allnodes)(struct ccinfo *__restrict info) {
 			}
 			if (!node) {
 				fallnodes_release();
+				node = prev;
 				break;
 			}
 		}
-		next = LIST_NEXT(node, fn_allnodes);
-		node = next;
+		node = LIST_NEXT(node, fn_allnodes);
 		++index;
 	}
 	if (node && ATOMIC_DECFETCH(node->mf_refcnt) == 0) {
 		ccinfo_account(info, sizeof(struct fnode));
 		mfile_destroy(node);
 	}
-}
-
-
-/* Invoke cache-clear callbacks for the given superblock. */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
-NOTHROW(KCALL system_cc_persuper)(struct fsuper *__restrict self,
-                                  struct ccinfo *__restrict info) {
-	system_cc_perfnode(&self->fs_root, info);
 }
 
 
@@ -724,7 +1086,6 @@ NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 	}
 	super = LIST_FIRST(&fallsuper_list);
 	for (;;) {
-		REF struct fsuper *next;
 		while (super && !tryincref(super))
 			super = LIST_NEXT(super, fs_root.fn_allsuper);
 		fallsuper_release();
@@ -734,16 +1095,16 @@ NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 		}
 		if (!super)
 			break;
-		system_cc_persuper(super, info);
+		system_cc_permfile(&super->fs_root, info);
 		if (ccinfo_isdone(info))
 			break;
-		prev = super;
 		if (!fallsuper_tryacquire()) {
 			if (ccinfo_noblock(info))
-				return;
+				break;
 			if (!fallsuper_acquire_nx())
-				return;
+				break;
 		}
+		prev = super;
 		if (!LIST_ISBOUND(super, fs_root.fn_allsuper)) {
 			/* Find  the `index'th super in the global list.
 			 * This is not failsafe (elements before `super'
@@ -756,11 +1117,11 @@ NOTHROW(KCALL system_cc_allsuper)(struct ccinfo *__restrict info) {
 			}
 			if (!super) {
 				fallsuper_release();
+				super = prev;
 				break;
 			}
 		}
-		next = LIST_NEXT(super, fs_root.fn_allsuper);
-		super = next;
+		super = LIST_NEXT(super, fs_root.fn_allsuper);
 		++index;
 	}
 	if (super && ATOMIC_DECFETCH(super->fs_root.mf_refcnt) == 0) {
@@ -791,9 +1152,6 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 #endif /* CONFIG_HAVE_USERELF_MODULES */
 	DOCC(system_cc_slab_prealloc(info));
 	DOCC(system_cc_heaps(info));
-
-	/* TODO: Clear unused buffer space from every HANDLE_TYPE_PIPE(|_READER|_WRITER)
-	 *       - Find these by enumerating thread->handles */
 
 	/* TODO: Clear unused memory from handle managers (once handle managers have been re-written) */
 
