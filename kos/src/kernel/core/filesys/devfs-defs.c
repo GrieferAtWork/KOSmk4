@@ -263,15 +263,15 @@ PUBLIC struct ramfs_super devfs = {
 		},
 	},
 	.rs_dat = {
-		.rdd_treelock = SHARED_RWLOCK_INIT,
-		.rdd_tree     = NULL,
+		.rdd_lock = SHARED_RWLOCK_INIT,
+		.rdd_lops = SLIST_HEAD_INITIALIZER(devfs.rs_dat.rdd_lops),
+		.rdd_tree = NULL,
 	},
 };
 
 
 /* Lock accessor helpers for `devfs_byname_lock' and `devfs_byname_tree' */
 PUBLIC NOBLOCK void NOTHROW(KCALL _devfs_byname_reap)(void) {
-	DEFINE_PUBLIC_SYMBOL(devfs_rootdir, &devfs.rs_sup.fs_root, sizeof(struct ramfs_dirnode));
 #ifndef __INTELLISENSE__
 #define __LOCAL_self      (&devfs_byname_lops)
 #define __LOCAL_trylock() devfs_byname_trywrite()

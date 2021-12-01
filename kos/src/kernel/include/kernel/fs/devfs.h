@@ -235,7 +235,7 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 /* The /dev/ filesystem superblock */
 struct ramfs_super; /* From `<kernel/fs/ramfs.h>' */
 DATDEF struct ramfs_super devfs;
-DATDEF struct ramfs_dirnode devfs_rootdir;
+#define devfs_rootdir (*ramfs_super_asdir(&devfs))
 DATDEF struct fsuper _devfs_super ASMNAME("devfs");
 DATDEF struct ffilesys devfs_filesys;
 

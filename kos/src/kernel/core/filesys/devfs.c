@@ -348,14 +348,14 @@ devfs_root_first_ramfs_dirent(void) {
 	REF struct fdirent *result = NULL;
 	struct ramfs_dirent *ent;
 	/* Start enumeration at the left-most node */
-	ramfs_dirdata_treelock_read(&devfs.rs_dat);
+	ramfs_dirnode_read(&devfs_rootdir);
 	ent = devfs.rs_dat.rdd_tree;
 	if likely(ent) {
 		while (ent->rde_treenode.rb_lhs)
 			ent = ent->rde_treenode.rb_lhs;
 		result = incref(&ent->rde_ent);
 	}
-	ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+	ramfs_dirnode_endread(&devfs_rootdir);
 	return result;
 }
 
@@ -419,7 +419,7 @@ unlock_byname_and_return_first_ramfs:
 		struct ramfs_dirent *me;
 		assert(fdirent_isramfs(self));
 		me = fdirent_asramfs(self);
-		ramfs_dirdata_treelock_read(&devfs.rs_dat);
+		ramfs_dirnode_read(&devfs_rootdir);
 		COMPILER_READ_BARRIER();
 		/* Check for special case: `self' was deleted. */
 		if unlikely(me->rde_treenode.rb_lhs == RAMFS_DIRENT_TREENODE_DELETED) {
@@ -431,7 +431,7 @@ unlock_byname_and_return_first_ramfs:
 		}
 		if (me != NULL)
 			result = incref(&me->rde_ent);
-		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+		ramfs_dirnode_endread(&devfs_rootdir);
 	}
 	return result;
 }
@@ -631,7 +631,7 @@ again_lookup:
 
 			/* Insert the new file */
 again_acquire_lock_for_insert:
-			ramfs_dirdata_treelock_write(&devfs.rs_dat);
+			ramfs_dirnode_write(&devfs_rootdir);
 			{
 				struct ramfs_dirent *old_dirent;
 				old_dirent = ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
@@ -646,7 +646,7 @@ again_acquire_lock_for_insert:
 				if unlikely(old_dirent) {
 					/* Special case: file already exists. */
 					incref(&old_dirent->rde_ent);
-					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+					ramfs_dirnode_endwrite(&devfs_rootdir);
 					kfree(new_dirent);
 					decref_likely(new_node);
 					info->mkf_dent  = &old_dirent->rde_ent;
@@ -660,7 +660,7 @@ again_acquire_lock_for_insert:
 			 * with  the same name is added while we're in here), it's OK to only acquire
 			 * a read-lock. */
 			if (!devfs_byname_tryread()) {
-				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				ramfs_dirnode_endwrite(&devfs_rootdir);
 				devfs_byname_waitread();
 				goto again_acquire_lock_for_insert;
 			}
@@ -677,7 +677,7 @@ again_acquire_lock_for_insert:
 				if (existing_device) {
 					if unlikely(!tryincref(existing_device)) {
 						if (!devfs_byname_tryupgrade()) {
-							ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+							ramfs_dirnode_endwrite(&devfs_rootdir);
 							devfs_byname_endread();
 							devfs_byname_waitwrite();
 							goto again_acquire_lock_for_insert;
@@ -687,7 +687,7 @@ again_acquire_lock_for_insert:
 						devfs_byname_downgrade();
 					} else {
 						/* Special case: file already exists. */
-						ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+						ramfs_dirnode_endwrite(&devfs_rootdir);
 						info->mkf_dent = incref(&existing_device->dv_dirent->dd_dirent);
 						devfs_byname_endread();
 						info->mkf_rnode = existing_device;
@@ -702,7 +702,7 @@ again_acquire_lock_for_insert:
 			TRY {
 				fnode_access(&devfs.fs_root, W_OK);
 			} EXCEPT {
-				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				ramfs_dirnode_endwrite(&devfs_rootdir);
 				devfs_byname_endread();
 				RETHROW();
 			}
@@ -718,14 +718,14 @@ again_acquire_lock_for_insert:
 				assert(new_node->mf_refcnt == 1);
 				if (!fsuper_nodes_trywrite(&devfs)) {
 					devfs_byname_endread();
-					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+					ramfs_dirnode_endwrite(&devfs_rootdir);
 					fsuper_nodes_waitwrite(&devfs);
 					goto again_acquire_lock_for_insert;
 				}
 				if (!fallnodes_tryacquire()) {
 					fsuper_nodes_endwrite(&devfs);
 					devfs_byname_endread();
-					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+					ramfs_dirnode_endwrite(&devfs_rootdir);
 					fallnodes_waitfor();
 					goto again_acquire_lock_for_insert;
 				}
@@ -751,11 +751,11 @@ again_acquire_lock_for_insert:
 			incref(new_node); /* For `new_dirent->rde_node' (or `info->mkf_rnode', depending on view) */
 
 			/* Insert the new directory entry. */
-			ramfs_direnttree_insert(&devfs.rs_dat.rdd_tree, new_dirent); /* Inherit reference */
+			ramfs_direnttree_insert(&devfs_rootdir.rdn_dat.rdd_tree, new_dirent); /* Inherit reference */
 
 			/* And with that, the "file" has been created! */
 			devfs_byname_endread();
-			ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+			ramfs_dirnode_endwrite(&devfs_rootdir);
 		} EXCEPT {
 			kfree(new_dirent);
 			RETHROW();
@@ -973,9 +973,9 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		/* Acquire locks. */
 again_acquire_locks:
 		TRY {
-			ramfs_dirdata_treelock_write(&devfs.rs_dat);
+			ramfs_dirnode_write(&devfs_rootdir);
 			if (!devfs_byname_tryread()) {
-				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				ramfs_dirnode_endwrite(&devfs_rootdir);
 				devfs_byname_waitread();
 				goto again_acquire_locks;
 			}
@@ -1000,15 +1000,15 @@ again_acquire_locks:
 				if (info->frn_repfile != existing->rde_node) {
 					info->frn_dent    = incref(&existing->rde_ent);
 					info->frn_repfile = mfile_asnode(incref(existing->rde_node));
-					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+					ramfs_dirnode_endwrite(&devfs_rootdir);
 					kfree(new_dirent);
 					return FDIRNODE_RENAME_EXISTS;
 				}
 				/* TODO: Remove `existing' */
-				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				ramfs_dirnode_endwrite(&devfs_rootdir);
 				THROW(E_NOT_IMPLEMENTED_TODO);
 			} else if (info->frn_repfile != NULL) {
-				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				ramfs_dirnode_endwrite(&devfs_rootdir);
 				info->frn_repfile = NULL;
 				info->frn_dent    = NULL;
 				return FDIRNODE_RENAME_EXISTS;
@@ -1028,7 +1028,7 @@ again_acquire_locks:
 					if (!tryincref(existing_device)) {
 						if (!devfs_byname_tryupgrade()) {
 							devfs_byname_endread();
-							ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+							ramfs_dirnode_endwrite(&devfs_rootdir);
 							TRY {
 								devfs_byname_write();
 							} EXCEPT {
@@ -1042,7 +1042,7 @@ again_acquire_locks:
 						existing_device->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
 						devfs_byname_downgrade();
 					} else {
-						ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+						ramfs_dirnode_endwrite(&devfs_rootdir);
 						info->frn_dent    = incref(&existing_device->dv_dirent->dd_dirent);
 						info->frn_repfile = existing_device; /* Inherit reference */
 						devfs_byname_endread();
@@ -1052,12 +1052,12 @@ again_acquire_locks:
 				} else {
 					/* TODO: Remove `existing_device' */
 					devfs_byname_endread();
-					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+					ramfs_dirnode_endwrite(&devfs_rootdir);
 					THROW(E_NOT_IMPLEMENTED_TODO);
 				}
 			} else if (info->frn_repfile != NULL) {
 				devfs_byname_endread();
-				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				ramfs_dirnode_endwrite(&devfs_rootdir);
 				kfree(new_dirent);
 				info->frn_repfile = NULL;
 				info->frn_dent    = NULL;
@@ -1067,24 +1067,24 @@ again_acquire_locks:
 
 		/* Acquire a lock to the old directory. */
 		if (ramfs_super_asdir(&devfs) != olddir) {
-			if (!ramfs_dirdata_treelock_trywrite(&olddir->rdn_dat)) {
+			if (!ramfs_dirnode_trywrite(olddir)) {
 				devfs_byname_endread();
-				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				ramfs_dirnode_endwrite(&devfs_rootdir);
 				TRY {
-					ramfs_dirdata_treelock_write(&olddir->rdn_dat);
+					ramfs_dirnode_write(olddir);
 				} EXCEPT {
 					kfree(new_dirent);
 					RETHROW();
 				}
-				ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
+				ramfs_dirnode_endwrite(olddir);
 				goto again_acquire_locks;
 			}
 
 			/* Check if the old directory has already been deleted. */
 			if unlikely(olddir->mf_flags & MFILE_F_DELETED) {
 				devfs_byname_endread();
-				ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
-				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				ramfs_dirnode_endwrite(olddir);
+				ramfs_dirnode_endwrite(&devfs_rootdir);
 				kfree(new_dirent);
 				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 			}
@@ -1097,9 +1097,9 @@ again_acquire_locks:
 		                            old_dirent->rde_ent.fd_name,
 		                            old_dirent->rde_ent.fd_namelen) != old_dirent) {
 			if (ramfs_super_asdir(&devfs) != olddir)
-				ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
+				ramfs_dirnode_endwrite(olddir);
 			devfs_byname_endread();
-			ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+			ramfs_dirnode_endwrite(&devfs_rootdir);
 			kfree(new_dirent);
 			return FDIRNODE_RENAME_DELETED;
 		}
@@ -1109,16 +1109,16 @@ again_acquire_locks:
 		old_dirent->rde_treenode.rb_lhs = RAMFS_DIRENT_TREENODE_DELETED; /* Mark as deleted. */
 
 		/* Insert the new directory entry into the new folder. */
-		ramfs_direnttree_insert(&devfs.rs_dat.rdd_tree, new_dirent);
+		ramfs_direnttree_insert(&devfs_rootdir.rdn_dat.rdd_tree, new_dirent);
 
 		/* For `new_dirent->rde_node' */
 		incref(info->frn_file);
 
 		/* Release locks */
 		if (ramfs_super_asdir(&devfs) != olddir)
-			ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
+			ramfs_dirnode_endwrite(olddir);
 		devfs_byname_endread();
-		ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+		ramfs_dirnode_endwrite(&devfs_rootdir);
 
 		/* Inherited   from   `olddir->rdn_dat.rdd_tree'
 		 * (nokill because caller still has a reference) */
@@ -1376,14 +1376,14 @@ again:
 		fsuper_nodes_waitwrite(&devfs);
 		goto again;
 	}
-	if (!ramfs_dirdata_treelock_tryread(&devfs.rs_dat)) {
+	if (!ramfs_dirnode_tryread(&devfs_rootdir)) {
 		fsuper_nodes_endwrite(&devfs);
 		devfs_byname_endwrite();
-		ramfs_dirdata_treelock_waitread(&devfs.rs_dat);
+		ramfs_dirnode_waitread(&devfs_rootdir);
 		goto again;
 	}
 	if (allnodes && !fallnodes_tryacquire()) {
-		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+		ramfs_dirnode_endread(&devfs_rootdir);
 		fsuper_nodes_endwrite(&devfs);
 		devfs_byname_endwrite();
 		fallnodes_waitfor();
@@ -1435,14 +1435,14 @@ NOTHROW(FCALL _device_register_lock_release)(bool allnodes) {
 	COMPILER_BARRIER();
 	if (allnodes)
 		_fallnodes_release();
-	_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+	_ramfs_dirnode_endread(&devfs_rootdir);
 	_fsuper_nodes_endwrite(&devfs);
 	_devfs_byname_endwrite();
 
 	/* Reap locks */
 	if (allnodes)
 		fallnodes_reap();
-	ramfs_dirdata_treelock_reap(&devfs.rs_dat);
+	ramfs_dirnode_reap(&devfs_rootdir);
 	fsuper_nodes_reap(&devfs);
 	devfs_byname_reap();
 }

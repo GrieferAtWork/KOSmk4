@@ -129,10 +129,20 @@ DATDEF struct fsocknode_ops const ramfs_socknode_ops;
 
 
 struct ramfs_dirent {
-	uintptr_t                     rde_isred;    /* [lock(:rdn_dat.rdd_treelock)] Red/black word (0: black; 1: red) */
-#define RAMFS_DIRENT_TREENODE_DELETED ((REF struct ramfs_dirent *)-1)
-	RBTREE_NODE(REF ramfs_dirent) rde_treenode; /* [0..1][lock(:rdn_dat.rdd_treelock)] File tree.
+	uintptr_t                     rde_isred;    /* [lock(:rdn_dat.rdd_lock)] Red/black word (0: black; 1: red) */
+#ifdef __WANT_RAMFS_DIRENT__rde_dead
+	union {
+		RBTREE_NODE(REF ramfs_dirent)      rde_treenode; /* ... (see below) */
+		struct {
+			void *_rde_pad[2];                           /* Padding... */
+			SLIST_ENTRY(REF ramfs_dirent) _rde_dead;     /* Used internally. */
+		};
+	};
+#else /* __WANT_RAMFS_DIRENT__rde_dead */
+	RBTREE_NODE(REF ramfs_dirent) rde_treenode; /* [0..1][lock(:rdn_dat.rdd_lock)] File tree.
 	                                             * When `.rb_lhs == RAMFS_DIRENT_TREENODE_DELETED', then this dirent has been deleted. */
+#endif /* !__WANT_RAMFS_DIRENT__rde_dead */
+#define RAMFS_DIRENT_TREENODE_DELETED ((REF struct ramfs_dirent *)-1)
 	REF struct fnode             *rde_node;     /* [1..1][const] Bound file-node (NOTE: This field also holds a  reference
 	                                             * to `->fn_nlink', which is decremented when this structure is "unlinked"
 	                                             * from its containing directory `rde_dir') */
@@ -152,47 +162,53 @@ DEFINE_REFCOUNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, __struct_ramfs
 /* Extended directory data. */
 struct ramfs_dirnode;
 struct ramfs_dirdata {
-	struct shared_rwlock          rdd_treelock; /* Lock for `rdd_tree' */
-	RBTREE_ROOT(REF ramfs_dirent) rdd_tree;     /* [0..n][lock(rdd_treelock)] Files in this directory (using the filename as key). */
+	struct shared_rwlock           rdd_lock; /* Lock for `rdd_tree' */
+	Toblockop_slist(ramfs_dirnode) rdd_lops; /* [0..n] Lockops for `rdd_lock' */
+	RBTREE_ROOT(REF ramfs_dirent)  rdd_tree; /* [0..n][lock(rdd_lock)] Files in this directory (using the filename as key). */
 };
 
-#define ramfs_dirdata_init(self)                \
-	(shared_rwlock_init(&(self)->rdd_treelock), \
+#define ramfs_dirdata_init(self)            \
+	(shared_rwlock_init(&(self)->rdd_lock), \
+	 SLIST_INIT(&(self)->rdd_lops),         \
 	 (self)->rdd_tree = __NULLPTR)
-#define ramfs_dirdata_cinit(self)                \
-	(shared_rwlock_cinit(&(self)->rdd_treelock), \
+#define ramfs_dirdata_cinit(self)                     \
+	(shared_rwlock_cinit(&(self)->rdd_lock),          \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->rdd_lops)), \
 	 __hybrid_assert((self)->rdd_tree == __NULLPTR))
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL ramfs_dirdata_fini)(struct ramfs_dirdata *__restrict self);
 
+/* Return the ramfs directory node containing a given `struct ramfs_dirdata' */
+#define ramfs_dirdata_asdir(self) \
+	COMPILER_CONTAINER_OF(self, struct ramfs_dirnode, rdn_dat)
 
-/* Helpers for accessing `rdd_treelock' */
-#define /*        */ _ramfs_dirdata_treelock_reap(self)        (void)0
-#define /*        */ ramfs_dirdata_treelock_reap(self)         (void)0
-#define /*        */ ramfs_dirdata_treelock_mustreap(self)     0
-#define /*BLOCKING*/ ramfs_dirdata_treelock_write(self)        shared_rwlock_write(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_write_nx(self)     shared_rwlock_write_nx(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_trywrite(self)     shared_rwlock_trywrite(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_endwrite(self)     (shared_rwlock_endwrite(&(self)->rdd_treelock), ramfs_dirdata_treelock_reap(self))
-#define /*        */ _ramfs_dirdata_treelock_endwrite(self)    shared_rwlock_endwrite(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_read(self)         shared_rwlock_read(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_read_nx(self)      shared_rwlock_read_nx(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_tryread(self)      shared_rwlock_tryread(&(self)->rdd_treelock)
-#define /*        */ _ramfs_dirdata_treelock_endread(self)     shared_rwlock_endread(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_endread(self)      (void)(shared_rwlock_endread(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
-#define /*        */ _ramfs_dirdata_treelock_end(self)         shared_rwlock_end(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_end(self)          (void)(shared_rwlock_end(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
-#define /*BLOCKING*/ ramfs_dirdata_treelock_upgrade(self)      shared_rwlock_upgrade(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_downgrade(self)    shared_rwlock_downgrade(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_reading(self)      shared_rwlock_reading(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_writing(self)      shared_rwlock_writing(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_canread(self)      shared_rwlock_canread(&(self)->rdd_treelock)
-#define /*        */ ramfs_dirdata_treelock_canwrite(self)     shared_rwlock_canwrite(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_waitread(self)     shared_rwlock_waitread(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_waitwrite(self)    shared_rwlock_waitwrite(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_waitread_nx(self)  shared_rwlock_waitread_nx(&(self)->rdd_treelock)
-#define /*BLOCKING*/ ramfs_dirdata_treelock_waitwrite_nx(self) shared_rwlock_waitwrite_nx(&(self)->rdd_treelock)
+/* Helpers for accessing `rdd_lock' */
+#define /*        */ _ramfs_dirdata_lock_reap(self)        _oblockop_reap_shared_rwlock(&(self)->rdd_lops, &(self)->rdd_lock, ramfs_dirdata_asdir(self))
+#define /*        */ ramfs_dirdata_lock_reap(self)         oblockop_reap_shared_rwlock(&(self)->rdd_lops, &(self)->rdd_lock, ramfs_dirdata_asdir(self))
+#define /*        */ ramfs_dirdata_lock_mustreap(self)     oblockop_mustreap(&(self)->rdd_lops)
+#define /*BLOCKING*/ ramfs_dirdata_lock_write(self)        shared_rwlock_write(&(self)->rdd_lock)
+#define /*BLOCKING*/ ramfs_dirdata_lock_write_nx(self)     shared_rwlock_write_nx(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_trywrite(self)     shared_rwlock_trywrite(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_endwrite(self)     (shared_rwlock_endwrite(&(self)->rdd_lock), ramfs_dirdata_lock_reap(self))
+#define /*        */ _ramfs_dirdata_lock_endwrite(self)    shared_rwlock_endwrite(&(self)->rdd_lock)
+#define /*BLOCKING*/ ramfs_dirdata_lock_read(self)         shared_rwlock_read(&(self)->rdd_lock)
+#define /*BLOCKING*/ ramfs_dirdata_lock_read_nx(self)      shared_rwlock_read_nx(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_tryread(self)      shared_rwlock_tryread(&(self)->rdd_lock)
+#define /*        */ _ramfs_dirdata_lock_endread(self)     shared_rwlock_endread(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_endread(self)      (void)(shared_rwlock_endread(&(self)->rdd_lock) && (ramfs_dirdata_lock_reap(self), 0))
+#define /*        */ _ramfs_dirdata_lock_end(self)         shared_rwlock_end(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_end(self)          (void)(shared_rwlock_end(&(self)->rdd_lock) && (ramfs_dirdata_lock_reap(self), 0))
+#define /*BLOCKING*/ ramfs_dirdata_lock_upgrade(self)      shared_rwlock_upgrade(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_tryupgrade(self)   shared_rwlock_tryupgrade(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_downgrade(self)    shared_rwlock_downgrade(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_reading(self)      shared_rwlock_reading(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_writing(self)      shared_rwlock_writing(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_canread(self)      shared_rwlock_canread(&(self)->rdd_lock)
+#define /*        */ ramfs_dirdata_lock_canwrite(self)     shared_rwlock_canwrite(&(self)->rdd_lock)
+#define /*BLOCKING*/ ramfs_dirdata_lock_waitread(self)     shared_rwlock_waitread(&(self)->rdd_lock)
+#define /*BLOCKING*/ ramfs_dirdata_lock_waitwrite(self)    shared_rwlock_waitwrite(&(self)->rdd_lock)
+#define /*BLOCKING*/ ramfs_dirdata_lock_waitread_nx(self)  shared_rwlock_waitread_nx(&(self)->rdd_lock)
+#define /*BLOCKING*/ ramfs_dirdata_lock_waitwrite_nx(self) shared_rwlock_waitwrite_nx(&(self)->rdd_lock)
 
 
 /* Ramfs directory by-name tree operations. (For `struct ramfs_dirdata::rdd_tree') */
@@ -242,7 +258,7 @@ ramfs_direnum_v_seekdir(struct fdirenum *__restrict self,
 
 /* Given a dirent `self' that has been deleted (RAMFS_DIRENT_TREENODE_DELETED),
  * return a pointer  to the first  dirent in `dir'  that has a  lexicographical
- * order `>= self'. The caller must be holding `dir->rdn_dat.rdd_treelock' */
+ * order `>= self'. The caller must be holding `dir->rdn_dat.rdd_lock' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) struct ramfs_dirent *
 NOTHROW(FCALL ramfs_dirent_fixdeleted)(struct ramfs_dirent *__restrict self,
                                        struct ramfs_dirnode *__restrict dir);
@@ -259,6 +275,35 @@ struct ramfs_dirnode
 #endif /* __WANT_FS_INLINE_STRUCTURES */
 	struct ramfs_dirdata rdn_dat; /* Directory data */
 };
+
+/* Helpers for accessing `rdn_dat.rdd_lock' */
+#define /*        */ _ramfs_dirnode_reap(self)        _ramfs_dirdata_lock_reap(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_reap(self)         ramfs_dirdata_lock_reap(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_mustreap(self)     ramfs_dirdata_lock_mustreap(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_write(self)        ramfs_dirdata_lock_write(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_write_nx(self)     ramfs_dirdata_lock_write_nx(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_trywrite(self)     ramfs_dirdata_lock_trywrite(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_endwrite(self)     ramfs_dirdata_lock_endwrite(&(self)->rdn_dat)
+#define /*        */ _ramfs_dirnode_endwrite(self)    _ramfs_dirdata_lock_endwrite(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_read(self)         ramfs_dirdata_lock_read(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_read_nx(self)      ramfs_dirdata_lock_read_nx(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_tryread(self)      ramfs_dirdata_lock_tryread(&(self)->rdn_dat)
+#define /*        */ _ramfs_dirnode_endread(self)     _ramfs_dirdata_lock_endread(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_endread(self)      ramfs_dirdata_lock_endread(&(self)->rdn_dat)
+#define /*        */ _ramfs_dirnode_end(self)         _ramfs_dirdata_lock_end(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_end(self)          ramfs_dirdata_lock_end(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_upgrade(self)      ramfs_dirdata_lock_upgrade(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_tryupgrade(self)   ramfs_dirdata_lock_tryupgrade(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_downgrade(self)    ramfs_dirdata_lock_downgrade(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_reading(self)      ramfs_dirdata_lock_reading(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_writing(self)      ramfs_dirdata_lock_writing(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_canread(self)      ramfs_dirdata_lock_canread(&(self)->rdn_dat)
+#define /*        */ ramfs_dirnode_canwrite(self)     ramfs_dirdata_lock_canwrite(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_waitread(self)     ramfs_dirdata_lock_waitread(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_waitwrite(self)    ramfs_dirdata_lock_waitwrite(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_waitread_nx(self)  ramfs_dirdata_lock_waitread_nx(&(self)->rdn_dat)
+#define /*BLOCKING*/ ramfs_dirnode_waitwrite_nx(self) ramfs_dirdata_lock_waitwrite_nx(&(self)->rdn_dat)
+
 
 /* Directory operators for `struct ramfs_dirnode' */
 DATDEF struct fdirnode_ops const ramfs_dirnode_ops;
@@ -323,11 +368,9 @@ struct ramfs_super
 	struct ramfs_dirdata rs_dat; /* Directory data */
 };
 
-#ifdef __WANT_FS_INLINE_STRUCTURES
-#define ramfs_super_asdir(self) ((struct ramfs_dirnode *)&(self)->rs_sup.fs_root)
-#else /* __WANT_FS_INLINE_STRUCTURES */
-#define ramfs_super_asdir(self) ((struct ramfs_dirnode *)&(self)->fs_root)
-#endif /* !__WANT_FS_INLINE_STRUCTURES */
+/* Return the root directory of a ramfs superblock as a ramfs_dirnode */
+#define ramfs_super_asdir(self) \
+	((struct ramfs_dirnode *)&(self)->_ramfs_super_super_ fs_root)
 
 
 DATDEF struct fsuper_ops const ramfs_super_ops;

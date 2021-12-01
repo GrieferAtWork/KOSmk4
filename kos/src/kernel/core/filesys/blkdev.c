@@ -1023,7 +1023,7 @@ blkdev_makeparts(struct blkdev *__restrict self,
  * - self->bd_rootinfo.br_partslock
  * - devfs_byname_lock
  * - devfs.rs_sup.fs_nodeslock
- * - devfs.rs_dat.rdd_treelock  // read-only
+ * - devfs.rs_dat.rdd_lock  // read-only
  * - fallnodes_lock */
 PRIVATE NONNULL((1)) void FCALL
 blkdev_repart_locks_acquire(struct blkdev *__restrict self)
@@ -1060,25 +1060,25 @@ again:
 		goto again;
 	}
 
-	/* devfs.rs_dat.rdd_treelock... // read-only */
-	if (!ramfs_dirdata_treelock_tryread(&devfs.rs_dat)) {
+	/* devfs.rs_dat.rdd_lock... // read-only */
+	if (!ramfs_dirnode_tryread(&devfs_rootdir)) {
 		_fsuper_nodes_endwrite(&devfs);
 		_blkdev_root_partslock_release(self);
 		_devfs_byname_endwrite();
 		fsuper_nodes_reap(&devfs);
 		blkdev_root_partslock_reap(self);
 		devfs_byname_reap();
-		ramfs_dirdata_treelock_waitread(&devfs.rs_dat);
+		ramfs_dirnode_waitread(&devfs_rootdir);
 		goto again;
 	}
 
 	/* fallnodes_lock... */
 	if (!fallnodes_tryacquire()) {
-		_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+		_ramfs_dirnode_endread(&devfs_rootdir);
 		_fsuper_nodes_endwrite(&devfs);
 		_blkdev_root_partslock_release(self);
 		_devfs_byname_endwrite();
-		ramfs_dirdata_treelock_reap(&devfs.rs_dat);
+		ramfs_dirnode_reap(&devfs_rootdir);
 		fsuper_nodes_reap(&devfs);
 		blkdev_root_partslock_reap(self);
 		devfs_byname_reap();
@@ -1168,7 +1168,7 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct blkdev *__restrict self) {
  *               - self->bd_rootinfo.br_partslock
  *               - devfs_byname_lock
  *               - devfs.rs_sup.fs_nodeslock
- *               - devfs.rs_dat.rdd_treelock  // read-only
+ *               - devfs.rs_dat.rdd_lock  // read-only
  *               - fallnodes_lock
  *   - Step #3: Clear `self->bd_rootinfo.br_parts' and:
  *               - tryincref() every partition. Those for which this
@@ -1190,7 +1190,7 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct blkdev *__restrict self) {
  *   - Step #5: Release locks from:
  *               - devfs_byname_lock
  *               - devfs.rs_sup.fs_nodeslock
- *               - devfs.rs_dat.rdd_treelock  // read-only
+ *               - devfs.rs_dat.rdd_lock  // read-only
  *               - fallnodes_lock
  *   - Step #6: Drop references from all of the old partitions
  *   - Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
@@ -1267,7 +1267,7 @@ blkdev_repart(struct blkdev *__restrict self)
 	/* Step #5: Release locks. */
 	_fallnodes_release();
 	_devfs_byname_endwrite();
-	_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+	_ramfs_dirnode_endread(&devfs_rootdir);
 	_fsuper_nodes_endwrite(&devfs);
 
 	/* Step #6: Drop references from all of the old partitions (Also mark then as unlinked). */
@@ -1285,7 +1285,7 @@ blkdev_repart(struct blkdev *__restrict self)
 	_blkdev_root_partslock_release(self);
 
 	/* Reap all of the locks released above */
-	ramfs_dirdata_treelock_reap(&devfs.rs_dat);
+	ramfs_dirnode_reap(&devfs_rootdir);
 	fallnodes_reap();
 	devfs_byname_reap();
 	fsuper_nodes_reap(&devfs);
@@ -1383,14 +1383,14 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 	/* Step #5: Release locks. */
 	_fallnodes_release();
 	_devfs_byname_endwrite();
-	_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+	_ramfs_dirnode_endread(&devfs_rootdir);
 	_fsuper_nodes_endwrite(&devfs);
 	_blkdev_root_partslock_release(self);
 
 	/* Reap all of the locks released above */
 	fallnodes_reap();
 	devfs_byname_reap();
-	ramfs_dirdata_treelock_reap(&devfs.rs_dat);
+	ramfs_dirnode_reap(&devfs_rootdir);
 	fsuper_nodes_reap(&devfs);
 	blkdev_root_partslock_reap(self);
 }

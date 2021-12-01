@@ -140,7 +140,7 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 		},
 	},
 	.rs_dat = {
-		.rdd_treelock = SHARED_RWLOCK_INIT,
+		.rdd_lock = SHARED_RWLOCK_INIT,
 		.rdd_tree     = NULL,
 	},
 };

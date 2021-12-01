@@ -670,6 +670,16 @@ struct fsuper;
 #if defined(__WANT_MFILE__mf_delfnodes) || defined(__WANT_MFILE__mf_deadnod)
 struct fnode;
 #endif /* __WANT_MFILE__mf_delfnodes || __WANT_MFILE__mf_deadnod */
+#if defined(__WANT_MFILE__mf_ramdirlop) || defined(__WANT_MFILE__mf_ramdirplop)
+struct ramfs_dirnode;
+#endif /* __WANT_MFILE__mf_ramdirlop || __WANT_MFILE__mf_ramdirplop */
+#ifdef __WANT_MFILE__mf_deadrament
+#ifndef __ramfs_dirent_slist_defined
+#define __ramfs_dirent_slist_defined
+struct ramfs_dirent;
+SLIST_HEAD(ramfs_dirent_slist, ramfs_dirent);
+#endif /* !__ramfs_dirent_slist_defined */
+#endif /* __WANT_MFILE__mf_deadrament */
 
 
 struct mfile {
@@ -774,7 +784,9 @@ struct mfile {
      defined(__WANT_MFILE__mf_fsuperlop) || defined(__WANT_MFILE__mf_fsuperplop) || \
      defined(__WANT_MFILE__mf_mfplop) || defined(__WANT_MFILE__mf_deadparts) ||     \
      defined(__WANT_MFILE__mf_mpplop) || defined(__WANT_MFILE__mf_compl) ||         \
-     defined(__WANT_MFILE__mf_deadnod) || defined(__WANT_MFILE__mf_lopX))
+     defined(__WANT_MFILE__mf_deadnod) || defined(__WANT_MFILE__mf_ramdirplop) ||   \
+     defined(__WANT_MFILE__mf_ramdirlop) || defined(__WANT_MFILE__mf_deadrament) || \
+     defined(__WANT_MFILE__mf_lopX))
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) {{ { .tv_sec = mf_atime__tv_sec, .tv_nsec = mf_atime__tv_nsec }
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
@@ -795,21 +807,35 @@ struct mfile {
 			                                      * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
 			                                      *      before proceeding to use the data you've just read! */
 		};
+
 #ifdef __WANT_MFILE__mf_lop
 		struct lockop            _mf_lop;        /* lock operation */
 #endif /* __WANT_MFILE__mf_lop */
+
 #ifdef __WANT_MFILE__mf_plop
 		struct postlockop        _mf_plop;       /* post-lock operation */
 #endif /* __WANT_MFILE__mf_plop */
+
 #ifdef __WANT_MFILE__mf_mflop
 		Toblockop(mfile)         _mf_mflop;      /* mem-file lock operation */
 #endif /* __WANT_MFILE__mf_mflop */
+
 #ifdef __WANT_MFILE__mf_mplop
 		Toblockop(mpart)         _mf_mplop;      /* mem-part lock operation */
 #endif /* __WANT_MFILE__mf_mplop */
+
 #ifdef __WANT_MFILE__mf_fsuperlop
 		Toblockop(fsuper)        _mf_fsuperlop;  /* filesystem-super lock operation */
 #endif /* __WANT_MFILE__mf_fsuperlop */
+
+#ifdef __WANT_MFILE__mf_mpplop
+		Tobpostlockop(mpart)     _mf_mpplop;     /* mem-part post-lock operation */
+#endif /* __WANT_MFILE__mf_mpplop */
+
+#ifdef __WANT_MFILE__mf_ramdirlop
+		Toblockop(ramfs_dirnode) _mf_ramdirlop;     /* mem-part post-lock operation */
+#endif /* __WANT_MFILE__mf_ramdirlop */
+
 #if defined(__WANT_MFILE__mf_fsuperplop) && defined(__WANT_MFILE__mf_delfnodes)
 		struct {
 			Tobpostlockop(fsuper) _mf_fsuperplop; /* filesystem-super post-lock operation */
@@ -820,6 +846,7 @@ struct mfile {
 #elif defined(__WANT_MFILE__mf_delfnodes)
 #error "__WANT_MFILE__mf_delfnodes requires __WANT_MFILE__mf_fsuperplop"
 #endif /* ... */
+
 #if defined(__WANT_MFILE__mf_mfplop) && defined(__WANT_MFILE__mf_deadparts)
 		struct {
 			Tobpostlockop(mfile) _mf_mfplop;     /* mem-file post-lock operation */
@@ -830,15 +857,26 @@ struct mfile {
 #elif defined(__WANT_MFILE__mf_deadparts)
 #error "__WANT_MFILE__mf_deadparts requires __WANT_MFILE__mf_mfplop"
 #endif /* __WANT_MFILE__mf_deadparts */
-#ifdef __WANT_MFILE__mf_mpplop
-		Tobpostlockop(mpart)     _mf_mpplop;     /* mem-part post-lock operation */
-#endif /* __WANT_MFILE__mf_mpplop */
+
+#if defined(__WANT_MFILE__mf_ramdirplop) && defined(__WANT_MFILE__mf_deadrament)
+		struct {
+			Tobpostlockop(ramfs_dirnode)  _mf_ramdirplop; /* Used internally for unmounting ramfs filesystems. */
+			struct REF ramfs_dirent_slist _mf_deadrament; /* Used internally for unmounting ramfs filesystems. */
+		};
+#elif defined(__WANT_MFILE__mf_ramdirplop)
+		Tobpostlockop(ramfs_dirnode)      _mf_ramdirplop; /* Used internally for unmounting ramfs filesystems. */
+#elif defined(__WANT_MFILE__mf_deadrament)
+#error "__WANT_MFILE__mf_deadrament requires __WANT_MFILE__mf_ramdirplop"
+#endif /* __WANT_MFILE__mf_deadrament */
+
 #ifdef __WANT_MFILE__mf_compl
 		struct sig_completion    _mf_compl;      /* Signal completion callback. (used for waiting on `mf_trunclock') */
 #endif /* __WANT_MFILE__mf_compl */
+
 #ifdef __WANT_MFILE__mf_deadnod
 		SLIST_ENTRY(fnode)       _mf_deadnod;    /* Used internally */
 #endif /* __WANT_MFILE__mf_deadnod */
+
 #ifdef __WANT_MFILE__mf_lopX
 		byte_t _mf_lopX[3 * sizeof(struct timespec)]; /* ... */
 #endif /* __WANT_MFILE__mf_lopX */

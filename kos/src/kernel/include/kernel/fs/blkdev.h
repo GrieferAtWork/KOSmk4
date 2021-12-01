@@ -275,7 +275,7 @@ blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
  *               - self->bd_rootinfo.br_partslock
  *               - devfs_byname_lock
  *               - devfs.rs_sup.fs_nodeslock
- *               - devfs.rs_dat.rdd_treelock  // read-only
+ *               - devfs.rs_dat.rdd_lock  // read-only
  *               - fallnodes_lock
  *   - Step #3: Clear `self->bd_rootinfo.br_parts' and:
  *               - tryincref() every partition. Those for which this
@@ -297,7 +297,7 @@ blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
  *   - Step #5: Release locks from:
  *               - devfs_byname_lock
  *               - devfs.rs_sup.fs_nodeslock
- *               - devfs.rs_dat.rdd_treelock  // read-only
+ *               - devfs.rs_dat.rdd_lock  // read-only
  *               - fallnodes_lock
  *   - Step #6: Drop references from all of the old partitions
  *   - Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
