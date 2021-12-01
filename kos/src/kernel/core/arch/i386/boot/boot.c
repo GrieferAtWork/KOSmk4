@@ -942,6 +942,38 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    doing `system_cc()', /proc/kos/raminfo still shows ~6MiB used for  file
 	 *    mappings, which is probably caused by shared memory from busybox+libc. */
 
+	/* TODO: Make it so that `struct pathmount::pm_fsmount' is allowed to be unbound */
+
+	/* TODO: Add an option (as in: a global personality variable, alongside an
+	 *       accompanying procfs file) to have  `struct pathmount::pm_fsmount'
+	 *       be  unbound immediatly during `path_umount()', rather that having
+	 *       this only be done once the pathmount gets destroyed.
+	 * Suggested filename: /proc/kos/fs/delayed-umount
+	 *        Value: "1": The current behavior, with fsuper_delete() delayed
+	 *                    until nothing references a path to the superblock.
+	 *        Value: "0": Requested behavior, where path_umount() already does
+	 *                    the unbinding of `struct pathmount::pm_fsmount', and
+	 *                    subsequent  fsuper_delete() if it was the last mount
+	 *                    point for the superblock.
+	 *        Default: "0"  (Since that feels much more natural, especially if
+	 *                      you're doing the umount because you want to remove
+	 *                      a USB stick and don't care if programs still  have
+	 *                      open files referencing it)
+	 *
+	 * Currently, `fsuper_delete()' only gets  called once the last  reference
+	 * to the last pathmount that is bound to some file of the superblock gets
+	 * destroyed (as in: its reference counter drops to 0), meaning you  could
+	 * keep  it open in a handle and keep  on using a superblock even after it
+	 * has been unmounted.
+	 *
+	 * !!! This isn't a matter of undefined behavior !!!
+	 *
+	 * The  filesystem layer already  has all the facilities  to throw errors and
+	 * the like when trying to operate on files after fsuper_delete() was called,
+	 * and  `fsuper_delete()' is NOBLOCK+NOTHROW, so it can easily be called from
+	 * within `path_umount()'.
+	 */
+
 	return state;
 }
 

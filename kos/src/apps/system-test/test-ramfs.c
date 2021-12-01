@@ -50,7 +50,7 @@ DEFINE_TEST(ramfs) {
 	EQd(0, mount(NULL, "/tmp/submount", "ramfs", 0, NULL));
 
 	/* Assert that the correct errors are produced when
-	 * trying to do non-sense with mounting points. */
+	 * trying  to  do non-sense  with  mounting points. */
 	EQd(-1, mkdir("/tmp/submount", 0755));
 	EQd(errno, EEXIST);
 	EQd(-1, rmdir("/tmp/submount"));
@@ -64,6 +64,9 @@ DEFINE_TEST(ramfs) {
 	}
 	EQd(0, close(fd));
 
+	/* Also create files in a recursive sub-directory (so that
+	 * `fsuper_delete()'  has to recursive  in order to delete
+	 * everything). */
 	EQd(0, mkdir("/tmp/submount/subdir", 0755));
 	LEd(0, (fd = open("/tmp/submount/subdir/foo.bar", O_CREAT | O_EXCL | O_WRONLY, 0644)));
 	{
@@ -71,7 +74,7 @@ DEFINE_TEST(ramfs) {
 		EQss(sizeof(s) - sizeof(char),
 		     write(fd, s, sizeof(s) - sizeof(char)));
 	}
-	/*EQd(0, close(fd));*/ /* Intentionally not closed! */
+	EQd(0, close(fd));
 
 	/* Unmount without first deleting "myfile.txt"
 	 *
