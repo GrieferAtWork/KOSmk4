@@ -932,6 +932,16 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  - After a couple of restarts, the kernel will panic because /dev/console got destroyed
 	 * Only logical conclusion: there's a missing incref() somewhere. */
 
+	/* TODO: When faulting a larger file mapping that has yet to be allocated (isn't
+	 *       MPART_ST_INCORE), only do  `mpart_setcore_or_unlock()' if  the part  is
+	 *       sufficiently  small in relation  to the region  being faulted. When the
+	 *       part is much larger than the accessed region, then split the part  into
+	 *       multiple smaller ones so that physical memory only has to be  allocated
+	 *       for a small sub-region of the original mapping.
+	 * -> This will probably fix KOS's currently high memory usage, as even after
+	 *    doing `system_cc()', /proc/kos/raminfo still shows ~6MiB used for  file
+	 *    mappings, which is probably caused by shared memory from busybox+libc. */
+
 	return state;
 }
 

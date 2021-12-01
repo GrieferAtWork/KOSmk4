@@ -1094,6 +1094,75 @@ again_acquire_locks:
 }
 
 
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self) {
+	struct ramfs_super *me = (struct ramfs_super *)mfile_assuper(self);
+	ramfs_dirdata_fini(&me->rs_dat);
+	fsuper_v_destroy(self);
+}
+
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ramfs_super_v_delete)(REF struct fsuper *__restrict self) {
+	REF struct ramfs_super *me = (REF struct ramfs_super *)self;
+	/* TODO: When  `self' is a  ramfs, then we must  recursively go through all
+	 *       directories reachable from `self->fs_root', lock their file trees,
+	 *       and delete all contained files.
+	 * Otherwise, we'll end up with memory leaks because of the reference loop:
+	 *
+	 * ```
+	 *   ramfs_super::rs_dat::rdd_tree
+	 *       ^                  |
+	 *       |                  |
+	 *       +----+             v
+	 *            |         ramfs_dirent::rde_node
+	 *   fnode::fn_super                    |
+	 *     ^                                |
+	 *     |                                |
+	 *     +--------------------------------+
+	 * ```
+	 *
+	 * To reproduce:
+	 *     $ mkdir /tmp/subfs
+	 *     $ mount -t ramfs - /tmp/subfs
+	 *     $ echo hi > /tmp/subfs/myfile.txt
+	 *     $ umount /tmp/subfs
+	 *     $ leaks
+	 * Output will indicate 3 Memory leaks:
+	 *  - ramfs_super:  "/tmp/subfs"
+	 *  - ramfs_dirent: "/tmp/subfs/myfile.txt"
+	 *  - fregnode:     "/tmp/subfs/myfile.txt"
+	 * Which makes sense as these are the 3 objects apart of the loop above.
+	 *
+	 * Solution: Fix this problem by adding a new operator to `fsuper_ops' that is called
+	 *           instead of `mfile_delete_impl()' below, which is then allowed to do some
+	 *           additional cleanup before eventually calling `mfile_delete_impl()'.
+	 */
+
+	mfile_delete_impl(&me->fs_root);
+}
+
+
+PUBLIC_CONST struct fsuper_ops const ramfs_super_ops = {
+	.so_delete = &ramfs_super_v_delete,
+	.so_fdir = {
+		.dno_node = {
+			.no_file = {
+				.mo_destroy = &ramfs_super_v_destroy,
+				.mo_changed = &ramfs_super_v_changed,
+				.mo_stream  = &ramfs_super_v_stream_ops,
+			},
+			.no_free   = &ramfs_super_v_free,
+			.no_wrattr = &ramfs_super_v_wrattr,
+		},
+		.dno_lookup = &ramfs_super_v_lookup,
+		.dno_enumsz = ramfs_super_v_enumsz,
+		.dno_enum   = &ramfs_super_v_enum,
+		.dno_mkfile = &ramfs_super_v_mkfile,
+		.dno_unlink = &ramfs_super_v_unlink,
+		.dno_rename = &ramfs_super_v_rename,
+	},
+};
 
 PRIVATE WUNUSED NONNULL((1)) REF struct fsuper *KCALL
 ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
@@ -1144,35 +1213,6 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	/* Done! */
 	return result;
 }
-
-
-PUBLIC_CONST struct fsuper_ops const ramfs_super_ops = {
-	.so_fdir = {
-		.dno_node = {
-			.no_file = {
-				.mo_destroy = &ramfs_super_v_destroy,
-				.mo_changed = &ramfs_super_v_changed,
-				.mo_stream  = &ramfs_super_v_stream_ops,
-			},
-			.no_free   = &ramfs_super_v_free,
-			.no_wrattr = &ramfs_super_v_wrattr,
-		},
-		.dno_lookup = &ramfs_super_v_lookup,
-		.dno_enumsz = ramfs_super_v_enumsz,
-		.dno_enum   = &ramfs_super_v_enum,
-		.dno_mkfile = &ramfs_super_v_mkfile,
-		.dno_unlink = &ramfs_super_v_unlink,
-		.dno_rename = &ramfs_super_v_rename,
-	},
-};
-
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self) {
-	struct ramfs_super *me = (struct ramfs_super *)mfile_assuper(self);
-	ramfs_dirdata_fini(&me->rs_dat);
-	fsuper_v_destroy(self);
-}
-
 
 
 /* Top-level ram filesystem descriptor. */

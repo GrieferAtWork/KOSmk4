@@ -20,7 +20,6 @@
 #ifndef __LOCAL_itoa_digits
 #include <__crt.h>
 
-
 /* >> char __LOCAL_itoa_digit(bool upper, uint8_t digit); */
 #define __LOCAL_itoa_digit(upper, digit) \
 	__LOCAL_itoa_digits[(digit) + (!!(upper) << 6)]

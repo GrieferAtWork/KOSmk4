@@ -172,6 +172,19 @@ struct fsuper_ops {
 	                   USER CHECKED struct statfs *result)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
+	/* [0..1]
+	 * Called to perform additional fs-specific tasks to faciliate a safe unmount operation.
+	 * If defined, this operator is called in place of `mfile_delete_impl()' at the end of a
+	 * call to `fsuper_delete()', and must in turn complete by calling `mfile_delete_impl()'
+	 * itself.
+	 *
+	 * In practice, this operator is used by `ramfs_super' to recursively delete files from
+	 * all reachable directories,  resolving the super->dir->dirent->file->super  reference
+	 * loop  that is normally used to prevent ramfs  files from being deleted the second no
+	 * one is explicitly referencing them anymore. */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (KCALL *so_delete)(REF struct fsuper *__restrict self);
+
 	struct fdirnode_ops so_fdir; /* FDirNode operators */
 
 	/* NOTE: root-directory-type-specific operators go here... */

@@ -339,6 +339,8 @@ DATDEF struct fsuper_ops const ramfs_super_ops;
 #define ramfs_super_v_hop        fsuper_v_hop
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self);
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ramfs_super_v_delete)(REF struct fsuper *__restrict self);
 #define ramfs_super_v_wrattr ramfs_dirnode_v_wrattr
 #define ramfs_super_v_lookup ramfs_dirnode_v_lookup
 #define ramfs_super_v_enumsz ramfs_dirnode_v_enumsz
@@ -349,16 +351,6 @@ NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self);
 
 /* Top-level ram filesystem descriptor. */
 DATDEF struct ffilesys ramfs_filesys;
-
-/* Construct a new ramfs filesystem.
- * @assume(!isshared(return));
- * @return: * : A new superblock was opened. The superblock has yet
- *              to be made globally visible, and if mounting should
- *              be  aborted, you can simply destroy() (or decref())
- *              it.
- * @param: args: USER CHECKED char const *: Mount arguments */
-#define ramfs_new(args) \
-	ffilesys_open(&ramfs_filesys, __NULLPTR, args))
 
 DECL_END
 #endif /* __CC__ */

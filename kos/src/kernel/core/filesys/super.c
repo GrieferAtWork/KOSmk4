@@ -497,40 +497,6 @@ again_unbind_allnodes:
 		}
 	}
 
-	/* TODO: When  `self' is a  ramfs, then we must  recursively go through all
-	 *       directories reachable from `self->fs_root', lock their file trees,
-	 *       and delete all contained files.
-	 * Otherwise, we'll end up with memory leaks because of the reference loop:
-	 *
-	 * ```
-	 *   ramfs_super::rs_dat::rdd_tree
-	 *       ^                  |
-	 *       |                  |
-	 *       +----+             v
-	 *            |         ramfs_dirent::rde_node
-	 *   fnode::fn_super                    |
-	 *     ^                                |
-	 *     |                                |
-	 *     +--------------------------------+
-	 * ```
-	 *
-	 * To reproduce:
-	 *     $ mkdir /tmp/subfs
-	 *     $ mount -t ramfs - /tmp/subfs
-	 *     $ echo hi > /tmp/subfs/myfile.txt
-	 *     $ umount /tmp/subfs
-	 *     $ leaks
-	 * Output will indicate 3 Memory leaks:
-	 *  - ramfs_super:  "/tmp/subfs"
-	 *  - ramfs_dirent: "/tmp/subfs/myfile.txt"
-	 *  - fregnode:     "/tmp/subfs/myfile.txt"
-	 * Which makes sense as these are the 3 objects apart of the loop above.
-	 *
-	 * Solution: Fix this problem by adding a new operator to `fsuper_ops' that is called
-	 *           instead of `mfile_delete_impl()' below, which is then allowed to do some
-	 *           additional cleanup before eventually calling `mfile_delete_impl()'.
-	 */
-
 	/* Delete the mfile-portion. */
 	mfile_delete_impl(self);
 }
@@ -540,6 +506,7 @@ again_unbind_allnodes:
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC fsuper_clearnodes_postlop)(Tobpostlockop(fsuper) *__restrict self,
                                              REF struct fsuper *__restrict me) {
+	struct fsuper_ops const *ops;
 	assert(self == &me->fs_root._mf_fsuperplop);
 	(void)self;
 
@@ -551,7 +518,12 @@ NOTHROW(LOCKOP_CC fsuper_clearnodes_postlop)(Tobpostlockop(fsuper) *__restrict s
 	}
 
 	/* Finalize deletion of the superblock by deleting the mfile backing its root directory. */
-	mfile_delete_impl(&me->fs_root);
+	ops = fsuper_getops(me);
+	if (ops->so_delete)
+		(*ops->so_delete)(me);
+	else {
+		mfile_delete_impl(&me->fs_root);
+	}
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
