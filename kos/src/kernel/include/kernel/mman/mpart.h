@@ -714,6 +714,14 @@ NOTHROW(KCALL mpart_ll_bzeromemcc)(struct mpart *__restrict self,
                                    mpart_reladdr_t offset,
                                    size_t num_bytes);
 
+/* Low-level populate the given address range by loading it from disk.
+ * No bounds check is  done by this function,  and the caller must  be
+ * holding a trunc-lock to the file associated with `self'! */
+FUNDEF BLOCKING NONNULL((1)) void KCALL
+mpart_ll_populate(struct mpart *__restrict self,
+                  mpart_reladdr_t blockaligned_offset,
+                  size_t blockaligned_num_bytes);
+
 
 /* Return  the # of pages containing MPART_BLOCK_ST_CHNG-
  * blocks that can be found within `[0,partrel_pageaddr)'

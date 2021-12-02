@@ -417,7 +417,6 @@ restart_after_extendpart:
 			mfile_lock_write(self);
 		} EXCEPT {
 			LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
-			part->mp_refcnt = 0;
 			mpart_destroy(part);
 			RETHROW();
 		}
@@ -427,7 +426,6 @@ restart_after_extendpart:
 destroy_new_part_and_try_again:
 			mfile_lock_endwrite(self);
 			LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
-			part->mp_refcnt = 0;
 			mpart_destroy(part);
 			goto again;
 		}
@@ -758,6 +756,12 @@ part_setcore:
 		goto again;
 	}
 
+	/* Because  we're about to increase the file's size, there can't possibly
+	 * be another pre-existing mem-part beyond `newpart_minaddr'. The special
+	 * case for a part overlapping with the trailing page was already handled
+	 * above! */
+	assert(!mpart_tree_rlocate(self->mf_parts, newpart_minaddr, newpart_maxaddr));
+
 	/* Try to extend an existing (preceding) part by using `mfile_extendpart_or_unlock()'
 	 * Note that if we  later end up failing  to write all of  the relevant data to  that
 	 * part, then we're entirely within out  rights to simply truncate block-status,  and
@@ -937,6 +941,20 @@ extend_undo:
 extend_failed:
 #endif /* !__OPTIMIZE_SIZE__ */
 
+#ifdef LOCAL_BUFFER_IS_IOVEC
+#ifdef LOCAL_BUFFER_IS_PHYS
+#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, copy_bytes) iov_physbuffer_copytophys(buffer, dstaddr, buf_offset + (src_offset), copy_bytes)
+#else /* LOCAL_BUFFER_IS_PHYS */
+#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, copy_bytes) iov_buffer_copytophys(buffer, dstaddr, buf_offset + (src_offset), copy_bytes)
+#endif /* !LOCAL_BUFFER_IS_PHYS */
+#else /* LOCAL_BUFFER_IS_IOVEC */
+#ifdef LOCAL_BUFFER_IS_PHYS
+#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, copy_bytes) copyinphys(dstaddr, buffer + (src_offset), copy_bytes)
+#else /* LOCAL_BUFFER_IS_PHYS */
+#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, copy_bytes) copytophys(dstaddr, (byte_t *)buffer + (src_offset), copy_bytes)
+#endif /* !LOCAL_BUFFER_IS_PHYS */
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
+
 	/* Must create a new part for the accessed address range, and directly write to said
 	 * part. Afterwards, try to  insert this new  part into the  file, and increase  the
 	 * file's size. (do this using `mfile_insert_and_merge_part_and_unlock()').
@@ -946,127 +964,270 @@ extend_failed:
 	 * instead using its backing physical memory as a new physical source buffer from which
 	 * to copy data to-be written  to the file. (this way,  we can prevent duplicate  reads
 	 * from VIO memory when this kind of memory was used as origin buffer) */
-	mfile_lock_end(self);
-	/*io_bytes = num_bytes;*/
+	{
+		/*
+		 * ```
+		 *            parthead_disk
+		 *            |    parthead_size
+		 *            |    |           parttail_disk
+		 *            |    |           |    parttail_size
+		 *            v    |           v    |
+		 *            [--] v           [--] v
+		 *            [----]           [----]
+		 *  PART: [???DDDD00***********DDDD00???]
+		 *            ^     ^          ^
+		 *            |     |          |
+		 *            |     |          parttail_base
+		 *            |     content_base
+		 *            parthead_base
+		 * ```
+		 *
+		 * Also: The both the parthead and parttail regions may overlap
+		 *       with the content area! */
 
-	/* Construct the new part. */
-	part = _mfile_newpart(self, newpart_minaddr,
-	                      (size_t)(newpart_maxaddr -
-	                               newpart_minaddr) +
-	                      1);
-	/* Initialize remaining fields. */
-	part->mp_refcnt = 3; /* +1: return:mfile_insert_and_merge_part_and_unlock,
-	                      * +1: MPART_F_CHANGED
-	                      * +1: MPART_F_GLOBAL_REF */
-	part->mp_xflags = MPART_XF_NORMAL;
-	part->mp_file   = incref(self);
-	LIST_INIT(&part->mp_copy);
-	LIST_INIT(&part->mp_share);
-	SLIST_INIT(&part->mp_lockops);
-	/*LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);*/ /* Initialized later... */
-	part->mp_minaddr = newpart_minaddr;
-	part->mp_maxaddr = newpart_maxaddr;
-	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
-	_mpart_init_asanon(part);
-	/* NOTE: Setting `MPART_F_CHANGED' here will cause `mfile_insert_and_merge_part_and_unlock()'
-	 *       to add  automatically  add  the  part  to  the  list  of  changed  parts  of  `self' */
-	part->mp_flags |= MPART_F_GLOBAL_REF | MPART_F_CHANGED;
+		mpart_reladdr_t content_base;
+		mpart_reladdr_t parthead_base, parttail_base;
+		mpart_reladdr_t parthead_size, parttail_size;
+		mpart_reladdr_t parthead_disk, parttail_disk;
+		pos_t parthead_pos, parttail_pos;
+		size_t changed_minblk, changed_maxblk;
 
-	/* Make sure that the part has been allocated. Afterwards, copy the
-	 * caller-provided buffer into the correct offset within the  part.
-	 *
-	 * Note that since we're not holding any locks while doing this, we
-	 * don't even have to take any care of prefaulting and/or VIO. - We
-	 * can simply access memory directly! */
-	TRY {
-#ifdef LOCAL_BUFFER_IS_IOVEC
-#ifdef LOCAL_BUFFER_IS_PHYS
-#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, num_bytes) iov_physbuffer_copytophys(buffer, dstaddr, buf_offset + (src_offset), num_bytes)
-#else /* LOCAL_BUFFER_IS_PHYS */
-#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, num_bytes) iov_buffer_copytophys(buffer, dstaddr, buf_offset + (src_offset), num_bytes)
-#endif /* !LOCAL_BUFFER_IS_PHYS */
-#else /* LOCAL_BUFFER_IS_IOVEC */
-#ifdef LOCAL_BUFFER_IS_PHYS
-#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, num_bytes) copyinphys(dstaddr, buffer + (src_offset), num_bytes)
-#else /* LOCAL_BUFFER_IS_PHYS */
-#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, num_bytes) copytophys(dstaddr, (byte_t *)buffer + (src_offset), num_bytes)
-#endif /* !LOCAL_BUFFER_IS_PHYS */
-#endif /* !LOCAL_BUFFER_IS_IOVEC */
-		mpart_reladdr_t partmin;
-		size_t blki, minblk, maxblk;
+		/* Figure out how much memory must be loaded from disk due to an unaligned write. */
+		content_base = (mpart_reladdr_t)(offset - newpart_minaddr);
+		assert(content_base <= self->mf_part_amask);
+		changed_minblk = (content_base) >> self->mf_blockshift;
+		changed_maxblk = (content_base + num_bytes - 1) >> self->mf_blockshift;
+		assert(changed_minblk <= changed_maxblk);
+		parthead_base = changed_minblk << self->mf_blockshift;
+		assert(content_base >= parthead_base);
+		parthead_size = content_base - parthead_base;
+		parthead_size = CEIL_ALIGN(parthead_size, mfile_getblocksize(self));
+		assert(parthead_size == 0 || parthead_size == mfile_getblocksize(self));
+		parttail_base = content_base + num_bytes;
+		parttail_base = FLOOR_ALIGN(parttail_base, mfile_getblocksize(self));
+		assert(((changed_maxblk + 1) << self->mf_blockshift) >= parttail_base);
+		parttail_size = ((changed_maxblk + 1) << self->mf_blockshift) - parttail_base;
+		assert(parttail_size == 0 || parttail_size == mfile_getblocksize(self));
+		parthead_pos = newpart_minaddr + parthead_base;
+		parttail_pos = newpart_minaddr + parttail_base;
+		if (OVERFLOW_USUB(filesize, parthead_pos, &parthead_disk))
+			parthead_disk = 0;
+		if (OVERFLOW_USUB(filesize, parttail_pos, &parttail_disk))
+			parttail_disk = 0;
+		parthead_disk = CEIL_ALIGN(parthead_disk, mfile_getblocksize(self));
+		parttail_disk = CEIL_ALIGN(parttail_disk, mfile_getblocksize(self));
+		if (parthead_disk > parthead_size)
+			parthead_disk = parthead_size;
+		if (parttail_disk > parttail_size)
+			parttail_disk = parttail_size;
+		assert(parthead_disk == 0 || parthead_disk == mfile_getblocksize(self));
+		assert(parttail_disk == 0 || parttail_disk == mfile_getblocksize(self));
 
-		if (!MPART_ST_INCORE(part->mp_state))
-			mpart_ll_allocmem(part, mpart_getsize(part) >> PAGESHIFT);
-		partmin = (mpart_reladdr_t)(offset - mpart_getminaddr(part));
-		assert(partmin <= self->mf_part_amask);
-		if (part->mp_state == MPART_ST_MEM) {
-			physaddr_t dst;
-			size_t total_bytes, source_end;
-			dst = physpage2addr(part->mp_mem.mc_start);
-			LOCAL_BUFFER_copy2phys(dst + partmin, 0, num_bytes);
-			total_bytes = part->mp_mem.mc_size << PAGESHIFT;
-			source_end  = partmin + num_bytes;
-			/* Force zero-initialization of the head/tail region. */
-			bzerophyscc(dst, partmin);
-			bzerophyscc(dst + source_end, total_bytes - source_end);
-		} else {
-			size_t i;
-			mpart_reladdr_t src_offset = 0;
-			size_t src_bytes = num_bytes;
-			assert(part->mp_state == MPART_ST_MEM_SC);
-			/* Copy memory from the caller's buffer into the chunk-vector. */
-			for (i = 0; i < part->mp_mem_sc.ms_c; ++i) {
-				struct mchunk chunk;
-				physaddr_t chunk_addr;
-				size_t chunk_size;
-				chunk      = part->mp_mem_sc.ms_v[i];
-				chunk_addr = physpage2addr(chunk.mc_start);
-				chunk_size = chunk.mc_size << PAGESHIFT;
-				if (partmin != 0) {
-					bzerophyscc(chunk_addr, partmin);
-					chunk_addr += partmin;
-					chunk_size -= partmin;
-					partmin = 0;
-				}
-				if (src_bytes >= chunk_size) {
-					LOCAL_BUFFER_copy2phys(chunk_addr, src_offset, chunk_size);
-					src_bytes -= chunk_size;
-					src_offset += chunk_size;
-				} else {
-					if (src_bytes != 0) {
-						LOCAL_BUFFER_copy2phys(chunk_addr, src_offset, src_bytes);
-						chunk_addr += src_bytes;
-						chunk_size -= src_bytes;
+		/* If there is any unaligned block access to already-allocated
+		 * parts of the file, then we need a trunc lock to prevent the
+		 * file's size from being lowered beyond the area of the parts
+		 * which we need to load from disk. */
+		if (parthead_disk || parttail_disk)
+			mfile_trunclock_inc(self);
+		mfile_lock_end(self);
+		TRY {
+
+			/* Construct the new part. */
+			part = _mfile_newpart(self, newpart_minaddr,
+			                      (size_t)(newpart_maxaddr -
+			                               newpart_minaddr) +
+			                      1);
+
+			/* Initialize remaining fields. */
+			part->mp_refcnt = 3; /* +1: return:mfile_insert_and_merge_part_and_unlock,
+			                      * +1: MPART_F_CHANGED
+			                      * +1: MPART_F_GLOBAL_REF */
+			part->mp_xflags = MPART_XF_NORMAL;
+			part->mp_file   = incref(self);
+			LIST_INIT(&part->mp_copy);
+			LIST_INIT(&part->mp_share);
+			SLIST_INIT(&part->mp_lockops);
+			/*LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);*/ /* Initialized later... */
+			part->mp_minaddr = newpart_minaddr;
+			part->mp_maxaddr = newpart_maxaddr;
+			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
+			_mpart_init_asanon(part);
+			/* NOTE: Setting `MPART_F_CHANGED' here will cause `mfile_insert_and_merge_part_and_unlock()'
+			 *       to add  automatically  add  the  part  to  the  list  of  changed  parts  of  `self' */
+			part->mp_flags |= MPART_F_GLOBAL_REF | MPART_F_CHANGED;
+
+			TRY {
+				/* Make sure that the part has been allocated. Afterwards, copy the
+				 * caller-provided buffer into the correct offset within the  part.
+				 *
+				 * Note that since we're not holding any locks while doing this, we
+				 * don't even have to take any care of prefaulting and/or VIO. - We
+				 * can simply access memory directly! */
+				if (!MPART_ST_INCORE(part->mp_state))
+					mpart_ll_allocmem(part, mpart_getsize(part) >> PAGESHIFT);
+
+				if (parthead_disk || parttail_disk) {
+					/* Complicated case: have to load a portion of the new part from disk.
+					 * - Load partially written to block from disk
+					 * - bzero memory that is beyond the file's size and also isn't written to
+					 * - Copy memory from the user's buffer (ala~ LOCAL_BUFFER_copy2phys) */
+
+
+					/* Check for special case: the  write is so small that the entire
+					 *                         part needs to be pre-loaded from disk.
+					 * In  this case, head/tail  areas either touch  of overlap, and as
+					 * such can (read: need) to be loaded simultaneously. Without  this
+					 * special handling, the `mpart_ll_bzeromemcc()' of the normal case
+					 * below  would clear out the memory we painfully loaded from disk. */
+					if (parthead_base + parthead_disk >= parttail_base) {
+						size_t loadsize;
+						/* The leading/trailing blocks that need to be loaded from disk overlap. */
+						loadsize = (size_t)((parttail_base + parttail_disk) - parthead_base);
+						assert(mpart_getsize(part) >= loadsize);
+						mpart_ll_populate(part, parthead_base, loadsize);
+						/* Potentially have to bzero some remaining portion of the tail. */
+						if (parttail_size > parttail_disk) {
+							mpart_ll_bzeromemcc(part,
+							                    parthead_base + loadsize,
+							                    parttail_size - parttail_disk);
+						}
+					} else {
+						/* Need to load leading/trailing blocks. */
+						if (parthead_disk != 0)
+							mpart_ll_populate(part, parthead_base, parthead_disk);
+						if (parttail_disk != 0)
+							mpart_ll_populate(part, parttail_base, parttail_disk);
+						/* Must bzero any difference between disk load and actual allocation. */
+						if (parthead_size > parthead_disk)
+							mpart_ll_bzeromemcc(part, parthead_base + parthead_disk, parthead_size - parthead_disk);
+						if (parttail_size > parttail_disk)
+							mpart_ll_bzeromemcc(part, parttail_base + parttail_disk, parttail_size - parttail_disk);
 					}
-					bzerophyscc(chunk_addr, chunk_size);
+				} else {
+					/* No  unaligned part of  the file needs to  be loaded fro disk.
+					 * This can  happen when  doing an  unaligned write  beyond  the
+					 * previously allocated bounds of the  file, and can be  handled
+					 * must simpler since it doesn't require complicated calculation
+					 * of file blocks. (All unaligned data is just bzero'd)
+					 *
+					 * In this case we can also further optimize which regions we do
+					 * actually zero-fill, since we don't  have to worry about  file
+					 * alignments! */
+					mpart_reladdr_t content_end, parttail_end;
+					if (parthead_base < content_base)
+						mpart_ll_bzeromemcc(part, parthead_base, content_base - parthead_base);
+					content_end  = content_base + num_bytes;
+					parttail_end = parttail_base + parttail_size;
+					if (parttail_end > content_end)
+						mpart_ll_bzeromemcc(part, content_end, (size_t)(parttail_end - content_end));
+				}
+
+				/* Finally, write memory from the actual user-buffer into the part. */
+				if (part->mp_state == MPART_ST_MEM) {
+					physaddr_t dst = physpage2addr(part->mp_mem.mc_start);
+					LOCAL_BUFFER_copy2phys(dst + content_base, 0, num_bytes);
+				} else {
+					size_t i;
+					mpart_reladdr_t src_offset = 0;
+					size_t src_bytes = num_bytes;
+					size_t skip = content_base;
+					assert(part->mp_state == MPART_ST_MEM_SC);
+					/* Copy memory from the caller's buffer into the chunk-vector. */
+					for (i = 0;; ++i) {
+						struct mchunk chunk;
+						physaddr_t chunk_addr;
+						size_t chunk_size;
+						assert(i < part->mp_mem_sc.ms_c);
+						chunk      = part->mp_mem_sc.ms_v[i];
+						chunk_size = chunk.mc_size << PAGESHIFT;
+						if (skip >= chunk_size) {
+							skip -= chunk_size;
+							continue;
+						}
+						chunk_addr = physpage2addr(chunk.mc_start);
+						chunk_addr += skip;
+						chunk_size -= skip;
+						skip = 0;
+						if (src_bytes >= chunk_size) {
+							LOCAL_BUFFER_copy2phys(chunk_addr, src_offset, chunk_size);
+							src_bytes -= chunk_size;
+							src_offset += chunk_size;
+						} else {
+							LOCAL_BUFFER_copy2phys(chunk_addr, src_offset, src_bytes);
+							chunk_addr += src_bytes;
+							chunk_size -= src_bytes;
+							break;
+						}
+					}
+				}
+
+				/* Mark all blocks that we've wrote data to as changed. */
+				{
+					size_t blki;
+					for (blki = changed_minblk; blki <= changed_maxblk; ++blki)
+						mpart_setblockstate(part, blki, MPART_BLOCK_ST_CHNG);
+				}
+
+				/* Re-acquire a lock to the file, so we can insert the new mem-part. */
+				mfile_lock_write(self);
+			} EXCEPT {
+				LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+				mpart_destroy(part);
+				RETHROW();
+			}
+		} EXCEPT {
+			if (parthead_disk || parttail_disk)
+				mfile_trunclock_dec(self);
+			RETHROW();
+		}
+
+		/* If we haven't already done so above, acquire a trunc-lock. */
+		if (!parthead_disk && !parttail_disk)
+			mfile_trunclock_inc(self);
+
+		/* Make sure that the file hasn't become anonymous. */
+		if unlikely(mfile_isanon(self))
+			goto handle_part_insert_failure;
+
+		/* Make sure that the file's size can still be altered. */
+		if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
+			goto handle_part_insert_failure;
+
+		/* When  any portion of the new part  had to be zero-initialized, then we
+		 * have to ensure that in the mean time the file's size hasn't increased.
+		 *
+		 * Normally, an increase in file size that overlaps with our new  `part'
+		 * would mean that `mfile_insert_and_merge_part_and_unlock()' would fail
+		 * since there would now be another part which with our's overlaps.  But
+		 * this doesn't happen if said other part has already been unloaded.
+		 *
+		 * As  such, we have to manually check  if the file's size has increased,
+		 * though in the case  where it will increase  after we make this  check,
+		 * `mfile_insert_and_merge_part_and_unlock()' would fail due to the other
+		 * pre-existing part.
+		 *
+		 * Without this, it becomes possible to increase a file's size while doing
+		 * a simultaneous write to the file's size, at which point a small area of
+		 * the file might end up (wrongfully) zero-initialized. */
+		if ((parthead_size > parthead_disk) ||
+		    (parttail_size > parttail_disk)) {
+			pos_t new_filesize = (pos_t)atomic64_read(&self->mf_filesize);
+			if (new_filesize > filesize) {
+				pos_t first_bzero_pos;
+				first_bzero_pos = parthead_pos + parthead_disk;
+				if (parthead_size <= parthead_disk)
+					first_bzero_pos = parttail_pos + parttail_disk;
+				assert(first_bzero_pos >= filesize);
+				if (first_bzero_pos < new_filesize) {
+					/* One of our bzero positions is no longer out-of-bounds
+					 * -> We can't insert this  part as-is into the  file
+					 *    because doing so would lead to file corruption! */
+					goto handle_part_insert_failure;
 				}
 			}
-			partmin = (mpart_reladdr_t)(offset - mpart_getminaddr(part));
 		}
-		/* Mark all blocks that we've wrote data to as changed. */
-		minblk = (partmin) >> self->mf_blockshift;
-		maxblk = (partmin + num_bytes - 1) >> self->mf_blockshift;
-		assert(minblk <= maxblk);
-		for (blki = minblk; blki <= maxblk; ++blki)
-			mpart_setblockstate(part, blki, MPART_BLOCK_ST_CHNG);
-#undef LOCAL_BUFFER_copy2phys
-
-		/* Re-acquire a lock to the file, so we can insert the new mem-part. */
-		mfile_lock_write(self);
-	} EXCEPT {
-		LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
-		part->mp_refcnt = 0;
-		mpart_destroy(part);
-		RETHROW();
 	}
-
-	/* Make sure that the file hasn't become anonymous. */
-	if unlikely(mfile_isanon(self))
-		goto handle_part_insert_failure;
-
-	/* Make sure that the file's size can still be altered. */
-	if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
-		goto handle_part_insert_failure;
+#undef LOCAL_BUFFER_copy2phys
 
 	/* Try to insert the new part into the file, as
 	 * well as merge it with its neighboring parts. */
@@ -1074,18 +1235,16 @@ extend_failed:
 		uintptr_t changes;
 		pos_t newsize, oldsize;
 		REF struct mpart *inserted_part;
-		mfile_trunclock_inc(self);
 		inserted_part = mfile_insert_and_merge_part_and_unlock(self, part);
 		if unlikely(!inserted_part) {
 #ifndef LOCAL_BUFFER_IS_PHYS
 			mpart_reladdr_t partoff;
 #endif /* !LOCAL_BUFFER_IS_PHYS */
-			mfile_trunclock_dec(self);
 handle_part_insert_failure:
+			mfile_trunclock_dec(self);
 			mfile_lock_endwrite(self);
 			RAII_FINALLY {
 				LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
-				part->mp_refcnt = 0;
 				mpart_destroy(part);
 			};
 #ifdef LOCAL_BUFFER_IS_PHYS
@@ -1117,6 +1276,7 @@ handle_part_insert_failure:
 		 * nothing if the file's size had already been increased to somewhere
 		 * beyond that point. */
 		newsize = offset + num_bytes;
+		assert(newsize > filesize);
 		for (;;) {
 			oldsize = (pos_t)atomic64_cmpxch_val(&self->mf_filesize,
 			                                     (u64)filesize,

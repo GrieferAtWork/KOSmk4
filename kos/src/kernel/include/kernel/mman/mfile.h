@@ -506,7 +506,7 @@ struct mfile_ops {
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
-	 * @assume(addr + num_bytes <= self->mf_filesize);
+	 * @assume(addr + num_bytes <= mfile_addr_ceilalign(self, self->mf_filesize));
 	 * @assume(num_bytes != 0);
 	 * @assume(self->mf_trunclock != 0);
 	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job)
@@ -524,7 +524,7 @@ struct mfile_ops {
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
-	 * @assume(addr + num_bytes <= self->mf_filesize);
+	 * @assume(addr + num_bytes <= mfile_addr_ceilalign(self, self->mf_filesize));
 	 * @assume(num_bytes != 0);
 	 * @assume(self->mf_trunclock != 0);
 	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job)

@@ -23,10 +23,13 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/aio.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
+
+#include <hybrid/align.h>
 
 #include <kos/except.h>
 
@@ -187,6 +190,86 @@ NOTHROW(FCALL mpart_ll_ccfreemem)(struct mpart *__restrict self) {
 		kfree(self->mp_mem_sc.ms_v);
 	}
 }
+
+/* Low-level populate the given address range by loading it from disk.
+ * No bounds check is  done by this function,  and the caller must  be
+ * holding a trunc-lock to the file associated with `self'! */
+PUBLIC BLOCKING NONNULL((1)) void KCALL
+mpart_ll_populate(struct mpart *__restrict self,
+                  mpart_reladdr_t blockaligned_offset,
+                  size_t blockaligned_num_bytes) {
+	struct mfile *file = self->mp_file;
+	auto mo_loadblocks = file->mf_ops->mo_loadblocks;
+	struct aio_multihandle_generic hand;
+	pos_t fpos;
+	assert(IS_ALIGNED(blockaligned_offset, mfile_getblocksize(file)));
+	assert(IS_ALIGNED(blockaligned_num_bytes, mfile_getblocksize(file)));
+	assertf(blockaligned_num_bytes != 0, "Must be checked by the caller");
+	assert(blockaligned_offset + blockaligned_num_bytes <= mpart_getsize(self));
+	fpos = mpart_getminaddr(self) + blockaligned_offset;
+
+	/* Check for special case: `MAP_UNINITIALIZED' */
+	if unlikely(!mo_loadblocks)
+		return;
+
+	/* Setup AIO */
+	aio_multihandle_generic_init(&hand);
+	TRY {
+
+		/* Figure out how we need to do initialization. */
+		if (self->mp_state == MPART_ST_MEM) {
+			(*mo_loadblocks)(file, fpos,
+			                 physpage2addr(self->mp_mem.mc_start) +
+			                 blockaligned_offset,
+			                 blockaligned_num_bytes, &hand);
+		} else {
+			size_t i;
+			assert(self->mp_state == MPART_ST_MEM_SC);
+			for (i = 0;; ++i) {
+				struct mchunk chunk;
+				physaddr_t chunk_addr;
+				size_t chunk_size;
+				assert(i < self->mp_mem_sc.ms_c);
+				chunk      = self->mp_mem_sc.ms_v[i];
+				chunk_size = chunk.mc_size << PAGESHIFT;
+				if (blockaligned_offset >= chunk_size) {
+					blockaligned_offset -= chunk_size;
+					continue; /* Skip this chunk. */
+				}
+				chunk_addr = physpage2addr(chunk.mc_start);
+
+				/* Skip leading memory of this chunk. */
+				chunk_addr += blockaligned_offset;
+				chunk_size -= blockaligned_offset;
+				blockaligned_offset = 0;
+
+				/* Limit I/O based on the caller's request */
+				if (chunk_size > blockaligned_num_bytes)
+					chunk_size = blockaligned_num_bytes;
+
+				/* Actually do the I/O */
+				(*mo_loadblocks)(file, fpos, chunk_addr, chunk_size, &hand);
+
+				/* Check if we're all done */
+				if (chunk_size >= blockaligned_num_bytes)
+					break;
+
+				/* Update loop variables based on how much I/O was performed. */
+				blockaligned_num_bytes -= chunk_size;
+				fpos += chunk_size;
+			}
+		}
+		aio_multihandle_done(&hand);
+	} EXCEPT {
+		aio_multihandle_fail(&hand);
+	}
+
+	/* Wait for AIO completion. */
+	RAII_FINALLY { aio_multihandle_generic_fini(&hand); };
+	aio_multihandle_generic_waitfor(&hand);
+	aio_multihandle_generic_checkerror(&hand);
+}
+
 
 DECL_END
 

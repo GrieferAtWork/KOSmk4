@@ -274,6 +274,12 @@ again_memaddr:
 		 *       write  whole blocks without  having to load them
 		 *       first! */
 #ifdef LOCAL_WRITING
+		/* NOTE: `mpart_memaddr_for_write()' won't fail for the trailing block
+		 *       ~per se. Instead, it  will limit `physloc.mppl_size' to  stop
+		 *       just shy of the trailing block, but still return `true'.
+		 * That way, we will write however much we can, before looking  back
+		 * around, at which point the used-to-be trailing block has suddenly
+		 * become the leading block! */
 		physloc.mppl_size = 1;
 #endif /* LOCAL_WRITING */
 		mpart_memload_and_unlock(self, part_offs, &physloc, NULL);
