@@ -51,6 +51,12 @@ if (TARGET_ARCH in ["i386", "x86_64"]) {
 		SET_OUTPUT("/bin/leaks")
 		SOURCE({ "misc/leaks.S" })
 	END
+	BEGIN GROUP("apps.cc") { COMPILE, LINK, MCOPY };
+		SET_NOSTDLIB()
+		SET_LANGUAGE("assembler-with-cpp")
+		SET_OUTPUT("/bin/cc")
+		SOURCE({ "misc/cc.S" })
+	END
 }
 
 
