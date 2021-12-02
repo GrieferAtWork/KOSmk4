@@ -385,7 +385,7 @@ DEFINE_SYSCALL3(errno_t, msync,
 /************************************************************************/
 /* mincore()                                                            */
 /************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_MSYNC
+#ifdef __ARCH_WANT_SYSCALL_MINCORE
 DEFINE_SYSCALL3(errno_t, mincore,
                 USER UNCHECKED void *, addr, size_t, len,
                 USER UNCHECKED uint8_t *, vec) {
@@ -527,7 +527,7 @@ copyinfo_and_continue:
 	return EOK;
 #undef MPART_BLOCK_ST_MINCORE
 }
-#endif /* __ARCH_WANT_SYSCALL_MSYNC */
+#endif /* __ARCH_WANT_SYSCALL_MINCORE */
 
 /* TODO: errno_t sys_remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
 /* TODO: errno_t sys_madvise(void *addr, size_t len, syscall_ulong_t advice); */
