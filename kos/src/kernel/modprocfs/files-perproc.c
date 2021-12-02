@@ -1087,7 +1087,7 @@ print_mounting_point(struct path *__restrict fsroot,
                      struct pathmount *__restrict self,
                      pformatprinter printer, void *arg) {
 	char flagsbuf[128], *writer;
-	struct fsuper *super = self->p_dir->fn_super;
+	struct fsuper *super = path_getsuper(self);
 	uintptr_t flags;
 
 	/* Name of the mounted device, or filename system. */

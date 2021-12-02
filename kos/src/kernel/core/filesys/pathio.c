@@ -956,7 +956,7 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
 
 	/* Check for E_FSERROR_CROSS_DEVICE_LINK */
 	assert(info->frn_olddir->fn_super == info->frn_file->fn_super);
-	if unlikely(newpath->p_dir->fn_super != info->frn_olddir->fn_super)
+	if unlikely(path_getsuper(newpath) != info->frn_olddir->fn_super)
 		THROW(E_FSERROR_CROSS_DEVICE_LINK);
 
 	/* Check for E_FSERROR_DIRECTORY_MOVE_TO_CHILD. For this purpose,
@@ -1346,7 +1346,7 @@ NOTHROW(FCALL path_subtree_mounts_superblock)(struct path *self,
 	if (self == stop)
 		return PATH_SUBTREE_MOUNTS_SUPERBLOCK_STOP;
 	if (path_ismount(self)) {
-		if (self->p_dir->fn_super == super)
+		if (path_getsuper(self) == super)
 			return PATH_SUBTREE_MOUNTS_SUPERBLOCK_YES;
 	}
 	if (self->p_cldlist != PATH_CLDLIST_DELETED) {
@@ -1372,7 +1372,7 @@ NOTHROW(FCALL path_subtree_unlock_supermounts)(struct path *self, struct path *r
 	if (self == stop)
 		return false;
 	if (path_ismount(self)) {
-		struct fsuper *super = self->p_dir->fn_super;
+		struct fsuper *super = path_getsuper(self);
 		if (super != keep_locked) {
 			/* Make sure that `super' hasn't already been unlocked. */
 			if (path_subtree_mounts_superblock(root, super, self) != PATH_SUBTREE_MOUNTS_SUPERBLOCK_YES)
@@ -1404,7 +1404,7 @@ NOTHROW(FCALL path_subtree_trylock_supermounts)(struct path *self,
                                                 struct path *root,
                                                 struct fsuper *already_locked) {
 	if (path_ismount(self)) {
-		struct fsuper *super = self->p_dir->fn_super;
+		struct fsuper *super = path_getsuper(self);
 		if (!fsuper_mounts_trywrite(super)) {
 			/* Aside from an outside actor holding the lock (for which we need
 			 * to let our caller block), there's  also the case or our  caller
@@ -1460,7 +1460,7 @@ NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self,
 		}
 		if (!(umount_flags & MNT_DETACH) && likely(LIST_ISBOUND(me, pm_fsmount))) {
 			/* Immediately unlink from the superblock. */
-			struct fsuper *super = me->p_dir->fn_super;
+			struct fsuper *super = path_getsuper(me);
 			assert(fsuper_mounts_writing(super));
 			LIST_UNBIND(me, pm_fsmount);
 			if (LIST_EMPTY(&super->fs_mounts)) {

@@ -591,7 +591,7 @@ sys_linkat_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
 		FINALLY_DECREF_UNLIKELY(mkinfo.mkf_hrdlnk.hl_node);
 		if (fnode_isdir(mkinfo.mkf_hrdlnk.hl_node))
 			THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_LINK);
-		if (mkinfo.mkf_hrdlnk.hl_node->fn_super != pathname_path->p_dir->fn_super)
+		if (mkinfo.mkf_hrdlnk.hl_node->fn_super != path_getsuper(pathname_path))
 			THROW(E_FSERROR_CROSS_DEVICE_LINK);
 
 		/* Create the new hard-link. */
@@ -727,7 +727,7 @@ sys_umount2_impl(fd_t dirfd, USER UNCHECKED char const *target,
 		require(CAP_MOUNT);
 
 		/* Force a sync before doing the unmount. (Don't unload in inconsistent state) */
-		fsuper_sync(unmount_me->p_dir->fn_super);
+		fsuper_sync(path_getsuper(unmount_me));
 
 		/* Do the unmount. */
 		path_umount(path_asmount(unmount_me), flags);
@@ -880,7 +880,7 @@ sys_mount_impl(USER UNCHECKED char const *source,
 			THROW(E_FSERROR_NOT_A_MOUNTING_POINT);
 		/* Require mounting rights. */
 		require(CAP_MOUNT);
-		super = target_path->p_dir->fn_super;
+		super = path_getsuper(target_path);
 		super_set_mount_flags(super, mountflags);
 	} else {
 		/* Regular, old mount() */

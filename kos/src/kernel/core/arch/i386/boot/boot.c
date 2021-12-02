@@ -942,8 +942,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    doing `system_cc()', /proc/kos/raminfo still shows ~6MiB used for  file
 	 *    mappings, which is probably caused by shared memory from busybox+libc. */
 
-	/* TODO: Make it so that `struct pathmount::pm_fsmount' is allowed to be unbound */
-
 	return state;
 }
 
