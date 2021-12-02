@@ -162,6 +162,15 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		}
 		break;
 
+	case FILE_IOC_BLKSHIFT: {
+		/* Query ioctl for buffer requirements of `O_DIRECT' */
+		validate_writable(arg, sizeof(shift_t[2]));
+		COMPILER_WRITE_BARRIER();
+		((USER CHECKED shift_t *)arg)[0] = self->mf_blockshift;
+		((USER CHECKED shift_t *)arg)[1] = self->mf_iobashift;
+		return 0;
+	}	break;
+
 	case FILE_IOC_TAILREAD: {
 		pos_t offset;
 		size_t num_bytes;

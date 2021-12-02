@@ -735,10 +735,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       prepare for  fs-specific  truncation,  do  `mfile_truncate',  do  the  fs-
 	 *       specific truncation, then release locks. */
 
-	/* TODO: What our mfiles implement as `mo_loadblocks' / `mo_saveblocks', linux
-	 *       also supports via the `O_DIRECT' flag. As such, we should add support
-	 *       for that flag! */
-
 	/* TODO: The devfs root directory rename() operator should really be  re-written
 	 *       from scratch (and the ramfs one should be, too). Both don't really work
 	 *       correctly  with all of  the special AT_RENAME_*  flags, since they were
@@ -846,29 +842,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * as a /dev/zero mapping will just give you another anonymous (and totally
 	 * unrelated) mapping. */
 
-	/* TODO: Many mo_loadblocks operators use bzerophyscc() to clear zero-memory.
-	 *       This works well  enough if  the caller-given memory  range was  just
-	 *       allocated  (as it  always is when  used for the  intended purpose of
-	 *       initializing unified I/O buffers, at which point the physical memory
-	 *       allocator's notion of zero-pages is still correct)
-	 * However: when the buffer originates from somewhere else, such as the kernel
-	 *          stack  (as is done in `blkdev_repart()' and by the various drivers
-	 *          opening  superblocks),  then physical  memory has  most definitely
-	 *          been modified such that whatever page_iszero() might say would  no
-	 *          longer be correct.
-	 * Solution:
-	 *  - After allocating a  new kernel stack,  explicitly clear the  page_iszero()
-	 *    bits for all of the backing physical memory pages. This way, kernel  stack
-	 *    buffers can always safely be passed to `mo_loadblocks' since page_iszero()
-	 *    will unconditionally return `false' for all of them.
-	 *  - Document the fact that `mo_loadblocks' is allowed to query  page_iszero()
-	 *    within the operator's documentation, as well as all of the wrapper macros
-	 *    relating to direct-IO (including those for the fast-pass in `fsuper')
-	 *  - When implementing O_DIRECT  for user-space, we  must manually clear  the
-	 *    `page_iszero()' bits for all buffer pages before passing along the user-
-	 *    provided buffer to the operator.
-	 */
-
 	/* TODO: We can emulate banked video memory as linear by using a
 	 *       custom mfile that maps overrides a new operator  that's
 	 *       yet to  be added  but will  behave similar  to what  is
@@ -926,11 +899,59 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       sub-class  type IDs can easily be used to test for parent classes, given a precise child
 	 *       class ID; e.g. `HANDLE_TYPEKIND_MFILE_ISNODE(x)' checks for FNODE and all fnode-subs. */
 
+	/* TODO: What our mfiles implement as `mo_loadblocks' / `mo_saveblocks', linux
+	 *       also supports via the `O_DIRECT' flag. As such, we should add support
+	 *       for that flag! */
+
+	/* TODO: Many mo_loadblocks operators use bzerophyscc() to clear zero-memory.
+	 *       This works well  enough if  the caller-given memory  range was  just
+	 *       allocated  (as it  always is when  used for the  intended purpose of
+	 *       initializing unified I/O buffers, at which point the physical memory
+	 *       allocator's notion of zero-pages is still correct)
+	 * However: when the buffer originates from somewhere else, such as the kernel
+	 *          stack  (as is done in `blkdev_repart()' and by the various drivers
+	 *          opening  superblocks),  then physical  memory has  most definitely
+	 *          been modified such that whatever page_iszero() might say would  no
+	 *          longer be correct.
+	 * Solution:
+	 *  - After allocating a  new kernel stack,  explicitly clear the  page_iszero()
+	 *    bits for all of the backing physical memory pages. This way, kernel  stack
+	 *    buffers can always safely be passed to `mo_loadblocks' since page_iszero()
+	 *    will unconditionally return `false' for all of them.
+	 *  - Document the fact that `mo_loadblocks' is allowed to query  page_iszero()
+	 *    within the operator's documentation, as well as all of the wrapper macros
+	 *    relating to direct-IO (including those for the fast-pass in `fsuper')
+	 *  - When implementing O_DIRECT  for user-space, we  must manually clear  the
+	 *    `page_iszero()' bits for all buffer pages before passing along the user-
+	 *    provided buffer to the operator.
+	 */
+
 	/* TODO: There's a missing incref() relating to mktty.
 	 * Replicate bug:
 	 *  - Repeatedly press CTRL+D on the busybox prompt
 	 *  - After a couple of restarts, the kernel will panic because /dev/console got destroyed
 	 * Only logical conclusion: there's a missing incref() somewhere. */
+
+	/* TODO: The total # of mem-parts mapped by mman_kernel increases them more programs
+	 *       have been executed. - Something doesn't feel right here, and I suspect that
+	 *       somewhere memory isn't being unmapped when it should be.
+	 * Reproduce:
+	 * $ watch -n 0.1 cat /proc/kos/raminfo
+	 *
+	 * Over time, "free" ram slowly goes down, but leaks(1) doesn't report anything, so
+	 * either whatever stays being is  globally reachable, or (most likely),  something
+	 * isn't being unmapped when it should.
+	 *
+	 * XXX: Expand kmalloc_leaks() to keep track of mnodes of the mman_kernel that are
+	 *      reachable via pointers into the associated mapping (only if such a pointer
+	 *      isn't already reachable as a trace node)
+	 *
+	 * After the big 'ol scan for memory leaks, go through all reached slabs, coreheap,
+	 * and trace  nodes  and mark  the  pointed-to  kernel mman  mnodes  as  reachable.
+	 *
+	 * Afterwards, any kernel mman mnode that isn't marked as reachable (and doesn't
+	 * fall  under special categories, such as reserved mappings), may be considered
+	 * a memory leak in regards to someone having forgotten to unmap it. */
 
 	return state;
 }

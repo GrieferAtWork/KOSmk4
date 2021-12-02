@@ -51,6 +51,13 @@
 #define FILE_IOC_HASRAWIO  _IOR_KOS('F', 0x01, int)                  /* Check if the file supports "raw io" (s.a. `mfile_hasrawio()') */
 #define FILE_IOC_DCHANGED  _IOR_KOS('F', 0x02, int)                  /* Check if data of the file has changed (s.a. `fdatasync(2)', `mfile_haschanged()') */
 #define FILE_IOC_CHANGED   _IOR_KOS('F', 0x03, int)                  /* Check if attributes or data have changed (s.a. `fsync(2)', `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED') */
+#define FILE_IOC_BLKSHIFT  _IOR_KOS('F', 0x04, __SHIFT_TYPE__[2])    /* Return an integer pair { block_shift, ioba_shift }, where
+                                                                      *  - `block_shift' is `log2(FILE_IOC_BLOCKSIZE)'            (s.a. `struct mfile::mf_blockshift')
+                                                                      *  - `ioba_shift' is `log2(ALIGNMENT_NEEDED_FOR_O_DIRECT)'  (s.a. `struct mfile::mf_iobashift')
+                                                                      * You may assume that `ioba_shift <= block_shift'
+                                                                      * This ioctl is meant to be used to query buffer requirements for  `O_DIRECT',
+                                                                      * which requires file offsets be aligned by `1 << block_shift', and I/O buffer
+                                                                      * pointers to be aligned by `1 << ioba_shift' (IOBaseAddress_SHIFT). */
 #define FILE_IOC_TAILREAD _IOWR_KOS('F', 0x20, struct file_tailread) /* Tail read (see below) */
 
 
