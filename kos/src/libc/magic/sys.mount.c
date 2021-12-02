@@ -45,6 +45,9 @@
 
 
 
+/************************************************************************/
+/* A couple of ioctl(2) commands relating to block devices              */
+/************************************************************************/
 #if !defined(BLKROSET) && defined(__BLKROSET)
 #define BLKROSET     __BLKROSET     /* [int const *arg] Set device read-only (0 = read-write) */
 #endif /* !BLKROSET && __BLKROSET */
@@ -90,92 +93,162 @@
 #if !defined(BLKGETSIZE64) && defined(__BLKGETSIZE64)
 #define BLKGETSIZE64 __BLKGETSIZE64 /* [u64 *arg] return device size in bytes */
 #endif /* !BLKGETSIZE64 && __BLKGETSIZE64 */
+/************************************************************************/
 
+
+
+
+/************************************************************************/
+/* ??? Block size ??? (don't use; I have no idea what this references)  */
+/************************************************************************/
 #if !defined(BLOCK_SIZE) && defined(__BLOCK_SIZE)
 #define BLOCK_SIZE      __BLOCK_SIZE      /* ... */
 #endif /* !BLOCK_SIZE && __BLOCK_SIZE */
 #if !defined(BLOCK_SIZE_BITS) && defined(__BLOCK_SIZE_BITS)
 #define BLOCK_SIZE_BITS __BLOCK_SIZE_BITS /* ... */
 #endif /* !BLOCK_SIZE_BITS && __BLOCK_SIZE_BITS */
+/************************************************************************/
 
+
+
+
+/************************************************************************/
+/* Flags for `mount(2)'                                                 */
+/************************************************************************/
+
+/* Disallow `write(2)',  as  well  as  `PROT_WRITE | PROT_SHARED'  mappings.
+ * Attempting to do either will result in `E_FSERROR_READONLY' being thrown. */
 #if !defined(MS_RDONLY) && defined(__MS_RDONLY)
-#define MS_RDONLY      __MS_RDONLY      /* ??? */
+#define MS_RDONLY      __MS_RDONLY
 #endif /* !MS_RDONLY && __MS_RDONLY */
+
+/* Ignore `S_ISGID' and `S_ISUID' bits */
 #if !defined(MS_NOSUID) && defined(__MS_NOSUID)
-#define MS_NOSUID      __MS_NOSUID      /* ??? */
+#define MS_NOSUID      __MS_NOSUID
 #endif /* !MS_NOSUID && __MS_NOSUID */
+
+/* ??? */
 #if !defined(MS_NODEV) && defined(__MS_NODEV)
-#define MS_NODEV       __MS_NODEV       /* ??? */
+#define MS_NODEV       __MS_NODEV
 #endif /* !MS_NODEV && __MS_NODEV */
+
+/* Disallow execution of files. */
 #if !defined(MS_NOEXEC) && defined(__MS_NOEXEC)
-#define MS_NOEXEC      __MS_NOEXEC      /* ??? */
+#define MS_NOEXEC      __MS_NOEXEC
 #endif /* !MS_NOEXEC && __MS_NOEXEC */
+
+/* ??? */
 #if !defined(MS_SYNCHRONOUS) && defined(__MS_SYNCHRONOUS)
-#define MS_SYNCHRONOUS __MS_SYNCHRONOUS /* ??? */
+#define MS_SYNCHRONOUS __MS_SYNCHRONOUS
 #endif /* !MS_SYNCHRONOUS && __MS_SYNCHRONOUS */
+
+/* ACTION: Modify mounting point flags */
 #if !defined(MS_REMOUNT) && defined(__MS_REMOUNT)
-#define MS_REMOUNT     __MS_REMOUNT     /* ??? */
+#define MS_REMOUNT     __MS_REMOUNT
 #endif /* !MS_REMOUNT && __MS_REMOUNT */
+
+/* ??? */
 #if !defined(MS_MANDLOCK) && defined(__MS_MANDLOCK)
-#define MS_MANDLOCK    __MS_MANDLOCK    /* ??? */
+#define MS_MANDLOCK    __MS_MANDLOCK
 #endif /* !MS_MANDLOCK && __MS_MANDLOCK */
+
+/* ??? */
 #if !defined(MS_DIRSYNC) && defined(__MS_DIRSYNC)
-#define MS_DIRSYNC     __MS_DIRSYNC     /* ??? */
+#define MS_DIRSYNC     __MS_DIRSYNC
 #endif /* !MS_DIRSYNC && __MS_DIRSYNC */
+
+/* Don't modify the value of `ATIME' (implies `MS_NODIRATIME') */
 #if !defined(MS_NOATIME) && defined(__MS_NOATIME)
-#define MS_NOATIME     __MS_NOATIME     /* ??? */
+#define MS_NOATIME     __MS_NOATIME
 #endif /* !MS_NOATIME && __MS_NOATIME */
+
+/* Don't update `ATIME' during path traversal */
 #if !defined(MS_NODIRATIME) && defined(__MS_NODIRATIME)
-#define MS_NODIRATIME  __MS_NODIRATIME  /* ??? */
+#define MS_NODIRATIME  __MS_NODIRATIME
 #endif /* !MS_NODIRATIME && __MS_NODIRATIME */
+
+/* ACTION: Bind fdirnode at `source' to `target' (MS_REMOUNT: override mounting point at target) */
 #if !defined(MS_BIND) && defined(__MS_BIND)
-#define MS_BIND        __MS_BIND        /* ??? */
+#define MS_BIND        __MS_BIND
 #endif /* !MS_BIND && __MS_BIND */
+
+/* ACTION: Move a mounting point from `source' to `target' (MS_REMOUNT: override mounting point at target) */
 #if !defined(MS_MOVE) && defined(__MS_MOVE)
-#define MS_MOVE        __MS_MOVE        /* ??? */
+#define MS_MOVE        __MS_MOVE
 #endif /* !MS_MOVE && __MS_MOVE */
+
+/* ??? */
 #if !defined(MS_REC) && defined(__MS_REC)
-#define MS_REC         __MS_REC         /* ??? */
+#define MS_REC         __MS_REC
 #endif /* !MS_REC && __MS_REC */
+
+/* ??? */
 #if !defined(MS_SILENT) && defined(__MS_SILENT)
-#define MS_SILENT      __MS_SILENT      /* ??? */
+#define MS_SILENT      __MS_SILENT
 #endif /* !MS_SILENT && __MS_SILENT */
+
+/* ??? */
 #if !defined(MS_POSIXACL) && defined(__MS_POSIXACL)
-#define MS_POSIXACL    __MS_POSIXACL    /* ??? */
+#define MS_POSIXACL    __MS_POSIXACL
 #endif /* !MS_POSIXACL && __MS_POSIXACL */
+
+/* ??? */
 #if !defined(MS_UNBINDABLE) && defined(__MS_UNBINDABLE)
-#define MS_UNBINDABLE  __MS_UNBINDABLE  /* ??? */
+#define MS_UNBINDABLE  __MS_UNBINDABLE
 #endif /* !MS_UNBINDABLE && __MS_UNBINDABLE */
+
+/* ??? */
 #if !defined(MS_PRIVATE) && defined(__MS_PRIVATE)
-#define MS_PRIVATE     __MS_PRIVATE     /* ??? */
+#define MS_PRIVATE     __MS_PRIVATE
 #endif /* !MS_PRIVATE && __MS_PRIVATE */
+
+/* ??? */
 #if !defined(MS_SLAVE) && defined(__MS_SLAVE)
-#define MS_SLAVE       __MS_SLAVE       /* ??? */
+#define MS_SLAVE       __MS_SLAVE
 #endif /* !MS_SLAVE && __MS_SLAVE */
+
+/* ??? */
 #if !defined(MS_SHARED) && defined(__MS_SHARED)
-#define MS_SHARED      __MS_SHARED      /* ??? */
+#define MS_SHARED      __MS_SHARED
 #endif /* !MS_SHARED && __MS_SHARED */
+
+/* Only relevant when `MS_NOATIME' isn't set: the last-accessed timestamp is only changed to the
+ * current realtime() when `OLD(ATIME) < MTIME'.  As such, ATIME can  only be used to  determine
+ * accessed-after-last-modified when this flag has been set. */
 #if !defined(MS_RELATIME) && defined(__MS_RELATIME)
-#define MS_RELATIME    __MS_RELATIME    /* ??? */
+#define MS_RELATIME    __MS_RELATIME
 #endif /* !MS_RELATIME && __MS_RELATIME */
+
+/* ??? */
 #if !defined(MS_KERNMOUNT) && defined(__MS_KERNMOUNT)
-#define MS_KERNMOUNT   __MS_KERNMOUNT   /* ??? */
+#define MS_KERNMOUNT   __MS_KERNMOUNT
 #endif /* !MS_KERNMOUNT && __MS_KERNMOUNT */
+
+/* ??? */
 #if !defined(MS_I_VERSION) && defined(__MS_I_VERSION)
-#define MS_I_VERSION   __MS_I_VERSION   /* ??? */
+#define MS_I_VERSION   __MS_I_VERSION
 #endif /* !MS_I_VERSION && __MS_I_VERSION */
+
+/* ??? */
 #if !defined(MS_STRICTATIME) && defined(__MS_STRICTATIME)
-#define MS_STRICTATIME __MS_STRICTATIME /* ??? */
+#define MS_STRICTATIME __MS_STRICTATIME
 #endif /* !MS_STRICTATIME && __MS_STRICTATIME */
+
+/* ??? */
 #if !defined(MS_LAZYTIME) && defined(__MS_LAZYTIME)
-#define MS_LAZYTIME    __MS_LAZYTIME    /* ??? */
+#define MS_LAZYTIME    __MS_LAZYTIME
 #endif /* !MS_LAZYTIME && __MS_LAZYTIME */
+
+/* ??? */
 #if !defined(MS_ACTIVE) && defined(__MS_ACTIVE)
-#define MS_ACTIVE      __MS_ACTIVE      /* ??? */
+#define MS_ACTIVE      __MS_ACTIVE
 #endif /* !MS_ACTIVE && __MS_ACTIVE */
+
+/* ??? */
 #if !defined(MS_NOUSER) && defined(__MS_NOUSER)
-#define MS_NOUSER      __MS_NOUSER      /* ??? */
+#define MS_NOUSER      __MS_NOUSER
 #endif /* !MS_NOUSER && __MS_NOUSER */
+/************************************************************************/
 
 /* Flags that can be changed when combined with `MS_REMOUNT' */
 #if !defined(MS_RMT_MASK) && defined(__MS_RMT_MASK)
@@ -190,19 +263,33 @@
 #define MS_MGC_MSK __MS_MGC_MSK /* Magic flag mask. */
 #endif /* !MS_MGC_MSK && __MS_MGC_MSK */
 
-/* Flags for `umount2(2)' */
+
+
+
+/************************************************************************/
+/* Flags for `umount2(2)'                                               */
+/************************************************************************/
+
+/* Force unmount. */
 #if !defined(MNT_FORCE) && defined(__MNT_FORCE)
-#define MNT_FORCE       __MNT_FORCE       /* Force unmount. */
+#define MNT_FORCE       __MNT_FORCE
 #endif /* !MNT_FORCE && __MNT_FORCE */
+
+/* Only detach from the file-tree. (Umount happens once no more path-references exist) */
 #if !defined(MNT_DETACH) && defined(__MNT_DETACH)
-#define MNT_DETACH      __MNT_DETACH      /* Only detach from the file-tree. */
+#define MNT_DETACH      __MNT_DETACH
 #endif /* !MNT_DETACH && __MNT_DETACH */
+
+/* Mark mounting point as expired. */
 #if !defined(MNT_EXPIRE) && defined(__MNT_EXPIRE)
-#define MNT_EXPIRE      __MNT_EXPIRE      /* Mark mounting point as expired. */
+#define MNT_EXPIRE      __MNT_EXPIRE
 #endif /* !MNT_EXPIRE && __MNT_EXPIRE */
+
+/* Don't follow symbolic links. */
 #if !defined(UMOUNT_NOFOLLOW) && defined(__UMOUNT_NOFOLLOW)
-#define UMOUNT_NOFOLLOW __UMOUNT_NOFOLLOW /* Don't follow symbolic links. */
+#define UMOUNT_NOFOLLOW __UMOUNT_NOFOLLOW
 #endif /* !UMOUNT_NOFOLLOW && __UMOUNT_NOFOLLOW */
+/************************************************************************/
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -210,6 +297,7 @@ __SYSDECL_BEGIN
 }
 
 
+@@>> mount(2)
 @@@param: mountflags: Set of `MS_*' from <sys/mount.h>
 [[cp, decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__mount", "__libc_mount")]]
@@ -217,12 +305,14 @@ int mount([[nullable]] char const *special_file, [[nullable]] char const *dir,
           [[nullable]] char const *fstype, $ulongptr_t mountflags,
           [[nullable]] void const *data);
 
+@@>> umount(2)
 [[cp, userimpl, requires_function(umount2)]]
 [[export_alias("__umount", "__libc_umount")]]
 int umount([[nullable]] char const *special_file) {
 	return umount2(special_file, 0);
 }
 
+@@>> umount2(2)
 @@@param: flags: Set of `MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW'
 [[cp, decl_include("<features.h>")]]
 int umount2([[nullable]] char const *special_file,

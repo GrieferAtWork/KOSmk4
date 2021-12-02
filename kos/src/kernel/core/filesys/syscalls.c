@@ -845,8 +845,10 @@ sys_mount_impl(USER UNCHECKED char const *source,
 			      E_INVALID_ARGUMENT_CONTEXT_UMOUNT2_FLAGS,
 			      mountflags, ~(MS_REC | MS_REMOUNT), MS_BIND);
 		}
-		if (mountflags & MS_REC)
-			THROW(E_NOT_IMPLEMENTED_TODO, "Recursively bind all mounting points from `src'");
+		if (mountflags & MS_REC) {
+			/* Recursively bind all mounting points from `source' */
+			THROW(E_NOT_IMPLEMENTED_TODO);
+		}
 		validate_readable(source, 1);
 		node = path_traversefull(AT_FDCWD, source, atflags);
 		FINALLY_DECREF_UNLIKELY(node);

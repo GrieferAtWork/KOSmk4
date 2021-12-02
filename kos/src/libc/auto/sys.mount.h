@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ecf57cc */
+/* HASH CRC-32:0x43447e0d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,13 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @param: mountflags: Set of `MS_*' from <sys/mount.h> */
+/* >> mount(2)
+ * @param: mountflags: Set of `MS_*' from <sys/mount.h> */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_mount)(char const *special_file, char const *dir, char const *fstype, ulongptr_t mountflags, void const *data);
+/* >> umount(2) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_umount)(char const *special_file);
-/* @param: flags: Set of `MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW' */
+/* >> umount2(2)
+ * @param: flags: Set of `MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW' */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_umount2)(char const *special_file, __STDC_INT_AS_UINT_T flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
