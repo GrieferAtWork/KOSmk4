@@ -1421,10 +1421,12 @@ unsharecow_lock_unique_mmans_or_unlock(struct mpart *__restrict part,
 		mm = node->mn_mman;
 		if (wasdestroyed(mm))
 			continue;
+
 		/* Check if we've already seen this mman */
 		if (mnode_list_contains_mman_until(LIST_FIRST(&part->mp_copy),
 		                                   node, mm, minaddr, maxaddr))
 			continue;
+
 		if (!mman_lock_tryacquire(mm)) {
 			/* Found one that can't be locked immediately.
 			 * -> Unlock all others and drop already-gathered references. */
