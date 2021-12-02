@@ -973,11 +973,69 @@ print_size_with_unit_and_percent(pformatprinter printer, void *arg,
 		return result;
 	usage_percent = 0;
 	if (total != 0)
-		usage_percent = (unsigned int)(((u64)count * 100 * 100000) / total);
+		usage_percent = (unsigned int)(((u64)count * 100 * 100) / total);
 	/* Print usage percent */
-	return printf("\t(%u.%.5u%%)",
-	              usage_percent / 100000,
-	              usage_percent % 100000);
+	return printf("\t(%u.%.2u%%)",
+	              usage_percent / 100,
+	              usage_percent % 100);
+}
+
+struct mpart_ram_usage {
+	uint64_t mru_ram;     /* Total # of bytes associated with INCORE mem-parts. */
+	uint64_t mru_locked;  /* Total # of bytes associated with LOCKED mem-parts. */
+	uint64_t mru_file;    /* Sum of INCORE parts that aren't anonymous. */
+	uint64_t mru_kernel;  /* Sum of INCORE parts that are exclusively mapped by the kernel. */
+	uint64_t mru_private; /* Sum of INCORE parts that are are anonymous and mapped (and don't appear in `mru_kernel') */
+	uint64_t mru_shared;  /* Sum of INCORE parts that are aren't anonymous and mapped (and don't appear in `mru_kernel') */
+};
+
+PRIVATE NONNULL((1)) void KCALL
+gather_mpart_ramusage(struct mpart_ram_usage *__restrict info) {
+	struct mpart *iter;
+again:
+	memset(info, 0, sizeof(*info));
+	mpart_all_acquire();
+	LIST_FOREACH (iter, &mpart_all_list, mp_allparts) {
+		if (!tryincref(iter))
+			continue; /* Skip */
+		if (!mpart_lock_tryacquire(iter)) {
+			mpart_all_release();
+			FINALLY_DECREF_UNLIKELY(iter);
+			mpart_lock_waitfor(iter);
+			goto again;
+		}
+		if (MPART_ST_INCORE(iter->mp_state)) {
+			struct mnode *exclusive_node;
+			size_t partsize = mpart_getsize(iter);
+			info->mru_ram += partsize;
+			if (iter->mp_flags & MPART_F_MLOCK)
+				info->mru_locked += partsize;
+			if (!mpart_isanon(iter))
+				info->mru_file += partsize;
+			exclusive_node = LIST_FIRST(&iter->mp_copy);
+			if (!LIST_EMPTY(&iter->mp_share)) {
+				if (exclusive_node)
+					exclusive_node = NULL;
+				else {
+					exclusive_node = LIST_FIRST(&iter->mp_share);
+				}
+			}
+			if (exclusive_node && LIST_NEXT(exclusive_node, mn_link) != NULL)
+				exclusive_node = NULL;
+			if (exclusive_node && exclusive_node->mn_mman == &mman_kernel) {
+				info->mru_kernel += partsize;
+			} else if (!LIST_EMPTY(&iter->mp_share) || !LIST_EMPTY(&iter->mp_copy)) {
+				if (mpart_isanon(iter)) {
+					info->mru_private += partsize;
+				} else {
+					info->mru_shared += partsize;
+				}
+			}
+		}
+		mpart_lock_release(iter);
+		decref_unlikely(iter);
+	}
+	mpart_all_release();
 }
 
 INTERN NONNULL((1)) void KCALL
@@ -993,9 +1051,11 @@ procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
 	uint64_t ram_total_usable;
 	uint64_t ram_total_kernel;
 	uint64_t ram_total_unusable;
+	struct mpart_ram_usage part_usage;
 
 	/* Load memory usage stats. */
 	page_stat(&dynmem_st);
+	gather_mpart_ramusage(&part_usage);
 	for (i = 0; i < sizeof(dynmem_usage) / sizeof(size_t); ++i)
 		((size_t *)&dynmem_usage)[i] = ATOMIC_READ(((size_t *)&page_usage)[i]);
 	dynmem_total_reasons = 0;
@@ -1032,46 +1092,34 @@ procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
 	}
 	ram_total = ram_total_usable + ram_total_kernel + ram_total_unusable;
 
-	PRINT("ram:\t");
+#define PAGES(n) ((uint64_t)(n) * PAGESIZE)
+#define print_stat(name, value, total)                                    \
+	PRINT("\n" name);                                                     \
+	if (print_size_with_unit_and_percent(printer, arg, value, total) < 0) \
+		return
+	PRINT     ("ram:             ");
 	if (print_size_with_unit(printer, arg, ram_total) < 0)
 		return;
-	PRINT("\n\tkernel:\t");
-	if (print_size_with_unit_and_percent(printer, arg, ram_total_kernel, ram_total) < 0)
-		return;
-	PRINT("\n\tusable:\t");
-	if (print_size_with_unit_and_percent(printer, arg, ram_total_usable, ram_total) < 0)
-		return;
+	print_stat("  kernel:        ", ram_total_kernel, ram_total);
+	print_stat("  usable:        ", ram_total_usable, ram_total);
 	if (ram_total_unusable) {
-		PRINT("\n\tunusable:\t");
-		if (print_size_with_unit_and_percent(printer, arg, ram_total_unusable, ram_total) < 0)
-			return;
+	print_stat("  unusable:      ", ram_total_unusable, ram_total);
 	}
-	PRINT("\ndynmem:\t");
-	if (print_size_with_unit_and_percent(printer, arg, dynmem_total, ram_total) < 0)
-		return;
-#define PAGES(n) ((uint64_t)(n) * PAGESIZE)
-	PRINT("\n\tfree:\t");
-	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_st.ps_free), dynmem_total) < 0)
-		return;
-	PRINT("\n\t\tzero:\t");
-	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_st.ps_zfree), PAGES(dynmem_st.ps_free)) < 0)
-		return;
-	PRINT("\n\tused:\t");
-	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_st.ps_used), dynmem_total) < 0)
-		return;
-	PRINT("\n\t\tmisc:\t");
-	if (print_size_with_unit_and_percent(printer, arg, dynmem_misc_usage, PAGES(dynmem_st.ps_used)) < 0)
-		return;
-	PRINT("\n\t\tpaging:\t");
-	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_usage.pu_paging), PAGES(dynmem_st.ps_used)) < 0)
-		return;
-	PRINT("\n\t\tstatic:\t");
-	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_usage.pu_static), PAGES(dynmem_st.ps_used)) < 0)
-		return;
+	print_stat("dynmem:          ", dynmem_total, ram_total);
+	print_stat("  free:          ", PAGES(dynmem_st.ps_free), dynmem_total);
+	print_stat("    zero:        ", PAGES(dynmem_st.ps_zfree), PAGES(dynmem_st.ps_free));
+	print_stat("  used:          ", PAGES(dynmem_st.ps_used), dynmem_total);
+	print_stat("    misc:        ", dynmem_misc_usage, PAGES(dynmem_st.ps_used));
+	print_stat("      mem-parts: ", part_usage.mru_ram, dynmem_misc_usage);
+	print_stat("        locked:  ", part_usage.mru_locked, part_usage.mru_ram);
+	print_stat("        file:    ", part_usage.mru_file, part_usage.mru_ram);
+	print_stat("        kernel:  ", part_usage.mru_kernel, part_usage.mru_ram);
+	print_stat("        private: ", part_usage.mru_private, part_usage.mru_ram);
+	print_stat("        shared:  ", part_usage.mru_shared, part_usage.mru_ram);
+	print_stat("    paging:      ", PAGES(dynmem_usage.pu_paging), PAGES(dynmem_st.ps_used));
+	print_stat("    static:      ", PAGES(dynmem_usage.pu_static), PAGES(dynmem_st.ps_used));
 #if defined(__x86_64__) || defined(__i386__)
-	PRINT("\n\t\tx86.iobm:\t");
-	if (print_size_with_unit_and_percent(printer, arg, PAGES(dynmem_usage.pu_x86_iobm), dynmem_st.ps_used) < 0)
-		return;
+	print_stat("    x86.iobm:    ", PAGES(dynmem_usage.pu_x86_iobm), dynmem_st.ps_used);
 #endif /* __x86_64__ || __i386__ */
 #undef PAGES
 	PRINT("\n");

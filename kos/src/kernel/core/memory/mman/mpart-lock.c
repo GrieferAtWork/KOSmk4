@@ -369,6 +369,7 @@ mpart_setcore_makememdat_or_unlock(struct mpart *__restrict self,
 				size_t avail;
 				assert(done < total_pages);
 				missing_pages = total_pages - done;
+
 				/* Make sure that there is sufficient space for one additional chunk. */
 				avail = kmalloc_usable_size(data->scd_copy_mem_sc.ms_v) / sizeof(struct mchunk);
 				assert(avail >= data->scd_copy_mem_sc.ms_c);
@@ -380,6 +381,7 @@ do_realloc_in_extend_after_unlock:
 					                                GFP_LOCKED | GFP_PREFLT);
 					data->scd_copy_mem_sc.ms_v = vec;
 				}
+
 				/* Allocate the new chunk. */
 				chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
 				if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
@@ -413,6 +415,7 @@ extend_vector:
 	for (;;) {
 		size_t avail;
 		missing_pages = total_pages - done;
+
 		/* Make sure that there is sufficient space for one additional chunk. */
 		avail = kmalloc_usable_size(data->scd_copy_mem_sc.ms_v) / sizeof(struct mchunk);
 		assert(avail >= data->scd_copy_mem_sc.ms_c);
@@ -429,6 +432,7 @@ extend_vector:
 			}
 			data->scd_copy_mem_sc.ms_v = vec;
 		}
+
 		/* Allocate the new chunk. */
 		chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
 		if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
