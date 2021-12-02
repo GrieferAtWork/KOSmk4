@@ -694,13 +694,24 @@ NOTHROW(LOCKOP_CC fsuper_delete_remove_from_all_lop)(struct lockop *__restrict s
  * required locks become available... */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
+	/* Do the deletion. */
+	if (fsuper_delete_strt(self))
+		fsuper_delete_impl(incref(self));
+}
+
+/* Internal implementation of `fsuper_delete()' (don't call this one
+ * unless  you know that you're doing; otherwise, you may cause race
+ * conditions that can result in data corruption) */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL fsuper_delete_strt)(struct fsuper *__restrict self) {
 	/* Check for special case: singleton filesystems mustn't be marked as DELETED */
 	if (self->fs_sys->ffs_flags & FFILESYS_F_SINGLE)
-		return;
+		return false;
+	return mfile_begin_delete(&self->fs_root);
+}
 
-	if (!mfile_begin_delete(&self->fs_root))
-		return; /* Already deleted, or deletion already in progress. */
-
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fsuper_delete_impl)(REF struct fsuper *__restrict self) {
 	if (self->fs_dev) {
 		if (mfile_isdevice(self->fs_dev)) {
 			struct device *dev = mfile_asdevice(self->fs_dev);
@@ -716,7 +727,6 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
 		printk(KERN_INFO "[fs] Deleting %s-superblock\n",
 		       self->fs_sys->ffs_name);
 	}
-	incref(self);
 
 	/* Remove from the list of all superblocks */
 	COMPILER_READ_BARRIER();

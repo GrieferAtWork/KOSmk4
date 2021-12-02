@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_FILESYS_PATHIO_C
 #define GUARD_KERNEL_CORE_FILESYS_PATHIO_C 1
+#define __WANT_MFILE__mf_delsup
 #define __WANT_PATH__p_LOPS
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
@@ -35,10 +36,13 @@
 #include <kernel/mman/driver.h>
 #include <sched/task.h>
 
+#include <hybrid/atomic.h>
+
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/io.h>
 #include <kos/lockop.h>
+#include <sys/mount.h>
 
 #include <assert.h>
 #include <fcntl.h>
@@ -1324,6 +1328,111 @@ waitfor_status_writelock:
 }
 
 
+#ifndef __fsuper_slist_defined
+#define __fsuper_slist_defined
+SLIST_HEAD(fsuper_slist, fsuper);
+#endif /* !__fsuper_slist_defined */
+
+/* Return values for `path_subtree_mounts_superblock()' */
+#define PATH_SUBTREE_MOUNTS_SUPERBLOCK_YES  0
+#define PATH_SUBTREE_MOUNTS_SUPERBLOCK_NO   1
+#define PATH_SUBTREE_MOUNTS_SUPERBLOCK_STOP 2
+
+/* Check if a path reachable from `self' _before_ `stop' is mounting `super' */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL path_subtree_mounts_superblock)(struct path *self,
+                                              struct fsuper *__restrict super,
+                                              struct path *stop) {
+	if (self == stop)
+		return PATH_SUBTREE_MOUNTS_SUPERBLOCK_STOP;
+	if (path_ismount(self)) {
+		if (self->p_dir->fn_super == super)
+			return PATH_SUBTREE_MOUNTS_SUPERBLOCK_YES;
+	}
+	if (self->p_cldlist != PATH_CLDLIST_DELETED) {
+		size_t i;
+		for (i = 0; i <= self->p_cldmask; ++i) {
+			struct path *child = self->p_cldlist[i].pb_path;
+			if (child && child != &deleted_path && !wasdestroyed(child)) {
+				unsigned int result;
+				result = path_subtree_mounts_superblock(child, super, stop);
+				if (result != PATH_SUBTREE_MOUNTS_SUPERBLOCK_NO)
+					return result;
+			}
+		}
+	}
+	return PATH_SUBTREE_MOUNTS_SUPERBLOCK_NO;
+}
+
+
+/* Release all locks from superblock mounting points, but stop when hitting `stop' */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL path_subtree_unlock_supermounts)(struct path *self, struct path *root,
+                                               struct path *stop, struct fsuper *keep_locked) {
+	if (self == stop)
+		return false;
+	if (path_ismount(self)) {
+		struct fsuper *super = self->p_dir->fn_super;
+		if (super != keep_locked) {
+			/* Make sure that `super' hasn't already been unlocked. */
+			if (path_subtree_mounts_superblock(root, super, self) != PATH_SUBTREE_MOUNTS_SUPERBLOCK_YES)
+				fsuper_mounts_endwrite(super);
+		}
+	}
+	if (self->p_cldlist != PATH_CLDLIST_DELETED) {
+		size_t i;
+		for (i = 0; i <= self->p_cldmask; ++i) {
+			struct path *child = self->p_cldlist[i].pb_path;
+			if (child && child != &deleted_path && !wasdestroyed(child)) {
+				if (!path_subtree_unlock_supermounts(child, root, stop, keep_locked))
+					return false;
+			}
+		}
+	}
+	return true;
+}
+
+
+/* Try  to acquire a lock to `fs_mountslock' of every superblock associated
+ * with a mounting point that is reachable from `self'. Assume that for any
+ * superblock reachable from `root' (before  `self' is reached), this  lock
+ * has already been acquired.
+ * @return: NULL: Success.
+ * @return: * :   A pointer to a superblock that could not be locked. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct fsuper *
+NOTHROW(FCALL path_subtree_trylock_supermounts)(struct path *self,
+                                                struct path *root,
+                                                struct fsuper *already_locked) {
+	if (path_ismount(self)) {
+		struct fsuper *super = self->p_dir->fn_super;
+		if (!fsuper_mounts_trywrite(super)) {
+			/* Aside from an outside actor holding the lock (for which we need
+			 * to let our caller block), there's  also the case or our  caller
+			 * already  holding the lock (`already_locked'), or the superblock
+			 * being mounted  multiple times,  and  thus already  having  been
+			 * locked. */
+			if (super != already_locked &&
+			    path_subtree_mounts_superblock(root, super, self) != PATH_SUBTREE_MOUNTS_SUPERBLOCK_YES) {
+				/* Blocking superblock found :( */
+				path_subtree_unlock_supermounts(root, root, self, already_locked);
+				return super;
+			}
+		}
+	}
+	if (self->p_cldlist != PATH_CLDLIST_DELETED) {
+		size_t i;
+		for (i = 0; i <= self->p_cldmask; ++i) {
+			struct path *child = self->p_cldlist[i].pb_path;
+			if (child && child != &deleted_path && !wasdestroyed(child)) {
+				struct fsuper *result;
+				result = path_subtree_trylock_supermounts(child, root, already_locked);
+				if (result != NULL)
+					return result;
+			}
+		}
+	}
+	return NULL;
+}
 
 
 /* Go through  all paths  starting at  `self' and  unlink `pm_vsmount'  for
@@ -1332,8 +1441,10 @@ waitfor_status_writelock:
  *
  * Additionally, also remove paths marked as `PATH_F_ISDRIVE' from the list
  * of DOS drive roots. */
-PRIVATE NONNULL((1)) void
-NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self) {
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self,
+                                   struct REF fsuper_slist *__restrict delsup,
+                                   uintptr_t umount_flags) {
 	size_t mask;
 	struct path_bucket *buckets;
 
@@ -1346,6 +1457,22 @@ NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self) {
 			/* Inherited from `pm_vsmount'; nokill
 			 * since caller still has a reference! */
 			decref_nokill(self);
+		}
+		if (!(umount_flags & MNT_DETACH) && likely(LIST_ISBOUND(me, pm_fsmount))) {
+			/* Immediately unlink from the superblock. */
+			struct fsuper *super = me->p_dir->fn_super;
+			assert(fsuper_mounts_writing(super));
+			LIST_UNBIND(me, pm_fsmount);
+			if (LIST_EMPTY(&super->fs_mounts)) {
+				ATOMIC_WRITE(super->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
+
+				/* Last mounting point removed -> must delete this superblock. */
+				if (fsuper_delete_strt(super)) {
+					/* Insert into the list of superblocks pending deletion. */
+					incref(super);
+					SLIST_INSERT(delsup, super, fs_root._mf_delsup);
+				}
+			}
 		}
 	}
 
@@ -1374,22 +1501,44 @@ NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self) {
 		for (i = 0; i <= mask; ++i) {
 			struct path *child = buckets[i].pb_path;
 			if (child && child != &deleted_path && !wasdestroyed(child))
-				path_umount_subtree(child);
+				path_umount_subtree(child, delsup, umount_flags);
 		}
+	}
+}
+
+/* Complete deletion of a given list of superblocks that were fully unmounted. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL path_umount_subtree_complete)(struct REF fsuper_slist *__restrict delsup) {
+	while (!SLIST_EMPTY(delsup)) {
+		REF struct fsuper *delme = SLIST_FIRST(delsup);
+		SLIST_REMOVE_HEAD(delsup, fs_root._mf_delsup);
+		fsuper_delete_impl(delme);
 	}
 }
 
 /* Unmount the  a given  path `self',  as well  as  all
  * child-paths of it which may also be mounting points.
+ * @param: umount_flags: Set of `0 | MNT_DETACH' (other flags are silently ignored)
+ *          - MNT_DETACH: Allow  unlinked `struct pathmount' to lazily unbind themselves
+ *                        from `struct fsuper::fs_mounts' of associated superblocks.  As
+ *                        a result, a superblock unmounted  in this manner continues  to
+ *                        be fully accessible to anyone that references some `path' from
+ *                        which a mounting  point (such as  `self') is reachable.  Else,
+ *                        any affect `struct path_mount' will be unbinding itself lazily
+ *                        during `path_destroy()'.
+ *                        Reminder: Once `struct fsuper::fs_mounts' becomes empty, a call
+ *                                  to  `fsuper_delete()' causes any futher file activity
+ *                                  to cease.
  * @return: true:  `self' was unmounted.
  * @return: false: `self' had already been unmounted. */
 PUBLIC BLOCKING NONNULL((1)) bool KCALL
-path_umount(struct pathmount *__restrict self)
+path_umount(struct pathmount *__restrict self, uintptr_t umount_flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	bool result;
 	REF struct vfs *pathvfs;
 	REF struct path *blocking_path;
 	struct pathmount *replacement_mount = NULL;
+	struct REF fsuper_slist delsup;
 	assert(path_ismount(self));
 
 	/* Load the associated VFS controller. */
@@ -1427,10 +1576,27 @@ again_acquire_locks:
 		goto again_acquire_locks;
 	}
 
+	if (!(umount_flags & MNT_DETACH)) {
+		/* Acquire locks to `fs_mountslock' of all reachable superblocks. */
+		struct fsuper *blocking;
+		blocking = path_subtree_trylock_supermounts(self, self, NULL);
+		if (blocking) {
+			incref(blocking);
+			vfs_driveslock_endwrite(pathvfs);
+			vfs_mountslock_release(pathvfs);
+			path_decref_and_unlock_whole_tree(self);
+			FINALLY_DECREF_UNLIKELY(blocking);
+			fsuper_mounts_waitwrite(blocking);
+			goto again_acquire_locks;
+		}
+	}
+
 	/* When `self' is the absolute root-node of the whole filesystem,
 	 * then  we also need to acquire a  lock to the VFS's root field. */
 	if (path_isroot(self)) {
 		if (!vfs_rootlock_trywrite(pathvfs)) {
+			if (!(umount_flags & MNT_DETACH))
+				path_subtree_unlock_supermounts(self, self, NULL, NULL);
 			vfs_driveslock_endwrite(pathvfs);
 			vfs_mountslock_release(pathvfs);
 			path_decref_and_unlock_whole_tree(self);
@@ -1446,6 +1612,8 @@ again_acquire_locks:
 #endif /* _pathmount_alloc_atomic_nx */
 				{
 					vfs_rootlock_endwrite(pathvfs);
+					if (!(umount_flags & MNT_DETACH))
+						path_subtree_unlock_supermounts(self, self, NULL, NULL);
 					vfs_driveslock_endwrite(pathvfs);
 					vfs_mountslock_release(pathvfs);
 					path_decref_and_unlock_whole_tree(self);
@@ -1471,6 +1639,8 @@ again_acquire_locks:
 			/* Must also link into `fsuper_unmounted's list of mounting points. */
 			if (!fsuper_mounts_trywrite(&fsuper_unmounted)) {
 				vfs_rootlock_endwrite(pathvfs);
+				if (!(umount_flags & MNT_DETACH))
+					path_subtree_unlock_supermounts(self, self, NULL, NULL);
 				vfs_driveslock_endwrite(pathvfs);
 				vfs_mountslock_release(pathvfs);
 				path_decref_and_unlock_whole_tree(self);
@@ -1497,6 +1667,8 @@ again_acquire_locks:
 again_load_parent:
 		parent = path_getparent(self);
 		if (!path_cldlock_trywrite(parent)) {
+			if (!(umount_flags & MNT_DETACH))
+				path_subtree_unlock_supermounts(self, self, NULL, NULL);
 			vfs_driveslock_endwrite(pathvfs);
 			vfs_mountslock_release(pathvfs);
 			path_decref_and_unlock_whole_tree(self);
@@ -1526,9 +1698,12 @@ again_load_parent:
 
 	/* This is where the (first part of the) magic happens:
 	 *  - Go through all paths and remove them from the mounting point, and drive lists. */
-	path_umount_subtree(self);
+	SLIST_INIT(&delsup);
+	path_umount_subtree(self, &delsup, umount_flags);
 
 	/* Release locks */
+	if (!(umount_flags & MNT_DETACH))
+		path_subtree_unlock_supermounts(self, self, NULL, NULL);
 	vfs_driveslock_endwrite(pathvfs);
 	vfs_mountslock_release(pathvfs);
 
@@ -1545,8 +1720,13 @@ again_load_parent:
 	 *    `fsuper_delete()' is called,  which does  the fs-level  unmount! */
 	incref(self); /* Inherited by `path_decref_and_delete_and_unlock_whole_tree()' */
 	path_decref_and_delete_and_unlock_whole_tree(self);
+
+	/* Complete deletion of any superblocks that was unmounted without delay. */
+	path_umount_subtree_complete(&delsup);
+
 	return result;
 }
+
 
 
 
@@ -1561,6 +1741,10 @@ again_load_parent:
  *         or altered to point to some other path.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED:
  *         The superblock of `dir' indicate `FSUPER_MOUNTS_DELETED'
+ * @param: umount_flags: Same flags as  taken by  `path_umount()::umount_flags'.
+ *                       These flags are used to describe the used behavior when
+ *                       `self' is already a mounting point, or a mounting point
+ *                       exists somewhere on a child-path of `self'.
  * @return: * :   The  new  path  node  replacing   `self'  and  pointing  to   `dir'.
  *                This path node is also referenced by `_path_getvfs(self)->vf_mounts'
  *                and has replaced `self' within the filesystem hierarchy, though  any
@@ -1571,12 +1755,15 @@ again_load_parent:
  * @return: NULL: `dir' can no longer be mounted because:
  *                `dir->fn_super->fs_mounts.lh_first == FSUPER_MOUNTS_DELETED' */
 PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
-path_mount(struct path *__restrict self, struct fdirnode *__restrict dir)
+path_mount(struct path *__restrict self,
+           struct fdirnode *__restrict dir,
+           uintptr_t umount_flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED, ...) {
 	REF struct pathmount *result;
 	REF struct vfs *pathvfs;
 	REF struct path *parent = NULL;
 	struct fsuper *super    = dir->fn_super;
+	struct REF fsuper_slist delsup;
 
 	/* Load the associated VFS controller. */
 	pathvfs = _path_getvfs(self);
@@ -1645,9 +1832,29 @@ again_acquire_locks:
 			_pathmount_free(result);
 			return NULL;
 		}
+		if (!(umount_flags & MNT_DETACH)) {
+			struct fsuper *blocking;
+			blocking = path_subtree_trylock_supermounts(self, self, super);
+			if (blocking) {
+				incref(blocking);
+				fsuper_mounts_endwrite(super);
+				vfs_driveslock_endwrite(pathvfs);
+				vfs_mountslock_release(pathvfs);
+				path_decref_and_unlock_whole_tree(self);
+				assertf(blocking != super,
+				        "Prevented by the `already_locked' argument "
+				        "of `path_subtree_trylock_supermounts()'");
+				FINALLY_DECREF_UNLIKELY(blocking);
+				fsuper_mounts_waitwrite(blocking);
+				goto again_acquire_locks;
+			}
+		}
+
 		if unlikely(path_isroot(self)) {
 			parent = NULL;
 			if (!vfs_rootlock_trywrite(pathvfs)) {
+				if (!(umount_flags & MNT_DETACH))
+					path_subtree_unlock_supermounts(self, self, NULL, super);
 				fsuper_mounts_endwrite(super);
 				vfs_driveslock_endwrite(pathvfs);
 				vfs_mountslock_release(pathvfs);
@@ -1659,6 +1866,8 @@ again_acquire_locks:
 again_load_parent:
 			parent = path_getparent(self);
 			if (!path_cldlock_trywrite(parent)) {
+				if (!(umount_flags & MNT_DETACH))
+					path_subtree_unlock_supermounts(self, self, NULL, super);
 				fsuper_mounts_endwrite(super);
 				vfs_driveslock_endwrite(pathvfs);
 				vfs_mountslock_release(pathvfs);
@@ -1677,6 +1886,8 @@ again_load_parent:
 			if unlikely(parent->p_cldlist == PATH_CLDLIST_DELETED) {
 				path_cldlock_endwrite(parent);
 				vfs_rootlock_endwrite(pathvfs);
+				if (!(umount_flags & MNT_DETACH))
+					path_subtree_unlock_supermounts(self, self, NULL, super);
 				fsuper_mounts_endwrite(super);
 				vfs_driveslock_endwrite(pathvfs);
 				vfs_mountslock_release(pathvfs);
@@ -1695,11 +1906,15 @@ again_load_parent:
 	result->p_name = incref(self->p_name);
 	incref(dir); /* For `result->p_dir' */
 
-	/* Delete any pre-existing mounting points reachable from `self' */
-	path_umount_subtree(self);
-
-	/* Hook the new mounting point within its superblock. */
+	/* Hook the new mounting point within its superblock.
+	 * Do this before calling `path_umount_subtree()'  in
+	 * case the same superblock was already being mounted
+	 * somewhere that is reachable from here. */
 	LIST_INSERT_HEAD(&super->fs_mounts, result, pm_fsmount);
+
+	/* Delete any pre-existing mounting points reachable from `self' */
+	SLIST_INIT(&delsup);
+	path_umount_subtree(self, &delsup, umount_flags);
 
 	/* Reference held by `result->pm_fsmount' */
 	incref(super->fs_sys->ffs_drv);
@@ -1725,6 +1940,8 @@ again_load_parent:
 	}
 
 	/* Release (remaining) locks. */
+	if (!(umount_flags & MNT_DETACH))
+		path_subtree_unlock_supermounts(self, self, NULL, super);
 	fsuper_mounts_endwrite(super);
 	vfs_driveslock_endwrite(pathvfs);
 	vfs_mountslock_release(pathvfs);
@@ -1734,6 +1951,9 @@ again_load_parent:
 	 * NOTE: This call also inherits the reference to `self' we received
 	 *       from  `path_cldlist_remove_force()'   /  `incref'd   above. */
 	path_decref_and_delete_and_unlock_whole_tree(self);
+
+	/* Complete deletion of any superblocks that was unmounted without delay. */
+	path_umount_subtree_complete(&delsup);
 
 	return result;
 }

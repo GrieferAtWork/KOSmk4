@@ -673,6 +673,9 @@ struct fnode;
 #if defined(__WANT_MFILE__mf_ramdirlop) || defined(__WANT_MFILE__mf_ramdirplop)
 struct ramfs_dirnode;
 #endif /* __WANT_MFILE__mf_ramdirlop || __WANT_MFILE__mf_ramdirplop */
+#ifdef __WANT_MFILE__mf_delsup
+struct fsuper;
+#endif /* __WANT_MFILE__mf_delsup */
 #ifdef __WANT_MFILE__mf_deadrament
 #ifndef __ramfs_dirent_slist_defined
 #define __ramfs_dirent_slist_defined
@@ -786,7 +789,7 @@ struct mfile {
      defined(__WANT_MFILE__mf_mpplop) || defined(__WANT_MFILE__mf_compl) ||         \
      defined(__WANT_MFILE__mf_deadnod) || defined(__WANT_MFILE__mf_ramdirplop) ||   \
      defined(__WANT_MFILE__mf_ramdirlop) || defined(__WANT_MFILE__mf_deadrament) || \
-     defined(__WANT_MFILE__mf_lopX))
+     defined(__WANT_MFILE__mf_delsup) || defined(__WANT_MFILE__mf_lopX))
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) {{ { .tv_sec = mf_atime__tv_sec, .tv_nsec = mf_atime__tv_nsec }
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
@@ -876,6 +879,10 @@ struct mfile {
 #ifdef __WANT_MFILE__mf_deadnod
 		SLIST_ENTRY(fnode)       _mf_deadnod;    /* Used internally */
 #endif /* __WANT_MFILE__mf_deadnod */
+
+#ifdef __WANT_MFILE__mf_delsup
+		SLIST_ENTRY(fsuper)      _mf_delsup;     /* Used internally */
+#endif /* __WANT_MFILE__mf_delsup */
 
 #ifdef __WANT_MFILE__mf_lopX
 		byte_t _mf_lopX[3 * sizeof(struct timespec)]; /* ... */

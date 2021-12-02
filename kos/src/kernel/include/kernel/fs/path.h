@@ -697,7 +697,7 @@ struct pathmount
 #else /* !__cplusplus */
 #define _pathmount_path_ /* nothing */
 #endif /* __cplusplus */
-	LIST_ENTRY(pathmount)     pm_fsmount; /* [1..1][lock(path_getsuper(this)->fs_mountslock)] Link entry in the
+	LIST_ENTRY(pathmount)     pm_fsmount; /* [0..1][lock(path_getsuper(this)->fs_mountslock)] Link entry in the
 	                                       * associated superblock's list  of mounting points.  This link  also
 	                                       * holds a reference to `self->p_dir->fn_super->fs_sys->ffs_drv'. */
 	LIST_ENTRY(REF pathmount) pm_vsmount; /* [0..1][lock(:VFS->vf_mountslock)]
@@ -727,6 +727,10 @@ struct pathmount
  *         or altered to point to some other path.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED:
  *         The superblock of `dir' indicate `FSUPER_MOUNTS_DELETED'
+ * @param: umount_flags: Same flags as  taken by  `path_umount()::umount_flags'.
+ *                       These flags are used to describe the used behavior when
+ *                       `self' is already a mounting point, or a mounting point
+ *                       exists somewhere on a child-path of `self'.
  * @return: * :   The  new  path  node  replacing   `self'  and  pointing  to   `dir'.
  *                This path node is also referenced by `_path_getvfs(self)->vf_mounts'
  *                and has replaced `self' within the filesystem hierarchy, though  any
@@ -737,17 +741,29 @@ struct pathmount
  * @return: NULL: `dir' can no longer be mounted because:
  *                `dir->fn_super->fs_mounts.lh_first == FSUPER_MOUNTS_DELETED' */
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
-path_mount(struct path *__restrict self, struct fdirnode *__restrict dir)
+path_mount(struct path *__restrict self,
+           struct fdirnode *__restrict dir,
+           uintptr_t umount_flags DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED, ...);
 
 /* Unmount the  a given  path `self',  as well  as  all
  * child-paths of it which may also be mounting points.
+ * @param: umount_flags: Set of `0 | MNT_DETACH' (other flags are silently ignored)
+ *          - MNT_DETACH: Allow  unlinked `struct pathmount' to lazily unbind themselves
+ *                        from `struct fsuper::fs_mounts' of associated superblocks.  As
+ *                        a result, a superblock unmounted  in this manner continues  to
+ *                        be fully accessible to anyone that references some `path' from
+ *                        which a mounting  point (such as  `self') is reachable.  Else,
+ *                        any affect `struct path_mount' will be unbinding itself lazily
+ *                        during `path_destroy()'.
+ *                        Reminder: Once `struct fsuper::fs_mounts' becomes empty, a call
+ *                                  to  `fsuper_delete()' causes any futher file activity
+ *                                  to cease.
  * @return: true:  `self' was unmounted.
  * @return: false: `self' had already been unmounted. */
 FUNDEF BLOCKING NONNULL((1)) __BOOL KCALL
-path_umount(struct pathmount *__restrict self)
+path_umount(struct pathmount *__restrict self, uintptr_t umount_flags DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-
 
 
 

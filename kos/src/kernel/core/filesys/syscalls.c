@@ -709,9 +709,12 @@ sys_umount2_impl(fd_t dirfd, USER UNCHECKED char const *target,
 	VALIDATE_FLAGSET(flags,
 	                 MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW,
 	                 E_INVALID_ARGUMENT_CONTEXT_UMOUNT2_FLAGS);
-	(void)MNT_FORCE;  /* KOS always does this */
-	(void)MNT_DETACH; /* ??? */
-	(void)MNT_EXPIRE; /* ??? (yes: some parts of unmounting happen async; is that what you're talking about?) */
+	/* Flags:
+	 *  - MNT_FORCE:       KOS always does forced unmounts.
+	 *  - MNT_DETACH:      Fully supported.
+	 *  - MNT_EXPIRE:      Unsupported
+	 *  - UMOUNT_NOFOLLOW: Fully supported.
+	 */
 	atflags = 0;
 	if (flags & UMOUNT_NOFOLLOW)
 		atflags |= AT_SYMLINK_NOFOLLOW;
@@ -727,7 +730,7 @@ sys_umount2_impl(fd_t dirfd, USER UNCHECKED char const *target,
 		fsuper_sync(unmount_me->p_dir->fn_super);
 
 		/* Do the unmount. */
-		path_umount(path_asmount(unmount_me));
+		path_umount(path_asmount(unmount_me), flags);
 	}
 	return -EOK;
 }

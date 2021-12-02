@@ -313,7 +313,7 @@ fsuper_dev_wrsectors_chk(struct fsuper *__restrict self, pos_t addr,
  * and reads yield all zeroes.
  *
  * The default for this option is `false' */
-DATDEF bool fsuper_allow_fs_oob;
+DATDEF __BOOL fsuper_allow_fs_oob;
 
 
 /* Return a pointer to superblock-node operators of `self' */
@@ -591,6 +591,14 @@ fsuper_setlabel(struct fsuper *__restrict self,
  * required locks become available... */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self);
+
+/* Internal implementation of `fsuper_delete()' (don't call this one
+ * unless  you know that you're doing; otherwise, you may cause race
+ * conditions that can result in data corruption) */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL fsuper_delete_strt)(struct fsuper *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fsuper_delete_impl)(struct fsuper *__restrict self);
 
 
 /* Gather information about the filesystem and store that information in `*result' */
