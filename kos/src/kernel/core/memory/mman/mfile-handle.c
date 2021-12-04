@@ -252,7 +252,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case _IO_WITHSIZE(BLKFLSBUF, 0):
 		/*require(CAP_SYS_ADMIN);*/ /* Linux does this... Why? */
-		mfile_usync(self);
+		mfile_udatasync(self);
 		return 0;
 
 	case _IO_WITHSIZE(BLKSSZGET, 0):

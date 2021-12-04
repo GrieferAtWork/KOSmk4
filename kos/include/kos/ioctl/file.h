@@ -38,7 +38,7 @@
                                                * - requires `CAP_SYS_ADMIN' for devices
                                                * - requires `CAP_FOWNER' / st_uid==geteuid() for regular files */
 /*efine FILE_IOC_GETSIZE512 BLKGETSIZE         * [ulongptr_t *arg] Get `st_size / 512' */
-/*efine FILE_IOC_FLSBUF     BLKFLSBUF          * Alias for `fsync(fd)' */
+/*efine FILE_IOC_FLSBUF     BLKFLSBUF          * Alias for `fdatasync(fd)' */
 /*efine _FILE_IOC_BLOCKSIZE BLKSSZGET          * [int *arg]    Get *actual* block size */
 #define FILE_IOC_BLOCKSIZE  BLKBSZGET         /* [size_t *arg] Get *actual* block size */
 #define FILE_IOC_GETSIZE    BLKGETSIZE64      /* [uint64_t *arg] Return `st_size' */
