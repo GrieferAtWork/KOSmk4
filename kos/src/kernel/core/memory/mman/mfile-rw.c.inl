@@ -19,23 +19,23 @@
  */
 #ifdef __INTELLISENSE__
 #include "mfile-rw.c"
-//#define       DEFINE_mfile_direct_read
-//#define     DEFINE_mfile_direct_read_p
-//#define      DEFINE_mfile_direct_readv
-//#define    DEFINE_mfile_direct_readv_p
-//#define      DEFINE_mfile_direct_write
-//#define    DEFINE_mfile_direct_write_p
-//#define     DEFINE_mfile_direct_writev
-//#define   DEFINE_mfile_direct_writev_p
-//#define DEFINE_mfile_direct_read_async
-#define   DEFINE_mfile_direct_read_async_p
+//#define           DEFINE_mfile_direct_read
+//#define         DEFINE_mfile_direct_read_p
+//#define          DEFINE_mfile_direct_readv
+//#define        DEFINE_mfile_direct_readv_p
+//#define          DEFINE_mfile_direct_write
+//#define        DEFINE_mfile_direct_write_p
+//#define         DEFINE_mfile_direct_writev
+//#define       DEFINE_mfile_direct_writev_p
+//#define     DEFINE_mfile_direct_read_async
+//#define   DEFINE_mfile_direct_read_async_p
 //#define    DEFINE_mfile_direct_readv_async
 //#define  DEFINE_mfile_direct_readv_async_p
 //#define    DEFINE_mfile_direct_write_async
 //#define  DEFINE_mfile_direct_write_async_p
 //#define   DEFINE_mfile_direct_writev_async
 //#define DEFINE_mfile_direct_writev_async_p
-//#define DEFINE_mfile_read
+#define DEFINE_mfile_read
 //#define       DEFINE_mfile_read_p
 //#define        DEFINE_mfile_readv
 //#define      DEFINE_mfile_readv_p
@@ -77,7 +77,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libvio/access.h>
+#include <libvio/api.h>
 
 DECL_BEGIN
 
@@ -769,12 +769,44 @@ again:
 		goto done;
 	mfile_lock_read(self);
 	if unlikely(mfile_isanon(self)) {
-		mfile_lock_endread(self);
 #ifdef LIBVIO_CONFIG_ENABLED
-		if (self->mf_ops->mo_vio) {
-			/* TODO: Handling for VIO */
-		}
+		/* Even when a file is anonymous, we're allowed to dispatch through  VIO,
+		 * so-long as the file isn't deleted and access happens within the file's
+		 * bounds (which we're not allowed to increase in the case of a write). */
+		if (self->mf_ops->mo_vio && !(self->mf_flags & MFILE_F_DELETED)) {
+			filesize = mfile_getsize(self);
+			if (OVERFLOW_USUB(filesize, offset, &io_bytes)) {
+#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
+				if (offset < filesize)
+					io_bytes = (size_t)-1;
+				else
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
+				{
+					goto dont_handle_vio;
+				}
+			}
+
+			/* Acquire a trunc-lock so the file's size can't be decreased. */
+			mfile_trunclock_inc(self);
+			mfile_lock_endread(self);
+			RAII_FINALLY { mfile_trunclock_dec(self); };
+
+			/* Dispatch VIO */
+			if (io_bytes > num_bytes)
+				io_bytes = num_bytes;
+#ifdef LOCAL_BUFFER_IS_IOVEC
+			LOCAL_mfile_viorw(self, buffer, buf_offset, io_bytes, offset);
+#else /* LOCAL_BUFFER_IS_IOVEC */
+			LOCAL_mfile_viorw(self, buffer, io_bytes, offset);
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
+
+			result += io_bytes;
+		} else
+dont_handle_vio:
 #endif /* LIBVIO_CONFIG_ENABLED */
+		{
+			mfile_lock_endread(self);
+		}
 
 #ifdef LOCAL_WRITING
 		/* Cannot write to anonymous files. If you try to, you'll get a READONLY error. */

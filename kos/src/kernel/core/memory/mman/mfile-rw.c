@@ -43,6 +43,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libvio/api.h>
+
 DECL_BEGIN
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -502,6 +504,7 @@ DECL_END
 
 
 #ifndef __INTELLISENSE__
+#ifdef LIBVIO_CONFIG_ENABLED
 #define DEFINE_mfile_vioread
 #include "mfile-rw-vio.c.inl"
 #define DEFINE_mfile_vioread_p
@@ -518,6 +521,7 @@ DECL_END
 #include "mfile-rw-vio.c.inl"
 #define DEFINE_mfile_viowritev_p
 #include "mfile-rw-vio.c.inl"
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 #define DEFINE_mfile_read
 #include "mfile-rw.c.inl"

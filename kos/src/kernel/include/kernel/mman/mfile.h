@@ -1432,7 +1432,7 @@ FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_writeall_p(struct mfile *__restric
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_writeallv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_writeallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
-/* Use tailread() to block instead of indicating EOF; use tailwrite() for O_APPEND. */
+/* Use tailread() to block instead of returning 0 for EOF; use tailwrite() for O_APPEND. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_tailread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_tailread_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_tailreadv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
@@ -1452,8 +1452,9 @@ FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_readv(struct mfile 
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mfile_buffered_tailwritev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
-/* "direct" versions of the above (for use with O_DIRECT; these bypass the unified I/O buffer)
- * - You cannot use these functions for VIO buffers!
+/* "direct" versions of the above (for use with O_DIRECT; these bypass
+ * the unified I/O buffer and directly talk to `mo_(load|save)blocks')
+ * - Trying to use these when the given buffer is VIO causes E_SEGFAULT_UNMAPPED,E_SEGFAULT_CONTEXT_VIO
  * - Alignment requirements are checked by these functions (`E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*') */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_direct_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_direct_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);

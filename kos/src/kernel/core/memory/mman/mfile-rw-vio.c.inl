@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <stddef.h>
 
+#include <libvio/api.h>
 #include <libvio/access.h>
 
 #ifdef LIBVIO_CONFIG_ENABLED
