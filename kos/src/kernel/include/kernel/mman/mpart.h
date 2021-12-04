@@ -714,6 +714,11 @@ NOTHROW(KCALL mpart_ll_bzeromemcc)(struct mpart *__restrict self,
                                    mpart_reladdr_t offset,
                                    size_t num_bytes);
 
+/* Reset the `page_iszero()' for physical memory of `self'.
+ * -> This is helper wrapper around `page_resetzero()'. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mpart_ll_resetzero)(struct mpart *__restrict self);
+
 /* Low-level populate the given address range by loading it from disk.
  * No bounds check is  done by this function,  and the caller must  be
  * holding a trunc-lock to the file associated with `self'! */

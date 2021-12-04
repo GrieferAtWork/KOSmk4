@@ -191,6 +191,25 @@ NOTHROW(FCALL mpart_ll_ccfreemem)(struct mpart *__restrict self) {
 	}
 }
 
+/* Reset the `page_iszero()' for physical memory of `self'.
+ * -> This is helper wrapper around `page_resetzero()'. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mpart_ll_resetzero)(struct mpart *__restrict self) {
+	if (self->mp_state == MPART_ST_MEM) {
+		page_resetzero(self->mp_mem.mc_start,
+		               self->mp_mem.mc_size);
+	} else {
+		size_t i;
+		assert(self->mp_state == MPART_ST_MEM_SC);
+		for (i = 0; i < self->mp_mem_sc.ms_c; ++i) {
+			page_resetzero(self->mp_mem_sc.ms_v[i].mc_start,
+			               self->mp_mem_sc.ms_v[i].mc_size);
+		}
+	}
+}
+
+
+
 /* Low-level populate the given address range by loading it from disk.
  * No bounds check is  done by this function,  and the caller must  be
  * holding a trunc-lock to the file associated with `self'! */

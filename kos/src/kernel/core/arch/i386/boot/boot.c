@@ -903,29 +903,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       also supports via the `O_DIRECT' flag. As such, we should add support
 	 *       for that flag! */
 
-	/* TODO: Many mo_loadblocks operators use bzerophyscc() to clear zero-memory.
-	 *       This works well  enough if  the caller-given memory  range was  just
-	 *       allocated  (as it  always is when  used for the  intended purpose of
-	 *       initializing unified I/O buffers, at which point the physical memory
-	 *       allocator's notion of zero-pages is still correct)
-	 * However: when the buffer originates from somewhere else, such as the kernel
-	 *          stack  (as is done in `blkdev_repart()' and by the various drivers
-	 *          opening  superblocks),  then physical  memory has  most definitely
-	 *          been modified such that whatever page_iszero() might say would  no
-	 *          longer be correct.
-	 * Solution:
-	 *  - After allocating a  new kernel stack,  explicitly clear the  page_iszero()
-	 *    bits for all of the backing physical memory pages. This way, kernel  stack
-	 *    buffers can always safely be passed to `mo_loadblocks' since page_iszero()
-	 *    will unconditionally return `false' for all of them.
-	 *  - Document the fact that `mo_loadblocks' is allowed to query  page_iszero()
-	 *    within the operator's documentation, as well as all of the wrapper macros
-	 *    relating to direct-IO (including those for the fast-pass in `fsuper')
-	 *  - When implementing O_DIRECT  for user-space, we  must manually clear  the
-	 *    `page_iszero()' bits for all buffer pages before passing along the user-
-	 *    provided buffer to the operator.
-	 */
-
 	/* TODO: There's a missing incref() relating to mktty.
 	 * Replicate bug:
 	 *  - Repeatedly press CTRL+D on the busybox prompt
