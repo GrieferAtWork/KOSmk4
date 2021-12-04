@@ -1897,7 +1897,7 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 "SIOCPROTOPRIVATE\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCDEVPRIVATE";
 
 #define GETBASE_KOS_IOCTLS(result, index) \
-	(((index) >= 0x4600 && (index) <= 0x4603) ? ((index) -= 0x4600, (result) = repr_KOS_IOCTLS_4600h, true) : \
+	(((index) >= 0x4600 && (index) <= 0x4604) ? ((index) -= 0x4600, (result) = repr_KOS_IOCTLS_4600h, true) : \
 	 ((index) == 0x4620) ? ((index) = 0, (result) = repr_KOS_IOCTLS_4620h, true) : \
 	 ((index) >= 0x4680 && (index) <= 0x4687) ? ((index) -= 0x4680, (result) = repr_KOS_IOCTLS_4680h, true) : \
 	 ((index) >= 0x4b00 && (index) <= 0x4b08) ? ((index) -= 0x4b00, (result) = repr_KOS_IOCTLS_4b00h, true) : \
@@ -1912,7 +1912,7 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 	 ((index) >= 0x7000 && (index) <= 0x700c) ? ((index) -= 0x7000, (result) = repr_KOS_IOCTLS_7000h, true) : false)
 PRIVATE char const repr_KOS_IOCTLS_4600h[] =
 "FILE_IOC_DELETED\0FILE_IOC_HASRAWIO\0FILE_IOC_DCHANGED\0FILE_IOC_CH"
-"ANGED";
+"ANGED\0FILE_IOC_BLKSHIFT";
 PRIVATE char const repr_KOS_IOCTLS_4620h[] =
 "FILE_IOC_TAILREAD";
 PRIVATE char const repr_KOS_IOCTLS_4680h[] =

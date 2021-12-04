@@ -430,11 +430,14 @@ NOTHROW(FCALL unix_server_remove_acceptme)(struct unix_server *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL UnixSocket_Fini)(struct socket *__restrict self) {
 	UnixSocket *me = (UnixSocket *)self;
-	assertf(me->us_node != (struct fsocknode *)-1,
-	        "Inconsistent state shouldn't happen, because this can only "
-	        "be the case when the socket is currently being bound on some "
-	        "other CPU in an SMP environment");
 	if (me->us_node) {
+		if unlikely(me->us_node == (struct fsocknode *)-1) {
+			/* This  right here can  actually happen if  the socket gets destroyed
+			 * while in the middle of an async connect operation. During this, the
+			 * socket can still be destroyed because `struct async_accept_wait' is
+			 * only holding a weak reference! */
+			return;
+		}
 
 		/* If this is the server socket, then we must:
 		 * - Set `us_max_backlog' to 0
@@ -630,7 +633,7 @@ struct async_accept_wait: async {
 	/* NOTE: All of the following are [1..1] before
 	 * `UnixSocket_WaitForAccept_Work()' finishes the async job. */
 	REF struct unix_client *aw_client;    /* [0..1] The client descriptor. */
-	REF struct fsocknode *aw_bind_node; /* [0..1] The socket to which to connect */
+	REF struct fsocknode   *aw_bind_node; /* [0..1] The socket to which to connect */
 	REF struct path        *aw_bind_path; /* [0..1] The path containing `ac_bind_node' */
 	REF struct fdirent     *aw_bind_name; /* [0..1] The name of `ac_bind_node' */
 };
@@ -683,7 +686,7 @@ UnixSocket_WaitForAccept_Work(struct async *__restrict self) {
 		/* The socket died? Ok... In that case, just force a disconnect */
 		if (!unix_client_refuse_connection(client))
 			unix_client_close_connection(client);
-		ATOMIC_WRITE(socket->us_node, NULL);
+		/*ATOMIC_WRITE(socket->us_node, NULL);*/ /* Don't modify because already destroyed. */
 		return ASYNC_FINISHED;
 	}
 
