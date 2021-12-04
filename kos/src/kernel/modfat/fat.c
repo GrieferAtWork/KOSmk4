@@ -579,8 +579,7 @@ fat_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
 	assertf((addr & super->ft_sectormask) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
 	assertf((num_bytes & super->ft_sectormask) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
-	if unlikely(!num_bytes)
-		return;
+	assert(num_bytes != 0);
 again:
 	FatNodeData_Read(dat);
 	{
@@ -645,8 +644,7 @@ fat_v_saveblocks(struct mfile *__restrict self, pos_t addr,
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
 	assertf((addr & super->ft_sectormask) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
 	assertf((num_bytes & super->ft_sectormask) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
-	if unlikely(!num_bytes)
-		return;
+	assert(num_bytes != 0);
 again:
 	/* Yes: We only need a read-lock  here since this lock isn't  used
 	 *      to guard the actual file-contents, but only the vector  of
