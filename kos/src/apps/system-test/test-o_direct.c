@@ -47,7 +47,7 @@ DECL_BEGIN
 PRIVATE void
 do_o_direct_test(char const *filename) {
 	fd_t fd;
-	shift_t align[2];
+	struct file_blkshift align;
 	void *buf;
 	size_t blocksize;
 	size_t blockalign;
@@ -63,11 +63,11 @@ do_o_direct_test(char const *filename) {
 	}
 
 	/* Query alignment requirements. */
-	EQd(0, ioctl(fd, FILE_IOC_BLKSHIFT, align));
+	EQd(0, ioctl(fd, FILE_IOC_BLKSHIFT, &align));
 
 	/* Buffer alignment requirements must be at most as restrictive as block-alignment. */
-	blocksize  = (size_t)1 << align[0];
-	blockalign = (size_t)1 << align[1];
+	blocksize  = (size_t)1 << align.fbs_blck;
+	blockalign = (size_t)1 << align.fbs_ioba;
 	GEd(blocksize, blockalign);
 
 	/* Allocate a properly aligned (and sized) buffer for I/O on at least 64 byts. */

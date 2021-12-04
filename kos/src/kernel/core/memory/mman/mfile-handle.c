@@ -163,11 +163,13 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		break;
 
 	case FILE_IOC_BLKSHIFT: {
+		USER CHECKED struct file_blkshift *info;
 		/* Query ioctl for buffer requirements of `O_DIRECT' */
-		validate_writable(arg, sizeof(shift_t[2]));
+		validate_writable(arg, sizeof(struct file_blkshift));
+		info = (USER CHECKED struct file_blkshift *)arg;
 		COMPILER_WRITE_BARRIER();
-		((USER CHECKED shift_t *)arg)[0] = self->mf_blockshift;
-		((USER CHECKED shift_t *)arg)[1] = self->mf_iobashift;
+		info->fbs_blck = self->mf_blockshift;
+		info->fbs_ioba = self->mf_iobashift;
 		return 0;
 	}	break;
 

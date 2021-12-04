@@ -442,10 +442,9 @@ mfile_dosyncio(struct mfile *__restrict self,
 
 /* For these 2, the caller must be holding a trunc-lock, or `MFILE_F_FIXEDFILESIZE' must be set.
  * NOTE: For the `*_nonatomic' versions, `MFILE_F_FIXEDFILESIZE' must be set unconditionally. */
-#define mfile_getsize(self)                 ((pos_t)atomic64_read(&(self)->mf_filesize))
-#define mfile_getsize_nonatomic(self)       ((pos_t)__atomic64_val((self)->mf_filesize))
-#define mfile_getblockcount(self)           (mfile_getsize(self) >> (self)->mf_blockshift)
-#define mfile_getblockcount_nonatomic(self) (mfile_getsize_nonatomic(self) >> (self)->mf_blockshift)
+#define mfile_getsize(self)           ((pos_t)atomic64_read(&(self)->mf_filesize))
+#define mfile_getsize_nonatomic(self) ((pos_t)__atomic64_val((self)->mf_filesize))
+#define mfile_getblockcount(self)     (mfile_getsize(self) >> (self)->mf_blockshift)
 
 
 struct mfile_ops {
