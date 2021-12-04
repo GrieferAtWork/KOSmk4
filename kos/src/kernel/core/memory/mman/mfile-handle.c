@@ -523,8 +523,11 @@ handle_mfile_pread(struct mfile *__restrict self,
 			return (*stream->mso_preadv)(self, &iov, num_bytes, addr, mode);
 		}
 	}
-	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
+		if unlikely(mode & IO_DIRECT)
+			return mfile_direct_read(self, dst, num_bytes, addr);
 		return mfile_read(self, dst, num_bytes, addr);
+	}
 	if (stream != NULL && addr == 0) {
 		if (stream->mso_read)
 			return (*stream->mso_read)(self, dst, num_bytes, mode);
@@ -554,8 +557,11 @@ handle_mfile_pwrite(struct mfile *__restrict self,
 			return (*stream->mso_pwritev)(self, &iov, num_bytes, addr, mode);
 		}
 	}
-	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
+		if unlikely(mode & IO_DIRECT)
+			return mfile_direct_write(self, src, num_bytes, addr);
 		return mfile_write(self, src, num_bytes, addr);
+	}
 	if (stream != NULL && addr == 0) {
 		if (stream->mso_write)
 			return (*stream->mso_write)(self, src, num_bytes, mode);
@@ -736,8 +742,11 @@ done_pread:
 			return result;
 		}
 	}
-	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
+		if unlikely(mode & IO_DIRECT)
+			return mfile_direct_readv(self, dst, 0, num_bytes, addr);
 		return mfile_readv(self, dst, 0, num_bytes, addr);
+	}
 	if (stream != NULL && addr == 0) {
 		if (stream->mso_readv)
 			return (*stream->mso_readv)(self, dst, num_bytes, mode);
@@ -811,8 +820,11 @@ done_pwrite:
 			return result;
 		}
 	}
-	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
+		if unlikely(mode & IO_DIRECT)
+			return mfile_direct_writev(self, src, 0, num_bytes, addr);
 		return mfile_writev(self, src, 0, num_bytes, addr);
+	}
 	if (stream != NULL && addr == 0) {
 		if (stream->mso_writev)
 			return (*stream->mso_writev)(self, src, num_bytes, mode);

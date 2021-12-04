@@ -341,7 +341,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
                                    * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
 #endif /* !O_DOSPATH && __O_DOSPATH */
 #if !defined(O_DIRECT) && defined(__O_DIRECT)
-#define O_DIRECT    __O_DIRECT    /* ??? */
+#define O_DIRECT    __O_DIRECT    /* Bypass unified I/O buffers. Directly read-from / write-to hardware (s.a. `FILE_IOC_BLKSHIFT'). */
 #endif /* !O_DIRECT && __O_DIRECT */
 #if !defined(O_NOATIME) && defined(__O_NOATIME)
 #define O_NOATIME   __O_NOATIME   /* Don't update last-accessed time stamps. */
@@ -485,7 +485,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_NONBLOCK   0x0800 /* Don't block in I/O (== O_NONBLOCK) */
 #define IO_DSYNC      0x1000 /* Ensure that all modified caches are flushed during write() (== O_DSYNC) */
 #define IO_ASYNC      0x2000 /* Use asynchronous I/O and generate SIGIO upon completion. */
-#define IO_DIRECT     0x4000 /* Bypass input/output buffers if possible. - Try to read/write data directly to/from provided buffers. */
+#define IO_DIRECT     0x4000 /* Bypass unified I/O buffers. Directly read-from / write-to hardware (s.a. `FILE_IOC_BLKSHIFT'). */
 #define IO_NODATAZERO 0x8000 /* For use with  `IO_NONBLOCK': Allow  0 to be  returned (which  normally indicates  EOF)
                               * when no data  is available at  the moment (which  normally would cause  `E_WOULDBLOCK'
                               * to be thrown). NOTE: This flag is merely a hint. - Functions are allowed to ignore it! */

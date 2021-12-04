@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e79a091 */
+/* HASH CRC-32:0xa7dcbee1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -219,8 +219,9 @@ __SYSDECL_BEGIN
 #endif /* __USE_KOS */
 
 #if defined(__USE_GNU) || defined(__USE_BSD)
+/* Bypass unified I/O buffers. Directly read-from / write-to hardware (s.a. `FILE_IOC_BLKSHIFT'). */
 #if !defined(O_DIRECT) && defined(__O_DIRECT)
-#define O_DIRECT __O_DIRECT /* ??? */
+#define O_DIRECT __O_DIRECT
 #endif /* !O_DIRECT && __O_DIRECT */
 #endif /* __USE_GNU || __USE_BSD */
 

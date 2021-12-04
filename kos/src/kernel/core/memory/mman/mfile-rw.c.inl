@@ -19,21 +19,21 @@
  */
 #ifdef __INTELLISENSE__
 #include "mfile-rw.c"
-//#define          DEFINE_mfile_direct_read
-//#define        DEFINE_mfile_direct_read_p
-//#define         DEFINE_mfile_direct_readv
-//#define       DEFINE_mfile_direct_readv_p
-//#define         DEFINE_mfile_direct_write
-//#define       DEFINE_mfile_direct_write_p
-//#define        DEFINE_mfile_direct_writev
-//#define      DEFINE_mfile_direct_writev_p
-//#define    DEFINE_mfile_direct_read_async
-//#define  DEFINE_mfile_direct_read_async_p
-//#define   DEFINE_mfile_direct_readv_async
-//#define DEFINE_mfile_direct_readv_async_p
-//#define   DEFINE_mfile_direct_write_async
-//#define DEFINE_mfile_direct_write_async_p
-#define DEFINE_mfile_direct_writev_async
+//#define       DEFINE_mfile_direct_read
+//#define     DEFINE_mfile_direct_read_p
+//#define      DEFINE_mfile_direct_readv
+//#define    DEFINE_mfile_direct_readv_p
+//#define      DEFINE_mfile_direct_write
+//#define    DEFINE_mfile_direct_write_p
+//#define     DEFINE_mfile_direct_writev
+//#define   DEFINE_mfile_direct_writev_p
+//#define DEFINE_mfile_direct_read_async
+#define   DEFINE_mfile_direct_read_async_p
+//#define    DEFINE_mfile_direct_readv_async
+//#define  DEFINE_mfile_direct_readv_async_p
+//#define    DEFINE_mfile_direct_write_async
+//#define  DEFINE_mfile_direct_write_async_p
+//#define   DEFINE_mfile_direct_writev_async
 //#define DEFINE_mfile_direct_writev_async_p
 //#define DEFINE_mfile_read
 //#define       DEFINE_mfile_read_p
@@ -449,7 +449,7 @@ again:
 	info.mdi_pos = offset;
 	aio->am_obj  = NULL;
 	RAII_FINALLY {
-		/* Release buffered AIO lock and restore old misc-lock. */
+		/* Release buffered AIO lock and restore old misc-object. */
 		if (aio->am_obj) {
 			assert(aio->am_obj->rca_destroy == &refcountable_dmalock_destroy);
 			decref(aio->am_obj);
@@ -470,6 +470,7 @@ again:
 #elif defined(LOCAL_DIRECT) && defined(LOCAL_ASYNC) && defined(LOCAL_BUFFER_IS_PHYS)
 	size_t result;
 	shift_t blockshift = self->mf_blockshift;
+	size_t io_bytes;
 #ifdef LOCAL_WRITING
 	auto io = self->mf_ops->mo_saveblocks;
 #else /* LOCAL_WRITING */
@@ -634,12 +635,13 @@ again:
 				THROW(E_FSERROR_FILE_TOO_BIG);
 			}
 		}
-		if (result > num_bytes)
-			result = num_bytes;
-		else {
+		if (result >= num_bytes) {
+			result   = num_bytes;
+			io_bytes = num_bytes;
+		} else {
 			/* Because `sf_filesize_max' may not be block-aligned, but align `result' now. */
-			result = CEIL_ALIGN(result, (size_t)1 << blockshift);
-			assertf(result <= num_bytes,
+			io_bytes = CEIL_ALIGN(result, (size_t)1 << blockshift);
+			assertf(io_bytes <= num_bytes,
 			        "Because `num_bytes' was asserted to be block-"
 			        "aligned, this should continue to hold true");
 		}
@@ -678,15 +680,11 @@ again_read_old_filesize:
 #endif /* LOCAL_WRITING */
 	{
 		/* Do I/O within allocated file bounds. */
-		pos_t blockaligned_filesize;
-		blockaligned_filesize = mfile_getsize(self);
-		blockaligned_filesize = CEIL_ALIGN(blockaligned_filesize, (size_t)1 << blockshift);
-
-		/* Figure out how much I/O we're allowed to perform. */
-		if (OVERFLOW_USUB(blockaligned_filesize, offset, &result)) {
+		pos_t filesize = mfile_getsize(self);
+		if (OVERFLOW_USUB(filesize, offset, &result)) {
 			result = 0;
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-			if (blockaligned_filesize > offset)
+			if (filesize > offset)
 				result = (size_t)-1;
 			else
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
@@ -700,21 +698,33 @@ again_read_old_filesize:
 		if (result > num_bytes)
 			result = num_bytes;
 
+		/* Figure out how much I/O we're allowed to perform. */
+		io_bytes = CEIL_ALIGN(result, (size_t)1 << blockshift);
+		assertf(io_bytes <= num_bytes, "Must be the case because `num_bytes' is block-aligned");
+
 		/* Prevent the file's size from being lowered. */
 		mfile_trunclock_inc(self);
 		mfile_lock_endread(self);
 	}
+
+	/* NOTE: At this point:
+	 * >> result <= io_bytes <= num_bytes
+	 * - result:    how much I/O we want to indicate to the caller (as
+	 *              limited by the file's  size during reads, and  the
+	 *              file's max possible size during writes)
+	 * - io_bytes:  the ceil-block-aligned value of `result'
+	 * - num_bytes: the block-aligned count for how much I/O the caller
+	 *              wanted us to do. */
 
 	/* Always release the trunc-lock once we're done. */
 	RAII_FINALLY { mfile_trunclock_dec(self); };
 
 	/* Actually do I/O */
 #ifndef LOCAL_BUFFER_IS_IOVEC
-	(*io)(self, offset, buffer, result, aio);
+	(*io)(self, offset, buffer, io_bytes, aio);
 #else /* !LOCAL_BUFFER_IS_IOVEC */
 	{
 		LOCAL_buffer_ent_t ent;
-		num_bytes = result;
 		IOV_PHYSBUFFER_FOREACH_N(ent, buffer) {
 			if (buf_offset) {
 				if (buf_offset >= ent.ive_size) {
@@ -725,15 +735,15 @@ again_read_old_filesize:
 				ent.ive_size -= buf_offset;
 				buf_offset = 0;
 			}
-			if (ent.ive_size > num_bytes)
-				ent.ive_size = num_bytes;
+			if (ent.ive_size > io_bytes)
+				ent.ive_size = io_bytes;
 
 			/* Must explicitly skip empty entries (load/save-blocks assumes non-empty requests) */
 			if likely(ent.ive_size != 0)
 				(*io)(self, offset, ent.ive_base, ent.ive_size, aio);
-			if (ent.ive_size >= num_bytes)
+			if (ent.ive_size >= io_bytes)
 				break;
-			num_bytes -= ent.ive_size;
+			io_bytes -= ent.ive_size;
 			offset += ent.ive_size;
 		}
 	}
