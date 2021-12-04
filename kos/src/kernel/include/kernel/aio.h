@@ -580,6 +580,7 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
 
 
 struct aio_multihandle;
+struct refcountable;
 struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_multiple
 #ifdef __cplusplus
 	: aio_handle
@@ -591,9 +592,10 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_multiple
 #define AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED_IS_ZERO 1
 #define AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED   ((struct aio_multihandle *)0)  /* Unused entry */
 #define AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE ((struct aio_multihandle *)-1) /* Completed/Canceled entry */
-	struct aio_multihandle *hg_controller; /* [0..1][lock(WRITE_ONCE(AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE))]
-	                                        * Associated controller. Set to `AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE'
-	                                        * after this handle's operation has completed. */
+	struct aio_multihandle  *hg_controller; /* [0..1][lock(WRITE_ONCE(AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE))]
+	                                         * Associated controller. Set to `AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE'
+	                                         * after this handle's operation has completed. */
+	REF struct refcountable *hg_obj;        /* [0..1][const] An object that is decref'd upon completion of this handle. */
 };
 
 /* Callback for `aio_handle_multiple' */
@@ -623,6 +625,9 @@ struct aio_multihandle_extension {
 
 struct aio_multihandle {
 	aio_multiple_completion_t  am_func;    /* [1..1][const] AIO completion callback. */
+	REF struct refcountable   *am_obj;     /* [0..1] When non-NULL incref'd and passed to newly created AIO handles.
+	                                        * Can be used for additional cleanup  (such as DMA locks) when  specific
+	                                        * sub-sets of handles complete. */
 	WEAK uintptr_t             am_status;  /* Set of `AIO_MULTIHANDLE_STATUS_*'. */
 	struct exception_data      am_error;   /* [lock(WRITE_ONCE)] AIO failure error. */
 	struct aio_multihandle_extension
@@ -651,6 +656,7 @@ NOTHROW(KCALL aio_multihandle_init)(struct aio_multihandle *__restrict self,
 	__libc_memset(&self->am_error, 0xcc, sizeof(self->am_error));
 	__libc_memset(self->am_ivec, 0xcc, sizeof(self->am_ivec));
 #endif /* !NDEBUG && !NDEBUG_FINI */
+	self->am_obj    = __NULLPTR;
 	self->am_func   = func;
 	self->am_status = (uintptr_t)AIO_COMPLETION_SUCCESS << AIO_MULTIHANDLE_STATUS_STATUSSHFT;
 	self->am_ext    = __NULLPTR;

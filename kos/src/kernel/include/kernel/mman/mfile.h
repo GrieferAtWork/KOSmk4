@@ -1438,6 +1438,30 @@ FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_writeall_p(struct mfile *__restric
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_writeallv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL mfile_writeallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
+/* "direct" versions of the above (for use with O_DIRECT; these bypass the unified I/O buffer)
+ * - You cannot use these functions for VIO buffers!
+ * - Alignment requirements are checked by these functions (`E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*') */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_direct_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL mfile_direct_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_direct_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL mfile_direct_readv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_direct_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1)) size_t KCALL mfile_direct_write_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_direct_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL mfile_direct_writev_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+
+/* Same as above, but these are the "async"-io versions
+ * NOTE: The virtual functions here will asynchronously and automatically
+ *       release DMA locks when  the associated I/O operations  complete. */
+FUNDEF BLOCKING WUNUSED NONNULL((1, 5)) size_t KCALL mfile_direct_read_async(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 5)) size_t KCALL mfile_direct_read_async_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2, 6)) size_t KCALL mfile_direct_readv_async(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2, 6)) size_t KCALL mfile_direct_readv_async_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1, 5)) size_t KCALL mfile_direct_write_async(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1, 5)) size_t KCALL mfile_direct_write_async_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1, 2, 6)) size_t KCALL mfile_direct_writev_async(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+FUNDEF BLOCKING NONNULL((1, 2, 6)) size_t KCALL mfile_direct_writev_async_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
+
 /* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */

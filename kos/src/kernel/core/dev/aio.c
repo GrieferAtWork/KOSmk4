@@ -28,6 +28,7 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/cc.h>
+#include <kernel/refcountable.h>
 #include <kernel/types.h>
 #include <sched/signal.h>
 
@@ -134,13 +135,19 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict self,
                                          unsigned int status) {
 	struct aio_multihandle *hand;
+	REF struct refcountable *obj;
 	uintptr_t old_status;
 	uintptr_t new_status;
 	hand = self->hg_controller;
+	obj  = self->hg_obj;
 	self->hg_controller = AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE;
+	DBG_memset(&self->hg_obj, 0xcc, sizeof(self->hg_obj));
 	COMPILER_BARRIER();
 	aio_handle_release(self);
 	COMPILER_BARRIER();
+	/* Decref the associated object (if any)
+	 * You could use this for stuff like async release of DMA locks! */
+	xdecref(obj);
 	assert(hand != AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED &&
 	       hand != AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
 	do {
@@ -269,6 +276,7 @@ fill_in_result:
 	DBG_memset(result, 0xcc, sizeof(struct aio_handle));
 	result->ah_func       = &aio_handle_multiple_func;
 	result->hg_controller = self;
+	result->hg_obj        = xincref(self->am_obj);
 	/* Required by `aio_multihandle_cancel()'
 	 * Used to ensure that the handle was actually initialized. */
 	result->ah_type = NULL;
@@ -327,6 +335,7 @@ fill_in_result:
 	DBG_memset(result, 0xcc, sizeof(struct aio_handle));
 	result->ah_func       = &aio_handle_multiple_func;
 	result->hg_controller = self;
+	result->hg_obj        = xincref(self->am_obj);
 	/* Required by `aio_multihandle_cancel()'
 	 * Used to ensure that the handle was actually initialized. */
 	result->ah_type = NULL;
@@ -424,15 +433,12 @@ NOTHROW(KCALL aio_multihandle_cancel)(struct aio_multihandle *__restrict self) {
 	unsigned int i;
 	struct aio_multihandle_extension *ext;
 	for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i) {
-		if (self->am_ivec[i].hg_controller &&
-		    self->am_ivec[i].ah_type) {
+		if (self->am_ivec[i].hg_controller && self->am_ivec[i].ah_type)
 			aio_handle_cancel(&self->am_ivec[i]);
-		}
 	}
 	for (ext = self->am_ext; ext; ext = ext->ame_next) {
 		for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i) {
-			if (ext->ame_handles[i].hg_controller &&
-			    ext->ame_handles[i].ah_type)
+			if (ext->ame_handles[i].hg_controller && ext->ame_handles[i].ah_type)
 				aio_handle_cancel(&ext->ame_handles[i]);
 		}
 	}

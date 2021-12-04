@@ -317,6 +317,13 @@ NOTHROW(KCALL page_isfree)(physpage_t page);
 FUNDEF NOBLOCK WUNUSED bool
 NOTHROW(KCALL page_iszero)(physpage_t page);
 
+/* Reset the is-zero attribute for all pages in the given range.
+ * Pages  that aren't  part of  any zones  are silently ignored. */
+FUNDEF NOBLOCK void
+NOTHROW(KCALL page_resetzero)(physpage_t page, physpagecnt_t num_pages);
+FUNDEF NOBLOCK void
+NOTHROW(KCALL page_resetzeroone)(physpage_t page);
+
 /* Check if all pages of a given physical memory range are mapped as available RAM. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages);

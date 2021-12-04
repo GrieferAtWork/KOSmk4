@@ -159,7 +159,7 @@ struct mpartmeta {
 	struct atomic_rwlock           mpm_ftxlock;  /* Lock for `mpm_ftx' */
 	Toblockop_slist(mpart)         mpm_ftxlops;  /* [0..n][lock(ATOMIC)] Lock operations for `mpm_ftxlock'. */
 	LLRBTREE_ROOT(WEAK REF mfutex) mpm_ftx;      /* [0..n][lock(mpm_ftx)] Futex tree. (May contain dead futex objects) */
-	WEAK refcnt_t                  mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
+	WEAK refcnt_t                  mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT || mpm_dmalocks != 0), DEC(ATOMIC))]
 	                                              * # of DMA locks referencing the associated part. */
 	struct sig                     mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
 #ifdef ARCH_HAVE_RTM
@@ -251,8 +251,8 @@ NOTHROW(FCALL _mpart_dma_donelock)(REF struct mpart *__restrict self);
 FORCELOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(mpart_dma_addlock)(struct mpart *__restrict self) {
 	struct mpartmeta *meta = self->mp_meta;
-	__hybrid_assert(mpart_lock_acquired(self));
 	__hybrid_assert(meta != __NULLPTR);
+	__hybrid_assert(mpart_lock_acquired(self) || __hybrid_atomic_load(meta->mpm_dmalocks, __ATOMIC_ACQUIRE) != 0);
 	__hybrid_atomic_inc(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
 }
 

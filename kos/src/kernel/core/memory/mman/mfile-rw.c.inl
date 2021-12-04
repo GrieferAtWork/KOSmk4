@@ -19,15 +19,31 @@
  */
 #ifdef __INTELLISENSE__
 #include "mfile-rw.c"
-//#define        DEFINE_mfile_read
-//#define      DEFINE_mfile_read_p
-//#define       DEFINE_mfile_readv
-//#define     DEFINE_mfile_readv_p
-//#define    DEFINE_mfile_tailread
-//#define  DEFINE_mfile_tailread_p
-//#define   DEFINE_mfile_tailreadv
-//#define DEFINE_mfile_tailreadv_p
-#define       DEFINE_mfile_write
+//#define          DEFINE_mfile_direct_read
+//#define        DEFINE_mfile_direct_read_p
+//#define         DEFINE_mfile_direct_readv
+//#define       DEFINE_mfile_direct_readv_p
+//#define         DEFINE_mfile_direct_write
+//#define       DEFINE_mfile_direct_write_p
+//#define        DEFINE_mfile_direct_writev
+//#define      DEFINE_mfile_direct_writev_p
+//#define    DEFINE_mfile_direct_read_async
+//#define  DEFINE_mfile_direct_read_async_p
+//#define   DEFINE_mfile_direct_readv_async
+//#define DEFINE_mfile_direct_readv_async_p
+//#define   DEFINE_mfile_direct_write_async
+//#define DEFINE_mfile_direct_write_async_p
+#define DEFINE_mfile_direct_writev_async
+//#define DEFINE_mfile_direct_writev_async_p
+//#define DEFINE_mfile_read
+//#define       DEFINE_mfile_read_p
+//#define        DEFINE_mfile_readv
+//#define      DEFINE_mfile_readv_p
+//#define     DEFINE_mfile_tailread
+//#define   DEFINE_mfile_tailread_p
+//#define    DEFINE_mfile_tailreadv
+//#define  DEFINE_mfile_tailreadv_p
+//#define        DEFINE_mfile_write
 //#define      DEFINE_mfile_write_p
 //#define       DEFINE_mfile_writev
 //#define     DEFINE_mfile_writev_p
@@ -37,9 +53,12 @@
 //#define DEFINE_mfile_tailwritev_p
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/aio.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/super.h>
 #include <kernel/iovec.h>
+#include <kernel/mman/dma.h>
+#include <kernel/mman/fault.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
@@ -52,6 +71,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -69,13 +89,78 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 #endif /* !DBG_memset */
 
-#if defined(DEFINE_mfile_read) || defined(DEFINE_mfile_tailread)
+#if defined(DEFINE_mfile_direct_read) || defined(DEFINE_mfile_direct_read_async)
+#ifdef DEFINE_mfile_direct_read_async
+#define LOCAL_ASYNC
+#endif /* DEFINE_mfile_direct_read_async */
+#define LOCAL_DIRECT
+#define LOCAL_mfile_normrw       mfile_direct_read
+#define LOCAL_mfile_asyncrw      mfile_direct_read_async
+#elif defined(DEFINE_mfile_direct_readv) || defined(DEFINE_mfile_direct_readv_async)
+#ifdef DEFINE_mfile_direct_readv_async
+#define LOCAL_ASYNC
+#endif /* DEFINE_mfile_direct_readv_async */
+#define LOCAL_DIRECT
+#define LOCAL_BUFFER_IS_IOVEC
+#define LOCAL_mfile_normrw       mfile_direct_readv
+#define LOCAL_mfile_asyncrw      mfile_direct_readv_async
+#elif defined(DEFINE_mfile_direct_write) || defined(DEFINE_mfile_direct_write_async)
+#ifdef DEFINE_mfile_direct_write_async
+#define LOCAL_ASYNC
+#endif /* DEFINE_mfile_direct_write_async */
+#define LOCAL_DIRECT
+#define LOCAL_WRITING
+#define LOCAL_mfile_normrw       mfile_direct_write
+#define LOCAL_mfile_asyncrw      mfile_direct_write_async
+#elif defined(DEFINE_mfile_direct_writev) || defined(DEFINE_mfile_direct_writev_async)
+#ifdef DEFINE_mfile_direct_writev_async
+#define LOCAL_ASYNC
+#endif /* DEFINE_mfile_direct_writev_async */
+#define LOCAL_DIRECT
+#define LOCAL_WRITING
+#define LOCAL_BUFFER_IS_IOVEC
+#define LOCAL_mfile_normrw       mfile_direct_writev
+#define LOCAL_mfile_asyncrw      mfile_direct_writev_async
+#elif defined(DEFINE_mfile_direct_read_p) || defined(DEFINE_mfile_direct_read_async_p)
+#ifdef DEFINE_mfile_direct_read_async_p
+#define LOCAL_ASYNC
+#endif /* DEFINE_mfile_direct_read_async_p */
+#define LOCAL_DIRECT
+#define LOCAL_BUFFER_IS_PHYS
+#define LOCAL_mfile_normrw       mfile_direct_read_p
+#define LOCAL_mfile_asyncrw      mfile_direct_read_async_p
+#elif defined(DEFINE_mfile_direct_readv_p) || defined(DEFINE_mfile_direct_readv_async_p)
+#ifdef DEFINE_mfile_direct_readv_async_p
+#define LOCAL_ASYNC
+#endif /* DEFINE_mfile_direct_readv_async_p */
+#define LOCAL_DIRECT
+#define LOCAL_BUFFER_IS_PHYS
+#define LOCAL_BUFFER_IS_IOVEC
+#define LOCAL_mfile_normrw       mfile_direct_readv_p
+#define LOCAL_mfile_asyncrw      mfile_direct_readv_async_p
+#elif defined(DEFINE_mfile_direct_write_p) || defined(DEFINE_mfile_direct_write_async_p)
+#ifdef DEFINE_mfile_direct_write_async_p
+#define LOCAL_ASYNC
+#endif /* DEFINE_mfile_direct_write_async_p */
+#define LOCAL_DIRECT
+#define LOCAL_WRITING
+#define LOCAL_BUFFER_IS_PHYS
+#define LOCAL_mfile_normrw       mfile_direct_write_p
+#define LOCAL_mfile_asyncrw      mfile_direct_write_async_p
+#elif defined(DEFINE_mfile_direct_writev_p) || defined(DEFINE_mfile_direct_writev_async_p)
+#ifdef DEFINE_mfile_direct_writev_async_p
+#define LOCAL_ASYNC
+#endif /* DEFINE_mfile_direct_writev_async_p */
+#define LOCAL_DIRECT
+#define LOCAL_WRITING
+#define LOCAL_BUFFER_IS_PHYS
+#define LOCAL_BUFFER_IS_IOVEC
+#define LOCAL_mfile_normrw       mfile_direct_writev_p
+#define LOCAL_mfile_asyncrw      mfile_direct_writev_async_p
+#elif defined(DEFINE_mfile_read) || defined(DEFINE_mfile_tailread)
 #ifdef DEFINE_mfile_tailread
 #define LOCAL_TAILIO
 #endif /* DEFINE_mfile_tailread */
-#define LOCAL_READING
-#define LOCAL_buffer_t           USER CHECKED void *
-#define LOCAL_ubuffer_t          uintptr_t
 #define LOCAL_mfile_viorw        mfile_vioread
 #define LOCAL_mfile_normrw       mfile_read
 #define LOCAL_mfile_tailrw       mfile_tailread
@@ -86,8 +171,6 @@ DECL_BEGIN
 #define LOCAL_TAILIO
 #endif /* DEFINE_mfile_tailwrite */
 #define LOCAL_WRITING
-#define LOCAL_buffer_t           USER CHECKED void const *
-#define LOCAL_ubuffer_t          uintptr_t
 #define LOCAL_mfile_viorw        mfile_viowrite
 #define LOCAL_mfile_normrw       mfile_write
 #define LOCAL_mfile_tailrw       mfile_tailwrite
@@ -97,10 +180,7 @@ DECL_BEGIN
 #ifdef DEFINE_mfile_tailreadv
 #define LOCAL_TAILIO
 #endif /* DEFINE_mfile_tailreadv */
-#define LOCAL_READING
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t           struct iov_buffer const *__restrict
-#define LOCAL_buffer_ent_t       struct iov_entry
 #define LOCAL_mfile_viorw        mfile_vioreadv
 #define LOCAL_mfile_normrw       mfile_readv
 #define LOCAL_mfile_tailrw       mfile_tailreadv
@@ -112,8 +192,6 @@ DECL_BEGIN
 #endif /* DEFINE_mfile_tailwritev */
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t           struct iov_buffer const *__restrict
-#define LOCAL_buffer_ent_t       struct iov_entry
 #define LOCAL_mfile_viorw        mfile_viowritev
 #define LOCAL_mfile_normrw       mfile_writev
 #define LOCAL_mfile_tailrw       mfile_tailwritev
@@ -123,10 +201,7 @@ DECL_BEGIN
 #ifdef DEFINE_mfile_tailread_p
 #define LOCAL_TAILIO
 #endif /* DEFINE_mfile_tailread_p */
-#define LOCAL_READING
 #define LOCAL_BUFFER_IS_PHYS
-#define LOCAL_buffer_t           physaddr_t
-#define LOCAL_ubuffer_t          physaddr_t
 #define LOCAL_mfile_viorw        mfile_vioread_p
 #define LOCAL_mfile_normrw       mfile_read_p
 #define LOCAL_mfile_tailrw       mfile_tailread_p
@@ -138,8 +213,6 @@ DECL_BEGIN
 #endif /* DEFINE_mfile_tailwrite_p */
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_PHYS
-#define LOCAL_buffer_t           physaddr_t
-#define LOCAL_ubuffer_t          physaddr_t
 #define LOCAL_mfile_viorw        mfile_viowrite_p
 #define LOCAL_mfile_normrw       mfile_write_p
 #define LOCAL_mfile_tailrw       mfile_tailwrite_p
@@ -149,11 +222,8 @@ DECL_BEGIN
 #ifdef DEFINE_mfile_tailreadv_p
 #define LOCAL_TAILIO
 #endif /* DEFINE_mfile_tailreadv_p */
-#define LOCAL_READING
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
-#define LOCAL_buffer_ent_t       struct iov_physentry
 #define LOCAL_mfile_viorw        mfile_vioreadv_p
 #define LOCAL_mfile_normrw       mfile_readv_p
 #define LOCAL_mfile_tailrw       mfile_tailreadv_p
@@ -166,8 +236,6 @@ DECL_BEGIN
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
-#define LOCAL_buffer_ent_t       struct iov_physentry
 #define LOCAL_mfile_viorw        mfile_viowritev_p
 #define LOCAL_mfile_normrw       mfile_writev_p
 #define LOCAL_mfile_tailrw       mfile_tailwritev_p
@@ -177,11 +245,38 @@ DECL_BEGIN
 #error "Bad configuration"
 #endif /* !... */
 
-#ifdef LOCAL_TAILIO
+#ifndef LOCAL_WRITING
+#define LOCAL_READING
+#endif /* !LOCAL_WRITING */
+
+#ifdef LOCAL_ASYNC
+#define LOCAL_DIRECT
+#endif /* LOCAL_ASYNC */
+
+#if defined(LOCAL_BUFFER_IS_PHYS) && defined(LOCAL_BUFFER_IS_IOVEC)
+#define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
+#define LOCAL_buffer_ent_t       struct iov_physentry
+#elif defined(LOCAL_BUFFER_IS_PHYS)
+#define LOCAL_buffer_t           physaddr_t
+#define LOCAL_ubuffer_t          physaddr_t
+#elif defined(LOCAL_BUFFER_IS_IOVEC)
+#define LOCAL_buffer_t           struct iov_buffer const *__restrict
+#define LOCAL_buffer_ent_t       struct iov_entry
+#elif defined(LOCAL_WRITING)
+#define LOCAL_buffer_t           USER CHECKED void const *
+#define LOCAL_ubuffer_t          uintptr_t
+#else /* ... */
+#define LOCAL_buffer_t           USER CHECKED void *
+#define LOCAL_ubuffer_t          uintptr_t
+#endif /* !... */
+
+#if defined(LOCAL_DIRECT) && defined(LOCAL_ASYNC)
+#define LOCAL_mfile_rw LOCAL_mfile_asyncrw
+#elif defined(LOCAL_TAILIO)
 #define LOCAL_mfile_rw LOCAL_mfile_tailrw
-#else /* LOCAL_TAILIO */
+#else /* ... */
 #define LOCAL_mfile_rw LOCAL_mfile_normrw
-#endif /* !LOCAL_TAILIO */
+#endif /* !... */
 
 #ifdef LOCAL_BUFFER_IS_IOVEC
 #define LOCAL_buffer_advance(count) (buf_offset += (count))
@@ -190,6 +285,77 @@ DECL_BEGIN
 #endif /* !LOCAL_BUFFER_IS_IOVEC */
 
 
+#if defined(LOCAL_DIRECT) && defined(LOCAL_ASYNC) && !defined(LOCAL_BUFFER_IS_PHYS)
+#ifdef LOCAL_WRITING
+#define LOCAL_dma_callback mfile_dma_write_cb
+#ifndef __mfile_dma_write_cb_defined
+#define __mfile_dma_write_cb_defined
+#define LOCAL_WANT_dma_callback
+#endif /* !__mfile_dma_write_cb_defined */
+#else /* LOCAL_WRITING */
+#define LOCAL_dma_callback mfile_dma_read_cb
+#ifndef __mfile_dma_read_cb_defined
+#define __mfile_dma_read_cb_defined
+#define LOCAL_WANT_dma_callback
+#endif /* !__mfile_dma_read_cb_defined */
+#endif /* !LOCAL_WRITING */
+#ifndef __mfile_dma_info_defined
+#define __mfile_dma_info_defined
+struct mfile_dma_info {
+	struct mfile            *mdi_fil; /* [1..1][const] The file on which to perform I/O. */
+	struct aio_multihandle  *mdi_aio; /* [1..1][const] AIO controller. */
+	struct refcountable     *mdi_msc; /* [0..1][const] Misc inner object to store alongside AIO handles. */
+	size_t                   mdi_iob; /* [in|out] Sum of bytes for which I/O was initiated */
+	pos_t                    mdi_pos; /* [in|out] File position of next segment */
+};
+#endif /* !__mfile_dma_info_defined */
+
+#ifdef LOCAL_WRITING
+#define LOCAL_mfile_direct_io_async_p mfile_direct_write_async_p
+#else /* LOCAL_WRITING */
+#define LOCAL_mfile_direct_io_async_p mfile_direct_read_async_p
+#endif /* !LOCAL_WRITING */
+
+#ifdef LOCAL_WANT_dma_callback
+#undef LOCAL_WANT_dma_callback
+PRIVATE NONNULL((1, 4)) ssize_t KCALL
+LOCAL_dma_callback(void *cookie, physaddr_t paddr, size_t num_bytes,
+                   /*inherit(always)*/ mdma_lock_t lock) {
+	size_t result;
+	struct mfile_dma_info *info;
+	struct refcountable_dmalock *rlck;
+	info = (struct mfile_dma_info *)cookie;
+	rlck = (struct refcountable_dmalock *)info->mdi_aio->am_obj;
+
+	/* If necessary, construct a new DMA lock controller for `lock' */
+	if (rlck == NULL || rlck->rld_lock != lock) {
+		REF struct refcountable_dmalock *newlock;
+		newlock = refcountable_dmalock_new(lock, info->mdi_msc);
+		xdecref(rlck);
+		info->mdi_aio->am_obj = newlock;
+	} else {
+		/* Existing lock can be re-used (but must still inherit `lock') */
+		mdma_lock_release_nokill(lock);
+	}
+
+	/* Do I/O. When this creates new AIO handles, those handles
+	 * will hold references to the currently relevant DMA lock. */
+	result = LOCAL_mfile_direct_io_async_p(info->mdi_fil, paddr, num_bytes,
+	                                       info->mdi_pos, info->mdi_aio);
+
+	/* Account for the amount of I/O performed. */
+	info->mdi_iob += result;
+	if (result < num_bytes)
+		return -1; /* Incomplete I/O count (stop trying to advance further into the file) */
+
+	/* Advance further into the file. */
+	info->mdi_pos += result;
+	return 0;
+}
+#endif /* LOCAL_WANT_dma_callback */
+
+#undef LOCAL_mfile_direct_io_async_p
+#endif /* LOCAL_DIRECT && LOCAL_ASYNC && !LOCAL_BUFFER_IS_PHYS */
 
 
 
@@ -208,8 +374,17 @@ LOCAL_mfile_rw(struct mfile *__restrict self,
                ,
                pos_t offset
 #endif /* LOCAL_READING || !LOCAL_TAILIO */
+#ifdef LOCAL_ASYNC
+               ,
+               struct aio_multihandle *__restrict aio
+#endif /* LOCAL_ASYNC */
                )
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+#ifdef LOCAL_DIRECT
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
+#else /* LOCAL_DIRECT */
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
+#endif /* !LOCAL_DIRECT */
+{
 #if defined(LOCAL_READING) && defined(LOCAL_TAILIO)
 	size_t result;
 again:
@@ -218,7 +393,7 @@ again:
 #else /* LOCAL_BUFFER_IS_IOVEC */
 	result = LOCAL_mfile_normrw(self, buffer, num_bytes, offset);
 #endif /* !LOCAL_BUFFER_IS_IOVEC */
-	if (result == 0 && !mfile_isanon(self)) {
+	if (result == 0 && !mfile_isanon(self) && num_bytes != 0) {
 		/* Wait for data to become available. */
 		task_connect(&self->mf_initdone);
 		{
@@ -238,7 +413,333 @@ again:
 		task_disconnectall();
 	}
 	return result;
-#else /* defined(LOCAL_READING) && defined(LOCAL_TAILIO) */
+#elif defined(LOCAL_DIRECT) && !defined(LOCAL_ASYNC)
+	size_t result;
+	struct aio_multihandle_generic hand;
+	aio_multihandle_generic_init(&hand);
+	TRY {
+		/* Do async IO */
+#ifdef LOCAL_BUFFER_IS_IOVEC
+		result = LOCAL_mfile_asyncrw(self, buffer, buf_offset, num_bytes, offset, &hand);
+#else /* LOCAL_BUFFER_IS_IOVEC */
+		result = LOCAL_mfile_asyncrw(self, buffer, num_bytes, offset, &hand);
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
+		aio_multihandle_done(&hand);
+	} EXCEPT {
+		aio_multihandle_fail(&hand);
+		result = 0; /* Silence warnings... */
+	}
+
+	/* Wait for AIO completion. */
+	RAII_FINALLY { aio_multihandle_generic_fini(&hand); };
+	aio_multihandle_generic_waitfor(&hand);
+	aio_multihandle_generic_checkerror(&hand);
+	return result;
+#elif defined(LOCAL_DIRECT) && defined(LOCAL_ASYNC) && !defined(LOCAL_BUFFER_IS_PHYS)
+#ifdef LOCAL_READING
+#define LOCAL_DMA_FLAGS MMAN_FAULT_F_WRITE /* read-from-file / WRITE-to-buffer */
+#else /* LOCAL_READING */
+#define LOCAL_DMA_FLAGS 0                  /* write-to-file / READ-from-buffer */
+#endif /* !LOCAL_READING */
+	struct mfile_dma_info info;
+	info.mdi_fil = self;
+	info.mdi_aio = aio;
+	info.mdi_msc = aio->am_obj;
+	info.mdi_iob = 0;
+	info.mdi_pos = offset;
+	aio->am_obj  = NULL;
+	RAII_FINALLY {
+		/* Release buffered AIO lock and restore old misc-lock. */
+		if (aio->am_obj) {
+			assert(aio->am_obj->rca_destroy == &refcountable_dmalock_destroy);
+			decref(aio->am_obj);
+		}
+		aio->am_obj = info.mdi_msc;
+	};
+
+	/* Enumerate DMA ranges and initiate I/O */
+#ifdef LOCAL_BUFFER_IS_IOVEC
+	mman_dmav(&LOCAL_dma_callback, &info, buffer, buf_offset, num_bytes, LOCAL_DMA_FLAGS);
+#else /* LOCAL_BUFFER_IS_IOVEC */
+	mman_dma(&LOCAL_dma_callback, &info, (void *)buffer, num_bytes, LOCAL_DMA_FLAGS);
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
+
+	/* Return the total # of bytes for which I/O was performed. */
+	return info.mdi_iob;
+#undef LOCAL_DMA_FLAGS
+#elif defined(LOCAL_DIRECT) && defined(LOCAL_ASYNC) && defined(LOCAL_BUFFER_IS_PHYS)
+	size_t result;
+	shift_t blockshift = self->mf_blockshift;
+#ifdef LOCAL_WRITING
+	auto io = self->mf_ops->mo_saveblocks;
+#else /* LOCAL_WRITING */
+	auto io = self->mf_ops->mo_loadblocks;
+#endif /* !LOCAL_WRITING */
+
+	/* Check for special case: no I/O requested. */
+	if unlikely(!num_bytes)
+		return 0;
+
+	/* Check if direct I/O of this kind is even possible. */
+	if unlikely(!io) {
+#ifdef LOCAL_WRITING
+		THROW(E_FSERROR_READONLY);
+#else /* LOCAL_WRITING */
+		return 0;
+#endif /* !LOCAL_WRITING */
+	}
+
+	/* Validate alignment of file position and buffer size. */
+	if unlikely(offset != ((offset >> blockshift) << blockshift)) {
+		THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+		      E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADPOS,
+		      (uintptr_t)offset, ((size_t)1 << blockshift) - 1);
+	}
+	if unlikely(num_bytes != ((num_bytes >> blockshift) << blockshift)) {
+		THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+		      E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADSIZ,
+		      num_bytes, ((size_t)1 << blockshift) - 1);
+	}
+
+	/* Also validate alignment of buffers (which uses a different shift) */
+	{
+		shift_t ioba_shift = self->mf_iobashift;
+#ifdef LOCAL_BUFFER_IS_IOVEC
+		LOCAL_buffer_ent_t ent;
+		size_t temp_offset = buf_offset;
+		size_t temp_bytes  = num_bytes;
+		pos_t temp_fpos    = offset;
+		IOV_PHYSBUFFER_FOREACH_N(ent, buffer)
+#endif /* LOCAL_BUFFER_IS_IOVEC */
+		{
+			physaddr_t bufaddr;
+#ifdef LOCAL_READING
+			size_t bufsize;
+#endif /* LOCAL_READING */
+#ifdef LOCAL_BUFFER_IS_IOVEC
+			if (temp_offset) {
+				if (temp_offset >= ent.ive_size) {
+					temp_offset -= ent.ive_size;
+					continue;
+				}
+				ent.ive_base += temp_offset;
+				ent.ive_size -= temp_offset;
+				temp_offset = 0;
+			}
+			if (ent.ive_size > temp_bytes)
+				ent.ive_size = temp_bytes;
+
+			/* Validate buffer size / file position at this location. */
+			if unlikely(temp_fpos != ((temp_fpos >> blockshift) << blockshift)) {
+				THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+				      E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADPOS,
+				      (uintptr_t)temp_fpos, ((size_t)1 << blockshift) - 1);
+			}
+			if unlikely(ent.ive_size != ((ent.ive_size >> blockshift) << blockshift)) {
+				THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+				      E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADSIZ,
+				      ent.ive_size, ((size_t)1 << blockshift) - 1);
+			}
+
+			bufaddr = ent.ive_base;
+#ifdef LOCAL_READING
+			bufsize = ent.ive_size;
+#endif /* LOCAL_READING */
+#else /* LOCAL_BUFFER_IS_IOVEC */
+			bufaddr = buffer;
+#ifdef LOCAL_READING
+			bufsize = num_bytes;
+#endif /* LOCAL_READING */
+#endif /* !LOCAL_BUFFER_IS_IOVEC */
+
+			/* Validate buffer address. */
+			if (bufaddr != ((bufaddr >> ioba_shift) << ioba_shift)) {
+				/* NOTE: It's OK if  this ends up  leaking physical memory  addresses
+				 *       into user-space (I think). Aside from possibly some unwanted
+				 *       introspection on system state, I can't think of any way this
+				 *       could be used by a malicious program. */
+				THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+				      E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF,
+				      (uintptr_t)bufaddr, ((size_t)1 << ioba_shift) - 1);
+			}
+
+			/* When loading blocks, allocator  functions are allowed to  assume
+			 * that the state of `page_iszero()' can be trusted (as is normally
+			 * the case since `mo_loadblocks' is  mainly used to populated  ram
+			 * that has been freshly allocated)
+			 *
+			 * However, to prevent `mo_loadblocks' from skipping any blocks that
+			 * used to be zero'd, but no longer are, we must manually clear  the
+			 * page-frame allocator's idea of  zero-pages for the address  range
+			 * we're trying to initialize. */
+#ifdef LOCAL_READING
+			bufsize += (size_t)(bufaddr & PAGEMASK);
+			bufaddr >>= PAGESHIFT;
+			bufaddr += PAGEMASK;
+			bufsize >>= PAGESHIFT;
+			page_resetzero((physpage_t)bufaddr, (physpagecnt_t)bufsize);
+#endif /* LOCAL_READING */
+
+#ifdef LOCAL_BUFFER_IS_IOVEC
+			if (ent.ive_size >= temp_bytes)
+				break;
+			temp_bytes -= ent.ive_size;
+			temp_fpos += ent.ive_size;
+#endif /* LOCAL_BUFFER_IS_IOVEC */
+		}
+	}
+
+	mfile_lock_read(self);
+
+	/* Check if the file has been deleted (or is read-only). */
+#ifdef LOCAL_WRITING
+	if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY))
+#else /* LOCAL_WRITING */
+	if unlikely(self->mf_flags & (MFILE_F_DELETED))
+#endif /* !LOCAL_WRITING */
+	{
+		mfile_lock_endread(self);
+#ifdef LOCAL_WRITING
+		THROW(E_FSERROR_READONLY);
+#else /* LOCAL_WRITING */
+		return 0;
+#endif /* !LOCAL_WRITING */
+	}
+
+#ifdef LOCAL_WRITING
+	if (!(self->mf_flags & MFILE_F_FIXEDFILESIZE)) {
+		/* If necessary, increase file size.
+		 * NOTE: Even if the write below fails, we don't decrease the
+		 *       file size (since that would require additional locks
+		 *       and can't be done safely because the new size  would
+		 *       have already been globally visible)
+		 * Also: The only reason anything below might fail is a hardware
+		 *       failure, or an interrupt, both of which are allowed  to
+		 *       leave the file in a state where data has been partially
+		 *       written.
+		 * NOTE: Only increase the file size when `num_bytes != 0' */
+		uintptr_t changes;
+		pos_t old_filesize, new_filesize;
+		pos_t max_file_size = (pos_t)-1;
+		if (mfile_isnode(self))
+			max_file_size = mfile_asnode(self)->fn_super->fs_feat.sf_filesize_max;
+		if (OVERFLOW_USUB(max_file_size, offset, &result)) {
+#if __SIZEOF_POS_T__ < __SIZEOF_SIZE_T__
+			if (offset < max_file_size)
+				result = (size_t)-1;
+			else
+#endif /* __SIZEOF_POS_T__ < __SIZEOF_SIZE_T__ */
+			{
+				mfile_lock_endread(self);
+				THROW(E_FSERROR_FILE_TOO_BIG);
+			}
+		}
+		if (result > num_bytes)
+			result = num_bytes;
+		else {
+			/* Because `sf_filesize_max' may not be block-aligned, but align `result' now. */
+			result = CEIL_ALIGN(result, (size_t)1 << blockshift);
+			assertf(result <= num_bytes,
+			        "Because `num_bytes' was asserted to be block-"
+			        "aligned, this should continue to hold true");
+		}
+
+		changes      = 0;
+		new_filesize = offset + result;
+again_read_old_filesize:
+		old_filesize = mfile_getsize(self);
+		if (new_filesize > old_filesize) {
+			/* Increase file size. */
+			if (!atomic64_cmpxch_weak(&self->mf_filesize,
+			                          (uint64_t)old_filesize,
+			                          (uint64_t)new_filesize))
+				goto again_read_old_filesize;
+			changes |= MFILE_F_ATTRCHANGED;
+		}
+		mfile_trunclock_inc(self);
+		mfile_lock_endread(self);
+
+		/* Update the last-modified timestamp (if necessary) */
+		if (!(self->mf_flags & MFILE_F_NOMTIME)) {
+			struct timespec now = realtime();
+			mfile_tslock_acquire(self);
+			COMPILER_READ_BARRIER();
+			if (!(self->mf_flags & (MFILE_F_NOMTIME | MFILE_F_DELETED))) {
+				self->mf_mtime = now;
+				changes |= MFILE_F_ATTRCHANGED;
+			}
+			mfile_tslock_release(self);
+		}
+
+		/* (possibly) mark file attributes as having changed. */
+		if (changes != 0)
+			mfile_changed(self, changes);
+	} else
+#endif /* LOCAL_WRITING */
+	{
+		/* Do I/O within allocated file bounds. */
+		pos_t blockaligned_filesize;
+		blockaligned_filesize = mfile_getsize(self);
+		blockaligned_filesize = CEIL_ALIGN(blockaligned_filesize, (size_t)1 << blockshift);
+
+		/* Figure out how much I/O we're allowed to perform. */
+		if (OVERFLOW_USUB(blockaligned_filesize, offset, &result)) {
+			result = 0;
+#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
+			if (blockaligned_filesize > offset)
+				result = (size_t)-1;
+			else
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
+			{
+#ifdef LOCAL_WRITING
+				mfile_lock_endread(self);
+				THROW(E_FSERROR_FILE_TOO_BIG);
+#endif /* LOCAL_WRITING */
+			}
+		}
+		if (result > num_bytes)
+			result = num_bytes;
+
+		/* Prevent the file's size from being lowered. */
+		mfile_trunclock_inc(self);
+		mfile_lock_endread(self);
+	}
+
+	/* Always release the trunc-lock once we're done. */
+	RAII_FINALLY { mfile_trunclock_dec(self); };
+
+	/* Actually do I/O */
+#ifndef LOCAL_BUFFER_IS_IOVEC
+	(*io)(self, offset, buffer, result, aio);
+#else /* !LOCAL_BUFFER_IS_IOVEC */
+	{
+		LOCAL_buffer_ent_t ent;
+		num_bytes = result;
+		IOV_PHYSBUFFER_FOREACH_N(ent, buffer) {
+			if (buf_offset) {
+				if (buf_offset >= ent.ive_size) {
+					buf_offset -= ent.ive_size;
+					continue;
+				}
+				ent.ive_base += buf_offset;
+				ent.ive_size -= buf_offset;
+				buf_offset = 0;
+			}
+			if (ent.ive_size > num_bytes)
+				ent.ive_size = num_bytes;
+
+			/* Must explicitly skip empty entries (load/save-blocks assumes non-empty requests) */
+			if likely(ent.ive_size != 0)
+				(*io)(self, offset, ent.ive_base, ent.ive_size, aio);
+			if (ent.ive_size >= num_bytes)
+				break;
+			num_bytes -= ent.ive_size;
+			offset += ent.ive_size;
+		}
+	}
+#endif /* LOCAL_BUFFER_IS_IOVEC */
+	return result;
+#else /* ... */
 	size_t result = 0;
 	PAGEDIR_PAGEALIGNED pos_t newpart_minaddr;
 	pos_t newpart_maxaddr; /* Aligned at .+1 */
@@ -1319,7 +1820,7 @@ handle_part_insert_failure:
 done:
 	return result;
 #undef offset
-#endif /* !LOCAL_READING || !LOCAL_TAILIO */
+#endif /* !... */
 }
 
 
@@ -1336,11 +1837,31 @@ done:
 #undef LOCAL_mfile_viorw
 #undef LOCAL_mfile_normrw
 #undef LOCAL_mfile_tailrw
+#undef LOCAL_mfile_asyncrw
+#undef LOCAL_dma_callback
 #undef LOCAL_READING
 #undef LOCAL_WRITING
+#undef LOCAL_ASYNC
+#undef LOCAL_DIRECT
 
 DECL_END
 
+#undef DEFINE_mfile_direct_read
+#undef DEFINE_mfile_direct_read_p
+#undef DEFINE_mfile_direct_readv
+#undef DEFINE_mfile_direct_readv_p
+#undef DEFINE_mfile_direct_write
+#undef DEFINE_mfile_direct_write_p
+#undef DEFINE_mfile_direct_writev
+#undef DEFINE_mfile_direct_writev_p
+#undef DEFINE_mfile_direct_read_async
+#undef DEFINE_mfile_direct_read_async_p
+#undef DEFINE_mfile_direct_readv_async
+#undef DEFINE_mfile_direct_readv_async_p
+#undef DEFINE_mfile_direct_write_async
+#undef DEFINE_mfile_direct_write_async_p
+#undef DEFINE_mfile_direct_writev_async
+#undef DEFINE_mfile_direct_writev_async_p
 #undef DEFINE_mfile_read
 #undef DEFINE_mfile_read_p
 #undef DEFINE_mfile_readv

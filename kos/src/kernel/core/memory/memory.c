@@ -1171,6 +1171,37 @@ NOTHROW(KCALL page_iszero)(physpage_t page) {
 	return false;
 }
 
+
+/* Reset the is-zero attribute for all pages in the given range.
+ * Pages  that aren't  part of  any zones  are silently ignored. */
+PUBLIC NOBLOCK void
+NOTHROW(KCALL page_resetzero)(physpage_t page, physpagecnt_t num_pages) {
+	/* Keep it simple... */
+	while (num_pages--)
+		page_resetzeroone(page++);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(KCALL page_resetzeroone)(physpage_t page) {
+	struct pmemzone *zone;
+	zone = mzones.pm_last;
+	do {
+		if (page >= zone->mz_start && page <= zone->mz_max) {
+			size_t i;
+			unsigned int j;
+			uintptr_t mask;
+			page -= zone->mz_start;
+			i    = (size_t)(page / PAGES_PER_WORD);
+			j    = (unsigned int)(page % PAGES_PER_WORD);
+			mask = (uintptr_t)PMEMZONE_ISUNDFMASK << (j * PMEMZONE_BITSPERPAGE);
+			ATOMIC_OR(zone->mz_free[i], mask);
+			return;
+		}
+	} while ((zone = zone->mz_prev) != NULL);
+}
+
+
+
 /* Check if all pages of a given physical memory range are mapped as available RAM. */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages) {

@@ -552,7 +552,40 @@ DECL_END
 #include "mfile-rw.c.inl"
 #define DEFINE_mfile_tailwritev_p
 #include "mfile-rw.c.inl"
-#endif /* !__INTELLISENSE__ */
 
+/* "direct" I/O */
+#define DEFINE_mfile_direct_read
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_readv
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_write
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_writev
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_read_p
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_readv_p
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_write_p
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_writev_p
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_read_async
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_readv_async
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_write_async
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_writev_async
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_read_async_p
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_readv_async_p
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_write_async_p
+#include "mfile-rw.c.inl"
+#define DEFINE_mfile_direct_writev_async_p
+#include "mfile-rw.c.inl"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_RW_C */
