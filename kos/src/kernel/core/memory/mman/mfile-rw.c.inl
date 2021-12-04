@@ -483,6 +483,7 @@ again:
 
 	/* Check if direct I/O of this kind is even possible. */
 	if unlikely(!io) {
+		/* XXX: Special handling for ramfs-style files? */
 #ifdef LOCAL_WRITING
 		THROW(E_FSERROR_READONLY);
 #else /* LOCAL_WRITING */

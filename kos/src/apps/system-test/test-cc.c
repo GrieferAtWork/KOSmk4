@@ -50,7 +50,11 @@ DEFINE_TEST(cc) {
 
 	fd_t fd;
 	unlink("/var/testfile.txt");
-	LEd(0, (fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644)));
+	fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644);
+	if (fd < 0) {
+		mkdir("/var/", 755);
+		LEd(0, (fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644)));
+	}
 	EQss(DATSZ, pwrite(fd, dat, DATSZ, 512));
 	EQd(0, close(fd));
 

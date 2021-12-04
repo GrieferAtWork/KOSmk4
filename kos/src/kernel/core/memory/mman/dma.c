@@ -49,7 +49,6 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-
 /* Start DMAing on  memory within the  specified address  range.
  * This function is used to lock physical memory for the purpose
  * of use with `mfile_direct_[read|write]()'.
@@ -87,6 +86,7 @@ mman_dma(mdma_range_callback_t prange, void *cookie,
 		size_t tail_offset;
 
 		/* Initialize fault controller. */
+again_init_mf:
 		__mfault_init(&mf);
 		mf.mfl_flags = flags;
 		mf.mfl_mman  = THIS_MMAN;
@@ -130,6 +130,7 @@ again_lock_mman:
 			/* Lock the associated mem-part. */
 			if (!mfault_lockpart_or_unlock(&mf))
 				goto again_lock_mman;
+
 			/* Fault memory for the access we need to do. */
 			if (!mfault_or_unlock(&mf))
 				goto again_lock_mman;
@@ -141,6 +142,17 @@ again_lock_mman:
 		/* No longer need the mman-lock! */
 		incref(mf.mfl_part);
 		mman_lock_endread(mf.mfl_mman);
+
+		/* Ensure that the mem-part had its meta-data controller allocated. */
+		TRY {
+			if (!mpart_hasmeta_or_unlock(mf.mfl_part, NULL)) {
+				decref_unlikely(mf.mfl_part);
+				goto again_init_mf;
+			}
+		} EXCEPT {
+			decref_unlikely(mf.mfl_part);
+			RETHROW();
+		}
 
 		/* Adjust the faulted address range to not include the unaligned page-offset
 		 * of the actually DMA location. (we had to subtract this originally,  since
