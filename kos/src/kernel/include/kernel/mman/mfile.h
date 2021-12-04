@@ -836,13 +836,13 @@ struct mfile {
 #endif /* __WANT_MFILE__mf_mpplop */
 
 #ifdef __WANT_MFILE__mf_ramdirlop
-		Toblockop(ramfs_dirnode) _mf_ramdirlop;     /* mem-part post-lock operation */
+		Toblockop(ramfs_dirnode) _mf_ramdirlop;  /* mem-part post-lock operation */
 #endif /* __WANT_MFILE__mf_ramdirlop */
 
 #if defined(__WANT_MFILE__mf_fsuperplop) && defined(__WANT_MFILE__mf_delfnodes)
 		struct {
-			Tobpostlockop(fsuper) _mf_fsuperplop; /* filesystem-super post-lock operation */
-			REF struct fnode     *_mf_delfnodes;  /* Used during `fsuper_delete()' */
+			Tobpostlockop(fsuper) _mf_fsuperplop;/* filesystem-super post-lock operation */
+			REF struct fnode     *_mf_delfnodes; /* Used during `fsuper_delete()' */
 		};
 #elif defined(__WANT_MFILE__mf_fsuperplop)
 		Tobpostlockop(fsuper)    _mf_fsuperplop; /* filesystem-super post-lock operation */

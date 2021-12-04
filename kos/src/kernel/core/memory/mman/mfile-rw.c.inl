@@ -32,10 +32,10 @@
 //#define    DEFINE_mfile_direct_readv_async
 //#define  DEFINE_mfile_direct_readv_async_p
 //#define    DEFINE_mfile_direct_write_async
-//#define  DEFINE_mfile_direct_write_async_p
+#define  DEFINE_mfile_direct_write_async_p
 //#define   DEFINE_mfile_direct_writev_async
 //#define DEFINE_mfile_direct_writev_async_p
-#define DEFINE_mfile_read
+//#define DEFINE_mfile_read
 //#define       DEFINE_mfile_read_p
 //#define        DEFINE_mfile_readv
 //#define      DEFINE_mfile_readv_p
@@ -472,24 +472,10 @@ again:
 	shift_t blockshift = self->mf_blockshift;
 	size_t io_bytes;
 #ifdef LOCAL_WRITING
-	auto io = self->mf_ops->mo_saveblocks;
+#define LOCAL_direct_io_operator(file) ((file)->mf_ops->mo_saveblocks)
 #else /* LOCAL_WRITING */
-	auto io = self->mf_ops->mo_loadblocks;
+#define LOCAL_direct_io_operator(file) ((file)->mf_ops->mo_loadblocks)
 #endif /* !LOCAL_WRITING */
-
-	/* Check for special case: no I/O requested. */
-	if unlikely(!num_bytes)
-		return 0;
-
-	/* Check if direct I/O of this kind is even possible. */
-	if unlikely(!io) {
-		/* XXX: Special handling for ramfs-style files? */
-#ifdef LOCAL_WRITING
-		THROW(E_FSERROR_READONLY);
-#else /* LOCAL_WRITING */
-		return 0;
-#endif /* !LOCAL_WRITING */
-	}
 
 	/* Validate alignment of file position and buffer size. */
 	if unlikely(offset != ((offset >> blockshift) << blockshift)) {
@@ -589,6 +575,18 @@ again:
 			temp_fpos += ent.ive_size;
 #endif /* LOCAL_BUFFER_IS_IOVEC */
 		}
+	}
+
+	/* Check if direct I/O of this kind is even possible. */
+	if unlikely(!LOCAL_direct_io_operator(self)) {
+		/* XXX: Special handling for ramfs-style files? */
+
+		/* Fallback: I/O not possible */
+#ifdef LOCAL_WRITING
+		THROW(E_FSERROR_READONLY);
+#else /* LOCAL_WRITING */
+		return 0;
+#endif /* !LOCAL_WRITING */
 	}
 
 	mfile_lock_read(self);
@@ -722,7 +720,8 @@ again_read_old_filesize:
 
 	/* Actually do I/O */
 #ifndef LOCAL_BUFFER_IS_IOVEC
-	(*io)(self, offset, buffer, io_bytes, aio);
+	if likely(io_bytes != 0)
+		(*LOCAL_direct_io_operator(self))(self, offset, buffer, io_bytes, aio);
 #else /* !LOCAL_BUFFER_IS_IOVEC */
 	{
 		LOCAL_buffer_ent_t ent;
@@ -741,7 +740,7 @@ again_read_old_filesize:
 
 			/* Must explicitly skip empty entries (load/save-blocks assumes non-empty requests) */
 			if likely(ent.ive_size != 0)
-				(*io)(self, offset, ent.ive_base, ent.ive_size, aio);
+				(*LOCAL_direct_io_operator(self))(self, offset, ent.ive_base, ent.ive_size, aio);
 			if (ent.ive_size >= io_bytes)
 				break;
 			io_bytes -= ent.ive_size;
@@ -749,6 +748,7 @@ again_read_old_filesize:
 		}
 	}
 #endif /* LOCAL_BUFFER_IS_IOVEC */
+#undef LOCAL_direct_io_operator
 	return result;
 #else /* ... */
 	size_t result = 0;
