@@ -35,9 +35,9 @@
 #include <hybrid/sync/atomic-rwlock.h>
 #endif /* !CONFIG_NO_SMP */
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #include <libc/string.h>
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 
 DECL_BEGIN
 
@@ -100,17 +100,15 @@ DECL_BEGIN
  *                             │              └─────────────│───────────────────────────│──────────│─┐ │
  *                             └────────────────────────────┘                           │          │ │ │
  *   ┌──────────────────────────────────────────────────────────────────────────────────┘          │ │ │
- *   │                                                                                             │ │ │
- *   v                                        ┌────> [async_poll(device)]                          │ │ │
- * [ASYNC_WORKER(device)]                     │      >> if (async_test(device)) return true;       │ │ │
- * >> struct async_worker_ops = {             │      >> task_connect_for_poll(&device->d_aio_avail)│ │ │
- * >>     .awc_poll = &async_poll, ───────────┘      >> return async_test(device);                 │ │ │
- * >>     .awc_work = &async_work, ───────┐                                                        │ │ │
- * >>     .awc_test = &async_test  ───────│────────> [async_test(device)]                          │ │ │
- * >> };                                  │          >> return ATOMIC_READ(device->d_aio_pending)  │ │ │
- *                                        │          >>        != NULL;                            │ │ │
+ *   v                                                                                             │ │ │
+ * [ASYNC_WORKER(device)]                     ┌───> [async_connect(device)]                        │ │ │
+ * >> struct async_worker_ops = {             │     >> task_connect_for_poll(&device->d_aio_avail);│ │ │
+ * >>     .awo_connect = &async_connect, ─────┘                                                    │ │ │
+ * >>     .awc_test    = &async_test, ────────────> [async_test(device)]                           │ │ │
+ * >>     .awc_work    = &async_work, ────┐         >> return ATOMIC_READ(device->d_aio_pending)   │ │ │
+ * >> };                                  │         >>        != NULL;                             │ │ │
+ *                                        │                                                        │ │ │
  *   ┌────────────────────────────────────┘                                                        │ │ │
- *   │                                                                                             │ │ │
  *   v                                                                                             │ │ │
  * [async_work(device)]                                                                            │ │ │
  * [ 0] >> for (;;) {                                                                              │ │ │
@@ -176,8 +174,8 @@ DECL_BEGIN
  * alongside checking if `aio' matches the     [11] >>     PREEMPTION_POP(was);
  * device's `d_aio_current' field.             [12] >>     goto do_cancel;
  *                                             [13] >> }
- *                                             [14] >> // If the cmd-pointer was already cleared, then the AIO operation
- *                                             [15] >> // is either currently in progress (i.e. the async-worker is executing
+ *                                             [14] >> // If the cmd-pointer was already cleared, then the AIO operation is
+ *                                             [15] >> // either currently in progress (i.e. the async-worker is executing
  *                                             [16] >> // `COMMAND_DESCRIPTOR_DO_NEXT_STEP()'), or the AIO operation was
  *                                             [17] >> // already completed or is/was canceled already.
  *                                             [18] >> if (ATOMIC_CMPXCH(device->d_aio_current, aio, NULL)) {
@@ -315,10 +313,10 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
  * Note that any other resources that may be released alongside the async
  * handle itself must be released _after_ this callback has been invoked.
  *
- * This also means that an implementation  of `ah_func' cannot use the  normal
- * sig_broadcast() function, but rather the special `sig_broadcast_nodecref()'
- * function that passes references to threads that would be destroyed back  to
- * the caller, which must then be released _after_ this callback was  invoked.
+ * This  also means  that an implementation  of `ah_func' cannot  use the normal
+ * sig_broadcast() function, but rather the special sig_broadcast_cleanup_nopr()
+ * function that can be used to release the AIO handle before destroying threads
+ * who's refcnt dropped to zero _after_ this callback was invoked.
  *
  * This is required to prevent deadlock scenarios such as the following:
  *      Setup: #1: Create a socket with an in-progress, async connect() operation
@@ -368,9 +366,9 @@ DATDEF struct aio_handle_type aio_noop_retval_type;
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL aio_handle_init)(struct aio_handle *__restrict self,
                                struct aio_handle_type const *__restrict typ) {
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 	__libc_memset(&self->ah_next, 0xcc, sizeof(self->ah_next));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 	self->ah_type = typ;
 }
 
@@ -513,9 +511,9 @@ NOTHROW(FCALL aio_handle_generic_func)(struct aio_handle *__restrict self,
 
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_generic_init)(struct aio_handle_generic *__restrict self) {
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 	__libc_memset(self, 0xcc, sizeof(*self));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 	self->ah_func   = &aio_handle_generic_func;
 	self->hg_status = 0;
 	sig_init(&self->hg_signal);
@@ -649,10 +647,10 @@ LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL aio_multihandle_init)(struct aio_multihandle *__restrict self,
                                     aio_multiple_completion_t func) {
 	unsigned int i;
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 	__libc_memset(&self->am_error, 0xcc, sizeof(self->am_error));
 	__libc_memset(self->am_ivec, 0xcc, sizeof(self->am_ivec));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 	self->am_func   = func;
 	self->am_status = (uintptr_t)AIO_COMPLETION_SUCCESS << AIO_MULTIHANDLE_STATUS_STATUSSHFT;
 	self->am_ext    = __NULLPTR;

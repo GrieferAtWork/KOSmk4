@@ -57,7 +57,7 @@ END(atomic64_lock)
 .section .text.cold
 PRIVATE_FUNCTION(atomic64_waitfor)
 	.cfi_startproc
-	ttest  mask=EFLAGS_IF, loc=0(%esp)
+	ttest  mask=EFLAGS_IF, loc=4(%esp)
 	jz     1f
 	pushl_cfi_r %eax
 	EXTERN(task_yield)
@@ -87,8 +87,8 @@ END(atomic64_waitfor)
 	testl  %eax, %eax;                \
 	jnz    992f;                      \
 	.pushsection .text.cold;          \
-992:	pushl $(991b);                \
-		jmp   atomic64_waitfor;       \
+992:	pause;                        \
+		jmp   991b;                   \
 	.popsection;                      \
 	popl_cfi_r %eax
 #define UNLOCK_NOPR() \

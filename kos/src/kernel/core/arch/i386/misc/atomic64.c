@@ -58,22 +58,22 @@ extern byte_t __i386_atomic64_fetchxor[];
 
 /* i386-specific atomic64 ABI cmpxchg8b-specific implementation. */
 PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_read[] = {
-	0x89, 0xc3,             /*     movl   %eax, %ebx  */
-	0x89, 0xd1,             /*     movl   %edx, %ecx  */
+	0x89, 0xc3,             /*     movl   %eax, %ebx         */
+	0x89, 0xd1,             /*     movl   %edx, %ecx         */
 	0xf0, 0x0f, 0xc7, 0x0f, /*     lock   cmpxchg8b (%edi)   */
-	0xc3,                   /*     ret                */
+	0xc3,                   /*     ret                       */
 };
 
 PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_cmpxch[] = {
 	0xf0, 0x0f, 0xc7, 0x0f, /*     lock   cmpxchg8b (%edi)   */
-	0xc3,                   /*     ret                */
+	0xc3,                   /*     ret                       */
 };
 
 /* also used for `__i386_atomic64_write' */
 PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_xch[] = {
 	0xf0, 0x0f, 0xc7, 0x0f, /* 1:  lock   cmpxchg8b (%edi)   */
-	0x75, 0xfb,             /*     jne    1b          */
-	0xc3,                   /*     ret                */
+	0x75, 0xfb,             /*     jne    1b                 */
+	0xc3,                   /*     ret                       */
 };
 
 #define I386_CMPXCHG8B_FETCHxxx(lo_opcode_, hi_opcode_)           \

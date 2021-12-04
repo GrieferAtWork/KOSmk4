@@ -180,7 +180,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 	/* Write to a debug port. */
 	if (level < COMPILER_LENOF(level_prefix)) {
 		/* Note that the max values here may not make perfect sense in
-		 * some cases, but we want to guaranty that there is no change
+		 * some cases, but we want to guaranty that there is no chance
 		 * of this ever overflowing. */
 		char buf[COMPILER_LENOF("[" PRIMAXu "-" PRIMAXu "-" PRIMAXu
 		                        "T" PRIMAXu ":" PRIMAXu ":" PRIMAXu
