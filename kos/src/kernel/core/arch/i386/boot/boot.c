@@ -897,6 +897,24 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       sub-class  type IDs can easily be used to test for parent classes, given a precise child
 	 *       class ID; e.g. `HANDLE_TYPEKIND_MFILE_ISNODE(x)' checks for FNODE and all fnode-subs. */
 
+	/* TODO: mo_loadblocks/mo_saveblocks document:
+	 * >> @assume(addr + num_bytes <= mfile_partaddr_ceilalign(self, self->mf_filesize));
+	 * This assertion is being adhered  to, but if you think  about it, this is  actually
+	 * incorrect. Instead, what should really be the requirement is:
+	 * >> @assume(addr + num_bytes <= mfile_blockaddr_ceilalign(self, self->mf_filesize));
+	 *
+	 * iow: it should be the BLOCK-ceil-aligned size of the file that represents the upper
+	 *      limit for up to where I/O is allowed, and not the PART-ceil-aligned file size,
+	 *      which may be larger because PART-aligned also implies page-aligned.
+	 *
+	 * Because of this, up to  PAGESIZE-SECTOR_SIZE out-of-bounds bytes might be  accessed
+	 * on a (theoretical) hdd who's size isn't divisible by PAGESIZE. Granted, this likely
+	 * isn't something that exists, but it's still a design flaw...
+	 *
+	 * As a counter-example, the O_DIRECT implementation  makes proper use of the  file's
+	 * block-aligned size, and thus will not attempt block-level access beyond the block-
+	 * aligned file size. */
+
 	/* TODO: There's a missing incref() relating to mktty.
 	 * Replicate bug:
 	 *  - Repeatedly press CTRL+D on the busybox prompt
