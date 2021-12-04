@@ -28,11 +28,11 @@
 //#define         DEFINE_mfile_direct_writev
 //#define       DEFINE_mfile_direct_writev_p
 //#define     DEFINE_mfile_direct_read_async
-//#define   DEFINE_mfile_direct_read_async_p
+#define   DEFINE_mfile_direct_read_async_p
 //#define    DEFINE_mfile_direct_readv_async
 //#define  DEFINE_mfile_direct_readv_async_p
 //#define    DEFINE_mfile_direct_write_async
-#define  DEFINE_mfile_direct_write_async_p
+//#define  DEFINE_mfile_direct_write_async_p
 //#define   DEFINE_mfile_direct_writev_async
 //#define DEFINE_mfile_direct_writev_async_p
 //#define DEFINE_mfile_read
@@ -577,11 +577,24 @@ again:
 		}
 	}
 
+	/* Special handling for ramfs-style files
+	 * In this case we simply forward the request to the non-direct operators. */
+	if unlikely(self->mf_flags & MFILE_F_PERSISTENT) {
+#if defined(LOCAL_WRITING) && defined(LOCAL_BUFFER_IS_IOVEC)
+		return mfile_writev_p(self, buffer, buf_offset, num_bytes, offset);
+#elif defined(LOCAL_WRITING) && !defined(LOCAL_BUFFER_IS_IOVEC)
+		return mfile_write_p(self, buffer, num_bytes, offset);
+#elif defined(LOCAL_READING) && defined(LOCAL_BUFFER_IS_IOVEC)
+		return mfile_readv_p(self, buffer, buf_offset, num_bytes, offset);
+#elif defined(LOCAL_READING) && !defined(LOCAL_BUFFER_IS_IOVEC)
+		return mfile_read_p(self, buffer, num_bytes, offset);
+#else /* ... */
+#error "Invalid configuration"
+#endif /* !... */
+	}
+
 	/* Check if direct I/O of this kind is even possible. */
 	if unlikely(!LOCAL_direct_io_operator(self)) {
-		/* XXX: Special handling for ramfs-style files? */
-
-		/* Fallback: I/O not possible */
 #ifdef LOCAL_WRITING
 		THROW(E_FSERROR_READONLY);
 #else /* LOCAL_WRITING */
