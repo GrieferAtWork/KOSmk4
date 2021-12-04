@@ -804,7 +804,7 @@ PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_threads)(struct ccinfo *__restrict info) {
 	if (ccinfo_noblock(info)) {
 		/* Not allowed to block -> can enumerate threads using the non-blocking method. */
-		task_enum_all_nb(&system_cc_pertask_cb, NULL);
+		task_enum_all_nb(&system_cc_pertask_cb, info);
 	} else {
 		gfp_t saved_gfp;
 		/* TODO: do  this  better (to  be precise:  in a  way that  doesn't require
