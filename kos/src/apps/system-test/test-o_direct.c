@@ -44,13 +44,23 @@
 
 DECL_BEGIN
 
-PRIVATE void do_o_direct_test(fd_t fd) {
+PRIVATE void
+do_o_direct_test(char const *filename) {
+	fd_t fd;
 	shift_t align[2];
 	void *buf;
 	size_t blocksize;
 	size_t blockalign;
 	size_t bufsize;
 	struct stat st;
+
+	unlink(filename);
+	fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644);
+	if (fd < 0) {
+		if (memcmp(filename, "/var/", 5 * sizeof(char)) == 0)
+			mkdir("/var/", 755);
+		LEd(0, (fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644)));
+	}
 
 	/* Query alignment requirements. */
 	EQd(0, ioctl(fd, FILE_IOC_BLKSHIFT, align));
@@ -92,32 +102,18 @@ PRIVATE void do_o_direct_test(fd_t fd) {
 	EQss(bufsize, pread(fd, buf, bufsize, 0));
 	assertf(strcmp((char *)buf, "Test Data!") == 0,
 	        "%$[hex]\n", bufsize, buf);
+
+	/* Cleanup... */
+	EQd(0, unlink(filename));
+	EQd(0, close(fd));
 }
 
 DEFINE_TEST(o_direct) {
 	/* Test for direct I/O */
-	fd_t fd;
-
-	unlink("/var/o_direct.txt");
-	fd = open("/var/o_direct.txt", O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644);
-	if (fd < 0) {
-		mkdir("/var/", 755);
-		LEd(0, (fd = open("/var/o_direct.txt", O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644)));
-	}
-	do_o_direct_test(fd);
-	EQd(0, unlink("/var/o_direct.txt"));
-	EQd(0, close(fd));
+	do_o_direct_test("/var/o_direct.txt");
 
 	/* Also test O_DIRECT on ramfs files */
-	unlink("/tmp/o_direct.txt");
-	fd = open("/tmp/o_direct.txt", O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644);
-	if (fd < 0) {
-		mkdir("/tmp/", 755);
-		LEd(0, (fd = open("/tmp/o_direct.txt", O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644)));
-	}
-	do_o_direct_test(fd);
-	EQd(0, unlink("/tmp/o_direct.txt"));
-	EQd(0, close(fd));
+	do_o_direct_test("/tmp/o_direct.txt");
 }
 
 DECL_END
