@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd992c562 */
+/* HASH CRC-32:0x877aafee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -181,7 +181,7 @@ __NAMESPACE_INT_END
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -202,7 +202,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,lfutexexpr,(lfutex_t *__uloc
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -224,7 +224,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,lfutexexpr,(lfutex_t *__ulo
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -248,7 +248,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -269,7 +269,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,lfutexexpr64,(lfutex_t *__u
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -291,7 +291,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,lfutexexpr64,(lfutex_t *__ul
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -307,7 +307,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr64, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #if defined(__CRT_HAVE_LFutexExpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -318,7 +318,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockad
 #elif defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -330,7 +330,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr,(lfutex_t *__ulocka
 #include <libc/local/kos.futexexpr/LFutexExpr_except.h>
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -344,7 +344,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int (__LIBCCALL LFutexExpr
 #if defined(__CRT_HAVE_LFutexExpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -355,7 +355,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr64,(lfutex_t *__uloc
 #elif defined(__CRT_HAVE_LFutexExpr64)
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -367,7 +367,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulock
 #include <libc/local/kos.futexexpr/LFutexExpr64_except.h>
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling

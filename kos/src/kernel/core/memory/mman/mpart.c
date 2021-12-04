@@ -718,7 +718,7 @@ again:
 
 			filesize = mfile_getsize(file);
 			if (!OVERFLOW_UADD(filesize, file->mf_part_amask, &filesize)) {
-				filesize = mfile_addr_flooralign(file, filesize);
+				filesize = mfile_partaddr_flooralign(file, filesize);
 				/* Limit the write-back address range by the size of the file,
 				 * or do nothing if the entirety of said range lies outside of
 				 * the file's effective bounds. */

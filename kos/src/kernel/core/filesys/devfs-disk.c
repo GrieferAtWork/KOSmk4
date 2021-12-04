@@ -97,7 +97,7 @@ NOTHROW(KCALL devdiskruledir_v_destroy)(struct mfile *__restrict self) {
 
 
 /* Unescape the filename encoded in `info', or return `NULL' if `info' is invalid.
- * Of the returned directory entry, only the following fields are initialized:
+ * Of the returned  directory entry,  only the following  fields are  initialized:
  *  - dld_ent.fd_namelen
  *  - dld_ent.fd_name     # Including a trailing NUL! */
 PRIVATE WUNUSED NONNULL((1)) struct devicelink_dirent *FCALL

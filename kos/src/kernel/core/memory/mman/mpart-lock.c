@@ -931,7 +931,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 			if (!mfile_isanon(file)) {
 				pos_t filesize = mfile_getsize(file);
 				if (!OVERFLOW_UADD(filesize, file->mf_part_amask, &filesize)) {
-					filesize = mfile_addr_flooralign(file, filesize);
+					filesize = mfile_partaddr_flooralign(file, filesize);
 
 					/* NOTE: The file size may increase in the mean time, but that's actually
 					 *       ok: We're currently holding exclusive locks to all of the blocks

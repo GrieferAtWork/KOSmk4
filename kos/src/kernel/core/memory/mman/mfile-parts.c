@@ -56,8 +56,8 @@ DECL_BEGIN
  * This function assumes that:
  *  - @assume(mfile_lock_reading(self) || mfile_lock_writing(self));
  *  - @assume(data->mep_minaddr <= data->mep_maxaddr);
- *  - @assume(mfile_addr_aligned(self, data->mep_minaddr));
- *  - @assume(mfile_addr_aligned(self, data->mep_maxaddr + 1));
+ *  - @assume(mfile_partaddr_aligned(self, data->mep_minaddr));
+ *  - @assume(mfile_partaddr_aligned(self, data->mep_maxaddr + 1));
  *  - @assume(WAS_CALLED(mfile_extendpart_data_init(data)));
  *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
  *  - @assume(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
@@ -91,8 +91,8 @@ mfile_extendpart_or_unlock(struct mfile *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	assert(mfile_lock_reading(self) || mfile_lock_writing(self));
 	assert(data->mep_minaddr <= data->mep_maxaddr);
-	assert(mfile_addr_aligned(self, data->mep_minaddr));
-	assert(mfile_addr_aligned(self, data->mep_maxaddr + 1));
+	assert(mfile_partaddr_aligned(self, data->mep_minaddr));
+	assert(mfile_partaddr_aligned(self, data->mep_maxaddr + 1));
 	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
 	assert(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
 
@@ -124,8 +124,8 @@ mfile_extendpart_or_unlock(struct mfile *__restrict self,
  *    apart of the mem-part tree of `self')
  * This function assumes that:
  *  - @assume(mfile_lock_writing(self));
- *  - @assume(mfile_addr_aligned(self, part->mp_minaddr));
- *  - @assume(mfile_addr_aligned(self, part->mp_maxaddr + 1));
+ *  - @assume(mfile_partaddr_aligned(self, part->mp_minaddr));
+ *  - @assume(mfile_partaddr_aligned(self, part->mp_maxaddr + 1));
  *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
  *  - @assume(LIST_EMPTY(&part->mp_copy));
  *  - @assume(LIST_EMPTY(&part->mp_share));
@@ -141,8 +141,8 @@ PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
 NOTHROW(FCALL mfile_insert_and_merge_part_and_unlock)(struct mfile *__restrict self,
                                                       /*inherit(on_success)*/ struct mpart *__restrict part) {
 	assert(mfile_lock_writing(self));
-	assert(mfile_addr_aligned(self, part->mp_minaddr));
-	assert(mfile_addr_aligned(self, part->mp_maxaddr + 1));
+	assert(mfile_partaddr_aligned(self, part->mp_minaddr));
+	assert(mfile_partaddr_aligned(self, part->mp_maxaddr + 1));
 	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
 	assert(LIST_EMPTY(&part->mp_copy));
 	assert(LIST_EMPTY(&part->mp_share));
@@ -267,8 +267,8 @@ mfile_makepart(struct mfile *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct mpart *result;
 	assert(mfile_isanon(self));
-	assert(mfile_addr_aligned(self, addr));
-	assert(mfile_addr_aligned(self, num_bytes));
+	assert(mfile_partaddr_aligned(self, addr));
+	assert(mfile_partaddr_aligned(self, num_bytes));
 	assert(num_bytes != 0);
 	result = _mfile_newpart(self, addr, num_bytes);
 
@@ -300,7 +300,7 @@ mfile_makepart(struct mfile *__restrict self,
  * if  a pre-existing part was spans beyond `addr +hint_bytes -1')
  *
  * Note that the caller must ensure that:
- * >> mfile_addr_aligned(addr) && mfile_addr_aligned(hint_bytes)
+ * >> mfile_partaddr_aligned(addr) && mfile_partaddr_aligned(hint_bytes)
  * @return: * : A reference to a part that (at some point in the past) contained
  *              the given `addr'. It may no  longer contain that address now  as
  *              the result of being truncated since.
@@ -319,8 +319,8 @@ makeanon:
 		return mfile_makepart(self, addr, hint_bytes);
 	}
 
-	assert(mfile_addr_aligned(self, addr));
-	assert(mfile_addr_aligned(self, hint_bytes));
+	assert(mfile_partaddr_aligned(self, addr));
+	assert(mfile_partaddr_aligned(self, hint_bytes));
 	assert(hint_bytes != 0);
 
 	/* Check for a pre-existing part at the given location,

@@ -39,7 +39,7 @@
 
 DECL_BEGIN
 
-/* Fun fact: this right here works (but only on i386) to force libc into
+/* Fun fact: this  right here works  (but only on i386)  to force libc into
  *           using a custom non-thread-safe `errno' global variable, rather
  *           than using its normal per-thread `errno'.
  * s.a. `/kos/src/libc/libc/arch/i386/errno.c' */

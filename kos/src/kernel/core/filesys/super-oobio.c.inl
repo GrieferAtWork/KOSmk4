@@ -85,7 +85,7 @@ fsuper_dev_wrsectors_chk(struct fsuper *__restrict self, pos_t addr,
 	if unlikely(OVERFLOW_UADD(addr, num_bytes, &endaddr) || endaddr > devsize) {
 		size_t ok_io;
 		/* I/O is actually allowed up until the device's next block-aligned boundary. */
-		devsize = mfile_addr_ceilalign(self->fs_dev, devsize);
+		devsize = mfile_partaddr_ceilalign(self->fs_dev, devsize);
 		if (OVERFLOW_USUB(devsize, addr, &ok_io))
 			ok_io = 0; /* We get here when `addr > devsize' */
 		if unlikely(ok_io >= num_bytes) {

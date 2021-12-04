@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e8dfaf4 */
+/* HASH CRC-32:0x564c760a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,7 +122,7 @@ INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_rwlock_waitwrit
 INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_rwlock_read_nx)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_rwlock_write_nx(3)
  * Acquire a write-lock to the given shared_rwlock.
- * Acquire a lock to the given shared_lock.
+ * Acquire  a  lock   to  the  given   shared_lock.
  * @return: true:  Successfully acquired a write-lock.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */

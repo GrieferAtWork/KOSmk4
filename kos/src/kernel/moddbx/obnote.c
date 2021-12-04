@@ -1390,14 +1390,14 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 					goto badobj;
 				return print_path_with_prefix(printer, arg, p, pstatus, "AT_FDCWD:");
 			}	break;
-	
+
 			case HANDLE_SYMBOLIC_FDROOT: {
 				struct path *p = curfs->fs_root;
 				if (!p || !ADDR_ISKERN(p))
 					goto badobj;
 				return print_path_with_prefix(printer, arg, p, pstatus, "AT_FDROOT:");
 			}	break;
-	
+
 			case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
 			     HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX):
 			case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
@@ -1420,7 +1420,7 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 				               : (fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN))));
 				return print_path_with_prefix(printer, arg, p, pstatus, prefixstr);
 			}	break;
-	
+
 			default:
 				break;
 			}

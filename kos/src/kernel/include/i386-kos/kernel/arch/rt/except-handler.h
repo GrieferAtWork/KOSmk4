@@ -55,7 +55,7 @@ DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 #endif /* !___this_x86_kernel_psp0_defined */
 
 /* Same as `userexcept_sysret_injected()', but allowed to given false
- * positives, though is _NOT_ allowed to given false negatives. */
+ * positives, though  is  _NOT_  allowed to  given  false  negatives. */
 FORCELOCAL ATTR_PURE WUNUSED __BOOL
 __NOTHROW(userexcept_sysret_maybe_injected)(void) {
 	void **psp0 = (void **)PERTASK_GET(this_x86_kernel_psp0);

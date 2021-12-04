@@ -506,14 +506,14 @@ struct mfile_ops {
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
-	 * @assume(addr + num_bytes <= mfile_addr_ceilalign(self, self->mf_filesize));
+	 * @assume(addr + num_bytes <= mfile_partaddr_ceilalign(self, self->mf_filesize));
 	 * @assume(num_bytes != 0);
 	 * @assume(self->mf_trunclock != 0);
 	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job)
 	 * NOTE: This function is allowed to be BLOCKING, but must still guaranty not to do so
 	 *       indefinitely,  as it may be called in the context of async workers, which may
-	 *       otherwise become locked-up. The intend is to use `aio' of the operation would
-	 *       need to block. */
+	 *       otherwise become locked-up. The intend is to use `aio' if the operation would
+	 *       need to block for an unspecified amount of time. */
 	BLOCKING NONNULL((1, 5)) void
 	(KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
 	                       physaddr_t buf, size_t num_bytes,
@@ -524,14 +524,14 @@ struct mfile_ops {
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift));
 	 * @assume(IS_ALIGNED(addr, mfile_getblocksize(self)));
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
-	 * @assume(addr + num_bytes <= mfile_addr_ceilalign(self, self->mf_filesize));
+	 * @assume(addr + num_bytes <= mfile_partaddr_ceilalign(self, self->mf_filesize));
 	 * @assume(num_bytes != 0);
 	 * @assume(self->mf_trunclock != 0);
 	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job)
 	 * NOTE: This function is allowed to be BLOCKING, but must still guaranty not to do so
 	 *       indefinitely,  as it may be called in the context of async workers, which may
-	 *       otherwise become locked-up. The intend is to use `aio' of the operation would
-	 *       need to block. */
+	 *       otherwise become locked-up. The intend is to use `aio' if the operation would
+	 *       need to block for an unspecified amount of time. */
 	BLOCKING NONNULL((1, 5)) void
 	(KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
 	                       physaddr_t buf, size_t num_bytes,
@@ -765,7 +765,7 @@ struct mfile {
 	                                              *                                                // By acquiring a write-lock to `mf_lock' and waiting for `mf_trunclock == 0',
 	                                              *                                                // one  must  be  able  to   prevent  `mf_filesize'  from  changing  at   all!
 	                                              *       DECREMENT: WRLOCK(mf_lock) && mf_trunclock == 0 &&
-	                                              *                  (mfile_addr_ceilalign(OLDVALUE) == mfile_addr_ceilalign(NEWVALUE) ||
+	                                              *                  (mfile_partaddr_ceilalign(OLDVALUE) == mfile_partaddr_ceilalign(NEWVALUE) ||
 	                                              *                   mpart_lock_acquired(ALL(mf_parts))))]
 	                                              * [const_if(MFILE_F_FIXEDFILESIZE || MFILE_F_DELETED)] // Also cannot be lowered when `mf_trunclock != 0'
 	                                              * [valid_if(!mfile_isanon(self))] File size field.
@@ -1048,13 +1048,21 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
  * as always unique and never the same during repeated calls. */
 #define mfile_isanon(self) ((self)->mf_parts == MFILE_PARTS_ANONYMOUS)
 
-/* Floor- or ceil-align a given `addr' such that it may describe the start/end of a mem-part. */
-#define mfile_addr_flooralign(self, addr) (pos_t)((uint64_t)(addr) & ~(uint64_t)(self)->mf_part_amask)
-#define mfile_addr_ceilalign(self, addr)  (pos_t)(((uint64_t)(addr) + (self)->mf_part_amask) & ~(uint64_t)(self)->mf_part_amask)
-#define mfile_addr_aligned(self, addr)    (((uint64_t)(addr) & (self)->mf_part_amask) == 0)
-#define mfile_size_flooralign(self, size) ((size) & ~(self)->mf_part_amask)
-#define mfile_size_ceilalign(self, size)  (((size) + (self)->mf_part_amask) & ~(self)->mf_part_amask)
-#define mfile_size_aligned(self, size)    (((size) & (self)->mf_part_amask) == 0)
+/* Floor- or ceil-align a given `addr'/`size' such that it may describe the start/end/size of a mem-part. */
+#define mfile_partaddr_flooralign(self, addr) (pos_t)((uint64_t)(addr) & ~(uint64_t)(self)->mf_part_amask)
+#define mfile_partaddr_ceilalign(self, addr)  (pos_t)(((uint64_t)(addr) + (self)->mf_part_amask) & ~(uint64_t)(self)->mf_part_amask)
+#define mfile_partaddr_aligned(self, addr)    (((uint64_t)(addr) & (self)->mf_part_amask) == 0)
+#define mfile_partsize_flooralign(self, size) ((size) & ~(self)->mf_part_amask)
+#define mfile_partsize_ceilalign(self, size)  (((size) + (self)->mf_part_amask) & ~(self)->mf_part_amask)
+#define mfile_partsize_aligned(self, size)    (((size) & (self)->mf_part_amask) == 0)
+
+/* Floor- or ceil-align a given `addr'/`size' such that it may be used as `addr' or `num_bytes' of `mo_(load|save)blocks'. */
+#define mfile_blockaddr_flooralign(self, addr) (pos_t)(((uint64_t)(addr) >> (self)->mf_blockshift) << (self)->mf_blockshift)
+#define mfile_blockaddr_ceilalign(self, addr)  mfile_blockaddr_flooralign(self, (addr) + ((size_t)1 << (self)->mf_blockshift) - 1)
+#define mfile_blockaddr_aligned(self, addr)    (((uint64_t)(addr) & (((size_t)1 << (self)->mf_blockshift) - 1)) == 0)
+#define mfile_blocksize_flooralign(self, size) (((size) >> (self)->mf_blockshift) << (self)->mf_blockshift)
+#define mfile_blocksize_ceilalign(self, size)  mfile_blocksize_flooralign(self, (size) + ((size_t)1 << (self)->mf_blockshift) - 1)
+#define mfile_blocksize_aligned(self, size)    (((size) & (((size_t)1 << (self)->mf_blockshift) - 1)) == 0)
 
 /* Reap lock operations of `self' */
 #define _mfile_lockops_reap(self)    _oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, (struct mfile *)(self))
@@ -1168,7 +1176,7 @@ mfile_sync(struct mfile *__restrict self)
  * if  a pre-existing part was spans beyond `addr +hint_bytes -1')
  *
  * Note that the caller must ensure that:
- * >> mfile_addr_aligned(addr) && mfile_addr_aligned(hint_bytes)
+ * >> mfile_partaddr_aligned(addr) && mfile_partaddr_aligned(hint_bytes)
  * @return: * : A reference to a part that (at some point in the past) contained
  *              the given `addr'. It may no  longer contain that address now  as
  *              the result of being truncated since.
@@ -1205,8 +1213,8 @@ struct unlockinfo;
  * This function assumes that:
  *  - @assume(mfile_lock_reading(self) || mfile_lock_writing(self));
  *  - @assume(data->mep_minaddr <= data->mep_maxaddr);
- *  - @assume(mfile_addr_aligned(self, data->mep_minaddr));
- *  - @assume(mfile_addr_aligned(self, data->mep_maxaddr + 1));
+ *  - @assume(mfile_partaddr_aligned(self, data->mep_minaddr));
+ *  - @assume(mfile_partaddr_aligned(self, data->mep_maxaddr + 1));
  *  - @assume(WAS_CALLED(mfile_extendpart_data_init(data)));
  *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
  *  - @assume(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
@@ -1272,8 +1280,8 @@ _mfile_newpart(struct mfile *__restrict self,
  *    apart of the mem-part tree of `self')
  * This function assumes that:
  *  - @assume(mfile_lock_writing(self));
- *  - @assume(mfile_addr_aligned(self, part->mp_minaddr));
- *  - @assume(mfile_addr_aligned(self, part->mp_maxaddr + 1));
+ *  - @assume(mfile_partaddr_aligned(self, part->mp_minaddr));
+ *  - @assume(mfile_partaddr_aligned(self, part->mp_maxaddr + 1));
  *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
  *  - @assume(LIST_EMPTY(&part->mp_copy));
  *  - @assume(LIST_EMPTY(&part->mp_share));

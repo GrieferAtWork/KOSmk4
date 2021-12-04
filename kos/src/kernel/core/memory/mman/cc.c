@@ -259,7 +259,7 @@ again:
 						return;
 					}
 
-					/* Check that `new_list' is still allowed, and
+					/* Check that `new_list'  is still allowed,  and
 					 * is also more efficient that the existing one. */
 					if unlikely(self->p_cldlist == PATH_CLDLIST_DELETED ||
 					            self->p_cldused > minmask ||
@@ -1272,7 +1272,7 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	/* TODO: Clear unused memory from pid namespace (once pid namespace have been re-written) */
 
 	/* TODO: Trim unmapped sub-regions of mem-parts, similar to `mpart_trim()', only that we should
-	 *       also do so for non-anonymous mem-parts (but only if `MFILE_F_PERSISTENT' isn't set) */
+	 *       also  do so for  non-anonymous mem-parts (but only  if `MFILE_F_PERSISTENT' isn't set) */
 
 	/* TODO: There a couple more things we can do to free up physical memory:
 	 *  - We're  already unloading cached files and file-parts, but we can even

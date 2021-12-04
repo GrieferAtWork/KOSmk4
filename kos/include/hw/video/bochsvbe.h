@@ -46,7 +46,7 @@
 
 /* Values for `VBE_DISPI_INDEX_BPP' */
 #define VBE_DISPI_BPP_PAL16     4 /* 16-bit color palette.
-                                   * - Pixels go through `VGA_ATC_PALETTEn', which
+                                   * - Pixels go through `VGA_ATC_PALETTEn',  which
                                    *   indexes into `VGA_PEL_D' (`basevga_wrpal()')
                                    * - Every byte holds 2 pixels */
 #define VBE_DISPI_BPP_PAL256    8 /* 256-bit color palette.

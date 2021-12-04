@@ -282,7 +282,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #define KSYSCTL_KERNEL_SET_PERSONALITY         0x005f0002 /* [int kp << 1 | (enabled & 1)] Enable/Disable the given personality `kp'. (return 0/1 indicative of the old state) */
 
 /* Driver related */
-#define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct openfd *result] Capture a snapshot of all currently loaded kernel
+#define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct openfd *result] Capture  a  snapshot of  all currently  loaded kernel
                                                            * drivers, and return a `HANDLE_TYPE_DRIVER_LOADLIST' handle for that snapshot.
                                                            * WARNING: None of the drivers loaded at the point this call is made can be
                                                            *          fully unloaded  before  the  returned handle  has  been  closed!

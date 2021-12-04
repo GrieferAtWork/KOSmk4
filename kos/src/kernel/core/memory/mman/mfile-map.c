@@ -289,9 +289,9 @@ _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 	assert(self->mfm_size != 0);
 	assert(IS_ALIGNED(self->mfm_addr, PAGESIZE));
 	assert(IS_ALIGNED(self->mfm_size, PAGESIZE));
-	block_aligned_addr = mfile_addr_flooralign(file, self->mfm_addr);
+	block_aligned_addr = mfile_partaddr_flooralign(file, self->mfm_addr);
 	block_aligned_size = self->mfm_size + (size_t)(self->mfm_addr - block_aligned_addr);
-	block_aligned_size = mfile_size_ceilalign(file, block_aligned_size);
+	block_aligned_size = mfile_partsize_ceilalign(file, block_aligned_size);
 	mpart_setcore_data_init(&self->mfm_scdat);
 	mpart_unsharecow_data_init(&self->mfm_ucdat);
 
@@ -611,9 +611,9 @@ continue_with_pnode:
 			gap_min_addr = self->mfm_addr + gap_min_offset;
 			gap_max_addr = self->mfm_addr + gap_max_offset;
 			gap_size     = (size_t)(gap_max_addr - gap_min_addr) + 1;
-			block_aligned_gap_addr = mfile_addr_flooralign(file, gap_min_addr);
+			block_aligned_gap_addr = mfile_partaddr_flooralign(file, gap_min_addr);
 			block_aligned_gap_size = gap_size + (size_t)(gap_min_addr - block_aligned_gap_addr);
-			block_aligned_gap_size = mfile_size_ceilalign(file, block_aligned_gap_size);
+			block_aligned_gap_size = mfile_partsize_ceilalign(file, block_aligned_gap_size);
 
 			/* Lookup the part that would best fit the gap. */
 			part = mfile_getpart(file,
@@ -770,9 +770,9 @@ mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
 	file = self->mfm_file;
 	assert(IS_ALIGNED(self->mfm_addr, PAGESIZE));
 	assert(IS_ALIGNED(self->mfm_size, PAGESIZE));
-	block_aligned_addr = mfile_addr_flooralign(file, self->mfm_addr);
+	block_aligned_addr = mfile_partaddr_flooralign(file, self->mfm_addr);
 	block_aligned_size = self->mfm_size + (size_t)(self->mfm_addr - block_aligned_addr);
-	block_aligned_size = mfile_size_ceilalign(file, block_aligned_size);
+	block_aligned_size = mfile_partsize_ceilalign(file, block_aligned_size);
 	/* Acquire locks to all parts already loaded! (For this  purpose,
 	 * we may assume that no part appears more than once, so we don't
 	 * have to take care to track which parts are already locked) */
@@ -860,9 +860,9 @@ mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
 	file = self->mfm_file;
 	assert(IS_ALIGNED(self->mfm_addr, PAGESIZE));
 	assert(IS_ALIGNED(self->mfm_size, PAGESIZE));
-	block_aligned_addr = mfile_addr_flooralign(file, self->mfm_addr);
+	block_aligned_addr = mfile_partaddr_flooralign(file, self->mfm_addr);
 	block_aligned_size = self->mfm_size + (size_t)(self->mfm_addr - block_aligned_addr);
-	block_aligned_size = mfile_size_ceilalign(file, block_aligned_size);
+	block_aligned_size = mfile_partsize_ceilalign(file, block_aligned_size);
 
 	/* Essentially do the same stuff as `mfile_map_acquire_or_unlock()' */
 	mfile_map_unlock_and_remove_non_overlapping_parts(self);

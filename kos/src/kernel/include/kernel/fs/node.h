@@ -262,7 +262,7 @@ struct fnode
 	mode_t                      fn_mode;     /* [lock(_MFILE_F_SMP_TSLOCK)] INode access mode (but note that file-type bits are [const]). */
 	uid_t                       fn_uid;      /* [lock(_MFILE_F_SMP_TSLOCK)][valid_if(!npo_getown)] INode owner UID. */
 	gid_t                       fn_gid;      /* [lock(_MFILE_F_SMP_TSLOCK)][valid_if(!npo_getown)] INode owner GID. */
-	ino_t                       fn_ino;      /* [lock(_MFILE_F_SMP_TSLOCK + fn_super->fs_nodeslock)] INode number.
+	ino_t                       fn_ino;      /* [lock(_MFILE_F_SMP_TSLOCK + fn_super->fs_nodeslock)] INode         number.
 	                                          * On some filesystems, this number may change when the file is renamed (e.g.
 	                                          * FAT). As such, a lock is  required when reading/writing the INode  number! */
 	REF_IF(!fnode_issuper(this))

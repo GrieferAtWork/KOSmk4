@@ -717,8 +717,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       `MFILE_F_NOMTIME'),  which  may  only  be  done  (atomically) while
 	 *       enumerating the super's node-tree and holding `fsuper_nodes_read()' */
 
-	/* TODO: Implement the special /dev/disk directory */
-
 	/* TODO: Use the general-purpose lockop system in `struct pidns' and replace `pn_dead' */
 
 	/* TODO: Re-write `struct heap' with lockop support */

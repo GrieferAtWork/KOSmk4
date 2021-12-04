@@ -37,7 +37,7 @@
 #include <kos/lockop.h>
 
 
-/* The /dev filesystem contains files of a number of different types.
+/* The  /dev filesystem contains files of a number of different types.
  * To differentiate between all of these, we use the least significant
  * few bits of the INO number. */
 #define DEVFS_INONS_MASK 7 /* Mark for INO-NS */

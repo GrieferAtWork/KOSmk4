@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8091a06b */
+/* HASH CRC-32:0x586df7d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -667,7 +667,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shared_rwlock_read_nx, __FORCELOCAL __ATTR_ARTIF
 #ifdef __CRT_HAVE_shared_rwlock_write_nx
 /* >> shared_rwlock_write_nx(3)
  * Acquire a write-lock to the given shared_rwlock.
- * Acquire a lock to the given shared_lock.
+ * Acquire  a  lock   to  the  given   shared_lock.
  * @return: true:  Successfully acquired a write-lock.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
@@ -676,7 +676,7 @@ __LIBC __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlo
 #include <libc/local/kos.sched.shared-rwlock/shared_rwlock_write_nx.h>
 /* >> shared_rwlock_write_nx(3)
  * Acquire a write-lock to the given shared_rwlock.
- * Acquire a lock to the given shared_lock.
+ * Acquire  a  lock   to  the  given   shared_lock.
  * @return: true:  Successfully acquired a write-lock.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */

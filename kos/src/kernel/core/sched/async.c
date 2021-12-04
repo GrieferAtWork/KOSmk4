@@ -48,7 +48,7 @@ DECL_BEGIN
 #define async_from_postlockop(lop) container_of(lop, struct async, _a_postlockop)
 
 
-/* There is 1 pre-defined async worker which can't ever go away and is
+/* There  is 1 pre-defined async worker which  can't ever go away and is
  * used to implement the fallback mechanism for `mpart_start_asyncjob()'
  *
  * We set-up the static initialization of async workers such that this

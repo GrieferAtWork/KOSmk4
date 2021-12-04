@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d8a0a98 */
+/* HASH CRC-32:0x24c5e2b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ DECL_BEGIN
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -59,7 +59,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulock
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -72,7 +72,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulock
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags);
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -82,7 +82,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulo
 INTDEF NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags) THROWS(...);
 /* >> LFutexExpr(2)
  * Excetion-enabled version of `lfutexexpr(2)'
- * @return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *               to see their  possible return  values, which are  always `0'  when they  would
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling

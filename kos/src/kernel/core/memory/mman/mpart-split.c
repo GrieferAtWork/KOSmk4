@@ -751,7 +751,7 @@ mpart_split(struct mpart *__restrict self,
 #define lopart data.msd_lopart
 #define hipart data.msd_hipart
 #endif /* !__INTELLISENSE__ */
-	assert(mfile_addr_aligned(self->mp_file, offset));
+	assert(mfile_partaddr_aligned(self->mp_file, offset));
 	mpart_split_data_init(&data, self);
 	TRY {
 again:
@@ -782,7 +782,7 @@ release_and_return_null:
 
 		file = self->mp_file;
 		assertf(data.msd_offset != 0, "Invalid split-offset: 0");
-		assertf(mfile_addr_aligned(file, data.msd_offset),
+		assertf(mfile_partaddr_aligned(file, data.msd_offset),
 		        "Badly aligned offset %#" PRIxSIZ, data.msd_offset);
 		assertf(!(self->mp_flags & MPART_F_NOSPLIT),
 		        "You're not allowed to split this part!");
@@ -811,7 +811,7 @@ relock_with_data:
 			if unlikely(data.msd_offset >= mpart_getsize(self))
 				goto release_and_return_null;
 			file = self->mp_file;
-			assertf(mfile_addr_aligned(file, data.msd_offset),
+			assertf(mfile_partaddr_aligned(file, data.msd_offset),
 			        "Internal error: file alignment changed");
 			assertf(!(self->mp_flags & MPART_F_NOSPLIT),
 			        "Internal error: MPART_F_NOSPLIT flag was modified");

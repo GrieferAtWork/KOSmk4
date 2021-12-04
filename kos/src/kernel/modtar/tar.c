@@ -845,7 +845,7 @@ again:
 				    tarfile_gethpos(tf) < tarfile_gethpos(result)) {
 					/* This file would have already enumerated this directory!
 					 * To more quickly reduce the effective on-disk ranges, we
-					 * skip all adjacent on-disk files that would also match
+					 * skip all adjacent on-disk  files that would also  match
 					 * the given prefix. */
 skip_already_enumerated_directory:
 					for (;;) {

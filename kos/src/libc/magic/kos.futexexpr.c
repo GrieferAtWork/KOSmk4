@@ -194,7 +194,7 @@ int lfutexexpr32([[nonnull]] lfutex_t *ulockaddr, void *base,
 @@@param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
 @@@param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
 @@@param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
-@@@return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+@@@return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
 @@             in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
 @@             to see their  possible return  values, which are  always `0'  when they  would
 @@             perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -258,7 +258,7 @@ int LFutexExpr32_except([[nonnull]] lfutex_t *ulockaddr, void *base,
 
 @@>> LFutexExpr(2)
 @@Excetion-enabled version of `lfutexexpr(2)'
-@@@return: * :  The  first  non-zero return  value  from executing  all  of the  given `expr'
+@@@return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
 @@              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
 @@              to see their  possible return  values, which are  always `0'  when they  would
 @@              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling

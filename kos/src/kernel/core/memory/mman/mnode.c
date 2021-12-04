@@ -405,7 +405,7 @@ reload_lonode_after_mman_lock:
 		goto reload_lonode_after_mman_lock;
 	}
 
-	/* Insert the new mem-node into the backing part's
+	/* Insert  the new mem-node  into the backing part's
 	 * list of either copy-on-write, or shared mappings. */
 	{
 		struct mnode_list *list;

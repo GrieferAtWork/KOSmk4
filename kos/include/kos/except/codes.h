@@ -623,7 +623,7 @@
 #endif /* !E_FSERROR_MOUNT_NEEDS_DEVICE */
 #ifndef E_FSERROR_WRONG_FILE_SYSTEM
 #define E_FSERROR_WRONG_FILE_SYSTEM               (E_FSERROR, 0x0014) /* [errno(ENODEV), msg("Invalid file-system type for mount()")]
-                                                                       * Attempted to mount a device with the wrong file system. Also
+                                                                       * Attempted to mount a device  with the wrong file system.  Also
                                                                        * thrown if the device is already mounted, but using a different
                                                                        * filesystem type. */
 #endif /* !E_FSERROR_WRONG_FILE_SYSTEM */

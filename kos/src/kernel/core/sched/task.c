@@ -501,13 +501,13 @@ PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *
 		 * on kernel stacks, we have to manually clear the `page_iszero()' bits for
 		 * backing memory of kernel stacks.
 		 *
-		 * Because mfile_ops::mo_(load|save)blocks is allowed to make use of said
+		 * Because mfile_ops::mo_(load|save)blocks is allowed to make use of  said
 		 * bit in order to speed up initialization in those cases where the target
-		 * buffer needs to be filled with all zeroes. As such, physical pages for
-		 * which `page_iszero()' returns true will be skipped in this situation.
-		 * However, for kernel stacks that is most probably no longer the case at
+		 * buffer needs to be filled with all zeroes. As such, physical pages  for
+		 * which `page_iszero()' returns true will  be skipped in this  situation.
+		 * However, for kernel stacks that is most probably no longer the case  at
 		 * the time the operator is invoked, so to work around this issue, we must
-		 * enforce a consistent state of the iszero bit for kernel stacks, which
+		 * enforce a consistent state of the  iszero bit for kernel stacks,  which
 		 * is done by clearing them here. */
 		mpart_ll_resetzero(&FORTASK(result, this_kernel_stackpart_));
 

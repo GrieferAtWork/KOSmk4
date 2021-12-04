@@ -30,7 +30,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_lfutexexpr,hash:CRC-32=0x567bba1e]]]*/
+/*[[[head:libc_lfutexexpr,hash:CRC-32=0xaedd29a0]]]*/
 /* >> lfutexexpr(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -40,7 +40,7 @@ DECL_BEGIN
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
@@ -76,7 +76,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulockaddr,
 }
 /*[[[end:libc_lfutexexpr]]]*/
 
-/*[[[head:libc_lfutexexpr64,hash:CRC-32=0x9a83f5e7]]]*/
+/*[[[head:libc_lfutexexpr64,hash:CRC-32=0x18e63f97]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_lfutexexpr64, libc_lfutexexpr);
 #else /* MAGIC:alias */
@@ -89,7 +89,7 @@ DEFINE_INTERN_ALIAS(libc_lfutexexpr64, libc_lfutexexpr);
  * @param: expr:          Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `expr'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
  *              to see their  possible return  values, which are  always `0'  when they  would
  *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling

@@ -123,7 +123,7 @@ NOTHROW(FCALL mount_in_progress_contains)(struct mfile *__restrict dev) {
 	return false;
 }
 
-/* Search for a pre-existing superblock that uses `dev'.
+/* Search  for a pre-existing superblock that uses `dev'.
  * The caller must be holding a lock to `fallsuper_list'. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct fsuper *
 NOTHROW(FCALL find_existing_superblock)(struct mfile *__restrict dev) {

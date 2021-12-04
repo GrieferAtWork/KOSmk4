@@ -714,7 +714,7 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 
 			/* Create a new partition */
 			dev = blkdev_makeparts_create(self, parts, partbase, partsize);
-			
+
 			/* Fill in partition information. */
 			dev->bd_partinfo.bp_mbr_sysno = 0;
 			*(char *)mempcpy(dev->bd_partinfo.bp_efi_name, pent->epe_desc, 64) = '\0';

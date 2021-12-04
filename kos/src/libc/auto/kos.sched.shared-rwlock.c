@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1d167b0 */
+/* HASH CRC-32:0xbf270014 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -596,7 +596,7 @@ success:
 #include <sched/signal.h>
 /* >> shared_rwlock_write_nx(3)
  * Acquire a write-lock to the given shared_rwlock.
- * Acquire a lock to the given shared_lock.
+ * Acquire  a  lock   to  the  given   shared_lock.
  * @return: true:  Successfully acquired a write-lock.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */

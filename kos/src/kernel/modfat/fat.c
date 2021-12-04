@@ -873,7 +873,7 @@ fatlnk_v_readlink(struct flnknode *__restrict self,
 		bufsize = result;
 
 	/* Try to make use of the cache already loaded during `fatdir_v_readdir()'
-	 * As such, anything that falls into the first file sect we read directly
+	 * As such, anything that falls into the first file sect we read  directly
 	 * from disk. */
 #if 1
 	filepos = (pos_t)FAT_SYMLINK_FILE_TEXTOFF;

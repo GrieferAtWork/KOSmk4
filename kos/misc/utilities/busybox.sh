@@ -76,5 +76,3 @@ done < "${OPTPATH}/busybox.links"
 # is the perfect place to set-up some additional system paths
 # within disk images
 install_symlink "/etc/mtab" "/proc/mounts"
-
-

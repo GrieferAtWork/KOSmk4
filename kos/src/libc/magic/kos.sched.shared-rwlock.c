@@ -729,7 +729,7 @@ success:
 
 @@>> shared_rwlock_write_nx(3)
 @@Acquire a write-lock to the given shared_rwlock.
-@@Acquire a lock to the given shared_lock.
+@@Acquire  a  lock   to  the  given   shared_lock.
 @@@return: true:  Successfully acquired a write-lock.
 @@@return: false: Preemption was disabled, and the operation would have blocked.
 @@@return: false: There are pending X-RPCs that could not be serviced.

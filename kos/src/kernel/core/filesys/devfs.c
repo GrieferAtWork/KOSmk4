@@ -809,7 +809,7 @@ devfs_super_v_unlink(struct fdirnode *__restrict self,
 	}
 
 	/* Only call the normal ramfs unlink function for ramfs directory entries.
-	 * If the entry belongs to `devfs_rootspec', then indicate that the entry
+	 * If  the entry belongs to `devfs_rootspec', then indicate that the entry
 	 * cannot be removed. */
 	if (!fdirent_isramfs(entry))
 		THROW(E_FSERROR_READONLY);
@@ -936,7 +936,7 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		info->frn_dent = &new_dirent->dd_dirent; /* Inherit reference */
 	} else if (!fdirent_isramfs(info->frn_oldent)) {
 		/* Only call the normal ramfs unlink function for ramfs directory entries.
-		 * If the entry belongs to `devfs_rootspec', then indicate that the entry
+		 * If  the entry belongs to `devfs_rootspec', then indicate that the entry
 		 * cannot be removed. */
 		THROW(E_FSERROR_READONLY);
 	} else {

@@ -2731,7 +2731,7 @@ NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie,
 		holder->fh_writefn = writefn;
 		holder->fh_seekfn  = seekfn;
 		holder->fh_flushfn = flushfn;
-	
+
 		/* Open the actual file. */
 		result = fp_funopen(/* cookie:  */ holder,
 		                    /* readfn:  */ readfn ? &funopen2_32_readfn : NULL,
