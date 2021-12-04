@@ -41,7 +41,7 @@ INTDEF byte_t execabi_system_rtld32_numpages[];
 PUBLIC struct mramfile execabi_system_rtld_file = {
 	.mrf_file = {
 		MFILE_INIT_mf_refcnt(1), /* +1: mfile_ndef */
-		MFILE_INIT_mf_ops(&mfile_ndef_ops),
+		MFILE_INIT_mf_ops(&mfile_anon_ops[PAGESHIFT]),
 		MFILE_INIT_mf_lock,
 		MFILE_INIT_mf_parts(&execabi_system_rtld_file.mrf_part),
 		MFILE_INIT_mf_initdone,
@@ -67,7 +67,7 @@ PUBLIC struct mramfile execabi_system_rtld_file = {
 PUBLIC struct mramfile execabi_system_rtld32_file = {
 	.mrf_file = {
 		MFILE_INIT_mf_refcnt(1), /* +1: mfile_ndef */
-		MFILE_INIT_mf_ops(&mfile_ndef_ops),
+		MFILE_INIT_mf_ops(&mfile_anon_ops[PAGESHIFT]),
 		MFILE_INIT_mf_lock,
 		MFILE_INIT_mf_parts(&execabi_system_rtld32_file.mrf_part),
 		MFILE_INIT_mf_initdone,

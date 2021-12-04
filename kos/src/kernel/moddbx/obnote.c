@@ -702,8 +702,6 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
 	} else if (ops >= mfile_anon_ops && ops < COMPILER_ENDOF(mfile_anon_ops)) {
 		result = buf;
 		sprintf(buf, "[?/dev/zero:anon:%u]", (unsigned int)(ops - mfile_anon_ops));
-	} else if (ops == &mfile_ndef_ops) {
-		result = "[?undef]";
 	}
 	return result;
 }

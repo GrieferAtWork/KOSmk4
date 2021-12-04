@@ -232,9 +232,7 @@ mfile_sync(struct mfile *__restrict self)
 }
 
 
-PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = {
-	NULL,
-};
+PRIVATE struct mfile_ops const mfile_ndef_ops = { NULL };
 
 PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_refcnt(1), /* +1: mfile_ndef */

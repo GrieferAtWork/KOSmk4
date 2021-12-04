@@ -1511,9 +1511,6 @@ DATDEF struct mfile mfile_ndef; /* Random, uninitialized, anonymous memory. */
 DATDEF struct mfile mfile_zero; /* Zero-initialized, anonymous memory. */
 #endif /* !__mfile_zero_defined */
 
-/* TODO: Get rid of `mfile_ndef_ops' */
-DATDEF struct mfile_ops const mfile_ndef_ops; /* ... */
-
 /* Fallback  files for anonymous memory. These behave the same as `mfile_zero',
  * but one exists for every possible `mf_blockshift' (where the index into this
  * array is equal to that file's `mf_blockshift' value)
