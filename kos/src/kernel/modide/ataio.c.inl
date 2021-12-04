@@ -320,7 +320,7 @@ next_chunk:
 			assert((ATOMIC_READ(bus->ab_state) & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INDMA);
 			AtaBus_StartNextDmaOperation(bus);
 		}
-		return;
+		goto done_part_sectors;
 	}
 
 	/* The bus isn't in a  ready state. - Setup  `hand' as a pending  DMA
@@ -337,6 +337,7 @@ next_chunk:
 	AtaBus_AppendDmaAioHandle(bus, hand);
 
 	/* Check if we need more than one AIO operation. */
+done_part_sectors:
 	if unlikely(part_sectors < num_sectors) {
 		num_sectors -= part_sectors;
 		lba += part_sectors;
