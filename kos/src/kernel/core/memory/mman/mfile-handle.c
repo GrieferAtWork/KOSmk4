@@ -367,7 +367,8 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
  * `mso_read'/`mso_readv', nor `mso_write'/`mso_writev' pre-defined. As such,
  * open(2)-ing a generic mfile object uses `mfile_open()' (see below). */
 PUBLIC NONNULL((1, 2)) void KCALL
-mfile_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
+mfile_v_open(struct mfile *__restrict self,
+             /*in|out*/ REF struct handle *__restrict hand,
              struct path *access_path, struct fdirent *access_dent)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct filehandle *fh;

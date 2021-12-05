@@ -72,14 +72,23 @@
 #endif /* __ARCH_HAVE_COMPAT */
 
 
-#include <kernel/mman/driver.h>
+#if 1
+#include <sched/pid-ctty.h>
+DECL_BEGIN
+#define TRACE_HOOK() trace_hook()
+PRIVATE void trace_hook() {
+	REF struct ttydev *tty = task_getctty_nx();
+	if (!tty)
+		return;
+	refcnt_t rc = tty->mf_refcnt - 1;
+	decref_unlikely(tty);
+	printk(KERN_TRACE "[RC=%p:%Iu] ", tty, rc);
+}
+DECL_END
+#endif
+
 
 DECL_BEGIN
-
-#if 0
-#define TRACE_HOOK() \
-	printk(KERN_TRACE "[RC=%Iu] ", kernel_driver.md_refcnt)
-#endif
 
 /* The main callback registered with `syscall_trace_start()' when this driver is loaded. */
 INTERN NONNULL((1, 2)) void FCALL

@@ -930,7 +930,7 @@ getctty(void) THROWS(E_WOULDBLOCK, E_NO_CTTY) {
 
 PRIVATE NONNULL((1, 2)) void KCALL
 devtty_v_open(struct mfile *__restrict UNUSED(self),
-              struct handle *__restrict hand,
+              /*in|out*/ REF struct handle *__restrict hand,
               struct path *access_path,
               struct fdirent *access_dent) {
 	assert(hand->h_data == &dev_tty);

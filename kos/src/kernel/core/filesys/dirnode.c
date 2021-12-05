@@ -217,7 +217,8 @@ fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
 
 /* Constructs a wrapper object that implements readdir() (s.a. `dirhandle_new()') */
 PUBLIC NONNULL((1, 2)) void KCALL
-fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
+fdirnode_v_open(struct mfile *__restrict self,
+                /*in|out*/ REF struct handle *__restrict hand,
                 struct path *access_path, struct fdirent *access_dent)
 		THROWS(E_BADALLOC) {
 	REF struct dirhandle *dh;

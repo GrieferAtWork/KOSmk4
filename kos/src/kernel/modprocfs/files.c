@@ -1949,7 +1949,7 @@ memleaks_createfile(void) {
 
 PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
 procfs_r_kos_leaks_v_open(struct mfile *__restrict self,
-                          struct handle *__restrict hand,
+                          /*in|out*/ REF struct handle *__restrict hand,
                           struct path *access_path,
                           struct fdirent *access_dent) {
 	REF struct memleaks *file;
