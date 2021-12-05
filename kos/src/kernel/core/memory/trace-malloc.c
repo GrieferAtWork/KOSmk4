@@ -691,7 +691,12 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
 	if (!TRACE_NODE_KIND_HAS_TRACEBACK(node->tn_kind)) {
 		result = 0;
 	} else {
-		result = trace_node_traceback_count(node);
+		size_t max = trace_node_traceback_count(node);
+		for (result = 0; result < max; ++result) {
+			if (trace_node_traceback_vector(node)[result] == NULL)
+				break;
+		}
+
 		/* Copy all traceback entries for which the caller has space. */
 		memcpy(tb, trace_node_traceback_vector(node),
 		       MIN(result, buflen), sizeof(void *));
@@ -1743,11 +1748,15 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 
 PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
 gc_gather_explicit_leak(struct trace_node **__restrict pleaks,
-                        u8 kind, void *base, size_t num_bytes) {
+                        u8 kind, void *base, size_t num_bytes,
+                        void const **tb DFL(NULL),
+                        size_t tb_len DFL(0), pid_t tid DFL(0)) {
 	struct trace_node *node;
 	heapptr_t node_ptr;
+	size_t tb_cnt;
 	node_ptr = heap_alloc_untraced(&trace_heap,
-	                               offsetof(struct trace_node, tn_trace),
+	                               offsetof(struct trace_node, tn_trace) +
+	                               (tb_len * sizeof(void *)),
 	                               TRACE_HEAP_FLAGS);
 	node = (struct trace_node *)heapptr_getptr(node_ptr);
 	trace_node_initlink(node, base, num_bytes);
@@ -1756,9 +1765,19 @@ gc_gather_explicit_leak(struct trace_node **__restrict pleaks,
 	node->tn_visit = 0;
 	node->tn_kind  = kind;
 	node->tn_flags = 0;
-	node->tn_tid   = 0;
-	if (trace_node_traceback_count(node))
-		trace_node_traceback_vector(node)[0] = NULL;
+	node->tn_tid   = tid;
+
+	/* Copy traceback */
+	tb_cnt = trace_node_traceback_count(node);
+	if (tb_cnt) {
+		void const **vec = trace_node_traceback_vector(node);
+		assert(tb_cnt >= tb_len);
+		memcpy(vec, tb, tb_len, sizeof(void *));
+		if (tb_cnt > tb_len)
+			vec[tb_len] = NULL;
+	}
+
+	/* Insert into list of leaks. */
 	trace_node_leak_next(node) = *pleaks;
 	*pleaks = node;
 }
@@ -1852,9 +1871,29 @@ again:
 	 *       to it exist. */
 
 	/* Yes, this does appear to be a leak! */
-	gc_gather_explicit_leak(pleaks, TRACE_NODE_KIND_MNODE,
-	                        mnode_getaddr(self),
-	                        mnode_getsize(self));
+	{
+		void const **tb = NULL;
+		size_t tb_len   = 0;
+		pid_t tid       = 0;
+		struct trace_node *tn;
+
+		/* When `self' was dynamically allocated, copy its traceback */
+		tn = tm_nodes_locate(self);
+		if (tn) {
+			size_t max;
+			tb  = trace_node_traceback_vector(tn);
+			max = trace_node_traceback_count(tn);
+			for (tb_len = 0; tb_len < max; ++tb_len) {
+				if (tb[tb_len] == NULL)
+					break;
+			}
+			tid = tn->tn_tid;
+		}
+		gc_gather_explicit_leak(pleaks, TRACE_NODE_KIND_MNODE,
+		                        mnode_getaddr(self),
+		                        mnode_getsize(self),
+		                        tb, tb_len, tid);
+	}
 
 next:
 	if (self->mn_mement.rb_lhs) {
@@ -1997,11 +2036,13 @@ trace_node_isbelow(struct trace_node *__restrict lhs,
 		return true;
 	if (trace_node_leak_getxrefs(lhs) > trace_node_leak_getxrefs(rhs))
 		return false;
+
 	/* Larger leaks should come before smaller leaks. */
 	if (trace_node_usize(lhs) > trace_node_usize(rhs))
 		return true;
 	if (trace_node_usize(lhs) < trace_node_usize(rhs))
 		return false;
+
 	/* If everything else matches, just sort by address. */
 	return trace_node_uaddr(lhs) < trace_node_uaddr(rhs);
 }
