@@ -215,6 +215,15 @@ NOTHROW(KCALL kmalloc_traceback)(void *UNUSED(ptr),
 	return 0;
 }
 
+
+PUBLIC NOBLOCK ATTR_WEAK ATTR_CONST ssize_t KCALL
+kmalloc_printtrace(void *UNUSED(ptr),
+                   __pformatprinter UNUSED(printer),
+                   void *UNUSED(arg)) {
+	return 0;
+}
+
+
 DEFINE_PUBLIC_WEAK_ALIAS(kmalloc_trace, kmalloc_trace_nx);
 
 #ifndef CONFIG_USE_SLAB_ALLOCATORS
