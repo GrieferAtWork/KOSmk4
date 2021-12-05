@@ -43,6 +43,7 @@
 #include <kernel/mman/futexfd.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/stat.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/pipe.h>
 #include <kernel/uname.h>
@@ -635,6 +636,109 @@ procfs_kos_fs_stat_printer(pformatprinter printer, void *arg,
 
 
 /************************************************************************/
+/* /proc/kos/mm/kernel-stat                                             */
+/************************************************************************/
+struct mmk_stat: mman_statinfo {
+	size_t mks_reserved; /* # of bytes mapped by reserved nodes. */
+	size_t mks_prepared; /* # of bytes mapped by nodes w/ `MNODE_F_MPREPARED'. */
+	size_t mks_krnpart;  /* # of bytes mapped by nodes w/ `MNODE_F_KERNPART'. */
+	size_t mks_nosplit;  /* # of bytes mapped by nodes w/ `MNODE_F_NOSPLIT'. */
+	size_t mks_nomerge;  /* # of bytes mapped by nodes w/ `MNODE_F_NOMERGE'. */
+};
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL kernel_mnode_tree_stat)(struct mnode *__restrict node,
+                                      struct mmk_stat info[2]) {
+	struct mpart *part;
+	size_t nodesize;
+	unsigned int i;
+again:
+	nodesize = mnode_getsize(node);
+	for (i = 0; i < 2; ++i) {
+		struct mmk_stat *set = &info[i];
+		if (i == 1)
+			nodesize = 1; /* Count # of nodes */
+		set->msi_size += nodesize;
+		if (node->mn_flags & MNODE_F_MLOCK)
+			set->msi_lock += nodesize;
+		if ((node->mn_flags & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD)) == (MNODE_F_PEXEC | MNODE_F_PREAD))
+			set->msi_nexe += nodesize;
+		if ((node->mn_flags & (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD)) == (MNODE_F_PWRITE | MNODE_F_PREAD))
+			set->msi_ndat += nodesize;
+		if (node->mn_flags & MNODE_F_MPREPARED)
+			set->mks_prepared += nodesize;
+		if (node->mn_flags & MNODE_F_KERNPART)
+			set->mks_krnpart += nodesize;
+		if (node->mn_flags & MNODE_F_NOSPLIT)
+			set->mks_nosplit += nodesize;
+		if (node->mn_flags & MNODE_F_NOMERGE)
+			set->mks_nomerge += nodesize;
+		part = node->mn_part;
+		if likely(part != NULL) {
+			uintptr_quarter_t state;
+			if (mpart_isanon_atomic(part))
+				set->msi_anon += nodesize;
+			state = ATOMIC_READ(part->mp_state);
+			if (state == MPART_ST_SWP || state == MPART_ST_SWP_SC)
+				set->msi_swap += nodesize;
+		} else {
+			set->mks_reserved += nodesize;
+		}
+	}
+
+	if (node->mn_mement.rb_lhs) {
+		if (node->mn_mement.rb_rhs)
+			kernel_mnode_tree_stat(node->mn_mement.rb_rhs, info);
+		node = node->mn_mement.rb_lhs;
+		goto again;
+	}
+	if (node->mn_mement.rb_rhs) {
+		node = node->mn_mement.rb_rhs;
+		goto again;
+	}
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_kos_mm_kernel_stat_printer(pformatprinter printer, void *arg,
+                                  pos_t UNUSED(offset_hint)) {
+	struct mmk_stat km_stat[2];
+
+	/* Gather information. */
+	memset(km_stat, 0, sizeof(km_stat));
+	mman_lock_read(&mman_kernel);
+	if (mman_kernel.mm_mappings)
+		kernel_mnode_tree_stat(mman_kernel.mm_mappings, km_stat);
+	mman_lock_endread(&mman_kernel);
+
+	/* Print some stats about the kernel mman. */
+	printf("mapped:   %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "locked:   %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "exec:     %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "data:     %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "anon:     %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "swap:     %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "reserved: %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "prepared: %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "krnpart:  %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "nosplit:  %" PRIuSIZ "\t%" PRIuSIZ "p\n"
+	       "nomerge:  %" PRIuSIZ "\t%" PRIuSIZ "p\n",
+	       km_stat[1].msi_size, km_stat[0].msi_size / PAGESIZE,
+	       km_stat[1].msi_lock, km_stat[0].msi_lock / PAGESIZE,
+	       km_stat[1].msi_nexe, km_stat[0].msi_nexe / PAGESIZE,
+	       km_stat[1].msi_ndat, km_stat[0].msi_ndat / PAGESIZE,
+	       km_stat[1].msi_anon, km_stat[0].msi_anon / PAGESIZE,
+	       km_stat[1].msi_swap, km_stat[0].msi_swap / PAGESIZE,
+	       km_stat[1].mks_reserved, km_stat[0].mks_reserved / PAGESIZE,
+	       km_stat[1].mks_prepared, km_stat[0].mks_prepared / PAGESIZE,
+	       km_stat[1].mks_krnpart, km_stat[0].mks_krnpart / PAGESIZE,
+	       km_stat[1].mks_nosplit, km_stat[0].mks_nosplit / PAGESIZE,
+	       km_stat[1].mks_nomerge, km_stat[0].mks_nomerge / PAGESIZE);
+}
+
+
+
+
+/************************************************************************/
 /* /proc/kos/mm/stat                                                    */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
@@ -1068,9 +1172,8 @@ procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
 	dynmem_total *= PAGESIZE;
 	dynmem_misc_usage *= PAGESIZE;
 
-	/* Print information */
-	ram_total_usable = 0;
-	ram_total_kernel = 0;
+	ram_total_usable   = 0;
+	ram_total_kernel   = 0;
 	ram_total_unusable = 0;
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		uint64_t banksize = (uint64_t)PMEMBANK_SIZE(minfo.mb_banks[i]);
@@ -1093,6 +1196,7 @@ procfs_kos_raminfo_printer(pformatprinter printer, void *arg,
 	}
 	ram_total = ram_total_usable + ram_total_kernel + ram_total_unusable;
 
+	/* Print information */
 #define PAGES(n) ((uint64_t)(n) * PAGESIZE)
 #define print_stat(name, value, total)                                    \
 	PRINT("\n" name);                                                     \
