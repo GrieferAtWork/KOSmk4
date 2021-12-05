@@ -539,7 +539,7 @@ struct mman;
 #define cred_require_sysadmin() require(CAP_SYS_ADMIN)
 
 /* TODO: Go through all system calls already defined and add credential checks where necessary. */
-/* TODO: Add credential checks for individual ksysctl() and hop() commands */
+/* TODO: Add credential checks for individual ksysctl() commands */
 
 #endif /* __CC__ */
 

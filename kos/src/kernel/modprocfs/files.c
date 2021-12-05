@@ -1690,7 +1690,6 @@ PRIVATE struct mfile_stream_ops const memleaks_v_stream_ops = {
 	.mso_preadv = &printnode_v_preadv,
 	.mso_stat   = &printnode_v_stat,
 	.mso_ioctl  = &memleaks_v_ioctl,
-	.mso_hop    = &printnode_v_hop,
 };
 PRIVATE struct printnode_ops const memleaks_ops = {
 	.pno_reg = {{

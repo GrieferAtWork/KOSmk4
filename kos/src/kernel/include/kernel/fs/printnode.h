@@ -168,7 +168,6 @@ struct printnode
 #define printnode_v_changed fregnode_v_changed
 #define printnode_v_wrattr  fnode_v_wrattr_noop
 #define printnode_v_ioctl   fregnode_v_ioctl
-#define printnode_v_hop     fregnode_v_hop
 FUNDEF NONNULL((1)) void KCALL /* Writes `0' into `st_size' and `st_blocks' */
 printnode_v_stat(struct mfile *__restrict self,
                  USER CHECKED struct stat *result)

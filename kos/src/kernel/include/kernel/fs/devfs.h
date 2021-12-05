@@ -134,7 +134,6 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 #define device_v_wrattr  fnode_v_wrattr_noop
 #define device_v_changed fdevnode_v_changed
 #define device_v_ioctl   fdevnode_v_ioctl
-#define device_v_hop     fdevnode_v_hop
 /* Device files can be casted  into PATH and DIRENT  objects,
  * returning the mounting point for /dev/ and the name of the
  * device file. (Note that this even continues to work if the

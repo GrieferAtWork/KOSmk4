@@ -1135,7 +1135,6 @@ again_acquire_locks:
 #define devfs_super_v_open       ramfs_super_v_open
 #define devfs_super_v_wrattr     ramfs_super_v_wrattr
 #define devfs_super_v_ioctl      ramfs_super_v_ioctl
-#define devfs_super_v_hop        ramfs_super_v_hop
 
 INTDEF NONNULL((1)) void KCALL /* From "./null.c" */
 nullfile_v_stat(struct mfile *__restrict self,
@@ -1152,7 +1151,6 @@ PRIVATE struct mfile_stream_ops const devfs_super_v_stream_ops = {
 	.mso_open  = &devfs_super_v_open,
 	.mso_stat  = &devfs_super_v_stat,
 	.mso_ioctl = &devfs_super_v_ioctl,
-	.mso_hop   = &devfs_super_v_hop,
 };
 
 /* INTERN because needed in "./devfsdefs.c" */
@@ -1264,7 +1262,6 @@ device_v_tryas(struct mfile *__restrict self,
 /* Device stream operators (simply only devices `.mso_tryas = &device_v_tryas') */
 PUBLIC_CONST struct mfile_stream_ops const device_v_stream_ops = {
 	.mso_ioctl = &device_v_ioctl,
-	.mso_hop   = &device_v_hop,
 	.mso_tryas = &device_v_tryas,
 };
 

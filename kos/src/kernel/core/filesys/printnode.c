@@ -209,7 +209,6 @@ PUBLIC_CONST struct mfile_stream_ops const printnode_v_stream_ops = {
 	.mso_preadv = &printnode_v_preadv,
 	.mso_stat   = &printnode_v_stat,
 	.mso_ioctl  = &printnode_v_ioctl,
-	.mso_hop    = &printnode_v_hop,
 };
 
 

@@ -142,7 +142,6 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
 #define flnknode_v_changed    fnode_v_changed
 #define flnknode_v_destroy    fnode_v_destroy
 #define flnknode_v_ioctl      fnode_v_ioctl
-#define flnknode_v_hop        fnode_v_hop
 
 /* Fallback operator for `mso_stat' that populates `st_size'
  * with  the return value  of the `lno_readlink()' operator. */

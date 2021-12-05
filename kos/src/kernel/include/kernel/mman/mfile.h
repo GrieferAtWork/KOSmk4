@@ -291,16 +291,6 @@ struct mfile_stream_ops {
 	                   USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
-	/* [0..1] Implementation for custom hop(2)-operators (s.a. `<kos/hop/[...].h>')
-	 * When not implemented, only the default set of hop-operators for mem-files is
-	 * usable with this mem-file.
-	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
-	 * When `NULL', same as `mfile_v_hop'. */
-	BLOCKING NONNULL((1)) syscall_slong_t
-	(KCALL *mso_hop)(struct mfile *__restrict self, ioctl_t cmd,
-	                 USER UNCHECKED void *arg, iomode_t mode)
-			THROWS(...);
-
 	/* [0..1] Try  to cast the given mem-file into a different handle type.
 	 * When this operator isn't defined, the mem-file cannot be cast to any
 	 * other  handle type. Note  that you may  assume that `wanted_type' is
@@ -347,14 +337,6 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
-/* Default hop(2) operator for mfiles. (currently unconditionally,
- * throws `E_INVALID_ARGUMENT_UNKNOWN_COMMAND', but should be used
- * by sub-class overrides as fallback) */
-FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
-mfile_v_hop(struct mfile *__restrict self, ioctl_t cmd,
-            USER UNCHECKED void *arg, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
-
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
  * be dispatched via `mfile_upread()' and `mfile_upwrite()' (which uses the `mso_pread'
  * and `mso_pwrite' operators, with `mfile_read()' and `mfile_write()' as fallback, so-
@@ -363,7 +345,7 @@ mfile_v_hop(struct mfile *__restrict self, ioctl_t cmd,
  * The operators of the following system calls are forwarded 1-on-1 to `mfile_u*':
  *   - pread(2), preadv(2), pwrite(2), pwritev(2)
  *   - ioctl(2), truncate(2), mmap(2), fallocate(2)
- *   - fsync(2), fdatasync(2), stat(2), poll(2), hop(2)
+ *   - fsync(2), fdatasync(2), stat(2), poll(2)
  * As stated, `lseek(2)', `read(2)' and `write(2)' are dispatched via pread/pwrite
  *
  * This function is actually used when trying to open a mem-file with neither
@@ -1546,7 +1528,6 @@ FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_udatasync(struct mfile *__restrict
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_ustat(struct mfile *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_upollconnect(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL mfile_upolltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL mfile_uhop(struct mfile *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF BLOCKING NONNULL((1)) REF void *KCALL mfile_utryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 FUNDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL mfile_uprintlink(struct mfile *__restrict self, __pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 

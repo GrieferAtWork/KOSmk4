@@ -1462,7 +1462,6 @@ PUBLIC_CONST struct mfile_stream_ops const kbddev_v_stream_ops = {
 	.mso_pollconnect = &kbddev_v_pollconnect,
 	.mso_polltest    = &kbddev_v_polltest,
 	.mso_ioctl       = &kbddev_v_ioctl,
-	.mso_hop         = &kbddev_v_hop,
 	.mso_tryas       = &kbddev_v_tryas,
 };
 

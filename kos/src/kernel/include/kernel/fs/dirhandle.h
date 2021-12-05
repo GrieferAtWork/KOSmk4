@@ -65,13 +65,13 @@ DEFINE_REFCOUNT_FUNCTIONS(struct dirhandle, dh_refcnt, dirhandle_destroy)
  * for seeking within the directory. Normal read(2) and write(2) ops,
  * as  well  as fsync(2),  fdatasync(2),  ftruncate(2), fallocate(2),
  * mmap(2) and poll(2) are not  implemented, but all other  operators
- * stat(2), ioctl(2), hop(2) and <mfile_utryas> are forwarded to  the
- * associated directory node (obtained via `fdirenum_getdir()')
+ * stat(2),   ioctl(2)  and  <mfile_utryas>   are  forwarded  to  the
+ * associated  directory  node  (obtained  via   `fdirenum_getdir()')
  *
  * The returned object also implements readdir(2) such that "."  and
- * ".." directory entries are enumerated (the later only so-long  as
- * the associated directory has a parent node; iow: isn't a fsuper),
- * and `READDIR_SKIPREL' isn't given to prevent this. */
+ * ".." directory entries are enumerated (so-long as the  associated
+ * directory has a parent node; iow: isn't the filesystem root), and
+ * `READDIR_SKIPREL' isn't given to prevent this. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct dirhandle *KCALL
 dirhandle_new(struct fdirnode *__restrict self,
               struct path *access_path,

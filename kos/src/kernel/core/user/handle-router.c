@@ -131,7 +131,7 @@ for (local ARGS: ops) {
 		print t,;
 		if (!t.endswith("*"))
 			print " ",;
-		if (!needPerType && name !in ["weakgetref"] && (n !in ["cmd"] || name !in ["ioctl", "hop"])) {
+		if (!needPerType && name !in ["weakgetref"] && (n !in ["cmd"] || name !in ["ioctl"])) {
 			print "UNUSED(",;
 			print n,;
 			print ")",;
@@ -329,7 +329,6 @@ INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.datasyn
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.stat") void KCALL handle_undefined_stat(void *__restrict UNUSED(self), USER CHECKED struct stat *UNUSED(result)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.pollconnect") void KCALL handle_undefined_pollconnect(void *__restrict UNUSED(self), poll_mode_t UNUSED(what)) THROWS(...) {  }
 INTERN BLOCKING WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.polltest") poll_mode_t KCALL handle_undefined_polltest(void *__restrict UNUSED(self), poll_mode_t UNUSED(what)) THROWS(...) { return 0; }
-INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.hop") syscall_slong_t KCALL handle_undefined_hop(void *__restrict UNUSED(self), ioctl_t cmd, USER UNCHECKED void *UNUSED(arg), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND, cmd); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.tryas") REF void *KCALL handle_undefined_tryas(void *__restrict UNUSED(self), uintptr_half_t UNUSED(wanted_type)) THROWS(E_WOULDBLOCK) { return NULL; }
 INTERN BLOCKING NONNULL((1, 2)) ATTR_SECTION(".text.kernel.handle_undefined.printlink") ssize_t KCALL handle_undefined_printlink(void *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) { return handle_generic_printlink(self, HANDLE_TYPE_UNDEFINED, printer, arg); }
 
@@ -957,29 +956,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_polltest,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_polltest
 	},
-	.h_hop = {
-		[HANDLE_TYPE_UNDEFINED]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
-		[HANDLE_TYPE_MFILE]           = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_mfile_hop,
-		[HANDLE_TYPE_DIRENT]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirent_hop,
-		[HANDLE_TYPE_PATH]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_path_hop,
-		[HANDLE_TYPE_FILEHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_hop,
-		[HANDLE_TYPE_TEMPHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_temphandle_hop,
-		[HANDLE_TYPE_DIRHANDLE]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_hop,
-		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_hop,
-		[HANDLE_TYPE_SOCKET]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_socket_hop,
-		[HANDLE_TYPE_EPOLL]           = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_epoll_hop,
-		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_hop,
-		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_hop,
-		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_hop,
-		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_hop,
-		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_hop,
-		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_hop,
-		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_hop,
-		[HANDLE_TYPE_TASK]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_task_hop,
-		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_module_hop,
-		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_hop,
-		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_hop
-	},
 	.h_tryas = {
 		[HANDLE_TYPE_UNDEFINED]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_undefined_tryas,
 		[HANDLE_TYPE_MFILE]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mfile_tryas,
@@ -1057,7 +1033,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_mfile_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_mfile_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_mfile.printlink") ssize_t KCALL
 handle_mfile_printlink(struct mfile *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1091,7 +1066,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_dirent_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirent_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_dirent.printlink") ssize_t KCALL
 handle_dirent_printlink(struct fdirent *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1125,7 +1099,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_path_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_path.printlink") ssize_t KCALL
 handle_path_printlink(struct path *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1159,7 +1132,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_filehandle.printlink") ssize_t KCALL
 handle_filehandle_printlink(struct filehandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1193,7 +1165,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_temphandle.printlink") ssize_t KCALL
 handle_temphandle_printlink(struct filehandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1227,7 +1198,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_dirhandle.printlink") ssize_t KCALL
 handle_dirhandle_printlink(struct dirhandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1261,7 +1231,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fifohandle.printlink") ssize_t KCALL
 handle_fifohandle_printlink(struct fifohandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1295,7 +1264,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_socket_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_socket_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_socket.printlink") ssize_t KCALL
 handle_socket_printlink(struct socket *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1329,7 +1297,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_epoll_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_epoll_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_epoll.printlink") ssize_t KCALL
 handle_epoll_printlink(struct epoll_controller *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1363,7 +1330,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_pipe.printlink") ssize_t KCALL
 handle_pipe_printlink(struct pipe *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1397,7 +1363,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_datasync, handle_undefined_datasync)
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_pipe_reader.printlink") ssize_t KCALL
 handle_pipe_reader_printlink(struct pipe_reader *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1431,7 +1396,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_datasync, handle_undefined_datasync)
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_pipe_writer.printlink") ssize_t KCALL
 handle_pipe_writer_printlink(struct pipe_writer *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1465,7 +1429,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_datasync, handle_undefined_datasyn
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_eventfd_fence.printlink") ssize_t KCALL
 handle_eventfd_fence_printlink(struct eventfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1499,7 +1462,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_datasync, handle_undefined_datasync
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_eventfd_sema.printlink") ssize_t KCALL
 handle_eventfd_sema_printlink(struct eventfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1533,7 +1495,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_signalfd.printlink") ssize_t KCALL
 handle_signalfd_printlink(struct signalfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1567,7 +1528,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_futexfd.printlink") ssize_t KCALL
 handle_futexfd_printlink(struct mfutexfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1601,7 +1561,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_task_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_task.printlink") ssize_t KCALL
 handle_task_printlink(struct taskpid *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1635,7 +1594,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_module_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_module_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_module.printlink") ssize_t KCALL
 handle_module_printlink(struct module *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1669,7 +1627,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_datasync, handle_undefined_datas
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_driver_loadlist.printlink") ssize_t KCALL
 handle_driver_loadlist_printlink(struct driver_loadlist *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
@@ -1703,7 +1660,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_datasync, handle_undefined_datasync
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_refcountable.printlink") ssize_t KCALL
 handle_refcountable_printlink(struct refcountable *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {

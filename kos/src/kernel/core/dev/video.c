@@ -1120,7 +1120,6 @@ PUBLIC_CONST struct mfile_stream_ops const viddev_v_stream_ops = {
 	.mso_write  = &viddev_v_write,
 	.mso_writev = &viddev_v_writev,
 	.mso_ioctl  = &viddev_v_ioctl,
-	.mso_hop    = &viddev_v_hop,
 	.mso_tryas  = &viddev_v_tryas,
 };
 

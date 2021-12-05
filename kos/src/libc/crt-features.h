@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2844e36 */
+/* HASH CRC-32:0x5bded872 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2990,8 +2990,6 @@
 #define __CRT_HAVE_GetSid
 #define __CRT_HAVE_GetSockName
 #define __CRT_HAVE_GetSockOpt
-#define __CRT_HAVE_Hop
-#define __CRT_HAVE_Hopf
 #define __CRT_HAVE_Ioctl
 #define __CRT_HAVE_LChmod
 #define __CRT_HAVE_LChown
@@ -4530,8 +4528,6 @@
 #define __CRT_HAVE_hdestroy_r
 #define __CRT_HAVE_heapsort
 #define __CRT_HAVE_herror
-#define __CRT_HAVE_hop
-#define __CRT_HAVE_hopf
 #define __CRT_HAVE_hsearch
 #define __CRT_HAVE_hsearch_r
 #define __CRT_HAVE_hstrerror

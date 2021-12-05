@@ -24,6 +24,7 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/handle-proto.h>
@@ -162,13 +163,6 @@ handle_path_polltest(struct path *__restrict self,
 	return mfile_upolltest(self->p_dir, what);
 }
 
-INTDEF NONNULL((1)) syscall_slong_t KCALL
-handle_path_hop(struct path *__restrict self, ioctl_t cmd,
-                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	/* TODO: PATH-specific HOP commands */
-	return mfile_uhop(self->p_dir, cmd, arg, mode);
-}
-
 INTDEF NONNULL((1)) REF void *KCALL
 handle_path_tryas(struct path *__restrict self,
                   uintptr_half_t wanted_type)
@@ -191,7 +185,14 @@ handle_path_tryas(struct path *__restrict self,
 	return mfile_utryas(self->p_dir, wanted_type);
 }
 
-
+INTERN NONNULL((1, 2)) ssize_t KCALL
+handle_path_printlink(struct path *__restrict self,
+                      pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	REF struct path *root = fs_getroot(THIS_FS);
+	FINALLY_DECREF_UNLIKELY(root);
+	return path_print(self, printer, arg, 0, root);
+}
 
 
 DECL_END

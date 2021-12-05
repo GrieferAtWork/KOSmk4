@@ -117,7 +117,6 @@ procfs_perproc_enum_impl(struct fdirent *const *files, size_t count,
 #define procfs_perproc_v_wrattr  fnode_v_wrattr_noop
 #define procfs_perproc_v_free    (*((void(KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1))
 #define procfs_perproc_v_ioctl   fnode_v_ioctl
-#define procfs_perproc_v_hop     fnode_v_hop
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self) {
 	struct fnode *me = mfile_asnode(self);
@@ -140,7 +139,6 @@ procfs_perproc_dir_v_stat(struct mfile *__restrict self,
 #define procfs_perproc_dir_v_perm_ops procfs_perproc_v_perm_ops
 #define procfs_perproc_dir_v_open     fdirnode_v_open
 #define procfs_perproc_dir_v_ioctl    fdirnode_v_ioctl
-#define procfs_perproc_dir_v_hop      fdirnode_v_hop
 INTDEF struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops;
 
 
@@ -541,13 +539,11 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 #define procfs_perproc_lnknode_v_destroy  procfs_perproc_v_destroy
 #define procfs_perproc_lnknode_v_changed  procfs_perproc_v_changed
 #define procfs_perproc_lnknode_v_ioctl    flnknode_v_ioctl
-#define procfs_perproc_lnknode_v_hop      flnknode_v_hop
 #define procfs_perproc_lnknode_v_free     procfs_perproc_v_free
 #define procfs_perproc_lnknode_v_wrattr   procfs_perproc_v_wrattr
 #define procfs_perproc_lnknode_v_perm_ops procfs_perproc_v_perm_ops
 INTDEF struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops;
 #define procfs_perproc_printnode_v_ioctl printnode_v_ioctl
-#define procfs_perproc_printnode_v_hop   printnode_v_hop
 INTDEF struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops;
 INTDEF NONNULL((1)) void KCALL
 procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
@@ -616,7 +612,6 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 		.mso_pwrite = &writer,                                                 \
 		.mso_stat   = &procfs_perproc_printnode_v_stat,                        \
 		.mso_ioctl  = &procfs_perproc_printnode_v_ioctl,                       \
-		.mso_hop    = &procfs_perproc_printnode_v_hop,                         \
 	};                                                                         \
 	INTERN_CONST struct printnode_ops const ops_symbol_name = {                \
 		.pno_reg = {{                                                          \
@@ -685,8 +680,6 @@ procfs_perproc_root_v_enum(struct fdirenum *__restrict result) {
 	                         result);
 }
 
-#define procfs_perproc_root_v_hop fdirnode_v_hop
-
 PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
 procfs_perproc_root_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                             USER UNCHECKED void *arg, iomode_t mode)
@@ -723,7 +716,6 @@ PRIVATE struct mfile_stream_ops const procfs_perproc_root_v_stream_ops = {
 	.mso_open  = &fdirnode_v_open,
 	.mso_stat  = &procfs_perproc_dir_v_stat,
 	.mso_ioctl = &procfs_perproc_root_v_ioctl,
-	.mso_hop   = &procfs_perproc_root_v_hop,
 	.mso_tryas = &procfs_perproc_root_v_tryas,
 };
 

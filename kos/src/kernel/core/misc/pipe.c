@@ -370,14 +370,6 @@ handle_pipe_reader_polltest(struct pipe_reader *__restrict self,
 	return result;
 }
 
-INTERN syscall_slong_t KCALL
-handle_pipe_reader_hop(struct pipe_reader *__restrict self, ioctl_t cmd,
-                       USER UNCHECKED void *arg, iomode_t mode) {
-	return handle_pipe_hop(self->pr_pipe, cmd, arg,
-	                       (mode & ~IO_ACCMODE) |
-	                       IO_RDONLY);
-}
-
 INTERN size_t KCALL
 handle_pipe_writer_write(struct pipe_writer *__restrict self,
                          USER CHECKED void const *src,
@@ -428,14 +420,6 @@ handle_pipe_writer_polltest(struct pipe_writer *__restrict self, poll_mode_t wha
 	if (ringbuffer_closed(rb))
 		result |= POLLHUP;
 	return result;
-}
-
-INTERN syscall_slong_t KCALL
-handle_pipe_writer_hop(struct pipe_writer *__restrict self, ioctl_t cmd,
-                       USER UNCHECKED void *arg, iomode_t mode) {
-	return handle_pipe_hop(self->pw_pipe, cmd, arg,
-	                       (mode & ~IO_ACCMODE) |
-	                       IO_WRONLY);
 }
 
 INTERN size_t KCALL

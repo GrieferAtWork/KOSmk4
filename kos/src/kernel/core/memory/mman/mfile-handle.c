@@ -350,21 +350,6 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 #undef typeof_field
 }
 
-/* Default hop(2) operator for mfiles. (currently unconditionally,
- * throws `E_INVALID_ARGUMENT_UNKNOWN_COMMAND', but should be used
- * by sub-class overrides as fallback) */
-PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
-mfile_v_hop(struct mfile *__restrict self, ioctl_t cmd,
-            USER UNCHECKED void *arg, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
-	/* TODO: Default HOP operations. */
-	(void)self;
-	(void)arg;
-	(void)mode;
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-	      cmd);
-}
 
 
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
@@ -375,7 +360,7 @@ mfile_v_hop(struct mfile *__restrict self, ioctl_t cmd,
  * The operators of the following system calls are forwarded 1-on-1 to `mfile_u*':
  *   - pread(2), preadv(2), pwrite(2), pwritev(2)
  *   - ioctl(2), truncate(2), mmap(2), fallocate(2)
- *   - fsync(2), fdatasync(2), stat(2), poll(2), hop(2)
+ *   - fsync(2), fdatasync(2), stat(2), poll(2)
  * As stated, `lseek(2)', `read(2)' and `write(2)' are dispatched via pread/pwrite
  *
  * This function is actually used when trying to open a mem-file with neither
@@ -450,7 +435,6 @@ DEFINE_PUBLIC_ALIAS(mfile_udatasync, handle_mfile_datasync);
 DEFINE_PUBLIC_ALIAS(mfile_ustat, handle_mfile_stat);
 DEFINE_PUBLIC_ALIAS(mfile_upollconnect, handle_mfile_pollconnect);
 DEFINE_PUBLIC_ALIAS(mfile_upolltest, handle_mfile_polltest);
-DEFINE_PUBLIC_ALIAS(mfile_uhop, handle_mfile_hop);
 DEFINE_PUBLIC_ALIAS(mfile_utryas, handle_mfile_tryas);
 DEFINE_PUBLIC_ALIAS(mfile_uprintlink, handle_mfile_printlink);
 
@@ -1138,22 +1122,6 @@ handle_mfile_polltest(struct mfile *__restrict self,
 		}
 	}
 	return result;
-}
-
-INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
-handle_mfile_hop(struct mfile *__restrict self, ioctl_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode)
-		THROWS(...) {
-	struct mfile_stream_ops const *stream;
-	BLOCKING NONNULL((1)) syscall_slong_t
-	(KCALL *mso_hop)(struct mfile *__restrict self, ioctl_t cmd,
-	                 USER UNCHECKED void *arg, iomode_t mode)
-			THROWS(...);
-	mso_hop = &mfile_v_hop;
-	stream  = self->mf_ops->mo_stream;
-	if (stream && stream->mso_hop)
-		mso_hop = stream->mso_hop; /* Custom HOP override. */
-	return (*mso_hop)(self, cmd, arg, mode);
 }
 
 INTERN BLOCKING NONNULL((1)) REF void *KCALL

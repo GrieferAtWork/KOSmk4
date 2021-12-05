@@ -44,7 +44,6 @@ PRIVATE struct mfile_stream_ops const fsuper_unmounted_v_stream_ops = {
 	.mso_open  = &ramfs_super_v_open,
 	.mso_stat  = &nullfile_v_stat, /* stat() on unmounted root paths returns `boottime' timestamps! */
 	.mso_ioctl = &fsuper_v_ioctl,
-	.mso_hop   = &fsuper_v_hop,
 };
 
 

@@ -155,7 +155,6 @@ DATDEF struct blkdev_ops const blkpart_ops;
 #define blkdev_v_changed    device_v_changed
 #define blkdev_v_wrattr     device_v_wrattr
 #define blkdev_v_tryas      device_v_tryas
-#define blkdev_v_hop        device_v_hop
 DATDEF struct mfile_stream_ops const blkdev_v_stream_ops;
 
 /* Implements `BLK*' ioctls from <linux/fs.h> */

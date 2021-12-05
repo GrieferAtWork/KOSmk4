@@ -74,9 +74,10 @@ union qword {
 #endif /* __BYTE_ORDER__ == ... */
 
 
-/* TODO: vioargs_getstate()  (implement through use of custom hop() operations that
- *                            can be used to get/set the CPU state of a waiting
- *                            thread by use of UVIO request ids `req.uq_reqid') */
+/* TODO: vioargs_getstate()
+ * -> implement  through  use of  custom  ioctl() operations
+ *    that can be used to get/set the CPU state of a waiting
+ *    thread by use of UVIO request ids `req.uq_reqid' */
 
 PRIVATE void *uvio_service_thread(void *cookie) {
 	fd_t fd;

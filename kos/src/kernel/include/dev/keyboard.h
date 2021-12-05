@@ -204,7 +204,6 @@ NOTHROW(KCALL kbddev_v_destroy)(struct mfile *__restrict self);
 #define kbddev_v_changed chrdev_v_changed
 #define kbddev_v_wrattr  chrdev_v_wrattr
 #define kbddev_v_tryas   chrdev_v_tryas
-#define kbddev_v_hop     chrdev_v_hop
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
 kbddev_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
               size_t num_bytes, iomode_t mode) THROWS(...);

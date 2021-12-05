@@ -167,7 +167,6 @@ PRIVATE struct mfile_stream_ops const devmem_stream_ops = {
 	.mso_pwritev = &devmem_v_pwritev,
 	.mso_stat    = &nullfile_v_stat,
 	.mso_ioctl   = &chrdev_v_ioctl,
-	.mso_hop     = &chrdev_v_hop,
 };
 
 
@@ -248,7 +247,6 @@ PRIVATE struct mfile_stream_ops const devnull_stream_ops = {
 	.mso_seek    = &devnull_v_seek,
 	.mso_stat    = &nullfile_v_stat,
 	.mso_ioctl   = &chrdev_v_ioctl,
-	.mso_hop     = &chrdev_v_hop,
 };
 
 
@@ -324,7 +322,6 @@ PRIVATE struct mfile_stream_ops const devzero_stream_ops = {
 	.mso_seek    = &devzero_v_seek,
 	.mso_stat    = &nullfile_v_stat,
 	.mso_ioctl   = &chrdev_v_ioctl,
-	.mso_hop     = &chrdev_v_hop,
 };
 
 
@@ -382,7 +379,6 @@ PRIVATE struct mfile_stream_ops const devfull_stream_ops = {
 	.mso_seek    = &devfull_v_seek,
 	.mso_stat    = &nullfile_v_stat,
 	.mso_ioctl   = &chrdev_v_ioctl,
-	.mso_hop     = &chrdev_v_hop,
 };
 
 
@@ -450,7 +446,6 @@ PRIVATE struct mfile_stream_ops const devkmem_stream_ops = {
 	.mso_pwritev = &devkmem_v_pwritev,
 	.mso_stat    = &nullfile_v_stat,
 	.mso_ioctl   = &chrdev_v_ioctl,
-	.mso_hop     = &chrdev_v_hop,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -611,7 +606,6 @@ PRIVATE struct mfile_stream_ops const devport_stream_ops = {
 	.mso_pwritev = &devport_v_pwritev,
 	.mso_stat    = &nullfile_v_stat,
 	.mso_ioctl   = &chrdev_v_ioctl,
-	.mso_hop     = &chrdev_v_hop,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -753,7 +747,6 @@ PRIVATE struct mfile_stream_ops const devrandom_stream_ops = {
 	.mso_pollconnect = &devrandom_v_pollconnect,
 	.mso_polltest    = &devrandom_v_polltest,
 	.mso_ioctl       = &chrdev_v_ioctl,
-	.mso_hop         = &chrdev_v_hop,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -844,7 +837,6 @@ PRIVATE struct mfile_stream_ops const devurandom_stream_ops = {
 	.mso_preadv = &devurandom_v_preadv,
 	.mso_stat   = &nullfile_v_stat,
 	.mso_ioctl  = &chrdev_v_ioctl,
-	.mso_hop    = &chrdev_v_hop,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -917,7 +909,6 @@ PRIVATE struct mfile_stream_ops const devkmsg_stream_ops = {
 	.mso_writev = &devkmsg_v_writev,
 	.mso_stat   = &nullfile_v_stat,
 	.mso_ioctl  = &chrdev_v_ioctl,
-	.mso_hop    = &chrdev_v_hop,
 };
 
 
@@ -1101,15 +1092,6 @@ devtty_v_polltest(struct mfile *__restrict UNUSED(self),
 	return mfile_upolltest(dev, what);
 }
 
-PRIVATE NONNULL((1)) syscall_slong_t KCALL
-devtty_v_hop(struct mfile *__restrict UNUSED(self), ioctl_t cmd,
-             USER UNCHECKED void *arg, iomode_t mode)
-		THROWS(...) {
-	REF struct device *dev = getctty();
-	FINALLY_DECREF_UNLIKELY(dev);
-	return mfile_uhop(dev, cmd, arg, mode);
-}
-
 PRIVATE NONNULL((1)) REF void *KCALL
 devtty_v_tryas(struct mfile *__restrict UNUSED(self), uintptr_half_t wanted_type)
 		THROWS(...) {
@@ -1136,8 +1118,16 @@ PRIVATE struct mfile_stream_ops const devtty_stream_ops = {
 	.mso_pollconnect = &devtty_v_pollconnect,
 	.mso_polltest    = &devtty_v_polltest,
 	.mso_ioctl       = &devtty_v_ioctl,
-	.mso_hop         = &devtty_v_hop,
 	.mso_tryas       = &devtty_v_tryas,
+//TODO:	BLOCKING WUNUSED NONNULL((1, 2)) ssize_t
+//TODO:	(KCALL *mso_printlink)(struct mfile *__restrict self, __pformatprinter printer, void *arg)
+//TODO:			THROWS(E_WOULDBLOCK, ...);
+//TODO:	BLOCKING NONNULL((1)) void
+//TODO:	(KCALL *mso_sync)(struct mfile *__restrict self)
+//TODO:			THROWS(E_WOULDBLOCK, E_IOERROR, ...);
+//TODO:	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
+//TODO:	/*NOTHROW*/ (KCALL *mso_cc)(struct mfile *__restrict self,
+//TODO:	                            struct ccinfo *__restrict info);
 };
 
 INTERN_CONST struct device_ops const dev_tty_ops = {{{

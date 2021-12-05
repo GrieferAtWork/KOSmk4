@@ -478,7 +478,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 - Libc:
 	- Try to maintain header (API) compatibility with GLIBc, MSVC and CYGWIN
 	- Try to maintain binary (ABI) compatibility with GLIBc and MSVC (CYGWIN only as far as that is possible)
-- KOS-specific, object-related kernel function can be exported as a `HOP_*` command (s.a. `/kos/include/kos/hop.h`)
+- KOS-specific, object-related kernel function can be exported as `MYOBJ_IOC_COMMAND` ioctls from files in `/kos/include/kos/ioctl/`
 
 
 

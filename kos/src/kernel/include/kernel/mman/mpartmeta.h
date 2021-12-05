@@ -326,15 +326,6 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
  *          cause the mem-part associated with the returned futex to also be anonymous,
  *          meaning that the part would get freshly allocated, and repeated calls  with
  *          the same arguments would not yield the same futex object!
- *       -> As  such, in the most common case of  a futex lookup where you wish to find
- *          the futex associated with some given  `uintptr_t', the process would be  to
- *          to determine the `mnode' of the address, and using that node then determine
- *          the associated mpart, and relative offset  into that mem-part. If a  lookup
- *          of  the   futex   then   returns  `MPART_FUTEX_OOB',   loop   back   around
- *          and once again lookup the `mnode'.
- *       -> In the end, there  exists no API also  found on linux that  would make use of  this
- *          function, however on  KOS it is  possible to  access this function  through use  of
- *          the HANDLE_TYPE_MFILE-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `addr' */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutex *FCALL
 mfile_createfutex(struct mfile *__restrict self, pos_t addr)

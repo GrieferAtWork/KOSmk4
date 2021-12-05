@@ -202,7 +202,6 @@ PRIVATE struct mfile_stream_ops const iso9660_dir_v_stream_ops = {
 	.mso_open  = &fdirnode_v_open,
 	.mso_stat  = NULL, /* Explicit! */
 	.mso_ioctl = &fdirnode_v_ioctl,
-	.mso_hop   = &fdirnode_v_hop,
 };
 
 PRIVATE struct fregnode_ops const iso9660_reg_ops = {

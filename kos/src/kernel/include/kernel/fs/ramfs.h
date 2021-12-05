@@ -81,7 +81,6 @@ DATDEF struct fregnode_ops const ramfs_regnode_ops;
 DATDEF struct fdevnode_ops const ramfs_devnode_ops;
 #define ramfs_devnode_v_open    fdevnode_v_open
 #define ramfs_devnode_v_ioctl   fdevnode_v_ioctl
-#define ramfs_devnode_v_hop     fdevnode_v_hop
 #define ramfs_devnode_v_wrattr  fnode_v_wrattr_noop
 #define ramfs_devnode_v_changed fdevnode_v_changed
 #define ramfs_devnode_v_destroy fdevnode_v_destroy
@@ -120,7 +119,6 @@ DATDEF struct ffifonode_ops const ramfs_fifonode_ops;
 DATDEF struct fsocknode_ops const ramfs_socknode_ops;
 #define ramfs_socknode_v_open     fsocknode_v_open
 #define ramfs_socknode_v_ioctl    fsocknode_v_ioctl
-#define ramfs_socknode_v_hop      fsocknode_v_hop
 #define ramfs_socknode_v_wrattr   fnode_v_wrattr_noop
 #define ramfs_socknode_v_changed  fsocknode_v_changed
 #define ramfs_socknode_v_destroy  fsocknode_v_destroy
@@ -378,7 +376,6 @@ DATDEF struct fsuper_ops const ramfs_super_ops;
 #define ramfs_super_v_open       ramfs_dirnode_v_open
 #define ramfs_super_v_stream_ops ramfs_dirnode_v_stream_ops
 #define ramfs_super_v_ioctl      fsuper_v_ioctl
-#define ramfs_super_v_hop        fsuper_v_hop
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self);
 PUBLIC NOBLOCK NONNULL((1)) void

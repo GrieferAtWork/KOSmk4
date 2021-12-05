@@ -297,7 +297,6 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vidtty_v_destroy)(struct mfile *__restrict self);
 #define vidtty_v_changed ansittydev_v_changed
 #define vidtty_v_wrattr  ansittydev_v_wrattr
-#define vidtty_v_hop     ansittydev_v_hop
 #define vidtty_v_tryas   ansittydev_v_tryas
 #define vidtty_v_write   ansittydev_v_write /* Cannot be overwritten! */
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
@@ -433,7 +432,6 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 /* Default operators for `struct vidlck' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vidlck_v_destroy)(struct mfile *__restrict self);
-#define vidlck_v_hop        mfile_v_hop
 #define vidlck_v_ioctl      mfile_v_ioctl
 #define vidlck_v_stream_ops UNDEFINED
 
@@ -556,7 +554,6 @@ viddev_newlck(struct viddev *__restrict self);
 #define viddev_v_destroy chrdev_v_destroy
 #define viddev_v_changed chrdev_v_changed
 #define viddev_v_wrattr  chrdev_v_wrattr
-#define viddev_v_hop     chrdev_v_hop
 #define viddev_v_tryas   chrdev_v_tryas
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 viddev_v_write(struct mfile *__restrict self, USER CHECKED void const *src,

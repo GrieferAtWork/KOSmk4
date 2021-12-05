@@ -280,13 +280,6 @@ handle_filehandle_polltest(struct filehandle *__restrict self,
 	return mfile_upolltest(self->fh_file, what);
 }
 
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_filehandle_hop(struct filehandle *__restrict self, ioctl_t cmd,
-                      USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	/* XXX: filehandle-specific HOPs? */
-	return mfile_uhop(self->fh_file, cmd, arg, mode);
-}
-
 INTERN NONNULL((1)) REF void *KCALL
 handle_filehandle_tryas(struct filehandle *__restrict self,
                         uintptr_half_t wanted_type)
@@ -384,7 +377,6 @@ DEFINE_INTERN_ALIAS(handle_temphandle_datasync, handle_filehandle_datasync);
 DEFINE_INTERN_ALIAS(handle_temphandle_stat, handle_filehandle_stat);
 DEFINE_INTERN_ALIAS(handle_temphandle_pollconnect, handle_filehandle_pollconnect);
 DEFINE_INTERN_ALIAS(handle_temphandle_polltest, handle_filehandle_polltest);
-DEFINE_INTERN_ALIAS(handle_temphandle_hop, handle_filehandle_hop);
 DEFINE_INTERN_ALIAS(handle_temphandle_tryas, handle_filehandle_tryas);
 DEFINE_INTERN_ALIAS(handle_temphandle_printlink, handle_filehandle_printlink);
 

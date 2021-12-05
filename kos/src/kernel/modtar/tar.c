@@ -1192,7 +1192,6 @@ PRIVATE struct mfile_stream_ops const tardirnode_v_stream_ops = {
 	.mso_open      = &fdirnode_v_open,
 	.mso_stat      = &fdirnode_v_stat,
 	.mso_ioctl     = &fdirnode_v_ioctl,
-	.mso_hop       = &fdirnode_v_hop,
 	.mso_printlink = &tarnode_v_printlink,
 };
 
@@ -1261,7 +1260,6 @@ PRIVATE struct mfile_stream_ops const tarsuper_v_stream_ops = {
 	.mso_open      = &fsuper_v_open,
 	.mso_stat      = &fsuper_v_stat,
 	.mso_ioctl     = &fsuper_v_ioctl,
-	.mso_hop       = &fsuper_v_hop,
 	.mso_printlink = &tarnode_v_printlink,
 	.mso_cc        = &tarsuper_v_cc,
 };

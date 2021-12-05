@@ -76,7 +76,6 @@ fdevnode_v_open(struct mfile *__restrict self,
 #define fdevnode_v_changed fnode_v_changed
 #define fdevnode_v_destroy fnode_v_destroy
 #define fdevnode_v_ioctl   fnode_v_ioctl
-#define fdevnode_v_hop     fnode_v_hop
 
 
 /* Initialize common+basic fields. The caller must still initialize:

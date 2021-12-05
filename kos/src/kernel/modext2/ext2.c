@@ -800,7 +800,6 @@ ext2_lnk_v_readlink(struct flnknode *__restrict self,
 /************************************************************************/
 PRIVATE struct mfile_stream_ops const ext2_reg_v_streams_ops = {
 	.mso_ioctl = &fregnode_v_ioctl,
-	.mso_hop   = &fregnode_v_hop,
 	.mso_cc    = &ext2_v_cc,
 };
 PRIVATE struct fregnode_ops const ext2_regops = {
@@ -819,7 +818,6 @@ PRIVATE struct mfile_stream_ops const ext2_dir_v_streams_ops = {
 	.mso_open  = &flatdirnode_v_open,
 	.mso_stat  = &flatdirnode_v_stat,
 	.mso_ioctl = &flatdirnode_v_ioctl,
-	.mso_hop   = &flatdirnode_v_hop,
 	.mso_cc    = &ext2_v_cc,
 };
 PRIVATE struct flatdirnode_ops const ext2_dirops = {
@@ -854,7 +852,6 @@ PRIVATE struct flatdirnode_ops const ext2_dirops = {
 };
 PRIVATE struct mfile_stream_ops const ext2_lnk_v_streams_ops = {
 	.mso_ioctl = &flnknode_v_ioctl,
-	.mso_hop   = &flnknode_v_hop,
 	.mso_cc    = &ext2_v_cc,
 };
 PRIVATE struct flnknode_ops const ext2_lnkops = {

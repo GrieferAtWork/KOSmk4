@@ -91,7 +91,6 @@ INTERN_CONST struct mfile_stream_ops const devfs_spec_v_stream_ops_with_boottime
 	.mso_open  = &fdirnode_v_open,
 	.mso_stat  = &devfs_spec_v_stat_with_boottime,
 	.mso_ioctl = &fdirnode_v_ioctl,
-	.mso_hop   = &fdirnode_v_hop,
 };
 
 

@@ -70,8 +70,8 @@ NOTHROW(FCALL dirhandle_destroy)(struct dirhandle *__restrict self) {
  * for seeking within the directory. Normal read(2) and write(2) ops,
  * as  well  as fsync(2),  fdatasync(2),  ftruncate(2), fallocate(2),
  * mmap(2) and poll(2) are not  implemented, but all other  operators
- * stat(2), ioctl(2), hop(2) and <mfile_utryas> are forwarded to  the
- * associated directory node (obtained via `fdirenum_getdir()')
+ * stat(2),   ioctl(2)  and  <mfile_utryas>   are  forwarded  to  the
+ * associated  directory  node  (obtained  via   `fdirenum_getdir()')
  *
  * The returned object also implements readdir(2) such that "."  and
  * ".." directory entries are enumerated (so-long as the  associated
@@ -327,13 +327,6 @@ INTERN BLOCKING NONNULL((1)) void KCALL
 handle_dirhandle_stat(struct dirhandle *__restrict self,
                       USER CHECKED struct stat *result) THROWS(...) {
 	return mfile_ustat(self->dh_enum.de_dir, result);
-}
-
-INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
-handle_dirhandle_hop(struct dirhandle *__restrict self, ioctl_t cmd,
-                     USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	/* XXX: dirhandle-specific HOPs? */
-	return mfile_uhop(self->dh_enum.de_dir, cmd, arg, mode);
 }
 
 INTERN BLOCKING NONNULL((1)) REF void *KCALL

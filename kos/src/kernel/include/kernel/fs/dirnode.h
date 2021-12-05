@@ -509,7 +509,6 @@ struct fdirnode
 #define fdirnode_v_destroy fnode_v_destroy
 #define fdirnode_v_changed fnode_v_changed
 #define fdirnode_v_ioctl   fnode_v_ioctl
-#define fdirnode_v_hop     fnode_v_hop
 /* Constructs a wrapper object that implements readdir() (s.a. `dirhandle_new()') */
 struct handle;
 FUNDEF NONNULL((1, 2)) void KCALL

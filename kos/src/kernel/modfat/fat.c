@@ -2396,7 +2396,6 @@ fat_v_printlink(struct mfile *__restrict self, __pformatprinter printer, void *a
 PRIVATE struct mfile_stream_ops const fatreg_v_stream_ops = {
 	/* TODO: Truncate operator (call the underlying truncate before freeing out-of-bounds clusters) */
 	.mso_ioctl     = &fat_v_ioctl,
-	.mso_hop       = &fregnode_v_hop,
 	.mso_printlink = &fat_v_printlink,
 	.mso_cc        = &fat_v_cc,
 };
@@ -2418,7 +2417,6 @@ PRIVATE struct mfile_stream_ops const fatdir_v_stream_ops = {
 	.mso_open      = &flatdirnode_v_open,
 	.mso_stat      = &flatdirnode_v_stat,
 	.mso_ioctl     = &fat_v_ioctl,
-	.mso_hop       = &flatdirnode_v_hop,
 	.mso_printlink = &fat_v_printlink,
 	.mso_cc        = &fat_v_cc,
 };
@@ -2456,7 +2454,6 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 PRIVATE struct mfile_stream_ops const fatlnk_v_stream_ops = {
 	.mso_stat      = &fatlnk_v_stat,
 	.mso_ioctl     = &fat_v_ioctl,
-	.mso_hop       = &flnknode_v_hop,
 	.mso_printlink = &fat_v_printlink,
 	.mso_cc        = &fat_v_cc,
 };

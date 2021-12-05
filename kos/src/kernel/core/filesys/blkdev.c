@@ -179,20 +179,11 @@ blkpart_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	return mfile_uioctl(me->bd_partinfo.bp_master, cmd, arg, mode);
 }
 
-PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
-blkpart_v_hop(struct mfile *__restrict self, ioctl_t cmd,
-              USER UNCHECKED void *arg, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
-	struct blkdev *me = mfile_asblkdev(self);
-	return mfile_uhop(me->bd_partinfo.bp_master, cmd, arg, mode);
-}
 
-
-/* Only needed for ioctl() and hop(); all other operators
- * are  already  implemented  inherently  via  fallbacks.
- * But since we're here, we also assign `mso_open',  even
- * though that one could have also been left as NULL with
- * the same behavior. */
+/* Only needed for ioctl(2);  all other operators are  already
+ * implemented inherently via fallbacks. But since we're here,
+ * we also assign `mso_open', even though that one could  have
+ * also been left as NULL with the same behavior. */
 PRIVATE struct mfile_stream_ops const blkpart_stream_ops = {
 	/* NOTE: _DONT_ Implement mmap() as a custom wrapper for the master drive!
 	 *
@@ -209,7 +200,6 @@ PRIVATE struct mfile_stream_ops const blkpart_stream_ops = {
 	 * If they're used for anything else, something is wrong already. */
 	.mso_open  = &mfile_v_open,
 	.mso_ioctl = &blkpart_v_ioctl,
-	.mso_hop   = &blkpart_v_hop,
 	.mso_tryas = &blkdev_v_tryas,
 	.mso_sync  = &blkpart_v_sync,
 };
@@ -231,7 +221,6 @@ PUBLIC_CONST struct blkdev_ops const blkpart_ops = {
 
 PUBLIC_CONST struct mfile_stream_ops const blkdev_v_stream_ops = {
 	.mso_ioctl = &blkdev_v_ioctl,
-	.mso_hop   = &blkdev_v_hop,
 	.mso_tryas = &blkdev_v_tryas,
 };
 

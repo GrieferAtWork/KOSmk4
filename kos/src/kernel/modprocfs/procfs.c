@@ -224,14 +224,12 @@ procfs_regfile_v_pwrite(struct mfile *__restrict self, USER CHECKED void const *
 #define procfs_regfile_v_preadv printnode_v_preadv
 #define procfs_regfile_v_stat   printnode_v_stat
 #define procfs_regfile_v_ioctl  printnode_v_ioctl
-#define procfs_regfile_v_hop    printnode_v_hop
 PRIVATE struct mfile_stream_ops const procfs_regfile_v_stream_ops = {
 	.mso_pread  = &procfs_regfile_v_pread,
 	.mso_preadv = &procfs_regfile_v_preadv,
 	.mso_pwrite = &procfs_regfile_v_pwrite,
 	.mso_stat   = &procfs_regfile_v_stat,
 	.mso_ioctl  = &procfs_regfile_v_ioctl,
-	.mso_hop    = &procfs_regfile_v_hop,
 };
 INTERN_CONST struct printnode_ops const procfs_regfile_ops = {
 	.pno_reg = {{

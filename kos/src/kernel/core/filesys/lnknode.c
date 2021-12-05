@@ -87,7 +87,6 @@ flnknode_v_stat_readlink_size(struct mfile *__restrict self,
 PUBLIC_CONST struct mfile_stream_ops const flnknode_v_stream_ops_readlink_size = {
 	.mso_stat  = &flnknode_v_stat_readlink_size,
 	.mso_ioctl = &flnknode_v_ioctl,
-	.mso_hop   = &flnknode_v_hop,
 };
 
 

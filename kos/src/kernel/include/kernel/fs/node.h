@@ -468,7 +468,6 @@ NOTHROW(KCALL fnode_v_changed)(struct mfile *__restrict self,
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self);
 #define fnode_v_ioctl mfile_v_ioctl
-#define fnode_v_hop   mfile_v_hop
 
 
 /* Get the uid/gid of a given file-node. These functions respect `npo_getown' */

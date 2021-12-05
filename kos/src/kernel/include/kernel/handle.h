@@ -181,12 +181,6 @@ struct handle_types {
 	poll_mode_t (BLOCKING WUNUSED NONNULL((1)) KCALL *h_polltest[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, poll_mode_t what)
 			/*THROWS(...)*/;
 
-	/* Implement handle control operations (s.a. `<kos/hop/[...].h>')
-	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment) */
-	syscall_slong_t (BLOCKING NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, ioctl_t cmd,
-	                                                                        USER UNCHECKED void *arg, iomode_t mode)
-			/*THROWS(...)*/;
-
 	/* Try to convert the given object into a handle data pointer of a different type.
 	 * If such a conversion isn't possible, this operator should simply return `NULL'.
 	 * NOTE: This operator is allowed to throw exceptions, however only as the  result

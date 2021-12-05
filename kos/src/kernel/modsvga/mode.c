@@ -302,7 +302,6 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 PRIVATE struct mfile_stream_ops const svgalck_v_stream_ops = {
 	.mso_ioctl = &svgalck_v_ioctl,
-	.mso_hop   = &vidlck_v_hop,
 	/* TODO: mmap (including support for automatic bank switching) */
 };
 
@@ -586,7 +585,6 @@ svgatty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 PRIVATE struct mfile_stream_ops const svgatty_v_stream_ops = {
 	.mso_write = &vidtty_v_write,
 	.mso_ioctl = &svgatty_v_ioctl,
-	.mso_hop   = &vidtty_v_hop,
 	.mso_tryas = &vidtty_v_tryas,
 };
 
@@ -866,7 +864,6 @@ PRIVATE struct mfile_stream_ops const svgadev_v_stream_ops = {
 	.mso_write  = &viddev_v_write,
 	.mso_writev = &viddev_v_writev,
 	.mso_ioctl  = &svgadev_v_ioctl,
-	.mso_hop    = &viddev_v_hop,
 	.mso_tryas  = &viddev_v_tryas,
 };
 

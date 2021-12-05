@@ -61,7 +61,6 @@ struct chrdev
 #define chrdev_v_wrattr     device_v_wrattr
 #define chrdev_v_tryas      device_v_tryas
 #define chrdev_v_ioctl      device_v_ioctl
-#define chrdev_v_hop        device_v_hop
 #define chrdev_v_stream_ops device_v_stream_ops
 
 

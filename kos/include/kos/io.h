@@ -498,7 +498,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_CANREADWRITE(mode) (((mode) & IO_ACCMODE) == IO_RDWR)
 
 /* Mask of flags accepted by the kos extension functions:
- *  `readf', `writef', `preadf', `pwritef', `ioctlf()', `hopf()' */
+ * -> `readf(2)', `writef(2)', `preadf(2)', `pwritef(2)', `ioctlf(2)' */
 #define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_DSYNC | IO_DIRECT | IO_NODATAZERO)
 
 /* Mask of flags modifiable via `F_SETFD' / `F_SETFL' */

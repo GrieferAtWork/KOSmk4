@@ -533,7 +533,6 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self);
 #define fsuper_v_open       fdirnode_v_open
 #define fsuper_v_stat       fdirnode_v_stat
 #define fsuper_v_ioctl      fdirnode_v_ioctl
-#define fsuper_v_hop        fdirnode_v_hop
 #define fsuper_v_stream_ops fdirnode_v_stream_ops
 
 

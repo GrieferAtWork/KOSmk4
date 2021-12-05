@@ -206,7 +206,6 @@ nicdev_v_write(struct mfile *__restrict self,
 PUBLIC_CONST struct mfile_stream_ops const nicdev_v_stream_ops = {
 	.mso_write = &nicdev_v_write,
 	.mso_ioctl = &nicdev_v_ioctl,
-	.mso_hop   = &nicdev_v_hop,
 	.mso_tryas = &nicdev_v_tryas,
 };
 

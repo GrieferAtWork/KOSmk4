@@ -2016,26 +2016,6 @@ handle_socket_stat(struct socket *__restrict self,
 	result->st_mode = S_IFSOCK;
 }
 
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_socket_hop(struct socket *__restrict self, ioctl_t cmd,
-                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	switch (cmd) {
-
-		/* TODO: HOP functions for things such as re-throwing the connect() exception, etc... */
-		(void)self;
-		(void)cmd;
-		(void)arg;
-		(void)mode;
-
-	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-		      cmd);
-		break;
-	}
-	return 0;
-}
-
 DECL_END
 
 #endif /* !GUARD_KERNEL_SRC_NETWORK_SOCKET_C */
