@@ -25,6 +25,9 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/path.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
@@ -154,9 +157,22 @@ driver_ioctl_getstring(struct module *__restrict self, uint64_t index,
 		result = (size_t)module_printname(self, &format_snprintf_printer, &pdat);
 		break;
 
-	case MOD_STR_FILENAME:
-		result = (size_t)module_printpath(self, &format_snprintf_printer, &pdat);
-		break;
+	case MOD_STR_FILENAME: {
+		if (self->md_fsname && self->md_fspath) {
+			/* Special handling so we don't expose paths outside the caller's sysroot.
+			 * Also: we want to emit paths using the relevant filesystem model! */
+			REF struct path *root = fs_getroot(THIS_FS);
+			FINALLY_DECREF_UNLIKELY(root);
+			result = (size_t)path_printent(self->md_fspath,
+			                               self->md_fsname->fd_name,
+			                               self->md_fsname->fd_namelen,
+			                               &format_snprintf_printer, &pdat,
+			                               fs_atflags(0) | AT_PATHPRINT_INCTRAIL,
+			                               root);
+		} else {
+			result = (size_t)module_printpath(self, &format_snprintf_printer, &pdat);
+		}
+	}	break;
 
 	case MOD_STR_CMDLINE: {
 		struct driver *me = require_driver(self);
