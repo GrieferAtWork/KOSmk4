@@ -253,6 +253,23 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case _IO_WITHSIZE(BLKFLSBUF, 0):
 		/*require(CAP_SYS_ADMIN);*/ /* Linux does this... Why? */
 		mfile_udatasync(self);
+		/* TODO: `BLKFLSBUF' also acts as a sort of minature system_cc() that will unload
+		 *       any  mem-parts associated  with a  non-anonymous file,  so-long as those
+		 *       parts aren't being mapped, or otherwise externally referenced.
+		 * >> if (part->mp_flags & MPART_F_GLOBAL_REF) CLEAR(MPART_F_GLOBAL_REF);
+		 * >> if (!ATOMIC_CMPXCH(part->mp_refcnt, 1, 0)) SET(MPART_F_GLOBAL_REF);
+		 * >> else mpart_destory(part);
+		 *
+		 * Supposedly, this command is meant to be used before `BLKRRPART' in  those
+		 * cases where a process may have modified the partition table, possibly  by
+		 * means of O_DIRECT, in which case the mpart I/O cache may differ from what
+		 * was actually written to disk, even when modified caches were synced.
+		 *
+		 * Though honestly, on KOS this wouldn't even be necessary since this would not
+		 * only require use of O_DIRECT for writing, but even in that case flushing the
+		 * cache isn't necessary because `blkdev_repart()' already tries to bypass  the
+		 * I/O buffer, meaning that in most cases it wouldn't even make use of possibly
+		 * outdated part caches... */
 		return 0;
 
 	case _IO_WITHSIZE(BLKSSZGET, 0):

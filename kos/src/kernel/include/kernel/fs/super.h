@@ -173,9 +173,9 @@ struct fsuper_ops {
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 
 	/* [0..1]
-	 * Called to perform additional fs-specific tasks to faciliate a safe unmount operation.
-	 * If defined, this operator is called in place of `mfile_delete_impl()' at the end of a
-	 * call to `fsuper_delete()', and must in turn complete by calling `mfile_delete_impl()'
+	 * Called to perform additional fs-specific tasks to facilitate a safe unmount operation.
+	 * If  defined, this operator is called in place of `mfile_delete_impl()' at the end of a
+	 * call  to `fsuper_delete()', and must in turn complete by calling `mfile_delete_impl()'
 	 * itself.
 	 *
 	 * In practice, this operator is used by `ramfs_super' to recursively delete files from
@@ -273,10 +273,14 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
  * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(&self->fs_root)));
  * @assume(addr + num_bytes <= self->fs_dev->mf_filesize);
  * @assume(num_bytes != 0); */
-#define fsuper_dev_rdsectors_async(self, addr, buf, num_bytes, aio) ((*(self)->fs_loadblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
-#define fsuper_dev_wrsectors_async(self, addr, buf, num_bytes, aio) ((*(self)->fs_saveblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
-#define fsuper_dev_rdsectors(self, addr, buf, num_bytes)            mfile_dosyncio((self)->fs_dev, (self)->fs_loadblocks, addr, buf, num_bytes)
-#define fsuper_dev_wrsectors(self, addr, buf, num_bytes)            mfile_dosyncio((self)->fs_dev, (self)->fs_saveblocks, addr, buf, num_bytes)
+#define fsuper_dev_rdsectors_async(self, addr, buf, num_bytes, aio) \
+	((*(self)->fs_loadblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
+#define fsuper_dev_wrsectors_async(self, addr, buf, num_bytes, aio) \
+	((*(self)->fs_saveblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
+#define fsuper_dev_rdsectors(self, addr, buf, num_bytes) \
+	mfile_dosyncio((self)->fs_dev, (self)->fs_loadblocks, addr, buf, num_bytes)
+#define fsuper_dev_wrsectors(self, addr, buf, num_bytes) \
+	mfile_dosyncio((self)->fs_dev, (self)->fs_saveblocks, addr, buf, num_bytes)
 
 /* Same as `fsuper_dev_*' above, but these perform an explicit check
  * for the requested address range to actually be in-bounds. When it
@@ -310,7 +314,7 @@ fsuper_dev_wrsectors_chk(struct fsuper *__restrict self, pos_t addr,
  * The value of this variable  can be controlled via  `/proc/kos/fs/allow-fs-oob'.
  * When  `true', filesystem driver disk access to out-of-bounds regions behaves as
  * though  those regions were  part of `/dev/zero', in  that writes are discarded,
- * and reads yield all zeroes.
+ * and reads yield all zeroes. Otherwise, `E_IOERROR_BADBOUNDS' is thrown instead.
  *
  * The default for this option is `false' */
 DATDEF __BOOL fsuper_allow_fs_oob;

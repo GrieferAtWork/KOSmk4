@@ -110,11 +110,12 @@ NOTHROW(FCALL fsuper_add2changed)(struct fsuper *__restrict self) {
 	return result;
 }
 
+
 /* Default behavior for filesystem drivers attempting to perform out-of-bounds I/O
  * The value of this variable  can be controlled via  `/proc/kos/fs/allow-fs-oob'.
  * When  `true', filesystem driver disk access to out-of-bounds regions behaves as
  * though  those regions were  part of `/dev/zero', in  that writes are discarded,
- * and reads yield all zeroes.
+ * and reads yield all zeroes. Otherwise, `E_IOERROR_BADBOUNDS' is thrown instead.
  *
  * The default for this option is `false' */
 PUBLIC ATTR_READMOSTLY bool fsuper_allow_fs_oob = false;

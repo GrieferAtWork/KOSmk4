@@ -53,8 +53,8 @@ DECL_BEGIN
  * the /proc/[pid]/fd/ folder, as  doing so mustn't follow  normal
  * open rules, where the associated symlink is followed.  Instead,
  * an open invocation for one of these files must behave more like
- * a dup(), followed by `fcntl(F_SETFL)'  to apply the new  oflags
- * that were passed to open().
+ * a dup(2), followed by `fcntl(F_SETFL)' to apply the new  oflags
+ * that were passed to open(2).
  *
  * While the regular follow-symlink approach works for ~regular~,
  * named files, anonymous  files would still  appear as  symlinks
