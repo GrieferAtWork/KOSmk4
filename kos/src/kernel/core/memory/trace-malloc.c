@@ -132,10 +132,12 @@ DECL_BEGIN
 
 #if ((GFP_NOLEAK >> 12) == TRACE_NODE_FLAG_NOLEAK && \
      (GFP_NOWALK >> 12) == TRACE_NODE_FLAG_NOWALK)
-#define TRACE_NODE_FLAG_FROM_GFP(gfp) (((gfp) & (GFP_NOLEAK | GFP_NOWALK)) >> 12)
+#define TRACE_NODE_FLAG_FROM_GFP(gfp) \
+	(((gfp) & __GFP_HEAPMASK) | ((gfp) & (GFP_NOLEAK | GFP_NOWALK)) >> 12)
 #else /* ... */
 #define TRACE_NODE_FLAG_FROM_GFP(gfp)                    \
-	(((gfp) & GFP_NOLEAK ? TRACE_NODE_FLAG_NOLEAK : 0) | \
+	(((gfp) & __GFP_HEAPMASK) |                          \
+	 ((gfp) & GFP_NOLEAK ? TRACE_NODE_FLAG_NOLEAK : 0) | \
 	 ((gfp) & GFP_NOWALK ? TRACE_NODE_FLAG_NOWALK : 0))
 #endif /* !... */
 

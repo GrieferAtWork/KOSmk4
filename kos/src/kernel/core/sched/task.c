@@ -383,7 +383,7 @@ NOTHROW(FCALL task_destroy_raw_impl_post)(Tobpostlockop(mman) *__restrict _lop,
 	decref(mm);
 
 	/* Free the backing memory of the task structure itself. */
-	heap_free(&kernel_locked_heap, self, self->t_heapsz, GFP_NORMAL);
+	heap_free(&kernel_locked_heap, self, self->t_heapsz, GFP_LOCKED);
 }
 
 /* Called while a lock to the kernel mman is held. */
@@ -582,7 +582,7 @@ again_lock_kernel_mman:
 		heap_free(&kernel_locked_heap,
 		          heapptr_getptr(resptr),
 		          heapptr_getsiz(resptr),
-		          GFP_NORMAL);
+		          GFP_LOCKED);
 		RETHROW();
 	}
 

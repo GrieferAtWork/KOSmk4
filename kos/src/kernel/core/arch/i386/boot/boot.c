@@ -921,23 +921,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  - After a couple of restarts, the kernel will panic because /dev/console got destroyed
 	 * Only logical conclusion: there's a missing incref() somewhere. */
 
-	/* TODO: The total # of mem-parts mapped by mman_kernel increases them more programs
-	 *       have been executed. - Something doesn't feel right here, and I suspect that
-	 *       somewhere memory isn't being unmapped when it should be.
-	 * Reproduce:
-	 * $ playground leakmon cat /proc/kos/raminfo
-	 *
-	 * Over time, "free" ram slowly goes down, but leaks(1) doesn't report anything, so
-	 * either  whatever stays behind is globally reachable, or (most likely), something
-	 * isn't being unmapped when it should.
-	 *
-	 * Theory: GFP_LOCKED memory is freed under GFP_NORMAL. As a result, the locked heap
-	 *         constantly has to map more memory because it thinks that there isn't  any
-	 *         left,  when in fact all of that memory  is part of the normal heap's free
-	 *         list.
-	 * Reasoning: The normal heap randomly starts serving locked memory, which can only
-	 *            happen if someone freed locked memory as normal. */
-
 	return state;
 }
 

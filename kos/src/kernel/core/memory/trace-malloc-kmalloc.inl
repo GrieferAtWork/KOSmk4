@@ -178,18 +178,21 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 #endif /* DEFINE_X_noexcept */
 		node = (struct trace_node *)heapptr_getptr(node_ptr);
 		node->tn_size = heapptr_getsiz(node_ptr);
+
 		/* Fill in the newly allocated node. */
 		trace_node_initlink(node, heapptr_getptr(result), heapptr_getsiz(result));
-		node->tn_reach       = gc_version;
-		node->tn_visit       = 0;
-		node->tn_kind        = TRACE_NODE_KIND_MALL;
-		node->tn_flags       = TRACE_NODE_FLAG_FROM_GFP(flags);
-		node->tn_tid         = task_getroottid_s();
+		node->tn_reach = gc_version;
+		node->tn_visit = 0;
+		node->tn_kind  = TRACE_NODE_KIND_MALL;
+		node->tn_flags = TRACE_NODE_FLAG_FROM_GFP(flags);
+		node->tn_tid   = task_getroottid_s();
+
 		/* Generate a traceback. */
 		lcpustate_current(&cs);
 		trace_malloc_generate_traceback(trace_node_traceback_vector(node),
 		                                trace_node_traceback_count(node),
 		                                &cs, 1);
+
 		/* Start tracing the node. */
 		MY_insert_trace_node_OR_trace_node_free(node, flags, 1);
 	}
@@ -284,18 +287,21 @@ do_normal_malloc:
 #endif /* DEFINE_X_noexcept */
 			node = (struct trace_node *)heapptr_getptr(node_ptr);
 			node->tn_size = heapptr_getsiz(node_ptr);
+
 			/* Fill in the newly allocated node. */
 			trace_node_initlink(node, heapptr_getptr(result), heapptr_getsiz(result));
-			node->tn_reach       = gc_version;
-			node->tn_visit       = 0;
-			node->tn_kind        = TRACE_NODE_KIND_MALL;
-			node->tn_flags       = TRACE_NODE_FLAG_FROM_GFP(flags);
-			node->tn_tid         = task_getroottid_s();
+			node->tn_reach = gc_version;
+			node->tn_visit = 0;
+			node->tn_kind  = TRACE_NODE_KIND_MALL;
+			node->tn_flags = TRACE_NODE_FLAG_FROM_GFP(flags);
+			node->tn_tid   = task_getroottid_s();
+
 			/* Generate a traceback. */
 			lcpustate_current(&cs);
 			trace_malloc_generate_traceback(trace_node_traceback_vector(node),
 			                                trace_node_traceback_count(node),
 			                                &cs, 1);
+
 			/* Start tracing the node. */
 			MY_insert_trace_node_OR_trace_node_free(node, flags, 1);
 		}
@@ -348,18 +354,21 @@ again_nonnull_ptr:
 #endif /* DEFINE_X_noexcept */
 			node = (struct trace_node *)heapptr_getptr(node_ptr);
 			node->tn_size = heapptr_getsiz(node_ptr);
+
 			/* Fill in the newly allocated node. */
 			trace_node_initlink(node, heapptr_getptr(result), heapptr_getsiz(result));
-			node->tn_reach       = gc_version;
-			node->tn_visit       = 0;
-			node->tn_kind        = TRACE_NODE_KIND_MALL;
-			node->tn_flags       = TRACE_NODE_FLAG_FROM_GFP(flags);
-			node->tn_tid         = task_getroottid_s();
+			node->tn_reach = gc_version;
+			node->tn_visit = 0;
+			node->tn_kind  = TRACE_NODE_KIND_MALL;
+			node->tn_flags = TRACE_NODE_FLAG_FROM_GFP(flags);
+			node->tn_tid   = task_getroottid_s();
+
 			/* Generate a traceback. */
 			lcpustate_current(&cs);
 			trace_malloc_generate_traceback(trace_node_traceback_vector(node),
 			                                trace_node_traceback_count(node),
 			                                &cs, 1);
+
 			/* Start tracing the node. */
 			MY_insert_trace_node_OR_trace_node_free(node, flags, 1);
 		}
