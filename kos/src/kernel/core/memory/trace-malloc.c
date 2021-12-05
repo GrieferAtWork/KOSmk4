@@ -119,6 +119,7 @@ DECL_BEGIN
                                      * Only used  when  dumping/discarding  leaks. */
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 #define TRACE_NODE_KIND_CORE   0x04 /* Like slab, referencing `mcoreheap_alloc()' */
+#define TRACE_NODE_KIND_MNODE  0x05 /* Unreachable kernel mman mnode. */
 
 #define TRACE_NODE_KIND_HAS_PADDING(kind)   ((kind) == TRACE_NODE_KIND_MALL)
 #define TRACE_NODE_KIND_HAS_TRACEBACK(kind) ((kind) != TRACE_NODE_KIND_BITSET)
@@ -964,6 +965,31 @@ NOTHROW(KCALL gc_coreheap_reset_reach)(void) {
 
 
 
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL gc_mnode_reset_reach)(struct mnode *__restrict self) {
+again:
+	self->mn_flags &= ~MNODE_F__REACH;
+	if (self->mn_mement.rb_lhs) {
+		if (self->mn_mement.rb_rhs)
+			gc_mnode_reset_reach(self->mn_mement.rb_rhs);
+		self = self->mn_mement.rb_lhs;
+		goto again;
+	}
+	if (self->mn_mement.rb_rhs) {
+		self = self->mn_mement.rb_rhs;
+		goto again;
+	}
+}
+
+/* Reset reachable bits for kernel mman nodes. */
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_kernel_mman_nodes_reset_reach)(void) {
+	if (mman_kernel.mm_mappings) /* Should never be NULL, but better be save... */
+		gc_mnode_reset_reach(mman_kernel.mm_mappings);
+}
+
+
+
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 	/* Do a number  of checks to  filter out often-found  pointers
@@ -1019,19 +1045,20 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 	node = tm_nodes_locate(ptr);
 	if (!node) {
 		/* Special handling for mcoreheap */
+		struct mnode *mn;
 		struct mcorepage *cp, *iter;
 		uintptr_t index, i;
 		cp    = (struct mcorepage *)FLOOR_ALIGN((uintptr_t)ptr, PAGESIZE);
 		index = (uintptr_t)((byte_t *)ptr - (byte_t *)cp->mcp_part);
 		index /= sizeof(union mcorepart);
 		if (index >= COMPILER_LENOF(cp->mcp_part))
-			return 0; /* Invalid index. (including the underflow case) */
+			goto check_reachable_mnode; /* Invalid index. (including the underflow case) */
 		if (!pagedir_iswritable((void *)cp))
 			return 0; /* Page isn't writable. -> This can't be one of them! */
 		if (!INUSE_BITSET_GET(cp->mcp_used, index))
-			return 0; /* Not allocated. */
+			goto check_reachable_mnode; /* Not allocated. */
 		if (INUSE_BITSET_GET(cp->_mcp_reach, index))
-			return 0; /* Already reached. */
+			goto check_reachable_mnode; /* Already reached. */
 
 		/* Check that `cp' really is one of the coreheap pages. */
 		for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
@@ -1049,6 +1076,11 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 				}
 			}
 		}
+check_reachable_mnode:
+		/* Mark reachable mnode objects from the kernel mman */
+		mn = mnode_tree_locate(mman_kernel.mm_mappings, ptr);
+		if (mn != NULL)
+			mn->mn_flags |= MNODE_F__REACH;
 		return 0;
 	}
 
@@ -1162,6 +1194,14 @@ NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task *__restrict thread,
 }
 
 
+DATDEF ATTR_PERTASK struct mnode this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL gc_reachable_thread)(struct task *__restrict thread) {
+	/* Mark mem-nodes inlined to the task as reachable. */
+	FORTASK(thread, this_kernel_stacknode_).mn_flags |= MNODE_F__REACH;
+}
+
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_this_thread)(void) {
 	size_t result = 0;
@@ -1169,6 +1209,7 @@ NOTHROW(KCALL gc_reachable_this_thread)(void) {
 	void *sp, *stack_min, *stack_end;
 	struct lcpustate context;
 	struct mnode const *my_stack;
+	gc_reachable_thread(THIS_TASK);
 
 	/* Search the registers of this thread. */
 	lcpustate_current(&context);
@@ -1277,12 +1318,14 @@ ARREF(driver_loadlist_arref, driver_loadlist);
 #endif /* !__driver_loadlist_arref_defined */
 
 PRIVATE NOBLOCK ATTR_COLDTEXT ssize_t
-NOTHROW(KCALL gc_reachable_thread)(void *UNUSED(arg),
-                                   struct task *thread,
-                                   struct taskpid *UNUSED(pid)) {
+NOTHROW(KCALL gc_reachable_thread_cb)(void *UNUSED(arg),
+                                      struct task *thread,
+                                      struct taskpid *UNUSED(pid)) {
 	size_t result = 0;
-	if (thread && thread != THIS_TASK)
+	if (thread && thread != THIS_TASK) {
+		gc_reachable_thread(thread);
 		result += gc_reachable_thread_scpustate(thread, FORTASK(thread, this_sstate));
+	}
 	return (ssize_t)result;
 }
 
@@ -1377,7 +1420,7 @@ NOTHROW(KCALL gc_find_reachable_impl)(void) {
 
 	/* Search all threads on all CPUs. */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2: Scan running threads\n");
-	task_enum_all_noipi_nb(&gc_reachable_thread, NULL);
+	task_enum_all_noipi_nb(&gc_reachable_thread_cb, NULL);
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");
 	gc_reachable_this_thread();
@@ -1698,11 +1741,9 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 }
 
 
-
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
 PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
-gc_gather_unreachable_slab_segment(struct trace_node **__restrict pleaks,
-                                   void *base, size_t num_bytes) {
+gc_gather_explicit_leak(struct trace_node **__restrict pleaks,
+                        u8 kind, void *base, size_t num_bytes) {
 	struct trace_node *node;
 	heapptr_t node_ptr;
 	node_ptr = heap_alloc_untraced(&trace_heap,
@@ -1710,18 +1751,19 @@ gc_gather_unreachable_slab_segment(struct trace_node **__restrict pleaks,
 	                               TRACE_HEAP_FLAGS);
 	node = (struct trace_node *)heapptr_getptr(node_ptr);
 	trace_node_initlink(node, base, num_bytes);
-	node->tn_size        = heapptr_getsiz(node_ptr);
-	node->tn_reach       = gc_version - 1;
-	node->tn_visit       = 0;
-	node->tn_kind        = TRACE_NODE_KIND_SLAB;
-	node->tn_flags       = 0;
-	node->tn_tid         = 0;
+	node->tn_size  = heapptr_getsiz(node_ptr);
+	node->tn_reach = gc_version - 1;
+	node->tn_visit = 0;
+	node->tn_kind  = kind;
+	node->tn_flags = 0;
+	node->tn_tid   = 0;
 	if (trace_node_traceback_count(node))
 		trace_node_traceback_vector(node)[0] = NULL;
 	trace_node_leak_next(node) = *pleaks;
 	*pleaks = node;
 }
 
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
 PRIVATE ATTR_COLDTEXT NONNULL((1, 2)) void KCALL
 gc_gather_unreachable_slab(struct trace_node **__restrict pleaks,
                            struct slab *__restrict self) {
@@ -1738,11 +1780,10 @@ gc_gather_unreachable_slab(struct trace_node **__restrict pleaks,
 		if likely(status != SLAB_SEGMENT_STATUS_ALLOC)
 			continue;
 		/* Well... It's a leak :( */
-		gc_gather_unreachable_slab_segment(pleaks,
-		                                   (byte_t *)self +
-		                                   SLAB_SEGMENT_OFFSET(self->s_size) +
-		                                   i * self->s_size,
-		                                   self->s_size);
+		gc_gather_explicit_leak(pleaks, TRACE_NODE_KIND_SLAB,
+		                        (byte_t *)self + SLAB_SEGMENT_OFFSET(self->s_size) +
+		                        i * self->s_size,
+		                        self->s_size);
 	}
 }
 
@@ -1781,32 +1822,57 @@ gc_gather_unreachable_coreheap(struct trace_node **__restrict pleaks) {
 		SLIST_FOREACH (iter, &mcoreheap_lists[i], mcp_link) {
 			unsigned int partno;
 			for (partno = 0; partno < COMPILER_LENOF(iter->mcp_part); ++partno) {
-				struct trace_node *node;
-				heapptr_t node_ptr;
 				if (!INUSE_BITSET_GET(iter->mcp_used, partno))
 					continue; /* This one's not allocated */
 				if (INUSE_BITSET_GET(iter->_mcp_reach, partno))
 					continue; /* This one's reachable... */
 				/* Ooops; found a leak :( */
-				node_ptr = heap_alloc_untraced(&trace_heap,
-				                               offsetof(struct trace_node, tn_trace),
-				                               TRACE_HEAP_FLAGS);
-				node = (struct trace_node *)heapptr_getptr(node_ptr);
-				trace_node_initlink(node, &iter->mcp_part[partno],
-				                    sizeof(iter->mcp_part[partno]));
-				node->tn_size  = heapptr_getsiz(node_ptr);
-				node->tn_reach = gc_version - 1;
-				node->tn_visit = 0;
-				node->tn_kind  = TRACE_NODE_KIND_CORE;
-				node->tn_flags = 0;
-				node->tn_tid   = 0;
-				if (trace_node_traceback_count(node))
-					trace_node_traceback_vector(node)[0] = NULL;
-				trace_node_leak_next(node) = *pleaks;
-				*pleaks = node;
+				gc_gather_explicit_leak(pleaks, TRACE_NODE_KIND_CORE,
+				                        &iter->mcp_part[partno],
+				                        sizeof(iter->mcp_part[partno]));
 			}
 		}
 	}
+}
+
+
+PRIVATE ATTR_COLDTEXT NONNULL((1, 2)) void KCALL
+gc_gather_unreachable_kernel_mman_nodes(struct mnode *__restrict self,
+                                        struct trace_node **__restrict pleaks) {
+again:
+	/* Check if we should consider this node as a leak. */
+	if (self->mn_flags & (MNODE_F__REACH | MNODE_F_KERNPART))
+		goto next; /* Node is reachable. */
+	if (!ADDR_ISKERN(self->mn_minaddr))
+		goto next; /* Can't trace outside of kernel-space. */
+	if (self->mn_part == NULL)
+		goto next; /* Don't consider reserved mappings as leaks. */
+	/* NOTE: There may be  more situations where  a mem-node  should
+	 *       be considered reachable, even when no pointers pointing
+	 *       to it exist. */
+
+	/* Yes, this does appear to be a leak! */
+	gc_gather_explicit_leak(pleaks, TRACE_NODE_KIND_MNODE,
+	                        mnode_getaddr(self),
+	                        mnode_getsize(self));
+
+next:
+	if (self->mn_mement.rb_lhs) {
+		if (self->mn_mement.rb_rhs)
+			gc_mnode_reset_reach(self->mn_mement.rb_rhs);
+		self = self->mn_mement.rb_lhs;
+		goto again;
+	}
+	if (self->mn_mement.rb_rhs) {
+		self = self->mn_mement.rb_rhs;
+		goto again;
+	}
+}
+
+PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
+gc_gather_unreachable_mnodes(struct trace_node **__restrict pleaks) {
+	if (mman_kernel.mm_mappings)
+		gc_gather_unreachable_kernel_mman_nodes(mman_kernel.mm_mappings, pleaks);
 }
 
 
@@ -1852,6 +1918,9 @@ kmalloc_leaks_gather(void) {
 	/* Reset reachable bits for coreheap objects. */
 	gc_coreheap_reset_reach();
 
+	/* Reset reachable bits for kernel mman nodes. */
+	gc_kernel_mman_nodes_reset_reach();
+
 	/* Clear the  is-reachable bits  from all  of
 	 * the different slabs that could be reached. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -1872,6 +1941,10 @@ kmalloc_leaks_gather(void) {
 		 * NOTE: This right here may cause new memory to be allocated. */
 		gc_gather_unreachable_slabs(&result);
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+		/* Gather nodes within the kernel mman who's pointed-to memory
+		 * isn't reachable. */
+		gc_gather_unreachable_mnodes(&result);
 	} EXCEPT {
 		/* Free dynamically allocated leak descriptors. */
 		while (result) {
@@ -2184,6 +2257,10 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			method = "coreheap-memory";
 			break;
 
+		case TRACE_NODE_KIND_MNODE:
+			method = "mnode-memory";
+			break;
+
 		default:
 			method = "heap-memory";
 			break;
@@ -2295,6 +2372,7 @@ NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
 		    node->tn_kind != TRACE_NODE_KIND_SLAB &&
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 		    node->tn_kind != TRACE_NODE_KIND_CORE &&
+		    node->tn_kind != TRACE_NODE_KIND_MNODE &&
 		    1) {
 			lock_acquire();
 			tm_nodes_insert(node);

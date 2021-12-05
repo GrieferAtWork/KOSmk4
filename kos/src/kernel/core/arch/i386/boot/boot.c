@@ -928,19 +928,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * $ watch -n 0.1 cat /proc/kos/raminfo
 	 *
 	 * Over time, "free" ram slowly goes down, but leaks(1) doesn't report anything, so
-	 * either whatever stays being is  globally reachable, or (most likely),  something
-	 * isn't being unmapped when it should.
-	 *
-	 * XXX: Expand kmalloc_leaks() to keep track of mnodes of the mman_kernel that are
-	 *      reachable via pointers into the associated mapping (only if such a pointer
-	 *      isn't already reachable as a trace node)
-	 *
-	 * After the big 'ol scan for memory leaks, go through all reached slabs, coreheap,
-	 * and trace  nodes  and mark  the  pointed-to  kernel mman  mnodes  as  reachable.
-	 *
-	 * Afterwards, any kernel mman mnode that isn't marked as reachable (and doesn't
-	 * fall  under special categories, such as reserved mappings), may be considered
-	 * a memory leak in regards to someone having forgotten to unmap it. */
+	 * either  whatever stays behind is globally reachable, or (most likely), something
+	 * isn't being unmapped when it should. */
 
 	return state;
 }

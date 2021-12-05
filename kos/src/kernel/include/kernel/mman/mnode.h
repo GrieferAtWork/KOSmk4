@@ -115,7 +115,7 @@
 /*efine MNODE_F_          0x10000000  * ... */
 /*efine MNODE_F_          0x20000000  * ... */
 /*efine MNODE_F_          0x40000000  * ... */
-/*efine MNODE_F_          0x80000000  * ... */
+#define MNODE_F__REACH    0x80000000 /* Used internally by the memory leak detector. */
 
 
 /* Expand to `MNODE_F_MPREPARED' if kernel-space is automatically prepared.
