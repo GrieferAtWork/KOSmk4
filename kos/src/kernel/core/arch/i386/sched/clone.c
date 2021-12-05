@@ -269,7 +269,7 @@ again_lock_mman:
 			heap_free(&kernel_locked_heap,
 			          heapptr_getptr(resptr),
 			          heapptr_getsiz(resptr),
-			          GFP_NORMAL);
+			          GFP_LOCKED);
 			RETHROW();
 		}
 	} EXCEPT {
