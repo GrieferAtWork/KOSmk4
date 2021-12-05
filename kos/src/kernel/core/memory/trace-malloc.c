@@ -1872,6 +1872,8 @@ again:
 		goto next; /* Can't trace outside of kernel-space. */
 	if (self->mn_part == NULL)
 		goto next; /* Don't consider reserved mappings as leaks. */
+	/* TODO: Mustn't consider `KERNEL_MHINT_DHEAP' (iow: memory for `tm_nodes') */
+
 	/* NOTE: There may be  more situations where  a mem-node  should
 	 *       be considered reachable, even when no pointers pointing
 	 *       to it exist. */
