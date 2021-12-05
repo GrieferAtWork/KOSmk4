@@ -94,9 +94,9 @@
 #endif /* !__x86_64__ */
 
 /* TODO: Adjust these hints to work better in a 64-bit address space */
-#define KERNEL_MHINT_HEAP         __KERNEL_MHINT(0xe1200000, 0xffffffffe1200000, __MAP_GROWSUP)   /* Hint for the regular kernel heap. */
-#define KERNEL_MHINT_LHEAP        __KERNEL_MHINT(0xe1a00000, 0xffffffffe1a00000, __MAP_GROWSUP)   /* Hint for the locked kernel heap. */
-#define KERNEL_MHINT_MMAN         __KERNEL_MHINT(0xe1a00000, 0xffffffffe1a00000, __MAP_GROWSUP)   /* Hint for memory managers. */
+#define KERNEL_MHINT_HEAP         __KERNEL_MHINT(0xe1000000, 0xffffffffe1000000, __MAP_GROWSUP)   /* Hint for the regular kernel heap. */
+#define KERNEL_MHINT_LHEAP        __KERNEL_MHINT(0xe2000000, 0xffffffffe2000000, __MAP_GROWSUP)   /* Hint for the locked kernel heap. */
+#define KERNEL_MHINT_MMAN         __KERNEL_MHINT(0xe8100000, 0xffffffffe8100000, __MAP_GROWSUP)   /* Hint for memory managers. */
 #define KERNEL_MHINT_SLAB         __KERNEL_MHINT(0xe8000000, 0xffffffffe8000000, __MAP_GROWSDOWN) /* Hint for the slab allocator. */
 #define KERNEL_MHINT_DHEAP        __KERNEL_MHINT(0xe0000000, 0xffffffffe0000000, __MAP_GROWSDOWN) /* Hint for the kernel heap used for allocating debug controllers. */
 #define KERNEL_MHINT_COREPAGE     __KERNEL_MHINT(0xf0000000, 0xfffffffff0000000, __MAP_GROWSDOWN) /* Hint for core-base pointers. */
