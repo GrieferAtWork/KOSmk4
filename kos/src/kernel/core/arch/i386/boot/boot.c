@@ -915,6 +915,41 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * block-aligned size, and thus will not attempt block-level access beyond the block-
 	 * aligned file size. */
 
+	/* TODO: Mounting  points shouldn't be  holding those hacky references  to drivers in order
+	 *       to keep potential statically allocated  structures alive. - Instead, drivers  such
+	 *       as procfs must  set the  destructor of their  singleton superblock  to a  function
+	 *       exported by the kernel which will decref() the associated driver when the struct's
+	 *       refcnt hits zero.
+	 * Furthermore, registration of the filesystem type sets the singleton superblock's refcnt
+	 * to `1', and unregistering the filesystem  type decrements the superblock's refcnt  like
+	 * normal.
+	 *
+	 * When mounting a singleton superblock, you'll have to tryincref() the singleton pointer,
+	 * and  if that fails, you may assume that the driver is currently being unloaded, and act
+	 * like the requested type didn't exist.
+	 *
+	 * XXX: The above is technically the correct way of doing this, but it leaves a problem
+	 *      when there are other statically allocated structures that reference the superblock,
+	 *      which is the case for all of the static files from procfs.
+	 * Technically, each of those files would also need to be holding its own reference to the
+	 * superblock, though only do so for as long as outside references exist to those parts.
+	 * Once such references no longer exist, the static object must be considered as invalid.
+	 * As such, constructing the initial reference to static objects would work like:
+	 * >> for (;;) {
+	 * >>     if (tryincref(obj))
+	 * >>         return obj;
+	 * >>     static_init_lock_acquire();
+	 * >>     if (obj->refcnt == 0) {
+	 * >>         REINITIALIZE(obj);
+	 * >>         incref(superblock);
+	 * >>         obj->refcnt = 1;
+	 * >>         static_init_lock_release();
+	 * >>         return obj;
+	 * >>     }
+	 * >>     static_init_lock_release();
+	 * >> }
+	 *
+	 */
 
 	return state;
 }
