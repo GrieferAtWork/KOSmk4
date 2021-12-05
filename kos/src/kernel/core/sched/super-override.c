@@ -106,12 +106,13 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	PREEMPTION_ENABLE();
 
 	while (ATOMIC_READ(super_override_cpu) != NULL) {
-		/* Wait for `mall_suspended_unlock' */
+		/* Wait for `super_override_release' */
 		task_connect_for_poll(&super_override_release);
 		if unlikely(ATOMIC_READ(super_override_cpu) == NULL) {
 			task_disconnectall();
 			break;
 		}
+
 		/* Wait for the other thread, but don't service
 		 * RPCs, or  allow  exceptions  to  be  thrown. */
 		if (!task_waitfor_norpc_nx())
