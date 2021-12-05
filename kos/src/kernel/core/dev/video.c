@@ -36,7 +36,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
-#include <kos/hop/openfd.h>
+#include <kos/ioctl/_openfd.h>
 #include <kos/ioctl/video.h>
 #include <sys/ioctl.h>
 
@@ -1064,7 +1064,7 @@ viddev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		hand.h_type = HANDLE_TYPE_MFILE;
 		hand.h_mode = IO_RDWR;
 		hand.h_data = lck;
-		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, hand);
+		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
 	}	break;
 
 	default:
