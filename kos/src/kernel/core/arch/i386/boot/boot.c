@@ -929,7 +929,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *
 	 * Over time, "free" ram slowly goes down, but leaks(1) doesn't report anything, so
 	 * either  whatever stays behind is globally reachable, or (most likely), something
-	 * isn't being unmapped when it should. */
+	 * isn't being unmapped when it should.
+	 *
+	 * Theory: GFP_LOCKED memory is freed under GFP_NORMAL. As a result, the locked heap
+	 *         constantly has to map more memory because it thinks that there isn't  any
+	 *         left,  when in fact all of that memory  is part of the normal heap's free
+	 *         list.
+	 * Reasoning: The normal heap randomly starts serving locked memory, which can only
+	 *            happen if someone freed locked memory as normal. */
 
 	return state;
 }
