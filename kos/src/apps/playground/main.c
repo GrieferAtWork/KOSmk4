@@ -1072,9 +1072,10 @@ int main_dumpdebug(int argc, char *argv[], char *envp[]) {
 int main_leakmon(int argc, char *argv[], char *envp[]) {
 	size_t loop;
 	static char const reset[] = AC_ED("") AC_CUP0;
+	char **volatile used_argv = argv; /* Prevents warnings about "returns_twice" and vfork()... */
 	write(STDOUT_FILENO, reset, sizeof(reset) - sizeof(char));
 	(void)argc;
-	++argv;
+	++used_argv;
 
 	for (loop = 0;; ++loop) {
 		int status;
@@ -1084,7 +1085,7 @@ int main_leakmon(int argc, char *argv[], char *envp[]) {
 		dprintf(STDOUT_FILENO, AC_ED("") AC_CUP0 "loop: %" PRIuSIZ "\n", loop);
 		cpid = vfork();
 		if (cpid == 0) {
-			execvpe(argv[0], argv, envp);
+			execvpe(used_argv[0], used_argv, envp);
 			_Exit(127);
 		}
 		if (cpid < 0)
