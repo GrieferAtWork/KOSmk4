@@ -53,9 +53,9 @@ STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 #define mptr_init(x, size, heap) ((x)->mp_data = (size) | ((uintptr_t)(heap) << MPTR_HEAP_SHIFT))
 #define mptr_size(x)             ((x)->mp_data & MPTR_SIZE_MASK)
 #define mptr_setsize(x, size)    ((x)->mp_data = (size) | ((uintptr_t)(x)->mp_data & MPTR_HEAP_MASK))
-#define mptr_heap(x)             (gfp_t)((x)->mp_data >> MPTR_HEAP_SHIFT)
+#define mptr_heap_gfp(x)         (gfp_t)((x)->mp_data >> MPTR_HEAP_SHIFT)
 #define mptr_assert(x)                                 \
-	(assert(mptr_heap(x) < __GFP_HEAPCOUNT),           \
+	(/*assert(mptr_heap_gfp(x) < __GFP_HEAPCOUNT),*/   \
 	 assert(IS_ALIGNED(mptr_size(x), HEAP_ALIGNMENT)), \
 	 assert(mptr_size(x) >= HEAP_MINSIZE))
 #else /* HEAP_ALIGNMENT < (__SIZEOF_SIZE_T__ + 1) */
@@ -74,15 +74,22 @@ STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 #define mptr_init(x, size, heap) ((x)->mp_size = (size), (x)->mp_heap = (heap))
 #define mptr_size(x)             (x)->mp_size
 #define mptr_setsize(x, size)    ((x)->mp_size = (size))
-#define mptr_heap(x)             (x)->mp_heap
+#define mptr_heap_gfp(x)         (x)->mp_heap
 #define mptr_assert(x)                                 \
-	(assert(mptr_heap(x) < __GFP_HEAPCOUNT),           \
+	(assert(mptr_heap_gfp(x) < __GFP_HEAPCOUNT),       \
 	 assert(IS_ALIGNED(mptr_size(x), HEAP_ALIGNMENT)), \
 	 assert(mptr_size(x) >= HEAP_MINSIZE))
 #endif /* HEAP_ALIGNMENT >= (__SIZEOF_SIZE_T__ + 1) */
 
 #define mptr_get(x)  ((struct mptr *)(x) - 1)
 #define mptr_user(x) ((struct mptr *)(x) + 1)
+#define mptr_heap(x) (&kernel_heaps[mptr_heap_gfp(x)])
+
+#if !defined(NDEBUG) && 1 /* TODO: Disable me */
+#define mptr_assert_paranoid mptr_assert
+#else /* !NDEBUG */
+#define mptr_assert_paranoid(x) (void)0
+#endif /* NDEBUG */
 
 
 PUBLIC ATTR_WEAK WUNUSED size_t
@@ -103,7 +110,6 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 PUBLIC ATTR_WEAK void
 NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	struct mptr *mblock;
-	gfp_t heap;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -115,16 +121,13 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
-	heap = mptr_heap(mblock);
-	heap_free_untraced(&kernel_heaps[heap],
-	                   mblock, mptr_size(mblock),
-	                   heap);
+	heap_free_untraced(mptr_heap(mblock), mblock,
+	                   mptr_size(mblock), mptr_heap_gfp(mblock));
 }
 
 PUBLIC ATTR_WEAK void
 NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	struct mptr *mblock;
-	gfp_t heap;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -136,10 +139,10 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
-	heap = mptr_heap(mblock);
-	heap_free_untraced(&kernel_heaps[heap],
+	heap_free_untraced(mptr_heap(mblock),
 	                   mblock, mptr_size(mblock),
-	                   heap | (flags & ~__GFP_HEAPMASK));
+	                   mptr_heap_gfp(mblock) |
+	                   (flags & ~__GFP_HEAPMASK));
 }
 
 

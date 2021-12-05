@@ -79,6 +79,7 @@ NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
 	assert(heapptr_getsiz(hptr) >= alloc_size);
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
+	mptr_assert_paranoid(result);
 	return mptr_user(result);
 IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
@@ -99,6 +100,7 @@ NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
 	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
+	mptr_assert_paranoid(result);
 	assert(IS_ALIGNED((uintptr_t)mptr_user(result), min_alignment));
 	return mptr_user(result);
 IFELSE_NX(err:, err_overflow:)
@@ -119,6 +121,7 @@ NOTHROW_NX(KCALL FUNC(kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
 	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
+	mptr_assert_paranoid(result);
 	assert(IS_ALIGNED((uintptr_t)mptr_user(result) + offset, min_alignment));
 	return mptr_user(result);
 IFELSE_NX(err:, err_overflow:)
@@ -144,7 +147,6 @@ NOTHROW_NX(KCALL FUNC(krealloc_in_place))(VIRT void *ptr,
                                           size_t n_bytes,
                                           gfp_t flags) {
 	struct mptr *result;
-	struct heap *heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if unlikely(!ptr)
@@ -154,6 +156,7 @@ NOTHROW_NX(KCALL FUNC(krealloc_in_place))(VIRT void *ptr,
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return n_bytes <= SLAB_GET(ptr)->s_size ? ptr : NULL;
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -168,22 +171,24 @@ NOTHROW_NX(KCALL FUNC(krealloc_in_place))(VIRT void *ptr,
 			/* Only  do  the truncation  if  the memory
 			 * that gets freed by this is large enough. */
 			unused_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
-			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
-			                   unused_ptr, unused, GFP_NORMAL);
+			heap_free_untraced(mptr_heap(result), unused_ptr,
+			                   unused, mptr_heap_gfp(result));
 			mptr_setsize(result, n_bytes);
+			mptr_assert_paranoid(result);
 		}
 		return ptr;
 	}
+
 	/* Increase the pointer (try to do so in-place at first) */
 	flags &= ~__GFP_HEAPMASK;
-	flags |= mptr_heap(result);
-	heap      = &kernel_heaps[mptr_heap(result)];
-	more_size = FUNC(heap_allat_untraced)(heap,
+	flags |= mptr_heap_gfp(result);
+	more_size = FUNC(heap_allat_untraced)(mptr_heap(result),
 	                                      (void *)((uintptr_t)result + mptr_size(result)),
 	                                      (size_t)(n_bytes - mptr_size(result)), flags);
 	if (more_size != 0) {
 		/* Allocation was OK. Update the mptr. */
 		mptr_setsize(result, mptr_size(result) + more_size);
+		mptr_assert_paranoid(result);
 		assert(mptr_size(result) >= n_bytes);
 		return ptr;
 	}
@@ -197,7 +202,7 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
                                  gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
-	struct heap *heap;
+	struct heap *used_heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr) {
@@ -224,6 +229,7 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
+
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -237,17 +243,19 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 			/* Only  do  the truncation  if  the memory
 			 * that gets freed by this is large enough. */
 			unused_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
-			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
-			                   unused_ptr, unused, GFP_NORMAL);
+			heap_free_untraced(mptr_heap(result),
+			                   unused_ptr, unused, mptr_heap_gfp(result));
 			mptr_setsize(result, n_bytes);
+			mptr_assert_paranoid(result);
 		}
 		return ptr;
 	}
+
 	/* Increase the pointer (try to do so in-place at first) */
 	flags &= ~__GFP_HEAPMASK;
-	flags |= mptr_heap(result);
-	heap      = &kernel_heaps[mptr_heap(result)];
-	more_size = FUNC(heap_allat_untraced)(heap,
+	flags |= mptr_heap_gfp(result);
+	used_heap = mptr_heap(result);
+	more_size = FUNC(heap_allat_untraced)(used_heap,
 	                                      (void *)((uintptr_t)result + mptr_size(result)),
 	                                      (size_t)(n_bytes - mptr_size(result)), flags);
 	if (more_size != 0) {
@@ -256,15 +264,21 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 		assert(mptr_size(result) >= n_bytes);
 		return ptr;
 	}
+
 	/* Overlap with another pointer. - Allocate a new block. */
-	hptr = FUNC(heap_alloc_untraced)(heap, sizeof(struct mptr) + n_bytes, flags);
+	hptr = FUNC(heap_alloc_untraced)(used_heap, sizeof(struct mptr) + n_bytes, flags);
 	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	memcpy(heapptr_getptr(hptr), result, mptr_size(result));
+
 	/* Free the old pointer. */
-	heap_free_untraced(heap, result, mptr_size(result), GFP_NORMAL);
+	heap_free_untraced(used_heap, result,
+	                   mptr_size(result),
+	                   mptr_heap_gfp(result));
+
 	/* Initialize the new pointer. */
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
+	mptr_assert_paranoid(result);
 	return mptr_user(result);
 #ifdef MALLOC_NX
 err:
@@ -277,7 +291,7 @@ NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
                                  size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
-	struct heap *heap;
+	struct heap *used_heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr)
@@ -299,6 +313,7 @@ NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
 		return resptr;
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -313,37 +328,45 @@ NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
 			/* Only  do  the truncation  if  the memory
 			 * that gets freed by this is large enough. */
 			unused_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
-			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
-			                   unused_ptr, unused, GFP_NORMAL);
+			heap_free_untraced(mptr_heap(result),
+			                   unused_ptr, unused, mptr_heap_gfp(result));
 			mptr_setsize(result, n_bytes);
+			mptr_assert_paranoid(result);
 		}
 		return ptr;
 	}
+
 	/* Increase the pointer (try to do so in-place at first) */
 	flags &= ~__GFP_HEAPMASK;
-	flags |= mptr_heap(result);
-	heap      = &kernel_heaps[mptr_heap(result)];
-	more_size = FUNC(heap_allat_untraced)(heap,
+	flags |= mptr_heap_gfp(result);
+	used_heap = mptr_heap(result);
+	more_size = FUNC(heap_allat_untraced)(used_heap,
 	                                      (void *)((uintptr_t)result + mptr_size(result)),
 	                                      (size_t)(n_bytes - mptr_size(result)), flags);
 	if (more_size != 0) {
 		/* Allocation was OK. Update the mptr. */
 		mptr_setsize(result, mptr_size(result) + more_size);
+		mptr_assert_paranoid(result);
 		assert(mptr_size(result) >= n_bytes);
 		return ptr;
 	}
 	/* Overlap with another pointer. - Allocate a new block. */
-	hptr = FUNC(heap_align_untraced)(heap, min_alignment,
+	hptr = FUNC(heap_align_untraced)(used_heap, min_alignment,
 	                                 sizeof(struct mptr),
 	                                 sizeof(struct mptr) + n_bytes,
 	                                 flags);
 	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	memcpy(heapptr_getptr(hptr), result, mptr_size(result));
+
 	/* Free the old pointer. */
-	heap_free_untraced(heap, result, mptr_size(result), GFP_NORMAL);
+	heap_free_untraced(used_heap, result,
+	                   mptr_size(result),
+	                   mptr_heap_gfp(result));
+
 	/* Initialize the new pointer. */
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
+	mptr_assert_paranoid(result);
 	return mptr_user(result);
 #ifdef MALLOC_NX
 err:
@@ -357,7 +380,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
                                         gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
-	struct heap *heap;
+	struct heap *used_heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr)
@@ -379,6 +402,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 		return resptr;
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -393,40 +417,46 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 			/* Only  do  the truncation  if  the memory
 			 * that gets freed by this is large enough. */
 			unused_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
-			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
-			                   unused_ptr, unused, GFP_NORMAL);
+			heap_free_untraced(mptr_heap(result),
+			                   unused_ptr, unused, mptr_heap_gfp(result));
 			mptr_setsize(result, n_bytes);
+			mptr_assert_paranoid(result);
 		}
 		return ptr;
 	}
+
 	/* Increase the pointer (try to do so in-place at first) */
 	flags &= ~__GFP_HEAPMASK;
-	flags |= mptr_heap(result);
-	heap      = &kernel_heaps[mptr_heap(result)];
-	more_size = FUNC(heap_allat_untraced)(heap,
+	flags |= mptr_heap_gfp(result);
+	used_heap = mptr_heap(result);
+	more_size = FUNC(heap_allat_untraced)(used_heap,
 	                                      (void *)((uintptr_t)result + mptr_size(result)),
 	                                      (size_t)(n_bytes - mptr_size(result)), flags);
 	if (more_size != 0) {
 		/* Allocation was OK. Update the mptr. */
 		mptr_setsize(result, mptr_size(result) + more_size);
 		assert(mptr_size(result) >= n_bytes);
+		mptr_assert_paranoid(result);
 		return ptr;
 	}
+
 	/* Overlap with another pointer. - Allocate a new block. */
-	hptr = FUNC(heap_align_untraced)(heap, min_alignment,
+	hptr = FUNC(heap_align_untraced)(used_heap, min_alignment,
 	                                 sizeof(struct mptr) + offset,
 	                                 sizeof(struct mptr) + n_bytes,
 	                                 flags);
 	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	memcpy(heapptr_getptr(hptr), result, mptr_size(result));
+
 	/* Free the old pointer. */
-	heap_free_untraced(heap,
-	                   result,
+	heap_free_untraced(used_heap, result,
 	                   mptr_size(result),
-	                   GFP_NORMAL);
+	                   mptr_heap_gfp(result));
+
 	/* Initialize the new pointer. */
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
+	mptr_assert_paranoid(result);
 	return mptr_user(result);
 #ifdef MALLOC_NX
 err:

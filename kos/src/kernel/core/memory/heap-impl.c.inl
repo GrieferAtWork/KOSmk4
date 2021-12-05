@@ -899,11 +899,13 @@ NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
 		goto err;
 	{
 		heapptr_t result;
+
 		/* Must allocate an entirely new data block and copy memory to it. */
 		result = FUNC(heap_align_untraced)(self, min_alignment, offset,
 		                                   new_bytes, alloc_flags);
 		IFELSE_NX(if (heapptr_getsiz(result) == 0) goto err;, )
 		memcpy(heapptr_getptr(result), old_ptr, old_bytes);
+
 		/* Free the old data block. */
 		heap_free_untraced(self, old_ptr, old_bytes,
 		                   free_flags & ~GFP_CALLOC);
