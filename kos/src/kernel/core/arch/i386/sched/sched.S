@@ -389,7 +389,7 @@ PUBLIC_FUNCTION(task_tryyield)
 #endif /* !__x86_64__ */
 
 #ifndef CONFIG_NO_SMP
-	pause /* Set other CPUs run for a bit */
+	pause /* Let other CPUs run for a bit */
 	cli   /* Don't forget to re-disable interrupts before loading the new CPU state */
 #endif /* !CONFIG_NO_SMP */
 

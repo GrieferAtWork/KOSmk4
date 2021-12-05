@@ -151,6 +151,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi_icpustate_Psp)
 1:	/* Serve pending IPIs */
 	movP   %Pbx, %R_fcall0P
 	movP   %Psp, %R_fcall1P
+	EXTERN(x86_serve_ipi)
 	call   x86_serve_ipi
 	cmpP   %Pax, %Psp
 	je     2f

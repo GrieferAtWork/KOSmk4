@@ -262,12 +262,13 @@ NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me) {
 	return false;
 }
 
-INTERN NONNULL((1, 2)) struct icpustate *
+INTERN NOPREEMPT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
                              struct icpustate *__restrict state) {
 	unsigned int i, j;
 	struct icpustate *new_state;
 	struct icpustate *result = state;
+	assert(!PREEMPTION_ENABLED());
 	IPI_DEBUG("x86_serve_ipi(%p,%p)\n",
 	          state, FORCPU(me, thiscpu_sched_current));
 	i = CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER);
@@ -327,9 +328,19 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 }
 
 
-PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-task_rpc_serve_ipi(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
-	ctx->rc_state = x86_serve_ipi(THIS_CPU, ctx->rc_state);
+PRIVATE NONNULL((1)) void
+NOTHROW(PRPC_EXEC_CALLBACK_CC task_rpc_serve_ipi)(struct rpc_context *__restrict ctx,
+                                                  void *UNUSED(cookie)) {
+	pflag_t was;
+	struct cpu *mycpu;
+	/* Disable preemption to prevent CPU switches and to
+	 * comply with `x86_serve_ipi()'s NOPREEMPT requirement. */
+	was   = PREEMPTION_PUSHOFF();
+	mycpu = THIS_CPU;
+
+	/* Serve IPIs */
+	ctx->rc_state = x86_serve_ipi(mycpu, ctx->rc_state);
+	PREEMPTION_POP(was);
 }
 
 

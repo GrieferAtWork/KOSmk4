@@ -94,16 +94,16 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	fpustate_savecpu();
 #endif /* CONFIG_FPU */
 
-	/* Re-enable  preemption  (our caller  will have
-	 * already made us our CPU's scheduler override,
-	 * so  we won't get  preempted by other threads) */
-	PREEMPTION_ENABLE();
-
 	/* Make sure that other IPIs also get handled!
 	 * This is important because HW-IPIs may only be send when there  aren't
 	 * any pending SW-IPIs, meaning that we wouldn't get the memo if we were
 	 * to wait for other CPUs while there are still more pending SW-IPIs! */
 	cpu_ipi_service_nopr();
+
+	/* Re-enable  preemption  (our caller  will have
+	 * already made us our CPU's scheduler override,
+	 * so  we won't get  preempted by other threads) */
+	PREEMPTION_ENABLE();
 
 	while (ATOMIC_READ(super_override_cpu) != NULL) {
 		/* Wait for `mall_suspended_unlock' */
