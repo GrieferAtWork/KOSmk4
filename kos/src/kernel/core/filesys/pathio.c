@@ -1471,7 +1471,13 @@ NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self,
 					/* Insert into the list of superblocks pending deletion. */
 					incref(super);
 					SLIST_INSERT(delsup, super, fs_root._mf_delsup);
+				} else {
+					/* Reference originally held by `pm_fsmount' */
+					decref_unlikely(super->fs_sys->ffs_drv);
 				}
+			} else {
+				/* Reference originally held by `pm_fsmount' */
+				decref_nokill(super->fs_sys->ffs_drv);
 			}
 		}
 	}
@@ -1510,9 +1516,12 @@ NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL path_umount_subtree_complete)(struct REF fsuper_slist *__restrict delsup) {
 	while (!SLIST_EMPTY(delsup)) {
+		REF struct driver *drv;
 		REF struct fsuper *delme = SLIST_FIRST(delsup);
 		SLIST_REMOVE_HEAD(delsup, fs_root._mf_delsup);
+		drv = delme->fs_sys->ffs_drv;
 		fsuper_delete_impl(delme);
+		decref_unlikely(drv);
 	}
 }
 
