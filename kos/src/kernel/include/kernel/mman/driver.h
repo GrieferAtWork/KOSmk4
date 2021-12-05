@@ -696,7 +696,7 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
                                             * But note that `driver_finalize()' may still throw
                                             * exceptions when this flag is set, since that func
                                             * may try to task_waitfor() the driver to finalize,
-                                            * of need to allocate  memory to remove the  driver
+                                            * or need to allocate  memory to remove the  driver
                                             * from some kind of global hook.
                                             * WARNING: Don't  set this flag! Using this flag is
                                             *          considered unsafe, the same way that use

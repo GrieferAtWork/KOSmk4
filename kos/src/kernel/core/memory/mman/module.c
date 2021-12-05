@@ -25,8 +25,8 @@
 #include <kernel/compiler.h>
 
 #include <debugger/rt.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/mnode.h>
@@ -111,13 +111,13 @@ module_printpath(struct module *__restrict self,
 		goto done;
 	if (self->md_fspath) {
 		result = path_printent(self->md_fspath,
-		                       self->md_fsname->de_name,
-		                       self->md_fsname->de_namelen,
+		                       self->md_fsname->fd_name,
+		                       self->md_fsname->fd_namelen,
 		                       printer, arg);
-	} else if (self->md_fsname->de_name[0] == '/') {
+	} else if (self->md_fsname->fd_name[0] == '/') {
 		result = (*printer)(arg,
-		                    self->md_fsname->de_name,
-		                    self->md_fsname->de_namelen);
+		                    self->md_fsname->fd_name,
+		                    self->md_fsname->fd_namelen);
 	}
 done:
 	return result;
@@ -136,8 +136,8 @@ module_printname(struct module *__restrict self,
 		}
 		goto done;
 	}
-	name    = self->md_fsname->de_name;
-	namelen = self->md_fsname->de_namelen;
+	name    = self->md_fsname->fd_name;
+	namelen = self->md_fsname->fd_namelen;
 	if (name[0] == '/') {
 		char const *tail;
 		tail    = (char const *)rawmemrchr(name + namelen, '/') + 1;
@@ -159,9 +159,9 @@ NOTHROW(FCALL module_getname)(struct module *__restrict self) {
 			return module_asdriver(self)->d_name;
 		return NULL;
 	}
-	result = self->md_fsname->de_name;
+	result = self->md_fsname->fd_name;
 	if (result[0] == '/')
-		result = (char const *)rawmemrchr(result + self->md_fsname->de_namelen, '/') + 1;
+		result = (char const *)rawmemrchr(result + self->md_fsname->fd_namelen, '/') + 1;
 	return result;
 }
 
@@ -172,13 +172,13 @@ module_printpath_or_name(struct module *__restrict self,
 	ssize_t result = 0;
 	if (self->md_fspath && self->md_fsname) {
 		result = path_printent(self->md_fspath,
-		                       self->md_fsname->de_name,
-		                       self->md_fsname->de_namelen,
+		                       self->md_fsname->fd_name,
+		                       self->md_fsname->fd_namelen,
 		                       printer, arg);
 	} else if (self->md_fsname) {
 		result = (*printer)(arg,
-		                    self->md_fsname->de_name,
-		                    self->md_fsname->de_namelen);
+		                    self->md_fsname->fd_name,
+		                    self->md_fsname->fd_namelen);
 	} else if (module_isdriver(self)) {
 		char const *name;
 		name = module_asdriver(self)->d_name;

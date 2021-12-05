@@ -24,23 +24,26 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
-#include <kernel/except.h>
+#include <kernel/driver.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/iovec.h>
+#include <kernel/mman.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/module.h>
+#include <kernel/mman/rw.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 
+#include <kos/except.h>
 #include <kos/except/reason/inval.h>
-#include <kos/hop/module.h>
+#include <kos/ioctl/mod.h>
 
+#include <format-printer.h>
 #include <string.h>
-
-/* TODO: Re-design the driver HOP-system from scratch */
 
 DECL_BEGIN
 
@@ -49,66 +52,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(module, struct module);
 DEFINE_HANDLE_REFCNT_FUNCTIONS(module_section, struct module_section);
 DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_loadlist, struct driver_loadlist);
 
-
-PRIVATE NOBLOCK uintptr_t KCALL
-hop_driver_getflags(struct driver *__restrict self)
-		THROWS(...) {
-	uintptr_t result = 0;
-	if (driver_getfile(self) != NULL)
-		result |= HOP_DRIVER_FLAG_HAS_FILE;
-	if (self->d_eh_frame_start < self->d_eh_frame_end)
-		result |= HOP_DRIVER_FLAG_HAS_EH_FRAME;
-	if (self->d_dynsym_tab)
-		result |= HOP_DRIVER_FLAG_HAS_DYNSYM;
-	return result;
-}
-
-PRIVATE NONNULL((1)) syscall_slong_t KCALL
-get_driver_string(USER CHECKED struct hop_driver_string *data,
-                  char const *__restrict str, size_t str_len_with_nul)
-		THROWS(...) {
-	USER UNCHECKED char *buf;
-	size_t buflen;
-	buf    = data->ds_buf;
-	buflen = data->ds_size;
-	data->ds_size = str_len_with_nul * sizeof(char);
-	COMPILER_BARRIER();
-	validate_writable(buf, buflen);
-	memcpy(buf, str, str_len_with_nul, sizeof(char));
-	return 0;
-}
-
-PRIVATE NONNULL((1)) syscall_slong_t KCALL
-get_driver_string0(USER UNCHECKED void *arg,
-                   char const *__restrict str,
-                   size_t str_len_with_nul)
-		THROWS(...) {
-	u64 index;
-	size_t struct_size;
-	USER CHECKED struct hop_driver_string *data;
-	data = (USER CHECKED struct hop_driver_string *)arg;
-	validate_writable(data, sizeof(*data));
-	COMPILER_READ_BARRIER();
-	struct_size = data->ds_struct_size;
-	COMPILER_READ_BARRIER();
-	if (struct_size != sizeof(*data))
-		THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
-	COMPILER_WRITE_BARRIER();
-	index = data->ds_index;
-	COMPILER_READ_BARRIER();
-	if unlikely(index != 0) {
-		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0,
-		      index);
-	}
-	return get_driver_string(data, str, str_len_with_nul);
-}
-
-
-/************************************************************************/
-/* struct driver;                                                       */
-/************************************************************************/
-PRIVATE struct driver *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct driver *FCALL
 require_driver(struct module *__restrict self) {
 	if (!module_isdriver(self)) {
 		THROW(E_INVALID_HANDLE_FILETYPE,
@@ -121,245 +65,275 @@ require_driver(struct module *__restrict self) {
 	return (struct driver *)self;
 }
 
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_module_hop(struct module *__restrict self,
-                  ioctl_t cmd,
-                  USER UNCHECKED void *arg,
-                  iomode_t mode)
-		THROWS(...) {
-	switch (cmd) {
 
-	case HOP_DRIVER_STAT: {
-		size_t struct_size;
+INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+handle_module_pread(struct module *__restrict self, USER CHECKED void *dst,
+                    size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	uintptr_t base;
+	size_t max_io;
+	if (OVERFLOW_USUB((uintptr_t)self->md_loadmin, addr, &base))
+		return 0;
+	if (OVERFLOW_USUB((uintptr_t)self->md_loadmax, base, &max_io))
+		return 0;
+	++max_io;
+	if (max_io == 0 || max_io > num_bytes)
+		max_io = num_bytes;
+	if (!tryincref(self->md_mman))
+		return 0;
+	FINALLY_DECREF_UNLIKELY(self->md_mman);
+	mman_read(self->md_mman, (void const *)base, dst, max_io, true);
+	return max_io;
+}
+
+INTERN BLOCKING NONNULL((1)) size_t KCALL
+handle_module_pwrite(struct module *__restrict self, USER CHECKED void const *src,
+                     size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	uintptr_t base;
+	size_t max_io;
+	if (OVERFLOW_USUB((uintptr_t)self->md_loadmin, addr, &base))
+		return 0;
+	if (OVERFLOW_USUB((uintptr_t)self->md_loadmax, base, &max_io))
+		return 0;
+	++max_io;
+	if (max_io == 0 || max_io > num_bytes)
+		max_io = num_bytes;
+	if (!tryincref(self->md_mman))
+		return 0;
+	/* XXX: If we ever implement cryptographically signed drivers, and
+	 *      `self' is such a driver, then  we must mark the kernel  as
+	 *      poisoned at this point! */
+	FINALLY_DECREF_UNLIKELY(self->md_mman);
+	mman_write(self->md_mman, (void *)base, src, max_io, true);
+	return max_io;
+}
+
+INTERN BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_module_preadv(struct module *__restrict self, struct iov_buffer *__restrict dst,
+                     size_t UNUSED(num_bytes), pos_t addr, iomode_t mode) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		size_t temp;
+		temp = handle_module_pread(self, ent.ive_base, ent.ive_size, addr, mode);
+		result += temp;
+		if (temp < ent.ive_size)
+			break;
+		addr += temp;
+	}
+	return result;
+}
+
+INTERN BLOCKING NONNULL((1, 2)) size_t KCALL
+handle_module_pwritev(struct module *__restrict self, struct iov_buffer *__restrict src,
+                      size_t UNUSED(num_bytes), pos_t addr, iomode_t mode) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, src) {
+		size_t temp;
+		temp = handle_module_pwrite(self, ent.ive_base, ent.ive_size, addr, mode);
+		result += temp;
+		if (temp < ent.ive_size)
+			break;
+		addr += temp;
+	}
+	return result;
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+driver_ioctl_getstring(struct module *__restrict self, uint64_t index,
+                       USER CHECKED struct mod_string *info) {
+	size_t result;
+	struct format_snprintf_data pdat;
+	pdat.sd_buffer = info->ms_buf;
+	pdat.sd_bufsiz = (size_t)info->ms_size;
+	COMPILER_READ_BARRIER();
+	validate_writable(pdat.sd_buffer, pdat.sd_bufsiz);
+	switch (index) {
+
+	case MOD_STR_NAME:
+		result = (size_t)module_printname(self, &format_snprintf_printer, &pdat);
+		break;
+
+	case MOD_STR_FILENAME:
+		result = (size_t)module_printpath(self, &format_snprintf_printer, &pdat);
+		break;
+
+	case MOD_STR_CMDLINE: {
 		struct driver *me = require_driver(self);
-		USER CHECKED struct hop_driver_stat *data;
-		data = (USER CHECKED struct hop_driver_stat *)arg;
-		validate_readwrite(data, sizeof(*data));
-		COMPILER_READ_BARRIER();
-		struct_size = data->ds_struct_size;
-		COMPILER_READ_BARRIER();
-		if (struct_size != sizeof(*data))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
-		COMPILER_WRITE_BARRIER();
-		data->ds_state      = 0;
-		data->ds_flags      = hop_driver_getflags(me);
-		data->ds_loadaddr   = me->md_loadaddr;
-		data->ds_loadstart  = (uintptr_t)me->md_loadmin;
-		data->ds_loadend    = (uintptr_t)me->md_loadmax + 1;
-		data->ds_argc       = me->d_argc;
-		data->ds_depc       = me->d_depcnt;
-		data->ds_symcnt     = me->d_dynsym_cnt;
-		data->ds_shnum      = me->d_shnum;
-		data->ds_strtabsz   = (size_t)(me->d_dynstr_end - me->d_dynstr);
-		data->ds_shstrtabsz = me->d_shstrsiz;
-		COMPILER_WRITE_BARRIER();
+		char const *cmdln = me->d_cmdline;
+		char const *cmdep = cmdln;
+		while (*cmdep)
+			cmdep = strend(cmdep) + 1;
+		result = (size_t)format_snprintf_printer(&pdat, cmdln, (size_t)(cmdep - cmdln));
 	}	break;
 
-	case HOP_DRIVER_GET_NAME: {
-		char const *name;
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_MODULE_STRING,
+		      (uintptr_t)index);
+		break;
+	}
+	/* Always append a trailing NUL */
+	result += (size_t)format_snprintf_printer(&pdat, "", 1);
+	COMPILER_WRITE_BARRIER();
+	info->ms_size = result;
+	return (syscall_slong_t)result;
+}
+
+
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
+handle_module_ioctl(struct module *__restrict self, ioctl_t cmd,
+                    USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+	switch (cmd) {
+
+	case MOD_IOC_GETOBJECT: {
 		struct driver *me;
-		me   = require_driver(self);
-		name = driver_getname(me);
-		return get_driver_string0(arg, name, strlen(name) + 1);
+		struct handle hand;
+		USER CHECKED struct mod_object *info;
+		uint64_t index;
+		validate_readwrite(arg, sizeof(*info));
+		info  = (USER CHECKED struct mod_object *)arg;
+		index = info->mo_index;
+		COMPILER_READ_BARRIER();
+		me = require_driver(self);
+		if (index >= (uint64_t)me->d_depcnt)
+			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, (size_t)index, 0, me->d_depcnt - 1);
+		require(CAP_SYS_MODULE);
+		hand.h_data = axref_get(&me->d_depvec[(size_t)index]);
+		if (!hand.h_data)
+			THROW(E_NO_SUCH_OBJECT);
+		hand.h_type = HANDLE_TYPE_MODULE;
+		hand.h_mode = mode;
+		FINALLY_DECREF_UNLIKELY((struct driver *)hand.h_data);
+		return handle_installopenfd(&info->mo_result, hand);
 	}	break;
 
-	case HOP_DRIVER_GET_CMDLINE: {
-		struct driver *me = require_driver(self);
-		char *cmdline, *endptr;
-		cmdline = me->d_cmdline;
-		endptr  = cmdline;
-		do {
-			endptr = strend(endptr) + 1;
-		} while (*endptr);
-		return get_driver_string0(arg, cmdline, (size_t)(endptr - cmdline));
+	case MOD_IOC_GETSTRING: {
+		USER CHECKED struct mod_string *info;
+		uint64_t index;
+		validate_readwrite(arg, sizeof(*info));
+		info  = (USER CHECKED struct mod_string *)arg;
+		index = info->ms_index;
+		COMPILER_READ_BARRIER();
+		return driver_ioctl_getstring(self, index, info);
 	}	break;
 
-	case HOP_DRIVER_GET_ARGV: {
-		struct driver *me = require_driver(self);
-		USER CHECKED struct hop_driver_string *data;
-		char const *argument_string;
-		size_t struct_size;
-		u64 index;
-		data = (USER CHECKED struct hop_driver_string *)arg;
-		validate_readwrite(data, sizeof(*data));
-		COMPILER_READ_BARRIER();
-		struct_size = data->ds_struct_size;
-		COMPILER_READ_BARRIER();
-		if (struct_size != sizeof(*data))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
+	case MOD_IOC_LOADINFO: {
+		USER CHECKED struct mod_loadinfo *info;
+		validate_readwrite(arg, sizeof(*info));
+		info = (USER CHECKED struct mod_loadinfo *)arg;
+		require(CAP_SYS_MODULE);
 		COMPILER_WRITE_BARRIER();
-		index = data->ds_index;
-		COMPILER_READ_BARRIER();
-		if unlikely(index >= (u64)me->d_argc) {
-			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
-			      (intptr_t)(uintptr_t)index,
-			      (intptr_t)(uintptr_t)0,
-			      (intptr_t)(uintptr_t)me->d_argc - 1);
-		}
-		argument_string = me->d_argv[(size_t)index];
-		return get_driver_string(data, argument_string,
-		                               strlen(argument_string) + 1);
+		info->mli_loadaddr  = (uintptr_t)self->md_loadaddr;
+		info->mli_loadstart = (uintptr_t)self->md_loadmin;
+		info->mli_loadmax   = (uintptr_t)self->md_loadmax;
+		return 0;
 	}	break;
 
-	case HOP_DRIVER_OPEN_FILE: {
-		struct driver *me = require_driver(self);
-		struct handle d;
-		struct mfile *file;
-		require(CAP_DRIVER_QUERY);
-		file = driver_getfile(me);
-		if unlikely(!file)
-			THROW(E_NO_SUCH_OBJECT);
-		d.h_type = HANDLE_TYPE_MFILE;
-		d.h_mode = mode;
-		d.h_data = file;
-		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, d);
+	case MOD_IOC_INIT: {
+		require(CAP_SYS_MODULE);
+		driver_initialize(require_driver(self));
+		return 0;
 	}	break;
 
-	case HOP_DRIVER_OPEN_DEPENDENCY: {
-		struct driver *me = require_driver(self);
-		struct handle d;
-		size_t struct_size;
-		u64 depno;
-		USER CHECKED struct hop_driver_open_dependency *data;
-		data = (USER CHECKED struct hop_driver_open_dependency *)arg;
-		validate_readable(data, sizeof(*data));
-		COMPILER_READ_BARRIER();
-		struct_size = data->dod_struct_size;
-		COMPILER_READ_BARRIER();
-		if (struct_size != sizeof(*data))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
-		require(CAP_DRIVER_QUERY);
-		COMPILER_READ_BARRIER();
-		depno = data->dod_depno;
-		COMPILER_READ_BARRIER();
-		if unlikely(depno >= (u64)me->d_depcnt) {
-			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
-			      (intptr_t)(uintptr_t)depno,
-			      (intptr_t)(uintptr_t)0,
-			      (intptr_t)(uintptr_t)me->d_depcnt - 1);
-		}
-		d.h_type = HANDLE_TYPE_MODULE;
-		d.h_mode = mode;
-		d.h_data = axref_get(&me->d_depvec[(uintptr_t)depno]);
-		if unlikely(!d.h_data)
-			THROW(E_NO_SUCH_OBJECT);
-		return handle_installopenfd(&data->dod_result, d);
-	}	break;
-
-	case HOP_DRIVER_INITIALIZE: {
-		struct driver *me = require_driver(self);
-		require(CAP_DRIVER_CONTROL);
-		driver_initialize(me);
-	}	break;
-
-	case HOP_DRIVER_FINALIZE: {
-		struct driver *me = require_driver(self);
-		require(CAP_DRIVER_CONTROL);
-		driver_finalize(me);
+	case MOD_IOC_FINI: {
+		require(CAP_SYS_MODULE);
+		driver_finalize(require_driver(self));
+		return 0;
 	}	break;
 
 	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-		      cmd);
 		break;
 	}
-	return 0;
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(MOD_IOC_GETCOUNT, 0): {
+		struct driver *me = require_driver(self);
+		return ioctl_intarg_setu64(cmd, arg, me->d_depcnt);
+	}	break;
+
+	case _IO_WITHSIZE(MOD_IOC_GETSTATE, 0): {
+		struct driver *me = require_driver(self);
+		uintptr_t state   = ATOMIC_READ(me->d_state);
+		return ioctl_intarg_setint(cmd, arg, ((int)state - DRIVER_STATE_LOADED));
+	}	break;
+
+	default:
+		break;
+	}
+	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+	      cmd);
 }
 
-
-/************************************************************************/
-/* struct driver_loadlist;                                                 */
-/************************************************************************/
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_driver_loadlist_hop(struct driver_loadlist *__restrict self,
-                           ioctl_t cmd,
-                           USER UNCHECKED void *arg,
-                           iomode_t mode)
-		THROWS(...) {
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
+handle_driver_loadlist_ioctl(struct driver_loadlist *__restrict self, ioctl_t cmd,
+                             USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
-	case HOP_DRIVER_LOADLIST_GET_COUNT: {
-		USER CHECKED u64 *dest;
-		dest = (USER CHECKED u64 *)arg;
-		validate_writable(dest, sizeof(*dest));
+	case MOD_IOC_GETOBJECT: {
+		struct handle hand;
+		USER CHECKED struct mod_object *info;
+		uint64_t index;
+		validate_readwrite(arg, sizeof(*info));
+		info  = (USER CHECKED struct mod_object *)arg;
+		index = info->mo_index;
 		COMPILER_READ_BARRIER();
-		*dest = (u64)self->dll_count;
-		COMPILER_READ_BARRIER();
+		if (index >= (uint64_t)self->dll_count)
+			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, (size_t)index, 0, self->dll_count - 1);
+		require(CAP_SYS_MODULE);
+		hand.h_data = self->dll_drivers[(size_t)index];
+		if (!tryincref((struct driver *)hand.h_data))
+			THROW(E_NO_SUCH_OBJECT);
+		hand.h_type = HANDLE_TYPE_MODULE;
+		hand.h_mode = mode;
+		FINALLY_DECREF_UNLIKELY((struct driver *)hand.h_data);
+		return handle_installopenfd(&info->mo_result, hand);
 	}	break;
 
-	case HOP_DRIVER_LOADLIST_GET_DRIVER: {
-		size_t struct_size;
-		u64 depno;
-		struct handle d;
-		syscall_slong_t result;
-		REF struct driver *result_driver;
-		USER CHECKED struct hop_driver_open_dependency *data;
-		data = (USER CHECKED struct hop_driver_open_dependency *)arg;
-		validate_readable(data, sizeof(*data));
+	case MOD_IOC_GETSTRING: {
+		REF struct driver *drv;
+		USER CHECKED struct mod_string *info;
+		uint64_t index;
+		validate_readwrite(arg, sizeof(*info));
+		info  = (USER CHECKED struct mod_string *)arg;
+		index = info->ms_index;
 		COMPILER_READ_BARRIER();
-		struct_size = data->dod_struct_size;
-		COMPILER_READ_BARRIER();
-		if (struct_size != sizeof(*data))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
-		require(CAP_DRIVER_QUERY);
-		COMPILER_READ_BARRIER();
-		depno = data->dod_depno;
-		COMPILER_READ_BARRIER();
-		if unlikely(depno >= (u64)self->dll_count) {
-			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
-			      (intptr_t)(uintptr_t)depno,
-			      (intptr_t)(uintptr_t)0,
-			      (intptr_t)(uintptr_t)self->dll_count - 1);
-		}
-		result_driver = self->dll_drivers[(uintptr_t)depno];
-		d.h_type = HANDLE_TYPE_MODULE;
-		d.h_mode = mode;
-		d.h_data = result_driver;
-		if unlikely(!tryincref(result_driver))
-			THROW(E_NO_SUCH_OBJECT); /* Dead driver */
-		{
-			FINALLY_DECREF_UNLIKELY(result_driver);
-			result = handle_installopenfd(&data->dod_result, d);
-		}
-		return result;
+		if (index >= (uint64_t)self->dll_count)
+			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, (size_t)index, 0, self->dll_count - 1);
+		drv = self->dll_drivers[(size_t)index];
+		if (!tryincref(drv))
+			THROW(E_NO_SUCH_OBJECT);
+		FINALLY_DECREF_UNLIKELY(drv);
+		return driver_ioctl_getstring(drv, MOD_STR_NAME, info);
 	}	break;
 
 	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-		      cmd);
 		break;
 	}
-	return 0;
-}
+	switch (_IO_WITHSIZE(cmd, 0)) {
 
-
-/************************************************************************/
-/* struct driver_section;                                               */
-/************************************************************************/
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_driver_section_hop(struct driver_section *__restrict self,
-                          ioctl_t cmd,
-                          USER UNCHECKED void *arg,
-                          iomode_t mode)
-		THROWS(...) {
-	switch (cmd) {
-
-		/* TODO */
-		(void)self;
-		(void)arg;
-		(void)mode;
+	case _IO_WITHSIZE(MOD_IOC_GETCOUNT, 0):
+		return ioctl_intarg_setu64(cmd, arg, self->dll_count);
 
 	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-		      cmd);
 		break;
 	}
-	return 0;
+	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+	      cmd);
 }
 
+
+INTERN BLOCKING NONNULL((1, 2)) ssize_t KCALL
+handle_module_printlink(struct module *__restrict self,
+                        pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	char const *name = module_getname(self);
+	return format_printf(printer, arg, "%s:[%q]",
+	                     module_isdriver(self) ? "driver" : "module",
+	                     name ? name : "?");
+}
 
 
 DECL_END

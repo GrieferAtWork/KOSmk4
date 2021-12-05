@@ -1909,6 +1909,7 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 	 ((index) >= 0x6600 && (index) <= 0x6612) ? ((index) -= 0x6600, (result) = repr_KOS_IOCTLS_6600h, true) : \
 	 ((index) >= 0x6680 && (index) <= 0x6685) ? ((index) -= 0x6680, (result) = repr_KOS_IOCTLS_6680h, true) : \
 	 ((index) >= 0x66c0 && (index) <= 0x66c1) ? ((index) -= 0x66c0, (result) = repr_KOS_IOCTLS_66c0h, true) : \
+	 ((index) >= 0x6d00 && (index) <= 0x6d13) ? ((index) -= 0x6d00, (result) = repr_KOS_IOCTLS_6d00h, true) : \
 	 ((index) >= 0x7000 && (index) <= 0x700c) ? ((index) -= 0x7000, (result) = repr_KOS_IOCTLS_7000h, true) : false)
 PRIVATE char const repr_KOS_IOCTLS_4600h[] =
 "FILE_IOC_DELETED\0FILE_IOC_HASRAWIO\0FILE_IOC_DCHANGED\0FILE_IOC_CH"
@@ -1947,6 +1948,9 @@ PRIVATE char const repr_KOS_IOCTLS_6680h[] =
 "OC_GETRADDR\0FD_IOC_GETREFCNT";
 PRIVATE char const repr_KOS_IOCTLS_66c0h[] =
 "FD_IOC_INCREF\0FD_IOC_DECREF";
+PRIVATE char const repr_KOS_IOCTLS_6d00h[] =
+"MOD_IOC_GETOBJECT\0MOD_IOC_GETCOUNT\0MOD_IOC_GETSTRING\0\0\0\0\0\0\0\0\0\0\0\0"
+"\0\0MOD_IOC_GETSTATE\0MOD_IOC_LOADINFO\0MOD_IOC_INIT\0MOD_IOC_FINI";
 PRIVATE char const repr_KOS_IOCTLS_7000h[] =
 "TASK_IOC_GETTID\0TASK_IOC_GETPID\0TASK_IOC_GETPPID\0TASK_IOC_GETPGI"
 "D\0TASK_IOC_GETSID\0\0\0\0\0TASK_IOC_OPENPID\0TASK_IOC_OPENPPID\0TASK_IO"

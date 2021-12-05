@@ -140,7 +140,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP,                           /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 	E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE,                         /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 	E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC,                        /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
-	E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0,              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
+	E_INVALID_ARGUMENT_CONTEXT_MODULE_STRING,                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: String index for `MOD_IOC_GETSTRING' isn't one of `MOD_STR_*' */
 	E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT,                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
 	E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT,                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
 	E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING,               /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
@@ -358,7 +358,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
+#define E_INVALID_ARGUMENT_CONTEXT_MODULE_STRING                      E_INVALID_ARGUMENT_CONTEXT_MODULE_STRING                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: String index for `MOD_IOC_GETSTRING' isn't one of `MOD_STR_*' */
 #define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
 #define E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
 #define E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
@@ -573,7 +573,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           94  /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         95  /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        96  /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
-#define E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              97  /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
+#define E_INVALID_ARGUMENT_CONTEXT_MODULE_STRING                      97  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: String index for `MOD_IOC_GETSTRING' isn't one of `MOD_STR_*' */
 #define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         98  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
 #define E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         99  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
 #define E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               100 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */

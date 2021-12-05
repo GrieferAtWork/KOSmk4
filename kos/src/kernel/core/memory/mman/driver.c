@@ -5019,8 +5019,8 @@ done_dynhdr_for_soname:
 			driver_init_cmdline(result, drv_cmdline);
 		} else {
 			/* Always allocate an argument vector, even if that vector is empty. */
-			result->d_argv = (char **)kmalloc(1 * sizeof(char *),
-			                                  GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
+			result->d_argv    = (char **)kmalloc(1 * sizeof(char *), GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
+			result->d_cmdline = (char *)kmalloc(sizeof(char), GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
 		}
 
 		shoff              = (uintptr_t)ATOMIC_READ(ehdr->e_shoff);

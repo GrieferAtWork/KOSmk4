@@ -144,12 +144,15 @@ ioctl_intarg_setu64(ioctl_t cmd, USER UNCHECKED void *arg, u64 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 #if __SIZEOF_INT__ >= 8
+#define ioctl_intarg_getint                   (int)(unsigned int)ioctl_intarg_getu64
 #define ioctl_intarg_getuint                  (unsigned int)ioctl_intarg_getu64
 #define ioctl_intarg_setuint(cmd, arg, value) ioctl_intarg_setu64(cmd, arg, (u64)(value))
 #else /* __SIZEOF_INT__ >= 8 */
+#define ioctl_intarg_getint                   (int)(unsigned int)ioctl_intarg_getu32
 #define ioctl_intarg_getuint                  (unsigned int)ioctl_intarg_getu32
 #define ioctl_intarg_setuint(cmd, arg, value) ioctl_intarg_setu32(cmd, arg, (u32)(value))
 #endif /* __SIZEOF_INT__ <= 8 */
+#define ioctl_intarg_setint(cmd, arg, value) ioctl_intarg_setu64(cmd, arg, (u64)(s64)(int)(value))
 
 
 /* Read a size_t-value from a a variable-sized (but defaulting to sizeof(size_t)) buffer `arg'

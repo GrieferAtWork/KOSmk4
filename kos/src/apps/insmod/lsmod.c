@@ -23,11 +23,12 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/hop/module.h>
 #include <kos/io.h>
+#include <kos/ioctl/mod.h>
 #include <kos/kernel/types.h>
 #include <kos/ksysctl.h>
 #include <kos/malloc.h>
+#include <kos/sys/ioctl.h>
 #include <kos/types.h>
 
 #include <malloc.h>
@@ -39,35 +40,32 @@
 DECL_BEGIN
 
 PRIVATE fd_t OpenDriverList(void) {
-	struct hop_openfd hfd;
-	hfd.of_mode  = HOP_OPENFD_MODE_AUTO;
+	struct openfd hfd;
+	hfd.of_mode  = OPENFD_MODE_AUTO;
 	hfd.of_flags = IO_CLOEXEC;
 	return KSysctl(KSYSCTL_DRIVER_LSMOD, &hfd);
 }
 
 PRIVATE size_t
-GetDriverStringBuf(fd_t driver, ioctl_t cmd,
-                   u64 index, char *buf, size_t buflen) {
-	struct hop_driver_string h;
+GetDriverStringBuf(fd_t driver, u64 index, char *buf, size_t buflen) {
+	struct mod_string h;
 	memset(&h, 0, sizeof(h));
-	h.ds_struct_size = sizeof(h);
-	h.ds_buf         = buf;
-	h.ds_size        = buflen;
-	h.ds_index       = index;
-	Hop(driver, cmd, &h);
-	return h.ds_size;
+	h.ms_buf   = buf;
+	h.ms_size  = buflen;
+	h.ms_index = index;
+	Ioctl(driver, MOD_IOC_GETSTRING, &h);
+	return h.ms_size;
 }
 
 PRIVATE char *
-GetDriverString(fd_t driver,
-                ioctl_t cmd, u64 index,
+GetDriverString(fd_t driver, u64 index,
                 size_t *pstringlen_with_nul) {
 	size_t buflen = 256;
 	size_t new_buflen;
 	char *buf;
 	buf = (char *)Malloc(buflen);
 again_getpath:
-	new_buflen = GetDriverStringBuf(driver, cmd, index, buf, buflen);
+	new_buflen = GetDriverStringBuf(driver, index, buf, buflen);
 	if (new_buflen > buflen) {
 		buf    = (char *)Realloc(buf, new_buflen);
 		buflen = new_buflen;
@@ -84,42 +82,41 @@ again_getpath:
 }
 
 PRIVATE fd_t
-OpenDriverDependency(fd_t driver, ioctl_t cmd, u64 index) {
-	struct hop_driver_open_dependency d;
+OpenDriverObject(fd_t driver, u64 index) {
+	struct mod_object d;
 	memset(&d, 0, sizeof(d));
-	d.dod_struct_size     = sizeof(d);
-	d.dod_depno           = index;
-	d.dod_result.of_mode  = HOP_OPENFD_MODE_AUTO;
-	d.dod_result.of_flags = IO_CLOEXEC;
-	return Hop(driver, cmd, &d);
+	d.mo_index           = index;
+	d.mo_result.of_mode  = OPENFD_MODE_AUTO;
+	d.mo_result.of_flags = IO_CLOEXEC;
+	return Ioctl(driver, MOD_IOC_GETOBJECT, &d);
 }
 
 
 PRIVATE void PrinterDriverInformation(fd_t driver) {
-	struct hop_driver_stat st;
-	char *temp;
-	u64 i;
-	memset(&st, 0, sizeof(st));
-	st.ds_struct_size = sizeof(st);
-	Hop(driver, HOP_DRIVER_STAT, &st);
-	temp = GetDriverString(driver,
-	                       st.ds_flags & HOP_DRIVER_FLAG_HAS_FILENAME
-	                       ? HOP_DRIVER_GET_FILENAME
-	                       : HOP_DRIVER_GET_NAME,
-	                       0, NULL);
+	u64 i, count;
+	char *temp, *iter;
+	temp = GetDriverString(driver, MOD_STR_FILENAME, NULL);
+	if (!*temp) {
+		free(temp);
+		temp = GetDriverString(driver, MOD_STR_NAME, NULL);
+		if (!*temp) {
+			free(temp);
+			temp = strdup("?");
+		}
+	}
 	printf("%s:[", temp);
 	free(temp);
-	for (i = 0; i < st.ds_argc; ++i) {
-		char *arg;
-		arg = GetDriverString(driver, HOP_DRIVER_GET_ARGV, i, NULL);
-		printf("%s%q", i == 0 ? "" : ", ", arg);
-		free(arg);
-	}
+	temp = GetDriverString(driver, MOD_STR_CMDLINE, NULL);
+	for (iter = temp; *iter; iter = strend(iter) + 1)
+		printf("%s%q", iter == temp ? "" : ", ", iter);
+	free(temp);
 	printf("]\tdepends:[");
-	for (i = 0; i < st.ds_depc; ++i) {
+	count = 0;
+	Ioctl(driver, MOD_IOC_GETCOUNT, &count);
+	for (i = 0; i < count; ++i) {
 		fd_t dep;
-		dep  = OpenDriverDependency(driver, HOP_DRIVER_OPEN_DEPENDENCY, i);
-		temp = GetDriverString(dep, HOP_DRIVER_GET_NAME, 0, NULL);
+		dep  = OpenDriverObject(driver, i);
+		temp = GetDriverString(dep, MOD_STR_NAME, NULL);
 		close(dep);
 		printf("%s%s", i == 0 ? "" : ", ", temp);
 		free(temp);
@@ -137,12 +134,10 @@ int main(int argc, char *argv[]) {
 	}
 	drivers = OpenDriverList();
 	count   = 0;
-	Hop(drivers, HOP_DRIVER_LOADLIST_GET_COUNT, &count);
+	Ioctl(drivers, MOD_IOC_GETCOUNT, &count);
 	for (i = 0; i < count; ++i) {
 		fd_t depfd;
-		depfd = OpenDriverDependency(drivers,
-		                             HOP_DRIVER_LOADLIST_GET_DRIVER,
-		                             i);
+		depfd = OpenDriverObject(drivers, i);
 		PrinterDriverInformation(depfd);
 		close(depfd);
 	}
