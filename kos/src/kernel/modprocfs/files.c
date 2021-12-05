@@ -974,8 +974,9 @@ print_size_with_unit_and_percent(pformatprinter printer, void *arg,
 	usage_percent = 0;
 	if (total != 0)
 		usage_percent = (unsigned int)(((u64)count * 100 * 100) / total);
-	/* Print usage percent */
-	return printf("\t(%u.%.2u%%)",
+	/* Print usage percent (also include `count' represented in pages) */
+	return printf("\t%" PRIu64 "p\t(%u.%.2u%%)",
+	              count / PAGESIZE,
 	              usage_percent / 100,
 	              usage_percent % 100);
 }
