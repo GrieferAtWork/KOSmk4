@@ -1484,6 +1484,25 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		RAII_FINALLY { decref_unlikely(hand); };
 		switch (hand.h_type) {
 
+		case HANDLE_TYPE_MFILE: {
+			/* Allow frealpath on files that can be casted into a path/dirent pair.
+			 * This is the case for (e.g.) device files! */
+			struct mfile *me = (struct mfile *)hand.h_data;
+			REF struct path *fspath;
+			REF struct fdirent *fsname;
+			fspath = (REF struct path *)mfile_utryas(me, HANDLE_TYPE_PATH);
+			if unlikely(!fspath)
+				goto bad_handle_type;
+			FINALLY_DECREF_UNLIKELY(fspath);
+			fsname = (REF struct fdirent *)mfile_utryas(me, HANDLE_TYPE_DIRENT);
+			if unlikely(!fsname)
+				goto bad_handle_type;
+			FINALLY_DECREF_UNLIKELY(fsname);
+			result = path_sprintent(fspath, fsname->fd_name,
+			                        fsname->fd_namelen, buf, buflen,
+			                        atflags | AT_PATHPRINT_INCTRAIL, root);
+		}	break;
+
 		case HANDLE_TYPE_FILEHANDLE:
 		case HANDLE_TYPE_TEMPHANDLE:
 		case HANDLE_TYPE_DIRHANDLE:
@@ -1494,10 +1513,10 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 			STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
 			struct filehandle *me;
 			me = (struct filehandle *)hand.h_data;
-			if unlikely(!me->fh_path)
+			if unlikely(!me->fh_path || !me->fh_dirent) {
+				/* TODO: Do what `HANDLE_TYPE_MFILE' does and try to cast the file to a path/name. */
 				goto bad_handle_type;
-			if unlikely(!me->fh_dirent)
-				goto bad_handle_type;
+			}
 			result = path_sprintent(me->fh_path, me->fh_dirent->fd_name,
 			                        me->fh_dirent->fd_namelen, buf, buflen,
 			                        atflags | AT_PATHPRINT_INCTRAIL, root);
