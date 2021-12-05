@@ -170,8 +170,7 @@ DATDEF struct heap kernel_default_heap; /* == &kernel_heaps[GFP_NORMAL] */
 DATDEF struct heap kernel_locked_heap;  /* == &kernel_heaps[GFP_LOCKED] */
 
 #ifdef CONFIG_DEBUG_HEAP
-DATDEF struct mfile_ops const mfile_dbgheap_ops;
-DATDEF struct mfile /*     */ mfile_dbgheap;
+DATDEF struct mfile mfile_dbgheap;
 #endif /* CONFIG_DEBUG_HEAP */
 
 

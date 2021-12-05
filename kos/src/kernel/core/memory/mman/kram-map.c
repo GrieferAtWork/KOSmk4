@@ -77,7 +77,7 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
 	phys_pop();
 }
 
-PUBLIC_CONST struct mfile_ops const mfile_dbgheap_ops = {
+PRIVATE struct mfile_ops const mfile_dbgheap_ops = {
 	.mo_loadblocks = &mfile_dbgheap_loadblocks,
 };
 
