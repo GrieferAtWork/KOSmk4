@@ -1154,11 +1154,11 @@ NOTHROW(KCALL gc_reachable_data)(void const *base, size_t num_bytes) {
 			/* FIXME: What if `base' isn't writable because it was written to SWAP?
 			 *        In this case  we'd have  to abort GC  detection, release  our
 			 *        scheduler super-lock, force  load `base' into  the core,  and
-			 *        finally: try again (though we should gather probably all pages
+			 *        finally: try again (though we should probably gather all pages
 			 *        to   which  this   applies,  and   load  them   all  at  once)
-			 * NOTE:  We  can only load them when not holding a super-lock, since
-			 *        the act of loading memory  from SWAP might require the  use
-			 *        of an async worker, which don't work while holding a super-
+			 * NOTE:  We can only load them when not holding a super-lock, since
+			 *        the  act of loading memory from SWAP might require the use
+			 *        of async workers, which don't work while holding a  super-
 			 *        lock. */
 			if (page_bytes >= num_bytes)
 				break;

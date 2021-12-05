@@ -1009,7 +1009,7 @@ err_bad_old_size:
 	 *        >> p = mremap(p, 0, 100 * PAGESIZE, MREMAP_MAYMOVE);
 	 *        Even if `file_with_limits' limited the mapable address range, mremap() is
 	 *        able  to exceed those limits, since we have no way of checking what those
-	 *        limits would have been originally... */
+	 *        limits would have originally been... */
 
 	if (used_old_size == 0) {
 		/* Special case: Create another mapping of a PROT_SHARED-mapping

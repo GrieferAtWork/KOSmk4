@@ -2238,8 +2238,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		}
 		/* With the VFORK flag cleared, check for pending POSIX signals,
 		 * since this also means  that our thread's user-visible  signal
-		 * mask has once again come into effect.
-		 * XXX: Use `sigmask_check_s()' (after all: we _do_ have `state') */
+		 * mask has once again come into effect. */
 		task_serve();
 	} else {
 		args->ea_mman = THIS_MMAN;
@@ -2297,17 +2296,12 @@ kernel_do_execveat(/*in|out*/ struct execargs *__restrict args) {
 			/* Allocate  the  register  buffer  beforehand,  so  this
 			 * allocation failing can still be handled by user-space.
 			 * NOTE: We  always  allocate this  buffer on  the heap,  since  file paths  can get  quite long,
-			 *       an being  as far  to the  bottom of  the  kernel stack  as we  are, it  could be  a  bit
+			 *       and  being as  close to the  bottom of  the kernel stack  as we  are, it could  be a bit
 			 *       risky to allocate a huge stack-based structure when we still have to call `mman_exec()',
 			 *       even when using `malloca()' (but maybe I'm just overlay cautios...) */
 			buf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
 			RAII_FINALLY { kfree(buf); };
-
 			dst = buf;
-			/* FIXME: If  the process  uses chroot()  between this  and the previous
-			 *        printent() call, then we may write past the end of the buffer!
-			 * Solution: Use `path_printentex()' and pass the same pre-loaded root-path
-			 *           during every invocation! */
 			path_printent(args->ea_xpath,
 			              args->ea_xdentry->fd_name,
 			              args->ea_xdentry->fd_namelen,
