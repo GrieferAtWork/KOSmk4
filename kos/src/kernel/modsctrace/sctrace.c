@@ -72,7 +72,7 @@
 #endif /* __ARCH_HAVE_COMPAT */
 
 
-#if 1
+#if 0
 #include <sched/pid-ctty.h>
 DECL_BEGIN
 #define TRACE_HOOK() trace_hook()
