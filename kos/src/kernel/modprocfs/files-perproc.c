@@ -833,10 +833,18 @@ NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self) {
 	if (self == &compat_execabi_system_rtld_file.mrf_file)
 		return COMPAT_RTLD_LIBDL;
 #endif /* __ARCH_HAVE_COMPAT */
+	if (self == &mfile_zero)
+		return "/dev/zero";
+	if (self == &mfile_phys)
+		return "/dev/mem";
 	if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon))
 		return "[anon]";
 	if (self == &mfile_ndef)
 		return "[undef]";
+#ifdef CONFIG_DEBUG_HEAP
+	if (self == &mfile_dbgheap)
+		return "[dbgheap]";
+#endif /* CONFIG_DEBUG_HEAP */
 	return NULL;
 }
 
@@ -847,6 +855,74 @@ struct maps_printer_data {
 	REF struct path *pd_root;    /* [0..1] Lazily initialized root directory of parent. */
 	atflag_t         pd_atflags; /* [valid_if(pd_root)] AT_* flags */
 };
+
+INTERN NONNULL((1)) ssize_t FCALL
+maps_print_name(struct maps_printer_data *__restrict ctx,
+                struct mfile *file, struct path *fspath,
+                struct fdirent *fsname) {
+	ssize_t result;
+	pformatprinter printer;
+	void *arg;
+	printer = ctx->pd_printer;
+	arg     = ctx->pd_arg;
+	if (fsname) {
+		if (fspath) {
+			if (!ctx->pd_root) {
+				ctx->pd_atflags = fs_atflags(0) | AT_PATHPRINT_INCTRAIL;
+				ctx->pd_root    = fs_getroot(THIS_FS);
+			}
+			result = path_printent(fspath, fsname->fd_name,
+			                       fsname->fd_namelen, printer, arg,
+			                       ctx->pd_atflags, ctx->pd_root);
+		} else if (fsname->fd_name[0] == '/') {
+			result = print(fsname->fd_name,
+			               fsname->fd_namelen);
+		} else {
+			result = printf("?/%$#q",
+			                (size_t)fsname->fd_namelen,
+			                fsname->fd_name);
+		}
+	} else if (file) {
+		/* Check if it's a device file (in which case we can extract the filename). */
+		if (mfile_isdevice(file)) {
+			REF struct path *devfs_mount;
+			struct devdirent *name;
+			struct device *dev = mfile_asdevice(file);
+			device_getname_lock_acquire(dev);
+			name = incref(dev->dv_dirent);
+			device_getname_lock_release(dev);
+			FINALLY_DECREF_UNLIKELY(name);
+			devfs_mount = vfs_mount_location(THIS_VFS, &devfs.fs_root);
+			if (devfs_mount) {
+				if (!ctx->pd_root) {
+					ctx->pd_atflags = fs_atflags(0) | AT_PATHPRINT_INCTRAIL;
+					ctx->pd_root    = fs_getroot(THIS_FS);
+				}
+				FINALLY_DECREF_UNLIKELY(devfs_mount);
+				result = path_printent(devfs_mount, name->dd_dirent.fd_name,
+				                       name->dd_dirent.fd_namelen, printer, arg,
+				                       ctx->pd_atflags, ctx->pd_root);
+			} else {
+				result = printf("devfs:/%$s",
+				                (size_t)name->dd_dirent.fd_namelen,
+				                name->dd_dirent.fd_name);
+			}
+		} else {
+			/* Lastly, there are a couple of special files for which we know names. */
+			char const *special_name;
+			special_name = nameof_special_file(file);
+			if (special_name) {
+				result = print(special_name, strlen(special_name));
+			} else {
+				/* For everything else, just print the /proc/[pid]/fd/[fdno] link text. */
+				result = mfile_uprintlink(file, printer, arg);
+			}
+		}
+	} else {
+		result = 0;
+	}
+	return result;
+}
 
 PRIVATE ssize_t FCALL
 maps_printer_cb(void *maps_arg, struct mmapinfo *__restrict info) {
@@ -884,60 +960,8 @@ maps_printer_cb(void *maps_arg, struct mmapinfo *__restrict info) {
 	           info->mmi_offset,
 	           MAJOR(dev), MINOR(dev), ino) < 0)
 		goto err;
-	if (info->mmi_fsname) {
-		if (info->mmi_fspath) {
-			if (!ctx->pd_root) {
-				ctx->pd_atflags = fs_atflags(0) | AT_PATHPRINT_INCTRAIL;
-				ctx->pd_root    = fs_getroot(THIS_FS);
-			}
-			path_printent(info->mmi_fspath, info->mmi_fsname->fd_name,
-			              info->mmi_fsname->fd_namelen, printer, arg,
-			              ctx->pd_atflags, ctx->pd_root);
-		} else if (info->mmi_fsname->fd_name[0] == '/') {
-			print(info->mmi_fsname->fd_name,
-			      info->mmi_fsname->fd_namelen);
-		} else {
-			printf("?/%$#q",
-			       (size_t)info->mmi_fsname->fd_namelen,
-			       info->mmi_fsname->fd_name);
-		}
-	} else if (info->mmi_file) {
-		/* Check if it's a device file (in which case we can extract the filename). */
-		if (mfile_isdevice(info->mmi_file)) {
-			REF struct path *devfs_mount;
-			struct devdirent *name;
-			struct device *dev = mfile_asdevice(info->mmi_file);
-			device_getname_lock_acquire(dev);
-			name = incref(dev->dv_dirent);
-			device_getname_lock_release(dev);
-			FINALLY_DECREF_UNLIKELY(name);
-			devfs_mount = vfs_mount_location(THIS_VFS, &devfs.fs_root);
-			if (devfs_mount) {
-				if (!ctx->pd_root) {
-					ctx->pd_atflags = fs_atflags(0) | AT_PATHPRINT_INCTRAIL;
-					ctx->pd_root    = fs_getroot(THIS_FS);
-				}
-				FINALLY_DECREF_UNLIKELY(devfs_mount);
-				path_printent(devfs_mount, name->dd_dirent.fd_name,
-				              name->dd_dirent.fd_namelen, printer, arg,
-				              ctx->pd_atflags, ctx->pd_root);
-			} else {
-				printf("devfs:/%$s",
-				       (size_t)name->dd_dirent.fd_namelen,
-				       name->dd_dirent.fd_name);
-			}
-		} else {
-			/* Lastly, there are a couple of special files for which we know names. */
-			char const *special_name;
-			special_name = nameof_special_file(info->mmi_file);
-			if (special_name) {
-				print(special_name, strlen(special_name));
-			} else {
-				/* For everything else, just print the /proc/[pid]/fd/[fdno] link text. */
-				mfile_uprintlink(info->mmi_file, printer, arg);
-			}
-		}
-	}
+	if (maps_print_name(ctx, info->mmi_file, info->mmi_fspath, info->mmi_fsname) < 0)
+		goto err;
 	if (PRINT("\n") < 0)
 		goto err;
 	return 0;

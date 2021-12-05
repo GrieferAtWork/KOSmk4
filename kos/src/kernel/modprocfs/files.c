@@ -737,6 +737,104 @@ procfs_kos_mm_kernel_stat_printer(pformatprinter printer, void *arg,
 
 
 
+/************************************************************************/
+/* /proc/kos/mm/kernel-maps                                             */
+/************************************************************************/
+struct maps_printer_data {
+	pformatprinter   pd_printer; /* [1..1] The target printer. */
+	void            *pd_arg;     /* [?..?] Argument for `pd_printer' */
+	REF struct path *pd_root;    /* [0..1] Lazily initialized root directory of parent. */
+	atflag_t         pd_atflags; /* [valid_if(pd_root)] AT_* flags */
+};
+
+INTDEF NONNULL((1)) ssize_t FCALL /* From "./files-perproc.c" */
+maps_print_name(struct maps_printer_data *__restrict ctx,
+                struct mfile *file, struct path *fspath,
+                struct fdirent *fsname);
+
+INTERN NONNULL((1)) void KCALL
+procfs_kos_mm_kernel_maps_printer(pformatprinter printer, void *arg,
+                                  pos_t UNUSED(offset_hint)) {
+	struct maps_printer_data ctx;
+	void *minaddr = (void *)0;
+	require(CAP_SYS_MODULE);
+	ctx.pd_printer = printer;
+	ctx.pd_arg     = arg;
+	ctx.pd_root    = NULL;
+	RAII_FINALLY { xdecref_unlikely(ctx.pd_root); };
+	for (;;) {
+		struct mnode node;
+		struct mnode_tree_minmax mima;
+		REF struct mfile *file;
+		pos_t part_minaddr;
+again:
+		mman_lock_read(&mman_kernel);
+		mnode_tree_minmaxlocate(mman_kernel.mm_mappings, minaddr, (void *)-1, &mima);
+		if (!mima.mm_min) {
+			mman_lock_endread(&mman_kernel);
+			break;
+		}
+		memcpy(&node, mima.mm_min, sizeof(struct mnode));
+		if (!(node.mn_flags & MNODE_F_UNMAPPED)) {
+			if (node.mn_part) {
+				if (!mpart_lock_tryacquire(node.mn_part)) {
+					incref(node.mn_part);
+					mman_lock_endread(&mman_kernel);
+					FINALLY_DECREF_UNLIKELY(node.mn_part);
+					mpart_lock_waitfor(node.mn_part);
+					goto again;
+				}
+				incref(node.mn_part);
+			}
+		} else {
+			node.mn_part = NULL;
+		}
+		xincref(node.mn_fspath);
+		xincref(node.mn_fsname);
+		mman_lock_endread(&mman_kernel);
+		part_minaddr = 0;
+		file         = NULL;
+		if (node.mn_part) {
+			file         = incref(node.mn_part->mp_file);
+			part_minaddr = mpart_getminaddr(node.mn_part);
+			mpart_lock_release(node.mn_part);
+		}
+		FINALLY_XDECREF_UNLIKELY(node.mn_fsname);
+		FINALLY_XDECREF_UNLIKELY(node.mn_fspath);
+		FINALLY_XDECREF_UNLIKELY(node.mn_part);
+		FINALLY_XDECREF_UNLIKELY(file);
+		if (printf("%.8" PRIxPTR "-%.8" PRIxPTR " "     /* from-to */
+		           "%c%c%c%c"                           /* [r-][w-][x-][sp] */
+		           "%c%c%c%c%c%c%c ",                   /* [U-][P-][K-][H-][L-][S-][M-] */
+		           node.mn_minaddr, node.mn_maxaddr,
+		           node.mn_flags & MNODE_F_PREAD ? 'r' : '-',
+		           node.mn_flags & MNODE_F_PWRITE ? 'w' : '-',
+		           node.mn_flags & MNODE_F_PEXEC ? 'x' : '-',
+		           node.mn_flags & MNODE_F_SHARED ? 's' : 'p',
+		           node.mn_flags & MNODE_F_UNMAPPED ? 'U' : '-',
+		           node.mn_flags & MNODE_F_MPREPARED ? 'P' : '-',
+		           node.mn_flags & MNODE_F_KERNPART ? 'K' : '-',
+		           node.mn_flags & MNODE_F_MHINT ? 'H' : '-',
+		           node.mn_flags & MNODE_F_MLOCK ? 'L' : '-',
+		           node.mn_flags & MNODE_F_NOSPLIT ? 'S' : '-',
+		           node.mn_flags & MNODE_F_NOMERGE ? 'M' : '-'))
+			return;
+		if (node.mn_part != NULL) {
+			if (printf("%.8" PRIxN(__SIZEOF_OFF64_T__) " ", /* offset */
+			           node.mn_partoff + part_minaddr) < 0)
+				return;
+		}
+		if (maps_print_name(&ctx, file, node.mn_fspath, node.mn_fsname) < 0)
+			return;
+		if (PRINT("\n") < 0)
+			return;
+		if (OVERFLOW_UADD((uintptr_t)node.mn_maxaddr, 1, (uintptr_t *)&minaddr))
+			break;
+	}
+}
+
+
+
 
 /************************************************************************/
 /* /proc/kos/mm/stat                                                    */
