@@ -27,7 +27,11 @@
 
 #include <kernel/malloc-defs.h>
 
-#if 0 /* Quick toggle to disable debug_malloc (and use the weak definitions from `malloc.c'). */
+/* Quick toggle to disable debug_malloc (and use the weak definitions from `malloc.c').
+ * NOTE: You can also achieve identical effects by passing "nomall" on the kernel
+ *       commandline, which  redirects all  traced malloc  functions to  untraced
+ *       counterparts during early boot. */
+#if 0
 #undef CONFIG_TRACE_MALLOC
 #endif
 

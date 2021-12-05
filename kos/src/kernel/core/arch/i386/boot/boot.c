@@ -928,13 +928,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * and  if that fails, you may assume that the driver is currently being unloaded, and act
 	 * like the requested type didn't exist.
 	 *
-	 * XXX: The above is technically the correct way of doing this, but it leaves a problem
+	 * XXX: The  above is technically  the correct way of  doing this, but  it leaves a problem
 	 *      when there are other statically allocated structures that reference the superblock,
 	 *      which is the case for all of the static files from procfs.
 	 * Technically, each of those files would also need to be holding its own reference to the
-	 * superblock, though only do so for as long as outside references exist to those parts.
-	 * Once such references no longer exist, the static object must be considered as invalid.
-	 * As such, constructing the initial reference to static objects would work like:
+	 * superblock,  though only do so for as long  as outside references exist to those parts.
+	 * Once  such references no longer exist, the static object must be considered as invalid.
+	 * As such,  constructing  the  initial  reference to  static  objects  would  work  like:
 	 * >> for (;;) {
 	 * >>     if (tryincref(obj))
 	 * >>         return obj;
@@ -950,6 +950,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * >> }
 	 *
 	 */
+
+	/* TODO: Get rid of the kernel `vpage_*' API. - I don't think anything's still left that once
+	 *       was using it, and at this point you're better off directly using  `mman_map_kram()'. */
 
 	return state;
 }

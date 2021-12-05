@@ -35,8 +35,8 @@
 DECL_BEGIN
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-PUBLIC ATTR_MALLOC WUNUSED ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(kmalloc_noslab))(size_t n_bytes, gfp_t flags) {
+INTERN ATTR_MALLOC WUNUSED VIRT void *
+NOTHROW_NX(KCALL FUNC(untraced_kmalloc_noslab))(size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
@@ -53,13 +53,13 @@ IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 #elif defined(MALLOC_NX)
-#define kmalloc_no_slab_nx kmalloc_nx
+#define untraced_kmalloc_no_slab_nx untraced_kmalloc_nx
 #else /* ... */
-#define kmalloc_noslab     kmalloc
+#define untraced_kmalloc_noslab     untraced_kmalloc
 #endif /* !... */
 
-PUBLIC ATTR_MALLOC WUNUSED ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
+INTERN ATTR_MALLOC WUNUSED VIRT void *
+NOTHROW_NX(KCALL FUNC(untraced_kmalloc))(size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
@@ -85,10 +85,10 @@ IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-PUBLIC ATTR_MALLOC WUNUSED ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
-                                  size_t n_bytes,
-                                  gfp_t flags) {
+INTERN ATTR_MALLOC WUNUSED VIRT void *
+NOTHROW_NX(KCALL FUNC(untraced_kmemalign))(size_t min_alignment,
+                                           size_t n_bytes,
+                                           gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
@@ -107,9 +107,9 @@ IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-PUBLIC ATTR_MALLOC WUNUSED ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
-                                         size_t n_bytes, gfp_t flags) {
+INTERN ATTR_MALLOC WUNUSED VIRT void *
+NOTHROW_NX(KCALL FUNC(untraced_kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
+                                                  size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
@@ -144,10 +144,10 @@ err_overflow:
 	          THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-PUBLIC ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(krealloc_in_place))(VIRT void *ptr,
-                                          size_t n_bytes,
-                                          gfp_t flags) {
+INTERN VIRT void *
+NOTHROW_NX(KCALL FUNC(untraced_krealloc_in_place))(VIRT void *ptr,
+                                                   size_t n_bytes,
+                                                   gfp_t flags) {
 	struct mptr *result;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
@@ -198,10 +198,10 @@ err:
 	return NULL;
 }
 
-PUBLIC ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
-                                 size_t n_bytes,
-                                 gfp_t flags) {
+INTERN VIRT void *
+NOTHROW_NX(KCALL FUNC(untraced_krealloc))(VIRT void *ptr,
+                                          size_t n_bytes,
+                                          gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	struct heap *used_heap;
@@ -209,9 +209,9 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr) {
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-		return FUNC(kmalloc_noslab)(n_bytes, flags);
+		return FUNC(untraced_kmalloc_noslab)(n_bytes, flags);
 #else /* CONFIG_USE_SLAB_ALLOCATORS */
-		return FUNC(kmalloc)(n_bytes, flags);
+		return FUNC(untraced_kmalloc)(n_bytes, flags);
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 	}
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -220,7 +220,7 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 		u8 old_size = SLAB_GET(ptr)->s_size;
 		if (n_bytes <= old_size)
 			return ptr;
-		resptr = FUNC(kmalloc_noslab)(n_bytes, flags);
+		resptr = FUNC(untraced_kmalloc_noslab)(n_bytes, flags);
 #ifdef MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;
@@ -288,16 +288,16 @@ err:
 #endif /* MALLOC_NX */
 }
 
-PUBLIC ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
-                                 size_t n_bytes, gfp_t flags) {
+INTERN VIRT void *
+NOTHROW_NX(KCALL FUNC(untraced_krealign))(VIRT void *ptr, size_t min_alignment,
+                                          size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	struct heap *used_heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr)
-		return FUNC(kmemalign)(min_alignment, n_bytes, flags);
+		return FUNC(untraced_kmemalign)(min_alignment, n_bytes, flags);
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
@@ -305,7 +305,7 @@ NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
 		u8 old_size = SLAB_GET(ptr)->s_size;
 		if (n_bytes <= old_size)
 			return ptr;
-		resptr = FUNC(kmemalign)(min_alignment, n_bytes, flags);
+		resptr = FUNC(untraced_kmemalign)(min_alignment, n_bytes, flags);
 #ifdef MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;
@@ -376,17 +376,17 @@ err:
 #endif /* MALLOC_NX */
 }
 
-PUBLIC ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
-                                        ptrdiff_t offset, size_t n_bytes,
-                                        gfp_t flags) {
+INTERN VIRT void *
+NOTHROW_NX(KCALL FUNC(untraced_krealign_offset))(VIRT void *ptr, size_t min_alignment,
+                                                 ptrdiff_t offset, size_t n_bytes,
+                                                 gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	struct heap *used_heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr)
-		return FUNC(kmemalign_offset)(min_alignment, offset, n_bytes, flags);
+		return FUNC(untraced_kmemalign_offset)(min_alignment, offset, n_bytes, flags);
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
@@ -394,7 +394,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 		u8 old_size = SLAB_GET(ptr)->s_size;
 		if (n_bytes <= old_size)
 			return ptr;
-		resptr = FUNC(kmemalign_offset)(min_alignment, offset, n_bytes, flags);
+		resptr = FUNC(untraced_kmemalign_offset)(min_alignment, offset, n_bytes, flags);
 #ifdef MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;

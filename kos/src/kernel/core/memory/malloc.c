@@ -38,6 +38,9 @@
 #include <stdint.h>
 #include <string.h>
 
+/**/
+#include "malloc.h"
+
 DECL_BEGIN
 
 #if HEAP_ALIGNMENT < (__SIZEOF_SIZE_T__ + 1)
@@ -92,8 +95,8 @@ STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 #endif /* NDEBUG */
 
 
-PUBLIC ATTR_WEAK WUNUSED size_t
-NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
+INTERN WUNUSED size_t
+NOTHROW(KCALL untraced_kmalloc_usable_size)(VIRT void *ptr) {
 	struct mptr *mblock;
 	if (!ptr)
 		return 0;
@@ -107,8 +110,8 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	return mptr_size(mblock) - sizeof(struct mptr);
 }
 
-PUBLIC ATTR_WEAK void
-NOTHROW(KCALL kfree)(VIRT void *ptr) {
+INTERN void
+NOTHROW(KCALL untraced_kfree)(VIRT void *ptr) {
 	struct mptr *mblock;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
@@ -125,8 +128,8 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	                   mptr_size(mblock), mptr_heap_gfp(mblock));
 }
 
-PUBLIC ATTR_WEAK void
-NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
+INTERN void
+NOTHROW(KCALL untraced_kffree)(VIRT void *ptr, gfp_t flags) {
 	struct mptr *mblock;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
@@ -146,25 +149,25 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 }
 
 
-PUBLIC NOBLOCK ATTR_WEAK void
-NOTHROW(KCALL kmalloc_validate)(void) {
+INTERN NOBLOCK void
+NOTHROW(KCALL untraced_kmalloc_validate)(void) {
 }
 
-PUBLIC ATTR_WEAK ATTR_CONST size_t KCALL
-kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
+INTERN ATTR_CONST size_t KCALL
+untraced_kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 	return 0;
 }
 
-PUBLIC ATTR_WEAK ATTR_CONST kmalloc_leaks_t KCALL
-kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
+INTERN ATTR_CONST kmalloc_leaks_t KCALL
+untraced_kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
 	return NULL;
 }
 
-PUBLIC ATTR_WEAK ATTR_CONST ssize_t KCALL
-kmalloc_leaks_print(kmalloc_leaks_t UNUSED(leaks),
-                    __pformatprinter UNUSED(printer),
-                    void *UNUSED(arg),
-                    size_t *UNUSED(pnum_leaks)) {
+INTERN ATTR_CONST ssize_t KCALL
+untraced_kmalloc_leaks_print(kmalloc_leaks_t UNUSED(leaks),
+                             __pformatprinter UNUSED(printer),
+                             void *UNUSED(arg),
+                             size_t *UNUSED(pnum_leaks)) {
 	return 0;
 }
 
@@ -174,61 +177,61 @@ kmalloc_leaks_print(kmalloc_leaks_t UNUSED(leaks),
  * >> WHEN THEY'RE ALREADY MARKED AS SUCH!!! << */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=const"
-PUBLIC NOBLOCK ATTR_CONST ATTR_WEAK WUNUSED size_t
-NOTHROW(KCALL kmalloc_leaks_count)(kmalloc_leaks_t UNUSED(leaks)) {
+INTERN NOBLOCK ATTR_CONST WUNUSED size_t
+NOTHROW(KCALL untraced_kmalloc_leaks_count)(kmalloc_leaks_t UNUSED(leaks)) {
 	return 0;
 }
 
-PUBLIC NOBLOCK ATTR_CONST ATTR_WEAK memleak_t
-NOTHROW(FCALL memleak_next)(kmalloc_leaks_t UNUSED(leaks),
-                            memleak_t UNUSED(prev)) {
+INTERN NOBLOCK ATTR_CONST memleak_t
+NOTHROW(FCALL untraced_memleak_next)(kmalloc_leaks_t UNUSED(leaks),
+                                     memleak_t UNUSED(prev)) {
 	return NULL;
 }
-DEFINE_PUBLIC_WEAK_ALIAS(memleak_getattr, memleak_next);
+DEFINE_INTERN_ALIAS(untraced_memleak_getattr, untraced_memleak_next);
 #pragma GCC diagnostic pop
 
 
-PUBLIC NOBLOCK ATTR_WEAK void
-NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t UNUSED(leaks),
-                                     unsigned int UNUSED(now)) {
+INTERN NOBLOCK void
+NOTHROW(KCALL untraced_kmalloc_leaks_release)(kmalloc_leaks_t UNUSED(leaks),
+                                              unsigned int UNUSED(now)) {
 }
 
-PUBLIC ATTR_WEAK ATTR_CONST NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
-NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
-                                gfp_t UNUSED(gfp), unsigned int UNUSED(tb_skip)) {
+INTERN ATTR_CONST NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
+NOTHROW(KCALL untraced_kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
+                                         gfp_t UNUSED(gfp), unsigned int UNUSED(tb_skip)) {
 	return base;
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_CONST void
-NOTHROW(KCALL kmalloc_untrace)(void *UNUSED(ptr)) {
+INTERN NOBLOCK ATTR_CONST void
+NOTHROW(KCALL untraced_kmalloc_untrace)(void *UNUSED(ptr)) {
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_CONST void
-NOTHROW(KCALL kmalloc_untrace_n)(void *UNUSED(ptr), size_t UNUSED(num_bytes)) {
+INTERN NOBLOCK ATTR_CONST void
+NOTHROW(KCALL untraced_kmalloc_untrace_n)(void *UNUSED(ptr),
+                                          size_t UNUSED(num_bytes)) {
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_CONST size_t
-NOTHROW(KCALL kmalloc_traceback)(void *UNUSED(ptr),
-                                 /*out*/ void **UNUSED(tb),
-                                 size_t UNUSED(buflen),
-                                 pid_t *UNUSED(p_alloc_roottid)) {
+INTERN NOBLOCK ATTR_CONST size_t
+NOTHROW(KCALL untraced_kmalloc_traceback)(void *UNUSED(ptr),
+                                          /*out*/ void **UNUSED(tb),
+                                          size_t UNUSED(buflen),
+                                          pid_t *UNUSED(p_alloc_roottid)) {
 	return 0;
 }
 
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_CONST ssize_t KCALL
-kmalloc_printtrace(void *UNUSED(ptr),
-                   __pformatprinter UNUSED(printer),
-                   void *UNUSED(arg)) {
+INTERN NOBLOCK ATTR_CONST ssize_t KCALL
+untraced_kmalloc_printtrace(void *UNUSED(ptr),
+                            __pformatprinter UNUSED(printer),
+                            void *UNUSED(arg)) {
 	return 0;
 }
 
 
-DEFINE_PUBLIC_WEAK_ALIAS(kmalloc_trace, kmalloc_trace_nx);
-
+DEFINE_INTERN_ALIAS(untraced_kmalloc_trace, untraced_kmalloc_trace_nx);
 #ifndef CONFIG_USE_SLAB_ALLOCATORS
-DEFINE_PUBLIC_WEAK_ALIAS(kmalloc_noslab, kmalloc);
-DEFINE_PUBLIC_WEAK_ALIAS(kmalloc_noslab_nx, kmalloc_nx);
+DEFINE_INTERN_ALIAS(untraced_kmalloc_noslab, untraced_kmalloc);
+DEFINE_INTERN_ALIAS(untraced_kmalloc_noslab_nx, untraced_kmalloc_nx);
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 
 DECL_END
@@ -239,5 +242,140 @@ DECL_END
 /**/
 #include "malloc-impl.c.inl"
 #endif /* !__INTELLISENSE__ */
+
+#include <asm/redirect.h>
+#ifdef CONFIG_TRACE_MALLOC
+#include <kernel/driver-param.h>
+#endif /* CONFIG_TRACE_MALLOC */
+
+DECL_BEGIN
+
+/* Export the untraced malloc API */
+#define MALLOC_EXPORT_TABLE(cb)                               \
+	cb(kmalloc_usable_size, untraced_kmalloc_usable_size)     \
+	cb(kfree, untraced_kfree)                                 \
+	cb(kffree, untraced_kffree)                               \
+	cb(kmalloc_validate, untraced_kmalloc_validate)           \
+	cb(kmalloc_leaks, untraced_kmalloc_leaks)                 \
+	cb(kmalloc_leaks_collect, untraced_kmalloc_leaks_collect) \
+	cb(kmalloc_leaks_print, untraced_kmalloc_leaks_print)     \
+	cb(kmalloc_leaks_count, untraced_kmalloc_leaks_count)     \
+	cb(memleak_next, untraced_memleak_next)                   \
+	cb(memleak_getattr, untraced_memleak_getattr)             \
+	cb(kmalloc_leaks_release, untraced_kmalloc_leaks_release) \
+	cb(kmalloc_trace_nx, untraced_kmalloc_trace_nx)           \
+	cb(kmalloc_trace, untraced_kmalloc_trace)                 \
+	cb(kmalloc_untrace, untraced_kmalloc_untrace)             \
+	cb(kmalloc_untrace_n, untraced_kmalloc_untrace_n)         \
+	cb(kmalloc_traceback, untraced_kmalloc_traceback)         \
+	cb(kmalloc_printtrace, untraced_kmalloc_printtrace)       \
+	cb(kmalloc_noslab, untraced_kmalloc_noslab)               \
+	cb(kmalloc_noslab_nx, untraced_kmalloc_noslab_nx)         \
+	cb(kmalloc, untraced_kmalloc)                             \
+	cb(kmalloc_nx, untraced_kmalloc_nx)                       \
+	cb(kmemalign, untraced_kmemalign)                         \
+	cb(kmemalign_nx, untraced_kmemalign_nx)                   \
+	cb(kmemalign_offset, untraced_kmemalign_offset)           \
+	cb(kmemalign_offset_nx, untraced_kmemalign_offset_nx)     \
+	cb(krealloc_in_place, untraced_krealloc_in_place)         \
+	cb(krealloc_in_place_nx, untraced_krealloc_in_place_nx)   \
+	cb(krealloc, untraced_krealloc)                           \
+	cb(krealloc_nx, untraced_krealloc_nx)                     \
+	cb(krealign, untraced_krealign)                           \
+	cb(krealign_nx, untraced_krealign_nx)                     \
+	cb(krealign_offset, untraced_krealign_offset)             \
+	cb(krealign_offset_nx, untraced_krealign_offset_nx)
+
+/* Define public symbols for untraced malloc functions. */
+#ifdef CONFIG_TRACE_MALLOC
+#define EXPORT(new, old) DEFINE_PUBLIC_WEAK_ALIAS(new, old); /* Allow override from "trace-malloc.c" */
+#else /* CONFIG_TRACE_MALLOC */
+#define EXPORT(new, old) DEFINE_PUBLIC_ALIAS(new, old);
+#endif /* !CONFIG_TRACE_MALLOC */
+MALLOC_EXPORT_TABLE(EXPORT)
+#undef EXPORT
+
+
+#ifdef CONFIG_TRACE_MALLOC
+#if __ARCH_REDIRECT_MAXBYTES != 0
+
+/* No-op replacements for `heap_validate()' and `heap_validate_all()' */
+PRIVATE NOBLOCK void
+NOTHROW(KCALL noop_heap_validate_all)(void) {
+}
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL noop_heap_validate)(struct heap *__restrict UNUSED(self)) {
+}
+
+
+/* Override traced heap functions with their untraced counterparts. */
+#define HEAP_OVERRIDE_TABLE(cb)                     \
+	cb(heap_alloc, heap_alloc_untraced)             \
+	cb(heap_align, heap_align_untraced)             \
+	cb(heap_allat, heap_allat_untraced)             \
+	cb(heap_alloc_nx, heap_alloc_untraced_nx)       \
+	cb(heap_align_nx, heap_align_untraced_nx)       \
+	cb(heap_allat_nx, heap_allat_untraced_nx)       \
+	cb(heap_realloc_nx, heap_realloc_untraced_nx)   \
+	cb(heap_realign_nx, heap_realign_untraced_nx)   \
+	cb(heap_free, heap_free_untraced)               \
+	cb(heap_truncate, heap_truncate_untraced)       \
+	cb(heap_realloc, heap_realloc_untraced)         \
+	cb(heap_realign, heap_realign_untraced)         \
+	cb(vpage_alloc, vpage_alloc_untraced)           \
+	cb(vpage_alloc_nx, vpage_alloc_untraced_nx)     \
+	cb(vpage_realloc, vpage_realloc_untraced)       \
+	cb(vpage_realloc_nx, vpage_realloc_untraced_nx) \
+	cb(vpage_free, vpage_free_untraced)             \
+	cb(vpage_ffree, vpage_ffree_untraced)
+
+
+#define DEFINE_NORMAL_SYMBOL(name, untraced_name) \
+	extern byte_t __##name[] ASMNAME(#name);
+MALLOC_EXPORT_TABLE(DEFINE_NORMAL_SYMBOL)
+#undef DEFINE_NORMAL_SYMBOL
+#define DEFINE_NORMAL_SYMBOL(name, untraced_name) \
+	extern byte_t __##name[] ASMNAME(#name);      \
+	extern byte_t __##untraced_name[] ASMNAME(#untraced_name);
+HEAP_OVERRIDE_TABLE(DEFINE_NORMAL_SYMBOL)
+#undef DEFINE_NORMAL_SYMBOL
+
+PRIVATE ATTR_FREERODATA void *const trace_malloc_overrides[][2] = {
+#define OVERRIDE(name, untraced_name) { __##name, (void *)&untraced_name },
+	MALLOC_EXPORT_TABLE(OVERRIDE)
+#undef OVERRIDE
+#define OVERRIDE(name, untraced_name) { __##name, __##untraced_name },
+	HEAP_OVERRIDE_TABLE(OVERRIDE)
+#undef OVERRIDE
+
+	/* `heap_validate_all()' takes up quite a bit of execution time, since
+	 * it  has  to scan  a  whole bunch  of  memory for  potential faults.
+	 * By overriding it to become a no-op, we can speed up execution  time
+	 * of kernel builds with this feature enabled by quite a lot. */
+	{ (void *)&heap_validate_all, (void *)&noop_heap_validate_all },
+	{ (void *)&heap_validate, (void *)&noop_heap_validate },
+};
+
+/* Kernel commandline option handler to disable trace-malloc */
+PRIVATE ATTR_USED ATTR_FREETEXT void KCALL
+kernel_disable_trace_malloc(void) {
+	unsigned int i;
+
+	/* Redirect malloc functions to their untraced counterparts. */
+	for (i = 0; i < COMPILER_LENOF(trace_malloc_overrides); ++i) {
+		void *from = trace_malloc_overrides[i][0];
+		void *to   = trace_malloc_overrides[i][1];
+		if (from != to)
+			__arch_redirect(from, to);
+	}
+}
+
+DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_disable_trace_malloc,
+                                            KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT,
+                                            "nomall");
+#endif /* __ARCH_REDIRECT_MAXBYTES != 0 */
+#endif /* CONFIG_TRACE_MALLOC */
+
+DECL_END
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MALLOC_C */
