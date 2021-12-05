@@ -915,11 +915,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * block-aligned size, and thus will not attempt block-level access beyond the block-
 	 * aligned file size. */
 
-	/* TODO: There's a missing incref() relating to mktty.
-	 * Replicate bug:
-	 *  - Repeatedly press CTRL+D on the busybox prompt
-	 *  - After a couple of restarts, the kernel will panic because /dev/console got destroyed
-	 * Only logical conclusion: there's a missing incref() somewhere. */
 
 	return state;
 }

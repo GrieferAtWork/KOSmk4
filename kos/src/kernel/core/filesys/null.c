@@ -933,14 +933,12 @@ devtty_v_open(struct mfile *__restrict UNUSED(self),
               struct handle *__restrict hand,
               struct path *access_path,
               struct fdirent *access_dent) {
-	REF struct device *dev;
 	assert(hand->h_data == &dev_tty);
-	dev = getctty();
-	FINALLY_DECREF_UNLIKELY(dev);
+	hand->h_data = getctty(); /* Inherit reference */
 	decref_nokill(&dev_tty); /* Old reference from `hand->h_data' */
-	hand->h_data = dev;
 	/* Recursive open */
-	mfile_open(dev, hand, access_path, access_dent);
+	mfile_open((struct device *)hand->h_data,
+	           hand, access_path, access_dent);
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
