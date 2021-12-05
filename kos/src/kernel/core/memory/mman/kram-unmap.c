@@ -733,6 +733,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			hi_split_chunk_offset -= count;
 			++hi_split_chunk_index;
 		}
+
 		/* We now have to adjust the backing storage, such that:
 		 * >> lopart->mp_mem_sc = { [0...<lo_split_chunk_index:lo_split_chunk_offset>) }
 		 * >> hipart->mp_mem_sc = { [<hi_split_chunk_index:hi_split_chunk_offset>...n) }
@@ -744,10 +745,12 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		hi_chunks = vec.ms_c - hi_split_chunk_index;
 		assert(lo_chunks >= 1);
 		assert(hi_chunks >= 1);
+
 		/* Handle the simple cases where one of the 2 parts can
 		 * be  implemented without the  need of a chunk-vector. */
 		if (lo_chunks == 1 && hi_chunks == 1) {
 			size_t lo_size;
+
 			/* Both parts only need a single chunk. */
 			assert((lo_split_chunk_index == 0 && lo_split_chunk_offset != 0) ||
 			       (lo_split_chunk_index == 1 && lo_split_chunk_offset == 0));
@@ -773,6 +776,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			kfree(vec.ms_v);
 		} else if (lo_chunks == 1) {
 			size_t lo_size;
+
 			/* `hipart' must use a vector, while `lopart' uses a single chunk. */
 			assert(hipart->mp_state == lopart->mp_state);
 			assert((lo_split_chunk_index == 0 && lo_split_chunk_offset != 0) ||
@@ -839,12 +843,14 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			struct mchunk *newvec;
 			assert(lo_chunks >= 2);
 			assert(hi_chunks >= 2);
+
 			/* Allocate a vector for the smaller of the 2 requirements. */
 			newvec = (struct mchunk *)kmalloc_nx(MIN(lo_chunks, hi_chunks) *
 			                                     sizeof(struct mchunk),
 			                                     flags);
 			if unlikely(!newvec)
 				goto fail_hinode_hipart_bitset;
+
 			/* === Point of no return */
 			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 
@@ -904,6 +910,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		hipart->mp_mem = lopart->mp_mem;
 		hipart->mp_mem.mc_start += hioffset_pages;
 		hipart->mp_mem.mc_size -= hioffset_pages;
+
 		/* === Point of no return */
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 		(*freefun)(lopart->mp_mem.mc_start + losize_pages,
@@ -963,6 +970,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 				movedown_bits(hiset, hiset, 0,
 				              hioffset_blocks * MPART_BLOCK_STBITS,
 				              hiblocks * MPART_BLOCK_STBITS);
+
 				/* Try to release unused memory. */
 				smaller_bitset = (mpart_blkst_word_t *)krealloc_nx(hiset,
 				                                                   CEILDIV(hiblocks, MPART_BLKST_BLOCKS_PER_WORD) *
@@ -970,12 +978,14 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 				                                                   flags);
 				if likely(smaller_bitset != NULL)
 					hiset = smaller_bitset;
+
 				/* Write-back the updated bitsets. */
 				lopart->mp_blkst_ptr = loset;
 				hipart->mp_blkst_ptr = hiset;
 			}
 		} else if (hisize > bitset_bytes_per_word) {
 			mpart_blkst_word_t *hiset, *smaller_bitset;
+
 			/* Re-use  the bitset from `lopart' in `hipart', and
 			 * change `lopart' to make use of the inline bitset. */
 			hiset = lopart->mp_blkst_ptr;
@@ -1206,6 +1216,7 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
 	SLIST_ATOMIC_INSERT(&self->mp_lockops, lop, olo_link);
 	if likely(!mpart_lock_tryacquire(self))
 		return true;
+
 	/* Welp... We've got the lock... -> Try to remove `lop' once again. */
 	locklist.slh_first = SLIST_ATOMIC_CLEAR(&self->mp_lockops);
 	did_remove         = true;
@@ -1228,6 +1239,7 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
 		mpart_lock_release(self);
 		return true;
 	}
+
 	/* Lock acquired, and `lop' not added to the lock-op list. */
 	return false;
 }
@@ -1335,7 +1347,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 		 * NOTE:     There would normally be a race condition right here:
 		 *           Before we're allowed to truncate the `Before' node, we must still
 		 *           ensure that no other CPU is currently inside of the #PF  handler,
-		 *           an  in the progress  of mapping the  same high-region which we've
+		 *           and in the progress of  mapping the same high-region which  we've
 		 *           already faulted at that point.  (though since that other CPU  may
 		 *           have started its #PF  before we already did  it's job for it,  it
 		 *           may still be trying to access `node')
@@ -1578,6 +1590,7 @@ again_service_lops:
 continue_with_next:
 		iter = next;
 	}
+
 	/* At this point, all remaining elements in `krlist' are requests
 	 * for unmapping kernel  RAM, which have  already been sorted  by
 	 * their base address. */
