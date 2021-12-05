@@ -37,6 +37,7 @@
 #include <kernel/isr.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/phys.h>
 #include <kernel/panic.h>
@@ -1539,7 +1540,7 @@ NOTHROW(KCALL uhci_fini)(struct chrdev *__restrict self) {
 		}
 	}
 	if (me->uc_framelist)
-		vpage_free(me->uc_framelist, 1);
+		mman_unmap_kram(me->uc_framelist, PAGESIZE);
 }
 
 /* Schedule the given queue for execution. */
@@ -2213,7 +2214,7 @@ NOTHROW(KCALL uhci_interrupt_frameentry_fini)(struct uhci_interrupt_frameentry *
 		if (self->ife_bufsize & 1) {
 			assert(IS_ALIGNED((uintptr_t)self->ife_buf, PAGESIZE));
 			assert(IS_ALIGNED((uintptr_t)self->ife_bufsize - 1, PAGESIZE));
-			vpage_free_untraced(self->ife_buf, self->ife_bufsize / PAGESIZE);
+			mman_unmap_kram(self->ife_buf, self->ife_bufsize - 1);
 		} else {
 			heap_free_untraced(&kernel_locked_heap,
 			                   self->ife_buf,
@@ -2320,11 +2321,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 		size_t num_pages;
 		void *buf;
 		num_pages = CEILDIV(buflen, PAGESIZE);
-		/* NOTE: Unlink the heap  allocation functions, vpage_alloc()  is guarantied  to
-		 *       respect the `GFP_PREFLT' flag, so we don't even have to touch allocated
-		 *       page in order to ensure that it got faulted. */
-		buf = vpage_alloc_untraced(num_pages, 1,
-		                           GFP_LOCKED | GFP_PREFLT); /* TODO: GFP_32BIT */
+		buf       = mman_map_kram(NULL, num_pages * PAGESIZE, GFP_LOCKED | GFP_PREFLT | GFP_MAP_32BIT);
 		assert(IS_ALIGNED((uintptr_t)self->ife_buf, PAGESIZE));
 		TRY {
 			size_t i;
@@ -2358,11 +2355,11 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 				i += num_cont;
 			}
 		} EXCEPT {
-			vpage_free_untraced(buf, num_pages);
+			mman_unmap_kram(buf, num_pages * PAGESIZE);
 			RETHROW();
 		}
 		self->ife_buf     = buf;
-		self->ife_bufsize = (num_pages * PAGESIZE) | 1; /* least significant bit: vpage-based buffer. */
+		self->ife_bufsize = (num_pages * PAGESIZE) | 1; /* least significant bit: kram-based buffer. */
 	}
 	assert(pnexttd != &self->ife_tdsf);
 	*pnexttd = NULL;
@@ -3041,7 +3038,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	}
 	result->uc_transfer        = &uhci_transfer;
 	result->uc_interrupt       = &uhci_register_interrupt;
-	result->uc_framelist       = (u32 *)vpage_alloc(1, 1, GFP_LOCKED | GFP_PREFLT);
+	result->uc_framelist       = (u32 *)mman_map_kram(NULL, PAGESIZE, GFP_LOCKED | GFP_PREFLT | GFP_MAP_32BIT);
 	result->uc_framelist_phys  = (u32)pagedir_translate(result->uc_framelist);
 	result->uc_qhstart.qh_self = (u32)pagedir_translate(&result->uc_qhstart);
 

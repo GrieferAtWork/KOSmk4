@@ -108,9 +108,7 @@ struct ata_bus: refcountable {
 	struct sig                  ab_piointr;     /* Signal broadcast for interrupts while in `ATA_BUS_STATE_INPIO' */
 #define ATA_PIOINTR_ALT_ENCODE(status) ((struct sig *)((uintptr_t)0x100 | (uintptr_t)(u8)(status)))
 #define ATA_PIOINTR_ALT_DECODE(resp)   ((u8)((uintptr_t)(resp) & 0xff))
-	PAGEDIR_PAGEALIGNED AtaPRD *ab_prdt;        /* [1..ATA_PRD_MAXCOUNT][valid_if(ab_dmaio != (port_t)-1)][owned][const]
-	                                             * NOTE: This pointer is  allocated using `vpage_alloc_untraced()',  and
-	                                             *       spans a single page of physical memory; used for DMA transfers. */
+	PAGEDIR_PAGEALIGNED AtaPRD *ab_prdt;        /* [1..1][valid_if(ab_dmaio != (port_t)-1)][owned][const] */
 	port_t                      ab_busio;       /* [const] ATA_DEFAULT_PRIMARY_BUS:  I/O port for the ATA bus. */
 	port_t                      ab_ctrlio;      /* [const] ATA_DEFAULT_PRIMARY_CTRL: Device control register/Alternate status ports. */
 	port_t                      ab_dmaio;       /* [const] DMA controller port (or (port_t)-1 if unsupported) (s.a. `DMA_PRIMARY_COMMAND', ...). */

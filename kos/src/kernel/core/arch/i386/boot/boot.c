@@ -951,9 +951,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *
 	 */
 
-	/* TODO: Get rid of the kernel `vpage_*' API. - I don't think anything's still left that once
-	 *       was using it, and at this point you're better off directly using  `mman_map_kram()'. */
-
 	return state;
 }
 

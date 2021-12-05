@@ -309,25 +309,19 @@ NOTHROW(KCALL noop_heap_validate)(struct heap *__restrict UNUSED(self)) {
 
 
 /* Override traced heap functions with their untraced counterparts. */
-#define HEAP_OVERRIDE_TABLE(cb)                     \
-	cb(heap_alloc, heap_alloc_untraced)             \
-	cb(heap_align, heap_align_untraced)             \
-	cb(heap_allat, heap_allat_untraced)             \
-	cb(heap_alloc_nx, heap_alloc_untraced_nx)       \
-	cb(heap_align_nx, heap_align_untraced_nx)       \
-	cb(heap_allat_nx, heap_allat_untraced_nx)       \
-	cb(heap_realloc_nx, heap_realloc_untraced_nx)   \
-	cb(heap_realign_nx, heap_realign_untraced_nx)   \
-	cb(heap_free, heap_free_untraced)               \
-	cb(heap_truncate, heap_truncate_untraced)       \
-	cb(heap_realloc, heap_realloc_untraced)         \
-	cb(heap_realign, heap_realign_untraced)         \
-	cb(vpage_alloc, vpage_alloc_untraced)           \
-	cb(vpage_alloc_nx, vpage_alloc_untraced_nx)     \
-	cb(vpage_realloc, vpage_realloc_untraced)       \
-	cb(vpage_realloc_nx, vpage_realloc_untraced_nx) \
-	cb(vpage_free, vpage_free_untraced)             \
-	cb(vpage_ffree, vpage_ffree_untraced)
+#define HEAP_OVERRIDE_TABLE(cb)                   \
+	cb(heap_alloc, heap_alloc_untraced)           \
+	cb(heap_align, heap_align_untraced)           \
+	cb(heap_allat, heap_allat_untraced)           \
+	cb(heap_alloc_nx, heap_alloc_untraced_nx)     \
+	cb(heap_align_nx, heap_align_untraced_nx)     \
+	cb(heap_allat_nx, heap_allat_untraced_nx)     \
+	cb(heap_realloc_nx, heap_realloc_untraced_nx) \
+	cb(heap_realign_nx, heap_realign_untraced_nx) \
+	cb(heap_free, heap_free_untraced)             \
+	cb(heap_truncate, heap_truncate_untraced)     \
+	cb(heap_realloc, heap_realloc_untraced)       \
+	cb(heap_realign, heap_realign_untraced)
 
 
 #define DEFINE_NORMAL_SYMBOL(name, untraced_name) \

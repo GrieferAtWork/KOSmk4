@@ -98,7 +98,7 @@ struct uhci_interrupt_frameentry {
 	REF struct uhci_interrupt *ife_next;    /* [0..1][lock(:uc_lock)] Next interrupt on this frame. */
 	void                      *ife_buf;     /* [0..?|ALLOC(ui_bufsize)][owned][const] Buffer base address. */
 	size_t                     ife_bufsize; /* [const] Allocated buffer size (as returned by `heap_alloc_untraced()')
-	                                         * NOTE: The least significant bit of this field is used to indicate a vpage-based buffer (1=vpage; 0=heap). */
+	                                         * NOTE: The least significant bit of this field is used to indicate a kram-based buffer (1=vpage; 0=heap). */
 	struct uhci_ostd          *ife_tdsf;    /* [1..1][owned][const] First TD entry describing this interrupt's data */
 	struct uhci_ostd          *ife_tdsl;    /* [1..1][const] Last TD entry describing this interrupt's data */
 };

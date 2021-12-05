@@ -1403,22 +1403,6 @@ DECL_END
 
 DECL_BEGIN
 
-PUBLIC NOBLOCK void
-NOTHROW(KCALL vpage_free_untraced)(VIRT /*page-aligned*/ void *base,
-                                   size_t num_pages) {
-	assertf(IS_ALIGNED((uintptr_t)base, PAGESIZE), "base = %p", base);
-	mman_unmap_kram(base, num_pages * PAGESIZE, GFP_NORMAL);
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/ void *base,
-                                    size_t num_pages, gfp_t flags) {
-	assertf(IS_ALIGNED((uintptr_t)base, PAGESIZE), "base = %p", base);
-	mman_unmap_kram(base, num_pages * PAGESIZE, flags & GFP_CALLOC);
-}
-
-
-
 /* Weakly alias the TRACED-versions of heap functions.
  * When DEBUG_MALLOC is enabled, `debug-malloc.c' will override these. */
 DEFINE_PUBLIC_WEAK_ALIAS(heap_alloc, heap_alloc_untraced);
@@ -1433,12 +1417,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(heap_free, heap_free_untraced);
 DEFINE_PUBLIC_WEAK_ALIAS(heap_truncate, heap_truncate_untraced);
 DEFINE_PUBLIC_WEAK_ALIAS(heap_realloc, heap_realloc_untraced);
 DEFINE_PUBLIC_WEAK_ALIAS(heap_realign, heap_realign_untraced);
-DEFINE_PUBLIC_WEAK_ALIAS(vpage_alloc, vpage_alloc_untraced);
-DEFINE_PUBLIC_WEAK_ALIAS(vpage_alloc_nx, vpage_alloc_untraced_nx);
-DEFINE_PUBLIC_WEAK_ALIAS(vpage_realloc, vpage_realloc_untraced);
-DEFINE_PUBLIC_WEAK_ALIAS(vpage_realloc_nx, vpage_realloc_untraced_nx);
-DEFINE_PUBLIC_WEAK_ALIAS(vpage_free, vpage_free_untraced);
-DEFINE_PUBLIC_WEAK_ALIAS(vpage_ffree, vpage_ffree_untraced);
 
 DECL_END
 

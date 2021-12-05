@@ -81,18 +81,6 @@
  *   - slab_kmalloc
  *   - slab_kmalloc_nx
  * #endif
- *   - vpage_alloc
- *   - vpage_alloc_untraced
- *   - vpage_alloc_nx
- *   - vpage_alloc_untraced_nx
- *   - vpage_realloc
- *   - vpage_realloc_untraced
- *   - vpage_realloc_nx
- *   - vpage_realloc_untraced_nx
- *   - vpage_free
- *   - vpage_ffree
- *   - vpage_free_untraced
- *   - vpage_ffree_untraced
  *   - kmalloc
  *   - kmalloc_nx
  * #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -206,18 +194,6 @@
 	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_malloc, /*    */ ph_kmalloc_nx))              \
 	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_kmalloc, /*   */ ph_kmalloc))                 \
 	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_kmalloc_nx, /**/ ph_kmalloc_nx))              \
-	bind_func(vpage_alloc, /*              */ ph_vpage_alloc)                                \
-	bind_func(vpage_alloc_untraced, /*     */ ph_vpage_alloc)                                \
-	bind_func(vpage_alloc_nx, /*           */ ph_vpage_alloc_nx)                             \
-	bind_func(vpage_alloc_untraced_nx, /*  */ ph_vpage_alloc_nx)                             \
-	bind_func(vpage_realloc, /*            */ ph_vpage_realloc)                              \
-	bind_func(vpage_realloc_untraced, /*   */ ph_vpage_realloc)                              \
-	bind_func(vpage_realloc_nx, /*         */ ph_vpage_realloc_nx)                           \
-	bind_func(vpage_realloc_untraced_nx, /**/ ph_vpage_realloc_nx)                           \
-	bind_void(vpage_free, /*               */ ph_vpage_free, 2)                              \
-	bind_void(vpage_ffree, /*              */ ph_vpage_ffree, 3)                             \
-	bind_void(vpage_free_untraced, /*      */ ph_vpage_free, 2)                              \
-	bind_void(vpage_ffree_untraced, /*     */ ph_vpage_ffree, 3)                             \
 	bind_func(kmalloc, /*                  */ ph_kmalloc)                                    \
 	bind_func(kmalloc_nx, /*               */ ph_kmalloc_nx)                                 \
 	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(kmalloc_noslab, ph_kmalloc))                       \

@@ -515,14 +515,6 @@ SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 #undef DEFINE_SLAB_ALLOCATOR_FUNCTIONS
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
-INTDEF ATTR_RETNONNULL /*page-aligned*/ void *KCALL ph_vpage_alloc(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-INTDEF ATTR_RETNONNULL /*page-aligned*/ void *NOTHROW(KCALL ph_vpage_alloc_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-INTDEF ATTR_RETNONNULL /*page-aligned*/ void *KCALL ph_vpage_realloc(/*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-INTDEF ATTR_RETNONNULL /*page-aligned*/ void *NOTHROW(KCALL ph_vpage_realloc_nx)(/*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
-INTDEF ATTR_CONST void NOTHROW(KCALL ph_vpage_free)(/*page-aligned*/ void *base, size_t num_pages);
-INTDEF ATTR_CONST void NOTHROW(KCALL ph_vpage_ffree)(/*page-aligned*/ void *base, size_t num_pages, gfp_t flags);
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
 
 INTDEF ATTR_RETNONNULL void *KCALL ph_kmalloc(size_t n_bytes, gfp_t flags);
 INTDEF void *NOTHROW(KCALL ph_kmalloc_nx)(size_t n_bytes, gfp_t flags);
@@ -715,63 +707,6 @@ SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 #undef DEFINE_SLAB_ALLOCATOR_FUNCTIONS
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
-
-INTERN ATTR_COLDTEXT ATTR_RETNONNULL /*page-aligned*/ void *KCALL
-ph_vpage_alloc(size_t num_pages, size_t alignment_in_pages, gfp_t flags) {
-	size_t min_alignment, num_bytes;
-	if (OVERFLOW_UMUL(alignment_in_pages, PAGESIZE, &min_alignment))
-		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, (size_t)-1);
-	if (OVERFLOW_UMUL(num_pages, PAGESIZE, &num_bytes))
-		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, (size_t)-1);
-	return phcore_memalign(min_alignment, 0, num_bytes, flags);
-}
-
-INTERN ATTR_COLDTEXT ATTR_RETNONNULL /*page-aligned*/ void *
-NOTHROW(KCALL ph_vpage_alloc_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags) {
-	size_t min_alignment, num_bytes;
-	if (OVERFLOW_UMUL(alignment_in_pages, PAGESIZE, &min_alignment))
-		return NULL;
-	if (OVERFLOW_UMUL(num_pages, PAGESIZE, &num_bytes))
-		return NULL;
-	return phcore_memalign_nx(min_alignment, 0, num_bytes, flags);
-}
-
-INTERN ATTR_COLDTEXT ATTR_RETNONNULL /*page-aligned*/ void *KCALL
-ph_vpage_realloc(/*page-aligned*/ void *old_base, size_t UNUSED(old_pages), size_t new_pages,
-                 size_t alignment_in_pages, gfp_t alloc_flags, gfp_t UNUSED(free_flags)) {
-	size_t min_alignment, new_bytes;
-	if (OVERFLOW_UMUL(alignment_in_pages, PAGESIZE, &min_alignment))
-		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, (size_t)-1);
-	if (OVERFLOW_UMUL(new_pages, PAGESIZE, &new_bytes))
-		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, (size_t)-1);
-	return phcore_realign(old_base, min_alignment, 0, new_bytes, alloc_flags);
-}
-
-INTERN ATTR_COLDTEXT ATTR_RETNONNULL /*page-aligned*/ void *
-NOTHROW(KCALL ph_vpage_realloc_nx)(/*page-aligned*/ void *old_base, size_t UNUSED(old_pages),
-                                   size_t new_pages, size_t alignment_in_pages,
-                                   gfp_t alloc_flags, gfp_t UNUSED(free_flags)) {
-	size_t min_alignment, new_bytes;
-	if (OVERFLOW_UMUL(alignment_in_pages, PAGESIZE, &min_alignment))
-		return NULL;
-	if (OVERFLOW_UMUL(new_pages, PAGESIZE, &new_bytes))
-		return NULL;
-	return phcore_realign_nx(old_base, min_alignment, 0, new_bytes, alloc_flags);
-}
-
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
-INTERN ATTR_CONST ATTR_COLDTEXT void
-NOTHROW(KCALL ph_vpage_free)(/*page-aligned*/ void *UNUSED(base),
-                             size_t UNUSED(num_pages)) {
-	/* no-op */
-}
-INTERN ATTR_CONST ATTR_COLDTEXT void
-NOTHROW(KCALL ph_vpage_ffree)(/*page-aligned*/ void *UNUSED(base),
-                              size_t UNUSED(num_pages),
-                              gfp_t UNUSED(flags)) {
-	/* no-op */
-}
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
 
 INTERN ATTR_COLDTEXT ATTR_RETNONNULL void *KCALL
 ph_kmalloc(size_t n_bytes, gfp_t flags) {
