@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96f9f53 */
+/* HASH CRC-32:0x3a864330 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1544,8 +1544,6 @@
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 #define __NR_readf                        __UINT32_C(0xfffffffd) /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-#define __NR_hopf                         __UINT32_C(0xfffffffe) /* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-#define __NR_hop                          __UINT32_C(0xffffffff) /* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 
 
 /************************************************************************/
@@ -2075,8 +2073,6 @@
 #define __NRRM_detach                       2
 #define __NRRM_writef                       0
 #define __NRRM_readf                        0
-#define __NRRM_hopf                         0
-#define __NRRM_hop                          0
 #endif /* !__NRFEAT_DEFINED_SYSCALL_RESTART_MODES */
 #endif /* __WANT_SYSCALL_RESTART_MODES */
 
@@ -2256,8 +2252,6 @@
 #define __NRCP_frealpath4
 #define __NRCP_writef
 #define __NRCP_readf
-#define __NRCP_hopf
-#define __NRCP_hop
 #endif /* !__NRFEAT_DEFINED_SYSCALL_CANCELLATION_POINTS */
 #endif /* __WANT_SYSCALL_CANCELLATION_POINTS */
 
@@ -2760,8 +2754,6 @@
 #define __NRRC_detach                       1
 #define __NRRC_writef                       4
 #define __NRRC_readf                        4
-#define __NRRC_hopf                         4
-#define __NRRC_hop                          3
 #endif /* !__NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT */
 #endif /* __WANT_SYSCALL_REGISTER_COUNT */
 

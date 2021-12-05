@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x343254f6 */
+/* HASH CRC-32:0xa4523df0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4668,20 +4668,6 @@ INTERN_FUNCTION(libc_sys_readf)
 END(libc_sys_readf)
 DEFINE_PUBLIC_ALIAS(sys_readf, libc_sys_readf)
 
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-INTERN_FUNCTION(libc_sys_hopf)
-	movl   $(0xfffffffe), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_hopf)
-DEFINE_PUBLIC_ALIAS(sys_hopf, libc_sys_hopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-INTERN_FUNCTION(libc_sys_hop)
-	movl   $(0xffffffff), %eax
-	jmp    libc_x86_exec_syscall3
-END(libc_sys_hop)
-DEFINE_PUBLIC_ALIAS(sys_hop, libc_sys_hop)
-
 /* errno_t restart_syscall(void) */
 INTERN_FUNCTION(libc_sys_Xrestart_syscall)
 	xorl   %eax, %eax
@@ -9116,20 +9102,6 @@ INTERN_FUNCTION(libc_sys_Xreadf)
 	jmp    libc_x86_exec_Xsyscall4
 END(libc_sys_Xreadf)
 DEFINE_PUBLIC_ALIAS(sys_Xreadf, libc_sys_Xreadf)
-
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-INTERN_FUNCTION(libc_sys_Xhopf)
-	movl   $(0xfffffffe), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xhopf)
-DEFINE_PUBLIC_ALIAS(sys_Xhopf, libc_sys_Xhopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-INTERN_FUNCTION(libc_sys_Xhop)
-	movl   $(0xffffffff), %eax
-	jmp    libc_x86_exec_Xsyscall3
-END(libc_sys_Xhop)
-DEFINE_PUBLIC_ALIAS(sys_Xhop, libc_sys_Xhop)
 
 
 .cfi_endproc /* Unwinding for syscall wrappers */

@@ -77,8 +77,6 @@
 #define __CRT_HAVE_GetSid
 #define __CRT_HAVE_GetSockName
 #define __CRT_HAVE_GetSockOpt
-#define __CRT_HAVE_Hop
-#define __CRT_HAVE_Hopf
 #define __CRT_HAVE_Ioctl
 #define __CRT_HAVE_KFStat
 #define __CRT_HAVE_KFStat64
@@ -2452,8 +2450,6 @@
 #define __CRT_HAVE_hdestroy_r
 #define __CRT_HAVE_heapsort
 #define __CRT_HAVE_herror
-#define __CRT_HAVE_hop
-#define __CRT_HAVE_hopf
 #define __CRT_HAVE_hsearch
 #define __CRT_HAVE_hsearch_r
 #define __CRT_HAVE_hstrerror
@@ -3883,8 +3879,6 @@
 #define __CRT_HAVE_sys_Xgettimeofday
 #define __CRT_HAVE_sys_Xgetuid
 #define __CRT_HAVE_sys_Xgetxattr
-#define __CRT_HAVE_sys_Xhop
-#define __CRT_HAVE_sys_Xhopf
 #define __CRT_HAVE_sys_Xinit_module
 #define __CRT_HAVE_sys_Xinotify_add_watch
 #define __CRT_HAVE_sys_Xinotify_init
@@ -4280,8 +4274,6 @@
 #define __CRT_HAVE_sys_gettimeofday
 #define __CRT_HAVE_sys_getuid
 #define __CRT_HAVE_sys_getxattr
-#define __CRT_HAVE_sys_hop
-#define __CRT_HAVE_sys_hopf
 #define __CRT_HAVE_sys_init_module
 #define __CRT_HAVE_sys_inotify_add_watch
 #define __CRT_HAVE_sys_inotify_init

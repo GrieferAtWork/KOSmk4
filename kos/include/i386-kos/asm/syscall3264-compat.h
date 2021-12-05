@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90861d6a */
+/* HASH CRC-32:0x8c52e6c2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,8 +119,6 @@
 #define __NR3264COMPAT_gettid                   1(gettid)
 #define __NR3264COMPAT_getuid                   2(getuid,getuid32)
 #define __NR3264COMPAT_getxattr                 1(getxattr)
-#define __NR3264COMPAT_hop                      1(hop)
-#define __NR3264COMPAT_hopf                     1(hopf)
 #define __NR3264COMPAT_init_module              1(init_module)
 #define __NR3264COMPAT_inotify_add_watch        1(inotify_add_watch)
 #define __NR3264COMPAT_inotify_init             1(inotify_init)

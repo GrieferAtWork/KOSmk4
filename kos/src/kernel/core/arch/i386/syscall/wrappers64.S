@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a48c48 */
+/* HASH CRC-32:0xa804b4ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -12916,67 +12916,6 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kstat)
-
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm64_syscall.hopf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xfffffffffffffffd
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_hopf)
-	call   sys_hopf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET64
-	.cfi_endproc
-END(__x86_asm64_syscall_hopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-.section .text.x86.asm64_syscall.hop
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hop)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xfffffffffffffffe
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_hop)
-	call   sys_hop
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET64
-	.cfi_endproc
-END(__x86_asm64_syscall_hop)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
@@ -26139,58 +26078,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	.cfi_endproc
 END(__x86_asm32_int80_readf)
 
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm32_syscall_int80.hopf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffffe
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_hopf)
-	call   sys32_hopf
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_hopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-.section .text.x86.asm32_syscall_int80.hop
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffff
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	EXTERN(sys32_hop)
-	call   sys32_hop
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_hop)
-
 
 
 
@@ -30793,12 +30680,6 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writef, __x86_asm32_int80_writef)
  * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readf, __x86_asm32_int80_readf)
-
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hopf, __x86_asm32_int80_hopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hop, __x86_asm32_int80_hop)
 
 
 
@@ -37165,31 +37046,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readf)
 	jmp    sys32_readf
 	.cfi_endproc
 END(__x86_asm32_sysrun32_readf)
-
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm32_syscall_sysrun32.hopf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hopf)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_hopf)
-	jmp    sys32_hopf
-	.cfi_endproc
-END(__x86_asm32_sysrun32_hopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-.section .text.x86.asm32_syscall_sysrun32.hop
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hop)
-	.cfi_startproc
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_hop)
-	jmp    sys32_hop
-	.cfi_endproc
-END(__x86_asm32_sysrun32_hop)
 
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_WRAPPERS64_S */

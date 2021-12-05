@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3405fe60 */
+/* HASH CRC-32:0x9420e62d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -572,7 +572,7 @@ __TSYSCALL0_TABLE_END(0x0, 0x1b7, 0x1b8, 0x0, 0x1b7, 0x1b8)
 /************************************************************************/
 /* Contents of the 2nd table                                            */
 /************************************************************************/
-__TSYSCALL1_TABLE_BEGIN(0xfffffeb2, 0xffffffff, 0x14e, 0xfffffeb2, 0xffffffff, 0x14e)
+__TSYSCALL1_TABLE_BEGIN(0xfffffeb2, 0xffffffff, 0x14e, 0xfffffeb2, 0xfffffffd, 0x14c)
 __TSYSCALL1(pwritevf, 0x0, 0x0)
 __TSYSCALL1(preadvf, 0x1, 0x1)
 __TSYSCALL1_UNUSED(0xfffffeb4, 0x2, 0x2)
@@ -905,9 +905,9 @@ __TSYSCALL1(getdrives, 0x148, 0x148)
 __TSYSCALL1(detach, 0x149, 0x149)
 __TSYSCALL1(writef, 0x14a, 0x14a)
 __TSYSCALL1(readf, 0x14b, 0x14b)
-__TSYSCALL1(hopf, 0x14c, 0x14c)
-__TSYSCALL1(hop, 0x14d, 0x14d)
-__TSYSCALL1_TABLE_END(0xfffffeb2, 0xffffffff, 0x14e, 0xfffffeb2, 0xffffffff, 0x14e)
+__TSYSCALL1_UNUSED_TRAILING(0xfffffffe, 0x14c, 0x14c, 0x0)
+__TSYSCALL1_UNUSED_TRAILING(0xffffffff, 0x14d, 0x14d, 0x1)
+__TSYSCALL1_TABLE_END(0xfffffeb2, 0xffffffff, 0x14e, 0xfffffeb2, 0xfffffffd, 0x14c)
 
 #undef __TSYSCALL1_TABLE_END
 #undef __TSYSCALL1_TABLE_BEGIN

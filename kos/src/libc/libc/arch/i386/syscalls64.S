@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ec7a1d1 */
+/* HASH CRC-32:0x73aca389 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4237,23 +4237,6 @@ INTERN_FUNCTION(libc_sys_kstat)
 	ret
 END(libc_sys_kstat)
 DEFINE_PUBLIC_ALIAS(sys_kstat, libc_sys_kstat)
-
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-INTERN_FUNCTION(libc_sys_hopf)
-	movq   $(0xfffffffffffffffd), %rax
-	movq   %rcx, %r10
-	syscall
-	ret
-END(libc_sys_hopf)
-DEFINE_PUBLIC_ALIAS(sys_hopf, libc_sys_hopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-INTERN_FUNCTION(libc_sys_hop)
-	movq   $(0xfffffffffffffffe), %rax
-	syscall
-	ret
-END(libc_sys_hop)
-DEFINE_PUBLIC_ALIAS(sys_hop, libc_sys_hop)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
@@ -9244,27 +9227,6 @@ INTERN_FUNCTION(libc_sys_Xkstat)
 	ret
 END(libc_sys_Xkstat)
 DEFINE_PUBLIC_ALIAS(sys_Xkstat, libc_sys_Xkstat)
-
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-INTERN_FUNCTION(libc_sys_Xhopf)
-	movq   $(0xfffffffffffffffd), %rax
-	movq   %rcx, %r10
-	std /* Enable exceptions */
-	syscall
-	cld /* Disable exceptions */
-	ret
-END(libc_sys_Xhopf)
-DEFINE_PUBLIC_ALIAS(sys_Xhopf, libc_sys_Xhopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-INTERN_FUNCTION(libc_sys_Xhop)
-	movq   $(0xfffffffffffffffe), %rax
-	std /* Enable exceptions */
-	syscall
-	cld /* Disable exceptions */
-	ret
-END(libc_sys_Xhop)
-DEFINE_PUBLIC_ALIAS(sys_Xhop, libc_sys_Xhop)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as

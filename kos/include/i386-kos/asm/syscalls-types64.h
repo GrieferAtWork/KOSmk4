@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb514f5c6 */
+/* HASH CRC-32:0x9f80dbda */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,8 +61,6 @@
 #define HAVE_SC_REPR_GETRUSAGE_WHO
 #define HAVE_SC_REPR_GID_T
 #define HAVE_SC_REPR_GID_VECTOR
-#define HAVE_SC_REPR_HOP_ARG
-#define HAVE_SC_REPR_HOP_COMMAND
 #define HAVE_SC_REPR_IDTYPE_T
 #define HAVE_SC_REPR_ID_T
 #define HAVE_SC_REPR_INT
@@ -216,8 +214,6 @@ __SYSCALL_REPR(SC_REPR_GETRANDOM_FLAGS)
 __SYSCALL_REPR(SC_REPR_GETRUSAGE_WHO)
 __SYSCALL_REPR(SC_REPR_GID_T)
 __SYSCALL_REPR(SC_REPR_GID_VECTOR)
-__SYSCALL_REPR(SC_REPR_HOP_ARG)
-__SYSCALL_REPR(SC_REPR_HOP_COMMAND)
 __SYSCALL_REPR(SC_REPR_IDTYPE_T)
 __SYSCALL_REPR(SC_REPR_ID_T)
 __SYSCALL_REPR(SC_REPR_INT)

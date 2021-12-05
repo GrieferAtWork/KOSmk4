@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecc9a0bf */
+/* HASH CRC-32:0x863213d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1152,13 +1152,6 @@
 #define __NR32AN1_readf                        buf
 #define __NR32AN2_readf                        bufsize
 #define __NR32AN3_readf                        mode
-#define __NR32AN0_hopf                         fd
-#define __NR32AN1_hopf                         command
-#define __NR32AN2_hopf                         mode
-#define __NR32AN3_hopf                         arg
-#define __NR32AN0_hop                          fd
-#define __NR32AN1_hop                          command
-#define __NR32AN2_hop                          arg
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES */
 #endif /* __WANT_SYSCALL_ARGUMENT_NAMES */
 
@@ -2904,17 +2897,6 @@
 #define __NR32ATR2_readf                        SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32ATR3_readf                        SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NR32RTR_readf                         SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_hopf                         SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_hopf                         SC_REPR_HOP_COMMAND                                                  /* command */ 
-#define __NR32ATR2_hopf                         SC_REPR_IOMODE_T                                                     /* mode */ 
-#define __NR32ATR3_hopf                         SC_REPR_HOP_ARG                                                      /* arg */ 
-#define __NR32ATL3_hopf                         1                                                                    /* arg -> command */ 
-#define __NR32RTR_hopf                          SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_hop                          SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_hop                          SC_REPR_HOP_COMMAND                                                  /* command */ 
-#define __NR32ATR2_hop                          SC_REPR_HOP_ARG                                                      /* arg */ 
-#define __NR32ATL2_hop                          1                                                                    /* arg -> command */ 
-#define __NR32RTR_hop                           SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT */
 #endif /* __WANT_SYSCALL_ARGUMENT_FORMAT */
 

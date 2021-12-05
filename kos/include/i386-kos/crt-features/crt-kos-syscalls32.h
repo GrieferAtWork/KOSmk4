@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9769516 */
+/* HASH CRC-32:0xf83dc831 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,8 +172,6 @@
 #define __CRT_HAVE_sys_getuid32
 #define __CRT_HAVE_sys_getxattr
 #define __CRT_HAVE_sys_gtty
-#define __CRT_HAVE_sys_hop
-#define __CRT_HAVE_sys_hopf
 #define __CRT_HAVE_sys_idle
 #define __CRT_HAVE_sys_init_module
 #define __CRT_HAVE_sys_inotify_add_watch
@@ -664,8 +662,6 @@
 #define __CRT_HAVE_sys_Xgetuid32
 #define __CRT_HAVE_sys_Xgetxattr
 #define __CRT_HAVE_sys_Xgtty
-#define __CRT_HAVE_sys_Xhop
-#define __CRT_HAVE_sys_Xhopf
 #define __CRT_HAVE_sys_Xidle
 #define __CRT_HAVE_sys_Xinit_module
 #define __CRT_HAVE_sys_Xinotify_add_watch

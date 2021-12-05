@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a9b24cc */
+/* HASH CRC-32:0x59f9fb71 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -528,8 +528,6 @@
 #define __NRAC_detach                       1
 #define __NRAC_writef                       4
 #define __NRAC_readf                        4
-#define __NRAC_hopf                         4
-#define __NRAC_hop                          3
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT */
 #endif /* __WANT_SYSCALL_ARGUMENT_COUNT */
 
@@ -1030,8 +1028,6 @@
 #define __NRRT_detach                       (errno_t, __errno_t)
 #define __NRRT_writef                       (ssize_t, __ssize_t)
 #define __NRRT_readf                        (ssize_t, __ssize_t)
-#define __NRRT_hopf                         (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_hop                          (syscall_slong_t, __syscall_slong_t)
 #endif /* !__NRFEAT_DEFINED_SYSCALL_RETURN_TYPES */
 #endif /* __WANT_SYSCALL_RETURN_TYPES */
 
@@ -2168,13 +2164,6 @@
 #define __NRAT1_readf                        (void *, void *)
 #define __NRAT2_readf                        (size_t, __size_t)
 #define __NRAT3_readf                        (iomode_t, __iomode_t)
-#define __NRAT0_hopf                         (fd_t, __fd_t)
-#define __NRAT1_hopf                         (ioctl_t, __ioctl_t)
-#define __NRAT2_hopf                         (iomode_t, __iomode_t)
-#define __NRAT3_hopf                         (void *, void *)
-#define __NRAT0_hop                          (fd_t, __fd_t)
-#define __NRAT1_hop                          (ioctl_t, __ioctl_t)
-#define __NRAT2_hop                          (void *, void *)
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
 #endif /* __WANT_SYSCALL_ARGUMENT_TYPES */
 
@@ -2675,8 +2664,6 @@
 #define __NRAM_detach(a, b, c, d, e, f)                       (__pid_t)a
 #define __NRAM_writef(a, b, c, d, e, f)                       (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #define __NRAM_readf(a, b, c, d, e, f)                        (__fd_t)a, (void *)b, (__size_t)c, (__iomode_t)d
-#define __NRAM_hopf(a, b, c, d, e, f)                         (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
-#define __NRAM_hop(a, b, c, d, e, f)                          (__fd_t)a, (__ioctl_t)b, (void *)c
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */
 
@@ -3177,8 +3164,6 @@
 #define __NRAP_detach(a)                                      (__syscall_ulong_t)a
 #define __NRAP_writef(a, b, c, d)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_readf(a, b, c, d)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_hopf(a, b, c, d)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_hop(a, b, c)                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_PACKER */
 

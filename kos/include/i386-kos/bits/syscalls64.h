@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6f43fa0 */
+/* HASH CRC-32:0x271041b9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1385,8 +1385,6 @@
 #define SYS_klstat                   __NR_klstat                   /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 #define SYS_kfstat                   __NR_kfstat                   /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
 #define SYS_kstat                    __NR_kstat                    /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
-#define SYS_hopf                     __NR_hopf                     /* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-#define SYS_hop                      __NR_hop                      /* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
  * possible at the time the call was made, and throw `E_WOULDBLOCK' if

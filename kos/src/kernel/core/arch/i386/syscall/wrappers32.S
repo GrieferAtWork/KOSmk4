@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29c8404f */
+/* HASH CRC-32:0x8c43347c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19458,82 +19458,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_readf)
-
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm32_syscall_int80.hopf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffffe
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_hopf)
-	call   sys_hopf
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_hopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-.section .text.x86.asm32_syscall_int80.hop
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffff
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_hop)
-	call   sys_hop
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_hop)
 
 
 
@@ -39087,82 +39011,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readf)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_readf)
-
-/* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm32_syscall_sysenter.hopf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_hopf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffffe
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_hopf)
-	call   sys_hopf
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_hopf)
-
-/* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
-.section .text.x86.asm32_syscall_sysenter.hop
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_hop)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffff
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_hop)
-	call   sys_hop
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_hop)
 
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_WRAPPERS32_S */

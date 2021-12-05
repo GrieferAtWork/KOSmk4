@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23d2e6b8 */
+/* HASH CRC-32:0x6a878c2a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,8 +142,6 @@
 #define __CRT_HAVE_sys_gettimeofday
 #define __CRT_HAVE_sys_getuid
 #define __CRT_HAVE_sys_getxattr
-#define __CRT_HAVE_sys_hop
-#define __CRT_HAVE_sys_hopf
 #define __CRT_HAVE_sys_init_module
 #define __CRT_HAVE_sys_inotify_add_watch
 #define __CRT_HAVE_sys_inotify_init
@@ -539,8 +537,6 @@
 #define __CRT_HAVE_sys_Xgettimeofday
 #define __CRT_HAVE_sys_Xgetuid
 #define __CRT_HAVE_sys_Xgetxattr
-#define __CRT_HAVE_sys_Xhop
-#define __CRT_HAVE_sys_Xhopf
 #define __CRT_HAVE_sys_Xinit_module
 #define __CRT_HAVE_sys_Xinotify_add_watch
 #define __CRT_HAVE_sys_Xinotify_init

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f6a7693 */
+/* HASH CRC-32:0xcfda745f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1382,8 +1382,6 @@
 #define __NR_klstat                   __UINT64_C(0xfffffffffffffffa) /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 #define __NR_kfstat                   __UINT64_C(0xfffffffffffffffb) /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
 #define __NR_kstat                    __UINT64_C(0xfffffffffffffffc) /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
-#define __NR_hopf                     __UINT64_C(0xfffffffffffffffd) /* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-#define __NR_hop                      __UINT64_C(0xfffffffffffffffe) /* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
  * possible at the time the call was made, and throw `E_WOULDBLOCK' if
@@ -1824,8 +1822,6 @@
 #define __NRRM_klstat                   0
 #define __NRRM_kfstat                   0
 #define __NRRM_kstat                    0
-#define __NRRM_hopf                     0
-#define __NRRM_hop                      0
 #define __NRRM_writef                   0
 #endif /* !__NRFEAT_DEFINED_SYSCALL_RESTART_MODES */
 #endif /* __WANT_SYSCALL_RESTART_MODES */
@@ -1973,8 +1969,6 @@
 #define __NRCP_klstat
 #define __NRCP_kfstat
 #define __NRCP_kstat
-#define __NRCP_hopf
-#define __NRCP_hop
 #define __NRCP_writef
 #endif /* !__NRFEAT_DEFINED_SYSCALL_CANCELLATION_POINTS */
 #endif /* __WANT_SYSCALL_CANCELLATION_POINTS */
@@ -2382,8 +2376,6 @@
 #define __NRRC_klstat                   2
 #define __NRRC_kfstat                   2
 #define __NRRC_kstat                    2
-#define __NRRC_hopf                     4
-#define __NRRC_hop                      3
 #define __NRRC_writef                   4
 #endif /* !__NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT */
 #endif /* __WANT_SYSCALL_REGISTER_COUNT */

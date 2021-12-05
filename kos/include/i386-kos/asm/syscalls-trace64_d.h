@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8933e8a5 */
+/* HASH CRC-32:0x1ea0e4be */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -938,13 +938,6 @@
 #define __NR64AN1_kfstat                   statbuf
 #define __NR64AN0_kstat                    filename
 #define __NR64AN1_kstat                    statbuf
-#define __NR64AN0_hopf                     fd
-#define __NR64AN1_hopf                     command
-#define __NR64AN2_hopf                     mode
-#define __NR64AN3_hopf                     arg
-#define __NR64AN0_hop                      fd
-#define __NR64AN1_hop                      command
-#define __NR64AN2_hop                      arg
 #define __NR64AN0_writef                   fd
 #define __NR64AN1_writef                   buf
 #define __NR64AN2_writef                   bufsize
@@ -2365,17 +2358,6 @@
 #define __NR64ATR0_kstat                    SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR64ATR1_kstat                    SC_REPR_POINTER                                                      /* statbuf */ 
 #define __NR64RTR_kstat                     SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_hopf                     SC_REPR_FD_T                                                         /* fd */ 
-#define __NR64ATR1_hopf                     SC_REPR_HOP_COMMAND                                                  /* command */ 
-#define __NR64ATR2_hopf                     SC_REPR_IOMODE_T                                                     /* mode */ 
-#define __NR64ATR3_hopf                     SC_REPR_HOP_ARG                                                      /* arg */ 
-#define __NR64ATL3_hopf                     1                                                                    /* arg -> command */ 
-#define __NR64RTR_hopf                      SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR64ATR0_hop                      SC_REPR_FD_T                                                         /* fd */ 
-#define __NR64ATR1_hop                      SC_REPR_HOP_COMMAND                                                  /* command */ 
-#define __NR64ATR2_hop                      SC_REPR_HOP_ARG                                                      /* arg */ 
-#define __NR64ATL2_hop                      1                                                                    /* arg -> command */ 
-#define __NR64RTR_hop                       SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR64ATR0_writef                   SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR1_writef                   SC_REPR_BUFFER                                                       /* buf */ 
 #define __NR64ATL1_writef                   2                                                                    /* buf -> bufsize */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bec31a6 */
+/* HASH CRC-32:0x1ab24732 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1152,13 +1152,6 @@
 #define __NRAN1_readf                        buf
 #define __NRAN2_readf                        bufsize
 #define __NRAN3_readf                        mode
-#define __NRAN0_hopf                         fd
-#define __NRAN1_hopf                         command
-#define __NRAN2_hopf                         mode
-#define __NRAN3_hopf                         arg
-#define __NRAN0_hop                          fd
-#define __NRAN1_hop                          command
-#define __NRAN2_hop                          arg
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES */
 #endif /* __WANT_SYSCALL_ARGUMENT_NAMES */
 
@@ -2904,17 +2897,6 @@
 #define __NRATR2_readf                        SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NRATR3_readf                        SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NRRTR_readf                         SC_REPR_SSIZE_T                                                      /* return */
-#define __NRATR0_hopf                         SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_hopf                         SC_REPR_HOP_COMMAND                                                  /* command */ 
-#define __NRATR2_hopf                         SC_REPR_IOMODE_T                                                     /* mode */ 
-#define __NRATR3_hopf                         SC_REPR_HOP_ARG                                                      /* arg */ 
-#define __NRATL3_hopf                         1                                                                    /* arg -> command */ 
-#define __NRRTR_hopf                          SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NRATR0_hop                          SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_hop                          SC_REPR_HOP_COMMAND                                                  /* command */ 
-#define __NRATR2_hop                          SC_REPR_HOP_ARG                                                      /* arg */ 
-#define __NRATL2_hop                          1                                                                    /* arg -> command */ 
-#define __NRRTR_hop                           SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT */
 #endif /* __WANT_SYSCALL_ARGUMENT_FORMAT */
 

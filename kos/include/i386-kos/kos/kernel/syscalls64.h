@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80ea83c6 */
+/* HASH CRC-32:0xaa8c245f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,8 +143,6 @@
 #define __ARCH_WANT_SYSCALL_GETTIMEOFDAY
 #define __ARCH_WANT_SYSCALL_GETUID
 #define __ARCH_WANT_SYSCALL_GETXATTR
-#define __ARCH_WANT_SYSCALL_HOP
-#define __ARCH_WANT_SYSCALL_HOPF
 #define __ARCH_WANT_SYSCALL_INIT_MODULE
 #define __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH
 #define __ARCH_WANT_SYSCALL_INOTIFY_INIT

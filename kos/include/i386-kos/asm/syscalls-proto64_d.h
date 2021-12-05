@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x466f6098 */
+/* HASH CRC-32:0xff733adf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -432,8 +432,6 @@
 #define __NR64AC_klstat                   2
 #define __NR64AC_kfstat                   2
 #define __NR64AC_kstat                    2
-#define __NR64AC_hopf                     4
-#define __NR64AC_hop                      3
 #define __NR64AC_writef                   4
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT */
 #endif /* __WANT_SYSCALL_ARGUMENT_COUNT */
@@ -839,8 +837,6 @@
 #define __NR64RT_klstat                   (errno_t, __errno_t)
 #define __NR64RT_kfstat                   (errno_t, __errno_t)
 #define __NR64RT_kstat                    (errno_t, __errno_t)
-#define __NR64RT_hopf                     (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_hop                      (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_writef                   (ssize_t, __ssize_t)
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_RETURN_TYPES */
 #endif /* __WANT_SYSCALL_RETURN_TYPES */
@@ -1764,13 +1760,6 @@
 #define __NR64AT1_kfstat                   (struct __kos_statx64 *, struct __kos_statx64 *)
 #define __NR64AT0_kstat                    (char const *, char const *)
 #define __NR64AT1_kstat                    (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NR64AT0_hopf                     (fd_t, __fd_t)
-#define __NR64AT1_hopf                     (ioctl_t, __ioctl_t)
-#define __NR64AT2_hopf                     (iomode_t, __iomode_t)
-#define __NR64AT3_hopf                     (void *, void *)
-#define __NR64AT0_hop                      (fd_t, __fd_t)
-#define __NR64AT1_hop                      (ioctl_t, __ioctl_t)
-#define __NR64AT2_hop                      (void *, void *)
 #define __NR64AT0_writef                   (fd_t, __fd_t)
 #define __NR64AT1_writef                   (void const *, void const *)
 #define __NR64AT2_writef                   (size_t, __size_t)
@@ -2179,8 +2168,6 @@
 #define __NR64AM_klstat(a, b, c, d, e, f)                   (char const *)a, (struct __kos_statx64 *)b
 #define __NR64AM_kfstat(a, b, c, d, e, f)                   (__fd_t)a, (struct __kos_statx64 *)b
 #define __NR64AM_kstat(a, b, c, d, e, f)                    (char const *)a, (struct __kos_statx64 *)b
-#define __NR64AM_hopf(a, b, c, d, e, f)                     (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
-#define __NR64AM_hop(a, b, c, d, e, f)                      (__fd_t)a, (__ioctl_t)b, (void *)c
 #define __NR64AM_writef(a, b, c, d, e, f)                   (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */
@@ -2586,8 +2573,6 @@
 #define __NR64AP_klstat(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_kfstat(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_kstat(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_hopf(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_hop(a, b, c)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_writef(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_PACKER */

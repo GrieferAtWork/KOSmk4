@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35f8c689 */
+/* HASH CRC-32:0xb25c5cf2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1547,7 +1547,5 @@
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 #define SYS_readf                        __NR_readf                        /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-#define SYS_hopf                         __NR_hopf                         /* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-#define SYS_hop                          __NR_hop                          /* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 
 #endif /* !_I386_KOS_BITS_SYSCALLS32_H */

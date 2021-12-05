@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae8e5caa */
+/* HASH CRC-32:0xcad6f801 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -993,12 +993,6 @@ __CDECLARE_SC(,__ssize_t,getxattr,(char const *__path, char const *__name, void 
 #if __CRT_HAVE_SC(gtty)
 __CDECLARE_SC(,__errno_t,gtty,(void),())
 #endif /* __CRT_HAVE_SC(gtty) */
-#if __CRT_HAVE_SC(hop)
-__CDECLARE_SC(,__syscall_slong_t,hop,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
-#endif /* __CRT_HAVE_SC(hop) */
-#if __CRT_HAVE_SC(hopf)
-__CDECLARE_SC(,__syscall_slong_t,hopf,(__fd_t __fd, __ioctl_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
-#endif /* __CRT_HAVE_SC(hopf) */
 #if __CRT_HAVE_SC(idle)
 __CDECLARE_SC(,__errno_t,idle,(void),())
 #endif /* __CRT_HAVE_SC(idle) */
@@ -3500,12 +3494,6 @@ __CDECLARE_XSC(,__ssize_t,getxattr,(char const *__path, char const *__name, void
 #if __CRT_HAVE_XSC(gtty)
 __CDECLARE_XSC(,__errno_t,gtty,(void),())
 #endif /* __CRT_HAVE_XSC(gtty) */
-#if __CRT_HAVE_XSC(hop)
-__CDECLARE_XSC(,__syscall_slong_t,hop,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
-#endif /* __CRT_HAVE_XSC(hop) */
-#if __CRT_HAVE_XSC(hopf)
-__CDECLARE_XSC(,__syscall_slong_t,hopf,(__fd_t __fd, __ioctl_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
-#endif /* __CRT_HAVE_XSC(hopf) */
 #if __CRT_HAVE_XSC(idle)
 __CDECLARE_XSC(,__errno_t,idle,(void),())
 #endif /* __CRT_HAVE_XSC(idle) */

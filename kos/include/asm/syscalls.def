@@ -619,8 +619,6 @@ dup3:(fd_t oldfd, fd_t newfd, [tostr(OFLAG__CLOEXEC__CLOFORK)] oflag_t flags) ->
 
 [cp] ioctl:(fd_t fd, [tostr(IOCTL_COMMAND)] ioctl_t command, [tostr(IOCTL_ARG:command)] void *arg) -> syscall_slong_t;
 [cp] ioctlf:(fd_t fd, [tostr(IOCTL_COMMAND)] ioctl_t command, iomode_t mode, [tostr(IOCTL_ARG:command)] void *arg) -> syscall_slong_t;
-[cp] hop:(fd_t fd, [tostr(HOP_COMMAND)] ioctl_t command, [tostr(HOP_ARG:command)] void *arg) -> syscall_slong_t;
-[cp] hopf:(fd_t fd, [tostr(HOP_COMMAND)] ioctl_t command, iomode_t mode, [tostr(HOP_ARG:command)] void *arg) -> syscall_slong_t;
 [cp] fcntl:(fd_t fd, [tostr(FCNTL_COMMAND)] fcntl_t command, [tostr(FCNTL_ARG:command)] void *arg) -> syscall_slong_t;
 [cp] fcntl64:(fd_t fd, [tostr(FCNTL64_COMMAND)] fcntl_t command, [tostr(FCNTL64_ARG:command)] void *arg) -> syscall_slong_t; /* UNIMPLEMENTED! */
 [cp] flock:(fd_t fd, syscall_ulong_t operation) -> errno_t; /* UNIMPLEMENTED! */

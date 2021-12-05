@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a219d69 */
+/* HASH CRC-32:0x6c5c4297 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -897,12 +897,6 @@ __CDECLARE_SC(,__uid_t,getuid,(void),())
 #if __CRT_HAVE_SC(getxattr)
 __CDECLARE_SC(,__ssize_t,getxattr,(char const *__path, char const *__name, void *__buf, __size_t __bufsize),(__path,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_SC(getxattr) */
-#if __CRT_HAVE_SC(hop)
-__CDECLARE_SC(,__syscall_slong_t,hop,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
-#endif /* __CRT_HAVE_SC(hop) */
-#if __CRT_HAVE_SC(hopf)
-__CDECLARE_SC(,__syscall_slong_t,hopf,(__fd_t __fd, __ioctl_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
-#endif /* __CRT_HAVE_SC(hopf) */
 #if __CRT_HAVE_SC(init_module)
 /* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
  * This system call exists for linux compatibility, and is implemented
@@ -3059,12 +3053,6 @@ __CDECLARE_XSC(,__uid_t,getuid,(void),())
 #if __CRT_HAVE_XSC(getxattr)
 __CDECLARE_XSC(,__ssize_t,getxattr,(char const *__path, char const *__name, void *__buf, __size_t __bufsize),(__path,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_XSC(getxattr) */
-#if __CRT_HAVE_XSC(hop)
-__CDECLARE_XSC(,__syscall_slong_t,hop,(__fd_t __fd, __ioctl_t __command, void *__arg),(__fd,__command,__arg))
-#endif /* __CRT_HAVE_XSC(hop) */
-#if __CRT_HAVE_XSC(hopf)
-__CDECLARE_XSC(,__syscall_slong_t,hopf,(__fd_t __fd, __ioctl_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
-#endif /* __CRT_HAVE_XSC(hopf) */
 #if __CRT_HAVE_XSC(init_module)
 /* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
  * This system call exists for linux compatibility, and is implemented

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa260ab6b */
+/* HASH CRC-32:0x2fc93b50 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1382,8 +1382,6 @@
 #define __NR64_klstat                   __UINT64_C(0xfffffffffffffffa) /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 #define __NR64_kfstat                   __UINT64_C(0xfffffffffffffffb) /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
 #define __NR64_kstat                    __UINT64_C(0xfffffffffffffffc) /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
-#define __NR64_hopf                     __UINT64_C(0xfffffffffffffffd) /* syscall_slong_t hopf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-#define __NR64_hop                      __UINT64_C(0xfffffffffffffffe) /* syscall_slong_t hop(fd_t fd, ioctl_t command, void *arg) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
  * possible at the time the call was made, and throw `E_WOULDBLOCK' if
@@ -1824,8 +1822,6 @@
 #define __NR64RM_klstat                   0
 #define __NR64RM_kfstat                   0
 #define __NR64RM_kstat                    0
-#define __NR64RM_hopf                     0
-#define __NR64RM_hop                      0
 #define __NR64RM_writef                   0
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_RESTART_MODES */
 #endif /* __WANT_SYSCALL_RESTART_MODES */
@@ -1973,8 +1969,6 @@
 #define __NR64CP_klstat
 #define __NR64CP_kfstat
 #define __NR64CP_kstat
-#define __NR64CP_hopf
-#define __NR64CP_hop
 #define __NR64CP_writef
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS */
 #endif /* __WANT_SYSCALL_CANCELLATION_POINTS */
@@ -2382,8 +2376,6 @@
 #define __NR64RC_klstat                   2
 #define __NR64RC_kfstat                   2
 #define __NR64RC_kstat                    2
-#define __NR64RC_hopf                     4
-#define __NR64RC_hop                      3
 #define __NR64RC_writef                   4
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_REGISTER_COUNT */
 #endif /* __WANT_SYSCALL_REGISTER_COUNT */

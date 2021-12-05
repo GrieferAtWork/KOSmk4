@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x955b0e8a */
+/* HASH CRC-32:0x29f283f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,8 +173,6 @@
 #define __ARCH_WANT_SYSCALL_GETUID32
 #define __ARCH_WANT_SYSCALL_GETXATTR
 #define __ARCH_WANT_SYSCALL_GTTY
-#define __ARCH_WANT_SYSCALL_HOP
-#define __ARCH_WANT_SYSCALL_HOPF
 #define __ARCH_WANT_SYSCALL_IDLE
 #define __ARCH_WANT_SYSCALL_INIT_MODULE
 #define __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH
