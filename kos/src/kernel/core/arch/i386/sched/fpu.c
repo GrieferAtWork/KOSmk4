@@ -40,6 +40,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
+#include <asm/redirect.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state-helpers.h>
@@ -100,7 +101,6 @@ clone_fpustate(struct task *__restrict new_thread, uintptr_t UNUSED(flags)) {
 
 PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct fpustate *KCALL
 fpustate_alloc_noinit(void) {
-	/* TODO: Slab-style cache */
 	return (struct fpustate *)kmemalign(ALIGNOF_FPUSTATE,
 	                                    SIZEOF_FPUSTATE,
 	                                    FPU_GFP);
@@ -109,7 +109,6 @@ fpustate_alloc_noinit(void) {
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct fpustate *KCALL
 fpustate_alloc(void) {
 	struct fpustate *result;
-	/* TODO: Slab-style cache */
 	result = (struct fpustate *)kmemalign(ALIGNOF_FPUSTATE,
 	                                      SIZEOF_FPUSTATE,
 	                                      FPU_GFP | GFP_CALLOC);
@@ -120,7 +119,6 @@ fpustate_alloc(void) {
 PUBLIC ATTR_MALLOC WUNUSED struct fpustate *
 NOTHROW(KCALL fpustate_alloc_nx)(void) {
 	struct fpustate *result;
-	/* TODO: Slab-style cache */
 	result = (struct fpustate *)kmemalign_nx(ALIGNOF_FPUSTATE,
 	                                         SIZEOF_FPUSTATE,
 	                                         FPU_GFP | GFP_CALLOC);
@@ -128,20 +126,19 @@ NOTHROW(KCALL fpustate_alloc_nx)(void) {
 		x86_fpustate_init(result);
 	return result;
 }
-PUBLIC NOBLOCK void
+
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict self) {
-	/* TODO: Slab-style cache */
 	kfree(self);
 }
 
 
 
 /* Ensure that `this_fpustate' has been allocated, allocating
- * and   initializing   it   now   if   it   hasn't  already. */
+ * and initializing it now if that hasn't been done  already. */
 PUBLIC void KCALL fpustate_init(void) THROWS(E_BADALLOC) {
-	if (PERTASK_TEST(this_fpustate))
-		return;
-	PERTASK_SET(this_fpustate, fpustate_alloc());
+	if (!PERTASK_TEST(this_fpustate))
+		PERTASK_SET(this_fpustate, fpustate_alloc());
 }
 
 PUBLIC WUNUSED bool NOTHROW(KCALL fpustate_init_nx)(void) {
@@ -187,17 +184,20 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
 PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void) {
 	pflag_t was;
 	struct task *holder;
-	was = PREEMPTION_PUSHOFF();
+	was    = PREEMPTION_PUSHOFF();
 	holder = PERCPU(thiscpu_fputhread);
 	if (holder) {
 		assert(!wasdestroyed(holder));
 		__clts();
+
 		/* The FPU state was changed. */
 		assertf(FORTASK(holder, this_fpustate),
 		        "This should have been allocated the first time thread %p used the FPU",
 		        holder);
+
 		/* Save the context */
 		x86_fpustate_save(FORTASK(holder, this_fpustate));
+
 		/* Disable FPU access (so-as to lazily re-load it
 		 * the next time an  access is made by  `holder') */
 		__wrcr0(__rdcr0() | CR0_TS);
@@ -339,24 +339,28 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 			 * if  at  some  point  it  needs  to  do  something  that  may  block. */
 			if (state->ics_irregs.ir_Pflags & EFLAGS_IF)
 				__sti();
+
 			/* Lazily allocate a new state upon first access.
 			 * NOTE: If this causes an exception, that exception
 			 *       will   be    propagated   to    user-space. */
 			mystate = fpustate_alloc();
 			__cli();
 			PERTASK_SET(this_fpustate, mystate);
+
 			/* Because we (may) had interrupts enabled again, we must re-read
 			 * the currently active FPU task again, as it may have changed in
 			 * the mean time. */
 			COMPILER_READ_BARRIER();
 			old_task = PERCPU(thiscpu_fputhread);
 		}
+
 		__clts();
 		if (old_task) {
 			/* Save the current state within the old context holder. */
 			assert(FORTASK(old_task, this_fpustate));
 			x86_fpustate_save(FORTASK(old_task, this_fpustate));
 		}
+
 		/* Load the new FPU state */
 		TRY {
 			x86_fpustate_load(mystate);
@@ -413,12 +417,6 @@ PRIVATE ATTR_FREERODATA byte_t const savexmm_nosse[] = {
 	0xc3                                           /* ret                                        */
 };
 
-PRIVATE ATTR_FREETEXT void KCALL
-inject_jmp(void *addr, void const *dst) {
-	*(byte_t *)addr = 0xe9;
-	*((s32 *)((byte_t *)addr + 1)) = (s32)((intptr_t)dst - ((intptr_t)addr + 5));
-}
-
 INTERN ATTR_FREEBSS bool x86_config_nofpu = false;
 DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_config_nofpu,
                                             KERNEL_COMMANDLINE_OPTION_TYPE_BOOL,
@@ -451,6 +449,7 @@ setup_fpu_emulation:
 		 *       recurse into itself... */
 		return;
 	}
+
 	/* Check for the existence of an FPU. */
 	cr0 = __rdcr0() & ~(CR0_EM | CR0_TS);
 	if (!X86_HAVE_FPU) {
@@ -499,10 +498,12 @@ setup_fpu_emulation:
 				fst.fx_mxcsr_mask = 0x0000ffbf;
 			x86_fxsave_mxcsr_mask_ = fst.fx_mxcsr_mask;
 		}
+
 		/* Mask the default MXCSR value with what is actually available */
 		x86_fpustate_init_mxcsr_value &= x86_fxsave_mxcsr_mask_;
 		printk(FREESTR(KERN_INFO "[fpu] Enable native fxsave/fxrstor support [mxcsr_mask=%#I32x]\n"),
 		       x86_fxsave_mxcsr_mask_);
+
 		/* The FXSAVE variants version of FTW works differently: a 0-bit means an empty register,
 		 * and  a 1-bit means a used register, whereas  FSAVE assigns 2 bits per register, with 3
 		 * meaning empty, and 0-2 meaning used, potentially with special values. */
@@ -520,9 +521,9 @@ setup_fpu_emulation:
 	} else {
 		if (X86_HAVE_SSE) {
 			/* x86_fxsave_mxcsr_mask_ = 0x0000ffbf; // Already the default */
-			inject_jmp((void *)&x86_fpustate_load, (void const *)&x86_fxrstor);
-			inject_jmp((void *)&x86_fpustate_save, (void const *)&x86_fxsave);
-			inject_jmp((void *)&x86_fpustate_save_noreset, (void const *)&x86_fxsave);
+			__arch_redirect((void *)&x86_fpustate_load, (void const *)&x86_fxrstor);
+			__arch_redirect((void *)&x86_fpustate_save, (void const *)&x86_fxsave);
+			__arch_redirect((void *)&x86_fpustate_save_noreset, (void const *)&x86_fxsave);
 			printk(FREESTR(KERN_INFO "[fpu] Enable #XF exception support\n"));
 			__wrcr4(__rdcr4() | CR4_OSXMMEXCPT);
 		} else {
@@ -563,6 +564,7 @@ setup_fpu_emulation:
 			x86_fpustate_init_mxcsr[0] = 0xc3; /* ret */
 		}
 	}
+
 	/* Set the TS bit because while the FPU is now initialized, `thiscpu_fputhread'
 	 * isn't   actually   set  to   anything,   much  less   the   calling  thread. */
 	__wrcr0(cr0 | CR0_TS);

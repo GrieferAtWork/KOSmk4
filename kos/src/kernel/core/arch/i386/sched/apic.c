@@ -242,9 +242,11 @@ NOTHROW(KCALL mnode_destory_locked_ram)(struct mnode *__restrict self) {
 	assert(self->mn_link.le_prev == &self->mn_part->mp_share.lh_first);
 	assert(self->mn_link.le_next == NULL);
 	assert(self->mn_part->mp_share.lh_first == self);
+
 	/* Clear out the SREFS field, as `mpart_destroy()'
 	 * will  cause  panic  if that  field  is non-NULL */
 	self->mn_part->mp_share.lh_first = NULL;
+
 	/* Drop references and free the node descriptor. */
 	decref_likely(self->mn_part);
 	kfree(self);
@@ -320,6 +322,7 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 		mnode_destory_locked_ram(cpu_node1);
 		RETHROW();
 	}
+
 	/* Fill in address ranges for CPU nodes. */
 	cpu_node1->mn_minaddr = cpu_baseaddr;
 	cpu_node1->mn_maxaddr = cpu_baseaddr + (size_t)__x86_cpu_part1_bytes - 1;
@@ -398,6 +401,7 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	cpu_baseaddr = (byte_t *)self;
 	mman_lock_write(&mman_kernel); /* Never throws due to early-boot guaranties. */
+
 	/* NOTE: Must remove `cpu_node2'  first, since that  mnode object is  actually
 	 *       stored inside of `cpu_node1', meaning that once that node is removed,
 	 *       the `cpu_node2' descriptor will automatically become invalid! */
@@ -417,6 +421,7 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	assert(cpu_node3);
 	assert(mnode_getminaddr(cpu_node1) == cpu_baseaddr);
 	assert(mnode_getmaxaddr(cpu_node1) == cpu_baseaddr + (size_t)__x86_cpu_part1_bytes - 1);
+
 	/* NOTE: Because we've already removed the nodes from `mman_kernel', we must no longer
 	 *       access the `cpu_node2' structure, since  the descriptor was contained  inside
 	 *       of `cpu_node1' */
@@ -444,6 +449,7 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 		for (; iter < __kernel_pertask_fini_end; ++iter)
 			(**iter)(&FORCPU(self, thiscpu_idle));
 	}
+
 	/* Unmap, sync, & unprepare the mappings for the CPU's IDLE and #DF stacks.
 	 * NOTE: Because these mappings are private the the CPU itself, we don't
 	 *       need to  be holding  a lock  to the  kernel VM  for this  part! */
@@ -471,6 +477,7 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	mman_mappings_removenode(&mman_kernel, &FORTASK(myidle, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 	mman_lock_release(&mman_kernel);
+
 	/* Finalize the associated data parts, freeing up backing physical memory. */
 	mpart_ll_freemem(&FORCPU(self, thiscpu_x86_dfstackpart_));
 	mpart_ll_freemem(&FORTASK(myidle, this_kernel_stackpart_));
@@ -485,9 +492,11 @@ i386_allocate_secondary_cores(void) {
 	for (i = 1; i < cpu_count_; ++i) {
 		struct cpu *altcore;
 		struct task *altidle;
+
 		/* Allocate an initialize the alternative core. */
 		altcore = cpu_alloc();
 		altidle = &FORCPU(altcore, thiscpu_idle);
+
 		/* Decode information previously encoded in `smp.c' */
 		FORCPU(altcore, thiscpu_x86_lapicid_)      = (uintptr_t)cpu_vector_[i] & 0xff;
 		FORCPU(altcore, thiscpu_x86_lapicversion_) = ((uintptr_t)cpu_vector_[i] & 0xff00) >> 8;
@@ -532,6 +541,7 @@ i386_allocate_secondary_cores(void) {
 			                 PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 			mman_mappings_insert(&mman_kernel, &FORCPU(altcore, thiscpu_x86_dfstacknode_));
 			addr = (byte_t *)addr + KERNEL_DF_STACKSIZE;
+
 			/* Store the DF stack pointer in internal CPU structures. */
 #ifdef __x86_64__
 			FORCPU(altcore, thiscpu_x86_tss).t_ist1 = (u64)addr;
@@ -553,6 +563,7 @@ i386_allocate_secondary_cores(void) {
 		}
 
 		FORTASK(altidle, this_kernel_stackpart_).mp_maxaddr = (pos_t)(KERNEL_IDLE_STACKSIZE - 1);
+
 		/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
 		FORTASK(altidle, this_kernel_stacknode_).mn_flags = (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |
 		                                                     MNODE_F_SHARED | MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
@@ -620,12 +631,12 @@ i386_allocate_secondary_cores(void) {
 		/* Set up the boot-strap CPU state for the new CPU.
 		 * -> When a CPU  is started  by using  an INIT IPI,  it will  perform internal  setup
 		 *    functions before executing `FORTASK(PERCPU(thiscpu_sched_current), this_sstate)'
-		 *    Since  this  is  the  first  time  that  we're  starting  this  CPU,  we  direct
-		 *    that  state   to  perform   some   high-level  CPU   initialization   functions,
-		 *    such   as  determining   CPU  features   (and  comparing   those  against  those
-		 *    implement by  the  boot  CPU  in  order  to  determine  the  features  available
-		 *    by  the  lowest   common  denominator),  before   shutting  down  again,   until
-		 *    some future point in time when the CPU will be used again. */
+		 *    Since  this is the first time that we're starting this CPU, we direct that state
+		 *    to perform some high-level CPU initialization functions, such as determining CPU
+		 *    features  (and comparing those against those implement  by the boot CPU in order
+		 *    to  determine the features  available by the  lowest common denominator), before
+		 *    shutting  down again, until some future point in  time when the CPU will be used
+		 *    again. */
 		{
 			struct scpustate *init_state;
 			init_state = (struct scpustate *)((byte_t *)mnode_getendaddr(&FORTASK(altidle, this_kernel_stacknode_)) -
@@ -692,8 +703,8 @@ DATDEF cpuset_t ___cpuset_full_mask ASMNAME("__cpuset_full_mask");
 #ifndef CONFIG_HAVE_DEBUGGER
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_pic)(void)
 #else /* !CONFIG_HAVE_DEBUGGER */
-/* The debugger calls this function during init,
- * so  we   can't  mark   it  as   ATTR_FREETEXT */
+/* The  debugger  calls this  function during
+ * init, so we can't mark it as ATTR_FREETEXT */
 INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
 #endif /* CONFIG_HAVE_DEBUGGER */
 {
@@ -732,6 +743,7 @@ INTERN ATTR_FREETEXT void KCALL pit_delay_hz(u16 hz) {
 	     PIT_COMMAND_ACCESS_FLOHI |
 	     PIT_COMMAND_MODE_FONESHOT |
 	     PIT_COMMAND_FBINARY);
+
 	/* Configure the PIT to trigger after 1/100th of a second (10ms). */
 	outb_p(PIT_DATA1, hz & 0xff);
 	outb(PIT_DATA1, (hz >> 8) & 0xff);
@@ -748,8 +760,8 @@ INTERN ATTR_FREETEXT void KCALL pit_delay_hz(u16 hz) {
 #endif /* !CONFIG_NO_SMP */
 
 
-INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
-
+INTERN ATTR_FREETEXT void
+NOTHROW(KCALL x86_initialize_apic)(void) {
 	/* Initialize the regular PIC */
 	x86_initialize_pic();
 
@@ -759,6 +771,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		unsigned int i;
 		if (cpu_count_ > 1) {
 			physpage_t entry_page;
+
 			/* Allocate low physical memory for the SMP initialization entry page. */
 			entry_page = page_malloc_between_for(page_usage.pu_static,
 			                                     (physpage_t)((physaddr_t)0x00000000 / PAGESIZE),
@@ -775,6 +788,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 			printk(FREESTR(KERN_INFO "[smp] Allocating SMP trampoline at %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"),
 			       physpage2addr(entry_page));
 			x86_smp_entry_page = (u8)entry_page;
+
 			/* Apply some custom AP entry relocations. */
 			{
 				u32 gdt_addr;
@@ -785,6 +799,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 				x86_smp_gdt_pointer_base += physpage2addr32(entry_page);
 			}
 			COMPILER_WRITE_BARRIER();
+
 			/* Copy AP entry code. */
 			copytophys(physpage2addr(entry_page),
 			           x86_smp_entry,
@@ -811,11 +826,13 @@ done_early_altcore_init:
 		            X86_INTERRUPT_APIC_SPURIOUS);
 #ifndef CONFIG_NO_SMP
 		assert(CPU_ALL_ONLINE);
+
 		/* Send INIT commands to all CPUs. */
 		for (i = 1; i < cpu_count_; ++i) {
 			cpu_offline_mask[i / 8] |= 1 << (i % 8); /* Mark the CPU as offline */
 			apic_send_init(FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
 		}
+
 		/* NOTE: The APIC  specs  require  us  to  wait  for  10ms
 		 *       before  we  should  send   `APIC_ICR0_TYPE_FSIPI'
 		 *       And wouldn't you know, that's also the time  that
@@ -839,10 +856,12 @@ done_early_altcore_init:
 		/* Wait for secondary CPUs to come online. */
 		if (!CPU_ALL_ONLINE) {
 			unsigned int timeout;
+
 			/* Wait for 1 ms (or 1/1000'th of a second) */
 			pit_delay_hz(PIT_HZ_DIV(1000));
 			if likely(CPU_ALL_ONLINE)
 				goto all_online;
+
 			/* Re-send start IPIs to all APs still not online. */
 			for (i = 1; i < cpu_count_; ++i) {
 				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8))))
@@ -852,15 +871,18 @@ done_early_altcore_init:
 				apic_send_startup(FORCPU(cpu_vector[i], thiscpu_x86_lapicid),
 				                  x86_smp_entry_page);
 			}
+
 			/* Wait up to a full second for the (possibly slow?) CPUs to come online. */
 			for (timeout = 0; timeout < 20; ++timeout) {
 				if (CPU_ALL_ONLINE)
 					goto all_online;
 				pit_delay_hz(PIT_HZ_DIV(20));
 			}
+
 			/* Check one last time? */
 			if (CPU_ALL_ONLINE)
 				goto all_online;
+
 			/* Guess these CPUs are just broken... */
 			for (i = 1; i < cpu_count_;) {
 				struct cpu *discard_cpu;
@@ -874,6 +896,7 @@ done_early_altcore_init:
 				                        "come online (removing it from the configuration)\n"),
 				       i, FORCPU(cpu_vector_[i], thiscpu_x86_lapicid));
 				cpu_destroy(cpu_vector_[i]);
+
 				/* Remove the CPU from the vector. */
 				--cpu_count_;
 				memmovedown(&cpu_vector_[i], &cpu_vector_[i + 1],

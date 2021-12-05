@@ -1145,14 +1145,23 @@
 
 
 #if __SIZEOF_POINTER__ <= 2
+#define __SIZEOF_INTPTR_HALF_T__ 1
 #define __INTPTR_HALF_TYPE__  __INT8_TYPE__
 #define __UINTPTR_HALF_TYPE__ __UINT8_TYPE__
 #elif __SIZEOF_POINTER__ <= 4
-#define __INTPTR_HALF_TYPE__  __INT16_TYPE__
-#define __UINTPTR_HALF_TYPE__ __UINT16_TYPE__
+#define __SIZEOF_INTPTR_HALF_T__ 2
+#define __SIZEOF_INTPTR_QUARTER_T__ 1
+#define __INTPTR_HALF_TYPE__     __INT16_TYPE__
+#define __UINTPTR_HALF_TYPE__    __UINT16_TYPE__
+#define __INTPTR_QUARTER_TYPE__  __INT8_TYPE__
+#define __UINTPTR_QUARTER_TYPE__ __UINT8_TYPE__
 #else /* __SIZEOF_POINTER__ <= ... */
-#define __INTPTR_HALF_TYPE__  __INT32_TYPE__
-#define __UINTPTR_HALF_TYPE__ __UINT32_TYPE__
+#define __SIZEOF_INTPTR_HALF_T__ 4
+#define __SIZEOF_INTPTR_QUARTER_T__ 2
+#define __INTPTR_HALF_TYPE__     __INT32_TYPE__
+#define __UINTPTR_HALF_TYPE__    __UINT32_TYPE__
+#define __INTPTR_QUARTER_TYPE__  __INT16_TYPE__
+#define __UINTPTR_QUARTER_TYPE__ __UINT16_TYPE__
 #endif /* __SIZEOF_POINTER__ > ... */
 
 #ifndef __BYTE_TYPE__

@@ -63,10 +63,10 @@ PUBLIC NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfutexfd_destroy)(struct mfutexfd
 /* Handle operators for `HANDLE_TYPE_FUTEXFD' (`struct mfutexfd') */
 DEFINE_HANDLE_REFCNT_FUNCTIONS(futexfd, struct mfutexfd);
 
-INTDEF BLOCKING NONNULL((1)) void KCALL
+INTERN BLOCKING NONNULL((1)) void KCALL
 handle_futexfd_pollconnect(struct mfutexfd *__restrict self,
                            poll_mode_t what) THROWS(...) {
-	if likely (what & POLLPRI)
+	if likely(what & POLLPRI)
 		mfutex_connect_for_poll(self->mfd_futex);
 }
 
@@ -82,7 +82,7 @@ NOTHROW(FCALL unlock_mman_info_unlock)(struct unlockinfo *__restrict self) {
 }
 
 
-INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL
+INTERN BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_futexfd_polltest(struct mfutexfd *__restrict self,
                         poll_mode_t what) THROWS(...) {
 	size_t i;

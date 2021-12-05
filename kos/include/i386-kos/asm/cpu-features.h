@@ -44,10 +44,11 @@
 /* List of known (named) x86 features.                                  */
 /************************************************************************/
 
-#define X86_FEAT_486   (X86_FEATURE_TYP_MISC | 0x00000001)  /* Are we running on a 486? */
-#define X86_FEAT_CPUID X86_FEAT_486                         /* Is the cpuid instruction supported? */
-#define X86_FEAT_FALSE (X86_FEATURE_TYP_CONST | 0x00000000) /* Always false */
-#define X86_FEAT_TRUE  (X86_FEATURE_TYP_CONST | 0x00000001) /* Always true */
+#define X86_FEAT_486    (X86_FEATURE_TYP_MISC | 0x00000001)  /* Are we running on a 486? */
+#define X86_FEAT_CPUID  X86_FEAT_486                         /* Is the `cpuid' instruction supported? */
+#define X86_FEAT_INVLPG X86_FEAT_486                         /* Is the `invlpg' instruction supported? */
+#define X86_FEAT_FALSE  (X86_FEATURE_TYP_CONST | 0x00000000) /* Always false */
+#define X86_FEAT_TRUE   (X86_FEATURE_TYP_CONST | 0x00000001) /* Always true */
 
 /*[[[deemon
 import * from deemon;

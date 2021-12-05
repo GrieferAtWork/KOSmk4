@@ -41,44 +41,6 @@ __HYBRID_ALTINT_TYPEDEF(__port_t, port_t, false);
 #define __IOPORT(x) ((__port_t)x)
 #endif /* !__IOPORT */
 
-#ifndef __intptr_half_t_defined
-#define __intptr_half_t_defined
-#if __SIZEOF_POINTER__ == 4
-typedef s16 intptr_half_t;
-typedef u16 uintptr_half_t;
-#elif __SIZEOF_POINTER__ == 8
-typedef s32 intptr_half_t;
-typedef u32 uintptr_half_t;
-#elif __SIZEOF_POINTER__ == 2
-typedef s8 intptr_half_t;
-typedef u8 uintptr_half_t;
-#elif __SIZEOF_POINTER__ == 16
-typedef s64 intptr_half_t;
-typedef u64 uintptr_half_t;
-#else /* __SIZEOF_POINTER__ == ... */
-#undef __intptr_half_t_defined
-#endif /* __SIZEOF_POINTER__ != ... */
-#endif /* !__intptr_half_t_defined */
-
-#ifndef __intptr_quarter_t_defined
-#define __intptr_quarter_t_defined
-#if __SIZEOF_POINTER__ == 4
-typedef s8 intptr_quarter_t;
-typedef u8 uintptr_quarter_t;
-#elif __SIZEOF_POINTER__ == 8
-typedef s16 intptr_quarter_t;
-typedef u16 uintptr_quarter_t;
-#elif __SIZEOF_POINTER__ == 16
-typedef s32 intptr_quarter_t;
-typedef u32 uintptr_quarter_t;
-#elif __SIZEOF_POINTER__ == 32
-typedef s64 intptr_quarter_t;
-typedef u64 uintptr_quarter_t;
-#else /* __SIZEOF_POINTER__ == ... */
-#undef __intptr_quarter_t_defined
-#endif /* __SIZEOF_POINTER__ != ... */
-#endif /* !__intptr_quarter_t_defined */
-
 /* Time (in Nano seconds == 1/1000000000 (1/1_000_000_000) seconds)
  * since the system was booted (s.a. `boottime')
  * NOTE: 64 bits is enough to keep this counter from overflowing for

@@ -93,6 +93,7 @@ NOTHROW(FCALL has_feature)(u32 feature) {
 			__cpuid(X86_FEATURE_GETEAX(feature),
 			        &regs[0], &regs[1],
 			        &regs[2], &regs[3]);
+
 			/* Test the requested bit. */
 			word = regs[X86_FEATURE_GETREG(feature)];
 		}
@@ -208,9 +209,11 @@ NOTHROW(KCALL x86_initialize_alternatives)(void) {
 		 *       so if we don't have an APIC, then we must hide TSC. */
 		bootcpu_x86_cpuid_.ci_1d &= ~(CPUID_1D_ACPI | CPUID_1D_TSC);
 	}
+
 	/* Disable TSC-extensions if we don't have the basic TSC */
 	if (!(bootcpu_x86_cpuid_.ci_1d & CPUID_1D_TSC))
 		bootcpu_x86_cpuid_.ci_80000007d &= ~CPUID_80000007D_INVARIANT_TSC;
+
 	/* Without an invariant TSC, the TSC-DEADLINE feature is completely useless. */
 	if (!(bootcpu_x86_cpuid_.ci_80000007d & CPUID_80000007D_INVARIANT_TSC))
 		bootcpu_x86_cpuid_.ci_1c &= ~CPUID_1C_TSC_DEADLINE;

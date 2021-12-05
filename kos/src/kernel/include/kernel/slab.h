@@ -75,15 +75,9 @@ struct slab {
 #define SLAB_FNORMAL 0x00  /* Normal slab flags. */
 #define SLAB_FLOCKED 0x01  /* The slab kernel page is locked into memory. */
 #define SLAB_FCALLOC 0x04  /* Slab memory (of unused slabs) is zero-initialized. */
-#if __SIZEOF_POINTER__ >= 8
-	u16              s_flags; /* Slab flags (Set of `SLAB_F*'). */
-	u16              s_size;  /* [const] Slab segment size (in bytes) */
-	WEAK u32         s_free;  /* Amount of free segments in this slab. */
-#else /* __SIZEOF_POINTER__ >= 8 */
-	u8               s_flags; /* Slab flags (Set of `SLAB_F*'). */
-	u8               s_size;  /* [const] Slab segment size (in bytes) */
-	WEAK u16         s_free;  /* Amount of free segments in this slab. */
-#endif /* __SIZEOF_POINTER__ < 8 */
+	uintptr_quarter_t     s_flags; /* Slab flags (Set of `SLAB_F*'). */
+	uintptr_quarter_t     s_size;  /* [const] Slab segment size (in bytes) */
+	WEAK uintptr_half_t   s_free;  /* Amount of free segments in this slab. */
 	/* A bitset of allocated segments goes here (every segment has `SLAB_SEGMENT_STATUS_BITS'
 	 * consecutive  status bits in  within this bitset, that  form an integer  that is one of
 	 * `SLAB_SEGMENT_STATUS_*').

@@ -100,15 +100,12 @@ typedef union {
 #endif /* !CONFIG_NO_PAGING_PAE */
 } kernel_share_t;
 
-
 /* Allocate BSS memory for the initial shared+identity mapping
  * that  will later be shared with, and re-appear in all other
  * page directories (except for the identity page)
  * NOTE: This buffer is quite large (1Mb), but we'd need
  *       to allocate it sooner or later, no matter what. */
 INTDEF kernel_share_t __x86_pagedir_kernel_share;
-
-
 
 DECL_END
 

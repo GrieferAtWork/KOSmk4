@@ -295,6 +295,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		validate_writable(user_ucontext, sizeof(LOCAL_struct_ucpustate));
 		COMPILER_WRITE_BARRIER();
 		usp -= sizeof(LOCAL_struct_ucpustate);
+
 		/* Only save the FPU state if it is in use. */
 		if (PERTASK_TEST(this_fpustate)) {
 			/* Only allocate what we need for the used FPU state */
@@ -308,6 +309,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			COMPILER_WRITE_BARRIER();
 			LOCAL_fpustate_saveinto(user_fpustate);
 		}
+
 		/* Only save the sigmask if it was changed. */
 		if (must_restore_sigmask) {
 			usp -= sizeof(sigset_t);

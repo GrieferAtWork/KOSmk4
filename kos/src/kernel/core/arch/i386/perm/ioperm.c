@@ -44,7 +44,7 @@
 
 DECL_BEGIN
 
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 iob_maskbyte(byte_t *pbyte, u8 byte_mask, u8 byte_flag) {
 	u8 oldval;
 	do {
@@ -52,7 +52,7 @@ iob_maskbyte(byte_t *pbyte, u8 byte_mask, u8 byte_flag) {
 	} while (!ATOMIC_CMPXCH_WEAK(*pbyte, oldval, (oldval & byte_mask) | byte_flag));
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 iob_maskbyte_c(byte_t *pbyte, shift_t minbit, shift_t bitcnt, bool turn_on) {
 	u8 bitmask;
 	assert((minbit + bitcnt) <= 8);
@@ -61,13 +61,13 @@ iob_maskbyte_c(byte_t *pbyte, shift_t minbit, shift_t bitcnt, bool turn_on) {
 	             turn_on ? 0 : bitmask);
 }
 
-LOCAL ATTR_PURE WUNUSED bool KCALL
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool KCALL
 iob_isenabled(byte_t const *iob, u16 port) {
 	return (iob[FLOORDIV(port, 8)] & (1 << (port & 7))) != 0;
 }
 
 /* Turn permission bits for a given range on/off. */
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 iob_setrange(byte_t *iob, u16 minport, u16 maxport, bool turn_on) {
 	size_t minbyte, maxbyte;
 	shift_t minbit;

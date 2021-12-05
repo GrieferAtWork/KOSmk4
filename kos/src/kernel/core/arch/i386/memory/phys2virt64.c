@@ -100,6 +100,7 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 	p64_page_fglobal_and_p64_page_fnoexec = used_pxx_page_fglobal; /* `P64_PAGE_FGLOBAL' or `0' */
 	if (X86_HAVE_EXECUTE_DISABLE)
 		p64_page_fglobal_and_p64_page_fnoexec |= P64_PAGE_FNOEXEC;
+
 	/* Check if 1GiB pages are possible.
 	 * If they are, configure physident to use them.
 	 * Otherwise, pre-allocate up to `CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC'
@@ -126,6 +127,7 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 			}
 		}
 		COMPILER_WRITE_BARRIER();
+
 		/* override `x86_phys2virt64_require()' to become a no-op */
 		((byte_t *)&x86_phys2virt64_require)[0] = 0xc3; /* ret */
 	} else {
@@ -219,12 +221,14 @@ x86_phys2virt64_require(void *addr) {
 		task_pause();
 again_read_e3_word:
 #endif /* !CONFIG_NO_SMP */
+
 	/* Check for unlikely case:
 	 *    This is a sporadic pagefault, or some other CPU
 	 *    already allocated  the same  1GiB page  vector. */
 	e3.p_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
 	if unlikely(e3.p_vec2.v_present)
 		goto done;
+
 	/* If no metadata is available, clear all phys2virt mappings */
 	if unlikely(!metadata_avail) {
 		/* Check for special case: No metadata has ever been allocated... */
@@ -242,6 +246,7 @@ again_read_e3_word:
 	new_e3_word = metadata_base + metadata_size - metadata_avail;
 	assert(IS_ALIGNED(new_e3_word, PAGESIZE));
 	metadata_avail -= PAGESIZE;
+
 	/* Create a temporary mapping of `PHYS:e3_word',
 	 * using the  current  thread's  VM  trampoline. */
 	{
@@ -253,6 +258,7 @@ again_read_e3_word:
 		                              PAGEDIR_PROT_READ |
 		                              PAGEDIR_PROT_WRITE);
 		pagedir_syncone(e2_vector);
+
 		/* Figure out which physical memory range should be mapped.
 		 * We're going to fill in  512 * 2MiB pages, totaling  1GiB
 		 * of physical memory.
@@ -260,6 +266,7 @@ again_read_e3_word:
 		 * phys2virt segment, then floor-align that offset by 1GiB. */
 		e2.p_word = (uintptr_t)addr - KERNEL_PHYS2VIRT_BASE;
 		e2.p_word &= ~(GiB(1) - 1);
+
 		/* Set control flags */
 		e2.p_word |= P64_PAGE_FPRESENT | P64_PAGE_FWRITE |
 		             P64_PAGE_FACCESSED | P64_PAGE_FDIRTY |
@@ -274,12 +281,14 @@ again_read_e3_word:
 	new_e3_word |= P64_PAGE_FPRESENT | P64_PAGE_FWRITE |
 	               P64_PAGE_FACCESSED | P64_PAGE_FDIRTY |
 	               p64_page_fglobal_and_p64_page_fnoexec;
+
 	/* Insert the fully initialized E2 vector into its proper entry. */
 #ifdef CONFIG_NO_SMP
 	COMPILER_WRITE_BARRIER();
 	P64_PDIR_E3_IDENTITY[vec4][vec3].p_word = new_e3_word;
 	COMPILER_WRITE_BARRIER();
 #else /* CONFIG_NO_SMP */
+
 	/* Guard against page directory modifications from other CPUs */
 	if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word,
 	                           e3.p_word, new_e3_word)) {
@@ -288,6 +297,7 @@ again_read_e3_word:
 		goto again_read_e3_word;
 	}
 #endif /* !CONFIG_NO_SMP */
+
 	printk(KERN_DEBUG "[p2v] Setup identity mapping at %p-%p\n",
 	       (byte_t *)P64_PDIR_VECADDR(vec4, vec3, 0, 0),
 	       (byte_t *)P64_PDIR_VECADDR(vec4, vec3, 511, 511) + PAGESIZE - 1);

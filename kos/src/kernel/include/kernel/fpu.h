@@ -67,11 +67,11 @@ FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct fpustate *KCALL fpustate_alloc
 FUNDEF ATTR_MALLOC WUNUSED struct fpustate *NOTHROW(KCALL fpustate_alloc_nx)(void);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_ALLOC */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_FREE
-FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict self);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_FREE */
 
 /* Ensure that `this_fpustate' has been allocated, allocating
- * and   initializing   it   now   if   it   hasn't  already. */
+ * and initializing it now if that hasn't been done  already. */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_INIT
 FUNDEF void KCALL fpustate_init(void) THROWS(E_BADALLOC);
 FUNDEF WUNUSED __BOOL NOTHROW(KCALL fpustate_init_nx)(void);

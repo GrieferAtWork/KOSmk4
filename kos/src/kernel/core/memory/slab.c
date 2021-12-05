@@ -644,6 +644,13 @@ print "#endif /" "* HEAP_ALIGNMENT == ... *" "/";
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define NDEBUG_UNREACHABLE(...) __VA_ARGS__
+#else /* !NDEBUG */
+#define NDEBUG_UNREACHABLE(...) __builtin_unreachable()
+#endif /* NDEBUG */
+
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 	struct slab *self;
@@ -659,17 +666,11 @@ NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 #undef CASE_SLAB_FREE
 #endif /* !__INTELLISENSE__ */
 	default:
-#ifndef NDEBUG
-#if __SIZEOF_POINTER__ >= 8
-		kernel_panic("Corrupted SLAB page at %p has an invalid size of %" PRIu16,
-		             self, self->s_size);
-#else /* __SIZEOF_POINTER__ >= 8 */
-		kernel_panic("Corrupted SLAB page at %p has an invalid size of %" PRIu8,
-		             self, self->s_size);
-#endif /* __SIZEOF_POINTER__ < 8 */
-#else /* !NDEBUG */
-		__builtin_unreachable();
-#endif /* NDEBUG */
+		NDEBUG_UNREACHABLE(
+		kernel_panic("Corrupted SLAB page at %p has an invalid "
+		             "size of %" PRIuN(__SIZEOF_INTPTR_QUARTER_T__),
+		             self, self->s_size));
+		break;
 	}
 }
 
@@ -689,17 +690,11 @@ NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags) {
 #undef CASE_SLAB_FREE
 #endif /* !__INTELLISENSE__ */
 	default:
-#ifndef NDEBUG
-#if __SIZEOF_POINTER__ >= 8
-		kernel_panic("Corrupted SLAB page at %p has an invalid size of %" PRIu16,
-		             self, self->s_size);
-#else /* __SIZEOF_POINTER__ >= 8 */
-		kernel_panic("Corrupted SLAB page at %p has an invalid size of %" PRIu8,
-		             self, self->s_size);
-#endif /* __SIZEOF_POINTER__ < 8 */
-#else /* !NDEBUG */
-		__builtin_unreachable();
-#endif /* NDEBUG */
+		NDEBUG_UNREACHABLE(
+		kernel_panic("Corrupted SLAB page at %p has an invalid "
+		             "size of %" PRIuN(__SIZEOF_INTPTR_QUARTER_T__),
+		             self, self->s_size));
+		break;
 	}
 }
 
@@ -713,12 +708,9 @@ NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC, _)
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
-#ifndef NDEBUG
+	NDEBUG_UNREACHABLE(
 	kernel_panic("Invalid slab size %" PRIuSIZ, num_bytes);
-	return NULL;
-#else /* !NDEBUG */
-	__builtin_unreachable();
-#endif /* NDEBUG */
+	return NULL);
 }
 
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
@@ -730,12 +722,9 @@ __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC, _)
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
-#ifndef NDEBUG
+	NDEBUG_UNREACHABLE(
 	kernel_panic("Invalid slab size %" PRIuSIZ, num_bytes);
-	return NULL;
-#else /* !NDEBUG */
-	__builtin_unreachable();
-#endif /* NDEBUG */
+	return NULL);
 }
 
 PUBLIC ATTR_MALLOC WUNUSED VIRT void *
@@ -747,12 +736,9 @@ NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC, _)
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
-#ifndef NDEBUG
+	NDEBUG_UNREACHABLE(
 	kernel_panic("Invalid slab size %" PRIuSIZ, num_bytes);
-	return NULL;
-#else /* !NDEBUG */
-	__builtin_unreachable();
-#endif /* NDEBUG */
+	return NULL);
 }
 
 

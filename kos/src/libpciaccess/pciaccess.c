@@ -247,11 +247,11 @@ INTERN WUNUSED ATTR_CONST struct pci_device *NOTHROW(LIBPCIACCESS_CC libpci_devi
 #define END_SCAN_FUNCTION \
 		return EOK;       \
 	}
-#define CALL_SCAN_FUNCTION(expr)            \
-	do {                                    \
-		errno_t error;                      \
-		if unlikely ((error = (expr)) != 0) \
-			return error;                   \
+#define CALL_SCAN_FUNCTION(expr)           \
+	do {                                   \
+		errno_t error;                     \
+		if unlikely((error = (expr)) != 0) \
+			return error;                  \
 	}	__WHILE0
 #endif /* !__KERNEL__ */
 

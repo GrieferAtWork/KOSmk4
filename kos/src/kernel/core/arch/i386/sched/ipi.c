@@ -40,7 +40,6 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/cpu-flags.h>
-#include <asm/intrin.h>
 #include <sys/io.h>
 
 #include <assert.h>
@@ -77,7 +76,7 @@ NOTHROW(KCALL apic_send_init)(u8 procid) {
 	            APIC_ICR0_FASSERT |
 	            APIC_ICR0_TARGET_FICR1);
 	while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-		__pause();
+		task_pause();
 }
 
 INTERN NOBLOCK void
@@ -89,7 +88,7 @@ NOTHROW(KCALL apic_send_startup)(u8 procid, u8 pageno) {
 	                       APIC_ICR0_FASSERT |
 	                       APIC_ICR0_TARGET_FICR1);
 	while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-		__pause();
+		task_pause();
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -99,7 +98,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	/* Make sure that our outgoing interrupt line isn't
 	 * still  pending  due to  another,  unrelated IPI. */
 	while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-		__pause();
+		task_pause();
 
 	/* Send an INIT IPI to the target CPU. */
 	apic_send_init(FORCPU(target, thiscpu_x86_lapicid));
@@ -107,7 +106,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	/* Wait for 10 milliseconds. */
 	was = PREEMPTION_PUSHOFF();
 	while (!sync_trywrite(&x86_pit_lock))
-		__pause();
+		task_pause();
 	outb(PIT_PCSPEAKER,
 	     (inb(PIT_PCSPEAKER) &
 	      ~(PIT_PCSPEAKER_FSYNCPIT | PIT_PCSPEAKER_FINOUT)) |
@@ -125,9 +124,10 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 		outb(PIT_PCSPEAKER, temp | PIT_PCSPEAKER_OUT);
 	}
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT)
-		__pause();
+		task_pause();
 	sync_endwrite(&x86_pit_lock);
 	PREEMPTION_POP(was);
+
 	/* Send the startup IPI */
 	apic_send_startup(FORCPU(target, thiscpu_x86_lapicid), x86_smp_entry_page);
 
@@ -141,12 +141,13 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 		} while (--poll_timeout);
 	}
 #endif
+
 	/* Explicitly wait for 1 millisecond. */
 	was = PREEMPTION_PUSHOFF();
 	while (!sync_trywrite(&x86_pit_lock)) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
-		__pause();
+		task_pause();
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 	}
@@ -174,7 +175,7 @@ done_ppop:
 			PREEMPTION_POP(was);
 			return;
 		}
-		__pause();
+		task_pause();
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 	}
@@ -182,14 +183,16 @@ done_ppop:
 	PREEMPTION_POP(was);
 	if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 		return;
+
 	/* Send the startup IPI again */
 	apic_send_startup(FORCPU(target, thiscpu_x86_lapicid), x86_smp_entry_page);
+
 	/* Wait for up to 1 second. */
 	was = PREEMPTION_PUSHOFF();
 	while (!sync_trywrite(&x86_pit_lock)) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
-		__pause();
+		task_pause();
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 	}
@@ -201,6 +204,7 @@ done_ppop:
 	     PIT_COMMAND_SELECT_F2 |
 	     PIT_COMMAND_ACCESS_FLOHI |
 	     PIT_COMMAND_MODE_FONESHOT);
+
 	/* 1s == 1000ms; 1000ms --> 1000 / 1000 --> 1HZ */
 	outb_p(PIT_DATA2, (PIT_HZ_DIV(1) & 0xff));
 	outb(PIT_DATA2, (PIT_HZ_DIV(1) >> 8) & 0xff);
@@ -212,7 +216,7 @@ done_ppop:
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
-		__pause();
+		task_pause();
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 	}
@@ -333,7 +337,7 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC task_rpc_serve_ipi)(struct rpc_context *__restrict
                                                   void *UNUSED(cookie)) {
 	pflag_t was;
 	struct cpu *mycpu;
-	/* Disable preemption to prevent CPU switches and to
+	/* Disable  preemption  to prevent  CPU switches  and to
 	 * comply with `x86_serve_ipi()'s NOPREEMPT requirement. */
 	was   = PREEMPTION_PUSHOFF();
 	mycpu = THIS_CPU;
@@ -366,9 +370,9 @@ NOTHROW(FCALL x86_execute_direct_ipi)(cpu_ipi_t func,
                                       void *args[CPU_IPI_ARGCOUNT]);
 
 
-/* TODO: Add dedicated cpu_broadcastipi() and cpu_broadcastipi_notthis() functions,
- *       which  collect  a   set  of  CPUs   to  signal,  and   make  use  of   the
- *       BROADCAST  /   BROADCAST_EXCEPT_SELF   functionality   found   in   LAPIC. */
+/* TODO: Add dedicated `cpu_broadcastipi()' and `cpu_broadcastipi_notthis()'
+ *       functions,  which collect a set of CPUs  to signal, and make use of
+ *       the BROADCAST / BROADCAST_EXCEPT_SELF functionality found in LAPIC. */
 
 PUBLIC NOBLOCK NONNULL((1, 2, 3)) bool
 NOTHROW(KCALL cpu_sendipi)(struct cpu *__restrict target,
@@ -399,9 +403,9 @@ NOTHROW(KCALL cpu_sendipi)(struct cpu *__restrict target,
 			assert(PREEMPTION_ENABLED());
 			goto done_success;
 		}
-		/* Don't allow sending an IPI to our own CPU when preemption is disabled.
-		 * The  caller  may  attempt  to   send  another,  at  which  point   the
-		 * `while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)'              loop
+		/* Don't  allow sending  an IPI to  our own CPU  when preemption is
+		 * disabled. The caller may attempt to send another, at which point
+		 * the  `while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)'   loop
 		 * below will block indefinitely! */
 		goto done_failure;
 	}
@@ -431,8 +435,9 @@ again_i:
 		       args, CPU_IPI_ARGCOUNT, sizeof(void *));
 		COMPILER_WRITE_BARRIER();
 
-		/* If  we  haven't seen  any other  IPIs, tell  the caller  that they  will have
-		 * to send an  IPI to  the cpu  in order to  get it  to serve  the new  command.
+		/* If we haven't seen any other IPIs, tell the caller that they will have
+		 * to send an IPI to the cpu in order to get it to serve the new command.
+		 *
 		 * Otherwise, we can just hi-jack whatever previous IPIs had already been there. */
 		if (i == 0 && word == 0) {
 			if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING) {
@@ -441,9 +446,11 @@ again_i:
 				ATOMIC_OR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_send_ipi:
 				IPI_DEBUG("cpu_sendipi:do_send_ipi\n");
+
 				/* Make sure that no other IPI is still pending to be delivered by our LAPIC */
 				while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-					__pause();
+					task_pause();
+
 				/* There were no other IPIs already, meaning it's our job to send the first! */
 				lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(FORCPU(target, thiscpu_x86_lapicid)));
 				lapic_write(APIC_ICR0,
@@ -454,7 +461,7 @@ do_send_ipi:
 				            APIC_ICR0_TARGET_FICR1);
 				if (flags & CPU_IPI_FWAITFOR) {
 					while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-						__pause();
+						task_pause();
 				}
 			} else if (flags & CPU_IPI_FWAKEUP) {
 				/* Indicate that the IPI is now ready for handling by the core. */
@@ -529,7 +536,7 @@ done_failure:
  * >>         // shortly change to `CPU_STATE_RUNNING'
  * >>         // In either case, wait for something to happen, but do so in a busy
  * >>         // loop, so-as to not block, fulfilling the `NOBLOCK' requirement.
- * >>         __pause();
+ * >>         task_pause();
  * >>         continue;
  * >>     case CPU_STATE_RUNNING:
  * >>         // The CPU should still be able to receive regular IPIs, so use those
@@ -575,7 +582,7 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target) {
 			 * shortly change to `CPU_STATE_RUNNING'
 			 * In either case, wait for something to happen, but do so in a busy
 			 * loop, so-as to not  block, fulfilling the `NOBLOCK'  requirement. */
-			__pause();
+			task_pause();
 			continue;
 
 		case CPU_STATE_RUNNING:
@@ -587,7 +594,7 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target) {
 			if (ATOMIC_READ(FORCPU(target, thiscpu_x86_ipi_inuse[0])) == 0) {
 				/* Make sure that no other IPI is still pending to be delivered by our LAPIC */
 				while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-					__pause();
+					task_pause();
 				/* Send an IPI to the CPU, forcing it to load pending tasks. */
 				IPI_DEBUG("cpu_sendipi:deliver_ipi\n");
 				lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(FORCPU(target, thiscpu_x86_lapicid)));
@@ -597,11 +604,11 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target) {
 				                       APIC_ICR0_FASSERT |
 				                       APIC_ICR0_TARGET_FICR1);
 			}
-			/* NOTE: If  the  CPU  changed  states  to  one  where  IPIs  can  no  longer be
-			 *       received (aka. from `CPU_STATE_RUNNING' to `CPU_STATE_FALLING_ASLEEP'),
-			 *       it would  have already  loaded pending  tasks during  that  transition,
-			 *       so regardless  of  the  IPI  actually being  delivered,  we  know  that
-			 *       the CPU _has_ loaded any pending tasks! */
+			/* NOTE: If the CPU changed states to one  where IPIs can no longer be  received
+			 *       (aka. from `CPU_STATE_RUNNING' to `CPU_STATE_FALLING_ASLEEP'), it would
+			 *       have already loaded pending tasks during that transition, so regardless
+			 *       of the IPI actually being delivered, we know that the CPU _has_  loaded
+			 *       any pending tasks! */
 			return;
 
 		default:

@@ -292,7 +292,7 @@ sys_sigreturn32_rpc(struct rpc_context *__restrict ctx,
 	USER UNCHECKED struct fpustate32 const *restore_fpu;
 	USER UNCHECKED sigset_t const *restore_sigmask;
 	USER UNCHECKED struct rpc_syscall_info32 const *restart_sc_info;
-	if unlikely (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+	if unlikely(ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_CPU];
 	restore_fpu     = (USER UNCHECKED struct fpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_FPU];
@@ -331,6 +331,7 @@ DEFINE_SYSCALL32_6(void, sigreturn,
 	(void)restore_sigmask;
 	(void)sc_info;
 	(void)restore_cpu;
+
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 	task_rpc_userunwind(&sys_sigreturn32_rpc, NULL);
 	__builtin_unreachable();
@@ -439,7 +440,7 @@ sys_sigreturn64_rpc(struct rpc_context *__restrict ctx,
 	USER UNCHECKED struct fpustate64 const *restore_fpu;
 	USER UNCHECKED sigset_t const *restore_sigmask;
 	USER UNCHECKED struct rpc_syscall_info64 const *restart_sc_info;
-	if unlikely (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+	if unlikely(ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	restore_cpu     = (USER UNCHECKED struct ucpustate64 const *)gpregs_getpbp(&ctx->rc_state->ics_gpregs);
 	restore_fpu     = (USER UNCHECKED struct fpustate64 const *)gpregs_getpbx(&ctx->rc_state->ics_gpregs);

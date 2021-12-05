@@ -1858,7 +1858,7 @@ NOTHROW(FCALL parse_assign)(struct cparser *__restrict self) {
 		if (parse_##name##_suffix_check(self->c_tok)) { \
 	parse_##name##_suffix_CASE:                         \
 			result = parse_##name##_suffix(self);       \
-			if unlikely (result != DBX_EOK)             \
+			if unlikely(result != DBX_EOK)              \
 				goto done;                              \
 		}
 		PARSE_CASE_CHECK(prod)

@@ -175,6 +175,7 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	e3[3] = (u64)page_mallocone_for_paging();
 	if unlikely((physpage_t)e3[3] == PHYSPAGE_INVALID)
 		goto err_3;
+
 	/* Now to initialize our pre-allocated level#3 vectors.
 	 * For this purpose, we must zero-initialize e3[0...2] and e3[3] like this:
 	 * >> e3[3].p_e2[0...507] = KERNEL_SHARE; // Kernel share:     0xc0000000 ... 0xff7fffff
@@ -193,6 +194,7 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 		memsetphyspage((physaddr_t)e3[1], 0);
 	if (!page_iszero((physpage_t)e3[2]))
 		memsetphyspage((physaddr_t)e3[2], 0);
+
 	/* Kernel share (copy from our own page directory) */
 	copytophys_onepage((physaddr_t)e3[3], PAE_PDIR_E2_IDENTITY[3], 508 * 8);
 	self->p_e3[0].p_word = e3[0] | PAE_PAGE_FPRESENT;
@@ -203,6 +205,7 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	e3[1] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[2] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[3] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
+
 	/* Identity mapping */
 	copytophys_onepage((physaddr_t)(e3[3] & PAE_PAGE_FVECTOR) +
 	                   508 * 8,
@@ -251,6 +254,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 	 * The  other possibility  would be  to use  the slow `copyfromphys()'
 	 * function to dereference its memory contents. */
 	pagedir_set((pagedir_phys_t)phys_self);
+
 	/* NOTE: Only iterate 0, 1 and 2 here (entry #3 contains) */
 	for (vec3 = 0; vec3 < 3; ++vec3) {
 		union pae_pdir_e3 e3;
@@ -267,6 +271,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 	}
 	pagedir_set(old_pagedir);
 	PREEMPTION_POP(was);
+
 	/* Free the always-allocated E2-vectors */
 	for (vec3 = 0; vec3 < 4; ++vec3) {
 		assert(self->p_e3[vec3].p_vec2.v_present);
@@ -326,6 +331,7 @@ again:
 		new_e1_vector = page_mallocone_for_paging();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
+
 		/* Initialize the inner vector.
 		 * We can safely make use of our trampoline, since kernel-space is always prepared. */
 		e1_p = (union pae_pdir_e1 *)THIS_TRAMPOLINE;
@@ -333,6 +339,7 @@ again:
 		                                 PAGEDIR_PROT_WRITE);
 		pagedir_syncone(e1_p);
 		COMPILER_WRITE_BARRIER();
+
 		/* If the 2MiB entry was marked as prepared, always mark every entry
 		 * within the E1-vector as prepared. */
 		if (vec1_prepare_size == 512 || (e2.p_word & PAE_PAGE_FPREPARED)) {
@@ -346,6 +353,7 @@ again:
 		}
 		COMPILER_WRITE_BARRIER();
 		pae_pagedir_pop_mapone(e1_p, backup);
+
 		/* Map the new vector. */
 		new_e2_word = ((u64)new_e1_vector * 4096) |
 		              PAE_PAGE_FPRESENT | PAE_PAGE_FWRITE | PAE_PAGE_FACCESSED;
@@ -404,6 +412,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		new_e2_word |= e2.p_word & (PAE_PAGE_FUSER | PAE_PAGE_FPWT |
 		                            PAE_PAGE_FPCD | PAE_PAGE_FACCESSED |
 		                            PAE_PAGE_FGLOBAL);
+
 		/* Make sure that the vector was allocated and is active */
 		goto atomic_set_new_e2_word_or_free_new_e1_vector;
 	} else {
@@ -414,6 +423,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 
 		/* The first page needs to be marked under special conditions. */
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
+
 		/* With a prepare-first token held, check if our e2 control work is still correct.
 		 * If some other thread flattened the vector  in the mean time, that control  word
 		 * will have changed. */
@@ -482,6 +492,7 @@ NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 const e1_p[51
 			return false; /* Cannot flatten prepared pages. */
 		if (PAE_PDIR_E1_ISHINT(e1.p_word))
 			return false; /* Cannot flatten hints. */
+
 		/* Check if we can form a linear page of memory. */
 		flag.p_word = 0;
 		iter.p_word = e1.p_word & ~(PAE_PAGE_FACCESSED | PAE_PAGE_FDIRTY);
@@ -508,6 +519,7 @@ NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 const e1_p[51
 	}
 	if (e1.p_word != PAE_PAGE_ABSENT)
 		return false; /* Non-present, but with meta-data (hint/prepared) -> Cannot flatten. */
+
 	/* Check if all entries are marked as ABSENT */
 	for (vec1 = 1; vec1 < 512; ++vec1) {
 		e1.p_word = ATOMIC_READ64(e1_p[vec1].p_word);
@@ -596,6 +608,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
 	assertf(!(e2.p_word & PAE_PAGE_F2MIB),
 	        "A 2MiB page couldn't have been prepared (only 4KiB pages can be)");
+
 	/* Check if the 4KiB vector can be merged.
 	 * NOTE: We are guarantied  that accessing the  E1-vector is OK,  because
 	 *       the caller guaranties that at least  some part of the vector  is
@@ -608,6 +621,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 		pae_pagedir_unset_prepared(&e1_p[vec1], vec3, vec2, vec1,
 		                           vec1_unprepare_start, vec1_unprepare_size);
 	}
+
 	/* Read  the  current prepare-version  _before_  we check  if  flattening is
 	 * possible. - That way, other threads are allowed to increment the version,
 	 * forcing us to check again further below. */
@@ -632,6 +646,7 @@ again_try_exchange_e2_word:
 			 * Note  that  we need  a read-lock  to  to the  prepare-lock in
 			 * order to prevent the vector from being freed while we do this */
 			X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ_NOVER(was);
+
 			/* Re-load the E2 control word in case it has changed. */
 			e2.p_word = ATOMIC_READ64(e2_p->p_word);
 			if (!(e2.p_word & PAE_PAGE_FPRESENT) || (e2.p_word & PAE_PAGE_F2MIB)) {
@@ -647,8 +662,10 @@ again_try_exchange_e2_word:
 				return;
 			goto again_try_exchange_e2_word;
 		}
+
 		/* Sync if necessary. */
 		pae_pagedir_sync_flattened_e1_vector(vec3, vec2);
+
 		/* Successfully merged the vector.
 		 * At this point, all that's left is to free the vector.
 		 * NOTE: No need to Shoot-down anything for this, since the new,
@@ -1167,6 +1184,7 @@ NOTHROW(FCALL pae_pagedir_gethint)(VIRT void *addr) {
 	if unlikely(word & PAE_PAGE_F2MIB)
 		return NULL; /* 2MiB page */
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
+
 	/* NOTE: Only read as much as fits into a pointer, thus subverting
 	 *       the problem of possibly reading a corrupted value on i386 */
 	word = ATOMIC_READ64(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word);
@@ -1327,6 +1345,7 @@ again_read_word:
 			e2.p_word = ATOMIC_READ64_ALLOW_CORRUPT(PAE_PDIR_E2_IDENTITY[vec3][vec2].p_word);
 			if likely(!(e2.p_word & PAE_PAGE_FPRESENT))
 				continue; /* Not allocated */
+
 			/* Delete this vector. */
 			if unlikely(!ATOMIC_CMPXCH_WEAK(PAE_PDIR_E2_IDENTITY[vec3][vec2].p_word, e2.p_word, PAE_PAGE_ABSENT))
 				goto again_read_word;
@@ -1349,6 +1368,7 @@ again_read_word:
 			}
 		}
 	}
+
 	/* Free any remaining pages. */
 	if (free_count) {
 		pagedir_syncall_smp();
@@ -1369,10 +1389,12 @@ NOTHROW(FCALL pae_pagedir_unmap_userspace_nosync)(void) {
 			union pae_pdir_e2 e2;
 			u64 pageptr;
 again_read_word:
+
 			/* Allow corruption, since we do our own CMPXCH() below. */
 			e2.p_word = ATOMIC_READ64_ALLOW_CORRUPT(PAE_PDIR_E2_IDENTITY[vec3][vec2].p_word);
 			if likely(!(e2.p_word & PAE_PAGE_FPRESENT))
 				continue; /* Not allocated */
+
 			/* Delete this vector. */
 			if unlikely(!ATOMIC_CMPXCH_WEAK(PAE_PDIR_E2_IDENTITY[vec3][vec2].p_word, e2.p_word, PAE_PAGE_ABSENT))
 				goto again_read_word;

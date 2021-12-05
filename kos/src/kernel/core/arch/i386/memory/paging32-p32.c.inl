@@ -92,6 +92,7 @@ NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_fini)(VIRT struct p32_pdir *__restrict self) {
 	unsigned int vec2;
+
 	/* Free all dynamically allocated E1 vectors below the kernel-share segment. */
 	for (vec2 = 0; vec2 < 768; ++vec2) {
 		union p32_pdir_e2 e2 = self->p_e2[vec2];
@@ -146,6 +147,7 @@ again:
 		new_e1_vector = page_mallocone32_for_paging();
 		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
+
 		/* Initialize the inner vector.
 		 * We can safely make use of our trampoline, since kernel-space is always prepared. */
 		e1_p   = (union p32_pdir_e1 *)THIS_TRAMPOLINE;
@@ -153,6 +155,7 @@ again:
 		                                 PAGEDIR_PROT_WRITE);
 		pagedir_syncone(e1_p);
 		COMPILER_WRITE_BARRIER();
+
 		/* If the 4MiB entry was marked as prepared, always mark every entry
 		 * within the E1-vector as prepared. */
 		if (vec1_prepare_size == 1024 || (e2.p_word & P32_PAGE_FPREPARED)) {
@@ -166,6 +169,7 @@ again:
 		}
 		COMPILER_WRITE_BARRIER();
 		p32_pagedir_pop_mapone(e1_p, backup);
+
 		/* Map the new vector. */
 		new_e2_word = physpage2addr32(new_e1_vector) |
 		              P32_PAGE_FPRESENT | P32_PAGE_FWRITE | P32_PAGE_FACCESSED;
@@ -211,6 +215,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 				e1_p[vec1] = e1;
 				e1.p_word += 4096;
 			}
+
 			/* Mark specific pages as prepared */
 			for (vec1 = vec1_prepare_start;
 			     vec1 < vec1_prepare_start + vec1_prepare_size; ++vec1)
@@ -223,6 +228,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		new_e2_word |= e2.p_word & (P32_PAGE_FUSER | P32_PAGE_FPWT |
 		                            P32_PAGE_FPCD | P32_PAGE_FACCESSED |
 		                            P32_PAGE_FGLOBAL);
+
 		/* Make sure that the vector was allocated and is active */
 		goto atomic_set_new_e2_word_or_free_new_e1_vector;
 	} else {
@@ -233,6 +239,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 
 		/* The first page needs to be marked under special conditions. */
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
+
 		/* With a prepare-first token held, check if our e2 control work is still correct.
 		 * If some other thread flattened the vector  in the mean time, that control  word
 		 * will have changed. */
@@ -297,6 +304,7 @@ NOTHROW(KCALL p32_pagedir_can_flatten_e1_vector)(union p32_pdir_e1 const e1_p[10
 			return false; /* Cannot flatten prepared pages. */
 		if (P32_PDIR_E1_ISHINT(e1.p_word))
 			return false; /* Cannot flatten hints. */
+
 		/* Check if we can form a linear page of memory. */
 		flag.p_word = 0;
 		iter.p_word = e1.p_word & ~(P32_PAGE_FACCESSED | P32_PAGE_FDIRTY);
@@ -325,6 +333,7 @@ NOTHROW(KCALL p32_pagedir_can_flatten_e1_vector)(union p32_pdir_e1 const e1_p[10
 	}
 	if (e1.p_word != P32_PAGE_ABSENT)
 		return false; /* Non-present, but with meta-data (hint/prepared) -> Cannot flatten. */
+
 	/* Check if all entries are marked as ABSENT */
 	for (vec1 = 1; vec1 < 1024; ++vec1) {
 		e1.p_word = ATOMIC_READ(e1_p[vec1].p_word);
@@ -400,6 +409,7 @@ NOTHROW(FCALL p32_pagedir_unprepare_impl_flatten)(unsigned int vec2,
 	        (byte_t *)P32_PDIR_VECADDR(vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
 	assertf(!(e2.p_word & P32_PAGE_F4MIB),
 	        "A 4MiB page couldn't have been prepared (only 4KiB pages can be)");
+
 	/* Check if the 4KiB vector can be merged.
 	 * NOTE: We are guarantied  that accessing the  E1-vector is OK,  because
 	 *       the caller guaranties that at least  some part of the vector  is
@@ -418,6 +428,7 @@ NOTHROW(FCALL p32_pagedir_unprepare_impl_flatten)(unsigned int vec2,
 		        (byte_t *)P32_PDIR_VECADDR(vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
 		p32_pagedir_unset_prepared(&e1_p[vec1], vec2, vec1, vec1_unprepare_start, vec1_unprepare_size);
 	}
+
 	/* Read  the  current prepare-version  _before_  we check  if  flattening is
 	 * possible. - That way, other threads are allowed to increment the version,
 	 * forcing us to check again further below. */
@@ -442,6 +453,7 @@ again_try_exchange_e2_word:
 			 * Note  that  we need  a read-lock  to  to the  prepare-lock in
 			 * order to prevent the vector from being freed while we do this */
 			X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ_NOVER(was);
+
 			/* Re-load the E2 control word in case it has changed. */
 			e2.p_word = ATOMIC_READ(e2_p->p_word);
 			if (!(e2.p_word & P32_PAGE_FPRESENT) || (e2.p_word & P32_PAGE_F4MIB)) {
@@ -457,8 +469,10 @@ again_try_exchange_e2_word:
 				return;
 			goto again_try_exchange_e2_word;
 		}
+
 		/* Sync if necessary. */
 		p32_pagedir_sync_flattened_e1_vector(vec2);
+
 		/* Successfully merged the vector.
 		 * At this point, all that's left is to free the vector.
 		 * NOTE: No need to Shoot-down anything for this, since the new,
@@ -523,6 +537,7 @@ NOTHROW(FCALL p32_pagedir_prepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec2_min = P32_PDIR_VEC2INDEX(addr);
 	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P32_PDIR_VEC1INDEX(addr);
+
 	/* Prepare within the same 4MiB region. */
 	if likely(vec2_min == vec2_max) {
 		bool result;
@@ -533,9 +548,11 @@ NOTHROW(FCALL p32_pagedir_prepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		return result;
 	}
 	vec1_end = P32_PDIR_VEC1INDEX((byte_t *)addr + num_bytes);
+
 	/* Prepare the partial range of the first 4MiB region. */
 	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, 1024 - vec1_min))
 		goto err_0;
+
 	/* Prepare the partial range of the last 4MiB region. */
 	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_max, 0, vec1_end))
 		goto err_1;
@@ -580,14 +597,17 @@ NOTHROW(FCALL p32_pagedir_unprepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec2_min = P32_PDIR_VEC2INDEX(addr);
 	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P32_PDIR_VEC1INDEX(addr);
+
 	/* Unprepare within the same 4MiB region. */
 	if likely(vec2_min == vec2_max) {
 		p32_pagedir_unprepare_impl_flatten(vec2_min, vec1_min, num_bytes / 4096);
 		return;
 	}
 	vec1_end = P32_PDIR_VEC1INDEX((byte_t *)addr + num_bytes);
+
 	/* Unprepare the partial range of the first 4MiB region. */
 	p32_pagedir_unprepare_impl_flatten(vec2_min, vec1_min, 1024 - vec1_min);
+
 	/* Unprepare the partial range of the last 4MiB region. */
 	p32_pagedir_unprepare_impl_flatten(vec2_max, 0, vec1_end);
 	if unlikely(vec2_min + 1 < vec2_max) {
@@ -960,6 +980,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_unmap_userspace)(void) {
 	unsigned int vec2, free_count = 0;
 	u32 free_pages[64];
+
 	/* Map all pages before the share-segment as absent. */
 	for (vec2 = 0; vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE); ++vec2) {
 		union p32_pdir_e2 e2;
@@ -968,6 +989,7 @@ again_read_word:
 		e2.p_word = ATOMIC_READ(P32_PDIR_E2_IDENTITY[vec2].p_word);
 		if likely(!(e2.p_word & P32_PAGE_FPRESENT))
 			continue; /* Not allocated */
+
 		/* Delete this vector. */
 		if unlikely(!ATOMIC_CMPXCH_WEAK(P32_PDIR_E2_IDENTITY[vec2].p_word, e2.p_word, P32_PAGE_ABSENT))
 			goto again_read_word;
@@ -989,6 +1011,7 @@ again_read_word:
 			free_pages[free_count++] = (u32)pageptr;
 		}
 	}
+
 	/* Free any remaining pages. */
 	if (free_count) {
 		pagedir_syncall_smp();
@@ -1002,6 +1025,7 @@ again_read_word:
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void) {
 	unsigned int vec2;
+
 	/* Map all pages before the share-segment as absent. */
 	for (vec2 = 0; vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE); ++vec2) {
 		union p32_pdir_e2 e2;
@@ -1010,6 +1034,7 @@ again_read_word:
 		e2.p_word = ATOMIC_READ(P32_PDIR_E2_IDENTITY[vec2].p_word);
 		if likely(!(e2.p_word & P32_PAGE_FPRESENT))
 			continue; /* Not allocated */
+
 		/* Delete this vector. */
 		if unlikely(!ATOMIC_CMPXCH_WEAK(P32_PDIR_E2_IDENTITY[vec2].p_word, e2.p_word, P32_PAGE_ABSENT))
 			goto again_read_word;

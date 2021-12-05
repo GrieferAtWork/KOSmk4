@@ -168,7 +168,7 @@ PUBLIC_FUNCTION(x86_fxsave)
 	/* Expand %st(i) registers */
 	pushP_cfi_r %Pdi
 #ifndef __x86_64__
-	pushl_cfi_r %esi
+	pushP_cfi_r %Psi
 #endif /* !__x86_64__ */
 	cld
 	leaP   (OFFSET_SFPUSTATE_ST(8) - 4)(%R_fcall0P), %Psi
@@ -232,8 +232,8 @@ INTERN_FUNCTION(x86_fxsave_section_savexmm)
 #endif /* __x86_64__ */
 END(x86_fxsave_section_savexmm)
 #ifndef __x86_64__
-	popl_cfi_r %esi
-	popl_cfi_r %edi
+	popP_cfi_r %Psi
+	popP_cfi_r %Pdi
 #endif /* !__x86_64__ */
 	ret
 	.cfi_endproc
@@ -249,7 +249,7 @@ PUBLIC_FUNCTION(x86_fxrstor)
 
 	pushP_cfi_r %Pdi
 #ifndef __x86_64__
-	pushl_cfi_r %esi
+	pushP_cfi_r %Psi
 #endif /* !__x86_64__ */
 	subP  $(SIZEOF_SFPUSTATE), %Psp
 	.cfi_adjust_cfa_offset SIZEOF_SFPUSTATE
@@ -261,14 +261,14 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	movzwl OFFSET_XFPUSTATE_FSW(%R_fcall0P), %eax
 	movl   %eax, OFFSET_SFPUSTATE_FSW(%Psp)
 #ifndef __x86_64__
-	pushl_cfi_r %ecx
+	pushP_cfi_r %Pcx
 #endif /* !__x86_64__ */
 	EXTERN(x86_fxsave_decompress_ftw)
 	call   x86_fxsave_decompress_ftw
 #ifdef __x86_64__
 	movq   SIZEOF_SFPUSTATE(%rsp), %rdi /* Re-load RDI (%R_fcall0P) */
 #else /* __x86_64__ */
-	popl_cfi_r %ecx
+	popP_cfi_r %Pcx
 #endif /* !__x86_64__ */
 	movl   %eax, OFFSET_SFPUSTATE_FTW(%Psp)
 	movl   OFFSET_XFPUSTATE_FIP(%R_fcall0P), %eax
@@ -309,7 +309,7 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	addP  $(SIZEOF_SFPUSTATE), %Psp
 	.cfi_adjust_cfa_offset -SIZEOF_SFPUSTATE
 #ifndef __x86_64__
-	popl_cfi_r %esi
+	popP_cfi_r %Psi
 #endif /* !__x86_64__ */
 	popP_cfi_r %Pdi
 

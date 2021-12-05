@@ -23,31 +23,32 @@
 
 #include <kernel/compiler.h>
 
+#include <asm/asmword.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/paging.h>
 
 .section .data.percpu.tss
 INTERN_OBJECT(__kernel_percpu_tss)
-	/* u32 __t_zero0; */ .int  0
+	/* u32 __t_zero0; */ .word32 0
 	EXTERN(__kernel_boottask_stack)
-	/* u64   t_rsp0;  */ .quad (__kernel_boottask_stack + KERNEL_STACKSIZE)
-	/* u64   t_rsp1;  */ .quad (__kernel_boottask_stack + KERNEL_STACKSIZE)
-	/* u64   t_rsp2;  */ .quad (__kernel_boottask_stack + KERNEL_STACKSIZE)
-	/* u32 __t_zero1; */ .int  0
-	/* u32 __t_zero2; */ .int  0
+	/* u64   t_rsp0;  */ .word64 (__kernel_boottask_stack + KERNEL_STACKSIZE)
+	/* u64   t_rsp1;  */ .word64 (__kernel_boottask_stack + KERNEL_STACKSIZE)
+	/* u64   t_rsp2;  */ .word64 (__kernel_boottask_stack + KERNEL_STACKSIZE)
+	/* u32 __t_zero1; */ .word32 0
+	/* u32 __t_zero2; */ .word32 0
 	EXTERN(bootcpu_x86_df_stack)
-	/* u64   t_ist1;  */ .quad (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist2;  */ .quad (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist3;  */ .quad (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist4;  */ .quad (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist5;  */ .quad (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist6;  */ .quad (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
-	/* u64   t_ist7;  */ .quad (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
-	/* u32 __t_zero3; */ .int  0
-	/* u32 __t_zero4; */ .int  0
-	/* u16 __t_zero5; */ .word 0
+	/* u64   t_ist1;  */ .word64 (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist2;  */ .word64 (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist3;  */ .word64 (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist4;  */ .word64 (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist5;  */ .word64 (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist6;  */ .word64 (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u64   t_ist7;  */ .word64 (bootcpu_x86_df_stack + KERNEL_DF_STACKSIZE)
+	/* u32 __t_zero3; */ .word32 0
+	/* u32 __t_zero4; */ .word32 0
+	/* u16 __t_zero5; */ .word16 0
 	EXTERN(__x86_cputss_iob_offset)
-	/* u16   t_iomap; */ .word __x86_cputss_iob_offset
+	/* u16   t_iomap; */ .word16 __x86_cputss_iob_offset
 END(__kernel_percpu_tss)
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSS64_S */

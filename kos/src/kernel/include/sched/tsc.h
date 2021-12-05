@@ -105,9 +105,10 @@ DATDEF ATTR_PERCPU tsc_hz_t thiscpu_tsc_hzmax;
 FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
 NOTHROW(FCALL tsc_get)(struct cpu *__restrict me);
 
-/* Set the TSC deadline, that is: the point in time when  `tsc_interrupt()'
- * should be  called  by  low-level,  arch-specific  code.  This  function,
- * alongside `tsc_get()' form the basis for timing-based scheduling on KOS.
+/* Set the TSC deadline, that is: the point in time when `tsc_interrupt()'
+ * should be  called  by  low-level, arch-specific  code.  This  function,
+ * together with `tsc_get()', form  the basis for timing-based  scheduling
+ * on KOS.
  * NOTE: A previously set deadline is overwritten by later calls to this
  *       function.  If a previous deadline has expired in the mean time,
  *       then `tsc_interrupt()' may or may not be called once the caller

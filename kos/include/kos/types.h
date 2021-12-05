@@ -408,11 +408,18 @@ typedef int idtype_t;
 #define __intptr_half_t_defined
 typedef __INTPTR_HALF_TYPE__ intptr_half_t;
 #endif /* !__intptr_half_t_defined */
-
 #ifndef __uintptr_half_t_defined
 #define __uintptr_half_t_defined
 typedef __UINTPTR_HALF_TYPE__ uintptr_half_t;
 #endif /* !__uintptr_half_t_defined */
+#ifndef __intptr_quarter_t_defined
+#define __intptr_quarter_t_defined
+typedef __INTPTR_QUARTER_TYPE__ intptr_quarter_t;
+#endif /* !__intptr_quarter_t_defined */
+#ifndef __uintptr_quarter_t_defined
+#define __uintptr_quarter_t_defined
+typedef __UINTPTR_QUARTER_TYPE__ uintptr_quarter_t;
+#endif /* !__uintptr_quarter_t_defined */
 
 #ifndef __timer_t_defined
 #define __timer_t_defined

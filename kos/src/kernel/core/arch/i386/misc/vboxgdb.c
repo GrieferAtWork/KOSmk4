@@ -30,6 +30,7 @@
 #include <hybrid/host.h>
 
 #include <asm/intrin.h>
+#include <asm/redirect.h>
 #include <sys/io.h>
 
 #include <string.h>
@@ -42,21 +43,15 @@ INTDEF byte_t _vboxgdb_debugtrap[];
 INTDEF byte_t _vboxgdb_breakpoint[];
 DATDEF byte_t _vboxgdb_trap[] ASMNAME("vboxgdb_trap");
 
-PRIVATE ATTR_FREETEXT void
-NOTHROW(KCALL inject_jmp)(byte_t *from, byte_t *to) {
-	from[0]            = 0xe9; /* jmp32 */
-	*(s32 *)(from + 1) = (s32)((intptr_t)((uintptr_t)to) -
-	                           (intptr_t)((uintptr_t)from + 5));
-}
-
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_vboxgdb)(void) {
 	/* Inject the int1 and int3 handler. (s.a. vboxgdb:vmResume) */
-	inject_jmp(x86_idt_debugtrap, _vboxgdb_debugtrap);
-	inject_jmp(x86_idt_breakpoint, _vboxgdb_breakpoint);
+	__arch_redirect(x86_idt_debugtrap, _vboxgdb_debugtrap);
+	__arch_redirect(x86_idt_breakpoint, _vboxgdb_breakpoint);
 	_vboxgdb_trap[0] = 0x90; /* nop (overwrite the `0xc3' (`ret') that was written here before now) */
 	__flush_instruction_cache();
 	COMPILER_WRITE_BARRIER();
+
 	/* Notify vboxgdb that the initial kernel init has completed
 	 * by  sending a special control sequence through port:0x504
 	 * Afterwards, jump into the vboxgdb step loop to allow  any

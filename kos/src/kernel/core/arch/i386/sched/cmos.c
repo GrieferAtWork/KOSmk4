@@ -112,31 +112,37 @@ NOTHROW(KCALL cmos_gettime)(bool lock) {
 	cmos_cent   = 0;
 	if (x86_cmos.cr_century)
 		cmos_cent = cmos_rd(x86_cmos.cr_century);
+
 	/* re-read the second register to ensure that it didn't change in the mean time. */
 	temp = cmos_rd(CMOS_SECOND);
 	if likely(temp == cmos_second)
 		goto got_time;
 	cmos_second = temp;
+
 	/* Same for minute */
 	temp = cmos_rd(CMOS_MINUTE);
 	if likely(cmos_minute == temp)
 		goto got_time;
 	cmos_minute = temp;
+
 	/* Same for hour */
 	temp = cmos_rd(CMOS_HOUR);
 	if likely(cmos_hour == temp)
 		goto got_time;
 	cmos_hour = temp;
+
 	/* Same for day */
 	temp = cmos_rd(CMOS_DAY);
 	if likely(cmos_day == temp)
 		goto got_time;
 	cmos_day = temp;
+
 	/* Same for month */
 	temp = cmos_rd(CMOS_MONTH);
 	if likely(cmos_month == temp)
 		goto got_time;
 	cmos_month = temp;
+
 	/* Same for year */
 	temp = cmos_rd(CMOS_YEAR);
 	if likely(cmos_year == temp)
@@ -147,6 +153,7 @@ NOTHROW(KCALL cmos_gettime)(bool lock) {
 got_time:
 	if (lock)
 		x86_cmos_lock_release_nopr();
+
 	/* Fix BCD time information. */
 	if ((x86_cmos.cr_stb & CMOS_B_DM) == CMOS_B_DM_BCD) {
 		cmos_second = CMOS_BCD_DECODE(cmos_second);
@@ -157,9 +164,11 @@ got_time:
 		cmos_year   = CMOS_BCD_DECODE(cmos_year);
 		cmos_cent   = CMOS_BCD_DECODE(cmos_cent);
 	}
+
 	/* Fix 12-hour time information. */
 	if ((x86_cmos.cr_stb & CMOS_B_2412) == CMOS_B_2412_12H && (cmos_hour & 0x80) != 0)
 		cmos_hour = ((cmos_hour & 0x7f) + 12) % 24;
+
 	/* Figure out the proper year. */
 	year = cmos_year;
 	if (x86_cmos.cr_century)
@@ -241,6 +250,7 @@ NOTHROW(KCALL cmos_setalarm)(time_t time) {
 		cmos_minute = CMOS_BCD_ENCODE(cmos_minute);
 		cmos_hour   = CMOS_BCD_ENCODE(cmos_hour & 0x7f) | (cmos_hour & 0x80);
 	}
+
 	/* Store  new alarm values,  but only do  so if they've changed.
 	 * This is done since the hour-value isn't that likely to change
 	 * all too often, so  we can gain a  bit of performance by  only
