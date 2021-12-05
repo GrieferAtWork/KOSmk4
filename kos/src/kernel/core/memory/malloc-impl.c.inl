@@ -136,6 +136,8 @@ NOTHROW_NX(KCALL FUNC(get_realloc_size))(size_t n_bytes) {
 	result &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(OVERFLOW_UADD(result, sizeof(struct mptr), &result))
 		goto err_overflow;
+	if unlikely(result < HEAP_MINSIZE)
+		result = HEAP_MINSIZE;
 	return result;
 err_overflow:
 	IFELSE_NX(return (size_t)-1,

@@ -85,7 +85,7 @@ STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 #define mptr_user(x) ((struct mptr *)(x) + 1)
 #define mptr_heap(x) (&kernel_heaps[mptr_heap_gfp(x)])
 
-#if !defined(NDEBUG) && 1 /* TODO: Disable me */
+#if !defined(NDEBUG) && 0
 #define mptr_assert_paranoid mptr_assert
 #else /* !NDEBUG */
 #define mptr_assert_paranoid(x) (void)0
