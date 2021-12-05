@@ -149,6 +149,10 @@ NOTHROW(KCALL system_cc_drivers)(struct ccinfo *__restrict info) {
 		if (!tryincref(drv))
 			continue; /* Dead driver... */
 		system_cc_perdriver(drv, info);
+		if (ATOMIC_DECFETCH(drv->md_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct driver));
+			destroy(drv);
+		}
 		if (ccinfo_isdone(info))
 			break;
 	}

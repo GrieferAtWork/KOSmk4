@@ -72,8 +72,14 @@
 #endif /* __ARCH_HAVE_COMPAT */
 
 
+#include <kernel/mman/driver.h>
 
 DECL_BEGIN
+
+#if 0
+#define TRACE_HOOK() \
+	printk(KERN_TRACE "[RC=%Iu] ", kernel_driver.md_refcnt)
+#endif
 
 /* The main callback registered with `syscall_trace_start()' when this driver is loaded. */
 INTERN NONNULL((1, 2)) void FCALL
@@ -81,13 +87,13 @@ sctrace(struct driver *__restrict UNUSED(self),
         struct rpc_syscall_info const *__restrict info) {
 	struct sc_desc desc;
 	unsigned int i;
-#if 0
-	printk(KERN_TRACE "[RC=%Iu]", PERTASK_GET(this_task.t_refcnt));
-#endif
 #ifdef __ARCH_HAVE_COMPAT
 	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(info->rsi_flags)) {
 		if (SCTRACE_COMPAT_IGNORE(info->rsi_sysno))
 			return;
+#ifdef TRACE_HOOK
+		TRACE_HOOK();
+#endif /* TRACE_HOOK */
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
 		printk(KERN_TRACE "sys32_");
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8
@@ -100,6 +106,9 @@ sctrace(struct driver *__restrict UNUSED(self),
 	{
 		if (SCTRACE_IGNORE(info->rsi_sysno))
 			return;
+#ifdef TRACE_HOOK
+		TRACE_HOOK();
+#endif /* TRACE_HOOK */
 		printk(KERN_TRACE "sys_");
 	}
 	sc_getdesc(info, &desc);
