@@ -73,6 +73,7 @@
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
@@ -279,13 +280,25 @@ DECL_END
 #endif
 #define RBTREE_WANT_RREMOVE
 #define RBTREE_WANT_TRYINSERT
-#define RBTREE(name)           trace_node_tree_##name
-#define RBTREE_T               struct trace_node
-#define RBTREE_Tkey            uintptr_t
-#define RBTREE_GETNODE(self)   (self)->tn_link
-#define RBTREE_ISRED(self)     ((self)->tn_flags & TRACE_NODE_FLAG_ISRED)
-#define RBTREE_SETRED(self)    ((self)->tn_flags |= TRACE_NODE_FLAG_ISRED)
-#define RBTREE_SETBLACK(self)  ((self)->tn_flags &= ~TRACE_NODE_FLAG_ISRED)
+#define RBTREE(name)          trace_node_tree_##name
+#define RBTREE_T              struct trace_node
+#define RBTREE_Tkey           uintptr_t
+#define RBTREE_GETNODE(self)  (self)->tn_link
+#define RBTREE_ISRED(self)    ((self)->tn_flags & TRACE_NODE_FLAG_ISRED)
+#define RBTREE_SETRED(self)   ((self)->tn_flags |= TRACE_NODE_FLAG_ISRED)
+#define RBTREE_SETBLACK(self) ((self)->tn_flags &= ~TRACE_NODE_FLAG_ISRED)
+#ifdef CONFIG_HAVE_DEBUGGER
+#define RBTREE_WANT_MINMAXLOCATE
+#define RBTREE_WANT_PREV_NEXT_NODE
+#ifdef RBTREE_LEFT_LEANING
+#define tm_nodes_prevnode(node) trace_node_tree_prevnode(tm_nodes, node)
+#define tm_nodes_nextnode(node) trace_node_tree_nextnode(tm_nodes, node)
+#else /* RBTREE_LEFT_LEANING */
+#define tm_nodes_prevnode(node) trace_node_tree_prevnode(node)
+#define tm_nodes_nextnode(node) trace_node_tree_nextnode(node)
+#endif /* !RBTREE_LEFT_LEANING */
+#define tm_nodes_minmaxlocate(minkey, maxkey, result) trace_node_tree_minmaxlocate(tm_nodes, minkey, maxkey, result)
+#endif /* CONFIG_HAVE_DEBUGGER */
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN
@@ -324,6 +337,7 @@ DEFINE_DBG_BZERO_OBJECT(tm_smplock);
 PRIVATE ATTR_MALL_UNTRACKED RBTREE_ROOT(trace_node) tm_nodes = NULL;
 #define tm_nodes_locate(ptr)       trace_node_tree_locate(tm_nodes, (uintptr_t)(ptr))
 #define tm_nodes_remove(ptr)       trace_node_tree_remove(&tm_nodes, (uintptr_t)(ptr))
+#define tm_nodes_rlocate(min, max) trace_node_tree_rlocate(tm_nodes, min, max)
 #define tm_nodes_rremove(min, max) trace_node_tree_rremove(&tm_nodes, min, max)
 #define tm_nodes_removenode(node)  trace_node_tree_removenode(&tm_nodes, node)
 #define tm_nodes_insert(node)      trace_node_tree_insert(&tm_nodes, node)
@@ -670,12 +684,6 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
                                  pid_t *p_alloc_roottid) {
 	size_t result;
 	struct trace_node *node;
-	if unlikely(!ptr)
-		return 0;
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	if (KERNEL_SLAB_CHECKPTR(ptr))
-		return 0;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	lock_acquire();
 	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
@@ -711,20 +719,10 @@ FUNDEF NOBLOCK ssize_t KCALL
 kmalloc_printtrace(void *ptr, __pformatprinter printer, void *arg) {
 	ssize_t result = 0;
 	struct trace_node *node;
-	if unlikely(!ptr)
-		return 0;
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	if (KERNEL_SLAB_CHECKPTR(ptr))
-		return 0;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	lock_acquire();
 	node = tm_nodes_locate(ptr);
-	if unlikely(!node) {
-		lock_break();
-		return 0;
-	}
 	lock_release();
-	if (TRACE_NODE_KIND_HAS_TRACEBACK(node->tn_kind))
+	if (node && TRACE_NODE_KIND_HAS_TRACEBACK(node->tn_kind))
 		result = trace_node_print_traceback(node, printer, arg);
 	return result;
 }
@@ -2910,11 +2908,29 @@ DBG_COMMAND(kmtrace,
             "\tPrint tracebacks for where ptr was allocated from\n",
             argc, argv) {
 	for (; argc >= 2; --argc, ++argv) {
-		uintptr_t addr;
-		if (!dbg_evaladdr(argv[1], &addr))
-			return DBG_STATUS_INVALID_ARGUMENTS;
-		dbg_printf(DBGSTR("kmalloc %p:\n"), addr);
-		kmalloc_printtrace((void *)addr, &dbg_printer, NULL);
+		uintptr_t addr, hi;
+		if (sscanf(argv[1], DBGSTR("%" SCNUPTR "-%" SCNUPTR), &addr, &hi) == 2) {
+			if (addr <= hi) {
+				trace_node_tree_minmax_t mima;
+				tm_nodes_minmaxlocate(addr, hi, &mima);
+				if (mima.mm_min) {
+					for (;;) {
+						dbg_printf(DBGSTR("kmalloc %p:\n"), trace_node_umin(mima.mm_min));
+						if (TRACE_NODE_KIND_HAS_TRACEBACK(mima.mm_min->tn_kind))
+							trace_node_print_traceback(mima.mm_min, &dbg_printer, NULL);
+						kmalloc_printtrace((void *)addr, &dbg_printer, NULL);
+						if (mima.mm_min == mima.mm_max)
+							break;
+						mima.mm_min = tm_nodes_nextnode(mima.mm_min);
+					}
+				}
+			}
+		} else {
+			if (!dbg_evaladdr(argv[1], &addr))
+				return DBG_STATUS_INVALID_ARGUMENTS;
+			dbg_printf(DBGSTR("kmalloc %p:\n"), addr);
+			kmalloc_printtrace((void *)addr, &dbg_printer, NULL);
+		}
 	}
 	return 0;
 }
