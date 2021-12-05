@@ -955,6 +955,32 @@ NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 #define INUSE_BITSET_TURNON(bitset, index)  (bitset[INUSE_BITSET_INDEXOF(index)] |= ((uintptr_t)1 << INUSE_BITSET_SHIFTOF(index)))
 
 
+/* To prevent gc traversal of certain object pointers, we take advantage of the
+ * fact  that all inter-object  pointers (iow: pointers to  object that in turn
+ * also point to more object) are always pointer-aligned (since a struct T that
+ * contains pointers must  have alignof(T)  >= alignof(void *)).  This is  also
+ * assumed by `gc_reachable_pointer()', which simply ignores pointers that  are
+ * not properly aligned.
+ *
+ * We  (ab-)use this fact  to prevent certain  inter-object pointers from being
+ * used for traversal, as we don't want links between global object lists to be
+ * considered as a viable method of reaching other global objects.
+ *
+ * As such, we assume that bit#0 is normally clear for inter-object pointers,
+ * and simply set it to 1 to prevent the link from being traversed. Once leak
+ * detection has finished, we change it back to clear.
+ *
+ * s.a. the discussion on why `Phase #3: Scan global objects' is disabled above */
+#define gc_isskewed(p) ((uintptr_t)(p) & 1)
+#define gc_skewed(p)   ((typeof(p))((uintptr_t)(p) | 1))
+#define gc_unskewed(p) ((typeof(p))((uintptr_t)(p) & ~1))
+#define gc_skew(p_p)   (void)(*(p_p) = gc_skewed(*(p_p)))
+#define gc_unskew(p_p) (void)(*(p_p) = gc_unskewed(*(p_p)))
+
+
+
+
+
 
 
 /* Reset coreheap reachability flags. */
@@ -1083,7 +1109,7 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 		}
 check_reachable_mnode:
 		/* Mark reachable mnode objects from the kernel mman */
-		mn = mnode_tree_locate(mman_kernel.mm_mappings, ptr);
+		mn = mnode_tree_locate(mman_kernel.mm_mappings, gc_skewed(ptr));
 		if (mn != NULL)
 			mn->mn_flags |= MNODE_F__REACH;
 		return 0;
@@ -1339,30 +1365,6 @@ NOTHROW(KCALL gc_reachable_thread_cb)(void *UNUSED(arg),
 #else
 #define PRINT_LEAKS_SEARCH_PHASE(...) (void)0
 #endif
-
-
-
-/* To prevent gc traversal of certain object pointers, we take advantage of the
- * fact  that all inter-object  pointers (iow: pointers to  object that in turn
- * also point to more object) are always pointer-aligned (since a struct T that
- * contains pointers must  have alignof(T)  >= alignof(void *)).  This is  also
- * assumed by `gc_reachable_pointer()', which simply ignores pointers that  are
- * not properly aligned.
- *
- * We  (ab-)use this fact  to prevent certain  inter-object pointers from being
- * used for traversal, as we don't want links between global object lists to be
- * considered as a viable method of reaching other global objects.
- *
- * As such, we assume that bit#0 is normally clear for inter-object pointers,
- * and simply set it to 1 to prevent the link from being traversed. Once leak
- * detection has finished, we change it back to clear.
- *
- * s.a. the discussion on why `Phase #3: Scan global objects' is disabled above */
-#define gc_isskewed(p) ((uintptr_t)(p) & 1)
-#define gc_skewed(p)   ((typeof(p))((uintptr_t)(p) | 1))
-#define gc_unskewed(p) ((typeof(p))((uintptr_t)(p) & ~1))
-#define gc_skew(p_p)   (void)(*(p_p) = gc_skewed(*(p_p)))
-#define gc_unskew(p_p) (void)(*(p_p) = gc_unskewed(*(p_p)))
 
 
 
