@@ -141,7 +141,6 @@ PRIVATE struct mfile_stream_ops const ramfs_fifonode_v_stream_ops = {
 	.mso_truncate = &ramfs_fifonode_v_truncate,
 	.mso_stat     = &ramfs_fifonode_v_stat,
 	.mso_ioctl    = &ramfs_fifonode_v_ioctl,
-	.mso_hop      = &ramfs_fifonode_v_hop,
 };
 PUBLIC_CONST struct ffifonode_ops const ramfs_fifonode_ops = {
 	.fno_node = {

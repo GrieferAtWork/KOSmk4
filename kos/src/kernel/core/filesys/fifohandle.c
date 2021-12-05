@@ -37,7 +37,6 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
-#include <kos/hop/pipe.h>
 #include <kos/kernel/handle.h> /* HANDLE_TYPE_FIFOHANDLE */
 #include <sys/stat.h>
 
@@ -116,12 +115,6 @@ handle_fifohandle_polltest(struct fifohandle *__restrict self,
 	if ((what & POLLOUTMASK) && ringbuffer_canwrite(rb))
 		result |= POLLOUTMASK;
 	return result;
-}
-
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_fifohandle_hop(struct fifohandle *__restrict self, ioctl_t cmd,
-                      USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	return ffifonode_v_hop(self->fu_fifo, cmd, arg, mode);
 }
 
 INTERN NONNULL((1)) REF void *KCALL

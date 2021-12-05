@@ -311,6 +311,7 @@ incdir("");
 #include <bits/os/statfs.h>
 #include <bits/os/statvfs.h>
 #include <bits/os/stropts.h>
+#include <bits/os/sysinfo.h>
 #include <bits/os/termio.h>
 #include <bits/os/termios.h>
 #include <bits/os/termiox.h>
@@ -421,6 +422,7 @@ incdir("");
 #include <compat/bits/os/stat.h>
 #include <compat/bits/os/statfs-convert.h>
 #include <compat/bits/os/statfs.h>
+#include <compat/bits/os/sysinfo.h>
 #include <compat/bits/os/timeb.h>
 #include <compat/bits/os/timespec.h>
 #include <compat/bits/os/timeval.h>
@@ -639,7 +641,6 @@ incdir("");
 #include <kos/hop/api.h>
 #include <kos/hop/module.h>
 #include <kos/hop/openfd.h>
-#include <kos/hop/pipe.h>
 #include <kos/hybrid/heap.h>
 #include <kos/hybrid/sched-signal.h>
 #include <kos/io.h>

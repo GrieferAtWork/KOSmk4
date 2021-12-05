@@ -37,7 +37,6 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
-#include <kos/hop/pipe.h>
 #include <kos/kernel/handle.h> /* HANDLE_TYPE_FIFOHANDLE */
 #include <sys/stat.h>
 
@@ -299,61 +298,6 @@ ffifonode_v_stat(struct mfile *__restrict self,
 	me    = mfile_asfifo(self);
 	avail = ATOMIC_READ(me->ff_buffer.rb_avail);
 	result->st_size = (typeof(result->st_size))avail;
-}
-
-INTDEF syscall_slong_t KCALL /* From "pipe.c" */
-_ringbuffer_pipe_tryhop(struct ringbuffer *__restrict self, ioctl_t cmd,
-                        USER UNCHECKED void *arg, iomode_t mode);
-
-/* Implements some `HOP_PIPE_OPEN_*' commands */
-PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ffifonode_v_hop(struct mfile *__restrict self, ioctl_t cmd,
-                USER UNCHECKED void *arg, iomode_t mode)
-		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
-	struct ffifonode *me = mfile_asfifo(self);
-	switch (cmd) {
-
-	case HOP_PIPE_OPEN_PIPE: {
-		struct handle temp;
-		if ((mode & IO_ACCMODE) != IO_RDWR)
-			require(CAP_PIPE_OPEN_CONTROLLER);
-		temp.h_type = HANDLE_TYPE_MFILE;
-		temp.h_mode = mode;
-		temp.h_data = me;
-		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
-	}	break;
-
-	case HOP_PIPE_CREATE_READER: {
-		struct handle temp;
-		require(CAP_PIPE_CREATE_WRAPPERS);
-		temp.h_type = HANDLE_TYPE_FIFOHANDLE;
-		temp.h_mode = (mode & ~IO_ACCMODE) | IO_RDONLY;
-		temp.h_data = fifohandle_new(me, temp.h_mode, NULL, NULL);
-		FINALLY_DECREF_UNLIKELY((REF struct fifohandle *)temp.h_data);
-		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
-	}	break;
-
-	case HOP_PIPE_CREATE_WRITER: {
-		struct handle temp;
-		require(CAP_PIPE_CREATE_WRAPPERS);
-		temp.h_type = HANDLE_TYPE_FIFOHANDLE;
-		temp.h_mode = (mode & ~IO_ACCMODE) | IO_WRONLY;
-		temp.h_data = fifohandle_new(me, temp.h_mode, NULL, NULL);
-		FINALLY_DECREF_UNLIKELY((REF struct fifohandle *)temp.h_data);
-		return handle_installopenfd((USER UNCHECKED struct hop_openfd *)arg, temp);
-	}	break;
-
-	default:
-		break;
-	}
-	{
-		syscall_slong_t result;
-		/* Execute generic pipe-HOPs on our ring-buffer. */
-		result = _ringbuffer_pipe_tryhop(&me->ff_buffer, cmd, arg, mode);
-		if (result != -EINVAL)
-			return result;
-	}
-	return fnode_v_hop(me, cmd, arg, mode);
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void

@@ -104,7 +104,6 @@ DATDEF struct ffifonode_ops const ramfs_fifonode_ops;
 #define ramfs_fifonode_v_truncate ffifonode_v_truncate
 #define ramfs_fifonode_v_stat     ffifonode_v_stat
 #define ramfs_fifonode_v_ioctl    ffifonode_v_ioctl
-#define ramfs_fifonode_v_hop      ffifonode_v_hop
 #define ramfs_fifonode_v_wrattr   fnode_v_wrattr_noop
 #define ramfs_fifonode_v_changed  ffifonode_v_changed
 #define ramfs_fifonode_v_destroy  ffifonode_v_destroy
