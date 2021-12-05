@@ -737,25 +737,28 @@ END(x86_unwind_scpustate_Psp)
 #ifdef __x86_64__
 	movzlq $(P64_PAGE_FPREPARED), %rcx
 	movq   $(0), thiscpu_x86_ioperm_bitmap(%rbx)
-	movq   %rcx, 0x0(%rdx)
-	movq   %rcx, 0x8(%rdx)
+	movq   %rcx, 0x0(%Pdx)
+	movq   %rcx, 0x8(%Pdx)
+	invlpg (%Pdx)
 #else /* __x86_64__ */
 	xorl   %ecx, %ecx  /* P32_PAGE_ABSENT / PAE_PAGE_ABSENT */
 	movl   %ecx, thiscpu_x86_ioperm_bitmap(%ebx)
-	movl   %ecx, 0x0(%edx)
-	movl   %ecx, 0x4(%edx)
-#endif /* !__x86_64__ */
-#ifndef __x86_64__
+	movl   %ecx, 0x0(%Pdx)
+	movl   %ecx, 0x4(%Pdx)
 #ifndef CONFIG_NO_PAGING_PAE
 INTERN_FUNCTION(__x86_lazy_disable_ioperm_bitmap_pae)
 	/* When  PAE  paging  is  disabled,  paging  initialization  overrides  this
 	 * instruction location with a `jmp __x86_lazy_disable_ioperm_bitmap_return' */
-	movl   %ecx, 0x8(%edx)
-	movl   %ecx, 0xc(%edx)
+	movl   %ecx, 0x8(%Pdx)
+	movl   %ecx, 0xc(%Pdx)
 END(__x86_lazy_disable_ioperm_bitmap_pae)
 #endif /* !CONFIG_NO_PAGING_PAE */
+.alt_if X86_FEAT_INVLPG
+	invlpg (%Pdx)
+.alt_else
+	/* ... */
+.alt_endif
 #endif /* !__x86_64__ */
-	/* TODO: invlpg */
 	jmp    __x86_lazy_disable_ioperm_bitmap_return
 	.cfi_endproc
 END(x86_load_thread_Pax_cpu_Pbx)
