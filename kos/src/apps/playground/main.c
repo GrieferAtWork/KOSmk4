@@ -1068,6 +1068,47 @@ int main_dumpdebug(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_leakmon(int argc, char *argv[], char *envp[]) {
+	size_t loop;
+	static char const reset[] = AC_ED("") AC_CUP0;
+	write(STDOUT_FILENO, reset, sizeof(reset) - sizeof(char));
+	(void)argc;
+	++argv;
+
+	for (loop = 0;; ++loop) {
+		int status;
+		pid_t cpid;
+		/*KSysctl(KSYSCTL_SYSTEM_CLEARCACHES);*/
+		KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
+		dprintf(STDOUT_FILENO, AC_ED("") AC_CUP0 "loop: %" PRIuSIZ "\n", loop);
+		cpid = vfork();
+		if (cpid == 0) {
+			execvpe(argv[0], argv, envp);
+			_Exit(127);
+		}
+		if (cpid < 0)
+			err(1, "vfork");
+		for (;;) {
+			pid_t error = waitpid(cpid, &status, 0);
+			if (error == cpid)
+				break;
+			if (error >= 0)
+				continue;
+			if (errno != EINTR)
+				err(1, "waitpid");
+		}
+		if (!WIFEXITED(status))
+			return 1;
+		if (WEXITSTATUS(status) != 0)
+			return WEXITSTATUS(status);
+	}
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -1113,6 +1154,7 @@ PRIVATE DEF defs[] = {
 	{ "dumpdebug", &main_dumpdebug },
 	{ "fg", &main_fg },
 	{ "fatls", &main_fatls },
+	{ "leakmon", &main_leakmon },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

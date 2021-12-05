@@ -925,7 +925,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       have been executed. - Something doesn't feel right here, and I suspect that
 	 *       somewhere memory isn't being unmapped when it should be.
 	 * Reproduce:
-	 * $ watch -n 0.1 cat /proc/kos/raminfo
+	 * $ playground leakmon cat /proc/kos/raminfo
 	 *
 	 * Over time, "free" ram slowly goes down, but leaks(1) doesn't report anything, so
 	 * either  whatever stays behind is globally reachable, or (most likely), something
