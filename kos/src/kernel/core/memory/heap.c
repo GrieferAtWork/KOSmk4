@@ -33,6 +33,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
@@ -1031,6 +1032,47 @@ NOTHROW(KCALL heap_free_untraced)(struct heap *__restrict self,
 	HEAP_ASSERTF(IS_ALIGNED(num_bytes, HEAP_ALIGNMENT),
 	             "Invalid heap_free(): Unaligned free size %" PRIuSIZ " (%#" PRIxSIZ ")",
 	             num_bytes, num_bytes);
+#ifndef NDEBUG
+	if (self == &kernel_heaps[0] || self == &kernel_heaps[1]) {
+		if (!!(flags & GFP_LOCKED) != !!(self == &kernel_heaps[1])) {
+			kernel_panic(1, "heap_free_untraced(%p,%p,%" PRIuSIZ ",%#x): "
+			                "Wrong heap used. Using GFP_LOCKED=%u requires %s",
+			             self, ptr, num_bytes, flags,
+			             flags & GFP_LOCKED ? 1 : 0,
+			             flags & GFP_LOCKED ? "kernel_locked_heap"
+			                                : "kernel_default_heap");
+		}
+	}
+
+	/* Make sure that the MLOCK attribute of the mem-node
+	 * backing  `ptr'  matches   the  given   GFP_LOCKED. */
+again_lock_mman:
+	if (mman_lock_tryread(&mman_kernel)) {
+		struct mnode *node;
+		node = mman_mappings_locate(&mman_kernel, ptr);
+		if unlikely(!node) {
+			mman_lock_endread(&mman_kernel);
+			kernel_panic(1, "heap_free_untraced(%p,%p,%" PRIuSIZ ",%#x): "
+			                "No mem-node at %p",
+			             self, ptr, num_bytes, flags,
+			             ptr);
+			goto again_lock_mman;
+		}
+		if (!!(node->mn_flags & MNODE_F_MLOCK) != !!(flags & GFP_LOCKED)) {
+			void *minaddr, *maxaddr;
+			minaddr = mnode_getminaddr(node);
+			maxaddr = mnode_getmaxaddr(node);
+			mman_lock_endread(&mman_kernel);
+			kernel_panic(1, "heap_free_untraced(%p,%p,%" PRIuSIZ ",%#x): "
+			                "MLOCK=%u of node at %p-%p uses doesn't match given GFP_LOCKED=%u",
+			             self, ptr, num_bytes, flags,
+			             (flags & GFP_LOCKED) ? 0 : 1, minaddr, maxaddr,
+			             (flags & GFP_LOCKED) ? 1 : 0);
+			goto again_lock_mman;
+		}
+		mman_lock_endread(&mman_kernel);
+	}
+#endif /* !NDEBUG */
 
 	/* Reset debug information. */
 #ifdef CONFIG_DEBUG_HEAP
