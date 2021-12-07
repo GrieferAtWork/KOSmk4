@@ -1437,6 +1437,7 @@ NOTHROW(KCALL gc_reachable_tm_memory)(void) {
 		struct mnode *lastnode;
 		lastnode = mman_mappings_locate(&mman_kernel, (void *)gc_skewed(tm_nodes));
 		assertf(lastnode, "Bad node pointer: %p", tm_nodes);
+		lastnode->mn_flags |= MNODE_F__REACH;
 		gc_reachable_tm_node_memory(tm_nodes, lastnode);
 	}
 }
