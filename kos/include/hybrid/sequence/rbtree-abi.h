@@ -20,8 +20,8 @@
 
 /* NOTE: This implementation is derived from information found on Wikipedia:
  *       https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
- * The implementation used when `RBTREE_LEFT_LEANING' is defined is based
- * on   that   same  article,   as   well  as   the   following  sources:
+ * The implementation used when `RBTREE_LEFT_LEANING' is defined is
+ * based  on that same  article, as well  as the following sources:
  *  - https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
  *  - https://github.com/sebastiencs/red-black-tree/blob/master/rbtree.c
  */

@@ -221,7 +221,8 @@ PRIVATE LLRBTREE_ROOT(pci_device) libpci_devices_tree = NULL;
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(pci_devices, libpci_devices_getter);
-INTERN WUNUSED ATTR_CONST struct pci_device *NOTHROW(LIBPCIACCESS_CC libpci_devices_getter)(void) {
+INTERN WUNUSED ATTR_CONST struct pci_device *
+NOTHROW(LIBPCIACCESS_CC libpci_devices_getter)(void) {
 	return SLIST_FIRST(&libpci_devices);
 }
 #endif /* !__KERNEL__ */

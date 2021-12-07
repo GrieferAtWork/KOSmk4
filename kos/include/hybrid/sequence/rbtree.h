@@ -37,8 +37,8 @@
  *     O(llrb.locate)   = O(log2(N)) == O(rb.locate)
  *     O(llrb.insert)   = O(log2(N)) >  O(rb.insert)
  *     O(llrb.remove)   = O(log2(N)) >  O(rb.remove)
- *     O(llrb.nextnode) = N/A
- *     O(llrb.prevnode) = N/A
+ *     O(llrb.nextnode) = O(log2(N))                  # Requires tree base; implemented via minmaxlocate
+ *     O(llrb.prevnode) = O(log2(N))                  # Requires tree base; implemented via minmaxlocate
  *       llrb.memory    = (2 * sizeof(void *) + C)*N + 1BIT*N
  *
  * Or in order words: Run times for both variants of red-black  trees
