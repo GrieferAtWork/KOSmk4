@@ -3001,7 +3001,7 @@ got_current:
 		}
 		if (result != 0) {
 			decref_unlikely(current);
-			break;
+			goto done;
 		}
 		/* Try to lock the next module. */
 		DlModule_AllLock_Read();
@@ -3012,11 +3012,12 @@ got_current:
 		/* Continue enumerating the next module. */
 		decref_unlikely(current);
 		if (!next)
-			break;
+			goto done;
 		current = next;
 		goto got_current;
 	}
 	DlModule_AllLock_EndRead();
+done:
 	return result;
 }
 
