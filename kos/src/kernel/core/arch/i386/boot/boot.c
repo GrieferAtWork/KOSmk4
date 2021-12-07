@@ -477,27 +477,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Make the x86 LDT object ATTR_PERMMAN, and reload LDT registers during an mman
 	 *       switch. On linux,  they're PERMMAN,  too, so we  really should  do the  same. */
 
-	/* TODO: deemon's module system appears somewhat broken on KOS.
-	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:
-	 *       $ deemon --help /deemon/string
-	 *
-	 *       >> IllegalInstruction: Illegal instruction at <anonymous>+001A
-	 *       >> /usr/lib/deemon/doctext.dee(148,1) : <anonymous>+001A
-	 *       >> /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
-	 *       >> /usr/lib/deemon/doc.dee(3823,33) : __str__+0051
-	 *       Also: In certain cases, this causes both the doc and doctext module's dec
-	 *             files to constantly get re-compiled  (though in other cases,  these
-	 *             exact dec files also get accepted as valid, possibly related to how
-	 *             they've been imported, implying a problem within the deemon core)
-	 *       NOTE: I'm assuming that the IllegalInstruction is caused by some discrepancy
-	 *             between the hand-written assembly RT engine, and the one written in  C
-	 *
-	 *       >> UnicodeDecodeError: Invalid utf-8 character byte 0x85
-	 *       >> /usr/lib/deemon/doc.dee(2537,34) : __str__+0002
-	 *       >> /usr/lib/deemon/doc.dee(3823,33) : __str__+0051
-	 *       When the dec files already exist, this error is thrown instead.
-	 *
-	 * TODO: Deemon's   SystemFile.size()   function   always   uses    lseek64()
+	/* TODO: Deemon's   SystemFile.size()   function   always   uses    lseek64()
 	 *       Change this to where it first attempts to use fstat() (if available)
 	 * TODO: Deemon's main() function should try to re-configure mallopt()  during
 	 *       init in order to optimize itself  for using large amounts of  memory.
@@ -505,14 +485,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       calls to mmap() (an overallocation of 32768 bytes might work well...)
 	 * TODO: When opening a dec file, use mmap() (if available) and malloc()+read()
 	 *       as    fall-back,    rather   than    always    using   malloc()+read() */
-
-	/* TODO: Play around with `no_caller_saved_registers'
-	 *       It may be possible to cut down on boiler-plate assembly needed to wrap
-	 *       simple C-level interrupt handlers and/or system calls, by not  needing
-	 *       to save registers that wouldn't be used in any case! */
-
-	/* TODO: Add auto-completion to the `cpuid' debugger command.
-	 *       We can easily determine valid leafs by looking at the value of CPUID[0].EAX! */
 
 	/* TODO: Now that there's once again a packet-buffer controller,
 	 *       add  support  for  pipe2(O_DIRECT)  (aka.  packet-mode)
@@ -525,10 +497,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       This will still print the normal libgcc.a filename, which
 	 *       wasn't built with support for -mno-red-zone.
 	 * >> https://wiki.osdev.org/Libgcc_without_red_zone */
-
-	/* TODO: The builtin  debugger's disassembler  should  show the  values  of
-	 *       registers used in the current instruction, as well as the contents
-	 *       of memory operands. */
 
 	/* TODO: The builtin debugger should contain a graphical applet that combines
 	 *       the functionality of the `lsthread', `thread', `trace', `l' and  `r'
@@ -572,10 +540,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     - Properly implement libc's regex functions
 	 */
 
-	/* TODO: libgen/c  should insert 1 blank line prior to the comment block
-	 *       of a function if that block is immediately preceded by a #endif
-	 *       or another function's declaration. */
-
 	/* TODO: Don't #define __builtin_unreachable() in <__crt.h> to __crt_unreachable()
 	 *       Instead  look into `-fsanitize=unreachable' (which does something similar
 	 *       on  a compiler-basis  and won't make  the library call  mandatory for all
@@ -585,7 +549,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add a KOS-specific libcrypt */
 
-	/* TODO: Investigate into a execution-time profiling system (using some  kind
+	/* TODO: Investigate into an execution-time profiling system (using some kind
 	 *       of hardware timer interrupt) that can be used to collect the program
 	 *       counter positions where the system spends most of its time, so  that
 	 *       those sub-routines can get more love & care for optimization. */
