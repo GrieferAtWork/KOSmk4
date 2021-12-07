@@ -1408,6 +1408,40 @@ NOTHROW(KCALL gc_reachable_fallsuper)(struct fsuper *first) {
 #endif
 
 
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) void
+NOTHROW(KCALL gc_reachable_tm_node_memory)(struct trace_node *__restrict self,
+                                           struct mnode *__restrict lastnode) {
+again:
+	if ((byte_t *)self < (byte_t *)mnode_getminaddr(lastnode) ||
+	    (byte_t *)self > (byte_t *)mnode_getmaxaddr(lastnode)) {
+		lastnode = mman_mappings_locate(&mman_kernel, (void *)gc_skewed(self));
+		assertf(lastnode, "Bad node pointer: %p", self);
+		lastnode->mn_flags |= MNODE_F__REACH;
+	}
+	if (self->tn_link.rb_lhs) {
+		if (self->tn_link.rb_rhs)
+			gc_reachable_tm_node_memory(self->tn_link.rb_rhs, lastnode);
+		self = self->tn_link.rb_lhs;
+		goto again;
+	}
+	if (self->tn_link.rb_rhs) {
+		self = self->tn_link.rb_rhs;
+		goto again;
+	}
+}
+
+/* Mark all mem-nodes used for backing `tm_nodes' as reachable. */
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_reachable_tm_memory)(void) {
+	if (tm_nodes) {
+		struct mnode *lastnode;
+		lastnode = mman_mappings_locate(&mman_kernel, (void *)gc_skewed(tm_nodes));
+		assertf(lastnode, "Bad node pointer: %p", tm_nodes);
+		gc_reachable_tm_node_memory(tm_nodes, lastnode);
+	}
+}
+
+
 /* Scan the kernel for all reachable, traced pointers. */
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_find_reachable_impl)(void) {
@@ -1428,6 +1462,9 @@ NOTHROW(KCALL gc_find_reachable_impl)(void) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #1: Scan .data + .bss\n");
 	gc_reachable_data((byte_t *)__debug_malloc_tracked_start,
 	                  (size_t)__debug_malloc_tracked_size);
+
+	/* Mark all mem-nodes used for backing `tm_nodes' as reachable. */
+	gc_reachable_tm_memory();
 
 	/* Search all threads on all CPUs. */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2: Scan running threads\n");
@@ -1872,7 +1909,6 @@ again:
 		goto next; /* Can't trace outside of kernel-space. */
 	if (self->mn_part == NULL)
 		goto next; /* Don't consider reserved mappings as leaks. */
-	/* TODO: Mustn't consider `KERNEL_MHINT_DHEAP' (iow: memory for `tm_nodes') */
 
 	/* NOTE: There may be  more situations where  a mem-node  should
 	 *       be considered reachable, even when no pointers pointing
