@@ -17,29 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD     (/sys/sys/ioccom.h) */
-/* (#) Portability: NetBSD      (/sys/sys/ioccom.h) */
-/* (#) Portability: OpenBSD     (/sys/sys/ioccom.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/ioccom.h) */
-#ifndef _SYS_IOCCOM_H
-#define _SYS_IOCCOM_H 1
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/link.h) */
+#ifndef _SYS_LINK_H
+#define _SYS_LINK_H 1
 
-#include <__stdinc.h>
+#include <link.h>
 
-#include <asm/ioctl.h>
-
-#define IOCPARM_MASK        _IOC_SIZEMASK
-#define IOCPARM_LEN         _IOC_SIZE
-#define IOCBASECMD(x)       ((x) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT))
-#define IOCGROUP            _IOC_TYPE
-#define IOCPARM_MAX         _IOC_SIZEMASK
-#define IOC_VOID            0
-#define IOC_DIRMASK         _IOC_DIRMASK
-#define IOC_IN              _IOC_IN
-#define IOC_OUT             _IOC_OUT
-#define IOC_INOUT           _IOC_INOUT
-#define _IORN(type, nr, N)  _IOC(_IOC_READ, type, nr, N)
-#define _IOWN(type, nr, N)  _IOC(_IOC_WRITE, type, nr, N)
-#define _IOWRN(type, nr, N) _IOC(_IOC_READ | _IOC_WRITE, type, nr, N)
-
-#endif /* !_SYS_IOCCOM_H */
+#endif /* !_SYS_LINK_H */
