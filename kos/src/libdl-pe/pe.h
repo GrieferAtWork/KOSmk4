@@ -53,8 +53,7 @@ DECL_BEGIN
 /* DL core operator table. */
 #define dl (*libpe_fmt.df_core)
 
-
-/* Replacement for `linker_main' from `libdl.so' when a PE binary gets executed. */
+/* Called by `linker_main' from `libdl.so' when a PE binary is getting executed. */
 INTDEF void *FCALL
 libpe_linker_main(struct peexec_info *__restrict info,
                   uintptr_t loadaddr,

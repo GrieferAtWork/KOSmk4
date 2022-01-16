@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBDL_PE_API_H
 #define GUARD_LIBDL_PE_API_H 1
+#define __WANT_INLINE_SYSCALLS
 
 #include <hybrid/compiler.h>
 

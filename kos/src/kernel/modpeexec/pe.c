@@ -404,6 +404,7 @@ done_bss:
 			/* Push: `struct peexec_info::pi_rtldaddr' */
 			stack_end -= sizeof(uintptr_t);
 			*(USER CHECKED uintptr_t *)stack_end = (uintptr_t)libdl_base;
+			COMPILER_BARRIER();
 		} EXCEPT {
 			if (oldmman != args->ea_mman)
 				task_setmman_inherit(oldmman);

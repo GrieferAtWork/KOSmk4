@@ -209,7 +209,7 @@ mfile_create_missaligned_wrapper(struct mfile *__restrict inner,
 	if (blockshift < PAGESHIFT)
 		blockshift = PAGESHIFT;
 	_mfile_init(result, &missaligned_mfile_ops, blockshift, inner->mf_iobashift);
-	result->mf_parts             = NULL;
+	result->mf_parts             = MFILE_PARTS_ANONYMOUS;
 	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
 	atomic64_init(&result->mf_filesize, (uint64_t)-1);
 
@@ -232,7 +232,7 @@ mfile_create_missaligned_wrapper(struct mfile *__restrict inner,
 	/* Fill in remaining fields. */
 	result->mam_base = incref(inner);
 	result->mam_offs = inner_fpos;
-	return inner;
+	return result;
 }
 
 

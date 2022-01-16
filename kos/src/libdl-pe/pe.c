@@ -25,8 +25,14 @@
 /**/
 
 #include <kos/except.h>
+#include <kos/syscalls.h>
+#include <sys/ioctl.h>
 
 #include <dlfcn.h>
+#include <stdlib.h>
+#include <syslog.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "pe.h"
 
@@ -150,13 +156,24 @@ INTERN void libpe_init(void) {
 	          &libpe_fmt,
 	          sizeof(struct dlmodule_format),
 	          sizeof(struct dlcore_ops));
+
+	/* Make sure that the registration was successful */
+	if unlikely(libpe_fmt.df_core == NULL) {
+		struct termios ios;
+		char const *error = dlerror();
+		syslog(LOG_ERR, "PE hook failed: %s\n", error);
+		if (sys_ioctl(STDERR_FILENO, TCGETA, &ios) >= 0) {
+			sys_write(STDERR_FILENO, "PE: ", 4);
+			sys_write(STDERR_FILENO, error, strlen(error));
+			sys_write(STDERR_FILENO, "\n", 1);
+		}
+		sys_exit_group(EXIT_FAILURE);
+	}
 }
 
 
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 /* Replacement for `linker_main' from `libdl.so' when a PE binary gets executed. */
 DEFINE_PUBLIC_ALIAS(__linker_main, libpe_linker_main);

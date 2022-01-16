@@ -31,6 +31,7 @@
 __DECL_BEGIN
 
 struct peexec_data {
+	/* TODO: Don't include the entire `IMAGE_NT_HEADERS' -- Only include what's actually used! */
 	IMAGE_NT_HEADERS                                pd_nt;    /* NT header. (actual field size is `offsetof(IMAGE_NT_HEADERS, OptionalHeader) + pd_nt.FileHeader.SizeOfOptionalHeader'). */
 /*	__COMPILER_FLEXIBLE_ARRAY(byte_t,              _pd_pad1);  * Pad to multiple of `sizeof(void *)' */
 /*	__COMPILER_FLEXIBLE_ARRAY(IMAGE_SECTION_HEADER, pd_sect);  * Section headers (length is `pd_nt.FileHeader.NumberOfSections') */
