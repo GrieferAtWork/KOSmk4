@@ -153,15 +153,10 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 					 */
 					if (((uintptr_t)bss_start & PAGEMASK) != 0) {
 						PAGEDIR_PAGEALIGNED byte_t *bss_overlap_addr;
-						size_t bss_start_offset, bss_overlap, bss_total_size;
+						size_t bss_start_offset;
 						struct mbnode *overlap_node;
 						assert(phdr_vector[i].p_memsz > phdr_vector[i].p_filesz);
-						bss_total_size = phdr_vector[i].p_memsz -
-						                 phdr_vector[i].p_filesz;
 						bss_start_offset = (size_t)((uintptr_t)bss_start & PAGEMASK);
-						bss_overlap = PAGESIZE - bss_start_offset;
-						if (bss_overlap > bss_total_size)
-							bss_overlap = bss_total_size;
 						bss_overlap_addr = loadaddr + fil_bytes;
 						if unlikely(mbuilder_mappings_locate(&builder, bss_overlap_addr) != NULL) {
 err_overlap:
@@ -170,16 +165,15 @@ err_overlap:
 							      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 							      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
 						}
-						overlap_node = create_bss_overlap_mbnode(args->ea_xfile,
-						                                         (pos_t)(phdr_vector[i].p_offset +
-						                                                 phdr_vector[i].p_filesz -
-						                                                 bss_start_offset),
-						                                         bss_start_offset,
-						                                         bss_overlap);
+						overlap_node = mbnode_create_partialbss(args->ea_xfile,
+						                                        (pos_t)(phdr_vector[i].p_offset +
+						                                                phdr_vector[i].p_filesz -
+						                                                bss_start_offset),
+						                                        bss_start_offset);
 						/* Fill in remaining fields of `overlap_node' */
 						overlap_node->mbn_minaddr = bss_overlap_addr;
 						overlap_node->mbn_maxaddr = bss_overlap_addr + PAGESIZE - 1;
-						overlap_node->mbn_flags   = prot;
+						overlap_node->mbn_flags   = mnodeflags_from_prot(prot);
 						mbuilder_insert_fmnode(&builder, overlap_node);
 						fil_bytes += PAGESIZE; /* Adjust to not map the first (special) page of .bss */
 						if unlikely(fil_bytes >= mem_bytes)
@@ -206,6 +200,7 @@ done_PT_LOAD_bss:
 				break;
 			}
 		}
+
 		/* If necessary, load the dynamic linker. */
 		if (need_dyn_linker) {
 			linker_base = mbuilder_map(/* self:        */ &builder,

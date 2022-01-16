@@ -143,6 +143,13 @@ BEGIN
 
 		if (TARGET_ARCH in ["i386", "x86_64"]) {
 			DEFINE_SIMPLE_ARCH_DRIVER("rtm")
+
+			/* PE executable driver. */
+			BEGIN GROUP("mod.peexec") { COMPILE, LINK, MCOPY };
+				SET_OUTPUT("/os/drivers/peexec")
+				LD_FLAGS({ "-soname=peexec" })
+				SOURCE({ "modpeexec/*.c" })
+			END
 		}
 
 		DEFINE_SIMPLE_DRIVER("sctrace",

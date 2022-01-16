@@ -165,6 +165,35 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct mbnode *NOTHROW(FCALL mbnode_tree_nex
 FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mbnode_tree_minmaxlocate)(struct mbnode *root, void const *minkey, void const *maxkey, struct mbnode_tree_minmax *__restrict result) ASMNAME("mnode_tree_minmaxlocate");
 
 
+/* Many binary formats contain the concept of a bss-overlap page.
+ * This is a page of memory that contains a leading portion  that
+ * is initialized from a file, as well as a trailing portion that
+ * is initialized as all zeroes.
+ *
+ * Creating a node to represent this is normally rather hard,
+ * but can  be simplified  by making  use of  this  function.
+ *
+ * This creates an already-initialized mbnode pointing to an  mpart
+ * describing a single page,  who's leading `head_size' bytse  have
+ * been loaded from `head_file', while tailing `PAGESIZE-head_size'
+ * bytes have been zero-initialized.
+ *
+ * The caller must still initialize:
+ *  - return->mbn_minaddr = ...
+ *  - return->mbn_maxaddr = return->mbn_minaddr + PAGESIZE - 1
+ *  - return->mbn_flags   = ...
+ * Afterwards, insert into an mbuilder using:
+ * >> mbuilder_insert_fmnode(&builder, overlap_node);
+ *
+ * @param: head_file: The file from which to load head data.
+ * @param: head_fpos: File position of head data.
+ * @param: head_size: Head data sizes (in bytes; < PAGESIZE) */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mbnode *KCALL
+mbnode_create_partialbss(struct mfile *__restrict head_file,
+                         pos_t head_fpos, size_t head_size);
+
+
+
 #define MBNODE_PARTSET_NUMBUCKETS 16
 struct mbnode_partset {
 	/* [0..n][link(mbn_nxtuprt)][*] List of nodes

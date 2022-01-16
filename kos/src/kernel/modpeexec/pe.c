@@ -1,0 +1,237 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_MODPEEXEC_PE_C
+#define GUARD_MODPEEXEC_PE_C 1
+#define _KOS_SOURCE 1
+
+#include <kernel/compiler.h>
+
+#include <kernel/driver.h>
+#include <kernel/execabi.h>
+#include <kernel/mman/flags.h>
+#include <kernel/mman/mbuilder.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/printk.h>
+
+#include <hybrid/align.h>
+
+#include <kos/except.h>
+#include <nt/winnt.h>
+
+#include <assert.h>
+#include <malloca.h>
+#include <stddef.h>
+
+/**/
+#include "pe.h"
+
+DECL_BEGIN
+
+/* Populate a given `effective_vm' by loading an PE executable file. */
+INTERN WUNUSED NONNULL((1)) unsigned int FCALL
+peabi_exec(/*in|out*/ struct execargs *__restrict args) {
+	struct mbuilder builder;
+	uint32_t e_lfanew; /* IMAGE_DOS_HEADER::e_lfanew */
+	IMAGE_NT_HEADERS nt;
+	size_t nthdr_size;
+	PIMAGE_SECTION_HEADER shdr;
+	pos_t shdr_off;
+	size_t i;
+	uintptr_t loadaddr;
+
+	/* Read offset of NT header */
+	mfile_readall(args->ea_xfile, &e_lfanew, sizeof(e_lfanew),
+	              (pos_t)offsetof(IMAGE_DOS_HEADER, e_lfanew));
+	nthdr_size = mfile_read(args->ea_xfile, &nt, sizeof(nt), (pos_t)e_lfanew);
+	if (nthdr_size < offsetof(IMAGE_NT_HEADERS, OptionalHeader))
+		return EXECABI_EXEC_NOTBIN;
+
+	/* Check the NT header. */
+	if (nt.Signature != IMAGE_NT_SIGNATURE)
+		return EXECABI_EXEC_NOTBIN;
+	if (nt.FileHeader.Machine != IMAGE_FILE_MACHINE_HOST)
+		return EXECABI_EXEC_NOTBIN;
+
+	 /* Make sure there are sections. */
+	if (nt.FileHeader.NumberOfSections == 0)
+		return EXECABI_EXEC_NOTBIN;
+
+	/* Limit the max number of sections. */
+	if (nt.FileHeader.NumberOfSections > 0xff)
+		return EXECABI_EXEC_NOTBIN;
+
+	/* Load section headers. */
+	shdr = (PIMAGE_SECTION_HEADER)malloca(nt.FileHeader.NumberOfSections,
+	                                      sizeof(IMAGE_SECTION_HEADER));
+	RAII_FINALLY { freea(shdr); };
+	shdr_off = (pos_t)e_lfanew;
+	shdr_off += offsetof(IMAGE_NT_HEADERS, OptionalHeader);
+	shdr_off += nt.FileHeader.SizeOfOptionalHeader;
+	mfile_readall(args->ea_xfile, shdr,
+	              nt.FileHeader.NumberOfSections *
+	              sizeof(IMAGE_SECTION_HEADER),
+	              shdr_off);
+
+	/* Figure out how many optional headers we got. */
+	nthdr_size -= offsetof(IMAGE_NT_HEADERS, OptionalHeader);
+	if (nt.FileHeader.SizeOfOptionalHeader > nthdr_size)
+		nt.FileHeader.SizeOfOptionalHeader = nthdr_size;
+
+	/* ASLR support */
+	loadaddr = 0; /* TODO */
+
+	/* Map sections */
+	mbuilder_init(&builder);
+	RAII_FINALLY { mbuilder_fini(&builder); };
+	for (i = 0; i < nt.FileHeader.NumberOfSections; ++i) {
+#define SHOULD_USE_IMAGE_SECTION_HEADER(x)                                  \
+	(((x)->VirtualAddress + (x)->Misc.VirtualSize) > (x)->VirtualAddress && \
+	 !((x)->Characteristics & (IMAGE_SCN_LNK_INFO | IMAGE_SCN_LNK_REMOVE)))
+		unsigned int prot = 0;
+		PIMAGE_SECTION_HEADER section = &shdr[i];
+		uintptr_t sectaddr;
+		if (!SHOULD_USE_IMAGE_SECTION_HEADER(section))
+			continue; /* Skip! */
+		printk(KERN_DEBUG "[pe] section[%Iu] = %q\n", i, section->Name);
+
+		/* Force page alignment. */
+		if (section->VirtualAddress & PAGEMASK) {
+			section->Misc.VirtualSize += section->VirtualAddress & PAGEMASK;
+			if (section->SizeOfRawData) {
+				section->PointerToRawData += section->VirtualAddress & PAGEMASK;
+				section->SizeOfRawData += section->VirtualAddress & PAGEMASK;
+			}
+			section->VirtualAddress &= ~PAGEMASK;
+		}
+		if (section->Misc.VirtualSize & PAGEMASK) {
+			bool was_ge;
+			size_t addend;
+			addend = PAGESIZE - (section->Misc.VirtualSize & PAGEMASK);
+			was_ge = section->SizeOfRawData >= section->Misc.VirtualSize;
+			section->Misc.VirtualSize += addend;
+			if (was_ge)
+				section->SizeOfRawData = section->Misc.VirtualSize;
+		}
+		if (section->SizeOfRawData > section->Misc.VirtualSize)
+			section->SizeOfRawData = section->Misc.VirtualSize;
+
+		/* Determine section protection. */
+		if (section->Characteristics & IMAGE_SCN_MEM_SHARED)
+			prot |= PROT_SHARED;
+		if (section->Characteristics & IMAGE_SCN_MEM_EXECUTE)
+			prot |= PROT_EXEC;
+		if ((section->Characteristics & IMAGE_SCN_MEM_READ) ||
+		    !(section->Characteristics & (IMAGE_SCN_LNK_REMOVE | IMAGE_SCN_LNK_INFO)))
+			prot |= PROT_READ;
+		if (section->Characteristics & IMAGE_SCN_MEM_WRITE)
+			prot |= PROT_WRITE;
+
+		/* Map section */
+		sectaddr = loadaddr + section->VirtualAddress;
+		assert(IS_ALIGNED((uintptr_t)sectaddr, PAGESIZE));
+		if (section->Misc.VirtualSize > section->SizeOfRawData) {
+			uintptr_t bss_start = section->SizeOfRawData;
+			uintptr_t bss_size  = section->Misc.VirtualSize - section->SizeOfRawData;
+			if (bss_start & PAGEMASK) {
+				struct mbnode *node;
+				pos_t head_fpos;
+				byte_t *addr;
+				section->SizeOfRawData &= ~PAGEMASK; /* Adjust for leading page. */
+				addr = (byte_t *)(sectaddr + section->SizeOfRawData);
+				node = mbuilder_mappings_locate(&builder, addr);
+				if unlikely(node != NULL) {
+					THROW(E_BADALLOC_ADDRESS_ALREADY_EXISTS,
+					      addr, addr + PAGEMASK,
+					      node->mbn_minaddr, node->mbn_maxaddr);
+				}
+
+				/* Construct partial bss page. */
+				head_fpos = (pos_t)section->PointerToRawData + section->SizeOfRawData;
+				node = mbnode_create_partialbss(args->ea_xfile, head_fpos,
+				                                bss_start & PAGEMASK);
+
+				/* Fill in missing fields. */
+				node->mbn_minaddr = addr;
+				node->mbn_maxaddr = addr + PAGEMASK;
+				node->mbn_flags   = mnodeflags_from_prot(prot);
+				mbuilder_insert_fmnode(&builder, node);
+
+				bss_start += PAGEMASK;
+				bss_start &= ~PAGEMASK;
+				if (bss_start <= section->SizeOfRawData)
+					goto done_bss;
+				bss_size = bss_start - section->SizeOfRawData;
+			}
+
+			/* Map normal .bss */
+			mbuilder_map(&builder, (void *)(sectaddr + bss_start),
+			             bss_size, prot & ~PROT_SHARED,
+			             MAP_FIXED | MAP_FIXED_NOREPLACE,
+			             &mfile_zero);
+		}
+done_bss:
+		if (section->SizeOfRawData) {
+			pos_t offset = (pos_t)section->PointerToRawData;
+			if (offset & PAGEMASK) {
+				/* Custom mfile to lazily load data from a miss-aligned file offset. */
+				REF struct mfile *wrapper;
+				wrapper = mfile_create_missaligned_wrapper(args->ea_xfile, offset);
+				FINALLY_DECREF_UNLIKELY(wrapper);
+				mbuilder_map(&builder, (void *)sectaddr,
+				             section->SizeOfRawData, prot,
+				             MAP_FIXED | MAP_FIXED_NOREPLACE,
+				             wrapper, args->ea_xpath,
+				             args->ea_xdentry, (pos_t)0);
+			} else {
+				mbuilder_map(&builder, (void *)sectaddr,
+				             section->SizeOfRawData, prot,
+				             MAP_FIXED | MAP_FIXED_NOREPLACE,
+				             args->ea_xfile, args->ea_xpath,
+				             args->ea_xdentry,
+				             (pos_t)offset);
+			}
+		}
+	}
+
+	/* TODO: Load libdl (and somehow tell it that this is a PE binary)
+	 * Solution #1: have a special version of libdl compiled with "-DCONFIG_PE"
+	 *              that is loads the primary executable as a PE and is able to
+	 *              load both PE and ELF libraries
+	 * Solution #2: Add support for (somehow) loading PE binaries into the normal
+	 *              libdl that comes shipped with the kernel core (I don't really
+	 *              like this solution since it would add bloat to the "pure" KOS
+	 *              kernel core) */
+	THROW(E_NOT_IMPLEMENTED_TODO);
+
+	return EXECABI_EXEC_SUCCESS;
+}
+
+
+
+#ifndef CONFIG_BUILDING_KERNEL_CORE
+PRIVATE struct execabi peabi = EXECABI_INIT_PE;
+PRIVATE DRIVER_INIT void KCALL init(void) {
+	execabis_register(&peabi);
+}
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
+DECL_END
+
+#endif /* !GUARD_MODPEEXEC_PE_C */

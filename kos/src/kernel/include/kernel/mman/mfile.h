@@ -1095,6 +1095,20 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lock_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->mf_lock)
 
 
+/* Create a wrapper file whose I/O cache is lazily populated from  `inner',
+ * with the given `inner_fpos' addend added to all file offsets. Note  that
+ * writes  to the  returned file will  _NEVER_ be passed  along to `inner',
+ * and that any modifications made to portions of `inner' that have already
+ * been loaded by `return' will _NOT_ be visible.
+ *
+ * This function is primarily used as a hacky wrapper for loading PE files
+ * into memory (as those  sometimes have sub-page alignment  constraints). */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfile *FCALL
+mfile_create_missaligned_wrapper(struct mfile *__restrict inner,
+                                 pos_t inner_fpos)
+		THROWS(E_BADALLOC);
+
+
 /* Make the given file anonymous+deleted. What this means is that (in order):
  *  - The `MFILE_F_DELETED' flag is set for the file.
  *  - The `MFILE_F_PERSISTENT' flag is cleared for the file.

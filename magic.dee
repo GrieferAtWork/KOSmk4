@@ -327,10 +327,12 @@ function main(argv: {string...}) {
 					CONFIG_EMULATOR_STARTED_PATTERN = value;
 					break;
 				case "--target":
-					TARGET_ARCH = value;
+					if (value != "${env.TARGET}")
+						TARGET_ARCH = value;
 					break;
 				case "--config":
-					setConfig(value);
+					if (value != "${env.CONFIG}")
+						setConfig(value);
 					break;
 				case "--vsgengroup":
 					config.FORMAT_ERRORS = true;

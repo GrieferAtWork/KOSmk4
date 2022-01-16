@@ -42,6 +42,10 @@
 #include "../../modshebang/shebang.h"
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
 
+#ifdef CONFIG_EXECABI_HAVE_BUILTIN_PE
+#include "../../modpeexec/pe.h"
+#endif /* CONFIG_EXECABI_HAVE_BUILTIN_PE */
+
 DECL_BEGIN
 
 enum {
@@ -52,6 +56,9 @@ enum {
 #ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
 	                          + 1
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
+#ifdef CONFIG_EXECABI_HAVE_BUILTIN_PE
+	                          + 1
+#endif /* CONFIG_EXECABI_HAVE_BUILTIN_PE */
 	                          )
 };
 
@@ -66,6 +73,9 @@ PRIVATE struct execabis_struct default_execabis = {
 #ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
 		EXECABI_INIT_SHEBANG,
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
+#ifdef CONFIG_EXECABI_HAVE_BUILTIN_PE
+		EXECABI_INIT_PE,
+#endif /* CONFIG_EXECABI_HAVE_BUILTIN_PE */
 	}
 };
 

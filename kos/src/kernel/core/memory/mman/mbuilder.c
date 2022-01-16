@@ -33,6 +33,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/phys.h>
 #include <sched/rpc-internal.h>
 
 #include <hybrid/align.h>
@@ -127,6 +128,107 @@ again:
 		goto again;
 	}
 }
+
+
+/* Many binary formats contain the concept of a bss-overlap page.
+ * This is a page of memory that contains a leading portion  that
+ * is initialized from a file, as well as a trailing portion that
+ * is initialized as all zeroes.
+ *
+ * Creating a node to represent this is normally rather hard,
+ * but can  be simplified  by making  use of  this  function.
+ *
+ * This creates an already-initialized mbnode pointing to an  mpart
+ * describing a single page,  who's leading `head_size' bytse  have
+ * been loaded from `head_file', while tailing `PAGESIZE-head_size'
+ * bytes have been zero-initialized.
+ *
+ * The caller must still initialize:
+ *  - return->mbn_minaddr = ...
+ *  - return->mbn_maxaddr = return->mbn_minaddr + PAGESIZE - 1
+ *  - return->mbn_flags   = ...
+ * Afterwards, insert into an mbuilder using:
+ * >> mbuilder_insert_fmnode(&builder, overlap_node);
+ *
+ * @param: head_file: The file from which to load head data.
+ * @param: head_fpos: File position of head data.
+ * @param: head_size: Head data sizes (in bytes; < PAGESIZE) */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mbnode *KCALL
+mbnode_create_partialbss(struct mfile *__restrict head_file,
+                         pos_t head_fpos, size_t head_size) {
+	struct mbnode *node;
+	struct mpart *part;
+	physpage_t overlap_page;
+	assertf(head_size <= PAGESIZE, "Head size too large (must fit a single page)");
+	assertf(head_size != PAGESIZE, "Then why wouldn't you use a normal file-map?");
+	node = (struct mbnode *)kmalloc(sizeof(struct mbnode),
+	                                GFP_LOCKED | GFP_PREFLT);
+	TRY {
+		part = (struct mpart *)kmalloc(sizeof(struct mpart),
+		                               GFP_LOCKED | GFP_PREFLT);
+		TRY {
+			overlap_page = page_mallocone();
+			if unlikely(overlap_page == PHYSPAGE_INVALID)
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+			TRY {
+				/* Load the overlapping file data into memory. */
+				mfile_readall_p(head_file, physpage2addr(overlap_page),
+				                head_size, head_fpos);
+
+				/* Check if we must zero-initialize the BSS portion. */
+				if (!page_iszero(overlap_page)) {
+					/* Zero-initialize the BSS portion */
+					memsetphys_onepage(physpage2addr(overlap_page) + head_size,
+					                   0, PAGESIZE - head_size);
+				}
+			} EXCEPT {
+				page_free(overlap_page, 1);
+				RETHROW();
+			}
+		} EXCEPT {
+			kfree(part);
+			RETHROW();
+		}
+	} EXCEPT {
+		kfree(node);
+		RETHROW();
+	}
+
+	/* Initialize... */
+	part->mp_refcnt = 1;
+	part->mp_xflags = MPART_XF_NORMAL;
+	part->mp_flags  = MPART_F_NORMAL;
+	part->mp_state  = MPART_ST_MEM;
+	part->mp_file   = incref(&mfile_zero);
+	LIST_INIT(&part->mp_copy);
+	LIST_INIT(&part->mp_share);
+	SLIST_INIT(&part->mp_lockops);
+	/*part->mp_allparts*/ /* Initialized by `mpart_all_list_insert' */
+	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
+	part->mp_minaddr      = (pos_t)(0);
+	part->mp_maxaddr      = (pos_t)(PAGESIZE - 1);
+	_mpart_init_asanon(part);
+	part->mp_blkst_ptr    = NULL;
+	part->mp_mem.mc_start = overlap_page;
+	part->mp_mem.mc_size  = 1;
+	part->mp_meta         = NULL;
+
+	/* Add the part to the list of all parts. */
+	mpart_all_list_insert(part);
+
+	/*node->mbn_minaddr;*/ /* Initialized by the caller */
+	/*node->mbn_maxaddr;*/ /* Initialized by the caller */
+	/*node->mbn_flags;*/   /* Initialized by the caller */
+	node->mbn_part   = part; /* Inherit reference */
+	node->mbn_filnxt = NULL; /* Single-node mapping */
+	node->mbn_fspath = NULL; /* Unused */
+	node->mbn_fsname = NULL; /* Unused */
+	node->mbn_file   = incref(&mfile_zero); /* Unused, but must be non-NULL */
+	mnode_mbn_filpos_set(node, 0);
+
+	return node;
+}
+
 
 /* Finalize the given mem-builder. */
 PUBLIC NOBLOCK NONNULL((1)) void
