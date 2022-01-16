@@ -1098,6 +1098,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
 			decref(mod);
 		return result;
 	}
+
 	/* Search for the closest dynamic symbol. */
 	if (mod->dm_elf.de_dynsym_tab) {
 		ElfW(Sym) const *iter, *end;
@@ -1122,6 +1123,8 @@ NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
 			}
 		}
 	}
+	/* XXX: set dl error? */
+	return -1;
 done:
 	if (!(mod->dm_flags & RTLD_NODELETE))
 		decref(mod);

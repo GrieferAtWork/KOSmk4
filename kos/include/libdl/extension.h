@@ -160,31 +160,35 @@ struct dlmodule_format {
 	NONNULL((1, 2)) __REF DlModule *(LIBDL_CC *df_open)(byte_t const header[DL_MODULE_MAXMAGIC],
 	                                                    /*inherit(on_success,HEAP)*/ char *__restrict filename,
 	                                                    /*inherit(on_success)*/ fd_t fd);
-	/* [0..1] Open a headers blob (must be implemented by formats used for more than
-	 *        just shared libraries, and also needs backing by the kernel core) */
-	NONNULL((1, 2)) __REF DlModule *(LIBDL_CC *df_open_hdrs)(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-	                                                         void *__restrict info, uintptr_t loadaddr);
-#define DLMODULE_FORMAT_OPEN_BAD_MAGIC ((DlModule *)-1) /* Special return value for `df_open' to instruct libdl to continue
-	                                                     * searching for a matching module format (to-be used for module
-	                                                     * formats that store additional magic bytes somewhere else than
-	                                                     * at the start of some given file). */
+
+	/* Special return value for `df_open' to instruct libdl to continue
+	 * searching for a matching module format (to-be used for module
+	 * formats that store additional magic bytes somewhere else than
+	 * at the start of some given file). */
+#define DLMODULE_FORMAT_OPEN_BAD_MAGIC ((DlModule *)-1)
 
 	/* [1..1] Finalizer callback, to-be invoked when the module is destroyed.
 	 * NOTE: This callback is also responsible for calling `sys_unmap()' on
 	 *       any mapped program segment  associated with the given  module. */
 	NONNULL((1)) void (LIBDL_CC *df_fini)(DlModule *__restrict self);
+
 	/* [0..1] Run user-defined module initializers. */
 	NONNULL((1)) void (LIBDL_CC *df_run_initializers)(DlModule *__restrict self);
+
 	/* [0..1] Run user-defined module finalizers (but don't run `dm_finalize'). */
 	NONNULL((1)) void (LIBDL_CC *df_run_finalizers)(DlModule *__restrict self);
+
 	/* [1..1] Check if `module_relative_pointer' points into a mapped segment. */
-	NONNULL((1)) bool (LIBDL_CC *df_ismapped)(DlModule *__restrict self, uintptr_t module_relative_pointer);
+	NONNULL((1)) bool (LIBDL_CC *df_ismapped)(DlModule *__restrict self,
+	                                          uintptr_t module_relative_pointer);
+
 	/* [1..1] Format-specific symbol lookup.
 	 * @return: * : One of `DLMODULE_FORMAT_DLSYM_*' */
 	NONNULL((1, 2, 3)) int (LIBDL_CC *df_dlsym)(DlModule *__restrict self,
 	                                            char const *__restrict symbol_name,
 	                                            void **__restrict psymbol_addr,
 	                                            size_t *psymbol_size);
+
 #define DLMODULE_FORMAT_DLSYM_WEAK  1    /* Symbol found, but it is weak */
 #define DLMODULE_FORMAT_DLSYM_OK    0    /* Symbol found */
 #define DLMODULE_FORMAT_DLSYM_ERROR (-1) /* Symbol could not be found (dlerror() was not modified) */
@@ -197,14 +201,18 @@ struct dlmodule_format {
 	 *        If necessary, lazily initialize `self->dm_shnum'
 	 * @return: >= self->dm_shnum: Unknown section `name' (dlerror() was not modified) */
 	NONNULL((1, 2)) uintptr_t (LIBDL_CC *df_dlsectindex)(DlModule *__restrict self, char const *__restrict name);
+
 	/* [0..1] Return information about a section, given its index.
 	 *        If necessary, lazily initialize `self->dm_shnum'
 	 * @return: != 0: Invalid section index (dlerror() was modified) */
-	NONNULL((1, 3)) int (LIBDL_CC *df_dlsectinfo)(DlModule *__restrict self, uintptr_t index, struct dl_sect_info *__restrict result);
+	NONNULL((1, 3)) int (LIBDL_CC *df_dlsectinfo)(DlModule *__restrict self, uintptr_t index,
+	                                              struct dl_sect_info *__restrict result);
+
 	/* [0..1] Return the name of a section, given its index.
 	 *        If necessary, lazily initialize `self->dm_shnum'
 	 * @return: NULL: Invalid section index (dlerror() was modified) */
 	NONNULL((1)) char const *(LIBDL_CC *df_dlsectname)(DlModule *__restrict self, uintptr_t index);
+
 	/* [0..1] Enumerate individual program headers in an ELF-like way.
 	 *        This operator should fill in:
 	 *        >> info->dlpi_phdr

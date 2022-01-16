@@ -25,6 +25,8 @@
 #include <kos/exec/elf.h>
 #include <nt/winnt.h>
 
+#include <libc/string.h>
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -55,6 +57,12 @@ struct peexec_info /*[PREFIX(ei_)]*/ {
 //	byte_t                          pi_entry_sp[]; /* Entry stack address (set the address of this field as
 //	                                                * stack-pointer when handing control to the hosted application) */
 };
+
+#define peexec_info__pi_pe(self)                                             \
+	((struct peexec_data *)(((uintptr_t)__libc_strend((self)->pi_libdl_pe) + \
+	                         sizeof(void *) - 1) &                           \
+	                        ~(sizeof(void *) - 1)))
+
 
 __DECL_END
 #endif /* __CC__ */
