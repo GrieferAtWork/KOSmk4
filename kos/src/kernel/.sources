@@ -141,17 +141,6 @@ BEGIN
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
 		DEFINE_SIMPLE_DRIVER("dbx") /* DeBug eXtensions */
 
-		if (TARGET_ARCH in ["i386", "x86_64"]) {
-			DEFINE_SIMPLE_ARCH_DRIVER("rtm")
-
-			/* PE executable driver. */
-			BEGIN GROUP("mod.peexec") { COMPILE, LINK, MCOPY };
-				SET_OUTPUT("/os/drivers/peexec")
-				LD_FLAGS({ "-soname=peexec" })
-				SOURCE({ "modpeexec/*.c" })
-			END
-		}
-
 		DEFINE_SIMPLE_DRIVER("sctrace",
 			SOURCE({ "../libsctrace/*.c" }) /* Include libsctrace source files */
 		)
@@ -159,6 +148,14 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("svga",
 			SOURCE({ "../libsvgadrv/*.c" }) /* Video driver library */
 		)
+
+		/* X86-specific drivers */
+		if (TARGET_ARCH in ["i386", "x86_64"]) {
+			DEFINE_SIMPLE_ARCH_DRIVER("rtm")
+
+			/* PE executable driver */
+			DEFINE_SIMPLE_DRIVER("peexec")
+		}
 
 #undef DEFINE_SIMPLE_ARCH_DRIVER
 #undef DEFINE_SIMPLE_DRIVER

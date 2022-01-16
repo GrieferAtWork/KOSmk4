@@ -751,7 +751,8 @@ DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restri
 	                                (info->ei_pnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
-	memcpy(result->dm_elf.de_phdr, info->ei_phdr, info->ei_pnum, sizeof(ElfW(Phdr)));
+	memcpy(result->dm_elf.de_phdr, info->ei_phdr,
+	       info->ei_pnum, sizeof(ElfW(Phdr)));
 	/*result->dm_ops     = NULL;*/ /* Implicitly done by `calloc()' */
 	result->dm_loadstart = (uintptr_t)-1;
 	/*result->dm_loadend = 0;*/

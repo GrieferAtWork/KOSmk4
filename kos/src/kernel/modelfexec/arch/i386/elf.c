@@ -150,6 +150,7 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 	/* Print the application filename to the user-space stack. */
 	buflen = 0;
 	for (;;) {
+		bool ok;
 		size_t reqlen;
 		if (exec_path && exec_dentry) {
 			REF struct path *myroot = fs_getroot(THIS_FS);
@@ -169,9 +170,10 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 			if (buflen)
 				((USER char *)user_state_sp - buflen)[0] = '\0';
 		}
-		if (reqlen <= buflen)
-			break;
+		ok = reqlen <= buflen;
 		buflen = (reqlen + 7) & ~7;
+		if (ok)
+			break;
 	}
 	user_state_sp -= buflen;
 	dl_data = (USER struct elfexec_info64 *)(user_state_sp -
@@ -339,6 +341,7 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 	/* Print the application filename to the user-space stack. */
 	buflen = 0;
 	for (;;) {
+		bool ok;
 		size_t reqlen;
 		if (exec_path && exec_dentry) {
 			REF struct path *myroot = fs_getroot(THIS_FS);
@@ -358,9 +361,10 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 			if (buflen)
 				((USER char *)user_state_sp - buflen)[0] = '\0';
 		}
-		if (reqlen <= buflen)
-			break;
+		ok     = reqlen <= buflen;
 		buflen = (reqlen + 3) & ~3;
+		if (ok)
+			break;
 	}
 	user_state_sp -= buflen;
 	dl_data = (USER struct elfexec_info32 *)(user_state_sp -

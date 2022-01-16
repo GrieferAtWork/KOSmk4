@@ -127,12 +127,15 @@ INTERN bool sys_debugtrap_disabled = false;
 INTDEF byte_t __rtld_end[];
 INTDEF byte_t __rtld_start[];
 
+typedef void *(FCALL *PLINKER_MAIN)(struct elfexec_info *__restrict info,
+                                    uintptr_t loadaddr,
+                                    struct process_peb *__restrict peb);
+
 
 INTERN WUNUSED NONNULL((1, 3)) void *FCALL
 linker_main(struct elfexec_info *__restrict info,
             uintptr_t loadaddr,
             struct process_peb *__restrict peb) {
-	char *filename;
 	void *result;
 	REF DlModule *base_module;
 	size_t rtld_size = __rtld_end - __rtld_start;
@@ -148,23 +151,43 @@ linker_main(struct elfexec_info *__restrict info,
 	dl_rtld_module.dm_elf.de_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
 	DlModule_AllList.dlh_first = &dl_rtld_module;
 
-	/* Return a pointer to `&info->ed_entry' */
-	filename = elfexec_info_getfilename(info);
-	result   = &elfexec_info_getentry(info);
-
-	filename = strdup(filename);
-	if unlikely(!filename) {
-		dl_seterror_nomem();
-		goto err;
-	}
-
 	/* Check for LD-specific environment variables. */
 	dl_library_path = process_peb_getenv(peb, "LD_LIBRARY_PATH");
 	if (!dl_library_path)
 		dl_library_path = (char *)RTLD_LIBRARY_PATH;
 
-	/* TODO: Support for executable formats other than ELF */
-	base_module = DlModule_ElfOpenLoadedProgramHeaders(filename, info, loadaddr);
+	/* Support for executable formats other than ELF */
+	if (elfexec_info_usesinterpreter(info)) {
+		char *int_name;
+		DlModule *int_lib;
+		PLINKER_MAIN int_main;
+		int_name = elfexec_info_getinterpreter(info);
+		int_lib  = DlModule_OpenFilename(int_name, RTLD_LAZY | RTLD_NODELETE);
+		if unlikely(!int_lib)
+			goto err;
+		*(void **)&int_main = libdl_dlsym(int_lib, "__linker_main");
+		if unlikely(!int_main)
+			goto err;
+
+		/* Invoke an external linker-main function. */
+		COMPILER_BARRIER();
+		result = (*int_main)(info, loadaddr, peb);
+		COMPILER_BARRIER();
+
+		base_module = LIST_FIRST(&DlModule_GlobalList);
+	} else {
+		/* Return a pointer to `&info->ed_entry' */
+		char *filename;
+		filename = elfexec_info_getfilename(info);
+		result   = &elfexec_info_getentry(info);
+		filename = strdup(filename);
+		if unlikely(!filename) {
+			dl_seterror_nomem();
+			goto err;
+		}
+		base_module = DlModule_ElfOpenLoadedProgramHeaders(filename, info, loadaddr);
+	}
+
 	if unlikely(!base_module)
 		goto err;
 	assert(base_module->dm_flags & RTLD_NOINIT);

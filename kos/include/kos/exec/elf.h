@@ -83,7 +83,7 @@
 #ifndef __elfexec_info_defined
 #define __elfexec_info_defined
 __DECL_BEGIN
-struct elfexec_info /*[PREFIX(pr_)]*/ {
+struct elfexec_info /*[PREFIX(ei_)]*/ {
 	ElfW(Addr)  ei_rtldaddr;    /* Load address of the RTLD itself. */
 	ElfW(Half)  ei_pnum;        /* Amount of ELF program headers. */
 	__uint8_t   ei_abi;         /* [const] The value of `EI_OSABI' */
@@ -98,6 +98,16 @@ struct elfexec_info /*[PREFIX(pr_)]*/ {
 };
 __DECL_END
 #endif /* !__elfexec_info_defined */
+
+/* Check if a custom interpreter library should be used. */
+#ifndef elfexec_info_usesinterpreter
+#define elfexec_info_usesinterpreter(x) ((x)->ei_pnum == (ElfW(Half))-1)
+#endif /* !elfexec_info_usesinterpreter */
+
+/* Return the filename for the interpreter library. */
+#ifndef elfexec_info_getinterpreter
+#define elfexec_info_getinterpreter(x) ((char *)&(x)->ei_abi)
+#endif /* !elfexec_info_getinterpreter */
 
 /* Return the filename of the primary application */
 #ifndef elfexec_info_getfilename

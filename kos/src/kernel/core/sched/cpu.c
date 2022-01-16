@@ -153,9 +153,12 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		}
 
 		/* Invoke cleanup callbacks. */
+		assert(PREEMPTION_ENABLED());
 		iter = __kernel_pertask_onexit_start;
-		for (; iter < __kernel_pertask_onexit_end; ++iter)
+		for (; iter < __kernel_pertask_onexit_end; ++iter) {
 			(**iter)();
+			assert(PREEMPTION_ENABLED());
+		}
 	}
 
 	PREEMPTION_DISABLE();
