@@ -40,24 +40,76 @@ INTDEF struct dlmodule_format libpe_fmt;
 /* Per-DlModule extension data for PE */
 struct dlmodule_pe {
 	IMAGE_NT_HEADERS                              dp_nt;    /* [const] NT file header */
-	COMPILER_FLEXIBLE_ARRAY(IMAGE_SECTION_HEADER, dp_sect); /* [const] Section headers */
+	COMPILER_FLEXIBLE_ARRAY(IMAGE_SECTION_HEADER, dp_sect); /* [const][:dm_shnum] Section headers */
 };
+
+#define DlModule_HasOptionalHeader(self, field)             \
+	((self)->dm_pe.dp_nt.FileHeader.SizeOfOptionalHeader >= \
+	 COMPILER_OFFSETAFTER(IMAGE_OPTIONAL_HEADER, field))
+#define DlModule_HasDataDirectory(self, id) DlModule_HasOptionalHeader(self, DataDirectory[id])
+#define DlModule_HasExports(self)           DlModule_HasDataDirectory(self, IMAGE_DIRECTORY_ENTRY_EXPORT)
+#define DlModule_GetExports(self)           (&(self)->dm_pe.dp_nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT])
+#define DlModule_HasImports(self)           DlModule_HasDataDirectory(self, IMAGE_DIRECTORY_ENTRY_IMPORT)
+#define DlModule_GetImports(self)           (&(self)->dm_pe.dp_nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT])
+#define DlModule_HasRelocs(self)            DlModule_HasDataDirectory(self, IMAGE_DIRECTORY_ENTRY_BASERELOC)
+#define DlModule_GetRelocs(self)            (&(self)->dm_pe.dp_nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC])
+
 
 DECL_END
 
+#include <malloc.h> /* So we can override malloc() and friends */
+
+#include <libc/malloc.h> /* So we can override malloc() and friends */
 #include <libdl/extension.h>
 #include <libdl/module.h>
+
+#undef __libc_malloc
+#undef __libc_free
+#undef __libc_calloc
+#undef __libc_realloc
+#undef __libc_realloc_in_place
+#undef __libc_memalign
+#undef __libc_strdup
+#define __libc_malloc           malloc
+#define __libc_free             free
+#define __libc_calloc           calloc
+#define __libc_realloc          realloc
+#define __libc_realloc_in_place realloc_in_place
+#define __libc_memalign         memalign
+#define __libc_strdup           strdup
 
 DECL_BEGIN
 
 /* DL core operator table. */
 #define dl (*libpe_fmt.df_core)
 
+/* Even though we could, we don't want to use heap functions from libc. If we
+ * did, corruption of allocations made by the hosted program would result  in
+ * module information also becoming corrupt.
+ *
+ * Instead, we just use the same stand-alone heap implementation that's also
+ * used by the core libdl (which we are extending) */
+#define malloc           (*libpe_fmt.df_core->dlmalloc)
+#define free             (*libpe_fmt.df_core->dlfree)
+#define calloc           (*libpe_fmt.df_core->dlcalloc)
+#define realloc          (*libpe_fmt.df_core->dlrealloc)
+#define realloc_in_place (*libpe_fmt.df_core->dlrealloc_in_place)
+#define memalign         (*libpe_fmt.df_core->dlmemalign)
+#define strdup           dlstrdup
+INTDEF char *CC dlstrdup(char const *str);
+INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_nomem)(void);
+
+
 /* Called by `linker_main' from `libdl.so' when a PE binary is getting executed. */
 INTDEF void *FCALL
 libpe_linker_main(struct peexec_info *__restrict info,
                   uintptr_t loadaddr,
                   struct process_peb *__restrict peb);
+
+
+/* Wrapper for `dlsym()' that does all of the "DOS$" / "KOS$" prefix handling. */
+INTDEF void *ATTR_STDCALL
+libpe_GetProcAddress(DlModule *self, char const *symbol_name);
 
 
 DECL_END

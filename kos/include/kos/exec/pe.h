@@ -32,16 +32,18 @@ __DECL_BEGIN
 
 struct peexec_data {
 	/* TODO: Don't include the entire `IMAGE_NT_HEADERS' -- Only include what's actually used! */
-	IMAGE_NT_HEADERS                                pd_nt;    /* NT header. (actual field size is `offsetof(IMAGE_NT_HEADERS, OptionalHeader) + pd_nt.FileHeader.SizeOfOptionalHeader'). */
-/*	__COMPILER_FLEXIBLE_ARRAY(byte_t,              _pd_pad1);  * Pad to multiple of `sizeof(void *)' */
-/*	__COMPILER_FLEXIBLE_ARRAY(IMAGE_SECTION_HEADER, pd_sect);  * Section headers (length is `pd_nt.FileHeader.NumberOfSections') */
-/*	__COMPILER_FLEXIBLE_ARRAY(char,                 pd_name);  * NUL-termianted, absolute filename of primary executable (e.g. `/bin/program.exe') */
-/*	__COMPILER_FLEXIBLE_ARRAY(byte_t,              _pd_pad2);  * Pad to multiples of `sizeof(void *)' */
+	__UINTPTR_TYPE__                                pd_loadmin; /* First (absolute) address mapped by the sections of this binary */
+	__UINTPTR_TYPE__                                pd_loadmax; /* Last (absolute) address mapped by the sections of this binary */
+	IMAGE_NT_HEADERS                                pd_nt;      /* NT header. (actual field size is `offsetof(IMAGE_NT_HEADERS, OptionalHeader) + pd_nt.FileHeader.SizeOfOptionalHeader'). */
+/*	__COMPILER_FLEXIBLE_ARRAY(byte_t,              _pd_pad1);    * Pad to multiple of `sizeof(void *)' */
+/*	__COMPILER_FLEXIBLE_ARRAY(IMAGE_SECTION_HEADER, pd_sect);    * Section headers (length is `pd_nt.FileHeader.NumberOfSections') */
+/*	__COMPILER_FLEXIBLE_ARRAY(char,                 pd_name);    * NUL-termianted, absolute filename of primary executable (e.g. `/bin/program.exe') */
+/*	__COMPILER_FLEXIBLE_ARRAY(byte_t,              _pd_pad2);    * Pad to multiples of `sizeof(void *)' */
 };
 
 /* Helper macros for accessing hidden fields. */
 #define _peexec_data__offsetof_pd_sect(self) \
-	(((self)->pd_nt.FileHeader.SizeOfOptionalHeader + offsetof(IMAGE_NT_HEADERS, OptionalHeader) + sizeof(void *) - 1) & ~(sizeof(void *) - 1))
+	(((self)->pd_nt.FileHeader.SizeOfOptionalHeader + offsetof(struct peexec_data, pd_nt.OptionalHeader) + sizeof(void *) - 1) & ~(sizeof(void *) - 1))
 #define _peexec_data__offsetof_pd_name(self) \
 	(_peexec_data__offsetof_pd_sect(self) + (self)->pd_nt.FileHeader.NumberOfSections * sizeof(IMAGE_SECTION_HEADER))
 #define peexec_data__pd_sect(self) ((IMAGE_SECTION_HEADER *)((__BYTE_TYPE__ *)(self) + _peexec_data__offsetof_pd_sect(self)))

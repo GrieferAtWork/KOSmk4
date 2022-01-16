@@ -20,23 +20,88 @@
 #ifndef GUARD_LIBDL_PE_PE_C
 #define GUARD_LIBDL_PE_PE_C 1
 #define _KOS_SOURCE 1
+#define _KOS_ALTERATIONS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "api.h"
 /**/
+
+#include "pe.h"
+/**/
+
+#include <hybrid/align.h>
+#include <hybrid/atomic.h>
+#include <hybrid/wordbits.h>
 
 #include <kos/except.h>
 #include <kos/syscalls.h>
 #include <sys/ioctl.h>
 
 #include <dlfcn.h>
+#include <link.h>
+#include <malloca.h>
 #include <stdlib.h>
 #include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
 
-#include "pe.h"
-
 DECL_BEGIN
+
+INTERN char *CC dlstrdup(char const *str) {
+	syslog(LOG_DEBUG, "dlstrdup(%q)\n", str);
+	size_t len   = (strlen(str) + 1) * sizeof(char);
+	char *result = (char *)malloc(len);
+	if (result)
+		result = (char *)memcpy(result, str, len);
+	return result;
+}
+
+INTERN ATTR_COLD int
+NOTHROW(CC dl_seterror_nomem)(void) {
+	return dl.dl_seterrorf("Insufficient memory");
+}
+
+
+/* Wrapper for `dlsym()' that does all of the "DOS$" / "KOS$" prefix handling. */
+DEFINE_PUBLIC_ALIAS(GetProcAddress, libpe_GetProcAddress);
+INTERN void *ATTR_STDCALL
+libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
+	void *result;
+	char *dos_symbol_name;
+	size_t symbol_name_len;
+
+	/* Check for special case: don't try to link against DOS symbols */
+	if (memcmp(symbol_name, "KOS$", 4 * sizeof(char)) == 0)
+		return dlsym(self, symbol_name + 4);
+
+	/* Firstly: try to link against "DOS$"-prefixed symbols. */
+	symbol_name_len = strlen(symbol_name);
+	dos_symbol_name = (char *)malloca(4 + symbol_name_len + 1, sizeof(char));
+	if unlikely(!dos_symbol_name) {
+		dl_seterror_nomem();
+		return NULL;
+	}
+	{
+		RAII_FINALLY { freea(dos_symbol_name); };
+	
+		/* Construct the DOS$-prefixed symbol name. */
+		*(uint32_t *)dos_symbol_name = ENCODE_INT32('D', 'O', 'S', '$');
+		memcpy(dos_symbol_name + 4, symbol_name, symbol_name_len + 1, sizeof(char));
+		result = dlsym(self, dos_symbol_name);
+	}
+	if (result)
+		return result;
+
+	/* Try again with the non-prefixed name. */
+	result = dlsym(self, symbol_name);
+	if (result) {
+		/* Clear the error message set by the initial failed `dlsym()' */
+		dl.dl_error_message = NULL;
+	}
+	return result;
+}
+
+
 
 PRIVATE NONNULL((1, 2)) REF DlModule *LIBDL_CC
 libpe_v_open(byte_t const header[DL_MODULE_MAXMAGIC],
@@ -161,7 +226,7 @@ INTERN void libpe_init(void) {
 	if unlikely(libpe_fmt.df_core == NULL) {
 		struct termios ios;
 		char const *error = dlerror();
-		syslog(LOG_ERR, "PE hook failed: %s\n", error);
+		syslog(LOG_ERR, "Failed to hook PE libdl-extension: %s\n", error);
 		if (sys_ioctl(STDERR_FILENO, TCGETA, &ios) >= 0) {
 			sys_write(STDERR_FILENO, "PE: ", 4);
 			sys_write(STDERR_FILENO, error, strlen(error));
@@ -171,34 +236,112 @@ INTERN void libpe_init(void) {
 	}
 }
 
-
-
-#include <stdio.h>
-
 /* Replacement for `linker_main' from `libdl.so' when a PE binary gets executed. */
 DEFINE_PUBLIC_ALIAS(__linker_main, libpe_linker_main);
 INTERN void *FCALL
 libpe_linker_main(struct peexec_info *__restrict info,
                   uintptr_t loadaddr,
-                  struct process_peb *__restrict peb) {
+                  struct process_peb *__restrict UNUSED(peb)) {
+	void *result;
+	DlModule *mod;
+	char *filename;
 	struct peexec_data *pe = peexec_info__pi_pe(info);
 
-	/* NOTE: We can't use printf() because that function may use
-	 *       `errno', which has yet to be initialized at this point! */
-	dprintf(STDOUT_FILENO, "libpe_linker_main(%p, %p, %p)\n", info, loadaddr, peb);
-	dprintf(STDOUT_FILENO, "\tinfo->pi_rtldaddr                         = %p\n", info->pi_rtldaddr);
-	dprintf(STDOUT_FILENO, "\tinfo->pi_pnum                             = %#I16x\n", info->pi_pnum);
-	dprintf(STDOUT_FILENO, "\tinfo->pi_libdl_pe                         = %q\n", info->pi_libdl_pe);
-	dprintf(STDOUT_FILENO, "\tpe->pd_nt.Signature                       = %#I32x\n", pe->pd_nt.Signature);
-	dprintf(STDOUT_FILENO, "\tpe->pd_nt.FileHeader.Machine              = %#I16x\n", pe->pd_nt.FileHeader.Machine);
-	dprintf(STDOUT_FILENO, "\tpe->pd_nt.FileHeader.NumberOfSections     = %#I16x\n", pe->pd_nt.FileHeader.NumberOfSections);
-	dprintf(STDOUT_FILENO, "\tpe->pd_nt.FileHeader.TimeDateStamp        = %#I32x\n", pe->pd_nt.FileHeader.TimeDateStamp);
-	dprintf(STDOUT_FILENO, "\tpe->pd_nt.FileHeader.PointerToSymbolTable = %#I32x\n", pe->pd_nt.FileHeader.PointerToSymbolTable);
-	dprintf(STDOUT_FILENO, "\tpe->pd_nt.FileHeader.NumberOfSymbols      = %#I32x\n", pe->pd_nt.FileHeader.NumberOfSymbols);
-	dprintf(STDOUT_FILENO, "\tpe->pd_nt.FileHeader.SizeOfOptionalHeader = %#I16x\n", pe->pd_nt.FileHeader.SizeOfOptionalHeader);
-	dprintf(STDOUT_FILENO, "\tpe->pd_nt.FileHeader.Characteristics      = %#I16x\n", pe->pd_nt.FileHeader.Characteristics);
-	dprintf(STDOUT_FILENO, "\tpe->pd_name                               = %q\n", peexec_data__pd_name(pe));
-	_Exit(0);
+#if 1
+	syslog(LOG_DEBUG, "[pe] info->pi_rtldaddr                         = %p\n", info->pi_rtldaddr);
+	syslog(LOG_DEBUG, "[pe] info->pi_pnum                             = %#I16x\n", info->pi_pnum);
+	syslog(LOG_DEBUG, "[pe] info->pi_libdl_pe                         = %q\n", info->pi_libdl_pe);
+	syslog(LOG_DEBUG, "[pe] pe->pd_nt.Signature                       = %#I32x\n", pe->pd_nt.Signature);
+	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.Machine              = %#I16x\n", pe->pd_nt.FileHeader.Machine);
+	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.NumberOfSections     = %#I16x\n", pe->pd_nt.FileHeader.NumberOfSections);
+	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.TimeDateStamp        = %#I32x\n", pe->pd_nt.FileHeader.TimeDateStamp);
+	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.PointerToSymbolTable = %#I32x\n", pe->pd_nt.FileHeader.PointerToSymbolTable);
+	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.NumberOfSymbols      = %#I32x\n", pe->pd_nt.FileHeader.NumberOfSymbols);
+	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.SizeOfOptionalHeader = %#I16x\n", pe->pd_nt.FileHeader.SizeOfOptionalHeader);
+	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.Characteristics      = %#I16x\n", pe->pd_nt.FileHeader.Characteristics);
+	syslog(LOG_DEBUG, "[pe] pe->pd_name                               = %q\n", peexec_data__pd_name(pe));
+#endif
+
+	/* TODO: Modify `dl_library_path' to include  `basename $(peexec_data__pd_name(pe))'
+	 *       This is required for semantic compatibility with how dlls are loaded on NT. */
+
+	/* Allocate the DL module descriptor for the PE binary. */
+	mod = (DlModule *)malloc(offsetof(DlModule, dm_pe.dp_sect) +
+	                         (pe->pd_nt.FileHeader.NumberOfSections *
+	                          sizeof(IMAGE_SECTION_HEADER)));
+	if unlikely(!mod)
+		goto err_nomem;
+
+	/* Duplicate the caller-given filename. */
+	filename = peexec_data__pd_name(pe);
+	result   = (void *)CEIL_ALIGN((uintptr_t)strend(filename), sizeof(void *));
+	filename = strdup(filename);
+	if unlikely(!filename)
+		goto err_nomem; /* Leaks don't matter; we're only called once during init! */
+
+	/* Initialize simple fields of the new module. */
+	mod->dm_loadaddr   = loadaddr;
+	mod->dm_filename   = filename; /* Inherit */
+	mod->dm_dynhdr     = NULL;     /* Only exists under ELF */
+	mod->dm_tlsoff     = 0;
+	mod->dm_tlsinit    = NULL;
+	mod->dm_tlsfsize   = 0;
+	mod->dm_tlsmsize   = 0;
+	mod->dm_tlsalign   = 0;
+	mod->dm_tlsstoff   = 0;
+	mod->dm_tls_init   = NULL;
+	mod->dm_tls_fini   = NULL;
+	mod->dm_tls_arg    = NULL;
+	mod->dm_refcnt     = 1;
+	mod->dm_weakrefcnt = 1;
+	mod->dm_file       = -1;
+	mod->dm_flags      = RTLD_LAZY | RTLD_NODELETE | RTLD_LOADING;
+	mod->dm_loadstart  = pe->pd_loadmin;
+	mod->dm_loadend    = pe->pd_loadmax + 1;
+	mod->dm_finalize   = NULL;
+
+	/* Fill in section information. */
+	mod->dm_shnum = pe->pd_nt.FileHeader.NumberOfSections;
+	atomic_rwlock_init(&mod->dm_sections_lock);
+	mod->dm_sections = (DlSection **)calloc(mod->dm_shnum, sizeof(DlSection *));
+	if unlikely(!mod->dm_sections)
+		goto err_nomem; /* Leaks don't matter; we're only called once during init! */
+	mod->dm_sections_dangling = NULL;
+	mod->dm_ops               = &libpe_fmt;
+
+	/* Copy over PE information. */
+	{
+		size_t size;
+		size = offsetof(IMAGE_NT_HEADERS, OptionalHeader) + pe->pd_nt.FileHeader.SizeOfOptionalHeader;
+		if unlikely(size > sizeof(IMAGE_NT_HEADERS))
+			size = sizeof(IMAGE_NT_HEADERS);
+		memset(mempcpy(&mod->dm_pe.dp_nt, pe, size), 0,
+		       sizeof(IMAGE_NT_HEADERS) - size);
+		memcpy(&mod->dm_pe.dp_sect, peexec_data__pd_sect(pe),
+		       pe->pd_nt.FileHeader.NumberOfSections,
+		       sizeof(IMAGE_SECTION_HEADER));
+	}
+
+	/* Fill in library dependencies */
+	mod->dm_depcnt = 0;    /* TODO */
+	mod->dm_depvec = NULL; /* TODO */
+
+	/* Hook the newly created module. */
+	DLIST_INSERT_TAIL(dl.DlModule_AllList, mod, dm_modules);
+	LIST_INSERT_HEAD(dl.DlModule_GlobalList, mod, dm_globals); /* NOTE: _MUST_ insert at head! */
+
+	/* TODO: Load dependencies */
+	/* TODO: Apply relocations */
+	asm("int3");
+
+	/* Mark this module as having been fully loaded. */
+	ATOMIC_AND(mod->dm_flags, ~RTLD_LOADING);
+
+	/* Return a pointer to the PE program entry point. */
+	return result;
+err_nomem:
+	dl_seterror_nomem();
+	return NULL;
 }
 
 DECL_END

@@ -103,23 +103,16 @@ INTDEF NONNULL((2)) ssize_t
 NOTHROW_RPC(CC preadall)(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset);
 
 
-#undef RTLD_LOADING
-/* Flag set while a module is still being loaded.
- * -> Used to detect cyclic dependencies. */
-#define RTLD_LOADING    UINT32_C(0x40000000)
-
-#if ELF_ARCH_USESRELA
-/* jmp relocation have addends. */
-#define RTLD_JMPRELA    UINT32_C(0x20000000)
-#endif /* ELF_ARCH_USESRELA */
-
 /* Invoke all callbacks from the given module finalizers list */
 INTDEF NONNULL((1)) void CC
 dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
 		THROWS(...);
 
 /* [1..1] List of global modules / pointer to the root binary. */
+#ifndef __dlmodule_list_defined
+#define __dlmodule_list_defined
 LIST_HEAD(dlmodule_list, dlmodule);
+#endif /* !__dlmodule_list_defined */
 INTDEF struct dlmodule_list DlModule_GlobalList;
 INTDEF struct atomic_rwlock DlModule_GlobalLock;
 
@@ -147,9 +140,12 @@ INTDEF struct atomic_rwlock DlModule_GlobalLock;
 #define DlModule_GlobalLock_WaitRead()   atomic_rwlock_waitread(&DlModule_GlobalLock)
 #define DlModule_GlobalLock_WaitWrite()  atomic_rwlock_waitwrite(&DlModule_GlobalLock)
 
+#ifndef __dlmodule_dlist_defined
+#define __dlmodule_dlist_defined
+DLIST_HEAD(dlmodule_dlist, dlmodule);
+#endif /* !__dlmodule_dlist_defined */
 
 /* [1..1] List of all loaded modules. */
-DLIST_HEAD(dlmodule_dlist, dlmodule);
 INTDEF struct dlmodule_dlist DlModule_AllList;
 INTDEF struct atomic_rwlock DlModule_AllLock;
 
@@ -831,7 +827,7 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 INTDEF struct process_peb *root_peb;
 
 INTDEF char dl_error_buffer[128];
-INTDEF char *dl_error_message;
+INTDEF char *dl_error_message; /* [0..1] The current DL error message */
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badptr)(USER void *ptr);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badmodule)(USER void *modptr);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badsection)(USER void *sectptr);

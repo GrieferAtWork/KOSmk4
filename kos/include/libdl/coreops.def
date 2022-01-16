@@ -38,5 +38,32 @@ DL_COREOP(WUNUSED ATTR_PURE_P NONNULL((1)), DlSection *, __FCALL, dlsec_builtin,
 DL_COREOP(WUNUSED ATTR_CONST_P, DlSection *, __FCALL, dlsec_builtin_index, (size_t sect_index))
 DL_COREOP(WUNUSED ATTR_CONST_P, char const *, __FCALL, dlsec_builtin_name, (size_t sect_index))
 
+/* [0..1] The current DL error message */
+DL_COREFIELD(char *, dl_error_message)
+
+/* NOTE: Put all global variables into a singular structure.
+ *       That way, libdl only needs to put a pointer to that
+ *       structure into `struct dlcore_ops', rather than put
+ *       many pointers to singular data items! */
+
+/* [1..1] List of global modules / pointer to the root binary. */
+DL_COREFIELD(struct dlmodule_list,  DlModule_GlobalList)
+DL_COREFIELD(struct atomic_rwlock,  DlModule_GlobalLock)
+
+/* [1..1] List of all loaded modules. */
+DL_COREFIELD(struct dlmodule_dlist, DlModule_AllList)
+DL_COREFIELD(struct atomic_rwlock,  DlModule_AllLock)
+
+/* The module describing the RTLD library itself. */
+DL_COREFIELD(DlModule, dl_rtld_module)
+
+/* Malloc functions to access the heap used by the libdl core. */
+DL_COREOP(ATTR_MALLOC WUNUSED, void *, __LIBCCALL, dlmalloc, (size_t bytes))
+DL_COREOP(, void , __LIBCCALL, dlfree, (void *mem))
+DL_COREOP(ATTR_MALLOC WUNUSED, void *, __LIBCCALL, dlcalloc, (size_t n_elements, size_t elem_size))
+DL_COREOP(WUNUSED, void *, __LIBCCALL, dlrealloc, (void *oldmem, size_t bytes))
+DL_COREOP(WUNUSED, void *, __LIBCCALL, dlrealloc_in_place, (void *oldmem, size_t bytes))
+DL_COREOP(WUNUSED, void *, __LIBCCALL, dlmemalign, (size_t alignment, size_t bytes))
+
 #undef DL_COREFIELD
 #undef DL_COREOP

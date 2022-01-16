@@ -2811,14 +2811,18 @@ done_add_finalizer:
 			dl_seterror_badptr(extension);
 			goto err;
 		}
+
 		/* Lookup which module it is that defines this extension. */
 		extmod = libdl_dlgethandle((void *)extension->df_open, DLGETHANDLE_FINCREF);
 		if unlikely(!extmod)
 			goto err;
+
 		/* Mark the declaring module as NODELETE. */
 		ATOMIC_OR(extmod->dm_flags, RTLD_NODELETE);
+
 		/* Fill in the coreops V-table pointer. */
 		extension->df_core = dl_getcoreops();
+
 		/* Register the extension. */
 		COMPILER_BARRIER();
 		do {
@@ -2826,6 +2830,7 @@ done_add_finalizer:
 			extension->df_next = next;
 			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(dl_extensions, next, extension));
+
 		/* Re-return a pointer to the given handle. */
 		result = self;
 	}	break;

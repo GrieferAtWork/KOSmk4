@@ -174,7 +174,20 @@ linker_main(struct elfexec_info *__restrict info,
 		result = (*int_main)(info, loadaddr, peb);
 		COMPILER_BARRIER();
 
+		/* The first element of the global module list must be loaded by an extension.
+		 * If it isn't,  then we must  assume that the  extension loaded above  didn't
+		 * actually load anything, and if it also  didn't set a dlerror, then we  will
+		 * set a fallback error indicating that the extension couldn't load the  base-
+		 * application given by the kernel. */
 		base_module = LIST_FIRST(&DlModule_GlobalList);
+		if unlikely(result == NULL || base_module == NULL ||
+		            base_module->dm_ops == NULL) {
+			if (!dl_error_message) {
+				dl_seterrorf("Cannot load application with %q",
+				             int_lib->dm_filename);
+			}
+			goto err;
+		}
 	} else {
 		/* Return a pointer to `&info->ed_entry' */
 		char *filename;
@@ -186,10 +199,10 @@ linker_main(struct elfexec_info *__restrict info,
 			goto err;
 		}
 		base_module = DlModule_ElfOpenLoadedProgramHeaders(filename, info, loadaddr);
+		if unlikely(!base_module)
+			goto err;
 	}
 
-	if unlikely(!base_module)
-		goto err;
 	assert(base_module->dm_flags & RTLD_NOINIT);
 
 	/* User-level initializers must be run _after_ we've initialized static TLS!

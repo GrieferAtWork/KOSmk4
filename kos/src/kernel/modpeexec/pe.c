@@ -74,6 +74,8 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	pos_t shdr_off;
 	size_t i;
 	uintptr_t loadaddr;
+	uintptr_t load_minaddr;
+	uintptr_t load_maxaddr;
 
 	/* Base addresses for user-space. */
 	USER CHECKED void *libdl_base;
@@ -122,10 +124,9 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	{
 		uintptr_t min_okaddr;
 		uintptr_t max_okaddr;
-		uintptr_t minaddr, maxaddr;
 		size_t total_size;
-		minaddr = (uintptr_t)-1;
-		maxaddr = (uintptr_t)0;
+		load_minaddr = (uintptr_t)-1;
+		load_maxaddr = (uintptr_t)0;
 		for (i = 0; i < nt.FileHeader.NumberOfSections; ++i) {
 			uintptr_t sect_minaddr, sect_maxaddr;
 			PIMAGE_SECTION_HEADER section = &shdr[i];
@@ -135,12 +136,12 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			sect_maxaddr = sect_minaddr;
 			if (OVERFLOW_UADD(sect_maxaddr, section->Misc.VirtualSize - 1, &sect_maxaddr))
 				sect_maxaddr = (uintptr_t)-1;
-			if (minaddr > sect_minaddr)
-				minaddr = sect_minaddr;
-			if (maxaddr < sect_maxaddr)
-				maxaddr = sect_maxaddr;
+			if (load_minaddr > sect_minaddr)
+				load_minaddr = sect_minaddr;
+			if (load_maxaddr < sect_maxaddr)
+				load_maxaddr = sect_maxaddr;
 		}
-		total_size = (maxaddr + 1) - minaddr;
+		total_size = (load_maxaddr + 1) - load_minaddr;
 #ifdef KERNELSPACE_HIGHMEM
 		min_okaddr = 0;
 		if (OVERFLOW_USUB(KERNELSPACE_BASE, total_size, &max_okaddr))
@@ -151,8 +152,9 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 
 		loadaddr = 0;
 		if (nt.FileHeader.SizeOfOptionalHeader >= offsetafter(IMAGE_OPTIONAL_HEADER, ImageBase))
-			loadaddr = minaddr + nt.OptionalHeader.ImageBase;
-		if (loadaddr == 0 || ((krand() & 7) <= 2)) {
+			loadaddr = load_minaddr + nt.OptionalHeader.ImageBase;
+		if (!(nt.FileHeader.Characteristics & IMAGE_FILE_RELOCS_STRIPPED) &&
+		    (loadaddr == 0 || ((krand() & 7) <= 2))) {
 			if (loadaddr == 0)
 				loadaddr = 0x08048000;
 			/* Choose a random address, centered around `loadaddr'. */
@@ -164,7 +166,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			loadaddr = max_okaddr;
 
 		/* Adjust load address for start of first section. */
-		loadaddr -= minaddr;
+		loadaddr -= load_minaddr;
 	}
 
 	/* Map sections */
@@ -339,15 +341,18 @@ done_bss:
 		}
 		TRY {
 			size_t buflen;
-			stack_end = (USER CHECKED byte_t *)stack_base + USER_STACK_SIZE;
-
+			void *entrypoint;
 			/* Pass important information onto the stack
 			 * and set-up the user-space register state. */
-			stack_end -= sizeof(void *);
+			stack_end = (USER CHECKED byte_t *)stack_base + USER_STACK_SIZE;
+
 
 			/* Push: `struct peexec_info::ei_entry' */
-			if (nt.FileHeader.SizeOfOptionalHeader >= offsetafter(IMAGE_OPTIONAL_HEADER, AddressOfEntryPoint))
-				*(USER CHECKED void **)stack_end = (void *)(loadaddr + nt.OptionalHeader.AddressOfEntryPoint);
+			stack_end -= sizeof(void *);
+			entrypoint = (void *)(loadaddr + nt.OptionalHeader.AddressOfEntryPoint);
+			if unlikely(nt.FileHeader.SizeOfOptionalHeader < offsetafter(IMAGE_OPTIONAL_HEADER, AddressOfEntryPoint))
+				entrypoint = (void *)(loadaddr + load_minaddr);
+			*(USER CHECKED void **)stack_end = entrypoint;
 
 			/* Push: `struct peexec_info::pi_pe.pd_name' */
 			buflen = 0;
@@ -387,6 +392,15 @@ done_bss:
 			buflen = offsetof(IMAGE_NT_HEADERS, OptionalHeader) + nt.FileHeader.SizeOfOptionalHeader;
 			stack_end -= CEIL_ALIGN(buflen, sizeof(void *));
 			memcpy(stack_end, &nt, buflen);
+
+			/* Push: `struct peexec_info::pi_pe.pd_loadmax' */
+			stack_end -= sizeof(uintptr_t);
+			*(USER CHECKED uintptr_t *)stack_end = loadaddr + load_maxaddr;
+
+			/* Push: `struct peexec_info::pi_pe.pd_loadmin' */
+			stack_end -= sizeof(uintptr_t);
+			*(USER CHECKED uintptr_t *)stack_end = loadaddr + load_minaddr;
+
 
 			/* Push: `struct peexec_info::pi_pnum' and `pi_libdl_pe' */
 			{

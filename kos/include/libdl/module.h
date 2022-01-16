@@ -47,6 +47,17 @@
 #ifdef __CC__
 DECL_BEGIN
 
+/* Flag set while a module is still being loaded.
+ * -> Used to detect cyclic dependencies. */
+#undef RTLD_LOADING
+#define RTLD_LOADING __UINT32_C(0x40000000)
+
+#if ELF_ARCH_USESRELA
+/* jmp relocation have addends. */
+#define RTLD_JMPRELA __UINT32_C(0x20000000)
+#endif /* ELF_ARCH_USESRELA */
+
+
 #ifndef __DLFCN_CC
 #define __DLFCN_CC  __LIBCCALL
 #define __DLFCN_VCC __VLIBCCALL

@@ -34,6 +34,15 @@ INTERN struct dlmodule_format *dl_extensions = NULL;
 
 PRIVATE struct dlcore_ops dl_coreops;
 
+/* Heap functions used by the libdl core. */
+INTDEF ATTR_MALLOC WUNUSED void *LIBCCALL dlmalloc(size_t bytes) ASMNAME("malloc");
+INTDEF void LIBCCALL dlfree(void *mem) ASMNAME("free");
+INTDEF ATTR_MALLOC WUNUSED void *LIBCCALL dlcalloc(size_t n_elements, size_t elem_size) ASMNAME("calloc");
+INTDEF WUNUSED void *LIBCCALL dlrealloc(void *oldmem, size_t bytes) ASMNAME("realloc");
+INTDEF WUNUSED void *LIBCCALL dlrealloc_in_place(void *oldmem, size_t bytes) ASMNAME("realloc_in_place");
+INTDEF WUNUSED void *LIBCCALL dlmemalign(size_t alignment, size_t bytes) ASMNAME("memalign");
+
+
 /* Lazily initialize and return the libdl core ops V-table. */
 INTERN ATTR_RETNONNULL WUNUSED struct dlcore_ops *
 NOTHROW(CC dl_getcoreops)(void) {

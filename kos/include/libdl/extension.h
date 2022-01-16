@@ -24,6 +24,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/sequence/list.h>
 #include <hybrid/typecore.h>
 
 #include <kos/anno.h>
@@ -104,6 +105,18 @@ struct dlmodule;
 typedef struct dlmodule DlModule;
 #endif /* !__DlModule_defined */
 
+#ifndef __dlmodule_list_defined
+#define __dlmodule_list_defined
+LIST_HEAD(dlmodule_list, dlmodule);
+#endif /* !__dlmodule_list_defined */
+
+#ifndef __dlmodule_dlist_defined
+#define __dlmodule_dlist_defined
+DLIST_HEAD(dlmodule_dlist, dlmodule);
+#endif /* !__dlmodule_dlist_defined */
+
+struct dlmodule_dlist;
+struct atomic_rwlock;
 
 /* Jump-table  of callbacks  which may  be invoked  by libdl extensions.
  * A pointer to this structure is stored by the libdl core in  extension

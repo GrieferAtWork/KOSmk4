@@ -31,6 +31,11 @@
 #define LIBDL_VCC __VLIBKCALL
 #endif /* !__i386__ || __x86_64__ */
 
+#ifndef __DLFCN_CC
+#define __DLFCN_CC  __LIBCCALL
+#define __DLFCN_VCC __VLIBCCALL
+#endif /* !__DLFCN_CC */
+
 #if 0
 #define LIBDL_WANT_PROTOTYPES
 #endif

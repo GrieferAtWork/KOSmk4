@@ -26,6 +26,7 @@
 #endif /* !_WINDEF_ */
 #include <hybrid/__atomic.h>
 
+#include <features.h>
 #include <ctype.h>
 
 #ifndef _BASETSD_H_
@@ -3777,7 +3778,11 @@ typedef struct ANON_OBJECT_HEADER {
 #define IMAGE_SIZEOF_SHORT_NAME 8
 
 typedef struct _IMAGE_SECTION_HEADER {
+#ifdef __USE_KOS_ALTERATIONS
+	char Name[IMAGE_SIZEOF_SHORT_NAME];
+#else /* __USE_KOS_ALTERATIONS */
 	BYTE Name[IMAGE_SIZEOF_SHORT_NAME];
+#endif /* !__USE_KOS_ALTERATIONS */
 	union {
 		DWORD PhysicalAddress;
 		DWORD VirtualSize;
@@ -3843,7 +3848,11 @@ typedef struct _IMAGE_SECTION_HEADER {
 
 typedef struct _IMAGE_SYMBOL {
 	union {
+#ifdef __USE_KOS_ALTERATIONS
+		char ShortName[8];
+#else /* __USE_KOS_ALTERATIONS */
 		BYTE ShortName[8];
+#endif /* !__USE_KOS_ALTERATIONS */
 		struct {
 			DWORD Short;
 			DWORD Long;
@@ -3971,7 +3980,11 @@ typedef union _IMAGE_AUX_SYMBOL {
 		WORD TvIndex;
 	} Sym;
 	struct {
+#ifdef __USE_KOS_ALTERATIONS
+		char Name[IMAGE_SIZEOF_SYMBOL];
+#else /* __USE_KOS_ALTERATIONS */
 		BYTE Name[IMAGE_SIZEOF_SYMBOL];
+#endif /* !__USE_KOS_ALTERATIONS */
 	} File;
 	struct {
 		DWORD Length;
@@ -4377,7 +4390,11 @@ typedef IMAGE_BASE_RELOCATION UNALIGNED *PIMAGE_BASE_RELOCATION;
 #define IMAGE_ARCHIVE_LONGNAMES_MEMBER "//              "
 
 typedef struct _IMAGE_ARCHIVE_MEMBER_HEADER {
+#ifdef __USE_KOS_ALTERATIONS
+	char Name[16];
+#else /* __USE_KOS_ALTERATIONS */
 	BYTE Name[16];
+#endif /* !__USE_KOS_ALTERATIONS */
 	BYTE Date[12];
 	BYTE UserID[6];
 	BYTE GroupID[6];
@@ -4404,7 +4421,11 @@ typedef struct _IMAGE_EXPORT_DIRECTORY {
 
 typedef struct _IMAGE_IMPORT_BY_NAME {
 	WORD Hint;
+#ifdef __USE_KOS_ALTERATIONS
+	char Name[1];
+#else /* __USE_KOS_ALTERATIONS */
 	BYTE Name[1];
+#endif /* !__USE_KOS_ALTERATIONS */
 } IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME;
 
 #include "pshpack8.h"
