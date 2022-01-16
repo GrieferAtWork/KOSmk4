@@ -25,11 +25,9 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/file.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/aio.h>
 #include <kernel/except.h>
+#include <kernel/fs/fs.h>
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
 #include <kernel/mman.h>

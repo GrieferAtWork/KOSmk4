@@ -47,10 +47,11 @@
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/debugger.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/mman/execinfo.h>
 #include <sched/pid.h>
+#include <sched/task.h>
 
 #include <libinstrlen/instrlen.h>
 #endif /* CONFIG_HAVE_DEBUGGER */
@@ -86,8 +87,8 @@ dbg_coredump(void const *const *traceback_vector,
 		dbg_print(DBGSTR("Coredump "));
 		if (ei->mei_path && ei->mei_dent) {
 			path_printent(ei->mei_path,
-			              ei->mei_dent->de_name,
-			              ei->mei_dent->de_namelen,
+			              ei->mei_dent->fd_name,
+			              ei->mei_dent->fd_namelen,
 			              &dbg_printer,
 			              NULL);
 			dbg_putc(' ');

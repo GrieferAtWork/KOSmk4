@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/char.h>
 #include <dev/tty.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
@@ -64,20 +63,20 @@ PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(KCALL ttydev_log_setsession)(struct ttydev *__restrict self,
                                      struct task *__restrict UNUSED(session),
                                      struct taskpid *__restrict session_pid) {
-	chrdev_getname_lock_acquire(self);
+	device_getname_lock_acquire(self);
 	printk(KERN_NOTICE "[ctty][+] Assign tty %q as controller for session %u\n",
-	       chrdev_getname(self), taskpid_getrootpid(session_pid));
-	chrdev_getname_lock_release(self);
+	       device_getname(self), taskpid_getrootpid(session_pid));
+	device_getname_lock_release(self);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(KCALL ttydev_log_delsession)(struct ttydev *__restrict self,
                                      struct task *__restrict UNUSED(session),
                                      struct taskpid *__restrict session_pid) {
-	chrdev_getname_lock_acquire(self);
+	device_getname_lock_acquire(self);
 	printk(KERN_NOTICE "[ctty][-] Remove tty %q as controller for session %u\n",
-	       chrdev_getname(self), taskpid_getrootpid(session_pid));
-	chrdev_getname_lock_release(self);
+	       device_getname(self), taskpid_getrootpid(session_pid));
+	device_getname_lock_release(self);
 }
 
 
@@ -123,12 +122,12 @@ do_try_override_fproc:
 
 		/* 11.1.4 -- Terminal Access Control */
 		if (is_SIGTTOU) {
-			chrdev_getname_lock_acquire(term);
+			device_getname_lock_acquire(term);
 			printk(KERN_INFO "[tty:%q] Background process group %p "
 			                 "[pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
-			       chrdev_getname(term), awref_ptr(&my_leader_pid->tp_thread),
+			       device_getname(term), awref_ptr(&my_leader_pid->tp_thread),
 			       taskpid_getrootpid(my_leader_pid));
-			chrdev_getname_lock_release(term);
+			device_getname_lock_release(term);
 
 			/* When `SIGTTOU' is ignored, allow the write */
 			if (THIS_SIGHAND_PTR) {
@@ -183,12 +182,12 @@ do_throw_ttou:
 			/* We might get here if `SIGTTOU' is being ignored by the calling thread.
 			 * -> As described by POSIX, allow the process to write in this scenario. */
 		} else {
-			chrdev_getname_lock_acquire(term);
+			device_getname_lock_acquire(term);
 			printk(KERN_INFO "[tty:%q] Background process group %p "
 			                 "[pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to read\n",
-			       chrdev_getname(term), my_leader_pid,
+			       device_getname(term), my_leader_pid,
 			       taskpid_getrootpid(my_leader_pid));
-			chrdev_getname_lock_release(term);
+			device_getname_lock_release(term);
 
 			/* ... if the reading process is ignoring or blocking the SIGTTIN signal, or if
 			 * the process group of the reading process isorphaned, the read() shall return
@@ -530,10 +529,10 @@ do_TCSETA: {
 			FINALLY_DECREF_UNLIKELY(newthread);
 			newpid = task_getprocessgroupleaderpid_of(newthread);
 		}
-		chrdev_getname_lock_acquire(me);
+		device_getname_lock_acquire(me);
 		printk(KERN_TRACE "[tty:%q] Set foreground process group to [pgid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
-		       chrdev_getname(me), taskpid_getrootpid(newpid));
-		chrdev_getname_lock_release(me);
+		       device_getname(me), taskpid_getrootpid(newpid));
+		device_getname_lock_release(me);
 		oldpid = axref_xch_inherit(&me->t_fproc, newpid);
 		xdecref(oldpid);
 	}	break;

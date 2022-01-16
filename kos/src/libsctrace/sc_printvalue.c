@@ -93,8 +93,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #endif /* __ARCH_HAVE_COMPAT */
 
 #ifdef __KERNEL__
-#include <dev/block.h>
-#include <dev/char.h>
+#include <kernel/fs/blkdev.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/user.h>
 #else /* __KERNEL__ */
 #define validate_readable(base, num_bytes)                          (void)0
@@ -126,16 +126,15 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 /* Figure out what we actually need to define. */
 #ifdef HAVE_SC_REPR_DEV_T
-#define NEED_print_dev_blk
-#define NEED_print_dev_chr
+#define NEED_print_dev
 #endif /* HAVE_SC_REPR_DEV_T */
 
 #ifdef HAVE_SC_REPR_DEV_BLK
-#define NEED_print_dev_blk
+#define NEED_print_dev
 #endif /* HAVE_SC_REPR_DEV_BLK */
 
 #ifdef HAVE_SC_REPR_DEV_CHR
-#define NEED_print_dev_chr
+#define NEED_print_dev
 #endif /* HAVE_SC_REPR_DEV_CHR */
 
 #ifdef HAVE_SC_REPR_MODE_T
@@ -780,20 +779,21 @@ err:
 
 
 
-#ifdef NEED_print_dev_blk
+#ifdef NEED_print_dev
 PRIVATE NONNULL((1)) ssize_t CC
-print_dev_blk(pformatprinter printer, void *arg, dev_t devno) {
+print_dev(pformatprinter printer, void *arg, mode_t mode, dev_t devno) {
 	ssize_t result;
 	result = format_printf(printer, arg,
-	                       "blk"
+	                       "%s"
 	                       ":%" PRIuN(__SIZEOF_MAJOR_T__)
 	                       ":%" PRIuN(__SIZEOF_MINOR_T__),
+	                       S_ISBLK(mode) ? "blk" : "chr",
 	                       MAJOR(devno),
 	                       MINOR(devno));
 #ifdef __KERNEL__
 	if likely(result >= 0) {
-		REF struct blkdev *dev;
-		dev = blkdev_lookup_nx(devno);
+		REF struct device *dev;
+		dev = device_lookup_bydev_nx(mode, devno);
 		if (dev) {
 			ssize_t temp;
 			REF struct fdirent *name;
@@ -811,41 +811,7 @@ print_dev_blk(pformatprinter printer, void *arg, dev_t devno) {
 #endif /* __KERNEL__ */
 	return result;
 }
-#endif /* NEED_print_dev_blk */
-
-
-#ifdef NEED_print_dev_chr
-PRIVATE NONNULL((1)) ssize_t CC
-print_dev_chr(pformatprinter printer, void *arg, dev_t devno) {
-	ssize_t result;
-	result = format_printf(printer, arg,
-	                       "chr"
-	                       ":%" PRIuN(__SIZEOF_MAJOR_T__)
-	                       ":%" PRIuN(__SIZEOF_MINOR_T__),
-	                       MAJOR(devno),
-	                       MINOR(devno));
-#ifdef __KERNEL__
-	if likely(result >= 0) {
-		REF struct chrdev *dev;
-		dev = chrdev_lookup_nx(devno);
-		if (dev) {
-			ssize_t temp;
-			REF struct fdirent *name;
-			name = device_getfilename(dev);
-			decref_unlikely(dev);
-			FINALLY_DECREF_UNLIKELY(name);
-			temp = format_printf(printer, arg, ":\"/dev/%#$q\"",
-			                     (size_t)name->fd_namelen,
-			                     name->fd_name);
-			if unlikely(temp < 0)
-				return temp;
-			result += temp;
-		}
-	}
-#endif /* __KERNEL__ */
-	return result;
-}
-#endif /* NEED_print_dev_chr */
+#endif /* NEED_print_dev */
 
 
 
@@ -5063,11 +5029,8 @@ do_struct_timespecx64:
 		dev_t devno = (dev_t)value.sv_u64;
 		if (link) {
 			mode_t linked_mode = (mode_t)link->sa_value.sv_u64;
-			if (S_ISBLK(linked_mode)) {
-				result = print_dev_blk(printer, arg, devno);
-				break;
-			} else if (S_ISCHR(linked_mode)) {
-				result = print_dev_chr(printer, arg, devno);
+			if (S_ISDEV(linked_mode)) {
+				result = print_dev(printer, arg, linked_mode, devno);
 				break;
 			}
 		}
@@ -5083,14 +5046,14 @@ do_struct_timespecx64:
 #ifdef HAVE_SC_REPR_DEV_BLK
 	case SC_REPR_DEV_BLK: {
 		dev_t devno = (dev_t)value.sv_u64;
-		result = print_dev_blk(printer, arg, devno);
+		result = print_dev(printer, arg, S_IFBLK, devno);
 	}	break;
 #endif /* HAVE_SC_REPR_DEV_BLK */
 
 #ifdef HAVE_SC_REPR_DEV_CHR
 	case SC_REPR_DEV_CHR: {
 		dev_t devno = (dev_t)value.sv_u64;
-		result = print_dev_chr(printer, arg, devno);
+		result = print_dev(printer, arg, S_IFCHR, devno);
 	}	break;
 #endif /* HAVE_SC_REPR_DEV_CHR */
 

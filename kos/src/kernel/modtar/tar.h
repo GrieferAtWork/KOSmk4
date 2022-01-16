@@ -169,10 +169,10 @@ struct tarsuper {
 	                                 * tarhdr-file that (may) have not been loaded, yet. When
 	                                 * >= the size of the underlying device, then all files
 	                                 * are loaded.
-	                                 * In  order  to  conserve memory,  tarfs  implements the
-	                                 * clear caches operator such that all global files  that
-	                                 * are not externally referenced are discarded, following
-	                                 * `ts_nfile' being set to `0'. */
+	                                 * In  order  to conserve  memory, tarfs  implements the
+	                                 * clear caches operator such that all global files that
+	                                 * are not externally referenced are discarded, followed
+	                                 * by `ts_nfile' being set to `0'. */
 	struct fsuper        ts_super;  /* Underlying superblock. */
 	struct tarfdat       ts_fdat;   /* Root directory file data. */
 };

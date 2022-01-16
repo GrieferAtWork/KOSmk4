@@ -260,7 +260,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 PUBLIC ATTR_NORETURN void
 NOTHROW(FCALL cpu_idlemain)(void) {
 	for (;;) {
-		/* TODO: sync() (`superblock_syncall()') superblocks.
+		/* TODO: sync() (`fsuper_syncall()') superblocks.
 		 * NOTE: Should only happen after some delay (e.g. 2 seconds)
 		 *       since the last write operation, or since IDLE began. */
 

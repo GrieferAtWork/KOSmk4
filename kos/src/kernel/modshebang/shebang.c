@@ -24,10 +24,13 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
+#include <kernel/mman/mfile.h>
 
 #include <hybrid/atomic.h>
 
@@ -36,6 +39,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <unistd.h>
 
 /**/
 #include "shebang.h"
@@ -163,7 +167,7 @@ shebang_exec(struct execargs *__restrict args) {
 				THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 
 			/* Check for execute permissions? */
-			inode_access(interp_node, R_OK | X_OK);
+			fnode_access(interp_node, R_OK | X_OK);
 
 			/* Construct a new set to arguments to-be injected. */
 			more_argc = 1;

@@ -24,9 +24,9 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/compat.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/execinfo.h>

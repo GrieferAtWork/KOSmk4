@@ -612,7 +612,7 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 
 	/* Don't do all of this trickery when the kernel's been poisoned.
 	 * The below code may call-back to (possibly) faulty kernel  code
-	 * due to the dependency on `inode_readallk()' */
+	 * due to the dependency on `mfile_readall()' */
 	if (kernel_poisoned())
 		goto nope;
 

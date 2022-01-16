@@ -26,12 +26,12 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/block.h>
-#include <dev/char.h>
 #include <drivers/usb.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/blkdev.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/heap.h>
 #include <kernel/iovec.h>
 #include <kernel/isr.h>
@@ -2420,7 +2420,7 @@ NOTHROW(FCALL uhci_count_isotds_for_interval_and_offset)(struct uhci_controller 
 /* Create an interrupt descriptor.
  * @param: endp:                          The endpoint from which to poll data.
  * @param: handler:                       The handler to-be invoked.
- * @param: character_or_block_device:     Either  a  `struct chrdev'  or   `struct block_device',
+ * @param: character_or_block_device:     Either  a  `struct chrdev'  or   `struct blkdev',
  *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
  * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
  *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
@@ -2482,7 +2482,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 	result->ui_flags   = flags;
 	result->ui_endp    = incref(endp);
 	result->ui_handler = handler;
-	awref_cinit(&result->ui_bind.ui_blk, (struct block_device *)character_or_block_device);
+	awref_cinit(&result->ui_bind.ui_blk, (struct blkdev *)character_or_block_device);
 	TRY {
 		u32 tok, orig_tok, cs;
 		u16 maxpck;

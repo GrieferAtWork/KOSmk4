@@ -24,8 +24,8 @@
 //#define      DEFINE_mman_map_res
 #endif /* __INTELLISENSE__ */
 
-#include <fs/node.h>
-#include <fs/vfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/flags.h>

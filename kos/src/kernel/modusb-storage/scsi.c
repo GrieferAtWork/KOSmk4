@@ -24,7 +24,7 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/block.h>
+#include <kernel/fs/blkdev.h>
 #include <drivers/usb.h>
 #include <kernel/aio.h>
 #include <kernel/except.h>
@@ -116,7 +116,7 @@ usb_scsi_io(struct usb_controller *__restrict self,
 
 
 PRIVATE NOBLOCK void
-NOTHROW(KCALL ms_scsi_device_fini)(struct block_device *__restrict self) {
+NOTHROW(KCALL ms_scsi_device_fini)(struct blkdev *__restrict self) {
 	struct ms_scsi_device *me;
 	me = (struct ms_scsi_device *)self;
 	xdecref(me->msd_ctrl);
@@ -215,7 +215,7 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 
 
 PRIVATE NONNULL((1, 5)) void KCALL
-ms_scsi_read(struct block_device *__restrict self,
+ms_scsi_read(struct blkdev *__restrict self,
              USER CHECKED void *dst, size_t num_sectors,
              lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
@@ -229,7 +229,7 @@ ms_scsi_read(struct block_device *__restrict self,
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
-ms_scsi_read_phys(struct block_device *__restrict self,
+ms_scsi_read_phys(struct blkdev *__restrict self,
                   physaddr_t dst, size_t num_sectors,
                   lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
@@ -243,7 +243,7 @@ ms_scsi_read_phys(struct block_device *__restrict self,
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
-ms_scsi_readv(struct block_device *__restrict self,
+ms_scsi_readv(struct blkdev *__restrict self,
               struct iov_buffer *__restrict buf, size_t num_sectors,
               lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
@@ -258,7 +258,7 @@ ms_scsi_readv(struct block_device *__restrict self,
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
-ms_scsi_readv_phys(struct block_device *__restrict self,
+ms_scsi_readv_phys(struct blkdev *__restrict self,
                    struct iov_physbuffer *__restrict buf, size_t num_sectors,
                    lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
@@ -274,7 +274,7 @@ ms_scsi_readv_phys(struct block_device *__restrict self,
 
 
 PRIVATE NONNULL((1, 5)) void KCALL
-ms_scsi_write(struct block_device *__restrict self,
+ms_scsi_write(struct blkdev *__restrict self,
               USER CHECKED void const *src, size_t num_sectors,
               lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
@@ -288,7 +288,7 @@ ms_scsi_write(struct block_device *__restrict self,
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
-ms_scsi_write_phys(struct block_device *__restrict self,
+ms_scsi_write_phys(struct blkdev *__restrict self,
                    physaddr_t src, size_t num_sectors,
                    lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
@@ -302,7 +302,7 @@ ms_scsi_write_phys(struct block_device *__restrict self,
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
-ms_scsi_writev(struct block_device *__restrict self,
+ms_scsi_writev(struct blkdev *__restrict self,
                struct iov_buffer *__restrict buf, size_t num_sectors,
                lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
@@ -317,7 +317,7 @@ ms_scsi_writev(struct block_device *__restrict self,
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
-ms_scsi_writev_phys(struct block_device *__restrict self,
+ms_scsi_writev_phys(struct blkdev *__restrict self,
                     struct iov_physbuffer *__restrict buf, size_t num_sectors,
                     lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {

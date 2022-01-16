@@ -23,8 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>

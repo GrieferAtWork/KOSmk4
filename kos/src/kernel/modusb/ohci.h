@@ -22,8 +22,8 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/char.h>
 #include <drivers/usb.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/printk.h>
 
 #include <hw/usb/ohci.h>

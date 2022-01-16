@@ -35,18 +35,20 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
-#include <dev/block.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/execabi.h> /* execabi_system_rtld_file */
+#include <kernel/fs/devnode.h>
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
+#include <kernel/fs/super.h>
 #include <kernel/mman.h>
 #include <kernel/mman/enum.h>
 #include <kernel/mman/map.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/ramfile.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/printk.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
@@ -134,8 +136,8 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 		u16 filename_len;
 		dbg_setcolor(ANSITTY_CL_LIME, ANSITTY_CL_DARK_GRAY);
 		if likely(info->mmi_fsname) {
-			filename     = info->mmi_fsname->de_name;
-			filename_len = info->mmi_fsname->de_namelen;
+			filename     = info->mmi_fsname->fd_name;
+			filename_len = info->mmi_fsname->fd_namelen;
 		} else {
 			static ATTR_DBGSTRINGS char const str_unknown[] = "[unknown]";
 			filename     = str_unknown;
@@ -145,14 +147,14 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 		              filename_len, &dbg_printer, NULL);
 	} else if (info->mmi_fsname) {
 		dbg_setcolor(ANSITTY_CL_LIME, ANSITTY_CL_DARK_GRAY);
-		if (info->mmi_fsname->de_name[0] == '/') {
+		if (info->mmi_fsname->fd_name[0] == '/') {
 			dbg_printer(NULL,
-			            info->mmi_fsname->de_name,
-			            info->mmi_fsname->de_namelen);
+			            info->mmi_fsname->fd_name,
+			            info->mmi_fsname->fd_namelen);
 		} else {
 			dbg_printf(DBGSTR("[%$#q]"),
-			           (size_t)info->mmi_fsname->de_namelen,
-			           info->mmi_fsname->de_name);
+			           (size_t)info->mmi_fsname->fd_namelen,
+			           info->mmi_fsname->fd_name);
 		}
 	} else {
 		/* Check for special names for certain datablocks. */

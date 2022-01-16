@@ -23,14 +23,15 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
 #include <kernel/execabi.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
 #include <kernel/mman.h>
 #include <kernel/mman/exec.h>
+#include <kernel/mman/mfile.h>
 #include <sched/rpc.h> /* task_serve() */
 
 #include <kos/except.h>
@@ -72,7 +73,8 @@ again_loadheader:
 	TRY {
 		size_t read_bytes;
 		/* Load the file header. */
-		read_bytes = inode_read(args->ea_xfile, args->ea_header, sizeof(args->ea_header), 0);
+		read_bytes = mfile_read(args->ea_xfile, args->ea_header,
+		                        sizeof(args->ea_header), 0);
 		if unlikely(read_bytes < CONFIG_EXECABI_MAXHEADER)
 			memset(args->ea_header + read_bytes, 0, CONFIG_EXECABI_MAXHEADER - read_bytes);
 	} EXCEPT {

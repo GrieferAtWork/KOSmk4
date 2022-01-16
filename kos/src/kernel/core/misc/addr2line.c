@@ -23,12 +23,12 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/addr2line.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/dirent.h>
 #include <kernel/types.h>
+#include <sched/signal.h>
 
 #include <kos/exec/module.h>
 

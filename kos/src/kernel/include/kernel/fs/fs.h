@@ -64,7 +64,7 @@ struct fs {
 	REF struct path     *fs_root;                 /* [1..1][lock(fs_pathlock)] Root directory. */
 	REF struct path     *fs_cwd;                  /* [1..1][lock(fs_pathlock)] Current working directory. */
 	REF struct path     *fs_dcwd[VFS_DRIVECOUNT]; /* [0..1][lock(fs_pathlock)][*] Per-drive working directories.
-	                                               * NOTE: When `NULL', use `f_vfs->v_drives[INDEX]' instead. */
+	                                               * NOTE: When `NULL', use `fs_vfs->vf_drives[INDEX]' instead. */
 	WEAK mode_t          fs_umask;                /* [lock(ATOMIC)] The currently effective UMASK.
 	                                               * NOTE: All bits not masked by `0777' _MUST_ always be ZERO(0)! */
 	WEAK u32             fs_lnkmax;               /* The max number of symbolic links allowed during resolution of a path.

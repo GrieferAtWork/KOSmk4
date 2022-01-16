@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/char.h>
 #include <drivers/usb.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
@@ -1350,7 +1349,7 @@ strange_device:
  */
 PUBLIC void KCALL
 usb_register_blkdev(struct usb_device *__restrict usb_dev,
-                          struct block_device *__restrict dev)
+                          struct blkdev *__restrict dev)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	/* TODO */
 	(void)usb_dev;

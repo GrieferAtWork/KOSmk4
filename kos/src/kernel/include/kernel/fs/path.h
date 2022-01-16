@@ -22,7 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifndef __INTELLISENSE__
 #include <kernel/fs/dirent.h>
+#endif /* !__INTELLISENSE__ */
 #include <kernel/types.h>
 
 #include <hybrid/sequence/list.h>
@@ -112,6 +114,7 @@ DECL_BEGIN
 struct fdirnode;
 struct path;
 struct vfs;
+struct fdirent;
 
 
 struct path_bucket {
@@ -241,6 +244,16 @@ NOTHROW(path_plock_acquire_nopr)(struct path *__restrict self) {
 	}	__WHILE0
 #endif /* !__INTELLISENSE__ */
 
+#ifdef __INTELLISENSE__
+NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirent *
+NOTHROW(FCALL path_getname)(struct path *__restrict self);
+NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *
+NOTHROW(FCALL path_getparent)(struct path *__restrict self);
+NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL path_get_parent_and_name)(struct path *__restrict self,
+                                        /*out[1..1]_ref*/ REF struct path **__restrict p_parent,
+                                        /*out[1..1]_ref*/ REF struct fdirent **__restrict p_name);
+#else /* __INTELLISENSE__ */
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirent *
 NOTHROW(FCALL path_getname)(struct path *__restrict self) {
 	REF struct fdirent *result;
@@ -268,6 +281,7 @@ NOTHROW(FCALL path_get_parent_and_name)(struct path *__restrict self,
 	*p_name   = incref(self->p_name);
 	path_plock_release(self);
 }
+#endif /* !__INTELLISENSE__ */
 
 
 

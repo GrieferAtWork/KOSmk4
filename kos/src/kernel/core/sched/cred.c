@@ -27,11 +27,13 @@
 #include <kernel/compiler.h>
 
 #include <debugger/hook.h> /* DEFINE_DBG_BZERO_OBJECT */
-#include <fs/node.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/super.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/nopf.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -43,6 +45,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/sequence/bsearch.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <compat/config.h>
 #include <sys/stat.h>

@@ -438,7 +438,7 @@ done_dynamic:
 #else /* ELF_ARCH_LAZYINDX */
 				self->dm_elf.de_jmpsize   = jmp_size;
 #endif /* !ELF_ARCH_LAZYINDX */
-				self->dm_flags    |= RTLD_JMPRELA;
+				self->dm_flags |= RTLD_JMPRELA;
 				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
 				                                                jmp_size / sizeof(ElfW(Rela)),
 				                                                flags))

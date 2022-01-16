@@ -34,10 +34,13 @@
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/arch/driver.h>
 #include <kernel/debugtrap.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/handle-proto.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
@@ -3246,9 +3249,9 @@ driver_runfini_unbindglob(struct driver *__restrict self) {
 	 *   - async_job_start()                    (Cancel all running jobs with callbacks apart of `self')
 	 *   - realtime_clock
 	 * XXX:
-	 *   - What  about   file  handles   that  somehow   reference  the   driver,
-	 *     including stuff like HANDLE_TYPE_FILEHANDLE->f_node->i_super->s_device
-	 *     We should probably try  to find these files,  and close them in  their
+	 *   - What about file handles that somehow reference the driver, including
+	 *     stuff   like   HANDLE_TYPE_FILEHANDLE->f_node->fn_super->fs_dev?  We
+	 *     should  probably try  to find these  files, and close  them in their
 	 *     accompanying handle manager.
 	 *     We can enumerate open handle managers by enumerating threads!
 	 *   - This function should also have a  return value to indicate if  it
@@ -5562,9 +5565,9 @@ path_equals_string(struct path *__restrict pth,
 		--pth_len;
 	}
 	while (path_get_last_segment(pth_str, &pth_len, &lastseg)) {
-		if (lastseg.ps_size != pth->p_dirent->de_namelen)
+		if (lastseg.ps_size != pth->p_name->fd_namelen)
 			goto nope;
-		if (memcmp(pth->p_dirent->de_name, lastseg.ps_base,
+		if (memcmp(pth->p_name->fd_name, lastseg.ps_base,
 		           lastseg.ps_size * sizeof(char)) != 0)
 			goto nope;
 		if unlikely((pth = pth->p_parent) == NULL)
@@ -5572,7 +5575,7 @@ path_equals_string(struct path *__restrict pth,
 	}
 	if (path_is_root)
 		return pth == ATOMIC_READ(vfs_kernel.vf_root);
-	return pth == ATOMIC_READ(THIS_FS->f_cwd);
+	return pth == ATOMIC_READ(THIS_FS->fs_cwd);
 nope:
 	return false;
 }
@@ -5601,7 +5604,7 @@ driver_fromfilename(USER CHECKED char const *driver_filename)
 			continue;
 		if (result->d_module.md_fspath && result->d_module.md_fsname) {
 			TRY {
-				if (strcmp(result->d_module.md_fsname->de_name, name) == 0 &&
+				if (strcmp(result->d_module.md_fsname->fd_name, name) == 0 &&
 				    path_equals_string(result->d_module.md_fspath,
 				                       driver_filename, pathlen))
 					return result; /* This is the one! */
@@ -5641,8 +5644,8 @@ driver_fromfilename_with_len(USER CHECKED char const *driver_filename,
 			continue;
 		if (result->d_module.md_fspath && result->d_module.md_fsname) {
 			TRY {
-				if (result->d_module.md_fsname->de_namelen == namelen &&
-				    memcmp(result->d_module.md_fsname->de_name,
+				if (result->d_module.md_fsname->fd_namelen == namelen &&
+				    memcmp(result->d_module.md_fsname->fd_name,
 				           name, namelen * sizeof(char)) == 0 &&
 				    path_equals_string(result->d_module.md_fspath,
 				                       driver_filename, pathlen))

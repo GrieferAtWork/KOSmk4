@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/char.h>
 #include <dev/pty.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -231,7 +230,7 @@ ptymaster_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	if unlikely(!slave) {
 		THROW(E_NO_DEVICE,
 		      E_NO_DEVICE_KIND_CHRDEV,
-		      PTY_SLAVE(MINOR(chrdev_getdevno(me))));
+		      PTY_SLAVE(device_getminor(me)));
 	}
 	{
 		FINALLY_DECREF_UNLIKELY(slave);

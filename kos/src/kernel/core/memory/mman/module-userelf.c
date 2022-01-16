@@ -33,9 +33,11 @@
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/execabi.h> /* execabi_system_rtld_file, compat_execabi_system_rtld_file */
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>

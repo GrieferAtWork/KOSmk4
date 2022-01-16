@@ -83,7 +83,7 @@ libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 	}
 	{
 		RAII_FINALLY { freea(dos_symbol_name); };
-	
+
 		/* Construct the DOS$-prefixed symbol name. */
 		*(uint32_t *)dos_symbol_name = ENCODE_INT32('D', 'O', 'S', '$');
 		memcpy(dos_symbol_name + 4, symbol_name, symbol_name_len + 1, sizeof(char));

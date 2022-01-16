@@ -162,6 +162,8 @@ DATDEF struct mfile_stream_ops const device_v_stream_ops;
 #define device_getname(self)    ((self)->dv_dirent->dd_dirent.fd_name)
 #define device_getnamelen(self) ((self)->dv_dirent->dd_dirent.fd_namelen)
 #define device_getdevno(self)   ((self)->_device_devnode_ dn_devno)
+#define device_getmajor(self)   MAJOR(device_getdevno(self))
+#define device_getminor(self)   MINOR(device_getdevno(self))
 
 /* Helpers for acquiring a non-blocking SMP-lock for `device_getname()' */
 #define device_getname_lock_acquire      mfile_tslock_acquire

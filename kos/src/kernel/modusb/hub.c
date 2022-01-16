@@ -26,11 +26,11 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/char.h>
 #include <drivers/usb.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
+#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hw/usb/class.h>

@@ -1319,7 +1319,7 @@ nogroup:
 		if (!ctty)
 			goto noctty;
 		FINALLY_DECREF_UNLIKELY(ctty);
-		tty_devno = chrdev_getdevno(ctty);
+		tty_devno = device_getdevno(ctty);
 		tty_devno_encoded = ((MAJOR(tty_devno) & 0xff) << 8) |
 		                    ((MINOR(tty_devno) & 0xff) |
 		                     (MINOR(tty_devno) & 0xffff00) << 8);

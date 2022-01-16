@@ -813,15 +813,16 @@ again_getkey:
 				len = keyboard_device_do_translate(self, packet.kp_key, packet.kp_mod);
 				len = keyboard_device_encode_cp(self, len);
 				if (len == 0) {
-					chrdev_getname_lock_acquire(self);
+					device_getname_lock_acquire(self);
 					printk(KERN_DEBUG "[keyboard:%q:"
 					                  "%" PRIuN(__SIZEOF_MAJOR_T__) "x:"
 					                  "%" PRIuN(__SIZEOF_MINOR_T__) "x] "
 					                  "translate(%#" PRIx16 ",%#" PRIx16 "): <empty>\n",
-					       chrdev_getname(self),
-					       MAJOR(chrdev_getdevno(self)), MINOR(chrdev_getdevno(self)),
+					       device_getname(self),
+					       device_getmajor(self),
+					       device_getminor(self),
 					       packet.kp_key, packet.kp_mod);
-					chrdev_getname_lock_release(self);
+					device_getname_lock_release(self);
 check_led_and_try_again:
 					kbddev_map_endwrite(self);
 					if (packet.kp_key == KEY_CAPSLOCK ||
@@ -830,15 +831,17 @@ check_led_and_try_again:
 						sync_leds(self);
 					goto again;
 				}
-				chrdev_getname_lock_acquire(self);
+				device_getname_lock_acquire(self);
 				printk(KERN_DEBUG "[keyboard:%q:"
 				                  "%" PRIuN(__SIZEOF_MAJOR_T__) "x:"
 				                  "%" PRIuN(__SIZEOF_MINOR_T__) "x] "
 				                  "translate(%#" PRIx16 ",%#" PRIx16 "): %$q\n",
-				       chrdev_getname(self),
-				       MAJOR(chrdev_getdevno(self)), MINOR(chrdev_getdevno(self)),
-				       packet.kp_key, packet.kp_mod, len, self->kd_pend);
-				chrdev_getname_lock_release(self);
+				       device_getname(self),
+				       device_getmajor(self),
+				       device_getminor(self),
+				       packet.kp_key, packet.kp_mod,
+				       len, self->kd_pend);
+				device_getname_lock_release(self);
 				break;
 			}
 			result = (int)(unsigned int)(unsigned char)self->kd_pend[0];

@@ -23,9 +23,10 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/except.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/path.h>
 #include <kernel/types.h>
 #include <kernel/x86/gdt.h>
 #include <sched/x86/eflags-mask.h>

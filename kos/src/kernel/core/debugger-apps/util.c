@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/debugger.h>
-#include <fs/node.h>
+#include <kernel/fs/super.h>
 
 DECL_BEGIN
 
@@ -42,7 +42,7 @@ DBG_COMMAND(sync,
 	(void)argv;
 	if (argc != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	superblock_syncall();
+	fsuper_syncall();
 	return 0;
 }
 

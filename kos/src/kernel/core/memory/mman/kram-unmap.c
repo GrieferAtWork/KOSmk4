@@ -24,8 +24,8 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/kram.h>

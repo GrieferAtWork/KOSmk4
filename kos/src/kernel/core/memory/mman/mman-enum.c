@@ -25,8 +25,8 @@
 
 #include <debugger/config.h>
 #include <debugger/rt.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/mman.h>
 #include <kernel/mman/enum.h>
 #include <kernel/mman/mfile.h>

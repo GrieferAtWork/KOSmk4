@@ -22,9 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/vfs.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirhandle.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/path.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>

@@ -26,10 +26,9 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/driver-param.h> /* DEFINE_CMDLINE_FLAG_VAR() */
 #include <kernel/except.h>
+#include <kernel/fs/fs.h>
 #include <kernel/handle.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>

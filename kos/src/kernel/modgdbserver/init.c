@@ -22,10 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/mman.h>
 #include <kernel/mman/event.h>
 #include <kernel/printk.h>

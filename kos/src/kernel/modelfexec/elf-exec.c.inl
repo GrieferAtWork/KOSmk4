@@ -69,9 +69,9 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 		RAII_FINALLY { mbuilder_fini(&builder); };
 		need_dyn_linker = false;
 		linker_base     = (UNCHECKED void *)-1;
+
 		/* Read the program segment header table into memory. */
-		inode_readall(args->ea_xfile,
-		              phdr_vector,
+		mfile_readall(args->ea_xfile, phdr_vector,
 		              ehdr->e_phnum * sizeof(LOCAL_ElfW(Phdr)),
 		              (pos_t)ehdr->e_phoff);
 

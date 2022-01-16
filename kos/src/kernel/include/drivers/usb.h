@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/char.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/types.h>
 #include <sched/mutex.h>
 
@@ -156,11 +156,11 @@ struct usb_transfer {
 
 
 struct chrdev;
-struct block_device;
+struct blkdev;
 
 
 /* USB interrupt handler.
- * @param: self:   [1..1] Either    a    `struct chrdev'    or     `struct block_device'
+ * @param: self:   [1..1] Either    a    `struct chrdev'    or     `struct blkdev'
  *                 When  a reference  could not be  acquired to the  given, the callback
  *                 is not invoked, and behaves as if `USB_INTERRUPT_HANDLER_RETURN_STOP'
  *                 was returned.
@@ -193,7 +193,7 @@ typedef NOBLOCK NONNULL((1)) unsigned int
                                                 unsigned int status,
                                                 void const *data, size_t datalen);
 typedef NOBLOCK NONNULL((1)) unsigned int
-/*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER_BLK)(struct block_device *__restrict self,
+/*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER_BLK)(struct blkdev *__restrict self,
                                                 unsigned int status,
                                                 void const *data, size_t datalen);
 
@@ -205,7 +205,7 @@ AWREF(chrdev_awref, chrdev);
 
 #ifndef __blkdev_awref_defined
 #define __blkdev_awref_defined
-AWREF(blkdev_awref, block_device);
+AWREF(blkdev_awref, blkdev);
 #endif /* !__blkdev_awref_defined */
 
 struct usb_interrupt {
@@ -217,7 +217,7 @@ struct usb_interrupt {
 	/*NOTHROW*/ (KCALL *ui_fini)(struct usb_interrupt *__restrict self);
 #define USB_INTERRUPT_FLAG_NORMAL      0x0000 /* Normal flags. */
 #define USB_INTERRUPT_FLAG_ISACHR      0x0000 /* [const] The bound device is a `struct chrdev'. */
-#define USB_INTERRUPT_FLAG_ISABLK      0x0001 /* [const] The bound device is a `struct block_device'. */
+#define USB_INTERRUPT_FLAG_ISABLK      0x0001 /* [const] The bound device is a `struct blkdev'. */
 #define USB_INTERRUPT_FLAG_SHORT       0x0002 /* [const] Allow short packets. */
 #define USB_INTERRUPT_FLAG_EVENPERIOD  0x0004 /* [const] Try to round `poll_interval_in_milliseconds', such
 	                                           * that all polls happen perfectly evenly spaced from each other.
@@ -230,7 +230,7 @@ struct usb_interrupt {
 	PUSB_INTERRUPT_HANDLER   ui_handler; /* [const][1..1] Interrupt handler callback. */
 	union {
 		struct chrdev_awref   ui_chr; /* [0..1] The pointed-to device. */
-		struct blkdev_awref       ui_blk; /* [0..1] The pointed-to device. */
+		struct blkdev_awref   ui_blk; /* [0..1] The pointed-to device. */
 	}                        ui_bind;   /* The bound interrupt handler callback. */
 	/* Controller-specific data goes here. */
 };
@@ -319,7 +319,7 @@ struct usb_controller
 	/* [1..1] Create an interrupt descriptor.
 	 * @param: endp:                          The endpoint from which to poll data.
 	 * @param: handler:                       The handler to-be invoked.
-	 * @param: character_or_block_device:     Either  a  `struct chrdev'  or   `struct block_device',
+	 * @param: character_or_block_device:     Either  a  `struct chrdev'  or   `struct blkdev',
 	 *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
 	 * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
 	 *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
@@ -382,7 +382,7 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
 /* Create an interrupt descriptor.
  * @param: endp:                          The endpoint from which to poll data.
  * @param: handler:                       The handler to-be invoked.
- * @param: character_or_block_device:     Either  a  `struct chrdev'  or   `struct block_device',
+ * @param: character_or_block_device:     Either  a  `struct chrdev'  or   `struct blkdev',
  *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
  * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
  *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
@@ -429,7 +429,7 @@ LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct usb_interrupt *KCALL
 usb_controller_interrupt_create(struct usb_controller *__restrict self,
                                 struct usb_endpoint *__restrict endp,
                                 PUSB_INTERRUPT_HANDLER_BLK handler,
-                                struct block_device *__restrict device,
+                                struct blkdev *__restrict device,
                                 size_t buflen, uintptr_t flags DFL(USB_INTERRUPT_FLAG_NORMAL),
                                 unsigned int poll_interval_in_milliseconds DFL(0)) {
 	REF struct usb_interrupt *result;
@@ -545,7 +545,7 @@ FUNDEF bool KCALL usb_unregister_device_probe(PUSB_DEVICE_PROBE func) THROWS(E_W
 FUNDEF bool KCALL usb_unregister_interface_probe(PUSB_INTERFACE_PROBE func) THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
-struct block_device;
+struct blkdev;
 struct chrdev;
 
 /* Register mappings between USB devices and device files, such that
@@ -566,11 +566,11 @@ struct chrdev;
  * single  given USB device,  however it is not  possible to delete such
  * a registration, other than physically removing the associated device.
  */
-FUNDEF void KCALL usb_register_blkdev(struct usb_device *__restrict usb_dev, struct block_device *__restrict dev) THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF void KCALL usb_register_blkdev(struct usb_device *__restrict usb_dev, struct blkdev *__restrict dev) THROWS(E_WOULDBLOCK, E_BADALLOC);
 FUNDEF void KCALL usb_register_chrdev(struct usb_device *__restrict usb_dev, struct chrdev *__restrict dev) THROWS(E_WOULDBLOCK, E_BADALLOC);
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF void KCALL usb_register_device(struct usb_device *__restrict usb_dev, struct block_device *__restrict dev) ASMNAME("usb_register_blkdev");
+FUNDEF void KCALL usb_register_device(struct usb_device *__restrict usb_dev, struct blkdev *__restrict dev) ASMNAME("usb_register_blkdev");
 FUNDEF void KCALL usb_register_device(struct usb_device *__restrict usb_dev, struct chrdev *__restrict dev) ASMNAME("usb_register_chrdev");
 }
 #endif /* __cplusplus */

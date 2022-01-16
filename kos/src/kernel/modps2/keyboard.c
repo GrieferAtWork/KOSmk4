@@ -67,17 +67,18 @@ NOTHROW(FCALL ps2_keyboard_postkey)(struct ps2_keyboard *__restrict self, u16 ke
 	entropy_giveint_nopr(tsc_get(THIS_CPU), bits);
 
 #if 1
-	chrdev_getname_lock_acquire(self);
+	device_getname_lock_acquire(self);
 	printk(KERN_DEBUG "[ps2:%q] Post key %#.4I16x [state=%u]\n",
-	       chrdev_getname(self), key, (unsigned int)self->pk_state);
-	chrdev_getname_lock_release(self);
+	       device_getname(self), key, (unsigned int)self->pk_state);
+	device_getname_lock_release(self);
 #endif
+
 	/* Schedule the key */
 	if unlikely(!kbddev_putkey_nopr(self, key)) {
-		chrdev_getname_lock_acquire(self);
+		device_getname_lock_acquire(self);
 		printk(KERN_WARNING "[ps2:%q] Keyboard buffer is full (dropping %#.4I16x)\n",
-		       chrdev_getname(self), key);
-		chrdev_getname_lock_release(self);
+		       device_getname(self), key);
+		device_getname_lock_release(self);
 	}
 }
 

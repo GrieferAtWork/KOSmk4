@@ -22,8 +22,8 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/block.h>
 #include <drivers/usb.h>
+#include <kernel/fs/blkdev.h>
 #include <kernel/types.h>
 #include <sched/mutex.h>
 
@@ -33,11 +33,11 @@ DECL_BEGIN
 /* MassStorageSCSIDevice */
 struct ms_scsi_device
 #ifdef __cplusplus
-	: block_device
+	: blkdev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct block_device        msd_device;   /* The underlying block-device. */
+	struct blkdev              msd_device;   /* The underlying block-device. */
 #endif /* !__cplusplus */
 	REF struct usb_controller *msd_ctrl;     /* [1..1][const] The associated USB controller. */
 	REF struct usb_endpoint   *msd_endp_in;  /* [1..1][const] Input endpoint (for reading from the device) */

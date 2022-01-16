@@ -325,7 +325,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__re
 
 /* Check if the given module has a path and/or name. */
 #define module_haspath(self) \
-	((self)->md_fsname != __NULLPTR && ((self)->md_fspath != __NULLPTR || (self)->md_fsname->de_name[0] == '/'))
+	((self)->md_fsname != __NULLPTR && ((self)->md_fspath != __NULLPTR || (self)->md_fsname->fd_name[0] == '/'))
 #define module_hasname(self)         ((self)->md_fsname != __NULLPTR || module_isdriver(self))
 #define module_haspath_or_name(self) ((self)->md_fsname != __NULLPTR || module_isdriver(self))
 

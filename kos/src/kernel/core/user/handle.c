@@ -26,16 +26,13 @@
 
 #include <debugger/config.h>
 #include <debugger/hook.h>
-#include <dev/block.h>
-#include <dev/char.h>
-#include <fs/fifo.h>
-#include <fs/file.h>
-#include <fs/node.h>
-#include <fs/special-node.h>
-#include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
+#include <kernel/fs/filehandle.h>
+#include <kernel/fs/fs.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/event.h>
@@ -46,6 +43,7 @@
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
@@ -1772,7 +1770,7 @@ handle_as_path_noinherit(struct handle const *__restrict hnd) {
 	case HANDLE_TYPE_TEMPHANDLE:
 	case HANDLE_TYPE_FIFOHANDLE:
 	case HANDLE_TYPE_DIRHANDLE:
-		result = incref(((struct filehandle *)hnd->h_data)->f_path);
+		result = incref(((struct filehandle *)hnd->h_data)->fh_path);
 		break;
 
 	case HANDLE_TYPE_PATH:
@@ -1801,10 +1799,10 @@ handle_tryclose_symolic(unsigned int fd)
 		REF struct path *oldp;
 		struct fs *f;
 		f = THIS_FS;
-		sync_write(&f->f_pathlock);
-		oldp     = f->f_cwd;
-		f->f_cwd = incref(f->f_root);
-		sync_endwrite(&f->f_pathlock);
+		fs_pathlock_write(f);
+		oldp      = f->fs_cwd;
+		f->fs_cwd = incref(f->fs_root);
+		fs_pathlock_endwrite(f);
 		decref(oldp);
 	}	break;
 
@@ -1815,18 +1813,18 @@ handle_tryclose_symolic(unsigned int fd)
 		struct fs *f;
 		id = (fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN));
 		f = THIS_FS;
-		sync_read(&f->f_vfs->v_drives_lock);
-		p = xincref(f->f_vfs->v_drives[id]);
-		sync_endread(&f->f_vfs->v_drives_lock);
+		vfs_driveslock_read(f->fs_vfs);
+		p = xincref(f->fs_vfs->vf_drives[id]);
+		vfs_driveslock_endread(f->fs_vfs);
 		TRY {
-			sync_write(&f->f_pathlock);
+			fs_pathlock_write(f);
 		} EXCEPT {
 			decref(p);
 			RETHROW();
 		}
-		oldp = f->f_dcwd[id];
-		f->f_dcwd[id] = p; /* Inherit reference */
-		sync_endwrite(&f->f_pathlock);
+		oldp = f->fs_dcwd[id];
+		f->fs_dcwd[id] = p; /* Inherit reference */
+		fs_pathlock_endwrite(f);
 		xdecref(oldp);
 		if unlikely(!p && !oldp)
 			throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
@@ -1907,14 +1905,14 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		p = handle_as_path_noinherit(hnd);
 		f = THIS_FS;
 		TRY {
-			sync_write(&f->f_pathlock);
+			fs_pathlock_write(f);
 		} EXCEPT {
 			decref(p);
 			RETHROW();
 		}
-		oldp     = f->f_cwd;
-		f->f_cwd = p; /* Inherit reference */
-		sync_endwrite(&f->f_pathlock);
+		oldp      = f->fs_cwd;
+		f->fs_cwd = p; /* Inherit reference */
+		fs_pathlock_endwrite(f);
 		decref(oldp);
 	}	break;
 
@@ -1924,14 +1922,14 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		p = handle_as_path_noinherit(hnd);
 		f = THIS_FS;
 		TRY {
-			sync_write(&f->f_pathlock);
+			fs_pathlock_write(f);
 		} EXCEPT {
 			decref(p);
 			RETHROW();
 		}
-		oldp      = f->f_root;
-		f->f_root = p; /* Inherit reference */
-		sync_endwrite(&f->f_pathlock);
+		oldp      = f->fs_root;
+		f->fs_root = p; /* Inherit reference */
+		fs_pathlock_endwrite(f);
 		decref(oldp);
 	}	break;
 
@@ -1945,14 +1943,14 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		p = handle_as_path_noinherit(hnd);
 		f = THIS_FS;
 		TRY {
-			sync_write(&f->f_pathlock);
+			fs_pathlock_write(f);
 		} EXCEPT {
 			decref(p);
 			RETHROW();
 		}
-		oldp = f->f_dcwd[id];
-		f->f_dcwd[id] = p; /* Inherit reference */
-		sync_endwrite(&f->f_pathlock);
+		oldp = f->fs_dcwd[id];
+		f->fs_dcwd[id] = p; /* Inherit reference */
+		fs_pathlock_endwrite(f);
 		decref(oldp);
 	}	break;
 
@@ -2013,9 +2011,9 @@ handle_lookup(unsigned int fd)
 		f             = THIS_FS;
 		result.h_type = HANDLE_TYPE_PATH;
 		result.h_mode = IO_RDONLY;
-		sync_read(&f->f_pathlock);
-		result.h_data = incref(f->f_cwd);
-		sync_endread(&f->f_pathlock);
+		fs_pathlock_read(f);
+		result.h_data = incref(f->fs_cwd);
+		fs_pathlock_endread(f);
 	}	break;
 
 	case HANDLE_SYMBOLIC_FDROOT: {
@@ -2023,9 +2021,9 @@ handle_lookup(unsigned int fd)
 		f             = THIS_FS;
 		result.h_type = HANDLE_TYPE_PATH;
 		result.h_mode = IO_RDONLY;
-		sync_read(&f->f_pathlock);
-		result.h_data = incref(f->f_root);
-		sync_endread(&f->f_pathlock);
+		fs_pathlock_read(f);
+		result.h_data = incref(f->fs_root);
+		fs_pathlock_endread(f);
 	}	break;
 
 	case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
@@ -2034,14 +2032,14 @@ handle_lookup(unsigned int fd)
 		f             = THIS_FS;
 		result.h_type = HANDLE_TYPE_PATH;
 		result.h_mode = IO_RDONLY;
-		sync_read(&f->f_pathlock);
-		result.h_data = xincref(f->f_dcwd[fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN)]);
-		sync_endread(&f->f_pathlock);
+		fs_pathlock_read(f);
+		result.h_data = xincref(f->fs_dcwd[fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN)]);
+		fs_pathlock_endread(f);
 		if (!result.h_data) {
-			struct vfs *v = f->f_vfs;
-			sync_read(&v->v_drives_lock);
-			result.h_data = xincref(v->v_drives[fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN)]);
-			sync_endread(&v->v_drives_lock);
+			struct vfs *v = f->fs_vfs;
+			vfs_driveslock_read(v);
+			result.h_data = xincref(v->vf_drives[fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN)]);
+			vfs_driveslock_endread(v);
 			if unlikely(!result.h_data)
 				throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
 		}
@@ -2050,10 +2048,10 @@ handle_lookup(unsigned int fd)
 	case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
 	     HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX): {
 		struct vfs *v;
-		v = THIS_FS->f_vfs;
-		sync_read(&v->v_drives_lock);
-		result.h_data = xincref(v->v_drives[fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN)]);
-		sync_endread(&v->v_drives_lock);
+		v = THIS_FS->fs_vfs;
+		vfs_driveslock_read(v);
+		result.h_data = xincref(v->vf_drives[fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN)]);
+		vfs_driveslock_endread(v);
 		if unlikely(!result.h_data)
 			throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
 	}	break;

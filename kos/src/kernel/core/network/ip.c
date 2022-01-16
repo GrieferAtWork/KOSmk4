@@ -237,10 +237,10 @@ ip_routepacket(struct nicdev *__restrict dev,
 	hdr = (struct iphdr *)packet_data;
 	if unlikely(hdr->ip_v != IPVERSION) {
 		/* Bad IP version. */
-		chrdev_getname_lock_acquire(dev);
+		device_getname_lock_acquire(dev);
 		printk(KERN_ERR "[ip:%s] Bad IP version in header isn't 4, but is %u\n",
-		       chrdev_getname(dev), hdr->ip_v);
-		chrdev_getname_lock_release(dev);
+		       device_getname(dev), hdr->ip_v);
+		device_getname_lock_release(dev);
 		return;
 	}
 	/* Check for simple case: The packet isn't fragmented. */
@@ -249,26 +249,26 @@ ip_routepacket(struct nicdev *__restrict dev,
 	header_length = hdr->ip_hl * 4;
 	if unlikely(header_length < 20) {
 		/* Header too small. */
-		chrdev_getname_lock_acquire(dev);
+		device_getname_lock_acquire(dev);
 		printk(KERN_ERR "[ip:%s] ip.siz[%" PRIu16 "] is less than 20\n",
-		       chrdev_getname(dev), header_length);
-		chrdev_getname_lock_release(dev);
+		       device_getname(dev), header_length);
+		device_getname_lock_release(dev);
 		return;
 	}
 	if unlikely(header_length > total_length) {
 		/* Header too large. */
-		chrdev_getname_lock_acquire(dev);
+		device_getname_lock_acquire(dev);
 		printk(KERN_ERR "[ip:%s] iphdr.siz[%" PRIu16 "] exceeds dgram.siz[%" PRIu16 "]\n",
-		       chrdev_getname(dev), header_length, total_length);
-		chrdev_getname_lock_release(dev);
+		       device_getname(dev), header_length, total_length);
+		device_getname_lock_release(dev);
 		return;
 	}
 	if unlikely(total_length > packet_size) {
 		/* total too large. */
-		chrdev_getname_lock_acquire(dev);
+		device_getname_lock_acquire(dev);
 		printk(KERN_ERR "[ip:%s] payload.siz[%" PRIu16 "] exceeds pck.siz[%" PRIuSIZ "]\n",
-		       chrdev_getname(dev), header_length, packet_size);
-		chrdev_getname_lock_release(dev);
+		       device_getname(dev), header_length, packet_size);
+		device_getname_lock_release(dev);
 		return;
 	}
 	/* Check for simple case: (offset == 0 && MF == 0) --> Non-fragmented */
@@ -294,10 +294,10 @@ ip_routepacket(struct nicdev *__restrict dev,
 		if (fragment_start != 0) {
 			if (fragment_start < 20) {
 				/* Only offset=0 fragments are allowed to write the IP header. */
-				chrdev_getname_lock_acquire(dev);
+				device_getname_lock_acquire(dev);
 				printk(KERN_ERR "[ip:%s] dgram.frag[start=%" PRIu16 ",siz=%" PRIu16 "] clips into iphdr\n",
-				       chrdev_getname(dev), fragment_start, fragment_size);
-				chrdev_getname_lock_release(dev);
+				       device_getname(dev), fragment_start, fragment_size);
+				device_getname_lock_release(dev);
 				return;
 			}
 			/* Non-first-fragment (only include the payload within the final datagram) */
@@ -309,10 +309,10 @@ ip_routepacket(struct nicdev *__restrict dev,
 		/* Calculate the fragment's end-offset */
 		if (OVERFLOW_UADD(fragment_start, fragment_size, &fragment_end)) {
 			/* Fragment buffer area is out-of-bounds. */
-			chrdev_getname_lock_acquire(dev);
+			device_getname_lock_acquire(dev);
 			printk(KERN_ERR "[ip:%s] dgram.frag[start=%" PRIu16 ",siz=%" PRIu16 "] overflows its end-offset\n",
-			       chrdev_getname(dev), fragment_start, fragment_size);
-			chrdev_getname_lock_release(dev);
+			       device_getname(dev), fragment_start, fragment_size);
+			device_getname_lock_release(dev);
 			return;
 		}
 		/* Collect all of the information used to identity incoming datagrams. */
@@ -332,12 +332,12 @@ again_lock_datagrams:
 			if unlikely(now.tv_sec > dg->dg_tmo) {
 				struct iphdr *datagram;
 				/* Discard this packet. */
-				chrdev_getname_lock_acquire(dev);
+				device_getname_lock_acquire(dev);
 				printk(KERN_ERR "[ip:%s] Timeout while receiving datagram "
 				                "from " NET_PRINTF_IPADDR_FMT "\n",
-				       chrdev_getname(dev),
+				       device_getname(dev),
 				       NET_PRINTF_IPADDR_ARG(uid.dg_src.s_addr));
-				chrdev_getname_lock_release(dev);
+				device_getname_lock_release(dev);
 				datagram = dg->dg_buf; /* Inherit */
 				/* Delete the datagram. */
 				assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
@@ -356,12 +356,12 @@ again_lock_datagrams:
 					if unlikely(dg->dg_flg & IP_DATAGRAM_FLAG_GOTLAST) {
 						struct iphdr *datagram;
 						/* Discard this packet. */
-						chrdev_getname_lock_acquire(dev);
+						device_getname_lock_acquire(dev);
 						printk(KERN_ERR "[ip:%s] Multiple last fragments in datagram "
 						                "from " NET_PRINTF_IPADDR_FMT "\n",
-						       chrdev_getname(dev),
+						       device_getname(dev),
 							   NET_PRINTF_IPADDR_ARG(uid.dg_src.s_addr));
-						chrdev_getname_lock_release(dev);
+						device_getname_lock_release(dev);
 						datagram = dg->dg_buf; /* Inherit */
 						/* Delete the datagram. */
 						assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
@@ -385,13 +385,13 @@ do_write_fragment_nogotlast:
 			if unlikely(dg->dg_flg & IP_DATAGRAM_FLAG_GOTLAST) {
 				struct iphdr *datagram;
 				/* Discard this packet. */
-				chrdev_getname_lock_acquire(dev);
+				device_getname_lock_acquire(dev);
 				printk(KERN_ERR "[ip:%s] Fragment from " NET_PRINTF_IPADDR_FMT " "
 				                "at %" PRIu16 "-%" PRIu16 " would exceed the "
 				                "last fragment maximum at %" PRIu16 "\n",
-				       chrdev_getname(dev), NET_PRINTF_IPADDR_ARG(uid.dg_src.s_addr),
+				       device_getname(dev), NET_PRINTF_IPADDR_ARG(uid.dg_src.s_addr),
 				       fragment_start, fragment_end - 1, dg->dg_len);
-				chrdev_getname_lock_release(dev);
+				device_getname_lock_release(dev);
 				datagram = dg->dg_buf; /* Inherit */
 				/* Delete the datagram. */
 				assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
@@ -605,12 +605,12 @@ ip_routedatagram(struct nicdev *__restrict dev,
 
 	case IPPROTO_UDP:
 		if unlikely(payload_len < sizeof(struct udphdr)) {
-			chrdev_getname_lock_acquire(dev);
+			device_getname_lock_acquire(dev);
 			printk(KERN_ERR "[ip:%s] udp packet of ip[siz=%" PRIu16 "] "
 			                "from " NET_PRINTF_IPADDR_FMT " is too small\n",
-			       chrdev_getname(dev), packet_size,
+			       device_getname(dev), packet_size,
 			       NET_PRINTF_IPADDR_ARG(packet->ip_src.s_addr));
-			chrdev_getname_lock_release(dev);
+			device_getname_lock_release(dev);
 			return;
 		}
 		udp_routepacket(dev, (struct udphdr const *)payload,
@@ -618,10 +618,10 @@ ip_routedatagram(struct nicdev *__restrict dev,
 		break;
 
 	default:
-		chrdev_getname_lock_acquire(dev);
+		device_getname_lock_acquire(dev);
 		printk(KERN_WARNING "[ip:%s] Unrecognized ip packet [prot=%#.2" PRIx8 ",siz=%" PRIu16 "]\n",
-		       chrdev_getname(dev), packet->ip_p, packet_size);
-		chrdev_getname_lock_release(dev);
+		       device_getname(dev), packet->ip_p, packet_size);
+		device_getname_lock_release(dev);
 		break;
 	}
 }

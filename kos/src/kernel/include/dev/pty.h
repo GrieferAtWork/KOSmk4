@@ -22,7 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/char.h>
 #include <dev/tty.h>
 #include <kernel/types.h>
 

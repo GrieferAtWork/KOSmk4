@@ -23,8 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>

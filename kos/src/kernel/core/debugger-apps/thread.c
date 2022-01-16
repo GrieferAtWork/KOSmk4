@@ -35,9 +35,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/addr2line.h>
+#include <kernel/fs/dirent.h>
 #include <kernel/mman.h>
 #include <kernel/mman/execinfo.h>
 #include <sched/async.h>
@@ -85,8 +84,8 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		ei = &FORMMAN(thread->t_mman, thismman_execinfo);
 		if (ei->mei_dent) {
 			len = dbg_printer(NULL,
-			                  ei->mei_dent->de_name,
-			                  ei->mei_dent->de_namelen);
+			                  ei->mei_dent->fd_name,
+			                  ei->mei_dent->fd_namelen);
 		} else if (thread->t_flags & TASK_FKERNTHREAD) {
 			len = dbg_print(DBGSTR("kernel"));
 		} else {

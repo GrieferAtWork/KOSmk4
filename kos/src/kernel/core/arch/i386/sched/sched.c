@@ -23,8 +23,8 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/vfs.h>
 #include <kernel/except.h>
+#include <kernel/fs/fs.h>
 #include <kernel/handle.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>

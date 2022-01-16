@@ -3178,7 +3178,7 @@ for (local name: SYSCONF_VALUES_LO_INT32) {
 		break;
 
 	case _SC_SYMLOOP_MAX:
-		result = SYMLOOP_MAX; /* TODO: Kernel:`THIS_FS->f_lnkmax' */
+		result = SYMLOOP_MAX; /* TODO: Kernel:`THIS_FS->fs_lnkmax' */
 		break;
 
 	default:

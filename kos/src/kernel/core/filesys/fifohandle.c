@@ -22,10 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/vfs.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
+#include <kernel/fs/path.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/iovec.h>

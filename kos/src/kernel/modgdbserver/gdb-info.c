@@ -25,8 +25,8 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/handle.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
@@ -142,7 +142,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 			mman_lock_endread(v);
 		}
 		if (filename_only && (dent || path)) {
-			result = dent ? (*printer)(arg, dent->de_name, dent->de_namelen)
+			result = dent ? (*printer)(arg, dent->fd_name, dent->fd_namelen)
 			              : (*printer)(arg, "?", 1);
 			xdecref_unlikely(path);
 			xdecref_unlikely(dent);
@@ -158,8 +158,8 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 			if likely(result >= 0) {
 				ssize_t temp;
 				temp = (*printer)(arg,
-				                  dent->de_name,
-				                  dent->de_namelen);
+				                  dent->fd_name,
+				                  dent->fd_namelen);
 				if unlikely(temp < 0)
 					result = temp;
 				else {

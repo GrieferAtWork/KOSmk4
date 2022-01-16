@@ -23,14 +23,15 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/event.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/paging.h>
 #include <sched/arch/userkern.h>

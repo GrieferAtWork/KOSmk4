@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/char.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/malloc-defs.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
