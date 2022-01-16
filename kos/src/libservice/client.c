@@ -290,8 +290,8 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 								struct cmsghdr *cmsg;
 								char fd_buf[CMSG_SPACE(sizeof(fd_t))];
 								struct iovec iov[1];
-								memset(fd_buf, 0, sizeof(fd_buf));
-								memset(&msg, 0, sizeof(msg));
+								bzero(fd_buf, sizeof(fd_buf));
+								bzero(&msg, sizeof(msg));
 								iov[0].iov_base    = (void *)LIBSERVICE_COM_HANDSHAKE_MESSAGE;
 								iov[0].iov_len     = sizeof(LIBSERVICE_COM_HANDSHAKE_MESSAGE);
 								msg.msg_iov        = iov;

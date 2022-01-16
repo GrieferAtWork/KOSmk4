@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbae4086a */
+/* HASH CRC-32:0x4e87f5f8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,30 @@
 #if defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_bzero_defined
+#define __local___localdep_bzero_defined
+#ifdef __CRT_HAVE_bzero
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE___bzero)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE_explicit_bzero)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/bzero.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
+#endif /* !... */
+#endif /* !__local___localdep_bzero_defined */
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined
 #ifdef __CRT_HAVE_close
@@ -119,20 +143,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-#ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined
-#ifdef __CRT_HAVE_memset
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* __CRT_HAVE_memset */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/memset.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_memset __LIBC_LOCAL_NAME(memset)
-#endif /* !__CRT_HAVE_memset */
-#endif /* !__local___localdep_memset_defined */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined
 __NAMESPACE_LOCAL_END
@@ -525,8 +535,8 @@ __again:
 #define __PRIVATE_WANT_err_infd
 		}
 	} else {
-		(__NAMESPACE_LOCAL_SYM __localdep_memset)(&__old_ios, 0, sizeof(struct termios));
-		(__NAMESPACE_LOCAL_SYM __localdep_memset)(&__new_ios, 0, sizeof(struct termios));
+		(__NAMESPACE_LOCAL_SYM __localdep_bzero)(&__old_ios, sizeof(struct termios));
+		(__NAMESPACE_LOCAL_SYM __localdep_bzero)(&__new_ios, sizeof(struct termios));
 #ifdef __ECHO
 		__old_ios.c_lflag = __ECHO;
 		__new_ios.c_lflag = __ECHO;
@@ -544,8 +554,8 @@ __again:
 	{
 		unsigned int __i;
 		struct sigaction __newact;
-		(__NAMESPACE_LOCAL_SYM __localdep_memset)((void *)__NAMESPACE_LOCAL_SYM __rpp_arrived, 0, sizeof(__NAMESPACE_LOCAL_SYM __rpp_arrived));
-		(__NAMESPACE_LOCAL_SYM __localdep_memset)(&__newact, 0, sizeof(__newact));
+		(__NAMESPACE_LOCAL_SYM __localdep_bzero)((void *)__NAMESPACE_LOCAL_SYM __rpp_arrived, sizeof(__NAMESPACE_LOCAL_SYM __rpp_arrived));
+		(__NAMESPACE_LOCAL_SYM __localdep_bzero)(&__newact, sizeof(__newact));
 		__newact.sa_handler = &__NAMESPACE_LOCAL_SYM __rpp_handler;
 		for (__i = 0; __i < __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __rpp_signals); ++__i) {
 			if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_sigaction)(__NAMESPACE_LOCAL_SYM __rpp_signals[__i], &__newact, &__old_sact[__i]) != 0) {

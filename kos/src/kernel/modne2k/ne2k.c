@@ -329,7 +329,7 @@ NOTHROW(FCALL Ne2k_HandleAioTxError)(Ne2kDevice *__restrict self,
 	printk(KERN_WARNING "[ne2k] Transmit error: %.2I8x\n", tsr);
 	my_error = error_data();
 	memcpy(&old_error, my_error, sizeof(old_error));
-	memset(my_error, 0, sizeof(*my_error));
+	bzero(my_error, sizeof(*my_error));
 	my_error->e_code                       = ERROR_CODEOF(E_IOERROR_ERRORBIT);
 	my_error->e_args.e_ioerror.i_subsystem = E_IOERROR_SUBSYSTEM_NET;
 	my_error->e_args.e_ioerror.i_reason    = E_IOERROR_REASON_NE2K_TXTSR;

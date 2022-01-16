@@ -94,7 +94,7 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 		/* This really shouldn't happen... */
 		buf    = shouldnt_happen;
 		buflen = sizeof(shouldnt_happen);
-		memset(shouldnt_happen, 0, sizeof(shouldnt_happen));
+		bzero(shouldnt_happen, sizeof(shouldnt_happen));
 	}
 	bufend = buf + buflen;
 	screen_left = buf;
@@ -326,7 +326,7 @@ NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
 		/* This really shouldn't happen... */
 		buf    = shouldnt_happen;
 		buflen = sizeof(shouldnt_happen);
-		memset(shouldnt_happen, 0, sizeof(shouldnt_happen));
+		bzero(shouldnt_happen, sizeof(shouldnt_happen));
 	}
 	screen_left = buf;
 	buf[buflen - 1] = '\0';

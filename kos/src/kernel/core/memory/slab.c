@@ -272,14 +272,14 @@ again:
 #endif /* GFP_CALLOC != SLAB_FCALLOC */
 		{
 			if (flags & GFP_CALLOC) {
-				memset(result, 0, PAGESIZE);
+				bzero(result, PAGESIZE);
 			} else {
 				mempatl(result, DEBUGHEAP_NO_MANS_LAND, PAGESIZE);
 			}
 		}
 #else /* CONFIG_DEBUG_HEAP */
 		if ((flags & GFP_CALLOC) && !(result->s_flags & SLAB_FCALLOC))
-			memset(result, 0, PAGESIZE);
+			bzero(result, PAGESIZE);
 #endif /* !CONFIG_DEBUG_HEAP */
 		return result;
 	}

@@ -994,7 +994,7 @@ NOTHROW(KCALL gc_coreheap_reset_reach)(void) {
 	for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
 		struct mcorepage *iter;
 		SLIST_FOREACH (iter, &mcoreheap_lists[i], mcp_link)
-			memset(iter->_mcp_reach, 0, sizeof(iter->_mcp_reach));
+			bzero(iter->_mcp_reach, sizeof(iter->_mcp_reach));
 	}
 }
 

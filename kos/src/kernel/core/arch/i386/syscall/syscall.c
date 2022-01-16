@@ -100,7 +100,7 @@ NOTHROW(FCALL __asm32_bad_sysenter_extension_impl)(struct icpustate *__restrict 
 	sc_info.rsi_regs[3] = state->ics_gpregs.gp_esi;
 
 	/* Fill in exception information. */
-	memset(info, 0, sizeof(*info));
+	bzero(info, sizeof(*info));
 	info->ei_code = ERROR_CODEOF(E_SEGFAULT_UNMAPPED);
 	info->ei_data.e_args.e_segfault.s_addr    = state->ics_gpregs.gp_ebp;
 	info->ei_data.e_args.e_segfault.s_context = E_SEGFAULT_CONTEXT_FAULT;

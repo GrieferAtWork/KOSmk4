@@ -166,7 +166,7 @@ INTERN void CC
 libphys_copyfromphys(void *dst, PHYS physaddr_t src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	WITHMEM(pread64(dev_mem, dst, num_bytes, (pos64_t)src),
-	        memset(dst, 0, num_bytes));
+	        bzero(dst, num_bytes));
 }
 
 PRIVATE ATTR_NOINLINE void CC

@@ -74,7 +74,7 @@ vesa_getbiosinfo(struct vesa_chipset *__restrict self) {
 	struct vbe_biosinfo *result;
 	result = (struct vbe_biosinfo *)vesa_chipset_biosaddr(self, VESA_CHIPSET_BIOSADDR_BIOSINFO);
 	DBG_memset(result, 0xcc, sizeof(*result));
-	memset(&self->vc_emu.b86e_vm.vr_regs, 0, sizeof(self->vc_emu.b86e_vm.vr_regs));
+	bzero(&self->vc_emu.b86e_vm.vr_regs, sizeof(self->vc_emu.b86e_vm.vr_regs));
 	memcpy(result->vbi_signature, "VBE2", 4);
 	self->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f00;
 	self->vc_emu.b86e_vm.vr_regs.vr_es = VESA_CHIPSET_BIOSADDR_BIOSINFO >> 4;
@@ -94,7 +94,7 @@ vesa_getmodeinfo(struct vesa_chipset *__restrict self, uint16_t mode) {
 	struct vbe_modeinfo *result;
 	result = (struct vbe_modeinfo *)vesa_chipset_biosaddr(self, VESA_CHIPSET_BIOSADDR_MODEINFO);
 	DBG_memset(result, 0xcc, sizeof(*result));
-	memset(&self->vc_emu.b86e_vm.vr_regs, 0, sizeof(self->vc_emu.b86e_vm.vr_regs));
+	bzero(&self->vc_emu.b86e_vm.vr_regs, sizeof(self->vc_emu.b86e_vm.vr_regs));
 	self->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f01;
 	self->vc_emu.b86e_vm.vr_regs.vr_cx = mode;
 	self->vc_emu.b86e_vm.vr_regs.vr_es = VESA_CHIPSET_BIOSADDR_MODEINFO >> 4;
@@ -107,7 +107,7 @@ vesa_getmodeinfo(struct vesa_chipset *__restrict self, uint16_t mode) {
 /* Set current VESA mode. */
 PRIVATE WUNUSED NONNULL((1)) bool CC
 vesa_setmode(struct vesa_chipset *__restrict self, uint16_t mode) {
-	memset(&self->vc_emu.b86e_vm.vr_regs, 0, sizeof(self->vc_emu.b86e_vm.vr_regs));
+	bzero(&self->vc_emu.b86e_vm.vr_regs, sizeof(self->vc_emu.b86e_vm.vr_regs));
 	self->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f02;
 	self->vc_emu.b86e_vm.vr_regs.vr_bx = mode;
 	if (!vesa_chipset_bios86_int(self, 0x10))
@@ -295,7 +295,7 @@ got_result:
 LOCAL NONNULL((1)) void CC
 vesa_setwindow(struct svga_chipset *__restrict self, uint8_t no, size_t window) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f05;
 	me->vc_emu.b86e_vm.vr_regs.vr_bx = 0x0000 | no; /* SET_WINDOW */
 	me->vc_emu.b86e_vm.vr_regs.vr_dx = (window * 64) >> me->vc_wingranshift;
@@ -306,7 +306,7 @@ vesa_setwindow(struct svga_chipset *__restrict self, uint8_t no, size_t window) 
 LOCAL NONNULL((1)) size_t CC
 vesa_getwindow(struct svga_chipset *__restrict self, uint8_t no) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f05;
 	me->vc_emu.b86e_vm.vr_regs.vr_bx = 0x0100 | no; /* GET_WINDOW */
 	if (!vesa_chipset_bios86_int(me, 0x10))
@@ -364,7 +364,7 @@ vesa_v_setwindow_wr_1(struct svga_chipset *__restrict self, size_t window) {
 PRIVATE NONNULL((1)) void CC
 vesa_v_setdisplaystart(struct svga_chipset *__restrict self, size_t offset) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f07;
 	me->vc_emu.b86e_vm.vr_regs.vr_bl = 0x00; /* SET_DISPLAY_START */
 	me->vc_emu.b86e_vm.vr_regs.vr_cx = offset % me->sc_logicalwidth;
@@ -377,7 +377,7 @@ vesa_v_setdisplaystart(struct svga_chipset *__restrict self, size_t offset) {
 PRIVATE WUNUSED NONNULL((1)) size_t CC
 vesa_getdisplaystart(struct svga_chipset *__restrict self) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f07;
 	me->vc_emu.b86e_vm.vr_regs.vr_bl = 0x01; /* GET_DISPLAY_START */
 	if (!vesa_chipset_bios86_int(me, 0x10))
@@ -391,7 +391,7 @@ vesa_getdisplaystart(struct svga_chipset *__restrict self) {
 PRIVATE NONNULL((1)) void CC
 vesa_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t width) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f06;
 	me->vc_emu.b86e_vm.vr_regs.vr_bl = 0x00; /* SET_SCAN_LINE_LENGTH_IN_PIXELS */
 	me->vc_emu.b86e_vm.vr_regs.vr_dx = (uint16_t)width;
@@ -403,7 +403,7 @@ vesa_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t width) {
 PRIVATE WUNUSED NONNULL((1)) uint16_t CC
 vesa_getlogicalwidth_max(struct svga_chipset *__restrict self) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f06;
 	me->vc_emu.b86e_vm.vr_regs.vr_bl = 0x03; /* GET_MAXIMUM_SCAN_LINE_LENGTH */
 	if (!vesa_chipset_bios86_int(me, 0x10))
@@ -509,7 +509,7 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 PRIVATE WUNUSED NONNULL((1)) size_t CC
 vesa_getregsbufsize(struct svga_chipset *__restrict self) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f04;
 	me->vc_emu.b86e_vm.vr_regs.vr_cx = me->vc_regsavebits;
 	me->vc_emu.b86e_vm.vr_regs.vr_dl = 0x00; /* SAVE_RESTORE_STATE_BUFFER_SIZE */
@@ -521,7 +521,7 @@ vesa_getregsbufsize(struct svga_chipset *__restrict self) {
 PRIVATE NONNULL((1)) void CC
 vesa_v_getregs(struct svga_chipset *__restrict self, byte_t regbuf[]) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f04;
 	me->vc_emu.b86e_vm.vr_regs.vr_cx = me->vc_regsavebits;
 	me->vc_emu.b86e_vm.vr_regs.vr_dl = 0x01; /* SAVE_STATE */
@@ -538,7 +538,7 @@ vesa_v_setregs(struct svga_chipset *__restrict self, byte_t const regbuf[]) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
 	memcpy(vesa_chipset_biosaddr(me, VESA_CHIPSET_BIOSADDR_REGBUF), regbuf,
 	       me->sc_ops.sco_regsize);
-	memset(&me->vc_emu.b86e_vm.vr_regs, 0, sizeof(me->vc_emu.b86e_vm.vr_regs));
+	bzero(&me->vc_emu.b86e_vm.vr_regs, sizeof(me->vc_emu.b86e_vm.vr_regs));
 	me->vc_emu.b86e_vm.vr_regs.vr_ax = 0x4f04;
 	me->vc_emu.b86e_vm.vr_regs.vr_cx = me->vc_regsavebits;
 	me->vc_emu.b86e_vm.vr_regs.vr_dl = 0x02; /* RESTORE_STATE */

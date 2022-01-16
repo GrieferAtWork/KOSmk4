@@ -797,11 +797,11 @@ cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
 	struct unwind_getreg_compat_data compat_getreg_data;
 #endif /* __ARCH_HAVE_COMPAT */
 
-	memset(&emulator, 0, sizeof(emulator));
+	bzero(&emulator, sizeof(emulator));
 	emulator.ue_tlsbase = (byte_t *)-1; /* Lazily calculate so we can detect if this was used. */
 	second_pass         = false;        /* Used to lazily calculate the correct `ue_tlsbase' (if used) */
 do_second_pass:
-	memset(&cu, 0, sizeof(cu));
+	bzero(&cu, sizeof(cu));
 	pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	/* Select the proper function. */
 	module_relative_pc = (uintptr_t)pc;
@@ -973,7 +973,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			di_debuginfo_compile_unit_simple_t cu;
 			size_t num_accessed_bits;
 			struct cmodule *mod;
-			memset(&cu, 0, sizeof(cu));
+			bzero(&cu, sizeof(cu));
 			cu.cu_ranges.r_startpc = self->v_cu_ranges_startpc;
 			cu.cu_addr_base        = self->v_cu_addr_base;
 			pc  = dbg_getpcreg(DBG_REGLEVEL_VIEW);
@@ -1475,7 +1475,7 @@ PUBLIC NONNULL((1)) dbx_errno_t /* Push `*(typ *)addr' */
 NOTHROW(FCALL cexpr_pushaddr_simple)(struct ctype *__restrict typ,
                                      USER void *addr) {
 	struct ctyperef ct;
-	memset(&ct, 0, sizeof(ct));
+	bzero(&ct, sizeof(ct));
 	ct.ct_typ = typ;
 	return cexpr_pushaddr(&ct, addr);
 }
@@ -1484,7 +1484,7 @@ PUBLIC NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
                                      void const *__restrict data) {
 	struct ctyperef ct;
-	memset(&ct, 0, sizeof(ct));
+	bzero(&ct, sizeof(ct));
 	ct.ct_typ = typ;
 	return cexpr_pushdata(&ct, data);
 }
@@ -1493,7 +1493,7 @@ PUBLIC NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint_simple)(struct ctype *__restrict typ,
                                     uintmax_t value) {
 	struct ctyperef ct;
-	memset(&ct, 0, sizeof(ct));
+	bzero(&ct, sizeof(ct));
 	ct.ct_typ = typ;
 	return cexpr_pushint(&ct, value);
 }
@@ -1886,7 +1886,7 @@ set_new_type:
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_cast_simple)(struct ctype *__restrict typ) {
 	struct ctyperef ct;
-	memset(&ct, 0, sizeof(ct));
+	bzero(&ct, sizeof(ct));
 	ct.ct_typ = typ;
 	return cexpr_cast(&ct);
 }
@@ -2190,7 +2190,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 		return DBX_ENOMEM;
 	/* Switch over to inline-data, thus re-using the object address as the inline pointer value. */
 	ctyperef_fini(&top->cv_type);
-	memset(&top->cv_type, 0, sizeof(top->cv_type));
+	bzero(&top->cv_type, sizeof(top->cv_type));
 	top->cv_type.ct_typ = typ; /* Inherit reference. */
 	if (top->cv_kind == CVALUE_KIND_ADDR)
 		top->cv_kind = CVALUE_KIND_IDATA;
@@ -2268,9 +2268,9 @@ NOTHROW(FCALL cvalue_setbool)(struct cvalue *__restrict self,
 	if (self->cv_kind == CVALUE_KIND_DATA)
 		dbx_free(self->cv_data);
 	self->cv_kind = CVALUE_KIND_IDATA;
-	memset(self->cv_idata, 0, sizeof(self->cv_idata));
+	bzero(self->cv_idata, sizeof(self->cv_idata));
 	ctyperef_fini(&self->cv_type);
-	memset(&self->cv_type, 0, sizeof(self->cv_type));
+	bzero(&self->cv_type, sizeof(self->cv_type));
 	self->cv_type.ct_typ    = incref(&ctype_bool);
 	*(bool *)self->cv_idata = value;
 }
@@ -2285,9 +2285,9 @@ NOTHROW(FCALL cvalue_setptrdiff_t)(struct cvalue *__restrict self,
 	if (self->cv_kind == CVALUE_KIND_DATA)
 		dbx_free(self->cv_data);
 	self->cv_kind = CVALUE_KIND_IDATA;
-	memset(self->cv_idata, 0, sizeof(self->cv_idata));
+	bzero(self->cv_idata, sizeof(self->cv_idata));
 	ctyperef_fini(&self->cv_type);
-	memset(&self->cv_type, 0, sizeof(self->cv_type));
+	bzero(&self->cv_type, sizeof(self->cv_type));
 	self->cv_type.ct_typ    = incref(&ctype_ptrdiff_t);
 	*(ptrdiff_t *)self->cv_idata = value;
 }
@@ -3215,7 +3215,7 @@ NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 		} else {
 			goto fallback_load_opt_type;
 		}
-		memset(&symtype, 0, sizeof(symtype));
+		bzero(&symtype, sizeof(symtype));
 		if (ELF32_ST_TYPE(st_info) == STT_FUNC) {
 			symtype.ct_typ = &ctype_int;
 			symtype.ct_typ = ctype_function(&symtype, 0, NULL,
@@ -3271,7 +3271,7 @@ fallback_load_opt_type:
 		ctyperef_fini(&symtype);
 		if unlikely(result != DBX_EOK)
 			goto done;
-		memset(&symtype, 0, sizeof(symtype));
+		bzero(&symtype, sizeof(symtype));
 		symtype.ct_typ = function_type; /* Inherit reference */
 	}
 	if likely(result == DBX_EOK) {

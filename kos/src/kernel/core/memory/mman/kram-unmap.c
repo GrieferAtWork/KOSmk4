@@ -1272,7 +1272,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 	assert(IS_ALIGNED((uintptr_t)job_maxaddr + 1, PAGESIZE));
 	assert(mman_lock_acquired(&mman_kernel));
 	if (job_flags & GFP_CALLOC)
-		memset(job, 0, sizeof(*job));
+		bzero(job, sizeof(*job));
 	for (;;) {
 		struct mnode *node;
 		struct mpart *part;
@@ -1437,7 +1437,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 				if (mpart_lockop_insert_or_lock(part, &job->mukj_lop_mp))
 					return MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC;
 				if (job_flags & GFP_CALLOC)
-					memset(job, 0, sizeof(*job));
+					bzero(job, sizeof(*job));
 			}
 		}
 
@@ -1536,7 +1536,7 @@ NOTHROW(FCALL krulist_merge_adjacent)(struct mman_unmap_kram_job_slist *__restri
 			iter->mukj_maxaddr       = next->mukj_maxaddr;
 			iter->mukj_flags         = next->mukj_flags;
 			if (iter->mukj_flags & GFP_CALLOC)
-				memset(next, 0, sizeof(*next));
+				bzero(next, sizeof(*next));
 			continue;
 		}
 		/* Continue trying to merge other segments. */

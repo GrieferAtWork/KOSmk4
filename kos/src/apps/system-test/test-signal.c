@@ -51,7 +51,7 @@ DEFINE_TEST(signal_works_correctly) {
 	hand_called = 0;
 
 	/* Install the signal handler. */
-	memset(&new_action, 0, sizeof(new_action));
+	bzero(&new_action, sizeof(new_action));
 	new_action.sa_handler = &myhand;
 	new_action.sa_flags   = 0;
 	EQd(sigaction(SIGUSR1, &new_action, &old_action), 0);

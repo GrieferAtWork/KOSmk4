@@ -71,7 +71,7 @@ NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t i
 	if (!textsiz)
 		return NULL;
 	/* zero-fill a small tail area after the text. */
-	memset(textbuf + textsiz, 0, ARCH_INSTRUCTION_MAXLENGTH - textsiz);
+	bzero(textbuf + textsiz, ARCH_INSTRUCTION_MAXLENGTH - textsiz);
 	result = instruction_succ_nx(textbuf, isa);
 	if (result)
 		result = (byte_t *)pc + (result - textbuf);

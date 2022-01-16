@@ -96,7 +96,7 @@ shebang_exec(struct execargs *__restrict args) {
 #define MAX_EXTSIZE (CONFIG_SHEBANG_INTERPRETER_LINE_MAX - (CONFIG_EXECABI_MAXHEADER - 2))
 		extlen = mfile_read(args->ea_xfile, ptr, MAX_EXTSIZE, (pos_t)(CONFIG_EXECABI_MAXHEADER - 2));
 		if (extlen < MAX_EXTSIZE)
-			memset(ptr + extlen, 0, MAX_EXTSIZE - extlen);
+			bzero(ptr + extlen, MAX_EXTSIZE - extlen);
 #undef MAX_EXTSIZE
 		execfile     = ext_header;
 		execline_end = find_eol(execfile, CONFIG_SHEBANG_INTERPRETER_LINE_MAX);

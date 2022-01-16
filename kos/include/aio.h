@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3cf080b */
+/* HASH CRC-32:0xe055314 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -140,7 +140,7 @@ typedef struct sigevent sigevent_t;
  * >>         // When `sigev_signo == 0', the below syscalls would become no-ops
  * >>         // Or   rather,   would  "test if we're allowed to send a signal".
  * >>         siginfo_t info;
- * >>         memset(&info, 0, sizeof(siginfo_t));
+ * >>         bzero(&info, sizeof(siginfo_t));
  * >>         info.si_signo = ev->sigev_signo;
  * >>         info.si_code  = SI_ASYNCIO;
  * >>         info.si_pid   = getpid();

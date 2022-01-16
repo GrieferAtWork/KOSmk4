@@ -184,7 +184,7 @@ rpc_membank_create(USER CHECKED byte_t *addr, size_t num_bytes)
 	result->rmb_datoff = data_offset;
 	result->rmb_addrlo = addr;
 	result->rmb_addrhi = addr + num_bytes - 1;
-	memset(result->rmb_status, 0, bitset_size);
+	bzero(result->rmb_status, bitset_size);
 	return result;
 }
 
@@ -890,7 +890,7 @@ rpc_vm_pushreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	assert(words);
 
 	/* Load the register */
-	memset(buf, 0, regsz);
+	bzero(buf, regsz);
 	error = rpc_vm_getreg(self, regno, buf);
 	if unlikely(error != UNWIND_SUCCESS) {
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
@@ -966,7 +966,7 @@ rpc_vm_pushreg2user(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	assert(words);
 
 	/* Load the register */
-	memset(buf, 0, regsz);
+	bzero(buf, regsz);
 	error = rpc_vm_getreg(self, regno, buf);
 	if unlikely(error != UNWIND_SUCCESS) {
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,

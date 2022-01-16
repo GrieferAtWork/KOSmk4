@@ -51,11 +51,11 @@
 
 DECL_BEGIN
 
-#ifdef NDEBUG
-#define DBG_memset(ptr, byte, num_bytes) (void)0
-#else /* NDEBUG */
-#define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
-#endif /* !NDEBUG */
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
 
 
 /* Try to pre-fault access to the given addres range, such that `memcpy_nopf()'

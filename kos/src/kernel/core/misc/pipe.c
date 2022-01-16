@@ -292,7 +292,7 @@ handle_pipe_stat(struct pipe *__restrict self,
                  USER CHECKED struct stat *result) {
 	size_t size;
 	size = ATOMIC_READ(self->p_buffer.rb_avail);
-	memset(result, 0, sizeof(*result));
+	bzero(result, sizeof(*result));
 	result->st_mode    = S_IFIFO;
 	result->st_nlink   = 1;
 	result->st_size    = size;

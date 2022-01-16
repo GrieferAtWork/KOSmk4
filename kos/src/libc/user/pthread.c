@@ -729,7 +729,7 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_init)(pthread_attr_t *attr)
 /*[[[body:libc_pthread_attr_init]]]*/
 {
-	memset(attr, 0, sizeof(*attr));
+	bzero(attr, sizeof(*attr));
 	attr->pa_guardsize = getpagesize();
 	return EOK;
 }
@@ -1098,7 +1098,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setaffinity_np)(pthread_attr_t *attr,
 			free(attr->pa_cpuset);
 			attr->pa_cpuset = (cpu_set_t *)&attr->pa_cpusetsize;
 		}
-		memset(&attr->pa_cpusetsize, 0, sizeof(attr->pa_cpusetsize));
+		bzero(&attr->pa_cpusetsize, sizeof(attr->pa_cpusetsize));
 		memcpy(&attr->pa_cpusetsize, cpuset, cpusetsize);
 	} else {
 		cpu_set_t *newset;
@@ -1148,7 +1148,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *att
 			return EINVAL; /* GLibc returns EINVAL here (I would have used ERANGE for this, but whatever...) */
 		p = (byte_t *)mempcpy(cpuset, attr->pa_cpuset, setsize);
 		/* Fill in the remainder with zeroes */
-		memset(p, 0, cpusetsize - setsize);
+		bzero(p, cpusetsize - setsize);
 	} else {
 		/* No affinity set defined -> All cpus may be used. */
 		memset(cpuset, 0xff, cpusetsize);
@@ -1191,8 +1191,8 @@ again:
 		attr->pa_stacksize = PTHREAD_STACK_MIN;
 	free(cpuset);
 	__STATIC_IF(sizeof(pthread_attr_t) > sizeof(pthread_attr_t)) {
-		memset((byte_t *)attr + sizeof(pthread_attr_t), 0x00,
-		       sizeof(pthread_attr_t) - sizeof(pthread_attr_t));
+		bzero((byte_t *)attr + sizeof(pthread_attr_t),
+		      sizeof(pthread_attr_t) - sizeof(pthread_attr_t));
 	}
 	return EOK;
 }
@@ -2417,7 +2417,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex,
                                               pthread_mutexattr_t const *mutexattr)
 /*[[[body:libc_pthread_mutex_init]]]*/
 {
-	memset(mutex, 0, sizeof(*mutex));
+	bzero(mutex, sizeof(*mutex));
 #if __PTHREAD_MUTEX_TIMED != 0
 	mutex->m_kind = __PTHREAD_MUTEX_TIMED;
 #endif /* __PTHREAD_MUTEX_TIMED != 0 */
@@ -3099,7 +3099,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict cond,
                                              pthread_condattr_t const *__restrict cond_attr)
 /*[[[body:libc_pthread_cond_init]]]*/
 {
-	memset(cond, 0, sizeof(*cond));
+	bzero(cond, sizeof(*cond));
 	(void)cond_attr;
 	return EOK;
 }

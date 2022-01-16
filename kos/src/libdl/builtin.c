@@ -115,7 +115,7 @@ INTERN ATTR_COLD ATTR_NORETURN void
 /*NOTHROW*/ (LIBCCALL __afail)(char const *expr, char const *file,
                                unsigned int line, char const *func) {
 	struct assert_args aargs;
-	memset(&aargs, 0, sizeof(aargs));
+	bzero(&aargs, sizeof(aargs));
 	aargs.expr = expr;
 	aargs.file = file;
 	aargs.line = line;
@@ -2286,7 +2286,7 @@ NOTHROW(CC decompress_section_data)(void *dst, size_t dst_size,
 		return (int)error; /* Inflate error. */
 	/* clear all trailing data that could not be read. */
 	if ((size_t)error < dst_size)
-		memset((byte_t *)dst + (size_t)error, 0, dst_size - error);
+		bzero((byte_t *)dst + (size_t)error, dst_size - error);
 	return ZLIB_ERROR_OK;
 }
 

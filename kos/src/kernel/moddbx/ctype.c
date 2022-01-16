@@ -364,7 +364,7 @@ NOTHROW(FCALL ctype_common)(struct ctype *a,
 #endif /* __ARCH_HAVE_COMPAT */
 		{
 			struct ctyperef ct;
-			memset(&ct, 0, sizeof(ct));
+			bzero(&ct, sizeof(ct));
 			ct.ct_typ = &ctype_void;
 			return ctype_ptr(&ct, CTYPE_KIND_SIZEOF(akind));
 		}
@@ -910,7 +910,7 @@ NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
                                 /*out*/ struct ctyperef *__restrict presult) {
 	dbx_errno_t result;
 	if (!type_debug_info) {
-		memset(presult, 0, sizeof(*presult));
+		bzero(presult, sizeof(*presult));
 		presult->ct_typ = incref(&ctype_void);
 		result          = DBX_EOK;
 	} else {
@@ -1006,7 +1006,7 @@ NOTHROW(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
 	dbx_errno_t result = DBX_EOK;
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_type_t typinfo;
-	memset(presult, 0, sizeof(*presult));
+	bzero(presult, sizeof(*presult));
 again:
 	if unlikely(!type_debug_info)
 		goto err_corrupt;
@@ -1050,7 +1050,7 @@ again:
 #endif /* __ARCH_HAVE_COMPAT */
 			{
 				struct ctyperef ctr;
-				memset(&ctr, 0, sizeof(ctr));
+				bzero(&ctr, sizeof(ctr));
 				ctr.ct_typ = &ctype_void;
 				presult->ct_typ = ctype_ptr(&ctr, typinfo.t_sizeof);
 			}

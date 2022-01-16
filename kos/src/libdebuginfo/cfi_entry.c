@@ -527,7 +527,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	self->ce_s_debug_addr   = NULL; /* Loaded lazily. */
 	self->ce_s_debug_loc    = NULL; /* Loaded lazily. */
 	self->ce_s_debug_ranges = NULL; /* Loaded lazily. */
-	memset(&self->ce_sections, 0, sizeof(self->ce_sections));
+	bzero(&self->ce_sections, sizeof(self->ce_sections));
 
 	/* Bind sections. */
 	if (self->ce_s_debug_aranges) {
@@ -723,7 +723,7 @@ again_runexpr:
 	emulator.ue_cu                 = &self->cr_cu;
 	emulator.ue_module_relative_pc = self->ce_modrelpc;
 	emulator.ue_tlsbase            = (byte_t *)-1;
-	memset(dst, 0, emulator.ue_piecesiz);
+	bzero(dst, emulator.ue_piecesiz);
 	if (deref_expression_result)
 		emulator.ue_piecesiz = 0;
 

@@ -1171,8 +1171,8 @@ sighand_reset_handler(signo_t signo,
 		return false;
 	}
 	/* Reset the action. */
-	memset(&hand->sh_actions[signo - 1], 0,
-	       sizeof(struct kernel_sigaction));
+	bzero(&hand->sh_actions[signo - 1],
+	      sizeof(struct kernel_sigaction));
 	sync_endwrite(hand);
 	/* Drop the reference held by the `sh_actions' vector.
 	 * Note however that since the caller must have copied that action at one point,
@@ -1606,13 +1606,12 @@ inherit_and_copy_ohandler:
 					       &ohandler.sa_mask->sm_mask,
 					       sizeof(sigset_t));
 				} else {
-					memset(&oact->sa_mask, 0,
-					       sizeof(sigset_t));
+					bzero(&oact->sa_mask, sizeof(sigset_t));
 				}
 				COMPILER_WRITE_BARRIER();
 			} else {
 no_old_handler:
-				memset(oact, 0, sizeof(*oact));
+				bzero(oact, sizeof(*oact));
 			}
 		}
 	} else {
@@ -1720,8 +1719,8 @@ compat_sigaction_to_sigaction(CHECKED USER struct compat_sigaction const *self,
 	memcpy(&result->sa_mask, &self->sa_mask,
 	       MIN_C(sizeof(sigset_t), sizeof(compat_sigset_t)));
 	__STATIC_IF(sizeof(sigset_t) > sizeof(compat_sigset_t)) {
-		memset((byte_t *)&result->sa_mask + sizeof(compat_sigset_t), 0,
-		       sizeof(sigset_t) - sizeof(compat_sigset_t));
+		bzero((byte_t *)&result->sa_mask + sizeof(compat_sigset_t),
+		      sizeof(sigset_t) - sizeof(compat_sigset_t));
 	}
 	result->sa_flags = self->sa_flags;
 	*(void **)&result->sa_restorer  = (void *)self->sa_restorer;
@@ -1735,8 +1734,8 @@ sigaction_to_compat_sigaction(struct sigaction const *__restrict self,
 	memcpy(&result->sa_mask, &self->sa_mask,
 	       MIN_C(sizeof(sigset_t), sizeof(compat_sigset_t)));
 	__STATIC_IF(sizeof(compat_sigset_t) > sizeof(sigset_t)) {
-		memset((byte_t *)&result->sa_mask + sizeof(sigset_t), 0,
-		       sizeof(compat_sigset_t) - sizeof(sigset_t));
+		bzero((byte_t *)&result->sa_mask + sizeof(sigset_t),
+		      sizeof(compat_sigset_t) - sizeof(sigset_t));
 	}
 	result->sa_flags = self->sa_flags;
 	result->sa_restorer = (compat_sigrestorer_t)(uintptr_t)(void *)self->sa_restorer;
@@ -1791,7 +1790,7 @@ DEFINE_SYSCALL2(sighandler_t, signal,
 	if (handler == SIG_GET) {
 		do_sigaction(signo, NULL, &oact);
 	} else {
-		memset(&act, 0, sizeof(act));
+		bzero(&act, sizeof(act));
 		act.sa_handler = handler;
 		do_sigaction(signo, &act, &oact);
 	}
@@ -1807,7 +1806,7 @@ DEFINE_COMPAT_SYSCALL2(sighandler_t, signal,
 	if (handler == SIG_GET) {
 		do_sigaction(signo, NULL, &oact);
 	} else {
-		memset(&act, 0, sizeof(act));
+		bzero(&act, sizeof(act));
 		act.sa_handler = handler;
 		do_sigaction(signo, &act, &oact);
 	}
@@ -2018,8 +2017,8 @@ DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
 	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
 	memcpy(mymask, &new_sigmask, MIN_C(sizeof(sigset_t), sizeof(new_sigmask)));
 #if __SIZEOF_SIGSET_T__ > __SIZEOF_SYSCALL_LONG_T__
-	memset((byte_t *)mymask + sizeof(new_sigmask),
-	       0, sizeof(sigset_t) - sizeof(new_sigmask));
+	bzero((byte_t *)mymask + sizeof(new_sigmask),
+	      sizeof(sigset_t) - sizeof(new_sigmask));
 #endif /* __SIZEOF_SIGSET_T__ > __SIZEOF_SYSCALL_LONG_T__ */
 	/* Make sure that these two signals aren't being masked! */
 	sigdelset(mymask, SIGKILL);
@@ -2042,8 +2041,8 @@ DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) 
 	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
 	memcpy(mymask, &used_sigmask, MIN_C(sizeof(sigset_t), sizeof(used_sigmask)));
 #if __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
-	memset((byte_t *)mymask+ sizeof(used_sigmask),
-	       0, sizeof(sigset_t) - sizeof(used_sigmask));
+	bzero((byte_t *)mymask+ sizeof(used_sigmask),
+	      sizeof(sigset_t) - sizeof(used_sigmask));
 #endif /* __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
 	/* Make sure that these two signals aren't being masked! */
 	sigdelset(mymask, SIGKILL);
@@ -2079,7 +2078,8 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 	REF struct task *target;
 	struct taskpid *mypid;
 	siginfo_t info;
-	memset(&info, 0, sizeof(siginfo_t));
+	bzero(&info, sizeof(siginfo_t));
+
 	/* Make sure we've been given a valid signal number. */
 	if unlikely(signo <= 0 || signo >= NSIG) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -2137,15 +2137,17 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 		      tid);
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
+
 	/* Check if the given TGID matches the group of this thread. */
 	if (taskpid_getpid_s(task_getprocesspid_of(target)) != (upid_t)pid) {
 		/* Maybe not necessarily exited, but no need to create a new exception type for this... */
 		THROW(E_PROCESS_EXITED, pid);
 	}
+
 	/* Don't deliver signal `0'. - It's used to test access. */
 	if (signo != 0) {
 		siginfo_t info;
-		memset(&info, 0, sizeof(siginfo_t));
+		bzero(&info, sizeof(siginfo_t));
 		info.si_signo = signo;
 		info.si_errno = 0;
 		info.si_code  = SI_TKILL;
@@ -2169,10 +2171,11 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
+
 	/* Don't deliver signal `0'. - It's used to test access. */
 	if (signo != 0) {
 		siginfo_t info;
-		memset(&info, 0, sizeof(siginfo_t));
+		bzero(&info, sizeof(siginfo_t));
 		info.si_signo = signo;
 		info.si_errno = 0;
 		info.si_code  = SI_TKILL;
@@ -2213,7 +2216,7 @@ siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
 			      usigno, info->si_signo);
 		}
 	} else {
-		memset(info, 0, sizeof(*info));
+		bzero(info, sizeof(*info));
 		info->si_signo = usigno;
 		info->si_errno = 0;
 		info->si_code  = SI_USER;
@@ -2240,7 +2243,7 @@ siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
 			      usigno, info->si_signo);
 		}
 	} else {
-		memset(info, 0, sizeof(*info));
+		bzero(info, sizeof(*info));
 		info->si_signo = usigno;
 		info->si_errno = 0;
 		info->si_code  = SI_USER;

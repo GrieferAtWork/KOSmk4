@@ -2193,7 +2193,7 @@ again_read_status:
 							infop->si_stime  = 0; /* ??? */
 						}
 						if (ru) {
-							memset(ru, 0, sizeof(*ru));
+							bzero(ru, sizeof(*ru));
 							/* XXX: Fill in usage information? */
 						}
 						COMPILER_WRITE_BARRIER();

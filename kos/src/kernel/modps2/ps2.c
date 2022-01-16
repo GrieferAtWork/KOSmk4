@@ -364,7 +364,7 @@ NOTHROW(KCALL early_poll_outport)(u8 *__restrict presult) {
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
 	u8 data;
 	ps2_portid_t portno;
-	memset(ps2_probe_data_buffer, 0, sizeof(ps2_probe_data_buffer));
+	bzero(ps2_probe_data_buffer, sizeof(ps2_probe_data_buffer));
 	ps2_probe_install_handlers(ps2_probe_data_buffer);
 	RAII_FINALLY { ps2_probe_delete_handlers(ps2_probe_data_buffer); };
 

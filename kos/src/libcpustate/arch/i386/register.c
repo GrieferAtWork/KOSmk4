@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBCPUSTATE_ARCH_I386_REGISTER_C
 #define GUARD_LIBCPUSTATE_ARCH_I386_REGISTER_C 1
 #define _KOS_KERNEL_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "../../api.h"
 /**/
@@ -1421,8 +1422,7 @@ NOTHROW_NCX(CC libcpu_setreg_xfpustate)(struct xfpustate *__restrict self, unsig
 
 	case (X86_REGISTER_FLOAT_ST0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_FLOAT_ST7 & ~X86_REGISTER_SIZEMASK):
 		if (buflen >= 10) {
-			memcpy(&self->fx_regs[regno & X86_REGISTER_IDMASK], buf, 10);
-			memset((byte_t *)&self->fx_regs[regno & X86_REGISTER_IDMASK] + 10, 0, 6);
+			bzero(mempcpy(&self->fx_regs[regno & X86_REGISTER_IDMASK], buf, 10), 6);
 		}
 		return 10;
 

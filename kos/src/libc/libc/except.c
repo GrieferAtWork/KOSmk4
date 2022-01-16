@@ -489,7 +489,7 @@ try_raise_signal_from_exception(error_register_state_t *__restrict state,
 		error_register_state_to_ucpustate(state, &uc);
 
 		/* Use sigreturn(2) to execute a call to `rt_tgsigqueueinfo(2)' from `uc' */
-		memset(&sc_info, 0, sizeof(sc_info));
+		bzero(&sc_info, sizeof(sc_info));
 		sc_info.rsi_sysno = SYS_rt_tgsigqueueinfo;
 		sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_OTHER | RPC_SYSCALL_INFO_FEXCEPT |
 		                    RPC_SYSCALL_INFO_FREGVALID(1) | RPC_SYSCALL_INFO_FREGVALID(2) |
@@ -1019,7 +1019,7 @@ libc_except_handler3_impl(error_register_state_t *__restrict state,
 	memcpy(&info->ei_state, state, sizeof(error_register_state_t));
 	memcpy(&info->ei_data, error, sizeof(struct exception_data));
 #if EXCEPT_BACKTRACE_SIZE != 0
-	memset(info->ei_trace, 0, sizeof(info->ei_trace));
+	bzero(info->ei_trace, sizeof(info->ei_trace));
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	COMPILER_BARRIER();
 	/* Perform exception unwinding */
@@ -1067,7 +1067,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	memcpy(&info->ei_data, error, sizeof(struct exception_data));
 	memcpy(&info->ei_state, state, sizeof(error_register_state_t));
 #if EXCEPT_BACKTRACE_SIZE != 0
-	memset(info->ei_trace, 0, sizeof(info->ei_trace));
+	bzero(info->ei_trace, sizeof(info->ei_trace));
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	COMPILER_BARRIER();
 	/* Make sure that libunwind has been loaded. */

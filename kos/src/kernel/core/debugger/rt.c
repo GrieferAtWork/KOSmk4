@@ -87,11 +87,11 @@ NOTHROW(KCALL dbg_getregbynamep)(unsigned int level, char const *__restrict name
 		return false;
 	if (reqlen < sizeof(*result)) {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		memset((byte_t *)result + reqlen, 0, sizeof(*result) - reqlen);
+		bzero((byte_t *)result + reqlen, sizeof(*result) - reqlen);
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 		memmoveup((byte_t *)result + sizeof(*result) - reqlen,
 		          result, sizeof(*result) - reqlen);
-		memset(result, 0, sizeof(*result) - reqlen);
+		bzero(result, sizeof(*result) - reqlen);
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	}
 	return true;

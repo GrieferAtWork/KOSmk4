@@ -719,8 +719,8 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 			}
 
 			dev->bd_partinfo.bp_active = 0; /* I don't think eMBR has a way to indicate active partitions... :( */
-			memset(&dev->bd_partinfo.bp_efi_typeguid, 0, sizeof(guid_t));
-			memset(&dev->bd_partinfo.bp_efi_partguid, 0, sizeof(guid_t));
+			bzero(&dev->bd_partinfo.bp_efi_typeguid, sizeof(guid_t));
+			bzero(&dev->bd_partinfo.bp_efi_partguid, sizeof(guid_t));
 		}
 nextpart:
 		/* Move to next partition */
@@ -884,8 +884,8 @@ make_normal_partition:
 			DBG_memset(dev->bd_partinfo.bp_efi_name, 0xcc, sizeof(dev->bd_partinfo.bp_efi_name));
 			dev->bd_partinfo.bp_efi_name[0] = '\0';
 			dev->bd_partinfo.bp_active      = mbr->mbr_part[i].pt.pt_bootable & PART_BOOTABLE_ACTICE;
-			memset(&dev->bd_partinfo.bp_efi_typeguid, 0, sizeof(guid_t));
-			memset(&dev->bd_partinfo.bp_efi_partguid, 0, sizeof(guid_t));
+			bzero(&dev->bd_partinfo.bp_efi_typeguid, sizeof(guid_t));
+			bzero(&dev->bd_partinfo.bp_efi_partguid, sizeof(guid_t));
 		}	break;
 
 		}
@@ -939,7 +939,7 @@ blkdev_makeparts(struct blkdev *__restrict self,
 	LIST_INIT(&result);
 
 	/* Default to no additional information. */
-	memset(info, 0, sizeof(*info));
+	bzero(info, sizeof(*info));
 
 	/* This should never fail, but is required for `blkdev_makeparts_from_mbr()'
 	 * being allowed to assume that  its given `subpart_sectorcnt' is  non-zero! */

@@ -594,7 +594,7 @@ NOTHROW_NCX(CC libkeymap_openblob)(struct keymap *__restrict self,
 	/* Initialize `self' */
 	self->km_defencoding = data->d_encoding;
 	self->km_ext         = data->d_code;
-	memset(self->km_basic, 0, sizeof(self->km_basic));
+	bzero(self->km_basic, sizeof(self->km_basic));
 	return true;
 nope:
 	return false;

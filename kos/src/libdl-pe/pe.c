@@ -315,8 +315,8 @@ libpe_linker_main(struct peexec_info *__restrict info,
 		size = offsetof(IMAGE_NT_HEADERS, OptionalHeader) + pe->pd_nt.FileHeader.SizeOfOptionalHeader;
 		if unlikely(size > sizeof(IMAGE_NT_HEADERS))
 			size = sizeof(IMAGE_NT_HEADERS);
-		memset(mempcpy(&mod->dm_pe.dp_nt, pe, size), 0,
-		       sizeof(IMAGE_NT_HEADERS) - size);
+		bzero(mempcpy(&mod->dm_pe.dp_nt, pe, size),
+		      sizeof(IMAGE_NT_HEADERS) - size);
 		memcpy(&mod->dm_pe.dp_sect, peexec_data__pd_sect(pe),
 		       pe->pd_nt.FileHeader.NumberOfSections,
 		       sizeof(IMAGE_SECTION_HEADER));

@@ -90,7 +90,7 @@ libservice_buffer_calloc(struct service *__restrict self, size_t num_bytes)
 	result = libservice_buffer_malloc(self, num_bytes);
 #endif /* !LOCAL_DEFINE_NOEXCEPT */
 	{
-		memset(result, 0, libservice_shmbuf_get_usable_size(result));
+		bzero(result, libservice_shmbuf_get_usable_size(result));
 	}
 	return result;
 }

@@ -766,7 +766,7 @@ void *calloc(size_t count, size_t num_bytes) {
 		total_bytes = (size_t)-1; /* Force down-stream failure */
 	result = malloc(total_bytes);
 	if likely(result)
-		memset(result, 0, total_bytes);
+		bzero(result, total_bytes);
 	return result;
 }
 
@@ -4929,7 +4929,7 @@ _aligned_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $siz
 		if (temp > num_bytes)
 			temp = num_bytes;
 		memcpy(result, aligned_mallptr, temp);
-		memset((byte_t *)result + temp, 0, num_bytes - temp);
+		bzero((byte_t *)result + temp, num_bytes - temp);
 		_aligned_free(aligned_mallptr);
 	}
 	return result;
@@ -4965,7 +4965,7 @@ _aligned_offset_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_byte
 		if (temp > num_bytes)
 			temp = num_bytes;
 		memcpy(result, aligned_mallptr, temp);
-		memset((byte_t *)result + temp, 0, num_bytes - temp);
+		bzero((byte_t *)result + temp, num_bytes - temp);
 		_aligned_free(aligned_mallptr);
 	}
 	return result;

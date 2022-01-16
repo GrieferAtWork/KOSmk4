@@ -239,7 +239,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	 * might  if the kernel  panic'd as the  result of calloc-memory not
 	 * actually being zero-initialized due to an error in said database) */
 	if (flags & GFP_CALLOC)
-		memset(result, 0, num_bytes);
+		bzero(result, num_bytes);
 
 	return result;
 err_unlock_node_part:
@@ -328,7 +328,7 @@ NOTHROW(KCALL phcore_unused_alloc_nx)(size_t num_bytes, gfp_t flags,
 	}
 	/* Deal with calloc()-like allocations. */
 	if (result && (flags & GFP_CALLOC))
-		memset(result, 0, *palloc_bytes);
+		bzero(result, *palloc_bytes);
 	return result;
 }
 

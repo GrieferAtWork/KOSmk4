@@ -180,7 +180,7 @@ arp_makemacrequest(struct nicdev *__restrict dev, be32 ip) {
 	req->ar_arp.ar_op   = htons(ARPOP_REQUEST);
 	memcpy(req->ar_sha, dev->nd_addr.na_hwmac, ETH_ALEN);
 	req->ar_sip.s_addr = dev->nd_addr.na_ip;
-	memset(req->ar_tha, 0x00, ETH_ALEN); /* Unknown... */
+	bzero(req->ar_tha, ETH_ALEN); /* Unknown... */
 	req->ar_tip.s_addr = ip;
 	return packet;
 }

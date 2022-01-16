@@ -55,8 +55,8 @@
 
 /* Define the ABI for the address tree used by heaps. */
 
-/* NOTE: Use left-leaning trees so we only have to keep track of 2  pointers
- *       relating within the tree-portion of `struct mfree', rather than the
+/* NOTE: Use left-leaning trees so we only have to keep track of 2 pointers
+ *       relating with the tree-portion of `struct mfree', rather than  the
  *       3 pointers that would be required for normal RB-Trees.
  *       This 1-pointer difference is quite significant since it affects the
  *       value  of `SIZEOF_MFREE', which  in turn determines `HEAP_MINSIZE',
@@ -518,7 +518,7 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 
 		/* Bring the pending free block back into a consistent state! */
 		if (pend_flags & GFP_CALLOC)
-			memset(pend, 0, sizeof(struct heap_pending_free));
+			bzero(pend, sizeof(struct heap_pending_free));
 #ifdef CONFIG_DEBUG_HEAP
 		else {
 			mempatl(pend, DEBUGHEAP_NO_MANS_LAND,
@@ -792,12 +792,12 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 			slot->mf_flags &= high_slot->mf_flags & GFP_CALLOC;
 			slot->mf_size += high_slot->mf_size;
 			if (slot->mf_flags & GFP_CALLOC)
-				memset(high_slot, 0, SIZEOF_MFREE);
+				bzero(high_slot, SIZEOF_MFREE);
 #else /* !CONFIG_DEBUG_HEAP */
 			if ((slot->mf_flags & GFP_CALLOC) &&
 			    (high_slot->mf_flags & GFP_CALLOC)) {
 				slot->mf_size += high_slot->mf_size;
-				memset(high_slot, 0, SIZEOF_MFREE);
+				bzero(high_slot, SIZEOF_MFREE);
 			} else {
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 				bool result;
@@ -852,7 +852,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 		slot_flags = slot->mf_flags & flags;
 		slot_size  = slot->mf_size;
 		if (slot_flags & GFP_CALLOC)
-			memset(slot, 0, SIZEOF_MFREE);
+			bzero(slot, SIZEOF_MFREE);
 		new_slot           = (struct mfree *)ptr;
 		new_slot->mf_size  = slot_size + num_bytes;
 		new_slot->mf_flags = slot_flags;
@@ -860,7 +860,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 		slot_flags = slot->mf_flags;
 		slot_size  = slot->mf_size;
 		if ((slot_flags & GFP_CALLOC) && (flags & GFP_CALLOC)) {
-			memset(slot, 0, SIZEOF_MFREE);
+			bzero(slot, SIZEOF_MFREE);
 			new_slot           = (struct mfree *)ptr;
 			new_slot->mf_size  = slot_size + num_bytes;
 			new_slot->mf_flags = slot_flags;
@@ -948,7 +948,7 @@ load_new_slot:
 			/* Release this slot to the VM. */
 			if (hkeep_size) {
 				if (flags & GFP_CALLOC)
-					memset(hkeep, 0, SIZEOF_MFREE);
+					bzero(hkeep, SIZEOF_MFREE);
 #ifdef CONFIG_DEBUG_HEAP
 				else {
 					mempatl(hkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
@@ -957,7 +957,7 @@ load_new_slot:
 			}
 			if (tkeep_size) {
 				if (flags & GFP_CALLOC)
-					memset(tkeep, 0, SIZEOF_MFREE);
+					bzero(tkeep, SIZEOF_MFREE);
 #ifdef CONFIG_DEBUG_HEAP
 				else {
 					mempatl(tkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
@@ -1188,7 +1188,7 @@ again:
 
 		/* Reset memory contained within the header of the data block we just allocated. */
 		if (free_flags & GFP_CALLOC)
-			memset(chain, 0, SIZEOF_MFREE);
+			bzero(chain, SIZEOF_MFREE);
 #ifdef CONFIG_DEBUG_HEAP
 		else {
 			mempatl(chain, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);

@@ -792,7 +792,7 @@ NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict UN
 		struct exception_data *mydat;
 		mydat = error_data();
 		odata = *mydat;
-		memset(mydat, 0, sizeof(*mydat));
+		bzero(mydat, sizeof(*mydat));
 		mydat->e_code                       = code;
 		mydat->e_args.e_ioerror.i_subsystem = E_IOERROR_SUBSYSTEM_USB;
 		mydat->e_args.e_ioerror.i_reason    = io_reason;
@@ -929,15 +929,15 @@ NOTHROW(FCALL uhci_int_completed_ioerror)(struct uhci_interrupt *__restrict ui,
 	struct exception_data *mydat;
 	mydat = error_data();
 	odata = *mydat;
-	memset(mydat, 0, sizeof(*mydat));
+	bzero(mydat, sizeof(*mydat));
 	mydat->e_code                       = code;
 	mydat->e_args.e_ioerror.i_subsystem = E_IOERROR_SUBSYSTEM_USB;
 	mydat->e_args.e_ioerror.i_reason    = io_reason;
 	mydat->e_args.e_pointers[2]         = pointer2;
 	result = uhci_int_do_invoke(ui,
-                                USB_INTERRUPT_HANDLER_STATUS_ERROR,
-                                data,
-                                datalen);
+	                            USB_INTERRUPT_HANDLER_STATUS_ERROR,
+	                            data,
+	                            datalen);
 	*mydat = odata;
 	return result;
 }

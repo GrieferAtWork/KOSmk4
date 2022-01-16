@@ -393,7 +393,7 @@ INTERN_FUNCTION(_start)
 	 * >> pagedir_kernel.pd_pae.p_e3[3].p_word = PHYS_ADDR(&ks_share_e2[3][0]) | PAE_PAGE_FPRESENT;
 	 * >> // Note that this init is already done by .bss (it is only
 	 * >> // explicitly stated here since this zero-init is required)
-	 * >> memset(ks_share_e2, 0, 3 * 512 * 8);
+	 * >> bzero(ks_share_e2, 3 * 512 * 8);
 	 * >> for (i = 0; i < 508; ++i) {
 	 * >>     ks_share_e2[3][i] = PHYS_ADDR(&ks_share_e1[i][0]) | VECTOR_FLAGS;
 	 * >> }

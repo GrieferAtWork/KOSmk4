@@ -147,11 +147,11 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 	struct smap_entry *entry;
 	vm86_state_t state;
 	bool result = false;
-	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	bzero(&state.vr_regs, sizeof(state.vr_regs));
 /*	state.vr_regs.vr_ebx = 0; * continue-id. */
 	entry                = SMAP_BUFFER;
 	do {
-		memset(entry, 0, sizeof(*entry));
+		bzero(entry, sizeof(*entry));
 		state.vr_regs.vr_eax = 0xe820;
 		state.vr_regs.vr_ecx = sizeof(struct smap_entry);
 		state.vr_regs.vr_edx = 0x534d4150;
@@ -180,7 +180,7 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e801)(void) {
 	vm86_state_t state;
-	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	bzero(&state.vr_regs, sizeof(state.vr_regs));
 	state.vr_regs.vr_eax = 0xe801;
 	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
@@ -206,7 +206,7 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e801)(void) {
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_da88)(void) {
 	vm86_state_t state;
 	u32 count;
-	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	bzero(&state.vr_regs, sizeof(state.vr_regs));
 	state.vr_regs.vr_eax = 0xda88;
 	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
@@ -223,7 +223,7 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_da88)(void) {
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_88)(void) {
 	vm86_state_t state;
 	u32 count;
-	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	bzero(&state.vr_regs, sizeof(state.vr_regs));
 	state.vr_regs.vr_eax = 0x88;
 	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
@@ -240,7 +240,7 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_88)(void) {
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_8a)(void) {
 	vm86_state_t state;
 	u32 count;
-	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	bzero(&state.vr_regs, sizeof(state.vr_regs));
 	state.vr_regs.vr_eax = 0x8a;
 	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
@@ -266,8 +266,8 @@ struct c7_record {
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_c7)(void) {
 	vm86_state_t state;
-	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
-	memset(C7_RECORD, 0, sizeof(*C7_RECORD));
+	bzero(&state.vr_regs, sizeof(state.vr_regs));
+	bzero(C7_RECORD, sizeof(*C7_RECORD));
 	state.vr_regs.vr_eax = 0xc7;
 	state.vr_regs.vr_esi = VM86_BUFFER_OFFSET;
 	state.vr_regs.vr_ds  = VM86_BUFFER_SEG;

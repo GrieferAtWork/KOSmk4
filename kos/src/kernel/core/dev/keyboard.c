@@ -1207,7 +1207,7 @@ continue_copy_keymap:
 			ssize_t real_length;
 			uint8_t reg_enc = data.km_defenc;
 			memcpy(new_map, data.km_maptext, data.km_mapsize);
-			memset(new_map + data.km_mapsize, 0, KEYMAP_UNTRUSTED_NUM_TRAILING_ZERO_BYTES);
+			bzero(new_map + data.km_mapsize, KEYMAP_UNTRUSTED_NUM_TRAILING_ZERO_BYTES);
 			real_length = keymap_codesize(new_map, &reg_enc, data.km_defenc);
 			if unlikely(real_length < 0)
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -1227,7 +1227,7 @@ continue_copy_keymap:
 		me->kd_map_extsiz         = data.km_mapsize;
 		me->kd_map.km_ext         = new_map;
 		me->kd_map.km_defencoding = data.km_defenc;
-		memset(&me->kd_map.km_basic, 0, sizeof(me->kd_map.km_basic));
+		bzero(&me->kd_map.km_basic, sizeof(me->kd_map.km_basic));
 		kbddev_map_endwrite(me);
 		kfree(old_map);
 	}	break;

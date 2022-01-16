@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xded6a84f */
+/* HASH CRC-32:0x1532e702 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3425,7 +3425,7 @@ NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *aligned_mallptr,
 		if (temp > num_bytes)
 			temp = num_bytes;
 		libc_memcpy(result, aligned_mallptr, temp);
-		libc_memset((byte_t *)result + temp, 0, num_bytes - temp);
+		libc_bzero((byte_t *)result + temp, num_bytes - temp);
 		libc__aligned_free(aligned_mallptr);
 	}
 	return result;
@@ -3460,7 +3460,7 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *aligned_mallptr,
 		if (temp > num_bytes)
 			temp = num_bytes;
 		libc_memcpy(result, aligned_mallptr, temp);
-		libc_memset((byte_t *)result + temp, 0, num_bytes - temp);
+		libc_bzero((byte_t *)result + temp, num_bytes - temp);
 		libc__aligned_free(aligned_mallptr);
 	}
 	return result;

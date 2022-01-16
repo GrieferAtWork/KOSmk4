@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 		err(1, "Failed to open '/dev/svga'");
 
 	/* List all supported modes. */
-	memset(&lsm, 0, sizeof(lsm));
+	bzero(&lsm, sizeof(lsm));
 	if (ioctl(svga, SVGA_IOC_LSMODES, &lsm) < 0)
 		err(1, "ioctl(SVGA_IOC_LSMODES)");
 	lsm.svl_buf = (struct svga_modeinfo *)malloc(lsm.svl_count, sizeof(struct svga_modeinfo));
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
 		struct winsize ws;
 		if (ioctl(svga, SVGA_IOC_GETCSNAME, csname) < 0)
 			err(1, "ioctl(SVGA_IOC_GETCSNAME)");
-		memset(&strings, 0, sizeof(strings));
+		bzero(&strings, sizeof(strings));
 		strings.svs_count = (uint64_t)-1;
 		if (ioctl(svga, SVGA_IOC_CSSTRINGS, &strings) < 0)
 			err(1, "ioctl(SVGA_IOC_CSSTRINGS)");

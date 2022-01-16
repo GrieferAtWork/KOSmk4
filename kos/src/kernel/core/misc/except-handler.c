@@ -209,7 +209,7 @@ PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1)) void FCALL
 abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict state)
 		THROWS(E_EXIT_PROCESS) {
 	struct exception_info info;
-	memset(&info, 0, sizeof(struct exception_info));
+	bzero(&info, sizeof(struct exception_info));
 	info.ei_data.e_code      = ERROR_CODEOF(E_INTERRUPT);
 	info.ei_data.e_faultaddr = icpustate_getpc(state);
 	coredump_create_for_exception(state, &info, true);
@@ -251,7 +251,7 @@ userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict sta
 			/* Made modifications to `state' that will make it look like the
 			 * interrupted  system call returned  with `-EINTR', or returned
 			 * to  user-space by calling the user-defined exception handler. */
-			memset(&error, 0, sizeof(error));
+			bzero(&error, sizeof(error));
 			error.e_code      = ERROR_CODEOF(E_INTERRUPT);
 			error.e_faultaddr = icpustate_getpc(state);
 			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
@@ -385,7 +385,7 @@ PRIVATE ABNORMAL_RETURN ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void
 NOTHROW(FCALL trigger_coredump_from__E_CORE_PROCESS)(struct icpustate *__restrict state,
                                                      struct exception_info *__restrict error) {
 	siginfo_t si;
-	memset(&si, 0, sizeof(si));
+	bzero(&si, sizeof(si));
 	si.si_signo = WSTOPSIG(error->ei_data.e_args.e_pointers[0]);
 	si.si_errno = error->ei_data.e_args.e_pointers[1];
 	si.si_code  = error->ei_data.e_args.e_pointers[2];
@@ -575,7 +575,7 @@ again_switch_action_handler:
 			if (error_priority(error->ei_code) < error_priority(code)) {
 				union wait reason;
 				reason.w_status = W_EXITCODE(1, rpc->pr_psig.si_signo);
-				memset(error, 0, sizeof(struct exception_info));
+				bzero(error, sizeof(struct exception_info));
 				error->ei_code = code;
 				if (action.sa_handler == SIG_CORE) {
 					error->ei_data.e_args.e_pointers[1] = rpc->pr_psig.si_errno;
@@ -658,7 +658,7 @@ again_switch_action_handler:
 			/* System call isn't being restarted; -> Must have it return with -EINTR,
 			 * or by  calling the  user-defined exception  handler with  E_INTERRUPT. */
 			struct exception_data error;
-			memset(&error, 0, sizeof(error));
+			bzero(&error, sizeof(error));
 			error.e_code      = ERROR_CODEOF(E_INTERRUPT);
 			error.e_faultaddr = icpustate_getpc(ctx->rc_state);
 			if (ctx->rc_scinfo.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
@@ -733,7 +733,7 @@ NOTHROW(FCALL set_unknown_syscall_exception)(struct rpc_syscall_info const *__re
 	info->ei_data.e_args.e_unknown_systemcall.us_arg4  = sc_info->rsi_regs[4];
 	info->ei_data.e_args.e_unknown_systemcall.us_arg5  = sc_info->rsi_regs[5];
 #if EXCEPT_BACKTRACE_SIZE != 0
-	memset(info->ei_trace, 0, sizeof(info->ei_trace));
+	bzero(info->ei_trace, sizeof(info->ei_trace));
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	info->ei_flags = EXCEPT_FNORMAL;
 }
@@ -1320,7 +1320,7 @@ NOTHROW(FCALL error_throw_current_at_icpustate)(struct icpustate *__restrict sta
 
 	/* Clear out the exception traceback */
 #if EXCEPT_BACKTRACE_SIZE != 0
-	memset(info->ei_trace, 0, sizeof(info->ei_trace));
+	bzero(info->ei_trace, sizeof(info->ei_trace));
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 
 	/* Fill in the exception register state. */

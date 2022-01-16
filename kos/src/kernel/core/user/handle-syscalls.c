@@ -1466,11 +1466,11 @@ do_select_scan(size_t nfds,
 			if (!result) {
 				/* Clear all fd_set bits leading words. */
 				if (readfds)
-					memset(readfds, 0, i, sizeof(fds_word_t));
+					bzero(readfds, i, sizeof(fds_word_t));
 				if (writefds)
-					memset(writefds, 0, i, sizeof(fds_word_t));
+					bzero(writefds, i, sizeof(fds_word_t));
 				if (exceptfds)
-					memset(exceptfds, 0, i, sizeof(fds_word_t));
+					bzero(exceptfds, i, sizeof(fds_word_t));
 			}
 			++result;
 			if (what & POLLSELECT_READFDS)

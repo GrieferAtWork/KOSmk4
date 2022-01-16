@@ -573,7 +573,7 @@ DEFINE_COMPAT_SYSCALL1(errno_t, sysinfo,
                        USER UNCHECKED struct compat_sysinfo *, info) {
 	struct sysinfo si;
 	validate_writable(info, sizeof(*info));
-	memset(&si, 0, sizeof(si));
+	bzero(&si, sizeof(si));
 	do_sysinfo(&si);
 
 	/* Write-back info. */

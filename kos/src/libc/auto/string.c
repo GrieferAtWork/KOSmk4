@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a0ffd18 */
+/* HASH CRC-32:0x204948ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,7 +244,7 @@ NOTHROW_NCX(LIBCCALL libc_strncpy)(char *__restrict buf,
                                    size_t buflen) {
 	size_t srclen = libc_strnlen(src, buflen);
 	libc_memcpy(buf, src, srclen * sizeof(char));
-	libc_memset(buf + srclen, '\0', (buflen - srclen) * sizeof(char));
+	libc_bzero(buf + srclen, (buflen - srclen) * sizeof(char));
 	return buf;
 }
 #endif /* !LIBC_ARCH_HAVE_STRNCPY */
@@ -445,7 +445,7 @@ NOTHROW_NCX(LIBCCALL libc_stpncpy)(char *__restrict buf,
                                    size_t buflen) {
 	size_t srclen = libc_strnlen(src, buflen);
 	libc_memcpy(buf, src, srclen * sizeof(char));
-	libc_memset(buf + srclen, '\0', (size_t)(buflen - srclen) * sizeof(char));
+	libc_bzero(buf + srclen, (size_t)(buflen - srclen) * sizeof(char));
 	return buf + srclen;
 }
 #endif /* !LIBC_ARCH_HAVE_STPNCPY */

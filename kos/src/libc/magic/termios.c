@@ -945,7 +945,7 @@ for (local field, add, flags: ops) {
 [[impl_include("<asm/os/termios.h>"), decl_include("<bits/os/termios.h>")]]
 void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	/* Default everything to ZERO */
-	memset(termios_p, 0, sizeof(*termios_p));
+	bzero(termios_p, sizeof(*termios_p));
 
 	/* Set sane flag values. */
 @@pp_if defined(__TTYDEF_CFLAG) && __TTYDEF_CFLAG != 0@@

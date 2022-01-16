@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36d5dd30 */
+/* HASH CRC-32:0x1d986806 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -313,7 +313,7 @@ for (local field, add, flags: ops) {
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
 	/* Default everything to ZERO */
-	libc_memset(termios_p, 0, sizeof(*termios_p));
+	libc_bzero(termios_p, sizeof(*termios_p));
 
 	/* Set sane flag values. */
 #if defined(__TTYDEF_CFLAG) && __TTYDEF_CFLAG

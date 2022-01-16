@@ -258,7 +258,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 			}
 			/* Copy the used portion of the string, and clear the unused portion. */
 			memcpy(dst, str, len, sizeof(char));
-			memset((char *)dst + len, 0, (size_t)maxlen - len, sizeof(char));
+			bzero((char *)dst + len, (size_t)maxlen - len, sizeof(char));
 		} else {
 			if (type == JSON_TYPE_STRING_WITH_LENGTH_OP) {
 				uint16_t len_offset;
@@ -278,7 +278,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 		uint16_t len;
 		len = UNALIGNED_GET16((uint16_t const *)*preader);
 		*preader += 2;
-		memset(dst, 0, (size_t)len);
+		bzero(dst, (size_t)len);
 	}	break;
 
 	case JSON_TYPE_STRING_WITH_LENGTH_OP: {

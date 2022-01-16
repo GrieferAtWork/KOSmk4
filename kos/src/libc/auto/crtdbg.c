@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x597373df */
+/* HASH CRC-32:0xb9bffac6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -389,7 +389,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtReportBlockType)(void const *ptr) {
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1)) void
 NOTHROW_NCX(LIBDCALL libc__CrtMemCheckpoint)(_CrtMemState *state) {
-	libc_memset(state, 0, sizeof(*state));
+	libc_bzero(state, sizeof(*state));
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state,
@@ -397,7 +397,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state,
                                              _CrtMemState const *new_state) {
 	(void)old_state;
 	(void)new_state;
-	libc_memset(state, 0, sizeof(*state));
+	libc_bzero(state, sizeof(*state));
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1)) void

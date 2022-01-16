@@ -682,7 +682,7 @@ $errno_t posix_spawnp([[nonnull]] pid_t *__restrict pid,
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 $errno_t posix_spawnattr_init([[nonnull]] posix_spawnattr_t *__restrict attr) {
-	memset(attr, 0, sizeof(*attr));
+	bzero(attr, sizeof(*attr));
 	return 0;
 }
 
@@ -872,7 +872,7 @@ $errno_t posix_spawnattr_setschedparam([[nonnull]] posix_spawnattr_t *__restrict
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 $errno_t posix_spawn_file_actions_init([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) {
-	memset(file_actions, 0, sizeof(*file_actions));
+	bzero(file_actions, sizeof(*file_actions));
 	return 0;
 }
 

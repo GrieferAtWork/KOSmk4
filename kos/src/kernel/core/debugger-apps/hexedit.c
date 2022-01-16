@@ -88,7 +88,7 @@ struct hd_change {
 /* Buffer of pending memory changes. */
 PRIVATE ATTR_DBGBSS byte_t hd_change_buffer[1024];
 #define hd_change_buffer_init() \
-	memset(hd_change_buffer, 0, offsetof(struct hd_change, hc_data))
+	bzero(hd_change_buffer, offsetof(struct hd_change, hc_data))
 
 
 PRIVATE ATTR_DBGTEXT bool

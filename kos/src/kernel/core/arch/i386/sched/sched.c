@@ -70,7 +70,7 @@ kernel_initialize_threadstack(struct task *__restrict thread,
 	/* Initialize the CPU state of the boot CPU's idle thread. */
 #ifdef __x86_64__
 	init_state = (struct scpustate *)((sp_base + sp_size) - SIZEOF_SCPUSTATE);
-	memset(init_state, 0, SIZEOF_SCPUSTATE);
+	bzero(init_state, SIZEOF_SCPUSTATE);
 	init_state->scs_sgbase.sg_gsbase = (u64)thread;
 	init_state->scs_sgregs.sg_gs     = SEGMENT_USER_DATA_RPL;
 	init_state->scs_sgregs.sg_fs     = SEGMENT_USER_DATA_RPL;
@@ -81,7 +81,7 @@ kernel_initialize_threadstack(struct task *__restrict thread,
 	init_state->scs_irregs.ir_rsp    = (u64)(sp_base + sp_size);
 #else /* __x86_64__ */
 	init_state = (struct scpustate *)((sp_base + sp_size) - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL));
-	memset(init_state, 0, OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
+	bzero(init_state, OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
 	init_state->scs_sgregs.sg_gs   = SEGMENT_USER_GSBASE_RPL;
 	init_state->scs_sgregs.sg_fs   = SEGMENT_KERNEL_FSBASE;
 	init_state->scs_sgregs.sg_es   = SEGMENT_USER_DATA_RPL;
@@ -118,7 +118,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 		dest -= (argc - 6) * 8;
 	state = (struct scpustate *)(dest - SIZEOF_SCPUSTATE);
 	/* Initialize the thread's entry state. */
-	memset(state, 0, sizeof(*state));
+	bzero(state, sizeof(*state));
 	state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
 	state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	state->scs_irregs.ir_rsp    = (u64)dest;
@@ -165,7 +165,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	state->scs_sgregs.sg_es       = SEGMENT_USER_DATA_RPL;
 	state->scs_sgregs.sg_ds       = SEGMENT_USER_DATA_RPL;
 	/* No special values required for general purpose registers. */
-	memset(&state->scs_gpregs, 0, sizeof(state->scs_gpregs));
+	bzero(&state->scs_gpregs, sizeof(state->scs_gpregs));
 #undef PUSH
 #endif /* !__x86_64__ */
 	/* TODO: Must also execute thread startup callbacks! */
@@ -297,7 +297,7 @@ DEFINE_SYSCALL3(syscall_slong_t, modify_ldt,
 
 	case 2:
 		validate_writable(ptr, bytecount);
-		memset(ptr, 0, bytecount);
+		bzero(ptr, bytecount);
 		break;
 
 	case 1:

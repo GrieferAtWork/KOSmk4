@@ -76,7 +76,7 @@ DBG_RESET(reset) {
 	/* Set-up `cexpr_stack' that `cexpr_stacktop' could be used. */
 	cexpr_stack     = cexpr_stack_stub + 1;
 	cexpr_stacksize = 0;
-	memset(cexpr_stack_stub, 0, sizeof(cexpr_stack_stub));
+	bzero(cexpr_stack_stub, sizeof(cexpr_stack_stub));
 	cexpr_stack_stub[0].cv_type.ct_typ = &ctype_void;
 #if CVALUE_KIND_VOID != 0
 	cexpr_stack_stub[0].cv_kind = CVALUE_KIND_VOID;

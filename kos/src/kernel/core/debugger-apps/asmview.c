@@ -100,17 +100,22 @@ NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self)
 	textsiz = MAXTEXTSIZ - dbg_readmemory(self->d_pc, textbuf, MAXTEXTSIZ);
 	if (!textsiz)
 		return false;
+
 	/* zero-fill a small tail area after the text to
 	 * ensure  that  instructions  are   terminated. */
-	memset(textbuf + textsiz, 0, TEXTTAILSIZE);
+	bzero(textbuf + textsiz, TEXTTAILSIZE);
+
 	/* Print instructions from our text buffer. */
 	old_pc          = self->d_pc;
 	self->d_pc      = textbuf;
 	self->d_baseoff = (uintptr_t)old_pc - (uintptr_t)textbuf;
+
 	/* Print the assembly. */
 	disasm_print_instruction(self);
+
 	/* Restore the proper PC value and account for distance moved. */
 	self->d_pc = old_pc + (size_t)(self->d_pc - textbuf);
+
 	/*self->d_baseoff = 0;*/
 	return true;
 }
@@ -282,8 +287,8 @@ DBG_FINI(finalize_av_symbol_cache) {
 		debug_addr2line_sections_unlock(&av_sections_cache[i].sl_dlsect);
 		module_decref_unlikely(av_sections_cache[i].sl_module);
 	}
-	memset(av_symbol_cache, 0, sizeof(av_symbol_cache));
-	memset(av_sections_cache, 0, sizeof(av_sections_cache));
+	bzero(av_symbol_cache, sizeof(av_symbol_cache));
+	bzero(av_sections_cache, sizeof(av_sections_cache));
 }
 
 PRIVATE ATTR_DBGTEXT bool

@@ -421,7 +421,7 @@ NOTHROW(LIBCCALL stat_conv)(int vers, struct stat const *__restrict st, void *__
 	{
 		struct linux_stat32 *res;
 		res = (struct linux_stat32 *)buf;
-		memset(res, 0, sizeof(*res));
+		bzero(res, sizeof(*res));
 		res->st_dev        = (typeof(res->st_dev))st->st_dev;
 		res->st_ino        = (typeof(res->st_ino))st->st_ino;
 		res->st_mode       = (typeof(res->st_mode))st->st_mode;
@@ -448,7 +448,7 @@ NOTHROW(LIBCCALL stat_conv)(int vers, struct stat const *__restrict st, void *__
 	{
 		struct linux_stat64 *res;
 		res = (struct linux_stat64 *)buf;
-		memset(res, 0, sizeof(*res));
+		bzero(res, sizeof(*res));
 		res->st_dev        = (typeof(res->st_dev))st->st_dev;
 #ifdef _HAVE_LINUX_STAT64___ST_INO
 		res->__st_ino      = (typeof(res->__st_ino))st->st_ino;
@@ -494,7 +494,7 @@ NOTHROW(LIBCCALL stat_conv)(int vers, struct stat const *__restrict st, void *__
 		};
 		struct glibc21_stat *res;
 		res = (struct glibc21_stat *)buf;
-		memset(res, 0, sizeof(*res));
+		bzero(res, sizeof(*res));
 		res->st_dev     = st->st_dev;
 		res->st_ino     = st->st_ino;
 		res->st_mode    = st->st_mode;

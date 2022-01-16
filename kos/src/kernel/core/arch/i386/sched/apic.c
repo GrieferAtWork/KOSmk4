@@ -641,7 +641,7 @@ i386_allocate_secondary_cores(void) {
 			struct scpustate *init_state;
 			init_state = (struct scpustate *)((byte_t *)mnode_getendaddr(&FORTASK(altidle, this_kernel_stacknode_)) -
 			                                  (offsetafter(struct scpustate, scs_irregs) + sizeof(void *)));
-			memset(init_state, 0, offsetafter(struct scpustate, scs_irregs));
+			bzero(init_state, offsetafter(struct scpustate, scs_irregs));
 			/* Set the return address to execute the IDLE main loop. */
 			*(void **)((byte_t *)init_state + offsetafter(struct scpustate, scs_irregs)) = (void *)&cpu_idlemain;
 #ifdef __x86_64__

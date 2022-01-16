@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_DEV_TTY_C
 #define GUARD_KERNEL_SRC_DEV_TTY_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -291,7 +292,7 @@ NOTHROW(KCALL ttydev_v_destroy)(struct mfile *__restrict self) {
 }
 
 
-LOCAL void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 termios_to_termios2(USER CHECKED struct termios2 *__restrict dst,
                     USER CHECKED struct termios const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
@@ -307,7 +308,7 @@ termios_to_termios2(USER CHECKED struct termios2 *__restrict dst,
 	dst->c_ospeed = src->c_ospeed;
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 termios2_to_termios(USER CHECKED struct termios *__restrict dst,
                     USER CHECKED struct termios2 const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
@@ -317,15 +318,14 @@ termios2_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_line  = src->c_line;
 	{
 		STATIC_ASSERT(sizeof(src->c_cc) <= sizeof(dst->c_cc));
-		memcpy(dst->c_cc, src->c_cc, sizeof(src->c_cc));
-		memset((byte_t *)dst->c_cc +  sizeof(src->c_cc), 0,
-		       sizeof(dst->c_cc) - sizeof(src->c_cc));
+		bzero(mempcpy(dst->c_cc, src->c_cc, sizeof(src->c_cc)),
+		      sizeof(dst->c_cc) - sizeof(src->c_cc));
 	}
 	dst->c_ispeed = src->c_ispeed;
 	dst->c_ospeed = src->c_ospeed;
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 termios_to_termio(USER CHECKED struct termio *__restrict dst,
                   USER CHECKED struct termios const *__restrict src) {
 	dst->c_iflag = (u16)src->c_iflag;
@@ -339,7 +339,7 @@ termios_to_termio(USER CHECKED struct termio *__restrict dst,
 	}
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 termio_to_termios(USER CHECKED struct termios *__restrict dst,
                   USER CHECKED struct termio const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
@@ -349,15 +349,14 @@ termio_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_line  = src->c_line;
 	{
 		STATIC_ASSERT(sizeof(src->c_cc) <= sizeof(dst->c_cc));
-		memcpy(dst->c_cc, src->c_cc, sizeof(src->c_cc));
-		memset((byte_t *)dst->c_cc +  sizeof(src->c_cc), 0,
-		       sizeof(dst->c_cc) - sizeof(src->c_cc));
+		bzero(mempcpy(dst->c_cc, src->c_cc, sizeof(src->c_cc)),
+		      sizeof(dst->c_cc) - sizeof(src->c_cc));
 	}
 	dst->c_ispeed = 0;
 	dst->c_ospeed = 0;
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 termios_to_termiox(USER CHECKED struct termiox *__restrict dst,
                    USER CHECKED struct termios const *__restrict src) {
 	/* I have no idea if this flag-mapping is even correct... */
@@ -370,7 +369,7 @@ termios_to_termiox(USER CHECKED struct termiox *__restrict dst,
 	}
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 termiox_to_termios(USER CHECKED struct termios *__restrict dst,
                    USER CHECKED struct termiox const *__restrict src) {
 	dst->c_iflag = src->x_hflag;
@@ -380,9 +379,8 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_line  = 0;
 	{
 		STATIC_ASSERT(sizeof(src->x_rflag) <= sizeof(dst->c_cc));
-		memcpy(dst->c_cc, src->x_rflag, sizeof(src->x_rflag));
-		memset((byte_t *)dst->c_cc +  sizeof(src->x_rflag), 0,
-		       sizeof(dst->c_cc) - sizeof(src->x_rflag));
+		bzero(mempcpy(dst->c_cc, src->x_rflag, sizeof(src->x_rflag)),
+		      sizeof(dst->c_cc) - sizeof(src->x_rflag));
 	}
 	dst->c_ispeed = 0;
 	dst->c_ospeed = 0;

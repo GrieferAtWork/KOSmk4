@@ -678,7 +678,7 @@ int _CrtReportBlockType(void const *ptr) {
 
 [[crt_dos_only]]
 void _CrtMemCheckpoint([[nonnull]] /*out*/ _CrtMemState *state) {
-	memset(state, 0, sizeof(*state));
+	bzero(state, sizeof(*state));
 }
 
 [[crt_dos_only]]
@@ -687,7 +687,7 @@ int _CrtMemDifference([[nonnull]] /*out*/ _CrtMemState *state,
                       [[nonnull]] _CrtMemState const *new_state) {
 	(void)old_state;
 	(void)new_state;
-	memset(state, 0, sizeof(*state));
+	bzero(state, sizeof(*state));
 	return 0;
 }
 

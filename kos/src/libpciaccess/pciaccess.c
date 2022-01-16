@@ -678,7 +678,7 @@ NOTHROW(CC libpci_device_probe)(struct pci_device *__restrict self) {
 		uint8_t romreg;
 		unsigned int i, barcount;
 		addr = self->pd_addr;
-		memset(self, 0, sizeof(*self));
+		bzero(self, sizeof(*self));
 		self->pd_addr = addr;
 
 		/* Simple fields... */
@@ -840,7 +840,7 @@ NOTHROW(CC libpci_device_getinfo_agp)(struct pci_device const *__restrict self,
 		if (!(PCI_DEV4_STAT(dev4) & PCI_CDEV4_STAT_HAVE_CAPLINK_34))
 			return ENOSYS; /* Not supported */
 		capptr = PCI_GDEV_RES0_CAPPTR(pci_rdaddr(self->pd_addr | 0x34));
-		memset(visited_offsets, 0, sizeof(visited_offsets));
+		bzero(visited_offsets, sizeof(visited_offsets));
 		visited_offsets[0] = 1 | 2 | 4 | 8; /* The first 4 control words can't be capabilities (because they're PCI_DEV0...PCI_DEVC) */
 		while (!VISITED_OFFSETS_OP(capptr, &)) {
 			uint32_t capword;

@@ -545,7 +545,7 @@ ctype_printname(struct ctype const *__restrict self,
                 struct cprinter const *__restrict printer,
                 char const *varname, size_t varname_len) {
 	struct ctyperef ct;
-	memset(&ct, 0, sizeof(ct));
+	bzero(&ct, sizeof(ct));
 	ct.ct_typ = (struct ctype *)self;
 	return ctyperef_printname(&ct, printer, varname, varname_len);
 }
@@ -1482,7 +1482,7 @@ err:
 		pointer_type.ct_children = NULL;
 		memcpy(&pointer_type.ct_pointer.cp_base, self, sizeof(struct ctyperef));
 		pointer_type.ct_pointer._cp_sib = NULL;
-		memset(&pointer_typeref, 0, sizeof(pointer_typeref));
+		bzero(&pointer_typeref, sizeof(pointer_typeref));
 		pointer_typeref.ct_typ = &pointer_type;
 		/* Print the function object at `ptr' as a pointer-to-function. */
 		result = ctype_printvalue(&pointer_typeref, printer, &ptr, flags,
@@ -1592,7 +1592,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 		    ((flags & (CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER | CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER)) !=
 		    /*     */ (CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER | CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER))) {
 			void *ptr;
-			memset(&ptr, 0, sizeof(ptr));
+			bzero(&ptr, sizeof(ptr));
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			if unlikely(dbg_readmemory(buf, &ptr, CTYPE_KIND_SIZEOF(kind)) != 0)
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
@@ -1647,7 +1647,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 				intmax_t s;
 				uintmax_t u;
 			} value;
-			memset(&value, 0, sizeof(value));
+			bzero(&value, sizeof(value));
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			if unlikely(dbg_readmemory(buf, &value, CTYPE_KIND_SIZEOF(kind)) != 0)
 				goto err_segfault;
@@ -1942,7 +1942,7 @@ do_print_no_recursion_dots_and_rbrace:
 				bool do_multiline;
 				struct ctyperef elem_type;
 				firstline_indent += 1; /* Account for the leading '{' */
-				memset(&elem_type, 0, sizeof(elem_type));
+				bzero(&elem_type, sizeof(elem_type));
 				elem_type.ct_flags = self->ct_flags;
 				elem_type.ct_typ   = me->ct_array.ca_elem;
 				elem_type.ct_info  = me->ct_array.ca_eleminfo;

@@ -107,7 +107,7 @@ NOTHROW_NCX(LIBCCALL libc_recalloc)(void *mallptr,
 	result  = realloc(mallptr, num_bytes);
 	if likely(result) {
 		if (num_bytes > oldsize)
-			memset((byte_t *)result + oldsize, 0, num_bytes - oldsize);
+			bzero((byte_t *)result + oldsize, num_bytes - oldsize);
 	}
 	return result;
 }
@@ -128,7 +128,7 @@ NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr,
 	result = realloc(mallptr, total_bytes);
 	if likely(result) {
 		if (total_bytes > oldsize)
-			memset((byte_t *)result + oldsize, 0, total_bytes - oldsize);
+			bzero((byte_t *)result + oldsize, total_bytes - oldsize);
 	}
 	return result;
 }

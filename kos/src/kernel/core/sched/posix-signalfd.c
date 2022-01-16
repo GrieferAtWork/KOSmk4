@@ -146,7 +146,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
 			usi->ssi_utime   = rpc->pr_psig.si_utime;
 			usi->ssi_stime   = rpc->pr_psig.si_stime;
 			usi->ssi_addr    = (u64)(uintptr_t)rpc->pr_psig.si_addr;
-			memset(usi->__pad, 0, sizeof(usi->__pad));
+			bzero(usi->__pad, sizeof(usi->__pad));
 			COMPILER_WRITE_BARRIER();
 		}
 

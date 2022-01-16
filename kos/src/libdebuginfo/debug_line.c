@@ -257,7 +257,7 @@ NOTHROW_NCX(CC libdi_debugline_scanunit)(di_debugline_unit_t const *__restrict s
 	byte_t const *reader = self->dlu_textbase;
 	dl_registers_t old_state, state;
 #define RESET_STATE()                                                        \
-	(memset(&state, 0, sizeof(state)),                                       \
+	(bzero(&state, sizeof(state)),                                           \
 	 state.file = 1, state.line = 1,                                         \
 	 state.flags = self->dlu_default_isstmt                                  \
 	               ? (DI_DEBUGLINE_INFO_FPROLOG | DI_DEBUGLINE_INFO_FISSTMT) \

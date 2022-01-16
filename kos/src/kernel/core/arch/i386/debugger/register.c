@@ -386,7 +386,7 @@ NOTHROW(KCALL loadview)(void) {
 	if (x86_dbg_viewthread != dbg_current) {
 		if (!dbg_current) {
 			/* Special case: no thread loaded. */
-			memset(&x86_dbg_origstate, 0, sizeof(x86_dbg_origstate));
+			bzero(&x86_dbg_origstate, sizeof(x86_dbg_origstate));
 		} else if (dbg_current == THIS_TASK) {
 			/* DBG_REGLEVEL_ORIG = DBG_REGLEVEL_TRAP */
 			get_fcpustate_from_trapstate(&x86_dbg_origstate);
@@ -482,7 +482,7 @@ do_normal_unscheduled_thread:
 				fcpustate_assign_scpustate(&x86_dbg_origstate,
 				                           FORTASK(dbg_current, this_sstate));
 			} else {
-				memset(&x86_dbg_origstate, 0, sizeof(x86_dbg_origstate));
+				bzero(&x86_dbg_origstate, sizeof(x86_dbg_origstate));
 			}
 			/* OK: [x86_dbg_origstate.fcs_sgbase]
 			 * OK: x86_dbg_origstate.fcs_gpregs
@@ -1142,7 +1142,7 @@ NOTHROW(KCALL x86_dbg_getregbyidp)(unsigned int level,
 	if (!reqlen || reqlen > sizeof(result))
 		return 0; /* Shouldn't happen... */
 	if (reqlen < sizeof(result))
-		memset((byte_t *)&result + reqlen, 0, sizeof(result) - reqlen);
+		bzero((byte_t *)&result + reqlen, sizeof(result) - reqlen);
 	return result;
 }
 

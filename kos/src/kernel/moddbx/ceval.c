@@ -1973,7 +1973,7 @@ again_after_comma:
 				result = DBX_ESYNTAX;
 				goto done;
 			}
-			memset(&new_array_type, 0, sizeof(new_array_type));
+			bzero(&new_array_type, sizeof(new_array_type));
 			new_array_type.ct_flags = lhs_elem_type.ct_flags;
 			new_array_type.ct_typ   = ctype_array(&lhs_elem_type, array_length);
 			if unlikely(!new_array_type.ct_typ)
@@ -2430,7 +2430,7 @@ NOTHROW(FCALL ctype_parse_base)(struct cparser *__restrict self,
 	char const *orig_tok = self->c_tokstart;
 	if (self->c_tok != CTOKEN_TOK_KEYWORD)
 		return DBX_ENOENT;
-	memset(presult, 0, sizeof(*presult));
+	bzero(presult, sizeof(*presult));
 	/* Parse const/volatile flags, and initial attributes. */
 	result = ctype_parse_cv(self, &presult->ct_flags, attrib);
 	if unlikely(result != DBX_EOK)

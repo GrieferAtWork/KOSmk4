@@ -1166,8 +1166,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_sfpustate_base)(struct sfpustate const *__res
 	case CFI_UNWIND_REGISTER_ST0 ... CFI_UNWIND_REGISTER_ST7:
 		dw_regno -= CFI_UNWIND_REGISTER_ST0;
 do_fpreg:
-		memcpy((byte_t *)dst, &self->fs_regs[dw_regno], 10);
-		memset((byte_t *)dst + 10, 0, 6);
+		bzero(mempcpy((byte_t *)dst, &self->fs_regs[dw_regno], 10), 6);
 		break;
 
 	case CFI_UNWIND_REGISTER_FCW:
@@ -1316,10 +1315,9 @@ do_fpreg:
 		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
 			goto badreg;
 		if (fpustate_isxsave(&self->mc_fpu)) {
-			memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
+			memcpy(dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
 		} else {
-			memcpy((byte_t *)dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10);
-			memset((byte_t *)dst + 10, 0, 6);
+			bzero(mempcpy(dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10), 6);
 		}
 		break;
 

@@ -231,9 +231,9 @@ struct vidtty
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 	struct vidttyaccess_arref vty_tty;    /* [1..1][lock(WRITE(vty_dev->vd_lock))]
 	                                       * Only the pointed-to  may have the  `VIDTTYACCESS_F_ACTIVE'
-	                                       * flag set. When you with to set a new tty access object (as
+	                                       * flag set. When you wish to set a new tty access object (as
 	                                       * the result of a mode-change  request), you must clear  the
-	                                       * `VIDTTYACCESS_F_ACTIVE' flag (if it is set).
+	                                       * `VIDTTYACCESS_F_ACTIVE' flag (if it was set).
 	                                       *
 	                                       * Also note that `VIDTTYACCESS_F_ACTIVE' can only ever be
 	                                       * set when `vty_active'.  As such,  changing the  current
@@ -333,19 +333,19 @@ FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC _vidtty_v_termios(struct ansitty *__
  * @param: struct vidtty_ops const *ops:  Video TTY operators. */
 #define _vidtty_init(self, ops)                                                        \
 	(_vidtty_assert_ops_(ops)                                                          \
-	 _chrdev_init(_vidtty_asansi(_ansittydev_aschr(self)), &(ops)->vto_ansi.ato_cdev), \
+	 _chrdev_init(_ansittydev_aschr(_vidtty_asansi(self)), &(ops)->vto_ansi.ato_cdev), \
 	 ansitty_init(&(self)->_vidtty_ansi_ at_ansi, &vidtty_ansitty_ops),                \
 	 awref_init(&(self)->_vidtty_ansi_ at_tty, __NULLPTR),                             \
 	 (self)->vty_active = 0, (self)->vty_oldtty = __NULLPTR)
 #define _vidtty_cinit(self, ops)                                                        \
 	(_vidtty_assert_ops_(ops)                                                           \
-	 _chrdev_cinit(_vidtty_asansi(_ansittydev_aschr(self)), &(ops)->vto_ansi.ato_cdev), \
+	 _chrdev_cinit(_ansittydev_aschr(_vidtty_asansi(self)), &(ops)->vto_ansi.ato_cdev), \
 	 ansitty_init(&(self)->_vidtty_ansi_ at_ansi, &vidtty_ansitty_ops),                 \
 	 awref_cinit(&(self)->_vidtty_ansi_ at_tty, __NULLPTR),                             \
 	 __hybrid_assert((self)->vty_active == 0),                                          \
 	 __hybrid_assert((self)->vty_oldtty == __NULLPTR))
 /* Finalize a partially initialized `struct vidtty' (as initialized by `_vidtty_init()') */
-#define _vidtty_fini(self) _chrdev_fini(_vidtty_asansi(_ansittydev_aschr(self)))
+#define _vidtty_fini(self) _chrdev_fini(_ansittydev_aschr(_vidtty_asansi(self)))
 
 
 

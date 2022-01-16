@@ -63,7 +63,7 @@ DECL_BEGIN
 	mempatl((byte_t *)(base), CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE)
 #endif /* (CONFIG_MALL_HEAD_SIZE & 3) != 0 */
 #define BZERO_USER_POINTER_HEAD(base, size) \
-	memset((byte_t *)(base), 0, CONFIG_MALL_HEAD_SIZE)
+	bzero((byte_t *)(base), CONFIG_MALL_HEAD_SIZE)
 #else /* CONFIG_MALL_HEAD_SIZE != 0 */
 #define INITIALIZE_USER_POINTER_HEAD(base, size) (void)0
 #define BZERO_USER_POINTER_HEAD(base, size)      (void)0
@@ -79,7 +79,7 @@ DECL_BEGIN
 	        CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE)
 #endif /* (CONFIG_MALL_TAIL_SIZE & 3) != 0 */
 #define BZERO_USER_POINTER_TAIL(base, size) \
-	memset((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, 0, CONFIG_MALL_TAIL_SIZE)
+	bzero((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, CONFIG_MALL_TAIL_SIZE)
 #else /* CONFIG_MALL_TAIL_SIZE != 0 */
 #define INITIALIZE_USER_POINTER_TAIL(base, size) (void)0
 #define BZERO_USER_POINTER_TAIL(base, size)      (void)0

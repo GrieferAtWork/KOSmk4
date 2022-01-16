@@ -1110,7 +1110,7 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 
 			/* Initialize the new entry. */
 			memcpy(entry->sfe_name, name, namelen + 1, sizeof(char));
-			memset(entry->sfe_entries, 0, sizeof(entry->sfe_entries));
+			bzero(entry->sfe_entries, sizeof(entry->sfe_entries));
 
 			/* Insert at the proper location. */
 			service_dlsym_insert(self, entry);
@@ -1230,7 +1230,7 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 			       sizeof(union exception_data_pointers));
 		} else {
 			e->e_code = ERROR_CODEOF(E_NO_SUCH_OBJECT);
-			memset(&e->e_args, 0, sizeof(e->e_args));
+			bzero(&e->e_args, sizeof(e->e_args));
 		}
 		error_throw_current();
 	}

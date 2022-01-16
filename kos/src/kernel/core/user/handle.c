@@ -174,7 +174,7 @@ clear_unused_but_allocated_handle_vector_tail(struct handle *__restrict vector,
 	 * the initial init.
 	 * NOTE: This is only required when GFP_CALLOC wasn't used to allocate
 	 *       the  original handle  vector, as  is the  case within CLONE() */
-	memset((byte_t *)vector + used_size, 0, alloc_size - used_size);
+	bzero((byte_t *)vector + used_size, alloc_size - used_size);
 }
 #else /* HANDLE_TYPE_UNDEFINED == 0 */
 #define clear_unused_but_allocated_handle_vector_tail(vector, alloc) (void)0

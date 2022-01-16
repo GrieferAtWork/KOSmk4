@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8562cbf */
+/* HASH CRC-32:0xb6ca9b1b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,6 +60,30 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
 #endif /* !__CRT_HAVE__aligned_msize */
 #endif /* !__local___localdep__aligned_msize_defined */
+#ifndef __local___localdep_bzero_defined
+#define __local___localdep_bzero_defined
+#ifdef __CRT_HAVE_bzero
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE___bzero)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE_explicit_bzero)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/bzero.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
+#endif /* !... */
+#endif /* !__local___localdep_bzero_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
@@ -74,20 +98,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-#ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined
-#ifdef __CRT_HAVE_memset
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* __CRT_HAVE_memset */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/memset.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_memset __LIBC_LOCAL_NAME(memset)
-#endif /* !__CRT_HAVE_memset */
-#endif /* !__local___localdep_memset_defined */
 __LOCAL_LIBC(_aligned_recalloc) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc))(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) {
 	void *__result;
@@ -98,7 +108,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc))(void *__aligned_m
 		if (__temp > __num_bytes)
 			__temp = __num_bytes;
 		(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__result, __aligned_mallptr, __temp);
-		(__NAMESPACE_LOCAL_SYM __localdep_memset)((__BYTE_TYPE__ *)__result + __temp, 0, __num_bytes - __temp);
+		(__NAMESPACE_LOCAL_SYM __localdep_bzero)((__BYTE_TYPE__ *)__result + __temp, __num_bytes - __temp);
 		(__NAMESPACE_LOCAL_SYM __localdep__aligned_free)(__aligned_mallptr);
 	}
 	return __result;

@@ -483,8 +483,8 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 				THROW(E_INVALID_ARGUMENT);
 			/* clear all trailing data that could not be read. */
 			if (dst_size > (size_t)error) {
-				memset((byte_t *)dst_data + (size_t)error,
-				       0, dst_size - error);
+				bzero((byte_t *)dst_data + (size_t)error,
+				      dst_size - error);
 			}
 		} EXCEPT {
 			mman_unmap_kram(dst_data, dst_size);

@@ -474,8 +474,8 @@ struct dbg_clearhook {
 #define _DBG_PRIVATE_BZERO_NAME2(prefix, y) _DBG_PRIVATE_BZERO_NAME3(prefix, y)
 #define _DBG_PRIVATE_BZERO_NAME(prefix) _DBG_PRIVATE_BZERO_NAME2(prefix, __LINE__)
 
-/* Define the callbacks necessary to do `memset(p, 0, size)' during a debugger
- * reset,  as  well  as safely  backup/restore  the original  contents  of the
+/* Define the callbacks necessary to do `bzero(p, size)' during a debugger
+ * reset,  as well as  safely backup/restore the  original contents of the
  * specified memory range upon initialization/finalization. */
 #define DEFINE_DBG_BZERO(p, size)                                                   \
 	PRIVATE ATTR_COLDBSS byte_t _DBG_PRIVATE_BZERO_NAME(_debug_bzero_backup)[size]; \

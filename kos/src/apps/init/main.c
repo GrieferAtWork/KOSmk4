@@ -163,8 +163,8 @@ done_tmpfs:
 		display = Open("/dev/svga", O_WRONLY | O_CLOEXEC, 0);
 
 		/* Construct ansitty device /dev/svga1 */
-		memset(&tty, 0, sizeof(tty));
-#if HOP_OPENFD_MODE_AUTO != 0 /* When `0', will have already been done by memset() */
+		bzero(&tty, sizeof(tty));
+#if HOP_OPENFD_MODE_AUTO != 0 /* When `0', will have already been done by bzero() */
 		tty.smt_res.of_mode = HOP_OPENFD_MODE_AUTO;
 #endif /* HOP_OPENFD_MODE_AUTO != 0 */
 		tty.smt_res.of_flags = IO_CLOEXEC;

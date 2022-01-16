@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_MODUSB_STORAGE_SCSI_C
 #define GUARD_MODUSB_STORAGE_SCSI_C 1
+#define _GNU_SOURCE 1
 
 #include "scsi.h"
 
@@ -65,8 +66,8 @@ usb_scsi_io(struct usb_controller *__restrict self,
 	cbw.cbw_dir    = SCSI_CBW_DIR_READ;
 	cbw.cbw_lun    = lun;
 	cbw.cbw_cb_len = cmdlen;
-	memcpy(cbw.cbw_cb, cmd, cmdlen);
-	memset(cbw.cbw_cb + cmdlen, 0, sizeof(cbw.cbw_cb) - cmdlen);
+	bzero(mempcpy(cbw.cbw_cb, cmd, cmdlen),
+	      sizeof(cbw.cbw_cb) - cmdlen);
 
 	/* The initial command packet. */
 	req.ut_endp   = out;
@@ -161,7 +162,7 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	cbw.cbw_cb[6]  = 0;
 	UNALIGNED_SETBE16((u16 *)(cbw.cbw_cb + 7), (u16)num_sectors);
 	cbw.cbw_cb[9]  = 0;
-	memset(cbw.cbw_cb + 10, 0, sizeof(cbw.cbw_cb) - 10);
+	bzero(cbw.cbw_cb + 10, sizeof(cbw.cbw_cb) - 10);
 
 	/* The initial command packet. */
 	req.ut_endp   = self->msd_endp_out;
@@ -350,7 +351,7 @@ usb_scsi_create_lun(struct usb_controller *__restrict self,
 	 *       Before it does this, we're technically not allowed to issue any
 	 *       other type of command. */
 
-	memset(cmd, 0, sizeof(cmd));
+	bzero(cmd, sizeof(cmd));
 	cmd[0] = SCSI_CMD_READ_CAPACITY;
 	cmd[1] = lun << 5; /* Grub also does this, but calls it `GRUB_SCSI_LUN_SHIFT' */
 	num_read = usb_scsi_io(self, in, out, lun,

@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc__ftime32)(struct timeb32 *timebuf)
 /*[[[body:libc__ftime32]]]*/
 {
 	if (ftime(timebuf) != 0)
-		memset(timebuf, 0, sizeof(*timebuf));
+		bzero(timebuf, sizeof(*timebuf));
 }
 /*[[[end:libc__ftime32]]]*/
 
@@ -63,7 +63,7 @@ NOTHROW_NCX(LIBCCALL libc__ftime64)(struct timeb64 *timebuf)
 /*[[[body:libc__ftime64]]]*/
 {
 	if (ftime64(timebuf) != 0)
-		memset(timebuf, 0, sizeof(*timebuf));
+		bzero(timebuf, sizeof(*timebuf));
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc__ftime64]]]*/

@@ -177,25 +177,21 @@ search_heap:
 				 * `chain...+=random_offset' and
 				 * `chain+random_offset+num_bytes...+=unused_size-random_offset' */
 				if (chain_flags & MFREE_FZERO)
-					memset(chain, 0, SIZEOF_MFREE);
+					bzero(chain, SIZEOF_MFREE);
 #ifdef CONFIG_DEBUG_HEAP
 				else {
 					mempatl(chain, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 				}
 #endif /* CONFIG_DEBUG_HEAP */
 				/* Free unused low memory. */
-				heap_free_underallocation(self,
-				                          chain,
-				                          random_offset,
+				heap_free_underallocation(self, chain, random_offset,
 				                          (flags & ~(GFP_CALLOC)) | chain_flags);
 				unused_size -= random_offset;
 				if (unused_size < HEAP_MINSIZE) {
 					result_siz += unused_size;
 				} else {
 					unused_begin = (void *)((uintptr_t)result_ptr + result_siz);
-					heap_free_overallocation(self,
-					                         unused_begin,
-					                         unused_size,
+					heap_free_overallocation(self, unused_begin, unused_size,
 					                         (flags & ~(GFP_CALLOC)) | chain_flags);
 				}
 			} else
@@ -203,9 +199,7 @@ search_heap:
 			{
 				HEAP_ASSERT(unused_size < MFREE_SIZE(chain));
 				/* Free the unused overallocation. */
-				heap_free_overallocation(self,
-				                         unused_begin,
-				                         unused_size,
+				heap_free_overallocation(self, unused_begin, unused_size,
 				                         (flags & ~(GFP_CALLOC)) | chain_flags);
 			}
 		}
@@ -216,9 +210,9 @@ search_heap:
 		/* Initialize the result memory. */
 		if (flags & GFP_CALLOC) {
 			if (chain_flags & MFREE_FZERO)
-				memset(result_ptr, 0, SIZEOF_MFREE);
+				bzero(result_ptr, SIZEOF_MFREE);
 			else {
-				memset(result_ptr, 0, result_siz);
+				bzero(result_ptr, result_siz);
 			}
 		}
 #ifdef CONFIG_DEBUG_HEAP
@@ -422,10 +416,10 @@ again:
 		slot_flags = (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | slot->mf_flags;
 #ifndef CONFIG_DEBUG_HEAP
 		if ((slot_flags & GFP_CALLOC) && (flags & GFP_CALLOC))
-			memset(slot, 0, SIZEOF_MFREE);
+			bzero(slot, SIZEOF_MFREE);
 #else /* !CONFIG_DEBUG_HEAP */
 		if (flags & GFP_CALLOC)
-			memset(slot, 0, SIZEOF_MFREE);
+			bzero(slot, SIZEOF_MFREE);
 		else {
 			mempatl(slot, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 		}
@@ -490,7 +484,7 @@ again:
 		sync_endwrite(&self->h_lock);
 		slot_flags = (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | slot->mf_flags;
 		if (slot_flags & GFP_CALLOC)
-			memset(slot, 0, MIN(free_offset, SIZEOF_MFREE));
+			bzero(slot, MIN(free_offset, SIZEOF_MFREE));
 #ifdef CONFIG_DEBUG_HEAP
 		else {
 			mempatl(slot, DEBUGHEAP_NO_MANS_LAND,
@@ -510,7 +504,7 @@ again:
 		reset_heap_data((byte_t *)ptr, DEBUGHEAP_FRESH_MEMORY, result);
 #endif /* CONFIG_DEBUG_HEAP */
 	if ((flags & GFP_CALLOC) && !(slot_flags & GFP_CALLOC))
-		memset(ptr, 0, result);
+		bzero(ptr, result);
 	HEAP_ASSERT(result >= HEAP_MINSIZE);
 	heap_validate_all_paranoid();
 	return result;
@@ -690,7 +684,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 				HEAP_ASSERT(hkeep_size >= HEAP_MINSIZE);
 				/* Reset data of the head if we're to re-free them. */
 				if (chain_flags & GFP_CALLOC)
-					memset(hkeep, 0, SIZEOF_MFREE);
+					bzero(hkeep, SIZEOF_MFREE);
 #ifdef CONFIG_DEBUG_HEAP
 				else {
 					mempatl(hkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
@@ -722,9 +716,9 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			/* Initialize the resulting memory. */
 			if (flags & GFP_CALLOC) {
 				if (chain_flags & MFREE_FZERO)
-					memset(result_ptr, 0, SIZEOF_MFREE);
+					bzero(result_ptr, SIZEOF_MFREE);
 				else {
-					memset(result_ptr, 0, result_siz);
+					bzero(result_ptr, result_siz);
 				}
 			}
 #ifdef CONFIG_DEBUG_HEAP

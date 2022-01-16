@@ -73,7 +73,7 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 				result = 4;
 			}
 			if (bufsize >= result)
-				memset(buf, 0, result);
+				bzero(buf, result);
 			return result;
 #elif defined(SET_REGISTER)
 			fpu = fpustate_alloc_nx();
@@ -92,12 +92,12 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 				fpureg = &fpu->f_xsave.fx_regs[regno - GDB_REGISTER_I386_ST0];
 #ifdef SET_REGISTER
 				if (bufsize == 10)
-					memset((byte_t *)fpureg + 10, 0, 6);
+					bzero((byte_t *)fpureg + 10, 6);
 #endif /* SET_REGISTER */
 			} else {
 #ifdef GET_REGISTER
 				if (bufsize >= 10)
-					memset(buf, 0, 10);
+					bzero(buf, 10);
 #endif /* GET_REGISTER */
 				return 10;
 			}
@@ -125,7 +125,7 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 			} else {
 #ifdef GET_REGISTER
 				if (bufsize >= 16)
-					memset(buf, 0, 16);
+					bzero(buf, 16);
 #endif /* GET_REGISTER */
 			}
 			return 16;

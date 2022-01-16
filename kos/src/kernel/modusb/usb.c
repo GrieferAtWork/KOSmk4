@@ -1009,7 +1009,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 	req.ur_length  = MIN(desc.ud_size, sizeof(desc));
 	transfer_size  = usb_controller_request_sync(self, dev, &req, &desc);
 	if unlikely(transfer_size < sizeof(desc))
-		memset((byte_t *)&desc + transfer_size, 0, sizeof(desc) - transfer_size);
+		bzero((byte_t *)&desc + transfer_size, sizeof(desc) - transfer_size);
 
 	/* Store the identification bits within the device structure. */
 	dev->ud_dev_class    = desc.ud_dev_class;

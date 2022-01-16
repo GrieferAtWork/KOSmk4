@@ -1566,10 +1566,10 @@ handle_set_register_error:
 			if (reqlen > reglen) {
 				/* zero-extend */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-				memmoveup(regbuf, regbuf + (reqlen - reglen), reglen);
-				memset(regbuf, 0, reqlen - reglen);
+				bzero(memmoveup(regbuf, regbuf + (reqlen - reglen), reglen),
+				      reqlen - reglen);
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-				memset(regbuf + reglen, 0, reqlen - reglen);
+				bzero(regbuf + reglen, reqlen - reglen);
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 			} else {
 				/* Try to trim zero/sign extensions. */

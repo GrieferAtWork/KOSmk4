@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8909fc7 */
+/* HASH CRC-32:0xedd3fa73 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,8 +202,8 @@ again:
 #define __PRIVATE_WANT_err_infd
 		}
 	} else {
-		libc_memset(&old_ios, 0, sizeof(struct termios));
-		libc_memset(&new_ios, 0, sizeof(struct termios));
+		libc_bzero(&old_ios, sizeof(struct termios));
+		libc_bzero(&new_ios, sizeof(struct termios));
 #ifdef __ECHO
 		old_ios.c_lflag = __ECHO;
 		new_ios.c_lflag = __ECHO;
@@ -221,8 +221,8 @@ again:
 	{
 		unsigned int i;
 		struct sigaction newact;
-		libc_memset((void *)__NAMESPACE_LOCAL_SYM rpp_arrived, 0, sizeof(__NAMESPACE_LOCAL_SYM rpp_arrived));
-		libc_memset(&newact, 0, sizeof(newact));
+		libc_bzero((void *)__NAMESPACE_LOCAL_SYM rpp_arrived, sizeof(__NAMESPACE_LOCAL_SYM rpp_arrived));
+		libc_bzero(&newact, sizeof(newact));
 		newact.sa_handler = &__NAMESPACE_LOCAL_SYM rpp_handler;
 		for (i = 0; i < __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM rpp_signals); ++i) {
 			if unlikely(libc_sigaction(__NAMESPACE_LOCAL_SYM rpp_signals[i], &newact, &old_sact[i]) != 0) {

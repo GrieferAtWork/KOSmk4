@@ -134,7 +134,7 @@ NOTHROW_NCX(LIBCCALL sigevent_notify)(struct sigevent const *__restrict self) {
 		/* When `sigev_signo == 0', the below syscalls would become no-ops
 		 * Or   rather,   would  "test if we're allowed to send a signal". */
 		siginfo_t info;
-		memset(&info, 0, sizeof(siginfo_t));
+		bzero(&info, sizeof(siginfo_t));
 		info.si_signo = self->sigev_signo;
 		info.si_code  = SI_ASYNCIO;
 		info.si_pid   = getpid();

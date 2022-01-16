@@ -47,7 +47,7 @@ DEFINE_TEST(aio) {
 	EQd(pipe(pipefds), 0);
 
 	/* Start reading from the pipe. */
-	memset(&aio, 0, sizeof(aio));
+	bzero(&aio, sizeof(aio));
 	aio.aio_fildes                = pipefds[0];
 	aio.aio_buf                   = buf;
 	aio.aio_nbytes                = sizeof(buf);

@@ -1581,7 +1581,7 @@ no_exec:
 		}
 	}
 
-	memset(&mmstat, 0, sizeof(mmstat));
+	bzero(&mmstat, sizeof(mmstat));
 	if (thread_mm)
 		mman_stat(thread_mm, &mmstat);
 	if (printf("\n"

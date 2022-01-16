@@ -270,7 +270,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mcoreheap_provide_page)(struct mcorepage *__restrict page) {
 
 	/* Initialize the in-use bitset to all-free. */
-	memset(page->mcp_used, 0, sizeof(page->mcp_used));
+	bzero(page->mcp_used, sizeof(page->mcp_used));
 
 	/* Insert the page into the free-list. */
 	SLIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);

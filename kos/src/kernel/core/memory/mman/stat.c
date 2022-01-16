@@ -81,7 +81,7 @@ PUBLIC NONNULL((1, 2)) void FCALL
 mman_stat(struct mman *__restrict self,
           struct mman_statinfo *__restrict result)
 		THROWS(E_WOULDBLOCK) {
-	memset(result, 0, sizeof(*result));
+	bzero(result, sizeof(*result));
 	mman_lock_read(self);
 	if likely(self->mm_mappings != NULL)
 		mnode_tree_stat(self, self->mm_mappings, result);

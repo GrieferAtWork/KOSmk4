@@ -326,7 +326,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 #endif /* !__x86_64__ */
 
 	/* Clear the set of pending interrupts. */
-	memset(ammend.dca_intr, 0, sizeof(ammend.dca_intr));
+	bzero(ammend.dca_intr, sizeof(ammend.dca_intr));
 
 	/* Fill in  the host-backup  area  of our  CPU,  thus
 	 * ACK-ing the fact that we're now supposed to sleep. */
@@ -711,7 +711,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 			/* Connections are all f'ed up. - Fully reset them, so
 			 * we can at least get ~some~ kind of working state... */
 fully_reset_task_connections:
-			memset(&FORTASK(mythread, this_root_connections), 0, sizeof(this_root_connections));
+			bzero(&FORTASK(mythread, this_root_connections), sizeof(this_root_connections));
 			pertask_init_task_connections(mythread);
 			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 		} else if likely(FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals) {
@@ -739,7 +739,7 @@ fully_reset_task_connections:
 	{
 		void *args[CPU_IPI_ARGCOUNT];
 		unsigned int count;
-		memset(x86_dbg_hostbackup.dhs_cpus, 0, sizeof(x86_dbg_hostbackup.dhs_cpus));
+		bzero(x86_dbg_hostbackup.dhs_cpus, sizeof(x86_dbg_hostbackup.dhs_cpus));
 		COMPILER_BARRIER();
 		count = cpu_broadcastipi_notthis_early_boot_aware(&debugger_wait_for_done, args,
 		                                                  CPU_IPI_FWAITFOR, me);
@@ -927,7 +927,7 @@ dont_pop_connections:
 		}
 	} else if unlikely(!verify_task_connections(FORTASK(mythread, this_connections))){
 reset_all_connections:
-		memset(&FORTASK(mythread, this_root_connections), 0, sizeof(this_root_connections));
+		bzero(&FORTASK(mythread, this_root_connections), sizeof(this_root_connections));
 		pertask_init_task_connections(mythread);
 		if (initok & INITOK_CONNECTIONS)
 			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
@@ -1048,7 +1048,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 		/* Wait for other CPUs to resume execution. */
 		while (x86_dbg_hostbackup_cpu_suspended_count() != 0)
 			__pause();
-		memset(x86_dbg_hostbackup.dhs_cpus, 0, sizeof(x86_dbg_hostbackup.dhs_cpus));
+		bzero(x86_dbg_hostbackup.dhs_cpus, sizeof(x86_dbg_hostbackup.dhs_cpus));
 	}
 #endif /* !CONFIG_NO_SMP */
 

@@ -65,7 +65,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(task, struct taskpid);
 INTERN void KCALL
 handle_task_stat(struct taskpid *__restrict self,
                  USER CHECKED struct stat *result) {
-	memset(result, 0, sizeof(*result));
+	bzero(result, sizeof(*result));
 	/* TODO: st_ctim: Thread creation time? */
 	/* TODO: st_atim: End of the latest quantum */
 	/* TODO: st_mtim: Start of the latest quantum */

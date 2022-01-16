@@ -101,12 +101,9 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 			goto err_nomem;
 		extab->te_module = self;
 		/* Initialize the data contents of this extended TLS table. */
-		memset(mempcpy(extab->te_data = (byte_t *)extab + data_offset,
-		               self->dm_tlsinit,
-		               self->dm_tlsfsize),
-		       0, /* .bss */
-		       self->dm_tlsmsize -
-		       self->dm_tlsfsize);
+		bzero(mempcpy(extab->te_data = (byte_t *)extab + data_offset,
+		              self->dm_tlsinit, self->dm_tlsfsize),
+		      self->dm_tlsmsize - self->dm_tlsfsize); /* .bss */
 		/* Invoke TLS initializers. */
 		if (self->dm_tls_init) {
 			TRY {

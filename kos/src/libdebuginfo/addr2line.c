@@ -818,7 +818,7 @@ INTERN TEXTSECTION NONNULL((2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
                                                     di_addr2line_sections_t *__restrict sections,
                                                     di_addr2line_dl_sections_t *__restrict dl_sections) {
-	memset(sections, 0, sizeof(*sections));
+	bzero(sections, sizeof(*sections));
 	if unlikely(!dl_handle)
 		goto err_no_data;
 #define locksection(name) \
@@ -871,7 +871,7 @@ handle_missing_symbol_tables:
 			/* Check if we've got anything at all... */
 			if (!dl_sections->dl_debug_line) {
 err_no_data:
-				memset(dl_sections, 0, sizeof(*dl_sections));
+				bzero(dl_sections, sizeof(*dl_sections));
 				return DEBUG_INFO_ERROR_NOFRAME; /* Nope; nothing... */
 			}
 		}

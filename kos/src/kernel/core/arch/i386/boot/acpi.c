@@ -277,7 +277,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 				       (physaddr_t)base + header.rsdp_length - 1,
 				       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
 				       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
-				memset(header.rsdp_signature, 0, sizeof(header.rsdp_signature));
+				bzero(header.rsdp_signature, sizeof(header.rsdp_signature));
 				copytophys(base + offsetof(ACPISDTHeader, rsdp_signature),
 				           &header.rsdp_signature[0], sizeof(header.rsdp_signature));
 				continue;
@@ -339,7 +339,7 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 		missing = buflen;
 		if (buflen > result) {
 			/* Zero-initialize trailing memory. */
-			memset((byte_t *)buf + result, 0, buflen - result);
+			bzero((byte_t *)buf + result, buflen - result);
 			missing = result;
 		}
 		if (missing > sizeof(ACPISDTHeader)) {

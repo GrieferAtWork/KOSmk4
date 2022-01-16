@@ -400,7 +400,7 @@ DBG_COMMAND(entropy,
 	size_t zerobits;
 
 	/* Collect statistical information on which bytes appear how often. */
-	memset(bytevalues, 0, sizeof(bytevalues));
+	bzero(bytevalues, sizeof(bytevalues));
 	onebits = 0;
 	for (i = 0; i < entropy_bits / NBBY; ++i) {
 		byte_t val = entropy_data[i];

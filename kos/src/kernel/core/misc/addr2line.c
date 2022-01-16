@@ -78,12 +78,12 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 	task_pushconnections(&newcons);
 	if unlikely((mod = module_fromaddr_nx(abs_pc)) == NULL) {
 		task_popconnections();
-		memset(buf, 0, sizeof(*buf));
+		bzero(buf, sizeof(*buf));
 		return (uintptr_t)abs_pc;
 	}
 	relpc = (uintptr_t)((byte_t const *)abs_pc - module_getloadaddr(mod));
 	if (debug_addr2line_sections_lock(mod, &buf->ds_info, &buf->ds_sect) != DEBUG_INFO_ERROR_SUCCESS)
-		memset(buf, 0, sizeof(*buf));
+		bzero(buf, sizeof(*buf));
 	task_popconnections();
 	buf->ds_mod = mod; /* Inherit reference */
 	return relpc;

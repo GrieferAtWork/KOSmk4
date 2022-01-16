@@ -119,7 +119,7 @@ NOTHROW(FCALL libservice_aux_load_except_as_error)(uintptr_t status,
 		 * command was canceled by some outside entity, of which there is only
 		 * the case of a sudden HUP event.
 		 * Simply handle this by throwing an E_SERVICE_EXITED */
-		memset(d, 0, sizeof(info->scd_com.sc_except));
+		bzero(d, sizeof(info->scd_com.sc_except));
 		d->e_code = ERROR_CODEOF(E_SERVICE_EXITED);
 	} else {
 		memcpy(d, &info->scd_com.sc_except, sizeof(info->scd_com.sc_except));
@@ -4470,7 +4470,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	assert((size_t)(self->cg_ehend - self->cg_ehbas) >= COM_GENERATOR_INITIAL_EH_BUFSIZ);
 #ifndef NDEBUG
 	/* So that we can detect uninitialized symbols in assertions. */
-	memset(self->cg_symbols, 0, sizeof(self->cg_symbols));
+	bzero(self->cg_symbols, sizeof(self->cg_symbols));
 #endif /* !NDEBUG */
 
 	self->cg_txptr      = self->cg_txbas;

@@ -722,7 +722,7 @@ libda_single_x86(struct disassembler *__restrict self) {
 	byte_t const *args_start = NULL;
 	struct instruction const *chain;
 	struct emu86_modrm rm;
-	memset(&rm, 0, sizeof(rm));
+	bzero(&rm, sizeof(rm));
 	switch (self->d_target) {
 	case DISASSEMBLER_TARGET_8086:
 		op_flags = EMU86_F_NORMAL | EMU86_F_16BIT;

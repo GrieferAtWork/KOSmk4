@@ -104,10 +104,10 @@ $errno_t crt_ftime64_s([[nonnull]] struct $timeb64 *timebuf);
 void _ftime32([[nonnull]] struct $timeb32 *timebuf) {
 @@pp_if $has_function(crt_ftime32_s)@@
 	if unlikely(crt_ftime32_s(timebuf))
-		memset(timebuf, 0, sizeof(*timebuf));
+		bzero(timebuf, sizeof(*timebuf));
 @@pp_elif $has_function(crt_ftime32)@@
 	if unlikely(crt_ftime32(timebuf))
-		memset(timebuf, 0, sizeof(*timebuf));
+		bzero(timebuf, sizeof(*timebuf));
 @@pp_elif $has_function(crt_dos_ftime64)@@
 	struct timeb64 temp;
 	crt_dos_ftime64(&temp)
@@ -123,7 +123,7 @@ void _ftime32([[nonnull]] struct $timeb32 *timebuf) {
 	if unlikely(crt_ftime64(&temp))
 @@pp_endif@@
 	{
-		memset(timebuf, 0, sizeof(*timebuf));
+		bzero(timebuf, sizeof(*timebuf));
 	} else {
 		timebuf->@time@     = (time32_t)temp.@time@;
 		timebuf->@millitm@  = temp.@millitm@;
@@ -141,10 +141,10 @@ void _ftime32([[nonnull]] struct $timeb32 *timebuf) {
 void _ftime64([[nonnull]] struct $timeb64 *timebuf) {
 @@pp_if $has_function(crt_ftime64_s)@@
 	if unlikely(crt_ftime64_s(timebuf))
-		memset(timebuf,0,sizeof(*timebuf));
+		bzero(timebuf, sizeof(*timebuf));
 @@pp_elif $has_function(crt_ftime64)@@
 	if unlikely(crt_ftime64(timebuf))
-		memset(timebuf,0,sizeof(*timebuf));
+		bzero(timebuf, sizeof(*timebuf));
 @@pp_elif $has_function(crt_dos_ftime32)@@
 	struct timeb32 temp;
 	crt_dos_ftime32(&temp)
@@ -160,7 +160,7 @@ void _ftime64([[nonnull]] struct $timeb64 *timebuf) {
 	if unlikely(crt_ftime32(&temp))
 @@pp_endif@@
 	{
-		memset(timebuf, 0, sizeof(*timebuf));
+		bzero(timebuf, sizeof(*timebuf));
 	} else {
 		timebuf->@time@     = (time64_t)temp.@time@;
 		timebuf->@millitm@  = temp.@millitm@;

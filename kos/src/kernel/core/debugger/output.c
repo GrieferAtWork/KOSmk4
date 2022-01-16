@@ -1203,9 +1203,9 @@ normal_ch:
 		} else {
 			/* Start a new utf-8 sequence. */
 			printer->p_utf8[0] = (u8)ch;
-			memset(printer->p_utf8 + 1, 0,
-			       sizeof(printer->p_utf8) -
-			       sizeof(*printer->p_utf8));
+			bzero(printer->p_utf8 + 1,
+			      sizeof(printer->p_utf8) -
+			      sizeof(*printer->p_utf8));
 		}
 	}
 }

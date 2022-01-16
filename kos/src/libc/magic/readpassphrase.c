@@ -231,8 +231,8 @@ again:
 #define __PRIVATE_WANT_err_infd
 		}
 	} else {
-		memset(&old_ios, 0, sizeof(struct termios));
-		memset(&new_ios, 0, sizeof(struct termios));
+		bzero(&old_ios, sizeof(struct termios));
+		bzero(&new_ios, sizeof(struct termios));
 @@pp_ifdef __ECHO@@
 		old_ios.@c_lflag@ = __ECHO;
 		new_ios.@c_lflag@ = __ECHO;
@@ -250,8 +250,8 @@ again:
 	{
 		unsigned int i;
 		struct @sigaction@ newact;
-		memset((void *)__NAMESPACE_LOCAL_SYM rpp_arrived, 0, sizeof(__NAMESPACE_LOCAL_SYM rpp_arrived));
-		memset(&newact, 0, sizeof(newact));
+		bzero((void *)__NAMESPACE_LOCAL_SYM rpp_arrived, sizeof(__NAMESPACE_LOCAL_SYM rpp_arrived));
+		bzero(&newact, sizeof(newact));
 		newact.@sa_handler@ = &__NAMESPACE_LOCAL_SYM rpp_handler;
 		for (i = 0; i < __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM rpp_signals); ++i) {
 			if unlikely(sigaction(__NAMESPACE_LOCAL_SYM rpp_signals[i], &newact, &old_sact[i]) != 0) {

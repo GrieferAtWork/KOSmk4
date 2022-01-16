@@ -216,7 +216,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_rpc_exec)(fd_t epfd,
 	pinfo.erp_max_param_count = 2;
 
 	/* Fill in an epoll event descriptor for RPC_PROG */
-	memset(&rpc_event.data, 0, sizeof(rpc_event.data));
+	bzero(&rpc_event.data, sizeof(rpc_event.data));
 	rpc_event.data.ptr = &pinfo;
 	rpc_event.events   = event->events;
 

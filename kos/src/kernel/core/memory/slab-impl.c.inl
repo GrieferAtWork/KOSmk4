@@ -75,7 +75,7 @@ NOTHROW(KCALL LOCAL_slab_dofreeptr)(struct slab *__restrict self,
 	assert(self == SLAB_GET(ptr));
 	assert(self->s_size == SEGMENT_SIZE);
 	if ((self->s_flags & SLAB_FCALLOC) && !(flags & GFP_CALLOC))
-		memset(ptr, 0, SEGMENT_SIZE);
+		bzero(ptr, SEGMENT_SIZE);
 	index = (((uintptr_t)ptr & PAGEMASK) - SEGMENT_OFFSET) / SEGMENT_SIZE;
 	assert(index < SEGMENT_COUNT);
 	assert(index == (size_t)((struct LOCAL_segment *)ptr - SEGMENTS(self)));
@@ -238,13 +238,13 @@ again:
 				if (!(flags & GFP_CALLOC))
 					mempatl(result, DEBUGHEAP_FRESH_MEMORY, SEGMENT_SIZE);
 			} else if (flags & GFP_CALLOC) {
-				memset(result, 0, SEGMENT_SIZE);
+				bzero(result, SEGMENT_SIZE);
 			} else {
 				mempatl(result, DEBUGHEAP_FRESH_MEMORY, SEGMENT_SIZE);
 			}
 #else /* CONFIG_DEBUG_HEAP */
 			if ((flags & GFP_CALLOC) && !(page_flags & SLAB_FCALLOC))
-				memset(result, 0, SEGMENT_SIZE);
+				bzero(result, SEGMENT_SIZE);
 #endif /* !CONFIG_DEBUG_HEAP */
 			return result;
 		}
@@ -271,7 +271,7 @@ again:
 	result_page->s_link.le_prev = &LOCAL_desc.sd_free.lh_first;
 	result_page->s_link.le_next = NULL;
 	if (!(flags & GFP_CALLOC))
-		memset(&INUSE_BITSET(result_page)[1], 0, SIZEOF_BITSET - sizeof(uintptr_t));
+		bzero(&INUSE_BITSET(result_page)[1], SIZEOF_BITSET - sizeof(uintptr_t));
 	(INUSE_BITSET(result_page)[0]) = SLAB_SEGMENT_STATUS_ALLOC;
 	result = &SEGMENTS(result_page)[0];
 

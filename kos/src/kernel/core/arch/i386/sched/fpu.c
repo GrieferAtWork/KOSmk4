@@ -211,8 +211,8 @@ PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL inplace_swap_fpustate_variant)(struct fpustate *__restrict state) {
 	struct fpustate newstate;
 	if (fpustate_isssave(state)) {
-		memset((byte_t *)&newstate.f_ssave + offsetafter(struct fpustate, f_ssave),
-		       0, sizeof(newstate) - offsetafter(struct fpustate, f_ssave));
+		bzero((byte_t *)&newstate.f_ssave + offsetafter(struct fpustate, f_ssave),
+		      sizeof(newstate) - offsetafter(struct fpustate, f_ssave));
 		sfpustate_to_xfpustate(&newstate.f_ssave, &state->f_xsave);
 	} else {
 		xfpustate_to_sfpustate(&newstate.f_xsave, &state->f_ssave);
@@ -265,7 +265,7 @@ fpustate_saveinto(USER CHECKED struct fpustate *state)
 		THROWS(E_SEGFAULT) {
 	struct fpustate *mystate;
 	if (!PERTASK_TEST(this_fpustate)) {
-		memset(state, 0, SIZEOF_FPUSTATE);
+		bzero(state, SIZEOF_FPUSTATE);
 		x86_fpustate_init(state);
 		return;
 	}

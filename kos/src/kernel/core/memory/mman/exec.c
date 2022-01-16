@@ -76,7 +76,7 @@ again_loadheader:
 		read_bytes = mfile_read(args->ea_xfile, args->ea_header,
 		                        sizeof(args->ea_header), 0);
 		if unlikely(read_bytes < CONFIG_EXECABI_MAXHEADER)
-			memset(args->ea_header + read_bytes, 0, CONFIG_EXECABI_MAXHEADER - read_bytes);
+			bzero(args->ea_header + read_bytes, CONFIG_EXECABI_MAXHEADER - read_bytes);
 	} EXCEPT {
 		decref_unlikely(abis);
 		RETHROW();

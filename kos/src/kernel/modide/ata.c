@@ -549,7 +549,7 @@ NOTHROW(FCALL AtaDrive_DmaAioHandle_CompleteWithError)(struct aio_handle *__rest
 	struct exception_data old_data;
 	struct exception_data *mydata = &THIS_EXCEPTION_DATA;
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
-	memset(mydata, 0, sizeof(struct exception_data));
+	bzero(mydata, sizeof(struct exception_data));
 	mydata->e_code = ERROR_CODE(ATA_ERROR_CLASS(error), ATA_ERROR_SUBCLASS(error));
 	mydata->e_args.e_ioerror.i_subsystem = E_IOERROR_SUBSYSTEM_HARDDISK;
 	mydata->e_args.e_ioerror.i_reason    = ATA_ERROR_REASON(error);

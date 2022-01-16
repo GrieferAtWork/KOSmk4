@@ -361,7 +361,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 				if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT) {
 					/* Common register */
 					if unlikely(!common_init_regs) {
-						memset(&result->cs_regs[temp], 0, sizeof(result->cs_regs[temp]));
+						bzero(&result->cs_regs[temp], sizeof(result->cs_regs[temp]));
 					} else {
 						memcpy(&result->cs_regs[temp], &common_init_regs[temp],
 						       sizeof(result->cs_regs[temp]));
@@ -445,7 +445,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 					if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT) {
 						/* Common register */
 						if unlikely(!common_init_regs) {
-							memset(&result->cs_regs[temp], 0, sizeof(result->cs_regs[temp]));
+							bzero(&result->cs_regs[temp], sizeof(result->cs_regs[temp]));
 						} else {
 							memcpy(&result->cs_regs[temp], &common_init_regs[temp],
 							       sizeof(result->cs_regs[temp]));

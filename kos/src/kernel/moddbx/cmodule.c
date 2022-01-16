@@ -2230,7 +2230,7 @@ NOTHROW(FCALL cmodule_parser_from_dip)(struct cmodule const *__restrict self,
 	cu = cmodule_findunit_from_dip(self, dip);
 	if unlikely(!cu) {
 		/* Special case: Bad DIP pointer. */
-		memset(result, 0, sizeof(*result));
+		bzero(result, sizeof(*result));
 		return;
 	}
 	/* Initialize the parser from `cu' and `dip'. */
@@ -2452,7 +2452,7 @@ NOTHROW(FCALL loadinfo_location)(di_debuginfo_cu_parser_t const *__restrict pars
                                  struct cmodsyminfo *__restrict info,
                                  uintptr_t form) {
 	if unlikely(!debuginfo_cu_parser_getexpr(parser, form, &info->clv_data.s_var.v_location))
-		memset(&info->clv_data.s_var.v_location, 0, sizeof(info->clv_data.s_var.v_location));
+		bzero(&info->clv_data.s_var.v_location, sizeof(info->clv_data.s_var.v_location));
 }
 
 PRIVATE NONNULL((1, 2)) void
@@ -2721,7 +2721,7 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 	} else if (cmodsyminfo_ismip(info)) {
 		info->clv_dip = cmodsyminfo_getmip(info)->ms_dip;
 	}
-	memset(&info->clv_data, 0, sizeof(info->clv_data));
+	bzero(&info->clv_data, sizeof(info->clv_data));
 	has_object_address = false;
 	if (cmodsyminfo_ismip(info) || cmodsyminfo_issip(info)) {
 		CLinkerSymbol const *psymbol;
@@ -2757,8 +2757,8 @@ no_sip_addr:
 		if unlikely(!info->clv_unit) {
 no_unit:
 			/* Shouldn't happen... (fill in stub-data) */
-			memset(&info->clv_cu, 0, sizeof(info->clv_cu));
-			memset(&info->clv_parser, 0, sizeof(info->clv_parser));
+			bzero(&info->clv_cu, sizeof(info->clv_cu));
+			bzero(&info->clv_parser, sizeof(info->clv_parser));
 			return;
 		}
 	}
@@ -2773,7 +2773,7 @@ no_unit:
 	while (info->clv_parser.dup_comp.dic_tag != DW_TAG_compile_unit) {
 		debuginfo_cu_parser_skipattr(&info->clv_parser);
 		if (!debuginfo_cu_parser_next(&info->clv_parser)) {
-			memset(&info->clv_cu, 0, sizeof(info->clv_cu));
+			bzero(&info->clv_cu, sizeof(info->clv_cu));
 			goto do_load_dip;
 		}
 	}
@@ -2781,7 +2781,7 @@ no_unit:
 	/* Load attributes for the associated CU */
 	if (!debuginfo_cu_parser_loadattr_compile_unit(&info->clv_parser,
 	                                               &info->clv_cu))
-		memset(&info->clv_cu, 0, sizeof(info->clv_cu));
+		bzero(&info->clv_cu, sizeof(info->clv_cu));
 
 	if (!info->clv_dip && has_object_address) {
 		/* The symbol being pushed originates from some module's .symtab,

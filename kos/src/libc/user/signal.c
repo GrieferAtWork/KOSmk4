@@ -915,7 +915,7 @@ NOTHROW_NCX(LIBCCALL libc_sigqueue)(pid_t pid,
 /*[[[body:libc_sigqueue]]]*/
 {
 	siginfo_t info;
-	memset(&info, 0, sizeof(siginfo_t));
+	bzero(&info, sizeof(siginfo_t));
 	info.si_value = val;
 	info.si_code  = SI_QUEUE;
 	return sigqueueinfo(pid, signo, &info);
@@ -1080,7 +1080,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t pthread,
 	siginfo_t info;
 	errno_t result;
 	pid_t tid;
-	memset(&info, 0, sizeof(siginfo_t));
+	bzero(&info, sizeof(siginfo_t));
 	info.si_value = val;
 	info.si_code  = SI_QUEUE;
 	tid = ATOMIC_READ(_pthread_tid(pthread));

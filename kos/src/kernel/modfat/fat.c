@@ -993,7 +993,7 @@ readnext:
 				}
 			}
 			assert(dst <= end);
-			memset(dst, 0, (size_t)(end - dst));
+			bzero(dst, (size_t)(end - dst));
 			do {
 				mfile_readall(self, &ent, sizeof(struct fat_dirent), pos);
 				pos += sizeof(struct fat_dirent);
@@ -2190,11 +2190,11 @@ next_next_ent:
 			/* This is another indicator that the end of the directory has been reached! */
 #ifdef NEED_COMPAT_IOCTL_FAT_READDIR
 			if (flags & FATDIRENUM_IOCTL_READDIR_F_COMPAT) {
-				memset(result, 0, 2 * sizeof(struct __compat_fat_dirent));
+				bzero(result, 2 * sizeof(struct __compat_fat_dirent));
 			} else
 #endif /* NEED_COMPAT_IOCTL_FAT_READDIR */
 			{
-				memset(result, 0, 2 * sizeof(struct __fat_dirent));
+				bzero(result, 2 * sizeof(struct __fat_dirent));
 			}
 			return 0;
 		}

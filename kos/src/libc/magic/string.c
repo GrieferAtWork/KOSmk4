@@ -761,7 +761,7 @@ miss:
                           [[nonnull]] char const *__restrict src, size_t buflen) {
 	size_t srclen = strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
-	memset(buf + srclen, '\0', (buflen - srclen) * sizeof(char));
+	bzero(buf + srclen, (buflen - srclen) * sizeof(char));
 	return buf;
 }
 
@@ -960,7 +960,7 @@ stpncpy:([[nonnull]] char *__restrict buf,
 {
 	size_t srclen = strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
-	memset(buf + srclen, '\0', (size_t)(buflen - srclen) * sizeof(char));
+	bzero(buf + srclen, (size_t)(buflen - srclen) * sizeof(char));
 	return buf + srclen;
 }
 

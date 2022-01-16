@@ -167,7 +167,7 @@ DEFINE_SYSCALL2(errno_t, sethostname,
 		THROW(E_BUFFER_TOO_SMALL, namelen, _UTSNAME_NODENAME_LENGTH);
 	cred_require_sysadmin();
 	memcpy(temp, name, namelen, sizeof(char));
-	memset(temp + namelen, 0, _UTSNAME_NODENAME_LENGTH - namelen, sizeof(char));
+	bzero(temp + namelen, _UTSNAME_NODENAME_LENGTH - namelen, sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(kernel_uname.nodename, temp, sizeof(temp));
 	return -EOK;
@@ -184,7 +184,7 @@ DEFINE_SYSCALL2(errno_t, setdomainname,
 		THROW(E_BUFFER_TOO_SMALL, namelen, _UTSNAME_DOMAIN_LENGTH);
 	cred_require_sysadmin();
 	memcpy(temp, name, namelen, sizeof(char));
-	memset(temp + namelen, 0, _UTSNAME_DOMAIN_LENGTH - namelen, sizeof(char));
+	bzero(temp + namelen, _UTSNAME_DOMAIN_LENGTH - namelen, sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(kernel_uname.domainname, temp, sizeof(temp));
 	return -EOK;

@@ -704,7 +704,7 @@ procfs_kos_mm_kernel_stat_printer(pformatprinter printer, void *arg,
 	struct mmk_stat km_stat[2];
 
 	/* Gather information. */
-	memset(km_stat, 0, sizeof(km_stat));
+	bzero(km_stat, sizeof(km_stat));
 	mman_lock_read(&mman_kernel);
 	if (mman_kernel.mm_mappings)
 		kernel_mnode_tree_stat(mman_kernel.mm_mappings, km_stat);
@@ -1196,7 +1196,7 @@ PRIVATE NONNULL((1)) void KCALL
 gather_mpart_ramusage(struct mpart_ram_usage *__restrict info) {
 	struct mpart *iter;
 again:
-	memset(info, 0, sizeof(*info));
+	bzero(info, sizeof(*info));
 	mpart_all_acquire();
 	LIST_FOREACH (iter, &mpart_all_list, mp_allparts) {
 		if (!tryincref(iter))
@@ -1503,7 +1503,7 @@ ProcFS_Sys_Kernel_Domainname_Write(USER CHECKED void const *buf,
 		THROW(E_BUFFER_TOO_SMALL, bufsize, _UTSNAME_DOMAIN_LENGTH);
 	cred_require_sysadmin();
 	memcpy(temp, buf, bufsize, sizeof(char));
-	memset(temp + bufsize, 0, _UTSNAME_DOMAIN_LENGTH - bufsize, sizeof(char));
+	bzero(temp + bufsize, _UTSNAME_DOMAIN_LENGTH - bufsize, sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(kernel_uname.domainname, temp, sizeof(temp));
 }
@@ -1532,7 +1532,7 @@ ProcFS_Sys_Kernel_Hostname_Write(USER CHECKED void const *buf,
 		THROW(E_BUFFER_TOO_SMALL, bufsize, _UTSNAME_NODENAME_LENGTH);
 	cred_require_sysadmin();
 	memcpy(temp, buf, bufsize, sizeof(char));
-	memset(temp + bufsize, 0, _UTSNAME_NODENAME_LENGTH - bufsize, sizeof(char));
+	bzero(temp + bufsize, _UTSNAME_NODENAME_LENGTH - bufsize, sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(kernel_uname.nodename, temp, sizeof(temp));
 }

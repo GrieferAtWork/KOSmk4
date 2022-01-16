@@ -174,7 +174,7 @@ ansittydev_v_termios(struct ansitty *__restrict self,
 	me = container_of(self, struct ansittydev, at_ansi);
 	output = awref_get(&me->at_tty);
 	if (!output) {
-		memset(oldios, 0, sizeof(*oldios));
+		bzero(oldios, sizeof(*oldios));
 	} else {
 		FINALLY_DECREF_UNLIKELY(output);
 		memcpy(oldios, &output->t_term.t_ios, sizeof(*oldios));

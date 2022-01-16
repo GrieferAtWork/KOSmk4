@@ -51,11 +51,11 @@
 #include <kos/kernel/segment.h>
 #endif /* __i386__ || __x86_64__ */
 
-#ifdef NDEBUG
-#define DBG_memset(ptr, byte, num_bytes) (void)0
-#else /* NDEBUG */
-#define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
-#endif /* !NDEBUG */
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Internal key used to chain threads that have to be destroyed. */
 #define sig_destroylater_next(thread) KEY_task__next(thread)

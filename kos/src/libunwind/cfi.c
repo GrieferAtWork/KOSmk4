@@ -498,7 +498,7 @@ NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8
 			byte_t data[CFI_REGISTER_MAXSIZE];
 		} regval;
 		size_t reg_bits, max_bits;
-		memset(regval.data, 0, sizeof(regval.data));
+		bzero(regval.data, sizeof(regval.data));
 		error = (*regget)(regget_arg, self->s_register, regval.data);
 		if unlikely(error != UNWIND_SUCCESS)
 			ERRORF(err, "self->s_register = %u (%u)\n", (unsigned int)self->s_register, error);
@@ -519,7 +519,7 @@ NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8
 		num_bits -= max_bits;
 		while (num_bits) {
 			/* Fill out-of-bounds register data with all zeros. */
-			memset(regval.data, 0, sizeof(regval.data));
+			bzero(regval.data, sizeof(regval.data));
 			max_bits = sizeof(regval.data) * NBBY;
 			if (max_bits > num_bits)
 				max_bits = num_bits;
@@ -2078,8 +2078,9 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	unwind_emulator_t emulator;
 	size_t expr_length;
 	unsigned int result;
-	memset(&emulator, 0, sizeof(emulator));
-	memset(buf, 0, bufsize); /* Pre-initialize the buffer to all zeroes */
+	bzero(&emulator, sizeof(emulator));
+	bzero(buf, bufsize); /* Pre-initialize the buffer to all zeroes */
+
 	/* Select the proper function. */
 	emulator.ue_pc = libuw_debuginfo_location_select(self,
 	                                                 cu ? cu->cu_ranges.r_startpc : 0,
@@ -2138,7 +2139,8 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
 	unwind_emulator_t emulator;
 	size_t expr_length;
 	unsigned int result;
-	memset(&emulator, 0, sizeof(emulator));
+	bzero(&emulator, sizeof(emulator));
+
 	/* Select the proper function. */
 	emulator.ue_pc = libuw_debuginfo_location_select(self,
 	                                                 cu ? cu->cu_ranges.r_startpc : 0,

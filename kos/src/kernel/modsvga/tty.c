@@ -694,7 +694,7 @@ notsup:
 	result->stx_swcur.vtc_word = 0;
 
 	/* Fill in the saved display state. */
-	memset(result->stx_display, 0, dispsz);
+	bzero(result->stx_display, dispsz);
 
 	/* Set default color for all cells. */
 	{

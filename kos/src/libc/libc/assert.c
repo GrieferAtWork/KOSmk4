@@ -138,12 +138,12 @@ maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 
 	/* Custom handler has been defined. -> Raise a signal. */
 	kcpustate_to_ucpustate(state, &uc);
-	memset(&si, 0, sizeof(si));
+	bzero(&si, sizeof(si));
 	si.si_signo = SIGABRT;
 	si.si_code  = SI_USER;
 
 	/* Use sigreturn(2) to execute a call to `rt_tgsigqueueinfo(2)' from `uc' */
-	memset(&sc_info, 0, sizeof(sc_info));
+	bzero(&sc_info, sizeof(sc_info));
 	sc_info.rsi_sysno = SYS_rt_tgsigqueueinfo;
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_OTHER | RPC_SYSCALL_INFO_FEXCEPT |
 	                    RPC_SYSCALL_INFO_FREGVALID(1) | RPC_SYSCALL_INFO_FREGVALID(2) |

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b94268e */
+/* HASH CRC-32:0x21f3b1a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,23 +22,33 @@
 #define __local__CrtMemCheckpoint_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined
-#ifdef __CRT_HAVE_memset
+#ifndef __local___localdep_bzero_defined
+#define __local___localdep_bzero_defined
+#ifdef __CRT_HAVE_bzero
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* __CRT_HAVE_memset */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE___bzero)
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/memset.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_memset __LIBC_LOCAL_NAME(memset)
-#endif /* !__CRT_HAVE_memset */
-#endif /* !__local___localdep_memset_defined */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE_explicit_bzero)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/bzero.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
+#endif /* !... */
+#endif /* !__local___localdep_bzero_defined */
 __LOCAL_LIBC(_CrtMemCheckpoint) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemCheckpoint))(_CrtMemState *__state) {
-	(__NAMESPACE_LOCAL_SYM __localdep_memset)(__state, 0, sizeof(*__state));
+	(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__state, sizeof(*__state));
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__CrtMemCheckpoint_defined

@@ -2409,7 +2409,7 @@ kernel_execveat(fd_t dirfd,
 	VALIDATE_FLAGSET(atflags,
 	                 AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS);
-	memset(&args, 0, sizeof(args));
+	bzero(&args, sizeof(args));
 	if ((atflags & AT_EMPTY_PATH) && !*pathname) {
 		/* Special case: `fexecve()' */
 		REF struct handle hand;

@@ -1059,9 +1059,9 @@ handle_mfile_stat(struct mfile *__restrict self,
 
 	/* Check if the file has been deleted. If it has, timestamps are invalid. */
 	if (ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) {
-		memset(&st_atimespec, 0, sizeof(struct timespec));
-		memset(&st_mtimespec, 0, sizeof(struct timespec));
-		memset(&st_ctimespec, 0, sizeof(struct timespec));
+		bzero(&st_atimespec, sizeof(struct timespec));
+		bzero(&st_mtimespec, sizeof(struct timespec));
+		bzero(&st_ctimespec, sizeof(struct timespec));
 	}
 
 	/* Fill in generic default information */

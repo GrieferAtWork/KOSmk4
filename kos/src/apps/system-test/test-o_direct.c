@@ -74,7 +74,7 @@ do_o_direct_test(char const *filename) {
 	bufsize = CEIL_ALIGN(64, blocksize);
 	buf     = memalign(blockalign, bufsize);
 	assertf(buf, "memalign(%" PRIuSIZ ", %" PRIuSIZ ") failed", blockalign, bufsize);
-	memset(buf, 0, bufsize);
+	bzero(buf, bufsize);
 	strcpy((char *)buf, "Test Data!");
 
 	/* Unaligned I/O must produce errors. */

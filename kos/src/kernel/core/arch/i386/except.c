@@ -137,7 +137,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 PUBLIC NONNULL((1)) ssize_t
 NOTHROW(KCALL error_print_into)(pformatprinter printer, void *arg) {
 	va_list empty_args;
-	memset((void *)&empty_args, 0, sizeof(empty_args));
+	bzero((void *)&empty_args, sizeof(empty_args));
 	print_unhandled_exception(printer, arg, printer, arg, NULL, empty_args);
 	/* TODO: Track `printer' return values. */
 	return 0;

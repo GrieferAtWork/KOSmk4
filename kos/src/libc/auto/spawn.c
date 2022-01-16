@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcca971d */
+/* HASH CRC-32:0x4b7f64dc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -559,7 +559,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
  * @return: 0 : Success */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict attr) {
-	libc_memset(attr, 0, sizeof(*attr));
+	libc_bzero(attr, sizeof(*attr));
 	return 0;
 }
 /* >> posix_spawnattr_destroy(3)
@@ -703,7 +703,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__re
  * @return: 0 : Success */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)(posix_spawn_file_actions_t *__restrict file_actions) {
-	libc_memset(file_actions, 0, sizeof(*file_actions));
+	libc_bzero(file_actions, sizeof(*file_actions));
 	return 0;
 }
 /* >> posix_spawn_file_actions_destroy(3)

@@ -150,7 +150,7 @@ INTERN NONNULL((1)) void KCALL
 handle_dirent_stat(struct fdirent *__restrict self,
                    USER CHECKED struct stat *result)
 		THROWS(E_SEGFAULT) {
-	memset(result, 0, sizeof(*result));
+	bzero(result, sizeof(*result));
 	/* NOTE: In this case, we can't invoke the `fdo_getino' operator... :( */
 	if (self->fd_ops->fdo_getino == NULL)
 		result->st_ino = (typeof(result->st_ino))self->fd_ino;

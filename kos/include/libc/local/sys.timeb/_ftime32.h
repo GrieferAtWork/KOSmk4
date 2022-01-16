@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc62eac1e */
+/* HASH CRC-32:0x6a6d4c12 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,30 @@
 #if defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime64)
 #include <bits/os/timeb.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_bzero_defined
+#define __local___localdep_bzero_defined
+#ifdef __CRT_HAVE_bzero
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE___bzero)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE_explicit_bzero)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/bzero.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
+#endif /* !... */
+#endif /* !__local___localdep_bzero_defined */
 #if !defined(__local___localdep_crt_dos_ftime64_defined) && defined(__CRT_HAVE__ftime64)
 #define __local___localdep_crt_dos_ftime64_defined
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_crt_dos_ftime64,(struct __timeb64 *__timebuf),_ftime64,(__timebuf))
@@ -50,28 +74,14 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_crt_ftime64_s,(struct __timeb64 *__timebuf),_ftime64_s,(__timebuf))
 #endif /* !__local___localdep_crt_ftime64_s_defined && __CRT_HAVE__ftime64_s */
-#ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined
-#ifdef __CRT_HAVE_memset
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* __CRT_HAVE_memset */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/memset.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_memset __LIBC_LOCAL_NAME(memset)
-#endif /* !__CRT_HAVE_memset */
-#endif /* !__local___localdep_memset_defined */
 __LOCAL_LIBC(_ftime32) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime32))(struct __timeb32 *__timebuf) {
 #ifdef __CRT_HAVE__ftime32_s
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_crt_ftime32_s)(__timebuf))
-		(__NAMESPACE_LOCAL_SYM __localdep_memset)(__timebuf, 0, sizeof(*__timebuf));
+		(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__timebuf, sizeof(*__timebuf));
 #elif defined(__CRT_HAVE_ftime)
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_crt_ftime32)(__timebuf))
-		(__NAMESPACE_LOCAL_SYM __localdep_memset)(__timebuf, 0, sizeof(*__timebuf));
+		(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__timebuf, sizeof(*__timebuf));
 #elif defined(__CRT_HAVE__ftime64)
 	struct __timeb64 __temp;
 	(__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime64)(&__temp)
@@ -87,7 +97,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime32))(struct __timeb32 *__timebu
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_crt_ftime64)(&__temp))
 #endif /* !__CRT_HAVE__ftime64_s */
 	{
-		(__NAMESPACE_LOCAL_SYM __localdep_memset)(__timebuf, 0, sizeof(*__timebuf));
+		(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__timebuf, sizeof(*__timebuf));
 	} else {
 		__timebuf->time     = (__time32_t)__temp.time;
 		__timebuf->millitm  = __temp.millitm;

@@ -181,7 +181,7 @@ process_long_option(int argc, char **argv, char const *optstring,
 								ambig_malloced = 1;
 							}
 							if (ambig_set) {
-								memset(ambig_set, 0, n_options);
+								bzero(ambig_set, n_options);
 								ambig_set[indfound] = 1;
 							}
 						}

@@ -121,7 +121,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t *__restrict self, /*
 #endif /* ... */
 {
 	unsigned int error;
-	memset(result, 0, sizeof(*result));
+	bzero(result, sizeof(*result));
+
 	/* Execute the init-body */
 	error = libuw_unwind_local_fde_exec_until(self,
 	                                          IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT(NULL,)

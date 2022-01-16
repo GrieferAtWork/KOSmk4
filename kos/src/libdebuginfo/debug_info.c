@@ -3366,7 +3366,7 @@ again_subprogram_component:
 						if (!libdi_debuginfo_cu_parser_loadattr_variable(self, &var))
 							goto err;
 						memcpy(&type_parser, self, sizeof(type_parser));
-						memset(&vartype, 0, sizeof(vartype));
+						bzero(&vartype, sizeof(vartype));
 						if (var.v_type) {
 							type_parser.dup_cu_info_pos = var.v_type;
 							if (libdi_debuginfo_cu_parser_next(&type_parser))
@@ -3529,8 +3529,8 @@ INTERN NONNULL((2, 3)) void
 NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
                                           di_debug_sections_t *__restrict sections,
                                           di_debug_dl_sections_t *__restrict dl_sections) {
-	memset(sections, 0, sizeof(*sections));
-	memset(dl_sections, 0, sizeof(*dl_sections));
+	bzero(sections, sizeof(*sections));
+	bzero(dl_sections, sizeof(*dl_sections));
 	if unlikely(!dl_handle)
 		return;
 	/* Special handling for .eh_frame and .eh_frame_hdr */

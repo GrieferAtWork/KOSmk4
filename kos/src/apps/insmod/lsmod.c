@@ -49,7 +49,7 @@ PRIVATE fd_t OpenDriverList(void) {
 PRIVATE size_t
 GetDriverStringBuf(fd_t driver, u64 index, char *buf, size_t buflen) {
 	struct mod_string h;
-	memset(&h, 0, sizeof(h));
+	bzero(&h, sizeof(h));
 	h.ms_buf   = buf;
 	h.ms_size  = buflen;
 	h.ms_index = index;
@@ -84,7 +84,7 @@ again_getpath:
 PRIVATE fd_t
 OpenDriverObject(fd_t driver, u64 index) {
 	struct mod_object d;
-	memset(&d, 0, sizeof(d));
+	bzero(&d, sizeof(d));
 	d.mo_index           = index;
 	d.mo_result.of_mode  = OPENFD_MODE_AUTO;
 	d.mo_result.of_flags = IO_CLOEXEC;

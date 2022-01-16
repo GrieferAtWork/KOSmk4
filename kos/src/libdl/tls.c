@@ -239,9 +239,9 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 			}
 		}
 		/* ZERO-initialize trailing TLS BSS bytes. */
-		memset(dst + iter->dm_tlsfsize, 0,
-		       iter->dm_tlsmsize -
-		       iter->dm_tlsfsize);
+		bzero(dst + iter->dm_tlsfsize,
+		      iter->dm_tlsmsize -
+		      iter->dm_tlsfsize);
 	}
 	static_tls_size = static_tls_size_no_segment;
 	static_tls_size += sizeof(struct tls_segment);

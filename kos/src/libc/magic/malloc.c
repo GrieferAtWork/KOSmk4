@@ -252,7 +252,7 @@ recalloc(void *mallptr, $size_t num_bytes)
 	result  = realloc(mallptr, num_bytes);
 	if likely(result) {
 		if (num_bytes > oldsize)
-			memset((byte_t *)result + oldsize, 0, num_bytes - oldsize);
+			bzero((byte_t *)result + oldsize, num_bytes - oldsize);
 	}
 	return result;
 }
@@ -271,7 +271,7 @@ recallocv(void *mallptr, $size_t elem_count, $size_t elem_size)
 	result = realloc(mallptr, total_bytes);
 	if likely(result) {
 		if (total_bytes > oldsize)
-			memset((byte_t *)result + oldsize, 0, total_bytes - oldsize);
+			bzero((byte_t *)result + oldsize, total_bytes - oldsize);
 	}
 	return result;
 }
