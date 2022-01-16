@@ -3,7 +3,7 @@ local gcc_opt = options.setdefault("GCC.options", []);
 if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 	gcc_opt.append("-Os");
 ]]]*/
-/* Copyright (c) 2019-2021 Griefer@Work                                       *
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -17,7 +17,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -914,6 +914,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * >> }
 	 *
 	 */
+
+	/* TODO: According to this: https://sourceware.org/bugzilla/show_bug.cgi?id=18228
+	 * The combination of O_PATH|O_NOFOLLOW can be used to on flnknode objects directly,
+	 * similar to the (now abandoned and now longer available) KOS-specific O_SYMLINK.  */
 
 	return state;
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 Griefer@Work
+# Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
 # warranty. In no event will the authors be held liable for any damages
@@ -12,7 +12,7 @@
 #    claim that you wrote the original software. If you use this software
 #    in a product, an acknowledgement (see the following) in the product
 #    documentation is required:
-#    Portions Copyright (c) 2019-2021 Griefer@Work
+#    Portions Copyright (c) 2019-2022 Griefer@Work
 # 2. Altered source versions must be plainly marked as such, and must not be
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
@@ -349,6 +349,14 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					*--disable-nls* | *--enable-nls*)
+						if ! [[ "$CONFIGURE" == *--enable-nls* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-nls* ]]; then
+							echo "	option: --enable-nls"
+							CONFIGURE="$CONFIGURE --enable-nls"
+						fi
+						;;
+
 					*--enable-malloc0returnsnull* | *--disable-malloc0returnsnull*)
 						# Used by (some) Xorg utilities
 						if ! [[ "$CONFIGURE" == *--enable-malloc0returnsnull* ]] && \
@@ -632,6 +640,86 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						   ! [[ "$CONFIGURE" == *--without-xsltproc* ]]; then
 							echo "	option: --without-xsltproc"
 							CONFIGURE="$CONFIGURE --without-xsltproc"
+						fi
+						;;
+
+					*--disable-doxygen-doc* | *--enable-doxygen-doc*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-doc* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-doc* ]]; then
+							echo "	option: --disable-doxygen-doc"
+							CONFIGURE="$CONFIGURE --disable-doxygen-doc"
+						fi
+						;;
+
+					*--disable-doxygen-dot* | *--enable-doxygen-dot*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-dot* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-dot* ]]; then
+							echo "	option: --disable-doxygen-dot"
+							CONFIGURE="$CONFIGURE --disable-doxygen-dot"
+						fi
+						;;
+
+					*--disable-doxygen-man* | *--enable-doxygen-man*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-man* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-man* ]]; then
+							echo "	option: --disable-doxygen-man"
+							CONFIGURE="$CONFIGURE --disable-doxygen-man"
+						fi
+						;;
+
+					*--disable-doxygen-rtf* | *--enable-doxygen-rtf*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-rtf* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-rtf* ]]; then
+							echo "	option: --disable-doxygen-rtf"
+							CONFIGURE="$CONFIGURE --disable-doxygen-rtf"
+						fi
+						;;
+
+					*--disable-doxygen-xml* | *--enable-doxygen-xml*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-xml* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-xml* ]]; then
+							echo "	option: --disable-doxygen-xml"
+							CONFIGURE="$CONFIGURE --disable-doxygen-xml"
+						fi
+						;;
+
+					*--disable-doxygen-chm* | *--enable-doxygen-chm*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-chm* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-chm* ]]; then
+							echo "	option: --disable-doxygen-chm"
+							CONFIGURE="$CONFIGURE --disable-doxygen-chm"
+						fi
+						;;
+
+					*--disable-doxygen-chi* | *--enable-doxygen-chi*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-chi* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-chi* ]]; then
+							echo "	option: --disable-doxygen-chi"
+							CONFIGURE="$CONFIGURE --disable-doxygen-chi"
+						fi
+						;;
+
+					*--disable-doxygen-html* | *--enable-doxygen-html*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-html* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-html* ]]; then
+							echo "	option: --disable-doxygen-html"
+							CONFIGURE="$CONFIGURE --disable-doxygen-html"
+						fi
+						;;
+
+					*--disable-doxygen-ps* | *--enable-doxygen-ps*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-ps* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-ps* ]]; then
+							echo "	option: --disable-doxygen-ps"
+							CONFIGURE="$CONFIGURE --disable-doxygen-ps"
+						fi
+						;;
+
+					*--disable-doxygen-pdf* | *--enable-doxygen-pdf*)
+						if ! [[ "$CONFIGURE" == *--disable-doxygen-pdf* ]] && \
+						   ! [[ "$CONFIGURE" == *--enable-doxygen-pdf* ]]; then
+							echo "	option: --disable-doxygen-pdf"
+							CONFIGURE="$CONFIGURE --disable-doxygen-pdf"
 						fi
 						;;
 

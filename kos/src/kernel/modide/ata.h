@@ -1,4 +1,4 @@
-/* Copyright (c) 2019-2021 Griefer@Work                                       *
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -12,7 +12,7 @@
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -62,6 +62,7 @@ typedef struct {
 
 /* Fill in `hd_io_lbaaddr' and `hd_io_sectors' with `io_lbaaddr' and `io_sectors' */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+/* TODO: This *(u32 *)&-write isn't properly unaligned and needs to use UNALIGNED_SET()! */
 #define AtaAIOHandleData_SetLbaAndSectors(self, io_lbaaddr, io_sectors) \
 	(*(u32 *)&(self)->hd_io_lbaaddr[0] = (u32)(io_lbaaddr),             \
 	 *(u16 *)&(self)->hd_io_lbaaddr[4] = (u16)((io_lbaaddr) >> 32),     \

@@ -1,5 +1,5 @@
 local copyright =
-"/* Copyright (c) 2019-2021 Griefer@Work                                       *
+"/* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -13,7 +13,7 @@ local copyright =
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -96,6 +96,7 @@ function getFilenameForLog(filename: string): string {
 
 @@Safely re-write a hashed file @filename, by calling ${fp_writer(fp: File)}
 function writeHashedFile(filename: string, fp_writer: Callable) {
+	local contents;
 	print "Updating file:", filename;
 #ifndef IGNORE_HASH_DIFF
 	local old_text = none;
@@ -112,6 +113,11 @@ function writeHashedFile(filename: string, fp_writer: Callable) {
 		local old_hash_name, none, old_hash_value = old_hash.partition(":")...;
 		local expected_old_hash = hash(old_hash_name, old_text).hex();
 		if (old_hash_value != expected_old_hash) {
+			contents = File.Writer();
+			fp_writer(contents);
+			contents = contents.string.encode("utf-8").bytes();
+			if (contents == old_text)
+				goto do_write_contents;
 			print "\n\n",;
 			print getFilenameForLog(filename),;
 			print ": Error: File", repr filename, "has been modified";
@@ -130,13 +136,14 @@ function writeHashedFile(filename: string, fp_writer: Callable) {
 	}
 do_overwrite_file:
 #endif /* !IGNORE_HASH_DIFF */
-	File.Writer contents;
+	contents = File.Writer();
 	fp_writer(contents);
 	contents = contents.string.encode("utf-8").bytes();
 #ifndef IGNORE_HASH_DIFF
 	if (old_text is none || old_text != contents)
 #endif /* !IGNORE_HASH_DIFF */
 	{
+do_write_contents:
 		with (local fp = File.open(filename, "w")) {
 			local new_hash = hash(HASHFUNCNAME, contents).hex();
 			fp << "/* HASH " << HASHFUNCNAME << ":" << new_hash << " */\n";
