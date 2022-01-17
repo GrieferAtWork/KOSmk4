@@ -29,7 +29,7 @@
 #define DLMODULE_EXT        dm_pe
 
 #include <kos/exec/pe.h>
-#include <nt/winnt.h>
+#include <nt/pe.h>
 
 DECL_BEGIN
 
@@ -58,6 +58,7 @@ struct dlmodule_pe {
 DECL_END
 
 #include <malloc.h> /* So we can override malloc() and friends */
+#include <string.h> /* So we can override strdup() */
 
 #include <libc/malloc.h> /* So we can override malloc() and friends */
 #include <libdl/extension.h>

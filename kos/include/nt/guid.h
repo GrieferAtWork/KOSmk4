@@ -17,12 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _GUIDDEF_H_
-#define _GUIDDEF_H_ 1
+#ifndef _NT_GUID_H
+#define _NT_GUID_H 1
 
-#ifndef _WINDEF_
-#include "windef.h"
-#endif /* !_WINDEF_ */
+#include "__stdinc.h"
+/**/
+
+#include "types.h"
+/**/
+
+#include <hybrid/typecore.h>
+
+#include <libc/string.h>
+
+/************************************************************************/
+/* Structures relating to GUIDs                                         */
+/************************************************************************/
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -33,21 +43,9 @@ typedef struct _GUID {
 	__UINT32_TYPE__ Data1;
 	__UINT16_TYPE__ Data2;
 	__UINT16_TYPE__ Data3;
-	__UINT8_TYPE__  Data4[8];
+	__UINT8_TYPE__ Data4[8];
 } GUID;
-#endif
-
-#undef DEFINE_GUID
-#ifdef INITGUID
-#ifdef __cplusplus
-#define DEFINE_GUID(name,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) EXTERN_C GUID const DECLSPEC_SELECTANY name = { l,w1,w2,{ b1,b2,b3,b4,b5,b6,b7,b8 } }
-#else /* __cplusplus */
-#define DEFINE_GUID(name,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) GUID const DECLSPEC_SELECTANY name = { l,w1,w2,{ b1,b2,b3,b4,b5,b6,b7,b8 } }
-#endif /* !__cplusplus */
-#else /* INITGUID */
-#define DEFINE_GUID(name,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) EXTERN_C GUID const name
-#endif /* !INITGUID */
-#define DEFINE_OLEGUID(name,l,w1,w2) DEFINE_GUID(name,l,w1,w2,0xC0,0,0,0,0,0,0,0x46)
+#endif /* !GUID_DEFINED */
 
 #ifndef __LPGUID_DEFINED__
 #define __LPGUID_DEFINED__
@@ -61,13 +59,10 @@ typedef GUID const *LPCGUID;
 #ifndef __IID_DEFINED__
 #define __IID_DEFINED__
 typedef GUID IID, *LPIID;
-#define IID_NULL                 GUID_NULL
 #define IsEqualIID(riid1, riid2) IsEqualGUID(riid1, riid2)
-
 typedef GUID CLSID, *LPCLSID;
 #define CLSID_NULL                     GUID_NULL
 #define IsEqualCLSID(rclsid1, rclsid2) IsEqualGUID(rclsid1, rclsid2)
-
 typedef GUID FMTID, *LPFMTID;
 #define FMTID_NULL                     GUID_NULL
 #define IsEqualFMTID(rfmtid1, rfmtid2) IsEqualGUID(rfmtid1, rfmtid2)
@@ -117,17 +112,15 @@ typedef GUID FMTID, *LPFMTID;
 
 #ifndef _SYS_GUID_OPERATORS_
 #define _SYS_GUID_OPERATORS_
-#include <string.h>
-
 #ifdef __cplusplus
-__LOCAL int (InlineIsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
+__LOCAL int(InlineIsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
 	return (((__UINT32_TYPE__ *)&rguid1)[0] == ((__UINT32_TYPE__ *)&rguid2)[0] &&
 	        ((__UINT32_TYPE__ *)&rguid1)[1] == ((__UINT32_TYPE__ *)&rguid2)[1] &&
 	        ((__UINT32_TYPE__ *)&rguid1)[2] == ((__UINT32_TYPE__ *)&rguid2)[2] &&
 	        ((__UINT32_TYPE__ *)&rguid1)[3] == ((__UINT32_TYPE__ *)&rguid2)[3]);
 }
-__LOCAL int (IsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
-	return !memcmp(&rguid1, &rguid2, sizeof(GUID));
+__LOCAL int(IsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
+	return !__libc_memcmp(&rguid1, &rguid2, sizeof(GUID));
 }
 #else /* __cplusplus */
 #define InlineIsEqualGUID(rguid1, rguid2)                                    \
@@ -135,7 +128,7 @@ __LOCAL int (IsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
 	 ((__UINT32_TYPE__ *)(rguid1))[1] == ((__UINT32_TYPE__ *)(rguid2))[1] && \
 	 ((__UINT32_TYPE__ *)(rguid1))[2] == ((__UINT32_TYPE__ *)(rguid2))[2] && \
 	 ((__UINT32_TYPE__ *)(rguid1))[3] == ((__UINT32_TYPE__ *)(rguid2))[3])
-#define IsEqualGUID(rguid1, rguid2) (!memcmp(rguid1, rguid2, sizeof(GUID)))
+#define IsEqualGUID(rguid1, rguid2) (!__libc_memcmp(rguid1, rguid2, sizeof(GUID)))
 #endif /* !__cplusplus */
 
 #ifdef __INLINE_ISEQUAL_GUID
@@ -150,8 +143,12 @@ __LOCAL int (IsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
      !defined(_NO_SYS_GUID_OPERATOR_EQ_))
 #define _SYS_GUID_OPERATOR_EQ_
 #ifdef __cplusplus
-__LOCAL int operator == (REFGUID guidOne, REFGUID guidOther) { return IsEqualGUID(guidOne,guidOther); }
-__LOCAL int operator != (REFGUID guidOne, REFGUID guidOther) { return !(guidOne==guidOther); }
+__LOCAL int operator==(REFGUID guidOne, REFGUID guidOther) {
+	return IsEqualGUID(guidOne, guidOther);
+}
+__LOCAL int operator!=(REFGUID guidOne, REFGUID guidOther) {
+	return !(guidOne == guidOther);
+}
 #endif /* __cplusplus */
 #endif /* ... */
 #endif /* !_SYS_GUID_OPERATORS_ */
@@ -159,4 +156,4 @@ __LOCAL int operator != (REFGUID guidOne, REFGUID guidOther) { return !(guidOne=
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_GUIDDEF_H_ */
+#endif /* !_NT_GUID_H */

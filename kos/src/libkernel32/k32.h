@@ -22,8 +22,7 @@
 
 #include "api.h"
 
-#include <kos/types.h>
-#include <nt/winnt.h>
+#include <nt/types.h>
 
 DECL_BEGIN
 

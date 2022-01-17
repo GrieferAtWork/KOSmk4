@@ -23,8 +23,6 @@
 #include "../__stdinc.h"
 #include "typecore.h"
 
-__DECL_BEGIN
-
 /* Compile-time constant implementations. */
 #define __hybrid_rol8_c(x, shift)  (((x) >> (0x8 - ((shift) & 0x07))) | ((x) << ((shift) & 0x07)))
 #define __hybrid_ror8_c(x, shift)  (((x) << (0x8 - ((shift) & 0x07))) | ((x) >> ((shift) & 0x07)))
@@ -41,38 +39,120 @@ __DECL_BEGIN
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 
-
 /* Arch/Compiler-specific runtime-optimized implementations. */
-#if __has_builtin(__builtin_rotateleft8)
+#if !defined(__hybrid_rol8_r) && __has_builtin(__builtin_rotateleft8)
 #define __hybrid_rol8_r __builtin_rotateleft8
-#endif /* __has_builtin(__builtin_rotateleft8) */
-#if __has_builtin(__builtin_rotateleft16)
+#endif /* !__hybrid_rol8_r && __has_builtin(__builtin_rotateleft8) */
+#if !defined(__hybrid_rol16_r) && __has_builtin(__builtin_rotateleft16)
 #define __hybrid_rol16_r __builtin_rotateleft16
-#endif /* __has_builtin(__builtin_rotateleft16) */
-#if __has_builtin(__builtin_rotateleft32)
+#endif /* !__hybrid_rol16_r && __has_builtin(__builtin_rotateleft16) */
+#if !defined(__hybrid_rol32_r) && __has_builtin(__builtin_rotateleft32)
 #define __hybrid_rol32_r __builtin_rotateleft32
-#endif /* __has_builtin(__builtin_rotateleft32) */
-#if __has_builtin(__builtin_rotateleft64)
+#endif /* !__hybrid_rol32_r && __has_builtin(__builtin_rotateleft32) */
+#if !defined(__hybrid_rol64_r) && __has_builtin(__builtin_rotateleft64)
 #define __hybrid_rol64_r __builtin_rotateleft64
-#endif /* __has_builtin(__builtin_rotateleft64) */
-#if __has_builtin(__builtin_rotateleft128)
+#endif /* !__hybrid_rol64_r && __has_builtin(__builtin_rotateleft64) */
+#if !defined(__hybrid_rol128_r) && __has_builtin(__builtin_rotateleft128)
 #define __hybrid_rol128_r __builtin_rotateleft128
-#endif /* __has_builtin(__builtin_rotateleft128) */
-#if __has_builtin(__builtin_rotateright8)
+#endif /* !__hybrid_rol128_r && __has_builtin(__builtin_rotateleft128) */
+#if !defined(__hybrid_ror8_r) && __has_builtin(__builtin_rotateright8)
 #define __hybrid_ror8_r __builtin_rotateright8
-#endif /* __has_builtin(__builtin_rotateright8) */
-#if __has_builtin(__builtin_rotateright16)
+#endif /* !__hybrid_ror8_r && __has_builtin(__builtin_rotateright8) */
+#if !defined(__hybrid_ror16_r) && __has_builtin(__builtin_rotateright16)
 #define __hybrid_ror16_r __builtin_rotateright16
-#endif /* __has_builtin(__builtin_rotateright16) */
-#if __has_builtin(__builtin_rotateright32)
+#endif /* !__hybrid_ror16_r && __has_builtin(__builtin_rotateright16) */
+#if !defined(__hybrid_ror32_r) && __has_builtin(__builtin_rotateright32)
 #define __hybrid_ror32_r __builtin_rotateright32
-#endif /* __has_builtin(__builtin_rotateright32) */
-#if __has_builtin(__builtin_rotateright64)
+#endif /* !__hybrid_ror32_r && __has_builtin(__builtin_rotateright32) */
+#if !defined(__hybrid_ror64_r) && __has_builtin(__builtin_rotateright64)
 #define __hybrid_ror64_r __builtin_rotateright64
-#endif /* __has_builtin(__builtin_rotateright64) */
-#if __has_builtin(__builtin_rotateright128)
+#endif /* !__hybrid_ror64_r && __has_builtin(__builtin_rotateright64) */
+#if !defined(__hybrid_ror128_r) && __has_builtin(__builtin_rotateright128)
 #define __hybrid_ror128_r __builtin_rotateright128
-#endif /* __has_builtin(__builtin_rotateright128) */
+#endif /* !__hybrid_ror128_r && __has_builtin(__builtin_rotateright128) */
+
+
+#if defined(_MSC_VER) && defined(__CC__)
+#include "host.h"
+__DECL_BEGIN
+
+#ifdef __x86_64__
+#ifndef __hybrid_rol8_r
+#define __hybrid_rol8_r _rotl8
+#ifndef _rotl8
+#define _rotl8 _rotl8
+unsigned char __cdecl _rotl8(unsigned char __val, unsigned char __shift);
+#pragma intrinsic(_rotl8)
+#endif /* !_rotl8 */
+#endif /* !__hybrid_rol8_r */
+
+#ifndef __hybrid_ror8_r
+#define __hybrid_ror8_r _rotr8
+#ifndef _rotr8
+#define _rotr8 _rotr8
+unsigned char __cdecl _rotr8(unsigned char __val, unsigned char __shift);
+#pragma intrinsic(_rotr8)
+#endif /* !_rotr8 */
+#endif /* !__hybrid_ror8_r */
+
+#ifndef __hybrid_rol16_r
+#define __hybrid_rol16_r _rotl16
+#ifndef _rotl16
+unsigned short __cdecl _rotl16(unsigned short __val, unsigned char __shift);
+#pragma intrinsic(_rotl16)
+#endif /* !_rotl16 */
+#endif /* !__hybrid_rol16_r */
+
+#ifndef __hybrid_ror16_r
+#define __hybrid_ror16_r _rotr16
+#ifndef _rotr16
+#define _rotr16 _rotr16
+unsigned short __cdecl _rotr16(unsigned short __val, unsigned char __shift);
+#pragma intrinsic(_rotr16)
+#endif /* !_rotr16 */
+#endif /* __x86_64__ */
+#endif /* !__hybrid_ror16_r */
+
+#if _MSC_VER >= 1300
+#ifndef __hybrid_rol32_r
+#define __hybrid_rol32_r(val, shift) _rotl(val, (int)(__SHIFT_TYPE__)(shift))
+#ifndef _rotl
+#define _rotl _rotl
+unsigned int __cdecl _rotl(unsigned int __val, int __shift);
+#pragma intrinsic(_rotl)
+#endif /* !_rotl */
+#endif /* !__hybrid_rol32_r */
+
+#ifndef __hybrid_ror32_r
+#define __hybrid_ror32_r(val, shift) _rotr(val, (int)(__SHIFT_TYPE__)(shift))
+#ifndef _rotr
+#define _rotr _rotr
+unsigned int __cdecl _rotr(unsigned int __val, int __shift);
+#pragma intrinsic(_rotr)
+#endif /* !_rotr */
+#endif /* !__hybrid_ror32_r */
+
+#ifndef __hybrid_rol64_r
+#define __hybrid_rol64_r(val, shift) _rotl64(val, (int)(__SHIFT_TYPE__)(shift))
+#ifndef _rotl64
+#define _rotl64 _rotl64
+unsigned __int64 __cdecl _rotl64(unsigned __int64 __val, int __shift);
+#pragma intrinsic(_rotl64)
+#endif /* !_rotl64 */
+#endif /* !__hybrid_rol64_r */
+
+#ifndef __hybrid_ror64_r
+#define __hybrid_ror64_r(val, shift) _rotr64(val, (int)(__SHIFT_TYPE__)(shift))
+#ifndef _rotr64
+#define _rotr64 _rotr64
+unsigned __int64 __cdecl _rotr64(unsigned __int64 __val, int __shift);
+#pragma intrinsic(_rotr64)
+#endif /* !_rotr64 */
+#endif /* !__hybrid_ror64_r */
+#endif  /* _MSC_VER >= 1300 */
+
+__DECL_END
+#endif /* _MSC_VER && __CC__ */
 
 #if ((!defined(__hybrid_rol8_r) || !defined(__hybrid_rol16_r) ||  \
       !defined(__hybrid_rol32_r) || !defined(__hybrid_rol64_r) || \
@@ -570,8 +650,5 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 #endif /* !__INTELLISENSE__ */
 #endif /* ... */
 #endif /* __NO_builtin_choose_expr */
-
-
-__DECL_END
 
 #endif /* !__GUARD_HYBRID___ROTATE_H */

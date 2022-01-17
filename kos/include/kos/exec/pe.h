@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 
 #include <kos/exec/elf.h>
-#include <nt/winnt.h>
+#include <nt/pe.h>
 
 #include <libc/string.h>
 

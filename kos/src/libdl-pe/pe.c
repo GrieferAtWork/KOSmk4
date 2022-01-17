@@ -39,13 +39,16 @@
 #include <sys/ioctl.h>
 
 #include <assert.h>
+#include <ctype.h>
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <link.h>
 #include <malloca.h>
+#include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
@@ -353,8 +356,7 @@ done:
 
 
 PRIVATE NONNULL((1)) int CC
-DlModule_PeInitialize(DlModule *__restrict self) {
-	/* Load dependencies of the module. */
+DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 	if (self->dm_depcnt) {
 		PIMAGE_DATA_DIRECTORY imports = DlModule_GetImports(self);
 		PIMAGE_IMPORT_DESCRIPTOR iter, end;
@@ -368,8 +370,12 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 		iter = (PIMAGE_IMPORT_DESCRIPTOR)(self->dm_loadaddr + imports->VirtualAddress);
 		end  = (PIMAGE_IMPORT_DESCRIPTOR)((byte_t *)iter + imports->Size);
 		for (; iter < end; ++iter) {
+			/* Import module symbols. */
+			PIMAGE_THUNK_DATA thunk_iter1, thunk_iter2;
 			char const *filename;
 			REF DlModule *dependency;
+			DWORD thunk1, thunk2;
+
 			/* The import table can be terminated by a ZERO-entry.
 			 * https://msdn.microsoft.com/en-us/library/ms809762.aspx */
 			if (!iter->Characteristics && !iter->TimeDateStamp &&
@@ -386,17 +392,53 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 				goto err;
 			}
 			self->dm_depvec[self->dm_depcnt++] = dependency; /* Inherit reference */
+
+			/* Resolve imported symbols. */
+			thunk1 = iter->OriginalFirstThunk ? iter->OriginalFirstThunk : iter->FirstThunk;
+			thunk2 = iter->FirstThunk ? iter->FirstThunk : iter->OriginalFirstThunk;
+			thunk_iter1 = (PIMAGE_THUNK_DATA)(self->dm_loadaddr + thunk1);
+			thunk_iter2 = (PIMAGE_THUNK_DATA)(self->dm_loadaddr + thunk2);
+			for (;; ++thunk_iter1, ++thunk_iter2) {
+				PIMAGE_IMPORT_BY_NAME ent;
+				void *addr;
+				if (!thunk_iter1->u1.AddressOfData)
+					break; /* ZERO-Terminated. */
+				ent = (PIMAGE_IMPORT_BY_NAME)(self->dm_loadaddr + thunk_iter1->u1.AddressOfData);
+				/* Import the symbol. */
+				addr = libpe_GetProcAddress(dependency, ent->Name);
+				if (!addr && *dl.dl_error_message != NULL) {
+					dl.dl_seterrorf("%q: Symbol %q missing from %q",
+					                self->dm_filename, ent->Name,
+					                dependency->dm_filename);
+					goto err;
+				}
+				thunk_iter1->u1.AddressOfData = (uintptr_t)addr;
+				thunk_iter2->u1.AddressOfData = (uintptr_t)addr;
+			}
 		}
 	}
-
-	/* TODO: Apply relocations */
-	asm("int3");
-
 	return 0;
 err_nomem:
 	dl_seterror_nomem();
 err:
 	return -1;
+}
+
+
+PRIVATE NONNULL((1)) int CC
+DlModule_PeInitialize(DlModule *__restrict self) {
+	int result;
+
+	/* Load dependencies of the module. */
+	result = DlModule_PeInitializeImportTable(self);
+	if (result != 0)
+		goto done;
+
+	/* TODO: Apply relocations */
+	asm("int3");
+
+done:
+	return result;
 }
 
 
