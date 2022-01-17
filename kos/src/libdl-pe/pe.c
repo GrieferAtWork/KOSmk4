@@ -405,6 +405,8 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 					break; /* ZERO-Terminated. */
 				ent = (PIMAGE_IMPORT_BY_NAME)(self->dm_loadaddr + thunk_iter1->u1.AddressOfData);
 				/* Import the symbol. */
+				syslog(LOG_DEBUG, "[pe] GetProcAddress(%q:%q)\n",
+				       dependency->dm_filename, ent->Name);
 				addr = libpe_GetProcAddress(dependency, ent->Name);
 				if (!addr && *dl.dl_error_message != NULL) {
 					dl.dl_seterrorf("%q: Symbol %q missing from %q",
@@ -673,7 +675,6 @@ libpe_linker_main(struct peexec_info *__restrict info,
 			if (!iter->Characteristics && !iter->TimeDateStamp &&
 			    !iter->ForwarderChain && !iter->Name && !iter->FirstThunk)
 				break;
-			syslog(LOG_DEBUG, "[pe] import: %q\n", (char *)(mod->dm_loadaddr + iter->Name));
 			++mod->dm_depcnt;
 		}
 	}

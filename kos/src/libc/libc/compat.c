@@ -42,6 +42,7 @@
 #include <unistd.h>
 
 #include "../user/stdio-api.h"
+#include "../user/stdlib.h"
 #include "compat.h"
 #include "dl.h"
 #include "globals.h"
@@ -784,5 +785,91 @@ NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
 
 DECL_END
 #endif /* __has_include(<fpu_control.h>) */
+
+
+
+
+/************************************************************************/
+/* Misc MSVCRT functions                                                */
+/************************************************************************/
+DECL_BEGIN
+
+typedef struct {
+	int newmode;
+} _startupinfo;
+struct _EXCEPTION_POINTERS;
+typedef int EXCEPTION_DISPOSITION;
+#define EXCEPTION_CONTINUE_SEARCH 0
+
+DEFINE_PUBLIC_ALIAS(DOS$__set_app_type, libd___set_app_type);
+DEFINE_PUBLIC_ALIAS(DOS$__getmainargs, libd___getmainargs);
+DEFINE_PUBLIC_ALIAS(DOS$__wgetmainargs, libd___wgetmainargs);
+DEFINE_PUBLIC_ALIAS(DOS$_XcptFilter, libd__XcptFilter);
+DEFINE_PUBLIC_ALIAS(DOS$_except_handler2, libd__except_handler4);
+DEFINE_PUBLIC_ALIAS(DOS$_except_handler3, libd__except_handler4);
+DEFINE_PUBLIC_ALIAS(DOS$_except_handler_3, libd__except_handler4);
+DEFINE_PUBLIC_ALIAS(DOS$_except_handler4, libd__except_handler4);
+DEFINE_PUBLIC_ALIAS(DOS$_except_handler4_common, libd__except_handler4);
+
+INTERN void LIBDCALL libd___set_app_type(int typ) {
+	CRT_UNIMPLEMENTEDF("__set_app_type(%d)", typ);
+}
+
+INTERN int LIBDCALL
+libd___getmainargs(int *pargc, char ***pargv,
+                   char ***penv, int dowildcard,
+                   _startupinfo *pstartinfo) {
+	struct process_peb *peb = &__peb;
+	(void)dowildcard;
+	(void)pstartinfo;
+	if (pargc != NULL)
+		*pargc = peb->pp_argc;
+	if (pargv != NULL)
+		*pargv = peb->pp_argv;
+	if (penv != NULL)
+		*penv = peb->pp_envp;
+	return 0;
+}
+
+INTERN int LIBDCALL
+libd___wgetmainargs(int *pargc, char16_t ***pargv,
+                    char16_t ***penv, int dowildcard,
+                    _startupinfo *pstartinfo) {
+	(void)dowildcard;
+	(void)pstartinfo;
+	if (pargc != NULL)
+		*pargc = *libc___p___argc();
+	if (pargv != NULL)
+		*pargv = *libd___p___wargv();
+	if (penv != NULL)
+		*penv = *libd___p___winitenv();
+	return 0;
+}
+
+INTERN int LIBDCALL
+libd__XcptFilter(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
+	(void)xno;
+	(void)infp_ptrs;
+	CRT_UNIMPLEMENTEDF("_XcptFilter(%" PRIu32 ", %p)", xno, infp_ptrs);
+	return 0;
+}
+
+INTERN EXCEPTION_DISPOSITION LIBCCALL
+libd__except_handler4(struct _EXCEPTION_RECORD *ExceptionRecord,
+                     void *EstablisherFrame,
+                     struct _CONTEXT *ContextRecord,
+                     void *DispatcherContext) {
+	(void)ExceptionRecord;
+	(void)EstablisherFrame;
+	(void)ContextRecord;
+	(void)DispatcherContext;
+	CRT_UNIMPLEMENTEDF("_except_handler4(%p, %p, %p, %p)",
+	                   ExceptionRecord, EstablisherFrame,
+	                   ContextRecord, DispatcherContext);
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+
+DECL_END
 
 #endif /* !GUARD_LIBC_LIBC_COMPAT_C */

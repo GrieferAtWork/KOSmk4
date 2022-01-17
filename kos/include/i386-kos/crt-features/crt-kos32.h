@@ -5325,10 +5325,12 @@
 #define __CRT_HAVE_ynf
 #define __CRT_HAVE_ynl
 #ifdef __PE__
+#define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE_KOS$__bsd_signal
 #define __CRT_HAVE_KOS$__creat
 #define __CRT_HAVE_KOS$__daylight
 #define __CRT_HAVE_KOS$__errno
+#define __CRT_HAVE___getmainargs
 #define __CRT_HAVE_KOS$__iswalnum_l
 #define __CRT_HAVE_KOS$__iswalpha_l
 #define __CRT_HAVE_KOS$__iswblank_l
@@ -5355,6 +5357,7 @@
 #define __CRT_HAVE_KOS$__p___winitenv
 #define __CRT_HAVE_KOS$__p__wenviron
 #define __CRT_HAVE_KOS$__p__wpgmptr
+#define __CRT_HAVE___set_app_type
 #define __CRT_HAVE_KOS$__strerror_r
 #define __CRT_HAVE_KOS$__sys_errlist
 #define __CRT_HAVE_KOS$__sys_nerr
@@ -5379,8 +5382,14 @@
 #define __CRT_HAVE_KOS$__wcstoul_l
 #define __CRT_HAVE_KOS$__wcstoull_l
 #define __CRT_HAVE_KOS$__wcsxfrm_l
+#define __CRT_HAVE___wgetmainargs
 #define __CRT_HAVE__creat
 #define __CRT_HAVE_KOS$_errno
+#define __CRT_HAVE__except_handler2
+#define __CRT_HAVE__except_handler3
+#define __CRT_HAVE__except_handler4
+#define __CRT_HAVE__except_handler4_common
+#define __CRT_HAVE__except_handler_3
 #define __CRT_HAVE__fgetwc_nolock
 #define __CRT_HAVE__fgetwchar
 #define __CRT_HAVE__fgetws_nolock
@@ -5907,10 +5916,12 @@
 #define __CRT_HAVE_KOS$wutime
 #define __CRT_HAVE_KOS$wutime64
 #else /* __PE__ */
+#define __CRT_HAVE_DOS$_XcptFilter
 #define __CRT_HAVE_DOS$__bsd_signal
 #define __CRT_HAVE_DOS$__creat
 #define __CRT_HAVE_DOS$__daylight
 #define __CRT_HAVE_DOS$__errno
+#define __CRT_HAVE_DOS$__getmainargs
 #define __CRT_HAVE_DOS$__iswalnum_l
 #define __CRT_HAVE_DOS$__iswalpha_l
 #define __CRT_HAVE_DOS$__iswblank_l
@@ -5937,6 +5948,7 @@
 #define __CRT_HAVE_DOS$__p___winitenv
 #define __CRT_HAVE_DOS$__p__wenviron
 #define __CRT_HAVE_DOS$__p__wpgmptr
+#define __CRT_HAVE_DOS$__set_app_type
 #define __CRT_HAVE_DOS$__strerror_r
 #define __CRT_HAVE_DOS$__sys_errlist
 #define __CRT_HAVE_DOS$__sys_nerr
@@ -5961,8 +5973,14 @@
 #define __CRT_HAVE_DOS$__wcstoul_l
 #define __CRT_HAVE_DOS$__wcstoull_l
 #define __CRT_HAVE_DOS$__wcsxfrm_l
+#define __CRT_HAVE_DOS$__wgetmainargs
 #define __CRT_HAVE_DOS$_creat
 #define __CRT_HAVE_DOS$_errno
+#define __CRT_HAVE_DOS$_except_handler2
+#define __CRT_HAVE_DOS$_except_handler3
+#define __CRT_HAVE_DOS$_except_handler4
+#define __CRT_HAVE_DOS$_except_handler4_common
+#define __CRT_HAVE_DOS$_except_handler_3
 #define __CRT_HAVE_DOS$_fgetwc_nolock
 #define __CRT_HAVE_DOS$_fgetwchar
 #define __CRT_HAVE_DOS$_fgetws_nolock

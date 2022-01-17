@@ -5016,6 +5016,7 @@
 #define __CRT_HAVE_KOS$_IO_vfscanf
 #define __CRT_HAVE_KOS$_IO_vsprintf
 #define __CRT_HAVE_KOS$_IO_vsscanf
+#define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE_KOS$__access
 #define __CRT_HAVE_KOS$__acct
 #define __CRT_HAVE_KOS$__acos
@@ -5184,6 +5185,7 @@
 #define __CRT_HAVE_KOS$__gethostname
 #define __CRT_HAVE_KOS$__getitimer
 #define __CRT_HAVE_KOS$__getline
+#define __CRT_HAVE___getmainargs
 #define __CRT_HAVE_KOS$__getmntent_r
 #define __CRT_HAVE_KOS$__getpgid
 #define __CRT_HAVE_KOS$__getrlimit
@@ -5549,6 +5551,7 @@
 #define __CRT_HAVE_KOS$__select
 #define __CRT_HAVE_KOS$__send
 #define __CRT_HAVE_KOS$__sendmmsg
+#define __CRT_HAVE___set_app_type
 #define __CRT_HAVE_KOS$__setdomainname
 #define __CRT_HAVE_KOS$__setfsgid
 #define __CRT_HAVE_KOS$__setfsuid
@@ -5704,6 +5707,7 @@
 #define __CRT_HAVE_KOS$__wcsxfrm_l
 #define __CRT_HAVE_KOS$__wctrans_l
 #define __CRT_HAVE_KOS$__wctype_l
+#define __CRT_HAVE___wgetmainargs
 #define __CRT_HAVE_KOS$__write
 #define __CRT_HAVE_KOS$__writev
 #define __CRT_HAVE_KOS$__xpg_basename
@@ -5774,6 +5778,11 @@
 #define __CRT_HAVE_KOS$_endthreadex
 #define __CRT_HAVE_KOS$_eof
 #define __CRT_HAVE__errno
+#define __CRT_HAVE__except_handler2
+#define __CRT_HAVE__except_handler3
+#define __CRT_HAVE__except_handler4
+#define __CRT_HAVE__except_handler4_common
+#define __CRT_HAVE__except_handler_3
 #define __CRT_HAVE__execl
 #define __CRT_HAVE__execle
 #define __CRT_HAVE__execlp
@@ -8645,6 +8654,7 @@
 #define __CRT_HAVE_DOS$_IO_vfscanf
 #define __CRT_HAVE_DOS$_IO_vsprintf
 #define __CRT_HAVE_DOS$_IO_vsscanf
+#define __CRT_HAVE_DOS$_XcptFilter
 #define __CRT_HAVE_DOS$__access
 #define __CRT_HAVE_DOS$__acct
 #define __CRT_HAVE_DOS$__acos
@@ -8813,6 +8823,7 @@
 #define __CRT_HAVE_DOS$__gethostname
 #define __CRT_HAVE_DOS$__getitimer
 #define __CRT_HAVE_DOS$__getline
+#define __CRT_HAVE_DOS$__getmainargs
 #define __CRT_HAVE_DOS$__getmntent_r
 #define __CRT_HAVE_DOS$__getpgid
 #define __CRT_HAVE_DOS$__getrlimit
@@ -9178,6 +9189,7 @@
 #define __CRT_HAVE_DOS$__select
 #define __CRT_HAVE_DOS$__send
 #define __CRT_HAVE_DOS$__sendmmsg
+#define __CRT_HAVE_DOS$__set_app_type
 #define __CRT_HAVE_DOS$__setdomainname
 #define __CRT_HAVE_DOS$__setfsgid
 #define __CRT_HAVE_DOS$__setfsuid
@@ -9333,6 +9345,7 @@
 #define __CRT_HAVE_DOS$__wcsxfrm_l
 #define __CRT_HAVE_DOS$__wctrans_l
 #define __CRT_HAVE_DOS$__wctype_l
+#define __CRT_HAVE_DOS$__wgetmainargs
 #define __CRT_HAVE_DOS$__write
 #define __CRT_HAVE_DOS$__writev
 #define __CRT_HAVE_DOS$__xpg_basename
@@ -9403,6 +9416,11 @@
 #define __CRT_HAVE_DOS$_endthreadex
 #define __CRT_HAVE_DOS$_eof
 #define __CRT_HAVE_DOS$_errno
+#define __CRT_HAVE_DOS$_except_handler2
+#define __CRT_HAVE_DOS$_except_handler3
+#define __CRT_HAVE_DOS$_except_handler4
+#define __CRT_HAVE_DOS$_except_handler4_common
+#define __CRT_HAVE_DOS$_except_handler_3
 #define __CRT_HAVE_DOS$_execl
 #define __CRT_HAVE_DOS$_execle
 #define __CRT_HAVE_DOS$_execlp
