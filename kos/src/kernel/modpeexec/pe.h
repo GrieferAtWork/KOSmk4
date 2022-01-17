@@ -27,7 +27,8 @@
 
 #include <hybrid/host.h>
 
-#include <nt/winnt.h>
+#include <nt/pe.h>
+
 
 DECL_BEGIN
 

@@ -157,22 +157,26 @@ NOTHROW(FCALL execargs_fini)(struct execargs *__restrict self);
 
 /* Helper macro to allocate a PEB from `struct execargs *args' */
 #ifdef __ARCH_HAVE_COMPAT
-#define mbuilder_alloc_peb32_from_execargs(self, args)                          \
-	((self)->ea_argv_is_compat                                                  \
-	 ? mbuilder_alloc_peb32_p32(self,                                           \
-	                            (args)->ea_argc_inject, (args)->ea_argv_inject, \
-	                            (args)->ea_argv, (args)->ea_envp)               \
-	 : mbuilder_alloc_peb32_p64(self,                                           \
-	                            (args)->ea_argc_inject, (args)->ea_argv_inject, \
-	                            (args)->ea_argv, (args)->ea_envp))
-#define mbuilder_alloc_peb64_from_execargs(self, args)                          \
-	((self)->ea_argv_is_compat                                                  \
-	 ? mbuilder_alloc_peb64_p32(self,                                           \
-	                            (args)->ea_argc_inject, (args)->ea_argv_inject, \
-	                            (args)->ea_argv, (args)->ea_envp)               \
-	 : mbuilder_alloc_peb64_p64(self,                                           \
-	                            (args)->ea_argc_inject, (args)->ea_argv_inject, \
-	                            (args)->ea_argv, (args)->ea_envp))
+#define mbuilder_alloc_peb32_from_execargs(self, args)                                                           \
+	((args)->ea_argv_is_compat                                                                                   \
+	 ? mbuilder_alloc_peb32_p32(self,                                                                            \
+	                            (args)->ea_argc_inject, (args)->ea_argv_inject,                                  \
+	                            (USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *)(args)->ea_argv, \
+	                            (USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *)(args)->ea_envp) \
+	 : mbuilder_alloc_peb32_p64(self,                                                                            \
+	                            (args)->ea_argc_inject, (args)->ea_argv_inject,                                  \
+	                            (USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *)(args)->ea_argv, \
+	                            (USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *)(args)->ea_envp))
+#define mbuilder_alloc_peb64_from_execargs(self, args)                                                           \
+	((args)->ea_argv_is_compat                                                                                   \
+	 ? mbuilder_alloc_peb64_p32(self,                                                                            \
+	                            (args)->ea_argc_inject, (args)->ea_argv_inject,                                  \
+	                            (USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *)(args)->ea_argv, \
+	                            (USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *)(args)->ea_envp) \
+	 : mbuilder_alloc_peb64_p64(self,                                                                            \
+	                            (args)->ea_argc_inject, (args)->ea_argv_inject,                                  \
+	                            (USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *)(args)->ea_argv, \
+	                            (USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *)(args)->ea_envp))
 #if __SIZEOF_POINER__ >= 8
 #define mbuilder_alloc_peb_from_execargs       mbuilder_alloc_peb64_from_execargs
 #define mbuilder_alloc_compatpeb_from_execargs mbuilder_alloc_peb32_from_execargs

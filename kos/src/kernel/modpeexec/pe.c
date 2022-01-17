@@ -25,6 +25,7 @@
 
 #include <kernel/driver.h>
 #include <kernel/execabi.h>
+#include <kernel/fs/dirent.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/path.h>
 #include <kernel/mman/execinfo.h>
@@ -43,7 +44,7 @@
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-#include <nt/winnt.h>
+#include <nt/pe.h>
 
 #include <assert.h>
 #include <format-printer.h>

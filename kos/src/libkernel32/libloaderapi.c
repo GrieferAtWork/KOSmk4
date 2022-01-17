@@ -56,6 +56,7 @@ DEFINE_PUBLIC_ALIAS(FreeLibraryAndExitThread, libk32_FreeLibraryAndExitThread);
 
 PRIVATE WUNUSED NONNULL((1)) char *CC wcs2utf8(LPCWSTR str) {
 	/* TODO: Convert `lpLibFileName' to utf-8 */
+	(void)str;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -142,7 +143,7 @@ libk32_FreeLibraryAndExitThread(HMODULE hLibModule, DWORD dwExitCode) {
 	dlclose(hLibModule);
 	/* TODO: This sets the pthread return value, but we want to set the system thread exit code!
 	 * libc: >> pthread_exit_thread(&current, dwExitCode); */
-	pthread_exit((void *)dwExitCode);
+	pthread_exit((void *)(uintptr_t)dwExitCode);
 }
 
 
