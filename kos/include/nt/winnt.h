@@ -28,6 +28,8 @@
 
 #include <features.h>
 #include <ctype.h>
+#include <libc/string.h>
+#include <libc/strings.h>
 
 #ifndef _BASETSD_H_
 #include "basetsd.h"
@@ -801,6 +803,100 @@ __DECL_END
 #define MAXIMUM_WAIT_OBJECTS  64
 #define MAXIMUM_SUSPEND_COUNT MAXCHAR
 
+#include <hybrid/typecore.h>
+
+#include <nt/arch/bittest.h>
+#include <nt/arch/cpu.h>
+#include <nt/arch/interlocked.h>
+
+#if __SIZEOF_SIZE_T__ >= 8
+#define InterlockedExchangeAddSizeT(a, b) _InterlockedExchangeAdd64((__LONG64_TYPE__ *)(a), b)
+#define InterlockedIncrementSizeT(a)      _InterlockedIncrement64((__LONG64_TYPE__ *)(a))
+#define InterlockedDecrementSizeT(a)      _InterlockedDecrement64((__LONG64_TYPE__ *)(a))
+#else /* __SIZEOF_SIZE_T__ >= 8 */
+#define InterlockedExchangeAddSizeT(a, b) _InterlockedExchangeAdd((__LONG32_TYPE__ *)(a), b)
+#define InterlockedIncrementSizeT(a)      _InterlockedIncrement((__LONG32_TYPE__ *)(a))
+#define InterlockedDecrementSizeT(a)      _InterlockedDecrement((__LONG32_TYPE__ *)(a))
+#endif /* __SIZEOF_SIZE_T__ < 8 */
+
+#define BitScanForward                           _BitScanForward
+#define BitScanReverse                           _BitScanReverse
+#define BitScanForward64                         _BitScanForward64
+#define BitScanReverse64                         _BitScanReverse64
+#define BitTest                                  _bittest
+#define BitTestAndComplement                     _bittestandcomplement
+#define BitTestAndSet                            _bittestandset
+#define BitTestAndReset                          _bittestandreset
+#define BitTest64                                _bittest64
+#define BitTestAndComplement64                   _bittestandcomplement64
+#define BitTestAndSet64                          _bittestandset64
+#define BitTestAndReset64                        _bittestandreset64
+#define InterlockedBitTestAndComplement          _interlockedbittestandcomplement
+#define InterlockedBitTestAndComplement64        _interlockedbittestandcomplement64
+#define InterlockedBitTestAndSet                 _interlockedbittestandset
+#define InterlockedBitTestAndSet64               _interlockedbittestandset64
+#define InterlockedBitTestAndReset               _interlockedbittestandreset
+#define InterlockedBitTestAndReset64             _interlockedbittestandreset64
+#define InterlockedIncrement16                   _InterlockedIncrement16
+#define InterlockedDecrement16                   _InterlockedDecrement16
+#define InterlockedCompareExchange16             _InterlockedCompareExchange16
+#define InterlockedAnd                           _InterlockedAnd
+#define InterlockedOr                            _InterlockedOr
+#define InterlockedXor                           _InterlockedXor
+#define InterlockedIncrement                     _InterlockedIncrement
+#define InterlockedIncrementAcquire              _InterlockedIncrementAcquire
+#define InterlockedIncrementRelease              _InterlockedIncrementRelease
+#define InterlockedDecrement                     _InterlockedDecrement
+#define InterlockedDecrementAcquire              _InterlockedDecrementAcquire
+#define InterlockedDecrementRelease              _InterlockedDecrementRelease
+#define InterlockedAdd                           _InterlockedAdd
+#define InterlockedExchange                      _InterlockedExchange
+#define InterlockedExchangeAdd                   _InterlockedExchangeAdd
+#define InterlockedCompareExchange               _InterlockedCompareExchange
+#define InterlockedCompareExchangeAcquire        _InterlockedCompareExchangeAcquire
+#define InterlockedCompareExchangeRelease        _InterlockedCompareExchangeRelease
+#define InterlockedAnd64                         _InterlockedAnd64
+#define InterlockedAndAffinity                   _InterlockedAnd64
+#define InterlockedOr64                          _InterlockedOr64
+#define InterlockedOrAffinity                    _InterlockedOr64
+#define InterlockedXor64                         _InterlockedXor64
+#define InterlockedIncrement64                   _InterlockedIncrement64
+#define InterlockedDecrement64                   _InterlockedDecrement64
+#define InterlockedAdd64                         _InterlockedAdd64
+#define InterlockedExchange64                    _InterlockedExchange64
+#define InterlockedExchangeAcquire64             _InterlockedExchangeAcquire64
+#define InterlockedExchangeAdd64                 _InterlockedExchangeAdd64
+#define InterlockedCompareExchange64             _InterlockedCompareExchange64
+#define InterlockedCompareExchangeAcquire64      _InterlockedCompareExchangeAcquire64
+#define InterlockedCompareExchangeRelease64      _InterlockedCompareExchangeRelease64
+#define InterlockedExchangePointer               _InterlockedExchangePointer
+#define InterlockedCompareExchangePointer        _InterlockedCompareExchangePointer
+#define InterlockedCompareExchangePointerAcquire _InterlockedCompareExchangePointer
+#define InterlockedCompareExchangePointerRelease _InterlockedCompareExchangePointer
+#define InterlockedIncrement16                   _InterlockedIncrement16
+#define InterlockedDecrement16                   _InterlockedDecrement16
+#define InterlockedCompareExchange16             _InterlockedCompareExchange16
+#define InterlockedAnd                           _InterlockedAnd
+#define InterlockedOr                            _InterlockedOr
+#define InterlockedXor                           _InterlockedXor
+#define InterlockedIncrement                     _InterlockedIncrement
+#define InterlockedDecrement                     _InterlockedDecrement
+#define InterlockedExchange                      _InterlockedExchange
+#define InterlockedAnd64                         _InterlockedAnd64
+#define InterlockedOr64                          _InterlockedOr64
+#define InterlockedXor64                         _InterlockedXor64
+#define InterlockedExchangeAdd                   _InterlockedExchangeAdd
+#define InterlockedCompareExchange               _InterlockedCompareExchange
+#define InterlockedAdd                           _InterlockedAdd
+#define InterlockedIncrement64                   _InterlockedIncrement64
+#define InterlockedDecrement64                   _InterlockedDecrement64
+#define InterlockedExchange64                    _InterlockedExchange64
+#define InterlockedExchangeAdd64                 _InterlockedExchangeAdd64
+#define InterlockedAdd64                         _InterlockedAdd64
+#define InterlockedCompareExchange64             _InterlockedCompareExchange64
+#define InterlockedCompareExchangePointer        _InterlockedCompareExchangePointer
+#define InterlockedExchangePointer               _InterlockedExchangePointer
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -809,233 +905,14 @@ typedef KSPIN_LOCK *PKSPIN_LOCK;
 
 #ifdef __x86_64__
 #if defined(__x86_64__) && !defined(RC_INVOKED)
-#define BitTest                      _bittest
-#define BitTestAndComplement         _bittestandcomplement
-#define BitTestAndSet                _bittestandset
-#define BitTestAndReset              _bittestandreset
-#define InterlockedBitTestAndSet     _interlockedbittestandset
-#define InterlockedBitTestAndReset   _interlockedbittestandreset
-#define BitTest64                    _bittest64
-#define BitTestAndComplement64       _bittestandcomplement64
-#define BitTestAndSet64              _bittestandset64
-#define BitTestAndReset64            _bittestandreset64
-#define InterlockedBitTestAndSet64   _interlockedbittestandset64
-#define InterlockedBitTestAndReset64 _interlockedbittestandreset64
-BOOLEAN _bittest(LONG const *Base, LONG Offset);
-BOOLEAN _bittestandcomplement(LONG *Base, LONG Offset);
-
-#ifndef __CRT__NO_INLINE
-__CRT_INLINE BOOLEAN(_bittest)(LONG const *Base, LONG Offset) {
-	int old = 0;
-	__asm__ __volatile__("btl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN(_bittestandcomplement)(LONG *Base, LONG Offset) {
-	int old = 0;
-	__asm__ __volatile__("btcl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-#endif /* __CRT__NO_INLINE */
-
-BOOLEAN InterlockedBitTestAndComplement(LONG *Base, LONG Bit);
-BOOLEAN _bittestandset(LONG *Base, LONG Offset);
-BOOLEAN _bittestandreset(LONG *Base, LONG Offset);
-BOOLEAN _interlockedbittestandset(LONG *Base, LONG Offset);
-BOOLEAN _interlockedbittestandreset(LONG *Base, LONG Offset);
-BOOLEAN _bittest64(LONG64 const *Base, LONG64 Offset);
-BOOLEAN _bittestandcomplement64(LONG64 *Base, LONG64 Offset);
-BOOLEAN _bittestandset64(LONG64 *Base, LONG64 Offset);
-BOOLEAN _bittestandreset64(LONG64 *Base, LONG64 Offset);
-BOOLEAN _interlockedbittestandset64(LONG64 *Base, LONG64 Offset);
-BOOLEAN _interlockedbittestandreset64(LONG64 *Base, LONG64 Offset);
-#ifndef __CRT__NO_INLINE
-__CRT_INLINE BOOLEAN InterlockedBitTestAndComplement(LONG *Base, LONG Bit) {
-	int old = 0;
-	__asm__ __volatile__("lock ; btcl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Bit));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _bittestandset(LONG *Base, LONG Offset) {
-	int old = 0;
-	__asm__ __volatile__("btsl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _bittestandreset(LONG *Base, LONG Offset) {
-	int old = 0;
-	__asm__ __volatile__("btrl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _interlockedbittestandset(LONG *Base, LONG Offset) {
-	int old = 0;
-	__asm__ __volatile__("lock ; btsl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _interlockedbittestandreset(LONG *Base, LONG Offset) {
-	int old = 0;
-	__asm__ __volatile__("lock ; btrl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _bittest64(LONG64 const *Base, LONG64 Offset) {
-	int old = 0;
-	__asm__ __volatile__("btq %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile LONG64 *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _bittestandcomplement64(LONG64 *Base, LONG64 Offset) {
-	int old = 0;
-	__asm__ __volatile__("btcq %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile LONG64 *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _bittestandset64(LONG64 *Base, LONG64 Offset) {
-	int old = 0;
-	__asm__ __volatile__("btsq %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile LONG64 *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _bittestandreset64(LONG64 *Base, LONG64 Offset) {
-	int old = 0;
-	__asm__ __volatile__("btrq %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile LONG64 *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _interlockedbittestandset64(LONG64 *Base, LONG64 Offset) {
-	int old = 0;
-	__asm__ __volatile__("lock ; btsq %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile LONG64 *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN _interlockedbittestandreset64(LONG64 *Base, LONG64 Offset) {
-	int old = 0;
-	__asm__ __volatile__("lock ; btrq %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile LONG64 *)Base))
-	                     : "Ir"(Offset));
-	return (BOOLEAN)(old != 0);
-}
-#endif /* !__CRT__NO_INLINE */
-
-#define BitScanForward   _BitScanForward
-#define BitScanReverse   _BitScanReverse
-#define BitScanForward64 _BitScanForward64
-#define BitScanReverse64 _BitScanReverse64
-
-BOOLEAN (_BitScanForward)(DWORD *Index, DWORD Mask);
-BOOLEAN (_BitScanReverse)(DWORD *Index, DWORD Mask);
-BOOLEAN (_BitScanForward64)(DWORD *Index, DWORD64 Mask);
-BOOLEAN (_BitScanReverse64)(DWORD *Index, DWORD64 Mask);
-
-#ifndef __CRT__NO_INLINE
-__CRT_INLINE BOOLEAN(_BitScanForward)(DWORD *Index, DWORD Mask) {
-	__asm__ __volatile__("bsfl %1,%0"
-	                     : "=r"(Mask), "=m"((*(volatile __LONG32_TYPE__ *)Index)));
-	return Mask != 0;
-}
-__CRT_INLINE BOOLEAN(_BitScanReverse)(DWORD *Index, DWORD Mask) {
-	__asm__ __volatile__("bsrl %1,%0"
-	                     : "=r"(Mask), "=m"((*(volatile __LONG32_TYPE__ *)Index)));
-	return Mask != 0;
-}
-__CRT_INLINE BOOLEAN(_BitScanForward64)(DWORD *Index, DWORD64 Mask) {
-	__asm__ __volatile__("bsfq %1,%0"
-	                     : "=r"(Mask), "=m"((*(volatile LONG64 *)Index)));
-	return Mask != 0;
-}
-__CRT_INLINE BOOLEAN(_BitScanReverse64)(DWORD *Index, DWORD64 Mask) {
-	__asm__ __volatile__("bsrq %1,%0"
-	                     : "=r"(Mask), "=m"((*(volatile LONG64 *)Index)));
-	return Mask != 0;
-}
-#endif /* !__CRT__NO_INLINE */
-
-#define InterlockedIncrement16                                              _InterlockedIncrement16
-#define InterlockedDecrement16                                              _InterlockedDecrement16
-#define InterlockedCompareExchange16                                        _InterlockedCompareExchange16
-#define InterlockedAnd                                                      _InterlockedAnd
-#define InterlockedOr                                                       _InterlockedOr
-#define InterlockedXor                                                      _InterlockedXor
-#define InterlockedIncrement                                                _InterlockedIncrement
-#define InterlockedIncrementAcquire                                         InterlockedIncrement
-#define InterlockedIncrementRelease                                         InterlockedIncrement
-#define InterlockedDecrement                                                _InterlockedDecrement
-#define InterlockedDecrementAcquire                                         InterlockedDecrement
-#define InterlockedDecrementRelease                                         InterlockedDecrement
-#define InterlockedAdd                                                      _InterlockedAdd
-#define InterlockedExchange                                                 _InterlockedExchange
-#define InterlockedExchangeAdd                                              _InterlockedExchangeAdd
-#define InterlockedCompareExchange                                          _InterlockedCompareExchange
-#define InterlockedCompareExchangeAcquire                                   InterlockedCompareExchange
-#define InterlockedCompareExchangeRelease                                   InterlockedCompareExchange
-#define InterlockedAnd64                                                    _InterlockedAnd64
-#define InterlockedAndAffinity                                              InterlockedAnd64
-#define InterlockedOr64                                                     _InterlockedOr64
-#define InterlockedOrAffinity                                               InterlockedOr64
-#define InterlockedXor64                                                    _InterlockedXor64
-#define InterlockedIncrement64                                              _InterlockedIncrement64
-#define InterlockedDecrement64                                              _InterlockedDecrement64
-#define InterlockedAdd64                                                    _InterlockedAdd64
-#define InterlockedExchange64                                               _InterlockedExchange64
-#define InterlockedExchangeAcquire64                                        InterlockedExchange64
-#define InterlockedExchangeAdd64                                            _InterlockedExchangeAdd64
-#define InterlockedCompareExchange64                                        _InterlockedCompareExchange64
-#define InterlockedCompareExchangeAcquire64                                 InterlockedCompareExchange64
-#define InterlockedCompareExchangeRelease64                                 InterlockedCompareExchange64
-#define InterlockedExchangePointer                                          _InterlockedExchangePointer
-#define InterlockedCompareExchangePointer                                   _InterlockedCompareExchangePointer
-#define InterlockedCompareExchangePointerAcquire                            _InterlockedCompareExchangePointer
-#define InterlockedCompareExchangePointerRelease                            _InterlockedCompareExchangePointer
-#define InterlockedExchangeAddSizeT(a, b)                                   InterlockedExchangeAdd64((LONG64 *)a, b)
-#define InterlockedIncrementSizeT(a)                                        InterlockedIncrement64((LONG64 *)a)
-#define InterlockedDecrementSizeT(a)                                        InterlockedDecrement64((LONG64 *)a)
-#define InterlockedIncrement16(Addend)                                      __hybrid_atomic_incfetch(*(Addend))
-#define InterlockedDecrement16(Addend)                                      __hybrid_atomic_decfetch(*(Addend))
-#define InterlockedCompareExchange16(Destination, ExChange, Comperand)      __hybrid_atomic_cmpxch_val(*(Destination), Comperand, ExChange)
-#define InterlockedAnd(Destination, Value)                                  __hybrid_atomic_andfetch(*(Destination), Value)
-#define InterlockedOr(Destination, Value)                                   __hybrid_atomic_orfetch(*(Destination), Value)
-#define InterlockedXor(Destination, Value)                                  __hybrid_atomic_xorfetch(*(Destination), Value)
-#define InterlockedIncrement(Addend)                                        __hybrid_atomic_incfetch(*(Addend))
-#define InterlockedDecrement(Addend)                                        __hybrid_atomic_decfetch(*(Addend))
-#define InterlockedExchange(Target, Value)                                  __hybrid_atomic_xch(*(Target), Value)
-#define InterlockedAnd64(Destination, Value)                                __hybrid_atomic_andfetch(*(Destination), Value)
-#define InterlockedOr64(Destination, Value)                                 __hybrid_atomic_orfetch(*(Destination), Value)
-#define InterlockedXor64(Destination, Value)                                __hybrid_atomic_xorfetch(*(Destination), Value)
-#define InterlockedExchangeAdd(Addend, Value)                               __hybrid_atomic_fetchadd(*(Addend), Value)
-#define InterlockedCompareExchange(Destination, ExChange, Comperand)        __hybrid_atomic_cmpxch_val(*(Destination), Comperand, ExChange)
-#define InterlockedAdd(Addend, Value)                                       __hybrid_atomic_addfetch(*(Addend), Value)
-#define InterlockedIncrement64(Addend)                                      __hybrid_atomic_incfetch(*(Addend))
-#define InterlockedDecrement64(Addend)                                      __hybrid_atomic_decfetch(*(Addend))
-#define InterlockedExchange64(Target, Value)                                __hybrid_atomic_xch(*(Target), Value)
-#define InterlockedExchangeAdd64(Addend, Value)                             __hybrid_atomic_fetchadd(*(Addend), Value)
-#define InterlockedAdd64(Addend, Value)                                     __hybrid_atomic_addfetch(*(Addend), Value)
-#define InterlockedCompareExchange64(Destination, ExChange, Comperand)      __hybrid_atomic_cmpxch_val(*(Destination), Comperand, ExChange)
-#define InterlockedCompareExchangePointer(Destination, ExChange, Comperand) __hybrid_atomic_cmpxch_val(*(Destination), Comperand, ExChange)
-#define InterlockedExchangePointer(Target, Value)                           __hybrid_atomic_xch(*(Target), Value)
-#define CacheLineFlush(Address)                                             _mm_clflush(Address)
-#define _ReadWriteBarrier()                                                 __COMPILER_BARRIER()
-#define FastFence                                                           __faststorefence /* FIXME: implement properly */
-#define LoadFence                                                           _mm_lfence
-#define MemoryFence                                                         _mm_mfence
-#define StoreFence                                                          _mm_sfence
-
 void(__faststorefence)(void);
 void(_m_prefetchw)(void *Source);
+
+#define CacheLineFlush(Address) _mm_clflush(Address)
+#define FastFence               __faststorefence /* FIXME: implement properly */
+#define LoadFence               _mm_lfence
+#define MemoryFence             _mm_mfence
+#define StoreFence              _mm_sfence
 
 #include <asm/intrin.h>
 #define YieldProcessor             _mm_pause
@@ -1069,15 +946,6 @@ LONG64 Multiply128(LONG64 Multiplier, LONG64 Multiplicand, LONG64 *HighProduct);
 DWORD64 UnsignedMultiply128(DWORD64 Multiplier, DWORD64 Multiplicand, DWORD64 *HighProduct);
 LONG64 MultiplyExtract128(LONG64 Multiplier, LONG64 Multiplicand, BYTE Shift);
 DWORD64 UnsignedMultiplyExtract128(DWORD64 Multiplier, DWORD64 Multiplicand, BYTE Shift);
-
-#define __readgsbyte(Offset)   __readgsb(Offset)
-#define __readgsword(Offset)   __readgsw(Offset)
-#define __readgsdword(Offset)  __readgsl(Offset)
-#define __readgsqword(Offset)  __readgsq(Offset)
-#define __writegsbyte(Offset)  __writegsb(Offset)
-#define __writegsword(Offset)  __writegsw(Offset)
-#define __writegsdword(Offset) __writegsl(Offset)
-#define __writegsqword(Offset) __writegsq(Offset)
 
 #ifndef __CRT__NO_INLINE
 __CRT_INLINE LONG64(MultiplyExtract128)(LONG64 Multiplier, LONG64 Multiplicand, BYTE Shift) {
@@ -1237,72 +1105,16 @@ typedef DWORD (*POUT_OF_PROCESS_FUNCTION_TABLE_CALLBACK)(HANDLE Process, PVOID T
 
 #define OUT_OF_PROCESS_FUNCTION_TABLE_CALLBACK_EXPORT_NAME "OutOfProcessFunctionTableCallback"
 struct _EXCEPTION_RECORD;
-NTSYSAPI VOID(__cdecl RtlRestoreContext)(PCONTEXT ContextRecord, struct _EXCEPTION_RECORD *ExceptionRecord);
-NTSYSAPI BOOLEAN(__cdecl RtlAddFunctionTable)(PRUNTIME_FUNCTION FunctionTable, DWORD EntryCount, DWORD64 BaseAddress);
-NTSYSAPI BOOLEAN(__cdecl RtlInstallFunctionTableCallback)(DWORD64 TableIdentifier, DWORD64 BaseAddress, DWORD Length, PGET_RUNTIME_FUNCTION_CALLBACK Callback, PVOID Context, PCWSTR OutOfProcessCallbackDll);
-NTSYSAPI BOOLEAN(__cdecl RtlDeleteFunctionTable)(PRUNTIME_FUNCTION FunctionTable);
+NTSYSAPI VOID (__ATTR_CDECL RtlRestoreContext)(PCONTEXT ContextRecord, struct _EXCEPTION_RECORD *ExceptionRecord);
+NTSYSAPI BOOLEAN (__ATTR_CDECL RtlAddFunctionTable)(PRUNTIME_FUNCTION FunctionTable, DWORD EntryCount, DWORD64 BaseAddress);
+NTSYSAPI BOOLEAN (__ATTR_CDECL RtlInstallFunctionTableCallback)(DWORD64 TableIdentifier, DWORD64 BaseAddress, DWORD Length, PGET_RUNTIME_FUNCTION_CALLBACK Callback, PVOID Context, PCWSTR OutOfProcessCallbackDll);
+NTSYSAPI BOOLEAN (__ATTR_CDECL RtlDeleteFunctionTable)(PRUNTIME_FUNCTION FunctionTable);
 
 #endif /* end of __x86_64__ */
 
 
 
 #ifdef _X86_
-#if defined(__i386__) && !defined(__x86_64__) && !defined(RC_INVOKED)
-
-#define BitTest                      _bittest
-#define BitTestAndComplement         _bittestandcomplement
-#define BitTestAndSet                _bittestandset
-#define BitTestAndReset              _bittestandreset
-#define InterlockedBitTestAndSet     _interlockedbittestandset
-#define InterlockedBitTestAndReset   _interlockedbittestandreset
-#define BitScanForward               _BitScanForward
-#define BitScanReverse               _BitScanReverse
-#define InterlockedIncrement16       _InterlockedIncrement16
-#define InterlockedDecrement16       _InterlockedDecrement16
-#define InterlockedCompareExchange16 _InterlockedCompareExchange16
-#define InterlockedIncrementAcquire  InterlockedIncrement
-#define InterlockedIncrementRelease  InterlockedIncrement
-BOOLEAN (InterlockedBitTestAndSet)(LONG *Base, LONG Bit);
-BOOLEAN (InterlockedBitTestAndReset)(LONG *Base, LONG Bit);
-#ifndef __CRT__NO_INLINE
-__CRT_INLINE BOOLEAN InterlockedBitTestAndSet(LONG *Base, LONG Bit) {
-	int old = 0;
-	__asm__ __volatile__("lock ; btsl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Bit));
-	return (BOOLEAN)(old != 0);
-}
-__CRT_INLINE BOOLEAN InterlockedBitTestAndReset(LONG *Base, LONG Bit) {
-	int old = 0;
-	__asm__ __volatile__("lock ; btrl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Bit));
-	return (BOOLEAN)(old != 0);
-}
-#endif /* !__CRT__NO_INLINE */
-
-BOOLEAN (InterlockedBitTestAndComplement)(LONG *Base, LONG Bit);
-#ifndef __CRT__NO_INLINE
-__CRT_INLINE BOOLEAN InterlockedBitTestAndComplement(LONG *Base, LONG Bit) {
-	int old = 0;
-	__asm__ __volatile__("lock ; btcl %2,%1\n\tsbbl %0,%0 "
-	                     : "=r"(old), "=m"((*(volatile __LONG32_TYPE__ *)Base))
-	                     : "Ir"(Bit));
-	return (BOOLEAN)(old != 0);
-}
-#endif /* !__CRT__NO_INLINE */
-
-#ifdef _PREFIX_
-BYTE(__readfsbyte)(DWORD Offset);
-WORD(__readfsword)(DWORD Offset);
-DWORD(__readfsdword)(DWORD Offset);
-VOID(__writefsbyte)(DWORD Offset, BYTE Data);
-VOID(__writefsword)(DWORD Offset, WORD Data);
-VOID(__writefsdword)(DWORD Offset, DWORD Data);
-#endif /* _PREFIX_ */
-#endif /* defined(__i386__) && !defined(__x86_64__) && !defined(RC_INVOKED) */
-
-
 #if defined(__i386__) && !defined(__x86_64__)
 #include <asm/intrin.h>
 #define YieldProcessor()        __pause()
@@ -1325,7 +1137,7 @@ __CRT_INLINE VOID MemoryBarrier(VOID) {
 	                     : "=r"(Barrier));
 }
 #endif /* !__CRT__NO_INLINE */
-#endif /* defined(__i386__) && !defined(__x86_64__) */
+#endif /* __i386__ && !__x86_64__ */
 
 #define EXCEPTION_READ_FAULT    0
 #define EXCEPTION_WRITE_FAULT   1
@@ -4459,7 +4271,7 @@ typedef IMAGE_THUNK_DATA32 *PIMAGE_THUNK_DATA32;
 #define IMAGE_SNAP_BY_ORDINAL64(Ordinal) ((Ordinal & IMAGE_ORDINAL_FLAG64) != 0)
 #define IMAGE_SNAP_BY_ORDINAL32(Ordinal) ((Ordinal & IMAGE_ORDINAL_FLAG32) != 0)
 
-typedef VOID(NTAPI *PIMAGE_TLS_CALLBACK)(PVOID DllHandle, DWORD Reason, PVOID Reserved);
+typedef VOID (NTAPI *PIMAGE_TLS_CALLBACK)(PVOID DllHandle, DWORD Reason, PVOID Reserved);
 
 typedef struct _IMAGE_TLS_DIRECTORY64 {
 	ULONGLONG StartAddressOfRawData;
@@ -4863,8 +4675,6 @@ typedef struct IMAGE_COR20_HEADER {
 } IMAGE_COR20_HEADER, *PIMAGE_COR20_HEADER;
 #endif
 
-#include <string.h>
-
 #ifndef _SLIST_HEADER_
 #define _SLIST_HEADER_
 
@@ -4955,45 +4765,15 @@ NTSYSAPI VOID NTAPI RtlCaptureContext(PCONTEXT ContextRecord);
 #define COMPRESSION_ENGINE_MAXIMUM  (0x0100)
 #define COMPRESSION_ENGINE_HIBER    (0x0200)
 
-#ifndef __CRT__NO_INLINE
-#if _DBG_MEMCPY_INLINE_ && !defined(_MEMCPY_INLINE_) && !defined(_CRTBLD)
-#define _MEMCPY_INLINE_
-__CRT_INLINE PVOID __cdecl memcpy_inline(void *dst, const void *src, size_t size) {
-	if (((char *)dst > (char *)src) && ((char *)dst < ((char *)src + size))) {
-		__debugbreak();
-	}
-	return memcpy(dst, src, size);
-}
-#define memcpy memcpy_inline
-#endif /* _DBG_MEMCPY_INLINE_ && !defined(_MEMCPY_INLINE_) && !defined(_CRTBLD) */
-#endif /* !__CRT__NO_INLINE */
-
 NTSYSAPI SIZE_T NTAPI RtlCompareMemory(const VOID *Source1, const VOID *Source2, SIZE_T Length);
+extern void WINAPI RtlUnwind(PVOID TargetFrame, PVOID TargetIp, PEXCEPTION_RECORD ExceptionRecord, PVOID ReturnValue);
 
-void WINAPI RtlUnwind(PVOID TargetFrame, PVOID TargetIp, PEXCEPTION_RECORD ExceptionRecord, PVOID ReturnValue);
-
-#define RtlEqualMemory(Destination, Source, Length) (!memcmp((Destination), (Source), (Length)))
-#define RtlMoveMemory(Destination, Source, Length)  memmove((Destination), (Source), (Length))
-#define RtlCopyMemory(Destination, Source, Length)  memcpy((Destination), (Source), (Length))
-#define RtlFillMemory(Destination, Length, Fill)    memset((Destination), (Fill), (Length))
-#define RtlZeroMemory(Destination, Length)          memset((Destination), 0, (Length))
-
-PVOID WINAPI RtlSecureZeroMemory(PVOID ptr, SIZE_T cnt);
-#ifndef __CRT__NO_INLINE
-__CRT_INLINE PVOID WINAPI RtlSecureZeroMemory(PVOID ptr, SIZE_T cnt) {
-	volatile char *vptr = (volatile char *)ptr;
-#ifdef __x86_64__
-	__stosb((PBYTE)((DWORD64)vptr), 0, cnt);
-#else
-	while (cnt) {
-		*vptr = 0;
-		vptr++;
-		cnt--;
-	}
-#endif /* __x86_64__ */
-	return ptr;
-}
-#endif /* !__CRT__NO_INLINE */
+#define RtlEqualMemory(Destination, Source, Length) (__libc_memcmp(Destination, Source, Length) == 0)
+#define RtlMoveMemory(Destination, Source, Length)  __libc_memmove(Destination, Source, Length)
+#define RtlCopyMemory(Destination, Source, Length)  __libc_memcpy(Destination, Source, Length)
+#define RtlFillMemory(Destination, Length, Fill)    __libc_memset(Destination, Fill, (Length))
+#define RtlZeroMemory(Destination, Length)          (__libc_bzero(Destination, Length), (Destination))
+#define RtlSecureZeroMemory(Destination, Length)    (__libc_explicit_bzero(Destination, Length), (Destination))
 
 typedef struct _MESSAGE_RESOURCE_ENTRY {
 	WORD Length;
@@ -5133,9 +4913,9 @@ typedef struct _RTL_CRITICAL_SECTION {
 	ULONG_PTR SpinCount;
 } RTL_CRITICAL_SECTION, *PRTL_CRITICAL_SECTION;
 
-typedef VOID(NTAPI *RTL_VERIFIER_DLL_LOAD_CALLBACK)(PWSTR DllName, PVOID DllBase, SIZE_T DllSize, PVOID Reserved);
-typedef VOID(NTAPI *RTL_VERIFIER_DLL_UNLOAD_CALLBACK)(PWSTR DllName, PVOID DllBase, SIZE_T DllSize, PVOID Reserved);
-typedef VOID(NTAPI *RTL_VERIFIER_NTDLLHEAPFREE_CALLBACK)(PVOID AllocationBase, SIZE_T AllocationSize);
+typedef VOID (NTAPI *RTL_VERIFIER_DLL_LOAD_CALLBACK)(PWSTR DllName, PVOID DllBase, SIZE_T DllSize, PVOID Reserved);
+typedef VOID (NTAPI *RTL_VERIFIER_DLL_UNLOAD_CALLBACK)(PWSTR DllName, PVOID DllBase, SIZE_T DllSize, PVOID Reserved);
+typedef VOID (NTAPI *RTL_VERIFIER_NTDLLHEAPFREE_CALLBACK)(PVOID AllocationBase, SIZE_T AllocationSize);
 
 typedef struct _RTL_VERIFIER_THUNK_DESCRIPTOR {
 	PCHAR ThunkName;
@@ -5270,9 +5050,9 @@ typedef struct _RTL_VERIFIER_PROVIDER_DESCRIPTOR {
 #define VERIFIER_STOP(Code, Msg, P1, S1, P2, S2, P3, S3, P4, S4) \
 	{ RtlApplicationVerifierStop((Code), (Msg), (ULONG_PTR)(P1), (S1), (ULONG_PTR)(P2), (S2), (ULONG_PTR)(P3), (S3), (ULONG_PTR)(P4), (S4)); }
 
-VOID NTAPI RtlApplicationVerifierStop(ULONG_PTR Code, PSTR Message, ULONG_PTR Param1, PSTR Description1, ULONG_PTR Param2, PSTR Description2, ULONG_PTR Param3, PSTR Description3, ULONG_PTR Param4, PSTR Description4);
+extern VOID NTAPI RtlApplicationVerifierStop(ULONG_PTR Code, PSTR Message, ULONG_PTR Param1, PSTR Description1, ULONG_PTR Param2, PSTR Description2, ULONG_PTR Param3, PSTR Description3, ULONG_PTR Param4, PSTR Description4);
 
-typedef LONG(NTAPI *PVECTORED_EXCEPTION_HANDLER)(struct _EXCEPTION_POINTERS *ExceptionInfo);
+typedef LONG (NTAPI *PVECTORED_EXCEPTION_HANDLER)(struct _EXCEPTION_POINTERS *ExceptionInfo);
 #define SEF_DACL_AUTO_INHERIT             0x01
 #define SEF_SACL_AUTO_INHERIT             0x02
 #define SEF_DEFAULT_DESCRIPTOR_FOR_OBJECT 0x04
@@ -5287,8 +5067,8 @@ typedef enum _HEAP_INFORMATION_CLASS {
 
 NTSYSAPI DWORD NTAPI RtlSetHeapInformation(PVOID HeapHandle, HEAP_INFORMATION_CLASS HeapInformationClass, PVOID HeapInformation, SIZE_T HeapInformationLength);
 NTSYSAPI DWORD NTAPI RtlQueryHeapInformation(PVOID HeapHandle, HEAP_INFORMATION_CLASS HeapInformationClass, PVOID HeapInformation, SIZE_T HeapInformationLength, PSIZE_T ReturnLength);
-DWORD NTAPI RtlMultipleAllocateHeap(PVOID HeapHandle, DWORD Flags, SIZE_T Size, DWORD Count, PVOID *Array);
-DWORD NTAPI RtlMultipleFreeHeap(PVOID HeapHandle, DWORD Flags, DWORD Count, PVOID *Array);
+extern DWORD NTAPI RtlMultipleAllocateHeap(PVOID HeapHandle, DWORD Flags, SIZE_T Size, DWORD Count, PVOID *Array);
+extern DWORD NTAPI RtlMultipleFreeHeap(PVOID HeapHandle, DWORD Flags, DWORD Count, PVOID *Array);
 
 #define WT_EXECUTEDEFAULT                           0x00000000
 #define WT_EXECUTEINIOTHREAD                        0x00000001
@@ -5301,10 +5081,10 @@ DWORD NTAPI RtlMultipleFreeHeap(PVOID HeapHandle, DWORD Flags, DWORD Count, PVOI
 #define WT_EXECUTEINPERSISTENTTHREAD                0x00000080
 #define WT_TRANSFER_IMPERSONATION                   0x00000100
 #define WT_SET_MAX_THREADPOOL_THREADS(Flags, Limit) ((Flags) |= (Limit) << 16)
-typedef VOID(NTAPI *WAITORTIMERCALLBACKFUNC)(PVOID, BOOLEAN);
-typedef VOID(NTAPI *WORKERCALLBACKFUNC)(PVOID);
-typedef VOID(NTAPI *APC_CALLBACK_FUNCTION)(DWORD, PVOID, PVOID);
-typedef VOID(NTAPI *PFLS_CALLBACK_FUNCTION)(PVOID lpFlsData);
+typedef VOID (NTAPI *WAITORTIMERCALLBACKFUNC)(PVOID, BOOLEAN);
+typedef VOID (NTAPI *WORKERCALLBACKFUNC)(PVOID);
+typedef VOID (NTAPI *APC_CALLBACK_FUNCTION)(DWORD, PVOID, PVOID);
+typedef VOID (NTAPI *PFLS_CALLBACK_FUNCTION)(PVOID lpFlsData);
 #define WT_EXECUTEINLONGTHREAD 0x00000010
 #define WT_EXECUTEDELETEWAIT   0x00000008
 

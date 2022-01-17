@@ -380,7 +380,6 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 
 /* Define intrinsic barrier functions. */
 #ifdef __cplusplus
-namespace __intern {
 extern "C" {
 #endif /* __cplusplus */
 #if (defined(__i386__) || defined(__i386) || defined(i386) ||          \
@@ -389,44 +388,45 @@ extern "C" {
      defined(__x86_64__) || defined(__amd64__) || defined(__amd64) ||  \
      defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) ||      \
      defined(_WIN64) || defined(WIN64))
+#ifndef _m_prefetch
+#define _m_prefetch _m_prefetch
 extern void (__cdecl _m_prefetch)(void *);
 #pragma intrinsic(_m_prefetch)
-#ifdef __cplusplus
-#define __builtin_prefetch(addr,...) ::__intern::_m_prefetch(addr)
-#else /* __cplusplus */
+#endif /* !_m_prefetch */
 #define __builtin_prefetch(addr,...) _m_prefetch(addr)
-#endif /* !__cplusplus */
-#else
+#else /* ... */
 #define __NO_builtin_prefetch    1
 #define __builtin_prefetch(...) (void)0
-#endif
+#endif /* !... */
+#ifndef _ReadBarrier
+#define _ReadBarrier _ReadBarrier
 extern void (__cdecl _ReadBarrier)(void);
-extern void (__cdecl _WriteBarrier)(void);
-extern void (__cdecl _ReadWriteBarrier)(void);
 #pragma intrinsic(_ReadBarrier)
+#endif /* !_ReadBarrier */
+#ifndef _WriteBarrier
+#define _WriteBarrier _WriteBarrier
+extern void (__cdecl _WriteBarrier)(void);
 #pragma intrinsic(_WriteBarrier)
+#endif /* !_WriteBarrier */
+#ifndef _ReadWriteBarrier
+#define _ReadWriteBarrier _ReadWriteBarrier
+extern void (__cdecl _ReadWriteBarrier)(void);
 #pragma intrinsic(_ReadWriteBarrier)
-#ifdef __cplusplus
-#define __COMPILER_BARRIER()       ::__intern::_ReadWriteBarrier()
-#define __COMPILER_READ_BARRIER()  ::__intern::_ReadBarrier()
-#define __COMPILER_WRITE_BARRIER() ::__intern::_WriteBarrier()
-#else /* __cplusplus */
+#endif /* !_ReadWriteBarrier */
 #define __COMPILER_BARRIER()       _ReadWriteBarrier()
 #define __COMPILER_READ_BARRIER()  _ReadBarrier()
 #define __COMPILER_WRITE_BARRIER() _WriteBarrier()
-#endif /* !__cplusplus */
 #ifdef __cplusplus
 } /* extern "C" */
-} /* namespace __intern */
 #endif /* __cplusplus */
 
 #define __COMPILER_IMPURE() (void)0
 
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
-#define __NULLPTR    nullptr
+#define __NULLPTR nullptr
 #else /* __INTELLISENSE__ */
-#define __NULLPTR          0
+#define __NULLPTR 0
 #endif /* !__INTELLISENSE__ */
 #else /* __cplusplus */
 #define __NULLPTR ((void *)0)
@@ -435,7 +435,7 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 /* Emulate the `__OPTIMIZE__' predefined macro, used in various headers. */
 #if defined(RELEASE) || defined(_RELEASE)
 #ifndef _RELEASE
-#define _RELEASE  RELEASE
+#define _RELEASE RELEASE
 #endif /* !_RELEASE */
 #if (_RELEASE+0) >= 1
 #define __OPTIMIZE__ _RELEASE

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x475bdc87 */
+/* HASH CRC-32:0x258a2269 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4383,8 +4383,11 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_fmode,(int *__pmode),(__pmode))
 __CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,_set_abort_behavior,(unsigned int __flags, unsigned int __mask),(__flags,__mask))
 #ifdef __INT64_TYPE__
 #if defined(_MSC_VER) && defined(__LIBCCALL_IS_LIBDCALL)
+#ifndef _abs64
+#define _abs64 _abs64
 extern __ATTR_CONST __INT64_TYPE__ (__LIBDCALL _abs64)(__INT64_TYPE__ __x);
 #pragma intrinsic(_abs64)
+#endif /* !_abs64 */
 #else /* _MSC_VER && __LIBCCALL_IS_LIBDCALL */
 #ifdef __CRT_HAVE__abs64
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64_TYPE__ __x),(__x))
@@ -4450,12 +4453,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_atoll_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __LONGLONG */
 
 #ifdef _MSC_VER
+#ifndef _byteswap_ushort
+#define _byteswap_ushort _byteswap_ushort
 extern unsigned short (_byteswap_ushort)(unsigned short __x);
-extern unsigned long (_byteswap_ulong)(unsigned long __x);
-extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 __x);
 #pragma intrinsic(_byteswap_ushort)
+#endif /* !_byteswap_ushort */
+#ifndef _byteswap_ulong
+#define _byteswap_ulong _byteswap_ulong
+extern unsigned long (_byteswap_ulong)(unsigned long __x);
 #pragma intrinsic(_byteswap_ulong)
+#endif /* !_byteswap_ulong */
+#ifndef _byteswap_uint64
+#define _byteswap_uint64 _byteswap_uint64
+extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 __x);
 #pragma intrinsic(_byteswap_uint64)
+#endif /* !_byteswap_uint64 */
 #else /* _MSC_VER */
 #ifdef __CRT_HAVE__byteswap_ushort
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT16_TYPE__,__NOTHROW_NCX,_byteswap_ushort,(__UINT16_TYPE__ __val),(__val))

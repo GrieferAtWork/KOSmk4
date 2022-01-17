@@ -4205,8 +4205,13 @@ unsigned int _set_abort_behavior(unsigned int flags, unsigned int mask);
 
 %#ifdef __INT64_TYPE__
 %#if defined(_MSC_VER) && defined(__LIBCCALL_IS_LIBDCALL)
-%extern __ATTR_CONST __INT64_TYPE__ (__LIBDCALL _abs64)(__INT64_TYPE__ __x);
-%#pragma intrinsic(_abs64)
+%{
+#ifndef _abs64
+#define _abs64 _abs64
+extern __ATTR_CONST __INT64_TYPE__ (__LIBDCALL _abs64)(__INT64_TYPE__ __x);
+#pragma intrinsic(_abs64)
+#endif /* !_abs64 */
+}
 %#else /* _MSC_VER && __LIBCCALL_IS_LIBDCALL */
 [[const, wunused, nothrow, section(".text.crt.dos.math.utility")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       crt_intern_kos_alias("libc_abs")]]
@@ -4254,12 +4259,21 @@ __LONGLONG _atoll_l([[nonnull]] char const *__restrict nptr, $locale_t locale) {
 %
 %{
 #ifdef _MSC_VER
+#ifndef _byteswap_ushort
+#define _byteswap_ushort _byteswap_ushort
 extern unsigned short (_byteswap_ushort)(unsigned short __x);
-extern unsigned long (_byteswap_ulong)(unsigned long __x);
-extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 __x);
 #pragma intrinsic(_byteswap_ushort)
+#endif /* !_byteswap_ushort */
+#ifndef _byteswap_ulong
+#define _byteswap_ulong _byteswap_ulong
+extern unsigned long (_byteswap_ulong)(unsigned long __x);
 #pragma intrinsic(_byteswap_ulong)
+#endif /* !_byteswap_ulong */
+#ifndef _byteswap_uint64
+#define _byteswap_uint64 _byteswap_uint64
+extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 __x);
 #pragma intrinsic(_byteswap_uint64)
+#endif /* !_byteswap_uint64 */
 #else /* _MSC_VER */
 }
 

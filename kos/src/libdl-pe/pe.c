@@ -143,7 +143,7 @@ libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 	result = dlsym(self, symbol_name);
 	if (result) {
 		/* Clear the error message set by the initial failed `dlsym()' */
-		dl.dl_error_message = NULL;
+		*dl.dl_error_message = NULL;
 	}
 	return result;
 }
@@ -161,7 +161,7 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 	REF DlModule *result;
 	char *fullname, *iter;
 	size_t i, fullnamelen, filenamelen;
-	bool has_nonstandard_extension;
+	int has_nonstandard_extension = 0;
 	if (!pathlen)
 		return NULL; /* Disallow empty leading paths. */
 
@@ -170,8 +170,10 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 		--pathlen;
 	filenamelen = strlen(filename);
 	if (filenamelen >= 4 && memcasecmp(filename + filenamelen - 4,
-	                                   ".dll", 4 * sizeof(char)) == 0)
+	                                   ".dll", 4 * sizeof(char)) == 0) {
+		has_nonstandard_extension = INT_MIN;
 		filenamelen -= 4;
+	}
 	if (!filenamelen)
 		return NULL; /* Disallow empty filenames. */
 	fullnamelen = pathlen +     /* "/lib" */
@@ -185,7 +187,6 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 	/* Construct the full filename. */
 	iter = (char *)mempcpy(fullname, path, pathlen, sizeof(char));
 	*iter++ = '/';
-	has_nonstandard_extension = false;
 	for (i = 0; i < filenamelen; ++i) {
 		char ch = filename[i];
 
@@ -195,32 +196,30 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 		 *
 		 * However, that's a lot of overhead, and doesn't work well with
 		 * the established dlopen()  function (which  doesn't feature  a
-		 * dlopenat() function), so to ensure uniform filenames, we just
+		 * dlopenat() variant), so to ensure uniform filenames, we  just
 		 * convert everything to lowercase.
 		 *
 		 * Sadly, this means that any dll you put on the system, you  have
 		 * to rename to all lower-case in order for us to find it. If this
-		 * even  becomes too much of a hassle,  I might end up making this
+		 * ever  becomes too much of a hassle,  I might end up making this
 		 * a 2-step process as described  above, just so the lookup  would
 		 * ignore casing. */
 		ch = tolower(ch);
 		if (ch == '\\')
 			ch = '/';
 		if (ch == '.')
-			has_nonstandard_extension = true;
-
-
+			++has_nonstandard_extension;
 		iter[i] = ch;
 	}
 	usedname = iter;
 	iter += filenamelen;
 	*iter = '\0';
-	if (!has_nonstandard_extension)
+	if (has_nonstandard_extension <= 0)
 		strcpy(iter, ".dll");
 
 	/* Do the initial open attempt. */
 	result = (REF DlModule *)dlopen(fullname, flags);
-	if (result || has_nonstandard_extension)
+	if (result || has_nonstandard_extension > 0)
 		return result;
 
 	/* Replace the ".dll" suffix with ".so" */
@@ -281,7 +280,9 @@ libpe_LoadLibraryInPathList(char const *__restrict pathlist,
 }
 
 
-PRIVATE NONNULL((1)) REF DlModule *CC
+
+DEFINE_PUBLIC_ALIAS(PeLoadLibrary, libpe_LoadLibrary);
+INTERN NONNULL((1)) REF DlModule *CC
 libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 	REF DlModule *result;
 	if ((filename[0] && filename[1] == ':') ||
@@ -342,11 +343,11 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 			goto done;
 	}
 
-	dl.dl_error_message = NULL;
+	*dl.dl_error_message = NULL;
 err:
 	return NULL;
 done:
-	dl.dl_error_message = NULL;
+	*dl.dl_error_message = NULL;
 	return result;
 }
 
@@ -379,7 +380,7 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 			syslog(LOG_DEBUG, "[pe] import: %q\n", filename);
 			dependency = libpe_LoadLibrary(filename, dep_flags);
 			if (!dependency) {
-				if (ATOMIC_READ(dl.dl_error_message) == NULL)
+				if (ATOMIC_READ(*dl.dl_error_message) == NULL)
 					dl.dl_seterrorf("Failed to load dependency %q of %q",
 					                filename, self->dm_filename);
 				goto err;
@@ -558,9 +559,6 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.Characteristics      = %#I16x\n", pe->pd_nt.FileHeader.Characteristics);
 	syslog(LOG_DEBUG, "[pe] pe->pd_name                               = %q\n", peexec_data__pd_name(pe));
 #endif
-
-	/* TODO: Modify `dl_library_path' to include  `basename $(peexec_data__pd_name(pe))'
-	 *       This is required for semantic compatibility with how dlls are loaded on NT. */
 
 	/* Allocate the DL module descriptor for the PE binary. */
 	mod = (DlModule *)malloc(offsetof(DlModule, dm_pe.dp_sect) +
