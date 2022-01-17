@@ -248,7 +248,7 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 		return result;
 
 	/* If stuff is still failing, check for special replacement files. */
-	if (strcmp(usedname, "msvcrt.so") == 0) {
+	if (strcmp(usedname, "libmsvcrt.so") == 0) {
 		strcpy(usedname, "libc.so");
 		result = (REF DlModule *)dlopen(fullname, flags);
 		if (result)

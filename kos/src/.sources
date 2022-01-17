@@ -133,7 +133,10 @@ BEGIN
 		DEFINE_SIMPLE_LIBRARY("libbios86")
 		DEFINE_SIMPLE_LIBRARY("libpciaccess", USELIB("libphys") LD_FLAGS({ "-fini=libpci_fini" }))
 		DEFINE_SIMPLE_LIBRARY("libsvgadrv", USELIB("libphys"))
+
+		/* DOS/NT emulation/compatiblity */
 		DEFINE_SIMPLE_LIBRARY("libdl-pe", USELIB("libdl") LD_FLAGS({ "-init=libpe_init" }))
+		DEFINE_SIMPLE_LIBRARY("libkernel32", USELIB("libdl") USELIB("libdl-pe"))
 	}
 
 	BEGIN GROUP("libs.libvideo-codec") { COMPILE, LINK, ARCHIVE, MCOPY };
