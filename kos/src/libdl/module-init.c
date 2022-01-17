@@ -275,6 +275,7 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 			assert(self->dm_depcnt < count);
 			filename = self->dm_elf.de_dynstr + self->dm_dynhdr[i].d_un.d_ptr;
 			/* Load the dependent library. */
+			ATOMIC_WRITE(dl_error_message, NULL);
 			if (self->dm_elf.de_runpath) {
 				dependency = DlModule_OpenFilenameInPathList(self->dm_elf.de_runpath,
 				                                             filename,
@@ -284,12 +285,12 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 					 * already   loaded  a  matching  candidate  of  this  library!
 					 * We  can  do  this because  `dl_library_path'  never changes. */
 					dependency = DlModule_FindFilenameInPathListFromAll(filename);
-					if (!dependency) {
+					if (dependency) {
+						try_add2global(dependency);
+					} else if (ATOMIC_READ(dl_error_message) == NULL) {
 						dependency = DlModule_OpenFilenameInPathList(dl_library_path,
 						                                             filename,
 						                                             dep_flags);
-					} else {
-						try_add2global(dependency);
 					}
 				}
 			} else {
@@ -297,12 +298,12 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 				 * already   loaded  a  matching  candidate  of  this  library!
 				 * We  can  do  this because  `dl_library_path'  never changes. */
 				dependency = DlModule_FindFilenameInPathListFromAll(filename);
-				if (!dependency) {
+				if (dependency) {
+					try_add2global(dependency);
+				} else if (ATOMIC_READ(dl_error_message) == NULL) {
 					dependency = DlModule_OpenFilenameInPathList(dl_library_path,
 					                                             filename,
 					                                             dep_flags);
-				} else {
-					try_add2global(dependency);
 				}
 			}
 			if (!dependency) {

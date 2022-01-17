@@ -378,8 +378,8 @@ again:
 			/* Load a module from an absolute filesystem location. */
 			result = DlModule_OpenFilename(filename, mode);
 		} else {
-			ATOMIC_WRITE(dl_error_message, NULL);
 			/* Load a module using the LD-library path List */
+			ATOMIC_WRITE(dl_error_message, NULL);
 			result = DlModule_OpenFilenameInPathList(dl_library_path,
 			                                         filename,
 			                                         mode);
