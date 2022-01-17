@@ -34,7 +34,11 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-# NOTE: This only works if you're using cygwin!!!
-cmd /bin/i686-w64-mingw32-gcc -m32 -o "$OPTPATH/testexe.exe" "$SRCPATH/main.c"
+# TODO: Also support this one
+## NOTE: This only works if you're using cygwin!!!
+#cmd /bin/i686-w64-mingw32-gcc -m32 -o "$OPTPATH/testexe.exe" "$SRCPATH/main.c"
+
+# NOTE: This only works if you've got tcc (32-bit) installed
+cmd tcc -o "$(cygpath -w "$OPTPATH/testexe.exe")" "$(cygpath -w "$SRCPATH/main.c")"
 
 install_file /bin/testexe.exe "$OPTPATH/testexe.exe"
