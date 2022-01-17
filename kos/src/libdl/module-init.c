@@ -311,7 +311,7 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 					             filename, self->dm_filename);
 				goto err;
 			}
-			self->dm_depvec[self->dm_depcnt++] = dependency;
+			self->dm_depvec[self->dm_depcnt++] = dependency; /* Inherit reference */
 		}
 	}
 	/* Service relocations of the module. */

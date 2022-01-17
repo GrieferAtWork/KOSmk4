@@ -38,6 +38,9 @@ DL_COREOP(WUNUSED ATTR_PURE_P NONNULL((1)), DlSection *, __FCALL, dlsec_builtin,
 DL_COREOP(WUNUSED ATTR_CONST_P, DlSection *, __FCALL, dlsec_builtin_index, (size_t sect_index))
 DL_COREOP(WUNUSED ATTR_CONST_P, char const *, __FCALL, dlsec_builtin_name, (size_t sect_index))
 
+/* [1..1][const] The library path set when the program was started (initenv:$LD_LIBRARY_PATH) */
+DL_COREFIELD(char *, dl_library_path)
+
 /* [0..1] The current DL error message */
 DL_COREFIELD(char *, dl_error_message)
 
