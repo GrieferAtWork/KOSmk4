@@ -1462,6 +1462,34 @@
 	void (*prefix##enumdir)(T *self, fdyndir_enum_callback_t cb, void *cookie)
 
 
+#define __C89_NAMELESS
+#define DUMMYUNIONNAME
+#define DUMMYUNIONNAME2
+#define DUMMYSTRUCTNAME
+#define DUMMYSTRUCTNAME2
+#define RESTRICTED_POINTER
+#define UNALIGNED
+#define far
+#define near
+#define pascal
+#define cdecl
+#define CDECL
+#define CALLBACK
+#define WINAPI
+#define WINAPIV
+#define APIENTRY
+#define APIPRIVATE
+#define PASCAL
+#define WINAPI_INLINE
+#define WINBASEAPI
+#define FAR
+#define NEAR
+#define FASTCALL
+#define NTAPI
+#define CONST const
+#define VOID void
+
+
 #define NCURSES_API
 #define NCURSES_IMPEXP
 #define NCURSES_SP_NAME(x) x##_sp

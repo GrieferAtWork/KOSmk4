@@ -29,6 +29,10 @@
 #define CC  ATTR_STDCALL /* WINAPI */
 #define VCC ATTR_CDECL
 
+#ifndef REF
+#define REF __REF
+#endif /* !REF */
+
 #ifndef NOBLOCK
 #define NOBLOCK __NOBLOCK
 #endif /* !NOBLOCK */

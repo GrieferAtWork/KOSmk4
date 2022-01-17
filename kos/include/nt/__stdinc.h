@@ -102,5 +102,38 @@
 #ifndef NTAPI
 #define NTAPI __ATTR_STDCALL
 #endif /* !NTAPI */
+#ifndef DECLSPEC_NORETURN
+#define DECLSPEC_NORETURN __ATTR_NORETURN
+#endif /* !DECLSPEC_NORETURN */
+
+#ifndef WINBASEAPI
+#define WINBASEAPI
+#endif /* !WINBASEAPI */
+
+#ifndef __MSABI_LONG
+#if __SIZEOF_LONG__ == 4
+#define __MSABI_LONG(x) x##L
+#elif __SIZEOF_LONG_LONG__ == 4
+#define __MSABI_LONG(x) x##LL
+#else /* ... */
+#define __MSABI_LONG(x) x
+#endif /* !... */
+#endif /* !__MSABI_LONG */
+
+#ifndef TRUE
+#define TRUE 1
+#endif /* !TRUE */
+#ifndef FALSE
+#define FALSE 0
+#endif /* !FALSE */
+
+#ifndef __MINGW_NAME_AW
+#ifdef UNICODE
+#define __MINGW_NAME_AW(x) x##W
+#else /* UNICODE */
+#define __MINGW_NAME_AW(x) x##A
+#endif /* !UNICODE */
+#endif /* !__MINGW_NAME_AW */
+
 
 #endif /* !_NT___STDINC_H */

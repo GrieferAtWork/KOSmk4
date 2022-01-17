@@ -491,6 +491,17 @@ typedef struct _SINGLE_LIST_ENTRY {
 } SINGLE_LIST_ENTRY, *PSINGLE_LIST_ENTRY;
 #endif /* !__LIST_ENTRY_DEFINED */
 
+
+typedef HANDLE *SPHANDLE;
+typedef HANDLE *LPHANDLE;
+typedef HANDLE HGLOBAL;
+typedef HANDLE HLOCAL;
+typedef HANDLE GLOBALHANDLE;
+typedef HANDLE LOCALHANDLE;
+typedef __INTPTR_TYPE__ (WINAPI *FARPROC)();
+typedef __INTPTR_TYPE__ (WINAPI *NEARPROC)();
+typedef __INTPTR_TYPE__ (WINAPI *PROC)();
+
 __DECL_END
 #endif /* __CC__ */
 
