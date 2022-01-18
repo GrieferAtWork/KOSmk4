@@ -31,9 +31,9 @@
 
 __DECL_BEGIN
 
-#define __ATOMIC_ONCE_PENDING 0 /* once is pending execution. */
-#define __ATOMIC_ONCE_RUNNING 1 /* once is currently running. */
-#define __ATOMIC_ONCE_RUNDONE 2 /* once has been executed. */
+#define __ATOMIC_ONCE_PENDING 0 /* Pending execution. */
+#define __ATOMIC_ONCE_RUNNING 1 /* Currently running. */
+#define __ATOMIC_ONCE_RUNDONE 2 /* Was executed. */
 
 #ifdef __CC__
 struct atomic_once {

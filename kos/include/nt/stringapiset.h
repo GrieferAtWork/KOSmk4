@@ -17,18 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBKERNEL32_K32_H
-#define GUARD_LIBKERNEL32_K32_H 1
+#ifndef _NT_STRINGAPISET_H
+#define _NT_STRINGAPISET_H 1
 
-#include "api.h"
+#include "__stdinc.h"
+/**/
 
-#include <nt/types.h>
+#include "types.h"
 
-DECL_BEGIN
+#ifdef __CC__
+__DECL_BEGIN
 
-INTDEF DWORD CC libk32_GetLastError(void);
-INTDEF void CC libk32_SetLastError(DWORD dwErrCode);
+WINBASEAPI int WINAPI MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
+WINBASEAPI int WINAPI WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWCH lpWideCharStr, int cchWideChar, LPSTR lpMultiByteStr, int cbMultiByte, LPCCH lpDefaultChar, LPBOOL lpUsedDefaultChar);
 
-DECL_END
+__DECL_END
+#endif /* __CC__ */
 
-#endif /* !GUARD_LIBKERNEL32_K32_H */
+#endif /* !_NT_STRINGAPISET_H */

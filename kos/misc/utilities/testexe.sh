@@ -34,11 +34,22 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-# TODO: Also support this one
-## NOTE: This only works if you're using cygwin!!!
-#cmd /bin/i686-w64-mingw32-gcc -m32 -o "$OPTPATH/testexe.exe" "$SRCPATH/main.c"
+# NOTE: This only works if you're using cygwin!!!
+if /bin/i686-w64-mingw32-gcc -m32 -o "$OPTPATH/pe-wingw32.exe" "$SRCPATH/main.c"; then
+	install_file /bin/pe-wingw32.exe "$OPTPATH/pe-wingw32.exe"
+fi
 
 # NOTE: This only works if you've got tcc (32-bit) installed
-cmd tcc -o "$(cygpath -w "$OPTPATH/testexe.exe")" "$(cygpath -w "$SRCPATH/main.c")"
+if tcc -o "$(cygpath -w "$OPTPATH/pe-tcc32.exe")" "$(cygpath -w "$SRCPATH/main.c")"; then
+	install_file /bin/pe-tcc32.exe "$OPTPATH/pe-tcc32.exe"
+fi
 
-install_file /bin/testexe.exe "$OPTPATH/testexe.exe"
+if [ "$TARGET_CPUNAME" == "x86_64" ]; then
+	if tcc64 -o "$(cygpath -w "$OPTPATH/pe-tcc64.exe")" "$(cygpath -w "$SRCPATH/main.c")"; then
+		install_file /bin/pe-tcc64.exe "$OPTPATH/pe-tcc64.exe"
+	fi
+	if /bin/x86_64-w64-mingw32-gcc -o "$OPTPATH/pe-wingw64.exe" "$SRCPATH/main.c"; then
+		install_file /bin/pe-wingw64.exe "$OPTPATH/pe-wingw64.exe"
+	fi
+fi
+

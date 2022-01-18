@@ -17,34 +17,44 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBKERNEL32_K32_C
-#define GUARD_LIBKERNEL32_K32_C 1
+#ifndef GUARD_LIBKERNEL32_STARTUP_C
+#define GUARD_LIBKERNEL32_STARTUP_C 1
 
 #include "api.h"
-/**/
 
-#include <kos/types.h>
-#include <errno.h>
+#include <nt/handle.h>
+#include <nt/startup.h>
 
-#include "k32.h"
+#include <unistd.h>
 
 DECL_BEGIN
 
-/* Special functions exported by `libc.so' */
-__LIBC NOBLOCK ATTR_PURE /*nt*/ errno_t NOTHROW(LIBDCALL __get_nterrno)(void);
-__LIBC NOBLOCK syscall_slong_t NOTHROW(LIBDCALL __set_nterrno)(/*nt*/ errno_t value);
+STATIC_ASSERT(sizeof(STARTUPINFOA) == sizeof(STARTUPINFOW));
 
-DEFINE_PUBLIC_ALIAS(GetLastError, libk32_GetLastError);
-INTERN DWORD CC libk32_GetLastError(void) {
-	return __get_nterrno();
-}
-
-DEFINE_PUBLIC_ALIAS(SetLastError, libk32_SetLastError);
-INTERN void CC libk32_SetLastError(DWORD dwErrCode) {
-	__set_nterrno((errno_t)dwErrCode);
+DEFINE_PUBLIC_ALIAS(GetStartupInfoA, libk32_GetStartupInfo);
+DEFINE_PUBLIC_ALIAS(GetStartupInfoW, libk32_GetStartupInfo);
+INTERN VOID WINAPI libk32_GetStartupInfo(LPSTARTUPINFO lpStartupInfo) {
+	lpStartupInfo->cb              = sizeof(*lpStartupInfo);
+	lpStartupInfo->lpReserved      = NULL;
+	lpStartupInfo->lpDesktop       = NULL;
+	lpStartupInfo->lpTitle         = NULL;
+	lpStartupInfo->dwX             = 0;
+	lpStartupInfo->dwY             = 0;
+	lpStartupInfo->dwXSize         = 0;
+	lpStartupInfo->dwYSize         = 0;
+	lpStartupInfo->dwXCountChars   = 0;
+	lpStartupInfo->dwYCountChars   = 0;
+	lpStartupInfo->dwFillAttribute = 0;
+	lpStartupInfo->dwFlags         = STARTF_USESTDHANDLES;
+	lpStartupInfo->wShowWindow     = 0;
+	lpStartupInfo->cbReserved2     = 0;
+	lpStartupInfo->lpReserved2     = NULL;
+	lpStartupInfo->hStdInput       = NTHANDLE_FROMFD(STDIN_FILENO);
+	lpStartupInfo->hStdOutput      = NTHANDLE_FROMFD(STDOUT_FILENO);
+	lpStartupInfo->hStdError       = NTHANDLE_FROMFD(STDERR_FILENO);
 }
 
 
 DECL_END
 
-#endif /* !GUARD_LIBKERNEL32_K32_C */
+#endif /* !GUARD_LIBKERNEL32_STARTUP_C */

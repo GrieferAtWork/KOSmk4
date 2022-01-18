@@ -1488,6 +1488,8 @@
 #define NTAPI
 #define CONST const
 #define VOID void
+#define __MINGW_TYPEDEF_AW(x) typedef x##A x;
+#define __MINGW_NAME_AW(x) x##A
 
 
 #define NCURSES_API

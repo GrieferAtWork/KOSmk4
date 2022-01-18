@@ -54,7 +54,7 @@ __DECL_BEGIN
 #define _NTHANDLE_FDSHIFT ((__SIZEOF_INT__ * 8) - _NTHANDLE_FDBITS)
 #define NTHANDLE_ASFD(handle) (((int)(unsigned int)(__UINTPTR_TYPE__)(handle) << _NTHANDLE_FDSHIFT) >> _NTHANDLE_FDSHIFT)
 #endif /* _NTHANDLE_FDBITS < (__SIZEOF_INT__ * 8) */
-#define NTHANDLE_FROMFD(fd) ((__UINTPTR_TYPE__)((int)(fd)&_NTHANDLE_FDMASK) + KERNELSPACE_BASE)
+#define NTHANDLE_FROMFD(fd) ((HANDLE)((__UINTPTR_TYPE__)((int)(fd)&_NTHANDLE_FDMASK) + KERNELSPACE_BASE))
 #else /* KERNELSPACE_HIGHMEM */
 #error "Unsupported configuration"
 #endif /* !KERNELSPACE_HIGHMEM */

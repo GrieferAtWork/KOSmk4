@@ -27,26 +27,33 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/sync/atomic-once.h>
+
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
 #include <kos/exec/peb.h>
 #include <kos/malloc.h>
 #include <kos/syscalls.h>
 #include <linux/net.h>
-#include <nt/except.h>
+#include <nt/errhandlingapi.h>
 
 #include <elf.h>
+#include <format-printer.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
 #include <syscall.h>
+#include <syslog.h>
 #include <unicode.h>
 #include <unistd.h>
+
+#include <libcmdline/encode.h>
 
 #include "../user/stdio-api.h"
 #include "../user/stdlib.h"
 #include "compat.h"
 #include "dl.h"
 #include "globals.h"
+#include "uchar.h"
 
 DECL_BEGIN
 
@@ -799,6 +806,7 @@ typedef struct {
 	int newmode;
 } _startupinfo;
 
+DEFINE_PUBLIC_ALIAS(DOS$__lconv_init, libd___lconv_init);
 DEFINE_PUBLIC_ALIAS(DOS$__set_app_type, libd___set_app_type);
 DEFINE_PUBLIC_ALIAS(DOS$__getmainargs, libd___getmainargs);
 DEFINE_PUBLIC_ALIAS(DOS$__wgetmainargs, libd___wgetmainargs);
@@ -809,11 +817,17 @@ DEFINE_PUBLIC_ALIAS(DOS$_except_handler_3, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler4, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler4_common, libd__except_handler4);
 
-INTERN void LIBDCALL libd___set_app_type(int typ) {
+INTERN ATTR_SECTION(".text.crt.dos.application.init")
+void LIBDCALL libd___lconv_init(void) {
+	CRT_UNIMPLEMENTED("__lconv_init()");
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.application.init")
+void LIBDCALL libd___set_app_type(int typ) {
 	CRT_UNIMPLEMENTEDF("__set_app_type(%d)", typ);
 }
 
-INTERN int LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
 libd___getmainargs(int *pargc, char ***pargv,
                    char ***penvp, int dowildcard,
                    _startupinfo *pstartinfo) {
@@ -830,7 +844,7 @@ libd___getmainargs(int *pargc, char ***pargv,
 	return 0;
 }
 
-INTERN int LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
 libd___wgetmainargs(int *pargc, char16_t ***pargv,
                     char16_t ***penvp, int dowildcard,
                     _startupinfo *pstartinfo) {
@@ -846,7 +860,7 @@ libd___wgetmainargs(int *pargc, char16_t ***pargv,
 	return 0;
 }
 
-INTERN int LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.except") int LIBDCALL
 libd__XcptFilter(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
 	(void)xno;
 	(void)infp_ptrs;
@@ -854,7 +868,7 @@ libd__XcptFilter(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
 	return 0;
 }
 
-INTERN EXCEPTION_DISPOSITION LIBCCALL
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.except") EXCEPTION_DISPOSITION LIBCCALL
 libd__except_handler4(struct _EXCEPTION_RECORD *ExceptionRecord,
                      void *EstablisherFrame,
                      struct _CONTEXT *ContextRecord,
@@ -867,6 +881,175 @@ libd__except_handler4(struct _EXCEPTION_RECORD *ExceptionRecord,
 	                   ExceptionRecord, EstablisherFrame,
 	                   ContextRecord, DispatcherContext);
 	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+
+
+/************************************************************************/
+/* _acmdln                                                              */
+/************************************************************************/
+PRIVATE ATTR_SECTION(".text.crt.dos.application.init") char *LIBDCALL
+construct_dos_commandline(void) {
+	struct process_peb *peb = &__peb;
+	char *result = NULL;
+	void *libcmdline;
+	PCMDLINE_ENCODE cmdline_encode;
+	libcmdline = dlopen(LIBCMDLINE_LIBRARY_NAME, RTLD_LAZY | RTLD_LOCAL);
+	if (!libcmdline)
+		return NULL;
+	*(void **)&cmdline_encode = dlsym(libcmdline, "cmdline_encode");
+	if (cmdline_encode) {
+		ssize_t error;
+		struct format_aprintf_data printer;
+		/* Encode the commandline. */
+		format_aprintf_data_init(&printer);
+		error = (*cmdline_encode)(&format_aprintf_printer, &printer,
+		                          peb->pp_argc, peb->pp_argv);
+		if unlikely(error < 0) {
+			format_aprintf_data_fini(&printer);
+		} else {
+			result = format_aprintf_pack(&printer, NULL);
+		}
+	}
+	dlclose(libcmdline);
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
+struct atomic_once libd___p__acmdln_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char *libd__acmdln = NULL;
+DEFINE_PUBLIC_IDATA_G(DOS$_acmdln, libd___p__acmdln, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_ALIAS(DOS$__p__acmdln, libd___p__acmdln);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") char **LIBDCALL
+libd___p__acmdln(void) {
+	ATOMIC_ONCE_RUN(&libd___p__acmdln_initialized, {
+		libd__acmdln = construct_dos_commandline();
+	});
+	return &libd__acmdln;
+}
+
+
+
+/************************************************************************/
+/* _wcmdln                                                              */
+/************************************************************************/
+PRIVATE ATTR_SECTION(".text.crt.dos.application.init") char16_t *LIBDCALL
+construct_dos_wcommandline(void) {
+	char *acmdln = *libd___p__acmdln();
+	return acmdln ? libc_uchar_mbstoc16(acmdln) : NULL;
+}
+
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
+struct atomic_once libd___p__wcmdln_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd__wcmdln = NULL;
+DEFINE_PUBLIC_IDATA_G(DOS$_wcmdln, libd___p__wcmdln, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_ALIAS(DOS$__p__wcmdln, libd___p__wcmdln);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") char16_t **LIBDCALL
+libd___p__wcmdln(void) {
+	ATOMIC_ONCE_RUN(&libd___p__wcmdln_initialized, {
+		libd__wcmdln = construct_dos_wcommandline();
+	});
+	return &libd__wcmdln;
+}
+
+
+/************************************************************************/
+/* _commode                                                             */
+/************************************************************************/
+INTERN ATTR_SECTION(".bss.crt.dos.application.init") int libd__commode = 0;
+/*DEFINE_PUBLIC_IDATA_G(DOS$_commode, libd___p__commode, __SIZEOF_POINTER__);*/
+DEFINE_PUBLIC_ALIAS(DOS$_commode, libd__commode);
+DEFINE_PUBLIC_ALIAS(DOS$__p__commode, libd___p__commode);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int *LIBDCALL
+libd___p__commode(void) {
+	return &libd__commode;
+}
+
+
+/************************************************************************/
+/* __mb_cur_max                                                         */
+/************************************************************************/
+INTERN ATTR_SECTION(".data.crt.dos.application.init") int libd___mb_cur_max = 7;
+DEFINE_PUBLIC_ALIAS(__mb_cur_max, libd___mb_cur_max);
+
+
+/************************************************************************/
+/* _setusermatherr()                                                    */
+/************************************************************************/
+struct _exception;
+typedef int (*_UserMathErrorFunctionPointer)(struct _exception *);
+DEFINE_PUBLIC_ALIAS(DOS$__setusermatherr, libd___setusermatherr);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
+libd___setusermatherr(_UserMathErrorFunctionPointer func) {
+	CRT_UNIMPLEMENTEDF("DOS$__setusermatherr(%p)\n", func);
+}
+
+
+
+/************************************************************************/
+/* _amsg_exit()                                                         */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(DOS$_amsg_exit, libd__amsg_exit);
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
+libd__amsg_exit(int errnum) {
+	CRT_UNIMPLEMENTEDF("DOS$_amsg_exit(%p)\n", errnum);
+	_Exit(-1);
+}
+
+
+
+/************************************************************************/
+/* _initterm()                                                          */
+/************************************************************************/
+typedef void (LIBDCALL *_INITTERMFUN)(void);
+typedef int (LIBDCALL *_INITTERM_E_FN)(void);
+
+DEFINE_PUBLIC_ALIAS(DOS$_initterm, libd__initterm);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
+libd__initterm(_INITTERMFUN *start, _INITTERMFUN *end) {
+	_INITTERMFUN *iter = start;
+	for (iter = start; iter < end; ++iter) {
+		if (!*iter)
+			continue;
+		syslog(LOG_DEBUG, "DOS$_initterm: call %p\n", *iter);
+		(**iter)();
+	}
+	syslog(LOG_DEBUG, "DOS$_initterm: done\n");
+}
+
+DEFINE_PUBLIC_ALIAS(DOS$_initterm_e, libd__initterm_e);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
+libd__initterm_e(_INITTERM_E_FN *start, _INITTERM_E_FN *end) {
+	_INITTERM_E_FN *iter;
+	int result = 0;
+	for (iter = start; iter < end; ++iter) {
+		if (!*iter)
+			continue;
+		syslog(LOG_DEBUG, "DOS$_initterm_e: call %p\n", *iter);
+		result = (**iter)();
+		if (result != 0) {
+			syslog(LOG_DEBUG, "DOS$_initterm_e: call %p failed -> %d\n", *iter, result);
+			break;
+		}
+	}
+	syslog(LOG_DEBUG, "DOS$_initterm_e: done\n");
+	return result;
+}
+
+
+
+/************************************************************************/
+/* _lock()                                                              */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(DOS$_lock, libd__lock);
+DEFINE_PUBLIC_ALIAS(DOS$_unlock, libd__unlock);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
+libd__lock(int locknum) {
+	CRT_UNIMPLEMENTEDF("DOS$_lock(%d)", locknum);
+}
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
+libd__unlock(int locknum) {
+	CRT_UNIMPLEMENTEDF("DOS$_unlock(%d)", locknum);
 }
 
 

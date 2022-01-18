@@ -159,5 +159,13 @@
 #endif /* !UNICODE */
 #endif /* !__MINGW_NAME_AW */
 
+#ifndef __MINGW_TYPEDEF_AW
+#ifdef UNICODE
+#define __MINGW_TYPEDEF_AW(x) typedef x##W x;
+#else /* UNICODE */
+#define __MINGW_TYPEDEF_AW(x) typedef x##A x;
+#endif /* !UNICODE */
+#endif /* !__MINGW_TYPEDEF_AW */
+
 
 #endif /* !_NT___STDINC_H */

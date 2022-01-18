@@ -17,54 +17,43 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _NT_EXCEPT_H
-#define _NT_EXCEPT_H 1
+#ifndef GUARD_LIBKERNEL32_STRINGAPISET_C
+#define GUARD_LIBKERNEL32_STRINGAPISET_C 1
 
-#include "__stdinc.h"
-/**/
+#include "api.h"
 
-#include "types.h"
-/**/
+#include <kos/types.h>
+#include <nt/stringapiset.h>
 
-#include <hybrid/typecore.h>
+#include <syslog.h>
 
-/* Thread Information Block (mainly for SEH) */
+DECL_BEGIN
 
-#ifdef __CC__
-__DECL_BEGIN
+DEFINE_PUBLIC_ALIAS(MultiByteToWideChar, libk32_MultiByteToWideChar);
+DEFINE_PUBLIC_ALIAS(WideCharToMultiByte, libk32_WideCharToMultiByte);
 
+INTERN int WINAPI
+libk32_MultiByteToWideChar(UINT CodePage, DWORD dwFlags,
+                           LPCCH lpMultiByteStr, int cbMultiByte,
+                           LPWSTR lpWideCharStr, int cchWideChar) {
+	syslog(LOG_WARNING, "NotImplemented: MultiByteToWideChar(%u, %#x, %q, %d, %p, %d)\n",
+	       CodePage, dwFlags, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
+	/* TODO */
+	return 0;
+}
 
-struct _CONTEXT;
-struct _EXCEPTION_RECORD;
-struct _EXCEPTION_POINTERS;
-typedef int EXCEPTION_DISPOSITION;
-#define EXCEPTION_CONTINUE_SEARCH 0
+INTERN int WINAPI
+libk32_WideCharToMultiByte(UINT CodePage, DWORD dwFlags,
+                           LPCWCH lpWideCharStr, int cchWideChar,
+                           LPSTR lpMultiByteStr, int cbMultiByte,
+                           LPCCH lpDefaultChar, LPBOOL lpUsedDefaultChar) {
+	syslog(LOG_WARNING, "NotImplemented: WideCharToMultiByte(%u, %#x, %I16q, %d, %p, %d, %p, %p)\n",
+	       CodePage, dwFlags, lpWideCharStr, cchWideChar,
+	       lpMultiByteStr, cbMultiByte, lpDefaultChar, lpUsedDefaultChar);
+	/* TODO */
+	return 0;
+}
 
-typedef EXCEPTION_DISPOSITION NTAPI
-EXCEPTION_ROUTINE(struct _EXCEPTION_RECORD *ExceptionRecord,
-                  PVOID EstablisherFrame,
-                  struct _CONTEXT *ContextRecord,
-                  PVOID DispatcherContext);
-#ifndef __PEXCEPTION_ROUTINE_DEFINED
-#define __PEXCEPTION_ROUTINE_DEFINED
-typedef EXCEPTION_ROUTINE *PEXCEPTION_ROUTINE;
-#endif /* !__PEXCEPTION_ROUTINE_DEFINED */
+DECL_END
 
-typedef struct _EXCEPTION_REGISTRATION_RECORD {
-	__C89_NAMELESS union {
-		struct _EXCEPTION_REGISTRATION_RECORD *Next;
-		struct _EXCEPTION_REGISTRATION_RECORD *prev;
-	};
-	__C89_NAMELESS union {
-		PEXCEPTION_ROUTINE Handler;
-		PEXCEPTION_ROUTINE handler;
-	};
-} EXCEPTION_REGISTRATION_RECORD;
-typedef EXCEPTION_REGISTRATION_RECORD *PEXCEPTION_REGISTRATION_RECORD;
-typedef EXCEPTION_REGISTRATION_RECORD EXCEPTION_REGISTRATION;
-typedef PEXCEPTION_REGISTRATION_RECORD PEXCEPTION_REGISTRATION;
-
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_NT_EXCEPT_H */
+#endif /* !GUARD_LIBKERNEL32_STRINGAPISET_C */

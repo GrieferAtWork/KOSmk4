@@ -29,6 +29,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 #include <hybrid/unaligned.h>
 
+#include <kos/exec/idata.h>
 #include <kos/exec/peb.h>
 #include <kos/syscalls.h>
 #include <sys/auxv.h>
@@ -1684,6 +1685,12 @@ char **NOTHROW(libc_get_initenv)(void) {
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char **libc___p___initenv_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
 
+#undef __initenv
+#undef __winitenv
+DEFINE_PUBLIC_IDATA_G(__initenv, libc___p___initenv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(__winitenv, libc___p___winitenv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(DOS$__winitenv, libd___p___winitenv, __SIZEOF_POINTER__);
+
 /*[[[head:libc___p___initenv,hash:CRC-32=0x2f3a191d]]]*/
 /* Access to the initial environment block */
 INTERN ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
@@ -1965,14 +1972,16 @@ NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
 }
 /*[[[end:libc__get_invalid_parameter_handler]]]*/
 
+#undef _fmode
+INTERN ATTR_SECTION(".bss.crt.dos.FILE.utility") int libd__fmode = 0;
+DEFINE_PUBLIC_ALIAS(_fmode, libd__fmode);
+
 /*[[[head:libc___p__fmode,hash:CRC-32=0x75afe2d]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
 NOTHROW_NCX(LIBCCALL libc___p__fmode)(void)
 /*[[[body:libc___p__fmode]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("__p__fmode"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+{
+	return &libd__fmode;
 }
 /*[[[end:libc___p__fmode]]]*/
 
@@ -1980,10 +1989,9 @@ NOTHROW_NCX(LIBCCALL libc___p__fmode)(void)
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") errno_t
 NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode)
 /*[[[body:libc__set_fmode]]]*/
-/*AUTO*/{
-	(void)mode;
-	CRT_UNIMPLEMENTEDF("_set_fmode(%x)", mode); /* TODO */
-	return ENOSYS;
+{
+	libd__fmode = mode;
+	return EOK;
 }
 /*[[[end:libc__set_fmode]]]*/
 
@@ -1991,10 +1999,9 @@ NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode)
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") errno_t
 NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode)
 /*[[[body:libc__get_fmode]]]*/
-/*AUTO*/{
-	(void)pmode;
-	CRT_UNIMPLEMENTEDF("_get_fmode(%p)", pmode); /* TODO */
-	return ENOSYS;
+{
+	*pmode = libd__fmode;
+	return EOK;
 }
 /*[[[end:libc__get_fmode]]]*/
 

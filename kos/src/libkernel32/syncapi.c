@@ -32,9 +32,11 @@
 #include <nt/types.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <pthread.h>
 #include <stddef.h>
 #include <string.h>
+#include <time.h>
 
 DECL_BEGIN
 
@@ -131,6 +133,38 @@ libk32_InitializeCriticalSectionAndSpinCount(LPCRITICAL_SECTION lpCriticalSectio
 INTERN VOID WINAPI
 libk32_InitializeCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 	libk32_InitializeCriticalSectionEx(lpCriticalSection, DEFAULT_SPIN_COUNT, 0);
+}
+/************************************************************************/
+
+
+
+
+
+
+/************************************************************************/
+/* MISC                                                                 */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(SleepEx, libk32_SleepEx);
+DEFINE_PUBLIC_ALIAS(Sleep, libk32_Sleep);
+INTERN DWORD WINAPI
+libk32_SleepEx(DWORD dwMilliseconds, WINBOOL bAlertable) {
+	struct timespec ts, rem;
+	ts.tv_sec  = 0;
+	ts.tv_nsec = 0;
+	ts.add_milliseconds(dwMilliseconds);
+	for (;;) {
+		if (nanosleep(&ts, &rem))
+			break;
+		if (errno == EINTR && bAlertable)
+			return WAIT_IO_COMPLETION;
+		ts = rem;
+	}
+	return 0;
+}
+
+INTERN VOID WINAPI
+libk32_Sleep(DWORD dwMilliseconds) {
+	libk32_SleepEx(dwMilliseconds, FALSE);
 }
 /************************************************************************/
 

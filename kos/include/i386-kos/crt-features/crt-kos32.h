@@ -537,6 +537,7 @@
 #define __CRT_HAVE___ilogb
 #define __CRT_HAVE___ilogbf
 #define __CRT_HAVE___ilogbl
+#define __CRT_HAVE___initenv
 #define __CRT_HAVE___initstate
 #define __CRT_HAVE___iob_func
 #define __CRT_HAVE___ioctl
@@ -767,6 +768,7 @@
 #define __CRT_HAVE___lxstat
 #define __CRT_HAVE___lxstat64
 #define __CRT_HAVE___madvise
+#define __CRT_HAVE___mb_cur_max
 #define __CRT_HAVE___mbrlen
 #define __CRT_HAVE___mbrtowc
 #define __CRT_HAVE___memccpy
@@ -1119,6 +1121,7 @@
 #define __CRT_HAVE___wcsxfrm_l
 #define __CRT_HAVE___wctrans_l
 #define __CRT_HAVE___wctype_l
+#define __CRT_HAVE___winitenv
 #define __CRT_HAVE___write
 #define __CRT_HAVE___writev
 #define __CRT_HAVE___x86_getcontext_eax
@@ -1257,6 +1260,7 @@
 #define __CRT_HAVE__flsbuf
 #define __CRT_HAVE__flushall
 #define __CRT_HAVE__flushlbf
+#define __CRT_HAVE__fmode
 #define __CRT_HAVE__fpclass
 #define __CRT_HAVE__fpreset
 #define __CRT_HAVE__fprintf_l
@@ -5354,6 +5358,7 @@
 #define __CRT_HAVE_KOS$__iswspace_l
 #define __CRT_HAVE_KOS$__iswupper_l
 #define __CRT_HAVE_KOS$__iswxdigit_l
+#define __CRT_HAVE___lconv_init
 #define __CRT_HAVE_KOS$__libc_access
 #define __CRT_HAVE_KOS$__libc_chdir
 #define __CRT_HAVE_KOS$__libc_chmod
@@ -5377,6 +5382,9 @@
 #define __CRT_HAVE_KOS$__open64
 #define __CRT_HAVE_KOS$__p___wargv
 #define __CRT_HAVE_KOS$__p___winitenv
+#define __CRT_HAVE___p__acmdln
+#define __CRT_HAVE___p__commode
+#define __CRT_HAVE___p__wcmdln
 #define __CRT_HAVE_KOS$__p__wenviron
 #define __CRT_HAVE_KOS$__p__wpgmptr
 #define __CRT_HAVE_KOS$__pathconf
@@ -5385,6 +5393,7 @@
 #define __CRT_HAVE_KOS$__rmdir
 #define __CRT_HAVE___set_app_type
 #define __CRT_HAVE_KOS$__setmntent
+#define __CRT_HAVE___setusermatherr
 #define __CRT_HAVE_KOS$__strerror_r
 #define __CRT_HAVE_KOS$__symlink
 #define __CRT_HAVE_KOS$__sys_errlist
@@ -5413,10 +5422,14 @@
 #define __CRT_HAVE_KOS$__wcstoull_l
 #define __CRT_HAVE_KOS$__wcsxfrm_l
 #define __CRT_HAVE___wgetmainargs
+#define __CRT_HAVE_KOS$__winitenv
 #define __CRT_HAVE_KOS$_access
 #define __CRT_HAVE_KOS$_access_s
+#define __CRT_HAVE__acmdln
+#define __CRT_HAVE__amsg_exit
 #define __CRT_HAVE_KOS$_chdir
 #define __CRT_HAVE_KOS$_chmod
+#define __CRT_HAVE__commode
 #define __CRT_HAVE__creat
 #define __CRT_HAVE_KOS$_errno
 #define __CRT_HAVE__except_handler2
@@ -5449,6 +5462,8 @@
 #define __CRT_HAVE_KOS$_getws_s
 #define __CRT_HAVE_KOS$_i64tow
 #define __CRT_HAVE_KOS$_i64tow_s
+#define __CRT_HAVE__initterm
+#define __CRT_HAVE__initterm_e
 #define __CRT_HAVE_KOS$_iswalnum_l
 #define __CRT_HAVE_KOS$_iswalpha_l
 #define __CRT_HAVE_KOS$_iswblank_l
@@ -5466,6 +5481,7 @@
 #define __CRT_HAVE_KOS$_iswxdigit_l
 #define __CRT_HAVE_KOS$_itow
 #define __CRT_HAVE_KOS$_itow_s
+#define __CRT_HAVE__lock
 #define __CRT_HAVE_KOS$_ltow
 #define __CRT_HAVE_KOS$_ltow_s
 #define __CRT_HAVE_KOS$_mbstowcs_l
@@ -5512,6 +5528,7 @@
 #define __CRT_HAVE_KOS$_ultow_s
 #define __CRT_HAVE__ungetwc_nolock
 #define __CRT_HAVE_KOS$_unlink
+#define __CRT_HAVE__unlock
 #define __CRT_HAVE_KOS$_vfwprintf_l
 #define __CRT_HAVE_KOS$_vfwprintf_p
 #define __CRT_HAVE_KOS$_vfwprintf_p_l
@@ -5538,6 +5555,7 @@
 #define __CRT_HAVE_KOS$_vwprintf_s_l
 #define __CRT_HAVE_KOS$_vwscanf_l
 #define __CRT_HAVE__wchdir
+#define __CRT_HAVE__wcmdln
 #define __CRT_HAVE__wcscoll_l
 #define __CRT_HAVE__wcsdup
 #define __CRT_HAVE_KOS$_wcserror
@@ -6066,6 +6084,7 @@
 #define __CRT_HAVE_DOS$__iswspace_l
 #define __CRT_HAVE_DOS$__iswupper_l
 #define __CRT_HAVE_DOS$__iswxdigit_l
+#define __CRT_HAVE_DOS$__lconv_init
 #define __CRT_HAVE_DOS$__libc_access
 #define __CRT_HAVE_DOS$__libc_chdir
 #define __CRT_HAVE_DOS$__libc_chmod
@@ -6089,6 +6108,9 @@
 #define __CRT_HAVE_DOS$__open64
 #define __CRT_HAVE_DOS$__p___wargv
 #define __CRT_HAVE_DOS$__p___winitenv
+#define __CRT_HAVE_DOS$__p__acmdln
+#define __CRT_HAVE_DOS$__p__commode
+#define __CRT_HAVE_DOS$__p__wcmdln
 #define __CRT_HAVE_DOS$__p__wenviron
 #define __CRT_HAVE_DOS$__p__wpgmptr
 #define __CRT_HAVE_DOS$__pathconf
@@ -6097,6 +6119,7 @@
 #define __CRT_HAVE_DOS$__rmdir
 #define __CRT_HAVE_DOS$__set_app_type
 #define __CRT_HAVE_DOS$__setmntent
+#define __CRT_HAVE_DOS$__setusermatherr
 #define __CRT_HAVE_DOS$__strerror_r
 #define __CRT_HAVE_DOS$__symlink
 #define __CRT_HAVE_DOS$__sys_errlist
@@ -6125,10 +6148,14 @@
 #define __CRT_HAVE_DOS$__wcstoull_l
 #define __CRT_HAVE_DOS$__wcsxfrm_l
 #define __CRT_HAVE_DOS$__wgetmainargs
+#define __CRT_HAVE_DOS$__winitenv
 #define __CRT_HAVE_DOS$_access
 #define __CRT_HAVE_DOS$_access_s
+#define __CRT_HAVE_DOS$_acmdln
+#define __CRT_HAVE_DOS$_amsg_exit
 #define __CRT_HAVE_DOS$_chdir
 #define __CRT_HAVE_DOS$_chmod
+#define __CRT_HAVE_DOS$_commode
 #define __CRT_HAVE_DOS$_creat
 #define __CRT_HAVE_DOS$_errno
 #define __CRT_HAVE_DOS$_except_handler2
@@ -6161,6 +6188,8 @@
 #define __CRT_HAVE_DOS$_getws_s
 #define __CRT_HAVE_DOS$_i64tow
 #define __CRT_HAVE_DOS$_i64tow_s
+#define __CRT_HAVE_DOS$_initterm
+#define __CRT_HAVE_DOS$_initterm_e
 #define __CRT_HAVE_DOS$_iswalnum_l
 #define __CRT_HAVE_DOS$_iswalpha_l
 #define __CRT_HAVE_DOS$_iswblank_l
@@ -6178,6 +6207,7 @@
 #define __CRT_HAVE_DOS$_iswxdigit_l
 #define __CRT_HAVE_DOS$_itow
 #define __CRT_HAVE_DOS$_itow_s
+#define __CRT_HAVE_DOS$_lock
 #define __CRT_HAVE_DOS$_ltow
 #define __CRT_HAVE_DOS$_ltow_s
 #define __CRT_HAVE_DOS$_mbstowcs_l
@@ -6224,6 +6254,7 @@
 #define __CRT_HAVE_DOS$_ultow_s
 #define __CRT_HAVE_DOS$_ungetwc_nolock
 #define __CRT_HAVE_DOS$_unlink
+#define __CRT_HAVE_DOS$_unlock
 #define __CRT_HAVE_DOS$_vfwprintf_l
 #define __CRT_HAVE_DOS$_vfwprintf_p
 #define __CRT_HAVE_DOS$_vfwprintf_p_l
@@ -6250,6 +6281,7 @@
 #define __CRT_HAVE_DOS$_vwprintf_s_l
 #define __CRT_HAVE_DOS$_vwscanf_l
 #define __CRT_HAVE_DOS$_wchdir
+#define __CRT_HAVE_DOS$_wcmdln
 #define __CRT_HAVE_DOS$_wcscoll_l
 #define __CRT_HAVE_DOS$_wcsdup
 #define __CRT_HAVE_DOS$_wcserror

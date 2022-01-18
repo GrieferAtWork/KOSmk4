@@ -272,6 +272,16 @@ WINBASEAPI WINBOOL WINAPI SetWaitableTimerEx(HANDLE hTimer, LARGE_INTEGER const 
 /************************************************************************/
 /* MISC                                                                 */
 /************************************************************************/
+#define STATUS_WAIT_0           ((DWORD)0x00000000)
+#define STATUS_ABANDONED_WAIT_0 ((DWORD)0x00000080)
+#define STATUS_USER_APC         ((DWORD)0x000000C0)
+#define STATUS_TIMEOUT          ((DWORD)0x00000102)
+#define STATUS_PENDING          ((DWORD)0x00000103)
+#define WAIT_FAILED             ((DWORD)0xffffffff)
+#define WAIT_OBJECT_0           (STATUS_WAIT_0 + 0)
+#define WAIT_ABANDONED          (STATUS_ABANDONED_WAIT_0 + 0)
+#define WAIT_ABANDONED_0        (STATUS_ABANDONED_WAIT_0 + 0)
+#define WAIT_IO_COMPLETION      STATUS_USER_APC
 WINBASEAPI DWORD WINAPI WaitForSingleObjectEx(HANDLE hHandle, DWORD dwMilliseconds, WINBOOL bAlertable);
 WINBASEAPI DWORD WINAPI WaitForMultipleObjectsEx(DWORD nCount, CONST HANDLE *lpHandles, WINBOOL bWaitAll, DWORD dwMilliseconds, WINBOOL bAlertable);
 WINBASEAPI DWORD WINAPI WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds);
