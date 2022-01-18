@@ -302,7 +302,26 @@ done_bss:
 		/* Load libdl and tell it  to dispatch library loading to  a
 		 * secondary helper library (libdl-pe.so) that represents an
 		 * extension  to libdl, as well as handles all of the module
-		 * initialization. */
+		 * initialization.
+		 *
+		 * NOTE: Unlike for ELF, in  the case of PE  we can do this  entirely
+		 *       unconditional. You might argue that  a PE program that  does
+		 *       not include any import dependencies, loaded at its preferred
+		 *       address or simply not including any relocation, wouldn't  be
+		 *       needing a dynamic linker. -- But you'd be wrong:
+		 * The primary entry of PE programs is allowed to return normally, in
+		 * which case it must trigger a  call to `_Exit(%Pax)'. For this,  we
+		 * need a user-space  support library that  provides the landing  pad
+		 * where a returning entry point function will jump to. So even if it
+		 * wasn't for the fact that figuring out the need of dynamic  linking
+		 * is a super complicated  thing to do for  PE, we'd still need  more
+		 * user-space support for full compliance.
+		 *
+		 * -> In the end, it's just easier to always load the dynamic linker,
+		 *    especially  since doing  most of  the work  in user-space makes
+		 *    writing code easier (because driver  code like this comment  is
+		 *    part of is much more prone to errors, which more often than not
+		 *    can go so far as to turn into security problems). */
 		libdl_base = mbuilder_map(/* self:        */ &builder,
 		                          /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_USER_DYNLINK),
 		                          /* num_bytes:   */ execabi_system_rtld_size,

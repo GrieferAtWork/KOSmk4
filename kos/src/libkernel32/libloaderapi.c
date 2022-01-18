@@ -36,6 +36,7 @@
 #include <pthread.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <uchar.h>
 
 DECL_BEGIN
 
@@ -50,15 +51,9 @@ DEFINE_PUBLIC_ALIAS(GetModuleHandleA, libk32_GetModuleHandleA);
 DEFINE_PUBLIC_ALIAS(GetModuleHandleW, libk32_GetModuleHandleW);
 DEFINE_PUBLIC_ALIAS(LoadLibraryA, libk32_LoadLibraryA);
 DEFINE_PUBLIC_ALIAS(LoadLibraryW, libk32_LoadLibraryW);
-/*DEFINE_PUBLIC_ALIAS(GetProcAddress, libk32_GetProcAddress);*/ /* Implicitly forwarded by "libdl-pe.so" */
+/*DEFINE_PUBLIC_ALIAS(GetProcAddress, libk32_GetProcAddress);*/ /* Implicitly forwarded from "libdl-pe.so" */
 DEFINE_PUBLIC_ALIAS(FreeLibrary, libk32_FreeLibrary);
 DEFINE_PUBLIC_ALIAS(FreeLibraryAndExitThread, libk32_FreeLibraryAndExitThread);
-
-PRIVATE WUNUSED NONNULL((1)) char *CC wcs2utf8(LPCWSTR str) {
-	/* TODO: Convert `lpLibFileName' to utf-8 */
-	(void)str;
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
 
 INTERN HMODULE WINAPI
 libk32_LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
@@ -75,7 +70,7 @@ libk32_LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
 	(void)dwFlags;
 	if (lpLibFileName == NULL)
 		return (HMODULE)fdlopen(NTHANDLE_ASFD(hFile), RTLD_LAZY | RTLD_GLOBAL);
-	utf8 = wcs2utf8(lpLibFileName);
+	utf8 = convert_c16tombs(lpLibFileName);
 	if unlikely(!utf8)
 		return NULL;
 	result = libk32_LoadLibraryExA(utf8, hFile, dwFlags);
@@ -99,7 +94,7 @@ libk32_GetModuleHandleExW(DWORD dwFlags, LPCWSTR lpModuleName, HMODULE *phModule
 	char *utf8;
 	if (dwFlags & GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS)
 		return GetModuleHandleExA(dwFlags, (LPCSTR)lpModuleName, phModule);
-	utf8 = wcs2utf8(lpModuleName);
+	utf8 = convert_c16tombs(lpModuleName);
 	if unlikely(!utf8)
 		return FALSE;
 	result = libk32_GetModuleHandleExA(dwFlags, utf8, phModule);
@@ -115,7 +110,7 @@ libk32_GetModuleHandleA(LPCSTR lpModuleName) {
 INTERN HMODULE WINAPI
 libk32_GetModuleHandleW(LPCWSTR lpModuleName) {
 	HMODULE result;
-	char *utf8 = wcs2utf8(lpModuleName);
+	char *utf8 = convert_c16tombs(lpModuleName);
 	if unlikely(!utf8)
 		return NULL;
 	result = libk32_GetModuleHandleA(utf8);
@@ -138,12 +133,11 @@ libk32_FreeLibrary(HMODULE hLibModule) {
 	return dlclose(hLibModule) == 0;
 }
 
+INTDEF DECLSPEC_NORETURN VOID WINAPI libk32_ExitThread(DWORD dwExitCode);
 INTERN DECLSPEC_NORETURN VOID WINAPI
 libk32_FreeLibraryAndExitThread(HMODULE hLibModule, DWORD dwExitCode) {
 	dlclose(hLibModule);
-	/* TODO: This sets the pthread return value, but we want to set the system thread exit code!
-	 * libc: >> pthread_exit_thread(&current, dwExitCode); */
-	pthread_exit((void *)(uintptr_t)dwExitCode);
+	libk32_ExitThread(dwExitCode);
 }
 
 

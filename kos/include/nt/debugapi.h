@@ -17,42 +17,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _NT_PROCESSTHREADSAPI_H
-#define _NT_PROCESSTHREADSAPI_H 1
+#ifndef _NT_DEBUGAPI_H
+#define _NT_DEBUGAPI_H 1
 
 #include "__stdinc.h"
 /**/
 
 #include "types.h"
-/**/
 
 #ifdef __CC__
 __DECL_BEGIN
 
-/************************************************************************/
-/* SIMPLE PROC/THREAD CONTROL                                           */
-/************************************************************************/
-WINBASEAPI DECLSPEC_NORETURN VOID WINAPI ExitThread(DWORD dwExitCode);
-WINBASEAPI DECLSPEC_NORETURN VOID WINAPI ExitProcess(UINT uExitCode);
-WINBASEAPI WINBOOL WINAPI SwitchToThread(VOID);
-WINBASEAPI DWORD WINAPI GetCurrentProcessorNumber(VOID);
-WINBASEAPI WINBOOL WINAPI ProcessIdToSessionId(DWORD dwProcessId, DWORD *pSessionId);
-WINBASEAPI DWORD WINAPI GetCurrentProcessId(VOID);
-WINBASEAPI DWORD WINAPI GetCurrentThreadId(VOID);
-WINBASEAPI WINBOOL WINAPI IsProcessorFeaturePresent(DWORD ProcessorFeature);
-WINBASEAPI VOID WINAPI FlushProcessWriteBuffers(VOID);
-
-
-/************************************************************************/
-/* TLS                                                                  */
-/************************************************************************/
-#define TLS_OUT_OF_INDEXES ((DWORD)0xffffffff)
-WINBASEAPI DWORD WINAPI TlsAlloc(VOID);
-WINBASEAPI LPVOID WINAPI TlsGetValue(DWORD dwTlsIndex);
-WINBASEAPI WINBOOL WINAPI TlsSetValue(DWORD dwTlsIndex, LPVOID lpTlsValue);
-WINBASEAPI WINBOOL WINAPI TlsFree(DWORD dwTlsIndex);
+WINBASEAPI VOID WINAPI DebugBreak(VOID);
+WINBASEAPI WINBOOL WINAPI IsDebuggerPresent(VOID);
+WINBASEAPI VOID WINAPI OutputDebugStringA(LPCSTR lpOutputString);
+WINBASEAPI VOID WINAPI OutputDebugStringW(LPCWSTR lpOutputString);
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_NT_PROCESSTHREADSAPI_H */
+#endif /* !_NT_DEBUGAPI_H */

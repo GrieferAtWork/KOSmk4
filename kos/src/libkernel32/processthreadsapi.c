@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBKERNEL32_PROCESSTHREADSAPI_C
 #define GUARD_LIBKERNEL32_PROCESSTHREADSAPI_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "api.h"
 /**/
@@ -29,9 +30,84 @@
 
 #include <errno.h>
 #include <pthread.h>
+#include <sched.h>
+#include <syslog.h>
+#include <unistd.h>
 
 DECL_BEGIN
 
+/************************************************************************/
+/* SIMPLE PROC/THREAD CONTROL                                           */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(ExitThread, libk32_ExitThread);
+DEFINE_PUBLIC_ALIAS(ExitProcess, libk32_ExitProcess);
+DEFINE_PUBLIC_ALIAS(SwitchToThread, libk32_SwitchToThread);
+DEFINE_PUBLIC_ALIAS(GetCurrentProcessorNumber, libk32_GetCurrentProcessorNumber);
+DEFINE_PUBLIC_ALIAS(ProcessIdToSessionId, libk32_ProcessIdToSessionId);
+DEFINE_PUBLIC_ALIAS(GetCurrentProcessId, libk32_GetCurrentProcessId);
+DEFINE_PUBLIC_ALIAS(GetCurrentThreadId, libk32_GetCurrentThreadId);
+DEFINE_PUBLIC_ALIAS(IsProcessorFeaturePresent, libk32_IsProcessorFeaturePresent);
+DEFINE_PUBLIC_ALIAS(FlushProcessWriteBuffers, libk32_FlushProcessWriteBuffers);
+
+INTERN DECLSPEC_NORETURN VOID WINAPI
+libk32_ExitThread(DWORD dwExitCode) {
+	/* TODO: This sets the pthread return value, but we want to set the system thread exit code!
+	 * libc: >> pthread_exit_thread(&current, dwExitCode); */
+	pthread_exit((void *)(uintptr_t)dwExitCode);
+}
+
+INTERN DECLSPEC_NORETURN VOID WINAPI
+libk32_ExitProcess(UINT uExitCode) {
+	_exit((int)uExitCode);
+}
+
+INTERN WINBOOL WINAPI
+libk32_SwitchToThread(VOID) {
+	pthread_yield();
+	return TRUE;
+}
+
+INTERN DWORD WINAPI
+libk32_GetCurrentProcessorNumber(VOID) {
+	return sched_getcpu();
+}
+
+INTERN WINBOOL WINAPI
+libk32_ProcessIdToSessionId(DWORD dwProcessId, DWORD *pSessionId) {
+	pid_t sid = getsid((pid_t)dwProcessId);
+	if (sid == -1)
+		return FALSE;
+	*pSessionId = sid;
+	return TRUE;
+}
+
+INTERN DWORD WINAPI
+libk32_GetCurrentProcessId(VOID) {
+	return getpid();
+}
+
+INTERN DWORD WINAPI
+libk32_GetCurrentThreadId(VOID) {
+	return gettid();
+}
+
+INTERN WINBOOL WINAPI
+libk32_IsProcessorFeaturePresent(DWORD ProcessorFeature) {
+	syslog(LOG_WARNING, "[k32] Not implemented: IsProcessorFeaturePresent(%I32u)\n",
+	       ProcessorFeature);
+	return FALSE;
+}
+
+INTERN VOID WINAPI
+libk32_FlushProcessWriteBuffers(VOID) {
+	syslog(LOG_WARNING, "[k32] Not implemented: FlushProcessWriteBuffers()\n");
+}
+
+
+
+/************************************************************************/
+/* TLS                                                                  */
+/************************************************************************/
 DEFINE_PUBLIC_ALIAS(TlsAlloc, libk32_TlsAlloc);
 DEFINE_PUBLIC_ALIAS(TlsGetValue, libk32_TlsGetValue);
 DEFINE_PUBLIC_ALIAS(TlsSetValue, libk32_TlsSetValue);

@@ -17,55 +17,59 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBKERNEL32_MEMORYAPI_C
-#define GUARD_LIBKERNEL32_MEMORYAPI_C 1
+#ifndef GUARD_LIBKERNEL32_DEBUGAPI_C
+#define GUARD_LIBKERNEL32_DEBUGAPI_C 1
+#define _KOS_SOURCE 1
+#define _UTF_SOURCE 1
 
 #include "api.h"
 /**/
 
+#include <asm/intrin.h>
 #include <kos/types.h>
-#include <nt/memoryapi.h>
-#include <sys/mman.h>
+#include <nt/debugapi.h>
 
+#include <string.h>
 #include <syslog.h>
-#include <errno.h>
+#include <uchar.h>
+#include <unicode.h>
+#include <wchar.h>
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(VirtualProtect, libk32_VirtualProtect);
+DEFINE_PUBLIC_ALIAS(DebugBreak, libk32_DebugBreak);
+DEFINE_PUBLIC_ALIAS(IsDebuggerPresent, libk32_IsDebuggerPresent);
+DEFINE_PUBLIC_ALIAS(OutputDebugStringA, libk32_OutputDebugStringA);
+DEFINE_PUBLIC_ALIAS(OutputDebugStringW, libk32_OutputDebugStringW);
+
+INTERN VOID WINAPI libk32_DebugBreak(VOID) {
+	__int3();
+}
+
 INTERN WINBOOL WINAPI
-libk32_VirtualProtect(LPVOID lpAddress, SIZE_T dwSize,
-                      DWORD flNewProtect, PDWORD lpflOldProtect) {
-	int prot;
-	if (flNewProtect & (PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE_READWRITE)) {
-		prot = PROT_READ | PROT_WRITE | PROT_EXEC;
-	} else if (flNewProtect & PAGE_EXECUTE_READ) {
-		prot = PROT_READ | PROT_EXEC;
-	} else if (flNewProtect & PAGE_EXECUTE) {
-		prot = PROT_EXEC;
-	} else if (flNewProtect & (PAGE_WRITECOPY | PAGE_READWRITE)) {
-		prot = PROT_READ | PROT_WRITE;
-	} else if (flNewProtect & PAGE_READONLY) {
-		prot = PROT_READ;
-	} else if (flNewProtect & PAGE_NOACCESS) {
-		prot = PROT_NONE;
-	} else {
-		prot = PROT_READ | PROT_WRITE; /* ??? */
-	}
-	*lpflOldProtect = PROT_READ | PROT_WRITE | PROT_EXEC; /* TODO */
-	return mprotect(lpAddress, dwSize, prot) == 0;
+libk32_IsDebuggerPresent(VOID) {
+	COMPILER_IMPURE();
+	return TRUE;
 }
 
-DEFINE_PUBLIC_ALIAS(VirtualQuery, libk32_VirtualQuery);
-INTERN SIZE_T WINAPI
-libk32_VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength) {
-	syslog(LOG_WARNING, "NotImplemented: VirtualQuery(%p, %p, %#Ix)\n",
-	       lpAddress, lpBuffer, dwLength);
-	return 0;
+INTERN VOID WINAPI
+libk32_OutputDebugStringA(LPCSTR lpOutputString) {
+	syslog_printer(SYSLOG_PRINTER_CLOSURE(LOG_DEBUG),
+	               lpOutputString,
+	               strlen(lpOutputString));
 }
 
+PRIVATE struct format_16to8_data libk32_OutputDebugStringW_printer = {
+	NULL, SYSLOG_PRINTER_CLOSURE(LOG_DEBUG), 0
+};
+INTERN VOID WINAPI
+libk32_OutputDebugStringW(LPCWSTR lpOutputString) {
+	if (libk32_OutputDebugStringW_printer.fd_printer == NULL)
+		libk32_OutputDebugStringW_printer.fd_printer = &syslog_printer;
+	format_16to8(&libk32_OutputDebugStringW_printer, lpOutputString, c16slen(lpOutputString));
+}
 
 
 DECL_END
 
-#endif /* !GUARD_LIBKERNEL32_MEMORYAPI_C */
+#endif /* !GUARD_LIBKERNEL32_DEBUGAPI_C */

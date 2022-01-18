@@ -33,7 +33,7 @@
 #include <string.h>
 #include <uchar.h>
 #include <unicode.h>
-#include <unistd.h>
+#include "unistd.h"
 
 #include "parts.wchar.unistd.h"
 
@@ -1054,7 +1054,7 @@ NOTHROW_RPC(LIBKCALL libc_wget_current_dir_name)(void)
 {
 	char *utf8_path;
 	char32_t *result;
-	utf8_path = get_current_dir_name();
+	utf8_path = libc_get_current_dir_name();
 	if unlikely(!utf8_path)
 		return NULL;
 	result = convert_mbstoc32(utf8_path);
@@ -1070,7 +1070,7 @@ NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void)
 {
 	char *utf8_path;
 	char16_t *result;
-	utf8_path = get_current_dir_name();
+	utf8_path = libd_get_current_dir_name();
 	if unlikely(!utf8_path)
 		return NULL;
 	result = convert_mbstoc16(utf8_path);

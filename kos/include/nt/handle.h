@@ -60,6 +60,8 @@ __DECL_BEGIN
 #endif /* !KERNELSPACE_HIGHMEM */
 #define NTHANDLE_ISPTR(x) (!NTHANDLE_ISFD(x))
 
+#define INVALID_HANDLE_VALUE ((HANDLE)(LONG_PTR)-1)
+
 __DECL_END
 #endif /* __CC__ */
 

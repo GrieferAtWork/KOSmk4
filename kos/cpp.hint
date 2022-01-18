@@ -1486,6 +1486,7 @@
 #define NEAR
 #define FASTCALL
 #define NTAPI
+#define DECLSPEC_NORETURN
 #define CONST const
 #define VOID void
 #define __MINGW_TYPEDEF_AW(x) typedef x##A x;

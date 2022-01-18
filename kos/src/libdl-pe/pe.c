@@ -858,7 +858,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	}
 
 	/* The entry point of PE applications is allowed to return normally.
-	 * -> When it does, it must `_Exit(%Pax)' the entire application. */
+	 * -> When it does, we simply have to `_Exit(%Pax)' the application. */
 	result = (byte_t *)result - sizeof(void *);
 	((void **)result)[0] = ((void **)result)[1];         /* Original entry point */
 	((void **)result)[1] = (void *)&pe_exit_wrapper_asm; /* Have entry point return here */
