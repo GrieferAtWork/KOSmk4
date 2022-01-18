@@ -535,6 +535,7 @@
 #define __CRT_HAVE___ilogb
 #define __CRT_HAVE___ilogbf
 #define __CRT_HAVE___ilogbl
+#define __CRT_HAVE___initenv
 #define __CRT_HAVE___initstate
 #define __CRT_HAVE___iob_func
 #define __CRT_HAVE___ioctl
@@ -763,6 +764,7 @@
 #define __CRT_HAVE___lxstat
 #define __CRT_HAVE___lxstat64
 #define __CRT_HAVE___madvise
+#define __CRT_HAVE___mb_cur_max
 #define __CRT_HAVE___mbrlen
 #define __CRT_HAVE___mbrtowc
 #define __CRT_HAVE___memccpy
@@ -1113,6 +1115,7 @@
 #define __CRT_HAVE___wcsxfrm_l
 #define __CRT_HAVE___wctrans_l
 #define __CRT_HAVE___wctype_l
+#define __CRT_HAVE___winitenv
 #define __CRT_HAVE___write
 #define __CRT_HAVE___writev
 #define __CRT_HAVE___x86_getcontext_rax
@@ -1218,6 +1221,7 @@
 #define __CRT_HAVE__flsbuf
 #define __CRT_HAVE__flushall
 #define __CRT_HAVE__flushlbf
+#define __CRT_HAVE__fmode
 #define __CRT_HAVE__fpclass
 #define __CRT_HAVE__fprintf_l
 #define __CRT_HAVE__fprintf_p
@@ -1740,6 +1744,14 @@
 #define __CRT_HAVE_conjl
 #define __CRT_HAVE_connect
 #define __CRT_HAVE_consttime_memequal
+#define __CRT_HAVE_convert_freev
+#define __CRT_HAVE_convert_freevn
+#define __CRT_HAVE_convert_mbstowcs
+#define __CRT_HAVE_convert_mbstowcsn
+#define __CRT_HAVE_convert_wcstombs
+#define __CRT_HAVE_convert_wcstombsn
+#define __CRT_HAVE_convert_wcstombsv
+#define __CRT_HAVE_convert_wcstombsvn
 #define __CRT_HAVE_copysign
 #define __CRT_HAVE_copysignf
 #define __CRT_HAVE_copysignl
@@ -5259,6 +5271,7 @@
 #define __CRT_HAVE_KOS$__jnf
 #define __CRT_HAVE_KOS$__jnl
 #define __CRT_HAVE_KOS$__kill
+#define __CRT_HAVE___lconv_init
 #define __CRT_HAVE_KOS$__ldexp
 #define __CRT_HAVE_KOS$__ldexpf
 #define __CRT_HAVE_KOS$__ldexpl
@@ -5493,6 +5506,9 @@
 #define __CRT_HAVE_KOS$__overflow
 #define __CRT_HAVE_KOS$__p___wargv
 #define __CRT_HAVE_KOS$__p___winitenv
+#define __CRT_HAVE___p__acmdln
+#define __CRT_HAVE___p__commode
+#define __CRT_HAVE___p__wcmdln
 #define __CRT_HAVE_KOS$__p__wenviron
 #define __CRT_HAVE_KOS$__p__wpgmptr
 #define __CRT_HAVE_KOS$__pathconf
@@ -5569,6 +5585,7 @@
 #define __CRT_HAVE_KOS$__setstate
 #define __CRT_HAVE_KOS$__settimeofday
 #define __CRT_HAVE_KOS$__setuid
+#define __CRT_HAVE___setusermatherr
 #define __CRT_HAVE_KOS$__sigaction
 #define __CRT_HAVE_KOS$__sigaddset
 #define __CRT_HAVE_KOS$__sigblock
@@ -5709,6 +5726,7 @@
 #define __CRT_HAVE_KOS$__wctrans_l
 #define __CRT_HAVE_KOS$__wctype_l
 #define __CRT_HAVE___wgetmainargs
+#define __CRT_HAVE_KOS$__winitenv
 #define __CRT_HAVE_KOS$__write
 #define __CRT_HAVE_KOS$__writev
 #define __CRT_HAVE_KOS$__xpg_basename
@@ -5726,6 +5744,7 @@
 #define __CRT_HAVE_KOS$_abs64
 #define __CRT_HAVE__access
 #define __CRT_HAVE_KOS$_access_s
+#define __CRT_HAVE__acmdln
 #define __CRT_HAVE_KOS$_aligned_free
 #define __CRT_HAVE_KOS$_aligned_malloc
 #define __CRT_HAVE_KOS$_aligned_msize
@@ -5735,6 +5754,7 @@
 #define __CRT_HAVE_KOS$_aligned_realloc
 #define __CRT_HAVE_KOS$_aligned_recalloc
 #define __CRT_HAVE_KOS$_alloca
+#define __CRT_HAVE__amsg_exit
 #define __CRT_HAVE_KOS$_atodbl
 #define __CRT_HAVE_KOS$_atodbl_l
 #define __CRT_HAVE_KOS$_atof_l
@@ -5761,6 +5781,7 @@
 #define __CRT_HAVE__chsize_s
 #define __CRT_HAVE__close
 #define __CRT_HAVE__commit
+#define __CRT_HAVE__commode
 #define __CRT_HAVE_KOS$_control87
 #define __CRT_HAVE_KOS$_controlfp
 #define __CRT_HAVE_KOS$_controlfp_s
@@ -5875,6 +5896,8 @@
 #define __CRT_HAVE_KOS$_i64toa_s
 #define __CRT_HAVE_KOS$_i64tow
 #define __CRT_HAVE_KOS$_i64tow_s
+#define __CRT_HAVE__initterm
+#define __CRT_HAVE__initterm_e
 #define __CRT_HAVE__isalnum_l
 #define __CRT_HAVE__isalpha_l
 #define __CRT_HAVE__isatty
@@ -5917,6 +5940,7 @@
 #define __CRT_HAVE_KOS$_lfind_s
 #define __CRT_HAVE_KOS$_loaddll
 #define __CRT_HAVE__localtime64
+#define __CRT_HAVE__lock
 #define __CRT_HAVE__lock_file
 #define __CRT_HAVE__locking
 #define __CRT_HAVE__logb
@@ -6116,6 +6140,7 @@
 #define __CRT_HAVE__ungetwc_nolock
 #define __CRT_HAVE__unlink
 #define __CRT_HAVE_KOS$_unloaddll
+#define __CRT_HAVE__unlock
 #define __CRT_HAVE_KOS$_unlock_fhandle
 #define __CRT_HAVE__unlock_file
 #define __CRT_HAVE_KOS$_utime32
@@ -6176,6 +6201,7 @@
 #define __CRT_HAVE_KOS$_vwprintf_s_l
 #define __CRT_HAVE_KOS$_vwscanf_l
 #define __CRT_HAVE__wchdir
+#define __CRT_HAVE__wcmdln
 #define __CRT_HAVE__wcscoll_l
 #define __CRT_HAVE__wcsdup
 #define __CRT_HAVE_KOS$_wcserror
@@ -6478,6 +6504,14 @@
 #define __CRT_HAVE_KOS$conjl
 #define __CRT_HAVE_KOS$connect
 #define __CRT_HAVE_KOS$consttime_memequal
+#define __CRT_HAVE_KOS$convert_freev
+#define __CRT_HAVE_KOS$convert_freevn
+#define __CRT_HAVE_KOS$convert_mbstowcs
+#define __CRT_HAVE_KOS$convert_mbstowcsn
+#define __CRT_HAVE_KOS$convert_wcstombs
+#define __CRT_HAVE_KOS$convert_wcstombsn
+#define __CRT_HAVE_KOS$convert_wcstombsv
+#define __CRT_HAVE_KOS$convert_wcstombsvn
 #define __CRT_HAVE_KOS$copysign
 #define __CRT_HAVE_KOS$copysignf
 #define __CRT_HAVE_KOS$copysignl
@@ -8911,6 +8945,7 @@
 #define __CRT_HAVE_DOS$__jnf
 #define __CRT_HAVE_DOS$__jnl
 #define __CRT_HAVE_DOS$__kill
+#define __CRT_HAVE_DOS$__lconv_init
 #define __CRT_HAVE_DOS$__ldexp
 #define __CRT_HAVE_DOS$__ldexpf
 #define __CRT_HAVE_DOS$__ldexpl
@@ -9145,6 +9180,9 @@
 #define __CRT_HAVE_DOS$__overflow
 #define __CRT_HAVE_DOS$__p___wargv
 #define __CRT_HAVE_DOS$__p___winitenv
+#define __CRT_HAVE_DOS$__p__acmdln
+#define __CRT_HAVE_DOS$__p__commode
+#define __CRT_HAVE_DOS$__p__wcmdln
 #define __CRT_HAVE_DOS$__p__wenviron
 #define __CRT_HAVE_DOS$__p__wpgmptr
 #define __CRT_HAVE_DOS$__pathconf
@@ -9221,6 +9259,7 @@
 #define __CRT_HAVE_DOS$__setstate
 #define __CRT_HAVE_DOS$__settimeofday
 #define __CRT_HAVE_DOS$__setuid
+#define __CRT_HAVE_DOS$__setusermatherr
 #define __CRT_HAVE_DOS$__sigaction
 #define __CRT_HAVE_DOS$__sigaddset
 #define __CRT_HAVE_DOS$__sigblock
@@ -9361,6 +9400,7 @@
 #define __CRT_HAVE_DOS$__wctrans_l
 #define __CRT_HAVE_DOS$__wctype_l
 #define __CRT_HAVE_DOS$__wgetmainargs
+#define __CRT_HAVE_DOS$__winitenv
 #define __CRT_HAVE_DOS$__write
 #define __CRT_HAVE_DOS$__writev
 #define __CRT_HAVE_DOS$__xpg_basename
@@ -9378,6 +9418,7 @@
 #define __CRT_HAVE_DOS$_abs64
 #define __CRT_HAVE_DOS$_access
 #define __CRT_HAVE_DOS$_access_s
+#define __CRT_HAVE_DOS$_acmdln
 #define __CRT_HAVE_DOS$_aligned_free
 #define __CRT_HAVE_DOS$_aligned_malloc
 #define __CRT_HAVE_DOS$_aligned_msize
@@ -9387,6 +9428,7 @@
 #define __CRT_HAVE_DOS$_aligned_realloc
 #define __CRT_HAVE_DOS$_aligned_recalloc
 #define __CRT_HAVE_DOS$_alloca
+#define __CRT_HAVE_DOS$_amsg_exit
 #define __CRT_HAVE_DOS$_atodbl
 #define __CRT_HAVE_DOS$_atodbl_l
 #define __CRT_HAVE_DOS$_atof_l
@@ -9413,6 +9455,7 @@
 #define __CRT_HAVE_DOS$_chsize_s
 #define __CRT_HAVE_DOS$_close
 #define __CRT_HAVE_DOS$_commit
+#define __CRT_HAVE_DOS$_commode
 #define __CRT_HAVE_DOS$_control87
 #define __CRT_HAVE_DOS$_controlfp
 #define __CRT_HAVE_DOS$_controlfp_s
@@ -9527,6 +9570,8 @@
 #define __CRT_HAVE_DOS$_i64toa_s
 #define __CRT_HAVE_DOS$_i64tow
 #define __CRT_HAVE_DOS$_i64tow_s
+#define __CRT_HAVE_DOS$_initterm
+#define __CRT_HAVE_DOS$_initterm_e
 #define __CRT_HAVE_DOS$_isalnum_l
 #define __CRT_HAVE_DOS$_isalpha_l
 #define __CRT_HAVE_DOS$_isatty
@@ -9569,6 +9614,7 @@
 #define __CRT_HAVE_DOS$_lfind_s
 #define __CRT_HAVE_DOS$_loaddll
 #define __CRT_HAVE_DOS$_localtime64
+#define __CRT_HAVE_DOS$_lock
 #define __CRT_HAVE_DOS$_lock_file
 #define __CRT_HAVE_DOS$_locking
 #define __CRT_HAVE_DOS$_logb
@@ -9768,6 +9814,7 @@
 #define __CRT_HAVE_DOS$_ungetwc_nolock
 #define __CRT_HAVE_DOS$_unlink
 #define __CRT_HAVE_DOS$_unloaddll
+#define __CRT_HAVE_DOS$_unlock
 #define __CRT_HAVE_DOS$_unlock_fhandle
 #define __CRT_HAVE_DOS$_unlock_file
 #define __CRT_HAVE_DOS$_utime32
@@ -9828,6 +9875,7 @@
 #define __CRT_HAVE_DOS$_vwprintf_s_l
 #define __CRT_HAVE_DOS$_vwscanf_l
 #define __CRT_HAVE_DOS$_wchdir
+#define __CRT_HAVE_DOS$_wcmdln
 #define __CRT_HAVE_DOS$_wcscoll_l
 #define __CRT_HAVE_DOS$_wcsdup
 #define __CRT_HAVE_DOS$_wcserror
@@ -10130,6 +10178,14 @@
 #define __CRT_HAVE_DOS$conjl
 #define __CRT_HAVE_DOS$connect
 #define __CRT_HAVE_DOS$consttime_memequal
+#define __CRT_HAVE_DOS$convert_freev
+#define __CRT_HAVE_DOS$convert_freevn
+#define __CRT_HAVE_DOS$convert_mbstowcs
+#define __CRT_HAVE_DOS$convert_mbstowcsn
+#define __CRT_HAVE_DOS$convert_wcstombs
+#define __CRT_HAVE_DOS$convert_wcstombsn
+#define __CRT_HAVE_DOS$convert_wcstombsv
+#define __CRT_HAVE_DOS$convert_wcstombsvn
 #define __CRT_HAVE_DOS$copysign
 #define __CRT_HAVE_DOS$copysignf
 #define __CRT_HAVE_DOS$copysignl

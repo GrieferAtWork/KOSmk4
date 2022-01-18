@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf24a1f16 */
+/* HASH CRC-32:0xc154494b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,6 +227,194 @@ __NAMESPACE_STD_USING(mbrtoc32)
 __NAMESPACE_STD_USING(c16rtomb)
 __NAMESPACE_STD_USING(c32rtomb)
 #endif /* !__CXX_SYSTEM_HEADER */
+
+
+#ifdef __USE_KOS
+/* Simple functions to convert between single-byte and multi-byte formats,
+ * without having to worry about buffers (since all of these functions will
+ * automatically allocate buffers on the heap) */
+
+#ifdef __CRT_HAVE_convert_freev
+__CDECLARE_VOID(,__NOTHROW_NCX,convert_freev,(char **__ptr),(__ptr))
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+#include <libc/local/uchar/convert_freev.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_freev, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freev)(char **__ptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freev))(__ptr); })
+#endif /* ... */
+#ifdef __CRT_HAVE_convert_freevn
+__CDECLARE_VOID(,__NOTHROW_NCX,convert_freevn,(char **__ptr, __SIZE_TYPE__ __count),(__ptr,__count))
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+#include <libc/local/uchar/convert_freevn.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_freevn, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freevn)(char **__ptr, __SIZE_TYPE__ __count) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freevn))(__ptr, __count); })
+#endif /* ... */
+#ifdef __CRT_HAVE_convert_wcstombs
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_wcstombs,(__WCHAR_TYPE__ const *__str),(__str))
+#elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#include <libc/local/uchar/convert_wcstombs.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_wcstombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL convert_wcstombs)(__WCHAR_TYPE__ const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombs))(__str); })
+#endif /* ... */
+#ifdef __CRT_HAVE_convert_wcstombsn
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_wcstombsn,(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),(__str,__len,__preslen))
+#elif defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#include <libc/local/uchar/convert_wcstombsn.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_wcstombsn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL convert_wcstombsn)(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsn))(__str, __len, __preslen); })
+#endif /* ... */
+#ifdef __CRT_HAVE_convert_wcstombsv
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_wcstombsv,(__WCHAR_TYPE__ const *const *__restrict __vector),(__vector))
+#elif defined(__CRT_HAVE_convert_wcstombsvn) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/uchar/convert_wcstombsv.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_wcstombsv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL convert_wcstombsv)(__WCHAR_TYPE__ const *const *__restrict __vector) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsv))(__vector); })
+#endif /* ... */
+#ifdef __CRT_HAVE_convert_wcstombsvn
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_wcstombsvn,(__WCHAR_TYPE__ const *const *__restrict __vector, size_t __count),(__vector,__count))
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/uchar/convert_wcstombsvn.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_wcstombsvn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL convert_wcstombsvn)(__WCHAR_TYPE__ const *const *__restrict __vector, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsvn))(__vector, __count); })
+#endif /* ... */
+#ifdef __CRT_HAVE_convert_mbstowcs
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,convert_mbstowcs,(char const *__restrict __str),(__str))
+#elif defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/uchar/convert_mbstowcs.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_mbstowcs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __WCHAR_TYPE__ *__NOTHROW_NCX(__LIBCCALL convert_mbstowcs)(char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstowcs))(__str); })
+#endif /* ... */
+#ifdef __CRT_HAVE_convert_mbstowcsn
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,convert_mbstowcsn,(char const *__restrict __str, size_t __len, size_t *__preslen),(__str,__len,__preslen))
+#elif (defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/uchar/convert_mbstowcsn.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_mbstowcsn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __WCHAR_TYPE__ *__NOTHROW_NCX(__LIBCCALL convert_mbstowcsn)(char const *__restrict __str, size_t __len, size_t *__preslen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstowcsn))(__str, __len, __preslen); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+#elif defined(__CRT_HAVE_DOS$convert_wcstombs)
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+#elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/uchar/convert_wcstombs.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL convert_c16tombs)(__CHAR16_TYPE__ const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombs))((__WCHAR_TYPE__ const *)__str); }
+#elif (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#include <libc/local/uchar/convert_c16tombs.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_c16tombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL convert_c16tombs)(__CHAR16_TYPE__ const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_c16tombs))(__str); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+#elif defined(__CRT_HAVE_KOS$convert_wcstombs)
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+#elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/uchar/convert_wcstombs.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBKCALL convert_c32tombs)(__CHAR32_TYPE__ const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombs))((__WCHAR_TYPE__ const *)__str); }
+#elif (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#include <libc/local/uchar/convert_c32tombs.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_c32tombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBKCALL convert_c32tombs)(__CHAR32_TYPE__ const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_c32tombs))(__str); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_c16tombsn,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+#elif defined(__CRT_HAVE_DOS$convert_wcstombsn)
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_c16tombsn,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+#elif (defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/uchar/convert_wcstombsn.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL convert_c16tombsn)(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsn))((__WCHAR_TYPE__ const *)__str, __len, __preslen); }
+#elif defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#include <libc/local/uchar/convert_c16tombsn.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_c16tombsn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL convert_c16tombsn)(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_c16tombsn))(__str, __len, __preslen); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_c32tombsn,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+#elif defined(__CRT_HAVE_KOS$convert_wcstombsn)
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_c32tombsn,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+#elif (defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/uchar/convert_wcstombsn.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBKCALL convert_c32tombsn)(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsn))((__WCHAR_TYPE__ const *)__str, __len, __preslen); }
+#elif defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#include <libc/local/uchar/convert_c32tombsn.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_c32tombsn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBKCALL convert_c32tombsn)(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_c32tombsn))(__str, __len, __preslen); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_wcstombsv) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_c16tombsv,(__CHAR16_TYPE__ const *const *__restrict __vector),convert_wcstombsv,(__vector))
+#elif defined(__CRT_HAVE_DOS$convert_wcstombsv)
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_c16tombsv,(__CHAR16_TYPE__ const *const *__restrict __vector),convert_wcstombsv,(__vector))
+#elif (defined(__CRT_HAVE_convert_wcstombsvn) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/uchar/convert_wcstombsv.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBDCALL convert_c16tombsv)(__CHAR16_TYPE__ const *const *__restrict __vector) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsv))((__WCHAR_TYPE__ const *const *)__vector); }
+#elif (defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombsvn) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/uchar/convert_c16tombsv.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_c16tombsv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBDCALL convert_c16tombsv)(__CHAR16_TYPE__ const *const *__restrict __vector) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_c16tombsv))(__vector); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_wcstombsv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_c32tombsv,(__CHAR32_TYPE__ const *const *__restrict __vector),convert_wcstombsv,(__vector))
+#elif defined(__CRT_HAVE_KOS$convert_wcstombsv)
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_c32tombsv,(__CHAR32_TYPE__ const *const *__restrict __vector),convert_wcstombsv,(__vector))
+#elif (defined(__CRT_HAVE_convert_wcstombsvn) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/uchar/convert_wcstombsv.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBKCALL convert_c32tombsv)(__CHAR32_TYPE__ const *const *__restrict __vector) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsv))((__WCHAR_TYPE__ const *const *)__vector); }
+#elif (defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombsvn) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/uchar/convert_c32tombsv.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_c32tombsv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBKCALL convert_c32tombsv)(__CHAR32_TYPE__ const *const *__restrict __vector) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_c32tombsv))(__vector); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_c16tombsvn,(__CHAR16_TYPE__ const *const *__restrict __vector, size_t __count),convert_wcstombsvn,(__vector,__count))
+#elif defined(__CRT_HAVE_DOS$convert_wcstombsvn)
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_c16tombsvn,(__CHAR16_TYPE__ const *const *__restrict __vector, size_t __count),convert_wcstombsvn,(__vector,__count))
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/uchar/convert_wcstombsvn.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBDCALL convert_c16tombsvn)(__CHAR16_TYPE__ const *const *__restrict __vector, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsvn))((__WCHAR_TYPE__ const *const *)__vector, __count); }
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/uchar/convert_c16tombsvn.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_c16tombsvn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBDCALL convert_c16tombsvn)(__CHAR16_TYPE__ const *const *__restrict __vector, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_c16tombsvn))(__vector, __count); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_c32tombsvn,(__CHAR32_TYPE__ const *const *__restrict __vector, size_t __count),convert_wcstombsvn,(__vector,__count))
+#elif defined(__CRT_HAVE_KOS$convert_wcstombsvn)
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,convert_c32tombsvn,(__CHAR32_TYPE__ const *const *__restrict __vector, size_t __count),convert_wcstombsvn,(__vector,__count))
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/uchar/convert_wcstombsvn.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBKCALL convert_c32tombsvn)(__CHAR32_TYPE__ const *const *__restrict __vector, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_wcstombsvn))((__WCHAR_TYPE__ const *const *)__vector, __count); }
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/uchar/convert_c32tombsvn.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_c32tombsvn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBKCALL convert_c32tombsvn)(__CHAR32_TYPE__ const *const *__restrict __vector, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_c32tombsvn))(__vector, __count); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_mbstowcs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR16_TYPE__ *,__NOTHROW_NCX,convert_mbstoc16,(char const *__restrict __str),convert_mbstowcs,(__str))
+#elif defined(__CRT_HAVE_DOS$convert_mbstowcs)
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR16_TYPE__ *,__NOTHROW_NCX,convert_mbstoc16,(char const *__restrict __str),convert_mbstowcs,(__str))
+#elif (defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/uchar/convert_mbstowcs.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __CHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL convert_mbstoc16)(char const *__restrict __str) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstowcs))(__str); }
+#elif (defined(__CRT_HAVE_convert_mbstowcsn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2) || (((defined(__CRT_HAVE_format_waprintf_printer) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_printer) || (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_format_waprintf_pack) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/uchar/convert_mbstoc16.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_mbstoc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __CHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL convert_mbstoc16)(char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstoc16))(__str); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_mbstowcs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
+#elif defined(__CRT_HAVE_KOS$convert_mbstowcs)
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
+#elif (defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/uchar/convert_mbstowcs.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __CHAR32_TYPE__ *__NOTHROW_NCX(__LIBKCALL convert_mbstoc32)(char const *__restrict __str) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstowcs))(__str); }
+#elif (defined(__CRT_HAVE_convert_mbstowcsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4) || (((defined(__CRT_HAVE_format_waprintf_printer) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$format_waprintf_printer) || (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_format_waprintf_pack) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/uchar/convert_mbstoc32.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_mbstoc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __CHAR32_TYPE__ *__NOTHROW_NCX(__LIBKCALL convert_mbstoc32)(char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstoc32))(__str); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_mbstowcsn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR16_TYPE__ *,__NOTHROW_NCX,convert_mbstoc16n,(char const *__restrict __str, size_t __len, size_t *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
+#elif defined(__CRT_HAVE_DOS$convert_mbstowcsn)
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR16_TYPE__ *,__NOTHROW_NCX,convert_mbstoc16n,(char const *__restrict __str, size_t __len, size_t *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
+#elif (defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/uchar/convert_mbstowcsn.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __CHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL convert_mbstoc16n)(char const *__restrict __str, size_t __len, size_t *__preslen) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstowcsn))(__str, __len, __preslen); }
+#elif ((defined(__CRT_HAVE_format_waprintf_printer) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_printer) || (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_format_waprintf_pack) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/uchar/convert_mbstoc16n.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_mbstoc16n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __CHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL convert_mbstoc16n)(char const *__restrict __str, size_t __len, size_t *__preslen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstoc16n))(__str, __len, __preslen); })
+#endif /* ... */
+#if defined(__CRT_HAVE_convert_mbstowcsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,convert_mbstoc32n,(char const *__restrict __str, size_t __len, size_t *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
+#elif defined(__CRT_HAVE_KOS$convert_mbstowcsn)
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,convert_mbstoc32n,(char const *__restrict __str, size_t __len, size_t *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
+#elif (defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/uchar/convert_mbstowcsn.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __CHAR32_TYPE__ *__NOTHROW_NCX(__LIBKCALL convert_mbstoc32n)(char const *__restrict __str, size_t __len, size_t *__preslen) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstowcsn))(__str, __len, __preslen); }
+#elif ((defined(__CRT_HAVE_format_waprintf_printer) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$format_waprintf_printer) || (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_format_waprintf_pack) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/uchar/convert_mbstoc32n.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_mbstoc32n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __CHAR32_TYPE__ *__NOTHROW_NCX(__LIBKCALL convert_mbstoc32n)(char const *__restrict __str, size_t __len, size_t *__preslen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_mbstoc32n))(__str, __len, __preslen); })
+#endif /* ... */
+#endif /* __USE_KOS */
 
 __SYSDECL_END
 #endif /* __CC__ */

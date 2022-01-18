@@ -24,17 +24,18 @@
 #include "../api.h"
 /**/
 
-#include "../libc/uchar.h"
-#include "parts.wchar.unistd.h"
-#include <unistd.h>
-#include <unicode.h>
+#include <sys/utsname.h>
+
+#include <fcntl.h>
 #include <format-printer.h>
 #include <malloc.h>
+#include <stdio.h> /* L_ctermid */
 #include <string.h>
 #include <uchar.h>
-#include <fcntl.h>
-#include <stdio.h> /* L_ctermid */
-#include <sys/utsname.h>
+#include <unicode.h>
+#include <unistd.h>
+
+#include "parts.wchar.unistd.h"
 
 DECL_BEGIN
 
@@ -44,9 +45,9 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED char32_t *
 NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd)
 /*[[[body:libc_wttyname]]]*/
-/*AUTO*/{
+{
 	static char32_t buf[32];
-	if likely(c32ttyname_r(fd, buf, sizeof(buf)) == 0)
+	if likely(libc_wttyname_r(fd, buf, sizeof(buf)) == 0)
 		return buf;
 	return NULL;
 }
@@ -58,9 +59,9 @@ NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd)
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") WUNUSED char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd)
 /*[[[body:libd_wttyname]]]*/
-/*AUTO*/{
+{
 	static char16_t buf[32];
-	if likely(c16ttyname_r(fd, buf, sizeof(buf)) == 0)
+	if likely(libd_wttyname_r(fd, buf, sizeof(buf)) == 0)
 		return buf;
 	return NULL;
 }
@@ -116,7 +117,7 @@ NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
 {
 	longptr_t result;
 	char *used_path;
-	used_path = libc_uchar_c32tombs(path);
+	used_path = convert_c32tombs(path);
 	if unlikely(!used_path)
 		return -1;
 	result = pathconf(used_path, name);
@@ -139,7 +140,7 @@ NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
 {
 	longptr_t result;
 	char *used_path;
-	used_path = libc_uchar_c16tombs(path);
+	used_path = convert_c16tombs(path);
 	if unlikely(!used_path)
 		return -1;
 	result = pathconf(used_path, name);
@@ -162,12 +163,12 @@ NOTHROW_RPC(LIBKCALL libc_wlinkat)(fd_t fromfd,
 	int result = -1;
 	char *used_from = NULL, *used_to = NULL;
 	if (from) {
-		used_from = libc_uchar_c32tombs(from);
+		used_from = convert_c32tombs(from);
 		if unlikely(!used_from)
 			goto done;
 	}
 	if (to) {
-		used_to = libc_uchar_c32tombs(to);
+		used_to = convert_c32tombs(to);
 		if unlikely(!used_to)
 			goto done_from;
 	}
@@ -194,12 +195,12 @@ NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd,
 	int result = -1;
 	char *used_from = NULL, *used_to = NULL;
 	if (from) {
-		used_from = libc_uchar_c16tombs(from);
+		used_from = convert_c16tombs(from);
 		if unlikely(!used_from)
 			goto done;
 	}
 	if (to) {
-		used_to = libc_uchar_c16tombs(to);
+		used_to = convert_c16tombs(to);
 		if unlikely(!used_to)
 			goto done_from;
 	}
@@ -221,7 +222,7 @@ NOTHROW_RPC(LIBKCALL libc_wchdir)(char32_t const *path)
 {
 	int result = -1;
 	char *used_path;
-	used_path = libc_uchar_c32tombs(path);
+	used_path = convert_c32tombs(path);
 	if likely(used_path) {
 		result = chdir(used_path);
 		free(used_path);
@@ -239,7 +240,7 @@ NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path)
 {
 	int result = -1;
 	char *used_path;
-	used_path = libc_uchar_c16tombs(path);
+	used_path = convert_c16tombs(path);
 	if likely(used_path) {
 		result = chdir(used_path);
 		free(used_path);
@@ -345,7 +346,7 @@ NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c32tombs(file);
+	used_file = convert_c32tombs(file);
 	if likely(used_file) {
 		result = faccessat(dfd, used_file, type, flags);
 		free(used_file);
@@ -367,7 +368,7 @@ NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c16tombs(file);
+	used_file = convert_c16tombs(file);
 	if likely(used_file) {
 		result = faccessat(dfd, used_file, type, flags);
 		free(used_file);
@@ -389,7 +390,7 @@ NOTHROW_RPC(LIBKCALL libc_wfchownat)(fd_t dfd,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c32tombs(file);
+	used_file = convert_c32tombs(file);
 	if likely(used_file) {
 		result = fchownat(dfd, used_file, owner, group, flags);
 		free(used_file);
@@ -411,7 +412,7 @@ NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c16tombs(file);
+	used_file = convert_c16tombs(file);
 	if likely(used_file) {
 		result = fchownat(dfd, used_file, owner, group, flags);
 		free(used_file);
@@ -432,10 +433,10 @@ NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text,
 {
 	int result = -1;
 	char *used_from, *used_to;
-	used_from = libc_uchar_c32tombs(link_text);
+	used_from = convert_c32tombs(link_text);
 	if unlikely(!used_from)
 		goto done;
-	used_to = libc_uchar_c32tombs(target_path);
+	used_to = convert_c32tombs(target_path);
 	if unlikely(!used_to)
 		goto done_from;
 	result = symlinkat(used_from, tofd, used_to);
@@ -459,10 +460,10 @@ NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text,
 {
 	int result = -1;
 	char *used_from, *used_to;
-	used_from = libc_uchar_c16tombs(link_text);
+	used_from = convert_c16tombs(link_text);
 	if unlikely(!used_from)
 		goto done;
-	used_to = libc_uchar_c16tombs(target_path);
+	used_to = convert_c16tombs(target_path);
 	if unlikely(!used_to)
 		goto done_from;
 	result = symlinkat(used_from, tofd, used_to);
@@ -571,7 +572,7 @@ NOTHROW_RPC(LIBKCALL libc_wunlinkat)(fd_t dfd,
 {
 	int result = -1;
 	char *used_name;
-	used_name = libc_uchar_c32tombs(name);
+	used_name = convert_c32tombs(name);
 	if likely(used_name) {
 		result = unlinkat(dfd, used_name, flags);
 		free(used_name);
@@ -591,7 +592,7 @@ NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
 {
 	int result = -1;
 	char *used_name;
-	used_name = libc_uchar_c16tombs(name);
+	used_name = convert_c16tombs(name);
 	if likely(used_name) {
 		result = unlinkat(dfd, used_name, flags);
 		free(used_name);
@@ -676,7 +677,7 @@ NOTHROW_NCX(LIBKCALL libc_wsetlogin)(char32_t const *name)
 {
 	int result = -1;
 	char *used_name;
-	used_name = libc_uchar_c32tombs(name);
+	used_name = convert_c32tombs(name);
 	if likely(used_name) {
 		result = setlogin(used_name);
 		free(used_name);
@@ -693,7 +694,7 @@ NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name)
 {
 	int result = -1;
 	char *used_name;
-	used_name = libc_uchar_c16tombs(name);
+	used_name = convert_c16tombs(name);
 	if likely(used_name) {
 		result = setlogin(used_name);
 		free(used_name);
@@ -713,7 +714,7 @@ NOTHROW_NCX(LIBKCALL libc_wsethostname)(char32_t const *name,
 	int result = -1;
 	char *used_name;
 	size_t used_len;
-	used_name = libc_uchar_c32tombsn(name, len, &used_len);
+	used_name = convert_c32tombsn(name, len, &used_len);
 	if likely(used_name) {
 		result = sethostname(used_name, used_len);
 		free(used_name);
@@ -733,7 +734,7 @@ NOTHROW_NCX(LIBDCALL libd_wsethostname)(char16_t const *name,
 	int result = -1;
 	char *used_name;
 	size_t used_len;
-	used_name = libc_uchar_c16tombsn(name, len, &used_len);
+	used_name = convert_c16tombsn(name, len, &used_len);
 	if likely(used_name) {
 		result = sethostname(used_name, used_len);
 		free(used_name);
@@ -819,7 +820,7 @@ NOTHROW_NCX(LIBKCALL libc_wsetdomainname)(char32_t const *name,
 	int result = -1;
 	char *used_name;
 	size_t used_len;
-	used_name = libc_uchar_c32tombsn(name, len, &used_len);
+	used_name = convert_c32tombsn(name, len, &used_len);
 	if likely(used_name) {
 		result = setdomainname(used_name, used_len);
 		free(used_name);
@@ -839,7 +840,7 @@ NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name,
 	int result = -1;
 	char *used_name;
 	size_t used_len;
-	used_name = libc_uchar_c16tombsn(name, len, &used_len);
+	used_name = convert_c16tombsn(name, len, &used_len);
 	if likely(used_name) {
 		result = setdomainname(used_name, used_len);
 		free(used_name);
@@ -858,7 +859,7 @@ NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *__restrict path)
 {
 	int result = -1;
 	char *used_path;
-	used_path = libc_uchar_c32tombs(path);
+	used_path = convert_c32tombs(path);
 	if likely(used_path) {
 		result = chroot(used_path);
 		free(used_path);
@@ -877,7 +878,7 @@ NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path)
 {
 	int result = -1;
 	char *used_path;
-	used_path = libc_uchar_c16tombs(path);
+	used_path = convert_c16tombs(path);
 	if likely(used_path) {
 		result = chroot(used_path);
 		free(used_path);
@@ -897,7 +898,7 @@ NOTHROW_RPC(LIBKCALL libc_wchown)(char32_t const *file,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c32tombs(file);
+	used_file = convert_c32tombs(file);
 	if likely(used_file) {
 		result = chown(used_file, owner, group);
 		free(used_file);
@@ -917,7 +918,7 @@ NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c16tombs(file);
+	used_file = convert_c16tombs(file);
 	if likely(used_file) {
 		result = chown(used_file, owner, group);
 		free(used_file);
@@ -1056,7 +1057,7 @@ NOTHROW_RPC(LIBKCALL libc_wget_current_dir_name)(void)
 	utf8_path = get_current_dir_name();
 	if unlikely(!utf8_path)
 		return NULL;
-	result = libc_uchar_mbstoc32(utf8_path);
+	result = convert_mbstoc32(utf8_path);
 	free(utf8_path);
 	return result;
 }
@@ -1072,7 +1073,7 @@ NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void)
 	utf8_path = get_current_dir_name();
 	if unlikely(!utf8_path)
 		return NULL;
-	result = libc_uchar_mbstoc16(utf8_path);
+	result = convert_mbstoc16(utf8_path);
 	free(utf8_path);
 	return result;
 }
@@ -1116,7 +1117,7 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c32tombs(file);
+	used_file = convert_c32tombs(file);
 	if likely(used_file) {
 		result = truncate(used_file, length);
 		free(used_file);
@@ -1135,7 +1136,7 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c16tombs(file);
+	used_file = convert_c16tombs(file);
 	if likely(used_file) {
 		result = truncate(used_file, length);
 		free(used_file);
@@ -1157,7 +1158,7 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c32tombs(file);
+	used_file = convert_c32tombs(file);
 	if likely(used_file) {
 		result = truncate64(used_file, length);
 		free(used_file);
@@ -1177,7 +1178,7 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
 {
 	int result = -1;
 	char *used_file;
-	used_file = libc_uchar_c16tombs(file);
+	used_file = convert_c16tombs(file);
 	if likely(used_file) {
 		result = truncate64(used_file, length);
 		free(used_file);

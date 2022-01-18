@@ -26,7 +26,6 @@
 #include <malloc.h>
 #include <uchar.h>
 
-#include "../libc/uchar.h"
 #include "parts.wchar.utime.h"
 
 DECL_BEGIN
@@ -39,7 +38,7 @@ NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c32tombs(filename);
+	used_filename = convert_c32tombs(filename);
 	if likely(used_filename) {
 		result = utime(used_filename, file_times);
 		free(used_filename);
@@ -56,7 +55,7 @@ NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c16tombs(filename);
+	used_filename = convert_c16tombs(filename);
 	if likely(used_filename) {
 		result = utime(used_filename, file_times);
 		free(used_filename);
@@ -76,7 +75,7 @@ NOTHROW_RPC(LIBKCALL libc_wutime64)(char32_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c32tombs(filename);
+	used_filename = convert_c32tombs(filename);
 	if likely(used_filename) {
 		result = utime64(used_filename, file_times);
 		free(used_filename);
@@ -94,7 +93,7 @@ NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c16tombs(filename);
+	used_filename = convert_c16tombs(filename);
 	if likely(used_filename) {
 		result = utime64(used_filename, file_times);
 		free(used_filename);

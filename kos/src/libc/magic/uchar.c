@@ -197,6 +197,194 @@ size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
 [[ignore]] uchar_c32rtomb(*) %{uchar32("wcrtomb")}
 
 
+
+
+%
+%
+%#ifdef __USE_KOS
+%{
+/* Simple functions to convert between single-byte and multi-byte formats,
+ * without having to worry about buffers (since all of these functions will
+ * automatically allocate buffers on the heap) */
+
+}
+
+%[default:section(".text.crt{|.dos}.wchar.unicode.convert")]
+
+[[requires_function(free)]]
+void convert_freev(/*utf-8*/ char **ptr) {
+	char **iter, *temp;
+	if unlikely(!ptr)
+		return;
+	for (iter = ptr; (temp = *iter) != NULL; ++iter)
+		free(temp);
+	free(ptr);
+}
+
+[[requires_function(free), decl_include("<hybrid/typecore.h>")]]
+void convert_freevn(/*utf-8*/ char **ptr, $size_t count) {
+	size_t i;
+	if unlikely(!ptr)
+		return;
+	for (i = 0; i < count; ++i) {
+		free(ptr[i]);
+	}
+	free(ptr);
+}
+
+[[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(convert_wcstombsn), impl_include("<libc/errno.h>")]]
+/*utf-8*/ char *convert_wcstombs($wchar_t const *str) {
+	if unlikely(!str) {
+@@pp_ifdef EINVAL@@
+		__libc_seterrno(EINVAL);
+@@pp_endif@@
+		return NULL;
+	}
+	return convert_wcstombsn(str, wcslen(str), NULL);
+}
+
+
+[[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(format_aprintf_printer, format_aprintf_pack)]]
+[[impl_include("<libc/errno.h>", "<bits/crt/format-printer.h>")]]
+/*utf-8*/ char *convert_wcstombsn($wchar_t const *__restrict str,
+                                  $size_t len, $size_t *preslen) {
+	struct __local_format_wto8_data {
+		__pformatprinter fd_printer;   /* [1..1] Inner printer */
+		void            *fd_arg;       /* Argument for `fd_printer' */
+@@pp_if __SIZEOF_WCHAR_T__ == 2@@
+		char16_t         fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+@@pp_endif@@
+	};
+	struct __local_format_aprintf_data {
+		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+		__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	};
+	struct __local_format_aprintf_data printer_data = { NULL, 0, 0 };
+	struct __local_format_wto8_data convert_data;
+	convert_data.fd_printer   = &format_aprintf_printer;
+	convert_data.fd_arg       = &printer_data;
+@@pp_if __SIZEOF_WCHAR_T__ == 2@@
+	convert_data.fd_surrogate = 0;
+@@pp_endif@@
+	if unlikely(format_wto8(&convert_data, str, len) < 0) {
+@@pp_if $has_function(free)@@
+		free(printer_data.ap_base);
+@@pp_endif@@
+		return NULL;
+	}
+	return format_aprintf_pack((struct @format_aprintf_data@ *)&printer_data, preslen);
+}
+
+[[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(convert_wcstombsvn)]]
+[[impl_include("<libc/errno.h>")]]
+/*utf-8*/ char **convert_wcstombsv($wchar_t const *const *__restrict vector) {
+	size_t count = 0;
+	if unlikely(!vector) {
+@@pp_ifdef EINVAL@@
+		__libc_seterrno(EINVAL);
+@@pp_endif@@
+		return NULL;
+	}
+	for (count = 0; vector[count]; ++count)
+		;
+	return convert_wcstombsvn(vector, count);
+}
+
+[[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(malloc, convert_wcstombs)]]
+[[impl_include("<libc/errno.h>")]]
+/*utf-8*/ char **convert_wcstombsvn($wchar_t const *const *__restrict vector, size_t count) {
+	size_t i;
+	char **result;
+	result = (char **)malloc((count + 1) * sizeof(char *));
+	if likely(result) {
+		for (i = 0; i < count; ++i) {
+			char *temp;
+			temp = convert_wcstombs(vector[i]);
+			if unlikely(!temp)
+				goto err;
+			result[i] = temp;
+		}
+		result[i] = NULL;
+	}
+	return result;
+err:
+@@pp_if $has_function(free)@@
+	while (i--)
+		free(result[i]);
+	free(result);
+@@pp_endif@@
+	return NULL;
+}
+
+
+[[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(convert_mbstowcsn)]]
+[[impl_include("<libc/errno.h>")]]
+$wchar_t *convert_mbstowcs(/*utf-8*/ char const *__restrict str) {
+	if unlikely(!str) {
+@@pp_ifdef EINVAL@@
+		__libc_seterrno(EINVAL);
+@@pp_endif@@
+		return NULL;
+	}
+	return convert_mbstowcsn(str, strlen(str), NULL);
+}
+
+[[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(format_waprintf_printer, format_waprintf_pack)]]
+[[impl_include("<libc/errno.h>", "<bits/crt/wformat-printer.h>")]]
+$wchar_t *convert_mbstowcsn(/*utf-8*/ char const *__restrict str, size_t len, size_t *preslen) {
+	struct __local_format_waprintf_data {
+		wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+		__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	};
+	struct __local_format_8tow_data {
+		__pwformatprinter fd_printer;    /* [1..1] Inner printer */
+		void             *fd_arg;        /* Argument for `fd_printer' */
+		__UINT32_TYPE__   fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	};
+	struct __local_format_waprintf_data printer_data = { NULL, 0, 0 };
+	struct __local_format_8tow_data convert_data;
+	convert_data.fd_printer    = &format_waprintf_printer;
+	convert_data.fd_arg        = &printer_data;
+	convert_data.fd_incomplete = 0;
+@@pp_if __SIZEOF_WCHAR_T__ == 2@@
+	if unlikely(format_8to16(&convert_data, str, len) < 0)
+@@pp_else@@
+	if unlikely(format_8to32(&convert_data, str, len) < 0)
+@@pp_endif@@
+	{
+@@pp_if $has_function(free)@@
+		free(printer_data.ap_base);
+@@pp_endif@@
+		return NULL;
+	}
+	return format_waprintf_pack((struct format_waprintf_data *)&printer_data, preslen);
+}
+
+
+convert_c16tombs(*) %{uchar16("convert_wcstombs")}
+convert_c32tombs(*) %{uchar32("convert_wcstombs")}
+convert_c16tombsn(*) %{uchar16("convert_wcstombsn")}
+convert_c32tombsn(*) %{uchar32("convert_wcstombsn")}
+convert_c16tombsv(*) %{uchar16("convert_wcstombsv")}
+convert_c32tombsv(*) %{uchar32("convert_wcstombsv")}
+convert_c16tombsvn(*) %{uchar16("convert_wcstombsvn")}
+convert_c32tombsvn(*) %{uchar32("convert_wcstombsvn")}
+convert_mbstoc16(*) %{uchar16("convert_mbstowcs")}
+convert_mbstoc32(*) %{uchar32("convert_mbstowcs")}
+convert_mbstoc16n(*) %{uchar16("convert_mbstowcsn")}
+convert_mbstoc32n(*) %{uchar32("convert_mbstowcsn")}
+
+%#endif /* __USE_KOS */
+
+
 %{
 
 __SYSDECL_END

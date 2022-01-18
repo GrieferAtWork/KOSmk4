@@ -28,11 +28,11 @@
 #include <malloc.h>
 #include <process.h>
 #include <stdarg.h>
+#include <uchar.h>
 #include <unistd.h>
 
 #include "../libc/capture-varargs.h"
 #include "../libc/globals.h"
-#include "../libc/uchar.h"
 #include "parts.wchar.process.h"
 
 DECL_BEGIN
@@ -45,27 +45,27 @@ NOTHROW_RPC(LIBCCALL libc_do_c16exec)(char16_t const *__restrict file_or_path,
                                       bool search_path) {
 	int result = -1;
 	char *used_file, **used_argv, **used_envp;
-	used_file = libc_uchar_c16tombs(file_or_path);
+	used_file = convert_c16tombs(file_or_path);
 	if unlikely(!used_file)
 		goto done;
-	used_argv = libc_uchar_c16tombsv(argv);
+	used_argv = convert_c16tombsv(argv);
 	if unlikely(!used_argv)
 		goto done_file;
 	if (envp) {
-		used_envp = libc_uchar_c16tombsv(envp);
+		used_envp = convert_c16tombsv(envp);
 		if unlikely(!used_envp)
 			goto done_argv;
 		result = search_path
 		         ? execvpe(used_file, used_argv, used_envp)
 		         : execve(used_file, used_argv, used_envp);
-		libc_uchar_freev(used_envp);
+		convert_freev(used_envp);
 	} else {
 		result = search_path
 		         ? execvp(used_file, used_argv)
 		         : execv(used_file, used_argv);
 	}
 done_argv:
-	libc_uchar_freev(used_argv);
+	convert_freev(used_argv);
 done_file:
 	free(used_file);
 done:
@@ -79,27 +79,27 @@ NOTHROW_RPC(LIBCCALL libc_do_c32exec)(char32_t const *__restrict file_or_path,
                                       bool search_path) {
 	int result = -1;
 	char *used_file, **used_argv, **used_envp;
-	used_file = libc_uchar_c32tombs(file_or_path);
+	used_file = convert_c32tombs(file_or_path);
 	if unlikely(!used_file)
 		goto done;
-	used_argv = libc_uchar_c32tombsv(argv);
+	used_argv = convert_c32tombsv(argv);
 	if unlikely(!used_argv)
 		goto done_file;
 	if (envp) {
-		used_envp = libc_uchar_c32tombsv(envp);
+		used_envp = convert_c32tombsv(envp);
 		if unlikely(!used_envp)
 			goto done_argv;
 		result = search_path
 		         ? execvpe(used_file, used_argv, used_envp)
 		         : execve(used_file, used_argv, used_envp);
-		libc_uchar_freev(used_envp);
+		convert_freev(used_envp);
 	} else {
 		result = search_path
 		         ? execvp(used_file, used_argv)
 		         : execv(used_file, used_argv);
 	}
 done_argv:
-	libc_uchar_freev(used_argv);
+	convert_freev(used_argv);
 done_file:
 	free(used_file);
 done:
@@ -114,27 +114,27 @@ NOTHROW_RPC(LIBCCALL libc_do_c16spawn)(int mode,
                                        bool search_path) {
 	int result = -1;
 	char *used_file, **used_argv, **used_envp;
-	used_file = libc_uchar_c16tombs(file_or_path);
+	used_file = convert_c16tombs(file_or_path);
 	if unlikely(!used_file)
 		goto done;
-	used_argv = libc_uchar_c16tombsv(argv);
+	used_argv = convert_c16tombsv(argv);
 	if unlikely(!used_argv)
 		goto done_file;
 	if (envp) {
-		used_envp = libc_uchar_c16tombsv(envp);
+		used_envp = convert_c16tombsv(envp);
 		if unlikely(!used_envp)
 			goto done_argv;
 		result = search_path
 		         ? spawnvpe(mode, used_file, used_argv, used_envp)
 		         : spawnve(mode, used_file, used_argv, used_envp);
-		libc_uchar_freev(used_envp);
+		convert_freev(used_envp);
 	} else {
 		result = search_path
 		         ? spawnvp(mode, used_file, used_argv)
 		         : spawnv(mode, used_file, used_argv);
 	}
 done_argv:
-	libc_uchar_freev(used_argv);
+	convert_freev(used_argv);
 done_file:
 	free(used_file);
 done:
@@ -149,27 +149,27 @@ NOTHROW_RPC(LIBCCALL libc_do_c32spawn)(int mode,
                                        bool search_path) {
 	int result = -1;
 	char *used_file, **used_argv, **used_envp;
-	used_file = libc_uchar_c32tombs(file_or_path);
+	used_file = convert_c32tombs(file_or_path);
 	if unlikely(!used_file)
 		goto done;
-	used_argv = libc_uchar_c32tombsv(argv);
+	used_argv = convert_c32tombsv(argv);
 	if unlikely(!used_argv)
 		goto done_file;
 	if (envp) {
-		used_envp = libc_uchar_c32tombsv(envp);
+		used_envp = convert_c32tombsv(envp);
 		if unlikely(!used_envp)
 			goto done_argv;
 		result = search_path
 		         ? spawnvpe(mode, used_file, used_argv, used_envp)
 		         : spawnve(mode, used_file, used_argv, used_envp);
-		libc_uchar_freev(used_envp);
+		convert_freev(used_envp);
 	} else {
 		result = search_path
 		         ? spawnvp(mode, used_file, used_argv)
 		         : spawnv(mode, used_file, used_argv);
 	}
 done_argv:
-	libc_uchar_freev(used_argv);
+	convert_freev(used_argv);
 done_file:
 	free(used_file);
 done:
@@ -772,7 +772,7 @@ NOTHROW_RPC(LIBKCALL libc_wsystem)(char32_t const *cmd)
 	if (!cmd) {
 		result = system(NULL);
 	} else {
-		used_cmd = libc_uchar_c32tombs(cmd);
+		used_cmd = convert_c32tombs(cmd);
 		if unlikely(!used_cmd)
 			return -1;
 		result = system(used_cmd);
@@ -792,7 +792,7 @@ NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd)
 	if (!cmd) {
 		result = system(NULL);
 	} else {
-		used_cmd = libc_uchar_c16tombs(cmd);
+		used_cmd = convert_c16tombs(cmd);
 		if unlikely(!used_cmd)
 			return -1;
 		result = system(used_cmd);

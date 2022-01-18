@@ -34,9 +34,9 @@
 #include <malloc.h>
 #include <string.h>
 #include <syscall.h>
+#include <uchar.h>
 #include <unistd.h>
 
-#include "../libc/uchar.h"
 #include "sys.stat.h"
 
 DECL_BEGIN
@@ -1293,7 +1293,7 @@ NOTHROW_NCX(LIBKCALL libc__wstat64)(char32_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c32tombs(filename);
+	used_filename = convert_c32tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat64(used_filename, buf);
 		free(used_filename);
@@ -1310,7 +1310,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c16tombs(filename);
+	used_filename = convert_c16tombs(filename);
 	if likely(used_filename) {
 		result = libd_dos_stat64(used_filename, buf);
 		free(used_filename);
@@ -1327,7 +1327,7 @@ NOTHROW_NCX(LIBKCALL libc__wstat32i64)(char32_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c32tombs(filename);
+	used_filename = convert_c32tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat32i64(used_filename, buf);
 		free(used_filename);
@@ -1344,7 +1344,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c16tombs(filename);
+	used_filename = convert_c16tombs(filename);
 	if likely(used_filename) {
 		result = libd_dos_stat32i64(used_filename, buf);
 		free(used_filename);
@@ -1361,7 +1361,7 @@ NOTHROW_NCX(LIBKCALL libc__wstat32)(char32_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c32tombs(filename);
+	used_filename = convert_c32tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat32(used_filename, buf);
 		free(used_filename);
@@ -1378,7 +1378,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 {
 	int result = -1;
 	char *used_filename;
-	used_filename = libc_uchar_c16tombs(filename);
+	used_filename = convert_c16tombs(filename);
 	if likely(used_filename) {
 		result = libd_dos_stat32(used_filename, buf);
 		free(used_filename);

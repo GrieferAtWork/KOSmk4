@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79f66234 */
+/* HASH CRC-32:0xa74b35a0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2228,6 +2228,10 @@ DFUN(".text.crt.dos.time", libd_asctime_r, libc_asctime_r, TP, 2, TP, TP)
 
 /* ttyent */
 DFUN(".text.crt.dos.database.utmpx", libd_getttynam, libc_getttynam, TP, 1, TP)
+
+/* uchar */
+DFUN(".text.crt.dos.wchar.unicode.convert", libd_convert_freev, libc_convert_freev, TV, 1, TP)
+DFUN(".text.crt.dos.wchar.unicode.convert", libd_convert_freevn, libc_convert_freevn, TV, 2, TP, TI)
 
 /* ulimit */
 DFUN(".text.crt.dos.unsorted", libd_ulimit, libc_ulimit, TP, 2, TD, TL)

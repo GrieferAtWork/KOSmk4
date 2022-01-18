@@ -43,6 +43,7 @@
 #include <string.h>
 #include <syscall.h>
 #include <syslog.h>
+#include <uchar.h>
 #include <unicode.h>
 #include <unistd.h>
 
@@ -53,7 +54,6 @@
 #include "compat.h"
 #include "dl.h"
 #include "globals.h"
-#include "uchar.h"
 
 DECL_BEGIN
 
@@ -936,7 +936,7 @@ libd___p__acmdln(void) {
 PRIVATE ATTR_SECTION(".text.crt.dos.application.init") char16_t *LIBDCALL
 construct_dos_wcommandline(void) {
 	char *acmdln = *libd___p__acmdln();
-	return acmdln ? libc_uchar_mbstoc16(acmdln) : NULL;
+	return acmdln ? convert_mbstoc16(acmdln) : NULL;
 }
 
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")

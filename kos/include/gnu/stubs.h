@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31ef81b6 */
+/* HASH CRC-32:0x838eee55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,6 @@
 #define __stub___p__crtAssertBusy
 #define __stub___p__crtBreakAlloc
 #define __stub___p__crtDbgFlag
-#define __stub___p__fmode
 #define __stub___p__wenviron
 #define __stub___p__wpgmptr
 #define __stub___pthread_register_cancel
@@ -61,7 +60,6 @@
 #define __stub__controlfp_s
 #define __stub__dupenv_s
 #define __stub__fpclass
-#define __stub__get_fmode
 #define __stub__get_invalid_parameter_handler
 #define __stub__get_output_format
 #define __stub__get_printf_count_output
@@ -74,7 +72,6 @@
 #define __stub__set_abort_behavior
 #define __stub__set_controlfp
 #define __stub__set_error_mode
-#define __stub__set_fmode
 #define __stub__set_invalid_parameter_handler
 #define __stub__set_output_format
 #define __stub__set_printf_count_output

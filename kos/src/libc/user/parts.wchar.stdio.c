@@ -23,7 +23,8 @@
 #include "../api.h"
 /**/
 
-#include "../libc/uchar.h"
+#include <uchar.h>
+
 #include "malloc.h"
 #include "parts.wchar.stdio.h"
 #include "stdio.h"
@@ -38,7 +39,7 @@ NOTHROW_NCX(LIBKCALL libc_wremove)(char32_t const *filename)
 {
 	int result = -1;
 	/*utf-8*/ char *utf8_filename;
-	utf8_filename = libc_uchar_c32tombs(filename);
+	utf8_filename = convert_c32tombs(filename);
 	if likely(utf8_filename) {
 		result = remove(utf8_filename);
 		free(utf8_filename);
@@ -54,7 +55,7 @@ NOTHROW_NCX(LIBDCALL libd_wremove)(char16_t const *filename)
 {
 	int result = -1;
 	/*utf-8*/ char *utf8_filename;
-	utf8_filename = libc_uchar_c16tombs(filename);
+	utf8_filename = convert_c16tombs(filename);
 	if likely(utf8_filename) {
 		result = remove(utf8_filename);
 		free(utf8_filename);
@@ -72,10 +73,10 @@ NOTHROW_NCX(LIBKCALL libc_wfopen)(char32_t const *filename,
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
 	/*utf-8*/ char *utf8_mode;
-	utf8_filename = libc_uchar_c32tombs(filename);
+	utf8_filename = convert_c32tombs(filename);
 	if unlikely(!utf8_filename)
 		goto done;
-	utf8_mode = libc_uchar_c32tombs(mode);
+	utf8_mode = convert_c32tombs(mode);
 	if unlikely(!utf8_mode) {
 		free(utf8_filename);
 		goto done;
@@ -97,10 +98,10 @@ NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename,
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
 	/*utf-8*/ char *utf8_mode;
-	utf8_filename = libc_uchar_c16tombs(filename);
+	utf8_filename = convert_c16tombs(filename);
 	if unlikely(!utf8_filename)
 		goto done;
-	utf8_mode = libc_uchar_c16tombs(mode);
+	utf8_mode = convert_c16tombs(mode);
 	if unlikely(!utf8_mode) {
 		free(utf8_filename);
 		goto done;
@@ -123,10 +124,10 @@ NOTHROW_NCX(LIBKCALL libc_wfreopen)(char32_t const *filename,
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
 	/*utf-8*/ char *utf8_mode;
-	utf8_filename = libc_uchar_c32tombs(filename);
+	utf8_filename = convert_c32tombs(filename);
 	if unlikely(!utf8_filename)
 		goto done;
-	utf8_mode = libc_uchar_c32tombs(mode);
+	utf8_mode = convert_c32tombs(mode);
 	if unlikely(!utf8_mode) {
 		free(utf8_filename);
 		goto done;
@@ -149,10 +150,10 @@ NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename,
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
 	/*utf-8*/ char *utf8_mode;
-	utf8_filename = libc_uchar_c16tombs(filename);
+	utf8_filename = convert_c16tombs(filename);
 	if unlikely(!utf8_filename)
 		goto done;
-	utf8_mode = libc_uchar_c16tombs(mode);
+	utf8_mode = convert_c16tombs(mode);
 	if unlikely(!utf8_mode) {
 		free(utf8_filename);
 		goto done;
@@ -174,10 +175,10 @@ NOTHROW_NCX(LIBKCALL libc_wpopen)(char32_t const *command,
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_command;
 	/*utf-8*/ char *utf8_mode;
-	utf8_command = libc_uchar_c32tombs(command);
+	utf8_command = convert_c32tombs(command);
 	if unlikely(!utf8_command)
 		goto done;
-	utf8_mode = libc_uchar_c32tombs(mode);
+	utf8_mode = convert_c32tombs(mode);
 	if unlikely(!utf8_mode) {
 		free(utf8_command);
 		goto done;
@@ -199,10 +200,10 @@ NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command,
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_command;
 	/*utf-8*/ char *utf8_mode;
-	utf8_command = libc_uchar_c16tombs(command);
+	utf8_command = convert_c16tombs(command);
 	if unlikely(!utf8_command)
 		goto done;
-	utf8_mode = libc_uchar_c16tombs(mode);
+	utf8_mode = convert_c16tombs(mode);
 	if unlikely(!utf8_mode) {
 		free(utf8_command);
 		goto done;

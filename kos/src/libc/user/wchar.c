@@ -32,7 +32,6 @@
 
 #include "../auto/parts.wchar.format-printer.h"
 #include "../libc/globals.h"
-#include "../libc/uchar.h"
 #include "malloc.h"
 #include "stdio-api.h"
 #include "stdio.h"
