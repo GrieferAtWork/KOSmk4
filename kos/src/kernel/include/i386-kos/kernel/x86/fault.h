@@ -43,6 +43,11 @@ DECL_BEGIN
 struct icpustate;
 struct df_cpustate;
 
+/* Fallback interrupt handler. */
+INTDEF ABNORMAL_RETURN WUNUSED NONNULL((1)) struct icpustate *FCALL
+x86_handle_unhandled_idt(struct icpustate *__restrict state,
+                         uintptr_t ecode, uintptr_t intno);
+
 /* Exception handlers */
 INTDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL x86_handle_divide_by_zero(struct icpustate *__restrict state);                         /* #DE  Divide-by-zero */
 INTDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL x86_handle_debugtrap(struct icpustate *__restrict state);                              /* #DB  Debug */
