@@ -50,10 +50,10 @@ x86_handle_invalid_tss(struct icpustate *__restrict state, uintptr_t ecode) {
 	 * is set (`EFLAGS.NT=1').
 	 *
 	 * Instead of doing a normal iret, the instruction will try to do:
-	 * >> __ltr(PERCPU(thiscpu_x86_tssdf).t_link);
+	 * >> __ltr(PERCPU(thiscpu_x86_tss).t_link);
 	 *
-	 * Because `PERCPU(thiscpu_x86_tssdf).t_link == 0', this will always
-	 * fail because  it would  try to  load a  NULL-segment  descriptor.
+	 * Because `PERCPU(thiscpu_x86_tss).t_link == 0', this will always
+	 * fail because it  would try to  load a NULL-segment  descriptor.
 	 *
 	 * The  solution to this  problem is to simply  detect this situation and
 	 * manually clear EFLAGS.NT before re-attempting the iret. This does mean
@@ -61,7 +61,7 @@ x86_handle_invalid_tss(struct icpustate *__restrict state, uintptr_t ecode) {
 	 * expecting this, but without this hack,  it'd be the kernel that  would
 	 * crash  when (as far  as I'm concerned) correct  use of "iret" suddenly
 	 * starts causing exceptions and going into the debugger and so on... */
-	if (ecode == 0) {
+	if (ecode == 0) { /* This `0' is the same `0' from `PERCPU(thiscpu_x86_tss).t_link' */
 		uintptr_t eflags;
 		byte_t const *pc;
 		eflags = icpustate_getpflags(state);
