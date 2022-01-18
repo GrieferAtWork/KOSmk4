@@ -665,6 +665,25 @@ INTERN void libpe_init(void) {
 	}
 }
 
+INTDEF void pe_exit_wrapper_asm(void);
+INTERN void FCALL pe_exit_wrapper(int exit_code) {
+	_Exit(exit_code);
+}
+__asm__(".pushsection .text\n"
+        ".global pe_exit_wrapper_asm\n"
+        ".hidden pe_exit_wrapper_asm\n"
+        ".type pe_exit_wrapper_asm, @function\n"
+        "pe_exit_wrapper_asm:\n"
+#ifdef __x86_64__
+        "	movq   %rax, %rdi\n"
+#else /* __x86_64__ */
+        "	movl   %eax, %ecx\n"
+#endif /* !__x86_64__ */
+        "	call   pe_exit_wrapper\n"
+        "	.size pe_exit_wrapper_asm, . - pe_exit_wrapper_asm\n"
+        ".popsection");
+
+
 /* Replacement for `linker_main' from `libdl.so' when a PE binary gets executed. */
 DEFINE_PUBLIC_ALIAS(__linker_main, libpe_linker_main);
 INTERN void *FCALL
@@ -800,6 +819,12 @@ libpe_linker_main(struct peexec_info *__restrict info,
 #error "Unsupported architecture"
 #endif /* !... */
 	}
+
+	/* The entry point of PE applications is allowed to return normally.
+	 * -> When it does, it must _exit(%Pax) the entire application. */
+	result = (byte_t *)result - sizeof(void *);
+	((void **)result)[0] = ((void **)result)[1];         /* Original entry point */
+	((void **)result)[1] = (void *)&pe_exit_wrapper_asm; /* Have entry point return here */
 
 	/* Return a pointer to the PE program entry point. */
 	return result;
