@@ -29,12 +29,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_process_vm_readv,hash:CRC-32=0x6a2ecd8f]]]*/
 /* >> process_vm_readv(2)
  * Read memory from another process's VM

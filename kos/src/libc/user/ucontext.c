@@ -25,13 +25,7 @@
 
 DECL_BEGIN
 
-
 #define CRT_NOT_REALL_UNIMPLEMENTED CRT_UNIMPLEMENTED
-
-
-
-
-
 
 /*[[[head:libc_getcontext,hash:CRC-32=0x202b2566]]]*/
 #ifndef LIBC_ARCH_HAVE_GETCONTEXT

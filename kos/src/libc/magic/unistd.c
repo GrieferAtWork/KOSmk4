@@ -696,8 +696,13 @@ $longptr_t fpathconf($fd_t fd, __STDC_INT_AS_UINT_T name);
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
 [[guard, cp, wunused, decl_include("<bits/types.h>")]]
-[[export_alias("__ttyname")]]
-char *ttyname($fd_t fd);
+[[export_alias("__ttyname"), requires_function(ttyname_r)]]
+char *ttyname($fd_t fd) {
+	static char buf[32];
+	if likely(ttyname_r(fd, buf, sizeof(buf)) == 0)
+		return buf;
+	return NULL;
+}
 
 @@>> ttyname_r(3)
 @@Return the name of a TTY given its file descriptor
@@ -736,7 +741,7 @@ char *getlogin() {
 
 @@>> chown(2)
 @@Change the ownership of a given `file' to `group:owner'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>"), export_alias("__chown", "__libc_chown")]]
 [[requires(defined(__AT_FDCWD) && $has_function(fchownat))]]
 int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
@@ -749,7 +754,7 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 @@return: * : The configuration limit associated with `name' for `path'
 @@return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
 @@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
-[[cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>")]]
+[[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>")]]
 [[userimpl, requires_include("<asm/os/oflags.h>"), export_alias("__pathconf")]]
 [[requires($has_function(fpathconf) && $has_function(open) && defined(__O_RDONLY))]]
 $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
@@ -769,7 +774,7 @@ $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
 @@Create a hard link from `from', leading to `to'
 [[cp, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(linkat))]]
-[[export_alias("__link", "__libc_link")]]
+[[crt_dos_variant, export_alias("__link", "__libc_link")]]
 int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
 	return linkat(__AT_FDCWD, from, __AT_FDCWD, to, 0);
@@ -961,7 +966,7 @@ int close($fd_t fd);
 @@>> access(2)
 @@@param: type: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `file', testing for `type'
-[[cp, guard, wunused, decl_include("<features.h>")]]
+[[cp, guard, wunused, crt_dos_variant, decl_include("<features.h>")]]
 [[dos_only_export_alias("_access"), section(".text.crt{|.dos}.fs.property")]]
 [[export_alias("__access", "__libc_access"), userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(faccessat))]]
@@ -972,14 +977,14 @@ int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 @@>> chdir(2)
 @@Change the current working directory to `path'
 [[cp, guard, dos_only_export_alias("_chdir"), export_alias("__chdir", "__libc_chdir")]]
-[[section(".text.crt{|.dos}.fs.basic_property")]]
+[[crt_dos_variant, section(".text.crt{|.dos}.fs.basic_property")]]
 int chdir([[nonnull]] char const *path);
 
 @@>> getcwd(2)
 @@Return the path of the current working directory, relative to the filesystem root set by `chdir(2)'
 [[cp, guard, dos_only_export_alias("_getcwd")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[crt_dos_variant, decl_include("<hybrid/typecore.h>")]]
 char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
@@ -987,7 +992,7 @@ char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 @@>> unlink(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `file'
 [[cp, guard, dos_only_export_alias("_unlink"), export_alias("__unlink", "__libc_unlink")]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
+[[crt_dos_variant, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
 int unlink([[nonnull]] char const *file) {
 	return unlinkat(__AT_FDCWD, file, 0);
@@ -996,10 +1001,10 @@ int unlink([[nonnull]] char const *file) {
 @@>> rmdir(2)
 @@Remove a directory referred to by `path'
 [[cp, guard, dos_only_export_alias("_rmdir"), export_alias("__rmdir", "__libc_rmdir")]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
-[[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
+[[crt_dos_variant, userimpl, requires_include("<asm/os/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && $has_function(unlinkat))]]
 int rmdir([[nonnull]] char const *path) {
-	return unlinkat(__AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
+	return unlinkat(__AT_FDCWD, path, __AT_REMOVEDIR);
 }
 
 %[default:section(".text.crt{|.dos}.fs.property")];
@@ -1008,7 +1013,7 @@ int rmdir([[nonnull]] char const *path) {
 @@>> euidaccess(2)
 @@@param: type: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `file', testing for `type', using the effective filesystem ids
-[[decl_include("<features.h>")]]
+[[crt_dos_variant, decl_include("<features.h>")]]
 [[cp, wunused, export_alias("eaccess")]]
 [[if(defined(__CRT_DOS)), alias("_access")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
@@ -1029,7 +1034,7 @@ eaccess(*) = euidaccess;
 @@>> faccessat(2)
 @@@param: type: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `dfd:file', testing for `type'
-[[cp, decl_include("<features.h>")]]
+[[crt_dos_variant, cp, decl_include("<features.h>")]]
 int faccessat($fd_t dfd, [[nonnull]] char const *file,
               __STDC_INT_AS_UINT_T type, $atflag_t flags);
 
@@ -1037,20 +1042,20 @@ int faccessat($fd_t dfd, [[nonnull]] char const *file,
 
 @@>> fchownat(2)
 @@Change the ownership of a given `dfd:file' to `group:owner'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int fchownat($fd_t dfd, [[nonnull]] char const *file,
              $uid_t owner, $gid_t group, $atflag_t flags);
 
 @@>> linkat(2)
 @@Create a hard link from `fromfd:from', leading to `tofd:to'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int linkat($fd_t fromfd, [[nonnull]] char const *from,
            $fd_t tofd, [[nonnull]] char const *to, $atflag_t flags);
 
 @@>> symlinkat(3)
 @@Create  a  new  symbolic  link  loaded  with  `link_text'  as link
 @@text, at the filesystem location referred to by `tofd:target_path'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
               [[nonnull]] char const *target_path);
 
@@ -1064,7 +1069,7 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 @@         keep on over allocating until the function indicates that it didn't
 @@         make use of the buffer in its entirety.
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'.
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *path,
                    [[outp(buflen)]] char *buf, size_t buflen);
 
@@ -1072,7 +1077,7 @@ ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *path,
 @@>> freadlinkat(2)
 @@Read the text of a symbolic link under `dfd:path' into the provided buffer.
 @@@param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *path,
                     [[outp(buflen)]] char *buf, size_t buflen,
                     $atflag_t flags);
@@ -1082,7 +1087,7 @@ ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *path,
 
 @@>> unlinkat(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `dfd:name'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int unlinkat($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
 
@@ -1415,9 +1420,10 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 }
 
 
-[[cp, wunused, ATTR_MALLOC]]
+[[crt_dos_variant, cp, wunused, ATTR_MALLOC]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
-[[impl_include("<bits/os/stat.h>"), requires_function(getcwd)]]
+[[impl_include("<bits/os/stat.h>")]]
+[[requires_function(getcwd), dependency(stat)]]
 char *get_current_dir_name() {
 @@pp_if $has_function(getenv) && $has_function(stat) && $has_function(strdup)@@
 	/* Specs require us to return a duplicate of $PWD iff it's correct
@@ -1496,7 +1502,7 @@ int usleep($useconds_t useconds) {
 	return 0;
 }
 
-[[cp, deprecated("Use getcwd()")]]
+[[crt_dos_variant, cp, deprecated("Use getcwd()")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
 [[userimpl, requires_function(getcwd)]]
 [[impl_include("<hybrid/typecore.h>")]]
@@ -1575,7 +1581,7 @@ $pid_t getsid($pid_t pid);
 @@Change the ownership of a given `file' to `group:owner',
 @@but don't reference it if  that file is a symbolic  link
 [[cp, section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
+[[crt_dos_variant, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(fchownat))]]
 int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
@@ -1603,7 +1609,7 @@ int truncate32([[nonnull]] char const *file, $pos32_t length);
 
 @@>> truncate(2), truncate64(2)
 @@Truncate the given file `file' to a length of `length'
-[[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[crt_dos_variant, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("truncate", "__truncate", "__libc_truncate")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("truncate64")]]
 [[section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>"), export_as("__truncate", "__libc_truncate")]]
@@ -1631,7 +1637,7 @@ int truncate([[nonnull]] char const *file, __PIO_OFFSET length) {
 %
 %#ifdef __USE_LARGEFILE64
 [[section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
-[[preferred_off64_variant_of(truncate), doc_alias("truncate")]]
+[[crt_dos_variant, preferred_off64_variant_of(truncate), doc_alias("truncate")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("__truncate", "__libc_truncate")]]
 [[impl_include("<features.h>"), impl_prefix(DEFINE_PIO_OFFSET)]]
 [[userimpl, requires($has_function(truncate32) || ($has_function(open64) && $has_function(ftruncate64)))]]
@@ -1844,7 +1850,7 @@ int ttyslot();
 @@text, at the filesystem location referred to by `target_path'.
 @@Same as `symlinkat(link_text, AT_FDCWD, target_path)'
 [[cp, section(".text.crt{|.dos}.fs.modify"), export_alias("__symlink", "__libc_symlink")]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
+[[crt_dos_variant, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(symlinkat))]]
 int symlink([[nonnull]] char const *link_text,
             [[nonnull]] char const *target_path) {
@@ -1861,7 +1867,7 @@ int symlink([[nonnull]] char const *link_text,
 @@         keep on over allocating until the function indicates that it didn't
 @@         make use of the buffer in its entirety.
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'
-[[cp, section(".text.crt{|.dos}.fs.property"), decl_include("<hybrid/typecore.h>")]]
+[[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.property"), decl_include("<hybrid/typecore.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>"), export_alias("__readlink", "__libc_readlink")]]
 [[requires(defined(__AT_FDCWD) && $has_function(readlinkat))]]
 ssize_t readlink([[nonnull]] char const *path,
@@ -2012,7 +2018,8 @@ __LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
 @@>> chroot(2)
 @@Change  the root directory of the calling `CLONE_FS' group of threads
 @@(usually the process) to a path that was previously address by `path'
-[[cp, section(".text.crt{|.dos}.fs.utility"), export_alias("__chroot", "__libc_chroot")]]
+[[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.utility")]]
+[[export_alias("__chroot", "__libc_chroot")]]
 int chroot([[nonnull]] char const *__restrict path);
 
 @@>> getpass(3), getpassphrase(3)
@@ -3077,7 +3084,7 @@ int fchroot($fd_t fd) {
 @@@return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
 @@@return: -1: Error. (s.a. `errno')
 [[decl_include("<hybrid/typecore.h>"), impl_include("<libc/errno.h>")]]
-[[requires_include("<asm/os/fcntl.h>")]]
+[[crt_dos_variant, requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(frealpathat) && defined(__AT_FDCWD))]]
 __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
                                   char *resolved, $size_t buflen) {

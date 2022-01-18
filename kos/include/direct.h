@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90f464e0 */
+/* HASH CRC-32:0xf7f489d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,12 +92,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),__libc_rmdir,(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); }
-#endif /* __AT_FDCWD && __CRT_HAVE_unlinkat */
+#endif /* __AT_FDCWD && __AT_REMOVEDIR && __CRT_HAVE_unlinkat */
 #endif /* !... */
 #define _getdcwd_nolock _getdcwd
 __CDECLARE_OPT(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),(__drive,__buf,__size))
@@ -143,14 +143,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),__r
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),__libc_rmdir,(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); })
-#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
+#else /* __AT_FDCWD && __AT_REMOVEDIR && __CRT_HAVE_unlinkat */
 #undef __rmdir_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
+#endif /* !__AT_FDCWD || !__AT_REMOVEDIR || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__rmdir_defined */
 #ifdef __CRT_HAVE__mkdir

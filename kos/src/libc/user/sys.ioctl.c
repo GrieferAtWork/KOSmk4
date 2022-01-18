@@ -27,13 +27,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
-
 /*[[[head:libc_ioctl,hash:CRC-32=0xb9c981c8]]]*/
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.

@@ -32,13 +32,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
-
 /*[[[head:libc_ulimit,hash:CRC-32=0x2d1ef6b5]]]*/
 /* >> ulimit(2)
  * @param: cmd: One OF `UL_*' */

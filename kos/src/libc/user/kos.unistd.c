@@ -42,8 +42,6 @@
 
 DECL_BEGIN
 
-
-
 /*[[[head:libc_Execv,hash:CRC-32=0x8d22d342]]]*/
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'

@@ -34,12 +34,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc__getdcwd,hash:CRC-32=0x887f4d]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.property") char *
 NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,

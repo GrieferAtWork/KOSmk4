@@ -694,7 +694,7 @@ int crt_flushall();
 
 @@>> remove(3)
 @@Remove a file or directory `filename'
-[[cp, std, guard]]
+[[crt_dos_variant, cp, std, guard]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(removeat))]]
 int remove([[nonnull]] char const *filename) {
@@ -705,7 +705,7 @@ int remove([[nonnull]] char const *filename) {
 @@Rename  a given file `oldname' to `newname_or_path', or in the event
 @@that `newname_or_path' refers to a directory, place the file within.
 [[cp, std, guard, export_alias("__rename", "__libc_rename")]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
+[[crt_dos_variant, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(renameat))]]
 int rename([[nonnull]] char const *oldname,
            [[nonnull]] char const *newname_or_path) {
@@ -714,7 +714,7 @@ int rename([[nonnull]] char const *oldname,
 
 
 @@>> tmpnam(3), tmpnam_r(3)
-[[std, wunused, section(".text.crt{|.dos}.fs.utility")]]
+[[crt_dos_variant, std, wunused, section(".text.crt{|.dos}.fs.utility")]]
 char *tmpnam([[nonnull]] char *buf);
 
 
@@ -1141,7 +1141,7 @@ FILE *tmpfile();
 
 @@>> fopen(3), fopen64(3)
 @@Create and return a new file-stream for accessing `filename'
-[[cp, std, wunused, export_as("_IO_fopen")]]
+[[crt_dos_variant, cp, std, wunused, export_as("_IO_fopen")]]
 [[export_as("setmntent", "__setmntent"), section(".text.crt{|.dos}.FILE.locked.access"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("fopen", "_IO_fopen")]]
 [[                                                                                                                                                     alias("fopen64")]]
@@ -1150,7 +1150,7 @@ FILE *fopen([[nonnull]] char const *__restrict filename,
 
 @@>> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
 @@Re-open the given  `stream' as a  file-stream for accessing  `filename'
-[[cp, std, section(".text.crt{|.dos}.FILE.locked.access"), no_crt_self_import]]
+[[crt_dos_variant, cp, std, section(".text.crt{|.dos}.FILE.locked.access"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")defined(__USE_STDIO_UNLOCKED) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)), alias("freopen_unlocked")]]
 [[if($extended_include_prefix("<features.h>"                     )defined(__USE_STDIO_UNLOCKED)                                                                                        ), alias("freopen64_unlocked")]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")                                 (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)), alias("freopen")]]
@@ -1606,7 +1606,7 @@ __STDC_INT_AS_SSIZE_T dprintf($fd_t fd, [[nonnull]] char const *__restrict forma
 %
 %#ifdef __USE_ATFILE
 @@>> renameat(2)
-[[cp, userimpl, requires_function(renameat2), section(".text.crt{|.dos}.fs.modify")]]
+[[crt_dos_variant, cp, userimpl, requires_function(renameat2), section(".text.crt{|.dos}.fs.modify")]]
 int renameat($fd_t oldfd, [[nonnull]] char const *oldname,
              $fd_t newfd, [[nonnull]] char const *newname_or_path) {
 	return renameat2(oldfd, oldname, newfd, newname_or_path, 0);
@@ -1616,7 +1616,7 @@ int renameat($fd_t oldfd, [[nonnull]] char const *oldname,
 %#ifdef __USE_KOS
 @@>> removeat(3)
 @@Remove a file or directory `filename' relative to a given base directory `dirfd'
-[[cp, section(".text.crt{|.dos}.fs.modify")]]
+[[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.modify")]]
 int removeat($fd_t dirfd, [[nonnull]] char const *filename);
 %#endif /* __USE_KOS */
 %#endif /* __USE_ATFILE */
@@ -1630,7 +1630,7 @@ int removeat($fd_t dirfd, [[nonnull]] char const *filename);
 @@  - `AT_RENAME_NOREPLACE' --> `RENAME_NOREPLACE'
 @@  - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
 @@  - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT'
-[[cp, section(".text.crt{|.dos}.fs.modify")]]
+[[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.modify")]]
 int renameat2($fd_t oldfd, [[nonnull]] char const *oldname,
               $fd_t newfd, [[nonnull]] char const *newname_or_path,
               $atflag_t flags);
@@ -2046,8 +2046,7 @@ $FILE *popenve([[nonnull]] char const *path,
 @@Similar to `getc()', but read 2 bytes
 [[cp_stdio, dos_only_export_alias("_getw")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("getw_unlocked")]]
-[[requires_function(fread)]]
-[[impl_include("<asm/crt/stdio.h>")]]
+[[requires_function(fread), impl_include("<asm/crt/stdio.h>")]]
 int getw([[nonnull]] $FILE *__restrict stream) {
 	u16 result;
 	return fread(&result, sizeof(result), 1, stream)
@@ -2059,9 +2058,9 @@ int getw([[nonnull]] $FILE *__restrict stream) {
 
 @@>> putw(3)
 @@Similar to `putc()', but write 2 bytes loaded from `W & 0xffff'
-[[cp_stdio, dos_only_export_alias("_putw"), requires_function(fwrite)]]
+[[cp_stdio, dos_only_export_alias("_putw")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("putw_unlocked")]]
-[[impl_include("<asm/crt/stdio.h>")]]
+[[requires_function(fwrite), impl_include("<asm/crt/stdio.h>")]]
 int putw(int w, [[nonnull]] $FILE *__restrict stream) {
 	u16 c = (u16)w;
 	return fwrite(&c, sizeof(c), 1, stream)
@@ -2558,12 +2557,12 @@ $off64_t ftello64([[nonnull]] $FILE *__restrict stream) {
 
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
-[[cp, wunused]]
+[[crt_dos_variant, cp, wunused]]
 [[preferred_largefile64_variant_of(fopen), doc_alias("fopen")]]
 $FILE *fopen64([[nonnull]] char const *__restrict filename,
                [[nonnull]] char const *__restrict modes);
 
-[[cp, doc_alias("freopen"), no_crt_self_import]]
+[[crt_dos_variant, cp, doc_alias("freopen"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")defined(__USE_STDIO_UNLOCKED) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)), alias("freopen_unlocked")]]
 [[if($extended_include_prefix("<features.h>"                     )defined(__USE_STDIO_UNLOCKED)                                                       ), alias("freopen64_unlocked")]]
 [[                                                                                                                                       largefile64_variant_of(freopen)]]
@@ -2743,7 +2742,7 @@ $FILE *fdreopen($fd_t fd, [[nonnull]] char const *__restrict modes,
 $FILE *fdreopen_unlocked($fd_t fd, [[nonnull]] char const *__restrict modes,
                          [[nonnull]] $FILE *__restrict stream);
 
-[[cp, doc_alias("freopen"), no_crt_self_import]]
+[[crt_dos_variant, cp, doc_alias("freopen"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("freopen_unlocked")]]
 [[                                                                                                                                                     alias("freopen64_unlocked")]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("freopen")]]
@@ -2752,7 +2751,7 @@ $FILE *freopen_unlocked([[nonnull]] char const *__restrict filename,
                         [[nonnull]] char const *__restrict modes,
                         [[nonnull]] $FILE *__restrict stream);
 
-[[cp, doc_alias("freopen"), no_crt_self_import]]
+[[crt_dos_variant, cp, doc_alias("freopen"), no_crt_self_import]]
 [[                                                                                    largefile64_variant_of(freopen_unlocked)]]
 [[                                                                                                    alias("freopen64_unlocked")]]
 [[if($extended_include_prefix("<asm/os/oflags.h>")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("freopen")]]
@@ -4190,7 +4189,7 @@ __NAMESPACE_STD_USING(FILE)
 %[insert:function(_pclose = pclose)]
 
 [[cp, wunused, section(".text.crt.dos.FILE.locked.access")]]
-[[requires_function(fopen)]]
+[[crt_dos_variant, requires_function(fopen)]]
 $FILE *_fsopen([[nonnull]] char const *filename,
                [[nonnull]] char const *modes, int sflag) {
 	(void)sflag;
@@ -4719,7 +4718,7 @@ __STDC_INT_AS_SIZE_T _fprintf_p_l([[nonnull]] $FILE *__restrict stream,
 [[cp, section(".text.crt.dos.FILE.locked.access")]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
-[[requires_function(fopen64)]]
+[[crt_dos_variant, requires_function(fopen64)]]
 errno_t fopen_s([[nonnull]] $FILE **pstream,
                 [[nonnull]] char const *filename,
                 [[nonnull]] char const *modes) {
@@ -4746,7 +4745,7 @@ errno_t fopen_s([[nonnull]] $FILE **pstream,
 [[cp, section(".text.crt.dos.FILE.locked.access")]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
-[[requires_function(freopen)]]
+[[crt_dos_variant, requires_function(freopen)]]
 errno_t freopen_s([[nonnull]] $FILE **pstream,
                   [[nonnull]] char const *filename,
                   [[nonnull]] char const *modes,

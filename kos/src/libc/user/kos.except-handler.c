@@ -26,8 +26,6 @@
 
 DECL_BEGIN
 
-
-
 /*[[[head:libc_set_exception_handler,hash:CRC-32=0xfd0dc29b]]]*/
 /* >> set_exception_handler(2)
  * Set the exception handler mode for the calling thread.

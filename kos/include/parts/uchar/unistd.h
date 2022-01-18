@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80db9554 */
+/* HASH CRC-32:0x524e2a61 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,6 +50,16 @@ __CREDIRECT(__ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16ttyname,(__fd_t __fd),wtt
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT_DOS(__ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16ttyname,(__fd_t __fd),wttyname,(__fd))
+#elif defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/parts.wchar.unistd/wttyname.h>
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBDCALL c16ttyname)(__fd_t __fd) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname))(__fd); }
+#elif defined(__CRT_HAVE_DOS$wttyname_r)
+#include <libc/local/parts.uchar.unistd/c16ttyname.h>
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBDCALL c16ttyname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ttyname))(__fd); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wttyname) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> ttyname(3)
@@ -59,6 +69,16 @@ __CREDIRECT(__ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32ttyname,(__fd_t __fd),wtt
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT_KOS(__ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32ttyname,(__fd_t __fd),wttyname,(__fd))
+#elif defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/parts.wchar.unistd/wttyname.h>
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char32_t *__NOTHROW_RPC(__LIBKCALL c32ttyname)(__fd_t __fd) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname))(__fd); }
+#elif defined(__CRT_HAVE_KOS$wttyname_r)
+#include <libc/local/parts.uchar.unistd/c32ttyname.h>
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char32_t *__NOTHROW_RPC(__LIBKCALL c32ttyname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ttyname))(__fd); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> ttyname_r(3)
@@ -442,12 +462,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__pa
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__path),_wrmdir,(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2
+#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.unistd/wrmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBDCALL c16rmdir)(char16_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wrmdir))((__WCHAR_TYPE__ const *)__path); }
-#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wunlinkat))
+#elif defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wunlinkat))
 #include <libc/local/parts.uchar.unistd/c16rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
@@ -472,12 +492,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32rmdir,(char32_t const *__pa
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32rmdir,(char32_t const *__path),_wrmdir,(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4
+#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.unistd/wrmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBKCALL c32rmdir)(char32_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wrmdir))((__WCHAR_TYPE__ const *)__path); }
-#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wunlinkat))
+#elif defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wunlinkat))
 #include <libc/local/parts.uchar.unistd/c32rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */

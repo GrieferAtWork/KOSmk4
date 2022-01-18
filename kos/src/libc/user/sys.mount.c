@@ -27,12 +27,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_mount,hash:CRC-32=0x1775d24a]]]*/
 /* >> mount(2)
  * @param: mountflags: Set of `MS_*' from <sys/mount.h> */

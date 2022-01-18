@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_ftok,hash:CRC-32=0xb02ba720]]]*/
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) key_t
 NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname,

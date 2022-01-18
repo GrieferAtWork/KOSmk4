@@ -4231,6 +4231,14 @@ do_handle_alt_variant_of:
 						LibraryFunctionBinding(
 							ppCond:  wholeCond,
 							binding: "libc_" + assemblyName));
+					if (currentFeatures.crt_dosVariant) {
+						if (currentDosLibraryFunction is none)
+							currentDosLibraryFunction = LibraryFunction();
+						currentDosLibraryFunction.bindings.append(
+							LibraryFunctionBinding(
+								ppCond:  wholeCond,
+								binding: "libd_" + assemblyName));
+					}
 					local binding = FunctionBinding(
 						ppCond:     constructAliasConditions(wholeCond, assemblyName),
 						prototypes: currentPrototypes,
@@ -5077,7 +5085,7 @@ got_chkExpr:
 						xcLocalFunction.prototype = []{
 							local usedPrototype: FunctionPrototype = currentPrototype;
 							local xc: XcharImplementation = wcharFunction
-								.getXCharImplementation(currentName, mode);
+								.getXCharImplementation(currentName, mode, false);
 							if (usedPrototype is none)
 								usedPrototype = xc.prototype;
 							local xcImpl: none | Callable | LoaderFunctionImplementation = xc.loaderImpl;
@@ -5096,7 +5104,7 @@ got_chkExpr:
 						};
 						xcLocalFunction.impl = []{
 							local xc: XcharImplementation = wcharFunction
-								.getXCharImplementation(currentName, mode);
+								.getXCharImplementation(currentName, mode, false);
 							local xcImpl: none | Callable | LoaderFunctionImplementation = xc.loaderImpl;
 							if (xcImpl is Callable)
 								xcImpl = xc.loaderImpl = xcImpl();
@@ -5121,7 +5129,7 @@ got_chkExpr:
 						local wc: Function = getWcharFunction();
 						@@The Xchar-function implementation
 						local xc: XcharImplementation = wcharFunction
-							.getXCharImplementation(currentName, mode);
+							.getXCharImplementation(currentName, mode, false);
 						/* Enumerate bindings of the underlying [[wchar]] Function to construct
 						 * new,  transformed  bindings   for  our  new   the  Xchar   function. */
 						local basicBindings = [];
@@ -5698,6 +5706,7 @@ again_lookup_wcsCurrent:
 					if (!allLibraryFunctionsByName.setnew(libc_dosName, currentDosLibraryFunction))
 						self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
 							.format({ libc_dosName }));
+					allDosVariantsByName[current.name] = currentDosLibraryFunction;
 					local crt_dosSection = currentFeatures.crt_dosSection !is none
 						? currentFeatures.crt_dosSection
 						: DEFAULT_DOS_SECTION;
@@ -5707,12 +5716,12 @@ again_lookup_wcsCurrent:
 						wcsCurrent.wc_internal_uchar = { currentDosLibraryFunction, currentKosLibraryFunction };
 						if (currentDosLibraryFunction.prototype !is bound) {
 							currentDosLibraryFunction.prototype = [] -> wcsCurrent
-								.getXCharImplementation(libc_dosName, WCHAR_REPLACEMENT_CHAR16)
+								.getXCharImplementation(libc_dosName, WCHAR_REPLACEMENT_CHAR16, true)
 								.prototype;
 						}
 						if (currentKosLibraryFunction.prototype !is bound) {
 							currentKosLibraryFunction.prototype = [] -> wcsCurrent
-								.getXCharImplementation(libc_kosName, WCHAR_REPLACEMENT_CHAR32)
+								.getXCharImplementation(libc_kosName, WCHAR_REPLACEMENT_CHAR32, true)
 								.prototype;
 						}
 						function createXCharBinding(
@@ -5722,7 +5731,7 @@ again_lookup_wcsCurrent:
 								implSection: UserString | string | none): Callable {
 							return []{
 								local xc: XcharImplementation = wcsCurrent
-									.getXCharImplementation(functionName, mode);
+									.getXCharImplementation(functionName, mode, true);
 								local xcLoaderImpl: LoaderFunctionImplementation = xc.loaderImpl;
 								if (xcLoaderImpl is Callable)
 									xcLoaderImpl = xcLoaderImpl();
@@ -5770,7 +5779,16 @@ again_lookup_wcsCurrent:
 							dosLibImpl = currentFeatures.crt_dosVariant.generate(
 								currentDosLibraryFunction, currentFeatures);
 						} else if (loaderImpl !is none) {
-							dosLibImpl = kosLibImpl;
+							/* Replace "libc_" prefix in calls to functions with DOS variants with "libd_"
+							 * Do this by explicitly replacing dependencies. */
+							dosLibImpl = []{
+								local usedKosLibImpl: FunctionImplementation = kosLibImpl;
+								if (usedKosLibImpl is Callable)
+									usedKosLibImpl = usedKosLibImpl();
+								return replaceWcharFunctionImplementation(
+									usedKosLibImpl, WCHAR_REPLACEMENT_CHAR16,
+									libc_dosName, currentPrototype, true);
+							};
 						} else {
 							local dosProto = currentDosLibraryFunction.prototype;
 							dosLibImpl = dosProto is Callable

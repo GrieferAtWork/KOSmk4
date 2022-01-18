@@ -26,12 +26,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_swapon,hash:CRC-32=0xf92aa9f3]]]*/
 /* >> swapon(2)
  * @param swapflags: Set of `SWAP_FLAG_*' */

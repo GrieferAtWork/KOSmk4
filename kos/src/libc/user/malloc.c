@@ -34,10 +34,6 @@
 
 DECL_BEGIN
 
-
-
-
-
 /*[[[skip:libc_valloc]]]*/
 /*[[[skip:libc_realloc_in_place]]]*/
 /*[[[skip:libc_posix_memalign]]]*/

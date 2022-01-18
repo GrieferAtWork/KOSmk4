@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_isastream,hash:CRC-32=0x195903e8]]]*/
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
 NOTHROW(LIBCCALL libc_isastream)(fd_t fd)

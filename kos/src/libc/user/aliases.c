@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_setaliasent,hash:CRC-32=0x27a2b301]]]*/
 /* >> setaliasent(3)
  * Rewind/Open the internal mail alias database file (which is located in `/etc/aliases') */

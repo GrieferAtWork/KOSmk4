@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x204948ff */
+/* HASH CRC-32:0xcb727320 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -354,7 +354,7 @@ NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) {
 	char *result;
 	char const *string;
 	result = strerror_buf;
-	string = libc_strerrordesc_np(errnum);
+	string = libd_strerrordesc_np(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
 		result[COMPILER_LENOF(strerror_buf) - 1] = '\0';
@@ -475,7 +475,7 @@ NOTHROW_NCX(LIBDCALL libd_strsignal)(signo_t signo) {
 	static char strsignal_buf[64];
 	char *result = strsignal_buf;
 	char const *string;
-	string = libc_sigdescr_np(signo);
+	string = libd_sigdescr_np(signo);
 	if (string) {
 		/* Copy the descriptor text. */
 		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
@@ -2067,7 +2067,7 @@ NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum,
 		goto fallback;
 	if (!buflen)
 		goto fallback;
-	string = libc_strerrordesc_np(errnum);
+	string = libd_strerrordesc_np(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
 		size_t msg_len = libc_strlen(string) + 1;
@@ -2080,7 +2080,7 @@ NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum,
 	}
 	return buf;
 fallback:
-	return libc_strerror(errnum);
+	return libd_strerror(errnum);
 }
 #include <hybrid/__assert.h>
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *

@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_getifaddrs,hash:CRC-32=0x8515e015]]]*/
 /* >> getifaddrs(3) */
 INTERN ATTR_SECTION(".text.crt.unsorted") int

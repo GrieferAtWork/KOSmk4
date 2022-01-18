@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6997 */
+/* HASH CRC-32:0x98a75d37 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,41 +30,10 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> mkdir(2) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mkdir)(char const *pathname, mode_t mode);
-/* >> chmod(2) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chmod)(char const *filename, mode_t mode);
-/* >> lchmod(2) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_lchmod)(char const *filename, mode_t mode);
 /* >> umask(2) */
 INTDEF mode_t NOTHROW_NCX(LIBDCALL libd_umask)(mode_t mode);
-/* >> fmkdirat(2)
- * @param flags: Set of `0 | AT_DOSPATH' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fmkdirat)(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags);
-/* >> fmknodat(2)
- * @param flags: Set of `0 | AT_DOSPATH' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fmknodat)(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags);
-/* >> mkfifo(2) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mkfifo)(char const *fifoname, mode_t mode);
-/* >> fchmodat(2)
- * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fchmodat)(fd_t dirfd, char const *filename, mode_t mode, atflag_t flags);
-/* >> mkdirat(2) */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_mkdirat)(fd_t dirfd, char const *pathname, mode_t mode);
-/* >> mkfifoat(2) */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_mkfifoat)(fd_t dirfd, char const *fifoname, mode_t mode);
 /* >> fchmod(2) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fchmod)(fd_t fd, mode_t mode);
-/* >> mknod(2) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mknod)(char const *nodename, mode_t mode, dev_t dev);
-/* >> mknodat(2) */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_mknodat)(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev);
-/* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_utimensat)(fd_t dirfd, char const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags);
-/* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_utimensat64)(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags);
 /* >> futimens(2), futimens64(2) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_futimens)(fd_t fd, struct timespec const times[2 /*or:3*/]);
 /* >> futimens(2), futimens64(2) */

@@ -33,12 +33,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_socket,hash:CRC-32=0x24108e4]]]*/
 /* >> socket(2)
  * Create a new socket for the given domain/type/protocol triple.

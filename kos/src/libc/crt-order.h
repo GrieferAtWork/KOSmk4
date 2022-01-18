@@ -450,6 +450,7 @@
 	CB(PREFIX.crt.dos.fs.environ) \
 	CB(PREFIX.crt.dos.fs.modify) \
 	CB(PREFIX.crt.dos.fs.dir) \
+	CB(PREFIX.crt.dos.fs.stat) \
 	CB(PREFIX.crt.dos.fs.utility) \
 	CB(PREFIX.crt.dos.string.memory) \
 	CB(PREFIX.crt.dos.unicode.UTF) \

@@ -30,9 +30,6 @@
 
 DECL_BEGIN
 
-
-
-
 /*[[[head:libc_acos,hash:CRC-32=0x2aab0512]]]*/
 /* Arc cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double

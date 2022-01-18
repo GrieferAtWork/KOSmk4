@@ -51,7 +51,7 @@ struct dfind {
 #define DFIND_INVALID ((struct dfind *)-1)
 
 PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir")
-struct dfind *LIBCCALL dfind_open(char const *__restrict filename) {
+struct dfind *LIBCCALL dfind_open(char const *__restrict filename, oflag_t oflags) {
 	char const *pathend;
 	struct dfind *result;
 	result = (struct dfind *)malloc(sizeof(struct dfind));
@@ -63,7 +63,7 @@ struct dfind *LIBCCALL dfind_open(char const *__restrict filename) {
 		--pathend;
 	if unlikely(pathend <= filename) {
 		PRIVATE ATTR_SECTION(".rodata.crt.dos.fs.dir") char const pwd[] = ".";
-		result->df_dir = fopendirat(AT_FDCWD, pwd, O_DOSPATH);
+		result->df_dir = fopendirat(AT_FDCWD, pwd, oflags);
 	} else {
 		char *path;
 		size_t pathlen;
@@ -71,7 +71,7 @@ struct dfind *LIBCCALL dfind_open(char const *__restrict filename) {
 		path    = (char *)alloca((pathlen + 1) * sizeof(char));
 		memcpy(path, filename, pathlen, sizeof(char));
 		path[pathlen] = '\0';
-		result->df_dir = fopendirat(AT_FDCWD, path, O_DOSPATH);
+		result->df_dir = fopendirat(AT_FDCWD, path, oflags);
 	}
 	if unlikely(!result->df_dir)
 		goto err_r;
@@ -192,16 +192,27 @@ err:
 
 
 
+/*[[[head:libd__access_s,hash:CRC-32=0x79d8bca9]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename,
+                                     int type)
+/*[[[body:libd__access_s]]]*/
+{
+	errno_t error;
+	error = sys_faccessat(AT_FDCWD, filename,
+	                      (syscall_ulong_t)(unsigned int)type,
+	                      AT_DOSPATH);
+	return libd_errno_kos2dos(-error);
+}
+/*[[[end:libd__access_s]]]*/
+
 /*[[[head:libc__access_s,hash:CRC-32=0x467308b4]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
                                      int type)
 /*[[[body:libc__access_s]]]*/
 {
-	errno_t error;
-	error = sys_access(filename,
-	                   (syscall_ulong_t)(unsigned int)type);
-	return libd_errno_kos2dos(-error);
+	return -sys_access(filename, (syscall_ulong_t)(unsigned int)type);
 }
 /*[[[end:libc__access_s]]]*/
 
@@ -219,14 +230,12 @@ NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd)
 }
 /*[[[end:libc__findclose]]]*/
 
-/*[[[head:libc__findfirst32,hash:CRC-32=0xfe0b33e5]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
-NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename,
-                                        struct _finddata32_t *__restrict finddata)
-/*[[[body:libc__findfirst32]]]*/
-{
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBCCALL libc__findfirst32_impl)(char const *__restrict filename,
+                                             struct _finddata32_t *__restrict finddata,
+                                             oflag_t oflags) {
 	struct dfind *result;
-	result = dfind_open(filename);
+	result = dfind_open(filename, oflags);
 	if likely(result != DFIND_INVALID) {
 		if (dfind_read32(result, finddata) != 0) {
 			dfind_close(result);
@@ -235,16 +244,34 @@ NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename,
 	}
 	return (intptr_t)(uintptr_t)result;
 }
+
+/*[[[head:libd__findfirst32,hash:CRC-32=0xc6fe465b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBDCALL libd__findfirst32)(char const *__restrict filename,
+                                        struct _finddata32_t *__restrict finddata)
+/*[[[body:libd__findfirst32]]]*/
+{
+	return libc__findfirst32_impl(filename, finddata, O_DOSPATH);
+}
+/*[[[end:libd__findfirst32]]]*/
+
+/*[[[head:libc__findfirst32,hash:CRC-32=0xfe0b33e5]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename,
+                                        struct _finddata32_t *__restrict finddata)
+/*[[[body:libc__findfirst32]]]*/
+{
+	return libc__findfirst32_impl(filename, finddata, 0);
+}
 /*[[[end:libc__findfirst32]]]*/
 
-/*[[[head:libc__findfirst32i64,hash:CRC-32=0x972e5214]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
-NOTHROW_RPC(LIBCCALL libc__findfirst32i64)(char const *__restrict filename,
-                                           struct _finddata32i64_t *__restrict finddata)
-/*[[[body:libc__findfirst32i64]]]*/
-{
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBCCALL libc__findfirst32i64_impl)(char const *__restrict filename,
+                                                struct _finddata32i64_t *__restrict finddata,
+                                                oflag_t oflags) {
 	struct dfind *result;
-	result = dfind_open(filename);
+	result = dfind_open(filename, oflags);
 	if likely(result != DFIND_INVALID) {
 		if (dfind_read32i64(result, finddata) != 0) {
 			dfind_close(result);
@@ -253,16 +280,34 @@ NOTHROW_RPC(LIBCCALL libc__findfirst32i64)(char const *__restrict filename,
 	}
 	return (intptr_t)(uintptr_t)result;
 }
+
+/*[[[head:libd__findfirst32i64,hash:CRC-32=0x2d574651]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBDCALL libd__findfirst32i64)(char const *__restrict filename,
+                                           struct _finddata32i64_t *__restrict finddata)
+/*[[[body:libd__findfirst32i64]]]*/
+{
+	return libc__findfirst32i64_impl(filename, finddata, O_DOSPATH);
+}
+/*[[[end:libd__findfirst32i64]]]*/
+
+/*[[[head:libc__findfirst32i64,hash:CRC-32=0x972e5214]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBCCALL libc__findfirst32i64)(char const *__restrict filename,
+                                           struct _finddata32i64_t *__restrict finddata)
+/*[[[body:libc__findfirst32i64]]]*/
+{
+	return libc__findfirst32i64_impl(filename, finddata, 0);
+}
 /*[[[end:libc__findfirst32i64]]]*/
 
-/*[[[head:libc__findfirst64,hash:CRC-32=0x9a3bf32c]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
-NOTHROW_RPC(LIBCCALL libc__findfirst64)(char const *__restrict filename,
-                                        struct __finddata64_t *__restrict finddata)
-/*[[[body:libc__findfirst64]]]*/
-{
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBCCALL libc__findfirst64_impl)(char const *__restrict filename,
+                                             struct __finddata64_t *__restrict finddata,
+                                             oflag_t oflags) {
 	struct dfind *result;
-	result = dfind_open(filename);
+	result = dfind_open(filename, oflags);
 	if likely(result != DFIND_INVALID) {
 		if (dfind_read64(result, finddata) != 0) {
 			dfind_close(result);
@@ -271,7 +316,27 @@ NOTHROW_RPC(LIBCCALL libc__findfirst64)(char const *__restrict filename,
 	}
 	return (intptr_t)(uintptr_t)result;
 }
+
+/*[[[head:libd__findfirst64,hash:CRC-32=0xb6da98d2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBDCALL libd__findfirst64)(char const *__restrict filename,
+                                        struct __finddata64_t *__restrict finddata)
+/*[[[body:libd__findfirst64]]]*/
+{
+	return libc__findfirst64_impl(filename, finddata, O_DOSPATH);
+}
+/*[[[end:libd__findfirst64]]]*/
+
+/*[[[head:libc__findfirst64,hash:CRC-32=0x9a3bf32c]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1, 2)) intptr_t
+NOTHROW_RPC(LIBCCALL libc__findfirst64)(char const *__restrict filename,
+                                        struct __finddata64_t *__restrict finddata)
+/*[[[body:libc__findfirst64]]]*/
+{
+	return libc__findfirst64_impl(filename, finddata, 0);
+}
 /*[[[end:libc__findfirst64]]]*/
+
 
 /*[[[head:libc__findnext32,hash:CRC-32=0xc2f9d86d]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.dir") NONNULL((2)) int
@@ -321,6 +386,27 @@ NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd,
 }
 /*[[[end:libc__findnext64]]]*/
 
+/*[[[head:libd__sopen_s,hash:CRC-32=0xfabc2763]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd,
+                                    char const *filename,
+                                    oflag_t oflags,
+                                    int sflags,
+                                    mode_t mode)
+/*[[[body:libd__sopen_s]]]*/
+{
+	fd_t resfd;
+	if unlikely(!fd)
+		return EINVAL;
+	(void)sflags; /* XXX: Share-mode? */
+	resfd = sys_open(filename, oflags | O_DOSPATH, mode);
+	if (E_ISERR(resfd))
+		return -(errno_t)resfd;
+	*fd = resfd;
+	return EOK;
+}
+/*[[[end:libd__sopen_s]]]*/
+
 /*[[[head:libc__sopen_s,hash:CRC-32=0x5885d95b]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
@@ -334,9 +420,7 @@ NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
 	if unlikely(!fd)
 		return EINVAL;
 	(void)sflags; /* XXX: Share-mode? */
-	resfd = sys_open(filename,
-	                 oflags,
-	                 mode);
+	resfd = sys_open(filename, oflags, mode);
 	if (E_ISERR(resfd))
 		return -(errno_t)resfd;
 	*fd = resfd;
@@ -367,13 +451,20 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
 #undef _findnext
 #undef _findnexti64
 
-/*[[[start:exports,hash:CRC-32=0x7c0c20c7]]]*/
+/*[[[start:exports,hash:CRC-32=0x63f78a07]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$_access_s, libd__access_s);
 DEFINE_PUBLIC_ALIAS(_access_s, libc__access_s);
 DEFINE_PUBLIC_ALIAS(_findclose, libc__findclose);
+DEFINE_PUBLIC_ALIAS(DOS$_findfirst, libd__findfirst32);
+DEFINE_PUBLIC_ALIAS(DOS$_findfirst32, libd__findfirst32);
 DEFINE_PUBLIC_ALIAS(_findfirst, libc__findfirst32);
 DEFINE_PUBLIC_ALIAS(_findfirst32, libc__findfirst32);
+DEFINE_PUBLIC_ALIAS(DOS$_findfirsti64, libd__findfirst32i64);
+DEFINE_PUBLIC_ALIAS(DOS$_findfirst32i64, libd__findfirst32i64);
 DEFINE_PUBLIC_ALIAS(_findfirsti64, libc__findfirst32i64);
 DEFINE_PUBLIC_ALIAS(_findfirst32i64, libc__findfirst32i64);
+DEFINE_PUBLIC_ALIAS(DOS$_findfirst64i32, libd__findfirst64);
+DEFINE_PUBLIC_ALIAS(DOS$_findfirst64, libd__findfirst64);
 DEFINE_PUBLIC_ALIAS(_findfirst64i32, libc__findfirst64);
 DEFINE_PUBLIC_ALIAS(_findfirst64, libc__findfirst64);
 DEFINE_PUBLIC_ALIAS(_findnext, libc__findnext32);
@@ -382,6 +473,8 @@ DEFINE_PUBLIC_ALIAS(_findnexti64, libc__findnext32i64);
 DEFINE_PUBLIC_ALIAS(_findnext32i64, libc__findnext32i64);
 DEFINE_PUBLIC_ALIAS(_findnext64i32, libc__findnext64);
 DEFINE_PUBLIC_ALIAS(_findnext64, libc__findnext64);
+DEFINE_PUBLIC_ALIAS(DOS$_sopen_s_nolock, libd__sopen_s);
+DEFINE_PUBLIC_ALIAS(DOS$_sopen_s, libd__sopen_s);
 DEFINE_PUBLIC_ALIAS(_sopen_s_nolock, libc__sopen_s);
 DEFINE_PUBLIC_ALIAS(_sopen_s, libc__sopen_s);
 DEFINE_PUBLIC_ALIAS(_mktemp_s, libc__mktemp_s);

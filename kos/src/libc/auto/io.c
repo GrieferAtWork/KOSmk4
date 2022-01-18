@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f3f9868 */
+/* HASH CRC-32:0x6718a0d3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,6 +104,19 @@ NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd,
 	return (fd_t)osfd;
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1)) fd_t
+NOTHROW_RPC(VLIBDCALL libd_sopen)(char const *filename,
+                                  oflag_t oflags,
+                                  int sflags,
+                                  ...) {
+	fd_t result;
+	va_list args;
+	va_start(args, sflags);
+	(void)sflags;
+	result = libd_open(filename, oflags, va_arg(args, mode_t));
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
                                   oflag_t oflags,
                                   int sflags,
@@ -155,6 +168,8 @@ DEFINE_PUBLIC_ALIAS(__lock_fhandle, libc___lock_fhandle);
 DEFINE_PUBLIC_ALIAS(_unlock_fhandle, libc__unlock_fhandle);
 DEFINE_PUBLIC_ALIAS(_get_osfhandle, libc__get_osfhandle);
 DEFINE_PUBLIC_ALIAS(_open_osfhandle, libc__open_osfhandle);
+DEFINE_PUBLIC_ALIAS(DOS$_sopen, libd_sopen);
+DEFINE_PUBLIC_ALIAS(DOS$sopen, libd_sopen);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_sopen, libc_sopen);
 #endif /* __LIBCCALL_IS_LIBDCALL */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a14c34c */
+/* HASH CRC-32:0xdff76843 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -382,9 +382,9 @@
 #endif /* __CRT_HAVE_rename || __CRT_HAVE___rename || __CRT_HAVE___libc_rename || (__AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_renameat2)) */
 
 #undef HAVE_RMDIR
-#if defined(__CRT_HAVE_rmdir) || defined(__CRT_HAVE__rmdir) || defined(__CRT_HAVE___rmdir) || defined(__CRT_HAVE___libc_rmdir) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
+#if defined(__CRT_HAVE_rmdir) || defined(__CRT_HAVE__rmdir) || defined(__CRT_HAVE___rmdir) || defined(__CRT_HAVE___libc_rmdir) || (defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat))
 #define HAVE_RMDIR 1
-#endif /* __CRT_HAVE_rmdir || __CRT_HAVE__rmdir || __CRT_HAVE___rmdir || __CRT_HAVE___libc_rmdir || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
+#endif /* __CRT_HAVE_rmdir || __CRT_HAVE__rmdir || __CRT_HAVE___rmdir || __CRT_HAVE___libc_rmdir || (__AT_FDCWD && __AT_REMOVEDIR && __CRT_HAVE_unlinkat) */
 
 #undef HAVE_SETENV
 #include <libc/template/environ.h>

@@ -25,7 +25,6 @@
 
 DECL_BEGIN
 
-
 /*[[[head:libc_inet_pton,hash:CRC-32=0xf535c570]]]*/
 /* >> inet_pton(3)
  * TODO: Implement & document */

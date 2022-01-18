@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x881bb0df */
+/* HASH CRC-32:0x61417337 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2152,6 +2152,13 @@ NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie,
 }
 #endif /* __SIZEOF_OFF64_T__ != __SIZEOF_OFF32_T__ */
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_RPC(LIBDCALL libd__fsopen)(char const *filename,
+                                   char const *modes,
+                                   int sflag) {
+	(void)sflag;
+	return libd_fopen(filename, modes);
+}
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename,
                                    char const *modes,
                                    int sflag) {
@@ -3088,6 +3095,30 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
+NOTHROW_RPC(LIBDCALL libd_fopen_s)(FILE **pstream,
+                                   char const *filename,
+                                   char const *modes) {
+	FILE *result;
+	if unlikely(!pstream || !filename || !modes) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	result = libd_fopen64(filename, modes);
+	if unlikely(!result) {
+#ifdef ENOMEM
+		return __libc_geterrno_or(ENOMEM);
+#else /* ENOMEM */
+		return 1;
+#endif /* !ENOMEM */
+	}
+	*pstream = result;
+	return EOK;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
 NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream,
                                    char const *filename,
                                    char const *modes) {
@@ -3108,6 +3139,30 @@ NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream,
 #endif /* !ENOMEM */
 	}
 	*pstream = result;
+	return EOK;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3, 4)) errno_t
+NOTHROW_RPC(LIBDCALL libd_freopen_s)(FILE **pstream,
+                                     char const *filename,
+                                     char const *modes,
+                                     FILE *oldstream) {
+	if unlikely(!pstream || !filename || !modes || !oldstream) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	oldstream = libd_freopen(filename, modes, oldstream);
+	if unlikely(!oldstream) {
+#ifdef __libc_geterrno
+		return __libc_geterrno();
+#else /* __libc_geterrno */
+		return 1;
+#endif /* !__libc_geterrno */
+	}
+	*pstream = oldstream;
 	return EOK;
 }
 #include <libc/errno.h>
@@ -3246,7 +3301,7 @@ INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 (LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...) {
 #ifdef __NO_PRINTF_STRERROR
 	char const *enodesc;
-	enodesc = libc_strerror(__libc_geterrno());
+	enodesc = libd_strerror(__libc_geterrno());
 	if (message) {
 
 		libc_fprintf(stderr, "%I16s: %I8s\n", message, enodesc);
@@ -3497,6 +3552,7 @@ DEFINE_PUBLIC_ALIAS(DOS$scanf_unlocked, libd_scanf_unlocked);
 DEFINE_PUBLIC_ALIAS(scanf_unlocked, libc_scanf_unlocked);
 DEFINE_PUBLIC_ALIAS(funopen, libc_funopen);
 DEFINE_PUBLIC_ALIAS(funopen64, libc_funopen64);
+DEFINE_PUBLIC_ALIAS(DOS$_fsopen, libd__fsopen);
 DEFINE_PUBLIC_ALIAS(_fsopen, libc__fsopen);
 DEFINE_PUBLIC_ALIAS(_vscanf_s_l, libc__vscanf_l);
 DEFINE_PUBLIC_ALIAS(_vscanf_l, libc__vscanf_l);
@@ -3692,7 +3748,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_fprintf_p_l, libd__fprintf_p_l);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_fprintf_p_l, libc__fprintf_p_l);
+DEFINE_PUBLIC_ALIAS(DOS$fopen_s, libd_fopen_s);
 DEFINE_PUBLIC_ALIAS(fopen_s, libc_fopen_s);
+DEFINE_PUBLIC_ALIAS(DOS$freopen_s, libd_freopen_s);
 DEFINE_PUBLIC_ALIAS(freopen_s, libc_freopen_s);
 DEFINE_PUBLIC_ALIAS(tmpnam_s, libc_tmpnam_s);
 DEFINE_PUBLIC_ALIAS(clearerr_s, libc_clearerr_s);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf11a551e */
+/* HASH CRC-32:0x99031dab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_wrmdir_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
+#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_wunlinkat)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wunlinkat_defined
 #define __local___localdep_wunlinkat_defined
@@ -33,14 +33,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t _
 #endif /* !__local___localdep_wunlinkat_defined */
 __LOCAL_LIBC(wrmdir) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wrmdir))(__WCHAR_TYPE__ const *__path) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_wunlinkat)(__AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
+	return (__NAMESPACE_LOCAL_SYM __localdep_wunlinkat)(__AT_FDCWD, __path, __AT_REMOVEDIR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wrmdir_defined
 #define __local___localdep_wrmdir_defined
 #define __localdep_wrmdir __LIBC_LOCAL_NAME(wrmdir)
 #endif /* !__local___localdep_wrmdir_defined */
-#else /* __AT_FDCWD && __CRT_HAVE_wunlinkat */
+#else /* __AT_FDCWD && __AT_REMOVEDIR && __CRT_HAVE_wunlinkat */
 #undef __local_wrmdir_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_wunlinkat */
+#endif /* !__AT_FDCWD || !__AT_REMOVEDIR || !__CRT_HAVE_wunlinkat */
 #endif /* !__local_wrmdir_defined */

@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_setrpcent,hash:CRC-32=0xfcccd260]]]*/
 INTERN ATTR_SECTION(".text.crt.net.rpc") void
 NOTHROW_RPC_KOS(LIBCCALL libc_setrpcent)(int stayopen)

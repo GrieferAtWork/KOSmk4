@@ -25,13 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
-
 /*[[[head:libc_login,hash:CRC-32=0x3f437df7]]]*/
 /* >> login(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1)) void

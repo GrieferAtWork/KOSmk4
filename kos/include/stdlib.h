@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x258a2269 */
+/* HASH CRC-32:0xd1523677 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3497,6 +3497,11 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),__ttyname,(__fd))
+#elif defined(__CRT_HAVE_ttyname_r)
+#include <libc/local/unistd/ttyname.h>
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL ttyname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ttyname))(__fd); })
 #else /* ... */
 #undef __ttyname_defined
 #endif /* !... */

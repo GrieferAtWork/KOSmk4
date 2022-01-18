@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_klogctl,hash:CRC-32=0xb4e5d19]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.klog") int
 NOTHROW_NCX(LIBCCALL libc_klogctl)(__STDC_INT_AS_UINT_T type,

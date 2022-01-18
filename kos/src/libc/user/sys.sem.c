@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libd_semctl,hash:CRC-32=0xc28f7352]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* Semaphore control operation. */

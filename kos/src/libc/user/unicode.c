@@ -29,7 +29,6 @@
 
 DECL_BEGIN
 
-
 /* Representation of a unicode character numerical value (s.a. `unicode_getnumeric(3)')
  * Because characters exist that represent  fractions (like ½), we  need to be able  to
  * represent  not just whole numbers, but also  fractions. For this purpose, the follow

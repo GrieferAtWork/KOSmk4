@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_getttyent,hash:CRC-32=0xf603834f]]]*/
 /* >> getttyent(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") struct ttyent *

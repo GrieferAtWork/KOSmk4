@@ -26,12 +26,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_ustat,hash:CRC-32=0x733bd28b]]]*/
 /* >> ustat(2) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) int

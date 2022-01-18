@@ -78,8 +78,6 @@ statfs64_to_statvfs64(struct statvfs64 *__restrict dst,
 
 
 
-
-
 /*[[[head:libc_statvfs,hash:CRC-32=0x98be8f6d]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_statvfs)(char const *file,

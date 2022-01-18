@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7faccb0d */
+/* HASH CRC-32:0xdd35a141 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -228,6 +228,15 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
                                     ...) {
 	__REDIRECT_EXECLE(char, libc_execvpe, file, args)
 }
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
+NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd) {
+	static char buf[32];
+	if likely(libc_ttyname_r(fd, buf, sizeof(buf)) == 0)
+		return buf;
+	return NULL;
+}
 /* >> getlogin(3)
  * Return the login name for the current user, or `NULL' on error.
  * s.a. `getlogin_r()' and `cuserid()' */
@@ -274,6 +283,26 @@ NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd) {
 #else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA */
 	return libc_tcgetattr(fd, &ios) != 0 ? 0 : 1;
 #endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA */
+}
+#include <bits/os/stat.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_MALLOC WUNUSED char *
+NOTHROW_RPC(LIBDCALL libd_get_current_dir_name)(void) {
+#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && ((defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))) && (defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
+	/* Specs require us to return a duplicate of $PWD iff it's correct
+	 *   ***Author's comment: DUMB!***
+	 */
+	char *pwd = libc_getenv("PWD");
+	if (pwd && *pwd) {
+		struct stat st_pwd, st_cwd;
+		if (stat(pwd, &st_pwd) == 0 &&
+		    stat(".", &st_cwd) == 0) {
+			if (st_pwd.st_dev == st_cwd.st_dev &&
+			    st_pwd.st_ino == st_cwd.st_ino)
+				return libc_strdup(pwd);
+		}
+	}
+#endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && ((__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) && (__CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) */
+	return libd_getcwd(NULL, 0);
 }
 #include <bits/os/stat.h>
 INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_MALLOC WUNUSED char *
@@ -1084,6 +1113,34 @@ NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
  * @return: -1: Error. (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd_resolvepath)(char const *filename,
+                                       char *resolved,
+                                       size_t buflen) {
+	__STDC_INT_AS_SSIZE_T retval;
+	char *result;
+	result = libd_frealpathat(__AT_FDCWD, filename, resolved, buflen, 0);
+	if unlikely(!result)
+		return -1;
+	retval = (__STDC_INT_AS_SSIZE_T)libc_strlen(result);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	if unlikely(!resolved)
+		libc_free(result);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return retval;
+}
+#include <libc/errno.h>
+/* >> resolvepath(3)
+ * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
+ * Also note that this function appears to  have a weird rule (which KOS  simply
+ * ignores)  that is related  to this function not  writing more than `PATH_MAX'
+ * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
+ * is to be able to handle names of arbitrary lengths)
+ * Additionally, the online docs don't mention what happens when `buflen' is  too
+ * small, so I guess I can just make up what's supposed to happen, and I say that
+ * the function will set errno=ERANGE and return -1
+ * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
+ * @return: -1: Error. (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename,
                                        char *resolved,
@@ -1176,6 +1233,8 @@ DEFINE_PUBLIC_ALIAS(DOS$execlpe, libd_execlpe);
 DEFINE_PUBLIC_ALIAS(_execlpe, libc_execlpe);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
+DEFINE_PUBLIC_ALIAS(__ttyname, libc_ttyname);
+DEFINE_PUBLIC_ALIAS(ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
@@ -1187,6 +1246,7 @@ DEFINE_PUBLIC_ALIAS(_isatty, libc_isatty);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isatty, libc_isatty);
 DEFINE_PUBLIC_ALIAS(isatty, libc_isatty);
+DEFINE_PUBLIC_ALIAS(DOS$get_current_dir_name, libd_get_current_dir_name);
 DEFINE_PUBLIC_ALIAS(get_current_dir_name, libc_get_current_dir_name);
 DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
@@ -1206,6 +1266,7 @@ DEFINE_PUBLIC_ALIAS(getpass_r, libc_getpass_r);
 DEFINE_PUBLIC_ALIAS(getpeereid, libc_getpeereid);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);
+DEFINE_PUBLIC_ALIAS(DOS$resolvepath, libd_resolvepath);
 DEFINE_PUBLIC_ALIAS(resolvepath, libc_resolvepath);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_tell, libc_tell);

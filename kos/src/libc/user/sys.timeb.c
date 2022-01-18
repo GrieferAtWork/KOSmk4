@@ -30,12 +30,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc__ftime32,hash:CRC-32=0x15c67f4e]]]*/
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'

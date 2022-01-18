@@ -38,12 +38,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_wttyname,hash:CRC-32=0x197d3063]]]*/
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
@@ -51,9 +45,9 @@ INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED char32_t *
 NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd)
 /*[[[body:libc_wttyname]]]*/
 /*AUTO*/{
-	(void)fd;
-	CRT_UNIMPLEMENTEDF("wttyname(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
-	libc_seterrno(ENOSYS);
+	static char32_t buf[32];
+	if likely(c32ttyname_r(fd, buf, sizeof(buf)) == 0)
+		return buf;
 	return NULL;
 }
 /*[[[end:libc_wttyname]]]*/
@@ -65,9 +59,9 @@ INTERN ATTR_SECTION(".text.crt.dos.unsorted") WUNUSED char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd)
 /*[[[body:libd_wttyname]]]*/
 /*AUTO*/{
-	(void)fd;
-	CRT_UNIMPLEMENTEDF("DOS$wttyname(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
-	libc_seterrno(ENOSYS);
+	static char16_t buf[32];
+	if likely(c16ttyname_r(fd, buf, sizeof(buf)) == 0)
+		return buf;
 	return NULL;
 }
 /*[[[end:libd_wttyname]]]*/

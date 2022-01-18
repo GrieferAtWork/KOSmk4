@@ -122,6 +122,7 @@ NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
 		return (uintptr_t)-1;
 	data->dtd_entry = entry;
 	data->dtd_arg   = arg;
+	/* TODO: Don't call clone() here -- Instead, use pthread_create()! */
 	result = clone(&dos_thread_entry,
 	               CLONE_CHILDSTACK_AUTO,
 	               CLONE_VM | CLONE_FS | CLONE_FILES |

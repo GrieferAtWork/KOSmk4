@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_setutxent,hash:CRC-32=0x8152a5f5]]]*/
 /* >> setutxent(3) */
 INTERN ATTR_SECTION(".text.crt.database.utmpx") void

@@ -29,7 +29,6 @@
 
 DECL_BEGIN
 
-
 #define DOS_O_APPEND     0x00008 /* Same as `O_APPEND' */
 #define DOS_O_TEMPORARY  0x00040 /* Same as `O_TMPFILE' */
 #define DOS_O_NOINHERIT  0x00080 /* Same as `O_CLOEXEC' */
@@ -66,6 +65,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 	if (dos_oflags & DOS_O_OBTAIN_DIR)
 		result |= O_DIRECTORY;
 #endif
+	result |= O_DOSPATH;
 	return result;
 }
 
@@ -91,15 +91,12 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
                                  ...)
 /*[[[body:libd_open]]]*/
 {
-#ifdef __NR_open
 	fd_t result;
 	oflag_t kos_oflags;
 	va_list args;
 	kos_oflags = oflag_dos2kos(oflags);
 	va_start(args, oflags);
-	result = sys_open(filename,
-	                  kos_oflags,
-	                  va_arg(args, mode_t));
+	result = libc_open(filename, kos_oflags, va_arg(args, mode_t));
 	va_end(args);
 	if unlikely(E_ISERR(result))
 		return libc_seterrno_neg(result);
@@ -112,15 +109,6 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 		}
 	}
 	return result;
-#else /* __NR_open */
-	va_list args;
-	mode_t mode;
-	va_start(args, oflags);
-	mode = va_arg(args, mode_t);
-	va_end(args);
-	return libd_openat(AT_FDCWD, filename,
-	                   oflags, mode);
-#endif /* !__NR_open */
 }
 /*[[[end:libd_open]]]*/
 
@@ -147,14 +135,9 @@ NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
 	va_list args;
 	va_start(args, oflags);
 #ifdef __NR_open
-	result = sys_open(filename,
-	                  oflags,
-	                  va_arg(args, mode_t));
+	result = sys_open(filename, oflags, va_arg(args, mode_t));
 #else /* __NR_open */
-	result = sys_openat(AT_FDCWD,
-	                    filename,
-	                    oflags,
-	                    va_arg(args, mode_t));
+	result = sys_openat(AT_FDCWD, filename, oflags, va_arg(args, mode_t));
 #endif /* !__NR_open */
 	va_end(args);
 	return libc_seterrno_syserr(result);
@@ -185,9 +168,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 #ifdef __NR_creat
 	result = sys_creat(filename, mode);
 #else /* __NR_creat */
-	result = sys_open(filename,
-	                  O_CREAT | O_WRONLY | O_TRUNC,
-	                  mode);
+	result = sys_open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
 #endif /* !__NR_creat */
 	return libc_seterrno_syserr(result);
 }
@@ -218,13 +199,9 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 	va_list args;
 	kos_oflags = oflag_dos2kos(oflags);
 	va_start(args, oflags);
-	result = sys_openat(dirfd, filename,
-	                    kos_oflags,
-	                    va_arg(args, mode_t));
+	result = libc_openat(dirfd, filename, kos_oflags, va_arg(args, mode_t));
 	va_end(args);
-	if unlikely(E_ISERR(result))
-		return libc_seterrno_neg(result);
-	if (!(oflags & DOS_O_OBTAIN_DIR)) {
+	if (result >= 0 && !(oflags & DOS_O_OBTAIN_DIR)) {
 		/* Make sure that the opened file isn't a directory. */
 		struct stat st;
 		if (E_ISOK(sys_kfstat(result, &st)) && S_ISDIR(st.st_mode)) {
@@ -259,10 +236,7 @@ NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd,
 	fd_t result;
 	va_list args;
 	va_start(args, oflags);
-	result = sys_openat(dirfd,
-	                    filename,
-	                    oflags,
-	                    va_arg(args, mode_t));
+	result = sys_openat(dirfd, filename, oflags, va_arg(args, mode_t));
 	va_end(args);
 	return libc_seterrno_syserr(result);
 }
@@ -359,10 +333,7 @@ NOTHROW_RPC(LIBCCALL libc_tee)(fd_t fdin,
 /*[[[body:libc_tee]]]*/
 {
 	ssize_t result;
-	result = sys_tee(fdin,
-	                 fdout,
-	                 length,
-	                 (syscall_ulong_t)flags);
+	result = sys_tee(fdin, fdout, length, (syscall_ulong_t)flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_tee]]]*/
@@ -377,10 +348,7 @@ NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd,
 /*[[[body:libc_name_to_handle_at]]]*/
 {
 	errno_t result;
-	result = sys_name_to_handle_at(dirfd,
-	                               name,
-	                               handle,
-	                               mnt_id,
+	result = sys_name_to_handle_at(dirfd, name, handle, mnt_id,
 	                               (syscall_ulong_t)flags);
 	return libc_seterrno_syserr(result);
 }
@@ -394,8 +362,7 @@ NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd,
 /*[[[body:libc_open_by_handle_at]]]*/
 {
 	fd_t result;
-	result = sys_open_by_handle_at(mountdirfd,
-	                               handle,
+	result = sys_open_by_handle_at(mountdirfd, handle,
 	                               (syscall_ulong_t)flags);
 	return libc_seterrno_syserr(result);
 }
@@ -450,9 +417,7 @@ NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
 	syscall_slong_t result;
 	va_list args;
 	va_start(args, cmd);
-	result = sys_fcntl(fd,
-	                   (syscall_ulong_t)cmd,
-	                   va_arg(args, void *));
+	result = sys_fcntl(fd, (syscall_ulong_t)cmd, va_arg(args, void *));
 	va_end(args);
 	return libc_seterrno_syserr(result);
 }
@@ -466,10 +431,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd,
                                          __STDC_INT_AS_UINT_T advise)
 /*[[[body:libc_posix_fadvise]]]*/
 {
-	return libc_posix_fadvise64(fd,
-	                            (off64_t)offset,
-	                            (off64_t)length,
-	                            advise);
+	return libc_posix_fadvise64(fd, (off64_t)offset, (off64_t)length, advise);
 }
 /*[[[end:libc_posix_fadvise]]]*/
 
@@ -480,9 +442,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd,
                                            __PIO_OFFSET length)
 /*[[[body:libc_posix_fallocate]]]*/
 {
-	return libc_posix_fallocate64(fd,
-	                              (off64_t)offset,
-	                              (off64_t)length);
+	return libc_posix_fallocate64(fd, (off64_t)offset, (off64_t)length);
 }
 /*[[[end:libc_posix_fallocate]]]*/
 

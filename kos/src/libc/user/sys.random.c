@@ -34,8 +34,6 @@
 
 DECL_BEGIN
 
-
-
 /*[[[head:libc_getrandom,hash:CRC-32=0x9174dfda]]]*/
 /* >> getrandom(2)
  * Ask the kernel for up to `num_bytes' bytes of random

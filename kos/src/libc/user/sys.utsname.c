@@ -27,12 +27,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_uname,hash:CRC-32=0x89815ceb]]]*/
 /* >> uname(2)
  * Put information about the system in `name'

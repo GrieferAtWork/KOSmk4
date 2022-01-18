@@ -31,12 +31,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_wutime,hash:CRC-32=0xeecda22f]]]*/
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify_time") NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *filename,

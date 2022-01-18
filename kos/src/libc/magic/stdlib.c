@@ -2483,7 +2483,7 @@ long a64l([[nonnull]] char const *s) {
 @@@param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
 @@                  path, or NULL  to automatically `malloc()'ate  and return  a
 @@                  buffer of sufficient size.
-[[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
+[[crt_dos_variant, cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *realpath([[nonnull]] char const *filename, char *resolved);
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -2499,7 +2499,7 @@ char *realpath([[nonnull]] char const *filename, char *resolved);
 @@      bytes  automatically allocated  in the heap,  ontop of which  you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 char *frealpath($fd_t fd, char *resolved, $size_t buflen);
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
@@ -2516,7 +2516,7 @@ char *frealpath($fd_t fd, char *resolved, $size_t buflen);
 @@      bytes  automatically allocated  in the heap,  ontop of which  you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 
 @@Returns the absolute filesystem path for the specified file
@@ -2533,7 +2533,7 @@ char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 @@@param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 @@@return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 char *frealpathat($fd_t dirfd, [[nonnull]] char const *filename,
                   char *resolved, $size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
@@ -2706,7 +2706,7 @@ int unlockpt($fd_t fd) {
 @@associated   with   the   master   descriptor   `fd'
 [[section(".text.crt{|.dos}.io.tty")]]
 [[wunused, requires_function(ptsname_r)]]
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 char *ptsname($fd_t fd) {
 	static char buf[64];
 	if unlikely(ptsname_r(fd, buf, sizeof(buf)))
@@ -2726,7 +2726,7 @@ $fd_t posix_openpt($oflag_t oflags);
 %#if defined(__USE_GNU) || defined(__USE_NETBSD)
 @@Returns the name of the PTY slave (Pseudo TTY slave)
 @@associated   with   the   master   descriptor   `fd'
-[[section(".text.crt{|.dos}.io.tty"), decl_include("<bits/types.h>")]]
+[[crt_dos_variant, section(".text.crt{|.dos}.io.tty"), decl_include("<bits/types.h>")]]
 int ptsname_r($fd_t fd, [[nonnull]] char *buf, $size_t buflen);
 %#endif /* __USE_GNU || __USE_NETBSD */
 
@@ -2838,7 +2838,7 @@ int getpt();
 
 @@Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
 @@Upon error, `NULL' is returned instead
-[[cp, ATTR_MALLOC, wunused, section(".text.crt{|.dos}.fs.property")]]
+[[crt_dos_variant, cp, ATTR_MALLOC, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *canonicalize_file_name([[nonnull]] char const *filename);
 
 @@Internal implementation for creating temporary files.
@@ -3209,7 +3209,7 @@ int shexec([[nullable]] char const *command) {
 %[insert:extern(ttyname)]
 
 @@Returns the absolute filename of the main executable (s.a. `program_invocation_name')
-[[const, wunused]]
+[[crt_dos_variant, const, wunused]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name))]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]

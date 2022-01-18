@@ -30,7 +30,6 @@
 
 DECL_BEGIN
 
-
 /*[[[skip:libc_MMap]]]*/
 /*[[[skip:libc_MUnmap]]]*/
 /*[[[skip:libc_MProtect]]]*/

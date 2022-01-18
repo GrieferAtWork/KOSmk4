@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc___h_errno_location,hash:CRC-32=0x907dfeca]]]*/
 /* Function to get address of global `h_errno' variable */
 INTERN ATTR_SECTION(".text.crt.net.db") ATTR_CONST ATTR_RETNONNULL WUNUSED int *

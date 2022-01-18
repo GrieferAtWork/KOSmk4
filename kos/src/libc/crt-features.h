@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeadf441c */
+/* HASH CRC-32:0x9e91b17c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,7 +158,11 @@
 #define __CRT_HAVE_DOS$__xpg_sigpause
 #define __CRT_HAVE_DOS$__xpg_strerror_r
 #define __CRT_HAVE_DOS$_abs64
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_access_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_aligned_free
 #define __CRT_HAVE_DOS$_aligned_malloc
 #define __CRT_HAVE_DOS$_aligned_msize
@@ -199,9 +203,13 @@
 #define __CRT_HAVE_DOS$_filelength
 #define __CRT_HAVE_DOS$_filelengthi64
 #define __CRT_HAVE_DOS$_findclose
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_findfirst32
 #define __CRT_HAVE_DOS$_findfirst32i64
 #define __CRT_HAVE_DOS$_findfirst64
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_findnext32
 #define __CRT_HAVE_DOS$_findnext32i64
 #define __CRT_HAVE_DOS$_findnext64
@@ -213,7 +221,11 @@
 #define __CRT_HAVE_DOS$_fprintf_s_l
 #define __CRT_HAVE_DOS$_fread_nolock_s
 #define __CRT_HAVE_DOS$_fscanf_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_fsopen
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_ftime32
 #define __CRT_HAVE_DOS$_ftime32_s
 #define __CRT_HAVE_DOS$_ftime64
@@ -372,9 +384,9 @@
 #define __CRT_HAVE_DOS$_snwscanf
 #define __CRT_HAVE_DOS$_snwscanf_l
 #define __CRT_HAVE_DOS$_snwscanf_s_l
+#define __CRT_HAVE_DOS$_sopen_s
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#define __CRT_HAVE_DOS$_sopen_s
 #define __CRT_HAVE_DOS$_splitpath
 #define __CRT_HAVE_DOS$_splitpath_s
 #define __CRT_HAVE_DOS$_sprintf_l
@@ -532,7 +544,11 @@
 #define __CRT_HAVE_DOS$abs
 #define __CRT_HAVE_DOS$accept
 #define __CRT_HAVE_DOS$accept4
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$access
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$acct
 #define __CRT_HAVE_DOS$acos
 #define __CRT_HAVE_DOS$acosf
@@ -642,7 +658,11 @@
 #define __CRT_HAVE_DOS$cacoshl
 #define __CRT_HAVE_DOS$cacosl
 #define __CRT_HAVE_DOS$calloc
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$canonicalize_file_name
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$carg
 #define __CRT_HAVE_DOS$cargf
 #define __CRT_HAVE_DOS$cargl
@@ -680,10 +700,14 @@
 #define __CRT_HAVE_DOS$cfsetispeed
 #define __CRT_HAVE_DOS$cfsetospeed
 #define __CRT_HAVE_DOS$cfsetspeed
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$chdir
 #define __CRT_HAVE_DOS$chmod
 #define __CRT_HAVE_DOS$chown
 #define __CRT_HAVE_DOS$chroot
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$cimag
 #define __CRT_HAVE_DOS$cimagf
 #define __CRT_HAVE_DOS$cimagl
@@ -832,7 +856,11 @@
 #define __CRT_HAVE_DOS$ether_ntoa_r
 #define __CRT_HAVE_DOS$ether_ntohost
 #define __CRT_HAVE_DOS$ether_paton_r
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$euidaccess
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$eventfd
 #define __CRT_HAVE_DOS$eventfd_read
 #define __CRT_HAVE_DOS$eventfd_write
@@ -861,15 +889,27 @@
 #define __CRT_HAVE_DOS$fabs
 #define __CRT_HAVE_DOS$fabsf
 #define __CRT_HAVE_DOS$fabsl
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$faccessat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fallocate
 #define __CRT_HAVE_DOS$fallocate64
 #define __CRT_HAVE_DOS$fattach
 #define __CRT_HAVE_DOS$fchdir
 #define __CRT_HAVE_DOS$fchmod
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fchmodat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fchown
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fchownat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fchroot
 #define __CRT_HAVE_DOS$fclose
 #define __CRT_HAVE_DOS$fcntl
@@ -964,16 +1004,24 @@
 #define __CRT_HAVE_DOS$fmin
 #define __CRT_HAVE_DOS$fminf
 #define __CRT_HAVE_DOS$fminl
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fmkdirat
 #define __CRT_HAVE_DOS$fmknodat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fmod
 #define __CRT_HAVE_DOS$fmodf
 #define __CRT_HAVE_DOS$fmodl
 #define __CRT_HAVE_DOS$fmtcheck
 #define __CRT_HAVE_DOS$fnmatch
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fopen
 #define __CRT_HAVE_DOS$fopen64
 #define __CRT_HAVE_DOS$fopen_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fopencookie
 #define __CRT_HAVE_DOS$fopendirat
 #define __CRT_HAVE_DOS$forkpty
@@ -1025,21 +1073,29 @@
 #define __CRT_HAVE_DOS$fread
 #define __CRT_HAVE_DOS$fread_s
 #define __CRT_HAVE_DOS$fread_unlocked
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$freadlinkat
 #define __CRT_HAVE_DOS$frealpath
 #define __CRT_HAVE_DOS$frealpath4
 #define __CRT_HAVE_DOS$frealpathat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$free
 #define __CRT_HAVE_DOS$freeaddrinfo
 #define __CRT_HAVE_DOS$freeifaddrs
 #define __CRT_HAVE_DOS$freelocale
 #define __CRT_HAVE_DOS$freezero
 #define __CRT_HAVE_DOS$fremovexattr
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$freopen
 #define __CRT_HAVE_DOS$freopen64
 #define __CRT_HAVE_DOS$freopen64_unlocked
 #define __CRT_HAVE_DOS$freopen_s
 #define __CRT_HAVE_DOS$freopen_unlocked
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$frexp
 #define __CRT_HAVE_DOS$frexpf
 #define __CRT_HAVE_DOS$frexpl
@@ -1148,6 +1204,11 @@
 #define __CRT_HAVE_DOS$gai_suspend
 #define __CRT_HAVE_DOS$gai_suspend64
 #define __CRT_HAVE_DOS$gcvt
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$get_current_dir_name
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$getaddrinfo
 #define __CRT_HAVE_DOS$getaddrinfo_a
 #define __CRT_HAVE_DOS$getaliasbyname
@@ -1155,7 +1216,11 @@
 #define __CRT_HAVE_DOS$getaliasent_r
 #define __CRT_HAVE_DOS$getauxval
 #define __CRT_HAVE_DOS$getbsize
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$getcwd
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$getdate
 #define __CRT_HAVE_DOS$getdate_r
 #define __CRT_HAVE_DOS$getdelim
@@ -1166,6 +1231,11 @@
 #define __CRT_HAVE_DOS$getentropy
 #define __CRT_HAVE_DOS$getenv
 #define __CRT_HAVE_DOS$getenv_s
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$getexecname
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$getgrent_r
 #define __CRT_HAVE_DOS$getgrgid
 #define __CRT_HAVE_DOS$getgrgid_r
@@ -1269,9 +1339,9 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$getwchar
 #define __CRT_HAVE_DOS$getwchar_unlocked
+#define __CRT_HAVE_DOS$getwd
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#define __CRT_HAVE_DOS$getwd
 #define __CRT_HAVE_DOS$getxattr
 #define __CRT_HAVE_DOS$gmtime
 #define __CRT_HAVE_DOS$gmtime64
@@ -1446,8 +1516,12 @@
 #define __CRT_HAVE_DOS$l64a
 #define __CRT_HAVE_DOS$l64a_r
 #define __CRT_HAVE_DOS$labs
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$lchmod
 #define __CRT_HAVE_DOS$lchown
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$lcong48
 #define __CRT_HAVE_DOS$lcong48_r
 #define __CRT_HAVE_DOS$ldexp
@@ -1462,8 +1536,12 @@
 #define __CRT_HAVE_DOS$lgammal
 #define __CRT_HAVE_DOS$lgammal_r
 #define __CRT_HAVE_DOS$lgetxattr
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$link
 #define __CRT_HAVE_DOS$linkat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$lio_listio
 #define __CRT_HAVE_DOS$lio_listio64
 #define __CRT_HAVE_DOS$listen
@@ -1669,13 +1747,21 @@
 #define __CRT_HAVE_DOS$memxlenw
 #define __CRT_HAVE_DOS$mergesort
 #define __CRT_HAVE_DOS$mincore
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$mkdir
 #define __CRT_HAVE_DOS$mkdirat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$mkdtemp
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$mkfifo
 #define __CRT_HAVE_DOS$mkfifoat
 #define __CRT_HAVE_DOS$mknod
 #define __CRT_HAVE_DOS$mknodat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$mkostemp
 #define __CRT_HAVE_DOS$mkostemp64
 #define __CRT_HAVE_DOS$mkostemps
@@ -1775,7 +1861,11 @@
 #define __CRT_HAVE_DOS$opendirat
 #define __CRT_HAVE_DOS$openlog
 #define __CRT_HAVE_DOS$openpty
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$pathconf
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$pclose
 #define __CRT_HAVE_DOS$perror
 #define __CRT_HAVE_DOS$pipe
@@ -1988,8 +2078,12 @@
 #define __CRT_HAVE_DOS$pthread_timedjoin_np
 #define __CRT_HAVE_DOS$pthread_tryjoin_np
 #define __CRT_HAVE_DOS$ptrace
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$ptsname
 #define __CRT_HAVE_DOS$ptsname_r
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$putchar
 #define __CRT_HAVE_DOS$putchar_unlocked
 #define __CRT_HAVE_DOS$putenv
@@ -2084,15 +2178,23 @@
 #define __CRT_HAVE_DOS$readdirk64
 #define __CRT_HAVE_DOS$readdirk64_r
 #define __CRT_HAVE_DOS$readdirk_r
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$readlink
 #define __CRT_HAVE_DOS$readlinkat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$readpassphrase
 #define __CRT_HAVE_DOS$readv
 #define __CRT_HAVE_DOS$realloc
 #define __CRT_HAVE_DOS$realloc_in_place
 #define __CRT_HAVE_DOS$reallocarray
 #define __CRT_HAVE_DOS$reallocf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$realpath
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$reboot
 #define __CRT_HAVE_DOS$recalloc
 #define __CRT_HAVE_DOS$recallocarray
@@ -2110,17 +2212,25 @@
 #define __CRT_HAVE_DOS$remainderf
 #define __CRT_HAVE_DOS$remainderl
 #define __CRT_HAVE_DOS$remap_file_pages
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$remove
 #define __CRT_HAVE_DOS$removeat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$removexattr
 #define __CRT_HAVE_DOS$remque
 #define __CRT_HAVE_DOS$remquo
 #define __CRT_HAVE_DOS$remquof
 #define __CRT_HAVE_DOS$remquol
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$rename
 #define __CRT_HAVE_DOS$renameat
 #define __CRT_HAVE_DOS$renameat2
 #define __CRT_HAVE_DOS$resolvepath
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$revoke
 #define __CRT_HAVE_DOS$rewind
 #define __CRT_HAVE_DOS$rewind_unlocked
@@ -2130,7 +2240,11 @@
 #define __CRT_HAVE_DOS$rint
 #define __CRT_HAVE_DOS$rintf
 #define __CRT_HAVE_DOS$rintl
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$rmdir
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$round
 #define __CRT_HAVE_DOS$roundf
 #define __CRT_HAVE_DOS$roundl
@@ -2319,7 +2433,11 @@
 #define __CRT_HAVE_DOS$sockatmark
 #define __CRT_HAVE_DOS$socket
 #define __CRT_HAVE_DOS$socketpair
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$sopen
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$spawnl
 #define __CRT_HAVE_DOS$spawnle
 #define __CRT_HAVE_DOS$spawnlp
@@ -2500,10 +2618,10 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$swprintf
 #define __CRT_HAVE_DOS$swscanf
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$symlink
 #define __CRT_HAVE_DOS$symlinkat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$sync_file_range
 #define __CRT_HAVE_DOS$syncfs
 #define __CRT_HAVE_DOS$syscall
@@ -2580,7 +2698,11 @@
 #define __CRT_HAVE_DOS$timespec_get64
 #define __CRT_HAVE_DOS$timingsafe_memcmp
 #define __CRT_HAVE_DOS$tmpfile_s
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$tmpnam
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$tmpnam_r
 #define __CRT_HAVE_DOS$tmpnam_s
 #define __CRT_HAVE_DOS$toascii
@@ -2599,8 +2721,12 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$trunc
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$truncate
 #define __CRT_HAVE_DOS$truncate64
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$truncf
 #define __CRT_HAVE_DOS$truncl
 #define __CRT_HAVE_DOS$tsearch
@@ -2654,8 +2780,12 @@
 #define __CRT_HAVE_DOS$unicode_writeutf16
 #define __CRT_HAVE_DOS$unicode_writeutf16_chk
 #define __CRT_HAVE_DOS$unicode_writeutf8
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$unlink
 #define __CRT_HAVE_DOS$unlinkat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$unlockpt
 #define __CRT_HAVE_DOS$unsetenv
 #define __CRT_HAVE_DOS$unshare
@@ -2666,8 +2796,12 @@
 #define __CRT_HAVE_DOS$ustat
 #define __CRT_HAVE_DOS$utime
 #define __CRT_HAVE_DOS$utime64
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$utimensat
 #define __CRT_HAVE_DOS$utimensat64
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$utimes
 #define __CRT_HAVE_DOS$utimes64
 #define __CRT_HAVE_DOS$utmpname

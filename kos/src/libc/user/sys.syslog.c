@@ -28,12 +28,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_closelog,hash:CRC-32=0x68d099ce]]]*/
 INTERN ATTR_SECTION(".text.crt.system.syslog") void
 NOTHROW_NCX(LIBCCALL libc_closelog)(void)

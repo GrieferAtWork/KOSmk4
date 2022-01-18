@@ -122,7 +122,7 @@ struct _finddata64i32_t;
 %[insert:function(_chmod = chmod)]
 
 [[cp, section(".text.crt.dos.fs.property")]]
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 errno_t _access_s([[nonnull]] char const *filename, int type);
 
 %[insert:function(_chsize = ftruncate)]
@@ -163,15 +163,15 @@ $oflag_t _setmode($fd_t fd, $oflag_t mode) {
 [[decl_include("<hybrid/typecore.h>")]]
 int _findclose(intptr_t findfd);
 
-[[cp, wunused, export_alias("_findfirst"), decl_include("<hybrid/typecore.h>")]]
+[[crt_dos_variant, cp, wunused, export_alias("_findfirst"), decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst32([[nonnull]] char const *__restrict filename,
                       [[nonnull]] struct _finddata32_t *__restrict finddata);
 
-[[cp, wunused, export_alias("_findfirsti64"), decl_include("<hybrid/typecore.h>")]]
+[[crt_dos_variant, cp, wunused, export_alias("_findfirsti64"), decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst32i64([[nonnull]] char const *__restrict filename,
                          [[nonnull]] struct _finddata32i64_t *__restrict finddata);
 
-[[cp, wunused, export_alias("_findfirst64i32"), decl_include("<hybrid/typecore.h>")]]
+[[crt_dos_variant, cp, wunused, export_alias("_findfirst64i32"), decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst64([[nonnull]] char const *__restrict filename,
                       [[nonnull]] struct __finddata64_t *__restrict finddata);
 
@@ -200,7 +200,7 @@ int _findnext64i32(intptr_t findfd,
 
 %[default:section(".text.crt.dos.fs.io")]
 %
-[[cp, export_alias("_sopen_s_nolock")]]
+[[crt_dos_variant, cp, export_alias("_sopen_s_nolock")]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(sopen)]]
@@ -330,7 +330,7 @@ $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 
 %[default:section(".text.crt.dos.fs.io")]
 
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 [[cp, vartypes($mode_t), wunused, dos_only_export_alias("_sopen")]]
 [[requires_function(open), section(".text.crt.dos.fs.io")]]
 $fd_t sopen([[nonnull]] char const *filename, $oflag_t oflags, int sflags, ...) {

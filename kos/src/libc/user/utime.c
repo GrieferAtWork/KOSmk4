@@ -27,12 +27,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_utime,hash:CRC-32=0x6ea63c2]]]*/
 /* >> utime(2), utime64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int

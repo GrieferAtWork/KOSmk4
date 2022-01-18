@@ -25,16 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
-
-
-
-
 /*[[[head:libc_ether_ntohost,hash:CRC-32=0xd6af50d2]]]*/
 /* Map a given `addr' to its corresponding hostname from `/etc/ethers'
  * @return: 0 : Success

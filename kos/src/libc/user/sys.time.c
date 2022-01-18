@@ -34,12 +34,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_gettimeofday,hash:CRC-32=0x551925d8]]]*/
 /* >> gettimeofday(2), gettimeofday64(2) */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int

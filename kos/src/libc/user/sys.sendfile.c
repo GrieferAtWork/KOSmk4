@@ -26,12 +26,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_sendfile,hash:CRC-32=0x4be9e70a]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ssize_t
 NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd,

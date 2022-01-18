@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_shmctl,hash:CRC-32=0x8db49986]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.shm") int
 NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid,

@@ -34,9 +34,6 @@
 
 DECL_BEGIN
 
-
-
-
 /* DISCLAIMER: The implementation in this file is derived from that of glibc. */
 /* Getopt for GNU.
    Copyright (C) 1987-2017 Free Software Foundation, Inc.

@@ -26,12 +26,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_setfsuid,hash:CRC-32=0xddd3be13]]]*/
 /* >> setfsuid(2)
  * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the

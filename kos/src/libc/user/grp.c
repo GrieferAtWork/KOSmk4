@@ -31,12 +31,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_getgrgid,hash:CRC-32=0xb6ef74b6]]]*/
 /* >> getgrgid(3), getgrgid_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.group") struct group *

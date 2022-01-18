@@ -30,12 +30,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_ioperm,hash:CRC-32=0x3342be26]]]*/
 /* Change I/O port permissions for a specific I/O port range */
 INTERN ATTR_SECTION(".text.crt.system.ioperm") int

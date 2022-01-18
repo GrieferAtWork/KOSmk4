@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa87a5432 */
+/* HASH CRC-32:0x5cf2f2cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,6 +172,13 @@ INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBDCALL libd_fpathconf)(fd_t fd, __STDC_IN
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_ttyname)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_ttyname_r)(fd_t fd, char *buf, size_t buflen);
@@ -189,19 +196,6 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getlogin)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> chown(2)
- * Change the ownership of a given `file' to `group:owner' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t owner, gid_t group);
-/* >> pathconf(2)
- * @param: name: One of `_PC_*' from <asm/crt/confname.h>
- * Return a path configuration value associated with `name' for `path'
- * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
- * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
-/* >> link(2)
- * Create a hard link from `from', leading to `to' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_link)(char const *from, char const *to);
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
@@ -274,56 +268,6 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_dup)(fd_t fd);
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_close)(fd_t fd);
-/* >> access(2)
- * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_access)(char const *file, __STDC_INT_AS_UINT_T type);
-/* >> chdir(2)
- * Change the current working directory to `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chdir)(char const *path);
-/* >> getcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTDEF char *NOTHROW_RPC(LIBDCALL libd_getcwd)(char *buf, size_t bufsize);
-/* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `file' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_unlink)(char const *file);
-/* >> rmdir(2)
- * Remove a directory referred to by `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_rmdir)(char const *path);
-/* >> euidaccess(2)
- * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_euidaccess)(char const *file, __STDC_INT_AS_UINT_T type);
-/* >> faccessat(2)
- * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `dfd:file', testing for `type' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_faccessat)(fd_t dfd, char const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
-/* >> fchownat(2)
- * Change the ownership of a given `dfd:file' to `group:owner' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fchownat)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags);
-/* >> linkat(2)
- * Create a hard link from `fromfd:from', leading to `tofd:to' */
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
-/* >> symlinkat(3)
- * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
- * text, at the filesystem location referred to by `tofd:target_path' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
-/* >> readlinkat(2)
- * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This  function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
-/* >> freadlinkat(2)
- * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off64_t NOTHROW_NCX(LIBDCALL libd_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
@@ -359,6 +303,7 @@ INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flag
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe2)(fd_t pipedes[2], oflag_t flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBDCALL libd_get_current_dir_name)(void);
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -387,7 +332,6 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setresuid)(uid_t ruid, uid_t euid, uid_t su
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setresgid)(gid_t rgid, gid_t egid, gid_t sgid);
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_usleep)(useconds_t useconds);
-INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf);
 INTDEF useconds_t NOTHROW_NCX(LIBDCALL libd_ualarm)(useconds_t value, useconds_t interval);
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
@@ -405,16 +349,6 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getpgid)(pid_t pid);
  * Return the ID of the session which a process `pid' is apart of.
  * return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getsid)(pid_t pid);
-/* >> lchown(2)
- * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if  that file is a symbolic  link */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file, uid_t owner, gid_t group);
-/* >> truncate(2), truncate64(2)
- * Truncate the given file `file' to a length of `length' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file, __PIO_OFFSET length);
-/* >> truncate(2), truncate64(2)
- * Truncate the given file `file' to a length of `length' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file, __PIO_OFFSET64 length);
 /* >> fexecve(2)
  * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
@@ -459,21 +393,6 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_seteuid)(uid_t euid);
  * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setegid)(gid_t egid);
-/* >> symlink(3)
- * Create  a new  symbolic link  loaded with  `link_text' as link
- * text, at the filesystem location referred to by `target_path'.
- * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_symlink)(char const *link_text, char const *target_path);
-/* >> readlink(3)
- * Read the text of a symbolic link under `path' into the provided buffer.
- * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This  function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path, char *buf, size_t buflen);
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */
@@ -512,10 +431,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_revoke)(char const *file);
 INTDEF longptr_t NOTHROW_RPC(VLIBDCALL libd_syscall)(longptr_t sysno, ...);
 /* >> syscall(2), syscall64(2) */
 INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBDCALL libd_syscall64)(syscall_ulong_t sysno, ...);
-/* >> chroot(2)
- * Change  the root directory of the calling `CLONE_FS' group of threads
- * (usually the process) to a path that was previously address by `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path);
 /* >> getpass(3), getpassphrase(3) */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_getpass)(char const *__restrict prompt);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -731,8 +646,6 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd);
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> resolvepath(3)
  * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
  * Also note that this function appears to  have a weird rule (which KOS  simply
@@ -745,8 +658,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd);
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
  * @return: -1: Error. (s.a. `errno') */
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_resolvepath)(char const *filename, char *resolved, size_t buflen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> resolvepath(3)
  * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
  * Also note that this function appears to  have a weird rule (which KOS  simply

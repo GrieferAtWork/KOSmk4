@@ -26,12 +26,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_acct,hash:CRC-32=0xcd3ca374]]]*/
 /* Switch process accounting on and off */
 INTERN ATTR_SECTION(".text.crt.fs.modify") int

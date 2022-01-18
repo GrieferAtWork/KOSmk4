@@ -27,13 +27,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
-
 /*[[[head:libc_ptrace,hash:CRC-32=0xd2da63a1]]]*/
 INTERN ATTR_SECTION(".text.crt.system.ptrace") longptr_t
 NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request,

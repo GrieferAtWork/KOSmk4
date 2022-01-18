@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4404f6a */
+/* HASH CRC-32:0x31ef81b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -593,7 +593,6 @@
 #define __stub_vhangup
 #define __stub_wcsnrtombs
 #define __stub_wfreadlinkat
-#define __stub_wttyname
 #define __stub_wttyname_r
 #define __stub___y0
 #define __stub_y0
@@ -629,6 +628,7 @@
 #define __stub_DOS$fgetwln
 #define __stub_DOS$mbsnrtowcs
 #define __stub_DOS$open_wmemstream
+#define __stub_DOS$ptsname_r
 #ifndef __LIBCCALL_IS_LIBDCALL
 #define __stub_DOS$semctl
 #define __stub_DOS$setproctitle
@@ -636,9 +636,9 @@
 #define __stub_DOS$__strfmon_l
 #define __stub_DOS$strfmon_l
 #endif /* !__LIBCCALL_IS_LIBDCALL */
+#define __stub_DOS$tmpnam
 #define __stub_DOS$vfwscanf
 #define __stub_DOS$vfwscanf_unlocked
 #define __stub_DOS$wcsnrtombs
 #define __stub_DOS$wfreadlinkat
-#define __stub_DOS$wttyname
 #define __stub_DOS$wttyname_r

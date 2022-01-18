@@ -32,7 +32,6 @@
 
 DECL_BEGIN
 
-
 /*[[[head:libc_FUtimens,hash:CRC-32=0x5d32beb6]]]*/
 /* >> futimens(2), futimens64(2) */
 INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") void

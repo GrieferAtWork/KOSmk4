@@ -1686,10 +1686,10 @@ $fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
 
 %
 %#ifdef __USE_LARGEFILE64
-[[vartypes($mode_t), preferred_largefile64_variant_of(open), doc_alias("open")]]
+[[vartypes($mode_t), crt_dos_variant, preferred_largefile64_variant_of(open), doc_alias("open")]]
 [[if($extended_include_prefix("<asm/os/oflags.h>")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), preferred_alias("_open", "__open", "__libc_open")]]
 [[export_alias("__open64"), decl_include("<bits/types.h>"), impl_include("<asm/os/oflags.h>")]]
-[[cp, wunused, crt_dos_variant, userimpl, requires_function(open32)]]
+[[cp, wunused, userimpl, requires_function(open32)]]
 $fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
@@ -1705,10 +1705,10 @@ $fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	return result;
 }
 
-[[guard, preferred_largefile64_variant_of(creat), doc_alias("creat")]]
+[[guard, crt_dos_variant, preferred_largefile64_variant_of(creat), doc_alias("creat")]]
 [[decl_include("<bits/types.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[if($extended_include_prefix("<asm/os/oflags.h>")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), preferred_alias("_creat", "__creat", "__libc_creat")]]
-[[cp, wunused, userimpl, crt_dos_variant, requires_function(open64)]]
+[[cp, wunused, userimpl, requires_function(open64)]]
 $fd_t creat64([[nonnull]] char const *filename, $mode_t mode) {
 	return open64(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
 }

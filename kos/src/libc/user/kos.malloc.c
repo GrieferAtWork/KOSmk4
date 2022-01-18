@@ -29,12 +29,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_Malloc,hash:CRC-32=0x1d1e4071]]]*/
 INTERN ATTR_SECTION(".text.crt.except.heap.malloc") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *
 (LIBCCALL libc_Malloc)(size_t num_bytes) THROWS(E_BADALLOC)

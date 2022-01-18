@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_setspent,hash:CRC-32=0x8a151368]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") void
 NOTHROW_RPC(LIBCCALL libc_setspent)(void)

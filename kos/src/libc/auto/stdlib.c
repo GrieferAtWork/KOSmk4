@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1532e702 */
+/* HASH CRC-32:0x2065309c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1828,6 +1828,16 @@ NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
+INTERN ATTR_SECTION(".text.crt.dos.io.tty") WUNUSED char *
+NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd) {
+	static char buf[64];
+	if unlikely(libd_ptsname_r(fd, buf, sizeof(buf)))
+		return NULL;
+	return buf;
+}
+/* >> ptsname(3)
+ * Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated   with   the   master   descriptor   `fd' */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
 	static char buf[64];
@@ -2166,6 +2176,12 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 
 
 	return -1;
+}
+#include <libc/template/program_invocation_name.h>
+/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+INTERN ATTR_SECTION(".text.crt.dos.solaris") ATTR_CONST WUNUSED char const *
+NOTHROW_NCX(LIBDCALL libd_getexecname)(void) {
+	return __LOCAL_program_invocation_name;
 }
 #include <libc/template/program_invocation_name.h>
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
@@ -4780,6 +4796,7 @@ DEFINE_PUBLIC_ALIAS(mkstemp, libc_mkstemp);
 DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp64);
 DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
+DEFINE_PUBLIC_ALIAS(DOS$ptsname, libd_ptsname);
 DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtol_l, libc_strtol_l);
@@ -4817,6 +4834,7 @@ DEFINE_PUBLIC_ALIAS(_strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
+DEFINE_PUBLIC_ALIAS(DOS$getexecname, libd_getexecname);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

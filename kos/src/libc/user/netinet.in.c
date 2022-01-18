@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_bindresvport,hash:CRC-32=0x21e9ad94]]]*/
 INTERN ATTR_SECTION(".text.crt.net.inet.6.bind_reserved") int
 NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd,

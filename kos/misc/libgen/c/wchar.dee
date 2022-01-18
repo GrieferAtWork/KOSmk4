@@ -62,6 +62,10 @@ global final WCHAR_REPLACEMENT_VCC:   (string, string) = { "VLIBDCALL", "VLIBKCA
 @@Duplicate entries aren't allowed
 global allWcharFunctionsByName: {string: WcharFunction} = Dict();
 
+@@Mapping from "myfun" to "libd_myfun"
+global allDosVariantsByName: {string: LibraryFunction} = Dict();
+
+
 @@Replace a single, given @keyword with its wchar replacement
 function replaceWcharTextKeyword(keyword: string, mode: int): string {
 	/* Check for explicitly defined keyword replacements */
@@ -352,7 +356,9 @@ function replaceWcharPrototypesShallow(
 
 function replaceWcharFunctionImplementation(
 		self: FunctionImplementation, mode: int,
-		functionName: string | UserString, prototype: FunctionPrototype): FunctionImplementation {
+		functionName: string | UserString,
+		prototype: FunctionPrototype,
+		forInLibraryImplementation: bool): FunctionImplementation {
 	local oldFunctionName: string = str(self.name);
 	local keyOverride = [](keyword: string): string | none {
 		/* Special handling: References to the function's own name
@@ -416,6 +422,17 @@ function replaceWcharFunctionImplementation(
 				func = allFunctionsByName.get(replacedName);
 				if (func is none)
 					continue;
+			} else if (forInLibraryImplementation && mode == WCHAR_REPLACEMENT_CHAR16) {
+				/* Check if this dependency has a custom DOS variant. */
+				local libFunc: LibraryFunction = allDosVariantsByName.get(name);
+				if (libFunc !is none) {
+					func = Function(
+						name:                     name,
+						internalName:             libFunc.name,
+						originalSystemHeaderName: libFunc.originalSystemHeaderName,
+//						bindings:                 [],
+						documentation:            libFunc.documentation);
+				}
 			}
 			newDeps[replacedName] = func;
 		}
@@ -474,12 +491,13 @@ class WcharFunction {
 		}
 	}
 
-	private member m_cx_cache: {(string, int): XcharImplementation} = Dict();
+	private member m_cx_cache: {(string, int, bool): XcharImplementation} = Dict();
 	@@Return an approriate X-char implementation for the given @functionName and @mode
 	public function getXCharImplementation(
-			functionName: string | UserString, mode: int): XcharImplementation {
-		local pair = (str(functionName), mode);
-		local result = m_cx_cache.get(pair);
+			functionName: string | UserString, mode: int,
+			forInLibraryImplementation: bool): XcharImplementation {
+		local key = (str(functionName), mode, forInLibraryImplementation);
+		local result = m_cx_cache.get(key);
 		if (result is none) {
 			result = XcharImplementation();
 			/* Convert prototypes */
@@ -504,10 +522,11 @@ class WcharFunction {
 got_result_prototypes:
 			result.loaderImpl = wcLoaderImpl is none ? none : LoaderFunctionImplementation(
 				impl: replaceWcharFunctionImplementation(
-					wcLoaderImpl.impl, mode, functionName, result.prototype),
+					wcLoaderImpl.impl, mode, functionName,
+					result.prototype, forInLibraryImplementation),
 				ppCond:       replaceWcharText(wcLoaderImpl.ppCond, mode),
 				ppCondPrefix: replaceWcharTextArray(wcLoaderImpl.ppCondPrefix, mode));
-			m_cx_cache[pair] = result;
+			m_cx_cache[key] = result;
 		}
 		return result;
 	}

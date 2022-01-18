@@ -26,8 +26,6 @@ DECL_BEGIN
 
 /*[[[skip:libc_Ioctl]]]*/
 
-
-
 /*[[[start:exports,hash:CRC-32=0x0]]]*/
 /*[[[end:exports]]]*/
 

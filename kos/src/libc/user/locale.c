@@ -25,8 +25,6 @@
 
 DECL_BEGIN
 
-
-
 /* TODO: On  startup,  `current_locale'   should  be   "C"
  *       Once  `setlocale(LC_ALL, "");'   is  called,   it
  *       should become some string that contains ".UTF-8".

@@ -29,7 +29,6 @@
 
 DECL_BEGIN
 
-
 /*[[[head:libc_prlimit,hash:CRC-32=0xcc2a3cc6]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.resource") int
 NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,

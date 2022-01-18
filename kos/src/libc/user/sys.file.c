@@ -27,12 +27,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_flock,hash:CRC-32=0x20089f7a]]]*/
 /* >> flock(2)
  * Apply or remove an advisory lock, according to `operation', on the file `fd' refers to */

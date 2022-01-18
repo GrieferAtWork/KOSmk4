@@ -31,12 +31,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_poll,hash:CRC-32=0xe87b09d0]]]*/
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
 INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((1)) int

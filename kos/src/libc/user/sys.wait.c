@@ -33,8 +33,6 @@
 
 DECL_BEGIN
 
-
-
 /*[[[head:libc_wait,hash:CRC-32=0xec1f862]]]*/
 /* >> wait(2)
  * Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */

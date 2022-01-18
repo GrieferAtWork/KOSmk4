@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_adjtimex,hash:CRC-32=0x5881aa58]]]*/
 /* >> adjtimex(2), adjtimex64(2) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int

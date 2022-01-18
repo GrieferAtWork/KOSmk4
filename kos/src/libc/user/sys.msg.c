@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_msgctl,hash:CRC-32=0x4dac60df]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.msg") int
 NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid,

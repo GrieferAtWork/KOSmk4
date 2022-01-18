@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_gtty,hash:CRC-32=0x4249e775]]]*/
 INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,

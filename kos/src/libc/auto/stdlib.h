@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6f54d85 */
+/* HASH CRC-32:0x5da3637 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -643,44 +643,6 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_a64l)(char 
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Load the filesystem location of a given file handle.
- * This  function behaves similar to `readlink()', but will also function for
- * non-symlink paths, as well as always return an absolute (unambiguous) path
- * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
- *                   path, or NULL  to automatically `malloc()'ate  and return  a
- *                   buffer of sufficient size. */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename, char *resolved);
-/* Load the filesystem location of a given file handle.
- * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
- *       bytes  automatically allocated  in the heap,  ontop of which  you may also
- *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd, char *resolved, size_t buflen);
-/* Load the filesystem location of a given file handle.
- * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
- * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
- *       representation  mode. This means  that if the  path would have normally
- *       been printed as a unix path, it would instead be printed as a DOS path.
- *       Similarly, the reverse also applies.
- * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
- *       bytes  automatically allocated  in the heap,  ontop of which  you may also
- *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
- * causing the path to  the symlink itself to  be printed. - Otherwise,  the
- * file pointed to by the symblic link is printed.
- * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
- *       representation  mode. This means  that if the  path would have normally
- *       been printed as a unix path, it would instead be printed as a DOS path.
- *       Similarly, the reverse also applies.
- * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
- *       bytes  automatically allocated  in the heap,  ontop of which  you may also
- *       pass `0' for `buflen' to automatically determine the required buffer size.
- * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
- * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
-INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
 /* >> mktemp(3)
  * Badly designed version of  `mkstemp' that won't actually  create
  * the temporary file, meaning that by the time the caller tries to
@@ -784,14 +746,10 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_unlockpt)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
@@ -799,9 +757,6 @@ INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBDCALL libd_posix_openpt)(oflag_t oflags);
-/* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated   with   the   master   descriptor   `fd' */
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_strtol_l)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -845,9 +800,6 @@ INTDEF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname);
-/* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
- * Upon error, `NULL' is returned instead */
-INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Internal implementation for creating temporary files.
@@ -890,6 +842,8 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_shexec)(char const *command);
  * any of them are tested, this function will try to use `getenv("SHELL")', if
  * and only if that variable is defined and starts with a '/'-character. */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command);
+/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_getexecname)(void);
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getexecname)(void);
 #endif /* !__KERNEL__ */

@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x91860828 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,38 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_SYS_REBOOT_C
-#define GUARD_LIBC_USER_SYS_REBOOT_C 1
-
-#include "../api.h"
-#include "sys.reboot.h"
-#include <kos/syscalls.h>
-
-DECL_BEGIN
-
-/*[[[head:libc_reboot,hash:CRC-32=0x7a5a0c26]]]*/
-/* Reboot or halt the system
- * @param: howto: One of the `RB_*' constants above */
-INTERN ATTR_SECTION(".text.crt.system.reboot") int
-NOTHROW_NCX(LIBCCALL libc_reboot)(__STDC_INT_AS_UINT_T howto)
-/*[[[body:libc_reboot]]]*/
-{
-	errno_t error;
-	error = sys_reboot((syscall_ulong_t)(unsigned int)howto);
-	return libc_seterrno_syserr(error);
+#ifndef __local_ttyname_defined
+#define __local_ttyname_defined
+#include <__crt.h>
+#ifdef __CRT_HAVE_ttyname_r
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_ttyname_r_defined
+#define __local___localdep_ttyname_r_defined
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_ttyname_r,(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen),ttyname_r,(__fd,__buf,__buflen))
+#endif /* !__local___localdep_ttyname_r_defined */
+__LOCAL_LIBC(ttyname) __ATTR_WUNUSED char *
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ttyname))(__fd_t __fd) {
+	static char __buf[32];
+	if __likely((__NAMESPACE_LOCAL_SYM __localdep_ttyname_r)(__fd, __buf, sizeof(__buf)) == 0)
+		return __buf;
+	return __NULLPTR;
 }
-/*[[[end:libc_reboot]]]*/
-
-
-
-
-
-/*[[[start:exports,hash:CRC-32=0x160a2a8c]]]*/
-DEFINE_PUBLIC_ALIAS(__reboot, libc_reboot);
-DEFINE_PUBLIC_ALIAS(__libc_reboot, libc_reboot);
-DEFINE_PUBLIC_ALIAS(reboot, libc_reboot);
-/*[[[end:exports]]]*/
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_SYS_REBOOT_C */
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_ttyname_defined
+#define __local___localdep_ttyname_defined
+#define __localdep_ttyname __LIBC_LOCAL_NAME(ttyname)
+#endif /* !__local___localdep_ttyname_defined */
+#else /* __CRT_HAVE_ttyname_r */
+#undef __local_ttyname_defined
+#endif /* !__CRT_HAVE_ttyname_r */
+#endif /* !__local_ttyname_defined */

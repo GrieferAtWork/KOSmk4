@@ -27,8 +27,6 @@
 
 DECL_BEGIN
 
-
-
 /*[[[head:libc_signalfd,hash:CRC-32=0xd09f55e]]]*/
 /* >> signalfd(2)
  * Create or update a poll(2)-able file descriptor which can be used to

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb480d38f */
+/* HASH CRC-32:0x9847dd57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1036,6 +1036,11 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),__ttyname,(__fd))
+#elif defined(__CRT_HAVE_ttyname_r)
+#include <libc/local/unistd/ttyname.h>
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL ttyname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ttyname))(__fd); })
 #else /* ... */
 #undef __ttyname_defined
 #endif /* !... */
@@ -1593,14 +1598,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),__r
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),__libc_rmdir,(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); })
-#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
+#else /* __AT_FDCWD && __AT_REMOVEDIR && __CRT_HAVE_unlinkat */
 #undef __rmdir_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
+#endif /* !__AT_FDCWD || !__AT_REMOVEDIR || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__rmdir_defined */
 #ifdef __USE_GNU

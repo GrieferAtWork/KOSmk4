@@ -40,12 +40,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_select,hash:CRC-32=0x9c2d65fd]]]*/
 INTERN ATTR_SECTION(".text.crt.io.poll") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,

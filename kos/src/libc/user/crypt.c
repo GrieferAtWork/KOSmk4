@@ -27,12 +27,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_crypt,hash:CRC-32=0x1562b560]]]*/
 /* >> crypt(3), crypt_r(3) */
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 2)) char *

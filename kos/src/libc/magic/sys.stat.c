@@ -642,7 +642,7 @@ int dos_mkdir([[nonnull]] char const *pathname);
 
 
 @@>> mkdir(2)
-[[cp, guard, userimpl, decl_include("<bits/types.h>"), export_alias("__mkdir", "__libc_mkdir")]]
+[[crt_dos_variant, cp, guard, userimpl, decl_include("<bits/types.h>"), export_alias("__mkdir", "__libc_mkdir")]]
 [[requires(defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir))]]
 int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
 	(void)mode;
@@ -651,7 +651,7 @@ int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
 
 
 @@>> chmod(2)
-[[cp, guard, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, guard, decl_include("<bits/types.h>")]]
 [[dos_only_export_alias("_chmod"), export_alias("__chmod", "__libc_chmod")]]
 int chmod([[nonnull]] char const *filename, $mode_t mode);
 
@@ -660,7 +660,7 @@ int chmod([[nonnull]] char const *filename, $mode_t mode);
 %#ifdef __USE_MISC
 
 @@>> lchmod(2)
-[[cp, guard, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, guard, decl_include("<bits/types.h>")]]
 [[if(defined(__CRT_DOS_PRIMARY)), alias("_chmod", "chmod")]]
 int lchmod([[nonnull]] char const *filename, $mode_t mode);
 
@@ -697,36 +697,36 @@ $mode_t getumask() {
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@>> fmkdirat(2)
 @@@param flags: Set of `0 | AT_DOSPATH'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int fmkdirat($fd_t dirfd,
              [[nonnull]] char const *pathname,
              $mode_t mode, $atflag_t flags);
 
 @@>> fmknodat(2)
 @@@param flags: Set of `0 | AT_DOSPATH'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int fmknodat($fd_t dirfd, [[nonnull]] char const *nodename,
              $mode_t mode, $dev_t dev, $atflag_t flags);
 %#endif /* __USE_KOS && __USE_ATFILE */
 
 
 @@>> mkfifo(2)
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int mkfifo([[nonnull]] char const *fifoname, $mode_t mode);
 
 %
 %#ifdef __USE_ATFILE
 @@>> fchmodat(2)
 @@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int fchmodat($fd_t dirfd, [[nonnull]] char const *filename, $mode_t mode, $atflag_t flags);
 
 @@>> mkdirat(2)
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int mkdirat($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode);
 
 @@>> mkfifoat(2)
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int mkfifoat($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode);
 %#endif /* __USE_ATFILE */
 
@@ -741,12 +741,12 @@ int fchmod($fd_t fd, $mode_t mode);
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 @@>> mknod(2)
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int mknod([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev);
 
 %#ifdef __USE_ATFILE
 @@>> mknodat(2)
-[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int mknodat($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev);
 %#endif /* __USE_ATFILE */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
@@ -768,7 +768,7 @@ int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat64")]]
 [[userimpl, requires($has_function(utimensat32) || $has_function(utimensat64))]]
-[[impl_include("<asm/os/fcntl.h>")]]
+[[crt_dos_variant, impl_include("<asm/os/fcntl.h>")]]
 int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
               [[nullable]] struct timespec const times[2 /*or:3*/],
               $atflag_t flags) {
@@ -825,9 +825,8 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-[[preferred_time64_variant_of(utimensat), doc_alias("utimensat")]]
-[[userimpl, requires_function(utimensat32)]]
-[[impl_include("<asm/os/fcntl.h>")]]
+[[crt_dos_variant, preferred_time64_variant_of(utimensat), doc_alias("utimensat")]]
+[[userimpl, requires_function(utimensat32), impl_include("<asm/os/fcntl.h>")]]
 int utimensat64($fd_t dirfd, [[nonnull]] char const *filename,
                 [[nullable]] struct timespec64 const times[2 /*or:3*/],
                 $atflag_t flags) {

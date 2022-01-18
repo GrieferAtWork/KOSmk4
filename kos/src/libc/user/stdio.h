@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x739070e1 */
+/* HASH CRC-32:0x5850fc20 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,11 +33,20 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> remove(3)
  * Remove a file or directory `filename' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename);
+/* >> remove(3)
+ * Remove a file or directory `filename' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename);
 /* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_rename)(char const *oldname, char const *newname_or_path);
+/* >> rename(2)
+ * Rename  a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname, char const *newname_or_path);
+/* >> tmpnam(3), tmpnam_r(3) */
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf);
 /* >> tmpnam(3), tmpnam_r(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf);
 /* >> fclose(3)
@@ -90,7 +99,13 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ferror)(FILE
 INTDEF WUNUSED FILE *NOTHROW_RPC(LIBCCALL libc_tmpfile)(void);
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename, char const *__restrict modes);
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename, char const *__restrict modes);
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
+INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
@@ -102,10 +117,23 @@ INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fgetpos)(FILE *__restrict stream, fpos
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
 /* >> renameat(2) */
+INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_renameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path);
+/* >> renameat(2) */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path);
 /* >> removeat(3)
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd, char const *filename);
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char const *filename);
+/* >> renameat2(2)
+ * @param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
+ *                       AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
+ * NOTE: For portability, use the following names:
+ *   - `AT_RENAME_NOREPLACE' --> `RENAME_NOREPLACE'
+ *   - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
+ *   - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT' */
+INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_renameat2)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags);
 /* >> renameat2(2)
  * @param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
  *                       AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
@@ -190,7 +218,13 @@ INTDEF NONNULL((1)) int (LIBCCALL libc_fseeko64)(FILE *__restrict stream, off64_
 INTDEF WUNUSED NONNULL((1)) off64_t (LIBCCALL libc_ftello64)(FILE *__restrict stream) THROWS(...);
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_fopen64)(char const *__restrict filename, char const *__restrict modes);
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_fopen64)(char const *__restrict filename, char const *__restrict modes);
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
+INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen64)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
@@ -215,7 +249,13 @@ INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char c
 INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
+INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
+INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen64_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);

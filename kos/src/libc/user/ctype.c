@@ -31,7 +31,6 @@
 
 DECL_BEGIN
 
-
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define CTB_LOC_ISUPPER  (1 << 0)
 #define CTB_LOC_ISLOWER  (1 << 1)

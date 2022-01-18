@@ -1681,6 +1681,18 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
 }
 /*[[[end:libc_flushall_unlocked]]]*/
 
+/*[[[head:libd_rename,hash:CRC-32=0xd00ba396]]]*/
+/* >> rename(2)
+ * Rename  a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
+NOTHROW_RPC(LIBDCALL libd_rename)(char const *oldname,
+                                  char const *newname_or_path)
+/*[[[body:libd_rename]]]*/
+{
+	return libd_renameat(AT_FDCWD, oldname, AT_FDCWD, newname_or_path);
+}
+/*[[[end:libd_rename]]]*/
 
 /*[[[head:libc_rename,hash:CRC-32=0xc8bce13c]]]*/
 /* >> rename(2)
@@ -1697,6 +1709,32 @@ NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname,
 }
 /*[[[end:libc_rename]]]*/
 
+/*[[[head:libd_tmpnam,hash:CRC-32=0x9ddb7cb7]]]*/
+/* >> tmpnam(3), tmpnam_r(3) */
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf)
+/*[[[body:libd_tmpnam]]]*/
+/*AUTO*/{
+	(void)buf;
+	CRT_UNIMPLEMENTEDF("tmpnam(%q)", buf); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libd_tmpnam]]]*/
+
+/*[[[head:libd_renameat,hash:CRC-32=0x526adc86]]]*/
+/* >> renameat(2) */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
+NOTHROW_RPC(LIBDCALL libd_renameat)(fd_t oldfd,
+                                    char const *oldname,
+                                    fd_t newfd,
+                                    char const *newname_or_path)
+/*[[[body:libd_renameat]]]*/
+{
+	return libc_renameat2(oldfd, oldname, newfd, newname_or_path, AT_DOSPATH);
+}
+/*[[[end:libd_renameat]]]*/
+
 /*[[[head:libc_renameat,hash:CRC-32=0x8856fbf3]]]*/
 /* >> renameat(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
@@ -1711,6 +1749,26 @@ NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd,
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_renameat]]]*/
+
+/*[[[head:libd_renameat2,hash:CRC-32=0xfcf51a3e]]]*/
+/* >> renameat2(2)
+ * @param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
+ *                       AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
+ * NOTE: For portability, use the following names:
+ *   - `AT_RENAME_NOREPLACE' --> `RENAME_NOREPLACE'
+ *   - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
+ *   - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
+NOTHROW_RPC(LIBDCALL libd_renameat2)(fd_t oldfd,
+                                     char const *oldname,
+                                     fd_t newfd,
+                                     char const *newname_or_path,
+                                     atflag_t flags)
+/*[[[body:libd_renameat2]]]*/
+{
+	return libc_renameat2(oldfd, oldname, newfd, newname_or_path, flags | AT_DOSPATH);
+}
+/*[[[end:libd_renameat2]]]*/
 
 /*[[[head:libc_renameat2,hash:CRC-32=0x8335016b]]]*/
 /* >> renameat2(2)
@@ -1734,6 +1792,21 @@ NOTHROW_RPC(LIBCCALL libc_renameat2)(fd_t oldfd,
 }
 /*[[[end:libc_renameat2]]]*/
 
+/*[[[head:libd_removeat,hash:CRC-32=0xcc2f51b7]]]*/
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd,
+                                    char const *filename)
+/*[[[body:libd_removeat]]]*/
+{
+	errno_t result;
+	result = sys_unlinkat(dirfd, filename,
+	                      AT_DOSPATH | AT_REMOVEDIR | AT_REMOVEREG);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libd_removeat]]]*/
+
 /*[[[head:libc_removeat,hash:CRC-32=0xb1a4dbad]]]*/
 /* >> removeat(3)
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
@@ -1749,6 +1822,17 @@ NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd,
 }
 /*[[[end:libc_removeat]]]*/
 
+/*[[[head:libd_remove,hash:CRC-32=0xce99c513]]]*/
+/* >> remove(3)
+ * Remove a file or directory `filename' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename)
+/*[[[body:libd_remove]]]*/
+{
+	return libd_removeat(AT_FDCWD, filename);
+}
+/*[[[end:libd_remove]]]*/
+
 /*[[[head:libc_remove,hash:CRC-32=0xdee82fbb]]]*/
 /* >> remove(3)
  * Remove a file or directory `filename' */
@@ -1756,7 +1840,7 @@ INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename)
 /*[[[body:libc_remove]]]*/
 {
-	return removeat(AT_FDCWD, filename);
+	return libc_removeat(AT_FDCWD, filename);
 }
 /*[[[end:libc_remove]]]*/
 
@@ -2888,6 +2972,32 @@ NOTHROW_RPC(LIBCCALL libc_tmpfile)(void)
 DEFINE_INTERN_ALIAS(libc_tmpfile64, libc_tmpfile);
 
 
+/*[[[head:libd_fopen,hash:CRC-32=0x7d0a2ee4]]]*/
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename,
+                                 char const *__restrict modes)
+/*[[[body:libd_fopen]]]*/
+{
+	fd_t fd;
+	FILE *result;
+	uint32_t flags;
+	oflag_t oflags;
+	flags = file_evalmodes(modes, &oflags);
+	fd    = open(filename, oflags | O_DOSPATH, 0644);
+	if unlikely(fd < 0)
+		return NULL;
+	result = file_openfd(fd, flags);
+	if likely(result) {
+		result = file_touser(result);
+	} else {
+		sys_close(fd);
+	}
+	return result;
+}
+/*[[[end:libd_fopen]]]*/
+
 /*[[[head:libc_fopen,hash:CRC-32=0x8e368ed0]]]*/
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
@@ -3575,6 +3685,40 @@ done:
 }
 /*[[[end:libc_fdreopen_unlocked]]]*/
 
+/*[[[head:libd_freopen,hash:CRC-32=0x4f03bc5]]]*/
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3)) FILE *
+NOTHROW_RPC(LIBDCALL libd_freopen)(char const *__restrict filename,
+                                   char const *__restrict modes,
+                                   FILE *__restrict stream)
+/*[[[body:libd_freopen]]]*/
+{
+	fd_t fd;
+	FILE *result;
+	uint32_t flags;
+	oflag_t oflags;
+	flags = file_evalmodes(modes, &oflags);
+	fd    = open(filename, oflags | O_DOSPATH, 0644);
+	if unlikely(fd < 0)
+		return NULL;
+	stream = file_fromuser(stream);
+	if (FMUSTLOCK(stream)) {
+		file_lock_write(stream);
+		result = file_reopenfd(stream, fd, flags);
+		file_lock_endwrite(stream);
+	} else {
+		result = file_reopenfd(stream, fd, flags);
+	}
+	if likely(result) {
+		result = file_touser(result);
+	} else {
+		sys_close(fd);
+	}
+	return result;
+}
+/*[[[end:libd_freopen]]]*/
+
 /*[[[head:libc_freopen,hash:CRC-32=0xf2a17dd0]]]*/
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
@@ -3609,6 +3753,34 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 }
 /*[[[end:libc_freopen]]]*/
 
+/*[[[head:libd_freopen_unlocked,hash:CRC-32=0x95feab24]]]*/
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
+INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.access") NONNULL((1, 2, 3)) FILE *
+NOTHROW_RPC(LIBDCALL libd_freopen_unlocked)(char const *__restrict filename,
+                                            char const *__restrict modes,
+                                            FILE *__restrict stream)
+/*[[[body:libd_freopen_unlocked]]]*/
+{
+	fd_t fd;
+	FILE *result;
+	uint32_t flags;
+	oflag_t oflags;
+	flags = file_evalmodes(modes, &oflags);
+	fd    = open(filename, oflags | O_DOSPATH, 0644);
+	if unlikely(fd < 0)
+		return NULL;
+	stream = file_fromuser(stream);
+	result = file_reopenfd(stream, fd, flags);
+	if likely(result) {
+		result = file_touser(result);
+	} else {
+		sys_close(fd);
+	}
+	return result;
+}
+/*[[[end:libd_freopen_unlocked]]]*/
+
 /*[[[head:libc_freopen_unlocked,hash:CRC-32=0x6c3a9bd8]]]*/
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
@@ -3638,12 +3810,20 @@ NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
 /*[[[end:libc_freopen_unlocked]]]*/
 
 
+
 /*[[[impl:libc_fopen64]]]*/
 /*[[[impl:libc_freopen64]]]*/
 /*[[[impl:libc_freopen64_unlocked]]]*/
 DEFINE_INTERN_ALIAS(libc_freopen64, libc_freopen);
 DEFINE_INTERN_ALIAS(libc_freopen64_unlocked, libc_freopen_unlocked);
 DEFINE_INTERN_ALIAS(libc_fopen64, libc_fopen);
+
+/*[[[impl:libd_fopen64]]]*/
+/*[[[impl:libd_freopen64]]]*/
+/*[[[impl:libd_freopen64_unlocked]]]*/
+DEFINE_INTERN_ALIAS(libd_freopen64, libd_freopen);
+DEFINE_INTERN_ALIAS(libd_freopen64_unlocked, libd_freopen_unlocked);
+DEFINE_INTERN_ALIAS(libd_fopen64, libd_fopen);
 
 
 #undef libc_feof_unlocked
@@ -3655,11 +3835,16 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x63b34696]]]*/
+/*[[[start:exports,hash:CRC-32=0xf4a91c76]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$remove, libd_remove);
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
+DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
+DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(__rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(__libc_rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
+DEFINE_PUBLIC_ALIAS(DOS$tmpnam, libd_tmpnam);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fclose_nolock, libc_fclose);
@@ -3697,17 +3882,25 @@ DEFINE_PUBLIC_ALIAS(_IO_ferror, libc_ferror);
 DEFINE_PUBLIC_ALIAS(ferror_unlocked, libc_ferror);
 DEFINE_PUBLIC_ALIAS(ferror, libc_ferror);
 DEFINE_PUBLIC_ALIAS(tmpfile, libc_tmpfile);
+DEFINE_PUBLIC_ALIAS(DOS$_IO_fopen, libd_fopen);
+DEFINE_PUBLIC_ALIAS(DOS$setmntent, libd_fopen);
+DEFINE_PUBLIC_ALIAS(DOS$__setmntent, libd_fopen);
+DEFINE_PUBLIC_ALIAS(DOS$fopen, libd_fopen);
 DEFINE_PUBLIC_ALIAS(_IO_fopen, libc_fopen);
 DEFINE_PUBLIC_ALIAS(setmntent, libc_fopen);
 DEFINE_PUBLIC_ALIAS(__setmntent, libc_fopen);
 DEFINE_PUBLIC_ALIAS(fopen, libc_fopen);
+DEFINE_PUBLIC_ALIAS(DOS$freopen, libd_freopen);
 DEFINE_PUBLIC_ALIAS(freopen, libc_freopen);
 DEFINE_PUBLIC_ALIAS(fgetpos, libc_fgetpos);
 DEFINE_PUBLIC_ALIAS(_IO_fgetpos, libc_fgetpos);
 DEFINE_PUBLIC_ALIAS(fsetpos, libc_fsetpos);
 DEFINE_PUBLIC_ALIAS(_IO_fsetpos, libc_fsetpos);
+DEFINE_PUBLIC_ALIAS(DOS$renameat, libd_renameat);
 DEFINE_PUBLIC_ALIAS(renameat, libc_renameat);
+DEFINE_PUBLIC_ALIAS(DOS$removeat, libd_removeat);
 DEFINE_PUBLIC_ALIAS(removeat, libc_removeat);
+DEFINE_PUBLIC_ALIAS(DOS$renameat2, libd_renameat2);
 DEFINE_PUBLIC_ALIAS(renameat2, libc_renameat2);
 DEFINE_PUBLIC_ALIAS(tmpnam_r, libc_tmpnam_r);
 #ifdef __LIBCCALL_IS_LIBDCALL
@@ -3774,7 +3967,9 @@ DEFINE_PUBLIC_ALIAS(_fseeki64, libc_fseeko64);
 DEFINE_PUBLIC_ALIAS(ftello64, libc_ftello64);
 DEFINE_PUBLIC_ALIAS(ftell64, libc_ftello64);
 DEFINE_PUBLIC_ALIAS(_ftelli64, libc_ftello64);
+DEFINE_PUBLIC_ALIAS(DOS$fopen64, libd_fopen64);
 DEFINE_PUBLIC_ALIAS(fopen64, libc_fopen64);
+DEFINE_PUBLIC_ALIAS(DOS$freopen64, libd_freopen64);
 DEFINE_PUBLIC_ALIAS(freopen64, libc_freopen64);
 DEFINE_PUBLIC_ALIAS(fgetpos64, libc_fgetpos64);
 DEFINE_PUBLIC_ALIAS(_IO_fgetpos64, libc_fgetpos64);
@@ -3784,7 +3979,9 @@ DEFINE_PUBLIC_ALIAS(file_printer, libc_file_printer);
 DEFINE_PUBLIC_ALIAS(file_printer_unlocked, libc_file_printer_unlocked);
 DEFINE_PUBLIC_ALIAS(fdreopen, libc_fdreopen);
 DEFINE_PUBLIC_ALIAS(fdreopen_unlocked, libc_fdreopen_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$freopen_unlocked, libd_freopen_unlocked);
 DEFINE_PUBLIC_ALIAS(freopen_unlocked, libc_freopen_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$freopen64_unlocked, libd_freopen64_unlocked);
 DEFINE_PUBLIC_ALIAS(freopen64_unlocked, libc_freopen64_unlocked);
 DEFINE_PUBLIC_ALIAS(fseek_unlocked, libc_fseek_unlocked);
 DEFINE_PUBLIC_ALIAS(_fseek_nolock, libc_fseek_unlocked);

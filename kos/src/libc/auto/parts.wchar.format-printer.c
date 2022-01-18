@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18ed2ecb */
+/* HASH CRC-32:0x4639840a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1208,7 +1208,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 #define __FORMAT_ARGS               args
 #define __CHAR_TYPE                 char16_t
 #define __CHAR_SIZE                 2
-#define __FORMAT_STRERROR           libc_strerror
+#define __FORMAT_STRERROR           libd_strerror
 #define __FORMAT_REPEAT             libd_format_wrepeat
 #define __FORMAT_HEXDUMP            libd_format_whexdump
 #define __FORMAT_WIDTH              libd_format_wwidth

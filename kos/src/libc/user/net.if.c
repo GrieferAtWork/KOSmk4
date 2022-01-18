@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libc_if_nametoindex,hash:CRC-32=0x52994efd]]]*/
 /* Convert an interface name to an index, and vice versa */
 INTERN ATTR_SECTION(".text.crt.net.interface") unsigned int

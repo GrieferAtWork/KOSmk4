@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45129cd2 */
+/* HASH CRC-32:0x92f02cae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,9 +42,16 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifdef __CRT_HAVE_wttyname
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE_OPT(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),(__fd))
+__CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE_wttyname_r)
+#include <libc/local/parts.wchar.unistd/wttyname.h>
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED wchar_t *__NOTHROW_RPC(__LIBCCALL wttyname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname))(__fd); })
+#endif /* ... */
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
@@ -156,12 +163,12 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),_wrmdir,(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
+#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_wunlinkat)
 #include <libc/local/parts.wchar.unistd/wrmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wrmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL wrmdir)(wchar_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wrmdir))(__path); })
-#endif /* __AT_FDCWD && __CRT_HAVE_wunlinkat */
+#endif /* __AT_FDCWD && __AT_REMOVEDIR && __CRT_HAVE_wunlinkat */
 #endif /* !... */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_weuidaccess

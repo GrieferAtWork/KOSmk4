@@ -25,12 +25,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
 /*[[[head:libd_strfmon,hash:CRC-32=0x7435bd4d]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 INTERN ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t
