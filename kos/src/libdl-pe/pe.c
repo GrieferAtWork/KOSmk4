@@ -155,6 +155,23 @@ libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 }
 
 
+
+struct librepl {
+	char lr_orig[24]; /* Original file name */
+	char lr_repl[8];  /* Replacement file name */
+};
+
+/* KOS replacements for NT system dlls. */
+PRIVATE struct librepl const lib_replacements[] = {
+	{ "msvcrt", /*       */ "libc.so" },
+	{ "vcruntime140", /* */ "libc.so" },
+	{ "vcruntime140d", /**/ "libc.so" },
+	{ "ucrtbase", /*     */ "libc.so" },
+	{ "ucrtbased", /*    */ "libc.so" },
+};
+
+
+
 /* NOTE: `path[pathlen-1]' may or may not be a `/'
  * However, it is guarantied to not be a '\\', as well as that `path'
  * is  a unix path (though `filename' may contain NT path characters,
@@ -254,14 +271,21 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 		return result;
 
 	/* If stuff is still failing, check for special replacement files. */
-	if (strcmp(usedname, "libmsvcrt.so") == 0) {
-		strcpy(usedname, "libc.so");
-		result = (REF DlModule *)dlopen(fullname, flags);
-		if (result)
-			return result;
-	} else {
-		/* No replacement for this -- maybe it can be found in another folder? */
+	memmovedown(usedname, usedname + 3, (size_t)(iter - (usedname + 3)), sizeof(char));
+	iter -= 3;
+	*iter = '\0';
+	{
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(lib_replacements); ++i) {
+			if (strcmp(usedname, lib_replacements[i].lr_orig) != 0)
+				continue;
+			strcpy(usedname, lib_replacements[i].lr_repl);
+			result = (REF DlModule *)dlopen(fullname, flags);
+			if (result)
+				return result;
+		}
 	}
+	/* No replacement for this -- maybe it can be found in another folder? */
 
 	return NULL;
 }
@@ -378,6 +402,7 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 			char const *filename;
 			REF DlModule *dependency;
 			DWORD thunk1, thunk2;
+			size_t i;
 
 			/* The import table can be terminated by a ZERO-entry.
 			 * https://msdn.microsoft.com/en-us/library/ms809762.aspx */
@@ -420,6 +445,18 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 				thunk_iter1->u1.AddressOfData = (uintptr_t)addr;
 				thunk_iter2->u1.AddressOfData = (uintptr_t)addr;
 			}
+
+			/* Check if `dependency' had already been loaded
+			 * -> This can happen due to `lib_replacements' */
+			for (i = 0; i < self->dm_depcnt - 1; ++i) {
+				if (self->dm_depvec[i] == dependency) {
+					/* Don't duplicate dependencies */
+					--self->dm_depcnt;
+					dlclose(dependency);
+					break;
+				}
+			}
+
 		}
 	}
 	return 0;
