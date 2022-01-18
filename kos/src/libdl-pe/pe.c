@@ -34,8 +34,10 @@
 #include <hybrid/atomic.h>
 #include <hybrid/wordbits.h>
 
+#include <asm/intrin.h>
 #include <kos/except.h>
 #include <kos/syscalls.h>
+#include <nt/tib.h>
 #include <sys/ioctl.h>
 
 #include <assert.h>
@@ -43,6 +45,7 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <link.h>
 #include <malloca.h>
@@ -426,6 +429,79 @@ err:
 	return -1;
 }
 
+PRIVATE NONNULL((1)) int CC
+DlModule_PeInitializeRelocations(DlModule *__restrict self) {
+	PIMAGE_DATA_DIRECTORY relocs;
+	PIMAGE_BASE_RELOCATION iter, end;
+	uintptr_t delta;
+	if (!DlModule_HasRelocs(self))
+		goto done;
+	delta = self->dm_loadaddr - self->dm_pe.dp_nt.OptionalHeader.ImageBase;
+	if (delta == 0)
+		goto done; /* Already properly relocated. */
+	relocs = DlModule_GetRelocs(self);
+	iter   = (PIMAGE_BASE_RELOCATION)(self->dm_loadaddr + relocs->VirtualAddress);
+	end    = (PIMAGE_BASE_RELOCATION)((uintptr_t)iter + relocs->Size);
+	while (iter < end) {
+		uintptr_t rel_base;
+		WORD *rel_iter, *rel_end;
+		if (iter->SizeOfBlock < sizeof(IMAGE_BASE_RELOCATION))
+			break;
+		/* Load this relocation block. */
+		rel_base = self->dm_loadaddr + iter->VirtualAddress;
+		rel_iter = (WORD *)(self + 1);
+		iter     = (PIMAGE_BASE_RELOCATION)((byte_t *)iter + iter->SizeOfBlock);
+		rel_end  = (WORD *)iter;
+		for (; rel_iter < rel_end; ++rel_iter) {
+			WORD word = *rel_iter;
+			uintptr_t rel_addr;
+			uint8_t rel_type; /* actually 4-bit (uint_least4_t) */
+			rel_addr = rel_base + (word & 0xfff);
+			rel_type = word >> 12;
+			switch (rel_type) {
+
+			case IMAGE_REL_BASED_ABSOLUTE:
+				/* QUOTE: "The base relocation is skipped" */
+				break;
+
+#if __SIZEOF_POINTER__ > 4
+			case IMAGE_REL_BASED_HIGHLOW:
+				*(u32 *)rel_addr += (uint32_t)delta;
+				break;
+			case IMAGE_REL_BASED_HIGHADJ:
+				*(u32 *)rel_addr += (uint32_t)(delta >> 32);
+				break;
+#else /* __SIZEOF_POINTER__ > 4 */
+			case IMAGE_REL_BASED_HIGHLOW:
+			case IMAGE_REL_BASED_HIGHADJ:
+				*(u32 *)rel_addr += delta;
+				break;
+#endif /* __SIZEOF_POINTER__ <= 4 */
+
+			case IMAGE_REL_BASED_LOW:
+				*(u16 *)rel_addr += delta & 0xffff;
+				break;
+			case IMAGE_REL_BASED_HIGH:
+				*(u16 *)rel_addr += (delta & 0xffff0000) >> 16;
+				break;
+
+			case IMAGE_REL_BASED_DIR64:
+				*(u64 *)rel_addr += (u64)delta;
+				break;
+
+			default:
+				return dl.dl_seterrorf("%q: Unknown relocation %" PRIu8 " at %p (%p)",
+				                       self->dm_filename, rel_type, rel_addr,
+				                       rel_addr - self->dm_loadaddr);
+			}
+		}
+	}
+	/* TODO: Make non-writable sections read-only. */
+
+done:
+	return 0;
+}
+
 
 PRIVATE NONNULL((1)) int CC
 DlModule_PeInitialize(DlModule *__restrict self) {
@@ -436,8 +512,10 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 	if (result != 0)
 		goto done;
 
-	/* TODO: Apply relocations */
-	asm("int3");
+	/* Apply relocations */
+	result = DlModule_PeInitializeRelocations(self);
+	/*if (result != 0)
+		goto done;*/
 
 done:
 	return result;
@@ -540,6 +618,15 @@ libpe_v_lsphdrs(DlModule *__restrict self,
 	return 0;
 }
 
+PRIVATE PNT_TIB CC libpe_AllocateTib(void) {
+	PNT_TIB result;
+	result = (PNT_TIB)calloc(1, sizeof(NT_TIB));
+	if (result)
+		result->Self = result;
+	return result;
+}
+
+
 
 INTERN struct dlmodule_format libpe_fmt = {
 	.df_magic       = { 'M', 'Z' },
@@ -613,10 +700,11 @@ libpe_linker_main(struct peexec_info *__restrict info,
 
 	/* Duplicate the caller-given filename. */
 	filename = peexec_data__pd_name(pe);
-	result   = (void *)CEIL_ALIGN((uintptr_t)strend(filename), sizeof(void *));
+	result   = (void *)CEIL_ALIGN((uintptr_t)(strend(filename) + 1), sizeof(void *));
 	filename = strdup(filename);
 	if unlikely(!filename)
 		goto err_nomem; /* Leaks don't matter; we're only called once during init! */
+	syslog(LOG_DEBUG, "[pe] ENTRY:%p@%p\n", *(void **)result, (void **)result + 1);
 
 	/* Initialize simple fields of the new module. */
 	mod->dm_loadaddr   = loadaddr;
@@ -634,7 +722,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	mod->dm_refcnt     = 1;
 	mod->dm_weakrefcnt = 1;
 	mod->dm_file       = -1;
-	mod->dm_flags      = RTLD_LAZY | RTLD_NODELETE | RTLD_LOADING;
+	mod->dm_flags      = RTLD_LAZY | RTLD_GLOBAL | RTLD_NODELETE | RTLD_NOINIT | RTLD_LOADING;
 	mod->dm_loadstart  = pe->pd_loadmin;
 	mod->dm_loadend    = pe->pd_loadmax + 1;
 	mod->dm_finalize   = NULL;
@@ -680,7 +768,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	}
 
 	/* Hook the newly created module. */
-	DLIST_INSERT_TAIL(dl.DlModule_AllList, mod, dm_modules);
+	DLIST_INSERT_AFTER(dl.dl_rtld_module, mod, dm_modules);    /* NOTE: _MUST_ insert after builtin DL module! */
 	LIST_INSERT_HEAD(dl.DlModule_GlobalList, mod, dm_globals); /* NOTE: _MUST_ insert at head! */
 
 	/* Initialize the PE module. */
@@ -689,6 +777,29 @@ libpe_linker_main(struct peexec_info *__restrict info,
 
 	/* Mark this module as having been fully loaded. */
 	ATOMIC_AND(mod->dm_flags, ~RTLD_LOADING);
+
+	/* Allocate a TIB for the calling thread. - Required to
+	 * prevent SEH inline code from talking to the userkern
+	 * segment.
+	 *
+	 * TODO: This must also happen in `pthread_create(3)'! */
+	{
+		uintptr_t stackend;
+		PNT_TIB tib = libpe_AllocateTib();
+		if (!tib)
+			goto err_nomem;
+#define USER_STACK_SIZE (64 * __ARCH_PAGESIZE) /* TODO: Don't put this here! */
+		stackend = (uintptr_t)((void **)result + 1);
+		tib->StackBase  = (PVOID)(stackend - USER_STACK_SIZE);
+		tib->StackLimit = (PVOID)stackend;
+#ifdef __x86_64__
+		__wrgsbase(tib);
+#elif defined(__i386__)
+		__wrfsbase(tib);
+#else /* ... */
+#error "Unsupported architecture"
+#endif /* !... */
+	}
 
 	/* Return a pointer to the PE program entry point. */
 	return result;

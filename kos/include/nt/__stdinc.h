@@ -52,6 +52,30 @@
 #define __C89_NAMELESS /* Nothing */
 #endif /* !__C89_NAMELESS */
 
+#ifndef __NT_STDCALL
+#ifdef __x86_64__
+#define __NT_STDCALL __ATTR_MSABI
+#else /* __x86_64__ */
+#define __NT_STDCALL __ATTR_STDCALL
+#endif /* !__x86_64__ */
+#endif /* !__NT_STDCALL */
+
+#ifndef __NT_CDECL
+#ifdef __x86_64__
+#define __NT_CDECL __ATTR_MSABI
+#else /* __x86_64__ */
+#define __NT_CDECL __ATTR_CDECL
+#endif /* !__x86_64__ */
+#endif /* !__NT_CDECL */
+
+#ifndef __NT_FASTCALL
+#ifdef __x86_64__
+#define __NT_FASTCALL __ATTR_MSABI
+#else /* __x86_64__ */
+#define __NT_FASTCALL __ATTR_FASTCALL
+#endif /* !__x86_64__ */
+#endif /* !__NT_FASTCALL */
+
 
 #ifndef far
 #define far /* Nothing */
@@ -60,22 +84,22 @@
 #define near /* Nothing */
 #endif /* !near */
 #ifndef pascal
-#define pascal __ATTR_STDCALL
+#define pascal __NT_STDCALL
 #endif /* !pascal */
 #ifndef cdecl
-#define cdecl __ATTR_CDECL
+#define cdecl __NT_CDECL
 #endif /* !cdecl */
 #ifndef CDECL
-#define CDECL __ATTR_CDECL
+#define CDECL __NT_CDECL
 #endif /* !CDECL */
 #ifndef CALLBACK
-#define CALLBACK __ATTR_STDCALL
+#define CALLBACK __NT_STDCALL
 #endif /* !CALLBACK */
 #ifndef WINAPI
-#define WINAPI __ATTR_STDCALL
+#define WINAPI __NT_STDCALL
 #endif /* !WINAPI */
 #ifndef WINAPIV
-#define WINAPIV __ATTR_CDECL
+#define WINAPIV __NT_CDECL
 #endif /* !WINAPIV */
 #ifndef APIENTRY
 #define APIENTRY WINAPI
@@ -97,10 +121,10 @@
 #endif /* !NEAR */
 
 #ifndef FASTCALL
-#define FASTCALL __ATTR_FASTCALL
+#define FASTCALL __NT_FASTCALL
 #endif /* !FASTCALL */
 #ifndef NTAPI
-#define NTAPI __ATTR_STDCALL
+#define NTAPI __NT_STDCALL
 #endif /* !NTAPI */
 #ifndef DECLSPEC_NORETURN
 #define DECLSPEC_NORETURN __ATTR_NORETURN

@@ -173,7 +173,14 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	/* Map sections */
 	mbuilder_init(&builder);
 	{
+		bool must_relocate;
 		RAII_FINALLY { mbuilder_fini(&builder); };
+		must_relocate = true;
+		if (nt.FileHeader.SizeOfOptionalHeader >= offsetafter(IMAGE_OPTIONAL_HEADER, ImageBase) &&
+		    loadaddr == nt.OptionalHeader.ImageBase)
+			must_relocate = false;
+		if (nt.FileHeader.SizeOfOptionalHeader < offsetafter(IMAGE_OPTIONAL_HEADER, DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC]))
+			must_relocate = false;
 		for (i = 0; i < nt.FileHeader.NumberOfSections; ++i) {
 			unsigned int prot = 0;
 			PIMAGE_SECTION_HEADER section = &shdr[i];
@@ -213,6 +220,8 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 				prot |= PROT_READ;
 			if (section->Characteristics & IMAGE_SCN_MEM_WRITE)
 				prot |= PROT_WRITE;
+			if (must_relocate)
+				prot |= PROT_WRITE; /* Write protection will be removed later */
 
 			/* Map section */
 			sectaddr = loadaddr + section->VirtualAddress;

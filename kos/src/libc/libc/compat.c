@@ -33,6 +33,7 @@
 #include <kos/malloc.h>
 #include <kos/syscalls.h>
 #include <linux/net.h>
+#include <nt/except.h>
 
 #include <elf.h>
 #include <stdlib.h> /* exit() */
@@ -797,9 +798,6 @@ DECL_BEGIN
 typedef struct {
 	int newmode;
 } _startupinfo;
-struct _EXCEPTION_POINTERS;
-typedef int EXCEPTION_DISPOSITION;
-#define EXCEPTION_CONTINUE_SEARCH 0
 
 DEFINE_PUBLIC_ALIAS(DOS$__set_app_type, libd___set_app_type);
 DEFINE_PUBLIC_ALIAS(DOS$__getmainargs, libd___getmainargs);
@@ -817,32 +815,34 @@ INTERN void LIBDCALL libd___set_app_type(int typ) {
 
 INTERN int LIBDCALL
 libd___getmainargs(int *pargc, char ***pargv,
-                   char ***penv, int dowildcard,
+                   char ***penvp, int dowildcard,
                    _startupinfo *pstartinfo) {
 	struct process_peb *peb = &__peb;
 	(void)dowildcard;
-	(void)pstartinfo;
 	if (pargc != NULL)
 		*pargc = peb->pp_argc;
 	if (pargv != NULL)
 		*pargv = peb->pp_argv;
-	if (penv != NULL)
-		*penv = peb->pp_envp;
+	if (penvp != NULL)
+		*penvp = peb->pp_envp;
+	if (pstartinfo != NULL)
+		libd___set_app_type(pstartinfo->newmode);
 	return 0;
 }
 
 INTERN int LIBDCALL
 libd___wgetmainargs(int *pargc, char16_t ***pargv,
-                    char16_t ***penv, int dowildcard,
+                    char16_t ***penvp, int dowildcard,
                     _startupinfo *pstartinfo) {
 	(void)dowildcard;
-	(void)pstartinfo;
 	if (pargc != NULL)
 		*pargc = *libc___p___argc();
 	if (pargv != NULL)
 		*pargv = *libd___p___wargv();
-	if (penv != NULL)
-		*penv = *libd___p___winitenv();
+	if (penvp != NULL)
+		*penvp = *libd___p___winitenv();
+	if (pstartinfo != NULL)
+		libd___set_app_type(pstartinfo->newmode);
 	return 0;
 }
 
