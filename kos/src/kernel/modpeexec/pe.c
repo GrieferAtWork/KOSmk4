@@ -142,7 +142,9 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			if (load_maxaddr < sect_maxaddr)
 				load_maxaddr = sect_maxaddr;
 		}
-		total_size = (load_maxaddr + 1) - load_minaddr;
+		load_minaddr = FLOOR_ALIGN(load_minaddr, PAGESIZE);
+		load_maxaddr = CEIL_ALIGN(load_maxaddr + 1, PAGESIZE) - 1;
+		total_size   = (load_maxaddr + 1) - load_minaddr;
 #ifdef KERNELSPACE_HIGHMEM
 		min_okaddr = 0;
 		if (OVERFLOW_USUB(KERNELSPACE_BASE, total_size, &max_okaddr))
@@ -181,6 +183,21 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			must_relocate = false;
 		if (nt.FileHeader.SizeOfOptionalHeader < offsetafter(IMAGE_OPTIONAL_HEADER, DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC]))
 			must_relocate = false;
+		if (load_minaddr != 0) {
+			/* Must inject another section to map file contents
+			 * starting  at `0' and going up to `load_minaddr'.
+			 *
+			 * Some PE programs will directly access their own program headers,
+			 * even though the values of those headers could as well have  just
+			 * been hard-coded, but whatever... This  is needed to get  certain
+			 * programs running. */
+			mbuilder_map(&builder, (void *)loadaddr,
+			             load_minaddr, PROT_READ,
+			             MAP_FIXED | MAP_FIXED_NOREPLACE,
+			             args->ea_xfile, args->ea_xpath,
+			             args->ea_xdentry, (pos_t)0);
+		}
+
 		for (i = 0; i < nt.FileHeader.NumberOfSections; ++i) {
 			unsigned int prot = 0;
 			PIMAGE_SECTION_HEADER section = &shdr[i];
@@ -222,7 +239,6 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 				prot |= PROT_WRITE;
 			if (must_relocate)
 				prot |= PROT_WRITE; /* Write protection will be removed later */
-
 			/* Map section */
 			sectaddr = loadaddr + section->VirtualAddress;
 			assert(IS_ALIGNED((uintptr_t)sectaddr, PAGESIZE));
@@ -409,7 +425,7 @@ done_bss:
 
 			/* Push: `struct peexec_info::pi_pe.pd_loadmin' */
 			stack_end -= sizeof(uintptr_t);
-			*(USER CHECKED uintptr_t *)stack_end = loadaddr + load_minaddr;
+			*(USER CHECKED uintptr_t *)stack_end = loadaddr/* + load_minaddr*/;
 
 
 			/* Push: `struct peexec_info::pi_pnum' and `pi_libdl_pe' */

@@ -1011,10 +1011,10 @@ libd__initterm(_INITTERMFUN *start, _INITTERMFUN *end) {
 	for (iter = start; iter < end; ++iter) {
 		if (!*iter)
 			continue;
-		syslog(LOG_DEBUG, "DOS$_initterm: call %p\n", *iter);
+		syslog(LOG_DEBUG, "[libc] DOS$_initterm: call %p\n", *iter);
 		(**iter)();
 	}
-	syslog(LOG_DEBUG, "DOS$_initterm: done\n");
+	syslog(LOG_DEBUG, "[libc] DOS$_initterm: done\n");
 }
 
 DEFINE_PUBLIC_ALIAS(DOS$_initterm_e, libd__initterm_e);
@@ -1025,14 +1025,14 @@ libd__initterm_e(_INITTERM_E_FN *start, _INITTERM_E_FN *end) {
 	for (iter = start; iter < end; ++iter) {
 		if (!*iter)
 			continue;
-		syslog(LOG_DEBUG, "DOS$_initterm_e: call %p\n", *iter);
+		syslog(LOG_DEBUG, "[libc] DOS$_initterm_e: call %p\n", *iter);
 		result = (**iter)();
 		if (result != 0) {
-			syslog(LOG_DEBUG, "DOS$_initterm_e: call %p failed -> %d\n", *iter, result);
+			syslog(LOG_DEBUG, "[libc] DOS$_initterm_e: call %p failed -> %d\n", *iter, result);
 			break;
 		}
 	}
-	syslog(LOG_DEBUG, "DOS$_initterm_e: done\n");
+	syslog(LOG_DEBUG, "[libc] DOS$_initterm_e: done\n");
 	return result;
 }
 
