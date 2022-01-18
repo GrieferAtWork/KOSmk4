@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9847dd57 */
+/* HASH CRC-32:0x6dcdf8c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1672,10 +1672,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchownat,(__fd_t __dfd, cha
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
+#ifdef __CRT_HAVE_symlinkat
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
+#elif defined(__CRT_HAVE_fsymlinkat)
+#include <libc/local/unistd/symlinkat.h>
+/* >> symlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(symlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_RPC(__LIBCCALL symlinkat)(char const *__link_text, __fd_t __tofd, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlinkat))(__link_text, __tofd, __target_path); })
+#endif /* ... */
+#ifdef __CRT_HAVE_readlinkat
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -1684,8 +1693,25 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *_
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,readlinkat,(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
+__CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,readlinkat,(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
+#elif defined(__CRT_HAVE_freadlinkat)
+#include <libc/local/unistd/readlinkat.h>
+/* >> readlinkat(2)
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * WARNING: This  function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(readlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) ssize_t __NOTHROW_RPC(__LIBCCALL readlinkat)(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readlinkat))(__dfd, __path, __buf, __buflen); })
+#endif /* ... */
 #ifdef __USE_KOS
+/* >> fsymlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path'
+ * @param flags: Set of `0 | AT_DOSPATH' */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__link_text,__tofd,__target_path,__flags))
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
@@ -2460,14 +2486,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,symlink,(char const *__link
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),__libc_symlink,(__link_text,__target_path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_symlinkat)
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_symlinkat) || defined(__CRT_HAVE_fsymlinkat))
 #include <libc/local/unistd/symlink.h>
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL symlink)(char const *__link_text, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlink))(__link_text, __target_path); })
-#endif /* __AT_FDCWD && __CRT_HAVE_symlinkat */
+#endif /* __AT_FDCWD && (__CRT_HAVE_symlinkat || __CRT_HAVE_fsymlinkat) */
 #endif /* !... */
 #ifdef __CRT_HAVE_readlink
 /* >> readlink(3)
@@ -2504,7 +2530,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,readlink,(char const *_
 __CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,readlink,(char const *__path, char *__buf, size_t __buflen),__libc_readlink,(__path,__buf,__buflen))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_readlinkat)
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_readlinkat) || defined(__CRT_HAVE_freadlinkat))
 #include <libc/local/unistd/readlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
@@ -2516,7 +2542,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,readlink,(char const *_
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) ssize_t __NOTHROW_RPC(__LIBCCALL readlink)(char const *__path, char *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readlink))(__path, __buf, __buflen); })
-#endif /* __AT_FDCWD && __CRT_HAVE_readlinkat */
+#endif /* __AT_FDCWD && (__CRT_HAVE_readlinkat || __CRT_HAVE_freadlinkat) */
 #endif /* !... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 

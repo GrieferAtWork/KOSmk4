@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7553613 */
+/* HASH CRC-32:0x39d40810 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,39 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_symlink_defined
-#define __local_symlink_defined
+#ifndef __local_symlinkat_defined
+#define __local_symlinkat_defined
 #include <__crt.h>
-#include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_symlinkat) || defined(__CRT_HAVE_fsymlinkat))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_symlinkat_defined
-#define __local___localdep_symlinkat_defined
-#ifdef __CRT_HAVE_symlinkat
-__NAMESPACE_LOCAL_END
+#ifdef __CRT_HAVE_fsymlinkat
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),symlinkat,(__link_text,__tofd,__target_path))
-#elif defined(__CRT_HAVE_fsymlinkat)
-__NAMESPACE_LOCAL_END
-#include <libc/local/unistd/symlinkat.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_symlinkat __LIBC_LOCAL_NAME(symlinkat)
-#else /* ... */
-#undef __local___localdep_symlinkat_defined
-#endif /* !... */
-#endif /* !__local___localdep_symlinkat_defined */
-__LOCAL_LIBC(symlink) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(symlink))(char const *__link_text, char const *__target_path) {
-	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
-	return (__NAMESPACE_LOCAL_SYM __localdep_symlinkat)(__link_text, __AT_FDCWD, __target_path);
+#ifndef __local___localdep_fsymlinkat_defined
+#define __local___localdep_fsymlinkat_defined
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),fsymlinkat,(__link_text,__tofd,__target_path,__flags))
+#endif /* !__local___localdep_fsymlinkat_defined */
+__LOCAL_LIBC(symlinkat) __ATTR_NONNULL((1, 3)) int
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(symlinkat))(char const *__link_text, __fd_t __tofd, char const *__target_path) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_fsymlinkat)(__link_text, __tofd, __target_path, 0);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_symlink_defined
-#define __local___localdep_symlink_defined
-#define __localdep_symlink __LIBC_LOCAL_NAME(symlink)
-#endif /* !__local___localdep_symlink_defined */
-#else /* __AT_FDCWD && (__CRT_HAVE_symlinkat || __CRT_HAVE_fsymlinkat) */
-#undef __local_symlink_defined
-#endif /* !__AT_FDCWD || (!__CRT_HAVE_symlinkat && !__CRT_HAVE_fsymlinkat) */
-#endif /* !__local_symlink_defined */
+#ifndef __local___localdep_symlinkat_defined
+#define __local___localdep_symlinkat_defined
+#define __localdep_symlinkat __LIBC_LOCAL_NAME(symlinkat)
+#endif /* !__local___localdep_symlinkat_defined */
+#else /* __CRT_HAVE_fsymlinkat */
+#undef __local_symlinkat_defined
+#endif /* !__CRT_HAVE_fsymlinkat */
+#endif /* !__local_symlinkat_defined */

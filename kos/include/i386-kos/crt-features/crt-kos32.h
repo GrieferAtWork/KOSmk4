@@ -2306,6 +2306,7 @@
 #define __CRT_HAVE_fstatfs64
 #define __CRT_HAVE_fstatvfs
 #define __CRT_HAVE_fstatvfs64
+#define __CRT_HAVE_fsymlinkat
 #define __CRT_HAVE_fsync
 #define __CRT_HAVE_ftell
 #define __CRT_HAVE_ftell64
@@ -5705,6 +5706,7 @@
 #define __CRT_HAVE_KOS$fstat64
 #define __CRT_HAVE_KOS$fstatat
 #define __CRT_HAVE_KOS$fstatat64
+#define __CRT_HAVE_KOS$fsymlinkat
 #define __CRT_HAVE_KOS$fuzzy_wcscasecmp
 #define __CRT_HAVE_KOS$fuzzy_wcscasecmp_l
 #define __CRT_HAVE_KOS$fuzzy_wcscmp
@@ -6416,6 +6418,7 @@
 #define __CRT_HAVE_DOS$fstat64
 #define __CRT_HAVE_DOS$fstatat
 #define __CRT_HAVE_DOS$fstatat64
+#define __CRT_HAVE_DOS$fsymlinkat
 #define __CRT_HAVE_DOS$fuzzy_wcscasecmp
 #define __CRT_HAVE_DOS$fuzzy_wcscasecmp_l
 #define __CRT_HAVE_DOS$fuzzy_wcscmp

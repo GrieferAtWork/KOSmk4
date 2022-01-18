@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x524e2a61 */
+/* HASH CRC-32:0x6aa121c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -701,6 +701,18 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t cons
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
+#elif defined(__CRT_HAVE_fsymlinkat) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/parts.wchar.unistd/wsymlinkat.h>
+/* >> symlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_RPC(__LIBDCALL c16symlinkat)(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlinkat))((__WCHAR_TYPE__ const *)__link_text, __tofd, (__WCHAR_TYPE__ const *)__target_path); }
+#elif defined(__CRT_HAVE_fsymlinkat)
+#include <libc/local/parts.uchar.unistd/c16symlinkat.h>
+/* >> symlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16symlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_RPC(__LIBDCALL c16symlinkat)(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16symlinkat))(__link_text, __tofd, __target_path); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> symlinkat(3)
@@ -712,6 +724,18 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c32symlinkat,(char32_t cons
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c32symlinkat,(char32_t const *__link_text, __fd_t __tofd, char32_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
+#elif defined(__CRT_HAVE_fsymlinkat) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/parts.wchar.unistd/wsymlinkat.h>
+/* >> symlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_RPC(__LIBKCALL c32symlinkat)(char32_t const *__link_text, __fd_t __tofd, char32_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlinkat))((__WCHAR_TYPE__ const *)__link_text, __tofd, (__WCHAR_TYPE__ const *)__target_path); }
+#elif defined(__CRT_HAVE_fsymlinkat)
+#include <libc/local/parts.uchar.unistd/c32symlinkat.h>
+/* >> symlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32symlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_RPC(__LIBKCALL c32symlinkat)(char32_t const *__link_text, __fd_t __tofd, char32_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32symlinkat))(__link_text, __tofd, __target_path); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> readlinkat(2)
@@ -733,6 +757,28 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16readlinkat,(__fd_t _
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16readlinkat,(__fd_t __dfd, char16_t const *__path, char16_t *__buf, size_t __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
+#elif defined(__CRT_HAVE_wfreadlinkat) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/parts.wchar.unistd/wreadlinkat.h>
+/* >> readlinkat(2)
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * WARNING: This  function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) ssize_t __NOTHROW_RPC(__LIBDCALL c16readlinkat)(__fd_t __dfd, char16_t const *__path, char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wreadlinkat))(__dfd, (__WCHAR_TYPE__ const *)__path, (__WCHAR_TYPE__ *)__buf, __buflen); }
+#elif defined(__CRT_HAVE_DOS$wfreadlinkat)
+#include <libc/local/parts.uchar.unistd/c16readlinkat.h>
+/* >> readlinkat(2)
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * WARNING: This  function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16readlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) ssize_t __NOTHROW_RPC(__LIBDCALL c16readlinkat)(__fd_t __dfd, char16_t const *__path, char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16readlinkat))(__dfd, __path, __buf, __buflen); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> readlinkat(2)
@@ -754,6 +800,28 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c32readlinkat,(__fd_t _
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c32readlinkat,(__fd_t __dfd, char32_t const *__path, char32_t *__buf, size_t __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
+#elif defined(__CRT_HAVE_wfreadlinkat) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/parts.wchar.unistd/wreadlinkat.h>
+/* >> readlinkat(2)
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * WARNING: This  function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) ssize_t __NOTHROW_RPC(__LIBKCALL c32readlinkat)(__fd_t __dfd, char32_t const *__path, char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wreadlinkat))(__dfd, (__WCHAR_TYPE__ const *)__path, (__WCHAR_TYPE__ *)__buf, __buflen); }
+#elif defined(__CRT_HAVE_KOS$wfreadlinkat)
+#include <libc/local/parts.uchar.unistd/c32readlinkat.h>
+/* >> readlinkat(2)
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * WARNING: This  function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32readlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) ssize_t __NOTHROW_RPC(__LIBKCALL c32readlinkat)(__fd_t __dfd, char32_t const *__path, char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32readlinkat))(__dfd, __path, __buf, __buflen); })
 #endif /* ... */
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_wfreadlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
@@ -1001,14 +1069,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const 
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const *__link_text, char16_t const *__target_path),wsymlink,(__link_text,__target_path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 2
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wsymlinkat) || defined(__CRT_HAVE_fsymlinkat)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.unistd/wsymlink.h>
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBDCALL c16symlink)(char16_t const *__link_text, char16_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))((__WCHAR_TYPE__ const *)__link_text, (__WCHAR_TYPE__ const *)__target_path); }
-#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wsymlinkat))
+#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wsymlinkat) || defined(__CRT_HAVE_fsymlinkat))
 #include <libc/local/parts.uchar.unistd/c16symlink.h>
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
@@ -1031,14 +1099,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32symlink,(char32_t const 
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32symlink,(char32_t const *__link_text, char32_t const *__target_path),wsymlink,(__link_text,__target_path))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wsymlinkat) || defined(__CRT_HAVE_fsymlinkat)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.unistd/wsymlink.h>
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBKCALL c32symlink)(char32_t const *__link_text, char32_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))((__WCHAR_TYPE__ const *)__link_text, (__WCHAR_TYPE__ const *)__target_path); }
-#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wsymlinkat))
+#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wsymlinkat) || defined(__CRT_HAVE_fsymlinkat))
 #include <libc/local/parts.uchar.unistd/c32symlink.h>
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
@@ -1071,7 +1139,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c16readlink,(char16_t c
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c16readlink,(char16_t const *__path, char16_t *__buf, size_t __buflen),wreadlink,(__path,__buf,__buflen))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 2
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wreadlinkat) || defined(__CRT_HAVE_wfreadlinkat)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.unistd/wreadlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
@@ -1083,7 +1151,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c16readlink,(char16
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) ssize_t __NOTHROW_RPC(__LIBDCALL c16readlink)(char16_t const *__path, char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wreadlink))((__WCHAR_TYPE__ const *)__path, (__WCHAR_TYPE__ *)__buf, __buflen); }
-#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wreadlinkat))
+#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wreadlinkat) || (defined(__CRT_HAVE_wfreadlinkat) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$wfreadlinkat))
 #include <libc/local/parts.uchar.unistd/c16readlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
@@ -1121,7 +1189,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c32readlink,(char32_t c
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c32readlink,(char32_t const *__path, char32_t *__buf, size_t __buflen),wreadlink,(__path,__buf,__buflen))
 #else /* ... */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wreadlinkat) || defined(__CRT_HAVE_wfreadlinkat)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.unistd/wreadlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
@@ -1133,7 +1201,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c32readlink,(char32
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) ssize_t __NOTHROW_RPC(__LIBKCALL c32readlink)(char32_t const *__path, char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wreadlink))((__WCHAR_TYPE__ const *)__path, (__WCHAR_TYPE__ *)__buf, __buflen); }
-#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wreadlinkat))
+#elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wreadlinkat) || (defined(__CRT_HAVE_wfreadlinkat) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$wfreadlinkat))
 #include <libc/local/parts.uchar.unistd/c32readlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.

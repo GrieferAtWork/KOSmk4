@@ -976,8 +976,7 @@ NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text,
                                      char const *target_path)
 /*[[[body:libd_symlinkat]]]*/
 {
-	errno_t result = sys_fsymlinkat(link_text, tofd, target_path, AT_DOSPATH);
-	return libc_seterrno_syserr(result);
+	return libc_fsymlinkat(link_text, tofd, target_path, AT_DOSPATH);
 }
 /*[[[end:libd_symlinkat]]]*/
 
@@ -991,8 +990,12 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
                                      char const *target_path)
 /*[[[body:libc_symlinkat]]]*/
 {
+#ifdef __OPTIMIZE_SIZE__
+	return libc_fsymlinkat(link_text, tofd, target_path, 0);
+#else /* __OPTIMIZE_SIZE__ */
 	errno_t result = sys_symlinkat(link_text, tofd, target_path);
 	return libc_seterrno_syserr(result);
+#endif /* !__OPTIMIZE_SIZE__ */
 }
 /*[[[end:libc_symlinkat]]]*/
 
@@ -1040,6 +1043,39 @@ NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
 #endif /* !__OPTIMIZE_SIZE__ */
 }
 /*[[[end:libc_readlinkat]]]*/
+
+/*[[[head:libd_fsymlinkat,hash:CRC-32=0x39d3bf9a]]]*/
+/* >> fsymlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path'
+ * @param flags: Set of `0 | AT_DOSPATH' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1, 3)) int
+NOTHROW_RPC(LIBDCALL libd_fsymlinkat)(char const *link_text,
+                                      fd_t tofd,
+                                      char const *target_path,
+                                      atflag_t flags)
+/*[[[body:libd_fsymlinkat]]]*/
+{
+	return libc_fsymlinkat(link_text, tofd, target_path, flags | AT_DOSPATH);
+}
+/*[[[end:libd_fsymlinkat]]]*/
+
+/*[[[head:libc_fsymlinkat,hash:CRC-32=0xc35abcfa]]]*/
+/* >> fsymlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path'
+ * @param flags: Set of `0 | AT_DOSPATH' */
+INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1, 3)) int
+NOTHROW_RPC(LIBCCALL libc_fsymlinkat)(char const *link_text,
+                                      fd_t tofd,
+                                      char const *target_path,
+                                      atflag_t flags)
+/*[[[body:libc_fsymlinkat]]]*/
+{
+	errno_t result = sys_fsymlinkat(link_text, tofd, target_path, flags);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_fsymlinkat]]]*/
 
 /*[[[head:libd_freadlinkat,hash:CRC-32=0xd5ba18ee]]]*/
 /* >> freadlinkat(2)
@@ -3898,7 +3934,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbc7db8d0]]]*/
+/*[[[start:exports,hash:CRC-32=0x1566417a]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4088,6 +4124,8 @@ DEFINE_PUBLIC_ALIAS(DOS$symlinkat, libd_symlinkat);
 DEFINE_PUBLIC_ALIAS(symlinkat, libc_symlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$readlinkat, libd_readlinkat);
 DEFINE_PUBLIC_ALIAS(readlinkat, libc_readlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$fsymlinkat, libd_fsymlinkat);
+DEFINE_PUBLIC_ALIAS(fsymlinkat, libc_fsymlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$freadlinkat, libd_freadlinkat);
 DEFINE_PUBLIC_ALIAS(freadlinkat, libc_freadlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$unlinkat, libd_unlinkat);

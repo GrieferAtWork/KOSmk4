@@ -1056,8 +1056,11 @@ int linkat($fd_t fromfd, [[nonnull]] char const *from,
 @@Create  a  new  symbolic  link  loaded  with  `link_text'  as link
 @@text, at the filesystem location referred to by `tofd:target_path'
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
+[[userimpl, requires_function(fsymlinkat)]]
 int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
-              [[nonnull]] char const *target_path);
+              [[nonnull]] char const *target_path) {
+	return fsymlinkat(link_text, tofd, target_path, 0);
+}
 
 %[default:section(".text.crt{|.dos}.fs.property")];
 
@@ -1070,10 +1073,21 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 @@         make use of the buffer in its entirety.
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'.
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
+[[userimpl, requires_function(freadlinkat)]]
 ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *path,
-                   [[outp(buflen)]] char *buf, size_t buflen);
+                   [[outp(buflen)]] char *buf, size_t buflen) {
+	return freadlinkat(dfd, path, buf, buflen, 0);
+}
 
 %#ifdef __USE_KOS
+@@>> fsymlinkat(3)
+@@Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+@@text, at the filesystem location referred to by `tofd:target_path'
+@@@param flags: Set of `0 | AT_DOSPATH'
+[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
+int fsymlinkat([[nonnull]] char const *link_text, $fd_t tofd,
+               [[nonnull]] char const *target_path, $atflag_t flags);
+
 @@>> freadlinkat(2)
 @@Read the text of a symbolic link under `dfd:path' into the provided buffer.
 @@@param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE'

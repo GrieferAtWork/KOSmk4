@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x702c5722 */
+/* HASH CRC-32:0x793d659 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,39 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_readlink_defined
-#define __local_readlink_defined
+#ifndef __local_readlinkat_defined
+#define __local_readlinkat_defined
 #include <__crt.h>
-#include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_readlinkat) || defined(__CRT_HAVE_freadlinkat))
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_readlinkat_defined
-#define __local___localdep_readlinkat_defined
-#ifdef __CRT_HAVE_readlinkat
-__NAMESPACE_LOCAL_END
+#ifdef __CRT_HAVE_freadlinkat
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_readlinkat,(__fd_t __dfd, char const *__path, char *__buf, __SIZE_TYPE__ __buflen),readlinkat,(__dfd,__path,__buf,__buflen))
-#elif defined(__CRT_HAVE_freadlinkat)
-__NAMESPACE_LOCAL_END
-#include <libc/local/unistd/readlinkat.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_readlinkat __LIBC_LOCAL_NAME(readlinkat)
-#else /* ... */
-#undef __local___localdep_readlinkat_defined
-#endif /* !... */
-#endif /* !__local___localdep_readlinkat_defined */
-__LOCAL_LIBC(readlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readlink))(char const *__path, char *__buf, __SIZE_TYPE__ __buflen) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_readlinkat)(__AT_FDCWD, __path, __buf, __buflen);
+#ifndef __local___localdep_freadlinkat_defined
+#define __local___localdep_freadlinkat_defined
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_freadlinkat,(__fd_t __dfd, char const *__path, char *__buf, __SIZE_TYPE__ __buflen, __atflag_t __flags),freadlinkat,(__dfd,__path,__buf,__buflen,__flags))
+#endif /* !__local___localdep_freadlinkat_defined */
+__LOCAL_LIBC(readlinkat) __ATTR_NONNULL((2, 3)) __SSIZE_TYPE__
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readlinkat))(__fd_t __dfd, char const *__path, char *__buf, __SIZE_TYPE__ __buflen) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_freadlinkat)(__dfd, __path, __buf, __buflen, 0);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_readlink_defined
-#define __local___localdep_readlink_defined
-#define __localdep_readlink __LIBC_LOCAL_NAME(readlink)
-#endif /* !__local___localdep_readlink_defined */
-#else /* __AT_FDCWD && (__CRT_HAVE_readlinkat || __CRT_HAVE_freadlinkat) */
-#undef __local_readlink_defined
-#endif /* !__AT_FDCWD || (!__CRT_HAVE_readlinkat && !__CRT_HAVE_freadlinkat) */
-#endif /* !__local_readlink_defined */
+#ifndef __local___localdep_readlinkat_defined
+#define __local___localdep_readlinkat_defined
+#define __localdep_readlinkat __LIBC_LOCAL_NAME(readlinkat)
+#endif /* !__local___localdep_readlinkat_defined */
+#else /* __CRT_HAVE_freadlinkat */
+#undef __local_readlinkat_defined
+#endif /* !__CRT_HAVE_freadlinkat */
+#endif /* !__local_readlinkat_defined */

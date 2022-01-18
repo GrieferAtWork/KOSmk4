@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcaa9a361 */
+/* HASH CRC-32:0x48cbc538 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -301,6 +301,16 @@ INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd, c
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
+/* >> fsymlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path'
+ * @param flags: Set of `0 | AT_DOSPATH' */
+INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_fsymlinkat)(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags);
+/* >> fsymlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path'
+ * @param flags: Set of `0 | AT_DOSPATH' */
+INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_fsymlinkat)(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */

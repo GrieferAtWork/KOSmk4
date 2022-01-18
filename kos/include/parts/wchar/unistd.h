@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92f02cae */
+/* HASH CRC-32:0x2ecb932a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -219,10 +219,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfchownat,(__fd_t __dfd, wc
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,wlinkat,(__fd_t __fromfd, wchar_t const *__from, __fd_t __tofd, wchar_t const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
+#ifdef __CRT_HAVE_wsymlinkat
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),(__link_text,__tofd,__target_path))
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),(__link_text,__tofd,__target_path))
+#elif defined(__CRT_HAVE_fsymlinkat)
+#include <libc/local/parts.wchar.unistd/wsymlinkat.h>
+/* >> symlinkat(3)
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wsymlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_RPC(__LIBCCALL wsymlinkat)(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlinkat))(__link_text, __tofd, __target_path); })
+#endif /* ... */
+#ifdef __CRT_HAVE_wreadlinkat
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -231,7 +240,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t cons
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wreadlinkat,(__fd_t __dfd, wchar_t const *__path, wchar_t *__buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
+__CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wreadlinkat,(__fd_t __dfd, wchar_t const *__path, wchar_t *__buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
+#elif defined(__CRT_HAVE_wfreadlinkat)
+#include <libc/local/parts.wchar.unistd/wreadlinkat.h>
+/* >> readlinkat(2)
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * WARNING: This  function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wreadlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) ssize_t __NOTHROW_RPC(__LIBCCALL wreadlinkat)(__fd_t __dfd, wchar_t const *__path, wchar_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wreadlinkat))(__dfd, __path, __buf, __buflen); })
+#endif /* ... */
 #ifdef __USE_KOS
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
@@ -316,14 +337,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wtruncate64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wsymlink,(wchar_t const *__link_text, wchar_t const *__target_path),(__link_text,__target_path))
 #else /* __CRT_HAVE_wsymlink */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wsymlinkat) || defined(__CRT_HAVE_fsymlinkat))
 #include <libc/local/parts.wchar.unistd/wsymlink.h>
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wsymlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL wsymlink)(wchar_t const *__link_text, wchar_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))(__link_text, __target_path); })
-#endif /* __AT_FDCWD && __CRT_HAVE_wsymlinkat */
+#endif /* __AT_FDCWD && (__CRT_HAVE_wsymlinkat || __CRT_HAVE_fsymlinkat) */
 #endif /* !__CRT_HAVE_wsymlink */
 #ifdef __CRT_HAVE_wreadlink
 /* >> readlink(3)
@@ -338,7 +359,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wsymlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,wreadlink,(wchar_t const *__path, wchar_t *__buf, size_t __buflen),(__path,__buf,__buflen))
 #else /* __CRT_HAVE_wreadlink */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat)
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wreadlinkat) || defined(__CRT_HAVE_wfreadlinkat))
 #include <libc/local/parts.wchar.unistd/wreadlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
@@ -350,7 +371,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,wreadlink,(wchar_t const
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wreadlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) ssize_t __NOTHROW_RPC(__LIBCCALL wreadlink)(wchar_t const *__path, wchar_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wreadlink))(__path, __buf, __buflen); })
-#endif /* __AT_FDCWD && __CRT_HAVE_wreadlinkat */
+#endif /* __AT_FDCWD && (__CRT_HAVE_wreadlinkat || __CRT_HAVE_wfreadlinkat) */
 #endif /* !__CRT_HAVE_wreadlink */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
