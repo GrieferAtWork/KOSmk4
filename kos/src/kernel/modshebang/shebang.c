@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODELFEXEC_ELF_C
-#define GUARD_MODELFEXEC_ELF_C 1
+#ifndef GUARD_MODELF_ELF_C
+#define GUARD_MODELF_ELF_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -245,4 +245,4 @@ PRIVATE DRIVER_INIT void KCALL init(void) {
 
 DECL_END
 
-#endif /* !GUARD_MODELFEXEC_ELF_C */
+#endif /* !GUARD_MODELF_ELF_C */

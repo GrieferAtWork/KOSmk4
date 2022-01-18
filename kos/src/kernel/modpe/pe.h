@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPEEXEC_PE_H
-#define GUARD_MODPEEXEC_PE_H 1
+#ifndef GUARD_MODPE_PE_H
+#define GUARD_MODPE_PE_H 1
 
 #include <kernel/compiler.h>
 
@@ -59,4 +59,4 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args);
 
 DECL_END
 
-#endif /* !GUARD_MODPEEXEC_PE_H */
+#endif /* !GUARD_MODPE_PE_H */

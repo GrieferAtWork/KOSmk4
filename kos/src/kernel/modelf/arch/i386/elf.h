@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODELFEXEC_ARCH_I386_ELF_H
-#define GUARD_MODELFEXEC_ARCH_I386_ELF_H 1
+#ifndef GUARD_MODELF_ARCH_I386_ELF_H
+#define GUARD_MODELF_ARCH_I386_ELF_H 1
 
 #include <kernel/compiler.h>
 
@@ -69,4 +69,4 @@ DECL_END
 #endif /* __CC__ */
 
 
-#endif /* !GUARD_MODELFEXEC_ARCH_I386_ELF_H */
+#endif /* !GUARD_MODELF_ARCH_I386_ELF_H */

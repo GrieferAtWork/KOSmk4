@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODELFEXEC_ELF_H
-#define GUARD_MODELFEXEC_ELF_H 1
+#ifndef GUARD_MODELF_ELF_H
+#define GUARD_MODELF_ELF_H 1
 
 #include <kernel/compiler.h>
 
@@ -115,4 +115,4 @@ elfabi_exec(/*in|out*/ struct execargs *__restrict args);
 
 DECL_END
 
-#endif /* !GUARD_MODELFEXEC_ELF_H */
+#endif /* !GUARD_MODELF_ELF_H */

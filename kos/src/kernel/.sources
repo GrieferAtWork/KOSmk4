@@ -154,7 +154,7 @@ BEGIN
 			DEFINE_SIMPLE_ARCH_DRIVER("rtm")
 
 			/* PE executable driver */
-			DEFINE_SIMPLE_DRIVER("peexec")
+			DEFINE_SIMPLE_DRIVER("pe")
 		}
 
 #undef DEFINE_SIMPLE_ARCH_DRIVER

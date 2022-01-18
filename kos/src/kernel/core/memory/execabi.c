@@ -36,7 +36,7 @@
 #include <string.h>
 
 #ifdef CONFIG_EXECABI_HAVE_BUILTIN_ELF
-#include "../../modelfexec/elf.h"
+#include "../../modelf/elf.h"
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_ELF */
 
 #ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
@@ -44,7 +44,7 @@
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
 
 #ifdef CONFIG_EXECABI_HAVE_BUILTIN_PE
-#include "../../modpeexec/pe.h"
+#include "../../modpe/pe.h"
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_PE */
 
 DECL_BEGIN

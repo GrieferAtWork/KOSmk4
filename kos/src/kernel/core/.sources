@@ -88,8 +88,8 @@ BEGIN
 		/* Pull in some hard-coded drivers */
 
 		/* Required for: executing ELF files. */
-		"../modelfexec/arch/" + XARCH + "/*.c",
-		"../modelfexec/*.c",
+		"../modelf/arch/" + XARCH + "/*.c",
+		"../modelf/*.c",
 
 		/* Required for: executing #!-files. */
 		"../modshebang/*.c",

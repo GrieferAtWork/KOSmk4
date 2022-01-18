@@ -598,7 +598,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       incorrect multi-character sequences, as well as overly long chars) */
 
 	/* TODO: Support for `PT_GNU_STACK'
-	 *   - Add handling in modelfexec
+	 *   - Add handling in modelf
 	 *   - Keep  track of requirements  in libdl during  the initial load phase
 	 *     If requirements change while the initial set of libraries is loaded,
 	 *     then mprotect() the main thread's stack to alter protection.

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODELFEXEC_ARCH_I386_ELF_C
-#define GUARD_MODELFEXEC_ARCH_I386_ELF_C 1
+#ifndef GUARD_MODELF_ARCH_I386_ELF_C
+#define GUARD_MODELF_ARCH_I386_ELF_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -405,4 +405,4 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 
 DECL_END
 
-#endif /* !GUARD_MODELFEXEC_ARCH_I386_ELF_C */
+#endif /* !GUARD_MODELF_ARCH_I386_ELF_C */

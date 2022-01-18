@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPEEXEC_PE_C
-#define GUARD_MODPEEXEC_PE_C 1
+#ifndef GUARD_MODPE_PE_C
+#define GUARD_MODPE_PE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -503,4 +503,4 @@ PRIVATE DRIVER_INIT void KCALL init(void) {
 
 DECL_END
 
-#endif /* !GUARD_MODPEEXEC_PE_C */
+#endif /* !GUARD_MODPE_PE_C */
