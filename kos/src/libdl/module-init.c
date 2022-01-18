@@ -169,18 +169,15 @@ again_search_noinit:
 	last->dm_flags &= ~RTLD_NOINIT;
 	incref(last);
 	DlModule_GlobalLock_EndRead();
-	/* TODO: Support for formats other than ELF. */
-#if 1 /* This is called during init. - If an exception happens here, it wouldn't even matter... */
-	DlModule_ElfRunInitializers(last);
-#else
-	TRY {
+
+	/* Support for formats other than ELF. */
+	if (last->dm_ops) {
+		if (last->dm_ops->df_run_initializers)
+			(*last->dm_ops->df_run_initializers)(last);
+	} else {
 		DlModule_ElfRunInitializers(last);
-	} EXCEPT {
-		decref(last);
-		decref(primary);
-		RETHROW();
 	}
-#endif
+
 	decref(last);
 	if (last != primary)
 		goto again_search_noinit;
