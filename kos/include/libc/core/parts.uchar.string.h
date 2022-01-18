@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf40d3305 */
+/* HASH CRC-32:0x3677d6f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,217 +33,217 @@ __SYSDECL_BEGIN
 #include <hybrid/typecore.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16send,(__CHAR16_TYPE__ const *__restrict __str),wcsend,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16end,(__CHAR16_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif defined(__CRT_HAVE_DOS$wcsend)
 #include <hybrid/typecore.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16send,(__CHAR16_TYPE__ const *__restrict __str),wcsend,(__str))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16end,(__CHAR16_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsend.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-#define __libc_core_c16send (*(__CHAR16_TYPE__ *(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend))
+#define __libc_core_c16end (*(__CHAR16_TYPE__ *(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c16send.h>
+#include <libc/local/parts.uchar.string/c16end.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-#define __libc_core_c16send __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16send)
+#define __libc_core_c16end __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16end)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsend) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 #include <hybrid/typecore.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32send,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32end,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif defined(__CRT_HAVE_KOS$wcsend)
 #include <hybrid/typecore.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32send,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32end,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsend.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-#define __libc_core_c32send (*(__CHAR32_TYPE__ *(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend))
+#define __libc_core_c32end (*(__CHAR32_TYPE__ *(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c32send.h>
+#include <libc/local/parts.uchar.string/c32end.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-#define __libc_core_c32send __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32send)
+#define __libc_core_c32end __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32end)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsnend) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 #include <hybrid/typecore.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16snend,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16nend,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsnend)
 #include <hybrid/typecore.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16snend,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16nend,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsnend.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-#define __libc_core_c16snend (*(__CHAR16_TYPE__ *(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend))
+#define __libc_core_c16nend (*(__CHAR16_TYPE__ *(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c16snend.h>
+#include <libc/local/parts.uchar.string/c16nend.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-#define __libc_core_c16snend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16snend)
+#define __libc_core_c16nend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16nend)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsnend) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 #include <hybrid/typecore.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32snend,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32nend,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsnend)
 #include <hybrid/typecore.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32snend,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32nend,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsnend.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-#define __libc_core_c32snend (*(__CHAR32_TYPE__ *(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend))
+#define __libc_core_c32nend (*(__CHAR32_TYPE__ *(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c32snend.h>
+#include <libc/local/parts.uchar.string/c32nend.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-#define __libc_core_c32snend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32snend)
+#define __libc_core_c32nend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32nend)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 #include <hybrid/typecore.h>
 /* >> wcslen(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16slen,(__CHAR16_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16len,(__CHAR16_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_DOS$wcslen)
 #include <hybrid/typecore.h>
 /* >> wcslen(3) */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16slen,(__CHAR16_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16len,(__CHAR16_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcslen.h>
 /* >> wcslen(3) */
-#define __libc_core_c16slen (*(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
+#define __libc_core_c16len (*(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c16slen.h>
+#include <libc/local/parts.uchar.string/c16len.h>
 /* >> wcslen(3) */
-#define __libc_core_c16slen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16slen)
+#define __libc_core_c16len __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16len)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 #include <hybrid/typecore.h>
 /* >> wcslen(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32len,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_KOS$wcslen)
 #include <hybrid/typecore.h>
 /* >> wcslen(3) */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32len,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcslen.h>
 /* >> wcslen(3) */
-#define __libc_core_c32slen (*(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
+#define __libc_core_c32len (*(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c32slen.h>
+#include <libc/local/parts.uchar.string/c32len.h>
 /* >> wcslen(3) */
-#define __libc_core_c32slen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32slen)
+#define __libc_core_c32len __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32len)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 #include <hybrid/typecore.h>
 /* >> wcsnlen(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16snlen,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16nlen,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsnlen)
 #include <hybrid/typecore.h>
 /* >> wcsnlen(3) */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16snlen,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16nlen,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsnlen.h>
 /* >> wcsnlen(3) */
-#define __libc_core_c16snlen (*(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))
+#define __libc_core_c16nlen (*(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c16snlen.h>
+#include <libc/local/parts.uchar.string/c16nlen.h>
 /* >> wcsnlen(3) */
-#define __libc_core_c16snlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16snlen)
+#define __libc_core_c16nlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16nlen)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 #include <hybrid/typecore.h>
 /* >> wcsnlen(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32snlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32nlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsnlen)
 #include <hybrid/typecore.h>
 /* >> wcsnlen(3) */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32snlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32nlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsnlen.h>
 /* >> wcsnlen(3) */
-#define __libc_core_c32snlen (*(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))
+#define __libc_core_c32nlen (*(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c32snlen.h>
+#include <libc/local/parts.uchar.string/c32nlen.h>
 /* >> wcsnlen(3) */
-#define __libc_core_c32snlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32snlen)
+#define __libc_core_c32nlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32nlen)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscmp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> wcscmp(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16scmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16cmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcscmp)
 /* >> wcscmp(3) */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16scmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16cmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcscmp.h>
 /* >> wcscmp(3) */
-#define __libc_core_c16scmp (*(int(__LIBDCALL*)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp))
+#define __libc_core_c16cmp (*(int(__LIBDCALL*)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c16scmp.h>
+#include <libc/local/parts.uchar.string/c16cmp.h>
 /* >> wcscmp(3) */
-#define __libc_core_c16scmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16scmp)
+#define __libc_core_c16cmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16cmp)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> wcscmp(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32scmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32cmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_KOS$wcscmp)
 /* >> wcscmp(3) */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32scmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32cmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcscmp.h>
 /* >> wcscmp(3) */
-#define __libc_core_c32scmp (*(int(__LIBKCALL*)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__ const *))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp))
+#define __libc_core_c32cmp (*(int(__LIBKCALL*)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__ const *))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c32scmp.h>
+#include <libc/local/parts.uchar.string/c32cmp.h>
 /* >> wcscmp(3) */
-#define __libc_core_c32scmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32scmp)
+#define __libc_core_c32cmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32cmp)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsncmp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 #include <hybrid/typecore.h>
 /* >> wcsncmp(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16sncmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16ncmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsncmp)
 #include <hybrid/typecore.h>
 /* >> wcsncmp(3) */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16sncmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16ncmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsncmp.h>
 /* >> wcsncmp(3) */
-#define __libc_core_c16sncmp (*(int(__LIBDCALL*)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp))
+#define __libc_core_c16ncmp (*(int(__LIBDCALL*)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c16sncmp.h>
+#include <libc/local/parts.uchar.string/c16ncmp.h>
 /* >> wcsncmp(3) */
-#define __libc_core_c16sncmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sncmp)
+#define __libc_core_c16ncmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ncmp)
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsncmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 #include <hybrid/typecore.h>
 /* >> wcsncmp(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32sncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32ncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsncmp)
 #include <hybrid/typecore.h>
 /* >> wcsncmp(3) */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32sncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32ncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsncmp.h>
 /* >> wcsncmp(3) */
-#define __libc_core_c32sncmp (*(int(__LIBKCALL*)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__ const *,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp))
+#define __libc_core_c32ncmp (*(int(__LIBKCALL*)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__ const *,__SIZE_TYPE__))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp))
 #else /* ... */
-#include <libc/local/parts.uchar.string/c32sncmp.h>
+#include <libc/local/parts.uchar.string/c32ncmp.h>
 /* >> wcsncmp(3) */
-#define __libc_core_c32sncmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sncmp)
+#define __libc_core_c32ncmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ncmp)
 #endif /* !... */
 
 __SYSDECL_END

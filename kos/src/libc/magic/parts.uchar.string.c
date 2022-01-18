@@ -55,117 +55,117 @@ c32mempmove(*) %{uchar32("wmempmove")}
 c16mempset(*) %{uchar16("wmempset")}
 c32mempset(*) %{uchar32("wmempset")}
 
-[[libc]] c16send(*) %{uchar16("wcsend")}
-[[libc]] c32send(*) %{uchar32("wcsend")}
-[[libc]] c16snend(*) %{uchar16("wcsnend")}
-[[libc]] c32snend(*) %{uchar32("wcsnend")}
-[[libc]] c16slen(*) %{uchar16("wcslen")}
-[[libc]] c32slen(*) %{uchar32("wcslen")}
-[[libc]] c16snlen(*) %{uchar16("wcsnlen")}
-[[libc]] c32snlen(*) %{uchar32("wcsnlen")}
-[[libc]] c16scmp(*) %{uchar16("wcscmp")}
-[[libc]] c32scmp(*) %{uchar32("wcscmp")}
-[[libc]] c16sncmp(*) %{uchar16("wcsncmp")}
-[[libc]] c32sncmp(*) %{uchar32("wcsncmp")}
+[[libc]] c16end(*) %{uchar16("wcsend")}
+[[libc]] c32end(*) %{uchar32("wcsend")}
+[[libc]] c16nend(*) %{uchar16("wcsnend")}
+[[libc]] c32nend(*) %{uchar32("wcsnend")}
+[[libc]] c16len(*) %{uchar16("wcslen")}
+[[libc]] c32len(*) %{uchar32("wcslen")}
+[[libc]] c16nlen(*) %{uchar16("wcsnlen")}
+[[libc]] c32nlen(*) %{uchar32("wcsnlen")}
+[[libc]] c16cmp(*) %{uchar16("wcscmp")}
+[[libc]] c32cmp(*) %{uchar32("wcscmp")}
+[[libc]] c16ncmp(*) %{uchar16("wcsncmp")}
+[[libc]] c32ncmp(*) %{uchar32("wcsncmp")}
 
-c16schr(*) %{uchar16("wcschr")}
-c32schr(*) %{uchar32("wcschr")}
-c16srchr(*) %{uchar16("wcsrchr")}
-c32srchr(*) %{uchar32("wcsrchr")}
-c16snchr(*) %{uchar16("wcsnchr")}
-c32snchr(*) %{uchar32("wcsnchr")}
-c16snrchr(*) %{uchar16("wcsnrchr")}
-c32snrchr(*) %{uchar32("wcsnrchr")}
+c16chr(*) %{uchar16("wcschr")}
+c32chr(*) %{uchar32("wcschr")}
+c16rchr(*) %{uchar16("wcsrchr")}
+c32rchr(*) %{uchar32("wcsrchr")}
+c16nchr(*) %{uchar16("wcsnchr")}
+c32nchr(*) %{uchar32("wcsnchr")}
+c16nrchr(*) %{uchar16("wcsnrchr")}
+c32nrchr(*) %{uchar32("wcsnrchr")}
 
-c16schrnul(*) %{uchar16("wcschrnul")}
-c32schrnul(*) %{uchar32("wcschrnul")}
-c16srchrnul(*) %{uchar16("wcsrchrnul")}
-c32srchrnul(*) %{uchar32("wcsrchrnul")}
-c16snchrnul(*) %{uchar16("wcsnchrnul")}
-c32snchrnul(*) %{uchar32("wcsnchrnul")}
-c16snrchrnul(*) %{uchar16("wcsnrchrnul")}
-c32snrchrnul(*) %{uchar32("wcsnrchrnul")}
+c16chrnul(*) %{uchar16("wcschrnul")}
+c32chrnul(*) %{uchar32("wcschrnul")}
+c16rchrnul(*) %{uchar16("wcsrchrnul")}
+c32rchrnul(*) %{uchar32("wcsrchrnul")}
+c16nchrnul(*) %{uchar16("wcsnchrnul")}
+c32nchrnul(*) %{uchar32("wcsnchrnul")}
+c16nrchrnul(*) %{uchar16("wcsnrchrnul")}
+c32nrchrnul(*) %{uchar32("wcsnrchrnul")}
 
-c16soff(*) %{uchar16("wcsoff")}
-c32soff(*) %{uchar32("wcsoff")}
-c16sroff(*) %{uchar16("wcsroff")}
-c32sroff(*) %{uchar32("wcsroff")}
-c16snoff(*) %{uchar16("wcsnoff")}
-c32snoff(*) %{uchar32("wcsnoff")}
-c16snroff(*) %{uchar16("wcsnroff")}
-c32snroff(*) %{uchar32("wcsnroff")}
+c16off(*) %{uchar16("wcsoff")}
+c32off(*) %{uchar32("wcsoff")}
+c16roff(*) %{uchar16("wcsroff")}
+c32roff(*) %{uchar32("wcsroff")}
+c16noff(*) %{uchar16("wcsnoff")}
+c32noff(*) %{uchar32("wcsnoff")}
+c16nroff(*) %{uchar16("wcsnroff")}
+c32nroff(*) %{uchar32("wcsnroff")}
 
-c16sstr(*) %{uchar16("wcsstr")}
-c32sstr(*) %{uchar32("wcsstr")}
-c16scasestr(*) %{uchar16("wcscasestr")}
-c32scasestr(*) %{uchar32("wcscasestr")}
+c16str(*) %{uchar16("wcsstr")}
+c32str(*) %{uchar32("wcsstr")}
+c16casestr(*) %{uchar16("wcscasestr")}
+c32casestr(*) %{uchar32("wcscasestr")}
 
-c16scpy(*) %{uchar16("wcscpy")}
-c32scpy(*) %{uchar32("wcscpy")}
-c16spcpy(*) %{uchar16("wcspcpy")}
-c32spcpy(*) %{uchar32("wcspcpy")}
-c16sncpy(*) %{uchar16("wcsncpy")}
-c32sncpy(*) %{uchar32("wcsncpy")}
-c16spncpy(*) %{uchar16("wcspncpy")}
-c32spncpy(*) %{uchar32("wcspncpy")}
+c16cpy(*) %{uchar16("wcscpy")}
+c32cpy(*) %{uchar32("wcscpy")}
+c16pcpy(*) %{uchar16("wcspcpy")}
+c32pcpy(*) %{uchar32("wcspcpy")}
+c16ncpy(*) %{uchar16("wcsncpy")}
+c32ncpy(*) %{uchar32("wcsncpy")}
+c16pncpy(*) %{uchar16("wcspncpy")}
+c32pncpy(*) %{uchar32("wcspncpy")}
 
-c16scat(*) %{uchar16("wcscat")}
-c32scat(*) %{uchar32("wcscat")}
-c16sncat(*) %{uchar16("wcsncat")}
-c32sncat(*) %{uchar32("wcsncat")}
+c16cat(*) %{uchar16("wcscat")}
+c32cat(*) %{uchar32("wcscat")}
+c16ncat(*) %{uchar16("wcsncat")}
+c32ncat(*) %{uchar32("wcsncat")}
 
-c16sspn(*) %{uchar16("wcsspn")}
-c32sspn(*) %{uchar32("wcsspn")}
-c16scspn(*) %{uchar16("wcscspn")}
-c32scspn(*) %{uchar32("wcscspn")}
+c16spn(*) %{uchar16("wcsspn")}
+c32spn(*) %{uchar32("wcsspn")}
+c16cspn(*) %{uchar16("wcscspn")}
+c32cspn(*) %{uchar32("wcscspn")}
 
-c16spbrk(*) %{uchar16("wcspbrk")}
-c32spbrk(*) %{uchar32("wcspbrk")}
+c16pbrk(*) %{uchar16("wcspbrk")}
+c32pbrk(*) %{uchar32("wcspbrk")}
 
-[[guard]] c16stok(*) %{uchar16("wcstok")}
-[[guard]] c32stok(*) %{uchar32("wcstok")}
+[[guard]] c16tok(*) %{uchar16("wcstok")}
+[[guard]] c32tok(*) %{uchar32("wcstok")}
 
-c16ssep(*) %{uchar16("wcssep")}
-c32ssep(*) %{uchar32("wcssep")}
+c16sep(*) %{uchar16("wcssep")}
+c32sep(*) %{uchar32("wcssep")}
 
-c16sdup(*) %{uchar16("wcsdup")}
-c32sdup(*) %{uchar32("wcsdup")}
+c16dup(*) %{uchar16("wcsdup")}
+c32dup(*) %{uchar32("wcsdup")}
 
-c16sndup(*) %{uchar16("wcsndup")}
-c32sndup(*) %{uchar32("wcsndup")}
+c16ndup(*) %{uchar16("wcsndup")}
+c32ndup(*) %{uchar32("wcsndup")}
 
-c16sfry(*) %{uchar16("wcsfry")}
-c32sfry(*) %{uchar32("wcsfry")}
+c16fry(*) %{uchar16("wcsfry")}
+c32fry(*) %{uchar32("wcsfry")}
 
-c16scasecmp(*) %{uchar16("wcscasecmp")}
-c32scasecmp(*) %{uchar32("wcscasecmp")}
-c16sncasecmp(*) %{uchar16("wcsncasecmp")}
-c32sncasecmp(*) %{uchar32("wcsncasecmp")}
+c16casecmp(*) %{uchar16("wcscasecmp")}
+c32casecmp(*) %{uchar32("wcscasecmp")}
+c16ncasecmp(*) %{uchar16("wcsncasecmp")}
+c32ncasecmp(*) %{uchar32("wcsncasecmp")}
 
-c16sxfrm(*) %{uchar16("wcsxfrm")}
-c32sxfrm(*) %{uchar32("wcsxfrm")}
+c16xfrm(*) %{uchar16("wcsxfrm")}
+c32xfrm(*) %{uchar32("wcsxfrm")}
 
-c16scoll(*) %{uchar16("wcscoll")}
-c32scoll(*) %{uchar32("wcscoll")}
-c16sncoll(*) %{uchar16("wcsncoll")}
-c32sncoll(*) %{uchar32("wcsncoll")}
-c16scasecoll(*) %{uchar16("wcscasecoll")}
-c32scasecoll(*) %{uchar32("wcscasecoll")}
-c16sncasecoll(*) %{uchar16("wcsncasecoll")}
-c32sncasecoll(*) %{uchar32("wcsncasecoll")}
+c16coll(*) %{uchar16("wcscoll")}
+c32coll(*) %{uchar32("wcscoll")}
+c16ncoll(*) %{uchar16("wcsncoll")}
+c32ncoll(*) %{uchar32("wcsncoll")}
+c16casecoll(*) %{uchar16("wcscasecoll")}
+c32casecoll(*) %{uchar32("wcscasecoll")}
+c16ncasecoll(*) %{uchar16("wcsncasecoll")}
+c32ncasecoll(*) %{uchar32("wcsncasecoll")}
 
-c16slwr(*) %{uchar16("wcslwr")}
-c32slwr(*) %{uchar32("wcslwr")}
-c16supr(*) %{uchar16("wcsupr")}
-c32supr(*) %{uchar32("wcsupr")}
-c16srev(*) %{uchar16("wcsrev")}
-c32srev(*) %{uchar32("wcsrev")}
-c16snrev(*) %{uchar16("wcsnrev")}
-c32snrev(*) %{uchar32("wcsnrev")}
-c16sset(*) %{uchar16("wcsset")}
-c32sset(*) %{uchar32("wcsset")}
-c16snset(*) %{uchar16("wcsnset")}
-c32snset(*) %{uchar32("wcsnset")}
+c16lwr(*) %{uchar16("wcslwr")}
+c32lwr(*) %{uchar32("wcslwr")}
+c16upr(*) %{uchar16("wcsupr")}
+c32upr(*) %{uchar32("wcsupr")}
+c16rev(*) %{uchar16("wcsrev")}
+c32rev(*) %{uchar32("wcsrev")}
+c16nrev(*) %{uchar16("wcsnrev")}
+c32nrev(*) %{uchar32("wcsnrev")}
+c16set(*) %{uchar16("wcsset")}
+c32set(*) %{uchar32("wcsset")}
+c16nset(*) %{uchar16("wcsnset")}
+c32nset(*) %{uchar32("wcsnset")}
 
 fuzzy_c16memcmp(*) %{uchar16("fuzzy_wmemcmp")}
 fuzzy_c32memcmp(*) %{uchar32("fuzzy_wmemcmp")}
@@ -180,46 +180,46 @@ fuzzy_c32scasecmp(*) %{uchar32("fuzzy_wcscasecmp")}
 fuzzy_c16sncasecmp(*) %{uchar16("fuzzy_wcsncasecmp")}
 fuzzy_c32sncasecmp(*) %{uchar32("fuzzy_wcsncasecmp")}
 
-wildc16scmp(*) %{uchar16("wildwcscmp")}
-wildc32scmp(*) %{uchar32("wildwcscmp")}
-wildc16scasecmp(*) %{uchar16("wildwcscasecmp")}
-wildc32scasecmp(*) %{uchar32("wildwcscasecmp")}
+wildc16cmp(*) %{uchar16("wildwcscmp")}
+wildc32cmp(*) %{uchar32("wildwcscmp")}
+wildc16casecmp(*) %{uchar16("wildwcscasecmp")}
+wildc32casecmp(*) %{uchar32("wildwcscasecmp")}
 
-c16sverscmp(*) %{uchar16("wcsverscmp")}
-c32sverscmp(*) %{uchar32("wcsverscmp")}
+c16verscmp(*) %{uchar16("wcsverscmp")}
+c32verscmp(*) %{uchar32("wcsverscmp")}
 
 
 %#ifdef __USE_XOPEN2K8
-c16scasestr_l(*) %{uchar16("wcscasestr_l")}
-c32scasestr_l(*) %{uchar32("wcscasestr_l")}
-c16scasecmp_l(*) %{uchar16("wcscasecmp_l")}
-c32scasecmp_l(*) %{uchar32("wcscasecmp_l")}
-c16sncasecmp_l(*) %{uchar16("wcsncasecmp_l")}
-c32sncasecmp_l(*) %{uchar32("wcsncasecmp_l")}
-c16sxfrm_l(*) %{uchar16("wcsxfrm_l")}
-c32sxfrm_l(*) %{uchar32("wcsxfrm_l")}
-c16scoll_l(*) %{uchar16("wcscoll_l")}
-c32scoll_l(*) %{uchar32("wcscoll_l")}
-c16sncoll_l(*) %{uchar16("wcsncoll_l")}
-c32sncoll_l(*) %{uchar32("wcsncoll_l")}
-c16scasecoll_l(*) %{uchar16("wcscasecoll_l")}
-c32scasecoll_l(*) %{uchar32("wcscasecoll_l")}
-c16sncasecoll_l(*) %{uchar16("wcsncasecoll_l")}
-c32sncasecoll_l(*) %{uchar32("wcsncasecoll_l")}
-c16slwr_l(*) %{uchar16("wcslwr_l")}
-c32slwr_l(*) %{uchar32("wcslwr_l")}
-c16supr_l(*) %{uchar16("wcsupr_l")}
-c32supr_l(*) %{uchar32("wcsupr_l")}
+c16casestr_l(*) %{uchar16("wcscasestr_l")}
+c32casestr_l(*) %{uchar32("wcscasestr_l")}
+c16casecmp_l(*) %{uchar16("wcscasecmp_l")}
+c32casecmp_l(*) %{uchar32("wcscasecmp_l")}
+c16ncasecmp_l(*) %{uchar16("wcsncasecmp_l")}
+c32ncasecmp_l(*) %{uchar32("wcsncasecmp_l")}
+c16xfrm_l(*) %{uchar16("wcsxfrm_l")}
+c32xfrm_l(*) %{uchar32("wcsxfrm_l")}
+c16coll_l(*) %{uchar16("wcscoll_l")}
+c32coll_l(*) %{uchar32("wcscoll_l")}
+c16ncoll_l(*) %{uchar16("wcsncoll_l")}
+c32ncoll_l(*) %{uchar32("wcsncoll_l")}
+c16casecoll_l(*) %{uchar16("wcscasecoll_l")}
+c32casecoll_l(*) %{uchar32("wcscasecoll_l")}
+c16ncasecoll_l(*) %{uchar16("wcsncasecoll_l")}
+c32ncasecoll_l(*) %{uchar32("wcsncasecoll_l")}
+c16lwr_l(*) %{uchar16("wcslwr_l")}
+c32lwr_l(*) %{uchar32("wcslwr_l")}
+c16upr_l(*) %{uchar16("wcsupr_l")}
+c32upr_l(*) %{uchar32("wcsupr_l")}
 
 fuzzy_c16memcasecmp_l(*) %{uchar16("fuzzy_wmemcasecmp_l")}
 fuzzy_c32memcasecmp_l(*) %{uchar32("fuzzy_wmemcasecmp_l")}
-fuzzy_c16scasecmp_l(*) %{uchar16("fuzzy_wcscasecmp_l")}
-fuzzy_c32scasecmp_l(*) %{uchar32("fuzzy_wcscasecmp_l")}
-fuzzy_c16sncasecmp_l(*) %{uchar16("fuzzy_wcsncasecmp_l")}
-fuzzy_c32sncasecmp_l(*) %{uchar32("fuzzy_wcsncasecmp_l")}
+fuzzy_c16casecmp_l(*) %{uchar16("fuzzy_wcscasecmp_l")}
+fuzzy_c32casecmp_l(*) %{uchar32("fuzzy_wcscasecmp_l")}
+fuzzy_c16ncasecmp_l(*) %{uchar16("fuzzy_wcsncasecmp_l")}
+fuzzy_c32ncasecmp_l(*) %{uchar32("fuzzy_wcsncasecmp_l")}
 
-wildc16scasecmp_l(*) %{uchar16("wildwcscasecmp_l")}
-wildc32scasecmp_l(*) %{uchar32("wildwcscasecmp_l")}
+wildc16casecmp_l(*) %{uchar16("wildwcscasecmp_l")}
+wildc32casecmp_l(*) %{uchar32("wildwcscasecmp_l")}
 %#endif /* __USE_XOPEN2K8 */
 
 

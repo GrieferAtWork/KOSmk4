@@ -28,6 +28,27 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+/************************************************************************/
+/* <STRING.H>-STYLE FUNCTIONS                                           */
+/************************************************************************/
+WINBASEAPI int WINAPI lstrcmpA(LPCSTR lpString1, LPCSTR lpString2);
+WINBASEAPI int WINAPI lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2);
+WINBASEAPI int WINAPI lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2);
+WINBASEAPI int WINAPI lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2);
+WINBASEAPI LPSTR WINAPI lstrcpynA(LPSTR lpString1, LPCSTR lpString2, int iMaxLength);
+WINBASEAPI LPWSTR WINAPI lstrcpynW(LPWSTR lpString1, LPCWSTR lpString2, int iMaxLength);
+WINBASEAPI LPSTR WINAPI lstrcpyA(LPSTR lpString1, LPCSTR lpString2);
+WINBASEAPI LPWSTR WINAPI lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2);
+WINBASEAPI LPSTR WINAPI lstrcatA(LPSTR lpString1, LPCSTR lpString2);
+WINBASEAPI LPWSTR WINAPI lstrcatW(LPWSTR lpString1, LPCWSTR lpString2);
+WINBASEAPI int WINAPI lstrlenA(LPCSTR lpString);
+WINBASEAPI int WINAPI lstrlenW(LPCWSTR lpString);
+
+
+
+/************************************************************************/
+/* CODEC CONVERSION                                                     */
+/************************************************************************/
 WINBASEAPI int WINAPI MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
 WINBASEAPI int WINAPI WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWCH lpWideCharStr, int cchWideChar, LPSTR lpMultiByteStr, int cbMultiByte, LPCCH lpDefaultChar, LPBOOL lpUsedDefaultChar);
 

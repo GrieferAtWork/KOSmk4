@@ -20,10 +20,11 @@
 #ifndef GUARD_LIBKERNEL32_API_H
 #define GUARD_LIBKERNEL32_API_H 1
 
+#include <__crt.h>
 #include <__stdinc.h>
 #include <hybrid/compiler.h>
 
-#include <__crt.h>
+#include <bits/types.h>
 #include <kos/anno.h>
 
 #define CC  ATTR_STDCALL /* WINAPI */
@@ -48,5 +49,15 @@
 #ifndef LIBDCALL
 #define LIBDCALL __LIBDCALL
 #endif /* !LIBDCALL */
+
+#ifdef __CC__
+DECL_BEGIN
+
+__LIBC __errno_t *NOTHROW(LIBCCALL __nterrno_location)(void);
+#define _nterrno (*__nterrno_location())
+
+DECL_END
+#endif /* __CC__ */
+
 
 #endif /* !GUARD_LIBKERNEL32_API_H */

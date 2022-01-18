@@ -66,7 +66,7 @@ INTERN VOID WINAPI
 libk32_OutputDebugStringW(LPCWSTR lpOutputString) {
 	if (libk32_OutputDebugStringW_printer.fd_printer == NULL)
 		libk32_OutputDebugStringW_printer.fd_printer = &syslog_printer;
-	format_16to8(&libk32_OutputDebugStringW_printer, lpOutputString, c16slen(lpOutputString));
+	format_16to8(&libk32_OutputDebugStringW_printer, lpOutputString, c16len(lpOutputString));
 }
 
 

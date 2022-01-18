@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b123c26 */
+/* HASH CRC-32:0xd206df1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,24 +24,24 @@
 #if (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_c32slen_defined
-#define __local___localdep_c32slen_defined
+#ifndef __local___localdep_c32len_defined
+#define __local___localdep_c32len_defined
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32len,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_KOS$wcslen)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32len,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32slen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict),wcslen)
+#define __localdep_c32len __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict),wcslen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.string/c32slen.h>
+#include <libc/local/parts.uchar.string/c32len.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32slen __LIBC_LOCAL_NAME(c32slen)
+#define __localdep_c32len __LIBC_LOCAL_NAME(c32len)
 #endif /* !... */
-#endif /* !__local___localdep_c32slen_defined */
+#endif /* !__local___localdep_c32len_defined */
 #ifndef __local___localdep_convert_c32tombsn_defined
 #define __local___localdep_convert_c32tombsn_defined
 #if defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
@@ -73,7 +73,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(convert_c32tombs))(__CHAR32_TYPE__ co
 #endif /* __EINVAL */
 		return __NULLPTR;
 	}
-	return (__NAMESPACE_LOCAL_SYM __localdep_convert_c32tombsn)(__str, (__NAMESPACE_LOCAL_SYM __localdep_c32slen)(__str), __NULLPTR);
+	return (__NAMESPACE_LOCAL_SYM __localdep_convert_c32tombsn)(__str, (__NAMESPACE_LOCAL_SYM __localdep_c32len)(__str), __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_convert_c32tombs_defined

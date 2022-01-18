@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x444f95b9 */
+/* HASH CRC-32:0x7cdfe823 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,24 +25,24 @@
 #include <parts/malloca.h>
 #if defined(__CRT_HAVE_fuzzy_memcmpl) || (defined(__CRT_HAVE_fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_KOS$fuzzy_wmemcmp) && defined(__LIBCCALL_IS_LIBKCALL)) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_c32slen_defined
-#define __local___localdep_c32slen_defined
+#ifndef __local___localdep_c32len_defined
+#define __local___localdep_c32len_defined
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32len,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_KOS$wcslen)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32len,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32slen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict),wcslen)
+#define __localdep_c32len __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict),wcslen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.string/c32slen.h>
+#include <libc/local/parts.uchar.string/c32len.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32slen __LIBC_LOCAL_NAME(c32slen)
+#define __localdep_c32len __LIBC_LOCAL_NAME(c32len)
 #endif /* !... */
-#endif /* !__local___localdep_c32slen_defined */
+#endif /* !__local___localdep_c32len_defined */
 #ifndef __local___localdep_fuzzy_memcmpl_defined
 #define __local___localdep_fuzzy_memcmpl_defined
 #ifdef __CRT_HAVE_fuzzy_memcmpl
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fuzzy_memcmpl_defined */
 __LOCAL_LIBC(fuzzy_c32scmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32scmp))(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_fuzzy_memcmpl)(__s1, (__NAMESPACE_LOCAL_SYM __localdep_c32slen)(__s1), __s2, (__NAMESPACE_LOCAL_SYM __localdep_c32slen)(__s2));
+	return (__NAMESPACE_LOCAL_SYM __localdep_fuzzy_memcmpl)(__s1, (__NAMESPACE_LOCAL_SYM __localdep_c32len)(__s1), __s2, (__NAMESPACE_LOCAL_SYM __localdep_c32len)(__s2));
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_c32scmp_defined

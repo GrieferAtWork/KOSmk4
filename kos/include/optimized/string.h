@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-/* Platform-independent, optimized string.h functions. */
+/* Platform-independent, optimized <string.h> functions. */
 #if (!defined(__NO_ATTR_FORCEINLINE) && \
      !defined(__NO_builtin_constant_p))
 #include <hybrid/__assert.h>
@@ -1328,19 +1328,16 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(/*aligned(1)*/ void *__restrict __dst,
      !defined(__fast_bzerow_defined) || \
      !defined(__fast_bzerol_defined) || \
      (!defined(__fast_bzeroq_defined) && defined(__UINT64_TYPE__)))
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-#define __private_bzero_constant(dst, n_bytes, alignment) \
-	(__private_bzero_constant)(dst, n_bytes)
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__private_bzero_constant)(void *__restrict __dst,
                                         __SIZE_TYPE__ __n_bytes
-#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define __private_bzero_constant_ifaligned(n, tt)         tt
+#define __private_bzero_constant(dst, n_bytes, alignment) (__private_bzero_constant)(dst, n_bytes)
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #define __private_bzero_constant_ifaligned(n, tt) if (__alignment >= n) tt
                                         ,
                                         __SIZE_TYPE__ __alignment
-#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-#define __private_bzero_constant_ifaligned(n, tt) tt
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
                                         ) {
 	switch __untraced(__n_bytes) {

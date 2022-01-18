@@ -477,7 +477,8 @@ void _aligned_free_dbg([[nullable]] void *ptr) {
 	_aligned_free(ptr);
 }
 
-[[guard, wunused, ATTR_MALLOC, crt_dos_only, requires_function(strdup)]]
+[[guard, wunused, ATTR_MALLOC]]
+[[crt_dos_only, requires_function(strdup)]]
 char *_strdup_dbg(char const *string, int block_type, char const *filename, int line) {
 	(void)block_type;
 	(void)filename;
@@ -485,15 +486,15 @@ char *_strdup_dbg(char const *string, int block_type, char const *filename, int 
 	return strdup(string);
 }
 
-[[guard, ATTR_MALLOC, wunused]]
-[[crt_dos_only, requires_function(c16sdup)]]
+[[guard, wunused, ATTR_MALLOC]]
+[[crt_dos_only, requires_function(c16dup)]]
 [[decl_include("<hybrid/typecore.h>")]]
 __WCHAR16_TYPE__ *_wcsdup_dbg(__WCHAR16_TYPE__ const *string,
                               int block_type, char const *filename, int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
-	return (__WCHAR16_TYPE__ *)c16sdup((char16_t const *)string);
+	return (__WCHAR16_TYPE__ *)c16dup((char16_t const *)string);
 }
 
 [[guard, wunused, ATTR_MALLOC]]

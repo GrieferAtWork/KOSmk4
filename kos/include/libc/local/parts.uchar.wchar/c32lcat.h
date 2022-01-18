@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb641328 */
+/* HASH CRC-32:0xeeb9ab33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,42 +23,42 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_c32slen_defined
-#define __local___localdep_c32slen_defined
+#ifndef __local___localdep_c32len_defined
+#define __local___localdep_c32len_defined
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32len,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_KOS$wcslen)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32len,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32slen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict),wcslen)
+#define __localdep_c32len __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict),wcslen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.string/c32slen.h>
+#include <libc/local/parts.uchar.string/c32len.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32slen __LIBC_LOCAL_NAME(c32slen)
+#define __localdep_c32len __LIBC_LOCAL_NAME(c32len)
 #endif /* !... */
-#endif /* !__local___localdep_c32slen_defined */
-#ifndef __local___localdep_c32snlen_defined
-#define __local___localdep_c32snlen_defined
+#endif /* !__local___localdep_c32len_defined */
+#ifndef __local___localdep_c32nlen_defined
+#define __local___localdep_c32nlen_defined
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32nlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsnlen)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32nlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32snlen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),wcsnlen)
+#define __localdep_c32nlen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),wcsnlen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.string/c32snlen.h>
+#include <libc/local/parts.uchar.string/c32nlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32snlen __LIBC_LOCAL_NAME(c32snlen)
+#define __localdep_c32nlen __LIBC_LOCAL_NAME(c32nlen)
 #endif /* !... */
-#endif /* !__local___localdep_c32snlen_defined */
+#endif /* !__local___localdep_c32nlen_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
@@ -72,8 +72,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memcpy_defined */
 __LOCAL_LIBC(c32lcat) __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32lcat))(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __bufsize) {
-	__SIZE_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_c32slen)(__src);
-	__CHAR32_TYPE__ *__new_dst = __dst + (__NAMESPACE_LOCAL_SYM __localdep_c32snlen)(__dst, __bufsize);
+	__SIZE_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_c32len)(__src);
+	__CHAR32_TYPE__ *__new_dst = __dst + (__NAMESPACE_LOCAL_SYM __localdep_c32nlen)(__dst, __bufsize);
 	__SIZE_TYPE__ __copy_size;
 	__bufsize -= (__new_dst - __dst);
 	__copy_size = __result < __bufsize ? __result : __bufsize - 1;

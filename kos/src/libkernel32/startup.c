@@ -25,6 +25,7 @@
 #include <nt/handle.h>
 #include <nt/startup.h>
 
+#include <string.h>
 #include <unistd.h>
 
 DECL_BEGIN
@@ -34,24 +35,12 @@ STATIC_ASSERT(sizeof(STARTUPINFOA) == sizeof(STARTUPINFOW));
 DEFINE_PUBLIC_ALIAS(GetStartupInfoA, libk32_GetStartupInfo);
 DEFINE_PUBLIC_ALIAS(GetStartupInfoW, libk32_GetStartupInfo);
 INTERN VOID WINAPI libk32_GetStartupInfo(LPSTARTUPINFO lpStartupInfo) {
-	lpStartupInfo->cb              = sizeof(*lpStartupInfo);
-	lpStartupInfo->lpReserved      = NULL;
-	lpStartupInfo->lpDesktop       = NULL;
-	lpStartupInfo->lpTitle         = NULL;
-	lpStartupInfo->dwX             = 0;
-	lpStartupInfo->dwY             = 0;
-	lpStartupInfo->dwXSize         = 0;
-	lpStartupInfo->dwYSize         = 0;
-	lpStartupInfo->dwXCountChars   = 0;
-	lpStartupInfo->dwYCountChars   = 0;
-	lpStartupInfo->dwFillAttribute = 0;
-	lpStartupInfo->dwFlags         = STARTF_USESTDHANDLES;
-	lpStartupInfo->wShowWindow     = 0;
-	lpStartupInfo->cbReserved2     = 0;
-	lpStartupInfo->lpReserved2     = NULL;
-	lpStartupInfo->hStdInput       = NTHANDLE_FROMFD(STDIN_FILENO);
-	lpStartupInfo->hStdOutput      = NTHANDLE_FROMFD(STDOUT_FILENO);
-	lpStartupInfo->hStdError       = NTHANDLE_FROMFD(STDERR_FILENO);
+	bzero(lpStartupInfo, sizeof(*lpStartupInfo));
+	lpStartupInfo->cb         = sizeof(*lpStartupInfo);
+	lpStartupInfo->dwFlags    = STARTF_USESTDHANDLES;
+	lpStartupInfo->hStdInput  = NTHANDLE_FROMFD(STDIN_FILENO);
+	lpStartupInfo->hStdOutput = NTHANDLE_FROMFD(STDOUT_FILENO);
+	lpStartupInfo->hStdError  = NTHANDLE_FROMFD(STDERR_FILENO);
 }
 
 

@@ -893,10 +893,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * The combination of O_PATH|O_NOFOLLOW can be used to directly open flnknode nodes,
 	 * similar to the (now abandoned  and now longer available) KOS-specific  O_SYMLINK. */
 
-	/* TODO: Expose system calls in headers:
-	 *  - sys_fsymlinkat
-	 */
-
 	return state;
 }
 

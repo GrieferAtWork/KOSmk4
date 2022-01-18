@@ -977,7 +977,7 @@ DEFINE_PUBLIC_ALIAS(__mb_cur_max, libd___mb_cur_max);
 /* _setusermatherr()                                                    */
 /************************************************************************/
 struct _exception;
-typedef int (*_UserMathErrorFunctionPointer)(struct _exception *);
+typedef int (LIBDCALL *_UserMathErrorFunctionPointer)(struct _exception *);
 DEFINE_PUBLIC_ALIAS(DOS$__setusermatherr, libd___setusermatherr);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
 libd___setusermatherr(_UserMathErrorFunctionPointer func) {

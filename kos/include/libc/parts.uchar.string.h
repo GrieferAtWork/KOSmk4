@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x554e440b */
+/* HASH CRC-32:0xbeb8366b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,32 +29,32 @@
 
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-#define __libc_c16send __libc_core_c16send
+#define __libc_c16end __libc_core_c16end
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-#define __libc_c32send __libc_core_c32send
+#define __libc_c32end __libc_core_c32end
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-#define __libc_c16snend __libc_core_c16snend
+#define __libc_c16nend __libc_core_c16nend
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-#define __libc_c32snend __libc_core_c32snend
+#define __libc_c32nend __libc_core_c32nend
 /* >> wcslen(3) */
-#define __libc_c16slen __libc_core_c16slen
+#define __libc_c16len __libc_core_c16len
 /* >> wcslen(3) */
-#define __libc_c32slen __libc_core_c32slen
+#define __libc_c32len __libc_core_c32len
 /* >> wcsnlen(3) */
-#define __libc_c16snlen __libc_core_c16snlen
+#define __libc_c16nlen __libc_core_c16nlen
 /* >> wcsnlen(3) */
-#define __libc_c32snlen __libc_core_c32snlen
+#define __libc_c32nlen __libc_core_c32nlen
 /* >> wcscmp(3) */
-#define __libc_c16scmp __libc_core_c16scmp
+#define __libc_c16cmp __libc_core_c16cmp
 /* >> wcscmp(3) */
-#define __libc_c32scmp __libc_core_c32scmp
+#define __libc_c32cmp __libc_core_c32cmp
 /* >> wcsncmp(3) */
-#define __libc_c16sncmp __libc_core_c16sncmp
+#define __libc_c16ncmp __libc_core_c16ncmp
 /* >> wcsncmp(3) */
-#define __libc_c32sncmp __libc_core_c32sncmp
+#define __libc_c32ncmp __libc_core_c32ncmp
 
 #endif /* __CC__ */
 

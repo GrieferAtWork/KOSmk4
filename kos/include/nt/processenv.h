@@ -62,6 +62,7 @@ WINBASEAPI LPWSTR WINAPI GetCommandLineW(VOID);
 /************************************************************************/
 /* ENVIRON                                                              */
 /************************************************************************/
+#define ERROR_ENVVAR_NOT_FOUND 203
 WINBASEAPI LPCH WINAPI GetEnvironmentStrings(VOID);
 WINBASEAPI LPWCH WINAPI GetEnvironmentStringsW(VOID);
 WINBASEAPI WINBOOL WINAPI FreeEnvironmentStringsA(LPCH penv);

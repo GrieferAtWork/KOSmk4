@@ -266,7 +266,7 @@ NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
 		char32_t *new_result;
 		if (!bufsize)
 			return result;
-		result_len = c32slen(result);
+		result_len = c32len(result);
 		if (bufsize <= result_len) {
 			libc_seterrno(ERANGE);
 			free(result);
@@ -279,7 +279,7 @@ NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
 		}
 		return new_result;
 	}
-	result_len = c32slen(result);
+	result_len = c32len(result);
 	if (bufsize <= result_len) {
 		libc_seterrno(ERANGE);
 		free(result);
@@ -308,7 +308,7 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
 		char16_t *new_result;
 		if (!bufsize)
 			return result;
-		result_len = c16slen(result);
+		result_len = c16len(result);
 		if (bufsize <= result_len) {
 			libc_seterrno(ERANGE);
 			free(result);
@@ -321,7 +321,7 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
 		}
 		return new_result;
 	}
-	result_len = c16slen(result);
+	result_len = c16len(result);
 	if (bufsize <= result_len) {
 		libc_seterrno(ERANGE);
 		free(result);

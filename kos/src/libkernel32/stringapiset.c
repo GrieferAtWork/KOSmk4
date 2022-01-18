@@ -19,16 +19,79 @@
  */
 #ifndef GUARD_LIBKERNEL32_STRINGAPISET_C
 #define GUARD_LIBKERNEL32_STRINGAPISET_C 1
+#define _UTF_SOURCE 1
 
 #include "api.h"
 
 #include <kos/types.h>
 #include <nt/stringapiset.h>
 
+#include <string.h>
+#include <wchar.h>
+#include <uchar.h>
 #include <syslog.h>
+
 
 DECL_BEGIN
 
+/************************************************************************/
+/* <STRING.H>-STYLE FUNCTIONS                                           */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(lstrcmpA, libk32_lstrcmpA);
+DEFINE_PUBLIC_ALIAS(lstrcmpW, libk32_lstrcmpW);
+DEFINE_PUBLIC_ALIAS(lstrcmpiA, libk32_lstrcmpiA);
+DEFINE_PUBLIC_ALIAS(lstrcmpiW, libk32_lstrcmpiW);
+DEFINE_PUBLIC_ALIAS(lstrcpynA, libk32_lstrcpynA);
+DEFINE_PUBLIC_ALIAS(lstrcpynW, libk32_lstrcpynW);
+DEFINE_PUBLIC_ALIAS(lstrcpyA, libk32_lstrcpyA);
+DEFINE_PUBLIC_ALIAS(lstrcpyW, libk32_lstrcpyW);
+DEFINE_PUBLIC_ALIAS(lstrcatA, libk32_lstrcatA);
+DEFINE_PUBLIC_ALIAS(lstrcatW, libk32_lstrcatW);
+DEFINE_PUBLIC_ALIAS(lstrlenA, libk32_lstrlenA);
+DEFINE_PUBLIC_ALIAS(lstrlenW, libk32_lstrlenW);
+
+INTERN int WINAPI libk32_lstrcmpA(LPCSTR lpString1, LPCSTR lpString2) {
+	return strcmp(lpString1, lpString2);
+}
+INTERN int WINAPI libk32_lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2) {
+	return c16cmp(lpString1, lpString2);
+}
+INTERN int WINAPI libk32_lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2) {
+	return strcasecmp(lpString1, lpString2);
+}
+INTERN int WINAPI libk32_lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2) {
+	return c16casecmp(lpString1, lpString2);
+}
+INTERN LPSTR WINAPI libk32_lstrcpynA(LPSTR lpString1, LPCSTR lpString2, int iMaxLength) {
+	return strncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
+}
+INTERN LPWSTR WINAPI libk32_lstrcpynW(LPWSTR lpString1, LPCWSTR lpString2, int iMaxLength) {
+	return c16ncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
+}
+INTERN LPSTR WINAPI libk32_lstrcpyA(LPSTR lpString1, LPCSTR lpString2) {
+	return strcpy(lpString1, lpString2);
+}
+INTERN LPWSTR WINAPI libk32_lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2) {
+	return c16cpy(lpString1, lpString2);
+}
+INTERN LPSTR WINAPI libk32_lstrcatA(LPSTR lpString1, LPCSTR lpString2) {
+	return strcat(lpString1, lpString2);
+}
+INTERN LPWSTR WINAPI libk32_lstrcatW(LPWSTR lpString1, LPCWSTR lpString2) {
+	return c16cat(lpString1, lpString2);
+}
+INTERN int WINAPI libk32_lstrlenA(LPCSTR lpString) {
+	return (int)(unsigned int)strlen(lpString);
+}
+INTERN int WINAPI libk32_lstrlenW(LPCWSTR lpString) {
+	return (int)(unsigned int)c16len(lpString);
+}
+
+
+
+/************************************************************************/
+/* CODEC CONVERSION                                                     */
+/************************************************************************/
 DEFINE_PUBLIC_ALIAS(MultiByteToWideChar, libk32_MultiByteToWideChar);
 DEFINE_PUBLIC_ALIAS(WideCharToMultiByte, libk32_WideCharToMultiByte);
 

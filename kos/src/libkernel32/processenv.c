@@ -87,7 +87,7 @@ libk32_GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer) {
 	wd = DOS$_wgetcwd(NULL, 0);
 	if (!wd)
 		return 0;
-	len = c16slen(wd) + 1;
+	len = c16len(wd) + 1;
 	if (nBufferLength >= len) {
 		memcpy(lpBuffer, wd, len, sizeof(WCHAR));
 		--len;
@@ -104,6 +104,7 @@ libk32_GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer) {
 DEFINE_PUBLIC_ALIAS(GetStdHandle, libk32_GetStdHandle);
 DEFINE_PUBLIC_ALIAS(SetStdHandle, libk32_SetStdHandle);
 DEFINE_PUBLIC_ALIAS(SetStdHandleEx, libk32_SetStdHandleEx);
+
 INTERN HANDLE WINAPI
 libk32_GetStdHandle(DWORD nStdHandle) {
 	switch (nStdHandle) {
@@ -118,6 +119,7 @@ libk32_GetStdHandle(DWORD nStdHandle) {
 	}
 	return INVALID_HANDLE_VALUE;
 }
+
 INTERN WINBOOL WINAPI
 libk32_SetStdHandleEx(DWORD nStdHandle, HANDLE hHandle, PHANDLE phPrevValue) {
 	fd_t fd;
@@ -192,9 +194,10 @@ DEFINE_PUBLIC_ALIAS(SetEnvironmentVariableW, libk32_SetEnvironmentVariableW);
 DEFINE_PUBLIC_ALIAS(ExpandEnvironmentStringsA, libk32_ExpandEnvironmentStringsA);
 DEFINE_PUBLIC_ALIAS(ExpandEnvironmentStringsW, libk32_ExpandEnvironmentStringsW);
 
+/* Let libc deal  with converting  stuff like  `$PATH'
+ * from "/bin:/usr/bin" to "C:\bin;C:\usr\bin", etc... */
 __LIBC char ***LIBDCALL DOS$__p__environ(void);
 __LIBC char *LIBDCALL DOS$getenv(char const *name);
-__LIBC char16_t *LIBDCALL DOS$_wgetenv(char16_t const *name);
 __LIBC int LIBDCALL DOS$setenv(char const *varname, char const *val, int replace);
 
 PRIVATE LPCH WINAPI
@@ -251,8 +254,10 @@ INTERN DWORD WINAPI
 libk32_GetEnvironmentVariableA(LPCSTR lpName, LPSTR lpBuffer, DWORD nSize) {
 	size_t len;
 	char *value = DOS$getenv(lpName);
-	if (!value)
+	if (!value) {
+		_nterrno = ERROR_ENVVAR_NOT_FOUND;
 		return 0;
+	}
 	len = strlen(value) + 1;
 	if (nSize >= len) {
 		memcpy(lpBuffer, value, len, sizeof(CHAR));
@@ -264,14 +269,27 @@ libk32_GetEnvironmentVariableA(LPCSTR lpName, LPSTR lpBuffer, DWORD nSize) {
 INTERN DWORD WINAPI
 libk32_GetEnvironmentVariableW(LPCWSTR lpName, LPWSTR lpBuffer, DWORD nSize) {
 	size_t len;
-	char16_t *value = DOS$_wgetenv(lpName);
+	char *utf8_name;
+	char *utf8_value;
+	char16_t *value;
+	utf8_name = convert_c16tombs(lpName);
+	if (!utf8_name)
+		return 0;
+	utf8_value = DOS$getenv(utf8_name);
+	free(utf8_name);
+	if (!utf8_value) {
+		_nterrno = ERROR_ENVVAR_NOT_FOUND;
+		return 0;
+	}
+	value = convert_mbstoc16(utf8_value);
 	if (!value)
 		return 0;
-	len = c16slen(value) + 1;
+	len = c16len(value) + 1;
 	if (nSize >= len) {
 		memcpy(lpBuffer, value, len, sizeof(WCHAR));
 		--len;
 	}
+	free(value);
 	return len;
 }
 
@@ -372,7 +390,7 @@ libk32_ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize) {
 	free(utf8_str);
 	if (!str)
 		return 0;
-	len = c16slen(str) + 1;
+	len = c16len(str) + 1;
 	if (nSize >= len)
 		memcpy(lpDst, str, len, sizeof(WCHAR));
 	free(str);
