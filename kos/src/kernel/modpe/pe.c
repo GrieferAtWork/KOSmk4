@@ -175,14 +175,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	/* Map sections */
 	mbuilder_init(&builder);
 	{
-		bool must_relocate;
 		RAII_FINALLY { mbuilder_fini(&builder); };
-		must_relocate = true;
-		if (nt.FileHeader.SizeOfOptionalHeader >= offsetafter(IMAGE_OPTIONAL_HEADER, ImageBase) &&
-		    loadaddr == nt.OptionalHeader.ImageBase)
-			must_relocate = false;
-		if (nt.FileHeader.SizeOfOptionalHeader < offsetafter(IMAGE_OPTIONAL_HEADER, DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC]))
-			must_relocate = false;
 		if (load_minaddr != 0) {
 			/* Must inject another section to map file contents
 			 * starting  at `0' and going up to `load_minaddr'.
@@ -235,10 +228,10 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			if ((section->Characteristics & IMAGE_SCN_MEM_READ) ||
 			    !(section->Characteristics & (IMAGE_SCN_LNK_REMOVE | IMAGE_SCN_LNK_INFO)))
 				prot |= PROT_READ;
-			if (section->Characteristics & IMAGE_SCN_MEM_WRITE)
-				prot |= PROT_WRITE;
-			if (must_relocate)
-				prot |= PROT_WRITE; /* Write protection will be removed later */
+			/*if (section->Characteristics & IMAGE_SCN_MEM_WRITE)
+				prot |= PROT_WRITE;*/
+			prot |= PROT_WRITE; /* Write protection is later removed by `libdl-pe.so' */
+
 			/* Map section */
 			sectaddr = loadaddr + section->VirtualAddress;
 			assert(IS_ALIGNED((uintptr_t)sectaddr, PAGESIZE));

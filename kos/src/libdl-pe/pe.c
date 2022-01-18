@@ -533,8 +533,6 @@ DlModule_PeInitializeRelocations(DlModule *__restrict self) {
 			}
 		}
 	}
-	/* TODO: Make non-writable sections read-only. */
-
 done:
 	return 0;
 }
@@ -551,8 +549,10 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 
 	/* Apply relocations */
 	result = DlModule_PeInitializeRelocations(self);
-	/*if (result != 0)
-		goto done;*/
+	if (result != 0)
+		goto done;
+
+	/* TODO: Make non-writable sections read-only. */
 
 done:
 	return result;
