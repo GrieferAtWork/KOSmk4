@@ -491,6 +491,25 @@ typedef struct _SINGLE_LIST_ENTRY {
 } SINGLE_LIST_ENTRY, *PSINGLE_LIST_ENTRY;
 #endif /* !__LIST_ENTRY_DEFINED */
 
+#ifndef _COORD_DEFINED
+#define _COORD_DEFINED
+typedef struct _COORD {
+	SHORT X;
+	SHORT Y;
+} COORD, *PCOORD;
+#endif /* !_COORD_DEFINED */
+
+#ifndef _SMALL_RECT_DEFINED
+#define _SMALL_RECT_DEFINED
+typedef struct _SMALL_RECT {
+	SHORT Left;
+	SHORT Top;
+	SHORT Right;
+	SHORT Bottom;
+} SMALL_RECT, *PSMALL_RECT;
+#endif /* !_SMALL_RECT_DEFINED */
+
+typedef DWORD COLORREF;
 
 typedef HANDLE *SPHANDLE;
 typedef HANDLE *LPHANDLE;

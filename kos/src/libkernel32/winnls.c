@@ -40,12 +40,12 @@ INTERN WINBOOL WINAPI libk32_IsValidCodePage(UINT CodePage) {
 
 INTERN UINT WINAPI libk32_GetACP(void) {
 	COMPILER_IMPURE();
-	return 0;
+	return CP_UTF8;
 }
 
 INTERN UINT WINAPI libk32_GetOEMCP(void) {
 	COMPILER_IMPURE();
-	return 0;
+	return CP_UTF8;
 }
 
 INTERN WINBOOL WINAPI libk32_IsDBCSLeadByte(BYTE TestChar) {
