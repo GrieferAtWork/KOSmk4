@@ -680,6 +680,7 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 	*(void **)&vio_destroy = dlsym(libvio, "vio_destroy");
 	if (!vio_destroy)
 		err(1, "dlsym failed: %s", dlerror());
+
 	uviofd = vio_create(&myvio_ops, NULL, 0x1000, O_CLOEXEC | O_CLOFORK);
 	if (uviofd < 0)
 		err(1, "vio_create failed");

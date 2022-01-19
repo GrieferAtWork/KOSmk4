@@ -23,13 +23,14 @@
 
 #include "api.h"
 
+#include <kos/except.h>
 #include <kos/types.h>
 #include <nt/stringapiset.h>
 
 #include <string.h>
-#include <wchar.h>
-#include <uchar.h>
 #include <syslog.h>
+#include <uchar.h>
+#include <wchar.h>
 
 
 DECL_BEGIN
@@ -63,16 +64,32 @@ INTERN int WINAPI libk32_lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2) {
 	return c16casecmp(lpString1, lpString2);
 }
 INTERN LPSTR WINAPI libk32_lstrcpynA(LPSTR lpString1, LPCSTR lpString2, int iMaxLength) {
-	return strncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
+	TRY {
+		return strncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
+	} EXCEPT {
+	}
+	return NULL;
 }
 INTERN LPWSTR WINAPI libk32_lstrcpynW(LPWSTR lpString1, LPCWSTR lpString2, int iMaxLength) {
-	return c16ncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
+	TRY {
+		return c16ncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
+	} EXCEPT {
+	}
+	return NULL;
 }
 INTERN LPSTR WINAPI libk32_lstrcpyA(LPSTR lpString1, LPCSTR lpString2) {
-	return strcpy(lpString1, lpString2);
+	TRY {
+		return strcpy(lpString1, lpString2);
+	} EXCEPT {
+	}
+	return NULL;
 }
 INTERN LPWSTR WINAPI libk32_lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2) {
-	return c16cpy(lpString1, lpString2);
+	TRY {
+		return c16cpy(lpString1, lpString2);
+	} EXCEPT {
+	}
+	return NULL;
 }
 INTERN LPSTR WINAPI libk32_lstrcatA(LPSTR lpString1, LPCSTR lpString2) {
 	return strcat(lpString1, lpString2);
@@ -81,10 +98,10 @@ INTERN LPWSTR WINAPI libk32_lstrcatW(LPWSTR lpString1, LPCWSTR lpString2) {
 	return c16cat(lpString1, lpString2);
 }
 INTERN int WINAPI libk32_lstrlenA(LPCSTR lpString) {
-	return (int)(unsigned int)strlen(lpString);
+	return !lpString ? 0 : (int)(unsigned int)strlen(lpString);
 }
 INTERN int WINAPI libk32_lstrlenW(LPCWSTR lpString) {
-	return (int)(unsigned int)c16len(lpString);
+	return !lpString ? 0 : (int)(unsigned int)c16len(lpString);
 }
 
 
