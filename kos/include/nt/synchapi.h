@@ -39,9 +39,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-typedef void *LPSECURITY_ATTRIBUTES;
 typedef void *PREASON_CONTEXT;
-
 
 /************************************************************************/
 /* CRITICAL_SECTION                                                     */

@@ -19,6 +19,8 @@
  */
 #ifndef GUARD_LIBKERNEL32_API_H
 #define GUARD_LIBKERNEL32_API_H 1
+#undef _TIME_T_BITS
+#define _TIME_T_BITS 64
 
 #include <__crt.h>
 #include <__stdinc.h>

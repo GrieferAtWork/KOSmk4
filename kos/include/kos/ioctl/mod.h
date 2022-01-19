@@ -77,7 +77,7 @@ struct mod_string {
 };
 
 struct mod_loadinfo {
-	__uint64_t mli_loadaddr;  /* Load address of the driver. */
+	__uint64_t mli_loadaddr;  /* Load address of the driver. (ASLR delta) */
 	__uint64_t mli_loadstart; /* Lowest address mapped by this driver (already adjusted for `mli_loadaddr'). */
 	__uint64_t mli_loadmax;   /* Greatest address mapped by this driver (already adjusted for `mli_loadaddr'). */
 };

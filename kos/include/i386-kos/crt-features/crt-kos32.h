@@ -447,6 +447,8 @@
 #define __CRT_HAVE___fdimf
 #define __CRT_HAVE___fdiml
 #define __CRT_HAVE___ffs
+#define __CRT_HAVE___find_open
+#define __CRT_HAVE___find_readdir
 #define __CRT_HAVE___finite
 #define __CRT_HAVE___finitef
 #define __CRT_HAVE___finitel

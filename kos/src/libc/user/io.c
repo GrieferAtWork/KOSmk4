@@ -50,8 +50,9 @@ struct dfind {
 
 #define DFIND_INVALID ((struct dfind *)-1)
 
-PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir")
-struct dfind *LIBCCALL dfind_open(char const *__restrict filename, oflag_t oflags) {
+DEFINE_PUBLIC_ALIAS(__find_open, dfind_open);
+INTERN WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") struct dfind *LIBCCALL
+dfind_open(char const *__restrict filename, oflag_t oflags) {
 	char const *pathend;
 	struct dfind *result;
 	result = (struct dfind *)malloc(sizeof(struct dfind));
@@ -59,7 +60,8 @@ struct dfind *LIBCCALL dfind_open(char const *__restrict filename, oflag_t oflag
 		goto err;
 	pathend = strend(filename);
 	while (pathend > filename &&
-	       (pathend[-1] != '/' && pathend[-1] != '\\'))
+	       (pathend[-1] != '/' &&
+	        (pathend[-1] != '\\' && (oflags & O_DOSPATH))))
 		--pathend;
 	if unlikely(pathend <= filename) {
 		PRIVATE ATTR_SECTION(".rodata.crt.dos.fs.dir") char const pwd[] = ".";
@@ -89,15 +91,16 @@ err:
 	goto done;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir")
-void LIBCCALL dfind_close(struct dfind *__restrict self) {
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir") void LIBCCALL
+dfind_close(struct dfind *__restrict self) {
 	closedir(self->df_dir);
 	free(self->df_query);
 	free(self);
 }
 
-PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir")
-struct dirent *LIBCCALL dfind_readdir(struct dfind *__restrict self) {
+DEFINE_PUBLIC_ALIAS(__find_readdir, dfind_readdir);
+INTERN WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") struct dirent *LIBCCALL
+dfind_readdir(struct dfind *__restrict self) {
 	struct dirent *result;
 	while ((result = readdir(self->df_dir)) != NULL) {
 		if (wildstrcasecmp(self->df_query, result->d_name) == 0)
@@ -119,8 +122,7 @@ dfind_read32(struct dfind *__restrict self,
 	ent = dfind_readdir(self);
 	if (!ent)
 		goto err;
-	if (fstatat(dirfd(self->df_dir), ent->d_name, &st,
-	            AT_DOSPATH | AT_SYMLINK_NOFOLLOW))
+	if (fstatat(dirfd(self->df_dir), ent->d_name, &st, AT_SYMLINK_NOFOLLOW))
 		goto err;
 	finddata->attrib      = dfind_attrib(ent, &st);
 	finddata->time_create = (s32)st.st_ctime32;
