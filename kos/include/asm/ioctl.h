@@ -58,6 +58,7 @@
  *  KOS    0x4B ('K')  KBDIO_*             <kos/ioctl/keyboard.h>
  *  KOS    0x4C ('L')  LEAKS_IOC_*         <kos/ioctl/leaks.h>
  *  KOS    0x4D ('M')  MOUSEIO_*           <kos/ioctl/mouse.h>
+ *  KOS    0x50 ('P')  PIPE_IOC_*          <kos/ioctl/pipe.h>
  *  KOS    0x53 ('S')  SVGA_IOC_*          <kos/ioctl/svga.h>
  *  KOS    0x54 ('T')  TTYIO_*             <kos/ioctl/tty.h>
  *  KOS    0x56 ('V')  VID_IOC_*           <kos/ioctl/video.h>

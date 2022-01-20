@@ -31,6 +31,7 @@
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/nopf.h>
 #include <kernel/pipe.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
@@ -39,12 +40,15 @@
 #include <sched/rpc.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 
 #include <kos/except/reason/inval.h>
+#include <kos/ioctl/pipe.h>
 #include <kos/syscalls.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
@@ -422,51 +426,129 @@ handle_pipe_writer_polltest(struct pipe_writer *__restrict self, poll_mode_t wha
 	return result;
 }
 
-INTERN size_t KCALL
-handle_pipe_reader_aread(struct pipe_reader *__restrict self,
-                         USER CHECKED void *dst, size_t num_bytes,
-                         iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
-	return handle_pipe_read(self->pr_pipe, dst, num_bytes, mode);
+/* Return -EINVAL if `cmd' isn't recognized. */
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
+ringbuffer_ioctl(struct ringbuffer *__restrict self, ioctl_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode) {
+	switch (cmd) {
+
+	case PIPE_IOC_PEEK: {
+		USER CHECKED struct pipe_peek *info;
+		USER CHECKED byte_t *buf;
+		size_t offset, count, total;
+		if unlikely(!IO_CANREAD(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
+		info = (USER CHECKED struct pipe_peek *)arg;
+		validate_readwrite(info, sizeof(*info));
+		COMPILER_READ_BARRIER();
+		buf    = (USER CHECKED byte_t *)info->pp_buf;
+		offset = (size_t)info->pp_bufof;
+		count  = (size_t)info->pp_bufsz;
+		COMPILER_READ_BARRIER();
+		validate_writable(buf, count);
+
+		/* Peek pipe data */
+again_peek:
+		ringbuffer_lock_read(self);
+		total = self->rb_avail;
+		if (total > offset) {
+			size_t temp, error;
+			size_t copy_size = total - offset;
+			size_t high_base = self->rb_rptr + offset;
+			if (copy_size > count)
+				copy_size = count;
+			high_base %= self->rb_size;
+			temp = self->rb_size - high_base;
+			if (temp > copy_size)
+				temp = copy_size;
+			error = memcpy_nopf(buf, self->rb_data + high_base, temp);
+			if (error != 0) {
+				byte_t next_byte;
+				size_t ok;
+handle_copy_error:
+				ok = temp - error;
+				assert(ok < count);
+				next_byte = self->rb_data[high_base + ok];
+				ringbuffer_lock_endread(self);
+				buf += ok;
+				offset += ok;
+				count -= ok;
+				assert(count);
+				*buf++ = next_byte;
+				++offset;
+				--count;
+				goto again_peek;
+			}
+			if (temp < copy_size) {
+				buf += temp;
+				offset += temp;
+				count -= temp;
+
+				/* Copy from low memory */
+				temp  = copy_size - temp;
+				error = memcpy_nopf(buf, self->rb_data, temp);
+				if (error != 0) {
+					high_base = 0;
+					goto handle_copy_error;
+				}
+			}
+		}
+		ringbuffer_lock_endread(self);
+		COMPILER_WRITE_BARRIER();
+		info->pp_bufsz = total;
+		return 0;
+	}	break;
+
+	default:
+		break;
+	}
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(PIPE_IOC_CLOSED, 0):
+		return ioctl_intarg_setbool(cmd, arg, ringbuffer_closed(self));
+	case _IO_WITHSIZE(PIPE_IOC_READABLE, 0):
+		if unlikely(!IO_CANREAD(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
+		return ioctl_intarg_setsize(cmd, arg, ATOMIC_READ(self->rb_avail));
+	case _IO_WITHSIZE(PIPE_IOC_DISCARD, 0): {
+		size_t count;
+		if unlikely(!IO_CANREAD(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
+		count = ioctl_intarg_getsize(cmd, arg);
+		count = ringbuffer_skipread(self, count, NULL);
+		return ioctl_intarg_setsize(cmd, arg, count);
+	}	break;
+
+	default:
+		break;
+	}
+	return -EINVAL;
 }
 
-INTERN size_t KCALL
-handle_pipe_reader_areadv(struct pipe_reader *__restrict self,
-                          struct iov_buffer *__restrict dst, size_t num_bytes,
-                          iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
-	return handle_pipe_readv(self->pr_pipe, dst, num_bytes, mode);
-}
-
-INTERN size_t KCALL
-handle_pipe_writer_awrite(struct pipe_writer *__restrict self,
-                          USER CHECKED void const *src, size_t num_bytes,
-                          iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
-	return handle_pipe_write(self->pw_pipe, src, num_bytes, mode);
-}
-
-INTERN size_t KCALL
-handle_pipe_writer_awritev(struct pipe_writer *__restrict self,
-                           struct iov_buffer *__restrict src, size_t num_bytes,
-                           iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
-	return handle_pipe_writev(self->pw_pipe, src, num_bytes, mode);
-}
-
-#if 0
-INTERN syscall_slong_t KCALL
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_pipe_ioctl(struct pipe *__restrict self, ioctl_t cmd,
                   USER UNCHECKED void *arg, iomode_t mode) {
-	return 0;
+	syscall_slong_t result;
+	result = ringbuffer_ioctl(&self->p_buffer, cmd, arg, mode);
+	if (result == -EINVAL) {
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+		      cmd);
+	}
+	return result;
 }
-INTERN syscall_slong_t KCALL
+
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_pipe_reader_ioctl(struct pipe_reader *__restrict self, ioctl_t cmd,
                          USER UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_ioctl(self->pr_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_RDONLY);
 }
-INTERN syscall_slong_t KCALL
+
+INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_pipe_writer_ioctl(struct pipe_writer *__restrict self, ioctl_t cmd,
                          USER UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_ioctl(self->pw_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_WRONLY);
 }
-#endif
 
 
 STATIC_ASSERT(IO_CLOEXEC == IO_FROM_OPENFLAG(O_CLOEXEC));

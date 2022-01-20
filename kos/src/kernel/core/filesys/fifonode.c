@@ -298,6 +298,24 @@ ffifonode_v_stat(struct mfile *__restrict self,
 	result->st_size = (typeof(result->st_size))avail;
 }
 
+
+INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL /* From "misc/pipe.c" */
+ringbuffer_ioctl(struct ringbuffer *__restrict self, ioctl_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode);
+
+PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
+ffifonode_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
+                  USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	struct ffifonode *me = mfile_asfifo(self);
+	syscall_slong_t result;
+	result = ringbuffer_ioctl(&me->ff_buffer, cmd, arg, mode);
+	if (result != -EINVAL)
+		return result;
+	return fnode_v_ioctl(self, cmd, arg, mode);
+}
+
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self) {
 	struct ffifonode *me;

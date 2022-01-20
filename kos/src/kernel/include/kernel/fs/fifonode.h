@@ -190,10 +190,13 @@ FUNDEF NONNULL((1)) void KCALL
 ffifonode_v_stat(struct mfile *__restrict self,
                  USER CHECKED struct stat *result)
 		THROWS(E_SEGFAULT);
+FUNDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL
+ffifonode_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
+                  USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 #define ffifonode_v_changed fnode_v_changed
-#define ffifonode_v_ioctl   fnode_v_ioctl
 
 
 /* Initialize common+basic fields. The caller must still initialize:

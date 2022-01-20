@@ -1869,6 +1869,7 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 	 ((index) >= 0x4b00 && (index) <= 0x4b08) ? ((index) -= 0x4b00, (result) = repr_KOS_IOCTLS_4b00h, true) : \
 	 ((index) >= 0x4c01 && (index) <= 0x4c06) ? ((index) -= 0x4c01, (result) = repr_KOS_IOCTLS_4c01h, true) : \
 	 ((index) >= 0x4d00 && (index) <= 0x4d07) ? ((index) -= 0x4d00, (result) = repr_KOS_IOCTLS_4d00h, true) : \
+	 ((index) >= 0x5000 && (index) <= 0x5009) ? ((index) -= 0x5000, (result) = repr_KOS_IOCTLS_5000h, true) : \
 	 ((index) >= 0x5300 && (index) <= 0x5305) ? ((index) -= 0x5300, (result) = repr_KOS_IOCTLS_5300h, true) : \
 	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
 	 ((index) >= 0x5600 && (index) <= 0x5612) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : \
@@ -1897,6 +1898,9 @@ PRIVATE char const repr_KOS_IOCTLS_4d00h[] =
 "MOUSEIO_SETABSMODE\0MOUSEIO_SETABSRECT\0MOUSEIO_PUTMOTION\0MOUSEIO_"
 "SETPOS\0MOUSEIO_PUTBUTTON\0MOUSEIO_PUTVWHEEL\0MOUSEIO_PUTHWHEEL\0MOU"
 "SEIO_FLUSHPENDING";
+PRIVATE char const repr_KOS_IOCTLS_5000h[] =
+"PIPE_IOC_CLOSED\0PIPE_IOC_READABLE\0\0\0\0\0\0\0PIPE_IOC_PEEK\0PIPE_IOC_D"
+"ISCARD";
 PRIVATE char const repr_KOS_IOCTLS_5300h[] =
 "SVGA_IOC_MAKETTY\0SVGA_IOC_GETMODE\0SVGA_IOC_SETDEFMODE\0SVGA_IOC_L"
 "SMODES\0SVGA_IOC_GETCSNAME\0SVGA_IOC_CSSTRINGS";
