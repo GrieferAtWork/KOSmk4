@@ -108,22 +108,6 @@ typedef struct _FILETIME {
 } FILETIME, *PFILETIME, *LPFILETIME;
 #endif /* !_FILETIME_ */
 
-#ifndef _OVERLAPPED_DEFINED
-#define _OVERLAPPED_DEFINED
-typedef struct _OVERLAPPED {
-	ULONG_PTR Internal;
-	ULONG_PTR InternalHigh;
-	__C89_NAMELESS union {
-		struct {
-			DWORD Offset;
-			DWORD OffsetHigh;
-		} DUMMYSTRUCTNAME;
-		PVOID Pointer;
-	} DUMMYUNIONNAME;
-	HANDLE hEvent;
-} OVERLAPPED, *LPOVERLAPPED;
-#endif /* !_OVERLAPPED_DEFINED */
-
 
 
 
