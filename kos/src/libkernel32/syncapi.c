@@ -28,11 +28,16 @@
 #include <hybrid/atomic.h>
 
 #include <kos/futex.h>
+#include <kos/ioctl/fd.h>
+#include <kos/types.h>
+#include <nt/handleapi.h>
 #include <nt/synchapi.h>
 #include <nt/types.h>
+#include <sys/poll.h>
 
 #include <assert.h>
 #include <errno.h>
+#include <malloca.h>
 #include <pthread.h>
 #include <stddef.h>
 #include <string.h>
@@ -144,8 +149,103 @@ libk32_InitializeCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 /************************************************************************/
 /* MISC                                                                 */
 /************************************************************************/
+DEFINE_PUBLIC_ALIAS(WaitForMultipleObjects, libk32_WaitForMultipleObjects);
+DEFINE_PUBLIC_ALIAS(WaitForMultipleObjectsEx, libk32_WaitForMultipleObjectsEx);
+DEFINE_PUBLIC_ALIAS(WaitForSingleObject, libk32_WaitForSingleObject);
+DEFINE_PUBLIC_ALIAS(WaitForSingleObjectEx, libk32_WaitForSingleObjectEx);
 DEFINE_PUBLIC_ALIAS(SleepEx, libk32_SleepEx);
 DEFINE_PUBLIC_ALIAS(Sleep, libk32_Sleep);
+
+PRIVATE DWORD WINAPI
+libk32_WaitForObjects(DWORD nCount, CONST HANDLE *lpHandles,
+                      DWORD dwMilliseconds) {
+	DWORD i, result;
+	struct pollfd *pfd;
+	ssize_t status;
+	pfd = (struct pollfd *)malloca(nCount, sizeof(struct pollfd));
+	if (!pfd)
+		return WAIT_FAILED;
+again:
+	for (i = 0; i < nCount; ++i) {
+		HANDLE hand = lpHandles[i];
+		if (!NTHANDLE_ISFD(hand)) {
+			errno = EBADF;
+			goto err;
+		}
+		pfd[i].fd      = NTHANDLE_ASFD(hand);
+		pfd[i].events  = POLLSELECT_READFDS;
+		pfd[i].revents = 0;
+	}
+	if (dwMilliseconds != INFINITE) {
+		struct timespec ts;
+		ts.tv_sec  = 0;
+		ts.tv_nsec = 0;
+		ts.add_milliseconds(dwMilliseconds);
+		status = ppoll(pfd, nCount, &ts, NULL);
+	} else {
+		status = ppoll(pfd, nCount, NULL, NULL);
+	}
+	if (status < 0) {
+		if (errno == EINTR) {
+			result = WAIT_IO_COMPLETION;
+			goto done;
+		}
+		goto err;
+	}
+	/* Check for signaled objects. */
+	for (i = 0; i < nCount; ++i) {
+		if (pfd[i].revents != 0) {
+			/* TODO: Based on object type, we (may) need to do additional actions!
+			 * e.g.: In case of an eventfd, we must do a non-blocking ticket acquire */
+			return WAIT_OBJECT_0 + i;
+		}
+	}
+	goto again;
+err:
+	result = WAIT_FAILED;
+done:
+	freea(pfd);
+	return result;
+}
+
+INTERN DWORD WINAPI
+libk32_WaitForMultipleObjectsEx(DWORD nCount, CONST HANDLE *lpHandles, WINBOOL bWaitAll,
+                                DWORD dwMilliseconds, WINBOOL bAlertable) {
+	DWORD result;
+	if (bWaitAll && nCount > 1) {
+		DWORD i;
+		result = WAIT_OBJECT_0;
+		for (i = 0; i < nCount; ++i) {
+			/* XXX: `dwMilliseconds' is supposed to be the TOTAL! */
+			result = libk32_WaitForMultipleObjectsEx(1, &lpHandles[i], FALSE,
+			                                         dwMilliseconds, bAlertable);
+			if (result != WAIT_OBJECT_0)
+				break;
+		}
+		return result;
+	}
+	do {
+		result = libk32_WaitForObjects(nCount, lpHandles, dwMilliseconds);
+	} while (result == WAIT_IO_COMPLETION && bAlertable);
+	return result;
+}
+
+INTERN DWORD WINAPI
+libk32_WaitForMultipleObjects(DWORD nCount, CONST HANDLE *lpHandles,
+                              WINBOOL bWaitAll, DWORD dwMilliseconds) {
+	return libk32_WaitForMultipleObjectsEx(nCount, lpHandles, bWaitAll, dwMilliseconds, FALSE);
+}
+
+INTERN DWORD WINAPI
+libk32_WaitForSingleObjectEx(HANDLE hHandle, DWORD dwMilliseconds, WINBOOL bAlertable) {
+	return libk32_WaitForMultipleObjectsEx(1, &hHandle, FALSE, dwMilliseconds, bAlertable);
+}
+
+INTERN DWORD WINAPI
+libk32_WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds) {
+	return libk32_WaitForSingleObjectEx(hHandle, dwMilliseconds, FALSE);
+}
+
 INTERN DWORD WINAPI
 libk32_SleepEx(DWORD dwMilliseconds, WINBOOL bAlertable) {
 	struct timespec ts, rem;

@@ -116,64 +116,18 @@ WINBASEAPI FARPROC WINAPI GetProcAddress(HMODULE hModule, LPCSTR lpProcName);
 WINBASEAPI WINBOOL WINAPI FreeLibrary(HMODULE hLibModule);
 WINBASEAPI DECLSPEC_NORETURN VOID WINAPI FreeLibraryAndExitThread(HMODULE hLibModule, DWORD dwExitCode);
 
-
+#ifndef ERROR_INSUFFICIENT_BUFFER
+#define ERROR_INSUFFICIENT_BUFFER 122
+#endif /* !ERROR_INSUFFICIENT_BUFFER */
 WINBASEAPI DWORD WINAPI GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize);
 WINBASEAPI DWORD WINAPI GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize);
-WINBASEAPI WINBOOL WINAPI EnumResourceNamesW(HMODULE hModule, LPCWSTR lpType, ENUMRESNAMEPROCW lpEnumFunc, LONG_PTR lParam);
-WINBASEAPI HRSRC WINAPI FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
-WINBASEAPI HRSRC WINAPI FindResourceExW(HMODULE hModule, LPCWSTR lpType, LPCWSTR lpName, WORD wLanguage);
-WINBASEAPI WINBOOL WINAPI FreeResource(HGLOBAL hResData);
-WINBASEAPI HGLOBAL WINAPI LoadResource(HMODULE hModule, HRSRC hResInfo);
-WINBASEAPI LPVOID WINAPI LockResource(HGLOBAL hResData);
-WINBASEAPI DWORD WINAPI SizeofResource(HMODULE hModule, HRSRC hResInfo);
-WINBASEAPI DLL_DIRECTORY_COOKIE WINAPI AddDllDirectory(PCWSTR NewDirectory);
-WINBASEAPI WINBOOL WINAPI RemoveDllDirectory(DLL_DIRECTORY_COOKIE Cookie);
-WINBASEAPI WINBOOL WINAPI SetDefaultDllDirectories(DWORD DirectoryFlags);
-WINBASEAPI WINBOOL WINAPI EnumResourceLanguagesA(HMODULE hModule, LPCSTR lpType, LPCSTR lpName, ENUMRESLANGPROCA lpEnumFunc, LONG_PTR lParam);
-WINBASEAPI WINBOOL WINAPI EnumResourceLanguagesW(HMODULE hModule, LPCWSTR lpType, LPCWSTR lpName, ENUMRESLANGPROCW lpEnumFunc, LONG_PTR lParam);
-WINBASEAPI WINBOOL APIENTRY EnumResourceLanguagesExA(HMODULE hModule, LPCSTR lpType, LPCSTR lpName, ENUMRESLANGPROCA lpEnumFunc, LONG_PTR lParam, DWORD dwFlags, LANGID LangId);
-WINBASEAPI WINBOOL APIENTRY EnumResourceLanguagesExW(HMODULE hModule, LPCWSTR lpType, LPCWSTR lpName, ENUMRESLANGPROCW lpEnumFunc, LONG_PTR lParam, DWORD dwFlags, LANGID LangId);
-WINBASEAPI WINBOOL WINAPI EnumResourceNamesExA(HMODULE hModule, LPCSTR lpType, ENUMRESNAMEPROCA lpEnumFunc, LONG_PTR lParam, DWORD dwFlags, LANGID LangId);
-WINBASEAPI WINBOOL WINAPI EnumResourceNamesExW(HMODULE hModule, LPCWSTR lpType, ENUMRESNAMEPROCW lpEnumFunc, LONG_PTR lParam, DWORD dwFlags, LANGID LangId);
-WINBASEAPI WINBOOL WINAPI EnumResourceTypesExA(HMODULE hModule, ENUMRESTYPEPROCA lpEnumFunc, LONG_PTR lParam, DWORD dwFlags, LANGID LangId);
-WINBASEAPI WINBOOL WINAPI EnumResourceTypesExW(HMODULE hModule, ENUMRESTYPEPROCW lpEnumFunc, LONG_PTR lParam, DWORD dwFlags, LANGID LangId);
-WINBASEAPI WINBOOL WINAPI QueryOptionalDelayLoadedAPI(HMODULE CallerModule, LPCSTR lpDllName, LPCSTR lpProcName, DWORD Reserved);
-WINBASEAPI WINBOOL WINAPI DisableThreadLibraryCalls(HMODULE hLibModule);
-WINBASEAPI int WINAPI FindStringOrdinal(DWORD dwFindStringOrdinalFlags, LPCWSTR lpStringSource, int cchSource, LPCWSTR lpStringValue, int cchValue, WINBOOL bIgnoreCase);
-//WINUSERAPI int WINAPI LoadStringA(HINSTANCE hInstance, UINT uID, LPSTR lpBuffer, int cchBufferMax);  /* User32.dll */
-//WINUSERAPI int WINAPI LoadStringW(HINSTANCE hInstance, UINT uID, LPWSTR lpBuffer, int cchBufferMax); /* User32.dll */
-
-#define CURRENT_IMPORT_REDIRECTION_VERSION 1
-typedef struct _REDIRECTION_FUNCTION_DESCRIPTOR {
-	PCSTR DllName;
-	PCSTR FunctionName;
-	PVOID RedirectionTarget;
-} REDIRECTION_FUNCTION_DESCRIPTOR, *PREDIRECTION_FUNCTION_DESCRIPTOR;
-typedef REDIRECTION_FUNCTION_DESCRIPTOR const *PCREDIRECTION_FUNCTION_DESCRIPTOR;
-
-typedef struct _REDIRECTION_DESCRIPTOR {
-	ULONG Version;
-	ULONG FunctionCount;
-	PCREDIRECTION_FUNCTION_DESCRIPTOR Redirections;
-} REDIRECTION_DESCRIPTOR, *PREDIRECTION_DESCRIPTOR;
-typedef REDIRECTION_DESCRIPTOR const *PCREDIRECTION_DESCRIPTOR;
 
 #define GetModuleFileName       __MINGW_NAME_AW(GetModuleFileName)
-#define EnumResourceLanguagesEx __MINGW_NAME_AW(EnumResourceLanguagesEx)
-#define EnumResourceNamesEx     __MINGW_NAME_AW(EnumResourceNamesEx)
-#define EnumResourceTypesEx     __MINGW_NAME_AW(EnumResourceTypesEx)
 #define GetModuleHandle         __MINGW_NAME_AW(GetModuleHandle)
 #define LoadLibrary             __MINGW_NAME_AW(LoadLibrary)
 #define PGET_MODULE_HANDLE_EX   __MINGW_NAME_AW(PGET_MODULE_HANDLE_EX)
-#define LoadString              __MINGW_NAME_AW(LoadString)
 #define GetModuleHandleEx       __MINGW_NAME_AW(GetModuleHandleEx)
 #define LoadLibraryEx           __MINGW_NAME_AW(LoadLibraryEx)
-#define EnumResourceLanguages   __MINGW_NAME_AW(EnumResourceLanguages)
-#ifdef UNICODE
-#define EnumResourceNames EnumResourceNamesW
-#define FindResource      FindResourceW
-#define FindResourceEx    FindResourceExW
-#endif /* UNICODE */
 
 __DECL_END
 #endif /* __CC__ */

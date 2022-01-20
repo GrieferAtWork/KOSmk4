@@ -52,6 +52,10 @@ WINBASEAPI HANDLE WINAPI GetCurrentThread(VOID);
 /************************************************************************/
 /* SIMPLE PROC/THREAD CONTROL                                           */
 /************************************************************************/
+typedef DWORD(WINAPI *PTHREAD_START_ROUTINE)(LPVOID lpThreadParameter);
+typedef PTHREAD_START_ROUTINE LPTHREAD_START_ROUTINE;
+#define CREATE_SUSPENDED 0x4
+WINBASEAPI HANDLE WINAPI CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId);
 WINBASEAPI DECLSPEC_NORETURN VOID WINAPI ExitThread(DWORD dwExitCode);
 WINBASEAPI DECLSPEC_NORETURN VOID WINAPI ExitProcess(UINT uExitCode);
 WINBASEAPI WINBOOL WINAPI SwitchToThread(VOID);
@@ -62,6 +66,22 @@ WINBASEAPI DWORD WINAPI GetCurrentThreadId(VOID);
 WINBASEAPI WINBOOL WINAPI IsProcessorFeaturePresent(DWORD ProcessorFeature);
 WINBASEAPI VOID WINAPI FlushProcessWriteBuffers(VOID);
 WINBASEAPI WINBOOL WINAPI FlushInstructionCache(HANDLE hProcess, LPCVOID lpBaseAddress, SIZE_T dwSize);
+typedef VOID(NTAPI *PAPCFUNC)(ULONG_PTR Parameter);
+typedef enum _QUEUE_USER_APC_FLAGS {
+	QUEUE_USER_APC_FLAGS_NONE,
+	QUEUE_USER_APC_FLAGS_SPECIAL_USER_APC
+} QUEUE_USER_APC_FLAGS;
+WINBASEAPI DWORD WINAPI QueueUserAPC(PAPCFUNC pfnAPC, HANDLE hThread, ULONG_PTR dwData);
+WINBASEAPI BOOL WINAPI QueueUserAPC2(PAPCFUNC pfnAPC, HANDLE hThread, ULONG_PTR dwData, QUEUE_USER_APC_FLAGS flFlags);
+WINBASEAPI DWORD WINAPI SuspendThread(HANDLE hThread);
+WINBASEAPI DWORD WINAPI ResumeThread(HANDLE hThread);
+typedef struct _CONTEXT {
+	int placeholder; /* TODO */
+} CONTEXT;
+typedef CONTEXT *LPCONTEXT;
+WINBASEAPI WINBOOL WINAPI GetThreadContext(HANDLE hThread, LPCONTEXT lpContext);
+WINBASEAPI WINBOOL WINAPI SetThreadContext(HANDLE hThread, CONST CONTEXT *lpContext);
+
 
 
 /************************************************************************/

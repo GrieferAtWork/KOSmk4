@@ -22,6 +22,7 @@
 #define _KOS_ALTERATIONS_SOURCE 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _UTF_SOURCE 1
 
 #include "api.h"
 
@@ -36,7 +37,9 @@
 #include <pthread.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <uchar.h>
+#include <wchar.h>
 
 DECL_BEGIN
 
@@ -138,6 +141,45 @@ INTERN DECLSPEC_NORETURN VOID WINAPI
 libk32_FreeLibraryAndExitThread(HMODULE hLibModule, DWORD dwExitCode) {
 	dlclose(hLibModule);
 	libk32_ExitThread(dwExitCode);
+}
+
+DEFINE_PUBLIC_ALIAS(GetModuleFileNameA, libk32_GetModuleFileNameA);
+DEFINE_PUBLIC_ALIAS(GetModuleFileNameW, libk32_GetModuleFileNameW);
+INTERN DWORD WINAPI
+libk32_GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize) {
+	char const *modname;
+	size_t len;
+	modname = dlmodulename(hModule);
+	if (!modname)
+		return 0;
+	len = strlen(modname) + 1;
+	if (len > nSize) {
+		_nterrno = ERROR_INSUFFICIENT_BUFFER;
+		len      = nSize;
+	}
+	memcpy(lpFilename, modname, len, sizeof(CHAR));
+	return len - 1;
+}
+
+INTERN DWORD WINAPI
+libk32_GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize) {
+	char const *modname;
+	char16_t *wmodname;
+	size_t len;
+	modname = dlmodulename(hModule);
+	if (!modname)
+		return 0;
+	wmodname = convert_mbstoc16(modname);
+	if (!wmodname)
+		return 0;
+	len = c16len(wmodname) + 1;
+	if (len > nSize) {
+		_nterrno = ERROR_INSUFFICIENT_BUFFER;
+		len      = nSize;
+	}
+	memcpy(lpFilename, wmodname, len, sizeof(WCHAR));
+	free(wmodname);
+	return len - 1;
 }
 
 

@@ -44,7 +44,7 @@
 
 DECL_BEGIN
 
-PRIVATE struct timespec CC
+INTERN struct timespec CC
 libk32_FileTimeToTimeSpec(CONST FILETIME *ft) {
 	struct timespec result;
 	/* TODO */
@@ -55,7 +55,7 @@ libk32_FileTimeToTimeSpec(CONST FILETIME *ft) {
 	return result;
 }
 
-PRIVATE FILETIME CC
+INTERN FILETIME CC
 libk32_TimeSpecToFileTime(struct timespec const *ts) {
 	FILETIME result;
 	/* TODO */

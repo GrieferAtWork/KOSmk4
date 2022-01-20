@@ -28,6 +28,7 @@
 
 #include <asm/intrin.h>
 #include <kos/ioctl/task.h>
+#include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
 #include <nt/handleapi.h>
@@ -38,9 +39,12 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <malloc.h>
 #include <pthread.h>
 #include <sched.h>
+#include <signal.h>
 #include <stdio.h>
+#include <string.h>
 #include <syslog.h>
 #include <unistd.h>
 
@@ -176,6 +180,7 @@ INTERN HANDLE WINAPI libk32_GetCurrentThread(VOID) {
 /************************************************************************/
 /* SIMPLE PROC/THREAD CONTROL                                           */
 /************************************************************************/
+DEFINE_PUBLIC_ALIAS(CreateThread, libk32_CreateThread);
 DEFINE_PUBLIC_ALIAS(ExitThread, libk32_ExitThread);
 DEFINE_PUBLIC_ALIAS(ExitProcess, libk32_ExitProcess);
 DEFINE_PUBLIC_ALIAS(SwitchToThread, libk32_SwitchToThread);
@@ -186,6 +191,92 @@ DEFINE_PUBLIC_ALIAS(GetCurrentThreadId, libk32_GetCurrentThreadId);
 DEFINE_PUBLIC_ALIAS(IsProcessorFeaturePresent, libk32_IsProcessorFeaturePresent);
 DEFINE_PUBLIC_ALIAS(FlushProcessWriteBuffers, libk32_FlushProcessWriteBuffers);
 DEFINE_PUBLIC_ALIAS(FlushInstructionCache, libk32_FlushInstructionCache);
+DEFINE_PUBLIC_ALIAS(QueueUserAPC, libk32_QueueUserAPC);
+DEFINE_PUBLIC_ALIAS(QueueUserAPC2, libk32_QueueUserAPC2);
+DEFINE_PUBLIC_ALIAS(SuspendThread, libk32_SuspendThread);
+DEFINE_PUBLIC_ALIAS(ResumeThread, libk32_ResumeThread);
+DEFINE_PUBLIC_ALIAS(GetThreadContext, libk32_GetThreadContext);
+DEFINE_PUBLIC_ALIAS(SetThreadContext, libk32_SetThreadContext);
+
+struct k32_thread_start_data {
+	LPTHREAD_START_ROUTINE lpStartAddress;
+	LPVOID                 lpParameter;
+	DWORD                  dwCreationFlags;
+};
+
+PRIVATE void *LIBCCALL
+k32_thread_start_routine(void *arg) {
+	struct k32_thread_start_data info;
+	memcpy(&info, arg, sizeof(struct k32_thread_start_data));
+	free(arg);
+	if (info.dwCreationFlags & CREATE_SUSPENDED) {
+		/* XXX: Kernel-side of this is not fully implemented
+		 * -> Once it is, there should be ioctls to (recursively) suspend/resume threads */
+		pthread_kill(pthread_self(), SIGSTOP);
+	}
+	return (void *)(uintptr_t)(*info.lpStartAddress)(info.lpParameter);
+}
+
+INTERN HANDLE WINAPI
+libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize,
+                    LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter,
+                    DWORD dwCreationFlags, LPDWORD lpThreadId) {
+	HANDLE result;
+	pid_t tid;
+	pthread_t thread;
+	pthread_attr_t attr;
+	errno_t error;
+	struct k32_thread_start_data *cookie;
+	(void)lpThreadAttributes;
+	error = pthread_attr_init(&attr);
+	if (error != EOK)
+		goto seterr;
+	cookie = (struct k32_thread_start_data *)malloc(sizeof(struct k32_thread_start_data));
+	if (!cookie) {
+		pthread_attr_destroy(&attr);
+		goto err;
+	}
+	cookie->lpStartAddress  = lpStartAddress;
+	cookie->lpParameter     = lpParameter;
+	cookie->dwCreationFlags = dwCreationFlags;
+
+	/* Use a custom stack size (if given) */
+	if (dwStackSize != 0) {
+		error = pthread_attr_setstacksize(&attr, dwStackSize);
+		if (error != EOK)
+			goto seterr_attr;
+	}
+
+	/* Actually create the new thread. */
+	error = pthread_create(&thread, &attr, &k32_thread_start_routine, cookie);
+	pthread_attr_destroy(&attr);
+	if (error != EOK)
+		goto seterr;
+
+	/* Construct a PIDFD descriptor for the thread. */
+	tid = pthread_gettid_np(thread);
+	if (lpThreadId)
+		*lpThreadId = tid;
+	result = libk32_OpenThread(0, FALSE, tid);
+	if (result == NULL)
+		pthread_cancel(thread);
+
+	/* Detach the pthread object. */
+	pthread_detach(thread);
+
+	if (dwCreationFlags & CREATE_SUSPENDED) {
+		/* TODO: Wait for the thread to suspend itself */
+	}
+
+	/* Return a OS-level handle for the thread. */
+	return result;
+seterr_attr:
+	pthread_attr_destroy(&attr);
+seterr:
+	errno = error;
+err:
+	return NULL;
+}
 
 INTERN DECLSPEC_NORETURN VOID WINAPI
 libk32_ExitThread(DWORD dwExitCode) {
@@ -231,14 +322,14 @@ libk32_GetCurrentThreadId(VOID) {
 
 INTERN WINBOOL WINAPI
 libk32_IsProcessorFeaturePresent(DWORD ProcessorFeature) {
-	syslog(LOG_WARNING, "[k32] Not implemented: IsProcessorFeaturePresent(%I32u)\n",
+	syslog(LOG_WARNING, "[k32] NotImplemented: IsProcessorFeaturePresent(%I32u)\n",
 	       ProcessorFeature);
 	return FALSE;
 }
 
 INTERN VOID WINAPI
 libk32_FlushProcessWriteBuffers(VOID) {
-	syslog(LOG_WARNING, "[k32] Not implemented: FlushProcessWriteBuffers()\n");
+	syslog(LOG_WARNING, "[k32] NotImplemented: FlushProcessWriteBuffers()\n");
 }
 
 INTERN WINBOOL WINAPI
@@ -252,6 +343,104 @@ libk32_FlushInstructionCache(HANDLE hProcess, LPCVOID lpBaseAddress, SIZE_T dwSi
 	__flush_instruction_cache();
 	return TRUE;
 }
+
+struct user_apc_data {
+	PAPCFUNC  pfnAPC;
+	ULONG_PTR dwData;
+};
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+user_apc_callback(struct rpc_context *__restrict UNUSED(ctx), void *cookie) {
+	struct user_apc_data dat;
+	memcpy(&dat, cookie, sizeof(struct user_apc_data));
+	free(cookie); /* FIXME: This is unsafe until we get a non-blocking free function! */
+	(*dat.pfnAPC)(dat.dwData);
+}
+
+INTERN BOOL WINAPI
+libk32_QueueUserAPC2(PAPCFUNC pfnAPC, HANDLE hThread,
+                     ULONG_PTR dwData, QUEUE_USER_APC_FLAGS flFlags) {
+	struct user_apc_data *cookie;
+	pid_t tid = libk32_GetThreadId(hThread);
+	unsigned int mode;
+	if (tid == 0)
+		return 0;
+	cookie = (struct user_apc_data *)malloc(sizeof(struct user_apc_data));
+	if (!cookie)
+		return 0;
+	cookie->pfnAPC = pfnAPC;
+	cookie->dwData = dwData;
+	/* From what I understand, "special" user-APC functions are just async RPCs... */
+	mode = RPC_SYNCMODE_CP | RPC_DOMAIN_THREAD | RPC_JOIN_WAITFOR;
+	if (flFlags == QUEUE_USER_APC_FLAGS_SPECIAL_USER_APC)
+		mode = RPC_SYNCMODE_ASYNC | RPC_DOMAIN_THREAD | RPC_JOIN_WAITFOR;
+	if (rpc_exec(tid, mode, &user_apc_callback, cookie) != 0) {
+		free(cookie);
+		return 0;
+	}
+	return 1;
+}
+
+INTERN DWORD WINAPI
+libk32_QueueUserAPC(PAPCFUNC pfnAPC, HANDLE hThread, ULONG_PTR dwData) {
+	return libk32_QueueUserAPC2(pfnAPC, hThread, dwData, QUEUE_USER_APC_FLAGS_NONE);
+}
+
+INTERN DWORD WINAPI
+libk32_SuspendThread(HANDLE hThread) {
+	errno_t error;
+	if (!NTHANDLE_ISFD(hThread)) {
+		errno = EBADF;
+		goto err;
+	}
+	error = sys_pidfd_send_signal(NTHANDLE_ASFD(hThread), SIGSTOP, NULL, 0);
+	if (error != EOK) {
+		errno = -error;
+		goto err;
+	}
+	return 0;
+err:
+	return (DWORD)-1;
+}
+
+INTERN DWORD WINAPI
+libk32_ResumeThread(HANDLE hThread) {
+	errno_t error;
+	if (!NTHANDLE_ISFD(hThread)) {
+		errno = EBADF;
+		goto err;
+	}
+	error = sys_pidfd_send_signal(NTHANDLE_ASFD(hThread), SIGCONT, NULL, 0);
+	if (error != EOK) {
+		errno = -error;
+		goto err;
+	}
+	return 1;
+err:
+	return (DWORD)-1;
+}
+
+INTERN WINBOOL WINAPI
+libk32_GetThreadContext(HANDLE hThread, LPCONTEXT lpContext) {
+	syslog(LOG_WARNING, "[k32] NotImplemented: GetThreadContext(%p, %p)\n",
+	       hThread, lpContext);
+	errno = ENOTSUP;
+	return FALSE;
+}
+
+INTERN WINBOOL WINAPI
+libk32_SetThreadContext(HANDLE hThread, CONST CONTEXT *lpContext) {
+	syslog(LOG_WARNING, "[k32] NotImplemented: SetThreadContext(%p, %p)\n",
+	       hThread, lpContext);
+	errno = ENOTSUP;
+	return FALSE;
+}
+
+
+
+
+
+
 
 
 
