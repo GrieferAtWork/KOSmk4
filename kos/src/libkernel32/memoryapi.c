@@ -19,44 +19,35 @@
  */
 #ifndef GUARD_LIBKERNEL32_MEMORYAPI_C
 #define GUARD_LIBKERNEL32_MEMORYAPI_C 1
+#define _AT_SOURCE 1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "api.h"
 /**/
 
 #include <kos/types.h>
+#include <nt/handleapi.h>
 #include <nt/memoryapi.h>
 #include <sys/mman.h>
+#include <sys/uio.h>
 
-#include <syslog.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <stddef.h>
+#include <syslog.h>
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(VirtualProtect, libk32_VirtualProtect);
-INTERN WINBOOL WINAPI
-libk32_VirtualProtect(LPVOID lpAddress, SIZE_T dwSize,
-                      DWORD flNewProtect, PDWORD lpflOldProtect) {
-	int prot;
-	if (flNewProtect & (PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE_READWRITE)) {
-		prot = PROT_READ | PROT_WRITE | PROT_EXEC;
-	} else if (flNewProtect & PAGE_EXECUTE_READ) {
-		prot = PROT_READ | PROT_EXEC;
-	} else if (flNewProtect & PAGE_EXECUTE) {
-		prot = PROT_EXEC;
-	} else if (flNewProtect & (PAGE_WRITECOPY | PAGE_READWRITE)) {
-		prot = PROT_READ | PROT_WRITE;
-	} else if (flNewProtect & PAGE_READONLY) {
-		prot = PROT_READ;
-	} else if (flNewProtect & PAGE_NOACCESS) {
-		prot = PROT_NONE;
-	} else {
-		prot = PROT_READ | PROT_WRITE; /* ??? */
-	}
-	*lpflOldProtect = PROT_READ | PROT_WRITE | PROT_EXEC; /* TODO */
-	return mprotect(lpAddress, dwSize, prot) == 0;
-}
-
 DEFINE_PUBLIC_ALIAS(VirtualQuery, libk32_VirtualQuery);
+DEFINE_PUBLIC_ALIAS(VirtualProtect, libk32_VirtualProtect);
+DEFINE_PUBLIC_ALIAS(VirtualProtectEx, libk32_VirtualProtectEx);
+DEFINE_PUBLIC_ALIAS(ReadProcessMemory, libk32_ReadProcessMemory);
+DEFINE_PUBLIC_ALIAS(WriteProcessMemory, libk32_WriteProcessMemory);
+DEFINE_PUBLIC_ALIAS(VirtualLock, libk32_VirtualLock);
+DEFINE_PUBLIC_ALIAS(VirtualUnlock, libk32_VirtualUnlock);
+DEFINE_PUBLIC_ALIAS(VirtualUnlockEx, libk32_VirtualUnlockEx);
+
 INTERN SIZE_T WINAPI
 libk32_VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength) {
 	syslog(LOG_WARNING, "NotImplemented: VirtualQuery(%p, %p, %#Ix)\n",
@@ -64,6 +55,150 @@ libk32_VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_
 	return 0;
 }
 
+PRIVATE int WINAPI
+libk32_MmanProtFromNtProt(DWORD flProtect) {
+	int prot;
+	if (flProtect & (PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE_READWRITE)) {
+		prot = PROT_READ | PROT_WRITE | PROT_EXEC;
+	} else if (flProtect & PAGE_EXECUTE_READ) {
+		prot = PROT_READ | PROT_EXEC;
+	} else if (flProtect & PAGE_EXECUTE) {
+		prot = PROT_EXEC;
+	} else if (flProtect & (PAGE_WRITECOPY | PAGE_READWRITE)) {
+		prot = PROT_READ | PROT_WRITE;
+	} else if (flProtect & PAGE_READONLY) {
+		prot = PROT_READ;
+	} else if (flProtect & PAGE_NOACCESS) {
+		prot = PROT_NONE;
+	} else {
+		prot = PROT_READ | PROT_WRITE; /* ??? */
+	}
+	return prot;
+}
+
+INTERN WINBOOL WINAPI
+libk32_VirtualProtect(LPVOID lpAddress, SIZE_T dwSize,
+                      DWORD flNewProtect, PDWORD lpflOldProtect) {
+	int prot = libk32_MmanProtFromNtProt(flNewProtect);
+	*lpflOldProtect = PROT_READ | PROT_WRITE | PROT_EXEC; /* TODO */
+	return mprotect(lpAddress, dwSize, prot) == 0;
+}
+
+INTERN WINBOOL WINAPI
+libk32_VirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize,
+                        DWORD flNewProtect, PDWORD lpflOldProtect) {
+	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+		errno = EACCES;
+		return FALSE;
+	}
+	return libk32_VirtualProtect(lpAddress, dwSize, flNewProtect, lpflOldProtect);
+}
+
+INTDEF DWORD WINAPI libk32_GetProcessId(HANDLE hProcess);
+
+INTERN WINBOOL WINAPI
+libk32_ReadProcessMemory(HANDLE hProcess, LPCVOID lpBaseAddress,
+                         LPVOID lpBuffer, SIZE_T nSize, SIZE_T *lpNumberOfBytesRead) {
+	struct iovec src, dst;
+	DWORD pid = libk32_GetProcessId(hProcess);
+	ssize_t total;
+	if (pid == 0)
+		return FALSE;
+	src.iov_base = (void *)lpBaseAddress;
+	src.iov_len  = nSize;
+	dst.iov_base = lpBuffer;
+	dst.iov_len  = nSize;
+	total = process_vm_readv((pid_t)pid, &dst, 1, &src, 1, 0);
+	if (total == -1)
+		return FALSE;
+	*lpNumberOfBytesRead = (SIZE_T)total;
+	return TRUE;
+}
+
+INTERN WINBOOL WINAPI
+libk32_WriteProcessMemory(HANDLE hProcess, LPVOID lpBaseAddress,
+                          LPCVOID lpBuffer, SIZE_T nSize, SIZE_T *lpNumberOfBytesWritten) {
+	struct iovec src, dst;
+	DWORD pid = libk32_GetProcessId(hProcess);
+	ssize_t total;
+	if (pid == 0)
+		return FALSE;
+	src.iov_base = (void *)lpBuffer;
+	src.iov_len  = nSize;
+	dst.iov_base = lpBaseAddress;
+	dst.iov_len  = nSize;
+	total = process_vm_writev((pid_t)pid, &src, 1, &dst, 1, 0);
+	if (total == -1)
+		return FALSE;
+	*lpNumberOfBytesWritten = (SIZE_T)total;
+	return TRUE;
+}
+
+INTERN WINBOOL WINAPI
+libk32_VirtualLock(LPVOID lpAddress, SIZE_T dwSize) {
+	return mlock(lpAddress, dwSize) == 0;
+}
+
+INTERN WINBOOL WINAPI
+libk32_VirtualUnlock(LPVOID lpAddress, SIZE_T dwSize) {
+	return munlock(lpAddress, dwSize) == 0;
+}
+
+INTERN WINBOOL WINAPI
+libk32_VirtualUnlockEx(HANDLE hProcess, LPVOID Address, SIZE_T Size) {
+	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+		errno = EACCES;
+		return FALSE;
+	}
+	return libk32_VirtualUnlock(Address, Size);
+}
+
+
+
+/************************************************************************/
+/* ALLOC / FREE                                                         */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(VirtualAlloc, libk32_VirtualAlloc);
+DEFINE_PUBLIC_ALIAS(VirtualAllocEx, libk32_VirtualAllocEx);
+DEFINE_PUBLIC_ALIAS(VirtualFree, libk32_VirtualFree);
+
+INTERN LPVOID WINAPI
+libk32_VirtualAlloc(LPVOID lpAddress, SIZE_T dwSize,
+                    DWORD flAllocationType, DWORD flProtect) {
+	void *result;
+	int prot, flags;
+	(void)flAllocationType;
+	prot  = libk32_MmanProtFromNtProt(flProtect);
+	flags = MAP_PRIVATE | MAP_ANON;
+	if ((flAllocationType & MEM_COMMIT) && !(flAllocationType & MEM_RESERVE)) {
+		/* Replace a RESERVE mapping with a COMMIT mapping
+		 * -> Emulate by overwriting an exiting mapping */
+		flags |= MAP_FIXED;
+	}
+	if (flAllocationType & MEM_LARGE_PAGES)
+		flags |= MAP_HUGETLB;
+	result = mmap(lpAddress, dwSize, prot, flags, -1, 0);
+	if (result == MAP_FAILED)
+		result = NULL;
+	return result;
+}
+
+INTERN WINBOOL WINAPI
+libk32_VirtualFree(LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType) {
+	if (!(dwFreeType & MEM_RELEASE))
+		return TRUE;
+	return munmap(lpAddress, dwSize) == 0;
+}
+
+INTERN LPVOID WINAPI
+libk32_VirtualAllocEx(HANDLE hProcess, LPVOID lpAddress,
+                      SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect) {
+	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+		errno = EACCES;
+		return FALSE;
+	}
+	return libk32_VirtualAlloc(lpAddress, dwSize, flAllocationType, flProtect);
+}
 
 
 DECL_END

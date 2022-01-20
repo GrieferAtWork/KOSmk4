@@ -64,8 +64,41 @@ typedef struct _MEMORY_BASIC_INFORMATION {
 	DWORD Type;
 } MEMORY_BASIC_INFORMATION, *PMEMORY_BASIC_INFORMATION;
 
-WINBASEAPI WINBOOL WINAPI VirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect);
 WINBASEAPI SIZE_T WINAPI VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength);
+WINBASEAPI WINBOOL WINAPI VirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect);
+WINBASEAPI WINBOOL WINAPI VirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect);
+WINBASEAPI WINBOOL WINAPI ReadProcessMemory(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T *lpNumberOfBytesRead);
+WINBASEAPI WINBOOL WINAPI WriteProcessMemory(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T *lpNumberOfBytesWritten);
+WINBASEAPI WINBOOL WINAPI VirtualLock(LPVOID lpAddress, SIZE_T dwSize);
+WINBASEAPI WINBOOL WINAPI VirtualUnlock(LPVOID lpAddress, SIZE_T dwSize);
+WINBASEAPI WINBOOL WINAPI VirtualUnlockEx(HANDLE hProcess, LPVOID Address, SIZE_T Size);
+
+
+/************************************************************************/
+/* ALLOC / FREE                                                         */
+/************************************************************************/
+#define MEM_COMMIT                  0x00001000
+#define MEM_RESERVE                 0x00002000
+#define MEM_DECOMMIT                0x00004000
+#define MEM_RELEASE                 0x00008000
+#define MEM_FREE                    0x00010000
+#define MEM_PRIVATE                 0x00020000
+#define MEM_MAPPED                  0x00040000
+#define MEM_RESET                   0x00080000
+#define MEM_TOP_DOWN                0x00100000
+#define MEM_WRITE_WATCH             0x00200000
+#define MEM_PHYSICAL                0x00400000
+#define MEM_ROTATE                  0x00800000
+#define MEM_DIFFERENT_IMAGE_BASE_OK 0x00800000
+#define MEM_RESET_UNDO              0x01000000
+#define MEM_LARGE_PAGES             0x20000000
+#define MEM_4MB_PAGES               0x80000000
+#define MEM_64K_PAGES               (MEM_LARGE_PAGES | MEM_PHYSICAL)
+
+WINBASEAPI LPVOID WINAPI VirtualAlloc(LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
+WINBASEAPI LPVOID WINAPI VirtualAllocEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
+WINBASEAPI WINBOOL WINAPI VirtualFree(LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType);
+
 
 __DECL_END
 #endif /* __CC__ */

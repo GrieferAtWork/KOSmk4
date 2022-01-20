@@ -43,6 +43,13 @@ INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FC
 x86_handle_invalid_tss(struct icpustate *__restrict state, uintptr_t ecode) {
 	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(X86_E_SYSTEM_TS & 0xff)); /* #TS  Invalid TSS */
 
+	/* TODO:
+	 * """
+	 * If  the NT flag is set and  the processor is in IA-32e mode
+	 * the IRET instruction causes a general protection exception.
+	 * """
+	 * Maybe we should add explicit handling for this? */
+
 	/* Because  user-space programs are able to set `EFLAGS.NT=1', and the KOS
 	 * kernel doesn't make use of hardware  task switching, but does make  use
 	 * of `iret' for the purpose of loading  PSP+PIP at the same time, we  run
@@ -89,6 +96,10 @@ x86_handle_invalid_tss(struct icpustate *__restrict state, uintptr_t ecode) {
 		return state;
 	}
 not_iret_with_nt:
+
+	if (icpustate_isuser(state)) {
+		/* TODO: Should probably throw some kind of exception */
+	}
 
 	/* Fallback: handle as an unhandled interrupt. */
 	return x86_handle_unhandled_idt(state, ecode, X86_E_SYSTEM_TS & 0xff);

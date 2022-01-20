@@ -46,12 +46,60 @@ __LIBC NOBLOCK syscall_slong_t NOTHROW(LIBDCALL __set_nterrno)(/*nt*/ errno_t va
 
 DEFINE_PUBLIC_ALIAS(GetLastError, libk32_GetLastError);
 DEFINE_PUBLIC_ALIAS(SetLastError, libk32_SetLastError);
+DEFINE_PUBLIC_ALIAS(RestoreLastError, libk32_SetLastError);
 INTERN DWORD WINAPI libk32_GetLastError(VOID) {
 	return __get_nterrno();
 }
 
 INTERN VOID WINAPI libk32_SetLastError(DWORD dwErrCode) {
 	__set_nterrno((errno_t)dwErrCode);
+}
+
+
+DEFINE_PUBLIC_ALIAS(GetErrorMode, libk32_GetErrorMode);
+DEFINE_PUBLIC_ALIAS(GetThreadErrorMode, libk32_GetThreadErrorMode);
+DEFINE_PUBLIC_ALIAS(SetErrorMode, libk32_SetErrorMode);
+DEFINE_PUBLIC_ALIAS(SetThreadErrorMode, libk32_SetThreadErrorMode);
+DEFINE_PUBLIC_ALIAS(RaiseException, libk32_RaiseException);
+
+INTERN UINT WINAPI libk32_GetErrorMode(VOID) {
+	COMPILER_IMPURE();
+	return SEM_FAILCRITICALERRORS |
+	       SEM_NOGPFAULTERRORBOX |
+	       SEM_NOALIGNMENTFAULTEXCEPT |
+	       SEM_NOOPENFILEERRORBOX;
+}
+
+INTERN UINT WINAPI libk32_SetErrorMode(UINT uMode) {
+	COMPILER_IMPURE();
+	(void)uMode;
+	return libk32_GetErrorMode();
+}
+
+INTERN DWORD WINAPI
+libk32_GetThreadErrorMode(VOID) {
+	return libk32_GetErrorMode();
+}
+
+INTERN WINBOOL WINAPI
+libk32_SetThreadErrorMode(DWORD dwNewMode, LPDWORD lpOldMode) {
+	DWORD mode = libk32_GetThreadErrorMode();
+	if (dwNewMode != mode) {
+		errno = EINVAL;
+		return FALSE;
+	}
+	if (lpOldMode)
+		*lpOldMode = mode;
+	return TRUE;
+}
+
+
+INTERN VOID WINAPI
+libk32_RaiseException(DWORD dwExceptionCode, DWORD dwExceptionFlags,
+                      DWORD nNumberOfArguments, CONST ULONG_PTR *lpArguments) {
+	syslog(LOG_WARNING, "NotImplemented: RaiseException(%#x, %#x, %u, %p)\n",
+	       dwExceptionCode, dwExceptionFlags,
+	       nNumberOfArguments, lpArguments);
 }
 
 DECL_END

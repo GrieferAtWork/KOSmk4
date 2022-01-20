@@ -27,7 +27,7 @@
 
 #include <kos/except.h>
 #include <kos/types.h>
-#include <nt/handle.h>
+#include <nt/handleapi.h>
 #include <nt/libloaderapi.h>
 #include <nt/types.h>
 

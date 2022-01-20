@@ -29,6 +29,26 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifndef STATUS_PENDING
+#define STATUS_PENDING ((DWORD)0x00000103)
+#endif /* !STATUS_PENDING */
+#define STILL_ACTIVE STATUS_PENDING
+
+/************************************************************************/
+/* INTER-PROCESS CONTROL                                                */
+/************************************************************************/
+WINBASEAPI HANDLE WINAPI OpenProcess(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwProcessId);
+WINBASEAPI WINBOOL WINAPI GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
+WINBASEAPI WINBOOL WINAPI GetExitCodeThread(HANDLE hThread, LPDWORD lpExitCode);
+WINBASEAPI HANDLE WINAPI OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadId);
+WINBASEAPI DWORD WINAPI GetProcessId(HANDLE hProcess);
+WINBASEAPI DWORD WINAPI GetThreadId(HANDLE Thread);
+WINBASEAPI WINBOOL WINAPI GetProcessHandleCount(HANDLE hProcess, PDWORD pdwHandleCount);
+WINBASEAPI DWORD WINAPI GetProcessIdOfThread(HANDLE Thread);
+WINBASEAPI HANDLE WINAPI GetCurrentProcess(VOID);
+WINBASEAPI HANDLE WINAPI GetCurrentThread(VOID);
+
+
 /************************************************************************/
 /* SIMPLE PROC/THREAD CONTROL                                           */
 /************************************************************************/
@@ -41,6 +61,7 @@ WINBASEAPI DWORD WINAPI GetCurrentProcessId(VOID);
 WINBASEAPI DWORD WINAPI GetCurrentThreadId(VOID);
 WINBASEAPI WINBOOL WINAPI IsProcessorFeaturePresent(DWORD ProcessorFeature);
 WINBASEAPI VOID WINAPI FlushProcessWriteBuffers(VOID);
+WINBASEAPI WINBOOL WINAPI FlushInstructionCache(HANDLE hProcess, LPCVOID lpBaseAddress, SIZE_T dwSize);
 
 
 /************************************************************************/

@@ -233,6 +233,23 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
 	}	break;
 
+	case TASK_IOC_EXITCODE: {
+		REF struct task *thread;
+		thread = taskpid_gettask(self);
+		if (thread) {
+			if (!(thread->t_flags & TASK_FTERMINATING)) {
+				decref_unlikely(thread);
+				THROW(E_INVALID_ARGUMENT_BAD_STATE,
+				      E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED,
+				      taskpid_getpid_s(self, THIS_PIDNS));
+			}
+			decref_unlikely(thread);
+		}
+		validate_writable(arg, sizeof(union wait));
+		memcpy(arg, &self->tp_status, sizeof(union wait));
+		return 0;
+	}	break;
+
 	default:
 		break;
 	}

@@ -27,7 +27,7 @@
 /**/
 
 #include <kos/types.h>
-#include <nt/handle.h>
+#include <nt/handleapi.h>
 #include <nt/processenv.h>
 
 #include <errno.h>

@@ -28,7 +28,7 @@
 
 #include <kos/types.h>
 #include <nt/fileapi.h>
-#include <nt/handle.h>
+#include <nt/handleapi.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 

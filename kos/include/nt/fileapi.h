@@ -166,10 +166,6 @@ typedef struct _WIN32_FIND_DATAW {
 #endif /* _MAC */
 } WIN32_FIND_DATAW, *PWIN32_FIND_DATAW, *LPWIN32_FIND_DATAW;
 
-__MINGW_TYPEDEF_AW(WIN32_FIND_DATA)
-__MINGW_TYPEDEF_AW(PWIN32_FIND_DATA)
-__MINGW_TYPEDEF_AW(LPWIN32_FIND_DATA)
-
 WINBASEAPI HANDLE WINAPI FindFirstFileA(LPCSTR lpFileName, LPWIN32_FIND_DATAA lpFindFileData);
 WINBASEAPI HANDLE WINAPI FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData);
 WINBASEAPI WINBOOL WINAPI FindNextFileA(HANDLE hFindFile, LPWIN32_FIND_DATAA lpFindFileData);
@@ -277,6 +273,29 @@ WINBASEAPI WINBOOL WINAPI SetFileTime(HANDLE hFile, CONST FILETIME *lpCreationTi
 WINBASEAPI DWORD WINAPI GetFileType(HANDLE hFile);
 WINBASEAPI WINBOOL WINAPI FileTimeToLocalFileTime(CONST FILETIME *lpFileTime, LPFILETIME lpLocalFileTime);
 WINBASEAPI WINBOOL WINAPI LocalFileTimeToFileTime(CONST FILETIME *lpLocalFileTime, LPFILETIME lpFileTime);
+
+
+
+
+
+/************************************************************************/
+/* UNICODE                                                              */
+/************************************************************************/
+__MINGW_TYPEDEF_AW(WIN32_FIND_DATA)
+__MINGW_TYPEDEF_AW(PWIN32_FIND_DATA)
+__MINGW_TYPEDEF_AW(LPWIN32_FIND_DATA)
+#define FindFirstFile            __MINGW_NAME_AW(FindFirstFile)
+#define FindNextFile             __MINGW_NAME_AW(FindNextFile)
+#define GetLogicalDriveStrings   __MINGW_NAME_AW(GetLogicalDriveStrings)
+#define GetFullPathName          __MINGW_NAME_AW(GetFullPathName)
+#define CreateDirectory          __MINGW_NAME_AW(CreateDirectory)
+#define DeleteFile               __MINGW_NAME_AW(DeleteFile)
+#define RemoveDirectory          __MINGW_NAME_AW(RemoveDirectory)
+#define CreateFile               __MINGW_NAME_AW(CreateFile)
+#define GetFinalPathNameByHandle __MINGW_NAME_AW(GetFinalPathNameByHandle)
+#define GetFileAttributes        __MINGW_NAME_AW(GetFileAttributes)
+#define GetFileAttributesEx      __MINGW_NAME_AW(GetFileAttributesEx)
+#define SetFileAttributes        __MINGW_NAME_AW(SetFileAttributes)
 
 __DECL_END
 #endif /* __CC__ */

@@ -17,15 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _NT_HANDLE_H
-#define _NT_HANDLE_H 1
+#ifndef _NT_HANDLEAPI_H
+#define _NT_HANDLEAPI_H 1
 
 #include "__stdinc.h"
 /**/
 
-#include <hybrid/typecore.h>
+#ifdef __KOS__
+#include <kos/types.h>
 #include <kos/kernel/paging.h>
+#endif /* __KOS__ */
 
+#include "types.h"
 
 /* We define NT handles in such a manner that you can implicitly  cast
  * pointers to user-space  only handle-like objects  into HANDLE.  But
@@ -37,6 +40,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifdef __KOS__
 #ifdef KERNELSPACE_HIGHMEM
 #if KERNELSPACE_BASE == __UINT32_C(0xc0000000)
 #define _NTHANDLE_FDMASK __UINT32_C(0x3fffffff)
@@ -51,7 +55,7 @@ __DECL_BEGIN
 #if _NTHANDLE_FDBITS >= (__SIZEOF_INT__ * 8)
 #define NTHANDLE_ASFD(handle) ((int)(unsigned int)(__UINTPTR_TYPE__)(handle))
 #else /* _NTHANDLE_FDBITS >= (__SIZEOF_INT__ * 8) */
-#define _NTHANDLE_FDSHIFT ((__SIZEOF_INT__ * 8) - _NTHANDLE_FDBITS)
+#define _NTHANDLE_FDSHIFT     ((__SIZEOF_INT__ * 8) - _NTHANDLE_FDBITS)
 #define NTHANDLE_ASFD(handle) (((int)(unsigned int)(__UINTPTR_TYPE__)(handle) << _NTHANDLE_FDSHIFT) >> _NTHANDLE_FDSHIFT)
 #endif /* _NTHANDLE_FDBITS < (__SIZEOF_INT__ * 8) */
 #define NTHANDLE_FROMFD(fd) ((HANDLE)((__UINTPTR_TYPE__)((int)(fd)&_NTHANDLE_FDMASK) + KERNELSPACE_BASE))
@@ -59,10 +63,22 @@ __DECL_BEGIN
 #error "Unsupported configuration"
 #endif /* !KERNELSPACE_HIGHMEM */
 #define NTHANDLE_ISPTR(x) (!NTHANDLE_ISFD(x))
+#endif /* __KOS__ */
+
 
 #define INVALID_HANDLE_VALUE ((HANDLE)(LONG_PTR)-1)
+
+#define HANDLE_FLAG_INHERIT            0x1
+#define HANDLE_FLAG_PROTECT_FROM_CLOSE 0x2
+
+WINBASEAPI WINBOOL WINAPI CloseHandle(HANDLE hObject);
+WINBASEAPI WINBOOL WINAPI DuplicateHandle(HANDLE hSourceProcessHandle, HANDLE hSourceHandle, HANDLE hTargetProcessHandle, LPHANDLE lpTargetHandle, DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwOptions);
+WINBASEAPI WINBOOL WINAPI CompareObjectHandles(HANDLE hFirstObjectHandle, HANDLE hSecondObjectHandle);
+WINBASEAPI WINBOOL WINAPI GetHandleInformation(HANDLE hObject, LPDWORD lpdwFlags);
+WINBASEAPI WINBOOL WINAPI SetHandleInformation(HANDLE hObject, DWORD dwMask, DWORD dwFlags);
+
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_NT_HANDLE_H */
+#endif /* !_NT_HANDLEAPI_H */

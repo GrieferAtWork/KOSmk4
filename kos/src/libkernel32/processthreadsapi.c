@@ -19,22 +19,159 @@
  */
 #ifndef GUARD_LIBKERNEL32_PROCESSTHREADSAPI_C
 #define GUARD_LIBKERNEL32_PROCESSTHREADSAPI_C 1
+#define _KOS_KERNEL_SOURCE 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
 #include "api.h"
 /**/
 
+#include <asm/intrin.h>
+#include <kos/ioctl/task.h>
+#include <kos/syscalls.h>
 #include <kos/types.h>
+#include <nt/handleapi.h>
 #include <nt/processthreadsapi.h>
+#include <sys/ioctl.h>
+#include <sys/wait.h>
 
+#include <dirent.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <pthread.h>
 #include <sched.h>
+#include <stdio.h>
 #include <syslog.h>
 #include <unistd.h>
 
 DECL_BEGIN
+
+/************************************************************************/
+/* INTER-PROCESS CONTROL                                                */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(OpenProcess, libk32_OpenProcess);
+DEFINE_PUBLIC_ALIAS(GetExitCodeProcess, libk32_GetExitCodeProcess);
+DEFINE_PUBLIC_ALIAS(GetExitCodeThread, libk32_GetExitCodeThread);
+DEFINE_PUBLIC_ALIAS(OpenThread, libk32_OpenThread);
+DEFINE_PUBLIC_ALIAS(GetProcessId, libk32_GetProcessId);
+DEFINE_PUBLIC_ALIAS(GetThreadId, libk32_GetThreadId);
+DEFINE_PUBLIC_ALIAS(GetProcessHandleCount, libk32_GetProcessHandleCount);
+DEFINE_PUBLIC_ALIAS(GetProcessIdOfThread, libk32_GetProcessIdOfThread);
+DEFINE_PUBLIC_ALIAS(GetCurrentProcess, libk32_GetCurrentProcess);
+DEFINE_PUBLIC_ALIAS(GetCurrentThread, libk32_GetCurrentThread);
+
+INTERN HANDLE WINAPI
+libk32_OpenProcess(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwProcessId) {
+	fd_t result;
+	(void)dwDesiredAccess;
+	result = sys_pidfd_open(dwProcessId, 0);
+	if (E_ISERR(result)) {
+		errno = -result;
+		return NULL;
+	}
+	if (bInheritHandle) {
+		if (fcntl(result, F_SETFL, 0) != 0) {
+			close(result);
+			return NULL;
+		}
+	}
+	return NTHANDLE_FROMFD(result);
+}
+
+INTERN WINBOOL WINAPI
+libk32_GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode) {
+	union wait w;
+	if (!NTHANDLE_ISFD(hProcess)) {
+		errno = EBADF;
+		return FALSE;
+	}
+	if (ioctl(NTHANDLE_ASFD(hProcess), TASK_IOC_EXITCODE, &w) < 0) {
+		if (errno == EINVAL) {
+			*lpExitCode = STILL_ACTIVE;
+			return TRUE;
+		}
+		return FALSE;
+	}
+	if (WIFEXITED(w)) {
+		*lpExitCode = WEXITSTATUS(w);
+		return TRUE;
+	}
+	/* Something else (e.h. a signal or coredump) */
+	*lpExitCode = (DWORD)-1;
+	return TRUE;
+}
+
+DEFINE_INTERN_ALIAS(libk32_GetExitCodeThread, libk32_GetExitCodeProcess);
+INTERN HANDLE WINAPI
+libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadId) {
+	fd_t result;
+	char filename[64];
+	(void)dwDesiredAccess;
+	/* NOTE: For linux compat, `sys_pidfd_open()' can't be used to open thread
+	 *       handles! - Instead, those can be opened via `open("/proc/[tid]")' */
+	sprintf(filename, "/proc/%d", (pid_t)dwThreadId);
+	result = open(filename,
+	              bInheritHandle ? (O_RDWR | O_DIRECTORY)
+	                             : (O_RDWR | O_DIRECTORY | O_CLOEXEC));
+	if (result == -1)
+		return NULL;
+	return NTHANDLE_FROMFD(result);
+}
+
+DEFINE_INTERN_ALIAS(libk32_GetProcessIdOfThread, libk32_GetProcessId);
+INTERN DWORD WINAPI
+libk32_GetProcessId(HANDLE hProcess) {
+	pid_t result;
+	if (!NTHANDLE_ISFD(hProcess)) {
+		errno = EBADF;
+		return 0;
+	}
+	if (ioctl(NTHANDLE_ASFD(hProcess), TASK_IOC_GETPID, &result) < 0)
+		return 0;
+	return result;
+}
+
+INTERN DWORD WINAPI
+libk32_GetThreadId(HANDLE hThread) {
+	pid_t result;
+	if (!NTHANDLE_ISFD(hThread)) {
+		errno = EBADF;
+		return 0;
+	}
+	if (ioctl(NTHANDLE_ASFD(hThread), TASK_IOC_GETTID, &result) < 0)
+		return 0;
+	return result;
+}
+
+INTERN WINBOOL WINAPI
+libk32_GetProcessHandleCount(HANDLE hProcess, PDWORD pdwHandleCount) {
+	/* Count the # of files in "/proc/pid/fd" */
+	char pathname[64];
+	DWORD pid = libk32_GetProcessId(hProcess);
+	DIR *fddir;
+	size_t count;
+	if (pid == 0)
+		return FALSE;
+	sprintf(pathname, "/proc/%d/fd", (pid_t)pid);
+	fddir = opendir(pathname);
+	if (!fddir)
+		return FALSE;
+	for (count = 0; readdir(fddir) != NULL; ++count)
+		;
+	closedir(fddir);
+	*pdwHandleCount = (DWORD)count;
+	return TRUE;
+}
+
+INTERN HANDLE WINAPI libk32_GetCurrentProcess(VOID) {
+	return NTHANDLE_FROMFD(AT_THIS_PROCESS);
+}
+
+INTERN HANDLE WINAPI libk32_GetCurrentThread(VOID) {
+	return NTHANDLE_FROMFD(AT_THIS_TASK);
+}
+
+
 
 /************************************************************************/
 /* SIMPLE PROC/THREAD CONTROL                                           */
@@ -48,6 +185,7 @@ DEFINE_PUBLIC_ALIAS(GetCurrentProcessId, libk32_GetCurrentProcessId);
 DEFINE_PUBLIC_ALIAS(GetCurrentThreadId, libk32_GetCurrentThreadId);
 DEFINE_PUBLIC_ALIAS(IsProcessorFeaturePresent, libk32_IsProcessorFeaturePresent);
 DEFINE_PUBLIC_ALIAS(FlushProcessWriteBuffers, libk32_FlushProcessWriteBuffers);
+DEFINE_PUBLIC_ALIAS(FlushInstructionCache, libk32_FlushInstructionCache);
 
 INTERN DECLSPEC_NORETURN VOID WINAPI
 libk32_ExitThread(DWORD dwExitCode) {
@@ -102,6 +240,19 @@ INTERN VOID WINAPI
 libk32_FlushProcessWriteBuffers(VOID) {
 	syslog(LOG_WARNING, "[k32] Not implemented: FlushProcessWriteBuffers()\n");
 }
+
+INTERN WINBOOL WINAPI
+libk32_FlushInstructionCache(HANDLE hProcess, LPCVOID lpBaseAddress, SIZE_T dwSize) {
+	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+		errno = EACCES;
+		return FALSE;
+	}
+	(void)lpBaseAddress;
+	(void)dwSize;
+	__flush_instruction_cache();
+	return TRUE;
+}
+
 
 
 

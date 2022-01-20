@@ -47,5 +47,6 @@
 /*      TASK_IOC_            _IO_KOS('p', 0x0d, ...)            * ... */
 /*      TASK_IOC_            _IO_KOS('p', 0x0e, ...)            * ... */
 /*      TASK_IOC_            _IO_KOS('p', 0x0f, ...)            * ... */
+#define TASK_IOC_EXITCODE   _IOR_KOS('p', 0x10, union wait)    /* Throws `E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED' when still running. */
 
 #endif /* !_KOS_IOCTL_TASK_H */

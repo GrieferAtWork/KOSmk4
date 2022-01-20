@@ -22,7 +22,7 @@
 
 #include "api.h"
 
-#include <nt/handle.h>
+#include <nt/handleapi.h>
 #include <nt/startup.h>
 
 #include <string.h>
