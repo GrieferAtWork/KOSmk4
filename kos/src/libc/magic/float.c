@@ -140,7 +140,16 @@ __SYSDECL_BEGIN
 #ifdef __LDBL_MIN__
 #define LDBL_MIN         __LDBL_MIN__
 #endif /* __LDBL_MIN__ */
-#define FLT_ROUNDS       1
+
+#ifndef FLT_ROUNDS
+}
+%[insert:pp_if($crt_has_function(__fpe_flt_rounds))]
+%#define FLT_ROUNDS __fpe_flt_rounds()
+%[insert:pp_else]
+%#define FLT_ROUNDS 1
+%[insert:pp_endif]
+%{
+#endif /* !FLT_ROUNDS */
 
 #if defined(__USE_ISOC99) || defined(__USE_ISOCXX11)
 #ifdef __FLT_EVAL_METHOD__
@@ -396,6 +405,13 @@ double _chgsign(double x) {
 @@@return: * : Set of `_FPCLASS_*'
 [[const, wunused, nothrow]]
 int _fpclass(double x);
+
+
+[[const, wunused, nothrow]]
+int __fpe_flt_rounds(void) {
+	return 1;
+}
+
 
 %#if defined(__x86_64__) || defined(__i386__)
 %[insert:function(_scalbf = scalbf)]

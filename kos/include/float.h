@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ceb4df2 */
+/* HASH CRC-32:0x77897c9d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,7 +148,14 @@ __SYSDECL_BEGIN
 #ifdef __LDBL_MIN__
 #define LDBL_MIN         __LDBL_MIN__
 #endif /* __LDBL_MIN__ */
-#define FLT_ROUNDS       1
+
+#ifndef FLT_ROUNDS
+#ifdef __CRT_HAVE___fpe_flt_rounds
+#define FLT_ROUNDS __fpe_flt_rounds()
+#else /* __CRT_HAVE___fpe_flt_rounds */
+#define FLT_ROUNDS 1
+#endif /* !__CRT_HAVE___fpe_flt_rounds */
+#endif /* !FLT_ROUNDS */
 
 #if defined(__USE_ISOC99) || defined(__USE_ISOCXX11)
 #ifdef __FLT_EVAL_METHOD__
@@ -493,6 +500,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCC
 #endif /* !... */
 /* @return: * : Set of `_FPCLASS_*' */
 __CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_fpclass,(double __x),(__x))
+#ifdef __CRT_HAVE___fpe_flt_rounds
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpe_flt_rounds,(void),())
+#else /* __CRT_HAVE___fpe_flt_rounds */
+#include <libc/local/float/__fpe_flt_rounds.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fpe_flt_rounds, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpe_flt_rounds)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpe_flt_rounds))(); })
+#endif /* !__CRT_HAVE___fpe_flt_rounds */
 #if defined(__x86_64__) || defined(__i386__)
 #if __has_builtin(__builtin_scalbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbf)
 /* Return `x' times (2 to the Nth power) */

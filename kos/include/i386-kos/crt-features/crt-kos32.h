@@ -474,6 +474,7 @@
 #define __CRT_HAVE___fpclassify
 #define __CRT_HAVE___fpclassifyf
 #define __CRT_HAVE___fpclassifyl
+#define __CRT_HAVE___fpe_flt_rounds
 #define __CRT_HAVE___fpecode
 #define __CRT_HAVE___fpending
 #define __CRT_HAVE___fpu_control

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76778d9 */
+/* HASH CRC-32:0xf476db9c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3336,6 +3336,7 @@
 #define __CRT_HAVE___fpclassify
 #define __CRT_HAVE___fpclassifyf
 #define __CRT_HAVE___fpclassifyl
+#define __CRT_HAVE___fpe_flt_rounds
 #define __CRT_HAVE___fpecode
 #define __CRT_HAVE___fpending
 #define __CRT_HAVE___fpurge

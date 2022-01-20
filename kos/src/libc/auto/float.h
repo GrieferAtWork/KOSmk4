@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa7e7bb5 */
+/* HASH CRC-32:0x7e68e174 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,9 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc__chgsign)(double x);
 /* @return: * : Set of `_FPCLASS_*' */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__fpclass)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpe_flt_rounds)(void);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

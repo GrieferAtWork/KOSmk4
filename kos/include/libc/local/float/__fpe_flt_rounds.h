@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf74ad4c5 */
+/* HASH CRC-32:0xe542a5ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,32 +18,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_FLOAT_C
-#define GUARD_LIBC_AUTO_FLOAT_C 1
-
-#include "../api.h"
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include "../user/float.h"
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED double
-NOTHROW(LIBCCALL libc__chgsign)(double x) {
-	return -x;
-}
-INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc___fpe_flt_rounds)(void) {
+#ifndef __local___fpe_flt_rounds_defined
+#define __local___fpe_flt_rounds_defined
+#include <__crt.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__fpe_flt_rounds) __ATTR_CONST __ATTR_WUNUSED int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpe_flt_rounds))(void) {
 	return 1;
 }
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_chgsign, libc__chgsign);
-DEFINE_PUBLIC_ALIAS(__fpe_flt_rounds, libc___fpe_flt_rounds);
-#endif /* !__KERNEL__ */
-
-#endif /* !GUARD_LIBC_AUTO_FLOAT_C */
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep___fpe_flt_rounds_defined
+#define __local___localdep___fpe_flt_rounds_defined
+#define __localdep___fpe_flt_rounds __LIBC_LOCAL_NAME(__fpe_flt_rounds)
+#endif /* !__local___localdep___fpe_flt_rounds_defined */
+#endif /* !__local___fpe_flt_rounds_defined */
