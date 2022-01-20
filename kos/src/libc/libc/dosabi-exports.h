@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaddc7fba */
+/* HASH CRC-32:0x649624f6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -950,19 +950,10 @@ DEFINE_PUBLIC_ALIAS(DOS$__scalbf, libd_scalbf);
 DEFINE_PUBLIC_ALIAS(DOS$scalbf, libd_scalbf);
 DEFINE_PUBLIC_ALIAS(DOS$__scalbl, libd_scalbl);
 DEFINE_PUBLIC_ALIAS(DOS$scalbl, libd_scalbl);
-DEFINE_PUBLIC_ALIAS(DOS$fpclassify, libd___fpclassify);
-DEFINE_PUBLIC_ALIAS(DOS$_dclass, libd___fpclassify);
-DEFINE_PUBLIC_ALIAS(DOS$__fpclassify, libd___fpclassify);
 DEFINE_PUBLIC_ALIAS(DOS$_dsign, libd___signbit);
 DEFINE_PUBLIC_ALIAS(DOS$__signbit, libd___signbit);
-DEFINE_PUBLIC_ALIAS(DOS$fpclassifyf, libd___fpclassifyf);
-DEFINE_PUBLIC_ALIAS(DOS$_fdclass, libd___fpclassifyf);
-DEFINE_PUBLIC_ALIAS(DOS$__fpclassifyf, libd___fpclassifyf);
 DEFINE_PUBLIC_ALIAS(DOS$_fdsign, libd___signbitf);
 DEFINE_PUBLIC_ALIAS(DOS$__signbitf, libd___signbitf);
-DEFINE_PUBLIC_ALIAS(DOS$fpclassifyl, libd___fpclassifyl);
-DEFINE_PUBLIC_ALIAS(DOS$_ldclass, libd___fpclassifyl);
-DEFINE_PUBLIC_ALIAS(DOS$__fpclassifyl, libd___fpclassifyl);
 DEFINE_PUBLIC_ALIAS(DOS$_ldsign, libd___signbitl);
 DEFINE_PUBLIC_ALIAS(DOS$__signbitl, libd___signbitl);
 DEFINE_PUBLIC_ALIAS(DOS$issignaling, libd___issignaling);

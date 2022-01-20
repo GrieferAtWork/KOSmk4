@@ -612,9 +612,9 @@ __do_wchar:;
 				if (__flags & __PRINTF_F_FIXBUF)
 					__string_length = __precision;
 				else if (__flags & __PRINTF_F_HASPREC)
-					__string_length = __libc_c32snlen((__CHAR32_TYPE__ const *)__string, __precision);
+					__string_length = __libc_c32nlen((__CHAR32_TYPE__ const *)__string, __precision);
 				else {
-					__string_length = __libc_c32slen((__CHAR32_TYPE__ const *)__string);
+					__string_length = __libc_c32len((__CHAR32_TYPE__ const *)__string);
 				}
 				__string_width = __string_length;
 				if (__width != 0) {
@@ -688,9 +688,9 @@ __do_wchar:;
 				if (__flags & __PRINTF_F_FIXBUF)
 					__string_length = __precision;
 				else if (__flags & __PRINTF_F_HASPREC)
-					__string_length = __libc_c16snlen((__CHAR16_TYPE__ const *)__string, __precision);
+					__string_length = __libc_c16nlen((__CHAR16_TYPE__ const *)__string, __precision);
 				else {
-					__string_length = __libc_c16slen((__CHAR16_TYPE__ const *)__string);
+					__string_length = __libc_c16len((__CHAR16_TYPE__ const *)__string);
 				}
 				__string_width = __string_length;
 				if (__width != 0) {
@@ -839,15 +839,15 @@ __do_wchar:;
 		}
 #elif __CHAR_SIZE == 2
 		else if (__flags & __PRINTF_F_HASPREC)
-			__string_length = __libc_c16snlen((__CHAR16_TYPE__ *)__string, __precision);
+			__string_length = __libc_c16nlen((__CHAR16_TYPE__ *)__string, __precision);
 		else {
-			__string_length = __libc_c16slen((__CHAR16_TYPE__ *)__string);
+			__string_length = __libc_c16len((__CHAR16_TYPE__ *)__string);
 		}
 #else
 		else if (__flags & __PRINTF_F_HASPREC)
-			__string_length = __libc_c32snlen((__CHAR32_TYPE__ *)__string, __precision);
+			__string_length = __libc_c32nlen((__CHAR32_TYPE__ *)__string, __precision);
 		else {
-			__string_length = __libc_c32slen((__CHAR32_TYPE__ *)__string);
+			__string_length = __libc_c32len((__CHAR32_TYPE__ *)__string);
 		}
 #endif
 print_string:

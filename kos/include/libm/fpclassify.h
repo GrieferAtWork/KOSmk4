@@ -25,7 +25,7 @@
 #ifndef __NO_FPU
 #include <hybrid/typecore.h>
 
-#include <asm/fp_type.h>
+#include <asm/crt/fp_type.h>
 #include <bits/types.h>
 
 #include <libm/fdlibm.h>

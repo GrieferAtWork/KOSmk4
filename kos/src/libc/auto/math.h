@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8aff3a4c */
+/* HASH CRC-32:0x1006d4ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1509,11 +1509,7 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_scalbl)(__LONGDOUBLE x, __LONG
 #ifndef __KERNEL__
 /* Return `x' times (2 to the Nth power) */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x, __LONGDOUBLE fn);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___fpclassify)(double x);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassify)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -1521,24 +1517,16 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___signbit)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbit)(double x);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___fpclassifyf)(float x);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassifyf)(float x);
+INTDEF int NOTHROW_NCX(LIBDCALL libd___fpclassifyf)(float x);
+INTDEF int NOTHROW_NCX(LIBCCALL libc___fpclassifyf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___signbitf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitf)(float x);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x);
+INTDEF int NOTHROW_NCX(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x);
+INTDEF int NOTHROW_NCX(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___signbitl)(__LONGDOUBLE x);
@@ -1563,6 +1551,12 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___issignalingl)(__LONGDOUBLE
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x);
+INTDEF WUNUSED short NOTHROW_NCX(LIBDCALL libd__dtest)(double *px);
+INTDEF WUNUSED short NOTHROW_NCX(LIBCCALL libc__dtest)(double *px);
+INTDEF WUNUSED short NOTHROW_NCX(LIBDCALL libd__fdtest)(float *px);
+INTDEF WUNUSED short NOTHROW_NCX(LIBCCALL libc__fdtest)(float *px);
+INTDEF WUNUSED short NOTHROW_NCX(LIBDCALL libd__ldtest)(__LONGDOUBLE *px);
+INTDEF WUNUSED short NOTHROW_NCX(LIBCCALL libc__ldtest)(__LONGDOUBLE *px);
 #endif /* !__KERNEL__ */
 
 DECL_END

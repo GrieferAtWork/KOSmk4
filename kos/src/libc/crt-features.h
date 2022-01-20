@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3136e8e5 */
+/* HASH CRC-32:0x76778d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,9 +41,13 @@
 #define __CRT_HAVE_DOS$__control87_2
 #define __CRT_HAVE_DOS$__fbufsize
 #define __CRT_HAVE_DOS$__flbf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$__fpclassify
 #define __CRT_HAVE_DOS$__fpclassifyf
 #define __CRT_HAVE_DOS$__fpclassifyl
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$__fpending
 #define __CRT_HAVE_DOS$__fpurge
 #define __CRT_HAVE_DOS$__freadable
@@ -194,11 +198,21 @@
 #define __CRT_HAVE_DOS$_control87
 #define __CRT_HAVE_DOS$_controlfp
 #define __CRT_HAVE_DOS$_controlfp_s
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_dtest
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_dupenv_s
 #define __CRT_HAVE_DOS$_ecvt_s
 #define __CRT_HAVE_DOS$_endthreadex
 #define __CRT_HAVE_DOS$_eof
 #define __CRT_HAVE_DOS$_fcvt_s
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_fdtest
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_filbuf
 #define __CRT_HAVE_DOS$_filelength
 #define __CRT_HAVE_DOS$_filelengthi64
@@ -285,6 +299,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_itow
 #define __CRT_HAVE_DOS$_itow_s
+#define __CRT_HAVE_DOS$_ldtest
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_lfind_s
@@ -3490,6 +3505,7 @@
 #define __CRT_HAVE__control87
 #define __CRT_HAVE__controlfp
 #define __CRT_HAVE__controlfp_s
+#define __CRT_HAVE__dtest
 #define __CRT_HAVE__dupenv_s
 #define __CRT_HAVE__dupenv_s_dbg
 #define __CRT_HAVE__ecvt_s
@@ -3503,6 +3519,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE__expand_dbg
 #define __CRT_HAVE__fcvt_s
+#define __CRT_HAVE__fdtest
 #define __CRT_HAVE__filbuf
 #define __CRT_HAVE__filelength
 #define __CRT_HAVE__filelengthi64
@@ -3579,6 +3596,7 @@
 #define __CRT_HAVE__itoa_upper_digits
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
+#define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__lrotl

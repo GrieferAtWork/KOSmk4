@@ -20,12 +20,24 @@
 #ifndef _ASM_FP_TYPE_H
 #define _ASM_FP_TYPE_H 1
 
-#include <__stdinc.h>
+#include <__crt.h>
+
+#ifdef __CRT_DOS_PRIMARY
+
+#define __FP_NAN       2
+#define __FP_INFINITE  1
+#define __FP_ZERO      0
+#define __FP_SUBNORMAL (-2)
+#define __FP_NORMAL    (-1)
+
+#else /* __CRT_DOS_PRIMARY */
 
 #define __FP_NAN       0 /* ... */
 #define __FP_INFINITE  1 /* ... */
 #define __FP_ZERO      2 /* ... */
 #define __FP_SUBNORMAL 3 /* ... */
 #define __FP_NORMAL    4 /* ... */
+
+#endif /* !__CRT_DOS_PRIMARY */
 
 #endif /* !_ASM_FP_TYPE_H */

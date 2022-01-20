@@ -1188,6 +1188,7 @@
 #define __CRT_HAVE__controlfp_s
 #define __CRT_HAVE__copysign
 #define __CRT_HAVE__dosmaperr
+#define __CRT_HAVE__dtest
 #define __CRT_HAVE__dupenv_s
 #define __CRT_HAVE__dupenv_s_dbg
 #define __CRT_HAVE__ecvt_s
@@ -1203,6 +1204,7 @@
 #define __CRT_HAVE__exit
 #define __CRT_HAVE__expand_dbg
 #define __CRT_HAVE__fcvt_s
+#define __CRT_HAVE__fdtest
 #define __CRT_HAVE__filbuf
 #define __CRT_HAVE__filelength
 #define __CRT_HAVE__filelengthi64
@@ -1299,6 +1301,7 @@
 #define __CRT_HAVE__itoa_upper_digits
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
+#define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__longjmp
@@ -5798,6 +5801,7 @@
 #define __CRT_HAVE__dclass
 #define __CRT_HAVE__difftime64
 #define __CRT_HAVE__dsign
+#define __CRT_HAVE_KOS$_dtest
 #define __CRT_HAVE__dup
 #define __CRT_HAVE__dup2
 #define __CRT_HAVE_KOS$_dupenv_s
@@ -5827,6 +5831,7 @@
 #define __CRT_HAVE__fdclass
 #define __CRT_HAVE__fdopen
 #define __CRT_HAVE__fdsign
+#define __CRT_HAVE_KOS$_fdtest
 #define __CRT_HAVE__fflush_nolock
 #define __CRT_HAVE__fgetwc_nolock
 #define __CRT_HAVE__fgetwchar
@@ -5942,6 +5947,7 @@
 #define __CRT_HAVE_KOS$_itow_s
 #define __CRT_HAVE__ldclass
 #define __CRT_HAVE__ldsign
+#define __CRT_HAVE_KOS$_ldtest
 #define __CRT_HAVE__lfind
 #define __CRT_HAVE_KOS$_lfind_s
 #define __CRT_HAVE_KOS$_loaddll
@@ -9476,6 +9482,7 @@
 #define __CRT_HAVE_DOS$_dclass
 #define __CRT_HAVE_DOS$_difftime64
 #define __CRT_HAVE_DOS$_dsign
+#define __CRT_HAVE_DOS$_dtest
 #define __CRT_HAVE_DOS$_dup
 #define __CRT_HAVE_DOS$_dup2
 #define __CRT_HAVE_DOS$_dupenv_s
@@ -9505,6 +9512,7 @@
 #define __CRT_HAVE_DOS$_fdclass
 #define __CRT_HAVE_DOS$_fdopen
 #define __CRT_HAVE_DOS$_fdsign
+#define __CRT_HAVE_DOS$_fdtest
 #define __CRT_HAVE_DOS$_fflush_nolock
 #define __CRT_HAVE_DOS$_fgetwc_nolock
 #define __CRT_HAVE_DOS$_fgetwchar
@@ -9620,6 +9628,7 @@
 #define __CRT_HAVE_DOS$_itow_s
 #define __CRT_HAVE_DOS$_ldclass
 #define __CRT_HAVE_DOS$_ldsign
+#define __CRT_HAVE_DOS$_ldtest
 #define __CRT_HAVE_DOS$_lfind
 #define __CRT_HAVE_DOS$_lfind_s
 #define __CRT_HAVE_DOS$_loaddll

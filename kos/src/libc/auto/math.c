@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5320dc04 */
+/* HASH CRC-32:0xb6aab531 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 
 DECL_BEGIN
 
+#include "../libc/dos-compat.h"
 #ifndef __KERNEL__
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -2288,6 +2289,8 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 	return (__LONGDOUBLE)libc_scalb((double)x, (double)fn);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd___fpclassify)(double x) { return fptype_kos2dos(libc___fpclassify(x)); }
 #include <libm/fpclassify.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___fpclassify)(double x) {
@@ -2312,9 +2315,11 @@ NOTHROW(LIBCCALL libc___signbit)(double x) {
 	return x < 0.0;
 #endif /* !... */
 }
+INTERN ATTR_SECTION(".text.crt.dos.math.math") int
+NOTHROW_NCX(LIBDCALL libd___fpclassifyf)(float x) { return fptype_kos2dos(libc___fpclassifyf(x)); }
 #include <libm/fpclassify.h>
-INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc___fpclassifyf)(float x) {
+INTERN ATTR_SECTION(".text.crt.math.math") int
+NOTHROW_NCX(LIBCCALL libc___fpclassifyf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 
@@ -2343,9 +2348,11 @@ NOTHROW(LIBCCALL libc___signbitf)(float x) {
 	return x < 0.0f;
 #endif /* !... */
 }
+INTERN ATTR_SECTION(".text.crt.dos.math.math") int
+NOTHROW_NCX(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x) { return fptype_kos2dos(libc___fpclassifyl(x)); }
 #include <libm/fpclassify.h>
-INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
+INTERN ATTR_SECTION(".text.crt.math.math") int
+NOTHROW_NCX(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 
 
@@ -2420,6 +2427,30 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return libc___issignaling((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+}
+INTERN ATTR_SECTION(".text.crt.dos.math.math") WUNUSED short
+NOTHROW_NCX(LIBDCALL libd__dtest)(double *px) {
+	return libd___fpclassify(*px);
+}
+INTERN ATTR_SECTION(".text.crt.dos.math.math") WUNUSED short
+NOTHROW_NCX(LIBCCALL libc__dtest)(double *px) {
+	return libc___fpclassify(*px);
+}
+INTERN ATTR_SECTION(".text.crt.dos.math.math") WUNUSED short
+NOTHROW_NCX(LIBDCALL libd__fdtest)(float *px) {
+	return libd___fpclassifyf(*px);
+}
+INTERN ATTR_SECTION(".text.crt.dos.math.math") WUNUSED short
+NOTHROW_NCX(LIBCCALL libc__fdtest)(float *px) {
+	return libc___fpclassifyf(*px);
+}
+INTERN ATTR_SECTION(".text.crt.dos.math.math") WUNUSED short
+NOTHROW_NCX(LIBDCALL libd__ldtest)(__LONGDOUBLE *px) {
+	return libd___fpclassifyl(*px);
+}
+INTERN ATTR_SECTION(".text.crt.dos.math.math") WUNUSED short
+NOTHROW_NCX(LIBCCALL libc__ldtest)(__LONGDOUBLE *px) {
+	return libc___fpclassifyl(*px);
 }
 #endif /* !__KERNEL__ */
 
@@ -2822,6 +2853,9 @@ DEFINE_PUBLIC_ALIAS(__scalbf, libc_scalbf);
 DEFINE_PUBLIC_ALIAS(scalbf, libc_scalbf);
 DEFINE_PUBLIC_ALIAS(__scalbl, libc_scalbl);
 DEFINE_PUBLIC_ALIAS(scalbl, libc_scalbl);
+DEFINE_PUBLIC_ALIAS(DOS$fpclassify, libd___fpclassify);
+DEFINE_PUBLIC_ALIAS(DOS$_dclass, libd___fpclassify);
+DEFINE_PUBLIC_ALIAS(DOS$__fpclassify, libd___fpclassify);
 DEFINE_PUBLIC_ALIAS(fpclassify, libc___fpclassify);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_dclass, libc___fpclassify);
@@ -2831,6 +2865,9 @@ DEFINE_PUBLIC_ALIAS(__fpclassify, libc___fpclassify);
 DEFINE_PUBLIC_ALIAS(_dsign, libc___signbit);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__signbit, libc___signbit);
+DEFINE_PUBLIC_ALIAS(DOS$fpclassifyf, libd___fpclassifyf);
+DEFINE_PUBLIC_ALIAS(DOS$_fdclass, libd___fpclassifyf);
+DEFINE_PUBLIC_ALIAS(DOS$__fpclassifyf, libd___fpclassifyf);
 DEFINE_PUBLIC_ALIAS(fpclassifyf, libc___fpclassifyf);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fdclass, libc___fpclassifyf);
@@ -2840,6 +2877,9 @@ DEFINE_PUBLIC_ALIAS(__fpclassifyf, libc___fpclassifyf);
 DEFINE_PUBLIC_ALIAS(_fdsign, libc___signbitf);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__signbitf, libc___signbitf);
+DEFINE_PUBLIC_ALIAS(DOS$fpclassifyl, libd___fpclassifyl);
+DEFINE_PUBLIC_ALIAS(DOS$_ldclass, libd___fpclassifyl);
+DEFINE_PUBLIC_ALIAS(DOS$__fpclassifyl, libd___fpclassifyl);
 DEFINE_PUBLIC_ALIAS(fpclassifyl, libc___fpclassifyl);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_ldclass, libc___fpclassifyl);
@@ -2855,6 +2895,12 @@ DEFINE_PUBLIC_ALIAS(issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(__issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(issignalingl, libc___issignalingl);
 DEFINE_PUBLIC_ALIAS(__issignalingl, libc___issignalingl);
+DEFINE_PUBLIC_ALIAS(DOS$_dtest, libd__dtest);
+DEFINE_PUBLIC_ALIAS(_dtest, libc__dtest);
+DEFINE_PUBLIC_ALIAS(DOS$_fdtest, libd__fdtest);
+DEFINE_PUBLIC_ALIAS(_fdtest, libc__fdtest);
+DEFINE_PUBLIC_ALIAS(DOS$_ldtest, libd__ldtest);
+DEFINE_PUBLIC_ALIAS(_ldtest, libc__ldtest);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_MATH_C */

@@ -34,7 +34,7 @@
 #include <libm/frexp.h>
 #include <libm/ldexp.h>
 #include <libm/fpclassify.h>
-#include <asm/fp_type.h>
+#include <asm/crt/fp_type.h>
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 #ifdef __CC__

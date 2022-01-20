@@ -1206,6 +1206,7 @@
 #define __CRT_HAVE__difftime64
 #define __CRT_HAVE__dosmaperr
 #define __CRT_HAVE__dsign
+#define __CRT_HAVE__dtest
 #define __CRT_HAVE__dup
 #define __CRT_HAVE__dup2
 #define __CRT_HAVE__dupenv_s
@@ -1239,6 +1240,7 @@
 #define __CRT_HAVE__fdclass
 #define __CRT_HAVE__fdopen
 #define __CRT_HAVE__fdsign
+#define __CRT_HAVE__fdtest
 #define __CRT_HAVE__fflush_nolock
 #define __CRT_HAVE__fgetchar
 #define __CRT_HAVE__filbuf
@@ -1375,6 +1377,7 @@
 #define __CRT_HAVE__itow_s
 #define __CRT_HAVE__ldclass
 #define __CRT_HAVE__ldsign
+#define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind
 #define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
@@ -5353,6 +5356,9 @@
 #define __CRT_HAVE_KOS$__creat
 #define __CRT_HAVE_KOS$__daylight
 #define __CRT_HAVE_KOS$__errno
+#define __CRT_HAVE_KOS$__fpclassify
+#define __CRT_HAVE_KOS$__fpclassifyf
+#define __CRT_HAVE_KOS$__fpclassifyl
 #define __CRT_HAVE___getmainargs
 #define __CRT_HAVE_KOS$__iswalnum_l
 #define __CRT_HAVE_KOS$__iswalpha_l
@@ -5446,12 +5452,16 @@
 #define __CRT_HAVE_KOS$_chmod
 #define __CRT_HAVE__commode
 #define __CRT_HAVE__creat
+#define __CRT_HAVE_KOS$_dclass
+#define __CRT_HAVE_KOS$_dtest
 #define __CRT_HAVE_KOS$_errno
 #define __CRT_HAVE__except_handler2
 #define __CRT_HAVE__except_handler3
 #define __CRT_HAVE__except_handler4
 #define __CRT_HAVE__except_handler4_common
 #define __CRT_HAVE__except_handler_3
+#define __CRT_HAVE_KOS$_fdclass
+#define __CRT_HAVE_KOS$_fdtest
 #define __CRT_HAVE__fgetwc_nolock
 #define __CRT_HAVE__fgetwchar
 #define __CRT_HAVE__fgetws_nolock
@@ -5496,6 +5506,8 @@
 #define __CRT_HAVE_KOS$_iswxdigit_l
 #define __CRT_HAVE_KOS$_itow
 #define __CRT_HAVE_KOS$_itow_s
+#define __CRT_HAVE_KOS$_ldclass
+#define __CRT_HAVE_KOS$_ldtest
 #define __CRT_HAVE__lock
 #define __CRT_HAVE_KOS$_ltow
 #define __CRT_HAVE_KOS$_ltow_s
@@ -5728,6 +5740,9 @@
 #define __CRT_HAVE_KOS$format_wto32
 #define __CRT_HAVE_KOS$format_wto8
 #define __CRT_HAVE_KOS$format_wwidth
+#define __CRT_HAVE_KOS$fpclassify
+#define __CRT_HAVE_KOS$fpclassifyf
+#define __CRT_HAVE_KOS$fpclassifyl
 #define __CRT_HAVE_KOS$fputwc
 #define __CRT_HAVE_KOS$fputwc_unlocked
 #define __CRT_HAVE_KOS$fputws
@@ -6089,6 +6104,9 @@
 #define __CRT_HAVE_DOS$__creat
 #define __CRT_HAVE_DOS$__daylight
 #define __CRT_HAVE_DOS$__errno
+#define __CRT_HAVE_DOS$__fpclassify
+#define __CRT_HAVE_DOS$__fpclassifyf
+#define __CRT_HAVE_DOS$__fpclassifyl
 #define __CRT_HAVE_DOS$__getmainargs
 #define __CRT_HAVE_DOS$__iswalnum_l
 #define __CRT_HAVE_DOS$__iswalpha_l
@@ -6182,12 +6200,16 @@
 #define __CRT_HAVE_DOS$_chmod
 #define __CRT_HAVE_DOS$_commode
 #define __CRT_HAVE_DOS$_creat
+#define __CRT_HAVE_DOS$_dclass
+#define __CRT_HAVE_DOS$_dtest
 #define __CRT_HAVE_DOS$_errno
 #define __CRT_HAVE_DOS$_except_handler2
 #define __CRT_HAVE_DOS$_except_handler3
 #define __CRT_HAVE_DOS$_except_handler4
 #define __CRT_HAVE_DOS$_except_handler4_common
 #define __CRT_HAVE_DOS$_except_handler_3
+#define __CRT_HAVE_DOS$_fdclass
+#define __CRT_HAVE_DOS$_fdtest
 #define __CRT_HAVE_DOS$_fgetwc_nolock
 #define __CRT_HAVE_DOS$_fgetwchar
 #define __CRT_HAVE_DOS$_fgetws_nolock
@@ -6232,6 +6254,8 @@
 #define __CRT_HAVE_DOS$_iswxdigit_l
 #define __CRT_HAVE_DOS$_itow
 #define __CRT_HAVE_DOS$_itow_s
+#define __CRT_HAVE_DOS$_ldclass
+#define __CRT_HAVE_DOS$_ldtest
 #define __CRT_HAVE_DOS$_lock
 #define __CRT_HAVE_DOS$_ltow
 #define __CRT_HAVE_DOS$_ltow_s
@@ -6464,6 +6488,9 @@
 #define __CRT_HAVE_DOS$format_wto32
 #define __CRT_HAVE_DOS$format_wto8
 #define __CRT_HAVE_DOS$format_wwidth
+#define __CRT_HAVE_DOS$fpclassify
+#define __CRT_HAVE_DOS$fpclassifyf
+#define __CRT_HAVE_DOS$fpclassifyl
 #define __CRT_HAVE_DOS$fputwc
 #define __CRT_HAVE_DOS$fputwc_unlocked
 #define __CRT_HAVE_DOS$fputws

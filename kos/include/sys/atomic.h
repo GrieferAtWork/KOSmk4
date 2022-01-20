@@ -189,9 +189,16 @@
 	__hybrid_atomic_cmpxch_val((*__SIZE_TYPE__ *)__COMPILER_REQTYPE(__SIZE_TYPE__ *)(p), \
 	                           (__SIZE_TYPE__)(oldval), (__SIZE_TYPE__)(newval),         \
 	                           __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define __atomic_add(p, val)                                                           \
-	__hybrid_atomic_fetchadd((*__SIZE_TYPE__ *)__COMPILER_REQTYPE(__SIZE_TYPE__ *)(p), \
-	                         (__SIZE_TYPE__)(val), __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#ifdef __CC__
+__DECL_BEGIN
+
+/* Can't use a macro for this one because libstdc++ has internal functions called `__atomic_add' */
+__FORCELOCAL __SIZE_TYPE__ (__atomic_add)(__SIZE_TYPE__ *__p, __SIZE_TYPE__ __val) {
+	return __hybrid_atomic_fetchadd(*__p, __val, __ATOMIC_SEQ_CST);
+}
+
+__DECL_END
+#endif /* !__CC__ */
 
 
 #endif /* !_SYS_ATOMIC_H */

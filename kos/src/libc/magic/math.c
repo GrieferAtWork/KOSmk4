@@ -64,6 +64,10 @@
 %[define_double_replacement(__INFINITY = __INFINITYF, __INFINITYL)]
 %[define_double_replacement(__NAN = __NANF, __NANL)]
 
+%(auto_source){
+#include "../libc/dos-compat.h"
+}
+
 %(c, ccompat)#ifndef __NO_FPU
 %[insert:prefix(
 #include <features.h>
@@ -86,7 +90,7 @@
 )]%{
 
 #ifdef __USE_ISOC99
-#include <asm/fp_type.h>      /* __FP_NAN, __FP_INFINITE, ... */
+#include <asm/crt/fp_type.h>  /* __FP_NAN, __FP_INFINITE, ... */
 #include <bits/crt/mathdef.h> /* __FLT_EVAL_METHOD__, __FP_ILOGB0, __FP_ILOGBNAN */
 #endif /* __USE_ISOC99 */
 
@@ -1959,6 +1963,7 @@ double scalb(double x, double fn) {
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+[[crt_dos_variant({ impl:{ return fptype_kos2dos(libc___fpclassify(x)); }})]]
 int __fpclassify(double x) {
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
 	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
@@ -1986,12 +1991,21 @@ int __signbit(double x) {
 
 
 [[export_alias("fpclassifyf")]]
-[[dos_only_export_alias("_fdclass")]]       __fpclassifyf(*) %{generate(double2float("__fpclassify"))}
-[[dos_only_export_alias("_fdsign")]]        __signbitf(*) %{generate(double2float("__signbit"))}
+[[dos_only_export_alias("_fdclass")]]
+[[crt_dos_variant({ impl:{ return fptype_kos2dos(libc___fpclassifyf(x)); }})]]
+int __fpclassifyf(float x) %{generate(double2float("__fpclassify"))}
+
+[[dos_only_export_alias("_fdsign")]]
+__signbitf(*) %{generate(double2float("__signbit"))}
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[export_alias("fpclassifyl")]]
-[[dos_only_export_alias("_ldclass")]]       __fpclassifyl(*) %{generate(double2ldouble("__fpclassify"))}
-[[dos_only_export_alias("_ldsign")]]        __signbitl(*) %{generate(double2ldouble("__signbit"))}
+[[dos_only_export_alias("_ldclass")]]
+[[crt_dos_variant({ impl:{ return fptype_kos2dos(libc___fpclassifyl(x)); }})]]
+int __fpclassifyl(__LONGDOUBLE x) %{generate(double2ldouble("__fpclassify"))}
+
+[[dos_only_export_alias("_ldsign")]]
+__signbitl(*) %{generate(double2ldouble("__signbit"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
@@ -2021,7 +2035,7 @@ __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
-[[const, wunused, ignore, nocrt, alias("_dpcomp")]]
+[[ignore, nocrt, alias("_dpcomp"), const, wunused]]
 int _dpcomp(double x, double y) /* TODO */;
 
 [[ignore, nocrt, alias("_fdpcomp")]] _fdpcomp(*) %{generate(double2float("_dpcomp"))}
@@ -2642,6 +2656,40 @@ __CDECLARE(,int,__NOTHROW,matherr,(struct exception *__exc),(__exc))
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#ifdef __USE_DOS
+#if !defined(_INFCODE) && defined(__FP_INFINITE)
+#define _INFCODE __FP_INFINITE
+#endif /* !_INFCODE && __FP_INFINITE */
+#if !defined(_NANCODE) && defined(__FP_NAN)
+#define _NANCODE __FP_NAN
+#endif /* !_NANCODE && __FP_NAN */
+#if !defined(_FINITE) && defined(__FP_NORMAL)
+#define _FINITE  __FP_NORMAL
+#endif /* !_FINITE && __FP_NORMAL */
+#if !defined(_DENORM) && defined(__FP_SUBNORMAL)
+#define _DENORM  __FP_SUBNORMAL
+#endif /* !_DENORM && __FP_SUBNORMAL */
+
+#ifdef __CC__
+__SYSDECL_BEGIN
+}
+
+%[default:section(".text.crt.dos.math.math")]
+
+[[crt_dos_variant, wunused]]
+short _dtest(double *px) {
+	return __fpclassify(*px);
+}
+
+[[crt_dos_variant]] _fdtest(*) %{generate(double2float("_dtest"))}
+[[crt_dos_variant]] _ldtest(*) %{generate(double2ldouble("_dtest"))}
+
+
+%{
+__SYSDECL_END
+#endif /* __CC__ */
+#endif /* __USE_DOS */
 
 }
 %(c, ccompat)#endif /* !__NO_FPU */

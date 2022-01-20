@@ -3155,7 +3155,7 @@ class CrtDosVariantCustomMetadata: CrtDosVariantMetadata {
 		local dosProto = dosLibraryFunction.prototype;
 		if (dosProto !is FunctionPrototype) {
 			this.err("Indirect prototypes are not supported "
-			         "with [[crt_dos_variant({...})]] (see: {!r})"
+			         "with [[crt_dos_variant({{...}})]] (see: {!r})"
 				.format({ name }));
 		}
 
