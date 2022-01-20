@@ -37,6 +37,8 @@ __DECL_BEGIN
 /************************************************************************/
 /* INTER-PROCESS CONTROL                                                */
 /************************************************************************/
+WINBASEAPI WINBOOL WINAPI TerminateProcess(HANDLE hProcess, UINT uExitCode);
+WINBASEAPI WINBOOL WINAPI TerminateThread(HANDLE hThread, DWORD dwExitCode);
 WINBASEAPI HANDLE WINAPI OpenProcess(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwProcessId);
 WINBASEAPI WINBOOL WINAPI GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
 WINBASEAPI WINBOOL WINAPI GetExitCodeThread(HANDLE hThread, LPDWORD lpExitCode);

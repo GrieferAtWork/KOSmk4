@@ -53,6 +53,8 @@ DECL_BEGIN
 /************************************************************************/
 /* INTER-PROCESS CONTROL                                                */
 /************************************************************************/
+DEFINE_PUBLIC_ALIAS(TerminateProcess, libk32_TerminateProcess);
+DEFINE_PUBLIC_ALIAS(TerminateThread, libk32_TerminateThread);
 DEFINE_PUBLIC_ALIAS(OpenProcess, libk32_OpenProcess);
 DEFINE_PUBLIC_ALIAS(GetExitCodeProcess, libk32_GetExitCodeProcess);
 DEFINE_PUBLIC_ALIAS(GetExitCodeThread, libk32_GetExitCodeThread);
@@ -63,6 +65,23 @@ DEFINE_PUBLIC_ALIAS(GetProcessHandleCount, libk32_GetProcessHandleCount);
 DEFINE_PUBLIC_ALIAS(GetProcessIdOfThread, libk32_GetProcessIdOfThread);
 DEFINE_PUBLIC_ALIAS(GetCurrentProcess, libk32_GetCurrentProcess);
 DEFINE_PUBLIC_ALIAS(GetCurrentThread, libk32_GetCurrentThread);
+
+INTERN WINBOOL WINAPI
+libk32_TerminateProcess(HANDLE hProcess, UINT uExitCode) {
+	errno_t error;
+	(void)uExitCode;
+	if (!NTHANDLE_ISFD(hProcess)) {
+		errno = EBADF;
+		return FALSE;
+	}
+	error = sys_pidfd_send_signal(NTHANDLE_ASFD(hProcess), SIGKILL, NULL, 0);
+	if (E_ISOK(error))
+		return TRUE;
+	errno = -error;
+	return FALSE;
+}
+
+DEFINE_INTERN_ALIAS(libk32_TerminateThread, libk32_TerminateProcess);
 
 INTERN HANDLE WINAPI
 libk32_OpenProcess(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwProcessId) {

@@ -33,11 +33,19 @@
 DECL_BEGIN
 
 DEFINE_PUBLIC_ALIAS(SetUnhandledExceptionFilter, libk32_SetUnhandledExceptionFilter);
+DEFINE_PUBLIC_ALIAS(UnhandledExceptionFilter, libk32_UnhandledExceptionFilter);
 INTERN LPTOP_LEVEL_EXCEPTION_FILTER WINAPI
 libk32_SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter) {
 	syslog(LOG_WARNING, "NotImplemented: SetUnhandledExceptionFilter(%p)\n", lpTopLevelExceptionFilter);
 	return NULL;
 }
+
+INTERN LONG WINAPI
+libk32_UnhandledExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo) {
+	syslog(LOG_WARNING, "NotImplemented: UnhandledExceptionFilter(%p)\n", ExceptionInfo);
+	return 0;
+}
+
 
 
 /* Special functions exported by `libc.so' */
