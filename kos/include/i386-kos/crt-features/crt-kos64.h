@@ -5040,6 +5040,7 @@
 #define __CRT_HAVE_KOS$__acoshf
 #define __CRT_HAVE_KOS$__acoshl
 #define __CRT_HAVE_KOS$__acosl
+#define __CRT_HAVE___acrt_iob_func
 #define __CRT_HAVE_KOS$__adjtime
 #define __CRT_HAVE_KOS$__adjtimex
 #define __CRT_HAVE_KOS$__adjtimex64
@@ -5704,6 +5705,9 @@
 #define __CRT_HAVE_KOS$__uselocale
 #define __CRT_HAVE_KOS$__utime
 #define __CRT_HAVE_KOS$__utimes
+#define __CRT_HAVE___vcrt_GetModuleFileNameW
+#define __CRT_HAVE___vcrt_GetModuleHandleW
+#define __CRT_HAVE___vcrt_LoadLibraryExW
 #define __CRT_HAVE_KOS$__vfscanf
 #define __CRT_HAVE_KOS$__vsnprintf
 #define __CRT_HAVE_KOS$__vsscanf
@@ -8714,6 +8718,7 @@
 #define __CRT_HAVE_DOS$__acoshf
 #define __CRT_HAVE_DOS$__acoshl
 #define __CRT_HAVE_DOS$__acosl
+#define __CRT_HAVE_DOS$__acrt_iob_func
 #define __CRT_HAVE_DOS$__adjtime
 #define __CRT_HAVE_DOS$__adjtimex
 #define __CRT_HAVE_DOS$__adjtimex64
@@ -9378,6 +9383,9 @@
 #define __CRT_HAVE_DOS$__uselocale
 #define __CRT_HAVE_DOS$__utime
 #define __CRT_HAVE_DOS$__utimes
+#define __CRT_HAVE_DOS$__vcrt_GetModuleFileNameW
+#define __CRT_HAVE_DOS$__vcrt_GetModuleHandleW
+#define __CRT_HAVE_DOS$__vcrt_LoadLibraryExW
 #define __CRT_HAVE_DOS$__vfscanf
 #define __CRT_HAVE_DOS$__vsnprintf
 #define __CRT_HAVE_DOS$__vsscanf

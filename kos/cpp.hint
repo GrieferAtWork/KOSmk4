@@ -1491,6 +1491,7 @@
 #define VOID void
 #define __MINGW_TYPEDEF_AW(x) typedef x##A x;
 #define __MINGW_NAME_AW(x) x##A
+#define DECLARE_HANDLE(HMODULE) typedef void *HMODULE
 
 
 #define NCURSES_API

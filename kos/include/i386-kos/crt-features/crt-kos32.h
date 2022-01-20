@@ -1467,6 +1467,7 @@
 #define __CRT_HAVE__set_purecall_handler
 #define __CRT_HAVE__seterrormode
 #define __CRT_HAVE__setjmp
+#define __CRT_HAVE__setjmp3
 #define __CRT_HAVE__setjmpex
 #define __CRT_HAVE__setmaxstdio
 #define __CRT_HAVE__setmode
@@ -5343,6 +5344,7 @@
 #define __CRT_HAVE_KOS$_IO_fopen
 #define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE_KOS$__access
+#define __CRT_HAVE___acrt_iob_func
 #define __CRT_HAVE_KOS$__bsd_signal
 #define __CRT_HAVE_KOS$__chdir
 #define __CRT_HAVE_KOS$__chmod
@@ -5417,6 +5419,9 @@
 #define __CRT_HAVE_KOS$__truncate
 #define __CRT_HAVE_KOS$__tzname
 #define __CRT_HAVE_KOS$__unlink
+#define __CRT_HAVE___vcrt_GetModuleFileNameW
+#define __CRT_HAVE___vcrt_GetModuleHandleW
+#define __CRT_HAVE___vcrt_LoadLibraryExW
 #define __CRT_HAVE_KOS$__wcscasecmp_l
 #define __CRT_HAVE_KOS$__wcscoll_l
 #define __CRT_HAVE_KOS$__wcserror
@@ -6075,6 +6080,7 @@
 #define __CRT_HAVE_DOS$_IO_fopen
 #define __CRT_HAVE_DOS$_XcptFilter
 #define __CRT_HAVE_DOS$__access
+#define __CRT_HAVE_DOS$__acrt_iob_func
 #define __CRT_HAVE_DOS$__bsd_signal
 #define __CRT_HAVE_DOS$__chdir
 #define __CRT_HAVE_DOS$__chmod
@@ -6149,6 +6155,9 @@
 #define __CRT_HAVE_DOS$__truncate
 #define __CRT_HAVE_DOS$__tzname
 #define __CRT_HAVE_DOS$__unlink
+#define __CRT_HAVE_DOS$__vcrt_GetModuleFileNameW
+#define __CRT_HAVE_DOS$__vcrt_GetModuleHandleW
+#define __CRT_HAVE_DOS$__vcrt_LoadLibraryExW
 #define __CRT_HAVE_DOS$__wcscasecmp_l
 #define __CRT_HAVE_DOS$__wcscoll_l
 #define __CRT_HAVE_DOS$__wcserror

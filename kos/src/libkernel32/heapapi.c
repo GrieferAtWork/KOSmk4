@@ -27,6 +27,7 @@
 
 #include <kos/except.h>
 #include <kos/malloc.h>
+#include <kos/types.h>
 #include <nt/heapapi.h>
 
 #include <errno.h>
@@ -67,6 +68,8 @@ libk32_HeapValidate(HANDLE hHeap, DWORD dwFlags, LPCVOID lpMem) {
 
 INTERN WINBOOL WINAPI
 libk32_HeapSummary(HANDLE hHeap, DWORD dwFlags, LPHEAP_SUMMARY lpSummary) {
+	(void)hHeap;
+	(void)dwFlags;
 	if (lpSummary->cb != sizeof(*lpSummary)) {
 		errno = EINVAL;
 		return FALSE;
@@ -151,7 +154,7 @@ libk32_HeapAlloc(HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes) {
 	}
 	if (result && !(dwFlags & HEAP_ZERO_MEMORY)) {
 		size_t sz = malloc_usable_size(result);
-		bzero(result + dwBytes, sz - dwBytes);
+		bzero((byte_t *)result + dwBytes, sz - dwBytes);
 	}
 	return result;
 }
@@ -177,7 +180,7 @@ libk32_HeapReAlloc(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem, SIZE_T dwBytes) {
 	}
 	if (result && !(dwFlags & HEAP_ZERO_MEMORY)) {
 		size_t sz = malloc_usable_size(result);
-		bzero(result + dwBytes, sz - dwBytes);
+		bzero((byte_t *)result + dwBytes, sz - dwBytes);
 	}
 	return result;
 }

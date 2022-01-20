@@ -31,11 +31,15 @@
 
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
+#include <kos/exec/ifunc.h>
 #include <kos/exec/peb.h>
 #include <kos/malloc.h>
 #include <kos/syscalls.h>
 #include <linux/net.h>
 #include <nt/errhandlingapi.h>
+#include <nt/handleapi.h>
+#include <nt/libloaderapi.h>
+#include <nt/types.h>
 
 #include <elf.h>
 #include <format-printer.h>
@@ -1052,6 +1056,73 @@ libd__unlock(int locknum) {
 	CRT_UNIMPLEMENTEDF("DOS$_unlock(%d)", locknum);
 }
 
+
+/************************************************************************/
+/* New-style MSVC stdio-FILE access                                     */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(DOS$__acrt_iob_func, libd___acrt_iob_func);
+INTERN ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos") FILE *
+NOTHROW(LIBDCALL libd___acrt_iob_func)(unsigned int index) {
+	return &libc_iob[index];
+}
+
+
+
+/************************************************************************/
+/* KERNEL32 forwarders exported from libc                               */
+/************************************************************************/
+PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") void *libkernel32 = NULL;
+PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *LIBCCALL libd_getk32(void) {
+	void *k32 = ATOMIC_READ(libkernel32);
+	if (k32)
+		return k32;
+	k32 = dlopen("libkernel32.so", RTLD_LAZY | RTLD_LOCAL);
+	if (!k32) {
+		syslog(LOG_CRIT, "[libc] Failed to load 'libkernel32.so': %s\n", dlerror());
+		sys_exit_group(1);
+	}
+	if (!ATOMIC_CMPXCH(libkernel32, NULL, k32)) {
+		dlclose(k32);
+		k32 = ATOMIC_READ(libkernel32);
+	}
+	return k32;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *LIBCCALL
+libd_requirek32(char const *__restrict symbol_name) {
+	void *result = dlsym(libd_getk32(), symbol_name);
+	if (!result) {
+		char *msg = dlerror();
+		if (msg) {
+			syslog(LOG_CRIT, "[libc] Failed to load '%s' from 'libkernel32.so': %s\n",
+			       symbol_name, msg);
+			sys_exit_group(1);
+		}
+	}
+	return result;
+}
+
+#define DEFINE_KERNEL32_FORWARDER_FUNCTION(T_RETURN, cc, name, params, k32name, args) \
+	DEFINE_PUBLIC_ALIAS(DOS$##name, libd_##name);                                     \
+	INTERN ATTR_SECTION(".text.crt.dos.compat.dos")                                   \
+	T_RETURN cc libd_##name params {                                                  \
+		typedef T_RETURN(WINAPI *LPK32##name) params;                                 \
+		static LPK32##name pdynK32##name = NULL;                                      \
+		if (!pdynK32##name)                                                           \
+			*(void **)&pdynK32##name = libd_requirek32(k32name);                      \
+		return (*pdynK32##name) args;                                                 \
+	}
+
+DEFINE_KERNEL32_FORWARDER_FUNCTION(DWORD, LIBDCALL, __vcrt_GetModuleFileNameW,
+                                   (HMODULE hModule, LPWSTR lpFilename, DWORD nSize),
+                                   "GetModuleFileNameW", (hModule, lpFilename, nSize))
+DEFINE_KERNEL32_FORWARDER_FUNCTION(HMODULE, LIBDCALL, __vcrt_GetModuleHandleW,
+                                   (LPCWSTR lpFilename),
+                                   "GetModuleHandleW", (lpFilename))
+DEFINE_KERNEL32_FORWARDER_FUNCTION(HMODULE, LIBDCALL, __vcrt_LoadLibraryExW,
+                                   (LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags),
+                                   "LoadLibraryExW", (lpLibFileName, hFile, dwFlags))
+#undef DEFINE_KERNEL32_FORWARDER_FUNCTION
 
 DECL_END
 

@@ -65,6 +65,7 @@ END(libc_setjmp)
 DEFINE_PUBLIC_ALIAS(setjmp, libc_setjmp)
 DEFINE_PUBLIC_ALIAS(_setjmp, libc_setjmp)
 DEFINE_PUBLIC_ALIAS(__setjmp, libc_setjmp)
+DEFINE_PUBLIC_ALIAS(_setjmp3, libc_setjmp)
 
 
 .section .text.crt.utility.setjmp
