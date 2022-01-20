@@ -43,6 +43,7 @@ DEFINE_PUBLIC_ALIAS(GetNativeSystemInfo, libk32_GetNativeSystemInfo);
 DEFINE_PUBLIC_ALIAS(GetTickCount, libk32_GetTickCount);
 DEFINE_PUBLIC_ALIAS(GetTickCount64, libk32_GetTickCount64);
 
+INTDEF FILETIME CC libk32_TimeSpecToFileTime(struct timespec const *ts);
 
 INTERN VOID WINAPI
 libk32_GetSystemTime(LPSYSTEMTIME lpSystemTime) {
@@ -60,7 +61,6 @@ libk32_GetSystemTime(LPSYSTEMTIME lpSystemTime) {
 	lpSystemTime->wMilliseconds = tv.tv_usec / 1000;
 }
 
-INTDEF FILETIME CC libk32_TimeSpecToFileTime(struct timespec const *ts);
 INTERN VOID WINAPI
 libk32_GetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime) {
 	struct timespec ts;
