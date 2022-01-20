@@ -546,6 +546,8 @@ typedef __INTPTR_TYPE__ (WINAPI *FARPROC)();
 typedef __INTPTR_TYPE__ (WINAPI *NEARPROC)();
 typedef __INTPTR_TYPE__ (WINAPI *PROC)();
 
+#define __NT_VA_LIST void *
+
 __DECL_END
 #endif /* __CC__ */
 
