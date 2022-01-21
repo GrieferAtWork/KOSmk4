@@ -197,7 +197,6 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			uintptr_t sectaddr;
 			if (!SHOULD_USE_IMAGE_SECTION_HEADER(section))
 				continue; /* Skip! */
-			printk(KERN_DEBUG "[pe] section[%Iu] = %q\n", i, section->Name);
 
 			/* Force page alignment. */
 			if (section->VirtualAddress & PAGEMASK) {
@@ -235,6 +234,10 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			/* Map section */
 			sectaddr = loadaddr + section->VirtualAddress;
 			assert(IS_ALIGNED((uintptr_t)sectaddr, PAGESIZE));
+			printk(KERN_DEBUG "[pe] section[%Iu] = %q @ %p-%p (%c%c%c%c)\n",
+			       i, section->Name, sectaddr, sectaddr + section->Misc.VirtualSize - 1,
+			       prot & PROT_READ ? 'r' : '-', prot & PROT_WRITE ? 'w' : '-',
+			       prot & PROT_EXEC ? 'x' : '-', prot & PROT_SHARED ? 's' : 'p');
 			if (section->Misc.VirtualSize > section->SizeOfRawData) {
 				uintptr_t bss_start = section->SizeOfRawData;
 				uintptr_t bss_size  = section->Misc.VirtualSize - section->SizeOfRawData;
@@ -262,11 +265,12 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 					node->mbn_flags   = mnodeflags_from_prot(prot);
 					mbuilder_insert_fmnode(&builder, node);
 
+					/* Everything after the partial-bss page is mapped as normal .bss */
 					bss_start += PAGEMASK;
 					bss_start &= ~PAGEMASK;
-					if (bss_start <= section->SizeOfRawData)
+					if (bss_start >= section->Misc.VirtualSize)
 						goto done_bss;
-					bss_size = bss_start - section->SizeOfRawData;
+					bss_size = section->Misc.VirtualSize - bss_start;
 				}
 
 				/* Map normal .bss */
