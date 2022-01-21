@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x838eee55 */
+/* HASH CRC-32:0x9a72d084 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,17 @@
 #define __stub__CrtSetReportHook2
 #define __stub__CrtSetReportHookW2
 #define __stub__CrtSetReportMode
+#define __stub__Getdays
+#define __stub__Getmonths
+#define __stub__Gettnames
+#define __stub__Strftime
+#define __stub__W_Getdays
+#define __stub__W_Getmonths
+#define __stub__W_Gettnames
+#define __stub__Wcsftime
+#define __stub____lc_codepage_func
+#define __stub____lc_collate_cp_func
+#define __stub____lc_locale_name_func
 #define __stub___control87_2
 #define __stub___fpecode
 #define __stub___h_errno_location
@@ -55,24 +66,37 @@
 #define __stub___wcserror_s
 #define __stub__beep
 #define __stub__clearfp
+#define __stub__configthreadlocale
 #define __stub__control87
 #define __stub__controlfp
 #define __stub__controlfp_s
+#define __stub___create_locale
+#define __stub__create_locale
 #define __stub__dupenv_s
 #define __stub__fpclass
+#define __stub___free_locale
+#define __stub__free_locale
+#define __stub___get_current_locale
+#define __stub__get_current_locale
 #define __stub__get_invalid_parameter_handler
 #define __stub__get_output_format
 #define __stub__get_printf_count_output
 #define __stub__get_purecall_handler
 #define __stub__getdiskfree
 #define __stub__getmaxstdio
+#define __stub__lock_locales
 #define __stub__mktemp_s
+#define __stub__query_new_handler
+#define __stub__query_new_mode
+#define __stub__register_thread_local_exe_atexit_callback
 #define __stub__rmtmp
 #define __stub__searchenv_s
 #define __stub__set_abort_behavior
 #define __stub__set_controlfp
 #define __stub__set_error_mode
 #define __stub__set_invalid_parameter_handler
+#define __stub__set_new_handler
+#define __stub__set_new_mode
 #define __stub__set_output_format
 #define __stub__set_printf_count_output
 #define __stub__set_purecall_handler
@@ -80,6 +104,8 @@
 #define __stub__setmaxstdio
 #define __stub__statusfp
 #define __stub__statusfp2
+#define __stub__unlock_locales
+#define __stub__wcreate_locale
 #define __stub__wcserror
 #define __stub__wcserror_s
 #define __stub__wdupenv_s
@@ -93,6 +119,7 @@
 #define __stub__wputenv
 #define __stub__wputenv_s
 #define __stub__wsearchenv_s
+#define __stub__wsetlocale
 #define __stub__wtempnam
 #define __stub__wtmpnam_s
 #define __stub___acos
@@ -597,12 +624,18 @@
 #define __stub_y1
 #define __stub___yn
 #define __stub_yn
+#define __stub_DOS$_W_Getdays
+#define __stub_DOS$_W_Getmonths
+#define __stub_DOS$_W_Gettnames
+#define __stub_DOS$_Wcsftime
+#define __stub_DOS$___lc_locale_name_func
 #define __stub_DOS$__p___wargv
 #define __stub_DOS$__p___winitenv
 #define __stub_DOS$__p__wenviron
 #define __stub_DOS$__p__wpgmptr
 #define __stub_DOS$__wcserror
 #define __stub_DOS$__wcserror_s
+#define __stub_DOS$_wcreate_locale
 #define __stub_DOS$_wcserror
 #define __stub_DOS$_wcserror_s
 #define __stub_DOS$_wdupenv_s
@@ -616,6 +649,7 @@
 #define __stub_DOS$_wputenv
 #define __stub_DOS$_wputenv_s
 #define __stub_DOS$_wsearchenv_s
+#define __stub_DOS$_wsetlocale
 #define __stub_DOS$_wtempnam
 #define __stub_DOS$_wtmpnam_s
 #ifndef __LIBCCALL_IS_LIBDCALL

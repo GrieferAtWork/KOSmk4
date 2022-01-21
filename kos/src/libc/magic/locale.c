@@ -187,9 +187,8 @@
 #define LC_GLOBAL_LOCALE (__CCAST(__locale_t)(-1))
 #endif /* __USE_XOPEN2K8 */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -240,6 +239,52 @@ void freelocale($locale_t dataset);
 $locale_t uselocale($locale_t dataset);
 
 %#endif /* __USE_XOPEN2K8 */
+
+%
+%#ifdef __USE_DOS
+%{
+#define _ENABLE_PER_THREAD_LOCALE         0x0001
+#define _DISABLE_PER_THREAD_LOCALE        0x0002
+#define _ENABLE_PER_THREAD_LOCALE_GLOBAL  0x0010
+#define _DISABLE_PER_THREAD_LOCALE_GLOBAL 0x0020
+#define _ENABLE_PER_THREAD_LOCALE_NEW     0x0100
+#define _DISABLE_PER_THREAD_LOCALE_NEW    0x0200
+}
+
+void _lock_locales(void);
+void _unlock_locales(void);
+int _configthreadlocale(int flag);
+
+[[export_alias("__get_current_locale")]]
+$locale_t _get_current_locale(void);
+
+[[export_alias("__create_locale")]]
+$locale_t _create_locale(int category, char const *locale);
+
+[[export_alias("__free_locale")]]
+void _free_locale($locale_t locale);
+
+[[wchar]] $wchar_t *_wsetlocale(int category, $wchar_t const *locale);
+[[wchar]] $locale_t _wcreate_locale(int category, $wchar_t const *locale);
+[[wchar, wunused]] $wchar_t **___lc_locale_name_func(void);
+[[wunused]] unsigned int ___lc_codepage_func(void);
+[[wunused]] unsigned int ___lc_collate_cp_func(void);
+
+[[wunused]] char *_Getdays(void);
+[[wunused]] char *_Getmonths(void);
+[[wunused]] void *_Gettnames(void);
+[[wchar, wunused]] $wchar_t *_W_Getdays(void);
+[[wchar, wunused]] $wchar_t *_W_Getmonths(void);
+[[wchar, wunused]] void *_W_Gettnames(void);
+
+$size_t _Strftime(char *buf, $size_t bufsize, [[nonnull]] char const *format,
+                  [[nonnull]] struct tm const *tms, void *lc_time_arg);
+[[wchar]]
+$size_t _Wcsftime($wchar_t *buf, $size_t bufsize, [[nonnull]] $wchar_t const *format,
+                  [[nonnull]] struct tm const *tms, void *lc_time_arg);
+
+%#endif /* __USE_DOS */
+
 
 %{
 

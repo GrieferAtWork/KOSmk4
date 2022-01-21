@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1523677 */
+/* HASH CRC-32:0x7332bd50 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,16 +102,16 @@ __NAMESPACE_STD_USING(abort)
 #define __exit_defined
 __NAMESPACE_STD_USING(exit)
 #endif /* !__exit_defined && __std_exit_defined */
-#if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE_at_quick_exit)
+#if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE__crt_atexit) || defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE__crt_at_quick_exit)
 __NAMESPACE_STD_USING(atexit)
-#endif /* __CRT_HAVE_atexit || __CRT_HAVE_at_quick_exit */
+#endif /* __CRT_HAVE_atexit || __CRT_HAVE__crt_atexit || __CRT_HAVE_at_quick_exit || __CRT_HAVE__crt_at_quick_exit */
 #if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 #if defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 __NAMESPACE_STD_USING(quick_exit)
 #endif /* __CRT_HAVE_quick_exit || __CRT_HAVE_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
-#if defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE_atexit)
+#if defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE__crt_at_quick_exit) || defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE__crt_atexit)
 __NAMESPACE_STD_USING(at_quick_exit)
-#endif /* __CRT_HAVE_at_quick_exit || __CRT_HAVE_atexit */
+#endif /* __CRT_HAVE_at_quick_exit || __CRT_HAVE__crt_at_quick_exit || __CRT_HAVE_atexit || __CRT_HAVE__crt_atexit */
 #endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 #ifdef __USE_ISOC99
 #if defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
@@ -771,6 +771,8 @@ __CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,abort,(void),{ __builtin_abo
 __CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),())
 #elif defined(__CRT_HAVE__ZSt9terminatev)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),_ZSt9terminatev,())
+#elif defined(__CRT_HAVE_terminate)
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),terminate,())
 #elif defined(__CRT_HAVE_$Qterminate$A$AYAXXZ)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
 #elif defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
@@ -802,8 +804,12 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__
 #endif /* !__std_exit_defined */
 #ifdef __CRT_HAVE_atexit
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),(__func))
+#elif defined(__CRT_HAVE__crt_atexit)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),_crt_atexit,(__func))
 #elif defined(__CRT_HAVE_at_quick_exit)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),at_quick_exit,(__func))
+#elif defined(__CRT_HAVE__crt_at_quick_exit)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),_crt_at_quick_exit,(__func))
 #endif /* ... */
 #if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 #ifdef __CRT_HAVE_quick_exit
@@ -817,8 +823,12 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,quick_exit,(int __status),_Exit,(__s
 #endif /* ... */
 #ifdef __CRT_HAVE_at_quick_exit
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(void (__LIBCCALL *__func)(void)),(__func))
+#elif defined(__CRT_HAVE__crt_at_quick_exit)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(void (__LIBCCALL *__func)(void)),_crt_at_quick_exit,(__func))
 #elif defined(__CRT_HAVE_atexit)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(void (__LIBCCALL *__func)(void)),atexit,(__func))
+#elif defined(__CRT_HAVE__crt_atexit)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(void (__LIBCCALL *__func)(void)),_crt_atexit,(__func))
 #endif /* ... */
 #endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 #ifdef __USE_ISOC99
@@ -1221,18 +1231,18 @@ __NAMESPACE_STD_USING(abort)
 #define __exit_defined
 __NAMESPACE_STD_USING(exit)
 #endif /* !__exit_defined && __std_exit_defined */
-#if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE_at_quick_exit)
+#if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE__crt_atexit) || defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE__crt_at_quick_exit)
 __NAMESPACE_STD_USING(atexit)
-#endif /* __CRT_HAVE_atexit || __CRT_HAVE_at_quick_exit */
+#endif /* __CRT_HAVE_atexit || __CRT_HAVE__crt_atexit || __CRT_HAVE_at_quick_exit || __CRT_HAVE__crt_at_quick_exit */
 #endif /* !__CXX_SYSTEM_HEADER */
 #if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 #ifndef __CXX_SYSTEM_HEADER
 #if defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 __NAMESPACE_STD_USING(quick_exit)
 #endif /* __CRT_HAVE_quick_exit || __CRT_HAVE_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
-#if defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE_atexit)
+#if defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE__crt_at_quick_exit) || defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE__crt_atexit)
 __NAMESPACE_STD_USING(at_quick_exit)
-#endif /* __CRT_HAVE_at_quick_exit || __CRT_HAVE_atexit */
+#endif /* __CRT_HAVE_at_quick_exit || __CRT_HAVE__crt_at_quick_exit || __CRT_HAVE_atexit || __CRT_HAVE__crt_atexit */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 #ifdef __USE_ISOC99

@@ -162,14 +162,26 @@ INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 }
 /*[[[end:libc__cexit]]]*/
 
+/*[[[head:libc__register_thread_local_exe_atexit_callback,hash:CRC-32=0x7664ff4e]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.sched.process") NONNULL((1)) void
+NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callback_type callback)
+/*[[[body:libc__register_thread_local_exe_atexit_callback]]]*/
+/*AUTO*/{
+	(void)callback;
+	CRT_UNIMPLEMENTED("_register_thread_local_exe_atexit_callback"); /* TODO */
+	libc_seterrno(ENOSYS);
+}
+/*[[[end:libc__register_thread_local_exe_atexit_callback]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x13d1477b]]]*/
+
+/*[[[start:exports,hash:CRC-32=0x827bc3dd]]]*/
 DEFINE_PUBLIC_ALIAS(_beginthread, libc__beginthread);
 DEFINE_PUBLIC_ALIAS(_beginthreadex, libc__beginthreadex);
 DEFINE_PUBLIC_ALIAS(_endthreadex, libc__endthreadex);
 DEFINE_PUBLIC_ALIAS(_cexit, libc__cexit);
+DEFINE_PUBLIC_ALIAS(_register_thread_local_exe_atexit_callback, libc__register_thread_local_exe_atexit_callback);
 /*[[[end:exports]]]*/
 
 DECL_END

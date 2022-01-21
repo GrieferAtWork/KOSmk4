@@ -69,10 +69,10 @@ DECL_BEGIN
 PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdin_data  = IOFILE_DATA_NOVTAB_INIT();
 PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdout_data = IOFILE_DATA_NOVTAB_INIT();
 PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stderr_data = IOFILE_DATA_NOVTAB_INIT();
-INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE libc_iob[3] = {
-	[0] = __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdin_data),             /* !Relocation: &default_stdin_io */
-	[1] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdout_data), /* !Relocation: &default_stdout_io */
-	[2] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&default_stderr_data), /* !Relocation: &default_stderr_io */
+INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE libc_iob[3]                               = {
+    [0] = __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdin_data),             /* !Relocation: &default_stdin_io */
+    [1] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdout_data), /* !Relocation: &default_stdout_io */
+    [2] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&default_stderr_data), /* !Relocation: &default_stderr_io */
 };
 
 /* These are the actual, exported std* stream symbols. */
@@ -93,8 +93,7 @@ DEFINE_PUBLIC_ALIAS(stderr, libc_stderr);
 DEFINE_PUBLIC_ALIAS(_iob, libc_iob);              /* For DOS compatibility */
 DEFINE_PUBLIC_ALIAS(__p__iob, libd___iob_func);   /* For DOS compatibility */
 DEFINE_PUBLIC_ALIAS(__iob_func, libd___iob_func); /* For DOS compatibility */
-INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.FILE.std_files") FILE *
-NOTHROW(LIBDCALL libd___iob_func)(void) {
+INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.FILE.std_files") FILE *NOTHROW(LIBDCALL libd___iob_func)(void) {
 	/* DOS doesn't have copy-relocations, we don't have
 	 * to  worry  about   `dlsym("_iob") != &libc_iob'. */
 	return libc_iob;
@@ -158,33 +157,33 @@ struct IO_FILE_84 {
 	 */
 
 	/*32|64-bit * ..................................... *     32-bit | 64-bit */
-	/* 0|  0*/ uint32_t           io84_flags;          /* if_ptr     | if_ptr */
+	/* 0|  0*/ uint32_t io84_flags; /* if_ptr     | if_ptr */
 #if __SIZEOF_POINTER__ > 4
-	/*     4*/ uint32_t          _io84_pad;            /* -          | if_ptr (cont.) */
-#endif /* __SIZEOF_POINTER__ > 4 */
-	/* 4|  8*/ byte_t            *io84_IO_read_ptr;    /* if_cnt     | if_cnt+__if_pad0 */
-	/* 8| 16*/ byte_t            *io84_IO_read_end;    /* if_base    | if_base */
-	/*12| 24*/ byte_t            *io84_IO_read_base;   /* if_flag    | if_flag+if_fd */
-	/*16| 32*/ byte_t            *io84_IO_write_base;  /* if_fd      | if_charbuf+if_bufsiz */
-	/*20| 40*/ byte_t            *io84_IO_write_ptr;   /* if_charbuf | if_exdata */
-	/*24| 48*/ byte_t            *io84_IO_write_end;   /* if_bufsiz  | - */
-	/*28| 56*/ byte_t            *io84_IO_buf_base;    /* if_exdata  | - */
-	/*32| 64*/ byte_t            *io84_IO_buf_end;
-	/*36| 72*/ byte_t            *io84_IO_save_base;
-	/*40| 80*/ byte_t            *io84_IO_backup_base;
-	/*44| 88*/ byte_t            *io84_IO_save_end;
-	/*48| 96*/ void              *io84_markers;
+	/*     4*/ uint32_t _io84_pad;         /* -          | if_ptr (cont.) */
+#endif                                     /* __SIZEOF_POINTER__ > 4 */
+	/* 4|  8*/ byte_t *io84_IO_read_ptr;   /* if_cnt     | if_cnt+__if_pad0 */
+	/* 8| 16*/ byte_t *io84_IO_read_end;   /* if_base    | if_base */
+	/*12| 24*/ byte_t *io84_IO_read_base;  /* if_flag    | if_flag+if_fd */
+	/*16| 32*/ byte_t *io84_IO_write_base; /* if_fd      | if_charbuf+if_bufsiz */
+	/*20| 40*/ byte_t *io84_IO_write_ptr;  /* if_charbuf | if_exdata */
+	/*24| 48*/ byte_t *io84_IO_write_end;  /* if_bufsiz  | - */
+	/*28| 56*/ byte_t *io84_IO_buf_base;   /* if_exdata  | - */
+	/*32| 64*/ byte_t *io84_IO_buf_end;
+	/*36| 72*/ byte_t *io84_IO_save_base;
+	/*40| 80*/ byte_t *io84_IO_backup_base;
+	/*44| 88*/ byte_t *io84_IO_save_end;
+	/*48| 96*/ void *io84_markers;
 	/*52|104*/ struct IO_FILE_84 *io84_chain;
-	/*56|112*/ uint32_t           io84_fileno;
-	/*60|116*/ uint32_t           io84_blksize;
-	/*64|120*/ uint64_t           io84_offset;
-	/*72|128*/ uint16_t           io84_cur_column;
-	/*74|130*/ uint8_t            io84_unused;
-	/*75|131*/ uint8_t            io84_shortbuf[1];
+	/*56|112*/ uint32_t io84_fileno;
+	/*60|116*/ uint32_t io84_blksize;
+	/*64|120*/ uint64_t io84_offset;
+	/*72|128*/ uint16_t io84_cur_column;
+	/*74|130*/ uint8_t io84_unused;
+	/*75|131*/ uint8_t io84_shortbuf[1];
 #if __SIZEOF_POINTER__ > 4
-	/*  |132*/ uint32_t          _io84_pad2;
+	/*  |132*/ uint32_t _io84_pad2;
 #endif /* __SIZEOF_POINTER__ > 4 */
-	/*76|136*/ void              *io84_lock;
+	/*76|136*/ void *io84_lock;
 	/*80|144*/ void const *const *io84_vtable;
 	/*84|152*/ /* End-of-struct */
 };
@@ -200,9 +199,9 @@ struct IO_FILE_84 {
 struct linux_default_stdio_file {
 #if __SIZEOF_POINTER__ == 4
 	byte_t ldsf_zero[sizeof(struct IO_FILE_84) - sizeof(FILE)]; /* 0 bytes... */
-	FILE   ldsf_stdio;                                          /* The actual file object */
+	FILE ldsf_stdio;                                            /* The actual file object */
 #elif __SIZEOF_POINTER__ == 8
-	FILE   ldsf_stdio;                                          /* The actual file object */
+	FILE ldsf_stdio;                                            /* The actual file object */
 	byte_t ldsf_zero[sizeof(struct IO_FILE_84) - sizeof(FILE)]; /* Pad with 0-byts. */
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported sizeof(void *)"
@@ -233,16 +232,14 @@ file_calloc(size_t extsize) {
 
 
 /* Lazily allocated linux STDIO file objects. */
-PRIVATE ATTR_SECTION(".bss.crt.compat.linux.stdio") struct linux_default_stdio_file *
-linux_stdio_files = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.linux.stdio") struct linux_default_stdio_file *linux_stdio_files = NULL;
 
 
 /* Helper for loading std stream addresses in compatibility mode. */
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") NONNULL((1, 2, 3)) FILE *
-NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
-                                              char const *__restrict name1,
-                                              char const *__restrict name2,
-                                              struct linux_default_stdio_file *__restrict fallback) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") NONNULL((1, 2, 3)) FILE *NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
+                                                                                                                                                   char const *__restrict name1,
+                                                                                                                                                   char const *__restrict name2,
+                                                                                                                                                   struct linux_default_stdio_file *__restrict fallback) {
 	byte_t *result;
 	ElfW(Sym) const *sym;
 	sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, name1);
@@ -261,8 +258,7 @@ NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
 	return (FILE *)result;
 }
 
-INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void
-NOTHROW(LIBCCALL linux_stdio_init)(bool is_2_1) {
+INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void NOTHROW(LIBCCALL linux_stdio_init)(bool is_2_1) {
 	void *mainapp;
 	struct linux_default_stdio_file *result;
 	if (linux_stdio_files)
@@ -299,39 +295,33 @@ NOTHROW(LIBCCALL linux_stdio_init)(bool is_2_1) {
 }
 
 /* Initialize the linux stdio-compatibility system. */
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
-NOTHROW(LIBCCALL linux_stdio_get_2_1_stdin)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_2_1_stdin)(void) {
 	linux_stdio_init(true);
 	return libc_stdin;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
-NOTHROW(LIBCCALL linux_stdio_get_2_1_stdout)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_2_1_stdout)(void) {
 	linux_stdio_init(true);
 	return libc_stdout;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
-NOTHROW(LIBCCALL linux_stdio_get_2_1_stderr)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_2_1_stderr)(void) {
 	linux_stdio_init(true);
 	return libc_stderr;
 }
 
 /* Initialize the linux stdio-compatibility system. */
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
-NOTHROW(LIBCCALL linux_stdio_get_stdin)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_stdin)(void) {
 	linux_stdio_init(false);
 	return libc_stdin;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
-NOTHROW(LIBCCALL linux_stdio_get_stdout)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_stdout)(void) {
 	linux_stdio_init(false);
 	return libc_stdout;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
-NOTHROW(LIBCCALL linux_stdio_get_stderr)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_stderr)(void) {
 	linux_stdio_init(false);
 	return libc_stderr;
 }
@@ -352,7 +342,7 @@ DEFINE_PUBLIC_IDATA_G(_IO_stderr_, linux_stdio_get_stderr, SIZEOF_IO_FILE_84);
 /************************************************************************/
 /* __builtin_[vec_](new|delete)                                         */
 /************************************************************************/
-typedef void (LIBCCALL *PNEW_HANDLER)(void);
+typedef void(LIBCCALL *PNEW_HANDLER)(void);
 PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.heap") char const
 default_new_handler_message[] = "Virtual memory exceeded in `new'\n";
 PRIVATE ATTR_SECTION(".text.crt.compat.linux.heap") void LIBCCALL
@@ -380,9 +370,9 @@ PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.heap")
 PNEW_HANDLER *LIBCCALL libc_p_new_handler(void) {
 	PNEW_HANDLER *result;
 	result = (PNEW_HANDLER *)dlsym(RTLD_DEFAULT, name___new_handler);
-	if unlikely(!result)
+	if unlikely (!result)
 		result = libc___new_handler_cb(); /* Shouldn't happen */
-	if unlikely(!*result)
+	if unlikely (!*result)
 		*result = &libc_default_new_handler;
 	return result;
 }
@@ -401,10 +391,9 @@ PNEW_HANDLER LIBCCALL libc_set_new_handler(PNEW_HANDLER handler) {
 }
 
 DEFINE_PUBLIC_ALIAS(__builtin_new, libc___builtin_new);
-INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.heap")
-void *LIBCCALL libc___builtin_new(size_t sz) {
+INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.heap") void *LIBCCALL libc___builtin_new(size_t sz) {
 	void *result = malloc(sz);
-	if unlikely(result == NULL)
+	if unlikely (result == NULL)
 		(*__new_handler)();
 	return result;
 }
@@ -728,7 +717,8 @@ DEFINE_PUBLIC_ALIAS(__libc_init, libc___libc_init);
 /* Prevent GCC from (rightfully) optimizing  away
  * (seemingly unnecessary) parameter assignments. */
 __attribute__((optimize("-O0")))
-INTERN ATTR_SECTION(".text.crt.compat.linux.init") void LIBCCALL
+INTERN
+ATTR_SECTION(".text.crt.compat.linux.init") void LIBCCALL
 libc___libc_init(int argc, char *argv[], char *envp[]) {
 	struct process_peb *peb;
 	libc_compat |= COMPAT_FLAG_CALLED___libc_init;
@@ -774,7 +764,7 @@ DECL_BEGIN
  * Control word set during startup of old linux applications. */
 #if _FPU_DEFAULT == 0
 INTERN ATTR_SECTION(".bss.crt.math.float") fpu_control_t libc___fpu_control = _FPU_DEFAULT;
-#else /* _FPU_DEFAULT == 0 */
+#else  /* _FPU_DEFAULT == 0 */
 INTERN ATTR_SECTION(".data.crt.math.float") fpu_control_t libc___fpu_control = _FPU_DEFAULT;
 #endif /* _FPU_DEFAULT != 0 */
 DEFINE_PUBLIC_ALIAS(__fpu_control, libc___fpu_control);
@@ -782,15 +772,14 @@ DEFINE_PUBLIC_ALIAS(__fpu_control, libc___fpu_control);
 /* >> __setfpucw(3)
  * Function called by old linux applications to set `__fpu_control()'. */
 DEFINE_PUBLIC_ALIAS(__setfpucw, libc___setfpucw);
-INTERN ATTR_SECTION(".text.crt.math.float") void
-NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
+INTERN ATTR_SECTION(".text.crt.math.float") void NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
 #if _FPU_RESERVED != 0
 	fpu_control_t word;
 	_FPU_GETCW(word);
 	word &= _FPU_RESERVED;
 	word |= ctrl & ~_FPU_RESERVED;
 	_FPU_SETCW(word);
-#else /* _FPU_RESERVED != 0 */
+#else  /* _FPU_RESERVED != 0 */
 	_FPU_SETCW(ctrl);
 #endif /* _FPU_RESERVED == 0 */
 }
@@ -811,24 +800,35 @@ typedef struct {
 } _startupinfo;
 
 DEFINE_PUBLIC_ALIAS(DOS$__lconv_init, libd___lconv_init);
+DEFINE_PUBLIC_ALIAS(DOS$_query_app_type, libd__query_app_type);
+DEFINE_PUBLIC_ALIAS(DOS$_set_app_type, libd___set_app_type);
 DEFINE_PUBLIC_ALIAS(DOS$__set_app_type, libd___set_app_type);
 DEFINE_PUBLIC_ALIAS(DOS$__getmainargs, libd___getmainargs);
 DEFINE_PUBLIC_ALIAS(DOS$__wgetmainargs, libd___wgetmainargs);
 DEFINE_PUBLIC_ALIAS(DOS$_XcptFilter, libd__XcptFilter);
+DEFINE_PUBLIC_ALIAS(DOS$_seh_filter_dll, libd__seh_filter_dll);
+DEFINE_PUBLIC_ALIAS(DOS$_seh_filter_exe, libd__seh_filter_exe);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler2, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler3, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler_3, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler4, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler4_common, libd__except_handler4);
 
-INTERN ATTR_SECTION(".text.crt.dos.application.init")
-void LIBDCALL libd___lconv_init(void) {
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
+libd___lconv_init(void) {
 	CRT_UNIMPLEMENTED("__lconv_init()");
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.application.init")
-void LIBDCALL libd___set_app_type(int typ) {
-	CRT_UNIMPLEMENTEDF("__set_app_type(%d)", typ);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
+libd__query_app_type(void) {
+	COMPILER_IMPURE();
+	return 1; /* _crt_console_app */
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
+libd___set_app_type(int typ) {
+	(void)typ;
+	COMPILER_IMPURE();
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
@@ -872,11 +872,27 @@ libd__XcptFilter(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
 	return 0;
 }
 
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.except") int LIBDCALL
+libd__seh_filter_dll(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
+	(void)xno;
+	(void)infp_ptrs;
+	CRT_UNIMPLEMENTEDF("_seh_filter_dll(%" PRIu32 ", %p)", xno, infp_ptrs);
+	return 0;
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.except") int LIBDCALL
+libd__seh_filter_exe(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
+	(void)xno;
+	(void)infp_ptrs;
+	CRT_UNIMPLEMENTEDF("_seh_filter_exe(%" PRIu32 ", %p)", xno, infp_ptrs);
+	return 0;
+}
+
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.except") EXCEPTION_DISPOSITION LIBCCALL
 libd__except_handler4(struct _EXCEPTION_RECORD *ExceptionRecord,
-                     void *EstablisherFrame,
-                     struct _CONTEXT *ContextRecord,
-                     void *DispatcherContext) {
+                      void *EstablisherFrame,
+                      struct _CONTEXT *ContextRecord,
+                      void *DispatcherContext) {
 	(void)ExceptionRecord;
 	(void)EstablisherFrame;
 	(void)ContextRecord;
@@ -895,7 +911,7 @@ libd__except_handler4(struct _EXCEPTION_RECORD *ExceptionRecord,
 PRIVATE ATTR_SECTION(".text.crt.dos.application.init") char *LIBDCALL
 construct_dos_commandline(void) {
 	struct process_peb *peb = &__peb;
-	char *result = NULL;
+	char *result            = NULL;
 	void *libcmdline;
 	PCMDLINE_ENCODE cmdline_encode;
 	libcmdline = dlopen(LIBCMDLINE_LIBRARY_NAME, RTLD_LAZY | RTLD_LOCAL);
@@ -909,7 +925,7 @@ construct_dos_commandline(void) {
 		format_aprintf_data_init(&printer);
 		error = (*cmdline_encode)(&format_aprintf_printer, &printer,
 		                          peb->pp_argc, peb->pp_argv);
-		if unlikely(error < 0) {
+		if unlikely (error < 0) {
 			format_aprintf_data_fini(&printer);
 		} else {
 			result = format_aprintf_pack(&printer, NULL);
@@ -919,9 +935,8 @@ construct_dos_commandline(void) {
 	return result;
 }
 
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
-struct atomic_once libd___p__acmdln_initialized = ATOMIC_ONCE_INIT;
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char *libd__acmdln = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p__acmdln_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char *libd__acmdln                              = NULL;
 DEFINE_PUBLIC_IDATA_G(DOS$_acmdln, libd___p__acmdln, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_ALIAS(DOS$__p__acmdln, libd___p__acmdln);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") char **LIBDCALL
@@ -943,9 +958,8 @@ construct_dos_wcommandline(void) {
 	return acmdln ? convert_mbstoc16(acmdln) : NULL;
 }
 
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
-struct atomic_once libd___p__wcmdln_initialized = ATOMIC_ONCE_INIT;
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd__wcmdln = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p__wcmdln_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd__wcmdln                          = NULL;
 DEFINE_PUBLIC_IDATA_G(DOS$_wcmdln, libd___p__wcmdln, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_ALIAS(DOS$__p__wcmdln, libd___p__wcmdln);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") char16_t **LIBDCALL
@@ -981,7 +995,7 @@ DEFINE_PUBLIC_ALIAS(__mb_cur_max, libd___mb_cur_max);
 /* _setusermatherr()                                                    */
 /************************************************************************/
 struct _exception;
-typedef int (LIBDCALL *_UserMathErrorFunctionPointer)(struct _exception *);
+typedef int(LIBDCALL *_UserMathErrorFunctionPointer)(struct _exception *);
 DEFINE_PUBLIC_ALIAS(DOS$__setusermatherr, libd___setusermatherr);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
 libd___setusermatherr(_UserMathErrorFunctionPointer func) {
@@ -1005,8 +1019,8 @@ libd__amsg_exit(int errnum) {
 /************************************************************************/
 /* _initterm()                                                          */
 /************************************************************************/
-typedef void (LIBDCALL *_INITTERMFUN)(void);
-typedef int (LIBDCALL *_INITTERM_E_FN)(void);
+typedef void(LIBDCALL *_INITTERMFUN)(void);
+typedef int(LIBDCALL *_INITTERM_E_FN)(void);
 
 DEFINE_PUBLIC_ALIAS(DOS$_initterm, libd__initterm);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
@@ -1061,8 +1075,7 @@ libd__unlock(int locknum) {
 /* New-style MSVC stdio-FILE access                                     */
 /************************************************************************/
 DEFINE_PUBLIC_ALIAS(DOS$__acrt_iob_func, libd___acrt_iob_func);
-INTERN ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos") FILE *
-NOTHROW(LIBDCALL libd___acrt_iob_func)(unsigned int index) {
+INTERN ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos") FILE *NOTHROW(LIBDCALL libd___acrt_iob_func)(unsigned int index) {
 	return &libc_iob[index];
 }
 
@@ -1110,7 +1123,7 @@ libd_requirek32(char const *__restrict symbol_name) {
 		static LPK32##name pdynK32##name = NULL;                                      \
 		if (!pdynK32##name)                                                           \
 			*(void **)&pdynK32##name = libd_requirek32(k32name);                      \
-		return (*pdynK32##name) args;                                                 \
+		return (*pdynK32##name)args;                                                  \
 	}
 
 DEFINE_KERNEL32_FORWARDER_FUNCTION(DWORD, LIBDCALL, __vcrt_GetModuleFileNameW,
@@ -1123,6 +1136,123 @@ DEFINE_KERNEL32_FORWARDER_FUNCTION(HMODULE, LIBDCALL, __vcrt_LoadLibraryExW,
                                    (LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags),
                                    "LoadLibraryExW", (lpLibFileName, hFile, dwFlags))
 #undef DEFINE_KERNEL32_FORWARDER_FUNCTION
+
+
+
+/************************************************************************/
+/* DOS Math error handling                                              */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(DOS$_except1, libd__except1);
+DEFINE_PUBLIC_ALIAS(DOS$_except2, libd__except2);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") double LIBCCALL
+libd__except1(int unknown_flags, int fpu_opcode, double arg1, double result, uintptr_t fpu_cw) {
+	/* This function seems related to DOS math error handling... */
+	CRT_UNIMPLEMENTEDF("DOS$_except1(%d,%d,%f,%f,%p)",
+	                   unknown_flags, fpu_opcode, arg1, result, fpu_cw);
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") double LIBCCALL
+libd__except2(int unknown_flags, int fpu_opcode, double arg1, double arg2, double result, uintptr_t fpu_cw) {
+	/* This function seems related to DOS math error handling... */
+	CRT_UNIMPLEMENTEDF("DOS$_except1(%d,%d,%f,%f,%f,%p)",
+	                   unknown_flags, fpu_opcode, arg1, arg2, result, fpu_cw);
+	return result;
+}
+
+
+
+/************************************************************************/
+/* New-style DOS CRT initialization                                     */
+/************************************************************************/
+#define _crt_argv_no_arguments         0
+#define _crt_argv_unexpanded_arguments 1
+#define _crt_argv_expanded_arguments   2
+typedef int _crt_argv_mode;
+
+DEFINE_PUBLIC_ALIAS(DOS$_configure_narrow_argv, libd__configure_narrow_argv);
+DEFINE_PUBLIC_ALIAS(DOS$_configure_wide_argv, libd__configure_wide_argv);
+DEFINE_PUBLIC_ALIAS(DOS$_initialize_narrow_environment, libd__initialize_narrow_environment);
+DEFINE_PUBLIC_ALIAS(DOS$_initialize_wide_environment, libd__initialize_wide_environment);
+DEFINE_PUBLIC_ALIAS(DOS$_get_initial_narrow_environment, libd__get_initial_narrow_environment);
+DEFINE_PUBLIC_ALIAS(DOS$_get_initial_wide_environment, libd__get_initial_wide_environment);
+DEFINE_PUBLIC_ALIAS(DOS$_get_narrow_winmain_command_line, libd__get_narrow_winmain_command_line);
+DEFINE_PUBLIC_ALIAS(DOS$_get_wide_winmain_command_line, libd__get_wide_winmain_command_line);
+
+DEFINE_INTERN_ALIAS(libd__configure_wide_argv, libd__configure_narrow_argv);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") errno_t LIBDCALL
+libd__configure_narrow_argv(_crt_argv_mode mode) {
+	(void)mode;
+	return 0;
+}
+
+DEFINE_INTERN_ALIAS(libd__initialize_wide_environment, libd__initialize_narrow_environment);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
+libd__initialize_narrow_environment(void) {
+	return 0;
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") char **LIBDCALL
+libd__get_initial_narrow_environment(void) {
+	return *libc___p___initenv();
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") char16_t **LIBDCALL
+libd__get_initial_wide_environment(void) {
+	return *libd___p___winitenv();
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") char *LIBDCALL
+libd__get_narrow_winmain_command_line(void) {
+	return *libd___p__acmdln();
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") char16_t *LIBDCALL
+libd__get_wide_winmain_command_line(void) {
+	return *libd___p__wcmdln();
+}
+
+typedef struct _onexit_table_t {
+	_onexit_t *_first;
+	_onexit_t *_last;
+	_onexit_t *_end;
+} _onexit_table_t;
+
+DEFINE_PUBLIC_ALIAS(DOS$_initialize_onexit_table, libd__initialize_onexit_table);
+DEFINE_PUBLIC_ALIAS(DOS$_register_onexit_function, libd__register_onexit_function);
+DEFINE_PUBLIC_ALIAS(DOS$_execute_onexit_table, libd__execute_onexit_table);
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
+libd__initialize_onexit_table(_onexit_table_t *self) {
+	bzero(self, sizeof(*self));
+	return 0;
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
+libd__register_onexit_function(_onexit_table_t *self, _onexit_t function) {
+	if (self->_last >= self->_end) {
+		_onexit_t *newtab;
+		size_t newcnt;
+		newcnt = (size_t)(self->_last - self->_first) + 1;
+		newtab = (_onexit_t *)realloc(self->_first, newcnt + 1, sizeof(_onexit_t));
+		if (!newtab)
+			return -1;
+		newcnt       = malloc_usable_size(newtab) / sizeof(_onexit_t);
+		self->_last  = newtab + (self->_last - self->_first);
+		self->_end   = newtab + newcnt;
+		self->_first = newtab;
+	}
+	*self->_last++ = function;
+	return 0;
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
+libd__execute_onexit_table(_onexit_table_t *self) {
+	return libd__initterm_e(self->_first, self->_last);
+}
+
+
+
 
 DECL_END
 

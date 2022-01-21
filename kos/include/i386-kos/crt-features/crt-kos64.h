@@ -222,6 +222,9 @@
 #define __CRT_HAVE__CrtSetReportHookW2
 #define __CRT_HAVE__CrtSetReportMode
 #define __CRT_HAVE__Exit
+#define __CRT_HAVE__Getdays
+#define __CRT_HAVE__Getmonths
+#define __CRT_HAVE__Gettnames
 #define __CRT_HAVE__IO_2_1_stderr_
 #define __CRT_HAVE__IO_2_1_stdin_
 #define __CRT_HAVE__IO_2_1_stdout_
@@ -269,6 +272,7 @@
 #define __CRT_HAVE__IO_vfscanf
 #define __CRT_HAVE__IO_vsprintf
 #define __CRT_HAVE__IO_vsscanf
+#define __CRT_HAVE__Strftime
 #define __CRT_HAVE__Unwind_Backtrace
 #define __CRT_HAVE__Unwind_DeleteException
 #define __CRT_HAVE__Unwind_FindEnclosingFunction
@@ -287,8 +291,15 @@
 #define __CRT_HAVE__Unwind_Resume_or_Rethrow
 #define __CRT_HAVE__Unwind_SetGR
 #define __CRT_HAVE__Unwind_SetIP
+#define __CRT_HAVE__W_Getdays
+#define __CRT_HAVE__W_Getmonths
+#define __CRT_HAVE__W_Gettnames
+#define __CRT_HAVE__Wcsftime
 #define __CRT_HAVE__ZSt9terminatev
 #define __CRT_HAVE____brk_addr
+#define __CRT_HAVE____lc_codepage_func
+#define __CRT_HAVE____lc_collate_cp_func
+#define __CRT_HAVE____lc_locale_name_func
 #define __CRT_HAVE___access
 #define __CRT_HAVE___acct
 #define __CRT_HAVE___acos
@@ -377,6 +388,7 @@
 #define __CRT_HAVE___coshl
 #define __CRT_HAVE___cosl
 #define __CRT_HAVE___creat
+#define __CRT_HAVE___create_locale
 #define __CRT_HAVE___crtSleep
 #define __CRT_HAVE___crt_unreachable
 #define __CRT_HAVE___ctype_C_flags
@@ -481,6 +493,7 @@
 #define __CRT_HAVE___fpurge
 #define __CRT_HAVE___freadable
 #define __CRT_HAVE___freading
+#define __CRT_HAVE___free_locale
 #define __CRT_HAVE___freelocale
 #define __CRT_HAVE___frexp
 #define __CRT_HAVE___frexpf
@@ -497,6 +510,7 @@
 #define __CRT_HAVE___gammaf
 #define __CRT_HAVE___gammal
 #define __CRT_HAVE___gcc_personality_v0
+#define __CRT_HAVE___get_current_locale
 #define __CRT_HAVE___get_cygerrno
 #define __CRT_HAVE___get_doserrno
 #define __CRT_HAVE___get_errno
@@ -1193,10 +1207,12 @@
 #define __CRT_HAVE__chdrive
 #define __CRT_HAVE__chgsign
 #define __CRT_HAVE__clearfp
+#define __CRT_HAVE__configthreadlocale
 #define __CRT_HAVE__control87
 #define __CRT_HAVE__controlfp
 #define __CRT_HAVE__controlfp_s
 #define __CRT_HAVE__copysign
+#define __CRT_HAVE__create_locale
 #define __CRT_HAVE__dosmaperr
 #define __CRT_HAVE__dtest
 #define __CRT_HAVE__dupenv_s
@@ -1244,6 +1260,7 @@
 #define __CRT_HAVE__fread_nolock
 #define __CRT_HAVE__fread_nolock_s
 #define __CRT_HAVE__free_dbg
+#define __CRT_HAVE__free_locale
 #define __CRT_HAVE__fscanf_l
 #define __CRT_HAVE__fscanf_s_l
 #define __CRT_HAVE__fseek_nolock
@@ -1276,6 +1293,7 @@
 #define __CRT_HAVE__fxstat
 #define __CRT_HAVE__fxstat64
 #define __CRT_HAVE__gcvt_s
+#define __CRT_HAVE__get_current_locale
 #define __CRT_HAVE__get_doserrno
 #define __CRT_HAVE__get_errno
 #define __CRT_HAVE__get_fmode
@@ -1314,6 +1332,7 @@
 #define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
+#define __CRT_HAVE__lock_locales
 #define __CRT_HAVE__longjmp
 #define __CRT_HAVE__lrotl
 #define __CRT_HAVE__lrotr
@@ -1348,9 +1367,12 @@
 #define __CRT_HAVE__printf_s_l
 #define __CRT_HAVE__putenv_s
 #define __CRT_HAVE__putws
+#define __CRT_HAVE__query_new_handler
+#define __CRT_HAVE__query_new_mode
 #define __CRT_HAVE__realloc_dbg
 #define __CRT_HAVE__recalloc
 #define __CRT_HAVE__recalloc_dbg
+#define __CRT_HAVE__register_thread_local_exe_atexit_callback
 #define __CRT_HAVE__rmtmp
 #define __CRT_HAVE__rotl
 #define __CRT_HAVE__rotl64
@@ -1375,6 +1397,8 @@
 #define __CRT_HAVE__set_error_mode
 #define __CRT_HAVE__set_fmode
 #define __CRT_HAVE__set_invalid_parameter_handler
+#define __CRT_HAVE__set_new_handler
+#define __CRT_HAVE__set_new_mode
 #define __CRT_HAVE__set_output_format
 #define __CRT_HAVE__set_printf_count_output
 #define __CRT_HAVE__set_purecall_handler
@@ -1447,6 +1471,7 @@
 #define __CRT_HAVE__ungetc_nolock
 #define __CRT_HAVE__unloaddll
 #define __CRT_HAVE__unlock_fhandle
+#define __CRT_HAVE__unlock_locales
 #define __CRT_HAVE__utime32
 #define __CRT_HAVE__utime64
 #define __CRT_HAVE__vfprintf_l
@@ -1506,6 +1531,8 @@
 #define __CRT_HAVE__vwprintf_p_l
 #define __CRT_HAVE__vwprintf_s_l
 #define __CRT_HAVE__vwscanf_l
+#define __CRT_HAVE__wassert
+#define __CRT_HAVE__wcreate_locale
 #define __CRT_HAVE__wcsdup_dbg
 #define __CRT_HAVE__wcserror
 #define __CRT_HAVE__wcserror_s
@@ -1543,6 +1570,7 @@
 #define __CRT_HAVE__wscanf_l
 #define __CRT_HAVE__wsearchenv
 #define __CRT_HAVE__wsearchenv_s
+#define __CRT_HAVE__wsetlocale
 #define __CRT_HAVE__wsplitpath
 #define __CRT_HAVE__wsplitpath_s
 #define __CRT_HAVE__wstat32
@@ -4617,6 +4645,7 @@
 #define __CRT_HAVE_tell64
 #define __CRT_HAVE_telldir
 #define __CRT_HAVE_tempnam
+#define __CRT_HAVE_terminate
 #define __CRT_HAVE_textdomain
 #define __CRT_HAVE_tfind
 #define __CRT_HAVE_tfind_r
@@ -5059,7 +5088,13 @@
 #define __CRT_HAVE_KOS$_IO_vfscanf
 #define __CRT_HAVE_KOS$_IO_vsprintf
 #define __CRT_HAVE_KOS$_IO_vsscanf
+#define __CRT_HAVE_KOS$_Strftime
+#define __CRT_HAVE_KOS$_W_Getdays
+#define __CRT_HAVE_KOS$_W_Getmonths
+#define __CRT_HAVE_KOS$_W_Gettnames
+#define __CRT_HAVE_KOS$_Wcsftime
 #define __CRT_HAVE__XcptFilter
+#define __CRT_HAVE_KOS$___lc_locale_name_func
 #define __CRT_HAVE_KOS$__access
 #define __CRT_HAVE_KOS$__acct
 #define __CRT_HAVE_KOS$__acos
@@ -5136,6 +5171,7 @@
 #define __CRT_HAVE_KOS$__coshl
 #define __CRT_HAVE_KOS$__cosl
 #define __CRT_HAVE_KOS$__creat
+#define __CRT_HAVE_KOS$__create_locale
 #define __CRT_HAVE_KOS$__crtSleep
 #define __CRT_HAVE_KOS$__daylight
 #define __CRT_HAVE_KOS$__dcgettext
@@ -5209,6 +5245,7 @@
 #define __CRT_HAVE_KOS$__fpurge
 #define __CRT_HAVE_KOS$__freadable
 #define __CRT_HAVE_KOS$__freading
+#define __CRT_HAVE_KOS$__free_locale
 #define __CRT_HAVE_KOS$__freelocale
 #define __CRT_HAVE_KOS$__frexp
 #define __CRT_HAVE_KOS$__frexpf
@@ -5825,11 +5862,17 @@
 #define __CRT_HAVE__close
 #define __CRT_HAVE__commit
 #define __CRT_HAVE__commode
+#define __CRT_HAVE_KOS$_configthreadlocale
+#define __CRT_HAVE__configure_narrow_argv
+#define __CRT_HAVE__configure_wide_argv
 #define __CRT_HAVE_KOS$_control87
 #define __CRT_HAVE_KOS$_controlfp
 #define __CRT_HAVE_KOS$_controlfp_s
 #define __CRT_HAVE_KOS$_copysign
 #define __CRT_HAVE__creat
+#define __CRT_HAVE_KOS$_create_locale
+#define __CRT_HAVE__crt_at_quick_exit
+#define __CRT_HAVE__crt_atexit
 #define __CRT_HAVE__ctime64
 #define __CRT_HAVE__cwait
 #define __CRT_HAVE__dclass
@@ -5844,6 +5887,8 @@
 #define __CRT_HAVE_KOS$_endthreadex
 #define __CRT_HAVE_KOS$_eof
 #define __CRT_HAVE__errno
+#define __CRT_HAVE__except1
+#define __CRT_HAVE__except2
 #define __CRT_HAVE__except_handler2
 #define __CRT_HAVE__except_handler3
 #define __CRT_HAVE__except_handler4
@@ -5853,6 +5898,7 @@
 #define __CRT_HAVE__execle
 #define __CRT_HAVE__execlp
 #define __CRT_HAVE__execlpe
+#define __CRT_HAVE__execute_onexit_table
 #define __CRT_HAVE__execv
 #define __CRT_HAVE__execve
 #define __CRT_HAVE__execvp
@@ -5900,6 +5946,7 @@
 #define __CRT_HAVE__fputws_nolock
 #define __CRT_HAVE_KOS$_fread_nolock
 #define __CRT_HAVE_KOS$_fread_nolock_s
+#define __CRT_HAVE_KOS$_free_locale
 #define __CRT_HAVE_KOS$_fscanf_l
 #define __CRT_HAVE_KOS$_fscanf_s_l
 #define __CRT_HAVE_KOS$_fseek_nolock
@@ -5927,8 +5974,12 @@
 #define __CRT_HAVE_KOS$_get_doserrno
 #define __CRT_HAVE_KOS$_get_errno
 #define __CRT_HAVE_KOS$_get_fmode
+#define __CRT_HAVE__get_initial_narrow_environment
+#define __CRT_HAVE__get_initial_wide_environment
+#define __CRT_HAVE__get_narrow_winmain_command_line
 #define __CRT_HAVE_KOS$_get_osfhandle
 #define __CRT_HAVE_KOS$_get_pgmptr
+#define __CRT_HAVE__get_wide_winmain_command_line
 #define __CRT_HAVE_KOS$_get_wpgmptr
 #define __CRT_HAVE__getcwd
 #define __CRT_HAVE_KOS$_getdcwd
@@ -5941,6 +5992,9 @@
 #define __CRT_HAVE_KOS$_i64toa_s
 #define __CRT_HAVE_KOS$_i64tow
 #define __CRT_HAVE_KOS$_i64tow_s
+#define __CRT_HAVE__initialize_narrow_environment
+#define __CRT_HAVE__initialize_onexit_table
+#define __CRT_HAVE__initialize_wide_environment
 #define __CRT_HAVE__initterm
 #define __CRT_HAVE__initterm_e
 #define __CRT_HAVE__isalnum_l
@@ -6034,8 +6088,10 @@
 #define __CRT_HAVE_KOS$_putenv_s
 #define __CRT_HAVE__putw
 #define __CRT_HAVE_KOS$_putws
+#define __CRT_HAVE__query_app_type
 #define __CRT_HAVE__read
 #define __CRT_HAVE_KOS$_recalloc
+#define __CRT_HAVE__register_onexit_function
 #define __CRT_HAVE__rmdir
 #define __CRT_HAVE_KOS$_rotl
 #define __CRT_HAVE_KOS$_rotl64
@@ -6055,7 +6111,10 @@
 #define __CRT_HAVE_KOS$_scwprintf_p_l
 #define __CRT_HAVE_KOS$_searchenv
 #define __CRT_HAVE_KOS$_searchenv_s
+#define __CRT_HAVE__seh_filter_dll
+#define __CRT_HAVE__seh_filter_exe
 #define __CRT_HAVE_KOS$_set_abort_behavior
+#define __CRT_HAVE__set_app_type
 #define __CRT_HAVE_KOS$_set_controlfp
 #define __CRT_HAVE_KOS$_set_doserrno
 #define __CRT_HAVE_KOS$_set_errno
@@ -6250,8 +6309,10 @@
 #define __CRT_HAVE_KOS$_vwprintf_p_l
 #define __CRT_HAVE_KOS$_vwprintf_s_l
 #define __CRT_HAVE_KOS$_vwscanf_l
+#define __CRT_HAVE_KOS$_wassert
 #define __CRT_HAVE__wchdir
 #define __CRT_HAVE__wcmdln
+#define __CRT_HAVE_KOS$_wcreate_locale
 #define __CRT_HAVE__wcscoll_l
 #define __CRT_HAVE__wcsdup
 #define __CRT_HAVE_KOS$_wcserror
@@ -6333,6 +6394,7 @@
 #define __CRT_HAVE_KOS$_wscanf_l
 #define __CRT_HAVE_KOS$_wsearchenv
 #define __CRT_HAVE_KOS$_wsearchenv_s
+#define __CRT_HAVE_KOS$_wsetlocale
 #define __CRT_HAVE__wspawnl
 #define __CRT_HAVE__wspawnle
 #define __CRT_HAVE__wspawnlp
@@ -8762,7 +8824,13 @@
 #define __CRT_HAVE_DOS$_IO_vfscanf
 #define __CRT_HAVE_DOS$_IO_vsprintf
 #define __CRT_HAVE_DOS$_IO_vsscanf
+#define __CRT_HAVE_DOS$_Strftime
+#define __CRT_HAVE_DOS$_W_Getdays
+#define __CRT_HAVE_DOS$_W_Getmonths
+#define __CRT_HAVE_DOS$_W_Gettnames
+#define __CRT_HAVE_DOS$_Wcsftime
 #define __CRT_HAVE_DOS$_XcptFilter
+#define __CRT_HAVE_DOS$___lc_locale_name_func
 #define __CRT_HAVE_DOS$__access
 #define __CRT_HAVE_DOS$__acct
 #define __CRT_HAVE_DOS$__acos
@@ -8839,6 +8907,7 @@
 #define __CRT_HAVE_DOS$__coshl
 #define __CRT_HAVE_DOS$__cosl
 #define __CRT_HAVE_DOS$__creat
+#define __CRT_HAVE_DOS$__create_locale
 #define __CRT_HAVE_DOS$__crtSleep
 #define __CRT_HAVE_DOS$__daylight
 #define __CRT_HAVE_DOS$__dcgettext
@@ -8912,6 +8981,7 @@
 #define __CRT_HAVE_DOS$__fpurge
 #define __CRT_HAVE_DOS$__freadable
 #define __CRT_HAVE_DOS$__freading
+#define __CRT_HAVE_DOS$__free_locale
 #define __CRT_HAVE_DOS$__freelocale
 #define __CRT_HAVE_DOS$__frexp
 #define __CRT_HAVE_DOS$__frexpf
@@ -9528,11 +9598,17 @@
 #define __CRT_HAVE_DOS$_close
 #define __CRT_HAVE_DOS$_commit
 #define __CRT_HAVE_DOS$_commode
+#define __CRT_HAVE_DOS$_configthreadlocale
+#define __CRT_HAVE_DOS$_configure_narrow_argv
+#define __CRT_HAVE_DOS$_configure_wide_argv
 #define __CRT_HAVE_DOS$_control87
 #define __CRT_HAVE_DOS$_controlfp
 #define __CRT_HAVE_DOS$_controlfp_s
 #define __CRT_HAVE_DOS$_copysign
 #define __CRT_HAVE_DOS$_creat
+#define __CRT_HAVE_DOS$_create_locale
+#define __CRT_HAVE_DOS$_crt_at_quick_exit
+#define __CRT_HAVE_DOS$_crt_atexit
 #define __CRT_HAVE_DOS$_ctime64
 #define __CRT_HAVE_DOS$_cwait
 #define __CRT_HAVE_DOS$_dclass
@@ -9547,6 +9623,8 @@
 #define __CRT_HAVE_DOS$_endthreadex
 #define __CRT_HAVE_DOS$_eof
 #define __CRT_HAVE_DOS$_errno
+#define __CRT_HAVE_DOS$_except1
+#define __CRT_HAVE_DOS$_except2
 #define __CRT_HAVE_DOS$_except_handler2
 #define __CRT_HAVE_DOS$_except_handler3
 #define __CRT_HAVE_DOS$_except_handler4
@@ -9556,6 +9634,7 @@
 #define __CRT_HAVE_DOS$_execle
 #define __CRT_HAVE_DOS$_execlp
 #define __CRT_HAVE_DOS$_execlpe
+#define __CRT_HAVE_DOS$_execute_onexit_table
 #define __CRT_HAVE_DOS$_execv
 #define __CRT_HAVE_DOS$_execve
 #define __CRT_HAVE_DOS$_execvp
@@ -9603,6 +9682,7 @@
 #define __CRT_HAVE_DOS$_fputws_nolock
 #define __CRT_HAVE_DOS$_fread_nolock
 #define __CRT_HAVE_DOS$_fread_nolock_s
+#define __CRT_HAVE_DOS$_free_locale
 #define __CRT_HAVE_DOS$_fscanf_l
 #define __CRT_HAVE_DOS$_fscanf_s_l
 #define __CRT_HAVE_DOS$_fseek_nolock
@@ -9630,8 +9710,12 @@
 #define __CRT_HAVE_DOS$_get_doserrno
 #define __CRT_HAVE_DOS$_get_errno
 #define __CRT_HAVE_DOS$_get_fmode
+#define __CRT_HAVE_DOS$_get_initial_narrow_environment
+#define __CRT_HAVE_DOS$_get_initial_wide_environment
+#define __CRT_HAVE_DOS$_get_narrow_winmain_command_line
 #define __CRT_HAVE_DOS$_get_osfhandle
 #define __CRT_HAVE_DOS$_get_pgmptr
+#define __CRT_HAVE_DOS$_get_wide_winmain_command_line
 #define __CRT_HAVE_DOS$_get_wpgmptr
 #define __CRT_HAVE_DOS$_getcwd
 #define __CRT_HAVE_DOS$_getdcwd
@@ -9644,6 +9728,9 @@
 #define __CRT_HAVE_DOS$_i64toa_s
 #define __CRT_HAVE_DOS$_i64tow
 #define __CRT_HAVE_DOS$_i64tow_s
+#define __CRT_HAVE_DOS$_initialize_narrow_environment
+#define __CRT_HAVE_DOS$_initialize_onexit_table
+#define __CRT_HAVE_DOS$_initialize_wide_environment
 #define __CRT_HAVE_DOS$_initterm
 #define __CRT_HAVE_DOS$_initterm_e
 #define __CRT_HAVE_DOS$_isalnum_l
@@ -9737,8 +9824,10 @@
 #define __CRT_HAVE_DOS$_putenv_s
 #define __CRT_HAVE_DOS$_putw
 #define __CRT_HAVE_DOS$_putws
+#define __CRT_HAVE_DOS$_query_app_type
 #define __CRT_HAVE_DOS$_read
 #define __CRT_HAVE_DOS$_recalloc
+#define __CRT_HAVE_DOS$_register_onexit_function
 #define __CRT_HAVE_DOS$_rmdir
 #define __CRT_HAVE_DOS$_rotl
 #define __CRT_HAVE_DOS$_rotl64
@@ -9758,7 +9847,10 @@
 #define __CRT_HAVE_DOS$_scwprintf_p_l
 #define __CRT_HAVE_DOS$_searchenv
 #define __CRT_HAVE_DOS$_searchenv_s
+#define __CRT_HAVE_DOS$_seh_filter_dll
+#define __CRT_HAVE_DOS$_seh_filter_exe
 #define __CRT_HAVE_DOS$_set_abort_behavior
+#define __CRT_HAVE_DOS$_set_app_type
 #define __CRT_HAVE_DOS$_set_controlfp
 #define __CRT_HAVE_DOS$_set_doserrno
 #define __CRT_HAVE_DOS$_set_errno
@@ -9953,8 +10045,10 @@
 #define __CRT_HAVE_DOS$_vwprintf_p_l
 #define __CRT_HAVE_DOS$_vwprintf_s_l
 #define __CRT_HAVE_DOS$_vwscanf_l
+#define __CRT_HAVE_DOS$_wassert
 #define __CRT_HAVE_DOS$_wchdir
 #define __CRT_HAVE_DOS$_wcmdln
+#define __CRT_HAVE_DOS$_wcreate_locale
 #define __CRT_HAVE_DOS$_wcscoll_l
 #define __CRT_HAVE_DOS$_wcsdup
 #define __CRT_HAVE_DOS$_wcserror
@@ -10036,6 +10130,7 @@
 #define __CRT_HAVE_DOS$_wscanf_l
 #define __CRT_HAVE_DOS$_wsearchenv
 #define __CRT_HAVE_DOS$_wsearchenv_s
+#define __CRT_HAVE_DOS$_wsetlocale
 #define __CRT_HAVE_DOS$_wspawnl
 #define __CRT_HAVE_DOS$_wspawnle
 #define __CRT_HAVE_DOS$_wspawnlp

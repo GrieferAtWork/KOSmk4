@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xa3e5e6ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,26 +17,48 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PROCESS_H
-#define GUARD_LIBC_USER_PROCESS_H 1
+%(c_prefix){
+/* (#) Portability: MSVC (/include/new.h) */
+}
 
-#include "../api.h"
-#include "../auto/process.h"
+%[define_replacement(locale_t = __locale_t)]
+%[default:section(".text.crt.dos.heap.malloc")]
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <process.h>
+%[insert:prefix(
+#include <features.h>
+)]%[insert:prefix(
+#include <crtdefs.h>
+)]%{
 
-DECL_BEGIN
+#ifdef __CC__
+__SYSDECL_BEGIN
 
-#ifndef __KERNEL__
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(void (LIBDCALL *entry)(void *arg), u32 stacksz, void *arg);
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
-INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callback_type callback);
-#endif /* !__KERNEL__ */
+}
 
-DECL_END
+%[define(DEFINE__PNH =
+@@pp_ifndef ___PNH_defined@@
+#define ___PNH_defined
+typedef int (__CRTDECL *_PNH)(size_t);
+@@pp_endif@@
+)]
 
-#endif /* !GUARD_LIBC_USER_PROCESS_H */
+%[define_replacement(_PNH = _PNH)]
+%[define_type_class(_PNH = "TP")]
+
+%[insert:prefix(DEFINE__PNH)]
+
+[[crt_dos_only, decl_prefix(DEFINE__PNH)]]
+_PNH _query_new_handler(void);
+
+[[crt_dos_only, decl_prefix(DEFINE__PNH)]]
+_PNH _set_new_handler(_PNH newhandler);
+
+[[crt_dos_only]] int _query_new_mode(void);
+[[crt_dos_only]] int _set_new_mode(int newmode);
+
+%{
+
+__SYSDECL_END
+#endif /* __CC__ */
+
+}

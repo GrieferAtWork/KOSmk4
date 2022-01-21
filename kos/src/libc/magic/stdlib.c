@@ -702,7 +702,7 @@ int system([[nullable]] char const *command) {
 
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
 [[section(".text.crt{|.dos}.application.exit")]]
-[[export_alias("_ZSt9terminatev")]]
+[[export_alias("_ZSt9terminatev", "terminate")]]
 [[dos_only_export_alias("?terminate@@YAXXZ")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
 [[requires_function(_Exit), impl_include("<asm/os/stdlib.h>")]]
@@ -715,7 +715,9 @@ void abort() {
 [[alias("quick_exit", "_exit", "_Exit")]]
 void exit(int status);
 
-[[std, alias("at_quick_exit"), section(".text.crt{|.dos}.sched.process")]]
+[[dos_only_export_alias("_crt_atexit")]]
+[[std, alias("at_quick_exit", "_crt_at_quick_exit")]]
+[[section(".text.crt{|.dos}.sched.process")]]
 int atexit([[nonnull]] void (LIBCCALL *func)(void));
 
 
@@ -724,7 +726,9 @@ int atexit([[nonnull]] void (LIBCCALL *func)(void));
 [[std, ATTR_NORETURN, throws, alias("exit", "_exit", "_Exit")]]
 void quick_exit(int status);
 
-[[std, alias("atexit"), section(".text.crt{|.dos}.sched.process")]]
+[[dos_only_export_alias("_crt_at_quick_exit")]]
+[[std, alias("atexit", "_crt_atexit")]]
+[[section(".text.crt{|.dos}.sched.process")]]
 int at_quick_exit([[nonnull]] void (LIBCCALL *func)(void));
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 

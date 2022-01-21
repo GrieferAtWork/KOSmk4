@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBC_LIBC_ASSERT_C
 #define GUARD_LIBC_LIBC_ASSERT_C 1
 #define _KOS_KERNEL_SOURCE 1
+#define _UTF_SOURCE 1
 
 /* Keep this one the first */
 #include "../api.h"
@@ -43,6 +44,7 @@
 #include <string.h>
 #include <syscall.h>
 #include <termio.h>
+#include <uchar.h>
 #include <unistd.h>
 
 #include <libunwind/api.h> /* UNWIND_USER_ABORT */
@@ -232,6 +234,38 @@ libc_unimplementedf(char const *__restrict format, ...) {
 	syslog(LOG_WARN, "'\n");
 }
 #endif /* CONFIG_LOG_LIBC_UNIMPLEMENTED */
+
+
+/************************************************************************/
+/* Compat wrappers for DOS'S `_wassert()' function                      */
+/************************************************************************/
+#ifndef __KERNEL__
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) ATTR_SECTION(".text.crt.dos.assert") void VLIBCCALL
+NOTHROW(FCALL libc_assertion_failure_core_c16)(struct assert_args *__restrict args) {
+	if (args->aa_expr != NULL)
+		args->aa_expr = convert_c16tombs((char16_t *)args->aa_expr);
+	if (args->aa_file != NULL)
+		args->aa_file = convert_c16tombs((char16_t *)args->aa_file);
+	if (args->aa_func != NULL)
+		args->aa_func = convert_c16tombs((char16_t *)args->aa_func);
+	if (args->aa_format != NULL)
+		args->aa_format = convert_c16tombs((char16_t *)args->aa_format);
+	libc_assertion_failure_core(args);
+}
+
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) ATTR_SECTION(".text.crt.dos.assert") void VLIBCCALL
+NOTHROW(FCALL libc_assertion_failure_core_c32)(struct assert_args *__restrict args) {
+	if (args->aa_expr != NULL)
+		args->aa_expr = convert_c32tombs((char32_t *)args->aa_expr);
+	if (args->aa_file != NULL)
+		args->aa_file = convert_c32tombs((char32_t *)args->aa_file);
+	if (args->aa_func != NULL)
+		args->aa_func = convert_c32tombs((char32_t *)args->aa_func);
+	if (args->aa_format != NULL)
+		args->aa_format = convert_c32tombs((char32_t *)args->aa_format);
+	libc_assertion_failure_core(args);
+}
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69b1709a */
+/* HASH CRC-32:0xece8f4e8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -201,9 +201,8 @@ __NAMESPACE_STD_USING(localeconv)
 #define LC_GLOBAL_LOCALE (__CCAST(__locale_t)(-1))
 #endif /* __USE_XOPEN2K8 */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 /* >> setlocale(3)
@@ -275,6 +274,46 @@ __CDECLARE(,__locale_t,__NOTHROW_NCX,uselocale,(__locale_t __dataset),(__dataset
 __CREDIRECT(,__locale_t,__NOTHROW_NCX,uselocale,(__locale_t __dataset),__uselocale,(__dataset))
 #endif /* ... */
 #endif /* __USE_XOPEN2K8 */
+
+#ifdef __USE_DOS
+#define _ENABLE_PER_THREAD_LOCALE         0x0001
+#define _DISABLE_PER_THREAD_LOCALE        0x0002
+#define _ENABLE_PER_THREAD_LOCALE_GLOBAL  0x0010
+#define _DISABLE_PER_THREAD_LOCALE_GLOBAL 0x0020
+#define _ENABLE_PER_THREAD_LOCALE_NEW     0x0100
+#define _DISABLE_PER_THREAD_LOCALE_NEW    0x0200
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,_lock_locales,(void),())
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,_unlock_locales,(void),())
+__CDECLARE_OPT(,int,__NOTHROW_NCX,_configthreadlocale,(int __flag),(__flag))
+#ifdef __CRT_HAVE__get_current_locale
+__CDECLARE(,__locale_t,__NOTHROW_NCX,_get_current_locale,(void),())
+#elif defined(__CRT_HAVE___get_current_locale)
+__CREDIRECT(,__locale_t,__NOTHROW_NCX,_get_current_locale,(void),__get_current_locale,())
+#endif /* ... */
+#ifdef __CRT_HAVE__create_locale
+__CDECLARE(,__locale_t,__NOTHROW_NCX,_create_locale,(int __category, char const *__locale),(__category,__locale))
+#elif defined(__CRT_HAVE___create_locale)
+__CREDIRECT(,__locale_t,__NOTHROW_NCX,_create_locale,(int __category, char const *__locale),__create_locale,(__category,__locale))
+#endif /* ... */
+#ifdef __CRT_HAVE__free_locale
+__CDECLARE_VOID(,__NOTHROW_NCX,_free_locale,(__locale_t __locale),(__locale))
+#elif defined(__CRT_HAVE___free_locale)
+__CREDIRECT_VOID(,__NOTHROW_NCX,_free_locale,(__locale_t __locale),__free_locale,(__locale))
+#endif /* ... */
+__CDECLARE_OPT(,__WCHAR_TYPE__ *,__NOTHROW_NCX,_wsetlocale,(int __category, __WCHAR_TYPE__ const *__locale),(__category,__locale))
+__CDECLARE_OPT(,__locale_t,__NOTHROW_NCX,_wcreate_locale,(int __category, __WCHAR_TYPE__ const *__locale),(__category,__locale))
+__CDECLARE_OPT(__ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,___lc_locale_name_func,(void),())
+__CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,___lc_codepage_func,(void),())
+__CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,___lc_collate_cp_func,(void),())
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_Getdays,(void),())
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_Getmonths,(void),())
+__CDECLARE_OPT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,_Gettnames,(void),())
+__CDECLARE_OPT(__ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,_W_Getdays,(void),())
+__CDECLARE_OPT(__ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,_W_Getmonths,(void),())
+__CDECLARE_OPT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,_W_Gettnames,(void),())
+__CDECLARE_OPT(__ATTR_NONNULL((3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_Strftime,(char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
+__CDECLARE_OPT(__ATTR_NONNULL((3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_Wcsftime,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
+#endif /* __USE_DOS */
 
 __SYSDECL_END
 #endif /* __CC__ */

@@ -461,6 +461,7 @@ incdir("");
 #include <confname.h>
 #include <confstr.h>
 #include <corecrt.h>
+#include <corecrt_stdio_config.h>
 #include <cpio.h>
 #include <crtdbg.h>
 #include <crtdefs.h>
@@ -972,6 +973,7 @@ incdir("");
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
 #include <netpacket/packet.h>
+#include <new.h>
 #include <newlib.h>
 #include <nt/__stdinc.h>
 #include <nt/debugapi.h>

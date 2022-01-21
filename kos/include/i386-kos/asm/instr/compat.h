@@ -118,6 +118,28 @@
 #define R_syscall5q r9
 #define R_syscall5P r9
 
+/* Register arguments for MsAbi */
+#define R_msabi0b cl
+#define R_msabi0w cx
+#define R_msabi0l ecx
+#define R_msabi0q rcx
+#define R_msabi0P rcx
+#define R_msabi1b dl
+#define R_msabi1w dx
+#define R_msabi1l edx
+#define R_msabi1q rdx
+#define R_msabi1P rdx
+#define R_msabi2b r8l
+#define R_msabi2w r8w
+#define R_msabi2l r8d
+#define R_msabi2q r8
+#define R_msabi2P r8
+#define R_msabi3b r9l
+#define R_msabi3w r9w
+#define R_msabi3l r9d
+#define R_msabi3q r9
+#define R_msabi3P r9
+
 /* Instructions */
 #define movsbP       movsbq
 #define movswP       movswq

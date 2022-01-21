@@ -178,6 +178,26 @@ void _endthreadex($u32 exitcode);
 [[throws]] void _c_exit() {
 }
 
+%[define(DEFINE__tls_callback_type =
+@@pp_ifndef ___tls_callback_type_defined@@
+#define ___tls_callback_type_defined
+#ifdef __NO_ATTR_STDCALL
+typedef void (__ATTR_MSABI *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE__ /*???*/, void * /*???*/);
+#else /* __NO_ATTR_STDCALL */
+typedef void (__ATTR_STDCALL *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE__ /*???*/, void * /*???*/);
+#endif /* !__NO_ATTR_STDCALL */
+@@pp_endif@@
+)]
+%[define_replacement(_tls_callback_type = _tls_callback_type)]
+
+%[insert:prefix(DEFINE__tls_callback_type)]
+
+[[crt_dos_only, decl_prefix(DEFINE__tls_callback_type)]]
+void _register_thread_local_exe_atexit_callback([[nonnull]] _tls_callback_type callback);
+
+
+
+
 %[insert:function(_getpid = getpid)]
 
 %[default:section(".text.crt.dos.fs.exec.exec")]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32f84248 */
+/* HASH CRC-32:0x68f6fdad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,10 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_freelocale)(locale_t dataset);
  * @return: LC_GLOBAL_LOCALE: The calling thread uses the global locale (default)
  * @return: * :               The currently used locale */
 INTDEF locale_t NOTHROW_NCX(LIBDCALL libd_uselocale)(locale_t dataset);
+INTDEF int NOTHROW_NCX(LIBDCALL libd__configthreadlocale)(int flag);
+INTDEF locale_t NOTHROW_NCX(LIBDCALL libd__create_locale)(int category, char const *locale);
+INTDEF void NOTHROW_NCX(LIBDCALL libd__free_locale)(locale_t locale);
+INTDEF NONNULL((3, 4)) size_t NOTHROW_NCX(LIBDCALL libd__Strftime)(char *buf, size_t bufsize, char const *format, struct tm const *tms, void *lc_time_arg);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

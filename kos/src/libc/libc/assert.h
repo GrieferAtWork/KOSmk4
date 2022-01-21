@@ -55,7 +55,10 @@ INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL l
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state);
 #ifdef __KERNEL__
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args);
-#endif /* __KERNEL__ */
+#else /* __KERNEL__ */
+INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_core_c16)(struct assert_args *__restrict args);
+INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_core_c32)(struct assert_args *__restrict args);
+#endif /* !__KERNEL__ */
 
 
 DATDEF uintptr_t __stack_chk_guard;

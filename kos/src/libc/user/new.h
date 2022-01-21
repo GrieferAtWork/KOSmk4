@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3e5e6ca */
+/* HASH CRC-32:0x41afd5cd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,26 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PROCESS_H
-#define GUARD_LIBC_USER_PROCESS_H 1
+#ifndef GUARD_LIBC_USER_NEW_H
+#define GUARD_LIBC_USER_NEW_H 1
 
 #include "../api.h"
-#include "../auto/process.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <process.h>
+#include <new.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(void (LIBDCALL *entry)(void *arg), u32 stacksz, void *arg);
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
-INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callback_type callback);
+INTDEF _PNH NOTHROW_NCX(LIBDCALL libc__query_new_handler)(void);
+INTDEF _PNH NOTHROW_NCX(LIBDCALL libc__set_new_handler)(_PNH newhandler);
+INTDEF int NOTHROW_NCX(LIBDCALL libc__query_new_mode)(void);
+INTDEF int NOTHROW_NCX(LIBDCALL libc__set_new_mode)(int newmode);
 #endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_USER_PROCESS_H */
+#endif /* !GUARD_LIBC_USER_NEW_H */

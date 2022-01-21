@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa45e4ef */
+/* HASH CRC-32:0x38b23cb8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -492,6 +492,10 @@ DFUN(".text.crt.dos.i18n", libd_newlocale, libc_newlocale, TP, 3, TD, TP, TP)
 DFUN(".text.crt.dos.i18n", libd_duplocale, libc_duplocale, TP, 1, TP)
 DFUN(".text.crt.dos.i18n", libd_freelocale, libc_freelocale, TV, 1, TP)
 DFUN(".text.crt.dos.i18n", libd_uselocale, libc_uselocale, TP, 1, TP)
+DFUN(".text.crt.dos.i18n", libd__configthreadlocale, libc__configthreadlocale, TD, 1, TD)
+DFUN(".text.crt.dos.i18n", libd__create_locale, libc__create_locale, TP, 2, TD, TP)
+DFUN(".text.crt.dos.i18n", libd__free_locale, libc__free_locale, TV, 1, TP)
+DFUN(".text.crt.dos.i18n", libd__Strftime, libc__Strftime, TI, 5, TP, TI, TP, TP, TP)
 
 /* malloc */
 DFUN(".text.crt.dos.heap.helpers", libd_realloc_in_place, libc_realloc_in_place, TP, 2, TP, TI)

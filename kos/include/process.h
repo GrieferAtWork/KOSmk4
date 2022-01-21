@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x770fe94c */
+/* HASH CRC-32:0x386f8ff2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -154,6 +154,8 @@ __CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,abort,(void),{ __builtin_abo
 __CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),())
 #elif defined(__CRT_HAVE__ZSt9terminatev)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),_ZSt9terminatev,())
+#elif defined(__CRT_HAVE_terminate)
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),terminate,())
 #elif defined(__CRT_HAVE_$Qterminate$A$AYAXXZ)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
 #elif defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
@@ -189,6 +191,17 @@ __CDECLARE_VOID(,__THROWING,_c_exit,(void),())
 #include <libc/local/process/_c_exit.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL _c_exit)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit))(); })
 #endif /* !__CRT_HAVE__c_exit */
+#ifndef ___tls_callback_type_defined
+#define ___tls_callback_type_defined
+#ifdef __NO_ATTR_STDCALL
+typedef void (__ATTR_MSABI *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE__ /*???*/, void * /*???*/);
+#else /* __NO_ATTR_STDCALL */
+typedef void (__ATTR_STDCALL *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE__ /*???*/, void * /*???*/);
+#endif /* !__NO_ATTR_STDCALL */
+#endif /* !___tls_callback_type_defined */
+#ifdef __CRT_HAVE__register_thread_local_exe_atexit_callback
+__LIBC __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _register_thread_local_exe_atexit_callback)(_tls_callback_type __callback) __CASMNAME_SAME("_register_thread_local_exe_atexit_callback");
+#endif /* __CRT_HAVE__register_thread_local_exe_atexit_callback */
 #ifdef __CRT_HAVE_getpid
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)

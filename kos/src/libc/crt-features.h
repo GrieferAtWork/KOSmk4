@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x659cbcfd */
+/* HASH CRC-32:0xe2d174ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,16 @@
 #define __CRT_HAVE_DOS$RpcInterrupt
 #define __CRT_HAVE_DOS$RpcSchedule
 #define __CRT_HAVE_DOS$_Exit
+#define __CRT_HAVE_DOS$_Strftime
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_W_Getdays
+#define __CRT_HAVE_DOS$_W_Getmonths
+#define __CRT_HAVE_DOS$_W_Gettnames
+#define __CRT_HAVE_DOS$_Wcsftime
+#define __CRT_HAVE_DOS$___lc_locale_name_func
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$__cmsg_nxthdr
 #define __CRT_HAVE_DOS$__control87_2
 #define __CRT_HAVE_DOS$__fbufsize
@@ -204,9 +214,11 @@
 #define __CRT_HAVE_DOS$_byteswap_ushort
 #define __CRT_HAVE_DOS$_chdrive
 #define __CRT_HAVE_DOS$_chgsign
+#define __CRT_HAVE_DOS$_configthreadlocale
 #define __CRT_HAVE_DOS$_control87
 #define __CRT_HAVE_DOS$_controlfp
 #define __CRT_HAVE_DOS$_controlfp_s
+#define __CRT_HAVE_DOS$_create_locale
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_dtest
@@ -243,6 +255,7 @@
 #define __CRT_HAVE_DOS$_fprintf_p_l
 #define __CRT_HAVE_DOS$_fprintf_s_l
 #define __CRT_HAVE_DOS$_fread_nolock_s
+#define __CRT_HAVE_DOS$_free_locale
 #define __CRT_HAVE_DOS$_fscanf_l
 #define __CRT_HAVE_DOS$_fscanf_s_l
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -531,6 +544,7 @@
 #define __CRT_HAVE_DOS$_vwprintf_p_l
 #define __CRT_HAVE_DOS$_vwprintf_s_l
 #define __CRT_HAVE_DOS$_vwscanf_l
+#define __CRT_HAVE_DOS$_wcreate_locale
 #define __CRT_HAVE_DOS$_wcserror
 #define __CRT_HAVE_DOS$_wcserror_s
 #define __CRT_HAVE_DOS$_wcslwr_s
@@ -563,6 +577,7 @@
 #define __CRT_HAVE_DOS$_wscanf_l
 #define __CRT_HAVE_DOS$_wsearchenv
 #define __CRT_HAVE_DOS$_wsearchenv_s
+#define __CRT_HAVE_DOS$_wsetlocale
 #define __CRT_HAVE_DOS$_wsplitpath
 #define __CRT_HAVE_DOS$_wsplitpath_s
 #define __CRT_HAVE_DOS$_wstat32
@@ -3333,9 +3348,22 @@
 #define __CRT_HAVE__CrtSetReportHookW2
 #define __CRT_HAVE__CrtSetReportMode
 #define __CRT_HAVE__Exit
+#define __CRT_HAVE__Getdays
+#define __CRT_HAVE__Getmonths
+#define __CRT_HAVE__Gettnames
+#define __CRT_HAVE__Strftime
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE__Unwind_Resume
+#ifndef __KERNEL__
+#define __CRT_HAVE__W_Getdays
+#define __CRT_HAVE__W_Getmonths
+#define __CRT_HAVE__W_Gettnames
+#define __CRT_HAVE__Wcsftime
 #define __CRT_HAVE__ZSt9terminatev
+#define __CRT_HAVE____lc_codepage_func
+#define __CRT_HAVE____lc_collate_cp_func
+#define __CRT_HAVE____lc_locale_name_func
+#endif /* !__KERNEL__ */
 #ifdef __KERNEL__
 #define __CRT_HAVE___acheck
 #define __CRT_HAVE___acheckf
@@ -3549,9 +3577,11 @@
 #define __CRT_HAVE__chdrive
 #define __CRT_HAVE__chgsign
 #define __CRT_HAVE__clearfp
+#define __CRT_HAVE__configthreadlocale
 #define __CRT_HAVE__control87
 #define __CRT_HAVE__controlfp
 #define __CRT_HAVE__controlfp_s
+#define __CRT_HAVE__create_locale
 #define __CRT_HAVE__dtest
 #define __CRT_HAVE__dupenv_s
 #define __CRT_HAVE__dupenv_s_dbg
@@ -3587,6 +3617,7 @@
 #define __CRT_HAVE__fprintf_s_l
 #define __CRT_HAVE__fread_nolock_s
 #define __CRT_HAVE__free_dbg
+#define __CRT_HAVE__free_locale
 #define __CRT_HAVE__fscanf_l
 #define __CRT_HAVE__fscanf_s_l
 #define __CRT_HAVE__fsopen
@@ -3608,6 +3639,7 @@
 #define __CRT_HAVE__fwprintf_s_l
 #define __CRT_HAVE__fwscanf_l
 #define __CRT_HAVE__gcvt_s
+#define __CRT_HAVE__get_current_locale
 #define __CRT_HAVE__get_doserrno
 #define __CRT_HAVE__get_errno
 #define __CRT_HAVE__get_fmode
@@ -3647,6 +3679,7 @@
 #define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
+#define __CRT_HAVE__lock_locales
 #define __CRT_HAVE__lrotl
 #define __CRT_HAVE__lrotr
 #define __CRT_HAVE__lsearch_s
@@ -3677,8 +3710,11 @@
 #define __CRT_HAVE__printf_s_l
 #define __CRT_HAVE__putenv_s
 #define __CRT_HAVE__putws
+#define __CRT_HAVE__query_new_handler
+#define __CRT_HAVE__query_new_mode
 #define __CRT_HAVE__realloc_dbg
 #define __CRT_HAVE__recalloc_dbg
+#define __CRT_HAVE__register_thread_local_exe_atexit_callback
 #define __CRT_HAVE__rmtmp
 #define __CRT_HAVE__rotl
 #define __CRT_HAVE__rotl64
@@ -3703,6 +3739,8 @@
 #define __CRT_HAVE__set_error_mode
 #define __CRT_HAVE__set_fmode
 #define __CRT_HAVE__set_invalid_parameter_handler
+#define __CRT_HAVE__set_new_handler
+#define __CRT_HAVE__set_new_mode
 #define __CRT_HAVE__set_output_format
 #define __CRT_HAVE__set_printf_count_output
 #define __CRT_HAVE__set_purecall_handler
@@ -3768,6 +3806,7 @@
 #define __CRT_HAVE__ultow_s
 #define __CRT_HAVE__unloaddll
 #define __CRT_HAVE__unlock_fhandle
+#define __CRT_HAVE__unlock_locales
 #define __CRT_HAVE__vfprintf_l
 #define __CRT_HAVE__vfprintf_p
 #define __CRT_HAVE__vfprintf_p_l
@@ -3825,6 +3864,7 @@
 #define __CRT_HAVE__vwprintf_p_l
 #define __CRT_HAVE__vwprintf_s_l
 #define __CRT_HAVE__vwscanf_l
+#define __CRT_HAVE__wcreate_locale
 #define __CRT_HAVE__wcsdup_dbg
 #define __CRT_HAVE__wcserror
 #define __CRT_HAVE__wcserror_s
@@ -3862,6 +3902,7 @@
 #define __CRT_HAVE__wscanf_l
 #define __CRT_HAVE__wsearchenv
 #define __CRT_HAVE__wsearchenv_s
+#define __CRT_HAVE__wsetlocale
 #define __CRT_HAVE__wsplitpath
 #define __CRT_HAVE__wsplitpath_s
 #define __CRT_HAVE__wstat32
@@ -6179,6 +6220,7 @@
 #define __CRT_HAVE_tell64
 #define __CRT_HAVE_telldir
 #define __CRT_HAVE_tempnam
+#define __CRT_HAVE_terminate
 #define __CRT_HAVE_textdomain
 #define __CRT_HAVE_tfind
 #define __CRT_HAVE_tfind_r

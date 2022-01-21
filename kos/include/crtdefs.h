@@ -413,9 +413,11 @@ typedef __time64_t time_t;
 
 #ifndef __CRTDECL
 #ifdef _M_CEE_PURE
-#define __CRTDECL   /* nothing */
+#define __CRTDECL /* nothing */
+#elif defined(__NO_ATTR_CDECL)
+#define __CRTDECL __ATTR_MSABI
 #else /* _M_CEE_PURE */
-#define __CRTDECL   __ATTR_CDECL
+#define __CRTDECL __ATTR_CDECL
 #endif /* !_M_CEE_PURE */
 #endif /* !__CRTDECL */
 

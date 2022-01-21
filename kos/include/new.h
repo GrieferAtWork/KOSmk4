@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3e5e6ca */
+/* HASH CRC-32:0x963b8730 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,26 +18,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PROCESS_H
-#define GUARD_LIBC_USER_PROCESS_H 1
+/* (#) Portability: MSVC (/include/new.h) */
+#ifndef _NEW_H
+#define _NEW_H 1
 
-#include "../api.h"
-#include "../auto/process.h"
+#include "__stdinc.h"
+#include "__crt.h"
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <process.h>
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-DECL_BEGIN
+#include <features.h>
+#include <crtdefs.h>
 
-#ifndef __KERNEL__
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(void (LIBDCALL *entry)(void *arg), u32 stacksz, void *arg);
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
-INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callback_type callback);
-#endif /* !__KERNEL__ */
+#ifdef __CC__
+__SYSDECL_BEGIN
 
-DECL_END
+#ifndef ___PNH_defined
+#define ___PNH_defined
+typedef int (__CRTDECL *_PNH)(size_t);
+#endif /* !___PNH_defined */
+#ifdef __CRT_HAVE__query_new_handler
+__LIBC _PNH __NOTHROW_NCX(__LIBDCALL _query_new_handler)(void) __CASMNAME_SAME("_query_new_handler");
+#endif /* __CRT_HAVE__query_new_handler */
+#ifdef __CRT_HAVE__set_new_handler
+__LIBC _PNH __NOTHROW_NCX(__LIBDCALL _set_new_handler)(_PNH __newhandler) __CASMNAME_SAME("_set_new_handler");
+#endif /* __CRT_HAVE__set_new_handler */
+#ifdef __CRT_HAVE__query_new_mode
+__LIBC int __NOTHROW_NCX(__LIBDCALL _query_new_mode)(void) __CASMNAME_SAME("_query_new_mode");
+#endif /* __CRT_HAVE__query_new_mode */
+#ifdef __CRT_HAVE__set_new_mode
+__LIBC int __NOTHROW_NCX(__LIBDCALL _set_new_mode)(int __newmode) __CASMNAME_SAME("_set_new_mode");
+#endif /* __CRT_HAVE__set_new_mode */
 
-#endif /* !GUARD_LIBC_USER_PROCESS_H */
+__SYSDECL_END
+#endif /* __CC__ */
+
+#endif /* !_NEW_H */

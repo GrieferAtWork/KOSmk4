@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53ea2a9b */
+/* HASH CRC-32:0x7d1ab133 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -469,6 +469,12 @@ DEFINE_PUBLIC_ALIAS(DOS$__freelocale, libd_freelocale);
 DEFINE_PUBLIC_ALIAS(DOS$freelocale, libd_freelocale);
 DEFINE_PUBLIC_ALIAS(DOS$__uselocale, libd_uselocale);
 DEFINE_PUBLIC_ALIAS(DOS$uselocale, libd_uselocale);
+DEFINE_PUBLIC_ALIAS(DOS$_configthreadlocale, libd__configthreadlocale);
+DEFINE_PUBLIC_ALIAS(DOS$__create_locale, libd__create_locale);
+DEFINE_PUBLIC_ALIAS(DOS$_create_locale, libd__create_locale);
+DEFINE_PUBLIC_ALIAS(DOS$__free_locale, libd__free_locale);
+DEFINE_PUBLIC_ALIAS(DOS$_free_locale, libd__free_locale);
+DEFINE_PUBLIC_ALIAS(DOS$_Strftime, libd__Strftime);
 
 /* malloc */
 DEFINE_PUBLIC_ALIAS(DOS$_expand, libd_realloc_in_place);
@@ -1769,8 +1775,10 @@ DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(DOS$mblen, libd_mblen);
 DEFINE_PUBLIC_ALIAS(DOS$system, libd_system);
 DEFINE_PUBLIC_ALIAS(DOS$exit, libd_exit);
+DEFINE_PUBLIC_ALIAS(DOS$_crt_atexit, libd_atexit);
 DEFINE_PUBLIC_ALIAS(DOS$atexit, libd_atexit);
 DEFINE_PUBLIC_ALIAS(DOS$quick_exit, libd_quick_exit);
+DEFINE_PUBLIC_ALIAS(DOS$_crt_at_quick_exit, libd_at_quick_exit);
 DEFINE_PUBLIC_ALIAS(DOS$at_quick_exit, libd_at_quick_exit);
 DEFINE_PUBLIC_ALIAS(DOS$_exit, libd__Exit);
 DEFINE_PUBLIC_ALIAS(DOS$_Exit, libd__Exit);

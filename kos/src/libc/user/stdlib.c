@@ -2425,11 +2425,17 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbfc53e83]]]*/
+/*[[[start:exports,hash:CRC-32=0x5e386367]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_crt_atexit, libc_atexit);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
 DEFINE_PUBLIC_ALIAS(quick_exit, libc_quick_exit);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_crt_at_quick_exit, libc_at_quick_exit);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(at_quick_exit, libc_at_quick_exit);
 DEFINE_PUBLIC_ALIAS(_exit, libc__Exit);
 DEFINE_PUBLIC_ALIAS(_Exit, libc__Exit);
