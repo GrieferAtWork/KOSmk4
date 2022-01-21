@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf74ad4c5 */
+/* HASH CRC-32:0xf92c54ec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,43 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <fpu_control.h>
+INTERN ATTR_SECTION(".text.crt.math.float") uint32_t
+NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval,
+                                      uint32_t mask) {
+	fpu_control_t result;
+	_FPU_GETCW(result);
+#if _FPU_RESERVED
+	mask &= ~_FPU_RESERVED; /* Don't allow modification of reserved words. */
+#endif /* _FPU_RESERVED */
+	if (mask) {
+		fpu_control_t newword;
+		newword = result;
+		newword &= ~mask;
+		newword = newval & mask;
+		_FPU_SETCW(newword);
+	}
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.math.float") void
+NOTHROW_NCX(LIBCCALL libc__set_controlfp)(uint32_t newval,
+                                          uint32_t mask) {
+	libc__controlfp(newval, mask);
+}
+INTERN ATTR_SECTION(".text.crt.math.float") errno_t
+NOTHROW_NCX(LIBCCALL libc__controlfp_s)(uint32_t *pcurrent,
+                                        uint32_t newval,
+                                        uint32_t mask) {
+	uint32_t st = libc__controlfp(newval, mask);
+	if (pcurrent)
+		*pcurrent = st;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.math.float") uint32_t
+NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval,
+                                      uint32_t mask) {
+	return libc__controlfp(newval, mask);
+}
 INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc__chgsign)(double x) {
 	return -x;
@@ -42,6 +79,10 @@ NOTHROW(LIBCCALL libc___fpe_flt_rounds)(void) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(_controlfp, libc__controlfp);
+DEFINE_PUBLIC_ALIAS(_set_controlfp, libc__set_controlfp);
+DEFINE_PUBLIC_ALIAS(_controlfp_s, libc__controlfp_s);
+DEFINE_PUBLIC_ALIAS(_control87, libc__control87);
 DEFINE_PUBLIC_ALIAS(_chgsign, libc__chgsign);
 DEFINE_PUBLIC_ALIAS(__fpe_flt_rounds, libc___fpe_flt_rounds);
 #endif /* !__KERNEL__ */

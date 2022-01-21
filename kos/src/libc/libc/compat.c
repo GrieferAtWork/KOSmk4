@@ -745,8 +745,8 @@ DECL_END
 /************************************************************************/
 /* <fpu_control.h>                                                      */
 /************************************************************************/
-#if __has_include(<fpu_control.h>)
 #include <fpu_control.h>
+#ifdef _FPU_GETCW
 
 DECL_BEGIN
 
@@ -785,7 +785,7 @@ INTERN ATTR_SECTION(".text.crt.math.float") void NOTHROW_NCX(LIBCCALL libc___set
 }
 
 DECL_END
-#endif /* __has_include(<fpu_control.h>) */
+#endif /* _FPU_GETCW */
 
 
 

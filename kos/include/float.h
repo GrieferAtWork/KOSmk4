@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77897c9d */
+/* HASH CRC-32:0xeb07df9e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -269,9 +269,33 @@ __SYSDECL_BEGIN
 #ifdef __USE_DOS
 #ifdef __CC__
 __CDECLARE_OPT(,__UINT32_TYPE__,__NOTHROW_NCX,_clearfp,(void),())
-__CDECLARE_OPT(,__UINT32_TYPE__,__NOTHROW_NCX,_controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,_set_controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
-__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,_controlfp_s,(__UINT32_TYPE__ *__pcurrent, __UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__pcurrent,__newval,__mask))
+#ifdef __CRT_HAVE__controlfp
+__CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
+#else /* __CRT_HAVE__controlfp */
+#include <fpu_control.h>
+#if defined(_FPU_GETCW) && defined(_FPU_SETCW)
+#include <libc/local/float/_controlfp.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_controlfp, __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL _controlfp)(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_controlfp))(__newval, __mask); })
+#endif /* _FPU_GETCW && _FPU_SETCW */
+#endif /* !__CRT_HAVE__controlfp */
+#ifdef __CRT_HAVE__set_controlfp
+__CDECLARE_VOID(,__NOTHROW_NCX,_set_controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
+#else /* __CRT_HAVE__set_controlfp */
+#include <fpu_control.h>
+#if defined(__CRT_HAVE__controlfp) || (defined(_FPU_GETCW) && defined(_FPU_SETCW))
+#include <libc/local/float/_set_controlfp.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_set_controlfp, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _set_controlfp)(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_set_controlfp))(__newval, __mask); })
+#endif /* __CRT_HAVE__controlfp || (_FPU_GETCW && _FPU_SETCW) */
+#endif /* !__CRT_HAVE__set_controlfp */
+#ifdef __CRT_HAVE__controlfp_s
+__CDECLARE(,__errno_t,__NOTHROW_NCX,_controlfp_s,(__UINT32_TYPE__ *__pcurrent, __UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__pcurrent,__newval,__mask))
+#else /* __CRT_HAVE__controlfp_s */
+#include <fpu_control.h>
+#if defined(__CRT_HAVE__controlfp) || (defined(_FPU_GETCW) && defined(_FPU_SETCW))
+#include <libc/local/float/_controlfp_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_controlfp_s, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL _controlfp_s)(__UINT32_TYPE__ *__pcurrent, __UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_controlfp_s))(__pcurrent, __newval, __mask); })
+#endif /* __CRT_HAVE__controlfp || (_FPU_GETCW && _FPU_SETCW) */
+#endif /* !__CRT_HAVE__controlfp_s */
 __CDECLARE_OPT(,__UINT32_TYPE__,__NOTHROW_NCX,_statusfp,(void),())
 #ifdef __CRT_HAVE_fpreset
 __CREDIRECT_VOID(,__NOTHROW_NCX,_fpreset,(void),fpreset,())
@@ -336,8 +360,12 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_statusfp2,(__UINT32_TYPE__ *__x86_stat, __UI
 #endif
 
 #ifdef __CC__
-/* TODO: This function is most definitely x86-specific! */
-__CDECLARE_OPT(,__UINT32_TYPE__,__NOTHROW_NCX,_control87,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
+#ifdef __CRT_HAVE__control87
+__CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_control87,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
+#else /* __CRT_HAVE__control87 */
+#include <libc/local/float/_control87.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_control87, __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL _control87)(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_control87))(__newval, __mask); })
+#endif /* !__CRT_HAVE__control87 */
 /* TODO: This function is most definitely x86-specific! */
 #if defined(__x86_64__) || defined(__i386__)
 __CDECLARE_OPT(,int,__NOTHROW_NCX,__control87_2,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask, __UINT32_TYPE__ *__x86_control_word, __UINT32_TYPE__ *__sse2_control_word),(__newval,__mask,__x86_control_word,__sse2_control_word))

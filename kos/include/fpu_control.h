@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xc511ef59 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +17,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_FLOAT_H
-#define GUARD_LIBC_USER_FLOAT_H 1
+/* (#) Portability: GNU C Library (/sysdeps/[...]/fpu_control.h) */
+/* (#) Portability: libc4/5       (/include/fpu_control.h) */
+#ifndef _FPU_CONTROL_H
+#define _FPU_CONTROL_H 1
 
-#include "../api.h"
-#include "../auto/float.h"
+#include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <float.h>
+#if 0 /* To-be overwritten by arch-specific headers */
+#ifdef __CC__
+__SYSDECL_BEGIN
 
-DECL_BEGIN
+typedef NATIVE_FPU_CONTROL_WORD_TYPE fpu_control_t;
 
-#ifndef __KERNEL__
-INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__clearfp)(void);
-INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__statusfp)(void);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__statusfp2)(uint32_t *x86_stat, uint32_t *sse2_stat);
-INTDEF int NOTHROW_NCX(LIBCCALL libc___control87_2)(uint32_t newval, uint32_t mask, uint32_t *x86_control_word, uint32_t *sse2_control_word);
-INTDEF int *NOTHROW_NCX(LIBCCALL libc___fpecode)(void);
-/* @return: * : Set of `_FPCLASS_*' */
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__fpclass)(double x);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_fpreset)(void);
-#endif /* !__KERNEL__ */
+/* Access hardware FPU control word. */
+#define _FPU_GETCW(cw) (void)((cw) = NATIVE_FPU_CONTROL_WORD)
+#define _FPU_SETCW(cw) (void)(NATIVE_FPU_CONTROL_WORD = (cw))
 
-DECL_END
+/* >> __fpu_control(3)
+ * Control word set during startup of old linux applications. */
+#ifdef __CRT_HAVE___fpu_control
+__LIBC fpu_control_t __fpu_control;
+#endif /* __CRT_HAVE___fpu_control */
 
-#endif /* !GUARD_LIBC_USER_FLOAT_H */
+/* >> __setfpucw(3)
+ * Function called by old linux applications to set `__fpu_control()'. */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,__setfpucw,(fpu_control_t __ctrl),(__ctrl))
+
+__SYSDECL_END
+#endif /* __CC__ */
+#endif
+
+#endif /* !_FPU_CONTROL_H */

@@ -493,6 +493,7 @@
 	CB(PREFIX.crt.dos.i18n) \
 	CB(PREFIX.crt.dos.system.adjtime PREFIX.crt.dos.system.info PREFIX.crt.dos.system.ioperm PREFIX.crt.dos.system.mman PREFIX.crt.dos.system.ptrace PREFIX.crt.dos.system.reboot PREFIX.crt.dos.system.syslog PREFIX.crt.dos.system.utility PREFIX.crt.dos.system) \
 	CB(PREFIX.crt.dos.debug) \
+	CB(PREFIX.crt.dos.assert) \
 	CB(PREFIX.crt.dos.ssp.string.memory) \
 	CB(PREFIX.crt.dos.fs.dlfcn PREFIX.crt.dos.fs.exec.posix_spawn PREFIX.crt.dos.fs.exec.spawn PREFIX.crt.dos.fs.exec.system PREFIX.crt.dos.fs.fts PREFIX.crt.dos.fs.io PREFIX.crt.dos.fs.statfs.statfs PREFIX.crt.dos.fs.statfs.statvfs) \
 	CB(PREFIX.crt.dos.sched.resource) \

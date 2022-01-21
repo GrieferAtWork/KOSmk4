@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a72d084 */
+/* HASH CRC-32:0xdef12457 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,9 +67,6 @@
 #define __stub__beep
 #define __stub__clearfp
 #define __stub__configthreadlocale
-#define __stub__control87
-#define __stub__controlfp
-#define __stub__controlfp_s
 #define __stub___create_locale
 #define __stub__create_locale
 #define __stub__dupenv_s
@@ -92,7 +89,6 @@
 #define __stub__rmtmp
 #define __stub__searchenv_s
 #define __stub__set_abort_behavior
-#define __stub__set_controlfp
 #define __stub__set_error_mode
 #define __stub__set_invalid_parameter_handler
 #define __stub__set_new_handler

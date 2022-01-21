@@ -36,48 +36,6 @@ NOTHROW_NCX(LIBCCALL libc__clearfp)(void)
 }
 /*[[[end:libc__clearfp]]]*/
 
-/*[[[head:libc__controlfp,hash:CRC-32=0xab4517aa]]]*/
-INTERN ATTR_SECTION(".text.crt.math.float") uint32_t
-NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval,
-                                      uint32_t mask)
-/*[[[body:libc__controlfp]]]*/
-/*AUTO*/{
-	(void)newval;
-	(void)mask;
-	CRT_UNIMPLEMENTEDF("_controlfp(%" PRIx32 ", %" PRIx32 ")", newval, mask); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__controlfp]]]*/
-
-/*[[[head:libc__set_controlfp,hash:CRC-32=0x8ae7121d]]]*/
-INTERN ATTR_SECTION(".text.crt.math.float") void
-NOTHROW_NCX(LIBCCALL libc__set_controlfp)(uint32_t newval,
-                                          uint32_t mask)
-/*[[[body:libc__set_controlfp]]]*/
-/*AUTO*/{
-	(void)newval;
-	(void)mask;
-	CRT_UNIMPLEMENTEDF("_set_controlfp(%" PRIx32 ", %" PRIx32 ")", newval, mask); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc__set_controlfp]]]*/
-
-/*[[[head:libc__controlfp_s,hash:CRC-32=0xf346904f]]]*/
-INTERN ATTR_SECTION(".text.crt.math.float") errno_t
-NOTHROW_NCX(LIBCCALL libc__controlfp_s)(uint32_t *pcurrent,
-                                        uint32_t newval,
-                                        uint32_t mask)
-/*[[[body:libc__controlfp_s]]]*/
-/*AUTO*/{
-	(void)pcurrent;
-	(void)newval;
-	(void)mask;
-	CRT_UNIMPLEMENTEDF("_controlfp_s(%p, %" PRIx32 ", %" PRIx32 ")", pcurrent, newval, mask); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libc__controlfp_s]]]*/
-
 /*[[[head:libc__statusfp,hash:CRC-32=0x3a5b5b50]]]*/
 INTERN ATTR_SECTION(".text.crt.math.float") uint32_t
 NOTHROW_NCX(LIBCCALL libc__statusfp)(void)
@@ -103,19 +61,6 @@ NOTHROW_NCX(LIBCCALL libc__statusfp2)(uint32_t *x86_stat,
 }
 /*[[[end:libc__statusfp2]]]*/
 
-/*[[[head:libc__control87,hash:CRC-32=0x3c84b0f8]]]*/
-INTERN ATTR_SECTION(".text.crt.math.float") uint32_t
-NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval,
-                                      uint32_t mask)
-/*[[[body:libc__control87]]]*/
-/*AUTO*/{
-	(void)newval;
-	(void)mask;
-	CRT_UNIMPLEMENTEDF("_control87(%" PRIx32 ", %" PRIx32 ")", newval, mask); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__control87]]]*/
 
 /*[[[head:libc___control87_2,hash:CRC-32=0x1dbbbb5e]]]*/
 INTERN ATTR_SECTION(".text.crt.math.float") int
@@ -181,14 +126,10 @@ NOTHROW_NCX(LIBCCALL libc_fpreset)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1270b0b8]]]*/
+/*[[[start:exports,hash:CRC-32=0xf895cdc4]]]*/
 DEFINE_PUBLIC_ALIAS(_clearfp, libc__clearfp);
-DEFINE_PUBLIC_ALIAS(_controlfp, libc__controlfp);
-DEFINE_PUBLIC_ALIAS(_set_controlfp, libc__set_controlfp);
-DEFINE_PUBLIC_ALIAS(_controlfp_s, libc__controlfp_s);
 DEFINE_PUBLIC_ALIAS(_statusfp, libc__statusfp);
 DEFINE_PUBLIC_ALIAS(_statusfp2, libc__statusfp2);
-DEFINE_PUBLIC_ALIAS(_control87, libc__control87);
 DEFINE_PUBLIC_ALIAS(__control87_2, libc___control87_2);
 DEFINE_PUBLIC_ALIAS(__fpecode, libc___fpecode);
 DEFINE_PUBLIC_ALIAS(_fpclass, libc__fpclass);

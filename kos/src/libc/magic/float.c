@@ -268,13 +268,37 @@ __SYSDECL_BEGIN
 $uint32_t _clearfp();
 
 [[decl_include("<hybrid/typecore.h>")]]
-$uint32_t _controlfp($uint32_t newval, $uint32_t mask);
+[[requires_include("<fpu_control.h>")]]
+[[requires(defined(_FPU_GETCW) && defined(_FPU_SETCW))]]
+[[impl_include("<fpu_control.h>")]]
+$uint32_t _controlfp($uint32_t newval, $uint32_t mask) {
+	@fpu_control_t@ result;
+	@_FPU_GETCW@(result);
+@@pp_if _FPU_RESERVED != 0@@
+	mask &= ~_FPU_RESERVED; /* Don't allow modification of reserved words. */
+@@pp_endif@@
+	if (mask) {
+		@fpu_control_t@ newword;
+		newword = result;
+		newword &= ~mask;
+		newword = newval & mask;
+		_FPU_SETCW(newword);
+	}
+	return result;
+}
 
-[[decl_include("<hybrid/typecore.h>")]]
-void _set_controlfp($uint32_t newval, $uint32_t mask);
+[[decl_include("<hybrid/typecore.h>"), requires_function(_controlfp)]]
+void _set_controlfp($uint32_t newval, $uint32_t mask) {
+	_controlfp(newval, mask);
+}
 
-[[decl_include("<hybrid/typecore.h>")]]
-$errno_t _controlfp_s($uint32_t *pcurrent, $uint32_t newval, $uint32_t mask);
+[[decl_include("<hybrid/typecore.h>"), requires_function(_controlfp)]]
+$errno_t _controlfp_s($uint32_t *pcurrent, $uint32_t newval, $uint32_t mask) {
+	uint32_t st = _controlfp(newval, mask);
+	if (pcurrent)
+		*pcurrent = st;
+	return 0;
+}
 
 [[decl_include("<hybrid/typecore.h>")]]
 $uint32_t _statusfp();
@@ -344,9 +368,10 @@ void _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 #ifdef __CC__
 }
 
-%/* TODO: This function is most definitely x86-specific! */
 [[decl_include("<hybrid/typecore.h>")]]
-$uint32_t _control87($uint32_t newval, $uint32_t mask);
+$uint32_t _control87($uint32_t newval, $uint32_t mask) {
+	return _controlfp(newval, mask);
+}
 
 %/* TODO: This function is most definitely x86-specific! */
 %#if defined(__x86_64__) || defined(__i386__)

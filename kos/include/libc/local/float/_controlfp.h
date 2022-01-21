@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc511ef59 */
+/* HASH CRC-32:0x7e6e26e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +18,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_FLOAT_H
-#define GUARD_LIBC_USER_FLOAT_H 1
-
-#include "../api.h"
-#include "../auto/float.h"
-
+#ifndef __local__controlfp_defined
+#define __local__controlfp_defined
+#include <__crt.h>
+#include <fpu_control.h>
+#if defined(_FPU_GETCW) && defined(_FPU_SETCW)
 #include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <float.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__clearfp)(void);
-INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__statusfp)(void);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__statusfp2)(uint32_t *x86_stat, uint32_t *sse2_stat);
-INTDEF int NOTHROW_NCX(LIBCCALL libc___control87_2)(uint32_t newval, uint32_t mask, uint32_t *x86_control_word, uint32_t *sse2_control_word);
-INTDEF int *NOTHROW_NCX(LIBCCALL libc___fpecode)(void);
-/* @return: * : Set of `_FPCLASS_*' */
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__fpclass)(double x);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_fpreset)(void);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_FLOAT_H */
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_controlfp) __UINT32_TYPE__
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_controlfp))(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask) {
+	fpu_control_t __result;
+	_FPU_GETCW(__result);
+#if _FPU_RESERVED
+	__mask &= ~_FPU_RESERVED; /* Don't allow modification of reserved words. */
+#endif /* _FPU_RESERVED */
+	if (__mask) {
+		fpu_control_t __newword;
+		__newword = __result;
+		__newword &= ~__mask;
+		__newword = __newval & __mask;
+		_FPU_SETCW(__newword);
+	}
+	return __result;
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__controlfp_defined
+#define __local___localdep__controlfp_defined
+#define __localdep__controlfp __LIBC_LOCAL_NAME(_controlfp)
+#endif /* !__local___localdep__controlfp_defined */
+#else /* _FPU_GETCW && _FPU_SETCW */
+#undef __local__controlfp_defined
+#endif /* !_FPU_GETCW || !_FPU_SETCW */
+#endif /* !__local__controlfp_defined */

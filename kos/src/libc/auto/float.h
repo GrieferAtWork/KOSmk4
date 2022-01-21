@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e68e174 */
+/* HASH CRC-32:0x37cc3409 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,30 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF uint32_t NOTHROW_NCX(LIBDCALL libd__controlfp)(uint32_t newval, uint32_t mask);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval, uint32_t mask);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF void NOTHROW_NCX(LIBDCALL libd__set_controlfp)(uint32_t newval, uint32_t mask);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF void NOTHROW_NCX(LIBCCALL libc__set_controlfp)(uint32_t newval, uint32_t mask);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__controlfp_s)(uint32_t *pcurrent, uint32_t newval, uint32_t mask);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__controlfp_s)(uint32_t *pcurrent, uint32_t newval, uint32_t mask);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF void NOTHROW_NCX(LIBDCALL libd__statusfp2)(uint32_t *x86_stat, uint32_t *sse2_stat);
 INTDEF uint32_t NOTHROW_NCX(LIBDCALL libd__control87)(uint32_t newval, uint32_t mask);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval, uint32_t mask);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd___control87_2)(uint32_t newval, uint32_t mask, uint32_t *x86_control_word, uint32_t *sse2_control_word);
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd__chgsign)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
