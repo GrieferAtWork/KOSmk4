@@ -4237,481 +4237,16 @@ int _flsbuf(int ch, [[nonnull]] $FILE *__restrict stream);
 
 [[wunused]]
 int _getmaxstdio();
-
 int _setmaxstdio(int val);
 
 [[wunused]]
-int _get_printf_count_output();
-
+int _get_printf_count_output(void);
 int _set_printf_count_output(int val);
 
 [[wunused]]
 $uint32_t _get_output_format();
-
 $uint32_t _set_output_format($uint32_t format);
 
-%[default:section(".text.crt.dos.FILE.locked.read.scanf")];
-
-%[insert:function(_vscanf = vscanf)]
-
-[[decl_include("<features.h>"), requires_function(vscanf)]]
-[[cp_stdio, ignore, ATTR_LIBC_SCANF(1, 3), wunused, export_alias("_vscanf_s_l")]]
-__STDC_INT_AS_SIZE_T _vscanf_l([[nonnull]] char const *__restrict format,
-                               $locale_t locale, $va_list args) {
-	(void)locale;
-	return vscanf(format, args);
-}
-
-[[decl_include("<features.h>"), requires_function(vfscanf)]]
-[[cp_stdio, ignore, ATTR_LIBC_SCANF(2, 4), wunused, export_alias("_vfscanf_s_l")]]
-__STDC_INT_AS_SIZE_T _vfscanf_l([[nonnull]] $FILE *__restrict stream,
-                                [[nonnull]] char const *__restrict format,
-                                $locale_t locale, $va_list args) {
-	(void)locale;
-	return vfscanf(stream, format, args);
-}
-
-[[decl_include("<features.h>")]]
-[[ignore, ATTR_LIBC_SCANF(2, 4), wunused, export_alias("_vsscanf_s_l")]]
-[[requires_function(vsscanf), section(".text.crt.dos.unicode.locale.format.scanf")]]
-__STDC_INT_AS_SIZE_T _vsscanf_l([[nonnull]] char const *__restrict input,
-                                [[nonnull]] char const *__restrict format,
-                                $locale_t locale, $va_list args) {
-	(void)locale;
-	return vsscanf(input, format, args);
-}
-
-[[ignore]] _vscanf_s(*) = vscanf;
-[[ignore]] _vscanf_s_l(*) = _vscanf_l;
-[[ignore]] _vfscanf(*) = vfscanf;
-[[ignore]] _vfscanf_s(*) = vfscanf;
-[[ignore]] _vfscanf_s_l(*) = _vfscanf_l;
-[[ignore]] _vsscanf(*) = vsscanf;
-[[ignore]] _vsscanf_s(*) = vsscanf;
-[[ignore]] _vsscanf_s_l(*) = _vsscanf_l;
-
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[ignore, export_alias("_vsnscanf_s")]]
-[[section(".text.crt.dos.unicode.static.format.scanf")]]
-[[dependency(unicode_readutf8_n, unicode_readutf8_rev)]]
-[[impl_include("<asm/crt/stdio.h>")]]
-[[impl_include("<hybrid/typecore.h>")]]
-[[impl_prefix(
-@@push_namespace(local)@@
-struct __vsnscanf_data {
-	char const *__ptr;
-	char const *__end;
-};
-__LOCAL_LIBC(@vsnscanf_getc@) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result;
-	__result = unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
-	                              ((struct __vsnscanf_data *)__arg)->__end);
-	return __result ? (__SSIZE_TYPE__)__result : (__SSIZE_TYPE__)__EOF;
-}
-__LOCAL_LIBC(@vsnscanf_ungetc@) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
-	return 0;
-}
-@@pop_namespace@@
-), wunused, ATTR_LIBC_SCANF(3, 4)]]
-__STDC_INT_AS_SIZE_T _vsnscanf([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-                               [[nonnull]] char const *__restrict format, $va_list args) {
-	struct __NAMESPACE_LOCAL_SYM __vsnscanf_data data;
-	data.__ptr = input;
-	data.__end = input + inputlen;
-	return format_vscanf(&__NAMESPACE_LOCAL_SYM __vsnscanf_getc,
-	                     &__NAMESPACE_LOCAL_SYM __vsnscanf_ungetc,
-	                     (void *)&data, format, args);
-}
-
-[[ignore]] _vsnscanf_s(*) = _vsnscanf;
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[ignore, ATTR_LIBC_SCANF(3, 5), export_alias("_vsnscanf_s_l")]]
-[[section(".text.crt.dos.unicode.locale.format.scanf")]]
-[[requires_function(_vsnscanf)]]
-__STDC_INT_AS_SIZE_T _vsnscanf_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-                                 [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
-	(void)locale;
-	return _vsnscanf(input, inputlen, format, args);
-}
-[[ignore]] _vsnscanf_s_l(*) = _vsnscanf_l;
-
-
-%
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_SCANF(1, 3), export_alias("_scanf_s_l")]]
-[[section(".text.crt.dos.FILE.locked.read.scanf")]]
-__STDC_INT_AS_SIZE_T _scanf_l([[nonnull]] char const *__restrict format,
-                              $locale_t locale, ...)
-	%{printf("_vscanf_l")}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_SCANF(2, 4), export_alias("_fscanf_s_l")]]
-[[section(".text.crt.dos.FILE.locked.read.scanf")]]
-__STDC_INT_AS_SIZE_T _fscanf_l([[nonnull]] $FILE *__restrict stream,
-                               [[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vfscanf_l")}
-
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[section(".text.crt.dos.unicode.static.format.scanf")]]
-[[ATTR_LIBC_SCANF(3, 4), export_alias("_snscanf_s")]]
-__STDC_INT_AS_SIZE_T _snscanf([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-                              [[nonnull]] char const *__restrict format, ...)
-	%{printf("_vsnscanf")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[section(".text.crt.dos.unicode.locale.format.scanf")]]
-[[ATTR_LIBC_SCANF(3, 5), export_alias("_snscanf_s_l")]]
-__STDC_INT_AS_SIZE_T _snscanf_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-                                [[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vsnscanf_l")}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_SCANF(1, 3), no_crt_impl]]
-__STDC_INT_AS_SIZE_T _scanf_s_l([[nonnull]] char const *__restrict format,
-                                $locale_t locale, ...)
-	%{printf("_vscanf_s_l")}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_SCANF(2, 4), no_crt_impl]]
-__STDC_INT_AS_SIZE_T  _sscanf_s_l([[nonnull]] char const *__restrict input,
-                                  [[nonnull]] char const *__restrict format,
-                                  $locale_t locale, ...)
-	%{printf("_vsscanf_s_l")}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_SCANF(2, 4), no_crt_impl]]
-__STDC_INT_AS_SIZE_T _fscanf_s_l([[nonnull]] $FILE *__restrict stream,
-                                 [[nonnull]] char const *__restrict format,
-                                 $locale_t locale, ...)
-	%{printf("_vfscanf_s_l")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[ATTR_LIBC_SCANF(3, 4), no_crt_impl]]
-__STDC_INT_AS_SIZE_T _snscanf_s([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-                                [[nonnull]] char const *__restrict format, ...)
-	%{printf("_vsnscanf_s")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[ATTR_LIBC_SCANF(3, 5), no_crt_impl]]
-__STDC_INT_AS_SIZE_T _snscanf_s_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-                                  [[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vsnscanf_s_l")}
-
-%
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(2, 0)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _vsprintf_l([[outp(return)]] char *__restrict buf,
-                                 [[nonnull]] char const *__restrict format,
-                                 $locale_t locale, $va_list args) {
-	(void)locale;
-	return vsprintf(buf, format, args);
-}
-
-_vsprintf_s_l(*) = _vsnprintf_l;
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF_P(3, 0)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _vsprintf_p([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                 [[nonnull]] char const *__restrict format, $va_list args) {
-	(void)buf;
-	(void)bufsize;
-	(void)format;
-	(void)args;
-	/* TODO */
-	__COMPILER_IMPURE();
-	return 0;
-}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF_P(3, 0)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _vsprintf_p_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                   [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
-	(void)locale;
-	return _vsprintf_p(buf, bufsize, format, args);
-}
-
-%
-%[default:section(".text.crt.dos.unicode.locale.format.printf")]
-
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(2, 4)]]
-__STDC_INT_AS_SIZE_T _sprintf_l([[outp(return)]] char *__restrict buf,
-                                [[nonnull]] char const *__restrict format,
-                                $locale_t locale, ...)
-	%{printf("_vsprintf_l")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 5)]]
-__STDC_INT_AS_SIZE_T _sprintf_s_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                  [[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vsprintf_s_l")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF_P(3, 4)]]
-__STDC_INT_AS_SIZE_T _sprintf_p([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                [[nonnull]] char const *__restrict format, ...)
-	%{printf("_vsprintf_p")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF_P(3, 5)]]
-__STDC_INT_AS_SIZE_T _sprintf_p_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                  [[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vsprintf_p_l")}
-
-%
-[[decl_include("<features.h>"), wunused, ATTR_LIBC_PRINTF(1, 0)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _vscprintf([[nonnull]] char const *__restrict format, $va_list args) {
-	return vsnprintf(NULL, 0, format, args);
-}
-
-[[decl_include("<features.h>"), wunused, ATTR_LIBC_PRINTF(1, 2)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _scprintf([[nonnull]] char const *__restrict format, ...)
-	%{printf("_vscprintf")}
-
-%
-[[decl_include("<features.h>"), wunused, ATTR_LIBC_PRINTF(1, 0)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _vscprintf_l([[nonnull]] char const *__restrict format,
-                                  $locale_t locale, $va_list args) {
-	(void)locale;
-	return _vscprintf(format, args);
-}
-
-
-[[decl_include("<features.h>"), wunused, ATTR_LIBC_PRINTF_P(1, 0)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _vscprintf_p([[nonnull]] char const *__restrict format, $va_list args) {
-	(void)format;
-	(void)args;
-	/* TODO */
-	__COMPILER_IMPURE();
-	return 0;
-}
-
-[[decl_include("<features.h>"), wunused, ATTR_LIBC_PRINTF_P(1, 0)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _vscprintf_p_l([[nonnull]] char const *__restrict format,
-                                    $locale_t locale, $va_list args) {
-	(void)locale;
-	return _vscprintf_p(format, args);
-}
-
-[[decl_include("<features.h>"), wunused, ATTR_LIBC_PRINTF(1, 3)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _scprintf_l([[nonnull]] char const *__restrict format,
-                                 $locale_t locale, ...)
-	%{printf("_vscprintf_l")}
-
-[[decl_include("<features.h>"), wunused, ATTR_LIBC_PRINTF_P(1, 2)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _scprintf_p([[nonnull]] char const *__restrict format, ...)
-	%{printf("_vscprintf_p")}
-
-[[decl_include("<features.h>"), wunused, ATTR_LIBC_PRINTF_P(1, 3)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _scprintf_p_l([[nonnull]] char const *__restrict format,
-                                   $locale_t locale, ...)
-	%{printf("_vscprintf_p_l")}
-
-%
-@@WARNING: This function returns the number of written character. - Not the required buffer size!
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 0)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _vsnprintf([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                [[nonnull]] char const *__restrict format, $va_list args) {
-	__STDC_INT_AS_SIZE_T result;
-	result = vsnprintf(buf, bufsize, format, args);
-	if ((size_t)result > bufsize)
-		result = (__STDC_INT_AS_SIZE_T)bufsize;
-	return result;
-}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[ATTR_LIBC_PRINTF(3, 0), export_alias("_vsprintf_s_l")]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _vsnprintf_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                  [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
-	(void)locale;
-	return _vsnprintf(buf, bufsize, format, args);
-}
-
-_vsnprintf_c(*) = _vsnprintf;
-_vsnprintf_c_l(*) = _vsnprintf_l;
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(4, 0)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _vsnprintf_s([[outp_opt(min(return, bufsize, buflen))]] char *__restrict buf,
-                                  $size_t bufsize, $size_t buflen,
-                                  [[nonnull]] char const *__restrict format, $va_list args) {
-	(void)buflen;
-	return _vsnprintf(buf, bufsize, format, args);
-}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(4, 0)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _vsnprintf_s_l([[outp_opt(min(return, bufsize, buflen))]] char *__restrict buf,
-                                    $size_t bufsize, $size_t buflen,
-                                    [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
-	(void)buflen;
-	(void)locale;
-	return _vsnprintf(buf, bufsize, format, args);
-}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 4)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _snprintf([[outp_opt(min(return, buf, bufsize))]] char *__restrict buf,
-                               $size_t bufsize, [[nonnull]] char const *__restrict format, ...)
-	%{printf("_vsnprintf")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 5)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _snprintf_l([[outp_opt(min(return, buf, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                 [[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vsnprintf_l")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 4)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _snprintf_c([[outp_opt(min(return, buf, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                 [[nonnull]] char const *__restrict format, ...)
-	%{printf("_vsnprintf_c")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 5)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _snprintf_c_l([[outp_opt(min(return, buf, bufsize))]] char *__restrict buf, $size_t bufsize,
-                                   [[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vsnprintf_c_l")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(4, 5)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _snprintf_s([[outp_opt(min(return, bufsize, buflen))]] char *__restrict buf, $size_t bufsize,
-                                 $size_t buflen, [[nonnull]] char const *__restrict format, ...)
-	%{printf("_vsnprintf_s")}
-
-[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(4, 6)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _snprintf_s_l([[outp_opt(min(return, bufsize, buflen))]] char *__restrict buf, $size_t bufsize,
-                                   $size_t buflen, [[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vsnprintf_s_l")}
-
-%
-%[default:section(".text.crt.dos.unicode.locale.format.printf")];
-[[decl_include("<features.h>"), requires_function(vprintf)]]
-[[cp_stdio, ATTR_LIBC_PRINTF(1, 0), export_alias("_vprintf_s_l")]]
-__STDC_INT_AS_SIZE_T _vprintf_l([[nonnull]] char const *__restrict format,
-                                $locale_t locale, $va_list args) {
-	(void)locale;
-	return vprintf(format, args);
-}
-
-_vprintf_s_l(*) = _vprintf_l;
-
-%[default:section(".text.crt.dos.unicode.static.format.printf")];
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_PRINTF_P(1, 0), impl_include("<libc/template/stdstreams.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(_vfprintf_p))]]
-__STDC_INT_AS_SIZE_T _vprintf_p([[nonnull]] char const *__restrict format, $va_list args) {
-	return _vfprintf_p(stdout, format, args);
-}
-
-%[default:section(".text.crt.dos.unicode.locale.format.printf")];
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_PRINTF_P(1, 0), requires_function(_vprintf_p)]]
-__STDC_INT_AS_SIZE_T _vprintf_p_l([[nonnull]] char const *__restrict format,
-                                  $locale_t locale, $va_list args) {
-	(void)locale;
-	return _vprintf_p(format, args);
-}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_PRINTF(1, 3), section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _printf_l([[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vprintf_l")}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_PRINTF(1, 3), section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _printf_s_l([[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vprintf_s_l")}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_PRINTF_P(1, 2), section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _printf_p([[nonnull]] char const *__restrict format, ...)
-	%{printf("_vprintf_p")}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_PRINTF_P(1, 3), section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _printf_p_l([[nonnull]] char const *__restrict format, $locale_t locale, ...)
-	%{printf("_vprintf_p_l")}
-
-%
-[[decl_include("<features.h>"), requires_function(vfprintf)]]
-[[cp_stdio, ATTR_LIBC_PRINTF(2, 0), export_alias("_vfprintf_s_l")]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _vfprintf_l([[nonnull]] $FILE *__restrict stream,
-                                 [[nonnull]] char const *__restrict format,
-                                 $locale_t locale, $va_list args) {
-	(void)locale;
-	return vfprintf(stream, format, args);
-}
-
-_vfprintf_s_l(*) = _vfprintf_l;
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_PRINTF_P(2, 0), requires_function(fwrite)]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _vfprintf_p([[nonnull]] $FILE *__restrict stream,
-                                 [[nonnull]] char const *__restrict format,
-                                 $va_list args) {
-	(void)stream;
-	(void)format;
-	(void)args;
-	/* TODO */
-	__COMPILER_IMPURE();
-	return 0;
-}
-
-[[decl_include("<features.h>")]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-[[cp_stdio, ATTR_LIBC_PRINTF_P(2, 0), requires_function(_vfprintf_p)]]
-__STDC_INT_AS_SIZE_T _vfprintf_p_l([[nonnull]] $FILE *__restrict stream,
-                                   [[nonnull]] char const *__restrict format,
-                                   $locale_t locale, $va_list args) {
-	(void)locale;
-	return _vfprintf_p(stream, format, args);
-}
-
-[[cp_stdio, ATTR_LIBC_PRINTF(2, 4), decl_include("<features.h>")]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _fprintf_l([[nonnull]] $FILE *__restrict stream,
-                                [[nonnull]] char const *__restrict format,
-                                $locale_t locale, ...)
-	%{printf("_vfprintf_l")}
-
-[[decl_include("<features.h>")]]
-[[cp_stdio, ATTR_LIBC_PRINTF(2, 4)]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _fprintf_s_l([[nonnull]] $FILE *__restrict stream,
-                                  [[nonnull]] char const *__restrict format,
-                                  $locale_t locale, ...)
-	%{printf("_vfprintf_s_l")}
-
-[[cp_stdio, ATTR_LIBC_PRINTF_P(2, 3), decl_include("<features.h>")]]
-[[section(".text.crt.dos.unicode.static.format.printf")]]
-__STDC_INT_AS_SIZE_T _fprintf_p([[nonnull]] $FILE *__restrict stream,
-                                [[nonnull]] char const *__restrict format, ...)
-	%{printf("_vfprintf_p")}
-
-[[cp_stdio, ATTR_LIBC_PRINTF_P(2, 4), decl_include("<features.h>")]]
-[[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _fprintf_p_l([[nonnull]] $FILE *__restrict stream,
-                                  [[nonnull]] char const *__restrict format,
-                                  $locale_t locale, ...)
-	%{printf("_vfprintf_p_l")}
 
 %
 %#ifdef __USE_DOS_SLIB
@@ -4876,27 +4411,6 @@ char *gets_s([[outp(min(strlen(return), bufsize))]] char *__restrict buf, rsize_
 		return NULL;
 	}
 	return fgets(buf, (__STDC_INT_AS_SIZE_T)(unsigned int)bufsize, stdin);
-}
-
-%[insert:function(printf_s = printf)]
-%[insert:function(vprintf_s = vprintf)]
-%[insert:function(fprintf_s = fprintf)]
-%[insert:function(vfprintf_s = vfprintf)]
-%[insert:function(sprintf_s = snprintf)]   /* XXX: This binding probably isn't correct... */
-%[insert:function(vsprintf_s = vsnprintf)] /* XXX: This binding probably isn't correct... */
-%[insert:function(fscanf_s = fscanf)]
-%[insert:function(vfscanf_s = vfscanf)]
-%[insert:function(scanf_s = scanf)]
-%[insert:function(vscanf_s = vscanf)]
-%[insert:function(sscanf_s = sscanf)]
-%[insert:function(vsscanf_s = vsscanf)]
-
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(4, 0)]]
-__STDC_INT_AS_SIZE_T vsnprintf_s([[outp_opt(min(return, buflen, bufsize))]] char *__restrict buf,
-                                 $size_t bufsize, $size_t buflen,
-                                 [[nonnull]] char const *__restrict format,
-                                 $va_list args) {
-	return vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
 }
 
 %#endif /* __USE_DOS_SLIB */
@@ -5105,6 +4619,396 @@ typedef __WCHAR_TYPE__ wchar_t;
 %#endif /* !_WSTDIO_DEFINED */
 
 
+
+%[define(_CRT_INTERNAL_PRINTF_LEGACY_VSPRINTF_NULL_TERMINATION = 1)]
+%[define(_CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR       = 2)]
+%[define(_CRT_INTERNAL_PRINTF_LEGACY_WIDE_SPECIFIERS           = 4)]
+%[define(_CRT_INTERNAL_PRINTF_LEGACY_MSVCRT_COMPATIBILITY      = 8)]
+%[define(_CRT_INTERNAL_PRINTF_LEGACY_THREE_DIGIT_EXPONENTS     = 16)]
+%[define(_CRT_INTERNAL_SCANF_SECURECRT                         = 1)]
+%[define(_CRT_INTERNAL_SCANF_LEGACY_WIDE_SPECIFIERS            = 2)]
+%[define(_CRT_INTERNAL_SCANF_LEGACY_MSVCRT_COMPATIBILITY       = 4)]
+
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<hybrid/typecore.h>"), requires_function(vfprintf)]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vfprintf($uint64_t options, [[nonnull]] $FILE *stream,
+                                              [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	(void)locale;
+	(void)options;
+	return vfprintf(stream, format, args);
+}
+
+[[decl_include("<hybrid/typecore.h>"), crt_intern_alias(__stdio_common_vfprintf), requires_function(__stdio_common_vfprintf)]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vfprintf_s($uint64_t options, [[nonnull]] $FILE *stream,
+                                                [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return __stdio_common_vfprintf(options, stream, format, locale, args);
+}
+
+[[decl_include("<hybrid/typecore.h>"), requires_function(vfprintf)]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vfprintf_p($uint64_t options, [[nonnull]] $FILE *stream,
+                                                [[nonnull]] char const *format, $locale_t locale,
+                                                $va_list args) {
+	/* TODO: Support for positional arguments */
+	(void)locale;
+	(void)options;
+	return vfprintf(stream, format, args);
+}
+
+[[decl_include("<hybrid/typecore.h>")]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vsprintf($uint64_t options, char *buf, $size_t bufsize,
+                                              [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result;
+	(void)locale;
+	result = vsnprintf(buf, bufsize, format, args);
+	if (!(options & _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR) && (size_t)result > bufsize)
+		result = bufsize;
+	return result;
+}
+
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/__assert.h>")]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vsprintf_s($uint64_t options, char *buf, $size_t bufsize,
+                                                [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result;
+	(void)options;
+	(void)locale;
+	result = vsnprintf(buf, bufsize, format, args);
+	__hybrid_assert(((size_t)result + 1) <= bufsize);
+	return result;
+}
+
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/__assert.h>")]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vsnprintf_s($uint64_t options, char *buf, $size_t bufsize,
+                                                 $size_t maxsize, [[nonnull]] char const *format,
+                                                 $locale_t locale, $va_list args) {
+	__hybrid_assert(bufsize <= maxsize);
+	return __stdio_common_vsprintf(options, buf, bufsize, format, locale, args);
+}
+
+[[decl_include("<hybrid/typecore.h>")]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vsprintf_p($uint64_t options, char *buf, $size_t bufsize,
+                                                [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result;
+	(void)locale;
+	/* TODO: Support for positional arguments */
+	result = vsnprintf(buf, bufsize, format, args);
+	if (!(options & _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR) && (size_t)result > bufsize)
+		result = bufsize;
+	return result;
+}
+
+%[default:section(".text.crt.dos.FILE.locked.read.scanf")];
+[[decl_include("<hybrid/typecore.h>"), wunused, requires_function(vfscanf)]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vfscanf($uint64_t options, [[nonnull]] $FILE *stream,
+                                             [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	(void)options;
+	(void)locale;
+	return vfscanf(stream, format, args);
+}
+
+[[decl_include("<hybrid/typecore.h>"), wunused]]
+[[dependency(unicode_readutf8_n, unicode_readutf8_rev)]]
+[[impl_include("<asm/crt/stdio.h>")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+struct __vsnscanf_data {
+	char const *__ptr;
+	char const *__end;
+};
+__LOCAL_LIBC(@vsnscanf_getc@) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
+	__CHAR32_TYPE__ __result;
+	__result = unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
+	                              ((struct __vsnscanf_data *)__arg)->__end);
+	return __result ? (__SSIZE_TYPE__)__result : (__SSIZE_TYPE__)__EOF;
+}
+__LOCAL_LIBC(@vsnscanf_ungetc@) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+	unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
+	return 0;
+}
+@@pop_namespace@@
+)]]
+__STDC_INT_AS_SSIZE_T __stdio_common_vsscanf($uint64_t options, char const *input, $size_t inputsize,
+                                             [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	struct __NAMESPACE_LOCAL_SYM __vsnscanf_data data;
+	(void)options;
+	(void)locale;
+	if (inputsize == (size_t)-1)
+		return vsscanf(input, format, args);
+	data.__ptr = input;
+	data.__end = input + inputsize;
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM __vsnscanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM __vsnscanf_ungetc,
+	                     (void *)&data, format, args);
+}
+
+/************************************************************************/
+/* __stdio_common_* wrappers                                            */
+/************************************************************************/
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsprintf)]]
+__STDC_INT_AS_SSIZE_T _vsnprintf_l(char *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS | _CRT_INTERNAL_PRINTF_LEGACY_VSPRINTF_NULL_TERMINATION, buf, bufsize, format, locale, args);
+	return result < 0 ? -1 : result;
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsprintf_s)]]
+__STDC_INT_AS_SSIZE_T _vsprintf_s_l(char *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, buf, bufsize, format, locale, args);
+	return result < 0 ? -1 : result;
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsprintf_p)]]
+__STDC_INT_AS_SSIZE_T _vsprintf_p_l(char *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, buf, bufsize, format, locale, args);
+	return result < 0 ? -1 : result;
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsprintf)]]
+__STDC_INT_AS_SSIZE_T _vscprintf_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS | _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR, NULL, 0, format, locale, args);
+	return result < 0 ? -1 : result;
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsprintf_p)]]
+__STDC_INT_AS_SSIZE_T _vscprintf_p_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS | _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR, NULL, 0, format, locale, args);
+	return result < 0 ? -1 : result;
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsprintf)]]
+__STDC_INT_AS_SSIZE_T _vsnprintf_c_l(char *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, buf, bufsize, format, locale, args);
+	return result < 0 ? -1 : result;
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsnprintf_s)]]
+__STDC_INT_AS_SSIZE_T _vsnprintf_s_l(char *buf, $size_t bufsize, $size_t maxsize, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsnprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, buf, bufsize, maxsize, format, locale, args);
+	return result < 0 ? -1 : result;
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vfprintf_s)]]
+__STDC_INT_AS_SSIZE_T _vfprintf_s_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return __stdio_common_vfprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vfprintf_p)]]
+__STDC_INT_AS_SSIZE_T _vfprintf_p_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return __stdio_common_vfprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
+}
+%[default:section(".text.crt.dos.FILE.locked.read.scanf")];
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), wunused, requires_function(__stdio_common_vfscanf)]]
+__STDC_INT_AS_SSIZE_T _vfscanf_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return __stdio_common_vfscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, stream, format, locale, args);
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), crt_intern_alias("_vfscanf_l"),  wunused, requires_function(__stdio_common_vfscanf)]]
+__STDC_INT_AS_SSIZE_T _vfscanf_s_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return __stdio_common_vfscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS | _CRT_INTERNAL_SCANF_SECURECRT, stream, format, locale, args);
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), ignore, wunused, requires_function(__stdio_common_vsscanf)]]
+__STDC_INT_AS_SSIZE_T _vsnscanf_l(char const *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return __stdio_common_vsscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, buf, bufsize, format, locale, args);
+}
+[[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), crt_intern_alias("_vsnscanf_l"), ignore, wunused, requires_function(__stdio_common_vsscanf)]]
+__STDC_INT_AS_SSIZE_T _vsnscanf_s_l(char const *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, va_list args) {
+	return __stdio_common_vsscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS | _CRT_INTERNAL_SCANF_SECURECRT, buf, bufsize, format, locale, args);
+}
+
+
+/************************************************************************/
+/* Direct aliases                                                       */
+/************************************************************************/
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>"), requires_function(vprintf)]]
+__STDC_INT_AS_SSIZE_T _vprintf_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	(void)locale;
+	return vprintf(format, args);
+}
+[[decl_include("<features.h>"), requires_function(vfprintf)]]
+__STDC_INT_AS_SSIZE_T _vfprintf_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	(void)locale;
+	return vfprintf(stream, format, args);
+}
+[[decl_include("<features.h>"), wunused, requires_function(vscanf)]]
+__STDC_INT_AS_SSIZE_T _vscanf_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	(void)locale;
+	return vscanf(format, args);
+}
+[[decl_include("<features.h>")]]
+__STDC_INT_AS_SSIZE_T _vsprintf_l([[nonnull]] char *buf, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	(void)locale;
+	return vsprintf(buf, format, args);
+}
+
+
+/************************************************************************/
+/* Misc. wrappers                                                       */
+/************************************************************************/
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>"), requires_function(_vfprintf_p_l)]]
+__STDC_INT_AS_SSIZE_T _vfprintf_p([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $va_list args) {
+	return _vfprintf_p_l(stream, format, NULL, args);
+}
+[[decl_include("<features.h>"), requires_function(_vprintf_p_l)]]
+__STDC_INT_AS_SSIZE_T _vprintf_p([[nonnull]] char const *format, $va_list args) {
+	return _vprintf_p_l(format, NULL, args);
+}
+@@WARNING: This function returns the number of written character. - Not the required buffer size!
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vsnprintf_l)]]
+__STDC_INT_AS_SSIZE_T _vsnprintf(char *buf, $size_t bufsize, [[nonnull]] char const *format, $va_list args) {
+	return _vsnprintf_l(buf, bufsize, format, NULL, args);
+}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vsprintf_p_l)]]
+__STDC_INT_AS_SSIZE_T _vsprintf_p(char *buf, $size_t bufsize, [[nonnull]] char const *format, $va_list args) {
+	return _vsprintf_p_l(buf, bufsize, format, NULL, args);
+}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vsnprintf_s_l)]]
+__STDC_INT_AS_SSIZE_T _vsnprintf_s(char *buf, $size_t bufsize, $size_t maxsize, [[nonnull]] char const *format, $va_list args) {
+	return _vsnprintf_s_l(buf, bufsize, maxsize, format, NULL, args);
+}
+[[decl_include("<features.h>"), requires_function(_vscprintf_l), wunused]]
+__STDC_INT_AS_SSIZE_T _vscprintf([[nonnull]] char const *format, $va_list args) {
+	return _vscprintf_l(format, NULL, args);
+}
+[[decl_include("<features.h>"), requires_function(_vscprintf_p_l), wunused]]
+__STDC_INT_AS_SSIZE_T _vscprintf_p([[nonnull]] char const *format, $va_list args) {
+	return _vscprintf_p_l(format, NULL, args);
+}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vsnprintf_c_l)]]
+__STDC_INT_AS_SSIZE_T _vsnprintf_c(char *buf, $size_t bufsize, [[nonnull]] char const *format, $va_list args) {
+	return _vsnprintf_c_l(buf, bufsize, format, NULL, args);
+}
+
+%[default:section(".text.crt.dos.FILE.locked.read.scanf")];
+[[decl_include("<features.h>"), requires_function(_vsnscanf_l), wunused, impl_include("<hybrid/typecore.h>")]]
+__STDC_INT_AS_SSIZE_T _vsscanf_l([[nonnull]] char const *buf, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return _vsnscanf_l(buf, ($size_t)-1, format, locale, args);
+}
+[[decl_include("<features.h>"), crt_intern_alias("_vsscanf_l"), requires_function(_vsnscanf_s_l), wunused, impl_include("<hybrid/typecore.h>")]]
+__STDC_INT_AS_SSIZE_T _vsscanf_s_l([[nonnull]] char const *buf, [[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return _vsnscanf_s_l(buf, ($size_t)-1, format, locale, args);
+}
+
+[[decl_include("<features.h>"), requires_function(_vsnscanf_l), wunused, ignore, impl_include("<hybrid/typecore.h>")]]
+__STDC_INT_AS_SSIZE_T _vsnscanf(char const *buf, $size_t bufsize, [[nonnull]] char const *format, $va_list args) {
+	return _vsnscanf_l(buf, bufsize, format, NULL, args);
+}
+[[decl_include("<features.h>"), crt_intern_alias("_vsnscanf"),  requires_function(_vsnscanf_s_l), wunused, ignore, impl_include("<hybrid/typecore.h>")]]
+__STDC_INT_AS_SSIZE_T _vsnscanf_s(char const *buf, $size_t bufsize, [[nonnull]] char const *format, $va_list args) {
+	return _vsnscanf_s_l(buf, bufsize, format, NULL, args);
+}
+
+
+/************************************************************************/
+/* STD-stream wrapper functions                                         */
+/************************************************************************/
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>"), requires($has_function(_vfprintf_s_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>")]]
+__STDC_INT_AS_SSIZE_T _vprintf_s_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return _vfprintf_s_l(stdout, format, locale, args);
+}
+[[decl_include("<features.h>"), requires($has_function(_vfprintf_p_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>")]]
+__STDC_INT_AS_SSIZE_T _vprintf_p_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return _vfprintf_p_l(stdout, format, locale, args);
+}
+%[default:section(".text.crt.dos.FILE.locked.read.scanf")];
+[[decl_include("<features.h>"), requires($has_function(_vfscanf_s_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>"), wunused]]
+__STDC_INT_AS_SSIZE_T _vscanf_s_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
+	return _vfscanf_s_l(stdin, format, locale, args);
+}
+
+
+/************************************************************************/
+/* Auto-generated printf wrapper functions                              */
+/************************************************************************/
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_l")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_s_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_s_l")}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_p([[nonnull]] $FILE *stream, [[nonnull]] char const *format, ...) %{printf("_vfprintf_p")}
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_p_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_p_l")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_l([[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vprintf_l")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_s_l([[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vprintf_s_l")}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_p([[nonnull]] char const *format, ...) %{printf("_vprintf_p")}
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_p_l([[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vprintf_p_l")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_l([[nonnull]] char *buf, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsprintf_l")}
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_s_l(char *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsprintf_s_l")}
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_p_l(char *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsprintf_p_l")}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_p(char *buf, $size_t bufsize, [[nonnull]] char const *format, ...) %{printf("_vsprintf_p")}
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snprintf_l(char *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsnprintf_l")}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snprintf(char *buf, $size_t bufsize, [[nonnull]] char const *format, ...) %{printf("_vsnprintf")}
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snprintf_c_l(char *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsnprintf_c_l")}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snprintf_c(char *buf, $size_t bufsize, [[nonnull]] char const *format, ...) %{printf("_vsnprintf_c")}
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snprintf_s_l(char *buf, $size_t bufsize, $size_t maxsize, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsnprintf_s_l")}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snprintf_s(char *buf, $size_t bufsize, $size_t maxsize, [[nonnull]] char const *format, ...) %{printf("_vsnprintf_s")}
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _scprintf_l([[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vscprintf_l")}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scprintf([[nonnull]] char const *format, ...) %{printf("_vscprintf")}
+%[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _scprintf_p_l([[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vscprintf_p_l")}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scprintf_p([[nonnull]] char const *format, ...) %{printf("_vscprintf_p")}
+%[default:section(".text.crt.dos.FILE.locked.read.scanf")];
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _fscanf_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vfscanf_l")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _fscanf_s_l([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vfscanf_s_l")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scanf_l([[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vscanf_l")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scanf_s_l([[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vscanf_s_l")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _sscanf_l([[nonnull]] char const *buf, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsscanf_l")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _sscanf_s_l([[nonnull]] char const *buf, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsscanf_s_l")}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _snscanf_l(char const *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsnscanf_l")}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _snscanf(char const *buf, $size_t bufsize, [[nonnull]] char const *format, ...) %{printf("_vsnscanf")}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _snscanf_s_l(char const *buf, $size_t bufsize, [[nonnull]] char const *format, $locale_t locale, ...) %{printf("_vsnscanf_s_l")}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _snscanf_s(char const *buf, $size_t bufsize, [[nonnull]] char const *format, ...) %{printf("_vsnscanf_s")}
+
+
+
+/************************************************************************/
+/* DOS's "secure" functions                                             */
+/************************************************************************/
+%#ifdef __USE_DOS_SLIB
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>"), requires_function(_vfprintf_s_l)]]
+__STDC_INT_AS_SSIZE_T vfprintf_s([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $va_list args) {
+	return _vfprintf_s_l(stream, format, NULL, args);
+}
+[[decl_include("<features.h>"), requires_function(_vprintf_s_l)]]
+__STDC_INT_AS_SSIZE_T vprintf_s([[nonnull]] char const *format, $va_list args) {
+	return _vprintf_s_l(format, NULL, args);
+}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vsprintf_s_l)]]
+__STDC_INT_AS_SSIZE_T vsprintf_s(char *buf, $size_t bufsize, [[nonnull]] char const *format, $va_list args) {
+	return _vsprintf_s_l(buf, bufsize, format, NULL, args);
+}
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vsnprintf_s_l)]]
+__STDC_INT_AS_SSIZE_T vsnprintf_s(char *buf, $size_t bufsize, $size_t maxsize, [[nonnull]] char const *format, $va_list args) {
+	return _vsnprintf_s_l(buf, bufsize, maxsize, format, NULL, args);
+}
+%[default:section(".text.crt.dos.FILE.locked.read.scanf")];
+[[decl_include("<features.h>"), requires_function(_vfscanf_s_l), wunused]]
+__STDC_INT_AS_SSIZE_T vfscanf_s([[nonnull]] $FILE *stream, [[nonnull]] char const *format, $va_list args) {
+	return _vfscanf_s_l(stream, format, NULL, args);
+}
+[[decl_include("<features.h>"), requires_function(_vscanf_s_l), wunused]]
+__STDC_INT_AS_SSIZE_T vscanf_s([[nonnull]] char const *format, $va_list args) {
+	return _vscanf_s_l(format, NULL, args);
+}
+[[decl_include("<features.h>"), requires_function(_vsscanf_s_l), wunused]]
+__STDC_INT_AS_SSIZE_T vsscanf_s([[nonnull]] char const *buf, [[nonnull]] char const *format, $va_list args) {
+	return _vsscanf_s_l(buf, format, NULL, args);
+}
+%[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T fprintf_s([[nonnull]] $FILE *stream, [[nonnull]] char const *format, ...) %{printf("vfprintf_s")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T printf_s([[nonnull]] char const *format, ...) %{printf("vprintf_s")}
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T sprintf_s(char *buf, $size_t bufsize, [[nonnull]] char const *format, ...) %{printf("vsprintf_s")}
+%[default:section(".text.crt.dos.FILE.locked.read.scanf")];
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T fscanf_s([[nonnull]] $FILE *stream, [[nonnull]] char const *format, ...) %{printf("vfscanf_s")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T scanf_s([[nonnull]] char const *format, ...) %{printf("vscanf_s")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T sscanf_s([[nonnull]] char const *buf, [[nonnull]] char const *format, ...) %{printf("vsscanf_s")}
+%#endif /* __USE_DOS_SLIB */
 %#endif /* __CC__ */
 %#endif /* __USE_DOS */
 %

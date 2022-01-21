@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1c8678e */
+/* HASH CRC-32:0xff215112 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,24 +22,28 @@
 #define __local__vsnprintf_s_l_defined
 #include <__crt.h>
 #include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep___stdio_common_vsnprintf_s_defined
+#define __local___localdep___stdio_common_vsnprintf_s_defined
+#ifdef __CRT_HAVE___stdio_common_vsnprintf_s
+__NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__vsnprintf_defined
-#define __local___localdep__vsnprintf_defined
-#ifdef __CRT_HAVE__vsnprintf
-__CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args),_vsnprintf,(__buf,__bufsize,__format,__args))
-#else /* __CRT_HAVE__vsnprintf */
+__CREDIRECT(__ATTR_NONNULL((5)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsnprintf_s,(__UINT64_TYPE__ __options, char *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __maxsize, char const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vsnprintf_s,(__options,__buf,__bufsize,__maxsize,__format,__locale,__args))
+#else /* __CRT_HAVE___stdio_common_vsnprintf_s */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdio/_vsnprintf.h>
+#include <libc/local/stdio/__stdio_common_vsnprintf_s.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep__vsnprintf __LIBC_LOCAL_NAME(_vsnprintf)
-#endif /* !__CRT_HAVE__vsnprintf */
-#endif /* !__local___localdep__vsnprintf_defined */
-__LOCAL_LIBC(_vsnprintf_s_l) __ATTR_LIBC_PRINTF(4, 0) __ATTR_NONNULL((4)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnprintf_s_l))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __buflen, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) {
-	(void)__buflen;
-	(void)__locale;
-	return (__NAMESPACE_LOCAL_SYM __localdep__vsnprintf)(__buf, __bufsize, __format, __args);
+#define __localdep___stdio_common_vsnprintf_s __LIBC_LOCAL_NAME(__stdio_common_vsnprintf_s)
+#endif /* !__CRT_HAVE___stdio_common_vsnprintf_s */
+#endif /* !__local___localdep___stdio_common_vsnprintf_s_defined */
+__NAMESPACE_LOCAL_END
+#include <corecrt_stdio_config.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_vsnprintf_s_l) __ATTR_NONNULL((4)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnprintf_s_l))(char *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __maxsize, char const *__format, __locale_t __locale, __builtin_va_list __args) {
+	__STDC_INT_AS_SSIZE_T __result = (__NAMESPACE_LOCAL_SYM __localdep___stdio_common_vsnprintf_s)(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, __buf, __bufsize, __maxsize, __format, __locale, __args);
+	return __result < 0 ? -1 : __result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vsnprintf_s_l_defined

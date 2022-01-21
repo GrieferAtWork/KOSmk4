@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe006f959 */
+/* HASH CRC-32:0x8b730e7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,20 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vscprintf_p) __ATTR_WUNUSED __ATTR_LIBC_PRINTF_P(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p))(char const *__restrict __format, __builtin_va_list __args) {
-	(void)__format;
-	(void)__args;
-	/* TODO */
-	__COMPILER_IMPURE();
-	return 0;
+#ifndef __local___localdep__vscprintf_p_l_defined
+#define __local___localdep__vscprintf_p_l_defined
+#ifdef __CRT_HAVE__vscprintf_p_l
+__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscprintf_p_l,(char const *__format, __locale_t __locale, __builtin_va_list __args),_vscprintf_p_l,(__format,__locale,__args))
+#else /* __CRT_HAVE__vscprintf_p_l */
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdio/_vscprintf_p_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__vscprintf_p_l __LIBC_LOCAL_NAME(_vscprintf_p_l)
+#endif /* !__CRT_HAVE__vscprintf_p_l */
+#endif /* !__local___localdep__vscprintf_p_l_defined */
+__LOCAL_LIBC(_vscprintf_p) __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p))(char const *__format, __builtin_va_list __args) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__vscprintf_p_l)(__format, __NULLPTR, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vscprintf_p_defined

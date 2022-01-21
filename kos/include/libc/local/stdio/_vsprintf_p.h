@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b0d12db */
+/* HASH CRC-32:0x57d486fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,20 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vsprintf_p) __ATTR_LIBC_PRINTF_P(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsprintf_p))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args) {
-	(void)__buf;
-	(void)__bufsize;
-	(void)__format;
-	(void)__args;
-	/* TODO */
-	__COMPILER_IMPURE();
-	return 0;
+#ifndef __local___localdep__vsprintf_p_l_defined
+#define __local___localdep__vsprintf_p_l_defined
+#ifdef __CRT_HAVE__vsprintf_p_l
+__CREDIRECT(__ATTR_NONNULL((3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsprintf_p_l,(char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __locale_t __locale, __builtin_va_list __args),_vsprintf_p_l,(__buf,__bufsize,__format,__locale,__args))
+#else /* __CRT_HAVE__vsprintf_p_l */
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdio/_vsprintf_p_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__vsprintf_p_l __LIBC_LOCAL_NAME(_vsprintf_p_l)
+#endif /* !__CRT_HAVE__vsprintf_p_l */
+#endif /* !__local___localdep__vsprintf_p_l_defined */
+__LOCAL_LIBC(_vsprintf_p) __ATTR_NONNULL((3)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsprintf_p))(char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __builtin_va_list __args) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__vsprintf_p_l)(__buf, __bufsize, __format, __NULLPTR, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vsprintf_p_defined

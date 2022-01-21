@@ -433,7 +433,7 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 					break; /* ZERO-Terminated. */
 				ent = (PIMAGE_IMPORT_BY_NAME)(self->dm_loadaddr + thunk_iter1->u1.AddressOfData);
 				/* Import the symbol. */
-				syslog(LOG_DEBUG, "[pe] GetProcAddress(%q:%q)\n",
+				syslog(LOG_DEBUG, "[pe] GetProcAddress(%q, %q)\n",
 				       dependency->dm_filename, ent->Name);
 				addr = libpe_GetProcAddress(dependency, ent->Name);
 				if (!addr && *dl.dl_error_message != NULL) {
@@ -666,17 +666,19 @@ PRIVATE PNT_TIB CC libpe_AllocateTib(void) {
 
 
 INTERN struct dlmodule_format libpe_fmt = {
-	.df_magic       = { 'M', 'Z' },
-	.df_magsz       = 2,
-	.df_open        = &libpe_v_open,
-	.df_fini        = &libpe_v_fini,
-	.df_ismapped    = &libpe_v_ismapped,
-	.df_dlsym       = &libpe_v_dlsym,
-	.df_dladdr      = &libpe_v_dladdr,
-	.df_dlsectindex = &libpe_v_dlsectindex,
-	.df_dlsectinfo  = &libpe_v_dlsectinfo,
-	.df_dlsectname  = &libpe_v_dlsectname,
-	.df_lsphdrs     = &libpe_v_lsphdrs,
+	.df_magic            = { 'M', 'Z' },
+	.df_magsz            = 2,
+	.df_open             = &libpe_v_open,
+	.df_fini             = &libpe_v_fini,
+	.df_run_initializers = NULL, /* XXX: Call DllMain()? */
+	.df_run_finalizers   = NULL, /* XXX: Call DllMain()? */
+	.df_ismapped         = &libpe_v_ismapped,
+	.df_dlsym            = &libpe_v_dlsym,
+	.df_dladdr           = &libpe_v_dladdr,
+	.df_dlsectindex      = &libpe_v_dlsectindex,
+	.df_dlsectinfo       = &libpe_v_dlsectinfo,
+	.df_dlsectname       = &libpe_v_dlsectname,
+	.df_lsphdrs          = &libpe_v_lsphdrs,
 };
 
 

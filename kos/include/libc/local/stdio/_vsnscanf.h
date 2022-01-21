@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc70dcee */
+/* HASH CRC-32:0x1d15465b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,74 +22,24 @@
 #define __local__vsnscanf_defined
 #include <__crt.h>
 #include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep__vsnscanf_l_defined
+#define __local___localdep__vsnscanf_l_defined
+#ifdef __CRT_HAVE__vsnscanf_l
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnscanf_l,(char const *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __locale_t __locale, __builtin_va_list __args),_vsnscanf_l,(__buf,__bufsize,__format,__locale,__args))
+#else /* __CRT_HAVE__vsnscanf_l */
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdio/_vsnscanf_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__vsnscanf_l __LIBC_LOCAL_NAME(_vsnscanf_l)
+#endif /* !__CRT_HAVE__vsnscanf_l */
+#endif /* !__local___localdep__vsnscanf_l_defined */
+__NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_format_vscanf_defined
-#define __local___localdep_format_vscanf_defined
-#ifdef __CRT_HAVE_format_vscanf
-__NAMESPACE_LOCAL_END
-#include <kos/anno.h>
-#include <bits/crt/format-printer.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args))
-#else /* __CRT_HAVE_format_vscanf */
-__NAMESPACE_LOCAL_END
-#include <libc/local/format-printer/format_vscanf.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
-#endif /* !__CRT_HAVE_format_vscanf */
-#endif /* !__local___localdep_format_vscanf_defined */
-#ifndef __local___localdep_unicode_readutf8_n_defined
-#define __local___localdep_unicode_readutf8_n_defined
-#ifdef __CRT_HAVE_unicode_readutf8_n
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
-#else /* __CRT_HAVE_unicode_readutf8_n */
-__NAMESPACE_LOCAL_END
-#include <libc/local/unicode/unicode_readutf8_n.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
-#endif /* !__CRT_HAVE_unicode_readutf8_n */
-#endif /* !__local___localdep_unicode_readutf8_n_defined */
-#ifndef __local___localdep_unicode_readutf8_rev_defined
-#define __local___localdep_unicode_readutf8_rev_defined
-#ifdef __CRT_HAVE_unicode_readutf8_rev
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
-#else /* __CRT_HAVE_unicode_readutf8_rev */
-__NAMESPACE_LOCAL_END
-#include <libc/local/unicode/unicode_readutf8_rev.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_unicode_readutf8_rev __LIBC_LOCAL_NAME(unicode_readutf8_rev)
-#endif /* !__CRT_HAVE_unicode_readutf8_rev */
-#endif /* !__local___localdep_unicode_readutf8_rev_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/crt/stdio.h>
-__NAMESPACE_LOCAL_BEGIN
-struct __vsnscanf_data {
-	char const *__ptr;
-	char const *__end;
-};
-__LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n)(&((struct __vsnscanf_data *)__arg)->__ptr,
-	                              ((struct __vsnscanf_data *)__arg)->__end);
-	return __result ? (__SSIZE_TYPE__)__result : (__SSIZE_TYPE__)__EOF;
-}
-__LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	(__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_rev)(&((struct __vsnscanf_data *)__arg)->__ptr);
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vsnscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf))(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args) {
-	struct __NAMESPACE_LOCAL_SYM __vsnscanf_data __data;
-	__data.__ptr = __input;
-	__data.__end = __input + __inputlen;
-	return (__NAMESPACE_LOCAL_SYM __localdep_format_vscanf)(&__NAMESPACE_LOCAL_SYM __vsnscanf_getc,
-	                     &__NAMESPACE_LOCAL_SYM __vsnscanf_ungetc,
-	                     (void *)&__data, __format, __args);
+__LOCAL_LIBC(_vsnscanf) __ATTR_WUNUSED __ATTR_NONNULL((3)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf))(char const *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __builtin_va_list __args) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__vsnscanf_l)(__buf, __bufsize, __format, __NULLPTR, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vsnscanf_defined

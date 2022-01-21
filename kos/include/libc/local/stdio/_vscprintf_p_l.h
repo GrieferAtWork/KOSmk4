@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x470e967e */
+/* HASH CRC-32:0x5ae5c872 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,27 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__vscprintf_p_defined
-#define __local___localdep__vscprintf_p_defined
-#ifdef __CRT_HAVE__vscprintf_p
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_PRINTF_P(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vscprintf_p,(char const *__restrict __format, __builtin_va_list __args),_vscprintf_p,(__format,__args))
-#else /* __CRT_HAVE__vscprintf_p */
+#ifndef __local___localdep___stdio_common_vsprintf_p_defined
+#define __local___localdep___stdio_common_vsprintf_p_defined
+#ifdef __CRT_HAVE___stdio_common_vsprintf_p
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdio/_vscprintf_p.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep__vscprintf_p __LIBC_LOCAL_NAME(_vscprintf_p)
-#endif /* !__CRT_HAVE__vscprintf_p */
-#endif /* !__local___localdep__vscprintf_p_defined */
-__LOCAL_LIBC(_vscprintf_p_l) __ATTR_WUNUSED __ATTR_LIBC_PRINTF_P(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p_l))(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) {
-	(void)__locale;
-	return (__NAMESPACE_LOCAL_SYM __localdep__vscprintf_p)(__format, __args);
+__CREDIRECT(__ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsprintf_p,(__UINT64_TYPE__ __options, char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vsprintf_p,(__options,__buf,__bufsize,__format,__locale,__args))
+#else /* __CRT_HAVE___stdio_common_vsprintf_p */
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdio/__stdio_common_vsprintf_p.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep___stdio_common_vsprintf_p __LIBC_LOCAL_NAME(__stdio_common_vsprintf_p)
+#endif /* !__CRT_HAVE___stdio_common_vsprintf_p */
+#endif /* !__local___localdep___stdio_common_vsprintf_p_defined */
+__NAMESPACE_LOCAL_END
+#include <corecrt_stdio_config.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_vscprintf_p_l) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p_l))(char const *__format, __locale_t __locale, __builtin_va_list __args) {
+	__STDC_INT_AS_SSIZE_T __result = (__NAMESPACE_LOCAL_SYM __localdep___stdio_common_vsprintf_p)(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS | 2, __NULLPTR, 0, __format, __locale, __args);
+	return __result < 0 ? -1 : __result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vscprintf_p_l_defined

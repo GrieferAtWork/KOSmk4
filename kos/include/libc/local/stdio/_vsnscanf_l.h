@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x841b7248 */
+/* HASH CRC-32:0x79b1de64 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,27 @@
 #define __local__vsnscanf_l_defined
 #include <__crt.h>
 #include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep___stdio_common_vsscanf_defined
+#define __local___localdep___stdio_common_vsscanf_defined
+#ifdef __CRT_HAVE___stdio_common_vsscanf
+__NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__vsnscanf_defined
-#define __local___localdep__vsnscanf_defined
-#ifdef __CRT_HAVE__vsnscanf
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(3, 4) __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args),_vsnscanf,(__input,__inputlen,__format,__args))
-#elif defined(__CRT_HAVE__vsnscanf_s)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(3, 4) __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args),_vsnscanf_s,(__input,__inputlen,__format,__args))
-#else /* ... */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsscanf,(__UINT64_TYPE__ __options, char const *__input, __SIZE_TYPE__ __inputsize, char const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vsscanf,(__options,__input,__inputsize,__format,__locale,__args))
+#else /* __CRT_HAVE___stdio_common_vsscanf */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdio/_vsnscanf.h>
+#include <libc/local/stdio/__stdio_common_vsscanf.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep__vsnscanf __LIBC_LOCAL_NAME(_vsnscanf)
-#endif /* !... */
-#endif /* !__local___localdep__vsnscanf_defined */
-__LOCAL_LIBC(_vsnscanf_l) __ATTR_LIBC_SCANF(3, 5) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf_l))(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) {
-	(void)__locale;
-	return (__NAMESPACE_LOCAL_SYM __localdep__vsnscanf)(__input, __inputlen, __format, __args);
+#define __localdep___stdio_common_vsscanf __LIBC_LOCAL_NAME(__stdio_common_vsscanf)
+#endif /* !__CRT_HAVE___stdio_common_vsscanf */
+#endif /* !__local___localdep___stdio_common_vsscanf_defined */
+__NAMESPACE_LOCAL_END
+#include <corecrt_stdio_config.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_vsnscanf_l) __ATTR_WUNUSED __ATTR_NONNULL((3)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf_l))(char const *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __locale_t __locale, __builtin_va_list __args) {
+	return (__NAMESPACE_LOCAL_SYM __localdep___stdio_common_vsscanf)(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, __buf, __bufsize, __format, __locale, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vsnscanf_l_defined

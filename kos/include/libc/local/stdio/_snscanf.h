@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabcf0131 */
+/* HASH CRC-32:0x8a5872ec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,22 +27,20 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsnscanf_defined
 #define __local___localdep__vsnscanf_defined
 #ifdef __CRT_HAVE__vsnscanf
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(3, 4) __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args),_vsnscanf,(__input,__inputlen,__format,__args))
-#elif defined(__CRT_HAVE__vsnscanf_s)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(3, 4) __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __builtin_va_list __args),_vsnscanf_s,(__input,__inputlen,__format,__args))
-#else /* ... */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnscanf,(char const *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __builtin_va_list __args),_vsnscanf,(__buf,__bufsize,__format,__args))
+#else /* __CRT_HAVE__vsnscanf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/_vsnscanf.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vsnscanf __LIBC_LOCAL_NAME(_vsnscanf)
-#endif /* !... */
+#endif /* !__CRT_HAVE__vsnscanf */
 #endif /* !__local___localdep__vsnscanf_defined */
-__LOCAL_LIBC(_snscanf) __ATTR_LIBC_SCANF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_snscanf))(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, ...) {
-	__STDC_INT_AS_SIZE_T __result;
+__LOCAL_LIBC(_snscanf) __ATTR_WUNUSED __ATTR_NONNULL((3)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_snscanf))(char const *__buf, __SIZE_TYPE__ __bufsize, char const *__format, ...) {
+	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
-	__result = (__NAMESPACE_LOCAL_SYM __localdep__vsnscanf)(__input, __inputlen, __format, __args);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep__vsnscanf)(__buf, __bufsize, __format, __args);
 	__builtin_va_end(__args);
 	return __result;
 }

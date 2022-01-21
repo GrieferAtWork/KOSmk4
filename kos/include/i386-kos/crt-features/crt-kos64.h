@@ -474,6 +474,7 @@
 #define __CRT_HAVE___fpclassify
 #define __CRT_HAVE___fpclassifyf
 #define __CRT_HAVE___fpclassifyl
+#define __CRT_HAVE___fpe_flt_rounds
 #define __CRT_HAVE___fpecode
 #define __CRT_HAVE___fpending
 #define __CRT_HAVE___fpu_control
@@ -1006,6 +1007,15 @@
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_guard
 #define __CRT_HAVE___statfs
+#define __CRT_HAVE___stdio_common_vfprintf
+#define __CRT_HAVE___stdio_common_vfprintf_p
+#define __CRT_HAVE___stdio_common_vfprintf_s
+#define __CRT_HAVE___stdio_common_vfscanf
+#define __CRT_HAVE___stdio_common_vsnprintf_s
+#define __CRT_HAVE___stdio_common_vsprintf
+#define __CRT_HAVE___stdio_common_vsprintf_p
+#define __CRT_HAVE___stdio_common_vsprintf_s
+#define __CRT_HAVE___stdio_common_vsscanf
 #define __CRT_HAVE___stime
 #define __CRT_HAVE___stpcpy
 #define __CRT_HAVE___stpcpy_chk
@@ -1397,6 +1407,8 @@
 #define __CRT_HAVE__sprintf_p
 #define __CRT_HAVE__sprintf_p_l
 #define __CRT_HAVE__sprintf_s_l
+#define __CRT_HAVE__sscanf_l
+#define __CRT_HAVE__sscanf_s_l
 #define __CRT_HAVE__stat
 #define __CRT_HAVE__stat32
 #define __CRT_HAVE__stat32i64
@@ -1463,6 +1475,8 @@
 #define __CRT_HAVE__vscwprintf_p
 #define __CRT_HAVE__vscwprintf_p_l
 #define __CRT_HAVE__vsnprintf
+#define __CRT_HAVE__vsnprintf_c
+#define __CRT_HAVE__vsnprintf_c_l
 #define __CRT_HAVE__vsnprintf_l
 #define __CRT_HAVE__vsnprintf_s
 #define __CRT_HAVE__vsnprintf_s_l
@@ -2106,6 +2120,7 @@
 #define __CRT_HAVE_fpclassifyl
 #define __CRT_HAVE_fpreset
 #define __CRT_HAVE_fprintf
+#define __CRT_HAVE_fprintf_s
 #define __CRT_HAVE_fprintf_unlocked
 #define __CRT_HAVE_fpurge
 #define __CRT_HAVE_fputc
@@ -2138,6 +2153,7 @@
 #define __CRT_HAVE_frexpf
 #define __CRT_HAVE_frexpl
 #define __CRT_HAVE_fscanf
+#define __CRT_HAVE_fscanf_s
 #define __CRT_HAVE_fscanf_unlocked
 #define __CRT_HAVE_fseek
 #define __CRT_HAVE_fseek64
@@ -3391,6 +3407,7 @@
 #define __CRT_HAVE_scandirk
 #define __CRT_HAVE_scandirk64
 #define __CRT_HAVE_scanf
+#define __CRT_HAVE_scanf_s
 #define __CRT_HAVE_scanf_unlocked
 #define __CRT_HAVE_sched_get_priority_max
 #define __CRT_HAVE_sched_get_priority_min
@@ -3605,6 +3622,7 @@
 #define __CRT_HAVE_spawnvpe
 #define __CRT_HAVE_splice
 #define __CRT_HAVE_sprintf
+#define __CRT_HAVE_sprintf_s
 #define __CRT_HAVE_sqrt
 #define __CRT_HAVE_sqrtf
 #define __CRT_HAVE_sqrtl
@@ -3615,6 +3633,7 @@
 #define __CRT_HAVE_srandom
 #define __CRT_HAVE_srandom_r
 #define __CRT_HAVE_sscanf
+#define __CRT_HAVE_sscanf_s
 #define __CRT_HAVE_ssignal
 #define __CRT_HAVE_stat
 #define __CRT_HAVE_stat64
@@ -4743,8 +4762,10 @@
 #define __CRT_HAVE_versionsortk64
 #define __CRT_HAVE_vfork
 #define __CRT_HAVE_vfprintf
+#define __CRT_HAVE_vfprintf_s
 #define __CRT_HAVE_vfprintf_unlocked
 #define __CRT_HAVE_vfscanf
+#define __CRT_HAVE_vfscanf_s
 #define __CRT_HAVE_vfscanf_unlocked
 #define __CRT_HAVE_vfwprintf
 #define __CRT_HAVE_vfwprintf_unlocked
@@ -4753,13 +4774,17 @@
 #define __CRT_HAVE_vhangup
 #define __CRT_HAVE_vmsplice
 #define __CRT_HAVE_vprintf
+#define __CRT_HAVE_vprintf_s
 #define __CRT_HAVE_vprintf_unlocked
 #define __CRT_HAVE_vscanf
+#define __CRT_HAVE_vscanf_s
 #define __CRT_HAVE_vscanf_unlocked
 #define __CRT_HAVE_vsnprintf
 #define __CRT_HAVE_vsnprintf_s
 #define __CRT_HAVE_vsprintf
+#define __CRT_HAVE_vsprintf_s
 #define __CRT_HAVE_vsscanf
+#define __CRT_HAVE_vsscanf_s
 #define __CRT_HAVE_vstrdupf
 #define __CRT_HAVE_vswprintf
 #define __CRT_HAVE_vswscanf
@@ -5623,6 +5648,15 @@
 #define __CRT_HAVE_KOS$__sqrtl
 #define __CRT_HAVE_KOS$__srandom
 #define __CRT_HAVE_KOS$__statfs
+#define __CRT_HAVE_KOS$__stdio_common_vfprintf
+#define __CRT_HAVE_KOS$__stdio_common_vfprintf_p
+#define __CRT_HAVE_KOS$__stdio_common_vfprintf_s
+#define __CRT_HAVE_KOS$__stdio_common_vfscanf
+#define __CRT_HAVE_KOS$__stdio_common_vsnprintf_s
+#define __CRT_HAVE_KOS$__stdio_common_vsprintf
+#define __CRT_HAVE_KOS$__stdio_common_vsprintf_p
+#define __CRT_HAVE_KOS$__stdio_common_vsprintf_s
+#define __CRT_HAVE_KOS$__stdio_common_vsscanf
 #define __CRT_HAVE_KOS$__stime
 #define __CRT_HAVE_KOS$__stpcpy
 #define __CRT_HAVE_KOS$__stpcpy_chk
@@ -6068,6 +6102,8 @@
 #define __CRT_HAVE_KOS$_sprintf_p
 #define __CRT_HAVE_KOS$_sprintf_p_l
 #define __CRT_HAVE_KOS$_sprintf_s_l
+#define __CRT_HAVE_KOS$_sscanf_l
+#define __CRT_HAVE_KOS$_sscanf_s_l
 #define __CRT_HAVE_KOS$_stat
 #define __CRT_HAVE_KOS$_stat32
 #define __CRT_HAVE_KOS$_stat32i64
@@ -6183,6 +6219,8 @@
 #define __CRT_HAVE_KOS$_vscwprintf_p
 #define __CRT_HAVE_KOS$_vscwprintf_p_l
 #define __CRT_HAVE_KOS$_vsnprintf
+#define __CRT_HAVE_KOS$_vsnprintf_c
+#define __CRT_HAVE_KOS$_vsnprintf_c_l
 #define __CRT_HAVE_KOS$_vsnprintf_l
 #define __CRT_HAVE_KOS$_vsnprintf_s
 #define __CRT_HAVE_KOS$_vsnprintf_s_l
@@ -6806,7 +6844,7 @@
 #define __CRT_HAVE_KOS$fpclassifyf
 #define __CRT_HAVE_KOS$fpclassifyl
 #define __CRT_HAVE_KOS$fprintf
-#define __CRT_HAVE_fprintf_s
+#define __CRT_HAVE_KOS$fprintf_s
 #define __CRT_HAVE_KOS$fprintf_unlocked
 #define __CRT_HAVE_KOS$fpurge
 #define __CRT_HAVE_KOS$fputc
@@ -6839,6 +6877,7 @@
 #define __CRT_HAVE_KOS$frexpf
 #define __CRT_HAVE_KOS$frexpl
 #define __CRT_HAVE_KOS$fscanf
+#define __CRT_HAVE_KOS$fscanf_s
 #define __CRT_HAVE_KOS$fscanf_unlocked
 #define __CRT_HAVE_KOS$fseek
 #define __CRT_HAVE_KOS$fseek64
@@ -7929,6 +7968,7 @@
 #define __CRT_HAVE_KOS$scalbnf
 #define __CRT_HAVE_KOS$scalbnl
 #define __CRT_HAVE_KOS$scanf
+#define __CRT_HAVE_KOS$scanf_s
 #define __CRT_HAVE_KOS$scanf_unlocked
 #define __CRT_HAVE_KOS$sched_get_priority_max
 #define __CRT_HAVE_KOS$sched_get_priority_min
@@ -8096,6 +8136,7 @@
 #define __CRT_HAVE_KOS$spawnvpe
 #define __CRT_HAVE_KOS$splice
 #define __CRT_HAVE_KOS$sprintf
+#define __CRT_HAVE_KOS$sprintf_s
 #define __CRT_HAVE_KOS$sqrt
 #define __CRT_HAVE_KOS$sqrtf
 #define __CRT_HAVE_KOS$sqrtl
@@ -8106,6 +8147,7 @@
 #define __CRT_HAVE_KOS$srandom
 #define __CRT_HAVE_KOS$srandom_r
 #define __CRT_HAVE_KOS$sscanf
+#define __CRT_HAVE_KOS$sscanf_s
 #define __CRT_HAVE_KOS$ssignal
 #define __CRT_HAVE_KOS$stat
 #define __CRT_HAVE_KOS$stat64
@@ -8425,8 +8467,10 @@
 #define __CRT_HAVE_KOS$versionsortk
 #define __CRT_HAVE_KOS$versionsortk64
 #define __CRT_HAVE_KOS$vfprintf
+#define __CRT_HAVE_KOS$vfprintf_s
 #define __CRT_HAVE_KOS$vfprintf_unlocked
 #define __CRT_HAVE_KOS$vfscanf
+#define __CRT_HAVE_KOS$vfscanf_s
 #define __CRT_HAVE_KOS$vfscanf_unlocked
 #define __CRT_HAVE_KOS$vfwprintf
 #define __CRT_HAVE_KOS$vfwprintf_unlocked
@@ -8434,14 +8478,17 @@
 #define __CRT_HAVE_KOS$vfwscanf_unlocked
 #define __CRT_HAVE_KOS$vmsplice
 #define __CRT_HAVE_KOS$vprintf
-#define __CRT_HAVE_vprintf_s
+#define __CRT_HAVE_KOS$vprintf_s
 #define __CRT_HAVE_KOS$vprintf_unlocked
 #define __CRT_HAVE_KOS$vscanf
+#define __CRT_HAVE_KOS$vscanf_s
 #define __CRT_HAVE_KOS$vscanf_unlocked
 #define __CRT_HAVE_KOS$vsnprintf
 #define __CRT_HAVE_KOS$vsnprintf_s
 #define __CRT_HAVE_KOS$vsprintf
+#define __CRT_HAVE_KOS$vsprintf_s
 #define __CRT_HAVE_KOS$vsscanf
+#define __CRT_HAVE_KOS$vsscanf_s
 #define __CRT_HAVE_KOS$vstrdupf
 #define __CRT_HAVE_KOS$vswprintf
 #define __CRT_HAVE_KOS$vswscanf
@@ -9304,6 +9351,15 @@
 #define __CRT_HAVE_DOS$__sqrtl
 #define __CRT_HAVE_DOS$__srandom
 #define __CRT_HAVE_DOS$__statfs
+#define __CRT_HAVE_DOS$__stdio_common_vfprintf
+#define __CRT_HAVE_DOS$__stdio_common_vfprintf_p
+#define __CRT_HAVE_DOS$__stdio_common_vfprintf_s
+#define __CRT_HAVE_DOS$__stdio_common_vfscanf
+#define __CRT_HAVE_DOS$__stdio_common_vsnprintf_s
+#define __CRT_HAVE_DOS$__stdio_common_vsprintf
+#define __CRT_HAVE_DOS$__stdio_common_vsprintf_p
+#define __CRT_HAVE_DOS$__stdio_common_vsprintf_s
+#define __CRT_HAVE_DOS$__stdio_common_vsscanf
 #define __CRT_HAVE_DOS$__stime
 #define __CRT_HAVE_DOS$__stpcpy
 #define __CRT_HAVE_DOS$__stpcpy_chk
@@ -9749,6 +9805,8 @@
 #define __CRT_HAVE_DOS$_sprintf_p
 #define __CRT_HAVE_DOS$_sprintf_p_l
 #define __CRT_HAVE_DOS$_sprintf_s_l
+#define __CRT_HAVE_DOS$_sscanf_l
+#define __CRT_HAVE_DOS$_sscanf_s_l
 #define __CRT_HAVE_DOS$_stat
 #define __CRT_HAVE_DOS$_stat32
 #define __CRT_HAVE_DOS$_stat32i64
@@ -9864,6 +9922,8 @@
 #define __CRT_HAVE_DOS$_vscwprintf_p
 #define __CRT_HAVE_DOS$_vscwprintf_p_l
 #define __CRT_HAVE_DOS$_vsnprintf
+#define __CRT_HAVE_DOS$_vsnprintf_c
+#define __CRT_HAVE_DOS$_vsnprintf_c_l
 #define __CRT_HAVE_DOS$_vsnprintf_l
 #define __CRT_HAVE_DOS$_vsnprintf_s
 #define __CRT_HAVE_DOS$_vsnprintf_s_l
@@ -10520,6 +10580,7 @@
 #define __CRT_HAVE_DOS$frexpf
 #define __CRT_HAVE_DOS$frexpl
 #define __CRT_HAVE_DOS$fscanf
+#define __CRT_HAVE_DOS$fscanf_s
 #define __CRT_HAVE_DOS$fscanf_unlocked
 #define __CRT_HAVE_DOS$fseek
 #define __CRT_HAVE_DOS$fseek64
@@ -11610,6 +11671,7 @@
 #define __CRT_HAVE_DOS$scalbnf
 #define __CRT_HAVE_DOS$scalbnl
 #define __CRT_HAVE_DOS$scanf
+#define __CRT_HAVE_DOS$scanf_s
 #define __CRT_HAVE_DOS$scanf_unlocked
 #define __CRT_HAVE_DOS$sched_get_priority_max
 #define __CRT_HAVE_DOS$sched_get_priority_min
@@ -11777,6 +11839,7 @@
 #define __CRT_HAVE_DOS$spawnvpe
 #define __CRT_HAVE_DOS$splice
 #define __CRT_HAVE_DOS$sprintf
+#define __CRT_HAVE_DOS$sprintf_s
 #define __CRT_HAVE_DOS$sqrt
 #define __CRT_HAVE_DOS$sqrtf
 #define __CRT_HAVE_DOS$sqrtl
@@ -11787,6 +11850,7 @@
 #define __CRT_HAVE_DOS$srandom
 #define __CRT_HAVE_DOS$srandom_r
 #define __CRT_HAVE_DOS$sscanf
+#define __CRT_HAVE_DOS$sscanf_s
 #define __CRT_HAVE_DOS$ssignal
 #define __CRT_HAVE_DOS$stat
 #define __CRT_HAVE_DOS$stat64
@@ -12106,8 +12170,10 @@
 #define __CRT_HAVE_DOS$versionsortk
 #define __CRT_HAVE_DOS$versionsortk64
 #define __CRT_HAVE_DOS$vfprintf
+#define __CRT_HAVE_DOS$vfprintf_s
 #define __CRT_HAVE_DOS$vfprintf_unlocked
 #define __CRT_HAVE_DOS$vfscanf
+#define __CRT_HAVE_DOS$vfscanf_s
 #define __CRT_HAVE_DOS$vfscanf_unlocked
 #define __CRT_HAVE_DOS$vfwprintf
 #define __CRT_HAVE_DOS$vfwprintf_unlocked
@@ -12118,11 +12184,14 @@
 #define __CRT_HAVE_DOS$vprintf_s
 #define __CRT_HAVE_DOS$vprintf_unlocked
 #define __CRT_HAVE_DOS$vscanf
+#define __CRT_HAVE_DOS$vscanf_s
 #define __CRT_HAVE_DOS$vscanf_unlocked
 #define __CRT_HAVE_DOS$vsnprintf
 #define __CRT_HAVE_DOS$vsnprintf_s
 #define __CRT_HAVE_DOS$vsprintf
+#define __CRT_HAVE_DOS$vsprintf_s
 #define __CRT_HAVE_DOS$vsscanf
+#define __CRT_HAVE_DOS$vsscanf_s
 #define __CRT_HAVE_DOS$vstrdupf
 #define __CRT_HAVE_DOS$vswprintf
 #define __CRT_HAVE_DOS$vswscanf

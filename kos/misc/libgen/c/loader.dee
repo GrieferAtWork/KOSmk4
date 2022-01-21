@@ -4134,6 +4134,23 @@ again_parse_annotations:
 					++numPreferredBindings;
 				}	break;
 
+				case "crt_intern_alias": {
+					self.next();
+					self.skip("(");
+					local name = str(self.parseCStringOrKeyword());
+					self.skip(")");
+					if (currentKosLibraryFunction is none)
+						currentKosLibraryFunction = LibraryFunction();
+					if (currentDosLibraryFunction is none)
+						currentDosLibraryFunction = LibraryFunction();
+					currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
+						ppCond:  currentConditions !is none ? currentConditions : "1",
+						binding: "libc_" + name));
+					currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
+						ppCond:  currentConditions !is none ? currentConditions : "1",
+						binding: "libd_" + name));
+				}	break;
+
 				case "crt_intern_kos_alias":
 				case "crt_intern_dos_alias": {
 					self.next();

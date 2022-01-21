@@ -463,7 +463,6 @@
 	CB(PREFIX.crt.dos.unicode.locale.ctype) \
 	CB(PREFIX.crt.dos.unicode.locale.convert) \
 	CB(PREFIX.crt.dos.unicode.locale.format.printf) \
-	CB(PREFIX.crt.dos.unicode.locale.format.scanf) \
 	CB(PREFIX.crt.dos.net.socket) \
 	CB(PREFIX.crt.dos.net.inet) \
 	CB(PREFIX.crt.dos.net.ether) \

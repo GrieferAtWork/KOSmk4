@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62cd1376 */
+/* HASH CRC-32:0x36f72220 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,31 +23,23 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_vsscanf_defined
-#define __local___localdep_vsscanf_defined
-#if __has_builtin(__builtin_vsscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsscanf)
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),vsscanf,{ return __builtin_vsscanf(__input, __format, __args); })
-#elif defined(__CRT_HAVE_vsscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),vsscanf,(__input,__format,__args))
-#elif defined(__CRT_HAVE__vsscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),_vsscanf,(__input,__format,__args))
-#elif defined(__CRT_HAVE__vsscanf_s)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),_vsscanf_s,(__input,__format,__args))
-#elif defined(__CRT_HAVE___vsscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),__vsscanf,(__input,__format,__args))
-#elif defined(__CRT_HAVE__IO_vsscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),_IO_vsscanf,(__input,__format,__args))
-#else /* ... */
+#ifndef __local___localdep__vsnscanf_l_defined
+#define __local___localdep__vsnscanf_l_defined
+#ifdef __CRT_HAVE__vsnscanf_l
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnscanf_l,(char const *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __locale_t __locale, __builtin_va_list __args),_vsnscanf_l,(__buf,__bufsize,__format,__locale,__args))
+#else /* __CRT_HAVE__vsnscanf_l */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdio/vsscanf.h>
+#include <libc/local/stdio/_vsnscanf_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_vsscanf __LIBC_LOCAL_NAME(vsscanf)
-#endif /* !... */
-#endif /* !__local___localdep_vsscanf_defined */
-__LOCAL_LIBC(_vsscanf_l) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsscanf_l))(char const *__restrict __input, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) {
-	(void)__locale;
-	return (__NAMESPACE_LOCAL_SYM __localdep_vsscanf)(__input, __format, __args);
+#define __localdep__vsnscanf_l __LIBC_LOCAL_NAME(_vsnscanf_l)
+#endif /* !__CRT_HAVE__vsnscanf_l */
+#endif /* !__local___localdep__vsnscanf_l_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_vsscanf_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsscanf_l))(char const *__buf, char const *__format, __locale_t __locale, __builtin_va_list __args) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__vsnscanf_l)(__buf, (__SIZE_TYPE__)-1, __format, __locale, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vsscanf_l_defined
