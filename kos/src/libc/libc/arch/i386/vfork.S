@@ -87,12 +87,13 @@ INTERN_FUNCTION(libc_VFork)
 	 * we must handle by  clearing `EFLAGS.DF' before returning  to
 	 * our caller. (otherwise, stuff like `memcpy(3)' will break if
 	 * the caller tries to use them) */
+/*[[[cfi{register = '%Pflags'} push %Pflags; and ~$EFLAGS_DF]]]*/
 #ifdef __x86_64__
-	.cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a
+	.cfi_escape 22,49,7,146,49,0,11,255,251,26
 #else /* __x86_64__ */
-	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a
+	.cfi_escape 22,9,6,121,0,11,255,251,26
 #endif /* !__x86_64__ */
-
+/*[[[end]]]*/
 
 	popP_cfi  %Pdx /* Return address */
 	.cfi_register %Pip, %Pdx

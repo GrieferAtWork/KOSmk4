@@ -129,7 +129,7 @@ INTERN_FUNCTION(libc_x86_syscall_init)
 	 *    sp[0x4..0x7] -- Copy of `%edi'
 	 *    sp[0x0..0x3] -- Either `libc___i386_syscall + 7' or `libc___i386_Xsyscall + 8'
 	 *
-	 * All other registers are already set-up for a int80-compatible system call.
+	 * All other registers are already set-up for an int80-compatible system call.
 	 *
 	 * Because our caller eventually intends to perform a system call, we must also
 	 * make sure to save _all_ registers (including %eflags) which we may otherwise
@@ -202,7 +202,7 @@ INTERN_FUNCTION(libc_x86_syscall_init)
 	movl   20(%esp), %edx                                /* %edx = return_pc; */
 	movl   $(ENCODE_INT32(0xcd, 0x80, 0xc3, 0x90)), %eax /* %eax = { int $0x80; ret; nop; }; */
 	movl   $(ENCODE_INT32(0xcd, 0x80, 0xfc, 0xc3)), %ecx /* %ecx = { int $0x80; cld; ret; }; */
-	cmpb   $(0xfd), -8(%edx)                             /* return_pc[-8] == 0xfd; */
+	cmpb   $(0xfd), -8(%edx)                             /* return_pc[-8] == 0xfd; // NOTE: 0xfd == `std' (set EFLAGS.DF=1) */
 	cmove  %ecx, %eax                                    /* if (return_pc[-8] == 0xfd) %eax = { int $0x80; cld; ret; }; */
 	/* Rewrite the `pushl %ebp'  and `pushl %edi',  as well as  the first  2
 	 * bytes of the `call' instruction of `libc_x86_syscall_init()' with the
@@ -246,7 +246,7 @@ END(libc_x86_sysenter_common)
 	.cfi_escape DW_OP_bra, 0x02, 0x00;                    /* if (INT80_ENABLED) goto 1f; */                    \
 	.cfi_escape DW_OP_plus_uconst, (sysenter_sp_offset - int80_sp_offset) /* CFI: [%esp+*] */
 
-/* Restore: `%regno = INT80_ENABLED ? *(u32 *)(%esp + 0) : *(u32 *)(%esp + sp_offset)' */
+/* Restore: `%regno = INT80_ENABLED ? *(u32 *)(%esp + sysenter_sp_offset) : *(u32 *)(%esp + sp_offset)' */
 #define CFI_RESTORE_FROM_ESP(regno, int80_sp_offset, sysenter_sp_offset)                                     \
 	.cfi_escape DW_CFA_expression, regno, 15;                                                                \
 	.cfi_escape DW_OP_breg0 + CFI_386_UNWIND_REGISTER_ESP, int80_sp_offset; /* CFI: [%esp] */                \
