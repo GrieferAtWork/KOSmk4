@@ -35,6 +35,17 @@ BEGIN
 	STATIC_USELIBGCC()
 	GCC_FLAGS({
 		"-ffreestanding",
+
+		/* Don't make assumptions based on __attribute__((nonnull)).
+		 * We use the  attribute for functions  like `fwrite()'  and
+		 * its  `stream' argument.  -- There  is no  valid reason to
+		 * ever  call such  a function  with NULL,  but it's allowed
+		 * and must be handled via `errno'.
+		 *
+		 * Thus, we must turn off optimizations that would remove
+		 * the `stream == NULL' checks from builds, else we'd end
+		 * up with a non-conforming library... */
+		"-fno-delete-null-pointer-checks",
 	})
 
 	/* Bind DT_INIT / DT_FINI */

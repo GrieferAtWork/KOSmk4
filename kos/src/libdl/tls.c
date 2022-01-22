@@ -546,6 +546,7 @@ NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
 	result = (DlModule *)malloc(SIZEOF_DL_MODULE_FOR_TLS);
 	if unlikely(!result)
 		goto err_nomem;
+
 	/* Invalidate all of the `struct link_map' emulation garbage. */
 	DBG_memset(result, 0xcc, OFFSETOF_DL_MODULE_FOR_TLS);
 	result->dm_tlsoff     = 0;
@@ -559,6 +560,7 @@ NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
 	result->dm_tls_arg    = perthread_callback_arg;
 	result->dm_refcnt     = 1;
 	result->dm_weakrefcnt = 1;
+
 	/* Copy TLS template data. */
 	if (template_size) {
 		result->dm_tlsinit = (byte_t *)malloc(template_size);
@@ -568,6 +570,7 @@ NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
 		       template_data,
 		       template_size);
 	}
+
 	/* No need for any sort of registration.
 	 * -> All of that is done lazily on a per-thread basis! */
 	return result;
@@ -588,6 +591,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(USER DlModule *self)
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_nullmodule;
 	DlModule_RemoveTLSExtension(self);
+
 	/* Wait for other threads to complete finalization (which may happen
 	 * if  they began  to do so,  just before this  function got called)
 	 * s.a. `libdl_dltlsfreeseg()' doing a tryincref() to prevent
@@ -620,6 +624,7 @@ NOTHROW(CC DlModule_TryGetTLSAddr)(DlModule *__restrict self) {
 	if unlikely(!self->dm_tlsmsize)
 		return NULL; /* No TLS segment. */
 	tls = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+
 	/* Simple case: Static TLS */
 	if (self->dm_tlsstoff)
 		return (byte_t *)tls + self->dm_tlsstoff;

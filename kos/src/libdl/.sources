@@ -21,7 +21,20 @@
 BEGIN
 	/* libdl should always be optimized for size, rather than speed! */
 	REMOVE_GCC_FLAGS({ "-O2", "-O3" })
-	GCC_FLAGS({ "-Os", "-fno-rtti", "-ffreestanding" })
+
+	GCC_FLAGS({
+		"-Os", "-fno-rtti", "-ffreestanding",
+
+		/* Don't make  assumptions  based  on  __attribute__((nonnull))
+		 * We use the attribut on  API functions for stuff like  module
+		 * handles, but user-code of the library might still pass NULL,
+		 * which we need to handle via `dlerror()'
+		 *
+		 * However, we _do_ still want to use the attribute so we're
+		 * getting  compiler warnings for invalid internal usage, as
+		 * well as when compiling programs with invalid usage. */
+		"-fno-delete-null-pointer-checks",
+	})
 
 	if (TARGET_ARCH == "x86_64") {
 		CC_FLAGS({
