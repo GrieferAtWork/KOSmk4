@@ -1015,12 +1015,16 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 		}                                                    \
 		/* Verify TLS segment */                             \
 		x86_verify_tls(state, error);                        \
+		/* Barrier to prevent premature TLS use */           \
+		COMPILER_BARRIER();                                  \
 	}	__WHILE0
+
 PRIVATE SECTION_EXCEPT_TEXT NONNULL((1, 2)) void CC
 x86_verify_tls(error_register_state_t *__restrict state,
                struct exception_data *__restrict error) {
 	bool readerror;
 	void *tlsbase, *tlsptr0;
+
 	/* In *_nopf-mode, read a pointer from `%segtls:0'.
 	 * - If a #PF (or some other exception) is generated, fail.
 	 * - Ensure that the read pointer equals `RD_TLS_BASE_REGISTER_S()' */

@@ -227,15 +227,16 @@ linker_main(struct elfexec_info *__restrict info,
 	/*decref(base_module);*/ /* Intentionally left dangling! */
 
 	return result;
-err:
 	{
-		char *error = libdl_dlerror();
+		char *error;
+err:
+		error = libdl_dlerror();
 		syslog(LOG_ERR, "DL Initialization failed: %s\n", error);
 		/* If STDERR is  a tty,  also print the  error message  there.
 		 * Don't  do so  when STDERR  is something  different (such as
 		 * a file) in order to  not accidentally inject an  unexpected
 		 * error message into an error stream that wouldn't understand
-		 * such an error. */
+		 * such a message. */
 		{
 			struct termios ios;
 			if (sys_ioctl(STDERR_FILENO, TCGETA, &ios) >= 0) {

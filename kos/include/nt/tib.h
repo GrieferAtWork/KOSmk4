@@ -26,7 +26,10 @@
 #include "types.h"
 /**/
 
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
+
+#include <asm/intrin.h>
 
 /* Thread Information Block (mainly for SEH) */
 
@@ -48,8 +51,25 @@ __C89_NAMELESS typedef struct _NT_TIB {
 	};
 	PVOID ArbitraryUserPointer;
 	struct _NT_TIB *Self;
+	/* BELOW: https://en.wikipedia.org/wiki/Win32_Thread_Information_Block */
+	PVOID _UnknownName_EnvironmentPointer;
+	PVOID _UnknownName_ProcessIdOrDebugContext;
+	PVOID _UnknownName_ThreadId;
+	PVOID _UnknownName_ActiveRpcHandle;
+	void **NativePeTlsArray; /* Used for native PE TLS memory. */
 } NT_TIB;
 typedef NT_TIB *PNT_TIB;
+
+#ifdef __x86_64__
+#define _GetTibFieldEx(bwlq, offset) __rdgs##bwlq(offset)
+#define _SetTib(addr)                __wrgsbase(addr)
+#elif defined(__i386__)
+#define _GetTibFieldEx(bwlq, offset) __rdfs##bwlq(offset)
+#define _SetTib(addr)                __wrfsbase(addr)
+#endif /* ... */
+#define _GetTib()              ((NT_TIB *)_GetTibFieldEx(ptr, __builtin_offsetof(NT_TIB, Self)))
+#define _GetNativePeTlsArray() ((void **)_GetTibFieldEx(ptr, __builtin_offsetof(NT_TIB, NativePeTlsArray)))
+
 #endif /* _NT_TIB_DEFINED */
 
 __DECL_END

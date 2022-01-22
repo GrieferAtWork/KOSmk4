@@ -37,6 +37,7 @@
 #include <asm/intrin.h>
 #include <kos/except.h>
 #include <kos/syscalls.h>
+#include <nt/libloaderapi.h>
 #include <nt/tib.h>
 #include <sys/ioctl.h>
 
@@ -538,6 +539,113 @@ done:
 }
 
 
+PRIVATE NONNULL((1)) void CC
+DlModule_PeTlsDoExec(DlModule *__restrict self, DWORD reason) {
+	PIMAGE_TLS_CALLBACK const *functions;
+	for (functions = self->dm_pe.dp_tlscalls; *functions; ++functions)
+		(**functions)(self, reason, NULL);
+}
+
+PRIVATE NONNULL((1, 2)) void CC
+DlModule_PeTlsExec(DlModule *__restrict self, void *base, DWORD reason) {
+	void **pmodtls, *oldbase;
+
+	/* Technically,  PE TLS should be initialized in the context of the
+	 * thread it is meant to be used for. -- This isn't something  that
+	 * is guarantied for KOS-style dlfcn tls initializers (which we are
+	 * basing our's on, so that `dltlsaddr()' will work for PE modules)
+	 *
+	 * As such, we hijack the calling thread's TLS base pointer for  the
+	 * relevant module and temporarily override it. If it already didn't
+	 * differ, then nothing will be lost and emulation is 100%. */
+	pmodtls  = &_GetNativePeTlsArray()[self->dm_pe.dp_tlsindex];
+	oldbase  = *pmodtls;
+	*pmodtls = base;
+	RAII_FINALLY { *pmodtls = oldbase; };
+	DlModule_PeTlsDoExec(self, reason);
+}
+
+PRIVATE void DLFCN_CC
+DlModule_PeTlsInit(void *arg, void *base) {
+	DlModule_PeTlsExec((DlModule *)arg, base, DLL_THREAD_ATTACH);
+}
+
+PRIVATE void DLFCN_CC
+DlModule_PeTlsFini(void *arg, void *base) {
+	DlModule_PeTlsExec((DlModule *)arg, base, DLL_THREAD_DETACH);
+}
+
+
+/* Next TLS index to hand out. */
+PRIVATE uintptr_t pe_nexttlsindex = 0;
+PRIVATE uintptr_t NOTHROW(CC PeTls_AllocIndex)(void) {
+	return pe_nexttlsindex++;
+}
+PRIVATE void NOTHROW(CC PeTls_FreeIndex)(uintptr_t index) {
+	COMPILER_IMPURE();
+	(void)index;
+}
+
+/* Allocate a TLS vector for use as `_GetNativePeTlsArray()'. */
+PRIVATE void **CC PeTls_AllocVector(bool forme) {
+	size_t count;
+	void **result;
+	DlModule *iter;
+	count  = ATOMIC_READ(pe_nexttlsindex);
+	result = (void **)calloc(count, sizeof(void *));
+	if (!result)
+		return NULL;
+	atomic_rwlock_read(dl.DlModule_AllLock);
+	DLIST_FOREACH (iter, dl.DlModule_AllList, dm_modules) {
+		void *block;
+		if (iter->dm_ops != &libpe_fmt)
+			continue;
+		if (iter->dm_tlsmsize == 0)
+			continue;
+		if (iter->dm_pe.dp_tlsindex >= count)
+			continue; /* Shouldn't happen... */
+		block = memalign(iter->dm_tlsalign, iter->dm_tlsmsize);
+		if (!block)
+			goto err;
+		result[iter->dm_pe.dp_tlsindex] = block;
+		if (iter->dm_pe.dp_tlscalls) {
+			if (forme) {
+				DlModule_PeTlsDoExec(iter, DLL_THREAD_ATTACH);
+			} else {
+				DlModule_PeTlsInit(iter, block);
+			}
+		}
+	}
+	atomic_rwlock_endread(dl.DlModule_AllLock);
+	return result;
+err:
+	DLIST_FOREACH (iter, dl.DlModule_AllList, dm_modules) {
+		void *block;
+		if (iter->dm_ops != &libpe_fmt)
+			continue;
+		if (iter->dm_tlsmsize == 0)
+			continue;
+		if (iter->dm_pe.dp_tlsindex >= count)
+			continue;
+		block = result[iter->dm_pe.dp_tlsindex];
+		if (!block)
+			continue;
+		if (iter->dm_pe.dp_tlscalls) {
+			if (forme) {
+				DlModule_PeTlsDoExec(iter, DLL_THREAD_DETACH);
+			} else {
+				DlModule_PeTlsFini(iter, block);
+			}
+		}
+		free(block);
+	}
+	atomic_rwlock_endread(dl.DlModule_AllLock);
+	free(result);
+	return NULL;
+}
+
+
+
 PRIVATE NONNULL((1)) int CC
 DlModule_PeInitialize(DlModule *__restrict self) {
 	int result;
@@ -551,6 +659,77 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 	result = DlModule_PeInitializeRelocations(self);
 	if (result != 0)
 		goto done;
+
+	if (DlModule_HasTls(self)) {
+		/* Load TLS, as per the specs:
+		 * >> https://en.wikipedia.org/wiki/Win32_Thread_Information_Block
+		 * >> https://docs.microsoft.com/en-us/windows/win32/debug/pe-format
+		 *
+		 * On PE, TLS works as follows:
+		 * >> __declspec(thread) int my_symbol;
+		 * >> static void set() {
+		 * >>     my_symbol = 42;
+		 * >> }
+		 *
+		 * Same as:
+		 * >> uintptr_t *tls_index = tls->AddressOfIndex;  // DlModule_GetTls(self)
+		 * >> #ifdef __x86_64__
+		 * >> void **tls_vector = *(void ***)%gs:0x58;
+		 * >> #else
+		 * >> void **tls_vector = *(void ***)%fs:0x2c;
+		 * >> #endif
+		 * >> void *mytls    = tls_vector[*tls_index];
+		 * >> int *my_symbol = mytls + OFFSET_OF_MY_SYMBOL;
+		 * >> *my_symbol = 42;
+		 *
+		 * This is  pretty much  the same  as ELF's  dynamic TLS  approach.
+		 * However, there's a  problem here  when it comes  to loading  new
+		 * libraries that require TLS: because there is no __tls_get_addr()
+		 * function, we can't  do lazy  initialization of TLS  blocks on  a
+		 * per-thread  basis; no: _all_ TLS must be allocated from the very
+		 * start of a thread, and  loading new libraries with TLS  requires
+		 * us to expand the TLS vector of every running thread also.
+		 *
+		 * Because of how complicated that would be, for now we take  the
+		 * easy way out by saying that a PE library w/ TLS that is loaded
+		 * after  the fact, will only be allocated the thread that loaded
+		 * it, or any thread created thereafter. */
+		PIMAGE_TLS_DIRECTORY tls;
+		tls = DlModule_GetTlsDir(self);
+
+		self->dm_tlsoff   = (ElfW(Off))-1; /* Unused for PE */
+		self->dm_tlsinit  = (byte_t *)(/*self->dm_loadaddr + */ tls->StartAddressOfRawData);
+		self->dm_tlsfsize = tls->EndAddressOfRawData - tls->StartAddressOfRawData;
+		self->dm_tlsmsize = self->dm_tlsfsize + tls->SizeOfZeroFill;
+		self->dm_tlsstoff = 0;
+
+		if (self->dm_tlsmsize) {
+			/* We can figure out the required alignment from `tls->Characteristics' */
+			self->dm_tlsalign = 1;
+			if (tls->Characteristics & IMAGE_SCN_ALIGN_MASK)
+				self->dm_tlsalign = (size_t)1 << (((tls->Characteristics & IMAGE_SCN_ALIGN_MASK) >> 20) - 1);
+			self->dm_tls_init = NULL;
+			self->dm_tls_fini = NULL;
+
+			/* Allocate a TLS index */
+			self->dm_pe.dp_tlsindex = PeTls_AllocIndex();
+
+			/* Store TLS index in module structure. */
+			*(uintptr_t *)(/*self->dm_loadaddr + */tls->AddressOfIndex) = self->dm_pe.dp_tlsindex;
+
+			/* Check for TLS initialization callbacks. */
+			if (tls->AddressOfCallBacks) {
+				PIMAGE_TLS_CALLBACK *tls_callbacks;
+				tls_callbacks = (PIMAGE_TLS_CALLBACK *)(/*self->dm_loadaddr + */tls->AddressOfCallBacks);
+				if (*tls_callbacks) {
+					self->dm_pe.dp_tlscalls = tls_callbacks;
+					self->dm_tls_init       = &DlModule_PeTlsInit;
+					self->dm_tls_fini       = &DlModule_PeTlsFini;
+					self->dm_tls_arg        = self;
+				}
+			}
+		}
+	}
 
 	/* TODO: Make non-writable sections read-only. */
 
@@ -574,6 +753,8 @@ libpe_v_open(byte_t const header[DL_MODULE_MAXMAGIC],
 
 PRIVATE NONNULL((1)) void LIBDL_CC
 libpe_v_fini(DlModule *__restrict self) {
+	if (self->dm_tlsmsize != 0)
+		PeTls_FreeIndex(self->dm_pe.dp_tlsindex);
 	/* TODO */
 	(void)self;
 	COMPILER_IMPURE();
@@ -850,13 +1031,9 @@ libpe_linker_main(struct peexec_info *__restrict info,
 		stackend = (uintptr_t)((void **)result + 1);
 		tib->StackBase  = (PVOID)(stackend - USER_STACK_SIZE);
 		tib->StackLimit = (PVOID)stackend;
-#ifdef __x86_64__
-		__wrgsbase(tib);
-#elif defined(__i386__)
-		__wrfsbase(tib);
-#else /* ... */
-#error "Unsupported architecture"
-#endif /* !... */
+		_SetTib(tib);
+		if (pe_nexttlsindex != 0)
+			tib->NativePeTlsArray = PeTls_AllocVector(true);
 	}
 
 	/* The entry point of PE applications is allowed to return normally.
@@ -864,6 +1041,23 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	result = (byte_t *)result - sizeof(void *);
 	((void **)result)[0] = ((void **)result)[1];         /* Original entry point */
 	((void **)result)[1] = (void *)&pe_exit_wrapper_asm; /* Have entry point return here */
+
+	if (pe_nexttlsindex != 0) {
+		/* TODO: Just inject another indirect function to-be called before `*result',
+		 *       that will copy the base addresses of PE TLS segments allocated above
+		 *       into the TLS extension table of the ELF-TLS context of the calling
+		 *       thread.
+		 * >> struct tls_segment *me = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+		 * >> FOREACH (pemod: dl.DlModule_AllList) {
+		 * >>     if (!HAS_TLS(pemod))
+		 * >>         continue;
+		 * >>     struct dtls_extension *node = malloc();
+		 * >>     node->te_module = pemod;
+		 * >>     node->te_data   = TLS_BASE_IN_MAIN_THREAD(pemod);
+		 * >>     dtls_extension_tree_insert(&me->ts_extree, node);
+		 * >> }
+		 */
+	}
 
 	/* Return a pointer to the PE program entry point. */
 	return result;

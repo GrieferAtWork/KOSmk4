@@ -208,6 +208,8 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 	DlModule_AllList_FOREACH(iter) {
 		if (!iter->dm_tlsmsize)
 			continue;
+		if (iter->dm_ops)
+			continue;
 		if (static_tls_align < iter->dm_tlsalign)
 			static_tls_align = iter->dm_tlsalign;
 		endptr -= iter->dm_tlsmsize;
@@ -223,6 +225,8 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 	DlModule_AllList_FOREACH(iter) {
 		byte_t *dst;
 		if (!iter->dm_tlsmsize)
+			continue;
+		if (iter->dm_ops)
 			continue;
 		dst = (byte_t *)static_tls_init +
 		      static_tls_size_no_segment +

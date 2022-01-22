@@ -10,7 +10,7 @@ In general, KOS isn't designed to re-invent the wheel (no square wheels here), b
 - KOS tries to be fully API- and ABI-compatible with Linux/GNU/GLibc/... on all supported architectures
 - KOS's source components are very tightly interwoven with each other, and both headers and sources make use of the many GCC extensions that exist to both improve generated code, as well as inducing the behavior of different functions
 - KOS's sources and headers contain a lot of documentation and I try to give every *magic* number that gets used a proper name. So to understand how KOS works, all that you need to do is to read the documentation of whatever you're looking at
-- KOS also includes binary compatibility for simple NT programs compiled with tcc/VisualC (including a PE binary loader)
+- KOS also includes a DOS/NT emulation mode that allows console programs compiled for NT (using TCC/MinGW/VC/VC++/...) to be executed under KOS. Also note that to do so, KOS will link PE binaries against ELF shared libraries, as PE loading is implemented as an extension to ELF loading (yes: it gets complicated, but it works).
 
 **NOTICE**: KOS uses git submodules (which are required to build KOS), so if you use the *download zip* function, you won't end up with everything that goes into building KOS. So in order to clone KOS in its entirety, you must clone this [git](https://git-scm.com/) through use of:
 

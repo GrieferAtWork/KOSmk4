@@ -1145,7 +1145,7 @@ typedef IMAGE_THUNK_DATA32 *PIMAGE_THUNK_DATA32;
 #define IMAGE_SNAP_BY_ORDINAL64(Ordinal) ((Ordinal & IMAGE_ORDINAL_FLAG64) != 0)
 #define IMAGE_SNAP_BY_ORDINAL32(Ordinal) ((Ordinal & IMAGE_ORDINAL_FLAG32) != 0)
 
-typedef VOID(NTAPI *PIMAGE_TLS_CALLBACK)(PVOID DllHandle, DWORD Reason, PVOID Reserved);
+typedef VOID(NTAPI *PIMAGE_TLS_CALLBACK)(PVOID pDllHandle, DWORD dwReason, PVOID pReserved);
 
 typedef struct _IMAGE_TLS_DIRECTORY64 {
 	ULONGLONG StartAddressOfRawData;

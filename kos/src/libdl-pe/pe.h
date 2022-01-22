@@ -39,8 +39,10 @@ INTDEF struct dlmodule_format libpe_fmt;
 
 /* Per-DlModule extension data for PE */
 struct dlmodule_pe {
-	IMAGE_NT_HEADERS                              dp_nt;    /* [const] NT file header */
-	COMPILER_FLEXIBLE_ARRAY(IMAGE_SECTION_HEADER, dp_sect); /* [const][:dm_shnum] Section headers */
+	__uintptr_t                                   dp_tlsindex; /* [const] TLS index of this module (if applicable) */
+	PIMAGE_TLS_CALLBACK const                    *dp_tlscalls; /* [0..1][0..1][const] TLS callback functions. */
+	IMAGE_NT_HEADERS                              dp_nt;       /* [const] NT file header */
+	COMPILER_FLEXIBLE_ARRAY(IMAGE_SECTION_HEADER, dp_sect);    /* [const][:dm_shnum] Section headers */
 };
 
 #define DlModule_HasOptionalHeader(self, field)             \
@@ -53,6 +55,9 @@ struct dlmodule_pe {
 #define DlModule_GetImports(self)           (&(self)->dm_pe.dp_nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT])
 #define DlModule_HasRelocs(self)            DlModule_HasDataDirectory(self, IMAGE_DIRECTORY_ENTRY_BASERELOC)
 #define DlModule_GetRelocs(self)            (&(self)->dm_pe.dp_nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC])
+#define DlModule_HasTls(self)               DlModule_HasDataDirectory(self, IMAGE_DIRECTORY_ENTRY_TLS)
+#define DlModule_GetTls(self)               (&(self)->dm_pe.dp_nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS])
+#define DlModule_GetTlsDir(self)            ((PIMAGE_TLS_DIRECTORY)((self)->dm_loadaddr + DlModule_GetTls(self)->VirtualAddress))
 
 
 DECL_END

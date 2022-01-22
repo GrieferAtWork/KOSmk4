@@ -34,6 +34,14 @@
 #define FCALL __FCALL
 #endif /* !FCALL */
 
+#ifndef DLFCN_CC
+#define DLFCN_CC __DLFCN_CC
+#endif /* !DLFCN_CC */
+#ifndef DLFCN_VCC
+#define DLFCN_VCC __DLFCN_VCC
+#endif /* !DLFCN_VCC */
+
+
 #ifndef REF
 #define REF __REF
 #endif /* !REF */

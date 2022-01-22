@@ -33,6 +33,13 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+/* Reason codes for DllMain() */
+#define DLL_PROCESS_DETACH   0
+#define DLL_PROCESS_ATTACH   1
+#define DLL_THREAD_ATTACH    2
+#define DLL_THREAD_DETACH    3
+#define DLL_PROCESS_VERIFIER 4
+
 #ifndef _HMODULE_DEFINED
 #define _HMODULE_DEFINED
 DECLARE_HANDLE(HMODULE);
