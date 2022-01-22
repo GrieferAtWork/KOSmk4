@@ -889,9 +889,11 @@ INTERN void libpe_init(void) {
 /************************************************************************/
 /* Handling for when a PE program's _start() does a `ret'               */
 /************************************************************************/
-INTERN void FCALL pe_exit_wrapper(int exit_code) {
+INTERN ATTR_NORETURN void FCALL
+pe_exit_wrapper(int exit_code) {
 	_Exit(exit_code);
 }
+
 INTDEF void pe_exit_wrapper_asm(void);
 __asm__(".pushsection .text\n"
         ".global pe_exit_wrapper_asm\n"
@@ -1049,9 +1051,9 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	((void **)result)[1] = (void *)&pe_exit_wrapper_asm; /* Have entry point return here */
 
 	if (pe_nexttlsindex != 0) {
-		/* TODO: Just inject another indirect function to-be called before `*result',
+		/* TODO: Must inject another indirect function to-be called before `*result',
 		 *       that will copy the base addresses of PE TLS segments allocated above
-		 *       into the TLS extension table of  the ELF-TLS context of the  calling
+		 *       into the TLS  extension table  of the  ELF-TLS context  of the  main
 		 *       thread.
 		 * >> struct tls_segment *me = (struct tls_segment *)RD_TLS_BASE_REGISTER();
 		 * >> FOREACH (pemod: dl.DlModule_AllList) {

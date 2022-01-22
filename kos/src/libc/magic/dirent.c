@@ -231,8 +231,8 @@ typedef struct __dirstream DIR;
 @@>> opendir(3)
 @@Open and return a new directory stream for reading, referring to `name'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
-[[userimpl, requires_include("<asm/os/fcntl.h>"), export_alias("__libc_opendir")]]
-[[requires(defined(__AT_FDCWD) && $has_function(opendirat))]]
+[[requires_include("<asm/os/fcntl.h>"), export_alias("__libc_opendir")]]
+[[crt_dos_variant, userimpl, requires(defined(__AT_FDCWD) && $has_function(opendirat))]]
 DIR *opendir([[nonnull]] char const *name) {
 	/* TODO: Emulate using DOS's _find* functions */
 	/* TODO: Emulate using fdopendir(open(name, 0)) */
@@ -245,7 +245,7 @@ DIR *opendir([[nonnull]] char const *name) {
 @@>> fopendirat(3)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
-[[userimpl, requires_function(fdopendir, openat)]]
+[[crt_dos_variant, userimpl, requires_function(fdopendir, openat)]]
 DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 	DIR *result;
 	fd_t fd = openat(dirfd, name, oflags);
@@ -262,7 +262,7 @@ DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 @@>> opendirat(3)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
-[[userimpl, requires_function(fopendirat)]]
+[[crt_dos_variant, userimpl, requires_function(fopendirat)]]
 DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {
 	return fopendirat(dirfd, name, 0);
 }

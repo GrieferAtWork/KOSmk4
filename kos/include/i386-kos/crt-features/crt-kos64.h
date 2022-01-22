@@ -5806,6 +5806,7 @@
 #define __CRT_HAVE_KOS$__tgamma
 #define __CRT_HAVE_KOS$__tgammaf
 #define __CRT_HAVE_KOS$__tgammal
+#define __CRT_HAVE___threadhandle
 #define __CRT_HAVE_KOS$__time
 #define __CRT_HAVE_KOS$__times
 #define __CRT_HAVE_KOS$__timezone
@@ -5839,6 +5840,7 @@
 #define __CRT_HAVE_KOS$__utimes
 #define __CRT_HAVE___vcrt_GetModuleFileNameW
 #define __CRT_HAVE___vcrt_GetModuleHandleW
+#define __CRT_HAVE___vcrt_InitializeCriticalSectionEx
 #define __CRT_HAVE___vcrt_LoadLibraryExW
 #define __CRT_HAVE_KOS$__vfscanf
 #define __CRT_HAVE_KOS$__vsnprintf
@@ -9542,6 +9544,7 @@
 #define __CRT_HAVE_DOS$__tgamma
 #define __CRT_HAVE_DOS$__tgammaf
 #define __CRT_HAVE_DOS$__tgammal
+#define __CRT_HAVE_DOS$__threadhandle
 #define __CRT_HAVE_DOS$__time
 #define __CRT_HAVE_DOS$__times
 #define __CRT_HAVE_DOS$__timezone
@@ -9575,6 +9578,7 @@
 #define __CRT_HAVE_DOS$__utimes
 #define __CRT_HAVE_DOS$__vcrt_GetModuleFileNameW
 #define __CRT_HAVE_DOS$__vcrt_GetModuleHandleW
+#define __CRT_HAVE_DOS$__vcrt_InitializeCriticalSectionEx
 #define __CRT_HAVE_DOS$__vcrt_LoadLibraryExW
 #define __CRT_HAVE_DOS$__vfscanf
 #define __CRT_HAVE_DOS$__vsnprintf

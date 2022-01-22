@@ -82,6 +82,17 @@ PRIVATE ATTR_SECTION(".bss.crt.fs.dir") size_t dirbuf_compat_offset = 0;
 
 
 
+/*[[[head:libd_opendir,hash:CRC-32=0x338c7c26]]]*/
+/* >> opendir(3)
+ * Open and return a new directory stream for reading, referring to `name' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1)) DIR *
+NOTHROW_RPC(LIBDCALL libd_opendir)(char const *name)
+/*[[[body:libd_opendir]]]*/
+{
+	return libd_opendirat(AT_FDCWD, name);
+}
+/*[[[end:libd_opendir]]]*/
+
 /*[[[head:libc_opendir,hash:CRC-32=0x9539498a]]]*/
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
@@ -101,6 +112,19 @@ err:
 	return NULL;
 }
 /*[[[end:libc_opendir]]]*/
+
+/*[[[head:libd_fopendirat,hash:CRC-32=0xd310085e]]]*/
+/* >> fopendirat(3)
+ * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((2)) DIR *
+NOTHROW_RPC(LIBDCALL libd_fopendirat)(fd_t dirfd,
+                                      char const *name,
+                                      oflag_t oflags)
+/*[[[body:libd_fopendirat]]]*/
+{
+	return libc_fopendirat(dirfd, name, oflags | O_DOSPATH);
+}
+/*[[[end:libd_fopendirat]]]*/
 
 /*[[[head:libc_fopendirat,hash:CRC-32=0x8b96f21e]]]*/
 /* >> fopendirat(3)
@@ -126,6 +150,18 @@ err:
 }
 /*[[[end:libc_fopendirat]]]*/
 
+/*[[[head:libd_opendirat,hash:CRC-32=0x18217be4]]]*/
+/* >> opendirat(3)
+ * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((2)) DIR *
+NOTHROW_RPC(LIBDCALL libd_opendirat)(fd_t dirfd,
+                                     char const *name)
+/*[[[body:libd_opendirat]]]*/
+{
+	return libc_fopendirat(dirfd, name, O_RDONLY | O_DIRECTORY | O_DOSPATH);
+}
+/*[[[end:libd_opendirat]]]*/
+
 /*[[[head:libc_opendirat,hash:CRC-32=0xc595fd2d]]]*/
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
@@ -134,7 +170,7 @@ NOTHROW_RPC(LIBCCALL libc_opendirat)(fd_t dirfd,
                                      char const *name)
 /*[[[body:libc_opendirat]]]*/
 {
-	return fopendirat(dirfd, name, O_RDONLY | O_DIRECTORY);
+	return libc_fopendirat(dirfd, name, O_RDONLY | O_DIRECTORY);
 }
 /*[[[end:libc_opendirat]]]*/
 
@@ -474,8 +510,8 @@ NOTHROW_RPC(LIBCCALL libc_scandirk)(char const *__restrict dir,
                                     int (LIBKCALL *selector)(struct dirent const *entry),
                                     int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b))
 /*[[[body:libc_scandirk]]]*/
-/*AUTO*/{
-	return scandirat(__AT_FDCWD, dir, namelist, selector, cmp);
+{
+	return libc_scandiratk(AT_FDCWD, dir, namelist, selector, cmp);
 }
 /*[[[end:libc_scandirk]]]*/
 
@@ -1094,10 +1130,14 @@ NOTHROW(LIBCCALL libc_get_scandirat64)(void) {
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7e3a6aca]]]*/
+/*[[[start:exports,hash:CRC-32=0x4b86272f]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$__libc_opendir, libd_opendir);
+DEFINE_PUBLIC_ALIAS(DOS$opendir, libd_opendir);
 DEFINE_PUBLIC_ALIAS(__libc_opendir, libc_opendir);
 DEFINE_PUBLIC_ALIAS(opendir, libc_opendir);
+DEFINE_PUBLIC_ALIAS(DOS$fopendirat, libd_fopendirat);
 DEFINE_PUBLIC_ALIAS(fopendirat, libc_fopendirat);
+DEFINE_PUBLIC_ALIAS(DOS$opendirat, libd_opendirat);
 DEFINE_PUBLIC_ALIAS(opendirat, libc_opendirat);
 DEFINE_PUBLIC_ALIAS(__libc_closedir, libc_closedir);
 DEFINE_PUBLIC_ALIAS(closedir, libc_closedir);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d1ab133 */
+/* HASH CRC-32:0xe7b61830 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,10 +244,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_getdiskfree, libd__getdiskfree);
 DEFINE_PUBLIC_ALIAS(DOS$_mkdir, libd__mkdir);
 
 /* dirent */
-DEFINE_PUBLIC_ALIAS(DOS$__libc_opendir, libd_opendir);
-DEFINE_PUBLIC_ALIAS(DOS$opendir, libd_opendir);
-DEFINE_PUBLIC_ALIAS(DOS$fopendirat, libd_fopendirat);
-DEFINE_PUBLIC_ALIAS(DOS$opendirat, libd_opendirat);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_closedir, libd_closedir);
 DEFINE_PUBLIC_ALIAS(DOS$closedir, libd_closedir);
 DEFINE_PUBLIC_ALIAS(DOS$fdclosedir, libd_fdclosedir);
@@ -1101,7 +1097,6 @@ DEFINE_PUBLIC_ALIAS(DOS$setsourcefilter, libd_setsourcefilter);
 DEFINE_PUBLIC_ALIAS(DOS$_beginthread, libd__beginthread);
 DEFINE_PUBLIC_ALIAS(DOS$_beginthreadex, libd__beginthreadex);
 DEFINE_PUBLIC_ALIAS(DOS$_endthreadex, libd__endthreadex);
-DEFINE_PUBLIC_ALIAS(DOS$_loaddll, libd__loaddll);
 DEFINE_PUBLIC_ALIAS(DOS$_unloaddll, libd__unloaddll);
 DEFINE_PUBLIC_ALIAS(DOS$_getdllprocaddr, libd__getdllprocaddr);
 DEFINE_PUBLIC_ALIAS(DOS$_cwait, libd_cwait);

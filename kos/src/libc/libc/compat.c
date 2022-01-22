@@ -1101,7 +1101,10 @@ PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *LIBCCALL libd_getk32(void
 	return k32;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *LIBCCALL
+/* Lazily load `libkernel32.so' (if not done already), and return the
+ * address  of the named  `symbol_name'. If non-existent, `_Exit(1)'. */
+ATTR_SECTION(".text.crt.dos.compat.dos")
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *LIBCCALL
 libd_requirek32(char const *__restrict symbol_name) {
 	void *result = dlsym(libd_getk32(), symbol_name);
 	if (!result) {
@@ -1135,6 +1138,10 @@ DEFINE_KERNEL32_FORWARDER_FUNCTION(HMODULE, LIBDCALL, __vcrt_GetModuleHandleW,
 DEFINE_KERNEL32_FORWARDER_FUNCTION(HMODULE, LIBDCALL, __vcrt_LoadLibraryExW,
                                    (LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags),
                                    "LoadLibraryExW", (lpLibFileName, hFile, dwFlags))
+DEFINE_KERNEL32_FORWARDER_FUNCTION(WINBOOL, LIBDCALL, __vcrt_InitializeCriticalSectionEx,
+                                   (/*LPCRITICAL_SECTION*/ void *lpCriticalSection, DWORD dwSpinCount, DWORD dwFlags),
+                                   "InitializeCriticalSectionEx", (lpCriticalSection, dwSpinCount, dwFlags))
+DEFINE_KERNEL32_FORWARDER_FUNCTION(uintptr_t, LIBDCALL, __threadhandle, (void), "GetCurrentThread", ())
 #undef DEFINE_KERNEL32_FORWARDER_FUNCTION
 
 

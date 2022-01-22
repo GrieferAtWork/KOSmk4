@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64fb96da */
+/* HASH CRC-32:0x42770c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2014,7 +2014,7 @@ again:
 #undef LIBC_RAND_MAX
 		}
 	}
-#ifdef __CRT_HAVE_gettid
+#if defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid)
 	seed ^= libc_gettid();
 #elif defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)
 	seed ^= libc_getpid();

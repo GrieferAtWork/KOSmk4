@@ -24,6 +24,7 @@
 /**/
 
 #include <kos/syscalls.h>
+#include <nt/libloaderapi.h>
 #include <sys/wait.h>
 
 #include <malloc.h>
@@ -31,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../libc/compat.h"
 #include "../libc/dl.h"
 #include "../libc/globals.h"
 #include "process.h"
@@ -173,15 +175,39 @@ NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callb
 }
 /*[[[end:libc__register_thread_local_exe_atexit_callback]]]*/
 
+/*[[[head:libd__loaddll,hash:CRC-32=0xfd03c949]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") intptr_t
+(LIBDCALL libd__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...)
+/*[[[body:libd__loaddll]]]*/
+{
+	typedef HMODULE (WINAPI *LPLOADLIBRARYA)(LPCSTR lpLibFileName);
+	static LPLOADLIBRARYA pdyn_LoadLibraryA = NULL;
+	if (!pdyn_LoadLibraryA)
+		*(void **)&pdyn_LoadLibraryA = libd_requirek32("LoadLibraryA");
+	return (intptr_t)(uintptr_t)(*pdyn_LoadLibraryA)(file);
+}
+/*[[[end:libd__loaddll]]]*/
+
+/*[[[head:libc__loaddll,hash:CRC-32=0x9112871e]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") intptr_t
+(LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...)
+/*[[[body:libc__loaddll]]]*/
+{
+	return (intptr_t)(uintptr_t)dlopen(file, RTLD_LOCAL);
+}
+/*[[[end:libc__loaddll]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x827bc3dd]]]*/
+
+/*[[[start:exports,hash:CRC-32=0xb29cf7a7]]]*/
 DEFINE_PUBLIC_ALIAS(_beginthread, libc__beginthread);
 DEFINE_PUBLIC_ALIAS(_beginthreadex, libc__beginthreadex);
 DEFINE_PUBLIC_ALIAS(_endthreadex, libc__endthreadex);
 DEFINE_PUBLIC_ALIAS(_cexit, libc__cexit);
 DEFINE_PUBLIC_ALIAS(_register_thread_local_exe_atexit_callback, libc__register_thread_local_exe_atexit_callback);
+DEFINE_PUBLIC_ALIAS(DOS$_loaddll, libd__loaddll);
+DEFINE_PUBLIC_ALIAS(_loaddll, libc__loaddll);
 /*[[[end:exports]]]*/
 
 DECL_END

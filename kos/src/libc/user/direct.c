@@ -71,9 +71,7 @@ NOTHROW_RPC(LIBCCALL libc__getdrive)(void)
 {
 	char buf[2];
 	ssize_t error;
-	error = sys_frealpath4(AT_FDROOT,
-	                       buf,
-	                       2,
+	error = sys_frealpath4(AT_FDCWD, buf, 2,
 	                       AT_READLINK_REQSIZE |
 	                       AT_DOSPATH);
 	if (error < 2 || buf[1] != ':' ||

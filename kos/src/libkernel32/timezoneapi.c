@@ -64,8 +64,8 @@ libk32_FileTimeToSystemTime(CONST FILETIME *lpFileTime, LPSYSTEMTIME lpSystemTim
 	struct tm tms;
 	ts = libk32_FileTimeToTimeSpec(lpFileTime);
 	gmtime_r(&ts.tv_sec, &tms);
-	lpSystemTime->wYear         = tms.tm_year;
-	lpSystemTime->wMonth        = tms.tm_mon;
+	lpSystemTime->wYear         = tms.tm_year + 1900;
+	lpSystemTime->wMonth        = tms.tm_mon + 1;
 	lpSystemTime->wDayOfWeek    = tms.tm_wday;
 	lpSystemTime->wDay          = tms.tm_wday;
 	lpSystemTime->wHour         = tms.tm_hour;
@@ -79,8 +79,8 @@ INTERN WINBOOL WINAPI
 libk32_SystemTimeToFileTime(CONST SYSTEMTIME *lpSystemTime, LPFILETIME lpFileTime) {
 	struct timespec ts;
 	struct tm tms;
-	tms.tm_year = lpSystemTime->wYear;
-	tms.tm_mon  = lpSystemTime->wMonth;
+	tms.tm_year = lpSystemTime->wYear - 1900;
+	tms.tm_mon  = lpSystemTime->wMonth - 1;
 	tms.tm_wday = lpSystemTime->wDayOfWeek;
 	tms.tm_wday = lpSystemTime->wDay;
 	tms.tm_hour = lpSystemTime->wHour;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9d9179e */
+/* HASH CRC-32:0xe4b7a1a0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,15 +30,6 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> opendir(3)
- * Open and return a new directory stream for reading, referring to `name' */
-INTDEF WUNUSED NONNULL((1)) DIR *NOTHROW_RPC(LIBDCALL libd_opendir)(char const *name);
-/* >> fopendirat(3)
- * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBDCALL libd_fopendirat)(fd_t dirfd, char const *name, oflag_t oflags);
-/* >> opendirat(3)
- * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBDCALL libd_opendirat)(fd_t dirfd, char const *name);
 /* >> closedir(3)
  * Close a directory stream previously returned by `opendir(3)' and friends */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_closedir)(DIR *dirp);

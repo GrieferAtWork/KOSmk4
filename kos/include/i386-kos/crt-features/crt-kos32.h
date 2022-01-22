@@ -1090,6 +1090,7 @@
 #define __CRT_HAVE___tgamma
 #define __CRT_HAVE___tgammaf
 #define __CRT_HAVE___tgammal
+#define __CRT_HAVE___threadid
 #define __CRT_HAVE___time
 #define __CRT_HAVE___times
 #define __CRT_HAVE___timezone
@@ -5495,6 +5496,7 @@
 #define __CRT_HAVE_KOS$__libc_link
 #define __CRT_HAVE_KOS$__libc_mkdir
 #define __CRT_HAVE_KOS$__libc_open
+#define __CRT_HAVE_KOS$__libc_opendir
 #define __CRT_HAVE_KOS$__libc_readlink
 #define __CRT_HAVE_KOS$__libc_rename
 #define __CRT_HAVE_KOS$__libc_rmdir
@@ -5526,6 +5528,7 @@
 #define __CRT_HAVE_KOS$__sys_errlist
 #define __CRT_HAVE_KOS$__sys_nerr
 #define __CRT_HAVE_KOS$__sysv_signal
+#define __CRT_HAVE___threadhandle
 #define __CRT_HAVE_KOS$__timezone
 #define __CRT_HAVE_KOS$__towctrans
 #define __CRT_HAVE_KOS$__towctrans_l
@@ -5536,6 +5539,7 @@
 #define __CRT_HAVE_KOS$__unlink
 #define __CRT_HAVE___vcrt_GetModuleFileNameW
 #define __CRT_HAVE___vcrt_GetModuleHandleW
+#define __CRT_HAVE___vcrt_InitializeCriticalSectionEx
 #define __CRT_HAVE___vcrt_LoadLibraryExW
 #define __CRT_HAVE_KOS$__wcscasecmp_l
 #define __CRT_HAVE_KOS$__wcscoll_l
@@ -5629,6 +5633,7 @@
 #define __CRT_HAVE_KOS$_itow_s
 #define __CRT_HAVE_KOS$_ldclass
 #define __CRT_HAVE_KOS$_ldtest
+#define __CRT_HAVE_KOS$_loaddll
 #define __CRT_HAVE__lock
 #define __CRT_HAVE_KOS$_ltow
 #define __CRT_HAVE_KOS$_ltow_s
@@ -5855,6 +5860,7 @@
 #define __CRT_HAVE_KOS$fopen
 #define __CRT_HAVE_KOS$fopen64
 #define __CRT_HAVE_KOS$fopen_s
+#define __CRT_HAVE_KOS$fopendirat
 #define __CRT_HAVE_KOS$format_vwprintf
 #define __CRT_HAVE_KOS$format_waprintf_alloc
 #define __CRT_HAVE_KOS$format_waprintf_pack
@@ -5968,6 +5974,8 @@
 #define __CRT_HAVE_KOS$open_wmemstream
 #define __CRT_HAVE_KOS$openat
 #define __CRT_HAVE_KOS$openat64
+#define __CRT_HAVE_KOS$opendir
+#define __CRT_HAVE_KOS$opendirat
 #define __CRT_HAVE_KOS$pathconf
 #define __CRT_HAVE_KOS$ptsname
 #define __CRT_HAVE_KOS$ptsname_r
@@ -6268,6 +6276,7 @@
 #define __CRT_HAVE_DOS$__libc_link
 #define __CRT_HAVE_DOS$__libc_mkdir
 #define __CRT_HAVE_DOS$__libc_open
+#define __CRT_HAVE_DOS$__libc_opendir
 #define __CRT_HAVE_DOS$__libc_readlink
 #define __CRT_HAVE_DOS$__libc_rename
 #define __CRT_HAVE_DOS$__libc_rmdir
@@ -6299,6 +6308,7 @@
 #define __CRT_HAVE_DOS$__sys_errlist
 #define __CRT_HAVE_DOS$__sys_nerr
 #define __CRT_HAVE_DOS$__sysv_signal
+#define __CRT_HAVE_DOS$__threadhandle
 #define __CRT_HAVE_DOS$__timezone
 #define __CRT_HAVE_DOS$__towctrans
 #define __CRT_HAVE_DOS$__towctrans_l
@@ -6309,6 +6319,7 @@
 #define __CRT_HAVE_DOS$__unlink
 #define __CRT_HAVE_DOS$__vcrt_GetModuleFileNameW
 #define __CRT_HAVE_DOS$__vcrt_GetModuleHandleW
+#define __CRT_HAVE_DOS$__vcrt_InitializeCriticalSectionEx
 #define __CRT_HAVE_DOS$__vcrt_LoadLibraryExW
 #define __CRT_HAVE_DOS$__wcscasecmp_l
 #define __CRT_HAVE_DOS$__wcscoll_l
@@ -6402,6 +6413,7 @@
 #define __CRT_HAVE_DOS$_itow_s
 #define __CRT_HAVE_DOS$_ldclass
 #define __CRT_HAVE_DOS$_ldtest
+#define __CRT_HAVE_DOS$_loaddll
 #define __CRT_HAVE_DOS$_lock
 #define __CRT_HAVE_DOS$_ltow
 #define __CRT_HAVE_DOS$_ltow_s
@@ -6628,6 +6640,7 @@
 #define __CRT_HAVE_DOS$fopen
 #define __CRT_HAVE_DOS$fopen64
 #define __CRT_HAVE_DOS$fopen_s
+#define __CRT_HAVE_DOS$fopendirat
 #define __CRT_HAVE_DOS$format_vwprintf
 #define __CRT_HAVE_DOS$format_waprintf_alloc
 #define __CRT_HAVE_DOS$format_waprintf_pack
@@ -6741,6 +6754,8 @@
 #define __CRT_HAVE_DOS$open_wmemstream
 #define __CRT_HAVE_DOS$openat
 #define __CRT_HAVE_DOS$openat64
+#define __CRT_HAVE_DOS$opendir
+#define __CRT_HAVE_DOS$opendirat
 #define __CRT_HAVE_DOS$pathconf
 #define __CRT_HAVE_DOS$ptsname
 #define __CRT_HAVE_DOS$ptsname_r

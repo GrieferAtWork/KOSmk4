@@ -380,6 +380,10 @@ INTDEF uintptr_t libc_compat; /* Set of `COMPAT_FLAG_*' */
 	                 COMPAT_FLAG_LINKED_IO_FILE_84_2_1)) ==                                  \
 	 COMPAT_FLAG_CALLED___libc_init)
 
+/* Lazily load `libkernel32.so' (if not done already), and return the
+ * address  of the named  `symbol_name'. If non-existent, `_Exit(1)'. */
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) void *LIBCCALL
+libd_requirek32(char const *__restrict symbol_name);
 
 DECL_END
 

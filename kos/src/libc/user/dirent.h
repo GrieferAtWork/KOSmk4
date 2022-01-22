@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc10d33dd */
+/* HASH CRC-32:0x222f4fba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,19 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
+INTDEF WUNUSED NONNULL((1)) DIR *NOTHROW_RPC(LIBDCALL libd_opendir)(char const *name);
+/* >> opendir(3)
+ * Open and return a new directory stream for reading, referring to `name' */
 INTDEF WUNUSED NONNULL((1)) DIR *NOTHROW_RPC(LIBCCALL libc_opendir)(char const *name);
 /* >> fopendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
+INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBDCALL libd_fopendirat)(fd_t dirfd, char const *name, oflag_t oflags);
+/* >> fopendirat(3)
+ * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBCCALL libc_fopendirat)(fd_t dirfd, char const *name, oflag_t oflags);
+/* >> opendirat(3)
+ * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
+INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBDCALL libd_opendirat)(fd_t dirfd, char const *name);
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBCCALL libc_opendirat)(fd_t dirfd, char const *name);

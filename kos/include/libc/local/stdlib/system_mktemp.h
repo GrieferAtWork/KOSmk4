@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ea0ed1e */
+/* HASH CRC-32:0x793738f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,10 +62,16 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(voi
 #undef __local___localdep_getpid_defined
 #endif /* !... */
 #endif /* !__local___localdep_getpid_defined */
-#if !defined(__local___localdep_gettid_defined) && defined(__CRT_HAVE_gettid)
+#ifndef __local___localdep_gettid_defined
 #define __local___localdep_gettid_defined
+#ifdef __CRT_HAVE_gettid
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(void),gettid,())
-#endif /* !__local___localdep_gettid_defined && __CRT_HAVE_gettid */
+#elif defined(__CRT_HAVE___threadid)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(void),__threadid,())
+#else /* ... */
+#undef __local___localdep_gettid_defined
+#endif /* !... */
+#endif /* !__local___localdep_gettid_defined */
 #ifndef __local___localdep_gettimeofday_defined
 #define __local___localdep_gettimeofday_defined
 __NAMESPACE_LOCAL_END
@@ -396,7 +402,7 @@ __again:
 #undef __LIBC_RAND_MAX
 		}
 	}
-#ifdef __CRT_HAVE_gettid
+#if defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid)
 	__seed ^= (__NAMESPACE_LOCAL_SYM __localdep_gettid)();
 #elif defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)
 	__seed ^= (__NAMESPACE_LOCAL_SYM __localdep_getpid)();

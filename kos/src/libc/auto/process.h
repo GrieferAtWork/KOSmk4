@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57c62dbc */
+/* HASH CRC-32:0x32fb51dc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,12 +41,6 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd__endthreadex)(u32 exitcode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF void (LIBCCALL libc__c_exit)(void) THROWS(...);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF intptr_t (LIBDCALL libd__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF intptr_t (LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int (LIBDCALL libd__unloaddll)(intptr_t hnd) THROWS(...);

@@ -52,8 +52,8 @@ libk32_GetSystemTime(LPSYSTEMTIME lpSystemTime) {
 	TRACE("GetSystemTime(%p)", lpSystemTime);
 	gettimeofday(&tv, NULL);
 	gmtime_r(&tv.tv_sec, &tms);
-	lpSystemTime->wYear         = tms.tm_year;
-	lpSystemTime->wMonth        = tms.tm_mon;
+	lpSystemTime->wYear         = tms.tm_year + 1900;
+	lpSystemTime->wMonth        = tms.tm_mon + 1;
 	lpSystemTime->wDayOfWeek    = tms.tm_wday;
 	lpSystemTime->wDay          = tms.tm_wday;
 	lpSystemTime->wHour         = tms.tm_hour;
@@ -81,8 +81,8 @@ libk32_GetLocalTime(LPSYSTEMTIME lpSystemTime) {
 	TRACE("GetLocalTime(%p)", lpSystemTime);
 	gettimeofday(&tv, NULL);
 	localtime_r(&tv.tv_sec, &tms);
-	lpSystemTime->wYear         = tms.tm_year;
-	lpSystemTime->wMonth        = tms.tm_mon;
+	lpSystemTime->wYear         = tms.tm_year + 1900;
+	lpSystemTime->wMonth        = tms.tm_mon + 1;
 	lpSystemTime->wDayOfWeek    = tms.tm_wday;
 	lpSystemTime->wDay          = tms.tm_wday;
 	lpSystemTime->wHour         = tms.tm_hour;

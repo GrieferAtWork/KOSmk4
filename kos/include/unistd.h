@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6dcdf8c1 */
+/* HASH CRC-32:0xc9fca62a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -619,13 +619,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,getpid,(void),__libc_g
 #endif /* !... */
 #endif /* !__getpid_defined */
 #ifdef __USE_KOS
-#if !defined(__gettid_defined) && defined(__CRT_HAVE_gettid)
+#ifndef __gettid_defined
 #define __gettid_defined
+#ifdef __CRT_HAVE_gettid
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),())
-#endif /* !__gettid_defined && __CRT_HAVE_gettid */
+#elif defined(__CRT_HAVE___threadid)
+/* >> gettid(2)
+ * Return the TID of the calling thread
+ * THIS_THREAD->PID */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),__threadid,())
+#else /* ... */
+#undef __gettid_defined
+#endif /* !... */
+#endif /* !__gettid_defined */
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_pipe
 /* >> pipe(2)

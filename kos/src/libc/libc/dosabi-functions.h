@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38b23cb8 */
+/* HASH CRC-32:0x64c6bb38 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -296,9 +296,6 @@ DFUN(".text.crt.dos.fs.property", libd__getdiskfree, libc__getdiskfree, TD, 2, T
 DFUN(".text.crt.dos.fs.modify", libd__mkdir, libc__mkdir, TD, 1, TP)
 
 /* dirent */
-DFUN(".text.crt.dos.fs.dir", libd_opendir, libc_opendir, TP, 1, TP)
-DFUN(".text.crt.dos.fs.dir", libd_fopendirat, libc_fopendirat, TP, 3, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_OFLAG_T__))
-DFUN(".text.crt.dos.fs.dir", libd_opendirat, libc_opendirat, TP, 2, TIn(__SIZEOF_FD_T__), TP)
 DFUN(".text.crt.dos.fs.dir", libd_closedir, libc_closedir, TD, 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_fdclosedir, libc_fdclosedir, TIn(__SIZEOF_FD_T__), 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_readdirk, libc_readdirk, TP, 1, TP)
@@ -858,7 +855,6 @@ DFUN(".text.crt.dos.net.inet.6.source_filter", libd_setsourcefilter, libc_setsou
 DFUN(".text.crt.dos.sched.thread", libd__beginthread, libc__beginthread, TP, 3, TP, TI32, TP)
 DFUN(".text.crt.dos.sched.thread", libd__beginthreadex, libc__beginthreadex, TP, 6, TP, TI32, TP, TP, TI32, TP)
 DFUN(".text.crt.dos.sched.thread", libd__endthreadex, libc__endthreadex, TV, 1, TI32)
-DFUN(".text.crt.dos.fs.dlfcn", libd__loaddll, libc__loaddll, TP, 1, TP)
 DFUN(".text.crt.dos.fs.dlfcn", libd__unloaddll, libc__unloaddll, TD, 1, TP)
 DFUN(".text.crt.dos.fs.dlfcn", libd__getdllprocaddr, libc__getdllprocaddr, TP, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.spawn", libd_cwait, libc_cwait, TIn(__SIZEOF_PID_T__), 3, TP, TIn(__SIZEOF_PID_T__), TD)

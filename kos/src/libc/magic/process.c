@@ -281,7 +281,7 @@ intptr_t _spawnlpe(__STDC_INT_AS_UINT_T mode,
 [[throws, decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_include("<libdl/asm/dlfcn.h>")]]
 [[requires(defined(__CRT_HAVE_dlopen))]]
-[[impl_include("<dlfcn.h>")]]
+[[crt_dos_variant, userimpl, impl_include("<dlfcn.h>")]]
 intptr_t _loaddll(char __KOS_FIXED_CONST *file) {
 @@pp_if defined(@RTLD_LOCAL@)@@
 	return (intptr_t)(uintptr_t)@dlopen@(file, @RTLD_LOCAL@);

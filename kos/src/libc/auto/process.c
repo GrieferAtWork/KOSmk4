@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fd81402 */
+/* HASH CRC-32:0xc08b3907 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,17 +42,6 @@ NOTHROW_NCX(LIBCCALL libc__endthread)(void) {
 }
 INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 (LIBCCALL libc__c_exit)(void) THROWS(...) {
-}
-#include <dlfcn.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") intptr_t
-(LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...) {
-#ifdef RTLD_LOCAL
-	return (intptr_t)(uintptr_t)dlopen(file, RTLD_LOCAL);
-#elif defined(RTLD_GLOBAL)
-	return (intptr_t)(uintptr_t)dlopen(file, RTLD_GLOBAL);
-#else /* ... */
-	return (intptr_t)(uintptr_t)dlopen(file, 0);
-#endif /* !... */
 }
 #include <dlfcn.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") int
@@ -443,7 +432,6 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_endthread, libc__endthread);
 DEFINE_PUBLIC_ALIAS(_c_exit, libc__c_exit);
-DEFINE_PUBLIC_ALIAS(_loaddll, libc__loaddll);
 DEFINE_PUBLIC_ALIAS(_unloaddll, libc__unloaddll);
 DEFINE_PUBLIC_ALIAS(_getdllprocaddr, libc__getdllprocaddr);
 #ifdef __LIBCCALL_IS_LIBDCALL
