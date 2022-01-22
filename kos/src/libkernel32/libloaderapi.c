@@ -41,9 +41,11 @@
 #include <uchar.h>
 #include <wchar.h>
 
+#include <libdl/api.h>
+
 DECL_BEGIN
 
-extern NONNULL((1)) REF void *ATTR_STDCALL /* From "libdl-pe.so" */
+__IMPDEF NONNULL((1)) REF void *LIBDL_CC /* From "libdl-pe.so" */
 PeLoadLibrary(char const *__restrict filename, unsigned int flags);
 
 DEFINE_PUBLIC_ALIAS(LoadLibraryExA, libk32_LoadLibraryExA);
