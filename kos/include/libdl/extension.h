@@ -175,8 +175,8 @@ struct dlmodule_format {
 	                                                    /*inherit(on_success)*/ fd_t fd);
 
 	/* Special return value for `df_open' to instruct libdl to continue
-	 * searching for a matching module format (to-be used for module
-	 * formats that store additional magic bytes somewhere else than
+	 * searching for a  matching module format  (to-be used for  module
+	 * formats that store  additional magic bytes  somewhere else  than
 	 * at the start of some given file). */
 #define DLMODULE_FORMAT_OPEN_BAD_MAGIC ((DlModule *)-1)
 
@@ -238,6 +238,26 @@ struct dlmodule_format {
 	(LIBDL_CC *df_lsphdrs)(DlModule *__restrict self,
 	                       struct dl_phdr_info *__restrict info,
 	                       __dl_iterator_callback callback, void *arg);
+
+	/* [0..1] Implement extension-specific auxiliary DL control commands.
+	 * @param: self: The module on which  the operation is invoked.  When
+	 *               the user passed `NULL' to `dlauxctrl()', the current
+	 *               main application  module is  used. If  that one  was
+	 *               provided  by  an  extension, this  operator  will be
+	 *               invoked from that extension.
+	 * @param: cmd:  The command being invoked. Note that this will never
+	 *               be any of th standard commands, as this operator  is
+	 *               essentially just called in the fallback branch after
+	 *               all standard commands were checked.
+	 * @param: args: Additional arguments (varargs)
+	 * @return: * :  Return value for `dlauxctrl()'. Any manipulation of
+	 *               `dlerror()' must be done by this operator (if  such
+	 *               manipulation is desired).
+	 *               This includes the case where `cmd' isn't recognized! */
+	NONNULL((1)) void *
+	(LIBDL_CC *df_dlauxctrl)(DlModule *__restrict self,
+	                         unsigned int cmd,
+	                         __builtin_va_list args);
 
 	/* Add more functions here. */
 };

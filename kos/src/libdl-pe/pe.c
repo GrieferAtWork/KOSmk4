@@ -37,6 +37,7 @@
 #include <asm/intrin.h>
 #include <kos/except.h>
 #include <kos/syscalls.h>
+#include <kos/thread.h>
 #include <nt/libloaderapi.h>
 #include <nt/tib.h>
 #include <sys/ioctl.h>
@@ -916,6 +917,7 @@ INTERN void *FCALL
 libpe_linker_main(struct peexec_info *__restrict info,
                   uintptr_t loadaddr,
                   struct process_peb *__restrict UNUSED(peb)) {
+	PNT_TIB tib;
 	void *result;
 	DlModule *mod;
 	char *filename;
@@ -1014,6 +1016,34 @@ libpe_linker_main(struct peexec_info *__restrict info,
 		}
 	}
 
+	/* Allocate a TIB for the calling thread. - Required to
+	 * prevent SEH inline code from talking to the userkern
+	 * segment.
+	 *
+	 * TODO: This must also happen in `pthread_create(3)'! */
+	tib = libpe_AllocateTib();
+	if (!tib)
+		goto err_nomem;
+
+	/* Assign TIB */
+	_SetTib(tib);
+
+	/* Hack: temporarily use the TIB's self-pointer as ELF TLS  register.
+	 * This will be overwritten sometime later in `libdl.so:linker_main',
+	 * but until then we need `%segtls:0'  to already resolve to a  valid
+	 * value, since that one's used by `__hybrid_gettid()', which is used
+	 * by  `atomic_owner_rwlock_write()',  which is  used  by `dlopen()',
+	 * which we are using to load dependencies of the main PE. */
+	WR_TLS_BASE_REGISTER(&tib->Self);
+
+	/* Fill in some missing fields in the TIB */
+	{
+#define USER_STACK_SIZE (64 * __ARCH_PAGESIZE) /* TODO: Don't put this here! */
+		uintptr_t stackend = (uintptr_t)((void **)result + 1);
+		tib->StackBase  = (PVOID)(stackend - USER_STACK_SIZE);
+		tib->StackLimit = (PVOID)stackend;
+	}
+
 	/* Hook the newly created module. */
 	DLIST_INSERT_AFTER(dl.dl_rtld_module, mod, dm_modules);    /* NOTE: _MUST_ insert after builtin DL module! */
 	LIST_INSERT_HEAD(dl.DlModule_GlobalList, mod, dm_globals); /* NOTE: _MUST_ insert at head! */
@@ -1025,24 +1055,9 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	/* Mark this module as having been fully loaded. */
 	ATOMIC_AND(mod->dm_flags, ~RTLD_LOADING);
 
-	/* Allocate a TIB for the calling thread. - Required to
-	 * prevent SEH inline code from talking to the userkern
-	 * segment.
-	 *
-	 * TODO: This must also happen in `pthread_create(3)'! */
-	{
-		uintptr_t stackend;
-		PNT_TIB tib = libpe_AllocateTib();
-		if (!tib)
-			goto err_nomem;
-#define USER_STACK_SIZE (64 * __ARCH_PAGESIZE) /* TODO: Don't put this here! */
-		stackend = (uintptr_t)((void **)result + 1);
-		tib->StackBase  = (PVOID)(stackend - USER_STACK_SIZE);
-		tib->StackLimit = (PVOID)stackend;
-		_SetTib(tib);
-		if (pe_nexttlsindex != 0)
-			tib->NativePeTlsArray = PeTls_AllocVector(true);
-	}
+	/* Initial the PE TLS vector for the calling thread. */
+	if (pe_nexttlsindex != 0)
+		tib->NativePeTlsArray = PeTls_AllocVector(true);
 
 	/* The entry point of PE applications is allowed to return normally.
 	 * -> When it does, we simply have to `_Exit(%Pax)' the application. */

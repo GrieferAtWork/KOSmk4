@@ -42,6 +42,21 @@ DECL_BEGIN
 #error "Unknown host"
 #endif
 
+typedef struct _IMAGE_NT_HEADERSX {
+	DWORD Signature;
+	IMAGE_FILE_HEADER FileHeader;
+#ifdef __x86_64__
+	union {
+		IMAGE_OPTIONAL_HEADER32 OptionalHeader32;
+		IMAGE_OPTIONAL_HEADER64 OptionalHeader64;
+	};
+#else /* __x86_64__ */
+	IMAGE_OPTIONAL_HEADER32 OptionalHeader32;
+#endif /* !__x86_64__ */
+} IMAGE_NT_HEADERSX, *PIMAGE_NT_HEADERSX;
+
+
+
 /* Populate a given `effective_vm' by loading an PE executable file. */
 INTDEF WUNUSED NONNULL((1)) unsigned int FCALL
 peabi_exec(/*in|out*/ struct execargs *__restrict args);

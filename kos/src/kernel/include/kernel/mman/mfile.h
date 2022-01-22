@@ -46,6 +46,10 @@
 #include <sched/signal-completion.h>
 #endif /* __WANT_MFILE__mf_compl */
 
+#if (__SIZEOF_POINTER__ < 8 && defined(__WANT_MFILE_INIT_mf_filesize_symbol) && defined(__WANT_FS_INIT))
+#include <hybrid/byteorder.h>
+#endif /* __SIZEOF_POINTER__ < 8 && __WANT_MFILE_INIT_mf_filesize_symbol && __WANT_FS_INIT */
+
 /* Trace program counters of write-locks to mfile objects. */
 #undef CONFIG_MFILE_TRACE_LOCKPC
 #if 1
@@ -732,7 +736,6 @@ struct mfile {
 #endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) == 0 */
 #define MFILE_INIT_mf_flags(mf_flags)           mf_flags
 #define MFILE_INIT_mf_trunclock                 0
-#define MFILE_INIT_mf_filesize(mf_filesize)     ATOMIC64_INIT(mf_filesize)
 #endif /* __WANT_FS_INIT */
 	uintptr_t                     mf_flags;      /* File flags (set of `MFILE_F_*') */
 	WEAK size_t                   mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
@@ -742,6 +745,34 @@ struct mfile {
 	                                              * parts  of  this file,  or a  lock to  the file  itself. However,
 	                                              * decrementing it  doesn't impose  such a  requirement. When  this
 	                                              * counter hits 0, then `mf_initdone' must be broadcast. */
+#ifdef __WANT_FS_INIT
+#if __SIZEOF_POINTER__ < 8 && defined(__WANT_MFILE_INIT_mf_filesize_symbol)
+	/* Hacky work-around so that we're able to statically initialize
+	 * `mf_filesize' from a linker symbol. The problem we're working
+	 * around is GCC (under 32-bit)  refusing to do something  like:
+	 * >> extern byte_t symbol[];
+	 * >> static uint64_t var = (uint64_t)(uintptr_t)symbol;
+	 *
+	 * So we have to work around this issue and do the zero-extension
+	 * of the static initialization ourselves. */
+	union {
+		atomic64_t                mf_filesize;   /* ... */
+		uintptr_t                _mf_filesize_ptr[2]; /* ... */
+	};
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define MFILE_INIT_mf_filesize_symbol(mf_filesize) { ._mf_filesize_ptr = { mf_filesize, 0 } }
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#define MFILE_INIT_mf_filesize_symbol(mf_filesize) { ._mf_filesize_ptr = { 0, mf_filesize } }
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#define MFILE_INIT_mf_filesize(mf_filesize)        { ATOMIC64_INIT(mf_filesize) }
+#else /* __SIZEOF_POINTER__ < 8 */
+#define MFILE_INIT_mf_filesize(mf_filesize) ATOMIC64_INIT(mf_filesize)
+#ifdef __WANT_MFILE_INIT_mf_filesize_symbol
+#define MFILE_INIT_mf_filesize_symbol MFILE_INIT_mf_filesize
+#endif /* __WANT_MFILE_INIT_mf_filesize_symbol */
+	atomic64_t                    mf_filesize;   /* ... */
+#endif /* __SIZEOF_POINTER__ >= 8 */
+#else /* __WANT_FS_INIT */
 	atomic64_t                    mf_filesize;   /* [lock(READ:      ATOMIC,
 	                                              *       INCREMENT: mf_trunclock != 0 && ATOMIC,  // NOTE: `mf_trunclock'   was    incremented    while    holding    `mf_lock'!
 	                                              *                                                // By acquiring a write-lock to `mf_lock' and waiting for `mf_trunclock == 0',
@@ -764,6 +795,7 @@ struct mfile {
 	                                              *       than    `mfile_asnode(self)->fn_super->fs_feat.sf_filesize_max'!
 	                                              * Attempting to expand the size beyond this boundary must result in an
 	                                              * `E_FSERROR_FILE_TOO_BIG' exceptions being thrown. */
+#endif /* !__WANT_FS_INIT */
 #if (defined(__WANT_MFILE__mf_lop) || defined(__WANT_MFILE__mf_plop) ||             \
      defined(__WANT_MFILE__mf_mflop) || defined(__WANT_MFILE__mf_mplop) ||          \
      defined(__WANT_MFILE__mf_fsuperlop) || defined(__WANT_MFILE__mf_fsuperplop) || \

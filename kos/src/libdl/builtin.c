@@ -2929,6 +2929,11 @@ done_add_finalizer:
 	}	break;
 
 	default:
+		/* Allow extensions to implement their own auxiliary control commands. */
+		if (self->dm_ops && self->dm_ops->df_dlauxctrl) {
+			result = (*self->dm_ops->df_dlauxctrl)(self, cmd, args);
+			break;
+		}
 		dl_seterrorf("Invalid auxctrl command %#x", cmd);
 		goto err;
 	}

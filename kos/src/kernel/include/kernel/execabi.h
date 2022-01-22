@@ -25,6 +25,8 @@
 #include <kernel/arch/execabi.h>
 #include <kernel/types.h>
 
+#include <hybrid/typecore.h>
+
 #include <compat/config.h>
 #include <kos/aref.h>
 
@@ -177,13 +179,13 @@ NOTHROW(FCALL execargs_fini)(struct execargs *__restrict self);
 	                            (args)->ea_argc_inject, (args)->ea_argv_inject,                                  \
 	                            (USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *)(args)->ea_argv, \
 	                            (USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *)(args)->ea_envp))
-#if __SIZEOF_POINER__ >= 8
+#if __SIZEOF_POINTER__ >= 8
 #define mbuilder_alloc_peb_from_execargs       mbuilder_alloc_peb64_from_execargs
 #define mbuilder_alloc_compatpeb_from_execargs mbuilder_alloc_peb32_from_execargs
-#else /* __SIZEOF_POINER__ >= 8 */
+#else /* __SIZEOF_POINTER__ >= 8 */
 #define mbuilder_alloc_peb_from_execargs       mbuilder_alloc_peb32_from_execargs
 #define mbuilder_alloc_compatpeb_from_execargs mbuilder_alloc_peb64_from_execargs
-#endif /* __SIZEOF_POINER__ < 8 */
+#endif /* __SIZEOF_POINTER__ < 8 */
 #else /* __ARCH_HAVE_COMPAT */
 #define mbuilder_alloc_peb_from_execargs(self, args)                   \
 	mbuilder_alloc_peb(self,                                           \

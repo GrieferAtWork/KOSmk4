@@ -69,7 +69,7 @@ INTERN WUNUSED NONNULL((1)) unsigned int FCALL
 peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	struct mbuilder builder;
 	uint32_t e_lfanew; /* IMAGE_DOS_HEADER::e_lfanew */
-	IMAGE_NT_HEADERS nt;
+	IMAGE_NT_HEADERSX nt;
 	size_t nthdr_size;
 	PIMAGE_SECTION_HEADER shdr;
 	pos_t shdr_off;
@@ -77,6 +77,18 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	uintptr_t loadaddr;
 	uintptr_t load_minaddr;
 	uintptr_t load_maxaddr;
+#ifdef __x86_64__
+	size_t sizeof_pointer = 8;
+#define IS_NATIVE (sizeof_pointer & 8)
+#define HAS_OPTIONAL_HEADER(field)                                                                 \
+	(IS_NATIVE ? nt.FileHeader.SizeOfOptionalHeader >= offsetafter(IMAGE_OPTIONAL_HEADER64, field) \
+	           : nt.FileHeader.SizeOfOptionalHeader >= offsetafter(IMAGE_OPTIONAL_HEADER32, field))
+#define GET_OPTIONAL_HEADER(field) (IS_NATIVE ? nt.OptionalHeader64.field : nt.OptionalHeader32.field)
+#else /* __x86_64__ */
+#define sizeof_pointer             sizeof(void *)
+#define HAS_OPTIONAL_HEADER(field) (nt.FileHeader.SizeOfOptionalHeader >= offsetafter(IMAGE_OPTIONAL_HEADER32, field))
+#define GET_OPTIONAL_HEADER(field) (nt.OptionalHeader32.field)
+#endif /* !__x86_64__ */
 
 	/* Base addresses for user-space. */
 	USER CHECKED void *libdl_base;
@@ -87,14 +99,21 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	mfile_readall(args->ea_xfile, &e_lfanew, sizeof(e_lfanew),
 	              (pos_t)offsetof(IMAGE_DOS_HEADER, e_lfanew));
 	nthdr_size = mfile_read(args->ea_xfile, &nt, sizeof(nt), (pos_t)e_lfanew);
-	if (nthdr_size < offsetof(IMAGE_NT_HEADERS, OptionalHeader))
+	if (nthdr_size < offsetof(IMAGE_NT_HEADERSX, OptionalHeader32))
 		return EXECABI_EXEC_NOTBIN;
 
 	/* Check the NT header. */
 	if (nt.Signature != IMAGE_NT_SIGNATURE)
 		return EXECABI_EXEC_NOTBIN;
-	if (nt.FileHeader.Machine != IMAGE_FILE_MACHINE_HOST)
-		return EXECABI_EXEC_NOTBIN; /* TODO: THROW */
+	if (nt.FileHeader.Machine != IMAGE_FILE_MACHINE_HOST) {
+#ifdef __x86_64__
+		sizeof_pointer = 4;
+		if (nt.FileHeader.Machine != IMAGE_FILE_MACHINE_I386)
+#endif /* __x86_64__ */
+		{
+			return EXECABI_EXEC_NOTBIN; /* TODO: THROW */
+		}
+	}
 
 	 /* Make sure there are sections. */
 	if (nt.FileHeader.NumberOfSections == 0)
@@ -109,7 +128,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	                                      sizeof(IMAGE_SECTION_HEADER));
 	RAII_FINALLY { freea(shdr); };
 	shdr_off = (pos_t)e_lfanew;
-	shdr_off += offsetof(IMAGE_NT_HEADERS, OptionalHeader);
+	shdr_off += offsetof(IMAGE_NT_HEADERSX, OptionalHeader32);
 	shdr_off += nt.FileHeader.SizeOfOptionalHeader;
 	mfile_readall(args->ea_xfile, shdr,
 	              nt.FileHeader.NumberOfSections *
@@ -117,7 +136,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	              shdr_off);
 
 	/* Figure out how many optional headers we got. */
-	nthdr_size -= offsetof(IMAGE_NT_HEADERS, OptionalHeader);
+	nthdr_size -= offsetof(IMAGE_NT_HEADERSX, OptionalHeader32);
 	if (nt.FileHeader.SizeOfOptionalHeader > nthdr_size)
 		nt.FileHeader.SizeOfOptionalHeader = nthdr_size;
 
@@ -147,15 +166,22 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 		total_size   = (load_maxaddr + 1) - load_minaddr;
 #ifdef KERNELSPACE_HIGHMEM
 		min_okaddr = 0;
-		if (OVERFLOW_USUB(KERNELSPACE_BASE, total_size, &max_okaddr))
+#ifdef __x86_64__
+		if (OVERFLOW_USUB(IS_NATIVE ? USERSPACE_END
+		                            : COMPAT_USERSPACE_END,
+		                  total_size, &max_okaddr))
 			return EXECABI_EXEC_NOTBIN; /* TODO: THROW */
+#else /* __x86_64__ */
+		if (OVERFLOW_USUB(USERSPACE_END, total_size, &max_okaddr))
+			return EXECABI_EXEC_NOTBIN; /* TODO: THROW */
+#endif /* !__x86_64__ */
 #else /* KERNELSPACE_HIGHMEM */
 #error "Invalid configuration"
 #endif /* !KERNELSPACE_HIGHMEM */
 
 		loadaddr = 0;
-		if (nt.FileHeader.SizeOfOptionalHeader >= offsetafter(IMAGE_OPTIONAL_HEADER, ImageBase))
-			loadaddr = load_minaddr + nt.OptionalHeader.ImageBase;
+		if (HAS_OPTIONAL_HEADER(ImageBase))
+			loadaddr = load_minaddr + GET_OPTIONAL_HEADER(ImageBase);
 		if (!(nt.FileHeader.Characteristics & IMAGE_FILE_RELOCS_STRIPPED) &&
 		    (loadaddr == 0 || ((krand() & 7) <= 2))) {
 			if (loadaddr == 0)
@@ -175,6 +201,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	/* Map sections */
 	mbuilder_init(&builder);
 	{
+		struct mramfile *libdl;
 		RAII_FINALLY { mbuilder_fini(&builder); };
 		if (load_minaddr != 0) {
 			/* Must inject another section to map file contents
@@ -192,7 +219,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 		}
 
 		for (i = 0; i < nt.FileHeader.NumberOfSections; ++i) {
-			unsigned int prot = 0;
+			unsigned int prot;
 			PIMAGE_SECTION_HEADER section = &shdr[i];
 			uintptr_t sectaddr;
 			if (!SHOULD_USE_IMAGE_SECTION_HEADER(section))
@@ -220,15 +247,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 				section->SizeOfRawData = section->Misc.VirtualSize;
 
 			/* Determine section protection. */
-			if (section->Characteristics & IMAGE_SCN_MEM_SHARED)
-				prot |= PROT_SHARED;
-			if (section->Characteristics & IMAGE_SCN_MEM_EXECUTE)
-				prot |= PROT_EXEC;
-			if ((section->Characteristics & IMAGE_SCN_MEM_READ) ||
-			    !(section->Characteristics & (IMAGE_SCN_LNK_REMOVE | IMAGE_SCN_LNK_INFO)))
-				prot |= PROT_READ;
-			/*if (section->Characteristics & IMAGE_SCN_MEM_WRITE)
-				prot |= PROT_WRITE;*/
+			prot = IMAGE_SCN_ASPROT(section->Characteristics);
 			prot |= PROT_WRITE; /* Write protection is later removed by `libdl-pe.so' */
 
 			/* Map section */
@@ -326,22 +345,34 @@ done_bss:
 		 *    writing code easier (because driver  code like this comment  is
 		 *    part of is much more prone to errors, which more often than not
 		 *    can go so far as to turn into security problems). */
+		libdl = &execabi_system_rtld_file;
+#ifdef __x86_64__
+		if (!IS_NATIVE)
+			libdl = &compat_execabi_system_rtld_file;
+#endif /* __x86_64__ */
+
 		libdl_base = mbuilder_map(/* self:        */ &builder,
 		                          /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_USER_DYNLINK),
-		                          /* num_bytes:   */ execabi_system_rtld_size,
+		                          /* num_bytes:   */ (size_t)__atomic64_val(libdl->mrf_file.mf_filesize),
 		                          /* prot:        */ PROT_READ | PROT_WRITE | PROT_EXEC,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
 		                          /* flags:       */ MAP_GROWSUP | MAP_NOASLR,
 #else
 		                          /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_USER_DYNLINK),
 #endif
-		                          /* file:        */ &execabi_system_rtld_file.mrf_file,
+		                          /* file:        */ &libdl->mrf_file,
 		                          /* file_fspath: */ NULL,
 		                          /* file_fsname: */ NULL,
 		                          /* file_pos:    */ 0);
 
 		/* Allocate the PEB */
+#ifdef __x86_64__
+		peb_base = IS_NATIVE
+		           ? mbuilder_alloc_peb_from_execargs(&builder, args)
+		           : mbuilder_alloc_compatpeb_from_execargs(&builder, args);
+#else /* __x86_64__ */
 		peb_base = mbuilder_alloc_peb_from_execargs(&builder, args);
+#endif /* !__x86_64__ */
 
 		/* Allocate a new user-space stack for the calling thread. */
 #define USER_STACK_SIZE (64 * PAGESIZE) /* TODO: Don't put this here! */
@@ -361,7 +392,7 @@ done_bss:
 			ei.mei_path = args->ea_xpath;
 			ei.mei_peb  = peb_base;
 #ifdef __ARCH_HAVE_COMPAT
-			ei.mei_peb_iscompat = false; /* TODO: Compat mode */
+			ei.mei_peb_iscompat = !IS_NATIVE;
 #endif /* __ARCH_HAVE_COMPAT */
 			mbuilder_apply(&builder,
 			               args->ea_mman,
@@ -387,14 +418,21 @@ done_bss:
 			/* Pass important information onto the stack
 			 * and set-up the user-space register state. */
 			stack_end = (USER CHECKED byte_t *)stack_base + USER_STACK_SIZE;
+#ifdef __x86_64__
+#define PUSHP(val)                                                                        \
+	(stack_end -= sizeof_pointer,                                                         \
+	 IS_NATIVE ? (void)(*(USER CHECKED uint64_t *)stack_end = (uint64_t)(uintptr_t)(val)) \
+	           : (void)(*(USER CHECKED uint32_t *)stack_end = (uint32_t)(uintptr_t)(val)))
+#else /* __x86_64__ */
+#define PUSHP(val) (void)(stack_end -= sizeof(uintptr_t), *(USER CHECKED uintptr_t *)stack_end = (uintptr_t)(val))
+#endif /* !__x86_64__ */
 
 
 			/* Push: `struct peexec_info::ei_entry' */
-			stack_end -= sizeof(void *);
-			entrypoint = (void *)(loadaddr + nt.OptionalHeader.AddressOfEntryPoint);
-			if unlikely(nt.FileHeader.SizeOfOptionalHeader < offsetafter(IMAGE_OPTIONAL_HEADER, AddressOfEntryPoint))
+			entrypoint = (void *)(loadaddr + GET_OPTIONAL_HEADER(AddressOfEntryPoint));
+			if unlikely(!HAS_OPTIONAL_HEADER(AddressOfEntryPoint))
 				entrypoint = (void *)(loadaddr + load_minaddr);
-			*(USER CHECKED void **)stack_end = entrypoint;
+			PUSHP(entrypoint);
 
 			/* Push: `struct peexec_info::pi_pe.pd_name' */
 			buflen = 0;
@@ -420,7 +458,7 @@ done_bss:
 						((USER char *)stack_end - buflen)[0] = '\0';
 				}
 				ok     = reqlen <= buflen;
-				buflen = (reqlen + sizeof(void *) - 1) & ~(sizeof(void *) - 1);
+				buflen = (reqlen + sizeof_pointer - 1) & ~(sizeof_pointer - 1);
 				if (ok)
 					break;
 			}
@@ -431,59 +469,61 @@ done_bss:
 			memcpy(stack_end, shdr, nt.FileHeader.NumberOfSections, sizeof(IMAGE_SECTION_HEADER));
 
 			/* Push: `struct peexec_info::pi_pe.pd_nt' */
-			buflen = offsetof(IMAGE_NT_HEADERS, OptionalHeader) + nt.FileHeader.SizeOfOptionalHeader;
-			stack_end -= CEIL_ALIGN(buflen, sizeof(void *));
+			buflen = offsetof(IMAGE_NT_HEADERSX, OptionalHeader32) + nt.FileHeader.SizeOfOptionalHeader;
+			stack_end -= CEIL_ALIGN(buflen, sizeof_pointer);
 			memcpy(stack_end, &nt, buflen);
 
 			/* Push: `struct peexec_info::pi_pe.pd_loadmax' */
-			stack_end -= sizeof(uintptr_t);
-			*(USER CHECKED uintptr_t *)stack_end = loadaddr + load_maxaddr;
+			PUSHP(loadaddr + load_maxaddr);
 
 			/* Push: `struct peexec_info::pi_pe.pd_loadmin' */
-			stack_end -= sizeof(uintptr_t);
-			*(USER CHECKED uintptr_t *)stack_end = loadaddr/* + load_minaddr*/;
-
+			PUSHP(loadaddr /* + load_minaddr*/);
 
 			/* Push: `struct peexec_info::pi_pnum' and `pi_libdl_pe' */
+#ifdef __x86_64__
+			if (IS_NATIVE) {
+				static char const libdl_pe[] = "\xFF\xFF" /* pi_pnum */
+				                               "/lib64/libdl-pe.so";
+				stack_end -= CEIL_ALIGN(sizeof(libdl_pe), 8);
+				memcpy(stack_end, libdl_pe, sizeof(libdl_pe));
+			} else
+#endif /* __x86_64__ */
 			{
 				static char const libdl_pe[] = "\xFF\xFF" /* pi_pnum */
-#ifdef __x86_64__
-				                               "/lib64/libdl-pe.so" /* TODO: Compat */
-#else /* __x86_64__ */
-				                               "/lib/libdl-pe.so"
-#endif /* !__x86_64__ */
-				                               ;
-				stack_end -= CEIL_ALIGN(sizeof(libdl_pe), sizeof(void *));
+				                               "/lib/libdl-pe.so";
+				stack_end -= CEIL_ALIGN(sizeof(libdl_pe), 4);
 				memcpy(stack_end, libdl_pe, sizeof(libdl_pe));
 			}
 
 			/* Push: `struct peexec_info::pi_rtldaddr' */
-			stack_end -= sizeof(uintptr_t);
-			*(USER CHECKED uintptr_t *)stack_end = (uintptr_t)libdl_base;
-			COMPILER_BARRIER();
+			PUSHP(libdl_base);
 		} EXCEPT {
 			if (oldmman != args->ea_mman)
 				task_setmman_inherit(oldmman);
 			RETHROW();
 		}
 
+		COMPILER_BARRIER();
 		/* ===== Point of no return
 		 * This is where we begin to modify user-level registers.
 		 * This  may  _only_ happen  _after_ we're  done touching
 		 * user-space memory! */
 		state = args->ea_state;
 #ifdef __x86_64__
-		x86_set_user_gsbase(x86_get_random_userkern_address());  /* re-roll the ukern address. */
-		gpregs_setpdi(&state->ics_gpregs, (uintptr_t)stack_end); /* ELF_ARCHX86_64_DL_RTLDDATA_REGISTER */
-		gpregs_setpsi(&state->ics_gpregs, (uintptr_t)loadaddr);  /* ELF_ARCHX86_64_DL_LOADADDR_REGISTER */
-		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)peb_base);  /* ELF_ARCHX86_64_PEB_REGISTER */
-		gpregs_setpbp(&state->ics_gpregs, (uintptr_t)peb_base);  /* ELF_ARCHX86_64_PEB_REGISTER2 */
-#else /* __x86_64__ */
-		x86_set_user_fsbase(x86_get_random_userkern_address32()); /* re-roll the ukern address. */
-		gpregs_setpcx(&state->ics_gpregs, (uintptr_t)stack_end);  /* ELF_ARCH386_DL_RTLDDATA_REGISTER */
-		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)loadaddr);   /* ELF_ARCH386_DL_LOADADDR_REGISTER */
-		gpregs_setpbp(&state->ics_gpregs, (uintptr_t)peb_base);   /* ELF_ARCH386_PEB_REGISTER */
-#endif /* !__x86_64__ */
+		if (IS_NATIVE) {
+			x86_set_user_gsbase(x86_get_random_userkern_address());  /* re-roll the ukern address. */
+			gpregs_setpdi(&state->ics_gpregs, (uintptr_t)stack_end); /* ELF_ARCHX86_64_DL_RTLDDATA_REGISTER */
+			gpregs_setpsi(&state->ics_gpregs, (uintptr_t)loadaddr);  /* ELF_ARCHX86_64_DL_LOADADDR_REGISTER */
+			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)peb_base);  /* ELF_ARCHX86_64_PEB_REGISTER */
+			gpregs_setpbp(&state->ics_gpregs, (uintptr_t)peb_base);  /* ELF_ARCHX86_64_PEB_REGISTER2 */
+		} else
+#endif /* __x86_64__ */
+		{
+			x86_set_user_fsbase(x86_get_random_userkern_address32()); /* re-roll the ukern address. */
+			gpregs_setpcx(&state->ics_gpregs, (uintptr_t)stack_end);  /* ELF_ARCH386_DL_RTLDDATA_REGISTER */
+			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)loadaddr);   /* ELF_ARCH386_DL_LOADADDR_REGISTER */
+			gpregs_setpbp(&state->ics_gpregs, (uintptr_t)peb_base);   /* ELF_ARCH386_PEB_REGISTER */
+		}
 		icpustate_setusersp(state, stack_end);
 		icpustate_setpc(state, libdl_base); /* Entry point is at offset=0 */
 		{
@@ -492,11 +532,15 @@ done_bss:
 			/* Mask eflags for exec() */
 			icpustate_mskpflags(state, mask.uem_mask, mask.uem_flag);
 		}
+
 #ifdef __x86_64__
-		icpustate_setcs(state, SEGMENT_USER_CODE64_RPL);
-		icpustate_setss(state, SEGMENT_USER_DATA64_RPL);
-//		icpustate_setcs(state, SEGMENT_USER_CODE32_RPL); /* TODO: COMPAT */
-//		icpustate_setss(state, SEGMENT_USER_DATA32_RPL); /* TODO: COMPAT */
+		if (IS_NATIVE) {
+			icpustate_setcs(state, SEGMENT_USER_CODE64_RPL);
+			icpustate_setss(state, SEGMENT_USER_DATA64_RPL);
+		} else {
+			icpustate_setcs(state, SEGMENT_USER_CODE32_RPL);
+			icpustate_setss(state, SEGMENT_USER_DATA32_RPL);
+		}
 #endif /* __x86_64__ */
 
 		if (oldmman != args->ea_mman) {

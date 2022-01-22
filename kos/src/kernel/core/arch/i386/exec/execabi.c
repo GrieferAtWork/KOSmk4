@@ -22,6 +22,7 @@
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 #define __WANT_FS_INIT
 #define __WANT_MPART_INIT
+#define __WANT_MFILE_INIT_mf_filesize_symbol
 
 #include <kernel/compiler.h>
 
@@ -52,7 +53,7 @@ PUBLIC struct mramfile execabi_system_rtld_file = {
 		                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 		                    MFILE_F_FIXEDFILESIZE),
 		MFILE_INIT_mf_trunclock,
-		MFILE_INIT_mf_filesize(execabi_system_rtld_size),
+		MFILE_INIT_mf_filesize_symbol(execabi_system_rtld_size),
 		MFILE_INIT_mf_atime(0, 0),
 		MFILE_INIT_mf_mtime(0, 0),
 		MFILE_INIT_mf_ctime(0, 0),
@@ -78,7 +79,7 @@ PUBLIC struct mramfile execabi_system_rtld32_file = {
 		                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 		                    MFILE_F_FIXEDFILESIZE),
 		MFILE_INIT_mf_trunclock,
-		MFILE_INIT_mf_filesize(execabi_system_rtld32_size),
+		MFILE_INIT_mf_filesize_symbol(execabi_system_rtld32_size),
 		MFILE_INIT_mf_atime(0, 0),
 		MFILE_INIT_mf_mtime(0, 0),
 		MFILE_INIT_mf_ctime(0, 0),
