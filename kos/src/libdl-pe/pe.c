@@ -60,7 +60,6 @@
 DECL_BEGIN
 
 INTERN char *CC dlstrdup(char const *str) {
-	syslog(LOG_DEBUG, "dlstrdup(%q)\n", str);
 	size_t len   = (strlen(str) + 1) * sizeof(char);
 	char *result = (char *)malloc(len);
 	if (result)
@@ -118,7 +117,7 @@ err_buffer_result_errno:
 
 /* Wrapper for `dlsym()' that does all of the "DOS$" / "KOS$" prefix handling. */
 DEFINE_PUBLIC_ALIAS(GetProcAddress, libpe_GetProcAddress);
-INTERN void *ATTR_STDCALL
+INTERN void *WINAPI
 libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 	void *result;
 	char *dos_symbol_name;
@@ -220,8 +219,9 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 		 *
 		 * However, that's a lot of overhead, and doesn't work well with
 		 * the established dlopen()  function (which  doesn't feature  a
-		 * dlopenat() variant), so to ensure uniform filenames, we  just
-		 * convert everything to lowercase.
+		 * dlopenat() variant; though I guess we could do the open here,
+		 * and  then  use  `fdlopen()'...). Anyways:  to  ensure uniform
+		 * filenames, we just convert everything to lowercase (for now).
 		 *
 		 * Sadly, this means that any dll you put on the system, you  have
 		 * to rename to all lower-case in order for us to find it. If this
@@ -885,10 +885,14 @@ INTERN void libpe_init(void) {
 	}
 }
 
-INTDEF void pe_exit_wrapper_asm(void);
+
+/************************************************************************/
+/* Handling for when a PE program's _start() does a `ret'               */
+/************************************************************************/
 INTERN void FCALL pe_exit_wrapper(int exit_code) {
 	_Exit(exit_code);
 }
+INTDEF void pe_exit_wrapper_asm(void);
 __asm__(".pushsection .text\n"
         ".global pe_exit_wrapper_asm\n"
         ".hidden pe_exit_wrapper_asm\n"
@@ -915,7 +919,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	char *filename;
 	struct peexec_data *pe = peexec_info__pi_pe(info);
 
-#if 1
+#if 0
 	syslog(LOG_DEBUG, "[pe] info->pi_rtldaddr                         = %p\n", info->pi_rtldaddr);
 	syslog(LOG_DEBUG, "[pe] info->pi_pnum                             = %#I16x\n", info->pi_pnum);
 	syslog(LOG_DEBUG, "[pe] info->pi_libdl_pe                         = %q\n", info->pi_libdl_pe);
@@ -943,7 +947,9 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	filename = strdup(filename);
 	if unlikely(!filename)
 		goto err_nomem; /* Leaks don't matter; we're only called once during init! */
+#if 0
 	syslog(LOG_DEBUG, "[pe] ENTRY:%p@%p\n", *(void **)result, (void **)result + 1);
+#endif
 
 	/* Initialize simple fields of the new module. */
 	mod->dm_loadaddr   = loadaddr;
@@ -1045,7 +1051,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	if (pe_nexttlsindex != 0) {
 		/* TODO: Just inject another indirect function to-be called before `*result',
 		 *       that will copy the base addresses of PE TLS segments allocated above
-		 *       into the TLS extension table of the ELF-TLS context of the calling
+		 *       into the TLS extension table of  the ELF-TLS context of the  calling
 		 *       thread.
 		 * >> struct tls_segment *me = (struct tls_segment *)RD_TLS_BASE_REGISTER();
 		 * >> FOREACH (pemod: dl.DlModule_AllList) {

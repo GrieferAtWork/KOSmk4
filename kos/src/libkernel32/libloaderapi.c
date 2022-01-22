@@ -133,13 +133,13 @@ libk32_GetModuleHandleW(LPCWSTR lpModuleName) {
 INTERN HMODULE WINAPI
 libk32_LoadLibraryA(LPCSTR lpLibFileName) {
 	TRACE("LoadLibraryA(%q)", lpLibFileName);
-	return LoadLibraryExA(lpLibFileName, NULL, 0);
+	return libk32_LoadLibraryExA(lpLibFileName, NULL, 0);
 }
 
 INTERN HMODULE WINAPI
 libk32_LoadLibraryW(LPCWSTR lpLibFileName) {
 	TRACE("LoadLibraryW(%I16q)", lpLibFileName);
-	return LoadLibraryExW(lpLibFileName, NULL, 0);
+	return libk32_LoadLibraryExW(lpLibFileName, NULL, 0);
 }
 
 INTERN WINBOOL WINAPI
