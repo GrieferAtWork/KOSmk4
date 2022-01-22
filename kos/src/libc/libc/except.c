@@ -59,6 +59,12 @@
 #include "sigreturn.h"
 #include "tls.h"
 
+#if defined(__i386__) || defined(__x86_64__)
+#include <kos/bits/thread.h>
+
+#include "../hybrid/arch/i386/memcpy_nopf.h"
+#endif /* __i386__ || __x86_64__ */
+
 DECL_BEGIN
 
 STATIC_ASSERT(offsetof(struct exception_info, ei_state) == OFFSET_EXCEPTION_INFO_STATE);
@@ -998,13 +1004,67 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 }
 
 
+#if defined(__i386__) || defined(__x86_64__)
+#define EXCEPT_HANDLER_ON_ENTRY(state, error)                \
+	do {                                                     \
+		/* nopf support */                                   \
+		void *pc = (void *)kcpustate_getpc(state);           \
+		if (libc_x86_nopf_check(pc)) {                       \
+			kcpustate_setpc(state, libc_x86_nopf_retof(pc)); \
+			return state;                                    \
+		}                                                    \
+		/* Verify TLS segment */                             \
+		x86_verify_tls(state, error);                        \
+	}	__WHILE0
+PRIVATE SECTION_EXCEPT_TEXT NONNULL((1, 2)) void CC
+x86_verify_tls(error_register_state_t *__restrict state,
+               struct exception_data *__restrict error) {
+	bool readerror;
+	void *tlsbase, *tlsptr0;
+	/* In *_nopf-mode, read a pointer from `%segtls:0'.
+	 * - If a #PF (or some other exception) is generated, fail.
+	 * - Ensure that the read pointer equals `RD_TLS_BASE_REGISTER_S()' */
+	__asm__ __volatile__(""
+#ifdef __x86_64__
+	                     "call libc_x86_nopf_movq_fsPax_rax"
+#else /* __x86_64__ */
+	                     "call libc_x86_nopf_movl_gsPax_eax"
+#endif /* !__x86_64__ */
+	                     : "=a" (tlsptr0)
+	                     , "=@ccc" (readerror)
+	                     : "a" (0)
+	                     : "cc");
+	if likely(!readerror) {
+		tlsbase = RD_TLS_BASE_REGISTER_S();
+		if likely(tlsbase == tlsptr0)
+			return;
+	}
+
+	/* TLS segment is corrupted. -- Trigger a coredump! */
+	trigger_coredump(state, state, error,
+	                 NULL, 0, UNWIND_USER_BADTLS);
+}
+#endif /* __i386__ || __x86_64__ */
+
+
+/* Common on-entry callback for exception handlers. Used to deal with
+ * architecture-specific checks/features, as  well as (if  supported)
+ * to verify TLS and fail with `UNWIND_USER_BADTLS' on error. */
+#ifndef EXCEPT_HANDLER_ON_ENTRY
+#define EXCEPT_HANDLER_ON_ENTRY(state, error) (void)0
+#endif /* !EXCEPT_HANDLER_ON_ENTRY */
 
 
 INTERN SECTION_EXCEPT_TEXT error_register_state_t *__EXCEPT_HANDLER_CC
 libc_except_handler3_impl(error_register_state_t *__restrict state,
                           struct exception_data *__restrict error) {
 	struct exception_info *info;
-	uintptr_t recursion_flag = EXCEPT_FINEXCEPT;
+	uintptr_t recursion_flag;
+
+	/* If supported by the architecture, verify the TLS context. */
+	EXCEPT_HANDLER_ON_ENTRY(state, error);
+
+	recursion_flag = EXCEPT_FINEXCEPT;
 	info = &current.pt_except;
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {
@@ -1042,8 +1102,13 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	error_register_state_t first_handler;
 	struct exception_info *info, saved_info;
 	bool got_first_handler;
-	uintptr_t recursion_flag = EXCEPT_FINEXCEPT;
+	uintptr_t recursion_flag;
 	void const *pc;
+
+	/* If supported by the architecture, verify the TLS context. */
+	EXCEPT_HANDLER_ON_ENTRY(state, error);
+
+	recursion_flag = EXCEPT_FINEXCEPT;
 	info = &current.pt_except;
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {

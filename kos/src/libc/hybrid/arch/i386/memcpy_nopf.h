@@ -17,11 +17,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF64_S
-#define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF64_S 1
+#ifndef GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_H
+#define GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_H 1
 
-#ifndef __INTELLISENSE__
-#include "memcpy_nopf.S"
-#endif /* !__INTELLISENSE__ */
+#include <hybrid/compiler.h>
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF64_S */
+#include <hybrid/host.h>
+#include <hybrid/typecore.h>
+
+#ifdef __CC__
+DECL_BEGIN
+
+DATDEF __BYTE_TYPE__ const libc_x86_nopf_begin[];   /* Start address for NOPF memory access PC values */
+DATDEF __BYTE_TYPE__ const libc_x86_nopf_end_clc[]; /* End of NOPF handlers that should return to `libc_x86_nopf_ret_stc' */
+DATDEF __BYTE_TYPE__ const libc_x86_nopf_end[];     /* End address for NOPF memory access PC values */
+DATDEF __BYTE_TYPE__ const libc_x86_nopf_ret_stc[]; /* Set the carry bit and return to the caller */
+DATDEF __BYTE_TYPE__ const libc_x86_nopf_ret[];     /* Return PC for #PF with `libc_x86_nopf_check(pc) == true' */
+
+/* Return the #PF-execution-resume address for a #PF  that happened at `pc', where pc  is
+ * apart of a libc_x86_nopf_* function, as indicated by `libc_x86_nopf_check(pc) == true' */
+#define libc_x86_nopf_retof(pc)                          \
+	((__BYTE_TYPE__ const *)(pc) < libc_x86_nopf_end_clc \
+	 ? (__BYTE_TYPE__ const *)libc_x86_nopf_ret_stc      \
+	 : (__BYTE_TYPE__ const *)libc_x86_nopf_ret)
+
+#define libc_x86_nopf_check(pc)                            \
+	((__BYTE_TYPE__ const *)(pc) >= libc_x86_nopf_begin && \
+	 (__BYTE_TYPE__ const *)(pc) < libc_x86_nopf_end)
+
+DECL_END
+#endif /* __CC__ */
+
+
+#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_H */

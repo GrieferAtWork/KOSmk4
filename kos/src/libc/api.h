@@ -157,6 +157,8 @@
 #define VLIBCCALL __VLIBCCALL
 #define VLIBDCALL __VLIBDCALL
 #define VLIBKCALL __VLIBKCALL
+#define CC        LIBCCALL
+#define VCC       VLIBCCALL
 
 #ifndef NOBLOCK
 #define NOBLOCK __NOBLOCK
