@@ -257,9 +257,14 @@ NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
                                    size_t bufsize)
 /*[[[body:libc_wgetcwd]]]*/
 {
+	char *utf8_result;
 	char32_t *result;
 	size_t result_len;
-	result = libc_wget_current_dir_name();
+	utf8_result = libc_getcwd(NULL, 0);
+	if unlikely(!utf8_result)
+		return NULL;
+	result = convert_mbstoc32(utf8_result);
+	free(utf8_result);
 	if unlikely(!result)
 		return NULL;
 	if (!buf) {
@@ -299,9 +304,14 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
                                    size_t bufsize)
 /*[[[body:libd_wgetcwd]]]*/
 {
+	char *utf8_result;
 	char16_t *result;
 	size_t result_len;
-	result = libd_wget_current_dir_name();
+	utf8_result = libd_getcwd(NULL, 0);
+	if unlikely(!utf8_result)
+		return NULL;
+	result = convert_mbstoc16(utf8_result);
+	free(utf8_result);
 	if unlikely(!result)
 		return NULL;
 	if (!buf) {
