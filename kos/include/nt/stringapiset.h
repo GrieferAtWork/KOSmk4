@@ -49,8 +49,8 @@ WINBASEAPI int WINAPI lstrlenW(LPCWSTR lpString);
 /************************************************************************/
 /* CODEC CONVERSION                                                     */
 /************************************************************************/
-WINBASEAPI int WINAPI MultiByteToWideChar(UINT CodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
-WINBASEAPI int WINAPI WideCharToMultiByte(UINT CodePage, DWORD dwFlags, LPCWCH lpWideCharStr, int cchWideChar, LPSTR lpMultiByteStr, int cbMultiByte, LPCCH lpDefaultChar, LPBOOL lpUsedDefaultChar);
+WINBASEAPI int WINAPI MultiByteToWideChar(UINT uCodePage, DWORD dwFlags, LPCCH lpMultiByteStr, int cbMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
+WINBASEAPI int WINAPI WideCharToMultiByte(UINT uCodePage, DWORD dwFlags, LPCWCH lpWideCharStr, int cchWideChar, LPSTR lpMultiByteStr, int cbMultiByte, LPCCH lpDefaultChar, LPBOOL lpUsedDefaultChar);
 
 __DECL_END
 #endif /* __CC__ */

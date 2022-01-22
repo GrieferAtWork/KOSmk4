@@ -672,7 +672,7 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 		 * >> }
 		 *
 		 * Same as:
-		 * >> uintptr_t *tls_index = tls->AddressOfIndex;  // DlModule_GetTls(self)
+		 * >> uintptr_t *tls_index = tls->AddressOfIndex;  // DlModule_GetTlsDir(self)
 		 * >> #ifdef __x86_64__
 		 * >> void **tls_vector = *(void ***)%gs:0x58;
 		 * >> #else
@@ -701,7 +701,7 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 		self->dm_tlsinit  = (byte_t *)(/*self->dm_loadaddr + */ tls->StartAddressOfRawData);
 		self->dm_tlsfsize = tls->EndAddressOfRawData - tls->StartAddressOfRawData;
 		self->dm_tlsmsize = self->dm_tlsfsize + tls->SizeOfZeroFill;
-		self->dm_tlsstoff = 0;
+		/*self->dm_tlsstoff = 0;*/ /* We don't have ELF-style static TLS (iow: direct %fs/%gs-offsets) */
 
 		if (self->dm_tlsmsize) {
 			/* We can figure out the required alignment from `tls->Characteristics' */

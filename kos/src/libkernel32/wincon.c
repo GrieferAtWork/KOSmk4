@@ -136,6 +136,7 @@ PRIVATE char const bg_color_to_ansi_code[16][7] = {
 INTERN WINBOOL WINAPI
 libk32_SetConsoleTextAttribute(HANDLE hConsoleOutput, WORD wAttributes) {
 	fd_t ttyfd;
+	TRACE("SetConsoleTextAttribute(%p, %#x)", hConsoleOutput, wAttributes);
 	(void)hConsoleOutput;
 	if (wAttributes == console_attributes)
 		return TRUE;
@@ -177,7 +178,10 @@ INTERN WINBOOL WINAPI
 libk32_SetConsoleCursorPosition(HANDLE hConsoleOutput, COORD dwCursorPosition) {
 	char buffer[64];
 	size_t len;
-	fd_t ttyfd = gettty();
+	fd_t ttyfd;
+	TRACE("SetConsoleCursorPosition(%p, {%u,%u})",
+	      hConsoleOutput, dwCursorPosition.X, dwCursorPosition.Y);
+	ttyfd = gettty();
 	(void)hConsoleOutput;
 	len = sprintf(buffer, AC_CUP("%u", "%u"),
 	              dwCursorPosition.Y,
@@ -188,6 +192,7 @@ libk32_SetConsoleCursorPosition(HANDLE hConsoleOutput, COORD dwCursorPosition) {
 
 INTERN WINBOOL WINAPI
 libk32_GetConsoleCursorInfo(HANDLE hConsoleOutput, PCONSOLE_CURSOR_INFO lpConsoleCursorInfo) {
+	TRACE("GetConsoleCursorInfo(%p, %p)", hConsoleOutput, lpConsoleCursorInfo);
 	(void)hConsoleOutput;
 	if (lpConsoleCursorInfo->dwSize != sizeof(CONSOLE_CURSOR_INFO)) {
 		errno = EINVAL;
@@ -199,6 +204,7 @@ libk32_GetConsoleCursorInfo(HANDLE hConsoleOutput, PCONSOLE_CURSOR_INFO lpConsol
 
 INTERN WINBOOL WINAPI
 libk32_SetConsoleCursorInfo(HANDLE hConsoleOutput, CONST CONSOLE_CURSOR_INFO *lpConsoleCursorInfo) {
+	TRACE("SetConsoleCursorInfo(%p, %p)", hConsoleOutput, lpConsoleCursorInfo);
 	(void)hConsoleOutput;
 	if (lpConsoleCursorInfo->dwSize != sizeof(CONSOLE_CURSOR_INFO)) {
 		errno = EINVAL;
@@ -219,6 +225,7 @@ INTERN COORD WINAPI
 libk32_GetLargestConsoleWindowSize(HANDLE hConsoleOutput) {
 	COORD result;
 	struct winsize wsz;
+	TRACE("GetLargestConsoleWindowSize(%p)", hConsoleOutput);
 	(void)hConsoleOutput;
 	result.X = 80;
 	result.Y = 25;
@@ -252,9 +259,11 @@ libk32_GetConsoleCursorPosition(fd_t ttyfd, COORD *pResult) {
 INTERN WINBOOL WINAPI
 libk32_GetConsoleScreenBufferInfo(HANDLE hConsoleOutput,
                                   PCONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo) {
-	fd_t ttyfd = gettty();
+	fd_t ttyfd;
 	struct winsize wsz;
+	TRACE("GetConsoleScreenBufferInfo(%p, %p)", hConsoleOutput, lpConsoleScreenBufferInfo);
 	(void)hConsoleOutput;
+	ttyfd = gettty();
 	lpConsoleScreenBufferInfo->dwSize.X        = 80;
 	lpConsoleScreenBufferInfo->dwSize.Y        = 25;
 	lpConsoleScreenBufferInfo->srWindow.Left   = 0;
@@ -298,8 +307,10 @@ static COLORREF const default_ColorTable[16] = {
 
 INTERN WINBOOL WINAPI
 libk32_GetConsoleScreenBufferInfoEx(HANDLE hConsoleOutput, PCONSOLE_SCREEN_BUFFER_INFOEX lpConsoleScreenBufferInfoEx) {
-	fd_t ttyfd = gettty();
+	fd_t ttyfd;
 	struct winsize wsz;
+	TRACE("GetConsoleScreenBufferInfoEx(%p, %p)", hConsoleOutput, lpConsoleScreenBufferInfoEx);
+	ttyfd = gettty();
 	(void)hConsoleOutput;
 	if (lpConsoleScreenBufferInfoEx->cbSize != sizeof(*lpConsoleScreenBufferInfoEx)) {
 		errno = EINVAL;
@@ -331,6 +342,7 @@ INTERN WINBOOL WINAPI
 libk32_SetConsoleScreenBufferInfoEx(HANDLE hConsoleOutput,
                                     PCONSOLE_SCREEN_BUFFER_INFOEX lpConsoleScreenBufferInfoEx) {
 	CONSOLE_SCREEN_BUFFER_INFOEX oldattr = { sizeof(oldattr) };
+	TRACE("SetConsoleScreenBufferInfoEx(%p, %p)", hConsoleOutput, lpConsoleScreenBufferInfoEx);
 	if (!libk32_GetConsoleScreenBufferInfoEx(hConsoleOutput, &oldattr))
 		return FALSE;
 	if (memcmp(&lpConsoleScreenBufferInfoEx->srWindow, &oldattr.srWindow, sizeof(oldattr.srWindow)) != 0)
@@ -360,18 +372,21 @@ illegal:
 
 INTERN WINBOOL WINAPI
 libk32_GetNumberOfConsoleMouseButtons(LPDWORD lpNumberOfMouseButtons) {
+	TRACE("GetNumberOfConsoleMouseButtons(%p)", lpNumberOfMouseButtons);
 	*lpNumberOfMouseButtons = 3;
 	return TRUE;
 }
 
 INTERN WINBOOL WINAPI
 libk32_SetConsoleActiveScreenBuffer(HANDLE hConsoleOutput) {
+	TRACE("SetConsoleActiveScreenBuffer(%p)", hConsoleOutput);
 	(void)hConsoleOutput;
 	return ioctl(gettty(), VID_IOC_ACTIVATE) >= 0;
 }
 
 INTERN WINBOOL WINAPI
 libk32_FlushConsoleInputBuffer(HANDLE hConsoleInput) {
+	TRACE("FlushConsoleInputBuffer(%p)", hConsoleInput);
 	(void)hConsoleInput;
 	return ioctl(gettty(), TCFLSH, TCIFLUSH) >= 0;
 }
@@ -386,6 +401,7 @@ PRIVATE void LIBCCALL sigint_handler(int UNUSED(signo)) {
 
 INTERN WINBOOL WINAPI
 libk32_SetConsoleCtrlHandler(PHANDLER_ROUTINE HandlerRoutine, WINBOOL Add) {
+	TRACE("SetConsoleCtrlHandler(%p, %u)", HandlerRoutine, Add);
 	if (Add) {
 		if (ctrl_handler) {
 			errno = ENOMEM;
@@ -407,6 +423,7 @@ libk32_SetConsoleCtrlHandler(PHANDLER_ROUTINE HandlerRoutine, WINBOOL Add) {
 
 INTERN WINBOOL WINAPI
 libk32_GenerateConsoleCtrlEvent(DWORD dwCtrlEvent, DWORD dwProcessGroupId) {
+	TRACE("GenerateConsoleCtrlEvent(%#x, %#x)", dwCtrlEvent, dwProcessGroupId);
 	if (dwCtrlEvent == CTRL_C_EVENT)
 		return kill(-(pid_t)dwProcessGroupId, SIGINT) >= 0;
 	errno = EINVAL;
@@ -415,6 +432,7 @@ libk32_GenerateConsoleCtrlEvent(DWORD dwCtrlEvent, DWORD dwProcessGroupId) {
 
 INTERN WINBOOL WINAPI
 libk32_SetConsoleTitleA(LPCSTR lpConsoleTitle) {
+	TRACE("SetConsoleTitleA(%q)", lpConsoleTitle);
 	return dprintf(gettty(),
 	               _AC_ESC "]" /* OSC */
 	               "2;"        /* Command #2: Set window title */
@@ -426,7 +444,9 @@ libk32_SetConsoleTitleA(LPCSTR lpConsoleTitle) {
 INTERN WINBOOL WINAPI
 libk32_SetConsoleTitleW(LPCWSTR lpConsoleTitle) {
 	WINBOOL result;
-	char *utf8 = convert_c16tombs(lpConsoleTitle);
+	char *utf8;
+	TRACE("SetConsoleTitleW(%I16q)", lpConsoleTitle);
+	utf8 = convert_c16tombs(lpConsoleTitle);
 	if (!utf8)
 		return FALSE;
 	result = libk32_SetConsoleTitleA(utf8);
@@ -438,8 +458,12 @@ INTERN WINBOOL WINAPI
 libk32_ReadConsoleA(HANDLE hConsoleInput, LPVOID lpBuffer,
                     DWORD nNumberOfCharsToRead,
                     LPDWORD lpNumberOfCharsRead, LPVOID lpReserved) {
-	fd_t ttyfd = gettty();
+	fd_t ttyfd;
 	ssize_t total;
+	TRACE("ReadConsoleA(%p, %p, %#x, %p, %p)",
+	      hConsoleInput, lpBuffer, nNumberOfCharsToRead,
+	      lpNumberOfCharsRead, lpReserved);
+	ttyfd = gettty();
 	(void)hConsoleInput;
 	(void)lpReserved;
 	total = read(ttyfd, lpBuffer, nNumberOfCharsToRead);
@@ -454,9 +478,13 @@ libk32_ReadConsoleW(HANDLE hConsoleInput, LPVOID lpBuffer,
                     DWORD nNumberOfCharsToRead,
                     LPDWORD lpNumberOfCharsRead, LPVOID lpReserved) {
 	PRIVATE uint32_t incomplete = 0;
-	fd_t ttyfd = gettty();
+	fd_t ttyfd;
 	struct format_c16snprintf_data printer;
 	struct format_8to16_data convert;
+	TRACE("ReadConsoleW(%p, %p, %#x, %p, %p)",
+	      hConsoleInput, lpBuffer, nNumberOfCharsToRead,
+	      lpNumberOfCharsRead, lpReserved);
+	ttyfd = gettty();
 	(void)hConsoleInput;
 	(void)lpReserved;
 	printer.sd_buffer     = (char16_t *)lpBuffer;
@@ -486,8 +514,12 @@ INTERN WINBOOL WINAPI
 libk32_WriteConsoleA(HANDLE hConsoleOutput, CONST VOID *lpBuffer,
                      DWORD nNumberOfCharsToWrite,
                      LPDWORD lpNumberOfCharsWritten, LPVOID lpReserved) {
-	fd_t ttyfd = gettty();
+	fd_t ttyfd;
 	ssize_t total;
+	TRACE("WriteConsoleA(%p, %p, %#x, %p, %p)",
+	      hConsoleOutput, lpBuffer, nNumberOfCharsToWrite,
+	      lpNumberOfCharsWritten, lpReserved);
+	ttyfd = gettty();
 	(void)hConsoleOutput;
 	(void)lpReserved;
 	total = write(ttyfd, lpBuffer, nNumberOfCharsToWrite);
@@ -503,7 +535,11 @@ libk32_WriteConsoleW(HANDLE hConsoleOutput, CONST VOID *lpBuffer,
                      LPDWORD lpNumberOfCharsWritten, LPVOID lpReserved) {
 	PRIVATE char16_t surrogate = 0;
 	struct format_16to8_data convert;
-	fd_t ttyfd = gettty();
+	fd_t ttyfd;
+	TRACE("WriteConsoleW(%p, %p, %#x, %p, %p)",
+	      hConsoleOutput, lpBuffer, nNumberOfCharsToWrite,
+	      lpNumberOfCharsWritten, lpReserved);
+	ttyfd = gettty();
 	(void)hConsoleOutput;
 	(void)lpReserved;
 	convert.fd_printer   = &write_printer;
@@ -518,12 +554,14 @@ libk32_WriteConsoleW(HANDLE hConsoleOutput, CONST VOID *lpBuffer,
 
 INTERN UINT WINAPI
 libk32_GetConsoleCP(VOID) {
+	TRACE("GetConsoleCP()");
 	COMPILER_IMPURE();
 	return CP_UTF8;
 }
 
 INTERN WINBOOL WINAPI
 libk32_SetConsoleCP(UINT wCodePageID) {
+	TRACE("SetConsoleCP(%u)", wCodePageID);
 	(void)wCodePageID;
 	COMPILER_IMPURE();
 	return TRUE;
@@ -531,12 +569,14 @@ libk32_SetConsoleCP(UINT wCodePageID) {
 
 INTERN UINT WINAPI
 libk32_GetConsoleOutputCP(VOID) {
+	TRACE("GetConsoleOutputCP()");
 	COMPILER_IMPURE();
 	return CP_UTF8;
 }
 
 INTERN WINBOOL WINAPI
 libk32_SetConsoleOutputCP(UINT wCodePageID) {
+	TRACE("SetConsoleOutputCP(%u)", wCodePageID);
 	(void)wCodePageID;
 	COMPILER_IMPURE();
 	return TRUE;

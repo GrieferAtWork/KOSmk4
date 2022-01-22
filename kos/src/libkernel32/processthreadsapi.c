@@ -69,6 +69,7 @@ DEFINE_PUBLIC_ALIAS(GetCurrentThread, libk32_GetCurrentThread);
 INTERN WINBOOL WINAPI
 libk32_TerminateProcess(HANDLE hProcess, UINT uExitCode) {
 	errno_t error;
+	TRACE("TerminateProcess(%p, %x)", hProcess, uExitCode);
 	(void)uExitCode;
 	if (!NTHANDLE_ISFD(hProcess)) {
 		errno = EBADF;
@@ -86,6 +87,7 @@ DEFINE_INTERN_ALIAS(libk32_TerminateThread, libk32_TerminateProcess);
 INTERN HANDLE WINAPI
 libk32_OpenProcess(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwProcessId) {
 	fd_t result;
+	TRACE("OpenProcess(%#x, %u, %#x)", dwDesiredAccess, bInheritHandle, dwProcessId);
 	(void)dwDesiredAccess;
 	result = sys_pidfd_open(dwProcessId, 0);
 	if (E_ISERR(result)) {
@@ -104,6 +106,7 @@ libk32_OpenProcess(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwProces
 INTERN WINBOOL WINAPI
 libk32_GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode) {
 	union wait w;
+	TRACE("GetExitCodeProcess(%p, %p)", hProcess, lpExitCode);
 	if (!NTHANDLE_ISFD(hProcess)) {
 		errno = EBADF;
 		return FALSE;
@@ -129,6 +132,7 @@ INTERN HANDLE WINAPI
 libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadId) {
 	fd_t result;
 	char filename[64];
+	TRACE("OpenThread(%#x, %u, %#x)", dwDesiredAccess, bInheritHandle, dwThreadId);
 	(void)dwDesiredAccess;
 	/* NOTE: For linux compat, `sys_pidfd_open()' can't be used to open thread
 	 *       handles! - Instead, those can be opened via `open("/proc/[tid]")' */
@@ -145,6 +149,7 @@ DEFINE_INTERN_ALIAS(libk32_GetProcessIdOfThread, libk32_GetProcessId);
 INTERN DWORD WINAPI
 libk32_GetProcessId(HANDLE hProcess) {
 	pid_t result;
+	TRACE("GetProcessId(%p)", hProcess);
 	if (!NTHANDLE_ISFD(hProcess)) {
 		errno = EBADF;
 		return 0;
@@ -157,6 +162,7 @@ libk32_GetProcessId(HANDLE hProcess) {
 INTERN DWORD WINAPI
 libk32_GetThreadId(HANDLE hThread) {
 	pid_t result;
+	TRACE("GetThreadId(%p)", hThread);
 	if (!NTHANDLE_ISFD(hThread)) {
 		errno = EBADF;
 		return 0;
@@ -173,6 +179,7 @@ libk32_GetProcessHandleCount(HANDLE hProcess, PDWORD pdwHandleCount) {
 	DWORD pid = libk32_GetProcessId(hProcess);
 	DIR *fddir;
 	size_t count;
+	TRACE("GetProcessHandleCount(%p, %p)", hProcess, pdwHandleCount);
 	if (pid == 0)
 		return FALSE;
 	sprintf(pathname, "/proc/%d/fd", (pid_t)pid);
@@ -187,10 +194,12 @@ libk32_GetProcessHandleCount(HANDLE hProcess, PDWORD pdwHandleCount) {
 }
 
 INTERN HANDLE WINAPI libk32_GetCurrentProcess(VOID) {
+	TRACE("GetCurrentProcess()");
 	return NTHANDLE_FROMFD(AT_THIS_PROCESS);
 }
 
 INTERN HANDLE WINAPI libk32_GetCurrentThread(VOID) {
+	TRACE("GetCurrentThread()");
 	return NTHANDLE_FROMFD(AT_THIS_TASK);
 }
 
@@ -246,6 +255,9 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 	pthread_attr_t attr;
 	errno_t error;
 	struct k32_thread_start_data *cookie;
+	TRACE("CreateThread(%p, %#Ix, %p, %p, %#x, %p)",
+	      lpThreadAttributes, dwStackSize, lpStartAddress,
+	      lpParameter, dwCreationFlags, lpThreadId);
 	(void)lpThreadAttributes;
 	error = pthread_attr_init(&attr);
 	if (error != EOK)
@@ -299,6 +311,7 @@ err:
 
 INTERN DECLSPEC_NORETURN VOID WINAPI
 libk32_ExitThread(DWORD dwExitCode) {
+	TRACE("ExitThread(%#x)", dwExitCode);
 	/* TODO: This sets the pthread return value, but we want to set the system thread exit code!
 	 * libc: >> pthread_exit_thread(&current, dwExitCode); */
 	pthread_exit((void *)(uintptr_t)dwExitCode);
@@ -306,23 +319,28 @@ libk32_ExitThread(DWORD dwExitCode) {
 
 INTERN DECLSPEC_NORETURN VOID WINAPI
 libk32_ExitProcess(UINT uExitCode) {
+	TRACE("ExitProcess(%#x)", uExitCode);
 	_exit((int)uExitCode);
 }
 
 INTERN WINBOOL WINAPI
 libk32_SwitchToThread(VOID) {
+	TRACE("SwitchToThread()");
 	pthread_yield();
 	return TRUE;
 }
 
 INTERN DWORD WINAPI
 libk32_GetCurrentProcessorNumber(VOID) {
+	TRACE("GetCurrentProcessorNumber()");
 	return sched_getcpu();
 }
 
 INTERN WINBOOL WINAPI
 libk32_ProcessIdToSessionId(DWORD dwProcessId, DWORD *pSessionId) {
-	pid_t sid = getsid((pid_t)dwProcessId);
+	pid_t sid;
+	TRACE("ProcessIdToSessionId(%#x, %p)", dwProcessId, pSessionId);
+	sid = getsid((pid_t)dwProcessId);
 	if (sid == -1)
 		return FALSE;
 	*pSessionId = sid;
@@ -331,16 +349,19 @@ libk32_ProcessIdToSessionId(DWORD dwProcessId, DWORD *pSessionId) {
 
 INTERN DWORD WINAPI
 libk32_GetCurrentProcessId(VOID) {
+	TRACE("GetCurrentProcessId()");
 	return getpid();
 }
 
 INTERN DWORD WINAPI
 libk32_GetCurrentThreadId(VOID) {
+	TRACE("GetCurrentThreadId()");
 	return gettid();
 }
 
 INTERN WINBOOL WINAPI
 libk32_IsProcessorFeaturePresent(DWORD ProcessorFeature) {
+	TRACE("IsProcessorFeaturePresent(%#x)", ProcessorFeature);
 	syslog(LOG_WARNING, "[k32] NotImplemented: IsProcessorFeaturePresent(%I32u)\n",
 	       ProcessorFeature);
 	return FALSE;
@@ -348,11 +369,14 @@ libk32_IsProcessorFeaturePresent(DWORD ProcessorFeature) {
 
 INTERN VOID WINAPI
 libk32_FlushProcessWriteBuffers(VOID) {
+	TRACE("FlushProcessWriteBuffers()");
 	syslog(LOG_WARNING, "[k32] NotImplemented: FlushProcessWriteBuffers()\n");
 }
 
 INTERN WINBOOL WINAPI
 libk32_FlushInstructionCache(HANDLE hProcess, LPCVOID lpBaseAddress, SIZE_T dwSize) {
+	TRACE("FlushInstructionCache(%p, %p, %#Ix)",
+	      hProcess, lpBaseAddress, dwSize);
 	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
 		errno = EACCES;
 		return FALSE;
@@ -380,8 +404,11 @@ INTERN BOOL WINAPI
 libk32_QueueUserAPC2(PAPCFUNC pfnAPC, HANDLE hThread,
                      ULONG_PTR dwData, QUEUE_USER_APC_FLAGS flFlags) {
 	struct user_apc_data *cookie;
-	pid_t tid = libk32_GetThreadId(hThread);
+	pid_t tid;
 	unsigned int mode;
+	TRACE("QueueUserAPC2(%p, %p, %p, %#x)",
+	      pfnAPC, hThread, dwData, flFlags);
+	tid = libk32_GetThreadId(hThread);
 	if (tid == 0)
 		return 0;
 	cookie = (struct user_apc_data *)malloc(sizeof(struct user_apc_data));
@@ -402,12 +429,15 @@ libk32_QueueUserAPC2(PAPCFUNC pfnAPC, HANDLE hThread,
 
 INTERN DWORD WINAPI
 libk32_QueueUserAPC(PAPCFUNC pfnAPC, HANDLE hThread, ULONG_PTR dwData) {
+	TRACE("QueueUserAPC(%p, %p, %p)",
+	      pfnAPC, hThread, dwData);
 	return libk32_QueueUserAPC2(pfnAPC, hThread, dwData, QUEUE_USER_APC_FLAGS_NONE);
 }
 
 INTERN DWORD WINAPI
 libk32_SuspendThread(HANDLE hThread) {
 	errno_t error;
+	TRACE("SuspendThread(%p)", hThread);
 	if (!NTHANDLE_ISFD(hThread)) {
 		errno = EBADF;
 		goto err;
@@ -425,6 +455,7 @@ err:
 INTERN DWORD WINAPI
 libk32_ResumeThread(HANDLE hThread) {
 	errno_t error;
+	TRACE("ResumeThread(%p)", hThread);
 	if (!NTHANDLE_ISFD(hThread)) {
 		errno = EBADF;
 		goto err;
@@ -441,6 +472,7 @@ err:
 
 INTERN WINBOOL WINAPI
 libk32_GetThreadContext(HANDLE hThread, LPCONTEXT lpContext) {
+	TRACE("GetThreadContext(%p, %p)", hThread, lpContext);
 	syslog(LOG_WARNING, "[k32] NotImplemented: GetThreadContext(%p, %p)\n",
 	       hThread, lpContext);
 	errno = ENOTSUP;
@@ -449,6 +481,7 @@ libk32_GetThreadContext(HANDLE hThread, LPCONTEXT lpContext) {
 
 INTERN WINBOOL WINAPI
 libk32_SetThreadContext(HANDLE hThread, CONST CONTEXT *lpContext) {
+	TRACE("SetThreadContext(%p, %p)", hThread, lpContext);
 	syslog(LOG_WARNING, "[k32] NotImplemented: SetThreadContext(%p, %p)\n",
 	       hThread, lpContext);
 	errno = ENOTSUP;
@@ -472,9 +505,12 @@ DEFINE_PUBLIC_ALIAS(TlsGetValue, libk32_TlsGetValue);
 DEFINE_PUBLIC_ALIAS(TlsSetValue, libk32_TlsSetValue);
 DEFINE_PUBLIC_ALIAS(TlsFree, libk32_TlsFree);
 
-INTERN DWORD WINAPI libk32_TlsAlloc(VOID) {
+INTERN DWORD WINAPI
+libk32_TlsAlloc(VOID) {
 	pthread_key_t key;
-	errno_t error = pthread_key_create(&key, NULL);
+	errno_t error;
+	TRACE("TlsAlloc()");
+	error = pthread_key_create(&key, NULL);
 	if (error != EOK) {
 		errno = error;
 		key   = TLS_OUT_OF_INDEXES;
@@ -484,12 +520,14 @@ INTERN DWORD WINAPI libk32_TlsAlloc(VOID) {
 
 INTERN LPVOID WINAPI
 libk32_TlsGetValue(DWORD dwTlsIndex) {
+	TRACE("TlsGetValue(%#x)", dwTlsIndex);
 	return pthread_getspecific(dwTlsIndex);
 }
 
 INTERN WINBOOL WINAPI
 libk32_TlsSetValue(DWORD dwTlsIndex, LPVOID lpTlsValue) {
 	errno_t error;
+	TRACE("TlsSetValue(%#x)", dwTlsIndex);
 	error = pthread_setspecific(dwTlsIndex, lpTlsValue);
 	if (error == EOK)
 		return TRUE;
@@ -497,8 +535,10 @@ libk32_TlsSetValue(DWORD dwTlsIndex, LPVOID lpTlsValue) {
 	return FALSE;
 }
 
-INTERN WINBOOL WINAPI libk32_TlsFree(DWORD dwTlsIndex) {
+INTERN WINBOOL WINAPI
+libk32_TlsFree(DWORD dwTlsIndex) {
 	errno_t error;
+	TRACE("TlsFree(%#x)", dwTlsIndex);
 	error = pthread_key_delete(dwTlsIndex);
 	if (error == EOK)
 		return TRUE;

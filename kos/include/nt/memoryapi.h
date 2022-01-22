@@ -71,7 +71,7 @@ WINBASEAPI WINBOOL WINAPI ReadProcessMemory(HANDLE hProcess, LPCVOID lpBaseAddre
 WINBASEAPI WINBOOL WINAPI WriteProcessMemory(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T *lpNumberOfBytesWritten);
 WINBASEAPI WINBOOL WINAPI VirtualLock(LPVOID lpAddress, SIZE_T dwSize);
 WINBASEAPI WINBOOL WINAPI VirtualUnlock(LPVOID lpAddress, SIZE_T dwSize);
-WINBASEAPI WINBOOL WINAPI VirtualUnlockEx(HANDLE hProcess, LPVOID Address, SIZE_T Size);
+WINBASEAPI WINBOOL WINAPI VirtualUnlockEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize);
 
 
 /************************************************************************/

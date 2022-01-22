@@ -45,6 +45,7 @@ DEFINE_PUBLIC_ALIAS(SetHandleInformation, libk32_SetHandleInformation);
 
 INTERN WINBOOL WINAPI
 libk32_CloseHandle(HANDLE hObject) {
+	TRACE("CloseHandle(%p)", hObject);
 	if (!NTHANDLE_ISFD(hObject)) {
 		/* XXX: decref() a user-space wrapper object? */
 		errno = EBADF;
@@ -58,6 +59,10 @@ libk32_DuplicateHandle(HANDLE hSourceProcessHandle, HANDLE hSourceHandle,
                        HANDLE hTargetProcessHandle, LPHANDLE lpTargetHandle,
                        DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwOptions) {
 	fd_t newfd;
+	TRACE("DuplicateHandle(%p, %p, %p, %p, %#x, %u, %#x)",
+	      hSourceProcessHandle, hSourceHandle,
+	      hTargetProcessHandle, lpTargetHandle,
+	      dwDesiredAccess, bInheritHandle, dwOptions);
 	if (hTargetProcessHandle != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
 		errno = EACCES;
 		return FALSE;
@@ -87,6 +92,8 @@ INTERN WINBOOL WINAPI
 libk32_CompareObjectHandles(HANDLE hFirstObjectHandle, HANDLE hSecondObjectHandle) {
 	errno_t error;
 	pid_t pid;
+	TRACE("CompareObjectHandles(%p, %p)",
+	      hFirstObjectHandle, hSecondObjectHandle);
 	if (hFirstObjectHandle == hSecondObjectHandle)
 		return TRUE;
 	if (!NTHANDLE_ISFD(hFirstObjectHandle) ||
@@ -106,6 +113,7 @@ libk32_CompareObjectHandles(HANDLE hFirstObjectHandle, HANDLE hSecondObjectHandl
 INTERN WINBOOL WINAPI
 libk32_GetHandleInformation(HANDLE hObject, LPDWORD lpdwFlags) {
 	int flags;
+	TRACE("GetHandleInformation(%p, %p)", hObject, lpdwFlags);
 	if (!NTHANDLE_ISFD(hObject)) {
 		*lpdwFlags = 0;
 		return TRUE;
@@ -120,6 +128,7 @@ libk32_GetHandleInformation(HANDLE hObject, LPDWORD lpdwFlags) {
 INTERN WINBOOL WINAPI
 libk32_SetHandleInformation(HANDLE hObject, DWORD dwMask, DWORD dwFlags) {
 	int flags, new_flags;
+	TRACE("SetHandleInformation(%p, %#x, %#x)", hObject, dwMask, dwFlags);
 	if (!(dwMask & HANDLE_FLAG_INHERIT))
 		return TRUE;
 	if (!NTHANDLE_ISFD(hObject)) {

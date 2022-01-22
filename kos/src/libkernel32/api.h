@@ -61,5 +61,15 @@ __LIBC __errno_t *NOTHROW(LIBCCALL __nterrno_location)(void);
 DECL_END
 #endif /* __CC__ */
 
+#if 1
+#include <syslog.h>
+#define TRACE(format, ...) \
+	syslog(LOG_DEBUG, "[k32] " format "\n", ##__VA_ARGS__)
+#endif
+
+#ifndef TRACE
+#define TRACE(...) (void)0
+#endif /* !TRACE */
+
 
 #endif /* !GUARD_LIBKERNEL32_API_H */

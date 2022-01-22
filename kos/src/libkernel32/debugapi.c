@@ -42,18 +42,22 @@ DEFINE_PUBLIC_ALIAS(IsDebuggerPresent, libk32_IsDebuggerPresent);
 DEFINE_PUBLIC_ALIAS(OutputDebugStringA, libk32_OutputDebugStringA);
 DEFINE_PUBLIC_ALIAS(OutputDebugStringW, libk32_OutputDebugStringW);
 
-INTERN VOID WINAPI libk32_DebugBreak(VOID) {
+INTERN VOID WINAPI
+libk32_DebugBreak(VOID) {
+	TRACE("DebugBreak()");
 	__int3();
 }
 
 INTERN WINBOOL WINAPI
 libk32_IsDebuggerPresent(VOID) {
+	TRACE("IsDebuggerPresent()");
 	COMPILER_IMPURE();
 	return TRUE;
 }
 
 INTERN VOID WINAPI
 libk32_OutputDebugStringA(LPCSTR lpOutputString) {
+//	TRACE("OutputDebugStringA(%q)", lpOutputString);
 	syslog_printer(SYSLOG_PRINTER_CLOSURE(LOG_DEBUG),
 	               lpOutputString,
 	               strlen(lpOutputString));
@@ -64,6 +68,7 @@ PRIVATE struct format_16to8_data libk32_OutputDebugStringW_printer = {
 };
 INTERN VOID WINAPI
 libk32_OutputDebugStringW(LPCWSTR lpOutputString) {
+//	TRACE("OutputDebugStringW(%I16q)", lpOutputString);
 	if (libk32_OutputDebugStringW_printer.fd_printer == NULL)
 		libk32_OutputDebugStringW_printer.fd_printer = &syslog_printer;
 	format_16to8(&libk32_OutputDebugStringW_printer, lpOutputString, c16len(lpOutputString));

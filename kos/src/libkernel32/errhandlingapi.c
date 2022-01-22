@@ -36,13 +36,15 @@ DEFINE_PUBLIC_ALIAS(SetUnhandledExceptionFilter, libk32_SetUnhandledExceptionFil
 DEFINE_PUBLIC_ALIAS(UnhandledExceptionFilter, libk32_UnhandledExceptionFilter);
 INTERN LPTOP_LEVEL_EXCEPTION_FILTER WINAPI
 libk32_SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter) {
-	syslog(LOG_WARNING, "NotImplemented: SetUnhandledExceptionFilter(%p)\n", lpTopLevelExceptionFilter);
+	TRACE("SetUnhandledExceptionFilter(%p)", lpTopLevelExceptionFilter);
+	syslog(LOG_WARNING, "[k32] NotImplemented: SetUnhandledExceptionFilter(%p)\n", lpTopLevelExceptionFilter);
 	return NULL;
 }
 
 INTERN LONG WINAPI
-libk32_UnhandledExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo) {
-	syslog(LOG_WARNING, "NotImplemented: UnhandledExceptionFilter(%p)\n", ExceptionInfo);
+libk32_UnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInfo) {
+	TRACE("UnhandledExceptionFilter(%p)", pExceptionInfo);
+	syslog(LOG_WARNING, "[k32] NotImplemented: UnhandledExceptionFilter(%p)\n", pExceptionInfo);
 	return 0;
 }
 
@@ -55,11 +57,15 @@ __LIBC NOBLOCK syscall_slong_t NOTHROW(LIBDCALL __set_nterrno)(/*nt*/ errno_t va
 DEFINE_PUBLIC_ALIAS(GetLastError, libk32_GetLastError);
 DEFINE_PUBLIC_ALIAS(SetLastError, libk32_SetLastError);
 DEFINE_PUBLIC_ALIAS(RestoreLastError, libk32_SetLastError);
-INTERN DWORD WINAPI libk32_GetLastError(VOID) {
+INTERN DWORD WINAPI
+libk32_GetLastError(VOID) {
+	TRACE("GetLastError()");
 	return __get_nterrno();
 }
 
-INTERN VOID WINAPI libk32_SetLastError(DWORD dwErrCode) {
+INTERN VOID WINAPI
+libk32_SetLastError(DWORD dwErrCode) {
+	TRACE("SetLastError(%#x)", dwErrCode);
 	__set_nterrno((errno_t)dwErrCode);
 }
 
@@ -70,7 +76,9 @@ DEFINE_PUBLIC_ALIAS(SetErrorMode, libk32_SetErrorMode);
 DEFINE_PUBLIC_ALIAS(SetThreadErrorMode, libk32_SetThreadErrorMode);
 DEFINE_PUBLIC_ALIAS(RaiseException, libk32_RaiseException);
 
-INTERN UINT WINAPI libk32_GetErrorMode(VOID) {
+INTERN UINT WINAPI
+libk32_GetErrorMode(VOID) {
+	TRACE("GetErrorMode()");
 	COMPILER_IMPURE();
 	return SEM_FAILCRITICALERRORS |
 	       SEM_NOGPFAULTERRORBOX |
@@ -78,7 +86,9 @@ INTERN UINT WINAPI libk32_GetErrorMode(VOID) {
 	       SEM_NOOPENFILEERRORBOX;
 }
 
-INTERN UINT WINAPI libk32_SetErrorMode(UINT uMode) {
+INTERN UINT WINAPI
+libk32_SetErrorMode(UINT uMode) {
+	TRACE("SetErrorMode(%#x)", uMode);
 	COMPILER_IMPURE();
 	(void)uMode;
 	return libk32_GetErrorMode();
@@ -86,12 +96,15 @@ INTERN UINT WINAPI libk32_SetErrorMode(UINT uMode) {
 
 INTERN DWORD WINAPI
 libk32_GetThreadErrorMode(VOID) {
+	TRACE("GetThreadErrorMode()");
 	return libk32_GetErrorMode();
 }
 
 INTERN WINBOOL WINAPI
 libk32_SetThreadErrorMode(DWORD dwNewMode, LPDWORD lpOldMode) {
-	DWORD mode = libk32_GetThreadErrorMode();
+	DWORD mode;
+	TRACE("SetThreadErrorMode(%#x, %p)", dwNewMode, lpOldMode);
+	mode = libk32_GetThreadErrorMode();
 	if (dwNewMode != mode) {
 		errno = EINVAL;
 		return FALSE;
@@ -105,7 +118,10 @@ libk32_SetThreadErrorMode(DWORD dwNewMode, LPDWORD lpOldMode) {
 INTERN VOID WINAPI
 libk32_RaiseException(DWORD dwExceptionCode, DWORD dwExceptionFlags,
                       DWORD nNumberOfArguments, CONST ULONG_PTR *lpArguments) {
-	syslog(LOG_WARNING, "NotImplemented: RaiseException(%#x, %#x, %u, %p)\n",
+	TRACE("RaiseException(%#x, %#x, %u, %p)",
+	      dwExceptionCode, dwExceptionFlags,
+	      nNumberOfArguments, lpArguments);
+	syslog(LOG_WARNING, "[k32] NotImplemented: RaiseException(%#x, %#x, %u, %p)\n",
 	       dwExceptionCode, dwExceptionFlags,
 	       nNumberOfArguments, lpArguments);
 }

@@ -60,6 +60,7 @@ DEFINE_PUBLIC_ALIAS(FreeLibraryAndExitThread, libk32_FreeLibraryAndExitThread);
 
 INTERN HMODULE WINAPI
 libk32_LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
+	TRACE("LoadLibraryExA(%q, %p, %#x)", lpLibFileName, hFile, dwFlags);
 	(void)dwFlags;
 	if (lpLibFileName == NULL)
 		return (HMODULE)fdlopen(NTHANDLE_ASFD(hFile), RTLD_LAZY | RTLD_GLOBAL);
@@ -70,6 +71,7 @@ INTERN HMODULE WINAPI
 libk32_LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
 	char *utf8;
 	HMODULE result;
+	TRACE("LoadLibraryExW(%I16q, %p, %#x)", lpLibFileName, hFile, dwFlags);
 	(void)dwFlags;
 	if (lpLibFileName == NULL)
 		return (HMODULE)fdlopen(NTHANDLE_ASFD(hFile), RTLD_LAZY | RTLD_GLOBAL);
@@ -84,6 +86,7 @@ libk32_LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
 INTERN WINBOOL WINAPI
 libk32_GetModuleHandleExA(DWORD dwFlags, LPCSTR lpModuleName, HMODULE *phModule) {
 	unsigned int dlflags = 0;
+	TRACE("GetModuleHandleExA(%#x, %q, %p)", dwFlags, lpModuleName, phModule);
 	if (!(dwFlags & GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT))
 		dlflags |= DLGETHANDLE_FINCREF;
 	if (dwFlags & GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS)
@@ -95,6 +98,7 @@ INTERN WINBOOL WINAPI
 libk32_GetModuleHandleExW(DWORD dwFlags, LPCWSTR lpModuleName, HMODULE *phModule) {
 	WINBOOL result;
 	char *utf8;
+	TRACE("GetModuleHandleExW(%#x, %I16q, %p)", dwFlags, lpModuleName, phModule);
 	if (dwFlags & GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS)
 		return GetModuleHandleExA(dwFlags, (LPCSTR)lpModuleName, phModule);
 	utf8 = convert_c16tombs(lpModuleName);
@@ -107,13 +111,16 @@ libk32_GetModuleHandleExW(DWORD dwFlags, LPCWSTR lpModuleName, HMODULE *phModule
 
 INTERN HMODULE WINAPI
 libk32_GetModuleHandleA(LPCSTR lpModuleName) {
+	TRACE("GetModuleHandleA(%q)", lpModuleName);
 	return (HMODULE)dlgetmodule(lpModuleName, DLGETHANDLE_FNOCASE);
 }
 
 INTERN HMODULE WINAPI
 libk32_GetModuleHandleW(LPCWSTR lpModuleName) {
 	HMODULE result;
-	char *utf8 = convert_c16tombs(lpModuleName);
+	char *utf8;
+	TRACE("GetModuleHandleW(%I16q)", lpModuleName);
+	utf8 = convert_c16tombs(lpModuleName);
 	if unlikely(!utf8)
 		return NULL;
 	result = libk32_GetModuleHandleA(utf8);
@@ -123,22 +130,26 @@ libk32_GetModuleHandleW(LPCWSTR lpModuleName) {
 
 INTERN HMODULE WINAPI
 libk32_LoadLibraryA(LPCSTR lpLibFileName) {
+	TRACE("LoadLibraryA(%q)", lpLibFileName);
 	return LoadLibraryExA(lpLibFileName, NULL, 0);
 }
 
 INTERN HMODULE WINAPI
 libk32_LoadLibraryW(LPCWSTR lpLibFileName) {
+	TRACE("LoadLibraryW(%I16q)", lpLibFileName);
 	return LoadLibraryExW(lpLibFileName, NULL, 0);
 }
 
 INTERN WINBOOL WINAPI
 libk32_FreeLibrary(HMODULE hLibModule) {
+	TRACE("FreeLibrary(%p)", hLibModule);
 	return dlclose(hLibModule) == 0;
 }
 
 INTDEF DECLSPEC_NORETURN VOID WINAPI libk32_ExitThread(DWORD dwExitCode);
 INTERN DECLSPEC_NORETURN VOID WINAPI
 libk32_FreeLibraryAndExitThread(HMODULE hLibModule, DWORD dwExitCode) {
+	TRACE("FreeLibraryAndExitThread(%p, %#x)", hLibModule, dwExitCode);
 	dlclose(hLibModule);
 	libk32_ExitThread(dwExitCode);
 }
@@ -149,6 +160,7 @@ INTERN DWORD WINAPI
 libk32_GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize) {
 	char const *modname;
 	size_t len;
+	TRACE("GetModuleFileNameA(%p, %p, %#x)", hModule, lpFilename, nSize);
 	modname = dlmodulename(hModule);
 	if (!modname)
 		return 0;
@@ -166,6 +178,9 @@ libk32_GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize) {
 	char const *modname;
 	char16_t *wmodname;
 	size_t len;
+	TRACE("GetModuleFileNameW(%p, %p, %#x)", hModule, lpFilename, nSize);
+	if (!hModule)
+		hModule = (HMODULE)dlopen(NULL, 0);
 	modname = dlmodulename(hModule);
 	if (!modname)
 		return 0;

@@ -92,6 +92,9 @@ libk32_FormatMessageA(DWORD dwFlags, LPCVOID lpSource, DWORD dwMessageId,
                       DWORD dwLanguageId, LPSTR lpBuffer, DWORD nSize, __NT_VA_LIST *Arguments) {
 	char *msg;
 	DWORD len;
+	TRACE("FormatMessageA(%#x, %p, %#x, %#x, %p, %#x, %p)",
+	      dwFlags, lpSource, dwMessageId,
+	      dwLanguageId, lpBuffer, nSize, Arguments);
 	msg = libk32_MakeMessageA(dwFlags, lpSource, dwMessageId, dwLanguageId, Arguments);
 	if (!msg)
 		return 0;
@@ -124,6 +127,9 @@ libk32_FormatMessageW(DWORD dwFlags, LPCVOID lpSource, DWORD dwMessageId,
                       __NT_VA_LIST *Arguments) {
 	char16_t *msg;
 	DWORD len;
+	TRACE("FormatMessageW(%#x, %p, %#x, %#x, %p, %#x, %p)",
+	      dwFlags, lpSource, dwMessageId,
+	      dwLanguageId, lpBuffer, nSize, Arguments);
 	msg = libk32_MakeMessageW(dwFlags, lpSource, dwMessageId, dwLanguageId, Arguments);
 	if (!msg)
 		return 0;

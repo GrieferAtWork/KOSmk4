@@ -113,22 +113,28 @@ DEFINE_PUBLIC_ALIAS(MultiByteToWideChar, libk32_MultiByteToWideChar);
 DEFINE_PUBLIC_ALIAS(WideCharToMultiByte, libk32_WideCharToMultiByte);
 
 INTERN int WINAPI
-libk32_MultiByteToWideChar(UINT CodePage, DWORD dwFlags,
+libk32_MultiByteToWideChar(UINT uCodePage, DWORD dwFlags,
                            LPCCH lpMultiByteStr, int cbMultiByte,
                            LPWSTR lpWideCharStr, int cchWideChar) {
+	TRACE("MultiByteToWideChar(%u, %#x, %q, %d, %p, %d)",
+	      uCodePage, dwFlags, lpMultiByteStr,
+	      cbMultiByte, lpWideCharStr, cchWideChar);
 	syslog(LOG_WARNING, "NotImplemented: MultiByteToWideChar(%u, %#x, %q, %d, %p, %d)\n",
-	       CodePage, dwFlags, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
+	       uCodePage, dwFlags, lpMultiByteStr, cbMultiByte, lpWideCharStr, cchWideChar);
 	/* TODO */
 	return 0;
 }
 
 INTERN int WINAPI
-libk32_WideCharToMultiByte(UINT CodePage, DWORD dwFlags,
+libk32_WideCharToMultiByte(UINT uCodePage, DWORD dwFlags,
                            LPCWCH lpWideCharStr, int cchWideChar,
                            LPSTR lpMultiByteStr, int cbMultiByte,
                            LPCCH lpDefaultChar, LPBOOL lpUsedDefaultChar) {
+	TRACE("WideCharToMultiByte(%u, %#x, %I16q, %d, %p, %d, %p, %p)",
+	      uCodePage, dwFlags, lpWideCharStr, cchWideChar,
+	      lpMultiByteStr, cbMultiByte, lpDefaultChar, lpUsedDefaultChar);
 	syslog(LOG_WARNING, "NotImplemented: WideCharToMultiByte(%u, %#x, %I16q, %d, %p, %d, %p, %p)\n",
-	       CodePage, dwFlags, lpWideCharStr, cchWideChar,
+	       uCodePage, dwFlags, lpWideCharStr, cchWideChar,
 	       lpMultiByteStr, cbMultiByte, lpDefaultChar, lpUsedDefaultChar);
 	/* TODO */
 	return 0;

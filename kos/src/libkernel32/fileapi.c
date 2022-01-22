@@ -109,6 +109,7 @@ INTERN WINBOOL WINAPI
 libk32_FindNextFileA(HANDLE hFindFile, LPWIN32_FIND_DATAA lpFindFileData) {
 	struct dirent *ent;
 	struct stat64 st;
+	TRACE("FindNextFileA(%p, %p)", hFindFile, lpFindFileData);
 	ent = __find_readdir((struct dfind *)hFindFile);
 	if (!ent) {
 		_nterrno = ERROR_NO_MORE_FILES;
@@ -137,6 +138,7 @@ libk32_FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData) {
 	struct dirent *ent;
 	struct stat64 st;
 	char16_t *wname;
+	TRACE("FindNextFileW(%p, %p)", hFindFile, lpFindFileData);
 	ent = __find_readdir((struct dfind *)hFindFile);
 	if (!ent) {
 		_nterrno = ERROR_NO_MORE_FILES;
@@ -167,13 +169,16 @@ libk32_FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData) {
 
 INTERN WINBOOL WINAPI
 libk32_FindClose(HANDLE hFindFile) {
+	TRACE("FindClose(%p)", hFindFile);
 	return __find_close((struct dfind *)hFindFile) == 0;
 }
 
 
 INTERN HANDLE WINAPI
 libk32_FindFirstFileA(LPCSTR lpFileName, LPWIN32_FIND_DATAA lpFindFileData) {
-	struct dfind *find = __find_open(lpFileName, O_DOSPATH);
+	struct dfind *find;
+	TRACE("FindFirstFileA(%q, %p)", lpFileName, lpFindFileData);
+	find = __find_open(lpFileName, O_DOSPATH);
 	if (find != DFIND_INVALID) {
 		if (!libk32_FindNextFileA((HANDLE)find, lpFindFileData)) {
 			if (_nterrno == ERROR_NO_MORE_FILES)
@@ -189,6 +194,7 @@ INTERN HANDLE WINAPI
 libk32_FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData) {
 	struct dfind *find;
 	char *utf8;
+	TRACE("FindFirstFileW(%I16q, %p)", lpFileName, lpFindFileData);
 	utf8 = convert_c16tombs(lpFileName);
 	if (!utf8)
 		return INVALID_HANDLE_VALUE;
@@ -208,6 +214,7 @@ libk32_FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData) {
 
 INTERN DWORD WINAPI
 libk32_GetLogicalDrives(VOID) {
+	TRACE("GetLogicalDrives()");
 	return _getdrives();
 }
 
@@ -215,7 +222,9 @@ libk32_GetLogicalDrives(VOID) {
 INTERN DWORD WINAPI
 libk32_GetLogicalDriveStringsA(DWORD nBufferLength, LPSTR lpBuffer) {
 	DWORD result;
-	DWORD mask = libk32_GetLogicalDrives();
+	DWORD mask;
+	TRACE("GetLogicalDriveStringsA(%#x, %p)", nBufferLength, lpBuffer);
+	mask = libk32_GetLogicalDrives();
 	char buf[MAX_LOGICAL_DRIVE_STRINGS], *iter = buf;
 	unsigned char letter;
 	for (letter = 'A'; letter <= 'Z'; ++letter, mask >>= 1) {
@@ -237,7 +246,9 @@ libk32_GetLogicalDriveStringsA(DWORD nBufferLength, LPSTR lpBuffer) {
 INTERN DWORD WINAPI
 libk32_GetLogicalDriveStringsW(DWORD nBufferLength, LPWSTR lpBuffer) {
 	DWORD result;
-	DWORD mask = libk32_GetLogicalDrives();
+	DWORD mask;
+	TRACE("GetLogicalDriveStringsW(%#x, %p)", nBufferLength, lpBuffer);
+	mask = libk32_GetLogicalDrives();
 	char buf[MAX_LOGICAL_DRIVE_STRINGS], *iter = buf;
 	unsigned char letter;
 	for (letter = 'A'; letter <= 'Z'; ++letter, mask >>= 1) {
@@ -280,7 +291,9 @@ INTERN DWORD WINAPI
 libk32_GetFullPathNameA(LPCSTR lpFileName, DWORD nBufferLength,
                         LPSTR lpBuffer, LPSTR *lpFilePart) {
 	DWORD len;
-	char *rp = DOS$realpath(lpFileName, NULL);
+	char *rp;
+	TRACE("GetFullPathNameA(%q, %#x, %p, %p)", lpFileName, nBufferLength, lpBuffer, lpFilePart);
+	rp = DOS$realpath(lpFileName, NULL);
 	if (!rp)
 		return 0;
 	len = (DWORD)(strlen(rp) + 1);
@@ -300,6 +313,7 @@ libk32_GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength,
 	DWORD len;
 	char *utf8_path, *rp;
 	char16_t *wrp;
+	TRACE("GetFullPathNameW(%I16q, %#x, %p, %p)", lpFileName, nBufferLength, lpBuffer, lpFilePart);
 	utf8_path = convert_c16tombs(lpFileName);
 	if (!utf8_path)
 		return 0;
@@ -331,33 +345,39 @@ __LIBC NONNULL((1)) int LIBDCALL DOS$_wrmdir(char16_t const *path);
 
 INTERN WINBOOL WINAPI
 libk32_CreateDirectoryA(LPCSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes) {
+	TRACE("CreateDirectoryA(%q, %p)", lpPathName, lpSecurityAttributes);
 	(void)lpSecurityAttributes;
 	return DOS$_mkdir(lpPathName) == 0;
 }
 
 INTERN WINBOOL WINAPI
 libk32_CreateDirectoryW(LPCWSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes) {
+	TRACE("CreateDirectoryW(%I16q, %p)", lpPathName, lpSecurityAttributes);
 	(void)lpSecurityAttributes;
 	return DOS$_wmkdir(lpPathName) == 0;
 }
 
 INTERN WINBOOL WINAPI
 libk32_DeleteFileA(LPCSTR lpFileName) {
+	TRACE("DeleteFileA(%q)", lpFileName);
 	return DOS$_unlink(lpFileName) == 0;
 }
 
 INTERN WINBOOL WINAPI
 libk32_DeleteFileW(LPCWSTR lpFileName) {
+	TRACE("DeleteFileW(%I16q)", lpFileName);
 	return DOS$_wunlink(lpFileName) == 0;
 }
 
 INTERN WINBOOL WINAPI
 libk32_RemoveDirectoryA(LPCSTR lpPathName) {
+	TRACE("RemoveDirectoryA(%q)", lpPathName);
 	return DOS$_rmdir(lpPathName) == 0;
 }
 
 INTERN WINBOOL WINAPI
 libk32_RemoveDirectoryW(LPCWSTR lpPathName) {
+	TRACE("RemoveDirectoryW(%I16q)", lpPathName);
 	return DOS$_wrmdir(lpPathName) == 0;
 }
 
@@ -386,6 +406,10 @@ libk32_CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
 	fd_t fd;
 	oflag_t oflags = 0;
 	mode_t mode    = 0644;
+	TRACE("CreateFileA(%q, %#x, %#x, %p, %#x, %#x, %p)",
+	      lpFileName, dwDesiredAccess, dwShareMode,
+	      lpSecurityAttributes, dwCreationDisposition,
+	      dwFlagsAndAttributes, hTemplateFile);
 	(void)dwShareMode;
 	(void)lpSecurityAttributes;
 	(void)hTemplateFile;
@@ -440,6 +464,10 @@ libk32_CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
                    DWORD dwFlagsAndAttributes, HANDLE hTemplateFile) {
 	char *utf8;
 	HANDLE result;
+	TRACE("CreateFileW(%I16q, %#x, %#x, %p, %#x, %#x, %p)",
+	      lpFileName, dwDesiredAccess, dwShareMode,
+	      lpSecurityAttributes, dwCreationDisposition,
+	      dwFlagsAndAttributes, hTemplateFile);
 	utf8 = convert_c16tombs(lpFileName);
 	if (!utf8)
 		return INVALID_HANDLE_VALUE;
@@ -455,6 +483,9 @@ libk32_CreateFile2(LPCWSTR lpFileName, DWORD dwDesiredAccess,
                    DWORD dwShareMode, DWORD dwCreationDisposition,
                    LPCREATEFILE2_EXTENDED_PARAMETERS pCreateExParams) {
 	HANDLE result;
+	TRACE("CreateFile2(%I16q, %#x, %#x, %#x, %p)",
+	      lpFileName, dwDesiredAccess, dwShareMode,
+	      dwCreationDisposition, pCreateExParams);
 	if (pCreateExParams && pCreateExParams->dwSize != sizeof(*pCreateExParams)) {
 		errno = EINVAL;
 		return INVALID_HANDLE_VALUE;
@@ -477,6 +508,9 @@ INTERN DWORD WINAPI
 libk32_SetFilePointer(HANDLE hFile, LONG lDistanceToMove,
                       PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod) {
 	off64_t newpos;
+	TRACE("SetFilePointer(%p, %d, %p, %#x)",
+	      hFile, lDistanceToMove,
+	      lpDistanceToMoveHigh, dwMoveMethod);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return INVALID_SET_FILE_POINTER;
@@ -502,6 +536,9 @@ INTERN WINBOOL WINAPI
 libk32_SetFilePointerEx(HANDLE hFile, LARGE_INTEGER liDistanceToMove,
                         PLARGE_INTEGER lpNewFilePointer, DWORD dwMoveMethod) {
 	off64_t newpos;
+	TRACE("SetFilePointerEx(%p, %I64d, %p, %#x)",
+	      hFile, liDistanceToMove.QuadPart,
+	      lpNewFilePointer, dwMoveMethod);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -517,6 +554,9 @@ INTERN WINBOOL WINAPI
 libk32_ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
                 LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped) {
 	ssize_t total;
+	TRACE("ReadFile(%p, %p, %#x, %p, %p)",
+	      hFile, lpBuffer, nNumberOfBytesToRead,
+	      lpNumberOfBytesRead, lpOverlapped);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -538,6 +578,9 @@ INTERN WINBOOL WINAPI
 libk32_WriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
                  LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped) {
 	ssize_t total;
+	TRACE("WriteFile(%p, %p, %#x, %p, %p)",
+	      hFile, lpBuffer, nNumberOfBytesToWrite,
+	      lpNumberOfBytesWritten, lpOverlapped);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -562,6 +605,8 @@ libk32_GetFinalPathNameByHandleA(HANDLE hFile, LPSTR lpszFilePath,
                                  DWORD cchFilePath, DWORD dwFlags) {
 	char *path;
 	DWORD len;
+	TRACE("GetFinalPathNameByHandleA(%p, %p, %#x, %#x)",
+	      hFile, lpszFilePath, cchFilePath, dwFlags);
 	(void)dwFlags;
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
@@ -583,6 +628,8 @@ libk32_GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath,
 	char *path;
 	char16_t *wpath;
 	DWORD len;
+	TRACE("GetFinalPathNameByHandleW(%p, %p, %#x, %#x)",
+	      hFile, lpszFilePath, cchFilePath, dwFlags);
 	(void)dwFlags;
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
@@ -602,6 +649,7 @@ libk32_GetFinalPathNameByHandleW(HANDLE hFile, LPWSTR lpszFilePath,
 
 INTERN WINBOOL WINAPI
 libk32_FlushFileBuffers(HANDLE hFile) {
+	TRACE("FlushFileBuffers(%p)", hFile);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -612,6 +660,7 @@ libk32_FlushFileBuffers(HANDLE hFile) {
 INTERN WINBOOL WINAPI
 libk32_SetEndOfFile(HANDLE hFile) {
 	off64_t offset;
+	TRACE("SetEndOfFile(%p)", hFile);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -653,6 +702,7 @@ __LIBC NONNULL((2)) int LIBDCALL DOS$klstat64(char const *__restrict filename, s
 INTERN DWORD WINAPI
 libk32_GetFileAttributesA(LPCSTR lpFileName) {
 	struct stat64 st;
+	TRACE("GetFileAttributesA(%q)", lpFileName);
 	if (DOS$klstat64(lpFileName, &st) != 0)
 		return INVALID_FILE_ATTRIBUTES;
 	return libk32_FileAttributesFromStat(&st);
@@ -661,7 +711,9 @@ libk32_GetFileAttributesA(LPCSTR lpFileName) {
 INTERN DWORD WINAPI
 libk32_GetFileAttributesW(LPCWSTR lpFileName) {
 	DWORD result;
-	char *utf8 = convert_c16tombs(lpFileName);
+	char *utf8;
+	TRACE("GetFileAttributesW(%I16q)", lpFileName);
+	utf8 = convert_c16tombs(lpFileName);
 	if (!utf8)
 		return INVALID_FILE_ATTRIBUTES;
 	result = libk32_GetFileAttributesA(utf8);
@@ -673,6 +725,8 @@ INTERN WINBOOL WINAPI
 libk32_GetFileAttributesExA(LPCSTR lpFileName,
                             GET_FILEEX_INFO_LEVELS fInfoLevelId,
                             LPVOID lpFileInformation) {
+	TRACE("GetFileAttributesExA(%q, %u, %p)",
+	      lpFileName, fInfoLevelId, lpFileInformation);
 	switch (fInfoLevelId) {
 
 	case GetFileExInfoStandard: {
@@ -701,7 +755,10 @@ libk32_GetFileAttributesExW(LPCWSTR lpFileName,
                             GET_FILEEX_INFO_LEVELS fInfoLevelId,
                             LPVOID lpFileInformation) {
 	WINBOOL result;
-	char *utf8 = convert_c16tombs(lpFileName);
+	char *utf8;
+	TRACE("GetFileAttributesExW(%I16q, %u, %p)",
+	      lpFileName, fInfoLevelId, lpFileInformation);
+	utf8 = convert_c16tombs(lpFileName);
 	if (!utf8)
 		return INVALID_FILE_ATTRIBUTES;
 	result = libk32_GetFileAttributesExA(utf8, fInfoLevelId, lpFileInformation);
@@ -715,6 +772,8 @@ INTERN WINBOOL WINAPI
 libk32_SetFileAttributesA(LPCSTR lpFileName, DWORD dwFileAttributes) {
 	struct stat64 st;
 	mode_t newmode;
+	TRACE("SetFileAttributesA(%q, %#x)",
+	      lpFileName, dwFileAttributes);
 	if (DOS$klstat64(lpFileName, &st) != 0)
 		return FALSE;
 	newmode = st.st_mode;
@@ -731,7 +790,10 @@ libk32_SetFileAttributesA(LPCSTR lpFileName, DWORD dwFileAttributes) {
 INTERN WINBOOL WINAPI
 libk32_SetFileAttributesW(LPCWSTR lpFileName, DWORD dwFileAttributes) {
 	WINBOOL result;
-	char *utf8 = convert_c16tombs(lpFileName);
+	char *utf8;
+	TRACE("SetFileAttributesW(%I16q, %#x)",
+	      lpFileName, dwFileAttributes);
+	utf8 = convert_c16tombs(lpFileName);
 	if (!utf8)
 		return INVALID_FILE_ATTRIBUTES;
 	result = libk32_SetFileAttributesA(utf8, dwFileAttributes);
@@ -742,6 +804,8 @@ libk32_SetFileAttributesW(LPCWSTR lpFileName, DWORD dwFileAttributes) {
 INTERN WINBOOL WINAPI
 libk32_GetFileInformationByHandle(HANDLE hFile, LPBY_HANDLE_FILE_INFORMATION lpFileInformation) {
 	struct stat64 st;
+	TRACE("GetFileInformationByHandle(%p, %p)",
+	      hFile, lpFileInformation);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -764,8 +828,10 @@ libk32_GetFileInformationByHandle(HANDLE hFile, LPBY_HANDLE_FILE_INFORMATION lpF
 INTERN LONG WINAPI
 libk32_CompareFileTime(CONST FILETIME *lpFileTime1,
                        CONST FILETIME *lpFileTime2) {
-	uint64_t lhs = ((uint64_t)lpFileTime1->dwLowDateTime | (uint64_t)lpFileTime1->dwHighDateTime << 32);
-	uint64_t rhs = ((uint64_t)lpFileTime2->dwLowDateTime | (uint64_t)lpFileTime2->dwHighDateTime << 32);
+	uint64_t lhs, rhs;
+	TRACE("CompareFileTime(%p, %p)", lpFileTime1, lpFileTime2);
+	lhs = ((uint64_t)lpFileTime1->dwLowDateTime | (uint64_t)lpFileTime1->dwHighDateTime << 32);
+	rhs = ((uint64_t)lpFileTime2->dwLowDateTime | (uint64_t)lpFileTime2->dwHighDateTime << 32);
 	if (lhs < rhs)
 		return -1;
 	if (lhs > rhs)
@@ -776,6 +842,7 @@ libk32_CompareFileTime(CONST FILETIME *lpFileTime1,
 INTERN DWORD WINAPI
 libk32_GetFileSize(HANDLE hFile, LPDWORD lpFileSizeHigh) {
 	struct stat64 st;
+	TRACE("GetFileSize(%p, %p)", hFile, lpFileSizeHigh);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return INVALID_FILE_SIZE;
@@ -790,6 +857,7 @@ libk32_GetFileSize(HANDLE hFile, LPDWORD lpFileSizeHigh) {
 INTERN WINBOOL WINAPI
 libk32_GetFileSizeEx(HANDLE hFile, PLARGE_INTEGER lpFileSize) {
 	struct stat64 st;
+	TRACE("GetFileSizeEx(%p, %p)", hFile, lpFileSize);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -806,6 +874,9 @@ libk32_GetFileTime(HANDLE hFile,
                    LPFILETIME lpLastAccessTime,
                    LPFILETIME lpLastWriteTime) {
 	struct stat64 st;
+	TRACE("GetFileTime(%p, %p, %p, %p)",
+	      hFile, lpCreationTime,
+	      lpLastAccessTime, lpLastWriteTime);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -828,6 +899,9 @@ libk32_SetFileTime(HANDLE hFile,
                    CONST FILETIME *lpLastWriteTime) {
 	struct timespec ts[3];
 	atflag_t flags = AT_EMPTY_PATH;
+	TRACE("SetFileTime(%p, %p, %p, %p)",
+	      hFile, lpCreationTime,
+	      lpLastAccessTime, lpLastWriteTime);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FALSE;
@@ -848,6 +922,7 @@ libk32_SetFileTime(HANDLE hFile,
 INTERN DWORD WINAPI
 libk32_GetFileType(HANDLE hFile) {
 	struct stat64 st;
+	TRACE("GetFileType(%p)", hFile);
 	if (!NTHANDLE_ISFD(hFile)) {
 		errno = EBADF;
 		return FILE_TYPE_UNKNOWN;
@@ -866,6 +941,7 @@ libk32_GetFileType(HANDLE hFile) {
 INTERN WINBOOL WINAPI
 libk32_FileTimeToLocalFileTime(CONST FILETIME *lpFileTime,
                                LPFILETIME lpLocalFileTime) {
+	TRACE("FileTimeToLocalFileTime(%p, %p)", lpFileTime, lpLocalFileTime);
 	*lpLocalFileTime = *lpFileTime;
 	return TRUE;
 }
@@ -873,6 +949,7 @@ libk32_FileTimeToLocalFileTime(CONST FILETIME *lpFileTime,
 INTERN WINBOOL WINAPI
 libk32_LocalFileTimeToFileTime(CONST FILETIME *lpLocalFileTime,
                                LPFILETIME lpFileTime) {
+	TRACE("LocalFileTimeToFileTime(%p, %p)", lpLocalFileTime, lpFileTime);
 	*lpFileTime = *lpLocalFileTime;
 	return TRUE;
 }

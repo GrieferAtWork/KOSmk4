@@ -61,6 +61,7 @@ DEFINE_PUBLIC_ALIAS(InitializeCriticalSection, libk32_InitializeCriticalSection)
 
 INTERN WINBOOL WINAPI
 libk32_TryEnterCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
+	TRACE("TryEnterCriticalSection(%p)", lpCriticalSection);
 	if (ATOMIC_CMPXCH(lpCriticalSection->LockSemaphore, 0, 1)) {
 		/* Initial lock. */
 		lpCriticalSection->OwningThread = pthread_self();
@@ -80,6 +81,7 @@ libk32_TryEnterCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 INTERN VOID WINAPI
 libk32_EnterCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 	ULONG_PTR spin;
+	TRACE("EnterCriticalSection(%p)", lpCriticalSection);
 again:
 	if (libk32_TryEnterCriticalSection(lpCriticalSection))
 		return;
@@ -96,6 +98,7 @@ again:
 
 INTERN VOID WINAPI
 libk32_LeaveCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
+	TRACE("LeaveCriticalSection(%p)", lpCriticalSection);
 	assertf(lpCriticalSection->OwningThread == pthread_self(),
 	        "You're not holding this lock");
 	assert(lpCriticalSection->LockSemaphore != 0);
@@ -111,19 +114,22 @@ libk32_LeaveCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 
 INTERN VOID WINAPI
 libk32_DeleteCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
+	TRACE("DeleteCriticalSection(%p)", lpCriticalSection);
 	futex_wake(&lpCriticalSection->LockSemaphore);
 }
 
 INTERN DWORD WINAPI
 libk32_SetCriticalSectionSpinCount(LPCRITICAL_SECTION lpCriticalSection,
                                    DWORD dwSpinCount) {
+	TRACE("SetCriticalSectionSpinCount(%p, %#x)", lpCriticalSection, dwSpinCount);
 	return ATOMIC_XCH(lpCriticalSection->SpinCount, dwSpinCount);
 }
 
 INTERN WINBOOL WINAPI
 libk32_InitializeCriticalSectionEx(LPCRITICAL_SECTION lpCriticalSection,
-                                   DWORD dwSpinCount, DWORD Flags) {
-	(void)Flags; /* Ignored */
+                                   DWORD dwSpinCount, DWORD dwFlags) {
+	TRACE("InitializeCriticalSectionEx(%p, %#x, %#x)", lpCriticalSection, dwSpinCount, dwFlags);
+	(void)dwFlags; /* Ignored */
 	bzero(lpCriticalSection, sizeof(*lpCriticalSection));
 	lpCriticalSection->SpinCount = dwSpinCount;
 	return TRUE;
@@ -132,11 +138,13 @@ libk32_InitializeCriticalSectionEx(LPCRITICAL_SECTION lpCriticalSection,
 INTERN WINBOOL WINAPI
 libk32_InitializeCriticalSectionAndSpinCount(LPCRITICAL_SECTION lpCriticalSection,
                                              DWORD dwSpinCount) {
+	TRACE("InitializeCriticalSectionAndSpinCount(%p, %#x)", lpCriticalSection, dwSpinCount);
 	return libk32_InitializeCriticalSectionEx(lpCriticalSection, dwSpinCount, DEFAULT_SPIN_COUNT);
 }
 
 INTERN VOID WINAPI
 libk32_InitializeCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
+	TRACE("InitializeCriticalSection(%p)", lpCriticalSection);
 	libk32_InitializeCriticalSectionEx(lpCriticalSection, DEFAULT_SPIN_COUNT, 0);
 }
 /************************************************************************/
@@ -212,6 +220,8 @@ INTERN DWORD WINAPI
 libk32_WaitForMultipleObjectsEx(DWORD nCount, CONST HANDLE *lpHandles, WINBOOL bWaitAll,
                                 DWORD dwMilliseconds, WINBOOL bAlertable) {
 	DWORD result;
+	TRACE("WaitForMultipleObjectsEx(%#x, %p, %u, %#x, %u)",
+	      nCount, lpHandles, bWaitAll, dwMilliseconds, bAlertable);
 	if (bWaitAll && nCount > 1) {
 		DWORD i;
 		result = WAIT_OBJECT_0;
@@ -233,22 +243,28 @@ libk32_WaitForMultipleObjectsEx(DWORD nCount, CONST HANDLE *lpHandles, WINBOOL b
 INTERN DWORD WINAPI
 libk32_WaitForMultipleObjects(DWORD nCount, CONST HANDLE *lpHandles,
                               WINBOOL bWaitAll, DWORD dwMilliseconds) {
+	TRACE("WaitForMultipleObjects(%#x, %p, %u, %#x)",
+	      nCount, lpHandles, bWaitAll, dwMilliseconds);
 	return libk32_WaitForMultipleObjectsEx(nCount, lpHandles, bWaitAll, dwMilliseconds, FALSE);
 }
 
 INTERN DWORD WINAPI
 libk32_WaitForSingleObjectEx(HANDLE hHandle, DWORD dwMilliseconds, WINBOOL bAlertable) {
+	TRACE("WaitForMultipleObjects(%p, %#x, %u)",
+	      hHandle, dwMilliseconds, bAlertable);
 	return libk32_WaitForMultipleObjectsEx(1, &hHandle, FALSE, dwMilliseconds, bAlertable);
 }
 
 INTERN DWORD WINAPI
 libk32_WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds) {
+	TRACE("WaitForSingleObject(%p, %#x)", hHandle, dwMilliseconds);
 	return libk32_WaitForSingleObjectEx(hHandle, dwMilliseconds, FALSE);
 }
 
 INTERN DWORD WINAPI
 libk32_SleepEx(DWORD dwMilliseconds, WINBOOL bAlertable) {
 	struct timespec ts, rem;
+	TRACE("SleepEx(%#x, %u)", dwMilliseconds, bAlertable);
 	ts.tv_sec  = 0;
 	ts.tv_nsec = 0;
 	ts.add_milliseconds(dwMilliseconds);
@@ -264,6 +280,7 @@ libk32_SleepEx(DWORD dwMilliseconds, WINBOOL bAlertable) {
 
 INTERN VOID WINAPI
 libk32_Sleep(DWORD dwMilliseconds) {
+	TRACE("Sleep(%#x)", dwMilliseconds);
 	libk32_SleepEx(dwMilliseconds, FALSE);
 }
 /************************************************************************/

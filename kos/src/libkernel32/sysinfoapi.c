@@ -49,6 +49,7 @@ INTERN VOID WINAPI
 libk32_GetSystemTime(LPSYSTEMTIME lpSystemTime) {
 	struct timeval tv;
 	struct tm tms;
+	TRACE("GetSystemTime(%p)", lpSystemTime);
 	gettimeofday(&tv, NULL);
 	gmtime_r(&tv.tv_sec, &tms);
 	lpSystemTime->wYear         = tms.tm_year;
@@ -65,6 +66,7 @@ INTERN VOID WINAPI
 libk32_GetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime) {
 	struct timespec ts;
 	struct timeval tv;
+	TRACE("GetSystemTimeAsFileTime(%p)", lpSystemTimeAsFileTime);
 	gettimeofday(&tv, NULL);
 	TIMEVAL_TO_TIMESPEC(&tv, &ts);
 	*lpSystemTimeAsFileTime = libk32_TimeSpecToFileTime(&ts);
@@ -76,6 +78,7 @@ INTERN VOID WINAPI
 libk32_GetLocalTime(LPSYSTEMTIME lpSystemTime) {
 	struct timeval tv;
 	struct tm tms;
+	TRACE("GetLocalTime(%p)", lpSystemTime);
 	gettimeofday(&tv, NULL);
 	localtime_r(&tv.tv_sec, &tms);
 	lpSystemTime->wYear         = tms.tm_year;
@@ -90,6 +93,7 @@ libk32_GetLocalTime(LPSYSTEMTIME lpSystemTime) {
 
 INTERN VOID WINAPI
 libk32_GetSystemInfo(LPSYSTEM_INFO lpSystemInfo) {
+	TRACE("GetSystemInfo(%p)", lpSystemInfo);
 	lpSystemInfo->dwOemId    = 0; /* ??? */
 	lpSystemInfo->dwPageSize = getpagesize();
 #ifdef USERSPACE_BASE
@@ -115,6 +119,7 @@ DEFINE_INTERN_ALIAS(libk32_GetNativeSystemInfo, libk32_GetSystemInfo);
 INTERN ULONGLONG WINAPI
 libk32_GetTickCount64(VOID) {
 	struct timeval tv;
+	TRACE("GetTickCount64()");
 	/* TODO: We're supposed to return time since system was started */
 	gettimeofday(&tv, NULL);
 	return ((ULONGLONG)tv.tv_sec * 1000 +
@@ -123,6 +128,7 @@ libk32_GetTickCount64(VOID) {
 
 INTERN DWORD WINAPI
 libk32_GetTickCount(VOID) {
+	TRACE("GetTickCount()");
 	return (DWORD)libk32_GetTickCount64();
 }
 

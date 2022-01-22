@@ -32,31 +32,41 @@ DEFINE_PUBLIC_ALIAS(GetOEMCP, libk32_GetOEMCP);
 DEFINE_PUBLIC_ALIAS(IsDBCSLeadByte, libk32_IsDBCSLeadByte);
 DEFINE_PUBLIC_ALIAS(IsDBCSLeadByteEx, libk32_IsDBCSLeadByteEx);
 
-INTERN WINBOOL WINAPI libk32_IsValidCodePage(UINT CodePage) {
+INTERN WINBOOL WINAPI
+libk32_IsValidCodePage(UINT uCodePage) {
+	TRACE("IsValidCodePage(%u)", uCodePage);
 	COMPILER_IMPURE();
-	(void)CodePage;
+	(void)uCodePage;
 	return TRUE;
 }
 
-INTERN UINT WINAPI libk32_GetACP(void) {
+INTERN UINT WINAPI
+libk32_GetACP(void) {
+	TRACE("GetACP()");
 	COMPILER_IMPURE();
 	return CP_UTF8;
 }
 
-INTERN UINT WINAPI libk32_GetOEMCP(void) {
+INTERN UINT WINAPI
+libk32_GetOEMCP(void) {
+	TRACE("GetOEMCP()");
 	COMPILER_IMPURE();
 	return CP_UTF8;
 }
 
-INTERN WINBOOL WINAPI libk32_IsDBCSLeadByte(BYTE TestChar) {
+INTERN WINBOOL WINAPI
+libk32_IsDBCSLeadByte(BYTE bTestChar) {
+	TRACE("IsDBCSLeadByte(%#x)", bTestChar);
 	COMPILER_IMPURE();
-	return TestChar >= 0x80;
+	return bTestChar >= 0x80;
 }
 
-INTERN WINBOOL WINAPI libk32_IsDBCSLeadByteEx(UINT CodePage, BYTE TestChar) {
-	(void)CodePage;
+INTERN WINBOOL WINAPI
+libk32_IsDBCSLeadByteEx(UINT uCodePage, BYTE bTestChar) {
+	TRACE("IsDBCSLeadByteEx(%u, %#x)", uCodePage, bTestChar);
+	(void)uCodePage;
 	COMPILER_IMPURE();
-	return TestChar >= 0x80;
+	return libk32_IsDBCSLeadByte(bTestChar);
 }
 
 DECL_END

@@ -37,6 +37,7 @@ DEFINE_PUBLIC_ALIAS(QueryPerformanceFrequency, libk32_QueryPerformanceFrequency)
 INTERN WINBOOL WINAPI
 libk32_QueryPerformanceCounter(LARGE_INTEGER *lpPerformanceCount) {
 	struct timeval tv;
+	TRACE("QueryPerformanceCounter(%p)", lpPerformanceCount);
 	if (gettimeofday(&tv, NULL) != 0)
 		return FALSE;
 	lpPerformanceCount->QuadPart = ((uint64_t)tv.tv_sec * 1000000) +
@@ -46,6 +47,7 @@ libk32_QueryPerformanceCounter(LARGE_INTEGER *lpPerformanceCount) {
 
 INTERN WINBOOL WINAPI
 libk32_QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency) {
+	TRACE("QueryPerformanceFrequency(%p)", lpFrequency);
 	lpFrequency->QuadPart = 1000000;
 	return TRUE;
 }

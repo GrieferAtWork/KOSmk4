@@ -48,6 +48,8 @@ INTERN WINBOOL WINAPI
 libk32_CreatePipe(PHANDLE hReadPipe, PHANDLE hWritePipe,
                   LPSECURITY_ATTRIBUTES lpPipeAttributes, DWORD nSize) {
 	fd_t fds[2];
+	TRACE("CreatePipe(%p, %p, %p, %#x)",
+	      hReadPipe, hWritePipe, lpPipeAttributes, nSize);
 	(void)lpPipeAttributes;
 	(void)nSize;
 	if (pipe2(fds, O_CLOEXEC) != 0)
@@ -63,6 +65,9 @@ libk32_PeekNamedPipe(HANDLE hNamedPipe, LPVOID lpBuffer,
                      LPDWORD lpTotalBytesAvail,
                      LPDWORD lpBytesLeftThisMessage) {
 	struct pipe_peek peek;
+	TRACE("PeekNamedPipe(%p, %p, %#x, %p, %p, %p)",
+	      hNamedPipe, lpBuffer, nBufferSize, lpBytesRead,
+	      lpTotalBytesAvail, lpBytesLeftThisMessage);
 	if (!NTHANDLE_ISFD(hNamedPipe)) {
 		errno = EBADF;
 		return FALSE;

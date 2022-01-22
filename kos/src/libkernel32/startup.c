@@ -34,7 +34,9 @@ STATIC_ASSERT(sizeof(STARTUPINFOA) == sizeof(STARTUPINFOW));
 
 DEFINE_PUBLIC_ALIAS(GetStartupInfoA, libk32_GetStartupInfo);
 DEFINE_PUBLIC_ALIAS(GetStartupInfoW, libk32_GetStartupInfo);
-INTERN VOID WINAPI libk32_GetStartupInfo(LPSTARTUPINFO lpStartupInfo) {
+INTERN VOID WINAPI
+libk32_GetStartupInfo(LPSTARTUPINFO lpStartupInfo) {
+	TRACE("GetStartupInfo(%p)", lpStartupInfo);
 	bzero(lpStartupInfo, sizeof(*lpStartupInfo));
 	lpStartupInfo->cb         = sizeof(*lpStartupInfo);
 	lpStartupInfo->dwFlags    = STARTF_USESTDHANDLES;
