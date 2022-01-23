@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x639175da */
+/* HASH CRC-32:0x7c905ff9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1298,11 +1298,6 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd__aligned_free)(void *aligned_mallptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF void NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *aligned_mallptr);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF char *NOTHROW_RPC(LIBDCALL libd__fullpath)(char *buf, char const *path, size_t buflen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_NCX(LIBDCALL libd__ecvt_s)(char *buf, size_t buflen, double val, int ndigit, int *__restrict decptr, int *__restrict sign);
 INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_NCX(LIBCCALL libc__ecvt_s)(char *buf, size_t buflen, double val, int ndigit, int *__restrict decptr, int *__restrict sign);
 INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_NCX(LIBDCALL libd__fcvt_s)(char *buf, size_t buflen, double val, int ndigit, int *__restrict decptr, int *__restrict sign);

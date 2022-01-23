@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x875e5645 */
+/* HASH CRC-32:0x4ca47e6d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -229,6 +229,7 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___p__fm
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode);
 INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags, unsigned int mask);
+INTDEF char *NOTHROW_RPC(LIBDCALL libd__fullpath)(char *buf, char const *path, size_t buflen);
 INTDEF char *NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf, char const *path, size_t buflen);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file, char const *envvar, char *__restrict resultpath, size_t buflen);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode);

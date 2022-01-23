@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x390fa357 */
+/* HASH CRC-32:0x9e55785a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,6 +52,10 @@ INTDEF ATTR_MALLOC WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd_convert_mbstowcs)
 INTDEF ATTR_MALLOC WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc_convert_mbstowcs)(char const *__restrict str);
 INTDEF ATTR_MALLOC WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsn)(char const *__restrict str, size_t len, size_t *preslen);
 INTDEF ATTR_MALLOC WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsn)(char const *__restrict str, size_t len, size_t *preslen);
+INTDEF ATTR_MALLOC WUNUSED char16_t **NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsv)(char const *const *__restrict vector);
+INTDEF ATTR_MALLOC WUNUSED char32_t **NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsv)(char const *const *__restrict vector);
+INTDEF ATTR_MALLOC WUNUSED char16_t **NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsvn)(char const *const *__restrict vector, size_t count);
+INTDEF ATTR_MALLOC WUNUSED char32_t **NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsvn)(char const *const *__restrict vector, size_t count);
 #endif /* !__KERNEL__ */
 
 DECL_END

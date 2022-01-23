@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab8292ae */
+/* HASH CRC-32:0x84611672 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1952,7 +1952,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_aligned_offset_realloc, libd__aligned_offset_realloc);
 DEFINE_PUBLIC_ALIAS(DOS$_aligned_offset_recalloc, libd__aligned_offset_recalloc);
 DEFINE_PUBLIC_ALIAS(DOS$_aligned_msize, libd__aligned_msize);
 DEFINE_PUBLIC_ALIAS(DOS$_aligned_free, libd__aligned_free);
-DEFINE_PUBLIC_ALIAS(DOS$_fullpath, libd__fullpath);
 DEFINE_PUBLIC_ALIAS(DOS$_atoflt, libd__atoflt);
 DEFINE_PUBLIC_ALIAS(DOS$_atoflt_l, libd__atoflt_l);
 DEFINE_PUBLIC_ALIAS(DOS$_atodbl, libd__atodbl);

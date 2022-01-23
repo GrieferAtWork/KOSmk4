@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc76d2c37 */
+/* HASH CRC-32:0x18523b0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1545,7 +1545,6 @@ DFUN(".text.crt.dos.heap", libd__aligned_offset_realloc, libc__aligned_offset_re
 DFUN(".text.crt.dos.heap", libd__aligned_offset_recalloc, libc__aligned_offset_recalloc, TP, 5, TP, TI, TI, TI, TI)
 DFUN(".text.crt.dos.heap", libd__aligned_msize, libc__aligned_msize, TI, 3, TP, TI, TI)
 DFUN(".text.crt.dos.heap", libd__aligned_free, libc__aligned_free, TV, 1, TP)
-DFUN(".text.crt.dos.fs.utility", libd__fullpath, libc__fullpath, TP, 3, TP, TP, TI)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoflt, libc__atoflt, TD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoflt_l, libc__atoflt_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atodbl, libc__atodbl, TD, 2, TP, TP)

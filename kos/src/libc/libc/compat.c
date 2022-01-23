@@ -40,7 +40,6 @@
 #include <nt/handleapi.h>
 #include <nt/libloaderapi.h>
 #include <nt/types.h>
-#include <nt/winnls.h>
 
 #include <elf.h>
 #include <format-printer.h>
@@ -1303,21 +1302,6 @@ libd__execute_onexit_table(_onexit_table_t *self) {
 	free(_first);
 	return result;
 }
-
-
-
-/************************************************************************/
-/* DOS ctype internals                                                  */
-/************************************************************************/
-DEFINE_PUBLIC_ALIAS(DOS$___lc_codepage_func, libd____lc_collate_cp_func);
-DEFINE_PUBLIC_ALIAS(DOS$___lc_collate_cp_func, libd____lc_collate_cp_func);
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") UINT LIBDCALL
-libd____lc_collate_cp_func(void) {
-	COMPILER_IMPURE();
-	return CP_UTF8;
-}
-
-
 
 DECL_END
 

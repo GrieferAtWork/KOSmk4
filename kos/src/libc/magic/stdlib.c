@@ -5055,7 +5055,7 @@ void _aligned_free(void *aligned_mallptr) {
 
 %
 %#define _CVTBUFSIZE   349
-[[cp, section(".text.crt.dos.fs.utility")]]
+[[crt_dos_variant, cp, section(".text.crt.dos.fs.utility")]]
 char *_fullpath(char *buf, char const *path, $size_t buflen);
 
 %#ifndef __NO_FPU

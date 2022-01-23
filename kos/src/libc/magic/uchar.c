@@ -369,6 +369,50 @@ $wchar_t *convert_mbstowcsn(/*utf-8*/ char const *__restrict str, size_t len, si
 }
 
 
+[[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(convert_mbstowcsvn)]]
+[[impl_include("<libc/errno.h>")]]
+$wchar_t **convert_mbstowcsv(/*utf-8*/ char const *const *__restrict vector) {
+	size_t count = 0;
+	if unlikely(!vector) {
+@@pp_ifdef EINVAL@@
+		__libc_seterrno(EINVAL);
+@@pp_endif@@
+		return NULL;
+	}
+	for (count = 0; vector[count]; ++count)
+		;
+	return convert_mbstowcsvn(vector, count);
+}
+
+[[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(malloc, convert_mbstowcs)]]
+[[impl_include("<libc/errno.h>")]]
+$wchar_t **convert_mbstowcsvn(/*utf-8*/ char const *const *__restrict vector, size_t count) {
+	size_t i;
+	$wchar_t **result;
+	result = ($wchar_t **)malloc((count + 1) * sizeof($wchar_t *));
+	if likely(result) {
+		for (i = 0; i < count; ++i) {
+			$wchar_t *temp;
+			temp = convert_mbstowcs(vector[i]);
+			if unlikely(!temp)
+				goto err;
+			result[i] = temp;
+		}
+		result[i] = NULL;
+	}
+	return result;
+err:
+@@pp_if $has_function(free)@@
+	while (i--)
+		free(result[i]);
+	free(result);
+@@pp_endif@@
+	return NULL;
+}
+
+
 convert_c16tombs(*) %{uchar16("convert_wcstombs")}
 convert_c32tombs(*) %{uchar32("convert_wcstombs")}
 convert_c16tombsn(*) %{uchar16("convert_wcstombsn")}
@@ -381,6 +425,10 @@ convert_mbstoc16(*) %{uchar16("convert_mbstowcs")}
 convert_mbstoc32(*) %{uchar32("convert_mbstowcs")}
 convert_mbstoc16n(*) %{uchar16("convert_mbstowcsn")}
 convert_mbstoc32n(*) %{uchar32("convert_mbstowcsn")}
+convert_mbstoc16v(*) %{uchar16("convert_mbstowcsv")}
+convert_mbstoc32v(*) %{uchar32("convert_mbstowcsv")}
+convert_mbstoc16vn(*) %{uchar16("convert_mbstowcsvn")}
+convert_mbstoc32vn(*) %{uchar32("convert_mbstowcsvn")}
 
 %#endif /* __USE_KOS */
 

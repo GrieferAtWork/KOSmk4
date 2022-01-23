@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b40de10 */
+/* HASH CRC-32:0x4fdb1e88 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -313,6 +313,86 @@ NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsn)(char const *__restrict str,
 	}
 	return libc_format_waprintf_pack((struct format_c32aprintf_data *)&printer_data, preslen);
 }
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char16_t **
+NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsv)(char const *const *__restrict vector) {
+	size_t count = 0;
+	if unlikely(!vector) {
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
+		return NULL;
+	}
+	for (count = 0; vector[count]; ++count)
+		;
+	return libd_convert_mbstowcsvn(vector, count);
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char32_t **
+NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsv)(char const *const *__restrict vector) {
+	size_t count = 0;
+	if unlikely(!vector) {
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
+		return NULL;
+	}
+	for (count = 0; vector[count]; ++count)
+		;
+	return libc_convert_mbstowcsvn(vector, count);
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char16_t **
+NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsvn)(char const *const *__restrict vector,
+                                              size_t count) {
+	size_t i;
+	char16_t **result;
+	result = (char16_t **)libc_malloc((count + 1) * sizeof(char16_t *));
+	if likely(result) {
+		for (i = 0; i < count; ++i) {
+			char16_t *temp;
+			temp = libd_convert_mbstowcs(vector[i]);
+			if unlikely(!temp)
+				goto err;
+			result[i] = temp;
+		}
+		result[i] = NULL;
+	}
+	return result;
+err:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	while (i--)
+		libc_free(result[i]);
+	libc_free(result);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return NULL;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char32_t **
+NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsvn)(char const *const *__restrict vector,
+                                              size_t count) {
+	size_t i;
+	char32_t **result;
+	result = (char32_t **)libc_malloc((count + 1) * sizeof(char32_t *));
+	if likely(result) {
+		for (i = 0; i < count; ++i) {
+			char32_t *temp;
+			temp = libc_convert_mbstowcs(vector[i]);
+			if unlikely(!temp)
+				goto err;
+			result[i] = temp;
+		}
+		result[i] = NULL;
+	}
+	return result;
+err:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	while (i--)
+		libc_free(result[i]);
+	libc_free(result);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return NULL;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -332,6 +412,10 @@ DEFINE_PUBLIC_ALIAS(DOS$convert_mbstowcs, libd_convert_mbstowcs);
 DEFINE_PUBLIC_ALIAS(convert_mbstowcs, libc_convert_mbstowcs);
 DEFINE_PUBLIC_ALIAS(DOS$convert_mbstowcsn, libd_convert_mbstowcsn);
 DEFINE_PUBLIC_ALIAS(convert_mbstowcsn, libc_convert_mbstowcsn);
+DEFINE_PUBLIC_ALIAS(DOS$convert_mbstowcsv, libd_convert_mbstowcsv);
+DEFINE_PUBLIC_ALIAS(convert_mbstowcsv, libc_convert_mbstowcsv);
+DEFINE_PUBLIC_ALIAS(DOS$convert_mbstowcsvn, libd_convert_mbstowcsvn);
+DEFINE_PUBLIC_ALIAS(convert_mbstowcsvn, libc_convert_mbstowcsvn);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UCHAR_C */

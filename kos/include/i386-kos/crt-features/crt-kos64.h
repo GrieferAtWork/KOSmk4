@@ -1565,6 +1565,7 @@
 #define __CRT_HAVE__wmakepath
 #define __CRT_HAVE__wmakepath_s
 #define __CRT_HAVE__wperror
+#define __CRT_HAVE__wpgmptr
 #define __CRT_HAVE__wprintf_l
 #define __CRT_HAVE__wprintf_p
 #define __CRT_HAVE__wprintf_p_l
@@ -1799,6 +1800,8 @@
 #define __CRT_HAVE_convert_freevn
 #define __CRT_HAVE_convert_mbstowcs
 #define __CRT_HAVE_convert_mbstowcsn
+#define __CRT_HAVE_convert_mbstowcsv
+#define __CRT_HAVE_convert_mbstowcsvn
 #define __CRT_HAVE_convert_wcstombs
 #define __CRT_HAVE_convert_wcstombsn
 #define __CRT_HAVE_convert_wcstombsv
@@ -5157,8 +5160,6 @@
 #define __CRT_HAVE_KOS$_Wcsftime
 #define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE___C_specific_handler
-#define __CRT_HAVE_KOS$___lc_codepage_func
-#define __CRT_HAVE_KOS$___lc_collate_cp_func
 #define __CRT_HAVE_KOS$___lc_locale_name_func
 #define __CRT_HAVE_KOS$__access
 #define __CRT_HAVE_KOS$__acct
@@ -6451,6 +6452,7 @@
 #define __CRT_HAVE_KOS$_wmakepath
 #define __CRT_HAVE_KOS$_wmakepath_s
 #define __CRT_HAVE_KOS$_wperror
+#define __CRT_HAVE_KOS$_wpgmptr
 #define __CRT_HAVE__wpopen
 #define __CRT_HAVE_KOS$_wprintf_l
 #define __CRT_HAVE_KOS$_wprintf_p
@@ -6690,6 +6692,8 @@
 #define __CRT_HAVE_KOS$convert_freevn
 #define __CRT_HAVE_KOS$convert_mbstowcs
 #define __CRT_HAVE_KOS$convert_mbstowcsn
+#define __CRT_HAVE_KOS$convert_mbstowcsv
+#define __CRT_HAVE_KOS$convert_mbstowcsvn
 #define __CRT_HAVE_KOS$convert_wcstombs
 #define __CRT_HAVE_KOS$convert_wcstombsn
 #define __CRT_HAVE_KOS$convert_wcstombsv
@@ -8902,8 +8906,6 @@
 #define __CRT_HAVE_DOS$_Wcsftime
 #define __CRT_HAVE_DOS$_XcptFilter
 #define __CRT_HAVE_DOS$__C_specific_handler
-#define __CRT_HAVE_DOS$___lc_codepage_func
-#define __CRT_HAVE_DOS$___lc_collate_cp_func
 #define __CRT_HAVE_DOS$___lc_locale_name_func
 #define __CRT_HAVE_DOS$__access
 #define __CRT_HAVE_DOS$__acct
@@ -10196,6 +10198,7 @@
 #define __CRT_HAVE_DOS$_wmakepath
 #define __CRT_HAVE_DOS$_wmakepath_s
 #define __CRT_HAVE_DOS$_wperror
+#define __CRT_HAVE_DOS$_wpgmptr
 #define __CRT_HAVE_DOS$_wpopen
 #define __CRT_HAVE_DOS$_wprintf_l
 #define __CRT_HAVE_DOS$_wprintf_p
@@ -10435,6 +10438,8 @@
 #define __CRT_HAVE_DOS$convert_freevn
 #define __CRT_HAVE_DOS$convert_mbstowcs
 #define __CRT_HAVE_DOS$convert_mbstowcsn
+#define __CRT_HAVE_DOS$convert_mbstowcsv
+#define __CRT_HAVE_DOS$convert_mbstowcsvn
 #define __CRT_HAVE_DOS$convert_wcstombs
 #define __CRT_HAVE_DOS$convert_wcstombsn
 #define __CRT_HAVE_DOS$convert_wcstombsv

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a590efe */
+/* HASH CRC-32:0x8ade42e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -267,9 +267,9 @@
 #define __CRT_HAVE_DOS$_ftime32_s
 #define __CRT_HAVE_DOS$_ftime64
 #define __CRT_HAVE_DOS$_ftime64_s
-#define __CRT_HAVE_DOS$_fullpath
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_fullpath
 #define __CRT_HAVE_DOS$_fwprintf_l
 #define __CRT_HAVE_DOS$_fwprintf_p
 #define __CRT_HAVE_DOS$_fwprintf_p_l
@@ -808,6 +808,8 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$convert_mbstowcs
 #define __CRT_HAVE_DOS$convert_mbstowcsn
+#define __CRT_HAVE_DOS$convert_mbstowcsv
+#define __CRT_HAVE_DOS$convert_mbstowcsvn
 #define __CRT_HAVE_DOS$convert_wcstombs
 #define __CRT_HAVE_DOS$convert_wcstombsn
 #define __CRT_HAVE_DOS$convert_wcstombsv
@@ -4154,6 +4156,8 @@
 #define __CRT_HAVE_convert_freevn
 #define __CRT_HAVE_convert_mbstowcs
 #define __CRT_HAVE_convert_mbstowcsn
+#define __CRT_HAVE_convert_mbstowcsv
+#define __CRT_HAVE_convert_mbstowcsvn
 #define __CRT_HAVE_convert_wcstombs
 #define __CRT_HAVE_convert_wcstombsn
 #define __CRT_HAVE_convert_wcstombsv

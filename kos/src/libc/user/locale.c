@@ -21,6 +21,10 @@
 #define GUARD_LIBC_USER_LOCALE_C 1
 
 #include "../api.h"
+/**/
+
+#include <nt/winnls.h>
+
 #include "locale.h"
 
 DECL_BEGIN
@@ -323,23 +327,14 @@ NOTHROW_NCX(LIBKCALL libc____lc_locale_name_func)(void)
 INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc____lc_codepage_func)(void)
 /*[[[body:libc____lc_codepage_func]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("___lc_codepage_func"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	COMPILER_IMPURE();
+	return CP_UTF8;
 }
 /*[[[end:libc____lc_codepage_func]]]*/
 
-/*[[[head:libc____lc_collate_cp_func,hash:CRC-32=0x1b2ef78d]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED unsigned int
-NOTHROW_NCX(LIBCCALL libc____lc_collate_cp_func)(void)
-/*[[[body:libc____lc_collate_cp_func]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("___lc_collate_cp_func"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc____lc_collate_cp_func]]]*/
+DEFINE_INTERN_ALIAS(libc____lc_collate_cp_func, libc____lc_codepage_func);
+/*[[[skip:libc____lc_collate_cp_func]]]*/
 
 /*[[[head:libc__Getdays,hash:CRC-32=0x95013a8b]]]*/
 INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED char *
