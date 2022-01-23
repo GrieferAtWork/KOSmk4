@@ -70,6 +70,7 @@ mbuilder_lockparts_or_unlock(struct mbuilder_norpc *__restrict self,
 			struct mpart *part = iter->mbn_part;
 			if (mpart_lock_tryacquire(part))
 				continue;
+
 			/* We've got a blocking part... */
 			for (bucket = 0;; ++bucket) {
 				assert(bucket < MBNODE_PARTSET_NUMBUCKETS);

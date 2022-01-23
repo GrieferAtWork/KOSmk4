@@ -878,7 +878,7 @@ again:
 
 	/* Enumerate all mem-parts. */
 	/* TODO: Would be better to enumerate from least-recent to most-recent
-	 *       Though for this, we should probably chance the list type from
+	 *       Though for this, we should probably change the list type from
 	 *       `LIST_*' to `TAILQ_*' (which has a O(1) *_LAST operation). */
 	LIST_FOREACH_SAFE (iter, &mpart_all_list, mp_allparts) {
 		if (!(iter->mp_flags & MPART_F_GLOBAL_REF))

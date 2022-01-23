@@ -1231,12 +1231,16 @@ DEFINE_PUBLIC_ALIAS(DOS$_execute_onexit_table, libd__execute_onexit_table);
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
 libd__initialize_onexit_table(_onexit_table_t *self) {
+	if unlikely(!self)
+		return -1;
 	bzero(self, sizeof(*self));
 	return 0;
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
 libd__register_onexit_function(_onexit_table_t *self, _onexit_t function) {
+	if unlikely(!self)
+		return -1;
 	if (self->_last >= self->_end) {
 		_onexit_t *newtab;
 		size_t newcnt;
@@ -1255,7 +1259,13 @@ libd__register_onexit_function(_onexit_table_t *self, _onexit_t function) {
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
 libd__execute_onexit_table(_onexit_table_t *self) {
-	return libd__initterm_e(self->_first, self->_last);
+	int result;
+	_onexit_t *_first = self->_first;
+	_onexit_t *_last  = self->_last;
+	libd__initialize_onexit_table(self);
+	result = libd__initterm_e(_first, _last);
+	free(_first);
+	return result;
 }
 
 

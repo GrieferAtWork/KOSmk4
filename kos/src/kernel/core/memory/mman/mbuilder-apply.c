@@ -409,7 +409,7 @@ again:
 	 * All of the newly created mappings  are simply going to be  bound
 	 * lazily, as they get accessed.
 	 * NOTE: Outside of SMP, or when `MBUILDER_APPLY_AA_TERMTHREADS' is given,
-	 *       we  can unmap user-space without having to do SMP TLB shootdowns. */
+	 *       we can unmap user-space without having to do SMP TLB shoot-downs. */
 #ifndef CONFIG_NO_SMP
 	if (!(additional_actions & MBUILDER_APPLY_AA_TERMTHREADS)) {
 		if (target == THIS_MMAN)
@@ -420,25 +420,25 @@ again:
 	} else
 #endif /* !CONFIG_NO_SMP */
 	{
-		if (target == THIS_MMAN)
+		if (target == THIS_MMAN) {
 			pagedir_unmap_userspace_nosync();
-		else {
+
+			/* Because our thread is  supposed to continue running,  and
+			 * because  user-space (presumably) contained stuff prior to
+			 * the exec, we must still sync the user-space portion  (and
+			 * also the page directory identity mapping, should that one
+			 * exist on this arch).
+			 *
+			 * Otherwise, we'd be executing user-space with a messed-up
+			 * TLB (since it may still contain entries relevant to  the
+			 * old state of user-space)
+			 *
+			 * Since we're only talking user-space here, it's enough  to
+			 * sync _it_ alone (as opposed to doing `pagedir_syncall()') */
+			pagedir_syncall_user();
+		} else {
 			pagedir_unmap_userspace_nosync_p(target->mm_pagedir_p);
 		}
-
-		/* Because our thread is  supposed to continue running,  and
-		 * because  user-space (presumably) contained stuff prior to
-		 * the exec, we must still sync the user-space portion  (and
-		 * also the page directory identity mapping, should that one
-		 * exist on this arch).
-		 *
-		 * Otherwise, we'd be executing user-space with a messed-up
-		 * TLB (since it may still contain entries relevant to  the
-		 * old state of user-space)
-		 *
-		 * Since we're only talking user-space here, it's enough  to
-		 * sync _it_ alone (as opposed to doing `pagedir_syncall()') */
-		pagedir_syncall_user();
 	}
 
 	/* Do the actual job of applying the new node-tree, as
@@ -462,8 +462,9 @@ again:
 		/* Done! (but must still release our lock to `target') */
 		mman_lock_release(target);
 
-		/* Drop references _after_ releasing the mman lock,
-		 * thus improving efficiency. */
+		/* Drop  references _after_ releasing the mman lock,
+		 * thus improving efficiency by keeping the lock for
+		 * a smaller period of time. */
 		xdecref(oldinfo.mei_file);
 		xdecref(oldinfo.mei_dent);
 		xdecref(oldinfo.mei_path);

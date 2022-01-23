@@ -617,8 +617,7 @@ mpart_lock_acquire(struct mpart *__restrict self)
 	while (!mpart_lock_tryacquire(self))
 		__hybrid_yield();
 }
-
-FORCELOCAL NONNULL((1)) __BOOL
+FORCELOCAL WUNUSED NONNULL((1)) __BOOL
 NOTHROW(mpart_lock_acquire_nx)(struct mpart *__restrict self) {
 	while (!mpart_lock_tryacquire(self)) {
 		if (!__hybrid_yield_nx())
@@ -632,7 +631,7 @@ mpart_lock_waitfor(struct mpart *__restrict self)
 	while (!mpart_lock_available(self))
 		__hybrid_yield();
 }
-FORCELOCAL NONNULL((1)) __BOOL
+FORCELOCAL WUNUSED NONNULL((1)) __BOOL
 NOTHROW(mpart_lock_waitfor_nx)(struct mpart *__restrict self) {
 	while (!mpart_lock_available(self)) {
 		if (!__hybrid_yield_nx())
