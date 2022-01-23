@@ -40,6 +40,11 @@ global wcharReplacementEscapes: {string: (string, string)} = Dict({
 	"__VLIBCCALL"        : ("__VLIBDCALL", "__VLIBKCALL"),
 });
 
+@@Additional keywords-replacements used by in-library implementations of DOS variants
+global dosReplacementEscapes: {string: string} = Dict({
+	"EOK" : "0",
+});
+
 @@Replacements for wchar-related headers
 global wcharReplacementHeaders: {string: (string, string)} = Dict({
 	"<bits/crt/wformat-printer.h>"   : ("<bits/crt/uformat-printer.h>",   "<bits/crt/uformat-printer.h>"),
@@ -67,7 +72,8 @@ global allDosVariantsByName: {string: LibraryFunction} = Dict();
 
 
 @@Replace a single, given @keyword with its wchar replacement
-function replaceWcharTextKeyword(keyword: string, mode: int): string {
+function replaceWcharTextKeyword(keyword: string, mode: int,
+		forInLibraryImplementation: bool = false): string {
 	/* Check for explicitly defined keyword replacements */
 	local repl = wcharReplacementEscapes.get(keyword);
 	if (repl !is none)
@@ -89,7 +95,12 @@ function replaceWcharTextKeyword(keyword: string, mode: int): string {
 		if (#keyword >= 2 && keyword[1] != "$") {
 			/* Replace without the leading "$" */
 			local withoutDollar = keyword[1:];
-			repl = replaceWcharTextKeyword(withoutDollar, mode);
+			if (forInLibraryImplementation && mode == WCHAR_REPLACEMENT_CHAR16) {
+				repl = dosReplacementEscapes.get(withoutDollar);
+				if (repl !is none)
+					return repl;
+			}
+			repl = replaceWcharTextKeyword(withoutDollar, mode, forInLibraryImplementation);
 			if (repl !== withoutDollar)
 				return "$" + repl;
 		}
@@ -112,7 +123,8 @@ function replaceWcharTextKeyword(keyword: string, mode: int): string {
 @@                     return value causes normal replacement to be performed.
 function replaceWcharText(
 		text: string | CParser | UserString, mode: int,
-		keyOverride: Callable with string = none): string | UserString {
+		keyOverride: Callable with string = none,
+		forInLibraryImplementation: bool = false): string | UserString {
 	{
 		/* Quick check: If @test is a single keyword, then we don't need a file writer and CParser */
 		local usedText = text;
@@ -130,7 +142,7 @@ function replaceWcharText(
 						goto got_simple_result;
 				}
 				try {
-					result = replaceWcharTextKeyword(usedText, mode);
+					result = replaceWcharTextKeyword(usedText, mode, forInLibraryImplementation);
 				} catch (Error as e) {
 					if (text is UserString)
 						text.err(e.message);
@@ -232,7 +244,7 @@ got_simple_result:
 				goto got_repl;
 		}
 		try {
-			repl = replaceWcharTextKeyword(tok, mode);
+			repl = replaceWcharTextKeyword(tok, mode, forInLibraryImplementation);
 		} catch (Error as e) {
 			self.err(e.message);
 		}
@@ -369,7 +381,9 @@ function replaceWcharFunctionImplementation(
 		return none;
 	};
 	local result = FunctionImplementation(
-		body:         replaceWcharText(self.body, mode, keyOverride: keyOverride),
+		body: replaceWcharText(self.body, mode,
+			keyOverride:                keyOverride,
+			forInLibraryImplementation: forInLibraryImplementation),
 		name:         functionName,
 		implPrefix:   replaceWcharTextArray(self.implPrefix, mode, keyOverride: keyOverride));
 #if 1 /* This must be used so-as to catch explicit dependencies in uchar-functions.

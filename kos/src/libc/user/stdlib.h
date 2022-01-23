@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24297869 */
+/* HASH CRC-32:0x875e5645 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_exit)(int status) THROWS(...);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atexit)(void (LIBCCALL *func)(void));
@@ -65,7 +66,9 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(void (LIBDCALL *func)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_on_exit)(void (LIBCCALL *func)(int status, void *arg), void *arg);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clearenv)(void);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname, char const *val, int replace);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname, char const *val, int replace);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname);
 INTDEF double NOTHROW_NCX(LIBCCALL libc_drand48)(void);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_lrand48)(void);
@@ -76,6 +79,7 @@ INTDEF NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_jrand48)(unsigned short xsubi
 INTDEF void NOTHROW_NCX(LIBCCALL libc_srand48)(long seedval);
 INTDEF NONNULL((1)) unsigned short *NOTHROW_NCX(LIBCCALL libc_seed48)(unsigned short seed16v[3]);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_lcong48)(unsigned short param[7]);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_putenv)(char *string);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_putenv)(char *string);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_random)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed);
@@ -165,6 +169,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf,
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getpt)(void);
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
@@ -173,17 +178,6 @@ INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_canonica
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */
 INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename);
-/* >> recallocarray(3)
- * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
- * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
-INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size);
-/* >> freezero(3)
- * Same as  `free(mallptr)', but  also ensure  that the  memory  region
- * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
- * immediately returned  to the  OS, rather  than being  left in  cache
- * while still containing its previous contents. */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr, size_t num_bytes);
 INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
@@ -235,8 +229,6 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___p__fm
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode);
 INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags, unsigned int mask);
-INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize, char *buf, rsize_t buflen, char const *varname);
-INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf, size_t *pbuflen, char const *varname);
 INTDEF char *NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf, char const *path, size_t buflen);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file, char const *envvar, char *__restrict resultpath, size_t buflen);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode);
@@ -245,10 +237,6 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq, unsigned int dur
 INTDEF onexit_t NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func);
 INTDEF WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname);
 INTDEF WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname);
-INTDEF NONNULL((1, 4)) errno_t NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size, char16_t *buf, size_t buflen, char16_t const *varname);
-INTDEF NONNULL((1, 4)) errno_t NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *return_size, char32_t *buf, size_t buflen, char32_t const *varname);
-INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf, size_t *pbuflen, char16_t const *varname);
-INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **pbuf, size_t *pbuflen, char32_t const *varname);
 INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf, char16_t const *path, size_t buflen);
 INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf, char32_t const *path, size_t buflen);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string);

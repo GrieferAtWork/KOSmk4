@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd35a141 */
+/* HASH CRC-32:0x21c89944 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -291,7 +291,7 @@ NOTHROW_RPC(LIBDCALL libd_get_current_dir_name)(void) {
 	/* Specs require us to return a duplicate of $PWD iff it's correct
 	 *   ***Author's comment: DUMB!***
 	 */
-	char *pwd = libc_getenv("PWD");
+	char *pwd = libd_getenv("PWD");
 	if (pwd && *pwd) {
 		struct stat st_pwd, st_cwd;
 		if (stat(pwd, &st_pwd) == 0 &&

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7b2f632 */
+/* HASH CRC-32:0x8d4c8753 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64tow_s))(__INT64_TYPE__ __val, __W
 	do {
 		*--__p = __LOCAL_itoa_upper_digits[__temp % (unsigned int)__radix];
 	} while ((__temp /= (unsigned int)__radix) != 0);
-	return 0;
+	return __EOK;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__i64tow_s_defined

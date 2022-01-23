@@ -165,7 +165,7 @@ rpc_interrupt_program[] = {
 	# there really shouldn't be a scenario where a system call
 	# would need to be restarted. However, since libc allows for
 	# full control of the `mode' given to `rpc_interrupt(3)', we
-	# have to handle the case where system calls do need to be
+	# have to handle the case where system calls _do_ need to be
 	# restarted... (possibly due to `RPC_SYSRESTART_RESTART')
 	jt     pop, 1f
 	ret

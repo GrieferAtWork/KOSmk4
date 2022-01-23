@@ -300,6 +300,8 @@
 #define __CRT_HAVE____lc_codepage_func
 #define __CRT_HAVE____lc_collate_cp_func
 #define __CRT_HAVE____lc_locale_name_func
+#define __CRT_HAVE____mb_cur_max_func
+#define __CRT_HAVE____mb_cur_max_l_func
 #define __CRT_HAVE___access
 #define __CRT_HAVE___acct
 #define __CRT_HAVE___acos
@@ -874,6 +876,7 @@
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
 #define __CRT_HAVE___p___initenv
+#define __CRT_HAVE___p___mb_cur_max
 #define __CRT_HAVE___p___wargv
 #define __CRT_HAVE___p___winitenv
 #define __CRT_HAVE___p__crtAssertBusy
@@ -1548,6 +1551,7 @@
 #define __CRT_HAVE__wctomb_s_l
 #define __CRT_HAVE__wdupenv_s
 #define __CRT_HAVE__wdupenv_s_dbg
+#define __CRT_HAVE__wenviron
 #define __CRT_HAVE__wfdopen
 #define __CRT_HAVE__wfopen_s
 #define __CRT_HAVE__wfreopen_s
@@ -5152,6 +5156,9 @@
 #define __CRT_HAVE_KOS$_W_Gettnames
 #define __CRT_HAVE_KOS$_Wcsftime
 #define __CRT_HAVE__XcptFilter
+#define __CRT_HAVE___C_specific_handler
+#define __CRT_HAVE_KOS$___lc_codepage_func
+#define __CRT_HAVE_KOS$___lc_collate_cp_func
 #define __CRT_HAVE_KOS$___lc_locale_name_func
 #define __CRT_HAVE_KOS$__access
 #define __CRT_HAVE_KOS$__acct
@@ -5242,6 +5249,7 @@
 #define __CRT_HAVE_KOS$__dup2
 #define __CRT_HAVE_KOS$__duplocale
 #define __CRT_HAVE_KOS$__endmntent
+#define __CRT_HAVE_KOS$__environ
 #define __CRT_HAVE_KOS$__erf
 #define __CRT_HAVE_KOS$__erfc
 #define __CRT_HAVE_KOS$__erfcf
@@ -5634,6 +5642,7 @@
 #define __CRT_HAVE_KOS$__p___winitenv
 #define __CRT_HAVE___p__acmdln
 #define __CRT_HAVE___p__commode
+#define __CRT_HAVE_KOS$__p__environ
 #define __CRT_HAVE___p__wcmdln
 #define __CRT_HAVE_KOS$__p__wenviron
 #define __CRT_HAVE_KOS$__p__wpgmptr
@@ -5945,6 +5954,7 @@
 #define __CRT_HAVE__ecvt
 #define __CRT_HAVE_KOS$_ecvt_s
 #define __CRT_HAVE_KOS$_endthreadex
+#define __CRT_HAVE_KOS$_environ
 #define __CRT_HAVE_KOS$_eof
 #define __CRT_HAVE__errno
 #define __CRT_HAVE__except1
@@ -6111,7 +6121,6 @@
 #define __CRT_HAVE__lseek
 #define __CRT_HAVE__lseeki64
 #define __CRT_HAVE__ltoa
-#define __CRT_HAVE_KOS$_ltoa_s
 #define __CRT_HAVE_KOS$_ltow
 #define __CRT_HAVE_KOS$_ltow_s
 #define __CRT_HAVE_KOS$_makepath
@@ -6420,6 +6429,7 @@
 #define __CRT_HAVE_KOS$_wctomb_l
 #define __CRT_HAVE_KOS$_wctomb_s_l
 #define __CRT_HAVE_KOS$_wdupenv_s
+#define __CRT_HAVE_KOS$_wenviron
 #define __CRT_HAVE__wexecl
 #define __CRT_HAVE__wexecle
 #define __CRT_HAVE__wexeclp
@@ -6760,6 +6770,7 @@
 #define __CRT_HAVE_KOS$encrypt
 #define __CRT_HAVE_KOS$encrypt_r
 #define __CRT_HAVE_KOS$endmntent
+#define __CRT_HAVE_KOS$environ
 #define __CRT_HAVE_KOS$envz_add
 #define __CRT_HAVE_KOS$envz_entry
 #define __CRT_HAVE_KOS$envz_get
@@ -8890,6 +8901,9 @@
 #define __CRT_HAVE_DOS$_W_Gettnames
 #define __CRT_HAVE_DOS$_Wcsftime
 #define __CRT_HAVE_DOS$_XcptFilter
+#define __CRT_HAVE_DOS$__C_specific_handler
+#define __CRT_HAVE_DOS$___lc_codepage_func
+#define __CRT_HAVE_DOS$___lc_collate_cp_func
 #define __CRT_HAVE_DOS$___lc_locale_name_func
 #define __CRT_HAVE_DOS$__access
 #define __CRT_HAVE_DOS$__acct
@@ -8980,6 +8994,7 @@
 #define __CRT_HAVE_DOS$__dup2
 #define __CRT_HAVE_DOS$__duplocale
 #define __CRT_HAVE_DOS$__endmntent
+#define __CRT_HAVE_DOS$__environ
 #define __CRT_HAVE_DOS$__erf
 #define __CRT_HAVE_DOS$__erfc
 #define __CRT_HAVE_DOS$__erfcf
@@ -9372,6 +9387,7 @@
 #define __CRT_HAVE_DOS$__p___winitenv
 #define __CRT_HAVE_DOS$__p__acmdln
 #define __CRT_HAVE_DOS$__p__commode
+#define __CRT_HAVE_DOS$__p__environ
 #define __CRT_HAVE_DOS$__p__wcmdln
 #define __CRT_HAVE_DOS$__p__wenviron
 #define __CRT_HAVE_DOS$__p__wpgmptr
@@ -9683,6 +9699,7 @@
 #define __CRT_HAVE_DOS$_ecvt
 #define __CRT_HAVE_DOS$_ecvt_s
 #define __CRT_HAVE_DOS$_endthreadex
+#define __CRT_HAVE_DOS$_environ
 #define __CRT_HAVE_DOS$_eof
 #define __CRT_HAVE_DOS$_errno
 #define __CRT_HAVE_DOS$_except1
@@ -9849,7 +9866,6 @@
 #define __CRT_HAVE_DOS$_lseek
 #define __CRT_HAVE_DOS$_lseeki64
 #define __CRT_HAVE_DOS$_ltoa
-#define __CRT_HAVE_DOS$_ltoa_s
 #define __CRT_HAVE_DOS$_ltow
 #define __CRT_HAVE_DOS$_ltow_s
 #define __CRT_HAVE_DOS$_makepath
@@ -10158,6 +10174,7 @@
 #define __CRT_HAVE_DOS$_wctomb_l
 #define __CRT_HAVE_DOS$_wctomb_s_l
 #define __CRT_HAVE_DOS$_wdupenv_s
+#define __CRT_HAVE_DOS$_wenviron
 #define __CRT_HAVE_DOS$_wexecl
 #define __CRT_HAVE_DOS$_wexecle
 #define __CRT_HAVE_DOS$_wexeclp
@@ -10498,6 +10515,7 @@
 #define __CRT_HAVE_DOS$encrypt
 #define __CRT_HAVE_DOS$encrypt_r
 #define __CRT_HAVE_DOS$endmntent
+#define __CRT_HAVE_DOS$environ
 #define __CRT_HAVE_DOS$envz_add
 #define __CRT_HAVE_DOS$envz_entry
 #define __CRT_HAVE_DOS$envz_get

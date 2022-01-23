@@ -52,6 +52,12 @@
 #include <bits/types.h>
 }
 
+/*%[define(EOK = 0)]*/
+%[define(DOS_EOK = 0)]
+%[define(CYG_EOK = 0)]
+%[define_dos_replacement(EOK = 0)]
+
+
 /* Explicit errno code substitutions */
 /* Errno codes from emulated libcs */
 /*[[[deemon
@@ -116,6 +122,14 @@ for (local contextName: printed_contexts) {
 	}
 	print("%[define(", contextName.upper(), "_EMAX   = ", context_emax, ")]");
 	print("%[define(", contextName.upper(), "_ECOUNT = ", context_emax + 1, ")]");
+	if (contextName == "dos") {
+		for (local i: [:context_emax + 1]) {
+			local name, comment = contextMap.get(i)...;
+			if (name is none)
+				continue;
+			print("%[define_dos_replacement(", name, " " * (longestErrnoName - #name), " = ", i, ")]");
+		}
+	}
 }
 ]]]*/
 /* Errno codes for DOS */
@@ -201,6 +215,86 @@ for (local contextName: printed_contexts) {
 %[define(DOS_EWOULDBLOCK     = 140)] /* Operation would block */
 %[define(DOS_EMAX   = 140)]
 %[define(DOS_ECOUNT = 141)]
+%[define_dos_replacement(EPERM           = 1)]
+%[define_dos_replacement(ENOENT          = 2)]
+%[define_dos_replacement(ESRCH           = 3)]
+%[define_dos_replacement(EINTR           = 4)]
+%[define_dos_replacement(EIO             = 5)]
+%[define_dos_replacement(ENXIO           = 6)]
+%[define_dos_replacement(E2BIG           = 7)]
+%[define_dos_replacement(ENOEXEC         = 8)]
+%[define_dos_replacement(EBADF           = 9)]
+%[define_dos_replacement(ECHILD          = 10)]
+%[define_dos_replacement(EAGAIN          = 11)]
+%[define_dos_replacement(ENOMEM          = 12)]
+%[define_dos_replacement(EACCES          = 13)]
+%[define_dos_replacement(EFAULT          = 14)]
+%[define_dos_replacement(EBUSY           = 16)]
+%[define_dos_replacement(EEXIST          = 17)]
+%[define_dos_replacement(EXDEV           = 18)]
+%[define_dos_replacement(ENODEV          = 19)]
+%[define_dos_replacement(ENOTDIR         = 20)]
+%[define_dos_replacement(EISDIR          = 21)]
+%[define_dos_replacement(EINVAL          = 22)]
+%[define_dos_replacement(ENFILE          = 23)]
+%[define_dos_replacement(EMFILE          = 24)]
+%[define_dos_replacement(ENOTTY          = 25)]
+%[define_dos_replacement(EFBIG           = 27)]
+%[define_dos_replacement(ENOSPC          = 28)]
+%[define_dos_replacement(ESPIPE          = 29)]
+%[define_dos_replacement(EROFS           = 30)]
+%[define_dos_replacement(EMLINK          = 31)]
+%[define_dos_replacement(EPIPE           = 32)]
+%[define_dos_replacement(EDOM            = 33)]
+%[define_dos_replacement(ERANGE          = 34)]
+%[define_dos_replacement(EDEADLK         = 36)]
+%[define_dos_replacement(ENAMETOOLONG    = 38)]
+%[define_dos_replacement(ENOLCK          = 39)]
+%[define_dos_replacement(ENOSYS          = 40)]
+%[define_dos_replacement(ENOTEMPTY       = 41)]
+%[define_dos_replacement(EILSEQ          = 42)]
+%[define_dos_replacement(STRUNCATE       = 80)]
+%[define_dos_replacement(EADDRINUSE      = 100)]
+%[define_dos_replacement(EADDRNOTAVAIL   = 101)]
+%[define_dos_replacement(EAFNOSUPPORT    = 102)]
+%[define_dos_replacement(EALREADY        = 103)]
+%[define_dos_replacement(EBADMSG         = 104)]
+%[define_dos_replacement(ECANCELED       = 105)]
+%[define_dos_replacement(ECONNABORTED    = 106)]
+%[define_dos_replacement(ECONNREFUSED    = 107)]
+%[define_dos_replacement(ECONNRESET      = 108)]
+%[define_dos_replacement(EDESTADDRREQ    = 109)]
+%[define_dos_replacement(EHOSTUNREACH    = 110)]
+%[define_dos_replacement(EIDRM           = 111)]
+%[define_dos_replacement(EINPROGRESS     = 112)]
+%[define_dos_replacement(EISCONN         = 113)]
+%[define_dos_replacement(ELOOP           = 114)]
+%[define_dos_replacement(EMSGSIZE        = 115)]
+%[define_dos_replacement(ENETDOWN        = 116)]
+%[define_dos_replacement(ENETRESET       = 117)]
+%[define_dos_replacement(ENETUNREACH     = 118)]
+%[define_dos_replacement(ENOBUFS         = 119)]
+%[define_dos_replacement(ENODATA         = 120)]
+%[define_dos_replacement(ENOLINK         = 121)]
+%[define_dos_replacement(ENOMSG          = 122)]
+%[define_dos_replacement(ENOPROTOOPT     = 123)]
+%[define_dos_replacement(ENOSR           = 124)]
+%[define_dos_replacement(ENOSTR          = 125)]
+%[define_dos_replacement(ENOTCONN        = 126)]
+%[define_dos_replacement(ENOTRECOVERABLE = 127)]
+%[define_dos_replacement(ENOTSOCK        = 128)]
+%[define_dos_replacement(ENOTSUP         = 129)]
+%[define_dos_replacement(EOPNOTSUPP      = 130)]
+%[define_dos_replacement(EOTHER          = 131)]
+%[define_dos_replacement(EOVERFLOW       = 132)]
+%[define_dos_replacement(EOWNERDEAD      = 133)]
+%[define_dos_replacement(EPROTO          = 134)]
+%[define_dos_replacement(EPROTONOSUPPORT = 135)]
+%[define_dos_replacement(EPROTOTYPE      = 136)]
+%[define_dos_replacement(ETIME           = 137)]
+%[define_dos_replacement(ETIMEDOUT       = 138)]
+%[define_dos_replacement(ETXTBSY         = 139)]
+%[define_dos_replacement(EWOULDBLOCK     = 140)]
 
 /* Errno codes for CYG */
 %[define(CYG_EPERM           = 1)]   /* Operation not permitted */

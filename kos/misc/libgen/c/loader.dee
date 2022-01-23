@@ -2340,6 +2340,10 @@ again:
 		parseDirective_define_replacement(partialKeywordEscapes);
 	}
 
+	public function parseDirective_define_dos_replacement() {
+		parseDirective_define_replacement(dosReplacementEscapes);
+	}
+
 	public function parseDirective_define_str2wcs_replacement() {
 		parseDirective_define_replacement(str2wcsReplacementEscapes);
 	}
@@ -3167,10 +3171,19 @@ class CrtDosVariantCustomMetadata: CrtDosVariantMetadata {
 			local result = FunctionImplementation(name: name);
 			result.implPrefix = implPrefix;
 			local implBodyStr = str(implBody);
+			if ("%[invoke_libc]" in implBodyStr) {
+				/* Replace "%[invoke_libc]" with an expression
+				 * that invokes the function's `libc_*' variant. */
+				local libcCall = "{}({})".format({
+					"libc_" + name[5:],
+					", ".join(dosProto.argv.each.name)
+				});
+				implBodyStr = implBodyStr.replace("%[invoke_libc]", libcCall);
+			}
 			if (implBodyStr.startswith("{") && implBodyStr.endswith("}")) {
 				result.body = implBody;
 			} else {
-				result.body = "{{\n\treturn {}; }}".format({ implBodyStr });
+				result.body = "{{\n\treturn {};\n}}".format({ implBodyStr });
 			}
 			result.dependencies = []{
 				for (local body: { implBody, implPrefix... }) {

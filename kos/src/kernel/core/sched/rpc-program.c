@@ -1088,7 +1088,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 	}	break;
 
 #if SIZEOF_POINTER >= 8
-	CASE(RPC_OP_const4u) {
+	case RPC_OP_const4u: {
 		uintptr_t value;
 		value = (uintptr_t)rpc_vm_pc_rdl(self);
 		TRACE_INSTRUCTION("RPC_OP_const4u %#" PRIx32 "\n", (uint32_t)value);
@@ -1102,8 +1102,8 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		PUSH(value);
 	}	break;
 
-	CASE(RPC_OP_const8u)
-	CASE(RPC_OP_const8s) {
+	case RPC_OP_const8u:
+	case RPC_OP_const8s: {
 		uintptr_t value;
 #if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER < 8
 		if (rpc_vm_addrsize(self) < 8)
@@ -1341,7 +1341,9 @@ follow_jmp:
 		self->rv_pc += delta;   /* Adjust program counter */
 		self->rv_pcbuf_siz = 0; /* Clear program text buffer */
 	}	break;
+
 #else /* RPC_TRACE_INSTRUCTIONS */
+
 	CASE(RPC_OP_bra)
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;

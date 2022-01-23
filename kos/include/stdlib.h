@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7332bd50 */
+/* HASH CRC-32:0x78daf9d8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4544,8 +4544,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__qsort_s_defined */
 #endif  /* _CRT_ALGO_DEFINED */
 
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,getenv_s,(__SIZE_TYPE__ *__psize, char *__buf, rsize_t __buflen, char const *__varname),(__psize,__buf,__buflen,__varname))
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),(__pbuf,__pbuflen,__varname))
+#ifdef __CRT_HAVE_getenv_s
+__CDECLARE(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,getenv_s,(__SIZE_TYPE__ *__preqsize, char *__buf, rsize_t __bufsize, char const *__varname),(__preqsize,__buf,__bufsize,__varname))
+#elif defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
+#include <libc/local/stdlib/getenv_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(getenv_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) errno_t __NOTHROW_NCX(__LIBCCALL getenv_s)(__SIZE_TYPE__ *__preqsize, char *__buf, rsize_t __bufsize, char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getenv_s))(__preqsize, __buf, __bufsize, __varname); })
+#endif /* ... */
+#ifdef __CRT_HAVE__dupenv_s
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),(__pbuf,__pbuflen,__varname))
+#elif (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
+#include <libc/local/stdlib/_dupenv_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_dupenv_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) errno_t __NOTHROW_NCX(__LIBCCALL _dupenv_s)(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_dupenv_s))(__pbuf, __pbuflen, __varname); })
+#endif /* ... */
 #endif /* __USE_DOS_SLIB */
 #ifdef __CRT_HAVE_itoa
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_itoa,(int __val, char *__buf, int __radix),itoa,(__val,__buf,__radix))
@@ -5760,14 +5770,28 @@ __CREDIRECT(,onexit_t,__NOTHROW_NCX,onexit,(onexit_t __func),_onexit,(__func))
 #define ___wgetenv_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wgetenv,(wchar_t const *__varname),(__varname))
 #endif /* !___wgetenv_defined && __CRT_HAVE__wgetenv */
-#if !defined(___wgetenv_s_defined) && defined(__CRT_HAVE__wgetenv_s)
+#ifndef ___wgetenv_s_defined
 #define ___wgetenv_s_defined
-__CDECLARE(__ATTR_NONNULL((1, 4)),errno_t,__NOTHROW_NCX,_wgetenv_s,(__SIZE_TYPE__ *__return_size, wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__varname),(__return_size,__buf,__buflen,__varname))
-#endif /* !___wgetenv_s_defined && __CRT_HAVE__wgetenv_s */
-#if !defined(___wdupenv_s_defined) && defined(__CRT_HAVE__wdupenv_s)
+#ifdef __CRT_HAVE__wgetenv_s
+__CDECLARE(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,_wgetenv_s,(__SIZE_TYPE__ *__preqsize, wchar_t *__buf, rsize_t __bufsize, wchar_t const *__varname),(__preqsize,__buf,__bufsize,__varname))
+#elif defined(__CRT_HAVE__wgetenv)
+#include <libc/local/stdlib/_wgetenv_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetenv_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) errno_t __NOTHROW_NCX(__LIBCCALL _wgetenv_s)(__SIZE_TYPE__ *__preqsize, wchar_t *__buf, rsize_t __bufsize, wchar_t const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetenv_s))(__preqsize, __buf, __bufsize, __varname); })
+#else /* ... */
+#undef ___wgetenv_s_defined
+#endif /* !... */
+#endif /* !___wgetenv_s_defined */
+#ifndef ___wdupenv_s_defined
 #define ___wdupenv_s_defined
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_wdupenv_s,(wchar_t **__pbuf, __SIZE_TYPE__ *__pbuflen, wchar_t const *__varname),(__pbuf,__pbuflen,__varname))
-#endif /* !___wdupenv_s_defined && __CRT_HAVE__wdupenv_s */
+#ifdef __CRT_HAVE__wdupenv_s
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_wdupenv_s,(wchar_t **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, wchar_t const *__varname),(__pbuf,__pbuflen,__varname))
+#elif defined(__CRT_HAVE__wgetenv) && (defined(__CRT_HAVE_wcsdup) || defined(__CRT_HAVE__wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
+#include <libc/local/stdlib/_wdupenv_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wdupenv_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) errno_t __NOTHROW_NCX(__LIBCCALL _wdupenv_s)(wchar_t **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, wchar_t const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wdupenv_s))(__pbuf, __pbuflen, __varname); })
+#else /* ... */
+#undef ___wdupenv_s_defined
+#endif /* !... */
+#endif /* !___wdupenv_s_defined */
 #ifndef _CRT_WSYSTEM_DEFINED
 #define _CRT_WSYSTEM_DEFINED
 #ifdef __CRT_HAVE_wsystem

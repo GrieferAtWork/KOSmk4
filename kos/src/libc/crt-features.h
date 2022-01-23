@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9ff774a */
+/* HASH CRC-32:0x3a590efe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,15 +222,15 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_dtest
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_dupenv_s
 #define __CRT_HAVE_DOS$_ecvt_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_endthreadex
 #define __CRT_HAVE_DOS$_eof
-#define __CRT_HAVE_DOS$_fcvt_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_fcvt_s
 #define __CRT_HAVE_DOS$_fdtest
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -275,11 +275,7 @@
 #define __CRT_HAVE_DOS$_fwprintf_p_l
 #define __CRT_HAVE_DOS$_fwprintf_s_l
 #define __CRT_HAVE_DOS$_fwscanf_l
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_gcvt_s
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_get_doserrno
 #define __CRT_HAVE_DOS$_get_errno
 #endif /* !__KERNEL__ */
@@ -301,9 +297,9 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_i64toa
-#define __CRT_HAVE_DOS$_i64toa_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_i64toa_s
 #define __CRT_HAVE_DOS$_i64tow
 #define __CRT_HAVE_DOS$_i64tow_s
 #endif /* !__KERNEL__ */
@@ -315,11 +311,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_iswcsym_l
 #define __CRT_HAVE_DOS$_iswcsymf_l
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_itoa_s
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_itow
 #define __CRT_HAVE_DOS$_itow_s
 #define __CRT_HAVE_DOS$_ldtest
@@ -342,7 +334,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_makepath
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_makepath_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_mblen_l
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -368,9 +364,9 @@
 #define __CRT_HAVE_DOS$_printf_p
 #define __CRT_HAVE_DOS$_printf_p_l
 #define __CRT_HAVE_DOS$_printf_s_l
-#define __CRT_HAVE_DOS$_putenv_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_putenv_s
 #define __CRT_HAVE_DOS$_putws
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -433,7 +429,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_splitpath
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_splitpath_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_sprintf_l
 #define __CRT_HAVE_DOS$_sprintf_p
 #define __CRT_HAVE_DOS$_sprintf_p_l
@@ -461,16 +461,12 @@
 #define __CRT_HAVE_DOS$_tolower
 #define __CRT_HAVE_DOS$_toupper
 #define __CRT_HAVE_DOS$_ui64toa
-#define __CRT_HAVE_DOS$_ui64toa_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_ui64toa_s
 #define __CRT_HAVE_DOS$_ui64tow
 #define __CRT_HAVE_DOS$_ui64tow_s
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_ultoa_s
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_ultow
 #define __CRT_HAVE_DOS$_ultow_s
 #endif /* !__KERNEL__ */
@@ -1311,10 +1307,10 @@
 #define __CRT_HAVE_DOS$getdirentries64
 #define __CRT_HAVE_DOS$getdomainname
 #define __CRT_HAVE_DOS$getentropy
-#define __CRT_HAVE_DOS$getenv
-#define __CRT_HAVE_DOS$getenv_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$getenv
+#define __CRT_HAVE_DOS$getenv_s
 #define __CRT_HAVE_DOS$getexecname
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -2173,7 +2169,11 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$putchar
 #define __CRT_HAVE_DOS$putchar_unlocked
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$putenv
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$putgrent
 #define __CRT_HAVE_DOS$putmsg
 #define __CRT_HAVE_DOS$putpmsg
@@ -2214,7 +2214,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$rand_r
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$rand_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$random_r
 #define __CRT_HAVE_DOS$rawmemchr
 #define __CRT_HAVE_DOS$rawmemchrl
@@ -2366,7 +2370,11 @@
 #define __CRT_HAVE_DOS$sched_setaffinity
 #define __CRT_HAVE_DOS$sched_setparam
 #define __CRT_HAVE_DOS$sched_setscheduler
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$secure_getenv
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$seed48
 #define __CRT_HAVE_DOS$seed48_r
 #define __CRT_HAVE_DOS$seekdir
@@ -2397,7 +2405,11 @@
 #define __CRT_HAVE_DOS$setbuffer
 #define __CRT_HAVE_DOS$setdomainname
 #define __CRT_HAVE_DOS$setegid
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$setenv
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$seteuid
 #define __CRT_HAVE_DOS$setfsgid
 #define __CRT_HAVE_DOS$setfsuid
@@ -2877,7 +2889,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$unlockpt
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$unsetenv
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$unshare
 #define __CRT_HAVE_DOS$updwtmp
 #define __CRT_HAVE_DOS$updwtmpx

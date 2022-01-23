@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebc3244a */
+/* HASH CRC-32:0x65e20487 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb_s))(int *__presult, char *__bu
 #endif /* !__ERANGE */
 	}
 	*__presult = (__NAMESPACE_LOCAL_SYM __localdep_wctomb)(__buf, __wc);
-	return 0;
+	return __EOK;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wctomb_s_defined

@@ -72,6 +72,7 @@
 
 %(auto_source){
 #include "../libc/globals.h"
+#include <strings.h>
 }
 
 
@@ -537,7 +538,7 @@ struct __div_struct div(int numer, int denom) {
 [[impl_include("<hybrid/typecore.h>")]]
 [[std, wunused, section(".text.crt{|.dos}.fs.environ")]]
 [[requires_include("<libc/template/environ.h>")]]
-[[userimpl, requires(defined(__LOCAL_environ))]]
+[[crt_dos_variant, userimpl, requires(defined(__LOCAL_environ))]]
 [[impl_prefix(
 @@pp_ifndef __OPTIMIZE_SIZE__@@
 #include <hybrid/__unaligned.h>
@@ -2320,7 +2321,7 @@ int dos_putenv_s([[nonnull]] char const *varname,
                  [[nonnull]] char const *val);
 
 [[section(".text.crt{|.dos}.fs.environ")]]
-[[userimpl, requires_function(getenv, dos_putenv_s)]]
+[[crt_dos_variant, userimpl, requires_function(getenv, dos_putenv_s)]]
 int setenv([[nonnull]] char const *varname,
            [[nonnull]] char const *val, int replace) {
 	if (!replace && getenv(varname))
@@ -2330,7 +2331,7 @@ int setenv([[nonnull]] char const *varname,
 
 [[section(".text.crt{|.dos}.fs.environ")]]
 [[impl_include("<parts/malloca.h>")]]
-[[userimpl, requires_function(putenv)]]
+[[crt_dos_variant, userimpl, requires_function(putenv)]]
 int unsetenv([[nonnull]] char const *varname) {
 	int result;
 	char *copy;
@@ -2413,7 +2414,7 @@ void lcong48([[nonnull]] unsigned short param[7]);
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
 [[section(".text.crt{|.dos}.fs.environ")]]
-[[dos_only_export_alias("_putenv")]]
+[[crt_dos_variant, dos_only_export_alias("_putenv")]]
 int putenv([[nonnull]] char *string);
 %#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 
@@ -2832,7 +2833,7 @@ __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
-[[wunused, section(".text.crt{|.dos}.fs.environ")]]
+[[crt_dos_variant, wunused, section(".text.crt{|.dos}.fs.environ")]]
 [[export_alias("__secure_getenv", "__libc_secure_getenv"), alias("getenv")]]
 [[if($extended_include_prefix("<libc/template/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
 char *secure_getenv([[nonnull]] char const *varname);
@@ -3325,7 +3326,7 @@ void *reallocf(void *mallptr, $size_t num_bytes) {
 @@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
 [[guard, section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((3, 4))]]
-[[userimpl, requires_function(recallocv, calloc, malloc_usable_size)]]
+[[requires_function(recallocv, calloc, malloc_usable_size)]]
 void *recallocarray(void *mallptr, $size_t old_elem_count,
                     $size_t new_elem_count, $size_t elem_size) {
 	if (mallptr != NULL && old_elem_count != 0) {
@@ -3361,7 +3362,7 @@ void *recallocarray(void *mallptr, $size_t old_elem_count,
 @@immediately returned  to the  OS, rather  than being  left in  cache
 @@while still containing its previous contents.
 [[section(".text.crt{|.dos}.heap.rare_helpers")]]
-[[userimpl, requires_function(free), guard]]
+[[requires_function(free), guard]]
 void freezero(void *mallptr, $size_t num_bytes) {
 	if likely(mallptr) {
 		explicit_bzero(mallptr, num_bytes);
@@ -4385,16 +4386,56 @@ void qsort_s([[nonnull]] void *base, $size_t elem_count, $size_t elem_size,
 %
 
 [[section(".text.crt.dos.utility")]]
-[[decl_include("<bits/types.h>")]]
-errno_t getenv_s([[nonnull]] $size_t *psize,
-                 [[nonnull]] char *buf, rsize_t buflen,
-                 [[nonnull]] char const *varname);
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
+[[requires_function(getenv), impl_include("<libc/errno.h>")]]
+errno_t getenv_s([[nonnull]] $size_t *preqsize,
+                 [[nonnull]] char *buf, rsize_t bufsize,
+                 [[nonnull]] char const *varname) {
+	size_t reqsize;
+	char *name = getenv(varname);
+	if (!name) {
+		if (preqsize)
+			*preqsize = 0;
+		return EOK;
+	}
+	reqsize = (strlen(name) + 1) * sizeof(char);
+	if (preqsize)
+		*preqsize = reqsize;
+	if (reqsize > bufsize) {
+@@pp_ifdef ERANGE@@
+		return ERANGE;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	memcpy(buf, name, reqsize);
+	return EOK;
+}
 
 [[section(".text.crt.dos.utility")]]
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
+[[requires_function(getenv, strdup), impl_include("<libc/errno.h>")]]
 errno_t _dupenv_s([[nonnull]] char **__restrict pbuf,
                   [[nonnull]] $size_t *pbuflen,
-                  [[nonnull]] char const *varname);
+                  [[nonnull]] char const *varname) {
+	char *name = getenv(varname);
+	if (!name) {
+		*pbuf    = NULL;
+		*pbuflen = 0;
+		return $EOK;
+	}
+	name = strdup(name);
+	if (!name) {
+@@pp_ifdef ENOMEM@@
+		return $ENOMEM;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	*pbuf    = name;
+	*pbuflen = (strlen(name) + 1) * sizeof(char);
+	return $EOK;
+}
 %#endif /* __USE_DOS_SLIB */
 
 %[insert:function(_itoa = itoa)]
@@ -4408,6 +4449,7 @@ errno_t _dupenv_s([[nonnull]] char **__restrict pbuf,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_i64toa_s")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	int temp;
@@ -4419,7 +4461,7 @@ errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	if (val < 0) {
 		if (!buflen--) {
 @@pp_ifdef ERANGE@@
-			return ERANGE;
+			return $ERANGE;
 @@pp_else@@
 			return 1;
 @@pp_endif@@
@@ -4433,7 +4475,7 @@ errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
-		return ERANGE;
+		return $ERANGE;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
@@ -4452,6 +4494,8 @@ errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 [[impl_include("<libc/errno.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
+[[crt_intern_dos_alias(libd__itoa_s)]]
+//[[crt_dos_variant({ impl: libd_errno_kos2dosinvoke_libclibc]); })]]
 errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	long temp;
@@ -4463,7 +4507,7 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	if (val < 0) {
 		if (!buflen--) {
 @@pp_ifdef ERANGE@@
-			return ERANGE;
+			return $ERANGE;
 @@pp_else@@
 			return 1;
 @@pp_endif@@
@@ -4477,7 +4521,7 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
-		return ERANGE;
+		return $ERANGE;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
@@ -4487,7 +4531,7 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	do {
 		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
-	return 0;
+	return $EOK;
 }
 
 [[decl_include("<bits/types.h>")]]
@@ -4495,6 +4539,7 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_ui64toa_s")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _ultoa_s(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	unsigned long temp;
@@ -4509,7 +4554,7 @@ errno_t _ultoa_s(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int r
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
-		return ERANGE;
+		return $ERANGE;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
@@ -4519,7 +4564,7 @@ errno_t _ultoa_s(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int r
 	do {
 		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
-	return 0;
+	return $EOK;
 }
 
 
@@ -4549,6 +4594,7 @@ char *_ui64toa($u64 val, [[nonnull]] char *buf, int radix) {
 [[impl_include("<libc/errno.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	s64 temp;
@@ -4560,7 +4606,7 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	if (val < 0) {
 		if (!buflen--) {
 @@pp_ifdef ERANGE@@
-			return ERANGE;
+			return $ERANGE;
 @@pp_else@@
 			return 1;
 @@pp_endif@@
@@ -4574,7 +4620,7 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
-		return ERANGE;
+		return $ERANGE;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
@@ -4584,7 +4630,7 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	do {
 		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
-	return 0;
+	return $EOK;
 }
 
 [[decl_include("<bits/types.h>")]]
@@ -4592,6 +4638,7 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 [[alt_variant_of(__SIZEOF_LONG__ == 8, _ultoa_s)]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _ui64toa_s($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	u64 temp;
@@ -4713,9 +4760,9 @@ errno_t _mbstowcs_s($size_t *presult,
 		*presult = error;
 @@pp_ifdef EILSEQ@@
 	if (error == (size_t)-1)
-		return EILSEQ;
+		return $EILSEQ;
 @@pp_endif@@
-	return 0;
+	return $EOK;
 }
 
 [[decl_include("<bits/types.h>")]]
@@ -4735,9 +4782,9 @@ errno_t mbstowcs_s($size_t *presult,
 		*presult = error;
 @@pp_ifdef EILSEQ@@
 	if (error == (size_t)-1)
-		return EILSEQ;
+		return $EILSEQ;
 @@pp_endif@@
-	return 0;
+	return $EOK;
 }
 
 [[wchar, decl_include("<bits/types.h>")]]
@@ -4757,25 +4804,26 @@ errno_t _mbstowcs_s_l($size_t *presult,
 		*presult = error;
 @@pp_ifdef EILSEQ@@
 	if (error == (size_t)-1)
-		return EILSEQ;
+		return $EILSEQ;
 @@pp_endif@@
-	return 0;
+	return $EOK;
 }
 
 
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
-[[section(".text.crt.dos.random")]]
+[[section(".text.crt.dos.random"), requires_function(rand)]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 	if (!randval) {
 @@pp_ifdef EINVAL@@
-		return EINVAL;
+		return $EINVAL;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
 	}
 	*randval = rand();
-	return 0;
+	return $EOK;
 }
 
 
@@ -4814,20 +4862,20 @@ errno_t wctomb_s([[nonnull]] int *presult,
                  rsize_t buflen, wchar_t wc) {
 	if (!presult || !buf) {
 @@pp_ifdef EINVAL@@
-		return EINVAL;
+		return $EINVAL;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
 	}
 	if (buflen < @MB_CUR_MAX@) {
 @@pp_ifdef ERANGE@@
-		return ERANGE;
+		return $ERANGE;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
 	}
 	*presult = wctomb(buf, wc);
-	return 0;
+	return $EOK;
 }
 %#endif /* __USE_DOS_SLIB */
 
@@ -4867,7 +4915,7 @@ errno_t wcstombs_s([[nonnull]] $size_t *presult,
                    [[nonnull]] wchar_t const *src, $size_t maxlen) {
 	if (!presult || !buf || !src) {
 @@pp_ifdef EINVAL@@
-		return EINVAL;
+		return $EINVAL;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
@@ -4875,8 +4923,8 @@ errno_t wcstombs_s([[nonnull]] $size_t *presult,
 	if (buflen > maxlen)
 		buflen = maxlen;
 	*presult = wcstombs(buf, src, buflen);
-	/* TODO: if (__buflen < *presult) return ERANGE; */
-	return 0;
+	/* TODO: if (buflen < *presult) return ERANGE; */
+	return $EOK;
 }
 
 
@@ -5012,41 +5060,56 @@ char *_fullpath(char *buf, char const *path, $size_t buflen);
 
 %#ifndef __NO_FPU
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<bits/types.h>")]]
-[[impl_include("<libc/errno.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _ecvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit,
                 [[nonnull]] int *__restrict decptr,
                 [[nonnull]] int *__restrict sign) {
-	if (!buf || !decptr || !sign)
-		return __EINVAL;
+	if (!buf || !decptr || !sign) {
+@@pp_ifdef EINVAL@@
+		return $EINVAL;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
 	ecvt_r(val, ndigit, decptr, sign, buf, buflen);
-	return 0;
+	return $EOK;
 }
 
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<bits/types.h>")]]
-[[impl_include("<libc/errno.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _fcvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit,
                 [[nonnull]] int *__restrict decptr,
                 [[nonnull]] int *__restrict sign) {
-	if (!buf || !decptr || !sign)
-		return __EINVAL;
+	if (!buf || !decptr || !sign) {
+@@pp_ifdef EINVAL@@
+		return $EINVAL;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
 	fcvt_r(val, ndigit, decptr, sign, buf, buflen);
-	return 0;
+	return $EOK;
 }
 
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<bits/types.h>")]]
-[[impl_include("<libc/errno.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _gcvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit) {
 	int a, b;
-	if (!buf)
-		return __EINVAL;
+	if (!buf) {
+@@pp_ifdef EINVAL@@
+		return $EINVAL;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
 	ecvt_r(val, ndigit, &a, &b, buf, buflen);
-	return 0;
+	return $EOK;
 }
 
 
@@ -5173,9 +5236,15 @@ unsigned long _lrotr(unsigned long val, int shift) {
 
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.fs.environ")]]
-[[requires_function(setenv), impl_include("<libc/errno.h>")]]
+[[crt_dos_variant, requires_function(setenv), impl_include("<libc/errno.h>")]]
 errno_t _putenv_s(char const *varname, char const *val) {
-	return setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
+	return setenv(varname, val, 1)
+@@pp_ifdef EINVAL@@
+	       ? __libc_geterrno_or($EINVAL)
+@@pp_else@@
+	       ? __libc_geterrno_or(1)
+@@pp_endif@@
+	       : 0;
 }
 
 
@@ -5212,8 +5281,8 @@ void _splitpath([[nonnull]] char const *__restrict abspath,
 }
 
 [[section(".text.crt.dos.fs.utility")]]
-[[decl_include("<bits/types.h>")]]
-[[impl_include("<libc/errno.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _makepath_s([[nonnull]] char *buf, $size_t buflen,
                     char const *drive, char const *dir,
                     char const *file, char const *ext) {
@@ -5252,18 +5321,18 @@ errno_t _makepath_s([[nonnull]] char *buf, $size_t buflen,
 	path_putc('\0');
 	return 0;
 err_buflen:
-#ifdef EINVAL
-	return EINVAL;
-#else /* EINVAL */
+@@pp_ifdef EINVAL@@
+	return $EINVAL;
+@@pp_else@@
 	return 1;
-#endif /* !EINVAL */
+@@pp_endif@@
 #undef path_putn
 #undef path_putc
 }
 
 [[section(".text.crt.dos.fs.utility")]]
-[[decl_include("<bits/types.h>")]]
-[[impl_include("<libc/errno.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _splitpath_s([[nonnull]] char const *__restrict abspath,
                      [[outp_opt(drivelen)]] char *drive, $size_t drivelen,
                      [[outp_opt(dirlen)]] char *dir, $size_t dirlen,
@@ -5340,14 +5409,14 @@ got_drive:
 	return 0;
 err_inval:
 @@pp_ifdef EINVAL@@
-	return EINVAL;
+	return $EINVAL;
 @@pp_else@@
 	return 1;
 @@pp_endif@@
 err_range:
 @@pp_ifdef ERANGE@@
 	(void)__libc_seterrno(ERANGE);
-	return ERANGE;
+	return $ERANGE;
 @@pp_else@@
 	return 1;
 @@pp_endif@@
@@ -5463,20 +5532,16 @@ onexit_t onexit(onexit_t func);
 [[guard, wchar, wunused]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
 wchar_t *_wgetenv([[nonnull]] wchar_t const *varname);
+%[define_str2wcs_replacement(getenv = _wgetenv)]
 
-[[decl_include("<bits/types.h>")]]
-[[section(".text.crt.dos.wchar.fs.environ")]]
-[[guard, wchar, decl_include("<bits/types.h>")]]
-errno_t _wgetenv_s([[nonnull]] $size_t *return_size,
-                   [[outp_opt(buflen)]] wchar_t *buf, $size_t buflen,
-                   [[nonnull]] wchar_t const *varname);
+//[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
+//_wgetenv(*) %{generate(str2wcs("getenv"))}
 
-[[decl_include("<bits/types.h>")]]
-[[section(".text.crt.dos.wchar.fs.environ")]]
-[[guard, wchar, decl_include("<bits/types.h>")]]
-errno_t _wdupenv_s([[nonnull]] wchar_t **pbuf,
-                   [[nonnull]] $size_t *pbuflen,
-                   [[nonnull]] wchar_t const *varname);
+[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
+_wgetenv_s(*) %{generate(str2wcs("getenv_s"))}
+
+[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
+_wdupenv_s(*) %{generate(str2wcs("_dupenv_s"))}
 
 %[insert:function(_wsystem = wsystem, guardName: "_CRT_WSYSTEM_DEFINED")]
 

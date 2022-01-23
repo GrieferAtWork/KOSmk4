@@ -40,6 +40,7 @@
 #include <nt/handleapi.h>
 #include <nt/libloaderapi.h>
 #include <nt/types.h>
+#include <nt/winnls.h>
 
 #include <elf.h>
 #include <format-printer.h>
@@ -69,7 +70,7 @@ DECL_BEGIN
 PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdin_data  = IOFILE_DATA_NOVTAB_INIT();
 PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdout_data = IOFILE_DATA_NOVTAB_INIT();
 PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stderr_data = IOFILE_DATA_NOVTAB_INIT();
-INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE libc_iob[3]                               = {
+INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE libc_iob[3] = {
     [0] = __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdin_data),             /* !Relocation: &default_stdin_io */
     [1] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdout_data), /* !Relocation: &default_stdout_io */
     [2] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&default_stderr_data), /* !Relocation: &default_stderr_io */
@@ -236,10 +237,11 @@ PRIVATE ATTR_SECTION(".bss.crt.compat.linux.stdio") struct linux_default_stdio_f
 
 
 /* Helper for loading std stream addresses in compatibility mode. */
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") NONNULL((1, 2, 3)) FILE *NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
-                                                                                                                                                   char const *__restrict name1,
-                                                                                                                                                   char const *__restrict name2,
-                                                                                                                                                   struct linux_default_stdio_file *__restrict fallback) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") NONNULL((1, 2, 3)) FILE *
+NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
+                                              char const *__restrict name1,
+                                              char const *__restrict name2,
+                                              struct linux_default_stdio_file *__restrict fallback) {
 	byte_t *result;
 	ElfW(Sym) const *sym;
 	sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, name1);
@@ -258,7 +260,8 @@ INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") NONN
 	return (FILE *)result;
 }
 
-INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void NOTHROW(LIBCCALL linux_stdio_init)(bool is_2_1) {
+INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void
+NOTHROW(LIBCCALL linux_stdio_init)(bool is_2_1) {
 	void *mainapp;
 	struct linux_default_stdio_file *result;
 	if (linux_stdio_files)
@@ -295,33 +298,39 @@ INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void NOTHROW(LIBCCALL linux_
 }
 
 /* Initialize the linux stdio-compatibility system. */
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_2_1_stdin)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_2_1_stdin)(void) {
 	linux_stdio_init(true);
 	return libc_stdin;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_2_1_stdout)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_2_1_stdout)(void) {
 	linux_stdio_init(true);
 	return libc_stdout;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_2_1_stderr)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_2_1_stderr)(void) {
 	linux_stdio_init(true);
 	return libc_stderr;
 }
 
 /* Initialize the linux stdio-compatibility system. */
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_stdin)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_stdin)(void) {
 	linux_stdio_init(false);
 	return libc_stdin;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_stdout)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_stdout)(void) {
 	linux_stdio_init(false);
 	return libc_stdout;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *NOTHROW(LIBCCALL linux_stdio_get_stderr)(void) {
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") FILE *
+NOTHROW(LIBCCALL linux_stdio_get_stderr)(void) {
 	linux_stdio_init(false);
 	return libc_stderr;
 }
@@ -391,7 +400,9 @@ PNEW_HANDLER LIBCCALL libc_set_new_handler(PNEW_HANDLER handler) {
 }
 
 DEFINE_PUBLIC_ALIAS(__builtin_new, libc___builtin_new);
-INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.heap") void *LIBCCALL libc___builtin_new(size_t sz) {
+ATTR_SECTION(".text.crt.compat.linux.heap")
+INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED void *LIBCCALL
+libc___builtin_new(size_t sz) {
 	void *result = malloc(sz);
 	if unlikely (result == NULL)
 		(*__new_handler)();
@@ -772,7 +783,8 @@ DEFINE_PUBLIC_ALIAS(__fpu_control, libc___fpu_control);
 /* >> __setfpucw(3)
  * Function called by old linux applications to set `__fpu_control()'. */
 DEFINE_PUBLIC_ALIAS(__setfpucw, libc___setfpucw);
-INTERN ATTR_SECTION(".text.crt.math.float") void NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
+INTERN ATTR_SECTION(".text.crt.math.float") void
+NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
 #if _FPU_RESERVED != 0
 	fpu_control_t word;
 	_FPU_GETCW(word);
@@ -813,6 +825,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_except_handler3, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler_3, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler4, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler4_common, libd__except_handler4);
+DEFINE_PUBLIC_ALIAS(DOS$__C_specific_handler, libd__except_handler4);
 
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
 libd___lconv_init(void) {
@@ -935,8 +948,9 @@ construct_dos_commandline(void) {
 	return result;
 }
 
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p__acmdln_initialized = ATOMIC_ONCE_INIT;
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char *libd__acmdln                              = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
+struct atomic_once libd___p__acmdln_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char *libd__acmdln = NULL;
 DEFINE_PUBLIC_IDATA_G(DOS$_acmdln, libd___p__acmdln, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_ALIAS(DOS$__p__acmdln, libd___p__acmdln);
 INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.application.init") char **LIBDCALL
@@ -958,8 +972,9 @@ construct_dos_wcommandline(void) {
 	return acmdln ? convert_mbstoc16(acmdln) : NULL;
 }
 
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p__wcmdln_initialized = ATOMIC_ONCE_INIT;
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd__wcmdln                          = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
+struct atomic_once libd___p__wcmdln_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd__wcmdln = NULL;
 DEFINE_PUBLIC_IDATA_G(DOS$_wcmdln, libd___p__wcmdln, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_ALIAS(DOS$__p__wcmdln, libd___p__wcmdln);
 INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.application.init") char16_t **LIBDCALL
@@ -987,8 +1002,26 @@ libd___p__commode(void) {
 /************************************************************************/
 /* __mb_cur_max                                                         */
 /************************************************************************/
-INTERN ATTR_SECTION(".data.crt.dos.application.init") int libd___mb_cur_max = 7;
 DEFINE_PUBLIC_ALIAS(__mb_cur_max, libd___mb_cur_max);
+DEFINE_PUBLIC_ALIAS(__p___mb_cur_max, libd___p___mb_cur_max);
+DEFINE_PUBLIC_ALIAS(___mb_cur_max_func, libd____mb_cur_max_func);
+DEFINE_PUBLIC_ALIAS(___mb_cur_max_l_func, libd____mb_cur_max_l_func);
+INTERN ATTR_SECTION(".data.crt.dos.application.init") int libd___mb_cur_max = 7;
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int *LIBDCALL
+libd___p___mb_cur_max(void) {
+	COMPILER_IMPURE();
+	return &libd___mb_cur_max;
+}
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
+libd____mb_cur_max_func(void) {
+	COMPILER_IMPURE();
+	return libd___mb_cur_max;
+}
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
+libd____mb_cur_max_l_func(locale_t locale) {
+	(void)locale;
+	return libd____mb_cur_max_func();
+}
 
 
 /************************************************************************/
@@ -1019,8 +1052,8 @@ libd__amsg_exit(int errnum) {
 /************************************************************************/
 /* _initterm()                                                          */
 /************************************************************************/
-typedef void(LIBDCALL *_INITTERMFUN)(void);
-typedef int(LIBDCALL *_INITTERM_E_FN)(void);
+typedef void (LIBDCALL *_INITTERMFUN)(void);
+typedef int (LIBDCALL *_INITTERM_E_FN)(void);
 
 DEFINE_PUBLIC_ALIAS(DOS$_initterm, libd__initterm);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
@@ -1075,7 +1108,8 @@ libd__unlock(int locknum) {
 /* New-style MSVC stdio-FILE access                                     */
 /************************************************************************/
 DEFINE_PUBLIC_ALIAS(DOS$__acrt_iob_func, libd___acrt_iob_func);
-INTERN ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos") FILE *NOTHROW(LIBDCALL libd___acrt_iob_func)(unsigned int index) {
+INTERN ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos") FILE *
+NOTHROW(LIBDCALL libd___acrt_iob_func)(unsigned int index) {
 	return &libc_iob[index];
 }
 
@@ -1122,7 +1156,7 @@ libd_requirek32(char const *__restrict symbol_name) {
 	DEFINE_PUBLIC_ALIAS(DOS$##name, libd_##name);                                     \
 	INTERN ATTR_SECTION(".text.crt.dos.compat.dos")                                   \
 	T_RETURN cc libd_##name params {                                                  \
-		typedef T_RETURN(WINAPI *LPK32##name) params;                                 \
+		typedef T_RETURN (WINAPI *LPK32##name) params;                                \
 		static LPK32##name pdynK32##name = NULL;                                      \
 		if (!pdynK32##name)                                                           \
 			*(void **)&pdynK32##name = libd_requirek32(k32name);                      \
@@ -1270,6 +1304,18 @@ libd__execute_onexit_table(_onexit_table_t *self) {
 	return result;
 }
 
+
+
+/************************************************************************/
+/* DOS ctype internals                                                  */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(DOS$___lc_codepage_func, libd____lc_collate_cp_func);
+DEFINE_PUBLIC_ALIAS(DOS$___lc_collate_cp_func, libd____lc_collate_cp_func);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") UINT LIBDCALL
+libd____lc_collate_cp_func(void) {
+	COMPILER_IMPURE();
+	return CP_UTF8;
+}
 
 
 

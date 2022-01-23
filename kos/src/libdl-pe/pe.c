@@ -36,6 +36,7 @@
 
 #include <asm/intrin.h>
 #include <kos/except.h>
+#include <kos/exec/bits/peb.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
 #include <nt/libloaderapi.h>
@@ -164,11 +165,18 @@ struct librepl {
 
 /* KOS replacements for NT system dlls. */
 PRIVATE struct librepl const lib_replacements[] = {
-	{ "msvcrt", /*       */ "libc.so" },
-	{ "vcruntime140", /* */ "libc.so" },
-	{ "vcruntime140d", /**/ "libc.so" },
-	{ "ucrtbase", /*     */ "libc.so" },
-	{ "ucrtbased", /*    */ "libc.so" },
+	{ "msvcrt", /*          */ "libc.so" },
+	{ "vcruntime140", /*    */ "libc.so" },
+	{ "vcruntime140d", /*   */ "libc.so" },
+	{ "ucrtbase", /*        */ "libc.so" },
+	{ "ucrtbased", /*       */ "libc.so" },
+	{ "msvcr80", /*         */ "libc.so" },
+	{ "msvcr90", /*         */ "libc.so" },
+	{ "msvcr100", /*        */ "libc.so" },
+	{ "msvcr120", /*        */ "libc.so" },
+	{ "msvcr120_clr0400", /**/ "libc.so" },
+	{ "msvcrt20", /*        */ "libc.so" },
+	{ "msvcrt40", /*        */ "libc.so" },
 };
 
 
@@ -916,7 +924,7 @@ DEFINE_PUBLIC_ALIAS(__linker_main, libpe_linker_main);
 INTERN void *FCALL
 libpe_linker_main(struct peexec_info *__restrict info,
                   uintptr_t loadaddr,
-                  struct process_peb *__restrict UNUSED(peb)) {
+                  struct process_peb *__restrict peb) {
 	PNT_TIB tib;
 	void *result;
 	DlModule *mod;
@@ -937,6 +945,20 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	syslog(LOG_DEBUG, "[pe] pe->pd_nt.FileHeader.Characteristics      = %#I16x\n", pe->pd_nt.FileHeader.Characteristics);
 	syslog(LOG_DEBUG, "[pe] pe->pd_name                               = %q\n", peexec_data__pd_name(pe));
 #endif
+
+	if (peb->pp_argc) {
+		char *argv0 = peb->pp_argv[0];
+		if (argv0 && argv0[0] == '/') {
+			/* The system gave  us an absolute  unix-style path as  argv[0].
+			 * Because argv[0]  is traditionally  the  name of  the  program
+			 * (even though use of `exec*()' doesn't make that a necessity),
+			 * we automagically convert that argument into a DOS-path. */
+			argv0 = dlfrealpathat(AT_FDCWD, argv0, AT_ALTPATH);
+			if unlikely(!argv0)
+				goto err_nomem;
+			peb->pp_argv[0] = argv0;
+		}
+	}
 
 	/* Allocate the DL module descriptor for the PE binary. */
 	mod = (DlModule *)malloc(offsetof(DlModule, dm_pe.dp_sect) +

@@ -1011,7 +1011,6 @@ PRIVATE struct {
 	char     an_name[20]; /* Flag name */
 } const atflag_names[] = {
 	{ AT_SYMLINK_NOFOLLOW, "AT_SYMLINK_NOFOLLOW" },
-	{ AT_REMOVEDIR,        "AT_REMOVEDIR" },
 	{ AT_SYMLINK_FOLLOW,   "AT_SYMLINK_FOLLOW" },
 	{ AT_NO_AUTOMOUNT,     "AT_NO_AUTOMOUNT" },
 	{ AT_EMPTY_PATH,       "AT_EMPTY_PATH" },
@@ -1030,10 +1029,9 @@ print_atflag_t_impl(pformatprinter printer, void *arg,
 	bool is_first = true;
 	unsigned int i;
 	atflag_t valid_mask;
-	valid_mask = (AT_SYMLINK_NOFOLLOW | AT_REMOVEDIR |
-	              AT_SYMLINK_FOLLOW | AT_NO_AUTOMOUNT |
-	              AT_EMPTY_PATH | AT_REMOVEREG | AT_ALTPATH |
-	              AT_DOSPATH);
+	valid_mask = (AT_SYMLINK_NOFOLLOW | AT_SYMLINK_FOLLOW |
+	              AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_REMOVEREG |
+	              AT_ALTPATH | AT_DOSPATH);
 	if (nameof_AT_READLINK_REQSIZE)
 		valid_mask |= AT_READLINK_REQSIZE;
 	for (i = 0; i < COMPILER_LENOF(atflag_names); ++i) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f2d8fb6 */
+/* HASH CRC-32:0xa8b7f20 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,9 +93,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf, __SIZE_TYP
 __err_buflen:
 #ifdef __EINVAL
 	return __EINVAL;
-#else /* EINVAL */
+#else /* __EINVAL */
 	return 1;
-#endif /* !EINVAL */
+#endif /* !__EINVAL */
 #undef __path_putn
 #undef __path_putc
 }
