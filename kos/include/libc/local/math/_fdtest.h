@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7eb92174 */
+/* HASH CRC-32:0x6bb482a4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,16 @@
 #ifndef __local__fdtest_defined
 #define __local__fdtest_defined
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___fpclassifyf_defined
 #define __local___localdep___fpclassifyf_defined
 #ifdef __CRT_HAVE___fpclassifyf
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep___fpclassifyf,(float __x),__fpclassifyf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassifyf,(float __x),__fpclassifyf,(__x))
 #elif defined(__CRT_HAVE_fpclassifyf)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep___fpclassifyf,(float __x),fpclassifyf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassifyf,(float __x),fpclassifyf,(__x))
 #elif defined(__CRT_HAVE__fdclass)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep___fpclassifyf,(float __x),_fdclass,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassifyf,(float __x),_fdclass,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <ieee754.h>
@@ -44,8 +45,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE___fpclassify && !__CRT_HAVE_fpclassify && !__CRT_HAVE__dclass && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !... */
 #endif /* !__local___localdep___fpclassifyf_defined */
-__LOCAL_LIBC(_fdtest) __ATTR_WUNUSED short
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fdtest))(float *__px) {
+__LOCAL_LIBC(_fdtest) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) short
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fdtest))(float __KOS_FIXED_CONST *__px) {
 	return (__NAMESPACE_LOCAL_SYM __localdep___fpclassifyf)(*__px);
 }
 __NAMESPACE_LOCAL_END

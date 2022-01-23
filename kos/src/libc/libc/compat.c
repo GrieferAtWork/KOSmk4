@@ -939,7 +939,7 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char *libd__acmdln                              = NULL;
 DEFINE_PUBLIC_IDATA_G(DOS$_acmdln, libd___p__acmdln, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_ALIAS(DOS$__p__acmdln, libd___p__acmdln);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") char **LIBDCALL
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.application.init") char **LIBDCALL
 libd___p__acmdln(void) {
 	ATOMIC_ONCE_RUN(&libd___p__acmdln_initialized, {
 		libd__acmdln = construct_dos_commandline();
@@ -962,7 +962,7 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd__wcmdln                          = NULL;
 DEFINE_PUBLIC_IDATA_G(DOS$_wcmdln, libd___p__wcmdln, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_ALIAS(DOS$__p__wcmdln, libd___p__wcmdln);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") char16_t **LIBDCALL
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.application.init") char16_t **LIBDCALL
 libd___p__wcmdln(void) {
 	ATOMIC_ONCE_RUN(&libd___p__wcmdln_initialized, {
 		libd__wcmdln = construct_dos_wcommandline();
@@ -978,7 +978,7 @@ INTERN ATTR_SECTION(".bss.crt.dos.application.init") int libd__commode = 0;
 /*DEFINE_PUBLIC_IDATA_G(DOS$_commode, libd___p__commode, __SIZEOF_POINTER__);*/
 DEFINE_PUBLIC_ALIAS(DOS$_commode, libd__commode);
 DEFINE_PUBLIC_ALIAS(DOS$__p__commode, libd___p__commode);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int *LIBDCALL
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.application.init") int *LIBDCALL
 libd___p__commode(void) {
 	return &libd__commode;
 }
@@ -1189,6 +1189,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_get_wide_winmain_command_line, libd__get_wide_winmain_c
 DEFINE_INTERN_ALIAS(libd__configure_wide_argv, libd__configure_narrow_argv);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") errno_t LIBDCALL
 libd__configure_narrow_argv(_crt_argv_mode mode) {
+	COMPILER_IMPURE();
 	(void)mode;
 	return 0;
 }
@@ -1196,25 +1197,26 @@ libd__configure_narrow_argv(_crt_argv_mode mode) {
 DEFINE_INTERN_ALIAS(libd__initialize_wide_environment, libd__initialize_narrow_environment);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
 libd__initialize_narrow_environment(void) {
+	COMPILER_IMPURE();
 	return 0;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") char **LIBDCALL
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.compat.dos") char **LIBDCALL
 libd__get_initial_narrow_environment(void) {
 	return *libc___p___initenv();
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") char16_t **LIBDCALL
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.compat.dos") char16_t **LIBDCALL
 libd__get_initial_wide_environment(void) {
 	return *libd___p___winitenv();
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") char *LIBDCALL
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.compat.dos") char *LIBDCALL
 libd__get_narrow_winmain_command_line(void) {
 	return *libd___p__acmdln();
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") char16_t *LIBDCALL
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.compat.dos") char16_t *LIBDCALL
 libd__get_wide_winmain_command_line(void) {
 	return *libd___p__wcmdln();
 }

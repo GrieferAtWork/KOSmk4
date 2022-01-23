@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bfba6e4 */
+/* HASH CRC-32:0x6557812b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10482,14 +10482,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __x),_ds
 __NAMESPACE_LOCAL_USING_OR_IMPL(__signbit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbit)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbit))(__x); })
 #endif /* !... */
 #ifdef __CRT_HAVE___fpclassifyf
-__CDECLARE(,int,__NOTHROW_NCX,__fpclassifyf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __x),(__x))
 #elif defined(__CRT_HAVE_fpclassifyf)
-__CREDIRECT(,int,__NOTHROW_NCX,__fpclassifyf,(float __x),fpclassifyf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __x),fpclassifyf,(__x))
 #elif defined(__CRT_HAVE__fdclass)
-__CREDIRECT(,int,__NOTHROW_NCX,__fpclassifyf,(float __x),_fdclass,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __x),_fdclass,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE_fpclassify) || defined(__CRT_HAVE__dclass) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/__fpclassifyf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyf, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL __fpclassifyf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyf))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE___signbitf
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __x),(__x))
@@ -10501,14 +10501,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__signbitf, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE___fpclassifyl
-__CDECLARE(,int,__NOTHROW_NCX,__fpclassifyl,(__LONGDOUBLE __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE_fpclassifyl)
-__CREDIRECT(,int,__NOTHROW_NCX,__fpclassifyl,(__LONGDOUBLE __x),fpclassifyl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),fpclassifyl,(__x))
 #elif defined(__CRT_HAVE__ldclass)
-__CREDIRECT(,int,__NOTHROW_NCX,__fpclassifyl,(__LONGDOUBLE __x),_ldclass,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),_ldclass,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE_fpclassify) || defined(__CRT_HAVE__dclass) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/__fpclassifyl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyl, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL __fpclassifyl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyl))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE___signbitl
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(__LONGDOUBLE __x),(__x))
@@ -11232,22 +11232,22 @@ __SYSDECL_END
 #ifdef __CC__
 __SYSDECL_BEGIN
 #ifdef __CRT_HAVE__dtest
-__CDECLARE(__ATTR_WUNUSED,short,__NOTHROW_NCX,_dtest,(double *__px),(__px))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),short,__NOTHROW_NCX,_dtest,(double __KOS_FIXED_CONST *__px),(__px))
 #else /* __CRT_HAVE__dtest */
 #include <libc/local/math/_dtest.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_dtest, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED short __NOTHROW_NCX(__LIBCCALL _dtest)(double *__px) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_dtest))(__px); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_dtest, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) short __NOTHROW_NCX(__LIBCCALL _dtest)(double __KOS_FIXED_CONST *__px) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_dtest))(__px); })
 #endif /* !__CRT_HAVE__dtest */
 #ifdef __CRT_HAVE__fdtest
-__CDECLARE(__ATTR_WUNUSED,short,__NOTHROW_NCX,_fdtest,(float *__px),(__px))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),short,__NOTHROW_NCX,_fdtest,(float __KOS_FIXED_CONST *__px),(__px))
 #else /* __CRT_HAVE__fdtest */
 #include <libc/local/math/_fdtest.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_fdtest, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED short __NOTHROW_NCX(__LIBCCALL _fdtest)(float *__px) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fdtest))(__px); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_fdtest, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) short __NOTHROW_NCX(__LIBCCALL _fdtest)(float __KOS_FIXED_CONST *__px) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fdtest))(__px); })
 #endif /* !__CRT_HAVE__fdtest */
 #ifdef __CRT_HAVE__ldtest
-__CDECLARE(__ATTR_WUNUSED,short,__NOTHROW_NCX,_ldtest,(__LONGDOUBLE *__px),(__px))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),short,__NOTHROW_NCX,_ldtest,(__LONGDOUBLE __KOS_FIXED_CONST *__px),(__px))
 #else /* __CRT_HAVE__ldtest */
 #include <libc/local/math/_ldtest.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ldtest, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED short __NOTHROW_NCX(__LIBCCALL _ldtest)(__LONGDOUBLE *__px) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ldtest))(__px); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ldtest, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) short __NOTHROW_NCX(__LIBCCALL _ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *__px) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ldtest))(__px); })
 #endif /* !__CRT_HAVE__ldtest */
 __SYSDECL_END
 #endif /* __CC__ */

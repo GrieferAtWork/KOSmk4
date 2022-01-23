@@ -145,9 +145,8 @@ typedef __except_subclass_t except_subclass_t;
 	"except_info", "except_data", "except_register_state",
 	"except_code", "except_active", "except_class", "except_subclass",
 	"except_unwind", "__cxa_begin_catch", "__cxa_end_catch",
-	"__gxx_personality_v0", "__gcc_personality_v0",
+	"__gxx_personality_v0", "__gcc_personality_v0", "_ZSt9terminatev",
 )]
-
 
 
 %[define_replacement(except_register_state_t = __EXCEPT_REGISTER_STATE_TYPE)]

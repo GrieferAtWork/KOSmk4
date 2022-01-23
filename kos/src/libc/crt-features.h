@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66f8acd */
+/* HASH CRC-32:0xf9ff774a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3371,7 +3371,9 @@
 #define __CRT_HAVE__W_Getmonths
 #define __CRT_HAVE__W_Gettnames
 #define __CRT_HAVE__Wcsftime
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE__ZSt9terminatev
+#ifndef __KERNEL__
 #define __CRT_HAVE____lc_codepage_func
 #define __CRT_HAVE____lc_collate_cp_func
 #define __CRT_HAVE____lc_locale_name_func

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa830be98 */
+/* HASH CRC-32:0x50c10c30 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,8 +44,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/fpclassify.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__fpclassifyl) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(__LONGDOUBLE __x) {
+__LOCAL_LIBC(__fpclassifyl) __ATTR_CONST __ATTR_WUNUSED int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(__LONGDOUBLE __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 
 

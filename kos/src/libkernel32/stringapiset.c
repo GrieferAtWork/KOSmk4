@@ -51,16 +51,16 @@ DEFINE_PUBLIC_ALIAS(lstrcatW, libk32_lstrcatW);
 DEFINE_PUBLIC_ALIAS(lstrlenA, libk32_lstrlenA);
 DEFINE_PUBLIC_ALIAS(lstrlenW, libk32_lstrlenW);
 
-INTERN int WINAPI libk32_lstrcmpA(LPCSTR lpString1, LPCSTR lpString2) {
+INTERN ATTR_PURE int WINAPI libk32_lstrcmpA(LPCSTR lpString1, LPCSTR lpString2) {
 	return strcmp(lpString1, lpString2);
 }
-INTERN int WINAPI libk32_lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2) {
+INTERN ATTR_PURE int WINAPI libk32_lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2) {
 	return c16cmp(lpString1, lpString2);
 }
-INTERN int WINAPI libk32_lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2) {
+INTERN ATTR_PURE int WINAPI libk32_lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2) {
 	return strcasecmp(lpString1, lpString2);
 }
-INTERN int WINAPI libk32_lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2) {
+INTERN ATTR_PURE int WINAPI libk32_lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2) {
 	return c16casecmp(lpString1, lpString2);
 }
 INTERN LPSTR WINAPI libk32_lstrcpynA(LPSTR lpString1, LPCSTR lpString2, int iMaxLength) {
@@ -97,10 +97,10 @@ INTERN LPSTR WINAPI libk32_lstrcatA(LPSTR lpString1, LPCSTR lpString2) {
 INTERN LPWSTR WINAPI libk32_lstrcatW(LPWSTR lpString1, LPCWSTR lpString2) {
 	return c16cat(lpString1, lpString2);
 }
-INTERN int WINAPI libk32_lstrlenA(LPCSTR lpString) {
+INTERN ATTR_PURE int WINAPI libk32_lstrlenA(LPCSTR lpString) {
 	return !lpString ? 0 : (int)(unsigned int)strlen(lpString);
 }
-INTERN int WINAPI libk32_lstrlenW(LPCWSTR lpString) {
+INTERN ATTR_PURE int WINAPI libk32_lstrlenW(LPCWSTR lpString) {
 	return !lpString ? 0 : (int)(unsigned int)c16len(lpString);
 }
 

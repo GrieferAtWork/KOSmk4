@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb0977cf */
+/* HASH CRC-32:0xc6ffd711 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__dtest_defined
 #define __local__dtest_defined
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___fpclassify_defined
 #define __local___localdep___fpclassify_defined
@@ -44,8 +45,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !... */
 #endif /* !__local___localdep___fpclassify_defined */
-__LOCAL_LIBC(_dtest) __ATTR_WUNUSED short
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_dtest))(double *__px) {
+__LOCAL_LIBC(_dtest) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) short
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_dtest))(double __KOS_FIXED_CONST *__px) {
 	return (__NAMESPACE_LOCAL_SYM __localdep___fpclassify)(*__px);
 }
 __NAMESPACE_LOCAL_END

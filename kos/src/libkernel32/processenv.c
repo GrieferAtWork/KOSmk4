@@ -210,7 +210,7 @@ __LIBC char ***LIBDCALL DOS$__p__environ(void);
 __LIBC char *LIBDCALL DOS$getenv(char const *name);
 __LIBC int LIBDCALL DOS$setenv(char const *varname, char const *val, int replace);
 
-PRIVATE LPCH WINAPI
+PRIVATE ATTR_MALLOC LPCH WINAPI
 libk32_GetEnvironmentStringsImpl(size_t *plen) {
 	struct format_aprintf_data dat;
 	char **env;
@@ -230,13 +230,13 @@ err:
 	return NULL;
 }
 
-INTERN LPCH WINAPI
+INTERN ATTR_MALLOC LPCH WINAPI
 libk32_GetEnvironmentStrings(VOID) {
 	TRACE("GetEnvironmentStrings()");
 	return libk32_GetEnvironmentStringsImpl(NULL);
 }
 
-INTERN LPWCH WINAPI
+INTERN ATTR_MALLOC LPWCH WINAPI
 libk32_GetEnvironmentStringsW(VOID) {
 	LPWCH result;
 	size_t len;
@@ -337,7 +337,7 @@ libk32_SetEnvironmentVariableW(LPCWSTR lpName, LPCWSTR lpValue) {
 	return result;
 }
 
-INTERN char *WINAPI
+INTERN ATTR_MALLOC char *WINAPI
 libk32_ExpandEnvironmentStringsAImpl(LPCSTR lpSrc) {
 	struct format_aprintf_data dat;
 	LPCSTR flush_start = lpSrc;

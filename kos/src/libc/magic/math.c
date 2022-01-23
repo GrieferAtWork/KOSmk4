@@ -1990,6 +1990,7 @@ int __signbit(double x) {
 }
 
 
+[[const, wunused, nothrow]]
 [[export_alias("fpclassifyf")]]
 [[dos_only_export_alias("_fdclass")]]
 [[crt_dos_variant({ impl:{ return fptype_kos2dos(libc___fpclassifyf(x)); }})]]
@@ -1999,6 +2000,7 @@ int __fpclassifyf(float x) %{generate(double2float("__fpclassify"))}
 __signbitf(*) %{generate(double2float("__signbit"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
+[[const, wunused, nothrow]]
 [[export_alias("fpclassifyl")]]
 [[dos_only_export_alias("_ldclass")]]
 [[crt_dos_variant({ impl:{ return fptype_kos2dos(libc___fpclassifyl(x)); }})]]
@@ -2677,8 +2679,8 @@ __SYSDECL_BEGIN
 
 %[default:section(".text.crt.dos.math.math")]
 
-[[crt_dos_variant, wunused]]
-short _dtest(double *px) {
+[[pure, crt_dos_variant, wunused, decl_include("<features.h>")]]
+short _dtest([[nonnull]] double __KOS_FIXED_CONST *px) {
 	return __fpclassify(*px);
 }
 

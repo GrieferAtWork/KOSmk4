@@ -103,7 +103,7 @@ libk32_HeapUnlock(HANDLE hHeap) {
 	return TRUE;
 }
 
-INTERN HANDLE WINAPI
+INTERN ATTR_MALLOC HANDLE WINAPI
 libk32_HeapCreate(DWORD flOptions, SIZE_T dwInitialSize, SIZE_T dwMaximumSize) {
 	struct ntheap *heap;
 	heap = (struct ntheap *)malloc(sizeof(struct ntheap));
@@ -193,7 +193,7 @@ libk32_HeapFree(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem) {
 	return TRUE;
 }
 
-INTERN SIZE_T WINAPI
+INTERN ATTR_PURE SIZE_T WINAPI
 libk32_HeapSize(HANDLE hHeap, DWORD dwFlags, LPCVOID lpMem) {
 	(void)dwFlags;
 	(void)hHeap;
@@ -223,7 +223,7 @@ DEFINE_PUBLIC_ALIAS(GlobalLock, libk32_GlobalLock);
 DEFINE_PUBLIC_ALIAS(GlobalUnlock, libk32_GlobalUnlock);
 DEFINE_PUBLIC_ALIAS(GlobalSize, libk32_GlobalSize);
 
-INTERN HLOCAL WINAPI
+INTERN ATTR_MALLOC HLOCAL WINAPI
 libk32_LocalAlloc(UINT uFlags, SIZE_T uBytes) {
 	void *result;
 	result = (uFlags & LMEM_ZEROINIT) ? calloc(uBytes)
@@ -274,7 +274,7 @@ libk32_LocalUnlock(HLOCAL hMem) {
 	return TRUE;
 }
 
-INTERN SIZE_T WINAPI
+INTERN ATTR_PURE SIZE_T WINAPI
 libk32_LocalSize(HLOCAL hMem) {
 	return malloc_usable_size(hMem);
 }

@@ -66,8 +66,8 @@ libk32_TimeSpecToFileTime(struct timespec const *ts) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) DWORD CC
-libk32_FileAttributesFromStat(struct stat64 *__restrict st) {
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) DWORD CC
+libk32_FileAttributesFromStat(struct stat64 const *__restrict st) {
 	DWORD result = 0;
 	if (!(st->st_mode & 0222))
 		result |= FILE_ATTRIBUTE_READONLY;
