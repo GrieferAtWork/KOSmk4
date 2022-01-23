@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32cfabe7 */
+/* HASH CRC-32:0x13a74dea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,27 +31,27 @@ DECL_BEGIN
 
 /* Make use of inline optimizations when possible! */
 #ifndef __INTELLISENSE__
-#ifdef __arch_error_data
-#define libc_error_data() __arch_error_data()
-#endif /* __arch_error_data */
-#ifdef __arch_error_code
-#define libc_error_code() __arch_error_code()
-#endif /* __arch_error_code */
-#ifdef __arch_error_active
-#define libc_error_active() __arch_error_active()
-#endif /* __arch_error_active */
-#ifdef __arch_error_class
-#define libc_error_class() __arch_error_class()
-#endif /* __arch_error_class */
-#ifdef __arch_error_subclass
-#define libc_error_subclass() __arch_error_subclass()
-#endif /* __arch_error_subclass */
-#ifdef __arch_error_register_state
-#define libc_error_register_state() __arch_error_register_state()
-#endif /* __arch_error_register_state */
-#ifdef __arch_error_info
-#define libc_error_info() __arch_error_info()
-#endif /* __arch_error_info */
+#ifdef __arch_except_data
+#define libc_except_data() __arch_except_data()
+#endif /* __arch_except_data */
+#ifdef __arch_except_code
+#define libc_except_code() __arch_except_code()
+#endif /* __arch_except_code */
+#ifdef __arch_except_active
+#define libc_except_active() __arch_except_active()
+#endif /* __arch_except_active */
+#ifdef __arch_except_class
+#define libc_except_class() __arch_except_class()
+#endif /* __arch_except_class */
+#ifdef __arch_except_subclass
+#define libc_except_subclass() __arch_except_subclass()
+#endif /* __arch_except_subclass */
+#ifdef __arch_except_register_state
+#define libc_except_register_state() __arch_except_register_state()
+#endif /* __arch_except_register_state */
+#ifdef __arch_except_info
+#define libc_except_info() __arch_except_info()
+#endif /* __arch_except_info */
 #endif /* !__INTELLISENSE__ */
 #include <bits/crt/format-printer.h>
 #ifndef __pformatprinter_defined
@@ -61,31 +61,31 @@ typedef __pformatgetc pformatgetc;
 typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 /* Transform the given exception into a posix errno value */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_error_as_errno)(struct exception_data const *__restrict self);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_except_as_errno)(struct exception_data const *__restrict self);
 /* Transform the given exception into a posix signal.
  * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
-INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result);
+INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBKCALL libc_except_as_signal)(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result);
 /* Return the name of the given error, or `NULL' if unknown.
  * This  name  is   the  same  as   the  `E_*'   identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBKCALL libc_error_name)(error_code_t code);
+ * E.g.: `except_name(EXCEPT_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBKCALL libc_except_name)(except_code_t code);
 /* Return the priority for a given error code, where exceptions
  * with greater priorities should take  the place of ones  with
  * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
-INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBKCALL libc_error_priority)(error_code_t code);
-/* >> error_print_short_description(3)
+INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBKCALL libc_except_priority)(except_code_t code);
+/* >> except_print_short_description(3)
  * Print a short, single-line (without trailing linefeed) description  of
  * the given error `data', including the error code, name and for certain
  * errors, prominent error arguments.
- * @param: flags: Set of `ERROR_PRINT_SHORT_DESCRIPTION_FLAG_*'
+ * @param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
  * @return: * : The usual pformatprinter-compatible return value */
-INTDEF NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer, void *arg, struct exception_data const *data, uintptr_t flags);
+INTDEF NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBKCALL libc_except_print_short_description)(pformatprinter printer, void *arg, struct exception_data const *data, uintptr_t flags);
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
-INTDEF NONNULL((1)) void NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved);
+INTDEF NONNULL((1)) void NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_nesting_data *__restrict saved);
 /* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
-INTDEF NONNULL((1)) void NOTHROW(__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting_data *__restrict saved);
+INTDEF NONNULL((1)) void NOTHROW(__EXCEPT_NESTING_END_CC libc_except_nesting_end)(struct _exception_nesting_data *__restrict saved);
 
 DECL_END
 

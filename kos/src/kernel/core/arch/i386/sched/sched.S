@@ -172,17 +172,17 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 #ifdef CONFIG_HAVE_DEBUGGER
 .Ldbg_active_task_yield:
 	/* Throw an exception if the builtin debugger is active. */
-	movP   $(ERROR_CODEOF(E_WOULDBLOCK)), %R_fcall0P
-	EXTERN(error_throw)
-	call   error_throw
+	movP   $(EXCEPT_CODEOF(E_WOULDBLOCK)), %R_fcall0P
+	EXTERN(except_throw)
+	call   except_throw
 	nop
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 	.cfi_restore_state
 .Lillegal_task_yield:
-	movP   $(ERROR_CODEOF(E_WOULDBLOCK_PREEMPTED)), %R_fcall0P
-	EXTERN(error_throw)
-	call   error_throw
+	movP   $(EXCEPT_CODEOF(E_WOULDBLOCK_PREEMPTED)), %R_fcall0P
+	EXTERN(except_throw)
+	call   except_throw
 	nop
 #ifdef __x86_64__
 END(X86_ASMSYSCALL64(sched_yield))

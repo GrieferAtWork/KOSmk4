@@ -173,7 +173,7 @@ typedef NOBLOCK NONNULL((1)) unsigned int
                                             size_t datalen);
 #define USB_INTERRUPT_HANDLER_STATUS_OK    0 /* Data was successfully received. */
 #define USB_INTERRUPT_HANDLER_STATUS_ERROR 1 /* The USB controller has indicated an error.
-                                              * In this case,  error_data() has been  filled in with  additional
+                                              * In this case, except_data() has  been filled in with  additional
                                               * information about  the error  (usually identical  to what  would
                                               * be thrown if the same problem had happened during a transmission
                                               * started with `usb_controller_transfer()')

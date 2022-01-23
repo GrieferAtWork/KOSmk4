@@ -33,7 +33,7 @@
 %[declare_kernel_only_export("__acheck", "__acheckf")]
 
 /* /kos/src/kernel/core/arch/[...]/except.c */
-%[declare_kernel_export("error_unwind", "__cxa_begin_catch", "__cxa_end_catch")]
+%[declare_kernel_export("except_unwind", "__cxa_begin_catch", "__cxa_end_catch")]
 %[declare_kernel_export("__gxx_personality_v0", "__gcc_personality_v0")]
 
 /* Indicate that we have support for all of the different assert functions. */

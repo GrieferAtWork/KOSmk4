@@ -27,14 +27,14 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
+#include <kos/bits/except.h>         /* __EXCEPT_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
 
-#ifndef __ERROR_REGISTER_STATE_TYPE
+#ifndef __EXCEPT_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
-#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__ERROR_REGISTER_STATE_TYPE */
+#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 
 #ifndef __EXCEPT_BACKTRACE_SIZE
 #if defined(NDEBUG) || defined(NDEBUG_EXCEPT_TRACE)
@@ -50,7 +50,7 @@ __DECL_BEGIN
 #define _EXCEPTION_NESTING_DATA_SIZE (sizeof(struct _exception_nesting_data) - sizeof(__size_t))
 struct _exception_nesting_data {
 	__size_t                    en_size;  /* == _EXCEPTION_NESTING_DATA_SIZE */
-	__ERROR_REGISTER_STATE_TYPE en_state; /* Saved exception state. */
+	__EXCEPT_REGISTER_STATE_TYPE en_state; /* Saved exception state. */
 	struct exception_data       en_data;  /* Saved exception data. */
 #if __EXCEPT_BACKTRACE_SIZE != 0
 	void                       *en_trace[__EXCEPT_BACKTRACE_SIZE]; /* Saved traceback. */

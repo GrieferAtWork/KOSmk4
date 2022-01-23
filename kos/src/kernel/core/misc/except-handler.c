@@ -64,8 +64,8 @@
 #include <libunwind/eh_frame.h>
 #include <libunwind/unwind.h>
 
-#define kcpustate_get_unwind_exception(state)        __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(*(state))
-#define kcpustate_set_unwind_exception(state, value) __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*(state), value)
+#define kcpustate_get_unwind_exception(state)        __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(*(state))
+#define kcpustate_set_unwind_exception(state, value) __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*(state), value)
 
 DECL_BEGIN
 
@@ -129,7 +129,7 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data c
 	siginfo_t si;
 	/* Try to translate the current exception  into a signal, so that  we
 	 * can use that signal code as reason for why the process has exited. */
-	if (!error_as_signal(error, &si))
+	if (!except_as_signal(error, &si))
 		si.si_signo = SIGILL;
 	process_exit(W_EXITCODE(1, si.si_signo) | WCOREFLAG);
 }
@@ -210,7 +210,7 @@ abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict stat
 		THROWS(E_EXIT_PROCESS) {
 	struct exception_info info;
 	bzero(&info, sizeof(struct exception_info));
-	info.ei_data.e_code      = ERROR_CODEOF(E_INTERRUPT);
+	info.ei_data.e_code      = EXCEPT_CODEOF(E_INTERRUPT);
 	info.ei_data.e_faultaddr = icpustate_getpc(state);
 	coredump_create_for_exception(state, &info, true);
 	THROW(E_EXIT_PROCESS, W_EXITCODE(1, SIGINT) | WCOREFLAG);
@@ -252,7 +252,7 @@ userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict sta
 			 * interrupted  system call returned  with `-EINTR', or returned
 			 * to  user-space by calling the user-defined exception handler. */
 			bzero(&error, sizeof(error));
-			error.e_code      = ERROR_CODEOF(E_INTERRUPT);
+			error.e_code      = EXCEPT_CODEOF(E_INTERRUPT);
 			error.e_faultaddr = icpustate_getpc(state);
 			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
 				/* Make transformations to invoke the user-space exception handler.
@@ -309,7 +309,7 @@ userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
 	siginfo_t siginfo;
 
 	/* Try to translate the given `error' into a signal. */
-	if (!error_as_signal(&error->ei_data, &siginfo))
+	if (!except_as_signal(&error->ei_data, &siginfo))
 		return NULL;
 
 	/* Include missing information within the signal info. */
@@ -408,24 +408,24 @@ again:
 	/* Handle/amend special exception codes */
 	switch (error->ei_code) {
 
-	case ERROR_CODEOF(E_EXIT_PROCESS):
+	case EXCEPT_CODEOF(E_EXIT_PROCESS):
 		process_exit((int)error->ei_data.e_args.e_exit_process.ep_exit_code);
 
-	case ERROR_CODEOF(E_EXIT_THREAD):
+	case EXCEPT_CODEOF(E_EXIT_THREAD):
 		task_exit((int)error->ei_data.e_args.e_exit_thread.et_exit_code);
 
-	case ERROR_CODEOF(_E_STOP_PROCESS):
+	case EXCEPT_CODEOF(_E_STOP_PROCESS):
 		/* TODO: If/when we implement this properly, `userexcept_unwind()' must be
 		 *       able  to return some  special value to  indicate that the current
 		 *       system call/interrupt should be restarted. */
 		return process_waitfor_SIG_CONT(state, error->ei_data.e_args.e_pointers[0]);
 
-	case ERROR_CODEOF(_E_CORE_PROCESS):
+	case EXCEPT_CODEOF(_E_CORE_PROCESS):
 		trigger_coredump_from__E_CORE_PROCESS(state, error);
 		break;
 
 #ifdef RPC_SYSCALL_INFO_METHOD_OTHER
-	case ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL): {
+	case EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL): {
 #ifdef RPC_SYSCALL_INFO_METHOD_F3264
 		enum { MMASK = RPC_SYSCALL_INFO_FMETHOD & ~RPC_SYSCALL_INFO_METHOD_F3264 };
 #else /* RPC_SYSCALL_INFO_METHOD_F3264 */
@@ -483,13 +483,13 @@ again:
 		if likely(result)
 			goto done;
 	} EXCEPT {
-		struct exception_info *tls = error_info();
-		if (error_priority(tls->ei_code) > error_priority(error->ei_code)) {
+		struct exception_info *tls = except_info();
+		if (except_priority(tls->ei_code) > except_priority(error->ei_code)) {
 			memcpy(error, tls, sizeof(struct exception_info));
 			assert(PREEMPTION_ENABLED());
 			goto again;
 		} else {
-			error_printf("raising exception/signal");
+			except_printf("raising exception/signal");
 		}
 	}
 
@@ -501,7 +501,7 @@ terminate_app:
 	process_exit_for_exception_after_coredump(&error->ei_data);
 	__builtin_unreachable();
 done:
-	assert(PERTASK_EQ(this_exception_info.ei_code, ERROR_CODEOF(E_OK)));
+	assert(PERTASK_EQ(this_exception_info.ei_code, EXCEPT_CODEOF(E_OK)));
 	assert(PERTASK_EQ(this_exception_info.ei_flags, EXCEPT_FNORMAL));
 	assert(PERTASK_EQ(this_exception_info.ei_nesting, 0));
 	assert(PREEMPTION_ENABLED());
@@ -560,19 +560,19 @@ again_switch_action_handler:
 
 		case __SIG_CONT:
 			/* Undo the effects of `SIG_STOP' */
-			if (error->ei_code == ERROR_CODEOF(_E_STOP_PROCESS))
-				error->ei_code = ERROR_CODEOF(E_OK);
+			if (error->ei_code == EXCEPT_CODEOF(_E_STOP_PROCESS))
+				error->ei_code = EXCEPT_CODEOF(E_OK);
 			break;
 
 		case __SIG_TERM: {
-			error_code_t code;
-			code = ERROR_CODEOF(E_EXIT_PROCESS);
-			__IF0 { case __SIG_EXIT: code = ERROR_CODEOF(E_EXIT_THREAD); }
-			__IF0 { case __SIG_STOP: code = ERROR_CODEOF(_E_STOP_PROCESS); }
-			__IF0 { case __SIG_CORE: code = ERROR_CODEOF(_E_CORE_PROCESS); }
+			except_code_t code;
+			code = EXCEPT_CODEOF(E_EXIT_PROCESS);
+			__IF0 { case __SIG_EXIT: code = EXCEPT_CODEOF(E_EXIT_THREAD); }
+			__IF0 { case __SIG_STOP: code = EXCEPT_CODEOF(_E_STOP_PROCESS); }
+			__IF0 { case __SIG_CORE: code = EXCEPT_CODEOF(_E_CORE_PROCESS); }
 
 			/* If applicable, override the active return-exception. */
-			if (error_priority(error->ei_code) < error_priority(code)) {
+			if (except_priority(error->ei_code) < except_priority(code)) {
 				union wait reason;
 				reason.w_status = W_EXITCODE(1, rpc->pr_psig.si_signo);
 				bzero(error, sizeof(struct exception_info));
@@ -607,12 +607,12 @@ again_switch_action_handler:
 				ctx->rc_state = newstate;
 			} EXCEPT {
 				/* Prioritize errors. */
-				struct exception_info *tls = error_info();
-				if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+				struct exception_info *tls = except_info();
+				if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 					xdecref_unlikely(action.sa_mask);
 					return false; /* Load other RPCs and try again. */
 				}
-				if (error_priority(error->ei_code) < error_priority(tls->ei_code))
+				if (except_priority(error->ei_code) < except_priority(tls->ei_code))
 					memcpy(error, tls, sizeof(struct exception_info));
 			}
 			break;
@@ -659,7 +659,7 @@ again_switch_action_handler:
 			 * or by  calling the  user-defined exception  handler with  E_INTERRUPT. */
 			struct exception_data error;
 			bzero(&error, sizeof(error));
-			error.e_code      = ERROR_CODEOF(E_INTERRUPT);
+			error.e_code      = EXCEPT_CODEOF(E_INTERRUPT);
 			error.e_faultaddr = icpustate_getpc(ctx->rc_state);
 			if (ctx->rc_scinfo.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
 				/* Make transformations to invoke the user-space exception handler.
@@ -686,10 +686,10 @@ again_switch_action_handler:
 			                                    &ctx->rc_scinfo);
 		} EXCEPT {
 			/* Prioritize errors. */
-			struct exception_info *tls = error_info();
-			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC))
+			struct exception_info *tls = except_info();
+			if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC))
 				return false; /* Load other RPCs before trying to serve this one again. */
-			if (error_priority(error->ei_code) < error_priority(tls->ei_code))
+			if (except_priority(error->ei_code) < except_priority(tls->ei_code))
 				memcpy(error, tls, sizeof(struct exception_info));
 			new_state = ctx->rc_state;
 		}
@@ -722,8 +722,8 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL set_unknown_syscall_exception)(struct rpc_syscall_info const *__restrict sc_info) {
 	struct exception_info *info;
 	/* Fill in exception information. */
-	info = error_info();
-	info->ei_code = ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL);
+	info = except_info();
+	info->ei_code = EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL);
 	info->ei_data.e_args.e_unknown_systemcall.us_sysno = sc_info->rsi_sysno;
 	info->ei_data.e_args.e_unknown_systemcall.us_flags = sc_info->rsi_flags;
 	info->ei_data.e_args.e_unknown_systemcall.us_arg0  = sc_info->rsi_regs[0];
@@ -1095,16 +1095,16 @@ INTDEF ATTR_COLD NONNULL((2)) void FCALL /* TODO: Standardize this function! (cu
 halt_unhandled_exception(unsigned int unwind_error,
                          struct kcpustate *__restrict unwind_state);
 
-DEFINE_PUBLIC_ALIAS(error_unwind, libc_error_unwind);
+DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *
-NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
+NOTHROW(FCALL libc_except_unwind)(struct kcpustate *__restrict state) {
 	unsigned int error;
 	unwind_fde_t fde;
 	struct kcpustate old_state;
 	void const *pc;
-	assertf(PERTASK_NE(this_exception_info.ei_code, ERROR_CODEOF(E_OK)) ||
+	assertf(PERTASK_NE(this_exception_info.ei_code, EXCEPT_CODEOF(E_OK)) ||
 	        PERTASK_NE(this_exception_info.ei_nesting, 0),
-	        "In error_unwind(), but no exception set");
+	        "In except_unwind(), but no exception set");
 
 search_fde:
 	/* unwind `state' until the nearest exception handler, or until user-space is reached.
@@ -1311,11 +1311,11 @@ err:
  * This  function should  be used  for throwing  exception from interrupt
  * handlers (read: CPU exception handler), such as page-faults & similar. */
 PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL error_throw_current_at_icpustate)(struct icpustate *__restrict state) {
-	struct exception_info *info = error_info();
-	assertf(info->ei_code != ERROR_CODEOF(E_OK),
+NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict state) {
+	struct exception_info *info = except_info();
+	assertf(info->ei_code != EXCEPT_CODEOF(E_OK),
 	        "No exception thrown");
-	assertf(info->ei_code != ERROR_CODEOF(E_INTERRUPT_USER_RPC),
+	assertf(info->ei_code != EXCEPT_CODEOF(E_INTERRUPT_USER_RPC),
 	        "No, you can't throw this one like that!");
 
 	/* Clear out the exception traceback */
@@ -1339,7 +1339,7 @@ NOTHROW(FCALL error_throw_current_at_icpustate)(struct icpustate *__restrict sta
 
 		/* Do normal unwinding. */
 		memcpy(&st, &info->ei_state, sizeof(struct kcpustate));
-		pst = libc_error_unwind(&st);
+		pst = libc_except_unwind(&st);
 		cpu_apply_kcpustate(pst);
 	}
 }
@@ -1406,7 +1406,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC __gxx_personality_v0)(struct unwind_fde_struct *__
 				 * implementation detail of the runtime, but rather stored in an exposed, per-task variable.
 				 * So while what we  write here really doesn't  matter at all, let's  just put in  something
 				 * that at the very least makes a bit of sense. */
-				kcpustate_set_unwind_exception(state, error_code());
+				kcpustate_set_unwind_exception(state, except_code());
 			}
 			return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
 		}

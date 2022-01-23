@@ -71,7 +71,7 @@ DATDEF ATTR_PERTASK struct user_except_handler this_user_except_handler;
  *     >>     } EXCEPT {
  *     >>         if (!was_thrown(E_SEGFAULT) ||
  *     >>             (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr))
- *     >>             error_printf("...");
+ *     >>             except_printf("...");
  *     >>     }
  *     >> }
  * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will  cause

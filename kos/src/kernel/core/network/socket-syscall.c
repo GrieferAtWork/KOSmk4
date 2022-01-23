@@ -763,8 +763,8 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully  is returned  instead. */
-				error_class_t cls = error_class();
-				if (i != 0 && !ERRORCLASS_ISRTLPRIORITY(cls))
+				except_class_t cls = except_class();
+				if (i != 0 && !EXCEPTCLASS_ISRTLPRIORITY(cls))
 					goto done;
 				RETHROW();
 			}
@@ -876,8 +876,8 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully  is returned  instead. */
-				error_class_t cls = error_class();
-				if (i != 0 && !ERRORCLASS_ISRTLPRIORITY(cls))
+				except_class_t cls = except_class();
+				if (i != 0 && !EXCEPTCLASS_ISRTLPRIORITY(cls))
 					goto done;
 				RETHROW();
 			}
@@ -1305,8 +1305,8 @@ sys_recvmmsg_impl(fd_t sockfd,
 				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully  is returned  instead. */
-				error_class_t cls = error_class();
-				if (i != 0 && !ERRORCLASS_ISRTLPRIORITY(cls))
+				except_class_t cls = except_class();
+				if (i != 0 && !EXCEPTCLASS_ISRTLPRIORITY(cls))
 					goto done;
 				RETHROW();
 			}
@@ -1483,8 +1483,8 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully  is returned  instead. */
-				error_class_t cls = error_class();
-				if (i != 0 && ERRORCLASS_ISRTLPRIORITY(cls))
+				except_class_t cls = except_class();
+				if (i != 0 && EXCEPTCLASS_ISRTLPRIORITY(cls))
 					goto done;
 				RETHROW();
 			}

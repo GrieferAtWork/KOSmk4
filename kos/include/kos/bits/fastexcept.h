@@ -27,42 +27,42 @@
 #include <__crt.h>
 #include <sched/pertask.h>
 
-#include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
-#include <kos/bits/exception_data.h> /* struct exception_data, __error_code_t, ... */
+#include <kos/bits/except.h>         /* __EXCEPT_REGISTER_STATE_TYPE */
+#include <kos/bits/exception_data.h> /* struct exception_data, __except_code_t, ... */
 
-#ifndef __ERROR_REGISTER_STATE_TYPE
+#ifndef __EXCEPT_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
-#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__ERROR_REGISTER_STATE_TYPE */
+#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 
 __DECL_BEGIN
 
-#ifndef __error_register_state_t_defined
-#define __error_register_state_t_defined
-typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
-#endif /* !__error_register_state_t_defined */
+#ifndef __except_register_state_t_defined
+#define __except_register_state_t_defined
+typedef __EXCEPT_REGISTER_STATE_TYPE except_register_state_t;
+#endif /* !__except_register_state_t_defined */
 
 struct exception_info;
 __PUBDEF /*ATTR_PERTASK*/ struct exception_info __arch_this_exception_info __ASMNAME("this_exception_info");
 __PUBDEF /*ATTR_PERTASK*/ struct exception_data __arch_this_exception_data __ASMNAME("this_exception_data");
-__PUBDEF /*ATTR_PERTASK*/ error_register_state_t __arch_this_exception_state __ASMNAME("this_exception_state");
-__PUBDEF /*ATTR_PERTASK*/ __error_code_t __arch_this_exception_code __ASMNAME("this_exception_code");
-__PUBDEF /*ATTR_PERTASK*/ __error_class_t __arch_this_exception_class __ASMNAME("this_exception_class");
-__PUBDEF /*ATTR_PERTASK*/ __error_subclass_t __arch_this_exception_subclass __ASMNAME("this_exception_subclass");
+__PUBDEF /*ATTR_PERTASK*/ except_register_state_t __arch_this_exception_state __ASMNAME("this_exception_state");
+__PUBDEF /*ATTR_PERTASK*/ __except_code_t __arch_this_exception_code __ASMNAME("this_exception_code");
+__PUBDEF /*ATTR_PERTASK*/ __except_class_t __arch_this_exception_class __ASMNAME("this_exception_class");
+__PUBDEF /*ATTR_PERTASK*/ __except_subclass_t __arch_this_exception_subclass __ASMNAME("this_exception_subclass");
 
 /* Directly access per-task variables, thus allowing for inline optimizations. */
-#define __arch_error_data()           (&PERTASK(__arch_this_exception_data))
-#define __arch_error_code()           PERTASK_GET(__arch_this_exception_code)
-#define __arch_error_active()         PERTASK_TEST(__arch_this_exception_code)
-#define __arch_error_class()          PERTASK_GET(__arch_this_exception_class)
-#define __arch_error_subclass()       PERTASK_GET(__arch_this_exception_subclass)
-#define __arch_error_register_state() (&PERTASK(__arch_this_exception_state))
-#define __arch_error_info()           (&PERTASK(__arch_this_exception_info))
+#define __arch_except_data()           (&PERTASK(__arch_this_exception_data))
+#define __arch_except_code()           PERTASK_GET(__arch_this_exception_code)
+#define __arch_except_active()         PERTASK_TEST(__arch_this_exception_code)
+#define __arch_except_class()          PERTASK_GET(__arch_this_exception_class)
+#define __arch_except_subclass()       PERTASK_GET(__arch_this_exception_subclass)
+#define __arch_except_register_state() (&PERTASK(__arch_this_exception_state))
+#define __arch_except_info()           (&PERTASK(__arch_this_exception_info))
 
 /* These are used to implement was_thrown() */
-#define __arch_error_code_eq(x)  PERTASK_EQ(__arch_this_exception_code, x)
-#define __arch_error_class_eq(x) PERTASK_EQ(__arch_this_exception_class, x)
+#define __arch_except_code_eq(x)  PERTASK_EQ(__arch_this_exception_code, x)
+#define __arch_except_class_eq(x) PERTASK_EQ(__arch_this_exception_class, x)
 
 __DECL_END
 #endif /* __CC__ && __KOS__ && __KERNEL__ && !__INTELLISENSE__ */

@@ -147,7 +147,7 @@ again:
  *  - return->mbn_minaddr = ...
  *  - return->mbn_maxaddr = return->mbn_minaddr + PAGESIZE - 1
  *  - return->mbn_flags   = ...
- * Afterwards, insert into an mbuilder using:
+ * Afterwards,   insert   into  an   mbuilder  using:
  * >> mbuilder_insert_fmnode(&builder, overlap_node);
  *
  * @param: head_file: The file from which to load head data.

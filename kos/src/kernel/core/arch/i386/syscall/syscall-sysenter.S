@@ -133,8 +133,8 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	EXTERN(userexcept_handler_nosys)
 	call   userexcept_handler_nosys
 
-	EXTERN(error_thrown)
-	call   error_thrown
+	EXTERN(except_thrown)
+	call   except_thrown
 	.cfi_endproc
 END(__x86_asm32_sysenter_break)
 

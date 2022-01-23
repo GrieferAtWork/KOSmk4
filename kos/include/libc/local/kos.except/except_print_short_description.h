@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7de3f79d */
+/* HASH CRC-32:0xa14a860a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,37 +18,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_print_short_description_defined
-#define __local_error_print_short_description_defined
+#ifndef __local_except_print_short_description_defined
+#define __local_except_print_short_description_defined
 #include <__crt.h>
 struct exception_data;
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_error_as_errno_defined
-#define __local___localdep_error_as_errno_defined
-#ifdef __CRT_HAVE_error_as_errno
-__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__LIBKCALL,__localdep_error_as_errno,(struct exception_data const *__restrict __self),error_as_errno,(__self))
-#else /* __CRT_HAVE_error_as_errno */
+#ifndef __local___localdep_except_as_errno_defined
+#define __local___localdep_except_as_errno_defined
+#ifdef __CRT_HAVE_except_as_errno
+__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__LIBKCALL,__localdep_except_as_errno,(struct exception_data const *__restrict __self),except_as_errno,(__self))
+#else /* __CRT_HAVE_except_as_errno */
 __NAMESPACE_LOCAL_END
-#include <libc/local/kos.except/error_as_errno.h>
+#include <libc/local/kos.except/except_as_errno.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_error_as_errno __LIBC_LOCAL_NAME(error_as_errno)
-#endif /* !__CRT_HAVE_error_as_errno */
-#endif /* !__local___localdep_error_as_errno_defined */
-#ifndef __local___localdep_error_name_defined
-#define __local___localdep_error_name_defined
-#ifdef __CRT_HAVE_error_name
+#define __localdep_except_as_errno __LIBC_LOCAL_NAME(except_as_errno)
+#endif /* !__CRT_HAVE_except_as_errno */
+#endif /* !__local___localdep_except_as_errno_defined */
+#ifndef __local___localdep_except_name_defined
+#define __local___localdep_except_name_defined
+#ifdef __CRT_HAVE_except_name
 __NAMESPACE_LOCAL_END
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__LIBKCALL,__localdep_error_name,(__error_code_t __code),error_name,(__code))
-#else /* __CRT_HAVE_error_name */
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__LIBKCALL,__localdep_except_name,(__except_code_t __code),except_name,(__code))
+#else /* __CRT_HAVE_except_name */
 __NAMESPACE_LOCAL_END
-#include <libc/local/kos.except/error_name.h>
+#include <libc/local/kos.except/except_name.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_error_name __LIBC_LOCAL_NAME(error_name)
-#endif /* !__CRT_HAVE_error_name */
-#endif /* !__local___localdep_error_name_defined */
+#define __localdep_except_name __LIBC_LOCAL_NAME(except_name)
+#endif /* !__CRT_HAVE_except_name */
+#endif /* !__local___localdep_except_name_defined */
 #ifndef __local___localdep_format_printf_defined
 #define __local___localdep_format_printf_defined
 #ifdef __CRT_HAVE_format_printf
@@ -88,8 +88,8 @@ __NAMESPACE_LOCAL_END
 #include <asm/registers.h>
 #endif /* __i386__ || __x86_64__ */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(error_print_short_description) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) {
+__LOCAL_LIBC(except_print_short_description) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(except_print_short_description))(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) {
 #ifndef __PRIxPTR
 #ifdef __PRIP_PREFIX
 #define __PRIxPTR __PRIP_PREFIX "x"
@@ -101,19 +101,19 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 	__SSIZE_TYPE__ __temp, __result = 0;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_format_printf)(__printer, __arg,
 	                       __FMT("exception "
-	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_ERROR_CLASS_T__) "x") ":"
-	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_ERROR_SUBCLASS_T__) "x"),
+	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_CLASS_T__) "x") ":"
+	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_SUBCLASS_T__) "x"),
 	                           "exception "
-	                           "%#" __PRIN_PREFIX(__SIZEOF_ERROR_CLASS_T__) "x:"
-	                           "%#" __PRIN_PREFIX(__SIZEOF_ERROR_SUBCLASS_T__) "x"),
+	                           "%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_CLASS_T__) "x:"
+	                           "%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_SUBCLASS_T__) "x"),
 	                       __data->e_class, __data->e_subclass);
 	if __unlikely(__result < 0)
 		goto __done;
 	{
 		char const *__name;
 		char const *__errno_name; /* XXX: Also print in kernel-space? */
-		__name = (__NAMESPACE_LOCAL_SYM __localdep_error_name)(__data->e_code);
-		__errno_name = (__NAMESPACE_LOCAL_SYM __localdep_strerrorname_np)((__NAMESPACE_LOCAL_SYM __localdep_error_as_errno)(__data));
+		__name = (__NAMESPACE_LOCAL_SYM __localdep_except_name)(__data->e_code);
+		__errno_name = (__NAMESPACE_LOCAL_SYM __localdep_strerrorname_np)((__NAMESPACE_LOCAL_SYM __localdep_except_as_errno)(__data));
 		if (__name) {
 			__temp = (__NAMESPACE_LOCAL_SYM __localdep_format_printf)(__printer, __arg,
 			                     __FMT(" [" AC_WHITE("%s") "%s" AC_WHITE("%s") "]",
@@ -129,11 +129,11 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 	__temp = 0;
 	switch (__data->e_class) {
 
-	case ERROR_CLASS(ERROR_CODEOF(E_BADALLOC)):
+	case EXCEPT_CLASS(EXCEPT_CODEOF(E_BADALLOC)):
 		switch (__data->e_subclass) {
 
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY)):
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY)):
 			__temp = (__NAMESPACE_LOCAL_SYM __localdep_format_printf)(__printer, __arg,
 			                     __FMT(" [num_bytes:" AC_WHITE("%#" __PRIxPTR) "]",
 			                         " [num_bytes:%#" __PRIxPTR "]"),
@@ -147,7 +147,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 
 	/* TODO: More error classes */
 
-	case ERROR_CLASS(ERROR_CODEOF(E_SEGFAULT)): {
+	case EXCEPT_CLASS(EXCEPT_CODEOF(E_SEGFAULT)): {
 		__temp = (__NAMESPACE_LOCAL_SYM __localdep_format_printf)(__printer, __arg,
 #if defined(__i386__) || defined(__x86_64__)
 		                     __FMT(" [cr2:" AC_WHITE("%p") "," AC_WHITE("%c%c%c%c%c%c") "]",
@@ -166,7 +166,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 		                     __data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_VIO ? 'v' : '-');
 	}	break;
 
-	case ERROR_CLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION)): {
+	case EXCEPT_CLASS(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION)): {
 #if defined(__i386__) || defined(__x86_64__)
 		__UINTPTR_TYPE__ __opcode, __opno;
 		__opcode = __data->e_args.e_illegal_instruction.ii_opcode;
@@ -222,7 +222,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 		switch (__data->e_subclass) {
 
 #ifdef E_ILLEGAL_INSTRUCTION_X86_INTERRUPT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)):
 			__temp = (__NAMESPACE_LOCAL_SYM __localdep_format_printf)(__printer, __arg,
 			                     __FMT(" [int:" AC_WHITE("%#.2" __PRIxPTR) ","
 			                                  AC_WHITE("%#" __PRIxPTR) ","
@@ -234,7 +234,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 			break;
 #endif /* E_ILLEGAL_INSTRUCTION_X86_INTERRUPT */
 
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND)): {
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND)): {
 			char const *__what_name;
 			switch (__data->e_args.e_illegal_instruction.ii_bad_operand.bo_what) {
 
@@ -264,7 +264,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 			}
 		}	break;
 
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER)): {
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER)): {
 			char const *__what;
 			__UINTPTR_TYPE__ __regno;
 			switch (__data->e_args.e_illegal_instruction.ii_register.r_how) {
@@ -386,8 +386,8 @@ __err:
 #undef __FMT
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_print_short_description_defined
-#define __local___localdep_error_print_short_description_defined
-#define __localdep_error_print_short_description __LIBC_LOCAL_NAME(error_print_short_description)
-#endif /* !__local___localdep_error_print_short_description_defined */
-#endif /* !__local_error_print_short_description_defined */
+#ifndef __local___localdep_except_print_short_description_defined
+#define __local___localdep_except_print_short_description_defined
+#define __localdep_except_print_short_description __LIBC_LOCAL_NAME(except_print_short_description)
+#endif /* !__local___localdep_except_print_short_description_defined */
+#endif /* !__local_except_print_short_description_defined */

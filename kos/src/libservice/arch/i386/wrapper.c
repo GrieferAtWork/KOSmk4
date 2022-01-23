@@ -82,10 +82,10 @@ STATIC_ASSERT(SIZEOF_POINTER == sizeof(void *));
 /* When the currently set exception is RT-level, return `false'.
  * Otherwise,   clear   the   exception   and   return   `true'. */
 INTERN bool NOTHROW(FCALL libservice_aux_com_discard_nonrt_exception)(void) {
-	struct exception_data *d = error_data();
-	if (ERRORCLASS_ISRTLPRIORITY(d->e_class))
+	struct exception_data *d = except_data();
+	if (EXCEPTCLASS_ISRTLPRIORITY(d->e_class))
 		return false;
-	d->e_code = ERROR_CODEOF(E_OK); /* Clear exception */
+	d->e_code = EXCEPT_CODEOF(E_OK); /* Clear exception */
 	return true;
 }
 
@@ -103,24 +103,24 @@ NOTHROW(FCALL libservice_aux_load_except_as_errno)(uintptr_t status,
 		/* Like below: HUP requested and command was canceled by outside entity. */
 		error = ENOSYS;
 	} else {
-		error = error_as_errno((struct exception_data const *)&info->scd_com.sc_except);
+		error = except_as_errno((struct exception_data const *)&info->scd_com.sc_except);
 	}
 	errno =	error;
 }
 
-/* Populate `error_data()' with the given information. */
+/* Populate `except_data()' with the given information. */
 INTERN NOBLOCK NONNULL((2, 3)) void
 NOTHROW(FCALL libservice_aux_load_except_as_error)(uintptr_t status,
                                                    struct service_comdesc *__restrict info,
                                                    void const *faultpc) {
-	struct exception_data *d = error_data();
+	struct exception_data *d = except_data();
 	if unlikely(status != SERVICE_COM_ST_EXCEPT) {
 		/* Special  case: When we read back ECHO,  that can only mean that the
 		 * command was canceled by some outside entity, of which there is only
 		 * the case of a sudden HUP event.
 		 * Simply handle this by throwing an E_SERVICE_EXITED */
 		bzero(d, sizeof(info->scd_com.sc_except));
-		d->e_code = ERROR_CODEOF(E_SERVICE_EXITED);
+		d->e_code = EXCEPT_CODEOF(E_SERVICE_EXITED);
 	} else {
 		memcpy(d, &info->scd_com.sc_except, sizeof(info->scd_com.sc_except));
 	}

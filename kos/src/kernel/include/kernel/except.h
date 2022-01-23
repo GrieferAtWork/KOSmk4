@@ -41,12 +41,12 @@ DATDEF ATTR_PERTASK struct exception_info this_exception_info;
 DATDEF ATTR_PERTASK struct exception_data this_exception_data; /* ALIAS:this_exception_info.ei_data */
 #define THIS_EXCEPTION_DATA PERTASK(this_exception_data)
 
-DATDEF ATTR_PERTASK error_register_state_t this_exception_state; /* ALIAS:this_exception_info.ei_state */
+DATDEF ATTR_PERTASK except_register_state_t this_exception_state; /* ALIAS:this_exception_info.ei_state */
 #define THIS_EXCEPTION_STATE PERTASK(this_exception_state)
 
-DATDEF ATTR_PERTASK error_code_t this_exception_code;                  /* ALIAS:this_exception_info.ei_code */
-DATDEF ATTR_PERTASK error_class_t this_exception_class;                /* ALIAS:this_exception_info.ei_class */
-DATDEF ATTR_PERTASK error_subclass_t this_exception_subclass;          /* ALIAS:this_exception_info.ei_subclass */
+DATDEF ATTR_PERTASK except_code_t this_exception_code;                 /* ALIAS:this_exception_info.ei_code */
+DATDEF ATTR_PERTASK except_class_t this_exception_class;               /* ALIAS:this_exception_info.ei_class */
+DATDEF ATTR_PERTASK except_subclass_t this_exception_subclass;         /* ALIAS:this_exception_info.ei_subclass */
 DATDEF ATTR_PERTASK uint8_t this_exception_flags;                      /* ALIAS:this_exception_info.ei_flags */
 DATDEF ATTR_PERTASK union exception_data_pointers this_exception_args; /* ALIAS:this_exception_info.ei_data.e_args */
 DATDEF ATTR_PERTASK void const *this_exception_faultaddr;              /* ALIAS:this_exception_info.ei_data.e_faultaddr */
@@ -55,10 +55,10 @@ DATDEF ATTR_PERTASK void const *this_exception_trace[EXCEPT_BACKTRACE_SIZE]; /* 
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 
 /* Dump the current exception to printk(), using the target prefixed by `reason' */
-FUNDEF void NOTHROW(VCALL error_printf)(char const *__restrict reason, ...);
-FUNDEF void NOTHROW(KCALL error_vprintf)(char const *__restrict reason, __builtin_va_list args);
+FUNDEF void NOTHROW(VCALL except_printf)(char const *__restrict reason, ...);
+FUNDEF void NOTHROW(KCALL except_vprintf)(char const *__restrict reason, __builtin_va_list args);
 /* Print information about the current exception into `printer' */
-FUNDEF ssize_t NOTHROW(KCALL error_print_into)(__pformatprinter printer, void *arg);
+FUNDEF ssize_t NOTHROW(KCALL except_print_into)(__pformatprinter printer, void *arg);
 
 #ifndef __errno_t_defined
 #define __errno_t_defined

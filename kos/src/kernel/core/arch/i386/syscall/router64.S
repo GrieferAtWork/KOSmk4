@@ -53,8 +53,8 @@ INTERN_FUNCTION(__x86_asm32_sysrun32_break)
 	movq   $(RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT | \
 	         ((1 << 6) - 1) << RPC_SYSCALL_INFO_FREGVALID_SHIFT), %rdx /* pointers[0] = flags */
 	movq   $(8), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_endproc
 END(__x86_asm32_sysrun32_break)
 

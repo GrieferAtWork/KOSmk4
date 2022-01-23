@@ -400,7 +400,7 @@ do_handle_timeout:
 								aio_handle_complete_nopr(aio, AIO_COMPLETION_FAILURE);
 								PREEMPTION_ENABLE();
 							} else {
-								error_printf("timeout async job %p", job);
+								except_printf("timeout async job %p", job);
 							}
 						}
 					}
@@ -503,7 +503,7 @@ do_handle_triggered_stop:
 			TRY {
 				(*job->a_ops->ao_cancel)(job);
 			} EXCEPT {
-				error_printf("canceling async job %p", job);
+				except_printf("canceling async job %p", job);
 			}
 		}
 		/* Get rid of this job */
@@ -628,7 +628,7 @@ again_rd_stat_before_reconnect:
 			 * that doesn't have an AIO handle attached, or that used to
 			 * have one attached, but was  canceled before it could  use
 			 * that handle. */
-			error_printf("running async job %p", job);
+			except_printf("running async job %p", job);
 		}
 		ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED_STOP);
 		goto again_rd_stat;

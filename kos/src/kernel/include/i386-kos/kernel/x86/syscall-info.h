@@ -164,8 +164,8 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
 					self->rsi_regs[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
 				}
 			} EXCEPT {
-				error_class_t cls = error_class();
-				if (ERRORCLASS_ISRTLPRIORITY(cls))
+				except_class_t cls = except_class();
+				if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 					RETHROW();
 			}
 		}
@@ -232,8 +232,8 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 					self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 				}
 			} EXCEPT {
-				error_class_t cls = error_class();
-				if (ERRORCLASS_ISRTLPRIORITY(cls))
+				except_class_t cls = except_class();
+				if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 					RETHROW();
 			}
 		}

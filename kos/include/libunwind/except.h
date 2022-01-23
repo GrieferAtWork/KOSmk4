@@ -176,8 +176,8 @@ struct _Unwind_Exception {
 struct _Unwind_Context /* Opaque structure */
 #ifdef __USE_KOS
 {
-	unwind_fde_t            uc_fde;   /* FDE descriptor. */
-	error_register_state_t *uc_state; /* [1..1] The register state that is loaded when resuming execution. */
+	unwind_fde_t             uc_fde;   /* FDE descriptor. */
+	except_register_state_t *uc_state; /* [1..1] The register state that is loaded when resuming execution. */
 }
 #endif /* __USE_KOS */
 ;

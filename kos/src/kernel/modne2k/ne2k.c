@@ -327,10 +327,10 @@ NOTHROW(FCALL Ne2k_HandleAioTxError)(Ne2kDevice *__restrict self,
 	struct exception_data *my_error;
 	(void)self;
 	printk(KERN_WARNING "[ne2k] Transmit error: %.2I8x\n", tsr);
-	my_error = error_data();
+	my_error = except_data();
 	memcpy(&old_error, my_error, sizeof(old_error));
 	bzero(my_error, sizeof(*my_error));
-	my_error->e_code                       = ERROR_CODEOF(E_IOERROR_ERRORBIT);
+	my_error->e_code                       = EXCEPT_CODEOF(E_IOERROR_ERRORBIT);
 	my_error->e_args.e_ioerror.i_subsystem = E_IOERROR_SUBSYSTEM_NET;
 	my_error->e_args.e_ioerror.i_reason    = E_IOERROR_REASON_NE2K_TXTSR;
 	my_error->e_args.e_pointers[2]         = tsr;
@@ -1407,11 +1407,11 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL Ne2k_InitDriver(void) {
 		TRY {
 			Ne2k_ProbePciDevice(dev);
 		} EXCEPT {
-			error_class_t cls = error_class();
-			if (ERRORCLASS_ISRTLPRIORITY(cls))
+			except_class_t cls = except_class();
+			if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 				RETHROW();
-			error_printf(FREESTR("Initializing ne2k at pci:%#I32x"),
-			             dev->pd_addr);
+			except_printf(FREESTR("Initializing ne2k at pci:%#I32x"),
+			              dev->pd_addr);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd85b8ad */
+/* HASH CRC-32:0x446ba765 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,22 +168,22 @@ __CDECLARE_OPT(,int,__THROWING,PKeyAlloc,(unsigned int __flags, unsigned int __a
 __CDECLARE_VOID(,__THROWING,PKeySet,(int __pkey, unsigned int __access_rights),(__pkey,__access_rights))
 #else /* __CRT_HAVE_PKeySet */
 #include <asm/pkey.h>
-#if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_error_thrown)
+#if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_except_thrown)
 #include <libc/local/kos.sys.mman/PKeySet.h>
 /* >> pkey_set(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PKeySet, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL PKeySet)(int __pkey, unsigned int __access_rights) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PKeySet))(__pkey, __access_rights); })
-#endif /* __ARCH_HAVE_PKEY && __CRT_HAVE_error_thrown */
+#endif /* __ARCH_HAVE_PKEY && __CRT_HAVE_except_thrown */
 #endif /* !__CRT_HAVE_PKeySet */
 #ifdef __CRT_HAVE_PKeyGet
 /* >> pkey_get(3) */
 __CDECLARE(,unsigned int,__THROWING,PKeyGet,(int __pkey),(__pkey))
 #else /* __CRT_HAVE_PKeyGet */
 #include <asm/pkey.h>
-#if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_error_thrown)
+#if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_except_thrown)
 #include <libc/local/kos.sys.mman/PKeyGet.h>
 /* >> pkey_get(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PKeyGet, __FORCELOCAL __ATTR_ARTIFICIAL unsigned int (__LIBCCALL PKeyGet)(int __pkey) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PKeyGet))(__pkey); })
-#endif /* __ARCH_HAVE_PKEY && __CRT_HAVE_error_thrown */
+#endif /* __ARCH_HAVE_PKEY && __CRT_HAVE_except_thrown */
 #endif /* !__CRT_HAVE_PKeyGet */
 /* >> pkey_free(2) */
 __CDECLARE_VOID_OPT(,__THROWING,PKeyFree,(int __pkey),(__pkey))

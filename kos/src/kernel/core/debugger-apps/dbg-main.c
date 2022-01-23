@@ -1049,7 +1049,7 @@ continue_readline_noauto:
 		TRY {
 			errorcode = dbg_commandhook_exec(cmd, argc, argv);
 		} EXCEPT {
-			error_print_into(&dbg_printer, NULL);
+			except_print_into(&dbg_printer, NULL);
 			errorcode = 1;
 		}
 		if (errorcode == DBG_STATUS_INVALID_ARGUMENTS) {

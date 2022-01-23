@@ -948,7 +948,7 @@ NOTHROW(KCALL GDBFs_EncodeErrno)(char *p, gdb_errno_t errno_value) {
 PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW(KCALL GDBFs_EncodeCurrentError)(char *o) {
 	errno_t error;
-	error = error_as_errno(error_data());
+	error = except_as_errno(except_data());
 	o = GDBFs_EncodeErrno(o, GDB_ErrnoEncode(error));
 	return o;
 }
@@ -2523,7 +2523,7 @@ INTERN void NOTHROW(FCALL GDB_Main)(void) {
 	struct exception_info saved_exceptions;
 	GDBThreadStopEvent *notif;
 	assert(PREEMPTION_ENABLED());
-	memcpy(&saved_exceptions, error_info(), sizeof(saved_exceptions));
+	memcpy(&saved_exceptions, except_info(), sizeof(saved_exceptions));
 again:
 	/* Determine the initial current thread. */
 	GDB_CurrentThread_general.ts_mode = GDBTHREADSEL_MODE_SINGLE;
@@ -2786,7 +2786,7 @@ done:
 		GDBThreadSel_Fini(&GDB_CurrentThread_continue);
 		GDB_CurrentThread_continue.ts_thread = NULL;
 	}
-	memcpy(error_info(), &saved_exceptions, sizeof(saved_exceptions));
+	memcpy(except_info(), &saved_exceptions, sizeof(saved_exceptions));
 	return;
 err_timeout_during_packet_receive:
 	printk(KERN_ERR "[gdb] Timeout while receiving packet %$q (assume detached)\n",

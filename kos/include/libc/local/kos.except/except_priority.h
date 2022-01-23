@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d96749e */
+/* HASH CRC-32:0x3b2072a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_priority_defined
-#define __local_error_priority_defined
+#ifndef __local_except_priority_defined
+#define __local_except_priority_defined
 #include <__crt.h>
 #include <kos/bits/exception_data.h>
 #include <kos/except/codes.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(error_priority) __ATTR_CONST __ATTR_WUNUSED unsigned int
-__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_priority))(__error_code_t __code) {
-	__error_class_t __code_class = ERROR_CLASS(__code);
-	if (ERRORCLASS_ISRTLPRIORITY(__code_class))
-		return 4 + (__code_class - ERRORCLASS_RTL_MIN);
-	if (ERRORCLASS_ISHIGHPRIORITY(__code_class))
+__LOCAL_LIBC(except_priority) __ATTR_CONST __ATTR_WUNUSED unsigned int
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_priority))(__except_code_t __code) {
+	__except_class_t __code_class = EXCEPT_CLASS(__code);
+	if (EXCEPTCLASS_ISRTLPRIORITY(__code_class))
+		return 4 + (__code_class - EXCEPTCLASS_RTL_MIN);
+	if (EXCEPTCLASS_ISHIGHPRIORITY(__code_class))
 		return 3;
-	if (__code_class != ERROR_CLASS(ERROR_CODEOF(E_OK))) {
-		if (!ERRORCLASS_ISLOWPRIORITY(__code_class))
+	if (__code_class != EXCEPT_CLASS(EXCEPT_CODEOF(E_OK))) {
+		if (!EXCEPTCLASS_ISLOWPRIORITY(__code_class))
 			return 2;
 		return 1;
 	}
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_priority_defined
-#define __local___localdep_error_priority_defined
-#define __localdep_error_priority __LIBC_LOCAL_NAME(error_priority)
-#endif /* !__local___localdep_error_priority_defined */
-#endif /* !__local_error_priority_defined */
+#ifndef __local___localdep_except_priority_defined
+#define __local___localdep_except_priority_defined
+#define __localdep_except_priority __LIBC_LOCAL_NAME(except_priority)
+#endif /* !__local___localdep_except_priority_defined */
+#endif /* !__local_except_priority_defined */

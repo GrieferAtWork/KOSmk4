@@ -1269,8 +1269,6 @@ incdir("");
 #undef max
 /* Some of the SAL bs also breaks libstdc++. */
 #undef __valid
-/* libstdc++ also doesn't like KOS's `error_code()' macro. */
-#undef error_code
 #include <__stdcxx.h>
 #include <atomic>
 #include <cassert>

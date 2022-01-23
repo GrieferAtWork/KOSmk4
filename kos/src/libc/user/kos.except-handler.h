@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87a9f31f */
+/* HASH CRC-32:0x3a1310bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,9 +63,9 @@ INTDEF int NOTHROW(LIBCCALL libc_set_exception_handler)(unsigned int mode, excep
  * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(unsigned int *pmode, except_handler_t *phandler, void **phandler_sp);
 /* Mode #2 / #3 exception handler (see description above) */
-INTDEF ATTR_NORETURN void (__EXCEPT_HANDLER_CC libc_except_handler3)(error_register_state_t *__restrict state, struct exception_data *__restrict error) THROWS(...);
+INTDEF ATTR_NORETURN void (__EXCEPT_HANDLER_CC libc_except_handler3)(except_register_state_t *__restrict state, struct exception_data *__restrict error) THROWS(...);
 /* Mode #4 exception handler (see description above) */
-INTDEF ATTR_NORETURN void (__EXCEPT_HANDLER_CC libc_except_handler4)(error_register_state_t *__restrict state, struct exception_data *__restrict error) THROWS(...);
+INTDEF ATTR_NORETURN void (__EXCEPT_HANDLER_CC libc_except_handler4)(except_register_state_t *__restrict state, struct exception_data *__restrict error) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

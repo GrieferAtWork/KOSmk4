@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfbc3b39 */
+/* HASH CRC-32:0x66f8acd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3603,8 +3603,8 @@
 #define __CRT_HAVE__environ
 #define __CRT_HAVE__eof
 #endif /* !__KERNEL__ */
-#define __CRT_HAVE__error_badusage_no_nesting
-#define __CRT_HAVE__error_check_no_nesting
+#define __CRT_HAVE__except_badusage_no_nesting
+#define __CRT_HAVE__except_check_no_nesting
 #ifndef __KERNEL__
 #define __CRT_HAVE__expand_dbg
 #define __CRT_HAVE__fcvt_s
@@ -4251,30 +4251,7 @@
 #define __CRT_HAVE_err
 #define __CRT_HAVE_errc
 #define __CRT_HAVE_error
-#endif /* !__KERNEL__ */
-#define __CRT_HAVE_error_active
-#define __CRT_HAVE_error_as_errno
-#define __CRT_HAVE_error_as_signal
-#ifndef __KERNEL__
 #define __CRT_HAVE_error_at_line
-#endif /* !__KERNEL__ */
-#define __CRT_HAVE_error_class
-#define __CRT_HAVE_error_code
-#define __CRT_HAVE_error_data
-#define __CRT_HAVE_error_info
-#define __CRT_HAVE_error_name
-#define __CRT_HAVE_error_nesting_begin
-#define __CRT_HAVE_error_nesting_end
-#define __CRT_HAVE_error_print_short_description
-#define __CRT_HAVE_error_priority
-#define __CRT_HAVE_error_register_state
-#define __CRT_HAVE_error_rethrow
-#define __CRT_HAVE_error_subclass
-#define __CRT_HAVE_error_throw
-#define __CRT_HAVE_error_throw_current
-#define __CRT_HAVE_error_thrown
-#define __CRT_HAVE_error_unwind
-#ifndef __KERNEL__
 #define __CRT_HAVE_errx
 #define __CRT_HAVE_ether_aton
 #define __CRT_HAVE_ether_aton_r
@@ -4288,8 +4265,31 @@
 #define __CRT_HAVE_eventfd
 #define __CRT_HAVE_eventfd_read
 #define __CRT_HAVE_eventfd_write
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE_except_active
+#define __CRT_HAVE_except_as_errno
+#define __CRT_HAVE_except_as_signal
+#define __CRT_HAVE_except_class
+#define __CRT_HAVE_except_code
+#define __CRT_HAVE_except_data
+#ifndef __KERNEL__
 #define __CRT_HAVE_except_handler3
 #define __CRT_HAVE_except_handler4
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE_except_info
+#define __CRT_HAVE_except_name
+#define __CRT_HAVE_except_nesting_begin
+#define __CRT_HAVE_except_nesting_end
+#define __CRT_HAVE_except_print_short_description
+#define __CRT_HAVE_except_priority
+#define __CRT_HAVE_except_register_state
+#define __CRT_HAVE_except_rethrow
+#define __CRT_HAVE_except_subclass
+#define __CRT_HAVE_except_throw
+#define __CRT_HAVE_except_throw_current
+#define __CRT_HAVE_except_thrown
+#define __CRT_HAVE_except_unwind
+#ifndef __KERNEL__
 #define __CRT_HAVE_execl
 #define __CRT_HAVE_execle
 #define __CRT_HAVE_execlp

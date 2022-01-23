@@ -50,13 +50,13 @@ x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	/* TODO: This function can also get called due to divide overflow! */
 	/* TODO: This function can also get called due to `aam $0' */
 
-	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_DIVIDE_BY_ZERO));
+	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_DIVIDE_BY_ZERO));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], 0);
 	PERTASK_SET(this_exception_faultaddr, curr_pc);
 	if (next_pc)
 		icpustate_setpc(state, next_pc);
-	error_throw_current_at_icpustate(state);
+	except_throw_current_at_icpustate(state);
 }
 
 DECL_END

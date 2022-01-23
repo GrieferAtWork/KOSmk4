@@ -1489,7 +1489,7 @@ again_read_ncon:
 				} else {
 					/* If the operation failed, return the exit error errno. */
 					if (ah->sca_aio.hg_status == AIO_COMPLETION_FAILURE) {
-						intval = error_as_errno(&ah->sca_aio.hg_error);
+						intval = except_as_errno(&ah->sca_aio.hg_error);
 					} else if (ah->sca_aio.hg_status == AIO_COMPLETION_CANCEL) {
 						intval = ECANCELED;
 					} else {

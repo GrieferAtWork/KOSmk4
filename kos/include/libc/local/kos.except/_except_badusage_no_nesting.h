@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x146ea192 */
+/* HASH CRC-32:0xca284cde */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,18 +18,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__error_badusage_no_nesting_defined
-#define __local__error_badusage_no_nesting_defined
+#ifndef __local__except_badusage_no_nesting_defined
+#define __local__except_badusage_no_nesting_defined
 #include <__crt.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_error_badusage_no_nesting) __ATTR_COLD __ATTR_NORETURN void
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_error_badusage_no_nesting))(void) {
+__LOCAL_LIBC(_except_badusage_no_nesting) __ATTR_COLD __ATTR_NORETURN void
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_except_badusage_no_nesting))(void) {
 	__hybrid_assertion_failed("Recursive `TRY' isn't nested; use `NESTED_TRY' instead");
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__error_badusage_no_nesting_defined
-#define __local___localdep__error_badusage_no_nesting_defined
-#define __localdep__error_badusage_no_nesting __LIBC_LOCAL_NAME(_error_badusage_no_nesting)
-#endif /* !__local___localdep__error_badusage_no_nesting_defined */
-#endif /* !__local__error_badusage_no_nesting_defined */
+#ifndef __local___localdep__except_badusage_no_nesting_defined
+#define __local___localdep__except_badusage_no_nesting_defined
+#define __localdep__except_badusage_no_nesting __LIBC_LOCAL_NAME(_except_badusage_no_nesting)
+#endif /* !__local___localdep__except_badusage_no_nesting_defined */
+#endif /* !__local__except_badusage_no_nesting_defined */

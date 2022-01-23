@@ -236,8 +236,8 @@ NOTHROW(KCALL kernel_open_rootfs_trydev)(struct blkdev *__restrict dev,
 			}
 		}
 	} EXCEPT {
-		error_printf(FREESTR("Opening blkdev \"/dev/%#q\""),
-		             dev->dv_dirent->dd_dirent.fd_name);
+		except_printf(FREESTR("Opening blkdev \"/dev/%#q\""),
+		              dev->dv_dirent->dd_dirent.fd_name);
 	}
 	if (result) {
 		if (*pnewly_created)

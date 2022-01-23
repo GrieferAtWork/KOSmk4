@@ -98,7 +98,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 		next_pc = instruction_trysucc(curr_pc, instrlen_isa_from_icpustate(state));
 	}
 	PERTASK_SET(this_exception_faultaddr, curr_pc);
-	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS));
+	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS));
 	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_index, bound_index);
 	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_min, bound_min);
 	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_max, bound_max);
@@ -108,7 +108,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			PERTASK_SET(this_exception_args.e_pointers[i], 0);
 	}
 	icpustate_setpc(state, next_pc);
-	error_throw_current_at_icpustate(state);
+	except_throw_current_at_icpustate(state);
 }
 
 DECL_END

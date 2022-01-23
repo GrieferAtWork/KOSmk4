@@ -1302,7 +1302,7 @@ NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device const *__restrict self,
 			result += size;
 		}
 	}
-	USER_EXCEPT(return -error_as_errno(error_data()))
+	USER_EXCEPT(return -except_as_errno(except_data()))
 done:
 	return result;
 }
@@ -1352,7 +1352,7 @@ NOTHROW_NCX(CC libpci_device_writecfg)(struct pci_device *__restrict self,
 			result += size;
 		}
 	}
-	USER_EXCEPT(return -error_as_errno(error_data()))
+	USER_EXCEPT(return -except_as_errno(except_data()))
 done:
 	return result;
 }

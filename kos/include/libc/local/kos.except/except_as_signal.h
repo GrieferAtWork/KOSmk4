@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x412e3b5e */
+/* HASH CRC-32:0x469e8c3c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_as_signal_defined
-#define __local_error_as_signal_defined
+#ifndef __local_except_as_signal_defined
+#define __local_except_as_signal_defined
 #include <__crt.h>
 struct exception_data;
 struct __siginfo_struct;
@@ -48,20 +48,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
 #endif /* !... */
 #endif /* !__local___localdep_bzero_defined */
-#ifndef __local___localdep_error_as_errno_defined
-#define __local___localdep_error_as_errno_defined
-#ifdef __CRT_HAVE_error_as_errno
+#ifndef __local___localdep_except_as_errno_defined
+#define __local___localdep_except_as_errno_defined
+#ifdef __CRT_HAVE_except_as_errno
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__LIBKCALL,__localdep_error_as_errno,(struct exception_data const *__restrict __self),error_as_errno,(__self))
-#else /* __CRT_HAVE_error_as_errno */
+__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__LIBKCALL,__localdep_except_as_errno,(struct exception_data const *__restrict __self),except_as_errno,(__self))
+#else /* __CRT_HAVE_except_as_errno */
 __NAMESPACE_LOCAL_END
-#include <libc/local/kos.except/error_as_errno.h>
+#include <libc/local/kos.except/except_as_errno.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_error_as_errno __LIBC_LOCAL_NAME(error_as_errno)
-#endif /* !__CRT_HAVE_error_as_errno */
-#endif /* !__local___localdep_error_as_errno_defined */
+#define __localdep_except_as_errno __LIBC_LOCAL_NAME(except_as_errno)
+#endif /* !__CRT_HAVE_except_as_errno */
+#endif /* !__local___localdep_except_as_errno_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 #include <asm/os/siginfo.h>
@@ -71,9 +71,9 @@ __NAMESPACE_LOCAL_END
 #include <kos/except/codes.h>
 #include <kos/kernel/handle.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(error_as_signal) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) {
-	__error_code_t __code = __self->e_code;
+__LOCAL_LIBC(except_as_signal) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(except_as_signal))(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) {
+	__except_code_t __code = __self->e_code;
 	(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__result, sizeof(*__result));
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
 	 *       Figure    3-27:    Hardware   Exceptions    and   Signals
@@ -95,7 +95,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_da
 	 *       15 (reserved)
 	 *       16 coprocessor error fault         SIGFPE
 	 *       other (unspecified)                SIGILL */
-	switch (ERROR_CLASS(__code)) {
+	switch (EXCEPT_CLASS(__code)) {
 
 #ifdef __SIGQUIT
 	case E_EXIT_THREAD:
@@ -162,22 +162,22 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_da
 		switch (__code) {
 
 #ifdef __SEGV_ACCERR
-		case ERROR_CODEOF(E_SEGFAULT_READONLY):
-		case ERROR_CODEOF(E_SEGFAULT_NOTREADABLE):
-		case ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE):
+		case EXCEPT_CODEOF(E_SEGFAULT_READONLY):
+		case EXCEPT_CODEOF(E_SEGFAULT_NOTREADABLE):
+		case EXCEPT_CODEOF(E_SEGFAULT_NOTEXECUTABLE):
 			__result->si_code = __SEGV_ACCERR;
 			break;
 #endif /* __SEGV_ACCERR */
 
 #if defined(__SIGBUS) && defined(__BUS_OBJERR)
-		case ERROR_CODEOF(E_SEGFAULT_NOTATOMIC):
+		case EXCEPT_CODEOF(E_SEGFAULT_NOTATOMIC):
 			__result->si_signo = __SIGBUS;
 			__result->si_code  = __BUS_OBJERR;
 			break;
 #endif /* __SIGBUS && __BUS_OBJERR */
 
 #if defined(__SIGBUS) && defined(__BUS_ADRALN)
-		case ERROR_CODEOF(E_SEGFAULT_UNALIGNED):
+		case EXCEPT_CODEOF(E_SEGFAULT_UNALIGNED):
 			__result->si_signo = __SIGBUS;
 			__result->si_code  = __BUS_ADRALN;
 			break;
@@ -197,7 +197,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_da
 		switch (__code) {
 
 #ifdef __ILL_ILLOPN
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND):
 			__result->si_code = __ILL_ILLOPN;
 #ifdef __ILL_ILLADR
 			if (__self->e_args.e_illegal_instruction.ii_bad_operand.bo_what == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY ||
@@ -208,13 +208,13 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_da
 #endif /* __ILL_ILLOPN */
 
 #ifdef __ILL_PRVOPC
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE):
 			__result->si_code = __ILL_PRVOPC;
 			break;
 #endif /* __ILL_PRVOPC */
 
 #ifdef __ILL_ILLOPN
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER):
 			__result->si_code = __ILL_ILLOPN;
 #ifdef __ILL_PRVREG
 			if (__self->e_args.e_illegal_instruction.ii_register.r_how == E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV ||
@@ -225,20 +225,20 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_da
 #endif /* __ILL_ILLOPN */
 
 #if defined(__ILL_ILLADR) && defined(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT):
 			__result->si_code = __ILL_ILLADR;
 			break;
 #endif /* __ILL_ILLADR && E_ILLEGAL_INSTRUCTION_X86_INTERRUPT */
 
 #ifdef __ILL_ILLOPC
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE):
 #ifdef E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX):
 #endif /* E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX */
 #ifdef E_ILLEGAL_INSTRUCTION_X86_TOO_LONG
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG):
 #endif /* E_ILLEGAL_INSTRUCTION_X86_TOO_LONG */
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE):
 			__result->si_code = __ILL_ILLOPC;
 			break;
 #endif /* __ILL_ILLOPC */
@@ -252,12 +252,12 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_da
 	default:
 		return 0;
 	}
-	__result->si_errno = (__NAMESPACE_LOCAL_SYM __localdep_error_as_errno)(__self);
+	__result->si_errno = (__NAMESPACE_LOCAL_SYM __localdep_except_as_errno)(__self);
 	return 1;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_as_signal_defined
-#define __local___localdep_error_as_signal_defined
-#define __localdep_error_as_signal __LIBC_LOCAL_NAME(error_as_signal)
-#endif /* !__local___localdep_error_as_signal_defined */
-#endif /* !__local_error_as_signal_defined */
+#ifndef __local___localdep_except_as_signal_defined
+#define __local___localdep_except_as_signal_defined
+#define __localdep_except_as_signal __LIBC_LOCAL_NAME(except_as_signal)
+#endif /* !__local___localdep_except_as_signal_defined */
+#endif /* !__local_except_as_signal_defined */

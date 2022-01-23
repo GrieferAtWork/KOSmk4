@@ -85,10 +85,10 @@ NOTHROW_NCX(CC libservice_api_create_nx)(char const *__restrict filename,
 	NESTED_TRY {
 		return libservice_api_create(filename, specs);
 	} EXCEPT {
-		error_class_t cls = error_class();
-		if (ERRORCLASS_ISRTLPRIORITY(cls))
+		except_class_t cls = except_class();
+		if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
-		errno = error_as_errno(error_data());
+		errno = except_as_errno(except_data());
 	}
 	return NULL;
 }

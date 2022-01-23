@@ -1401,7 +1401,7 @@ handle_fixed_operand_size:
 	                            fullyLimited: HashSet with string)
 			: {(string, {string | int...})...} {
 		this.outLimits = Dict();
-		/* Assembly twice so code can be optimized through outLimits assumptions */
+		/* Assemble twice so code can be optimized via outLimits assumptions */
 		this.assembleOnceWithHeaders(outputRegister)...;
 		local bytes = Tuple(this.assembleOnceWithHeaders(outputRegister));
 		if (!this.outLimits) {

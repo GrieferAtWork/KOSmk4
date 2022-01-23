@@ -1388,7 +1388,7 @@ DEFINE_SYSCALL0(errno_t, sync) {
 	TRY {
 		fsuper_syncall();
 	} EXCEPT {
-		error_printf("sync()");
+		except_printf("sync()");
 		RETHROW();
 	}
 	return -EOK;
@@ -2221,10 +2221,10 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 				TRY {
 					ATOMIC_WRITE(um->pm_sigmask, NULL);
 				} EXCEPT {
-					error_class_t cls = error_class();
-					if (ERRORCLASS_ISRTLPRIORITY(cls))
+					except_class_t cls = except_class();
+					if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 						RETHROW();
-					error_printf("Handling TASK_FUSERPROCMASK_AFTER_VFORK");
+					except_printf("Handling TASK_FUSERPROCMASK_AFTER_VFORK");
 				}
 			}
 		}
@@ -2354,7 +2354,7 @@ kernel_exec_rpc(struct rpc_context *__restrict ctx, void *cookie) {
 	if unlikely(ctx->rc_context == RPC_REASONCTX_SHUTDOWN) {
 		assert(THIS_TASKPID);
 		bzero(&data->er_except.e_args, sizeof(data->er_except.e_args));
-		data->er_except.e_code                            = ERROR_CODEOF(E_EXIT_THREAD);
+		data->er_except.e_code                            = EXCEPT_CODEOF(E_EXIT_THREAD);
 		data->er_except.e_args.e_exit_thread.et_exit_code = (uintptr_t)(unsigned int)THIS_TASKPID->tp_status.w_status;
 		goto error_completion;
 	}
@@ -2363,10 +2363,10 @@ kernel_exec_rpc(struct rpc_context *__restrict ctx, void *cookie) {
 		kernel_do_execveat(&data->er_args);
 		ctx->rc_state = data->er_args.ea_state;
 	} EXCEPT {
-		error_class_t cls = error_class();
-		if (ERRORCLASS_ISRTLPRIORITY(cls))
+		except_class_t cls = except_class();
+		if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
-		memcpy(&data->er_except, error_data(), sizeof(data->er_except));
+		memcpy(&data->er_except, except_data(), sizeof(data->er_except));
 		goto error_completion;
 	}
 	kfree(data);
@@ -2524,11 +2524,11 @@ send_rpc_to_main_thread:
 
 		/* We only get here if the exec failed, in which case  the
 		 * proper error will have been stored in `data->er_except' */
-		memcpy(error_data(), &data->er_except, sizeof(data->er_except));
+		memcpy(except_data(), &data->er_except, sizeof(data->er_except));
 	} /* Scope... */
 
 	/* Throw the exception returned by the main thread. */
-	error_throw_current();
+	except_throw_current();
 }
 
 #ifdef __ARCH_WANT_SYSCALL_EXECVEAT

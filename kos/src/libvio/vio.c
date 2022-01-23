@@ -408,12 +408,12 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 		} EXCEPT {
 			unsigned int i;
 			struct exception_data *data;
-			error_class_t cls = error_class();
+			except_class_t cls = except_class();
 			/* Always propagate RTL-priority exceptions. */
-			if (ERRORCLASS_ISRTLPRIORITY(cls))
+			if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 				RETHROW();
 			/* Respond with an exception */
-			data                   = error_data();
+			data                   = except_data();
 			resp.rx.ur_opcode      = UVIO_OPCODE_EXCEPT;
 			resp.rx.ur_except_code = data->e_code;
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)

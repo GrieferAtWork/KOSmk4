@@ -267,8 +267,8 @@ ps2_probe_port(struct ps2_probe_data *__restrict probe_data,
 	} EXCEPT {
 		if (!was_thrown(E_IOERROR))
 			RETHROW();
-		error_printf(FREESTR("disabling scanning on ps2 port #%u"),
-		             portno + 1);
+		except_printf(FREESTR("disabling scanning on ps2 port #%u"),
+		              portno + 1);
 	}
 	nid_port = ps2_run_identify_command(probe_data, portno, id_port);
 	if (nid_port == 0) {
@@ -428,7 +428,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
 		} EXCEPT {
 			if (!was_thrown(E_IOERROR))
 				RETHROW();
-			error_printf("probing ps/2 port #%u", portno + 1);
+			except_printf("probing ps/2 port #%u", portno + 1);
 		}
 	}
 }

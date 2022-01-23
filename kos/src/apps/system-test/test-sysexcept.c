@@ -58,8 +58,8 @@ print("#define X86_64_CFI_CLEARDF ", repr(",".join(assemble('x86_64', '%rflags',
 #define X86_64_CFI_CLEARDF "22,49,7,146,49,0,11,255,251,26"
 /*[[[end]]]*/
 
-#define assert_error_code(code) \
-	assertf(was_thrown(code), "error_code(): %#Ix", error_code())
+#define assert_except_code(code) \
+	assertf(was_thrown(code), "except_code(): %#Ix", except_code())
 
 #if defined(__i386__) && !defined(__x86_64__)
 INTDEF void lcall7_Pipe(fd_t fd[2]);
@@ -173,7 +173,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		Pipe(null);
 		assert_failed("syscall:libc: Shouldn't get here!");
 	} EXCEPT {
-		assert_error_code(E_SEGFAULT);
+		assert_except_code(E_SEGFAULT);
 	}
 
 	/* The libc direct syscall function */
@@ -192,7 +192,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		sys_Xpipe(NULL);
 		assert_failed("syscall:libc:sysX: Shouldn't get here!");
 	} EXCEPT {
-		assert_error_code(E_SEGFAULT);
+		assert_except_code(E_SEGFAULT);
 	}
 
 	/* Also make sure  that ukern system  calls _can_  work
@@ -215,7 +215,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		userkern_Syscall(userkern_self(), pipe)(NULL);
 		assert_failed("syscall:useg: Shouldn't get here!");
 	} EXCEPT {
-		assert_error_code(E_SEGFAULT);
+		assert_except_code(E_SEGFAULT);
 	}
 
 #if defined(__i386__) && !defined(__x86_64__)
@@ -235,7 +235,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		lcall7_Pipe(NULL);
 		assert_failed("syscall:lcall7: Shouldn't get here!");
 	} EXCEPT {
-		assert_error_code(E_SEGFAULT);
+		assert_except_code(E_SEGFAULT);
 	}
 	/* Manually invoke: sysenter */
 	ctest_subtestf("sysenter_Pipe() works");
@@ -253,7 +253,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		sysenter_Pipe(NULL);
 		assert_failed("syscall:sysenter: Shouldn't get here!");
 	} EXCEPT {
-		assert_error_code(E_SEGFAULT);
+		assert_except_code(E_SEGFAULT);
 	}
 #endif /* __i386__ && !__x86_64 */
 
@@ -274,22 +274,22 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		int80_Pipe(NULL);
 		assert_failed("syscall:int80: Shouldn't get here!");
 	} EXCEPT {
-		assert_error_code(E_SEGFAULT);
+		assert_except_code(E_SEGFAULT);
 	}
 #endif /* __i386__ || __x86_64__ */
 
 	/* Throw an exception manually by using the THROW() macro. */
-	assert_error_code(E_OK);
+	assert_except_code(E_OK);
 	ctest_subtestf("THROW(X) works");
 	TRY {
 		THROW(E_DIVIDE_BY_ZERO);
 		assert_failed("THROW(): Shouldn't get here!");
 	} EXCEPT {
-		assert_error_code(E_DIVIDE_BY_ZERO);
+		assert_except_code(E_DIVIDE_BY_ZERO);
 	}
 
 	/* Throw an exception manually by using the THROW() macro (with additional pointers). */
-	assert_error_code(E_OK);
+	assert_except_code(E_OK);
 	ctest_subtestf("THROW(X, Y, Z) works");
 	TRY {
 		THROW(E_DIVIDE_BY_ZERO, 1, 2, 3);
@@ -297,8 +297,8 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	} EXCEPT {
 		unsigned int i;
 		struct exception_data *data;
-		assert_error_code(E_DIVIDE_BY_ZERO);
-		data = error_data();
+		assert_except_code(E_DIVIDE_BY_ZERO);
+		data = except_data();
 		assertf(data->e_args.e_pointers[0] == 1, "data->e_args.e_pointers[0] = %p", data->e_args.e_pointers[0]);
 		assertf(data->e_args.e_pointers[1] == 2, "data->e_args.e_pointers[1] = %p", data->e_args.e_pointers[1]);
 		assertf(data->e_args.e_pointers[2] == 3, "data->e_args.e_pointers[2] = %p", data->e_args.e_pointers[2]);
@@ -311,7 +311,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 
 	/* Do something that causes  the kernel to throw  an
 	 * exception due to performing an illegal operation. */
-	assert_error_code(E_OK);
+	assert_except_code(E_OK);
 	ctest_subtestf("E_DIVIDE_BY_ZERO works");
 	TRY {
 		static volatile int x = 10;
@@ -321,9 +321,9 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		assert_failed("usfault: Shouldn't get here!");
 		x = z; /* Suppress warning: z set, but not used */
 	} EXCEPT {
-		assert_error_code(E_DIVIDE_BY_ZERO);
+		assert_except_code(E_DIVIDE_BY_ZERO);
 	}
-	assert_error_code(E_OK);
+	assert_except_code(E_OK);
 }
 
 

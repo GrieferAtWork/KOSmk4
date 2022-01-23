@@ -3145,8 +3145,8 @@ driver_run_initfini_array(struct driver *__restrict self,
 		TRY {
 			(*func)((int)(unsigned int)self->d_argc, self->d_argv);
 		} EXCEPT {
-			error_printf("running driver %q function %p from %s[%" PRIuSIZ "] (of %" PRIuSIZ ") at %p",
-			             self->d_name, (void *)func, name, i, vec.difv_siz, &vec.difv_vec[i]);
+			except_printf("running driver %q function %p from %s[%" PRIuSIZ "] (of %" PRIuSIZ ") at %p",
+			              self->d_name, (void *)func, name, i, vec.difv_siz, &vec.difv_vec[i]);
 			if (!(flags & DRIVER_INITFINI_F_FORCEFINI))
 				RETHROW();
 		}
@@ -3182,8 +3182,8 @@ driver_run_initfini_func(struct driver *__restrict self, intptr_t elf_dt_func,
 	TRY {
 		(*func)((int)(unsigned int)self->d_argc, self->d_argv);
 	} EXCEPT {
-		error_printf("running driver %q %s-function at %p",
-		             self->d_name, name, (void *)func);
+		except_printf("running driver %q %s-function at %p",
+		              self->d_name, name, (void *)func);
 		if (!(flags & DRIVER_INITFINI_F_FORCEFINI))
 			RETHROW();
 	}
@@ -5714,8 +5714,8 @@ driver_loadmod_file_with_path(struct driver_libpath_struct *__restrict lp,
 			                                     driver_cmdline, pnew_driver_loaded,
 			                                     create_new_drivers);
 		} EXCEPT {
-			error_code_t code = error_code();
-			if (ERROR_CLASS(code) != E_FSERROR || !E_FSERROR_IS_FILE_NOT_FOUND(code))
+			except_code_t code = except_code();
+			if (EXCEPT_CLASS(code) != E_FSERROR || !E_FSERROR_IS_FILE_NOT_FOUND(code))
 				RETHROW(); /* Something other than file-not-found */
 			if (create_new_drivers && !*sep)
 				RETHROW(); /* This is the last possible path to search in the second phase. */

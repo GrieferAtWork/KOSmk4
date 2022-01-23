@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc154494b */
+/* HASH CRC-32:0x1b6d68c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -230,7 +230,7 @@ __NAMESPACE_STD_USING(c32rtomb)
 
 
 #ifdef __USE_KOS
-/* Simple functions to convert between single-byte and multi-byte formats,
+/* Simple functions to convert between single-byte and multi-byte  formats,
  * without having to worry about buffers (since all of these functions will
  * automatically allocate buffers on the heap) */
 

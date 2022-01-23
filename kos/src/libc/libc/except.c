@@ -78,84 +78,84 @@ STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFS
 
 
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
-struct exception_info *NOTHROW_NCX(LIBCCALL libc_error_info)(void) {
+struct exception_info *NOTHROW_NCX(LIBCCALL libc_except_info)(void) {
 	return &current.pt_except;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
-struct exception_data *NOTHROW_NCX(LIBCCALL libc_error_data)(void) {
+struct exception_data *NOTHROW_NCX(LIBCCALL libc_except_data)(void) {
 	return &current.pt_except.ei_data;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
-error_register_state_t *NOTHROW_NCX(LIBCCALL libc_error_register_state)(void) {
+except_register_state_t *NOTHROW_NCX(LIBCCALL libc_except_register_state)(void) {
 	return &current.pt_except.ei_state;
 }
-INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED error_code_t
-NOTHROW_NCX(LIBCCALL libc_error_code)(void) {
+INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED except_code_t
+NOTHROW_NCX(LIBCCALL libc_except_code)(void) {
 	return current.pt_except.ei_code;
 }
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED bool
-NOTHROW_NCX(LIBCCALL libc_error_active)(void) {
+NOTHROW_NCX(LIBCCALL libc_except_active)(void) {
 	return current.pt_except.ei_code != E_OK;
 }
-INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED error_class_t
-NOTHROW_NCX(LIBCCALL libc_error_class)(void) {
-	return ERROR_CLASS(current.pt_except.ei_code);
+INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED except_class_t
+NOTHROW_NCX(LIBCCALL libc_except_class)(void) {
+	return EXCEPT_CLASS(current.pt_except.ei_code);
 }
-INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED error_subclass_t
-NOTHROW_NCX(LIBCCALL libc_error_subclass)(void) {
-	return ERROR_SUBCLASS(current.pt_except.ei_code);
+INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED except_subclass_t
+NOTHROW_NCX(LIBCCALL libc_except_subclass)(void) {
+	return EXCEPT_SUBCLASS(current.pt_except.ei_code);
 }
 
-#undef error_info
-#undef error_data
-#undef error_register_state
-#undef error_code
-#undef error_active
-#undef error_class
-#undef error_subclass
+#undef except_info
+#undef except_data
+#undef except_register_state
+#undef except_code
+#undef except_active
+#undef except_class
+#undef except_subclass
 
-DEFINE_PUBLIC_ALIAS(error_info, libc_error_info);
-DEFINE_PUBLIC_ALIAS(error_data, libc_error_data);
-DEFINE_PUBLIC_ALIAS(error_register_state, libc_error_register_state);
-DEFINE_PUBLIC_ALIAS(error_code, libc_error_code);
-DEFINE_PUBLIC_ALIAS(error_active, libc_error_active);
-DEFINE_PUBLIC_ALIAS(error_class, libc_error_class);
-DEFINE_PUBLIC_ALIAS(error_subclass, libc_error_subclass);
+DEFINE_PUBLIC_ALIAS(except_info, libc_except_info);
+DEFINE_PUBLIC_ALIAS(except_data, libc_except_data);
+DEFINE_PUBLIC_ALIAS(except_register_state, libc_except_register_state);
+DEFINE_PUBLIC_ALIAS(except_code, libc_except_code);
+DEFINE_PUBLIC_ALIAS(except_active, libc_except_active);
+DEFINE_PUBLIC_ALIAS(except_class, libc_except_class);
+DEFINE_PUBLIC_ALIAS(except_subclass, libc_except_subclass);
 
 /* Exception support. */
 
 /* Dynamically loaded dependencies to libunwind.so */
-INTERN SECTION_EXCEPT_BSS void /*                          */ *pdyn_libunwind                          = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_FIND /*              */ pdyn_unwind_fde_find                    = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_GETREG_ERROR_REGISTER_STATE pdyn_unwind_getreg_error_register_state = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_SETREG_ERROR_REGISTER_STATE pdyn_unwind_setreg_error_register_state = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC /*              */ pdyn_unwind_fde_exec                    = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_APPLY /*             */ pdyn_unwind_cfa_apply                   = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_CFA /*          */ pdyn_unwind_fde_exec_cfa                = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_CALCULATE_CFA /*     */ pdyn_unwind_fde_calculate_cfa           = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_LANDING_EXEC /*      */ pdyn_unwind_fde_landing_exec            = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_LANDING_APPLY /*     */ pdyn_unwind_cfa_landing_apply           = NULL;
-PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_POINTER /*         */ pdyn_dwarf_decode_pointer               = NULL;
-PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_ULEB128 /*         */ pdyn_dwarf_decode_uleb128               = NULL;
+INTERN SECTION_EXCEPT_BSS void /*                           */ *pdyn_libunwind                           = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_FIND /*               */ pdyn_unwind_fde_find                     = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_GETREG_EXCEPT_REGISTER_STATE pdyn_unwind_getreg_except_register_state = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_SETREG_EXCEPT_REGISTER_STATE pdyn_unwind_setreg_except_register_state = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC /*               */ pdyn_unwind_fde_exec                     = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_APPLY /*              */ pdyn_unwind_cfa_apply                    = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_CFA /*           */ pdyn_unwind_fde_exec_cfa                 = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_CALCULATE_CFA /*      */ pdyn_unwind_fde_calculate_cfa            = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_LANDING_EXEC /*       */ pdyn_unwind_fde_landing_exec             = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_LANDING_APPLY /*      */ pdyn_unwind_cfa_landing_apply            = NULL;
+PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_POINTER /*          */ pdyn_dwarf_decode_pointer                = NULL;
+PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_ULEB128 /*          */ pdyn_dwarf_decode_uleb128                = NULL;
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC /*     */ pdyn_unwind_fde_sigframe_exec  = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY /*    */ pdyn_unwind_cfa_sigframe_apply = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC /*      */ pdyn_unwind_fde_sigframe_exec  = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY /*     */ pdyn_unwind_cfa_sigframe_apply = NULL;
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 #define ENSURE_LIBUNWIND_LOADED() \
 	(ATOMIC_READ(pdyn_libunwind) != NULL || (initialize_libunwind(), 0))
 
 PRIVATE SECTION_EXCEPT_STRING char const name_libunwind_so[] = LIBUNWIND_LIBRARY_NAME;
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_find[]                    = "unwind_fde_find";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_getreg_error_register_state[] = UNWIND_GETREG_ERROR_REGISTER_STATE_NAME;
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_setreg_error_register_state[] = UNWIND_SETREG_ERROR_REGISTER_STATE_NAME;
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec[]                    = "unwind_fde_exec";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_apply[]                   = "unwind_cfa_apply";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec_cfa[]                = "unwind_fde_exec_cfa";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_calculate_cfa[]           = "unwind_fde_calculate_cfa";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_landing_exec[]            = "unwind_fde_landing_exec";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_landing_apply[]           = "unwind_cfa_landing_apply";
-PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_pointer[]               = "dwarf_decode_pointer";
-PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_uleb128[]               = "dwarf_decode_uleb128";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_find[]                     = "unwind_fde_find";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_getreg_except_register_state[] = UNWIND_GETREG_EXCEPT_REGISTER_STATE_NAME;
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_setreg_except_register_state[] = UNWIND_SETREG_EXCEPT_REGISTER_STATE_NAME;
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec[]                     = "unwind_fde_exec";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_apply[]                    = "unwind_cfa_apply";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec_cfa[]                 = "unwind_fde_exec_cfa";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_calculate_cfa[]            = "unwind_fde_calculate_cfa";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_landing_exec[]             = "unwind_fde_landing_exec";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_landing_apply[]            = "unwind_cfa_landing_apply";
+PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_pointer[]                = "dwarf_decode_pointer";
+PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_uleb128[]                = "dwarf_decode_uleb128";
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_sigframe_exec[]  = "unwind_fde_sigframe_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unwind_cfa_sigframe_apply";
@@ -181,8 +181,8 @@ void LIBCCALL initialize_libunwind(void) {
 	if unlikely((*(void **)&func = dlsym(handle, name)) == NULL) \
 		goto err_init_failed
 	BIND(pdyn_unwind_fde_find, name_unwind_fde_find);
-	BIND(pdyn_unwind_getreg_error_register_state, name_unwind_getreg_error_register_state);
-	BIND(pdyn_unwind_setreg_error_register_state, name_unwind_setreg_error_register_state);
+	BIND(pdyn_unwind_getreg_except_register_state, name_unwind_getreg_except_register_state);
+	BIND(pdyn_unwind_setreg_except_register_state, name_unwind_setreg_except_register_state);
 	BIND(pdyn_unwind_fde_exec, name_unwind_fde_exec);
 	BIND(pdyn_unwind_cfa_apply, name_unwind_cfa_apply);
 	BIND(pdyn_unwind_fde_exec_cfa, name_unwind_fde_exec_cfa);
@@ -212,25 +212,25 @@ err_init_failed:
 }
 
 
-#define unwind_fde_find                    (*pdyn_unwind_fde_find)
-#define unwind_getreg_error_register_state (*pdyn_unwind_getreg_error_register_state)
-#define unwind_setreg_error_register_state (*pdyn_unwind_setreg_error_register_state)
-#define unwind_fde_exec                    (*pdyn_unwind_fde_exec)
-#define unwind_cfa_apply                   (*pdyn_unwind_cfa_apply)
-#define unwind_fde_exec_cfa                (*pdyn_unwind_fde_exec_cfa)
-#define unwind_fde_calculate_cfa           (*pdyn_unwind_fde_calculate_cfa)
-#define unwind_fde_landing_exec            (*pdyn_unwind_fde_landing_exec)
-#define unwind_cfa_landing_apply           (*pdyn_unwind_cfa_landing_apply)
-#define unwind_fde_sigframe_exec           (*pdyn_unwind_fde_sigframe_exec)
-#define unwind_cfa_sigframe_apply          (*pdyn_unwind_cfa_sigframe_apply)
-#define dwarf_decode_pointer               (*pdyn_dwarf_decode_pointer)
-#define dwarf_decode_uleb128               (*pdyn_dwarf_decode_uleb128)
+#define unwind_fde_find                     (*pdyn_unwind_fde_find)
+#define unwind_getreg_except_register_state (*pdyn_unwind_getreg_except_register_state)
+#define unwind_setreg_except_register_state (*pdyn_unwind_setreg_except_register_state)
+#define unwind_fde_exec                     (*pdyn_unwind_fde_exec)
+#define unwind_cfa_apply                    (*pdyn_unwind_cfa_apply)
+#define unwind_fde_exec_cfa                 (*pdyn_unwind_fde_exec_cfa)
+#define unwind_fde_calculate_cfa            (*pdyn_unwind_fde_calculate_cfa)
+#define unwind_fde_landing_exec             (*pdyn_unwind_fde_landing_exec)
+#define unwind_cfa_landing_apply            (*pdyn_unwind_cfa_landing_apply)
+#define unwind_fde_sigframe_exec            (*pdyn_unwind_fde_sigframe_exec)
+#define unwind_cfa_sigframe_apply           (*pdyn_unwind_cfa_sigframe_apply)
+#define dwarf_decode_pointer                (*pdyn_dwarf_decode_pointer)
+#define dwarf_decode_uleb128                (*pdyn_dwarf_decode_uleb128)
 
 PRIVATE SECTION_EXCEPT_TEXT void LIBCCALL
 kos_unwind_exception_cleanup(_Unwind_Reason_Code UNUSED(reason),
                              struct _Unwind_Exception *UNUSED(exc)) {
 	/* Clear the active error code */
-	current.pt_except.ei_code = ERROR_CODEOF(E_OK);
+	current.pt_except.ei_code = EXCEPT_CODEOF(E_OK);
 }
 
 PRIVATE SECTION_EXCEPT_DATA struct _Unwind_Exception kos_unwind_exception = {
@@ -272,7 +272,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 
 	reader     = (byte_t const *)context->uc_fde.f_lsdaaddr;
 	landingpad = (byte_t const *)context->uc_fde.f_pcstart;
-	pc         = (byte_t const *)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
+	pc         = (byte_t const *)__EXCEPT_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
 
 	/* HINT: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
@@ -310,10 +310,10 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 			if (!phase_2)
 				return _URC_HANDLER_FOUND;
 			/* Jump to the associated handler */
-			__ERROR_REGISTER_STATE_TYPE_WRPC(*context->uc_state, landingpad + handler);
+			__EXCEPT_REGISTER_STATE_TYPE_WRPC(*context->uc_state, landingpad + handler);
 			if (action != 0) {
-				__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*context->uc_state,
-				                                                (uintptr_t)libc_get_kos_unwind_exception());
+				__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*context->uc_state,
+				                                                 (uintptr_t)libc_get_kos_unwind_exception());
 			}
 			return _URC_INSTALL_CONTEXT;
 		}
@@ -342,10 +342,10 @@ libc_gxx_personality_v0(int version /* = 1 */,
 }
 
 
-PRIVATE SECTION_EXCEPT_TEXT unsigned int __ERROR_UNWIND_CC
+PRIVATE SECTION_EXCEPT_TEXT unsigned int __EXCEPT_UNWIND_CC
 unwind_fde(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-           error_register_state_t *__restrict new_state,
-           error_register_state_t const *__restrict old_state,
+           except_register_state_t *__restrict new_state,
+           except_register_state_t const *__restrict old_state,
            void const *pc) {
 	unsigned int unwind_error;
 	/* Execute the CFA program to generate the row of rules for our current source location. */
@@ -358,8 +358,8 @@ unwind_fde(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized 
 			goto done;
 		/* Apply the rules to our register state to unwind the stack to that function's call-site. */
 		unwind_error = unwind_cfa_sigframe_apply(&cfa, fde, pc,
-		                                         &unwind_getreg_error_register_state, old_state,
-		                                         &unwind_setreg_error_register_state, new_state);
+		                                         &unwind_getreg_except_register_state, old_state,
+		                                         &unwind_setreg_except_register_state, new_state);
 	} else
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 	{
@@ -369,8 +369,8 @@ unwind_fde(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized 
 			goto done;
 		/* Apply the rules to our register state to unwind the stack to that function's call-site. */
 		unwind_error = unwind_cfa_apply(&cfa, fde, pc,
-		                                &unwind_getreg_error_register_state, old_state,
-		                                &unwind_setreg_error_register_state, new_state);
+		                                &unwind_getreg_except_register_state, old_state,
+		                                &unwind_setreg_except_register_state, new_state);
 	}
 	if (unwind_error == UNWIND_INVALID_REGISTER) {
 		/* TODO: Try again, but this time include the current FPU context. */
@@ -382,21 +382,21 @@ done:
 
 PRIVATE SECTION_EXCEPT_TEXT unsigned int __FCALL
 unwind_landingpad(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                  error_register_state_t *__restrict state,
+                  except_register_state_t *__restrict state,
                   void const *except_pc) {
 	void const *landing_pad_pc;
 	unwind_cfa_landing_state_t cfa;
-	error_register_state_t new_state;
+	except_register_state_t new_state;
 	unsigned int unwind_error;
-	landing_pad_pc = __ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+	landing_pad_pc = __EXCEPT_REGISTER_STATE_TYPE_RDPC(*state);
 	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto done;
 	/* Apply landing-pad transformations. */
 	memcpy(&new_state, state, sizeof(new_state));
 	unwind_error = unwind_cfa_landing_apply(&cfa, fde, except_pc,
-	                                        &unwind_getreg_error_register_state, state,
-	                                        &unwind_setreg_error_register_state, &new_state);
+	                                        &unwind_getreg_except_register_state, state,
+	                                        &unwind_setreg_except_register_state, &new_state);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto done;
 	/* Write-back the new register state. */
@@ -405,7 +405,7 @@ unwind_landingpad(unwind_fde_t *__restrict fde, /* Only non-const for lazy initi
 done:
 	if (unwind_error == UNWIND_NO_FRAME) {
 		/* Directly jump to the landing pad. */
-		__ERROR_REGISTER_STATE_TYPE_WRPC(*state, (uintptr_t)landing_pad_pc);
+		__EXCEPT_REGISTER_STATE_TYPE_WRPC(*state, (uintptr_t)landing_pad_pc);
 		unwind_error = UNWIND_SUCCESS;
 	}
 	return unwind_error;
@@ -415,17 +415,17 @@ done:
 
 
 
-PRIVATE SECTION_EXCEPT_TEXT error_register_state_t *LIBCCALL
-handle_special_exception(error_register_state_t *__restrict state,
+PRIVATE SECTION_EXCEPT_TEXT except_register_state_t *LIBCCALL
+handle_special_exception(except_register_state_t *__restrict state,
                          struct exception_data *__restrict error) {
 	(void)state;
 	switch (error->e_code) {
 
-	case ERROR_CODEOF(E_EXIT_THREAD):
+	case EXCEPT_CODEOF(E_EXIT_THREAD):
 		exit_thread((int)error->e_args.e_exit_thread.et_exit_code);
 		break;
 
-	case ERROR_CODEOF(E_EXIT_PROCESS):
+	case EXCEPT_CODEOF(E_EXIT_PROCESS):
 		exit((int)error->e_args.e_exit_process.ep_exit_code);
 		break;
 
@@ -436,16 +436,16 @@ handle_special_exception(error_register_state_t *__restrict state,
 	return NULL;
 }
 
-#define error_register_state_to_ucpustate kcpustate_to_ucpustate
-#define error_register_state_getpc        kcpustate_getpc
-#define error_register_state_setpc        kcpustate_setpc
+#define except_register_state_to_ucpustate kcpustate_to_ucpustate
+#define except_register_state_getpc        kcpustate_getpc
+#define except_register_state_setpc        kcpustate_setpc
 
 PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE void LIBCCALL
 trigger_debugtrap(struct ucpustate *__restrict state,
                   struct exception_data *__restrict error) {
 	siginfo_t si;
 	struct debugtrap_reason r;
-	if (!error_as_signal(error, &si))
+	if (!except_as_signal(error, &si))
 		si.si_signo = SIGABRT;
 	r.dtr_signo  = si.si_signo;
 	r.dtr_reason = DEBUGTRAP_REASON_NONE;
@@ -453,15 +453,15 @@ trigger_debugtrap(struct ucpustate *__restrict state,
 }
 
 PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void LIBCCALL
-trigger_coredump(error_register_state_t *curr_state,
-                 error_register_state_t *orig_state,
+trigger_coredump(except_register_state_t *curr_state,
+                 except_register_state_t *orig_state,
                  struct exception_data *exc,
                  void const **unwind_tracevector,
                  unsigned int unwind_tracelength,
                  unsigned int unwind_error) {
 	struct ucpustate curr_ust, orig_ust;
-	error_register_state_to_ucpustate(curr_state, &curr_ust);
-	error_register_state_to_ucpustate(orig_state, &orig_ust);
+	except_register_state_to_ucpustate(curr_state, &curr_ust);
+	except_register_state_to_ucpustate(orig_state, &orig_ust);
 
 	/* Try  to trigger a  coredump including all  of the information needed
 	 * to re-construct (up to `EXCEPT_BACKTRACE_SIZE' frames) of the unwind
@@ -476,7 +476,7 @@ trigger_coredump(error_register_state_t *curr_state,
 
 	/* Shouldn't get here, but if something went wrong,
 	 * also   try  to  trigger  a  legacy  debug  trap. */
-	error_register_state_to_ucpustate(curr_state, &curr_ust);
+	except_register_state_to_ucpustate(curr_state, &curr_ust);
 	trigger_debugtrap(&curr_ust, exc);
 
 	/* As a fallback: just abort execution. */
@@ -485,14 +485,14 @@ trigger_coredump(error_register_state_t *curr_state,
 
 
 PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE NONNULL((1, 2)) void LIBCCALL
-try_raise_signal_from_exception(error_register_state_t *__restrict state,
+try_raise_signal_from_exception(except_register_state_t *__restrict state,
                                 struct exception_data *__restrict error) {
 	siginfo_t si;
-	if (error_as_signal(error, &si)) {
+	if (except_as_signal(error, &si)) {
 		/* raise a signal `si' at `*state' */
 		struct ucpustate uc;
 		struct rpc_syscall_info sc_info;
-		error_register_state_to_ucpustate(state, &uc);
+		except_register_state_to_ucpustate(state, &uc);
 
 		/* Use sigreturn(2) to execute a call to `rt_tgsigqueueinfo(2)' from `uc' */
 		bzero(&sc_info, sizeof(sc_info));
@@ -511,13 +511,13 @@ try_raise_signal_from_exception(error_register_state_t *__restrict state,
 
 
 
-DEFINE_PUBLIC_ALIAS(error_unwind, libc_error_unwind);
-INTERN SECTION_EXCEPT_TEXT WUNUSED error_register_state_t *
-NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restrict state) {
+DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
+INTERN SECTION_EXCEPT_TEXT WUNUSED except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__restrict state) {
 	unsigned int unwind_error;
 	struct _Unwind_Context context;
-	error_register_state_t orig_state;
-	error_register_state_t oldstate;
+	except_register_state_t orig_state;
+	except_register_state_t oldstate;
 	void const *pc;
 #if EXCEPT_BACKTRACE_SIZE != 0
 	unsigned int orig_tracecount;
@@ -537,7 +537,7 @@ search_fde:
 	 * NOTE: PC-1 because the state we're being given has its PC pointer
 	 *       set   to  be  directed   after  the  faulting  instruction. */
 	memcpy(&oldstate, state, sizeof(*state));
-	pc           = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
+	pc           = __EXCEPT_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 	unwind_error = unwind_fde_find(pc, &context.uc_fde);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err;
@@ -581,9 +581,9 @@ search_fde:
 			if (!current.pt_except.ei_trace[i])
 				break;
 		}
-		current.pt_except.ei_trace[i] = __ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+		current.pt_except.ei_trace[i] = __EXCEPT_REGISTER_STATE_TYPE_RDPC(*state);
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		current.pt_except.ei_trace[0] = __ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+		current.pt_except.ei_trace[0] = __EXCEPT_REGISTER_STATE_TYPE_RDPC(*state);
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -593,7 +593,7 @@ err:
 	{
 		struct exception_info *info = &current.pt_except;
 		if (unwind_error == UNWIND_NO_FRAME || unwind_error == UNWIND_USER_NOTHROW) {
-			error_register_state_t *new_state;
+			except_register_state_t *new_state;
 			/* Try to handle special exceptions (E_EXIT_THREAD and E_EXIT_PROCESS) */
 			new_state = handle_special_exception(state, &info->ei_data);
 			if (new_state != NULL)
@@ -606,16 +606,16 @@ err:
 			PRIVATE SECTION_EXCEPT_STRING char const message_unwind_failed[] =
 				"[libc] Failed to unwind stack at %p [error=%u]\n";
 			syslog(LOG_ERR, message_unwind_failed,
-			       __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate),
+			       __EXCEPT_REGISTER_STATE_TYPE_RDPC(oldstate),
 			       unwind_error);
 		}
-		/* Use the original state that the caller of `libc_error_unwind()' provided
-		 * in order to minimize the stack portion which can only be  re-constructed
+		/* Use the original state that the caller of `libc_except_unwind()' provided
+		 * in order to minimize the stack  portion which can only be  re-constructed
 		 * by walking the stack trace stored in `&current.pt_except->ei_trace' */
 #if EXCEPT_BACKTRACE_SIZE != 0
 		if (orig_tracecount < EXCEPT_BACKTRACE_SIZE) {
 			/* Mark the traceback as complete by setting LAST_PC == CURR_PC */
-			info->ei_trace[orig_tracecount] = error_register_state_getpc(&orig_state);
+			info->ei_trace[orig_tracecount] = except_register_state_getpc(&orig_state);
 			++orig_tracecount;
 		}
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
@@ -637,7 +637,7 @@ err:
 
 
 
-LOCAL SECTION_EXCEPT_TEXT ATTR_PURE NONNULL((1)) _Unwind_Word __ERROR_UNWIND_CC
+LOCAL SECTION_EXCEPT_TEXT ATTR_PURE NONNULL((1)) _Unwind_Word __EXCEPT_UNWIND_CC
 _Unwind_Context_Identify(struct _Unwind_Context *__restrict self) { /* Only non-const for lazy initialized fields! */
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 	return libc_Unwind_GetCFA(self) - self->uc_fde.f_sigframe;
@@ -647,11 +647,11 @@ _Unwind_Context_Identify(struct _Unwind_Context *__restrict self) { /* Only non-
 }
 
 
-LOCAL ATTR_NOINLINE SECTION_EXCEPT_TEXT NONNULL((1)) error_register_state_t *
-NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_raise_phase_2)(error_register_state_t *__restrict state,
-                                                            struct _Unwind_Exception *__restrict exception_object) {
+LOCAL ATTR_NOINLINE SECTION_EXCEPT_TEXT NONNULL((1)) except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_raise_phase_2)(except_register_state_t *__restrict state,
+                                                             struct _Unwind_Exception *__restrict exception_object) {
 	struct _Unwind_Context context;
-	error_register_state_t oldstate, newstate;
+	except_register_state_t oldstate, newstate;
 	unsigned int unwind_error;
 	void const *pc;
 	ENSURE_LIBUNWIND_LOADED();
@@ -660,7 +660,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_raise_phase_2)(error_register_state
 	for (;;) {
 		int actions;
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
+		pc = __EXCEPT_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
@@ -692,15 +692,15 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_raise_phase_2)(error_register_state
 	memcpy(state, &newstate, sizeof(newstate));
 	return state;
 err_unwind__URC_FATAL_PHASE2_ERROR:
-	__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
+	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
 	return state;
 }
 
-LOCAL ATTR_NOINLINE SECTION_EXCEPT_TEXT NONNULL((1)) error_register_state_t *
-NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_forceunwind_phase_2)(error_register_state_t *__restrict state,
-                                                                  struct _Unwind_Exception *__restrict exception_object) {
+LOCAL ATTR_NOINLINE SECTION_EXCEPT_TEXT NONNULL((1)) except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_register_state_t *__restrict state,
+                                                                   struct _Unwind_Exception *__restrict exception_object) {
 	struct _Unwind_Context context;
-	error_register_state_t oldstate, newstate;
+	except_register_state_t oldstate, newstate;
 	unsigned int unwind_error;
 	_Unwind_Stop_Fn stop;
 	void *stop_argument;
@@ -714,7 +714,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_forceunwind_phase_2)(error_register
 		_Unwind_Reason_Code reason;
 		int action;
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
+		pc = __EXCEPT_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS && unwind_error != UNWIND_NO_FRAME)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
@@ -755,31 +755,31 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_forceunwind_phase_2)(error_register
 	memcpy(state, &newstate, sizeof(newstate));
 	return state;
 err_unwind__URC_FATAL_PHASE2_ERROR:
-	__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
+	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
 	return state;
 }
 
-INTERN SECTION_EXCEPT_TEXT WUNUSED NONNULL((1)) error_register_state_t *
-NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_Resume_impl)(error_register_state_t *__restrict state,
-                                                       struct _Unwind_Exception *exception_object) {
+INTERN SECTION_EXCEPT_TEXT WUNUSED NONNULL((1)) except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_Resume_impl)(except_register_state_t *__restrict state,
+                                                        struct _Unwind_Exception *exception_object) {
 	/* Special case: Unwind a KERNKOS exception. */
 	if (!exception_object || exception_object->exception_class == _UEC_KERNKOS)
-		return libc_error_unwind(state);
+		return libc_except_unwind(state);
 	return exception_object->private_1 == 0
 	       ? libc_exception_raise_phase_2(state, exception_object)
 	       : libc_exception_forceunwind_phase_2(state, exception_object);
 }
 
-INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2)) error_register_state_t *
-NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_state_t *__restrict state,
-                                                                  struct _Unwind_Exception *exception_object) {
+INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2)) except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_state_t *__restrict state,
+                                                                struct _Unwind_Exception *exception_object) {
 	unsigned int unwind_error;
 	struct _Unwind_Context context;
-	error_register_state_t oldstate, newstate;
+	except_register_state_t oldstate, newstate;
 	void const *pc;
 	/* Special case: Raise a KERNKOS exception (with information already stored in `tls.t_except') */
 	if unlikely(!exception_object || exception_object->exception_class == _UEC_KERNKOS)
-		return libc_error_unwind(state);
+		return libc_except_unwind(state);
 	/* Make sure that libunwind has been loaded. */
 	ENSURE_LIBUNWIND_LOADED();
 	memcpy(&newstate, state, sizeof(newstate));
@@ -787,7 +787,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_st
 	/* Phase #1: Search for a viable exception handler. */
 	for (;;) {
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
+		pc = __EXCEPT_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind;
@@ -814,47 +814,47 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_st
 err_unwind:
 	/* NOTE: This is how we must propagate errors! */
 	if (unwind_error == UNWIND_NO_FRAME) {
-		__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_END_OF_STACK);
+		__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_END_OF_STACK);
 	} else {
 err_unwind__URC_FATAL_PHASE1_ERROR:
-		__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE1_ERROR);
+		__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE1_ERROR);
 	}
 	return state;
 }
 
 
-INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2)) error_register_state_t *
-NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_Resume_or_Rethrow_impl)(error_register_state_t *__restrict state,
-                                                                  struct _Unwind_Exception *__restrict exception_object) {
+INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2)) except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_Resume_or_Rethrow_impl)(except_register_state_t *__restrict state,
+                                                                   struct _Unwind_Exception *__restrict exception_object) {
 	/* Choose between continuing to process _Unwind_RaiseException or _Unwind_ForcedUnwind.  */
 	if unlikely(!exception_object || exception_object->exception_class == _UEC_KERNKOS)
-		return libc_error_unwind(state);
+		return libc_except_unwind(state);
 	if (exception_object->private_1 == 0)
 		return libc_Unwind_RaiseException_impl(state, exception_object);
 	return libc_exception_forceunwind_phase_2(state, exception_object);
 }
 
-INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2, 3)) error_register_state_t *
-NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_ForcedUnwind_impl)(error_register_state_t *__restrict state,
-                                                             struct _Unwind_Exception *__restrict exception_object,
-                                                             _Unwind_Stop_Fn stop, void *stop_arg) {
+INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2, 3)) except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_ForcedUnwind_impl)(except_register_state_t *__restrict state,
+                                                              struct _Unwind_Exception *__restrict exception_object,
+                                                              _Unwind_Stop_Fn stop, void *stop_arg) {
 	exception_object->private_1 = (_Unwind_Ptr)stop;
 	exception_object->private_2 = (_Unwind_Ptr)stop_arg;
 	return libc_exception_forceunwind_phase_2(state, exception_object);
 }
 
-INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2)) _Unwind_Reason_Code __ERROR_UNWIND_CC
-libc_Unwind_Backtrace_impl(error_register_state_t *__restrict state,
+INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2)) _Unwind_Reason_Code __EXCEPT_UNWIND_CC
+libc_Unwind_Backtrace_impl(except_register_state_t *__restrict state,
                            _Unwind_Trace_Fn func, void *arg) {
 	struct _Unwind_Context context;
-	error_register_state_t oldstate;
+	except_register_state_t oldstate;
 	_Unwind_Reason_Code reason;
 	unsigned int unwind_error;
 	context.uc_state = state;
 	for (;;) {
 		void const *pc;
 		memcpy(&oldstate, state, sizeof(oldstate));
-		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
+		pc = __EXCEPT_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if (unwind_error != UNWIND_SUCCESS) {
 			if unlikely(unwind_error != UNWIND_NO_FRAME)
@@ -883,11 +883,11 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context *__restrict self
 	uintptr_t result;
 	ENSURE_LIBUNWIND_LOADED();
 	unwind_error = unwind_fde_exec_cfa(&self->uc_fde, &cfa,
-	                                   __ERROR_REGISTER_STATE_TYPE_RDPC(*self->uc_state));
+	                                   __EXCEPT_REGISTER_STATE_TYPE_RDPC(*self->uc_state));
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		return 0;
 	unwind_error = unwind_fde_calculate_cfa(&self->uc_fde, &cfa,
-	                                        &unwind_getreg_error_register_state,
+	                                        &unwind_getreg_except_register_state,
 	                                        &self->uc_state, &result);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		return 0;
@@ -952,9 +952,9 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetGR)(struct _Unwind_Context const *__restrict
 	uintptr_t result = 0;
 	if likely(CFI_REGISTER_SIZE(sizeof(void *), (unwind_regno_t)index) <= sizeof(result)) {
 		ENSURE_LIBUNWIND_LOADED();
-		unwind_getreg_error_register_state(context->uc_state,
-		                                   (unwind_regno_t)index,
-		                                   &result);
+		unwind_getreg_except_register_state(context->uc_state,
+		                                    (unwind_regno_t)index,
+		                                    &result);
 	}
 	return result;
 }
@@ -965,22 +965,22 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_SetGR)(struct _Unwind_Context *__restrict conte
                                         int index, uintptr_t value) {
 	if likely(CFI_REGISTER_SIZE(sizeof(void *), (unwind_regno_t)index) <= sizeof(value)) {
 		ENSURE_LIBUNWIND_LOADED();
-		unwind_setreg_error_register_state(context->uc_state,
-		                                   (unwind_regno_t)index,
-		                                   &value);
+		unwind_setreg_except_register_state(context->uc_state,
+		                                    (unwind_regno_t)index,
+		                                    &value);
 	}
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetIP, libc_Unwind_GetIP);
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetIP)(struct _Unwind_Context const *__restrict context) {
-	return (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
+	return (uintptr_t)__EXCEPT_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_SetIP, libc_Unwind_SetIP);
 INTERN SECTION_EXCEPT_TEXT ATTR_LEAF NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_Unwind_SetIP)(struct _Unwind_Context *__restrict context, uintptr_t value) {
-	__ERROR_REGISTER_STATE_TYPE_WRPC(*context->uc_state, value);
+	__EXCEPT_REGISTER_STATE_TYPE_WRPC(*context->uc_state, value);
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetLanguageSpecificData, libc_Unwind_GetLanguageSpecificData);
@@ -1000,7 +1000,7 @@ INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1, 2)) uintptr_t
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__restrict context,
                                             int *__restrict ip_before_insn) {
 	*ip_before_insn = (int)context->uc_fde.f_sigframe;
-	return (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
+	return (uintptr_t)__EXCEPT_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
 }
 
 
@@ -1020,7 +1020,7 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 	}	__WHILE0
 
 PRIVATE SECTION_EXCEPT_TEXT NONNULL((1, 2)) void CC
-x86_verify_tls(error_register_state_t *__restrict state,
+x86_verify_tls(except_register_state_t *__restrict state,
                struct exception_data *__restrict error) {
 	bool readerror;
 	void *tlsbase, *tlsptr0;
@@ -1059,8 +1059,8 @@ x86_verify_tls(error_register_state_t *__restrict state,
 #endif /* !EXCEPT_HANDLER_ON_ENTRY */
 
 
-INTERN SECTION_EXCEPT_TEXT error_register_state_t *__EXCEPT_HANDLER_CC
-libc_except_handler3_impl(error_register_state_t *__restrict state,
+INTERN SECTION_EXCEPT_TEXT except_register_state_t *__EXCEPT_HANDLER_CC
+libc_except_handler3_impl(except_register_state_t *__restrict state,
                           struct exception_data *__restrict error) {
 	struct exception_info *info;
 	uintptr_t recursion_flag;
@@ -1080,14 +1080,14 @@ libc_except_handler3_impl(error_register_state_t *__restrict state,
 	/* Fill in the thread-local exception information descriptor. */
 	info->ei_flags |= recursion_flag;
 	COMPILER_WRITE_BARRIER();
-	memcpy(&info->ei_state, state, sizeof(error_register_state_t));
+	memcpy(&info->ei_state, state, sizeof(except_register_state_t));
 	memcpy(&info->ei_data, error, sizeof(struct exception_data));
 #if EXCEPT_BACKTRACE_SIZE != 0
 	bzero(info->ei_trace, sizeof(info->ei_trace));
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	COMPILER_BARRIER();
 	/* Perform exception unwinding */
-	state = libc_error_unwind(state);
+	state = libc_except_unwind(state);
 	/* Unset the in-except flag once we've successfully
 	 * unwound  the  stack  up until  a  valid handler. */
 	COMPILER_BARRIER();
@@ -1096,14 +1096,14 @@ libc_except_handler3_impl(error_register_state_t *__restrict state,
 	return state;
 }
 
-INTERN SECTION_EXCEPT_TEXT error_register_state_t *__EXCEPT_HANDLER_CC
-libc_except_handler4_impl(error_register_state_t *__restrict state,
+INTERN SECTION_EXCEPT_TEXT except_register_state_t *__EXCEPT_HANDLER_CC
+libc_except_handler4_impl(except_register_state_t *__restrict state,
                           struct exception_data *__restrict error) {
 	/* HINT: `libc_except_handler4()' is bound in `init.c:libc_init()' */
 	unsigned int unwind_error;
 	struct _Unwind_Context context;
-	error_register_state_t oldstate, newstate;
-	error_register_state_t first_handler;
+	except_register_state_t oldstate, newstate;
+	except_register_state_t first_handler;
 	struct exception_info *info, saved_info;
 	bool got_first_handler;
 	uintptr_t recursion_flag;
@@ -1126,7 +1126,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	if (dlexceptaware(dlopen(NULL, 0)) > 0)
 		goto handle_mode_3;
 	/* Check for special exceptions that are always handled in mode #3 */
-	if (ERRORCLASS_ISRTLPRIORITY(error->e_class))
+	if (EXCEPTCLASS_ISRTLPRIORITY(error->e_class))
 		goto handle_mode_3;
 	COMPILER_BARRIER();
 	memcpy(&saved_info, info, sizeof(*info));
@@ -1134,7 +1134,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	info->ei_flags |= recursion_flag | EXCEPT_FMAYSIGNAL;
 	COMPILER_BARRIER();
 	memcpy(&info->ei_data, error, sizeof(struct exception_data));
-	memcpy(&info->ei_state, state, sizeof(error_register_state_t));
+	memcpy(&info->ei_state, state, sizeof(except_register_state_t));
 #if EXCEPT_BACKTRACE_SIZE != 0
 	bzero(info->ei_trace, sizeof(info->ei_trace));
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -1146,7 +1146,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	got_first_handler = false;
 	for (;;) {
 		memcpy(&newstate, &oldstate, sizeof(oldstate));
-		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(newstate) - 1;
+		pc = __EXCEPT_REGISTER_STATE_TYPE_RDPC(newstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS) {
 			if (unwind_error == UNWIND_NO_FRAME)
@@ -1202,9 +1202,9 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 				if (!info->ei_trace[i])
 					break;
 			}
-			info->ei_trace[i] = __ERROR_REGISTER_STATE_TYPE_RDPC(newstate);
+			info->ei_trace[i] = __EXCEPT_REGISTER_STATE_TYPE_RDPC(newstate);
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-			info->ei_trace[0] = __ERROR_REGISTER_STATE_TYPE_RDPC(newstate);
+			info->ei_trace[0] = __EXCEPT_REGISTER_STATE_TYPE_RDPC(newstate);
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 		}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -1213,7 +1213,7 @@ install_first_handler:
 	/* Load the first found exception handler. */
 	info->ei_flags &= ~recursion_flag;
 	/* Pass the placeholder exception object for KOS exceptions. */
-	__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(first_handler, (uintptr_t)libc_get_kos_unwind_exception());
+	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(first_handler, (uintptr_t)libc_get_kos_unwind_exception());
 	memcpy(state, &first_handler, sizeof(*state));
 	return state;
 handle_mode_3:

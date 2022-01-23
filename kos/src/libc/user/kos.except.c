@@ -27,20 +27,20 @@
 
 DECL_BEGIN
 
-/*[[[skip:libc_error_data]]]*/
-/*[[[skip:libc_error_code]]]*/
-/*[[[skip:libc_error_active]]]*/
-/*[[[skip:libc_error_class]]]*/
-/*[[[skip:libc_error_subclass]]]*/
-/*[[[skip:libc_error_register_state]]]*/
-/*[[[skip:libc_error_info]]]*/
-/*[[[skip:libc_error_unwind]]]*/
-/*[[[skip:libc_error_throw_current]]]*/
-/*[[[skip:libc_error_rethrow]]]*/
-/*[[[skip:libc_error_throw]]]*/
-/*[[[skip:libc_error_thrown]]]*/
-/*[[[skip:libc__error_badusage_no_nesting]]]*/
-/*[[[skip:libc__error_check_no_nesting]]]*/
+/*[[[skip:libc_except_data]]]*/
+/*[[[skip:libc_except_code]]]*/
+/*[[[skip:libc_except_active]]]*/
+/*[[[skip:libc_except_class]]]*/
+/*[[[skip:libc_except_subclass]]]*/
+/*[[[skip:libc_except_register_state]]]*/
+/*[[[skip:libc_except_info]]]*/
+/*[[[skip:libc_except_unwind]]]*/
+/*[[[skip:libc_except_throw_current]]]*/
+/*[[[skip:libc_except_rethrow]]]*/
+/*[[[skip:libc_except_throw]]]*/
+/*[[[skip:libc_except_thrown]]]*/
+/*[[[skip:libc__except_badusage_no_nesting]]]*/
+/*[[[skip:libc__except_check_no_nesting]]]*/
 
 /*[[[start:exports,hash:CRC-32=0x0]]]*/
 /*[[[end:exports]]]*/

@@ -60,8 +60,8 @@ INTERN_FUNCTION(sys_break0)
 	shll   $(RPC_SYSCALL_INFO_FREGVALID_SHIFT), %edx
 	orl    $(RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT), %edx
 	movl   %edx, 4(%esp) /* flags */
-	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
-	call   error_thrown
+	pushl_cfi $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL))
+	call   except_thrown
 	.cfi_endproc
 END(sys_break0)
 .cfi_startproc

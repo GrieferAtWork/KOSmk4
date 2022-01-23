@@ -76,7 +76,7 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
  *     >>     } EXCEPT {
  *     >>         if (!was_thrown(E_SEGFAULT) ||
  *     >>             PERTASK_NE(this_exception_args.e_segfault.s_addr, (uintptr_t)addr))
- *     >>             error_printf("...");
+ *     >>             except_printf("...");
  *     >>     }
  *     >> }
  * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will  cause
@@ -120,7 +120,7 @@ INTERN ATTR_USED void NOTHROW(KCALL onexit_this_tid_address)(void) {
 				 * has to be NOTHROW() (especially so since we're called
 				 * as part of thread cleanup)
 				 * Because of this, dump all other errors that happen here. */
-				error_printf("Broadcasting tid_address=%p", addr);
+				except_printf("Broadcasting tid_address=%p", addr);
 			}
 		}
 	}

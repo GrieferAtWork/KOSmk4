@@ -48,16 +48,16 @@
 #define __SIZEOF_EXCEPTION_DATA            ((EXCEPTION_DATA_POINTERS + 2) * __SIZEOF_POINTER__)
 
 
-#define __SIZEOF_ERROR_CODE_T__     __SIZEOF_POINTER__
-#define __SIZEOF_ERROR_CLASS_T__    (__SIZEOF_POINTER__ / 2)
-#define __SIZEOF_ERROR_SUBCLASS_T__ (__SIZEOF_POINTER__ / 2)
+#define __SIZEOF_EXCEPT_CODE_T__     __SIZEOF_POINTER__
+#define __SIZEOF_EXCEPT_CLASS_T__    (__SIZEOF_POINTER__ / 2)
+#define __SIZEOF_EXCEPT_SUBCLASS_T__ (__SIZEOF_POINTER__ / 2)
 
 #if defined(__CC__) || defined(__DEEMON__)
 __SYSDECL_BEGIN
 
-typedef __UINTPTR_TYPE__      __error_code_t;
-typedef __UINTPTR_HALF_TYPE__ __error_class_t;
-typedef __UINTPTR_HALF_TYPE__ __error_subclass_t;
+typedef __UINTPTR_TYPE__      __except_code_t;
+typedef __UINTPTR_HALF_TYPE__ __except_class_t;
+typedef __UINTPTR_HALF_TYPE__ __except_subclass_t;
 
 /*[[[deemon (printExceptionDataStructs from ....misc.libgen.exceptinfo)(
 	escapeTypename: [](x) -> "__syscall_ulong_t /" "*{}*" "/".format({ x })); ]]]*/
@@ -605,14 +605,14 @@ union exception_data_pointers {
 /* Exception information. */
 struct __ATTR_PACKED exception_data /*[PREFIX(e_)]*/ {
 	union __ATTR_PACKED {
-		__error_code_t e_code; /* Exception code. */
+		__except_code_t e_code; /* Exception code. */
 		struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			__error_class_t     e_class;    /* Current exception class. */
-			__error_subclass_t  e_subclass; /* Current exception sub-class. */
+			__except_class_t     e_class;    /* Current exception class. */
+			__except_subclass_t  e_subclass; /* Current exception sub-class. */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			__error_subclass_t  e_subclass; /* Current exception sub-class. */
-			__error_class_t     e_class;    /* Current exception class. */
+			__except_subclass_t  e_subclass; /* Current exception sub-class. */
+			__except_class_t     e_class;    /* Current exception class. */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		}
 #ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
@@ -627,17 +627,17 @@ struct __ATTR_PACKED exception_data /*[PREFIX(e_)]*/ {
 	/* Exception-specific arguments */
 	union exception_data_pointers e_args;
 	/* The address of the instruction that caused the fault.
-	 * Unlike  the  program  counter stored  within  the `error_register_state_t'
-	 * structure  which  can be  accessed through  `error_register_state()', this
+	 * Unlike  the  program counter  stored within  the `except_register_state_t'
+	 * structure which can  be accessed  through `except_register_state()',  this
 	 * one  _may_ point _before_  the instruction that  caused the error, however
 	 * it may also point after  the instruction. Which of  the two it is  depends
 	 * on  how the  specific exception was  generated, though it  should be noted
 	 * that in the case of errors thrown by `THROW()', this address will _always_
 	 * point  _after_ the instruction  (meaning it's always  equal to the program
-	 * counter stored in `error_register_state()')
-	 *  - e_faultaddr: Either equal to `GETPC(error_register_state())', or points
-	 *                 to  the  instruction  that  is   `error_register_state()'.
-	 *  - GETPC(error_register_state()):
+	 * counter stored in `except_register_state()')
+	 *  - e_faultaddr: Either equal to `GETPC(except_register_state())', or points
+	 *                 to  the  instruction  that  is   `except_register_state()'.
+	 *  - GETPC(except_register_state()):
 	 *                 Always points to the instruction that would have been
 	 *                 executed next if  the exception  hadn't been  thrown. */
 	void const *e_faultaddr;

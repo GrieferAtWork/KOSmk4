@@ -374,7 +374,7 @@ sync_leds(struct kbddev *__restrict self)
 					kbddev_leds_release(self);
 					if (!was_thrown(E_IOERROR))
 						RETHROW();
-					error_printf("syncing keyboard leds");
+					except_printf("syncing keyboard leds");
 					return;
 				}
 			}

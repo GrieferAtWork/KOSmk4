@@ -21,22 +21,22 @@
 #define _KOS_BITS_EXCEPT_HANDLER_H 1
 
 #include <__stdinc.h>
-#ifndef __error_register_state_t_defined
-#include <kos/bits/except.h> /* __ERROR_REGISTER_STATE_TYPE */
-#ifndef __ERROR_REGISTER_STATE_TYPE
+#ifndef __except_register_state_t_defined
+#include <kos/bits/except.h> /* __EXCEPT_REGISTER_STATE_TYPE */
+#ifndef __EXCEPT_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
-#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__ERROR_REGISTER_STATE_TYPE */
-#endif /* !__error_register_state_t_defined */
+#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
+#endif /* !__except_register_state_t_defined */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifndef __error_register_state_t_defined
-#define __error_register_state_t_defined
-typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
-#endif /* !__error_register_state_t_defined */
+#ifndef __except_register_state_t_defined
+#define __except_register_state_t_defined
+typedef __EXCEPT_REGISTER_STATE_TYPE except_register_state_t;
+#endif /* !__except_register_state_t_defined */
 
 #ifndef __EXCEPT_HANDLER_CC
 #define __EXCEPT_HANDLER_CC  /* nothing */
@@ -51,7 +51,7 @@ typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
  * Other  caveats  include  the  fact   that  the  expected  behavior  of   the
  * function may differ based on other flags passed to `set_exception_handler()' */
 typedef /*__ATTR_NORETURN*/ void
-(__EXCEPT_HANDLER_CC *__except_handler_t)(error_register_state_t *__restrict state,
+(__EXCEPT_HANDLER_CC *__except_handler_t)(except_register_state_t *__restrict state,
                                           struct exception_data *__restrict error);
 
 

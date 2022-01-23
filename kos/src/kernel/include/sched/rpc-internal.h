@@ -62,7 +62,7 @@ struct pending_user_rpc {
 			                                            * Should be flexible, but GCC sucks and doesn't allow that... */
 		};
 		struct {
-			__error_code_t                e_code; /* Exception code. */
+			__except_code_t               e_code; /* Exception code. */
 			union exception_data_pointers e_args; /* Exception args. */
 		} pur_error; /* [valid_if(PENDING_USER_RPC_STATUS_ERROR)] */
 	};

@@ -51,20 +51,20 @@ INTDEF void CXA_CC libc_cxa_end_catch(void);
 
 /* Bad usage: missing nesting for TRY. */
 INTDEF ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_error_badusage_no_nesting)(error_register_state_t const *state);
+NOTHROW(FCALL libc_except_badusage_no_nesting)(except_register_state_t const *state);
 
 #ifndef NDEBUG
 /* Bad usage: Attempted to call `RETHROW()' from outside of a catch-block. */
 INTDEF ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_error_badusage_rethrow_outside_catch)(error_register_state_t const *state);
+NOTHROW(FCALL libc_except_badusage_rethrow_outside_catch)(except_register_state_t const *state);
 
 /* Bad usage: Attempted to  call `THROW()'  from inside  of a  catch-block,
  *            without wrapping the throwing code location inside of another
  *            NESTED_TRY-block. */
 INTDEF ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_error_badusage_throw_inside_catch)(error_register_state_t const *state,
-                                                      error_code_t code, size_t argc,
-                                                      va_list args);
+NOTHROW(FCALL libc_except_badusage_throw_inside_catch)(except_register_state_t const *state,
+                                                       except_code_t code, size_t argc,
+                                                       va_list args);
 #endif /* !NDEBUG */
 
 DECL_END

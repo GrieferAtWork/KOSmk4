@@ -51,8 +51,8 @@ LOCAL void doio() {
 	outsb(portno, s, strlen(s));
 }
 
-#define assert_error_code(code) \
-	assertf(was_thrown(code), "error_code(): %#Ix", error_code())
+#define assert_except_code(code) \
+	assertf(was_thrown(code), "except_code(): %#Ix", except_code())
 
 DEFINE_TEST(ioperm_works_correctly) {
 	TRY {
@@ -60,7 +60,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 		doio();
 		assert_failed("outsb:defl: ok\n");
 	} EXCEPT {
-		assert_error_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
+		assert_except_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 	}
 	TRY {
 		/* Make sure outsb() works with IOPL=3 */
@@ -68,7 +68,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 			err(EXIT_FAILURE, "iopl(3) failed");
 		doio();
 	} EXCEPT {
-		assert_failed("outsb:iopl(3): error_code(): %#Ix\n", error_code());
+		assert_failed("outsb:iopl(3): except_code(): %#Ix\n", except_code());
 	}
 	TRY {
 		/* Make sure outsb() doesn't work with IOPL=0 */
@@ -77,7 +77,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 		doio();
 		assert_failed("outsb:iopl(0): ok\n");
 	} EXCEPT {
-		assert_error_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
+		assert_except_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 	}
 	TRY {
 		/* Make sure ioperm() can be used to enable access to ports */
@@ -85,7 +85,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 			err(EXIT_FAILURE, "ioperm(%#I16x, 1, 1) failed", portno);
 		doio();
 	} EXCEPT {
-		assert_failed("outsb:ioperm(1): error_code(): %#Ix\n", error_code());
+		assert_failed("outsb:ioperm(1): except_code(): %#Ix\n", except_code());
 	}
 	{
 		pid_t cpid = fork();
@@ -94,7 +94,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 			TRY {
 				doio();
 			} EXCEPT {
-				assert_failed("child:outsb:ioperm(1): error_code(): %#Ix\n", error_code());
+				assert_failed("child:outsb:ioperm(1): except_code(): %#Ix\n", except_code());
 			}
 			TRY {
 				/* Turn off permissions within the child process. */
@@ -103,7 +103,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 				doio();
 				assert_failed("child:outsb:ioperm(0): ok\n");
 			} EXCEPT {
-				assert_error_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
+				assert_except_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 			}
 			_Exit(0);
 		}
@@ -125,14 +125,14 @@ DEFINE_TEST(ioperm_works_correctly) {
 	TRY {
 		doio();
 	} EXCEPT {
-		assert_failed("outsb:ioperm(1): error_code(): %#Ix\n", error_code());
+		assert_failed("outsb:ioperm(1): except_code(): %#Ix\n", except_code());
 	}
 	TRY {
 		/* Make sure ioperm() only enables access to the specified ports */
 		outsb(portno + 1, s, strlen(s));
 		assert_failed("outsb:ioperm+1: ok\n");
 	} EXCEPT {
-		assert_error_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
+		assert_except_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 	}
 	TRY {
 		/* Make sure ioperm() can also be used to turn off permissions */
@@ -141,7 +141,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 		doio();
 		assert_failed("outsb:ioperm(0): ok\n");
 	} EXCEPT {
-		assert_error_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
+		assert_except_code(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 	}
 }
 

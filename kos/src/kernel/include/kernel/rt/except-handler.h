@@ -86,7 +86,7 @@ struct task;
  * This  function should  be used  for throwing  exception from interrupt
  * handlers (read: CPU exception handler), such as page-faults & similar. */
 FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL error_throw_current_at_icpustate)(struct icpustate *__restrict state);
+NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict state);
 
 
 
@@ -195,13 +195,13 @@ NOTHROW(FCALL userexcept_handler_with_sigmask)(struct icpustate *__restrict stat
 
 
 /* Arch-specific function:
- * Wrapper around `userexcept_handler()' for use in implementing `error_unwind()'.
- * This  function will (safely) construct a complete `struct icpustate' at the far
- * end of the  calling thread's stack  and populate with  with register info  from
- * `state'. Afterwards, it  will force-unwind  the kernel  stack such  that it  is
- * located immediately at the new state. Once that is done, a call to the portable
- * function  `userexcept_handler(<state>, sc_info)' is made,  and if that function
- * returns normally,  either  `syscall_emulate_r(..., sc_info)'  if  non-NULL,  or
+ * Wrapper around `userexcept_handler()' for use in implementing `except_unwind()'.
+ * This function will (safely) construct  a complete `struct icpustate' at the  far
+ * end of the  calling thread's  stack and populate  with with  register info  from
+ * `state'.  Afterwards,  it will  force-unwind the  kernel stack  such that  it is
+ * located  immediately at the new state. Once that is done, a call to the portable
+ * function `userexcept_handler(<state>, sc_info)' is  made, and  if that  function
+ * returns  normally,  either  `syscall_emulate_r(..., sc_info)'  if  non-NULL,  or
  * directly load the associated state by means of `cpu_apply_icpustate()'. */
 FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,

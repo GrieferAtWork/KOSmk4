@@ -131,7 +131,7 @@ uvio_request_impl(struct uvio *__restrict self,
 			PERTASK_SET(this_exception_data.e_args.e_pointers[i],
 			            slot->kur_except.kue_pointers[i]);
 		}
-		error_throw_current();
+		except_throw_current();
 	}
 
 	/* Success-status. -> Copy the request result into `argv_result' */
@@ -644,7 +644,7 @@ uvio_server_write(struct mfile *__restrict self,
 	case UVIO_OPCODE_EXCEPT: {
 		struct kernel_uvio_except except;
 		USER CHECKED struct uvio_response_except *full_response;
-		STATIC_ASSERT(sizeof(error_code_t) == sizeof(uintptr_t));
+		STATIC_ASSERT(sizeof(except_code_t) == sizeof(uintptr_t));
 		result = sizeof(struct uvio_response_except);
 		if unlikely(num_bytes < result) {
 err_buffer_too_small:
@@ -654,7 +654,7 @@ err_buffer_too_small:
 		/* Read exception data. */
 		COMPILER_READ_BARRIER();
 		full_response = (USER CHECKED struct uvio_response_except *)src;
-		except.kue_code = (error_code_t)full_response->ur_except_code;
+		except.kue_code = (except_code_t)full_response->ur_except_code;
 		memcpy(except.kue_pointers, full_response->ur_except_ptrs,
 		       EXCEPTION_DATA_POINTERS, sizeof(uintptr_t));
 		COMPILER_READ_BARRIER();
@@ -682,7 +682,7 @@ complete_slot_with_except:
 		/* Read exception data. */
 		COMPILER_READ_BARRIER();
 		full_response = (USER CHECKED struct uvio_response_except_compat *)src;
-		except.kue_code = (error_code_t)full_response->ur_except_code;
+		except.kue_code = (except_code_t)full_response->ur_except_code;
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 			except.kue_pointers[i] = (uintptr_t)full_response->ur_except_ptrs[i];
 		COMPILER_READ_BARRIER();

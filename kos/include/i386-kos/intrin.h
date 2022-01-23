@@ -375,14 +375,14 @@ __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset64)(__LONG64_TYPE__ *__base, _
 #define _InterlockedDecrement64(ptr) \
 	__hybrid_atomic_decfetch(*__COMPILER_REQTYPE(__LONG64_TYPE__ *, ptr), __ATOMIC_SEQ_CST)
 #endif /* !_InterlockedDecrement64 */
-//#ifndef _InterlockedDecrementPointer
+//#ifndef        _InterlockedDecrementPointer
 //#define _InterlockedDecrementPointer(ptr) \
 //	__hybrid_atomic_decfetch(*__COMPILER_REQTYPE(void **, ptr), __ATOMIC_SEQ_CST)
 //#endif /* !_InterlockedDecrementPointer */
 
 
 /* _InterlockedDecrementAcquire */
-//#ifndef _InterlockedDecrementAcquire8
+//#ifndef        _InterlockedDecrementAcquire8
 //#define _InterlockedDecrementAcquire8(ptr) \
 //	__hybrid_atomic_decfetch(*__COMPILER_REQTYPE(__INT8_TYPE__ *, ptr), __ATOMIC_ACQUIRE)
 //#endif /* !_InterlockedDecrementAcquire8 */
@@ -398,14 +398,14 @@ __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset64)(__LONG64_TYPE__ *__base, _
 #define _InterlockedDecrementAcquire64(ptr) \
 	__hybrid_atomic_decfetch(*__COMPILER_REQTYPE(__LONG64_TYPE__ *, ptr), __ATOMIC_ACQUIRE)
 #endif /* !_InterlockedDecrementAcquire64 */
-//#ifndef _InterlockedDecrementAcquirePointer
+//#ifndef        _InterlockedDecrementAcquirePointer
 //#define _InterlockedDecrementAcquirePointer(ptr) \
 //	__hybrid_atomic_decfetch(*__COMPILER_REQTYPE(void **, ptr), __ATOMIC_ACQUIRE)
 //#endif /* !_InterlockedDecrementAcquirePointer */
 
 
 /* _InterlockedDecrementRelease */
-//#ifndef _InterlockedDecrementRelease8
+//#ifndef        _InterlockedDecrementRelease8
 //#define _InterlockedDecrementRelease8(ptr) \
 //	__hybrid_atomic_decfetch(*__COMPILER_REQTYPE(__INT8_TYPE__ *, ptr), __ATOMIC_RELEASE)
 //#endif /* !_InterlockedDecrementRelease8 */
@@ -421,7 +421,7 @@ __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset64)(__LONG64_TYPE__ *__base, _
 #define _InterlockedDecrementRelease64(ptr) \
 	__hybrid_atomic_decfetch(*__COMPILER_REQTYPE(__LONG64_TYPE__ *, ptr), __ATOMIC_RELEASE)
 #endif /* !_InterlockedDecrementRelease64 */
-//#ifndef _InterlockedDecrementReleasePointer
+//#ifndef        _InterlockedDecrementReleasePointer
 //#define _InterlockedDecrementReleasePointer(ptr) \
 //	__hybrid_atomic_decfetch(*__COMPILER_REQTYPE(void **, ptr), __ATOMIC_RELEASE)
 //#endif /* !_InterlockedDecrementReleasePointer */
@@ -444,14 +444,14 @@ __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset64)(__LONG64_TYPE__ *__base, _
 #define _InterlockedIncrement64(ptr) \
 	__hybrid_atomic_incfetch(*__COMPILER_REQTYPE(__LONG64_TYPE__ *, ptr), __ATOMIC_SEQ_CST)
 #endif /* !_InterlockedIncrement64 */
-//#ifndef _InterlockedIncrementPointer
+//#ifndef        _InterlockedIncrementPointer
 //#define _InterlockedIncrementPointer(ptr) \
 //	__hybrid_atomic_incfetch(*__COMPILER_REQTYPE(void **, ptr), __ATOMIC_SEQ_CST)
 //#endif /* !_InterlockedIncrementPointer */
 
 
 /* _InterlockedIncrementAcquire */
-//#ifndef _InterlockedIncrementAcquire8
+//#ifndef        _InterlockedIncrementAcquire8
 //#define _InterlockedIncrementAcquire8(ptr) \
 //	__hybrid_atomic_incfetch(*__COMPILER_REQTYPE(__INT8_TYPE__ *, ptr), __ATOMIC_ACQUIRE)
 //#endif /* !_InterlockedIncrementAcquire8 */
@@ -467,14 +467,14 @@ __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset64)(__LONG64_TYPE__ *__base, _
 #define _InterlockedIncrementAcquire64(ptr) \
 	__hybrid_atomic_incfetch(*__COMPILER_REQTYPE(__LONG64_TYPE__ *, ptr), __ATOMIC_ACQUIRE)
 #endif /* !_InterlockedIncrementAcquire64 */
-//#ifndef _InterlockedIncrementAcquirePointer
+//#ifndef        _InterlockedIncrementAcquirePointer
 //#define _InterlockedIncrementAcquirePointer(ptr) \
 //	__hybrid_atomic_incfetch(*__COMPILER_REQTYPE(void **, ptr), __ATOMIC_ACQUIRE)
 //#endif /* !_InterlockedIncrementAcquirePointer */
 
 
 /* _InterlockedIncrementRelease */
-//#ifndef _InterlockedIncrementRelease8
+//#ifndef        _InterlockedIncrementRelease8
 //#define _InterlockedIncrementRelease8(ptr) \
 //	__hybrid_atomic_incfetch(*__COMPILER_REQTYPE(__INT8_TYPE__ *, ptr), __ATOMIC_RELEASE)
 //#endif /* !_InterlockedIncrementRelease8 */
@@ -490,7 +490,7 @@ __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset64)(__LONG64_TYPE__ *__base, _
 #define _InterlockedIncrementRelease64(ptr) \
 	__hybrid_atomic_incfetch(*__COMPILER_REQTYPE(__LONG64_TYPE__ *, ptr), __ATOMIC_RELEASE)
 #endif /* !_InterlockedIncrementRelease64 */
-//#ifndef _InterlockedIncrementReleasePointer
+//#ifndef        _InterlockedIncrementReleasePointer
 //#define _InterlockedIncrementReleasePointer(ptr) \
 //	__hybrid_atomic_incfetch(*__COMPILER_REQTYPE(void **, ptr), __ATOMIC_RELEASE)
 //#endif /* !_InterlockedIncrementReleasePointer */

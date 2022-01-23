@@ -243,12 +243,12 @@ int PKeyAlloc(unsigned int flags, unsigned int access_rights);
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 [[impl_include("<asm/pkey.h>", "<kos/except/codes.h>", "<kos/except/reason/inval.h>")]]
 [[requires_include("<asm/pkey.h>")]]
-[[requires(defined(__ARCH_HAVE_PKEY) && $has_function(error_thrown))]]
+[[requires(defined(__ARCH_HAVE_PKEY) && $has_function(except_thrown))]]
 void PKeySet(int pkey, unsigned int access_rights) {
 	if unlikely(!__arch_pkey_verify_key(pkey))
-		error_thrown(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@), 2, @E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY@, pkey);
+		except_thrown(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@), 2, @E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY@, pkey);
 	if unlikely(!__arch_pkey_verify_rights(access_rights))
-		error_thrown(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@), 2, @E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS@, access_rights);
+		except_thrown(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@), 2, @E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS@, access_rights);
 	__arch_pkey_set(pkey, access_rights);
 }
 
@@ -256,10 +256,10 @@ void PKeySet(int pkey, unsigned int access_rights) {
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 [[impl_include("<asm/pkey.h>", "<kos/except/codes.h>", "<kos/except/reason/inval.h>")]]
 [[requires_include("<asm/pkey.h>")]]
-[[requires(defined(__ARCH_HAVE_PKEY) && $has_function(error_thrown))]]
+[[requires(defined(__ARCH_HAVE_PKEY) && $has_function(except_thrown))]]
 unsigned int PKeyGet(int pkey) {
 	if unlikely(!__arch_pkey_verify_key(pkey))
-		error_thrown(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@), 2, @E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY@, pkey);
+		except_thrown(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@), 2, @E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY@, pkey);
 	return __arch_pkey_get(pkey);
 }
 

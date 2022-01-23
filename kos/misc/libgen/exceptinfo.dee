@@ -73,8 +73,8 @@ class ExceptClass: WeakRefAble {
 	@@Exception message
 	public member message: string = "";
 
-	@@Default exception  code (either  `ERROR_CLASS()`
-	@@when @baseClass is @none, or `ERROR_SUBCLASS()`)
+	@@Default exception  code (either  `EXCEPT_CLASS()`
+	@@when @baseClass is @none, or `EXCEPT_SUBCLASS()`)
 	public member code: int;
 
 	@@Set to @true if the code of this @ExceptClass can be overwritten
@@ -256,7 +256,7 @@ yes:
 			: File {
 		if (cbField is none) {
 			cbField = [](name: string): string {
-				fp << "error_data()->e_args." << findFieldByName(name)[0];
+				fp << "except_data()->e_args." << findFieldByName(name)[0];
 			};
 		}
 		local expr = errnoExpr;
@@ -1201,7 +1201,7 @@ function printExceptNameFunctionBodyForMappings(
 	@@Min/max bounds for continuous error sub-class ranges
 	local subClassPartitions: {int: {(int, int)...}} = Dict();
 
-	@@Mappings for @ERROR_CLASS(...) where @(#subClassPartitions[ERROR_CLASS(...)] >= 2)
+	@@Mappings for @EXCEPT_CLASS(...) where @(#subClassPartitions[EXCEPT_CLASS(...)] >= 2)
 	local nonLinearMappings: {int: {int: ExceptClass}} = Dict();
 
 	@@Same as @mappings, but doesn't contain class
@@ -1264,8 +1264,8 @@ function printExceptNameFunctionBodyForMappings(
 	}
 	/* Generate code to select the correct range from `classParitions' */
 	fp	<< linePrefix << "char const *result;\n"
-		<< linePrefix << "error_class_t class_offset;\n"
-		<< linePrefix << "error_subclass_t subclass_offset;\n"
+		<< linePrefix << "except_class_t class_offset;\n"
+		<< linePrefix << "except_subclass_t subclass_offset;\n"
 		<< linePrefix;
 	local isFirst = true;
 	for (local min, max: classParitions) {

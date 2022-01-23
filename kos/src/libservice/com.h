@@ -152,11 +152,11 @@ typedef sigset_t *pflag_t;
  * >>     if (SERVICE_COM_ISSPECIAL(com->sc_code)) {
  * >>         if (com->sc_code == SERVICE_COM_ST_EXCEPT) {
  * >> #if EXCEPT_ENABLED
- * >>             struct exception_data *ex = error_data();
+ * >>             struct exception_data *ex = except_data();
  * >>             ex->e_code = com->sc_except.e_code;
  * >>             ex->e_args = com->sc_except.e_args;
  * >>             FREE_COMMAND(shm, com);
- * >>             error_throw_current();
+ * >>             except_throw_current();
  * >> #else // EXCEPT_ENABLED
  * >>             struct exception_data data;
  * >>             data.e_code = com->sc_except.e_code;
@@ -211,7 +211,7 @@ typedef sigset_t *pflag_t;
  * >>         } EXCEPT {
  * >>             if (was_throws(E_INTERRUPT)) // Thrown as the result of `INTERRUPT_SERVICE_OPERATION()'
  * >>                 goto again;
- * >>             struct exception_data *ex = error_data();
+ * >>             struct exception_data *ex = except_data();
  * >>             com->sc_except.e_code = ex->e_code;
  * >>             com->sc_except.e_code = ex->e_args;
  * >>             if (!ATOMIC_CMPXCH(com->sc_code, code, SERVICE_COM_ST_EXCEPT))
@@ -279,14 +279,14 @@ struct service_com_exceptinfo {
 	 *       with  the exception  that this  one is  lacking the `e_faultaddr'
 	 *       field at the end. */
 	union {
-		error_code_t              e_code;     /* Exception code. */
+		except_code_t              e_code;     /* Exception code. */
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			error_class_t         e_class;    /* Exception class. */
-			error_subclass_t      e_subclass; /* Exception sub-class. */
+			except_class_t         e_class;    /* Exception class. */
+			except_subclass_t      e_subclass; /* Exception sub-class. */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			error_subclass_t      e_subclass; /* Exception sub-class. */
-			error_class_t         e_class;    /* Exception class. */
+			except_subclass_t      e_subclass; /* Exception sub-class. */
+			except_class_t         e_class;    /* Exception class. */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 	};

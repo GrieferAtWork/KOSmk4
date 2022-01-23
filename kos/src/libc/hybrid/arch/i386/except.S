@@ -38,7 +38,7 @@ EXTERN(this_exception_args)
 EXTERN(this_exception_faultaddr)
 EXTERN(this_exception_state)
 
-#define FIELD_ERROR_CODE           %segtls:this_exception_code
+#define FIELD_EXCEPT_CODE          %segtls:this_exception_code
 #define FIELD_ERROR_FLAGS          %segtls:this_exception_flags
 #define FIELD_ERROR_TRACE(off)     %segtls:this_exception_trace + (off)
 #define FIELD_ERROR_POINTERS(off)  %segtls:this_exception_args + (off)
@@ -46,8 +46,8 @@ EXTERN(this_exception_state)
 #define FIELD_ERROR_REGISTERS(off) %segtls:this_exception_state + (off)
 #define SECTION_EXCEPT_TEXT        .text
 #else /* __KERNEL__ */
-#define FIELD_ERROR_CODE            OFFSET_EXCEPTION_INFO_CODE(%Pax)
-#define FIELD_ERROR_FLAGS           OFFSET_EXCEPTION_INFO_FLAGS(%Pax)
+#define FIELD_EXCEPT_CODE          OFFSET_EXCEPTION_INFO_CODE(%Pax)
+#define FIELD_ERROR_FLAGS          OFFSET_EXCEPTION_INFO_FLAGS(%Pax)
 #define FIELD_ERROR_POINTERS(off)  (OFFSET_EXCEPTION_INFO_POINTERS + (off))(%Pax)
 #define FIELD_ERROR_FAULTADDR      (OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_FAULTADDR)(%Pax)
 #define FIELD_ERROR_TRACE(off)     (OFFSET_EXCEPTION_INFO_TRACE + (off))(%Pax)
@@ -65,23 +65,23 @@ EXTERN(this_exception_state)
 
 
 .section SECTION_EXCEPT_TEXT
-DEFINE_PUBLIC_ALIAS(_error_check_no_nesting, libc__error_check_no_nesting)
-DEFINE_PUBLIC_ALIAS(_error_badusage_no_nesting, libc__error_badusage_no_nesting)
-INTERN_FUNCTION(libc__error_check_no_nesting)
+DEFINE_PUBLIC_ALIAS(_except_check_no_nesting, libc__except_check_no_nesting)
+DEFINE_PUBLIC_ALIAS(_except_badusage_no_nesting, libc__except_badusage_no_nesting)
+INTERN_FUNCTION(libc__except_check_no_nesting)
 	.cfi_startproc
-IU(	INTERN(libc_error_info))
-IU(	call   libc_error_info)
-	cmpP   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
-	jne    libc__error_badusage_no_nesting /* ERROR: Illegal TRY-nesting */
+IU(	INTERN(libc_except_info))
+IU(	call   libc_except_info)
+	cmpP   $(EXCEPT_CODEOF(E_OK)), FIELD_EXCEPT_CODE
+	jne    libc__except_badusage_no_nesting /* ERROR: Illegal TRY-nesting */
 	ret
-INTERN_FUNCTION(libc__error_badusage_no_nesting)
+INTERN_FUNCTION(libc__except_badusage_no_nesting)
 	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
 	movP   %Psp, %R_fcall0P
-	EXTERN(libc_error_badusage_no_nesting)
-	call   libc_error_badusage_no_nesting
-END(libc__error_badusage_no_nesting)
+	EXTERN(libc_except_badusage_no_nesting)
+	call   libc_except_badusage_no_nesting
+END(libc__except_badusage_no_nesting)
 	.cfi_endproc
-END(libc__error_check_no_nesting)
+END(libc__except_check_no_nesting)
 
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT_S */

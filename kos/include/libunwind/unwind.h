@@ -58,17 +58,17 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC un
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
-#ifndef LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS
-#define LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS 1
-typedef PUNWIND_GETREG_MCONTEXT PUNWIND_GETREG_ERROR_REGISTER_STATE;
-typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_ERROR_REGISTER_STATE;
-#define UNWIND_GETREG_ERROR_REGISTER_STATE_NAME "unwind_getreg_mcontext"
-#define UNWIND_SETREG_ERROR_REGISTER_STATE_NAME "unwind_setreg_mcontext"
+#ifndef LIBUNWIND_HAVE_EXCEPT_REGISTER_STATE_ACCESSORS
+#define LIBUNWIND_HAVE_EXCEPT_REGISTER_STATE_ACCESSORS 1
+typedef PUNWIND_GETREG_MCONTEXT PUNWIND_GETREG_EXCEPT_REGISTER_STATE;
+typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_EXCEPT_REGISTER_STATE;
+#define UNWIND_GETREG_EXCEPT_REGISTER_STATE_NAME "unwind_getreg_mcontext"
+#define UNWIND_SETREG_EXCEPT_REGISTER_STATE_NAME "unwind_setreg_mcontext"
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-#define unwind_getreg_error_register_state unwind_getreg_mcontext
-#define unwind_setreg_error_register_state unwind_setreg_mcontext
+#define unwind_getreg_except_register_state unwind_getreg_mcontext
+#define unwind_setreg_except_register_state unwind_setreg_mcontext
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
-#endif /* !LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS */
+#endif /* !LIBUNWIND_HAVE_EXCEPT_REGISTER_STATE_ACCESSORS */
 #endif /* !__KERNEL__ */
 
 

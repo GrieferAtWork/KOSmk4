@@ -26,7 +26,7 @@
  *       processor can be found in `/kos/include/libansitty/ansitty.h' */
 
 /* TODO: The unicode C1 area contains characters that act as aliases
- *       for \e[ and other sequences. -- Support them here! */
+ *       for  \e[  and  other  sequences.  --  Support  them   here! */
 
 #include "api.h"
 /**/

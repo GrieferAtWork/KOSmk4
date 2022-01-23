@@ -52,4 +52,3 @@ if [ "$TARGET_CPUNAME" == "x86_64" ]; then
 		install_file /bin/pe-wingw64.exe "$OPTPATH/pe-wingw64.exe"
 	fi
 fi
-

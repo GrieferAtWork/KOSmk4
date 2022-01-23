@@ -224,7 +224,7 @@ NOTHROW(FCALL task_asyncrpc_destroy_for_shutdown)(struct pending_rpc *__restrict
 			                      self->pr_kern.k_cookie);
 		} EXCEPT {
 			/* Dump the exception if it is non-signaling */
-			error_printf("Unhandled exception in RPC function during thread termination");
+			except_printf("Unhandled exception in RPC function during thread termination");
 		}
 		goto free_rpc;
 	} else if (self->pr_flags & RPC_CONTEXT_SIGNAL){
@@ -257,7 +257,7 @@ NOTHROW(FCALL unwind_current_exception_at_icpustate)(struct icpustate *__restric
 	struct kcpustate kst;
 	struct kcpustate *newstate;
 	icpustate_to_kcpustate(state, &kst);
-	newstate = error_unwind(&kst);
+	newstate = except_unwind(&kst);
 	cpu_apply_kcpustate(newstate);
 }
 

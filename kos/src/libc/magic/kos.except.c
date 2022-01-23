@@ -28,27 +28,27 @@
 %(auto_header){
 /* Make use of inline optimizations when possible! */
 #ifndef __INTELLISENSE__
-#ifdef __arch_error_data
-#define libc_error_data() __arch_error_data()
-#endif /* __arch_error_data */
-#ifdef __arch_error_code
-#define libc_error_code() __arch_error_code()
-#endif /* __arch_error_code */
-#ifdef __arch_error_active
-#define libc_error_active() __arch_error_active()
-#endif /* __arch_error_active */
-#ifdef __arch_error_class
-#define libc_error_class() __arch_error_class()
-#endif /* __arch_error_class */
-#ifdef __arch_error_subclass
-#define libc_error_subclass() __arch_error_subclass()
-#endif /* __arch_error_subclass */
-#ifdef __arch_error_register_state
-#define libc_error_register_state() __arch_error_register_state()
-#endif /* __arch_error_register_state */
-#ifdef __arch_error_info
-#define libc_error_info() __arch_error_info()
-#endif /* __arch_error_info */
+#ifdef __arch_except_data
+#define libc_except_data() __arch_except_data()
+#endif /* __arch_except_data */
+#ifdef __arch_except_code
+#define libc_except_code() __arch_except_code()
+#endif /* __arch_except_code */
+#ifdef __arch_except_active
+#define libc_except_active() __arch_except_active()
+#endif /* __arch_except_active */
+#ifdef __arch_except_class
+#define libc_except_class() __arch_except_class()
+#endif /* __arch_except_class */
+#ifdef __arch_except_subclass
+#define libc_except_subclass() __arch_except_subclass()
+#endif /* __arch_except_subclass */
+#ifdef __arch_except_register_state
+#define libc_except_register_state() __arch_except_register_state()
+#endif /* __arch_except_register_state */
+#ifdef __arch_except_info
+#define libc_except_info() __arch_except_info()
+#endif /* __arch_except_info */
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -68,7 +68,7 @@
 )]%[insert:prefix(
 #include <hybrid/host.h>
 )]%[insert:prefix(
-#include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
+#include <kos/bits/except.h>         /* __EXCEPT_REGISTER_STATE_TYPE */
 )]%[insert:prefix(
 #include <kos/bits/exception_data.h> /* struct exception_data */
 )]%[insert:prefix(
@@ -89,11 +89,11 @@
 #define EXCEPTION_DATA_POINTERS  8
 #endif /* !EXCEPTION_DATA_POINTERS */
 
-#ifndef __ERROR_REGISTER_STATE_TYPE
+#ifndef __EXCEPT_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
-#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__ERROR_REGISTER_STATE_TYPE */
+#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 
 }
 
@@ -111,49 +111,49 @@ typedef __pformatungetc pformatungetc;
 %{
 __SYSDECL_BEGIN
 
-#ifndef __ERROR_THROW_CC
-#define __ERROR_THROW_CC __LIBKCALL
-#endif /* !__ERROR_THROW_CC */
-#ifndef __ERROR_THROWN_CC
-#define __ERROR_THROWN_CC __LIBKCALL
-#endif /* !__ERROR_THROWN_CC */
-#ifndef __ERROR_UNWIND_CC
-#define __ERROR_UNWIND_CC __LIBKCALL
-#endif /* !__ERROR_UNWIND_CC */
-#ifndef __ERROR_NESTING_BEGIN_CC
-#define __ERROR_NESTING_BEGIN_CC __LIBKCALL
-#endif /* !__ERROR_NESTING_BEGIN_CC */
-#ifndef __ERROR_NESTING_END_CC
-#define __ERROR_NESTING_END_CC __LIBKCALL
-#endif /* !__ERROR_NESTING_END_CC */
+#ifndef __EXCEPT_THROW_CC
+#define __EXCEPT_THROW_CC __LIBKCALL
+#endif /* !__EXCEPT_THROW_CC */
+#ifndef __EXCEPT_THROWN_CC
+#define __EXCEPT_THROWN_CC __LIBKCALL
+#endif /* !__EXCEPT_THROWN_CC */
+#ifndef __EXCEPT_UNWIND_CC
+#define __EXCEPT_UNWIND_CC __LIBKCALL
+#endif /* !__EXCEPT_UNWIND_CC */
+#ifndef __EXCEPT_NESTING_BEGIN_CC
+#define __EXCEPT_NESTING_BEGIN_CC __LIBKCALL
+#endif /* !__EXCEPT_NESTING_BEGIN_CC */
+#ifndef __EXCEPT_NESTING_END_CC
+#define __EXCEPT_NESTING_END_CC __LIBKCALL
+#endif /* !__EXCEPT_NESTING_END_CC */
 
 
-#ifndef __error_register_state_t_defined
-#define __error_register_state_t_defined
-typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
-#endif /* !__error_register_state_t_defined */
+#ifndef __except_register_state_t_defined
+#define __except_register_state_t_defined
+typedef __EXCEPT_REGISTER_STATE_TYPE except_register_state_t;
+#endif /* !__except_register_state_t_defined */
 
-typedef __error_code_t error_code_t;
-typedef __error_class_t error_class_t;
-typedef __error_subclass_t error_subclass_t;
+typedef __except_code_t except_code_t;
+typedef __except_class_t except_class_t;
+typedef __except_subclass_t except_subclass_t;
 
 }
 
 %[declare_kernel_export(
-	"error_rethrow", "__cxa_rethrow", "_Unwind_Resume",
-	"error_thrown", "error_throw", "error_throw_current",
-	"error_info", "error_data", "error_register_state",
-	"error_code", "error_active", "error_class", "error_subclass",
-	"error_unwind", "__cxa_begin_catch", "__cxa_end_catch",
+	"except_rethrow", "__cxa_rethrow", "_Unwind_Resume",
+	"except_thrown", "except_throw", "except_throw_current",
+	"except_info", "except_data", "except_register_state",
+	"except_code", "except_active", "except_class", "except_subclass",
+	"except_unwind", "__cxa_begin_catch", "__cxa_end_catch",
 	"__gxx_personality_v0", "__gcc_personality_v0",
 )]
 
 
 
-%[define_replacement(error_register_state_t = __ERROR_REGISTER_STATE_TYPE)]
-%[define_replacement(error_code_t = __error_code_t)]
-%[define_replacement(error_class_t = __error_class_t)]
-%[define_replacement(error_subclass_t = __error_subclass_t)]
+%[define_replacement(except_register_state_t = __EXCEPT_REGISTER_STATE_TYPE)]
+%[define_replacement(except_code_t = __except_code_t)]
+%[define_replacement(except_class_t = __except_class_t)]
+%[define_replacement(except_subclass_t = __except_subclass_t)]
 %[define_replacement(bool = __BOOL)]
 %[define_replacement(true = 1)]
 %[define_replacement(false = 0)]
@@ -161,88 +161,88 @@ typedef __error_subclass_t error_subclass_t;
 
 /* Returns non-zero if there is an active exception. */
 [[kernel, cc(LIBKCALL)]]
-[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_data)),
-  preferred_fast_extern_inline("error_data", { return __arch_error_data(); })]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_data)),
+  preferred_fast_extern_inline("except_data", { return __arch_except_data(); })]]
 [[const, wunused, nothrow, nonnull, decl_prefix(struct exception_data;)]]
-[[userimpl, requires_include("<kos/bits/fastexcept.h>"), requires(defined(__arch_error_data))]]
-struct exception_data *error_data(void) {
-	return __arch_error_data();
+[[userimpl, requires_include("<kos/bits/fastexcept.h>"), requires(defined(__arch_except_data))]]
+struct exception_data *except_data(void) {
+	return __arch_except_data();
 }
 
 [[kernel, cc(LIBKCALL)]]
-[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_code)),
-  preferred_fast_extern_inline("error_code", { return __arch_error_code(); })]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_code)),
+  preferred_fast_extern_inline("except_code", { return __arch_except_code(); })]]
 [[pure, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
-[[requires(defined(__arch_error_code) || $has_function(error_data))]]
-error_code_t error_code(void) {
-@@pp_ifdef __arch_error_code@@
-	return __arch_error_code();
+[[requires(defined(__arch_except_code) || $has_function(except_data))]]
+except_code_t except_code(void) {
+@@pp_ifdef __arch_except_code@@
+	return __arch_except_code();
 @@pp_else@@
-	return error_data()->@e_code@;
+	return except_data()->@e_code@;
 @@pp_endif@@
 }
 
 [[kernel, cc(LIBKCALL)]]
-[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_active)),
-  preferred_fast_extern_inline("error_active", { return __arch_error_active(); })]]
-[[pure, wunused, nothrow, userimpl, requires_function(error_code)]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_active)),
+  preferred_fast_extern_inline("except_active", { return __arch_except_active(); })]]
+[[pure, wunused, nothrow, userimpl, requires_function(except_code)]]
 [[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
-[[requires(defined(__arch_error_active) || $has_function(error_code))]]
-$bool error_active(void) {
-@@pp_ifdef __arch_error_active@@
-	return __arch_error_active();
+[[requires(defined(__arch_except_active) || $has_function(except_code))]]
+$bool except_active(void) {
+@@pp_ifdef __arch_except_active@@
+	return __arch_except_active();
 @@pp_else@@
-	return error_code() != @E_OK@;
+	return except_code() != @E_OK@;
 @@pp_endif@@
 }
 
 [[kernel, cc(LIBKCALL)]]
-[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_class)),
-  preferred_fast_extern_inline("error_class", { return __arch_error_class(); })]]
-[[pure, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
-[[impl_include("<kos/except/codes.h>")]]
-[[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
-[[requires(defined(__arch_error_class) || $has_function(error_code))]]
-error_class_t error_class(void) {
-@@pp_ifdef __arch_error_class@@
-	return __arch_error_class();
-@@pp_else@@
-	return @ERROR_CLASS@(error_code());
-@@pp_endif@@
-}
-
-[[kernel, cc(LIBKCALL)]]
-[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_subclass)),
-  preferred_fast_extern_inline("error_subclass", { return __arch_error_subclass(); })]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_class)),
+  preferred_fast_extern_inline("except_class", { return __arch_except_class(); })]]
 [[pure, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
-[[requires(defined(__arch_error_subclass) || $has_function(error_code))]]
-error_subclass_t error_subclass(void) {
-@@pp_ifdef __arch_error_subclass@@
-	return __arch_error_subclass();
+[[requires(defined(__arch_except_class) || $has_function(except_code))]]
+except_class_t except_class(void) {
+@@pp_ifdef __arch_except_class@@
+	return __arch_except_class();
 @@pp_else@@
-	return @ERROR_SUBCLASS@(error_code());
+	return @EXCEPT_CLASS@(except_code());
 @@pp_endif@@
 }
 
 [[kernel, cc(LIBKCALL)]]
-[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_register_state)),
-  preferred_fast_extern_inline("error_register_state", { return __arch_error_register_state(); })]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_subclass)),
+  preferred_fast_extern_inline("except_subclass", { return __arch_except_subclass(); })]]
+[[pure, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
+[[impl_include("<kos/except/codes.h>")]]
+[[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
+[[requires(defined(__arch_except_subclass) || $has_function(except_code))]]
+except_subclass_t except_subclass(void) {
+@@pp_ifdef __arch_except_subclass@@
+	return __arch_except_subclass();
+@@pp_else@@
+	return @EXCEPT_SUBCLASS@(except_code());
+@@pp_endif@@
+}
+
+[[kernel, cc(LIBKCALL)]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_register_state)),
+  preferred_fast_extern_inline("except_register_state", { return __arch_except_register_state(); })]]
 [[const, wunused, nothrow, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
-#ifndef __ERROR_REGISTER_STATE_TYPE
+#ifndef __EXCEPT_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
-#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__ERROR_REGISTER_STATE_TYPE */
+#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 )]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
-[[requires(defined(__arch_error_register_state))]]
-error_register_state_t *error_register_state(void) {
-	return __arch_error_register_state();
+[[requires(defined(__arch_except_register_state))]]
+except_register_state_t *except_register_state(void) {
+	return __arch_except_register_state();
 }
 
 @@Transform the given exception into a posix errno value
@@ -260,7 +260,7 @@ error_register_state_t *error_register_state(void) {
 [[impl_include("<kos/except/reason/noexec.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[impl_include("<kos/kernel/handle.h>")]]
-$errno_t error_as_errno([[nonnull]] struct exception_data const *__restrict self) {
+$errno_t except_as_errno([[nonnull]] struct exception_data const *__restrict self) {
 @@pp_ifdef EPERM@@
 	errno_t result = EPERM;
 @@pp_else@@
@@ -365,7 +365,7 @@ for (local name: classes.keys.sorted()) {
 			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
 			if (reqMacros)
 				print("@@pp_if ", reqMacros, "@@");
-			print("\t\tcase @ERROR_SUBCLASS@(@ERROR_CODEOF@(@", c.name, "@)):");
+			print("\t\tcase @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@", c.name, "@)):");
 			print("\t\t\tresult = ", expr.replace("\n", "\n\t\t\t"), ";");
 			print("\t\t\tbreak;");
 			if (reqMacros)
@@ -386,22 +386,22 @@ for (local name: classes.keys.sorted()) {
 @@pp_endif@@
 		switch(self->@e_subclass@) {
 @@pp_if defined(EEXIST)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_ADDRESS_ALREADY_EXISTS@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_BADALLOC_ADDRESS_ALREADY_EXISTS@)):
 			result = EEXIST;
 			break;
 @@pp_endif@@
 @@pp_if defined(EMFILE)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS@)):
 			result = EMFILE;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENFILE)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_HANDLE_RANGE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_BADALLOC_INSUFFICIENT_HANDLE_RANGE@)):
 			result = ENFILE;
 			break;
 @@pp_endif@@
 @@pp_if defined(EADDRNOTAVAIL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_PORT_NUMBERS@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_BADALLOC_INSUFFICIENT_PORT_NUMBERS@)):
 			result = EADDRNOTAVAIL;
 			break;
 @@pp_endif@@
@@ -430,137 +430,137 @@ for (local name: classes.keys.sorted()) {
 	case @E_FSERROR@:
 		switch(self->@e_subclass@) {
 @@pp_if defined(ENOENT)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DELETED@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_DELETED@)):
 			result = ENOENT;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOENT)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_FILE_NOT_FOUND@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_FILE_NOT_FOUND@)):
 			result = ENOENT;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOENT)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_PATH_NOT_FOUND@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_PATH_NOT_FOUND@)):
 			result = ENOENT;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENAMETOOLONG)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_ILLEGAL_PATH@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_ILLEGAL_PATH@)):
 			result = ENAMETOOLONG;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOTDIR)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_NOT_A_DIRECTORY@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_NOT_A_DIRECTORY@)):
 			result = ENOTDIR;
 			break;
 @@pp_endif@@
 @@pp_if defined(ELOOP)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_TOO_MANY_SYMBOLIC_LINKS@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_TOO_MANY_SYMBOLIC_LINKS@)):
 			result = ELOOP;
 			break;
 @@pp_endif@@
 @@pp_if defined(EACCES)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_ACCESS_DENIED@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_ACCESS_DENIED@)):
 			result = EACCES;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOSPC)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DISK_FULL@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_DISK_FULL@)):
 			result = ENOSPC;
 			break;
 @@pp_endif@@
 @@pp_if defined(EROFS)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_READONLY@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_READONLY@)):
 			result = EROFS;
 			break;
 @@pp_endif@@
 @@pp_if defined(EMLINK)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_TOO_MANY_HARD_LINKS@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_TOO_MANY_HARD_LINKS@)):
 			result = EMLINK;
 			break;
 @@pp_endif@@
 @@pp_if defined(EPERM) && defined(EISDIR)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_IS_A_DIRECTORY@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_IS_A_DIRECTORY@)):
 			result = self->@e_args@.@e_fserror@.@f_is_a_directory@.@iad_action_context@ == @E_FILESYSTEM_IS_A_DIRECTORY_LINK@ ? EPERM : EISDIR;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOENT)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_NOT_A_SYMBOLIC_LINK@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_NOT_A_SYMBOLIC_LINK@)):
 			result = ENOENT;
 			break;
 @@pp_endif@@
 @@pp_if defined(ELOOP)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_IS_A_SYMBOLIC_LINK@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_IS_A_SYMBOLIC_LINK@)):
 			result = ELOOP;
 			break;
 @@pp_endif@@
 @@pp_if defined(EEXIST)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_FILE_ALREADY_EXISTS@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_FILE_ALREADY_EXISTS@)):
 			result = EEXIST;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOTEMPTY)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DIRECTORY_NOT_EMPTY@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_DIRECTORY_NOT_EMPTY@)):
 			result = ENOTEMPTY;
 			break;
 @@pp_endif@@
 @@pp_if defined(EXDEV)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_CROSS_DEVICE_LINK@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_CROSS_DEVICE_LINK@)):
 			result = EXDEV;
 			break;
 @@pp_endif@@
 @@pp_if defined(EINVAL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DIRECTORY_MOVE_TO_CHILD@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_DIRECTORY_MOVE_TO_CHILD@)):
 			result = EINVAL;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOTBLK)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_MOUNT_UNSUPPORTED_DEVICE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_MOUNT_UNSUPPORTED_DEVICE@)):
 			result = ENOTBLK;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOTBLK)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_MOUNT_NEEDS_DEVICE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_MOUNT_NEEDS_DEVICE@)):
 			result = ENOTBLK;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENODEV)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_WRONG_FILE_SYSTEM@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_WRONG_FILE_SYSTEM@)):
 			result = ENODEV;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENODEV)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_UNKNOWN_FILE_SYSTEM@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_UNKNOWN_FILE_SYSTEM@)):
 			result = ENODEV;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENODEV)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_CORRUPTED_FILE_SYSTEM@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_CORRUPTED_FILE_SYSTEM@)):
 			result = ENODEV;
 			break;
 @@pp_endif@@
 @@pp_if defined(EBUSY)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_PATH_ALREADY_MOUNTED@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_PATH_ALREADY_MOUNTED@)):
 			result = EBUSY;
 			break;
 @@pp_endif@@
 @@pp_if defined(EINVAL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_NOT_A_MOUNTING_POINT@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_NOT_A_MOUNTING_POINT@)):
 			result = EINVAL;
 			break;
 @@pp_endif@@
 @@pp_if defined(EBUSY)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_IS_A_MOUNTING_POINT@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_IS_A_MOUNTING_POINT@)):
 			result = EBUSY;
 			break;
 @@pp_endif@@
 @@pp_if defined(EFBIG)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_FILE_TOO_BIG@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_FILE_TOO_BIG@)):
 			result = EFBIG;
 			break;
 @@pp_endif@@
 @@pp_if defined(ESPIPE) && defined(EINVAL) && defined(ENOTDIR) && defined(ENODEV) && defined(EROFS) && defined(EPERM)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_UNSUPPORTED_OPERATION@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_FSERROR_UNSUPPORTED_OPERATION@)):
 			result = (self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_SEEK@ || self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_PREAD@ ||
 			         self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_PWRITE@) ? ESPIPE :
 			        (self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_READ@ || self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_WRITE@ ||
@@ -593,7 +593,7 @@ for (local name: classes.keys.sorted()) {
 @@pp_endif@@
 		switch(self->@e_subclass@) {
 @@pp_if defined(EINVAL) && defined(ELOOP)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_ILLEGAL_REFERENCE_LOOP@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_ILLEGAL_REFERENCE_LOOP@)):
 			result = self->@e_args@.@e_illegal_operation@.@io_reason@ == @E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP@ ? EINVAL : ELOOP;
 			break;
 @@pp_endif@@
@@ -626,7 +626,7 @@ for (local name: classes.keys.sorted()) {
 @@pp_endif@@
 		switch(self->@e_subclass@) {
 @@pp_if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_UNKNOWN_COMMAND@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_UNKNOWN_COMMAND@)):
 			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY@ ? EAFNOSUPPORT :
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE@ ? ESOCKTNOSUPPORT :
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL@ ? EPROTONOSUPPORT :
@@ -634,7 +634,7 @@ for (local name: classes.keys.sorted()) {
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EINVAL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_BAD_STATE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_STATE@)):
 			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED@ ||
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED@ ||
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED@ ? ENOTCONN :
@@ -648,12 +648,12 @@ for (local name: classes.keys.sorted()) {
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOPROTOOPT)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_SOCKET_OPT@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_SOCKET_OPT@)):
 			result = ENOPROTOOPT;
 			break;
 @@pp_endif@@
 @@pp_if defined(EAFNOSUPPORT) && defined(EINVAL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_UNEXPECTED_COMMAND@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_UNEXPECTED_COMMAND@)):
 			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY@ ? EAFNOSUPPORT : EINVAL;
 			break;
 @@pp_endif@@
@@ -673,17 +673,17 @@ for (local name: classes.keys.sorted()) {
 @@pp_endif@@
 		switch(self->@e_subclass@) {
 @@pp_if defined(ENOTSOCK) && defined(EBADFD)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_FILETYPE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_HANDLE_FILETYPE@)):
 			result = self->@e_args@.@e_invalid_handle@.@ih_filetype@.@f_needed_handle_type@ == @HANDLE_TYPE_SOCKET@ ? ENOTSOCK : EBADFD;
 			break;
 @@pp_endif@@
 @@pp_if defined(EINVAL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_OPERATION@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_HANDLE_OPERATION@)):
 			result = EINVAL;
 			break;
 @@pp_endif@@
 @@pp_if defined(EOPNOTSUPP)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_NET_OPERATION@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_HANDLE_NET_OPERATION@)):
 			result = EOPNOTSUPP;
 			break;
 @@pp_endif@@
@@ -700,52 +700,52 @@ for (local name: classes.keys.sorted()) {
 	case @E_NET_ERROR@:
 		switch(self->@e_subclass@) {
 @@pp_if defined(EHOSTUNREACH)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_HOST_UNREACHABLE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_HOST_UNREACHABLE@)):
 			result = EHOSTUNREACH;
 			break;
 @@pp_endif@@
 @@pp_if defined(EADDRINUSE)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_ADDRESS_IN_USE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_ADDRESS_IN_USE@)):
 			result = EADDRINUSE;
 			break;
 @@pp_endif@@
 @@pp_if defined(EMSGSIZE)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_MESSAGE_TOO_LONG@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_MESSAGE_TOO_LONG@)):
 			result = EMSGSIZE;
 			break;
 @@pp_endif@@
 @@pp_if defined(ECONNABORTED)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_CONNECTION_ABORT@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_CONNECTION_ABORT@)):
 			result = ECONNABORTED;
 			break;
 @@pp_endif@@
 @@pp_if defined(ECONNREFUSED)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_CONNECTION_REFUSED@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_CONNECTION_REFUSED@)):
 			result = ECONNREFUSED;
 			break;
 @@pp_endif@@
 @@pp_if defined(ECONNRESET)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_CONNECTION_RESET@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_CONNECTION_RESET@)):
 			result = ECONNRESET;
 			break;
 @@pp_endif@@
 @@pp_if defined(ETIMEDOUT)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_TIMEOUT@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_TIMEOUT@)):
 			result = ETIMEDOUT;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENETUNREACH)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_UNREACHABLE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_UNREACHABLE@)):
 			result = ENETUNREACH;
 			break;
 @@pp_endif@@
 @@pp_if defined(EADDRNOTAVAIL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_ADDRESS_NOT_AVAILABLE@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_ADDRESS_NOT_AVAILABLE@)):
 			result = EADDRNOTAVAIL;
 			break;
 @@pp_endif@@
 @@pp_if defined(EPIPE)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_SHUTDOWN@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_NET_SHUTDOWN@)):
 			result = EPIPE;
 			break;
 @@pp_endif@@
@@ -852,9 +852,9 @@ for (local name: classes.keys.sorted()) {
 [[impl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[impl_include("<kos/kernel/handle.h>")]]
-$bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
-                      [[nonnull]] struct __siginfo_struct *__restrict result) {
-	error_code_t code = self->@e_code@;
+$bool except_as_signal([[nonnull]] struct exception_data const *__restrict self,
+                       [[nonnull]] struct __siginfo_struct *__restrict result) {
+	except_code_t code = self->@e_code@;
 	bzero(result, sizeof(*result));
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
 	 *       Figure    3-27:    Hardware   Exceptions    and   Signals
@@ -876,7 +876,7 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 	 *       15 (reserved)
 	 *       16 coprocessor error fault         SIGFPE
 	 *       other (unspecified)                SIGILL */
-	switch (@ERROR_CLASS@(code)) {
+	switch (@EXCEPT_CLASS@(code)) {
 
 @@pp_ifdef SIGQUIT@@
 	case @E_EXIT_THREAD@:
@@ -943,22 +943,22 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 		switch (code) {
 
 @@pp_if defined(SEGV_ACCERR)@@
-		case @ERROR_CODEOF@(@E_SEGFAULT_READONLY@):
-		case @ERROR_CODEOF@(@E_SEGFAULT_NOTREADABLE@):
-		case @ERROR_CODEOF@(@E_SEGFAULT_NOTEXECUTABLE@):
+		case @EXCEPT_CODEOF@(@E_SEGFAULT_READONLY@):
+		case @EXCEPT_CODEOF@(@E_SEGFAULT_NOTREADABLE@):
+		case @EXCEPT_CODEOF@(@E_SEGFAULT_NOTEXECUTABLE@):
 			result->@si_code@ = SEGV_ACCERR;
 			break;
 @@pp_endif@@
 
 @@pp_if defined(SIGBUS) && defined(BUS_OBJERR)@@
-		case @ERROR_CODEOF@(@E_SEGFAULT_NOTATOMIC@):
+		case @EXCEPT_CODEOF@(@E_SEGFAULT_NOTATOMIC@):
 			result->@si_signo@ = SIGBUS;
 			result->@si_code@  = BUS_OBJERR;
 			break;
 @@pp_endif@@
 
 @@pp_if defined(SIGBUS) && defined(BUS_ADRALN)@@
-		case @ERROR_CODEOF@(@E_SEGFAULT_UNALIGNED@):
+		case @EXCEPT_CODEOF@(@E_SEGFAULT_UNALIGNED@):
 			result->@si_signo@ = SIGBUS;
 			result->@si_code@  = BUS_ADRALN;
 			break;
@@ -978,7 +978,7 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 		switch (code) {
 
 @@pp_if defined(ILL_ILLOPN)@@
-		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_BAD_OPERAND@):
+		case @EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_BAD_OPERAND@):
 			result->@si_code@ = ILL_ILLOPN;
 @@pp_if defined(ILL_ILLADR)@@
 			if (self->@e_args@.@e_illegal_instruction@.@ii_bad_operand@.@bo_what@ == @E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY@ ||
@@ -989,13 +989,13 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 @@pp_endif@@
 
 @@pp_if defined(ILL_PRVOPC)@@
-		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE@):
+		case @EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE@):
 			result->@si_code@ = ILL_PRVOPC;
 			break;
 @@pp_endif@@
 
 @@pp_if defined(ILL_ILLOPN)@@
-		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_REGISTER@):
+		case @EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_REGISTER@):
 			result->@si_code@ = ILL_ILLOPN;
 @@pp_if defined(ILL_PRVREG)@@
 			if (self->@e_args@.@e_illegal_instruction@.@ii_register@.@r_how@ == @E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV@ ||
@@ -1006,20 +1006,20 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 @@pp_endif@@
 
 @@pp_if defined(ILL_ILLADR) && defined(@E_ILLEGAL_INSTRUCTION_X86_INTERRUPT@)@@
-		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_INTERRUPT@):
+		case @EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_INTERRUPT@):
 			result->@si_code@ = ILL_ILLADR;
 			break;
 @@pp_endif@@
 
 @@pp_if defined(ILL_ILLOPC)@@
-		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_BAD_OPCODE@):
+		case @EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_BAD_OPCODE@):
 @@pp_if defined(@E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX@)@@
-		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX@):
+		case @EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX@):
 @@pp_endif@@
 @@pp_if defined(@E_ILLEGAL_INSTRUCTION_X86_TOO_LONG@)@@
-		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_TOO_LONG@):
+		case @EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_TOO_LONG@):
 @@pp_endif@@
-		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE@):
+		case @EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE@):
 			result->@si_code@ = ILL_ILLOPC;
 			break;
 @@pp_endif@@
@@ -1033,7 +1033,7 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 	default:
 		return false;
 	}
-	result->@si_errno@ = error_as_errno(self);
+	result->@si_errno@ = except_as_errno(self);
 	return true;
 }
 
@@ -1041,13 +1041,13 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 
 @@Return the name of the given error, or `NULL' if unknown.
 @@This  name  is   the  same  as   the  `E_*'   identifier.
-@@E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC"
+@@E.g.: `except_name(EXCEPT_CODEOF(E_BADALLOC))' -> "E_BADALLOC"
 [[kernel, cc(LIBKCALL)]]
 [[const, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<hybrid/host.h>", "<kos/except/codes.h>")]]
-char const *error_name(error_code_t code) {
-	error_class_t err_class       = @ERROR_CLASS@(code);
-	error_subclass_t err_subclass = @ERROR_SUBCLASS@(code);
+char const *except_name(except_code_t code) {
+	except_class_t err_class       = @EXCEPT_CLASS@(code);
+	except_subclass_t err_subclass = @EXCEPT_SUBCLASS@(code);
 /*[[[deemon
 (printExceptNameFunctionBody from ....misc.libgen.exceptinfo)(
 	classVariableName:    "err_class",
@@ -1103,8 +1103,8 @@ char const *error_name(error_code_t code) {
 	"TRUCTION_BAD_OPERAND\0\0\0\0\0\0\0\0\0\0\0\0\0E_ILLEGAL_INSTRUCTION_REGISTER\0"
 	"\1E_STACK_OVERFLOW\0\1E_INDEX_ERROR\0E_INDEX_ERROR_OUT_OF_BOUNDS\0\1";
 	char const *result;
-	error_class_t class_offset;
-	error_subclass_t subclass_offset;
+	except_class_t class_offset;
+	except_subclass_t subclass_offset;
 	if (err_class <= 0x000a) {
 		result = e_linear_0000h_000ah;
 		class_offset = err_class;
@@ -1229,8 +1229,8 @@ non_linear_prefix:
 	"GFAULT_NOTREADABLE\0E_SEGFAULT_NOTEXECUTABLE\0E_SEGFAULT_NOTATOMIC"
 	"\0E_SEGFAULT_UNALIGNED\0E_SEGFAULT_NONCONTINUOUS\0\1";
 	char const *result;
-	error_class_t class_offset;
-	error_subclass_t subclass_offset;
+	except_class_t class_offset;
+	except_subclass_t subclass_offset;
 	if (err_class <= 0x000a) {
 		result = e_linear_0000h_000ah;
 		class_offset = err_class;
@@ -1343,14 +1343,14 @@ non_linear_prefix:
 [[impl_include("<kos/except/codes.h>")]]
 [[impl_include("<kos/bits/exception_data.h>")]]
 [[decl_include("<kos/bits/exception_data.h>")]]
-unsigned int error_priority(error_code_t code) {
-	error_class_t code_class = @ERROR_CLASS@(code);
-	if (@ERRORCLASS_ISRTLPRIORITY@(code_class))
-		return 4 + (code_class - @ERRORCLASS_RTL_MIN@);
-	if (@ERRORCLASS_ISHIGHPRIORITY@(code_class))
+unsigned int except_priority(except_code_t code) {
+	except_class_t code_class = @EXCEPT_CLASS@(code);
+	if (@EXCEPTCLASS_ISRTLPRIORITY@(code_class))
+		return 4 + (code_class - @EXCEPTCLASS_RTL_MIN@);
+	if (@EXCEPTCLASS_ISHIGHPRIORITY@(code_class))
 		return 3;
-	if (code_class != @ERROR_CLASS@(@ERROR_CODEOF@(@E_OK@))) {
-		if (!@ERRORCLASS_ISLOWPRIORITY@(code_class))
+	if (code_class != @EXCEPT_CLASS@(@EXCEPT_CODEOF@(@E_OK@))) {
+		if (!@EXCEPTCLASS_ISLOWPRIORITY@(code_class))
 			return 2;
 		return 1;
 	}
@@ -1359,20 +1359,20 @@ unsigned int error_priority(error_code_t code) {
 
 
 %{
-/* Flags for `error_print_short_description()' */
-#define ERROR_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL 0x0000 /* Normal flags */
-#define ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY    0x0001 /* Print TTY escape sequences for color highlighting */
+/* Flags for `except_print_short_description()' */
+#define EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL 0x0000 /* Normal flags */
+#define EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY    0x0001 /* Print TTY escape sequences for color highlighting */
 }
 
-%[define_replacement(ERROR_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL = 0)]
-%[define_replacement(ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY = 1)]
+%[define_replacement(EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL = 0)]
+%[define_replacement(EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY = 1)]
 
 
-@@>> error_print_short_description(3)
+@@>> except_print_short_description(3)
 @@Print a short, single-line (without trailing linefeed) description  of
 @@the given error `data', including the error code, name and for certain
 @@errors, prominent error arguments.
-@@@param: flags: Set of `ERROR_PRINT_SHORT_DESCRIPTION_FLAG_*'
+@@@param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
 @@@return: * : The usual pformatprinter-compatible return value
 [[kernel, cc(LIBKCALL)]]
 [[decl_prefix(struct exception_data;)]]
@@ -1386,7 +1386,7 @@ unsigned int error_priority(error_code_t code) {
 #include <asm/registers.h>
 @@pp_endif@@
 )]]
-$ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void *arg,
+$ssize_t except_print_short_description([[nonnull]] $pformatprinter printer, void *arg,
                                        [[nonnull]] struct exception_data const *data,
                                        $uintptr_t flags) {
 @@pp_ifndef PRIxPTR@@
@@ -1396,23 +1396,23 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 #define PRIxPTR "zx"
 @@pp_endif@@
 @@pp_endif@@
-#define FMT(tty, notty) (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY ? tty : notty)
+#define FMT(tty, notty) (flags & EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY ? tty : notty)
 	ssize_t temp, result = 0;
 	result = format_printf(printer, arg,
 	                       FMT("exception "
-	                           @AC_WHITE@("%#" __PRIN_PREFIX(__SIZEOF_ERROR_CLASS_T__) "x") ":"
-	                           @AC_WHITE@("%#" __PRIN_PREFIX(__SIZEOF_ERROR_SUBCLASS_T__) "x"),
+	                           @AC_WHITE@("%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_CLASS_T__) "x") ":"
+	                           @AC_WHITE@("%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_SUBCLASS_T__) "x"),
 	                           "exception "
-	                           "%#" __PRIN_PREFIX(__SIZEOF_ERROR_CLASS_T__) "x:"
-	                           "%#" __PRIN_PREFIX(__SIZEOF_ERROR_SUBCLASS_T__) "x"),
+	                           "%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_CLASS_T__) "x:"
+	                           "%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_SUBCLASS_T__) "x"),
 	                       data->@e_class@, data->@e_subclass@);
 	if unlikely(result < 0)
 		goto done;
 	{
 		char const *name;
 		char const *errno_name; /* XXX: Also print in kernel-space? */
-		name = error_name(data->@e_code@);
-		errno_name = strerrorname_np(error_as_errno(data));
+		name = except_name(data->@e_code@);
+		errno_name = strerrorname_np(except_as_errno(data));
 		if (name) {
 			temp = format_printf(printer, arg,
 			                     FMT(" [" @AC_WHITE@("%s") "%s" @AC_WHITE@("%s") "]",
@@ -1428,11 +1428,11 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 	temp = 0;
 	switch (data->@e_class@) {
 
-	case @ERROR_CLASS@(@ERROR_CODEOF@(@E_BADALLOC@)):
+	case @EXCEPT_CLASS@(@EXCEPT_CODEOF@(@E_BADALLOC@)):
 		switch (data->@e_subclass@) {
 
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_HEAP_MEMORY@)):
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_BADALLOC_INSUFFICIENT_HEAP_MEMORY@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY@)):
 			temp = format_printf(printer, arg,
 			                     FMT(" [num_bytes:" @AC_WHITE@("%#" PRIxPTR) "]",
 			                         " [num_bytes:%#" PRIxPTR "]"),
@@ -1446,7 +1446,7 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 
 	/* TODO: More error classes */
 
-	case @ERROR_CLASS@(@ERROR_CODEOF@(@E_SEGFAULT@)): {
+	case @EXCEPT_CLASS@(@EXCEPT_CODEOF@(@E_SEGFAULT@)): {
 		temp = format_printf(printer, arg,
 @@pp_if defined(@__i386__@) || defined(@__x86_64__@)@@
 		                     FMT(" [cr2:" @AC_WHITE@("%p") "," @AC_WHITE@("%c%c%c%c%c%c") "]",
@@ -1465,7 +1465,7 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 		                     data->@e_args@.@e_segfault@.@s_context@ & @E_SEGFAULT_CONTEXT_VIO@ ? 'v' : '-');
 	}	break;
 
-	case @ERROR_CLASS@(@ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION@)): {
+	case @EXCEPT_CLASS@(@EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION@)): {
 @@pp_if defined(@__i386__@) || defined(@__x86_64__@)@@
 		uintptr_t opcode, opno;
 		opcode = data->@e_args@.@e_illegal_instruction@.@ii_opcode@;
@@ -1521,7 +1521,7 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 		switch (data->@e_subclass@) {
 
 @@pp_if defined(@E_ILLEGAL_INSTRUCTION_X86_INTERRUPT@)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_INTERRUPT@)):
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_INTERRUPT@)):
 			temp = format_printf(printer, arg,
 			                     FMT(" [int:" @AC_WHITE@("%#.2" PRIxPTR) ","
 			                                  @AC_WHITE@("%#" PRIxPTR) ","
@@ -1533,7 +1533,7 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 			break;
 @@pp_endif@@
 
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_BAD_OPERAND@)): {
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_BAD_OPERAND@)): {
 			char const *what_name;
 			switch (data->@e_args@.@e_illegal_instruction@.@ii_bad_operand.bo_what@) {
 
@@ -1563,7 +1563,7 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 			}
 		}	break;
 
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_REGISTER@)): {
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_ILLEGAL_INSTRUCTION_REGISTER@)): {
 			char const *what;
 			uintptr_t regno;
 			switch (data->@e_args@.@e_illegal_instruction@.@ii_register@.@r_how@) {
@@ -1606,7 +1606,7 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 			} else
 @@pp_endif@@
 			{
-				if (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
+				if (flags & EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
 					static char const beginfg[] = @AC_FG@(@ANSITTY_CL_WHITE@);
 					temp = (*printer)(arg, beginfg, COMPILER_STRLEN(beginfg));
 					if unlikely(temp < 0)
@@ -1646,7 +1646,7 @@ print_generic_register_name:
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
-				if (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
+				if (flags & EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
 					static char const endfg[] = @AC_FGDEF@;
 					temp = (*printer)(arg, endfg, COMPILER_STRLEN(endfg));
 					if unlikely(temp < 0)
@@ -1690,76 +1690,76 @@ err:
 
 %#ifdef __USE_KOS_KERNEL
 [[kernel, cc(LIBKCALL)]]
-[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_info)),
-  preferred_fast_extern_inline("error_info", { return __arch_error_info(); })]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_info)),
+  preferred_fast_extern_inline("except_info", { return __arch_except_info(); })]]
 [[const, wunused, nothrow, nonnull, decl_prefix(struct exception_info;)]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
-[[requires(defined(__arch_error_info))]]
-struct exception_info *error_info(void) {
-	return __arch_error_info();
+[[requires(defined(__arch_except_info))]]
+struct exception_info *except_info(void) {
+	return __arch_except_info();
 }
 
 @@Unwind the given register state to propagate the currently set error.
 @@Following this, the  returned register state  should then be  loaded.
-[[kernel, cc(__ERROR_UNWIND_CC)]]
+[[kernel, cc(__EXCEPT_UNWIND_CC)]]
 [[wunused, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
-#ifndef __ERROR_UNWIND_CC
-#define __ERROR_UNWIND_CC __LIBKCALL
-#endif /* !__ERROR_UNWIND_CC */
+#ifndef __EXCEPT_UNWIND_CC
+#define __EXCEPT_UNWIND_CC __LIBKCALL
+#endif /* !__EXCEPT_UNWIND_CC */
 )]]
 [[decl_prefix(
-#ifndef __ERROR_REGISTER_STATE_TYPE
+#ifndef __EXCEPT_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
-#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__ERROR_REGISTER_STATE_TYPE */
+#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 )]]
-error_register_state_t *error_unwind([[nonnull]] error_register_state_t *__restrict state);
+except_register_state_t *except_unwind([[nonnull]] except_register_state_t *__restrict state);
 
 %#endif /* __USE_KOS_KERNEL */
 
 
-@@Throw the currently set (in `error_data()') exception.
+@@Throw the currently set (in `except_data()') exception.
 [[noreturn, cold, throws]]
 [[kernel, cc(LIBKCALL)]]
-void error_throw_current(void);
+void except_throw_current(void);
 
 @@Rethrow the current exception (same as a c++ `throw;' expression)
 [[guard, noreturn, cold, throws]]
 [[kernel, cc(LIBKCALL)]]
-void error_rethrow(void);
+void except_rethrow(void);
 
 
 @@Throw an exception and fill exception pointers with all zeroes
 [[guard, decl_prefix(
 #include <kos/bits/exception_data.h>
-#ifndef __ERROR_THROW_CC
-#define __ERROR_THROW_CC __LIBKCALL
-#endif /* !__ERROR_THROW_CC */
+#ifndef __EXCEPT_THROW_CC
+#define __EXCEPT_THROW_CC __LIBKCALL
+#endif /* !__EXCEPT_THROW_CC */
 )]]
 [[noreturn, cold, throws]]
-[[kernel, cc(__ERROR_THROW_CC)]]
-void error_throw(error_code_t code);
+[[kernel, cc(__EXCEPT_THROW_CC)]]
+void except_throw(except_code_t code);
 
 
 @@Throw an exception and load `argc' pointers from varargs
 [[guard, decl_prefix(
 #include <kos/bits/exception_data.h>
-#ifndef __ERROR_THROWN_CC
-#define __ERROR_THROWN_CC __LIBKCALL
-#endif /* !__ERROR_THROWN_CC */
+#ifndef __EXCEPT_THROWN_CC
+#define __EXCEPT_THROWN_CC __LIBKCALL
+#endif /* !__EXCEPT_THROWN_CC */
 )]]
 [[noreturn, cold, throws]]
-[[kernel, cc(__ERROR_THROWN_CC)]]
-void error_thrown(error_code_t code, unsigned int _argc, ...);
+[[kernel, cc(__EXCEPT_THROWN_CC)]]
+void except_thrown(except_code_t code, unsigned int _argc, ...);
 
 
 
 %{
 /* Rethrow the last exception */
-#ifdef __error_rethrow_defined
-#define RETHROW() error_rethrow()
+#ifdef __except_rethrow_defined
+#define RETHROW() except_rethrow()
 #elif defined(__cplusplus)
 #define RETHROW() throw
 #endif /* ... */
@@ -1776,7 +1776,7 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
  * arguments may be provided, which are stored in `e_pointers',  with
  * any argument not provided simply substituted in with `NULL' / 0. */
 #define THROW THROW
-__ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(error_code_t __code, ...);
+__ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(except_code_t __code, ...);
 
 /* Check if the current exception matches the given error code, class, or sub-class
  * >> TRY {
@@ -1788,7 +1788,7 @@ __ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(error_code_t __code, ...);
  * >>     ...
  * >> }
  */
-__ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
+__ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 }
 %#else /* __INTELLISENSE__ */
 %{
@@ -1798,7 +1798,7 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 %{
 #ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code
-#define __PRIVATE_THROW_PACKAGE_CODE2       ERROR_CODE
+#define __PRIVATE_THROW_PACKAGE_CODE2       EXCEPT_CODE
 #define __PRIVATE_THROW_PACKAGE_CODEN2(n)   __PRIVATE_THROW_PACKAGE_CODE##n
 #define __PRIVATE_THROW_PACKAGE_CODEN(n)    __PRIVATE_THROW_PACKAGE_CODEN2(n)
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
@@ -1807,21 +1807,21 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 #define __PRIVATE_THROW_PACKAGE_CODE(args...) __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(args))(args)
 #endif /* ... */
 
-#ifdef __error_throw_defined
-#define __PRIVATE_THROW1(code) error_throw(__PRIVATE_THROW_PACKAGE_CODE code)
-#elif defined(__error_thrown_defined)
-#define __PRIVATE_THROW1(code) error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 0)
+#ifdef __except_throw_defined
+#define __PRIVATE_THROW1(code) except_throw(__PRIVATE_THROW_PACKAGE_CODE code)
+#elif defined(__except_thrown_defined)
+#define __PRIVATE_THROW1(code) except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 0)
 #endif /* ... */
-#ifdef __error_thrown_defined
-#define __PRIVATE_THROW2(code, a)                      error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 1, (__UINTPTR_TYPE__)(a))
-#define __PRIVATE_THROW3(code, a, b)                   error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 2, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b))
-#define __PRIVATE_THROW4(code, a, b, c)                error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 3, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c))
-#define __PRIVATE_THROW5(code, a, b, c, d)             error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 4, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d))
-#define __PRIVATE_THROW6(code, a, b, c, d, e)          error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 5, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e))
-#define __PRIVATE_THROW7(code, a, b, c, d, e, f)       error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 6, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f))
-#define __PRIVATE_THROW8(code, a, b, c, d, e, f, g)    error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 7, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f), (__UINTPTR_TYPE__)(g))
-#define __PRIVATE_THROW9(code, a, b, c, d, e, f, g, h) error_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 8, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f), (__UINTPTR_TYPE__)(g), (__UINTPTR_TYPE__)(h))
-#endif /* __error_thrown_defined */
+#ifdef __except_thrown_defined
+#define __PRIVATE_THROW2(code, a)                      except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 1, (__UINTPTR_TYPE__)(a))
+#define __PRIVATE_THROW3(code, a, b)                   except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 2, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b))
+#define __PRIVATE_THROW4(code, a, b, c)                except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 3, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c))
+#define __PRIVATE_THROW5(code, a, b, c, d)             except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 4, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d))
+#define __PRIVATE_THROW6(code, a, b, c, d, e)          except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 5, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e))
+#define __PRIVATE_THROW7(code, a, b, c, d, e, f)       except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 6, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f))
+#define __PRIVATE_THROW8(code, a, b, c, d, e, f, g)    except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 7, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f), (__UINTPTR_TYPE__)(g))
+#define __PRIVATE_THROW9(code, a, b, c, d, e, f, g, h) except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 8, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f), (__UINTPTR_TYPE__)(g), (__UINTPTR_TYPE__)(h))
+#endif /* __except_thrown_defined */
 #define __PRIVATE_THROW_N2(n) __PRIVATE_THROW##n
 #define __PRIVATE_THROW_N(n)  __PRIVATE_THROW_N2(n)
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
@@ -1833,18 +1833,18 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 #endif /* !THROW */
 
 #ifndef was_thrown
-#ifndef __arch_error_code_eq
-#define __arch_error_code_eq(x) (error_code() == (x))
-#endif /* !__arch_error_code_eq */
-#ifndef __arch_error_class_eq
-#define __arch_error_class_eq(x) (error_class() == (x))
-#endif /* !__arch_error_class_eq */
+#ifndef __arch_except_code_eq
+#define __arch_except_code_eq(x) (except_code() == (x))
+#endif /* !__arch_except_code_eq */
+#ifndef __arch_except_class_eq
+#define __arch_except_class_eq(x) (except_class() == (x))
+#endif /* !__arch_except_class_eq */
 #ifndef __PRIVATE_WAS_THROWN_PACKAGE_CODE1
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE1(code) \
-	((__builtin_constant_p(code) && (code) <= 0xffff) ? __arch_error_class_eq(code) : __arch_error_code_eq(code))
+	((__builtin_constant_p(code) && (code) <= 0xffff) ? __arch_except_class_eq(code) : __arch_except_code_eq(code))
 #endif /* !__PRIVATE_WAS_THROWN_PACKAGE_CODE1 */
 #ifndef __PRIVATE_WAS_THROWN_PACKAGE_CODE2
-#define __PRIVATE_WAS_THROWN_PACKAGE_CODE2(class, subclass) __arch_error_code_eq(ERROR_CODE(class, subclass))
+#define __PRIVATE_WAS_THROWN_PACKAGE_CODE2(class, subclass) __arch_except_code_eq(EXCEPT_CODE(class, subclass))
 #endif /* !__PRIVATE_WAS_THROWN_PACKAGE_CODE2 */
 #ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)              __PRIVATE_WAS_THROWN_PACKAGE_CODE##n
@@ -1864,50 +1864,50 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 
 @@Begin a nested TRY-block. (i.e. inside of another EXCEPT block)
 [[guard, no_local, decl_prefix(
-#ifndef __ERROR_NESTING_BEGIN_CC
-#define __ERROR_NESTING_BEGIN_CC __LIBKCALL
-#endif /* !__ERROR_NESTING_BEGIN_CC */
-), nothrow, kernel, cc(__ERROR_NESTING_BEGIN_CC)]]
+#ifndef __EXCEPT_NESTING_BEGIN_CC
+#define __EXCEPT_NESTING_BEGIN_CC __LIBKCALL
+#endif /* !__EXCEPT_NESTING_BEGIN_CC */
+), nothrow, kernel, cc(__EXCEPT_NESTING_BEGIN_CC)]]
 [[decl_include("<kos/bits/exception_info.h>", "<bits/types.h>")]]
-void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict saved) {
-	struct exception_info *info = error_info();
-	if (info->@ei_code@ == @ERROR_CODEOF@(@E_OK@)) {
-		/* Not inside of a  catch-block (ignore the nesting  request)
-		 * This can happen if the caller  is only using the nest  for
-		 * safety  (in case a sub-function needs to be able to handle
-		 * its own  exceptions, but  may be  called from  an  unaware
-		 * exception handler),  or  is  using  more  than  one  nest.
-		 * In all of these cases, just ignore the nest, and also make
-		 * it so that the associated `error_nesting_end()' is a no-op */
+void except_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict saved) {
+	struct exception_info *info = except_info();
+	if (info->@ei_code@ == @EXCEPT_CODEOF@(@E_OK@)) {
+		/* Not inside of  a catch-block (ignore  the nesting  request)
+		 * This  can happen if  the caller is only  using the nest for
+		 * safety (in case a sub-function  needs to be able to  handle
+		 * its  own  exceptions, but  may  be called  from  an unaware
+		 * exception  handler),  or  is  using  more  than  one  nest.
+		 * In all of these cases, just ignore the nest, and also  make
+		 * it so that the associated `except_nesting_end()' is a no-op */
 		saved->@en_size@ = 0;
 	} else {
 		if unlikely(saved->@en_size@ > @_EXCEPTION_NESTING_DATA_SIZE@)
 			saved->@en_size@ = @_EXCEPTION_NESTING_DATA_SIZE@;
 		memcpy(&saved->@en_state@, info, saved->@en_size@);
-		info->@ei_code@   = @ERROR_CODEOF@(@E_OK@);
+		info->@ei_code@   = @EXCEPT_CODEOF@(@E_OK@);
 		++info->@ei_nesting@;
 	}
 }
 
 @@End a nested TRY-block. (i.e. inside of another EXCEPT block)
 [[guard, no_local, decl_prefix(
-#ifndef __ERROR_NESTING_END_CC
-#define __ERROR_NESTING_END_CC __LIBKCALL
-#endif /* !__ERROR_NESTING_END_CC */
-), nothrow, kernel, cc(__ERROR_NESTING_END_CC)]]
+#ifndef __EXCEPT_NESTING_END_CC
+#define __EXCEPT_NESTING_END_CC __LIBKCALL
+#endif /* !__EXCEPT_NESTING_END_CC */
+), nothrow, kernel, cc(__EXCEPT_NESTING_END_CC)]]
 [[decl_include("<kos/bits/exception_info.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
-void error_nesting_end([[nonnull]] struct _exception_nesting_data *__restrict saved) {
+void except_nesting_end([[nonnull]] struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info;
 	if unlikely(!saved->@en_size@)
 		return; /* No-op */
-	info = error_info();
+	info = except_info();
 	__hybrid_assertf(info->@ei_nesting@ != 0,
 	                 "Error-nesting stack is empty");
 	--info->@ei_nesting@;
-	__hybrid_assertf(saved->@en_data@.@e_code@ != @ERROR_CODEOF@(@E_OK@),
-	                 "No saved exception in `error_nesting_end()'");
-	if (info->@ei_code@ == @ERROR_CODEOF@(@E_OK@)) {
+	__hybrid_assertf(saved->@en_data@.@e_code@ != @EXCEPT_CODEOF@(@E_OK@),
+	                 "No saved exception in `except_nesting_end()'");
+	if (info->@ei_code@ == @EXCEPT_CODEOF@(@E_OK@)) {
 		/* No newly thrown exception. (meaning we're currently not propagating
 		 * any exceptions, so we also shouldn't try to set the RETHROW  flag!) */
 restore_saved_exception:
@@ -1934,17 +1934,17 @@ restore_saved_exception:
 		 * [ 2] if (EXCEPTION_THROWN) {
 		 * [ 3]     __cxa_begin_catch();              // [ 3]
 		 * [ 4]     struct _exception_nesting_data nest;
-		 * [ 5]     error_nesting_begin(&nest);
+		 * [ 5]     except_nesting_begin(&nest);
 		 * [ 6]     bar();                            // [ 5]
 		 * [ 7]     if (EXCEPTION_THROWN) {
 		 * [ 8]         __cxa_begin_catch();          // [ 6]
 		 * [ 9]         foobar();                     // [ 7]
-		 * [10]         error_rethrow();              // [ 8]
+		 * [10]         except_rethrow();              // [ 8]
 		 * [11]         __cxa_end_catch();            // [ 9]
-		 * [12]         error_nesting_end(&nest);
+		 * [12]         except_nesting_end(&nest);
 		 * [13]     } else {
-		 * [14]         error_nesting_end(&nest);
-		 * [15]         error_rethrow();              // [10]
+		 * [14]         except_nesting_end(&nest);
+		 * [15]         except_rethrow();              // [10]
 		 * [16]     }
 		 * [17]     __cxa_end_catch();                // [11]
 		 * [18] }
@@ -1959,8 +1959,8 @@ restore_saved_exception:
 		 */
 		info->@ei_flags@ |= @EXCEPT_FRETHROW@;
 		/* Select the more important exception. */
-		if (error_priority(saved->@en_data@.@e_code@) >=
-		    error_priority(info->@ei_code@))
+		if (except_priority(saved->@en_data@.@e_code@) >=
+		    except_priority(info->@ei_code@))
 			goto restore_saved_exception;
 		/* Keep the newly set exception. */
 	}
@@ -2024,16 +2024,16 @@ __NAMESPACE_INT_END
 #endif /* !__NOTHROW_BEGIN */
 
 /* Nested exception support */
-#if defined(__error_nesting_begin_defined) && defined(__error_nesting_end_defined)
+#if defined(__except_nesting_begin_defined) && defined(__except_nesting_end_defined)
 class __cxx_exception_nesting: public _exception_nesting_data {
 public:
 	__ATTR_FORCEINLINE operator bool() const __CXX_NOEXCEPT { return false; }
 	__ATTR_FORCEINLINE __cxx_exception_nesting() __CXX_NOEXCEPT {
 		en_size = _EXCEPTION_NESTING_DATA_SIZE;
-		error_nesting_begin(this);
+		except_nesting_begin(this);
 	}
 	__ATTR_FORCEINLINE ~__cxx_exception_nesting() __CXX_NOEXCEPT {
-		error_nesting_end(this);
+		except_nesting_end(this);
 	}
 };
 #ifdef __COUNTER__
@@ -2043,7 +2043,7 @@ public:
 #endif /* !__COUNTER__ */
 #define __NESTED_TRY       if(__cxx_exception_nesting __PRIVATE_CXX_EXCEPT_NESTING_NAME {});else try
 #define __NESTED_EXCEPTION __cxx_exception_nesting __PRIVATE_CXX_EXCEPT_NESTING_NAME
-#endif /* __error_nesting_begin_defined && __error_nesting_end_defined */
+#endif /* __except_nesting_begin_defined && __except_nesting_end_defined */
 #endif /* __cplusplus */
 }
 
@@ -2075,48 +2075,48 @@ public:
 }
 %#if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT) && !defined(NDEBUG_EXCEPT_NESTING)
 %[declare_kernel_export(
-	"_error_badusage_no_nesting",
-	"_error_check_no_nesting",
+	"_except_badusage_no_nesting",
+	"_except_check_no_nesting",
 )]
 
 @@Assertion check handler for missing `TRY' nesting
 [[cold, userimpl, noreturn, nothrow, impl_include("<hybrid/__assert.h>")]]
-void _error_badusage_no_nesting(void) {
+void _except_badusage_no_nesting(void) {
 	__hybrid_assertion_failed("Recursive `TRY' isn't nested; use `NESTED_TRY' instead");
 }
 
 @@Assert that a TRY-block is currently allowed (iow: that no error is active)
 [[userimpl, nothrow, impl_include("<kos/bits/fastexcept.h>")]]
-[[requires_function(error_active)]]
-void _error_check_no_nesting(void) {
-@@pp_ifdef __arch_error_active@@
-	if (__arch_error_active())
+[[requires_function(except_active)]]
+void _except_check_no_nesting(void) {
+@@pp_ifdef __arch_except_active@@
+	if (__arch_except_active())
 @@pp_else@@
-	if (error_active())
+	if (except_active())
 @@pp_endif@@
 	{
-		_error_badusage_no_nesting();
+		_except_badusage_no_nesting();
 	}
 }
 
-%[insert:pp_if($has_function(_error_check_no_nesting))]
+%[insert:pp_if($has_function(_except_check_no_nesting))]
 %{
-#if !defined(__OPTIMIZE_SIZE__) && defined(__arch_error_active)
-#define _error_check_no_nesting() (void)(__likely(!__arch_error_active()) || (_error_badusage_no_nesting(), 0))
-#endif /* !__OPTIMIZE_SIZE__ && __arch_error_active */
+#if !defined(__OPTIMIZE_SIZE__) && defined(__arch_except_active)
+#define _except_check_no_nesting() (void)(__likely(!__arch_except_active()) || (_except_badusage_no_nesting(), 0))
+#endif /* !__OPTIMIZE_SIZE__ && __arch_except_active */
 #if !defined(TRY) && defined(__TRY)
-#if !defined(__OPTIMIZE_SIZE__) && defined(__arch_error_active)
-#define TRY if __unlikely(__arch_error_active()) _error_badusage_no_nesting(); else __TRY
-#else /* !__OPTIMIZE_SIZE__ && __arch_error_active */
-#define TRY if ((_error_check_no_nesting(), 0)); else __TRY
-#endif /* __OPTIMIZE_SIZE__ || !__arch_error_active */
+#if !defined(__OPTIMIZE_SIZE__) && defined(__arch_except_active)
+#define TRY if __unlikely(__arch_except_active()) _except_badusage_no_nesting(); else __TRY
+#else /* !__OPTIMIZE_SIZE__ && __arch_except_active */
+#define TRY if ((_except_check_no_nesting(), 0)); else __TRY
+#endif /* __OPTIMIZE_SIZE__ || !__arch_except_active */
 #endif /* !TRY && __TRY */
 }
 %[insert:pp_endif]
 %#else /* !NDEBUG && !NDEBUG_EXCEPT && !NDEBUG_EXCEPT_NESTING */
 /* Turn these into no-ops under this configuration. */
-%#define _error_badusage_no_nesting() __builtin_unreachable()
-%#define _error_check_no_nesting()    (void)0
+%#define _except_badusage_no_nesting() __builtin_unreachable()
+%#define _except_check_no_nesting()    (void)0
 %#endif /* NDEBUG || NDEBUG_EXCEPT || NDEBUG_EXCEPT_NESTING */
 
 
@@ -2153,28 +2153,28 @@ void _error_check_no_nesting(void) {
 
 #ifndef __INTELLISENSE__
 /* Use macros to directly invoke __arch_* variants (if they've been defined) */
-#ifdef __arch_error_data
-#define error_data() __arch_error_data()
-#endif /* __arch_error_data */
-#ifdef __arch_error_code
-#define error_code() __arch_error_code()
-#endif /* __arch_error_code */
-#ifdef __arch_error_active
-#define error_active() __arch_error_active()
-#endif /* __arch_error_active */
-#ifdef __arch_error_class
-#define error_class() __arch_error_class()
-#endif /* __arch_error_class */
-#ifdef __arch_error_subclass
-#define error_subclass() __arch_error_subclass()
-#endif /* __arch_error_subclass */
-#ifdef __arch_error_register_state
-#define error_register_state() __arch_error_register_state()
-#endif /* __arch_error_register_state */
+#ifdef __arch_except_data
+#define except_data() __arch_except_data()
+#endif /* __arch_except_data */
+#ifdef __arch_except_code
+#define except_code() __arch_except_code()
+#endif /* __arch_except_code */
+#ifdef __arch_except_active
+#define except_active() __arch_except_active()
+#endif /* __arch_except_active */
+#ifdef __arch_except_class
+#define except_class() __arch_except_class()
+#endif /* __arch_except_class */
+#ifdef __arch_except_subclass
+#define except_subclass() __arch_except_subclass()
+#endif /* __arch_except_subclass */
+#ifdef __arch_except_register_state
+#define except_register_state() __arch_except_register_state()
+#endif /* __arch_except_register_state */
 #ifdef __USE_KOS_KERNEL
-#ifdef __arch_error_info
-#define error_info() __arch_error_info()
-#endif /* __arch_error_info */
+#ifdef __arch_except_info
+#define except_info() __arch_except_info()
+#endif /* __arch_except_info */
 #endif /* __USE_KOS_KERNEL */
 #endif /* !__INTELLISENSE__ */
 

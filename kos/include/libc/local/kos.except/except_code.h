@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e34f43c */
+/* HASH CRC-32:0xa8f2a80d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,43 +18,43 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_code_defined
-#define __local_error_code_defined
+#ifndef __local_except_code_defined
+#define __local_except_code_defined
 #include <__crt.h>
 #include <kos/bits/fastexcept.h>
-#if defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
+#if defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_error_data_defined
-#define __local___localdep_error_data_defined
-#ifdef __CRT_HAVE_error_data
+#ifndef __local___localdep_except_data_defined
+#define __local___localdep_except_data_defined
+#ifdef __CRT_HAVE_except_data
 __NAMESPACE_LOCAL_END
 struct exception_data;
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,__localdep_error_data,(void),error_data,())
-#elif defined(__arch_error_data)
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,__localdep_except_data,(void),except_data,())
+#elif defined(__arch_except_data)
 __NAMESPACE_LOCAL_END
-#include <libc/local/kos.except/error_data.h>
+#include <libc/local/kos.except/except_data.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_error_data __LIBC_LOCAL_NAME(error_data)
+#define __localdep_except_data __LIBC_LOCAL_NAME(except_data)
 #else /* ... */
-#undef __local___localdep_error_data_defined
+#undef __local___localdep_except_data_defined
 #endif /* !... */
-#endif /* !__local___localdep_error_data_defined */
-__LOCAL_LIBC(error_code) __ATTR_PURE __ATTR_WUNUSED __error_code_t
-__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_code))(void) {
-#ifdef __arch_error_code
-	return __arch_error_code();
-#else /* __arch_error_code */
-	return (__NAMESPACE_LOCAL_SYM __localdep_error_data)()->e_code;
-#endif /* !__arch_error_code */
+#endif /* !__local___localdep_except_data_defined */
+__LOCAL_LIBC(except_code) __ATTR_PURE __ATTR_WUNUSED __except_code_t
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_code))(void) {
+#ifdef __arch_except_code
+	return __arch_except_code();
+#else /* __arch_except_code */
+	return (__NAMESPACE_LOCAL_SYM __localdep_except_data)()->e_code;
+#endif /* !__arch_except_code */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_code_defined
-#define __local___localdep_error_code_defined
-#define __localdep_error_code __LIBC_LOCAL_NAME(error_code)
-#endif /* !__local___localdep_error_code_defined */
-#else /* __arch_error_code || __CRT_HAVE_error_data || __arch_error_data */
-#undef __local_error_code_defined
-#endif /* !__arch_error_code && !__CRT_HAVE_error_data && !__arch_error_data */
-#endif /* !__local_error_code_defined */
+#ifndef __local___localdep_except_code_defined
+#define __local___localdep_except_code_defined
+#define __localdep_except_code __LIBC_LOCAL_NAME(except_code)
+#endif /* !__local___localdep_except_code_defined */
+#else /* __arch_except_code || __CRT_HAVE_except_data || __arch_except_data */
+#undef __local_except_code_defined
+#endif /* !__arch_except_code && !__CRT_HAVE_except_data && !__arch_except_data */
+#endif /* !__local_except_code_defined */

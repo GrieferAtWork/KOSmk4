@@ -83,17 +83,17 @@ DECL_BEGIN
  * >> if (EXCEPTION_THROWN) {
  * >>     __cxa_begin_catch();              // [ 3]
  * >>     struct _exception_nesting_data nest;
- * >>     error_nesting_begin(&nest);
+ * >>     except_nesting_begin(&nest);
  * >>     bar();                            // [ 5]
  * >>     if (EXCEPTION_THROWN) {
  * >>         __cxa_begin_catch();          // [ 6]
  * >>         foobar();                     // [ 7]
- * >>         error_rethrow();              // [ 8]
+ * >>         except_rethrow();             // [ 8]
  * >>         __cxa_end_catch();            // [ 9]
- * >>         error_nesting_end(&nest);
+ * >>         except_nesting_end(&nest);
  * >>     } else {
- * >>         error_nesting_end(&nest);
- * >>         error_rethrow();              // [10]
+ * >>         except_nesting_end(&nest);
+ * >>         except_rethrow();             // [10]
  * >>     }
  * >>     __cxa_end_catch();                // [11]
  * >> }
@@ -118,24 +118,24 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	 * >> } catch (MyException &exc) {
 	 * >>     printk("exc @ %p\n", &exc); // Prints the address that this function returns.
 	 * >> }
-	 * The given `ptr' is what `libc_error_unwind()' originally set as value
+	 * The given `ptr' is what `libc_except_unwind()' originally set as value
 	 * for the `CFI_UNWIND_REGISTER_EXCEPTION' register. */
 	struct exception_info *info;
-	info = error_info();
+	info = except_info();
 	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
 	        "Exception handler entered, but no exception set");
 #if defined(__KERNEL__) && 0
 	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
 	                  "__cxa_begin_catch [%#" PRIx8 "] [error=%s ("
-	                  "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-	                  "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ")]\n",
+	                  "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
+	                  "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ")]\n",
 	                  __builtin_return_address(0),
 	                  __builtin_return_address(0),
 	                  THIS_TASK,
 	                  info->ei_flags,
-	                  error_name(info->ei_code),
-	                  ERROR_CLASS(info->ei_code),
-	                  ERROR_SUBCLASS(info->ei_code));
+	                  except_name(info->ei_code),
+	                  EXCEPT_CLASS(info->ei_code),
+	                  EXCEPT_SUBCLASS(info->ei_code));
 #endif
 	return ptr;
 }
@@ -164,20 +164,20 @@ libc_cxa_end_catch(void) {
 	/* For our purposes, we only get here when an EXCEPT block reaches
 	 * its  end, and we  delete the exception  if it wasn't re-thrown. */
 	struct exception_info *info;
-	info = error_info();
+	info = except_info();
 #if defined(__KERNEL__) && 0
 	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
 	                  "__cxa_end_catch%s [%#Ix] [error=%s ("
-	                  "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-	                  "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ")]\n",
+	                  "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
+	                  "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ")]\n",
 	                  __builtin_return_address(0),
 	                  __builtin_return_address(0),
 	                  THIS_TASK,
 	                  info->ei_flags & EXCEPT_FRETHROW ? "" : " [delete]",
 	                  info->ei_flags,
-	                  error_name(info->ei_code),
-	                  ERROR_CLASS(info->ei_code),
-	                  ERROR_SUBCLASS(info->ei_code));
+	                  except_name(info->ei_code),
+	                  EXCEPT_CLASS(info->ei_code),
+	                  EXCEPT_SUBCLASS(info->ei_code));
 #endif
 	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
 	        "Exception handler entered, but no exception set");
@@ -185,7 +185,7 @@ libc_cxa_end_catch(void) {
 		/* TODO: If  `this_exception_code'  is  an RT-level  exception,  then we
 		 *       must set some kind of thread-local flag to have it be re-thrown
 		 *       the next time the a call to `task_serve()' is made! */
-		info->ei_code = ERROR_CODEOF(E_OK);
+		info->ei_code = EXCEPT_CODEOF(E_OK);
 	}
 	info->ei_flags &= ~(EXCEPT_FRETHROW);
 }
@@ -193,9 +193,9 @@ libc_cxa_end_catch(void) {
 
 /* Bad usage: missing nesting for TRY. */
 INTERN SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_error_badusage_no_nesting)(error_register_state_t const *state) {
+NOTHROW(FCALL libc_except_badusage_no_nesting)(except_register_state_t const *state) {
 	struct assert_args args;
-	/* FIXME: This assumes that error_register_state_t is kcpustate! */
+	/* FIXME: This assumes that except_register_state_t is kcpustate! */
 	memcpy(&args.aa_state, state, sizeof(struct kcpustate));
 	args.aa_file   = NULL;
 	args.aa_line   = 0;
@@ -208,12 +208,12 @@ NOTHROW(FCALL libc_error_badusage_no_nesting)(error_register_state_t const *stat
 
 #ifndef NDEBUG
 PRIVATE SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-assert_failf_at(error_register_state_t const *state,
+assert_failf_at(except_register_state_t const *state,
                 char const *__restrict expr,
                 char const *__restrict format, ...) {
 	struct assert_args args;
 	va_start(args.aa_args, format);
-	/* FIXME: This assumes that error_register_state_t is kcpustate! */
+	/* FIXME: This assumes that except_register_state_t is kcpustate! */
 	memcpy(&args.aa_state, state, sizeof(struct kcpustate));
 	args.aa_expr   = expr;
 	args.aa_file   = NULL;
@@ -225,7 +225,7 @@ assert_failf_at(error_register_state_t const *state,
 
 /* Bad usage: Attempted to call `RETHROW()' from outside of a catch-block. */
 INTERN SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_error_badusage_rethrow_outside_catch)(error_register_state_t const *state) {
+NOTHROW(FCALL libc_except_badusage_rethrow_outside_catch)(except_register_state_t const *state) {
 	assert_failf_at(state, "RETHROW()", "RETHROW() outside of catch-block");
 }
 
@@ -233,9 +233,9 @@ NOTHROW(FCALL libc_error_badusage_rethrow_outside_catch)(error_register_state_t 
  *            without wrapping the throwing code location inside of another
  *            NESTED_TRY-block. */
 INTERN SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_error_badusage_throw_inside_catch)(error_register_state_t const *state,
-                                                      error_code_t code, size_t argc,
-                                                      va_list args) {
+NOTHROW(FCALL libc_except_badusage_throw_inside_catch)(except_register_state_t const *state,
+                                                       except_code_t code, size_t argc,
+                                                       va_list args) {
 	char args_buf[EXCEPTION_DATA_POINTERS * (4 + sizeof(void *) * 2) + 1];
 	char *endp = args_buf;
 	if unlikely(argc > EXCEPTION_DATA_POINTERS)
@@ -247,15 +247,15 @@ NOTHROW(FCALL libc_error_badusage_throw_inside_catch)(error_register_state_t con
 	*endp = '\0';
 	assert_failf_at(state, "THROW(...)",
 	                "THROW(%s%s) ("
-	                "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-	                "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ""
+	                "%.4" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
+	                "%.4" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__) ""
 	                ") inside of catch-block\n"
 	                "Consider adding/changing a surrounding `TRY' between "
 	                "here and the nearest `EXCEPT' to `NESTED_TRY'",
-	                error_name(code),
+	                except_name(code),
 	                args_buf,
-	                ERROR_CLASS(code),
-	                ERROR_SUBCLASS(code));
+	                EXCEPT_CLASS(code),
+	                EXCEPT_SUBCLASS(code));
 }
 #endif /* !NDEBUG */
 

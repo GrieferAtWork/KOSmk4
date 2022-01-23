@@ -345,7 +345,7 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 		}
 	} EXCEPT {
 		errno_t error;
-		error = error_as_errno(error_data());
+		error = except_as_errno(except_data());
 		return GDB_ErrnoEncode(error);
 	}
 	return 0;
@@ -373,7 +373,7 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
 		path_remove(p, last_seg, last_seglen, atflags);
 	} EXCEPT {
 		errno_t error;
-		error = error_as_errno(error_data());
+		error = except_as_errno(except_data());
 		return GDB_ErrnoEncode(error);
 	}
 	return 0;
@@ -410,7 +410,7 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename, char *buf,
 		*pbuflen = used;
 	} EXCEPT {
 		errno_t error;
-		error = error_as_errno(error_data());
+		error = except_as_errno(except_data());
 		return GDB_ErrnoEncode(error);
 	}
 	return 0;

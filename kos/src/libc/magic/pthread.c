@@ -1199,8 +1199,8 @@ again:
 			__hybrid_atomic_store(*once_control,
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
-@@pp_if $has_function(error_rethrow)@@
-			error_rethrow();
+@@pp_if $has_function(except_rethrow)@@
+			except_rethrow();
 @@pp_else@@
 			@throw@;
 @@pp_endif@@

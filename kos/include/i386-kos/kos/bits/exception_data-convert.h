@@ -47,8 +47,8 @@ __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(exception_data32_to_exception_data64)(struct __exception_data32 const *__restrict __self,
                                                     struct __exception_data64 *__restrict __result) {
 	unsigned int i;
-	__result->e_class    = (__error_class64_t)__self->e_class;
-	__result->e_subclass = (__error_subclass64_t)__self->e_subclass;
+	__result->e_class    = (__except_class64_t)__self->e_class;
+	__result->e_subclass = (__except_subclass64_t)__self->e_subclass;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		__result->e_args.e_pointers[i] = (__ULONG64_TYPE__)__self->e_args.e_pointers[i];
 	__result->e_faultaddr = (__HYBRID_PTR64(void const))__self->e_faultaddr;
@@ -58,8 +58,8 @@ __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(exception_data64_to_exception_data32)(struct __exception_data64 const *__restrict __self,
                                                     struct __exception_data32 *__restrict __result) {
 	unsigned int i;
-	__result->e_class    = (__error_class32_t)__self->e_class;
-	__result->e_subclass = (__error_subclass32_t)__self->e_subclass;
+	__result->e_class    = (__except_class32_t)__self->e_class;
+	__result->e_subclass = (__except_subclass32_t)__self->e_subclass;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		__result->e_args.e_pointers[i] = (__ULONG32_TYPE__)__self->e_args.e_pointers[i];
 	__result->e_faultaddr = (__HYBRID_PTR32(void const))__self->e_faultaddr;

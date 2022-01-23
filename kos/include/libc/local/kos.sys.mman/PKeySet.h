@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6feb579a */
+/* HASH CRC-32:0x224f58ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,19 @@
 #define __local_PKeySet_defined
 #include <__crt.h>
 #include <asm/pkey.h>
-#if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_error_thrown)
+#if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_except_thrown)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_error_thrown_defined
-#define __local___localdep_error_thrown_defined
+#ifndef __local___localdep_except_thrown_defined
+#define __local___localdep_except_thrown_defined
 __NAMESPACE_LOCAL_END
 #include <kos/bits/exception_data.h>
-#ifndef __ERROR_THROWN_CC
-#define __ERROR_THROWN_CC __LIBKCALL
-#endif /* !__ERROR_THROWN_CC */
+#ifndef __EXCEPT_THROWN_CC
+#define __EXCEPT_THROWN_CC __LIBKCALL
+#endif /* !__EXCEPT_THROWN_CC */
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC __localdep_error_thrown)(__error_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME("error_thrown");
-#endif /* !__local___localdep_error_thrown_defined */
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROWN_CC __localdep_except_thrown)(__except_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME("except_thrown");
+#endif /* !__local___localdep_except_thrown_defined */
 __NAMESPACE_LOCAL_END
 #include <kos/except/codes.h>
 #include <kos/except/reason/inval.h>
@@ -42,9 +42,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(PKeySet) void
 (__LIBCCALL __LIBC_LOCAL_NAME(PKeySet))(int __pkey, unsigned int __access_rights) __THROWS(...) {
 	if __unlikely(!__arch_pkey_verify_key(__pkey))
-		(__NAMESPACE_LOCAL_SYM __localdep_error_thrown)(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY, __pkey);
+		(__NAMESPACE_LOCAL_SYM __localdep_except_thrown)(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY, __pkey);
 	if __unlikely(!__arch_pkey_verify_rights(__access_rights))
-		(__NAMESPACE_LOCAL_SYM __localdep_error_thrown)(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS, __access_rights);
+		(__NAMESPACE_LOCAL_SYM __localdep_except_thrown)(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS, __access_rights);
 	__arch_pkey_set(__pkey, __access_rights);
 }
 __NAMESPACE_LOCAL_END
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_PKeySet_defined
 #define __localdep_PKeySet __LIBC_LOCAL_NAME(PKeySet)
 #endif /* !__local___localdep_PKeySet_defined */
-#else /* __ARCH_HAVE_PKEY && __CRT_HAVE_error_thrown */
+#else /* __ARCH_HAVE_PKEY && __CRT_HAVE_except_thrown */
 #undef __local_PKeySet_defined
-#endif /* !__ARCH_HAVE_PKEY || !__CRT_HAVE_error_thrown */
+#endif /* !__ARCH_HAVE_PKEY || !__CRT_HAVE_except_thrown */
 #endif /* !__local_PKeySet_defined */

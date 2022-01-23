@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x577977ab */
+/* HASH CRC-32:0xb6fa3fe3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_as_errno_defined
-#define __local_error_as_errno_defined
+#ifndef __local_except_as_errno_defined
+#define __local_except_as_errno_defined
 #include <__crt.h>
 #include <bits/types.h>
 struct exception_data;
@@ -35,8 +35,8 @@ struct exception_data;
 #include <kos/except/codes.h>
 #include <kos/kernel/handle.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(error_as_errno) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_errno))(struct exception_data const *__restrict __self) {
+__LOCAL_LIBC(except_as_errno) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(except_as_errno))(struct exception_data const *__restrict __self) {
 #ifdef __EPERM
 	__errno_t __result = __EPERM;
 #else /* __EPERM */
@@ -141,7 +141,7 @@ for (local name: classes.keys.sorted()) {
 			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
 			if (reqMacros)
 				print("@@pp_if ", reqMacros, "@@");
-			print("\t\tcase @ERROR_SUBCLASS@(@ERROR_CODEOF@(@", c.name, "@)):");
+			print("\t\tcase @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@", c.name, "@)):");
 			print("\t\t\tresult = ", expr.replace("\n", "\n\t\t\t"), ";");
 			print("\t\t\tbreak;");
 			if (reqMacros)
@@ -162,22 +162,22 @@ for (local name: classes.keys.sorted()) {
 #endif /* __ENOMEM */
 		switch(__self->e_subclass) {
 #ifdef __EEXIST
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_ADDRESS_ALREADY_EXISTS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_ADDRESS_ALREADY_EXISTS)):
 			__result = __EEXIST;
 			break;
 #endif /* __EEXIST */
 #ifdef __EMFILE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS)):
 			__result = __EMFILE;
 			break;
 #endif /* __EMFILE */
 #ifdef __ENFILE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)):
 			__result = __ENFILE;
 			break;
 #endif /* __ENFILE */
 #ifdef __EADDRNOTAVAIL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_PORT_NUMBERS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_PORT_NUMBERS)):
 			__result = __EADDRNOTAVAIL;
 			break;
 #endif /* __EADDRNOTAVAIL */
@@ -206,127 +206,127 @@ for (local name: classes.keys.sorted()) {
 	case E_FSERROR:
 		switch(__self->e_subclass) {
 #ifdef __ENOENT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DELETED)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_DELETED)):
 			__result = __ENOENT;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_FILE_NOT_FOUND)):
 			__result = __ENOENT;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_PATH_NOT_FOUND)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_PATH_NOT_FOUND)):
 			__result = __ENOENT;
 			break;
 #endif /* __ENOENT */
 #ifdef __ENAMETOOLONG
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_ILLEGAL_PATH)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_ILLEGAL_PATH)):
 			__result = __ENAMETOOLONG;
 			break;
 #endif /* __ENAMETOOLONG */
 #ifdef __ENOTDIR
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NOT_A_DIRECTORY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_NOT_A_DIRECTORY)):
 			__result = __ENOTDIR;
 			break;
 #endif /* __ENOTDIR */
 #ifdef __ELOOP
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS)):
 			__result = __ELOOP;
 			break;
 #endif /* __ELOOP */
 #ifdef __EACCES
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_ACCESS_DENIED)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_ACCESS_DENIED)):
 			__result = __EACCES;
 			break;
 #endif /* __EACCES */
 #ifdef __ENOSPC
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DISK_FULL)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_DISK_FULL)):
 			__result = __ENOSPC;
 			break;
 #endif /* __ENOSPC */
 #ifdef __EROFS
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_READONLY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_READONLY)):
 			__result = __EROFS;
 			break;
 #endif /* __EROFS */
 #ifdef __EMLINK
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_TOO_MANY_HARD_LINKS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_TOO_MANY_HARD_LINKS)):
 			__result = __EMLINK;
 			break;
 #endif /* __EMLINK */
 #if defined(__EPERM) && defined(__EISDIR)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_IS_A_DIRECTORY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_IS_A_DIRECTORY)):
 			__result = __self->e_args.e_fserror.f_is_a_directory.iad_action_context == E_FILESYSTEM_IS_A_DIRECTORY_LINK ? __EPERM : __EISDIR;
 			break;
 #endif /* __EPERM && __EISDIR */
 #ifdef __ENOENT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NOT_A_SYMBOLIC_LINK)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_NOT_A_SYMBOLIC_LINK)):
 			__result = __ENOENT;
 			break;
 #endif /* __ENOENT */
 #ifdef __ELOOP
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_IS_A_SYMBOLIC_LINK)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_IS_A_SYMBOLIC_LINK)):
 			__result = __ELOOP;
 			break;
 #endif /* __ELOOP */
 #ifdef __EEXIST
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_FILE_ALREADY_EXISTS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_FILE_ALREADY_EXISTS)):
 			__result = __EEXIST;
 			break;
 #endif /* __EEXIST */
 #ifdef __ENOTEMPTY
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DIRECTORY_NOT_EMPTY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_DIRECTORY_NOT_EMPTY)):
 			__result = __ENOTEMPTY;
 			break;
 #endif /* __ENOTEMPTY */
 #ifdef __EXDEV
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_CROSS_DEVICE_LINK)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_CROSS_DEVICE_LINK)):
 			__result = __EXDEV;
 			break;
 #endif /* __EXDEV */
 #ifdef __EINVAL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DIRECTORY_MOVE_TO_CHILD)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_DIRECTORY_MOVE_TO_CHILD)):
 			__result = __EINVAL;
 			break;
 #endif /* __EINVAL */
 #ifdef __ENOTBLK
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_MOUNT_UNSUPPORTED_DEVICE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_MOUNT_UNSUPPORTED_DEVICE)):
 			__result = __ENOTBLK;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_MOUNT_NEEDS_DEVICE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_MOUNT_NEEDS_DEVICE)):
 			__result = __ENOTBLK;
 			break;
 #endif /* __ENOTBLK */
 #ifdef __ENODEV
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_WRONG_FILE_SYSTEM)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_WRONG_FILE_SYSTEM)):
 			__result = __ENODEV;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_UNKNOWN_FILE_SYSTEM)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_UNKNOWN_FILE_SYSTEM)):
 			__result = __ENODEV;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_CORRUPTED_FILE_SYSTEM)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_CORRUPTED_FILE_SYSTEM)):
 			__result = __ENODEV;
 			break;
 #endif /* __ENODEV */
 #ifdef __EBUSY
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_PATH_ALREADY_MOUNTED)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_PATH_ALREADY_MOUNTED)):
 			__result = __EBUSY;
 			break;
 #endif /* __EBUSY */
 #ifdef __EINVAL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NOT_A_MOUNTING_POINT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_NOT_A_MOUNTING_POINT)):
 			__result = __EINVAL;
 			break;
 #endif /* __EINVAL */
 #ifdef __EBUSY
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_IS_A_MOUNTING_POINT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_IS_A_MOUNTING_POINT)):
 			__result = __EBUSY;
 			break;
 #endif /* __EBUSY */
 #ifdef __EFBIG
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_FILE_TOO_BIG)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_FILE_TOO_BIG)):
 			__result = __EFBIG;
 			break;
 #endif /* __EFBIG */
 #if defined(__ESPIPE) && defined(__EINVAL) && defined(__ENOTDIR) && defined(__ENODEV) && defined(__EROFS) && defined(__EPERM)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)):
 			__result = (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SEEK || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PREAD ||
 			         __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PWRITE) ? __ESPIPE :
 			        (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READ || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_WRITE ||
@@ -359,7 +359,7 @@ for (local name: classes.keys.sorted()) {
 #endif /* __ENXIO && __EPERM */
 		switch(__self->e_subclass) {
 #if defined(__EINVAL) && defined(__ELOOP)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
 			__result = __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? __EINVAL : __ELOOP;
 			break;
 #endif /* __EINVAL && __ELOOP */
@@ -392,7 +392,7 @@ for (local name: classes.keys.sorted()) {
 #endif /* __EPERM && __EINVAL */
 		switch(__self->e_subclass) {
 #if defined(__EAFNOSUPPORT) && defined(__ESOCKTNOSUPPORT) && defined(__EPROTONOSUPPORT) && defined(__EINVAL)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND)):
 			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY ? __EAFNOSUPPORT :
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE ? __ESOCKTNOSUPPORT :
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL ? __EPROTONOSUPPORT :
@@ -400,7 +400,7 @@ for (local name: classes.keys.sorted()) {
 			break;
 #endif /* __EAFNOSUPPORT && __ESOCKTNOSUPPORT && __EPROTONOSUPPORT && __EINVAL */
 #if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__ENXIO) && defined(__EPIPE) && defined(__ENOMEM) && defined(__EINVAL)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
 			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED ? __ENOTCONN :
@@ -414,12 +414,12 @@ for (local name: classes.keys.sorted()) {
 			break;
 #endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __ENXIO && __EPIPE && __ENOMEM && __EINVAL */
 #ifdef __ENOPROTOOPT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
 			__result = __ENOPROTOOPT;
 			break;
 #endif /* __ENOPROTOOPT */
 #if defined(__EAFNOSUPPORT) && defined(__EINVAL)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND)):
 			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY ? __EAFNOSUPPORT : __EINVAL;
 			break;
 #endif /* __EAFNOSUPPORT && __EINVAL */
@@ -439,17 +439,17 @@ for (local name: classes.keys.sorted()) {
 #endif /* __EBADF */
 		switch(__self->e_subclass) {
 #if defined(__ENOTSOCK) && defined(__EBADFD)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_HANDLE_FILETYPE)):
 			__result = __self->e_args.e_invalid_handle.ih_filetype.f_needed_handle_type == HANDLE_TYPE_SOCKET ? __ENOTSOCK : __EBADFD;
 			break;
 #endif /* __ENOTSOCK && __EBADFD */
 #ifdef __EINVAL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_OPERATION)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_HANDLE_OPERATION)):
 			__result = __EINVAL;
 			break;
 #endif /* __EINVAL */
 #ifdef __EOPNOTSUPP
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_NET_OPERATION)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_HANDLE_NET_OPERATION)):
 			__result = __EOPNOTSUPP;
 			break;
 #endif /* __EOPNOTSUPP */
@@ -466,52 +466,52 @@ for (local name: classes.keys.sorted()) {
 	case E_NET_ERROR:
 		switch(__self->e_subclass) {
 #ifdef __EHOSTUNREACH
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_HOST_UNREACHABLE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_HOST_UNREACHABLE)):
 			__result = __EHOSTUNREACH;
 			break;
 #endif /* __EHOSTUNREACH */
 #ifdef __EADDRINUSE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_ADDRESS_IN_USE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_ADDRESS_IN_USE)):
 			__result = __EADDRINUSE;
 			break;
 #endif /* __EADDRINUSE */
 #ifdef __EMSGSIZE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_MESSAGE_TOO_LONG)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_MESSAGE_TOO_LONG)):
 			__result = __EMSGSIZE;
 			break;
 #endif /* __EMSGSIZE */
 #ifdef __ECONNABORTED
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_CONNECTION_ABORT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_CONNECTION_ABORT)):
 			__result = __ECONNABORTED;
 			break;
 #endif /* __ECONNABORTED */
 #ifdef __ECONNREFUSED
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_CONNECTION_REFUSED)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_CONNECTION_REFUSED)):
 			__result = __ECONNREFUSED;
 			break;
 #endif /* __ECONNREFUSED */
 #ifdef __ECONNRESET
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_CONNECTION_RESET)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_CONNECTION_RESET)):
 			__result = __ECONNRESET;
 			break;
 #endif /* __ECONNRESET */
 #ifdef __ETIMEDOUT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_TIMEOUT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_TIMEOUT)):
 			__result = __ETIMEDOUT;
 			break;
 #endif /* __ETIMEDOUT */
 #ifdef __ENETUNREACH
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_UNREACHABLE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_UNREACHABLE)):
 			__result = __ENETUNREACH;
 			break;
 #endif /* __ENETUNREACH */
 #ifdef __EADDRNOTAVAIL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_ADDRESS_NOT_AVAILABLE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_ADDRESS_NOT_AVAILABLE)):
 			__result = __EADDRNOTAVAIL;
 			break;
 #endif /* __EADDRNOTAVAIL */
 #ifdef __EPIPE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_SHUTDOWN)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_SHUTDOWN)):
 			__result = __EPIPE;
 			break;
 #endif /* __EPIPE */
@@ -603,8 +603,8 @@ for (local name: classes.keys.sorted()) {
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_as_errno_defined
-#define __local___localdep_error_as_errno_defined
-#define __localdep_error_as_errno __LIBC_LOCAL_NAME(error_as_errno)
-#endif /* !__local___localdep_error_as_errno_defined */
-#endif /* !__local_error_as_errno_defined */
+#ifndef __local___localdep_except_as_errno_defined
+#define __local___localdep_except_as_errno_defined
+#define __localdep_except_as_errno __LIBC_LOCAL_NAME(except_as_errno)
+#endif /* !__local___localdep_except_as_errno_defined */
+#endif /* !__local_except_as_errno_defined */

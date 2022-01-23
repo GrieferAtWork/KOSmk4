@@ -203,7 +203,7 @@ size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
 %
 %#ifdef __USE_KOS
 %{
-/* Simple functions to convert between single-byte and multi-byte formats,
+/* Simple functions to convert between single-byte and multi-byte  formats,
  * without having to worry about buffers (since all of these functions will
  * automatically allocate buffers on the heap) */
 

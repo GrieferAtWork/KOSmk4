@@ -158,7 +158,7 @@ NOTHROW(KCALL x86_initialize_commandline_himem)(void) {
 		}
 		printk(FREESTR(KERN_INFO "]\n"));
 	} EXCEPT {
-		error_printf(FREESTR("Allocating kernel commandline"));
+		except_printf(FREESTR("Allocating kernel commandline"));
 		kfree(cmdline_copy);
 		kernel_driver.d_argc    = 0;
 		kernel_driver.d_argv    = NULL;
@@ -253,9 +253,9 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 				                       driver_descriptor.cmdline,
 				                       (size_t)driver_descriptor.pad);
 			} EXCEPT {
-				error_printf(FREESTR("Loading bootloader driver from %" PRIp32 "...%" PRIp32),
-				             (u32)driver_descriptor.mod_start,
-				             (u32)driver_descriptor.mod_end - 1);
+				except_printf(FREESTR("Loading bootloader driver from %" PRIp32 "...%" PRIp32),
+				              (u32)driver_descriptor.mod_start,
+				              (u32)driver_descriptor.mod_end - 1);
 			}
 		}
 	}	break;
@@ -284,9 +284,9 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 					                       (PHYS u32)(PHYS uintptr_t)&mod->cmdline[0],
 					                       cmdline_max_length);
 				} EXCEPT {
-					error_printf(FREESTR("Loading bootloader driver from %" PRIp32 "...%" PRIp32),
-					             (u32)tag.mod_start,
-					             (u32)tag.mod_end - 1);
+					except_printf(FREESTR("Loading bootloader driver from %" PRIp32 "...%" PRIp32),
+					              (u32)tag.mod_start,
+					              (u32)tag.mod_end - 1);
 				}
 			}
 			tag_iter = (PHYS struct mb2_tag *)((byte_t *)tag_iter + CEIL_ALIGN(tag.size, MB2_TAG_ALIGN));
@@ -330,7 +330,7 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 				              memtype_bios_matrix[iter->type]);
 			}
 		} EXCEPT {
-			error_printf(FREESTR("Loading multiboot memory map"));
+			except_printf(FREESTR("Loading multiboot memory map"));
 		}
 	}
 	if (vinfo->flags & MB_MEMORY_INFO)
@@ -496,8 +496,8 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 				break;
 			}
 		} EXCEPT {
-			error_printf(FREESTR("Loading MB2 tag at %p"),
-			             tag_iter);
+			except_printf(FREESTR("Loading MB2 tag at %p"),
+			              tag_iter);
 		}
 	}
 }

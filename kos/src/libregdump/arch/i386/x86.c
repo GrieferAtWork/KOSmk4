@@ -1272,11 +1272,11 @@ libregdump_ip(struct regdump_printer *__restrict self,
 				DO(disasm_single(self->rdp_printer, self->rdp_printer_arg, (void *)prev_ip,
 				                 DISASSEMBLER_TARGET_CURRENT, DISASSEMBLER_FNORMAL));
 			} EXCEPT {
-				error_class_t cls = error_class();
-				if (ERRORCLASS_ISRTLPRIORITY(cls))
+				except_class_t cls = except_class();
+				if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 					RETHROW();
 				format(REGDUMP_FORMAT_ERROR_PREFIX);
-				printf("error:%s", error_name(error_code()));
+				printf("error:%s", except_name(except_code()));
 				format(REGDUMP_FORMAT_ERROR_SUFFIX);
 			}
 			PRINT("]\n");

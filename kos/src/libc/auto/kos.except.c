@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f228ce0 */
+/* HASH CRC-32:0x375b3859 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ DECL_BEGIN
 #include <kos/kernel/handle.h>
 /* Transform the given exception into a posix errno value */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_PURE WUNUSED NONNULL((1)) errno_t
-NOTHROW_NCX(LIBKCALL libc_error_as_errno)(struct exception_data const *__restrict self) {
+NOTHROW_NCX(LIBKCALL libc_except_as_errno)(struct exception_data const *__restrict self) {
 #ifdef EPERM
 	errno_t result = EPERM;
 #else /* EPERM */
@@ -150,7 +150,7 @@ for (local name: classes.keys.sorted()) {
 			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
 			if (reqMacros)
 				print("@@pp_if ", reqMacros, "@@");
-			print("\t\tcase @ERROR_SUBCLASS@(@ERROR_CODEOF@(@", c.name, "@)):");
+			print("\t\tcase @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@", c.name, "@)):");
 			print("\t\t\tresult = ", expr.replace("\n", "\n\t\t\t"), ";");
 			print("\t\t\tbreak;");
 			if (reqMacros)
@@ -171,22 +171,22 @@ for (local name: classes.keys.sorted()) {
 #endif /* ENOMEM */
 		switch(self->e_subclass) {
 #ifdef EEXIST
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_ADDRESS_ALREADY_EXISTS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_ADDRESS_ALREADY_EXISTS)):
 			result = EEXIST;
 			break;
 #endif /* EEXIST */
 #ifdef EMFILE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS)):
 			result = EMFILE;
 			break;
 #endif /* EMFILE */
 #ifdef ENFILE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)):
 			result = ENFILE;
 			break;
 #endif /* ENFILE */
 #ifdef EADDRNOTAVAIL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_PORT_NUMBERS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_PORT_NUMBERS)):
 			result = EADDRNOTAVAIL;
 			break;
 #endif /* EADDRNOTAVAIL */
@@ -215,127 +215,127 @@ for (local name: classes.keys.sorted()) {
 	case E_FSERROR:
 		switch(self->e_subclass) {
 #ifdef ENOENT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DELETED)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_DELETED)):
 			result = ENOENT;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_FILE_NOT_FOUND)):
 			result = ENOENT;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_PATH_NOT_FOUND)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_PATH_NOT_FOUND)):
 			result = ENOENT;
 			break;
 #endif /* ENOENT */
 #ifdef ENAMETOOLONG
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_ILLEGAL_PATH)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_ILLEGAL_PATH)):
 			result = ENAMETOOLONG;
 			break;
 #endif /* ENAMETOOLONG */
 #ifdef ENOTDIR
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NOT_A_DIRECTORY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_NOT_A_DIRECTORY)):
 			result = ENOTDIR;
 			break;
 #endif /* ENOTDIR */
 #ifdef ELOOP
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS)):
 			result = ELOOP;
 			break;
 #endif /* ELOOP */
 #ifdef EACCES
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_ACCESS_DENIED)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_ACCESS_DENIED)):
 			result = EACCES;
 			break;
 #endif /* EACCES */
 #ifdef ENOSPC
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DISK_FULL)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_DISK_FULL)):
 			result = ENOSPC;
 			break;
 #endif /* ENOSPC */
 #ifdef EROFS
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_READONLY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_READONLY)):
 			result = EROFS;
 			break;
 #endif /* EROFS */
 #ifdef EMLINK
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_TOO_MANY_HARD_LINKS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_TOO_MANY_HARD_LINKS)):
 			result = EMLINK;
 			break;
 #endif /* EMLINK */
 #if defined(EPERM) && defined(EISDIR)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_IS_A_DIRECTORY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_IS_A_DIRECTORY)):
 			result = self->e_args.e_fserror.f_is_a_directory.iad_action_context == E_FILESYSTEM_IS_A_DIRECTORY_LINK ? EPERM : EISDIR;
 			break;
 #endif /* EPERM && EISDIR */
 #ifdef ENOENT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NOT_A_SYMBOLIC_LINK)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_NOT_A_SYMBOLIC_LINK)):
 			result = ENOENT;
 			break;
 #endif /* ENOENT */
 #ifdef ELOOP
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_IS_A_SYMBOLIC_LINK)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_IS_A_SYMBOLIC_LINK)):
 			result = ELOOP;
 			break;
 #endif /* ELOOP */
 #ifdef EEXIST
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_FILE_ALREADY_EXISTS)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_FILE_ALREADY_EXISTS)):
 			result = EEXIST;
 			break;
 #endif /* EEXIST */
 #ifdef ENOTEMPTY
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DIRECTORY_NOT_EMPTY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_DIRECTORY_NOT_EMPTY)):
 			result = ENOTEMPTY;
 			break;
 #endif /* ENOTEMPTY */
 #ifdef EXDEV
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_CROSS_DEVICE_LINK)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_CROSS_DEVICE_LINK)):
 			result = EXDEV;
 			break;
 #endif /* EXDEV */
 #ifdef EINVAL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_DIRECTORY_MOVE_TO_CHILD)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_DIRECTORY_MOVE_TO_CHILD)):
 			result = EINVAL;
 			break;
 #endif /* EINVAL */
 #ifdef ENOTBLK
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_MOUNT_UNSUPPORTED_DEVICE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_MOUNT_UNSUPPORTED_DEVICE)):
 			result = ENOTBLK;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_MOUNT_NEEDS_DEVICE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_MOUNT_NEEDS_DEVICE)):
 			result = ENOTBLK;
 			break;
 #endif /* ENOTBLK */
 #ifdef ENODEV
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_WRONG_FILE_SYSTEM)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_WRONG_FILE_SYSTEM)):
 			result = ENODEV;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_UNKNOWN_FILE_SYSTEM)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_UNKNOWN_FILE_SYSTEM)):
 			result = ENODEV;
 			break;
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_CORRUPTED_FILE_SYSTEM)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_CORRUPTED_FILE_SYSTEM)):
 			result = ENODEV;
 			break;
 #endif /* ENODEV */
 #ifdef EBUSY
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_PATH_ALREADY_MOUNTED)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_PATH_ALREADY_MOUNTED)):
 			result = EBUSY;
 			break;
 #endif /* EBUSY */
 #ifdef EINVAL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NOT_A_MOUNTING_POINT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_NOT_A_MOUNTING_POINT)):
 			result = EINVAL;
 			break;
 #endif /* EINVAL */
 #ifdef EBUSY
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_IS_A_MOUNTING_POINT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_IS_A_MOUNTING_POINT)):
 			result = EBUSY;
 			break;
 #endif /* EBUSY */
 #ifdef EFBIG
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_FILE_TOO_BIG)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_FILE_TOO_BIG)):
 			result = EFBIG;
 			break;
 #endif /* EFBIG */
 #if defined(ESPIPE) && defined(EINVAL) && defined(ENOTDIR) && defined(ENODEV) && defined(EROFS) && defined(EPERM)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)):
 			result = (self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SEEK || self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PREAD ||
 			         self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PWRITE) ? ESPIPE :
 			        (self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READ || self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_WRITE ||
@@ -368,7 +368,7 @@ for (local name: classes.keys.sorted()) {
 #endif /* ENXIO && EPERM */
 		switch(self->e_subclass) {
 #if defined(EINVAL) && defined(ELOOP)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
 			result = self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP;
 			break;
 #endif /* EINVAL && ELOOP */
@@ -401,7 +401,7 @@ for (local name: classes.keys.sorted()) {
 #endif /* EPERM && EINVAL */
 		switch(self->e_subclass) {
 #if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND)):
 			result = self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY ? EAFNOSUPPORT :
 			        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE ? ESOCKTNOSUPPORT :
 			        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL ? EPROTONOSUPPORT :
@@ -409,7 +409,7 @@ for (local name: classes.keys.sorted()) {
 			break;
 #endif /* EAFNOSUPPORT && ESOCKTNOSUPPORT && EPROTONOSUPPORT && EINVAL */
 #if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EINVAL)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
 			result = self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
 			        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
 			        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED ? ENOTCONN :
@@ -423,12 +423,12 @@ for (local name: classes.keys.sorted()) {
 			break;
 #endif /* ENOTCONN && EDESTADDRREQ && EISCONN && ENXIO && EPIPE && ENOMEM && EINVAL */
 #ifdef ENOPROTOOPT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
 			result = ENOPROTOOPT;
 			break;
 #endif /* ENOPROTOOPT */
 #if defined(EAFNOSUPPORT) && defined(EINVAL)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND)):
 			result = self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY ? EAFNOSUPPORT : EINVAL;
 			break;
 #endif /* EAFNOSUPPORT && EINVAL */
@@ -448,17 +448,17 @@ for (local name: classes.keys.sorted()) {
 #endif /* EBADF */
 		switch(self->e_subclass) {
 #if defined(ENOTSOCK) && defined(EBADFD)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_HANDLE_FILETYPE)):
 			result = self->e_args.e_invalid_handle.ih_filetype.f_needed_handle_type == HANDLE_TYPE_SOCKET ? ENOTSOCK : EBADFD;
 			break;
 #endif /* ENOTSOCK && EBADFD */
 #ifdef EINVAL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_OPERATION)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_HANDLE_OPERATION)):
 			result = EINVAL;
 			break;
 #endif /* EINVAL */
 #ifdef EOPNOTSUPP
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_NET_OPERATION)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_HANDLE_NET_OPERATION)):
 			result = EOPNOTSUPP;
 			break;
 #endif /* EOPNOTSUPP */
@@ -475,52 +475,52 @@ for (local name: classes.keys.sorted()) {
 	case E_NET_ERROR:
 		switch(self->e_subclass) {
 #ifdef EHOSTUNREACH
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_HOST_UNREACHABLE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_HOST_UNREACHABLE)):
 			result = EHOSTUNREACH;
 			break;
 #endif /* EHOSTUNREACH */
 #ifdef EADDRINUSE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_ADDRESS_IN_USE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_ADDRESS_IN_USE)):
 			result = EADDRINUSE;
 			break;
 #endif /* EADDRINUSE */
 #ifdef EMSGSIZE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_MESSAGE_TOO_LONG)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_MESSAGE_TOO_LONG)):
 			result = EMSGSIZE;
 			break;
 #endif /* EMSGSIZE */
 #ifdef ECONNABORTED
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_CONNECTION_ABORT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_CONNECTION_ABORT)):
 			result = ECONNABORTED;
 			break;
 #endif /* ECONNABORTED */
 #ifdef ECONNREFUSED
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_CONNECTION_REFUSED)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_CONNECTION_REFUSED)):
 			result = ECONNREFUSED;
 			break;
 #endif /* ECONNREFUSED */
 #ifdef ECONNRESET
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_CONNECTION_RESET)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_CONNECTION_RESET)):
 			result = ECONNRESET;
 			break;
 #endif /* ECONNRESET */
 #ifdef ETIMEDOUT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_TIMEOUT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_TIMEOUT)):
 			result = ETIMEDOUT;
 			break;
 #endif /* ETIMEDOUT */
 #ifdef ENETUNREACH
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_UNREACHABLE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_UNREACHABLE)):
 			result = ENETUNREACH;
 			break;
 #endif /* ENETUNREACH */
 #ifdef EADDRNOTAVAIL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_ADDRESS_NOT_AVAILABLE)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_ADDRESS_NOT_AVAILABLE)):
 			result = EADDRNOTAVAIL;
 			break;
 #endif /* EADDRNOTAVAIL */
 #ifdef EPIPE
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_NET_SHUTDOWN)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NET_SHUTDOWN)):
 			result = EPIPE;
 			break;
 #endif /* EPIPE */
@@ -618,9 +618,9 @@ for (local name: classes.keys.sorted()) {
  * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") WUNUSED NONNULL((1, 2)) bool
-NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restrict self,
-                                           struct __siginfo_struct *__restrict result) {
-	error_code_t code = self->e_code;
+NOTHROW_NCX(LIBKCALL libc_except_as_signal)(struct exception_data const *__restrict self,
+                                            struct __siginfo_struct *__restrict result) {
+	except_code_t code = self->e_code;
 	libc_bzero(result, sizeof(*result));
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
 	 *       Figure    3-27:    Hardware   Exceptions    and   Signals
@@ -642,7 +642,7 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 	 *       15 (reserved)
 	 *       16 coprocessor error fault         SIGFPE
 	 *       other (unspecified)                SIGILL */
-	switch (ERROR_CLASS(code)) {
+	switch (EXCEPT_CLASS(code)) {
 
 #ifdef SIGQUIT
 	case E_EXIT_THREAD:
@@ -709,22 +709,22 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 		switch (code) {
 
 #ifdef SEGV_ACCERR
-		case ERROR_CODEOF(E_SEGFAULT_READONLY):
-		case ERROR_CODEOF(E_SEGFAULT_NOTREADABLE):
-		case ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE):
+		case EXCEPT_CODEOF(E_SEGFAULT_READONLY):
+		case EXCEPT_CODEOF(E_SEGFAULT_NOTREADABLE):
+		case EXCEPT_CODEOF(E_SEGFAULT_NOTEXECUTABLE):
 			result->si_code = SEGV_ACCERR;
 			break;
 #endif /* SEGV_ACCERR */
 
 #if defined(SIGBUS) && defined(BUS_OBJERR)
-		case ERROR_CODEOF(E_SEGFAULT_NOTATOMIC):
+		case EXCEPT_CODEOF(E_SEGFAULT_NOTATOMIC):
 			result->si_signo = SIGBUS;
 			result->si_code  = BUS_OBJERR;
 			break;
 #endif /* SIGBUS && BUS_OBJERR */
 
 #if defined(SIGBUS) && defined(BUS_ADRALN)
-		case ERROR_CODEOF(E_SEGFAULT_UNALIGNED):
+		case EXCEPT_CODEOF(E_SEGFAULT_UNALIGNED):
 			result->si_signo = SIGBUS;
 			result->si_code  = BUS_ADRALN;
 			break;
@@ -744,7 +744,7 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 		switch (code) {
 
 #ifdef ILL_ILLOPN
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND):
 			result->si_code = ILL_ILLOPN;
 #ifdef ILL_ILLADR
 			if (self->e_args.e_illegal_instruction.ii_bad_operand.bo_what == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY ||
@@ -755,13 +755,13 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 #endif /* ILL_ILLOPN */
 
 #ifdef ILL_PRVOPC
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE):
 			result->si_code = ILL_PRVOPC;
 			break;
 #endif /* ILL_PRVOPC */
 
 #ifdef ILL_ILLOPN
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER):
 			result->si_code = ILL_ILLOPN;
 #ifdef ILL_PRVREG
 			if (self->e_args.e_illegal_instruction.ii_register.r_how == E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV ||
@@ -772,20 +772,20 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 #endif /* ILL_ILLOPN */
 
 #if defined(ILL_ILLADR) && defined(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT):
 			result->si_code = ILL_ILLADR;
 			break;
 #endif /* ILL_ILLADR && E_ILLEGAL_INSTRUCTION_X86_INTERRUPT */
 
 #ifdef ILL_ILLOPC
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE):
 #ifdef E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX):
 #endif /* E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX */
 #ifdef E_ILLEGAL_INSTRUCTION_X86_TOO_LONG
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG):
 #endif /* E_ILLEGAL_INSTRUCTION_X86_TOO_LONG */
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE):
+		case EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE):
 			result->si_code = ILL_ILLOPC;
 			break;
 #endif /* ILL_ILLOPC */
@@ -799,16 +799,16 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 	default:
 		return false;
 	}
-	result->si_errno = libc_error_as_errno(self);
+	result->si_errno = libc_except_as_errno(self);
 	return true;
 }
 /* Return the name of the given error, or `NULL' if unknown.
  * This  name  is   the  same  as   the  `E_*'   identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
+ * E.g.: `except_name(EXCEPT_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBKCALL libc_error_name)(error_code_t code) {
-	error_class_t err_class       = ERROR_CLASS(code);
-	error_subclass_t err_subclass = ERROR_SUBCLASS(code);
+NOTHROW(LIBKCALL libc_except_name)(except_code_t code) {
+	except_class_t err_class       = EXCEPT_CLASS(code);
+	except_subclass_t err_subclass = EXCEPT_SUBCLASS(code);
 /*[[[deemon
 (printExceptNameFunctionBody from ....misc.libgen.exceptinfo)(
 	classVariableName:    "err_class",
@@ -864,8 +864,8 @@ NOTHROW(LIBKCALL libc_error_name)(error_code_t code) {
 	"TRUCTION_BAD_OPERAND\0\0\0\0\0\0\0\0\0\0\0\0\0E_ILLEGAL_INSTRUCTION_REGISTER\0"
 	"\1E_STACK_OVERFLOW\0\1E_INDEX_ERROR\0E_INDEX_ERROR_OUT_OF_BOUNDS\0\1";
 	char const *result;
-	error_class_t class_offset;
-	error_subclass_t subclass_offset;
+	except_class_t class_offset;
+	except_subclass_t subclass_offset;
 	if (err_class <= 0x000a) {
 		result = e_linear_0000h_000ah;
 		class_offset = err_class;
@@ -990,8 +990,8 @@ non_linear_prefix:
 	"GFAULT_NOTREADABLE\0E_SEGFAULT_NOTEXECUTABLE\0E_SEGFAULT_NOTATOMIC"
 	"\0E_SEGFAULT_UNALIGNED\0E_SEGFAULT_NONCONTINUOUS\0\1";
 	char const *result;
-	error_class_t class_offset;
-	error_subclass_t subclass_offset;
+	except_class_t class_offset;
+	except_subclass_t subclass_offset;
 	if (err_class <= 0x000a) {
 		result = e_linear_0000h_000ah;
 		class_offset = err_class;
@@ -1097,14 +1097,14 @@ non_linear_prefix:
  * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_CONST WUNUSED unsigned int
-NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {
-	error_class_t code_class = ERROR_CLASS(code);
-	if (ERRORCLASS_ISRTLPRIORITY(code_class))
-		return 4 + (code_class - ERRORCLASS_RTL_MIN);
-	if (ERRORCLASS_ISHIGHPRIORITY(code_class))
+NOTHROW(LIBKCALL libc_except_priority)(except_code_t code) {
+	except_class_t code_class = EXCEPT_CLASS(code);
+	if (EXCEPTCLASS_ISRTLPRIORITY(code_class))
+		return 4 + (code_class - EXCEPTCLASS_RTL_MIN);
+	if (EXCEPTCLASS_ISHIGHPRIORITY(code_class))
 		return 3;
-	if (code_class != ERROR_CLASS(ERROR_CODEOF(E_OK))) {
-		if (!ERRORCLASS_ISLOWPRIORITY(code_class))
+	if (code_class != EXCEPT_CLASS(EXCEPT_CODEOF(E_OK))) {
+		if (!EXCEPTCLASS_ISLOWPRIORITY(code_class))
 			return 2;
 		return 1;
 	}
@@ -1117,17 +1117,17 @@ NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {
 #if defined(__i386__) || defined(__x86_64__)
 #include <asm/registers.h>
 #endif /* __i386__ || __x86_64__ */
-/* >> error_print_short_description(3)
+/* >> except_print_short_description(3)
  * Print a short, single-line (without trailing linefeed) description  of
  * the given error `data', including the error code, name and for certain
  * errors, prominent error arguments.
- * @param: flags: Set of `ERROR_PRINT_SHORT_DESCRIPTION_FLAG_*'
+ * @param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
  * @return: * : The usual pformatprinter-compatible return value */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1, 3)) ssize_t
-NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
-                                                         void *arg,
-                                                         struct exception_data const *data,
-                                                         uintptr_t flags) {
+NOTHROW_NCX(LIBKCALL libc_except_print_short_description)(pformatprinter printer,
+                                                          void *arg,
+                                                          struct exception_data const *data,
+                                                          uintptr_t flags) {
 #ifndef PRIxPTR
 #ifdef __PRIP_PREFIX
 #define PRIxPTR __PRIP_PREFIX "x"
@@ -1135,23 +1135,23 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 #define PRIxPTR "zx"
 #endif /* !__PRIP_PREFIX */
 #endif /* !PRIxPTR */
-#define FMT(tty, notty) (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY ? tty : notty)
+#define FMT(tty, notty) (flags & EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY ? tty : notty)
 	ssize_t temp, result = 0;
 	result = libc_format_printf(printer, arg,
 	                       FMT("exception "
-	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_ERROR_CLASS_T__) "x") ":"
-	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_ERROR_SUBCLASS_T__) "x"),
+	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_CLASS_T__) "x") ":"
+	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_SUBCLASS_T__) "x"),
 	                           "exception "
-	                           "%#" __PRIN_PREFIX(__SIZEOF_ERROR_CLASS_T__) "x:"
-	                           "%#" __PRIN_PREFIX(__SIZEOF_ERROR_SUBCLASS_T__) "x"),
+	                           "%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_CLASS_T__) "x:"
+	                           "%#" __PRIN_PREFIX(__SIZEOF_EXCEPT_SUBCLASS_T__) "x"),
 	                       data->e_class, data->e_subclass);
 	if unlikely(result < 0)
 		goto done;
 	{
 		char const *name;
 		char const *errno_name; /* XXX: Also print in kernel-space? */
-		name = libc_error_name(data->e_code);
-		errno_name = libc_strerrorname_np(libc_error_as_errno(data));
+		name = libc_except_name(data->e_code);
+		errno_name = libc_strerrorname_np(libc_except_as_errno(data));
 		if (name) {
 			temp = libc_format_printf(printer, arg,
 			                     FMT(" [" AC_WHITE("%s") "%s" AC_WHITE("%s") "]",
@@ -1167,11 +1167,11 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 	temp = 0;
 	switch (data->e_class) {
 
-	case ERROR_CLASS(ERROR_CODEOF(E_BADALLOC)):
+	case EXCEPT_CLASS(EXCEPT_CODEOF(E_BADALLOC)):
 		switch (data->e_subclass) {
 
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY)):
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY)):
 			temp = libc_format_printf(printer, arg,
 			                     FMT(" [num_bytes:" AC_WHITE("%#" PRIxPTR) "]",
 			                         " [num_bytes:%#" PRIxPTR "]"),
@@ -1185,7 +1185,7 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 
 	/* TODO: More error classes */
 
-	case ERROR_CLASS(ERROR_CODEOF(E_SEGFAULT)): {
+	case EXCEPT_CLASS(EXCEPT_CODEOF(E_SEGFAULT)): {
 		temp = libc_format_printf(printer, arg,
 #if defined(__i386__) || defined(__x86_64__)
 		                     FMT(" [cr2:" AC_WHITE("%p") "," AC_WHITE("%c%c%c%c%c%c") "]",
@@ -1204,7 +1204,7 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 		                     data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_VIO ? 'v' : '-');
 	}	break;
 
-	case ERROR_CLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION)): {
+	case EXCEPT_CLASS(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION)): {
 #if defined(__i386__) || defined(__x86_64__)
 		uintptr_t opcode, opno;
 		opcode = data->e_args.e_illegal_instruction.ii_opcode;
@@ -1260,7 +1260,7 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 		switch (data->e_subclass) {
 
 #ifdef E_ILLEGAL_INSTRUCTION_X86_INTERRUPT
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)):
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)):
 			temp = libc_format_printf(printer, arg,
 			                     FMT(" [int:" AC_WHITE("%#.2" PRIxPTR) ","
 			                                  AC_WHITE("%#" PRIxPTR) ","
@@ -1272,7 +1272,7 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 			break;
 #endif /* E_ILLEGAL_INSTRUCTION_X86_INTERRUPT */
 
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND)): {
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND)): {
 			char const *what_name;
 			switch (data->e_args.e_illegal_instruction.ii_bad_operand.bo_what) {
 
@@ -1302,7 +1302,7 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 			}
 		}	break;
 
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER)): {
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER)): {
 			char const *what;
 			uintptr_t regno;
 			switch (data->e_args.e_illegal_instruction.ii_register.r_how) {
@@ -1345,7 +1345,7 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 			} else
 #endif /* __i386__ || __x86_64__ */
 			{
-				if (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
+				if (flags & EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
 					static char const beginfg[] = AC_FG(ANSITTY_CL_WHITE);
 					temp = (*printer)(arg, beginfg, COMPILER_STRLEN(beginfg));
 					if unlikely(temp < 0)
@@ -1385,7 +1385,7 @@ print_generic_register_name:
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
-				if (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
+				if (flags & EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
 					static char const endfg[] = AC_FGDEF;
 					temp = (*printer)(arg, endfg, COMPILER_STRLEN(endfg));
 					if unlikely(temp < 0)
@@ -1425,39 +1425,39 @@ err:
 }
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
-NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) {
-	struct exception_info *info = libc_error_info();
-	if (info->ei_code == ERROR_CODEOF(E_OK)) {
-		/* Not inside of a  catch-block (ignore the nesting  request)
-		 * This can happen if the caller  is only using the nest  for
-		 * safety  (in case a sub-function needs to be able to handle
-		 * its own  exceptions, but  may be  called from  an  unaware
-		 * exception handler),  or  is  using  more  than  one  nest.
-		 * In all of these cases, just ignore the nest, and also make
-		 * it so that the associated `error_nesting_end()' is a no-op */
+NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_nesting_data *__restrict saved) {
+	struct exception_info *info = libc_except_info();
+	if (info->ei_code == EXCEPT_CODEOF(E_OK)) {
+		/* Not inside of  a catch-block (ignore  the nesting  request)
+		 * This  can happen if  the caller is only  using the nest for
+		 * safety (in case a sub-function  needs to be able to  handle
+		 * its  own  exceptions, but  may  be called  from  an unaware
+		 * exception  handler),  or  is  using  more  than  one  nest.
+		 * In all of these cases, just ignore the nest, and also  make
+		 * it so that the associated `except_nesting_end()' is a no-op */
 		saved->en_size = 0;
 	} else {
 		if unlikely(saved->en_size > _EXCEPTION_NESTING_DATA_SIZE)
 			saved->en_size = _EXCEPTION_NESTING_DATA_SIZE;
 		libc_memcpy(&saved->en_state, info, saved->en_size);
-		info->ei_code   = ERROR_CODEOF(E_OK);
+		info->ei_code   = EXCEPT_CODEOF(E_OK);
 		++info->ei_nesting;
 	}
 }
 #include <hybrid/__assert.h>
 /* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
-NOTHROW(__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting_data *__restrict saved) {
+NOTHROW(__EXCEPT_NESTING_END_CC libc_except_nesting_end)(struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info;
 	if unlikely(!saved->en_size)
 		return; /* No-op */
-	info = libc_error_info();
+	info = libc_except_info();
 	__hybrid_assertf(info->ei_nesting != 0,
 	                 "Error-nesting stack is empty");
 	--info->ei_nesting;
-	__hybrid_assertf(saved->en_data.e_code != ERROR_CODEOF(E_OK),
-	                 "No saved exception in `error_nesting_end()'");
-	if (info->ei_code == ERROR_CODEOF(E_OK)) {
+	__hybrid_assertf(saved->en_data.e_code != EXCEPT_CODEOF(E_OK),
+	                 "No saved exception in `except_nesting_end()'");
+	if (info->ei_code == EXCEPT_CODEOF(E_OK)) {
 		/* No newly thrown exception. (meaning we're currently not propagating
 		 * any exceptions, so we also shouldn't try to set the RETHROW  flag!) */
 restore_saved_exception:
@@ -1484,17 +1484,17 @@ restore_saved_exception:
 		 * [ 2] if (EXCEPTION_THROWN) {
 		 * [ 3]     __cxa_begin_catch();              // [ 3]
 		 * [ 4]     struct _exception_nesting_data nest;
-		 * [ 5]     error_nesting_begin(&nest);
+		 * [ 5]     except_nesting_begin(&nest);
 		 * [ 6]     bar();                            // [ 5]
 		 * [ 7]     if (EXCEPTION_THROWN) {
 		 * [ 8]         __cxa_begin_catch();          // [ 6]
 		 * [ 9]         foobar();                     // [ 7]
-		 * [10]         error_rethrow();              // [ 8]
+		 * [10]         except_rethrow();              // [ 8]
 		 * [11]         __cxa_end_catch();            // [ 9]
-		 * [12]         error_nesting_end(&nest);
+		 * [12]         except_nesting_end(&nest);
 		 * [13]     } else {
-		 * [14]         error_nesting_end(&nest);
-		 * [15]         error_rethrow();              // [10]
+		 * [14]         except_nesting_end(&nest);
+		 * [15]         except_rethrow();              // [10]
 		 * [16]     }
 		 * [17]     __cxa_end_catch();                // [11]
 		 * [18] }
@@ -1509,8 +1509,8 @@ restore_saved_exception:
 		 */
 		info->ei_flags |= EXCEPT_FRETHROW;
 		/* Select the more important exception. */
-		if (libc_error_priority(saved->en_data.e_code) >=
-		    libc_error_priority(info->ei_code))
+		if (libc_except_priority(saved->en_data.e_code) >=
+		    libc_except_priority(info->ei_code))
 			goto restore_saved_exception;
 		/* Keep the newly set exception. */
 	}
@@ -1518,12 +1518,12 @@ restore_saved_exception:
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(error_as_errno, libc_error_as_errno);
-DEFINE_PUBLIC_ALIAS(error_as_signal, libc_error_as_signal);
-DEFINE_PUBLIC_ALIAS(error_name, libc_error_name);
-DEFINE_PUBLIC_ALIAS(error_priority, libc_error_priority);
-DEFINE_PUBLIC_ALIAS(error_print_short_description, libc_error_print_short_description);
-DEFINE_PUBLIC_ALIAS(error_nesting_begin, libc_error_nesting_begin);
-DEFINE_PUBLIC_ALIAS(error_nesting_end, libc_error_nesting_end);
+DEFINE_PUBLIC_ALIAS(except_as_errno, libc_except_as_errno);
+DEFINE_PUBLIC_ALIAS(except_as_signal, libc_except_as_signal);
+DEFINE_PUBLIC_ALIAS(except_name, libc_except_name);
+DEFINE_PUBLIC_ALIAS(except_priority, libc_except_priority);
+DEFINE_PUBLIC_ALIAS(except_print_short_description, libc_except_print_short_description);
+DEFINE_PUBLIC_ALIAS(except_nesting_begin, libc_except_nesting_begin);
+DEFINE_PUBLIC_ALIAS(except_nesting_end, libc_except_nesting_end);
 
 #endif /* !GUARD_LIBC_AUTO_KOS_EXCEPT_C */

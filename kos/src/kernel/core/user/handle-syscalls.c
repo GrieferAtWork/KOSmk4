@@ -119,7 +119,7 @@ DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
 		handle_installinto_sym((unsigned int)newfd, hand);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
-			struct exception_data *d = error_data();
+			struct exception_data *d = except_data();
 			if (d->e_args.e_invalid_handle.ih_fd == (uintptr_t)-1)
 				d->e_args.e_invalid_handle.ih_fd = (uintptr_t)(intptr_t)oldfd;
 		}
@@ -171,10 +171,10 @@ DEFINE_SYSCALL3(syscall_slong_t, fcntl, fd_t, fd,
 #if defined(__ARCH_WANT_SYSCALL_IOCTL) || defined(__ARCH_WANT_SYSCALL_IOCTLF)
 PRIVATE NOBLOCK void
 NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
-	error_code_t code = error_code();
+	except_code_t code = except_code();
 	switch (code) {
 
-	case ERROR_CODEOF(E_INVALID_HANDLE_OPERATION):
+	case EXCEPT_CODEOF(E_INVALID_HANDLE_OPERATION):
 		if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd)) /* fd */
 			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd);
 		break;

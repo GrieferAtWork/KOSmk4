@@ -512,7 +512,7 @@ DBG_COMMAND(rawmagic,
 DBG_COMMAND(except,
             "except\n"
             "\tPrint the currently active exception\n") {
-	error_printf(NULL);
+	except_printf(NULL);
 	return 0;
 }
 

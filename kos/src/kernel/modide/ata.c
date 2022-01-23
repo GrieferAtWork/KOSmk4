@@ -86,10 +86,10 @@ DEFINE_CMDLINE_FLAG_VAR(ide_nodma, "ide_nodma");
 /* Hardware helpers                                                     */
 /************************************************************************/
 typedef u32 AtaError_t; /* ATA error  */
-#define ATA_ERROR(error, reason) (ERROR_SUBCLASS(ERROR_CODEOF(error)) | ((reason) << 16))
+#define ATA_ERROR(error, reason) (EXCEPT_SUBCLASS(EXCEPT_CODEOF(error)) | ((reason) << 16))
 #define ATA_ERROR_OK             0x0000
-#define ATA_ERROR_CLASS(x)       E_IOERROR
-#define ATA_ERROR_SUBCLASS(x)    ((x)&0xffff)
+#define ATA_EXCEPT_CLASS(x)      E_IOERROR
+#define ATA_EXCEPT_SUBCLASS(x)   ((x)&0xffff)
 #define ATA_ERROR_REASON(x)      (((x) >> 16) & 0xffff)
 
 /* ATA specifies a 400ns delay after drive switching,
@@ -550,7 +550,7 @@ NOTHROW(FCALL AtaDrive_DmaAioHandle_CompleteWithError)(struct aio_handle *__rest
 	struct exception_data *mydata = &THIS_EXCEPTION_DATA;
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	bzero(mydata, sizeof(struct exception_data));
-	mydata->e_code = ERROR_CODE(ATA_ERROR_CLASS(error), ATA_ERROR_SUBCLASS(error));
+	mydata->e_code = EXCEPT_CODE(ATA_EXCEPT_CLASS(error), ATA_EXCEPT_SUBCLASS(error));
 	mydata->e_args.e_ioerror.i_subsystem = E_IOERROR_SUBSYSTEM_HARDDISK;
 	mydata->e_args.e_ioerror.i_reason    = ATA_ERROR_REASON(error);
 	COMPILER_BARRIER();
@@ -661,8 +661,8 @@ handle_io_error:
 	                "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
 	                "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
 	                "dma:%#" PRIxN(__SIZEOF_PORT_T__) ")\n",
-	       (u16)ATA_ERROR_CLASS(error),
-	       (u16)ATA_ERROR_SUBCLASS(error),
+	       (u16)ATA_EXCEPT_CLASS(error),
+	       (u16)ATA_EXCEPT_SUBCLASS(error),
 	       (u16)ATA_ERROR_REASON(error),
 	       self->ab_busio,
 	       self->ab_ctrlio,
@@ -1462,10 +1462,10 @@ AtaInit_TryInitializeDrive(struct ata_ports *__restrict ports,
 		result = AtaInit_InitializeDrive(ports, p_bus, drive_id,
 		                                 is_primary_bus, is_default_ide);
 	} EXCEPT {
-		error_class_t cls = error_class();
-		if (ERRORCLASS_ISRTLPRIORITY(cls))
+		except_class_t cls = except_class();
+		if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
-		error_printf("Initializing ATA device");
+		except_printf("Initializing ATA device");
 		result = false;
 	}
 	return result;

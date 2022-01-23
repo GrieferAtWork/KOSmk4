@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x142ef1b0 */
+/* HASH CRC-32:0x263616dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@
  * the process simply  being terminated  when the  kernel tries  to propagate  an
  * exception  (meaning that sys_X*  system calls either  terminate the process on
  * error, or propagate an exception by sending a POSIX signal, when such a signal
- * exists (s.a. `error_as_signal(3)'))
+ * exists (s.a. `except_as_signal(3)'))
  * Using this interface, user-space can define a per-thread exception handler.
  *   - This handler is inherited by child processes/threads during `clone(2)' / `fork(2)'
  *   - When exec() is called, the handler is reset, meaning that applications
@@ -140,13 +140,13 @@
  *                If it is, move on to step #CORE
  *         #2:    Check if the base application is exception aware (see below)
  *                If it is, raise  the exception like it  would be in mode  #3
- *         #3:    Check if  the  exception  is  ERRORCLASS_ISRTLPRIORITY().
+ *         #3:    Check  if  the exception  is EXCEPTCLASS_ISRTLPRIORITY().
  *                If it is, raise the exception like it would be in mode #3
  *         #4:    Save  the currently active  thread-local KOS exception, and
  *                set the `EXCEPT_FINEXCEPT'  flag. (may  be restored  later)
  *                Then set the currently active thread-local KOS exception to
  *                the new one provided by the kernel.
- *         #5:    Unwind  the  stack using  `error_unwind(3)' until  an exception
+ *         #5:    Unwind the stack  using `except_unwind(3)'  until an  exception
  *                handler is found. - If no handler can be found before the stack
  *                is fully unwound,  or if  an error occurs  during unwind  (s.a.
  *                `UNWIND_*' from <libunwind/api.h>), move on to step #SIG
@@ -173,8 +173,8 @@
  *                which  differs from the usual single-pass unwinding used for handling all
  *                other types of KOS exceptions.
  *         #SIG:  Restore the KOS exception saved in step #1.
- *                Translate the exception into a signal which is raised
- *                within the calling thread (s.a. `error_as_signal(3)')
+ *                Translate the exception into a signal which is  raised
+ *                within the calling thread (s.a. `except_as_signal(3)')
  *                If the exception cannot be translated into a signal, move on to step #CORE.
  *         #CORE: Trigger a coredump to terminate the current application. (s.a. `sys_coredump(2)')
  *                If the kernel  is configured  to allow it,  this may  also trigger a  trap in  an
@@ -274,11 +274,11 @@ __CDECLARE_OPT(,int,__NOTHROW,set_exception_handler,(unsigned int __mode, except
 __CDECLARE_OPT(,int,__NOTHROW_NCX,get_exception_handler,(unsigned int *__pmode, except_handler_t *__phandler, void **__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #ifdef __CRT_HAVE_except_handler3
 /* Mode #2 / #3 exception handler (see description above) */
-__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler3)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __THROWS(...) __CASMNAME_SAME("except_handler3");
+__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler3)(except_register_state_t *__restrict __state, struct exception_data *__restrict __error) __THROWS(...) __CASMNAME_SAME("except_handler3");
 #endif /* __CRT_HAVE_except_handler3 */
 #ifdef __CRT_HAVE_except_handler4
 /* Mode #4 exception handler (see description above) */
-__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler4)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __THROWS(...) __CASMNAME_SAME("except_handler4");
+__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler4)(except_register_state_t *__restrict __state, struct exception_data *__restrict __error) __THROWS(...) __CASMNAME_SAME("except_handler4");
 #endif /* __CRT_HAVE_except_handler4 */
 
 __SYSDECL_END

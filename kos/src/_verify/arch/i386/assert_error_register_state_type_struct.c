@@ -17,14 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD__VERIFY_ARCH_I386_ASSERT_ERROR_REGISTER_STATE_TYPE_STRUCT_C
-#define GUARD__VERIFY_ARCH_I386_ASSERT_ERROR_REGISTER_STATE_TYPE_STRUCT_C 1
+#ifndef GUARD__VERIFY_ARCH_I386_ASSERT_EXCEPT_REGISTER_STATE_TYPE_STRUCT_C
+#define GUARD__VERIFY_ARCH_I386_ASSERT_EXCEPT_REGISTER_STATE_TYPE_STRUCT_C 1
 
 #include <features.h>
-#undef __USE_KOS_KERNEL /* Mustn't be defined to get headers to use `struct __error_register_state_type_struct' */
+#undef __USE_KOS_KERNEL /* Mustn't be defined to get headers to use `struct __except_register_state_type_struct' */
 
 /**/
-#include <kos/bits/except.h>             /* struct __error_register_state_type_struct */
+#include <kos/bits/except.h>             /* struct __except_register_state_type_struct */
 #include <kos/kernel/cpu-state-compat.h> /* gp_p..., kcs_Pflags, kcs_Pip */
 #include <kos/kernel/cpu-state.h>        /* struct kcpustate */
 /**/
@@ -34,9 +34,9 @@
 #include <assert.h>
 #include <stddef.h>
 
-/* Assert that `struct __error_register_state_type_struct' matches `struct kcpustate' */
+/* Assert that `struct __except_register_state_type_struct' matches `struct kcpustate' */
 #define ASSERT_SAME_OFFSET(escaped_field, kcpustate_field)                              \
-	static_assert(offsetof(struct __error_register_state_type_struct, escaped_field) == \
+	static_assert(offsetof(struct __except_register_state_type_struct, escaped_field) == \
 	              offsetof(struct kcpustate, kcpustate_field))
 #ifdef __x86_64__
 ASSERT_SAME_OFFSET(__ers_r15, kcs_gpregs.gp_r15);
@@ -61,4 +61,4 @@ ASSERT_SAME_OFFSET(__ers_pip, kcs_Pip);
 #undef ASSERT_SAME_OFFSET
 
 
-#endif /* !GUARD__VERIFY_ARCH_I386_ASSERT_ERROR_REGISTER_STATE_TYPE_STRUCT_C */
+#endif /* !GUARD__VERIFY_ARCH_I386_ASSERT_EXCEPT_REGISTER_STATE_TYPE_STRUCT_C */

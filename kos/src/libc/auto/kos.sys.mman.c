@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc54273b */
+/* HASH CRC-32:0x1c6c8346 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,9 +120,9 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") void
 (LIBCCALL libc_PKeySet)(int pkey,
                         unsigned int access_rights) THROWS(...) {
 	if unlikely(!__arch_pkey_verify_key(pkey))
-		libc_error_thrown(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY, pkey);
+		libc_except_thrown(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY, pkey);
 	if unlikely(!__arch_pkey_verify_rights(access_rights))
-		libc_error_thrown(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS, access_rights);
+		libc_except_thrown(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS, access_rights);
 	__arch_pkey_set(pkey, access_rights);
 }
 #include <kos/except/codes.h>
@@ -131,7 +131,7 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") void
 INTERN ATTR_SECTION(".text.crt.except.system.mman") unsigned int
 (LIBCCALL libc_PKeyGet)(int pkey) THROWS(...) {
 	if unlikely(!__arch_pkey_verify_key(pkey))
-		libc_error_thrown(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY, pkey);
+		libc_except_thrown(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY, pkey);
 	return __arch_pkey_get(pkey);
 }
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */

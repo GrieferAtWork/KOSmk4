@@ -529,7 +529,7 @@ aio_handle_generic_checkerror(struct aio_handle_generic *__restrict self)
 	if unlikely(self->hg_status == AIO_COMPLETION_FAILURE) {
 		__libc_memcpy(&THIS_EXCEPTION_DATA,
 		              &self->hg_error, sizeof(self->hg_error));
-		error_throw_current();
+		except_throw_current();
 	}
 }
 
@@ -760,7 +760,7 @@ aio_multimultihandle_generic_checkerror(struct aio_multihandle_generic *__restri
 		__libc_memcpy(&THIS_EXCEPTION_DATA,
 		              &self->_aio_multihandle_generic_base_ am_error,
 		              sizeof(self->_aio_multihandle_generic_base_ am_error));
-		error_throw_current();
+		except_throw_current();
 	}
 }
 
@@ -780,7 +780,7 @@ aio_multihandle_generic_checkerror(struct aio_multihandle_generic *__restrict se
 		__libc_memcpy(&THIS_EXCEPTION_DATA,
 		              &self->_aio_multihandle_generic_base_ am_error,
 		              sizeof(self->_aio_multihandle_generic_base_ am_error));
-		error_throw_current();
+		except_throw_current();
 	}
 }
 

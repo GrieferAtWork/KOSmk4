@@ -87,7 +87,7 @@ DECL_BEGIN
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL __asm32_bad_sysenter_extension_impl)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc_info;
-	struct exception_info *info = error_info();
+	struct exception_info *info = except_info();
 
 	/* Fill in system call information */
 	sc_info.rsi_flags   = (RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) |
@@ -101,7 +101,7 @@ NOTHROW(FCALL __asm32_bad_sysenter_extension_impl)(struct icpustate *__restrict 
 
 	/* Fill in exception information. */
 	bzero(info, sizeof(*info));
-	info->ei_code = ERROR_CODEOF(E_SEGFAULT_UNMAPPED);
+	info->ei_code = EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED);
 	info->ei_data.e_args.e_segfault.s_addr    = state->ics_gpregs.gp_ebp;
 	info->ei_data.e_args.e_segfault.s_context = E_SEGFAULT_CONTEXT_FAULT;
 	icpustate_to_kcpustate(state, &info->ei_state);

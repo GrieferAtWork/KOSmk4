@@ -251,7 +251,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				}
 
 				/* Invalid use of the lcall instruction. */
-				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+				PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, 0x9a);
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how,
@@ -300,7 +300,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 					}
 
 					/* Invalid use of the lcall instruction. */
-					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+					PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode,
 					            E_ILLEGAL_INSTRUCTION_X86_OPCODE(0xff, mod.mi_reg));
 					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
@@ -328,7 +328,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				} else {
 					goto generic_failure;
 				}
-				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+				PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode,
 				            E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x0f00, mod.mi_reg));
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags,
@@ -346,7 +346,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 			case EMU86_OPCODE_ENCODE(0x8e):
 				/* MOV Sreg**,r/m16 */
 				MOD_DECODE();
-				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+				PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x8e, mod.mi_reg));
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
@@ -381,7 +381,7 @@ generic_failure:
 		;
 	}
 	/* Fallback: Throw an `E_ILLEGAL_INSTRUCTION_REGISTER' exception */
-	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, EMU86_OPCODE_DECODE(tiny_opcode));
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
@@ -401,7 +401,7 @@ generic_failure:
 unwind_state:
 	PERTASK_SET(this_exception_faultaddr, orig_pc);
 	icpustate_setpc(state, pc);
-	error_throw_current_at_icpustate(state);
+	except_throw_current_at_icpustate(state);
 }
 
 

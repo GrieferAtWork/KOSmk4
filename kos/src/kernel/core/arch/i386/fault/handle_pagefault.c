@@ -849,7 +849,7 @@ do_handle_iob_node_access:
 			if (args.vea_args.va_ops->vo_call && addr == pc) {
 				/* Make sure that memory mapping has execute permissions! */
 				if unlikely(!(node_flags & MNODE_F_PEXEC)) {
-					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+					PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 					PERTASK_SET(this_exception_args.e_segfault.s_context,
 					            E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
 					            E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS());
@@ -940,8 +940,8 @@ do_normal_vio:
 			            ? !(node_flags & MNODE_F_PWRITE)   /* Write to read-only VIO segment */
 			            : !(node_flags & MNODE_F_PREAD)) { /* Read from non-readable VIO segment */
 				PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_WRITING)
-				                                 ? ERROR_CODEOF(E_SEGFAULT_READONLY)
-				                                 : ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
+				                                 ? EXCEPT_CODEOF(E_SEGFAULT_READONLY)
+				                                 : EXCEPT_CODEOF(E_SEGFAULT_NOTREADABLE));
 				PERTASK_SET(this_exception_args.e_segfault.s_context,
 				            E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
 				            E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS());
@@ -993,7 +993,7 @@ do_normal_vio:
 		if unlikely(!(mf.mfl_node->mn_flags & MNODE_F_PEXEC) &&
 		            ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || addr == pc)) {
 			/* Non-executable memory */
-			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+			PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 decref_part_and_pop_connections_and_set_exception_pointers:
 			mman_lock_release(mf.mfl_mman);
 			mfault_fini(&mf);
@@ -1003,13 +1003,13 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		if (mf.mfl_flags & MMAN_FAULT_F_WRITE) {
 			if unlikely(!(mf.mfl_node->mn_flags & MNODE_F_PWRITE)) {
 				/* Read-only memory */
-				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
+				PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_READONLY));
 				goto decref_part_and_pop_connections_and_set_exception_pointers;
 			}
 		} else {
 			if unlikely(!(mf.mfl_node->mn_flags & MNODE_F_PREAD)) {
 				/* Write-only memory */
-				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
+				PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_NOTREADABLE));
 				goto decref_part_and_pop_connections_and_set_exception_pointers;
 			}
 		}
@@ -1173,8 +1173,8 @@ pop_connections_and_throw_segfault:
 		}
 		PERTASK_SET(this_exception_faultaddr, callsite_pc);
 		PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_PRESENT)
-		                                 ? ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE)
-		                                 : ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+		                                 ? EXCEPT_CODEOF(E_SEGFAULT_NOTEXECUTABLE)
+		                                 : EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED));
 		PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)addr);
 		PERTASK_SET(this_exception_args.e_segfault.s_context,
 		            E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
@@ -1192,12 +1192,12 @@ pop_connections_and_throw_segfault:
 not_a_badcall:
 	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) ==
 	    /*    */ (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) {
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
+		PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_READONLY));
 	} else if ((ecode & X86_PAGEFAULT_ECODE_PRESENT) &&
 	           ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (pc == addr))) {
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 	} else {
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+		PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED));
 	}
 set_exception_pointers:
 	PERTASK_SET(this_exception_args.e_segfault.s_context,
@@ -1221,7 +1221,7 @@ set_exception_pointers2:
 	 * into the GPF handler when we see a non-canon address! */
 	if unlikely(ADDR_IS_NONCANON(addr)) {
 handle_noncanon_as_gpf:
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+		PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_OK));
 		return x86_handle_gpf(state, 0);
 	}
 #endif /* __x86_64__ */
@@ -1238,8 +1238,8 @@ do_unwind_state:
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);
-	assert(error_active());
-	error_throw_current_at_icpustate(state);
+	assert(except_active());
+	except_throw_current_at_icpustate(state);
 #undef FAULT_IS_USER
 #undef FAULT_IS_WRITE
 #undef GET_PF_CONTEXT_UW_BITS

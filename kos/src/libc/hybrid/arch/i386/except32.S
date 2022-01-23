@@ -48,7 +48,7 @@ EXTERN(this_exception_args)
 EXTERN(this_exception_faultaddr)
 EXTERN(this_exception_state)
 
-#define FIELD_ERROR_CODE           %fs:this_exception_code
+#define FIELD_EXCEPT_CODE          %fs:this_exception_code
 #define FIELD_ERROR_FLAGS          %fs:this_exception_flags
 #define FIELD_ERROR_TRACE(off)     %fs:this_exception_trace + (off)
 #define FIELD_ERROR_POINTERS(off)  %fs:this_exception_args + (off)
@@ -56,8 +56,8 @@ EXTERN(this_exception_state)
 #define FIELD_ERROR_REGISTERS(off) %fs:this_exception_state + (off)
 #define SECTION_EXCEPT_TEXT        .text
 #else /* __KERNEL__ */
-#define FIELD_ERROR_CODE            OFFSET_EXCEPTION_INFO_CODE(%eax)
-#define FIELD_ERROR_FLAGS           OFFSET_EXCEPTION_INFO_FLAGS(%eax)
+#define FIELD_EXCEPT_CODE          OFFSET_EXCEPTION_INFO_CODE(%eax)
+#define FIELD_ERROR_FLAGS          OFFSET_EXCEPTION_INFO_FLAGS(%eax)
 #define FIELD_ERROR_POINTERS(off)  (OFFSET_EXCEPTION_INFO_POINTERS + (off))(%eax)
 #define FIELD_ERROR_FAULTADDR      (OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_FAULTADDR)(%eax)
 #define FIELD_ERROR_TRACE(off)     (OFFSET_EXCEPTION_INFO_TRACE + (off))(%eax)
@@ -89,24 +89,24 @@ EXTERN(this_exception_state)
 
 
 .section SECTION_EXCEPT_TEXT
-DEFINE_PUBLIC_ALIAS(error_rethrow, libc_error_rethrow)
-INTERN_FUNCTION(libc_error_rethrow)
-	/* ATTR_NORETURN void error_rethrow(void) */
+DEFINE_PUBLIC_ALIAS(except_rethrow, libc_except_rethrow)
+INTERN_FUNCTION(libc_except_rethrow)
+	/* ATTR_NORETURN void except_rethrow(void) */
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY_WITH_CFI_FOR_ESP
-IU(	INTERN(libc_error_info))
-IU(	call   libc_error_info)
+IU(	INTERN(libc_except_info))
+IU(	call   libc_except_info)
 #ifndef NDEBUG
 	.cfi_remember_state
-	cmpl   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
-	je     .Llibc_error_rethrow_outside_catch
+	cmpl   $(EXCEPT_CODEOF(E_OK)), FIELD_EXCEPT_CODE
+	je     .Llibc_except_rethrow_outside_catch
 #endif /* !NDEBUG */
 	orb    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
 .Ldo_unwind_esp:
 	movl   %esp, %ecx
-	INTERN(libc_error_unwind)
-	call   libc_error_unwind
+	INTERN(libc_except_unwind)
+	call   libc_except_unwind
 .Lload_kcpustate_eax:
 	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDI(%eax), %edi
 	.cfi_same_value %edi
@@ -151,22 +151,22 @@ IU(	call   libc_error_info)
 	popl_cfi_r %ecx
 	ret
 #ifndef NDEBUG
-.Llibc_error_rethrow_outside_catch:
+.Llibc_except_rethrow_outside_catch:
 	.cfi_restore_state
 	movl   %esp, %ecx
-	EXTERN(libc_error_badusage_rethrow_outside_catch)
-	call   libc_error_badusage_rethrow_outside_catch
+	EXTERN(libc_except_badusage_rethrow_outside_catch)
+	call   libc_except_badusage_rethrow_outside_catch
 #endif /* !NDEBUG */
 	.cfi_endproc
-END(libc_error_rethrow)
+END(libc_except_rethrow)
 
 /* This function is called when the c++ `throw;' expression is used. */
-DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_error_rethrow)
+DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_except_rethrow)
 
 #ifdef __KERNEL__
 /* NOTE: _Unwind_Resume() is more akin to deemon's `end finally' instruction
- *      (with the exception of not being invoked when a finally wasn't entered
- *       because of an exception), rather than `error_rethrow()', which is
+  *      (with the exception of not being invoked when a finally wasn't entered
+ *       because of an exception), rather than `except_rethrow()', which is
  *       equivalent to `throw except'.
  *       However, since kernel exception handling is rather simplistic, we can
  *       simply handle it the same way we handle rethrow! */
@@ -180,7 +180,7 @@ PUBLIC_FUNCTION(_Unwind_Resume)
 	.cfi_endproc
 END(_Unwind_Resume)
 #else
-DEFINE_PUBLIC_ALIAS(_Unwind_Resume, error_rethrow)
+DEFINE_PUBLIC_ALIAS(_Unwind_Resume, except_rethrow)
 #endif
 
 #else /* __KERNEL__ */
@@ -190,7 +190,7 @@ INTERN_FUNCTION(libc_Unwind_RaiseException)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   %esp, %ecx                       /* except_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_RaiseException_impl)
 	call   libc_Unwind_RaiseException_impl
@@ -205,7 +205,7 @@ INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   %esp, %ecx                       /* except_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_Resume_impl)
 	call   libc_Unwind_Resume_impl
@@ -220,7 +220,7 @@ INTERN_FUNCTION(libc_Unwind_Resume_or_Rethrow)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   %esp, %ecx                       /* except_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_Resume_or_Rethrow_impl)
 	call   libc_Unwind_Resume_or_Rethrow_impl
@@ -235,7 +235,7 @@ INTERN_FUNCTION(libc_Unwind_ForcedUnwind)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   %esp, %ecx                       /* except_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* struct _Unwind_Exception *__restrict exception_object */
 	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp) /* void *stop_arg */
 	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp) /* _Unwind_Stop_Fn stop */
@@ -253,7 +253,7 @@ INTERN_FUNCTION(libc_Unwind_Backtrace)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   %esp, %ecx                       /* except_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* _Unwind_Trace_Fn func */
 	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp) /* void *arg */
 	INTERN(libc_Unwind_Backtrace_impl)
@@ -286,7 +286,7 @@ INTERN_FUNCTION(libc_except_handler3)
 	.cfi_signal_frame
 	.cfi_def_cfa %ecx, SIZEOF_KCPUSTATE
 	CFI_REL_OFFSET_KCPUSTATE_DEFS(0)
-	movl   %ecx, %ebp /* Preserve `error_register_state_t *__restrict state' for unwinding. */
+	movl   %ecx, %ebp /* Preserve `except_register_state_t *__restrict state' for unwinding. */
 	.cfi_def_cfa_register %ebp
 	INTERN(libc_except_handler3_impl)
 	call   libc_except_handler3_impl
@@ -301,7 +301,7 @@ INTERN_FUNCTION(libc_except_handler4)
 	.cfi_signal_frame
 	.cfi_def_cfa %ecx, SIZEOF_KCPUSTATE
 	CFI_REL_OFFSET_KCPUSTATE_DEFS(0)
-	movl   %ecx, %ebp /* Preserve `error_register_state_t *__restrict state' for unwinding. */
+	movl   %ecx, %ebp /* Preserve `except_register_state_t *__restrict state' for unwinding. */
 	.cfi_def_cfa_register %ebp
 	INTERN(libc_except_handler4_impl)
 	call   libc_except_handler4_impl
@@ -323,26 +323,26 @@ DEFINE_PUBLIC_ALIAS(except_handler4, libc_except_handler4)
 
 
 .section SECTION_EXCEPT_TEXT
-DEFINE_PUBLIC_ALIAS(error_thrown, libc_error_thrown)
-INTERN_FUNCTION(libc_error_thrown)
-	/* ATTR_NORETURN void error_thrown(error_code_t code, unsigned int argc, ...) */
+DEFINE_PUBLIC_ALIAS(except_thrown, libc_except_thrown)
+INTERN_FUNCTION(libc_except_thrown)
+	/* ATTR_NORETURN void except_thrown(except_code_t code, unsigned int argc, ...) */
 	.cfi_startproc
 	pushfl_cfi_r
 	pushal_cfi_r
-IU(	INTERN(libc_error_info))
-IU(	call   libc_error_info)
+IU(	INTERN(libc_except_info))
+IU(	call   libc_except_info)
 #ifndef NDEBUG
 	.cfi_remember_state
-	cmpl   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
-	jne    .Llibc_error_thrown_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
+	cmpl   $(EXCEPT_CODEOF(E_OK)), FIELD_EXCEPT_CODE
+	jne    .Llibc_except_thrown_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
 #endif /* !NDEBUG */
 /*	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
 	/* Fill in the per-task exception context. */
 IK(	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
 IK(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
 IK(	movl   %edx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
-	/* The call to `libc_error_info()' (may) have clobbered eax, ecx, edx
-	 * So  instead,  we  must  copy  these  registers  from  the   stack. */
+	/* The call to `libc_except_info()' (may) have clobbered eax, ecx, edx
+	 * So  instead,  we  must  copy   these  registers  from  the   stack. */
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%esp), %ecx)
 IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%esp), %ecx)
@@ -366,7 +366,7 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 	leal   SIZEOF_KCPUSTATE(%esp), %esi /* %esi = &code */
 IK(	movl   $(this_exception_code), %edi)
 IK(	addl   %fs:0, %edi                            /* %edi = &%fs:this_exception_code */)
-IU(	leal   OFFSET_EXCEPTION_INFO_CODE(%eax), %edi /* %edi = &libc_error_info()->ei_code */)
+IU(	leal   OFFSET_EXCEPTION_INFO_CODE(%eax), %edi /* %edi = &libc_except_info()->ei_code */)
 #if EXCEPT_BACKTRACE_SIZE != 0
 IU(	pushl_cfi %eax)
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -394,44 +394,44 @@ IU(	popl_cfi %eax)
 	jmp    .Ldo_unwind_rsp_maybe_fill_trace
 #ifndef NDEBUG
 	.cfi_restore_state
-.Llibc_error_thrown_inside_catch:
+.Llibc_except_thrown_inside_catch:
 	/* Fix %esp within `state' */
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
 	/* Pass arguments */
 	leal   SIZEOF_KCPUSTATE(%esp), %esi /* %esi = &code */
 	lodsl  /* %eax = code */
-	movl   %esp, %ecx /* error_register_state_t const *state */
-	movl   %eax, %edx /* error_code_t code */
+	movl   %esp, %ecx /* except_register_state_t const *state */
+	movl   %eax, %edx /* except_code_t code */
 	lodsl  /* %eax = argc, %edi == &[argv] */
 	pushl_cfi %edi    /* va_list args */
 	pushl_cfi %eax    /* size_t argc */
-	EXTERN(libc_error_badusage_throw_inside_catch)
-	call   libc_error_badusage_throw_inside_catch
+	EXTERN(libc_except_badusage_throw_inside_catch)
+	call   libc_except_badusage_throw_inside_catch
 	nop    /* For unwinding */
 #endif /* !NDEBUG */
 	.cfi_endproc
-END(libc_error_thrown)
+END(libc_except_thrown)
 
 
 
 .section SECTION_EXCEPT_TEXT
-DEFINE_PUBLIC_ALIAS(error_throw, libc_error_throw)
-INTERN_FUNCTION(libc_error_throw)
+DEFINE_PUBLIC_ALIAS(except_throw, libc_except_throw)
+INTERN_FUNCTION(libc_except_throw)
 	.cfi_startproc
-	/* ATTR_NORETURN void FCALL error_throw(error_code_t code) */
+	/* ATTR_NORETURN void FCALL except_throw(except_code_t code) */
 IU(	.cfi_remember_state)
 IU(	pushfl_cfi_r)
 IU(	pushal_cfi_r)
-IU(	INTERN(libc_error_info))
-IU(	call   libc_error_info)
-IU(	movl   OFFSET_GPREGS_ECX(%esp), %ecx) /* Reload %ecx, which may have been clobbered by `libc_error_info()' */
+IU(	INTERN(libc_except_info))
+IU(	call   libc_except_info)
+IU(	movl   OFFSET_GPREGS_ECX(%esp), %ecx) /* Reload %ecx, which may have been clobbered by `libc_except_info()' */
 #ifndef NDEBUG
 IK(	.cfi_remember_state)
-	cmpl   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
-	jne    .Llibc_error_throw_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
+	cmpl   $(EXCEPT_CODEOF(E_OK)), FIELD_EXCEPT_CODE
+	jne    .Llibc_except_throw_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
 #endif /* !NDEBUG */
-	movl   %ecx, FIELD_ERROR_CODE
+	movl   %ecx, FIELD_EXCEPT_CODE
 #if EXCEPTION_DATA_POINTERS != 0
 	.Lindex = 0
 	.rept  EXCEPTION_DATA_POINTERS
@@ -441,20 +441,20 @@ IK(	.cfi_remember_state)
 #endif /* EXCEPTION_DATA_POINTERS != 0 */
 IU(	jmp    1f)
 IU(	.cfi_restore_state)
-DEFINE_PUBLIC_ALIAS(error_throw_current, libc_error_throw_current)
-INTERN_FUNCTION(libc_error_throw_current)
-	/* ATTR_NORETURN void error_throw_current(void) */
+DEFINE_PUBLIC_ALIAS(except_throw_current, libc_except_throw_current)
+INTERN_FUNCTION(libc_except_throw_current)
+	/* ATTR_NORETURN void except_throw_current(void) */
 	pushfl_cfi_r
 	pushal_cfi_r
-IU(	INTERN(libc_error_info))
-IU(	call   libc_error_info)
+IU(	INTERN(libc_except_info))
+IU(	call   libc_except_info)
 IU(1:)
 	/* Fill in the per-task exception context. */
 IK(	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
 IK(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
 IK(	movl   %edx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
-	/* The call to `libc_error_info()' (may) have clobbered eax, ecx, edx
-	 * So  instead,  we  must  copy  these  registers  from  the   stack. */
+	/* The call to `libc_except_info()' (may) have clobbered eax, ecx, edx
+	 * So  instead,  we  must  copy   these  registers  from  the   stack. */
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%esp), %ecx)
 IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%esp), %ecx)
@@ -485,28 +485,28 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 	jmp    .Ldo_unwind_esp
 #ifndef NDEBUG
 IK(	.cfi_restore_state)
-.Llibc_error_throw_inside_catch:
+.Llibc_except_throw_inside_catch:
 IK(	pushfl_cfi_r)
 IK(	pushal_cfi_r)
 	/* Fix %esp within `state' */
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
 	/* Pass arguments */
-	movl   %ecx, %edx /* error_code_t code */
-	movl   %esp, %ecx /* error_register_state_t const *state */
+	movl   %ecx, %edx /* except_code_t code */
+	movl   %esp, %ecx /* except_register_state_t const *state */
 	pushl_cfi $(0)    /* va_list args */
 	pushl_cfi $(0)    /* size_t argc */
-	EXTERN(libc_error_badusage_throw_inside_catch)
-	call   libc_error_badusage_throw_inside_catch
+	EXTERN(libc_except_badusage_throw_inside_catch)
+	call   libc_except_badusage_throw_inside_catch
 	nop    /* For unwinding */
 #endif /* !NDEBUG */
-END(libc_error_throw_current)
+END(libc_except_throw_current)
 	.cfi_endproc
-END(libc_error_throw)
+END(libc_except_throw)
 
 
 #ifndef __INTELLISENSE__
-#undef FIELD_ERROR_CODE
+#undef FIELD_EXCEPT_CODE
 #undef FIELD_ERROR_FLAGS
 #undef FIELD_ERROR_TRACE
 #undef FIELD_ERROR_POINTERS

@@ -238,7 +238,7 @@ LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
 		 * created. */
 		{
 			siginfo_t si;
-			if (error_as_signal(&exc, &si))
+			if (except_as_signal(&exc, &si))
 				signo = si.si_signo;
 		}
 	}

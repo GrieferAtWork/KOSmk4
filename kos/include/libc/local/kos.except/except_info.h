@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27d69ffd */
+/* HASH CRC-32:0x63edfb25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,23 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_data_defined
-#define __local_error_data_defined
+#ifndef __local_except_info_defined
+#define __local_except_info_defined
 #include <__crt.h>
 #include <kos/bits/fastexcept.h>
-#ifdef __arch_error_data
-struct exception_data;
+#ifdef __arch_except_info
+struct exception_info;
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(error_data) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *
-__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_data))(void) {
-	return __arch_error_data();
+__LOCAL_LIBC(except_info) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_info))(void) {
+	return __arch_except_info();
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_data_defined
-#define __local___localdep_error_data_defined
-#define __localdep_error_data __LIBC_LOCAL_NAME(error_data)
-#endif /* !__local___localdep_error_data_defined */
-#else /* __arch_error_data */
-#undef __local_error_data_defined
-#endif /* !__arch_error_data */
-#endif /* !__local_error_data_defined */
+#ifndef __local___localdep_except_info_defined
+#define __local___localdep_except_info_defined
+#define __localdep_except_info __LIBC_LOCAL_NAME(except_info)
+#endif /* !__local___localdep_except_info_defined */
+#else /* __arch_except_info */
+#undef __local_except_info_defined
+#endif /* !__arch_except_info */
+#endif /* !__local_except_info_defined */

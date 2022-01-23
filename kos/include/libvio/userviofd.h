@@ -229,7 +229,7 @@ struct uvio_response_readx {
 
 struct uvio_response_except {
 	UVIO_RESPONSE_HEADER
-	__uintptr_t ur_except_code;                          /* Exception code (one of `ERROR_CODEOF(*)') */
+	__uintptr_t ur_except_code;                          /* Exception code (one of `EXCEPT_CODEOF(*)') */
 	__uintptr_t ur_except_ptrs[EXCEPTION_DATA_POINTERS]; /* Exception pointers */
 };
 
@@ -239,7 +239,7 @@ struct uvio_response_except {
 #define uvio_response_except32      uvio_response_except
 struct uvio_response_except64 {
 	UVIO_RESPONSE_HEADER
-	__uint64_t ur_except_code;                          /* Exception code (one of `ERROR_CODEOF(*)') */
+	__uint64_t ur_except_code;                          /* Exception code (one of `EXCEPT_CODEOF(*)') */
 	__uint64_t ur_except_ptrs[EXCEPTION_DATA_POINTERS]; /* Exception pointers */
 };
 #elif __SIZEOF_POINTER__ == 8
@@ -247,7 +247,7 @@ struct uvio_response_except64 {
 #define uvio_response_except64      uvio_response_except
 struct uvio_response_except32 {
 	UVIO_RESPONSE_HEADER
-	__uint32_t ur_except_code;                          /* Exception code (one of `ERROR_CODEOF(*)') */
+	__uint32_t ur_except_code;                          /* Exception code (one of `EXCEPT_CODEOF(*)') */
 	__uint32_t ur_except_ptrs[EXCEPTION_DATA_POINTERS]; /* Exception pointers */
 };
 #else /* __SIZEOF_POINTER__ == ... */

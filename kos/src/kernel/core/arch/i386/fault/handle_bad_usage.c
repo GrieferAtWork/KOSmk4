@@ -453,7 +453,7 @@ loophint(struct icpustate *__restrict state) {
 /* Fill in missing exception pointer. */
 PRIVATE ABNORMAL_RETURN NOBLOCK ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
-	error_class_t cls;
+	except_class_t cls;
 	cls = PERTASK_GET(this_exception_class);
 	if (cls == E_SEGFAULT) {
 		uintptr_t context;
@@ -481,14 +481,14 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 			icpustate_setpc(self, next_pc);
 		PERTASK_SET(this_exception_faultaddr, pc);
 	}
-	error_throw_current_at_icpustate(self);
+	except_throw_current_at_icpustate(self);
 }
 
 /* Fill in missing exception pointer. */
 PRIVATE ABNORMAL_RETURN NOBLOCK ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL complete_except_switch)(struct icpustate *__restrict self,
                                       uintptr_t opcode, uintptr_t op_flags) {
-	error_class_t cls = PERTASK_GET(this_exception_class);
+	except_class_t cls = PERTASK_GET(this_exception_class);
 	if (cls == E_ILLEGAL_INSTRUCTION) {
 		if (!PERTASK_GET(this_exception_args.e_illegal_instruction.ii_opcode))
 			PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, opcode);
@@ -500,7 +500,7 @@ NOTHROW(FCALL complete_except_switch)(struct icpustate *__restrict self,
 
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL throw_illegal_instruction_exception)(struct icpustate *__restrict state,
-                                                   error_code_t code, uintptr_t opcode,
+                                                   except_code_t code, uintptr_t opcode,
                                                    uintptr_t op_flags, uintptr_t ptr2,
                                                    uintptr_t ptr3, uintptr_t ptr4,
                                                    uintptr_t ptr5, uintptr_t ptr6) {
@@ -524,12 +524,12 @@ NOTHROW(FCALL throw_illegal_instruction_exception)(struct icpustate *__restrict 
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);
-	error_throw_current_at_icpustate(state);
+	except_throw_current_at_icpustate(state);
 }
 
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL throw_exception)(struct icpustate *__restrict state,
-                               error_code_t code, uintptr_t ptr0,
+                               except_code_t code, uintptr_t ptr0,
                                uintptr_t ptr1) {
 	unsigned int i;
 	void const *pc, *next_pc;
@@ -543,7 +543,7 @@ NOTHROW(FCALL throw_exception)(struct icpustate *__restrict state,
 	PERTASK_SET(this_exception_args.e_pointers[1], ptr1);
 	for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], 0);
-	error_throw_current_at_icpustate(state);
+	except_throw_current_at_icpustate(state);
 }
 
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
@@ -563,7 +563,7 @@ NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict st
 	if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_UD) {
 		/* #UD simply results in a generic BAD_OPCODE exception! */
 		throw_illegal_instruction_exception(state,
-		                                    ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE),
+		                                    EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE),
 		                                    opcode, op_flags, 0, 0, 0, 0, 0);
 	} else {
 		u16 segval;
@@ -603,7 +603,7 @@ NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict st
 #endif /* !__x86_64__ && !__I386_NO_VM86 */
 		    1) {
 			/* Throw a NULL-segment exception. */
-			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),
+			throw_illegal_instruction_exception(state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),
 			                                    /* opcode:   */ opcode,
 			                                    /* op_flags: */ op_flags,
 			                                    /* how:      */ E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
@@ -634,7 +634,7 @@ NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict st
 			                    "[pc=%p,opcode=%#" PRIxPTR ",opflags=%#" PRIx32 "]\n",
 			       icpustate_getpc(state), opcode, op_flags);
 			throw_exception(state,
-			                ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
+			                EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED),
 			                X86_64_ADDRBUS_NONCANON_MIN,
 			                icpustate_isuser(state)
 			                ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE
@@ -650,17 +650,17 @@ NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict st
 			 * When  EFLAGS.AC is set,  we default to  throwing an `E_SEGFAULT_UNALIGNED' exception! */
 			if (icpustate_getpflags(state) & EFLAGS_AC) {
 				throw_exception(state,
-				                ERROR_CODEOF(E_SEGFAULT_UNALIGNED), 0,
+				                EXCEPT_CODEOF(E_SEGFAULT_UNALIGNED), 0,
 				                icpustate_isuser(state)
 				                ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE
 				                : E_SEGFAULT_CONTEXT_NONCANON);
 			}
-			throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE),
+			throw_illegal_instruction_exception(state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE),
 			                                    opcode, op_flags, 0, 0, 0, 0, 0);
 		}
 
 		/* In kernel space, this one's a wee bit more complicated... */
-		throw_illegal_instruction_exception(state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT),
+		throw_illegal_instruction_exception(state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT),
 		                                    opcode, op_flags, BAD_USAGE_INTNO(usage),
 		                                    BAD_USAGE_ECODE(usage), segval, 0, 0);
 	}
@@ -674,7 +674,7 @@ NOTHROW(FCALL throw_unsupported_instruction)(struct icpustate *__restrict state,
 		/* An unsupported instruction caused a #UD
 		 * -> Throw an UNSUPPORTED_OPCODE exception */
 		throw_illegal_instruction_exception(state,
-		                                    ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE),
+		                                    EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE),
 		                                    opcode, op_flags, 0, 0, 0, 0, 0);
 	} else {
 		/* An unsupported instruction caused a #GPF or #SS
@@ -685,18 +685,18 @@ NOTHROW(FCALL throw_unsupported_instruction)(struct icpustate *__restrict state,
 
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION()           throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags, 0xff)
 #define EMU86_EMULATE_RETURN_UNKNOWN_INSTRUCTION_RMREG()     throw_generic_unknown_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags, EMU86_MODRM_ISMEM(modrm.mi_type) ? modrm.mi_rm : 0xff)
-#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER, _EMU86_GETMODRM_RM_GPREGNO(), 0, _EMU86_GETMODRM_RM_GPREGVAL(), 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER, _EMU86_GETMODRM_RM_GPREGNO(), 0, _EMU86_GETMODRM_RM_GPREGVAL(), 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY, 0, _EMU86_GETMODRM_RM_MEMADDR(), 0, 0)
-#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY, 0, _EMU86_GETMODRM_RM_MEMADDR(), 0, 0)
-#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX()             throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0, 0)
-#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX_RMREG()       throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION()        throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_PRIVILEGED_INSTRUCTION_RMREG()  throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM()         throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER, _EMU86_GETMODRM_RM_GPREGNO(), 0, _EMU86_GETMODRM_RM_GPREGVAL(), 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_MEMORY_MODRM_RMREG()   throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER, _EMU86_GETMODRM_RM_GPREGNO(), 0, _EMU86_GETMODRM_RM_GPREGVAL(), 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM()       throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY, 0, _EMU86_GETMODRM_RM_MEMADDR(), 0, 0)
+#define EMU86_EMULATE_RETURN_EXPECTED_REGISTER_MODRM_RMREG() throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND), _EMU86_GETOPCODE_RMREG(), op_flags, E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY, 0, _EMU86_GETMODRM_RM_MEMADDR(), 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX()             throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE(), op_flags, 0, 0, 0, 0, 0)
+#define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX_RMREG()       throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags)
 #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, offset, regval, regval2) \
-	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
+	throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
 	                                    /* opcode:   */ _EMU86_GETOPCODE(),                   \
 	                                    /* op_flags: */ op_flags,                             \
 	                                    /* how:      */ how,                                  \
@@ -705,7 +705,7 @@ NOTHROW(FCALL throw_unsupported_instruction)(struct icpustate *__restrict state,
 	                                    /* regval:   */ regval,                               \
 	                                    /* regval2:  */ regval2)
 #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, offset, regval, regval2) \
-	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),       \
+	throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),       \
 	                                    /* opcode:   */ _EMU86_GETOPCODE_RMREG(),                   \
 	                                    /* op_flags: */ op_flags,                                   \
 	                                    /* how:      */ how,                                        \
@@ -714,7 +714,7 @@ NOTHROW(FCALL throw_unsupported_instruction)(struct icpustate *__restrict state,
 	                                    /* regval:   */ regval,                                     \
 	                                    /* regval2:  */ regval2)
 #define EMU86_EMULATE_RETURN_AFTER_XEND()                                                               \
-	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), \
+	throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), \
 	                                    _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
 
 #define EMU86_EMULATE_GETOPFLAGS() emu86_opflags_from_icpustate(_state)
@@ -1110,7 +1110,7 @@ assert_canonical_pc(struct icpustate *__restrict state,
 		}
 set_noncanon_pc_exception:
 		PERTASK_SET(this_exception_faultaddr, callsite_pc);
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+		PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED));
 		PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)pc);
 		PERTASK_SET(this_exception_args.e_segfault.s_context,
 		            E_SEGFAULT_CONTEXT_USERCODE |
@@ -1126,7 +1126,7 @@ set_noncanon_pc_exception:
 		icpustate_setpc(state, callsite_pc);
 		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF]\n",
 		       pc, callsite_pc);
-		error_throw_current_at_icpustate(state);
+		except_throw_current_at_icpustate(state);
 	}
 }
 

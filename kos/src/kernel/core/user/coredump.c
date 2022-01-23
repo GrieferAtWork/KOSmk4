@@ -110,8 +110,8 @@ dbg_coredump(void const *const *traceback_vector,
 		if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
 			siginfo_t siginfo;
 			unsigned int i;
-			error_print_short_description(&dbg_printer, NULL, &reason->ci_except,
-			                              ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY);
+			except_print_short_description(&dbg_printer, NULL, &reason->ci_except,
+			                               EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY);
 			dbg_putc('\n');
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
 				if (!reason->ci_except.e_args.e_pointers[i])
@@ -120,7 +120,7 @@ dbg_coredump(void const *const *traceback_vector,
 				           i, reason->ci_except.e_args.e_pointers[i],
 				           reason->ci_except.e_args.e_pointers[i]);
 			}
-			if (error_as_signal(&reason->ci_except, &siginfo)) {
+			if (except_as_signal(&reason->ci_except, &siginfo)) {
 				dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n"),
 				           siginfo.si_signo);
 				if (siginfo.si_code != 0) {
@@ -316,8 +316,8 @@ coredump_create(struct ucpustate const *curr_ustate,
 		if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
 			siginfo_t siginfo;
 			unsigned int i;
-			error_print_short_description(&syslog_printer, SYSLOG_LEVEL_ERR, &reason->ci_except,
-			                              ERROR_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL);
+			except_print_short_description(&syslog_printer, SYSLOG_LEVEL_ERR, &reason->ci_except,
+			                               EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL);
 			printk(KERN_ERR "\n");
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
 				if (!reason->ci_except.e_args.e_pointers[i])
@@ -326,7 +326,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 				       i, reason->ci_except.e_args.e_pointers[i],
 				       reason->ci_except.e_args.e_pointers[i]);
 			}
-			if (error_as_signal(&reason->ci_except, &siginfo)) {
+			if (except_as_signal(&reason->ci_except, &siginfo)) {
 				printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n",
 				       siginfo.si_signo);
 				if (siginfo.si_code != 0) {
@@ -385,7 +385,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_COREDUMP)) {
 		siginfo_t siginfo;
-		if (!error_as_signal(error_data(), &siginfo))
+		if (!except_as_signal(except_data(), &siginfo))
 			siginfo.si_signo = SIGABRT;
 #if 1
 		/* Trigger a debugger trap at last valid text location. */

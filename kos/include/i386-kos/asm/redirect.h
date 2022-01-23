@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 
 /* Max # of bytes which may be modified by `__arch_redirect()'
- * You can test if redirection is supported on your arch via:
+ * You  can test if redirection is supported on your arch via:
  * >> #if __ARCH_REDIRECT_MAXBYTES != 0 */
 #define __ARCH_REDIRECT_MAXBYTES 5
 

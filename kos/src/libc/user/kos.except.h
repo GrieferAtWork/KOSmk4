@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf525d9 */
+/* HASH CRC-32:0x5c5beb73 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,29 +30,29 @@
 
 DECL_BEGIN
 
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_data *NOTHROW(LIBKCALL libc_error_data)(void);
-INTDEF ATTR_PURE WUNUSED error_code_t NOTHROW(LIBKCALL libc_error_code)(void);
-INTDEF ATTR_PURE WUNUSED bool NOTHROW(LIBKCALL libc_error_active)(void);
-INTDEF ATTR_PURE WUNUSED error_class_t NOTHROW(LIBKCALL libc_error_class)(void);
-INTDEF ATTR_PURE WUNUSED error_subclass_t NOTHROW(LIBKCALL libc_error_subclass)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED error_register_state_t *NOTHROW(LIBKCALL libc_error_register_state)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW(LIBKCALL libc_error_info)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_data *NOTHROW(LIBKCALL libc_except_data)(void);
+INTDEF ATTR_PURE WUNUSED except_code_t NOTHROW(LIBKCALL libc_except_code)(void);
+INTDEF ATTR_PURE WUNUSED bool NOTHROW(LIBKCALL libc_except_active)(void);
+INTDEF ATTR_PURE WUNUSED except_class_t NOTHROW(LIBKCALL libc_except_class)(void);
+INTDEF ATTR_PURE WUNUSED except_subclass_t NOTHROW(LIBKCALL libc_except_subclass)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED except_register_state_t *NOTHROW(LIBKCALL libc_except_register_state)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW(LIBKCALL libc_except_info)(void);
 /* Unwind the given register state to propagate the currently set error.
  * Following this, the  returned register state  should then be  loaded. */
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) error_register_state_t *NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restrict state);
-/* Throw the currently set (in `error_data()') exception. */
-INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_error_throw_current)(void) THROWS(...);
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) except_register_state_t *NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__restrict state);
+/* Throw the currently set (in `except_data()') exception. */
+INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_throw_current)(void) THROWS(...);
 /* Rethrow the current exception (same as a c++ `throw;' expression) */
-INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_error_rethrow)(void) THROWS(...);
+INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_rethrow)(void) THROWS(...);
 /* Throw an exception and fill exception pointers with all zeroes */
-INTDEF ATTR_COLD ATTR_NORETURN void (__ERROR_THROW_CC libc_error_throw)(error_code_t code) THROWS(...);
+INTDEF ATTR_COLD ATTR_NORETURN void (__EXCEPT_THROW_CC libc_except_throw)(except_code_t code) THROWS(...);
 /* Throw an exception and load `argc' pointers from varargs */
-INTDEF ATTR_COLD ATTR_NORETURN void (__ERROR_THROWN_CC libc_error_thrown)(error_code_t code, unsigned int _argc, ...) THROWS(...);
+INTDEF ATTR_COLD ATTR_NORETURN void (__EXCEPT_THROWN_CC libc_except_thrown)(except_code_t code, unsigned int _argc, ...) THROWS(...);
 #ifndef __KERNEL__
 /* Assertion check handler for missing `TRY' nesting */
-INTDEF ATTR_COLD ATTR_NORETURN void NOTHROW(LIBCCALL libc__error_badusage_no_nesting)(void);
+INTDEF ATTR_COLD ATTR_NORETURN void NOTHROW(LIBCCALL libc__except_badusage_no_nesting)(void);
 /* Assert that a TRY-block is currently allowed (iow: that no error is active) */
-INTDEF void NOTHROW(LIBCCALL libc__error_check_no_nesting)(void);
+INTDEF void NOTHROW(LIBCCALL libc__except_check_no_nesting)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

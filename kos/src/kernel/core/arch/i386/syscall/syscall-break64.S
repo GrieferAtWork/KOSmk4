@@ -58,8 +58,8 @@ INTERN_FUNCTION(sys_break0)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(0)), %rdx /* pointers[0] = flags */
 	movq   $(2), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 END(sys_break0)
 
 INTERN_FUNCTION(sys_break1)
@@ -67,8 +67,8 @@ INTERN_FUNCTION(sys_break1)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(1)), %rdx /* pointers[0] = flags */
 	movq   $(3), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 END(sys_break1)
 
 INTERN_FUNCTION(sys_break2)
@@ -77,8 +77,8 @@ INTERN_FUNCTION(sys_break2)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(2)), %rdx /* pointers[0] = flags */
 	movq   $(4), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 END(sys_break2)
 
 INTERN_FUNCTION(sys_break3)
@@ -88,8 +88,8 @@ INTERN_FUNCTION(sys_break3)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(3)), %rdx /* pointers[0] = flags */
 	movq   $(5), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_adjust_cfa_offset -8
 END(sys_break3)
 
@@ -101,8 +101,8 @@ INTERN_FUNCTION(sys_break4)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(4)), %rdx /* pointers[0] = flags */
 	movq   $(6), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_adjust_cfa_offset -16
 END(sys_break4)
 
@@ -115,8 +115,8 @@ INTERN_FUNCTION(sys_break5)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(5)), %rdx /* pointers[0] = flags */
 	movq   $(7), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_adjust_cfa_offset -24
 END(sys_break5)
 
@@ -130,8 +130,8 @@ INTERN_FUNCTION(sys_break6)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(6)), %rdx /* pointers[0] = flags */
 	movq   $(8), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_adjust_cfa_offset -32
 END(sys_break6)
 
@@ -171,8 +171,8 @@ INTERN_FUNCTION(sys32_break0)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(0)), %rdx /* pointers[0] = flags */
 	movq   $(2), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 END(sys32_break0)
 
 INTERN_FUNCTION(sys32_break1)
@@ -180,8 +180,8 @@ INTERN_FUNCTION(sys32_break1)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(1)), %rdx /* pointers[0] = flags */
 	movq   $(3), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 END(sys32_break1)
 
 INTERN_FUNCTION(sys32_break2)
@@ -190,8 +190,8 @@ INTERN_FUNCTION(sys32_break2)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(2)), %rdx /* pointers[0] = flags */
 	movq   $(4), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 END(sys32_break2)
 
 INTERN_FUNCTION(sys32_break3)
@@ -201,8 +201,8 @@ INTERN_FUNCTION(sys32_break3)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(3)), %rdx /* pointers[0] = flags */
 	movq   $(5), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_adjust_cfa_offset -8
 END(sys32_break3)
 
@@ -214,8 +214,8 @@ INTERN_FUNCTION(sys32_break4)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(4)), %rdx /* pointers[0] = flags */
 	movq   $(6), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_adjust_cfa_offset -16
 END(sys32_break4)
 
@@ -228,8 +228,8 @@ INTERN_FUNCTION(sys32_break5)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(5)), %rdx /* pointers[0] = flags */
 	movq   $(7), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_adjust_cfa_offset -24
 END(sys32_break5)
 
@@ -243,8 +243,8 @@ INTERN_FUNCTION(sys32_break6)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(6)), %rdx /* pointers[0] = flags */
 	movq   $(8), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   except_thrown
 	.cfi_adjust_cfa_offset -32
 END(sys32_break6)
 

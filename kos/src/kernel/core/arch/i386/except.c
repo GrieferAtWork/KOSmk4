@@ -79,14 +79,14 @@ print_unhandled_exception(pformatprinter printer, void *arg,
                           char const *reason, va_list args) {
 	unsigned int i;
 	bool is_first_pointer;
-	struct exception_info info, *tls = error_info();
+	struct exception_info info, *tls = except_info();
 	struct regdump_printer rd_printer;
 	memcpy(&info, tls, sizeof(struct exception_info));
-	tls->ei_code = ERROR_CODEOF(E_OK);
+	tls->ei_code = EXCEPT_CODEOF(E_OK);
 
 	/* Dump the exception that occurred. */
-	error_print_short_description(printer, arg, &info.ei_data,
-	                              ERROR_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL);
+	except_print_short_description(printer, arg, &info.ei_data,
+	                               EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL);
 	if (reason) {
 		(*printer)(arg, "\nThrown when: ", COMPILER_STRLEN("\nThrown when: "));
 		format_vprintf(printer, arg, reason, args);
@@ -135,7 +135,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 
 /* Print information about the current exception into `printer' */
 PUBLIC NONNULL((1)) ssize_t
-NOTHROW(KCALL error_print_into)(pformatprinter printer, void *arg) {
+NOTHROW(KCALL except_print_into)(pformatprinter printer, void *arg) {
 	va_list empty_args;
 	bzero((void *)&empty_args, sizeof(empty_args));
 	print_unhandled_exception(printer, arg, printer, arg, NULL, empty_args);
@@ -144,17 +144,17 @@ NOTHROW(KCALL error_print_into)(pformatprinter printer, void *arg) {
 }
 
 PUBLIC void
-NOTHROW(KCALL error_vprintf)(char const *__restrict reason, va_list args) {
+NOTHROW(KCALL except_vprintf)(char const *__restrict reason, va_list args) {
 	print_unhandled_exception(&syslog_printer, SYSLOG_LEVEL_ERR,
 	                          &syslog_printer, SYSLOG_LEVEL_RAW,
 	                          reason, args);
 }
 
 PUBLIC void
-NOTHROW(VCALL error_printf)(char const *__restrict reason, ...) {
+NOTHROW(VCALL except_printf)(char const *__restrict reason, ...) {
 	va_list args;
 	va_start(args, reason);
-	error_vprintf(reason, args);
+	except_vprintf(reason, args);
 	va_end(args);
 }
 
@@ -167,8 +167,8 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	bool is_first_pointer;
 	instrlen_isa_t isa;
 	/* Dump the exception that occurred. */
-	error_print_short_description(&dbg_printer, NULL, &info->ei_data,
-	                              ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY);
+	except_print_short_description(&dbg_printer, NULL, &info->ei_data,
+	                               EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY);
 	dbg_putc('\n');
 	is_first_pointer = true;
 	/* Print exception pointers. */
@@ -249,7 +249,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 	print_unhandled_exception(&syslog_printer, SYSLOG_LEVEL_EMERG,
 	                          &syslog_printer, SYSLOG_LEVEL_RAW,
 	                          NULL, NULL);
-	info = error_info();
+	info = except_info();
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
@@ -289,7 +289,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT)) {
 		siginfo_t si;
-		if (!error_as_signal(&info->ei_data, &si))
+		if (!except_as_signal(&info->ei_data, &si))
 			si.si_signo = SIGABRT;
 		kernel_debugtrap(&info->ei_state, si.si_signo);
 	}

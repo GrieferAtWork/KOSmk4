@@ -110,7 +110,7 @@ GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 		/* Try to rewind an `int3' or `int $3' instruction.
 		 * If this succeeds, set the `swbreak' register when triggering the trap. */
 		byte_t instr;
-		memcpy(&old_error, error_info(), sizeof(old_error));
+		memcpy(&old_error, except_info(), sizeof(old_error));
 		TRY {
 			instr = pc[-1];
 		} EXCEPT {
@@ -141,7 +141,7 @@ set_trap:
 	state = GDBServer_TrapICpuState(state, &reason);
 	return state;
 restore_except_and_set_trap:
-	memcpy(error_info(), &old_error, sizeof(old_error));
+	memcpy(except_info(), &old_error, sizeof(old_error));
 	goto set_trap;
 }
 

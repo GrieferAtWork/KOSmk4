@@ -159,14 +159,14 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 	/* Fallback: Throw an E_BREAKPOINT exception. */
-	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_BREAKPOINT));
+	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_BREAKPOINT));
 	PERTASK_SET(this_exception_faultaddr, faultpc);
 	{
 		unsigned int i;
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_args.e_pointers[i], 0);
 	}
-	error_throw_current_at_icpustate(state);
+	except_throw_current_at_icpustate(state);
 }
 
 

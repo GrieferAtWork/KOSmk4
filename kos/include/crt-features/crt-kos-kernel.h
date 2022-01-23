@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1aadc2e */
+/* HASH CRC-32:0x62294c3a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@
 #define __CRT_HAVE___gxx_personality_v0
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_guard
-#define __CRT_HAVE__error_badusage_no_nesting
-#define __CRT_HAVE__error_check_no_nesting
+#define __CRT_HAVE__except_badusage_no_nesting
+#define __CRT_HAVE__except_check_no_nesting
 #define __CRT_HAVE__itoa_digits
 #define __CRT_HAVE_abort
 #define __CRT_HAVE_bitcpy
@@ -46,25 +46,25 @@
 #define __CRT_HAVE_bzeroq
 #define __CRT_HAVE_bzerow
 #define __CRT_HAVE_cfmakesane
-#define __CRT_HAVE_error_active
-#define __CRT_HAVE_error_as_errno
-#define __CRT_HAVE_error_as_signal
-#define __CRT_HAVE_error_class
-#define __CRT_HAVE_error_code
-#define __CRT_HAVE_error_data
-#define __CRT_HAVE_error_info
-#define __CRT_HAVE_error_name
-#define __CRT_HAVE_error_nesting_begin
-#define __CRT_HAVE_error_nesting_end
-#define __CRT_HAVE_error_print_short_description
-#define __CRT_HAVE_error_priority
-#define __CRT_HAVE_error_register_state
-#define __CRT_HAVE_error_rethrow
-#define __CRT_HAVE_error_subclass
-#define __CRT_HAVE_error_throw
-#define __CRT_HAVE_error_throw_current
-#define __CRT_HAVE_error_thrown
-#define __CRT_HAVE_error_unwind
+#define __CRT_HAVE_except_active
+#define __CRT_HAVE_except_as_errno
+#define __CRT_HAVE_except_as_signal
+#define __CRT_HAVE_except_class
+#define __CRT_HAVE_except_code
+#define __CRT_HAVE_except_data
+#define __CRT_HAVE_except_info
+#define __CRT_HAVE_except_name
+#define __CRT_HAVE_except_nesting_begin
+#define __CRT_HAVE_except_nesting_end
+#define __CRT_HAVE_except_print_short_description
+#define __CRT_HAVE_except_priority
+#define __CRT_HAVE_except_register_state
+#define __CRT_HAVE_except_rethrow
+#define __CRT_HAVE_except_subclass
+#define __CRT_HAVE_except_throw
+#define __CRT_HAVE_except_throw_current
+#define __CRT_HAVE_except_thrown
+#define __CRT_HAVE_except_unwind
 #define __CRT_HAVE_format_escape
 #define __CRT_HAVE_format_hexdump
 #define __CRT_HAVE_format_length

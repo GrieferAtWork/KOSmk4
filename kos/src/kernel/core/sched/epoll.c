@@ -1194,15 +1194,15 @@ again_acquire:
 			/* Try to cancel delivery of the RPC. */
 			canceled_rpc = ATOMIC_XCH(newmon->ehm_rpc, NULL);
 			if (canceled_rpc == NULL) {
-				error_code_t code = error_code();
+				except_code_t code = except_code();
 				/* RPC was already triggered. - This is bad since we can't
 				 * indicate to our caller that the system call failed,  as
 				 * it really didn't. (The RPC got send...) */
-				if (ERRORCLASS_ISRTLPRIORITY(ERROR_CLASS(code)))
+				if (EXCEPTCLASS_ISRTLPRIORITY(EXCEPT_CLASS(code)))
 					RETHROW(); /* Too important to simply discard... */
-				if (code != ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+				if (code != EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 					/* Sorry, but I can't propagate this exception */
-					error_printf("Testing RPC epoll monitor");
+					except_printf("Testing RPC epoll monitor");
 				} else {
 					/* ~breath-of-relieve~ It's only an interrupt request... */
 				}

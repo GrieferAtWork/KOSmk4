@@ -1532,7 +1532,7 @@ static_assert(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 /* struct __exception_exit_thread_data32 */
 /* ... */
 
-/* struct __exception_fserror_data32 */
+/* struct __exception_fsexcept_data32 */
 /* ... */
 
 /* struct __exception_illegal_instruction_data32 */
@@ -1541,7 +1541,7 @@ static_assert(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 /* struct __exception_illegal_operation_data32 */
 /* ... */
 
-/* struct __exception_index_error_data32 */
+/* struct __exception_index_except_data32 */
 /* ... */
 
 /* struct __exception_insufficient_rights_data32 */
@@ -1553,10 +1553,10 @@ static_assert(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 /* struct __exception_invalid_handle_data32 */
 /* ... */
 
-/* struct __exception_ioerror_data32 */
+/* struct __exception_ioexcept_data32 */
 /* ... */
 
-/* struct __exception_net_error_data32 */
+/* struct __exception_net_except_data32 */
 /* ... */
 
 /* struct __exception_not_executable_data32 */
@@ -1609,7 +1609,7 @@ static_assert(sizeof(struct __exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 /* struct __exception_exit_thread_data64 */
 /* ... */
 
-/* struct __exception_fserror_data64 */
+/* struct __exception_fsexcept_data64 */
 /* ... */
 
 /* struct __exception_illegal_instruction_data64 */
@@ -1618,7 +1618,7 @@ static_assert(sizeof(struct __exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 /* struct __exception_illegal_operation_data64 */
 /* ... */
 
-/* struct __exception_index_error_data64 */
+/* struct __exception_index_except_data64 */
 /* ... */
 
 /* struct __exception_insufficient_rights_data64 */
@@ -1630,10 +1630,10 @@ static_assert(sizeof(struct __exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 /* struct __exception_invalid_handle_data64 */
 /* ... */
 
-/* struct __exception_ioerror_data64 */
+/* struct __exception_ioexcept_data64 */
 /* ... */
 
-/* struct __exception_net_error_data64 */
+/* struct __exception_net_except_data64 */
 /* ... */
 
 /* struct __exception_not_executable_data64 */
@@ -2502,15 +2502,15 @@ static_assert(SEGMENT_IS_VALID_USERDATA(SEGMENT_USER_DATA32_RPL));
 
 #include <kos/bits/exception_data32.h>
 #include <kos/bits/exception_data64.h>
-static_assert(__SIZEOF_ERROR_CODE32_T__ == sizeof(__error_code32_t));
-static_assert(__SIZEOF_ERROR_CLASS32_T__ == sizeof(__error_class32_t));
-static_assert(__SIZEOF_ERROR_SUBCLASS32_T__ == sizeof(__error_subclass32_t));
-static_assert(__SIZEOF_ERROR_CODE64_T__ == sizeof(__error_code64_t));
-static_assert(__SIZEOF_ERROR_CLASS64_T__ == sizeof(__error_class64_t));
-static_assert(__SIZEOF_ERROR_SUBCLASS64_T__ == sizeof(__error_subclass64_t));
-static_assert(__SIZEOF_ERROR_CODE_T__ == sizeof(__error_code_t));
-static_assert(__SIZEOF_ERROR_CLASS_T__ == sizeof(__error_class_t));
-static_assert(__SIZEOF_ERROR_SUBCLASS_T__ == sizeof(__error_subclass_t));
+static_assert(__SIZEOF_EXCEPT_CODE32_T__ == sizeof(__except_code32_t));
+static_assert(__SIZEOF_EXCEPT_CLASS32_T__ == sizeof(__except_class32_t));
+static_assert(__SIZEOF_EXCEPT_SUBCLASS32_T__ == sizeof(__except_subclass32_t));
+static_assert(__SIZEOF_EXCEPT_CODE64_T__ == sizeof(__except_code64_t));
+static_assert(__SIZEOF_EXCEPT_CLASS64_T__ == sizeof(__except_class64_t));
+static_assert(__SIZEOF_EXCEPT_SUBCLASS64_T__ == sizeof(__except_subclass64_t));
+static_assert(__SIZEOF_EXCEPT_CODE_T__ == sizeof(__except_code_t));
+static_assert(__SIZEOF_EXCEPT_CLASS_T__ == sizeof(__except_class_t));
+static_assert(__SIZEOF_EXCEPT_SUBCLASS_T__ == sizeof(__except_subclass_t));
 
 #include <bits/os/kos/mcontext32.h>
 static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_EDI]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_edi));

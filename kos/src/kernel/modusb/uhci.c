@@ -779,7 +779,7 @@ NOTHROW(FCALL uhci_osqh_aio_docomplete)(struct aio_handle *__restrict aio,
 PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict UNUSED(self),
                                            struct uhci_osqh *__restrict osqh,
-                                           error_code_t code,
+                                           except_code_t code,
                                            uintptr_t io_reason,
                                            uintptr_t pointer2 DFL(0)) {
 	struct aio_handle *aio;
@@ -790,7 +790,7 @@ NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict UN
 	if likely(!(ATOMIC_READ(aio_data->ud_flags) & UHCI_AIO_FSERVED)) {
 		struct exception_data odata;
 		struct exception_data *mydat;
-		mydat = error_data();
+		mydat = except_data();
 		odata = *mydat;
 		bzero(mydat, sizeof(*mydat));
 		mydat->e_code                       = code;
@@ -831,7 +831,7 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 				/* Shouldn't actually get here... From what I can tell, on working
 				 * hardware,  this should be handled in `uhci_finish_completed()'. */
 				uhci_osqh_completed_ioerror(self, osqh,
-				                            ERROR_CODEOF(E_IOERROR_NODATA),
+				                            EXCEPT_CODEOF(E_IOERROR_NODATA),
 				                            E_IOERROR_REASON_USB_SHORTPACKET);
 				return;
 			}
@@ -868,7 +868,7 @@ short_packet_ok:
 		           UHCI_TDCS_DBE | UHCI_TDCS_STALL |
 		           UHCI_TDCS_ACTIVE)) != 0) {
 			uhci_osqh_completed_ioerror(self, osqh,
-			                            ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                            EXCEPT_CODEOF(E_IOERROR_ERRORBIT),
 			                            E_IOERROR_REASON_UHCI_TDCS,
 			                            cs);
 			return;
@@ -921,13 +921,13 @@ do_stop:
 PRIVATE NOBLOCK ATTR_NOINLINE unsigned int
 NOTHROW(FCALL uhci_int_completed_ioerror)(struct uhci_interrupt *__restrict ui,
                                           void const *data, size_t datalen,
-                                          error_code_t code,
+                                          except_code_t code,
                                           uintptr_t io_reason,
                                           uintptr_t pointer2 DFL(0)) {
 	unsigned int result;
 	struct exception_data odata;
 	struct exception_data *mydat;
-	mydat = error_data();
+	mydat = except_data();
 	odata = *mydat;
 	bzero(mydat, sizeof(*mydat));
 	mydat->e_code                       = code;
@@ -966,7 +966,7 @@ NOTHROW(FCALL uhci_int_completed)(struct uhci_controller *__restrict self,
 		if (actlen < maxlen) {
 			if unlikely(cs & UHCI_TDCS_SPD) {
 				result = uhci_int_completed_ioerror(ui, ent->ife_buf, retsize,
-				                                    ERROR_CODEOF(E_IOERROR_NODATA),
+				                                    EXCEPT_CODEOF(E_IOERROR_NODATA),
 				                                    E_IOERROR_REASON_USB_SHORTPACKET);
 				goto done;
 			}
@@ -1004,7 +1004,7 @@ short_packet_ok:
 		           UHCI_TDCS_DBE | UHCI_TDCS_STALL |
 		           UHCI_TDCS_ACTIVE)) != 0) {
 			result = uhci_int_completed_ioerror(ui, ent->ife_buf, retsize,
-			                                    ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                                    EXCEPT_CODEOF(E_IOERROR_ERRORBIT),
 			                                    E_IOERROR_REASON_UHCI_TDCS,
 			                                    cs);
 			goto done;
@@ -1073,7 +1073,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, ep);
 			HW_WRITE(qh->qh_ep, UHCI_QHEP_TERM);
 			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
-			                                          ERROR_CODEOF(E_IOERROR_NODATA),
+			                                          EXCEPT_CODEOF(E_IOERROR_NODATA),
 			                                          E_IOERROR_REASON_UHCI_BADEP,
 			                                          ep);
 			goto done_qh;
@@ -1093,7 +1093,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 					                "uhci:int:short-packet (%" PRIu16 " < %" PRIu16 ")\n",
 					       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, actlen, maxlen);
 					restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
-					                                          ERROR_CODEOF(E_IOERROR_NODATA),
+					                                          EXCEPT_CODEOF(E_IOERROR_NODATA),
 					                                          E_IOERROR_REASON_USB_SHORTPACKET);
 					goto done_qh;
 				}
@@ -1107,7 +1107,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 			                "uhci:int:error (cs=%#" PRIx32 ",tok=%#" PRIx32 ")\n",
 			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
 			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
-			                                          ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                                          EXCEPT_CODEOF(E_IOERROR_ERRORBIT),
 			                                          E_IOERROR_REASON_UHCI_TDCS,
 			                                          cs);
 			goto done_qh;
@@ -1117,7 +1117,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 			                "uhci:int:inactive for unknown reason\n",
 			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
-			                                          ERROR_CODEOF(E_IOERROR_NODATA),
+			                                          EXCEPT_CODEOF(E_IOERROR_NODATA),
 			                                          E_IOERROR_REASON_UHCI_INCOMPLETE);
 			goto done_qh;
 		}
@@ -1168,7 +1168,7 @@ done_qh:
 			                "uhci:int:error (cs=%#" PRIx32 ",tok=%#" PRIx32 ")\n",
 			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
 			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
-			                                          ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                                          EXCEPT_CODEOF(E_IOERROR_ERRORBIT),
 			                                          E_IOERROR_REASON_UHCI_TDCS,
 			                                          cs);
 			goto done_nqh;
@@ -1307,7 +1307,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, ep);
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_ioerror(self, iter,
-			                            ERROR_CODEOF(E_IOERROR_NODATA),
+			                            EXCEPT_CODEOF(E_IOERROR_NODATA),
 			                            E_IOERROR_REASON_UHCI_BADEP,
 			                            ep);
 			decref(iter);
@@ -1329,7 +1329,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 					       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, actlen, maxlen);
 					uhci_osqh_unlink(self, iter, piter);
 					uhci_osqh_completed_ioerror(self, iter,
-					                            ERROR_CODEOF(E_IOERROR_NODATA),
+					                            EXCEPT_CODEOF(E_IOERROR_NODATA),
 					                            E_IOERROR_REASON_USB_SHORTPACKET);
 					decref(iter);
 					continue;
@@ -1345,7 +1345,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_ioerror(self, iter,
-			                            ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                            EXCEPT_CODEOF(E_IOERROR_ERRORBIT),
 			                            E_IOERROR_REASON_UHCI_TDCS,
 			                            cs);
 			decref(iter);
@@ -1357,7 +1357,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_ioerror(self, iter,
-			                            ERROR_CODEOF(E_IOERROR_NODATA),
+			                            EXCEPT_CODEOF(E_IOERROR_NODATA),
 			                            E_IOERROR_REASON_UHCI_INCOMPLETE);
 			decref(iter);
 			continue;
@@ -2690,11 +2690,11 @@ uhci_controller_device_attached(struct uhci_controller *__restrict self,
 	TRY {
 		usb_device_discovered(self, flags);
 	} EXCEPT {
-		error_class_t cls = error_class();
-		if (ERRORCLASS_ISRTLPRIORITY(cls))
+		except_class_t cls = except_class();
+		if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
-		error_printf("discovering usb device on uhci[pci:%" PRIp32 ",io:%#" PRIxPTR "] port #%" PRIu16,
-		             self->uc_pci->pd_addr, self->uc_base.uc_mmbase, portno);
+		except_printf("discovering usb device on uhci[pci:%" PRIp32 ",io:%#" PRIxPTR "] port #%" PRIu16,
+		              self->uc_pci->pd_addr, self->uc_base.uc_mmbase, portno);
 	}
 }
 

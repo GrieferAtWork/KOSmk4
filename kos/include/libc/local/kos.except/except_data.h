@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30c5d40 */
+/* HASH CRC-32:0x925f6065 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,28 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_register_state_defined
-#define __local_error_register_state_defined
+#ifndef __local_except_data_defined
+#define __local_except_data_defined
 #include <__crt.h>
 #include <kos/bits/fastexcept.h>
-#ifdef __arch_error_register_state
-#include <kos/bits/except.h>
-#ifndef __ERROR_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__ERROR_REGISTER_STATE_TYPE */
+#ifdef __arch_except_data
+struct exception_data;
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(error_register_state) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __ERROR_REGISTER_STATE_TYPE *
-__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_register_state))(void) {
-	return __arch_error_register_state();
+__LOCAL_LIBC(except_data) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_data))(void) {
+	return __arch_except_data();
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_register_state_defined
-#define __local___localdep_error_register_state_defined
-#define __localdep_error_register_state __LIBC_LOCAL_NAME(error_register_state)
-#endif /* !__local___localdep_error_register_state_defined */
-#else /* __arch_error_register_state */
-#undef __local_error_register_state_defined
-#endif /* !__arch_error_register_state */
-#endif /* !__local_error_register_state_defined */
+#ifndef __local___localdep_except_data_defined
+#define __local___localdep_except_data_defined
+#define __localdep_except_data __LIBC_LOCAL_NAME(except_data)
+#endif /* !__local___localdep_except_data_defined */
+#else /* __arch_except_data */
+#undef __local_except_data_defined
+#endif /* !__arch_except_data */
+#endif /* !__local_except_data_defined */

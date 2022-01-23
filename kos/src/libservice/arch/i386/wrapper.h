@@ -1615,7 +1615,7 @@ INTDEF NOBLOCK NONNULL((2)) void
 NOTHROW(FCALL libservice_aux_load_except_as_errno)(uintptr_t status,
                                                    struct service_comdesc *__restrict info);
 
-/* Populate `error_data()' with the given information. */
+/* Populate `except_data()' with the given information. */
 INTDEF NOBLOCK NONNULL((2, 3)) void
 NOTHROW(FCALL libservice_aux_load_except_as_error)(uintptr_t status,
                                                    struct service_comdesc *__restrict info,

@@ -566,7 +566,7 @@ NOTHROW(FCALL aio_handle_async_func)(struct aio_handle *__restrict self,
 	} else {
 		aio_handle_release(me);
 		if (status == AIO_COMPLETION_FAILURE)
-			error_printf("Performing background AIO operation");
+			except_printf("Performing background AIO operation");
 	}
 	aio_handle_async_restore_chain(me, me);
 }

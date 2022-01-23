@@ -34,47 +34,47 @@
 DECL_BEGIN
 
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_info *
-NOTHROW_NCX(LIBCCALL libc_error_info)(void) {
+NOTHROW_NCX(LIBCCALL libc_except_info)(void) {
 	return &THIS_EXCEPTION_INFO;
 }
 
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_data *
-NOTHROW_NCX(LIBCCALL libc_error_data)(void) {
+NOTHROW_NCX(LIBCCALL libc_except_data)(void) {
 	return &THIS_EXCEPTION_DATA;
 }
 
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL error_register_state_t *
-NOTHROW_NCX(LIBCCALL libc_error_register_state)(void) {
+INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL except_register_state_t *
+NOTHROW_NCX(LIBCCALL libc_except_register_state)(void) {
 	return &THIS_EXCEPTION_STATE;
 }
 
-INTERN ATTR_PURE WUNUSED error_code_t
-NOTHROW_NCX(LIBCCALL libc_error_code)(void) {
+INTERN ATTR_PURE WUNUSED except_code_t
+NOTHROW_NCX(LIBCCALL libc_except_code)(void) {
 	return PERTASK_GET(this_exception_code);
 }
 
 INTERN ATTR_PURE WUNUSED bool
-NOTHROW_NCX(LIBCCALL libc_error_active)(void) {
-	return PERTASK_NE(this_exception_code, ERROR_CODEOF(E_OK));
+NOTHROW_NCX(LIBCCALL libc_except_active)(void) {
+	return PERTASK_NE(this_exception_code, EXCEPT_CODEOF(E_OK));
 }
 
-INTERN ATTR_PURE WUNUSED error_class_t
-NOTHROW_NCX(LIBCCALL libc_error_class)(void) {
+INTERN ATTR_PURE WUNUSED except_class_t
+NOTHROW_NCX(LIBCCALL libc_except_class)(void) {
 	return PERTASK_GET(this_exception_class);
 }
 
-INTERN ATTR_PURE WUNUSED error_subclass_t
-NOTHROW_NCX(LIBCCALL libc_error_subclass)(void) {
+INTERN ATTR_PURE WUNUSED except_subclass_t
+NOTHROW_NCX(LIBCCALL libc_except_subclass)(void) {
 	return PERTASK_GET(this_exception_subclass);
 }
 
-DEFINE_PUBLIC_ALIAS(error_info, libc_error_info);
-DEFINE_PUBLIC_ALIAS(error_data, libc_error_data);
-DEFINE_PUBLIC_ALIAS(error_register_state, libc_error_register_state);
-DEFINE_PUBLIC_ALIAS(error_code, libc_error_code);
-DEFINE_PUBLIC_ALIAS(error_active, libc_error_active);
-DEFINE_PUBLIC_ALIAS(error_class, libc_error_class);
-DEFINE_PUBLIC_ALIAS(error_subclass, libc_error_subclass);
+DEFINE_PUBLIC_ALIAS(except_info, libc_except_info);
+DEFINE_PUBLIC_ALIAS(except_data, libc_except_data);
+DEFINE_PUBLIC_ALIAS(except_register_state, libc_except_register_state);
+DEFINE_PUBLIC_ALIAS(except_code, libc_except_code);
+DEFINE_PUBLIC_ALIAS(except_active, libc_except_active);
+DEFINE_PUBLIC_ALIAS(except_class, libc_except_class);
+DEFINE_PUBLIC_ALIAS(except_subclass, libc_except_subclass);
 
 DECL_END
 

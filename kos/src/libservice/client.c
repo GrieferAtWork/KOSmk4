@@ -366,10 +366,10 @@ NOTHROW_RPC(CC libservice_open_nx)(char const *filename) {
 	NESTED_TRY {
 		return libservice_open(filename);
 	} EXCEPT {
-		error_class_t cls = error_class();
-		if (ERRORCLASS_ISRTLPRIORITY(cls))
+		except_class_t cls = except_class();
+		if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
-		errno = error_as_errno(error_data());
+		errno = except_as_errno(except_data());
 	}
 	return NULL;
 }
@@ -515,10 +515,10 @@ NOTHROW_RPC(CC libservice_dlsym_nx)(struct service *__restrict self,
 	NESTED_TRY {
 		result = libservice_dlsym_lookup_or_create(self, symname, SERVICE_FUNCTION_ENTRY_KIND_NORMAL);
 	} EXCEPT {
-		error_class_t cls = error_class();
-		if (ERRORCLASS_ISRTLPRIORITY(cls))
+		except_class_t cls = except_class();
+		if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
-		errno  = error_as_errno(error_data());
+		errno  = except_as_errno(except_data());
 		result = NULL;
 	}
 	return result;

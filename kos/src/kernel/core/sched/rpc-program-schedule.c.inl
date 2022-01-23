@@ -337,7 +337,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 			TRY {
 				task_waitfor();
 			} EXCEPT {
-				error_code_t code = error_code();
+				except_code_t code = except_code();
 
 				/* Must  cancel the RPC  if we get  here, and, if that
 				 * cancel can't be performed because the RPC finished,
@@ -346,7 +346,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 				status = ATOMIC_XCH(rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_CANCELED);
 				if (status != PENDING_USER_RPC_STATUS_COMPLETE) {
 					if (status == PENDING_USER_RPC_STATUS_PENDING &&
-					    code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+					    code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 						/* Check for special case: The interrupt is the result of us trying
 						 * to  send an RPC to ourselves (either  our own thread, or our own
 						 * process; in the later case, we already know that no other thread
@@ -379,7 +379,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 				 * A special case here are  RT exception which are  too
 				 * important to dismiss (as they include stuff like our
 				 * own thread being supposed to terminate) */
-				if (ERRORCLASS_ISRTLPRIORITY(ERROR_CLASS(code)))
+				if (EXCEPTCLASS_ISRTLPRIORITY(EXCEPT_CLASS(code)))
 					RETHROW(); /* Sorry. Can't discard this one... */
 
 				/* If it was  just an `E_INTERRUPT_USER_RPC',  then we  can
@@ -387,13 +387,13 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 				 * RPCs/posix signals can  be handled  that way).  However,
 				 * synchronous RPCs can't be handled anymore since we can't
 				 * restart the system call at this point (as it  succeeded) */
-				if (code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+				if (code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 					userexcept_sysret_inject_self();
 				} else {
 					/* Everything else is just dumped to the system log.
 					 * But  note that there really shouldn't be anything
 					 * that gets here... */
-					error_printf("canceling user RPC");
+					except_printf("canceling user RPC");
 				}
 				break;
 			}
@@ -412,12 +412,12 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 				THROW(E_PROCESS_EXITED, (upid_t)target_tid);
 
 			/* Rethrow the exception that brought down the RPC VM */
-			tls = error_data();
+			tls = except_data();
 			tls->e_code      = rpc->pr_user.pur_error.e_code;
 			tls->e_faultaddr = NULL; /* ??? */
 			memcpy(&tls->e_args, &rpc->pr_user.pur_error.e_args,
 			       sizeof(union exception_data_pointers));
-			error_throw_current();
+			except_throw_current();
 		}
 	}
 

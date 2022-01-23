@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce349be8 */
+/* HASH CRC-32:0x7f7e5284 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,11 +72,11 @@ again:
 			__hybrid_atomic_store(*once_control,
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
-#ifdef __CRT_HAVE_error_rethrow
-			libc_error_rethrow();
-#else /* __CRT_HAVE_error_rethrow */
+#ifdef __CRT_HAVE_except_rethrow
+			libc_except_rethrow();
+#else /* __CRT_HAVE_except_rethrow */
 			throw;
-#endif /* !__CRT_HAVE_error_rethrow */
+#endif /* !__CRT_HAVE_except_rethrow */
 		}
 #else /* __cplusplus */
 		(*init_routine)();

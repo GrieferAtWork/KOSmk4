@@ -1209,11 +1209,11 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 		sys_Xlfutex(&com->scd_com.sc_code, LFUTEX_WAIT_WHILE,
 		            SERVICE_COM_DLSYM, NULL, 0);
 	} EXCEPT {
-		error_class_t cls = error_class();
+		except_class_t cls = except_class();
 		/* Abort the command. */
 		if (libservice_aux_com_abort(self, com, SERVICE_COM_DLSYM))
 			RETHROW();
-		if (ERRORCLASS_ISRTLPRIORITY(cls))
+		if (EXCEPTCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
 	}
 
@@ -1222,17 +1222,17 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 
 	/* Check return status. */
 	if (com->scd_com.sc_code != SERVICE_COM_ST_SUCCESS) {
-		struct exception_data *e = error_data();
-		assert(e->e_code == ERROR_CODEOF(E_OK));
+		struct exception_data *e = except_data();
+		assert(e->e_code == EXCEPT_CODEOF(E_OK));
 		if (com->scd_com.sc_code == SERVICE_COM_ST_EXCEPT) {
 			e->e_code = com->scd_com.sc_except.e_code;
 			memcpy(&e->e_args, &com->scd_com.sc_except.e_args,
 			       sizeof(union exception_data_pointers));
 		} else {
-			e->e_code = ERROR_CODEOF(E_NO_SUCH_OBJECT);
+			e->e_code = EXCEPT_CODEOF(E_NO_SUCH_OBJECT);
 			bzero(&e->e_args, sizeof(e->e_args));
 		}
-		error_throw_current();
+		except_throw_current();
 	}
 
 	/* On success, copy back function information */

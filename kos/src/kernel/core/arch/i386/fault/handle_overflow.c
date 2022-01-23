@@ -42,11 +42,11 @@ INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FC
 x86_handle_overflow(struct icpustate *__restrict state) {
 	unsigned int i;
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x04)); /* #OF  Overflow */
-	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OVERFLOW));
+	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_OVERFLOW));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], 0);
 	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
-	error_throw_current_at_icpustate(state);
+	except_throw_current_at_icpustate(state);
 }
 
 DECL_END

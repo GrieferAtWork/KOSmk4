@@ -64,10 +64,10 @@ NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict
 	       error->e_args.e_pointers[pointer_count - 1] == 0)
 		--pointer_count;
 	printk(KERN_TRACE "[except] Translate exception "
-	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-	                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
+	                  "%#" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
+	                  "%#" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__),
 	       error->e_class, error->e_subclass);
-	if ((name = error_name(error->e_code)) != NULL)
+	if ((name = except_name(error->e_code)) != NULL)
 		printk(KERN_TRACE ",%s", name);
 	if (pointer_count != 0) {
 		unsigned int i;
@@ -99,10 +99,10 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 	       error->e_args.e_pointers[pointer_count - 1] == 0)
 		--pointer_count;
 	printk(KERN_TRACE "[except] Propagate exception "
-	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-	                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
+	                  "%#" PRIxN(__SIZEOF_EXCEPT_CLASS_T__) ":"
+	                  "%#" PRIxN(__SIZEOF_EXCEPT_SUBCLASS_T__),
 	       error->e_class, error->e_subclass);
-	if ((name = error_name(error->e_code)) != NULL)
+	if ((name = except_name(error->e_code)) != NULL)
 		printk(KERN_TRACE ",%s", name);
 	if (pointer_count != 0) {
 		unsigned int i;
@@ -183,10 +183,10 @@ userexcept_callhandler(struct icpustate *__restrict state,
 #ifdef __x86_64__
 	/* Propagate class & sub-class individually, since the way in
 	 * which they form e_code is  different in x32 and x64  mode. */
-	user_error->e_class    = (__error_class32_t)error->e_class;
-	user_error->e_subclass = (__error_subclass32_t)error->e_subclass;
+	user_error->e_class    = (__except_class32_t)error->e_class;
+	user_error->e_subclass = (__except_subclass32_t)error->e_subclass;
 #else /* __x86_64__ */
-	user_error->e_code = (__error_code32_t)error->e_code;
+	user_error->e_code = (__except_code32_t)error->e_code;
 #endif /* !__x86_64__ */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_args.e_pointers[i] = (u32)error->e_args.e_pointers[i];
@@ -251,7 +251,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	/* Fill in user-space context information */
 	icpustate_user_to_kcpustate64(state, user_state);
 	/* Copy exception data onto the user-space stack. */
-	user_error->e_code = (__error_code64_t)error->e_code;
+	user_error->e_code = (__except_code64_t)error->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_args.e_pointers[i] = (u64)error->e_args.e_pointers[i];
 	/* In case of  a system call,  set the  fault
@@ -307,7 +307,7 @@ userexcept_seterrno(struct icpustate *__restrict state,
                     struct exception_data const *__restrict data)
 		/* NOTE: On x86, this implementation is actually NOTHROW... */
 		THROWS(E_SEGFAULT) {
-	errno_t errval = -error_as_errno(data);
+	errno_t errval = -except_as_errno(data);
 	log_userexcept_errno_propagate(state, sc_info, data, errval);
 
 	/* All system call  methods return error  values through  EAX.

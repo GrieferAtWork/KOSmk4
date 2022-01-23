@@ -168,7 +168,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	/* Clear the current exception (else the kernel might panic because
 	 * it  would  think  that  we  didn't  nest  exceptions   properly) */
 	EXTERN(this_exception_code)
-	movq   $(ERROR_CODEOF(E_OK)), %gs:this_exception_code
+	movq   $(EXCEPT_CODEOF(E_OK)), %gs:this_exception_code
 .Lsysret64_probe_begin2:
 	ttest  mask=0, loc=0(%rcx)
 .Lsysret64_probe_end2:
@@ -181,8 +181,8 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	ttest  mask=E_SEGFAULT_CONTEXT_NONCANON, loc=this_exception_args + 8, seg=%gs
 	jnz    .Ldo_iret_clearexcept
 	/* RETHROW() the exception. */
-	EXTERN(error_rethrow)
-	call   error_rethrow
+	EXTERN(except_rethrow)
+	call   except_rethrow
 	/* UNREACHABLE */
 
 .Ldo_iret_clearexcept:
@@ -191,7 +191,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	 * the next system call might think that exceptions were  being
 	 * nested) */
 	EXTERN(this_exception_code)
-	movq   $(ERROR_CODEOF(E_OK)), %gs:this_exception_code
+	movq   $(EXCEPT_CODEOF(E_OK)), %gs:this_exception_code
 
 .Ldo_iret:
 	.cfi_restore_state

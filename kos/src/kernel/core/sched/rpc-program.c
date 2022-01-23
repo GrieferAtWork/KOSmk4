@@ -2053,11 +2053,11 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 #endif /* !__i386__ && !__x86_64__ */
 
 	} EXCEPT {
-		struct exception_info *tls = error_info();
+		struct exception_info *tls = except_info();
 		rpc_vm_fini(&vm);
-		if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC))
+		if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC))
 			RETHROW(); /* Handled by the caller (causes the RPC to be re-attempted later) */
-		if (ERRORCLASS_ISRTLPRIORITY(tls->ei_class)) {
+		if (EXCEPTCLASS_ISRTLPRIORITY(tls->ei_class)) {
 			/* Too important to discard. Instead, cancel the RPC and rethrow */
 			if (ATOMIC_CMPXCH(rpc->pr_user.pur_status,
 			                  PENDING_USER_RPC_STATUS_PENDING,
@@ -2080,7 +2080,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 			sig_broadcast(&rpc->pr_user.pur_stchng);
 		} else {
 			/* If no one's there to receive the error, dump it to the system log */
-			error_printf("executing async user RPC program");
+			except_printf("executing async user RPC program");
 		}
 		goto done_nofini;
 	}

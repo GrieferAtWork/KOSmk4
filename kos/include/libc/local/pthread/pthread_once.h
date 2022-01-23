@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe55e7099 */
+/* HASH CRC-32:0x132848ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_error_rethrow_defined) && defined(__CRT_HAVE_error_rethrow)
-#define __local___localdep_error_rethrow_defined
-__COMPILER_REDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCALL,__localdep_error_rethrow,(void),error_rethrow,())
-#endif /* !__local___localdep_error_rethrow_defined && __CRT_HAVE_error_rethrow */
+#if !defined(__local___localdep_except_rethrow_defined) && defined(__CRT_HAVE_except_rethrow)
+#define __local___localdep_except_rethrow_defined
+__COMPILER_REDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCALL,__localdep_except_rethrow,(void),except_rethrow,())
+#endif /* !__local___localdep_except_rethrow_defined && __CRT_HAVE_except_rethrow */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/pthreadvalues.h>
 #include <hybrid/__atomic.h>
@@ -55,11 +55,11 @@ __again:
 			__hybrid_atomic_store(*__once_control,
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
-#ifdef __CRT_HAVE_error_rethrow
-			(__NAMESPACE_LOCAL_SYM __localdep_error_rethrow)();
-#else /* __CRT_HAVE_error_rethrow */
+#ifdef __CRT_HAVE_except_rethrow
+			(__NAMESPACE_LOCAL_SYM __localdep_except_rethrow)();
+#else /* __CRT_HAVE_except_rethrow */
 			throw;
-#endif /* !__CRT_HAVE_error_rethrow */
+#endif /* !__CRT_HAVE_except_rethrow */
 		}
 #else /* __cplusplus */
 		(*__init_routine)();

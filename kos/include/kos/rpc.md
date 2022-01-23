@@ -111,7 +111,7 @@ struct icpustate *task_serve_with_icpustate(struct icpustate *__restrict state) 
 	bool must_unwind;
 	ctx.rc_context = RPC_REASONCTX_SYNC;
 	ctx.rc_state   = state;
-	error.ei_code  = ERROR_CODEOF(E_OK);
+	error.ei_code  = EXCEPT_CODEOF(E_OK);
 	restore_plast  = SLIST_PFIRST(&restore);
 	did_serve_rpcs = false;
 	must_unwind    = false;
@@ -163,8 +163,8 @@ handle_pending:
 		TRY {
 			(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 		} EXCEPT {
-			struct exception_info *tls = error_info();
-			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+			struct exception_info *tls = except_info();
+			if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 				pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -172,7 +172,7 @@ handle_pending:
 				goto handle_pending;
 			}
 			/* Prioritize errors. */
-			if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+			if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 				memcpy(&error, tls, sizeof(error));
 		}
 		pending_rpc_free(rpc);
@@ -186,8 +186,8 @@ handle_pending:
 	}
 
 	/* Check if we must throw a new exception. */
-	if (error.ei_code != ERROR_CODEOF(E_OK)) {
-		memcpy(error_info(), &error, sizeof(error));
+	if (error.ei_code != EXCEPT_CODEOF(E_OK)) {
+		memcpy(except_info(), &error, sizeof(error));
 		_Unwind_Resume(ctx.rc_state);
 	}
 
@@ -219,7 +219,7 @@ again:
 		return DO_INTERRUPT_OR_SYSTEM_CALL(state, sc_info);
 		/* Notice that _everything_ below is _just_ there to handle exceptions! */
 	} EXCEPT {
-		struct exception_info *tls = error_info();
+		struct exception_info *tls = except_info();
 		if (!icpustate_isuser(state))
 			RETHROW();
 		state = userexcept_handler(state, sc_info);
@@ -244,17 +244,17 @@ NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
 	struct exception_info error;
 
 	/* Load exception information. */
-	memcpy(&error, error_info(), sizeof(error));
-	assertf(error.ei_code != ERROR_CODEOF(E_OK),
+	memcpy(&error, except_info(), sizeof(error));
+	assertf(error.ei_code != EXCEPT_CODEOF(E_OK),
 	        "In user exception handler, but no exception was thrown");
 
 	/* Consume the current exception. */
-	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_OK));
 
 	/* Handle the `E_INTERRUPT_USER_RPC' exception now. */
-	if (error.ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+	if (error.ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 		DBG_memset(&error, 0xcc, sizeof(error));
-		error.ei_code = ERROR_CODEOF(E_OK);
+		error.ei_code = EXCEPT_CODEOF(E_OK);
 	}
 
 	ctx.rc_state = state;
@@ -307,8 +307,8 @@ handle_pending:
 				is_masked = sigmask_ismasked_chk(_RPC_GETSIGNO(rpc->pr_flags));
 			} EXCEPT {
 				/* Prioritize errors. */
-				struct exception_info *tls = error_info();
-				if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+				struct exception_info *tls = except_info();
+				if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 					memcpy(&error, tls, sizeof(error));
 				pending_user_rpc_fini(&rpc->pr_user);
 				pending_rpc_free(rpc);
@@ -343,8 +343,8 @@ make_inactive:
 				                                       user_rpc_reason, &ctx.rc_scinfo);
 			} EXCEPT {
 				/* Prioritize errors. */
-				struct exception_info *tls = error_info();
-				if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+				struct exception_info *tls = except_info();
+				if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 					memcpy(&error, tls, sizeof(error));
 			}
 			/* User-space RPCs are _always_ required (or at least expected) to
@@ -362,14 +362,14 @@ make_inactive:
 		                               : NULL);
 	} EXCEPT {
 		/* Prioritize errors. */
-		struct exception_info *tls = error_info();
-		if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+		struct exception_info *tls = except_info();
+		if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 			/* Load additional RPCs, but discard this new exception */
 			pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 			ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 			goto handle_pending;
 		}
-		if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+		if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 			memcpy(&error, tls, sizeof(error));
 	}
 
@@ -418,13 +418,13 @@ make_inactive:
 				TRY {
 					(*func)(&ctx, cookie);
 				} EXCEPT {
-					struct exception_info *tls = error_info();
-					if (tls->ei_code != ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+					struct exception_info *tls = except_info();
+					if (tls->ei_code != EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 						goto handle_pending;
 					}
 					/* Prioritize errors. */
-					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+					if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
 				}
 				restore_plast = SLIST_PFIRST(&restore);
@@ -436,8 +436,8 @@ make_inactive:
 				TRY {
 					(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 				} EXCEPT {
-					struct exception_info *tls = error_info();
-					if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+					struct exception_info *tls = except_info();
+					if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 						pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
 						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
@@ -445,7 +445,7 @@ make_inactive:
 						goto handle_pending;
 					}
 					/* Prioritize errors. */
-					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+					if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
 				}
 				pending_rpc_free(rpc);
@@ -463,7 +463,7 @@ make_inactive:
 	 * to happen) */
 	if (restore_plast != SLIST_PFIRST(&restore)) {
 		*restore_plast = NULL; /* NULL-terminate list */
-		if (error.ei_code != ERROR_CODEOF(E_OK) || ctx.rc_context == RPC_REASONCTX_SYSRET) {
+		if (error.ei_code != EXCEPT_CODEOF(E_OK) || ctx.rc_context == RPC_REASONCTX_SYSRET) {
 			/* When  the system call won't be restarted, then we must still
 			 * serve kernel RPCS with the `RPC_SYNCMODE_F_SYSRET' flag set. */
 			struct pending_rpc **piter;
@@ -496,8 +496,8 @@ make_inactive:
 				TRY {
 					(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 				} EXCEPT {
-					struct exception_info *tls = error_info();
-					if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+					struct exception_info *tls = except_info();
+					if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 						pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -505,7 +505,7 @@ make_inactive:
 						goto handle_pending;
 					}
 					/* Prioritize errors. */
-					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+					if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
 				}
 				pending_rpc_free(rpc);
@@ -521,9 +521,9 @@ make_inactive:
 	}
 
 	/* Check if we must throw a new exception. */
-	if (error.ei_code != ERROR_CODEOF(E_OK)) {
+	if (error.ei_code != EXCEPT_CODEOF(E_OK)) {
 		/* This will unwind into user-space! */
-		memcpy(error_info(), &error, sizeof(error));
+		memcpy(except_info(), &error, sizeof(error));
 		_Unwind_Resume(ctx.rc_state);
 	}
 
@@ -580,7 +580,7 @@ struct icpustate *userexcept_sysret(struct icpustate *state) {
 	/* Re-enable disabled RPCs and serve kernel RPCs with `RPC_REASONCTX_SYSRET' */
 	sysret_ctx.rc_state      = state;
 	sysret_ctx.rc_context    = RPC_REASONCTX_SYSRET;
-	sysret_error.ei_code     = ERROR_CODEOF(E_OK);
+	sysret_error.ei_code     = EXCEPT_CODEOF(E_OK);
 	sysret_pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~(TASK_FRPC | TASK_FWAKEONMSKRPC));
 	sysret_restore_plast = SLIST_PFIRST(&sysret_restore);
@@ -609,8 +609,8 @@ sysret_handle_pending:
 					is_masked = sigmask_ismasked(_RPC_GETSIGNO(rpc->pr_flags));
 				} EXCEPT {
 					/* Prioritize errors. */
-					struct exception_info *tls = error_info();
-					if (error_priority(sysret_error.ei_code) < error_priority(tls->ei_code))
+					struct exception_info *tls = except_info();
+					if (except_priority(sysret_error.ei_code) < except_priority(tls->ei_code))
 						memcpy(&sysret_error, tls, sizeof(sysret_error));
 					pending_user_rpc_fini(&rpc->pr_user);
 					pending_rpc_free(rpc);
@@ -629,8 +629,8 @@ sysret_make_inactive:
 					                                              _RPC_REASONCTX_ASYNC, NULL);
 				} EXCEPT {
 					/* Prioritize errors. */
-					struct exception_info *tls = error_info();
-					if (error_priority(sysret_error.ei_code) < error_priority(tls->ei_code))
+					struct exception_info *tls = except_info();
+					if (except_priority(sysret_error.ei_code) < except_priority(tls->ei_code))
 						memcpy(&sysret_error, tls, sizeof(sysret_error));
 				}
 				pending_user_rpc_fini(&rpc->pr_user);
@@ -644,14 +644,14 @@ sysret_make_inactive:
 		sysret_ctx.rc_state = sigmask_check_s(sysret_ctx.rc_state, NULL);
 	} EXCEPT {
 		/* Prioritize errors. */
-		struct exception_info *tls = error_info();
-		if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+		struct exception_info *tls = except_info();
+		if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 			/* Load additional RPCs, but discard this new exception */
 			ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 			sysret_pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 			goto sysret_handle_pending;
 		}
-		if (error_priority(sysret_error.ei_code) < error_priority(tls->ei_code))
+		if (except_priority(sysret_error.ei_code) < except_priority(tls->ei_code))
 			memcpy(&sysret_error, tls, sizeof(sysret_error));
 	}
 
@@ -663,8 +663,8 @@ sysret_make_inactive:
 		TRY {
 			(*rpc->pr_kern.k_func)(&sysret_ctx, rpc->pr_kern.k_cookie);
 		} EXCEPT {
-			struct exception_info *tls = error_info();
-			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+			struct exception_info *tls = except_info();
+			if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 				pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
 				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
@@ -672,7 +672,7 @@ sysret_make_inactive:
 				goto sysret_handle_pending;
 			}
 			/* Prioritize errors. */
-			if (error_priority(sysret_error.ei_code) < error_priority(tls->ei_code))
+			if (except_priority(sysret_error.ei_code) < except_priority(tls->ei_code))
 				memcpy(&sysret_error, tls, sizeof(sysret_error));
 		}
 		assert(sysret_ctx.rc_context == RPC_REASONCTX_SYSRET);
@@ -687,8 +687,8 @@ sysret_make_inactive:
 	}
 
 	/* Check if we must throw a new exception. */
-	if (sysret_error.ei_code != ERROR_CODEOF(E_OK)) {
-		memcpy(error_info(), &sysret_error, sizeof(sysret_error));
+	if (sysret_error.ei_code != EXCEPT_CODEOF(E_OK)) {
+		memcpy(except_info(), &sysret_error, sizeof(sysret_error));
 		/* This will unwind into user-space! */
 		_Unwind_Resume(ctx.rc_state);
 	}

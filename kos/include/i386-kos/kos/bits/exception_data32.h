@@ -30,16 +30,16 @@
 
 
 #if defined(__i386__) && !defined(__x86_64__)
-#undef __ERROR_UNWIND_CC
-#undef __ERROR_THROW_CC
-#undef __ERROR_THROWN_CC
-#undef __ERROR_NESTING_BEGIN_CC
-#undef __ERROR_NESTING_END_CC
-#define __ERROR_UNWIND_CC        __ATTR_FASTCALL
-#define __ERROR_THROW_CC         __ATTR_FASTCALL
-#define __ERROR_THROWN_CC        __ATTR_CDECL
-#define __ERROR_NESTING_BEGIN_CC __ATTR_FASTCALL
-#define __ERROR_NESTING_END_CC   __ATTR_FASTCALL
+#undef __EXCEPT_UNWIND_CC
+#undef __EXCEPT_THROW_CC
+#undef __EXCEPT_THROWN_CC
+#undef __EXCEPT_NESTING_BEGIN_CC
+#undef __EXCEPT_NESTING_END_CC
+#define __EXCEPT_UNWIND_CC        __ATTR_FASTCALL
+#define __EXCEPT_THROW_CC         __ATTR_FASTCALL
+#define __EXCEPT_THROWN_CC        __ATTR_CDECL
+#define __EXCEPT_NESTING_BEGIN_CC __ATTR_FASTCALL
+#define __EXCEPT_NESTING_END_CC   __ATTR_FASTCALL
 
 #define __OFFSET_EXCEPTION_DATA_CODE      __OFFSET_EXCEPTION_DATA32_CODE
 #define __OFFSET_EXCEPTION_DATA_CLASS     __OFFSET_EXCEPTION_DATA32_CLASS
@@ -48,12 +48,12 @@
 #define __OFFSET_EXCEPTION_DATA_POINTER   __OFFSET_EXCEPTION_DATA32_POINTER
 #define __OFFSET_EXCEPTION_DATA_FAULTADDR __OFFSET_EXCEPTION_DATA32_FAULTADDR
 #define __SIZEOF_EXCEPTION_DATA           __SIZEOF_EXCEPTION_DATA32
-#define __SIZEOF_ERROR_CODE_T__           __SIZEOF_ERROR_CODE32_T__
-#define __SIZEOF_ERROR_CLASS_T__          __SIZEOF_ERROR_CLASS32_T__
-#define __SIZEOF_ERROR_SUBCLASS_T__       __SIZEOF_ERROR_SUBCLASS32_T__
-#define __error_code32_t                  __error_code_t
-#define __error_class32_t                 __error_class_t
-#define __error_subclass32_t              __error_subclass_t
+#define __SIZEOF_EXCEPT_CODE_T__          __SIZEOF_EXCEPT_CODE32_T__
+#define __SIZEOF_EXCEPT_CLASS_T__         __SIZEOF_EXCEPT_CLASS32_T__
+#define __SIZEOF_EXCEPT_SUBCLASS_T__      __SIZEOF_EXCEPT_SUBCLASS32_T__
+#define __except_code32_t                 __except_code_t
+#define __except_class32_t                __except_class_t
+#define __except_subclass32_t             __except_subclass_t
 #define __exception_data32                exception_data
 #endif /* __i386__ && !__x86_64__ */
 
@@ -70,16 +70,16 @@
 #define __OFFSET_EXCEPTION_DATA32_FAULTADDR  __OFFSET_EXCEPTION_DATA32_POINTER(EXCEPTION_DATA_POINTERS)
 #define __SIZEOF_EXCEPTION_DATA32            ((EXCEPTION_DATA_POINTERS + 2) * 4)
 
-#define __SIZEOF_ERROR_CODE32_T__     4
-#define __SIZEOF_ERROR_CLASS32_T__    2
-#define __SIZEOF_ERROR_SUBCLASS32_T__ 2
+#define __SIZEOF_EXCEPT_CODE32_T__     4
+#define __SIZEOF_EXCEPT_CLASS32_T__    2
+#define __SIZEOF_EXCEPT_SUBCLASS32_T__ 2
 
 #if defined(__CC__) || defined(__DEEMON__)
 __SYSDECL_BEGIN
 
-typedef __UINT32_TYPE__ __error_code32_t;
-typedef __UINT16_TYPE__ __error_class32_t;
-typedef __UINT16_TYPE__ __error_subclass32_t;
+typedef __UINT32_TYPE__ __except_code32_t;
+typedef __UINT16_TYPE__ __except_class32_t;
+typedef __UINT16_TYPE__ __except_subclass32_t;
 
 /*[[[deemon
 import * from deemon;
@@ -671,10 +671,10 @@ union __exception_data_pointers32 {
 /* Exception information. */
 struct __exception_data32 /*[NAME(exception_data32)][PREFIX(e_)]*/ {
 	union {
-		__error_code32_t          e_code;   /* Exception code. */
+		__except_code32_t          e_code;   /* Exception code. */
 		struct {
-			__error_class32_t     e_class;    /* Current exception class. */
-			__error_subclass32_t  e_subclass; /* Current exception sub-class. */
+			__except_class32_t     e_class;    /* Current exception class. */
+			__except_subclass32_t  e_subclass; /* Current exception sub-class. */
 		}
 #ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
 		_ed_class_subclass
@@ -688,17 +688,17 @@ struct __exception_data32 /*[NAME(exception_data32)][PREFIX(e_)]*/ {
 	/* Exception-specific arguments */
 	union __exception_data_pointers32 e_args;
 	/* The address of the instruction that caused the fault.
-	 * Unlike  the  program  counter stored  within  the `error_register_state_t'
-	 * structure  which  can be  accessed through  `error_register_state()', this
+	 * Unlike  the  program counter  stored within  the `except_register_state_t'
+	 * structure which can  be accessed  through `except_register_state()',  this
 	 * one  _may_ point _before_  the instruction that  caused the error, however
 	 * it may also point after  the instruction. Which of  the two it is  depends
 	 * on  how the  specific exception was  generated, though it  should be noted
 	 * that in the case of errors thrown by `THROW()', this address will _always_
 	 * point  _after_ the instruction  (meaning it's always  equal to the program
-	 * counter stored in `error_register_state()')
-	 *  - e_faultaddr: Either equal to `GETPC(error_register_state())', or points
-	 *                 to  the  instruction  that  is   `error_register_state()'.
-	 *  - GETPC(error_register_state()):
+	 * counter stored in `except_register_state()')
+	 *  - e_faultaddr: Either equal to `GETPC(except_register_state())', or points
+	 *                 to  the  instruction  that  is   `except_register_state()'.
+	 *  - GETPC(except_register_state()):
 	 *                 Always points to the instruction that would have been
 	 *                 executed next if  the exception  hadn't been  thrown. */
 	__HYBRID_PTR32(void const) e_faultaddr;

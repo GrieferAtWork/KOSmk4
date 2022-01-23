@@ -150,14 +150,14 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC un
 
 
 /* Accessor functions for working with the register descriptor used by exception handling. */
-#define LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS 1
-typedef PUNWIND_GETREG_KCPUSTATE PUNWIND_GETREG_ERROR_REGISTER_STATE;
-typedef PUNWIND_SETREG_KCPUSTATE PUNWIND_SETREG_ERROR_REGISTER_STATE;
-#define UNWIND_GETREG_ERROR_REGISTER_STATE_NAME "unwind_getreg_kcpustate"
-#define UNWIND_SETREG_ERROR_REGISTER_STATE_NAME "unwind_setreg_kcpustate"
+#define LIBUNWIND_HAVE_EXCEPT_REGISTER_STATE_ACCESSORS 1
+typedef PUNWIND_GETREG_KCPUSTATE PUNWIND_GETREG_EXCEPT_REGISTER_STATE;
+typedef PUNWIND_SETREG_KCPUSTATE PUNWIND_SETREG_EXCEPT_REGISTER_STATE;
+#define UNWIND_GETREG_EXCEPT_REGISTER_STATE_NAME "unwind_getreg_kcpustate"
+#define UNWIND_SETREG_EXCEPT_REGISTER_STATE_NAME "unwind_setreg_kcpustate"
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-#define unwind_getreg_error_register_state unwind_getreg_kcpustate
-#define unwind_setreg_error_register_state unwind_setreg_kcpustate
+#define unwind_getreg_except_register_state unwind_getreg_kcpustate
+#define unwind_setreg_except_register_state unwind_setreg_kcpustate
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 

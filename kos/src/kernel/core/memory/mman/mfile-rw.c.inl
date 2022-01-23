@@ -19,15 +19,15 @@
  */
 #ifdef __INTELLISENSE__
 #include "mfile-rw.c"
-//#define           DEFINE_mfile_direct_read
-//#define         DEFINE_mfile_direct_read_p
-//#define          DEFINE_mfile_direct_readv
-//#define        DEFINE_mfile_direct_readv_p
-//#define          DEFINE_mfile_direct_write
-//#define        DEFINE_mfile_direct_write_p
-//#define         DEFINE_mfile_direct_writev
-//#define       DEFINE_mfile_direct_writev_p
-//#define     DEFINE_mfile_direct_read_async
+//#define       DEFINE_mfile_direct_read
+//#define     DEFINE_mfile_direct_read_p
+//#define      DEFINE_mfile_direct_readv
+//#define    DEFINE_mfile_direct_readv_p
+//#define      DEFINE_mfile_direct_write
+//#define    DEFINE_mfile_direct_write_p
+//#define     DEFINE_mfile_direct_writev
+//#define   DEFINE_mfile_direct_writev_p
+//#define DEFINE_mfile_direct_read_async
 #define   DEFINE_mfile_direct_read_async_p
 //#define    DEFINE_mfile_direct_readv_async
 //#define  DEFINE_mfile_direct_readv_async_p

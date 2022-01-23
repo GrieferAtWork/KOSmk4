@@ -1030,7 +1030,7 @@
 #define EXCEPT
 #define __EXCEPT
 #define RETHROW() throw
-#define THROW(...) error_throw(0)
+#define THROW(...) except_throw(0)
 #define RAII_FINALLY
 #define __RAII_FINALLY
 

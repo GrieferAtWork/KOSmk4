@@ -238,14 +238,14 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	movq   %rax, %rcx                                          /* sysno */
 	movq   (Pn(4) + OFFSET_RPC_SYSCALL_INFO_FLAGS)(%Psp), %rdx /* flags */
 	movq   $(8), %rsi                                          /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi         /* ecode */
+	movq   $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi        /* ecode */
 #else /* __x86_64__ */
 	pushP_cfi %eax                                          /* sysno */
 	pushP_cfi (Pn(7) + OFFSET_RPC_SYSCALL_INFO_FLAGS)(%Psp) /* flags */
 	pushP_cfi $(8)                                          /* argc */
-	pushP_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))         /* ecode */
+	pushP_cfi $(EXCEPT_CODEOF(E_UNKNOWN_SYSTEMCALL))        /* ecode */
 #endif /* !__x86_64__ */
-	call   error_thrown
+	call   except_thrown
 	.cfi_adjust_cfa_offset -Pn(4)
 
 .Lbad_sysno_ENOSYS:

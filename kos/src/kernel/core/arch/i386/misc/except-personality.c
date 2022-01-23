@@ -346,10 +346,10 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_stru
 			/* NOTE: Adjust for the fact that `pc' */
 			if (pc > ent->ee_start && pc <= ent->ee_end) {
 				if (ent->ee_mask != (uintptr_t)-1) {
-					error_code_t code = error_code();
-					if (ERROR_SUBCLASS(ent->ee_mask) != 0
+					except_code_t code = except_code();
+					if (EXCEPT_SUBCLASS(ent->ee_mask) != 0
 					    ? ent->ee_mask != code
-					    : ERROR_CLASS(ent->ee_mask) != ERROR_CLASS(code))
+					    : EXCEPT_CLASS(ent->ee_mask) != EXCEPT_CLASS(code))
 						continue; /* Different mask. */
 				}
 				kcpustate_setpc(state, ent->ee_entry);

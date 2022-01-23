@@ -47,7 +47,7 @@ DEFINE_TEST(kernel_exceptions_function_correctly_with_cxx_handlers) {
 	bool volatile reached_after = false;
 	bool volatile reached_inner = false;
 	bool volatile reached_outer = false;
-	assert(error_code() == ERROR_CODEOF(E_OK)); /* No exception thrown */
+	assert(except_code() == EXCEPT_CODEOF(E_OK)); /* No exception thrown */
 	try {
 		try {
 			reached_before = true;
@@ -55,48 +55,48 @@ DEFINE_TEST(kernel_exceptions_function_correctly_with_cxx_handlers) {
 			reached_after = true;  /* NOT REACHABLE! (asserted below) */
 		} catch (...) {
 			reached_inner = true;
-			assertf(error_code() == ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
-			        "error_code() = %#" PRIxN(__SIZEOF_ERROR_CODE_T__), error_code());
+			assertf(except_code() == EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED),
+			        "except_code() = %#" PRIxN(__SIZEOF_EXCEPT_CODE_T__), except_code());
 			throw; /* Rethrow the exception */
 		}
 	} catch (...) {
 		reached_outer = true;
-		assertf(error_code() == ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
-		        "error_code() = %#" PRIxN(__SIZEOF_ERROR_CODE_T__), error_code());
-		assertf((void *)error_data()->e_args.e_segfault.s_addr == (void *)p,
-		        "error_data()->e_args.e_segfault.s_addr = %p\n",
+		assertf(except_code() == EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED),
+		        "except_code() = %#" PRIxN(__SIZEOF_EXCEPT_CODE_T__), except_code());
+		assertf((void *)except_data()->e_args.e_segfault.s_addr == (void *)p,
+		        "except_data()->e_args.e_segfault.s_addr = %p\n",
 		        "p                                      = %p\n",
-		        error_data()->e_args.e_segfault.s_addr, p);
+		        except_data()->e_args.e_segfault.s_addr, p);
 #ifdef E_SEGFAULT_CONTEXT_FAULT
-		assert(error_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_FAULT);
+		assert(except_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_FAULT);
 #endif /* E_SEGFAULT_CONTEXT_FAULT */
 #ifdef E_SEGFAULT_CONTEXT_WRITING
-		assert(error_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_WRITING);
+		assert(except_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_WRITING);
 #endif /* E_SEGFAULT_CONTEXT_WRITING */
 #ifdef E_SEGFAULT_CONTEXT_USERCODE
-		assert(error_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_USERCODE);
+		assert(except_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_USERCODE);
 #endif /* E_SEGFAULT_CONTEXT_USERCODE */
 #ifdef E_SEGFAULT_CONTEXT_NONCANON
-		assert(!(error_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_NONCANON));
+		assert(!(except_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_NONCANON));
 #endif /* E_SEGFAULT_CONTEXT_NONCANON */
 #ifdef E_SEGFAULT_CONTEXT_EXEC
-		assert(!(error_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_EXEC));
+		assert(!(except_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_EXEC));
 #endif /* E_SEGFAULT_CONTEXT_EXEC */
 #ifdef E_SEGFAULT_CONTEXT_UNMAP
-		assert(!(error_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_UNMAP));
+		assert(!(except_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_UNMAP));
 #endif /* E_SEGFAULT_CONTEXT_UNMAP */
 		/* HINT: This is where the SEGFAULT exception gets cleaned up. */
 	}
-	assert(error_code() == ERROR_CODEOF(E_OK)); /* No exception thrown (any more) */
+	assert(except_code() == EXCEPT_CODEOF(E_OK)); /* No exception thrown (any more) */
 	assert(reached_before);
 	assert(!reached_after);
 	assert(reached_inner);
 	assert(reached_outer);
 
-	/* Also make sure that `error_name()' works correctly. */
+	/* Also make sure that `except_name()' works correctly. */
 #define ASSERT_ERROR_NAME(e, str)                         \
 	{                                                     \
-		char const *_name = error_name(ERROR_CODEOF(e));  \
+		char const *_name = except_name(EXCEPT_CODEOF(e));  \
 		assertf(_name != NULL && strcmp(_name, str) == 0, \
 		        "is:%q, expected:%q", _name, str);        \
 	}

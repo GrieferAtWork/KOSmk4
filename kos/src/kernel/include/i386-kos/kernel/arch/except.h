@@ -41,7 +41,7 @@
 	.local entry; .quad entry;                         \
 	.local start; .quad start;                         \
 	.local end;   .quad end;                           \
-	.quad ERROR_CODEOF(code);
+	.quad EXCEPT_CODEOF(code);
 #define EXCEPT_HANDLERS_END \
 	.quad 0;                \
 	.popsection;
@@ -55,7 +55,7 @@
 	.local entry; .long entry;                         \
 	.local start; .long start;                         \
 	.local end;   .long end;                           \
-	.long ERROR_CODEOF(code);
+	.long EXCEPT_CODEOF(code);
 #define EXCEPT_HANDLERS_END \
 	.long 0;                \
 	.popsection;

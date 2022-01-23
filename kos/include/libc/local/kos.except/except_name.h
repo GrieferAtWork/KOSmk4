@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda8e39fa */
+/* HASH CRC-32:0x40f093c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_name_defined
-#define __local_error_name_defined
+#ifndef __local_except_name_defined
+#define __local_except_name_defined
 #include <__crt.h>
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -51,10 +51,10 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 #include <kos/except/codes.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(error_name) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_name))(__error_code_t __code) {
-	__error_class_t __err_class       = ERROR_CLASS(__code);
-	__error_subclass_t __err_subclass = ERROR_SUBCLASS(__code);
+__LOCAL_LIBC(except_name) __ATTR_CONST __ATTR_WUNUSED char const *
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_name))(__except_code_t __code) {
+	__except_class_t __err_class       = EXCEPT_CLASS(__code);
+	__except_subclass_t __err_subclass = EXCEPT_SUBCLASS(__code);
 /*[[[deemon
 (printExceptNameFunctionBody from ....misc.libgen.exceptinfo)(
 	classVariableName:    "err_class",
@@ -110,8 +110,8 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_name))(__error_code_t __code) {
 	"TRUCTION_BAD_OPERAND\0\0\0\0\0\0\0\0\0\0\0\0\0E_ILLEGAL_INSTRUCTION_REGISTER\0"
 	"\1E_STACK_OVERFLOW\0\1E_INDEX_ERROR\0E_INDEX_ERROR_OUT_OF_BOUNDS\0\1";
 	char const *__result;
-	__error_class_t __class_offset;
-	__error_subclass_t __subclass_offset;
+	__except_class_t __class_offset;
+	__except_subclass_t __subclass_offset;
 	if (__err_class <= 0x000a) {
 		__result = __e_linear_0000h_000ah;
 		__class_offset = __err_class;
@@ -236,8 +236,8 @@ __non_linear_prefix:
 	"GFAULT_NOTREADABLE\0E_SEGFAULT_NOTEXECUTABLE\0E_SEGFAULT_NOTATOMIC"
 	"\0E_SEGFAULT_UNALIGNED\0E_SEGFAULT_NONCONTINUOUS\0\1";
 	char const *__result;
-	__error_class_t __class_offset;
-	__error_subclass_t __subclass_offset;
+	__except_class_t __class_offset;
+	__except_subclass_t __subclass_offset;
 	if (__err_class <= 0x000a) {
 		__result = __e_linear_0000h_000ah;
 		__class_offset = __err_class;
@@ -339,8 +339,8 @@ __non_linear_prefix:
 /*[[[end]]]*/
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_name_defined
-#define __local___localdep_error_name_defined
-#define __localdep_error_name __LIBC_LOCAL_NAME(error_name)
-#endif /* !__local___localdep_error_name_defined */
-#endif /* !__local_error_name_defined */
+#ifndef __local___localdep_except_name_defined
+#define __local___localdep_except_name_defined
+#define __localdep_except_name __LIBC_LOCAL_NAME(except_name)
+#endif /* !__local___localdep_except_name_defined */
+#endif /* !__local_except_name_defined */

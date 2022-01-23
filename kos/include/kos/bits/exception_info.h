@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
+#include <kos/bits/except.h>         /* __EXCEPT_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
 #include <kos/bits/exception_nest.h> /* __EXCEPT_BACKTRACE_SIZE */
 
@@ -48,30 +48,30 @@
                                 *       error codes (in this case  `UNWIND_SEGFAULT') get produced instead of  always
                                 *       causing `UNWIND_USER_RECURSION' (which should only be produced if the  unwind
                                 *       machinery itself has become faulty) */
-#define EXCEPT_FMAYSIGNAL 0x80 /* FLAG: The exception may be converted into a signal when `error_unwind(3)' cannot find
-                                *       a handler apart  of some except-aware  module (s.a.  set_exception_handler:#4).
+#define EXCEPT_FMAYSIGNAL 0x80 /* FLAG: The exception may be converted into a signal when `except_unwind(3)' cannot find
+                                *       a handler  apart of  some except-aware  module (s.a.  set_exception_handler:#4).
                                 *       If the exception cannot be translated, a coredump is performed. */
 #endif /* !__KERNEL__ */
 #define OFFSET_EXCEPTION_INFO_STATE    0
-#define OFFSET_EXCEPTION_INFO_DATA     __SIZEOF_ERROR_REGISTER_STATE
-#define OFFSET_EXCEPTION_INFO_CODE     (__SIZEOF_ERROR_REGISTER_STATE + __OFFSET_EXCEPTION_DATA_CODE)
-#define OFFSET_EXCEPTION_INFO_POINTERS (__SIZEOF_ERROR_REGISTER_STATE + __OFFSET_EXCEPTION_DATA_ARGS)
-#define OFFSET_EXCEPTION_INFO_TRACE    (__SIZEOF_ERROR_REGISTER_STATE + __SIZEOF_EXCEPTION_DATA)
-#define OFFSET_EXCEPTION_INFO_FLAGS    (__SIZEOF_ERROR_REGISTER_STATE + __SIZEOF_EXCEPTION_DATA + (__EXCEPT_BACKTRACE_SIZE * __SIZEOF_POINTER__))
+#define OFFSET_EXCEPTION_INFO_DATA     __SIZEOF_EXCEPT_REGISTER_STATE
+#define OFFSET_EXCEPTION_INFO_CODE     (__SIZEOF_EXCEPT_REGISTER_STATE + __OFFSET_EXCEPTION_DATA_CODE)
+#define OFFSET_EXCEPTION_INFO_POINTERS (__SIZEOF_EXCEPT_REGISTER_STATE + __OFFSET_EXCEPTION_DATA_ARGS)
+#define OFFSET_EXCEPTION_INFO_TRACE    (__SIZEOF_EXCEPT_REGISTER_STATE + __SIZEOF_EXCEPTION_DATA)
+#define OFFSET_EXCEPTION_INFO_FLAGS    (__SIZEOF_EXCEPT_REGISTER_STATE + __SIZEOF_EXCEPTION_DATA + (__EXCEPT_BACKTRACE_SIZE * __SIZEOF_POINTER__))
 
-#ifndef __ERROR_REGISTER_STATE_TYPE
+#ifndef __EXCEPT_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
-#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__ERROR_REGISTER_STATE_TYPE */
+#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __error_register_state_t_defined
-#define __error_register_state_t_defined
-typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
-#endif /* !__error_register_state_t_defined */
+#ifndef __except_register_state_t_defined
+#define __except_register_state_t_defined
+typedef __EXCEPT_REGISTER_STATE_TYPE except_register_state_t;
+#endif /* !__except_register_state_t_defined */
 struct exception_info;
 
 #ifdef __USE_KOS_KERNEL
@@ -91,16 +91,16 @@ struct exception_info {
 	 *       you  must always subtract  `1' from the  address, such as when
 	 *       calling  `unwind_at()', which requires you to provide `PC - 1'
 	 *       for its `abs_pc' argument. */
-	error_register_state_t     ei_state;
+	except_register_state_t     ei_state;
 	union {
-		__error_code_t         ei_code;     /* Current exception code. */
+		__except_code_t         ei_code;     /* Current exception code. */
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			__error_class_t    ei_class;    /* Current exception class. */
-			__error_subclass_t ei_subclass; /* Current exception sub-class. */
+			__except_class_t    ei_class;    /* Current exception class. */
+			__except_subclass_t ei_subclass; /* Current exception sub-class. */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			__error_subclass_t ei_subclass; /* Current exception sub-class. */
-			__error_class_t    ei_class;    /* Current exception class. */
+			__except_subclass_t ei_subclass; /* Current exception sub-class. */
+			__except_class_t    ei_class;    /* Current exception class. */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		}
 #ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
@@ -131,13 +131,13 @@ struct exception_info {
 #endif /* __EXCEPT_BACKTRACE_SIZE != 0 */
 	__uint8_t                  ei_flags;    /* Flags describing the current exception state (Set of `EXCEPT_F*'). */
 #if __SIZEOF_POINTER__ < 4
-	__uint8_t                  ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+	__uint8_t                  ei_nesting;  /* # of times that `except_nesting_begin()' was called (as a non-no-op). */
 #elif __SIZEOF_POINTER__ == 4
 	__uint8_t                __ei_pad[1];   /* ... */
-	__uint16_t                 ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+	__uint16_t                 ei_nesting;  /* # of times that `except_nesting_begin()' was called (as a non-no-op). */
 #elif __SIZEOF_POINTER__ == 8
 	__uint8_t                __ei_pad[3];   /* ... */
-	__uint32_t                 ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+	__uint32_t                 ei_nesting;  /* # of times that `except_nesting_begin()' was called (as a non-no-op). */
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported `__SIZEOF_POINTER__'"
 #endif /* __SIZEOF_POINTER__ != ... */

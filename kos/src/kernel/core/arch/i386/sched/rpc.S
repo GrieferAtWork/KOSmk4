@@ -369,13 +369,13 @@ END(x86_userexcept_sysret)
  * >> NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,
  * >>                                             struct rpc_syscall_info *sc_info);
  * Arch-specific function:
- * Wrapper around `userexcept_handler()' for use in implementing `error_unwind()'.
- * This  function will (safely) construct a complete `struct icpustate' at the far
- * end of the  calling thread's stack  and populate with  with register info  from
- * `state'. Afterwards, it  will force-unwind  the kernel  stack such  that it  is
- * located immediately at the new state. Once that is done, a call to the portable
- * function  `userexcept_handler(<state>, sc_info)' is made,  and if that function
- * returns normally,  either  `syscall_emulate_r(..., sc_info)'  if  non-NULL,  or
+ * Wrapper around `userexcept_handler()' for use in implementing `except_unwind()'.
+ * This function will (safely) construct  a complete `struct icpustate' at the  far
+ * end of the  calling thread's  stack and populate  with with  register info  from
+ * `state'.  Afterwards,  it will  force-unwind the  kernel stack  such that  it is
+ * located  immediately at the new state. Once that is done, a call to the portable
+ * function `userexcept_handler(<state>, sc_info)' is  made, and  if that  function
+ * returns  normally,  either  `syscall_emulate_r(..., sc_info)'  if  non-NULL,  or
  * directly load the associated state by means of `cpu_apply_icpustate()'. */
 .section .text
 INTERN_FUNCTION(userexcept_handler_ucpustate)
@@ -598,7 +598,7 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 
 	/* Normally when `userexcept_handler()' returns, it means that the
 	 * current system call or interrupt should be restarted.  However,
-	 * the only reason  we ever get  here is because  `error_unwind()'
+	 * the only reason we ever  get here is because  `except_unwind()'
 	 * tried  to unwind an exception into userspace in a context where
 	 * no prior exception handler  claimed ownership of the  exception
 	 * for the purpose of allowing restarts.

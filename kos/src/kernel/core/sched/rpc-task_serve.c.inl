@@ -76,8 +76,8 @@ task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
 #ifdef LOCAL_NOEXCEPT
 	result = TASK_SERVE_NX_NORMAL;
 #else /* LOCAL_NOEXCEPT */
-	assertf(!error_active(), "Then how would we be able to THROW below?");
-	error.ei_code  = ERROR_CODEOF(E_OK);
+	assertf(!except_active(), "Then how would we be able to THROW below?");
+	error.ei_code  = EXCEPT_CODEOF(E_OK);
 	did_serve_rpcs = false;
 	must_unwind    = false;
 #endif /* !LOCAL_NOEXCEPT */
@@ -221,8 +221,8 @@ handle_pending:
 		TRY {
 			(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 		} EXCEPT {
-			struct exception_info *tls = error_info();
-			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+			struct exception_info *tls = except_info();
+			if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 				pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
 				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
@@ -230,7 +230,7 @@ handle_pending:
 				goto handle_pending;
 			}
 			/* Prioritize errors. */
-			if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+			if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 				memcpy(&error, tls, sizeof(error));
 		}
 #endif /* !LOCAL_NOEXCEPT */
@@ -248,8 +248,8 @@ handle_pending:
 	return ctx.rc_state;
 #else /* LOCAL_NOEXCEPT */
 	/* Check if we must throw a new exception. */
-	if (error.ei_code != ERROR_CODEOF(E_OK)) {
-		memcpy(error_info(), &error, sizeof(error));
+	if (error.ei_code != EXCEPT_CODEOF(E_OK)) {
+		memcpy(except_info(), &error, sizeof(error));
 		unwind_current_exception_at_icpustate(ctx.rc_state);
 	}
 

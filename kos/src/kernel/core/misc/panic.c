@@ -33,7 +33,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  *
  * Since we're already talking about undefined behavior here,
  * we'd only make our life harder by introducing more asserts
- * for  `!error_active()' who's failure  would mean the panic
+ * for  `!except_active()' who's failure would mean the panic
  * system recursing in on itself. */
 #define NDEBUG_EXCEPT_NESTING
 
@@ -173,8 +173,8 @@ NOTHROW(KCALL _kernel_poison)(void) {
 
 
 PRIVATE void
-NOTHROW(KCALL handle_error_during_panic_info)(void) {
-	error_printf("printing panic info");
+NOTHROW(KCALL handle_except_during_panic_info)(void) {
+	except_printf("printing panic info");
 }
 
 
@@ -204,9 +204,9 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 #endif /* LOG_STACK_REMAINDER */
 	_kernel_poison();
 	memcpy(&state, dumpstate, sizeof(struct ucpustate));
-	tls_info = error_info();
+	tls_info = except_info();
 	memcpy(&saved_info, tls_info, sizeof(struct exception_info));
-	tls_info->ei_code = ERROR_CODEOF(E_OK);
+	tls_info->ei_code = EXCEPT_CODEOF(E_OK);
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
@@ -321,7 +321,7 @@ panic_assert_dbg_main(void *arg) {
 			dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
 		}
 	} EXCEPT {
-		handle_error_during_panic_info();
+		handle_except_during_panic_info();
 	}
 	dbg_printf(DBGSTR("addr: " AC_WITHFG(ANSITTY_CL_WHITE, "%p") "\n"),
 	           kcpustate_getpc(&args->aa_state));
@@ -351,7 +351,7 @@ NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) 
 			printk(KERN_RAW "\n");
 		}
 	} EXCEPT {
-		handle_error_during_panic_info();
+		handle_except_during_panic_info();
 	}
 	{
 		struct ucpustate temp;
@@ -398,7 +398,7 @@ panic_assert_chk_print_message(void *arg) {
 			dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
 		}
 	} EXCEPT {
-		handle_error_during_panic_info();
+		handle_except_during_panic_info();
 	}
 	dbg_printf(DBGSTR("addr: " AC_WITHFG(ANSITTY_CL_WHITE, "%p") "\n"),
 	           kcpustate_getpc(&args->aa_state));
@@ -519,7 +519,7 @@ NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 			printk(KERN_RAW "\n");
 		}
 	} EXCEPT {
-		handle_error_during_panic_info();
+		handle_except_during_panic_info();
 	}
 	TRY {
 		struct ucpustate temp;
@@ -639,7 +639,7 @@ panic_kernel_dbg_main(void *arg) {
 		TRY {
 			format_vprintf(&dbg_printer, NULL, args->format, args->args);
 		} EXCEPT {
-			handle_error_during_panic_info();
+			handle_except_during_panic_info();
 		}
 		dbg_indent -= 6;
 		dbg_print(AC_DEFCOLOR "\n");
@@ -666,7 +666,7 @@ NOTHROW(FCALL kernel_vpanic_ucpustate_n)(unsigned int n_skip,
 		TRY {
 			format_vprintf(&syslog_printer, SYSLOG_LEVEL_EMERG, format, vargs_copy);
 		} EXCEPT {
-			handle_error_during_panic_info();
+			handle_except_during_panic_info();
 		}
 		va_end(vargs_copy);
 		printk(KERN_EMERG "\n");

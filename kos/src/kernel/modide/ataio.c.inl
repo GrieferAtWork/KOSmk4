@@ -460,8 +460,8 @@ err_io_error:
 	                "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
 	                "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
 	                "dma:%#" PRIxN(__SIZEOF_PORT_T__) ")\n",
-	       (u16)ATA_ERROR_CLASS(error),
-	       (u16)ATA_ERROR_SUBCLASS(error),
+	       (u16)ATA_EXCEPT_CLASS(error),
+	       (u16)ATA_EXCEPT_SUBCLASS(error),
 	       (u16)ATA_ERROR_REASON(error),
 	       bus->ab_busio,
 	       bus->ab_ctrlio,
@@ -477,8 +477,8 @@ err_io_error:
 	}
 
 	/* Throw an I/O error exception */
-	error_thrown(ERROR_CODE(ATA_ERROR_CLASS(error), ATA_ERROR_SUBCLASS(error)),
-	             2, E_IOERROR_SUBSYSTEM_HARDDISK, ATA_ERROR_REASON(error));
+	except_thrown(EXCEPT_CODE(ATA_EXCEPT_CLASS(error), ATA_EXCEPT_SUBCLASS(error)),
+	              2, E_IOERROR_SUBSYSTEM_HARDDISK, ATA_ERROR_REASON(error));
 #endif /* !LOCAL_IS_DMA */
 }
 

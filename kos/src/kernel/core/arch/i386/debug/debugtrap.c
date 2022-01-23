@@ -66,8 +66,8 @@ NOTHROW(EXCEPT_PERSONALITY_CC driver_initializer_personality)(struct unwind_fde_
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE)) {
 		siginfo_t si;
 		struct kcpustate *st;
-		struct exception_info *info = error_info();
-		if (!error_as_signal(&info->ei_data, &si))
+		struct exception_info *info = except_info();
+		if (!except_as_signal(&info->ei_data, &si))
 			si.si_signo = SIGILL;
 		st = kernel_debugtrap_r(&info->ei_state, si.si_signo);
 		(void)st;

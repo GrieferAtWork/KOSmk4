@@ -254,8 +254,8 @@ union kernel_uvio_argument {
 #define KERNEL_UVIO_REQUEST_STATUS_EXCEPT    3 /* The request has completed with an exception. */
 
 struct kernel_uvio_except {
-	error_code_t kue_code;                              /* Exception code (one of `ERROR_CODEOF(*)') */
-	uintptr_t    kue_pointers[EXCEPTION_DATA_POINTERS]; /* Exception pointers */
+	except_code_t kue_code;                              /* Exception code (one of `EXCEPT_CODEOF(*)') */
+	uintptr_t     kue_pointers[EXCEPTION_DATA_POINTERS]; /* Exception pointers */
 };
 
 struct kernel_uvio_request {
