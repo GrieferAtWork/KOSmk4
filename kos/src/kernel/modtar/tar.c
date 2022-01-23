@@ -1359,9 +1359,21 @@ tarfile_new(struct tarhdr const *__restrict self,
 			break;
 		}
 	}
+
+	/* Decode file mode. */
 	mode = (uint16_t)decode_oct(self->th_mode, COMPILER_LENOF(self->th_mode));
+
+#if 1
+	/* From https://www.gnu.org/software/tar/manual/html_node/Standard.html:
+	 * """
+	 *     Modes which are not supported by the operating system
+	 *     restoring  files  from the  archive will  be ignored.
+	 * """ */
+	mode &= 07777;
+#else
 	if (mode & ~07777)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+#endif
 
 	/* Figure out the correct file size. */
 	fsize       = (uint32_t)decode_oct(self->th_size, COMPILER_LENOF(self->th_size));
@@ -1443,7 +1455,7 @@ handle_empty_fstr:
 		} else {
 handle_empty_name:
 			/* Special case: we allow an empty name for the root directory (though we ignore it). */
-			if (!S_ISDIR(mode))
+			if (S_ISDIR(mode))
 				return NULL;
 
 			/* Empty filename (not allowed) */
@@ -1874,7 +1886,7 @@ PRIVATE struct ffilesys tarfs_filesys = {
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-INTERN ATTR_FREETEXT void KCALL kernel_initialize_tarfs_driver(void)
+INTERN ATTR_FREETEXT void KCALL kernel_initialize_tar_driver(void)
 #else  /* CONFIG_BUILDING_KERNEL_CORE */
 PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL init(void)
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
