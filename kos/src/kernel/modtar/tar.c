@@ -1454,12 +1454,12 @@ handle_empty_fstr:
 			}
 		} else {
 handle_empty_name:
-			/* Special case: we allow an empty name for the root directory (though we ignore it). */
-			if (S_ISDIR(mode))
-				return NULL;
-
-			/* Empty filename (not allowed) */
-			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+			/* Special case: we allow an empty name for the root
+			 *               directory (though  we  ignore  it).
+			 * NOTE: This also handles  tar files with  trailing
+			 *       NUL bytes present after all preceding files
+			 *       have been enumerated. */
+			return NULL;
 		}
 	}
 
