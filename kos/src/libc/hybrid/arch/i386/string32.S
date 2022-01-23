@@ -47,6 +47,7 @@
 #endif /* !__INTELLISENSE__ */
 
 #ifndef __KERNEL__
+DEFINE_INTERN_ALIAS(libc_bcmp, libc_memcmp)
 DEFINE_PUBLIC_ALIAS(bcmp, libc_memcmp)
 DEFINE_PUBLIC_ALIAS(__bzero, libc_bzero)
 DEFINE_PUBLIC_ALIAS(explicit_bzero, libc_bzero)
@@ -67,6 +68,21 @@ DEFINE_PUBLIC_ALIAS(DOS$wmemset, libc_memsetw)
 DEFINE_PUBLIC_ALIAS(DOS$wmempcpy, libc_mempcpyw)
 DEFINE_PUBLIC_ALIAS(DOS$wmempmove, libc_mempmovew)
 DEFINE_PUBLIC_ALIAS(DOS$wmempset, libc_mempsetw)
+
+DEFINE_INTERN_ALIAS(libc_wmemcmp, libc_memcmpl)
+DEFINE_INTERN_ALIAS(libc_wmemcpy, libc_memcpyl)
+DEFINE_INTERN_ALIAS(libc_wmemmove, libc_memmovel)
+DEFINE_INTERN_ALIAS(libc_wmemset, libc_memsetl)
+DEFINE_INTERN_ALIAS(libc_wmempcpy, libc_mempcpyl)
+DEFINE_INTERN_ALIAS(libc_wmempmove, libc_mempmovel)
+DEFINE_INTERN_ALIAS(libc_wmempset, libc_mempsetl)
+DEFINE_INTERN_ALIAS(libd_wmemcmp, libc_memcmpw)
+DEFINE_INTERN_ALIAS(libd_wmemcpy, libc_memcpyw)
+DEFINE_INTERN_ALIAS(libd_wmemmove, libc_memmovew)
+DEFINE_INTERN_ALIAS(libd_wmemset, libc_memsetw)
+DEFINE_INTERN_ALIAS(libd_wmempcpy, libc_mempcpyw)
+DEFINE_INTERN_ALIAS(libd_wmempmove, libc_mempmovew)
+DEFINE_INTERN_ALIAS(libd_wmempset, libc_mempsetw)
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_STRING32_S */

@@ -212,24 +212,31 @@ size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
 %[default:section(".text.crt{|.dos}.wchar.unicode.convert")]
 
 [[requires_function(free)]]
-void convert_freev(/*utf-8*/ char **ptr) {
-	char **iter, *temp;
-	if unlikely(!ptr)
+void convert_freev(void *vector)
+	[(/*utf-8*/ char **vector)]
+	[(char16_t **vector)]
+	[(char32_t **vector)]
+{
+	void **iter, *temp;
+	if unlikely(!vector)
 		return;
-	for (iter = ptr; (temp = *iter) != NULL; ++iter)
+	for (iter = (void **)vector; (temp = *iter) != NULL; ++iter)
 		free(temp);
-	free(ptr);
+	free(vector);
 }
 
 [[requires_function(free), decl_include("<hybrid/typecore.h>")]]
-void convert_freevn(/*utf-8*/ char **ptr, $size_t count) {
+void convert_freevn(void *vector, $size_t count)
+	[(/*utf-8*/ char **vector, $size_t count)]
+	[(char16_t **vector, $size_t count)]
+	[(char32_t **vector, $size_t count)]
+{
 	size_t i;
-	if unlikely(!ptr)
+	if unlikely(!vector)
 		return;
-	for (i = 0; i < count; ++i) {
-		free(ptr[i]);
-	}
-	free(ptr);
+	for (i = 0; i < count; ++i)
+		free(((void **)vector)[i]);
+	free(vector);
 }
 
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]

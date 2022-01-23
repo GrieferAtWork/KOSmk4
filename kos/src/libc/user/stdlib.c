@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_STDLIB_C
 #define GUARD_LIBC_USER_STDLIB_C 1
+#define _UTF_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -118,8 +119,8 @@ PRIVATE ATTR_SECTION(".bss.crt.fs.environ.heap") char **libc_environ_heap = NULL
 /* [lock(libc_environ_lock)][0..1] Linked list of heap-allocated environ strings. */
 PRIVATE ATTR_SECTION(".bss.crt.fs.environ.heap") struct environ_heapstr *libc_environ_strings = NULL;
 
-LOCAL ATTR_SECTION(".text.crt.fs.environ.heap")
-bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
+LOCAL ATTR_SECTION(".text.crt.fs.environ.heap") bool LIBCCALL
+environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 	struct environ_heapstr **piter, *iter;
 	assert(environ_reading());
 	for (piter = &libc_environ_strings; (iter = *piter) != NULL;
@@ -711,55 +712,53 @@ NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 }
 /*[[[end:libd___p__wenviron]]]*/
 
+ATTR_SECTION(".text.crt.dos.application.init")
+PRIVATE ATTR_CONST WUNUSED char **NOTHROW(libc_get_initenv)(void);
+
+ATTR_SECTION(".text.crt.dos.application.init")
+PRIVATE WUNUSED char **NOTHROW(libd_get_initenv)(void) {
+	/* TODO: Special handling for certain variables. */
+	COMPILER_IMPURE();
+	return libc_get_initenv();
+}
+
+#undef _wenviron
+DEFINE_PUBLIC_IDATA_G(DOS$_wenviron, libd___p__wenviron, __SIZEOF_POINTER__);
+/************************************************************************/
+
+
+
+
+PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.fs.environ") char32_t **libc_wenviron = NULL;
+DEFINE_PUBLIC_IDATA_G(_wenviron, libc___p__wenviron, __SIZEOF_POINTER__);
+#define _wenviron GET_NOREL_GLOBAL(_wenviron)
+
+#define libc_alloc_wenviron()   convert_mbstoc32v(environ)
+#define libc_free_wenviron(tab) convert_freev(tab)
+
+PRIVATE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") int
+NOTHROW_NCX(LIBKCALL libc_update_wenviron)(void) {
+	char32_t ***_pwenviron, **oldtab, **newtab;
+	newtab = libc_alloc_wenviron();
+	if unlikely(newtab == NULL)
+		return -1;
+	_pwenviron = &_wenviron;
+	oldtab      = *_pwenviron;
+	*_pwenviron = newtab;
+	libc_free_wenviron(oldtab);
+	return 0;
+}
+
 /*[[[head:libc___p__wenviron,hash:CRC-32=0x6f0d52ce]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
 NOTHROW_NCX(LIBKCALL libc___p__wenviron)(void)
 /*[[[body:libc___p__wenviron]]]*/
 {
-	/* TODO: Special handling for certain variables. */
-	CRT_UNIMPLEMENTED("__p__wenviron"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	if (libc_wenviron == NULL)
+		libc_wenviron = libc_alloc_wenviron();
+	return &libc_wenviron;
 }
 /*[[[end:libc___p__wenviron]]]*/
-
-/*[[[head:libd___p___winitenv,hash:CRC-32=0xbaabf17d]]]*/
-/* Access to the initial environment block */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
-NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
-/*[[[body:libd___p___winitenv]]]*/
-{
-	/* TODO: Special handling for certain variables. */
-	CRT_UNIMPLEMENTED("DOS$__p___winitenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd___p___winitenv]]]*/
-
-/*[[[head:libc___p___winitenv,hash:CRC-32=0x208a5e9e]]]*/
-/* Access to the initial environment block */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
-NOTHROW_NCX(LIBKCALL libc___p___winitenv)(void)
-/*[[[body:libc___p___winitenv]]]*/
-{
-	/* TODO: Special handling for certain variables. */
-	CRT_UNIMPLEMENTED("__p___winitenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc___p___winitenv]]]*/
-
-
-#undef _wenviron
-#undef __winitenv
-DEFINE_PUBLIC_IDATA_G(_wenviron, libc___p__wenviron, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$_wenviron, libd___p__wenviron, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(__winitenv, libc___p___winitenv, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$__winitenv, libd___p___winitenv, __SIZEOF_POINTER__);
-/************************************************************************/
-
-
-
 
 
 /*[[[head:libc__wgetenv,hash:CRC-32=0x47d36374]]]*/
@@ -769,7 +768,20 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname)
 {
 	static ATTR_SECTION(".bss.crt.dos.wchar.fs.environ") char32_t *last_c32getenv = NULL;
 	char *utf8_varname, *utf8_varval;
-	char32_t *c32_varval;
+	char32_t *c32_varval, **wenviron;
+	if ((libc_wenviron != NULL) && (wenviron = _wenviron) != NULL) {
+		/* Search through our c32-environment cache. */
+		size_t i, len = c32len(varname);
+		char32_t *envstr;
+		for (i = 0; (envstr = wenviron[i]) != NULL; ++i) {
+			if (c32memcmp(envstr, varname, len) != 0)
+				continue;
+			if (envstr[len] != '=')
+				continue;
+			return envstr + len + 1;
+		}
+		return NULL;
+	}
 	utf8_varname = convert_c32tombs(varname);
 	if (!utf8_varname)
 		return NULL;
@@ -874,6 +886,10 @@ NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string)
 		result = libc_setenv(utf8, eq, 1);
 	}
 	free(utf8);
+
+	/* If it's being used, update the global 32-bit `_wenviron' array. */
+	if (result == 0 && libc_wenviron != NULL)
+		result = libc_update_wenviron();
 	return result;
 }
 /*[[[end:libc__wputenv]]]*/
@@ -924,6 +940,12 @@ NOTHROW_NCX(LIBKCALL libc__wputenv_s)(char32_t const *varname,
 	result = libc__putenv_s(utf8_varname, utf8_val);
 	free(utf8_val);
 	free(utf8_varname);
+
+	/* If it's being used, update the global 32-bit `_wenviron' array. */
+	if (result == 0 && libc_wenviron != NULL) {
+		if (libc_update_wenviron())
+			result = libc_geterrno();
+	}
 	return result;
 /*err_val:
 	free(utf8_val);*/
@@ -1981,11 +2003,13 @@ char **NOTHROW(libc_get_initenv)(void) {
 }
 
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char **libc___p___initenv_pointer = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
-struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char **libd___p___initenv_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p___initenv_initialized = ATOMIC_ONCE_INIT;
 
 #undef __initenv
 DEFINE_PUBLIC_IDATA_G(__initenv, libc___p___initenv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(DOS$__initenv, libd___p___initenv, __SIZEOF_POINTER__);
 
 /*[[[head:libc___p___initenv,hash:CRC-32=0x2f3a191d]]]*/
 /* Access to the initial environment block */
@@ -1999,6 +2023,55 @@ NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 	return &libc___p___initenv_pointer;
 }
 /*[[[end:libc___p___initenv]]]*/
+
+/*[[[head:libd___p___initenv,hash:CRC-32=0xe1169326]]]*/
+/* Access to the initial environment block */
+INTERN ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
+NOTHROW_NCX(LIBDCALL libd___p___initenv)(void)
+/*[[[body:libd___p___initenv]]]*/
+{
+	ATOMIC_ONCE_RUN(&libd___p___initenv_initialized, {
+		libd___p___initenv_pointer = libd_get_initenv();
+	});
+	return &libd___p___initenv_pointer;
+}
+/*[[[end:libd___p___initenv]]]*/
+
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t **libd___p___winitenv_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char32_t **libc___p___winitenv_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p___winitenv_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___p___winitenv_initialized = ATOMIC_ONCE_INIT;
+
+#undef __winitenv
+DEFINE_PUBLIC_IDATA_G(__winitenv, libc___p___winitenv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(DOS$__winitenv, libd___p___winitenv, __SIZEOF_POINTER__);
+
+/*[[[head:libd___p___winitenv,hash:CRC-32=0xbaabf17d]]]*/
+/* Access to the initial environment block */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
+/*[[[body:libd___p___winitenv]]]*/
+{
+	ATOMIC_ONCE_RUN(&libd___p___winitenv_initialized, {
+		libd___p___winitenv_pointer = convert_mbstoc16v(*libd___p___initenv());
+	});
+	return &libd___p___winitenv_pointer;
+}
+/*[[[end:libd___p___winitenv]]]*/
+
+/*[[[head:libc___p___winitenv,hash:CRC-32=0x208a5e9e]]]*/
+/* Access to the initial environment block */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
+NOTHROW_NCX(LIBKCALL libc___p___winitenv)(void)
+/*[[[body:libc___p___winitenv]]]*/
+{
+	ATOMIC_ONCE_RUN(&libc___p___winitenv_initialized, {
+		libc___p___winitenv_pointer = convert_mbstoc32v(*libd___p___initenv());
+	});
+	return &libc___p___winitenv_pointer;
+}
+/*[[[end:libc___p___winitenv]]]*/
+
 
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd___p__wpgmptr_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char32_t *libc___p__wpgmptr_pointer = NULL;
@@ -2485,7 +2558,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xea4d6677]]]*/
+/*[[[start:exports,hash:CRC-32=0xe184957d]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -2595,6 +2668,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__p__wenviron, libd___p__wenviron);
 DEFINE_PUBLIC_ALIAS(__p__wenviron, libc___p__wenviron);
 DEFINE_PUBLIC_ALIAS(DOS$__p__wpgmptr, libd___p__wpgmptr);
 DEFINE_PUBLIC_ALIAS(__p__wpgmptr, libc___p__wpgmptr);
+DEFINE_PUBLIC_ALIAS(DOS$__p___initenv, libd___p___initenv);
 DEFINE_PUBLIC_ALIAS(__p___initenv, libc___p___initenv);
 DEFINE_PUBLIC_ALIAS(DOS$__p___winitenv, libd___p___winitenv);
 DEFINE_PUBLIC_ALIAS(__p___winitenv, libc___p___winitenv);

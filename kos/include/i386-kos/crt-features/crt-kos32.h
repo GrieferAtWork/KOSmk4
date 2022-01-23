@@ -5479,6 +5479,7 @@
 #define __CRT_HAVE_KOS$__fpclassifyf
 #define __CRT_HAVE_KOS$__fpclassifyl
 #define __CRT_HAVE___getmainargs
+#define __CRT_HAVE_KOS$__initenv
 #define __CRT_HAVE_KOS$__iswalnum_l
 #define __CRT_HAVE_KOS$__iswalpha_l
 #define __CRT_HAVE_KOS$__iswblank_l
@@ -5519,6 +5520,7 @@
 #define __CRT_HAVE_KOS$__mkdir
 #define __CRT_HAVE_KOS$__open
 #define __CRT_HAVE_KOS$__open64
+#define __CRT_HAVE_KOS$__p___initenv
 #define __CRT_HAVE_KOS$__p___wargv
 #define __CRT_HAVE_KOS$__p___winitenv
 #define __CRT_HAVE___p__acmdln
@@ -6290,6 +6292,7 @@
 #define __CRT_HAVE_DOS$__fpclassifyf
 #define __CRT_HAVE_DOS$__fpclassifyl
 #define __CRT_HAVE_DOS$__getmainargs
+#define __CRT_HAVE_DOS$__initenv
 #define __CRT_HAVE_DOS$__iswalnum_l
 #define __CRT_HAVE_DOS$__iswalpha_l
 #define __CRT_HAVE_DOS$__iswblank_l
@@ -6330,6 +6333,7 @@
 #define __CRT_HAVE_DOS$__mkdir
 #define __CRT_HAVE_DOS$__open
 #define __CRT_HAVE_DOS$__open64
+#define __CRT_HAVE_DOS$__p___initenv
 #define __CRT_HAVE_DOS$__p___wargv
 #define __CRT_HAVE_DOS$__p___winitenv
 #define __CRT_HAVE_DOS$__p__acmdln

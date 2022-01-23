@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ade42e4 */
+/* HASH CRC-32:0xaacaaff9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,6 +129,7 @@
 #define __CRT_HAVE_DOS$__overflow
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$__p___initenv
 #define __CRT_HAVE_DOS$__p___wargv
 #define __CRT_HAVE_DOS$__p___winitenv
 #define __CRT_HAVE_DOS$__p__wenviron

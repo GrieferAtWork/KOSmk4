@@ -334,7 +334,7 @@ NOTHROW_NCX(LIBCCALL libc____lc_codepage_func)(void)
 /*[[[end:libc____lc_codepage_func]]]*/
 
 DEFINE_INTERN_ALIAS(libc____lc_collate_cp_func, libc____lc_codepage_func);
-/*[[[skip:libc____lc_collate_cp_func]]]*/
+/*[[[impl:libc____lc_collate_cp_func]]]*/
 
 /*[[[head:libc__Getdays,hash:CRC-32=0x95013a8b]]]*/
 INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED char *

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf51102d6 */
+/* HASH CRC-32:0xc9d497c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,14 +39,13 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 __LOCAL_LIBC(convert_freevn) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(convert_freevn))(char **__ptr, __SIZE_TYPE__ __count) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(convert_freevn))(void *__vector, __SIZE_TYPE__ __count) {
 	__SIZE_TYPE__ __i;
-	if __unlikely(!__ptr)
+	if __unlikely(!__vector)
 		return;
-	for (__i = 0; __i < __count; ++__i) {
-		(__NAMESPACE_LOCAL_SYM __localdep_free)(__ptr[__i]);
-	}
-	(__NAMESPACE_LOCAL_SYM __localdep_free)(__ptr);
+	for (__i = 0; __i < __count; ++__i)
+		(__NAMESPACE_LOCAL_SYM __localdep_free)(((void **)__vector)[__i]);
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__vector);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_convert_freevn_defined

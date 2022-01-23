@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fdb1e88 */
+/* HASH CRC-32:0x91da728 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,24 +36,23 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") void
-NOTHROW_NCX(LIBCCALL libc_convert_freev)(char **ptr) {
-	char **iter, *temp;
-	if unlikely(!ptr)
+NOTHROW_NCX(LIBCCALL libc_convert_freev)(void *vector) {
+	void **iter, *temp;
+	if unlikely(!vector)
 		return;
-	for (iter = ptr; (temp = *iter) != NULL; ++iter)
+	for (iter = (void **)vector; (temp = *iter) != NULL; ++iter)
 		libc_free(temp);
-	libc_free(ptr);
+	libc_free(vector);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") void
-NOTHROW_NCX(LIBCCALL libc_convert_freevn)(char **ptr,
+NOTHROW_NCX(LIBCCALL libc_convert_freevn)(void *vector,
                                           size_t count) {
 	size_t i;
-	if unlikely(!ptr)
+	if unlikely(!vector)
 		return;
-	for (i = 0; i < count; ++i) {
-		libc_free(ptr[i]);
-	}
-	libc_free(ptr);
+	for (i = 0; i < count; ++i)
+		libc_free(((void **)vector)[i]);
+	libc_free(vector);
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char *

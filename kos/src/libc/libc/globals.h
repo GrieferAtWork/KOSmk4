@@ -82,6 +82,7 @@ DECL_BEGIN
 #undef __LOCAL_environ
 #undef __environ
 #undef _environ
+#undef _wenviron
 #undef environ
 struct process_peb;
 DECLARE_NOREL_GLOBAL_META(struct process_peb, __peb);
@@ -90,6 +91,7 @@ DECLARE_NOREL_GLOBAL_META(char **, __argv);
 DECLARE_NOREL_GLOBAL_META(char *, _pgmptr);    /* aka. `program_invocation_name', `__progname_full' */
 DECLARE_NOREL_GLOBAL_META(char *, __progname); /* aka. `program_invocation_short_name' */
 DECLARE_NOREL_GLOBAL_META(char **, environ);   /* aka. `_environ', `__environ' */
+DECLARE_NOREL_GLOBAL_META(char32_t **, _wenviron);
 #define __peb                                   GET_NOREL_GLOBAL(__peb)
 #define __argc                                  GET_NOREL_GLOBAL(__argc)
 #define __argv                                  GET_NOREL_GLOBAL(__argv)
@@ -106,6 +108,7 @@ DECLARE_NOREL_GLOBAL_META(char **, environ);   /* aka. `_environ', `__environ' *
 #define __environ                               GET_NOREL_GLOBAL(environ)
 #define _environ                                GET_NOREL_GLOBAL(environ)
 #define environ                                 GET_NOREL_GLOBAL(environ)
+#define _wenviron                               GET_NOREL_GLOBAL(_wenviron)
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ca97575 */
+/* HASH CRC-32:0xed2a92e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -235,16 +235,48 @@ __NAMESPACE_STD_USING(c32rtomb)
  * automatically allocate buffers on the heap) */
 
 #ifdef __CRT_HAVE_convert_freev
-__CDECLARE_VOID(,__NOTHROW_NCX,convert_freev,(char **__ptr),(__ptr))
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UCHAR_H_PROTO)
+extern "C++" {
+__CREDIRECT_VOID(,__NOTHROW_NCX,convert_freev,(char **__vector),convert_freev,(__vector))
+__CREDIRECT_VOID(,__NOTHROW_NCX,convert_freev,(char16_t **__vector),convert_freev,(__vector))
+__CREDIRECT_VOID(,__NOTHROW_NCX,convert_freev,(char32_t **__vector),convert_freev,(__vector))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_UCHAR_H_PROTO */
+__CDECLARE_VOID(,__NOTHROW_NCX,convert_freev,(void *__vector),(__vector))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_UCHAR_H_PROTO */
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/uchar/convert_freev.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(convert_freev, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freev)(char **__ptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freev))(__ptr); })
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UCHAR_H_PROTO)
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freev)(char **__vector) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freev))((void *)__vector); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freev)(char16_t **__vector) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freev))((void *)__vector); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freev)(char32_t **__vector) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freev))((void *)__vector); }
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_UCHAR_H_PROTO */
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_freev, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freev)(void *__vector) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freev))(__vector); })
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_UCHAR_H_PROTO */
 #endif /* ... */
 #ifdef __CRT_HAVE_convert_freevn
-__CDECLARE_VOID(,__NOTHROW_NCX,convert_freevn,(char **__ptr, __SIZE_TYPE__ __count),(__ptr,__count))
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UCHAR_H_PROTO)
+extern "C++" {
+__CREDIRECT_VOID(,__NOTHROW_NCX,convert_freevn,(char **__vector, __SIZE_TYPE__ __count),convert_freevn,(__vector,__count))
+__CREDIRECT_VOID(,__NOTHROW_NCX,convert_freevn,(char16_t **__vector, __SIZE_TYPE__ __count),convert_freevn,(__vector,__count))
+__CREDIRECT_VOID(,__NOTHROW_NCX,convert_freevn,(char32_t **__vector, __SIZE_TYPE__ __count),convert_freevn,(__vector,__count))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_UCHAR_H_PROTO */
+__CDECLARE_VOID(,__NOTHROW_NCX,convert_freevn,(void *__vector, __SIZE_TYPE__ __count),(__vector,__count))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_UCHAR_H_PROTO */
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/uchar/convert_freevn.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(convert_freevn, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freevn)(char **__ptr, __SIZE_TYPE__ __count) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freevn))(__ptr, __count); })
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UCHAR_H_PROTO)
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freevn)(char **__vector, __SIZE_TYPE__ __count) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freevn))((void *)__vector, __count); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freevn)(char16_t **__vector, __SIZE_TYPE__ __count) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freevn))((void *)__vector, __count); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freevn)(char32_t **__vector, __SIZE_TYPE__ __count) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freevn))((void *)__vector, __count); }
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_UCHAR_H_PROTO */
+__NAMESPACE_LOCAL_USING_OR_IMPL(convert_freevn, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL convert_freevn)(void *__vector, __SIZE_TYPE__ __count) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(convert_freevn))(__vector, __count); })
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_UCHAR_H_PROTO */
 #endif /* ... */
 #ifdef __CRT_HAVE_convert_wcstombs
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,convert_wcstombs,(__WCHAR_TYPE__ const *__str),(__str))

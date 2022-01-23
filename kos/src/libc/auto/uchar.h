@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e55785a */
+/* HASH CRC-32:0x990e197f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,16 +30,16 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF void NOTHROW_NCX(LIBDCALL libd_convert_freev)(char **ptr);
+INTDEF void NOTHROW_NCX(LIBDCALL libd_convert_freev)(void *vector);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF void NOTHROW_NCX(LIBCCALL libc_convert_freev)(char **ptr);
+INTDEF void NOTHROW_NCX(LIBCCALL libc_convert_freev)(void *vector);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF void NOTHROW_NCX(LIBDCALL libd_convert_freevn)(char **ptr, size_t count);
+INTDEF void NOTHROW_NCX(LIBDCALL libd_convert_freevn)(void *vector, size_t count);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF void NOTHROW_NCX(LIBCCALL libc_convert_freevn)(char **ptr, size_t count);
+INTDEF void NOTHROW_NCX(LIBCCALL libc_convert_freevn)(void *vector, size_t count);
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libd_convert_wcstombs)(char16_t const *str);
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBKCALL libc_convert_wcstombs)(char32_t const *str);
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libd_convert_wcstombsn)(char16_t const *__restrict str, size_t len, size_t *preslen);

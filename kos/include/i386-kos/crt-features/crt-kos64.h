@@ -5351,6 +5351,7 @@
 #define __CRT_HAVE_KOS$__ilogb
 #define __CRT_HAVE_KOS$__ilogbf
 #define __CRT_HAVE_KOS$__ilogbl
+#define __CRT_HAVE_KOS$__initenv
 #define __CRT_HAVE_KOS$__initstate
 #define __CRT_HAVE_KOS$__ioctl
 #define __CRT_HAVE_KOS$__ioperm
@@ -5639,6 +5640,7 @@
 #define __CRT_HAVE_KOS$__open
 #define __CRT_HAVE_KOS$__open64
 #define __CRT_HAVE_KOS$__overflow
+#define __CRT_HAVE_KOS$__p___initenv
 #define __CRT_HAVE_KOS$__p___wargv
 #define __CRT_HAVE_KOS$__p___winitenv
 #define __CRT_HAVE___p__acmdln
@@ -9097,6 +9099,7 @@
 #define __CRT_HAVE_DOS$__ilogb
 #define __CRT_HAVE_DOS$__ilogbf
 #define __CRT_HAVE_DOS$__ilogbl
+#define __CRT_HAVE_DOS$__initenv
 #define __CRT_HAVE_DOS$__initstate
 #define __CRT_HAVE_DOS$__ioctl
 #define __CRT_HAVE_DOS$__ioperm
@@ -9385,6 +9388,7 @@
 #define __CRT_HAVE_DOS$__open
 #define __CRT_HAVE_DOS$__open64
 #define __CRT_HAVE_DOS$__overflow
+#define __CRT_HAVE_DOS$__p___initenv
 #define __CRT_HAVE_DOS$__p___wargv
 #define __CRT_HAVE_DOS$__p___winitenv
 #define __CRT_HAVE_DOS$__p__acmdln

@@ -4083,9 +4083,9 @@ __LIBC char **__initenv;
 #else /* __CRT_HAVE___initenv */
 }
 @@Access to the initial environment block
-[[guard, const, wunused]]
+[[crt_dos_variant, guard, const, wunused]]
 [[section(".text.crt.dos.fs.environ")]]
-__p___initenv() -> [[nonnull]] char ***;
+[[nonnull]] char ***__p___initenv();
 %{
 #ifdef ____p___initenv_defined
 #define __initenv (*__p___initenv())
@@ -4100,7 +4100,7 @@ __LIBC wchar_t **__winitenv;
 @@Access to the initial environment block
 [[guard, const, wunused, wchar]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
-__p___winitenv() -> [[nonnull]] wchar_t ***;
+[[nonnull]] wchar_t ***__p___winitenv();
 %{
 #ifdef ____p___winitenv_defined
 #define __winitenv (*__p___winitenv())

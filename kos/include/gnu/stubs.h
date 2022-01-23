@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefdac348 */
+/* HASH CRC-32:0xdc538d63 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,11 +47,9 @@
 #define __stub___h_errno_location
 #define __stub___locale_ctype_ptr
 #define __stub___locale_ctype_ptr_l
-#define __stub___p___winitenv
 #define __stub___p__crtAssertBusy
 #define __stub___p__crtBreakAlloc
 #define __stub___p__crtDbgFlag
-#define __stub___p__wenviron
 #define __stub___pthread_register_cancel
 #define __stub___pthread_register_cancel_defer
 #define __stub___pthread_unregister_cancel
@@ -614,7 +612,6 @@
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func
-#define __stub_DOS$__p___winitenv
 #define __stub_DOS$__p__wenviron
 #define __stub_DOS$__wcserror
 #define __stub_DOS$__wcserror_s
