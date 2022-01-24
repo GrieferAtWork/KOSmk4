@@ -945,7 +945,7 @@ int isatty($fd_t fd) {
 @@@return: newfd: Returns the new handle upon success.
 @@Duplicate a file referred to by `oldfd' into `newfd'
 [[guard, decl_include("<bits/types.h>")]]
-[[section(".text.crt{|.dos}.io.access")]]
+[[crt_dos_variant, section(".text.crt{|.dos}.io.access")]]
 [[dos_only_export_alias("_dup2"), export_alias("__dup2", "__libc_dup2")]]
 $fd_t dup2($fd_t oldfd, $fd_t newfd);
 
@@ -1372,7 +1372,7 @@ ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, __PIO_
 %#if defined(__USE_GNU) || defined(__USE_NETBSD)
 [[section(".text.crt{|.dos}.io.access")]]
 [[userimpl, requires_function(dup2)]]
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 $fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
 	/* TODO: Document which `flags' actually do anything */
 	/* TODO: Emulate using dup2()+fcntl() */

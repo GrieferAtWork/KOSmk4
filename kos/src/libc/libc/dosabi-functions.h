@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18523b0b */
+/* HASH CRC-32:0xfb262058 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2298,7 +2298,6 @@ DFUN(".text.crt.dos.io.read", libd_readall, libc_readall, TI, 3, TIn(__SIZEOF_FD
 DFUN(".text.crt.dos.io.write", libd_writeall, libc_writeall, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)
 DFUN(".text.crt.dos.io.seek", libd_lseek, libc_lseek, TIn(__SIZEOF_OFF32_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF32_T__), TD)
 DFUN(".text.crt.dos.io.tty", libd_isatty, libc_isatty, TD, 1, TIn(__SIZEOF_FD_T__))
-DFUN(".text.crt.dos.io.access", libd_dup2, libc_dup2, TIn(__SIZEOF_FD_T__), 2, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.access", libd_dup, libc_dup, TIn(__SIZEOF_FD_T__), 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.access", libd_close, libc_close, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.large.seek", libd_lseek64, libc_lseek64, TIn(__SIZEOF_OFF64_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF64_T__), TD)
@@ -2310,7 +2309,6 @@ DFUN(".text.crt.dos.io.large.read", libd_pread64, libc_pread64, TI, 4, TIn(__SIZ
 DFUN(".text.crt.dos.io.large.write", libd_pwrite64, libc_pwrite64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TIn(__SIZEOF_OFF64_T__))
 DFUN(".text.crt.dos.io.large.read", libd_preadall64, libc_preadall64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TIn(__SIZEOF_OFF64_T__))
 DFUN(".text.crt.dos.io.large.write", libd_pwriteall64, libc_pwriteall64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TIn(__SIZEOF_OFF64_T__))
-DFUN(".text.crt.dos.io.access", libd_dup3, libc_dup3, TIn(__SIZEOF_FD_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.io.access", libd_pipe2, libc_pipe2, TD, 2, TP, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.modify", libd_syncfs, libc_syncfs, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.sched.user", libd_group_member, libc_group_member, TD, 1, TIn(__SIZEOF_GID_T__))

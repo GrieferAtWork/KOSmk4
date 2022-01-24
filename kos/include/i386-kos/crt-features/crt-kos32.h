@@ -5473,6 +5473,7 @@
 #define __CRT_HAVE_KOS$__chroot
 #define __CRT_HAVE_KOS$__creat
 #define __CRT_HAVE_KOS$__daylight
+#define __CRT_HAVE_KOS$__dup2
 #define __CRT_HAVE_KOS$__environ
 #define __CRT_HAVE_KOS$__errno
 #define __CRT_HAVE_KOS$__fpclassify
@@ -5503,6 +5504,7 @@
 #define __CRT_HAVE_KOS$__libc_chown
 #define __CRT_HAVE_KOS$__libc_chroot
 #define __CRT_HAVE_KOS$__libc_creat
+#define __CRT_HAVE_KOS$__libc_dup2
 #define __CRT_HAVE_KOS$__libc_link
 #define __CRT_HAVE_KOS$__libc_mkdir
 #define __CRT_HAVE_KOS$__libc_open
@@ -5584,6 +5586,7 @@
 #define __CRT_HAVE__creat
 #define __CRT_HAVE_KOS$_dclass
 #define __CRT_HAVE_KOS$_dtest
+#define __CRT_HAVE_KOS$_dup2
 #define __CRT_HAVE_KOS$_dupenv_s
 #define __CRT_HAVE_KOS$_ecvt_s
 #define __CRT_HAVE_KOS$_environ
@@ -5877,6 +5880,8 @@
 #define __CRT_HAVE_KOS$convert_wcstombsvn
 #define __CRT_HAVE_KOS$creat
 #define __CRT_HAVE_KOS$creat64
+#define __CRT_HAVE_KOS$dup2
+#define __CRT_HAVE_KOS$dup3
 #define __CRT_HAVE_KOS$eaccess
 #define __CRT_HAVE_KOS$environ
 #define __CRT_HAVE_KOS$euidaccess
@@ -6288,6 +6293,7 @@
 #define __CRT_HAVE_DOS$__chroot
 #define __CRT_HAVE_DOS$__creat
 #define __CRT_HAVE_DOS$__daylight
+#define __CRT_HAVE_DOS$__dup2
 #define __CRT_HAVE_DOS$__environ
 #define __CRT_HAVE_DOS$__errno
 #define __CRT_HAVE_DOS$__fpclassify
@@ -6318,6 +6324,7 @@
 #define __CRT_HAVE_DOS$__libc_chown
 #define __CRT_HAVE_DOS$__libc_chroot
 #define __CRT_HAVE_DOS$__libc_creat
+#define __CRT_HAVE_DOS$__libc_dup2
 #define __CRT_HAVE_DOS$__libc_link
 #define __CRT_HAVE_DOS$__libc_mkdir
 #define __CRT_HAVE_DOS$__libc_open
@@ -6399,6 +6406,7 @@
 #define __CRT_HAVE_DOS$_creat
 #define __CRT_HAVE_DOS$_dclass
 #define __CRT_HAVE_DOS$_dtest
+#define __CRT_HAVE_DOS$_dup2
 #define __CRT_HAVE_DOS$_dupenv_s
 #define __CRT_HAVE_DOS$_ecvt_s
 #define __CRT_HAVE_DOS$_environ
@@ -6692,6 +6700,8 @@
 #define __CRT_HAVE_DOS$convert_wcstombsvn
 #define __CRT_HAVE_DOS$creat
 #define __CRT_HAVE_DOS$creat64
+#define __CRT_HAVE_DOS$dup2
+#define __CRT_HAVE_DOS$dup3
 #define __CRT_HAVE_DOS$eaccess
 #define __CRT_HAVE_DOS$environ
 #define __CRT_HAVE_DOS$euidaccess

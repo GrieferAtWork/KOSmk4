@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48cbc538 */
+/* HASH CRC-32:0x484f9f76 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,6 +207,10 @@ INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, __STDC_INT_
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
+INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd, fd_t newfd);
+/* >> dup2(2)
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd, fd_t newfd);
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
@@ -356,6 +360,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void 
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2], oflag_t flags);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd);

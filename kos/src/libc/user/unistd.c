@@ -616,6 +616,19 @@ NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
 }
 /*[[[end:libc_write]]]*/
 
+/*[[[head:libc_dup,hash:CRC-32=0x9db26688]]]*/
+/* >> dup(2)
+ * @return: * : Returns the new handle upon success.
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
+INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED fd_t
+NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
+/*[[[body:libc_dup]]]*/
+{
+	fd_t result = sys_dup(fd);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_dup]]]*/
+
 /*[[[head:libc_dup2,hash:CRC-32=0x7ac90214]]]*/
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
@@ -630,18 +643,53 @@ NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
 }
 /*[[[end:libc_dup2]]]*/
 
-/*[[[head:libc_dup,hash:CRC-32=0x9db26688]]]*/
-/* >> dup(2)
- * @return: * : Returns the new handle upon success.
- * Duplicate a file referred to by `fd' and return its duplicated handle number */
-INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED fd_t
-NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
-/*[[[body:libc_dup]]]*/
+/*[[[head:libc_dup3,hash:CRC-32=0x88bdc54a]]]*/
+INTERN ATTR_SECTION(".text.crt.io.access") fd_t
+NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
+                                fd_t newfd,
+                                oflag_t flags)
+/*[[[body:libc_dup3]]]*/
 {
-	fd_t result = sys_dup(fd);
+	fd_t result = sys_dup3(oldfd, newfd, flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:libc_dup]]]*/
+/*[[[end:libc_dup3]]]*/
+
+/* Must clear `libd_dos_fsroot' in `DOS$chroot()' and `DOS$dup[2|3]()' with AT_FDROOT */
+INTDEF ATTR_SECTION(".text.crt.dos.fs.environ") void
+NOTHROW(CC libd_dos_fsroot_changed)(void);
+
+/*[[[head:libd_dup2,hash:CRC-32=0xf8dbcbef]]]*/
+/* >> dup2(2)
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
+INTERN ATTR_SECTION(".text.crt.dos.io.access") fd_t
+NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd,
+                                fd_t newfd)
+/*[[[body:libd_dup2]]]*/
+{
+	fd_t result;
+	result = libc_dup2(oldfd, newfd);
+	if (result == 0 && newfd == AT_FDROOT)
+		libd_dos_fsroot_changed();
+	return result;
+}
+/*[[[end:libd_dup2]]]*/
+
+/*[[[head:libd_dup3,hash:CRC-32=0xd6e23971]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.io.access") fd_t
+NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd,
+                                fd_t newfd,
+                                oflag_t flags)
+/*[[[body:libd_dup3]]]*/
+{
+	fd_t result;
+	result = libc_dup3(oldfd, newfd, flags);
+	if (result == 0 && newfd == AT_FDROOT)
+		libd_dos_fsroot_changed();
+	return result;
+}
+/*[[[end:libd_dup3]]]*/
 
 /*[[[head:libc_close,hash:CRC-32=0x30df5919]]]*/
 /* >> close(2)
@@ -1254,18 +1302,6 @@ NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2],
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_pipe2]]]*/
-
-/*[[[head:libc_dup3,hash:CRC-32=0x88bdc54a]]]*/
-INTERN ATTR_SECTION(".text.crt.io.access") fd_t
-NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
-                                fd_t newfd,
-                                oflag_t flags)
-/*[[[body:libc_dup3]]]*/
-{
-	fd_t result = sys_dup3(oldfd, newfd, flags);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_dup3]]]*/
 
 PRIVATE ATTR_NOINLINE int LIBCCALL
 group_member_impl(gid_t gid, unsigned int bufsize) {
@@ -2111,8 +2147,12 @@ NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 	fd_t fd = open(path, O_RDONLY | O_DIRECTORY | O_DOSPATH);
 	if (fd < 0)
 		return -1;
-	result = dup2(fd, AT_FDROOT);
+	result = libd_dup2(fd, AT_FDROOT);
 	sys_close(fd);
+#if 0 /* Already done for us by `libd_dup2()' */
+	if (result == 0)
+		libd_dos_fsroot_changed();
+#endif
 	return result;
 }
 /*[[[end:libd_chroot]]]*/
@@ -3923,7 +3963,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbd870cd7]]]*/
+/*[[[start:exports,hash:CRC-32=0x2e25f8b5]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4038,6 +4078,10 @@ DEFINE_PUBLIC_ALIAS(_lseek, libc_lseek);
 DEFINE_PUBLIC_ALIAS(__lseek, libc_lseek);
 DEFINE_PUBLIC_ALIAS(__libc_lseek, libc_lseek);
 DEFINE_PUBLIC_ALIAS(lseek, libc_lseek);
+DEFINE_PUBLIC_ALIAS(DOS$_dup2, libd_dup2);
+DEFINE_PUBLIC_ALIAS(DOS$__dup2, libd_dup2);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_dup2, libd_dup2);
+DEFINE_PUBLIC_ALIAS(DOS$dup2, libd_dup2);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_dup2, libc_dup2);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4138,6 +4182,7 @@ DEFINE_PUBLIC_ALIAS(__pwrite64, libc_pwrite64);
 DEFINE_PUBLIC_ALIAS(pwrite64, libc_pwrite64);
 DEFINE_PUBLIC_ALIAS(preadall64, libc_preadall64);
 DEFINE_PUBLIC_ALIAS(pwriteall64, libc_pwriteall64);
+DEFINE_PUBLIC_ALIAS(DOS$dup3, libd_dup3);
 DEFINE_PUBLIC_ALIAS(dup3, libc_dup3);
 DEFINE_PUBLIC_ALIAS(pipe2, libc_pipe2);
 DEFINE_PUBLIC_ALIAS(syncfs, libc_syncfs);

@@ -667,8 +667,19 @@ NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname)
  * DOS drive letter, we will use that letter, but if not, we use "\\unix\"
  *
  * Also note that the returned path is guarantied to end with a slash! */
+PRIVATE ATTR_SECTION(".rodata.crt.dos.fs.environ") char const libd_dos_fsroot_default[] = "\\\\unix\\";
 PRIVATE ATTR_SECTION(".bss.crt.dos.fs.environ") char const *libd_dos_fsroot = NULL;
-/* TODO: Must clear `libd_dos_fsroot' in `DOS$chroot()' and `DOS$dup[23]()' with AT_FDROOT */
+
+/* Must clear `libd_dos_fsroot' in `DOS$chroot()' and `DOS$dup[2|3]()' with AT_FDROOT */
+INTERN ATTR_SECTION(".text.crt.dos.fs.environ") void
+NOTHROW(CC libd_dos_fsroot_changed)(void) {
+	if (libd_dos_fsroot != libd_dos_fsroot_default) {
+		char *old_root = (char *)libd_dos_fsroot;
+		libd_dos_fsroot = NULL;
+		free(old_root);
+	}
+}
+
 PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_RETNONNULL WUNUSED char const *
 NOTHROW_NCX(CC libd_get_dos_fsroot)(void) {
 	if (!libd_dos_fsroot) {
@@ -677,7 +688,7 @@ NOTHROW_NCX(CC libd_get_dos_fsroot)(void) {
 		result = libc_frealpathat(AT_FDCWD, "/", NULL, 0, AT_ALTPATH);
 		if (!result || !*result) {
 fallback:
-			libd_dos_fsroot = "\\\\unix\\";
+			libd_dos_fsroot = libd_dos_fsroot_default;
 		} else {
 			char const *end = strend(result);
 			if (end[-1] != '\\' && end[-1] != '/') {
@@ -729,7 +740,7 @@ NOTHROW_NCX(CC libd_from_unix_filename_print)(struct format_aprintf_data *__rest
 		char ch = *unix_filename;
 		if (ch == '/') {
 			/* Replace with '\\' (not technically necessary,
-			 * but done to get that uniform DOS-feeling) */
+			 * but  done  to get  that  uniform DOS-feeling) */
 			result = format_aprintf_printer(printer, flush_start, (size_t)(unix_filename - flush_start));
 			if unlikely(result < 0)
 				goto done;
@@ -825,8 +836,8 @@ struct environ_special_struct {
  * objects.
  *
  * Since I really don't see the point, exclude $LD_LIBRARY_PATH
- * from this list since that one's meaningless under DOS,  such
- * that converting it would just be unnecessary overhead.
+ * from this list since that one's meaningless under true  DOS,
+ * such that converting it would just be unnecessary overhead.
  *
  * Also note that we can't  simply use `realpath()' to have  the
  * kernel do the path conversion for us! That function will fail
@@ -911,7 +922,6 @@ err:
 }
 
 
-PRIVATE ATTR_SECTION(".bss.crt.dos.fs.environ") char **libd_environ = NULL;
 
 /* DOS single-byte environment table. */
 #undef DOS$environ
@@ -921,14 +931,23 @@ DEFINE_PUBLIC_ALIAS(DOS$__p__environ, libd_p_environ);
 DEFINE_PUBLIC_IDATA_G(DOS$environ, libd_p_environ, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(DOS$_environ, libd_p_environ, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(DOS$__environ, libd_p_environ, __SIZEOF_POINTER__);
-#define DOS$environ libd_environ /* Don't need to use dlsym("DOS$environ") because PE doesn't have copy relocations */
+
+/* Don't need to use dlsym("DOS$environ") because PE doesn't have copy relocations */
+#define DOS$environ (*libd_p_environ())
+
+/* Internal storage for `DOS$environ' */
+PRIVATE ATTR_SECTION(".bss.crt.dos.fs.environ") char **libd_environ = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.fs.environ")
+struct atomic_once libd_environ_initialized = ATOMIC_ONCE_INIT;
+
+/* Lazy initializer for `DOS$environ' */
 ATTR_SECTION(".text.crt.dos.fs.environ")
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL char ***
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
 NOTHROW(LIBDCALL libd_p_environ)(void) {
-	/* If not already created,  allocate the environment table  now,
-	 * including performing any path conversions that may be needed. */
-	if (libd_environ == NULL)
+	/* Allocate the environment table on first access. */
+	ATOMIC_ONCE_RUN(&libd_environ_initialized, {
 		libd_environ = libd_alloc_environ(environ);
+	});
 	return &libd_environ;
 }
 
@@ -957,18 +976,17 @@ search_dos_environment:
 	}
 
 	/* Check for special variables. If the one being requested is one such
-	 * special variable, then allocate the DOS environment and search it
+	 * special variable, then allocate the  DOS environment and search  it
 	 * for said variable. */
 	{
 		size_t i;
 		for (i = 0; i < COMPILER_LENOF(environ_special); ++i) {
-			char ***p_dos_environ;
 			if (strcmp(environ_special[i].es_name, varname) != 0)
 				continue;
 			/* Yup: it's one of the special variables! */
-			p_dos_environ = &DOS$environ;
-			if (*p_dos_environ == NULL)
-				*p_dos_environ = libd_alloc_environ(environ);
+			dos_environ = DOS$environ;
+			if unlikely(!dos_environ)
+				return NULL; /* No dos environ */
 			goto search_dos_environment;
 		}
 	}
@@ -981,7 +999,7 @@ search_dos_environment:
 
 struct libd_to_unix_cache {
 	char *d2uc_drives[('Z' - 'A') + 1]; /* [0..1][owned] Unix paths for DOS drives. */
-	int   d2uc_drive;                   /* Current drive (or `\0') */
+	int   d2uc_drive;                   /* Current drive letter (or `0' if unknown) */
 };
 #define libd_to_unix_cache_init(self) bzero(self, sizeof(*(self)))
 PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) void
@@ -1251,29 +1269,31 @@ NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname)
 /*[[[body:libd_unsetenv]]]*/
 {
 	int result;
-	char ***p_dos_environ;
 	result = libc_unsetenv(varname);
 
 	/* On success, also  try to  remove the string  from the  DOS
 	 * environment table (in case said table has been allocated). */
-	if (result == 0 && *(p_dos_environ = &DOS$environ) != NULL) {
-		char *str, **tab = *p_dos_environ;
-		size_t i, len = strlen(varname);
-		for (i = 0; (str = tab[i]) != NULL; ++i) {
-			if (memcmp(str, varname, len * sizeof(char)) != 0)
-				continue;
-			if (str[len] != '=')
-				continue;
-			/* Remove `str' from the DOS environment table. */
-			for (len = i + 1; tab[len]; ++len)
-				;
-			--len;
-			memmovedown(&tab[i], &tab[i + 1], len - i, sizeof(char *));
-			tab = (char **)realloc(tab, len, sizeof(char *));
-			if likely(tab)
-				*p_dos_environ = tab;
-			free(str);
-			break;
+	if (result == 0 && libd_environ != NULL) {
+		char **tab, ***p_dos_environ = &DOS$environ;
+		if ((tab = *p_dos_environ) != NULL) {
+			char *str;
+			size_t i, len = strlen(varname);
+			for (i = 0; (str = tab[i]) != NULL; ++i) {
+				if (memcmp(str, varname, len * sizeof(char)) != 0)
+					continue;
+				if (str[len] != '=')
+					continue;
+				/* Remove `str' from the DOS environment table. */
+				for (len = i + 1; tab[len]; ++len)
+					;
+				memmovedown(&tab[i], &tab[i + 1], len - i, sizeof(char *));
+				--len; /* Decrement `len' after, so `memmovedown' includes the trailing `NULL' */
+				tab = (char **)realloc(tab, len, sizeof(char *));
+				if likely(tab)
+					*p_dos_environ = tab;
+				free(str);
+				break;
+			}
 		}
 	}
 	return result;
