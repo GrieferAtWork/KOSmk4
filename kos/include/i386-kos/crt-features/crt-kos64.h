@@ -1285,8 +1285,6 @@
 #define __CRT_HAVE__ftime64_s
 #define __CRT_HAVE__fullpath
 #define __CRT_HAVE__fullpath_dbg
-#define __CRT_HAVE__futime32
-#define __CRT_HAVE__futime64
 #define __CRT_HAVE__fwprintf_l
 #define __CRT_HAVE__fwprintf_p
 #define __CRT_HAVE__fwprintf_p_l
@@ -1475,8 +1473,6 @@
 #define __CRT_HAVE__unloaddll
 #define __CRT_HAVE__unlock_fhandle
 #define __CRT_HAVE__unlock_locales
-#define __CRT_HAVE__utime32
-#define __CRT_HAVE__utime64
 #define __CRT_HAVE__vfprintf_l
 #define __CRT_HAVE__vfprintf_p
 #define __CRT_HAVE__vfprintf_p_l
@@ -6036,8 +6032,8 @@
 #define __CRT_HAVE_KOS$_ftime64
 #define __CRT_HAVE_KOS$_ftime64_s
 #define __CRT_HAVE_KOS$_fullpath
-#define __CRT_HAVE_KOS$_futime32
-#define __CRT_HAVE_KOS$_futime64
+#define __CRT_HAVE__futime32
+#define __CRT_HAVE__futime64
 #define __CRT_HAVE_KOS$_fwprintf_l
 #define __CRT_HAVE_KOS$_fwprintf_p
 #define __CRT_HAVE_KOS$_fwprintf_p_l
@@ -6325,8 +6321,8 @@
 #define __CRT_HAVE__unlock
 #define __CRT_HAVE_KOS$_unlock_fhandle
 #define __CRT_HAVE__unlock_file
-#define __CRT_HAVE_KOS$_utime32
-#define __CRT_HAVE_KOS$_utime64
+#define __CRT_HAVE__utime32
+#define __CRT_HAVE__utime64
 #define __CRT_HAVE_KOS$_vfprintf_l
 #define __CRT_HAVE_KOS$_vfprintf_p
 #define __CRT_HAVE_KOS$_vfprintf_p_l

@@ -27,6 +27,28 @@
 
 DECL_BEGIN
 
+/*[[[head:libd_utime,hash:CRC-32=0xc6321830]]]*/
+/* >> utime(2), utime64(2) */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify_time") NONNULL((1)) int
+NOTHROW_RPC(LIBDCALL libd_utime)(char const *filename,
+                                 struct utimbuf const *file_times)
+/*[[[body:libd_utime]]]*/
+{
+	errno_t error;
+	if (file_times) {
+		struct timespec tv[2];
+		tv[0].tv_sec  = file_times->actime;
+		tv[0].tv_nsec = 0;
+		tv[1].tv_sec  = file_times->modtime;
+		tv[1].tv_nsec = 0;
+		error = sys_utimensat(AT_FDCWD, filename, tv, AT_DOSPATH);
+	} else {
+		error = sys_utimensat(AT_FDCWD, filename, NULL, AT_DOSPATH);
+	}
+	return libc_seterrno_syserr(error);
+}
+/*[[[end:libd_utime]]]*/
+
 /*[[[head:libc_utime,hash:CRC-32=0x6ea63c2]]]*/
 /* >> utime(2), utime64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
@@ -52,6 +74,32 @@ NOTHROW_RPC(LIBCCALL libc_utime)(char const *filename,
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_utime]]]*/
+
+/*[[[head:libd_utime64,hash:CRC-32=0x298e73a0]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libd_utime64, libd_utime);
+#else /* MAGIC:alias */
+/* >> utime(2), utime64(2) */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify_time") NONNULL((1)) int
+NOTHROW_RPC(LIBDCALL libd_utime64)(char const *filename,
+                                   struct utimbuf64 const *file_times)
+/*[[[body:libd_utime64]]]*/
+{
+	errno_t error;
+	if (file_times) {
+		struct timespec64 tv[2];
+		tv[0].tv_sec  = file_times->actime;
+		tv[0].tv_nsec = 0;
+		tv[1].tv_sec  = file_times->modtime;
+		tv[1].tv_nsec = 0;
+		error = sys_utimensat_time64(AT_FDCWD, filename, tv, AT_DOSPATH);
+	} else {
+		error = sys_utimensat_time64(AT_FDCWD, filename, NULL, AT_DOSPATH);
+	}
+	return libc_seterrno_syserr(error);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libd_utime64]]]*/
 
 /*[[[head:libc_utime64,hash:CRC-32=0xe7eed121]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -135,16 +183,30 @@ NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x39cdd95d]]]*/
+/*[[[start:exports,hash:CRC-32=0xe089f820]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$__utime, libd_utime);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_utime, libd_utime);
+DEFINE_PUBLIC_ALIAS(DOS$_utime32, libd_utime);
+DEFINE_PUBLIC_ALIAS(DOS$utime, libd_utime);
 DEFINE_PUBLIC_ALIAS(__utime, libc_utime);
 DEFINE_PUBLIC_ALIAS(__libc_utime, libc_utime);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_utime32, libc_utime);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(utime, libc_utime);
+DEFINE_PUBLIC_ALIAS(DOS$_utime64, libd_utime64);
+DEFINE_PUBLIC_ALIAS(DOS$utime64, libd_utime64);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_utime64, libc_utime64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(utime64, libc_utime64);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_futime32, libc_futime);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(futime, libc_futime);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_futime64, libc_futime64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(futime64, libc_futime64);
 /*[[[end:exports]]]*/
 

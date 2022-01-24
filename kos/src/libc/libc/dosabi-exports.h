@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x807a2896 */
+/* HASH CRC-32:0xa2b2a791 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3040,12 +3040,6 @@ DEFINE_PUBLIC_ALIAS(DOS$opendev, libd_opendev);
 DEFINE_PUBLIC_ALIAS(DOS$fparseln, libd_fparseln);
 
 /* utime */
-DEFINE_PUBLIC_ALIAS(DOS$__utime, libd_utime);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_utime, libd_utime);
-DEFINE_PUBLIC_ALIAS(DOS$_utime32, libd_utime);
-DEFINE_PUBLIC_ALIAS(DOS$utime, libd_utime);
-DEFINE_PUBLIC_ALIAS(DOS$_utime64, libd_utime64);
-DEFINE_PUBLIC_ALIAS(DOS$utime64, libd_utime64);
 DEFINE_PUBLIC_ALIAS(DOS$_futime32, libd_futime);
 DEFINE_PUBLIC_ALIAS(DOS$futime, libd_futime);
 DEFINE_PUBLIC_ALIAS(DOS$_futime64, libd_futime64);

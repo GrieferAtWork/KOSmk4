@@ -5521,6 +5521,7 @@
 #define __CRT_HAVE_KOS$__libc_symlink
 #define __CRT_HAVE_KOS$__libc_truncate
 #define __CRT_HAVE_KOS$__libc_unlink
+#define __CRT_HAVE_KOS$__libc_utime
 #define __CRT_HAVE_KOS$__link
 #define __CRT_HAVE_KOS$__mbrlen
 #define __CRT_HAVE_KOS$__mbrtowc
@@ -5559,6 +5560,7 @@
 #define __CRT_HAVE_KOS$__truncate
 #define __CRT_HAVE_KOS$__tzname
 #define __CRT_HAVE_KOS$__unlink
+#define __CRT_HAVE_KOS$__utime
 #define __CRT_HAVE___vcrt_GetModuleFileNameW
 #define __CRT_HAVE___vcrt_GetModuleHandleW
 #define __CRT_HAVE___vcrt_InitializeCriticalSectionEx
@@ -5725,6 +5727,8 @@
 #define __CRT_HAVE__ungetwc_nolock
 #define __CRT_HAVE_KOS$_unlink
 #define __CRT_HAVE__unlock
+#define __CRT_HAVE_KOS$_utime32
+#define __CRT_HAVE_KOS$_utime64
 #define __CRT_HAVE_KOS$_vfwprintf_l
 #define __CRT_HAVE_KOS$_vfwprintf_p
 #define __CRT_HAVE_KOS$_vfwprintf_p_l
@@ -6079,6 +6083,8 @@
 #define __CRT_HAVE_KOS$unlink
 #define __CRT_HAVE_KOS$unlinkat
 #define __CRT_HAVE_KOS$unsetenv
+#define __CRT_HAVE_KOS$utime
+#define __CRT_HAVE_KOS$utime64
 #define __CRT_HAVE_KOS$utimensat
 #define __CRT_HAVE_KOS$utimensat64
 #define __CRT_HAVE_KOS$vfwprintf
@@ -6342,6 +6348,7 @@
 #define __CRT_HAVE_DOS$__libc_symlink
 #define __CRT_HAVE_DOS$__libc_truncate
 #define __CRT_HAVE_DOS$__libc_unlink
+#define __CRT_HAVE_DOS$__libc_utime
 #define __CRT_HAVE_DOS$__link
 #define __CRT_HAVE_DOS$__mbrlen
 #define __CRT_HAVE_DOS$__mbrtowc
@@ -6380,6 +6387,7 @@
 #define __CRT_HAVE_DOS$__truncate
 #define __CRT_HAVE_DOS$__tzname
 #define __CRT_HAVE_DOS$__unlink
+#define __CRT_HAVE_DOS$__utime
 #define __CRT_HAVE_DOS$__vcrt_GetModuleFileNameW
 #define __CRT_HAVE_DOS$__vcrt_GetModuleHandleW
 #define __CRT_HAVE_DOS$__vcrt_InitializeCriticalSectionEx
@@ -6546,6 +6554,8 @@
 #define __CRT_HAVE_DOS$_ungetwc_nolock
 #define __CRT_HAVE_DOS$_unlink
 #define __CRT_HAVE_DOS$_unlock
+#define __CRT_HAVE_DOS$_utime32
+#define __CRT_HAVE_DOS$_utime64
 #define __CRT_HAVE_DOS$_vfwprintf_l
 #define __CRT_HAVE_DOS$_vfwprintf_p
 #define __CRT_HAVE_DOS$_vfwprintf_p_l
@@ -6900,6 +6910,8 @@
 #define __CRT_HAVE_DOS$unlink
 #define __CRT_HAVE_DOS$unlinkat
 #define __CRT_HAVE_DOS$unsetenv
+#define __CRT_HAVE_DOS$utime
+#define __CRT_HAVE_DOS$utime64
 #define __CRT_HAVE_DOS$utimensat
 #define __CRT_HAVE_DOS$utimensat64
 #define __CRT_HAVE_DOS$vfwprintf

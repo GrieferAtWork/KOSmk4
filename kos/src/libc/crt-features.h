@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58b23871 */
+/* HASH CRC-32:0xb745fed6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2907,10 +2907,10 @@
 #define __CRT_HAVE_DOS$uselocale
 #define __CRT_HAVE_DOS$usleep
 #define __CRT_HAVE_DOS$ustat
-#define __CRT_HAVE_DOS$utime
-#define __CRT_HAVE_DOS$utime64
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$utime
+#define __CRT_HAVE_DOS$utime64
 #define __CRT_HAVE_DOS$utimensat
 #define __CRT_HAVE_DOS$utimensat64
 #endif /* !__KERNEL__ */

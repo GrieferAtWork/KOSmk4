@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85f9bf13 */
+/* HASH CRC-32:0x19b45905 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,11 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> utime(2), utime64(2) */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_utime)(char const *filename, struct utimbuf const *file_times);
+/* >> utime(2), utime64(2) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_utime)(char const *filename, struct utimbuf const *file_times);
+/* >> utime(2), utime64(2) */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_utime64)(char const *filename, struct utimbuf64 const *file_times);
 /* >> utime(2), utime64(2) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_utime64)(char const *filename, struct utimbuf64 const *file_times);
 /* >> futime(3), futime64(3) */

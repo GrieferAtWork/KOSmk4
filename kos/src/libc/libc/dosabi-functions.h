@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb262058 */
+/* HASH CRC-32:0xdaaab633 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2367,8 +2367,6 @@ DFUN(".text.crt.dos.io.tty", libd_opendev, libc_opendev, TIn(__SIZEOF_FD_T__), 4
 DFUN(".text.crt.dos.FILE.locked.read.read", libd_fparseln, libc_fparseln, TP, 5, TP, TP, TP, TP, TD)
 
 /* utime */
-DFUN(".text.crt.dos.fs.modify_time", libd_utime, libc_utime, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.modify_time", libd_utime64, libc_utime64, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.modify_time", libd_futime, libc_futime, TD, 2, TIn(__SIZEOF_FD_T__), TP)
 DFUN(".text.crt.dos.fs.modify_time", libd_futime64, libc_futime64, TD, 2, TIn(__SIZEOF_FD_T__), TP)
 

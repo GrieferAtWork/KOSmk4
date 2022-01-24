@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47171ecd */
+/* HASH CRC-32:0x26fce392 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *file,
 	utf8_file = libd_convert_wcstombs(file);
 	if unlikely(!utf8_file)
 		return -1;
-	result = libc_utime(utf8_file, file_times);
+	result = libd_utime(utf8_file, file_times);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	libc_free(utf8_file);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
@@ -121,7 +121,7 @@ NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *file,
 	utf8_file = libd_convert_wcstombs(file);
 	if unlikely(!utf8_file)
 		return -1;
-	result = libc_utime64(utf8_file, file_times);
+	result = libd_utime64(utf8_file, file_times);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	libc_free(utf8_file);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
