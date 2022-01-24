@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7750ee36 */
+/* HASH CRC-32:0x4f8ea951 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,33 +85,8 @@ INTDEF long NOTHROW_NCX(LIBCCALL libc_random)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed);
 INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed, char *statebuf, size_t statelen);
 INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf);
-/* Load the filesystem location of a given file handle.
- * This  function behaves similar to `readlink()', but will also function for
- * non-symlink paths, as well as always return an absolute (unambiguous) path
- * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
- *                   path, or NULL  to automatically `malloc()'ate  and return  a
- *                   buffer of sufficient size. */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename, char *resolved);
-/* Load the filesystem location of a given file handle.
- * This  function behaves similar to `readlink()', but will also function for
- * non-symlink paths, as well as always return an absolute (unambiguous) path
- * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
- *                   path, or NULL  to automatically `malloc()'ate  and return  a
- *                   buffer of sufficient size. */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename, char *resolved);
-/* Load the filesystem location of a given file handle.
- * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
- *       bytes  automatically allocated  in the heap,  ontop of which  you may also
- *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd, char *resolved, size_t buflen);
-/* Load the filesystem location of a given file handle.
- * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
- *       bytes  automatically allocated  in the heap,  ontop of which  you may also
- *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd, char *resolved, size_t buflen);
-/* Load the filesystem location of a given file handle.
+/* >> frealpath4(2)
+ * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
@@ -122,7 +97,8 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd, char *resolve
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
-/* Load the filesystem location of a given file handle.
+/* >> frealpath4(2)
+ * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
@@ -133,7 +109,8 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolv
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
-/* Returns the absolute filesystem path for the specified file
+/* >> frealpathat(2)
+ * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
  * file pointed to by the symblic link is printed.
@@ -147,7 +124,8 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolv
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
 INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
-/* Returns the absolute filesystem path for the specified file
+/* >> frealpathat(2)
+ * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
  * file pointed to by the symblic link is printed.
@@ -231,8 +209,6 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___p__fm
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode);
 INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags, unsigned int mask);
-INTDEF char *NOTHROW_RPC(LIBDCALL libd__fullpath)(char *buf, char const *path, size_t buflen);
-INTDEF char *NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf, char const *path, size_t buflen);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file, char const *envvar, char *__restrict resultpath, size_t buflen);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode);
@@ -240,8 +216,6 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq, unsigned int dur
 INTDEF onexit_t NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func);
 INTDEF WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname);
 INTDEF WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname);
-INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf, char16_t const *path, size_t buflen);
-INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf, char32_t const *path, size_t buflen);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__wputenv_s)(char16_t const *varname, char16_t const *val);

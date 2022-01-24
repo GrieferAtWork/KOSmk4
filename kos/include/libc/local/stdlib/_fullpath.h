@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea90d549 */
+/* HASH CRC-32:0x98c2a75 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,24 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PARTS_WCHAR_UTIME_H
-#define GUARD_LIBC_USER_PARTS_WCHAR_UTIME_H 1
-
-#include "../api.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <parts/wchar/utime.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *filename, struct utimbuf const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *filename, struct utimbuf const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *filename, struct utimbuf64 const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wutime64)(char32_t const *filename, struct utimbuf64 const *file_times);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_PARTS_WCHAR_UTIME_H */
+#ifndef __local__fullpath_defined
+#define __local__fullpath_defined
+#include <__crt.h>
+#include <asm/os/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat)
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_frealpathat_defined
+#define __local___localdep_frealpathat_defined
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,__localdep_frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpathat,(__dirfd,__filename,__resolved,__buflen,__flags))
+#endif /* !__local___localdep_frealpathat_defined */
+__LOCAL_LIBC(_fullpath) __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fullpath))(char *__buf, char const *__path, __SIZE_TYPE__ __buflen) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_frealpathat)(__AT_FDCWD, __path, __buf, __buflen, 0);
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__fullpath_defined
+#define __local___localdep__fullpath_defined
+#define __localdep__fullpath __LIBC_LOCAL_NAME(_fullpath)
+#endif /* !__local___localdep__fullpath_defined */
+#else /* __AT_FDCWD && __CRT_HAVE_frealpathat */
+#undef __local__fullpath_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_frealpathat */
+#endif /* !__local__fullpath_defined */

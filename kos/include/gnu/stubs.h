@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd96e4885 */
+/* HASH CRC-32:0xc1fdf25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,6 @@
 #define __stub__wfopen_s
 #define __stub__wfreopen_s
 #define __stub__wfsopen
-#define __stub__wfullpath
 #define __stub__wsearchenv_s
 #define __stub__wsetlocale
 #define __stub__wtempnam
@@ -621,7 +620,6 @@
 #define __stub_DOS$_wfopen_s
 #define __stub_DOS$_wfreopen_s
 #define __stub_DOS$_wfsopen
-#define __stub_DOS$_wfullpath
 #define __stub_DOS$_wsearchenv_s
 #define __stub_DOS$_wsetlocale
 #define __stub_DOS$_wtempnam

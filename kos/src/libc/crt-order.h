@@ -364,7 +364,9 @@
 	CB(PREFIX.crt.wchar.FILE.unlocked.write.write) \
 	CB(PREFIX.crt.wchar.FILE.unlocked.write.printf) \
 	CB(PREFIX.crt.wchar.FILE.unlocked.write.putc) \
+	CB(PREFIX.crt.wchar.fs.basic_property PREFIX.crt.wchar.fs.property) \
 	CB(PREFIX.crt.wchar.fs.modify) \
+	CB(PREFIX.crt.wchar.fs.utility) \
 	CB(PREFIX.crt.wchar.string.memory) \
 	CB(PREFIX.crt.wchar.unicode.static.memory) \
 	CB(PREFIX.crt.wchar.unicode.static.ctype) \
@@ -379,8 +381,10 @@
 	CB(PREFIX.crt.wchar.unicode.static.mbs) \
 	CB(PREFIX.crt.wchar.unicode.locale.mbs) \
 	CB(PREFIX.crt.wchar.unicode.convert) \
+	CB(PREFIX.crt.wchar.io.tty) \
 	CB(PREFIX.crt.wchar.fs.modify_time) \
 	CB(PREFIX.crt.wchar.fs.exec.spawn PREFIX.crt.wchar.fs.exec.system) \
+	CB(PREFIX.crt.wchar.system.configuration) \
 	CB(PREFIX.crt.except.fs.exec.exec PREFIX.crt.except.sched.access) \
 	CB(PREFIX.crt.except.sched.param) \
 	CB(PREFIX.crt.except.sched.process) \
@@ -527,6 +531,7 @@
 	CB(PREFIX.crt.dos.wchar.FILE.unlocked.write.write) \
 	CB(PREFIX.crt.dos.wchar.FILE.unlocked.write.printf) \
 	CB(PREFIX.crt.dos.wchar.FILE.unlocked.write.putc) \
+	CB(PREFIX.crt.dos.wchar.fs.basic_property PREFIX.crt.dos.wchar.fs.property) \
 	CB(PREFIX.crt.dos.wchar.fs.environ) \
 	CB(PREFIX.crt.dos.wchar.fs.modify) \
 	CB(PREFIX.crt.dos.wchar.fs.stat) \
@@ -545,7 +550,9 @@
 	CB(PREFIX.crt.dos.wchar.unicode.static.mbs) \
 	CB(PREFIX.crt.dos.wchar.unicode.locale.mbs) \
 	CB(PREFIX.crt.dos.wchar.unicode.convert) \
+	CB(PREFIX.crt.dos.wchar.io.tty) \
 	CB(PREFIX.crt.dos.wchar.fs.modify_time) \
 	CB(PREFIX.crt.dos.wchar.errno) \
-	CB(PREFIX.crt.dos.wchar.fs.exec.spawn PREFIX.crt.dos.wchar.fs.exec.system)
+	CB(PREFIX.crt.dos.wchar.fs.exec.spawn PREFIX.crt.dos.wchar.fs.exec.system) \
+	CB(PREFIX.crt.dos.wchar.system.configuration)
 /*[[[end]]]*/

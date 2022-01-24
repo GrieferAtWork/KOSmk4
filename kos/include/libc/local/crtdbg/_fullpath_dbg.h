@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac99db35 */
+/* HASH CRC-32:0x549ec4f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,22 @@
 #ifndef __local__fullpath_dbg_defined
 #define __local__fullpath_dbg_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__fullpath
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE__fullpath) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__fullpath_defined
 #define __local___localdep__fullpath_defined
-__CREDIRECT(,char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
+#ifdef __CRT_HAVE__fullpath
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
+#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat)
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdlib/_fullpath.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__fullpath __LIBC_LOCAL_NAME(_fullpath)
+#else /* ... */
+#undef __local___localdep__fullpath_defined
+#endif /* !... */
 #endif /* !__local___localdep__fullpath_defined */
 __LOCAL_LIBC(_fullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) {
@@ -40,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__fullpath_dbg_defined
 #define __localdep__fullpath_dbg __LIBC_LOCAL_NAME(_fullpath_dbg)
 #endif /* !__local___localdep__fullpath_dbg_defined */
-#else /* __CRT_HAVE__fullpath */
+#else /* __CRT_HAVE__fullpath || (__AT_FDCWD && __CRT_HAVE_frealpathat) */
 #undef __local__fullpath_dbg_defined
-#endif /* !__CRT_HAVE__fullpath */
+#endif /* !__CRT_HAVE__fullpath && (!__AT_FDCWD || !__CRT_HAVE_frealpathat) */
 #endif /* !__local__fullpath_dbg_defined */

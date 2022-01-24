@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15eb1566 */
+/* HASH CRC-32:0x58b23871 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3123,6 +3123,7 @@
 #define __CRT_HAVE_DOS$wfopen
 #define __CRT_HAVE_DOS$wfreadlinkat
 #define __CRT_HAVE_DOS$wfreopen
+#define __CRT_HAVE_DOS$wfsymlinkat
 #define __CRT_HAVE_DOS$wget_current_dir_name
 #define __CRT_HAVE_DOS$wgetcwd
 #define __CRT_HAVE_DOS$wgetdomainname
@@ -6583,6 +6584,7 @@
 #define __CRT_HAVE_wfopen
 #define __CRT_HAVE_wfreadlinkat
 #define __CRT_HAVE_wfreopen
+#define __CRT_HAVE_wfsymlinkat
 #define __CRT_HAVE_wget_current_dir_name
 #define __CRT_HAVE_wgetcwd
 #define __CRT_HAVE_wgetdomainname

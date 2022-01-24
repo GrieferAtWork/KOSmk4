@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca951600 */
+/* HASH CRC-32:0x3783ccb2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_wutime64_defined
 #define __local___localdep_crt_wutime64_defined
 #ifdef __CRT_HAVE_wutime64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__file, struct __utimbuf64 const *__file_times),wutime64,(__file,__file_times))
 #elif defined(__CRT_HAVE__wutime64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__file, struct __utimbuf64 const *__file_times),_wutime64,(__file,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_wutime64_defined
 #endif /* !... */

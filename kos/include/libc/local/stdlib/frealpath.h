@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x136d18dd */
+/* HASH CRC-32:0xab908f2e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,28 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PARTS_WCHAR_STDIO_H
-#define GUARD_LIBC_USER_PARTS_WCHAR_STDIO_H 1
-
-#include "../api.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <parts/wchar/stdio.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wremove)(char16_t const *filename);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wremove)(char32_t const *filename);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename, char16_t const *mode);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wfopen)(char32_t const *filename, char32_t const *mode);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename, char16_t const *mode, FILE *stream);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wfreopen)(char32_t const *filename, char32_t const *mode, FILE *stream);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command, char16_t const *mode);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wpopen)(char32_t const *command, char32_t const *mode);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_PARTS_WCHAR_STDIO_H */
+#ifndef __local_frealpath_defined
+#define __local_frealpath_defined
+#include <__crt.h>
+#ifdef __CRT_HAVE_frealpath4
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_frealpath4_defined
+#define __local___localdep_frealpath4_defined
+__CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
+#endif /* !__local___localdep_frealpath4_defined */
+__LOCAL_LIBC(frealpath) __ATTR_WUNUSED char *
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(frealpath))(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_frealpath4)(__fd, __resolved, __buflen, 0);
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_frealpath_defined
+#define __local___localdep_frealpath_defined
+#define __localdep_frealpath __LIBC_LOCAL_NAME(frealpath)
+#endif /* !__local___localdep_frealpath_defined */
+#else /* __CRT_HAVE_frealpath4 */
+#undef __local_frealpath_defined
+#endif /* !__CRT_HAVE_frealpath4 */
+#endif /* !__local_frealpath_defined */

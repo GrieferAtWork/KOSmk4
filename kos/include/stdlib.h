@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78daf9d8 */
+/* HASH CRC-32:0x2310ef2b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2686,13 +2686,29 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,a64
  * Convert between `long' and base-64 encoded integer strings. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(a64l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL a64l)(char const *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(a64l))(__s); })
 #endif /* !__CRT_HAVE_a64l */
-/* Load the filesystem location of a given file handle.
+#ifdef __CRT_HAVE_realpath
+/* >> realpath(3)
+ * Load the filesystem location of a given file handle.
  * This  function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
  *                   path, or NULL  to automatically `malloc()'ate  and return  a
  *                   buffer of sufficient size. */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,(char const *__filename, char *__resolved),(__filename,__resolved))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,(char const *__filename, char *__resolved),(__filename,__resolved))
+#else /* __CRT_HAVE_realpath */
+#include <asm/os/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat)
+#include <libc/local/stdlib/realpath.h>
+/* >> realpath(3)
+ * Load the filesystem location of a given file handle.
+ * This  function behaves similar to `readlink()', but will also function for
+ * non-symlink paths, as well as always return an absolute (unambiguous) path
+ * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
+ *                   path, or NULL  to automatically `malloc()'ate  and return  a
+ *                   buffer of sufficient size. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(realpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL realpath)(char const *__filename, char *__resolved) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(realpath))(__filename, __resolved); })
+#endif /* __AT_FDCWD && __CRT_HAVE_frealpathat */
+#endif /* !__CRT_HAVE_realpath */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
@@ -2700,16 +2716,29 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,
  *       but it seems to be something that GLibc isn't implementing for some reason...
  *       Because of that, I didn't really know where to put this, so I put it in the
  *       same _SOURCE-block as its `realpath()' companion. */
-/* Load the filesystem location of a given file handle.
+#ifdef __CRT_HAVE_frealpath
+/* >> frealpath(3)
+ * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen),(__fd,__resolved,__buflen))
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen),(__fd,__resolved,__buflen))
+#elif defined(__CRT_HAVE_frealpath4)
+#include <libc/local/stdlib/frealpath.h>
+/* >> frealpath(3)
+ * Load the filesystem location of a given file handle.
+ * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
+ *       pass `0' for `buflen' to automatically determine the required buffer size. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(frealpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL frealpath)(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frealpath))(__fd, __resolved, __buflen); })
+#endif /* ... */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 #ifdef __USE_KOS
-/* Load the filesystem location of a given file handle.
+/* >> frealpath4(2)
+ * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
@@ -2720,7 +2749,8 @@ __CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath,(__fd_t __fd, char 
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
 __CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
-/* Returns the absolute filesystem path for the specified file
+/* >> frealpathat(2)
+ * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
  * file pointed to by the symblic link is printed.
@@ -4108,13 +4138,13 @@ __SYSDECL_BEGIN
 
 #ifndef __errno_t_defined
 #define __errno_t_defined
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 
 #ifndef _ONEXIT_T_DEFINED
 #define _ONEXIT_T_DEFINED 1
 typedef int (__LIBDCALL *_onexit_t)(void);
-#endif  /* _ONEXIT_T_DEFINED */
+#endif /* !_ONEXIT_T_DEFINED */
 #ifndef onexit_t
 #define onexit_t _onexit_t
 #endif /* !onexit_t */
@@ -5372,7 +5402,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free, __FORCELOCAL __ATTR_ARTIFICIAL vo
 #endif /* ... */
 
 #define _CVTBUFSIZE   349
-__CDECLARE_OPT(,char *,__NOTHROW_RPC,_fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),(__buf,__path,__buflen))
+#ifdef __CRT_HAVE__fullpath
+/* >> _fullpath(3)
+ * s.a. `realpath(3)', `frealpathat(3)' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,_fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),(__buf,__path,__buflen))
+#else /* __CRT_HAVE__fullpath */
+#include <asm/os/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat)
+#include <libc/local/stdlib/_fullpath.h>
+/* >> _fullpath(3)
+ * s.a. `realpath(3)', `frealpathat(3)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(_fullpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_RPC(__LIBCCALL _fullpath)(char *__buf, char const *__path, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fullpath))(__buf, __path, __buflen); })
+#endif /* __AT_FDCWD && __CRT_HAVE_frealpathat */
+#endif /* !__CRT_HAVE__fullpath */
 #ifndef __NO_FPU
 #ifdef __CRT_HAVE__ecvt_s
 __CDECLARE(__ATTR_NONNULL((1, 5, 6)),errno_t,__NOTHROW_NCX,_ecvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__buf,__buflen,__val,__ndigit,__decptr,__sign))
@@ -5798,6 +5840,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wdupenv_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 __CREDIRECT(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),wsystem,(__cmd))
 #elif defined(__CRT_HAVE__wsystem)
 __CDECLARE(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),(__cmd))
+#elif (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_system) || ((defined(__CRT_HAVE_shexec) || defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__LOCAL_environ))) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork) || defined(__CRT_HAVE___libc_fork))))
+#include <libc/local/parts.wchar.process/wsystem.h>
+__FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL _wsystem)(wchar_t const *__cmd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsystem))(__cmd); }
 #else /* ... */
 #undef _CRT_WSYSTEM_DEFINED
 #endif /* !... */
@@ -6528,10 +6573,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoll_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !_WSTDLIB_DEFINED */
 #ifndef _WSTDLIBP_DEFINED
 #define _WSTDLIBP_DEFINED 1
-#if !defined(___wfullpath_defined) && defined(__CRT_HAVE__wfullpath)
+#ifndef ___wfullpath_defined
 #define ___wfullpath_defined
+#ifdef __CRT_HAVE__wfullpath
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,_wfullpath,(wchar_t *__buf, wchar_t const *__path, __SIZE_TYPE__ __buflen),(__buf,__path,__buflen))
-#endif /* !___wfullpath_defined && __CRT_HAVE__wfullpath */
+#else /* __CRT_HAVE__wfullpath */
+#include <asm/os/fcntl.h>
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE__fullpath) || defined(__CRT_HAVE_frealpathat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
+#include <libc/local/stdlib/_wfullpath.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wfullpath, __FORCELOCAL __ATTR_ARTIFICIAL wchar_t *__NOTHROW_NCX(__LIBCCALL _wfullpath)(wchar_t *__buf, wchar_t const *__path, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfullpath))(__buf, __path, __buflen); })
+#else /* __AT_FDCWD && (__CRT_HAVE__fullpath || __CRT_HAVE_frealpathat) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_convert_mbstowcs || __CRT_HAVE_convert_mbstowcsn || ((__CRT_HAVE_format_waprintf_printer || __CRT_HAVE_format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_format_waprintf_pack || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) */
+#undef ___wfullpath_defined
+#endif /* !__AT_FDCWD || (!__CRT_HAVE__fullpath && !__CRT_HAVE_frealpathat) || (!__CRT_HAVE_convert_wcstombs && !__CRT_HAVE_convert_wcstombsn && !__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) || (!__CRT_HAVE_convert_mbstowcs && !__CRT_HAVE_convert_mbstowcsn && ((!__CRT_HAVE_format_waprintf_printer && !__CRT_HAVE_format_waprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) || (!__CRT_HAVE_format_waprintf_pack && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc))) */
+#endif /* !__CRT_HAVE__wfullpath */
+#endif /* !___wfullpath_defined */
 #ifndef ___wmakepath_s_defined
 #define ___wmakepath_s_defined
 #ifdef __CRT_HAVE__wmakepath_s

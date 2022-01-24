@@ -3172,7 +3172,7 @@ class CrtDosVariantCustomMetadata: CrtDosVariantMetadata {
 			result.implPrefix = implPrefix;
 			local implBodyStr = str(implBody);
 			if ("%[invoke_libc]" in implBodyStr) {
-				/* Replace "%[invoke_libc]" with an expression
+				/* Replace "%[invoke_libc]"  with an  expression
 				 * that invokes the function's `libc_*' variant. */
 				local libcCall = "{}({})".format({
 					"libc_" + name[5:],
@@ -5152,7 +5152,14 @@ got_chkExpr:
 							return getWcharFunction().documentationString;
 						};
 					}
-					current.internalName = [] -> wcharFunction.wc_internal_uchar[mode].name;
+					current.internalName = [] {
+						if (wcharFunction.wc_internal_uchar !is bound) {
+							/* Associated   [[wchar]]-function   was  marked   as  [[ignore]]
+							 * In this case, the uchar-variant doesn't have an internal name! */
+							return none;
+						}
+						return wcharFunction.wc_internal_uchar[mode].name;
+					};
 					/* Lazily construct function bindings upon first access */
 					current.bindings = [](): {FunctionBinding...} {
 						@@The referenced [[wchar]]-Function

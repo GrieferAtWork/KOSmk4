@@ -364,11 +364,36 @@ function builtin_has_function(
 	} catch (Error as e) {
 		self.err(e.message);
 	}
-	self.next();
+	tok = self.next();
+	if (tok == ",") {
+		tok = self.next();
+		if (tok == ")")
+			goto print_single;
+		fp << "(";
+		fun.cprintRequires(fp, extendedPrefixes);
+		for (;;) {
+			if (tok == ")")
+				break;
+			try {
+				fun = findFunctionByName(tok);
+			} catch (Error as e) {
+				self.err(e.message);
+			}
+			fp << "&&";
+			fun.cprintRequires(fp, extendedPrefixes);
+			tok = self.next();
+			if (tok != ",")
+				break;
+			tok = self.next();
+		}
+		fp << ")";
+	} else {
+print_single:
+		fun.cprintRequires(fp, extendedPrefixes);
+	}
 	local result = self.tokEnd;
 	self.skip(")");
 	/* Print requires-conditions for this function */
-	fun.cprintRequires(fp, extendedPrefixes);
 	return result;
 }
 

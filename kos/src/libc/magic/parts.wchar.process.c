@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
 
 }
 
-%(auto_header,user){
+%(auto_header){
 #ifndef __T16ARGV
 #ifdef __USE_DOS_ALTERATIONS
 #define __T16ARGV char16_t const *const *__restrict ___argv
@@ -81,40 +81,134 @@ __SYSDECL_BEGIN
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecv")]]
-int wexecv([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
+[[requires_function(execv, convert_wcstombs, convert_wcstombsv)]]
+int wexecv([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV) {
+	int result = -1;
+	char *utf8_path, **utf8_argv;
+	utf8_path = convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto done;
+	utf8_argv = convert_wcstombsv(___argv);
+	if unlikely(!utf8_argv)
+		goto done_file;
+	result = execv(utf8_path, utf8_argv);
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_argv);
+@@pp_endif@@
+done_file:
+@@pp_if $has_function(free)@@
+	free(utf8_path);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecve")]]
-int wexecve([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
+[[requires_function(execve, convert_wcstombs, convert_wcstombsv)]]
+int wexecve([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) {
+	int result = -1;
+	char *utf8_path, **utf8_argv, **utf8_envp;
+	utf8_path = convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto done;
+	utf8_argv = convert_wcstombsv(___argv);
+	if unlikely(!utf8_argv)
+		goto done_file;
+	utf8_envp = NULL;
+	if unlikely(___envp && (utf8_envp = convert_wcstombsv(___envp)) == NULL)
+		goto done_argv;
+	result = execve(utf8_path, utf8_argv, utf8_envp);
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_envp);
+@@pp_endif@@
+done_argv:
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_argv);
+@@pp_endif@@
+done_file:
+@@pp_if $has_function(free)@@
+	free(utf8_path);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecvp")]]
-int wexecvp([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV);
+[[requires_function(execvp, convert_wcstombs, convert_wcstombsv)]]
+int wexecvp([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV) {
+	int result = -1;
+	char *utf8_file, **utf8_argv;
+	utf8_file = convert_wcstombs(file);
+	if unlikely(!utf8_file)
+		goto done;
+	utf8_argv = convert_wcstombsv(___argv);
+	if unlikely(!utf8_argv)
+		goto done_file;
+	result = execvp(utf8_file, utf8_argv);
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_argv);
+@@pp_endif@@
+done_file:
+@@pp_if $has_function(free)@@
+	free(utf8_file);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecvpe")]]
-int wexecvpe([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
+[[requires_function(execvpe, convert_wcstombs, convert_wcstombsv)]]
+int wexecvpe([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) {
+	int result = -1;
+	char *utf8_file, **utf8_argv, **utf8_envp;
+	utf8_file = convert_wcstombs(file);
+	if unlikely(!utf8_file)
+		goto done;
+	utf8_argv = convert_wcstombsv(___argv);
+	if unlikely(!utf8_argv)
+		goto done_file;
+	utf8_envp = NULL;
+	if unlikely(___envp && (utf8_envp = convert_wcstombsv(___envp)) == NULL)
+		goto done_argv;
+	result = execvpe(utf8_file, utf8_argv, utf8_envp);
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_envp);
+@@pp_endif@@
+done_argv:
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_argv);
+@@pp_endif@@
+done_file:
+@@pp_if $has_function(free)@@
+	free(utf8_file);
+@@pp_endif@@
+done:
+	return result;
+}
 
 
-[[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
+[[cp, guard, wchar, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wexecv), ATTR_SENTINEL, dos_export_alias("_wexecl")]]
 int wexecl([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_EXECL(wchar_t, wexecv, path, args)
 }
 
-[[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wexecvp), ATTR_SENTINEL, dos_export_alias("_wexeclp")]]
-int wexeclp([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
-	__REDIRECT_EXECL(wchar_t, wexecvp, file, args)
-}
-
-[[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
+[[cp, guard, wchar, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wexecve), ATTR_SENTINEL_O(1), dos_export_alias("_wexecle")]]
 int wexecle([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_EXECLE(wchar_t, wexecve, path, args)
 }
 
-[[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
+[[cp, guard, wchar, impl_include("<parts/redirect-exec.h>")]]
+[[requires_dependent_function(wexecvp), ATTR_SENTINEL, dos_export_alias("_wexeclp")]]
+int wexeclp([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
+	__REDIRECT_EXECL(wchar_t, wexecvp, file, args)
+}
+
+[[cp, guard, wchar, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wexecvpe), ATTR_SENTINEL_O(1), dos_export_alias("_wexeclpe")]]
 int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_EXECLE(wchar_t, wexecvpe, file, args)
@@ -125,39 +219,138 @@ int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ..
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(mode, path, ___argv), dos_export_alias("_wspawnv")]]
-$pid_t wspawnv(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
+[[requires_function(spawnv, convert_wcstombs, convert_wcstombsv)]]
+$pid_t wspawnv(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV) {
+	int result = -1;
+	char *utf8_path, **utf8_argv;
+	utf8_path = convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto done;
+	utf8_argv = convert_wcstombsv(___argv);
+	if unlikely(!utf8_argv)
+		goto done_file;
+	result = spawnv(mode, utf8_path, utf8_argv);
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_argv);
+@@pp_endif@@
+done_file:
+@@pp_if $has_function(free)@@
+	free(utf8_path);
+@@pp_endif@@
+done:
+	return result;
+}
+
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(mode, path, ___argv, ___envp), dos_export_alias("_wspawnve")]]
-$pid_t wspawnve(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
+[[requires_function(spawnve, convert_wcstombs, convert_wcstombsv)]]
+$pid_t wspawnve(__STDC_INT_AS_UINT_T mode,
+                [[nonnull]] wchar_t const *__restrict path,
+                [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) {
+	int result = -1;
+	char *utf8_path, **utf8_argv, **utf8_envp;
+	utf8_path = convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto done;
+	utf8_argv = convert_wcstombsv(___argv);
+	if unlikely(!utf8_argv)
+		goto done_file;
+	utf8_envp = NULL;
+	if unlikely(___envp && (utf8_envp = convert_wcstombsv(___envp)) == NULL)
+		goto done_argv;
+	result = spawnve(mode, utf8_path, utf8_argv, utf8_envp);
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_envp);
+@@pp_endif@@
+done_argv:
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_argv);
+@@pp_endif@@
+done_file:
+@@pp_if $has_function(free)@@
+	free(utf8_path);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(mode, file, ___argv), dos_export_alias("_wspawnvp")]]
-$pid_t wspawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV);
+[[requires_function(spawnvp, convert_wcstombs, convert_wcstombsv)]]
+$pid_t wspawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV) {
+	int result = -1;
+	char *utf8_file, **utf8_argv;
+	utf8_file = convert_wcstombs(file);
+	if unlikely(!utf8_file)
+		goto done;
+	utf8_argv = convert_wcstombsv(___argv);
+	if unlikely(!utf8_argv)
+		goto done_file;
+	result = spawnvp(mode, utf8_file, utf8_argv);
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_argv);
+@@pp_endif@@
+done_file:
+@@pp_if $has_function(free)@@
+	free(utf8_file);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(mode, file, ___argv, ___envp), dos_export_alias("_wspawnvpe")]]
-$pid_t wspawnvpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
+[[requires_function(spawnvpe, convert_wcstombs, convert_wcstombsv)]]
+$pid_t wspawnvpe(__STDC_INT_AS_UINT_T mode,
+                 [[nonnull]] wchar_t const *__restrict file,
+                 [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) {
+	int result = -1;
+	char *utf8_file, **utf8_argv, **utf8_envp;
+	utf8_file = convert_wcstombs(file);
+	if unlikely(!utf8_file)
+		goto done;
+	utf8_argv = convert_wcstombsv(___argv);
+	if unlikely(!utf8_argv)
+		goto done_file;
+	utf8_envp = NULL;
+	if unlikely(___envp && (utf8_envp = convert_wcstombsv(___envp)) == NULL)
+		goto done_argv;
+	result = spawnvpe(mode, utf8_file, utf8_argv, utf8_envp);
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_envp);
+@@pp_endif@@
+done_argv:
+@@pp_if $has_function(convert_freev)@@
+	convert_freev(utf8_argv);
+@@pp_endif@@
+done_file:
+@@pp_if $has_function(free)@@
+	free(utf8_file);
+@@pp_endif@@
+done:
+	return result;
+}
 
-[[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
+[[cp, guard, wchar, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wspawnv), ATTR_SENTINEL, dos_export_alias("_wspawnl")]]
 $pid_t wspawnl(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_SPAWNL(wchar_t, wspawnv, mode, path, args)
 }
 
-[[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wspawnvp), ATTR_SENTINEL, dos_export_alias("_wspawnlp")]]
-$pid_t wspawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
-	__REDIRECT_SPAWNL(wchar_t, wspawnvp, mode, file, args)
-}
-
-[[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
+[[cp, guard, wchar, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wspawnve), ATTR_SENTINEL_O(1), dos_export_alias("_wspawnle")]]
 $pid_t wspawnle(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnve, mode, path, args)
 }
 
-[[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
+[[cp, guard, wchar, impl_include("<parts/redirect-exec.h>")]]
+[[requires_dependent_function(wspawnvp), ATTR_SENTINEL, dos_export_alias("_wspawnlp")]]
+$pid_t wspawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
+	__REDIRECT_SPAWNL(wchar_t, wspawnvp, mode, file, args)
+}
+
+[[cp, guard, wchar, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wspawnvpe), ATTR_SENTINEL_O(1), dos_export_alias("_wspawnlpe")]]
 $pid_t wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnvpe, mode, file, args)
@@ -165,7 +358,23 @@ $pid_t wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restric
 
 [[cp, guard, wchar, dos_export_alias("_wsystem")]]
 [[section(".text.crt{|.dos}.wchar.fs.exec.system")]]
-int wsystem([[nullable]] wchar_t const *cmd);
+[[requires_function(convert_wcstombs, system)]]
+int wsystem([[nullable]] wchar_t const *cmd) {
+	int result;
+	char *used_cmd;
+	if (!cmd) {
+		result = system(NULL);
+	} else {
+		used_cmd = convert_wcstombs(cmd);
+		if unlikely(!used_cmd)
+			return -1;
+		result = system(used_cmd);
+@@pp_if $has_function(free)@@
+		free(used_cmd);
+@@pp_endif@@
+	}
+	return result;
+}
 
 
 %{

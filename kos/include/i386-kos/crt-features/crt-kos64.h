@@ -4979,6 +4979,7 @@
 #define __CRT_HAVE_wfopen
 #define __CRT_HAVE_wfreadlinkat
 #define __CRT_HAVE_wfreopen
+#define __CRT_HAVE_wfsymlinkat
 #define __CRT_HAVE_wget_current_dir_name
 #define __CRT_HAVE_wgetcwd
 #define __CRT_HAVE_wgetdomainname
@@ -8789,6 +8790,7 @@
 #define __CRT_HAVE_KOS$wfopen
 #define __CRT_HAVE_KOS$wfreadlinkat
 #define __CRT_HAVE_KOS$wfreopen
+#define __CRT_HAVE_KOS$wfsymlinkat
 #define __CRT_HAVE_KOS$wget_current_dir_name
 #define __CRT_HAVE_KOS$wgetcwd
 #define __CRT_HAVE_KOS$wgetdomainname
@@ -12539,6 +12541,7 @@
 #define __CRT_HAVE_DOS$wfopen
 #define __CRT_HAVE_DOS$wfreadlinkat
 #define __CRT_HAVE_DOS$wfreopen
+#define __CRT_HAVE_DOS$wfsymlinkat
 #define __CRT_HAVE_DOS$wget_current_dir_name
 #define __CRT_HAVE_DOS$wgetcwd
 #define __CRT_HAVE_DOS$wgetdomainname

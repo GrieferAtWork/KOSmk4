@@ -1698,6 +1698,7 @@
 #define __CRT_HAVE__vwprintf_s_l
 #define __CRT_HAVE__vwscanf_l
 #define __CRT_HAVE__wassert
+#define __CRT_HAVE__wchdir
 #define __CRT_HAVE__wcreate_locale
 #define __CRT_HAVE__wcsdup_dbg
 #define __CRT_HAVE__wcserror
@@ -1721,6 +1722,7 @@
 #define __CRT_HAVE__wfsopen
 #define __CRT_HAVE__wfullpath
 #define __CRT_HAVE__wfullpath_dbg
+#define __CRT_HAVE__wgetcwd
 #define __CRT_HAVE__wgetcwd_dbg
 #define __CRT_HAVE__wgetdcwd_dbg
 #define __CRT_HAVE__wgetenv
@@ -1736,6 +1738,7 @@
 #define __CRT_HAVE__wputenv
 #define __CRT_HAVE__wputenv_s
 #define __CRT_HAVE__write
+#define __CRT_HAVE__wrmdir
 #define __CRT_HAVE__wscanf_l
 #define __CRT_HAVE__wsearchenv
 #define __CRT_HAVE__wsearchenv_s
@@ -1756,6 +1759,7 @@
 #define __CRT_HAVE__wtoi_l
 #define __CRT_HAVE__wtol_l
 #define __CRT_HAVE__wtoll_l
+#define __CRT_HAVE__wunlink
 #define __CRT_HAVE__wutime32
 #define __CRT_HAVE__xmknod
 #define __CRT_HAVE__xmknodat
@@ -5333,6 +5337,7 @@
 #define __CRT_HAVE_wfopen
 #define __CRT_HAVE_wfreadlinkat
 #define __CRT_HAVE_wfreopen
+#define __CRT_HAVE_wfsymlinkat
 #define __CRT_HAVE_wget_current_dir_name
 #define __CRT_HAVE_wgetcwd
 #define __CRT_HAVE_wgetdomainname
@@ -5746,7 +5751,7 @@
 #define __CRT_HAVE_KOS$_vwprintf_s_l
 #define __CRT_HAVE_KOS$_vwscanf_l
 #define __CRT_HAVE_KOS$_wassert
-#define __CRT_HAVE__wchdir
+#define __CRT_HAVE_KOS$_wchdir
 #define __CRT_HAVE__wcmdln
 #define __CRT_HAVE_KOS$_wcreate_locale
 #define __CRT_HAVE__wcscoll_l
@@ -5812,7 +5817,7 @@
 #define __CRT_HAVE_KOS$_wfreopen_s
 #define __CRT_HAVE_KOS$_wfsopen
 #define __CRT_HAVE_KOS$_wfullpath
-#define __CRT_HAVE__wgetcwd
+#define __CRT_HAVE_KOS$_wgetcwd
 #define __CRT_HAVE_KOS$_wgetenv
 #define __CRT_HAVE_KOS$_wgetenv_s
 #define __CRT_HAVE_KOS$_wmakepath
@@ -5827,7 +5832,7 @@
 #define __CRT_HAVE_KOS$_wputenv
 #define __CRT_HAVE_KOS$_wputenv_s
 #define __CRT_HAVE__wremove
-#define __CRT_HAVE__wrmdir
+#define __CRT_HAVE_KOS$_wrmdir
 #define __CRT_HAVE_KOS$_wscanf_l
 #define __CRT_HAVE_KOS$_wsearchenv
 #define __CRT_HAVE_KOS$_wsearchenv_s
@@ -5859,7 +5864,7 @@
 #define __CRT_HAVE_KOS$_wtol_l
 #define __CRT_HAVE__wtoll
 #define __CRT_HAVE_KOS$_wtoll_l
-#define __CRT_HAVE__wunlink
+#define __CRT_HAVE_KOS$_wunlink
 #define __CRT_HAVE_KOS$_wutime32
 #define __CRT_HAVE__wutime64
 #define __CRT_HAVE_KOS$access
@@ -6220,6 +6225,7 @@
 #define __CRT_HAVE_KOS$wfopen
 #define __CRT_HAVE_KOS$wfreadlinkat
 #define __CRT_HAVE_KOS$wfreopen
+#define __CRT_HAVE_KOS$wfsymlinkat
 #define __CRT_HAVE_KOS$wget_current_dir_name
 #define __CRT_HAVE_KOS$wgetcwd
 #define __CRT_HAVE_KOS$wgetdomainname
@@ -7040,6 +7046,7 @@
 #define __CRT_HAVE_DOS$wfopen
 #define __CRT_HAVE_DOS$wfreadlinkat
 #define __CRT_HAVE_DOS$wfreopen
+#define __CRT_HAVE_DOS$wfsymlinkat
 #define __CRT_HAVE_DOS$wget_current_dir_name
 #define __CRT_HAVE_DOS$wgetcwd
 #define __CRT_HAVE_DOS$wgetdomainname

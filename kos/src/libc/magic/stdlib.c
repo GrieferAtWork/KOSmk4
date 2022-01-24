@@ -2482,6 +2482,9 @@ long a64l([[nonnull]] char const *s) {
 	return result;
 }
 
+%[define(_POSIX_PATH_MAX = 256)] /* s.a. <limits.h> */
+
+@@>> realpath(3)
 @@Load the filesystem location of a given file handle.
 @@This  function behaves similar to `readlink()', but will also function for
 @@non-symlink paths, as well as always return an absolute (unambiguous) path
@@ -2489,7 +2492,16 @@ long a64l([[nonnull]] char const *s) {
 @@                  path, or NULL  to automatically `malloc()'ate  and return  a
 @@                  buffer of sufficient size.
 [[crt_dos_variant, cp, wunused, section(".text.crt{|.dos}.fs.property")]]
-char *realpath([[nonnull]] char const *filename, char *resolved);
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(frealpathat))]]
+[[impl_include("<asm/os/fcntl.h>", "<asm/os/limits.h>")]]
+char *realpath([[nonnull]] char const *filename, char *resolved) {
+@@pp_if defined(__PATH_MAX) && __PATH_MAX != -1@@
+	return frealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
+@@pp_else@@
+	return frealpathat(__AT_FDCWD, filename, resolved, resolved ? _POSIX_PATH_MAX : 0, 0);
+@@pp_endif@@
+}
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %
@@ -2498,18 +2510,22 @@ char *realpath([[nonnull]] char const *filename, char *resolved);
 % *       but it seems to be something that GLibc isn't implementing for some reason...
 % *       Because of that, I didn't really know where to put this, so I put it in the
 % *       same _SOURCE-block as its `realpath()' companion. */
+@@>> frealpath(3)
 @@Load the filesystem location of a given file handle.
 @@This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
 @@NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
 @@      bytes  automatically allocated  in the heap,  ontop of which  you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
-[[crt_dos_variant, decl_include("<bits/types.h>")]]
-char *frealpath($fd_t fd, char *resolved, $size_t buflen);
+[[crt_dos_variant, decl_include("<bits/types.h>"), requires_function(frealpath4)]]
+char *frealpath($fd_t fd, char *resolved, $size_t buflen) {
+	return frealpath4(fd, resolved, buflen, 0);
+}
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 %
 %#ifdef __USE_KOS
+@@>> frealpath4(2)
 @@Load the filesystem location of a given file handle.
 @@This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
 @@@param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
@@ -2524,6 +2540,7 @@ char *frealpath($fd_t fd, char *resolved, $size_t buflen);
 [[crt_dos_variant, decl_include("<bits/types.h>")]]
 char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 
+@@>> frealpathat(2)
 @@Returns the absolute filesystem path for the specified file
 @@When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
 @@causing the path to  the symlink itself to  be printed. - Otherwise,  the
@@ -3850,13 +3867,13 @@ __SYSDECL_BEGIN
 
 #ifndef __errno_t_defined
 #define __errno_t_defined
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 
 #ifndef _ONEXIT_T_DEFINED
 #define _ONEXIT_T_DEFINED 1
 typedef int (__LIBDCALL *_onexit_t)(void);
-#endif  /* _ONEXIT_T_DEFINED */
+#endif /* !_ONEXIT_T_DEFINED */
 #ifndef onexit_t
 #define onexit_t _onexit_t
 #endif /* !onexit_t */
@@ -3865,7 +3882,7 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 %
 %#ifndef _CRT_ERRNO_DEFINED
 %#define _CRT_ERRNO_DEFINED 1
-/* NOTE: Cygwin calls it `__errno()' and DOS calls it `_errno()' */
+/* NOTE: Cygwin calls it `__errno()', and DOS calls it `_errno()' */
 %#ifndef errno
 %[insert:extern(__errno_location)]
 %#ifdef ____errno_location_defined
@@ -5055,8 +5072,15 @@ void _aligned_free(void *aligned_mallptr) {
 
 %
 %#define _CVTBUFSIZE   349
+@@>> _fullpath(3)
+@@s.a. `realpath(3)', `frealpathat(3)'
 [[crt_dos_variant, cp, section(".text.crt.dos.fs.utility")]]
-char *_fullpath(char *buf, char const *path, $size_t buflen);
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(frealpathat))]]
+[[impl_include("<asm/os/fcntl.h>"), wunused]]
+char *_fullpath(char *buf, [[nonnull]] char const *path, $size_t buflen) {
+	return frealpathat(__AT_FDCWD, path, buf, buflen, 0);
+}
 
 %#ifndef __NO_FPU
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
@@ -5513,10 +5537,10 @@ char *ultoa(unsigned long val, [[nonnull]] char *buf, int radix) {
 %[define_replacement(onexit_t = _onexit_t)]
 %[define_replacement(_onexit_t = _onexit_t)]
 %[define(DEFINE_ONEXIT_T =
-#ifndef _ONEXIT_T_DEFINED
+@@pp_ifndef _ONEXIT_T_DEFINED@@
 #define _ONEXIT_T_DEFINED 1
 typedef int (__LIBDCALL *_onexit_t)(void);
-#endif  /* _ONEXIT_T_DEFINED */
+@@pp_endif@@
 )]
 %[define_type_class(onexit_t  = "TP")]
 %[define_type_class(_onexit_t = "TP")]
@@ -5659,7 +5683,48 @@ _wtoll_l(*) %{generate(str2wcs("_atoll_l"))}
 %#define _WSTDLIBP_DEFINED 1
 
 [[guard, wchar, section(".text.crt.dos.wchar.fs.utility")]]
-wchar_t *_wfullpath(wchar_t *buf, wchar_t const *path, $size_t buflen);
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(_fullpath, convert_wcstombs, convert_mbstowcs))]]
+[[impl_include("<libc/errno.h>", "<asm/os/fcntl.h>")]]
+wchar_t *_wfullpath(wchar_t *buf, wchar_t const *path, $size_t buflen) {
+	size_t reqlen;
+	char *utf8_path, *utf8_realpath;
+	wchar_t *wcs_realpath;
+	utf8_path = convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		return NULL;
+	utf8_realpath = _fullpath(NULL, utf8_path, 0);
+@@pp_if $has_function(free)@@
+	free(utf8_path);
+@@pp_endif@@
+	if unlikely(!utf8_realpath)
+		return NULL;
+	wcs_realpath = convert_mbstowcs(utf8_realpath);
+@@pp_if $has_function(free)@@
+	free(utf8_realpath);
+@@pp_endif@@
+	if unlikely(!wcs_realpath)
+		return NULL;
+	if (!buf)
+		return wcs_realpath;
+	reqlen = wcslen(wcs_realpath) + 1;
+	if (reqlen > buflen) {
+@@pp_if $has_function(free)@@
+		free(wcs_realpath);
+@@pp_endif@@
+@@pp_ifdef ERANGE@@
+		libc_seterrno(ERANGE);
+@@pp_else@@
+		libc_seterrno(1);
+@@pp_endif@@
+		return NULL;
+	}
+	wmemcpy(buf, wcs_realpath, reqlen);
+@@pp_if $has_function(free)@@
+	free(wcs_realpath);
+@@pp_endif@@
+	return buf;
+}
 
 [[guard, wchar, section(".text.crt.dos.wchar.fs.utility")]]
 _wmakepath_s(*) %{generate(str2wcs("_makepath_s"))}

@@ -1035,7 +1035,7 @@ eaccess(*) = euidaccess;
 @@>> faccessat(2)
 @@@param: type: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `dfd:file', testing for `type'
-[[crt_dos_variant, cp, decl_include("<features.h>")]]
+[[crt_dos_variant, cp, decl_include("<features.h>", "<bits/types.h>")]]
 int faccessat($fd_t dfd, [[nonnull]] char const *file,
               __STDC_INT_AS_UINT_T type, $atflag_t flags);
 

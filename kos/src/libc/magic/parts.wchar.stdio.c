@@ -42,23 +42,98 @@ __SYSDECL_BEGIN
 
 [[guard, wchar, dos_export_alias("_wremove")]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wremove([[nonnull]] wchar_t const *filename);
+[[requires_function(convert_wcstombs, remove)]]
+int wremove([[nonnull]] wchar_t const *filename) {
+	int result = -1;
+	/*utf-8*/ char *utf8_filename;
+	utf8_filename = convert_wcstombs(filename);
+	if likely(utf8_filename) {
+		result = remove(utf8_filename);
+@@pp_if $has_function(free)@@
+		free(utf8_filename);
+@@pp_endif@@
+	}
+	return result;
+}
 
 [[wchar, wunused, dos_export_alias("_wfopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
+[[requires_function(convert_wcstombs, fopen)]]
 $FILE *wfopen([[nonnull]] wchar_t const *filename,
-              [[nonnull]] wchar_t const *mode);
+              [[nonnull]] wchar_t const *mode) {
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_filename;
+	/*utf-8*/ char *utf8_mode;
+	utf8_filename = convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done_utf8_filename;
+	result = fopen(utf8_filename, utf8_mode);
+@@pp_if $has_function(free)@@
+	free(utf8_mode);
+@@pp_endif@@
+done_utf8_filename:
+@@pp_if $has_function(free)@@
+	free(utf8_filename);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[wchar, wunused, dos_export_alias("_wfreopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
+[[requires_function(convert_wcstombs, freopen)]]
 $FILE *wfreopen([[nonnull]] wchar_t const *filename,
                 [[nonnull]] wchar_t const *mode,
-                $FILE *stream);
+                $FILE *stream) {
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_filename;
+	/*utf-8*/ char *utf8_mode;
+	utf8_filename = convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done_utf8_filename;
+	result = freopen(utf8_filename, utf8_mode, stream);
+@@pp_if $has_function(free)@@
+	free(utf8_mode);
+@@pp_endif@@
+done_utf8_filename:
+@@pp_if $has_function(free)@@
+	free(utf8_filename);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[guard, wchar, wunused, dos_export_alias("_wpopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
+[[requires_function(convert_wcstombs, popen)]]
 $FILE *wpopen([[nonnull]] wchar_t const *command,
-              [[nonnull]] wchar_t const *mode);
+              [[nonnull]] wchar_t const *mode) {
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_command;
+	/*utf-8*/ char *utf8_mode;
+	utf8_command = convert_wcstombs(command);
+	if unlikely(!utf8_command)
+		goto done;
+	utf8_mode = convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done_utf8_command;
+	result = popen(utf8_command, utf8_mode);
+@@pp_if $has_function(free)@@
+	free(utf8_mode);
+@@pp_endif@@
+done_utf8_command:
+@@pp_if $has_function(free)@@
+	free(utf8_command);
+@@pp_endif@@
+done:
+	return result;
+}
 
 
 %{

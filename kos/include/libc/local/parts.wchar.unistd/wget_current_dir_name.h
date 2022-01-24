@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95864144 */
+/* HASH CRC-32:0xc35f05b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,132 +21,70 @@
 #ifndef __local_wget_current_dir_name_defined
 #define __local_wget_current_dir_name_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
+#if (defined(__CRT_HAVE_get_current_dir_name) || defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep__wgetenv_defined) && defined(__CRT_HAVE__wgetenv)
-#define __local___localdep__wgetenv_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__wgetenv,(__WCHAR_TYPE__ const *__varname),_wgetenv,(__varname))
-#endif /* !__local___localdep__wgetenv_defined && __CRT_HAVE__wgetenv */
-#ifndef __local___localdep_stat_defined
-#define __local___localdep_stat_defined
-#if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),kstat,(__filename,__buf))
-#elif defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),kstat64,(__filename,__buf))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-#if defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64,(__filename,__buf))
-#elif defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64i32,(__filename,__buf))
-#elif defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stati64,(__filename,__buf))
-#elif defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32i64,(__filename,__buf))
-#elif defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat,(__filename,__buf))
-#elif defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
-#elif defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat,(__filename,__buf))
-#elif defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
-__NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat64,(__filename,__buf))
-#else /* ... */
-#undef __local___localdep_stat_defined
-#endif /* !... */
-#endif /* !... */
-#endif /* !__local___localdep_stat_defined */
-#ifndef __local___localdep_wcsdup_defined
-#define __local___localdep_wcsdup_defined
-#ifdef __CRT_HAVE_wcsdup
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsdup,(__WCHAR_TYPE__ const *__restrict __string),wcsdup,(__string))
-#elif defined(__CRT_HAVE__wcsdup)
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsdup,(__WCHAR_TYPE__ const *__restrict __string),_wcsdup,(__string))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
-__NAMESPACE_LOCAL_END
-#include <libc/local/wchar/wcsdup.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_wcsdup __LIBC_LOCAL_NAME(wcsdup)
-#else /* ... */
-#undef __local___localdep_wcsdup_defined
-#endif /* !... */
-#endif /* !__local___localdep_wcsdup_defined */
-#ifndef __local___localdep_wgetcwd_defined
-#define __local___localdep_wgetcwd_defined
-#ifdef __CRT_HAVE_wgetcwd
+#ifndef __local___localdep_convert_mbstowcs_defined
+#define __local___localdep_convert_mbstowcs_defined
+#ifdef __CRT_HAVE_convert_mbstowcs
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),wgetcwd,(__buf,__bufsize))
-#elif defined(__CRT_HAVE__wgetcwd)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstowcs,(char const *__restrict __str),convert_mbstowcs,(__str))
+#elif defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
+#include <libc/local/uchar/convert_mbstowcs.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),_wgetcwd,(__buf,__bufsize))
+#define __localdep_convert_mbstowcs __LIBC_LOCAL_NAME(convert_mbstowcs)
 #else /* ... */
-#undef __local___localdep_wgetcwd_defined
+#undef __local___localdep_convert_mbstowcs_defined
 #endif /* !... */
-#endif /* !__local___localdep_wgetcwd_defined */
+#endif /* !__local___localdep_convert_mbstowcs_defined */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined
+#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
+#elif defined(__CRT_HAVE_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
+#elif defined(__CRT_HAVE_cfree)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#elif defined(__CRT_HAVE___libc_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(__mallptr))
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
+#ifndef __local___localdep_get_current_dir_name_defined
+#define __local___localdep_get_current_dir_name_defined
+#ifdef __CRT_HAVE_get_current_dir_name
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_RPC,__localdep_get_current_dir_name,(void),get_current_dir_name,())
+#elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 __NAMESPACE_LOCAL_END
-#include <bits/os/stat.h>
+#include <libc/local/unistd/get_current_dir_name.h>
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_get_current_dir_name __LIBC_LOCAL_NAME(get_current_dir_name)
+#else /* ... */
+#undef __local___localdep_get_current_dir_name_defined
+#endif /* !... */
+#endif /* !__local___localdep_get_current_dir_name_defined */
 __LOCAL_LIBC(wget_current_dir_name) __ATTR_MALLOC __ATTR_WUNUSED __WCHAR_TYPE__ *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wget_current_dir_name))(void) {
-#if defined(__CRT_HAVE__wgetenv) && ((defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))) && (defined(__CRT_HAVE_wcsdup) || defined(__CRT_HAVE__wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
-	/* Specs require us to return a duplicate of $PWD iff it's correct
-	 *   ***Author's comment: DUMB!***
-	 */
-	__WCHAR_TYPE__ *__pwd = (__NAMESPACE_LOCAL_SYM __localdep__wgetenv)("PWD");
-	if (__pwd && *__pwd) {
-		struct stat __st_pwd, __st_cwd;
-		if ((__NAMESPACE_LOCAL_SYM __localdep_stat)(__pwd, &__st_pwd) == 0 &&
-		    (__NAMESPACE_LOCAL_SYM __localdep_stat)(".", &__st_cwd) == 0) {
-			if (__st_pwd.st_dev == __st_cwd.st_dev &&
-			    __st_pwd.st_ino == __st_cwd.st_ino)
-				return (__NAMESPACE_LOCAL_SYM __localdep_wcsdup)(__pwd);
-		}
-	}
-#endif /* __CRT_HAVE__wgetenv && ((__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) && (__CRT_HAVE_wcsdup || __CRT_HAVE__wcsdup || __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) */
-	return (__NAMESPACE_LOCAL_SYM __localdep_wgetcwd)(__NULLPTR, 0);
+	char *__utf8_path;
+	__WCHAR_TYPE__ *__result;
+	__utf8_path = (__NAMESPACE_LOCAL_SYM __localdep_get_current_dir_name)();
+	if __unlikely(!__utf8_path)
+		return __NULLPTR;
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_convert_mbstowcs)(__utf8_path);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__utf8_path);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wget_current_dir_name_defined
 #define __local___localdep_wget_current_dir_name_defined
 #define __localdep_wget_current_dir_name __LIBC_LOCAL_NAME(wget_current_dir_name)
 #endif /* !__local___localdep_wget_current_dir_name_defined */
-#else /* __CRT_HAVE_wgetcwd || __CRT_HAVE__wgetcwd */
+#else /* (__CRT_HAVE_get_current_dir_name || __CRT_HAVE_getcwd || __CRT_HAVE__getcwd) && (__CRT_HAVE_convert_mbstowcs || __CRT_HAVE_convert_mbstowcsn || ((__CRT_HAVE_format_waprintf_printer || __CRT_HAVE_format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_format_waprintf_pack || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) */
 #undef __local_wget_current_dir_name_defined
-#endif /* !__CRT_HAVE_wgetcwd && !__CRT_HAVE__wgetcwd */
+#endif /* (!__CRT_HAVE_get_current_dir_name && !__CRT_HAVE_getcwd && !__CRT_HAVE__getcwd) || (!__CRT_HAVE_convert_mbstowcs && !__CRT_HAVE_convert_mbstowcsn && ((!__CRT_HAVE_format_waprintf_printer && !__CRT_HAVE_format_waprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) || (!__CRT_HAVE_format_waprintf_pack && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc))) */
 #endif /* !__local_wget_current_dir_name_defined */

@@ -2193,74 +2193,9 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
 }
 /*[[[end:libc_setstate]]]*/
 
-/*[[[head:libd_realpath,hash:CRC-32=0xe61a4788]]]*/
-/* Load the filesystem location of a given file handle.
- * This  function behaves similar to `readlink()', but will also function for
- * non-symlink paths, as well as always return an absolute (unambiguous) path
- * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
- *                   path, or NULL  to automatically `malloc()'ate  and return  a
- *                   buffer of sufficient size. */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) char *
-NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename,
-                                    char *resolved)
-/*[[[body:libd_realpath]]]*/
-{
-	return libc_frealpathat(AT_FDCWD, filename, resolved,
-	                        resolved ? PATH_MAX : 0, AT_DOSPATH);
-}
-/*[[[end:libd_realpath]]]*/
-
-/*[[[head:libc_realpath,hash:CRC-32=0x124eed81]]]*/
-/* Load the filesystem location of a given file handle.
- * This  function behaves similar to `readlink()', but will also function for
- * non-symlink paths, as well as always return an absolute (unambiguous) path
- * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
- *                   path, or NULL  to automatically `malloc()'ate  and return  a
- *                   buffer of sufficient size. */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) char *
-NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
-                                    char *resolved)
-/*[[[body:libc_realpath]]]*/
-{
-	return libc_frealpathat(AT_FDCWD, filename, resolved,
-	                        resolved ? PATH_MAX : 0, 0);
-}
-/*[[[end:libc_realpath]]]*/
-
-/*[[[head:libd_frealpath,hash:CRC-32=0xa79bd98]]]*/
-/* Load the filesystem location of a given file handle.
- * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
- *       bytes  automatically allocated  in the heap,  ontop of which  you may also
- *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED char *
-NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd,
-                                     char *resolved,
-                                     size_t buflen)
-/*[[[body:libd_frealpath]]]*/
-{
-	return libc_frealpath4(fd, resolved, buflen, AT_DOSPATH);
-}
-/*[[[end:libd_frealpath]]]*/
-
-/*[[[head:libc_frealpath,hash:CRC-32=0x56ec606d]]]*/
-/* Load the filesystem location of a given file handle.
- * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
- *       bytes  automatically allocated  in the heap,  ontop of which  you may also
- *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED char *
-NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
-                                     char *resolved,
-                                     size_t buflen)
-/*[[[body:libc_frealpath]]]*/
-{
-	return libc_frealpath4(fd, resolved, buflen, 0);
-}
-/*[[[end:libc_frealpath]]]*/
-
-/*[[[head:libd_frealpath4,hash:CRC-32=0xb9506afa]]]*/
-/* Load the filesystem location of a given file handle.
+/*[[[head:libd_frealpath4,hash:CRC-32=0x8aa202ec]]]*/
+/* >> frealpath4(2)
+ * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
@@ -2281,8 +2216,9 @@ NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
 }
 /*[[[end:libd_frealpath4]]]*/
 
-/*[[[head:libc_frealpath4,hash:CRC-32=0x6655b46f]]]*/
-/* Load the filesystem location of a given file handle.
+/*[[[head:libc_frealpath4,hash:CRC-32=0x6096b810]]]*/
+/* >> frealpath4(2)
+ * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
@@ -2362,8 +2298,9 @@ done:
 }
 /*[[[end:libc_frealpath4]]]*/
 
-/*[[[head:libd_frealpathat,hash:CRC-32=0x4d90df47]]]*/
-/* Returns the absolute filesystem path for the specified file
+/*[[[head:libd_frealpathat,hash:CRC-32=0x8785929e]]]*/
+/* >> frealpathat(2)
+ * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
  * file pointed to by the symblic link is printed.
@@ -2388,8 +2325,9 @@ NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd,
 }
 /*[[[end:libd_frealpathat]]]*/
 
-/*[[[head:libc_frealpathat,hash:CRC-32=0xe792b5bd]]]*/
-/* Returns the absolute filesystem path for the specified file
+/*[[[head:libc_frealpathat,hash:CRC-32=0x680c6a42]]]*/
+/* >> frealpathat(2)
+ * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
  * file pointed to by the symblic link is printed.
@@ -2658,8 +2596,8 @@ NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 }
 /*[[[end:libc___p___initenv]]]*/
 
-ATTR_SECTION(".text.crt.dos.application.init")
-PRIVATE WUNUSED char **NOTHROW_NCX(LIBDCALL libd_get_initenv)(void) {
+PRIVATE ATTR_SECTION(".text.crt.dos.application.init") WUNUSED char **
+NOTHROW_NCX(LIBDCALL libd_alloc_initenv)(void) {
 	return libd_alloc_environ(libc_get_initenv());
 }
 
@@ -2670,7 +2608,7 @@ NOTHROW_NCX(LIBDCALL libd___p___initenv)(void)
 /*[[[body:libd___p___initenv]]]*/
 {
 	ATOMIC_ONCE_RUN(&libd___p___initenv_initialized, {
-		libd___p___initenv_pointer = libd_get_initenv();
+		libd___p___initenv_pointer = libd_alloc_initenv();
 	});
 	return &libd___p___initenv_pointer;
 }
@@ -2718,7 +2656,7 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
 char *libd___p__pgmptr_pointer = NULL;
 
 PRIVATE ATTR_SECTION(".text.crt.dos.application.init") WUNUSED char *
-NOTHROW_NCX(LIBDCALL libd_make_pgmptr)(void) {
+NOTHROW_NCX(LIBDCALL libd_alloc_pgmptr)(void) {
 	char *unix_pgmptr = _pgmptr;
 	if (!unix_pgmptr)
 		return NULL;
@@ -2733,7 +2671,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__p__pgmptr, libd___p__pgmptr);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
 NOTHROW_NCX(LIBDCALL libd___p__pgmptr)(void) {
 	ATOMIC_ONCE_RUN(&libd___p__pgmptr_initialized, {
-		libd___p__pgmptr_pointer = libd_make_pgmptr();
+		libd___p__pgmptr_pointer = libd_alloc_pgmptr();
 	});
 	return &libd___p__pgmptr_pointer;
 }
@@ -2772,29 +2710,7 @@ NOTHROW_NCX(LIBKCALL libc___p__wpgmptr)(void)
 }
 /*[[[end:libc___p__wpgmptr]]]*/
 
-/*[[[head:libd__fullpath,hash:CRC-32=0x55ce0cf3]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") char *
-NOTHROW_RPC(LIBDCALL libd__fullpath)(char *buf,
-                                     char const *path,
-                                     size_t buflen)
-/*[[[body:libd__fullpath]]]*/
-{
-	return libc_frealpathat(AT_FDCWD, path, buf, buflen, AT_DOSPATH);
-}
-/*[[[end:libd__fullpath]]]*/
-
-/*[[[head:libc__fullpath,hash:CRC-32=0x78797651]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") char *
-NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
-                                     char const *path,
-                                     size_t buflen)
-/*[[[body:libc__fullpath]]]*/
-{
-	return libc_frealpathat(AT_FDCWD, path, buf, buflen, 0);
-}
-/*[[[end:libc__fullpath]]]*/
-
-/* All of these are implemented in libc/libc/errno.c */
+/* This one is implemented in libc/libc/errno.c */
 /*[[[skip:libc___doserrno]]]*/
 
 /*[[[head:libd__get_errno,hash:CRC-32=0x89478bd0]]]*/
@@ -2802,7 +2718,7 @@ INTERN ATTR_SECTION(".text.crt.dos.errno_access") errno_t
 NOTHROW_NCX(LIBDCALL libd__get_errno)(errno_t *perr)
 /*[[[body:libd__get_errno]]]*/
 {
-	if (!perr)
+	if unlikely(!perr)
 		return DOS_EINVAL;
 	*perr = libd_geterrno();
 	return EOK;
@@ -2814,7 +2730,7 @@ INTERN ATTR_SECTION(".text.crt.dos.errno_access") errno_t
 NOTHROW_NCX(LIBCCALL libc__get_errno)(errno_t *perr)
 /*[[[body:libc__get_errno]]]*/
 {
-	if (!perr)
+	if unlikely(!perr)
 		return EINVAL;
 	*perr = libc_geterrno();
 	return EOK;
@@ -3011,38 +2927,6 @@ NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags,
 
 
 
-/*[[[head:libd__wfullpath,hash:CRC-32=0x8506fc61]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") char16_t *
-NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
-                                      char16_t const *path,
-                                      size_t buflen)
-/*[[[body:libd__wfullpath]]]*/
-/*AUTO*/{
-	(void)buf;
-	(void)path;
-	(void)buflen;
-	CRT_UNIMPLEMENTEDF("DOS$_wfullpath(%p, %p, %Ix)", buf, path, buflen); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd__wfullpath]]]*/
-
-/*[[[head:libc__wfullpath,hash:CRC-32=0xe620b50]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") char32_t *
-NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
-                                      char32_t const *path,
-                                      size_t buflen)
-/*[[[body:libc__wfullpath]]]*/
-/*AUTO*/{
-	(void)buf;
-	(void)path;
-	(void)buflen;
-	CRT_UNIMPLEMENTEDF("_wfullpath(%p, %p, %Ix)", buf, path, buflen); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__wfullpath]]]*/
-
 /*[[[head:libd__wsearchenv_s,hash:CRC-32=0x39e33fd3]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
 NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file,
@@ -3224,7 +3108,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe184957d]]]*/
+/*[[[start:exports,hash:CRC-32=0x26d3077e]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -3288,10 +3172,6 @@ DEFINE_PUBLIC_ALIAS(__initstate, libc_initstate);
 DEFINE_PUBLIC_ALIAS(initstate, libc_initstate);
 DEFINE_PUBLIC_ALIAS(__setstate, libc_setstate);
 DEFINE_PUBLIC_ALIAS(setstate, libc_setstate);
-DEFINE_PUBLIC_ALIAS(DOS$realpath, libd_realpath);
-DEFINE_PUBLIC_ALIAS(realpath, libc_realpath);
-DEFINE_PUBLIC_ALIAS(DOS$frealpath, libd_frealpath);
-DEFINE_PUBLIC_ALIAS(frealpath, libc_frealpath);
 DEFINE_PUBLIC_ALIAS(DOS$frealpath4, libd_frealpath4);
 DEFINE_PUBLIC_ALIAS(frealpath4, libc_frealpath4);
 DEFINE_PUBLIC_ALIAS(DOS$frealpathat, libd_frealpathat);
@@ -3346,8 +3226,6 @@ DEFINE_PUBLIC_ALIAS(__p__fmode, libc___p__fmode);
 DEFINE_PUBLIC_ALIAS(_set_fmode, libc__set_fmode);
 DEFINE_PUBLIC_ALIAS(_get_fmode, libc__get_fmode);
 DEFINE_PUBLIC_ALIAS(_set_abort_behavior, libc__set_abort_behavior);
-DEFINE_PUBLIC_ALIAS(DOS$_fullpath, libd__fullpath);
-DEFINE_PUBLIC_ALIAS(_fullpath, libc__fullpath);
 DEFINE_PUBLIC_ALIAS(_searchenv_s, libc__searchenv_s);
 DEFINE_PUBLIC_ALIAS(_seterrormode, libc__seterrormode);
 DEFINE_PUBLIC_ALIAS(_set_error_mode, libc__set_error_mode);
@@ -3358,8 +3236,6 @@ DEFINE_PUBLIC_ALIAS(_onexit, libc_onexit);
 DEFINE_PUBLIC_ALIAS(onexit, libc_onexit);
 DEFINE_PUBLIC_ALIAS(DOS$_wgetenv, libd__wgetenv);
 DEFINE_PUBLIC_ALIAS(_wgetenv, libc__wgetenv);
-DEFINE_PUBLIC_ALIAS(DOS$_wfullpath, libd__wfullpath);
-DEFINE_PUBLIC_ALIAS(_wfullpath, libc__wfullpath);
 DEFINE_PUBLIC_ALIAS(DOS$_wputenv, libd__wputenv);
 DEFINE_PUBLIC_ALIAS(_wputenv, libc__wputenv);
 DEFINE_PUBLIC_ALIAS(DOS$_wputenv_s, libd__wputenv_s);

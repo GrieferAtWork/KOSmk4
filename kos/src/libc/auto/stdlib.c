@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4fe5409 */
+/* HASH CRC-32:0xcfa2848d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,7 @@
 #include "../user/sys.stat.h"
 #include "../user/sys.time.h"
 #include "../user/sys.wait.h"
+#include "uchar.h"
 #include "../user/unicode.h"
 #include "../user/unistd.h"
 #include "../user/wchar.h"
@@ -1704,6 +1705,66 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
 		shift += 6;
 	}
 	return result;
+}
+#include <asm/os/fcntl.h>
+#include <asm/os/limits.h>
+/* >> realpath(3)
+ * Load the filesystem location of a given file handle.
+ * This  function behaves similar to `readlink()', but will also function for
+ * non-symlink paths, as well as always return an absolute (unambiguous) path
+ * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
+ *                   path, or NULL  to automatically `malloc()'ate  and return  a
+ *                   buffer of sufficient size. */
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) char *
+NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename,
+                                    char *resolved) {
+#if defined(__PATH_MAX) && __PATH_MAX != -1
+	return libd_frealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
+#else /* __PATH_MAX && __PATH_MAX != -1 */
+	return libd_frealpathat(__AT_FDCWD, filename, resolved, resolved ? 256 : 0, 0);
+#endif /* !__PATH_MAX || __PATH_MAX == -1 */
+}
+#include <asm/os/fcntl.h>
+#include <asm/os/limits.h>
+/* >> realpath(3)
+ * Load the filesystem location of a given file handle.
+ * This  function behaves similar to `readlink()', but will also function for
+ * non-symlink paths, as well as always return an absolute (unambiguous) path
+ * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
+ *                   path, or NULL  to automatically `malloc()'ate  and return  a
+ *                   buffer of sufficient size. */
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) char *
+NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
+                                    char *resolved) {
+#if defined(__PATH_MAX) && __PATH_MAX != -1
+	return libc_frealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
+#else /* __PATH_MAX && __PATH_MAX != -1 */
+	return libc_frealpathat(__AT_FDCWD, filename, resolved, resolved ? 256 : 0, 0);
+#endif /* !__PATH_MAX || __PATH_MAX == -1 */
+}
+/* >> frealpath(3)
+ * Load the filesystem location of a given file handle.
+ * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
+ *       pass `0' for `buflen' to automatically determine the required buffer size. */
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED char *
+NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd,
+                                     char *resolved,
+                                     size_t buflen) {
+	return libd_frealpath4(fd, resolved, buflen, 0);
+}
+/* >> frealpath(3)
+ * Load the filesystem location of a given file handle.
+ * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
+ *       pass `0' for `buflen' to automatically determine the required buffer size. */
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED char *
+NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
+                                     char *resolved,
+                                     size_t buflen) {
+	return libc_frealpath4(fd, resolved, buflen, 0);
 }
 /* >> mktemp(3)
  * Badly designed version of  `mkstemp' that won't actually  create
@@ -3672,6 +3733,24 @@ NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *aligned_mallptr) {
 	if (aligned_mallptr)
 		libc_free(((void **)aligned_mallptr)[-1]);
 }
+#include <asm/os/fcntl.h>
+/* >> _fullpath(3)
+ * s.a. `realpath(3)', `frealpathat(3)' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((2)) char *
+NOTHROW_RPC(LIBDCALL libd__fullpath)(char *buf,
+                                     char const *path,
+                                     size_t buflen) {
+	return libd_frealpathat(__AT_FDCWD, path, buf, buflen, 0);
+}
+#include <asm/os/fcntl.h>
+/* >> _fullpath(3)
+ * s.a. `realpath(3)', `frealpathat(3)' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((2)) char *
+NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
+                                     char const *path,
+                                     size_t buflen) {
+	return libc_frealpathat(__AT_FDCWD, path, buf, buflen, 0);
+}
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ecvt_s)(char *buf,
                                    size_t buflen,
@@ -4683,6 +4762,92 @@ NOTHROW_NCX(LIBKCALL libc__wtoll_l)(char32_t const *__restrict nptr,
 	return libc_wcstoll_l(nptr, NULL, 10, locale);
 }
 #endif /* !... */
+#include <asm/os/fcntl.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") char16_t *
+NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
+                                      char16_t const *path,
+                                      size_t buflen) {
+	size_t reqlen;
+	char *utf8_path, *utf8_realpath;
+	char16_t *wcs_realpath;
+	utf8_path = libd_convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		return NULL;
+	utf8_realpath = libd__fullpath(NULL, utf8_path, 0);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_path);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	if unlikely(!utf8_realpath)
+		return NULL;
+	wcs_realpath = libd_convert_mbstowcs(utf8_realpath);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_realpath);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	if unlikely(!wcs_realpath)
+		return NULL;
+	if (!buf)
+		return wcs_realpath;
+	reqlen = libd_wcslen(wcs_realpath) + 1;
+	if (reqlen > buflen) {
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+		libc_free(wcs_realpath);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+#ifdef ERANGE
+		libc_seterrno(ERANGE);
+#else /* ERANGE */
+		libc_seterrno(1);
+#endif /* !ERANGE */
+		return NULL;
+	}
+	(char16_t *)libc_memcpyw(buf, wcs_realpath, reqlen);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(wcs_realpath);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return buf;
+}
+#include <asm/os/fcntl.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") char32_t *
+NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
+                                      char32_t const *path,
+                                      size_t buflen) {
+	size_t reqlen;
+	char *utf8_path, *utf8_realpath;
+	char32_t *wcs_realpath;
+	utf8_path = libc_convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		return NULL;
+	utf8_realpath = libc__fullpath(NULL, utf8_path, 0);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_path);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	if unlikely(!utf8_realpath)
+		return NULL;
+	wcs_realpath = libc_convert_mbstowcs(utf8_realpath);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_realpath);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	if unlikely(!wcs_realpath)
+		return NULL;
+	if (!buf)
+		return wcs_realpath;
+	reqlen = libc_wcslen(wcs_realpath) + 1;
+	if (reqlen > buflen) {
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+		libc_free(wcs_realpath);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+#ifdef ERANGE
+		libc_seterrno(ERANGE);
+#else /* ERANGE */
+		libc_seterrno(1);
+#endif /* !ERANGE */
+		return NULL;
+	}
+	(char32_t *)libc_memcpyl(buf, wcs_realpath, reqlen);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(wcs_realpath);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return buf;
+}
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wmakepath_s)(char16_t *buf,
                                         size_t buflen,
@@ -5127,6 +5292,10 @@ DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
 DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps64);
 DEFINE_PUBLIC_ALIAS(l64a, libc_l64a);
 DEFINE_PUBLIC_ALIAS(a64l, libc_a64l);
+DEFINE_PUBLIC_ALIAS(DOS$realpath, libd_realpath);
+DEFINE_PUBLIC_ALIAS(realpath, libc_realpath);
+DEFINE_PUBLIC_ALIAS(DOS$frealpath, libd_frealpath);
+DEFINE_PUBLIC_ALIAS(frealpath, libc_frealpath);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_mktemp, libc_mktemp);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -5294,6 +5463,8 @@ DEFINE_PUBLIC_ALIAS(_aligned_offset_realloc, libc__aligned_offset_realloc);
 DEFINE_PUBLIC_ALIAS(_aligned_offset_recalloc, libc__aligned_offset_recalloc);
 DEFINE_PUBLIC_ALIAS(_aligned_msize, libc__aligned_msize);
 DEFINE_PUBLIC_ALIAS(_aligned_free, libc__aligned_free);
+DEFINE_PUBLIC_ALIAS(DOS$_fullpath, libd__fullpath);
+DEFINE_PUBLIC_ALIAS(_fullpath, libc__fullpath);
 DEFINE_PUBLIC_ALIAS(DOS$_ecvt_s, libd__ecvt_s);
 DEFINE_PUBLIC_ALIAS(_ecvt_s, libc__ecvt_s);
 DEFINE_PUBLIC_ALIAS(DOS$_fcvt_s, libd__fcvt_s);
@@ -5371,6 +5542,8 @@ DEFINE_PUBLIC_ALIAS(DOS$_wtoi64_l, libd__wtoi64_l);
 DEFINE_PUBLIC_ALIAS(_wtoi64_l, libc__wtoi64_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wtoll_l, libd__wtoll_l);
 DEFINE_PUBLIC_ALIAS(_wtoll_l, libc__wtoll_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wfullpath, libd__wfullpath);
+DEFINE_PUBLIC_ALIAS(_wfullpath, libc__wfullpath);
 DEFINE_PUBLIC_ALIAS(DOS$_wmakepath_s, libd__wmakepath_s);
 DEFINE_PUBLIC_ALIAS(_wmakepath_s, libc__wmakepath_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wmakepath, libd__wmakepath);

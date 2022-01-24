@@ -84,6 +84,8 @@ c32symlinkat(*) %{uchar32("wsymlinkat")}
 c16readlinkat(*) %{uchar16("wreadlinkat")}
 c32readlinkat(*) %{uchar32("wreadlinkat")}
 %#ifdef __USE_KOS
+c16fsymlinkat(*) %{uchar16("wfsymlinkat")}
+c32fsymlinkat(*) %{uchar32("wfsymlinkat")}
 c16freadlinkat(*) %{uchar16("wfreadlinkat")}
 c32freadlinkat(*) %{uchar32("wfreadlinkat")}
 %#endif /* __USE_KOS */
@@ -109,9 +111,6 @@ c32lchown(*) %{uchar32("wlchown")}
 
 c16truncate(*) %{uchar16("wtruncate")}
 c32truncate(*) %{uchar32("wtruncate")}
-
-[[ignore]] c16truncate32(*) %{uchar16("wtruncate32")}
-[[ignore]] c32truncate32(*) %{uchar32("wtruncate32")}
 
 %#ifdef __USE_LARGEFILE64
 c16truncate64(*) %{uchar16("wtruncate64")}
