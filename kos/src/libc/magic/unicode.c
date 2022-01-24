@@ -1499,106 +1499,95 @@ $size_t unicode_c16toc8([[nonnull]] char pc8[3], char16_t c16,
 
 
 
+//struct format_8tow_data {
+//	__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
+//	void               *fd_arg;        /* Argument for `fd_printer' */
+//	mbstate_t           fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+//};
+
+@@>> format_8tow(3)
+@@Format printer  (compatible  with  `__pformatprinter')  for
+@@converting UTF-8 unicode input data into a UTF-16/32 output
+[[wchar, hidden, decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
+[[impl_include("<bits/crt/mbstate.h>", "<bits/crt/wformat-printer.h>")]]
+$ssize_t format_8tow(/*struct format_8tow_data **/ void *arg,
+                     /*utf-8*/ char const *data, $size_t datalen) {
+	struct __local_format_8tow_data {
+		$pwformatprinter fd_printer;    /* [1..1] Inner printer */
+		void            *fd_arg;        /* Argument for `fd_printer' */
+		$mbstate_t       fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	};
+	wchar_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
+	struct __local_format_8tow_data *closure;
+	ssize_t temp, result = 0;
+	closure = (struct __local_format_8tow_data *)arg;
+	while (datalen) {
+		do {
+			size_t error;
+@@pp_if __SIZEOF_WCHAR_T__ == 2@@
+			error = unicode_c8toc16((char16_t *)dst, data, datalen, &closure->fd_incomplete);
+@@pp_else@@
+			error = unicode_c8toc32((char32_t *)dst, data, datalen, &closure->fd_incomplete);
+@@pp_endif@@
+			if unlikely(error == (size_t)-1) {
+				mbstate_init(&closure->fd_incomplete);
+				*dst = data[0];
+				error = 1;
+			} else if (error == (size_t)-2) {
+				datalen = 0;
+				break;
+			}
+			data += error;
+			datalen -= error;
+			++dst;
+		} while (dst < COMPILER_ENDOF(buf) && datalen);
+		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+		dst = buf;
+	}
+	return result;
+err:
+	return temp;
+}
+
+
+
+
 %{
 
 struct format_8to16_data {
 	__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 	void               *fd_arg;        /* Argument for `fd_printer' */
-	__UINT32_TYPE__     fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	mbstate_t           fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 };
 }
 
 @@>> format_8to16(3)
 @@Format printer (compatible with `__pformatprinter')  for
 @@converting UTF-8 unicode input data into a UTF-16 output
-[[impl_include("<bits/crt/mbstate.h>", "<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
+[[decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
 $ssize_t format_8to16(/*struct format_8to16_data **/ void *arg,
-                      /*utf-8*/ char const *data, $size_t datalen) {
-	struct __local_format_8to16_data {
-		$pc16formatprinter fd_printer;    /* [1..1] Inner printer */
-		void              *fd_arg;        /* Argument for `fd_printer' */
-		$mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
-	};
-	char16_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
-	struct __local_format_8to16_data *closure;
-	ssize_t temp, result = 0;
-	closure = (struct __local_format_8to16_data *)arg;
-	while (datalen) {
-		do {
-			size_t error = unicode_c8toc16(dst, data, datalen, &closure->fd_incomplete);
-			if unlikely(error == (size_t)-1) {
-				mbstate_init(&closure->fd_incomplete);
-				*dst = data[0];
-				error = 1;
-			} else if (error == (size_t)-2) {
-				datalen = 0;
-				break;
-			}
-			data += error;
-			datalen -= error;
-			++dst;
-		} while (dst < COMPILER_ENDOF(buf) && datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-		dst = buf;
-	}
-	return result;
-err:
-	return temp;
-}
-
+                      /*utf-8*/ char const *data, $size_t datalen)
+	%{uchar16("format_8tow")}
 
 %{
 
 struct format_8to32_data {
 	__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 	void               *fd_arg;        /* Argument for `fd_printer' */
-	__UINT32_TYPE__     fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	mbstate_t           fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 };
 }
 
 @@>> format_8to32(3)
 @@Format printer (compatible with `__pformatprinter')  for
 @@converting UTF-8 unicode input data into a UTF-32 output
-[[impl_include("<bits/crt/mbstate.h>", "<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
+[[decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
 $ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
-                      /*utf-8*/ char const *data, $size_t datalen) {
-	struct __local_format_8to32_data {
-		$pc32formatprinter fd_printer;    /* [1..1] Inner printer */
-		void              *fd_arg;        /* Argument for `fd_printer' */
-		$mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
-	};
-	char32_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
-	struct __local_format_8to32_data *closure;
-	ssize_t temp, result = 0;
-	closure = (struct __local_format_8to32_data *)arg;
-	while (datalen) {
-		do {
-			size_t error = unicode_c8toc32(dst, data, datalen, &closure->fd_incomplete);
-			if unlikely(error == (size_t)-1) {
-				mbstate_init(&closure->fd_incomplete);
-				*dst = data[0];
-				error = 1;
-			} else if (error == (size_t)-2) {
-				datalen = 0;
-				break;
-			}
-			data += error;
-			datalen -= error;
-			++dst;
-		} while (dst < COMPILER_ENDOF(buf) && datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-		dst = buf;
-	}
-	return result;
-err:
-	return temp;
-}
+                      /*utf-8*/ char const *data, $size_t datalen)
+	%{uchar32("format_8tow")}
 
 
 //struct format_wto8_data {
@@ -1612,7 +1601,8 @@ err:
 @@>> format_wto8(3)
 @@Format   printer   (compatible  with   `pc16formatprinter')  for
 @@converting wide-character unicode input data into a UTF-8 output
-[[hidden, impl_include("<bits/crt/format-printer.h>"), wchar]]
+[[wchar, hidden, decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
+[[impl_include("<bits/crt/format-printer.h>")]]
 $ssize_t format_wto8(/*struct format_wto8_data **/ void *arg,
                      $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1704,6 +1694,7 @@ struct format_16to8_data {
 @@>> format_16to8(3)
 @@Format printer (compatible with `pc16formatprinter') for
 @@converting UTF-16 unicode input data into a UTF-8 output
+[[decl_include("<bits/crt/uformat-printer.h>"), cc(__C16FORMATPRINTER_CC)]]
 $ssize_t format_16to8(/*struct format_16to8_data **/ void *arg,
                       char16_t const *data, $size_t datalen)
 	%{uchar16("format_wto8")}
@@ -1720,6 +1711,7 @@ struct format_32to8_data {
 @@>> format_32to8(3)
 @@Format printer (compatible with `pc32formatprinter') for
 @@converting UTF-32 unicode input data into a UTF-8 output
+[[decl_include("<bits/crt/uformat-printer.h>"), cc(__C32FORMATPRINTER_CC)]]
 $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
                       char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto8")}
@@ -1738,6 +1730,7 @@ $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
 @@Format  printer   (compatible   with   `pc16formatprinter')   for
 @@converting wide-character unicode input data into a UTF-32 output
 [[hidden, impl_include("<bits/crt/uformat-printer.h>"), wchar]]
+[[decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
 $ssize_t format_wto32(/*struct format_wto32_data **/ void *arg,
                       $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1814,6 +1807,7 @@ struct format_16to32_data {
 @@>> format_16to32(3)
 @@Format printer (compatible with `pc16formatprinter')  for
 @@converting UTF-16 unicode input data into a UTF-32 output
+[[decl_include("<bits/crt/uformat-printer.h>"), cc(__C16FORMATPRINTER_CC)]]
 $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
                        char16_t const *data, $size_t datalen)
 	%{uchar16("format_wto32")}
@@ -1827,6 +1821,7 @@ $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
 @@>> format_wto16(3)
 @@Format   printer   (compatible   with   `pwformatprinter')    for
 @@converting wide-character unicode input data into a UTF-16 output
+[[decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
 [[hidden, wchar, impl_include("<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
 $ssize_t format_wto16(/*struct format_wto16_data **/ void *arg,
                       $wchar_t const *data, $size_t datalen) {
@@ -1876,6 +1871,7 @@ struct format_32to16_data {
 @@>> format_32to16(3)
 @@Format printer (compatible with `__pc32formatprinter') for
 @@converting UTF-32 unicode input data into a UTF-16  output
+[[decl_include("<bits/crt/uformat-printer.h>"), cc(__C32FORMATPRINTER_CC)]]
 $ssize_t format_32to16(/*struct format_32to16_data **/ void *arg,
                        char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto16")}

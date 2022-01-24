@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91ec81c8 */
+/* HASH CRC-32:0xcb726b38 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_16to32) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_16to32))(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__C16FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_16to32))(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 
 	struct __local_format_16to32_data {
 		__pc32formatprinter __fd_printer;   /* [1..1] Inner printer */

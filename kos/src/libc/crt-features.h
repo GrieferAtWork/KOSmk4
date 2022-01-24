@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb745fed6 */
+/* HASH CRC-32:0x6c16ca8e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1103,8 +1103,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$forkpty
-#define __CRT_HAVE_DOS$format_8to16
-#define __CRT_HAVE_DOS$format_8to32
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$format_8tow
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$format_aprintf_alloc
 #define __CRT_HAVE_DOS$format_aprintf_pack
 #define __CRT_HAVE_DOS$format_escape
@@ -4459,8 +4462,7 @@
 #define __CRT_HAVE_fopendirat
 #define __CRT_HAVE_fork
 #define __CRT_HAVE_forkpty
-#define __CRT_HAVE_format_8to16
-#define __CRT_HAVE_format_8to32
+#define __CRT_HAVE_format_8tow
 #define __CRT_HAVE_format_aprintf_alloc
 #define __CRT_HAVE_format_aprintf_pack
 #define __CRT_HAVE_format_aprintf_printer

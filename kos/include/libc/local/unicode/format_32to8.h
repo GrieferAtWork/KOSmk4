@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72413653 */
+/* HASH CRC-32:0xf331d0b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_format_32to8_defined
 #define __local_format_32to8_defined
 #include <__crt.h>
+#include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf8_defined
 #define __local___localdep_unicode_writeutf8_defined
@@ -37,7 +38,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_32to8) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_32to8))(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__C32FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_32to8))(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 
 
 

@@ -477,7 +477,7 @@ INTERN WINBOOL WINAPI
 libk32_ReadConsoleW(HANDLE hConsoleInput, LPVOID lpBuffer,
                     DWORD nNumberOfCharsToRead,
                     LPDWORD lpNumberOfCharsRead, LPVOID lpReserved) {
-	PRIVATE uint32_t incomplete = 0;
+	PRIVATE mbstate_t incomplete = MBSTATE_INIT;
 	fd_t ttyfd;
 	struct format_c16snprintf_data printer;
 	struct format_8to16_data convert;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6948039f */
+/* HASH CRC-32:0x2129b61b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -930,6 +930,7 @@ done:
 #endif /* !... */
 }
 #include <bits/crt/uformat-printer.h>
+#include <bits/crt/mbstate.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.system.configuration") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
@@ -941,7 +942,7 @@ NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
 	struct __LOCAL_format_8tow_data {
 		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 		void             *fd_arg;        /* Argument for `fd_printer' */
-		__UINT32_TYPE__   fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		struct __mbstate  fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	struct utsname uts;
 	int result = libc_uname(&uts);
@@ -950,16 +951,12 @@ NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
 		struct __LOCAL_format_8tow_data convert_data;
 		size_t len = libc_strnlen(uts.nodename, COMPILER_LENOF(uts.nodename));
 		ssize_t width;
-		printer_data.sd_buffer     = name;
-		printer_data.sd_bufsiz     = buflen;
-		convert_data.fd_arg        = &printer_data;
-		convert_data.fd_printer    = &libd_format_wsnprintf_printer;
-		convert_data.fd_incomplete = 0;
-
-
-
-		width = libc_format_8to16(&convert_data, uts.nodename, len);
-
+		printer_data.sd_buffer  = name;
+		printer_data.sd_bufsiz  = buflen;
+		convert_data.fd_arg     = &printer_data;
+		convert_data.fd_printer = &libd_format_wsnprintf_printer;
+		__mbstate_init(&convert_data.fd_incomplete);
+		width = libd_format_8tow(&convert_data, uts.nodename, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
@@ -974,6 +971,7 @@ NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
 	return result;
 }
 #include <bits/crt/uformat-printer.h>
+#include <bits/crt/mbstate.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") NONNULL((1)) int
 NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name,
@@ -985,7 +983,7 @@ NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name,
 	struct __LOCAL_format_8tow_data {
 		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 		void             *fd_arg;        /* Argument for `fd_printer' */
-		__UINT32_TYPE__   fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		struct __mbstate  fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	struct utsname uts;
 	int result = libc_uname(&uts);
@@ -994,16 +992,12 @@ NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name,
 		struct __LOCAL_format_8tow_data convert_data;
 		size_t len = libc_strnlen(uts.nodename, COMPILER_LENOF(uts.nodename));
 		ssize_t width;
-		printer_data.sd_buffer     = name;
-		printer_data.sd_bufsiz     = buflen;
-		convert_data.fd_arg        = &printer_data;
-		convert_data.fd_printer    = &libc_format_wsnprintf_printer;
-		convert_data.fd_incomplete = 0;
-
-		width = libc_format_8to32(&convert_data, uts.nodename, len);
-
-
-
+		printer_data.sd_buffer  = name;
+		printer_data.sd_bufsiz  = buflen;
+		convert_data.fd_arg     = &printer_data;
+		convert_data.fd_printer = &libc_format_wsnprintf_printer;
+		__mbstate_init(&convert_data.fd_incomplete);
+		width = libc_format_8tow(&convert_data, uts.nodename, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
@@ -1074,6 +1068,7 @@ NOTHROW_NCX(LIBKCALL libc_wsethostname)(char32_t const *name,
 	return result;
 }
 #include <bits/crt/uformat-printer.h>
+#include <bits/crt/mbstate.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.system.configuration") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
@@ -1085,7 +1080,7 @@ NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
 	struct __LOCAL_format_8tow_data {
 		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 		void             *fd_arg;        /* Argument for `fd_printer' */
-		__UINT32_TYPE__   fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		struct __mbstate  fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	struct utsname uts;
 	int result = libc_uname(&uts);
@@ -1094,16 +1089,12 @@ NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
 		struct __LOCAL_format_8tow_data convert_data;
 		size_t len = libc_strnlen(uts.domainname, COMPILER_LENOF(uts.domainname));
 		ssize_t width;
-		printer_data.sd_buffer     = name;
-		printer_data.sd_bufsiz     = buflen;
-		convert_data.fd_arg        = &printer_data;
-		convert_data.fd_printer    = &libd_format_wsnprintf_printer;
-		convert_data.fd_incomplete = 0;
-
-
-
-		width = libc_format_8to16(&convert_data, uts.domainname, len);
-
+		printer_data.sd_buffer  = name;
+		printer_data.sd_bufsiz  = buflen;
+		convert_data.fd_arg     = &printer_data;
+		convert_data.fd_printer = &libd_format_wsnprintf_printer;
+		__mbstate_init(&convert_data.fd_incomplete);
+		width = libd_format_8tow(&convert_data, uts.domainname, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
@@ -1118,6 +1109,7 @@ NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
 	return result;
 }
 #include <bits/crt/uformat-printer.h>
+#include <bits/crt/mbstate.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") NONNULL((1)) int
 NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name,
@@ -1129,7 +1121,7 @@ NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name,
 	struct __LOCAL_format_8tow_data {
 		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 		void             *fd_arg;        /* Argument for `fd_printer' */
-		__UINT32_TYPE__   fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		struct __mbstate  fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	struct utsname uts;
 	int result = libc_uname(&uts);
@@ -1138,16 +1130,12 @@ NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name,
 		struct __LOCAL_format_8tow_data convert_data;
 		size_t len = libc_strnlen(uts.domainname, COMPILER_LENOF(uts.domainname));
 		ssize_t width;
-		printer_data.sd_buffer     = name;
-		printer_data.sd_bufsiz     = buflen;
-		convert_data.fd_arg        = &printer_data;
-		convert_data.fd_printer    = &libc_format_wsnprintf_printer;
-		convert_data.fd_incomplete = 0;
-
-		width = libc_format_8to32(&convert_data, uts.domainname, len);
-
-
-
+		printer_data.sd_buffer  = name;
+		printer_data.sd_bufsiz  = buflen;
+		convert_data.fd_arg     = &printer_data;
+		convert_data.fd_printer = &libc_format_wsnprintf_printer;
+		__mbstate_init(&convert_data.fd_incomplete);
+		width = libc_format_8tow(&convert_data, uts.domainname, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaed18aea */
+/* HASH CRC-32:0x8fb5fe38 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,15 +26,17 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_16to8_defined
 #define __local___localdep_format_16to8_defined
-#if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wto8)
-__CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+#if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 2 && defined(__C16FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/uformat-printer.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
+#include <bits/crt/uformat-printer.h>
 #include <libc/local/unicode/format_wto8.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_16to8 __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__LIBDCALL*)(void *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),__SSIZE_TYPE__(__LIBDCALL&)(void *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),format_wto8)
+#define __localdep_format_16to8 __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__C16FORMATPRINTER_CC*)(void *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),__SSIZE_TYPE__(__C16FORMATPRINTER_CC&)(void *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),format_wto8)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_16to8.h>

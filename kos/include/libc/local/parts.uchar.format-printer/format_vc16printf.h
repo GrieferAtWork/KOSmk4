@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d919411 */
+/* HASH CRC-32:0xb032359e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,15 +26,13 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_16to32_defined
 #define __local___localdep_format_16to32_defined
-#if defined(__CRT_HAVE_format_wto32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wto32)
-__CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
+#if defined(__CRT_HAVE_format_wto32) && __SIZEOF_WCHAR_T__ == 2 && defined(__C16FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_wto32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_16to32 __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__LIBDCALL*)(void *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),__SSIZE_TYPE__(__LIBDCALL&)(void *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),format_wto32)
+#define __localdep_format_16to32 __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__C16FORMATPRINTER_CC*)(void *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),__SSIZE_TYPE__(__C16FORMATPRINTER_CC&)(void *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),format_wto32)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_16to32.h>
@@ -44,15 +42,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_format_16to32_defined */
 #ifndef __local___localdep_format_32to16_defined
 #define __local___localdep_format_32to16_defined
-#if defined(__CRT_HAVE_format_wto16) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_KOS$format_wto16)
-__CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
+#if defined(__CRT_HAVE_format_wto16) && __SIZEOF_WCHAR_T__ == 4 && defined(__C32FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,__localdep_format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_wto16.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_32to16 __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__LIBKCALL*)(void *,__CHAR32_TYPE__ const *,__SIZE_TYPE__),__SSIZE_TYPE__(__LIBKCALL&)(void *,__CHAR32_TYPE__ const *,__SIZE_TYPE__),format_wto16)
+#define __localdep_format_32to16 __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__C32FORMATPRINTER_CC*)(void *,__CHAR32_TYPE__ const *,__SIZE_TYPE__),__SSIZE_TYPE__(__C32FORMATPRINTER_CC&)(void *,__CHAR32_TYPE__ const *,__SIZE_TYPE__),format_wto16)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_32to16.h>
@@ -62,26 +58,23 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_format_32to16_defined */
 #ifndef __local___localdep_format_8to16_defined
 #define __local___localdep_format_8to16_defined
-#ifdef __CRT_HAVE_format_8to16
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8to16,(__arg,__data,__datalen))
-#else /* __CRT_HAVE_format_8to16 */
+#if defined(__CRT_HAVE_format_8tow) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <bits/crt/format-printer.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
+#elif __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <libc/local/unicode/format_8tow.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_format_8to16 __LIBC_LOCAL_NAME(format_8tow)
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_8to16.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_8to16 __LIBC_LOCAL_NAME(format_8to16)
-#endif /* !__CRT_HAVE_format_8to16 */
+#endif /* !... */
 #endif /* !__local___localdep_format_8to16_defined */
-#ifndef __local___localdep_format_8to32_defined
-#define __local___localdep_format_8to32_defined
-#ifdef __CRT_HAVE_format_8to32
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8to32,(__arg,__data,__datalen))
-#else /* __CRT_HAVE_format_8to32 */
-__NAMESPACE_LOCAL_END
-#include <libc/local/unicode/format_8to32.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_8to32 __LIBC_LOCAL_NAME(format_8to32)
-#endif /* !__CRT_HAVE_format_8to32 */
-#endif /* !__local___localdep_format_8to32_defined */
 #ifndef __local___localdep_format_c16escape_defined
 #define __local___localdep_format_c16escape_defined
 #if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
@@ -358,13 +351,12 @@ __LOCAL_LIBC(format_vc16printf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3))
 #define __FORMAT_ESCAPE             (__NAMESPACE_LOCAL_SYM __localdep_format_c16escape)
 #define __FORMAT_WIDTH8             (__NAMESPACE_LOCAL_SYM __localdep_format_width)
 #define __FORMAT_ESCAPE8            (__NAMESPACE_LOCAL_SYM __localdep_format_escape)
+#define __FORMAT_UNICODE_FORMAT8    (__NAMESPACE_LOCAL_SYM __localdep_format_8to16)
 
 #define __FORMAT_WIDTH32            (__NAMESPACE_LOCAL_SYM __localdep_format_c32width)
 #define __FORMAT_ESCAPE32           (__NAMESPACE_LOCAL_SYM __localdep_format_c32escape)
 #define __FORMAT_UNICODE_WRITECHAR  (__NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf16)
-#define __FORMAT_UNICODE_FORMAT8    (__NAMESPACE_LOCAL_SYM __localdep_format_8to16)
 #define __FORMAT_UNICODE_FORMAT32   (__NAMESPACE_LOCAL_SYM __localdep_format_32to16)
-
 
 
 

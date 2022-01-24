@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a517f1 */
+/* HASH CRC-32:0x443ff96b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_format_wto8_defined
 #define __local_format_wto8_defined
 #include <__crt.h>
+#include <bits/crt/wformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf8_defined
 #define __local___localdep_unicode_writeutf8_defined
@@ -37,7 +38,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_wto8) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto8))(void *__arg, __WCHAR_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__WFORMATPRINTER_CC __LIBC_LOCAL_NAME(format_wto8))(void *__arg, __WCHAR_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 #if __SIZEOF_WCHAR_T__ == 2
 	struct __local_format_16to8_data {
 		__pformatprinter __fd_printer;   /* [1..1] Inner printer */

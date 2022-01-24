@@ -32,16 +32,17 @@
 #include <sys/mman.h>
 #include <sys/wait.h>
 
-#include <format-printer.h>
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <format-printer.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
 #include <time.h>
+#include <unicode.h>
 #include <unistd.h>
 
 #include <libvideo/gfx/buffer.h>
@@ -117,7 +118,7 @@ int main(int argc, char *argv[]) {
 	fontprinter_data.vfp_font    = font;
 	fontprinter_data.vfp_lnstart = 0;
 	fontprinter_data.vfp_color   = VIDEO_COLOR_BLACK;
-	fontprinter_data.vfp_u8word  = 0;
+	mbstate_init(&fontprinter_data.vfp_u8word);
 
 	int render_mode = 0;
 again_font:

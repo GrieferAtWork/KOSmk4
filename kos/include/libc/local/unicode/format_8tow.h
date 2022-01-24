@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x514ac74 */
+/* HASH CRC-32:0x2cfe19b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_format_8to32_defined
-#define __local_format_8to32_defined
+#ifndef __local_format_8tow_defined
+#define __local_format_8tow_defined
 #include <__crt.h>
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -53,27 +53,27 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_unicode_c8toc32_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
-#include <bits/crt/uformat-printer.h>
+#include <bits/crt/wformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_8to32) __SSIZE_TYPE__
-__NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_8to32))(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) {
+__LOCAL_LIBC(format_8tow) __SSIZE_TYPE__
+__NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_8tow))(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) {
 	struct __local_format_8tow_data {
-		__pc32formatprinter __fd_printer;    /* [1..1] Inner printer */
+		__pwformatprinter __fd_printer;    /* [1..1] Inner printer */
 		void            *__fd_arg;        /* Argument for `fd_printer' */
 		struct __mbstate       __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
-	__CHAR32_TYPE__ __buf[64], *__dst = __buf;
+	__WCHAR_TYPE__ __buf[64], *__dst = __buf;
 	struct __local_format_8tow_data *__closure;
 	__SSIZE_TYPE__ __temp, __result = 0;
 	__closure = (struct __local_format_8tow_data *)__arg;
 	while (__datalen) {
 		do {
 			__SIZE_TYPE__ __error;
-
-
-
+#if __SIZEOF_WCHAR_T__ == 2
+			__error = (__NAMESPACE_LOCAL_SYM __localdep_unicode_c8toc16)((__CHAR16_TYPE__ *)__dst, __data, __datalen, &__closure->__fd_incomplete);
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 			__error = (__NAMESPACE_LOCAL_SYM __localdep_unicode_c8toc32)((__CHAR32_TYPE__ *)__dst, __data, __datalen, &__closure->__fd_incomplete);
-
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 			if __unlikely(__error == (__SIZE_TYPE__)-1) {
 				__mbstate_init(&__closure->__fd_incomplete);
 				*__dst = __data[0];
@@ -97,8 +97,8 @@ __err:
 	return __temp;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_format_8to32_defined
-#define __local___localdep_format_8to32_defined
-#define __localdep_format_8to32 __LIBC_LOCAL_NAME(format_8to32)
-#endif /* !__local___localdep_format_8to32_defined */
-#endif /* !__local_format_8to32_defined */
+#ifndef __local___localdep_format_8tow_defined
+#define __local___localdep_format_8tow_defined
+#define __localdep_format_8tow __LIBC_LOCAL_NAME(format_8tow)
+#endif /* !__local___localdep_format_8tow_defined */
+#endif /* !__local_format_8tow_defined */

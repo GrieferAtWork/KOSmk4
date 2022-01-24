@@ -2113,8 +2113,7 @@
 #define __CRT_HAVE_fopendirat
 #define __CRT_HAVE_fork
 #define __CRT_HAVE_forkpty
-#define __CRT_HAVE_format_8to16
-#define __CRT_HAVE_format_8to32
+#define __CRT_HAVE_format_8tow
 #define __CRT_HAVE_format_aprintf_alloc
 #define __CRT_HAVE_format_aprintf_pack
 #define __CRT_HAVE_format_aprintf_printer
@@ -2142,7 +2141,6 @@
 #define __CRT_HAVE_format_wsprintf_printer
 #define __CRT_HAVE_format_wto16
 #define __CRT_HAVE_format_wto32
-#define __CRT_HAVE_format_wto8
 #define __CRT_HAVE_format_wwidth
 #define __CRT_HAVE_fparseln
 #define __CRT_HAVE_fpathconf
@@ -6950,8 +6948,7 @@
 #define __CRT_HAVE_KOS$fopencookie
 #define __CRT_HAVE_KOS$fopendirat
 #define __CRT_HAVE_KOS$forkpty
-#define __CRT_HAVE_KOS$format_8to16
-#define __CRT_HAVE_KOS$format_8to32
+#define __CRT_HAVE_KOS$format_8tow
 #define __CRT_HAVE_KOS$format_aprintf_alloc
 #define __CRT_HAVE_KOS$format_aprintf_pack
 #define __CRT_HAVE_KOS$format_escape
@@ -6974,7 +6971,7 @@
 #define __CRT_HAVE_KOS$format_wsprintf_printer
 #define __CRT_HAVE_KOS$format_wto16
 #define __CRT_HAVE_KOS$format_wto32
-#define __CRT_HAVE_KOS$format_wto8
+#define __CRT_HAVE_format_wto8
 #define __CRT_HAVE_KOS$format_wwidth
 #define __CRT_HAVE_KOS$fparseln
 #define __CRT_HAVE_KOS$fpathconf
@@ -10701,8 +10698,7 @@
 #define __CRT_HAVE_DOS$fopencookie
 #define __CRT_HAVE_DOS$fopendirat
 #define __CRT_HAVE_DOS$forkpty
-#define __CRT_HAVE_DOS$format_8to16
-#define __CRT_HAVE_DOS$format_8to32
+#define __CRT_HAVE_DOS$format_8tow
 #define __CRT_HAVE_DOS$format_aprintf_alloc
 #define __CRT_HAVE_DOS$format_aprintf_pack
 #define __CRT_HAVE_DOS$format_escape

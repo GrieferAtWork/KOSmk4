@@ -361,12 +361,7 @@ $wchar_t *convert_mbstowcsn(/*utf-8*/ char const *__restrict str, size_t len, si
 	convert_data.fd_printer    = &format_waprintf_printer;
 	convert_data.fd_arg        = &printer_data;
 	convert_data.fd_incomplete = 0;
-@@pp_if __SIZEOF_WCHAR_T__ == 2@@
-	if unlikely(format_8to16(&convert_data, str, len) < 0)
-@@pp_else@@
-	if unlikely(format_8to32(&convert_data, str, len) < 0)
-@@pp_endif@@
-	{
+	if unlikely(format_8tow(&convert_data, str, len) < 0) {
 @@pp_if $has_function(free)@@
 		free(printer_data.ap_base);
 @@pp_endif@@

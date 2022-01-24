@@ -172,17 +172,16 @@ $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
 #define __FORMAT_ESCAPE             format_wescape
 #define __FORMAT_WIDTH8             format_width
 #define __FORMAT_ESCAPE8            format_escape
+#define __FORMAT_UNICODE_FORMAT8    format_8tow
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 #define __FORMAT_WIDTH32            format_c32width
 #define __FORMAT_ESCAPE32           format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf16
-#define __FORMAT_UNICODE_FORMAT8    format_8to16
 #define __FORMAT_UNICODE_FORMAT32   format_32to16
 @@pp_else@@
 #define __FORMAT_WIDTH16            format_c16width
 #define __FORMAT_ESCAPE16           format_c16escape
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
-#define __FORMAT_UNICODE_FORMAT8    format_8to32
 #define __FORMAT_UNICODE_FORMAT16   format_16to32
 @@pp_endif@@
 #include <libc/template/format-printf.h>

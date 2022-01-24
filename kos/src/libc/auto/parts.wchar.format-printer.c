@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4639840a */
+/* HASH CRC-32:0xbbd571a0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1215,13 +1215,12 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 #define __FORMAT_ESCAPE             libd_format_wescape
 #define __FORMAT_WIDTH8             libc_format_width
 #define __FORMAT_ESCAPE8            libc_format_escape
+#define __FORMAT_UNICODE_FORMAT8    libd_format_8tow
 
 #define __FORMAT_WIDTH32            libc_format_wwidth
 #define __FORMAT_ESCAPE32           libc_format_wescape
 #define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
-#define __FORMAT_UNICODE_FORMAT8    libc_format_8to16
 #define __FORMAT_UNICODE_FORMAT32   libc_format_wto16
-
 
 
 
@@ -1360,7 +1359,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 #define __FORMAT_ESCAPE             libc_format_wescape
 #define __FORMAT_WIDTH8             libc_format_width
 #define __FORMAT_ESCAPE8            libc_format_escape
-
+#define __FORMAT_UNICODE_FORMAT8    libc_format_8tow
 
 
 
@@ -1370,7 +1369,6 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 #define __FORMAT_WIDTH16            libd_format_wwidth
 #define __FORMAT_ESCAPE16           libd_format_wescape
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
-#define __FORMAT_UNICODE_FORMAT8    libc_format_8to32
 #define __FORMAT_UNICODE_FORMAT16   libd_format_wto32
 
 #include <libc/template/format-printf.h>

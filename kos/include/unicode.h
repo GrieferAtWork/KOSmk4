@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd617f339 */
+/* HASH CRC-32:0x97853705 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1010,94 +1010,96 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c16toc8, __FORCELOCAL __ATTR_ARTIFICIAL 
 struct format_8to16_data {
 	__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 	void               *fd_arg;        /* Argument for `fd_printer' */
-	__UINT32_TYPE__     fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	mbstate_t           fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 };
-#ifdef __CRT_HAVE_format_8to16
+#if defined(__CRT_HAVE_format_8tow) && __SIZEOF_WCHAR_T__ == 2
 /* >> format_8to16(3)
  * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-16 output */
-__CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
-#else /* __CRT_HAVE_format_8to16 */
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/unicode/format_8tow.h>
+/* >> format_8to16(3)
+ * Format printer (compatible with `__pformatprinter')  for
+ * converting UTF-8 unicode input data into a UTF-16 output */
+__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_8to16)(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_8tow))(__arg, __data, __datalen); }
+#else /* ... */
 #include <libc/local/unicode/format_8to16.h>
 /* >> format_8to16(3)
  * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-16 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_8to16, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_8to16)(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_8to16))(__arg, __data, __datalen); })
-#endif /* !__CRT_HAVE_format_8to16 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_8to16, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_8to16)(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_8to16))(__arg, __data, __datalen); })
+#endif /* !... */
 
 struct format_8to32_data {
 	__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 	void               *fd_arg;        /* Argument for `fd_printer' */
-	__UINT32_TYPE__     fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	mbstate_t           fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 };
-#ifdef __CRT_HAVE_format_8to32
+#if defined(__CRT_HAVE_format_8tow) && __SIZEOF_WCHAR_T__ == 4
 /* >> format_8to32(3)
  * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-32 output */
-__CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
-#else /* __CRT_HAVE_format_8to32 */
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/unicode/format_8tow.h>
+/* >> format_8to32(3)
+ * Format printer (compatible with `__pformatprinter')  for
+ * converting UTF-8 unicode input data into a UTF-32 output */
+__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_8to32)(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_8tow))(__arg, __data, __datalen); }
+#else /* ... */
 #include <libc/local/unicode/format_8to32.h>
 /* >> format_8to32(3)
  * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-32 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_8to32, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_8to32)(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_8to32))(__arg, __data, __datalen); })
-#endif /* !__CRT_HAVE_format_8to32 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_8to32, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_8to32)(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_8to32))(__arg, __data, __datalen); })
+#endif /* !... */
 
 struct format_16to8_data {
 	__pformatprinter fd_printer;   /* [1..1] Inner printer */
 	void            *fd_arg;       /* Argument for `fd_printer' */
 	char16_t         fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 };
-#if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 2 && defined(__C16FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
 /* >> format_16to8(3)
  * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wto8)
-/* >> format_16to8(3)
- * Format printer (compatible with `pc16formatprinter') for
- * converting UTF-16 unicode input data into a UTF-8 output */
-__CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/unicode/format_wto8.h>
 /* >> format_16to8(3)
  * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
-__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to8)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto8))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__C16FORMATPRINTER_CC format_16to8)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto8))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
 #else /* ... */
 #include <libc/local/unicode/format_16to8.h>
 /* >> format_16to8(3)
  * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_16to8, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to8)(void *__arg, char16_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to8))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_16to8, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__C16FORMATPRINTER_CC format_16to8)(void *__arg, char16_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to8))(__arg, __data, __datalen); })
 #endif /* !... */
 
 struct format_32to8_data {
 	__pformatprinter fd_printer; /* [1..1] Inner printer */
 	void            *fd_arg;     /* Argument for `fd_printer' */
 };
-#if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 4 && defined(__C32FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
 /* >> format_32to8(3)
  * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_KOS$format_wto8)
-/* >> format_32to8(3)
- * Format printer (compatible with `pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-8 output */
-__CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/unicode/format_wto8.h>
 /* >> format_32to8(3)
  * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
-__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to8)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto8))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__C32FORMATPRINTER_CC format_32to8)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto8))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
 #else /* ... */
 #include <libc/local/unicode/format_32to8.h>
 /* >> format_32to8(3)
  * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_32to8, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to8)(void *__arg, char32_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to8))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_32to8, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__C32FORMATPRINTER_CC format_32to8)(void *__arg, char32_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to8))(__arg, __data, __datalen); })
 #endif /* !... */
 
 struct format_16to32_data {
@@ -1105,56 +1107,46 @@ struct format_16to32_data {
 	void               *fd_arg;       /* Argument for `fd_printer' */
 	char16_t            fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 };
-#if defined(__CRT_HAVE_format_wto32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_format_wto32) && __SIZEOF_WCHAR_T__ == 2 && defined(__C16FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
 /* >> format_16to32(3)
  * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wto32)
-/* >> format_16to32(3)
- * Format printer (compatible with `pc16formatprinter')  for
- * converting UTF-16 unicode input data into a UTF-32 output */
-__CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/unicode/format_wto32.h>
 /* >> format_16to32(3)
  * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
-__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to32)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto32))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__C16FORMATPRINTER_CC format_16to32)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto32))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
 #else /* ... */
 #include <libc/local/unicode/format_16to32.h>
 /* >> format_16to32(3)
  * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_16to32, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to32)(void *__arg, char16_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to32))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_16to32, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__C16FORMATPRINTER_CC format_16to32)(void *__arg, char16_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to32))(__arg, __data, __datalen); })
 #endif /* !... */
 
 struct format_32to16_data {
 	__pc16formatprinter fd_printer; /* [1..1] Inner printer */
 	void               *fd_arg;     /* Argument for `fd_printer' */
 };
-#if defined(__CRT_HAVE_format_wto16) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_format_wto16) && __SIZEOF_WCHAR_T__ == 4 && defined(__C32FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16  output */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_KOS$format_wto16)
-/* >> format_32to16(3)
- * Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-16  output */
-__CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/unicode/format_wto16.h>
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16  output */
-__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to16)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto16))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__C32FORMATPRINTER_CC format_32to16)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto16))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
 #else /* ... */
 #include <libc/local/unicode/format_32to16.h>
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16  output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_32to16, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to16)(void *__arg, char32_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to16))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_32to16, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__C32FORMATPRINTER_CC format_32to16)(void *__arg, char32_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to16))(__arg, __data, __datalen); })
 #endif /* !... */
 #if !defined(____unicode_descriptor_defined) && defined(__CRT_HAVE___unicode_descriptor)
 #define ____unicode_descriptor_defined

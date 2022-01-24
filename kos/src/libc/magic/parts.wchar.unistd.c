@@ -594,8 +594,8 @@ ssize_t wreadlink([[nonnull]] wchar_t const *path,
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-[[section(".text.crt{|.dos}.wchar.system.configuration")]]
-[[wchar, impl_include("<bits/crt/wformat-printer.h>", "<libc/errno.h>")]]
+[[wchar, section(".text.crt{|.dos}.wchar.system.configuration")]]
+[[impl_include("<bits/crt/wformat-printer.h>", "<bits/crt/mbstate.h>", "<libc/errno.h>")]]
 [[requires($has_function(uname))]]
 int wgethostname([[outp(buflen)]] wchar_t *name, size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
@@ -605,7 +605,7 @@ int wgethostname([[outp(buflen)]] wchar_t *name, size_t buflen) {
 	struct __LOCAL_format_8tow_data {
 		__pwformatprinter fd_printer;    /* [1..1] Inner printer */
 		void             *fd_arg;        /* Argument for `fd_printer' */
-		__UINT32_TYPE__   fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		struct __mbstate  fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	struct utsname uts;
 	int result = uname(&uts);
@@ -614,16 +614,12 @@ int wgethostname([[outp(buflen)]] wchar_t *name, size_t buflen) {
 		struct __LOCAL_format_8tow_data convert_data;
 		size_t len = strnlen(uts.@nodename@, COMPILER_LENOF(uts.@nodename@));
 		ssize_t width;
-		printer_data.sd_buffer     = name;
-		printer_data.sd_bufsiz     = buflen;
-		convert_data.fd_arg        = &printer_data;
-		convert_data.fd_printer    = &format_wsnprintf_printer;
-		convert_data.fd_incomplete = 0;
-@@pp_if __SIZEOF_WCHAR_T__ == 4@@
-		width = format_8to32(&convert_data, uts.@nodename@, len);
-@@pp_else@@
-		width = format_8to16(&convert_data, uts.@nodename@, len);
-@@pp_endif@@
+		printer_data.sd_buffer  = name;
+		printer_data.sd_bufsiz  = buflen;
+		convert_data.fd_arg     = &printer_data;
+		convert_data.fd_printer = &format_wsnprintf_printer;
+		__mbstate_init(&convert_data.fd_incomplete);
+		width = format_8tow(&convert_data, uts.@nodename@, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
@@ -674,8 +670,8 @@ int wsethostname([[inp(len)]] wchar_t const *name, size_t len) {
 	return result;
 }
 
-[[section(".text.crt{|.dos}.wchar.system.configuration")]]
-[[wchar, impl_include("<bits/crt/wformat-printer.h>", "<libc/errno.h>")]]
+[[wchar, section(".text.crt{|.dos}.wchar.system.configuration")]]
+[[impl_include("<bits/crt/wformat-printer.h>", "<bits/crt/mbstate.h>", "<libc/errno.h>")]]
 [[requires($has_function(uname))]]
 int wgetdomainname([[outp(buflen)]] wchar_t *name, size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
@@ -685,7 +681,7 @@ int wgetdomainname([[outp(buflen)]] wchar_t *name, size_t buflen) {
 	struct __LOCAL_format_8tow_data {
 		__pwformatprinter fd_printer;    /* [1..1] Inner printer */
 		void             *fd_arg;        /* Argument for `fd_printer' */
-		__UINT32_TYPE__   fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		struct __mbstate  fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	struct utsname uts;
 	int result = uname(&uts);
@@ -694,16 +690,12 @@ int wgetdomainname([[outp(buflen)]] wchar_t *name, size_t buflen) {
 		struct __LOCAL_format_8tow_data convert_data;
 		size_t len = strnlen(uts.@domainname@, COMPILER_LENOF(uts.@domainname@));
 		ssize_t width;
-		printer_data.sd_buffer     = name;
-		printer_data.sd_bufsiz     = buflen;
-		convert_data.fd_arg        = &printer_data;
-		convert_data.fd_printer    = &format_wsnprintf_printer;
-		convert_data.fd_incomplete = 0;
-@@pp_if __SIZEOF_WCHAR_T__ == 4@@
-		width = format_8to32(&convert_data, uts.@domainname@, len);
-@@pp_else@@
-		width = format_8to16(&convert_data, uts.@domainname@, len);
-@@pp_endif@@
+		printer_data.sd_buffer  = name;
+		printer_data.sd_bufsiz  = buflen;
+		convert_data.fd_arg     = &printer_data;
+		convert_data.fd_printer = &format_wsnprintf_printer;
+		__mbstate_init(&convert_data.fd_incomplete);
+		width = format_8tow(&convert_data, uts.@domainname@, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {

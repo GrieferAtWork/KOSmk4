@@ -26,7 +26,8 @@
 #include <hybrid/__atomic.h>
 #include <hybrid/typecore.h>
 
-#include <bits/crt/format-printer.h>  /* __FORMATPRINTER_CC */
+#include <bits/crt/format-printer.h> /* __FORMATPRINTER_CC */
+#include <bits/crt/mbstate.h>
 #include <bits/crt/uformat-printer.h> /* __C32FORMATPRINTER_CC */
 #include <bits/types.h>
 #include <kos/anno.h>
@@ -133,7 +134,7 @@ struct video_fontprinter_data {
 	__intptr_t         vfp_lnend;    /* Ending  X coord for additional lines (when `> vfp_lnstart',
 	                                  * wrap to a new line when a glyph would exceed this position) */
 	video_color_t      vfp_color;    /* Output color for the next glyph. */
-	__uint32_t         vfp_u8word;   /* Incomplete utf-8 word (used by `format_8to32_data::fd_incomplete') (initialize to 0) */
+	struct __mbstate   vfp_u8word;   /* Incomplete utf-8 word (used by `format_8to32_data::fd_incomplete') (initialize to 0) */
 	/* TODO: Special character attribute flags (underline, cross-out, mirrored?, bold?, cursive?) */
 };
 

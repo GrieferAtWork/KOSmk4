@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c1cfd56 */
+/* HASH CRC-32:0x578b6ab9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -355,54 +355,38 @@ INTDEF NONNULL((1, 3)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c16toc8)(char pc
  * @return: (size_t)-1: Unicode error (the given input string
  *                      isn't  a   valid  unicode   sequence) */
 INTDEF NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c16toc8)(char pc8[3], char16_t c16, mbstate_t *__restrict mbs);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> format_8to16(3)
- * Format printer (compatible with `__pformatprinter')  for
- * converting UTF-8 unicode input data into a UTF-16 output */
-INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_8to16)(void *arg, char const *data, size_t datalen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> format_8to16(3)
- * Format printer (compatible with `__pformatprinter')  for
- * converting UTF-8 unicode input data into a UTF-16 output */
-INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg, char const *data, size_t datalen);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> format_8to32(3)
- * Format printer (compatible with `__pformatprinter')  for
- * converting UTF-8 unicode input data into a UTF-32 output */
-INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_8to32)(void *arg, char const *data, size_t datalen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> format_8to32(3)
- * Format printer (compatible with `__pformatprinter')  for
- * converting UTF-8 unicode input data into a UTF-32 output */
-INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg, char const *data, size_t datalen);
+/* >> format_8tow(3)
+ * Format printer  (compatible  with  `__pformatprinter')  for
+ * converting UTF-8 unicode input data into a UTF-16/32 output */
+INTDEF ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libd_format_8tow)(void *arg, char const *data, size_t datalen);
+/* >> format_8tow(3)
+ * Format printer  (compatible  with  `__pformatprinter')  for
+ * converting UTF-8 unicode input data into a UTF-16/32 output */
+INTDEF ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_8tow)(void *arg, char const *data, size_t datalen);
 /* >> format_wto8(3)
  * Format   printer   (compatible  with   `pc16formatprinter')  for
  * converting wide-character unicode input data into a UTF-8 output */
-INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg, char16_t const *data, size_t datalen);
+INTDEF ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wto8)(void *arg, char16_t const *data, size_t datalen);
 /* >> format_wto8(3)
  * Format   printer   (compatible  with   `pc16formatprinter')  for
  * converting wide-character unicode input data into a UTF-8 output */
-INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg, char32_t const *data, size_t datalen);
+INTDEF ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wto8)(void *arg, char32_t const *data, size_t datalen);
 /* >> format_wto32(3)
  * Format  printer   (compatible   with   `pc16formatprinter')   for
  * converting wide-character unicode input data into a UTF-32 output */
-INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg, char16_t const *data, size_t datalen);
+INTDEF ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wto32)(void *arg, char16_t const *data, size_t datalen);
 /* >> format_wto32(3)
  * Format  printer   (compatible   with   `pc16formatprinter')   for
  * converting wide-character unicode input data into a UTF-32 output */
-INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg, char32_t const *data, size_t datalen);
+INTDEF ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wto32)(void *arg, char32_t const *data, size_t datalen);
 /* >> format_wto16(3)
  * Format   printer   (compatible   with   `pwformatprinter')    for
  * converting wide-character unicode input data into a UTF-16 output */
-INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg, char16_t const *data, size_t datalen);
+INTDEF ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wto16)(void *arg, char16_t const *data, size_t datalen);
 /* >> format_wto16(3)
  * Format   printer   (compatible   with   `pwformatprinter')    for
  * converting wide-character unicode input data into a UTF-16 output */
-INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg, char32_t const *data, size_t datalen);
+INTDEF ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wto16)(void *arg, char32_t const *data, size_t datalen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> __unicode_descriptor(3)

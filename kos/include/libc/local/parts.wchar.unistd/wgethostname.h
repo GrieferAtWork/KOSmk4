@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff483495 */
+/* HASH CRC-32:0x27b5b58e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,28 +23,20 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_uname) || defined(__CRT_HAVE___uname) || defined(__CRT_HAVE___libc_uname)
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_format_8to16_defined
-#define __local___localdep_format_8to16_defined
-#ifdef __CRT_HAVE_format_8to16
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8to16,(__arg,__data,__datalen))
-#else /* __CRT_HAVE_format_8to16 */
+#ifndef __local___localdep_format_8tow_defined
+#define __local___localdep_format_8tow_defined
+#ifdef __CRT_HAVE_format_8tow
 __NAMESPACE_LOCAL_END
-#include <libc/local/unicode/format_8to16.h>
+#include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_8to16 __LIBC_LOCAL_NAME(format_8to16)
-#endif /* !__CRT_HAVE_format_8to16 */
-#endif /* !__local___localdep_format_8to16_defined */
-#ifndef __local___localdep_format_8to32_defined
-#define __local___localdep_format_8to32_defined
-#ifdef __CRT_HAVE_format_8to32
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8to32,(__arg,__data,__datalen))
-#else /* __CRT_HAVE_format_8to32 */
+__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_8tow,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
+#else /* __CRT_HAVE_format_8tow */
 __NAMESPACE_LOCAL_END
-#include <libc/local/unicode/format_8to32.h>
+#include <libc/local/unicode/format_8tow.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_8to32 __LIBC_LOCAL_NAME(format_8to32)
-#endif /* !__CRT_HAVE_format_8to32 */
-#endif /* !__local___localdep_format_8to32_defined */
+#define __localdep_format_8tow __LIBC_LOCAL_NAME(format_8tow)
+#endif /* !__CRT_HAVE_format_8tow */
+#endif /* !__local___localdep_format_8tow_defined */
 #ifndef __local___localdep_format_wsnprintf_printer_defined
 #define __local___localdep_format_wsnprintf_printer_defined
 #ifdef __CRT_HAVE_format_wsnprintf_printer
@@ -98,6 +90,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_uname,(struct utsna
 #endif /* !__local___localdep_uname_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wformat-printer.h>
+#include <bits/crt/mbstate.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wgethostname) __ATTR_NONNULL((1)) int
@@ -109,7 +102,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wgethostname))(__WCHAR_TYPE__ *__name
 	struct __LOCAL_format_8tow_data {
 		__pwformatprinter __fd_printer;    /* [1..1] Inner printer */
 		void             *__fd_arg;        /* Argument for `fd_printer' */
-		__UINT32_TYPE__   __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		struct __mbstate  __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	struct utsname __uts;
 	int __result = (__NAMESPACE_LOCAL_SYM __localdep_uname)(&__uts);
@@ -118,16 +111,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wgethostname))(__WCHAR_TYPE__ *__name
 		struct __LOCAL_format_8tow_data __convert_data;
 		__SIZE_TYPE__ __len = (__NAMESPACE_LOCAL_SYM __localdep_strnlen)(__uts.nodename, __COMPILER_LENOF(__uts.nodename));
 		__SSIZE_TYPE__ __width;
-		__printer_data.__sd_buffer     = __name;
-		__printer_data.__sd_bufsiz     = __buflen;
-		__convert_data.__fd_arg        = &__printer_data;
-		__convert_data.__fd_printer    = &(__NAMESPACE_LOCAL_SYM __localdep_format_wsnprintf_printer);
-		__convert_data.__fd_incomplete = 0;
-#if __SIZEOF_WCHAR_T__ == 4
-		__width = (__NAMESPACE_LOCAL_SYM __localdep_format_8to32)(&__convert_data, __uts.nodename, __len);
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-		__width = (__NAMESPACE_LOCAL_SYM __localdep_format_8to16)(&__convert_data, __uts.nodename, __len);
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+		__printer_data.__sd_buffer  = __name;
+		__printer_data.__sd_bufsiz  = __buflen;
+		__convert_data.__fd_arg     = &__printer_data;
+		__convert_data.__fd_printer = &(__NAMESPACE_LOCAL_SYM __localdep_format_wsnprintf_printer);
+		__mbstate_init(&__convert_data.__fd_incomplete);
+		__width = (__NAMESPACE_LOCAL_SYM __localdep_format_8tow)(&__convert_data, __uts.nodename, __len);
 		if __unlikely(__width < 0)
 			return -1;
 		if ((__SIZE_TYPE__)__width >= __buflen) {
