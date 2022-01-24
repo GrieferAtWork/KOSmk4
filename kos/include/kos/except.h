@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0688572 */
+/* HASH CRC-32:0xb96f9a1f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,95 +86,146 @@ typedef __except_class_t except_class_t;
 typedef __except_subclass_t except_subclass_t;
 
 #if defined(__arch_except_data) && defined(__CRT_HAVE_except_data)
+/* >> except_data(3)
+ * Return a pointer to the thread-local descriptor of the current exception */
 __COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,except_data,(void),{ return __arch_except_data(); })
 #elif defined(__CRT_HAVE_except_data)
+/* >> except_data(3)
+ * Return a pointer to the thread-local descriptor of the current exception */
 __LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *__NOTHROW(__LIBKCALL except_data)(void) __CASMNAME_SAME("except_data");
 #elif defined(__arch_except_data)
 #include <libc/local/kos.except/except_data.h>
+/* >> except_data(3)
+ * Return a pointer to the thread-local descriptor of the current exception */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_data, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *__NOTHROW(__LIBKCALL except_data)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_data))(); })
 #endif /* ... */
 #if defined(__arch_except_code) && defined(__CRT_HAVE_except_code)
+/* >> except_code(3)
+ * Return the current exception code, or `EXCEPT_CODEOF(E_OK)' when none is active */
 __COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_code_t,__NOTHROW,__LIBKCALL,except_code,(void),{ return __arch_except_code(); })
 #elif defined(__CRT_HAVE_except_code)
+/* >> except_code(3)
+ * Return the current exception code, or `EXCEPT_CODEOF(E_OK)' when none is active */
 __LIBC __ATTR_PURE __ATTR_WUNUSED except_code_t __NOTHROW(__LIBKCALL except_code)(void) __CASMNAME_SAME("except_code");
 #elif defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)
 #include <libc/local/kos.except/except_code.h>
+/* >> except_code(3)
+ * Return the current exception code, or `EXCEPT_CODEOF(E_OK)' when none is active */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_code, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED except_code_t __NOTHROW(__LIBKCALL except_code)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_code))(); })
 #endif /* ... */
 #if defined(__arch_except_active) && defined(__CRT_HAVE_except_active)
+/* >> except_active(3)
+ * Check if an exception is active; same as `except_code() != EXCEPT_CODEOF(E_OK)' */
 __COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,__BOOL,__NOTHROW,__LIBKCALL,except_active,(void),{ return __arch_except_active(); })
 #elif defined(__CRT_HAVE_except_active)
+/* >> except_active(3)
+ * Check if an exception is active; same as `except_code() != EXCEPT_CODEOF(E_OK)' */
 __LIBC __ATTR_PURE __ATTR_WUNUSED __BOOL __NOTHROW(__LIBKCALL except_active)(void) __CASMNAME_SAME("except_active");
 #elif defined(__CRT_HAVE_except_code) || defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)
 #include <libc/local/kos.except/except_active.h>
+/* >> except_active(3)
+ * Check if an exception is active; same as `except_code() != EXCEPT_CODEOF(E_OK)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_active, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __BOOL __NOTHROW(__LIBKCALL except_active)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_active))(); })
 #endif /* ... */
 #if defined(__arch_except_class) && defined(__CRT_HAVE_except_class)
+/* >> except_class(3)
+ * Return the current exception class; same as `EXCEPT_CLASS(except_code())' */
 __COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_class_t,__NOTHROW,__LIBKCALL,except_class,(void),{ return __arch_except_class(); })
 #elif defined(__CRT_HAVE_except_class)
+/* >> except_class(3)
+ * Return the current exception class; same as `EXCEPT_CLASS(except_code())' */
 __LIBC __ATTR_PURE __ATTR_WUNUSED except_class_t __NOTHROW(__LIBKCALL except_class)(void) __CASMNAME_SAME("except_class");
 #elif defined(__arch_except_class) || defined(__CRT_HAVE_except_code) || defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)
 #include <libc/local/kos.except/except_class.h>
+/* >> except_class(3)
+ * Return the current exception class; same as `EXCEPT_CLASS(except_code())' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_class, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED except_class_t __NOTHROW(__LIBKCALL except_class)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_class))(); })
 #endif /* ... */
 #if defined(__arch_except_subclass) && defined(__CRT_HAVE_except_subclass)
+/* >> except_subclass(3)
+ * Return the current exception sub-class; same as `EXCEPT_SUBCLASS(except_code())' */
 __COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_subclass_t,__NOTHROW,__LIBKCALL,except_subclass,(void),{ return __arch_except_subclass(); })
 #elif defined(__CRT_HAVE_except_subclass)
+/* >> except_subclass(3)
+ * Return the current exception sub-class; same as `EXCEPT_SUBCLASS(except_code())' */
 __LIBC __ATTR_PURE __ATTR_WUNUSED except_subclass_t __NOTHROW(__LIBKCALL except_subclass)(void) __CASMNAME_SAME("except_subclass");
 #elif defined(__arch_except_subclass) || defined(__CRT_HAVE_except_code) || defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)
 #include <libc/local/kos.except/except_subclass.h>
+/* >> except_subclass(3)
+ * Return the current exception sub-class; same as `EXCEPT_SUBCLASS(except_code())' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_subclass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED except_subclass_t __NOTHROW(__LIBKCALL except_subclass)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_subclass))(); })
 #endif /* ... */
 #if defined(__arch_except_register_state) && defined(__CRT_HAVE_except_register_state)
+/* >> except_register_state(3)
+ * Return  the register state  at the time the  current exception was thrown.
+ * The returned block of memory is only valid when `except_active() == true'. */
 __COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,except_register_state_t *,__NOTHROW,__LIBKCALL,except_register_state,(void),{ return __arch_except_register_state(); })
 #elif defined(__CRT_HAVE_except_register_state)
+/* >> except_register_state(3)
+ * Return  the register state  at the time the  current exception was thrown.
+ * The returned block of memory is only valid when `except_active() == true'. */
 __LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED except_register_state_t *__NOTHROW(__LIBKCALL except_register_state)(void) __CASMNAME_SAME("except_register_state");
 #elif defined(__arch_except_register_state)
 #include <libc/local/kos.except/except_register_state.h>
+/* >> except_register_state(3)
+ * Return  the register state  at the time the  current exception was thrown.
+ * The returned block of memory is only valid when `except_active() == true'. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_register_state, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED except_register_state_t *__NOTHROW(__LIBKCALL except_register_state)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_register_state))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_except_as_errno
-/* Transform the given exception into a posix errno value */
+/* >> except_as_errno(3)
+ * Transform the  given exception  into  a posix  errno  value.
+ * When no special errno is defined for `data', return `EPERM'. */
 __LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBKCALL except_as_errno)(struct exception_data const *__restrict __self) __CASMNAME_SAME("except_as_errno");
 #else /* __CRT_HAVE_except_as_errno */
 #include <libc/local/kos.except/except_as_errno.h>
-/* Transform the given exception into a posix errno value */
+/* >> except_as_errno(3)
+ * Transform the  given exception  into  a posix  errno  value.
+ * When no special errno is defined for `data', return `EPERM'. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_as_errno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBKCALL except_as_errno)(struct exception_data const *__restrict __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_as_errno))(__self); })
 #endif /* !__CRT_HAVE_except_as_errno */
 struct __siginfo_struct;
 #ifdef __CRT_HAVE_except_as_signal
-/* Transform the given exception into a posix signal.
- * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
- * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
+/* >> except_as_signal(3)
+ * Transform the given exception into a posix signal.
+ * If doing this is possible, fill in `*result' and return `true'.
+ * Otherwise, `*result' is left in an undefined state, and `false'
+ * is returned. */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL except_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) __CASMNAME_SAME("except_as_signal");
 #else /* __CRT_HAVE_except_as_signal */
 #include <libc/local/kos.except/except_as_signal.h>
-/* Transform the given exception into a posix signal.
- * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
- * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
+/* >> except_as_signal(3)
+ * Transform the given exception into a posix signal.
+ * If doing this is possible, fill in `*result' and return `true'.
+ * Otherwise, `*result' is left in an undefined state, and `false'
+ * is returned. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_as_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL except_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_as_signal))(__self, __result); })
 #endif /* !__CRT_HAVE_except_as_signal */
 #ifdef __CRT_HAVE_except_name
-/* Return the name of the given error, or `NULL' if unknown.
- * This  name  is   the  same  as   the  `E_*'   identifier.
+/* >> except_name(3)
+ * Return the name of the  given error, or `NULL'  if
+ * unknown. This name is one of the `E_*' identifier.
  * E.g.: `except_name(EXCEPT_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 __LIBC __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL except_name)(except_code_t __code) __CASMNAME_SAME("except_name");
 #else /* __CRT_HAVE_except_name */
 #include <libc/local/kos.except/except_name.h>
-/* Return the name of the given error, or `NULL' if unknown.
- * This  name  is   the  same  as   the  `E_*'   identifier.
+/* >> except_name(3)
+ * Return the name of the  given error, or `NULL'  if
+ * unknown. This name is one of the `E_*' identifier.
  * E.g.: `except_name(EXCEPT_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL except_name)(except_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_name))(__code); })
 #endif /* !__CRT_HAVE_except_name */
 #ifdef __CRT_HAVE_except_priority
-/* Return the priority for a given error code, where exceptions
+/* >> except_priority(3)
+ * Return the priority for a given error code, where exceptions
  * with greater priorities should take  the place of ones  with
  * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
 __LIBC __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL except_priority)(except_code_t __code) __CASMNAME_SAME("except_priority");
 #else /* __CRT_HAVE_except_priority */
 #include <libc/local/kos.except/except_priority.h>
-/* Return the priority for a given error code, where exceptions
+/* >> except_priority(3)
+ * Return the priority for a given error code, where exceptions
  * with greater priorities should take  the place of ones  with
  * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
@@ -203,36 +254,59 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_print_short_description, __FORCELOCAL __A
 #endif /* !__CRT_HAVE_except_print_short_description */
 #ifdef __USE_KOS_KERNEL
 #if defined(__arch_except_info) && defined(__CRT_HAVE_except_info)
+/* >> except_info(3)
+ * Return a pointer to the thread-local exception info structure.
+ * Note  that the exact  layout of this  structure depends on how
+ * libc/the kernel was configured. For the sake of compatibility,
+ * try to  use `except_data()'  and `except_register_state()'  in
+ * favor of this function. */
 __COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_info *,__NOTHROW,__LIBKCALL,except_info,(void),{ return __arch_except_info(); })
 #elif defined(__CRT_HAVE_except_info)
+/* >> except_info(3)
+ * Return a pointer to the thread-local exception info structure.
+ * Note  that the exact  layout of this  structure depends on how
+ * libc/the kernel was configured. For the sake of compatibility,
+ * try to  use `except_data()'  and `except_register_state()'  in
+ * favor of this function. */
 __LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *__NOTHROW(__LIBKCALL except_info)(void) __CASMNAME_SAME("except_info");
 #elif defined(__arch_except_info)
 #include <libc/local/kos.except/except_info.h>
+/* >> except_info(3)
+ * Return a pointer to the thread-local exception info structure.
+ * Note  that the exact  layout of this  structure depends on how
+ * libc/the kernel was configured. For the sake of compatibility,
+ * try to  use `except_data()'  and `except_register_state()'  in
+ * favor of this function. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(except_info, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *__NOTHROW(__LIBKCALL except_info)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_info))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_except_unwind
-/* Unwind the given register state to propagate the currently set error.
+/* >> except_unwind(3)
+ * Unwind the given register state to propagate the currently set error.
  * Following this, the  returned register state  should then be  loaded. */
 __LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) except_register_state_t *__NOTHROW_NCX(__EXCEPT_UNWIND_CC except_unwind)(except_register_state_t *__restrict __state) __CASMNAME_SAME("except_unwind");
 #endif /* __CRT_HAVE_except_unwind */
 #endif /* __USE_KOS_KERNEL */
 #ifdef __CRT_HAVE_except_throw_current
-/* Throw the currently set (in `except_data()') exception. */
+/* >> except_throw_current(3)
+ * Throw the currently set (in `except_data()') exception. */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL except_throw_current)(void) __THROWS(...) __CASMNAME_SAME("except_throw_current");
 #endif /* __CRT_HAVE_except_throw_current */
 #if !defined(__except_rethrow_defined) && defined(__CRT_HAVE_except_rethrow)
 #define __except_rethrow_defined
-/* Rethrow the current exception (same as a c++ `throw;' expression) */
+/* >> except_rethrow(3)
+ * Rethrow the current exception (same as a c++ `throw;' expression) */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL except_rethrow)(void) __THROWS(...) __CASMNAME_SAME("except_rethrow");
 #endif /* !__except_rethrow_defined && __CRT_HAVE_except_rethrow */
 #if !defined(__except_throw_defined) && defined(__CRT_HAVE_except_throw)
 #define __except_throw_defined
-/* Throw an exception and fill exception pointers with all zeroes */
+/* >> except_throw(3)
+ * Throw an exception and fill exception pointers with all zeroes */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROW_CC except_throw)(except_code_t __code) __THROWS(...) __CASMNAME_SAME("except_throw");
 #endif /* !__except_throw_defined && __CRT_HAVE_except_throw */
 #if !defined(__except_thrown_defined) && defined(__CRT_HAVE_except_thrown)
 #define __except_thrown_defined
-/* Throw an exception and load `argc' pointers from varargs */
+/* >> except_thrown(3)
+ * Throw an exception and load `argc' pointers from varargs */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROWN_CC except_thrown)(except_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME_SAME("except_thrown");
 #endif /* !__except_thrown_defined && __CRT_HAVE_except_thrown */
 /* Rethrow the last exception */
@@ -242,7 +316,8 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROWN_CC except_thrown)(excep
 #define RETHROW() throw
 #endif /* ... */
 #ifdef __INTELLISENSE__
-/* Throw a new exception `code', which is either an exception class,
+/* >> THROW(3)
+ * Throw a new exception `code', which is either an exception class,
  * an  exception code, or an exception-class+sub-class pair, written
  * as `(class,subclass)', going in hand with the macros defining the
  * various exceptions there are.
@@ -250,9 +325,10 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__EXCEPT_THROWN_CC except_thrown)(excep
  * arguments may be provided, which are stored in `e_pointers',  with
  * any argument not provided simply substituted in with `NULL' / 0. */
 #define THROW THROW
-__ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(except_code_t __code, ...);
+__ATTR_NORETURN __ATTR_COLD void (THROW)(except_code_t __code, ...);
 
-/* Check if the current exception matches the given error code, class, or sub-class
+/* >> was_thrown(3)
+ * Check if the current exception matches the given error code, class, or sub-class
  * >> TRY {
  * >>     ...
  * >> } EXCEPT {
@@ -260,8 +336,7 @@ __ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(except_code_t __code, ...);
  * >>         RETHROW();
  * >>     // Handle `E_SEGFAULT'
  * >>     ...
- * >> }
- */
+ * >> } */
 __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #else /* __INTELLISENSE__ */
 
@@ -331,12 +406,15 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #endif /* !__INTELLISENSE__ */
 #if !defined(__except_nesting_begin_defined) && defined(__CRT_HAVE_except_nesting_begin)
 #define __except_nesting_begin_defined
-/* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
+/* >> except_nesting_begin(3)
+ * Begin a nested  TRY-block. (i.e. inside  of another EXCEPT  block)
+ * Don't call this function directly; use `NESTED_EXCEPTION' instead. */
 __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__EXCEPT_NESTING_BEGIN_CC except_nesting_begin)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("except_nesting_begin");
 #endif /* !__except_nesting_begin_defined && __CRT_HAVE_except_nesting_begin */
 #if !defined(__except_nesting_end_defined) && defined(__CRT_HAVE_except_nesting_end)
 #define __except_nesting_end_defined
-/* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
+/* >> except_nesting_end(3)
+ * End a nested TRY-block. (i.e. inside of another EXCEPT block) */
 __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__EXCEPT_NESTING_END_CC except_nesting_end)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("except_nesting_end");
 #endif /* !__except_nesting_end_defined && __CRT_HAVE_except_nesting_end */
 #ifdef __cplusplus
@@ -442,19 +520,23 @@ public:
  */
 #if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT) && !defined(NDEBUG_EXCEPT_NESTING)
 #ifdef __CRT_HAVE__except_badusage_no_nesting
-/* Assertion check handler for missing `TRY' nesting */
+/* >> _except_badusage_no_nesting(3)
+ * Assertion check handler for missing `TRY' nesting */
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,__NOTHROW,_except_badusage_no_nesting,(void),())
 #else /* __CRT_HAVE__except_badusage_no_nesting */
 #include <libc/local/kos.except/_except_badusage_no_nesting.h>
-/* Assertion check handler for missing `TRY' nesting */
+/* >> _except_badusage_no_nesting(3)
+ * Assertion check handler for missing `TRY' nesting */
 __NAMESPACE_LOCAL_USING_OR_IMPL(_except_badusage_no_nesting, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_NORETURN void __NOTHROW(__LIBCCALL _except_badusage_no_nesting)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_except_badusage_no_nesting))(); })
 #endif /* !__CRT_HAVE__except_badusage_no_nesting */
 #ifdef __CRT_HAVE__except_check_no_nesting
-/* Assert that a TRY-block is currently allowed (iow: that no error is active) */
+/* >> _except_check_no_nesting(3)
+ * Assert that a TRY-block is currently allowed (iow: that no error is active) */
 __CDECLARE_VOID(,__NOTHROW,_except_check_no_nesting,(void),())
 #elif defined(__CRT_HAVE_except_active) || defined(__CRT_HAVE_except_code) || defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)
 #include <libc/local/kos.except/_except_check_no_nesting.h>
-/* Assert that a TRY-block is currently allowed (iow: that no error is active) */
+/* >> _except_check_no_nesting(3)
+ * Assert that a TRY-block is currently allowed (iow: that no error is active) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(_except_check_no_nesting, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL _except_check_no_nesting)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_except_check_no_nesting))(); })
 #endif /* ... */
 #if defined(__CRT_HAVE__except_check_no_nesting) || defined(__CRT_HAVE_except_active) || defined(__CRT_HAVE_except_code) || defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)

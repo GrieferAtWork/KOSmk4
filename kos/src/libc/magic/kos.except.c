@@ -159,6 +159,8 @@ typedef __except_subclass_t except_subclass_t;
 
 
 /* Returns non-zero if there is an active exception. */
+@@>> except_data(3)
+@@Return a pointer to the thread-local descriptor of the current exception
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_data)),
   preferred_fast_extern_inline("except_data", { return __arch_except_data(); })]]
@@ -168,6 +170,8 @@ struct exception_data *except_data(void) {
 	return __arch_except_data();
 }
 
+@@>> except_code(3)
+@@Return the current exception code, or `EXCEPT_CODEOF(E_OK)' when none is active
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_code)),
   preferred_fast_extern_inline("except_code", { return __arch_except_code(); })]]
@@ -182,6 +186,8 @@ except_code_t except_code(void) {
 @@pp_endif@@
 }
 
+@@>> except_active(3)
+@@Check if an exception is active; same as `except_code() != EXCEPT_CODEOF(E_OK)'
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_active)),
   preferred_fast_extern_inline("except_active", { return __arch_except_active(); })]]
@@ -197,6 +203,8 @@ $bool except_active(void) {
 @@pp_endif@@
 }
 
+@@>> except_class(3)
+@@Return the current exception class; same as `EXCEPT_CLASS(except_code())'
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_class)),
   preferred_fast_extern_inline("except_class", { return __arch_except_class(); })]]
@@ -212,6 +220,8 @@ except_class_t except_class(void) {
 @@pp_endif@@
 }
 
+@@>> except_subclass(3)
+@@Return the current exception sub-class; same as `EXCEPT_SUBCLASS(except_code())'
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_subclass)),
   preferred_fast_extern_inline("except_subclass", { return __arch_except_subclass(); })]]
@@ -227,6 +237,9 @@ except_subclass_t except_subclass(void) {
 @@pp_endif@@
 }
 
+@@>> except_register_state(3)
+@@Return  the register state  at the time the  current exception was thrown.
+@@The returned block of memory is only valid when `except_active() == true'.
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_register_state)),
   preferred_fast_extern_inline("except_register_state", { return __arch_except_register_state(); })]]
@@ -244,7 +257,9 @@ except_register_state_t *except_register_state(void) {
 	return __arch_except_register_state();
 }
 
-@@Transform the given exception into a posix errno value
+@@>> except_as_errno(3)
+@@Transform the  given exception  into  a posix  errno  value.
+@@When no special errno is defined for `data', return `EPERM'.
 [[kernel, cc(LIBKCALL)]]
 [[pure, wunused, decl_include("<bits/types.h>")]]
 [[decl_prefix(struct exception_data;)]]
@@ -838,9 +853,12 @@ for (local name: classes.keys.sorted()) {
 
 
 %struct __siginfo_struct;
+
+@@>> except_as_signal(3)
 @@Transform the given exception into a posix signal.
-@@If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
-@@Otherwise, `*result' is left in an undefined state, and `false' is returned.
+@@If doing this is possible, fill in `*result' and return `true'.
+@@Otherwise, `*result' is left in an undefined state, and `false'
+@@is returned.
 [[wunused, kernel, cc(LIBKCALL)]]
 [[decl_prefix(struct exception_data;)]]
 [[decl_prefix(struct __siginfo_struct;)]]
@@ -1038,8 +1056,9 @@ $bool except_as_signal([[nonnull]] struct exception_data const *__restrict self,
 
 
 
-@@Return the name of the given error, or `NULL' if unknown.
-@@This  name  is   the  same  as   the  `E_*'   identifier.
+@@>> except_name(3)
+@@Return the name of the  given error, or `NULL'  if
+@@unknown. This name is one of the `E_*' identifier.
 @@E.g.: `except_name(EXCEPT_CODEOF(E_BADALLOC))' -> "E_BADALLOC"
 [[kernel, cc(LIBKCALL)]]
 [[const, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
@@ -1333,6 +1352,7 @@ non_linear_prefix:
 
 
 
+@@>> except_priority(3)
 @@Return the priority for a given error code, where exceptions
 @@with greater priorities should take  the place of ones  with
 @@lower priorities in  situations where multiple  simultaneous
@@ -1688,6 +1708,12 @@ err:
 
 
 %#ifdef __USE_KOS_KERNEL
+@@>> except_info(3)
+@@Return a pointer to the thread-local exception info structure.
+@@Note  that the exact  layout of this  structure depends on how
+@@libc/the kernel was configured. For the sake of compatibility,
+@@try to  use `except_data()'  and `except_register_state()'  in
+@@favor of this function.
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_info)),
   preferred_fast_extern_inline("except_info", { return __arch_except_info(); })]]
@@ -1698,6 +1724,7 @@ struct exception_info *except_info(void) {
 	return __arch_except_info();
 }
 
+@@>> except_unwind(3)
 @@Unwind the given register state to propagate the currently set error.
 @@Following this, the  returned register state  should then be  loaded.
 [[kernel, cc(__EXCEPT_UNWIND_CC)]]
@@ -1719,17 +1746,20 @@ except_register_state_t *except_unwind([[nonnull]] except_register_state_t *__re
 %#endif /* __USE_KOS_KERNEL */
 
 
+@@>> except_throw_current(3)
 @@Throw the currently set (in `except_data()') exception.
 [[noreturn, cold, throws]]
 [[kernel, cc(LIBKCALL)]]
 void except_throw_current(void);
 
+@@>> except_rethrow(3)
 @@Rethrow the current exception (same as a c++ `throw;' expression)
 [[guard, noreturn, cold, throws]]
 [[kernel, cc(LIBKCALL)]]
 void except_rethrow(void);
 
 
+@@>> except_throw(3)
 @@Throw an exception and fill exception pointers with all zeroes
 [[guard, decl_prefix(
 #include <kos/bits/exception_data.h>
@@ -1742,6 +1772,7 @@ void except_rethrow(void);
 void except_throw(except_code_t code);
 
 
+@@>> except_thrown(3)
 @@Throw an exception and load `argc' pointers from varargs
 [[guard, decl_prefix(
 #include <kos/bits/exception_data.h>
@@ -1767,7 +1798,8 @@ void except_thrown(except_code_t code, unsigned int _argc, ...);
 
 %#ifdef __INTELLISENSE__
 %{
-/* Throw a new exception `code', which is either an exception class,
+/* >> THROW(3)
+ * Throw a new exception `code', which is either an exception class,
  * an  exception code, or an exception-class+sub-class pair, written
  * as `(class,subclass)', going in hand with the macros defining the
  * various exceptions there are.
@@ -1775,9 +1807,10 @@ void except_thrown(except_code_t code, unsigned int _argc, ...);
  * arguments may be provided, which are stored in `e_pointers',  with
  * any argument not provided simply substituted in with `NULL' / 0. */
 #define THROW THROW
-__ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(except_code_t __code, ...);
+__ATTR_NORETURN __ATTR_COLD void (THROW)(except_code_t __code, ...);
 
-/* Check if the current exception matches the given error code, class, or sub-class
+/* >> was_thrown(3)
+ * Check if the current exception matches the given error code, class, or sub-class
  * >> TRY {
  * >>     ...
  * >> } EXCEPT {
@@ -1785,8 +1818,7 @@ __ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(except_code_t __code, ...);
  * >>         RETHROW();
  * >>     // Handle `E_SEGFAULT'
  * >>     ...
- * >> }
- */
+ * >> } */
 __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 }
 %#else /* __INTELLISENSE__ */
@@ -1861,7 +1893,9 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 
 %#endif /* !__INTELLISENSE__ */
 
-@@Begin a nested TRY-block. (i.e. inside of another EXCEPT block)
+@@>> except_nesting_begin(3)
+@@Begin a nested  TRY-block. (i.e. inside  of another EXCEPT  block)
+@@Don't call this function directly; use `NESTED_EXCEPTION' instead.
 [[guard, no_local, decl_prefix(
 #ifndef __EXCEPT_NESTING_BEGIN_CC
 #define __EXCEPT_NESTING_BEGIN_CC __LIBKCALL
@@ -1888,6 +1922,7 @@ void except_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict
 	}
 }
 
+@@>> except_nesting_end(3)
 @@End a nested TRY-block. (i.e. inside of another EXCEPT block)
 [[guard, no_local, decl_prefix(
 #ifndef __EXCEPT_NESTING_END_CC
@@ -1938,12 +1973,12 @@ restore_saved_exception:
 		 * [ 7]     if (EXCEPTION_THROWN) {
 		 * [ 8]         __cxa_begin_catch();          // [ 6]
 		 * [ 9]         foobar();                     // [ 7]
-		 * [10]         except_rethrow();              // [ 8]
+		 * [10]         except_rethrow();             // [ 8]
 		 * [11]         __cxa_end_catch();            // [ 9]
 		 * [12]         except_nesting_end(&nest);
 		 * [13]     } else {
 		 * [14]         except_nesting_end(&nest);
-		 * [15]         except_rethrow();              // [10]
+		 * [15]         except_rethrow();             // [10]
 		 * [16]     }
 		 * [17]     __cxa_end_catch();                // [11]
 		 * [18] }
@@ -2078,12 +2113,14 @@ public:
 	"_except_check_no_nesting",
 )]
 
+@@>> _except_badusage_no_nesting(3)
 @@Assertion check handler for missing `TRY' nesting
 [[cold, userimpl, noreturn, nothrow, impl_include("<hybrid/__assert.h>")]]
 void _except_badusage_no_nesting(void) {
 	__hybrid_assertion_failed("Recursive `TRY' isn't nested; use `NESTED_TRY' instead");
 }
 
+@@>> _except_check_no_nesting(3)
 @@Assert that a TRY-block is currently allowed (iow: that no error is active)
 [[userimpl, nothrow, impl_include("<kos/bits/fastexcept.h>")]]
 [[requires_function(except_active)]]

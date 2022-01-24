@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c5beb73 */
+/* HASH CRC-32:0x1432aebe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,28 +30,54 @@
 
 DECL_BEGIN
 
+/* >> except_data(3)
+ * Return a pointer to the thread-local descriptor of the current exception */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_data *NOTHROW(LIBKCALL libc_except_data)(void);
+/* >> except_code(3)
+ * Return the current exception code, or `EXCEPT_CODEOF(E_OK)' when none is active */
 INTDEF ATTR_PURE WUNUSED except_code_t NOTHROW(LIBKCALL libc_except_code)(void);
+/* >> except_active(3)
+ * Check if an exception is active; same as `except_code() != EXCEPT_CODEOF(E_OK)' */
 INTDEF ATTR_PURE WUNUSED bool NOTHROW(LIBKCALL libc_except_active)(void);
+/* >> except_class(3)
+ * Return the current exception class; same as `EXCEPT_CLASS(except_code())' */
 INTDEF ATTR_PURE WUNUSED except_class_t NOTHROW(LIBKCALL libc_except_class)(void);
+/* >> except_subclass(3)
+ * Return the current exception sub-class; same as `EXCEPT_SUBCLASS(except_code())' */
 INTDEF ATTR_PURE WUNUSED except_subclass_t NOTHROW(LIBKCALL libc_except_subclass)(void);
+/* >> except_register_state(3)
+ * Return  the register state  at the time the  current exception was thrown.
+ * The returned block of memory is only valid when `except_active() == true'. */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED except_register_state_t *NOTHROW(LIBKCALL libc_except_register_state)(void);
+/* >> except_info(3)
+ * Return a pointer to the thread-local exception info structure.
+ * Note  that the exact  layout of this  structure depends on how
+ * libc/the kernel was configured. For the sake of compatibility,
+ * try to  use `except_data()'  and `except_register_state()'  in
+ * favor of this function. */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW(LIBKCALL libc_except_info)(void);
-/* Unwind the given register state to propagate the currently set error.
+/* >> except_unwind(3)
+ * Unwind the given register state to propagate the currently set error.
  * Following this, the  returned register state  should then be  loaded. */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) except_register_state_t *NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__restrict state);
-/* Throw the currently set (in `except_data()') exception. */
+/* >> except_throw_current(3)
+ * Throw the currently set (in `except_data()') exception. */
 INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_throw_current)(void) THROWS(...);
-/* Rethrow the current exception (same as a c++ `throw;' expression) */
+/* >> except_rethrow(3)
+ * Rethrow the current exception (same as a c++ `throw;' expression) */
 INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_rethrow)(void) THROWS(...);
-/* Throw an exception and fill exception pointers with all zeroes */
+/* >> except_throw(3)
+ * Throw an exception and fill exception pointers with all zeroes */
 INTDEF ATTR_COLD ATTR_NORETURN void (__EXCEPT_THROW_CC libc_except_throw)(except_code_t code) THROWS(...);
-/* Throw an exception and load `argc' pointers from varargs */
+/* >> except_thrown(3)
+ * Throw an exception and load `argc' pointers from varargs */
 INTDEF ATTR_COLD ATTR_NORETURN void (__EXCEPT_THROWN_CC libc_except_thrown)(except_code_t code, unsigned int _argc, ...) THROWS(...);
 #ifndef __KERNEL__
-/* Assertion check handler for missing `TRY' nesting */
+/* >> _except_badusage_no_nesting(3)
+ * Assertion check handler for missing `TRY' nesting */
 INTDEF ATTR_COLD ATTR_NORETURN void NOTHROW(LIBCCALL libc__except_badusage_no_nesting)(void);
-/* Assert that a TRY-block is currently allowed (iow: that no error is active) */
+/* >> _except_check_no_nesting(3)
+ * Assert that a TRY-block is currently allowed (iow: that no error is active) */
 INTDEF void NOTHROW(LIBCCALL libc__except_check_no_nesting)(void);
 #endif /* !__KERNEL__ */
 

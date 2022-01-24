@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13a74dea */
+/* HASH CRC-32:0x15f001af */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,17 +60,23 @@ typedef __pformatprinter pformatprinter;
 typedef __pformatgetc pformatgetc;
 typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
-/* Transform the given exception into a posix errno value */
+/* >> except_as_errno(3)
+ * Transform the  given exception  into  a posix  errno  value.
+ * When no special errno is defined for `data', return `EPERM'. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_except_as_errno)(struct exception_data const *__restrict self);
-/* Transform the given exception into a posix signal.
- * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
- * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
+/* >> except_as_signal(3)
+ * Transform the given exception into a posix signal.
+ * If doing this is possible, fill in `*result' and return `true'.
+ * Otherwise, `*result' is left in an undefined state, and `false'
+ * is returned. */
 INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBKCALL libc_except_as_signal)(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result);
-/* Return the name of the given error, or `NULL' if unknown.
- * This  name  is   the  same  as   the  `E_*'   identifier.
+/* >> except_name(3)
+ * Return the name of the  given error, or `NULL'  if
+ * unknown. This name is one of the `E_*' identifier.
  * E.g.: `except_name(EXCEPT_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBKCALL libc_except_name)(except_code_t code);
-/* Return the priority for a given error code, where exceptions
+/* >> except_priority(3)
+ * Return the priority for a given error code, where exceptions
  * with greater priorities should take  the place of ones  with
  * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
@@ -82,9 +88,12 @@ INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBKCALL libc_except_priority)(ex
  * @param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
  * @return: * : The usual pformatprinter-compatible return value */
 INTDEF NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBKCALL libc_except_print_short_description)(pformatprinter printer, void *arg, struct exception_data const *data, uintptr_t flags);
-/* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
+/* >> except_nesting_begin(3)
+ * Begin a nested  TRY-block. (i.e. inside  of another EXCEPT  block)
+ * Don't call this function directly; use `NESTED_EXCEPTION' instead. */
 INTDEF NONNULL((1)) void NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_nesting_data *__restrict saved);
-/* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
+/* >> except_nesting_end(3)
+ * End a nested TRY-block. (i.e. inside of another EXCEPT block) */
 INTDEF NONNULL((1)) void NOTHROW(__EXCEPT_NESTING_END_CC libc_except_nesting_end)(struct _exception_nesting_data *__restrict saved);
 
 DECL_END

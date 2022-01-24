@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x375b3859 */
+/* HASH CRC-32:0x73d6632d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,9 @@ DECL_BEGIN
 #include <kos/except/reason/noexec.h>
 #include <kos/except/codes.h>
 #include <kos/kernel/handle.h>
-/* Transform the given exception into a posix errno value */
+/* >> except_as_errno(3)
+ * Transform the  given exception  into  a posix  errno  value.
+ * When no special errno is defined for `data', return `EPERM'. */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_PURE WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBKCALL libc_except_as_errno)(struct exception_data const *__restrict self) {
 #ifdef EPERM
@@ -614,9 +616,11 @@ for (local name: classes.keys.sorted()) {
 #include <asm/os/siginfo.h>
 #include <asm/os/signal.h>
 #include <bits/os/siginfo.h>
-/* Transform the given exception into a posix signal.
- * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
- * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
+/* >> except_as_signal(3)
+ * Transform the given exception into a posix signal.
+ * If doing this is possible, fill in `*result' and return `true'.
+ * Otherwise, `*result' is left in an undefined state, and `false'
+ * is returned. */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") WUNUSED NONNULL((1, 2)) bool
 NOTHROW_NCX(LIBKCALL libc_except_as_signal)(struct exception_data const *__restrict self,
                                             struct __siginfo_struct *__restrict result) {
@@ -802,8 +806,9 @@ NOTHROW_NCX(LIBKCALL libc_except_as_signal)(struct exception_data const *__restr
 	result->si_errno = libc_except_as_errno(self);
 	return true;
 }
-/* Return the name of the given error, or `NULL' if unknown.
- * This  name  is   the  same  as   the  `E_*'   identifier.
+/* >> except_name(3)
+ * Return the name of the  given error, or `NULL'  if
+ * unknown. This name is one of the `E_*' identifier.
  * E.g.: `except_name(EXCEPT_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBKCALL libc_except_name)(except_code_t code) {
@@ -1092,7 +1097,8 @@ non_linear_prefix:
 #endif /* !... */
 /*[[[end]]]*/
 }
-/* Return the priority for a given error code, where exceptions
+/* >> except_priority(3)
+ * Return the priority for a given error code, where exceptions
  * with greater priorities should take  the place of ones  with
  * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
@@ -1423,7 +1429,9 @@ err:
 	return temp;
 #undef FMT
 }
-/* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
+/* >> except_nesting_begin(3)
+ * Begin a nested  TRY-block. (i.e. inside  of another EXCEPT  block)
+ * Don't call this function directly; use `NESTED_EXCEPTION' instead. */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
 NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = libc_except_info();
@@ -1445,7 +1453,8 @@ NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_n
 	}
 }
 #include <hybrid/__assert.h>
-/* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
+/* >> except_nesting_end(3)
+ * End a nested TRY-block. (i.e. inside of another EXCEPT block) */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
 NOTHROW(__EXCEPT_NESTING_END_CC libc_except_nesting_end)(struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info;
@@ -1489,12 +1498,12 @@ restore_saved_exception:
 		 * [ 7]     if (EXCEPTION_THROWN) {
 		 * [ 8]         __cxa_begin_catch();          // [ 6]
 		 * [ 9]         foobar();                     // [ 7]
-		 * [10]         except_rethrow();              // [ 8]
+		 * [10]         except_rethrow();             // [ 8]
 		 * [11]         __cxa_end_catch();            // [ 9]
 		 * [12]         except_nesting_end(&nest);
 		 * [13]     } else {
 		 * [14]         except_nesting_end(&nest);
-		 * [15]         except_rethrow();              // [10]
+		 * [15]         except_rethrow();             // [10]
 		 * [16]     }
 		 * [17]     __cxa_end_catch();                // [11]
 		 * [18] }
