@@ -498,15 +498,16 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
  *  - upath = "C:\\foo\\"    --> return=$root[C];      lastseg="foo" (with AT_IGNORE_TRAILING_SLASHES)
  *  - upath = "C:\\foo\\bar" --> return=$root[C]\\foo; lastseg="bar"
  * Irregardless of `AT_DOSPATH', `upath' starting with "\\\\unix\\" has special semantics:
- *  - upath = "\\\\unix\\"        --> return=$root;         lastseg=""
- *  - upath = "\\\\unix\\foo"     --> return=$root;         lastseg="foo"
- *  - upath = "\\\\unix\\foo/bar" --> return=$root/foo;     lastseg="bar"
- *  - upath = "\\\\unix\\."       --> return=$cwd;          lastseg=""
- *  - upath = "\\\\unix\\.\\foo"  --> return=$cwd;          lastseg="foo"
- *  - upath = "\\\\unix\\./foo"   --> return=$cwd;          lastseg="foo"
- *  - upath = "\\\\unix\\.."      --> return=$cwd/..;       lastseg=""
- *  - upath = "\\\\unix\\..\\foo" --> return=$cwd/..;       lastseg="foo"
- *  - upath = "\\\\unix\\../foo"  --> return=$cwd/..;       lastseg="foo"
+ *  - upath = "\\\\unix\\"         --> return=$root;         lastseg=""
+ *  - upath = "\\\\unix\\foo"      --> return=$root;         lastseg="foo"
+ *  - upath = "\\\\unix\\foo/bar"  --> return=$root/foo;     lastseg="bar"
+ *  - upath = "\\\\unix\\foo\\bar" --> return=$root/foo;     lastseg="bar"
+ *  - upath = "\\\\unix\\."        --> return=$cwd;          lastseg=""
+ *  - upath = "\\\\unix\\.\\foo"   --> return=$cwd;          lastseg="foo"
+ *  - upath = "\\\\unix\\./foo"    --> return=$cwd;          lastseg="foo"
+ *  - upath = "\\\\unix\\.."       --> return=$cwd/..;       lastseg=""
+ *  - upath = "\\\\unix\\..\\foo"  --> return=$cwd/..;       lastseg="foo"
+ *  - upath = "\\\\unix\\../foo"   --> return=$cwd/..;       lastseg="foo"
  *
  * [*] For $cwd, use `cwd ? cwd : THIS_FS->fs_cwd'
  * [*] For $root, use `THIS_FS->fs_root'

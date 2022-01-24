@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc538d63 */
+/* HASH CRC-32:0xd96e4885 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -612,7 +612,6 @@
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func
-#define __stub_DOS$__p__wenviron
 #define __stub_DOS$__wcserror
 #define __stub_DOS$__wcserror_s
 #define __stub_DOS$_wcreate_locale

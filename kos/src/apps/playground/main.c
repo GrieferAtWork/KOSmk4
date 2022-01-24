@@ -1111,6 +1111,32 @@ int main_leakmon(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_dosenv(int argc, char *argv[], char *envp[]) {
+	int (__LIBDCALL *dos_setenv)(char const *varname, char const *val, int replace);
+	char ***p_dos_environ, **dos_environ;
+	(void)argc, (void)argv, (void)envp;
+	if ((*(void **)&p_dos_environ = dlsym(RTLD_DEFAULT, "DOS$_environ")) == NULL ||
+	    (*(void **)&dos_setenv = dlsym(RTLD_DEFAULT, "DOS$setenv")) == NULL)
+		err(1, "dlerror: %s", dlerror());
+	if ((dos_environ = *p_dos_environ) != NULL) {
+		size_t i;
+		for (i = 0; environ[i] || dos_environ[i]; ++i)
+			printf("%s\t%s\n", environ[i], dos_environ[i]);
+	}
+	if ((*dos_setenv)("PATH", "C:\\Windows\\system32;C:\\Window;C:\\Program Files\\bin", 1))
+		err(1, "DOS$setenv");
+	if ((dos_environ = *p_dos_environ) != NULL) {
+		size_t i;
+		for (i = 0; environ[i] || dos_environ[i]; ++i)
+			printf("%s\t%s\n", environ[i], dos_environ[i]);
+	}
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -1157,6 +1183,7 @@ PRIVATE DEF defs[] = {
 	{ "fg", &main_fg },
 	{ "fatls", &main_fatls },
 	{ "leakmon", &main_leakmon },
+	{ "dosenv", &main_dosenv },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

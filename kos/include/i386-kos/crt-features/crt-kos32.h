@@ -5526,6 +5526,7 @@
 #define __CRT_HAVE___p__acmdln
 #define __CRT_HAVE___p__commode
 #define __CRT_HAVE_KOS$__p__environ
+#define __CRT_HAVE_KOS$__p__pgmptr
 #define __CRT_HAVE___p__wcmdln
 #define __CRT_HAVE_KOS$__p__wenviron
 #define __CRT_HAVE_KOS$__p__wpgmptr
@@ -5665,6 +5666,7 @@
 #define __CRT_HAVE_KOS$_mbstowcs_s_l
 #define __CRT_HAVE_KOS$_mbtowc_l
 #define __CRT_HAVE__open
+#define __CRT_HAVE_KOS$_pgmptr
 #define __CRT_HAVE_KOS$_putenv
 #define __CRT_HAVE_KOS$_putenv_s
 #define __CRT_HAVE_KOS$_putws
@@ -6339,6 +6341,7 @@
 #define __CRT_HAVE_DOS$__p__acmdln
 #define __CRT_HAVE_DOS$__p__commode
 #define __CRT_HAVE_DOS$__p__environ
+#define __CRT_HAVE_DOS$__p__pgmptr
 #define __CRT_HAVE_DOS$__p__wcmdln
 #define __CRT_HAVE_DOS$__p__wenviron
 #define __CRT_HAVE_DOS$__p__wpgmptr
@@ -6478,6 +6481,7 @@
 #define __CRT_HAVE_DOS$_mbstowcs_s_l
 #define __CRT_HAVE_DOS$_mbtowc_l
 #define __CRT_HAVE_DOS$_open
+#define __CRT_HAVE_DOS$_pgmptr
 #define __CRT_HAVE_DOS$_putenv
 #define __CRT_HAVE_DOS$_putenv_s
 #define __CRT_HAVE_DOS$_putws

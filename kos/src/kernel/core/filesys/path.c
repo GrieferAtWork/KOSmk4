@@ -1245,15 +1245,16 @@ again_lookup_dent:
  *  - upath = "C:\\foo\\"    --> return=$root[C];      lastseg="foo" (with AT_IGNORE_TRAILING_SLASHES)
  *  - upath = "C:\\foo\\bar" --> return=$root[C]\\foo; lastseg="bar"
  * Irregardless of `AT_DOSPATH', `upath' starting with "\\\\unix\\" has special semantics:
- *  - upath = "\\\\unix\\"        --> return=$root;         lastseg=""
- *  - upath = "\\\\unix\\foo"     --> return=$root;         lastseg="foo"
- *  - upath = "\\\\unix\\foo/bar" --> return=$root/foo;     lastseg="bar"
- *  - upath = "\\\\unix\\."       --> return=$cwd;          lastseg=""
- *  - upath = "\\\\unix\\.\\foo"  --> return=$cwd;          lastseg="foo"
- *  - upath = "\\\\unix\\./foo"   --> return=$cwd;          lastseg="foo"
- *  - upath = "\\\\unix\\.."      --> return=$cwd/..;       lastseg=""
- *  - upath = "\\\\unix\\..\\foo" --> return=$cwd/..;       lastseg="foo"
- *  - upath = "\\\\unix\\../foo"  --> return=$cwd/..;       lastseg="foo"
+ *  - upath = "\\\\unix\\"         --> return=$root;         lastseg=""
+ *  - upath = "\\\\unix\\foo"      --> return=$root;         lastseg="foo"
+ *  - upath = "\\\\unix\\foo/bar"  --> return=$root/foo;     lastseg="bar"
+ *  - upath = "\\\\unix\\foo\\bar" --> return=$root/foo;     lastseg="bar"
+ *  - upath = "\\\\unix\\."        --> return=$cwd;          lastseg=""
+ *  - upath = "\\\\unix\\.\\foo"   --> return=$cwd;          lastseg="foo"
+ *  - upath = "\\\\unix\\./foo"    --> return=$cwd;          lastseg="foo"
+ *  - upath = "\\\\unix\\.."       --> return=$cwd/..;       lastseg=""
+ *  - upath = "\\\\unix\\..\\foo"  --> return=$cwd/..;       lastseg="foo"
+ *  - upath = "\\\\unix\\../foo"   --> return=$cwd/..;       lastseg="foo"
  *
  * [*] For $cwd, use `cwd ? cwd : THIS_FS->fs_cwd'
  * [*] For $root, use `THIS_FS->fs_root'
@@ -1288,11 +1289,12 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 	                                         : memcmp(upath + 2, "unix", 4 * sizeof(char))) &&
 	            upath[6] == '\\') {
 		char ch;
-		upath += 6;
+		upath += COMPILER_STRLEN("\\\\unix\\");
 		atflags &= ~AT_DOSPATH; /* The original value is kept for `sep_atflags' */
-		ch = *upath;
-		if (ch == '.') {
+		ch = upath[0];
+		if (ch == '.' && (ch = upath[1], ch == '/' || (ch == '\\' && (sep_atflags & AT_DOSPATH)))) {
 			/* Relative to current directory */
+			upath += 2;
 		} else {
 			/* Relative to root directory */
 			root_ref = fs_getroot(THIS_FS);

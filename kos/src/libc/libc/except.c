@@ -1010,6 +1010,7 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 		/* nopf support */                                   \
 		void *pc = (void *)kcpustate_getpc(state);           \
 		if (libc_x86_nopf_check(pc)) {                       \
+			/* Don't do this for E_EXIT_THREAD and similar! */ \
 			kcpustate_setpc(state, libc_x86_nopf_retof(pc)); \
 			return state;                                    \
 		}                                                    \
@@ -1068,8 +1069,10 @@ libc_except_handler3_impl(except_register_state_t *__restrict state,
 	/* If supported by the architecture, verify the TLS context. */
 	EXCEPT_HANDLER_ON_ENTRY(state, error);
 
+	/* Load TLS context */
+	info           = &current.pt_except;
 	recursion_flag = EXCEPT_FINEXCEPT;
-	info = &current.pt_except;
+
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {
 		if unlikely(info->ei_flags & EXCEPT_FINEXCEPT2)
@@ -1077,6 +1080,7 @@ libc_except_handler3_impl(except_register_state_t *__restrict state,
 		recursion_flag = EXCEPT_FINEXCEPT2;
 	}
 	COMPILER_BARRIER();
+
 	/* Fill in the thread-local exception information descriptor. */
 	info->ei_flags |= recursion_flag;
 	COMPILER_WRITE_BARRIER();
@@ -1086,8 +1090,10 @@ libc_except_handler3_impl(except_register_state_t *__restrict state,
 	bzero(info->ei_trace, sizeof(info->ei_trace));
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	COMPILER_BARRIER();
+
 	/* Perform exception unwinding */
 	state = libc_except_unwind(state);
+
 	/* Unset the in-except flag once we've successfully
 	 * unwound  the  stack  up until  a  valid handler. */
 	COMPILER_BARRIER();
@@ -1112,8 +1118,10 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 	/* If supported by the architecture, verify the TLS context. */
 	EXCEPT_HANDLER_ON_ENTRY(state, error);
 
+	/* Load TLS context */
+	info           = &current.pt_except;
 	recursion_flag = EXCEPT_FINEXCEPT;
-	info = &current.pt_except;
+
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {
 		if unlikely(info->ei_flags & EXCEPT_FINEXCEPT2)
@@ -1121,10 +1129,12 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 		recursion_flag = EXCEPT_FINEXCEPT2;
 	}
 	COMPILER_BARRIER();
+
 	/* Check if the base module is exception aware.
 	 * If it is, handle the exception using mode #3 */
 	if (dlexceptaware(dlopen(NULL, 0)) > 0)
 		goto handle_mode_3;
+
 	/* Check for special exceptions that are always handled in mode #3 */
 	if (EXCEPTCLASS_ISRTLPRIORITY(error->e_class))
 		goto handle_mode_3;
@@ -1139,6 +1149,7 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 	bzero(info->ei_trace, sizeof(info->ei_trace));
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	COMPILER_BARRIER();
+
 	/* Make sure that libunwind has been loaded. */
 	ENSURE_LIBUNWIND_LOADED();
 	memcpy(&oldstate, state, sizeof(*state));
@@ -1210,8 +1221,10 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 install_first_handler:
+
 	/* Load the first found exception handler. */
 	info->ei_flags &= ~recursion_flag;
+
 	/* Pass the placeholder exception object for KOS exceptions. */
 	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(first_handler, (uintptr_t)libc_get_kos_unwind_exception());
 	memcpy(state, &first_handler, sizeof(*state));
@@ -1219,10 +1232,13 @@ install_first_handler:
 handle_mode_3:
 	return libc_except_handler3_impl(state, error);
 raise_signal:
+
 	/* Restore the old exception */
 	memcpy(info, &saved_info, sizeof(*info));
+
 	/* raise the exception as a signal. */
 	try_raise_signal_from_exception(state, error);
+
 	/* Fallthrough  to  a regular  coredump  if the
 	 * exception cannot be translated into a signal */
 do_coredump_with_unwind_error:
@@ -1243,7 +1259,7 @@ do_coredump_with_dlerror:
  *
  * Also note that even though these functions need to go into libc (so that
  * programs can use  them without needing  to specify additional  libraries
- * during link), the actual implementations need to go into `libunwind.so'! */
+ * during link), the actual implementations are found in `libunwind.so'! */
 struct rf_object {
 	void *_data[6];
 };
@@ -1271,7 +1287,9 @@ PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.__register_frame") char const nam
 	(ATOMIC_READ(pdyn__Unwind_Find_FDE) != NULL || (initialize_libunwind_rf(), 0))
 INTERN ATTR_NOINLINE ATTR_SECTION(".text.crt.compat.linux.__register_frame")
 void LIBCCALL initialize_libunwind_rf(void) {
+	/* Bind normal `libunwind.so' functions (as also used during exception handling) */
 	ENSURE_LIBUNWIND_LOADED();
+
 	/* Dynamically bind functions. */
 #define BIND(func, name)                                                 \
 	if unlikely((*(void **)&func = dlsym(pdyn_libunwind, name)) == NULL) \
@@ -1289,7 +1307,7 @@ err_init_failed:
 }
 
 /* Register-frame ABI (as normally defined by libgcc,  but on KOS is defined in  libc
- * as a couple of proxy functions that call forward to a smaller set of equalls named
+ * as a couple of proxy functions that call forward to a smaller set of equally named
  * functions found in libunwind) */
 INTDEF NONNULL((2)) void LIBCCALL libc___register_frame_info_bases(/*nullable*/ void const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
 INTDEF NONNULL((2)) void LIBCCALL libc___register_frame_info(/*nullable*/ void const *begin, struct rf_object *__restrict ob);

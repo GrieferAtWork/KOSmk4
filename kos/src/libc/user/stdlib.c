@@ -37,11 +37,15 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <ctype.h>
+#include <direct.h>
 #include <fcntl.h>
+#include <format-printer.h>
 #include <limits.h>
 #include <malloc.h>
 #include <malloca.h>
 #include <sched.h>
+#include <stdio.h>
 #include <string.h>
 #include <strings.h>
 #include <uchar.h>
@@ -658,14 +662,274 @@ NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname)
 /* DOS ENVIRON HANDLING                                                 */
 /************************************************************************/
 
+/* Return the a prefix which is accepted by filesystem system calls under DOS
+ * mode as a reference to the unix root directory. If "/" has been bound to a
+ * DOS drive letter, we will use that letter, but if not, we use "\\unix\"
+ *
+ * Also note that the returned path is guarantied to end with a slash! */
+PRIVATE ATTR_SECTION(".bss.crt.dos.fs.environ") char const *libd_dos_fsroot = NULL;
+/* TODO: Must clear `libd_dos_fsroot' in `DOS$chroot()' and `DOS$dup[23]()' with AT_FDROOT */
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_RETNONNULL WUNUSED char const *
+NOTHROW_NCX(CC libd_get_dos_fsroot)(void) {
+	if (!libd_dos_fsroot) {
+		char *result;
+		/* Try to print "/" as a DOS path. */
+		result = libc_frealpathat(AT_FDCWD, "/", NULL, 0, AT_ALTPATH);
+		if (!result || !*result) {
+fallback:
+			libd_dos_fsroot = "\\\\unix\\";
+		} else {
+			char const *end = strend(result);
+			if (end[-1] != '\\' && end[-1] != '/') {
+				/* Must append a trailing '\\' */
+				char *new_result;
+				new_result = strdupf("%s\\", result);
+				free(result);
+				if unlikely(!new_result)
+					goto fallback;
+				result = new_result;
+			}
+			libd_dos_fsroot = result;
+		}
+	}
+	return libd_dos_fsroot;
+}
+
+/* NOTE: This function is similar to `DOS$realpath()', but unlike that one,
+ *       this one won't  expand symbolic  links, remove "."  and ".."  path
+ *       segments, or fail if the named file doesn't actually exist!
+ * NOTE: Only call this function when `unix_filename[0] == '/''!
+ * @param: prefix: When non-NULL, a prefix to prepend before the returned string.
+ * The returned path must be `free(3)'d */
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(CC libd_from_unix_filename_print)(struct format_aprintf_data *__restrict printer,
+                                              char const *__restrict unix_filename,
+                                              size_t unix_filename_len) {
+	ssize_t result;
+	char const *dos_fsroot, *end, *flush_start;
+	assert(unix_filename_len >= 1);
+	assert(unix_filename[0] == '/');
+	++unix_filename, --unix_filename_len;
+	while (unix_filename_len >= 2 &&
+	       (unix_filename[0] == '.' && unix_filename[1] == '/')) {
+		/* Skip "./" prefixes, else a prepended `\\unix\'-
+		 * prefix would consider  it a CWD-relative  path. */
+		unix_filename += 2;
+		unix_filename_len -= 2;
+	}
+
+	/* Print the DOS fs-root prefix. */
+	dos_fsroot = libd_get_dos_fsroot();
+	result = format_aprintf_printer(printer, dos_fsroot, strlen(dos_fsroot));
+	if unlikely(result < 0)
+		goto done;
+	flush_start = unix_filename;
+	end         = unix_filename + unix_filename_len;
+	while (unix_filename < end) {
+		char ch = *unix_filename;
+		if (ch == '/') {
+			/* Replace with '\\' (not technically necessary,
+			 * but done to get that uniform DOS-feeling) */
+			result = format_aprintf_printer(printer, flush_start, (size_t)(unix_filename - flush_start));
+			if unlikely(result < 0)
+				goto done;
+			result = format_aprintf_printer(printer, "\\", 1);
+			if unlikely(result < 0)
+				goto done;
+			++unix_filename;
+			flush_start = unix_filename;
+		} else {
+			++unix_filename;
+		}
+	}
+	result = format_aprintf_printer(printer, flush_start, (size_t)(end - flush_start));
+done:
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(CC libd_from_unix_filename)(char const *unix_filename,
+                                        char const *prefix,
+                                        size_t prefix_len) {
+	struct format_aprintf_data printer;
+	format_aprintf_data_init(&printer);
+	if (prefix_len) {
+		if unlikely(format_aprintf_printer(&printer, prefix, prefix_len) < 0)
+			goto err;
+	}
+	if unlikely(libd_from_unix_filename_print(&printer, unix_filename, strlen(unix_filename)) < 0)
+		goto err;
+	return format_aprintf_pack(&printer, NULL);
+err:
+	format_aprintf_data_fini(&printer);
+	return NULL;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(CC libd_from_unix_filename_list)(char const *unix_filename_list,
+                                             char const *prefix,
+                                             size_t prefix_len) {
+	struct format_aprintf_data printer;
+	format_aprintf_data_init(&printer);
+	if (prefix_len) {
+		if (format_aprintf_printer(&printer, prefix, prefix_len) < 0)
+			goto err;
+	}
+	for (;;) {
+		char const *colon;
+		size_t seglen;
+		ssize_t error;
+		colon  = strchrnul(unix_filename_list, ':');
+		seglen = (size_t)(colon - unix_filename_list);
+		if (seglen < 1 || unix_filename_list[0] != '/') {
+			/* Keep as-is. */
+			error = format_aprintf_printer(&printer, unix_filename_list, seglen);
+		} else {
+			/* Convert unix path to dos */
+			error = libd_from_unix_filename_print(&printer, unix_filename_list, seglen);
+		}
+		if unlikely(error < 0)
+			goto err;
+		if (!*colon)
+			break;
+		/* Print a ';' as separator, replacing the ":" from the original string. */
+		error = format_aprintf_printer(&printer, ";", 1);
+		if unlikely(error < 0)
+			goto err;
+		unix_filename_list = colon + 1;
+	}
+	return format_aprintf_pack(&printer, NULL);
+err:
+	format_aprintf_data_fini(&printer);
+	return NULL;
+}
+
+
+struct environ_special_struct {
+	char          es_name[7]; /* Environment variable name. */
+	unsigned char es_type;    /* One of `ENVIRON_SPECIAL_*' */
+#define ENVIRON_SPECIAL_PATH  0 /* Singular path */
+#define ENVIRON_SPECIAL_PATHS 1 /* ':'-seperated path list (becomes ';'-seperated under DOS) */
+};
+
+/* Cygwin converts the following paths:
+ *  - $PATH              -- /usr/bin:/bin    <===>   C:\usr\bin;C:\bin
+ *  - $HOME              -- /root            <===>   C:\root
+ *  - $LD_LIBRARY_PATH   -- /usr/lib:/lib    <===>   C:\usr\lib;C:\lib
+ *  - $TMPDIR            -- /tmp             <===>   C:\tmp
+ *  - $TMP               -- /tmp             <===>   C:\tmp
+ *  - $TEMP              -- /tmp             <===>   C:\tmp
+ *
+ * Of these, treat `$PATH' and $LD_LIBRARY_PATH as path lists,
+ * but all of the other  variables are treated as  single-path
+ * objects.
+ *
+ * Since I really don't see the point, exclude $LD_LIBRARY_PATH
+ * from this list since that one's meaningless under DOS,  such
+ * that converting it would just be unnecessary overhead.
+ *
+ * Also note that we can't  simply use `realpath()' to have  the
+ * kernel do the path conversion for us! That function will fail
+ * if  the named files/folders  don't exist (as  well as do path
+ * expansion based on symbolic links). We mustn't do that, so we
+ * have to implement our own path conversion system!
+ *
+ * NOTES:
+ *  - Non-absolute paths don't need to be converted ('/' is OK
+ *    when used as path separator in DOS paths)
+ *  - When "/" isn't bound to a DOS drive, replace the leading
+ *    "/" with "\\unix\", thus turning the entire path into  a
+ *    universal unix path (s.a. `path_traverse_ex()')
+ *
+ * However, still need to ask the kernel for the DOS name of "/"
+ */
+PRIVATE ATTR_SECTION(".rodata.crt.dos.fs.environ")
+struct environ_special_struct const environ_special[] = {
+	{ "PATH", /*  */ ENVIRON_SPECIAL_PATHS },
+	{ "HOME", /*  */ ENVIRON_SPECIAL_PATH },
+	{ "TMPDIR", /**/ ENVIRON_SPECIAL_PATH },
+	{ "TMP", /*   */ ENVIRON_SPECIAL_PATH },
+	{ "TEMP", /*  */ ENVIRON_SPECIAL_PATH },
+};
+
+
+#define libd_free_environ(tab) convert_freev(tab)
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED char **
+NOTHROW_NCX(CC libd_alloc_environ)(char **unix_environ) {
+	char **result;
+	size_t i, count;
+	if (!unix_environ)
+		return NULL;
+	for (count = 0; unix_environ[count]; ++count)
+		;
+	result = (char **)malloc(count + 1, sizeof(char *));
+	if unlikely(!result)
+		return NULL;
+	for (i = 0; i < count; ++i) {
+		char *str = unix_environ[i];
+		char *eq  = strchr(str, '=');
+		if (eq) {
+			size_t i, name_length = (size_t)(eq - str);
+			if (name_length > COMPILER_STRLEN(environ_special[0].es_name))
+				goto fallback;
+			/* Check for special variable names. */
+			for (i = 0;; ++i) {
+				if (i >= COMPILER_LENOF(environ_special))
+					goto fallback;
+				if (environ_special[i].es_name[name_length] != '\0')
+					continue;
+				if (memcmp(str, environ_special[i].es_name, name_length * sizeof(char)) != 0)
+					continue;
+				switch (environ_special[i].es_type) {
+				case ENVIRON_SPECIAL_PATH:
+					str = libd_from_unix_filename(eq + 1, str, name_length + 1);
+					break;
+				case ENVIRON_SPECIAL_PATHS:
+					str = libd_from_unix_filename_list(eq + 1, str, name_length + 1);
+					break;
+				default: __builtin_unreachable();
+				}
+				break;
+			}
+		} else {
+fallback:
+			str = strdup(str);
+		}
+		if (!str)
+			goto err;
+		result[i] = str;
+	}
+	result[i] = NULL;
+	return result;
+err:
+	while (i) {
+		--i;
+		free(result[i]);
+	}
+	free(result);
+	return NULL;
+}
+
+
+PRIVATE ATTR_SECTION(".bss.crt.dos.fs.environ") char **libd_environ = NULL;
+
+/* DOS single-byte environment table. */
+#undef DOS$environ
+#undef DOS$_environ
+#undef DOS$__environ
 DEFINE_PUBLIC_ALIAS(DOS$__p__environ, libd_p_environ);
 DEFINE_PUBLIC_IDATA_G(DOS$environ, libd_p_environ, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(DOS$_environ, libd_p_environ, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(DOS$__environ, libd_p_environ, __SIZEOF_POINTER__);
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.fs.environ")
-char ***NOTHROW(LIBDCALL libd_p_environ)(void) {
-	/* TODO: Special handling for certain variables. */
-	return libc_p_environ();
+#define DOS$environ libd_environ /* Don't need to use dlsym("DOS$environ") because PE doesn't have copy relocations */
+ATTR_SECTION(".text.crt.dos.fs.environ")
+INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL char ***
+NOTHROW(LIBDCALL libd_p_environ)(void) {
+	/* If not already created,  allocate the environment table  now,
+	 * including performing any path conversions that may be needed. */
+	if (libd_environ == NULL)
+		libd_environ = libd_alloc_environ(environ);
+	return &libd_environ;
 }
 
 /*[[[head:libd_getenv,hash:CRC-32=0x6479cc27]]]*/
@@ -673,10 +937,227 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname)
 /*[[[body:libd_getenv]]]*/
 {
-	/* TODO: Special handling for certain variables. */
+	char **dos_environ;
+	if unlikely(!varname)
+		return NULL;
+	if ((dos_environ = DOS$environ) != NULL) {
+		/* Search through our c32-environment cache. */
+		size_t i, len;
+		char *envstr;
+search_dos_environment:
+		len = strlen(varname);
+		for (i = 0; (envstr = dos_environ[i]) != NULL; ++i) {
+			if (memcmp(envstr, varname, len * sizeof(char)) != 0)
+				continue;
+			if (envstr[len] != '=')
+				continue;
+			return envstr + len + 1;
+		}
+		return NULL;
+	}
+
+	/* Check for special variables. If the one being requested is one such
+	 * special variable, then allocate the DOS environment and search it
+	 * for said variable. */
+	{
+		size_t i;
+		for (i = 0; i < COMPILER_LENOF(environ_special); ++i) {
+			char ***p_dos_environ;
+			if (strcmp(environ_special[i].es_name, varname) != 0)
+				continue;
+			/* Yup: it's one of the special variables! */
+			p_dos_environ = &DOS$environ;
+			if (*p_dos_environ == NULL)
+				*p_dos_environ = libd_alloc_environ(environ);
+			goto search_dos_environment;
+		}
+	}
+
+	/* Fallback: for regular, old environment variables, just scan the unix environ! */
 	return libc_getenv(varname);
 }
 /*[[[end:libd_getenv]]]*/
+
+
+struct libd_to_unix_cache {
+	char *d2uc_drives[('Z' - 'A') + 1]; /* [0..1][owned] Unix paths for DOS drives. */
+	int   d2uc_drive;                   /* Current drive (or `\0') */
+};
+#define libd_to_unix_cache_init(self) bzero(self, sizeof(*(self)))
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) void
+NOTHROW(CC libd_to_unix_cache_fini)(struct libd_to_unix_cache *__restrict self) {
+	size_t i;
+	for (i = 0; i < COMPILER_LENOF(self->d2uc_drives); ++i)
+		free(self->d2uc_drives[i]);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") char *
+NOTHROW(CC libd_to_unix_cache_drivepath)(struct libd_to_unix_cache *self,
+                                         char drive_letter) {
+	char *result;
+	char buf[4];
+	drive_letter = toupper(drive_letter);
+	assert(drive_letter >= 'A' && drive_letter <= 'Z');
+	if (self) {
+		result = self->d2uc_drives[drive_letter - 'A'];
+		if (result)
+			return result;
+	}
+	sprintf(buf, "%c:\\", drive_letter);
+	result = libc_frealpathat(AT_FDCWD, buf, NULL, 0, AT_DOSPATH | AT_ALTPATH);
+	if (self)
+		self->d2uc_drives[drive_letter - 'A'] = result;
+	return result;
+}
+
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(CC libd_to_unix_filename_print)(struct format_aprintf_data *__restrict printer,
+                                            char const *__restrict dos_filename,
+                                            size_t dos_filename_len,
+                                            struct libd_to_unix_cache *cache) {
+	char const *flush_start, *end;
+	ssize_t temp;
+	if (!dos_filename_len)
+		return 0;
+	if (dos_filename[0] == '/' || dos_filename[0] == '\\') {
+		/* Path relative to root of current drive, or "\\unix\"-prefix. */
+		if (dos_filename_len >= COMPILER_STRLEN("\\\\unix\\") &&
+		    dos_filename[0] == '\\' && dos_filename[1] == '\\' &&
+		    memcasecmp(dos_filename + 2, "unix", 4 * sizeof(char)) == 0 &&
+		    dos_filename[6] == '\\') {
+			dos_filename += COMPILER_STRLEN("\\\\unix\\");
+			dos_filename_len -= COMPILER_STRLEN("\\\\unix\\");
+		} else {
+			int drive = 0;
+			char *path;
+			size_t path_len;
+			if (cache)
+				drive = cache->d2uc_drive;
+			if (drive == 0) {
+				drive = _getdrive();
+				if (drive < 0)
+					goto err;
+				drive += 'A';
+				if (cache)
+					cache->d2uc_drive = drive;
+			}
+			path = libd_to_unix_cache_drivepath(cache, drive);
+			if (!path)
+				goto err;
+			path_len = strlen(path);
+			while (path_len && path[path_len - 1] == '/')
+				--path_len;
+			temp = format_aprintf_printer(printer, path, path_len);
+			if (!cache)
+				free(path);
+			if unlikely(temp < 0)
+				goto err;
+			++dos_filename;
+			--dos_filename_len;
+		}
+print_slash_before_prefix:
+		temp = format_aprintf_printer(printer, "/", 1);
+		if unlikely(temp < 0)
+			goto err;
+	} else if (dos_filename_len >= 2 &&
+	           dos_filename[1] == ':' &&
+	           isalpha(dos_filename[0])) {
+		char drive = dos_filename[0];
+		bool must_free_path;
+		char *path;
+		size_t path_len;
+		if (dos_filename_len >= 3 && (dos_filename[2] == '/' ||
+		                              dos_filename[2] == '\\')) {
+			/* Relative to root of drive */
+			path = libd_to_unix_cache_drivepath(cache, drive);
+			must_free_path = cache == NULL;
+			dos_filename += 3;
+			dos_filename_len -= 3;
+		} else {
+			/* Relative to cwd of drive */
+			char buf[3] = { drive, ':', '\0' };
+			path = libc_frealpathat(AT_FDCWD, buf, NULL, 0, AT_DOSPATH | AT_ALTPATH);
+			must_free_path = true;
+			dos_filename += 2;
+			dos_filename_len -= 2;
+		}
+		if unlikely(!path)
+			goto err;
+		path_len = strlen(path);
+		while (path_len && path[path_len - 1] == '/')
+			--path_len;
+		temp = format_aprintf_printer(printer, path, path_len);
+		if (must_free_path)
+			free(path);
+		goto print_slash_before_prefix;
+	} else {
+		/* Relative path (no prefix needed) */
+	}
+
+	/* Convert the relative path portion. */
+	flush_start = dos_filename;
+	end         = dos_filename + dos_filename_len;
+	while (dos_filename < end) {
+		char ch = *dos_filename;
+		if (ch == '\\') {
+			if (format_aprintf_printer(printer, flush_start, (size_t)(dos_filename - flush_start)) < 0)
+				goto err;
+			if (format_aprintf_printer(printer, "/", 1) < 0)
+				goto err;
+			++dos_filename;
+			flush_start = dos_filename;
+		} else {
+			++dos_filename;
+		}
+	}
+	return format_aprintf_printer(printer, flush_start, (size_t)(end - flush_start));
+err:
+	return -1;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(CC libd_to_unix_filename)(char const *dos_filename,
+                                      struct libd_to_unix_cache *cache) {
+	struct format_aprintf_data printer;
+	format_aprintf_data_init(&printer);
+	if unlikely(libd_to_unix_filename_print(&printer, dos_filename, strlen(dos_filename), cache) < 0)
+		goto err;
+	return format_aprintf_pack(&printer, NULL);
+err:
+	format_aprintf_data_fini(&printer);
+	return NULL;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(CC libd_to_unix_filename_list)(char const *dos_filename_list,
+                                           struct libd_to_unix_cache *cache) {
+	struct format_aprintf_data printer;
+	format_aprintf_data_init(&printer);
+	for (;;) {
+		char const *semicolon;
+		size_t seglen;
+		ssize_t error;
+		semicolon = strchrnul(dos_filename_list, ';');
+		seglen    = (size_t)(semicolon - dos_filename_list);
+		/* Convert dos path to unix */
+		error = libd_to_unix_filename_print(&printer, dos_filename_list, seglen, cache);
+		if unlikely(error < 0)
+			goto err;
+		if (!*semicolon)
+			break;
+		/* Print a ':' as separator, replacing the ";" from the original string. */
+		error = format_aprintf_printer(&printer, ":", 1);
+		if unlikely(error < 0)
+			goto err;
+		dos_filename_list = semicolon + 1;
+	}
+	return format_aprintf_pack(&printer, NULL);
+err:
+	format_aprintf_data_fini(&printer);
+	return NULL;
+}
+
 
 /*[[[head:libd_setenv,hash:CRC-32=0xb2e0dbfc]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1, 2)) int
@@ -685,56 +1166,155 @@ NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname,
                                   int replace)
 /*[[[body:libd_setenv]]]*/
 {
-	/* TODO: Special handling for certain variables. */
-	return libc_setenv(varname, val, replace);
+	size_t i;
+	if (!replace) {
+		if (libc_getenv(varname) != NULL)
+			return 0; /* Don't overwrite existing variables. */
+	}
+
+	/* Update the dos environment table (if it was allocated). */
+	if (libd_environ != NULL) {
+		/* Update the variable within the DOS$environ table. */
+		char ***p_dos_environ = &DOS$environ;
+		char **dos_environ = *p_dos_environ;
+		if (dos_environ != NULL) {
+			char **new_environ;
+			size_t j;
+			size_t namelen = strlen(varname);
+			char *newstr   = strdupf("%s=%s", varname, val);
+			if (!newstr)
+				return -1;
+			for (j = 0; dos_environ[j]; ++j) {
+				char *str = dos_environ[j];
+				if (memcmp(str, varname, namelen * sizeof(char)) != 0)
+					continue;
+				if (str[namelen] != '=')
+					continue;
+				/* Override an existing variable. */
+				dos_environ[j] = newstr;
+				free(str);
+				goto did_update_dos_environ;
+			}
+			/* Must append `newstr' to `DOS$environ */
+			new_environ = (char **)realloc(dos_environ, j + 2, sizeof(char *));
+			if unlikely(!new_environ) {
+				free(newstr);
+				return -1;
+			}
+			new_environ[j + 0] = newstr;
+			new_environ[j + 1] = NULL;
+			*p_dos_environ     = new_environ;
+		}
+	}
+did_update_dos_environ:
+
+	/* Check for special variables. */
+	for (i = 0; i < COMPILER_LENOF(environ_special); ++i) {
+		int result;
+		char *unixval;
+		if (strcmp(environ_special[i].es_name, varname) != 0)
+			continue;
+
+		/* Yup: it's one of the special variables!
+		 * In this case, we must convert `val' into unix format. */
+		switch (environ_special[i].es_type) {
+		case ENVIRON_SPECIAL_PATH:
+			unixval = libd_to_unix_filename(val, NULL);
+			break;
+		case ENVIRON_SPECIAL_PATHS: {
+			struct libd_to_unix_cache cache;
+			libd_to_unix_cache_init(&cache);
+			unixval = libd_to_unix_filename_list(val, &cache);
+			libd_to_unix_cache_fini(&cache);
+		}	break;
+		default: __builtin_unreachable();
+		}
+		if unlikely(!unixval)
+			return -1;
+		result = libc_setenv(varname, unixval, 1);
+		free(unixval);
+		return result;
+	}
+
+	/* Fallback: normal environment variables can just be set as-is under unix. */
+	return libc_setenv(varname, val, 1);
 }
 /*[[[end:libd_setenv]]]*/
+
+/************************************************************************/
+
+
 
 /*[[[head:libd_unsetenv,hash:CRC-32=0x656808f6]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname)
 /*[[[body:libd_unsetenv]]]*/
 {
-	/* TODO: Special handling for certain variables. */
-	return libc_unsetenv(varname);
+	int result;
+	char ***p_dos_environ;
+	result = libc_unsetenv(varname);
+
+	/* On success, also  try to  remove the string  from the  DOS
+	 * environment table (in case said table has been allocated). */
+	if (result == 0 && *(p_dos_environ = &DOS$environ) != NULL) {
+		char *str, **tab = *p_dos_environ;
+		size_t i, len = strlen(varname);
+		for (i = 0; (str = tab[i]) != NULL; ++i) {
+			if (memcmp(str, varname, len * sizeof(char)) != 0)
+				continue;
+			if (str[len] != '=')
+				continue;
+			/* Remove `str' from the DOS environment table. */
+			for (len = i + 1; tab[len]; ++len)
+				;
+			--len;
+			memmovedown(&tab[i], &tab[i + 1], len - i, sizeof(char *));
+			tab = (char **)realloc(tab, len, sizeof(char *));
+			if likely(tab)
+				*p_dos_environ = tab;
+			free(str);
+			break;
+		}
+	}
+	return result;
 }
 /*[[[end:libd_unsetenv]]]*/
 
-/*[[[head:libd___p__wenviron,hash:CRC-32=0xf111074f]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
-NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
-/*[[[body:libd___p__wenviron]]]*/
-{
-	/* TODO: Special handling for certain variables. */
-	CRT_UNIMPLEMENTED("DOS$__p__wenviron"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd___p__wenviron]]]*/
 
-ATTR_SECTION(".text.crt.dos.application.init")
-PRIVATE ATTR_CONST WUNUSED char **NOTHROW(libc_get_initenv)(void);
 
-ATTR_SECTION(".text.crt.dos.application.init")
-PRIVATE WUNUSED char **NOTHROW(libd_get_initenv)(void) {
-	/* TODO: Special handling for certain variables. */
-	COMPILER_IMPURE();
-	return libc_get_initenv();
-}
 
-#undef _wenviron
-DEFINE_PUBLIC_IDATA_G(DOS$_wenviron, libd___p__wenviron, __SIZEOF_POINTER__);
+
+
 /************************************************************************/
-
-
-
-
+/* Wide-character environment tables                                    */
+/************************************************************************/
+#undef DOS$_wenviron
+#undef _wenviron
+PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.fs.environ") char16_t **libd_wenviron = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.fs.environ") char32_t **libc_wenviron = NULL;
+DEFINE_PUBLIC_IDATA_G(DOS$_wenviron, libd___p__wenviron, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(_wenviron, libc___p__wenviron, __SIZEOF_POINTER__);
-#define _wenviron GET_NOREL_GLOBAL(_wenviron)
+#define DOS$_wenviron libd_wenviron
+#define _wenviron     GET_NOREL_GLOBAL(_wenviron)
+
+#define libd_alloc_wenviron()   convert_mbstoc16v(*libd_p_environ())
+#define libd_free_wenviron(tab) convert_freev(tab)
 
 #define libc_alloc_wenviron()   convert_mbstoc32v(environ)
 #define libc_free_wenviron(tab) convert_freev(tab)
+
+PRIVATE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") int
+NOTHROW_NCX(LIBKCALL libd_update_wenviron)(void) {
+	char16_t ***_pwenviron, **oldtab, **newtab;
+	newtab = libd_alloc_wenviron();
+	if unlikely(newtab == NULL)
+		return -1;
+	_pwenviron  = &DOS$_wenviron;
+	oldtab      = *_pwenviron;
+	*_pwenviron = newtab;
+	libd_free_wenviron(oldtab);
+	return 0;
+}
 
 PRIVATE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") int
 NOTHROW_NCX(LIBKCALL libc_update_wenviron)(void) {
@@ -742,12 +1322,23 @@ NOTHROW_NCX(LIBKCALL libc_update_wenviron)(void) {
 	newtab = libc_alloc_wenviron();
 	if unlikely(newtab == NULL)
 		return -1;
-	_pwenviron = &_wenviron;
+	_pwenviron  = &_wenviron;
 	oldtab      = *_pwenviron;
 	*_pwenviron = newtab;
 	libc_free_wenviron(oldtab);
 	return 0;
 }
+
+/*[[[head:libd___p__wenviron,hash:CRC-32=0xf111074f]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
+/*[[[body:libd___p__wenviron]]]*/
+{
+	if (libd_wenviron == NULL)
+		libd_wenviron = libd_alloc_wenviron();
+	return &libd_wenviron;
+}
+/*[[[end:libd___p__wenviron]]]*/
 
 /*[[[head:libc___p__wenviron,hash:CRC-32=0x6f0d52ce]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
@@ -806,6 +1397,19 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 	static ATTR_SECTION(".bss.crt.dos.wchar.fs.environ") char16_t *last_c16getenv = NULL;
 	char *utf8_varname, *utf8_varval;
 	char16_t *c16_varval;
+	if (libd_wenviron != NULL) {
+		/* Search through our c32-environment cache. */
+		size_t i, len = c16len(varname);
+		char16_t *envstr;
+		for (i = 0; (envstr = libd_wenviron[i]) != NULL; ++i) {
+			if (c16memcmp(envstr, varname, len) != 0)
+				continue;
+			if (envstr[len] != '=')
+				continue;
+			return envstr + len + 1;
+		}
+		return NULL;
+	}
 	utf8_varname = convert_c16tombs(varname);
 	if (!utf8_varname)
 		return NULL;
@@ -864,6 +1468,10 @@ NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string)
 		return -1;
 	result = libd_putenv(utf8);
 	free(utf8);
+
+	/* If it's being used, update the global utf-16 `_wenviron' array. */
+	if (result == 0 && libd_wenviron != NULL)
+		result = libd_update_wenviron();
 	return result;
 }
 /*[[[end:libd__wputenv]]]*/
@@ -887,7 +1495,7 @@ NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string)
 	}
 	free(utf8);
 
-	/* If it's being used, update the global 32-bit `_wenviron' array. */
+	/* If it's being used, update the global utf-32 `_wenviron' array. */
 	if (result == 0 && libc_wenviron != NULL)
 		result = libc_update_wenviron();
 	return result;
@@ -912,6 +1520,12 @@ NOTHROW_NCX(LIBDCALL libd__wputenv_s)(char16_t const *varname,
 	result = libd__putenv_s(utf8_varname, utf8_val);
 	free(utf8_val);
 	free(utf8_varname);
+
+	/* If it's being used, update the global utf-32 `_wenviron' array. */
+	if (result == 0 && libd_wenviron != NULL) {
+		if (libd_update_wenviron())
+			result = libc_geterrno();
+	}
 	return result;
 /*err_val:
 	free(utf8_val);*/
@@ -941,7 +1555,7 @@ NOTHROW_NCX(LIBKCALL libc__wputenv_s)(char32_t const *varname,
 	free(utf8_val);
 	free(utf8_varname);
 
-	/* If it's being used, update the global 32-bit `_wenviron' array. */
+	/* If it's being used, update the global utf-32 `_wenviron' array. */
 	if (result == 0 && libc_wenviron != NULL) {
 		if (libc_update_wenviron())
 			result = libc_geterrno();
@@ -1990,7 +2604,7 @@ NOTHROW_NCX(LIBKCALL libc___p___wargv)(void)
 
 
 PRIVATE ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.dos.application.init")
-char **NOTHROW(libc_get_initenv)(void) {
+char **NOTHROW_NCX(LIBDCALL libc_get_initenv)(void) {
 	struct process_peb *peb;
 	char **result;
 	peb = &__peb;
@@ -2023,6 +2637,11 @@ NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 	return &libc___p___initenv_pointer;
 }
 /*[[[end:libc___p___initenv]]]*/
+
+ATTR_SECTION(".text.crt.dos.application.init")
+PRIVATE WUNUSED char **NOTHROW_NCX(LIBDCALL libd_get_initenv)(void) {
+	return libd_alloc_environ(libc_get_initenv());
+}
 
 /*[[[head:libd___p___initenv,hash:CRC-32=0xe1169326]]]*/
 /* Access to the initial environment block */
@@ -2073,6 +2692,33 @@ NOTHROW_NCX(LIBKCALL libc___p___winitenv)(void)
 /*[[[end:libc___p___winitenv]]]*/
 
 
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
+struct atomic_once libd___p__pgmptr_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
+char *libd___p__pgmptr_pointer = NULL;
+
+PRIVATE ATTR_SECTION(".text.crt.dos.application.init") WUNUSED char *
+NOTHROW_NCX(LIBDCALL libd_make_pgmptr)(void) {
+	char *unix_pgmptr = _pgmptr;
+	if (!unix_pgmptr)
+		return NULL;
+	if (unix_pgmptr[0] != '/')
+		return unix_pgmptr; /* Non-absolute paths work the same under DOS */
+	/* Convert path into a DOS name. */
+	return libd_from_unix_filename(unix_pgmptr, NULL, 0);
+}
+
+DEFINE_PUBLIC_IDATA_G(DOS$_pgmptr, libd___p__pgmptr, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_ALIAS(DOS$__p__pgmptr, libd___p__pgmptr);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
+NOTHROW_NCX(LIBDCALL libd___p__pgmptr)(void) {
+	ATOMIC_ONCE_RUN(&libd___p__pgmptr_initialized, {
+		libd___p__pgmptr_pointer = libd_make_pgmptr();
+	});
+	return &libd___p__pgmptr_pointer;
+}
+
+
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd___p__wpgmptr_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char32_t *libc___p__wpgmptr_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p__wpgmptr_initialized = ATOMIC_ONCE_INIT;
@@ -2088,7 +2734,7 @@ NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 /*[[[body:libd___p__wpgmptr]]]*/
 {
 	ATOMIC_ONCE_RUN(&libd___p__wpgmptr_initialized, {
-		libd___p__wpgmptr_pointer = convert_mbstoc16(_pgmptr);
+		libd___p__wpgmptr_pointer = convert_mbstoc16(*libd___p__pgmptr());
 	});
 	return &libd___p__wpgmptr_pointer;
 }

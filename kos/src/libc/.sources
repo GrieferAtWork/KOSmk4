@@ -21,14 +21,6 @@
 
 BEGIN
 
-	/* Symbols to keep marked as WEAK in the final library. */
-	final local MANDATORY_WEAK_SYMBOLS = {
-		"__gxx_personality_v0",
-		"__cxa_rethrow",
-		"__cxa_begin_catch",
-		"__cxa_end_catch",
-	};
-
 	SET_NOSTDLIB()
 	SET_SHARED()
 	USELIB("libdl")

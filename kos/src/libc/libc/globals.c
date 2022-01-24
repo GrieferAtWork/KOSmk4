@@ -37,13 +37,16 @@ DECL_BEGIN
 #undef _pgmptr
 #undef __progname
 #undef environ
-#undef _wenviron
 DEFINE_NOREL_GLOBAL_META(struct process_peb, __peb, ".crt.glibc.application.init");
 DEFINE_NOREL_GLOBAL_META(int, __argc, ".crt.dos.application.init");
 DEFINE_NOREL_GLOBAL_META(char **, __argv, ".crt.dos.application.init");
 DEFINE_NOREL_GLOBAL_META(char *, _pgmptr, ".crt.dos.application.init");
 DEFINE_NOREL_GLOBAL_META(char *, __progname, ".crt.errno.utility");
 DEFINE_NOREL_GLOBAL_META(char **, environ, ".crt.fs.environ");
+
+
+/* <stdlib.h> */
+#undef _wenviron
 DEFINE_NOREL_GLOBAL_META(char32_t **, _wenviron, ".crt.dos.wchar.fs.environ");
 
 
