@@ -1025,6 +1025,7 @@ incdir("");
 #include <parts/redirect-exec.h>
 #include <parts/timespec-cxx-support.h>
 #include <parts/timeval-cxx-support.h>
+#include <parts/uchar/direct.h>
 #include <parts/uchar/fcntl.h>
 #include <parts/uchar/format-printer.h>
 #include <parts/uchar/inttypes.h>

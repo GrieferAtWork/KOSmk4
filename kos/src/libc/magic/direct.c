@@ -103,10 +103,12 @@ unsigned int _getdiskfree(unsigned int drive, struct _diskfree_t *diskfree);
 %[insert:extern(getcwd)];
 %[insert:extern(rmdir)];
 
+%[define(DOS_MKDIR_ACCESS_MODE = 0755)]
+
 [[section(".text.crt.dos.fs.modify")]]
 [[cp, requires_function(mkdir)]]
 int _mkdir([[nonnull]] char const *path) {
-	return mkdir(path, 0755);
+	return mkdir(path, DOS_MKDIR_ACCESS_MODE);
 }
 
 %{

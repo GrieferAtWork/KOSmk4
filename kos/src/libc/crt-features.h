@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe4a51a9 */
+/* HASH CRC-32:0x6283b722 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -608,10 +608,12 @@
 #define __CRT_HAVE_DOS$_wfreopen_s
 #define __CRT_HAVE_DOS$_wfsopen
 #define __CRT_HAVE_DOS$_wfullpath
+#define __CRT_HAVE_DOS$_wgetdcwd
 #define __CRT_HAVE_DOS$_wgetenv
 #define __CRT_HAVE_DOS$_wgetenv_s
 #define __CRT_HAVE_DOS$_wmakepath
 #define __CRT_HAVE_DOS$_wmakepath_s
+#define __CRT_HAVE_DOS$_wmkdir
 #define __CRT_HAVE_DOS$_wmktemp
 #define __CRT_HAVE_DOS$_wmktemp_s
 #define __CRT_HAVE_DOS$_wperror
@@ -4054,11 +4056,13 @@
 #define __CRT_HAVE__wfullpath
 #define __CRT_HAVE__wfullpath_dbg
 #define __CRT_HAVE__wgetcwd_dbg
+#define __CRT_HAVE__wgetdcwd
 #define __CRT_HAVE__wgetdcwd_dbg
 #define __CRT_HAVE__wgetenv
 #define __CRT_HAVE__wgetenv_s
 #define __CRT_HAVE__wmakepath
 #define __CRT_HAVE__wmakepath_s
+#define __CRT_HAVE__wmkdir
 #define __CRT_HAVE__wmktemp
 #define __CRT_HAVE__wmktemp_s
 #define __CRT_HAVE__wperror

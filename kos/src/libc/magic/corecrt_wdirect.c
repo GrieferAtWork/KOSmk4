@@ -54,7 +54,32 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 %[insert:function(_wgetcwd = wgetcwd)]
 
-/* TODO: Incomplete */
+[[wchar, cp, decl_include("<hybrid/typecore.h>")]]
+[[requires_include("<asm/os/fcntl.h>"), impl_include("<libc/errno.h>")]]
+[[requires($has_function(wfrealpath4) && defined(__AT_FDDRIVE_CWD))]]
+wchar_t *_wgetdcwd(int drive, wchar_t *buf, size_t size) {
+	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
+@@pp_ifdef EINVAL@@
+		__libc_seterrno(EINVAL);
+@@pp_else@@
+		__libc_seterrno(1);
+@@pp_endif@@
+		return NULL;
+	}
+	return wfrealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
+}
+
+%[insert:pp_if($has_function(_wgetdcwd))]
+%#define _wgetdcwd_nolock _wgetdcwd
+%[insert:pp_endif]
+
+%[insert:function(_wchdir = wchdir)]
+%[insert:function(_wrmdir = wrmdir)]
+
+[[wchar, cp, requires_function(wmkdir)]]
+int _wmkdir([[nonnull]] wchar_t const *path) {
+	return wmkdir(path, DOS_MKDIR_ACCESS_MODE);
+}
 
 %{
 

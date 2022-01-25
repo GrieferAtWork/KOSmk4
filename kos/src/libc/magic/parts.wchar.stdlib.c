@@ -38,6 +38,7 @@ __SYSDECL_BEGIN
 
 }
 
+%[define_str2wcs_replacement(system = wsystem)]
 
 [[cp, guard, wchar, dos_export_alias("_wsystem")]]
 [[section(".text.crt{|.dos}.wchar.fs.exec.system")]]
@@ -61,6 +62,8 @@ int wsystem([[nullable]] wchar_t const *cmd) {
 
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+%[define_str2wcs_replacement(realpath = wrealpath)]
+
 [[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wfrealpathat)) ||
@@ -122,6 +125,8 @@ wchar_t *wrealpath([[nonnull]] wchar_t const *filename, wchar_t *resolved) {
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
+%[define_str2wcs_replacement(frealpath = wfrealpath)]
+
 [[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
 [[decl_include("<bits/types.h>")]]
 [[requires($has_function(wfrealpath4) ||
@@ -167,6 +172,8 @@ wchar_t *wfrealpath($fd_t fd, wchar_t *resolved, $size_t buflen) {
 
 %
 %#ifdef __USE_KOS
+%[define_str2wcs_replacement(frealpath4 = wfrealpath4)]
+
 [[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
 [[decl_include("<bits/types.h>"), requires_function(frealpath4, convert_mbstowcs)]]
 wchar_t *wfrealpath4($fd_t fd, wchar_t *resolved, $size_t buflen, $atflag_t flags) {
@@ -202,6 +209,8 @@ wchar_t *wfrealpath4($fd_t fd, wchar_t *resolved, $size_t buflen, $atflag_t flag
 @@pp_endif@@
 	return resolved;
 }
+
+%[define_str2wcs_replacement(frealpathat = wfrealpathat)]
 
 [[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
 [[decl_include("<bits/types.h>"), requires_function(frealpathat, convert_wcstombs, convert_mbstowcs)]]
