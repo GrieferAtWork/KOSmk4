@@ -7638,76 +7638,6 @@ char *_strerror(char const *message) {
 %[insert:function(_strncmpi_l = strncasecmp_l)]
 %[insert:function(strncmpi = strncasecmp)]
 
-%
-%#ifndef _WSTRING_DEFINED
-%#define _WSTRING_DEFINED 1
-%[insert:guarded_function(_wcsdup = wcsdup)]
-%[insert:extern(wcscat)]
-%[insert:extern(wcschr)]
-%[insert:extern(wcscmp)]
-%[insert:extern(wcscpy)]
-%[insert:extern(wcscspn)]
-%[insert:extern(wcslen)]
-%[insert:extern(wcsnlen)]
-%[insert:extern(wcsncat)]
-%[insert:extern(wcsncmp)]
-%[insert:extern(wcsncpy)]
-%[insert:extern(wcspbrk)]
-%[insert:extern(wcsrchr)]
-%[insert:extern(wcsspn)]
-%[insert:extern(wcsstr)]
-%[insert:extern(wcstok)]
-%[insert:extern(_wcserror)]
-%[insert:extern(_wcserror_s)]
-%[insert:extern(__wcserror)]
-%[insert:extern(__wcserror_s)]
-%[insert:guarded_function(_wcsicmp = wcscasecmp)]
-%[insert:guarded_function(_wcsicmp_l = wcscasecmp_l)]
-%[insert:guarded_function(_wcsnicmp = wcsncasecmp)]
-%[insert:guarded_function(_wcsnicmp_l = wcsncasecmp_l)]
-%[insert:extern(_wcsnset_s)]
-%[insert:guarded_function(_wcsnset = wcsnset)]
-%[insert:guarded_function(_wcsrev = wcsrev)]
-%[insert:extern(_wcsset_s)]
-%[insert:guarded_function(_wcsset = wcsset)]
-%[insert:extern(_wcslwr_s)]
-%[insert:guarded_function(_wcslwr = wcslwr)]
-%[insert:extern(_wcslwr_s_l)]
-%[insert:guarded_function(_wcslwr_l = wcslwr_l)]
-%[insert:extern(_wcsupr_s)]
-%[insert:guarded_function(_wcsupr = wcsupr)]
-%[insert:extern(_wcsupr_s_l)]
-%[insert:guarded_function(_wcsupr_l = wcsupr_l)]
-%[insert:extern(wcsxfrm)]
-%[insert:guarded_function(_wcsxfrm_l = wcsxfrm_l)]
-%[insert:extern(wcscoll)]
-%[insert:guarded_function(_wcscoll_l = wcscoll_l)]
-%[insert:guarded_function(_wcsicoll = wcscasecoll)]
-%[insert:guarded_function(_wcsicoll_l = wcscasecoll_l)]
-%[insert:guarded_function(_wcsncoll = wcsncasecoll)]
-%[insert:guarded_function(_wcsncoll_l = wcsncoll_l)]
-%[insert:guarded_function(_wcsnicoll = wcsncasecoll)]
-%[insert:guarded_function(_wcsnicoll_l = wcsncasecoll_l)]
-%[insert:extern(wcsdup)]
-%[insert:guarded_function(wcswcs = wcsstr)]
-%[insert:guarded_function(wcsicmp = wcscasecmp)]
-%[insert:guarded_function(wcsnicmp = wcsncasecmp)]
-%[insert:extern(wcsnset)]
-%[insert:extern(wcsrev)]
-%[insert:extern(wcsset)]
-%[insert:extern(wcslwr)]
-%[insert:extern(wcsupr)]
-%[insert:guarded_function(wcsicoll = wcscasecoll)]
-%#ifdef __USE_DOS_SLIB
-%[insert:extern(wcscat_s)]
-%[insert:extern(wcscpy_s)]
-%[insert:extern(wcsncat_s)]
-%[insert:extern(wcsncpy_s)]
-%[insert:guarded_function(wcstok_s = wcstok)]
-%[insert:extern(wcsnlen_s)]
-%#endif  /* __USE_DOS_SLIB */
-%#endif /* !_WSTRING_DEFINED */
-
 %{
 #endif /* __USE_DOS */
 
@@ -8337,6 +8267,10 @@ int consttime_memequal([[nonnull]] void const *s1,
 
 __SYSDECL_END
 
+#ifdef __USE_DOS
+#include <corecrt_wstring.h>
+#endif /* __USE_DOS */
+
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STRING_H)
 #include <parts/uchar/string.h>
@@ -8349,38 +8283,3 @@ __SYSDECL_END
 
 }
 
-// [[requires_include("<hybrid/typecore.h>")]] /* defined(__UINT64_TYPE__) */
-// [[requires(defined(__UINT64_TYPE__))]]
-
-// [[impl_include("<hybrid/typecore.h>")]] /* __SIZEOF_BUSINT__ */
-
-// [[impl_include("<optimized/string.h>")]]
-
-// memcpyq(dst, src, n_qwords) >>>> {
-// 	if __untraced(__builtin_constant_p(dst == src) && (dst == src))
-// 		return (u64 *)dst;
-// 	__ASSERT_MEMCPY_CT(dst,  src,  n_qwords  *  8);
-// 	if __untraced(__builtin_constant_p(n_qwords)) {
-// 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-// 		switch __untraced(n_qwords) {
-// 		case 0: return (u64 *)dst;
-// @@pp_if __SIZEOF_BUSINT__ >= 8@@
-// 		case 1: @@c:inline_memcpy(dst, src, u64[1])@@; return (u64 *)dst;
-// 		case 2: @@c:inline_memcpy(dst, src, u64[2])@@; return (u64 *)dst;
-// @@pp_else@@
-// 		case 1: @@c:inline_memcpy(dst, src, u32[2])@@; return (u64 *)dst;
-// @@pp_endif@@
-// 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
-// @@pp_ifndef __OPTIMIZE_SIZE__@@
-// @@pp_if __SIZEOF_BUSINT__ >= 8@@
-// 		case 3: @@c:inline_memcpy(dst, src, u64[3])@@; return (u64 *)dst;
-// 		case 4: @@c:inline_memcpy(dst, src, u64[4])@@; return (u64 *)dst;
-// @@pp_else@@
-// 		case 2: @@c:inline_memcpy(dst, src, u32[4])@@; return (u64 *)dst;
-// @@pp_endif@@
-// @@pp_endif@@
-// 		default: break;
-// 		}
-// 	}
-// 	return memcpyq(dst, src, n_qwords);
-// }

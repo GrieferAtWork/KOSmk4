@@ -1172,9 +1172,9 @@ __STDC_INT32_AS_SSIZE_T wcswidth([[inp(num_chars)]] wchar_t const *__restrict st
 %#endif /* __USE_XOPEN */
 
 %
-%#if defined(__USE_XOPEN) || defined(__USE_DOS)
+%#ifdef __USE_XOPEN
 %[insert:guarded_function(wcswcs = wcsstr)]
-%#endif /* __USE_XOPEN || __USE_DOS */
+%#endif /* __USE_XOPEN */
 
 %
 %#ifdef __USE_GNU
@@ -2041,127 +2041,6 @@ wcslcpy(*) %{generate(str2wcs("strlcpy"))}
 %
 %
 
-%
-%#ifdef __USE_DOS
-%#ifndef _WSTRING_DEFINED
-%#define _WSTRING_DEFINED 1
-
-%[insert:guarded_function(_wcsdup = wcsdup)]
-
-%
-%#ifdef __USE_DOS_SLIB
-@@>> wcscat_s(3)
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
-wcscat_s(*) %{generate(str2wcs("strcat_s"))}
-
-@@>> wcscpy_s(3)
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
-wcscpy_s(*) %{generate(str2wcs("strcpy_s"))}
-
-@@>> wcsnlen_s(3)
-[[decl_include("<hybrid/typecore.h>")]]
-[[guard, inline, nocrt, pure, wunused]]
-$size_t wcsnlen_s([[nullable]] wchar_t const *str, $size_t maxlen) {
-	return str ? wcsnlen(str, maxlen) : 0;
-}
-
-@@>> wcsncat_s(3)
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
-wcsncat_s(*) %{generate(str2wcs("strncat_s"))}
-
-@@>> wcsncpy_s(3)
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
-wcsncpy_s(*) %{generate(str2wcs("strncpy_s"))}
-
-%[insert:guarded_function(wcstok_s = wcstok)]
-
-%#endif  /* __USE_DOS_SLIB */
-
-%[default:section(".text.crt.dos.wchar.errno")];
-
-[[guard, wchar, decl_include("<hybrid/typecore.h>")]]
-wchar_t *_wcserror(int errno_value);
-
-[[guard, wchar, decl_include("<bits/types.h>")]]
-$errno_t _wcserror_s(wchar_t *buf, $size_t bufsize, int errno_value);
-
-[[guard, wchar, decl_include("<hybrid/typecore.h>")]]
-wchar_t *__wcserror(wchar_t const *message);
-
-[[guard, wchar, decl_include("<bits/types.h>")]]
-$errno_t __wcserror_s(wchar_t *buf, $size_t bufsize, wchar_t const *message);
-
-%[insert:guarded_function(_wcsicmp = wcscasecmp)]
-%[insert:guarded_function(_wcsnicmp = wcsncasecmp)]
-%[insert:guarded_function(_wcsicmp_l = wcscasecmp_l)]
-%[insert:guarded_function(_wcsnicmp_l = wcsncasecmp_l)]
-
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
-[[decl_include("<bits/types.h>")]]
-$errno_t _wcsnset_s(wchar_t *__restrict buf, $size_t buflen, wchar_t ch, $size_t maxlen)
-	%{generate(str2wcs("_strnset_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
-[[decl_include("<bits/types.h>")]]
-$errno_t _wcsset_s([[nonnull]] wchar_t *dst, $size_t dstsize, wchar_t ch)
-	%{generate(str2wcs("_strset_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.memory")]]
-_wcslwr_s(*) %{generate(str2wcs("_strlwr_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.memory")]]
-_wcsupr_s(*) %{generate(str2wcs("_strupr_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.locale.memory")]]
-_wcslwr_s_l(*) %{generate(str2wcs("_strlwr_s_l"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.locale.memory")]]
-_wcsupr_s_l(*) %{generate(str2wcs("_strupr_s_l"))}
-
-[[decl_include("<bits/types.h>")]]
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
-$errno_t wmemcpy_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
-                   [[nonnull]] wchar_t const *src, rsize_t srclength)
-	%{generate(str2wcs("memcpy_s"))}
-
-[[decl_include("<bits/types.h>")]]
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
-$errno_t wmemmove_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
-                    [[nonnull]] wchar_t const *src, rsize_t srclength)
-	%{generate(str2wcs("memmove_s"))}
-
-%
-%
-%
-
-%[insert:guarded_function(_wcsnset = wcsnset)]
-%[insert:guarded_function(_wcsrev = wcsrev)]
-%[insert:guarded_function(_wcsset = wcsset)]
-%[insert:guarded_function(_wcslwr = wcslwr)]
-%[insert:guarded_function(_wcsupr = wcsupr)]
-%[insert:guarded_function(_wcslwr_l = wcslwr_l)]
-%[insert:guarded_function(_wcsupr_l = wcsupr_l)]
-%[insert:guarded_function(_wcsxfrm_l = wcsxfrm_l)]
-%[insert:guarded_function(_wcscoll_l = wcscoll_l)]
-%[insert:guarded_function(_wcsicoll = wcscasecoll)]
-%[insert:guarded_function(_wcsicoll_l = wcscasecoll_l)]
-%[insert:guarded_function(_wcsncoll = wcsncasecoll)]
-%[insert:guarded_function(_wcsncoll_l = wcsncoll_l)]
-%[insert:guarded_function(_wcsnicoll = wcsncasecoll)]
-%[insert:guarded_function(_wcsnicoll_l = wcsncasecoll_l)]
-
-%
-%
-%
-
-%[insert:guarded_function(wcsicmp = wcscasecmp)]
-%[insert:guarded_function(wcsnicmp = wcsncasecmp)]
-%[insert:guarded_function(wcsicoll = wcscasecoll)]
-
-%#endif /* !_WSTRING_DEFINED */
-%#endif /* __USE_DOS */
-
-
 %#if defined(__USE_DOS) || defined(__USE_KOS)
 @@>> wcsnset(3)
 [[decl_include("<hybrid/typecore.h>")]]
@@ -2831,6 +2710,7 @@ __SYSDECL_END
 #ifdef __USE_DOS
 #include <corecrt_wio.h>
 #include <corecrt_wstdlib.h>
+#include <corecrt_wstring.h>
 #endif /* __USE_DOS */
 
 }

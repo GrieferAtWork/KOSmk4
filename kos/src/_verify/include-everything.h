@@ -463,7 +463,10 @@ incdir("");
 #include <confstr.h>
 #include <corecrt.h>
 #include <corecrt_stdio_config.h>
+#include <corecrt_wdirect.h>
 #include <corecrt_wio.h>
+#include <corecrt_wstdlib.h>
+#include <corecrt_wstring.h>
 #include <cpio.h>
 #include <crtdbg.h>
 #include <crtdefs.h>

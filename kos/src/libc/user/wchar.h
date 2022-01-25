@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e9b87d5 */
+/* HASH CRC-32:0x3b457287 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,14 +91,6 @@ INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBK
 INTDEF WUNUSED NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
 /* >> fgetwln(3) */
 INTDEF WUNUSED NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
-INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wcserror)(int errno_value);
-INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wcserror)(int errno_value);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf, size_t bufsize, int errno_value);
-INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf, size_t bufsize, int errno_value);
-INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message);
-INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf, size_t bufsize, char16_t const *message);
-INTDEF errno_t NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf, size_t bufsize, char32_t const *message);
 INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory, char16_t const *file_prefix);
 INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory, char32_t const *file_prefix);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst, size_t wchar_count);
