@@ -809,7 +809,7 @@
 #endif /* __WCHAR_MAX__ == ... */
 #endif /* __WCHAR_MAX__ */
 #ifndef __SIZEOF_WCHAR_T__
-#if defined(__PE__)
+#ifdef __PE__
 #define __SIZEOF_WCHAR_T__ 2
 #else /* __PE__ */
 #define __SIZEOF_WCHAR_T__ 4
@@ -999,7 +999,7 @@
 
 #ifndef __INT_LEAST8_TYPE__
 #ifdef __SIZEOF_INT_LEAST8_T__
-#define __INT_LEAST8_TYPE__   __TYPEFOR_INTIB(__SIZEOF_INT_LEAST8_T__)
+#define __INT_LEAST8_TYPE__ __TYPEFOR_INTIB(__SIZEOF_INT_LEAST8_T__)
 #endif /* __SIZEOF_INT_LEAST8_T__ */
 #endif /* !__INT_LEAST8_TYPE__ */
 #ifndef __INT_LEAST16_TYPE__
@@ -1180,7 +1180,7 @@
 #elif (defined(__cplusplus) &&              \
        defined(__native_wchar_t_defined) && \
        defined(__KOS_SYSTEM_HEADERS__))
-/*  g++ Seems to pre-define `__WCHAR_TYPE__' incorrectly as its integral value
+/* g++ seems to pre-define `__WCHAR_TYPE__'  incorrectly as its integral  value
  * (the same way it does in C; `#define __WCHAR_TYPE__ int'), so fix it here... */
 #undef __WCHAR_TYPE__
 #define __WCHAR_TYPE__ wchar_t
@@ -1295,8 +1295,8 @@
 #define __ULONG64_TYPE__ __UINT64_TYPE__
 #endif /* __SIZEOF_LONG__ != 8 */
 
-/* The max integral type that the target's main address bus is optimized for.
- * Currently,  that   is  equal   to   `sizeof(void *)'  for   all   targets. */
+/* The max integral type that the target's main address bus is optimized
+ * for. Currently, that  is equal to  `sizeof(void *)' for all  targets. */
 #ifndef __SIZEOF_BUSINT__
 #define __SIZEOF_BUSINT__ __SIZEOF_POINTER__
 #define __BUSINT_TYPE__   __INTPTR_TYPE__
@@ -1375,8 +1375,8 @@
        defined(__THW_INTEL__) || defined(__INTEL__))
 #define __SIZEOF_LONG_DOUBLE__ 12
 #elif (defined(__X86_64__) || defined(__amd64__) || \
-       defined(__amd64) || defined(__x86_64) || \
-       defined(_M_X64) || defined(_M_AMD64) || \
+       defined(__amd64) || defined(__x86_64) ||     \
+       defined(_M_X64) || defined(_M_AMD64) ||      \
        defined(_WIN64) || defined(WIN64))
 #define __SIZEOF_LONG_DOUBLE__ 16
 #elif (defined(__arm__) || defined(_M_ARM) || \

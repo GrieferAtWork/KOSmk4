@@ -1151,7 +1151,7 @@ char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict sel
 @@The returned pointer remains valid until the next time this function is called,
 @@the format_aprintf buffer `self' is finalized,  or some other function is  used
 @@to append additional data to the end of `self'
-@@@return: NULL: Failed to allocate additional memory
+@@@return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM')
 [[impl_include("<hybrid/__assert.h>"), wunused]]
 [[decl_prefix(struct format_aprintf_data;)]]
 [[impl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
@@ -1190,6 +1190,8 @@ err:
 @@>> format_aprintf_printer(3)
 @@Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
 @@This function is intended to be used as a pformatprinter-compatible printer sink
+@@@return: datalen: Success.
+@@@return: -1: [errno=ENOMEM] Insufficient memory.
 [[wunused, requires_function(format_aprintf_alloc)]]
 [[no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]

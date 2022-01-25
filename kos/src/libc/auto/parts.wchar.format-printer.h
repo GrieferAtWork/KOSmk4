@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf23b7d22 */
+/* HASH CRC-32:0xea1ab2b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -467,26 +467,26 @@ INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_wpr
 INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBKCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...) THROWS(...);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBKCALL libc_format_wsprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsnprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsnprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
-INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wwidth)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* Pack  and  finalize  a  given  aprintf  format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format  printer sub-system should  be used as follows:
@@ -536,21 +536,27 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTH
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self, size_t num_wchars);
 /* >> format_waprintf_alloc(3)
  * Allocate  a  buffer  of  `num_wchars'  wide-characters  at  the  end  of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self, size_t num_wchars);
 /* >> format_waprintf_printer(3)
- * Print data to a dynamically allocated heap buffer. On error, `-1' is returned */
-INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
+ * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
+ * This function is intended to be used as a pwformatprinter-compatible printer sink
+ * @return: datalen: Success.
+ * @return: -1: [errno=ENOMEM] Insufficient memory. */
+INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_waprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* >> format_waprintf_printer(3)
- * Print data to a dynamically allocated heap buffer. On error, `-1' is returned */
-INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBKCALL libc_format_waprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
+ * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
+ * This function is intended to be used as a pwformatprinter-compatible printer sink
+ * @return: datalen: Success.
+ * @return: -1: [errno=ENOMEM] Insufficient memory. */
+INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_waprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 
 DECL_END

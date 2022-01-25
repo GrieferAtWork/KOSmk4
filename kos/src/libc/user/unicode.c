@@ -57,10 +57,10 @@ typedef union {
 #define UNICODE_FOLD_MAXLEN 3
 #define UNICODE_FOLD_COUNT  42
 struct unifold {
-	uint16_t uf_repl[3];
+	uint16_t uf_repl[UNICODE_FOLD_MAXLEN];
 };
 PRIVATE struct unifold const unicode_fold_descriptors[UNICODE_FOLD_COUNT];
-#define UNICODE_DIGIT_COUNT 42
+#define UNICODE_DIGIT_COUNT 149
 PRIVATE unidigit_t const unicode_digits[UNICODE_DIGIT_COUNT];
 #define UNICODE_DESCRIPTOR_COUNT 42
 PRIVATE struct __unitraits const unicode_descriptors[UNICODE_DESCRIPTOR_COUNT];
@@ -194,11 +194,22 @@ NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch,
 	}
 	fold   = &unicode_fold_descriptors[trt->__ut_fold_idx];
 	buf[0] = fold->uf_repl[0];
+#if UNICODE_FOLD_MAXLEN >= 2
 	if ((buf[1] = fold->uf_repl[1]) == 0)
 		return buf + 1;
+#endif /* UNICODE_FOLD_MAXLEN >= 2 */
+#if UNICODE_FOLD_MAXLEN >= 3
 	if ((buf[2] = fold->uf_repl[2]) == 0)
 		return buf + 2;
-	return buf + 3;
+#endif /* UNICODE_FOLD_MAXLEN >= 3 */
+#if UNICODE_FOLD_MAXLEN >= 4
+	if ((buf[3] = fold->uf_repl[3]) == 0)
+		return buf + 3;
+#endif /* UNICODE_FOLD_MAXLEN >= 4 */
+#if UNICODE_FOLD_MAXLEN >= 5
+#error "Not implemented"
+#endif /* UNICODE_FOLD_MAXLEN >= 5 */
+	return buf + UNICODE_FOLD_MAXLEN;
 }
 /*[[[end:libc_unicode_fold]]]*/
 

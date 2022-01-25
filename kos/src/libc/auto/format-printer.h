@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ba90da2 */
+/* HASH CRC-32:0x14230d8a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -646,7 +646,7 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -655,11 +655,13 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNUL
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
 /* >> format_aprintf_printer(3)
  * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
- * This function is intended to be used as a pformatprinter-compatible printer sink */
+ * This function is intended to be used as a pformatprinter-compatible printer sink
+ * @return: datalen: Success.
+ * @return: -1: [errno=ENOMEM] Insufficient memory. */
 INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 

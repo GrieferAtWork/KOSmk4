@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c4152a7 */
+/* HASH CRC-32:0x1e9b87d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,14 +99,6 @@ INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message);
 INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf, size_t bufsize, char16_t const *message);
 INTDEF errno_t NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf, size_t bufsize, char32_t const *message);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename, char16_t const *mode, __STDC_INT_AS_UINT_T sh_flag);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc__wfsopen)(char32_t const *filename, char32_t const *mode, __STDC_INT_AS_UINT_T sh_flag);
-INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd, char16_t const *mode);
-INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBKCALL libc__wfdopen)(fd_t fd, char32_t const *mode);
-INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream, char16_t const *filename, char16_t const *mode);
-INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBKCALL libc__wfopen_s)(FILE **pstream, char32_t const *filename, char32_t const *mode);
-INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream, char16_t const *filename, char16_t const *mode, FILE *stream);
-INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBKCALL libc__wfreopen_s)(FILE **pstream, char32_t const *filename, char32_t const *mode, FILE *stream);
 INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory, char16_t const *file_prefix);
 INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory, char32_t const *file_prefix);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst, size_t wchar_count);

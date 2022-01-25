@@ -200,11 +200,7 @@ NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename,
                                      int type)
 /*[[[body:libd__access_s]]]*/
 {
-	errno_t error;
-	error = sys_faccessat(AT_FDCWD, filename,
-	                      (syscall_ulong_t)(unsigned int)type,
-	                      AT_DOSPATH);
-	return libd_errno_kos2dos(-error);
+	return libd_errno_kos2dos(libc__access_s(filename, type));
 }
 /*[[[end:libd__access_s]]]*/
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbd571a0 */
+/* HASH CRC-32:0xc3ba029e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1581,18 +1581,18 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(void *arg,
-                                                   char16_t const *__restrict data,
-                                                   size_t datalen) {
+NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsprintf_printer)(void *arg,
+                                                                char16_t const *__restrict data,
+                                                                size_t datalen) {
 	*(char16_t **)arg = (char16_t *)libc_mempcpyc(*(char16_t **)arg, data, datalen, sizeof(char16_t));
 	return (ssize_t)datalen;
 }
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_wsprintf_printer)(void *arg,
-                                                   char32_t const *__restrict data,
-                                                   size_t datalen) {
+NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsprintf_printer)(void *arg,
+                                                                char32_t const *__restrict data,
+                                                                size_t datalen) {
 	*(char32_t **)arg = (char32_t *)libc_mempcpyc(*(char32_t **)arg, data, datalen, sizeof(char32_t));
 	return (ssize_t)datalen;
 }
@@ -1602,9 +1602,9 @@ NOTHROW_NCX(LIBKCALL libc_format_wsprintf_printer)(void *arg,
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg,
-                                                    char16_t const *__restrict data,
-                                                    size_t datalen) {
+NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsnprintf_printer)(void *arg,
+                                                                 char16_t const *__restrict data,
+                                                                 size_t datalen) {
 	struct __local_format_snprintf_data {
 		char16_t  *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t sd_bufsiz; /* Remaining buffer size. */
@@ -1625,9 +1625,9 @@ NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg,
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg,
-                                                    char32_t const *__restrict data,
-                                                    size_t datalen) {
+NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsnprintf_printer)(void *arg,
+                                                                 char32_t const *__restrict data,
+                                                                 size_t datalen) {
 	struct __local_format_snprintf_data {
 		char32_t  *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t sd_bufsiz; /* Remaining buffer size. */
@@ -1646,9 +1646,9 @@ NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg,
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_PURE NONNULL((2)) ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
-                                         char16_t const *__restrict data,
-                                         size_t datalen) {
+NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wwidth)(void *arg,
+                                                      char16_t const *__restrict data,
+                                                      size_t datalen) {
 
 	size_t result = 0;
 	char16_t const *iter, *end;
@@ -1811,7 +1811,7 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self,
                                                  size_t num_wchars) {
@@ -1848,7 +1848,7 @@ err:
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self,
                                                  size_t num_wchars) {
@@ -1880,11 +1880,14 @@ err:
 	return NULL;
 }
 /* >> format_waprintf_printer(3)
- * Print data to a dynamically allocated heap buffer. On error, `-1' is returned */
+ * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
+ * This function is intended to be used as a pwformatprinter-compatible printer sink
+ * @return: datalen: Success.
+ * @return: -1: [errno=ENOMEM] Insufficient memory. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") WUNUSED NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(void *arg,
-                                                   char16_t const *__restrict data,
-                                                   size_t datalen) {
+NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_waprintf_printer)(void *arg,
+                                                                char16_t const *__restrict data,
+                                                                size_t datalen) {
 	char16_t *buf;
 	buf = libd_format_waprintf_alloc((struct format_c16aprintf_data *)arg, datalen);
 	if unlikely(!buf)
@@ -1895,11 +1898,14 @@ err:
 	return -1;
 }
 /* >> format_waprintf_printer(3)
- * Print data to a dynamically allocated heap buffer. On error, `-1' is returned */
+ * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
+ * This function is intended to be used as a pwformatprinter-compatible printer sink
+ * @return: datalen: Success.
+ * @return: -1: [errno=ENOMEM] Insufficient memory. */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") WUNUSED NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_waprintf_printer)(void *arg,
-                                                   char32_t const *__restrict data,
-                                                   size_t datalen) {
+NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_waprintf_printer)(void *arg,
+                                                                char32_t const *__restrict data,
+                                                                size_t datalen) {
 	char32_t *buf;
 	buf = libc_format_waprintf_alloc((struct format_c32aprintf_data *)arg, datalen);
 	if unlikely(!buf)

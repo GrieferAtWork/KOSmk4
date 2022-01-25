@@ -26,6 +26,19 @@
 #include <hybrid/typecore.h>
 
 #include <bits/crt/format-printer.h>
+#include <bits/crt/wformat-printer.h>
+
+#ifdef __PE__
+#ifndef __C16FORMATPRINTER_CC
+#define __C16FORMATPRINTER_CC_IS_WFORMATPRINTER_CC
+#define __C16FORMATPRINTER_CC __WFORMATPRINTER_CC
+#endif /* !__C16FORMATPRINTER_CC */
+#elif defined(__ELF__)
+#ifndef __C32FORMATPRINTER_CC
+#define __C32FORMATPRINTER_CC_IS_WFORMATPRINTER_CC
+#define __C32FORMATPRINTER_CC __WFORMATPRINTER_CC
+#endif /* !__C32FORMATPRINTER_CC */
+#endif /* ... */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

@@ -410,7 +410,6 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 		if (how == SIG_BLOCK)
 			return 0;
 
-		ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 		for (i = 0; i < __SIGSET_NWORDS; ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
@@ -427,6 +426,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 				 * available in the mean time is still available now. - The signal may
 				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
+				ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
 				/* With the signal mask having  gotten less restrictive, force  check
@@ -546,7 +546,6 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 	/* Check previously pending signals became available */
 	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
 		unsigned int i;
-		ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 		for (i = 0; i < __SIGSET_NWORDS; ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
@@ -563,6 +562,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 				 * available in the mean time is still available now. - The signal may
 				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
+				ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
 				/* With the signal mask having  gotten less restrictive, force  check
@@ -670,7 +670,6 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
 		sigset_t *sigmaskptr;
 		unsigned int i;
-		ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 		sigmaskptr = me->pt_pmask.lpm_pmask.pm_sigmask;
 		for (i = 0; i < __SIGSET_NWORDS; ++i) {
 			ulongptr_t pending_word;
@@ -688,6 +687,7 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 				 * available in the mean time is still available now. - The signal may
 				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
+				ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
 				/* With the signal mask having  gotten less restrictive, force  check
@@ -1000,7 +1000,7 @@ NOTHROW_NCX(LIBCCALL libc_siginterrupt)(signo_t signo,
 /*[[[body:libc_siginterrupt]]]*/
 {
 	struct sigaction action;
-	if (sigaction(signo, (struct sigaction *)NULL, &action) < 0)
+	if (libc_sigaction(signo, (struct sigaction *)NULL, &action) < 0)
 		goto err;
 	if (interrupt) {
 		libc_sigaddset(&__sigintr, signo);

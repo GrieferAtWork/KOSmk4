@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bb83b89 */
+/* HASH CRC-32:0x7af16558 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,6 +65,24 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
+#ifndef __local___localdep_ungetc_defined
+#define __local___localdep_ungetc_defined
+#if defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock) && defined(__USE_STDIO_UNLOCKED)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc_unlocked)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+#else /* ... */
+#undef __local___localdep_ungetc_defined
+#endif /* !... */
+#endif /* !__local___localdep_ungetc_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -76,7 +94,7 @@ __LOCAL_LIBC(vfscanf_getc) __SSIZE_TYPE__
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vfscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __ch) {
-	return __ungetc((int)(unsigned int)__ch, (__FILE *)__arg);
+	return (__NAMESPACE_LOCAL_SYM __localdep_ungetc)((int)(unsigned int)__ch, (__FILE *)__arg);
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN

@@ -1290,7 +1290,7 @@ __STDC_INT_AS_SSIZE_T printf([[nonnull]] char const *__restrict format, ...)
 [[std, cp_stdio, guard, ATTR_LIBC_SCANF(2, 0), wunused, doc_alias("fscanf")]]
 [[alias("_vfscanf", "_vfscanf_s"), export_alias("_IO_vfscanf")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vfscanf_unlocked")]]
-[[requires($has_function(fgetc) && $has_function(ungetc))]]
+[[requires_dependent_function(fgetc, ungetc)]]
 [[section(".text.crt{|.dos}.FILE.locked.read.scanf"), alias("vfscanf_unlocked")]]
 [[decl_include("<features.h>"), dependency(fgetc)]]
 [[impl_include("<hybrid/typecore.h>"), impl_prefix(
@@ -3189,7 +3189,7 @@ __STDC_INT_AS_SSIZE_T printf_unlocked([[nonnull]] char const *__restrict format,
 
 [[cp_stdio, ATTR_LIBC_SCANF(2, 0), wunused, doc_alias("fscanf_unlocked")]]
 [[alias("vfscanf", "__vfscanf", "_vfscanf", "_vfscanf_s", "_IO_vfscanf")]]
-[[requires_function(fgetc_unlocked, ungetc_unlocked)]]
+[[requires_dependent_function(fgetc_unlocked, ungetc_unlocked)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), dependency(fgetc_unlocked)]]
 [[impl_include("<hybrid/typecore.h>"), impl_prefix(
 @@push_namespace(local)@@

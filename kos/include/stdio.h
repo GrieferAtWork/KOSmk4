@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x120c247e */
+/* HASH CRC-32:0x41e6bd05 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6556,22 +6556,50 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _ws
 #undef ___wscanf_s_l_defined
 #endif /* !... */
 #endif /* !___wscanf_s_l_defined */
-#if !defined(___wfsopen_defined) && defined(__CRT_HAVE__wfsopen)
+#ifndef ___wfsopen_defined
 #define ___wfsopen_defined
+#ifdef __CRT_HAVE__wfsopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(wchar_t const *__filename, wchar_t const *__mode, __STDC_INT_AS_UINT_T __sh_flag),(__filename,__mode,__sh_flag))
-#endif /* !___wfsopen_defined && __CRT_HAVE__wfsopen */
-#if !defined(___wfdopen_defined) && defined(__CRT_HAVE__wfdopen)
+#elif (defined(__CRT_HAVE__fsopen) || (defined(__CRT_HAVE_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE__IO_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_fopen64)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/wchar/_wfsopen.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wfsopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *__NOTHROW_NCX(__LIBCCALL _wfsopen)(wchar_t const *__filename, wchar_t const *__mode, __STDC_INT_AS_UINT_T __sh_flag) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfsopen))(__filename, __mode, __sh_flag); })
+#else /* ... */
+#undef ___wfsopen_defined
+#endif /* !... */
+#endif /* !___wfsopen_defined */
+#ifndef ___wfdopen_defined
 #define ___wfdopen_defined
+#ifdef __CRT_HAVE__wfdopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,_wfdopen,(__fd_t __fd, wchar_t const *__mode),(__fd,__mode))
-#endif /* !___wfdopen_defined && __CRT_HAVE__wfdopen */
-#if !defined(___wfopen_s_defined) && defined(__CRT_HAVE__wfopen_s)
+#elif (defined(__CRT_HAVE_fdopen) || defined(__CRT_HAVE__fdopen) || defined(__CRT_HAVE__IO_fdopen)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/wchar/_wfdopen.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wfdopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __FILE *__NOTHROW_NCX(__LIBCCALL _wfdopen)(__fd_t __fd, wchar_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfdopen))(__fd, __mode); })
+#else /* ... */
+#undef ___wfdopen_defined
+#endif /* !... */
+#endif /* !___wfdopen_defined */
+#ifndef ___wfopen_s_defined
 #define ___wfopen_s_defined
+#ifdef __CRT_HAVE__wfopen_s
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,_wfopen_s,(__FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode),(__pstream,__filename,__mode))
-#endif /* !___wfopen_s_defined && __CRT_HAVE__wfopen_s */
-#if !defined(___wfreopen_s_defined) && defined(__CRT_HAVE__wfreopen_s)
+#elif (defined(__CRT_HAVE_fopen_s) || (defined(__CRT_HAVE_fopen) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_fopen64)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/wchar/_wfopen_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wfopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL _wfopen_s)(__FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfopen_s))(__pstream, __filename, __mode); })
+#else /* ... */
+#undef ___wfopen_s_defined
+#endif /* !... */
+#endif /* !___wfopen_s_defined */
+#ifndef ___wfreopen_s_defined
 #define ___wfreopen_s_defined
+#ifdef __CRT_HAVE__wfreopen_s
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,_wfreopen_s,(__FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),(__pstream,__filename,__mode,__stream))
-#endif /* !___wfreopen_s_defined && __CRT_HAVE__wfreopen_s */
+#elif (defined(__CRT_HAVE_freopen_s) || (defined(__CRT_HAVE_freopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_freopen64) || (defined(__CRT_HAVE_freopen_unlocked) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_freopen64_unlocked)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/wchar/_wfreopen_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wfreopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL _wfreopen_s)(__FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfreopen_s))(__pstream, __filename, __mode, __stream); })
+#else /* ... */
+#undef ___wfreopen_s_defined
+#endif /* !... */
+#endif /* !___wfreopen_s_defined */
 #ifndef ___wfopen_defined
 #define ___wfopen_defined
 #ifdef __CRT_HAVE_wfopen

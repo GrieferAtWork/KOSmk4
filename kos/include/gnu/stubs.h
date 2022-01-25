@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1fdf25 */
+/* HASH CRC-32:0xb6ed5d53 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,10 +97,6 @@
 #define __stub__wcreate_locale
 #define __stub__wcserror
 #define __stub__wcserror_s
-#define __stub__wfdopen
-#define __stub__wfopen_s
-#define __stub__wfreopen_s
-#define __stub__wfsopen
 #define __stub__wsearchenv_s
 #define __stub__wsetlocale
 #define __stub__wtempnam
@@ -616,10 +612,6 @@
 #define __stub_DOS$_wcreate_locale
 #define __stub_DOS$_wcserror
 #define __stub_DOS$_wcserror_s
-#define __stub_DOS$_wfdopen
-#define __stub_DOS$_wfopen_s
-#define __stub_DOS$_wfreopen_s
-#define __stub_DOS$_wfsopen
 #define __stub_DOS$_wsearchenv_s
 #define __stub_DOS$_wsetlocale
 #define __stub_DOS$_wtempnam

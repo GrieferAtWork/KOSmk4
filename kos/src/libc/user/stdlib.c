@@ -959,7 +959,8 @@ NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname)
 	char **dos_environ;
 	if unlikely(!varname)
 		return NULL;
-	if ((dos_environ = DOS$environ) != NULL) {
+	if (libd_environ != NULL &&
+	    (dos_environ = DOS$environ) != NULL) {
 		/* Search through our c32-environment cache. */
 		size_t i, len;
 		char *envstr;

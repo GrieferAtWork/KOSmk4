@@ -33,9 +33,10 @@
 
 #include "intellisense-common.h"
 
-#if 0 /* This  adds auto-completion for stuff like `#ifdef __INTELLISENSE__',
-       * as VS only auto completes macros that are defined somewhere (luckily
-       * even when only defined in "#if 0"-blocks) */
+/* This  adds auto-completion for stuff like `#ifdef __INTELLISENSE__',
+ * as VS only auto completes macros that are defined somewhere (luckily
+ * even when only defined in "#if 0"-blocks) */
+#ifndef __INTELLISENSE__
 #define __INTELLISENSE__ 1
 #endif
 

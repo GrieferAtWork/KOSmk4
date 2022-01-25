@@ -481,7 +481,7 @@ function generateUnicodeDatabase() {
 	/* Generate the unicode digit decode table. */
 	local digit2Index: {int | string | none: int} = Dict();
 	local index2Digit: {(int | string | none)...} = [];
-	/* Special case: the first 50 digits have one-on-one mapping!
+	/* Special case: the first 50+1 digits have one-on-one mapping!
 	 * NOTE: This 50 is hard-coded as `__UNICODE_DIGIT_IDENTITY_MAX' */
 	for (local x: [:50+1]) {
 		digit2Index[x] = x;
@@ -572,8 +572,8 @@ function generateUnicodeDatabase() {
 	function lookup(ch) {
 		return index2Desc[unicode_tab2[(unicode_tab1[ch >> shift] << shift) + (ch & tab1_mask)]];
 	}
-	/* Generate unicode traits descriptors.
-	 * NOTE: These are (0: flags, 1: digit, 2: foldSeq, 3: lowerDelta, 4: upperDelta, 5: titleDelta) */
+
+	/* For testing, assert that '1' behaves as expected. */
 	assert lookup('1'.ord())[0] & UNICODE_ISDIGIT;
 	assert lookup('1'.ord())[1] != 0xff;
 	assert index2Digit[lookup('1'.ord())[1]] == 1;

@@ -2640,23 +2640,113 @@ __STDC_INT_AS_SSIZE_T _wscanf_l([[nonnull]] wchar_t const *format,
 
 [[guard, wchar, wunused]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[requires_function(_fsopen, convert_wcstombs)]]
 $FILE *_wfsopen([[nonnull]] wchar_t const *filename,
                 [[nonnull]] wchar_t const *mode,
-                __STDC_INT_AS_UINT_T sh_flag);
+                __STDC_INT_AS_UINT_T sh_flag) {
+	$FILE *result = NULL;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done_filename;
+	result = _fsopen(utf8_filename, utf8_mode, sh_flag);
+@@pp_if $has_function(free)@@
+	free(utf8_mode);
+@@pp_endif@@
+done_filename:
+@@pp_if $has_function(free)@@
+	free(utf8_filename);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[guard, wchar, wunused, decl_include("<bits/types.h>")]]
-$FILE *_wfdopen($fd_t fd, [[nonnull]] wchar_t const *mode);
+[[requires_function(fdopen, convert_wcstombs)]]
+$FILE *_wfdopen($fd_t fd, [[nonnull]] wchar_t const *mode) {
+	$FILE *result = NULL;
+	char *utf8_mode;
+	utf8_mode = convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done;
+	result = fdopen(fd, utf8_mode);
+@@pp_if $has_function(free)@@
+	free(utf8_mode);
+@@pp_endif@@
+done:
+	return result;
+}
 
 [[guard, wchar, decl_include("<bits/types.h>")]]
+[[requires_function(fopen_s, convert_wcstombs)]]
+[[impl_include("<libc/errno.h>")]]
 $errno_t _wfopen_s([[nonnull]] $FILE **pstream,
                    [[nonnull]] wchar_t const *filename,
-                   [[nonnull]] wchar_t const *mode);
+                   [[nonnull]] wchar_t const *mode) {
+	errno_t result;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto err_badalloc;
+	utf8_mode = convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto err_badalloc_filename;
+	result = fopen_s(pstream, utf8_filename, utf8_mode);
+@@pp_if $has_function(free)@@
+	free(utf8_mode);
+	free(utf8_filename);
+@@pp_endif@@
+	return result;
+err_badalloc_filename:
+@@pp_if $has_function(free)@@
+	free(utf8_filename);
+@@pp_endif@@
+err_badalloc:
+@@pp_ifdef ENOMEM@@
+	return __libc_geterrno_or(ENOMEM);
+@@pp_else@@
+	return __libc_geterrno_or(1);
+@@pp_endif@@
+}
 
 [[guard, wchar, decl_include("<bits/types.h>")]]
+[[requires_function(freopen_s, convert_wcstombs)]]
+[[impl_include("<libc/errno.h>")]]
 $errno_t _wfreopen_s([[nonnull]] $FILE **pstream,
                      [[nonnull]] wchar_t const *filename,
                      [[nonnull]] wchar_t const *mode,
-                     $FILE *stream);
+                     $FILE *stream) {
+	errno_t result;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto err_badalloc;
+	utf8_mode = convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto err_badalloc_filename;
+	result = freopen_s(pstream, utf8_filename, utf8_mode, stream);
+@@pp_if $has_function(free)@@
+	free(utf8_mode);
+	free(utf8_filename);
+@@pp_endif@@
+	return result;
+err_badalloc_filename:
+@@pp_if $has_function(free)@@
+	free(utf8_filename);
+@@pp_endif@@
+err_badalloc:
+@@pp_ifdef ENOMEM@@
+	return __libc_geterrno_or(ENOMEM);
+@@pp_else@@
+	return __libc_geterrno_or(1);
+@@pp_endif@@
+}
 
 %[insert:guarded_function(_wfopen = wfopen)]
 %[insert:guarded_function(_wfreopen = wfreopen)]

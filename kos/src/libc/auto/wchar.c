@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18740bfe */
+/* HASH CRC-32:0x7e213aaa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,7 @@
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
+#include "uchar.h"
 #include "../user/unicode.h"
 #include "wctype.h"
 
@@ -6750,6 +6751,210 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED NONNUL
 	va_end(args);
 	return result;
 }
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename,
+                                    char16_t const *mode,
+                                    __STDC_INT_AS_UINT_T sh_flag) {
+	FILE *result = NULL;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = libd_convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = libd_convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done_filename;
+	result = libd__fsopen(utf8_filename, utf8_mode, sh_flag);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_mode);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+done_filename:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+done:
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_NCX(LIBKCALL libc__wfsopen)(char32_t const *filename,
+                                    char32_t const *mode,
+                                    __STDC_INT_AS_UINT_T sh_flag) {
+	FILE *result = NULL;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = libc_convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = libc_convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done_filename;
+	result = libc__fsopen(utf8_filename, utf8_mode, sh_flag);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_mode);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+done_filename:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+done:
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((2)) FILE *
+NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
+                                    char16_t const *mode) {
+	FILE *result = NULL;
+	char *utf8_mode;
+	utf8_mode = libd_convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done;
+	result = libc_fdopen(fd, utf8_mode);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_mode);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+done:
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((2)) FILE *
+NOTHROW_NCX(LIBKCALL libc__wfdopen)(fd_t fd,
+                                    char32_t const *mode) {
+	FILE *result = NULL;
+	char *utf8_mode;
+	utf8_mode = libc_convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto done;
+	result = libc_fdopen(fd, utf8_mode);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_mode);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+done:
+	return result;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
+NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream,
+                                     char16_t const *filename,
+                                     char16_t const *mode) {
+	errno_t result;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = libd_convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto err_badalloc;
+	utf8_mode = libd_convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto err_badalloc_filename;
+	result = libd_fopen_s(pstream, utf8_filename, utf8_mode);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_mode);
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return result;
+err_badalloc_filename:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+err_badalloc:
+#ifdef ENOMEM
+	return __libc_geterrno_or(ENOMEM);
+#else /* ENOMEM */
+	return __libc_geterrno_or(1);
+#endif /* !ENOMEM */
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
+NOTHROW_NCX(LIBKCALL libc__wfopen_s)(FILE **pstream,
+                                     char32_t const *filename,
+                                     char32_t const *mode) {
+	errno_t result;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = libc_convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto err_badalloc;
+	utf8_mode = libc_convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto err_badalloc_filename;
+	result = libc_fopen_s(pstream, utf8_filename, utf8_mode);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_mode);
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return result;
+err_badalloc_filename:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+err_badalloc:
+#ifdef ENOMEM
+	return __libc_geterrno_or(ENOMEM);
+#else /* ENOMEM */
+	return __libc_geterrno_or(1);
+#endif /* !ENOMEM */
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
+NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream,
+                                       char16_t const *filename,
+                                       char16_t const *mode,
+                                       FILE *stream) {
+	errno_t result;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = libd_convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto err_badalloc;
+	utf8_mode = libd_convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto err_badalloc_filename;
+	result = libd_freopen_s(pstream, utf8_filename, utf8_mode, stream);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_mode);
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return result;
+err_badalloc_filename:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+err_badalloc:
+#ifdef ENOMEM
+	return __libc_geterrno_or(ENOMEM);
+#else /* ENOMEM */
+	return __libc_geterrno_or(1);
+#endif /* !ENOMEM */
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
+NOTHROW_NCX(LIBKCALL libc__wfreopen_s)(FILE **pstream,
+                                       char32_t const *filename,
+                                       char32_t const *mode,
+                                       FILE *stream) {
+	errno_t result;
+	char *utf8_filename;
+	char *utf8_mode;
+	utf8_filename = libc_convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		goto err_badalloc;
+	utf8_mode = libc_convert_wcstombs(mode);
+	if unlikely(!utf8_mode)
+		goto err_badalloc_filename;
+	result = libc_freopen_s(pstream, utf8_filename, utf8_mode, stream);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_mode);
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return result;
+err_badalloc_filename:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(utf8_filename);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+err_badalloc:
+#ifdef ENOMEM
+	return __libc_geterrno_or(ENOMEM);
+#else /* ENOMEM */
+	return __libc_geterrno_or(1);
+#endif /* !ENOMEM */
+}
 #include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") char16_t *
 NOTHROW_NCX(LIBDCALL libd__getws_s)(char16_t *buf,
@@ -7298,6 +7503,14 @@ DEFINE_PUBLIC_ALIAS(DOS$_vwscanf_l, libd__vwscanf_l);
 DEFINE_PUBLIC_ALIAS(_vwscanf_l, libc__vwscanf_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wscanf_l, libd__wscanf_l);
 DEFINE_PUBLIC_ALIAS(_wscanf_l, libc__wscanf_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wfsopen, libd__wfsopen);
+DEFINE_PUBLIC_ALIAS(_wfsopen, libc__wfsopen);
+DEFINE_PUBLIC_ALIAS(DOS$_wfdopen, libd__wfdopen);
+DEFINE_PUBLIC_ALIAS(_wfdopen, libc__wfdopen);
+DEFINE_PUBLIC_ALIAS(DOS$_wfopen_s, libd__wfopen_s);
+DEFINE_PUBLIC_ALIAS(_wfopen_s, libc__wfopen_s);
+DEFINE_PUBLIC_ALIAS(DOS$_wfreopen_s, libd__wfreopen_s);
+DEFINE_PUBLIC_ALIAS(_wfreopen_s, libc__wfreopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$_getws_s, libd__getws_s);
 DEFINE_PUBLIC_ALIAS(_getws_s, libc__getws_s);
 DEFINE_PUBLIC_ALIAS(DOS$_putws, libd__putws);

@@ -2141,6 +2141,7 @@
 #define __CRT_HAVE_format_wsprintf_printer
 #define __CRT_HAVE_format_wto16
 #define __CRT_HAVE_format_wto32
+#define __CRT_HAVE_format_wto8
 #define __CRT_HAVE_format_wwidth
 #define __CRT_HAVE_fparseln
 #define __CRT_HAVE_fpathconf
@@ -6971,7 +6972,7 @@
 #define __CRT_HAVE_KOS$format_wsprintf_printer
 #define __CRT_HAVE_KOS$format_wto16
 #define __CRT_HAVE_KOS$format_wto32
-#define __CRT_HAVE_format_wto8
+#define __CRT_HAVE_KOS$format_wto8
 #define __CRT_HAVE_KOS$format_wwidth
 #define __CRT_HAVE_KOS$fparseln
 #define __CRT_HAVE_KOS$fpathconf

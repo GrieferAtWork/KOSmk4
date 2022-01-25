@@ -714,6 +714,7 @@ read_from_buffer:
 		if (bufavail > num_bytes)
 			bufavail = num_bytes;
 		memcpy(buf, self->if_ptr, bufavail);
+
 		/* Update buf pointers. */
 		self->if_cnt -= bufavail;
 		self->if_ptr += bufavail;
@@ -721,6 +722,7 @@ read_from_buffer:
 		num_bytes -= bufavail;
 		if (!num_bytes)
 			goto done_noeof;
+
 		/* Make sure that we only invoke read() on the  underlying
 		 * file once, so-as to ensure that we don't start blocking
 		 * because the underlying file is pipe-like and now empty,
@@ -730,6 +732,7 @@ read_from_buffer:
 			goto done;
 		buf = (byte_t *)buf + bufavail;
 	}
+
 	/* The buf is empty and must be re-filled. */
 	/* First off: Flush any changes that had been made. */
 	COMPILER_BARRIER();
@@ -740,6 +743,7 @@ read_from_buffer:
 	COMPILER_BARRIER();
 	ex->io_chng = self->if_base;
 	ex->io_chsz = 0;
+
 	/* Unlikely: But can happen due to recursive callbacks. */
 	if unlikely(self->if_cnt)
 		goto read_from_buffer;
@@ -805,15 +809,18 @@ read_through:
 	} else if (num_bytes >= self->if_bufsiz) {
 		size_t new_bufsize;
 		uint8_t *new_buffer;
+
 		/* The caller wants at least as much as this buf could even handle.
 		 * Upscale  the  buf, or  use  load data  using  read-through mode. */
 		if (self->if_flag & (IO_NODYNSCALE | IO_READING))
 			goto read_through;
 		if (num_bytes > IOBUF_MAX)
 			goto read_through;
+
 		/* Upscale the buf. */
 		new_bufsize = num_bytes;
 		new_buffer  = file_buffer_realloc_dynscale(self, &new_bufsize, next_data);
+
 		/* If the allocation failed, also use read-through mode. */
 		if unlikely(!new_buffer) {
 			new_bufsize = num_bytes;
@@ -826,6 +833,7 @@ read_through:
 		self->if_flag  |= IO_MALLBUF;
 	} else {
 		size_t new_bufsize;
+
 		/* Make  use  of   the  current  file-offset   to  dynamically  increase   the
 		 * max  buffer  size,  such  that  we  try  to  keep  said  max  buffer   size
 		 * capped around `ftell() / IOBUF_FACTOR' (though still cap it with its limit) */
@@ -906,6 +914,7 @@ file_writedata(FILE *__restrict self, void const *buf, size_t num_bytes) {
 	assert(self);
 	ex = self->if_exdata;
 	assert(ex);
+
 	/* Check to make sure that this file is writable. */
 	if (!(self->if_flag & IO_RW)) {
 		libc_seterrno(EPERM);
@@ -913,8 +922,9 @@ file_writedata(FILE *__restrict self, void const *buf, size_t num_bytes) {
 	}
 	if (self->if_flag & IO_LNIFTYY)
 		file_determine_isatty(self);
-again:
+
 	/* Fill available buf. */
+again:
 	bufavail = (self->if_base + self->if_bufsiz) - self->if_ptr;
 	if likely(bufavail) {
 		if (bufavail > num_bytes)
@@ -923,6 +933,7 @@ again:
 			goto done_noeof;
 		memcpy(self->if_ptr, buf, bufavail);
 		result += bufavail;
+
 		/* Update the changed file-area. */
 		if (!ex->io_chsz) {
 			ex->io_chng = self->if_ptr;
@@ -935,6 +946,7 @@ again:
 			if (ex->io_chng + ex->io_chsz < self->if_ptr + bufavail)
 				ex->io_chsz = (size_t)((self->if_ptr + bufavail) - ex->io_chng);
 		}
+
 		/* If this is a line-buffered file, add it to the chain of changed ones. */
 		if (self->if_flag & IO_LNBUF)
 			changed_linebuffered_insert(self);
@@ -946,6 +958,7 @@ again:
 		else {
 			self->if_cnt = 0;
 		}
+
 		/* When  operating  in line-buffered  mode, check
 		 * if there was a linefeed in what we just wrote. */
 		if ((self->if_flag & IO_LNBUF) &&
@@ -953,6 +966,7 @@ again:
 		     memchr(buf, '\r', num_bytes))) {
 			/* Flush all line-buffered files. */
 			file_sync_lnfiles();
+
 			/* Flush this file. */
 			COMPILER_BARRIER();
 			if ((self->if_flag & IO_ERR) || file_sync(self))
@@ -970,6 +984,7 @@ again:
 			goto done;
 		buf = (byte_t *)buf + bufavail;
 	}
+
 	/* No more buf available.
 	 * Either we must flush the buf, or we must extend it. */
 	if (self->if_bufsiz >= IOBUF_MAX ||
@@ -984,6 +999,7 @@ again:
 		COMPILER_BARRIER();
 		ex->io_chng = self->if_base;
 		ex->io_chsz = 0;
+
 		/* Check for special case: If the buf is fixed to zero-length,
 		 *                         we must act as a write-through buf. */
 		if (!self->if_bufsiz) {
@@ -998,6 +1014,7 @@ do_writethrough:
 			num_bytes -= (size_t)temp;
 			goto done;
 		}
+
 		/* If there  is  no  more  available  buf  to-be  read,
 		 * reset the file pointer and change to the next chunk. */
 		if (!self->if_cnt) {
@@ -1024,12 +1041,14 @@ do_writethrough:
 		ex->io_chsz = 0;
 		goto do_writethrough;
 	}
+
 	/* Install the new buf. */
 	self->if_ptr    = new_buffer + (self->if_ptr - self->if_base);
 	ex->io_chng     = new_buffer + (ex->io_chng - self->if_base);
 	self->if_bufsiz = new_bufsize;
 	self->if_base   = new_buffer;
 	self->if_flag  |= IO_MALLBUF;
+
 	/* Go back and use the new buf. */
 	goto again;
 done:
@@ -1055,6 +1074,7 @@ file_seek(FILE *__restrict self, off64_t off, int whence) {
 		pos64_t old_abspos;
 		pos64_t new_abspos;
 		uint8_t *new_pos;
+
 		/* For these modes, we  can calculate the new  position,
 		 * allowing for in-buffer seek, as well as delayed seek. */
 		old_abspos = ex->io_fblk;
@@ -1077,12 +1097,14 @@ file_seek(FILE *__restrict self, off64_t off, int whence) {
 		if ((new_abspos - old_abspos) >= SIZE_MAX)
 			goto full_seek;
 #endif /* __SIZEOF_POINTER__ < 8 */
+
 		/* Seek-ahead-in-buffer. */
 		new_pos = self->if_base + (size_t)(new_abspos - ex->io_fblk);
 #if __SIZEOF_POINTER__ < 8
 		if (new_pos < self->if_base)
 			goto full_seek;
 #endif /* __SIZEOF_POINTER__ < 8 */
+
 		/* Truncate the read buffer */
 		if (new_pos < self->if_ptr) {
 			/* Seek  below the current pointer (but we don't
@@ -1105,6 +1127,7 @@ full_seek:
 		file_determine_isatty(self);
 	if (self->if_flag & IO_LNBUF)
 		file_sync_lnfiles();
+
 	/* Synchronize the buffer. */
 	COMPILER_BARRIER();
 	if ((self->if_flag & IO_ERR) || file_sync(self))
@@ -1155,6 +1178,7 @@ read_from_buffer:
 	}
 	ex = self->if_exdata;
 	assert(ex);
+
 	/* The buffer is empty and must be re-filled. */
 	/* First off: Flush any changes that had been made. */
 	COMPILER_BARRIER();
@@ -1163,6 +1187,7 @@ read_from_buffer:
 	COMPILER_BARRIER();
 	ex->io_chng = self->if_base;
 	ex->io_chsz = 0;
+
 	/* Unlikely: But can happen due to recursive callbacks. */
 	if unlikely(self->if_cnt)
 		goto read_from_buffer;
@@ -1216,6 +1241,7 @@ read_through:
 			}
 			goto done;
 		}
+
 		/* Start out with the smallest size. */
 		new_bufsize = IOBUF_MIN;
 		new_buffer  = file_buffer_realloc_dynscale(self, &new_bufsize, next_data);
@@ -1284,6 +1310,7 @@ read_through:
 	if unlikely(ex->io_chsz)
 		goto again;
 	ex->io_fpos = next_data + (size_t)read_size;
+
 	/* Check for special case: EOF reached. */
 	if (!read_size) {
 		result = EOF;
@@ -1312,6 +1339,7 @@ file_ungetc(FILE *__restrict self, unsigned char ch) {
 	/* Simple case: unget() the character. */
 	if (self->if_ptr > self->if_base)
 		goto unget_in_buffer;
+
 	/* The buffer is already full. - Try to resize it, then insert at the front. */
 	if (self->if_flag & IO_READING)
 		goto eof;
@@ -1323,10 +1351,12 @@ file_ungetc(FILE *__restrict self, unsigned char ch) {
 	}
 	ex = self->if_exdata;
 	assert(ex);
+
 	/* If the current block cannot be further extended, that's an EOF. */
 	if (!ex->io_fblk)
 		goto eof;
 	inc_size = self->if_bufsiz;
+
 	/* Determine the minimum buffer size. */
 	if unlikely(!inc_size)
 		inc_size = (self->if_flag & IO_NODYNSCALE) ? 1 : IOBUF_MIN;
@@ -1342,6 +1372,7 @@ file_ungetc(FILE *__restrict self, unsigned char ch) {
 			goto err;
 	}
 	assert(new_bufsize > self->if_bufsiz);
+
 	/* Install the new buffer. */
 	self->if_ptr = new_buffer + (self->if_ptr - self->if_base) + inc_size;
 	if (ex->io_chsz)
@@ -1351,6 +1382,7 @@ file_ungetc(FILE *__restrict self, unsigned char ch) {
 	self->if_bufsiz = new_bufsize;
 	self->if_flag  |= IO_MALLBUF;
 	assert(self->if_ptr > self->if_base);
+
 	/* Finally, insert the character into the buffer. */
 unget_in_buffer:
 	*--self->if_ptr = (uint8_t)(unsigned char)(unsigned int)ch;
@@ -1371,6 +1403,7 @@ file_truncate(FILE *__restrict self, pos64_t new_size) {
 	pos64_t abs_pos, abs_end;
 	struct iofile_data *ex;
 	assert(self);
+
 	/* Synchronize the buffer. */
 	if unlikely(file_sync(self))
 		goto err0;
@@ -1387,6 +1420,7 @@ file_truncate(FILE *__restrict self, pos64_t new_size) {
 		/* Truncate the current buffer. */
 		self->if_cnt = (size_t)(new_size - abs_pos);
 	}
+
 	/* With  data flushed and the loaded buffer
 	 * truncated, truncate the underlying file. */
 	COMPILER_BARRIER();
@@ -1515,6 +1549,7 @@ file_evalmodes(char const *modes, oflag_t *poflags) {
 					goto found_option;
 				}
 			}
+
 			/* Check for an STD-C conforming open mode. */
 			if (!optlen)
 				goto err_invalid_oflags;
@@ -1592,6 +1627,7 @@ file_openfd(/*inherit(on_success)*/ fd_t fd, uint32_t flags) {
 	assert(ex->io_zero == 0);
 	ex->io_refcnt   = 1;
 	result->if_flag = flags;
+
 	/* Insert the new file stream into the global list of them. */
 	allfiles_insert(result);
 done:
@@ -1673,6 +1709,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
 {
 	/* All all streams opened by the user. */
 	file_syncall_unlocked();
+
 	/* Flush the active STD streams. */
 	file_sync(file_fromuser(stdin));
 	file_sync(file_fromuser(stdout));

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cd64b8a */
+/* HASH CRC-32:0x75bbabcf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -847,7 +847,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_pack, __FORCELOCAL __ATTR_ARTIFIC
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,format_aprintf_alloc,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars),(__self,__num_chars))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/format-printer/format_aprintf_alloc.h>
@@ -856,19 +856,23 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL format_aprintf_alloc)(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_alloc))(__self, __num_chars); })
 #endif /* ... */
 #ifdef __CRT_HAVE_format_aprintf_printer
 /* >> format_aprintf_printer(3)
  * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
- * This function is intended to be used as a pformatprinter-compatible printer sink */
+ * This function is intended to be used as a pformatprinter-compatible printer sink
+ * @return: datalen: Success.
+ * @return: -1: [errno=ENOMEM] Insufficient memory. */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_aprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_aprintf_printer");
 #elif defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/format-printer/format_aprintf_printer.h>
 /* >> format_aprintf_printer(3)
  * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
- * This function is intended to be used as a pformatprinter-compatible printer sink */
+ * This function is intended to be used as a pformatprinter-compatible printer sink
+ * @return: datalen: Success.
+ * @return: -1: [errno=ENOMEM] Insufficient memory. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_aprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))(__arg, __data, __datalen); })
 #endif /* ... */
 

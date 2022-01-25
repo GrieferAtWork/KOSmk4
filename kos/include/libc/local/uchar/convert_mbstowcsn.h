@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ac43b1f */
+/* HASH CRC-32:0x4fbc2523 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,10 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_waprintf_printer_defined
 #define __local___localdep_format_waprintf_printer_defined
 #ifdef __CRT_HAVE_format_waprintf_printer
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_waprintf_printer,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wformat-printer.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__WFORMATPRINTER_CC,__localdep_format_waprintf_printer,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_waprintf_printer.h>

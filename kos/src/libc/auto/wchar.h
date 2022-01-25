@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dc58cd3 */
+/* HASH CRC-32:0x11bab9a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -801,6 +801,14 @@ INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vwscanf_l)(cha
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBKCALL libc__vwscanf_l)(char32_t const *format, locale_t locale, va_list args) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__wscanf_l)(char16_t const *format, locale_t locale, ...) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBKCALL libc__wscanf_l)(char32_t const *format, locale_t locale, ...) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename, char16_t const *mode, __STDC_INT_AS_UINT_T sh_flag);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc__wfsopen)(char32_t const *filename, char32_t const *mode, __STDC_INT_AS_UINT_T sh_flag);
+INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd, char16_t const *mode);
+INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBKCALL libc__wfdopen)(fd_t fd, char32_t const *mode);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream, char16_t const *filename, char16_t const *mode);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBKCALL libc__wfopen_s)(FILE **pstream, char32_t const *filename, char32_t const *mode);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream, char16_t const *filename, char16_t const *mode, FILE *stream);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBKCALL libc__wfreopen_s)(FILE **pstream, char32_t const *filename, char32_t const *mode, FILE *stream);
 INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__getws_s)(char16_t *buf, size_t buflen);
 INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__getws_s)(char32_t *buf, size_t buflen);
 INTDEF NONNULL((1)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd__putws)(char16_t const *str);

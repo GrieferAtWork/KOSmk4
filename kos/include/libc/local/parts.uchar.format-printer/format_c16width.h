@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac41a568 */
+/* HASH CRC-32:0xfc9e8aff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,11 @@
 #ifndef __local_format_c16width_defined
 #define __local_format_c16width_defined
 #include <__crt.h>
+#include <bits/crt/uformat-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_c16width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16width))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__C16FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_c16width))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 
 	__SIZE_TYPE__ __result = 0;
 	__CHAR16_TYPE__ const *__iter, *__end;

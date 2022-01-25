@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x706b761e */
+/* HASH CRC-32:0xa99714dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1185,7 +1185,7 @@ struct format_aprintf_data {
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
+ * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self,
                                                 size_t num_chars) {
@@ -1218,7 +1218,9 @@ err:
 }
 /* >> format_aprintf_printer(3)
  * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
- * This function is intended to be used as a pformatprinter-compatible printer sink */
+ * This function is intended to be used as a pformatprinter-compatible printer sink
+ * @return: datalen: Success.
+ * @return: -1: [errno=ENOMEM] Insufficient memory. */
 INTERN ATTR_SECTION(".text.crt.string.format") WUNUSED NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg,
                                                             char const *__restrict data,

@@ -199,6 +199,7 @@ format_wprintf(*) %{printf("format_vwprintf")}
 @@Format-printer implementation for printing to a string buffer like `wsprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 [[wchar]]
+[[decl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>"), cc(__WFORMATPRINTER_CC)]]
 $ssize_t format_wsprintf_printer([[nonnull]] /*wchar_t ***/ void *arg,
                                  [[nonnull]] wchar_t const *__restrict data,
                                  $size_t datalen)
@@ -230,6 +231,7 @@ struct format_wsnprintf_data {
 @@NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
 @@      alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)'
 [[wchar]]
+[[decl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>"), cc(__WFORMATPRINTER_CC)]]
 $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ void *arg,
                                   [[nonnull]] wchar_t const *__restrict data,
                                   $size_t datalen)
@@ -239,6 +241,7 @@ $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ 
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_alias("format_length")]]
 /* Don't export in KOS-mode (in that mode, we're an alias for `libc_format_length') */
 [[crt_kos_impl_if(0), crt_dos_impl_if(!defined(__KERNEL__))]]
+[[decl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>"), cc(__WFORMATPRINTER_CC)]]
 $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	size_t result = 0;
@@ -402,10 +405,9 @@ wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restric
 @@The returned pointer remains valid until the next time this function is called,
 @@the format_aprintf buffer `self' is finalized,  or some other function is  used
 @@to append additional data to the end of `self'
-@@@return: NULL: Failed to allocate additional memory
+@@@return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM')
 [[wchar, wunused, impl_include("<hybrid/__assert.h>")]]
-[[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]]
-[[requires_function(realloc)]]
+[[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA), requires_function(realloc)]]
 format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
                        $size_t num_wchars) -> [[malloc /*(num_wchars * sizeof(wchar_t))*/]] wchar_t * {
 	wchar_t *result;
@@ -437,8 +439,12 @@ err:
 }
 
 @@>> format_waprintf_printer(3)
-@@Print data to a dynamically allocated heap buffer. On error, `-1' is returned
-[[wchar, wunused, requires_function(format_waprintf_alloc)]]
+@@Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
+@@This function is intended to be used as a pwformatprinter-compatible printer sink
+@@@return: datalen: Success.
+@@@return: -1: [errno=ENOMEM] Insufficient memory.
+[[wchar, wunused, requires_function(format_waprintf_alloc), cc(__WFORMATPRINTER_CC)]]
+[[decl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_waprintf_printer([[nonnull]] /*struct format_waprintf_data **/ void *arg,
                                  [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
 	wchar_t *buf;

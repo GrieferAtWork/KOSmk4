@@ -827,140 +827,6 @@ NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
 }
 /*[[[end:libd___wcserror_s]]]*/
 
-
-
-
-
-
-
-/*[[[head:libc__wfsopen,hash:CRC-32=0xc201095f]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
-NOTHROW_NCX(LIBKCALL libc__wfsopen)(char32_t const *filename,
-                                    char32_t const *mode,
-                                    __STDC_INT_AS_UINT_T sh_flag)
-/*[[[body:libc__wfsopen]]]*/
-/*AUTO*/{
-	(void)filename;
-	(void)mode;
-	(void)sh_flag;
-	CRT_UNIMPLEMENTEDF("_wfsopen(%p, %p, %x)", filename, mode, sh_flag); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__wfsopen]]]*/
-
-/*[[[head:libd__wfsopen,hash:CRC-32=0xd879952b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
-NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename,
-                                    char16_t const *mode,
-                                    __STDC_INT_AS_UINT_T sh_flag)
-/*[[[body:libd__wfsopen]]]*/
-/*AUTO*/{
-	(void)filename;
-	(void)mode;
-	(void)sh_flag;
-	CRT_UNIMPLEMENTEDF("DOS$_wfsopen(%p, %p, %x)", filename, mode, sh_flag); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd__wfsopen]]]*/
-
-/*[[[head:libc__wfdopen,hash:CRC-32=0x4ccfddcb]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((2)) FILE *
-NOTHROW_NCX(LIBKCALL libc__wfdopen)(fd_t fd,
-                                    char32_t const *mode)
-/*[[[body:libc__wfdopen]]]*/
-/*AUTO*/{
-	(void)fd;
-	(void)mode;
-	CRT_UNIMPLEMENTEDF("_wfdopen(%" PRIxN(__SIZEOF_FD_T__) ", %p)", fd, mode); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__wfdopen]]]*/
-
-/*[[[head:libd__wfdopen,hash:CRC-32=0xbd1e6774]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((2)) FILE *
-NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
-                                    char16_t const *mode)
-/*[[[body:libd__wfdopen]]]*/
-/*AUTO*/{
-	(void)fd;
-	(void)mode;
-	CRT_UNIMPLEMENTEDF("DOS$_wfdopen(%" PRIxN(__SIZEOF_FD_T__) ", %p)", fd, mode); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd__wfdopen]]]*/
-
-
-
-
-
-/*[[[head:libc__wfopen_s,hash:CRC-32=0xfd293a6d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
-NOTHROW_NCX(LIBKCALL libc__wfopen_s)(FILE **pstream,
-                                     char32_t const *filename,
-                                     char32_t const *mode)
-/*[[[body:libc__wfopen_s]]]*/
-/*AUTO*/{
-	(void)pstream;
-	(void)filename;
-	(void)mode;
-	CRT_UNIMPLEMENTEDF("_wfopen_s(%p, %p, %p)", pstream, filename, mode); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libc__wfopen_s]]]*/
-
-/*[[[head:libd__wfopen_s,hash:CRC-32=0xe928135b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
-NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream,
-                                     char16_t const *filename,
-                                     char16_t const *mode)
-/*[[[body:libd__wfopen_s]]]*/
-/*AUTO*/{
-	(void)pstream;
-	(void)filename;
-	(void)mode;
-	CRT_UNIMPLEMENTEDF("DOS$_wfopen_s(%p, %p, %p)", pstream, filename, mode); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libd__wfopen_s]]]*/
-
-/*[[[head:libc__wfreopen_s,hash:CRC-32=0x8d8f311b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
-NOTHROW_NCX(LIBKCALL libc__wfreopen_s)(FILE **pstream,
-                                       char32_t const *filename,
-                                       char32_t const *mode,
-                                       FILE *stream)
-/*[[[body:libc__wfreopen_s]]]*/
-/*AUTO*/{
-	(void)pstream;
-	(void)filename;
-	(void)mode;
-	(void)stream;
-	CRT_UNIMPLEMENTEDF("_wfreopen_s(%p, %p, %p, %p)", pstream, filename, mode, stream); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libc__wfreopen_s]]]*/
-
-/*[[[head:libd__wfreopen_s,hash:CRC-32=0xbde1c414]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
-NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream,
-                                       char16_t const *filename,
-                                       char16_t const *mode,
-                                       FILE *stream)
-/*[[[body:libd__wfreopen_s]]]*/
-/*AUTO*/{
-	(void)pstream;
-	(void)filename;
-	(void)mode;
-	(void)stream;
-	CRT_UNIMPLEMENTEDF("DOS$_wfreopen_s(%p, %p, %p, %p)", pstream, filename, mode, stream); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libd__wfreopen_s]]]*/
-
 /*[[[head:libc__wtempnam,hash:CRC-32=0xdf74d60d]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") WUNUSED char32_t *
 NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory,
@@ -988,10 +854,6 @@ NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
 	return NULL;
 }
 /*[[[end:libd__wtempnam]]]*/
-
-
-
-
 
 /*[[[head:libc__wtmpnam_s,hash:CRC-32=0xf4219000]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
@@ -1023,7 +885,7 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbdbcfd2f]]]*/
+/*[[[start:exports,hash:CRC-32=0xa8919cb9]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
@@ -1067,14 +929,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__wcserror, libd___wcserror);
 DEFINE_PUBLIC_ALIAS(__wcserror, libc___wcserror);
 DEFINE_PUBLIC_ALIAS(DOS$__wcserror_s, libd___wcserror_s);
 DEFINE_PUBLIC_ALIAS(__wcserror_s, libc___wcserror_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wfsopen, libd__wfsopen);
-DEFINE_PUBLIC_ALIAS(_wfsopen, libc__wfsopen);
-DEFINE_PUBLIC_ALIAS(DOS$_wfdopen, libd__wfdopen);
-DEFINE_PUBLIC_ALIAS(_wfdopen, libc__wfdopen);
-DEFINE_PUBLIC_ALIAS(DOS$_wfopen_s, libd__wfopen_s);
-DEFINE_PUBLIC_ALIAS(_wfopen_s, libc__wfopen_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wfreopen_s, libd__wfreopen_s);
-DEFINE_PUBLIC_ALIAS(_wfreopen_s, libc__wfreopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wtempnam, libd__wtempnam);
 DEFINE_PUBLIC_ALIAS(_wtempnam, libc__wtempnam);
 DEFINE_PUBLIC_ALIAS(DOS$_wtmpnam_s, libd__wtmpnam_s);

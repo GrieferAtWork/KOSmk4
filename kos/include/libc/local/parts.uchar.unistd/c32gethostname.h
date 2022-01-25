@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85a45838 */
+/* HASH CRC-32:0x30e0c975 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,15 +44,19 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_format_8to32_defined */
 #ifndef __local___localdep_format_c32snprintf_printer_defined
 #define __local___localdep_format_c32snprintf_printer_defined
-#if defined(__CRT_HAVE_format_wsnprintf_printer) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32snprintf_printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_KOS$format_wsnprintf_printer)
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32snprintf_printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
+#if defined(__CRT_HAVE_format_wsnprintf_printer) && __SIZEOF_WCHAR_T__ == 4 && defined(__C32FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/uformat-printer.h>
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,__localdep_format_c32snprintf_printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
+#include <bits/crt/uformat-printer.h>
+#include <hybrid/typecore.h>
 #include <libc/local/parts.wchar.format-printer/format_wsnprintf_printer.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_c32snprintf_printer __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__LIBKCALL*)(void *,__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SSIZE_TYPE__(__LIBKCALL&)(void *,__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),format_wsnprintf_printer)
+#define __localdep_format_c32snprintf_printer __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__C32FORMATPRINTER_CC*)(void *,__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SSIZE_TYPE__(__C32FORMATPRINTER_CC&)(void *,__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),format_wsnprintf_printer)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.format-printer/format_c32snprintf_printer.h>

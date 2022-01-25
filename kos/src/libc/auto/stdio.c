@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bc216d7 */
+/* HASH CRC-32:0x9602d897 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -257,7 +257,7 @@ __LOCAL_LIBC(vfscanf_getc) ssize_t
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc) ssize_t
 (__FORMATPRINTER_CC vfscanf_ungetc)(void *arg, char32_t ch) {
-	return ungetc((int)(unsigned int)ch, (FILE *)arg);
+	return libc_ungetc((int)(unsigned int)ch, (FILE *)arg);
 }
 __NAMESPACE_LOCAL_END
 /* >> fscanf(3), vfscanf(3)
@@ -1443,7 +1443,7 @@ __LOCAL_LIBC(vfscanf_getc_unlocked) ssize_t
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc_unlocked) ssize_t
 (__FORMATPRINTER_CC vfscanf_ungetc_unlocked)(void *arg, char32_t ch) {
-	return ungetc_unlocked((int)(unsigned int)ch, (FILE *)arg);
+	return libc_ungetc_unlocked((int)(unsigned int)ch, (FILE *)arg);
 }
 __NAMESPACE_LOCAL_END
 /* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
