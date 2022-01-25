@@ -5550,13 +5550,25 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 onexit_t onexit(onexit_t func);
 
 
-%#ifndef _WSTDLIB_DEFINED
-%#define _WSTDLIB_DEFINED
+
+
+/************************************************************************/
+/* The following functions are exposed in <corecrt_wstdlib.h>, but for  */
+/* the sake of making their impl in user/stdlib.c easier, we define     */
+/* them here, such that they can be defined alongside the other environ */
+/* functions.                                                           */
+/************************************************************************/
+%[push_default]
+%[default:ignore]
+
+%[define_str2wcs_replacement(getenv       = _wgetenv)]
+%[define_str2wcs_replacement(_putenv      = _wputenv)]
+%[define_str2wcs_replacement(_putenv_s    = _wputenv_s)]
+%[define_str2wcs_replacement(_searchenv_s = _wsearchenv_s)]
 
 [[guard, wchar, wunused]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
 wchar_t *_wgetenv([[nonnull]] wchar_t const *varname);
-%[define_str2wcs_replacement(getenv = _wgetenv)]
 
 //[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
 //_wgetenv(*) %{generate(str2wcs("getenv"))}
@@ -5566,177 +5578,6 @@ _wgetenv_s(*) %{generate(str2wcs("getenv_s"))}
 
 [[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
 _wdupenv_s(*) %{generate(str2wcs("_dupenv_s"))}
-
-%[insert:function(_wsystem = wsystem, guardName: "_CRT_WSYSTEM_DEFINED")]
-
-%[insert:extern(wcstol)]
-%[insert:extern(wcstoll)]
-%[insert:extern(wcstoul)]
-%[insert:extern(wcstoull)]
-%[insert:guarded_function(_wcstol_l = wcstol_l)]
-%[insert:guarded_function(_wcstoul_l = wcstoul_l)]
-
-%#ifndef __NO_FPU
-%[insert:extern(wcstof)]
-%[insert:extern(wcstod)]
-%[insert:guarded_function(_wcstof_l = wcstof_l)]
-%[insert:guarded_function(_wcstod_l = wcstod_l)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:extern(wcstold)]
-%[insert:guarded_function(_wcstold_l = wcstold_l)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-
-[[guard, wchar, pure, wunused]]
-[[section(".text.crt.dos.wchar.unicode.static.convert")]]
-double _wtof([[nonnull]] wchar_t const *nptr) {
-	return wcstod(nptr, NULL);
-}
-
-[[guard, wchar, pure, wunused]]
-[[section(".text.crt.dos.wchar.unicode.static.convert")]]
-double _wtof_l([[nonnull]] wchar_t const *nptr,
-               [[nullable]] $locale_t locale) {
-	return wcstod_l(nptr, NULL, locale);
-}
-%#endif /* !__NO_FPU */
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_itow(*) %{generate(str2wcs("itoa"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_ltow(*) %{generate(str2wcs("ltoa"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_ultow(*) %{generate(str2wcs("ultoa"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_i64tow(*) %{generate(str2wcs("_i64toa"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_ui64tow(*) %{generate(str2wcs("_ui64toa"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_itow_s(*) %{generate(str2wcs("_itoa_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_ltow_s(*) %{generate(str2wcs("_ltoa_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_ultow_s(*) %{generate(str2wcs("_ultoa_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_i64tow_s(*) %{generate(str2wcs("_i64toa_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-_ui64tow_s(*) %{generate(str2wcs("_ui64toa_s"))}
-
-%[insert:guarded_function(_wtoi = wtoi)]
-%[insert:guarded_function(_wtol = wtol)]
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.convert")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       alias("_wtoi")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias("_wtol")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_wtoll")]]
-_wtoi64(*) %{generate(str2wcs("_atoi64"))}
-
-%[insert:guarded_function(_wcstoi64  = wcsto64)]
-%[insert:guarded_function(_wcstoui64 = wcstou64)]
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.locale.convert")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),      alias("_wtol_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("_wtoll_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),                    alias("_wtoi64_l")]]
-_wtoi_l(*) %{generate(str2wcs("_atoi_l"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.locale.convert")]]
-[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, _wtoi_l)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("_wtoll_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                    alias("_wtoi64_l")]]
-_wtol_l(*) %{generate(str2wcs("_atol_l"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.locale.convert")]]
-[[alt_variant_of(__SIZEOF_INT__ == 8, _wtoi_l)]]
-[[alt_variant_of(__SIZEOF_LONG__ == 8, _wtol_l)]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, _wtoll_l)]]
-_wtoi64_l(*) %{generate(str2wcs("_atoi64_l"))}
-
-%[insert:guarded_function(_wcstoi64_l  = wcsto64_l)]
-%[insert:guarded_function(_wcstoui64_l = wcstou64_l)]
-
-
-%#ifdef __LONGLONG
-%[insert:guarded_function(_wcstoll_l  = wcstoll_l)]
-%[insert:guarded_function(_wcstoull_l = wcstoull_l)]
-%[insert:guarded_function(_wtoll      = wtoll)]
-
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.locale.convert")]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, _wtoi_l)]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, _wtol_l)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_wtoi64_l")]]
-_wtoll_l(*) %{generate(str2wcs("_atoll_l"))}
-%#endif /* __LONGLONG */
-
-%#endif /* !_WSTDLIB_DEFINED */
-
-
-%#ifndef _WSTDLIBP_DEFINED
-%#define _WSTDLIBP_DEFINED 1
-
-[[guard, wchar, section(".text.crt.dos.wchar.fs.utility")]]
-[[requires_include("<asm/os/fcntl.h>")]]
-[[requires(defined(__AT_FDCWD) && $has_function(_fullpath, convert_wcstombs, convert_mbstowcs))]]
-[[impl_include("<libc/errno.h>", "<asm/os/fcntl.h>")]]
-wchar_t *_wfullpath(wchar_t *buf, wchar_t const *path, $size_t buflen) {
-	size_t reqlen;
-	char *utf8_path, *utf8_realpath;
-	wchar_t *wcs_realpath;
-	utf8_path = convert_wcstombs(path);
-	if unlikely(!utf8_path)
-		return NULL;
-	utf8_realpath = _fullpath(NULL, utf8_path, 0);
-@@pp_if $has_function(free)@@
-	free(utf8_path);
-@@pp_endif@@
-	if unlikely(!utf8_realpath)
-		return NULL;
-	wcs_realpath = convert_mbstowcs(utf8_realpath);
-@@pp_if $has_function(free)@@
-	free(utf8_realpath);
-@@pp_endif@@
-	if unlikely(!wcs_realpath)
-		return NULL;
-	if (!buf)
-		return wcs_realpath;
-	reqlen = wcslen(wcs_realpath) + 1;
-	if (reqlen > buflen) {
-@@pp_if $has_function(free)@@
-		free(wcs_realpath);
-@@pp_endif@@
-@@pp_ifdef ERANGE@@
-		libc_seterrno(ERANGE);
-@@pp_else@@
-		libc_seterrno(1);
-@@pp_endif@@
-		return NULL;
-	}
-	wmemcpy(buf, wcs_realpath, reqlen);
-@@pp_if $has_function(free)@@
-	free(wcs_realpath);
-@@pp_endif@@
-	return buf;
-}
-
-[[guard, wchar, section(".text.crt.dos.wchar.fs.utility")]]
-_wmakepath_s(*) %{generate(str2wcs("_makepath_s"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.fs.utility")]]
-_wmakepath(*) %{generate(str2wcs("_makepath"))}
-
-%[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
-
-%[define_str2wcs_replacement(_putenv      = _wputenv)]
-%[define_str2wcs_replacement(_putenv_s    = _wputenv_s)]
-%[define_str2wcs_replacement(_searchenv_s = _wsearchenv_s)]
 
 [[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
 int _wputenv([[nonnull]] wchar_t *string);
@@ -5752,17 +5593,9 @@ errno_t _wsearchenv_s([[nonnull]] wchar_t const *file,
                       [[nonnull]] wchar_t *__restrict resultpath,
                       $size_t buflen);
 
-[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
-_wsearchenv(*) %{generate(str2wcs("_searchenv"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
-_wsplitpath(*) %{generate(str2wcs("_splitpath"))}
-
-[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
-_wsplitpath_s(*) %{generate(str2wcs("_splitpath_s"))}
-
-%#endif /* !_WSTDLIBP_DEFINED */
-
+%[pop_default]
+/************************************************************************/
+/************************************************************************/
 
 
 %{
@@ -5770,9 +5603,11 @@ _wsplitpath_s(*) %{generate(str2wcs("_splitpath_s"))}
 #endif /* __CC__ */
 #endif /* __USE_DOS */
 
-
-
 __SYSDECL_END
+
+#ifdef __USE_DOS
+#include <corecrt_wstdlib.h>
+#endif /* __USE_DOS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STDLIB_H)

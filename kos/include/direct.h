@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ff6ad69 */
+/* HASH CRC-32:0x1aed75f9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,8 +100,24 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
 #endif /* __AT_FDCWD && __AT_REMOVEDIR && __CRT_HAVE_unlinkat */
 #endif /* !... */
 #define _getdcwd_nolock _getdcwd
-__CDECLARE_OPT(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),(__drive,__buf,__size))
-__CDECLARE_OPT(,int,__NOTHROW_RPC,_chdrive,(int __drive),(__drive))
+#ifdef __CRT_HAVE__getdcwd
+__CDECLARE(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),(__drive,__buf,__size))
+#else /* __CRT_HAVE__getdcwd */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD)
+#include <libc/local/direct/_getdcwd.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_RPC(__LIBCCALL _getdcwd)(int __drive, char *__buf, size_t __size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd))(__drive, __buf, __size); })
+#endif /* __CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD */
+#endif /* !__CRT_HAVE__getdcwd */
+#ifdef __CRT_HAVE__chdrive
+__CDECLARE(,int,__NOTHROW_RPC,_chdrive,(int __drive),(__drive))
+#else /* __CRT_HAVE__chdrive */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_fchdir) || defined(__CRT_HAVE___fchdir) || defined(__CRT_HAVE___libc_fchdir)) && defined(__AT_FDDRIVE_ROOT)
+#include <libc/local/direct/_chdrive.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_chdrive, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL _chdrive)(int __drive) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_chdrive))(__drive); })
+#endif /* (__CRT_HAVE_fchdir || __CRT_HAVE___fchdir || __CRT_HAVE___libc_fchdir) && __AT_FDDRIVE_ROOT */
+#endif /* !__CRT_HAVE__chdrive */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,_getdrive,(void),())
 __CDECLARE_OPT(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
 

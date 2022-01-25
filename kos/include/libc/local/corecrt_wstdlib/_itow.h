@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f51f3eb */
+/* HASH CRC-32:0x2a2a3517 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,26 +18,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_wreadlinkat_defined
-#define __local_wreadlinkat_defined
+#ifndef __local__itow_defined
+#define __local__itow_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_wfreadlinkat
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep__itow_s_defined
+#define __local___localdep__itow_s_defined
+#ifdef __CRT_HAVE__itow_s
+__NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_wfreadlinkat_defined
-#define __local___localdep_wfreadlinkat_defined
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_wfreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__path, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __atflag_t __flags),wfreadlinkat,(__dfd,__path,__buf,__buflen,__flags))
-#endif /* !__local___localdep_wfreadlinkat_defined */
-__LOCAL_LIBC(wreadlinkat) __ATTR_NONNULL((2, 3)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wreadlinkat))(__fd_t __dfd, __WCHAR_TYPE__ const *__path, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_wfreadlinkat)(__dfd, __path, __buf, __buflen, 0);
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
+#else /* __CRT_HAVE__itow_s */
+__NAMESPACE_LOCAL_END
+#include <libc/local/corecrt_wstdlib/_itow_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__itow_s __LIBC_LOCAL_NAME(_itow_s)
+#endif /* !__CRT_HAVE__itow_s */
+#endif /* !__local___localdep__itow_s_defined */
+__LOCAL_LIBC(_itow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow))(int __val, __WCHAR_TYPE__ *__buf, int __radix) {
+	(__NAMESPACE_LOCAL_SYM __localdep__itow_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
+	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_wreadlinkat_defined
-#define __local___localdep_wreadlinkat_defined
-#define __localdep_wreadlinkat __LIBC_LOCAL_NAME(wreadlinkat)
-#endif /* !__local___localdep_wreadlinkat_defined */
-#else /* __CRT_HAVE_wfreadlinkat */
-#undef __local_wreadlinkat_defined
-#endif /* !__CRT_HAVE_wfreadlinkat */
-#endif /* !__local_wreadlinkat_defined */
+#ifndef __local___localdep__itow_defined
+#define __local___localdep__itow_defined
+#define __localdep__itow __LIBC_LOCAL_NAME(_itow)
+#endif /* !__local___localdep__itow_defined */
+#endif /* !__local__itow_defined */

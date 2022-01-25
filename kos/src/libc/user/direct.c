@@ -34,36 +34,6 @@
 
 DECL_BEGIN
 
-/*[[[head:libc__getdcwd,hash:CRC-32=0x887f4d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") char *
-NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
-                                    char *buf,
-                                    size_t size)
-/*[[[body:libc__getdcwd]]]*/
-{
-	if unlikely(drive < AT_DOS_DRIVEMIN || drive > AT_DOS_DRIVEMAX) {
-		libc_seterrno(EINVAL);
-		return NULL;
-	}
-	return frealpath4(AT_FDDRIVE_CWD(drive),
-	                  buf,
-	                  size,
-	                  0);
-}
-/*[[[end:libc__getdcwd]]]*/
-
-/*[[[head:libc__chdrive,hash:CRC-32=0xb48bbfa2]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") int
-NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive)
-/*[[[body:libc__chdrive]]]*/
-{
-	drive = toupper((unsigned char)drive);
-	if unlikely(drive < AT_DOS_DRIVEMIN || drive > AT_DOS_DRIVEMAX)
-		return libc_seterrno(EINVAL);
-	return fchdir(AT_FDDRIVE_ROOT(drive));
-}
-/*[[[end:libc__chdrive]]]*/
-
 /*[[[head:libc__getdrive,hash:CRC-32=0xa2abfff3]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.property") int
 NOTHROW_RPC(LIBCCALL libc__getdrive)(void)
@@ -118,9 +88,7 @@ NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x842fe167]]]*/
-DEFINE_PUBLIC_ALIAS(_getdcwd, libc__getdcwd);
-DEFINE_PUBLIC_ALIAS(_chdrive, libc__chdrive);
+/*[[[start:exports,hash:CRC-32=0x1671125]]]*/
 DEFINE_PUBLIC_ALIAS(_getdrive, libc__getdrive);
 DEFINE_PUBLIC_ALIAS(_getdrives, libc__getdrives);
 DEFINE_PUBLIC_ALIAS(_getdiskfree, libc__getdiskfree);

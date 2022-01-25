@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76a2c974 */
+/* HASH CRC-32:0xfe82c89e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,32 +18,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__ui64tow_defined
-#define __local__ui64tow_defined
+#ifndef __local__getdcwd_defined
+#define __local__getdcwd_defined
 #include <__crt.h>
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__ui64tow_s_defined
-#define __local___localdep__ui64tow_s_defined
-#ifdef __CRT_HAVE__ui64tow_s
+#ifndef __local___localdep_frealpath4_defined
+#define __local___localdep_frealpath4_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64tow_s,(__UINT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64tow_s,(__val,__buf,__buflen,__radix))
-#else /* __CRT_HAVE__ui64tow_s */
+__CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
+#endif /* !__local___localdep_frealpath4_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/_ui64tow_s.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep__ui64tow_s __LIBC_LOCAL_NAME(_ui64tow_s)
-#endif /* !__CRT_HAVE__ui64tow_s */
-#endif /* !__local___localdep__ui64tow_s_defined */
-__LOCAL_LIBC(_ui64tow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64tow))(__UINT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, int __radix) {
-	(__NAMESPACE_LOCAL_SYM __localdep__ui64tow_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
-	return __buf;
+__LOCAL_LIBC(_getdcwd) char *
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_getdcwd))(int __drive, char *__buf, __SIZE_TYPE__ __size) {
+	if __unlikely(__drive < __AT_DOS_DRIVEMIN || __drive > __AT_DOS_DRIVEMAX) {
+#ifdef __EINVAL
+		__libc_seterrno(__EINVAL);
+#else /* __EINVAL */
+		__libc_seterrno(1);
+#endif /* !__EINVAL */
+		return __NULLPTR;
+	}
+	return (__NAMESPACE_LOCAL_SYM __localdep_frealpath4)(__AT_FDDRIVE_CWD(__drive), __buf, __size, 0);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__ui64tow_defined
-#define __local___localdep__ui64tow_defined
-#define __localdep__ui64tow __LIBC_LOCAL_NAME(_ui64tow)
-#endif /* !__local___localdep__ui64tow_defined */
-#endif /* !__local__ui64tow_defined */
+#ifndef __local___localdep__getdcwd_defined
+#define __local___localdep__getdcwd_defined
+#define __localdep__getdcwd __LIBC_LOCAL_NAME(_getdcwd)
+#endif /* !__local___localdep__getdcwd_defined */
+#else /* __CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD */
+#undef __local__getdcwd_defined
+#endif /* !__CRT_HAVE_frealpath4 || !__AT_FDDRIVE_CWD */
+#endif /* !__local__getdcwd_defined */

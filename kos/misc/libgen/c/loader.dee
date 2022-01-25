@@ -1957,6 +1957,7 @@ do_push_macroList:
 		if (pushedDefaultFeatures is none)
 			pushedDefaultFeatures = [];
 		pushedDefaultFeatures.pushback(copy defaultFeatures);
+		self.next();
 	}
 
 	public function parseDirective_popdefault() {
@@ -1966,6 +1967,7 @@ do_push_macroList:
 		if (!pushedDefaultFeatures)
 			self.err("%[popdefault] without %[pushdefault]");
 		defaultFeatures = pushedDefaultFeatures.popback();
+		self.next();
 	}
 
 	public function parseDirective_default() {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31efe6b4 */
+/* HASH CRC-32:0x594e60f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -238,7 +238,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_isctype, libd__isctype);
 DEFINE_PUBLIC_ALIAS(DOS$_isctype_l, libd__isctype_l);
 
 /* direct */
-DEFINE_PUBLIC_ALIAS(DOS$_getdcwd, libd__getdcwd);
 DEFINE_PUBLIC_ALIAS(DOS$_chdrive, libd__chdrive);
 DEFINE_PUBLIC_ALIAS(DOS$_getdiskfree, libd__getdiskfree);
 DEFINE_PUBLIC_ALIAS(DOS$_mkdir, libd__mkdir);

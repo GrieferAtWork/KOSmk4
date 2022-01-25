@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x200dff2b */
+/* HASH CRC-32:0x493dd3dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,39 +18,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_wreadlink_defined
-#define __local_wreadlink_defined
+#ifndef __local__ui64tow_defined
+#define __local__ui64tow_defined
 #include <__crt.h>
-#include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wreadlinkat) || defined(__CRT_HAVE_wfreadlinkat))
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_wreadlinkat_defined
-#define __local___localdep_wreadlinkat_defined
-#ifdef __CRT_HAVE_wreadlinkat
+#ifndef __local___localdep__ui64tow_s_defined
+#define __local___localdep__ui64tow_s_defined
+#ifdef __CRT_HAVE__ui64tow_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__path, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
-#elif defined(__CRT_HAVE_wfreadlinkat)
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64tow_s,(__UINT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64tow_s,(__val,__buf,__buflen,__radix))
+#else /* __CRT_HAVE__ui64tow_s */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.wchar.unistd/wreadlinkat.h>
+#include <libc/local/corecrt_wstdlib/_ui64tow_s.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wreadlinkat __LIBC_LOCAL_NAME(wreadlinkat)
-#else /* ... */
-#undef __local___localdep_wreadlinkat_defined
-#endif /* !... */
-#endif /* !__local___localdep_wreadlinkat_defined */
-__LOCAL_LIBC(wreadlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wreadlink))(__WCHAR_TYPE__ const *__path, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_wreadlinkat)(__AT_FDCWD, __path, __buf, __buflen);
+#define __localdep__ui64tow_s __LIBC_LOCAL_NAME(_ui64tow_s)
+#endif /* !__CRT_HAVE__ui64tow_s */
+#endif /* !__local___localdep__ui64tow_s_defined */
+__LOCAL_LIBC(_ui64tow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64tow))(__UINT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, int __radix) {
+	(__NAMESPACE_LOCAL_SYM __localdep__ui64tow_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
+	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_wreadlink_defined
-#define __local___localdep_wreadlink_defined
-#define __localdep_wreadlink __LIBC_LOCAL_NAME(wreadlink)
-#endif /* !__local___localdep_wreadlink_defined */
-#else /* __AT_FDCWD && (__CRT_HAVE_wreadlinkat || __CRT_HAVE_wfreadlinkat) */
-#undef __local_wreadlink_defined
-#endif /* !__AT_FDCWD || (!__CRT_HAVE_wreadlinkat && !__CRT_HAVE_wfreadlinkat) */
-#endif /* !__local_wreadlink_defined */
+#ifndef __local___localdep__ui64tow_defined
+#define __local___localdep__ui64tow_defined
+#define __localdep__ui64tow __LIBC_LOCAL_NAME(_ui64tow)
+#endif /* !__local___localdep__ui64tow_defined */
+#endif /* !__local__ui64tow_defined */

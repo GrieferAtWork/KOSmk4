@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc57fa6f6 */
+/* HASH CRC-32:0xdaf9a54a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,32 +18,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__ultow_defined
-#define __local__ultow_defined
+#ifndef __local__i64tow_defined
+#define __local__i64tow_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__ultow_s_defined
-#define __local___localdep__ultow_s_defined
-#ifdef __CRT_HAVE__ultow_s
+#ifndef __local___localdep__i64tow_s_defined
+#define __local___localdep__i64tow_s_defined
+#ifdef __CRT_HAVE__i64tow_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultow_s,(__val,__buf,__buflen,__radix))
-#else /* __CRT_HAVE__ultow_s */
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64tow_s,(__val,__buf,__buflen,__radix))
+#else /* __CRT_HAVE__i64tow_s */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/_ultow_s.h>
+#include <libc/local/corecrt_wstdlib/_i64tow_s.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep__ultow_s __LIBC_LOCAL_NAME(_ultow_s)
-#endif /* !__CRT_HAVE__ultow_s */
-#endif /* !__local___localdep__ultow_s_defined */
-__LOCAL_LIBC(_ultow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultow))(unsigned long __val, __WCHAR_TYPE__ *__buf, int __radix) {
-	(__NAMESPACE_LOCAL_SYM __localdep__ultow_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
+#define __localdep__i64tow_s __LIBC_LOCAL_NAME(_i64tow_s)
+#endif /* !__CRT_HAVE__i64tow_s */
+#endif /* !__local___localdep__i64tow_s_defined */
+__LOCAL_LIBC(_i64tow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64tow))(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, int __radix) {
+	(__NAMESPACE_LOCAL_SYM __localdep__i64tow_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__ultow_defined
-#define __local___localdep__ultow_defined
-#define __localdep__ultow __LIBC_LOCAL_NAME(_ultow)
-#endif /* !__local___localdep__ultow_defined */
-#endif /* !__local__ultow_defined */
+#ifndef __local___localdep__i64tow_defined
+#define __local___localdep__i64tow_defined
+#define __localdep__i64tow __LIBC_LOCAL_NAME(_i64tow)
+#endif /* !__local___localdep__i64tow_defined */
+#endif /* !__local__i64tow_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fed98ab */
+/* HASH CRC-32:0xeff7f689 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,17 @@
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#ifndef __KERNEL__
 INTDEF char *NOTHROW_RPC(LIBDCALL libd__getdcwd)(int drive, char *buf, size_t size);
+INTDEF char *NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive, char *buf, size_t size);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_RPC(LIBDCALL libd__chdrive)(int drive);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF unsigned int NOTHROW_RPC(LIBDCALL libd__getdiskfree)(unsigned int drive, struct _diskfree_t *diskfree);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__mkdir)(char const *path);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

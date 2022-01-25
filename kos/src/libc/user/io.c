@@ -189,31 +189,6 @@ err:
 }
 
 
-
-
-
-
-
-/*[[[head:libd__access_s,hash:CRC-32=0x79d8bca9]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) errno_t
-NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename,
-                                     int type)
-/*[[[body:libd__access_s]]]*/
-{
-	return libd_errno_kos2dos(libc__access_s(filename, type));
-}
-/*[[[end:libd__access_s]]]*/
-
-/*[[[head:libc__access_s,hash:CRC-32=0x467308b4]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) errno_t
-NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
-                                     int type)
-/*[[[body:libc__access_s]]]*/
-{
-	return -sys_access(filename, (syscall_ulong_t)(unsigned int)type);
-}
-/*[[[end:libc__access_s]]]*/
-
 /*[[[head:libc__findclose,hash:CRC-32=0xd06b2791]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.dir") int
 NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd)
@@ -384,48 +359,6 @@ NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd,
 }
 /*[[[end:libc__findnext64]]]*/
 
-/*[[[head:libd__sopen_s,hash:CRC-32=0xfabc2763]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
-NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd,
-                                    char const *filename,
-                                    oflag_t oflags,
-                                    int sflags,
-                                    mode_t mode)
-/*[[[body:libd__sopen_s]]]*/
-{
-	fd_t resfd;
-	if unlikely(!fd)
-		return EINVAL;
-	(void)sflags; /* XXX: Share-mode? */
-	resfd = sys_open(filename, oflags | O_DOSPATH, mode);
-	if (E_ISERR(resfd))
-		return -(errno_t)resfd;
-	*fd = resfd;
-	return EOK;
-}
-/*[[[end:libd__sopen_s]]]*/
-
-/*[[[head:libc__sopen_s,hash:CRC-32=0x5885d95b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
-NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
-                                    char const *filename,
-                                    oflag_t oflags,
-                                    int sflags,
-                                    mode_t mode)
-/*[[[body:libc__sopen_s]]]*/
-{
-	fd_t resfd;
-	if unlikely(!fd)
-		return EINVAL;
-	(void)sflags; /* XXX: Share-mode? */
-	resfd = sys_open(filename, oflags, mode);
-	if (E_ISERR(resfd))
-		return -(errno_t)resfd;
-	*fd = resfd;
-	return EOK;
-}
-/*[[[end:libc__sopen_s]]]*/
-
 /*[[[head:libc__mktemp_s,hash:CRC-32=0x7a5599fd]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
@@ -449,9 +382,7 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
 #undef _findnext
 #undef _findnexti64
 
-/*[[[start:exports,hash:CRC-32=0x63f78a07]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$_access_s, libd__access_s);
-DEFINE_PUBLIC_ALIAS(_access_s, libc__access_s);
+/*[[[start:exports,hash:CRC-32=0xdf2d67f2]]]*/
 DEFINE_PUBLIC_ALIAS(_findclose, libc__findclose);
 DEFINE_PUBLIC_ALIAS(DOS$_findfirst, libd__findfirst32);
 DEFINE_PUBLIC_ALIAS(DOS$_findfirst32, libd__findfirst32);
@@ -471,10 +402,6 @@ DEFINE_PUBLIC_ALIAS(_findnexti64, libc__findnext32i64);
 DEFINE_PUBLIC_ALIAS(_findnext32i64, libc__findnext32i64);
 DEFINE_PUBLIC_ALIAS(_findnext64i32, libc__findnext64);
 DEFINE_PUBLIC_ALIAS(_findnext64, libc__findnext64);
-DEFINE_PUBLIC_ALIAS(DOS$_sopen_s_nolock, libd__sopen_s);
-DEFINE_PUBLIC_ALIAS(DOS$_sopen_s, libd__sopen_s);
-DEFINE_PUBLIC_ALIAS(_sopen_s_nolock, libc__sopen_s);
-DEFINE_PUBLIC_ALIAS(_sopen_s, libc__sopen_s);
 DEFINE_PUBLIC_ALIAS(_mktemp_s, libc__mktemp_s);
 /*[[[end:exports]]]*/
 

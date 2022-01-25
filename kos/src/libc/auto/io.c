@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5741ca4d */
+/* HASH CRC-32:0x5e74d229 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,22 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename,
+                                     __STDC_INT_AS_UINT_T type) {
+	if (libd_access(filename, type) == 0)
+		return 0;
+	return __libd_geterrno_or(1);
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
+                                     __STDC_INT_AS_UINT_T type) {
+	if (libc_access(filename, type) == 0)
+		return EOK;
+	return __libc_geterrno_or(1);
+}
 INTERN ATTR_SECTION(".text.crt.unsorted") oflag_t
 NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd,
                                     oflag_t mode) {
@@ -44,6 +60,48 @@ NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd,
 		return -1;
 	return libc_fcntl(fd, __F_SETFL, mode);
 #endif /* !__F_SETFL_XCH */
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd,
+                                    char const *filename,
+                                    oflag_t oflags,
+                                    int sflags,
+                                    mode_t mode) {
+	fd_t result;
+	if (!fd) {
+#ifdef EINVAL
+		return 22;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	result = libd_sopen(filename, oflags, sflags, mode);
+	if (result < 0)
+		return __libd_geterrno_or(1);
+	*fd = result;
+	return 0;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
+                                    char const *filename,
+                                    oflag_t oflags,
+                                    int sflags,
+                                    mode_t mode) {
+	fd_t result;
+	if (!fd) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	result = libc_sopen(filename, oflags, sflags, mode);
+	if (result < 0)
+		return __libc_geterrno_or(1);
+	*fd = result;
+	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 5)) errno_t
 NOTHROW_RPC(LIBDCALL libd__sopen_dispatch)(char const *filename,
@@ -194,7 +252,13 @@ NOTHROW_NCX(LIBCCALL libc__eof)(fd_t fd) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$_access_s, libd__access_s);
+DEFINE_PUBLIC_ALIAS(_access_s, libc__access_s);
 DEFINE_PUBLIC_ALIAS(_setmode, libc__setmode);
+DEFINE_PUBLIC_ALIAS(DOS$_sopen_s_nolock, libd__sopen_s);
+DEFINE_PUBLIC_ALIAS(DOS$_sopen_s, libd__sopen_s);
+DEFINE_PUBLIC_ALIAS(_sopen_s_nolock, libc__sopen_s);
+DEFINE_PUBLIC_ALIAS(_sopen_s, libc__sopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$_sopen_dispatch, libd__sopen_dispatch);
 DEFINE_PUBLIC_ALIAS(_sopen_dispatch, libc__sopen_dispatch);
 DEFINE_PUBLIC_ALIAS(_pipe, libc__pipe);

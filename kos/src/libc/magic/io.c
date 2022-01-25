@@ -124,8 +124,13 @@ struct _finddata64i32_t;
 %[insert:function(_chmod = chmod)]
 
 [[cp, section(".text.crt.dos.fs.property")]]
-[[crt_dos_variant, decl_include("<bits/types.h>")]]
-errno_t _access_s([[nonnull]] char const *filename, int type);
+[[crt_dos_variant, decl_include("<bits/types.h>", "<features.h>")]]
+[[requires_function(access), impl_include("<libc/errno.h>")]]
+errno_t _access_s([[nonnull]] char const *filename, __STDC_INT_AS_UINT_T type) {
+	if (access(filename, type) == 0)
+		return $EOK;
+	return $__libc_geterrno_or(1);
+}
 
 %[insert:function(_chsize = ftruncate)]
 %[insert:function(_chsize_s = ftruncate64)]
@@ -205,7 +210,7 @@ int _findnext64i32(intptr_t findfd,
 [[crt_dos_variant, cp, export_alias("_sopen_s_nolock")]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
-[[userimpl, requires_function(sopen)]]
+[[requires_function(sopen)]]
 errno_t _sopen_s([[nonnull]] $fd_t *fd,
                  [[nonnull]] char const *filename,
                  $oflag_t oflags, int sflags,

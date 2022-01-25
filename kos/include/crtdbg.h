@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb32e2fe9 */
+/* HASH CRC-32:0x2da4ba80 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -598,12 +598,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #define ___getdcwd_dbg_defined
 #ifdef __CRT_HAVE__getdcwd_dbg
 __LIBC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getdcwd_dbg");
-#elif defined(__CRT_HAVE__getdcwd)
+#else /* __CRT_HAVE__getdcwd_dbg */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE__getdcwd) || (defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD))
 #include <libc/local/crtdbg/_getdcwd_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); })
-#else /* ... */
+#else /* __CRT_HAVE__getdcwd || (__CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD) */
 #undef ___getdcwd_dbg_defined
-#endif /* !... */
+#endif /* !__CRT_HAVE__getdcwd && (!__CRT_HAVE_frealpath4 || !__AT_FDDRIVE_CWD) */
+#endif /* !__CRT_HAVE__getdcwd_dbg */
 #endif /* !___getdcwd_dbg_defined */
 #ifndef ___wgetdcwd_dbg_defined
 #define ___wgetdcwd_dbg_defined
@@ -618,12 +621,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __
 #define ___getdcwd_lk_dbg_defined
 #ifdef __CRT_HAVE__getdcwd_dbg
 __COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,char *,__NOTHROW_NCX,__LIBDCALL,_getdcwd_lk_dbg,(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line),_getdcwd_dbg,(__driveno,__buf,__bufsize,__block_type,__filename,__line))
-#elif defined(__CRT_HAVE__getdcwd)
+#else /* __CRT_HAVE__getdcwd_dbg */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE__getdcwd) || (defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD))
 #include <libc/local/crtdbg/_getdcwd_dbg.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getdcwd_lk_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); }
-#else /* ... */
+#else /* __CRT_HAVE__getdcwd || (__CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD) */
 #undef ___getdcwd_lk_dbg_defined
-#endif /* !... */
+#endif /* !__CRT_HAVE__getdcwd && (!__CRT_HAVE_frealpath4 || !__AT_FDDRIVE_CWD) */
+#endif /* !__CRT_HAVE__getdcwd_dbg */
 #endif /* !___getdcwd_lk_dbg_defined */
 #ifndef ___wgetdcwd_lk_dbg_defined
 #define ___wgetdcwd_lk_dbg_defined

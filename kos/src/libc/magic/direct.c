@@ -57,11 +57,37 @@ typedef __SIZE_TYPE__ size_t;
 
 %[default:section(".text.crt.dos.fs.property")]
 %#define _getdcwd_nolock _getdcwd
-[[cp, decl_include("<hybrid/typecore.h>")]]
-char *_getdcwd(int drive, char *buf, size_t size);
 
-[[cp]]
-int _chdrive(int drive);
+[[cp, decl_include("<hybrid/typecore.h>")]]
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires($has_function(frealpath4) && defined(__AT_FDDRIVE_CWD))]]
+[[crt_dos_variant, impl_include("<libc/errno.h>")]]
+char *_getdcwd(int drive, char *buf, size_t size) {
+	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
+@@pp_ifdef EINVAL@@
+		__libc_seterrno(EINVAL);
+@@pp_else@@
+		__libc_seterrno(1);
+@@pp_endif@@
+		return NULL;
+	}
+	return frealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
+}
+
+[[cp, requires_include("<asm/os/fcntl.h>")]]
+[[requires($has_function(fchdir) && defined(__AT_FDDRIVE_ROOT))]]
+[[impl_include("<libc/errno.h>")]]
+int _chdrive(int drive) {
+	drive = toupper((unsigned char)drive);
+	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
+@@pp_ifdef EINVAL@@
+		return __libc_seterrno(EINVAL);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	return fchdir(__AT_FDDRIVE_ROOT(drive));
+}
 
 [[cp]]
 int _getdrive();

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe201e2a5 */
+/* HASH CRC-32:0x9c22dd5f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -746,7 +746,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename
 /* >> chmod(2) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _chmod)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chmod))(__filename, __mode); }
 #endif /* ... */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_RPC,_access_s,(char const *__filename, int __type),(__filename,__type))
+#ifdef __CRT_HAVE__access_s
+__CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_RPC,_access_s,(char const *__filename, __STDC_INT_AS_UINT_T __type),(__filename,__type))
+#elif defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))
+#include <libc/local/io/_access_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_access_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_RPC(__LIBCCALL _access_s)(char const *__filename, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_access_s))(__filename, __type); })
+#endif /* ... */
 #if defined(__CRT_HAVE_ftruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */

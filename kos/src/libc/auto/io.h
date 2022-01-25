@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa01a9421 */
+/* HASH CRC-32:0x5e56f0dc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,10 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename, __STDC_INT_AS_UINT_T type);
+INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename, __STDC_INT_AS_UINT_T type);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF oflag_t NOTHROW_NCX(LIBDCALL libd__setmode)(fd_t fd, oflag_t mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -42,6 +46,8 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd__findnext32i64)(intptr_t findf
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd__findnext64)(intptr_t findfd, struct __finddata64_t *__restrict finddata);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
 INTDEF WUNUSED NONNULL((1, 5)) errno_t NOTHROW_RPC(LIBDCALL libd__sopen_dispatch)(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
 INTDEF WUNUSED NONNULL((1, 5)) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_dispatch)(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
 #endif /* !__KERNEL__ */

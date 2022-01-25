@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46c1e618 */
+/* HASH CRC-32:0xaec01908 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,25 @@
 #ifndef __local__getdcwd_dbg_defined
 #define __local__getdcwd_dbg_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__getdcwd
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE__getdcwd) || (defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__getdcwd_defined
 #define __local___localdep__getdcwd_defined
+#ifdef __CRT_HAVE__getdcwd
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __size),_getdcwd,(__drive,__buf,__size))
+#elif defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD)
+__NAMESPACE_LOCAL_END
+#include <libc/local/direct/_getdcwd.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__getdcwd __LIBC_LOCAL_NAME(_getdcwd)
+#else /* ... */
+#undef __local___localdep__getdcwd_defined
+#endif /* !... */
 #endif /* !__local___localdep__getdcwd_defined */
 __LOCAL_LIBC(_getdcwd_dbg) __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_getdcwd_dbg))(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) {
@@ -43,7 +53,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__getdcwd_dbg_defined
 #define __localdep__getdcwd_dbg __LIBC_LOCAL_NAME(_getdcwd_dbg)
 #endif /* !__local___localdep__getdcwd_dbg_defined */
-#else /* __CRT_HAVE__getdcwd */
+#else /* __CRT_HAVE__getdcwd || (__CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD) */
 #undef __local__getdcwd_dbg_defined
-#endif /* !__CRT_HAVE__getdcwd */
+#endif /* !__CRT_HAVE__getdcwd && (!__CRT_HAVE_frealpath4 || !__AT_FDDRIVE_CWD) */
 #endif /* !__local__getdcwd_dbg_defined */

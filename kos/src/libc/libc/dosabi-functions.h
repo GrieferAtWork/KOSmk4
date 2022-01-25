@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c8782ff */
+/* HASH CRC-32:0x83edc95b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,7 +290,6 @@ DFUN(".text.crt.dos.unicode.locale.ctype", libd__isctype_l, libc__isctype_l, TD,
 #endif /* !__LIBDCALL_CALLER_CLEANUP */
 
 /* direct */
-DFUN(".text.crt.dos.fs.property", libd__getdcwd, libc__getdcwd, TP, 3, TD, TP, TI)
 DFUN(".text.crt.dos.fs.property", libd__chdrive, libc__chdrive, TD, 1, TD)
 DFUN(".text.crt.dos.fs.property", libd__getdiskfree, libc__getdiskfree, TD, 2, TD, TP)
 DFUN(".text.crt.dos.fs.modify", libd__mkdir, libc__mkdir, TD, 1, TP)

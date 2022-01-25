@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d1f63de */
+/* HASH CRC-32:0x14a2515e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF char *NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive, char *buf, size_t size);
-INTDEF int NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive);
 INTDEF int NOTHROW_RPC(LIBCCALL libc__getdrive)(void);
 INTDEF __ULONG32_TYPE__ NOTHROW_RPC(LIBCCALL libc__getdrives)(void);
 INTDEF unsigned int NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive, struct _diskfree_t *diskfree);

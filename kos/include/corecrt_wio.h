@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedab3feb */
+/* HASH CRC-32:0x34ce0f72 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,10 +48,10 @@ typedef __errno_t errno_t;
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
-#ifndef __ssize_t_defined
-#define __ssize_t_defined
-typedef __ssize_t ssize_t;
-#endif /* !__ssize_t_defined */
+#ifndef __wchar_t_defined
+#define __wchar_t_defined
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* !__wchar_t_defined */
 
 #ifndef __intptr_t_defined
 #define __intptr_t_defined

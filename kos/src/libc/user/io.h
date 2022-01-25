@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1653df7 */
+/* HASH CRC-32:0x948348ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename, int type);
-INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename, int type);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd);
 INTDEF WUNUSED NONNULL((1, 2)) intptr_t NOTHROW_RPC(LIBDCALL libd__findfirst32)(char const *__restrict filename, struct _finddata32_t *__restrict finddata);
 INTDEF WUNUSED NONNULL((1, 2)) intptr_t NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename, struct _finddata32_t *__restrict finddata);
@@ -43,8 +41,6 @@ INTDEF WUNUSED NONNULL((1, 2)) intptr_t NOTHROW_RPC(LIBCCALL libc__findfirst64)(
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc__findnext32)(intptr_t findfd, struct _finddata32_t *__restrict finddata);
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc__findnext32i64)(intptr_t findfd, struct _finddata32i64_t *__restrict finddata);
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd, struct __finddata64_t *__restrict finddata);
-INTDEF NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
-INTDEF NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_, size_t size);
 #endif /* !__KERNEL__ */
 

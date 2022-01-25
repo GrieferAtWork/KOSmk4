@@ -5689,6 +5689,7 @@
 #define __CRT_HAVE__get_wide_winmain_command_line
 #define __CRT_HAVE_KOS$_get_wpgmptr
 #define __CRT_HAVE_KOS$_getcwd
+#define __CRT_HAVE_KOS$_getdcwd
 #define __CRT_HAVE_KOS$_getws_s
 #define __CRT_HAVE_KOS$_i64toa_s
 #define __CRT_HAVE_KOS$_i64tow
@@ -6565,6 +6566,7 @@
 #define __CRT_HAVE_DOS$_get_wide_winmain_command_line
 #define __CRT_HAVE_DOS$_get_wpgmptr
 #define __CRT_HAVE_DOS$_getcwd
+#define __CRT_HAVE_DOS$_getdcwd
 #define __CRT_HAVE_DOS$_getws_s
 #define __CRT_HAVE_DOS$_i64toa_s
 #define __CRT_HAVE_DOS$_i64tow

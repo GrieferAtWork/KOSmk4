@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc491149 */
+/* HASH CRC-32:0x249b7936 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,57 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/direct.h"
+#include "../user/ctype.h"
+#include "../user/stdlib.h"
 #include "../user/sys.stat.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") char *
+NOTHROW_RPC(LIBDCALL libd__getdcwd)(int drive,
+                                    char *buf,
+                                    size_t size) {
+	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#else /* EINVAL */
+		__libc_seterrno(1);
+#endif /* !EINVAL */
+		return NULL;
+	}
+	return libd_frealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") char *
+NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
+                                    char *buf,
+                                    size_t size) {
+	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#else /* EINVAL */
+		__libc_seterrno(1);
+#endif /* !EINVAL */
+		return NULL;
+	}
+	return libc_frealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") int
+NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive) {
+	drive = libc_toupper((unsigned char)drive);
+	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
+#ifdef EINVAL
+		return __libc_seterrno(EINVAL);
+#else /* EINVAL */
+		return __libc_seterrno(1);
+#endif /* !EINVAL */
+	}
+	return libc_fchdir(__AT_FDDRIVE_ROOT(drive));
+}
 INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path) {
 	return libc_mkdir(path, 0755);
@@ -39,6 +85,9 @@ NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$_getdcwd, libd__getdcwd);
+DEFINE_PUBLIC_ALIAS(_getdcwd, libc__getdcwd);
+DEFINE_PUBLIC_ALIAS(_chdrive, libc__chdrive);
 DEFINE_PUBLIC_ALIAS(_mkdir, libc__mkdir);
 #endif /* !__KERNEL__ */
 

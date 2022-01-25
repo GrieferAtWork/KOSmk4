@@ -2791,66 +2791,6 @@ $errno_t _wtmpnam_s([[outp(wchar_count)]] wchar_t *dst, $size_t wchar_count);
 
 %#endif /* !_WSTDIO_DEFINED */
 
-
-%#ifndef _WSTDLIB_DEFINED
-%#define _WSTDLIB_DEFINED
-%[insert:guarded_function(_wcstol_l = wcstol_l)]
-%[insert:guarded_function(_wcstoul_l = wcstoul_l)]
-%#ifndef __NO_FPU
-%[insert:guarded_function(_wcstof_l = wcstof_l)]
-%[insert:guarded_function(_wcstod_l = wcstod_l)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:guarded_function(_wcstold_l = wcstold_l)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%[insert:extern(_wtof)]
-%[insert:extern(_wtof_l)]
-%#endif /* !__NO_FPU */
-%[insert:extern(_itow)]
-%[insert:extern(_ltow)]
-%[insert:extern(_ultow)]
-%[insert:extern(_i64tow)]
-%[insert:extern(_ui64tow)]
-%[insert:extern(_itow_s)]
-%[insert:extern(_ltow_s)]
-%[insert:extern(_ultow_s)]
-%[insert:extern(_i64tow_s)]
-%[insert:extern(_ui64tow_s)]
-%[insert:extern(_wgetenv)]
-%[insert:extern(_wgetenv_s)]
-%[insert:extern(_wdupenv_s)]
-%[insert:function(_wsystem = wsystem, guardName: "_CRT_WSYSTEM_DEFINED")]
-%[insert:guarded_function(_wtoi = wtoi)]
-%[insert:guarded_function(_wtol = wtol)]
-%[insert:extern(_wtoi64)]
-%[insert:guarded_function(_wcstoi64 = wcsto64)]
-%[insert:guarded_function(_wcstoui64 = wcstou64)]
-%[insert:extern(_wtoi_l)]
-%[insert:extern(_wtol_l)]
-%[insert:extern(_wtoi64_l)]
-%[insert:guarded_function(_wcstoi64_l = wcsto64_l)]
-%[insert:guarded_function(_wcstoui64_l = wcstou64_l)]
-%#ifdef __LONGLONG
-%[insert:guarded_function(_wcstoll_l = wcstoll_l)]
-%[insert:guarded_function(_wcstoull_l = wcstoull_l)]
-%[insert:guarded_function(_wtoll = wtoll)]
-%[insert:extern(_wtoll_l)]
-%#endif /* __LONGLONG */
-%#endif /* !_WSTDLIB_DEFINED */
-
-%#ifndef _WSTDLIBP_DEFINED
-%#define _WSTDLIBP_DEFINED 1
-%[insert:extern(_wfullpath)]
-%[insert:extern(_wmakepath_s)]
-%[insert:extern(_wmakepath)]
-%[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
-%[insert:extern(_wputenv)]
-%[insert:extern(_wputenv_s)]
-%[insert:extern(_wsearchenv_s)]
-%[insert:extern(_wsearchenv)]
-%[insert:extern(_wsplitpath)]
-%[insert:extern(_wsplitpath_s)]
-%#endif /* !_WSTDLIBP_DEFINED */
-
 %#endif /* __USE_DOS */
 
 
@@ -2889,9 +2829,8 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __USE_DOS
-#ifndef _CORECRT_WIO_H
 #include <corecrt_wio.h>
-#endif /* !_CORECRT_WIO_H */
+#include <corecrt_wstdlib.h>
 #endif /* __USE_DOS */
 
 }
