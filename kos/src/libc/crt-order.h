@@ -548,13 +548,14 @@
 	CB(PREFIX.crt.dos.wchar.unicode.locale.memory) \
 	CB(PREFIX.crt.dos.wchar.unicode.locale.ctype) \
 	CB(PREFIX.crt.dos.wchar.unicode.locale.convert) \
+	CB(PREFIX.crt.dos.wchar.unicode.locale.format.printf) \
 	CB(PREFIX.crt.dos.wchar.unicode.locale.format.strftime) \
 	CB(PREFIX.crt.dos.wchar.unicode.static.mbs) \
 	CB(PREFIX.crt.dos.wchar.unicode.locale.mbs) \
 	CB(PREFIX.crt.dos.wchar.unicode.convert) \
 	CB(PREFIX.crt.dos.wchar.io.tty) \
 	CB(PREFIX.crt.dos.wchar.fs.modify_time) \
-	CB(PREFIX.crt.dos.wchar.errno) \
+	CB(PREFIX.crt.dos.wchar.errno.utility PREFIX.crt.dos.wchar.errno) \
 	CB(PREFIX.crt.dos.wchar.fs.exec.spawn PREFIX.crt.dos.wchar.fs.exec.system PREFIX.crt.dos.wchar.fs.io) \
 	CB(PREFIX.crt.dos.wchar.system.configuration)
 /*[[[end]]]*/

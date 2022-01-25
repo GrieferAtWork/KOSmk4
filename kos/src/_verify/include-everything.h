@@ -465,6 +465,7 @@ incdir("");
 #include <corecrt_stdio_config.h>
 #include <corecrt_wdirect.h>
 #include <corecrt_wio.h>
+#include <corecrt_wstdio.h>
 #include <corecrt_wstdlib.h>
 #include <corecrt_wstring.h>
 #include <cpio.h>

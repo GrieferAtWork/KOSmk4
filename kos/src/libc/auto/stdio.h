@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c47e84b */
+/* HASH CRC-32:0xb57500ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -787,8 +787,6 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_gets_s)(char *__rest
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf, rsize_t bufsize);
-INTDEF ATTR_COLD void (LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...);
-INTDEF ATTR_COLD void (LIBKCALL libc__wperror)(char32_t const *__restrict message) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1, 5)) size_t (LIBDCALL libd__fread_nolock_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);

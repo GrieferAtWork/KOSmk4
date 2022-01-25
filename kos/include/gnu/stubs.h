@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x925f2ad4 */
+/* HASH CRC-32:0x22d0a285 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,6 +114,7 @@
 #define __stub__wsearchenv_s
 #define __stub__wsetlocale
 #define __stub__wtempnam
+#define __stub__wtmpnam
 #define __stub__wtmpnam_s
 #define __stub___acos
 #define __stub_acos
@@ -643,6 +644,7 @@
 #define __stub_DOS$_wsearchenv_s
 #define __stub_DOS$_wsetlocale
 #define __stub_DOS$_wtempnam
+#define __stub_DOS$_wtmpnam
 #define __stub_DOS$_wtmpnam_s
 #ifndef __LIBCCALL_IS_LIBDCALL
 #define __stub_DOS$__clone

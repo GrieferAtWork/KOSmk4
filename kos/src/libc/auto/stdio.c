@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d08f93b */
+/* HASH CRC-32:0xa258981 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2444,64 +2444,6 @@ NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
 	}
 	return libc_fgets(buf, (__STDC_INT_AS_SIZE_T)(unsigned int)bufsize, stdin);
 }
-#include <libc/template/stdstreams.h>
-#include <libc/errno.h>
-#include <parts/printf-config.h>
-INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
-(LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...) {
-#ifdef __NO_PRINTF_STRERROR
-	char const *enodesc;
-	enodesc = libd_strerror(__libc_geterrno());
-	if (message) {
-
-		libc_fprintf(stderr, "%I16s: %I8s\n", message, enodesc);
-
-
-
-	} else {
-		libc_fprintf(stderr, "%I8s\n", enodesc);
-	}
-#else /* __NO_PRINTF_STRERROR */
-	if (message) {
-
-		libc_fprintf(stderr, "%I16s: %m\n", message);
-
-
-
-	} else {
-		libc_fprintf(stderr, "%m\n");
-	}
-#endif /* !__NO_PRINTF_STRERROR */
-}
-#include <libc/template/stdstreams.h>
-#include <libc/errno.h>
-#include <parts/printf-config.h>
-INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
-(LIBKCALL libc__wperror)(char32_t const *__restrict message) THROWS(...) {
-#ifdef __NO_PRINTF_STRERROR
-	char const *enodesc;
-	enodesc = libc_strerror(__libc_geterrno());
-	if (message) {
-
-
-
-		libc_fprintf(stderr, "%I32s: %I8s\n", message, enodesc);
-
-	} else {
-		libc_fprintf(stderr, "%I8s\n", enodesc);
-	}
-#else /* __NO_PRINTF_STRERROR */
-	if (message) {
-
-
-
-		libc_fprintf(stderr, "%I32s: %m\n", message);
-
-	} else {
-		libc_fprintf(stderr, "%m\n");
-	}
-#endif /* !__NO_PRINTF_STRERROR */
-}
 INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.read") WUNUSED NONNULL((1, 5)) size_t
 (LIBCCALL libc__fread_nolock_s)(void *__restrict buf,
                                 size_t bufsize,
@@ -4147,8 +4089,6 @@ DEFINE_PUBLIC_ALIAS(clearerr_s, libc_clearerr_s);
 DEFINE_PUBLIC_ALIAS(tmpfile_s, libc_tmpfile_s);
 DEFINE_PUBLIC_ALIAS(fread_s, libc_fread_s);
 DEFINE_PUBLIC_ALIAS(gets_s, libc_gets_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wperror, libd__wperror);
-DEFINE_PUBLIC_ALIAS(_wperror, libc__wperror);
 DEFINE_PUBLIC_ALIAS(_fread_nolock_s, libc__fread_nolock_s);
 DEFINE_PUBLIC_ALIAS(__stdio_common_vfprintf, libc___stdio_common_vfprintf);
 DEFINE_PUBLIC_ALIAS(__stdio_common_vfprintf_s, libc___stdio_common_vfprintf_s);

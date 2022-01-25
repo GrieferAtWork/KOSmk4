@@ -4449,42 +4449,6 @@ char *gets_s([[outp(min(strlen(return), bufsize))]] char *__restrict buf, rsize_
 }
 
 %#endif /* __USE_DOS_SLIB */
-
-%
-[[section(".text.crt.dos.errno.utility")]]
-[[cp_stdio, wchar, ATTR_COLD, guard("_CRT_WPERROR_DEFINED")]]
-[[requires_include("<__crt.h>", "<libc/errno.h>")]]
-[[impl_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && $has_function(fprintf) && $has_function(strerror))]]
-[[impl_include("<parts/printf-config.h>")]]
-[[decl_include("<hybrid/typecore.h>")]]
-void _wperror($wchar_t const *__restrict message) {
-@@pp_ifdef __NO_PRINTF_STRERROR@@
-	char const *enodesc;
-	enodesc = strerror(__libc_geterrno());
-	if (message) {
-@@pp_if __SIZEOF_WCHAR_T__ == 2@@
-		fprintf(stderr, "%I16s: %I8s\n", message, enodesc);
-@@pp_else@@
-		fprintf(stderr, "%I32s: %I8s\n", message, enodesc);
-@@pp_endif@@
-	} else {
-		fprintf(stderr, "%I8s\n", enodesc);
-	}
-@@pp_else@@
-	if (message) {
-@@pp_if __SIZEOF_WCHAR_T__ == 2@@
-		fprintf(stderr, "%I16s: %m\n", message);
-@@pp_else@@
-		fprintf(stderr, "%I32s: %m\n", message);
-@@pp_endif@@
-	} else {
-		fprintf(stderr, "%m\n");
-	}
-@@pp_endif@@
-}
-
-%
 %#endif /* _STDIO_DEFINED */
 
 /*[nocrt]*/ %[insert:function(_fgetc_nolock = fgetc_unlocked)]
@@ -4529,131 +4493,6 @@ $size_t _fread_nolock_s([[outp(min(return * elemsize, elemcount * elemsize, bufs
 #define SYS_OPEN     _SYS_OPEN
 
 }
-
-
-%#ifndef _WSTDIO_DEFINED
-%#define _WSTDIO_DEFINED 1
-
-%{
-#ifndef WEOF
-#define WEOF __WEOF
-#endif /* !WEOF */
-
-/* Define 'wchar_t' */
-#ifndef __wchar_t_defined
-#define __wchar_t_defined
-typedef __WCHAR_TYPE__ wchar_t;
-#endif /* !__wchar_t_defined */
-}
-
-%[insert:extern(fgetwc)]
-%[insert:extern(fputwc)]
-%[insert:guarded_function(getwc = fgetwc)]
-%[insert:extern(getwchar)]
-%[insert:guarded_function(putwc = fputwc)]
-%[insert:extern(putwchar)]
-%[insert:extern(ungetwc)]
-%[insert:extern(fgetws)]
-%[insert:extern(fputws)]
-%[insert:extern(vfwprintf)]
-%[insert:extern(fwprintf)]
-%[insert:extern(vfwscanf)]
-%[insert:extern(fwscanf)]
-%[insert:extern(vwprintf)]
-%[insert:extern(wprintf)]
-%[insert:extern(vwscanf)]
-%[insert:extern(wscanf)]
-%[insert:extern(vswscanf)]
-%[insert:extern(swscanf)]
-
-%#ifdef __USE_DOS_SLIB
-%[insert:guarded_function(vswprintf_s = vswprintf)]
-%[insert:guarded_function(swprintf_s = swprintf)]
-%[insert:guarded_function(vfwprintf_s = vfwprintf)]
-%[insert:guarded_function(fwprintf_s = fwprintf)]
-%[insert:guarded_function(vwprintf_s = vwprintf)]
-%[insert:guarded_function(wprintf_s = wprintf)]
-%[insert:guarded_function(vswscanf_s = vswscanf)]
-%[insert:guarded_function(swscanf_s = swscanf)]
-%[insert:guarded_function(vfwscanf_s = vfwscanf)]
-%[insert:guarded_function(fwscanf_s = fwscanf)]
-%[insert:guarded_function(vwscanf_s = vwscanf)]
-%[insert:guarded_function(wscanf_s = wscanf)]
-%#endif /* __USE_DOS_SLIB */
-%[insert:extern(_vscwprintf)]
-%[insert:extern(_scwprintf)]
-%[insert:extern(_vscwprintf_p)]
-%[insert:extern(_scwprintf_p)]
-%[insert:extern(_vscwprintf_l)]
-%[insert:extern(_scwprintf_l)]
-%[insert:extern(_vscwprintf_p_l)]
-%[insert:extern(_scwprintf_p_l)]
-%[insert:guarded_function(_vswprintf_c = vswprintf)]
-%[insert:guarded_function(_swprintf_c = swprintf)]
-%[insert:extern(_vsnwprintf_s)]
-%[insert:extern(_snwprintf_s)]
-%[insert:extern(_vfwprintf_p)]
-%[insert:extern(_fwprintf_p)]
-%[insert:extern(_vwprintf_p)]
-%[insert:extern(_wprintf_p)]
-%[insert:extern(_vswprintf_p)]
-%[insert:extern(_swprintf_p)]
-%[insert:extern(_vwprintf_l)]
-%[insert:extern(_wprintf_l)]
-%[insert:extern(_vwprintf_p_l)]
-%[insert:extern(_wprintf_p_l)]
-%[insert:extern(_vwprintf_s_l)]
-%[insert:extern(_wprintf_s_l)]
-%[insert:extern(_vfwprintf_l)]
-%[insert:extern(_fwprintf_l)]
-%[insert:extern(_vfwprintf_p_l)]
-%[insert:extern(_fwprintf_p_l)]
-%[insert:extern(_vfwprintf_s_l)]
-%[insert:extern(_fwprintf_s_l)]
-%[insert:extern(_vswprintf_c_l)]
-%[insert:extern(_swprintf_c_l)]
-%[insert:extern(_vswprintf_p_l)]
-%[insert:extern(_swprintf_p_l)]
-%[insert:extern(_vswprintf_s_l)]
-%[insert:extern(_swprintf_s_l)]
-%[insert:extern(_vsnwprintf_l)]
-%[insert:extern(_snwprintf_l)]
-%[insert:extern(_vsnwprintf_s_l)]
-%[insert:extern(_snwprintf_s_l)]
-%[insert:extern(_fwscanf_l)]
-%[insert:guarded_function(_fwscanf_s_l = _fwscanf_l)]
-%[insert:extern(_swscanf_l)]
-%[insert:guarded_function(_swscanf_s_l = _swscanf_l)]
-%[insert:extern(_snwscanf)]
-%[insert:extern(_snwscanf_l)]
-%[insert:guarded_function(_snwscanf_s = _snwscanf)]
-%[insert:extern(_snwscanf_s_l)]
-%[insert:extern(_wscanf_l)]
-%[insert:guarded_function(_wscanf_s_l = _wscanf_l)]
-%[insert:extern(_wfsopen)]
-%[insert:extern(_wfdopen)]
-%[insert:extern(_wfopen_s)]
-%[insert:extern(_wfreopen_s)]
-%[insert:guarded_function(_wfopen = wfopen)]
-%[insert:guarded_function(_wfreopen = wfreopen)]
-%[insert:guarded_function(_fgetwchar = getwchar)]
-%[insert:guarded_function(_fputwchar = putwchar)]
-%[insert:extern(_getws_s)]
-%[insert:extern(_putws)]
-%[insert:extern(_wtempnam)]
-%[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
-%[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
-%[insert:guarded_function(_wpopen = wpopen)]
-%[insert:guarded_function(_wremove = wremove)]
-%[insert:extern(_wtmpnam_s)]
-%[insert:guarded_function(_fgetwc_nolock = fgetwc_unlocked)]
-%[insert:guarded_function(_fputwc_nolock = fputwc_unlocked)]
-%[insert:guarded_function(_ungetwc_nolock = ungetwc_unlocked)]
-%[insert:guarded_function(_getwc_nolock = fgetwc_unlocked)]
-%[insert:guarded_function(_putwc_nolock = fputwc_unlocked)]
-%#endif /* !_WSTDIO_DEFINED */
-
-
 
 %[define(_CRT_INTERNAL_PRINTF_LEGACY_VSPRINTF_NULL_TERMINATION = 1)]
 %[define(_CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR       = 2)]
@@ -5051,6 +4890,10 @@ __STDC_INT_AS_SSIZE_T vsscanf_s([[nonnull]] char const *buf, [[nonnull]] char co
 
 
 %{
+
+#ifdef __USE_DOS
+#include <corecrt_wstdio.h>
+#endif /* __USE_DOS */
 
 #if ((defined(__USE_XOPEN) && !defined(__USE_XOPEN2K) && !defined(__USE_GNU)) || defined(__USE_SOLARIS))
 #include <getopt.h>

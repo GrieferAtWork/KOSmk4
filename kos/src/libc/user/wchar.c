@@ -727,65 +727,15 @@ NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst,
 
 
 
-/*[[[head:libc__wtempnam,hash:CRC-32=0xdf74d60d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") WUNUSED char32_t *
-NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory,
-                                     char32_t const *file_prefix)
-/*[[[body:libc__wtempnam]]]*/
-/*AUTO*/{
-	(void)directory;
-	(void)file_prefix;
-	CRT_UNIMPLEMENTEDF("_wtempnam(%p, %p)", directory, file_prefix); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__wtempnam]]]*/
-
-/*[[[head:libd__wtempnam,hash:CRC-32=0xc2e4bfc6]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") WUNUSED char16_t *
-NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
-                                     char16_t const *file_prefix)
-/*[[[body:libd__wtempnam]]]*/
-/*AUTO*/{
-	(void)directory;
-	(void)file_prefix;
-	CRT_UNIMPLEMENTEDF("DOS$_wtempnam(%p, %p)", directory, file_prefix); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd__wtempnam]]]*/
-
-/*[[[head:libc__wtmpnam_s,hash:CRC-32=0xf4219000]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
-NOTHROW_NCX(LIBKCALL libc__wtmpnam_s)(char32_t *dst,
-                                      size_t wchar_count)
-/*[[[body:libc__wtmpnam_s]]]*/
-/*AUTO*/{
-	(void)dst;
-	(void)wchar_count;
-	CRT_UNIMPLEMENTEDF("_wtmpnam_s(%p, %Ix)", dst, wchar_count); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libc__wtmpnam_s]]]*/
-
-/*[[[head:libd__wtmpnam_s,hash:CRC-32=0x3cf6b66]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
-NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
-                                      size_t wchar_count)
-/*[[[body:libd__wtmpnam_s]]]*/
-/*AUTO*/{
-	(void)dst;
-	(void)wchar_count;
-	CRT_UNIMPLEMENTEDF("DOS$_wtmpnam_s(%p, %Ix)", dst, wchar_count); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libd__wtmpnam_s]]]*/
 
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbcb31436]]]*/
+
+
+
+/*[[[start:exports,hash:CRC-32=0x80505f8c]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
@@ -821,10 +771,6 @@ DEFINE_PUBLIC_ALIAS(DOS$vfwscanf_unlocked, libd_vfwscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(vfwscanf_unlocked, libc_vfwscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwln, libd_fgetwln);
 DEFINE_PUBLIC_ALIAS(fgetwln, libc_fgetwln);
-DEFINE_PUBLIC_ALIAS(DOS$_wtempnam, libd__wtempnam);
-DEFINE_PUBLIC_ALIAS(_wtempnam, libc__wtempnam);
-DEFINE_PUBLIC_ALIAS(DOS$_wtmpnam_s, libd__wtmpnam_s);
-DEFINE_PUBLIC_ALIAS(_wtmpnam_s, libc__wtmpnam_s);
 /*[[[end:exports]]]*/
 
 DECL_END

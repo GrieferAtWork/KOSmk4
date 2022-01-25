@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b457287 */
+/* HASH CRC-32:0x3966b58d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,10 +91,6 @@ INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBK
 INTDEF WUNUSED NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
 /* >> fgetwln(3) */
 INTDEF WUNUSED NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
-INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory, char16_t const *file_prefix);
-INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory, char32_t const *file_prefix);
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst, size_t wchar_count);
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc__wtmpnam_s)(char32_t *dst, size_t wchar_count);
 #endif /* !__KERNEL__ */
 
 DECL_END

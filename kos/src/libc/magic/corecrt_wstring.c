@@ -121,48 +121,48 @@ typedef __SIZE_TYPE__ rsize_t;
 %/* DOS-specific functions */
 %[default:section(".text.crt.dos.wchar.errno")];
 
-[[guard, wchar, decl_include("<hybrid/typecore.h>")]]
+[[wchar, decl_include("<hybrid/typecore.h>")]]
 wchar_t *_wcserror(int errno_value);
 
-[[guard, wchar, decl_include("<bits/types.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 $errno_t _wcserror_s(wchar_t *buf, $size_t bufsize, int errno_value);
 
-[[guard, wchar, decl_include("<hybrid/typecore.h>")]]
+[[wchar, decl_include("<hybrid/typecore.h>")]]
 wchar_t *__wcserror(wchar_t const *message);
 
-[[guard, wchar, decl_include("<bits/types.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 $errno_t __wcserror_s(wchar_t *buf, $size_t bufsize, wchar_t const *message);
 
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[wchar, section(".text.crt.dos.wchar.string.memory")]]
 [[decl_include("<bits/types.h>")]]
 $errno_t _wcsnset_s(wchar_t *__restrict buf, $size_t buflen, wchar_t ch, $size_t maxlen)
 	%{generate(str2wcs("_strnset_s"))}
 
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[wchar, section(".text.crt.dos.wchar.string.memory")]]
 [[decl_include("<bits/types.h>")]]
 $errno_t _wcsset_s([[nonnull]] wchar_t *dst, $size_t dstsize, wchar_t ch)
 	%{generate(str2wcs("_strset_s"))}
 
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.memory")]]
+[[wchar, section(".text.crt.dos.wchar.unicode.static.memory")]]
 _wcslwr_s(*) %{generate(str2wcs("_strlwr_s"))}
 
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.static.memory")]]
+[[wchar, section(".text.crt.dos.wchar.unicode.static.memory")]]
 _wcsupr_s(*) %{generate(str2wcs("_strupr_s"))}
 
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.locale.memory")]]
+[[wchar, section(".text.crt.dos.wchar.unicode.locale.memory")]]
 _wcslwr_s_l(*) %{generate(str2wcs("_strlwr_s_l"))}
 
-[[guard, wchar, section(".text.crt.dos.wchar.unicode.locale.memory")]]
+[[wchar, section(".text.crt.dos.wchar.unicode.locale.memory")]]
 _wcsupr_s_l(*) %{generate(str2wcs("_strupr_s_l"))}
 
 [[decl_include("<bits/types.h>")]]
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[wchar, section(".text.crt.dos.wchar.string.memory")]]
 $errno_t wmemcpy_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
                    [[nonnull]] wchar_t const *src, rsize_t srclength)
 	%{generate(str2wcs("memcpy_s"))}
 
 [[decl_include("<bits/types.h>")]]
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[wchar, section(".text.crt.dos.wchar.string.memory")]]
 $errno_t wmemmove_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
                     [[nonnull]] wchar_t const *src, rsize_t srclength)
 	%{generate(str2wcs("memmove_s"))}
@@ -170,26 +170,26 @@ $errno_t wmemmove_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
 %
 %#ifdef __USE_DOS_SLIB
 @@>> wcscat_s(3)
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[wchar, section(".text.crt.dos.wchar.string.memory")]]
 wcscat_s(*) %{generate(str2wcs("strcat_s"))}
 
 @@>> wcscpy_s(3)
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[wchar, section(".text.crt.dos.wchar.string.memory")]]
 wcscpy_s(*) %{generate(str2wcs("strcpy_s"))}
 
 @@>> wcsnlen_s(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[guard, inline, nocrt, pure, wunused]]
+[[inline, nocrt, pure, wunused]]
 $size_t wcsnlen_s([[nullable]] wchar_t const *str, $size_t maxlen) {
 	return str ? wcsnlen(str, maxlen) : 0;
 }
 
 @@>> wcsncat_s(3)
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[wchar, section(".text.crt.dos.wchar.string.memory")]]
 wcsncat_s(*) %{generate(str2wcs("strncat_s"))}
 
 @@>> wcsncpy_s(3)
-[[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[wchar, section(".text.crt.dos.wchar.string.memory")]]
 wcsncpy_s(*) %{generate(str2wcs("strncpy_s"))}
 
 %[insert:function(wcstok_s = wcstok)]
@@ -205,9 +205,9 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 #ifdef __USE_UTF
-#if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STDLIB_H)
-#include <parts/uchar/stdlib.h>
-#endif /* _UCHAR_H && !_PARTS_UCHAR_STDLIB_H */
+#if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STRING_H)
+#include <parts/uchar/string.h>
+#endif /* _UCHAR_H && !_PARTS_UCHAR_STRING_H */
 #endif /* __USE_UTF */
 
 }
