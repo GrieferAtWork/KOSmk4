@@ -42,6 +42,7 @@ __SYSDECL_BEGIN
 
 c16utime(*) %{uchar16("wutime")}
 c32utime(*) %{uchar32("wutime")}
+
 %#ifdef __USE_TIME64
 c16utime64(*) %{uchar16("wutime64")}
 c32utime64(*) %{uchar32("wutime64")}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2258b0c */
+/* HASH CRC-32:0x95fd2da2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -577,40 +577,6 @@ NOTHROW_RPC(VLIBKCALL libc_wspawnlpe)(__STDC_INT_AS_UINT_T mode,
                                       ...) {
 	__REDIRECT_SPAWNLE(char32_t, libc_wspawnvpe, mode, file, args)
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.system") int
-NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd) {
-	int result;
-	char *used_cmd;
-	if (!cmd) {
-		result = libc_system(NULL);
-	} else {
-		used_cmd = libd_convert_wcstombs(cmd);
-		if unlikely(!used_cmd)
-			return -1;
-		result = libc_system(used_cmd);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
-		libc_free(used_cmd);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
-	}
-	return result;
-}
-INTERN ATTR_SECTION(".text.crt.wchar.fs.exec.system") int
-NOTHROW_RPC(LIBKCALL libc_wsystem)(char32_t const *cmd) {
-	int result;
-	char *used_cmd;
-	if (!cmd) {
-		result = libc_system(NULL);
-	} else {
-		used_cmd = libc_convert_wcstombs(cmd);
-		if unlikely(!used_cmd)
-			return -1;
-		result = libc_system(used_cmd);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
-		libc_free(used_cmd);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
-	}
-	return result;
-}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -664,9 +630,6 @@ DEFINE_PUBLIC_ALIAS(wspawnlp, libc_wspawnlp);
 DEFINE_PUBLIC_ALIAS(DOS$_wspawnlpe, libd_wspawnlpe);
 DEFINE_PUBLIC_ALIAS(DOS$wspawnlpe, libd_wspawnlpe);
 DEFINE_PUBLIC_ALIAS(wspawnlpe, libc_wspawnlpe);
-DEFINE_PUBLIC_ALIAS(DOS$_wsystem, libd_wsystem);
-DEFINE_PUBLIC_ALIAS(DOS$wsystem, libd_wsystem);
-DEFINE_PUBLIC_ALIAS(wsystem, libc_wsystem);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_PROCESS_C */

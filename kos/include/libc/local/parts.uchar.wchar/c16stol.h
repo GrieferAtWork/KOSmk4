@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x674c8c4c */
+/* HASH CRC-32:0xb963d419 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16sto32 __NAMESPACE_LOCAL_TYPEHAX(__INT32_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),__INT32_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),wcsto32)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.wchar/c16sto32.h>
+#include <libc/local/parts.uchar.stdlib/c16sto32.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16sto32 __LIBC_LOCAL_NAME(c16sto32)
 #endif /* !... */
@@ -91,7 +91,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16sto64 __NAMESPACE_LOCAL_TYPEHAX(__INT64_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),__INT64_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),wcsto64)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.wchar/c16sto64.h>
+#include <libc/local/parts.uchar.stdlib/c16sto64.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16sto64 __LIBC_LOCAL_NAME(c16sto64)
 #endif /* !... */

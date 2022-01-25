@@ -2258,7 +2258,12 @@ int setstate_r([[nonnull]] char *__restrict statebuf, [[nonnull]] struct random_
 int on_exit([[nonnull]] void (LIBCCALL *func)(int status, void *arg), void *arg);
 
 [[section(".text.crt{|.dos}.fs.environ")]]
-int clearenv();
+[[requires_include("<libc/template/environ.h>")]]
+[[userimpl, requires(defined(__LOCAL_environ))]]
+int clearenv(void) {
+	__LOCAL_environ = NULL;
+	return 0;
+}
 
 
 @@>> mkstemps(3), mkstemps64(3)

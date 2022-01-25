@@ -107,8 +107,8 @@ c32spawnle(*) %{uchar32("wspawnle")}
 c16spawnlpe(*) %{uchar16("wspawnlpe")}
 c32spawnlpe(*) %{uchar32("wspawnlpe")}
 
-c16system(*) %{uchar16("wsystem")}
-c32system(*) %{uchar32("wsystem")}
+%[insert:extern(c16system)]
+%[insert:extern(c32system)]
 
 %{
 

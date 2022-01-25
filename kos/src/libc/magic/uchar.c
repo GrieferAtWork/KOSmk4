@@ -447,28 +447,62 @@ __SYSDECL_END
  * For example:
  * >> #define _UTF_SOURCE
  * >> #include <string.h>  // Order of #includes doesn't matter; <string.h>
- * >> #include <uchar.h>   // also has a check if _UCHAR was already included
+ * >> #include <uchar.h>   // also has a check if uchar was already included
  * >> // At this point, symbols `size_t c16slen(char16_t const *str)'
  * >> // have been defined (but be aware that calling conventions may
  * >> // not be identical between char16_t and char32_t variants of
- * >> // libc functions!)
+ * >> // libc functions, and that utf-16 filesystem functions take
+ * >> // DOS paths, rather than unix paths!)
  */
 #ifdef __USE_UTF
-#if defined(_STRING_H) && !defined(_PARTS_UCHAR_STRING_H)
-#include <parts/uchar/string.h>
-#endif /* _STRING_H && !_PARTS_UCHAR_STRING_H */
+
+#if defined(_CORECRT_WDIRECT_H) && !defined(_PARTS_UCHAR_DIRECT_H)
+#include <parts/uchar/direct.h>
+#endif /* _CORECRT_WDIRECT_H && !_PARTS_UCHAR_DIRECT_H */
+
+#if defined(_FCNTL_H) && !defined(_PARTS_UCHAR_FCNTL_H)
+#include <parts/uchar/fcntl.h>
+#endif /* _FCNTL_H && !_PARTS_UCHAR_FCNTL_H */
+
+#if defined(_FORMAT_PRINTER_H) && !defined(_PARTS_UCHAR_FORMATPRINTER_H)
+#include <parts/uchar/format-printer.h>
+#endif /* _FORMAT_PRINTER_H && !_PARTS_UCHAR_FORMATPRINTER_H */
+
+#if defined(_INTTYPES_H) && !defined(_PARTS_UCHAR_INTTYPES_H)
+#include <parts/uchar/inttypes.h>
+#endif /* _INTTYPES_H && !_PARTS_UCHAR_INTTYPES_H */
+
+#if defined(_IO_H) && !defined(_PARTS_UCHAR_IO_H)
+#include <parts/uchar/io.h>
+#endif /* _IO_H && !_PARTS_UCHAR_IO_H */
 
 #if defined(_PROCESS_H) && !defined(_PARTS_UCHAR_PROCESS_H)
 #include <parts/uchar/process.h>
 #endif /* _PROCESS_H && !_PARTS_UCHAR_PROCESS_H */
 
+#if defined(_STDIO_H) && !defined(_PARTS_UCHAR_STDIO_H)
+#include <parts/uchar/stdio.h>
+#endif /* _STDIO_H && !_PARTS_UCHAR_STDIO_H */
+
 #if defined(_STDLIB_H) && !defined(_PARTS_UCHAR_STDLIB_H)
 #include <parts/uchar/stdlib.h>
 #endif /* _STDLIB_H && !_PARTS_UCHAR_STDLIB_H */
 
-#if defined(_FCNTL_H) && !defined(_PARTS_UCHAR_FCNTL_H)
-#include <parts/uchar/fcntl.h>
-#endif /* _FCNTL_H && !_PARTS_UCHAR_FCNTL_H */
+#if defined(_STRING_H) && !defined(_PARTS_UCHAR_STRING_H)
+#include <parts/uchar/string.h>
+#endif /* _STRING_H && !_PARTS_UCHAR_STRING_H */
+
+#if defined(_SYS_MMAN_H) && !defined(_PARTS_UCHAR_SYS_MMAN_H)
+#include <parts/uchar/sys/mman.h>
+#endif /* _SYS_MMAN_H && !_PARTS_UCHAR_SYS_MMAN_H */
+
+#if defined(_SYS_STAT_H) && !defined(_PARTS_UCHAR_SYS_STAT_H)
+#include <parts/uchar/sys/stat.h>
+#endif /* _SYS_STAT_H && !_PARTS_UCHAR_SYS_STAT_H */
+
+#if defined(_TIME_H) && !defined(_PARTS_UCHAR_TIME_H)
+#include <parts/uchar/time.h>
+#endif /* _TIME_H && !_PARTS_UCHAR_TIME_H */
 
 #if defined(_UNISTD_H) && !defined(_PARTS_UCHAR_UNISTD_H)
 #include <parts/uchar/unistd.h>
@@ -478,34 +512,6 @@ __SYSDECL_END
 #include <parts/uchar/utime.h>
 #endif /* _UTIME_H && !_PARTS_UCHAR_UTIME_H */
 
-#if defined(_FORMAT_PRINTER_H) && !defined(_PARTS_UCHAR_FORMATPRINTER_H)
-#include <parts/uchar/format-printer.h>
-#endif /* _FORMAT_PRINTER_H && !_PARTS_UCHAR_FORMATPRINTER_H */
-
-#if defined(_IO_H) && !defined(_PARTS_UCHAR_IO_H)
-#include <parts/uchar/io.h>
-#endif /* _IO_H && !_PARTS_UCHAR_IO_H */
-
-#if defined(_STDIO_H) && !defined(_PARTS_UCHAR_STDIO_H)
-#include <parts/uchar/stdio.h>
-#endif /* _STDIO_H && !_PARTS_UCHAR_STDIO_H */
-
-#if defined(_TIME_H) && !defined(_PARTS_UCHAR_TIME_H)
-#include <parts/uchar/time.h>
-#endif /* _TIME_H && !_PARTS_UCHAR_TIME_H */
-
-#if defined(_SYS_STAT_H) && !defined(_PARTS_UCHAR_SYS_STAT_H)
-#include <parts/uchar/sys/stat.h>
-#endif /* _SYS_STAT_H && !_PARTS_UCHAR_SYS_STAT_H */
-
-#if defined(_SYS_MMAN_H) && !defined(_PARTS_UCHAR_SYS_MMAN_H)
-#include <parts/uchar/sys/mman.h>
-#endif /* _SYS_MMAN_H && !_PARTS_UCHAR_SYS_MMAN_H */
-
-#if defined(_INTTYPES_H) && !defined(_PARTS_UCHAR_INTTYPES_H)
-#include <parts/uchar/inttypes.h>
-#endif /* _INTTYPES_H && !_PARTS_UCHAR_INTTYPES_H */
-
 #if defined(_WCHAR_H) && !defined(_PARTS_UCHAR_WCHAR_H)
 #include <parts/uchar/wchar.h>
 #endif /* _WCHAR_H && !_PARTS_UCHAR_WCHAR_H */
@@ -513,6 +519,7 @@ __SYSDECL_END
 #if defined(_WCTYPE_H) && !defined(_PARTS_UCHAR_WCTYPE_H)
 #include <parts/uchar/wctype.h>
 #endif /* _WCTYPE_H && !_PARTS_UCHAR_WCTYPE_H */
+
 #endif /* __USE_UTF */
 
 }

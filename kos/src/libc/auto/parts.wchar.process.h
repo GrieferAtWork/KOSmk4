@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f85d7c5 */
+/* HASH CRC-32:0x7b87eeab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,8 +80,6 @@ INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_wspawnlp)(__S
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBKCALL libc_wspawnlp)(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict file, char32_t const *args, ...);
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_wspawnlpe)(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, char16_t const *args, ...);
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBKCALL libc_wspawnlpe)(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict file, char32_t const *args, ...);
-INTDEF int NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd);
-INTDEF int NOTHROW_RPC(LIBKCALL libc_wsystem)(char32_t const *cmd);
 #endif /* !__KERNEL__ */
 
 DECL_END

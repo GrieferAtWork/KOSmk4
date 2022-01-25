@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ca84827 */
+/* HASH CRC-32:0xfe4a51a9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3196,6 +3196,9 @@
 #define __CRT_HAVE_DOS$wfmknodat
 #define __CRT_HAVE_DOS$wfopen
 #define __CRT_HAVE_DOS$wfreadlinkat
+#define __CRT_HAVE_DOS$wfrealpath
+#define __CRT_HAVE_DOS$wfrealpath4
+#define __CRT_HAVE_DOS$wfrealpathat
 #define __CRT_HAVE_DOS$wfreopen
 #define __CRT_HAVE_DOS$wfsymlinkat
 #define __CRT_HAVE_DOS$wget_current_dir_name
@@ -3236,6 +3239,7 @@
 #define __CRT_HAVE_DOS$wprintf_unlocked
 #define __CRT_HAVE_DOS$wreadlink
 #define __CRT_HAVE_DOS$wreadlinkat
+#define __CRT_HAVE_DOS$wrealpath
 #define __CRT_HAVE_DOS$wremove
 #define __CRT_HAVE_DOS$wremoveat
 #define __CRT_HAVE_DOS$wrename
@@ -6730,6 +6734,9 @@
 #define __CRT_HAVE_wfmknodat
 #define __CRT_HAVE_wfopen
 #define __CRT_HAVE_wfreadlinkat
+#define __CRT_HAVE_wfrealpath
+#define __CRT_HAVE_wfrealpath4
+#define __CRT_HAVE_wfrealpathat
 #define __CRT_HAVE_wfreopen
 #define __CRT_HAVE_wfsymlinkat
 #define __CRT_HAVE_wget_current_dir_name
@@ -6766,6 +6773,7 @@
 #define __CRT_HAVE_wprintf_unlocked
 #define __CRT_HAVE_wreadlink
 #define __CRT_HAVE_wreadlinkat
+#define __CRT_HAVE_wrealpath
 #define __CRT_HAVE_wremove
 #define __CRT_HAVE_wremoveat
 #define __CRT_HAVE_wrename

@@ -356,26 +356,7 @@ $pid_t wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restric
 	__REDIRECT_SPAWNLE(wchar_t, wspawnvpe, mode, file, args)
 }
 
-[[cp, guard, wchar, dos_export_alias("_wsystem")]]
-[[section(".text.crt{|.dos}.wchar.fs.exec.system")]]
-[[requires_function(convert_wcstombs, system)]]
-int wsystem([[nullable]] wchar_t const *cmd) {
-	int result;
-	char *used_cmd;
-	if (!cmd) {
-		result = system(NULL);
-	} else {
-		used_cmd = convert_wcstombs(cmd);
-		if unlikely(!used_cmd)
-			return -1;
-		result = system(used_cmd);
-@@pp_if $has_function(free)@@
-		free(used_cmd);
-@@pp_endif@@
-	}
-	return result;
-}
-
+%[insert:extern(wsystem)]
 
 %{
 

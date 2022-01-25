@@ -121,68 +121,6 @@ c32width(*) %{uchar32("wcwidth")}
 %#endif /* __USE_XOPEN */
 
 %
-%#ifdef __USE_KOS
-c16sto32_r(*) %{uchar16("wcsto32_r")}
-c32sto32_r(*) %{uchar32("wcsto32_r")}
-c16stou32_r(*) %{uchar16("wcstou32_r")}
-c32stou32_r(*) %{uchar32("wcstou32_r")}
-
-c16sto32(*) %{uchar16("wcsto32")}
-c32sto32(*) %{uchar32("wcsto32")}
-c16stou32(*) %{uchar16("wcstou32")}
-c32stou32(*) %{uchar32("wcstou32")}
-
-%#ifdef __UINT64_TYPE__
-c16sto64_r(*) %{uchar16("wcsto64_r")}
-c32sto64_r(*) %{uchar32("wcsto64_r")}
-c16stou64_r(*) %{uchar16("wcstou64_r")}
-c32stou64_r(*) %{uchar32("wcstou64_r")}
-
-c16sto64(*) %{uchar16("wcsto64")}
-c32sto64(*) %{uchar32("wcsto64")}
-c16stou64(*) %{uchar16("wcstou64")}
-c32stou64(*) %{uchar32("wcstou64")}
-%#endif /* __UINT64_TYPE__ */
-
-c16stol_r(*) %{uchar16("wcstol_r")}
-c32stol_r(*) %{uchar32("wcstol_r")}
-c16stoul_r(*) %{uchar16("wcstoul_r")}
-c32stoul_r(*) %{uchar32("wcstoul_r")}
-
-%#ifdef __LONGLONG
-c16stoll_r(*) %{uchar16("wcstoll_r")}
-c32stoll_r(*) %{uchar32("wcstoll_r")}
-c16stoull_r(*) %{uchar16("wcstoull_r")}
-c32stoull_r(*) %{uchar32("wcstoull_r")}
-%#endif /* __LONGLONG */
-
-
-%
-%#ifdef __USE_XOPEN2K8
-c16sto32_l(*) %{uchar16("wcsto32_l")}
-c32sto32_l(*) %{uchar32("wcsto32_l")}
-c16stou32_l(*) %{uchar16("wcstou32_l")}
-c32stou32_l(*) %{uchar32("wcstou32_l")}
-
-%
-%#ifdef __UINT64_TYPE__
-c16sto64_l(*) %{uchar16("wcsto64_l")}
-c32sto64_l(*) %{uchar32("wcsto64_l")}
-c16stou64_l(*) %{uchar16("wcstou64_l")}
-c32stou64_l(*) %{uchar32("wcstou64_l")}
-%#endif /* __UINT64_TYPE__ */
-%#endif /* __USE_XOPEN2K8 */
-
-
-c16toi(*) %{uchar16("wtoi")}
-c32toi(*) %{uchar32("wtoi")}
-c16tol(*) %{uchar16("wtol")}
-c32tol(*) %{uchar32("wtol")}
-c16toll(*) %{uchar16("wtoll")}
-c32toll(*) %{uchar32("wtoll")}
-%#endif /* __USE_KOS */
-
-%
 %#ifdef __USE_BSD
 fgetc16ln(*) %{uchar16("fgetwln")}
 fgetc32ln(*) %{uchar32("fgetwln")}

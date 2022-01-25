@@ -34,6 +34,10 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+/************************************************************************/
+/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/************************************************************************/
+
 }
 
 mbtoc16(*) %{uchar16("mbtowc")}
@@ -44,6 +48,96 @@ mbstoc16s(*) %{uchar16("mbstowcs")}
 mbstoc32s(*) %{uchar32("mbstowcs")}
 c16stombs(*) %{uchar16("wcstombs")}
 c32stombs(*) %{uchar32("wcstombs")}
+
+
+[[guard]] c16system(*) %{uchar16("wsystem")}
+[[guard]] c32system(*) %{uchar32("wsystem")}
+
+%
+%#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+c16realpath(*) %{uchar16("wrealpath")}
+c32realpath(*) %{uchar32("wrealpath")}
+%#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
+
+%
+%#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
+c16frealpath(*) %{uchar16("wfrealpath")}
+c32frealpath(*) %{uchar32("wfrealpath")}
+%#endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
+
+%
+%#ifdef __USE_KOS
+c16frealpath4(*) %{uchar16("wfrealpath4")}
+c32frealpath4(*) %{uchar32("wfrealpath4")}
+c16frealpathat(*) %{uchar16("wfrealpathat")}
+c32frealpathat(*) %{uchar32("wfrealpathat")}
+%#endif /* __USE_KOS */
+
+
+
+%
+%#ifdef __USE_KOS
+c16sto32_r(*) %{uchar16("wcsto32_r")}
+c32sto32_r(*) %{uchar32("wcsto32_r")}
+c16stou32_r(*) %{uchar16("wcstou32_r")}
+c32stou32_r(*) %{uchar32("wcstou32_r")}
+
+c16sto32(*) %{uchar16("wcsto32")}
+c32sto32(*) %{uchar32("wcsto32")}
+c16stou32(*) %{uchar16("wcstou32")}
+c32stou32(*) %{uchar32("wcstou32")}
+
+%#ifdef __UINT64_TYPE__
+c16sto64_r(*) %{uchar16("wcsto64_r")}
+c32sto64_r(*) %{uchar32("wcsto64_r")}
+c16stou64_r(*) %{uchar16("wcstou64_r")}
+c32stou64_r(*) %{uchar32("wcstou64_r")}
+
+c16sto64(*) %{uchar16("wcsto64")}
+c32sto64(*) %{uchar32("wcsto64")}
+c16stou64(*) %{uchar16("wcstou64")}
+c32stou64(*) %{uchar32("wcstou64")}
+%#endif /* __UINT64_TYPE__ */
+
+c16stol_r(*) %{uchar16("wcstol_r")}
+c32stol_r(*) %{uchar32("wcstol_r")}
+c16stoul_r(*) %{uchar16("wcstoul_r")}
+c32stoul_r(*) %{uchar32("wcstoul_r")}
+
+%#ifdef __LONGLONG
+c16stoll_r(*) %{uchar16("wcstoll_r")}
+c32stoll_r(*) %{uchar32("wcstoll_r")}
+c16stoull_r(*) %{uchar16("wcstoull_r")}
+c32stoull_r(*) %{uchar32("wcstoull_r")}
+%#endif /* __LONGLONG */
+
+%
+%#ifdef __USE_XOPEN2K8
+c16sto32_l(*) %{uchar16("wcsto32_l")}
+c32sto32_l(*) %{uchar32("wcsto32_l")}
+c16stou32_l(*) %{uchar16("wcstou32_l")}
+c32stou32_l(*) %{uchar32("wcstou32_l")}
+
+%
+%#ifdef __UINT64_TYPE__
+c16sto64_l(*) %{uchar16("wcsto64_l")}
+c32sto64_l(*) %{uchar32("wcsto64_l")}
+c16stou64_l(*) %{uchar16("wcstou64_l")}
+c32stou64_l(*) %{uchar32("wcstou64_l")}
+%#endif /* __UINT64_TYPE__ */
+%#endif /* __USE_XOPEN2K8 */
+
+c16toi(*) %{uchar16("wtoi")}
+c32toi(*) %{uchar32("wtoi")}
+c16tol(*) %{uchar16("wtol")}
+c32tol(*) %{uchar32("wtol")}
+%#ifdef __LONGLONG
+c16toll(*) %{uchar16("wtoll")}
+c32toll(*) %{uchar32("wtoll")}
+%#endif /* __LONGLONG */
+%#endif /* __USE_KOS */
+
+
 
 
 [[ignore]] __p___c16argv(*) %{uchar16("__p___wargv")}
