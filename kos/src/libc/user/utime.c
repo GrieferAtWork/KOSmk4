@@ -41,9 +41,9 @@ NOTHROW_RPC(LIBDCALL libd_utime)(char const *filename,
 		tv[0].tv_nsec = 0;
 		tv[1].tv_sec  = file_times->modtime;
 		tv[1].tv_nsec = 0;
-		error = sys_utimensat(AT_FDCWD, filename, tv, AT_DOSPATH);
+		error = sys_utimensat(AT_FDCWD, filename, tv, libd_AT_DOSPATH);
 	} else {
-		error = sys_utimensat(AT_FDCWD, filename, NULL, AT_DOSPATH);
+		error = sys_utimensat(AT_FDCWD, filename, NULL, libd_AT_DOSPATH);
 	}
 	return libc_seterrno_syserr(error);
 }
@@ -92,9 +92,9 @@ NOTHROW_RPC(LIBDCALL libd_utime64)(char const *filename,
 		tv[0].tv_nsec = 0;
 		tv[1].tv_sec  = file_times->modtime;
 		tv[1].tv_nsec = 0;
-		error = sys_utimensat_time64(AT_FDCWD, filename, tv, AT_DOSPATH);
+		error = sys_utimensat_time64(AT_FDCWD, filename, tv, libd_AT_DOSPATH);
 	} else {
-		error = sys_utimensat_time64(AT_FDCWD, filename, NULL, AT_DOSPATH);
+		error = sys_utimensat_time64(AT_FDCWD, filename, NULL, libd_AT_DOSPATH);
 	}
 	return libc_seterrno_syserr(error);
 }

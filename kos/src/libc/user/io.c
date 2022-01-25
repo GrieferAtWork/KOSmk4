@@ -147,7 +147,7 @@ dfind_read32i64(struct dfind *__restrict self,
 	if (!ent)
 		goto err;
 	if (fstatat(dirfd(self->df_dir), ent->d_name, &st,
-	            AT_DOSPATH | AT_SYMLINK_NOFOLLOW))
+	            AT_SYMLINK_NOFOLLOW))
 		goto err;
 	finddata->attrib      = dfind_attrib(ent, &st);
 	finddata->time_create = (s32)st.st_ctime32;
@@ -172,7 +172,7 @@ dfind_read64(struct dfind *__restrict self,
 	if (!ent)
 		goto err;
 	if (fstatat(dirfd(self->df_dir), ent->d_name, &st,
-	            AT_DOSPATH | AT_SYMLINK_NOFOLLOW))
+	            AT_SYMLINK_NOFOLLOW))
 		goto err;
 	finddata->attrib      = dfind_attrib(ent, &st);
 	finddata->time_create = (s64)st.st_ctime64;
@@ -260,7 +260,7 @@ NOTHROW_RPC(LIBDCALL libd__findfirst32i64)(char const *__restrict filename,
                                            struct _finddata32i64_t *__restrict finddata)
 /*[[[body:libd__findfirst32i64]]]*/
 {
-	return libc__findfirst32i64_impl(filename, finddata, O_DOSPATH);
+	return libc__findfirst32i64_impl(filename, finddata, libd_O_DOSPATH);
 }
 /*[[[end:libd__findfirst32i64]]]*/
 
@@ -296,7 +296,7 @@ NOTHROW_RPC(LIBDCALL libd__findfirst64)(char const *__restrict filename,
                                         struct __finddata64_t *__restrict finddata)
 /*[[[body:libd__findfirst64]]]*/
 {
-	return libc__findfirst64_impl(filename, finddata, O_DOSPATH);
+	return libc__findfirst64_impl(filename, finddata, libd_O_DOSPATH);
 }
 /*[[[end:libd__findfirst64]]]*/
 

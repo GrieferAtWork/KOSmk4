@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83edc95b */
+/* HASH CRC-32:0x83325e4c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -454,6 +454,9 @@ DFUN(".text.crt.dos.fs.utility", libd__get_osfhandle, libc__get_osfhandle, TP, 1
 DFUN(".text.crt.dos.fs.utility", libd__open_osfhandle, libc__open_osfhandle, TIn(__SIZEOF_FD_T__), 2, TP, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.utility", libd__filelength, libc__filelength, TI32, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.utility", libd__eof, libc__eof, TD, 1, TIn(__SIZEOF_FD_T__))
+
+/* kos.dosfs */
+DFUN(".text.crt.dos.io.access", libd_dosfs_setenabled, libc_dosfs_setenabled, TD, 1, TD)
 
 /* kos.guid */
 DFUN(".text.crt.dos.sched.rpc", libd_guid_fromstr, libc_guid_fromstr, TP, 2, TP, TP)

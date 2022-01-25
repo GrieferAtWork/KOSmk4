@@ -32,6 +32,7 @@
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
 #include <kos/debugtrap.h>
+#include <kos/dosfs.h>
 #include <kos/except.h>
 #include <kos/fcntl.h>
 #include <kos/kernel/types.h>
@@ -1116,6 +1117,14 @@ int main_dosenv(int argc, char *argv[], char *envp[]) {
 	int (__LIBDCALL *dos_setenv)(char const *varname, char const *val, int replace);
 	char ***p_dos_environ, **dos_environ;
 	(void)argc, (void)argv, (void)envp;
+
+	/* Enable dosfs emulation. - Otherwise, libc won't
+	 * convert  environ  paths  to/from  DOS   format.
+	 *
+	 * Note that in PE binaries, dosfs emulation will
+	 * be turned on by default! */
+	dosfs_setenabled(DOSFS_ENABLED);
+
 	if ((*(void **)&p_dos_environ = dlsym(RTLD_DEFAULT, "DOS$_environ")) == NULL ||
 	    (*(void **)&dos_setenv = dlsym(RTLD_DEFAULT, "DOS$setenv")) == NULL)
 		err(1, "dlerror: %s", dlerror());

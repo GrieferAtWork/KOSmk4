@@ -65,7 +65,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 	if (dos_oflags & DOS_O_OBTAIN_DIR)
 		result |= O_DIRECTORY;
 #endif
-	result |= O_DOSPATH;
+	result |= libd_O_DOSPATH;
 	return result;
 }
 

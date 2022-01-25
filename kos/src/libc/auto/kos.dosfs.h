@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x5ffe283b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,56 +18,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_AUTO_KOS_DOSFS_H
+#define GUARD_LIBC_AUTO_KOS_DOSFS_H 1
 
-%[define_replacement(char16_t = __CHAR16_TYPE__)]
-%[define_replacement(char32_t = __CHAR32_TYPE__)]
+#include "../api.h"
 
-%[insert:prefix(
-#include <features.h>
-)]%{
-#ifndef _FCNTL_H
-#include <fcntl.h>
-#endif /* !_FCNTL_H */
-#ifndef _UCHAR_H
-#include <uchar.h>
-#endif /* !_UCHAR_H */
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <kos/dosfs.h>
 
-#ifdef __CC__
-__SYSDECL_BEGIN
+DECL_BEGIN
 
-/************************************************************************/
-/* WARNING: UTF-16 functions use DOS paths under `DOSFS_ENABLED'        */
-/*          s.a. `dosfs_setenabled(3)'                                  */
-/************************************************************************/
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> dosfs_setenabled(3)
+ * Set the is-enabled  state for filesystem  emulation.
+ * When enabled, all DOS$-prefixed filesystem functions
+ * will include  `O_DOSPATH' /  `AT_DOSPATH' in  system
+ * calls,  meaning they accept/return DOS paths, rather
+ * than unix paths.
+ *
+ * The default state of dosfs emultion depends on the
+ * binary format of the main application. If the main
+ * application is an ELF binary, the default state is
+ * set to `DOSFS_DISABLED'.  When it's  a PE  binary,
+ * the default state is `DOSFS_ENABLED'
+ *
+ * Note that this function does not affect programs  that
+ * explicitly pass  `O_DOSPATH'  /  `AT_DOSPATH'  to  API
+ * functions.  -  This  only affects  the  implicit flags
+ * added to caller-given arguments within DOS$ functions.
+ *
+ * @param: newmode: The new mode to set (one of `DOSFS_*')
+ * @return: * :     The old mode (one of `DOSFS_*') */
+INTDEF unsigned int NOTHROW(LIBDCALL libd_dosfs_setenabled)(unsigned int newmode);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
-}
+DECL_END
 
-c16open(*) %{uchar16("wopen")}
-c32open(*) %{uchar32("wopen")}
-c16creat(*) %{uchar16("wcreat")}
-c32creat(*) %{uchar32("wcreat")}
-
-%
-%#ifdef __USE_LARGEFILE64
-c16open64(*) %{uchar16("wopen64")}
-c32open64(*) %{uchar32("wopen64")}
-c16creat64(*) %{uchar16("wcreat64")}
-c32creat64(*) %{uchar32("wcreat64")}
-%#endif /* __USE_LARGEFILE64 */
-
-%
-%#ifdef __USE_ATFILE
-c16openat(*) %{uchar16("wopenat")}
-c32openat(*) %{uchar32("wopenat")}
-%#ifdef __USE_LARGEFILE64
-c16openat64(*) %{uchar16("wopenat64")}
-c32openat64(*) %{uchar32("wopenat64")}
-%#endif /* __USE_LARGEFILE64 */
-%#endif /* __USE_ATFILE */
-
-%{
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-}
+#endif /* !GUARD_LIBC_AUTO_KOS_DOSFS_H */

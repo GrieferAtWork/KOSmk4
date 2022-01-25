@@ -42,7 +42,8 @@
 __SYSDECL_BEGIN
 
 /************************************************************************/
-/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/* WARNING: UTF-16 functions use DOS paths under `DOSFS_ENABLED'        */
+/*          s.a. `dosfs_setenabled(3)'                                  */
 /************************************************************************/
 
 #ifndef __wint16_t_defined

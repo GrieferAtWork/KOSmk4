@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6283b722 */
+/* HASH CRC-32:0xda18abd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -934,6 +934,7 @@
 #define __CRT_HAVE_DOS$dirname
 #define __CRT_HAVE_DOS$div
 #define __CRT_HAVE_DOS$dngettext
+#define __CRT_HAVE_DOS$dosfs_setenabled
 #define __CRT_HAVE_DOS$dprintf
 #define __CRT_HAVE_DOS$drand48_r
 #define __CRT_HAVE_DOS$dup
@@ -4368,6 +4369,8 @@
 #define __CRT_HAVE_dirname
 #define __CRT_HAVE_div
 #define __CRT_HAVE_dngettext
+#define __CRT_HAVE_dosfs_getenabled
+#define __CRT_HAVE_dosfs_setenabled
 #define __CRT_HAVE_dprintf
 #define __CRT_HAVE_drand48
 #define __CRT_HAVE_drand48_r

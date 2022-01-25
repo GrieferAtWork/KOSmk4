@@ -17,52 +17,52 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-
-%[define_replacement(char16_t = __CHAR16_TYPE__)]
-%[define_replacement(char32_t = __CHAR32_TYPE__)]
+%[default:section(".text.crt.dos.io.access")]
 
 %[insert:prefix(
-#include <features.h>
+#include <bits/types.h>
 )]%{
-#ifndef _FCNTL_H
-#include <fcntl.h>
-#endif /* !_FCNTL_H */
-#ifndef _UCHAR_H
-#include <uchar.h>
-#endif /* !_UCHAR_H */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-/************************************************************************/
-/* WARNING: UTF-16 functions use DOS paths under `DOSFS_ENABLED'        */
-/*          s.a. `dosfs_setenabled(3)'                                  */
-/************************************************************************/
+/* Possible values for `dosfs_(get|set)enabled(3)' */
+#define DOSFS_DISABLED 0
+#define DOSFS_ENABLED  1
 
 }
 
-c16open(*) %{uchar16("wopen")}
-c32open(*) %{uchar32("wopen")}
-c16creat(*) %{uchar16("wcreat")}
-c32creat(*) %{uchar32("wcreat")}
 
-%
-%#ifdef __USE_LARGEFILE64
-c16open64(*) %{uchar16("wopen64")}
-c32open64(*) %{uchar32("wopen64")}
-c16creat64(*) %{uchar16("wcreat64")}
-c32creat64(*) %{uchar32("wcreat64")}
-%#endif /* __USE_LARGEFILE64 */
+@@>> dosfs_getenabled(3)
+@@Get the current dosfs-emulation mode, as used by
+@@libc filesystem functions  whose names are  pre-
+@@fixed with `DOS$' (s.a.  `dosfs_setenabled(3)').
+@@@return: * : The current mode (one of `DOSFS_*')
+[[pure, wunused, nothrow]]
+unsigned int dosfs_getenabled(void);
 
-%
-%#ifdef __USE_ATFILE
-c16openat(*) %{uchar16("wopenat")}
-c32openat(*) %{uchar32("wopenat")}
-%#ifdef __USE_LARGEFILE64
-c16openat64(*) %{uchar16("wopenat64")}
-c32openat64(*) %{uchar32("wopenat64")}
-%#endif /* __USE_LARGEFILE64 */
-%#endif /* __USE_ATFILE */
+@@>> dosfs_setenabled(3)
+@@Set the is-enabled  state for filesystem  emulation.
+@@When enabled, all DOS$-prefixed filesystem functions
+@@will include  `O_DOSPATH' /  `AT_DOSPATH' in  system
+@@calls,  meaning they accept/return DOS paths, rather
+@@than unix paths.
+@@
+@@The default state of dosfs emultion depends on the
+@@binary format of the main application. If the main
+@@application is an ELF binary, the default state is
+@@set to `DOSFS_DISABLED'.  When it's  a PE  binary,
+@@the default state is `DOSFS_ENABLED'
+@@
+@@Note that this function does not affect programs  that
+@@explicitly pass  `O_DOSPATH'  /  `AT_DOSPATH'  to  API
+@@functions.  -  This  only affects  the  implicit flags
+@@added to caller-given arguments within DOS$ functions.
+@@
+@@@param: newmode: The new mode to set (one of `DOSFS_*')
+@@@return: * :     The old mode (one of `DOSFS_*')
+[[nothrow]]
+unsigned int dosfs_setenabled(unsigned int newmode);
 
 %{
 

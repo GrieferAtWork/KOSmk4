@@ -513,7 +513,7 @@ NOTHROW_RPC(LIBDCALL libd_chown)(char const *file,
                                  gid_t group)
 /*[[[body:libd_chown]]]*/
 {
-	return libc_fchownat(AT_FDCWD, file, owner, group, AT_DOSPATH);
+	return libc_fchownat(AT_FDCWD, file, owner, group, libd_AT_DOSPATH);
 }
 /*[[[end:libd_chown]]]*/
 
@@ -557,7 +557,7 @@ NOTHROW_RPC(LIBDCALL libd_link)(char const *from,
                                 char const *to)
 /*[[[body:libd_link]]]*/
 {
-	return libc_linkat(AT_FDCWD, from, AT_FDCWD, to, AT_DOSPATH);
+	return libc_linkat(AT_FDCWD, from, AT_FDCWD, to, libd_AT_DOSPATH);
 }
 /*[[[end:libd_link]]]*/
 
@@ -712,7 +712,7 @@ NOTHROW_RPC(LIBDCALL libd_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_access]]]*/
 {
-	return libc_faccessat(AT_FDCWD, file, type, AT_DOSPATH);
+	return libc_faccessat(AT_FDCWD, file, type, libd_AT_DOSPATH);
 }
 /*[[[end:libd_access]]]*/
 
@@ -737,7 +737,7 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_chdir)(char const *path)
 /*[[[body:libd_chdir]]]*/
 {
-	errno_t result = sys_fchdirat(AT_FDCWD, path, AT_DOSPATH);
+	errno_t result = sys_fchdirat(AT_FDCWD, path, libd_AT_DOSPATH);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libd_chdir]]]*/
@@ -838,7 +838,7 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_unlink)(char const *file)
 /*[[[body:libd_unlink]]]*/
 {
-	return libc_unlinkat(AT_FDCWD, file, AT_DOSPATH);
+	return libc_unlinkat(AT_FDCWD, file, libd_AT_DOSPATH);
 }
 /*[[[end:libd_unlink]]]*/
 
@@ -861,7 +861,7 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_rmdir)(char const *path)
 /*[[[body:libd_rmdir]]]*/
 {
-	return libc_unlinkat(AT_FDCWD, path, AT_REMOVEDIR | AT_DOSPATH);
+	return libc_unlinkat(AT_FDCWD, path, AT_REMOVEDIR | libd_AT_DOSPATH);
 }
 /*[[[end:libd_rmdir]]]*/
 
@@ -886,7 +886,7 @@ NOTHROW_RPC(LIBDCALL libd_euidaccess)(char const *file,
                                       __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_euidaccess]]]*/
 {
-	return libc_faccessat(AT_FDCWD, file, type, AT_DOSPATH | AT_EACCESS);
+	return libc_faccessat(AT_FDCWD, file, type, libd_AT_DOSPATH | AT_EACCESS);
 }
 /*[[[end:libd_euidaccess]]]*/
 
@@ -919,7 +919,7 @@ NOTHROW_RPC(LIBDCALL libd_faccessat)(fd_t dfd,
                                      atflag_t flags)
 /*[[[body:libd_faccessat]]]*/
 {
-	return libc_faccessat(dfd, file, type, flags | AT_DOSPATH);
+	return libc_faccessat(dfd, file, type, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_faccessat]]]*/
 
@@ -951,7 +951,7 @@ NOTHROW_RPC(LIBDCALL libd_fchownat)(fd_t dfd,
                                     atflag_t flags)
 /*[[[body:libd_fchownat]]]*/
 {
-	return libc_fchownat(dfd, file, owner, group, flags | AT_DOSPATH);
+	return libc_fchownat(dfd, file, owner, group, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_fchownat]]]*/
 
@@ -983,7 +983,7 @@ NOTHROW_RPC(LIBDCALL libd_linkat)(fd_t fromfd,
                                   atflag_t flags)
 /*[[[body:libd_linkat]]]*/
 {
-	return libc_linkat(fromfd, from, tofd, to, flags | AT_DOSPATH);
+	return libc_linkat(fromfd, from, tofd, to, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_linkat]]]*/
 
@@ -1013,7 +1013,7 @@ NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text,
                                      char const *target_path)
 /*[[[body:libd_symlinkat]]]*/
 {
-	return libc_fsymlinkat(link_text, tofd, target_path, AT_DOSPATH);
+	return libc_fsymlinkat(link_text, tofd, target_path, libd_AT_DOSPATH);
 }
 /*[[[end:libd_symlinkat]]]*/
 
@@ -1052,7 +1052,7 @@ NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd,
                                       size_t buflen)
 /*[[[body:libd_readlinkat]]]*/
 {
-	return libc_freadlinkat(dfd, path, buf, buflen, AT_DOSPATH);
+	return libc_freadlinkat(dfd, path, buf, buflen, libd_AT_DOSPATH);
 }
 /*[[[end:libd_readlinkat]]]*/
 
@@ -1093,7 +1093,7 @@ NOTHROW_RPC(LIBDCALL libd_fsymlinkat)(char const *link_text,
                                       atflag_t flags)
 /*[[[body:libd_fsymlinkat]]]*/
 {
-	return libc_fsymlinkat(link_text, tofd, target_path, flags | AT_DOSPATH);
+	return libc_fsymlinkat(link_text, tofd, target_path, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_fsymlinkat]]]*/
 
@@ -1126,7 +1126,7 @@ NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd,
                                        atflag_t flags)
 /*[[[body:libd_freadlinkat]]]*/
 {
-	return libc_freadlinkat(dfd, path, buf, buflen, flags | AT_DOSPATH);
+	return libc_freadlinkat(dfd, path, buf, buflen, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_freadlinkat]]]*/
 
@@ -1156,7 +1156,7 @@ NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd,
                                     atflag_t flags)
 /*[[[body:libd_unlinkat]]]*/
 {
-	return libc_unlinkat(dfd, name, flags | AT_DOSPATH);
+	return libc_unlinkat(dfd, name, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_unlinkat]]]*/
 
@@ -1553,7 +1553,7 @@ NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file,
                                   gid_t group)
 /*[[[body:libd_lchown]]]*/
 {
-	return libc_fchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW | AT_DOSPATH);
+	return libc_fchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW | libd_AT_DOSPATH);
 }
 /*[[[end:libd_lchown]]]*/
 
@@ -1590,7 +1590,7 @@ NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file,
 /*[[[body:libd_truncate]]]*/
 {
 	int result;
-	fd_t fd = open(file, O_RDWR | O_DOSPATH);
+	fd_t fd = open(file, O_RDWR | libd_O_DOSPATH);
 	if (fd < 0)
 		return -1;
 	result = libc_ftruncate(fd, length);
@@ -1624,7 +1624,7 @@ NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file,
 /*[[[body:libd_truncate64]]]*/
 {
 	int result;
-	fd_t fd = open(file, O_RDWR | O_DOSPATH);
+	fd_t fd = open(file, O_RDWR | libd_O_DOSPATH);
 	if (fd < 0)
 		return -1;
 	result = libc_ftruncate64(fd, length);
@@ -2144,7 +2144,7 @@ NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 /*[[[body:libd_chroot]]]*/
 {
 	int result;
-	fd_t fd = open(path, O_RDONLY | O_DIRECTORY | O_DOSPATH);
+	fd_t fd = open(path, O_RDONLY | O_DIRECTORY | libd_O_DOSPATH);
 	if (fd < 0)
 		return -1;
 	result = libd_dup2(fd, AT_FDROOT);
@@ -2484,7 +2484,7 @@ NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path,
 		result = libc_seterrno(EINVAL);
 	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
 		fd_t fd;
-		fd = open(path, O_RDONLY | O_DOSPATH);
+		fd = open(path, O_RDONLY | libd_O_DOSPATH);
 		if unlikely(fd < 0)
 			return -1;
 		result = libc_fpathconf(fd, name);

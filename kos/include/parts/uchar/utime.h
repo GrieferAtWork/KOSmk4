@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12563b9 */
+/* HASH CRC-32:0xe899ac94 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,8 @@
 __SYSDECL_BEGIN
 
 /************************************************************************/
-/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/* WARNING: UTF-16 functions use DOS paths under `DOSFS_ENABLED'        */
+/*          s.a. `dosfs_setenabled(3)'                                  */
 /************************************************************************/
 
 #include <bits/types.h>

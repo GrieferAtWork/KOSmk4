@@ -123,7 +123,7 @@ NOTHROW_RPC(LIBDCALL libd_kos_fstatat)(fd_t dirfd,
                                        struct __kos_stat *__restrict buf,
                                        atflag_t flags) {
 	errno_t error;
-	error = sys_kfstatat(dirfd, filename, (struct stat *)buf, flags | AT_DOSPATH);
+	error = sys_kfstatat(dirfd, filename, (struct stat *)buf, flags | libd_AT_DOSPATH);
 	return libc_seterrno_syserr(error);
 }
 
@@ -846,7 +846,7 @@ NOTHROW_RPC(LIBDCALL libd_mkdir)(char const *pathname,
                                  mode_t mode)
 /*[[[body:libd_mkdir]]]*/
 {
-	return libc_fmkdirat(AT_FDCWD, pathname, mode, AT_DOSPATH);
+	return libc_fmkdirat(AT_FDCWD, pathname, mode, libd_AT_DOSPATH);
 }
 /*[[[end:libd_mkdir]]]*/
 
@@ -870,7 +870,7 @@ NOTHROW_RPC(LIBDCALL libd_chmod)(char const *filename,
                                  mode_t mode)
 /*[[[body:libd_chmod]]]*/
 {
-	return libc_fchmodat(AT_FDCWD, filename, mode, AT_DOSPATH);
+	return libc_fchmodat(AT_FDCWD, filename, mode, libd_AT_DOSPATH);
 }
 /*[[[end:libd_chmod]]]*/
 
@@ -894,7 +894,7 @@ NOTHROW_RPC(LIBDCALL libd_lchmod)(char const *filename,
                                   mode_t mode)
 /*[[[body:libd_lchmod]]]*/
 {
-	return libc_fchmodat(AT_FDCWD, filename, mode, AT_DOSPATH | AT_SYMLINK_NOFOLLOW);
+	return libc_fchmodat(AT_FDCWD, filename, mode, libd_AT_DOSPATH | AT_SYMLINK_NOFOLLOW);
 }
 /*[[[end:libd_lchmod]]]*/
 
@@ -947,7 +947,7 @@ NOTHROW_RPC(LIBDCALL libd_fmkdirat)(fd_t dirfd,
                                     atflag_t flags)
 /*[[[body:libd_fmkdirat]]]*/
 {
-	return libc_fmkdirat(dirfd, pathname, mode, flags | AT_DOSPATH);
+	return libc_fmkdirat(dirfd, pathname, mode, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_fmkdirat]]]*/
 
@@ -978,7 +978,7 @@ NOTHROW_RPC(LIBDCALL libd_fmknodat)(fd_t dirfd,
                                     atflag_t flags)
 /*[[[body:libd_fmknodat]]]*/
 {
-	return libc_fmknodat(dirfd, nodename, mode, dev, flags | AT_DOSPATH);
+	return libc_fmknodat(dirfd, nodename, mode, dev, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_fmknodat]]]*/
 
@@ -1009,7 +1009,7 @@ NOTHROW_RPC(LIBDCALL libd_fchmodat)(fd_t dirfd,
                                     atflag_t flags)
 /*[[[body:libd_fchmodat]]]*/
 {
-	return libc_fchmodat(dirfd, filename, mode, flags | AT_DOSPATH);
+	return libc_fchmodat(dirfd, filename, mode, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_fchmodat]]]*/
 
@@ -1037,7 +1037,7 @@ NOTHROW_RPC(LIBDCALL libd_mkdirat)(fd_t dirfd,
                                    mode_t mode)
 /*[[[body:libd_mkdirat]]]*/
 {
-	return libc_fmkdirat(dirfd, pathname, mode, AT_DOSPATH);
+	return libc_fmkdirat(dirfd, pathname, mode, libd_AT_DOSPATH);
 }
 /*[[[end:libd_mkdirat]]]*/
 
@@ -1076,7 +1076,7 @@ NOTHROW_RPC(LIBDCALL libd_mknod)(char const *nodename,
                                  dev_t dev)
 /*[[[body:libd_mknod]]]*/
 {
-	return libc_fmknodat(AT_FDCWD, nodename, mode, dev, AT_DOSPATH);
+	return libc_fmknodat(AT_FDCWD, nodename, mode, dev, libd_AT_DOSPATH);
 }
 /*[[[end:libd_mknod]]]*/
 
@@ -1107,7 +1107,7 @@ NOTHROW_RPC(LIBDCALL libd_mknodat)(fd_t dirfd,
                                    dev_t dev)
 /*[[[body:libd_mknodat]]]*/
 {
-	return libc_fmknodat(dirfd, nodename, mode, dev, AT_DOSPATH);
+	return libc_fmknodat(dirfd, nodename, mode, dev, libd_AT_DOSPATH);
 }
 /*[[[end:libd_mknodat]]]*/
 
@@ -1136,7 +1136,7 @@ NOTHROW_RPC(LIBDCALL libd_utimensat)(fd_t dirfd,
                                      atflag_t flags)
 /*[[[body:libd_utimensat]]]*/
 {
-	return libc_utimensat(dirfd, filename, times, flags | AT_DOSPATH);
+	return libc_utimensat(dirfd, filename, times, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_utimensat]]]*/
 
@@ -1171,7 +1171,7 @@ NOTHROW_RPC(LIBDCALL libd_utimensat64)(fd_t dirfd,
                                        atflag_t flags)
 /*[[[body:libd_utimensat64]]]*/
 {
-	return libc_utimensat64(dirfd, filename, times, flags | AT_DOSPATH);
+	return libc_utimensat64(dirfd, filename, times, flags | libd_AT_DOSPATH);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libd_utimensat64]]]*/

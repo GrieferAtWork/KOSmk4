@@ -878,7 +878,10 @@ NOTHROW_NCX(CC libd_alloc_environ)(char **unix_environ) {
 		return NULL;
 	for (i = 0; i < count; ++i) {
 		char *str = unix_environ[i];
-		char *eq  = strchr(str, '=');
+		char *eq;
+		if (!libd_have_dosfs())
+			goto fallback;
+		eq = strchr(str, '=');
 		if (eq) {
 			size_t i, name_length = (size_t)(eq - str);
 			if (name_length > COMPILER_STRLEN(environ_special[0].es_name))
@@ -957,6 +960,8 @@ NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname)
 /*[[[body:libd_getenv]]]*/
 {
 	char **dos_environ;
+	if (!libd_have_dosfs())
+		return libc_getenv(varname);
 	if unlikely(!varname)
 		return NULL;
 	if (libd_environ != NULL &&
@@ -1186,6 +1191,9 @@ NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname,
 /*[[[body:libd_setenv]]]*/
 {
 	size_t i;
+	if (!libd_have_dosfs())
+		return libc_setenv(varname, val, replace);
+
 	if (!replace) {
 		if (libc_getenv(varname) != NULL)
 			return 0; /* Don't overwrite existing variables. */
@@ -1274,7 +1282,7 @@ NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname)
 
 	/* On success, also  try to  remove the string  from the  DOS
 	 * environment table (in case said table has been allocated). */
-	if (result == 0 && libd_environ != NULL) {
+	if (result == 0 && libd_environ != NULL && libd_have_dosfs()) {
 		char **tab, ***p_dos_environ = &DOS$environ;
 		if ((tab = *p_dos_environ) != NULL) {
 			char *str;
@@ -2213,7 +2221,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
                                       atflag_t flags)
 /*[[[body:libd_frealpath4]]]*/
 {
-	return libc_frealpath4(fd, resolved, buflen, flags | AT_DOSPATH);
+	return libc_frealpath4(fd, resolved, buflen, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_frealpath4]]]*/
 
@@ -2322,7 +2330,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd,
                                        atflag_t flags)
 /*[[[body:libd_frealpathat]]]*/
 {
-	return libc_frealpathat(dirfd, filename, resolved, buflen, flags | AT_DOSPATH);
+	return libc_frealpathat(dirfd, filename, resolved, buflen, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_frealpathat]]]*/
 
@@ -2663,6 +2671,8 @@ NOTHROW_NCX(LIBDCALL libd_alloc_pgmptr)(void) {
 		return NULL;
 	if (unix_pgmptr[0] != '/')
 		return unix_pgmptr; /* Non-absolute paths work the same under DOS */
+	if (!libd_have_dosfs())
+		return unix_pgmptr; /* Not trying to emulate a DOS filesystem */
 	/* Convert path into a DOS name. */
 	return libd_from_unix_filename(unix_pgmptr, NULL, 0);
 }

@@ -262,6 +262,14 @@ INTDEF NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/ errno_t v
 INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno_neg)(errno_t value);
 INTDEF NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value);
 
+/* DOS filesystem compatibility controls. */
+INTDEF oflag_t libd_O_DOSPATH;   /* Either `0' or `O_DOSPATH' */
+INTDEF atflag_t libd_AT_DOSPATH; /* Either `0' or `AT_DOSPATH' */
+
+/* Check if DOS filesystem emulation should be used for `DOS$' functions. */
+#define libd_have_dosfs() (libd_O_DOSPATH != 0)
+
+
 #if 1
 #define CONFIG_LOG_LIBC_UNIMPLEMENTED 1
 INTDEF void LIBCCALL libc_unimplemented(char const *__restrict name);

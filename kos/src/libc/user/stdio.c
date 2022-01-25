@@ -1768,7 +1768,7 @@ NOTHROW_RPC(LIBDCALL libd_renameat)(fd_t oldfd,
                                     char const *newname_or_path)
 /*[[[body:libd_renameat]]]*/
 {
-	return libc_renameat2(oldfd, oldname, newfd, newname_or_path, AT_DOSPATH);
+	return libc_renameat2(oldfd, oldname, newfd, newname_or_path, libd_AT_DOSPATH);
 }
 /*[[[end:libd_renameat]]]*/
 
@@ -1803,7 +1803,7 @@ NOTHROW_RPC(LIBDCALL libd_renameat2)(fd_t oldfd,
                                      atflag_t flags)
 /*[[[body:libd_renameat2]]]*/
 {
-	return libc_renameat2(oldfd, oldname, newfd, newname_or_path, flags | AT_DOSPATH);
+	return libc_renameat2(oldfd, oldname, newfd, newname_or_path, flags | libd_AT_DOSPATH);
 }
 /*[[[end:libd_renameat2]]]*/
 
@@ -2968,7 +2968,7 @@ NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename,
 	uint32_t flags;
 	oflag_t oflags;
 	flags = file_evalmodes(modes, &oflags);
-	fd    = open(filename, oflags | O_DOSPATH, 0644);
+	fd    = open(filename, oflags | libd_O_DOSPATH, 0644);
 	if unlikely(fd < 0)
 		return NULL;
 	result = file_openfd(fd, flags);
@@ -3682,7 +3682,7 @@ NOTHROW_RPC(LIBDCALL libd_freopen)(char const *__restrict filename,
 	uint32_t flags;
 	oflag_t oflags;
 	flags = file_evalmodes(modes, &oflags);
-	fd    = open(filename, oflags | O_DOSPATH, 0644);
+	fd    = open(filename, oflags | libd_O_DOSPATH, 0644);
 	if unlikely(fd < 0)
 		return NULL;
 	stream = file_fromuser(stream);
@@ -3750,7 +3750,7 @@ NOTHROW_RPC(LIBDCALL libd_freopen_unlocked)(char const *__restrict filename,
 	uint32_t flags;
 	oflag_t oflags;
 	flags = file_evalmodes(modes, &oflags);
-	fd    = open(filename, oflags | O_DOSPATH, 0644);
+	fd    = open(filename, oflags | libd_O_DOSPATH, 0644);
 	if unlikely(fd < 0)
 		return NULL;
 	stream = file_fromuser(stream);

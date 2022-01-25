@@ -2095,6 +2095,8 @@
 #define __CRT_HAVE_dirname
 #define __CRT_HAVE_div
 #define __CRT_HAVE_dngettext
+#define __CRT_HAVE_dosfs_getenabled
+#define __CRT_HAVE_dosfs_setenabled
 #define __CRT_HAVE_dprintf
 #define __CRT_HAVE_drand48
 #define __CRT_HAVE_drand48_r

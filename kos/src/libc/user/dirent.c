@@ -122,7 +122,7 @@ NOTHROW_RPC(LIBDCALL libd_fopendirat)(fd_t dirfd,
                                       oflag_t oflags)
 /*[[[body:libd_fopendirat]]]*/
 {
-	return libc_fopendirat(dirfd, name, oflags | O_DOSPATH);
+	return libc_fopendirat(dirfd, name, oflags | libd_O_DOSPATH);
 }
 /*[[[end:libd_fopendirat]]]*/
 
@@ -158,7 +158,7 @@ NOTHROW_RPC(LIBDCALL libd_opendirat)(fd_t dirfd,
                                      char const *name)
 /*[[[body:libd_opendirat]]]*/
 {
-	return libc_fopendirat(dirfd, name, O_RDONLY | O_DIRECTORY | O_DOSPATH);
+	return libc_fopendirat(dirfd, name, O_RDONLY | O_DIRECTORY | libd_O_DOSPATH);
 }
 /*[[[end:libd_opendirat]]]*/
 

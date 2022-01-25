@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf75ad1a9 */
+/* HASH CRC-32:0xeef5b40a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,11 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+/************************************************************************/
+/* WARNING: UTF-16 functions use DOS paths under `DOSFS_ENABLED'        */
+/*          s.a. `dosfs_setenabled(3)'                                  */
+/************************************************************************/
 
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_wopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)

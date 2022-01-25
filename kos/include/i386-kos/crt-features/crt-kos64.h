@@ -1912,6 +1912,8 @@
 #define __CRT_HAVE_dirname
 #define __CRT_HAVE_div
 #define __CRT_HAVE_dngettext
+#define __CRT_HAVE_dosfs_getenabled
+#define __CRT_HAVE_dosfs_setenabled
 #define __CRT_HAVE_dprintf
 #define __CRT_HAVE_drand48
 #define __CRT_HAVE_drand48_r
@@ -6899,6 +6901,7 @@
 #define __CRT_HAVE_KOS$dirname
 #define __CRT_HAVE_KOS$div
 #define __CRT_HAVE_KOS$dngettext
+#define __CRT_HAVE_KOS$dosfs_setenabled
 #define __CRT_HAVE_KOS$dprintf
 #define __CRT_HAVE_KOS$drand48_r
 #define __CRT_HAVE_KOS$drem
@@ -10741,6 +10744,7 @@
 #define __CRT_HAVE_DOS$dirname
 #define __CRT_HAVE_DOS$div
 #define __CRT_HAVE_DOS$dngettext
+#define __CRT_HAVE_DOS$dosfs_setenabled
 #define __CRT_HAVE_DOS$dprintf
 #define __CRT_HAVE_DOS$drand48_r
 #define __CRT_HAVE_DOS$drem

@@ -35,6 +35,7 @@
 #include <hybrid/wordbits.h>
 
 #include <asm/intrin.h>
+#include <kos/dosfs.h>
 #include <kos/except.h>
 #include <kos/exec/bits/peb.h>
 #include <kos/syscalls.h>
@@ -931,7 +932,11 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	char *filename;
 	struct peexec_data *pe = peexec_info__pi_pe(info);
 
+	/* Turn on dosfs emulation for `DOS$'-prefixed functions in libc. */
+	dosfs_setenabled(DOSFS_ENABLED);
+
 #if 0
+	/* Dump some information to the system log. */
 	syslog(LOG_DEBUG, "[pe] info->pi_rtldaddr                         = %p\n", info->pi_rtldaddr);
 	syslog(LOG_DEBUG, "[pe] info->pi_pnum                             = %#I16x\n", info->pi_pnum);
 	syslog(LOG_DEBUG, "[pe] info->pi_libdl_pe                         = %q\n", info->pi_libdl_pe);

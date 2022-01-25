@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a278d0 */
+/* HASH CRC-32:0x550f4a35 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,8 @@
 __SYSDECL_BEGIN
 
 /************************************************************************/
-/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/* WARNING: UTF-16 functions use DOS paths under `DOSFS_ENABLED'        */
+/*          s.a. `dosfs_setenabled(3)'                                  */
 /************************************************************************/
 
 struct _c16finddata32_t;
