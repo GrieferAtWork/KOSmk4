@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93ee571d */
+/* HASH CRC-32:0x31efe6b4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -418,7 +418,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_findnext64, libd__findnext64);
 DEFINE_PUBLIC_ALIAS(DOS$_mktemp_s, libd__mktemp_s);
 DEFINE_PUBLIC_ALIAS(DOS$_pipe, libd__pipe);
 DEFINE_PUBLIC_ALIAS(DOS$_filelengthi64, libd__filelengthi64);
-DEFINE_PUBLIC_ALIAS(DOS$umask_s, libd_umask_s);
 DEFINE_PUBLIC_ALIAS(DOS$__lock_fhandle, libd___lock_fhandle);
 DEFINE_PUBLIC_ALIAS(DOS$_unlock_fhandle, libd__unlock_fhandle);
 DEFINE_PUBLIC_ALIAS(DOS$_get_osfhandle, libd__get_osfhandle);

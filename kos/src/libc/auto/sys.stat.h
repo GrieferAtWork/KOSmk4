@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98a75d37 */
+/* HASH CRC-32:0xc7330beb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,18 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> umask(2) */
 INTDEF mode_t NOTHROW_NCX(LIBDCALL libd_umask)(mode_t mode);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mkfifo(2) */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mkfifo)(char const *fifoname, mode_t mode);
+/* >> mkfifo(2) */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkfifo)(char const *fifoname, mode_t mode);
+/* >> mkfifoat(2) */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_mkfifoat)(fd_t dirfd, char const *fifoname, mode_t mode);
+/* >> mkfifoat(2) */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_mkfifoat)(fd_t dirfd, char const *fifoname, mode_t mode);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fchmod(2) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fchmod)(fd_t fd, mode_t mode);
 /* >> futimens(2), futimens64(2) */

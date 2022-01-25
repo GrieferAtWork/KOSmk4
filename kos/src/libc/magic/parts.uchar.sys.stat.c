@@ -34,10 +34,66 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+/************************************************************************/
+/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/************************************************************************/
+
 }
 
-/* TODO */
+c16mkdir(*) %{uchar16("wmkdir")}
+c32mkdir(*) %{uchar32("wmkdir")}
+c16chmod(*) %{uchar16("wchmod")}
+c32chmod(*) %{uchar32("wchmod")}
 
+%
+%#ifdef __USE_MISC
+c16lchmod(*) %{uchar16("wlchmod")}
+c32lchmod(*) %{uchar32("wlchmod")}
+%#endif /* __USE_MISC */
+
+
+%
+%#if defined(__USE_KOS) && defined(__USE_ATFILE)
+c16fmkdirat(*) %{uchar16("wfmkdirat")}
+c32fmkdirat(*) %{uchar32("wfmkdirat")}
+c16fmknodat(*) %{uchar16("wfmknodat")}
+c32fmknodat(*) %{uchar32("wfmknodat")}
+%#endif /* __USE_KOS && __USE_ATFILE */
+
+c16mkfifo(*) %{uchar16("wmkfifo")}
+c32mkfifo(*) %{uchar32("wmkfifo")}
+
+%
+%#ifdef __USE_ATFILE
+c16fchmodat(*) %{uchar16("wfchmodat")}
+c32fchmodat(*) %{uchar32("wfchmodat")}
+c16mkdirat(*) %{uchar16("wmkdirat")}
+c32mkdirat(*) %{uchar32("wmkdirat")}
+c16mkfifoat(*) %{uchar16("wmkfifoat")}
+c32mkfifoat(*) %{uchar32("wmkfifoat")}
+%#endif /* __USE_ATFILE */
+
+%
+%#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+c16mknod(*) %{uchar16("wmknod")}
+c32mknod(*) %{uchar32("wmknod")}
+
+%#ifdef __USE_ATFILE
+c16mknodat(*) %{uchar16("wmknodat")}
+c32mknodat(*) %{uchar32("wmknodat")}
+%#endif /* __USE_ATFILE */
+%#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
+
+%
+%#ifdef __USE_ATFILE
+c16utimensat(*) %{uchar16("wutimensat")}
+c32utimensat(*) %{uchar32("wutimensat")}
+
+%#ifdef __USE_TIME64
+c16utimensat64(*) %{uchar16("wutimensat64")}
+c32utimensat64(*) %{uchar32("wutimensat64")}
+%#endif /* __USE_TIME64 */
+%#endif /* __USE_ATFILE */
 
 %{
 

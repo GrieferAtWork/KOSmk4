@@ -695,10 +695,25 @@ int crt_flushall();
 @@>> remove(3)
 @@Remove a file or directory `filename'
 [[crt_dos_variant, cp, std, guard]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
-[[requires(defined(__AT_FDCWD) && $has_function(removeat))]]
+[[requires_include("<asm/os/fcntl.h>", "<asm/os/errno.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(removeat)) ||
+           (defined(__EISDIR) && defined(__ENOTDIR) && $has_function(unlink, rmdir)))]]
+[[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>")]]
 int remove([[nonnull]] char const *filename) {
+@@pp_if defined(__AT_FDCWD) && $has_function(removeat)@@
 	return removeat(__AT_FDCWD, filename);
+@@pp_else@@
+	int result;
+	for (;;) {
+		result = unlink(filename);
+		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
+			break;
+		result = rmdir(filename);
+		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
+			break;
+	}
+	return result;
+@@pp_endif@@
 }
 
 @@>> rename(2)
@@ -1606,7 +1621,8 @@ __STDC_INT_AS_SSIZE_T dprintf($fd_t fd, [[nonnull]] char const *__restrict forma
 %
 %#ifdef __USE_ATFILE
 @@>> renameat(2)
-[[crt_dos_variant, cp, userimpl, requires_function(renameat2), section(".text.crt{|.dos}.fs.modify")]]
+[[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.modify")]]
+[[userimpl, requires_function(renameat2)]]
 int renameat($fd_t oldfd, [[nonnull]] char const *oldname,
              $fd_t newfd, [[nonnull]] char const *newname_or_path) {
 	return renameat2(oldfd, oldname, newfd, newname_or_path, 0);
@@ -1617,7 +1633,26 @@ int renameat($fd_t oldfd, [[nonnull]] char const *oldname,
 @@>> removeat(3)
 @@Remove a file or directory `filename' relative to a given base directory `dirfd'
 [[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.modify")]]
-int removeat($fd_t dirfd, [[nonnull]] char const *filename);
+[[requires_include("<asm/os/fcntl.h>", "<asm/os/errno.h>")]]
+[[requires(defined(__AT_REMOVEDIR) && $has_function(unlinkat) &&
+           (defined(__AT_REMOVEDIR) || (defined(__EISDIR) && defined(__ENOTDIR))))]]
+[[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>")]]
+int removeat($fd_t dirfd, [[nonnull]] char const *filename) {
+@@pp_ifdef __AT_REMOVEREG@@
+	return unlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
+@@pp_else@@
+	int result;
+	for (;;) {
+		result = unlinkat(dirfd, filename, 0);
+		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
+			break;
+		result = unlinkat(dirfd, filename, __AT_REMOVEDIR);
+		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
+			break;
+	}
+	return result;
+@@pp_endif@@
+}
 %#endif /* __USE_KOS */
 %#endif /* __USE_ATFILE */
 
@@ -5026,5 +5061,11 @@ __STDC_INT_AS_SSIZE_T vsscanf_s([[nonnull]] char const *buf, [[nonnull]] char co
 #include <parts/uchar/stdio.h>
 #endif /* _UCHAR_H && !_PARTS_UCHAR_STDIO_H */
 #endif /* __USE_UTF */
+
+#ifdef __USE_KOS
+#if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_STDIO_H)
+#include <parts/wchar/stdio.h>
+#endif /* _WCHAR_H && !_PARTS_WCHAR_STDIO_H */
+#endif /* __USE_KOS */
 
 }

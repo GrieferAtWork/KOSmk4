@@ -27,11 +27,11 @@
 #if defined(_M_FP_FAST)
 #define __FLT_EVAL_METHOD__ (-1)
 #elif defined(_M_IX86)
-#if defined(_M_IX86_FP) && (_M_IX86_FP + 0) == 2
+#if defined(_M_IX86_FP) && (_M_IX86_FP + 0) >= 2
 #define __FLT_EVAL_METHOD__ 0
-#else /* _M_IX86_FP == 2 */
+#else /* _M_IX86_FP >= 2 */
 #define __FLT_EVAL_METHOD__ 2
-#endif /* _M_IX86_FP != 2 */
+#endif /* _M_IX86_FP < 2 */
 #else /* ... */
 #define __FLT_EVAL_METHOD__ 0
 #endif /* !... */

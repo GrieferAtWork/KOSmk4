@@ -2888,4 +2888,10 @@ __SYSDECL_END
 #endif /* _UCHAR_H && !_PARTS_UCHAR_WCHAR_H */
 #endif /* __USE_UTF */
 
+#ifdef __USE_DOS
+#ifndef _CORECRT_WIO_H
+#include <corecrt_wio.h>
+#endif /* !_CORECRT_WIO_H */
+#endif /* __USE_DOS */
+
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc540d85 */
+/* HASH CRC-32:0x9c8782ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -449,7 +449,6 @@ DFUN(".text.crt.dos.fs.dir", libd__findnext64, libc__findnext64, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd__mktemp_s, libc__mktemp_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TI)
 DFUN(".text.crt.dos.fs.io", libd__pipe, libc__pipe, TD, 3, TP, TI32, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.utility", libd__filelengthi64, libc__filelengthi64, TI64, 1, TIn(__SIZEOF_FD_T__))
-DFUN(".text.crt.dos.fs.basic_property", libd_umask_s, libc_umask_s, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_MODE_T__), TP)
 DFUN(".text.crt.dos.fs.utility", libd___lock_fhandle, libc___lock_fhandle, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.utility", libd__unlock_fhandle, libc__unlock_fhandle, TV, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.utility", libd__get_osfhandle, libc__get_osfhandle, TP, 1, TIn(__SIZEOF_FD_T__))

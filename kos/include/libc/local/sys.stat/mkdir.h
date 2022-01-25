@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2863f7c5 */
+/* HASH CRC-32:0x66186f9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,42 @@
 #ifndef __local_mkdir_defined
 #define __local_mkdir_defined
 #include <__crt.h>
-#if defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dos_mkdir_defined
+#if !defined(__local___localdep_dos_mkdir_defined) && defined(__CRT_HAVE__mkdir)
 #define __local___localdep_dos_mkdir_defined
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_dos_mkdir,(char const *__pathname),_mkdir,(__pathname))
-#endif /* !__local___localdep_dos_mkdir_defined */
+#endif /* !__local___localdep_dos_mkdir_defined && __CRT_HAVE__mkdir */
+#ifndef __local___localdep_mkdirat_defined
+#define __local___localdep_mkdirat_defined
+#ifdef __CRT_HAVE_mkdirat
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_mkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),mkdirat,(__dirfd,__pathname,__mode))
+#elif defined(__CRT_HAVE_fmkdirat)
+__NAMESPACE_LOCAL_END
+#include <libc/local/sys.stat/mkdirat.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_mkdirat __LIBC_LOCAL_NAME(mkdirat)
+#else /* ... */
+#undef __local___localdep_mkdirat_defined
+#endif /* !... */
+#endif /* !__local___localdep_mkdirat_defined */
 __LOCAL_LIBC(mkdir) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdir))(char const *__pathname, __mode_t __mode) {
+#if defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 	(void)__mode;
 	return (__NAMESPACE_LOCAL_SYM __localdep_dos_mkdir)(__pathname);
+#else /* __CRT_DOS_PRIMARY && __CRT_HAVE__mkdir */
+	return (__NAMESPACE_LOCAL_SYM __localdep_mkdirat)(__AT_FDCWD, __pathname, __mode);
+#endif /* !__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mkdir_defined
 #define __local___localdep_mkdir_defined
 #define __localdep_mkdir __LIBC_LOCAL_NAME(mkdir)
 #endif /* !__local___localdep_mkdir_defined */
-#else /* __CRT_DOS_PRIMARY && __CRT_HAVE__mkdir */
+#else /* (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat)) */
 #undef __local_mkdir_defined
-#endif /* !__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir */
+#endif /* (!__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir) && (!__AT_FDCWD || (!__CRT_HAVE_mkdirat && !__CRT_HAVE_fmkdirat)) */
 #endif /* !__local_mkdir_defined */

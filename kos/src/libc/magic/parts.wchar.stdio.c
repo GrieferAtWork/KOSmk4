@@ -40,25 +40,143 @@ __SYSDECL_BEGIN
 
 }
 
-[[guard, wchar, dos_export_alias("_wremove")]]
-[[section(".text.crt{|.dos}.wchar.fs.modify")]]
-[[requires_function(convert_wcstombs, remove)]]
+%[default:section(".text.crt{|.dos}.wchar.fs.modify")]
+
+[[wchar, cp, dos_only_export_alias("_wremove")]]
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(wremoveat)) ||
+           $has_function(remove, convert_wcstombs))]]
 int wremove([[nonnull]] wchar_t const *filename) {
-	int result = -1;
-	/*utf-8*/ char *utf8_filename;
+@@pp_if defined(__AT_FDCWD) && $has_function(wremoveat)@@
+	return wremoveat(__AT_FDCWD, filename);
+@@pp_else@@
+	char *utf8_filename;
+	int result;
 	utf8_filename = convert_wcstombs(filename);
-	if likely(utf8_filename) {
-		result = remove(utf8_filename);
+	if unlikely(!utf8_filename)
+		return -1;
+	result = remove(utf8_filename);
 @@pp_if $has_function(free)@@
-		free(utf8_filename);
+	free(utf8_filename);
 @@pp_endif@@
-	}
 	return result;
+@@pp_endif@@
 }
 
-[[wchar, wunused, dos_export_alias("_wfopen")]]
+[[wchar, cp, dos_only_export_alias("_wrename")]]
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(wrenameat)) ||
+           $has_function(renameat, convert_wcstombs))]]
+int wrename([[nonnull]] wchar_t const *oldname,
+            [[nonnull]] wchar_t const *newname_or_path) {
+@@pp_if defined(__AT_FDCWD) && $has_function(wrenameat)@@
+	return wrenameat(__AT_FDCWD, oldname, __AT_FDCWD, newname_or_path);
+@@pp_else@@
+	char *utf8_oldname;
+	char *utf8_newname_or_path;
+	int result;
+	utf8_oldname = convert_wcstombs(oldname);
+	if unlikely(!utf8_oldname)
+		return -1;
+	utf8_newname_or_path = convert_wcstombs(newname_or_path);
+	if unlikely(!utf8_newname_or_path) {
+@@pp_if $has_function(free)@@
+		free(utf8_oldname);
+@@pp_endif@@
+		return -1;
+	}
+	result = rename(utf8_oldname, utf8_newname_or_path);
+@@pp_if $has_function(free)@@
+	free(utf8_newname_or_path);
+	free(utf8_oldname);
+@@pp_endif@@
+	return result;
+@@pp_endif@@
+}
+
+%
+%#ifdef __USE_ATFILE
+[[wchar, cp]]
+[[requires($has_function(wrenameat2) ||
+           $has_function(renameat, convert_wcstombs))]]
+int wrenameat($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
+              $fd_t newfd, [[nonnull]] wchar_t const *newname_or_path) {
+@@pp_if $has_function(wrenameat2)@@
+	return wrenameat2(oldfd, oldname, newfd, newname_or_path, 0);
+@@pp_else@@
+	char *utf8_oldname;
+	char *utf8_newname_or_path;
+	int result;
+	utf8_oldname = convert_wcstombs(oldname);
+	if unlikely(!utf8_oldname)
+		return -1;
+	utf8_newname_or_path = convert_wcstombs(newname_or_path);
+	if unlikely(!utf8_newname_or_path) {
+@@pp_if $has_function(free)@@
+		free(utf8_oldname);
+@@pp_endif@@
+		return -1;
+	}
+	result = renameat(oldfd, utf8_oldname, newfd, utf8_newname_or_path);
+@@pp_if $has_function(free)@@
+	free(utf8_newname_or_path);
+	free(utf8_oldname);
+@@pp_endif@@
+	return result;
+@@pp_endif@@
+}
+
+%
+%#ifdef __USE_KOS
+[[wchar, cp, requires_function(removeat, convert_wcstombs)]]
+int wremoveat($fd_t dirfd, [[nonnull]] wchar_t const *filename) {
+	char *utf8_filename;
+	int result;
+	utf8_filename = convert_wcstombs(filename);
+	if unlikely(!utf8_filename)
+		return -1;
+	result = removeat(dirfd, utf8_filename);
+@@pp_if $has_function(free)@@
+	free(utf8_filename);
+@@pp_endif@@
+	return result;
+}
+%#endif /* __USE_KOS */
+%#endif /* __USE_ATFILE */
+
+
+%#ifdef __USE_GNU
+[[wchar, cp, requires_function(renameat2, convert_wcstombs)]]
+int wrenameat2($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
+               $fd_t newfd, [[nonnull]] wchar_t const *newname_or_path,
+               $atflag_t flags) {
+	char *utf8_oldname;
+	char *utf8_newname_or_path;
+	int result;
+	utf8_oldname = convert_wcstombs(oldname);
+	if unlikely(!utf8_oldname)
+		return -1;
+	utf8_newname_or_path = convert_wcstombs(newname_or_path);
+	if unlikely(!utf8_newname_or_path) {
+@@pp_if $has_function(free)@@
+		free(utf8_oldname);
+@@pp_endif@@
+		return -1;
+	}
+	result = renameat2(oldfd, utf8_oldname, newfd, utf8_newname_or_path, flags);
+@@pp_if $has_function(free)@@
+	free(utf8_newname_or_path);
+	free(utf8_oldname);
+@@pp_endif@@
+	return result;
+}
+%#endif /* __USE_GNU */
+
+
+
+[[wchar, wunused, dos_only_export_alias("_wfopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
-[[requires_function(convert_wcstombs, fopen)]]
+[[requires_function(fopen, convert_wcstombs)]]
 $FILE *wfopen([[nonnull]] wchar_t const *filename,
               [[nonnull]] wchar_t const *mode) {
 	FILE *result = NULL;
@@ -82,9 +200,9 @@ done:
 	return result;
 }
 
-[[wchar, wunused, dos_export_alias("_wfreopen")]]
+[[wchar, wunused, dos_only_export_alias("_wfreopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
-[[requires_function(convert_wcstombs, freopen)]]
+[[requires_function(freopen, convert_wcstombs)]]
 $FILE *wfreopen([[nonnull]] wchar_t const *filename,
                 [[nonnull]] wchar_t const *mode,
                 $FILE *stream) {
@@ -109,9 +227,9 @@ done:
 	return result;
 }
 
-[[guard, wchar, wunused, dos_export_alias("_wpopen")]]
+[[guard, wchar, wunused, dos_only_export_alias("_wpopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
-[[requires_function(convert_wcstombs, popen)]]
+[[requires_function(popen, convert_wcstombs)]]
 $FILE *wpopen([[nonnull]] wchar_t const *command,
               [[nonnull]] wchar_t const *mode) {
 	FILE *result = NULL;

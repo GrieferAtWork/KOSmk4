@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc04488d8 */
+/* HASH CRC-32:0x12563b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,10 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+/************************************************************************/
+/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/************************************************************************/
 
 #include <bits/types.h>
 #if defined(__CRT_HAVE_wutime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

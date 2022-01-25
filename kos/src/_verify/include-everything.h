@@ -133,6 +133,7 @@ incdir("");
 #include <asm/cacheline.h>
 #include <asm/crt/aio.h>
 #include <asm/crt/confname.h>
+#include <asm/crt/float.h>
 #include <asm/crt/fp_type.h>
 #include <asm/crt/getpassfd.h>
 #include <asm/crt/glob.h>
@@ -462,6 +463,7 @@ incdir("");
 #include <confstr.h>
 #include <corecrt.h>
 #include <corecrt_stdio_config.h>
+#include <corecrt_wio.h>
 #include <cpio.h>
 #include <crtdbg.h>
 #include <crtdefs.h>
@@ -489,6 +491,7 @@ incdir("");
 #include <float.h>
 #include <fnmatch.h>
 #include <format-printer.h>
+#include <fpu_control.h>
 #include <fts.h>
 #include <ftw.h>
 #include <getopt.h>
@@ -1034,6 +1037,7 @@ incdir("");
 #include <parts/uchar/wchar.h>
 #include <parts/uchar/wctype.h>
 #include <parts/waitmacros.h>
+#include <parts/wchar/fcntl.h>
 #include <parts/wchar/format-printer.h>
 #include <parts/wchar/process.h>
 #include <parts/wchar/stdio.h>

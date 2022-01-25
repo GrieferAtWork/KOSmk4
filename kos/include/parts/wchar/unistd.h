@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5a561b7 */
+/* HASH CRC-32:0xac7de9d8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,13 +85,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !__CRT_HAVE_wlink */
 #ifdef __CRT_HAVE_waccess
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
-#else /* __CRT_HAVE_waccess */
+#elif defined(__CRT_HAVE__waccess)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
+#else /* ... */
 #include <asm/os/fcntl.h>
 #if (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_faccessat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/parts.wchar.unistd/waccess.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(waccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL waccess)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(waccess))(__file, __type); })
 #endif /* (__AT_FDCWD && (__CRT_HAVE_wfaccessat || (__CRT_HAVE_faccessat && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)))) || ((__CRT_HAVE_access || __CRT_HAVE__access || __CRT_HAVE___access || __CRT_HAVE___libc_access || (__AT_FDCWD && __CRT_HAVE_faccessat)) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)) */
-#endif /* !__CRT_HAVE_waccess */
+#endif /* !... */
 #ifdef __CRT_HAVE_wchdir
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),(__path))
 #elif defined(__CRT_HAVE__wchdir)

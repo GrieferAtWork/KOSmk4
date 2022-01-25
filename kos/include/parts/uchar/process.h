@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e422b24 */
+/* HASH CRC-32:0xf90345f2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,8 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <bits/types.h>
+
 #ifndef _PROCESS_H
 #include <process.h>
 #endif /* !_PROCESS_H */
@@ -36,10 +38,12 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
-#include <bits/types.h>
-
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+/************************************************************************/
+/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/************************************************************************/
 
 #ifndef __T16ARGV
 #ifdef __USE_DOS_ALTERATIONS

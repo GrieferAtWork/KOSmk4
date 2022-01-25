@@ -1829,60 +1829,6 @@ NOTHROW_RPC(LIBCCALL libc_renameat2)(fd_t oldfd,
 }
 /*[[[end:libc_renameat2]]]*/
 
-/*[[[head:libd_removeat,hash:CRC-32=0xcc2f51b7]]]*/
-/* >> removeat(3)
- * Remove a file or directory `filename' relative to a given base directory `dirfd' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
-NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd,
-                                    char const *filename)
-/*[[[body:libd_removeat]]]*/
-{
-	errno_t result;
-	result = sys_unlinkat(dirfd, filename,
-	                      AT_DOSPATH | AT_REMOVEDIR | AT_REMOVEREG);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libd_removeat]]]*/
-
-/*[[[head:libc_removeat,hash:CRC-32=0xb1a4dbad]]]*/
-/* >> removeat(3)
- * Remove a file or directory `filename' relative to a given base directory `dirfd' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd,
-                                    char const *filename)
-/*[[[body:libc_removeat]]]*/
-{
-	errno_t result;
-	result = sys_unlinkat(dirfd, filename,
-	                      AT_REMOVEDIR | AT_REMOVEREG);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_removeat]]]*/
-
-/*[[[head:libd_remove,hash:CRC-32=0xce99c513]]]*/
-/* >> remove(3)
- * Remove a file or directory `filename' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
-NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename)
-/*[[[body:libd_remove]]]*/
-{
-	return libd_removeat(AT_FDCWD, filename);
-}
-/*[[[end:libd_remove]]]*/
-
-/*[[[head:libc_remove,hash:CRC-32=0xdee82fbb]]]*/
-/* >> remove(3)
- * Remove a file or directory `filename' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename)
-/*[[[body:libc_remove]]]*/
-{
-	return libc_removeat(AT_FDCWD, filename);
-}
-/*[[[end:libc_remove]]]*/
-
-
-
 /*[[[head:libc_ftrylockfile,hash:CRC-32=0x740c6ac5]]]*/
 /* >> ftrylockfile(3)
  * Try to acquire a lock to `stream' */
@@ -3872,9 +3818,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf4a91c76]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$remove, libd_remove);
-DEFINE_PUBLIC_ALIAS(remove, libc_remove);
+/*[[[start:exports,hash:CRC-32=0xfa4f6046]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -3935,8 +3879,6 @@ DEFINE_PUBLIC_ALIAS(fsetpos, libc_fsetpos);
 DEFINE_PUBLIC_ALIAS(_IO_fsetpos, libc_fsetpos);
 DEFINE_PUBLIC_ALIAS(DOS$renameat, libd_renameat);
 DEFINE_PUBLIC_ALIAS(renameat, libc_renameat);
-DEFINE_PUBLIC_ALIAS(DOS$removeat, libd_removeat);
-DEFINE_PUBLIC_ALIAS(removeat, libc_removeat);
 DEFINE_PUBLIC_ALIAS(DOS$renameat2, libd_renameat2);
 DEFINE_PUBLIC_ALIAS(renameat2, libc_renameat2);
 DEFINE_PUBLIC_ALIAS(tmpnam_r, libc_tmpnam_r);

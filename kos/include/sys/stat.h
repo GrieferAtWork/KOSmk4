@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2446fb7f */
+/* HASH CRC-32:0x3a179564 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -576,12 +576,15 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname,
 #elif defined(__CRT_HAVE___libc_mkdir)
 /* >> mkdir(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),__libc_mkdir,(__pathname,__mode))
-#elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 #include <libc/local/sys.stat/mkdir.h>
 /* >> mkdir(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir))(__pathname, __mode); })
-#else /* ... */
+#else /* (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat)) */
 #undef __mkdir_defined
+#endif /* (!__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir) && (!__AT_FDCWD || (!__CRT_HAVE_mkdirat && !__CRT_HAVE_fmkdirat)) */
 #endif /* !... */
 #endif /* !__mkdir_defined */
 #ifndef __chmod_defined
@@ -599,7 +602,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename,
 /* >> chmod(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),__libc_chmod,(__filename,__mode))
 #else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_fchmodat)
+#include <libc/local/sys.stat/chmod.h>
+/* >> chmod(2) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(chmod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL chmod)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chmod))(__filename, __mode); })
+#else /* __AT_FDCWD && __CRT_HAVE_fchmodat */
 #undef __chmod_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_fchmodat */
 #endif /* !... */
 #endif /* !__chmod_defined */
 
@@ -616,7 +626,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchmod,(char const *__filename
 /* >> lchmod(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchmod,(char const *__filename, __mode_t __mode),chmod,(__filename,__mode))
 #else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_fchmodat)
+#include <libc/local/sys.stat/lchmod.h>
+/* >> lchmod(2) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(lchmod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL lchmod)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lchmod))(__filename, __mode); })
+#else /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_fchmodat */
 #undef __lchmod_defined
+#endif /* !__AT_FDCWD || !__AT_SYMLINK_NOFOLLOW || !__CRT_HAVE_fchmodat */
 #endif /* !... */
 #endif /* !__lchmod_defined */
 #endif /* __USE_MISC */
@@ -662,17 +679,38 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fmkdirat,(__fd_t __dirfd, c
  * @param flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fmknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
 #endif /* __USE_KOS && __USE_ATFILE */
+#ifdef __CRT_HAVE_mkfifo
 /* >> mkfifo(2) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
+#else /* __CRT_HAVE_mkfifo */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_mknod) || ((defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && defined(__AT_FDCWD))) && defined(__S_IFIFO)
+#include <libc/local/sys.stat/mkfifo.h>
+/* >> mkfifo(2) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkfifo, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkfifo)(char const *__fifoname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkfifo))(__fifoname, __mode); })
+#endif /* (__CRT_HAVE_mknod || ((__CRT_HAVE_mknodat || __CRT_HAVE_fmknodat) && __AT_FDCWD)) && __S_IFIFO */
+#endif /* !__CRT_HAVE_mkfifo */
 
 #ifdef __USE_ATFILE
 /* >> fchmodat(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchmodat,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
+#ifdef __CRT_HAVE_mkdirat
 /* >> mkdirat(2) */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
+#elif defined(__CRT_HAVE_fmkdirat)
+#include <libc/local/sys.stat/mkdirat.h>
+/* >> mkdirat(2) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkdirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL mkdirat)(__fd_t __dirfd, char const *__pathname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdirat))(__dirfd, __pathname, __mode); })
+#endif /* ... */
+#ifdef __CRT_HAVE_mkfifoat
 /* >> mkfifoat(2) */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkfifoat,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkfifoat,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
+#elif (defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && defined(__S_IFIFO)
+#include <libc/local/sys.stat/mkfifoat.h>
+/* >> mkfifoat(2) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkfifoat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL mkfifoat)(__fd_t __dirfd, char const *__fifoname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkfifoat))(__dirfd, __fifoname, __mode); })
+#endif /* ... */
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_POSIX
@@ -689,11 +727,26 @@ __CREDIRECT(,int,__NOTHROW_RPC,fchmod,(__fd_t __fd, __mode_t __mode),__libc_fchm
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+#ifdef __CRT_HAVE_mknod
 /* >> mknod(2) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
+#else /* __CRT_HAVE_mknod */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && defined(__AT_FDCWD)
+#include <libc/local/sys.stat/mknod.h>
+/* >> mknod(2) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mknod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mknod)(char const *__nodename, __mode_t __mode, __dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mknod))(__nodename, __mode, __dev); })
+#endif /* (__CRT_HAVE_mknodat || __CRT_HAVE_fmknodat) && __AT_FDCWD */
+#endif /* !__CRT_HAVE_mknod */
 #ifdef __USE_ATFILE
+#ifdef __CRT_HAVE_mknodat
 /* >> mknodat(2) */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
+#elif defined(__CRT_HAVE_fmknodat)
+#include <libc/local/sys.stat/mknodat.h>
+/* >> mknodat(2) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mknodat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL mknodat)(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mknodat))(__dirfd, __nodename, __mode, __dev); })
+#endif /* ... */
 #endif /* __USE_ATFILE */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 

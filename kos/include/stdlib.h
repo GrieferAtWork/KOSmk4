@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2310ef2b */
+/* HASH CRC-32:0x241c940b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2930,7 +2930,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkstemp64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * and re-return `template_' to indicate success.
  * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,mkdtemp,(char *__template_),(__template_))
-#elif defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+#else /* __CRT_HAVE_mkdtemp */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 #include <libc/local/stdlib/mkdtemp.h>
 /* >> mkdtemp(3)
  * Replace the last 6 characters of `template_', which must be filled with
@@ -2940,7 +2942,8 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,mkdtemp,(char
  * and re-return `template_' to indicate success.
  * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkdtemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL mkdtemp)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdtemp))(__template_); })
-#endif /* ... */
+#endif /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat)) */
+#endif /* !__CRT_HAVE_mkdtemp */
 #endif /* __USE_XOPEN2K8 */
 
 #ifdef __USE_XOPEN

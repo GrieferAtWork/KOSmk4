@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6718a0d3 */
+/* HASH CRC-32:0x5741ca4d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,26 @@ NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd,
 	return libc_fcntl(fd, __F_SETFL, mode);
 #endif /* !__F_SETFL_XCH */
 }
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 5)) errno_t
+NOTHROW_RPC(LIBDCALL libd__sopen_dispatch)(char const *filename,
+                                           oflag_t oflags,
+                                           int sflags,
+                                           mode_t mode,
+                                           fd_t *fd,
+                                           int bsecure) {
+	(void)bsecure;
+	return libd__sopen_s(fd, filename, oflags, sflags, mode);
+}
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 5)) errno_t
+NOTHROW_RPC(LIBCCALL libc__sopen_dispatch)(char const *filename,
+                                           oflag_t oflags,
+                                           int sflags,
+                                           mode_t mode,
+                                           fd_t *fd,
+                                           int bsecure) {
+	(void)bsecure;
+	return libc__sopen_s(fd, filename, oflags, sflags, mode);
+}
 INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
                                  uint32_t pipesize,
@@ -63,6 +83,20 @@ NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd) {
 	if likely(result >= 0)
 		libc_lseek64(fd, oldpos, __SEEK_SET);
 	return result;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") errno_t
+NOTHROW_NCX(LIBDCALL libd_umask_s)(mode_t newmode,
+                                   mode_t *oldmode) {
+	if (!oldmode) {
+#ifdef EINVAL
+		return 22;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	*oldmode = libc_umask(newmode);
+	return 0;
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") errno_t
@@ -161,8 +195,11 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_setmode, libc__setmode);
+DEFINE_PUBLIC_ALIAS(DOS$_sopen_dispatch, libd__sopen_dispatch);
+DEFINE_PUBLIC_ALIAS(_sopen_dispatch, libc__sopen_dispatch);
 DEFINE_PUBLIC_ALIAS(_pipe, libc__pipe);
 DEFINE_PUBLIC_ALIAS(_filelengthi64, libc__filelengthi64);
+DEFINE_PUBLIC_ALIAS(DOS$umask_s, libd_umask_s);
 DEFINE_PUBLIC_ALIAS(umask_s, libc_umask_s);
 DEFINE_PUBLIC_ALIAS(__lock_fhandle, libc___lock_fhandle);
 DEFINE_PUBLIC_ALIAS(_unlock_fhandle, libc__unlock_fhandle);

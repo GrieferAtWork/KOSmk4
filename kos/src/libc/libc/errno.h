@@ -31,9 +31,11 @@ INTDEF NOBLOCK errno_t NOTHROW(LIBCCALL libc_geterrno)(void);
 INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value);
 */
 
-INTDEF NOBLOCK ATTR_CONST /*dos*/ errno_t *NOTHROW(LIBDCALL libd_errno_p)(void);
-INTDEF NOBLOCK ATTR_PURE /*dos*/ errno_t NOTHROW(LIBDCALL libd_geterrno)(void);
-INTDEF NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/ errno_t value);
+/*
+INTDEF NOBLOCK ATTR_CONST / *dos* / errno_t *NOTHROW(LIBDCALL libd_errno_p)(void);
+INTDEF NOBLOCK ATTR_PURE / *dos* / errno_t NOTHROW(LIBDCALL libd_geterrno)(void);
+INTDEF NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/ *dos* / errno_t value);
+*/
 
 INTDEF NOBLOCK ATTR_CONST /*nt*/ errno_t *NOTHROW(LIBDCALL libd_nterrno_p)(void);
 INTDEF NOBLOCK ATTR_PURE /*nt*/ errno_t NOTHROW(LIBDCALL libd_getnterrno)(void);

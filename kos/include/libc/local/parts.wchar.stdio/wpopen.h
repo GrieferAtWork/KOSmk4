@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59b5fd49 */
+/* HASH CRC-32:0xf79791c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_wpopen_defined
 #define __local_wpopen_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_popen) || defined(__CRT_HAVE__popen) || defined(__CRT_HAVE__IO_popen))
+#if (defined(__CRT_HAVE_popen) || defined(__CRT_HAVE__popen) || defined(__CRT_HAVE__IO_popen)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_wcstombs_defined
 #define __local___localdep_convert_wcstombs_defined
@@ -92,7 +92,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wpopen_defined
 #define __localdep_wpopen __LIBC_LOCAL_NAME(wpopen)
 #endif /* !__local___localdep_wpopen_defined */
-#else /* (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_popen || __CRT_HAVE__popen || __CRT_HAVE__IO_popen) */
+#else /* (__CRT_HAVE_popen || __CRT_HAVE__popen || __CRT_HAVE__IO_popen) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
 #undef __local_wpopen_defined
-#endif /* (!__CRT_HAVE_convert_wcstombs && !__CRT_HAVE_convert_wcstombsn && !__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) || (!__CRT_HAVE_popen && !__CRT_HAVE__popen && !__CRT_HAVE__IO_popen) */
+#endif /* (!__CRT_HAVE_popen && !__CRT_HAVE__popen && !__CRT_HAVE__IO_popen) || (!__CRT_HAVE_convert_wcstombs && !__CRT_HAVE_convert_wcstombsn && !__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) */
 #endif /* !__local_wpopen_defined */

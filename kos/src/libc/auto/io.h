@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd44b5312 */
+/* HASH CRC-32:0xa01a9421 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,12 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd__findclose)(intptr_t findfd);
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd__findnext32)(intptr_t findfd, struct _finddata32_t *__restrict finddata);
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd__findnext32i64)(intptr_t findfd, struct _finddata32i64_t *__restrict finddata);
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd__findnext64)(intptr_t findfd, struct __finddata64_t *__restrict finddata);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED NONNULL((1, 5)) errno_t NOTHROW_RPC(LIBDCALL libd__sopen_dispatch)(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
+INTDEF WUNUSED NONNULL((1, 5)) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_dispatch)(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__mktemp_s)(char *template_, size_t size);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__pipe)(fd_t pipedes[2], uint32_t pipesize, oflag_t textmode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -51,11 +57,7 @@ INTDEF WUNUSED int64_t NOTHROW_NCX(LIBDCALL libd__filelengthi64)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED int64_t NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_umask_s)(mode_t newmode, mode_t *oldmode);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode, mode_t *oldmode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

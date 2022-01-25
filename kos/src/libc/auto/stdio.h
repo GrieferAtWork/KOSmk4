@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf91c9d13 */
+/* HASH CRC-32:0x6c47e84b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,14 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+/* >> remove(3)
+ * Remove a file or directory `filename' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename);
+/* >> remove(3)
+ * Remove a file or directory `filename' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fclose(3)
  * Close and destroy a given file `stream' */
@@ -355,6 +363,12 @@ INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLI
 #ifndef __KERNEL__
 /* >> dprintf(3), vdprintf(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...);
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd, char const *filename);
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char const *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tmpnam(3), tmpnam_r(3) */

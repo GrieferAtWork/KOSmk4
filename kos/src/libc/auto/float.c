@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf92c54ec */
+/* HASH CRC-32:0x7e534aee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,10 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED int
+NOTHROW(LIBCCALL libc___fpe_flt_rounds)(void) {
+	return 1;
+}
 #include <fpu_control.h>
 INTERN ATTR_SECTION(".text.crt.math.float") uint32_t
 NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval,
@@ -70,21 +74,17 @@ INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc__chgsign)(double x) {
 	return -x;
 }
-INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc___fpe_flt_rounds)(void) {
-	return 1;
-}
 #endif /* !__KERNEL__ */
 
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__fpe_flt_rounds, libc___fpe_flt_rounds);
 DEFINE_PUBLIC_ALIAS(_controlfp, libc__controlfp);
 DEFINE_PUBLIC_ALIAS(_set_controlfp, libc__set_controlfp);
 DEFINE_PUBLIC_ALIAS(_controlfp_s, libc__controlfp_s);
 DEFINE_PUBLIC_ALIAS(_control87, libc__control87);
 DEFINE_PUBLIC_ALIAS(_chgsign, libc__chgsign);
-DEFINE_PUBLIC_ALIAS(__fpe_flt_rounds, libc___fpe_flt_rounds);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FLOAT_C */

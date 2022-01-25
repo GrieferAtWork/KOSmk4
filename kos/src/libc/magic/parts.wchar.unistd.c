@@ -112,7 +112,7 @@ done:
 
 [[wchar, cp, wunused, decl_include("<features.h>")]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-[[requires_include("<asm/os/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>"), dos_only_export_alias("_waccess")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wfaccessat)) ||
            $has_function(access, convert_wcstombs))]]
 int waccess([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {

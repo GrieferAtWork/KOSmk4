@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2129b61b */
+/* HASH CRC-32:0xe16e383d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1218,7 +1218,11 @@ DEFINE_PUBLIC_ALIAS(DOS$wpathconf, libd_wpathconf);
 DEFINE_PUBLIC_ALIAS(wpathconf, libc_wpathconf);
 DEFINE_PUBLIC_ALIAS(DOS$wlink, libd_wlink);
 DEFINE_PUBLIC_ALIAS(wlink, libc_wlink);
+DEFINE_PUBLIC_ALIAS(DOS$_waccess, libd_waccess);
 DEFINE_PUBLIC_ALIAS(DOS$waccess, libd_waccess);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_waccess, libc_waccess);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(waccess, libc_waccess);
 DEFINE_PUBLIC_ALIAS(DOS$_wchdir, libd_wchdir);
 DEFINE_PUBLIC_ALIAS(DOS$wchdir, libd_wchdir);

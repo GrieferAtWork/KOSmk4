@@ -36,8 +36,28 @@ __SYSDECL_BEGIN
 
 }
 
-/* TODO */
+c16open(*) %{uchar16("wopen")}
+c32open(*) %{uchar32("wopen")}
+c16creat(*) %{uchar16("wcreat")}
+c32creat(*) %{uchar32("wcreat")}
 
+%
+%#ifdef __USE_LARGEFILE64
+c16open64(*) %{uchar16("wopen64")}
+c32open64(*) %{uchar32("wopen64")}
+c16creat64(*) %{uchar16("wcreat64")}
+c32creat64(*) %{uchar32("wcreat64")}
+%#endif /* __USE_LARGEFILE64 */
+
+%
+%#ifdef __USE_ATFILE
+c16openat(*) %{uchar16("wopenat")}
+c32openat(*) %{uchar32("wopenat")}
+%#ifdef __USE_LARGEFILE64
+c16openat64(*) %{uchar16("wopenat64")}
+c32openat64(*) %{uchar32("wopenat64")}
+%#endif /* __USE_LARGEFILE64 */
+%#endif /* __USE_ATFILE */
 
 %{
 

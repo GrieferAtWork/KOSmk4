@@ -43,6 +43,12 @@ global wcharReplacementEscapes: {string: (string, string)} = Dict({
 @@Additional keywords-replacements used by in-library implementations of DOS variants
 global dosReplacementEscapes: {string: string} = Dict({
 	"EOK" : "0",
+	"__libc_geterrno"    : "__libd_geterrno",
+	"__libc_seterrno"    : "__libd_seterrno",
+	"__libc_geterrno_or" : "__libd_geterrno_or",
+	"libc_geterrno"      : "libd_geterrno",
+	"libc_seterrno"      : "libd_seterrno",
+	"libc_geterrno_or"   : "libd_geterrno_or",
 });
 
 @@Replacements for wchar-related headers

@@ -994,11 +994,12 @@ class FunctionPrototype {
 				isFirst = false;
 				a.ctype.cprint(fp, escapeMode);
 			}
-			if (myHaveEllipsis) {
-				if (!isFirst)
-					fp << ",";
-				fp << "...";
-			}
+			/* Ellipsis are already printed by the preceding for-loop */
+//			if (myHaveEllipsis) {
+//				if (!isFirst)
+//					fp << ",";
+//				fp << "...";
+//			}
 			fp << ")";
 		}
 		if (fp.namespace === LOCAL_NAMESPACE &&

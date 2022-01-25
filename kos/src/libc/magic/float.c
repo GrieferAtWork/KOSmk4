@@ -51,6 +51,7 @@
 )]%{
 
 #ifdef __USE_DOS
+#include <asm/crt/float.h>
 #include <bits/types.h>
 #endif /* __USE_DOS */
 
@@ -145,6 +146,12 @@ __SYSDECL_BEGIN
 }
 %[insert:pp_if($crt_has_function(__fpe_flt_rounds))]
 %#define FLT_ROUNDS __fpe_flt_rounds()
+%#ifdef __CC__
+[[const, wunused, nothrow, inline, no_extern_inline]]
+int __fpe_flt_rounds(void) {
+	return 1;
+}
+%#endif /* !__CC__ */
 %[insert:pp_else]
 %#define FLT_ROUNDS 1
 %[insert:pp_endif]
@@ -261,6 +268,7 @@ __SYSDECL_BEGIN
 
 
 }
+
 %#ifdef __USE_DOS
 %#ifdef __CC__
 
@@ -312,10 +320,6 @@ void _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 %{
 
 /* TODO: This stuff is most definitely x86-specific! */
-#define _clear87        _clearfp
-#define _status87       _statusfp
-
-/* TODO: This stuff is most definitely x86-specific! */
 #define _SW_INEXACT     0x00000001 /* Inexact precision. */
 #define _SW_UNDERFLOW   0x00000002 /* Underflow. */
 #define _SW_OVERFLOW    0x00000004 /* Overflow. */
@@ -360,37 +364,11 @@ void _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 #define _DN_SAVE_OPERANDS_FLUSH_RESULTS 0x03000000  /* Save + flush results to zero. */
 
 #if defined(__x86_64__) || defined(__i386__)
-#define _CW_DEFAULT (_RC_NEAR|_PC_53|_EM_INVALID|_EM_ZERODIVIDE|_EM_OVERFLOW|_EM_UNDERFLOW|_EM_INEXACT|_EM_DENORMAL)
-#else /* defined (_M_X64) || defined (_M_ARM) */
-#define _CW_DEFAULT (_RC_NEAR|_EM_INVALID|_EM_ZERODIVIDE|_EM_OVERFLOW|_EM_UNDERFLOW|_EM_INEXACT|_EM_DENORMAL)
+#define _CW_DEFAULT (_RC_NEAR | _PC_53 | _EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW | _EM_INEXACT | _EM_DENORMAL)
+#else
+#define _CW_DEFAULT (_RC_NEAR | _EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW | _EM_INEXACT | _EM_DENORMAL)
 #endif
 
-#ifdef __CC__
-}
-
-[[decl_include("<hybrid/typecore.h>")]]
-$uint32_t _control87($uint32_t newval, $uint32_t mask) {
-	return _controlfp(newval, mask);
-}
-
-%/* TODO: This function is most definitely x86-specific! */
-%#if defined(__x86_64__) || defined(__i386__)
-[[decl_include("<hybrid/typecore.h>")]]
-int __control87_2($uint32_t newval, $uint32_t mask,
-                  $uint32_t *x86_control_word,
-                  $uint32_t *sse2_control_word);
-%#endif /* X64... */
-
-%/* TODO: This function is most definitely x86-specific! */
-[[guard]] int *__fpecode();
-%{
-#ifdef ____fpecode_defined
-#define _fpecode (*__fpecode())
-#endif /* ____fpecode_defined */
-}
-
-%{
-#endif /* __CC__ */
 
 /* TODO: This stuff is most definitely x86-specific! */
 #define _SW_UNEMULATED          0x0040
@@ -410,65 +388,6 @@ int __control87_2($uint32_t newval, $uint32_t mask,
 #define _FPE_EXPLICITGEN        0x8c
 #define _FPE_MULTIPLE_TRAPS     0x8d
 #define _FPE_MULTIPLE_FAULTS    0x8e
-
-#ifdef __CC__
-}
-
-%[insert:function(_copysign = copysign)]
-
-[[const, wunused, nothrow]]
-double _chgsign(double x) {
-	return -x;
-}
-
-%[insert:function(_scalb = scalb)]
-%[insert:function(_logb = logb)]
-%[insert:function(_nextafter = nextafter)]
-%[insert:function(_finite = finite)]
-%[insert:function(_isnan = isnan)]
-
-@@@return: * : Set of `_FPCLASS_*'
-[[const, wunused, nothrow]]
-int _fpclass(double x);
-
-
-[[const, wunused, nothrow]]
-int __fpe_flt_rounds(void) {
-	return 1;
-}
-
-
-%#if defined(__x86_64__) || defined(__i386__)
-%[insert:function(_scalbf = scalbf)]
-%#endif /* __x86_64__ || __i386__ */
-
-%{
-#endif /* __CC__ */
-
-/* TODO: This stuff belongs in <asm/crt/float.h> */
-#define _FPCLASS_SNAN   0x0001 /* signaling NaN. */
-#define _FPCLASS_QNAN   0x0002 /* quiet NaN. */
-#define _FPCLASS_NINF   0x0004 /* negative infinity. */
-#define _FPCLASS_NN     0x0008 /* negative normal. */
-#define _FPCLASS_ND     0x0010 /* negative denormal. */
-#define _FPCLASS_NZ     0x0020 /* -0 */
-#define _FPCLASS_PZ     0x0040 /* +0 */
-#define _FPCLASS_PD     0x0080 /* positive denormal. */
-#define _FPCLASS_PN     0x0100 /* positive normal. */
-#define _FPCLASS_PINF   0x0200 /* positive infinity. */
-
-#ifdef __CC__
-}
-
-[[dos_only_export_alias("_fpreset")]]
-void fpreset();
-
-%{
-
-#define clear87   _clear87
-#define status87  _status87
-#define control87 _control87
-#endif /* __CC__ */
 
 #define DBL_RADIX          FLT_RADIX
 #define DBL_ROUNDS         FLT_ROUNDS
@@ -517,6 +436,99 @@ void fpreset();
 #define FPE_STACKOVERFLOW  _FPE_STACKOVERFLOW
 #define FPE_STACKUNDERFLOW _FPE_STACKUNDERFLOW
 #define FPE_EXPLICITGEN    _FPE_EXPLICITGEN
+
+/* Bits for return value of `_fpclass(3)' */
+#if !defined(_FPCLASS_SNAN) && defined(__FPCLASS_SNAN)
+#define _FPCLASS_SNAN __FPCLASS_SNAN /* signaling NaN. */
+#endif /* !_FPCLASS_SNAN && __FPCLASS_SNAN */
+#if !defined(_FPCLASS_QNAN) && defined(__FPCLASS_QNAN)
+#define _FPCLASS_QNAN __FPCLASS_QNAN /* quiet NaN. */
+#endif /* !_FPCLASS_QNAN && __FPCLASS_QNAN */
+#if !defined(_FPCLASS_NINF) && defined(__FPCLASS_NINF)
+#define _FPCLASS_NINF __FPCLASS_NINF /* negative infinity. */
+#endif /* !_FPCLASS_NINF && __FPCLASS_NINF */
+#if !defined(_FPCLASS_NN) && defined(__FPCLASS_NN)
+#define _FPCLASS_NN   __FPCLASS_NN   /* negative normal. */
+#endif /* !_FPCLASS_NN && __FPCLASS_NN */
+#if !defined(_FPCLASS_ND) && defined(__FPCLASS_ND)
+#define _FPCLASS_ND   __FPCLASS_ND   /* negative denormal. */
+#endif /* !_FPCLASS_ND && __FPCLASS_ND */
+#if !defined(_FPCLASS_NZ) && defined(__FPCLASS_NZ)
+#define _FPCLASS_NZ   __FPCLASS_NZ   /* -0 */
+#endif /* !_FPCLASS_NZ && __FPCLASS_NZ */
+#if !defined(_FPCLASS_PZ) && defined(__FPCLASS_PZ)
+#define _FPCLASS_PZ   __FPCLASS_PZ   /* +0 */
+#endif /* !_FPCLASS_PZ && __FPCLASS_PZ */
+#if !defined(_FPCLASS_PD) && defined(__FPCLASS_PD)
+#define _FPCLASS_PD   __FPCLASS_PD   /* positive denormal. */
+#endif /* !_FPCLASS_PD && __FPCLASS_PD */
+#if !defined(_FPCLASS_PN) && defined(__FPCLASS_PN)
+#define _FPCLASS_PN   __FPCLASS_PN   /* positive normal. */
+#endif /* !_FPCLASS_PN && __FPCLASS_PN */
+#if !defined(_FPCLASS_PINF) && defined(__FPCLASS_PINF)
+#define _FPCLASS_PINF __FPCLASS_PINF /* positive infinity. */
+#endif /* !_FPCLASS_PINF && __FPCLASS_PINF */
+
+#ifdef __CC__
+}
+
+[[decl_include("<hybrid/typecore.h>")]]
+$uint32_t _control87($uint32_t newval, $uint32_t mask) {
+	return _controlfp(newval, mask);
+}
+
+%/* TODO: This function is most definitely x86-specific! */
+%#if defined(__x86_64__) || defined(__i386__)
+[[decl_include("<hybrid/typecore.h>")]]
+int __control87_2($uint32_t newval, $uint32_t mask,
+                  $uint32_t *x86_control_word,
+                  $uint32_t *sse2_control_word);
+%#endif /* X64... */
+
+%/* TODO: This function is most definitely x86-specific! */
+[[guard]] int *__fpecode();
+%{
+#ifdef ____fpecode_defined
+#define _fpecode (*__fpecode())
+#endif /* ____fpecode_defined */
+}
+
+%[insert:function(_copysign = copysign)]
+
+[[const, wunused, nothrow]]
+double _chgsign(double x) {
+	return -x;
+}
+
+%[insert:function(_scalb = scalb)]
+%[insert:function(_logb = logb)]
+%[insert:function(_nextafter = nextafter)]
+%[insert:function(_finite = finite)]
+%[insert:function(_isnan = isnan)]
+
+@@>> _fpclass(3)
+@@@return: * : Set of `_FPCLASS_*'
+[[const, wunused, nothrow]]
+int _fpclass(double x);
+
+
+
+
+%#if defined(__x86_64__) || defined(__i386__)
+%[insert:function(_scalbf = scalbf)]
+%#endif /* __x86_64__ || __i386__ */
+
+[[dos_only_export_alias("_fpreset")]]
+void fpreset();
+
+%{
+
+#define _clear87  _clearfp
+#define _status87 _statusfp
+#define clear87   _clear87
+#define status87  _status87
+#define control87 _control87
+#endif /* __CC__ */
 
 }
 %#endif /* __USE_DOS */

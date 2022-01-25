@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5850fc20 */
+/* HASH CRC-32:0x720300ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* >> remove(3)
- * Remove a file or directory `filename' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename);
-/* >> remove(3)
- * Remove a file or directory `filename' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename);
 /* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
@@ -120,12 +114,6 @@ INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fsetpos)(FILE *__restrict stream, fpos
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_renameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path);
 /* >> renameat(2) */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path);
-/* >> removeat(3)
- * Remove a file or directory `filename' relative to a given base directory `dirfd' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd, char const *filename);
-/* >> removeat(3)
- * Remove a file or directory `filename' relative to a given base directory `dirfd' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char const *filename);
 /* >> renameat2(2)
  * @param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
  *                       AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'

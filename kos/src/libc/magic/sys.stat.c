@@ -642,18 +642,29 @@ int dos_mkdir([[nonnull]] char const *pathname);
 
 
 @@>> mkdir(2)
-[[crt_dos_variant, cp, guard, userimpl, decl_include("<bits/types.h>"), export_alias("__mkdir", "__libc_mkdir")]]
-[[requires(defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir))]]
+[[crt_dos_variant, cp, guard, decl_include("<bits/types.h>")]]
+[[userimpl, export_alias("__mkdir", "__libc_mkdir")]]
+[[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
+[[requires((defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir)) ||
+           (defined(__AT_FDCWD) && $has_function(mkdirat)))]]
 int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
+@@pp_if defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir)@@
 	(void)mode;
 	return dos_mkdir(pathname);
+@@pp_else@@
+	return mkdirat(__AT_FDCWD, pathname, mode);
+@@pp_endif@@
 }
 
 
 @@>> chmod(2)
 [[crt_dos_variant, cp, guard, decl_include("<bits/types.h>")]]
 [[dos_only_export_alias("_chmod"), export_alias("__chmod", "__libc_chmod")]]
-int chmod([[nonnull]] char const *filename, $mode_t mode);
+[[userimpl, requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(fchmodat))]]
+int chmod([[nonnull]] char const *filename, $mode_t mode) {
+	return fchmodat(__AT_FDCWD, filename, mode, 0);
+}
 
 
 %
@@ -662,7 +673,11 @@ int chmod([[nonnull]] char const *filename, $mode_t mode);
 @@>> lchmod(2)
 [[crt_dos_variant, cp, guard, decl_include("<bits/types.h>")]]
 [[if(defined(__CRT_DOS_PRIMARY)), alias("_chmod", "chmod")]]
-int lchmod([[nonnull]] char const *filename, $mode_t mode);
+[[userimpl, requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(fchmodat))]]
+int lchmod([[nonnull]] char const *filename, $mode_t mode) {
+	return fchmodat(__AT_FDCWD, filename, mode, __AT_SYMLINK_NOFOLLOW);
+}
 
 %#endif /* __USE_MISC */
 
@@ -712,7 +727,11 @@ int fmknodat($fd_t dirfd, [[nonnull]] char const *nodename,
 
 @@>> mkfifo(2)
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
-int mkfifo([[nonnull]] char const *fifoname, $mode_t mode);
+[[requires_include("<asm/os/stat.h>"), impl_include("<asm/os/stat.h>")]]
+[[requires($has_function(mknod) && defined(__S_IFIFO))]]
+int mkfifo([[nonnull]] char const *fifoname, $mode_t mode) {
+	return mknod(fifoname, mode | __S_IFIFO, 0);
+}
 
 %
 %#ifdef __USE_ATFILE
@@ -723,11 +742,18 @@ int fchmodat($fd_t dirfd, [[nonnull]] char const *filename, $mode_t mode, $atfla
 
 @@>> mkdirat(2)
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
-int mkdirat($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode);
+[[userimpl, requires_function(fmkdirat)]]
+int mkdirat($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode) {
+	return fmkdirat(dirfd, pathname, mode, 0);
+}
 
 @@>> mkfifoat(2)
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
-int mkfifoat($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode);
+[[requires_include("<asm/os/stat.h>"), impl_include("<asm/os/stat.h>")]]
+[[requires($has_function(mknodat) && defined(__S_IFIFO))]]
+int mkfifoat($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode) {
+	return mknodat(dirfd, fifoname, mode | __S_IFIFO, 0);
+}
 %#endif /* __USE_ATFILE */
 
 %
@@ -741,13 +767,20 @@ int fchmod($fd_t fd, $mode_t mode);
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 @@>> mknod(2)
-[[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
-int mknod([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev);
+[[crt_dos_variant, cp, decl_include("<bits/types.h>"), userimpl]]
+[[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
+[[requires($has_function(mknodat) && defined(__AT_FDCWD))]]
+int mknod([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) {
+	return mknodat(__AT_FDCWD, nodename, mode, dev);
+}
 
 %#ifdef __USE_ATFILE
 @@>> mknodat(2)
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
-int mknodat($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev);
+[[userimpl, requires($has_function(fmknodat))]]
+int mknodat($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) {
+	return fmknodat(dirfd, nodename, mode, dev, 0);
+}
 %#endif /* __USE_ATFILE */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 

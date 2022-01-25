@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe542a5ca */
+/* HASH CRC-32:0xd25a7348 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,17 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local___fpe_flt_rounds_defined
-#define __local___fpe_flt_rounds_defined
+#ifndef __local_mkdirat_defined
+#define __local_mkdirat_defined
 #include <__crt.h>
+#ifdef __CRT_HAVE_fmkdirat
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__fpe_flt_rounds) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpe_flt_rounds))(void) {
-	return 1;
+#ifndef __local___localdep_fmkdirat_defined
+#define __local___localdep_fmkdirat_defined
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_fmkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),fmkdirat,(__dirfd,__pathname,__mode,__flags))
+#endif /* !__local___localdep_fmkdirat_defined */
+__LOCAL_LIBC(mkdirat) __ATTR_NONNULL((2)) int
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdirat))(__fd_t __dirfd, char const *__pathname, __mode_t __mode) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_fmkdirat)(__dirfd, __pathname, __mode, 0);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep___fpe_flt_rounds_defined
-#define __local___localdep___fpe_flt_rounds_defined
-#define __localdep___fpe_flt_rounds __LIBC_LOCAL_NAME(__fpe_flt_rounds)
-#endif /* !__local___localdep___fpe_flt_rounds_defined */
-#endif /* !__local___fpe_flt_rounds_defined */
+#ifndef __local___localdep_mkdirat_defined
+#define __local___localdep_mkdirat_defined
+#define __localdep_mkdirat __LIBC_LOCAL_NAME(mkdirat)
+#endif /* !__local___localdep_mkdirat_defined */
+#else /* __CRT_HAVE_fmkdirat */
+#undef __local_mkdirat_defined
+#endif /* !__CRT_HAVE_fmkdirat */
+#endif /* !__local_mkdirat_defined */

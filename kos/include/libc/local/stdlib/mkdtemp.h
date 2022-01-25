@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb49e67f */
+/* HASH CRC-32:0xbe336fea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_mkdtemp_defined
 #define __local_mkdtemp_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_system_mktemp_defined
 #define __local___localdep_system_mktemp_defined
@@ -41,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_mkdtemp_defined
 #define __localdep_mkdtemp __LIBC_LOCAL_NAME(mkdtemp)
 #endif /* !__local___localdep_mkdtemp_defined */
-#else /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
+#else /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat)) */
 #undef __local_mkdtemp_defined
-#endif /* !__CRT_HAVE_mkdir && !__CRT_HAVE___mkdir && !__CRT_HAVE___libc_mkdir && (!__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir) */
+#endif /* !__CRT_HAVE_mkdir && !__CRT_HAVE___mkdir && !__CRT_HAVE___libc_mkdir && (!__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir) && (!__AT_FDCWD || (!__CRT_HAVE_mkdirat && !__CRT_HAVE_fmkdirat)) */
 #endif /* !__local_mkdtemp_defined */

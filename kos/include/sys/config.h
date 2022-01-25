@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdff76843 */
+/* HASH CRC-32:0x5199f377 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -350,14 +350,16 @@
 #define HAVE_MEMCPY 1
 
 #undef HAVE_MKDIR
-#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 #define HAVE_MKDIR 1
-#endif /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
+#endif /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat)) */
 
 #undef HAVE_MKFIFO
-#ifdef __CRT_HAVE_mkfifo
+#include <asm/os/stat.h>
+#if defined(__CRT_HAVE_mkfifo) || ((defined(__CRT_HAVE_mknod) || ((defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && defined(__AT_FDCWD))) && defined(__S_IFIFO))
 #define HAVE_MKFIFO 1
-#endif /* __CRT_HAVE_mkfifo */
+#endif /* __CRT_HAVE_mkfifo || ((__CRT_HAVE_mknod || ((__CRT_HAVE_mknodat || __CRT_HAVE_fmknodat) && __AT_FDCWD)) && __S_IFIFO) */
 
 #undef HAVE_MKTIME
 #define HAVE_MKTIME 1
@@ -376,7 +378,6 @@
 #define HAVE_RANDOM 1
 
 #undef HAVE_RENAME
-#include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_rename) || defined(__CRT_HAVE___rename) || defined(__CRT_HAVE___libc_rename) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_renameat2)))
 #define HAVE_RENAME 1
 #endif /* __CRT_HAVE_rename || __CRT_HAVE___rename || __CRT_HAVE___libc_rename || (__AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_renameat2)) */

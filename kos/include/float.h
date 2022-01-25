@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb07df9e */
+/* HASH CRC-32:0x311e5bb3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,6 +59,7 @@
 #include <hybrid/typecore.h>
 
 #ifdef __USE_DOS
+#include <asm/crt/float.h>
 #include <bits/types.h>
 #endif /* __USE_DOS */
 
@@ -152,6 +153,9 @@ __SYSDECL_BEGIN
 #ifndef FLT_ROUNDS
 #ifdef __CRT_HAVE___fpe_flt_rounds
 #define FLT_ROUNDS __fpe_flt_rounds()
+#ifdef __CC__
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpe_flt_rounds,(void),())
+#endif /* !__CC__ */
 #else /* __CRT_HAVE___fpe_flt_rounds */
 #define FLT_ROUNDS 1
 #endif /* !__CRT_HAVE___fpe_flt_rounds */
@@ -306,10 +310,6 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_statusfp2,(__UINT32_TYPE__ *__x86_stat, __UI
 #endif /* __CC__ */
 
 /* TODO: This stuff is most definitely x86-specific! */
-#define _clear87        _clearfp
-#define _status87       _statusfp
-
-/* TODO: This stuff is most definitely x86-specific! */
 #define _SW_INEXACT     0x00000001 /* Inexact precision. */
 #define _SW_UNDERFLOW   0x00000002 /* Underflow. */
 #define _SW_OVERFLOW    0x00000004 /* Overflow. */
@@ -354,31 +354,11 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_statusfp2,(__UINT32_TYPE__ *__x86_stat, __UI
 #define _DN_SAVE_OPERANDS_FLUSH_RESULTS 0x03000000  /* Save + flush results to zero. */
 
 #if defined(__x86_64__) || defined(__i386__)
-#define _CW_DEFAULT (_RC_NEAR|_PC_53|_EM_INVALID|_EM_ZERODIVIDE|_EM_OVERFLOW|_EM_UNDERFLOW|_EM_INEXACT|_EM_DENORMAL)
-#else /* defined (_M_X64) || defined (_M_ARM) */
-#define _CW_DEFAULT (_RC_NEAR|_EM_INVALID|_EM_ZERODIVIDE|_EM_OVERFLOW|_EM_UNDERFLOW|_EM_INEXACT|_EM_DENORMAL)
+#define _CW_DEFAULT (_RC_NEAR | _PC_53 | _EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW | _EM_INEXACT | _EM_DENORMAL)
+#else
+#define _CW_DEFAULT (_RC_NEAR | _EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW | _EM_INEXACT | _EM_DENORMAL)
 #endif
 
-#ifdef __CC__
-#ifdef __CRT_HAVE__control87
-__CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_control87,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
-#else /* __CRT_HAVE__control87 */
-#include <libc/local/float/_control87.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_control87, __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL _control87)(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_control87))(__newval, __mask); })
-#endif /* !__CRT_HAVE__control87 */
-/* TODO: This function is most definitely x86-specific! */
-#if defined(__x86_64__) || defined(__i386__)
-__CDECLARE_OPT(,int,__NOTHROW_NCX,__control87_2,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask, __UINT32_TYPE__ *__x86_control_word, __UINT32_TYPE__ *__sse2_control_word),(__newval,__mask,__x86_control_word,__sse2_control_word))
-#endif /* X64... */
-/* TODO: This function is most definitely x86-specific! */
-#if !defined(____fpecode_defined) && defined(__CRT_HAVE___fpecode)
-#define ____fpecode_defined
-__CDECLARE(,int *,__NOTHROW_NCX,__fpecode,(void),())
-#endif /* !____fpecode_defined && __CRT_HAVE___fpecode */
-#ifdef ____fpecode_defined
-#define _fpecode (*__fpecode())
-#endif /* ____fpecode_defined */
-#endif /* __CC__ */
 
 /* TODO: This stuff is most definitely x86-specific! */
 #define _SW_UNEMULATED          0x0040
@@ -399,7 +379,105 @@ __CDECLARE(,int *,__NOTHROW_NCX,__fpecode,(void),())
 #define _FPE_MULTIPLE_TRAPS     0x8d
 #define _FPE_MULTIPLE_FAULTS    0x8e
 
+#define DBL_RADIX          FLT_RADIX
+#define DBL_ROUNDS         FLT_ROUNDS
+#define LDBL_RADIX         FLT_RADIX
+#define LDBL_ROUNDS        FLT_ROUNDS
+#define EM_AMBIGUIOUS      _EM_AMBIGUOUS
+#define EM_AMBIGUOUS       _EM_AMBIGUOUS
+#define MCW_EM             _MCW_EM
+#define EM_INVALID         _EM_INVALID
+#define EM_DENORMAL        _EM_DENORMAL
+#define EM_ZERODIVIDE      _EM_ZERODIVIDE
+#define EM_OVERFLOW        _EM_OVERFLOW
+#define EM_UNDERFLOW       _EM_UNDERFLOW
+#define EM_INEXACT         _EM_INEXACT
+#define MCW_IC             _MCW_IC
+#define IC_AFFINE          _IC_AFFINE
+#define IC_PROJECTIVE      _IC_PROJECTIVE
+#define MCW_RC             _MCW_RC
+#define RC_CHOP            _RC_CHOP
+#define RC_UP              _RC_UP
+#define RC_DOWN            _RC_DOWN
+#define RC_NEAR            _RC_NEAR
+#define MCW_PC             _MCW_PC
+#define PC_24              _PC_24
+#define PC_53              _PC_53
+#define PC_64              _PC_64
+#define CW_DEFAULT         _CW_DEFAULT
+#define SW_INVALID         _SW_INVALID
+#define SW_DENORMAL        _SW_DENORMAL
+#define SW_ZERODIVIDE      _SW_ZERODIVIDE
+#define SW_OVERFLOW        _SW_OVERFLOW
+#define SW_UNDERFLOW       _SW_UNDERFLOW
+#define SW_INEXACT         _SW_INEXACT
+#define SW_UNEMULATED      _SW_UNEMULATED
+#define SW_SQRTNEG         _SW_SQRTNEG
+#define SW_STACKOVERFLOW   _SW_STACKOVERFLOW
+#define SW_STACKUNDERFLOW  _SW_STACKUNDERFLOW
+#define FPE_INVALID        _FPE_INVALID
+#define FPE_DENORMAL       _FPE_DENORMAL
+#define FPE_ZERODIVIDE     _FPE_ZERODIVIDE
+#define FPE_OVERFLOW       _FPE_OVERFLOW
+#define FPE_UNDERFLOW      _FPE_UNDERFLOW
+#define FPE_INEXACT        _FPE_INEXACT
+#define FPE_UNEMULATED     _FPE_UNEMULATED
+#define FPE_SQRTNEG        _FPE_SQRTNEG
+#define FPE_STACKOVERFLOW  _FPE_STACKOVERFLOW
+#define FPE_STACKUNDERFLOW _FPE_STACKUNDERFLOW
+#define FPE_EXPLICITGEN    _FPE_EXPLICITGEN
+
+/* Bits for return value of `_fpclass(3)' */
+#if !defined(_FPCLASS_SNAN) && defined(__FPCLASS_SNAN)
+#define _FPCLASS_SNAN __FPCLASS_SNAN /* signaling NaN. */
+#endif /* !_FPCLASS_SNAN && __FPCLASS_SNAN */
+#if !defined(_FPCLASS_QNAN) && defined(__FPCLASS_QNAN)
+#define _FPCLASS_QNAN __FPCLASS_QNAN /* quiet NaN. */
+#endif /* !_FPCLASS_QNAN && __FPCLASS_QNAN */
+#if !defined(_FPCLASS_NINF) && defined(__FPCLASS_NINF)
+#define _FPCLASS_NINF __FPCLASS_NINF /* negative infinity. */
+#endif /* !_FPCLASS_NINF && __FPCLASS_NINF */
+#if !defined(_FPCLASS_NN) && defined(__FPCLASS_NN)
+#define _FPCLASS_NN   __FPCLASS_NN   /* negative normal. */
+#endif /* !_FPCLASS_NN && __FPCLASS_NN */
+#if !defined(_FPCLASS_ND) && defined(__FPCLASS_ND)
+#define _FPCLASS_ND   __FPCLASS_ND   /* negative denormal. */
+#endif /* !_FPCLASS_ND && __FPCLASS_ND */
+#if !defined(_FPCLASS_NZ) && defined(__FPCLASS_NZ)
+#define _FPCLASS_NZ   __FPCLASS_NZ   /* -0 */
+#endif /* !_FPCLASS_NZ && __FPCLASS_NZ */
+#if !defined(_FPCLASS_PZ) && defined(__FPCLASS_PZ)
+#define _FPCLASS_PZ   __FPCLASS_PZ   /* +0 */
+#endif /* !_FPCLASS_PZ && __FPCLASS_PZ */
+#if !defined(_FPCLASS_PD) && defined(__FPCLASS_PD)
+#define _FPCLASS_PD   __FPCLASS_PD   /* positive denormal. */
+#endif /* !_FPCLASS_PD && __FPCLASS_PD */
+#if !defined(_FPCLASS_PN) && defined(__FPCLASS_PN)
+#define _FPCLASS_PN   __FPCLASS_PN   /* positive normal. */
+#endif /* !_FPCLASS_PN && __FPCLASS_PN */
+#if !defined(_FPCLASS_PINF) && defined(__FPCLASS_PINF)
+#define _FPCLASS_PINF __FPCLASS_PINF /* positive infinity. */
+#endif /* !_FPCLASS_PINF && __FPCLASS_PINF */
+
 #ifdef __CC__
+#ifdef __CRT_HAVE__control87
+__CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_control87,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
+#else /* __CRT_HAVE__control87 */
+#include <libc/local/float/_control87.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_control87, __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL _control87)(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_control87))(__newval, __mask); })
+#endif /* !__CRT_HAVE__control87 */
+/* TODO: This function is most definitely x86-specific! */
+#if defined(__x86_64__) || defined(__i386__)
+__CDECLARE_OPT(,int,__NOTHROW_NCX,__control87_2,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask, __UINT32_TYPE__ *__x86_control_word, __UINT32_TYPE__ *__sse2_control_word),(__newval,__mask,__x86_control_word,__sse2_control_word))
+#endif /* X64... */
+/* TODO: This function is most definitely x86-specific! */
+#if !defined(____fpecode_defined) && defined(__CRT_HAVE___fpecode)
+#define ____fpecode_defined
+__CDECLARE(,int *,__NOTHROW_NCX,__fpecode,(void),())
+#endif /* !____fpecode_defined && __CRT_HAVE___fpecode */
+#ifdef ____fpecode_defined
+#define _fpecode (*__fpecode())
+#endif /* ____fpecode_defined */
 #if __has_builtin(__builtin_copysign) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysign)
 /* Return `x' with its signed changed to `y's */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_copysign,(double __num, double __sign),copysign,{ return __builtin_copysign(__num, __sign); })
@@ -526,14 +604,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),__isna
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !... */
-/* @return: * : Set of `_FPCLASS_*' */
+/* >> _fpclass(3)
+ * @return: * : Set of `_FPCLASS_*' */
 __CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_fpclass,(double __x),(__x))
-#ifdef __CRT_HAVE___fpe_flt_rounds
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpe_flt_rounds,(void),())
-#else /* __CRT_HAVE___fpe_flt_rounds */
-#include <libc/local/float/__fpe_flt_rounds.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__fpe_flt_rounds, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpe_flt_rounds)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpe_flt_rounds))(); })
-#endif /* !__CRT_HAVE___fpe_flt_rounds */
 #if defined(__x86_64__) || defined(__i386__)
 #if __has_builtin(__builtin_scalbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbf)
 /* Return `x' times (2 to the Nth power) */
@@ -556,79 +629,18 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_scalb || __CRT_HAVE__scalb || __CRT_HAVE___scalb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !... */
 #endif /* __x86_64__ || __i386__ */
-#endif /* __CC__ */
-
-/* TODO: This stuff belongs in <asm/crt/float.h> */
-#define _FPCLASS_SNAN   0x0001 /* signaling NaN. */
-#define _FPCLASS_QNAN   0x0002 /* quiet NaN. */
-#define _FPCLASS_NINF   0x0004 /* negative infinity. */
-#define _FPCLASS_NN     0x0008 /* negative normal. */
-#define _FPCLASS_ND     0x0010 /* negative denormal. */
-#define _FPCLASS_NZ     0x0020 /* -0 */
-#define _FPCLASS_PZ     0x0040 /* +0 */
-#define _FPCLASS_PD     0x0080 /* positive denormal. */
-#define _FPCLASS_PN     0x0100 /* positive normal. */
-#define _FPCLASS_PINF   0x0200 /* positive infinity. */
-
-#ifdef __CC__
 #ifdef __CRT_HAVE_fpreset
 __CDECLARE_VOID(,__NOTHROW_NCX,fpreset,(void),())
 #elif defined(__CRT_HAVE__fpreset)
 __CREDIRECT_VOID(,__NOTHROW_NCX,fpreset,(void),_fpreset,())
 #endif /* ... */
 
+#define _clear87  _clearfp
+#define _status87 _statusfp
 #define clear87   _clear87
 #define status87  _status87
 #define control87 _control87
 #endif /* __CC__ */
-
-#define DBL_RADIX          FLT_RADIX
-#define DBL_ROUNDS         FLT_ROUNDS
-#define LDBL_RADIX         FLT_RADIX
-#define LDBL_ROUNDS        FLT_ROUNDS
-#define EM_AMBIGUIOUS      _EM_AMBIGUOUS
-#define EM_AMBIGUOUS       _EM_AMBIGUOUS
-#define MCW_EM             _MCW_EM
-#define EM_INVALID         _EM_INVALID
-#define EM_DENORMAL        _EM_DENORMAL
-#define EM_ZERODIVIDE      _EM_ZERODIVIDE
-#define EM_OVERFLOW        _EM_OVERFLOW
-#define EM_UNDERFLOW       _EM_UNDERFLOW
-#define EM_INEXACT         _EM_INEXACT
-#define MCW_IC             _MCW_IC
-#define IC_AFFINE          _IC_AFFINE
-#define IC_PROJECTIVE      _IC_PROJECTIVE
-#define MCW_RC             _MCW_RC
-#define RC_CHOP            _RC_CHOP
-#define RC_UP              _RC_UP
-#define RC_DOWN            _RC_DOWN
-#define RC_NEAR            _RC_NEAR
-#define MCW_PC             _MCW_PC
-#define PC_24              _PC_24
-#define PC_53              _PC_53
-#define PC_64              _PC_64
-#define CW_DEFAULT         _CW_DEFAULT
-#define SW_INVALID         _SW_INVALID
-#define SW_DENORMAL        _SW_DENORMAL
-#define SW_ZERODIVIDE      _SW_ZERODIVIDE
-#define SW_OVERFLOW        _SW_OVERFLOW
-#define SW_UNDERFLOW       _SW_UNDERFLOW
-#define SW_INEXACT         _SW_INEXACT
-#define SW_UNEMULATED      _SW_UNEMULATED
-#define SW_SQRTNEG         _SW_SQRTNEG
-#define SW_STACKOVERFLOW   _SW_STACKOVERFLOW
-#define SW_STACKUNDERFLOW  _SW_STACKUNDERFLOW
-#define FPE_INVALID        _FPE_INVALID
-#define FPE_DENORMAL       _FPE_DENORMAL
-#define FPE_ZERODIVIDE     _FPE_ZERODIVIDE
-#define FPE_OVERFLOW       _FPE_OVERFLOW
-#define FPE_UNDERFLOW      _FPE_UNDERFLOW
-#define FPE_INEXACT        _FPE_INEXACT
-#define FPE_UNEMULATED     _FPE_UNEMULATED
-#define FPE_SQRTNEG        _FPE_SQRTNEG
-#define FPE_STACKOVERFLOW  _FPE_STACKOVERFLOW
-#define FPE_STACKUNDERFLOW _FPE_STACKUNDERFLOW
-#define FPE_EXPLICITGEN    _FPE_EXPLICITGEN
 
 #endif /* __USE_DOS */
 

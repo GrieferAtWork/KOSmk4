@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9602d897 */
+/* HASH CRC-32:0x9d08f93b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,48 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #ifndef __KERNEL__
+#include <asm/os/fcntl.h>
+#include <libc/errno.h>
+/* >> remove(3)
+ * Remove a file or directory `filename' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename) {
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_removeat) || (defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)))
+	return libd_removeat(__AT_FDCWD, filename);
+#else /* __AT_FDCWD && (__CRT_HAVE_removeat || (__AT_REMOVEDIR && __CRT_HAVE_unlinkat)) */
+	int result;
+	for (;;) {
+		result = libd_unlink(filename);
+		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
+			break;
+		result = libd_rmdir(filename);
+		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
+			break;
+	}
+	return result;
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_removeat && (!__AT_REMOVEDIR || !__CRT_HAVE_unlinkat)) */
+}
+#include <asm/os/fcntl.h>
+#include <libc/errno.h>
+/* >> remove(3)
+ * Remove a file or directory `filename' */
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename) {
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_removeat) || (defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)))
+	return libc_removeat(__AT_FDCWD, filename);
+#else /* __AT_FDCWD && (__CRT_HAVE_removeat || (__AT_REMOVEDIR && __CRT_HAVE_unlinkat)) */
+	int result;
+	for (;;) {
+		result = libc_unlink(filename);
+		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
+			break;
+		result = libc_rmdir(filename);
+		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
+			break;
+	}
+	return result;
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_removeat && (!__AT_REMOVEDIR || !__CRT_HAVE_unlinkat)) */
+}
 #include <asm/crt/stdio.h>
 /* >> setbuf(3)
  * Alias for `setvbuf(stream, buf, _IOFBF, BUFSIZ)' */
@@ -616,6 +658,50 @@ NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
 	result = libc_vdprintf(fd, format, args);
 	va_end(args);
 	return result;
+}
+#include <asm/os/fcntl.h>
+#include <libc/errno.h>
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd,
+                                    char const *filename) {
+#ifdef __AT_REMOVEREG
+	return libd_unlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
+#else /* __AT_REMOVEREG */
+	int result;
+	for (;;) {
+		result = libd_unlinkat(dirfd, filename, 0);
+		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
+			break;
+		result = libd_unlinkat(dirfd, filename, __AT_REMOVEDIR);
+		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
+			break;
+	}
+	return result;
+#endif /* !__AT_REMOVEREG */
+}
+#include <asm/os/fcntl.h>
+#include <libc/errno.h>
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd,
+                                    char const *filename) {
+#ifdef __AT_REMOVEREG
+	return libc_unlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
+#else /* __AT_REMOVEREG */
+	int result;
+	for (;;) {
+		result = libc_unlinkat(dirfd, filename, 0);
+		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
+			break;
+		result = libc_unlinkat(dirfd, filename, __AT_REMOVEDIR);
+		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
+			break;
+	}
+	return result;
+#endif /* !__AT_REMOVEREG */
 }
 #include <asm/crt/stdio.h>
 /* >> setbuffer(3)
@@ -3864,6 +3950,8 @@ NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *buf,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$remove, libd_remove);
+DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(setbuf, libc_setbuf);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fgetchar, libc_getchar);
@@ -3962,6 +4050,8 @@ DEFINE_PUBLIC_ALIAS(DOS$dprintf, libd_dprintf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(dprintf, libc_dprintf);
+DEFINE_PUBLIC_ALIAS(DOS$removeat, libd_removeat);
+DEFINE_PUBLIC_ALIAS(removeat, libc_removeat);
 DEFINE_PUBLIC_ALIAS(_IO_setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setlinebuf, libc_setlinebuf);

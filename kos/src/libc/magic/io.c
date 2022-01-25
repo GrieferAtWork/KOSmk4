@@ -39,6 +39,8 @@
 #include <asm/os/fcntl.h>
 )]%[insert:prefix(
 #include <asm/os/oflags.h>
+)]%[insert:prefix(
+#include <corecrt_wio.h>
 )]%{
 
 
@@ -211,24 +213,29 @@ errno_t _sopen_s([[nonnull]] $fd_t *fd,
 	fd_t result;
 	if (!fd) {
 @@pp_ifdef EINVAL@@
-		return EINVAL;
+		return $EINVAL;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
 	}
 	result = sopen(filename, oflags, sflags, mode);
-	if (result < 0) {
-@@pp_ifdef __libc_geterrno@@
-		return __libc_geterrno();
-@@pp_else@@
-		return 1;
-@@pp_endif@@
-	}
+	if (result < 0)
+		return $__libc_geterrno_or(1);
 	*fd = result;
 	return 0;
 }
 
 %[insert:function(_sopen_s_nolock = _sopen_s)]
+
+[[cp, wunused, crt_dos_variant, decl_include("<bits/types.h>")]]
+[[requires_function(_sopen_s), section(".text.crt.dos.fs.io")]]
+errno_t _sopen_dispatch([[nonnull]] char const *filename,
+                        $oflag_t oflags, int sflags, $mode_t mode,
+                        [[nonnull]] $fd_t *fd, int bsecure) {
+	(void)bsecure;
+	return _sopen_s(fd, filename, oflags, sflags, mode);
+}
+
 
 [[section(".text.crt.dos.fs.utility")]]
 errno_t _mktemp_s([[nonnull]] char *template_, size_t size);
@@ -268,12 +275,12 @@ $int64_t _filelengthi64($fd_t fd) {
 %[default:section(".text.crt.dos.fs.basic_property")]
 
 [[decl_include("<bits/types.h>")]]
-[[requires_function(umask)]]
+[[crt_dos_variant, requires_function(umask)]]
 [[impl_include("<libc/errno.h>")]]
 errno_t umask_s($mode_t newmode, $mode_t *oldmode) {
 	if (!oldmode) {
 @@pp_ifdef EINVAL@@
-		return EINVAL;
+		return $EINVAL;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
@@ -343,6 +350,9 @@ $fd_t sopen([[nonnull]] char const *filename, $oflag_t oflags, int sflags, ...) 
 	return result;
 }
 
+
+
+
 %[default:section(".text.crt.dos.fs.utility")]
 
 [[decl_include("<bits/types.h>")]]
@@ -382,11 +392,10 @@ int eof($fd_t fd) {
 
 %{
 
-/* Safely first! */
-}%[push_macro @undef { attrib time_create time_access time_write size name }]%{
-
 #ifndef _FINDDATA_T_DEFINED
 #define _FINDDATA_T_DEFINED 1
+/* Safely first! */
+}%[push_macro @undef { attrib time_create time_access time_write size name }]%{
 struct _finddata32_t {
 	__UINT32_TYPE__      attrib;
 	__INT32_TYPE__       time_create;
@@ -455,7 +464,3 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 }
-
-//TODO:#ifdef __USE_DOS
-//TODO:#include "parts/dos/wio.h"
-//TODO:#endif /* __USE_DOS */

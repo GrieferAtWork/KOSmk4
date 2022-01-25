@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7f489d9 */
+/* HASH CRC-32:0x2ff6ad69 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,10 +155,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !__rmdir_defined */
 #ifdef __CRT_HAVE__mkdir
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_mkdir,(char const *__path),(__path))
-#elif defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir)
+#else /* __CRT_HAVE__mkdir */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 #include <libc/local/direct/_mkdir.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _mkdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir))(__path); })
-#endif /* ... */
+#endif /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat)) */
+#endif /* !__CRT_HAVE__mkdir */
 /* DOS  normally defines  mkdir() as  the 1-argument  form, but for
  * compatibility with <sys/stat.h>, we define it as the  2-argument
  * form, with the addition of a preprocessor overload to also allow
@@ -174,12 +177,15 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname,
 #elif defined(__CRT_HAVE___libc_mkdir)
 /* >> mkdir(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),__libc_mkdir,(__pathname,__mode))
-#elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 #include <libc/local/sys.stat/mkdir.h>
 /* >> mkdir(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir))(__pathname, __mode); })
-#else /* ... */
+#else /* (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat)) */
 #undef __mkdir_defined
+#endif /* (!__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir) && (!__AT_FDCWD || (!__CRT_HAVE_mkdirat && !__CRT_HAVE_fmkdirat)) */
 #endif /* !... */
 #endif /* !__mkdir_defined */
 
@@ -188,7 +194,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
  * the  1-argument form,  and mkdir()  as the  2-argument one, with
  * the addition of (if possible) a preprocessor overload of mkdir()
  * to also accept 1 argument. */
-#if defined(__HYBRID_PP_VA_OVERLOAD) && (defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))) && (defined(__CRT_HAVE__mkdir) || defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir))
+#include <asm/os/fcntl.h>
+#if defined(__HYBRID_PP_VA_OVERLOAD) && (defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))) && (defined(__CRT_HAVE__mkdir) || defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat))))
 #define __PRIVATE_mkdir_1 (_mkdir)
 #define __PRIVATE_mkdir_2 (mkdir)
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
@@ -196,7 +203,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define mkdir(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mkdir_, (args))(args)
 #endif /* ... */
-#endif /* __HYBRID_PP_VA_OVERLOAD && (__CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir)) && (__CRT_HAVE__mkdir || __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir) */
+#endif /* __HYBRID_PP_VA_OVERLOAD && (__CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat))) && (__CRT_HAVE__mkdir || __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat))) */
 
 __SYSDECL_END
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85063ea */
+/* HASH CRC-32:0x53246f61 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_creat64_defined
 #include <__crt.h>
 #include <asm/os/oflags.h>
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)
+#if defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_open64_defined
@@ -48,9 +48,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_open64_defined
 #endif /* !... */
 #endif /* !__local___localdep_open64_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/os/fcntl.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(creat64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(creat64))(char const *__filename, __mode_t __mode) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_open64)(__filename, __O_CREAT | __O_WRONLY | __O_TRUNC, __mode);
@@ -60,7 +57,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_creat64_defined
 #define __localdep_creat64 __LIBC_LOCAL_NAME(creat64)
 #endif /* !__local___localdep_creat64_defined */
-#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open */
+#else /* __O_CREAT && __O_WRONLY && __O_TRUNC && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open) */
 #undef __local_creat64_defined
-#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open */
+#endif /* !__O_CREAT || !__O_WRONLY || !__O_TRUNC || (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open) */
 #endif /* !__local_creat64_defined */

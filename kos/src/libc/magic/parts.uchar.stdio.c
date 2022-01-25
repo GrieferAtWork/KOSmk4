@@ -41,6 +41,10 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+/************************************************************************/
+/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/************************************************************************/
+
 #ifndef __wint16_t_defined
 #define __wint16_t_defined
 typedef __WINT16_TYPE__ wint16_t;
@@ -48,6 +52,41 @@ typedef __WINT32_TYPE__ wint32_t;
 #endif /* !__wint16_t_defined */
 
 }
+
+
+/* Functions from `parts.wchar.stdio.c' */
+c16remove(*) %{uchar16("wremove")}
+c32remove(*) %{uchar32("wremove")}
+c16rename(*) %{uchar16("wrename")}
+c32rename(*) %{uchar32("wrename")}
+
+%
+%#ifdef __USE_ATFILE
+c16renameat(*) %{uchar16("wrenameat")}
+c32renameat(*) %{uchar32("wrenameat")}
+
+%
+%#ifdef __USE_KOS
+c16removeat(*) %{uchar16("wremoveat")}
+c32removeat(*) %{uchar32("wremoveat")}
+%#endif /* __USE_KOS */
+%#endif /* __USE_ATFILE */
+
+%
+%#ifdef __USE_GNU
+c16renameat2(*) %{uchar16("wrenameat2")}
+c32renameat2(*) %{uchar32("wrenameat2")}
+%#endif /* __USE_GNU */
+
+c16fopen(*) %{uchar16("wfopen")}
+c32fopen(*) %{uchar32("wfopen")}
+c16freopen(*) %{uchar16("wfreopen")}
+c32freopen(*) %{uchar32("wfreopen")}
+c16popen(*) %{uchar16("wpopen")}
+c32popen(*) %{uchar32("wpopen")}
+
+
+
 
 getchar16(*) %{uchar16("getwchar")}
 getchar32(*) %{uchar32("getwchar")}
@@ -161,16 +200,6 @@ fc16scanf_unlocked(*) %{uchar16("fwscanf_unlocked")}
 fc32scanf_unlocked(*) %{uchar32("fwscanf_unlocked")}
 c16scanf_unlocked(*) %{uchar16("wscanf_unlocked")}
 c32scanf_unlocked(*) %{uchar32("wscanf_unlocked")}
-
-/* Functions from `parts.wchar.stdio.c' */
-c16remove(*) %{uchar16("wremove")}
-c32remove(*) %{uchar32("wremove")}
-c16fopen(*) %{uchar16("wfopen")}
-c32fopen(*) %{uchar32("wfopen")}
-c16freopen(*) %{uchar16("wfreopen")}
-c32freopen(*) %{uchar32("wfreopen")}
-c16popen(*) %{uchar16("wpopen")}
-c32popen(*) %{uchar32("wpopen")}
 %#endif /* __USE_KOS */
 
 

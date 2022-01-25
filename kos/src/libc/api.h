@@ -201,6 +201,10 @@
 #undef __libc_geterrno
 #undef __libc_geterrno_or
 #undef __libc_seterrno
+#undef __libd_errno
+#undef __libd_geterrno
+#undef __libd_geterrno_or
+#undef __libd_seterrno
 #undef ____errno_location_defined
 
 #ifndef __KERNEL__
@@ -210,6 +214,10 @@
 #define __libc_geterrno         libc_geterrno
 #define __libc_geterrno_or(alt) libc_geterrno()
 #define __libc_seterrno         libc_seterrno
+#define __libd_errno            (*libd_errno_p())
+#define __libd_geterrno         libd_geterrno
+#define __libd_geterrno_or(alt) libd_geterrno()
+#define __libd_seterrno         libd_seterrno
 #define ____errno_location_defined
 #define __errno_location()            libc_errno_p()
 #define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno_neg((errno_t)(syscall_slong_t)(syscall_ulong_t)(e)))
@@ -231,11 +239,15 @@ typedef __errno_t errno_t;
 #endif /* !errno_t_defined */
 
 #ifndef __KERNEL__
-INTDEF NOBLOCK ATTR_CONST errno_t *NOTHROW(LIBCCALL libc_errno_p)(void);
-INTDEF NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno)(void);
+INTDEF NOBLOCK ATTR_CONST /*kos*/ errno_t *NOTHROW(LIBCCALL libc_errno_p)(void);
+INTDEF NOBLOCK ATTR_CONST /*dos*/ errno_t *NOTHROW(LIBDCALL libd_errno_p)(void);
+INTDEF NOBLOCK ATTR_PURE /*kos*/ errno_t NOTHROW(LIBCCALL libc_geterrno)(void);
+INTDEF NOBLOCK ATTR_PURE /*dos*/ errno_t NOTHROW(LIBDCALL libd_geterrno)(void);
 INTDEF NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno_safe)(void);
+
 /* Always returns (syscall_slong_t)-1 */
-INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value);
+INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(/*kos*/ errno_t value);
+INTDEF NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/ errno_t value);
 /* Same as `libc_seterrno(-value)' */
 INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno_neg)(errno_t value);
 INTDEF NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value);
@@ -258,9 +270,14 @@ INTDEF void VLIBCCALL libc_unimplementedf(char const *__restrict format, ...);
 #undef __libc_geterrno
 #undef __libc_geterrno_or
 #undef __libc_seterrno
+#undef __libd_geterrno
+#undef __libd_geterrno_or
+#undef __libd_seterrno
 #undef __errno_location
 #define __libc_geterrno_or(alt) alt
 #define __libc_seterrno(v)      ((void)0, -1)
+#define __libd_geterrno_or(alt) alt
+#define __libd_seterrno(v)      ((void)0, -1)
 #endif /* __KERNEL__ */
 
 

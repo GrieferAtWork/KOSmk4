@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fa152c9 */
+/* HASH CRC-32:0x36a06b79 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local__mkdir_defined
 #define __local__mkdir_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mkdir_defined
 #define __local___localdep_mkdir_defined
@@ -40,7 +41,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_mkdir,(char const *__pathname, __mode_t __mode),__libc_mkdir,(__pathname,__mode))
-#elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
+#elif (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/mkdir.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -58,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mkdir_defined
 #define __localdep__mkdir __LIBC_LOCAL_NAME(_mkdir)
 #endif /* !__local___localdep__mkdir_defined */
-#else /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
+#else /* __CRT_HAVE_mkdir || __CRT_HAVE___mkdir || __CRT_HAVE___libc_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) || (__AT_FDCWD && (__CRT_HAVE_mkdirat || __CRT_HAVE_fmkdirat)) */
 #undef __local__mkdir_defined
-#endif /* !__CRT_HAVE_mkdir && !__CRT_HAVE___mkdir && !__CRT_HAVE___libc_mkdir && (!__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir) */
+#endif /* !__CRT_HAVE_mkdir && !__CRT_HAVE___mkdir && !__CRT_HAVE___libc_mkdir && (!__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir) && (!__AT_FDCWD || (!__CRT_HAVE_mkdirat && !__CRT_HAVE_fmkdirat)) */
 #endif /* !__local__mkdir_defined */

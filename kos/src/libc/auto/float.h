@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37cc3409 */
+/* HASH CRC-32:0xd789b9c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,9 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpe_flt_rounds)(void);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF uint32_t NOTHROW_NCX(LIBDCALL libd__controlfp)(uint32_t newval, uint32_t mask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -62,12 +65,10 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd__chgsign)(double x);
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc__chgsign)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @return: * : Set of `_FPCLASS_*' */
+/* >> _fpclass(3)
+ * @return: * : Set of `_FPCLASS_*' */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__fpclass)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpe_flt_rounds)(void);
-#endif /* !__KERNEL__ */
 
 DECL_END
 

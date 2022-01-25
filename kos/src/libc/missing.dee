@@ -29,6 +29,7 @@ for (local l: File.open("../../include/i386-kos/crt-features/crt-kos32.h")) {
 	try n = l.scanf("#define __CRT_HAVE_%[^ ]")...;
 	catch (...)
 		continue;
+	n = n.strip().lsstrip("DOS$");
 	names.insert(n);
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8820ee1 */
+/* HASH CRC-32:0x346114aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1664,7 +1664,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char 
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <libc/local/fcntl/creat.h>
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
@@ -1801,7 +1801,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat64,(cha
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat64,(char const *__filename, __mode_t __mode),(__filename,__mode))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)
+#elif defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open))
 #include <libc/local/fcntl/creat64.h>
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
@@ -2023,5 +2023,11 @@ __SYSDECL_END
 #include <parts/uchar/fcntl.h>
 #endif /* _UCHAR_H && !_PARTS_UCHAR_FCNTL_H */
 #endif /* __USE_UTF */
+
+#ifdef __USE_KOS
+#if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_FCNTL_H)
+#include <parts/wchar/fcntl.h>
+#endif /* _WCHAR_H && !_PARTS_WCHAR_FCNTL_H */
+#endif /* __USE_KOS */
 
 #endif /* !_FCNTL_H */

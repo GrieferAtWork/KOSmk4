@@ -24,7 +24,10 @@
 
 %[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
+#include <bits/types.h>
 )]%{
+
 #ifndef _PROCESS_H
 #include <process.h>
 #endif /* !_PROCESS_H */
@@ -32,12 +35,12 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
-}%[insert:prefix(
-#include <bits/types.h>
-)]%{
-
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+/************************************************************************/
+/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/************************************************************************/
 
 }
 

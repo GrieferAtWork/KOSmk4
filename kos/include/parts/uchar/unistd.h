@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d6186d7 */
+/* HASH CRC-32:0x3bcc0120 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,10 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+/************************************************************************/
+/* WARNING: UTF-16 functions use DOS paths!!!                           */
+/************************************************************************/
 
 #if defined(__CRT_HAVE_wttyname) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> ttyname(3)
@@ -188,6 +192,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16access,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$waccess)
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16access,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
+#elif defined(__CRT_HAVE__waccess) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16access,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
+#elif defined(__CRT_HAVE_DOS$_waccess)
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16access,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_faccessat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2)
@@ -202,6 +210,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32access,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
 #elif defined(__CRT_HAVE_KOS$waccess)
 __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32access,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
+#elif defined(__CRT_HAVE__waccess) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32access,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
+#elif defined(__CRT_HAVE_KOS$_waccess)
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32access,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_faccessat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4)
