@@ -108,9 +108,9 @@ wchar_t *wrealpath([[nonnull]] wchar_t const *filename, wchar_t *resolved) {
 		free(wcs_resolved);
 @@pp_endif@@
 @@pp_ifdef ERANGE@@
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 @@pp_else@@
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		return NULL;
 	}
@@ -155,9 +155,9 @@ wchar_t *wfrealpath($fd_t fd, wchar_t *resolved, $size_t buflen) {
 		free(wcs_resolved);
 @@pp_endif@@
 @@pp_ifdef ERANGE@@
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 @@pp_else@@
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		return NULL;
 	}
@@ -197,9 +197,9 @@ wchar_t *wfrealpath4($fd_t fd, wchar_t *resolved, $size_t buflen, $atflag_t flag
 		free(wcs_resolved);
 @@pp_endif@@
 @@pp_ifdef ERANGE@@
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 @@pp_else@@
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		return NULL;
 	}
@@ -242,9 +242,9 @@ wchar_t *wfrealpathat($fd_t dirfd, [[nonnull]] wchar_t const *filename,
 		free(wcs_resolved);
 @@pp_endif@@
 @@pp_ifdef ERANGE@@
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 @@pp_else@@
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		return NULL;
 	}

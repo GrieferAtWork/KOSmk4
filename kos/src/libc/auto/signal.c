@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9870fb2e */
+/* HASH CRC-32:0x6a5a49a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -893,9 +893,9 @@ NOTHROW_NCX(LIBCCALL libc_sigset)(signo_t signo,
 	       : oact.sa_handler;
 err_inval:
 #ifdef EINVAL
-	(void)__libc_seterrno(EINVAL);
+	(void)libc_seterrno(EINVAL);
 #else /* EINVAL */
-	(void)__libc_seterrno(1);
+	(void)libc_seterrno(1);
 #endif /* !EINVAL */
 err:
 	return (sighandler_t)__SIG_ERR;

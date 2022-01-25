@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21c89944 */
+/* HASH CRC-32:0x6f52308f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,7 +197,7 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 		}
 	} else {
 #ifdef ENOENT
-		(void)__libc_seterrno(ENOENT);
+		(void)libc_seterrno(ENOENT);
 #endif /* ENOENT */
 	}
 	return -1;
@@ -535,7 +535,7 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 	if (buflen < 1) {
 		/* Invalid buffer length */
 #ifdef EINVAL
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		goto out;
 	}
@@ -688,9 +688,9 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 					goto out; /* Error... */
 				if unlikely(status == 0) {
 #ifdef ETIMEDOUT
-					(void)__libc_seterrno(ETIMEDOUT);
+					(void)libc_seterrno(ETIMEDOUT);
 #else /* ETIMEDOUT */
-					(void)__libc_seterrno(1);
+					(void)libc_seterrno(1);
 #endif /* !ETIMEDOUT */
 					goto out; /* Timeout... */
 				}
@@ -713,7 +713,7 @@ handle_eof:
 					if (flags & __GETPASS_FAIL_EOF) {
 						/* Error out on regular, old EOF */
 #ifdef ENODATA
-						(void)__libc_seterrno(ENODATA);
+						(void)libc_seterrno(ENODATA);
 #endif /* ENODATA */
 						goto out;
 					}
@@ -1021,7 +1021,7 @@ out:
 				(void)libc_raise(interrupt_signo);
 #endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || ((__CRT_HAVE_kill || __CRT_HAVE___kill || __CRT_HAVE___libc_kill) && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid || __CRT_HAVE___libc_getpid)) */
 #ifdef EINTR
-			(void)__libc_seterrno(EINTR);
+			(void)libc_seterrno(EINTR);
 #endif /* EINTR */
 		}
 	}
@@ -1070,9 +1070,9 @@ NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
 		           ? __COMPILER_OFFSETAFTER(struct ucred, uid)
 		           : __COMPILER_OFFSETAFTER(struct ucred, gid))) {
 #ifdef ENOPROTOOPT
-			result = __libc_seterrno(ENOPROTOOPT);
+			result = libc_seterrno(ENOPROTOOPT);
 #else /* ENOPROTOOPT */
-			result = __libc_seterrno(1);
+			result = libc_seterrno(1);
 #endif /* !ENOPROTOOPT */
 		} else {
 			*euid = cred.uid;

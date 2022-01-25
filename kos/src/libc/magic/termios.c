@@ -706,9 +706,9 @@ int tcsetattr($fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
 
 	default:
 @@pp_ifdef EINVAL@@
-		return __libc_seterrno(EINVAL);
+		return libc_seterrno(EINVAL);
 @@pp_else@@
-		return __libc_seterrno(1);
+		return libc_seterrno(1);
 @@pp_endif@@
 	}
 	return (int)ioctl(fd, cmd, termios_p);
@@ -771,9 +771,9 @@ int tcsetsid($fd_t fd, $pid_t pid) {
 	int result;
 	if unlikely(pid != getsid(0)) {
 @@pp_ifdef EINVAL@@
-		result = __libc_seterrno(EINVAL);
+		result = libc_seterrno(EINVAL);
 @@pp_else@@
-		result = __libc_seterrno(1);
+		result = libc_seterrno(1);
 @@pp_endif@@
 	} else {
 		result = ioctl(fd, __TIOCSCTTY, NULL);

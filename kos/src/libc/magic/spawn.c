@@ -196,7 +196,7 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
 	pid_t child;
 	old_errno = __libc_geterrno_or(0);
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-	(void)__libc_seterrno(0);
+	(void)libc_seterrno(0);
 	child = vfork();
 	if (child == 0)
 		goto do_exec;
@@ -208,14 +208,14 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
 	if (result != 0) {
 		if (child < 0) {
 			/* The vfork() itself failed. */
-			(void)__libc_seterrno(old_errno);
+			(void)libc_seterrno(old_errno);
 			return result;
 		}
 		/* Something within the child failed after vfork(). */
 		goto err_join_zombie_child;
 	}
 	/* Restore the old errno */
-	(void)__libc_seterrno(old_errno);
+	(void)libc_seterrno(old_errno);
 	/* Write back the child's PID */
 	*pid = child;
 	return result;
@@ -224,7 +224,7 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
 	if (pipe2(pipes, O_CLOEXEC)) {
 err_without_child:
 		result = __libc_geterrno_or(0);
-		(void)__libc_seterrno(old_errno);
+		(void)libc_seterrno(old_errno);
 		return result;
 	}
 	child = fork();
@@ -243,7 +243,7 @@ err_without_child:
 	/* This means that `fexecve()' below closed the pipe during a successful exec(). */
 	if (temp != sizeof(result)) {
 		*pid = child;
-		(void)__libc_seterrno(old_errno);
+		(void)libc_seterrno(old_errno);
 		return 0;
 	}
 @@pp_endif@@
@@ -257,7 +257,7 @@ err_join_zombie_child:
 			goto err_join_zombie_child;
 @@pp_endif@@
 	}
-	(void)__libc_seterrno(old_errno);
+	(void)libc_seterrno(old_errno);
 	return result;
 do_exec:
 	/* Perform additional actions within the child. */
@@ -372,11 +372,11 @@ do_exec:
 #undef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
 			default:
 @@pp_ifdef ENOSYS@@
-				(void)__libc_seterrno(ENOSYS);
+				(void)libc_seterrno(ENOSYS);
 @@pp_elif defined(EPERM)@@
-				(void)__libc_seterrno(EPERM);
+				(void)libc_seterrno(EPERM);
 @@pp_else@@
-				(void)__libc_seterrno(1);
+				(void)libc_seterrno(1);
 @@pp_endif@@
 				goto child_error;
 @@pp_else@@
@@ -403,11 +403,11 @@ do_exec:
 @@pp_endif@@
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)__libc_seterrno(ENOSYS);
+			(void)libc_seterrno(ENOSYS);
 @@pp_elif defined(EPERM)@@
-			(void)__libc_seterrno(EPERM);
+			(void)libc_seterrno(EPERM);
 @@pp_else@@
-			(void)__libc_seterrno(1);
+			(void)libc_seterrno(1);
 @@pp_endif@@
 			goto child_error;
 @@pp_endif@@
@@ -419,11 +419,11 @@ do_exec:
 				goto child_error;
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)__libc_seterrno(ENOSYS);
+			(void)libc_seterrno(ENOSYS);
 @@pp_elif defined(EPERM)@@
-			(void)__libc_seterrno(EPERM);
+			(void)libc_seterrno(EPERM);
 @@pp_else@@
-			(void)__libc_seterrno(1);
+			(void)libc_seterrno(1);
 @@pp_endif@@
 			goto child_error;
 @@pp_endif@@
@@ -443,11 +443,11 @@ do_exec:
 			}
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)__libc_seterrno(ENOSYS);
+			(void)libc_seterrno(ENOSYS);
 @@pp_elif defined(EPERM)@@
-			(void)__libc_seterrno(EPERM);
+			(void)libc_seterrno(EPERM);
 @@pp_else@@
-			(void)__libc_seterrno(1);
+			(void)libc_seterrno(1);
 @@pp_endif@@
 			goto child_error;
 @@pp_endif@@
@@ -458,11 +458,11 @@ do_exec:
 				goto child_error;
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)__libc_seterrno(ENOSYS);
+			(void)libc_seterrno(ENOSYS);
 @@pp_elif defined(EPERM)@@
-			(void)__libc_seterrno(EPERM);
+			(void)libc_seterrno(EPERM);
 @@pp_else@@
-			(void)__libc_seterrno(1);
+			(void)libc_seterrno(1);
 @@pp_endif@@
 			goto child_error;
 @@pp_endif@@
@@ -485,11 +485,11 @@ do_exec:
 				goto child_error;
 @@pp_else@@
 @@pp_ifdef ENOSYS@@
-			(void)__libc_seterrno(ENOSYS);
+			(void)libc_seterrno(ENOSYS);
 @@pp_elif defined(EPERM)@@
-			(void)__libc_seterrno(EPERM);
+			(void)libc_seterrno(EPERM);
 @@pp_else@@
-			(void)__libc_seterrno(1);
+			(void)libc_seterrno(1);
 @@pp_endif@@
 			goto child_error;
 @@pp_endif@@
@@ -502,7 +502,7 @@ do_exec:
 	if (attrp && attrp->@__flags@ & __POSIX_SPAWN_NOEXECERR) {
 		/* Suppress the exec error. */
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-		(void)__libc_seterrno(0);
+		(void)libc_seterrno(0);
 @@pp_endif@@
 	} else
 @@pp_endif@@

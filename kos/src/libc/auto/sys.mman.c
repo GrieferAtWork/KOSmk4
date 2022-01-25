@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb679680 */
+/* HASH CRC-32:0x2e8d215c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,7 +132,7 @@ NOTHROW_NCX(LIBCCALL libc_pkey_set)(int pkey,
 	return 0;
 badkey_or_rights:
 #ifdef EINVAL
-	return __libc_seterrno(EINVAL);
+	return libc_seterrno(EINVAL);
 #else /* EINVAL */
 	return -1;
 #endif /* !EINVAL */
@@ -146,7 +146,7 @@ NOTHROW_NCX(LIBCCALL libc_pkey_get)(int pkey) {
 	return __arch_pkey_get(pkey);
 badkey:
 #ifdef EINVAL
-	return __libc_seterrno(EINVAL);
+	return libc_seterrno(EINVAL);
 #else /* EINVAL */
 	return -1;
 #endif /* !EINVAL */

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xd1257449 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__fullpath_defined
-#define __local__fullpath_defined
-#include <__crt.h>
-#include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat)
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_frealpathat_defined
-#define __local___localdep_frealpathat_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,__localdep_frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpathat,(__dirfd,__filename,__resolved,__buflen,__flags))
-#endif /* !__local___localdep_frealpathat_defined */
-__LOCAL_LIBC(_fullpath) __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fullpath))(char *__buf, char const *__path, __SIZE_TYPE__ __buflen) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_frealpathat)(__AT_FDCWD, __path, __buf, __buflen, 0);
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep__fullpath_defined
-#define __local___localdep__fullpath_defined
-#define __localdep__fullpath __LIBC_LOCAL_NAME(_fullpath)
-#endif /* !__local___localdep__fullpath_defined */
-#else /* __AT_FDCWD && __CRT_HAVE_frealpathat */
-#undef __local__fullpath_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_frealpathat */
-#endif /* !__local__fullpath_defined */
+/* (#) Portability: Windows Kits (/ucrt/corecrt_io.h) */
+#ifndef _CORECRT_IO_H
+#define _CORECRT_IO_H 1
+
+#include <io.h>
+
+#endif /* !_CORECRT_IO_H */

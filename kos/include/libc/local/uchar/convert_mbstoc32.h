@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3de50af7 */
+/* HASH CRC-32:0x9578fe7d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __LOCAL_LIBC(convert_mbstoc32) __ATTR_MALLOC __ATTR_WUNUSED __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(convert_mbstoc32))(char const *__restrict __str) {
 	if __unlikely(!__str) {
 #ifdef __EINVAL
-		__libc_seterrno(__EINVAL);
+		(void)__libc_seterrno(__EINVAL);
 #endif /* __EINVAL */
 		return __NULLPTR;
 	}

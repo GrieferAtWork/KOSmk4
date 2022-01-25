@@ -838,7 +838,7 @@ int pkey_set(int pkey, unsigned int access_rights) {
 	return 0;
 badkey_or_rights:
 @@pp_ifdef EINVAL@@
-	return __libc_seterrno(EINVAL);
+	return libc_seterrno(EINVAL);
 @@pp_else@@
 	return -1;
 @@pp_endif@@
@@ -853,7 +853,7 @@ int pkey_get(int pkey) {
 	return __arch_pkey_get(pkey);
 badkey:
 @@pp_ifdef EINVAL@@
-	return __libc_seterrno(EINVAL);
+	return libc_seterrno(EINVAL);
 @@pp_else@@
 	return -1;
 @@pp_endif@@

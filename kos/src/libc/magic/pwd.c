@@ -410,7 +410,7 @@ done_free_dbline:
 
 err_ERANGE:
 @@pp_ifdef ERANGE@@
-	(void)__libc_seterrno(ERANGE);
+	(void)libc_seterrno(ERANGE);
 @@pp_endif@@
 	/* FALLTHRU */
 err_restore:

@@ -126,7 +126,7 @@ int eventfd_read($fd_t fd, eventfd_t *value) {
 		return 0;
 @@pp_ifdef EINVAL@@
 	if (error >= 0)
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 	return -1;
 }
@@ -142,7 +142,7 @@ int eventfd_write($fd_t fd, eventfd_t value) {
 		return 0;
 @@pp_ifdef EINVAL@@
 	if (error >= 0)
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 	return -1;
 }

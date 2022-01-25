@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad64d347 */
+/* HASH CRC-32:0x15a19974 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED c
 NOTHROW_NCX(LIBDCALL libd_convert_wcstombs)(char16_t const *str) {
 	if unlikely(!str) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}
@@ -70,7 +70,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char 
 NOTHROW_NCX(LIBKCALL libc_convert_wcstombs)(char32_t const *str) {
 	if unlikely(!str) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}
@@ -148,7 +148,7 @@ NOTHROW_NCX(LIBDCALL libd_convert_wcstombsv)(char16_t const *const *__restrict v
 	size_t count = 0;
 	if unlikely(!vector) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}
@@ -162,7 +162,7 @@ NOTHROW_NCX(LIBKCALL libc_convert_wcstombsv)(char32_t const *const *__restrict v
 	size_t count = 0;
 	if unlikely(!vector) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}
@@ -227,7 +227,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED c
 NOTHROW_NCX(LIBDCALL libd_convert_mbstowcs)(char const *__restrict str) {
 	if unlikely(!str) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}
@@ -238,7 +238,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char3
 NOTHROW_NCX(LIBKCALL libc_convert_mbstowcs)(char const *__restrict str) {
 	if unlikely(!str) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}
@@ -308,7 +308,7 @@ NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsv)(char const *const *__restrict vecto
 	size_t count = 0;
 	if unlikely(!vector) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}
@@ -322,7 +322,7 @@ NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsv)(char const *const *__restrict vecto
 	size_t count = 0;
 	if unlikely(!vector) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}

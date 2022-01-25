@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5c31ae3 */
+/* HASH CRC-32:0x4e15d7a5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,9 +111,9 @@ NOTHROW_RPC(LIBDCALL libd_wrealpath)(char16_t const *filename,
 		libc_free(wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -168,9 +168,9 @@ NOTHROW_RPC(LIBKCALL libc_wrealpath)(char32_t const *filename,
 		libc_free(wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -208,9 +208,9 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpath)(fd_t fd,
 		libc_free(wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -248,9 +248,9 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpath)(fd_t fd,
 		libc_free(wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -286,9 +286,9 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpath4)(fd_t fd,
 		libc_free(wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -323,9 +323,9 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpath4)(fd_t fd,
 		libc_free(wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -367,9 +367,9 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpathat)(fd_t dirfd,
 		libc_free(wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -411,9 +411,9 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpathat)(fd_t dirfd,
 		libc_free(wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}

@@ -143,9 +143,9 @@ char *readpassphrase([[nullable]] char const *prompt,
 	/* Validate input arguments. */
 	if unlikely(buf == NULL || bufsize < sizeof(char)) {
 @@pp_ifdef EINVAL@@
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_else@@
-		(void)__libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		goto err;
 	}
@@ -176,18 +176,18 @@ again:
 		if unlikely(infd == -1) {
 @@pp_ifdef ENOTTY@@
 			if (flags & __RPP_REQUIRE_TTY)
-				(void)__libc_seterrno(ENOTTY);
+				(void)libc_seterrno(ENOTTY);
 @@pp_endif@@
 			goto err;
 		}
 		outfd = infd;
 @@pp_else@@
 @@pp_if defined(ENOTTY) && defined(ENOENT)@@
-		(void)__libc_seterrno(flags & __RPP_REQUIRE_TTY ? ENOTTY : ENOENT);
+		(void)libc_seterrno(flags & __RPP_REQUIRE_TTY ? ENOTTY : ENOENT);
 @@pp_elif defined(ENOENT)@@
-		(void)__libc_seterrno(ENOENT);
+		(void)libc_seterrno(ENOENT);
 @@pp_else@@
-		(void)__libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		goto err;
 @@pp_endif@@
@@ -198,7 +198,7 @@ again:
 	if (tcgetattr(infd, &old_ios) != 0) {
 		if (flags & RPP_REQUIRE_TTY) {
 @@pp_ifdef ENOTTY@@
-			(void)__libc_seterrno(ENOTTY);
+			(void)libc_seterrno(ENOTTY);
 @@pp_endif@@
 			goto err_infd;
 #define __PRIVATE_WANT_err_infd

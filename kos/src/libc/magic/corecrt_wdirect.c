@@ -60,9 +60,9 @@ typedef __WCHAR_TYPE__ wchar_t;
 wchar_t *_wgetdcwd(int drive, wchar_t *buf, size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_else@@
-		__libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		return NULL;
 	}

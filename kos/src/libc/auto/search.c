@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6924e6db */
+/* HASH CRC-32:0x349c8394 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -201,7 +201,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 	if (action == ENTER) {
 		if (htab->filled == htab->size) {
 #ifdef ENOMEM
-			(void)__libc_seterrno(ENOMEM);
+			(void)libc_seterrno(ENOMEM);
 #endif /* ENOMEM */
 			*retval = NULL;
 			return 0;
@@ -213,7 +213,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 		return 1;
 	}
 #ifdef ESRCH
-	(void)__libc_seterrno(ESRCH);
+	(void)libc_seterrno(ESRCH);
 #endif /* ESRCH */
 	*retval = NULL;
 	return 0;
@@ -262,7 +262,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 	} entry_type;
 	if (htab == NULL) {
 #ifdef EINVAL
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return 0;
 	}
@@ -273,7 +273,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 	for (nel |= 1;; nel += 2) {
 		if (UINT_MAX - 2 < nel) {
 #ifdef ENOMEM
-			(void)__libc_seterrno(ENOMEM);
+			(void)libc_seterrno(ENOMEM);
 #endif /* ENOMEM */
 			return 0;
 		}
@@ -302,7 +302,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {
 	if (htab == NULL) {
 #ifdef EINVAL
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return;
 	}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x249b7936 */
+/* HASH CRC-32:0xd72f721b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,9 @@ NOTHROW_RPC(LIBDCALL libd__getdcwd)(int drive,
                                     size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #else /* EINVAL */
-		__libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !EINVAL */
 		return NULL;
 	}
@@ -55,9 +55,9 @@ NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
                                     size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #else /* EINVAL */
-		__libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !EINVAL */
 		return NULL;
 	}
@@ -69,9 +69,9 @@ NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive) {
 	drive = libc_toupper((unsigned char)drive);
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 #ifdef EINVAL
-		return __libc_seterrno(EINVAL);
+		return libc_seterrno(EINVAL);
 #else /* EINVAL */
-		return __libc_seterrno(1);
+		return libc_seterrno(1);
 #endif /* !EINVAL */
 	}
 	return libc_fchdir(__AT_FDDRIVE_ROOT(drive));

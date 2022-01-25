@@ -217,7 +217,7 @@ _wtoll_l(*) %{generate(str2wcs("_atoll_l"))}
 %#define _WSTDLIBP_DEFINED 1
 
 [[wchar, section(".text.crt.dos.wchar.fs.utility")]]
-[[requires_include("<asm/os/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(_fullpath, convert_wcstombs, convert_mbstowcs))]]
 [[impl_include("<libc/errno.h>", "<asm/os/fcntl.h>")]]
 wchar_t *_wfullpath(wchar_t *buf, wchar_t const *path, $size_t buflen) {
@@ -247,9 +247,9 @@ wchar_t *_wfullpath(wchar_t *buf, wchar_t const *path, $size_t buflen) {
 		free(wcs_realpath);
 @@pp_endif@@
 @@pp_ifdef ERANGE@@
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 @@pp_else@@
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		return NULL;
 	}

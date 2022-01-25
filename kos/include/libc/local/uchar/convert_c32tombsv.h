@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5f60ff1 */
+/* HASH CRC-32:0xf4d233d1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(convert_c32tombsv))(__CHAR32_TYPE__ c
 	__SIZE_TYPE__ __count = 0;
 	if __unlikely(!__vector) {
 #ifdef __EINVAL
-		__libc_seterrno(__EINVAL);
+		(void)__libc_seterrno(__EINVAL);
 #endif /* __EINVAL */
 		return __NULLPTR;
 	}

@@ -576,7 +576,7 @@ $pid_t spawnvpe(__STDC_INT_AS_UINT_T mode,
 		}
 	} else {
 @@pp_ifdef ENOENT@@
-		(void)__libc_seterrno(ENOENT);
+		(void)libc_seterrno(ENOENT);
 @@pp_endif@@
 	}
 	return -1;
@@ -642,8 +642,8 @@ $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
 	if (mode == P_OVERLAY)
 		return fexecve(execfd, ___argv, ___envp);
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-	old_errno = __libc_geterrno_or(0);
-	(void)__libc_seterrno(0);
+	old_errno = libc_geterrno_or(0);
+	(void)libc_seterrno(0);
 @@pp_endif@@
 @@pp_if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || !$has_function(vfork)@@
 	/* Create a pair of pipes for temporary communication. */
@@ -688,11 +688,11 @@ $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
 		/* Check for errors that may have happened in  the
 		 * child process _after_ we did the vfork() above. */
-		if (__libc_geterrno_or(0) != 0)
+		if (libc_geterrno_or(0) != 0)
 			goto err_join_zombie_child;
 		/* Success (but still restore the old errno
 		 * since  we  overwrote it  to be  0 above) */
-		(void)__libc_seterrno(old_errno);
+		(void)libc_seterrno(old_errno);
 @@pp_else@@
 		close(pipes[1]); /* Close the writer. */
 		temp = read(pipes[0], &error, sizeof(error));
@@ -701,7 +701,7 @@ $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
 			goto err_join_zombie_child;
 		if (temp == sizeof(error)) {
 			/* If something was read, then it is the errno value that caused the failure. */
-			(void)__libc_seterrno(error);
+			(void)libc_seterrno(error);
 			goto err;
 		}
 @@pp_endif@@
@@ -730,11 +730,11 @@ read_child_errors:
 	 * our (vm-shared) errno as non-zero (which would indicate that the
 	 * child encountered an error at  some point after vfork()  already
 	 * succeeded) */
-	if (__libc_geterrno_or(0) != 0)
+	if (libc_geterrno_or(0) != 0)
 		goto err_join_zombie_child;
 	/* Complete success (but we must still restore the old errno from
 	 * before we were called) */
-	(void)__libc_seterrno(old_errno);
+	(void)libc_seterrno(old_errno);
 	/* Return the child's PID */
 	return child;
 @@pp_else@@
@@ -750,7 +750,7 @@ read_child_errors:
 	if (temp != sizeof(error))
 		return child;
 	/* If something was read, then it is the errno value that caused the failure. */
-	(void)__libc_seterrno(error);
+	(void)libc_seterrno(error);
 @@pp_endif@@
 err_join_zombie_child:
 	if (mode != P_DETACH) {
@@ -778,9 +778,9 @@ do_exec:
 @@pp_else@@
 	/* Write the exec-error back to our parent. */
 @@pp_ifdef ENOENT@@
-	error = __libc_geterrno_or(ENOENT);
+	error = libc_geterrno_or(ENOENT);
 @@pp_else@@
-	error = __libc_geterrno_or(1);
+	error = libc_geterrno_or(1);
 @@pp_endif@@
 	/* Communicate back why this failed. */
 	write(pipes[1], &error, sizeof(error));

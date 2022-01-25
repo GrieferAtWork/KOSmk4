@@ -164,13 +164,13 @@ size_t ReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 				           (byte_t *)buf + (size_t)result,
 				            bufsize - (size_t)result);
 			} @EXCEPT@ {
-@@pp_ifdef __libc_geterrno@@
-				int old_error = __libc_geterrno();
+@@pp_ifdef libc_geterrno@@
+				int old_error = libc_geterrno();
 @@pp_endif@@
 				/* Try to un-read data that had already been loaded. */
 				lseek(fd, -(off_t)(pos_t)result, SEEK_CUR);
-@@pp_ifdef __libc_geterrno@@
-				(void)__libc_seterrno(old_error);
+@@pp_ifdef libc_geterrno@@
+				(void)libc_seterrno(old_error);
 @@pp_endif@@
 				@RETHROW@();
 			}

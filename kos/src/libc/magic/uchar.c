@@ -244,7 +244,7 @@ void convert_freevn(void *vector, $size_t count)
 /*utf-8*/ char *convert_wcstombs($wchar_t const *str) {
 	if unlikely(!str) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 		return NULL;
 	}
@@ -292,7 +292,7 @@ void convert_freevn(void *vector, $size_t count)
 	size_t count = 0;
 	if unlikely(!vector) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 		return NULL;
 	}
@@ -335,7 +335,7 @@ err:
 $wchar_t *convert_mbstowcs(/*utf-8*/ char const *__restrict str) {
 	if unlikely(!str) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 		return NULL;
 	}
@@ -378,7 +378,7 @@ $wchar_t **convert_mbstowcsv(/*utf-8*/ char const *const *__restrict vector) {
 	size_t count = 0;
 	if unlikely(!vector) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 		return NULL;
 	}

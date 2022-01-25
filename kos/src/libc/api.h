@@ -197,13 +197,21 @@
 /* Re-bind errno memory locations. */
 #undef errno
 #undef __errno
+#undef libc_errno
 #undef __libc_errno
+#undef libc_geterrno
 #undef __libc_geterrno
+#undef libc_geterrno_or
 #undef __libc_geterrno_or
+#undef libc_seterrno
 #undef __libc_seterrno
+#undef libd_errno
 #undef __libd_errno
+#undef libd_geterrno
 #undef __libd_geterrno
+#undef libd_geterrno_or
 #undef __libd_geterrno_or
+#undef libd_seterrno
 #undef __libd_seterrno
 #undef ____errno_location_defined
 
@@ -213,10 +221,12 @@
 #define __libc_errno            (*libc_errno_p())
 #define __libc_geterrno         libc_geterrno
 #define __libc_geterrno_or(alt) libc_geterrno()
+#define libc_geterrno_or(alt)   libc_geterrno()
 #define __libc_seterrno         libc_seterrno
 #define __libd_errno            (*libd_errno_p())
 #define __libd_geterrno         libd_geterrno
 #define __libd_geterrno_or(alt) libd_geterrno()
+#define libd_geterrno_or(alt)   libd_geterrno()
 #define __libd_seterrno         libd_seterrno
 #define ____errno_location_defined
 #define __errno_location()            libc_errno_p()
@@ -267,17 +277,27 @@ INTDEF void VLIBCCALL libc_unimplementedf(char const *__restrict format, ...);
 #undef libc_seterrno_syserr2
 #undef errno
 #undef __errno
-#undef __libc_geterrno
-#undef __libc_geterrno_or
-#undef __libc_seterrno
-#undef __libd_geterrno
-#undef __libd_geterrno_or
-#undef __libd_seterrno
 #undef __errno_location
+#undef libc_geterrno
+#undef __libc_geterrno
+#undef libc_geterrno_or
+#undef __libc_geterrno_or
+#undef libc_seterrno
+#undef __libc_seterrno
+#undef libd_geterrno
+#undef __libd_geterrno
+#undef libd_geterrno_or
+#undef __libd_geterrno_or
+#undef libd_seterrno
+#undef __libd_seterrno
 #define __libc_geterrno_or(alt) alt
 #define __libc_seterrno(v)      ((void)0, -1)
 #define __libd_geterrno_or(alt) alt
 #define __libd_seterrno(v)      ((void)0, -1)
+#define libc_geterrno_or(alt)   alt
+#define libc_seterrno(v)        ((void)0, -1)
+#define libd_geterrno_or(alt)   alt
+#define libd_seterrno(v)        ((void)0, -1)
 #endif /* __KERNEL__ */
 
 

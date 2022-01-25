@@ -289,12 +289,12 @@ int ftime([[nonnull]] struct timeb *timebuf) {
 @@pp_if $has_function(crt_ftime32_s) && !defined(__USE_TIME_BITS64)@@
 	errno_t error = crt_ftime32_s(timebuf);
 	if unlikely(error)
-		error = __libc_seterrno(error);
+		error = libc_seterrno(error);
 	return (int)error;
 @@pp_elif $has_function(crt_ftime64_s) && defined(__USE_TIME_BITS64)@@
 	errno_t error = crt_ftime64_s(timebuf);
 	if unlikely(error)
-		error = __libc_seterrno(error);
+		error = libc_seterrno(error);
 	return (int)error;
 @@pp_elif $has_function(crt_dos_ftime32) && !defined(__USE_TIME_BITS64)@@
 	crt_dos_ftime32(&temp);
@@ -326,7 +326,7 @@ int ftime([[nonnull]] struct timeb *timebuf) {
 	struct timeb32 temp;
 	errno_t error = crt_ftime32_s(&temp);
 	if unlikely(error) {
-		error = __libc_seterrno(error);
+		error = libc_seterrno(error);
 	} else {
 		timebuf->@time@     = (time64_t)temp.@time@;
 		timebuf->@millitm@  = temp.@millitm@;
@@ -338,7 +338,7 @@ int ftime([[nonnull]] struct timeb *timebuf) {
 	struct timeb64 temp;
 	errno_t error = crt_ftime64_s(&temp);
 	if unlikely(error) {
-		error = __libc_seterrno(error);
+		error = libc_seterrno(error);
 	} else {
 		timebuf->@time@     = (time32_t)temp.@time@;
 		timebuf->@millitm@  = temp.@millitm@;
@@ -377,7 +377,7 @@ int ftime64([[nonnull]] struct timeb64 *timebuf) {
 @@pp_if $has_function(crt_ftime64_s)@@
 	errno_t error = crt_ftime64_s(timebuf);
 	if unlikely(error) {
-		error = __libc_seterrno(error);
+		error = libc_seterrno(error);
 	}
 	return (int)error;
 @@pp_elif $has_function(crt_dos_ftime64)@@
@@ -397,7 +397,7 @@ int ftime64([[nonnull]] struct timeb64 *timebuf) {
 	struct timeb32 temp;
 	errno_t error = crt_ftime32_s(&temp);
 	if unlikely(error) {
-		error = __libc_seterrno(error);
+		error = libc_seterrno(error);
 	} else {
 		timebuf->@time@     = (time64_t)temp.@time@;
 		timebuf->@millitm@  = temp.@millitm@;

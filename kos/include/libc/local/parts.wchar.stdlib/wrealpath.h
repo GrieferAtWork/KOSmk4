@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46818087 */
+/* HASH CRC-32:0xa743374f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -196,9 +196,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wrealpath))(__WCHAR_TYPE__ const *__f
 		(__NAMESPACE_LOCAL_SYM __localdep_free)(__wcs_resolved);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef __ERANGE
-		__libc_seterrno(__ERANGE);
+		(void)__libc_seterrno(__ERANGE);
 #else /* __ERANGE */
-		__libc_seterrno(1);
+		(void)__libc_seterrno(1);
 #endif /* !__ERANGE */
 		return __NULLPTR;
 	}

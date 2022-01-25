@@ -1296,7 +1296,7 @@ int raise($signo_t signo) {
 	errno_t error;
 	error = pthread_kill(pthread_self(), signo);
 	if unlikely(error != EOK)
-		error = (errno_t)__libc_seterrno(error);
+		error = (errno_t)libc_seterrno(error);
 	return (int)error;
 @@pp_else@@
 	return kill(getpid(), signo);
@@ -2638,9 +2638,9 @@ $sighandler_t sigset($signo_t signo, $sighandler_t disp) {
 	       : oact.@sa_handler@;
 err_inval:
 @@pp_ifdef EINVAL@@
-	(void)__libc_seterrno(EINVAL);
+	(void)libc_seterrno(EINVAL);
 @@pp_else@@
-	(void)__libc_seterrno(1);
+	(void)libc_seterrno(1);
 @@pp_endif@@
 err:
 	return (sighandler_t)@__SIG_ERR@;

@@ -65,9 +65,9 @@ typedef __SIZE_TYPE__ size_t;
 char *_getdcwd(int drive, char *buf, size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_else@@
-		__libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		return NULL;
 	}
@@ -81,9 +81,9 @@ int _chdrive(int drive) {
 	drive = toupper((unsigned char)drive);
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 @@pp_ifdef EINVAL@@
-		return __libc_seterrno(EINVAL);
+		return libc_seterrno(EINVAL);
 @@pp_else@@
-		return __libc_seterrno(1);
+		return libc_seterrno(1);
 @@pp_endif@@
 	}
 	return fchdir(__AT_FDDRIVE_ROOT(drive));

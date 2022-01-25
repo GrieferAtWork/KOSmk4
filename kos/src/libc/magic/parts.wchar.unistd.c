@@ -171,9 +171,9 @@ wchar_t *wgetcwd([[outp_opt(bufsize)]] wchar_t *buf, size_t bufsize) {
 			return result;
 		if (bufsize < result_len) {
 @@pp_ifdef ERANGE@@
-			libc_seterrno(ERANGE);
+			(void)libc_seterrno(ERANGE);
 @@pp_else@@
-			libc_seterrno(1);
+			(void)libc_seterrno(1);
 @@pp_endif@@
 			buf = NULL;
 			goto done;
@@ -191,9 +191,9 @@ wchar_t *wgetcwd([[outp_opt(bufsize)]] wchar_t *buf, size_t bufsize) {
 	}
 	if (bufsize < result_len) {
 @@pp_ifdef ERANGE@@
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 @@pp_else@@
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 @@pp_endif@@
 		buf = NULL;
 		goto done;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x140d500a */
+/* HASH CRC-32:0x4b0efcb2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -297,7 +297,7 @@ NOTHROW(LIBCCALL libc_ldexp)(double x,
 #endif /* !... */
 #ifdef ERANGE
 	if unlikely(!__LIBM_MATHFUN(finite, result) || result == 0.0)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 	return result;
 }
@@ -379,7 +379,7 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
 #endif /* !... */
 #ifdef ERANGE
 	if unlikely(!__LIBM_MATHFUNF(finite, result) || result == 0.0f)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 	return result;
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
@@ -481,7 +481,7 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 #endif /* !... */
 #ifdef ERANGE
 	if unlikely(!__LIBM_MATHFUNL(finite, result) || result == 0.0L)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 	return result;
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
@@ -2152,7 +2152,7 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 				return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef __ERANGE
-				(void)__libc_seterrno(__ERANGE);
+				(void)libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
 			}
 		} else if (result == 0.0 && result != x) {
@@ -2206,7 +2206,7 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 				return __kernel_standard_f(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef __ERANGE
-				(void)__libc_seterrno(__ERANGE);
+				(void)libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
 			}
 		} else if (result == 0.0f && result != x) {
@@ -2263,7 +2263,7 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 				return __kernel_standard_l(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef __ERANGE
-				(void)__libc_seterrno(__ERANGE);
+				(void)libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
 			}
 		} else if (result == 0.0L && result != x) {

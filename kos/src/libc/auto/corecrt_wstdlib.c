@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccd857d5 */
+/* HASH CRC-32:0x61853a23 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -605,9 +605,9 @@ NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
 		libc_free(wcs_realpath);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -649,9 +649,9 @@ NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
 		libc_free(wcs_realpath);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 #ifdef ERANGE
-		libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
-		libc_seterrno(1);
+		(void)libc_seterrno(1);
 #endif /* !ERANGE */
 		return NULL;
 	}
@@ -903,7 +903,7 @@ err_inval:
 #endif /* !EINVAL */
 err_range:
 #ifdef ERANGE
-	(void)__libc_seterrno(ERANGE);
+	(void)libc_seterrno(ERANGE);
 	return 34;
 #else /* ERANGE */
 	return 1;
@@ -997,7 +997,7 @@ err_inval:
 #endif /* !EINVAL */
 err_range:
 #ifdef ERANGE
-	(void)__libc_seterrno(ERANGE);
+	(void)libc_seterrno(ERANGE);
 	return ERANGE;
 #else /* ERANGE */
 	return 1;

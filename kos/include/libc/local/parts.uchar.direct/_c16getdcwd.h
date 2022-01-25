@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1eecb08f */
+/* HASH CRC-32:0xff2ec0ee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,9 +58,9 @@ __LOCAL_LIBC(_c16getdcwd) __CHAR16_TYPE__ *
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(_c16getdcwd))(int __drive, __CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __size) {
 	if __unlikely(__drive < __AT_DOS_DRIVEMIN || __drive > __AT_DOS_DRIVEMAX) {
 #ifdef __EINVAL
-		__libc_seterrno(__EINVAL);
+		(void)__libc_seterrno(__EINVAL);
 #else /* __EINVAL */
-		__libc_seterrno(1);
+		(void)__libc_seterrno(1);
 #endif /* !__EINVAL */
 		return __NULLPTR;
 	}

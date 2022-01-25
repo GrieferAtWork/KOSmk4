@@ -479,7 +479,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 		}
 	} else {
 @@pp_ifdef ENOENT@@
-		(void)__libc_seterrno(ENOENT);
+		(void)libc_seterrno(ENOENT);
 @@pp_endif@@
 	}
 	return -1;
@@ -833,7 +833,7 @@ ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 				/* Try to un-read data that had already been loaded. */
 				lseek(fd, -(off_t)(pos_t)result, SEEK_CUR);
 @@pp_ifdef __libc_geterrno@@
-				(void)__libc_seterrno(old_error);
+				(void)libc_seterrno(old_error);
 @@pp_endif@@
 				result = temp;
 				break;
@@ -2362,7 +2362,7 @@ char *getpassfd([[nullable]] char const *prompt,
 	if (buflen < 1) {
 		/* Invalid buffer length */
 @@pp_ifdef EINVAL@@
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 		goto out;
 	}
@@ -2515,9 +2515,9 @@ char *getpassfd([[nullable]] char const *prompt,
 					goto out; /* Error... */
 				if unlikely(status == 0) {
 @@pp_ifdef ETIMEDOUT@@
-					(void)__libc_seterrno(ETIMEDOUT);
+					(void)libc_seterrno(ETIMEDOUT);
 @@pp_else@@
-					(void)__libc_seterrno(1);
+					(void)libc_seterrno(1);
 @@pp_endif@@
 					goto out; /* Timeout... */
 				}
@@ -2540,7 +2540,7 @@ handle_eof:
 					if (flags & __GETPASS_FAIL_EOF) {
 						/* Error out on regular, old EOF */
 @@pp_ifdef ENODATA@@
-						(void)__libc_seterrno(ENODATA);
+						(void)libc_seterrno(ENODATA);
 @@pp_endif@@
 						goto out;
 					}
@@ -2848,7 +2848,7 @@ out:
 				(void)raise(interrupt_signo);
 @@pp_endif@@
 @@pp_ifdef EINTR@@
-			(void)__libc_seterrno(EINTR);
+			(void)libc_seterrno(EINTR);
 @@pp_endif@@
 		}
 	}
@@ -2912,9 +2912,9 @@ int getpeereid($fd_t sockfd,
 		           ? __COMPILER_OFFSETAFTER(struct ucred, @uid@)
 		           : __COMPILER_OFFSETAFTER(struct ucred, @gid@))) {
 @@pp_ifdef ENOPROTOOPT@@
-			result = __libc_seterrno(ENOPROTOOPT);
+			result = libc_seterrno(ENOPROTOOPT);
 @@pp_else@@
-			result = __libc_seterrno(1);
+			result = libc_seterrno(1);
 @@pp_endif@@
 		} else {
 			*euid = cred.@uid@;

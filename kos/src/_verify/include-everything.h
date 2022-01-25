@@ -462,6 +462,7 @@ incdir("");
 #include <confname.h>
 #include <confstr.h>
 #include <corecrt.h>
+#include <corecrt_io.h>
 #include <corecrt_stdio_config.h>
 #include <corecrt_wdirect.h>
 #include <corecrt_wio.h>

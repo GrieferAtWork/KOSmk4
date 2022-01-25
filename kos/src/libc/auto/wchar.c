@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa73ab31e */
+/* HASH CRC-32:0x510e9c4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -165,7 +165,7 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 
 #ifdef EILSEQ
 	if (error == (size_t)-1)
-		(void)__libc_seterrno(EILSEQ);
+		(void)libc_seterrno(EILSEQ);
 #endif /* EILSEQ */
 	return error;
 }
@@ -194,7 +194,7 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
 
 #ifdef EILSEQ
 	if (error == (size_t)-1)
-		(void)__libc_seterrno(EILSEQ);
+		(void)libc_seterrno(EILSEQ);
 #endif /* EILSEQ */
 	return error;
 }
@@ -223,7 +223,7 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 		              (u16)wc <= 0xdfff)) {
 			/* Expected low surrogate */
 #ifdef EILSEQ
-			(void)__libc_seterrno(EILSEQ);
+			(void)libc_seterrno(EILSEQ);
 #endif /* EILSEQ */
 			return (size_t)-1;
 		}
@@ -678,7 +678,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef ERANGE
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 		return NULL;
 	}
@@ -721,7 +721,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.read") WUNUSED NONNULL((1,
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef ERANGE
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 		return NULL;
 	}
@@ -2271,7 +2271,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef ERANGE
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 		return NULL;
 	}
@@ -2314,7 +2314,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) c
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef ERANGE
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 		return NULL;
 	}
@@ -3067,7 +3067,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
 	errno_t error;
 	result = libd_wcsto32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libd_wcsto32_r(nptr, endptr, base, NULL);
@@ -3084,7 +3084,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
 	errno_t error;
 	result = libc_wcsto32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_wcsto32_r(nptr, endptr, base, NULL);
@@ -3101,7 +3101,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
 	errno_t error;
 	result = libd_wcstou32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libd_wcstou32_r(nptr, endptr, base, NULL);
@@ -3118,7 +3118,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 	errno_t error;
 	result = libc_wcstou32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_wcstou32_r(nptr, endptr, base, NULL);
@@ -3631,7 +3631,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
 	errno_t error;
 	result = libd_wcstou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libd_wcstou64_r(nptr, endptr, base, NULL);
@@ -3648,7 +3648,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
 	errno_t error;
 	result = libc_wcstou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_wcstou64_r(nptr, endptr, base, NULL);
@@ -3665,7 +3665,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
 	errno_t error;
 	result = libd_wcsto64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libd_wcsto64_r(nptr, endptr, base, NULL);
@@ -3682,7 +3682,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
 	errno_t error;
 	result = libc_wcsto64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_wcsto64_r(nptr, endptr, base, NULL);

@@ -405,11 +405,11 @@ char *inet_neta($uint32_t net, [[outp(len)]] char *buf, $size_t len) {
 	return buf;
 too_small:
 @@pp_ifdef EMSGSIZE@@
-	(void)__libc_seterrno(EMSGSIZE);
+	(void)libc_seterrno(EMSGSIZE);
 @@pp_elif defined(ERANGE)@@
-	(void)__libc_seterrno(ERANGE);
+	(void)libc_seterrno(ERANGE);
 @@pp_elif defined(EINVAL)@@
-	(void)__libc_seterrno(EINVAL);
+	(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 	return NULL;
 }

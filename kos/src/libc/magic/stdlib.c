@@ -1749,7 +1749,7 @@ $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
 	errno_t error;
 	result = strtou32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 @@pp_else@@
 	return strtou32_r(nptr, endptr, base, NULL);
@@ -1769,7 +1769,7 @@ $int32_t strto32([[nonnull]] char const *__restrict nptr,
 	errno_t error;
 	result = strto32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 @@pp_else@@
 	return strto32_r(nptr, endptr, base, NULL);
@@ -1792,7 +1792,7 @@ $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
 	errno_t error;
 	result = strtou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 @@pp_else@@
 	return strtou64_r(nptr, endptr, base, NULL);
@@ -1815,7 +1815,7 @@ $int64_t strto64([[nonnull]] char const *__restrict nptr,
 	errno_t error;
 	result = strto64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 @@pp_else@@
 	return strto64_r(nptr, endptr, base, NULL);
@@ -2906,9 +2906,9 @@ $fd_t system_mktemp(unsigned int what, [[nonnull]] char *template_,
 	/* Verify the validity of the input template. */
 	if unlikely(xloc < template_ || memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
 @@pp_ifdef EINVAL@@
-		return __libc_seterrno(EINVAL);
+		return libc_seterrno(EINVAL);
 @@pp_else@@
-		return __libc_seterrno(1);
+		return libc_seterrno(1);
 @@pp_endif@@
 	}
 
@@ -3046,9 +3046,9 @@ again:
 			close(result);
 @@pp_endif@@
 @@pp_ifdef EEXIST@@
-			result = __libc_seterrno(EEXIST);
+			result = libc_seterrno(EEXIST);
 @@pp_else@@
-			result = __libc_seterrno(1);
+			result = libc_seterrno(1);
 @@pp_endif@@
 #define NEED_do_try_again
 			goto do_try_again;
@@ -3272,7 +3272,7 @@ int fdwalk([[nonnull]] int (LIBCCALL *walk)(void *arg, $fd_t fd), void *arg) {
 		fd = fcntl(fd, __F_NEXT);
 		if (fd < 0) {
 @@pp_ifdef __libc_geterrno@@
-			(void)__libc_seterrno(saved_err);
+			(void)libc_seterrno(saved_err);
 @@pp_endif@@
 			break;
 		}
@@ -5080,7 +5080,7 @@ void _aligned_free(void *aligned_mallptr) {
 @@>> _fullpath(3)
 @@s.a. `realpath(3)', `frealpathat(3)'
 [[crt_dos_variant, cp, section(".text.crt.dos.fs.utility")]]
-[[requires_include("<asm/os/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(frealpathat))]]
 [[impl_include("<asm/os/fcntl.h>"), wunused]]
 char *_fullpath(char *buf, [[nonnull]] char const *path, $size_t buflen) {
@@ -5444,7 +5444,7 @@ err_inval:
 @@pp_endif@@
 err_range:
 @@pp_ifdef ERANGE@@
-	(void)__libc_seterrno(ERANGE);
+	(void)libc_seterrno(ERANGE);
 	return $ERANGE;
 @@pp_else@@
 	return 1;

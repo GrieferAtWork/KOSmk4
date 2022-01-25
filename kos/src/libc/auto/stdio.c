@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa258981 */
+/* HASH CRC-32:0x987d0af */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,7 +115,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) c
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef ERANGE
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 		return NULL;
 	}
@@ -1228,7 +1228,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3))
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef ERANGE
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 		return NULL;
 	}
@@ -2419,13 +2419,13 @@ NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf,
 	if (__hybrid_overflow_umul(elemsize, elemcount, &reqbuf) ||
 	    reqbuf > bufsize) {
 #ifdef ERANGE
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 		return 0;
 	}
 	if unlikely(!stream || !buf) {
 #ifdef EINVAL
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return 0;
 	}
@@ -2438,7 +2438,7 @@ NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
                                   rsize_t bufsize) {
 	if unlikely(!buf) {
 #ifdef EINVAL
-		(void)__libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		return NULL;
 	}

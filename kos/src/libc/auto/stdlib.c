@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeaebac6c */
+/* HASH CRC-32:0x7eb4c396 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1310,7 +1310,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 	errno_t error;
 	result = libc_strtou32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_strtou32_r(nptr, endptr, base, NULL);
@@ -1340,7 +1340,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
 	errno_t error;
 	result = libc_strto32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_strto32_r(nptr, endptr, base, NULL);
@@ -1370,7 +1370,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 	errno_t error;
 	result = libc_strtou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_strtou64_r(nptr, endptr, base, NULL);
@@ -1400,7 +1400,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr,
 	errno_t error;
 	result = libc_strto64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		(void)__libc_seterrno(ERANGE);
+		(void)libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_strto64_r(nptr, endptr, base, NULL);
@@ -2025,9 +2025,9 @@ NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
 	/* Verify the validity of the input template. */
 	if unlikely(xloc < template_ || libc_memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
 #ifdef EINVAL
-		return __libc_seterrno(EINVAL);
+		return libc_seterrno(EINVAL);
 #else /* EINVAL */
-		return __libc_seterrno(1);
+		return libc_seterrno(1);
 #endif /* !EINVAL */
 	}
 
@@ -2165,9 +2165,9 @@ again:
 			libc_close(result);
 #endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || (__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) && (!__CRT_HAVE_stat64 || (!__USE_FILE_OFFSET64 && !__STAT32_MATCHES_STAT64)) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close) */
 #ifdef EEXIST
-			result = __libc_seterrno(EEXIST);
+			result = libc_seterrno(EEXIST);
 #else /* EEXIST */
-			result = __libc_seterrno(1);
+			result = libc_seterrno(1);
 #endif /* !EEXIST */
 #define NEED_do_try_again
 			goto do_try_again;
@@ -2302,7 +2302,7 @@ INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
 		fd = libc_fcntl(fd, __F_NEXT);
 		if (fd < 0) {
 #ifdef __libc_geterrno
-			(void)__libc_seterrno(saved_err);
+			(void)libc_seterrno(saved_err);
 #endif /* __libc_geterrno */
 			break;
 		}
@@ -4106,7 +4106,7 @@ err_inval:
 #endif /* !EINVAL */
 err_range:
 #ifdef ERANGE
-	(void)__libc_seterrno(ERANGE);
+	(void)libc_seterrno(ERANGE);
 	return ERANGE;
 #else /* ERANGE */
 	return 1;
