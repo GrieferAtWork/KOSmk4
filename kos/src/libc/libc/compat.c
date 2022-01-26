@@ -93,7 +93,7 @@ DEFINE_PUBLIC_ALIAS(stderr, libc_stderr);
 DEFINE_PUBLIC_ALIAS(_iob, libc_iob);              /* For DOS compatibility */
 DEFINE_PUBLIC_ALIAS(__p__iob, libd___iob_func);   /* For DOS compatibility */
 DEFINE_PUBLIC_ALIAS(__iob_func, libd___iob_func); /* For DOS compatibility */
-INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.FILE.std_files") FILE *NOTHROW(LIBDCALL libd___iob_func)(void) {
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.FILE.std_files") FILE *NOTHROW(LIBDCALL libd___iob_func)(void) {
 	/* DOS doesn't have copy-relocations, we don't have
 	 * to  worry  about   `dlsym("_iob") != &libc_iob'. */
 	return libc_iob;
@@ -237,10 +237,10 @@ PRIVATE ATTR_SECTION(".bss.crt.compat.linux.stdio") struct linux_default_stdio_f
 
 /* Helper for loading std stream addresses in compatibility mode. */
 INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.stdio") NONNULL((1, 2, 3)) FILE *
-NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
-                                              char const *__restrict name1,
-                                              char const *__restrict name2,
-                                              struct linux_default_stdio_file *__restrict fallback) {
+NOTHROW(CC get_mainapp_std_stream_addr)(void *__restrict mainapp,
+                                        char const *__restrict name1,
+                                        char const *__restrict name2,
+                                        struct linux_default_stdio_file *__restrict fallback) {
 	byte_t *result;
 	ElfW(Sym) const *sym;
 	sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, name1);
@@ -260,7 +260,7 @@ NOTHROW(LIBCCALL get_mainapp_std_stream_addr)(void *__restrict mainapp,
 }
 
 INTERN ATTR_SECTION(".text.crt.compat.linux.stdio") void
-NOTHROW(LIBCCALL linux_stdio_init)(bool is_2_1) {
+NOTHROW(CC linux_stdio_init)(bool is_2_1) {
 	void *mainapp;
 	struct linux_default_stdio_file *result;
 	if (linux_stdio_files)
@@ -350,7 +350,7 @@ DEFINE_PUBLIC_IDATA_G(_IO_stderr_, linux_stdio_get_stderr, SIZEOF_IO_FILE_84);
 /************************************************************************/
 /* __builtin_[vec_](new|delete)                                         */
 /************************************************************************/
-typedef void(LIBCCALL *PNEW_HANDLER)(void);
+typedef void (LIBCCALL *PNEW_HANDLER)(void);
 PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.heap") char const
 default_new_handler_message[] = "Virtual memory exceeded in `new'\n";
 PRIVATE ATTR_SECTION(".text.crt.compat.linux.heap") void LIBCCALL
@@ -411,7 +411,7 @@ libc___builtin_new(size_t sz) {
 DEFINE_PUBLIC_ALIAS(__builtin_vec_delete, libc___builtin_vec_delete);
 INTERN ATTR_SECTION(".text.crt.compat.linux.heap") void LIBCCALL
 libc___builtin_vec_delete(void *ptr, size_t maxindex, size_t size,
-                          void(LIBCCALL *dtor)(void *obj, int auto_delete),
+                          void (LIBCCALL *dtor)(void *obj, int auto_delete),
                           int auto_delete_vec, int auto_delete) {
 	size_t count = maxindex + 1;
 	byte_t *iter = (byte_t *)ptr + count * size;
@@ -426,7 +426,7 @@ libc___builtin_vec_delete(void *ptr, size_t maxindex, size_t size,
 DEFINE_PUBLIC_ALIAS(__builtin_vec_new, libc___builtin_vec_new);
 INTERN ATTR_SECTION(".text.crt.compat.linux.heap") void *LIBCCALL
 libc___builtin_vec_new(void *ptr, size_t maxindex, size_t size,
-                       void(LIBCCALL *ctor)(void *obj)) {
+                       void (LIBCCALL *ctor)(void *obj)) {
 	byte_t *iter;
 	size_t count = maxindex + 1;
 	if (ptr == NULL)
@@ -746,7 +746,8 @@ libc___libc_init(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 /* General compatibility flags                                          */
 /************************************************************************/
-INTERN ATTR_SECTION(".bss.crt.compat.linux.init") uintptr_t libc_compat = COMPAT_FLAG_NORMAL;
+INTERN ATTR_SECTION(".bss.crt.compat.linux.init")
+uintptr_t libc_compat = COMPAT_FLAG_NORMAL;
 
 
 DECL_END
@@ -1118,7 +1119,7 @@ NOTHROW(LIBDCALL libd___acrt_iob_func)(unsigned int index) {
 /* KERNEL32 forwarders exported from libc                               */
 /************************************************************************/
 PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") void *libkernel32 = NULL;
-PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *LIBCCALL libd_getk32(void) {
+PRIVATE ATTR_SECTION(".text.crt.dos.compat.dos") void *CC libd_getk32(void) {
 	void *k32 = ATOMIC_READ(libkernel32);
 	if (k32)
 		return k32;

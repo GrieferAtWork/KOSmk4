@@ -190,7 +190,7 @@
  *     jmp    <symbol>      Alias for 'skip <symbol>;'
  * ```
  *
- * The following instructions overloads  don't ~really~ exist, but  are
+ * The following instruction  overloads don't ~really~  exist, but  are
  * here for convenience and only exist to make it easier to write code.
  *
  * ```

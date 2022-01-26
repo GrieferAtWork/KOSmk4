@@ -22,12 +22,12 @@
 
 #include <kernel/compiler.h>
 
+#include <sched/cred.h>
+
 #include <asm/cpu-flags.h>
+#include <kos/capability.h>
 
 DECL_BEGIN
-
-/* Return true if the calling thread is allowed to modify EFLAGS.IOPERM */
-#define cred_allow_hwio() 1 /* TODO */
 
 /* Mask of eflags bits that a user-space process is allowed to  modify.
  * Attempting to set any non-masked EFLAGS bit will cause an exception:
@@ -36,10 +36,9 @@ DECL_BEGIN
  *            X86_REGISTER_MISC_EFLAGS:
  *                value
  * to be thrown */
-#define cred_allow_eflags_modify_mask() \
-	(cred_allow_hwio() ? (EFLAGS_UMASK) \
-	                   : (EFLAGS_UMASK | EFLAGS_IOPLMASK))
-
+#define cred_allow_eflags_modify_mask()                        \
+	(capable(CAP_SYS_RAWIO) ? (EFLAGS_UMASK | EFLAGS_IOPLMASK) \
+	                        : (EFLAGS_UMASK))
 
 DECL_END
 

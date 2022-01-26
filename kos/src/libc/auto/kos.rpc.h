@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fc070e5 */
+/* HASH CRC-32:0x2e3c23da */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,17 +33,17 @@ DECL_BEGIN
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
- * thread terminate before the  conditions for the RPC  to be served are  ever
- * met. Note that these  conditions depend on the  given `mode'. Note that  on
- * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * thread may terminate  before the conditions  for the RPC  to be served  are
+ * ever met. Note that these conditions depend on the given `mode'. Note  that
+ * on multi-arch platforms (such as x86), the register numbers, as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  *
- * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+ * NOTE: This function is a cancellation point when `RPC_JOIN_WAITFOR' is given!
  *
  * @param: target_tid:      The TID of the targeted thread
- * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:            One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                          one of `RPC_SYSRESTART_*', optionally or'd with
- *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of `RPC_PRIORITY_*',  optionally or'd  with
  *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                          one of `RPC_JOIN_*'
  * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
@@ -55,22 +55,19 @@ DECL_BEGIN
  * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
  *                             The given `mode' is invalid.
  * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
- *                             The RPC program  contains illegal  instructions.
- *                             In this case, modifications made by instructions
- *                             encountered before the illegal one(s) will still
- *                             have  happened, meaning that the target thread's
- *                             state may have become inconsistent.
- * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
- *                             doesn't exist. Note  though that unless  the
- *                             thread  is  part  of your  own  process, are
- *                             still many reasons  outside of your  control
- *                             for why it  may terminate immediately  after
+ *                             The RPC program contains illegal instructions.
+ * @throws: E_PROCESS_EXITED:  The  target thread has already terminated, or
+ *                             doesn't exist.  Note though  that unless  the
+ *                             thread is part of your own process, there are
+ *                             still many  reasons outside  of your  control
+ *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
 INTDEF NONNULL((3)) int NOTHROW_RPC(LIBDCALL libd_rpc_schedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count);
 /* >> rpc_exec(3)
- * Send a RPC to `target_tid' (which must be a thread within the current process).
- * The RPC will modify  the target thread's register  state such that `func'  will
- * be executed before  (upon its  return), execution resumes  within that  thread.
+ * Send an RPC to `target_tid' (which must be a thread within the  current
+ * process). The RPC will modify  the target thread's register state  such
+ * that `func' will be executed before (upon its return) execution resumes
+ * within that thread.
  * How/when exactly the RPC is served depends on the given `mode'.
  * WARNING: Unless special conditions are met, trying to use this function to send
  *          an RPC to another process  (read: different mman), will probably  fail
@@ -78,9 +75,9 @@ INTDEF NONNULL((3)) int NOTHROW_RPC(LIBDCALL libd_rpc_schedule)(pid_t target_tid
  *          that other process.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:       One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
- *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of `RPC_PRIORITY_*',  optionally or'd  with
  *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                     one of `RPC_JOIN_*'
  * @return: 0 :                Success
@@ -92,21 +89,22 @@ INTDEF NONNULL((3)) int NOTHROW_RPC(LIBDCALL libd_rpc_schedule)(pid_t target_tid
  *                             the RPC program finished. */
 INTDEF NONNULL((3)) int NOTHROW_RPC(LIBDCALL libd_rpc_exec)(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie);
 /* >> rpc_interrupt(3)
- * Send  a RPC to `target_tid' (which must be a thread within the current process).
- * The RPC won't do anything except causing an in-progress system call to fail with
- * `errno=EINTR' (so-long as that system call isn't marked as [restart(dont)]).
+ * Send an RPC to `target_tid' (which must be a thread within the current
+ * process).  The RPC won't do anything except causing an in-progress (or
+ * upcoming) system  call to  fail with  `errno=EINTR' (so-long  as  that
+ * system call isn't marked as [restart(dont)]).
  *
  * This function can be used to send sporadic interrupts to other threads within
  * the  current process, as well as allow  one to stop in-progress, but blocking
  * system calls performed by  those threads. This function  is a no-op when  the
  * given `target_tid == gettid()'.
  *
- * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+ * NOTE: This function is a cancellation point when `RPC_JOIN_WAITFOR' is given!
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:       One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
- *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of `RPC_PRIORITY_*',  optionally or'd  with
  *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                     one of `RPC_JOIN_*'
  * @return: 0 :               Success
@@ -120,17 +118,17 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_rpc_interrupt)(pid_t target_tid, unsigned i
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
- * thread terminate before the  conditions for the RPC  to be served are  ever
- * met. Note that these  conditions depend on the  given `mode'. Note that  on
- * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * thread may terminate  before the conditions  for the RPC  to be served  are
+ * ever met. Note that these conditions depend on the given `mode'. Note  that
+ * on multi-arch platforms (such as x86), the register numbers, as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  *
- * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+ * NOTE: This function is a cancellation point when `RPC_JOIN_WAITFOR' is given!
  *
  * @param: target_tid:      The TID of the targeted thread
- * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:            One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                          one of `RPC_SYSRESTART_*', optionally or'd with
- *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of `RPC_PRIORITY_*',  optionally or'd  with
  *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                          one of `RPC_JOIN_*'
  * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
@@ -142,22 +140,19 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_rpc_interrupt)(pid_t target_tid, unsigned i
  * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
  *                             The given `mode' is invalid.
  * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
- *                             The RPC program  contains illegal  instructions.
- *                             In this case, modifications made by instructions
- *                             encountered before the illegal one(s) will still
- *                             have  happened, meaning that the target thread's
- *                             state may have become inconsistent.
- * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
- *                             doesn't exist. Note  though that unless  the
- *                             thread  is  part  of your  own  process, are
- *                             still many reasons  outside of your  control
- *                             for why it  may terminate immediately  after
+ *                             The RPC program contains illegal instructions.
+ * @throws: E_PROCESS_EXITED:  The  target thread has already terminated, or
+ *                             doesn't exist.  Note though  that unless  the
+ *                             thread is part of your own process, there are
+ *                             still many  reasons outside  of your  control
+ *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
 INTDEF NONNULL((3)) void (LIBDCALL libd_RpcSchedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count) THROWS(...);
 /* >> rpc_exec(3)
- * Send a RPC to `target_tid' (which must be a thread within the current process).
- * The RPC will modify  the target thread's register  state such that `func'  will
- * be executed before  (upon its  return), execution resumes  within that  thread.
+ * Send an RPC to `target_tid' (which must be a thread within the  current
+ * process). The RPC will modify  the target thread's register state  such
+ * that `func' will be executed before (upon its return) execution resumes
+ * within that thread.
  * How/when exactly the RPC is served depends on the given `mode'.
  * WARNING: Unless special conditions are met, trying to use this function to send
  *          an RPC to another process  (read: different mman), will probably  fail
@@ -165,9 +160,9 @@ INTDEF NONNULL((3)) void (LIBDCALL libd_RpcSchedule)(pid_t target_tid, unsigned 
  *          that other process.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:       One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
- *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of `RPC_PRIORITY_*',  optionally or'd  with
  *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                     one of `RPC_JOIN_*'
  * @return: 0 :                Success
@@ -179,21 +174,22 @@ INTDEF NONNULL((3)) void (LIBDCALL libd_RpcSchedule)(pid_t target_tid, unsigned 
  *                             the RPC program finished. */
 INTDEF NONNULL((3)) void (LIBDCALL libd_RpcExec)(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie) THROWS(...);
 /* >> rpc_interrupt(3)
- * Send  a RPC to `target_tid' (which must be a thread within the current process).
- * The RPC won't do anything except causing an in-progress system call to fail with
- * `errno=EINTR' (so-long as that system call isn't marked as [restart(dont)]).
+ * Send an RPC to `target_tid' (which must be a thread within the current
+ * process).  The RPC won't do anything except causing an in-progress (or
+ * upcoming) system  call to  fail with  `errno=EINTR' (so-long  as  that
+ * system call isn't marked as [restart(dont)]).
  *
  * This function can be used to send sporadic interrupts to other threads within
  * the  current process, as well as allow  one to stop in-progress, but blocking
  * system calls performed by  those threads. This function  is a no-op when  the
  * given `target_tid == gettid()'.
  *
- * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+ * NOTE: This function is a cancellation point when `RPC_JOIN_WAITFOR' is given!
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:       One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
- *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of `RPC_PRIORITY_*',  optionally or'd  with
  *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                     one of `RPC_JOIN_*'
  * @return: 0 :               Success

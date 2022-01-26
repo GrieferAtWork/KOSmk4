@@ -354,8 +354,8 @@ LOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getsessionleader_
 LOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getsessionleaderpid_of_nx)(struct task *__restrict thread);
 
 /* Returns true if the calling/given thread is a process leader (aka. process main thread) */
-LOCAL WUNUSED ATTR_CONST bool NOTHROW(KCALL task_isprocessleader)(void);
-LOCAL WUNUSED ATTR_CONST NONNULL((1)) bool NOTHROW(KCALL task_isprocessleader_p)(struct task const *__restrict thread);
+LOCAL ATTR_CONST WUNUSED bool NOTHROW(KCALL task_isprocessleader)(void);
+LOCAL ATTR_CONST WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_isprocessleader_p)(struct task const *__restrict thread);
 
 /* Returns true if the calling/given thread is a process group leader */
 LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_isprocessgroupleader)(void);
@@ -1060,7 +1060,7 @@ NOTHROW(KCALL task_getsessionleader_of_nx)(struct task *__restrict thread) {
 
 
 
-LOCAL WUNUSED ATTR_CONST bool
+LOCAL ATTR_CONST WUNUSED bool
 NOTHROW(KCALL task_isprocessleader)(void) {
 	struct task *me = THIS_TASK;
 	return FORTASK(me, this_taskgroup.tg_process) == me;

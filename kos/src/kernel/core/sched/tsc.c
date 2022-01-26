@@ -100,7 +100,7 @@ PRIVATE ATTR_PERCPU struct timestamp thiscpu_startup = { 0, 0 }; /* Startup time
 PRIVATE ATTR_PERCPU struct timestamp thiscpu_basetime = { 0, 0 }; /* Baseline timestamp. */
 
 
-PRIVATE NOBLOCK WUNUSED ATTR_CONST tsc_hz_t
+PRIVATE NOBLOCK ATTR_CONST WUNUSED tsc_hz_t
 NOTHROW(FCALL calculate_hz)(tsc_t tsc, ktime_t time, bool ceildiv) {
 	tsc_hz_t result;
 	if (OVERFLOW_UMUL(tsc, NSEC_PER_SEC, &result)) {
@@ -657,7 +657,7 @@ PUBLIC struct timespec boottime_ = { 0, 0 };
 
 /* Convert a given ktime timestamp into a `struct timespec'.
  * This  is done  by adding  `boottime' to  the given value. */
-PUBLIC NOBLOCK WUNUSED ATTR_CONST struct timespec
+PUBLIC NOBLOCK ATTR_CONST WUNUSED struct timespec
 NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
 	struct timespec result;
 	result.tv_sec  = (time_t)(t / NSEC_PER_SEC);
@@ -748,7 +748,7 @@ overflow:
 }
 
 /* Do the inverse of `reltimespec_to_relktime' */
-PUBLIC NOBLOCK WUNUSED ATTR_CONST struct timespec
+PUBLIC NOBLOCK ATTR_CONST WUNUSED struct timespec
 NOTHROW(FCALL relktime_to_reltimespec)(ktime_t t) {
 	struct timespec result;
 	result.tv_sec  = (time_t)(t / NSEC_PER_SEC);

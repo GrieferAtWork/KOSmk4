@@ -935,7 +935,7 @@ got_active:
 }
 
 /* Create a new video lock object for a given video device. */
-PUBLIC BLOCKING WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vidlck *FCALL
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vidlck *FCALL
 viddev_newlck(struct viddev *__restrict self) {
 	REF struct vidlck *result;
 	REF struct mfile *active;

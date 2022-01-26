@@ -326,7 +326,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 
 %(user){
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_environ)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW(LIBCCALL libc_p_environ)(void);
 #endif /* !__KERNEL__ */
 };
 

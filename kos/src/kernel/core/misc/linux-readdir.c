@@ -137,7 +137,7 @@ PRIVATE struct sig readdir_locksig = SIG_INIT;
 #define readdir_lockbits_mask(i) ((uintptr_t)1 << ((i) % BITSOF(uintptr_t)))
 
 /* Return the lock-index for a given `h_data' pointer */
-PRIVATE WUNUSED ATTR_CONST unsigned int
+PRIVATE ATTR_CONST WUNUSED unsigned int
 NOTHROW(KCALL readdir_lock_index)(void *h_data) {
 	uintptr_t result;
 	result = (uintptr_t)h_data;

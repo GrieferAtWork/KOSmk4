@@ -3499,7 +3499,7 @@ return_pointer:
 
 
 
-INTERN WUNUSED ATTR_CONST DlSection *
+INTERN ATTR_CONST WUNUSED DlSection *
 NOTHROW(CC dlsec_builtin_index)(size_t sect_index) {
 	DlSection *result;
 	switch (sect_index) {
@@ -3525,7 +3525,7 @@ NOTHROW(CC dlsec_builtin_index)(size_t sect_index) {
 	return result;
 }
 
-INTERN WUNUSED ATTR_CONST char const *
+INTERN ATTR_CONST WUNUSED char const *
 NOTHROW(CC dlsec_builtin_name)(size_t sect_index) {
 	char const *result;
 	switch (sect_index) {

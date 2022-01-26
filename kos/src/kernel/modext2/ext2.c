@@ -84,7 +84,7 @@ ext2_inoaddr(struct ext2super *__restrict self, ext2_ino_t ino) {
 
 
 /* Allocate physically continuous memory. */
-PRIVATE WUNUSED ATTR_RETNONNULL void *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED void *FCALL
 kmemalign_offset_physcont(size_t min_alignment, ptrdiff_t offset,
                           size_t num_bytes, gfp_t gfp) {
 	/* TODO: Do this via a proper kernel API
@@ -144,7 +144,7 @@ kfree_physcont(void *ptr) {
 #define ext2iblock_free(self)   kfree_physcont(self)
 #define ext2iiblock_free(self)  kfree_physcont(self)
 #define ext2iiiblock_free(self) kfree_physcont(self)
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1)) struct ext2iblock *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ext2iblock *FCALL
 ext2iblock_alloc(struct ext2super *__restrict super, ext2_blocki_t addr) {
 	struct ext2iblock *result;
 	result = (struct ext2iblock *)kmemalign_offset_physcont(super->es_iobalign,
@@ -163,7 +163,7 @@ ext2iblock_alloc(struct ext2super *__restrict super, ext2_blocki_t addr) {
 	return result;
 }
 
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1)) struct ext2iiblock *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ext2iiblock *FCALL
 ext2iiblock_alloc(struct ext2super *__restrict super, ext2_blockii_t addr) {
 	struct ext2iiblock *result;
 	result = (struct ext2iiblock *)kmemalign_offset_physcont(super->es_iobalign,

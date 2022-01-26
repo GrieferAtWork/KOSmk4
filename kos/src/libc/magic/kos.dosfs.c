@@ -27,8 +27,9 @@
 __SYSDECL_BEGIN
 
 /* Possible values for `dosfs_(get|set)enabled(3)' */
-#define DOSFS_DISABLED 0
-#define DOSFS_ENABLED  1
+#define DOSFS_DISABLED 0 /* Disabled (default for ELF) */
+#define DOSFS_ENABLED  1 /* Enabled (default for PE; implicitly pass `O_DOSPATH'+
+                          * `AT_DOSPATH' in  syscalls  made  by  DOS$-functions). */
 
 }
 

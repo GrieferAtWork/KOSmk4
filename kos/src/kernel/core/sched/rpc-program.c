@@ -1941,8 +1941,8 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 			/* To  ensure that  RPC programs  with infinite  loops don't cause
 			 * the kernel to hang itself, a call to `task_serve_with_sigmask',
 			 * with a signal mask that is  masking all signals except for  the
-			 * mandatory `SIGKILL' and  `SIGSTOP' is made  prior to  executing
-			 * any given instruction. */
+			 * mandatory `SIGKILL' and `SIGSTOP'  is made after executing  any
+			 * given instruction. */
 			task_serve_with_sigmask(&kernel_sigmask_full.sm_mask);
 		}
 

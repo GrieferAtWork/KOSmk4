@@ -348,7 +348,7 @@ NOTHROW(KCALL tardir_v_destroy)(struct mfile *__restrict self) {
  * @param: tf:              Template tarfile
  * @param: indexof_tf:      The index of `tf' within `self->ts_filev'
  * @param: dirlen_plus_one: The # of characters to match from `tf' */
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) struct tarfile *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct tarfile *FCALL
 tarsuper_find_first_subtree_file(struct tarsuper const *__restrict self,
                                  struct tarfile *__restrict tf,
                                  size_t indexof_tf,

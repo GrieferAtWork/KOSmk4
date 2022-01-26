@@ -272,7 +272,7 @@ PRIVATE void fini_libdebuginfo() {
 #endif /* !__KERNEL__ */
 #endif /* CONFIG_LOOKUP_SYMBOL_NAME */
 
-PRIVATE WUNUSED ATTR_CONST unsigned int CC
+PRIVATE ATTR_CONST WUNUSED unsigned int CC
 address_width(uintptr_half_t target) {
 	switch (target) {
 

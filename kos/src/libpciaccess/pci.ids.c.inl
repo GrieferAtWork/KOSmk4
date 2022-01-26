@@ -370,7 +370,7 @@ NOTHROW(CC pci_ids_parser_fini)(struct pci_ids_parser *__restrict self) {
 	gzclose(self->pip_file);
 }
 
-PRIVATE WUNUSED ATTR_CONST uint8_t
+PRIVATE ATTR_CONST WUNUSED uint8_t
 NOTHROW(CC decode_hex1)(char ch) {
 	if (ch >= '0' && ch <= '9')
 		return ch - '0';

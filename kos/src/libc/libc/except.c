@@ -77,15 +77,15 @@ STATIC_ASSERT(offsetof(struct exception_info, ei_data) == OFFSET_EXCEPTION_INFO_
 STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFSET_EXCEPTION_INFO_POINTERS);
 
 
-INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
+INTERN SECTION_EXCEPT_TEXT ATTR_CONST ATTR_RETNONNULL WUNUSED
 struct exception_info *NOTHROW_NCX(LIBCCALL libc_except_info)(void) {
 	return &current.pt_except;
 }
-INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
+INTERN SECTION_EXCEPT_TEXT ATTR_CONST ATTR_RETNONNULL WUNUSED
 struct exception_data *NOTHROW_NCX(LIBCCALL libc_except_data)(void) {
 	return &current.pt_except.ei_data;
 }
-INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
+INTERN SECTION_EXCEPT_TEXT ATTR_CONST ATTR_RETNONNULL WUNUSED
 except_register_state_t *NOTHROW_NCX(LIBCCALL libc_except_register_state)(void) {
 	return &current.pt_except.ei_state;
 }

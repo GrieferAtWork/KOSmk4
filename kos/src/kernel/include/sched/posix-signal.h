@@ -277,7 +277,7 @@ sighand_ptr_lockwrite(void) THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Return the default action to perform when faced with `signo' configured as `SIG_DFL'
  * @return: * : One of `SIG_*' (excluding `SIG_DFL' and `SIG_GET') */
-FUNDEF NOBLOCK WUNUSED ATTR_CONST user_sighandler_func_t
+FUNDEF NOBLOCK ATTR_CONST WUNUSED user_sighandler_func_t
 NOTHROW(KCALL sighand_default_action)(signo_t signo);
 
 

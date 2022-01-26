@@ -61,12 +61,12 @@ PUBLIC ATTR_WEAK uintptr_t __stack_chk_guard = 0x123baf37;
 PRIVATE ATTR_SECTION(".bss.crt.assert") int stderr_isatty = 0;
 
 INTERN ATTR_NOINLINE ATTR_COLD ATTR_SECTION(".text.crt.assert") void
-NOTHROW(LIBCCALL determine_stderr_isatty)(void) {
+NOTHROW(CC determine_stderr_isatty)(void) {
 	struct termios ios;
 	stderr_isatty = sys_ioctl(STDERR_FILENO, TCGETA, &ios) < 0 ? 2 : 1;
 }
 
-INTERN ATTR_COLD ATTR_SECTION(".text.crt.assert") ssize_t LIBCCALL
+INTERN ATTR_COLD ATTR_SECTION(".text.crt.assert") ssize_t CC
 assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datalen) {
 	/* Also write assertion error text to stderr, but only if it's a TTY. */
 	if (stderr_isatty != 2) {
@@ -80,7 +80,7 @@ assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datale
 }
 
 
-PRIVATE ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void LIBCCALL
+PRIVATE ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void CC
 trap_application(struct kcpustate *__restrict state,
                  union coredump_info *info,
                  unsigned int unwind_error) {
@@ -219,12 +219,12 @@ NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) 
 }
 
 #ifdef CONFIG_LOG_LIBC_UNIMPLEMENTED
-INTERN ATTR_SECTION(".text.crt.assert") void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.assert") void CC
 libc_unimplemented(char const *__restrict name) {
 	syslog(LOG_WARN, "[libc] Unimplemented function called: `%#q()'\n", name);
 }
 
-INTERN ATTR_SECTION(".text.crt.assert") void VLIBCCALL
+INTERN ATTR_SECTION(".text.crt.assert") void VCC
 libc_unimplementedf(char const *__restrict format, ...) {
 	va_list args;
 	syslog(LOG_WARN, "[libc] Unimplemented function called: `");
@@ -240,7 +240,7 @@ libc_unimplementedf(char const *__restrict format, ...) {
 /* Compat wrappers for DOS'S `_wassert()' function                      */
 /************************************************************************/
 #ifndef __KERNEL__
-INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) ATTR_SECTION(".text.crt.dos.assert") void VLIBCCALL
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) ATTR_SECTION(".text.crt.dos.assert") void
 NOTHROW(FCALL libc_assertion_failure_core_c16)(struct assert_args *__restrict args) {
 	if (args->aa_expr != NULL)
 		args->aa_expr = convert_c16tombs((char16_t *)args->aa_expr);
@@ -253,7 +253,7 @@ NOTHROW(FCALL libc_assertion_failure_core_c16)(struct assert_args *__restrict ar
 	libc_assertion_failure_core(args);
 }
 
-INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) ATTR_SECTION(".text.crt.dos.assert") void VLIBCCALL
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) ATTR_SECTION(".text.crt.dos.assert") void
 NOTHROW(FCALL libc_assertion_failure_core_c32)(struct assert_args *__restrict args) {
 	if (args->aa_expr != NULL)
 		args->aa_expr = convert_c32tombs((char32_t *)args->aa_expr);

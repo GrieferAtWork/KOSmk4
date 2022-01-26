@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca525574 */
+/* HASH CRC-32:0x678f0757 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,8 +34,9 @@
 __SYSDECL_BEGIN
 
 /* Possible values for `dosfs_(get|set)enabled(3)' */
-#define DOSFS_DISABLED 0
-#define DOSFS_ENABLED  1
+#define DOSFS_DISABLED 0 /* Disabled (default for ELF) */
+#define DOSFS_ENABLED  1 /* Enabled (default for PE; implicitly pass `O_DOSPATH'+
+                          * `AT_DOSPATH' in  syscalls  made  by  DOS$-functions). */
 
 /* >> dosfs_getenabled(3)
  * Get the current dosfs-emulation mode, as used by

@@ -270,7 +270,7 @@ DATDEF struct timespec const boottime;
 
 /* Convert a given ktime timestamp into a `struct timespec'.
  * This  is done  by adding  `boottime' to  the given value. */
-FUNDEF NOBLOCK WUNUSED ATTR_CONST struct timespec
+FUNDEF NOBLOCK ATTR_CONST WUNUSED struct timespec
 NOTHROW(FCALL ktime_to_timespec)(ktime_t t);
 
 /* Convert a given  `struct timespec' into  a ktime  timestamp.
@@ -295,7 +295,7 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) ktime_t
 NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time);
 
 /* Do the inverse of `reltimespec_to_relktime' */
-FUNDEF NOBLOCK WUNUSED ATTR_CONST struct timespec
+FUNDEF NOBLOCK ATTR_CONST WUNUSED struct timespec
 NOTHROW(FCALL relktime_to_reltimespec)(ktime_t t);
 
 

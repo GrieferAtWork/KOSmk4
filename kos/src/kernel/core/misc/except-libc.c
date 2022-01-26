@@ -33,17 +33,17 @@
 
 DECL_BEGIN
 
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_info *
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *
 NOTHROW_NCX(LIBCCALL libc_except_info)(void) {
 	return &THIS_EXCEPTION_INFO;
 }
 
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_data *
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_data *
 NOTHROW_NCX(LIBCCALL libc_except_data)(void) {
 	return &THIS_EXCEPTION_DATA;
 }
 
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL except_register_state_t *
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED except_register_state_t *
 NOTHROW_NCX(LIBCCALL libc_except_register_state)(void) {
 	return &THIS_EXCEPTION_STATE;
 }

@@ -265,7 +265,8 @@ NOTHROW(libc_sys_sigreturn)(struct ucpustate const *restore_cpu,
 
 #ifdef __x86_64__
 #define libc_handle libc_handle
-LOCAL WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(libc_handle)(void) {
+LOCAL ATTR_CONST ATTR_RETNONNULL WUNUSED void *
+NOTHROW(libc_handle)(void) {
 	void *result;
 	/* The  `current@tlsgd' symbol points to a `tls_index' structure,
 	 * which consists of 16 bytes total, where the first 8 are filled

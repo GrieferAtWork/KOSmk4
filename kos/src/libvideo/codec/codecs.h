@@ -32,7 +32,7 @@
 DECL_BEGIN
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
-INTDEF WUNUSED ATTR_CONST struct video_codec const *CC
+INTDEF ATTR_CONST WUNUSED struct video_codec const *CC
 libvideo_codec_lookup(video_codec_t codec);
 
 

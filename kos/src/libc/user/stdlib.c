@@ -66,7 +66,7 @@ INTERN ATTR_SECTION(".bss.crt.fs.environ")
 struct atomic_rwlock libc_environ_lock = ATOMIC_RWLOCK_INIT;
 
 DEFINE_PUBLIC_ALIAS(__p__environ, libc_p_environ);
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.fs.environ")
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.fs.environ")
 char ***NOTHROW(LIBCCALL libc_p_environ)(void) {
 	return &environ;
 }

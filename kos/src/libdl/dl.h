@@ -851,8 +851,8 @@ INTDEF ATTR_COLD NONNULL((1)) int NOTHROW_NCX(CC dl_vseterrorf)(char const *__re
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(CC dlsym_builtin_size)(USER char const *name) THROWS(E_SEGFAULT);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) DlSection *NOTHROW_NCX(CC dlsec_builtin)(USER char const *name) THROWS(E_SEGFAULT);
-INTDEF WUNUSED ATTR_CONST DlSection *NOTHROW(CC dlsec_builtin_index)(size_t sect_index);
-INTDEF WUNUSED ATTR_CONST char const *NOTHROW(CC dlsec_builtin_name)(size_t sect_index);
+INTDEF ATTR_CONST WUNUSED DlSection *NOTHROW(CC dlsec_builtin_index)(size_t sect_index);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC dlsec_builtin_name)(size_t sect_index);
 
 /* Return the address of a function `name'  that is required by the RTLD  core
  * and  must be defined by one of the  loaded libraries. - If no such function

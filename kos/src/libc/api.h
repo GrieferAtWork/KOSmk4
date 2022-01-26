@@ -278,6 +278,7 @@ INTDEF void VLIBCCALL libc_unimplementedf(char const *__restrict format, ...);
 #define CRT_UNIMPLEMENTEDF(...) libc_unimplementedf(__VA_ARGS__)
 #else
 #define CRT_UNIMPLEMENTED(name) (void)0
+#define CRT_UNIMPLEMENTEDF(...) (void)0
 #endif
 #else /* !__KERNEL__ */
 /* The kernel doesn't have an ERRNO binding */

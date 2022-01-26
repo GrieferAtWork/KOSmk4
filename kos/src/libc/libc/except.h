@@ -92,9 +92,9 @@ struct exception_data;
 struct exception_info;
 
 /* Returns non-zero if there is an active exception. */
-INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_info *NOTHROW_NCX(LIBCCALL libc_except_info)(void);
-INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_data *NOTHROW_NCX(LIBCCALL libc_except_data)(void);
-INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL except_register_state_t *NOTHROW_NCX(LIBCCALL libc_except_register_state)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW_NCX(LIBCCALL libc_except_info)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_data *NOTHROW_NCX(LIBCCALL libc_except_data)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED except_register_state_t *NOTHROW_NCX(LIBCCALL libc_except_register_state)(void);
 INTDEF ATTR_PURE WUNUSED except_code_t NOTHROW_NCX(LIBCCALL libc_except_code)(void);
 INTDEF ATTR_PURE WUNUSED bool NOTHROW_NCX(LIBCCALL libc_except_active)(void);
 INTDEF ATTR_PURE WUNUSED except_class_t NOTHROW_NCX(LIBCCALL libc_except_class)(void);

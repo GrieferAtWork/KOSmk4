@@ -265,7 +265,7 @@ handle_iob_access(struct cpu *__restrict me,
 
 #ifndef CONFIG_NO_SMP
 /* Check if the given `node' is the IOB vector of some CPU */
-LOCAL NOBLOCK WUNUSED ATTR_CONST bool
+LOCAL NOBLOCK ATTR_CONST WUNUSED bool
 NOTHROW(FCALL is_iob_mnode)(struct mnode *node) {
 	unsigned int i;
 	for (i = 0; i < cpu_count; ++i) {

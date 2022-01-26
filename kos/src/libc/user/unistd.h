@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x484f9f76 */
+/* HASH CRC-32:0xbc46076a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_environ)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW(LIBCCALL libc_p_environ)(void);
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execve(2)

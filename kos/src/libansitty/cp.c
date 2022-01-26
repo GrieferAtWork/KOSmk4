@@ -78,7 +78,7 @@ PRIVATE char16_t const ldm_chars[] = {
 #undef CHR
 };
 
-INTERN WUNUSED ATTR_CONST char32_t
+INTERN ATTR_CONST WUNUSED char32_t
 NOTHROW(FCALL libansitty_decode_cp_ldm)(uint8_t byte) {
 	/* Translate line-drawing-mode characters. */
 	char32_t result = (char32_t)byte;
@@ -90,7 +90,7 @@ NOTHROW(FCALL libansitty_decode_cp_ldm)(uint8_t byte) {
 
 
 #define BEGIN_CP(name)                                         \
-	INTERN WUNUSED ATTR_CONST char32_t                         \
+	INTERN ATTR_CONST WUNUSED char32_t                         \
 	NOTHROW(FCALL libansitty_decode_cp_##name)(uint8_t byte) { \
 		char32_t result = byte;                                \
 		switch (byte) {
@@ -113,7 +113,7 @@ NOTHROW(FCALL libansitty_decode_cp_ldm)(uint8_t byte) {
 
 
 #define BEGIN_CP(name)                                        \
-	INTERN WUNUSED ATTR_CONST uint8_t                         \
+	INTERN ATTR_CONST WUNUSED uint8_t                         \
 	NOTHROW(FCALL libansitty_encode_cp_##name)(char32_t ch) { \
 		uint8_t result = (uint8_t)ch;                         \
 		switch (ch) {

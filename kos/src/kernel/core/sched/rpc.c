@@ -195,7 +195,7 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
  * unwind the current system  call. This is identical  to:
  * >> task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, func, cookie);
  * >> THROW(E_INTERRUPT_USER_RPC); */
-PUBLIC ATTR_NORETURN NONNULL((1)) void KCALL
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void KCALL
 task_rpc_userunwind(prpc_exec_callback_t func, void *cookie)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC) {
 #ifdef NDEBUG

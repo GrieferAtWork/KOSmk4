@@ -186,7 +186,7 @@ THROWS(E_SEGFAULT) {
 
 /* Sigreturn system call implementation.
  * WARNING: This function may not necessarily return normally, or by throwing an exception! */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_sigreturn32_impl(struct icpustate *__restrict state,
                      USER UNCHECKED struct ucpustate32 const *restore_cpu,
                      USER UNCHECKED struct fpustate32 const *restore_fpu,
@@ -285,7 +285,7 @@ sys_sigreturn32_impl(struct icpustate *__restrict state,
 #define SIGRETURN32_ARGID_SC_INFO         4 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%edi) */
 
 
-PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+PRIVATE ABNORMAL_RETURN NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_sigreturn32_rpc(struct rpc_context *__restrict ctx,
                     void *UNUSED(cookie)) {
 	USER UNCHECKED struct ucpustate32 const *restore_cpu;

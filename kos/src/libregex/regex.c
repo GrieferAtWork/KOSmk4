@@ -1773,7 +1773,7 @@ libregex_matchesptr(/*utf-8*/ char const *__restrict data, size_t datalen,
 
 
 
-LOCAL WUNUSED ATTR_CONST bool CC is_regex_special(char ch, uintptr_t flags) {
+LOCAL ATTR_CONST WUNUSED bool CC is_regex_special(char ch, uintptr_t flags) {
 	switch (ch) {
 
 	case '{':
@@ -1825,7 +1825,7 @@ LOCAL WUNUSED ATTR_CONST bool CC is_regex_special(char ch, uintptr_t flags) {
 	return false;
 }
 
-LOCAL WUNUSED ATTR_CONST bool CC is_regex_suffix(char ch, uintptr_t flags) {
+LOCAL ATTR_CONST WUNUSED bool CC is_regex_suffix(char ch, uintptr_t flags) {
 	switch (ch) {
 
 	case '{':

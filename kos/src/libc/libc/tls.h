@@ -46,7 +46,7 @@ INTDEF ATTR_THREAD struct pthread current;
  * shared library handle, but rather simply returns the raw handle pointer. */
 #ifndef libc_handle
 #ifdef LIBC_ARCH_HAVE_LIBC_HANDLE
-INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(LIBCCALL libc_handle)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void *NOTHROW(LIBCCALL libc_handle)(void);
 #else /* LIBC_ARCH_HAVE_LIBC_HANDLE */
 #define libc_handle() dlgethandle((void *)&libc_get_dlgethandle, DLGETHANDLE_FNORMAL)
 #endif /* !LIBC_ARCH_HAVE_LIBC_HANDLE */
