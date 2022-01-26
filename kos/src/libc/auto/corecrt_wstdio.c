@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5757f2b */
+/* HASH CRC-32:0x322ef78 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
 #include <libc/template/stdstreams.h>
 #include <libc/errno.h>

@@ -23,6 +23,7 @@
 %(auto_source){
 #include <errno.h>
 #include <signal.h>
+#include "../libc/dl.h" /* dlopen(), dlclose() */
 }
 
 %(auto_header){

@@ -24,6 +24,10 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
 
+%(auto_source){
+#include "../libc/globals.h"
+}
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(

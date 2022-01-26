@@ -37,6 +37,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+#include "unicode.h"
 #include "wchar.h"
 
 DECL_BEGIN
@@ -576,7 +577,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2))
 	struct format_32to8_data format;
 	format.fd_printer = &libc_file_printer_unlocked;
 	format.fd_arg     = arg;
-	return format_32to8(&format, data, datalen);
+	return libc_format_wto8(&format, data, datalen);
 }
 /*[[[end:libc_file_wprinter_unlocked]]]*/
 
@@ -626,7 +627,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1,
 		format.fd_surrogate = 0xdc00 + (ex->io_mbs.__mb_word & 0x000003ff);
 		ex->io_mbs.__mb_word = __MBSTATE_TYPE_EMPTY;
 	}
-	result = format_16to8(&format, data, datalen);
+	result = libd_format_wto8(&format, data, datalen);
 	/* Update the pending surrogate pair */
 	if (format.fd_surrogate)
 		ex->io_mbs.__mb_word = __MBSTATE_TYPE_UTF16_LO | (format.fd_surrogate - 0xdc00);

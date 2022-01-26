@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73d6632d */
+/* HASH CRC-32:0xa7e174d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@ DECL_BEGIN
 
 #include <errno.h>
 #include <signal.h>
+#include "../libc/dl.h" /* dlopen(), dlclose() */
 #include <asm/os/errno.h>
 #include <hybrid/host.h>
 #include <kos/bits/exception_data.h>
