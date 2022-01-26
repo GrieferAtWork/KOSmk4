@@ -332,7 +332,7 @@ echo "Check if deemon was installed under '$KOS_BINUTILS/deemon'"
 if [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
 	DEEMON="$KOS_BINUTILS/deemon/deemon.exe"
 	echo "    Found deemon in '$KOS_BINUTILS/deemon/deemon.exe'"
-elif [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
+elif [ -f "$KOS_BINUTILS/deemon/deemon" ]; then
 	DEEMON="$KOS_BINUTILS/deemon/deemon"
 	echo "    Found deemon in '$KOS_BINUTILS/deemon/deemon'"
 else
