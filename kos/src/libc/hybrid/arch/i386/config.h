@@ -108,6 +108,14 @@
 #define LIBC_ARCH_HAVE_C32MEMCMP 1 /* Alias for `memcmpl', because on i386/x86_64 `sizeof(int) <= 4' */
 #endif /* !__KERNEL__ */
 
+/* bcmp() */
+#define LIBC_ARCH_HAVE_BCMP  1
+#define LIBC_ARCH_HAVE_BCMPW 1
+#define LIBC_ARCH_HAVE_BCMPL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_BCMPQ 1
+#endif /* __x86_64__ */
+
 /* strlen() */
 #define LIBC_ARCH_HAVE_STRLEN  1
 #define LIBC_ARCH_HAVE_STREND  1

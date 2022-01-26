@@ -204,6 +204,27 @@ END_MEMFUNC(memcmp)
 
 
 /********************************************************************************/
+/* Tsigned LIBCCALL bcmp(void const *lhs, void const *rhs, size_t num_Tword);   */
+/********************************************************************************/
+BEGIN_MEMFUNC(bcmp)
+	ENTER_Pdi_Psi_Pcx
+	BEGIN_CLD
+	/* Compare DS:PSI (rhs) with ES:PDI (lhs) */
+	xorP   %Pax, %Pax  /* result = 0; // HINT: This also forces  %eflags into a  je=1 state  to
+	                    *             //       handle %Pcx==0 (where cmps won't update %eflags) */
+	repe   I(cmps)     /* Do the actual compare */
+	/* jne -> return 1; */
+	/* je  -> return 0; */
+	setne  %al         /* result = (result & 0xffffffffffffff00) | ((rhs != lhs) ? 1 : 0); */
+	END_CLD
+	LEAVE_Pdi_Psi_Pcx
+	RET(12)
+END_MEMFUNC(bcmp)
+
+
+
+
+/********************************************************************************/
 /* void *LIBCCALL rawmemchr(void const *haystack, T needle);                    */
 /********************************************************************************/
 BEGIN_MEMFUNC(rawmemchr)

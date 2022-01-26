@@ -1724,6 +1724,9 @@
 #define __CRT_HAVE_backtrace_symbols_fd
 #define __CRT_HAVE_basename
 #define __CRT_HAVE_bcmp
+#define __CRT_HAVE_bcmpl
+#define __CRT_HAVE_bcmpq
+#define __CRT_HAVE_bcmpw
 #define __CRT_HAVE_bcopy
 #define __CRT_HAVE_bind
 #define __CRT_HAVE_bind_textdomain_codeset

@@ -47,8 +47,6 @@
 #endif /* !__INTELLISENSE__ */
 
 #ifndef __KERNEL__
-DEFINE_INTERN_ALIAS(libc_bcmp, libc_memcmp)
-DEFINE_PUBLIC_ALIAS(bcmp, libc_memcmp)
 DEFINE_PUBLIC_ALIAS(__bzero, libc_bzero)
 DEFINE_PUBLIC_ALIAS(explicit_bzero, libc_bzero)
 DEFINE_PUBLIC_ALIAS(explicit_memset, libc_memset)
