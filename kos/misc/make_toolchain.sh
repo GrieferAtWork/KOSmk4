@@ -35,8 +35,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- Fix a bug parsing c-style struct initializers in jit
-DEEMON_VERSION="a967c9b1329abf001f4b30995f5cbd9fcf4f151f"
+#     v -- Fix compiler warnings & KOS compatibility
+DEEMON_VERSION="47f13ef4494fa65831cdc8420c834ba162d8f7ad"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 
