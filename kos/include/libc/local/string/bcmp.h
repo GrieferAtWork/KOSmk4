@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54df6cb4 */
+/* HASH CRC-32:0x25b48652 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_envz_entry_defined
-#define __local_envz_entry_defined
+#ifndef __local_bcmp_defined
+#define __local_bcmp_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -34,44 +34,13 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
 #endif /* !__CRT_HAVE_memcmp */
 #endif /* !__local___localdep_memcmp_defined */
-#ifndef __local___localdep_strend_defined
-#define __local___localdep_strend_defined
-#ifdef __CRT_HAVE_strend
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
-#else /* __CRT_HAVE_strend */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/strend.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strend __LIBC_LOCAL_NAME(strend)
-#endif /* !__CRT_HAVE_strend */
-#endif /* !__local___localdep_strend_defined */
-#ifndef __local___localdep_stroff_defined
-#define __local___localdep_stroff_defined
-#ifdef __CRT_HAVE_stroff
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_stroff,(char const *__restrict __haystack, int __needle),stroff,(__haystack,__needle))
-#else /* __CRT_HAVE_stroff */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/stroff.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_stroff __LIBC_LOCAL_NAME(stroff)
-#endif /* !__CRT_HAVE_stroff */
-#endif /* !__local___localdep_stroff_defined */
-__LOCAL_LIBC(envz_entry) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_entry))(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name) {
-	__SIZE_TYPE__ __namelen;
-	char *__envz_end = (char *)(__envz + __envz_len);
-	__namelen = (__NAMESPACE_LOCAL_SYM __localdep_stroff)(__name, '=');
-	while (__envz < __envz_end) {
-		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__envz, __name, __namelen) == 0 &&
-		    (__envz[__namelen] == '\0' || __envz[__namelen] == '='))
-			return (char *)__envz; /* Found it! */
-		__envz = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__envz) + 1;
-	}
-	return __NULLPTR;
+__LOCAL_LIBC(bcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bcmp))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__s1, __s2, __n_bytes);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_envz_entry_defined
-#define __local___localdep_envz_entry_defined
-#define __localdep_envz_entry __LIBC_LOCAL_NAME(envz_entry)
-#endif /* !__local___localdep_envz_entry_defined */
-#endif /* !__local_envz_entry_defined */
+#ifndef __local___localdep_bcmp_defined
+#define __local___localdep_bcmp_defined
+#define __localdep_bcmp __LIBC_LOCAL_NAME(bcmp)
+#endif /* !__local___localdep_bcmp_defined */
+#endif /* !__local_bcmp_defined */

@@ -6720,6 +6720,7 @@
 #define __CRT_HAVE_KOS$backtrace_symbols
 #define __CRT_HAVE_KOS$backtrace_symbols_fd
 #define __CRT_HAVE_KOS$basename
+#define __CRT_HAVE_KOS$bcmp
 #define __CRT_HAVE_KOS$bcopy
 #define __CRT_HAVE_KOS$bind
 #define __CRT_HAVE_KOS$bind_textdomain_codeset
@@ -10563,6 +10564,7 @@
 #define __CRT_HAVE_DOS$backtrace_symbols
 #define __CRT_HAVE_DOS$backtrace_symbols_fd
 #define __CRT_HAVE_DOS$basename
+#define __CRT_HAVE_DOS$bcmp
 #define __CRT_HAVE_DOS$bcopy
 #define __CRT_HAVE_DOS$bind
 #define __CRT_HAVE_DOS$bind_textdomain_codeset

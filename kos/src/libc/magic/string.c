@@ -115,6 +115,7 @@ local funcs = {
 	"mempsetw(dst, word, n_words)",
 	"mempsetl(dst, dword, n_dwords)",
 	"mempsetq(dst, qword, n_qwords)",
+	"bcmp(s1, s2, n_bytes)",
 	"bzero(dst, n_bytes)",
 	"bzerow(dst, n_words)",
 	"bzerol(dst, n_dwords)",
@@ -305,6 +306,9 @@ for (local f: funcs) {
 #ifdef __fast_mempsetq_defined
 #define libc_mempsetq(dst, qword, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetq))(dst, qword, n_qwords)
 #endif /* __fast_mempsetq_defined */
+#ifdef __fast_bcmp_defined
+#define libc_bcmp(s1, s2, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(s1, s2, n_bytes)
+#endif /* __fast_bcmp_defined */
 #ifdef __fast_bzero_defined
 #define libc_bzero(dst, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(dst, n_bytes)
 #endif /* __fast_bzero_defined */
@@ -589,9 +593,8 @@ typedef __size_t rsize_t;
 @@@return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
 @@@return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes'
 [[decl_include("<hybrid/typecore.h>")]]
-[[preferred_fastbind, std, libc, kernel, pure, wunused, alias("bcmp")]]
+[[preferred_fastbind, std, libc, kernel, pure, wunused]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMP))]]
-[[if(!defined(__KERNEL__)), kos_export_as("bcmp")]]
 int memcmp([[nonnull]] void const *s1,
            [[nonnull]] void const *s2, $size_t n_bytes) {
 	byte_t *p1 = (byte_t *)s1;
@@ -3394,7 +3397,25 @@ void bzeroc([[nonnull]] void *__restrict dst,
 %#endif /* __USE_KOS */
 
 
-%[insert:guarded_function(bcmp = memcmp)]
+@@>> bcmp(3)
+@@Similar to `memcmp(3)', except that no ordering is done,
+@@such  that compare is  only correct for equal/non-equal.
+@@@return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+@@@return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes'
+[[guard, decl_include("<hybrid/typecore.h>")]]
+[[libc, kernel, pure, wunused]]
+[[preferred_fastbind(bcmp(s1, s2, n_bytes), ["bcmp"])]]
+[[preferred_fastbind(memcmp(s1, s2, n_bytes), ["bcmp"])]]
+[[preferred_fastbind(bcmp(s1, s2, n_bytes), ["memcmp"])]]
+[[preferred_fastbind(memcmp(s1, s2, n_bytes), ["memcmp"])]]
+[[crt_impl_requires(!defined(LIBC_ARCH_HAVE_BCMP))]]
+[[if(!defined(LIBC_ARCH_HAVE_BCMP)), crt_intern_alias(memcmp)]]
+[[alias("memcmp"), bind_local_function("memcmp")]]
+int bcmp([[nonnull]] void const *s1,
+         [[nonnull]] void const *s2, $size_t n_bytes) {
+	return memcmp(s1, s2, n_bytes);
+}
+
 %[insert:guarded_function(index = strchr)]
 %[insert:guarded_function(rindex = strrchr)]
 
@@ -4434,7 +4455,7 @@ $size_t rawmemrlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 }
 
 
-
+%
 %#ifdef __UINT64_TYPE__
 @@Copy memory between non-overlapping memory blocks.
 [[preferred_fastbind, libc, kernel, leaf]]
@@ -8282,4 +8303,3 @@ __SYSDECL_END
 #endif /* __SSP_FORTIFY_LEVEL */
 
 }
-

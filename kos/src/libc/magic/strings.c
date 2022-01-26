@@ -70,7 +70,7 @@ typedef __SIZE_TYPE__ size_t;
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 
 %[insert:extern(bcopy)]
-%[insert:guarded_function(bcmp = memcmp)]
+%[insert:guarded_function(bcmp)]
 %[insert:guarded_function(index = strchr)]
 %[insert:guarded_function(rindex = strrchr)]
 

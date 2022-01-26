@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ea25867 */
+/* HASH CRC-32:0x2f8742de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,15 +76,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
-#elif defined(__CRT_HAVE_bcmp)
-#include <hybrid/typecore.h>
-/* >> memcmp(3)
- * Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memcmp */
 #include <libc/local/string/memcmp.h>
 /* >> memcmp(3)
  * Compare memory buffers and return the difference of the first non-matching byte
@@ -92,7 +84,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __libc_core_memcmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memcmp */
 #ifdef __CRT_HAVE_memchr
 #include <hybrid/typecore.h>
 /* >> memchr(3)
@@ -277,6 +269,31 @@ __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzero
 #include <libc/local/string/bzeroc.h>
 #define __libc_core_bzeroc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroc)
 #endif /* !__CRT_HAVE_bzeroc */
+#ifdef __CRT_HAVE_bcmp
+#include <hybrid/typecore.h>
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
+#elif defined(__CRT_HAVE_memcmp)
+#include <hybrid/typecore.h>
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
+#else /* ... */
+#include <libc/local/string/memcmp.h>
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+#define __libc_core_bcmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp)
+#endif /* !... */
 #ifdef __CRT_HAVE_memcpyw
 #include <hybrid/typecore.h>
 /* Copy memory between non-overlapping memory blocks. */

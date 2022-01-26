@@ -42,8 +42,8 @@
 
 #if !defined(__USE_XOPEN_EXTENDED) || defined(__USE_SOLARIS)
 #define BSWAP_8(x)  ((x) & __UINT8_C(0xff))
-#define	BSWAP_16(x) __hybrid_bswap16(x)
-#define	BSWAP_32(x) __hybrid_bswap32(x)
+#define BSWAP_16(x) __hybrid_bswap16(x)
+#define BSWAP_32(x) __hybrid_bswap32(x)
 #ifdef __hybrid_bswap64
 #define	BSWAP_64(x) __hybrid_bswap64(x)
 #endif /* __hybrid_bswap64 */
@@ -51,8 +51,8 @@
 #define BMASK_16(x) ((x) & __UINT16_C(0xffff))
 #define BMASK_32(x) ((x) & __UINT32_C(0xffffffff))
 #define BMASK_64(x) (x)
-#define	BE_8(x)     ((x) & __UINT8_C(0xff))
-#define	LE_8(x)     ((x) & __UINT8_C(0xff))
+#define BE_8(x)     ((x) & __UINT8_C(0xff))
+#define LE_8(x)     ((x) & __UINT8_C(0xff))
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define BE_16(x) BMASK_16(x)

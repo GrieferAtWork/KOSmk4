@@ -252,7 +252,7 @@
 
 #ifdef __KOS_SYSTEM_HEADERS__
 #undef HAVE_BCMP
-}%[insert:pp_if($has_function(memcmp))]%{
+}%[insert:pp_if($has_function(bcmp))]%{
 #define HAVE_BCMP 1
 }%[insert:pp_endif]%{
 

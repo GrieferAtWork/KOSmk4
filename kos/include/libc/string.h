@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e0c399f */
+/* HASH CRC-32:0xe2c26510 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -153,6 +153,21 @@
 #else /* __fast_bzeroc_defined */
 #define __libc_bzeroc __libc_core_bzeroc
 #endif /* !__fast_bzeroc_defined */
+#ifdef __fast_bcmp_defined
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+#define __libc_bcmp (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))
+#else /* __fast_bcmp_defined */
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+#define __libc_bcmp __libc_core_bcmp
+#endif /* !__fast_bcmp_defined */
 #ifdef __fast_memcpyw_defined
 /* Copy memory between non-overlapping memory blocks. */
 #define __libc_memcpyw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyw))

@@ -8,7 +8,6 @@
 <bsd/timeconv.h>       (libbsd)
 <bsd/vis.h>            (libbsd)
 <conio.h>              (dos)
-<corecrt_wstdlib.h>    (msvcrt)
 <fmtmsg.h>             (GLibc!)
 <fstab.h>              (GLibc!)
 <gnu-versions.h>       (GLibc!)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb727320 */
+/* HASH CRC-32:0x35346205 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2250,6 +2250,9 @@ NOTHROW_NCX(LIBCCALL libc_bzeroc)(void *__restrict dst,
 	libc_bzero(dst, elem_count * elem_size);
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 }
+#ifndef LIBC_ARCH_HAVE_BCMP
+DEFINE_INTERN_ALIAS(libc_bcmp, libc_memcmp);
+#endif /* !LIBC_ARCH_HAVE_BCMP */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1,
@@ -5955,9 +5958,6 @@ DEFINE_PUBLIC_ALIAS(memmove, libc_memmove);
 DEFINE_PUBLIC_ALIAS(memset, libc_memset);
 #endif /* !LIBC_ARCH_HAVE_MEMSET */
 #ifndef LIBC_ARCH_HAVE_MEMCMP
-#ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(bcmp, libc_memcmp);
-#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcmp, libc_memcmp);
 #endif /* !LIBC_ARCH_HAVE_MEMCMP */
 #ifndef LIBC_ARCH_HAVE_MEMCHR
@@ -6135,6 +6135,9 @@ DEFINE_PUBLIC_ALIAS(bzerol, libc_bzerol);
 DEFINE_PUBLIC_ALIAS(bzeroq, libc_bzeroq);
 #endif /* !LIBC_ARCH_HAVE_BZEROQ */
 DEFINE_PUBLIC_ALIAS(bzeroc, libc_bzeroc);
+#ifndef LIBC_ARCH_HAVE_BCMP
+DEFINE_PUBLIC_ALIAS(bcmp, libc_bcmp);
+#endif /* !LIBC_ARCH_HAVE_BCMP */
 #ifndef __KERNEL__
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_stricmp, libc_strcasecmp);

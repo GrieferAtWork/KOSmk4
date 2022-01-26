@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa22b34f5 */
+/* HASH CRC-32:0xb0967569 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,6 +91,7 @@ local funcs = {
 	"mempsetw(dst, word, n_words)",
 	"mempsetl(dst, dword, n_dwords)",
 	"mempsetq(dst, qword, n_qwords)",
+	"bcmp(s1, s2, n_bytes)",
 	"bzero(dst, n_bytes)",
 	"bzerow(dst, n_words)",
 	"bzerol(dst, n_dwords)",
@@ -281,6 +282,9 @@ for (local f: funcs) {
 #ifdef __fast_mempsetq_defined
 #define libc_mempsetq(dst, qword, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetq))(dst, qword, n_qwords)
 #endif /* __fast_mempsetq_defined */
+#ifdef __fast_bcmp_defined
+#define libc_bcmp(s1, s2, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(s1, s2, n_bytes)
+#endif /* __fast_bcmp_defined */
 #ifdef __fast_bzero_defined
 #define libc_bzero(dst, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(dst, n_bytes)
 #endif /* __fast_bzero_defined */
@@ -856,6 +860,20 @@ INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_bzeroq)(void *__res
 INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_bzeroc)(void *__restrict dst, size_t elem_count, size_t elem_size);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_bzeroc)(void *__restrict dst, size_t elem_count, size_t elem_size);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_bcmp)(void const *s1, void const *s2, size_t n_bytes);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_bcmp)(void const *s1, void const *s2, size_t n_bytes);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strcasecmp)(char const *s1, char const *s2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
