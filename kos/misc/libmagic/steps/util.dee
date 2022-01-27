@@ -87,14 +87,18 @@ function updateFileContents(filename: string, callback: Callable): bool {
 	File.Writer tempfp;
 	callback(tempfp);
 	tempfp = tempfp.string.encode("utf-8");
-	if (fp.size() != #tempfp) {
+	local fpSize = fp.size();
+	print("INFO: fpSize: ", fpSize, "; #tempfp: ", #tempfp);
+	if (fpSize != #tempfp) {
 		fp.close();
 	} else {
 		local oldData = fp.read();
 		fp.close();
+		print("INFO: #oldData: ", #oldData, "; #tempfp: ", #tempfp);
 		if (oldData == tempfp)
 			return false;
 	}
+	print("Updating file contents for:", repr filename);
 	with (fp = File.open(filename, "w"))
 		fp.write(tempfp);
 	return true;

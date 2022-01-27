@@ -130,7 +130,7 @@ struct iofile_data_novtab {
 	LIST_ENTRY(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry  in  the  global chain  of  open  files.
 	                                       * (Used by `fcloseall()', as well as flushing all open files during `exit()') */
 	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a global flush. */
-	pos64_t                    io_fblk;   /* [valid_if(:if_bufsiz != 0)] The starting address of the data block currently stored in `if_base'. */
+	pos64_t                    io_fblk;   /* The starting address of the data block currently stored in `if_base'. */
 	pos64_t                    io_fpos;   /* The current (assumed) position within the underlying file stream. */
 	mbstate_t                  io_mbs;    /* MB State used for translating unicode data. */
 };

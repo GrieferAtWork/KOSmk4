@@ -772,6 +772,7 @@ read_from_buffer:
 		if unlikely(self->if_flag & IO_NODYNSCALE) {
 			/* Dynamic scaling is disabled. Must forward the read() to the underlying file. */
 read_through:
+			self->if_ptr = self->if_base;
 			if (next_data != ex->io_fpos) {
 				/* Seek in the underlying file to get where we need to go. */
 				off64_t new_pos;
@@ -795,7 +796,9 @@ read_through:
 		}
 		if (num_bytes >= IOBUF_MAX)
 			goto read_through;
-		new_bufsize = num_bytes;
+		new_bufsize = num_bytes * 2;
+		if (new_bufsize > IOBUF_MAX)
+			new_bufsize = IOBUF_MAX;
 		if (new_bufsize < IOBUF_MIN)
 			new_bufsize = IOBUF_MIN;
 		new_buffer = file_buffer_realloc_dynscale(self, &new_bufsize, next_data);
@@ -820,8 +823,10 @@ read_through:
 			goto read_through;
 
 		/* Upscale the buf. */
-		new_bufsize = num_bytes;
-		new_buffer  = file_buffer_realloc_dynscale(self, &new_bufsize, next_data);
+		new_bufsize = num_bytes * 2;
+		if (new_bufsize > IOBUF_MAX)
+			new_bufsize = IOBUF_MAX;
+		new_buffer = file_buffer_realloc_dynscale(self, &new_bufsize, next_data);
 
 		/* If the allocation failed, also use read-through mode. */
 		if unlikely(!new_buffer) {
@@ -1030,6 +1035,8 @@ do_writethrough:
 	new_bufsize = (size_t)self->if_bufsiz * 2;
 	if (new_bufsize < IOBUF_MIN)
 		new_bufsize = IOBUF_MIN;
+	if (new_bufsize > IOBUF_MAX)
+		new_bufsize = IOBUF_MAX;
 	new_buffer = file_buffer_realloc(self, new_bufsize);
 	if unlikely(!new_buffer) {
 		/* Buffer relocation failed. - sync() + operate in write-through mode as fallback. */
