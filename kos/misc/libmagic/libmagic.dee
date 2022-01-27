@@ -200,8 +200,13 @@ function normalizePath(path: string, expand_symlinks: bool = true): string {
 	path = fs.expand(path, "p").replace("\\", "/");
 	if (expand_symlinks)
 		path = realpath(path);
-	if (path.lower().startswith(ROOTDIR))
+#ifdef __WINDOWS__
+	if (path.casestartswith(ROOTDIR))
 		path = path[#ROOTDIR:];
+#else /* __WINDOWS__ */
+	if (path.startswith(ROOTDIR))
+		path = path[#ROOTDIR:];
+#endif /* !__WINDOWS__ */
 	return path;
 }
 
