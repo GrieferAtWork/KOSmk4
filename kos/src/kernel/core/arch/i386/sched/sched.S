@@ -297,7 +297,7 @@ PUBLIC_FUNCTION(task_tryyield_or_pause)
 	.cfi_rel_offset %rsp, 0
 #endif /* __x86_64__ */
 	pushfP_cfi_r
-	ttest  mask=EFLAGS_IF, loc=(%Psp)
+	ttest  mask=EFLAGS_IF, loc=0(%Psp)
 	jnz    1f
 #ifdef __x86_64__
 	addq   $(24), %rsp
@@ -329,7 +329,7 @@ PUBLIC_FUNCTION(task_tryyield)
 	.cfi_rel_offset %rsp, 0
 #endif /* __x86_64__ */
 	pushfP_cfi_r
-	ttest  mask=EFLAGS_IF, loc=(%Psp)
+	ttest  mask=EFLAGS_IF, loc=0(%Psp)
 	jnz    1f
 	.cfi_remember_state
 #ifdef __x86_64__
