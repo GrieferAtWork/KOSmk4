@@ -39,6 +39,46 @@
  *
  * You can also use registers for the `loc' operand. */
 
+
+
+/*
+ * Q: Why do you check for 32-bit masks using this:
+ *    >> (__ASM_ARG(\mask) <= 0xffffffff) || (__ASM_ARG(\mask) >= (-0x7fffffff - 1) && __ASM_ARG(\mask) <= 0x7fffffff)
+ *    Instead of just doing this:
+ *    >> (__ASM_ARG(\mask) <= 0xffffffff))
+ *    When I use the later, it's working fine for me, so what's with the bloat?
+ *
+ * A: Weird answer:
+ *      You've just revealed to me that you're using a 64-bit computer to build KOS.
+ *    Short answer:
+ *      GAS sucks!
+ *    Long answer:
+ *      GAS still sucks. And here's why:
+ *      When building the KOS toolchain on a 32-bit machine, the assembler that gets
+ *      built (which is the one that has to parse the conditional expression) is set
+ *      up such that  it uses  host-machine-sized data words  to store  intermediate
+ *      values for use in constant expressions (emphasis on the "host" part). Before
+ *      I set out to build KOS on the  old i386 linux server I've got sitting in  my
+ *      basement, I always thought gas  used 64-bit integers in all  configurations.
+ *      Well: I was proven wrong, so to give you an example:
+ *         >> .if (0x8000000 < 0)
+ *         >> .error "The machine you're using to assemble this file is 32-bit"
+ *         >> .else
+ *         >> .error "The machine you're using to assemble this file is 64-bit"
+ *         >> .endif
+ *      Reason: `0x8000000' becomes INT32_MIN when casted to signed 32-bit,  which
+ *      is exactly what GAS does (without warning) if the machine it is running on
+ *      is a 32-bit machine.
+ *      So  if you take another look at the expression above, you will see that the
+ *      `(__ASM_ARG(\mask) >= (-0x7fffffff - 1) && __ASM_ARG(\mask) <= 0x7fffffff)'
+ *      part  always becomes true  if all operands are  truncated to signed 32-bit.
+ *      But if the  operands are allowed  to be signed  64-bit (as is  the case  if
+ *      your build machine is 64-bit), then the expression correctly works to  test
+ *      for signed 32-bit integer (or unsigned 31-bit, hence why we still need  the
+ *      other `<= UINT32_MAX'-style check to accept all types of 32-bit  integers).
+ */
+
+
 __ASM_BEGIN
 /* ttest with register operand in `regname+regkind',
  * which is one of a,c,d,b:
@@ -70,7 +110,7 @@ __ASM_L(	.elseif (__ASM_ARG(\mask) <= 0xffff))
 __ASM_L(	.if (__ASM_ARG(\mask) <= 0xffff))
 #endif /* !__x86_64__ */
 __ASM_L(		testw $(__ASM_ARG(\mask)), %__ASM_ARG(\regname))
-__ASM_L(	.elseif (__ASM_ARG(\mask) <= 0xffffffff))
+__ASM_L(	.elseif (__ASM_ARG(\mask) <= 0xffffffff) || (__ASM_ARG(\mask) >= (-0x7fffffff - 1) && __ASM_ARG(\mask) <= 0x7fffffff))
 #if defined(__ASSEMBLER__) || defined(__TPP_VERSION__)
 __ASM_L(		testl $(\mask), %e\regname)
 #else /* __ASSEMBLER__ || __TPP_VERSION__ */
