@@ -463,6 +463,7 @@ incdir("");
 #include <confstr.h>
 #include <corecrt.h>
 #include <corecrt_io.h>
+#include <corecrt_memory.h>
 #include <corecrt_stdio_config.h>
 #include <corecrt_wdirect.h>
 #include <corecrt_wio.h>
@@ -623,6 +624,7 @@ incdir("");
 #include <kos/coredump.h>
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
+#include <kos/dosfs.h>
 #include <kos/except/asm/codes.h>
 #include <kos/except/codes.h>
 #include <kos/except/reason/fs.h>
@@ -1255,6 +1257,7 @@ incdir("");
 #include <utmpx.h>
 #include <vadefs.h>
 #include <values.h>
+#include <vcruntime_string.h>
 #include <vfork.h>
 #include <wait.h>
 #include <waitflags.h>

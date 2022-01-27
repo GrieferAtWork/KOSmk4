@@ -63,7 +63,7 @@
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
 #define HANDLE_FOREACH_TYPE(cb)                          \
 	cb(HANDLE_TYPE_MFILE, struct mfile)                  \
-	cb(HANDLE_TYPE_DIRENT, struct fdirent)              \
+	cb(HANDLE_TYPE_DIRENT, struct fdirent)               \
 	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)        \
 	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)          \
 	cb(HANDLE_TYPE_PATH, struct path)                    \
@@ -103,8 +103,8 @@
 #define HANDLE_TYPEKIND_MFILE_FSOCKNODE 0x0007 /* The handle refers to a `struct fsocknode' */
 
 /* Handle kinds for `HANDLE_TYPE_MODULE' */
-#define HANDLE_TYPEKIND_MODULE_GENERIC        0x0000 /* The handle refers to a `struct module' */
-#define HANDLE_TYPEKIND_MODULE_DRIVER         0x0001 /* The handle refers to a `struct driver' */
+#define HANDLE_TYPEKIND_MODULE_GENERIC 0x0000 /* The handle refers to a `struct module' */
+#define HANDLE_TYPEKIND_MODULE_DRIVER  0x0001 /* The handle refers to a `struct driver' */
 
 
 #endif /* !_KOS_KERNEL_HANDLE_H */

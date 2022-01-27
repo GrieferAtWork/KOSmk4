@@ -534,7 +534,7 @@ typedef __size_t rsize_t;
 @@>> memcpy(3)
 @@Copy memory between non-overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[[decl_include("<hybrid/typecore.h>")]]
+[[guard, decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind, libc, std, kernel, leaf]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPY))]]
 [[nonnull]] void *memcpy([[nonnull]] void *__restrict dst,
@@ -3538,7 +3538,7 @@ $size_t strlcpy([[nonnull]] char *__restrict dst,
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
 
-[[leaf, decl_include("<hybrid/typecore.h>")]]
+[[guard, leaf, decl_include("<hybrid/typecore.h>")]]
 [[dos_only_export_alias("_memccpy"), export_alias("__memccpy")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCCPY))]]
 void *memccpy([[nonnull]] void *__restrict dst,
@@ -7320,10 +7320,10 @@ strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 #ifdef __USE_DOS
 }
 
-%[insert:function(_memccpy = memccpy)]
-%[insert:function(_memicmp = memcasecmp)]
-%[insert:function(_memicmp_l = memcasecmp_l)]
-%[insert:function(memicmp = memcasecmp)]
+%[insert:guarded_function(_memccpy = memccpy)]
+%[insert:guarded_function(_memicmp = memcasecmp)]
+%[insert:guarded_function(_memicmp_l = memcasecmp_l)]
+%[insert:guarded_function(memicmp = memcasecmp)]
 
 [[impl_include("<libc/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
@@ -7348,7 +7348,7 @@ strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 %
 %#ifdef __USE_DOS_SLIB
 [[impl_include("<libc/errno.h>", "<libc/string.h>")]]
-[[section(".text.crt.dos.string.memory")]]
+[[guard, section(".text.crt.dos.string.memory")]]
 [[decl_include("<bits/types.h>")]]
 /*dos*/ $errno_t memcpy_s([[nonnull]] void *dst, rsize_t dstlength,
                           [[nonnull]] void const *src, rsize_t srclength) {
@@ -7369,7 +7369,7 @@ strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 }
 
 [[impl_include("<libc/errno.h>", "<libc/string.h>")]]
-[[section(".text.crt.dos.string.memory")]]
+[[guard, section(".text.crt.dos.string.memory")]]
 [[decl_include("<bits/types.h>")]]
 /*dos*/ $errno_t memmove_s([[nonnull]] void *dst, rsize_t dstlength,
                            [[nonnull]] void const *src, rsize_t srclength) {

@@ -127,20 +127,19 @@
 #endif /* !defined(_KOS_PURE_SOURCE) || _KOS_PURE_SOURCE != 0 */
 #else /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__ && !__USE_ISOC_PURE) */
 /* KOS header purification.
- * This feature  causes  some  old,  or  badly  namespace'd  macros,
- * structs  and  struct  members  to  not  be  visible  in  order to
- * prevent redundancy  and  ensure  that  code  uniformly  uses  the
- * same   symbols   for   referring  to   the   same  functionality.
- * This mainly affects  network- and  socket-related headers,  where
- * various protocol descriptor  structures often  come with  varying
- * names  that appear  inconsistent with  each other  in how they've
- * been named, as well as if their members have been given a prefix.
- * This  feature  is  enabled  by  default  when  `__USE_KOS_KERNEL'
- * extensions are  also enabled  (i.e.  the default  when  compiling
- * code  for use within  the kernel; though in  can be disabled with
- * `#define _KOS_PURE_SOURCE 0'), and disabled otherwise (i.e.  when
- * compiling code  for user-space;  though can  manually be  enabled
- * by `#define _KOS_PURE_SOURCE 1') */
+ * This feature causes some old, or badly namespace'd macros, structs and
+ * struct  members to not  be visible in order  to prevent redundancy and
+ * ensure that code uniformly uses the same symbols for referring to  the
+ * same functionality.
+ * This mainly affects network- and socket-related headers, where various
+ * protocol descriptor  structures often  come  with varying  names  that
+ * appear inconsistent with each other in how they've been named, as well
+ * as if their members have been given a prefix.
+ * This feature  is enabled  by default  when `__USE_KOS_KERNEL'  extensions
+ * are  also enabled  (i.e. the default  when compiling code  for use within
+ * the kernel; though in can be disabled with `#define _KOS_PURE_SOURCE 0'),
+ * and disabled otherwise (i.e. when  compiling code for user-space;  though
+ * can manually be enabled by `#define _KOS_PURE_SOURCE 1') */
 #if defined(_KOS_PURE_SOURCE) && (_KOS_PURE_SOURCE + 0) != 0
 #define __USE_KOS_PURE 1
 #endif /* _KOS_PURE_SOURCE != 0 */

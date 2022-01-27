@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf479b1f */
+/* HASH CRC-32:0x55f7e2cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,10 @@ __NAMESPACE_STD_USING(size_t)
 #define ____forward_size_defined
 __NAMESPACE_STD_USING(__forward_size)
 #endif /* __std___forward_size_defined && !____forward_size_defined */
+#if !defined(__memcpy_defined) && defined(__std_memcpy_defined)
+#define __memcpy_defined
 __NAMESPACE_STD_USING(memcpy)
+#endif /* !__memcpy_defined && __std_memcpy_defined */
 __NAMESPACE_STD_USING(memmove)
 __NAMESPACE_STD_USING(memset)
 __NAMESPACE_STD_USING(memcmp)
@@ -212,7 +215,14 @@ __NAMESPACE_STD_USING(__forward_size)
  *           - `strlwr()' - Can also be found in DOS -> DOS-specific, but also provided by KOS
  */
 __NAMESPACE_STD_BEGIN
-#if defined(__fast_memcpy_defined) && defined(__CRT_HAVE_memcpy)
+#ifndef __std_memcpy_defined
+#define __std_memcpy_defined
+#ifdef __memcpy_defined
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_GLB_USING_OR_IMPL(memcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpy)(void *__restrict __dst, void const *__restrict __src, size_t __n_bytes) { return :: memcpy(__dst, __src, __n_bytes); })
+#elif defined(__fast_memcpy_defined) && defined(__CRT_HAVE_memcpy)
 /* >> memcpy(3)
  * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
@@ -236,6 +246,7 @@ __NAMESPACE_STD_BEGIN
  * @return: * : Always re-returns `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpy)(void *__restrict __dst, void const *__restrict __src, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))(__dst, __src, __n_bytes); })
 #endif /* !... */
+#endif /* !__std_memcpy_defined */
 #if defined(__fast_memmove_defined) && defined(__CRT_HAVE_memmove)
 /* >> memmove(3)
  * Move memory between potentially overlapping memory blocks.
@@ -925,7 +936,10 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
+#if !defined(__memcpy_defined) && defined(__std_memcpy_defined)
+#define __memcpy_defined
 __NAMESPACE_STD_USING(memcpy)
+#endif /* !__memcpy_defined && __std_memcpy_defined */
 __NAMESPACE_STD_USING(memmove)
 __NAMESPACE_STD_USING(memset)
 __NAMESPACE_STD_USING(memcmp)
@@ -2285,6 +2299,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strlcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* __USE_MISC */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
+#ifndef __memccpy_defined
+#define __memccpy_defined
 #ifdef __CRT_HAVE_memccpy
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memccpy,(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes),(__dst,__src,__needle,__num_bytes))
 #elif defined(__CRT_HAVE__memccpy)
@@ -2295,6 +2311,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memccpy,(voi
 #include <libc/local/string/memccpy.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(memccpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memccpy)(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memccpy))(__dst, __src, __needle, __num_bytes); })
 #endif /* !... */
+#endif /* !__memccpy_defined */
 #endif /* __USE_MISC || __USE_XOPEN */
 
 
@@ -7273,6 +7290,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strrev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 
 
 #ifdef __USE_DOS
+#ifndef ___memccpy_defined
+#define ___memccpy_defined
 #ifdef __CRT_HAVE_memccpy
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,_memccpy,(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes),memccpy,(__dst,__src,__needle,__num_bytes))
 #elif defined(__CRT_HAVE__memccpy)
@@ -7283,6 +7302,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,_memccpy,(vo
 #include <libc/local/string/memccpy.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL _memccpy)(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memccpy))(__dst, __src, __needle, __num_bytes); }
 #endif /* !... */
+#endif /* !___memccpy_defined */
+#ifndef ___memicmp_defined
+#define ___memicmp_defined
 #ifdef __CRT_HAVE_memcasecmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_memicmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcasecmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_memicmp)
@@ -7293,6 +7315,9 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_
 #include <libc/local/string/memcasecmp.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _memicmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp))(__s1, __s2, __n_bytes); }
 #endif /* !... */
+#endif /* !___memicmp_defined */
+#ifndef ___memicmp_l_defined
+#define ___memicmp_l_defined
 #ifdef __CRT_HAVE_memcasecmp_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_memicmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
 #elif defined(__CRT_HAVE__memicmp_l)
@@ -7301,6 +7326,9 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_
 #include <libc/local/string/memcasecmp_l.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _memicmp_l)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp_l))(__s1, __s2, __n_bytes, __locale); }
 #endif /* !... */
+#endif /* !___memicmp_l_defined */
+#ifndef __memicmp_defined
+#define __memicmp_defined
 #ifdef __CRT_HAVE_memcasecmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,memicmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcasecmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_memicmp)
@@ -7311,6 +7339,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #include <libc/local/string/memcasecmp.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL memicmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp))(__s1, __s2, __n_bytes); }
 #endif /* !... */
+#endif /* !__memicmp_defined */
 #ifdef __CRT_HAVE__strset_s
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_strset_s,(char *__dst, __SIZE_TYPE__ __dstsize, int __ch),(__dst,__dstsize,__ch))
 #else /* __CRT_HAVE__strset_s */
@@ -7319,18 +7348,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_strset_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE__strset_s */
 
 #ifdef __USE_DOS_SLIB
+#ifndef __memcpy_s_defined
+#define __memcpy_s_defined
 #ifdef __CRT_HAVE_memcpy_s
 __CDECLARE(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,memcpy_s,(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength),(__dst,__dstlength,__src,__srclength))
 #else /* __CRT_HAVE_memcpy_s */
 #include <libc/local/string/memcpy_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcpy_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL memcpy_s)(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy_s))(__dst, __dstlength, __src, __srclength); })
 #endif /* !__CRT_HAVE_memcpy_s */
+#endif /* !__memcpy_s_defined */
+#ifndef __memmove_s_defined
+#define __memmove_s_defined
 #ifdef __CRT_HAVE_memmove_s
 __CDECLARE(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,memmove_s,(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength),(__dst,__dstlength,__src,__srclength))
 #else /* __CRT_HAVE_memmove_s */
 #include <libc/local/string/memmove_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmove_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL memmove_s)(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove_s))(__dst, __dstlength, __src, __srclength); })
 #endif /* !__CRT_HAVE_memmove_s */
+#endif /* !__memmove_s_defined */
 #ifdef __CRT_HAVE_strcpy_s
 __CDECLARE(,__errno_t,__NOTHROW_NCX,strcpy_s,(char *__dst, __SIZE_TYPE__ __dstsize, char const *__src),(__dst,__dstsize,__src))
 #else /* __CRT_HAVE_strcpy_s */
