@@ -132,6 +132,7 @@
 #define __CXX_USING_TYPE(ns, x) using ns x;
 #endif /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 
+#define __NAMESPACE_GLB_SYM ::
 #ifdef __NO_NAMESPACE_STD
 #define __NAMESPACE_STD_BEGIN               /* nothing */
 #define __NAMESPACE_STD_END                 /* nothing */

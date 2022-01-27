@@ -69,24 +69,20 @@ __LIBC char *__progname_full;
 #elif defined(__CRT_HAVE_getexecname)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char /*const*/ *,__NOTHROW_NCX,__LOCAL_getexecname,(void),getexecname,())
 #define __LOCAL_program_invocation_name __LOCAL_getexecname()
-#else /* ... */
+#elif defined(__CRT_HAVE___p__pgmptr) || defined(__CRT_HAVE___p_program_invocation_name)
 #ifndef ____p__pgmptr_defined
 #define ____p__pgmptr_defined
 #ifdef __CRT_HAVE___p__pgmptr
 /* Alias for argv[0], as passed to main() */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
-#elif defined(__CRT_HAVE___p_program_invocation_name)
+#else /* __CRT_HAVE___p__pgmptr */
 /* Alias for argv[0], as passed to main() */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),__p_program_invocation_name,())
-#else /* LIBC: __p__pgmptr */
-#undef ____p__pgmptr_defined
-#endif /* __p__pgmptr... */
+#endif /* !__CRT_HAVE___p__pgmptr */
 #endif /* !____p__pgmptr_defined */
-#ifdef ____p__pgmptr_defined
-#define __LOCAL_program_invocation_name   (*__p__pgmptr())
-#define __LOCAL_program_invocation_name_p (*__p__pgmptr())
-#endif /* ____p__pgmptr_defined */
-#endif /* !... */
+#define __LOCAL_program_invocation_name   (*__NAMESPACE_GLB_SYM __p__pgmptr())
+#define __LOCAL_program_invocation_name_p (*__NAMESPACE_GLB_SYM __p__pgmptr())
+#endif /* ... */
 #endif /* !__LOCAL_program_invocation_name */
 
 /* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
@@ -119,19 +115,14 @@ __LIBC char *__progname;
 #define __LOCAL_program_invocation_short_name   __progname
 #define __LOCAL_program_invocation_short_name_p __progname
 #endif /* __NO_ASMNAME */
-#else /* ... */
+#elif defined(__CRT_HAVE___p_program_invocation_short_name)
 #ifndef ____p_program_invocation_short_name_defined
 #define ____p_program_invocation_short_name_defined
-#ifdef __CRT_HAVE___p_program_invocation_short_name
 /* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p_program_invocation_short_name,(void),())
-#else /* LIBC: __p_program_invocation_short_name */
-#undef ____p_program_invocation_short_name_defined
-#endif /* __p_program_invocation_short_name... */
 #endif /* !____p_program_invocation_short_name_defined */
-#ifdef ____p__pgmptr_defined
-#define __LOCAL_program_invocation_short_name   (*__p__pgmptr())
-#define __LOCAL_program_invocation_short_name_p (*__p__pgmptr())
+#define __LOCAL_program_invocation_short_name   (*__NAMESPACE_GLB_SYM __p_program_invocation_short_name())
+#define __LOCAL_program_invocation_short_name_p (*__NAMESPACE_GLB_SYM __p_program_invocation_short_name())
 #elif defined(__LOCAL_program_invocation_name)
 __SYSDECL_END
 #include <libc/string.h>
@@ -159,8 +150,7 @@ __NAMESPACE_LOCAL_END
 
 #define __LOCAL_program_invocation_short_name \
 	((__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_program_invocation_short_name))())
-#endif
-#endif /* !... */
+#endif /* ... */
 #endif /* !__LOCAL_program_invocation_short_name */
 
 __SYSDECL_END

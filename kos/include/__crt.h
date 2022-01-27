@@ -193,6 +193,36 @@
 
 /* Automatic namespacing for header-local implementations of functions. */
 #ifdef __cplusplus
+#ifdef __INTELLISENSE__
+#define __LIBC_LOCAL_NAME(x)                  x
+#define __LIBC_LOCAL_NAME_IS_IDENTITY
+#else /* __INTELLISENSE__ */
+/* Name local functions differently to prevent errors:
+ * >> extern "C" {
+ * >> namespace inner {
+ * >> inline __attribute__((__noinline__)) int my_function(void) {
+ * >> 	return 42;
+ * >> }
+ * >> }
+ * >> static int my_function(void) {
+ * >> 	return inner::my_function();
+ * >> }
+ * >> }
+ * >> 
+ * >> extern "C" {
+ * >> extern void foo(void *);
+ * >> void foobar(void) {
+ * >> 	foo((void *)&my_function);
+ * >> }
+ * >> }
+ *
+ * Error:
+ * >> Assembler messages:
+ * >> Error: symbol `my_function' is already defined
+ * >> Error: .size expression for my_function does not evaluate to a constant
+ */
+#define __LIBC_LOCAL_NAME(x)                  __l_##x
+#endif /* !__INTELLISENSE__ */
 extern "C++" {namespace __local_imp {
 #if (__has_feature(cxx_alias_templates) ||                                  \
      (defined(__cpp_alias_templates) && __cpp_alias_templates >= 200704) || \
@@ -207,22 +237,25 @@ extern "C++" {namespace __local_imp {
  * Used by `cheaders.dee' when generating macros for linking against functions
  * from the __local_imp namespace. */
 template<class __T> using __loc_T = __T;
-#define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x) __loc_T<Tr>(::__local_imp::x)
+#define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x) __loc_T<Tr>(::__local_imp::__LIBC_LOCAL_NAME(x))
 #else /* ... */
 template<class __S> struct __loc_T { typedef __S __T; };
-#define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x) __loc_T<Tr>::__T(::__local_imp::x)
+#define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x) __loc_T<Tr>::__T(::__local_imp::__LIBC_LOCAL_NAME(x))
 #endif /* !... */
 }}
 #define __NAMESPACE_LOCAL_BEGIN               namespace __local_imp {
 #define __NAMESPACE_LOCAL_END                 }
 #define __NAMESPACE_LOCAL_SYM                 ::__local_imp::
+#ifdef __LIBC_LOCAL_NAME_IS_IDENTITY
 #define __NAMESPACE_LOCAL_USING(x)            using ::__local_imp::x;
 #ifdef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) i
 #else /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) using ::__local_imp::x;
 #endif /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
-#define __LIBC_LOCAL_NAME(x)                  x
+#else /* __LIBC_LOCAL_NAME_IS_IDENTITY */
+#define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) i
+#endif /* !__LIBC_LOCAL_NAME_IS_IDENTITY */
 #else /* __cplusplus */
 #define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x)  (*(Tp)&__local_##x)
 #define __NAMESPACE_LOCAL_BEGIN               /* nothing */
