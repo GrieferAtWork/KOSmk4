@@ -223,7 +223,9 @@ final global function createDirectoryTree(path: string) {
 
 
 local final _lastModfiedTimeCache: {string: time.Time} = Dict();
-local final libwin32 = try import("win32") catch (...) none;
+global libwin32 = try import("win32") catch (...) none;
+if (!hasattr(libwin32, "CreateFile"))
+	libwin32 = none;
 
 @@Get the last-modified timestamp for the given @filename
 @@NOTE: This function keeps an internal cache that is volatime
