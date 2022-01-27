@@ -120,14 +120,14 @@ __ASM_L(.endm)
 #define rdgsbaseq  safe_rdgsbase
 #define wrfsbaseq  safe_wrfsbase
 #define wrgsbaseq  safe_wrgsbase
-#define rdfsbase   ;.error 'Dont use `rdfsbase`, use `rdfsbaseq` instead';
-#define rdgsbase   ;.error 'Dont use `rdgsbase`, use `rdgsbaseq` instead';
-#define wrfsbase   ;.error 'Dont use `wrfsbase`, use `wrfsbaseq` instead';
-#define wrgsbase   ;.error 'Dont use `wrgsbase`, use `wrgsbaseq` instead';
-#define rdfsbasel  ;.error 'Dont use `rdfsbasel`, use `rdfsbaseq` instead';
-#define rdgsbasel  ;.error 'Dont use `rdgsbasel`, use `rdgsbaseq` instead';
-#define wrfsbasel  ;.error 'Dont use `wrfsbasel`, use `wrfsbaseq` instead';
-#define wrgsbasel  ;.error 'Dont use `wrgsbasel`, use `wrgsbaseq` instead';
+#define rdfsbase   ;.error "Dont use `rdfsbase`, use `rdfsbaseq` instead";
+#define rdgsbase   ;.error "Dont use `rdgsbase`, use `rdgsbaseq` instead";
+#define wrfsbase   ;.error "Dont use `wrfsbase`, use `wrfsbaseq` instead";
+#define wrgsbase   ;.error "Dont use `wrgsbase`, use `wrgsbaseq` instead";
+#define rdfsbasel  ;.error "Dont use `rdfsbasel`, use `rdfsbaseq` instead";
+#define rdgsbasel  ;.error "Dont use `rdgsbasel`, use `rdgsbaseq` instead";
+#define wrfsbasel  ;.error "Dont use `wrfsbasel`, use `wrfsbaseq` instead";
+#define wrgsbasel  ;.error "Dont use `wrgsbasel`, use `wrgsbaseq` instead";
 #endif /* !CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE */
 #endif /* __ASSEMBLER__ */
 

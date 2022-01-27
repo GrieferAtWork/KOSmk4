@@ -69,7 +69,7 @@ __ASM_L(991:)
 __ASM_L(.else)
 __ASM_L(.ifc __ASM_ARG(\type),INTR)
 __ASM_L(.else)
-__ASM_L(.error 'Expected TRAP or INTR for `type`, but got `\type`';)
+__ASM_L(.error "Expected TRAP or INTR for `type`, but got `\type`";)
 __ASM_L(.endif; .endif)
 __ASM_L(.endm)
 
