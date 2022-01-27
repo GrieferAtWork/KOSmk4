@@ -35,8 +35,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- Fix compiler warnings & KOS compatibility
-DEEMON_VERSION="47f13ef4494fa65831cdc8420c834ba162d8f7ad"
+#     v -- "Fix default permissions used by fs.mkdir()"
+DEEMON_VERSION="95ba160424039a3cc0f336cb6856d3f5cb66def3"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 

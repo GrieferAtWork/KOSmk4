@@ -95,11 +95,11 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- ![dbg_eval.png](kos/misc/gallery/dbg_eval.png)
 	- GDB support
 		- QEMU features a builtin gdb server, that is supported for debugging the core itself
-			- This feature can be used via `deemon magic.dee --emulator=qemu --gdb=emulator`
+			- This feature can be used via `./binutils/deemon/deemon magic.dee --emulator=qemu --gdb=emulator`
 		- BOCHS can be compiled to support a builtin GDB stub
-			- This feature can be used via `deemon magic.dee --emulator=bochs --gdb=emulator`
+			- This feature can be used via `./binutils/deemon/deemon magic.dee --emulator=bochs --gdb=emulator`
 		- VirtualBox has its own builtin debugger (not GDB), that can be accessed via telnet. KOS's toolchain contains a (self-made) glue-driver that connects to VirtualBox to provide a(n experimental) GDB-compatible interface.
-			- This feature can be used via `deemon magic.dee --emulator=vbox --gdb=emulator`
+			- This feature can be used via `./binutils/deemon/deemon magic.dee --emulator=vbox --gdb=emulator`
 		- Seperately, KOS provides a custom GDB server driver (s.a. `/kos/src/kernel/modgdbserver`) for emulator-independent and real-hardware debugging
 			- This driver can also be used to not just debug the kernel core, but also running user-space program. This, alongside the fact that kos and all of its utility programs are built from source, means that using this driver, you can even single-step into system calls and see a *complete* traceback while doing so.
 		- Fully integrated with Visual Studio (who knew you could do this... I certainly didn't until I stumbled across some vague reports of GDB debugging support in VS2017, that later turned out to be true)
@@ -503,24 +503,28 @@ Requirements:
 		- `mpfr`, `gmp`, `mpclib` (needed for building gcc)
 		- `patch` (for patching 3rd party packages to better understand KOS)
 		- `gdb` (if you wish to debug KOS)
-- On linux: Should work out of the box, but it's not my usual test environment (so no promises made)
-	
+- On linux: Everything work out of the box, but here's some hints:
+	- You'll still need all of the same utilities listed under 
+	- To install `mpfr` / `gmp` / `mpclib` (as needed for building gcc), I had to do:  
+	  ```sh
+	  apt-get install libmpc-dev
+	  ```
 Building KOS (from $PROJPATH):
 
 ```sh
-deemon magic.dee --build-only --target=i386 --config=OD
+./binutils/deemon/deemon magic.dee --build-only --target=i386 --config=OD
 ```
 	
 Running KOS (from $PROJPATH):
 
 ```sh
-deemon magic.dee --run-only --target=i386 --config=OD
+./binutils/deemon/deemon magic.dee --run-only --target=i386 --config=OD
 ```
 	
 Building+Running KOS (from $PROJPATH):
 
 ```sh
-deemon magic.dee --target=i386 --config=OD
+./binutils/deemon/deemon magic.dee --target=i386 --config=OD
 ```
 
 
