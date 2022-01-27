@@ -504,7 +504,7 @@ Requirements:
 		- `patch` (for patching 3rd party packages to better understand KOS)
 		- `gdb` (if you wish to debug KOS)
 - On linux: Everything work out of the box, but here's some hints:
-	- You'll still need all of the same utilities listed under 
+	- You'll still need all of the same utilities listed for above under *Cygwin*
 	- To install `mpfr` / `gmp` / `mpclib` (as needed for building gcc), I had to do:  
 	  ```sh
 	  apt-get install libmpc-dev
@@ -526,6 +526,8 @@ Building+Running KOS (from $PROJPATH):
 ```sh
 ./binutils/deemon/deemon magic.dee --target=i386 --config=OD
 ```
+
+Be careful if you're using an outdated version of `deemon`. I (GrieferAtWork) am the BDFL for it, as well as KOS, and it already happened more than once that I fixed/added something in/to deemon because I needed it for use with the KOS toolchain. So if something's not working, try to re-build deemon for the `$DEEMON_VERSION` declared in `kos/misc/make_toolchain.sh`, and if that also isn't working, try using the most recent version of deemon. One or the other should be working, and if not, create an issue for it and I'll see if I can help.
 
 
 
