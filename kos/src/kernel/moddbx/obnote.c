@@ -72,6 +72,7 @@
 #include <kos/exec/rtld.h>
 #include <sys/poll.h>
 
+#include <fcntl.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -1382,40 +1383,38 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 				goto badobj;
 			switch (fd) {
 
-			case HANDLE_SYMBOLIC_FDCWD: {
+			case (unsigned int)AT_FDCWD: {
 				struct path *p = curfs->fs_cwd;
 				if (!p || !ADDR_ISKERN(p))
 					goto badobj;
 				return print_path_with_prefix(printer, arg, p, pstatus, "AT_FDCWD:");
 			}	break;
 
-			case HANDLE_SYMBOLIC_FDROOT: {
+			case (unsigned int)AT_FDROOT: {
 				struct path *p = curfs->fs_root;
 				if (!p || !ADDR_ISKERN(p))
 					goto badobj;
 				return print_path_with_prefix(printer, arg, p, pstatus, "AT_FDROOT:");
 			}	break;
 
-			case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
-			     HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX):
-			case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
-			     HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX): {
+			case (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN) ... (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX):
+			case (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) ... (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX): {
 				char prefixstr[COMPILER_LENOF("AT_FDDRIVE_ROOT('Z')")];
-				struct path *p = curfs->fs_dcwd[fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN)];
-				if (!p || (fd >= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) &&
-				           fd <= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX)))
-					p = curvfs->vf_drives[fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN)];
+				struct path *p = curfs->fs_dcwd[fd - (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)];
+				if (!p || (fd >= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
+				           fd <= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)))
+					p = curvfs->vf_drives[fd - (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN)];
 				if (!p || !ADDR_ISKERN(p))
 					goto badobj;
 				sprintf(prefixstr, "AT_FDDRIVE_%s('%c')",
-				        fd >= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) &&
-				        fd <= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX)
+				        fd >= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
+				        fd <= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)
 				        ? "ROOT"
 				        : "CWD",
-				        'A' + ((fd >= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) &&
-				                fd <= HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX))
-				               ? (fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN))
-				               : (fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN))));
+				        'A' + ((fd >= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
+				                fd <= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX))
+				               ? (fd - (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN))
+				               : (fd - (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN))));
 				return print_path_with_prefix(printer, arg, p, pstatus, prefixstr);
 			}	break;
 

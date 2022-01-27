@@ -56,6 +56,7 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <fcntl.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdint.h> /* UINT64_C */
@@ -291,19 +292,19 @@ handle_get_task(unsigned int fd)
 	REF struct handle hnd;
 	switch (fd) {
 
-	case HANDLE_SYMBOLIC_THISTASK:
+	case (unsigned int)AT_THIS_TASK:
 		return incref(THIS_TASK);
 
-	case HANDLE_SYMBOLIC_THISPROCESS:
+	case (unsigned int)AT_THIS_PROCESS:
 		return incref(task_getprocess());
 
-	case HANDLE_SYMBOLIC_GROUPLEADER:
+	case (unsigned int)AT_GROUP_LEADER:
 		return task_getprocessgroupleader_srch();
 
-	case HANDLE_SYMBOLIC_SESSIONLEADER:
+	case (unsigned int)AT_SESSION_LEADER:
 		return task_getsessionleader_srch();
 
-	case HANDLE_SYMBOLIC_PARENTPROCESS: {
+	case (unsigned int)AT_PARENT_PROCESS: {
 		REF struct task *temp;
 		temp = task_getprocessparent();
 		if likely(temp)

@@ -1795,7 +1795,7 @@ handle_tryclose_symolic(unsigned int fd)
 		THROWS(E_WOULDBLOCK) {
 	switch (fd) {
 
-	case HANDLE_SYMBOLIC_FDCWD: {
+	case (unsigned int)AT_FDCWD: {
 		REF struct path *oldp;
 		struct fs *f;
 		f = THIS_FS;
@@ -1806,12 +1806,12 @@ handle_tryclose_symolic(unsigned int fd)
 		decref(oldp);
 	}	break;
 
-	case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
-	     HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX): {
+	case (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN) ...
+	     (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX): {
 		REF struct path *p, *oldp;
 		unsigned int id;
 		struct fs *f;
-		id = (fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN));
+		id = (fd - (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN));
 		f = THIS_FS;
 		vfs_driveslock_read(f->fs_vfs);
 		p = xincref(f->fs_vfs->vf_drives[id]);
@@ -1830,12 +1830,12 @@ handle_tryclose_symolic(unsigned int fd)
 			throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
 	}	break;
 
-	case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
-	     HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX): {
+	case (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) ...
+	     (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX): {
 		struct vfs *myvfs = THIS_VFS;
 		unsigned int id;
 		REF struct path *oldp;
-		id = (fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
+		id = (fd - (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN));
 		require(CAP_MOUNT_DRIVES);
 		vfs_driveslock_write(myvfs);
 		oldp = myvfs->vf_drives[id]; /* Inherit reference */
@@ -1899,7 +1899,7 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 	/* Symbolic handles */
 	switch (dst_fd) {
 
-	case HANDLE_SYMBOLIC_FDCWD: {
+	case (unsigned int)AT_FDCWD: {
 		REF struct path *p, *oldp;
 		struct fs *f;
 		p = handle_as_path_noinherit(hnd);
@@ -1916,7 +1916,7 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		decref(oldp);
 	}	break;
 
-	case HANDLE_SYMBOLIC_FDROOT: {
+	case (unsigned int)AT_FDROOT: {
 		REF struct path *p, *oldp;
 		struct fs *f;
 		p = handle_as_path_noinherit(hnd);
@@ -1933,13 +1933,13 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		decref(oldp);
 	}	break;
 
-	case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
-	     HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX): {
+	case (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN) ...
+	     (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX): {
 		REF struct path *p, *oldp;
 		unsigned int id;
 		struct fs *f;
 		/* Bind DOS per-drive current working directories */
-		id = (dst_fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN));
+		id = (dst_fd - (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN));
 		p = handle_as_path_noinherit(hnd);
 		f = THIS_FS;
 		TRY {
@@ -1954,14 +1954,14 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		decref(oldp);
 	}	break;
 
-	case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
-	     HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX): {
+	case (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) ...
+	     (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX): {
 		REF struct path *newp, *oldp;
 		struct vfs *myvfs = THIS_VFS;
 		unsigned int id;
 		require(CAP_MOUNT_DRIVES);
 		/* Bind DOS drives */
-		id   = (dst_fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
+		id   = (dst_fd - (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN));
 		newp = handle_as_path_noinherit(hnd);
 		TRY {
 			vfs_driveslock_write(myvfs);
@@ -2006,7 +2006,7 @@ handle_lookup(unsigned int fd)
 
 	/* Symbolic handles */
 
-	case HANDLE_SYMBOLIC_FDCWD: {
+	case (unsigned int)AT_FDCWD: {
 		struct fs *f;
 		f             = THIS_FS;
 		result.h_type = HANDLE_TYPE_PATH;
@@ -2016,7 +2016,7 @@ handle_lookup(unsigned int fd)
 		fs_pathlock_endread(f);
 	}	break;
 
-	case HANDLE_SYMBOLIC_FDROOT: {
+	case (unsigned int)AT_FDROOT: {
 		struct fs *f;
 		f             = THIS_FS;
 		result.h_type = HANDLE_TYPE_PATH;
@@ -2026,61 +2026,61 @@ handle_lookup(unsigned int fd)
 		fs_pathlock_endread(f);
 	}	break;
 
-	case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
-	     HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX): {
+	case (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN) ...
+	     (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX): {
 		struct fs *f;
 		f             = THIS_FS;
 		result.h_type = HANDLE_TYPE_PATH;
 		result.h_mode = IO_RDONLY;
 		fs_pathlock_read(f);
-		result.h_data = xincref(f->fs_dcwd[fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN)]);
+		result.h_data = xincref(f->fs_dcwd[fd - (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)]);
 		fs_pathlock_endread(f);
 		if (!result.h_data) {
 			struct vfs *v = f->fs_vfs;
 			vfs_driveslock_read(v);
-			result.h_data = xincref(v->vf_drives[fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN)]);
+			result.h_data = xincref(v->vf_drives[fd - (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)]);
 			vfs_driveslock_endread(v);
 			if unlikely(!result.h_data)
 				throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
 		}
 	}	break;
 
-	case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
-	     HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX): {
+	case (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) ...
+	     (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX): {
 		struct vfs *v;
 		v = THIS_FS->fs_vfs;
 		vfs_driveslock_read(v);
-		result.h_data = xincref(v->vf_drives[fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN)]);
+		result.h_data = xincref(v->vf_drives[fd - (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN)]);
 		vfs_driveslock_endread(v);
 		if unlikely(!result.h_data)
 			throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
 	}	break;
 
-	case HANDLE_SYMBOLIC_THISTASK:
+	case (unsigned int)AT_THIS_TASK:
 		result.h_type = HANDLE_TYPE_TASK;
 		result.h_mode = IO_RDONLY;
 		result.h_data = incref(THIS_TASKPID);
 		break;
 
-	case HANDLE_SYMBOLIC_THISPROCESS:
+	case (unsigned int)AT_THIS_PROCESS:
 		result.h_type = HANDLE_TYPE_TASK;
 		result.h_mode = IO_RDONLY;
 		result.h_data = incref(task_getprocesspid());
 		break;
 
-	case HANDLE_SYMBOLIC_PARENTPROCESS:
+	case (unsigned int)AT_PARENT_PROCESS:
 		result.h_type = HANDLE_TYPE_TASK;
 		result.h_mode = IO_RDONLY;
 		result.h_data = task_getprocessparentpid();
 		break;
 
-	case HANDLE_SYMBOLIC_GROUPLEADER:
+	case (unsigned int)AT_GROUP_LEADER:
 		result.h_type = HANDLE_TYPE_TASK;
 		result.h_mode = IO_RDONLY;
 		result.h_data = task_getprocessgroupleaderpid();
 		break;
 
-	case HANDLE_SYMBOLIC_SESSIONLEADER:
+	case (unsigned int)AT_SESSION_LEADER:
 		result.h_type = HANDLE_TYPE_TASK;
 		result.h_mode = IO_RDONLY;
 		result.h_data = task_getsessionleaderpid();

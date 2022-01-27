@@ -94,7 +94,10 @@ NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes);
 /************************************************************************/
 
 
-/* Return a file descriptor for /dev/mem (or -1 with `errno' modified) */
+/* Return a file descriptor for /dev/mem (or -1 with `errno' modified)
+ * NOTE: Don't try to dup() or close() the file descriptor. - Just  use
+ *       it as-is. It will be close()'d automatically once libphys gets
+ *       unloaded. */
 INTDEF NOBLOCK WUNUSED fd_t NOTHROW(CC libphys_getdevmem)(void);
 
 

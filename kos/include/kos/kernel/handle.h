@@ -26,26 +26,6 @@
 #error "KOS-only system header"
 #endif /* !__KOS__ */
 
-/* Special values which may be used to refer to specific handles. */
-#define HANDLE_SYMBOLIC_FDCWD         __CCAST(unsigned int)(-100) /* HANDLE_TYPE_PATH (writable) */
-#define HANDLE_SYMBOLIC_FDROOT        __CCAST(unsigned int)(-101) /* HANDLE_TYPE_PATH (writable) */
-#define HANDLE_SYMBOLIC_THISTASK      __CCAST(unsigned int)(-180) /* HANDLE_TYPE_TASK (readonly, Equivalent of `gettid()') */
-#define HANDLE_SYMBOLIC_THISPROCESS   __CCAST(unsigned int)(-181) /* HANDLE_TYPE_TASK (writable, Equivalent of `getpid()') */
-#define HANDLE_SYMBOLIC_PARENTPROCESS __CCAST(unsigned int)(-182) /* HANDLE_TYPE_TASK (writable, Equivalent of `getppid()') */
-#define HANDLE_SYMBOLIC_GROUPLEADER   __CCAST(unsigned int)(-183) /* HANDLE_TYPE_TASK (writable, Equivalent of `getpgid(0)') */
-#define HANDLE_SYMBOLIC_SESSIONLEADER __CCAST(unsigned int)(-184) /* HANDLE_TYPE_TASK (writable, Equivalent of `getsid(0)') */
-#define HANDLE_SYMBOLIC_THISVM        HANDLE_SYMBOLIC_THISTASK
-#define HANDLE_SYMBOLIC_THISFS        HANDLE_SYMBOLIC_THISTASK
-#define HANDLE_SYMBOLIC_THISVFS       HANDLE_SYMBOLIC_THISTASK
-#define HANDLE_SYMBOLIC_THISPIDNS     HANDLE_SYMBOLIC_THISTASK
-
-/* Symbolic handles for DOS drives */
-#define HANDLE_SYMBOLIC_DDRIVECWD(drivechar)  __CCAST(unsigned int)((-350)+((drivechar)-'A')) /* HANDLE_TYPE_PATH (writable) */
-#define HANDLE_SYMBOLIC_DDRIVEROOT(drivechar) __CCAST(unsigned int)((-300)+((drivechar)-'A')) /* HANDLE_TYPE_PATH (writable) */
-#define HANDLE_SYMBOLIC_DDRIVEMIN             'A' /* Min valid DDrive letter */
-#define HANDLE_SYMBOLIC_DDRIVEMAX             'Z' /* Max valid DDrive letter */
-
-
 /* KOS Handle type codes.
  * NOTE: Changes to this list must be updated with:
  * $ deemon -F kos/src/kernel/core/user/handle-router.c kos/src/kernel/include/kernel/handle-proto.h && touch kos/src/kernel/include/kernel/handle.h

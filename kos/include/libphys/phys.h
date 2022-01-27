@@ -133,7 +133,10 @@ LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC munmapphys)(void *base, size_t 
 /************************************************************************/
 
 
-/* Return a file descriptor for /dev/mem (or -1 with `errno' modified) */
+/* Return a file descriptor for /dev/mem (or -1 with `errno' modified)
+ * NOTE: Don't try to dup() or close() the file descriptor. - Just  use
+ *       it as-is. It will be close()'d automatically once libphys gets
+ *       unloaded. */
 typedef __NOBLOCK __ATTR_WUNUSED __fd_t /*__NOTHROW*/ (LIBPHYS_CC PGETDEVMEM)(void);
 #ifdef LIBPHYS_WANT_PROTOTYPES
 LIBPHYS_DECL __NOBLOCK __ATTR_WUNUSED __fd_t __NOTHROW(LIBPHYS_CC getdevmem)(void);

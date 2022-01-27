@@ -36,7 +36,7 @@
 #define CAP_ALLOW_PR_CAPBSET_DROP            CAP_SETPCAP         /* Allow use of `prctl(PR_CAPBSET_DROP)'. */
 #define CAP_ALLOW_PR_SET_SECUREBITS          CAP_SETPCAP         /* Allow use of `prctl(PR_SET_SECUREBITS)'. */
 #define CAP_MOUNT                            CAP_SYS_ADMIN       /* Modify mounted file systems. */
-#define CAP_MOUNT_DRIVES                     CAP_SYS_ADMIN       /* Re-bind `HANDLE_SYMBOLIC_DDRIVEROOT(<letter>)' file handles. */
+#define CAP_MOUNT_DRIVES                     CAP_SYS_ADMIN       /* Re-bind `AT_FDDRIVE_ROOT(<letter>)' file handles. */
 #define CAP_EXCEED_PIPE_MAX_SIZE             CAP_SYS_RESOURCE    /* Exceed and modify the pipe-buffer-size limit from `/proc/sys/fs/pipe-max-size' */
 #define CAP_ALLOW_CTTY_STEALING              CAP_SYS_ADMIN       /* Allow stealing of controlling terminals (s.a. `TIOCSCTTY') */
 #define CAP_SET_TTY_BUFFER_SIZES             CAP_SYS_RESOURCE    /* Allow use of `TTYIO_IBUF_SETLIMIT', `TTYIO_CANON_SETLIMIT', `TTYIO_OPEND_SETLIMIT', `TTYIO_IPEND_SETLIMIT' */
