@@ -767,6 +767,8 @@ read_from_buffer:
 		/* Start out with the smallest size. */
 		uint8_t *new_buffer;
 		size_t new_bufsize;
+		assert(self->if_ptr == self->if_base);
+		next_data = ex->io_fpos;
 		if unlikely(self->if_flag & IO_NODYNSCALE) {
 			/* Dynamic scaling is disabled. Must forward the read() to the underlying file. */
 read_through:
@@ -786,7 +788,7 @@ read_through:
 			COMPILER_BARRIER();
 			if unlikely(read_size < 0)
 				goto err;
-			ex->io_fpos = next_data + num_bytes;
+			ex->io_fpos = next_data + (size_t)read_size;
 			result += (size_t)read_size;
 			num_bytes -= (size_t)read_size;
 			goto done;
