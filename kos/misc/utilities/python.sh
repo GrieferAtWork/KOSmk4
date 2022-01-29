@@ -143,6 +143,7 @@ built_missing_module() {
 }
 
 
+. "$KOS_MISC/utilities/misc/target-info.sh"
 if ! test -z "$TARGET_CONFIG_ILP32"; then
 	# Python doesn't want to built `imageop.so`, unless the host
 	# (that is: the machine you're calling this build script from)

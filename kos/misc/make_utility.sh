@@ -132,24 +132,32 @@ UTILITY_NAME="$2"
 TARGET_CPUNAME="$TARGET_NAME"
 TARGET_LIBPATH="lib"
 TARGET_INCPATH="$TARGET_CPUNAME-kos"
-if [ "$TARGET_CPUNAME" == "i386" ]; then
-	TARGET_CPUNAME="i686"
-	TARGET_CONFIG_ILP32=1
-fi
-if [ "$TARGET_CPUNAME" == "x86_64" ]; then
-	TARGET_INCPATH="i386-kos"
-	TARGET_LIBPATH="lib64"
-	TARGET_CONFIG_LP64=1
-fi
-
-
 KOS_MISC="$(dirname "$(readlink -f "$0")")"
 KOS_PATCHES="${KOS_MISC}/patches"
 cmd cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
+MTOOLS="$KOS_ROOT/binutils/misc/bin/mtools"
+
+if [ "$TARGET_CPUNAME" == "i386" ]; then
+	TARGET_CPUNAME="i686"
+	# Because of multi-arch support on x86_64, /bin/i386-kos may be linked to x86_64
+	# When we want to build utilities for i386 however, such linkage will result in
+	# unexpected errors, so to save on the hassle: check that the symlink is valid.
+	_BINDIR_LNK="$(readlink "./bin/i386-kos" 2>&1)"
+	if [[ "$_BINDIR_LNK" == *x86_64* ]]; then
+		echo "ERROR: 'bin/i386-kos' is linked against x86_64 (specifically: '$_BINDIR_LNK')"
+		echo "       Fix this by running 'deemon magic.dee --build-only --target=i386 --config=...'"
+		exit 1
+	fi
+fi
+if [ "$TARGET_CPUNAME" == "x86_64" ]; then
+	TARGET_INCPATH="i386-kos"
+	TARGET_LIBPATH="lib64"
+fi
+
+
 TARGET_SYSROOT="${KOS_ROOT}/bin/${TARGET_NAME}-kos-common"
 BINUTILS_SYSROOT="${KOS_ROOT}/binutils/${TARGET_NAME}-kos"
-MTOOLS="$KOS_ROOT/binutils/misc/bin/mtools"
 
 if ! [ -d "$TARGET_SYSROOT" ]; then
 	echo "Common system root ${TARGET_SYSROOT} is missing (re-run 'make_toolchain.sh' to fix)"
