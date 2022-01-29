@@ -62,8 +62,8 @@
 #define __IUCLC    __UINT32_C(0x00000200) /* Map uppercase characters to lowercase on input (requires `IEXTEN'). */
 #define __IXON     __UINT32_C(0x00000400) /* Enable support for `VSTOP' to disable TTY output transmission. */
 #define __IXANY    __UINT32_C(0x00000800) /* Any input character has the behavior of `VSTART' */
-#define __IXOFF    __UINT32_C(0x00001000) /* Status  bit  for   `VSTOP'  /   `VSTART':  Don't   transmit  pending   TTY  output   until  this   bit  is   cleared.
-                                           * When set, tty output is instead stored in a secondary buffer (s.a. `TTYIO_OPEND_GETLIMIT' and `TTYIO_OPEND_SETLIMIT') */
+#define __IXOFF    __UINT32_C(0x00001000) /* Status bit for `VSTOP' / `VSTART': Don't transmit pending  TTY output until this bit is cleared. When  set,
+                                           * tty output is instead stored in a secondary buffer (s.a. `TTYIO_OPEND_GETLIMIT' and `TTYIO_OPEND_SETLIMIT') */
 #define __IMAXBEL  __UINT32_C(0x00002000) /* Ring bell when input queue is full (KOS-SPECIFIC: The bell also gets triggered when the queue is empty and a delete character is received) */
 #define __IUTF8    __UINT32_C(0x00004000) /* Input is UTF8 */
 /*      __I        __UINT32_C(0x00008000)  * ... */

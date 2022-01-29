@@ -33,10 +33,9 @@
  * the dynamic linker program (even though in the case of KOS, the RTLD is hard-
  * coded as a simple one-segment application always loaded from kernel-memory) */
 
+#ifdef __CC__
 __DECL_BEGIN
 
-
-#ifdef __CC__
 #if defined(__KOS__) && !defined(__KERNEL__)
 #ifndef ____peb_defined
 #define ____peb_defined
@@ -62,8 +61,8 @@ __NOTHROW_NCX(__LIBCCALL process_peb_getenv)(struct process_peb *__restrict self
 	return __NULLPTR;
 }
 
-#endif /* __CC__ */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_EXEC_PEB_H */

@@ -577,9 +577,8 @@ fail_badsig:
 }
 
 
-/* Try  to decode EFI partitions. If the pointed sector(s) don't actually
- * contain a proper EFI partition table, return `false'. Otherwise, parse
- * the table and create partitions. */
+/* Try to decode an eMBR partition table:
+ * https://web.archive.org/web/20210417035311/http://www.fysnet.net/fysos_embr.htm */
 PRIVATE BLOCKING ATTR_NOINLINE NONNULL((1, 2)) bool FCALL
 blkdev_makeparts_loadembr(struct blkdev *__restrict self,
                           struct blkdev_list *__restrict parts,

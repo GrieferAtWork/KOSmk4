@@ -82,6 +82,7 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 			case PT_NULL:
 				/* Unused entry. */
 				break;
+
 			case PT_NOTE:
 			case PT_PHDR:
 				break;

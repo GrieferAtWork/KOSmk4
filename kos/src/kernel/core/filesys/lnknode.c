@@ -74,6 +74,8 @@ flnknode_v_stat_readlink_size(struct mfile *__restrict self,
 	ops = flnknode_getops(me);
 #ifndef __OPTIMIZE_SIZE__
 	if (ops->lno_linkstr != NULL) {
+		/* As  per the specs,  the file's size is  only required to be
+		 * correct after `lno_linkstr' has been invoked at least once. */
 		(*ops->lno_linkstr)(me);
 		result->st_size = (typeof(result->st_size))mfile_getsize_nonatomic(self);
 	} else

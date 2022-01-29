@@ -185,11 +185,11 @@ elfabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	STATIC_ASSERT(CONFIG_EXECABI_MAXHEADER >= sizeof(COMPAT_ElfW(Ehdr)));
 #endif /* __ARCH_HAVE_COMPAT */
 	uintptr_t reason;
-	reason = elf_validate_ehdr((ElfW(Ehdr) *)args->ea_header);
+	reason = elf_validate_ehdr((ElfW(Ehdr) const *)args->ea_header);
 	if (reason == 0)
 		return elf_exec_impl(args);
 #ifdef __ARCH_HAVE_COMPAT
-	reason = compat_elf_validate_ehdr((COMPAT_ElfW(Ehdr) *)args->ea_header);
+	reason = compat_elf_validate_ehdr((COMPAT_ElfW(Ehdr) const *)args->ea_header);
 	if (reason == 0)
 		return compat_elf_exec_impl(args);
 #endif /* __ARCH_HAVE_COMPAT */

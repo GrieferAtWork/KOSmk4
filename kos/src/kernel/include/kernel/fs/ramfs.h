@@ -37,6 +37,7 @@
 #include <hybrid/sequence/rbtree.h>
 
 #include <kos/aref.h>
+#include <kos/lockop.h>
 #include <kos/sched/shared-rwlock.h>
 
 #ifdef __CC__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x700ddfd3 */
+/* HASH CRC-32:0x33d9e025 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __SYSDECL_BEGIN
 #include <bits/types.h>
 /* >> raise(3)
  * Raise a signal within the current thread.
- * In  a *-theaded process  this is same as:
+ * In  a *-threaded process this is same as:
  *   *=multi:  `pthread_kill(pthread_self(), signo)'
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
@@ -45,7 +45,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_raise,(__signo_t __signo),raise,(__si
 #include <libc/local/signal/raise.h>
 /* >> raise(3)
  * Raise a signal within the current thread.
- * In  a *-theaded process  this is same as:
+ * In  a *-threaded process this is same as:
  *   *=multi:  `pthread_kill(pthread_self(), signo)'
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success

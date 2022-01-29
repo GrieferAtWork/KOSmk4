@@ -73,10 +73,10 @@ INTDEF void /*ASMCALL*/ libc_sig_restore(void);
 
 
 
-/*[[[head:libd_raise,hash:CRC-32=0x2247937f]]]*/
+/*[[[head:libd_raise,hash:CRC-32=0xeb3b73a9]]]*/
 /* >> raise(3)
  * Raise a signal within the current thread.
- * In  a *-theaded process  this is same as:
+ * In  a *-threaded process this is same as:
  *   *=multi:  `pthread_kill(pthread_self(), signo)'
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
@@ -89,10 +89,10 @@ NOTHROW_NCX(LIBDCALL libd_raise)(signo_t signo)
 }
 /*[[[end:libd_raise]]]*/
 
-/*[[[head:libc_raise,hash:CRC-32=0xbb96ae5]]]*/
+/*[[[head:libc_raise,hash:CRC-32=0x6a894e0d]]]*/
 /* >> raise(3)
  * Raise a signal within the current thread.
- * In  a *-theaded process  this is same as:
+ * In  a *-threaded process this is same as:
  *   *=multi:  `pthread_kill(pthread_self(), signo)'
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
@@ -724,11 +724,11 @@ NOTHROW_RPC(LIBCCALL libc_sigsuspend)(sigset_t const *set)
 }
 /*[[[end:libc_sigsuspend]]]*/
 
-/*[[[head:libc_sigaction,hash:CRC-32=0x42476a3b]]]*/
+/*[[[head:libc_sigaction,hash:CRC-32=0xb6eb76e7]]]*/
 /* >> sigaction(2)
  * Get/Set the  action that  shall  be performed  when  a
  * signal `signo' must be handled by the calling process.
- * This function will modifiy the caller's kernel-space signal handler descriptor,
+ * This function will modify the caller's kernel-space signal handler  descriptor,
  * who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
@@ -892,10 +892,10 @@ NOTHROW_RPC(LIBCCALL libc_sigtimedwait64)(sigset_t const *__restrict set,
 #endif /* MAGIC:alias */
 /*[[[end:libc_sigtimedwait64]]]*/
 
-/*[[[head:libc_sigqueue,hash:CRC-32=0x60844282]]]*/
+/*[[[head:libc_sigqueue,hash:CRC-32=0xc5fb9544]]]*/
 /* >> sigqueue(2)
  * Similar to  `kill(2)',  but  `pid'  must  be positive  and  reference  a  process's  PID,
- * meaning that this function can only be uesd to send a signal to single, specific process.
+ * meaning that this function can only be used to send a signal to single, specific process.
  * @param: pid:   The PID of the process that shall receive the signal.
  * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to

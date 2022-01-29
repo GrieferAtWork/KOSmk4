@@ -335,7 +335,6 @@ NOTHROW(FCALL _path_cldlock_reap)(struct path *__restrict self) {
 #define __LOCAL_self      (&self->p_cldlops)
 #define __LOCAL_obj       self
 #define __LOCAL_type      path
-#define __LOCAL_type      path
 #define __LOCAL_trylock() path_cldlock_trywrite(self)
 #define __LOCAL_unlock()  _path_cldlock_endwrite(self)
 #include <libc/template/lockop.h>

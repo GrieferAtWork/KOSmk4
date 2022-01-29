@@ -161,9 +161,8 @@ fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
 		THROWS(E_BADALLOC, E_INVALID_ARGUMENT_BAD_STATE, ...) {
 	REF struct fifohandle *result;
 	assert(!task_wasconnected());
-	assert((iomode & ~(IO_ACCMODE | IO_NONBLOCK)) == 0);
 	result = (REF struct fifohandle *)kmalloc(sizeof(struct fifohandle),
-	                                         GFP_NORMAL);
+	                                          GFP_NORMAL);
 	/* Register a new reader/writer/both */
 	TRY {
 		switch (iomode & IO_ACCMODE) {
@@ -221,6 +220,7 @@ fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
 		kfree(result);
 		RETHROW();
 	}
+
 	/* Fill in fields of the new FIFO user object. */
 	result->fu_refcnt  = 1;
 	result->fu_fifo    = (REF struct ffifonode *)incref(self);

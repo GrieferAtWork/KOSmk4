@@ -1282,7 +1282,7 @@ __NAMESPACE_STD_USING(size_t)
 
 @@>> raise(3)
 @@Raise a signal within the current thread.
-@@In  a *-theaded process  this is same as:
+@@In  a *-threaded process this is same as:
 @@  *=multi:  `pthread_kill(pthread_self(), signo)'
 @@  *=single: `kill(getpid(), signo)'
 @@@return: 0:  Success
@@ -1720,7 +1720,7 @@ int sigsuspend([[nonnull]] sigset_t const *set);
 @@>> sigaction(2)
 @@Get/Set the  action that  shall  be performed  when  a
 @@signal `signo' must be handled by the calling process.
-@@This function will modifiy the caller's kernel-space signal handler descriptor,
+@@This function will modify the caller's kernel-space signal handler  descriptor,
 @@who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
 @@@return: 0:  Success
 @@@return: -1: [errno=EINVAL] The given `signo' is invalid
@@ -1854,7 +1854,7 @@ int sigtimedwait([[nonnull]] $sigset_t const *__restrict set,
 
 @@>> sigqueue(2)
 @@Similar to  `kill(2)',  but  `pid'  must  be positive  and  reference  a  process's  PID,
-@@meaning that this function can only be uesd to send a signal to single, specific process.
+@@meaning that this function can only be used to send a signal to single, specific process.
 @@@param: pid:   The PID of the process that shall receive the signal.
 @@@param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
 @@               and this function can be used to test if the caller would be allowed to

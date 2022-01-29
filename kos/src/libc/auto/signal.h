@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2947414f */
+/* HASH CRC-32:0x7000fdc2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,7 +222,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *se
 /* >> sigaction(2)
  * Get/Set the  action that  shall  be performed  when  a
  * signal `signo' must be handled by the calling process.
- * This function will modifiy the caller's kernel-space signal handler descriptor,
+ * This function will modify the caller's kernel-space signal handler  descriptor,
  * who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
@@ -295,7 +295,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigwaitinfo)(sigset_t const *_
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec const *rel_timeout);
 /* >> sigqueue(2)
  * Similar to  `kill(2)',  but  `pid'  must  be positive  and  reference  a  process's  PID,
- * meaning that this function can only be uesd to send a signal to single, specific process.
+ * meaning that this function can only be used to send a signal to single, specific process.
  * @param: pid:   The PID of the process that shall receive the signal.
  * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
