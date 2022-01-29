@@ -97,7 +97,7 @@ typedef __ssize_t ssize_t;
 [[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int setxattr([[nonnull]] char const *path,
              [[nonnull]] char const *name,
-             [[inp(bufsize)]] void const *buf,
+             [[inp_opt(bufsize)]] void const *buf,
              size_t bufsize,
              __STDC_INT_AS_UINT_T flags);
 
@@ -106,7 +106,7 @@ int setxattr([[nonnull]] char const *path,
 [[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int lsetxattr([[nonnull]] char const *path,
               [[nonnull]] char const *name,
-              [[inp(bufsize)]] void const *buf,
+              [[inp_opt(bufsize)]] void const *buf,
               size_t bufsize,
               __STDC_INT_AS_UINT_T flags);
 
@@ -115,7 +115,7 @@ int lsetxattr([[nonnull]] char const *path,
 [[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int fsetxattr($fd_t fd,
               [[nonnull]] char const *name,
-              [[inp(bufsize)]] void const *buf,
+              [[inp_opt(bufsize)]] void const *buf,
               size_t bufsize,
               __STDC_INT_AS_UINT_T flags);
 
@@ -123,39 +123,39 @@ int fsetxattr($fd_t fd,
 [[cp, decl_include("<hybrid/typecore.h>")]]
 ssize_t getxattr([[nonnull]] char const *path,
                  [[nonnull]] char const *name,
-                 [[outp(bufsize)]] void *buf,
+                 [[outp_opt(bufsize)]] void *buf,
                  size_t bufsize);
 
 @@>> lgetxattr(2)
 [[cp, decl_include("<hybrid/typecore.h>")]]
 ssize_t lgetxattr([[nonnull]] char const *path,
                   [[nonnull]] char const *name,
-                  [[outp(bufsize)]] void *buf,
+                  [[outp_opt(bufsize)]] void *buf,
                   size_t bufsize);
 
 @@>> fgetxattr(2)
 [[cp, decl_include("<bits/types.h>")]]
 ssize_t fgetxattr($fd_t fd,
                   [[nonnull]] char const *name,
-                  [[outp(bufsize)]] void *buf,
+                  [[outp_opt(bufsize)]] void *buf,
                   size_t bufsize);
 
 @@>> listxattr(2)
 [[cp, decl_include("<hybrid/typecore.h>")]]
 ssize_t listxattr([[nonnull]] char const *path,
-                  [[outp(listbufsize)]] char *listbuf,
+                  [[outp_opt(listbufsize)]] char *listbuf,
                   size_t listbufsize);
 
 @@>> llistxattr(2)
 [[cp, decl_include("<hybrid/typecore.h>")]]
 ssize_t llistxattr([[nonnull]] char const *path,
-                   [[outp(listbufsize)]] char *listbuf,
+                   [[outp_opt(listbufsize)]] char *listbuf,
                    size_t listbufsize);
 
 @@>> flistxattr(2)
 [[cp, decl_include("<bits/types.h>")]]
 ssize_t flistxattr($fd_t fd,
-                   [[outp(listbufsize)]] char *listbuf,
+                   [[outp_opt(listbufsize)]] char *listbuf,
                    size_t listbufsize);
 
 @@>> removexattr(2)

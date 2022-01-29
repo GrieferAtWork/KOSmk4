@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79db2bed */
+/* HASH CRC-32:0x5c28719a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,25 +32,25 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_setxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_setxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* >> lsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_lsetxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_lsetxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* >> fsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBDCALL libd_fsetxattr)(fd_t fd, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fsetxattr)(fd_t fd, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* >> getxattr(2) */
-INTDEF NONNULL((1, 2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_getxattr)(char const *path, char const *name, void *buf, size_t bufsize);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_getxattr)(char const *path, char const *name, void *buf, size_t bufsize);
 /* >> lgetxattr(2) */
-INTDEF NONNULL((1, 2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_lgetxattr)(char const *path, char const *name, void *buf, size_t bufsize);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_lgetxattr)(char const *path, char const *name, void *buf, size_t bufsize);
 /* >> fgetxattr(2) */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_fgetxattr)(fd_t fd, char const *name, void *buf, size_t bufsize);
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_fgetxattr)(fd_t fd, char const *name, void *buf, size_t bufsize);
 /* >> listxattr(2) */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_listxattr)(char const *path, char *listbuf, size_t listbufsize);
+INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBDCALL libd_listxattr)(char const *path, char *listbuf, size_t listbufsize);
 /* >> llistxattr(2) */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_llistxattr)(char const *path, char *listbuf, size_t listbufsize);
+INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBDCALL libd_llistxattr)(char const *path, char *listbuf, size_t listbufsize);
 /* >> flistxattr(2) */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_flistxattr)(fd_t fd, char *listbuf, size_t listbufsize);
+INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_flistxattr)(fd_t fd, char *listbuf, size_t listbufsize);
 /* >> removexattr(2) */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_removexattr)(char const *path, char const *name);
 /* >> lremovexattr(2) */
